@@ -13,6 +13,7 @@ export class Mordred extends Character {
 		merlin: 'unknown',
 		morgana: 'morgana',
 		oberon: 'unknown',
-		mordred: 'evil'
+		mordred: 'evil',
+		percival: 'unknown'
 	};
 }

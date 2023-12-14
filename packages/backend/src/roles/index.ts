@@ -14,6 +14,7 @@ import { Mordred } from '@/roles/evil/mordred';
  */
 import { Servant } from '@/roles/good/servant';
 import { Merlin } from '@/roles/good/merlin';
+import { Percival } from '@/roles/good/percival';
 
 
 const roles = {
@@ -22,7 +23,8 @@ const roles = {
 	merlin: Merlin,
 	morgana: Morgana,
 	oberon: Oberon,
-	mordred: Mordred
+	mordred: Mordred,
+	percival: Percival
 } as const;
 
 export default roles;
