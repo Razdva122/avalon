@@ -6,6 +6,8 @@ export * from '@/roles/abstract';
  */
 import { Minion } from '@/roles/evil/minion';
 import { Morgana } from '@/roles/evil/morgana';
+import { Oberon } from '@/roles/evil/oberon';
+import { Mordred } from '@/roles/evil/mordred';
 
 /**
  * Good roles
@@ -13,11 +15,14 @@ import { Morgana } from '@/roles/evil/morgana';
 import { Servant } from '@/roles/good/servant';
 import { Merlin } from '@/roles/good/merlin';
 
+
 const roles = {
 	minion: Minion,
 	servant: Servant,
 	merlin: Merlin,
-	morgana: Morgana
+	morgana: Morgana,
+	oberon: Oberon,
+	mordred: Mordred
 } as const;
 
 export default roles;

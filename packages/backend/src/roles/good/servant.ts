@@ -11,6 +11,8 @@ export class Servant extends Character {
 		servant: 'unknown',
 		minion: 'unknown',
 		merlin: 'unknown',
-		morgana: 'unknown'
+		morgana: 'unknown',
+		oberon: 'unknown',
+		mordred: 'unknown'
 	};
 }

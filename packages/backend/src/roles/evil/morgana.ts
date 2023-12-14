@@ -11,6 +11,8 @@ export class Morgana extends Character {
 		servant: 'unknown',
 		minion: 'evil',
 		merlin: 'unknown',
-		morgana: 'evil'
+		morgana: 'evil',
+		oberon: 'unknown',
+		mordred: 'mordred'
 	};
 }

@@ -6,7 +6,7 @@ export type TRoles = TOptionalRoles | TRequiredRoles;
 /**
  * Roles what can be added in game
  */
-export type TOptionalRoles = 'merlin' | 'morgana';
+export type TOptionalRoles = 'merlin' | 'morgana' | 'oberon' | 'mordred';
 
 /**
  * Roles what cant be deleted from game
