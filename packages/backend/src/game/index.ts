@@ -305,16 +305,24 @@ export class Game {
 	 */
 	protected finishMission(): void {
 		this.finishCurrentRound();
+		let needEndGame = false;
 
 		if (this.missions.filter((mission) => mission.data.result === 'fail').length === 3) {
 			this.winner = 'evil';
-			this.updateStage('end');
-			return;
+			needEndGame = true;
 		}
 
 		if (this.missions.filter((mission) => mission.data.result === 'success').length === 3) {
 			this.winner = 'good';
-			this.updateStage('end');
+			needEndGame = true;
+		}
+
+		if (needEndGame) {
+			if (this.updateStage('end') === false) {
+				return;
+			}
+
+			this.openRoles();
 			return;
 		}
 
@@ -360,5 +368,14 @@ export class Game {
 		}
 
 		return player;
+	}
+
+	/**
+	 * Opens the roles of the selected loyalty
+	 */
+	openRoles(loyalty?: TLoyalty): void {
+		this.players.forEach((player) => {
+			player.role.makeRolesVisible(loyalty);
+		});
 	}
 }

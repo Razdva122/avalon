@@ -1,5 +1,6 @@
 import type { TVisibility } from '@/roles/interface';
 import type { TRoles, TLoyalty, TMissionResult } from '@avalon/types';
+import { evilRoles, goodRoles } from '@/roles';
 
 export abstract class Character {
 	/**
@@ -31,5 +32,22 @@ export abstract class Character {
 		}
 
 		return ['fail', 'success'];
+	}
+
+	/**
+	 * Makes the roles visible, useful at the stages of the game when some of the roles are revealed
+	 */
+	makeRolesVisible(loyalty?: TLoyalty): void {
+		const makeRoleVisible = (roleName: TRoles) => {
+			this.visibility[roleName] = roleName;
+		};
+
+		if (loyalty !== 'evil') {
+			(<(keyof typeof goodRoles)[]>Object.keys(goodRoles)).forEach(makeRoleVisible);
+		}
+
+		if (loyalty !== 'good') {
+			(<(keyof typeof evilRoles)[]>Object.keys(evilRoles)).forEach(makeRoleVisible);
+		}
 	}
 }

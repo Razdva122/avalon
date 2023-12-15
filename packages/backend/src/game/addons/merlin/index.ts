@@ -22,6 +22,7 @@ export class MerlinAddon implements IGameAddon {
 		if (this.game.winner === 'good') {
 			this.game.winner = undefined;
 			this.game.updateStage('selectMerlin');
+			this.game.openRoles('evil');
 			return false;
 		}
 
@@ -37,6 +38,7 @@ export class MerlinAddon implements IGameAddon {
 		
 		// @ts-expect-error changing the stage directly to avoid loops
 		this.game._stage = 'end';
+		this.game.openRoles();
 
 		if (assassinate.assassinatePlayer(possibleMerlin) === 'hit') {
 			this.game.winner = 'evil';
