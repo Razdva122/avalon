@@ -7,16 +7,22 @@
 				v-for="n in 10" 
 				:style="{ 'transform': 'rotate(' + (360 / 10 * (n - 1) + 180) + 'deg)' }"
 			>
-				<img
-					class="player-frame" 
-					alt="frame" 
-					src="../assets/player-frame.png"
-					:style="{ 'transform': 'translate(-50%, -50%) rotate(-' + (360 / 10 * (n - 1) + 180) + 'deg)' }"
-				>
+				<Player :style="{ 'transform': 'translateY(-50%) rotate(-' + (360 / 10 * (n - 1) + 180) + 'deg)' }"/>
 			</div>
 		</div>
   </div>
 </template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import Player from '@/components/Player';
+
+export default defineComponent({
+  components: {
+    Player
+  }
+})
+</script>
 
 <style lang="scss">
 .board-container {
@@ -36,10 +42,5 @@
 	top: 0;
 	width: 600px;
 	height: 600px;
-}
-
-.player-frame {
-	position: absolute;
-	width: 115px;
 }
 </style>
