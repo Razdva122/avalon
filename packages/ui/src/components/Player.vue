@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import type { IPlayer } from '@avlaon/types';
+import type { IPlayer } from '@avalon/types';
 
 export default defineComponent({
   data() {

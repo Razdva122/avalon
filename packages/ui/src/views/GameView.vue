@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Player from '@/components/Player';
+import Player from '@/components/Player.vue';
 
 export default defineComponent({
   components: {
