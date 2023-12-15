@@ -18,7 +18,8 @@ export default defineComponent({
       player: {
         id: 'random-id',
         name: 'Dmitrii',
-        role: 'merlin'
+        role: 'merlin',
+				features: {}
       } as IPlayer
     }
   }

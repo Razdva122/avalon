@@ -3,7 +3,7 @@ import type { IGameAddon, MerlinAddon } from '@/game/addons';
 import type { Character } from '@/roles';
 import type { User } from '@/user';
 
-import type { IMissionSettings } from '@avalon/types';
+import type { IMissionSettings, IPlayerFeatures } from '@avalon/types';
 
 export type TGameStage = 'initialization' | 'votingForTeam' | 'onMission' | 'selectTeam' | 'selectMerlin' | 'end';
 
@@ -33,29 +33,7 @@ export interface IPlayerInGame {
 	 */
 	next: IPlayerInGame,
 
-	features: IPlayerFeatures & {
-		/**
-		 * True if player assassin
-		 */
-		isAssassin: boolean;
-	}
-}
-
-export interface IPlayerFeatures {
-	/**
-	 * The leader, collects the mission
-	 */
-	isLeader: boolean;
-
-	/**
-	 * Marked as a potential participant in the mission
-	 */
-	isSelected: boolean;
-
-	/**
-	 * Suggested by the leader to send on a mission
-	 */
-	isSent: boolean;
+	features: IPlayerFeatures
 }
 
 export type TAddonsArray = IGameAddon[];
