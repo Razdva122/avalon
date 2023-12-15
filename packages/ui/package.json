@@ -11,6 +11,7 @@
     "vue": "^3.3.11",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.2.5",
+    "vuetify": "^3.4.7",
     "vuex": "^4.1.0"
   },
   "devDependencies": {
