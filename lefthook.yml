@@ -1,0 +1,11 @@
+# EXAMPLE USAGE:
+#
+#   Refer for explanation to following link:
+#   https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
+
+
+pre-commit:
+  parallel: true
+  commands:
+    prettier:
+      run: npx prettier . --write
