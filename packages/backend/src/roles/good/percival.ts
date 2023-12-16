@@ -1,11 +1,11 @@
-import { Character } from '@/roles/abstract'
-import type { TVisibility } from '@/roles/interface'
-import type { TLoyalty, TRoles } from '@avalon/types'
+import { Character } from '@/roles/abstract';
+import type { TVisibility } from '@/roles/interface';
+import type { TLoyalty, TRoles } from '@avalon/types';
 
 export class Percival extends Character {
-  role: TRoles = 'percival'
-  selfRole: TRoles = 'percival'
-  loyalty: TLoyalty = 'good'
+  role: TRoles = 'percival';
+  selfRole: TRoles = 'percival';
+  loyalty: TLoyalty = 'good';
 
   visibility: TVisibility = {
     servant: 'unknown',
@@ -15,5 +15,5 @@ export class Percival extends Character {
     oberon: 'unknown',
     mordred: 'unknown',
     percival: 'unknown',
-  }
+  };
 }

@@ -6,8 +6,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import type { IPlayer } from '@avalon/types'
+import { defineComponent, PropType } from 'vue';
+import type { IPlayer } from '@avalon/types';
 
 export default defineComponent({
   props: {
@@ -16,7 +16,7 @@ export default defineComponent({
       required: true,
     },
   },
-})
+});
 </script>
 
 <style scoped lang="scss">

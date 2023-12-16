@@ -1,5 +1,5 @@
-import { Game } from '@/game'
-import { User } from '@/user'
+import { Game } from '@/game';
+import { User } from '@/user';
 
 const game = new Game(
   [
@@ -12,6 +12,6 @@ const game = new Game(
     new User('misha7', 'misha7'),
   ],
   { roles: { merlin: 1 } },
-)
+);
 
-console.log(game.players)
+console.log(game.players);

@@ -1,4 +1,4 @@
 /**
  * Possible vote option
  */
-export type TVoteOption = 'approve' | 'reject'
+export type TVoteOption = 'approve' | 'reject';

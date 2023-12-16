@@ -1,43 +1,43 @@
-import type { TLoyalty, TOptionalRoles } from '@avalon/types'
-import type { IGameAddon, MerlinAddon } from '@/game/addons'
-import type { Character } from '@/roles'
-import type { User } from '@/user'
+import type { TLoyalty, TOptionalRoles } from '@avalon/types';
+import type { IGameAddon, MerlinAddon } from '@/game/addons';
+import type { Character } from '@/roles';
+import type { User } from '@/user';
 
-import type { IMissionSettings, IPlayerFeatures } from '@avalon/types'
+import type { IMissionSettings, IPlayerFeatures } from '@avalon/types';
 
-export type TGameStage = 'initialization' | 'votingForTeam' | 'onMission' | 'selectTeam' | 'selectMerlin' | 'end'
+export type TGameStage = 'initialization' | 'votingForTeam' | 'onMission' | 'selectTeam' | 'selectMerlin' | 'end';
 
 export interface IPresetsForGame {
-  [key: number]: IGameSettings
+  [key: number]: IGameSettings;
 }
 
 export interface IGameSettings {
-  missions: IMissionSettings[]
+  missions: IMissionSettings[];
   players: {
-    [key in TLoyalty]: number
-  }
+    [key in TLoyalty]: number;
+  };
 }
 
 export interface IGameOptions {
   roles: {
-    [key in TOptionalRoles]?: number
-  }
+    [key in TOptionalRoles]?: number;
+  };
 }
 
 export interface IPlayerInGame {
-  user: User
-  role: Character
+  user: User;
+  role: Character;
 
   /**
    * Next player in game
    */
-  next: IPlayerInGame
+  next: IPlayerInGame;
 
-  features: IPlayerFeatures
+  features: IPlayerFeatures;
 }
 
-export type TAddonsArray = IGameAddon[]
+export type TAddonsArray = IGameAddon[];
 
 export interface IGameAddons extends TAddonsArray {
-  merlin?: MerlinAddon
+  merlin?: MerlinAddon;
 }

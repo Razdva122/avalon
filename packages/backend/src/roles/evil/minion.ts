@@ -1,11 +1,11 @@
-import { Character } from '@/roles/abstract'
-import type { TVisibility } from '@/roles/interface'
-import type { TLoyalty, TRoles } from '@avalon/types'
+import { Character } from '@/roles/abstract';
+import type { TVisibility } from '@/roles/interface';
+import type { TLoyalty, TRoles } from '@avalon/types';
 
 export class Minion extends Character {
-  role: TRoles = 'minion'
-  selfRole: TRoles = 'minion'
-  loyalty: TLoyalty = 'evil'
+  role: TRoles = 'minion';
+  selfRole: TRoles = 'minion';
+  loyalty: TLoyalty = 'evil';
 
   visibility: TVisibility = {
     servant: 'unknown',
@@ -15,5 +15,5 @@ export class Minion extends Character {
     oberon: 'unknown',
     mordred: 'mordred',
     percival: 'unknown',
-  }
+  };
 }

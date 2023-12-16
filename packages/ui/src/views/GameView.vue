@@ -11,25 +11,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import Player from '@/components/Player.vue'
-import { players } from '@/mocks/players'
+import { defineComponent } from 'vue';
+import Player from '@/components/Player.vue';
+import { players } from '@/mocks/players';
 
 export default defineComponent({
   data() {
     return {
       players: players,
-    }
+    };
   },
   components: {
     Player,
   },
   methods: {
     calculateRotate(i: number, negative: boolean = false): string {
-      return `rotate(${negative ? '-' : ''}${(360 / this.players.length) * i + 180}deg)`
+      return `rotate(${negative ? '-' : ''}${(360 / this.players.length) * i + 180}deg)`;
     },
   },
-})
+});
 </script>
 
 <style lang="scss">

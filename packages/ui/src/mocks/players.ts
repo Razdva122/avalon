@@ -1,4 +1,4 @@
-import type { IPlayer } from '@avalon/types'
+import type { IPlayer } from '@avalon/types';
 
 export const players: IPlayer[] = [
   {
@@ -43,4 +43,4 @@ export const players: IPlayer[] = [
     role: 'unknown',
     features: {},
   },
-]
+];

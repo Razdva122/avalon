@@ -1,6 +1,6 @@
-import type { IPresetsForGame } from '@/game/interface'
-import { TAddonsConstructor, MerlinAddon } from '@/game/addons'
-import { TRolesWithAddons } from '@/game/addons'
+import type { IPresetsForGame } from '@/game/interface';
+import { TAddonsConstructor, MerlinAddon } from '@/game/addons';
+import { TRolesWithAddons } from '@/game/addons';
 
 /**
  * Game settings with different number of players
@@ -84,11 +84,11 @@ export const gamesSettings: IPresetsForGame = {
       evil: 4,
     },
   },
-}
+};
 
 /**
  * Roles with addons for main game
  */
 export const rolesWithAddons: Record<TRolesWithAddons, TAddonsConstructor> = {
   merlin: MerlinAddon,
-}
+};

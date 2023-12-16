@@ -1,11 +1,11 @@
-import { Character } from '@/roles/abstract'
-import type { TVisibility } from '@/roles/interface'
-import type { TLoyalty, TRoles } from '@avalon/types'
+import { Character } from '@/roles/abstract';
+import type { TVisibility } from '@/roles/interface';
+import type { TLoyalty, TRoles } from '@avalon/types';
 
 export class Servant extends Character {
-  role: TRoles = 'servant'
-  selfRole: TRoles = 'servant'
-  loyalty: TLoyalty = 'good'
+  role: TRoles = 'servant';
+  selfRole: TRoles = 'servant';
+  loyalty: TLoyalty = 'good';
 
   visibility: TVisibility = {
     servant: 'unknown',
@@ -15,5 +15,5 @@ export class Servant extends Character {
     oberon: 'unknown',
     mordred: 'unknown',
     percival: 'percival',
-  }
+  };
 }
