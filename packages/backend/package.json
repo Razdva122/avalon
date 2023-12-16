@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint . --ext .ts",
     "test": "jest --detectOpenHandles --colors",
-		"start": "npx ts-node ./src/index.ts",
+    "start": "npx ts-node ./src/index.ts",
     "dev": "npx nodemon"
   },
   "keywords": [],

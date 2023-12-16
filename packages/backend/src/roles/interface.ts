@@ -1,5 +1,5 @@
-import type { TRoles, TVisibleRole } from "@avalon/types";
+import type { TRoles, TVisibleRole } from '@avalon/types'
 
 export type TVisibility = {
-	[key in TRoles]: TVisibleRole
-};
+  [key in TRoles]: TVisibleRole
+}
