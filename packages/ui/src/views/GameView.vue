@@ -4,10 +4,13 @@
 		<div class="board-container">
 			<img class="game-board" alt="board" src="../assets/board.jpeg">
 			<div class="player-container" 
-				v-for="n in 10" 
-				:style="{ 'transform': calculateRotate(n) }"
+				v-for="(player, i) in players" 
+				:style="{ 'transform': calculateRotate(i) }"
 			>
-				<Player :style="{ 'transform': 'translateY(-50%)' + calculateRotate(n, true) }"/>
+				<Player
+					:player = player
+					:style="{ 'transform': 'translateY(-50%) ' + calculateRotate(i, true) }"
+				/>
 			</div>
 		</div>
   </div>
@@ -16,14 +19,20 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Player from '@/components/Player.vue';
+import { players } from '@/mocks/players';
 
 export default defineComponent({
+	data() {
+		return {
+			players: players
+		}
+	},
   components: {
     Player
   },
 	methods: {
-    calculateRotate(n: number, negative: boolean = false): string {
-      return `rotate(${negative ? '-' : ''}${360 / 10 * (n - 1) + 180}deg)`;
+    calculateRotate(i: number, negative: boolean = false): string {
+      return `rotate(${negative ? '-' : ''}${360 / this.players.length * i + 180}deg)`;
     }
   }
 })
@@ -44,6 +53,8 @@ export default defineComponent({
 }
 
 .player-container {
+	display: flex;
+	justify-content: center;
 	position: absolute;
 	top: 0;
 	width: 600px;
