@@ -5,8 +5,6 @@ import type { User } from '@/user';
 
 import type { IMissionSettings, IPlayerFeatures } from '@avalon/types';
 
-export type TGameStage = 'initialization' | 'votingForTeam' | 'onMission' | 'selectTeam' | 'selectMerlin' | 'end';
-
 export interface IPresetsForGame {
   [key: number]: IGameSettings;
 }

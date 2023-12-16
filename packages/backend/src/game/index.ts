@@ -2,9 +2,9 @@ import * as _ from 'lodash';
 
 import type { User } from '@/user';
 
-import type { IGameSettings, IGameOptions, IPlayerInGame, TGameStage, IGameAddons } from '@/game/interface';
+import type { IGameSettings, IGameOptions, IPlayerInGame, IGameAddons } from '@/game/interface';
 
-import type { TMissionResult, TRoles, TLoyalty, TVoteOption } from '@avalon/types';
+import type { TMissionResult, TRoles, TLoyalty, TVoteOption, TGameStage } from '@avalon/types';
 
 import type { TAddonsConstructor, TAfterMethods, TBeforeMethods, TRolesWithAddons } from '@/game/addons';
 import { rolesWithAddons } from '@/game/const';

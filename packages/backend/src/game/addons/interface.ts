@@ -1,5 +1,5 @@
 import { Game } from '@/game';
-import type { TGameStage } from '@/game';
+import type { TGameStage } from '@avalon/types';
 
 export type TBeforeMethods = `before${Capitalize<TGameStage>}`;
 export type TAfterMethods = `after${Capitalize<TGameStage>}`;

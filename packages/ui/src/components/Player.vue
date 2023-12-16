@@ -1,6 +1,7 @@
 <template>
   <div class="player-container">
     <img class="player-frame" alt="frame" src="../assets/player-frame.png" />
+    <div class="player-icon" :class="{ 'player-active': player.features.waitForAction }"></div>
     <span class="player-name">{{ player.name }}</span>
   </div>
 </template>
@@ -38,5 +39,20 @@ export default defineComponent({
   background-image: url('../assets/name-frame.png');
   background-size: contain;
   color: white;
+}
+
+.player-icon {
+  position: absolute;
+  top: 8px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0);
+}
+
+.player-active {
+  border-color: rgba(173, 255, 47, 0.6);
 }
 </style>

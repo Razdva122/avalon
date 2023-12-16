@@ -3,6 +3,7 @@
     <h1>This is game page</h1>
     <div class="board-container">
       <img class="game-board" alt="board" src="../assets/board.jpeg" />
+      <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
       <div class="player-container" v-for="(player, i) in players" :style="{ transform: calculateRotate(i) }">
         <Player :player="player" :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }" />
       </div>
@@ -14,12 +15,28 @@
 import { defineComponent } from 'vue';
 import Player from '@/components/Player.vue';
 import { players } from '@/mocks/players';
+import type { TGameStage } from '@avalon/types';
 
 export default defineComponent({
   data() {
     return {
       players: players,
+      stage: 'selectMerlin' as TGameStage,
     };
+  },
+  computed: {
+    currentGameStage(): string {
+      const stages = {
+        initialization: 'The game is being initialized...',
+        selectTeam: 'The leader chooses the team.',
+        votingForTeam: 'The round table votes for the selected team.',
+        onMission: 'The selected team is on a mission.',
+        selectMerlin: "Mordred's minions are trying to figure out Merlin.",
+        end: 'The game is over.',
+      } as const;
+
+      return stages[this.stage];
+    },
   },
   components: {
     Player,
@@ -53,5 +70,13 @@ export default defineComponent({
   top: 0;
   width: 600px;
   height: 600px;
+}
+
+.game-stage {
+  position: absolute;
+  top: 20%;
+  width: 300px;
+  background-color: white;
+  font-size: 18px;
 }
 </style>

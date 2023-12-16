@@ -5,7 +5,9 @@ export const players: IPlayer[] = [
     id: '1',
     name: 'Dmitrii',
     role: 'merlin',
-    features: {},
+    features: {
+      waitForAction: true,
+    },
   },
   {
     id: '2',
@@ -23,7 +25,9 @@ export const players: IPlayer[] = [
     id: '4',
     name: 'John',
     role: 'oberon',
-    features: {},
+    features: {
+      waitForAction: true,
+    },
   },
   {
     id: '5',
@@ -35,7 +39,9 @@ export const players: IPlayer[] = [
     id: '6',
     name: 'Ivan',
     role: 'servant',
-    features: {},
+    features: {
+      waitForAction: true,
+    },
   },
   {
     id: '7',

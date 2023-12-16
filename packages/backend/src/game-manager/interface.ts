@@ -1,5 +1,5 @@
-import type { THistoryResults, IPlayer } from '@avalon/types';
-import type { IGameSettings, TGameStage } from '@/game';
+import type { THistoryResults, IPlayer, TGameStage } from '@avalon/types';
+import type { IGameSettings } from '@/game';
 
 export interface IVisualGameState {
   stage: TGameStage;
