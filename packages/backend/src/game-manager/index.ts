@@ -1,6 +1,7 @@
 import { Game, IGameOptions } from '@/game';
 import type { User } from '@/user';
 import type { TRoomState } from '@/game-manager/interface';
+import { TGameStage } from '@avalon/types';
 
 export * from '@/game-manager/interface';
 
@@ -27,19 +28,39 @@ export class GameManager {
           features: player.features,
         };
       }),
-      roles: this.game.players.reduce<TRoomState['roles']>((acc, el) => {
-        acc[el.user.id] = this.game.players.map((player) => {
-          if (player === el) {
-            return player.role.selfRole;
-          }
-
-          return el.role.visibility[player.role.role];
-        });
-        return acc;
-      }, {}),
-      publicRoles: this.game.players.map(() => 'unknown'),
+      ...this.calculatePlayersRoles(this.game.stage),
     };
   }
 
-  calculatePlayersState() {}
+  calculatePlayersRoles(newStage: TGameStage): Pick<TRoomState, 'publicRoles' | 'roles'> {
+    const overrideMethod = this.game.stageVisibilityChange[newStage];
+
+    const publicRoles = this.game.players.map((player) => {
+      const overrideRole = overrideMethod ? overrideMethod(newStage, player.role) : false;
+      return overrideRole ? player.role.role : 'unknown';
+    });
+
+    const roles = this.game.players.reduce<TRoomState['roles']>((acc, observer) => {
+      acc[observer.user.id] = this.game.players.map((target) => {
+        const overrideRole = overrideMethod ? overrideMethod(newStage, target.role) : false;
+
+        if (overrideRole) {
+          return target.role.role;
+        }
+
+        if (target === observer) {
+          return target.role.selfRole;
+        }
+
+        return observer.role.visibility[target.role.role];
+      });
+
+      return acc;
+    }, {});
+
+    return {
+      publicRoles,
+      roles,
+    };
+  }
 }
