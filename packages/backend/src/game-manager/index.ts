@@ -1,6 +1,6 @@
 import { Game, IGameOptions } from '@/game';
 import type { User } from '@/user';
-import type { TRoomState } from '@/game-manager/interface';
+import type { TRoomState, IVisualGameState } from '@/game-manager/interface';
 import { TGameStage } from '@avalon/types';
 
 export * from '@/game-manager/interface';
@@ -61,6 +61,17 @@ export class GameManager {
     return {
       publicRoles,
       roles,
+    };
+  }
+
+  prepareStateForUser(userId?: string): IVisualGameState {
+    const roles = userId && this.roomState.roles[userId] ? this.roomState.roles[userId] : this.roomState.publicRoles;
+
+    return {
+      stage: this.roomState.stage,
+      settings: this.roomState.settings,
+      history: this.roomState.history,
+      players: this.roomState.players.map((player, index) => ({ ...player, role: roles[index] })),
     };
   }
 }
