@@ -12,6 +12,7 @@ import { rolesWithAddons } from '@/game/const';
 import { Mission } from '@/game/history/mission';
 import { Vote } from '@/game/history/vote';
 import { HistoryElement } from '@/game/history';
+import { StateObserver } from '@/game/state-observer';
 
 import type { Character } from '@/roles';
 
@@ -60,6 +61,11 @@ export class Game {
   addons: IGameAddons;
 
   /**
+   * state game observer
+   */
+  stateObserver: StateObserver;
+
+  /**
    * Current leader
    */
   protected leader: IPlayerInGame;
@@ -92,10 +98,12 @@ export class Game {
     return true;
   }
 
-  constructor(users: User[], options: IGameOptions) {
+  constructor(users: User[], options: IGameOptions, stateObserver: StateObserver) {
     if (users.length < 5 || users.length > 10) {
       throw new Error(`Invalid players count. Players count: ${users.length}`);
     }
+
+    this.stateObserver = stateObserver;
 
     const settings = gamesSettings[users.length];
 
@@ -146,6 +154,7 @@ export class Game {
     }, []);
 
     this.updateStage('selectTeam');
+    this.stateObserver.gameStateChanged();
   }
 
   /**
@@ -158,7 +167,7 @@ export class Game {
   /**
    * Selected players for the current mission
    */
-  protected get selectedPlayers() {
+  get selectedPlayers() {
     return this.players.filter((player) => player.features.isSelected);
   }
 
@@ -264,6 +273,7 @@ export class Game {
     const selectedPlayer = this.findPlayerByID(playerID);
 
     selectedPlayer.features.isSelected = !selectedPlayer.features.isSelected;
+    this.stateObserver.gameStateChanged();
   }
 
   /**
@@ -285,6 +295,8 @@ export class Game {
     } else {
       this.updateStage('votingForTeam');
     }
+
+    this.stateObserver.gameStateChanged();
   }
 
   /**
@@ -334,6 +346,8 @@ export class Game {
     if (this.currentMission.makeAction(player, result)) {
       this.finishMission();
     }
+
+    this.stateObserver.gameStateChanged();
   }
 
   /**
@@ -350,6 +364,8 @@ export class Game {
         this.nextVote();
       }
     }
+
+    this.stateObserver.gameStateChanged();
   }
 
   /**

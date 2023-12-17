@@ -1,26 +1,15 @@
-import { User } from '@/user';
-import { Game, gamesSettings } from '@/game';
+import { gamesSettings } from '@/game';
 import { GameTestHelper } from '@/game/test/helpers';
 
-const users = [
-  new User('1', 'Misha'),
-  new User('2', 'John'),
-  new User('3', 'Dima'),
-  new User('4', 'Anna'),
-  new User('5', 'Alex'),
-  new User('6', 'Ivan'),
-  new User('7', 'Tom'),
-];
-
-let game = new Game(users, { roles: { merlin: 1 } });
-let gameHelper = new GameTestHelper(game);
+const options = [7, { roles: { merlin: 1 } }] as const;
+const gameHelper = new GameTestHelper(...options);
+const settings = gamesSettings[options[0]];
+let game = gameHelper.game;
 
 function generateNewGame() {
-  game = new Game(users, { roles: { merlin: 1 } });
-  gameHelper = new GameTestHelper(game);
+  gameHelper.restartGame(...options);
+  game = gameHelper.game;
 }
-
-const settings = gamesSettings[users.length];
 
 describe('Roles', () => {
   test('Game have merlin in players', () => {
@@ -232,5 +221,30 @@ describe('Features', () => {
     expect(game.vote.stage).toBe('finished');
     expect(game.vote.data.result).toBe('approve');
     expect(game.history.length).toBe(5);
+  });
+});
+
+describe('Game state', () => {
+  beforeEach(() => {
+    generateNewGame();
+  });
+
+  test('Select and unselect player should change game state', () => {
+    game.selectPlayer('1');
+    game.selectPlayer('1');
+    game.selectPlayer('1');
+
+    expect(gameHelper.observer.stateChangedNumber).toEqual(4);
+  });
+
+  test('1 mission game state changes', () => {
+    gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
+
+    const init = 1;
+    const selectPlayersAndSent = settings.missions[0].players + 1;
+    const votes = options[0];
+    const actions = settings.missions[0].players;
+
+    expect(gameHelper.observer.stateChangedNumber).toEqual(init + selectPlayersAndSent + votes + actions);
   });
 });

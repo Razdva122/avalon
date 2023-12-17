@@ -1,10 +1,40 @@
-import type { Game } from '@/game';
+import { Game, IGameOptions } from '@/game';
+import { User } from '@/user';
+import { StateObserver } from '@/game/state-observer';
+
+const users = [
+  new User('1', 'Misha'),
+  new User('2', 'John'),
+  new User('3', 'Dima'),
+  new User('4', 'Anna'),
+  new User('5', 'Alex'),
+  new User('6', 'Ivan'),
+  new User('7', 'Tom'),
+  new User('8', 'Jack'),
+  new User('9', 'Pavel'),
+  new User('10', 'Anna'),
+];
+
+class FakeObserver implements StateObserver {
+  stateChangedNumber: number = 0;
+
+  gameStateChanged(): void {
+    this.stateChangedNumber += 1;
+  }
+}
 
 export class GameTestHelper {
   game: Game;
+  observer: FakeObserver;
 
-  constructor(game: Game) {
-    this.game = game;
+  constructor(playersAmount: number, options: IGameOptions) {
+    this.observer = new FakeObserver();
+    this.game = new Game(users.slice(0, playersAmount), options, this.observer);
+  }
+
+  restartGame(playersAmount: number, options: IGameOptions) {
+    this.observer = new FakeObserver();
+    this.game = new Game(users.slice(0, playersAmount), options, this.observer);
   }
 
   selectPlayersOnMission(evil: number = 0): this {
@@ -60,7 +90,8 @@ export class GameTestHelper {
       return correctMerlin ? player.role.role === 'merlin' : player.role.role !== 'merlin';
     })!.user.id;
 
-    this.game.addons.merlin!.selectMerlin(id);
+    this.game.selectPlayer(id);
+    this.game.addons.merlin!.selectMerlin();
 
     return this;
   }
