@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import type { User } from '@/user';
 
-import type { IGameSettings, IGameOptions, IPlayerInGame, IGameAddons } from '@/game/interface';
+import type { IGameSettings, IGameOptions, IPlayerInGame, IGameAddons, IStateObserver } from '@/game/interface';
 
 import type { TMissionResult, TRoles, TLoyalty, TVoteOption, TGameStage } from '@avalon/types';
 
@@ -12,7 +12,6 @@ import { rolesWithAddons } from '@/game/const';
 import { Mission } from '@/game/history/mission';
 import { Vote } from '@/game/history/vote';
 import { HistoryElement } from '@/game/history';
-import { StateObserver } from '@/game/state-observer';
 
 import type { Character } from '@/roles';
 
@@ -63,7 +62,7 @@ export class Game {
   /**
    * state game observer
    */
-  stateObserver: StateObserver;
+  stateObserver: IStateObserver;
 
   /**
    * Current leader
@@ -98,7 +97,7 @@ export class Game {
     return true;
   }
 
-  constructor(users: User[], options: IGameOptions, stateObserver: StateObserver) {
+  constructor(users: User[], options: IGameOptions, stateObserver: IStateObserver) {
     if (users.length < 5 || users.length > 10) {
       throw new Error(`Invalid players count. Players count: ${users.length}`);
     }

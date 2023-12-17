@@ -234,7 +234,7 @@ describe('Game state', () => {
     game.selectPlayer('1');
     game.selectPlayer('1');
 
-    expect(gameHelper.observer.stateChangedNumber).toEqual(4);
+    expect(gameHelper.stateChangedNumber).toEqual(4);
   });
 
   test('1 mission game state changes', () => {
@@ -245,6 +245,6 @@ describe('Game state', () => {
     const votes = options[0];
     const actions = settings.missions[0].players;
 
-    expect(gameHelper.observer.stateChangedNumber).toEqual(init + selectPlayersAndSent + votes + actions);
+    expect(gameHelper.stateChangedNumber).toEqual(init + selectPlayersAndSent + votes + actions);
   });
 });

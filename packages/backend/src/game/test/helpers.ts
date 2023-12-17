@@ -1,6 +1,5 @@
 import { Game, IGameOptions } from '@/game';
 import { User } from '@/user';
-import { StateObserver } from '@/game/state-observer';
 
 const users = [
   new User('1', 'Misha'),
@@ -15,26 +14,21 @@ const users = [
   new User('10', 'Anna'),
 ];
 
-class FakeObserver implements StateObserver {
-  stateChangedNumber: number = 0;
-
-  gameStateChanged(): void {
-    this.stateChangedNumber += 1;
-  }
-}
-
 export class GameTestHelper {
   game: Game;
-  observer: FakeObserver;
+  stateChangedNumber: number = 0;
 
   constructor(playersAmount: number, options: IGameOptions) {
-    this.observer = new FakeObserver();
-    this.game = new Game(users.slice(0, playersAmount), options, this.observer);
+    this.game = new Game(users.slice(0, playersAmount), options, {
+      gameStateChanged: () => (this.stateChangedNumber += 1),
+    });
   }
 
   restartGame(playersAmount: number, options: IGameOptions) {
-    this.observer = new FakeObserver();
-    this.game = new Game(users.slice(0, playersAmount), options, this.observer);
+    this.stateChangedNumber = 0;
+    this.game = new Game(users.slice(0, playersAmount), options, {
+      gameStateChanged: () => (this.stateChangedNumber += 1),
+    });
   }
 
   selectPlayersOnMission(evil: number = 0): this {

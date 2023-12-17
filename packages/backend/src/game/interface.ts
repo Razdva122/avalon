@@ -39,3 +39,7 @@ export type TAddonsArray = IGameAddon[];
 export interface IGameAddons extends TAddonsArray {
   merlin?: MerlinAddon;
 }
+
+export interface IStateObserver {
+  gameStateChanged(): void;
+}
