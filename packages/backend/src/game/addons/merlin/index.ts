@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { IGameAddon } from '@/game/addons/interface';
 import { Assassinate } from '@/game/addons/merlin/assassinate';
 import { Game } from '@/game';
+import { TGameStage } from '@avalon/types';
 
 export class MerlinAddon implements IGameAddon {
   game: Game;
@@ -14,15 +15,20 @@ export class MerlinAddon implements IGameAddon {
   afterInitialization() {
     // Generate assassin
     _.sample(this.game.players.filter((player) => player.role.loyalty === 'evil'))!.features.isAssassin = true;
+    // On select merlin stage all minions are visible
+    this.game.stageVisibilityChange.selectMerlin = (_stage, role) => role.loyalty === 'evil';
 
     return true;
   }
 
-  beforeEnd() {
+  beforeEnd(prevStage: TGameStage) {
+    if (prevStage === 'selectMerlin') {
+      return true;
+    }
+
     if (this.game.winner === 'good') {
       this.game.winner = undefined;
       this.game.updateStage('selectMerlin');
-      this.game.openRoles('evil');
       this.game.stateObserver.gameStateChanged();
       return false;
     }
@@ -40,9 +46,7 @@ export class MerlinAddon implements IGameAddon {
 
     const assassinate = new Assassinate(this.game.players.find((player) => player.features.isAssassin)!);
 
-    // @ts-expect-error changing the stage directly to avoid loops
-    this.game._stage = 'end';
-    this.game.openRoles();
+    this.game.updateStage('end');
 
     if (assassinate.assassinatePlayer(this.game.selectedPlayers[0]) === 'hit') {
       this.game.winner = 'evil';

@@ -2,7 +2,14 @@ import * as _ from 'lodash';
 
 import type { User } from '@/user';
 
-import type { IGameSettings, IGameOptions, IPlayerInGame, IGameAddons, IStateObserver } from '@/game/interface';
+import type {
+  IGameSettings,
+  IGameOptions,
+  IPlayerInGame,
+  IGameAddons,
+  IStateObserver,
+  TStageVisibilityChange,
+} from '@/game/interface';
 
 import type { TMissionResult, TRoles, TLoyalty, TVoteOption, TGameStage } from '@avalon/types';
 
@@ -60,9 +67,21 @@ export class Game {
   addons: IGameAddons;
 
   /**
-   * state game observer
+   * State game observer
    */
   stateObserver: IStateObserver;
+
+  /**
+   * Game settings
+   */
+  settings: IGameSettings;
+
+  /**
+   * On some stages of the game, the visibility of the roles may change
+   */
+  stageVisibilityChange: TStageVisibilityChange = {
+    end: () => true,
+  };
 
   /**
    * Current leader
@@ -104,10 +123,10 @@ export class Game {
 
     this.stateObserver = stateObserver;
 
-    const settings = gamesSettings[users.length];
+    this.settings = gamesSettings[users.length];
 
     // Generates roles and give to players
-    const gameRoles = this.generateRolesForGame(settings, options);
+    const gameRoles = this.generateRolesForGame(this.settings, options);
 
     const players = users.map((user, index) => ({
       user,
@@ -133,7 +152,7 @@ export class Game {
     this.leader.features.isLeader = true;
 
     // Generate missions
-    this.missions = settings.missions.map((el, index) => {
+    this.missions = this.settings.missions.map((el, index) => {
       return new Mission(index === 0 ? 'active' : 'inactive', el);
     });
 
@@ -153,7 +172,6 @@ export class Game {
     }, []);
 
     this.updateStage('selectTeam');
-    this.stateObserver.gameStateChanged();
   }
 
   /**
@@ -325,11 +343,7 @@ export class Game {
     }
 
     if (needEndGame) {
-      if (this.updateStage('end') === false) {
-        return;
-      }
-
-      this.openRoles();
+      this.updateStage('end');
       return;
     }
 
@@ -379,14 +393,5 @@ export class Game {
     }
 
     return player;
-  }
-
-  /**
-   * Opens the roles of the selected loyalty
-   */
-  openRoles(loyalty?: TLoyalty): void {
-    this.players.forEach((player) => {
-      player.role.makeRolesVisible(loyalty);
-    });
   }
 }

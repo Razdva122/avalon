@@ -15,13 +15,11 @@ const users = [
 ];
 
 export class GameTestHelper {
-  game: Game;
+  game!: Game;
   stateChangedNumber: number = 0;
 
   constructor(playersAmount: number, options: IGameOptions) {
-    this.game = new Game(users.slice(0, playersAmount), options, {
-      gameStateChanged: () => (this.stateChangedNumber += 1),
-    });
+    this.restartGame(playersAmount, options);
   }
 
   restartGame(playersAmount: number, options: IGameOptions) {

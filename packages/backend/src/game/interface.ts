@@ -1,4 +1,4 @@
-import type { TLoyalty, TOptionalRoles } from '@avalon/types';
+import type { TGameStage, TLoyalty, TOptionalRoles } from '@avalon/types';
 import type { IGameAddon, MerlinAddon } from '@/game/addons';
 import type { Character } from '@/roles';
 import type { User } from '@/user';
@@ -43,3 +43,7 @@ export interface IGameAddons extends TAddonsArray {
 export interface IStateObserver {
   gameStateChanged(): void;
 }
+
+export type TStageVisibilityChange = {
+  [key in TGameStage]?: (stage: key, role: Character) => boolean;
+};
