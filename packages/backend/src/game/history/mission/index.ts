@@ -84,4 +84,24 @@ export class Mission implements HistoryElement<'mission'> {
 
     return false;
   }
+
+  dataForManager(options: { withResult?: boolean }) {
+    return {
+      type: this.type,
+      result: this.data.result!,
+      settings: this.data.settings,
+      leaderID: this.data.leader!.user.id,
+      fails: this.data.fails!,
+      actions: this.data.actions.map((action) => {
+        if (options.withResult) {
+          return {
+            playerID: action.player.user.id,
+            value: action.value,
+          };
+        }
+
+        return { playerID: action.player.user.id };
+      }),
+    };
+  }
 }

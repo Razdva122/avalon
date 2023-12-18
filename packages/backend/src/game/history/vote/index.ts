@@ -59,4 +59,17 @@ export class Vote implements HistoryElement<'vote'> {
 
     return false;
   }
+
+  dataForManager() {
+    return {
+      type: this.type,
+      result: this.data.result!,
+      leaderID: this.data.leader.user.id,
+      votes: this.data.votes.map((el) => ({
+        playerID: el.player.user.id,
+        onMission: el.onMission,
+        value: <TVoteOption>el.value,
+      })),
+    };
+  }
 }

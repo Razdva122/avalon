@@ -34,6 +34,7 @@ export type THistoryVote = {
  * History mission data
  */
 export type THistoryMission = {
+  type: 'mission';
   result: TMissionResult;
   settings: IMissionSettings;
   leaderID: string;
@@ -45,6 +46,7 @@ export type THistoryMission = {
  * History assassinate data
  */
 export type THistoryAssassinate = {
+  type: 'assassinate';
   result: TAssassinateResult;
   assassinID: string;
   killed: string;

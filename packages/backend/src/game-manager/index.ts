@@ -20,7 +20,6 @@ export class GameManager {
   initRoomState(): void {
     this.roomState = {
       stage: this.game.stage,
-      history: [],
       settings: this.game.settings,
       players: this.game.players.map((player) => {
         return {
@@ -29,6 +28,7 @@ export class GameManager {
           features: player.features,
         };
       }),
+      history: this.prepareHistoryForView(),
       ...this.calculatePlayersRoles(this.game.stage),
     };
   }
@@ -56,6 +56,8 @@ export class GameManager {
         features: player.features,
       };
     });
+
+    this.roomState.history = this.prepareHistoryForView();
   }
 
   /**
@@ -93,6 +95,19 @@ export class GameManager {
       publicRoles,
       roles,
     };
+  }
+
+  /**
+   * Transforms the history data into a format for display
+   */
+  prepareHistoryForView() {
+    return this.game.history.map((el) => {
+      if (el.type === 'mission' && this.game.stage === 'end') {
+        return el.dataForManager({ withResult: true });
+      }
+
+      return el.dataForManager({});
+    });
   }
 
   /**

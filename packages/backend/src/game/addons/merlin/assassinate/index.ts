@@ -23,4 +23,13 @@ export class Assassinate implements HistoryElement<'assassinate'> {
 
     return result;
   }
+
+  dataForManager() {
+    return {
+      type: this.type,
+      result: this.data.result!,
+      assassinID: this.data.assassin.user.id,
+      killed: this.data.killed!.user.id,
+    };
+  }
 }
