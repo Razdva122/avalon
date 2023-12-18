@@ -6,6 +6,9 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "start": "npm run build --workspace=packages/ui && npm run start --workspace=packages/backend"
+  },
   "dependencies": {
     "lodash": "^4.17.21",
     "typescript": "^5.3.3"
