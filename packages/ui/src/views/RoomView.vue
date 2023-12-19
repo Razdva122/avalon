@@ -1,5 +1,5 @@
 <template>
-  <div class="game">
+  <div class="room">
     <h1>This is game page</h1>
     <div class="board-container">
       <img class="game-board" alt="board" src="../assets/board.jpeg" />

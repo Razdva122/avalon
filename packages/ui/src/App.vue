@@ -1,10 +1,15 @@
 <template>
   <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/game">Game</router-link>
+    <router-link to="/">Lobby</router-link> |
+    <router-link to="/room/1">Room</router-link>
   </nav>
   <router-view />
 </template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+export default defineComponent({});
+</script>
 
 <style lang="scss">
 #app {

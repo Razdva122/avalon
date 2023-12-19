@@ -2,6 +2,7 @@ import express from 'express';
 import { createServer } from 'node:http';
 import { join } from 'node:path';
 import { Server } from 'socket.io';
+import crypto from 'crypto';
 
 const app = express();
 const server = createServer(app);
@@ -12,6 +13,14 @@ app.use(express.static(dirPath));
 
 app.get('/', function (req, res) {
   res.sendFile(dirPath + 'index.html');
+});
+
+app.get('/room', function (req, res) {
+  res.sendFile(dirPath + 'index.html');
+});
+
+app.get('/api/create_room', function (req, res) {
+  res.send(crypto.randomUUID());
 });
 
 io.on('connection', (socket) => {
