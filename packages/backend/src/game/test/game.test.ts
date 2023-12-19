@@ -1,38 +1,13 @@
-import { gamesSettings } from '@/game';
-import { GameTestHelper } from '@/game/test/helpers';
+import { generateNewGame, settings } from '@/game/test/const';
 
-const options = [7, { roles: { merlin: 1 } }] as const;
-const gameHelper = new GameTestHelper(...options);
-const settings = gamesSettings[options[0]];
-let game = gameHelper.game;
-
-function generateNewGame() {
-  gameHelper.restartGame(...options);
-  game = gameHelper.game;
-}
-
-describe('Roles', () => {
-  test('Game have merlin in players', () => {
-    expect(game.players.some((player) => player.role.role === 'merlin')).toBe(true);
-  });
-
-  test('Game have valid amount of player in both teams', () => {
-    const loyalty = game.players.reduce(
-      (acc, el) => {
-        acc[el.role.loyalty] += 1;
-        return acc;
-      },
-      { evil: 0, good: 0 },
-    );
-
-    expect(loyalty).toEqual(settings.players);
-  });
-});
+let { game, gameHelper } = generateNewGame();
 
 describe('Gameplay', () => {
   describe('3-1 goods win', () => {
     beforeAll(() => {
-      generateNewGame();
+      const restart = generateNewGame();
+      game = restart.game;
+      gameHelper = restart.gameHelper;
     });
 
     describe('First round', () => {
@@ -148,7 +123,9 @@ describe('Gameplay', () => {
 
   describe('2-3 evil win', () => {
     beforeAll(() => {
-      generateNewGame();
+      const restart = generateNewGame();
+      game = restart.game;
+      gameHelper = restart.gameHelper;
     });
 
     test('First mission: Fail mission', () => {
@@ -192,58 +169,5 @@ describe('Gameplay', () => {
       expect(game.winner).toBe('evil');
       expect(game.stage).toBe('end');
     });
-  });
-});
-
-describe('Features', () => {
-  beforeEach(() => {
-    generateNewGame();
-  });
-
-  test('Fifth vote should be forced', () => {
-    gameHelper
-      .selectPlayersOnMission()
-      .sentSelectedPlayers()
-      .makeVotes(game.players.length)
-      .selectPlayersOnMission()
-      .sentSelectedPlayers()
-      .makeVotes(game.players.length)
-      .selectPlayersOnMission()
-      .sentSelectedPlayers()
-      .makeVotes(game.players.length)
-      .selectPlayersOnMission()
-      .sentSelectedPlayers()
-      .makeVotes(game.players.length)
-      .selectPlayersOnMission()
-      .sentSelectedPlayers();
-
-    expect(game.stage).toBe('onMission');
-    expect(game.vote.stage).toBe('finished');
-    expect(game.vote.data.result).toBe('approve');
-    expect(game.history.length).toBe(5);
-  });
-});
-
-describe('Game state', () => {
-  beforeEach(() => {
-    generateNewGame();
-  });
-
-  test('Select and unselect player should change game state', () => {
-    game.selectPlayer('1');
-    game.selectPlayer('1');
-    game.selectPlayer('1');
-
-    expect(gameHelper.stateChangedNumber).toEqual(3);
-  });
-
-  test('1 mission game state changes', () => {
-    gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
-
-    const selectPlayersAndSent = settings.missions[0].players + 1;
-    const votes = options[0];
-    const actions = settings.missions[0].players;
-
-    expect(gameHelper.stateChangedNumber).toEqual(selectPlayersAndSent + votes + actions);
   });
 });

@@ -86,7 +86,7 @@ export class Game {
   /**
    * Current leader
    */
-  protected leader: IPlayerInGame;
+  leader: IPlayerInGame;
 
   private _stage: TGameStage = 'initialization';
 
@@ -150,6 +150,7 @@ export class Game {
 
     this.leader = _.sample(playersWithNext)!;
     this.leader.features.isLeader = true;
+    this.leader.features.waitForAction = true;
 
     // Generate missions
     this.missions = this.settings.missions.map((el, index) => {
@@ -235,6 +236,7 @@ export class Game {
     this.leader.features.isLeader = false;
     this.leader = this.leader.next;
     this.leader.features.isLeader = true;
+    this.leader.features.waitForAction = true;
   }
 
   /**
@@ -252,7 +254,6 @@ export class Game {
    */
   protected finishCurrentRound(): void {
     this.clearSelectedAndSendPlayers();
-    this.moveLeader();
     this.history.push(this.currentMission);
   }
 
@@ -272,6 +273,7 @@ export class Game {
    */
   protected nextVote(reset?: true): void {
     this.clearSelectedAndSendPlayers();
+    this.moveLeader();
 
     if (reset) {
       this.turn = 0;
@@ -307,10 +309,16 @@ export class Game {
       player.features.isSent = true;
     });
 
+    this.leader.features.waitForAction = false;
+
     if (this.turn === 4) {
       this.startMission();
     } else {
       this.updateStage('votingForTeam');
+
+      this.players.forEach((player) => {
+        player.features.waitForAction = true;
+      });
     }
 
     this.stateObserver.gameStateChanged();
@@ -323,6 +331,10 @@ export class Game {
     this.history.push(this.vote);
     this.currentMission.startMission(this.sentPlayers, this.leader);
     this.updateStage('onMission');
+
+    this.sentPlayers.forEach((player) => {
+      player.features.waitForAction = true;
+    });
   }
 
   /**
@@ -355,6 +367,7 @@ export class Game {
    */
   actionOnMission(playerID: string, result: TMissionResult): void {
     const player = this.findPlayerByID(playerID);
+    player.features.waitForAction = false;
 
     if (this.currentMission.makeAction(player, result)) {
       this.finishMission();
@@ -368,6 +381,7 @@ export class Game {
    */
   voteForMission(playerID: string, option: TVoteOption): void {
     const player = this.findPlayerByID(playerID);
+    player.features.waitForAction = false;
 
     if (this.vote.makeVote(player, option)) {
       if (this.vote.data.result === 'approve') {

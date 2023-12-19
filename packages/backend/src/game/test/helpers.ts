@@ -48,11 +48,13 @@ export class GameTestHelper {
 
   makeVotes(rejects: number = 0): this {
     this.game.players.forEach((player) => {
-      if (rejects > 0) {
-        rejects -= 1;
-        this.game.voteForMission(player.user.id, 'reject');
-      } else {
-        this.game.voteForMission(player.user.id, 'approve');
+      if (player.features.waitForAction) {
+        if (rejects > 0) {
+          rejects -= 1;
+          this.game.voteForMission(player.user.id, 'reject');
+        } else {
+          this.game.voteForMission(player.user.id, 'approve');
+        }
       }
     });
 
@@ -61,11 +63,13 @@ export class GameTestHelper {
 
   makeActions(fails: number = 0): this {
     this.game.currentMission.data.actions.forEach((action) => {
-      if (action.player.role.loyalty === 'evil' && fails > 0) {
-        this.game.actionOnMission(action.player.user.id, 'fail');
-        fails -= 1;
-      } else {
-        this.game.actionOnMission(action.player.user.id, 'success');
+      if (action.player.features.waitForAction) {
+        if (action.player.role.loyalty === 'evil' && fails > 0) {
+          this.game.actionOnMission(action.player.user.id, 'fail');
+          fails -= 1;
+        } else {
+          this.game.actionOnMission(action.player.user.id, 'success');
+        }
       }
     });
 

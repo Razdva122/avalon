@@ -14,6 +14,7 @@ export interface IGameSettings {
   players: {
     [key in TLoyalty]: number;
   };
+  total: number;
 }
 
 export interface IGameOptions {

@@ -4,9 +4,7 @@ export interface IPlayer {
   id: string;
   name: string;
   role: TVisibleRole;
-  features: IPlayerFeatures & {
-    waitForAction?: boolean;
-  };
+  features: IPlayerFeatures;
 }
 
 export interface IPlayerFeatures {
@@ -29,4 +27,9 @@ export interface IPlayerFeatures {
    * True if player assassin
    */
   isAssassin?: boolean;
+
+  /**
+   * True if the player has to do some action
+   */
+  waitForAction?: boolean;
 }

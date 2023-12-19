@@ -18,6 +18,7 @@ export const gamesSettings: IPresetsForGame = {
       good: 3,
       evil: 2,
     },
+    total: 5,
   },
   6: {
     missions: [
@@ -31,6 +32,7 @@ export const gamesSettings: IPresetsForGame = {
       good: 3,
       evil: 3,
     },
+    total: 6,
   },
   7: {
     missions: [
@@ -44,6 +46,7 @@ export const gamesSettings: IPresetsForGame = {
       good: 4,
       evil: 3,
     },
+    total: 7,
   },
   8: {
     missions: [
@@ -57,6 +60,7 @@ export const gamesSettings: IPresetsForGame = {
       good: 5,
       evil: 3,
     },
+    total: 8,
   },
   9: {
     missions: [
@@ -70,6 +74,7 @@ export const gamesSettings: IPresetsForGame = {
       good: 6,
       evil: 3,
     },
+    total: 9,
   },
   10: {
     missions: [
@@ -83,6 +88,7 @@ export const gamesSettings: IPresetsForGame = {
       good: 6,
       evil: 4,
     },
+    total: 10,
   },
 };
 
