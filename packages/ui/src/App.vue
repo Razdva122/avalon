@@ -4,43 +4,20 @@
     <router-link to="/room/1">Room</router-link>
   </nav>
   <router-view />
-  <v-overlay v-model="isUserNotExist" class="align-center justify-center">
-    <v-card>
-      <v-sheet width="300" class="mx-auto pa-4">
-        <v-form @submit.prevent="createUser" class="d-flex flex-column align-center justify-center">
-          <span class="mb-2">Select your username for game</span>
-          <v-text-field v-model="username" :rules="rules" label="Username" class="w-100 mb-2"></v-text-field>
-          <v-btn type="submit" rounded="lg" variants="tonal">Submit</v-btn>
-        </v-form>
-      </v-sheet>
-    </v-card>
-  </v-overlay>
+  <registration v-if="!isUserExist" />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-export default defineComponent({
-  data() {
-    return {
-      overlay: true,
-      username: '',
-      rules: [
-        (value: string | undefined) => {
-          if (value) return true;
+import Registration from '@/components/Registration.vue';
 
-          return 'You must enter a username.';
-        },
-      ],
-    };
+export default defineComponent({
+  components: {
+    Registration,
   },
   computed: {
-    isUserNotExist() {
-      return !this.$store.state.user;
-    },
-  },
-  methods: {
-    createUser() {
-      this.$store.commit('setUserData', { id: crypto.randomUUID(), username: this.username });
+    isUserExist() {
+      return this.$store.state.user;
     },
   },
 });

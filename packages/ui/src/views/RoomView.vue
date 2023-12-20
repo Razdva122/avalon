@@ -5,7 +5,7 @@
       <img class="game-board" alt="board" src="../assets/board.jpeg" />
       <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
       <div class="player-container" v-for="(player, i) in players" :style="{ transform: calculateRotate(i) }">
-        <Player :player="player" :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }" />
+        <player :player="player" :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }" />
       </div>
     </div>
   </div>
