@@ -5,6 +5,11 @@ import { Server } from 'socket.io';
 import crypto from 'crypto';
 import CookieParser from 'cookie-parser';
 
+import { Manager } from '@/main';
+import { User } from '@/user';
+
+const manager = new Manager();
+
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
@@ -22,9 +27,13 @@ app.get('/room/*', function (req, res) {
 });
 
 app.get('/api/create_room', function (req, res) {
-  console.log(req.cookies);
   const uuid = crypto.randomUUID();
+  manager.createRoom(uuid, new User(req.cookies['user_id'], req.cookies['user_name']));
   res.send(uuid);
+});
+
+app.get('/api/check_room/:uuid', function (req, res) {
+  res.send(manager.isRoomExist(req.params.uuid));
 });
 
 io.on('connection', (socket) => {

@@ -1,16 +1,16 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import LobbyView from '@/views/LobbyView.vue';
+import Lobby from '@/pages/lobby/Lobby.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'lobby',
-    component: LobbyView,
+    component: Lobby,
   },
   {
     path: '/room/:id',
     name: 'room',
-    component: () => import('@/views/RoomView.vue'),
+    component: () => import('@/pages/room/Room.vue'),
   },
 ];
 

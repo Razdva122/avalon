@@ -2,7 +2,7 @@
   <div class="room">
     <h1>This is game page</h1>
     <div class="board-container">
-      <img class="game-board" alt="board" src="../assets/board.jpeg" />
+      <img class="game-board" alt="board" src="../../assets/board.jpeg" />
       <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
       <div class="player-container" v-for="(player, i) in players" :style="{ transform: calculateRotate(i) }">
         <player :player="player" :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }" />
@@ -13,20 +13,27 @@
 
 <script lang="ts">
 import '@/socket';
-import { defineComponent } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import Player from '@/components/Player.vue';
-import { players } from '@/mocks/players';
+import { players as playersMock } from '@/mocks/players';
 import type { TGameStage } from '@avalon/types';
 
 export default defineComponent({
-  data() {
-    return {
-      players: players,
-      stage: 'selectMerlin' as TGameStage,
-    };
+  name: 'Room',
+  components: {
+    Player,
   },
-  computed: {
-    currentGameStage(): string {
+  props: {
+    id: {
+      required: true,
+      type: String,
+    },
+  },
+  setup(props) {
+    const players = ref(playersMock);
+    const stage = ref<TGameStage>('selectMerlin');
+
+    const currentGameStage = computed(() => {
       const stages = {
         initialization: 'The game is being initialized...',
         selectTeam: 'The leader chooses the team.',
@@ -36,16 +43,14 @@ export default defineComponent({
         end: 'The game is over.',
       } as const;
 
-      return stages[this.stage];
-    },
-  },
-  components: {
-    Player,
-  },
-  methods: {
-    calculateRotate(i: number, negative: boolean = false): string {
-      return `rotate(${negative ? '-' : ''}${(360 / this.players.length) * i + 180}deg)`;
-    },
+      return stages[stage.value];
+    });
+
+    const calculateRotate = (i: number, negative: boolean = false) => {
+      return `rotate(${negative ? '-' : ''}${(360 / players.value.length) * i + 180}deg)`;
+    };
+
+    return { players, stage, currentGameStage, calculateRotate };
   },
 });
 </script>

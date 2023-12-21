@@ -2,7 +2,19 @@
   <nav>
     <router-link to="/">Lobby</router-link>
   </nav>
-  <router-view />
+  <RouterView v-slot="{ Component }">
+    <template v-if="Component">
+      <Transition mode="out-in">
+        <KeepAlive>
+          <Suspense>
+            <component :is="Component"></component>
+
+            <template #fallback> Loading... </template>
+          </Suspense>
+        </KeepAlive>
+      </Transition>
+    </template>
+  </RouterView>
   <registration v-if="!isUserExist" />
 </template>
 
