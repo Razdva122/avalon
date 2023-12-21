@@ -1,13 +1,19 @@
 <template>
   <div class="room">
-    <h1>This is game page</h1>
-    <div class="board-container">
-      <img class="game-board" alt="board" src="../../assets/board.jpeg" />
-      <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
-      <div class="player-container" v-for="(player, i) in players" :style="{ transform: calculateRotate(i) }">
-        <player :player="player" :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }" />
+    <template v-if="!isValidUuid">
+      <h1>This is wrong uuid</h1>
+    </template>
+
+    <template v-else>
+      <h1>This is game page</h1>
+      <div class="board-container">
+        <img class="game-board" alt="board" src="../../assets/board.jpeg" />
+        <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
+        <div class="player-container" v-for="(player, i) in players" :style="{ transform: calculateRotate(i) }">
+          <player :player="player" :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }" />
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -17,6 +23,7 @@ import { defineComponent, ref, computed } from 'vue';
 import Player from '@/components/Player.vue';
 import { players as playersMock } from '@/mocks/players';
 import type { TGameStage } from '@avalon/types';
+import axios from 'axios';
 
 export default defineComponent({
   name: 'Room',
@@ -24,14 +31,18 @@ export default defineComponent({
     Player,
   },
   props: {
-    id: {
+    uuid: {
       required: true,
       type: String,
     },
   },
-  setup(props) {
+  async setup(props) {
     const players = ref(playersMock);
     const stage = ref<TGameStage>('selectMerlin');
+
+    const data = (await axios.get<boolean>(`http://localhost:3000/api/check_room/${props.uuid}`)).data;
+
+    const isValidUuid = ref<boolean>(data);
 
     const currentGameStage = computed(() => {
       const stages = {
@@ -50,7 +61,7 @@ export default defineComponent({
       return `rotate(${negative ? '-' : ''}${(360 / players.value.length) * i + 180}deg)`;
     };
 
-    return { players, stage, currentGameStage, calculateRotate };
+    return { players, stage, currentGameStage, calculateRotate, isValidUuid };
   },
 });
 </script>

@@ -12,7 +12,7 @@ export default defineComponent({
   methods: {
     async createRoom(): Promise<void> {
       const data = (await axios.get<string>('http://localhost:3000/api/create_room')).data;
-      this.$router.push({ name: 'room', params: { id: data } });
+      this.$router.push({ name: 'room', params: { uuid: data } });
     },
   },
 });

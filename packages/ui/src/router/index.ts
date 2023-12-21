@@ -8,7 +8,8 @@ const routes: Array<RouteRecordRaw> = [
     component: Lobby,
   },
   {
-    path: '/room/:id',
+    path: '/room/:uuid',
+    props: true,
     name: 'room',
     component: () => import('@/pages/room/Room.vue'),
   },
