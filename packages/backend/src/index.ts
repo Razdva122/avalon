@@ -3,12 +3,14 @@ import { createServer } from 'node:http';
 import { join } from 'node:path';
 import { Server } from 'socket.io';
 import crypto from 'crypto';
+import CookieParser from 'cookie-parser';
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
 const dirPath = join(__dirname, '../..', 'ui/dist/');
 
+app.use(CookieParser());
 app.use(express.static(dirPath));
 
 app.get('/', function (req, res) {
@@ -20,7 +22,9 @@ app.get('/room/*', function (req, res) {
 });
 
 app.get('/api/create_room', function (req, res) {
-  res.send(crypto.randomUUID());
+  console.log(req.cookies);
+  const uuid = crypto.randomUUID();
+  res.send(uuid);
 });
 
 io.on('connection', (socket) => {
