@@ -9,6 +9,7 @@
   "dependencies": {
     "axios": "^1.6.2",
     "core-js": "^3.34.0",
+    "js-cookie": "^3.0.5",
     "socket.io-client": "^4.7.2",
     "vue": "^3.3.11",
     "vue-router": "^4.2.5",
@@ -16,6 +17,7 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-plugin-typescript": "~5.0.0",

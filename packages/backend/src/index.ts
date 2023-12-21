@@ -15,7 +15,7 @@ app.get('/', function (req, res) {
   res.sendFile(dirPath + 'index.html');
 });
 
-app.get('/room', function (req, res) {
+app.get('/room/*', function (req, res) {
   res.sendFile(dirPath + 'index.html');
 });
 
@@ -24,7 +24,7 @@ app.get('/api/create_room', function (req, res) {
 });
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  console.log('a user connected', socket.handshake.headers.cookie);
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });

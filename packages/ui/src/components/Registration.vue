@@ -31,7 +31,7 @@ export default defineComponent({
   },
   methods: {
     createUser() {
-      this.$store.commit('setUserData', { id: crypto.randomUUID(), username: this.username });
+      this.$store.commit('setUserData', { id: crypto.randomUUID(), name: this.username });
     },
   },
 });

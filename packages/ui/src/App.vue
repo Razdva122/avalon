@@ -1,7 +1,6 @@
 <template>
   <nav>
-    <router-link to="/">Lobby</router-link> |
-    <router-link to="/room/1">Room</router-link>
+    <router-link to="/">Lobby</router-link>
   </nav>
   <router-view />
   <registration v-if="!isUserExist" />

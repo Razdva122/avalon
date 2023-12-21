@@ -1,17 +1,13 @@
-import axios from 'axios';
 import { InjectionKey } from 'vue';
 import { createStore, Store, useStore as baseUseStore } from 'vuex';
 
+import { updateUserData, clearUserData } from '@/store/persistent';
+
 import { userStoragePath } from '@/store/const';
 
-export interface IState {
-  user: IUser | null;
-}
+import type { IState, IUser } from '@/store/interface';
 
-export interface IUser {
-  id: string;
-  name: string;
-}
+export * from '@/store/interface';
 
 export const key: InjectionKey<Store<IState>> = Symbol();
 
@@ -25,17 +21,19 @@ export const store = createStore<IState>({
   mutations: {
     setUserData(state: IState, user: IUser) {
       state.user = user;
-      localStorage.setItem(userStoragePath, JSON.stringify(user));
-      axios.defaults.headers.common.Authorization = `${user.id}`;
+      updateUserData(user);
     },
 
     updateUserName(state: IState, name: string) {
-      state.user!.name = name;
-      localStorage.setItem(userStoragePath, JSON.stringify(state.user));
+      if (state.user) {
+        state.user.name = name;
+        updateUserData(state.user);
+      }
     },
 
     clearUserData() {
       localStorage.removeItem(userStoragePath);
+      clearUserData();
     },
   },
   actions: {},

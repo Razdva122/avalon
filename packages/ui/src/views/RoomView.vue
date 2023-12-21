@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { socket } from '@/socket';
+import '@/socket';
 import { defineComponent } from 'vue';
 import Player from '@/components/Player.vue';
 import { players } from '@/mocks/players';
