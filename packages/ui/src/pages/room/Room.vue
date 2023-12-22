@@ -18,12 +18,12 @@
 </template>
 
 <script lang="ts">
-import '@/socket';
 import { defineComponent, ref, computed } from 'vue';
 import Player from '@/components/Player.vue';
 import { players as playersMock } from '@/mocks/players';
 import type { TGameStage } from '@avalon/types';
 import axios from 'axios';
+import { useStore } from '@/store';
 
 export default defineComponent({
   name: 'Room',
@@ -39,10 +39,15 @@ export default defineComponent({
   async setup(props) {
     const players = ref(playersMock);
     const stage = ref<TGameStage>('selectMerlin');
+    const store = useStore();
 
     const data = (await axios.get<boolean>(`http://localhost:3000/api/check_room/${props.uuid}`)).data;
 
     const isValidUuid = ref<boolean>(data);
+
+    if (isValidUuid.value) {
+      store.state.socket.emit('joinRoom', props.uuid);
+    }
 
     const currentGameStage = computed(() => {
       const stages = {

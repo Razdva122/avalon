@@ -1,3 +1,4 @@
+import { io } from 'socket.io-client';
 import { InjectionKey } from 'vue';
 import { createStore, Store, useStore as baseUseStore } from 'vuex';
 
@@ -12,10 +13,13 @@ export * from '@/store/interface';
 export const key: InjectionKey<Store<IState>> = Symbol();
 
 const userInStorage = localStorage.getItem(userStoragePath);
+const socket = io('http://localhost:3000');
 
 export const store = createStore<IState>({
   state: {
     user: userInStorage ? JSON.parse(userInStorage) : null,
+    socket,
+    connect: null,
   },
   getters: {},
   mutations: {
@@ -35,9 +39,21 @@ export const store = createStore<IState>({
       localStorage.removeItem(userStoragePath);
       clearUserData();
     },
+
+    updateConnectState(state: IState, value: boolean) {
+      state.connect = value;
+    },
   },
   actions: {},
   modules: {},
+});
+
+socket.on('connect', () => {
+  store.commit('updateConnectState', true);
+});
+
+socket.on('disconnect', () => {
+  store.commit('updateConnectState', false);
 });
 
 export function useStore() {

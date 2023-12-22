@@ -4,18 +4,25 @@ import { join } from 'node:path';
 import { Server } from 'socket.io';
 import crypto from 'crypto';
 import CookieParser from 'cookie-parser';
+import cors from 'cors';
 
 import { Manager } from '@/main';
 import { User } from '@/user';
 
-const manager = new Manager();
-
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const corsOpts = {
+  cors: {
+    origin: '*',
+  },
+};
+const io = new Server(server, corsOpts);
 const dirPath = join(__dirname, '../..', 'ui/dist/');
 
+const manager = new Manager(io);
+
 app.use(CookieParser());
+app.use(cors(corsOpts.cors));
 app.use(express.static(dirPath));
 
 app.get('/', function (req, res) {
@@ -34,13 +41,6 @@ app.get('/api/create_room', function (req, res) {
 
 app.get('/api/check_room/:uuid', function (req, res) {
   res.send(manager.isRoomExist(req.params.uuid));
-});
-
-io.on('connection', (socket) => {
-  console.log('a user connected', socket.handshake.headers.cookie);
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
 });
 
 server.listen(3000, () => {
