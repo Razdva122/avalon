@@ -5,7 +5,7 @@ export class Room {
   roomID: string;
   users: User[];
   leaderID: string;
-  state: TRoomState = { stage: 'generated' };
+  state: TRoomState = { stage: 'created' };
   maxCapacity = 10;
 
   constructor(roomID: string, leader: User) {
@@ -14,8 +14,8 @@ export class Room {
     this.leaderID = leader.id;
   }
 
-  joinRoom(user: User) {
-    if (this.state.stage !== 'generated') {
+  joinGame(user: User) {
+    if (this.state.stage !== 'created') {
       return;
     }
 
@@ -24,8 +24,8 @@ export class Room {
     }
   }
 
-  leaveRoom(user: User) {
-    if (this.state.stage !== 'generated') {
+  leaveGame(user: User) {
+    if (this.state.stage !== 'created') {
       return;
     }
 
@@ -43,10 +43,10 @@ export class Room {
   }
 
   toggleLockedState() {
-    if (this.state.stage === 'generated') {
+    if (this.state.stage === 'created') {
       this.state = { stage: 'locked' };
     } else if (this.state.stage === 'locked') {
-      this.state = { stage: 'generated' };
+      this.state = { stage: 'created' };
     }
   }
 

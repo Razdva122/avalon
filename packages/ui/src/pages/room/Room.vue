@@ -68,6 +68,10 @@ export default defineComponent({
 
     return { players, stage, currentGameStage, calculateRotate, isValidUuid };
   },
+
+  beforeRouteLeave() {
+    this.$store.state.socket.emit('leaveRoom', this.$props.uuid);
+  },
 });
 </script>
 

@@ -11,10 +11,14 @@ export class Manager {
     io.on('connection', (socket) => {
       this.socket = socket;
 
-      console.log(socket.handshake.headers);
-
       socket.on('joinRoom', (uuid) => {
+        socket.join(uuid);
         console.log(`user ${socket.handshake.headers.cookie} join uuid: ${uuid}`);
+      });
+
+      socket.on('leaveRoom', (uuid) => {
+        socket.leave(uuid);
+        console.log(`user ${socket.handshake.headers.cookie} leave uuid: ${uuid}`);
       });
 
       socket.on('disconnect', () => {
