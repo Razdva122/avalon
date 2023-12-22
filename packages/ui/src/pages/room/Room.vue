@@ -10,7 +10,7 @@
         <img class="game-board" alt="board" src="../../assets/board.jpeg" />
         <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
         <div class="player-container" v-for="(player, i) in players" :style="{ transform: calculateRotate(i) }">
-          <player :player="player" :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }" />
+          <Player :player="player" :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }" />
         </div>
       </div>
     </template>
@@ -22,7 +22,6 @@ import { defineComponent, ref, computed } from 'vue';
 import Player from '@/components/Player.vue';
 import { players as playersMock } from '@/mocks/players';
 import type { TGameStage } from '@avalon/types';
-import axios from 'axios';
 import { useStore } from '@/store';
 
 export default defineComponent({
@@ -41,13 +40,17 @@ export default defineComponent({
     const stage = ref<TGameStage>('selectMerlin');
     const store = useStore();
 
-    const data = (await axios.get<boolean>(`http://localhost:3000/api/check_room/${props.uuid}`)).data;
+    const promise = new Promise((res) => {
+      store.state.socket.emit('joinRoom', props.uuid, (state: any) => {
+        res(state);
+      });
+    });
 
-    const isValidUuid = ref<boolean>(data);
+    const state: any = await promise;
 
-    if (isValidUuid.value) {
-      store.state.socket.emit('joinRoom', props.uuid);
-    }
+    console.log(state);
+
+    const isValidUuid = ref<boolean>(state.stage !== 'unavailable');
 
     const currentGameStage = computed(() => {
       const stages = {

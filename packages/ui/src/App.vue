@@ -5,26 +5,27 @@
   <RouterView v-slot="{ Component }">
     <template v-if="Component">
       <Transition mode="out-in">
-        <KeepAlive>
-          <Suspense>
-            <component :is="Component"></component>
+        <Suspense>
+          <component :is="Component"></component>
 
-            <template #fallback> Loading... </template>
-          </Suspense>
-        </KeepAlive>
+          <template #fallback> Loading... </template>
+        </Suspense>
       </Transition>
     </template>
   </RouterView>
-  <registration v-if="!isUserExist" />
+  <Registration v-if="!isUserExist" />
+  <ConnectStatus class="connect-status" />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Registration from '@/components/Registration.vue';
+import ConnectStatus from './components/ConnectStatus.vue';
 
 export default defineComponent({
   components: {
     Registration,
+    ConnectStatus,
   },
   computed: {
     isUserExist() {
@@ -41,6 +42,12 @@ export default defineComponent({
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+
+.connect-status {
+  position: absolute;
+  top: 0px;
+  left: 2px;
 }
 
 nav {

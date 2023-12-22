@@ -1,16 +1,19 @@
 import type { User } from '@/user';
 import type { TRoomState } from '@/room/interace';
+import type { Server } from 'socket.io';
 
 export class Room {
   roomID: string;
-  users: User[];
+  players: User[];
   leaderID: string;
   state: TRoomState = { stage: 'created' };
   maxCapacity = 10;
+  io: Server;
 
-  constructor(roomID: string, leader: User) {
+  constructor(roomID: string, leader: User, io: Server) {
+    this.io = io;
     this.roomID = roomID;
-    this.users = [leader];
+    this.players = [leader];
     this.leaderID = leader.id;
   }
 
@@ -19,8 +22,8 @@ export class Room {
       return;
     }
 
-    if (!this.users.includes(user) && this.users.length < this.maxCapacity) {
-      this.users.push(user);
+    if (!this.players.includes(user) && this.players.length < this.maxCapacity) {
+      this.players.push(user);
     }
   }
 
@@ -29,15 +32,15 @@ export class Room {
       return;
     }
 
-    if (this.users.includes(user)) {
-      this.users.splice(this.users.indexOf(user), 1);
+    if (this.players.includes(user)) {
+      this.players.splice(this.players.indexOf(user), 1);
     }
 
     if (user.id === this.leaderID) {
-      if (this.users.length === 0) {
+      if (this.players.length === 0) {
         this.destroyRoom();
       } else {
-        this.leaderID = this.users[0].id;
+        this.leaderID = this.players[0].id;
       }
     }
   }
@@ -48,6 +51,17 @@ export class Room {
     } else if (this.state.stage === 'locked') {
       this.state = { stage: 'created' };
     }
+  }
+
+  updateRoomState() {}
+
+  calculateRoomState() {
+    return {
+      stage: this.state.stage,
+      roomID: this.roomID,
+      leaderID: this.leaderID,
+      players: this.players.map(({ name, id }) => ({ name, id })),
+    };
   }
 
   protected destroyRoom() {

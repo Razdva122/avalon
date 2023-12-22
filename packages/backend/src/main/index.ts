@@ -1,19 +1,34 @@
 import { Room } from '@/room';
 import { User } from '@/user';
 import type { Dictionary } from '@avalon/types';
-import type { Server, Socket } from 'socket.io';
+import type { Server } from 'socket.io';
+
+import { parseCookie } from '@/helpers';
 
 export class Manager {
   rooms: Dictionary<Room> = {};
-  socket!: Socket;
+  io: Server;
 
   constructor(io: Server) {
-    io.on('connection', (socket) => {
-      this.socket = socket;
+    this.io = io;
 
-      socket.on('joinRoom', (uuid) => {
-        socket.join(uuid);
+    io.on('connection', (socket) => {
+      const cookie = parseCookie(socket.handshake.headers.cookie || '');
+
+      if (cookie['user_id']) {
+        socket.join(cookie['user_id']);
+      }
+
+      socket.on('joinRoom', (uuid, cb) => {
         console.log(`user ${socket.handshake.headers.cookie} join uuid: ${uuid}`);
+        const room = this.rooms[uuid];
+
+        if (room) {
+          socket.join(uuid);
+          cb(this.rooms[uuid].calculateRoomState());
+        } else {
+          cb({ stage: 'unavailable' });
+        }
       });
 
       socket.on('leaveRoom', (uuid) => {
@@ -32,6 +47,6 @@ export class Manager {
   }
 
   createRoom(uuid: string, leader: User) {
-    this.rooms[uuid] = new Room(uuid, leader);
+    this.rooms[uuid] = new Room(uuid, leader, this.io);
   }
 }

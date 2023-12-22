@@ -10,6 +10,10 @@ export type TLockedRoomState = {
   stage: 'locked';
 };
 
+export type TUnavailableState = {
+  stage: 'unavailable';
+};
+
 export type TStartedRoomState = {
   stage: 'started';
   manager: GameManager;
