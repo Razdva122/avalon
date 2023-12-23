@@ -1,7 +1,7 @@
 import { Room } from '@/room';
 import { User } from '@/user';
 import type { Dictionary } from '@avalon/types';
-import type { Server } from 'socket.io';
+import type { Server } from '@avalon/types';
 
 import { parseCookie } from '@/helpers';
 
@@ -20,7 +20,7 @@ export class Manager {
       }
 
       socket.on('joinRoom', (uuid, cb) => {
-        console.log(`user ${socket.handshake.headers.cookie} join uuid: ${uuid}`);
+        console.log(`user ${cookie.user_name} join room uuid: ${uuid}`);
         const room = this.rooms[uuid];
 
         if (room) {
@@ -33,7 +33,7 @@ export class Manager {
 
       socket.on('leaveRoom', (uuid) => {
         socket.leave(uuid);
-        console.log(`user ${socket.handshake.headers.cookie} leave uuid: ${uuid}`);
+        console.log(`user ${cookie.user_name} leave room uuid: ${uuid}`);
       });
 
       socket.on('disconnect', () => {

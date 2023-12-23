@@ -1,4 +1,4 @@
-import type { Socket } from 'socket.io-client';
+import type { Socket } from '@avalon/types';
 
 export interface IState {
   user: IUser | null;

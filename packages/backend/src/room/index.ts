@@ -1,12 +1,12 @@
 import type { User } from '@/user';
-import type { TRoomState } from '@/room/interace';
-import type { Server } from 'socket.io';
+import type { TRoomState, Server } from '@avalon/types';
+import type { TRoomData } from '@/room/interace';
 
 export class Room {
   roomID: string;
   players: User[];
   leaderID: string;
-  state: TRoomState = { stage: 'created' };
+  data: TRoomData = { stage: 'created' };
   maxCapacity = 10;
   io: Server;
 
@@ -18,17 +18,18 @@ export class Room {
   }
 
   joinGame(user: User) {
-    if (this.state.stage !== 'created') {
+    if (this.data.stage !== 'created') {
       return;
     }
 
     if (!this.players.includes(user) && this.players.length < this.maxCapacity) {
       this.players.push(user);
+      this.updateRoomState();
     }
   }
 
   leaveGame(user: User) {
-    if (this.state.stage !== 'created') {
+    if (this.data.stage !== 'created') {
       return;
     }
 
@@ -43,21 +44,27 @@ export class Room {
         this.leaderID = this.players[0].id;
       }
     }
+
+    this.updateRoomState();
   }
 
   toggleLockedState() {
-    if (this.state.stage === 'created') {
-      this.state = { stage: 'locked' };
-    } else if (this.state.stage === 'locked') {
-      this.state = { stage: 'created' };
+    if (this.data.stage === 'created') {
+      this.data = { stage: 'locked' };
+    } else if (this.data.stage === 'locked') {
+      this.data = { stage: 'created' };
     }
+
+    this.updateRoomState();
   }
 
-  updateRoomState() {}
+  updateRoomState() {
+    this.io.to(this.roomID).emit('roomUpdated', this.calculateRoomState());
+  }
 
-  calculateRoomState() {
+  calculateRoomState(): TRoomState {
     return {
-      stage: this.state.stage,
+      stage: this.data.stage,
       roomID: this.roomID,
       leaderID: this.leaderID,
       players: this.players.map(({ name, id }) => ({ name, id })),

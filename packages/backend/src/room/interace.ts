@@ -1,20 +1,20 @@
 import type { GameManager } from '@/core/game-manager';
 
-export type TRoomState = TCreatedRoomState | TLockedRoomState | TStartedRoomState;
+export type TRoomData = TCreatedRoomData | TLockedRoomData | TStartedRoomData | TUnavailableData;
 
-export type TCreatedRoomState = {
+export type TCreatedRoomData = {
   stage: 'created';
 };
 
-export type TLockedRoomState = {
+export type TLockedRoomData = {
   stage: 'locked';
 };
 
-export type TUnavailableState = {
+export type TUnavailableData = {
   stage: 'unavailable';
 };
 
-export type TStartedRoomState = {
+export type TStartedRoomData = {
   stage: 'started';
   manager: GameManager;
 };

@@ -40,15 +40,7 @@ export default defineComponent({
     const stage = ref<TGameStage>('selectMerlin');
     const store = useStore();
 
-    const promise = new Promise((res) => {
-      store.state.socket.emit('joinRoom', props.uuid, (state: any) => {
-        res(state);
-      });
-    });
-
-    const state: any = await promise;
-
-    console.log(state);
+    const state = await store.state.socket.emitWithAck('joinRoom', props.uuid);
 
     const isValidUuid = ref<boolean>(state.stage !== 'unavailable');
 

@@ -3,17 +3,17 @@ import { InjectionKey } from 'vue';
 import { createStore, Store, useStore as baseUseStore } from 'vuex';
 
 import { updateUserData, clearUserData } from '@/store/persistent';
-
 import { userStoragePath } from '@/store/const';
-
 import type { IState, IUser } from '@/store/interface';
+
+import type { Socket } from '@avalon/types';
 
 export * from '@/store/interface';
 
 export const key: InjectionKey<Store<IState>> = Symbol();
 
 const userInStorage = localStorage.getItem(userStoragePath);
-const socket = io('http://localhost:3000');
+const socket: Socket = io('http://localhost:3000');
 
 export const store = createStore<IState>({
   state: {
