@@ -1,20 +1,29 @@
 <template>
   <div class="player-container">
     <img class="player-frame" alt="frame" src="../assets/player-frame.png" />
-    <div class="player-icon" :class="{ 'player-active': player.features.waitForAction }"></div>
+    <div class="player-icon" :class="iconClasses"></div>
     <span class="player-name">{{ player.name }}</span>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import type { IPlayer } from '@avalon/types';
+import type { IPlayer, TRoomPlayer } from '@avalon/types';
 
 export default defineComponent({
   props: {
     player: {
-      type: Object as PropType<IPlayer>,
+      type: Object as PropType<IPlayer | TRoomPlayer>,
       required: true,
+    },
+  },
+  computed: {
+    iconClasses() {
+      if ('features' in this.player) {
+        return { 'player-active': this.player.features.waitForAction };
+      }
+
+      return {};
     },
   },
 });

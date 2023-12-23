@@ -6,7 +6,7 @@ type TMetaRoomState = {
   players: TRoomPlayer[];
 };
 
-type TRoomPlayer = {
+export type TRoomPlayer = {
   id: string;
   name: string;
 };

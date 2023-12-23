@@ -1,6 +1,6 @@
 <template>
   <div class="room">
-    <template v-if="!isValidUuid">
+    <template v-if="roomState.stage === 'unavailable'">
       <h1>This is wrong uuid</h1>
     </template>
 
@@ -9,7 +9,11 @@
       <div class="board-container">
         <img class="game-board" alt="board" src="../../assets/board.jpeg" />
         <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
-        <div class="player-container" v-for="(player, i) in players" :style="{ transform: calculateRotate(i) }">
+        <div
+          class="player-container"
+          v-for="(player, i) in roomState.players"
+          :style="{ transform: calculateRotate(i) }"
+        >
           <Player :player="player" :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }" />
         </div>
       </div>
@@ -20,8 +24,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
 import Player from '@/components/Player.vue';
-import { players as playersMock } from '@/mocks/players';
-import type { TGameStage } from '@avalon/types';
+import type { TGameStage, TRoomState } from '@avalon/types';
 import { useStore } from '@/store';
 
 export default defineComponent({
@@ -36,13 +39,9 @@ export default defineComponent({
     },
   },
   async setup(props) {
-    const players = ref(playersMock);
-    const stage = ref<TGameStage>('selectMerlin');
+    const stage = ref<TGameStage | undefined>(undefined);
     const store = useStore();
-
-    const state = await store.state.socket.emitWithAck('joinRoom', props.uuid);
-
-    const isValidUuid = ref<boolean>(state.stage !== 'unavailable');
+    const roomState = ref<TRoomState>(await store.state.socket.emitWithAck('joinRoom', props.uuid));
 
     const currentGameStage = computed(() => {
       const stages = {
@@ -52,16 +51,22 @@ export default defineComponent({
         onMission: 'The selected team is on a mission.',
         selectMerlin: "Mordred's minions are trying to figure out Merlin.",
         end: 'The game is over.',
+        created: 'The game has been created, we are waiting for the players to connect',
+        locked: 'The game is locked, we are waiting for the start of the game',
+        started: 'The game has started',
+        unavailable: 'The game is not available',
       } as const;
 
-      return stages[stage.value];
+      return stages[stage.value || roomState.value.stage];
     });
 
     const calculateRotate = (i: number, negative: boolean = false) => {
-      return `rotate(${negative ? '-' : ''}${(360 / players.value.length) * i + 180}deg)`;
+      if (roomState.value.stage !== 'unavailable') {
+        return `rotate(${negative ? '-' : ''}${(360 / roomState.value.players.length) * i + 180}deg)`;
+      }
     };
 
-    return { players, stage, currentGameStage, calculateRotate, isValidUuid };
+    return { stage, currentGameStage, calculateRotate, roomState };
   },
 
   beforeRouteLeave() {
