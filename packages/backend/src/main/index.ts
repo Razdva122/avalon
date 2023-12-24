@@ -1,7 +1,7 @@
 import { Room } from '@/room';
 import { User } from '@/user';
 import type { Dictionary } from '@avalon/types';
-import type { Server } from '@avalon/types';
+import type { Server, ServerSocket } from '@avalon/types';
 import crypto from 'crypto';
 
 import { parseCookie } from '@/helpers';
@@ -9,6 +9,10 @@ import { parseCookie } from '@/helpers';
 export class Manager {
   rooms: Dictionary<Room> = {};
   io: Server;
+
+  createRoom(uuid: string, leader: User) {
+    this.rooms[uuid] = new Room(uuid, leader, this.io);
+  }
 
   constructor(io: Server) {
     this.io = io;
@@ -35,35 +39,7 @@ export class Manager {
       });
 
       if (userID && userName) {
-        socket.on('createRoom', (cb) => {
-          const uuid = crypto.randomUUID();
-          console.log('createRoom', uuid);
-          this.createRoom(uuid, new User(userID, userName));
-          cb(uuid);
-        });
-
-        socket.on('leaveRoom', (uuid) => {
-          socket.leave(uuid);
-          console.log(`user ${userName} leave room uuid: ${uuid}`);
-        });
-
-        socket.on('joinGame', (uuid) => {
-          console.log('joinGame', uuid);
-          this.rooms[uuid].joinGame(userID, userName);
-        });
-
-        socket.on('leaveGame', (uuid) => {
-          console.log('leaveGame', uuid);
-          this.rooms[uuid].leaveGame(userID);
-        });
-
-        socket.on('lockRoom', (uuid) => {
-          console.log('lockRoom', uuid);
-          const room = this.rooms[uuid];
-          if (room.leaderID === userID) {
-            this.rooms[uuid].toggleLockedState();
-          }
-        });
+        this.createMethodsForAuthUsers(socket, userID, userName);
       }
 
       socket.on('disconnect', () => {
@@ -72,11 +48,35 @@ export class Manager {
     });
   }
 
-  isRoomExist(uuid: string): boolean {
-    return Boolean(this.rooms[uuid]);
-  }
+  createMethodsForAuthUsers(socket: ServerSocket, userID: string, userName: string): void {
+    socket.on('createRoom', (cb) => {
+      const uuid = crypto.randomUUID();
+      console.log('createRoom', uuid);
+      this.createRoom(uuid, new User(userID, userName));
+      cb(uuid);
+    });
 
-  createRoom(uuid: string, leader: User) {
-    this.rooms[uuid] = new Room(uuid, leader, this.io);
+    socket.on('leaveRoom', (uuid) => {
+      socket.leave(uuid);
+      console.log(`user ${userName} leave room uuid: ${uuid}`);
+    });
+
+    socket.on('joinGame', (uuid) => {
+      console.log('joinGame', uuid);
+      this.rooms[uuid].joinGame(userID, userName);
+    });
+
+    socket.on('leaveGame', (uuid) => {
+      console.log('leaveGame', uuid);
+      this.rooms[uuid].leaveGame(userID);
+    });
+
+    socket.on('lockRoom', (uuid) => {
+      console.log('lockRoom', uuid);
+      const room = this.rooms[uuid];
+      if (room.leaderID === userID) {
+        this.rooms[uuid].toggleLockedState();
+      }
+    });
   }
 }

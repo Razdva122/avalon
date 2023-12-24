@@ -1,6 +1,6 @@
 import type { TRoomState } from '../room';
 
-import type { Server as SuperServer } from 'socket.io';
+import type { Server as SuperServer, Socket as SuperServerSocket } from 'socket.io';
 import type { Socket as SuperSocket } from 'socket.io-client';
 
 export interface ServerToClientEvents {
@@ -18,3 +18,4 @@ export interface ClientToServerEvents {
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;
 export type Socket = SuperSocket<ServerToClientEvents, ClientToServerEvents>;
+export type ServerSocket = SuperServerSocket<ClientToServerEvents, ServerToClientEvents>;
