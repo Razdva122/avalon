@@ -8,10 +8,15 @@
       <div class="board-container">
         <img class="game-board" alt="board" src="../../assets/board.jpeg" />
         <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
-        <div class="actions-container">
-          <v-btn rounded="lg" variants="tonal" color="info" @click="joinClick">{{
-            userInGame ? 'Leave Game' : 'Join Game'
+        <div class="actions-container d-flex flex-column">
+          <v-btn rounded="lg" variants="tonal" :color="isUserInGame ? 'warning' : 'info'" @click="joinClick">{{
+            isUserInGame ? 'Leave Game' : 'Join Game'
           }}</v-btn>
+          <template v-if="isUserLeader && (roomState.stage === 'created' || roomState.stage === 'locked')">
+            <v-btn class="mt-2" rounded="lg" variants="tonal" color="info" @click="lockClick">{{
+              roomState.stage === 'created' ? 'Lock Game' : 'Unlock game'
+            }}</v-btn>
+          </template>
         </div>
         <div
           class="player-container"
@@ -65,15 +70,25 @@ export default defineComponent({
       return stages[stage.value || roomState.value.stage];
     });
 
-    const userInGame = computed(() => {
+    const isUserInGame = computed(() => {
       return roomState.value.stage === 'unavailable'
         ? false
         : roomState.value.players.some((player) => player.id === store.state.user?.id);
     });
 
+    const isUserLeader = computed(() => {
+      return roomState.value.stage === 'unavailable' ? false : roomState.value.leaderID === store.state.user?.id;
+    });
+
     const joinClick = () => {
       if (roomState.value.stage !== 'unavailable') {
-        socket.emit(userInGame.value ? 'leaveGame' : 'joinGame', roomState.value.roomID);
+        socket.emit(isUserInGame.value ? 'leaveGame' : 'joinGame', roomState.value.roomID);
+      }
+    };
+
+    const lockClick = () => {
+      if (roomState.value.stage !== 'unavailable') {
+        socket.emit('lockRoom', roomState.value.roomID);
       }
     };
 
@@ -87,7 +102,18 @@ export default defineComponent({
       roomState.value = state;
     });
 
-    return { stage, currentGameStage, calculateRotate, roomState, userInGame, joinClick };
+    return {
+      roomState,
+      stage,
+      currentGameStage,
+
+      isUserLeader,
+      isUserInGame,
+
+      calculateRotate,
+      joinClick,
+      lockClick,
+    };
   },
 
   beforeRouteLeave() {
