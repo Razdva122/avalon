@@ -1,4 +1,3 @@
-import { io } from 'socket.io-client';
 import { InjectionKey } from 'vue';
 import { createStore, Store, useStore as baseUseStore } from 'vuex';
 
@@ -6,19 +5,21 @@ import { updateUserData, clearUserData } from '@/store/persistent';
 import { userStoragePath } from '@/store/const';
 import type { IState, IUser } from '@/store/interface';
 
-import type { Socket } from '@avalon/types';
-
 export * from '@/store/interface';
+
+import { socket } from '@/api/socket';
 
 export const key: InjectionKey<Store<IState>> = Symbol();
 
 const userInStorage = localStorage.getItem(userStoragePath);
-const socket: Socket = io('http://localhost:3000');
+
+if (userInStorage) {
+  updateUserData(JSON.parse(userInStorage));
+}
 
 export const store = createStore<IState>({
   state: {
     user: userInStorage ? JSON.parse(userInStorage) : null,
-    socket,
     connect: null,
   },
   getters: {},

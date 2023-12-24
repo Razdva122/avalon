@@ -1,8 +1,5 @@
-import type { Socket } from '@avalon/types';
-
 export interface IState {
   user: IUser | null;
-  socket: Socket;
   connect: boolean | null;
 }
 

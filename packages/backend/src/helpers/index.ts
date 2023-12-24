@@ -5,7 +5,10 @@ export const parseCookie = (str: string) =>
     .split(';')
     .map((v) => v.split('='))
     .reduce<Dictionary<string>>((acc, v) => {
-      const key = decodeURIComponent(v[0].trim());
-      acc[key] = decodeURIComponent(v[1].trim());
+      if (v.length === 2) {
+        const key = decodeURIComponent(v[0].trim());
+        acc[key] = decodeURIComponent(v[1].trim());
+      }
+
       return acc;
     }, {});

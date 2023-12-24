@@ -1,4 +1,4 @@
-import type { User } from '@/user';
+import { User } from '@/user';
 import type { TRoomState, Server } from '@avalon/types';
 import type { TRoomData } from '@/room/interace';
 
@@ -17,27 +17,29 @@ export class Room {
     this.leaderID = leader.id;
   }
 
-  joinGame(user: User) {
+  joinGame(userID: string, name: string) {
     if (this.data.stage !== 'created') {
       return;
     }
 
-    if (!this.players.includes(user) && this.players.length < this.maxCapacity) {
-      this.players.push(user);
+    if (!this.players.find((player) => player.id === userID) && this.players.length < this.maxCapacity) {
+      this.players.push(new User(userID, name));
       this.updateRoomState();
     }
   }
 
-  leaveGame(user: User) {
+  leaveGame(userID: string) {
     if (this.data.stage !== 'created') {
       return;
     }
 
-    if (this.players.includes(user)) {
-      this.players.splice(this.players.indexOf(user), 1);
+    const userIndex = this.players.findIndex((player) => player.id === userID);
+
+    if (userIndex !== -1) {
+      this.players.splice(userIndex, 1);
     }
 
-    if (user.id === this.leaderID) {
+    if (userID === this.leaderID) {
       if (this.players.length === 0) {
         this.destroyRoom();
       } else {

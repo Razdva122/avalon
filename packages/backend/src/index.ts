@@ -2,24 +2,23 @@ import express from 'express';
 import { createServer } from 'node:http';
 import { join } from 'node:path';
 import { Server } from 'socket.io';
-import crypto from 'crypto';
 import CookieParser from 'cookie-parser';
 import cors from 'cors';
 
 import { Manager } from '@/main';
-import { User } from '@/user';
 
 const app = express();
 const server = createServer(app);
 const corsOpts = {
   cors: {
-    origin: '*',
+    origin: 'http://localhost:8080',
+    credentials: true,
   },
 };
 const io = new Server(server, corsOpts);
 const dirPath = join(__dirname, '../..', 'ui/dist/');
 
-const manager = new Manager(io);
+new Manager(io);
 
 app.use(CookieParser());
 app.use(cors(corsOpts.cors));
@@ -31,16 +30,6 @@ app.get('/', function (req, res) {
 
 app.get('/room/*', function (req, res) {
   res.sendFile(dirPath + 'index.html');
-});
-
-app.get('/api/create_room', function (req, res) {
-  const uuid = crypto.randomUUID();
-  manager.createRoom(uuid, new User(req.cookies['user_id'], req.cookies['user_name']));
-  res.send(uuid);
-});
-
-app.get('/api/check_room/:uuid', function (req, res) {
-  res.send(manager.isRoomExist(req.params.uuid));
 });
 
 server.listen(3000, () => {

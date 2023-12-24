@@ -5,10 +5,14 @@
     </template>
 
     <template v-else>
-      <h1>This is game page</h1>
       <div class="board-container">
         <img class="game-board" alt="board" src="../../assets/board.jpeg" />
         <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
+        <div class="actions-container">
+          <v-btn rounded="lg" variants="tonal" color="info" @click="joinClick">{{
+            userInGame ? 'Leave Game' : 'Join Game'
+          }}</v-btn>
+        </div>
         <div
           class="player-container"
           v-for="(player, i) in roomState.players"
@@ -25,6 +29,7 @@
 import { defineComponent, ref, computed } from 'vue';
 import Player from '@/components/Player.vue';
 import type { TGameStage, TRoomState } from '@avalon/types';
+import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 
 export default defineComponent({
@@ -41,7 +46,7 @@ export default defineComponent({
   async setup(props) {
     const stage = ref<TGameStage | undefined>(undefined);
     const store = useStore();
-    const roomState = ref<TRoomState>(await store.state.socket.emitWithAck('joinRoom', props.uuid));
+    let roomState = ref<TRoomState>(await socket.emitWithAck('joinRoom', props.uuid));
 
     const currentGameStage = computed(() => {
       const stages = {
@@ -60,17 +65,33 @@ export default defineComponent({
       return stages[stage.value || roomState.value.stage];
     });
 
+    const userInGame = computed(() => {
+      return roomState.value.stage === 'unavailable'
+        ? false
+        : roomState.value.players.some((player) => player.id === store.state.user?.id);
+    });
+
+    const joinClick = () => {
+      if (roomState.value.stage !== 'unavailable') {
+        socket.emit(userInGame.value ? 'leaveGame' : 'joinGame', roomState.value.roomID);
+      }
+    };
+
     const calculateRotate = (i: number, negative: boolean = false) => {
       if (roomState.value.stage !== 'unavailable') {
         return `rotate(${negative ? '-' : ''}${(360 / roomState.value.players.length) * i + 180}deg)`;
       }
     };
 
-    return { stage, currentGameStage, calculateRotate, roomState };
+    socket.on('roomUpdated', (state) => {
+      roomState.value = state;
+    });
+
+    return { stage, currentGameStage, calculateRotate, roomState, userInGame, joinClick };
   },
 
   beforeRouteLeave() {
-    this.$store.state.socket.emit('leaveRoom', this.$props.uuid);
+    socket.emit('leaveRoom', this.$props.uuid);
   },
 });
 </script>
@@ -83,6 +104,11 @@ export default defineComponent({
   justify-content: center;
   position: relative;
   width: 100vw;
+}
+
+.actions-container {
+  z-index: 1;
+  position: absolute;
 }
 
 .game-board {
