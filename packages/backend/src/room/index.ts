@@ -64,6 +64,11 @@ export class Room {
     this.io.to(this.roomID).emit('roomUpdated', this.calculateRoomState());
   }
 
+  startGame() {
+    this.data = { stage: 'started' };
+    this.updateRoomState();
+  }
+
   calculateRoomState(): TRoomState {
     return {
       stage: this.data.stage,

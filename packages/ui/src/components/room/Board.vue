@@ -2,14 +2,24 @@
   <div class="board-container">
     <img class="game-board" alt="board" src="../../assets/board.jpeg" />
     <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
-    <div class="actions-container d-flex flex-column">
+    <div class="actions-container d-flex flex-column" v-if="roomState.stage !== 'started'">
       <v-btn rounded="lg" variants="tonal" :color="isUserInGame ? 'warning' : 'info'" @click="joinClick">{{
         isUserInGame ? 'Leave Game' : 'Join Game'
       }}</v-btn>
-      <template v-if="isUserLeader && (roomState.stage === 'created' || roomState.stage === 'locked')">
+      <template v-if="isUserLeader">
         <v-btn class="mt-2" rounded="lg" variants="tonal" color="info" @click="lockClick">{{
           roomState.stage === 'created' ? 'Lock Game' : 'Unlock game'
         }}</v-btn>
+        <v-btn
+          class="mt-2"
+          rounded="lg"
+          variants="tonal"
+          color="success"
+          :disabled="isStartGameDisabled"
+          @click="startClick"
+        >
+          Start Game
+        </v-btn>
       </template>
     </div>
     <div
@@ -59,12 +69,22 @@ export default defineComponent({
       return roomState.value.leaderID === store.state.user?.id;
     });
 
+    const isStartGameDisabled = computed(() => {
+      return (
+        roomState.value.stage !== 'locked' || roomState.value.players.length < 5 || roomState.value.players.length > 10
+      );
+    });
+
     const joinClick = () => {
       socket.emit(isUserInGame.value ? 'leaveGame' : 'joinGame', roomState.value.roomID);
     };
 
     const lockClick = () => {
       socket.emit('lockRoom', roomState.value.roomID);
+    };
+
+    const startClick = () => {
+      socket.emit('startGame', roomState.value.roomID);
     };
 
     const calculateRotate = (i: number, negative: boolean = false) => {
@@ -78,10 +98,12 @@ export default defineComponent({
 
       isUserLeader,
       isUserInGame,
+      isStartGameDisabled,
 
       calculateRotate,
       joinClick,
       lockClick,
+      startClick,
     };
   },
 });

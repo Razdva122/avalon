@@ -78,5 +78,13 @@ export class Manager {
         this.rooms[uuid].toggleLockedState();
       }
     });
+
+    socket.on('startGame', (uuid) => {
+      console.log('startGame', uuid);
+      const room = this.rooms[uuid];
+      if (room.leaderID === userID) {
+        this.rooms[uuid].startGame();
+      }
+    });
   }
 }

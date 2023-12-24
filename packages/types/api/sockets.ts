@@ -12,6 +12,7 @@ export interface ClientToServerEvents {
   joinRoom: (uuid: string, callback: (state: TRoomState) => void) => void;
   lockRoom: (uuid: string) => void;
   joinGame: (uuid: string) => void;
+  startGame: (uuid: string) => void;
   leaveGame: (uuid: string) => void;
   leaveRoom: (uuid: string) => void;
 }

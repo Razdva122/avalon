@@ -1,4 +1,4 @@
-import type { GameManager } from '@/core/game-manager';
+// import type { GameManager } from '@/core/game-manager';
 
 export type TRoomData = TCreatedRoomData | TLockedRoomData | TStartedRoomData | TUnavailableData;
 
@@ -16,5 +16,5 @@ export type TUnavailableData = {
 
 export type TStartedRoomData = {
   stage: 'started';
-  manager: GameManager;
+  // manager: GameManager;
 };
