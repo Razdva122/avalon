@@ -29,7 +29,7 @@ export class Room {
   }
 
   leaveGame(userID: string) {
-    if (this.data.stage !== 'created') {
+    if (this.data.stage !== 'started') {
       return;
     }
 
