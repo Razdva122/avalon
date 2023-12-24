@@ -1,4 +1,5 @@
 export type TRoomState = TCreatedRoomState | TLockedRoomState | TStartedRoomState | TUnavailableState;
+export type TAvailableRoom = Exclude<TRoomState, TUnavailableState>;
 
 type TMetaRoomState = {
   roomID: string;
