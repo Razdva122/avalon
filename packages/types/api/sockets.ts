@@ -5,6 +5,7 @@ import type { Socket as SuperSocket } from 'socket.io-client';
 
 export interface ServerToClientEvents {
   roomUpdated: (state: TRoomState) => void;
+  serverError: (error: string) => void;
 }
 
 export interface ClientToServerEvents {

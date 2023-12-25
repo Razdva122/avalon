@@ -19,7 +19,7 @@ export class Room {
 
   joinGame(userID: string, name: string) {
     if (this.data.stage !== 'created') {
-      return;
+      throw new Error(`${userID} try to join game with id ${this.roomID} with stage ${this.data.stage}`);
     }
 
     if (!this.players.find((player) => player.id === userID) && this.players.length < this.maxCapacity) {
@@ -29,8 +29,8 @@ export class Room {
   }
 
   leaveGame(userID: string) {
-    if (this.data.stage !== 'started') {
-      return;
+    if (this.data.stage === 'started') {
+      throw new Error(`${userID} try to leave game with id ${this.roomID} with stage 'started'`);
     }
 
     const userIndex = this.players.findIndex((player) => player.id === userID);

@@ -1,5 +1,7 @@
 import type { Dictionary } from '@avalon/types';
 
+export * from '@/helpers/socket';
+
 export const parseCookie = (str: string) =>
   str
     .split(';')

@@ -15,17 +15,20 @@
   </RouterView>
   <Registration v-if="!isUserExist" />
   <ConnectStatus class="connect-status" />
+  <ErrorSnackbar />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Registration from '@/components/Registration.vue';
-import ConnectStatus from './components/ConnectStatus.vue';
+import ConnectStatus from '@/components/ConnectStatus.vue';
+import ErrorSnackbar from '@/components/ErrorSnackbar.vue';
 
 export default defineComponent({
   components: {
     Registration,
     ConnectStatus,
+    ErrorSnackbar,
   },
   computed: {
     isUserExist() {

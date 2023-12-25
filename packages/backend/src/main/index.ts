@@ -4,7 +4,7 @@ import type { Dictionary } from '@avalon/types';
 import type { Server, ServerSocket } from '@avalon/types';
 import crypto from 'crypto';
 
-import { parseCookie } from '@/helpers';
+import { parseCookie, handleSocketErrors } from '@/helpers';
 
 export class Manager {
   rooms: Dictionary<Room> = {};
@@ -18,9 +18,9 @@ export class Manager {
     this.io = io;
 
     io.on('connection', (socket) => {
-      const { user_id: userID, user_name: userName } = parseCookie(socket.handshake.headers.cookie || '');
+      handleSocketErrors(socket);
 
-      console.log('user connected', userID, userName);
+      const { user_id: userID, user_name: userName } = parseCookie(socket.handshake.headers.cookie || '');
 
       if (userID) {
         socket.join(userID);
