@@ -1,6 +1,7 @@
 import { User } from '@/user';
 import type { TRoomState, Server } from '@avalon/types';
 import type { TRoomData } from '@/room/interace';
+import { GameManager } from '@/core/game-manager';
 
 export class Room {
   roomID: string;
@@ -65,17 +66,29 @@ export class Room {
   }
 
   startGame() {
-    this.data = { stage: 'started' };
+    this.data = { stage: 'started', manager: new GameManager(this.players, { roles: {} }, this.io, this.roomID) };
     this.updateRoomState();
   }
 
-  calculateRoomState(): TRoomState {
-    return {
-      stage: this.data.stage,
+  calculateRoomState(userID?: string): TRoomState {
+    const roomState = {
       roomID: this.roomID,
       leaderID: this.leaderID,
       players: this.players.map(({ name, id }) => ({ name, id })),
     };
+
+    if (this.data.stage === 'started') {
+      return {
+        ...roomState,
+        stage: this.data.stage,
+        game: this.data.manager.prepareStateForUser(userID),
+      };
+    } else {
+      return {
+        ...roomState,
+        stage: this.data.stage,
+      };
+    }
   }
 
   protected destroyRoom() {

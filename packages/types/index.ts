@@ -4,6 +4,8 @@ export * from './game/mission';
 export * from './game/roles';
 export * from './game/vote';
 export * from './game/player';
+export * from './game/state';
+export * from './game/settings';
 export * from './api/sockets';
 export * from './room';
 export * from './utils';

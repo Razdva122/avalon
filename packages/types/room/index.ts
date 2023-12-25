@@ -1,3 +1,5 @@
+import type { IVisualGameState } from '../game/state';
+
 export type TRoomState = TCreatedRoomState | TLockedRoomState | TStartedRoomState | TUnavailableState;
 export type TAvailableRoom = Exclude<TRoomState, TUnavailableState>;
 
@@ -26,4 +28,5 @@ export type TUnavailableState = {
 
 export type TStartedRoomState = {
   stage: 'started';
+  game: IVisualGameState;
 } & TMetaRoomState;

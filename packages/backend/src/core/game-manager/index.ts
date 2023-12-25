@@ -1,15 +1,19 @@
 import { Game, IGameOptions } from '@/core/game';
 import type { User } from '@/user';
-import type { TRoomState, IVisualGameState } from '@/core/game-manager/interface';
-import { TGameStage } from '@avalon/types';
+import type { TRoomState } from '@/core/game-manager/interface';
+import { TGameStage, Server, IVisualGameState } from '@avalon/types';
 
 export * from '@/core/game-manager/interface';
 
 export class GameManager {
   game: Game;
   roomState!: TRoomState;
+  io: Server;
+  roomID: string;
 
-  constructor(users: User[], options: IGameOptions) {
+  constructor(users: User[], options: IGameOptions, io: Server, roomID: string) {
+    this.roomID = roomID;
+    this.io = io;
     this.game = new Game(users, options, { gameStateChanged: () => this.gameStateChanged });
     this.initRoomState();
   }
@@ -58,6 +62,22 @@ export class GameManager {
     });
 
     this.roomState.history = this.prepareHistoryForView();
+
+    this.sendNewStateToUsers();
+  }
+
+  /**
+   * Sends the new game state to all users
+   */
+  sendNewStateToUsers(): void {
+    this.game.players.forEach((player) => {
+      this.io.to(player.user.id).emit('gameUpdated', this.prepareStateForUser(player.user.id));
+    });
+
+    this.io
+      .except(this.game.players.map((player) => player.user.id))
+      .to(this.roomID)
+      .emit('gameUpdated', this.prepareStateForUser());
   }
 
   /**

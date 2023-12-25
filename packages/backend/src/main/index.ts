@@ -32,7 +32,7 @@ export class Manager {
 
         if (room) {
           socket.join(uuid);
-          cb(this.rooms[uuid].calculateRoomState());
+          cb(this.rooms[uuid].calculateRoomState(userID));
         } else {
           cb({ stage: 'unavailable' });
         }

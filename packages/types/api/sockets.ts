@@ -1,10 +1,12 @@
 import type { TRoomState } from '../room';
+import type { IVisualGameState } from '../game/state';
 
 import type { Server as SuperServer, Socket as SuperServerSocket } from 'socket.io';
 import type { Socket as SuperSocket } from 'socket.io-client';
 
 export interface ServerToClientEvents {
   roomUpdated: (state: TRoomState) => void;
+  gameUpdated: (state: IVisualGameState) => void;
   serverError: (error: string) => void;
 }
 

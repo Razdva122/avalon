@@ -3,11 +3,6 @@ import type { TVoteOption } from './vote';
 import type { TAssassinateResult } from './addons';
 
 /**
- * Possible game stages
- */
-export type TGameStage = 'initialization' | 'votingForTeam' | 'onMission' | 'selectTeam' | 'selectMerlin' | 'end';
-
-/**
  * Possible history element
  */
 export type THistoryType = 'mission' | 'vote' | 'assassinate';
