@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { v4 as uuidv4 } from 'uuid';
 
 export default defineComponent({
   data() {
@@ -31,7 +32,7 @@ export default defineComponent({
   },
   methods: {
     createUser() {
-      this.$store.commit('setUserData', { id: crypto.randomUUID(), name: this.username });
+      this.$store.commit('setUserData', { id: uuidv4(), name: this.username });
       document.location.reload();
     },
   },
