@@ -24,6 +24,7 @@ export class GameManager {
   initRoomState(): void {
     this.roomState = {
       stage: this.game.stage,
+      vote: this.game.turn,
       settings: this.game.settings,
       players: this.game.players.map((player) => {
         return {
@@ -62,6 +63,8 @@ export class GameManager {
     });
 
     this.roomState.history = this.prepareHistoryForView();
+
+    this.roomState.vote = this.game.turn;
 
     this.sendNewStateToUsers();
   }
@@ -140,6 +143,7 @@ export class GameManager {
 
     return {
       stage: this.roomState.stage,
+      vote: this.roomState.vote,
       settings: this.roomState.settings,
       history: this.roomState.history,
       players: this.roomState.players.map((player, index) => ({ ...player, role: roles[index] })),

@@ -31,11 +31,13 @@
           </v-btn>
         </template>
       </template>
-      <template v-else> </template>
+      <template v-else>
+        <Game :game="roomState.game"></Game>
+      </template>
     </div>
     <div
       class="player-container"
-      v-for="(player, i) in roomState.players"
+      v-for="(player, i) in players"
       :style="{ transform: calculateRotate(i) }"
       :key="player.id"
     >
@@ -49,9 +51,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, PropType, toRef } from 'vue';
+import { defineComponent, computed, PropType, toRef } from 'vue';
 import Player from '@/components/Player.vue';
-import type { TAvailableRoom, TGameStage } from '@avalon/types';
+import type { TAvailableRoom } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { stages } from '@/components/room/const';
@@ -70,12 +72,15 @@ export default defineComponent({
     },
   },
   async setup(props) {
-    const stage = ref<TGameStage | undefined>(undefined);
     const roomState = toRef(props, 'roomState');
     const store = useStore();
 
     const currentGameStage = computed(() => {
-      return stages[stage.value || roomState.value.stage];
+      if (roomState.value.stage === 'started') {
+        return stages[roomState.value.game.stage];
+      }
+
+      return stages[roomState.value.stage];
     });
 
     const isUserInGame = computed(() => {
@@ -90,6 +95,14 @@ export default defineComponent({
       return (
         roomState.value.stage !== 'locked' || roomState.value.players.length < 5 || roomState.value.players.length > 10
       );
+    });
+
+    const players = computed(() => {
+      if (roomState.value.stage === 'started') {
+        return roomState.value.game.players;
+      }
+
+      return roomState.value.players;
     });
 
     const joinClick = () => {
@@ -114,8 +127,8 @@ export default defineComponent({
 
     return {
       roomState,
-      stage,
       currentGameStage,
+      players,
 
       isUserLeader,
       isUserInGame,

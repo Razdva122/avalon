@@ -40,6 +40,7 @@ export class Manager {
 
       if (userID && userName) {
         this.createMethodsForAuthUsers(socket, userID, userName);
+        this.createMethodsForGame(socket, userID, userName);
       }
 
       socket.on('disconnect', () => {
@@ -85,6 +86,12 @@ export class Manager {
       if (room.leaderID === userID) {
         this.rooms[uuid].startGame();
       }
+    });
+  }
+
+  createMethodsForGame(socket: ServerSocket, userID: string, userName: string): void {
+    socket.on('selectPlayer', (uuid, selectedUserID) => {
+      console.log(`Player ${selectedUserID} selected by ${userName} in game ${uuid}`);
     });
   }
 }

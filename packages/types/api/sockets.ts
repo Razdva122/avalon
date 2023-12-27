@@ -14,10 +14,13 @@ export interface ClientToServerEvents {
   createRoom: (callback: (uuid: string) => void) => void;
   joinRoom: (uuid: string, callback: (state: TRoomState) => void) => void;
   lockRoom: (uuid: string) => void;
+  leaveRoom: (uuid: string) => void;
+
   joinGame: (uuid: string) => void;
   startGame: (uuid: string) => void;
   leaveGame: (uuid: string) => void;
-  leaveRoom: (uuid: string) => void;
+
+  selectPlayer: (uuid: string, userID: string) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;

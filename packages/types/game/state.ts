@@ -4,6 +4,7 @@ import type { IGameSettings } from './settings';
 
 export interface IVisualGameState {
   stage: TGameStage;
+  vote: number;
   settings: IGameSettings;
   history: THistoryResults[];
   players: IPlayer[];
