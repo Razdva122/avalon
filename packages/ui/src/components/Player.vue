@@ -1,5 +1,5 @@
 <template>
-  <div class="player-container">
+  <div class="player-container" @click="$emit('playerClick', player.id)">
     <img class="player-frame" alt="frame" src="../assets/player-frame.png" />
     <div class="player-icon" :class="iconClasses"></div>
     <span class="player-name">{{ player.name }}</span>
@@ -36,6 +36,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
+  pointer-events: all;
 }
 
 .player-frame,

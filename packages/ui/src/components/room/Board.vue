@@ -2,25 +2,36 @@
   <div class="board-container">
     <img class="game-board" alt="board" src="../../assets/board.jpeg" />
     <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
-    <div class="actions-container d-flex flex-column" v-if="roomState.stage !== 'started'">
-      <v-btn rounded="lg" variants="tonal" :color="isUserInGame ? 'warning' : 'info'" @click="joinClick">{{
-        isUserInGame ? 'Leave Game' : 'Join Game'
-      }}</v-btn>
-      <template v-if="isUserLeader">
-        <v-btn class="mt-2" rounded="lg" variants="tonal" color="info" @click="lockClick">{{
-          roomState.stage === 'created' ? 'Lock Game' : 'Unlock game'
-        }}</v-btn>
+    <div class="actions-container d-flex flex-column">
+      <template v-if="roomState.stage !== 'started'">
+        <v-btn v-if="isUserInGame" rounded="lg" variants="tonal" color="warning" @click="joinClick"> Leave Game </v-btn>
         <v-btn
-          class="mt-2"
+          v-else
           rounded="lg"
           variants="tonal"
-          color="success"
-          :disabled="isStartGameDisabled"
-          @click="startClick"
+          color="info"
+          :disabled="roomState.stage !== 'created'"
+          @click="joinClick"
         >
-          Start Game
+          Join Game
         </v-btn>
+        <template v-if="isUserLeader">
+          <v-btn class="mt-2" rounded="lg" variants="tonal" color="info" @click="lockClick">
+            {{ roomState.stage === 'created' ? 'Lock Game' : 'Unlock game' }}
+          </v-btn>
+          <v-btn
+            class="mt-2"
+            rounded="lg"
+            variants="tonal"
+            color="success"
+            :disabled="isStartGameDisabled"
+            @click="startClick"
+          >
+            Start Game
+          </v-btn>
+        </template>
       </template>
+      <template v-else> </template>
     </div>
     <div
       class="player-container"
@@ -28,7 +39,11 @@
       :style="{ transform: calculateRotate(i) }"
       :key="player.id"
     >
-      <Player :player="player" :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }" />
+      <Player
+        :player="player"
+        :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }"
+        @player-click="playerClick"
+      />
     </div>
   </div>
 </template>
@@ -40,11 +55,13 @@ import type { TAvailableRoom, TGameStage } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { stages } from '@/components/room/const';
+import Game from '@/components/room/Game.vue';
 
 export default defineComponent({
   name: 'Board',
   components: {
     Player,
+    Game,
   },
   props: {
     roomState: {
@@ -91,6 +108,10 @@ export default defineComponent({
       return `rotate(${negative ? '-' : ''}${(360 / roomState.value.players.length) * i + 180}deg)`;
     };
 
+    const playerClick = (uuid: string) => {
+      console.log(uuid);
+    };
+
     return {
       roomState,
       stage,
@@ -104,6 +125,7 @@ export default defineComponent({
       joinClick,
       lockClick,
       startClick,
+      playerClick,
     };
   },
 });
@@ -129,6 +151,8 @@ export default defineComponent({
 }
 
 .player-container {
+  user-select: none;
+  pointer-events: none;
   display: flex;
   justify-content: center;
   position: absolute;
