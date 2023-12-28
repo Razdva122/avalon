@@ -31,6 +31,12 @@ export default defineComponent({
       roomState.value = state;
     });
 
+    socket.on('gameUpdated', (game) => {
+      if (roomState.value.stage === 'started') {
+        roomState.value.game = game;
+      }
+    });
+
     return {
       roomState,
     };

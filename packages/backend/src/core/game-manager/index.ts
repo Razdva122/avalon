@@ -1,6 +1,12 @@
 import { Game, IGameOptions } from '@/core/game';
 import type { User } from '@/user';
-import type { TRoomState } from '@/core/game-manager/interface';
+import type {
+  TRoomState,
+  TGameMethodsParams,
+  TGameMethods,
+  TMethodSelectPlayerParams,
+} from '@/core/game-manager/interface';
+
 import { TGameStage, Server, IVisualGameState } from '@avalon/types';
 
 export * from '@/core/game-manager/interface';
@@ -14,7 +20,7 @@ export class GameManager {
   constructor(users: User[], options: IGameOptions, io: Server, roomID: string) {
     this.roomID = roomID;
     this.io = io;
-    this.game = new Game(users, options, { gameStateChanged: () => this.gameStateChanged });
+    this.game = new Game(users, options, { gameStateChanged: () => this.gameStateChanged() });
     this.initRoomState();
   }
 
@@ -148,5 +154,14 @@ export class GameManager {
       history: this.roomState.history,
       players: this.roomState.players.map((player, index) => ({ ...player, role: roles[index] })),
     };
+  }
+
+  callGameMethods(method: 'selectPlayer', userID: string, params: TMethodSelectPlayerParams): void;
+  callGameMethods(method: TGameMethods, userID: string, params: TGameMethodsParams): void {
+    if (this.game.leader.user.id === userID) {
+      this.game[method](params.playerID);
+    } else {
+      throw new Error(`User with userID: ${userID} not a leader`);
+    }
   }
 }

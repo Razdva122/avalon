@@ -5,3 +5,11 @@ export type TRoomState = Pick<IVisualGameState, 'stage' | 'history' | 'settings'
   roles: Dictionary<TVisibleRole[]>;
   publicRoles: TVisibleRole[];
 };
+
+export type TGameMethodsParams = TMethodSelectPlayerParams;
+
+export type TGameMethods = 'selectPlayer';
+
+export type TMethodSelectPlayerParams = {
+  playerID: string;
+};

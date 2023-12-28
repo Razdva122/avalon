@@ -76,7 +76,7 @@ export class Manager {
       console.log('lockRoom', uuid);
       const room = this.rooms[uuid];
       if (room.leaderID === userID) {
-        this.rooms[uuid].toggleLockedState();
+        room.toggleLockedState();
       }
     });
 
@@ -84,14 +84,24 @@ export class Manager {
       console.log('startGame', uuid);
       const room = this.rooms[uuid];
       if (room.leaderID === userID) {
-        this.rooms[uuid].startGame();
+        room.startGame();
       }
     });
   }
 
   createMethodsForGame(socket: ServerSocket, userID: string, userName: string): void {
+    const getRoomManager = (uuid: string) => {
+      const room = this.rooms[uuid];
+      if (room.data.stage === 'started') {
+        return room.data.manager;
+      }
+
+      throw new Error(`Room with uuid ${uuid} have wrong stage ${this.rooms[uuid].data.stage}`);
+    };
+
     socket.on('selectPlayer', (uuid, selectedUserID) => {
       console.log(`Player ${selectedUserID} selected by ${userName} in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods('selectPlayer', userID, { playerID: selectedUserID });
     });
   }
 }

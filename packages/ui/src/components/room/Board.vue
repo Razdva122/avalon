@@ -91,6 +91,12 @@ export default defineComponent({
       return roomState.value.leaderID === store.state.user?.id;
     });
 
+    const isPlayerLeader = computed(() => {
+      if (roomState.value.stage === 'created') {
+        return roomState.value.leaderID === store.state.user?.id;
+      }
+    });
+
     const isStartGameDisabled = computed(() => {
       return (
         roomState.value.stage !== 'locked' || roomState.value.players.length < 5 || roomState.value.players.length > 10
@@ -122,7 +128,9 @@ export default defineComponent({
     };
 
     const playerClick = (uuid: string) => {
-      console.log(uuid);
+      if (isPlayerLeader.value) {
+        socket.emit('selectPlayer', roomState.value.roomID, uuid);
+      }
     };
 
     return {
