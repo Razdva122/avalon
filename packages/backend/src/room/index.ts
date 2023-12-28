@@ -61,13 +61,24 @@ export class Room {
     this.updateRoomState();
   }
 
-  updateRoomState() {
-    this.io.to(this.roomID).emit('roomUpdated', this.calculateRoomState());
+  updateRoomState(direct: boolean = false) {
+    if (direct) {
+      this.players.forEach((player) => {
+        this.io.to(player.id).emit('roomUpdated', this.calculateRoomState(player.id));
+      });
+
+      this.io
+        .except(this.players.map((player) => player.id))
+        .to(this.roomID)
+        .emit('roomUpdated', this.calculateRoomState());
+    } else {
+      this.io.to(this.roomID).emit('roomUpdated', this.calculateRoomState());
+    }
   }
 
   startGame() {
     this.data = { stage: 'started', manager: new GameManager(this.players, { roles: {} }, this.io, this.roomID) };
-    this.updateRoomState();
+    this.updateRoomState(true);
   }
 
   calculateRoomState(userID?: string): TRoomState {
