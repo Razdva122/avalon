@@ -101,7 +101,17 @@ export class Manager {
 
     socket.on('selectPlayer', (uuid, selectedUserID) => {
       console.log(`Player ${selectedUserID} selected by ${userName} in game ${uuid}`);
-      getRoomManager(uuid).callGameMethods('selectPlayer', userID, { playerID: selectedUserID });
+      getRoomManager(uuid).callGameMethods(userID, { method: 'selectPlayer', playerID: selectedUserID });
+    });
+
+    socket.on('sentSelectedPlayers', (uuid) => {
+      console.log(`Player ${userName} send mission in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'sentSelectedPlayers' });
+    });
+
+    socket.on('voteForMission', (uuid, option) => {
+      console.log(`Player ${userName} vote for mission (${option}) in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'voteForMission', option });
     });
   }
 }

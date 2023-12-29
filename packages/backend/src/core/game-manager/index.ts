@@ -1,11 +1,6 @@
 import { Game, IGameOptions } from '@/core/game';
 import type { User } from '@/user';
-import type {
-  TRoomState,
-  TGameMethodsParams,
-  TGameMethods,
-  TMethodSelectPlayerParams,
-} from '@/core/game-manager/interface';
+import type { TRoomState, TGameMethodsParams } from '@/core/game-manager/interface';
 
 import { TGameStage, Server, IVisualGameState } from '@avalon/types';
 
@@ -156,12 +151,27 @@ export class GameManager {
     };
   }
 
-  callGameMethods(method: 'selectPlayer', userID: string, params: TMethodSelectPlayerParams): void;
-  callGameMethods(method: TGameMethods, userID: string, params: TGameMethodsParams): void {
-    if (this.game.leader.user.id === userID) {
-      this.game[method](params.playerID);
-    } else {
-      throw new Error(`User with userID: ${userID} not a leader`);
+  callGameMethods(userID: string, params: TGameMethodsParams): void {
+    const validateUserIsLeader = () => {
+      if (this.game.leader.user.id !== userID) {
+        throw new Error(`User with userID: ${userID} not a leader`);
+      }
+    };
+
+    switch (params.method) {
+      case 'voteForMission':
+        this.game.voteForMission(userID, params.option);
+        break;
+
+      case 'selectPlayer':
+        validateUserIsLeader();
+        this.game.selectPlayer(params.playerID);
+        break;
+
+      case 'sentSelectedPlayers':
+        validateUserIsLeader();
+        this.game.sentSelectedPlayers();
+        break;
     }
   }
 }
