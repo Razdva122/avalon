@@ -29,7 +29,11 @@ export class MerlinAddon implements IGameAddon {
     if (this.game.winner === 'good') {
       this.game.winner = undefined;
       this.game.updateStage('selectMerlin');
-      this.game.players.find((player) => player.features.isAssassin)!.features.waitForAction = true;
+
+      const assassin = this.game.players.find((player) => player.features.isAssassin)!;
+      this.game.leader = assassin;
+      assassin.features.waitForAction = true;
+
       this.game.stateObserver.gameStateChanged();
       return false;
     }
@@ -46,7 +50,7 @@ export class MerlinAddon implements IGameAddon {
     }
 
     const assassinate = new Assassinate(this.game.players.find((player) => player.features.isAssassin)!);
-    this.game.players.find((player) => player.features.isAssassin)!.features.waitForAction = false;
+    this.game.leader.features.waitForAction = false;
 
     this.game.updateStage('end');
 

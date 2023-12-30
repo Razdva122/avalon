@@ -1,4 +1,4 @@
-import type { IPlayer, TVisibleRole, IVisualGameState, Dictionary, TVoteOption } from '@avalon/types';
+import type { IPlayer, TVisibleRole, IVisualGameState, Dictionary, TVoteOption, TMissionResult } from '@avalon/types';
 
 export type TRoomState = Pick<IVisualGameState, 'stage' | 'history' | 'settings' | 'vote'> & {
   players: Pick<IPlayer, 'features' | 'id' | 'name'>[];
@@ -6,7 +6,12 @@ export type TRoomState = Pick<IVisualGameState, 'stage' | 'history' | 'settings'
   publicRoles: TVisibleRole[];
 };
 
-export type TGameMethodsParams = TSelectPlayerParams | TVoteParams | TSentPlayersParams;
+export type TGameMethodsParams =
+  | TSelectPlayerParams
+  | TVoteParams
+  | TSentPlayersParams
+  | TActionOnMissionParams
+  | TSelectMerlinParams;
 
 export type TSelectPlayerParams = {
   method: 'selectPlayer';
@@ -20,4 +25,14 @@ export type TVoteParams = {
 
 export type TSentPlayersParams = {
   method: 'sentSelectedPlayers';
+};
+
+export type TActionOnMissionParams = {
+  method: 'actionOnMission';
+  result: TMissionResult;
+};
+
+export type TSelectMerlinParams = {
+  method: 'selectMerlin';
+  merlinID: string;
 };

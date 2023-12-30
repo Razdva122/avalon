@@ -4,6 +4,7 @@ import type { IVisualGameState } from '../game/state';
 import type { Server as SuperServer, Socket as SuperServerSocket } from 'socket.io';
 import type { Socket as SuperSocket } from 'socket.io-client';
 import type { TVoteOption } from '../game/vote';
+import { TMissionResult } from '../game/mission';
 
 export interface ServerToClientEvents {
   roomUpdated: (state: TRoomState) => void;
@@ -24,6 +25,8 @@ export interface ClientToServerEvents {
   selectPlayer: (uuid: string, userID: string) => void;
   sentSelectedPlayers: (uuid: string) => void;
   voteForMission: (uuid: string, option: TVoteOption) => void;
+  actionOnMission: (uuid: string, result: TMissionResult) => void;
+  selectMerlin: (uuid: string, merlinID: string) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;

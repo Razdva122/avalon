@@ -172,6 +172,22 @@ export class GameManager {
         validateUserIsLeader();
         this.game.sentSelectedPlayers();
         break;
+
+      case 'actionOnMission':
+        this.game.actionOnMission(userID, params.result);
+        break;
+
+      case 'selectMerlin':
+        if (!this.game.addons.merlin) {
+          throw new Error('You cant select merlin in game without merlin addon');
+        }
+
+        if (!this.game.players.find((player) => player.user.id === userID)?.features.isAssassin) {
+          throw new Error('Only Assassin can select merlin');
+        }
+
+        this.game.addons.merlin.selectMerlin();
+        break;
     }
   }
 }

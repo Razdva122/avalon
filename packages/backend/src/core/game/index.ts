@@ -82,10 +82,23 @@ export class Game {
     end: () => true,
   };
 
-  /**
-   * Current leader
-   */
-  leader: IPlayerInGame;
+  set leader({ user: { id } }: IPlayerInGame) {
+    if (this.leader) {
+      this.leader.features.isLeader = false;
+    }
+
+    const nextLeader = this.players.find((player) => player.user.id === id);
+
+    if (!nextLeader) {
+      throw new Error(`Cant set new leader with id: ${id}`);
+    }
+
+    nextLeader.features.isLeader = true;
+  }
+
+  get leader() {
+    return this.players.find((player) => player.features.isLeader)!;
+  }
 
   private _stage: TGameStage = 'initialization';
 
@@ -148,7 +161,6 @@ export class Game {
     this.players = playersWithNext;
 
     this.leader = _.sample(playersWithNext)!;
-    this.leader.features.isLeader = true;
     this.leader.features.waitForAction = true;
 
     // Generate missions
@@ -232,9 +244,7 @@ export class Game {
    * Move leader to next player
    */
   protected moveLeader(): void {
-    this.leader.features.isLeader = false;
     this.leader = this.leader.next;
-    this.leader.features.isLeader = true;
     this.leader.features.waitForAction = true;
   }
 
