@@ -21,8 +21,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Registration from '@/components/Registration.vue';
-import ConnectStatus from '@/components/ConnectStatus.vue';
-import ErrorSnackbar from '@/components/ErrorSnackbar.vue';
+import ConnectStatus from '@/components/feedback/ConnectStatus.vue';
+import ErrorSnackbar from '@/components/feedback/ErrorSnackbar.vue';
 
 export default defineComponent({
   components: {

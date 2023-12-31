@@ -3,15 +3,16 @@
     <template v-if="roomState.stage === 'unavailable'">
       <h1>This is wrong uuid</h1>
     </template>
-    <Board v-else :roomState="roomState" />
+    <Board v-else />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
-import Board from '@/components/room/Board.vue';
+import { defineComponent, ref, provide, Ref } from 'vue';
+import Board from '@/components/game/board/Board.vue';
 import type { TRoomState } from '@avalon/types';
 import { socket } from '@/api/socket';
+import { roomStateKey, TAvailableRoomState } from '@/pages/room/const';
 
 export default defineComponent({
   name: 'Room',
@@ -25,7 +26,9 @@ export default defineComponent({
     },
   },
   async setup(props) {
-    let roomState = ref<TRoomState>(await socket.emitWithAck('joinRoom', props.uuid));
+    let roomState = ref() as Ref<TRoomState>;
+    provide(roomStateKey, <TAvailableRoomState>roomState);
+    roomState.value = await socket.emitWithAck('joinRoom', props.uuid);
 
     socket.on('roomUpdated', (state) => {
       roomState.value = state;

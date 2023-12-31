@@ -1,6 +1,6 @@
 <template>
   <div class="player-container" @click="$emit('playerClick', player.id)">
-    <img class="player-frame" alt="frame" src="../assets/player-frame.png" />
+    <img class="player-frame" alt="frame" src="@/assets/player-frame.png" />
     <div class="player-icon" :class="iconClasses"></div>
     <span class="player-name" :class="nameClasses">{{ player.name }}</span>
   </div>
@@ -62,7 +62,7 @@ export default defineComponent({
 
 .player-name {
   @include text-overflow(1);
-  background-image: url('../assets/name-frame.png');
+  background-image: url('@/assets/name-frame.png');
   background-size: contain;
   color: white;
 }

@@ -10,9 +10,9 @@
 <script lang="ts">
 import * as _ from 'lodash';
 import type { IVisualGameState, THistoryMission } from '@avalon/types';
-import type { IMissionWithResult } from '@/components/room/interface';
+import type { IMissionWithResult } from '@/components/game/board/interface';
 import { defineComponent, PropType } from 'vue';
-import Mission from '@/components/room/Mission.vue';
+import Mission from '@/components/game/board/modules/Mission.vue';
 
 export default defineComponent({
   name: 'Game',

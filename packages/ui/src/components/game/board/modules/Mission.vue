@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import type { IMissionWithResult } from '@/components/room/interface';
+import type { IMissionWithResult } from '@/components/game/board/interface';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({

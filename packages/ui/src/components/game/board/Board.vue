@@ -1,6 +1,6 @@
 <template>
   <div class="board-container">
-    <img class="game-board" alt="board" src="../../assets/board.jpeg" />
+    <img class="game-board" alt="board" src="@/assets/board.jpeg" />
     <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
     <div class="actions-container d-flex flex-column">
       <template v-if="roomState.stage !== 'started'">
@@ -51,13 +51,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType, toRef } from 'vue';
-import Player from '@/components/Player.vue';
-import type { TAvailableRoom } from '@avalon/types';
+import { defineComponent, computed, inject } from 'vue';
+import Player from '@/components/game/board/modules/Player.vue';
+import Game from '@/components/game/board/modules/Game.vue';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
-import { stages } from '@/components/room/const';
-import Game from '@/components/room/Game.vue';
+import { stages } from '@/components/game/board/const';
+import { roomStateKey } from '@/pages/room/const';
 
 export default defineComponent({
   name: 'Board',
@@ -65,14 +65,8 @@ export default defineComponent({
     Player,
     Game,
   },
-  props: {
-    roomState: {
-      required: true,
-      type: Object as PropType<TAvailableRoom>,
-    },
-  },
-  async setup(props) {
-    const roomState = toRef(props, 'roomState');
+  async setup() {
+    const roomState = inject(roomStateKey)!;
     const store = useStore();
 
     const currentGameStage = computed(() => {
