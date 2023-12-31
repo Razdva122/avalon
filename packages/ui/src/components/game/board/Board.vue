@@ -4,32 +4,7 @@
     <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
     <div class="actions-container d-flex flex-column">
       <template v-if="roomState.stage !== 'started'">
-        <v-btn v-if="isUserInGame" rounded="lg" variants="tonal" color="warning" @click="joinClick"> Leave Game </v-btn>
-        <v-btn
-          v-else
-          rounded="lg"
-          variants="tonal"
-          color="info"
-          :disabled="roomState.stage !== 'created'"
-          @click="joinClick"
-        >
-          Join Game
-        </v-btn>
-        <template v-if="isUserLeader">
-          <v-btn class="mt-2" rounded="lg" variants="tonal" color="info" @click="lockClick">
-            {{ roomState.stage === 'created' ? 'Lock Game' : 'Unlock game' }}
-          </v-btn>
-          <v-btn
-            class="mt-2"
-            rounded="lg"
-            variants="tonal"
-            color="success"
-            :disabled="isStartGameDisabled"
-            @click="startClick"
-          >
-            Start Game
-          </v-btn>
-        </template>
+        <StartPanel />
       </template>
       <template v-else>
         <Game :game="roomState.game"></Game>
@@ -54,6 +29,7 @@
 import { defineComponent, computed, inject } from 'vue';
 import Player from '@/components/game/board/modules/Player.vue';
 import Game from '@/components/game/board/modules/Game.vue';
+import StartPanel from '@/components/game/board/modules/StartPanel.vue';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { stages } from '@/components/game/board/const';
@@ -64,8 +40,9 @@ export default defineComponent({
   components: {
     Player,
     Game,
+    StartPanel,
   },
-  async setup() {
+  setup() {
     const roomState = inject(roomStateKey)!;
     const store = useStore();
 
@@ -77,24 +54,10 @@ export default defineComponent({
       return stages[roomState.value.stage];
     });
 
-    const isUserInGame = computed(() => {
-      return roomState.value.players.some((player) => player.id === store.state.user?.id);
-    });
-
-    const isUserLeader = computed(() => {
-      return roomState.value.leaderID === store.state.user?.id;
-    });
-
     const isPlayerLeader = computed(() => {
       if (roomState.value.stage === 'created') {
         return roomState.value.leaderID === store.state.user?.id;
       }
-    });
-
-    const isStartGameDisabled = computed(() => {
-      return (
-        roomState.value.stage !== 'locked' || roomState.value.players.length < 5 || roomState.value.players.length > 10
-      );
     });
 
     const players = computed(() => {
@@ -104,18 +67,6 @@ export default defineComponent({
 
       return roomState.value.players;
     });
-
-    const joinClick = () => {
-      socket.emit(isUserInGame.value ? 'leaveGame' : 'joinGame', roomState.value.roomID);
-    };
-
-    const lockClick = () => {
-      socket.emit('lockRoom', roomState.value.roomID);
-    };
-
-    const startClick = () => {
-      socket.emit('startGame', roomState.value.roomID);
-    };
 
     const calculateRotate = (i: number, negative: boolean = false) => {
       return `rotate(${negative ? '-' : ''}${(360 / roomState.value.players.length) * i + 180}deg)`;
@@ -132,14 +83,7 @@ export default defineComponent({
       currentGameStage,
       players,
 
-      isUserLeader,
-      isUserInGame,
-      isStartGameDisabled,
-
       calculateRotate,
-      joinClick,
-      lockClick,
-      startClick,
       playerClick,
     };
   },
