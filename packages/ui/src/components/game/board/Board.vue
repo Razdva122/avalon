@@ -8,6 +8,7 @@
       </template>
       <template v-else>
         <Game :game="roomState.game"></Game>
+        <InGamePanel :game="roomState.game"></InGamePanel>
       </template>
     </div>
     <div
@@ -19,7 +20,7 @@
       <Player
         :player="player"
         :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }"
-        @player-click="playerClick"
+        @player-click="onPlayerClick"
       />
     </div>
   </div>
@@ -30,6 +31,7 @@ import { defineComponent, computed, inject } from 'vue';
 import Player from '@/components/game/board/modules/Player.vue';
 import Game from '@/components/game/board/modules/Game.vue';
 import StartPanel from '@/components/game/board/modules/StartPanel.vue';
+import InGamePanel from './modules/InGamePanel.vue';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { stages } from '@/components/game/board/const';
@@ -41,6 +43,7 @@ export default defineComponent({
     Player,
     Game,
     StartPanel,
+    InGamePanel,
   },
   setup() {
     const roomState = inject(roomStateKey)!;
@@ -72,7 +75,7 @@ export default defineComponent({
       return `rotate(${negative ? '-' : ''}${(360 / roomState.value.players.length) * i + 180}deg)`;
     };
 
-    const playerClick = (uuid: string) => {
+    const onPlayerClick = (uuid: string) => {
       if (isPlayerLeader.value) {
         socket.emit('selectPlayer', roomState.value.roomID, uuid);
       }
@@ -84,7 +87,7 @@ export default defineComponent({
       players,
 
       calculateRotate,
-      playerClick,
+      onPlayerClick,
     };
   },
 });

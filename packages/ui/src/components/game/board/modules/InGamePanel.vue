@@ -1,23 +1,48 @@
 <template>
   <template v-if="game.stage === 'selectTeam' && isUserLeader">
-    <v-btn rounded="lg" variants="tonal" color="warning" :disabled="isSendTeamDisabled">Send Team</v-btn>
+    <v-btn rounded="lg" variants="tonal" color="warning" :disabled="isSendTeamDisabled" @click="onSendTeamClick"
+      >Send Team</v-btn
+    >
   </template>
   <template v-if="game.stage === 'votingForTeam'">
-    <v-btn rounded="lg" variants="tonal" color="success" :disabled="!isPlayerActive">Approve</v-btn>
-    <v-btn rounded="lg" variants="tonal" color="danger" :disabled="!isPlayerActive">Reject</v-btn>
+    <v-btn
+      rounded="lg"
+      variants="tonal"
+      color="success"
+      :disabled="!isPlayerActive"
+      @click="() => onVoteClick('approve')"
+      >Approve</v-btn
+    >
+    <v-btn rounded="lg" variants="tonal" color="danger" :disabled="!isPlayerActive" @click="() => onVoteClick('reject')"
+      >Reject</v-btn
+    >
   </template>
   <template v-if="game.stage === 'onMission' && isPlayerOnMission">
-    <v-btn rounded="lg" variants="tonal" color="success" :disabled="!isPlayerActive">Success</v-btn>
-    <v-btn rounded="lg" variants="tonal" color="danger" :disabled="!isPlayerActive || !isPlayerCanFail">Fail</v-btn>
+    <v-btn
+      rounded="lg"
+      variants="tonal"
+      color="success"
+      :disabled="!isPlayerActive"
+      @click="() => onMissionClick('success')"
+      >Success</v-btn
+    >
+    <v-btn
+      rounded="lg"
+      variants="tonal"
+      color="danger"
+      :disabled="!isPlayerActive || !isPlayerCanFail"
+      @click="() => onMissionClick('fail')"
+      >Fail</v-btn
+    >
   </template>
   <template v-if="game.stage === 'selectMerlin' && isUserLeader">
-    <v-btn rounded="lg" variants="tonal" color="danger">Execute merlin</v-btn>
+    <v-btn rounded="lg" variants="tonal" color="danger" @click="onExecuteMerlinClick">Execute merlin</v-btn>
   </template>
 </template>
 
 <script lang="ts">
 import { defineComponent, computed, PropType, ref } from 'vue';
-import type { IVisualGameState } from '@avalon/types';
+import type { IVisualGameState, TMissionResult, TVoteOption } from '@avalon/types';
 import { useStore } from '@/store';
 import { socket } from '@/api/socket';
 
@@ -58,6 +83,22 @@ export default defineComponent({
       return game.value.players.filter((player) => player.features.isSelected).length !== needPlayers;
     });
 
+    const onSendTeamClick = () => {
+      socket.emit('sentSelectedPlayers', game.value.uuid);
+    };
+
+    const onVoteClick = (option: TVoteOption) => {
+      socket.emit('voteForMission', game.value.uuid, option);
+    };
+
+    const onMissionClick = (result: TMissionResult) => {
+      socket.emit('actionOnMission', game.value.uuid, result);
+    };
+
+    const onExecuteMerlinClick = () => {
+      socket.emit('selectMerlin', game.value.uuid);
+    };
+
     return {
       isUserLeader,
       isPlayerOnMission,
@@ -65,6 +106,11 @@ export default defineComponent({
       isPlayerCanFail,
 
       isSendTeamDisabled,
+
+      onSendTeamClick,
+      onVoteClick,
+      onMissionClick,
+      onExecuteMerlinClick,
     };
   },
 });

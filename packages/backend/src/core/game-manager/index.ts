@@ -24,6 +24,7 @@ export class GameManager {
    */
   initRoomState(): void {
     this.roomState = {
+      uuid: this.roomID,
       stage: this.game.stage,
       vote: this.game.turn,
       mission: this.game.round,
@@ -144,6 +145,7 @@ export class GameManager {
     const roles = userId && this.roomState.roles[userId] ? this.roomState.roles[userId] : this.roomState.publicRoles;
 
     return {
+      uuid: this.roomState.uuid,
       stage: this.roomState.stage,
       vote: this.roomState.vote,
       mission: this.roomState.mission,

@@ -1,10 +1,17 @@
 <template>
-  <v-btn v-if="isUserInGame" rounded="lg" variants="tonal" color="warning" @click="joinClick"> Leave Game </v-btn>
-  <v-btn v-else rounded="lg" variants="tonal" color="info" :disabled="roomState.stage !== 'created'" @click="joinClick">
+  <v-btn v-if="isUserInGame" rounded="lg" variants="tonal" color="warning" @click="onJoinClick"> Leave Game </v-btn>
+  <v-btn
+    v-else
+    rounded="lg"
+    variants="tonal"
+    color="info"
+    :disabled="roomState.stage !== 'created'"
+    @click="onJoinClick"
+  >
     Join Game
   </v-btn>
   <template v-if="isUserLeader">
-    <v-btn class="mt-2" rounded="lg" variants="tonal" color="info" @click="lockClick">
+    <v-btn class="mt-2" rounded="lg" variants="tonal" color="info" @click="onLockClick">
       {{ roomState.stage === 'created' ? 'Lock Game' : 'Unlock game' }}
     </v-btn>
     <v-btn
@@ -13,7 +20,7 @@
       variants="tonal"
       color="success"
       :disabled="isStartGameDisabled"
-      @click="startClick"
+      @click="onStartClick"
     >
       Start Game
     </v-btn>
@@ -46,15 +53,15 @@ export default defineComponent({
       );
     });
 
-    const joinClick = () => {
+    const onJoinClick = () => {
       socket.emit(isUserInGame.value ? 'leaveGame' : 'joinGame', roomState.value.roomID);
     };
 
-    const lockClick = () => {
+    const onLockClick = () => {
       socket.emit('lockRoom', roomState.value.roomID);
     };
 
-    const startClick = () => {
+    const onStartClick = () => {
       socket.emit('startGame', roomState.value.roomID);
     };
 
@@ -65,9 +72,9 @@ export default defineComponent({
       isUserLeader,
       isStartGameDisabled,
 
-      joinClick,
-      lockClick,
-      startClick,
+      onJoinClick,
+      onLockClick,
+      onStartClick,
     };
   },
 });

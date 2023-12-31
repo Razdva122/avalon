@@ -26,7 +26,7 @@ export interface ClientToServerEvents {
   sentSelectedPlayers: (uuid: string) => void;
   voteForMission: (uuid: string, option: TVoteOption) => void;
   actionOnMission: (uuid: string, result: TMissionResult) => void;
-  selectMerlin: (uuid: string, merlinID: string) => void;
+  selectMerlin: (uuid: string) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;

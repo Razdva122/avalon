@@ -3,6 +3,7 @@ import type { THistoryResults } from './history';
 import type { IGameSettings } from './settings';
 
 export interface IVisualGameState {
+  uuid: string;
   stage: TGameStage;
   vote: number;
   mission: number;
