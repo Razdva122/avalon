@@ -1,10 +1,12 @@
 import type { TVisibleRole } from './roles';
+import type { TMissionResult } from './mission';
 
 export interface IPlayer {
   id: string;
   name: string;
   role: TVisibleRole;
   features: IPlayerFeatures;
+  validMissionsResult?: TMissionResult[];
 }
 
 export interface IPlayerFeatures {

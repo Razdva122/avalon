@@ -73,9 +73,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped lang="scss">
-.mission {
-  width: 64px;
-  height: 64px;
-}
-</style>
+<style scoped lang="scss"></style>

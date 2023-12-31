@@ -2,7 +2,7 @@ import { Game, IGameOptions } from '@/core/game';
 import type { User } from '@/user';
 import type { TRoomState, TGameMethodsParams } from '@/core/game-manager/interface';
 
-import { TGameStage, Server, IVisualGameState } from '@avalon/types';
+import { TGameStage, Server, IVisualGameState, IPlayer } from '@avalon/types';
 
 export * from '@/core/game-manager/interface';
 
@@ -26,6 +26,7 @@ export class GameManager {
     this.roomState = {
       stage: this.game.stage,
       vote: this.game.turn,
+      mission: this.game.round,
       settings: this.game.settings,
       players: this.game.players.map((player) => {
         return {
@@ -145,9 +146,18 @@ export class GameManager {
     return {
       stage: this.roomState.stage,
       vote: this.roomState.vote,
+      mission: this.roomState.mission,
       settings: this.roomState.settings,
       history: this.roomState.history,
-      players: this.roomState.players.map((player, index) => ({ ...player, role: roles[index] })),
+      players: this.roomState.players.map((player, index) => {
+        const playerData: IPlayer = { ...player, role: roles[index] };
+
+        if (player.id === userId) {
+          playerData.validMissionsResult = this.game.players[index].role.validMissionResult;
+        }
+
+        return playerData;
+      }),
     };
   }
 

@@ -1,6 +1,6 @@
 import type { IPlayer, TVisibleRole, IVisualGameState, Dictionary, TVoteOption, TMissionResult } from '@avalon/types';
 
-export type TRoomState = Pick<IVisualGameState, 'stage' | 'history' | 'settings' | 'vote'> & {
+export type TRoomState = Pick<IVisualGameState, 'stage' | 'history' | 'settings' | 'vote' | 'mission'> & {
   players: Pick<IPlayer, 'features' | 'id' | 'name'>[];
   roles: Dictionary<TVisibleRole[]>;
   publicRoles: TVisibleRole[];
