@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType, ref } from 'vue';
+import { defineComponent, computed, PropType, toRefs } from 'vue';
 import type { IVisualGameState, TMissionResult, TVoteOption } from '@avalon/types';
 import { useStore } from '@/store';
 import { socket } from '@/api/socket';
@@ -64,7 +64,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const game = ref(props.game);
+    const { game } = toRefs(props);
     const store = useStore();
 
     const player = computed(() => {
@@ -89,6 +89,8 @@ export default defineComponent({
 
     const isSendTeamDisabled = computed(() => {
       const needPlayers = game.value.settings.missions[game.value.mission].players;
+      console.log(needPlayers);
+      console.log(game.value.players.filter((player) => player.features.isSelected).length);
       return game.value.players.filter((player) => player.features.isSelected).length !== needPlayers;
     });
 

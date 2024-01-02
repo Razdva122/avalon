@@ -119,9 +119,9 @@ export class Manager {
       getRoomManager(uuid).callGameMethods(userID, { method: 'actionOnMission', result });
     });
 
-    socket.on('selectMerlin', (uuid, merlinID) => {
-      console.log(`Player ${userName} selectMerlin (${merlinID}) in game ${uuid}`);
-      getRoomManager(uuid).callGameMethods(userID, { method: 'selectMerlin', merlinID });
+    socket.on('selectMerlin', (uuid) => {
+      console.log(`Player ${userName} selectMerlin in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'selectMerlin' });
     });
   }
 }

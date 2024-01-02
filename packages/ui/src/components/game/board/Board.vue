@@ -8,7 +8,7 @@
       </template>
       <template v-else>
         <Game :game="roomState.game"></Game>
-        <InGamePanel :game="roomState.game"></InGamePanel>
+        <InGamePanel v-if="playerInGame" :game="roomState.game"></InGamePanel>
       </template>
     </div>
     <div
@@ -57,9 +57,9 @@ export default defineComponent({
       return stages[roomState.value.stage];
     });
 
-    const isPlayerLeader = computed(() => {
-      if (roomState.value.stage === 'created') {
-        return roomState.value.leaderID === store.state.user?.id;
+    const playerInGame = computed(() => {
+      if (roomState.value.stage === 'started') {
+        return roomState.value.game.players.find((player) => player.id === store.state.user?.id);
       }
     });
 
@@ -76,7 +76,11 @@ export default defineComponent({
     };
 
     const onPlayerClick = (uuid: string) => {
-      if (isPlayerLeader.value) {
+      if (roomState.value.stage !== 'started') {
+        return;
+      }
+
+      if (playerInGame.value?.features.isLeader) {
         socket.emit('selectPlayer', roomState.value.roomID, uuid);
       }
     };
@@ -85,6 +89,7 @@ export default defineComponent({
       roomState,
       currentGameStage,
       players,
+      playerInGame,
 
       calculateRotate,
       onPlayerClick,

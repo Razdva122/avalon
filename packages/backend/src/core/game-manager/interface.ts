@@ -34,5 +34,4 @@ export type TActionOnMissionParams = {
 
 export type TSelectMerlinParams = {
   method: 'selectMerlin';
-  merlinID: string;
 };

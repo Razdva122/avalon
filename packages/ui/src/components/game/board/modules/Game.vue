@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for="mission in missions">
+    <div v-for="mission in missions" class="d-flex flex-row">
       <Mission :mission="mission" />
     </div>
     <div>Vote stage: {{ game.vote }}</div>
