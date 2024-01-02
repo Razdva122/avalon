@@ -4,7 +4,15 @@
       <h1>This is wrong uuid</h1>
     </template>
     <template v-else>
-      <v-alert color="info" variant="tonal" class="game-stage rounded-xl mb-10" :text="currentGameStage"></v-alert>
+      <v-alert
+        v-model="alert"
+        color="info"
+        variant="tonal"
+        class="game-stage rounded-xl mb-10"
+        closable
+        close-label="Close Alert"
+        :text="currentGameStage"
+      ></v-alert>
       <Board />
     </template>
   </div>
@@ -32,6 +40,7 @@ export default defineComponent({
   },
   async setup(props) {
     let roomState = ref() as Ref<TRoomState>;
+    const alert = ref<boolean>(true);
     const store = useStore();
     provide(roomStateKey, <TAvailableRoomState>roomState);
 
@@ -74,6 +83,7 @@ export default defineComponent({
     return {
       roomState,
       currentGameStage,
+      alert,
     };
   },
 
@@ -85,7 +95,7 @@ export default defineComponent({
 
 <style lang="scss">
 .game-stage {
-  width: 300px;
+  width: 500px;
   background-color: white;
   font-size: 18px;
 }
