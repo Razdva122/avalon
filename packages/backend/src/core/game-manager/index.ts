@@ -177,6 +177,10 @@ export class GameManager {
 
       case 'selectPlayer':
         validateUserIsLeader();
+        if (this.game.stage !== 'selectTeam' && this.game.stage !== 'selectMerlin') {
+          throw new Error(`You cant select users in this stage: ${this.game.stage}`);
+        }
+
         this.game.selectPlayer(params.playerID);
         break;
 

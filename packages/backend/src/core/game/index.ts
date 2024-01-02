@@ -252,10 +252,9 @@ export class Game {
    * Start next round
    */
   protected startNextRound(): void {
-    this.nextVote(true);
     this.round += 1;
     this.currentMission.activateMission();
-    this.updateStage('selectTeam');
+    this.nextVote(true);
   }
 
   /**
@@ -291,6 +290,7 @@ export class Game {
     }
 
     this.vote = new Vote(this.players, this.leader, this.turn === 4 ? true : undefined);
+    this.updateStage('selectTeam');
   }
 
   /**
