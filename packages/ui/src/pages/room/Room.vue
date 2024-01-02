@@ -13,6 +13,8 @@ import Board from '@/components/game/board/Board.vue';
 import type { TRoomState } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { roomStateKey, TAvailableRoomState } from '@/pages/room/const';
+import { mutateRoomGameForPosition } from '@/pages/room/helpers';
+import { useStore } from '@/store';
 
 export default defineComponent({
   name: 'Room',
@@ -27,15 +29,33 @@ export default defineComponent({
   },
   async setup(props) {
     let roomState = ref() as Ref<TRoomState>;
+    const store = useStore();
     provide(roomStateKey, <TAvailableRoomState>roomState);
-    roomState.value = await socket.emitWithAck('joinRoom', props.uuid);
+
+    const stateFromBackend = await socket.emitWithAck('joinRoom', props.uuid);
+    const userID = store.state.user?.id;
+
+    function syncState(state: TRoomState) {
+      if (state.stage !== 'unavailable') {
+        mutateRoomGameForPosition(state, userID);
+      }
+
+      if ('game' in state) {
+        mutateRoomGameForPosition(state.game, userID);
+      }
+
+      roomState.value = state;
+    }
+
+    syncState(stateFromBackend);
 
     socket.on('roomUpdated', (state) => {
-      roomState.value = state;
+      syncState(state);
     });
 
     socket.on('gameUpdated', (game) => {
       if (roomState.value.stage === 'started') {
+        mutateRoomGameForPosition(game, userID);
         roomState.value.game = game;
       }
     });

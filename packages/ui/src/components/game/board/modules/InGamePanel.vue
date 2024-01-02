@@ -7,7 +7,7 @@
     <v-btn color="danger" :disabled="!isPlayerActive" @click="() => onVoteClick('reject')"> Reject </v-btn>
   </template>
   <template v-if="game.stage === 'onMission' && isPlayerOnMission">
-    <v-btn color="error" :disabled="!isPlayerActive" @click="() => onMissionClick('success')"> Success </v-btn>
+    <v-btn color="success" :disabled="!isPlayerActive" @click="() => onMissionClick('success')"> Success </v-btn>
     <v-btn color="error" :disabled="!isPlayerActive || !isPlayerCanFail" @click="() => onMissionClick('fail')">
       Fail
     </v-btn>
@@ -57,8 +57,6 @@ export default defineComponent({
 
     const isSendTeamDisabled = computed(() => {
       const needPlayers = game.value.settings.missions[game.value.mission].players;
-      console.log(needPlayers);
-      console.log(game.value.players.filter((player) => player.features.isSelected).length);
       return game.value.players.filter((player) => player.features.isSelected).length !== needPlayers;
     });
 

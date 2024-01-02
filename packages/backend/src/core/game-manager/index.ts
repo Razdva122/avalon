@@ -69,6 +69,8 @@ export class GameManager {
 
     this.roomState.vote = this.game.turn;
 
+    this.roomState.mission = this.game.round;
+
     this.sendNewStateToUsers();
   }
 
