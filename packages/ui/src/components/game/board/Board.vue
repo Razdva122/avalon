@@ -1,14 +1,17 @@
 <template>
-  <div class="board-container">
+  <div class="board-container mt-16">
     <img class="game-board" alt="board" src="@/assets/board.jpeg" />
-    <v-alert color="info" variant="tonal" class="game-stage rounded-xl" :text="currentGameStage"></v-alert>
     <div class="actions-container d-flex flex-column">
       <template v-if="roomState.stage !== 'started'">
-        <StartPanel />
+        <div class="button-panel d-flex flex-column align-center">
+          <StartPanel />
+        </div>
       </template>
       <template v-else>
         <Game :game="roomState.game"></Game>
-        <InGamePanel v-if="playerInGame" :game="roomState.game"></InGamePanel>
+        <div class="button-panel d-flex flex-column align-center">
+          <InGamePanel v-if="playerInGame" :game="roomState.game" />
+        </div>
       </template>
     </div>
     <div
@@ -34,7 +37,6 @@ import StartPanel from '@/components/game/board/modules/StartPanel.vue';
 import InGamePanel from './modules/InGamePanel.vue';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
-import { stages } from '@/components/game/board/const';
 import { roomStateKey } from '@/pages/room/const';
 
 export default defineComponent({
@@ -48,14 +50,6 @@ export default defineComponent({
   setup() {
     const roomState = inject(roomStateKey)!;
     const store = useStore();
-
-    const currentGameStage = computed(() => {
-      if (roomState.value.stage === 'started') {
-        return stages[roomState.value.game.stage];
-      }
-
-      return stages[roomState.value.stage];
-    });
 
     const playerInGame = computed(() => {
       if (roomState.value.stage === 'started') {
@@ -87,7 +81,6 @@ export default defineComponent({
 
     return {
       roomState,
-      currentGameStage,
       players,
       playerInGame,
 
@@ -128,11 +121,7 @@ export default defineComponent({
   height: 600px;
 }
 
-.game-stage {
-  position: absolute;
-  top: 20%;
-  width: 300px;
-  background-color: white;
-  font-size: 18px;
+.button-panel > button {
+  width: 200px;
 }
 </style>

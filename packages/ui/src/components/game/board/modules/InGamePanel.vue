@@ -3,11 +3,15 @@
     <v-btn color="warning" :disabled="isSendTeamDisabled" @click="onSendTeamClick"> Send Team </v-btn>
   </template>
   <template v-if="game.stage === 'votingForTeam'">
-    <v-btn color="success" :disabled="!isPlayerActive" @click="() => onVoteClick('approve')"> Approve </v-btn>
-    <v-btn color="danger" :disabled="!isPlayerActive" @click="() => onVoteClick('reject')"> Reject </v-btn>
+    <v-btn color="success" :disabled="!isPlayerActive" @click="() => onVoteClick('approve')" class="mb-2">
+      Approve
+    </v-btn>
+    <v-btn color="error" :disabled="!isPlayerActive" @click="() => onVoteClick('reject')"> Reject </v-btn>
   </template>
   <template v-if="game.stage === 'onMission' && isPlayerOnMission">
-    <v-btn color="success" :disabled="!isPlayerActive" @click="() => onMissionClick('success')"> Success </v-btn>
+    <v-btn color="success" :disabled="!isPlayerActive" @click="() => onMissionClick('success')" class="mb-2">
+      Success
+    </v-btn>
     <v-btn color="error" :disabled="!isPlayerActive || !isPlayerCanFail" @click="() => onMissionClick('fail')">
       Fail
     </v-btn>

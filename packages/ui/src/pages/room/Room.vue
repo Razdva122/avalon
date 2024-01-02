@@ -1,18 +1,21 @@
 <template>
-  <div class="room">
+  <div class="room d-flex flex-column align-center mt-8">
     <template v-if="roomState.stage === 'unavailable'">
       <h1>This is wrong uuid</h1>
     </template>
-    <Board v-else />
+    <template v-else>
+      <v-alert color="info" variant="tonal" class="game-stage rounded-xl mb-10" :text="currentGameStage"></v-alert>
+      <Board />
+    </template>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, provide, Ref } from 'vue';
+import { defineComponent, ref, provide, Ref, computed } from 'vue';
 import Board from '@/components/game/board/Board.vue';
 import type { TRoomState } from '@avalon/types';
 import { socket } from '@/api/socket';
-import { roomStateKey, TAvailableRoomState } from '@/pages/room/const';
+import { roomStateKey, TAvailableRoomState, stages } from '@/pages/room/const';
 import { mutateRoomGameForPosition } from '@/pages/room/helpers';
 import { useStore } from '@/store';
 
@@ -60,8 +63,17 @@ export default defineComponent({
       }
     });
 
+    const currentGameStage = computed(() => {
+      if (roomState.value.stage === 'started') {
+        return stages[roomState.value.game.stage];
+      }
+
+      return stages[roomState.value.stage];
+    });
+
     return {
       roomState,
+      currentGameStage,
     };
   },
 
@@ -70,3 +82,11 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss">
+.game-stage {
+  width: 300px;
+  background-color: white;
+  font-size: 18px;
+}
+</style>

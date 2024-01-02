@@ -1,5 +1,5 @@
 <template>
-  <div class="lobby">
+  <div class="lobby ma-5">
     <v-btn color="info" @click="createRoom"> Create room </v-btn>
   </div>
 </template>
