@@ -5,7 +5,7 @@
         <v-form @submit.prevent="createUser" class="d-flex flex-column align-center justify-center">
           <span class="mb-2">Select your username for game</span>
           <v-text-field v-model="username" :rules="rules" label="Username" class="w-100 mb-2"></v-text-field>
-          <v-btn type="submit" rounded="lg" variants="tonal">Submit</v-btn>
+          <v-btn type="submit">Submit</v-btn>
         </v-form>
       </v-sheet>
     </v-card>

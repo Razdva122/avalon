@@ -1,6 +1,6 @@
 <template>
   <div class="lobby">
-    <v-btn rounded="lg" variants="tonal" color="info" @click="createRoom"> Create room </v-btn>
+    <v-btn color="info" @click="createRoom"> Create room </v-btn>
   </div>
 </template>
 

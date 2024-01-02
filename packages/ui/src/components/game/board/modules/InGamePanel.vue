@@ -1,51 +1,19 @@
 <template>
   <template v-if="game.stage === 'selectTeam' && isUserLeader">
-    <v-btn rounded="lg" variants="tonal" color="warning" :disabled="isSendTeamDisabled" @click="onSendTeamClick">
-      Send Team
-    </v-btn>
+    <v-btn color="warning" :disabled="isSendTeamDisabled" @click="onSendTeamClick"> Send Team </v-btn>
   </template>
   <template v-if="game.stage === 'votingForTeam'">
-    <v-btn
-      rounded="lg"
-      variants="tonal"
-      color="success"
-      :disabled="!isPlayerActive"
-      @click="() => onVoteClick('approve')"
-    >
-      Approve
-    </v-btn>
-    <v-btn
-      rounded="lg"
-      variants="tonal"
-      color="danger"
-      :disabled="!isPlayerActive"
-      @click="() => onVoteClick('reject')"
-    >
-      Reject
-    </v-btn>
+    <v-btn color="success" :disabled="!isPlayerActive" @click="() => onVoteClick('approve')"> Approve </v-btn>
+    <v-btn color="danger" :disabled="!isPlayerActive" @click="() => onVoteClick('reject')"> Reject </v-btn>
   </template>
   <template v-if="game.stage === 'onMission' && isPlayerOnMission">
-    <v-btn
-      rounded="lg"
-      variants="tonal"
-      color="success"
-      :disabled="!isPlayerActive"
-      @click="() => onMissionClick('success')"
-    >
-      Success
-    </v-btn>
-    <v-btn
-      rounded="lg"
-      variants="tonal"
-      color="danger"
-      :disabled="!isPlayerActive || !isPlayerCanFail"
-      @click="() => onMissionClick('fail')"
-    >
+    <v-btn color="error" :disabled="!isPlayerActive" @click="() => onMissionClick('success')"> Success </v-btn>
+    <v-btn color="error" :disabled="!isPlayerActive || !isPlayerCanFail" @click="() => onMissionClick('fail')">
       Fail
     </v-btn>
   </template>
   <template v-if="game.stage === 'selectMerlin' && isUserLeader">
-    <v-btn rounded="lg" variants="tonal" color="danger" @click="onExecuteMerlinClick">Execute merlin</v-btn>
+    <v-btn color="error" @click="onExecuteMerlinClick">Execute merlin</v-btn>
   </template>
 </template>
 

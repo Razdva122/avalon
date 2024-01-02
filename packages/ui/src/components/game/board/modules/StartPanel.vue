@@ -1,29 +1,11 @@
 <template>
-  <v-btn v-if="isUserInGame" rounded="lg" variants="tonal" color="warning" @click="onJoinClick"> Leave Game </v-btn>
-  <v-btn
-    v-else
-    rounded="lg"
-    variants="tonal"
-    color="info"
-    :disabled="roomState.stage !== 'created'"
-    @click="onJoinClick"
-  >
-    Join Game
-  </v-btn>
+  <v-btn v-if="isUserInGame" color="warning" @click="onJoinClick"> Leave Game </v-btn>
+  <v-btn v-else color="info" :disabled="roomState.stage !== 'created'" @click="onJoinClick"> Join Game </v-btn>
   <template v-if="isUserLeader">
-    <v-btn class="mt-2" rounded="lg" variants="tonal" color="info" @click="onLockClick">
+    <v-btn class="mt-2" color="info" @click="onLockClick">
       {{ roomState.stage === 'created' ? 'Lock Game' : 'Unlock game' }}
     </v-btn>
-    <v-btn
-      class="mt-2"
-      rounded="lg"
-      variants="tonal"
-      color="success"
-      :disabled="isStartGameDisabled"
-      @click="onStartClick"
-    >
-      Start Game
-    </v-btn>
+    <v-btn class="mt-2" color="success" :disabled="isStartGameDisabled" @click="onStartClick"> Start Game </v-btn>
   </template>
 </template>
 

@@ -14,6 +14,13 @@ const vuetify = createVuetify({
   theme: {
     defaultTheme: 'light',
   },
+  defaults: {
+    VBtn: {
+      color: 'primary',
+      variants: 'tonal',
+      rounded: 'lg',
+    },
+  },
 });
 
 createApp(App).use(store, key).use(router).use(vuetify).mount('#app');
