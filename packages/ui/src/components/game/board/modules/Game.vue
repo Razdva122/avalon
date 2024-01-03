@@ -1,5 +1,6 @@
 <template>
   <div>
+    <History :history="game.history" :players="game.players" />
     <div class="d-flex flex-row mb-3">
       <Mission v-for="mission in missions" :mission="mission" />
     </div>
@@ -13,11 +14,13 @@ import type { IVisualGameState, THistoryMission } from '@avalon/types';
 import type { IMissionWithResult } from '@/components/game/board/interface';
 import { defineComponent, PropType } from 'vue';
 import Mission from '@/components/game/board/modules/Mission.vue';
+import History from '@/components/game/board/modules/History.vue';
 
 export default defineComponent({
   name: 'Game',
   components: {
     Mission,
+    History,
   },
   props: {
     game: {

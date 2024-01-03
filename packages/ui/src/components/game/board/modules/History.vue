@@ -1,62 +1,80 @@
 <template>
-  <div class="history">
-    <div v-for="history in historyForView">
-      <div v-if="history.type === 'missionStart'">{{ history.index }} mission started</div>
-      <div v-if="history.type === 'mission'">
-        <div>{{ history.index + 1 }} mission</div>
-        <div>Leader: {{ calculateNameByID(history.leaderID) }}</div>
-        <div>Result {{ history.result }}</div>
-        <div>Fails {{ history.fails }}</div>
-        <div>Participants: {{ history.actions.map((el) => calculateNameByID(el.playerID)).join(', ') }}</div>
-      </div>
-      <div v-if="history.type === 'assassinate'">
-        <div>{{ calculateNameByID(history.assassinID) }} assassinate {{ calculateNameByID(history.killedID) }}</div>
-        <div>{{ calculateNameByID(history.killedID) }} {{ history.result === 'hit' ? 'is' : 'is not' }} Merlin</div>
-      </div>
-      <div v-if="history.type === 'vote'">
-        <div>{{ history.index + 1 }} vote</div>
-        <div>Leader: {{ calculateNameByID(history.leaderID) }}</div>
-        <div>
-          Team:
-          {{
-            history.votes
-              .filter((el) => el.onMission)
-              .map((el) => calculateNameByID(el.playerID))
-              .join(', ')
-          }}
+  <v-btn @click="overlay = !overlay" class="mb-12">
+    <template v-slot:prepend>
+      <span class="material-icons"> history </span>
+    </template>
+    History
+  </v-btn>
+  <v-overlay v-model="overlay" class="align-center justify-center">
+    <div class="history pa-4 rounded-lg">
+      <div v-for="historyEl in history">
+        <div class="mission" v-if="historyEl.type === 'mission'">
+          <div>
+            <span :class="historyEl.result === 'fail' ? 'text-error' : 'text-success'">
+              {{ historyEl.index + 1 }} mission
+            </span>
+            <span> / fails {{ historyEl.fails }} </span>
+          </div>
+          <div></div>
+          <div>Team: {{ historyEl.actions.map((el) => calculateNameByID(el.playerID)).join(', ') }}</div>
         </div>
-        <template v-if="history.forced"> Vote was forced </template>
-        <template v-else>
+        <div v-if="historyEl.type === 'assassinate'">
           <div>
-            Approve:
+            {{ calculateNameByID(historyEl.assassinID) }} assassinate {{ calculateNameByID(historyEl.killedID) }}
+          </div>
+          <div>
+            {{ calculateNameByID(historyEl.killedID) }} {{ historyEl.result === 'hit' ? 'is' : 'is not' }} Merlin
+          </div>
+        </div>
+        <div v-if="historyEl.type === 'vote'">
+          <div>
+            <span v-if="historyEl.forced" class="text-info"> Forced vote </span>
+            <span v-else :class="historyEl.result === 'reject' ? 'text-error' : 'text-success'">
+              {{ historyEl.index + 1 }} vote
+            </span>
+            <span>
+              team selected by <b>{{ calculateNameByID(historyEl.leaderID) }}</b>
+            </span>
+          </div>
+          <div>
+            Team:
             {{
-              history.votes
-                .filter((el) => el.value === 'approve')
+              historyEl.votes
+                .filter((el) => el.onMission)
                 .map((el) => calculateNameByID(el.playerID))
                 .join(', ')
             }}
           </div>
-          <div>
-            Reject:
-            {{
-              history.votes
-                .filter((el) => el.value === 'reject')
-                .map((el) => calculateNameByID(el.playerID))
-                .join(', ')
-            }}
-          </div>
-        </template>
-        <div>Result: {{ history.result }}</div>
+          <template v-if="!historyEl.forced">
+            <div>
+              Approve:
+              {{
+                historyEl.votes
+                  .filter((el) => el.value === 'approve')
+                  .map((el) => calculateNameByID(el.playerID))
+                  .join(', ')
+              }}
+            </div>
+            <div>
+              Reject:
+              {{
+                historyEl.votes
+                  .filter((el) => el.value === 'reject')
+                  .map((el) => calculateNameByID(el.playerID))
+                  .join(', ')
+              }}
+            </div>
+          </template>
+        </div>
+        <v-divider :thickness="3"></v-divider>
       </div>
     </div>
-  </div>
+  </v-overlay>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { THistoryResults, IPlayer } from '@avalon/types';
-
-type THistoryForView = THistoryResults | { type: 'missionStart'; index: number };
 
 export default defineComponent({
   props: {
@@ -69,22 +87,9 @@ export default defineComponent({
       type: Object as PropType<IPlayer[]>,
     },
   },
-  computed: {
-    historyForView() {
-      return this.history.reduce<THistoryForView[]>(
-        (acc, el) => {
-          acc.push(el);
-
-          if (el.type === 'mission' && el.index !== 4) {
-            acc.push({ type: 'missionStart', index: el.index + 1 });
-          }
-
-          return acc;
-        },
-        [{ type: 'missionStart', index: 1 }],
-      );
-    },
-  },
+  data: () => ({
+    overlay: false,
+  }),
   methods: {
     calculateNameByID(playerID: string) {
       return this.players.find((player) => player.id === playerID)!.name;
@@ -93,4 +98,15 @@ export default defineComponent({
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.history {
+  background-color: white;
+  width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.mission {
+  font-size: x-large;
+}
+</style>

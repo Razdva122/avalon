@@ -102,6 +102,7 @@ export default defineComponent({
 }
 
 .actions-container {
+  top: 150px;
   z-index: 1;
   position: absolute;
 }

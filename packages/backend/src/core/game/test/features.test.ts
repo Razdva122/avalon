@@ -27,8 +27,8 @@ describe('Features', () => {
       .sentSelectedPlayers();
 
     expect(game.stage).toBe('onMission');
-    expect(game.vote.stage).toBe('finished');
-    expect(game.vote.data.result).toBe('approve');
+    expect(game.vote?.stage).toBe('finished');
+    expect(game.vote?.data.result).toBe('approve');
     expect(game.history.length).toBe(5);
   });
 

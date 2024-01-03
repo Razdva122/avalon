@@ -48,7 +48,7 @@ export class Game {
   /**
    * Vote for mission state
    */
-  vote: Vote;
+  vote: Vote | undefined;
 
   /**
    * Each round turn is reset to 0, the turn increases when the select moves to the next player
@@ -168,9 +168,6 @@ export class Game {
       return new Mission(index === 0 ? 'active' : 'inactive', el, index);
     });
 
-    // Generate vote
-    this.vote = new Vote(this.players, this.leader, 0);
-
     // Generate addons
     this.addons = Object.entries(rolesWithAddons).reduce<IGameAddons>((acc, data) => {
       const [role, addon] = <[TRolesWithAddons, TAddonsConstructor]>data;
@@ -289,7 +286,6 @@ export class Game {
       this.turn += 1;
     }
 
-    this.vote = new Vote(this.players, this.leader, this.turn, this.turn === 4 ? true : undefined);
     this.updateStage('selectTeam');
   }
 
@@ -320,6 +316,8 @@ export class Game {
 
     this.leader.features.waitForAction = false;
 
+    this.vote = new Vote(this.players, this.leader, this.turn, this.turn === 4 ? true : undefined);
+
     if (this.turn === 4) {
       this.startMission();
     } else {
@@ -337,7 +335,7 @@ export class Game {
    * Start mission
    */
   protected startMission(): void {
-    this.history.push(this.vote);
+    this.history.push(this.vote!);
     this.currentMission.startMission(this.sentPlayers, this.leader);
     this.updateStage('onMission');
 
@@ -391,6 +389,10 @@ export class Game {
   voteForMission(playerID: string, option: TVoteOption): void {
     const player = this.findPlayerByID(playerID);
     player.features.waitForAction = false;
+
+    if (!this.vote) {
+      throw new Error(`You cant vote for mission on stage ${this.stage}`);
+    }
 
     if (this.vote.makeVote(player, option)) {
       if (this.vote.data.result === 'approve') {
