@@ -1,7 +1,7 @@
 <template>
   <div class="board-container mt-16">
     <img class="game-board" alt="board" src="@/assets/board.jpeg" />
-    <div class="actions-container d-flex flex-column">
+    <div class="actions-container d-flex flex-column justify-center">
       <template v-if="roomState.stage !== 'started'">
         <div class="button-panel d-flex flex-column align-center">
           <StartPanel />
@@ -102,7 +102,7 @@ export default defineComponent({
 }
 
 .actions-container {
-  top: 150px;
+  height: 600px;
   z-index: 1;
   position: absolute;
 }

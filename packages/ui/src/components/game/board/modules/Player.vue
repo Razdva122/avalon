@@ -2,6 +2,9 @@
   <div class="player-container" @click="$emit('playerClick', player.id)">
     <img class="player-frame" alt="frame" src="@/assets/player-frame.png" />
     <div class="player-icon" :class="iconClasses"></div>
+    <template v-if="'role' in player">
+      <span class="player-role">{{ player.role }}</span>
+    </template>
     <span class="player-name" :class="nameClasses">{{ player.name }}</span>
   </div>
 </template>
@@ -64,6 +67,12 @@ export default defineComponent({
   @include text-overflow(1);
   background-image: url('@/assets/name-frame.png');
   background-size: contain;
+  color: white;
+}
+
+.player-role {
+  position: absolute;
+  top: 50px;
   color: white;
 }
 

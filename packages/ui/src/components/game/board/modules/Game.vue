@@ -1,6 +1,6 @@
 <template>
   <div>
-    <History :history="game.history" :players="game.players" />
+    <History v-if="game.history.length" :history="game.history" :players="game.players" />
     <div class="d-flex flex-row mb-3">
       <Mission v-for="mission in missions" :mission="mission" />
     </div>
