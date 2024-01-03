@@ -20,8 +20,10 @@ export type THistoryResults = THistoryVote | THistoryMission | THistoryAssassina
  */
 export type THistoryVote = {
   type: 'vote';
+  index: number;
   result: TVoteOption;
   leaderID: string;
+  forced: boolean;
   votes: TVote[];
 };
 
@@ -30,6 +32,7 @@ export type THistoryVote = {
  */
 export type THistoryMission = {
   type: 'mission';
+  index: number;
   result: TMissionResult;
   settings: IMissionSettings;
   leaderID: string;
@@ -44,7 +47,7 @@ export type THistoryAssassinate = {
   type: 'assassinate';
   result: TAssassinateResult;
   assassinID: string;
-  killed: string;
+  killedID: string;
 };
 
 /**

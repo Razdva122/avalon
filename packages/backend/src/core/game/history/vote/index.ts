@@ -11,11 +11,13 @@ export class Vote implements HistoryElement<'vote'> {
   data: THistoryData['vote'];
   stage: THistoryStage;
 
-  constructor(players: IPlayerInGame[], leader: IPlayerInGame, forced?: true) {
+  constructor(players: IPlayerInGame[], leader: IPlayerInGame, index: number, forced?: true) {
     this.stage = 'active';
 
     this.data = {
       leader,
+      index,
+      forced: Boolean(forced),
       votes: players.map((player) => ({
         player,
         onMission: Boolean(player.features.isSent),
@@ -64,6 +66,8 @@ export class Vote implements HistoryElement<'vote'> {
     return {
       type: this.type,
       result: this.data.result!,
+      index: this.data.index,
+      forced: this.data.forced,
       leaderID: this.data.leader.user.id,
       votes: this.data.votes.map((el) => ({
         playerID: el.player.user.id,

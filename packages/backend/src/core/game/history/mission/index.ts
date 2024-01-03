@@ -11,10 +11,11 @@ export class Mission implements HistoryElement<'mission'> {
   data: THistoryData['mission'];
   stage: THistoryStage;
 
-  constructor(stage: 'active' | 'inactive', settings: IMissionSettings) {
+  constructor(stage: 'active' | 'inactive', settings: IMissionSettings, index: number) {
     this.stage = stage;
     this.data = {
       settings,
+      index,
       actions: [],
     };
   }
@@ -88,6 +89,7 @@ export class Mission implements HistoryElement<'mission'> {
   dataForManager(options: { withResult?: boolean }) {
     return {
       type: this.type,
+      index: this.data.index,
       result: this.data.result!,
       settings: this.data.settings,
       leaderID: this.data.leader!.user.id,

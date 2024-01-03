@@ -165,11 +165,11 @@ export class Game {
 
     // Generate missions
     this.missions = this.settings.missions.map((el, index) => {
-      return new Mission(index === 0 ? 'active' : 'inactive', el);
+      return new Mission(index === 0 ? 'active' : 'inactive', el, index);
     });
 
     // Generate vote
-    this.vote = new Vote(this.players, this.leader);
+    this.vote = new Vote(this.players, this.leader, 0);
 
     // Generate addons
     this.addons = Object.entries(rolesWithAddons).reduce<IGameAddons>((acc, data) => {
@@ -289,7 +289,7 @@ export class Game {
       this.turn += 1;
     }
 
-    this.vote = new Vote(this.players, this.leader, this.turn === 4 ? true : undefined);
+    this.vote = new Vote(this.players, this.leader, this.turn, this.turn === 4 ? true : undefined);
     this.updateStage('selectTeam');
   }
 

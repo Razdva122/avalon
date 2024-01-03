@@ -29,7 +29,7 @@ export class Assassinate implements HistoryElement<'assassinate'> {
       type: this.type,
       result: this.data.result!,
       assassinID: this.data.assassin.user.id,
-      killed: this.data.killed!.user.id,
+      killedID: this.data.killed!.user.id,
     };
   }
 }
