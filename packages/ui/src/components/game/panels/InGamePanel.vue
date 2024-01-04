@@ -17,7 +17,7 @@
     </v-btn>
   </template>
   <template v-if="game.stage === 'selectMerlin' && isUserLeader">
-    <v-btn color="error" @click="onExecuteMerlinClick">Execute merlin</v-btn>
+    <v-btn color="error" :disabled="isExecuteDisabled" @click="onExecuteMerlinClick">Execute merlin</v-btn>
   </template>
 </template>
 
@@ -64,6 +64,10 @@ export default defineComponent({
       return game.value.players.filter((player) => player.features.isSelected).length !== needPlayers;
     });
 
+    const isExecuteDisabled = computed(() => {
+      return game.value.players.filter((player) => player.features.isSelected).length !== 1;
+    });
+
     const onSendTeamClick = () => {
       socket.emit('sentSelectedPlayers', game.value.uuid);
     };
@@ -85,6 +89,7 @@ export default defineComponent({
       isPlayerOnMission,
       isPlayerActive,
       isPlayerCanFail,
+      isExecuteDisabled,
 
       isSendTeamDisabled,
 

@@ -70,7 +70,7 @@ export default defineComponent({
     };
 
     const onPlayerClick = (uuid: string) => {
-      if (roomState.value.stage !== 'started') {
+      if (roomState.value.stage !== 'started' || roomState.value.game.stage === 'end') {
         return;
       }
 
@@ -102,7 +102,7 @@ export default defineComponent({
 }
 
 .actions-container {
-  height: 600px;
+  height: 300px;
   z-index: 1;
   position: absolute;
 }
