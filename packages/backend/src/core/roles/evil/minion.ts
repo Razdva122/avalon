@@ -11,9 +11,9 @@ export class Minion extends Character {
     servant: 'unknown',
     minion: 'evil',
     merlin: 'unknown',
-    morgana: 'morgana',
+    morgana: 'evil',
     oberon: 'unknown',
-    mordred: 'mordred',
+    mordred: 'evil',
     percival: 'unknown',
   };
 }
