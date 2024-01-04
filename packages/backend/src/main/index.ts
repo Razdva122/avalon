@@ -12,6 +12,11 @@ export class Manager {
 
   createRoom(uuid: string, leader: User) {
     this.rooms[uuid] = new Room(uuid, leader, this.io);
+
+    // Delete room after 1 day timeout
+    setTimeout(() => {
+      delete this.rooms[uuid];
+    }, 86400000);
   }
 
   constructor(io: Server) {
