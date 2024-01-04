@@ -1,8 +1,8 @@
-import { Game, IGameOptions } from '@/core/game';
+import { Game } from '@/core/game';
 import type { User } from '@/user';
 import type { TRoomState, TGameMethodsParams } from '@/core/game-manager/interface';
 
-import { TGameStage, Server, IVisualGameState, IPlayer } from '@avalon/types';
+import { TGameStage, Server, IVisualGameState, IPlayer, IGameOptions } from '@avalon/types';
 
 export * from '@/core/game-manager/interface';
 

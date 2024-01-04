@@ -14,6 +14,6 @@ export class Servant extends Character {
     morgana: 'unknown',
     oberon: 'unknown',
     mordred: 'unknown',
-    percival: 'percival',
+    percival: 'unknown',
   };
 }

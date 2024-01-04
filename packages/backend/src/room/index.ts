@@ -1,5 +1,5 @@
 import { User } from '@/user';
-import type { TRoomState, Server } from '@avalon/types';
+import type { TRoomState, Server, IGameOptions } from '@avalon/types';
 import type { TRoomData } from '@/room/interace';
 import { GameManager } from '@/core/game-manager';
 
@@ -76,8 +76,8 @@ export class Room {
     }
   }
 
-  startGame() {
-    this.data = { stage: 'started', manager: new GameManager(this.players, { roles: {} }, this.io, this.roomID) };
+  startGame(options: IGameOptions) {
+    this.data = { stage: 'started', manager: new GameManager(this.players, options, this.io, this.roomID) };
     this.updateRoomState(true);
   }
 

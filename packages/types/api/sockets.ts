@@ -1,5 +1,6 @@
 import type { TRoomState } from '../room';
 import type { IVisualGameState } from '../game/state';
+import type { IGameOptions } from '../game/options';
 
 import type { Server as SuperServer, Socket as SuperServerSocket } from 'socket.io';
 import type { Socket as SuperSocket } from 'socket.io-client';
@@ -19,7 +20,7 @@ export interface ClientToServerEvents {
   leaveRoom: (uuid: string) => void;
 
   joinGame: (uuid: string) => void;
-  startGame: (uuid: string) => void;
+  startGame: (uuid: string, options: IGameOptions) => void;
   leaveGame: (uuid: string) => void;
 
   selectPlayer: (uuid: string, userID: string) => void;

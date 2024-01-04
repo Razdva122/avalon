@@ -80,11 +80,11 @@ export class Manager {
       }
     });
 
-    socket.on('startGame', (uuid) => {
+    socket.on('startGame', (uuid, options) => {
       console.log('startGame', uuid);
       const room = this.rooms[uuid];
       if (room.leaderID === userID) {
-        room.startGame();
+        room.startGame(options);
       }
     });
   }

@@ -13,8 +13,6 @@ export class MerlinAddon implements IGameAddon {
   }
 
   afterInitialization() {
-    // Generate assassin
-    _.sample(this.game.players.filter((player) => player.role.loyalty === 'evil'))!.features.isAssassin = true;
     // On select merlin stage all minions are visible
     this.game.stageVisibilityChange.selectMerlin = (_stage, role) => role.loyalty === 'evil';
 
@@ -30,9 +28,12 @@ export class MerlinAddon implements IGameAddon {
       this.game.winner = undefined;
       this.game.updateStage('selectMerlin');
 
-      const assassin = this.game.players.find((player) => player.features.isAssassin)!;
-      this.game.leader = assassin;
+      // Generate assassin
+      const assassin = _.sample(this.game.players.filter((player) => player.role.loyalty === 'evil'))!;
+
+      assassin.features.isAssassin = true;
       assassin.features.waitForAction = true;
+      this.game.leader = assassin;
 
       this.game.stateObserver.gameStateChanged();
       return false;

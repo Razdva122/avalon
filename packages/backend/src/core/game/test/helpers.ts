@@ -1,4 +1,5 @@
-import { Game, IGameOptions } from '@/core/game';
+import { Game } from '@/core/game';
+import { IGameOptions } from '@avalon/types';
 import { User } from '@/user';
 
 const users = [

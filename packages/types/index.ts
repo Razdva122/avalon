@@ -1,6 +1,7 @@
 export * from './game/addons';
 export * from './game/history';
 export * from './game/mission';
+export * from './game/options';
 export * from './game/roles';
 export * from './game/vote';
 export * from './game/player';

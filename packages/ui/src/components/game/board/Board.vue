@@ -33,8 +33,8 @@
 import { defineComponent, computed, inject } from 'vue';
 import Player from '@/components/game/board/modules/Player.vue';
 import Game from '@/components/game/board/modules/Game.vue';
-import StartPanel from '@/components/game/board/modules/StartPanel.vue';
-import InGamePanel from './modules/InGamePanel.vue';
+import StartPanel from '@/components/game/panels/StartPanel.vue';
+import InGamePanel from '@/components/game/panels/InGamePanel.vue';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { roomStateKey } from '@/pages/room/const';

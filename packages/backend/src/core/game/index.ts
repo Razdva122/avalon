@@ -2,15 +2,17 @@ import * as _ from 'lodash';
 
 import type { User } from '@/user';
 
-import type {
-  IGameOptions,
-  IPlayerInGame,
-  IGameAddons,
-  IStateObserver,
-  TStageVisibilityChange,
-} from '@/core/game/interface';
+import type { IPlayerInGame, IGameAddons, IStateObserver, TStageVisibilityChange } from '@/core/game/interface';
 
-import type { TMissionResult, TRoles, TLoyalty, TVoteOption, TGameStage, IGameSettings } from '@avalon/types';
+import type {
+  TMissionResult,
+  TRoles,
+  TLoyalty,
+  TVoteOption,
+  TGameStage,
+  IGameSettings,
+  IGameOptions,
+} from '@avalon/types';
 
 import type { TAddonsConstructor, TAfterMethods, TBeforeMethods, TRolesWithAddons } from '@/core/game/addons';
 import { rolesWithAddons } from '@/core/game/const';
