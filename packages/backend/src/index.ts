@@ -8,10 +8,13 @@ import cors from 'cors';
 import { Manager } from '@/main';
 
 const app = express();
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
+const FRONT_PORT = process.env.FRONT_PORT ? Number(process.env.FRONT_PORT) : 8080;
+const HOSTNAME = process.env.HOSTNAME || 'localhost';
 const server = createServer(app);
 const corsOpts = {
   cors: {
-    origin: 'http://localhost:8080',
+    origin: `http://${HOSTNAME}:${FRONT_PORT}`,
     credentials: true,
   },
 };
@@ -32,6 +35,6 @@ app.get('/room/*', function (req, res) {
   res.sendFile(dirPath + 'index.html');
 });
 
-server.listen(3000, () => {
-  console.log('server running at http://localhost:3000');
+server.listen(PORT, HOSTNAME, () => {
+  console.log(`server running at http://${HOSTNAME}:${PORT}`);
 });
