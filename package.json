@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "dev": "npm run serve --workspace=packages/ui & npm run dev --workspace=packages/backend",
-    "start": "npm run build --workspace=packages/ui && npm run start --workspace=packages/backend"
+    "start": "npm run build --workspace=packages/ui && npm run start --workspace=packages/backend",
+    "prod:start": "NODE_ENV=production npm run start"
   },
   "dependencies": {
     "lodash": "^4.17.21",
