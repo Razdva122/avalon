@@ -2,8 +2,9 @@
   <div class="player-container" @click="$emit('playerClick', player.id)">
     <img class="player-frame" alt="frame" src="@/assets/player-frame.png" />
     <div class="player-icon" :class="iconClasses"></div>
-    <template v-if="'role' in player && player.role !== 'unknown'">
-      <span class="player-role">{{ player.role }}</span>
+    <template v-if="'features' in player">
+      <span v-if="player.role !== 'unknown'" class="player-role">{{ player.role }}</span>
+      <img v-if="player.features.isLeader" class="player-crown" alt="crown" src="@/assets/crown.png" />
     </template>
     <span class="player-name" :class="nameClasses">{{ player.name }}</span>
   </div>
@@ -112,5 +113,12 @@ export default defineComponent({
 
 .player-name-sent {
   border-color: rgba(220, 20, 60, 0.6);
+}
+
+.player-crown {
+  position: absolute;
+  top: -18px;
+  left: 20px;
+  width: 48px;
 }
 </style>

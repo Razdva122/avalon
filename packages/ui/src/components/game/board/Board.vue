@@ -1,6 +1,6 @@
 <template>
   <div class="board-container mt-16">
-    <img class="game-board" alt="board" src="@/assets/board.jpeg" />
+    <img class="game-board" alt="board" src="@/assets/board.png" />
     <div class="actions-container d-flex flex-column justify-center">
       <template v-if="roomState.stage !== 'started'">
         <div class="button-panel d-flex flex-column align-center">
@@ -108,7 +108,7 @@ export default defineComponent({
 }
 
 .game-board {
-  width: 800px;
+  width: 600px;
 }
 
 .player-container {
