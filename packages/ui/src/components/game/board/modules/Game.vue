@@ -1,10 +1,10 @@
 <template>
   <div>
     <History v-if="game.history.length" :history="game.history" :players="game.players" />
-    <div class="d-flex flex-row mb-3">
+    <div class="d-flex flex-row mb-4">
       <Mission v-for="mission in missions" :mission="mission" />
     </div>
-    <div class="text-white">Vote stage: {{ game.vote + 1 }}</div>
+    <div class="text-white mb-4">Vote stage: {{ game.vote + 1 }}</div>
   </div>
 </template>
 
