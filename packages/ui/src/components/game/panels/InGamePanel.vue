@@ -16,7 +16,7 @@
       Fail
     </v-btn>
   </template>
-  <template v-if="game.stage === 'selectMerlin' && isUserLeader">
+  <template v-if="game.stage === 'selectMerlin' && isUserAssassin">
     <v-btn color="error" :disabled="isExecuteDisabled" @click="onExecuteMerlinClick">Execute merlin</v-btn>
   </template>
 </template>
@@ -45,6 +45,10 @@ export default defineComponent({
 
     const isUserLeader = computed(() => {
       return player.value?.features.isLeader;
+    });
+
+    const isUserAssassin = computed(() => {
+      return player.value?.features.isAssassin;
     });
 
     const isPlayerOnMission = computed(() => {
@@ -86,6 +90,7 @@ export default defineComponent({
 
     return {
       isUserLeader,
+      isUserAssassin,
       isPlayerOnMission,
       isPlayerActive,
       isPlayerCanFail,
