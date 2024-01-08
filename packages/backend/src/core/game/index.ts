@@ -20,8 +20,15 @@ import type {
   IGameOptions,
 } from '@avalon/types';
 
-import type { TAddonsConstructor, TAfterMethods, TBeforeMethods, TRolesWithAddons } from '@/core/game/addons';
-import { rolesWithAddons } from '@/core/game/const';
+import type {
+  TRolesAddonsConstructor,
+  TAfterMethods,
+  TBeforeMethods,
+  TRolesWithAddons,
+  TAdditionalAddons,
+  TAdditionalAddonsConstructor,
+} from '@/core/game/addons';
+import { rolesWithAddons, addons } from '@/core/game/const';
 
 import { Mission } from '@/core/game/history/mission';
 import { Vote } from '@/core/game/history/vote';
@@ -183,9 +190,9 @@ export class Game {
       return new Mission(index === 0 ? 'active' : 'inactive', el, index);
     });
 
-    // Generate addons
+    // Generate roles addons
     this.addons = Object.entries(rolesWithAddons).reduce<IGameAddons>((acc, data) => {
-      const [role, addon] = <[TRolesWithAddons, TAddonsConstructor]>data;
+      const [role, addon] = <[TRolesWithAddons, TRolesAddonsConstructor]>data;
 
       if (options.roles[role]) {
         acc[role] = new addon(this);
@@ -194,6 +201,16 @@ export class Game {
 
       return acc;
     }, []);
+
+    // Generate roles-independent addons
+    Object.entries(addons).forEach((data) => {
+      const [name, addon] = <[TAdditionalAddons, TAdditionalAddonsConstructor]>data;
+
+      if (options.addons[name]) {
+        this.addons[name] = new addon(this);
+        this.addons.push(this.addons[name]!);
+      }
+    });
 
     this.updateStage('selectTeam');
   }

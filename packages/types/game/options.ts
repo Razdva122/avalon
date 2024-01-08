@@ -4,4 +4,7 @@ export interface IGameOptions {
   roles: {
     [key in TOptionalRoles]?: number;
   };
+  addons: {
+    ladyOfLake?: boolean;
+  };
 }

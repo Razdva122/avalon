@@ -1,7 +1,7 @@
 import { GameTestHelper } from '@/core/game/test/helpers';
 import { gamesSettings } from '@/core/game';
 
-const options = [7, { roles: { merlin: 1 } }] as const;
+const options = [7, { roles: { merlin: 1 }, addons: {} }] as const;
 export const settings = gamesSettings[options[0]];
 const gameHelper = new GameTestHelper(...options);
 let game = gameHelper.game;

@@ -1,6 +1,11 @@
 import type { IPresetsForGame } from '@/core/game/interface';
-import { TAddonsConstructor, MerlinAddon } from '@/core/game/addons';
-import { TRolesWithAddons } from '@/core/game/addons';
+import {
+  TAdditionalAddonsConstructor,
+  TRolesAddonsConstructor,
+  MerlinAddon,
+  LadyOfLakeAddon,
+} from '@/core/game/addons';
+import { TRolesWithAddons, TAdditionalAddons } from '@/core/game/addons';
 
 /**
  * Game settings with different number of players
@@ -95,6 +100,13 @@ export const gamesSettings: IPresetsForGame = {
 /**
  * Roles with addons for main game
  */
-export const rolesWithAddons: Record<TRolesWithAddons, TAddonsConstructor> = {
+export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsConstructor> = {
   merlin: MerlinAddon,
+};
+
+/**
+ * Role-independent addons
+ */
+export const addons: Record<TAdditionalAddons, TAdditionalAddonsConstructor> = {
+  ladyOfLake: LadyOfLakeAddon,
 };

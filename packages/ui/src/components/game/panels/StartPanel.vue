@@ -64,7 +64,7 @@ export default defineComponent({
 
           return acc;
         },
-        { roles: {} },
+        { roles: {}, addons: {} },
       );
 
       socket.emit('startGame', roomState.value.roomID, options);
