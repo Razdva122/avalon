@@ -2,8 +2,9 @@
   <div class="player-container" @click="$emit('playerClick', player.id)">
     <img class="player-frame" alt="frame" src="@/assets/player-frame.png" />
     <div class="player-icon" :class="iconClasses"></div>
-    <template v-if="'features' in player">
+    <template v-if="'role' in player">
       <span v-if="player.role !== 'unknown'" class="player-role">{{ player.role }}</span>
+      <div class="player-role-icon" :class="'role-' + player.role"></div>
       <img v-if="player.features.isLeader" class="player-crown" alt="crown" src="@/assets/crown.png" />
     </template>
     <span class="player-name" :class="nameClasses">{{ player.name }}</span>
@@ -99,6 +100,14 @@ export default defineComponent({
   height: 100px;
 }
 
+.player-role-icon {
+  position: absolute;
+  top: 13px;
+  width: 90px;
+  height: 90px;
+  background-size: 160%;
+}
+
 .player-icon-active {
   border-color: rgba(173, 255, 47, 0.6);
 }
@@ -120,5 +129,25 @@ export default defineComponent({
   top: -18px;
   left: 20px;
   width: 48px;
+}
+
+.player-role-icon {
+  border-radius: 50%;
+}
+
+.role-merlin {
+  background-image: url('@/assets/roles/merlin.png');
+  background-position: 50% 22%;
+}
+
+.role-minion {
+  background-image: url('@/assets/roles/minion.png');
+  background-position: 40% 0%;
+}
+
+.role-servant {
+  background-image: url('@/assets/roles/servant.png');
+  background-position: 48% 25%;
+  background-size: 150%;
 }
 </style>
