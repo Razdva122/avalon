@@ -166,29 +166,17 @@ export class GameManager {
   }
 
   callGameMethods(userID: string, params: TGameMethodsParams): void {
-    const validateUserIsLeader = () => {
-      if (this.game.leader.user.id !== userID) {
-        throw new Error(`User with userID: ${userID} not a leader`);
-      }
-    };
-
     switch (params.method) {
       case 'voteForMission':
         this.game.voteForMission(userID, params.option);
         break;
 
       case 'selectPlayer':
-        validateUserIsLeader();
-        if (this.game.stage !== 'selectTeam' && this.game.stage !== 'selectMerlin') {
-          throw new Error(`You cant select users in this stage: ${this.game.stage}`);
-        }
-
-        this.game.selectPlayer(params.playerID);
+        this.game.selectPlayer(userID, params.playerID);
         break;
 
       case 'sentSelectedPlayers':
-        validateUserIsLeader();
-        this.game.sentSelectedPlayers();
+        this.game.sentSelectedPlayers(userID);
         break;
 
       case 'actionOnMission':
@@ -196,13 +184,11 @@ export class GameManager {
         break;
 
       case 'selectMerlin':
-        validateUserIsLeader();
-
         if (!this.game.addons.merlin) {
           throw new Error('You cant select merlin in game without merlin addon');
         }
 
-        this.game.addons.merlin.selectMerlin();
+        this.game.addons.merlin.selectMerlin(userID);
         break;
     }
   }

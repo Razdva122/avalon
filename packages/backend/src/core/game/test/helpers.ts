@@ -37,10 +37,10 @@ export class GameTestHelper {
     for (let i = 0; i < amount; i += 1) {
       if (evil > 0) {
         evil -= 1;
-        this.game.selectPlayer(evilPlayers[evil].user.id);
+        this.game.selectPlayer(this.game.leader.user.id, evilPlayers[evil].user.id);
       } else {
         const unselectedPlayer = this.game.players.find((player) => player.features.isSelected === false)!;
-        this.game.selectPlayer(unselectedPlayer?.user.id);
+        this.game.selectPlayer(this.game.leader.user.id, unselectedPlayer?.user.id);
       }
     }
 
@@ -78,7 +78,7 @@ export class GameTestHelper {
   }
 
   sentSelectedPlayers(): this {
-    this.game.sentSelectedPlayers();
+    this.game.sentSelectedPlayers(this.game.leader.user.id);
     return this;
   }
 
@@ -87,8 +87,12 @@ export class GameTestHelper {
       return correctMerlin ? player.role.role === 'merlin' : player.role.role !== 'merlin';
     })!.user.id;
 
-    this.game.selectPlayer(id);
-    this.game.addons.merlin!.selectMerlin();
+    const assassinID = this.game.players.find((player) => {
+      return player.features.isAssassin;
+    })!.user.id;
+
+    this.game.selectPlayer(assassinID, id);
+    this.game.addons.merlin!.selectMerlin(assassinID);
 
     return this;
   }

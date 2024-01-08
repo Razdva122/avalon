@@ -10,9 +10,9 @@ describe('Game state', () => {
   });
 
   test('Select and unselect player should change game state', () => {
-    game.selectPlayer('1');
-    game.selectPlayer('1');
-    game.selectPlayer('1');
+    game.selectPlayer(game.leader.user.id, '1');
+    game.selectPlayer(game.leader.user.id, '1');
+    game.selectPlayer(game.leader.user.id, '1');
 
     expect(gameHelper.stateChangedNumber).toEqual(3);
   });

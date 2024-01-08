@@ -2,7 +2,13 @@ import * as _ from 'lodash';
 
 import type { User } from '@/user';
 
-import type { IPlayerInGame, IGameAddons, IStateObserver, TStageVisibilityChange } from '@/core/game/interface';
+import type {
+  IPlayerInGame,
+  IGameAddons,
+  IStateObserver,
+  TStageVisibilityChange,
+  TSelectAvailable,
+} from '@/core/game/interface';
 
 import type {
   TMissionResult,
@@ -82,6 +88,13 @@ export class Game {
    */
   stageVisibilityChange: TStageVisibilityChange = {
     end: () => true,
+  };
+
+  /**
+   * A map with a calculation of which role can make a choice at this stage
+   */
+  selectAvailable: TSelectAvailable = {
+    selectTeam: (player) => Boolean(player.features.isLeader),
   };
 
   set leader({ user: { id } }: IPlayerInGame) {
@@ -292,20 +305,30 @@ export class Game {
   }
 
   /**
-   * Leader select player for next mission
+   * Select player
    * If player already selected his status will be toggled
    */
-  selectPlayer(playerID: string): void {
-    const selectedPlayer = this.findPlayerByID(playerID);
+  selectPlayer(executorID: string, playerID: string): void {
+    const executor = this.findPlayerByID(executorID);
 
-    selectedPlayer.features.isSelected = !selectedPlayer.features.isSelected;
-    this.stateObserver.gameStateChanged();
+    if (this.selectAvailable[this.stage]?.(executor)) {
+      const selectedPlayer = this.findPlayerByID(playerID);
+
+      selectedPlayer.features.isSelected = !selectedPlayer.features.isSelected;
+      this.stateObserver.gameStateChanged();
+    } else {
+      throw new Error(`You cant select player on stage ${this.stage}`);
+    }
   }
 
   /**
    * Leader sent selected players on vote
    */
-  sentSelectedPlayers(): void {
+  sentSelectedPlayers(executorID: string): void {
+    if (this.leader.user.id !== executorID) {
+      throw new Error('Only leader can send selected players');
+    }
+
     if (this.currentMission.data.settings.players !== this.selectedPlayers.length) {
       throw new Error(
         `You cant send ${this.selectedPlayers.length} player, on mission what required ${this.currentMission.data.settings.players}`,

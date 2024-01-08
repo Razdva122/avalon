@@ -33,3 +33,7 @@ export interface IStateObserver {
 export type TStageVisibilityChange = {
   [key in TGameStage]?: (stage: TGameStage, role: Character) => boolean;
 };
+
+export type TSelectAvailable = {
+  [key in TGameStage]?: (player: IPlayerInGame) => boolean;
+};
