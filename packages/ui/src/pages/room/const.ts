@@ -12,6 +12,8 @@ export const stages = {
   locked: 'The game is locked, we are waiting for the start of the game',
   started: 'The game has started',
   unavailable: 'The game in unavailable',
+  checkLoyalty: 'The player chooses whose loyalty he wants to check',
+  announceLoyalty: 'The player declares the loyalty of the verified player',
 } as const;
 
 export type TAvailableRoomState = Ref<TAvailableRoom>;
