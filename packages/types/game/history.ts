@@ -1,11 +1,12 @@
 import type { TMissionResult, IMissionSettings } from './mission';
 import type { TVoteOption } from './vote';
 import type { TAssassinateResult } from './addons';
+import type { TLoyalty } from './roles';
 
 /**
  * Possible history element
  */
-export type THistoryType = 'mission' | 'vote' | 'assassinate';
+export type THistoryType = 'mission' | 'vote' | 'assassinate' | 'checkLoyalty';
 
 /**
  * History element stages
@@ -13,7 +14,7 @@ export type THistoryType = 'mission' | 'vote' | 'assassinate';
  */
 export type THistoryStage = 'active' | 'inactive' | 'progress' | 'finished';
 
-export type THistoryResults = THistoryVote | THistoryMission | THistoryAssassinate;
+export type THistoryResults = THistoryVote | THistoryMission | THistoryAssassinate | TCheckLoyalty;
 
 /**
  * History vote data
@@ -48,6 +49,16 @@ export type THistoryAssassinate = {
   result: TAssassinateResult;
   assassinID: string;
   killedID: string;
+};
+
+/**
+ * Check loyalty data
+ */
+export type TCheckLoyalty = {
+  type: 'checkLoyalty';
+  validatorID: string;
+  inspectedID: string;
+  result?: TLoyalty;
 };
 
 /**

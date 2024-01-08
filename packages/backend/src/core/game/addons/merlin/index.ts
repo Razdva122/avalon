@@ -57,12 +57,14 @@ export class MerlinAddon implements IGameAddon {
       throw new Error('Only one player can be selected to execute Merlin');
     }
 
+    const selectedPlayer = this.game.selectedPlayers[0];
+
     const assassinate = new Assassinate(assassin);
     assassin.features.waitForAction = false;
 
     this.game.updateStage('end');
 
-    if (assassinate.assassinatePlayer(this.game.selectedPlayers[0]) === 'hit') {
+    if (assassinate.assassinatePlayer(selectedPlayer) === 'hit') {
       this.game.winner = 'evil';
     } else {
       this.game.winner = 'good';

@@ -1,5 +1,6 @@
 import type { TVisibleRole } from './roles';
 import type { TMissionResult } from './mission';
+import type { TAddonsFeatures } from './addons';
 
 export interface IPlayer {
   id: string;
@@ -9,7 +10,7 @@ export interface IPlayer {
   validMissionsResult?: TMissionResult[];
 }
 
-export interface IPlayerFeatures {
+export interface IPlayerFeatures extends TAddonsFeatures {
   /**
    * The leader, collects the mission
    */
@@ -24,11 +25,6 @@ export interface IPlayerFeatures {
    * Suggested by the leader to send on a mission
    */
   isSent?: boolean;
-
-  /**
-   * True if player assassin
-   */
-  isAssassin?: boolean;
 
   /**
    * True if the player has to do some action

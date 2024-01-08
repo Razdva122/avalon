@@ -9,6 +9,8 @@ import type {
   THistoryVote,
   THistoryMission,
   THistoryAssassinate,
+  TLoyalty,
+  TCheckLoyalty,
 } from '@avalon/types';
 
 export type THistoryData = {
@@ -32,10 +34,16 @@ export type THistoryData = {
     assassin: IPlayerInGame;
     killed?: IPlayerInGame;
   };
+  checkLoyalty: {
+    validator: IPlayerInGame;
+    inspected: IPlayerInGame;
+    result?: TLoyalty;
+  };
 };
 
 export type THistoryDataForManager = {
   vote: THistoryVote;
   mission: THistoryMission;
   assassinate: THistoryAssassinate;
+  checkLoyalty: TCheckLoyalty;
 };

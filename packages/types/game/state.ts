@@ -1,6 +1,7 @@
 import type { IPlayer } from './player';
 import type { THistoryResults } from './history';
 import type { IGameSettings } from './settings';
+import type { TAddonsStages } from './addons';
 
 export interface IVisualGameState {
   uuid: string;
@@ -15,4 +16,4 @@ export interface IVisualGameState {
 /**
  * Possible game stages
  */
-export type TGameStage = 'initialization' | 'votingForTeam' | 'onMission' | 'selectTeam' | 'selectMerlin' | 'end';
+export type TGameStage = 'initialization' | 'votingForTeam' | 'onMission' | 'selectTeam' | 'end' | TAddonsStages;
