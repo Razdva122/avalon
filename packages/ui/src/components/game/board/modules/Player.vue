@@ -153,4 +153,10 @@ export default defineComponent({
   background-position: 48% 25%;
   background-size: 150%;
 }
+
+.role-evil {
+  background-image: url('@/assets/red_team_no_background.png');
+  background-position: 50% 52%;
+  background-size: 135%;
+}
 </style>
