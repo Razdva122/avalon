@@ -22,4 +22,4 @@ export type TLoyalty = 'evil' | 'good';
  * Visible roles for other players,
  * They may differ from real roles
  */
-export type TVisibleRole = TRoles | 'unknown' | 'evil' | 'merlin/morgana';
+export type TVisibleRole = TRoles | 'unknown' | 'evil' | 'mystery-wizard';

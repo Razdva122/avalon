@@ -3,7 +3,6 @@
     <img class="player-frame" alt="frame" src="@/assets/player-frame.png" />
     <div class="player-icon" :class="iconClasses"></div>
     <template v-if="'role' in player">
-      <span v-if="player.role !== 'unknown'" class="player-role">{{ player.role }}</span>
       <div class="player-role-icon" :class="'role-' + player.role"></div>
       <img v-if="player.features.isLeader" class="player-crown" alt="crown" src="@/assets/crown.png" />
     </template>
@@ -143,9 +142,27 @@ export default defineComponent({
   background-position: 50% 22%;
 }
 
+.role-morgana {
+  background-image: url('@/assets/roles/morgana.png');
+  background-position: 47% 35%;
+  background-size: 180%;
+}
+
+.role-percival {
+  background-image: url('@/assets/roles/percival.png');
+  background-position: 50% 15%;
+  background-size: 170%;
+}
+
+.role-mystery-wizard {
+  background-image: url('@/assets/roles/mystery.png');
+  background-position: 50% 5%;
+}
+
 .role-minion {
   background-image: url('@/assets/roles/minion.png');
   background-position: 40% 0%;
+  background-size: 150%;
 }
 
 .role-servant {

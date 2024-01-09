@@ -10,8 +10,8 @@ export class Percival extends Character {
   visibility: TVisibility = {
     servant: 'unknown',
     minion: 'unknown',
-    merlin: 'merlin/morgana',
-    morgana: 'merlin/morgana',
+    merlin: 'mystery-wizard',
+    morgana: 'mystery-wizard',
     oberon: 'unknown',
     mordred: 'unknown',
     percival: 'unknown',
