@@ -5,6 +5,9 @@
       <Mission v-for="mission in missions" :mission="mission" />
     </div>
     <div class="text-white mb-4">Vote stage: {{ game.vote + 1 }}</div>
+    <div class="button-panel d-flex flex-column align-center">
+      <InGamePanel v-if="inGamePanel" :game="game" />
+    </div>
   </div>
 </template>
 
@@ -15,17 +18,23 @@ import type { IMissionWithResult } from '@/components/game/board/interface';
 import { defineComponent, PropType } from 'vue';
 import Mission from '@/components/game/board/modules/Mission.vue';
 import History from '@/components/game/history/History.vue';
+import InGamePanel from '@/components/game/panels/InGamePanel.vue';
 
 export default defineComponent({
   name: 'Game',
   components: {
     Mission,
     History,
+    InGamePanel,
   },
   props: {
     game: {
       required: true,
       type: Object as PropType<IVisualGameState>,
+    },
+    inGamePanel: {
+      required: true,
+      type: Boolean,
     },
   },
   computed: {

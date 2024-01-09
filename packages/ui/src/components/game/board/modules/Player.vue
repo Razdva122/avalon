@@ -1,5 +1,5 @@
 <template>
-  <div class="player-container" @click="$emit('playerClick', player.id)">
+  <div :title="'role' in player ? player.role : ''" class="player-container" @click="$emit('playerClick', player.id)">
     <img class="player-frame" alt="frame" src="@/assets/player-frame.png" />
     <div class="player-icon" :class="iconClasses"></div>
     <template v-if="'role' in player">
@@ -109,7 +109,10 @@ export default defineComponent({
 }
 
 .player-icon-active {
-  border-color: rgba(173, 255, 47, 0.6);
+  border-color: rgba(65, 105, 225, 0.8);
+  box-shadow:
+    2px 4px 8px 0px rgba(130, 144, 255, 0.3),
+    2px 4px 16px 0px rgba(130, 144, 255, 0.3);
 }
 
 .player-icon-assassin {

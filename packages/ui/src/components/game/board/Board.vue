@@ -8,10 +8,7 @@
         </div>
       </template>
       <template v-else>
-        <Game :game="roomState.game"></Game>
-        <div class="button-panel d-flex flex-column align-center">
-          <InGamePanel v-if="playerInGame" :game="roomState.game" />
-        </div>
+        <Game :game="roomState.game" :inGamePanel="Boolean(playerInGame)"></Game>
       </template>
     </div>
     <div
@@ -34,7 +31,6 @@ import { defineComponent, computed, inject } from 'vue';
 import Player from '@/components/game/board/modules/Player.vue';
 import Game from '@/components/game/board/modules/Game.vue';
 import StartPanel from '@/components/game/panels/StartPanel.vue';
-import InGamePanel from '@/components/game/panels/InGamePanel.vue';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { roomStateKey } from '@/pages/room/const';
@@ -45,7 +41,6 @@ export default defineComponent({
     Player,
     Game,
     StartPanel,
-    InGamePanel,
   },
   setup() {
     const roomState = inject(roomStateKey)!;
