@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex flex-row align-center justify-center">
     <div :class="state.class" class="rounded-circle circle"></div>
-    <div class="ml-2">{{ state.text }}</div>
+    <div class="ml-2 text-white">{{ state.text }}</div>
   </div>
 </template>
 

@@ -69,7 +69,11 @@ export default defineComponent({
         return;
       }
 
-      if (playerInGame.value?.features.isLeader) {
+      const userCanSelect =
+        (roomState.value.game.stage === 'selectTeam' && playerInGame.value?.features.isLeader) ||
+        (roomState.value.game.stage === 'selectMerlin' && playerInGame.value?.features.isAssassin);
+
+      if (userCanSelect) {
         socket.emit('selectPlayer', roomState.value.roomID, uuid);
       }
     };
