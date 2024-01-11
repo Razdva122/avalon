@@ -48,21 +48,25 @@
           <template v-if="!historyEl.forced">
             <div>
               Approve:
-              {{
-                historyEl.votes
-                  .filter((el) => el.value === 'approve')
-                  .map((el) => calculateNameByID(el.playerID))
-                  .join(', ')
-              }}
+              <span class="text-success">
+                {{
+                  historyEl.votes
+                    .filter((el) => el.value === 'approve')
+                    .map((el) => calculateNameByID(el.playerID))
+                    .join(', ')
+                }}
+              </span>
             </div>
             <div>
               Reject:
-              {{
-                historyEl.votes
-                  .filter((el) => el.value === 'reject')
-                  .map((el) => calculateNameByID(el.playerID))
-                  .join(', ')
-              }}
+              <span class="text-error">
+                {{
+                  historyEl.votes
+                    .filter((el) => el.value === 'reject')
+                    .map((el) => calculateNameByID(el.playerID))
+                    .join(', ')
+                }}
+              </span>
             </div>
           </template>
         </div>

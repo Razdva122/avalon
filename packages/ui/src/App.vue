@@ -10,26 +10,36 @@
       </Transition>
     </template>
   </RouterView>
-  <Registration v-if="!isUserExist" />
+  <Settings ref="settings" />
+  <Profile @usernameClick="usernameClick" class="profile" />
   <ConnectStatus class="connect-status" />
   <ErrorSnackbar />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Registration from '@/components/Registration.vue';
+import Settings from '@/components/user/Settings.vue';
+import Profile from '@/components/user/Profile.vue';
 import ConnectStatus from '@/components/feedback/ConnectStatus.vue';
 import ErrorSnackbar from '@/components/feedback/ErrorSnackbar.vue';
 
 export default defineComponent({
   components: {
-    Registration,
+    Settings,
     ConnectStatus,
     ErrorSnackbar,
+    Profile,
   },
-  computed: {
-    isUserExist() {
-      return this.$store.state.user;
+  data() {
+    const { user } = this.$store.state;
+
+    return {
+      overlay: !user,
+    };
+  },
+  methods: {
+    usernameClick() {
+      (<InstanceType<typeof Settings>>this.$refs.settings).displaySettings();
     },
   },
 });
@@ -45,9 +55,17 @@ export default defineComponent({
 }
 
 .connect-status {
-  position: absolute;
+  font-size: large;
+  position: fixed;
   top: 0px;
   left: 2px;
+}
+
+.profile {
+  font-size: large;
+  position: fixed;
+  top: 5px;
+  right: 10px;
 }
 
 body {

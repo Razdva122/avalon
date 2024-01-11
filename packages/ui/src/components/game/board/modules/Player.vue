@@ -3,7 +3,7 @@
     <img class="player-frame" alt="frame" src="@/assets/player-frame.png" />
     <div class="player-icon" :class="iconClasses"></div>
     <template v-if="'role' in player">
-      <div class="player-role-icon" :class="'role-' + randomRole"></div>
+      <div class="player-role-icon" :class="'role-' + player.role"></div>
       <img v-if="player.features.isLeader" class="player-crown" alt="crown" src="@/assets/crown.png" />
     </template>
     <span class="player-name" :class="nameClasses">{{ player.name }}</span>
@@ -31,10 +31,6 @@ export default defineComponent({
       }
 
       return {};
-    },
-    randomRole() {
-      const items = ['mordred', 'oberon', 'merlin', 'morgana', 'minion', 'servant', 'percival'];
-      return items[Math.floor(Math.random() * items.length)];
     },
     nameClasses() {
       if ('features' in this.player) {

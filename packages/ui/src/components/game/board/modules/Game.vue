@@ -4,9 +4,13 @@
     <div class="d-flex flex-row mb-4">
       <Mission v-for="mission in missions" :mission="mission" />
     </div>
-    <div class="text-white mb-4">Vote stage: {{ game.vote + 1 }}</div>
-    <div class="button-panel d-flex flex-column align-center">
+    <div class="text-white mb-4">Vote stage: {{ game.vote + 1 }} / 5</div>
+    <div class="button-panel mb-4 d-flex flex-column align-center">
       <InGamePanel v-if="inGamePanel" :game="game" />
+    </div>
+    <div class="teams text-white font-weight-bold">
+      <span class="text-info">{{ game.settings.players.good }}</span> vs
+      <span class="text-error">{{ game.settings.players.evil }}</span>
     </div>
   </div>
 </template>
@@ -53,4 +57,8 @@ export default defineComponent({
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.teams {
+  font-size: larger;
+}
+</style>
