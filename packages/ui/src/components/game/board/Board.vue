@@ -18,6 +18,7 @@
       :key="player.id"
     >
       <Player
+        ref="playersRefs"
         :player="player"
         :cross="displayCross"
         :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }"
@@ -28,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, inject } from 'vue';
+import { defineComponent, computed, inject, watch, ref, onMounted } from 'vue';
 import Player from '@/components/game/board/modules/Player.vue';
 import Game from '@/components/game/board/modules/Game.vue';
 import StartPanel from '@/components/game/panels/StartPanel.vue';
@@ -46,6 +47,7 @@ export default defineComponent({
   setup() {
     const roomState = inject(roomStateKey)!;
     const store = useStore();
+    const playersRefs = ref<InstanceType<typeof Player>[]>([]);
 
     const playerInGame = computed(() => {
       if (roomState.value.stage === 'started') {
@@ -95,11 +97,36 @@ export default defineComponent({
       }
     };
 
+    const gameHistory = computed(() => {
+      if (roomState.value.stage === 'started') {
+        return roomState.value.game.history;
+      }
+    });
+
+    onMounted(() => {
+      watch(gameHistory, (newValue, oldValue) => {
+        if (newValue && oldValue && newValue.length !== oldValue.length) {
+          const lastElement = newValue[newValue.length - 1];
+
+          if (lastElement.type === 'vote') {
+            lastElement.votes.forEach((vote) => {
+              playersRefs.value.forEach((playerRef) => {
+                if (playerRef.player.id === vote.playerID) {
+                  playerRef.displayIcon(vote.value === 'approve' ? 'check' : 'cross', 10000);
+                }
+              });
+            });
+          }
+        }
+      });
+    });
+
     return {
       roomState,
       players,
       playerInGame,
       displayCross,
+      playersRefs,
 
       calculateRotate,
       onPlayerClick,

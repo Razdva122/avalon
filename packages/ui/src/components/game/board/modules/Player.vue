@@ -8,7 +8,7 @@
     </template>
     <span class="player-name" :class="nameClasses">{{ player.name }}</span>
     <i ref="cross" :style="getIconsStyle('cross')" class="material-icons action-icon close text-error"></i>
-    <i ref="close" :style="getIconsStyle('check')" class="material-icons action-icon check text-success"></i>
+    <i ref="check" :style="getIconsStyle('check')" class="material-icons action-icon check text-success"></i>
   </div>
 </template>
 
@@ -61,7 +61,7 @@ export default defineComponent({
 
       if (timeout) {
         setTimeout(() => {
-          style.cssText = 'display: cross';
+          style.cssText = 'display: none';
         }, timeout);
       }
     },
