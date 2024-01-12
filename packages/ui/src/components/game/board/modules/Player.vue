@@ -7,6 +7,8 @@
       <img v-if="player.features.isLeader" class="player-crown" alt="crown" src="@/assets/crown.png" />
     </template>
     <span class="player-name" :class="nameClasses">{{ player.name }}</span>
+    <i ref="cross" :style="getIconsStyle('cross')" class="material-icons action-icon close text-error"></i>
+    <i ref="close" :style="getIconsStyle('check')" class="material-icons action-icon check text-success"></i>
   </div>
 </template>
 
@@ -19,6 +21,12 @@ export default defineComponent({
     player: {
       type: Object as PropType<IPlayer | TRoomPlayer>,
       required: true,
+    },
+    check: {
+      type: Boolean,
+    },
+    cross: {
+      type: Boolean,
     },
   },
   computed: {
@@ -43,6 +51,21 @@ export default defineComponent({
       return {};
     },
   },
+  methods: {
+    getIconsStyle(iconName: 'check' | 'cross') {
+      return `display: ${this[iconName] ? 'block' : 'none'}`;
+    },
+    displayIcon(iconName: 'check' | 'cross', timeout?: number) {
+      const style = (<HTMLElement>this.$refs[iconName]).style;
+      style.cssText = 'display: block';
+
+      if (timeout) {
+        setTimeout(() => {
+          style.cssText = 'display: cross';
+        }, timeout);
+      }
+    },
+  },
 });
 </script>
 
@@ -54,6 +77,13 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   pointer-events: all;
+}
+
+.action-icon {
+  position: absolute;
+  font-size: 90px;
+  top: 12px;
+  left: 16px;
 }
 
 .player-name {

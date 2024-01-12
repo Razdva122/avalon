@@ -19,6 +19,7 @@
     >
       <Player
         :player="player"
+        :cross="displayCross"
         :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }"
         @player-click="onPlayerClick"
       />
@@ -60,12 +61,28 @@ export default defineComponent({
       return roomState.value.players;
     });
 
+    const userIsLeader = computed(() => {
+      return store.state.user?.id === roomState.value.leaderID;
+    });
+
+    const displayCross = computed(() => {
+      return roomState.value.stage !== 'started' && userIsLeader.value;
+    });
+
     const calculateRotate = (i: number, negative: boolean = false) => {
       return `rotate(${negative ? '-' : ''}${(360 / roomState.value.players.length) * i + 180}deg)`;
     };
 
     const onPlayerClick = (uuid: string) => {
-      if (roomState.value.stage !== 'started' || roomState.value.game.stage === 'end') {
+      if (roomState.value.stage !== 'started') {
+        if (userIsLeader.value) {
+          socket.emit('kickPlayer', roomState.value.roomID, uuid);
+        }
+
+        return;
+      }
+
+      if (roomState.value.game.stage === 'end') {
         return;
       }
 
@@ -82,6 +99,7 @@ export default defineComponent({
       roomState,
       players,
       playerInGame,
+      displayCross,
 
       calculateRotate,
       onPlayerClick,

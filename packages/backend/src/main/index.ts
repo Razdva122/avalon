@@ -92,6 +92,14 @@ export class Manager {
         room.startGame(options);
       }
     });
+
+    socket.on('kickPlayer', (uuid, kickUserID) => {
+      console.log('kick player', kickUserID);
+      const room = this.rooms[uuid];
+      if (room.leaderID === userID) {
+        room.leaveGame(kickUserID);
+      }
+    });
   }
 
   createMethodsForGame(socket: ServerSocket, userID: string, userName: string): void {
