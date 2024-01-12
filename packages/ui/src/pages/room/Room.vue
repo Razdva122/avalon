@@ -1,7 +1,7 @@
 <template>
   <div class="room d-flex flex-column align-center mt-8">
     <template v-if="roomState.stage === 'unavailable'">
-      <h1>This is wrong uuid</h1>
+      <h1 class="text-white">This is wrong uuid</h1>
     </template>
     <template v-else>
       <v-alert
@@ -13,12 +13,14 @@
         close-label="Close Alert"
         :text="currentGameStage"
       ></v-alert>
+      <v-btn v-if="displayRestartButton">Restart game</v-btn>
       <Board />
     </template>
   </div>
 </template>
 
 <script lang="ts">
+import { useRouter } from 'vue-router';
 import { defineComponent, ref, provide, Ref, computed } from 'vue';
 import Board from '@/components/game/board/Board.vue';
 import type { TRoomState } from '@avalon/types';
@@ -42,6 +44,7 @@ export default defineComponent({
     let roomState = ref() as Ref<TRoomState>;
     const alert = ref<boolean>(true);
     const store = useStore();
+    const router = useRouter();
     provide(roomStateKey, <TAvailableRoomState>roomState);
 
     const stateFromBackend = await socket.emitWithAck('joinRoom', props.uuid);
@@ -72,6 +75,10 @@ export default defineComponent({
       }
     });
 
+    socket.on('restartGame', (uuid) => {
+      router.push({ name: 'room', params: { uuid } });
+    });
+
     const currentGameStage = computed(() => {
       if (roomState.value.stage === 'started') {
         return stages[roomState.value.game.stage];
@@ -80,8 +87,17 @@ export default defineComponent({
       return stages[roomState.value.stage];
     });
 
+    const displayRestartButton = computed(() => {
+      return (
+        roomState.value.stage === 'started' &&
+        roomState.value.game.stage === 'end' &&
+        roomState.value.leaderID === userID
+      );
+    });
+
     return {
       roomState,
+      displayRestartButton,
       currentGameStage,
       alert,
     };

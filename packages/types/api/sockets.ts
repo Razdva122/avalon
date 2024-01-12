@@ -10,6 +10,7 @@ import { TMissionResult } from '../game/mission';
 export interface ServerToClientEvents {
   roomUpdated: (state: TRoomState) => void;
   gameUpdated: (state: IVisualGameState) => void;
+  restartGame: (uuid: string) => void;
   serverError: (error: string) => void;
 }
 
@@ -23,6 +24,7 @@ export interface ClientToServerEvents {
   joinGame: (uuid: string) => void;
   startGame: (uuid: string, options: IGameOptions) => void;
   leaveGame: (uuid: string) => void;
+  restartGame: (uuid: string) => void;
 
   selectPlayer: (uuid: string, userID: string) => void;
   sentSelectedPlayers: (uuid: string) => void;

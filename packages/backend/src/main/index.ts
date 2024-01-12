@@ -10,13 +10,34 @@ export class Manager {
   rooms: Dictionary<Room> = {};
   io: Server;
 
-  createRoom(uuid: string, leader: User) {
-    this.rooms[uuid] = new Room(uuid, leader, this.io);
+  createRoom(uuid: string, leaderID: string, players: User[]) {
+    this.rooms[uuid] = new Room(uuid, leaderID, players, this.io);
 
     // Delete room after 1 day timeout
     setTimeout(() => {
       delete this.rooms[uuid];
     }, 86400000);
+  }
+
+  restartRoom(uuid: string) {
+    const room = this.rooms[uuid];
+
+    if (room == null) {
+      throw new Error(`Cant find game for restart with uuid ${uuid}`);
+    }
+
+    if (room.data.stage === 'started') {
+      if (room.data.manager.game.stage === 'end') {
+        const newUUID = crypto.randomUUID();
+        this.createRoom(newUUID, room.leaderID, room.players);
+
+        this.io.emit('restartGame', newUUID);
+      } else {
+        throw new Error(`Cant restart game with uuid ${uuid}, room stage ${room.data.manager.game.stage}`);
+      }
+    } else {
+      throw new Error(`Cant restart game with uuid ${uuid}, room stage ${room.data.stage}`);
+    }
   }
 
   constructor(io: Server) {
@@ -58,8 +79,13 @@ export class Manager {
     socket.on('createRoom', (cb) => {
       const uuid = crypto.randomUUID();
       console.log('createRoom', uuid);
-      this.createRoom(uuid, new User(userID, userName));
+      this.createRoom(uuid, userID, [new User(userID, userName)]);
       cb(uuid);
+    });
+
+    socket.on('restartGame', (uuid) => {
+      console.log(`restart room with uuid: ${uuid}`);
+      this.restartRoom(uuid);
     });
 
     socket.on('leaveRoom', (uuid) => {

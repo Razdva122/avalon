@@ -11,11 +11,11 @@ export class Room {
   maxCapacity = 10;
   io: Server;
 
-  constructor(roomID: string, leader: User, io: Server) {
+  constructor(roomID: string, leaderID: string, players: User[], io: Server) {
     this.io = io;
     this.roomID = roomID;
-    this.players = [leader];
-    this.leaderID = leader.id;
+    this.players = players;
+    this.leaderID = leaderID;
   }
 
   joinGame(userID: string, name: string) {
