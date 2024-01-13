@@ -1,8 +1,11 @@
 <template>
-  <div class="mission mr-2 d-flex flex-column justify-center" :class="missionClasses">
-    <div v-if="!mission.result">
-      {{ mission.players }}
+  <div>
+    <div class="mission mr-2 d-flex flex-column justify-center" :class="missionClasses">
+      <div v-if="!mission.result">
+        {{ mission.players }}
+      </div>
     </div>
+    <div class="text-white" v-if="mission.failsRequired > 1">Fails: {{ mission.failsRequired }}</div>
   </div>
 </template>
 

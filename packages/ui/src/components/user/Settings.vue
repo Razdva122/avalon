@@ -1,5 +1,5 @@
 <template>
-  <v-overlay :model-value="overlay" :persistent="!isUserExist" class="align-center justify-center">
+  <v-overlay v-model="overlay" :persistent="!isUserExist" class="align-center justify-center">
     <v-card>
       <v-sheet width="300" class="mx-auto pa-4">
         <v-form @submit.prevent="updateUser" class="d-flex flex-column align-center justify-center">

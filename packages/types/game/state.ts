@@ -1,6 +1,6 @@
 import type { IPlayer } from './player';
 import type { THistoryResults } from './history';
-import type { IGameSettings } from './settings';
+import type { IGameSettingsWithRoles } from './settings';
 import type { TAddonsStages } from './addons';
 
 export interface IVisualGameState {
@@ -8,7 +8,7 @@ export interface IVisualGameState {
   stage: TGameStage;
   vote: number;
   mission: number;
-  settings: IGameSettings;
+  settings: IGameSettingsWithRoles;
   history: THistoryResults[];
   players: IPlayer[];
 }

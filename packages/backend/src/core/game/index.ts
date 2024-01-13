@@ -17,7 +17,10 @@ import type {
   TVoteOption,
   TGameStage,
   IGameSettings,
+  IGameSettingsWithRoles,
   IGameOptions,
+  TEvilRoles,
+  TGoodRoles,
 } from '@avalon/types';
 
 import type {
@@ -28,6 +31,7 @@ import type {
   TAdditionalAddons,
   TAdditionalAddonsConstructor,
 } from '@/core/game/addons';
+
 import { rolesWithAddons, addons } from '@/core/game/const';
 
 import { Mission } from '@/core/game/history/mission';
@@ -88,7 +92,7 @@ export class Game {
   /**
    * Game settings
    */
-  settings: IGameSettings;
+  settings: IGameSettingsWithRoles;
 
   /**
    * On some stages of the game, the visibility of the roles may change
@@ -157,10 +161,32 @@ export class Game {
 
     this.stateObserver = stateObserver;
 
-    this.settings = gamesSettings[users.length];
+    const settings = gamesSettings[users.length];
 
     // Generates roles and give to players
-    const gameRoles = this.generateRolesForGame(this.settings, options);
+    const gameRoles = this.generateRolesForGame(settings, options);
+
+    const roles = gameRoles.reduce<IGameSettingsWithRoles['roles']>(
+      (acc, el) => {
+        if (el.loyalty === 'evil') {
+          const loyalty = acc[el.loyalty];
+          const role = <TEvilRoles>el.role;
+          loyalty[role] = loyalty[role] ? loyalty[role]! + 1 : 1;
+        } else {
+          const loyalty = acc[el.loyalty];
+          const role = <TGoodRoles>el.role;
+          loyalty[role] = loyalty[role] ? loyalty[role]! + 1 : 1;
+        }
+
+        return acc;
+      },
+      { evil: {}, good: {} },
+    );
+
+    this.settings = {
+      ...settings,
+      roles,
+    };
 
     const players = users.map((user, index) => ({
       user,

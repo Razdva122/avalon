@@ -3,15 +3,39 @@
  */
 export type TRoles = TOptionalRoles | TRequiredRoles;
 
+export type TGoodRoles = TGoodOptionalRoles | TGoodRequiredRoles;
+
+export type TEvilRoles = TEvilOptionalRoles | TEvilRequiredRoles;
+
+/**
+ * Good optional roles
+ */
+export type TGoodOptionalRoles = 'merlin' | 'percival';
+
+/**
+ * Good required roles
+ */
+export type TGoodRequiredRoles = 'servant';
+
+/**
+ * Evil optional roles
+ */
+export type TEvilOptionalRoles = 'morgana' | 'oberon' | 'mordred';
+
+/**
+ * Evil required roles
+ */
+export type TEvilRequiredRoles = 'minion';
+
 /**
  * Roles what can be added in game
  */
-export type TOptionalRoles = 'merlin' | 'morgana' | 'oberon' | 'mordred' | 'percival';
+export type TOptionalRoles = TGoodOptionalRoles | TEvilOptionalRoles;
 
 /**
  * Roles what cant be deleted from game
  */
-export type TRequiredRoles = 'minion' | 'servant';
+export type TRequiredRoles = TEvilRequiredRoles | TGoodRequiredRoles;
 
 /**
  * Available loyalty
