@@ -14,6 +14,7 @@
   <Profile @usernameClick="usernameClick" class="profile" />
   <ConnectStatus class="connect-status" />
   <ErrorSnackbar />
+  <Version class="version" />
 </template>
 
 <script lang="ts">
@@ -22,6 +23,7 @@ import Settings from '@/components/user/Settings.vue';
 import Profile from '@/components/user/Profile.vue';
 import ConnectStatus from '@/components/feedback/ConnectStatus.vue';
 import ErrorSnackbar from '@/components/feedback/ErrorSnackbar.vue';
+import Version from '@/components/feedback/Version.vue';
 
 export default defineComponent({
   components: {
@@ -29,6 +31,7 @@ export default defineComponent({
     ConnectStatus,
     ErrorSnackbar,
     Profile,
+    Version,
   },
   data() {
     const { user } = this.$store.state;
@@ -65,6 +68,14 @@ export default defineComponent({
   font-size: large;
   position: fixed;
   top: 5px;
+  right: 10px;
+}
+
+.version {
+  opacity: 30%;
+  font-size: large;
+  position: fixed;
+  bottom: 5px;
   right: 10px;
 }
 

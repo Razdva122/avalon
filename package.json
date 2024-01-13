@@ -1,6 +1,6 @@
 {
   "name": "avalon-monorepo",
-  "version": "1.0.0",
+  "version": "1.0.21",
   "description": "A monorepo for avalon",
   "private": true,
   "workspaces": [
@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "npm run serve --workspace=packages/ui & npm run dev --workspace=packages/backend",
     "start": "npm run build --workspace=packages/ui && npm run start --workspace=packages/backend",
-    "prod:start": "NODE_ENV=production npm run start"
+    "prod:start": "NODE_ENV=production npm run start",
+    "version": "npm version $npm_package_version --no-git-tag-version --workspaces && git add ."
   },
   "dependencies": {
     "lodash": "^4.17.21",
