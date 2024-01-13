@@ -13,7 +13,7 @@
         close-label="Close Alert"
         :text="currentGameStage"
       ></v-alert>
-      <v-btn v-if="displayRestartButton">Restart game</v-btn>
+      <v-btn v-if="displayRestartButton" @click="restartGame">Restart game</v-btn>
       <Board />
     </template>
   </div>
@@ -95,11 +95,18 @@ export default defineComponent({
       );
     });
 
+    const restartGame = () => {
+      if (roomState.value.stage !== 'unavailable') {
+        return socket.emit('restartGame', roomState.value.roomID);
+      }
+    };
+
     return {
       roomState,
       displayRestartButton,
       currentGameStage,
       alert,
+      restartGame,
     };
   },
 
