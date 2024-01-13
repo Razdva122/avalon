@@ -34,8 +34,8 @@ export const gamesSettings: IPresetsForGame = {
       { players: 4, failsRequired: 1 },
     ],
     players: {
-      good: 3,
-      evil: 3,
+      good: 4,
+      evil: 2,
     },
     total: 6,
   },
