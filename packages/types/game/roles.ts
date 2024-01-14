@@ -7,6 +7,8 @@ export type TGoodRoles = TGoodOptionalRoles | TGoodRequiredRoles;
 
 export type TEvilRoles = TEvilOptionalRoles | TEvilRequiredRoles;
 
+export type TUnknownRoles = 'unknown' | 'mystery-wizard';
+
 /**
  * Good optional roles
  */
@@ -46,4 +48,4 @@ export type TLoyalty = 'evil' | 'good';
  * Visible roles for other players,
  * They may differ from real roles
  */
-export type TVisibleRole = TRoles | 'unknown' | 'evil' | 'mystery-wizard';
+export type TVisibleRole = TRoles | TUnknownRoles | 'evil';

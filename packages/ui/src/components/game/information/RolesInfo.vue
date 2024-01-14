@@ -5,7 +5,7 @@
       <div class="d-flex flex-row align-center">
         <h2 class="title">{{ selectedRole ? selectedRole : 'Roles' }}</h2>
         <v-switch
-          v-if="!selectedRole && visibleRoles"
+          v-if="!selectedRole && visibleRolesInfo.length > 2"
           v-model="mode"
           hide-details
           true-value="real"
@@ -20,18 +20,23 @@
         <div class="role-info">{{ roleInfo.info }}</div>
         <div v-if="roleInfo.loyalty" :class="'icon-loyalty-' + roleInfo.loyalty"></div>
       </template>
-      <template v-else-if="mode == 'real'">
-        <div class="loyalty-container">
-          <div v-for="role in gameRolesArray.good">
+      <template v-else>
+        <div class="loyalty-container" v-if="mode === 'real'" v-for="loyalty in ['good', 'evil'] as const">
+          <div v-for="role in gameRoles[loyalty]">
             <div class="role-name">{{ role }}</div>
-            <Role @click="selectRole(role)" class="role-loyalty-good role" :role="role" />
+            <Role @click="selectRole(role)" class="role" :class="'role-loyalty-' + loyalty" :role="role" />
           </div>
-          <v-divider :thickness="2" class="mt-4 mb-4"></v-divider>
+          <v-divider v-if="loyalty === 'good'" :thickness="2" class="mt-2 mb-2"></v-divider>
         </div>
-        <div class="loyalty-container">
-          <div v-for="role in gameRolesArray.evil">
-            <div class="role-name">{{ role }}</div>
-            <Role @click="selectRole(role)" class="role-loyalty-evil role" :role="role" />
+        <div class="loyalty-container" v-else>
+          <div v-for="role in visibleRolesInfo">
+            <div class="role-name">{{ role.name }}</div>
+            <Role
+              @click="selectRole(role.name)"
+              class="role"
+              :class="'role-loyalty-' + role.loyalty"
+              :role="role.name"
+            />
           </div>
         </div>
       </template>
@@ -49,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import type { IGameSettingsWithRoles, TVisibleRole } from '@avalon/types';
+import type { TGameRoles, TVisibleRole } from '@avalon/types';
 import { defineComponent, PropType } from 'vue';
 import Role from '@/components/game/information/Role.vue';
 import { rolesShortInfo } from '@/components/game/information/const';
@@ -61,9 +66,10 @@ export default defineComponent({
   props: {
     gameRoles: {
       required: true,
-      type: Object as PropType<IGameSettingsWithRoles['roles']>,
+      type: Object as PropType<TGameRoles>,
     },
     visibleRoles: {
+      required: true,
       type: Array as PropType<TVisibleRole[]>,
     },
   },
@@ -73,28 +79,19 @@ export default defineComponent({
     selectedRole: undefined as TVisibleRole | undefined,
   }),
   computed: {
-    gameRolesArray() {
-      function accumulateRoles(acc: TVisibleRole[], [role, amount]: [TVisibleRole, number]) {
-        for (let i = 0; i < amount; i += 1) {
-          acc.push(role);
-        }
-
-        return acc;
-      }
-
-      const roles = {
-        evil: (<[TVisibleRole, number][]>Object.entries(this.gameRoles.evil))
-          .reduce<TVisibleRole[]>(accumulateRoles, [])
-          .reverse(),
-        good: (<[TVisibleRole, number][]>Object.entries(this.gameRoles.good))
-          .reduce<TVisibleRole[]>(accumulateRoles, [])
-          .reverse(),
-      };
-
-      return roles;
-    },
     roleInfo() {
       return rolesShortInfo[this.selectedRole!];
+    },
+    visibleRolesInfo() {
+      return this.visibleRoles
+        .map((el) => ({ name: el, ...rolesShortInfo[el] }))
+        .sort((a) => {
+          if (a.loyalty === 'evil') {
+            return -1;
+          }
+
+          return a.loyalty === 'good' ? 0 : 1;
+        });
     },
   },
   methods: {
@@ -116,6 +113,7 @@ export default defineComponent({
 .roles-info {
   background-color: white;
   width: 400px;
+  min-height: 500px;
   max-height: 80vh;
   overflow-y: auto;
 }
@@ -146,6 +144,10 @@ export default defineComponent({
 
 .role-loyalty-evil {
   border: 5px solid rgb(var(--v-theme-error));
+}
+
+.role-loyalty-unknown {
+  border: 5px solid gray;
 }
 
 .icon-loyalty-good,

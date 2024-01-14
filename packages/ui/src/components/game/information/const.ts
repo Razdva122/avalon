@@ -1,6 +1,6 @@
 import { TLoyalty, TVisibleRole } from '@avalon/types';
 
-export const rolesShortInfo: { [key in TVisibleRole]: { loyalty?: TLoyalty; info: string } } = {
+export const rolesShortInfo: { [key in TVisibleRole]: { loyalty: TLoyalty | 'unknown'; info: string } } = {
   merlin: {
     loyalty: 'good',
     info: 'Knows evil, must remain hidden',
@@ -34,9 +34,11 @@ export const rolesShortInfo: { [key in TVisibleRole]: { loyalty?: TLoyalty; info
     info: 'Evil player with an unknown role',
   },
   unknown: {
+    loyalty: 'unknown',
     info: 'Unknown role',
   },
   'mystery-wizard': {
+    loyalty: 'unknown',
     info: 'One of the two wizards is good (Merlin) or evil (Morgana)',
   },
 };

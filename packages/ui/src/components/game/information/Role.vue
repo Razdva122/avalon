@@ -10,7 +10,7 @@ export default defineComponent({
   props: {
     role: {
       required: true,
-      type: Object as PropType<TVisibleRole>,
+      type: String as PropType<TVisibleRole>,
     },
   },
 });
@@ -71,6 +71,12 @@ export default defineComponent({
 .role-evil {
   background-image: url('@/assets/red_team_no_background.png');
   background-position: 50% 52%;
+  background-size: 135%;
+}
+
+.role-unknown {
+  background-image: url('@/assets/player-frame.png');
+  background-position: center;
   background-size: 135%;
 }
 </style>

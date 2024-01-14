@@ -21,6 +21,7 @@ import type {
   IGameOptions,
   TEvilRoles,
   TGoodRoles,
+  TGameRoles,
 } from '@avalon/types';
 
 import type {
@@ -166,21 +167,21 @@ export class Game {
     // Generates roles and give to players
     const gameRoles = this.generateRolesForGame(settings, options);
 
-    const roles = gameRoles.reduce<IGameSettingsWithRoles['roles']>(
+    const roles = gameRoles.reduce<TGameRoles>(
       (acc, el) => {
         if (el.loyalty === 'evil') {
           const loyalty = acc[el.loyalty];
           const role = <TEvilRoles>el.role;
-          loyalty[role] = loyalty[role] ? loyalty[role]! + 1 : 1;
+          loyalty.push(role);
         } else {
           const loyalty = acc[el.loyalty];
           const role = <TGoodRoles>el.role;
-          loyalty[role] = loyalty[role] ? loyalty[role]! + 1 : 1;
+          loyalty.push(role);
         }
 
         return acc;
       },
-      { evil: {}, good: {} },
+      { evil: [], good: [] },
     );
 
     this.settings = {

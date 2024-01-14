@@ -10,12 +10,10 @@ export interface IGameSettings {
 }
 
 export interface IGameSettingsWithRoles extends IGameSettings {
-  roles: {
-    evil: {
-      [key in TEvilRoles]?: number;
-    };
-    good: {
-      [key in TGoodRoles]?: number;
-    };
-  };
+  roles: TGameRoles;
+}
+
+export interface TGameRoles {
+  evil: TEvilRoles[];
+  good: TGoodRoles[];
 }

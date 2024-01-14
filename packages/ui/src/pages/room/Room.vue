@@ -6,7 +6,11 @@
     <template v-else>
       <v-btn v-if="displayRestartButton" @click="restartGame">Restart game</v-btn>
       <Board />
-      <RolesInfo v-if="roomState.stage === 'started'" :game-roles="roomState.game.settings.roles" />
+      <RolesInfo
+        v-if="roomState.stage === 'started'"
+        :game-roles="roomState.game.settings.roles"
+        :visible-roles="visibleRoles"
+      />
     </template>
   </div>
 </template>
@@ -15,7 +19,7 @@
 import { useRouter } from 'vue-router';
 import { defineComponent, ref, provide, Ref, computed } from 'vue';
 import Board from '@/components/game/board/Board.vue';
-import type { TRoomState } from '@avalon/types';
+import type { TRoomState, TVisibleRole } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { roomStateKey, TAvailableRoomState } from '@/pages/room/const';
 import { mutateRoomGameForPosition } from '@/pages/room/helpers';
@@ -39,9 +43,16 @@ export default defineComponent({
     const alert = ref<boolean>(true);
     const store = useStore();
     const router = useRouter();
+
     provide(roomStateKey, <TAvailableRoomState>roomState);
 
-    const stateFromBackend = await socket.emitWithAck('joinRoom', props.uuid);
+    const initState = async (uuid: string) => {
+      const stateFromBackend = await socket.emitWithAck('joinRoom', uuid);
+      syncState(stateFromBackend);
+    };
+
+    await initState(props.uuid);
+
     const userID = store.state.user?.id;
 
     function syncState(state: TRoomState) {
@@ -56,8 +67,6 @@ export default defineComponent({
       roomState.value = state;
     }
 
-    syncState(stateFromBackend);
-
     socket.on('roomUpdated', (state) => {
       syncState(state);
     });
@@ -71,6 +80,7 @@ export default defineComponent({
 
     socket.on('restartGame', (uuid) => {
       router.push({ name: 'room', params: { uuid } });
+      initState(uuid);
     });
 
     const displayRestartButton = computed(() => {
@@ -87,9 +97,24 @@ export default defineComponent({
       }
     };
 
+    const visibleRoles = computed(() => {
+      if (roomState.value.stage === 'started') {
+        return roomState.value.game.players.reduce<TVisibleRole[]>((acc, el) => {
+          if (!acc.includes(el.role)) {
+            acc.push(el.role);
+          }
+
+          return acc;
+        }, []);
+      }
+
+      return [];
+    });
+
     return {
       roomState,
       displayRestartButton,
+      visibleRoles,
       alert,
       restartGame,
     };
