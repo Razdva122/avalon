@@ -21,7 +21,7 @@ import type { IVisualGameState, THistoryMission } from '@avalon/types';
 import type { IMissionWithResult } from '@/components/game/board/interface';
 import { defineComponent, PropType } from 'vue';
 import Mission from '@/components/game/board/modules/Mission.vue';
-import History from '@/components/game/history/History.vue';
+import History from '@/components/game/information/History.vue';
 import InGamePanel from '@/components/game/panels/InGamePanel.vue';
 
 export default defineComponent({

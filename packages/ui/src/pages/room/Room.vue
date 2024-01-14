@@ -4,17 +4,9 @@
       <h1 class="text-white">This is wrong uuid</h1>
     </template>
     <template v-else>
-      <v-alert
-        v-model="alert"
-        color="info"
-        variant="tonal"
-        class="game-stage rounded-xl mb-10"
-        closable
-        close-label="Close Alert"
-        :text="currentGameStage"
-      ></v-alert>
       <v-btn v-if="displayRestartButton" @click="restartGame">Restart game</v-btn>
       <Board />
+      <RolesInfo v-if="roomState.stage === 'started'" :game-roles="roomState.game.settings.roles" />
     </template>
   </div>
 </template>
@@ -25,14 +17,16 @@ import { defineComponent, ref, provide, Ref, computed } from 'vue';
 import Board from '@/components/game/board/Board.vue';
 import type { TRoomState } from '@avalon/types';
 import { socket } from '@/api/socket';
-import { roomStateKey, TAvailableRoomState, stages } from '@/pages/room/const';
+import { roomStateKey, TAvailableRoomState } from '@/pages/room/const';
 import { mutateRoomGameForPosition } from '@/pages/room/helpers';
 import { useStore } from '@/store';
+import RolesInfo from '@/components/game/information/RolesInfo.vue';
 
 export default defineComponent({
   name: 'Room',
   components: {
     Board,
+    RolesInfo,
   },
   props: {
     uuid: {
@@ -79,14 +73,6 @@ export default defineComponent({
       router.push({ name: 'room', params: { uuid } });
     });
 
-    const currentGameStage = computed(() => {
-      if (roomState.value.stage === 'started') {
-        return stages[roomState.value.game.stage];
-      }
-
-      return stages[roomState.value.stage];
-    });
-
     const displayRestartButton = computed(() => {
       return (
         roomState.value.stage === 'started' &&
@@ -104,7 +90,6 @@ export default defineComponent({
     return {
       roomState,
       displayRestartButton,
-      currentGameStage,
       alert,
       restartGame,
     };
