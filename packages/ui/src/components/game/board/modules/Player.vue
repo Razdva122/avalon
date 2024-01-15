@@ -1,12 +1,12 @@
 <template>
-  <div class="player-container" @click="$emit('playerClick', player.id)">
+  <div class="player-container" :class="playerClasses" @click="$emit('playerClick', player.id)">
     <img class="player-frame" alt="frame" src="@/assets/player-frame.png" />
-    <div class="player-icon" :class="iconClasses"></div>
+    <div class="player-icon"></div>
     <template v-if="'role' in player">
       <Role class="role-container" :role="player.role" />
       <img v-if="player.features.isLeader" class="player-crown" alt="crown" src="@/assets/crown.png" />
     </template>
-    <span class="player-name" :class="nameClasses">{{ player.name }}</span>
+    <span class="player-name">{{ player.name }}</span>
     <i ref="cross" :style="getIconsStyle('cross')" class="material-icons action-icon close text-error"></i>
     <i ref="check" :style="getIconsStyle('check')" class="material-icons action-icon check text-success"></i>
   </div>
@@ -34,22 +34,12 @@ export default defineComponent({
     },
   },
   computed: {
-    iconClasses() {
+    playerClasses() {
       if ('features' in this.player) {
-        return {
-          'player-icon-active': this.player.features.waitForAction,
-          'player-icon-assassin': this.player.features.isAssassin,
-        };
-      }
-
-      return {};
-    },
-    nameClasses() {
-      if ('features' in this.player) {
-        return {
-          'player-name-selected': this.player.features.isSelected,
-          'player-name-sent': this.player.features.isSent,
-        };
+        return Object.entries(this.player.features).reduce<{ [key: string]: boolean }>((acc, [key, value]) => {
+          acc[`player-feature-${key}`] = value;
+          return acc;
+        }, {});
       }
 
       return {};
@@ -134,22 +124,19 @@ export default defineComponent({
   height: 90px;
 }
 
-.player-icon-active {
+.player-feature-waitForAction .player-name {
   border-color: rgba(65, 105, 225, 0.8);
-  box-shadow:
-    2px 4px 8px 0px rgba(130, 144, 255, 0.3),
-    2px 4px 16px 0px rgba(130, 144, 255, 0.3);
 }
 
-.player-icon-assassin {
+.player-feature-isAssassin .player-name {
   border-color: rgba(220, 20, 60, 0.6);
 }
 
-.player-name-selected {
+.player-feature-isSelected .player-icon {
   border-color: rgba(255, 245, 50, 0.642);
 }
 
-.player-name-sent {
+.player-feature-isSent .player-icon {
   border-color: rgba(220, 20, 60, 0.6);
 }
 

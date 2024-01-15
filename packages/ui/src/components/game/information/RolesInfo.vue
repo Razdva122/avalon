@@ -99,6 +99,14 @@ export default defineComponent({
       this.selectedRole = role;
     },
   },
+  watch: {
+    overlay(value: boolean) {
+      if (value === true) {
+        this.selectedRole = undefined;
+        this.mode = 'real';
+      }
+    },
+  },
 });
 </script>
 
