@@ -1,6 +1,7 @@
 <template>
   <div class="board-container mt-16">
     <img class="game-board" alt="board" src="@/assets/board.png" />
+    <Timer class="timer" @timerEnd="clearHistoryElement" :duration="timerDuration" />
     <div class="actions-container d-flex flex-column justify-center">
       <template v-if="roomState.stage !== 'started'">
         <div class="button-panel d-flex flex-column align-center">
@@ -18,7 +19,6 @@
       :key="player.id"
     >
       <Player
-        ref="playersRefs"
         :player="player"
         :cross="displayCross"
         :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }"
@@ -29,10 +29,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, inject, watch, ref, onMounted } from 'vue';
+import * as _ from 'lodash';
+import { defineComponent, computed, inject, watch, ref } from 'vue';
 import Player from '@/components/game/board/modules/Player.vue';
+import Timer from '@/components/feedback/Timer.vue';
 import Game from '@/components/game/board/modules/Game.vue';
 import StartPanel from '@/components/game/panels/StartPanel.vue';
+import { THistoryResults } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { roomStateKey } from '@/pages/room/const';
@@ -43,11 +46,13 @@ export default defineComponent({
     Player,
     Game,
     StartPanel,
+    Timer,
   },
   setup() {
     const roomState = inject(roomStateKey)!;
     const store = useStore();
-    const playersRefs = ref<InstanceType<typeof Player>[]>([]);
+    const visibleHistory = ref<THistoryResults>();
+    const timerDuration = ref(0);
 
     const playerInGame = computed(() => {
       if (roomState.value.stage === 'started') {
@@ -75,6 +80,10 @@ export default defineComponent({
       return `rotate(${negative ? '-' : ''}${(360 / roomState.value.players.length) * i + 180}deg)`;
     };
 
+    const clearHistoryElement = () => {
+      visibleHistory.value = undefined;
+    };
+
     const onPlayerClick = (uuid: string) => {
       if (roomState.value.stage !== 'started') {
         if (userIsLeader.value) {
@@ -97,28 +106,22 @@ export default defineComponent({
       }
     };
 
-    const gameHistory = computed(() => {
+    const gameHistoryLength = computed(() => {
       if (roomState.value.stage === 'started') {
-        return roomState.value.game.history;
+        return roomState.value.game.history.length;
       }
     });
 
-    onMounted(() => {
-      watch(gameHistory, (newValue, oldValue) => {
-        if (newValue && oldValue && newValue.length !== oldValue.length) {
-          const lastElement = newValue[newValue.length - 1];
+    watch(gameHistoryLength, () => {
+      if ('game' in roomState.value) {
+        const lastElement = _.last(roomState.value.game.history);
 
-          if (lastElement.type === 'vote') {
-            lastElement.votes.forEach((vote) => {
-              playersRefs.value.forEach((playerRef) => {
-                if (playerRef.player.id === vote.playerID) {
-                  playerRef.displayIcon(vote.value === 'approve' ? 'check' : 'cross', 10000);
-                }
-              });
-            });
-          }
+        if (lastElement?.type === 'vote') {
+          const timeoutTime = 10000;
+          visibleHistory.value = lastElement;
+          timerDuration.value = timeoutTime;
         }
-      });
+      }
     });
 
     return {
@@ -126,7 +129,10 @@ export default defineComponent({
       players,
       playerInGame,
       displayCross,
-      playersRefs,
+      visibleHistory,
+
+      timerDuration,
+      clearHistoryElement,
 
       calculateRotate,
       onPlayerClick,
@@ -168,5 +174,11 @@ export default defineComponent({
 
 .button-panel > button {
   width: 200px;
+}
+
+.timer {
+  position: absolute;
+  top: 120px;
+  font-size: 28px;
 }
 </style>
