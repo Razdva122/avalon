@@ -6,7 +6,7 @@
     </div>
     <div class="text-white mb-4">Vote stage: {{ game.vote + 1 }} / 5</div>
     <div class="button-panel mb-4 d-flex flex-column align-center">
-      <InGamePanel v-if="inGamePanel" :game="game" />
+      <InGamePanel v-if="inGamePanel && !visibleHistory" :game="game" />
     </div>
     <div class="teams text-white font-weight-bold">
       <span class="text-info">{{ game.settings.players.good }}</span> vs
@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import * as _ from 'lodash';
-import type { IVisualGameState, THistoryMission } from '@avalon/types';
+import type { IVisualGameState, THistoryMission, THistoryResults } from '@avalon/types';
 import type { IMissionWithResult } from '@/components/game/board/interface';
 import { defineComponent, PropType } from 'vue';
 import Mission from '@/components/game/board/modules/Mission.vue';
@@ -39,6 +39,9 @@ export default defineComponent({
     inGamePanel: {
       required: true,
       type: Boolean,
+    },
+    visibleHistory: {
+      type: Object as PropType<THistoryResults>,
     },
   },
   computed: {

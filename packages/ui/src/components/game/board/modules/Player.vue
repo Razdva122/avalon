@@ -5,16 +5,17 @@
     <template v-if="'role' in player">
       <Role class="role-container" :role="player.role" />
       <img v-if="player.features.isLeader" class="player-crown" alt="crown" src="@/assets/crown.png" />
+      <i v-if="player.features.vote === 'reject'" class="material-icons action-icon close text-error"></i>
+      <i v-if="player.features.vote === 'approve'" class="material-icons action-icon check text-success"></i>
     </template>
     <span class="player-name">{{ player.name }}</span>
-    <i ref="cross" :style="getIconsStyle('cross')" class="material-icons action-icon close text-error"></i>
-    <i ref="check" :style="getIconsStyle('check')" class="material-icons action-icon check text-success"></i>
   </div>
 </template>
 
 <script lang="ts">
+import * as _ from 'lodash';
 import { defineComponent, PropType } from 'vue';
-import type { IPlayer, TRoomPlayer } from '@avalon/types';
+import type { IPlayerWithVote, TRoomPlayer, THistoryResults } from '@avalon/types';
 import Role from '@/components/game/information/Role.vue';
 
 export default defineComponent({
@@ -22,18 +23,32 @@ export default defineComponent({
     Role,
   },
   props: {
-    player: {
-      type: Object as PropType<IPlayer | TRoomPlayer>,
+    playerState: {
+      type: Object as PropType<IPlayerWithVote | TRoomPlayer>,
       required: true,
     },
-    check: {
-      type: Boolean,
-    },
-    cross: {
-      type: Boolean,
+    visibleHistory: {
+      type: Object as PropType<THistoryResults>,
     },
   },
   computed: {
+    player(): IPlayerWithVote | TRoomPlayer {
+      if ('features' in this.playerState && this.visibleHistory?.type === 'vote') {
+        const clone = _.cloneDeep(this.playerState);
+        const userVote = this.visibleHistory.votes.find((player) => player.playerID === clone.id)!;
+
+        clone.features.isLeader = this.visibleHistory.leaderID === clone.id;
+        clone.features.isSelected = false;
+        clone.features.isSent = userVote.onMission;
+        clone.features.vote = userVote.value;
+        clone.features.waitForAction = false;
+
+        return clone;
+      }
+
+      return this.playerState;
+    },
+
     playerClasses() {
       if ('features' in this.player) {
         return Object.entries(this.player.features).reduce<{ [key: string]: boolean }>((acc, [key, value]) => {
@@ -43,21 +58,6 @@ export default defineComponent({
       }
 
       return {};
-    },
-  },
-  methods: {
-    getIconsStyle(iconName: 'check' | 'cross') {
-      return `display: ${this[iconName] ? 'block' : 'none'}`;
-    },
-    displayIcon(iconName: 'check' | 'cross', timeout?: number) {
-      const style = (<HTMLElement>this.$refs[iconName]).style;
-      style.cssText = 'display: block';
-
-      if (timeout) {
-        setTimeout(() => {
-          style.cssText = 'display: none';
-        }, timeout);
-      }
     },
   },
 });
@@ -137,7 +137,7 @@ export default defineComponent({
 }
 
 .player-feature-isSent .player-icon {
-  border-color: rgba(220, 20, 60, 0.6);
+  border-color: rgba(255, 255, 255, 0.8);
 }
 
 .player-crown {

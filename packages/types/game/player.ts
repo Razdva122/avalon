@@ -1,6 +1,7 @@
 import type { TVisibleRole } from './roles';
 import type { TMissionResult } from './mission';
 import type { TAddonsFeatures } from './addons';
+import { TVoteOption } from './vote';
 
 export interface IPlayer {
   id: string;
@@ -8,6 +9,10 @@ export interface IPlayer {
   role: TVisibleRole;
   features: IPlayerFeatures;
   validMissionsResult?: TMissionResult[];
+}
+
+export interface IPlayerWithVote extends IPlayer {
+  features: IPlayerFeatures & { vote?: TVoteOption };
 }
 
 export interface IPlayerFeatures extends TAddonsFeatures {

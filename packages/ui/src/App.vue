@@ -11,7 +11,7 @@
     </template>
   </RouterView>
   <Settings ref="settings" />
-  <Profile @usernameClick="usernameClick" class="profile" />
+  <Profile v-if="user" @usernameClick="usernameClick" class="profile" />
   <ConnectStatus class="connect-status" />
   <ErrorSnackbar />
   <Version class="version" />
@@ -37,7 +37,7 @@ export default defineComponent({
     const { user } = this.$store.state;
 
     return {
-      overlay: !user,
+      user,
     };
   },
   methods: {

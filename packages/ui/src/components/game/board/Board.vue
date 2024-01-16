@@ -9,7 +9,7 @@
         </div>
       </template>
       <template v-else>
-        <Game :game="roomState.game" :inGamePanel="Boolean(playerInGame)"></Game>
+        <Game :game="roomState.game" :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory"></Game>
       </template>
     </div>
     <div
@@ -19,8 +19,8 @@
       :key="player.id"
     >
       <Player
-        :player="player"
-        :cross="displayCross"
+        :player-state="player"
+        :visible-history="visibleHistory"
         :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }"
         @player-click="onPlayerClick"
       />
@@ -72,16 +72,13 @@ export default defineComponent({
       return store.state.user?.id === roomState.value.leaderID;
     });
 
-    const displayCross = computed(() => {
-      return roomState.value.stage !== 'started' && userIsLeader.value;
-    });
-
     const calculateRotate = (i: number, negative: boolean = false) => {
       return `rotate(${negative ? '-' : ''}${(360 / roomState.value.players.length) * i + 180}deg)`;
     };
 
     const clearHistoryElement = () => {
       visibleHistory.value = undefined;
+      timerDuration.value = 0;
     };
 
     const onPlayerClick = (uuid: string) => {
@@ -128,7 +125,6 @@ export default defineComponent({
       roomState,
       players,
       playerInGame,
-      displayCross,
       visibleHistory,
 
       timerDuration,
