@@ -27,12 +27,8 @@ export class LadyOfLakeAddon implements IGameAddon {
     return true;
   }
 
-  afterOnMission(nextStage: TGameStage) {
-    if (nextStage === 'end') {
-      return true;
-    }
-
-    if (this.game.round >= 2 && this.game.round <= 4) {
+  beforeSelectTeam(prevStage: TGameStage) {
+    if (this.game.round >= 2 && prevStage !== 'announceLoyalty') {
       this.game.updateStage('checkLoyalty');
       this.game.stateObserver.gameStateChanged();
       return false;
@@ -54,8 +50,8 @@ export class LadyOfLakeAddon implements IGameAddon {
 
     const selectedPlayer = this.game.selectedPlayers[0];
 
-    if (selectedPlayer.features.ladyOfLake === 'used') {
-      throw new Error("You can't use the lady of the lake on the previous owner");
+    if (selectedPlayer.features.ladyOfLake !== undefined) {
+      throw new Error("You can't use the lady of the lake on the previous owner or yourself");
     }
 
     this.game.history.push(new CheckLoyalty(ownerOfLady, selectedPlayer));
@@ -83,6 +79,7 @@ export class LadyOfLakeAddon implements IGameAddon {
 
     ownerOfLady.features.ladyOfLake = 'used';
     selectedPlayer.features.ladyOfLake = 'has';
+    selectedPlayer.features.isSelected = false;
 
     this.game.updateStage('selectTeam');
 

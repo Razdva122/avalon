@@ -70,6 +70,16 @@
             </div>
           </template>
         </div>
+        <div v-if="historyEl.type === 'checkLoyalty'">
+          <div>
+            <b>{{ calculateNameByID(historyEl.validatorID) }}</b> checked
+            <b>{{ calculateNameByID(historyEl.inspectedID) }}</b> loyalty
+          </div>
+          <div>
+            And declared his loyalty as
+            <span :class="historyEl.result === 'evil' ? 'text-error' : 'text-success'"> {{ historyEl.result }}</span>
+          </div>
+        </div>
         <v-divider :thickness="3"></v-divider>
       </div>
     </div>

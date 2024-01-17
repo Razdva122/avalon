@@ -1,5 +1,5 @@
 import { Game } from '@/core/game';
-import { IGameOptions } from '@avalon/types';
+import { IGameOptions, TLoyalty } from '@avalon/types';
 import { User } from '@/user';
 
 const users = [
@@ -94,6 +94,27 @@ export class GameTestHelper {
     this.game.selectPlayer(assassinID, id);
     this.game.addons.merlin!.selectMerlin(assassinID);
 
+    return this;
+  }
+
+  useLadyOfLake(): this {
+    const randomPlayerID = this.game.players.find((player) => player.features.ladyOfLake === undefined)!.user.id;
+
+    const ownerID = this.game.players.find((player) => {
+      return player.features.ladyOfLake == 'has';
+    })!.user.id;
+
+    this.game.selectPlayer(ownerID, randomPlayerID);
+    this.game.addons.ladyOfLake!.checkLoyalty(ownerID);
+    return this;
+  }
+
+  announceLoyalty(loyalty: TLoyalty): this {
+    const id = this.game.players.find((player) => {
+      return player.features.ladyOfLake == 'has';
+    })!.user.id;
+
+    this.game.addons.ladyOfLake!.announceLoyalty(id, loyalty);
     return this;
   }
 }
