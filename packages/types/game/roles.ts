@@ -7,12 +7,12 @@ export type TGoodRoles = TGoodOptionalRoles | TGoodRequiredRoles;
 
 export type TEvilRoles = TEvilOptionalRoles | TEvilRequiredRoles;
 
-export type TUnknownRoles = 'unknown' | 'mystery-wizard';
+export type TUnknownRoles = 'unknown' | 'mysteryWizard';
 
 /**
  * Good optional roles
  */
-export type TGoodOptionalRoles = 'merlin' | 'percival';
+export type TGoodOptionalRoles = 'merlin' | 'percival' | 'merlinPure';
 
 /**
  * Good required roles

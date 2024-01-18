@@ -25,12 +25,12 @@ import type {
 } from '@avalon/types';
 
 import type {
-  TRolesAddonsConstructor,
+  TRolesAddonsData,
   TAfterMethods,
   TBeforeMethods,
   TRolesWithAddons,
   TAdditionalAddons,
-  TAdditionalAddonsConstructor,
+  TAdditionalAddonsData,
 } from '@/core/game/addons';
 
 import { rolesWithAddons, addons } from '@/core/game/const';
@@ -219,11 +219,11 @@ export class Game {
 
     // Generate roles addons
     this.addons = Object.entries(rolesWithAddons).reduce<IGameAddons>((acc, data) => {
-      const [role, addon] = <[TRolesWithAddons, TRolesAddonsConstructor]>data;
+      const [role, addonData] = <[TRolesWithAddons, TRolesAddonsData]>data;
 
       if (options.roles[role]) {
-        acc[role] = new addon(this);
-        acc.push(acc[role]!);
+        acc[addonData.key] = new addonData.addon(this);
+        acc.push(acc[addonData.key]!);
       }
 
       return acc;
@@ -231,11 +231,11 @@ export class Game {
 
     // Generate roles-independent addons
     Object.entries(addons).forEach((data) => {
-      const [name, addon] = <[TAdditionalAddons, TAdditionalAddonsConstructor]>data;
+      const [name, addonData] = <[TAdditionalAddons, TAdditionalAddonsData]>data;
 
       if (options.addons[name]) {
-        this.addons[name] = new addon(this);
-        this.addons.push(this.addons[name]!);
+        this.addons[addonData.key] = new addonData.addon(this);
+        this.addons.push(this.addons[addonData.key]!);
       }
     });
 

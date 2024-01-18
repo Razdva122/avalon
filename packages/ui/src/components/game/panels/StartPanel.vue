@@ -35,6 +35,7 @@ export default defineComponent({
     const roomState = inject(roomStateKey)!;
     const store = useStore();
     const roles = ref<TRolesOptions>({
+      merlinPure: false,
       merlin: false,
       mordred: false,
       morgana: false,

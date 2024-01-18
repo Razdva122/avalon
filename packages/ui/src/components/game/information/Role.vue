@@ -24,7 +24,12 @@ export default defineComponent({
 
 .role-merlin {
   background-image: url('@/assets/roles/merlin.png');
-  background-position: 50% 22%;
+  background-position: 45% 0%;
+}
+
+.role-merlinPure {
+  background-image: url('@/assets/roles/merlin_pure.png');
+  background-position: 55% 0%;
 }
 
 .role-morgana {
@@ -39,7 +44,7 @@ export default defineComponent({
   background-size: 170%;
 }
 
-.role-mystery-wizard {
+.role-mysteryWizard {
   background-image: url('@/assets/roles/mystery.png');
   background-position: 50% 5%;
 }

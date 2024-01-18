@@ -15,7 +15,7 @@ export class Assassinate implements HistoryElement<'assassinate'> {
   }
 
   assassinatePlayer(victim: IPlayerInGame) {
-    const result = victim.role.role === 'merlin' ? 'hit' : 'miss';
+    const result = victim.role.role.startsWith('merlin') ? 'hit' : 'miss';
     this.data.result = result;
     this.data.killed = victim;
 

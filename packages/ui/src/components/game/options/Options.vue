@@ -9,9 +9,34 @@
     <div class="options pa-4 rounded-lg">
       Roles
       <v-form>
-        <v-checkbox v-model="roles.merlin" color="success" :hide-details="true" label="Merlin"></v-checkbox>
-        <v-checkbox v-model="roles.morgana" color="warning" :hide-details="true" label="Morgana"></v-checkbox>
-        <v-checkbox v-model="roles.percival" color="success" :hide-details="true" label="Percival"></v-checkbox>
+        <v-checkbox
+          :disabled="roles.merlinPure"
+          v-model="roles.merlin"
+          color="success"
+          :hide-details="true"
+          label="Merlin"
+        ></v-checkbox>
+        <v-checkbox
+          :disabled="roles.merlin"
+          v-model="roles.merlinPure"
+          color="success"
+          :hide-details="true"
+          label="Merlin Pure"
+        ></v-checkbox>
+        <v-checkbox
+          :disabled="!roles.merlin && !roles.merlinPure"
+          v-model="roles.morgana"
+          color="warning"
+          :hide-details="true"
+          label="Morgana"
+        ></v-checkbox>
+        <v-checkbox
+          :disabled="!roles.merlin && !roles.merlinPure"
+          v-model="roles.percival"
+          color="success"
+          :hide-details="true"
+          label="Percival"
+        ></v-checkbox>
         <v-checkbox v-model="roles.oberon" color="warning" :hide-details="true" label="Oberon"></v-checkbox>
         <v-checkbox v-model="roles.mordred" color="warning" :hide-details="true" label="Mordred"></v-checkbox>
       </v-form>

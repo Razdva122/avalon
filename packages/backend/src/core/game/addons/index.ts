@@ -7,3 +7,17 @@ import { LadyOfLakeAddon } from '@/core/game/addons/lady-of-lake';
 
 export type TAdditionalAddonsConstructor = typeof LadyOfLakeAddon;
 export type TRolesAddonsConstructor = typeof MerlinAddon;
+
+export type TRolesAddonsKeys = 'merlin';
+
+export type TAdditionalAddonsKeys = 'ladyOfLake';
+
+export type TRolesAddonsData = {
+  key: TRolesAddonsKeys;
+  addon: TRolesAddonsConstructor;
+};
+
+export type TAdditionalAddonsData = {
+  key: TAdditionalAddonsKeys;
+  addon: TAdditionalAddonsConstructor;
+};

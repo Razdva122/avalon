@@ -1,10 +1,5 @@
 import type { IPresetsForGame } from '@/core/game/interface';
-import {
-  TAdditionalAddonsConstructor,
-  TRolesAddonsConstructor,
-  MerlinAddon,
-  LadyOfLakeAddon,
-} from '@/core/game/addons';
+import { TAdditionalAddonsData, TRolesAddonsData, MerlinAddon, LadyOfLakeAddon } from '@/core/game/addons';
 import { TRolesWithAddons, TAdditionalAddons } from '@/core/game/addons';
 
 /**
@@ -100,13 +95,23 @@ export const gamesSettings: IPresetsForGame = {
 /**
  * Roles with addons for main game
  */
-export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsConstructor> = {
-  merlin: MerlinAddon,
+export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsData> = {
+  merlin: {
+    addon: MerlinAddon,
+    key: 'merlin',
+  },
+  merlinPure: {
+    addon: MerlinAddon,
+    key: 'merlin',
+  },
 };
 
 /**
  * Role-independent addons
  */
-export const addons: Record<TAdditionalAddons, TAdditionalAddonsConstructor> = {
-  ladyOfLake: LadyOfLakeAddon,
+export const addons: Record<TAdditionalAddons, TAdditionalAddonsData> = {
+  ladyOfLake: {
+    addon: LadyOfLakeAddon,
+    key: 'ladyOfLake',
+  },
 };

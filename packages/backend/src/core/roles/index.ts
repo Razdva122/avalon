@@ -21,11 +21,13 @@ export const evilRoles = {
  */
 import { Servant } from '@/core/roles/good/servant';
 import { Merlin } from '@/core/roles/good/merlin';
+import { MerlinPure } from '@/core/roles/good/merlinPure';
 import { Percival } from '@/core/roles/good/percival';
 
 export const goodRoles = {
   servant: Servant,
   merlin: Merlin,
+  merlinPure: MerlinPure,
   percival: Percival,
 } as const;
 

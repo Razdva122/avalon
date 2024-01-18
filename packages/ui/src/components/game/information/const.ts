@@ -5,6 +5,10 @@ export const rolesShortInfo: { [key in TVisibleRole]: { loyalty: TLoyalty | 'unk
     loyalty: 'good',
     info: 'Knows evil, must remain hidden',
   },
+  merlinPure: {
+    loyalty: 'good',
+    info: 'Knows evil and their roles, must remain hidden',
+  },
   percival: {
     loyalty: 'good',
     info: 'Knows two wizards (Merlin and Morgana), but does not know which of them is which',
@@ -37,7 +41,7 @@ export const rolesShortInfo: { [key in TVisibleRole]: { loyalty: TLoyalty | 'unk
     loyalty: 'unknown',
     info: 'Unknown role',
   },
-  'mystery-wizard': {
+  mysteryWizard: {
     loyalty: 'unknown',
     info: 'One of the two wizards is good (Merlin) or evil (Morgana)',
   },

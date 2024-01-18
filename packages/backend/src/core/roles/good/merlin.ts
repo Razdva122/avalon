@@ -8,6 +8,7 @@ export class Merlin extends Character {
   loyalty: TLoyalty = 'good';
 
   visibility: TVisibility = {
+    merlinPure: 'unknown',
     servant: 'unknown',
     minion: 'evil',
     merlin: 'unknown',

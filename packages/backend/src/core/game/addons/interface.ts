@@ -7,7 +7,7 @@ export type TAfterMethods = `after${Capitalize<TGameStage>}`;
 export type TBefore = Partial<Record<TBeforeMethods, (prev: TGameStage) => boolean>>;
 export type TAfter = Partial<Record<TAfterMethods, (next: TGameStage) => boolean>>;
 
-export type TRolesWithAddons = 'merlin';
+export type TRolesWithAddons = 'merlin' | 'merlinPure';
 
 export type TAdditionalAddons = 'ladyOfLake';
 
