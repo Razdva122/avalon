@@ -52,6 +52,7 @@ export default defineComponent({
         .filter((el): el is THistoryMission => el.type === 'mission')
         .forEach((mission, index) => {
           missions[index].result = mission.result;
+          missions[index].fails = mission.fails;
         });
 
       return missions;

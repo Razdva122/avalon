@@ -1,10 +1,17 @@
 <template>
   <div>
-    <div class="mission mr-2 d-flex flex-column justify-center" :class="missionClasses">
-      <div v-if="!mission.result">
-        {{ mission.players }}
-      </div>
-    </div>
+    <v-tooltip :disabled="!mission.result" location="top center" origin="auto" no-click-animation>
+      <template v-slot:activator="{ props: tooltip }">
+        <div v-bind="tooltip" class="mission mr-2 d-flex flex-column justify-center" :class="missionClasses">
+          <div v-if="!mission.result">
+            {{ mission.players }}
+          </div>
+        </div>
+      </template>
+
+      <div>Players: {{ mission.players }}</div>
+      <div>Fails: {{ mission.fails }}</div>
+    </v-tooltip>
     <div class="text-white" v-if="mission.failsRequired > 1">Fails: {{ mission.failsRequired }}</div>
   </div>
 </template>
