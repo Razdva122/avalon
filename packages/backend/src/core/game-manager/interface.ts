@@ -1,4 +1,12 @@
-import type { IPlayer, TVisibleRole, IVisualGameState, Dictionary, TVoteOption, TMissionResult } from '@avalon/types';
+import type {
+  IPlayer,
+  TVisibleRole,
+  IVisualGameState,
+  Dictionary,
+  TVoteOption,
+  TMissionResult,
+  TLoyalty,
+} from '@avalon/types';
 
 export type TRoomState = Omit<IVisualGameState, 'players'> & {
   players: Pick<IPlayer, 'features' | 'id' | 'name'>[];
@@ -11,7 +19,9 @@ export type TGameMethodsParams =
   | TVoteParams
   | TSentPlayersParams
   | TActionOnMissionParams
-  | TSelectMerlinParams;
+  | TSelectMerlinParams
+  | TCheckLoyaltyParams
+  | TAnnounceLoyaltyParams;
 
 export type TSelectPlayerParams = {
   method: 'selectPlayer';
@@ -34,4 +44,13 @@ export type TActionOnMissionParams = {
 
 export type TSelectMerlinParams = {
   method: 'selectMerlin';
+};
+
+export type TCheckLoyaltyParams = {
+  method: 'checkLoyalty';
+};
+
+export type TAnnounceLoyaltyParams = {
+  method: 'announceLoyalty';
+  loyalty: TLoyalty;
 };

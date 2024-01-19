@@ -38,6 +38,10 @@ export class LadyOfLakeAddon implements IGameAddon {
   }
 
   checkLoyalty(executorID: string) {
+    if (this.game.stage !== 'checkLoyalty') {
+      throw new Error(`You cant check loyalty on stage ${this.game.stage}`);
+    }
+
     const ownerOfLady = this.game.players.find((player) => player.features.ladyOfLake === 'has')!;
 
     if (ownerOfLady.user.id !== executorID) {
@@ -61,6 +65,10 @@ export class LadyOfLakeAddon implements IGameAddon {
   }
 
   announceLoyalty(executorID: string, loyalty: TLoyalty) {
+    if (this.game.stage !== 'announceLoyalty') {
+      throw new Error(`You cant announce loyalty on stage ${this.game.stage}`);
+    }
+
     const ownerOfLady = this.game.players.find((player) => player.features.ladyOfLake === 'has')!;
 
     if (ownerOfLady.user.id !== executorID) {

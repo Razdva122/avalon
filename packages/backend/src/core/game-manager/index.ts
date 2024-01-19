@@ -190,6 +190,22 @@ export class GameManager {
 
         this.game.addons.merlin.selectMerlin(userID);
         break;
+
+      case 'checkLoyalty':
+        if (!this.game.addons.ladyOfLake) {
+          throw new Error('You cant user lady of lake in game without lady addon');
+        }
+
+        this.game.addons.ladyOfLake.checkLoyalty(userID);
+        break;
+
+      case 'announceLoyalty':
+        if (!this.game.addons.ladyOfLake) {
+          throw new Error('You cant user lady of lake in game without lady addon');
+        }
+
+        this.game.addons.ladyOfLake.announceLoyalty(userID, params.loyalty);
+        break;
     }
   }
 }

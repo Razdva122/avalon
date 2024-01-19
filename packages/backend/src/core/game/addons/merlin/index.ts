@@ -47,6 +47,10 @@ export class MerlinAddon implements IGameAddon {
    * If merlin exist in game enemy can kill him in end of game
    */
   selectMerlin(executorID: string): void {
+    if (this.game.stage !== 'selectMerlin') {
+      throw new Error(`You cant select merlin on stage ${this.game.stage}`);
+    }
+
     const assassin = this.game.players.find((player) => player.features.isAssassin)!;
 
     if (assassin.user.id !== executorID) {

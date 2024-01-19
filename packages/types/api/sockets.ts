@@ -5,7 +5,8 @@ import type { IGameOptions } from '../game/options';
 import type { Server as SuperServer, Socket as SuperServerSocket } from 'socket.io';
 import type { Socket as SuperSocket } from 'socket.io-client';
 import type { TVoteOption } from '../game/vote';
-import { TMissionResult } from '../game/mission';
+import type { TMissionResult } from '../game/mission';
+import type { TLoyalty } from '../game/roles';
 
 export interface ServerToClientEvents {
   roomUpdated: (state: TRoomState) => void;
@@ -31,6 +32,9 @@ export interface ClientToServerEvents {
   voteForMission: (uuid: string, option: TVoteOption) => void;
   actionOnMission: (uuid: string, result: TMissionResult) => void;
   selectMerlin: (uuid: string) => void;
+
+  checkLoyalty: (uuid: string) => void;
+  announceLoyalty: (uuid: string, loualty: TLoyalty) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;

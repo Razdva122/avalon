@@ -17,7 +17,10 @@
     </v-btn>
   </template>
   <template v-if="game.stage === 'selectMerlin' && isUserAssassin">
-    <v-btn color="error" :disabled="isExecuteDisabled" @click="onExecuteMerlinClick">Execute merlin</v-btn>
+    <v-btn color="error" :disabled="!isSinglePlayerSelected" @click="onExecuteMerlinClick">Execute merlin</v-btn>
+  </template>
+  <template v-if="game.stage === 'checkLoyalty' && isUserLadyOwner">
+    <v-btn color="warning" :disabled="!isLadyAvailable" @click="onCheckLoyaltyClick">Check Loyalty</v-btn>
   </template>
 </template>
 
@@ -63,13 +66,26 @@ export default defineComponent({
       return player.value?.validMissionsResult?.includes('fail');
     });
 
+    const isUserLadyOwner = computed(() => {
+      return player.value?.features.ladyOfLake === 'has';
+    });
+
     const isSendTeamDisabled = computed(() => {
       const needPlayers = game.value.settings.missions[game.value.mission].players;
       return game.value.players.filter((player) => player.features.isSelected).length !== needPlayers;
     });
 
-    const isExecuteDisabled = computed(() => {
-      return game.value.players.filter((player) => player.features.isSelected).length !== 1;
+    const isSinglePlayerSelected = computed(() => {
+      return game.value.players.filter((player) => player.features.isSelected).length === 1;
+    });
+
+    const isLadyAvailable = computed(() => {
+      return (
+        isSinglePlayerSelected &&
+        Boolean(
+          game.value.players.find((player) => player.features.isSelected && player.features.ladyOfLake === undefined),
+        )
+      );
     });
 
     const onSendTeamClick = () => {
@@ -88,13 +104,19 @@ export default defineComponent({
       socket.emit('selectMerlin', game.value.uuid);
     };
 
+    const onCheckLoyaltyClick = () => {
+      socket.emit('checkLoyalty', game.value.uuid);
+    };
+
     return {
       isUserLeader,
       isUserAssassin,
+      isUserLadyOwner,
       isPlayerOnMission,
       isPlayerActive,
       isPlayerCanFail,
-      isExecuteDisabled,
+      isSinglePlayerSelected,
+      isLadyAvailable,
 
       isSendTeamDisabled,
 
@@ -102,6 +124,7 @@ export default defineComponent({
       onVoteClick,
       onMissionClick,
       onExecuteMerlinClick,
+      onCheckLoyaltyClick,
     };
   },
 });

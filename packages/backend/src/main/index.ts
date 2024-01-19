@@ -162,5 +162,15 @@ export class Manager {
       console.log(`Player ${userName} selectMerlin in game ${uuid}`);
       getRoomManager(uuid).callGameMethods(userID, { method: 'selectMerlin' });
     });
+
+    socket.on('checkLoyalty', (uuid) => {
+      console.log(`Player ${userName} checkLoyalty in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'checkLoyalty' });
+    });
+
+    socket.on('announceLoyalty', (uuid, loyalty) => {
+      console.log(`Player ${userName} announceLoyalty in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'announceLoyalty', loyalty });
+    });
   }
 }
