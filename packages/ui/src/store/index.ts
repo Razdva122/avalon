@@ -5,17 +5,13 @@ import { updateUserData, clearUserData } from '@/store/persistent';
 import { userStoragePath } from '@/store/const';
 import type { IState, IUser } from '@/store/interface';
 
+import { userInStorage } from '@/store/init';
+
 export * from '@/store/interface';
 
 import { socket } from '@/api/socket';
 
 export const key: InjectionKey<Store<IState>> = Symbol();
-
-const userInStorage = localStorage.getItem(userStoragePath);
-
-if (userInStorage) {
-  updateUserData(JSON.parse(userInStorage));
-}
 
 export const store = createStore<IState>({
   state: {
