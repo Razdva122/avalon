@@ -52,7 +52,18 @@ export default defineComponent({
         if (this.visibleHistory?.type === 'checkLoyalty' && this.visibleHistory.result) {
           const clone = _.cloneDeep(this.playerState);
 
-          clone.role = this.visibleHistory.result;
+          if (clone.features.isLeader) {
+            clone.features.waitForAction = false;
+          }
+
+          if (clone.id === this.visibleHistory.inspectedID) {
+            clone.role = this.visibleHistory.result;
+            clone.features.isSelected = true;
+          }
+
+          if (clone.id === this.visibleHistory.validatorID) {
+            clone.features.waitForAction = true;
+          }
 
           return clone;
         }

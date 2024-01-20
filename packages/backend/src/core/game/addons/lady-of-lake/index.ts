@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 import { IGameAddon } from '@/core/game/addons/interface';
 import { CheckLoyalty } from '@/core/game/addons/lady-of-lake/check-loyalty';
 import { Game } from '@/core/game';
@@ -62,7 +60,6 @@ export class LadyOfLakeAddon implements IGameAddon {
       throw new Error("You can't use the lady of the lake on the previous owner or yourself");
     }
 
-    this.game.history.push(new CheckLoyalty(ownerOfLady, selectedPlayer));
     this.game.updateStage('announceLoyalty');
 
     this.game.stateObserver.gameStateChanged();
@@ -95,15 +92,11 @@ export class LadyOfLakeAddon implements IGameAddon {
       throw new Error('Only owner of lady of the lake can announce loyalty');
     }
 
-    const lastHistoryElement = _.last(this.game.history);
-
-    if (lastHistoryElement?.type !== 'checkLoyalty') {
-      throw new Error('Something went wrong last action is not check loyalty');
-    }
-
-    (<CheckLoyalty>lastHistoryElement).announceLoyalty(loyalty);
-
     const selectedPlayer = this.game.selectedPlayers[0];
+
+    const loyaltyCheck = new CheckLoyalty(ownerOfLady, selectedPlayer, loyalty);
+
+    this.game.history.push(loyaltyCheck);
 
     ownerOfLady.features.ladyOfLake = 'used';
     ownerOfLady.features.waitForAction = false;

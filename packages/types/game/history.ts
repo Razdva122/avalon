@@ -58,7 +58,7 @@ export type TCheckLoyalty = {
   type: 'checkLoyalty';
   validatorID: string;
   inspectedID: string;
-  result?: TLoyalty;
+  result: TLoyalty;
 };
 
 /**

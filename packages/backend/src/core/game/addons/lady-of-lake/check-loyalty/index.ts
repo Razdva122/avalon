@@ -7,17 +7,13 @@ export class CheckLoyalty implements HistoryElement<'checkLoyalty'> {
   data: THistoryData['checkLoyalty'];
   stage: THistoryStage;
 
-  constructor(validator: IPlayerInGame, inspected: IPlayerInGame) {
+  constructor(validator: IPlayerInGame, inspected: IPlayerInGame, result: TLoyalty) {
     this.data = {
       validator,
       inspected,
+      result,
     };
 
-    this.stage = 'progress';
-  }
-
-  announceLoyalty(loyalty: TLoyalty) {
-    this.data.result = loyalty;
     this.stage = 'finished';
   }
 

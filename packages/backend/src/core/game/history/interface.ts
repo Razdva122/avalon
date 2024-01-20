@@ -37,7 +37,7 @@ export type THistoryData = {
   checkLoyalty: {
     validator: IPlayerInGame;
     inspected: IPlayerInGame;
-    result?: TLoyalty;
+    result: TLoyalty;
   };
 };
 
