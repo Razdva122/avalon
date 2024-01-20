@@ -28,7 +28,7 @@ export class LadyOfLakeAddon implements IGameAddon {
   }
 
   beforeSelectTeam(prevStage: TGameStage) {
-    if (this.game.round >= 2 && prevStage !== 'announceLoyalty') {
+    if (this.game.turn === 0 && this.game.round >= 2 && prevStage !== 'announceLoyalty') {
       this.game.players.forEach((player) => {
         player.features.waitForAction = player.features.ladyOfLake === 'has';
       });
