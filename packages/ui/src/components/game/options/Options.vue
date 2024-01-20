@@ -7,19 +7,24 @@
   </v-btn>
   <v-overlay v-model="overlay" class="align-center justify-center">
     <div class="options pa-4 rounded-lg">
-      <h2>Roles</h2>
       <v-form>
+        <h2>Roles</h2>
         <div class="option" v-for="option in options">
           <Role class="role" :role="option.role" />
           <v-checkbox
             :disabled="option.disabled"
             v-model="roles[option.role]"
+            :true-value="1"
+            :false-value="0"
             :hide-details="true"
             :color="option.color"
             :label="option.label"
           >
           </v-checkbox>
         </div>
+        <h2>Addons</h2>
+        <v-checkbox v-for="(value, key) in addons" v-model="addons[key]" :label="key" :hide-details="true">
+        </v-checkbox>
       </v-form>
     </div>
   </v-overlay>
@@ -28,7 +33,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import Role from '@/components/game/information/Role.vue';
-import type { TRolesOptions } from '@/components/game/options/interface';
+import type { TGameOptionsRoles, TGameOptionsAddons } from '@avalon/types';
 
 export default defineComponent({
   components: {
@@ -37,7 +42,11 @@ export default defineComponent({
   props: {
     roles: {
       required: true,
-      type: Object as PropType<TRolesOptions>,
+      type: Object as PropType<TGameOptionsRoles>,
+    },
+    addons: {
+      required: true,
+      type: Object as PropType<TGameOptionsAddons>,
     },
   },
   data() {
@@ -48,8 +57,8 @@ export default defineComponent({
   computed: {
     options() {
       return [
-        { role: 'merlin', label: 'Merlin', disabled: this.roles.merlinPure, color: 'success' },
-        { role: 'merlinPure', label: 'Merlin Pure', disabled: this.roles.merlin, color: 'success' },
+        { role: 'merlin', label: 'Merlin', disabled: Boolean(this.roles.merlinPure), color: 'success' },
+        { role: 'merlinPure', label: 'Merlin Pure', disabled: Boolean(this.roles.merlin), color: 'success' },
         {
           role: 'percival',
           label: 'Percival',
@@ -69,8 +78,8 @@ export default defineComponent({
   },
   methods: {
     removeMerlinAdditionalRoles() {
-      this.roles.morgana = false;
-      this.roles.percival = false;
+      this.roles.morgana = 0;
+      this.roles.percival = 0;
     },
   },
   watch: {
@@ -81,7 +90,7 @@ export default defineComponent({
         }
 
         if (!this.roles.percival) {
-          this.roles.morgana = false;
+          this.roles.morgana = 0;
         }
       },
       deep: true,

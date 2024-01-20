@@ -79,6 +79,12 @@ export default defineComponent({
   background-size: 135%;
 }
 
+.role-good {
+  background-image: url('@/assets/blue_team_no_background.png');
+  background-position: 50% 52%;
+  background-size: 135%;
+}
+
 .role-unknown {
   background-image: url('@/assets/player-frame.png');
   background-position: center;

@@ -75,7 +75,7 @@
             <b>{{ calculateNameByID(historyEl.validatorID) }}</b> checked
             <b>{{ calculateNameByID(historyEl.inspectedID) }}</b> loyalty
           </div>
-          <div>
+          <div v-if="historyEl.result">
             And declared his loyalty as
             <span :class="historyEl.result === 'evil' ? 'text-error' : 'text-success'"> {{ historyEl.result }}</span>
           </div>

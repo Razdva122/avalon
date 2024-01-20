@@ -48,4 +48,4 @@ export type TLoyalty = 'evil' | 'good';
  * Visible roles for other players,
  * They may differ from real roles
  */
-export type TVisibleRole = TRoles | TUnknownRoles | 'evil';
+export type TVisibleRole = TRoles | TUnknownRoles | 'evil' | 'good';

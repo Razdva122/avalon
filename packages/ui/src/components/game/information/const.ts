@@ -37,6 +37,10 @@ export const rolesShortInfo: { [key in TVisibleRole]: { loyalty: TLoyalty | 'unk
     loyalty: 'evil',
     info: 'Evil player with an unknown role',
   },
+  good: {
+    loyalty: 'good',
+    info: 'Good player with an unknown role',
+  },
   unknown: {
     loyalty: 'unknown',
     info: 'Unknown role',

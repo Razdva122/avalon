@@ -9,7 +9,15 @@
         </div>
       </template>
       <template v-else>
-        <Game :game="roomState.game" :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory"></Game>
+        <template v-if="roomState.game.stage === 'announceLoyalty' && playerInGame?.features.ladyOfLake === 'has'">
+          <AnnounceLoyalty />
+        </template>
+        <Game
+          v-else
+          :game="roomState.game"
+          :inGamePanel="Boolean(playerInGame)"
+          :visible-history="visibleHistory"
+        ></Game>
       </template>
     </div>
     <div
@@ -35,6 +43,7 @@ import Player from '@/components/game/board/modules/Player.vue';
 import Timer from '@/components/feedback/Timer.vue';
 import Game from '@/components/game/board/modules/Game.vue';
 import StartPanel from '@/components/game/panels/StartPanel.vue';
+import AnnounceLoyalty from './modules/AnnounceLoyalty.vue';
 import { THistoryResults } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
@@ -47,6 +56,7 @@ export default defineComponent({
     Game,
     StartPanel,
     Timer,
+    AnnounceLoyalty,
   },
   setup() {
     const roomState = inject(roomStateKey)!;
@@ -96,7 +106,8 @@ export default defineComponent({
 
       const userCanSelect =
         (roomState.value.game.stage === 'selectTeam' && playerInGame.value?.features.isLeader) ||
-        (roomState.value.game.stage === 'selectMerlin' && playerInGame.value?.features.isAssassin);
+        (roomState.value.game.stage === 'selectMerlin' && playerInGame.value?.features.isAssassin) ||
+        (roomState.value.game.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfLake === 'has');
 
       if (userCanSelect) {
         socket.emit('selectPlayer', roomState.value.roomID, uuid);
@@ -113,7 +124,7 @@ export default defineComponent({
       if ('game' in roomState.value) {
         const lastElement = _.last(roomState.value.game.history);
 
-        if (lastElement?.type === 'vote') {
+        if (lastElement?.type === 'vote' || (lastElement?.type === 'checkLoyalty' && lastElement.result)) {
           const timeoutTime = 10000;
           visibleHistory.value = lastElement;
           timerDuration.value = timeoutTime;

@@ -13,7 +13,7 @@
       {{ roomState.stage === 'created' ? 'Lock Game' : 'Unlock game' }}
     </v-btn>
     <v-btn class="mt-2" color="success" :disabled="isStartGameDisabled" @click="onStartClick"> Start Game </v-btn>
-    <Options :roles="roles" />
+    <Options :roles="roles" :addons="addons" />
   </template>
 </template>
 
@@ -22,8 +22,7 @@ import { defineComponent, inject, computed, ref } from 'vue';
 import { useStore } from '@/store';
 import { roomStateKey } from '@/pages/room/const';
 import { socket } from '@/api/socket';
-import type { TRolesOptions } from '@/components/game/options/interface';
-import type { IGameOptions, TOptionalRoles } from '@avalon/types';
+import type { TGameOptionsRoles, TGameOptionsAddons } from '@avalon/types';
 import Options from '@/components/game/options/Options.vue';
 
 export default defineComponent({
@@ -34,13 +33,18 @@ export default defineComponent({
   setup() {
     const roomState = inject(roomStateKey)!;
     const store = useStore();
-    const roles = ref<TRolesOptions>({
-      merlinPure: false,
-      merlin: false,
-      mordred: false,
-      morgana: false,
-      oberon: false,
-      percival: false,
+    const roles = ref<TGameOptionsRoles>({
+      merlinPure: 0,
+      merlin: 0,
+      mordred: 0,
+      morgana: 0,
+      oberon: 0,
+      percival: 0,
+    });
+
+    const addons = ref<TGameOptionsAddons>({
+      ladyOfLake: false,
+      excalibur: false,
     });
 
     const isUserInGame = computed(() => {
@@ -66,21 +70,13 @@ export default defineComponent({
     };
 
     const onStartClick = () => {
-      const options = (<TOptionalRoles[]>Object.keys(roles.value)).reduce<IGameOptions>(
-        (acc, key) => {
-          acc.roles[key] = Number(roles.value[key]);
-
-          return acc;
-        },
-        { roles: {}, addons: {} },
-      );
-
-      socket.emit('startGame', roomState.value.roomID, options);
+      socket.emit('startGame', roomState.value.roomID, { roles: roles.value, addons: addons.value });
     };
 
     return {
       roomState,
       roles,
+      addons,
 
       isUserInGame,
       isUserLeader,

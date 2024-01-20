@@ -34,6 +34,7 @@ export interface ClientToServerEvents {
   selectMerlin: (uuid: string) => void;
 
   checkLoyalty: (uuid: string) => void;
+  getLoyalty: (uuid: string, callback: (loyalty: TLoyalty) => void) => void;
   announceLoyalty: (uuid: string, loualty: TLoyalty) => void;
 }
 

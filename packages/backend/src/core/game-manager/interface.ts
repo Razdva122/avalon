@@ -54,3 +54,10 @@ export type TAnnounceLoyaltyParams = {
   method: 'announceLoyalty';
   loyalty: TLoyalty;
 };
+
+export type TGetLoyaltyData = {
+  params: {
+    method: 'getLoyalty';
+  };
+  result: TLoyalty;
+};

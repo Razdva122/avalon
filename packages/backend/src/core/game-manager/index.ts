@@ -1,6 +1,6 @@
 import { Game } from '@/core/game';
 import type { User } from '@/user';
-import type { TRoomState, TGameMethodsParams } from '@/core/game-manager/interface';
+import type { TRoomState, TGameMethodsParams, TGetLoyaltyData } from '@/core/game-manager/interface';
 
 import { TGameStage, Server, IVisualGameState, IPlayer, IGameOptions } from '@avalon/types';
 
@@ -193,7 +193,7 @@ export class GameManager {
 
       case 'checkLoyalty':
         if (!this.game.addons.ladyOfLake) {
-          throw new Error('You cant user lady of lake in game without lady addon');
+          throw new Error('You cant use lady of lake in game without lady addon');
         }
 
         this.game.addons.ladyOfLake.checkLoyalty(userID);
@@ -201,11 +201,22 @@ export class GameManager {
 
       case 'announceLoyalty':
         if (!this.game.addons.ladyOfLake) {
-          throw new Error('You cant user lady of lake in game without lady addon');
+          throw new Error('You cant use lady of lake in game without lady addon');
         }
 
         this.game.addons.ladyOfLake.announceLoyalty(userID, params.loyalty);
         break;
+    }
+  }
+
+  getGameData<T extends TGetLoyaltyData>(userID: string, params: T['params']): T['result'] {
+    switch (params.method) {
+      case 'getLoyalty':
+        if (!this.game.addons.ladyOfLake) {
+          throw new Error('You cant use lady of lake in game without lady addon');
+        }
+
+        return this.game.addons.ladyOfLake.getLoyalty(userID);
     }
   }
 }

@@ -29,6 +29,10 @@ export class LadyOfLakeAddon implements IGameAddon {
 
   beforeSelectTeam(prevStage: TGameStage) {
     if (this.game.round >= 2 && prevStage !== 'announceLoyalty') {
+      this.game.players.forEach((player) => {
+        player.features.waitForAction = player.features.ladyOfLake === 'has';
+      });
+
       this.game.updateStage('checkLoyalty');
       this.game.stateObserver.gameStateChanged();
       return false;
@@ -64,6 +68,22 @@ export class LadyOfLakeAddon implements IGameAddon {
     this.game.stateObserver.gameStateChanged();
   }
 
+  getLoyalty(executorID: string): TLoyalty {
+    if (this.game.stage !== 'announceLoyalty') {
+      throw new Error(`You cant get loyalty on stage ${this.game.stage}`);
+    }
+
+    const ownerOfLady = this.game.players.find((player) => player.features.ladyOfLake === 'has')!;
+
+    if (ownerOfLady.user.id !== executorID) {
+      throw new Error('Only owner of lady of the lake can check loyalty');
+    }
+
+    const selectedPlayer = this.game.selectedPlayers[0];
+
+    return selectedPlayer.role.loyalty;
+  }
+
   announceLoyalty(executorID: string, loyalty: TLoyalty) {
     if (this.game.stage !== 'announceLoyalty') {
       throw new Error(`You cant announce loyalty on stage ${this.game.stage}`);
@@ -86,8 +106,11 @@ export class LadyOfLakeAddon implements IGameAddon {
     const selectedPlayer = this.game.selectedPlayers[0];
 
     ownerOfLady.features.ladyOfLake = 'used';
+    ownerOfLady.features.waitForAction = false;
     selectedPlayer.features.ladyOfLake = 'has';
     selectedPlayer.features.isSelected = false;
+
+    this.game.leader.features.waitForAction = true;
 
     this.game.updateStage('selectTeam');
 

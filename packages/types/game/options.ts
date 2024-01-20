@@ -1,10 +1,15 @@
 import { TOptionalRoles } from './roles';
 
 export interface IGameOptions {
-  roles: {
-    [key in TOptionalRoles]?: number;
-  };
-  addons: {
-    ladyOfLake?: boolean;
-  };
+  roles: TGameOptionsRoles;
+  addons: TGameOptionsAddons;
 }
+
+export type TGameOptionsRoles = {
+  [key in TOptionalRoles]?: number;
+};
+
+export type TGameOptionsAddons = {
+  ladyOfLake?: boolean;
+  excalibur?: boolean;
+};
