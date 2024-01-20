@@ -387,17 +387,26 @@ export class Game {
 
     this.vote = new Vote(this.players, this.leader, this.turn, this.turn === 4 ? true : undefined);
 
+    this.sentTeamNextStage();
+
+    this.stateObserver.gameStateChanged();
+  }
+
+  /**
+   * Moves the game to the next stage after sending the team
+   */
+  sentTeamNextStage(): void {
     if (this.turn === 4) {
       this.startMission();
     } else {
-      this.updateStage('votingForTeam');
+      if (this.updateStage('votingForTeam') === false) {
+        return;
+      }
 
       this.players.forEach((player) => {
         player.features.waitForAction = true;
       });
     }
-
-    this.stateObserver.gameStateChanged();
   }
 
   /**

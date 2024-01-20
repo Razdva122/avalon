@@ -74,16 +74,20 @@ export class Mission implements HistoryElement<'mission'> {
     action.value = result;
 
     if (this.data.actions.every((action) => action.value !== 'unvoted')) {
-      this.stage = 'finished';
-      const fails = this.data.actions.filter((action) => action.value === 'fail').length;
-
-      this.data.result = fails >= this.data.settings.failsRequired ? 'fail' : 'success';
-      this.data.fails = fails;
+      this.finishMission();
 
       return true;
     }
 
     return false;
+  }
+
+  finishMission() {
+    this.stage = 'finished';
+    const fails = this.data.actions.filter((action) => action.value === 'fail').length;
+
+    this.data.result = fails >= this.data.settings.failsRequired ? 'fail' : 'success';
+    this.data.fails = fails;
   }
 
   dataForManager(options: { withResult?: boolean }) {
