@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:18
+FROM --platform=linux/amd64 node:21-slim
 
 # App directory
 ARG APP_DIR=app
@@ -12,8 +12,5 @@ RUN npm install
 # Copy
 COPY . .
 
-# Port for application
-EXPOSE 80
-
 # Start of project
-CMD ["npm", "run", "prod:start"]
+CMD ["npm", "run", "start:backend"]

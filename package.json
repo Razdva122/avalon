@@ -8,10 +8,12 @@
   ],
   "scripts": {
     "dev": "npm run serve --workspace=packages/ui & npm run dev --workspace=packages/backend",
-    "start": "npm run build --workspace=packages/ui && npm run start --workspace=packages/backend",
-    "prod:start": "NODE_ENV=production npm run start",
-    "version": "npm version $npm_package_version --no-git-tag-version --workspaces && git add . && npm run image:docker",
-    "image:docker": "docker build --tag razdva12/node-avalon:V$npm_package_version . && docker push razdva12/node-avalon:V$npm_package_version"
+    "build:ui": "NODE_ENV=production npm run build --workspace=packages/ui",
+    "start:backend": "NODE_ENV=production npm run start --workspace=packages/backend",
+    "version": "npm version $npm_package_version --no-git-tag-version --workspaces && git add . && npm run image:build",
+    "image:ui": "docker build --tag razdva12/nginx-avalon:V$npm_package_version . && docker push razdva12/nginx-avalon:V$npm_package_version",
+    "image:backend": "docker build --tag razdva12/backend-avalon:V$npm_package_version . && docker push razdva12/backend-avalon:V$npm_package_version",
+    "image:build": "image:ui & image:backend"
   },
   "dependencies": {
     "lodash": "^4.17.21",
