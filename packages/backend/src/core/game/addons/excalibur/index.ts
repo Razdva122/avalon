@@ -1,6 +1,5 @@
 import { IGameAddon } from '@/core/game/addons/interface';
 import { Game } from '@/core/game';
-import { TGameStage } from '@avalon/types';
 
 export class ExcaliburAddon implements IGameAddon {
   game: Game;
@@ -9,14 +8,14 @@ export class ExcaliburAddon implements IGameAddon {
     this.game = game;
   }
 
-  afterSelectTeam(nextStage: TGameStage) {
+  afterSelectTeam() {
     this.game.leader.features.waitForAction = true;
     this.game.updateStage('giveExcalibur');
 
     return false;
   }
 
-  afterOnMission(prevStage: TGameStage) {
+  afterOnMission() {
     this.game.updateStage('useExcalibur');
 
     return false;
