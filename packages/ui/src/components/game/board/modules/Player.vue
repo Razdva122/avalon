@@ -35,9 +35,14 @@ export default defineComponent({
   },
   computed: {
     player(): IPlayerWithVote | TRoomPlayer {
-      if ('features' in this.playerState) {
+      const clone = _.cloneDeep(this.playerState);
+
+      if ('features' in clone) {
+        if (this.$store.state.hideSpoilers) {
+          clone.role = 'unknown';
+        }
+
         if (this.visibleHistory?.type === 'vote') {
-          const clone = _.cloneDeep(this.playerState);
           const userVote = this.visibleHistory.votes.find((player) => player.playerID === clone.id)!;
 
           clone.features.isLeader = this.visibleHistory.leaderID === clone.id;
@@ -50,8 +55,6 @@ export default defineComponent({
         }
 
         if (this.visibleHistory?.type === 'checkLoyalty' && this.visibleHistory.result) {
-          const clone = _.cloneDeep(this.playerState);
-
           if (clone.features.isLeader) {
             clone.features.waitForAction = false;
           }
@@ -69,7 +72,7 @@ export default defineComponent({
         }
       }
 
-      return this.playerState;
+      return clone;
     },
 
     playerClasses() {
@@ -102,6 +105,7 @@ export default defineComponent({
 }
 
 .player-actions-features {
+  display: flex;
   position: absolute;
   height: 40px;
   padding: 5px;

@@ -16,6 +16,7 @@ export const key: InjectionKey<Store<IState>> = Symbol();
 export const store = createStore<IState>({
   state: {
     user: userInStorage ? JSON.parse(userInStorage) : null,
+    hideSpoilers: false,
     connect: null,
   },
   getters: {},
@@ -39,6 +40,10 @@ export const store = createStore<IState>({
 
     updateConnectState(state: IState, value: boolean) {
       state.connect = value;
+    },
+
+    updateHideSpoilers(state: IState, value: boolean) {
+      state.hideSpoilers = value;
     },
   },
   actions: {},

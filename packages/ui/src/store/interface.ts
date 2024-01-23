@@ -1,5 +1,6 @@
 export interface IState {
   user: IUser | null;
+  hideSpoilers: boolean;
   connect: boolean | null;
 }
 

@@ -5,6 +5,8 @@
         <v-form @submit.prevent="updateUser" class="d-flex flex-column align-center justify-center">
           <span class="mb-2">Select your username for game</span>
           <v-text-field v-model="username" :rules="rules" label="Username" class="w-100 mb-2"></v-text-field>
+          <v-checkbox v-if="isUserExist" v-model="hideSpoilers" :hide-details="true" label="Hide spoilers">
+          </v-checkbox>
           <v-btn type="submit">{{ isUserExist ? 'Update' : 'Submit' }}</v-btn>
         </v-form>
       </v-sheet>
@@ -34,15 +36,29 @@ export default defineComponent({
       ],
     };
   },
+  computed: {
+    hideSpoilers: {
+      get() {
+        return this.$store.state.hideSpoilers;
+      },
+      set(value: boolean) {
+        this.$store.commit('updateHideSpoilers', value);
+      },
+    },
+  },
   methods: {
     updateUser() {
-      if (this.isUserExist) {
-        this.$store.commit('updateUserName', this.username);
-      } else {
-        this.$store.commit('setUserData', { id: uuidv4(), name: this.username });
+      if (this.username !== this.$store.state.user?.name) {
+        if (this.isUserExist) {
+          this.$store.commit('updateUserName', this.username);
+        } else {
+          this.$store.commit('setUserData', { id: uuidv4(), name: this.username });
+        }
+
+        document.location.reload();
       }
 
-      document.location.reload();
+      this.closeSettings();
     },
     closeSettings() {
       this.overlay = false;
