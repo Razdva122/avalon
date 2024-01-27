@@ -9,12 +9,14 @@
     <v-btn color="error" :disabled="!isPlayerActive" @click="() => onVoteClick('reject')"> Reject </v-btn>
   </template>
   <template v-if="game.stage === 'onMission' && isPlayerOnMission">
-    <v-btn color="success" :disabled="!isPlayerActive" @click="() => onMissionClick('success')" class="mb-2">
-      Success
-    </v-btn>
-    <v-btn color="error" :disabled="!isPlayerActive || !isPlayerCanFail" @click="() => onMissionClick('fail')">
-      Fail
-    </v-btn>
+    <Spoiler :size="{ width: '200px', height: '80px' }">
+      <v-btn color="success" :disabled="!isPlayerActive" @click="() => onMissionClick('success')" class="mb-2">
+        Success
+      </v-btn>
+      <v-btn color="error" :disabled="!isPlayerActive || !isPlayerCanFail" @click="() => onMissionClick('fail')">
+        Fail
+      </v-btn>
+    </Spoiler>
   </template>
   <template v-if="game.stage === 'selectMerlin' && isUserAssassin">
     <v-btn color="error" :disabled="!isSinglePlayerSelected" @click="onExecuteMerlinClick">Execute merlin</v-btn>
@@ -29,9 +31,13 @@ import { defineComponent, computed, PropType, toRefs } from 'vue';
 import type { IVisualGameState, TMissionResult, TVoteOption } from '@avalon/types';
 import { useStore } from '@/store';
 import { socket } from '@/api/socket';
+import Spoiler from '@/components/feedback/Spoiler.vue';
 
 export default defineComponent({
   name: 'InGamePanel',
+  components: {
+    Spoiler,
+  },
   props: {
     game: {
       required: true,

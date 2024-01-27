@@ -1,11 +1,13 @@
 <template>
-  <div class="d-flex flex-column align-center justify-center" v-if="loyalty">
-    <div class="mb-8" :class="loyalty"></div>
-    <div>
-      <v-btn class="mr-4" color="success" @click="announceLoyalty('good')"> Announce Good </v-btn>
-      <v-btn color="error" @click="announceLoyalty('evil')"> Announce Evil </v-btn>
+  <Spoiler :size="{ width: '300px', height: '200px' }">
+    <div class="d-flex flex-column align-center justify-center" v-if="loyalty">
+      <div class="mb-8" :class="loyalty"></div>
+      <div>
+        <v-btn class="mr-4" color="success" @click="announceLoyalty('good')"> Announce Good </v-btn>
+        <v-btn color="error" @click="announceLoyalty('evil')"> Announce Evil </v-btn>
+      </div>
     </div>
-  </div>
+  </Spoiler>
 </template>
 
 <script lang="ts">
@@ -13,8 +15,12 @@ import { defineComponent, inject, Ref, ref } from 'vue';
 import { socket } from '@/api/socket';
 import { roomStateKey } from '@/pages/room/const';
 import { TLoyalty } from '@avalon/types';
+import Spoiler from '@/components/feedback/Spoiler.vue';
 
 export default defineComponent({
+  components: {
+    Spoiler,
+  },
   async setup() {
     const roomState = inject(roomStateKey)!;
     const loyalty = ref() as Ref<TLoyalty>;
