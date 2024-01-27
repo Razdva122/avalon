@@ -16,8 +16,9 @@
 
 <script lang="ts">
 import * as _ from 'lodash';
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, PropType, inject } from 'vue';
 import type { IPlayerWithVote, TRoomPlayer, THistoryResults } from '@avalon/types';
+import { roomStateKey } from '@/pages/room/const';
 import Role from '@/components/game/information/Role.vue';
 
 export default defineComponent({
@@ -36,9 +37,12 @@ export default defineComponent({
   computed: {
     player(): IPlayerWithVote | TRoomPlayer {
       const clone = _.cloneDeep(this.playerState);
+      const roomState = inject(roomStateKey)!;
 
       if ('features' in clone) {
-        if (this.$store.state.hideSpoilers) {
+        const isGameEnded = roomState.value.stage === 'started' && roomState.value.game.stage === 'end';
+
+        if (this.$store.state.hideSpoilers && !isGameEnded) {
           clone.role = 'unknown';
         }
 
