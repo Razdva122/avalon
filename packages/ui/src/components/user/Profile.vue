@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-row align-center justify-center text-white">
-    <SpoilerEye class="mr-2" />
+    <SpoilerEye class="mr-1" />
     <span class="mr-2">User: </span
     ><v-btn @click="$emit('usernameClick')" class="user" variant="outlined" color="white" density="comfortable">{{
       userName

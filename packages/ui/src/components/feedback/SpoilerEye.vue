@@ -1,5 +1,5 @@
 <template>
-  <span class="material-icons spoiler-eye" @click="toggleSpoilerStatus"> {{ iconName }} </span>
+  <v-btn density="comfortable" @click="toggleSpoilerStatus" :icon="iconName" variant="plain" color="white"></v-btn>
 </template>
 
 <script lang="ts">
@@ -19,8 +19,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped lang="scss">
-.spoiler-eye {
-  cursor: pointer;
-}
-</style>
+<style scoped lang="scss"></style>
