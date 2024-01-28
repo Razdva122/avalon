@@ -1,5 +1,6 @@
 import { IGameAddon } from '@/core/game/addons/interface';
 import { Game } from '@/core/game';
+import { TGameStage } from '@avalon/types';
 
 export class ExcaliburAddon implements IGameAddon {
   game: Game;
@@ -8,7 +9,18 @@ export class ExcaliburAddon implements IGameAddon {
     this.game = game;
   }
 
-  afterSelectTeam() {
+  afterInitialization() {
+    // On check loyalty user with lady of lake can select players
+    this.game.selectAvailable.giveExcalibur = (player) => Boolean(player.features.isLeader);
+
+    return true;
+  }
+
+  afterSelectTeam(nextStage: TGameStage) {
+    if (nextStage === 'giveExcalibur') {
+      return true;
+    }
+
     this.game.leader.features.waitForAction = true;
     this.game.updateStage('giveExcalibur');
 

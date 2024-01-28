@@ -21,10 +21,11 @@ describe('Gameplay', () => {
       });
 
       test('Sent players', () => {
+        const selectedPlayers = game.players.filter((player) => player.features.isSelected);
         gameHelper.sentSelectedPlayers();
-        const isAllPlayersSent = game.players.every((player) => player.features.isSelected === player.features.isSent);
+        const sentPlayers = game.players.filter((player) => player.features.isSent);
 
-        expect(isAllPlayersSent).toBeTruthy();
+        expect(selectedPlayers.length).toBe(sentPlayers.length);
         expect(game.stage).toBe('votingForTeam');
       });
 

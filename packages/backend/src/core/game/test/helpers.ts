@@ -117,4 +117,21 @@ export class GameTestHelper {
     this.game.addons.ladyOfLake!.announceLoyalty(id, loyalty);
     return this;
   }
+
+  giveExcalibur(giveExcalibur: true | string): this {
+    const playerToExcalibur =
+      giveExcalibur === true
+        ? this.game.players.find((player) => player.features.isSent && !player.features.isLeader)
+        : this.game.players.find((player) => player.user.id === giveExcalibur);
+
+    this.game.selectPlayer(this.game.leader.user.id, playerToExcalibur!.user.id);
+
+    this.game.addons.excalibur!.giveExcalibur(this.game.leader.user.id);
+
+    return this;
+  }
+
+  useExcalibur(): this {
+    return this;
+  }
 }

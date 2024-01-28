@@ -234,6 +234,7 @@ export class Game {
       const [name, addonData] = <[TAdditionalAddons, TAdditionalAddonsData]>data;
 
       if (options.addons[name]) {
+        // @ts-expect-error in order not to write if for each individual addon
         this.addons[addonData.key] = new addonData.addon(this);
         this.addons.push(this.addons[addonData.key]!);
       }
@@ -317,16 +318,15 @@ export class Game {
    * Finish active round
    */
   protected finishCurrentRound(): void {
-    this.clearSelectedAndSendPlayers();
+    this.clearSendPlayers();
     this.history.push(this.currentMission);
   }
 
   /**
    * Remove features from all players
    */
-  protected clearSelectedAndSendPlayers(): void {
+  protected clearSendPlayers(): void {
     this.players.forEach((player) => {
-      player.features.isSelected = false;
       player.features.isSent = false;
     });
   }
@@ -336,7 +336,7 @@ export class Game {
    * @param reset - if true clear stage to 0
    */
   protected nextVote(reset?: true): void {
-    this.clearSelectedAndSendPlayers();
+    this.clearSendPlayers();
     this.moveLeader();
 
     if (reset) {
@@ -399,6 +399,10 @@ export class Game {
     if (this.turn === 4) {
       this.startMission();
     } else {
+      this.players.forEach((player) => {
+        player.features.isSelected = false;
+      });
+
       if (this.updateStage('votingForTeam') === false) {
         return;
       }

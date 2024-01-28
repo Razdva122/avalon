@@ -1,5 +1,11 @@
 import type { IPresetsForGame } from '@/core/game/interface';
-import { TAdditionalAddonsData, TRolesAddonsData, MerlinAddon, LadyOfLakeAddon } from '@/core/game/addons';
+import {
+  TAdditionalAddonsData,
+  TRolesAddonsData,
+  MerlinAddon,
+  LadyOfLakeAddon,
+  ExcaliburAddon,
+} from '@/core/game/addons';
 import { TRolesWithAddons, TAdditionalAddons } from '@/core/game/addons';
 
 /**
@@ -113,5 +119,9 @@ export const addons: Record<TAdditionalAddons, TAdditionalAddonsData> = {
   ladyOfLake: {
     addon: LadyOfLakeAddon,
     key: 'ladyOfLake',
+  },
+  excalibur: {
+    addon: ExcaliburAddon,
+    key: 'excalibur',
   },
 };

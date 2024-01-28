@@ -1,4 +1,4 @@
-import type { IGameAddon, LadyOfLakeAddon, MerlinAddon } from '@/core/game/addons';
+import type { ExcaliburAddon, IGameAddon, LadyOfLakeAddon, MerlinAddon } from '@/core/game/addons';
 import type { Character } from '@/core/roles';
 import type { User } from '@/user';
 
@@ -25,6 +25,7 @@ export type TAddonsArray = IGameAddon[];
 export interface IGameAddons extends TAddonsArray {
   merlin?: MerlinAddon;
   ladyOfLake?: LadyOfLakeAddon;
+  excalibur?: ExcaliburAddon;
 }
 
 export interface IStateObserver {

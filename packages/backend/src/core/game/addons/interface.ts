@@ -9,7 +9,7 @@ export type TAfter = Partial<Record<TAfterMethods, (next: TGameStage) => boolean
 
 export type TRolesWithAddons = 'merlin' | 'merlinPure';
 
-export type TAdditionalAddons = 'ladyOfLake';
+export type TAdditionalAddons = 'ladyOfLake' | 'excalibur';
 
 export interface IGameAddon extends TBefore, TAfter {
   game: Game;
