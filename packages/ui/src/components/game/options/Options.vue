@@ -9,22 +9,24 @@
     <div class="options pa-4 rounded-lg">
       <v-form>
         <h2>Roles</h2>
-        <div class="option" v-for="option in options">
-          <Role class="role" :role="option.role" />
+        <div class="option" v-for="role in rolesSettings">
+          <Role class="role" :role="role.role" />
           <v-checkbox
-            :disabled="option.disabled"
-            v-model="roles[option.role]"
+            :disabled="role.disabled"
+            v-model="roles[role.role]"
             :true-value="1"
             :false-value="0"
             :hide-details="true"
-            :color="option.color"
-            :label="option.label"
+            :color="role.color"
+            :label="role.label"
           >
           </v-checkbox>
         </div>
         <h2>Addons</h2>
-        <v-checkbox v-for="(value, key) in addons" v-model="addons[key]" :label="key" :hide-details="true">
-        </v-checkbox>
+        <div class="addon" v-for="addon in addonsSettings">
+          <div :class="addon.name" class="addon-icon"></div>
+          <v-checkbox v-model="addons[addon.name]" :label="addon.label" :hide-details="true" color="info" />
+        </div>
       </v-form>
     </div>
   </v-overlay>
@@ -55,7 +57,7 @@ export default defineComponent({
     };
   },
   computed: {
-    options() {
+    rolesSettings() {
       return [
         { role: 'merlin', label: 'Merlin', disabled: Boolean(this.roles.merlinPure), color: 'success' },
         { role: 'merlinPure', label: 'Merlin Pure', disabled: Boolean(this.roles.merlin), color: 'success' },
@@ -73,6 +75,12 @@ export default defineComponent({
         },
         { role: 'oberon', label: 'Oberon', disabled: false, color: 'warning' },
         { role: 'mordred', label: 'Mordred', disabled: false, color: 'warning' },
+      ] as const;
+    },
+    addonsSettings() {
+      return [
+        { name: 'ladyOfLake', label: 'Lady of the lake' },
+        { name: 'excalibur', label: 'Excalibur' },
       ] as const;
     },
   },
@@ -105,13 +113,26 @@ export default defineComponent({
   width: 300px;
 }
 
-.role {
+.role,
+.addon-icon {
   width: 40px;
   height: 40px;
+  border: 1px solid black;
 }
 
-.option {
+.option,
+.addon {
   display: flex;
   align-items: center;
+}
+
+.ladyOfLake {
+  background-image: url('@/assets/features/lady_of_lake.png');
+  background-size: contain;
+}
+
+.excalibur {
+  background-image: url('@/assets/features/excalibur.png');
+  background-size: contain;
 }
 </style>
