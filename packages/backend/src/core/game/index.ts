@@ -396,13 +396,13 @@ export class Game {
    * Moves the game to the next stage after sending the team
    */
   sentTeamNextStage(): void {
+    this.players.forEach((player) => {
+      player.features.isSelected = false;
+    });
+
     if (this.turn === 4) {
       this.startMission();
     } else {
-      this.players.forEach((player) => {
-        player.features.isSelected = false;
-      });
-
       if (this.updateStage('votingForTeam') === false) {
         return;
       }

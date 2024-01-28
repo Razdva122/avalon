@@ -10,7 +10,7 @@ export class ExcaliburAddon implements IGameAddon {
   }
 
   afterInitialization() {
-    // On check loyalty user with lady of lake can select players
+    // On give excalibur leader should select player
     this.game.selectAvailable.giveExcalibur = (player) => Boolean(player.features.isLeader);
 
     return true;
