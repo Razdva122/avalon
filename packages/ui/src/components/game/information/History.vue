@@ -15,8 +15,17 @@
             </span>
             <span> / fails {{ historyEl.fails }} </span>
           </div>
-          <div></div>
-          <div>Team: {{ historyEl.actions.map((el) => calculateNameByID(el.playerID)).join(', ') }}</div>
+          <div>
+            Team:
+            <template v-for="(el, index) in historyEl.actions">
+              <span :class="{ fail: 'text-error', success: 'text-success' }[(el as TActionWithResult).value]">
+                {{ calculateNameByID(el.playerID) }}
+              </span>
+              <span>
+                {{ index !== historyEl.actions.length - 1 ? ', ' : '' }}
+              </span>
+            </template>
+          </div>
         </div>
         <div v-if="historyEl.type === 'assassinate'">
           <div>
@@ -88,7 +97,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { THistoryResults, IPlayer } from '@avalon/types';
+import { THistoryResults, IPlayer, TActionWithResult } from '@avalon/types';
 
 export default defineComponent({
   props: {
