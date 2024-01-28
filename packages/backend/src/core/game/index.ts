@@ -12,16 +12,11 @@ import type {
 
 import type {
   TMissionResult,
-  TRoles,
   TLoyalty,
   TVoteOption,
   TGameStage,
-  IGameSettings,
   IGameSettingsWithRoles,
   IGameOptions,
-  TEvilRoles,
-  TGoodRoles,
-  TGameRoles,
 } from '@avalon/types';
 
 import type {
@@ -39,10 +34,9 @@ import { Mission } from '@/core/game/history/mission';
 import { Vote } from '@/core/game/history/vote';
 import { HistoryElement } from '@/core/game/history';
 
-import type { Character } from '@/core/roles';
-
 import { gamesSettings } from '@/core/game/const';
-import roles from '@/core/roles';
+
+import { generateRolesForGame } from '@/core/game/helpers';
 
 export * from '@/core/game/interface';
 export * from '@/core/game/const';
@@ -164,34 +158,17 @@ export class Game {
 
     const settings = gamesSettings[users.length];
 
-    // Generates roles and give to players
-    const gameRoles = this.generateRolesForGame(settings, options);
-
-    const roles = gameRoles.reduce<TGameRoles>(
-      (acc, el) => {
-        if (el.loyalty === 'evil') {
-          const loyalty = acc[el.loyalty];
-          const role = <TEvilRoles>el.role;
-          loyalty.push(role);
-        } else {
-          const loyalty = acc[el.loyalty];
-          const role = <TGoodRoles>el.role;
-          loyalty.push(role);
-        }
-
-        return acc;
-      },
-      { evil: [], good: [] },
-    );
+    // Generates roles
+    const rolesInfo = generateRolesForGame(settings, options);
 
     this.settings = {
       ...settings,
-      roles,
+      roles: rolesInfo.roles,
     };
 
     const players = users.map((user, index) => ({
       user,
-      role: gameRoles[index],
+      role: rolesInfo.characters[index],
       features: {
         isSelected: false,
         isLeader: false,
@@ -262,39 +239,6 @@ export class Game {
    */
   protected get sentPlayers() {
     return this.players.filter((player) => player.features.isSent);
-  }
-
-  /**
-   * Generate roles for game
-   */
-  protected generateRolesForGame(settings: IGameSettings, options: IGameOptions): Character[] {
-    const gameRoles: Character[] = [];
-
-    const loyalty = { ...settings.players };
-
-    Object.entries(options.roles).forEach((role) => {
-      const [roleName, inGame] = <[TRoles, number]>role;
-
-      for (let i = 0; i < inGame; i += 1) {
-        const character = new roles[roleName]();
-        gameRoles.push(new roles[roleName]());
-        loyalty[character.loyalty] -= 1;
-      }
-    });
-
-    if (loyalty.evil < 0 || loyalty.good < 0) {
-      throw new Error(`It is not possible to create a game with selected roles`);
-    }
-
-    for (let i = 0; i < loyalty.evil; i += 1) {
-      gameRoles.push(new roles.minion());
-    }
-
-    for (let i = 0; i < loyalty.good; i += 1) {
-      gameRoles.push(new roles.servant());
-    }
-
-    return _.shuffle(gameRoles);
   }
 
   /**
