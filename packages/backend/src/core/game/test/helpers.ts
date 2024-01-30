@@ -131,7 +131,17 @@ export class GameTestHelper {
     return this;
   }
 
-  useExcalibur(): this {
+  useExcalibur(useOnSuccess: boolean = true): this {
+    const actionWithCorrectRes = this.game.currentMission.data.actions.find((action) => {
+      return useOnSuccess ? action.value === 'success' : action.value === 'fail' && !action.player.features.excalibur;
+    })!;
+
+    const playerWithExcaliburId = this.game.players.find((player) => player.features.excalibur)!.user.id;
+
+    this.game.selectPlayer(playerWithExcaliburId, actionWithCorrectRes.player.user.id);
+
+    this.game.addons.excalibur!.useExcalibur(playerWithExcaliburId);
+
     return this;
   }
 }

@@ -18,16 +18,15 @@ export class MerlinAddon implements IGameAddon {
     // On select merlin stage assassin can select players
     this.game.selectAvailable.selectMerlin = (player) => Boolean(player.features.isAssassin);
 
-    return true;
+    return { continueExecution: true, updateStage: true };
   }
 
   beforeEnd(prevStage: TGameStage) {
     if (prevStage === 'selectMerlin') {
-      return true;
+      return { continueExecution: true, updateStage: true };
     }
 
-    if (this.game.winner === 'good') {
-      this.game.winner = undefined;
+    if (this.game.calculateCurrentWinner() === 'good') {
       this.game.updateStage('selectMerlin');
 
       // Generate assassin
@@ -37,10 +36,10 @@ export class MerlinAddon implements IGameAddon {
       assassin.features.waitForAction = true;
 
       this.game.stateObserver.gameStateChanged();
-      return false;
+      return { continueExecution: true, updateStage: false };
     }
 
-    return true;
+    return { continueExecution: true, updateStage: true };
   }
 
   /**

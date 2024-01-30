@@ -27,8 +27,19 @@ describe('Wait for action', () => {
   });
 
   test('Assassinate correct wait', () => {
-    game.winner = 'good';
-    game.updateStage('end');
+    gameHelper
+      .selectPlayersOnMission()
+      .sentSelectedPlayers()
+      .makeVotes()
+      .makeActions()
+      .selectPlayersOnMission()
+      .sentSelectedPlayers()
+      .makeVotes()
+      .makeActions()
+      .selectPlayersOnMission()
+      .sentSelectedPlayers()
+      .makeVotes()
+      .makeActions();
 
     expect(game.players.find((player) => player.features.isAssassin && player.features.waitForAction)).toBeTruthy();
 

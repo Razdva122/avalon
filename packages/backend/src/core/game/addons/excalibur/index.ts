@@ -13,24 +13,36 @@ export class ExcaliburAddon implements IGameAddon {
     // On give excalibur leader should select player
     this.game.selectAvailable.giveExcalibur = (player) => Boolean(player.features.isLeader);
 
-    return true;
+    // On use excalibur user with excalibur should select player
+    this.game.selectAvailable.useExcalibur = (player) => Boolean(player.features.excalibur);
+
+    return { continueExecution: true, updateStage: true };
   }
 
   afterSelectTeam(nextStage: TGameStage) {
     if (nextStage === 'giveExcalibur') {
-      return true;
+      return { continueExecution: true, updateStage: true };
     }
 
     this.game.leader.features.waitForAction = true;
     this.game.updateStage('giveExcalibur');
+    this.game.stateObserver.gameStateChanged();
 
-    return false;
+    return { continueExecution: false, updateStage: false };
   }
 
-  afterOnMission() {
-    this.game.updateStage('useExcalibur');
+  afterOnMission(nextStage: TGameStage) {
+    if (nextStage === 'useExcalibur') {
+      return { continueExecution: true, updateStage: true };
+    }
 
-    return false;
+    const playerWithExcalibur = this.game.players.find((player) => player.features.excalibur)!;
+    playerWithExcalibur.features.waitForAction = true;
+
+    this.game.updateStage('useExcalibur');
+    this.game.stateObserver.gameStateChanged();
+
+    return { continueExecution: false, updateStage: false };
   }
 
   giveExcalibur(executorID: string) {
@@ -86,6 +98,9 @@ export class ExcaliburAddon implements IGameAddon {
 
       action.value = action.value === 'fail' ? 'success' : 'fail';
       mission.finishMission();
+      this.game.finishMission();
     }
+
+    this.game.stateObserver.gameStateChanged();
   }
 }

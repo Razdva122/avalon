@@ -22,7 +22,7 @@ export class LadyOfLakeAddon implements IGameAddon {
     // Right player from leader get ladyOfLake
     lastPlayer.features.ladyOfLake = 'has';
 
-    return true;
+    return { continueExecution: true, updateStage: true };
   }
 
   beforeSelectTeam(prevStage: TGameStage) {
@@ -33,10 +33,10 @@ export class LadyOfLakeAddon implements IGameAddon {
 
       this.game.updateStage('checkLoyalty');
       this.game.stateObserver.gameStateChanged();
-      return false;
+      return { continueExecution: true, updateStage: false };
     }
 
-    return true;
+    return { continueExecution: true, updateStage: true };
   }
 
   checkLoyalty(executorID: string) {

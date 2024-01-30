@@ -132,20 +132,27 @@ export class Game {
    * @returns false if addon has taken control
    */
   updateStage(value: TGameStage): boolean {
+    const afterMethod = `after${_.upperFirst(this._stage)}` as TAfterMethods;
+    const beforeMethod = `before${_.upperFirst(value)}` as TBeforeMethods;
+    const defaultResult = { continueExecution: true, updateStage: true };
+
+    let updateStage = true;
+
     for (let i = 0; i < this.addons.length; i += 1) {
-      const afterMethod = `after${_.upperFirst(this._stage)}` as TAfterMethods;
-      const beforeMethod = `before${_.upperFirst(value)}` as TBeforeMethods;
+      const afterMethodResult = this.addons[i][afterMethod]?.(value) || defaultResult;
+      const beforeMethodResult = this.addons[i][beforeMethod]?.(this._stage) || defaultResult;
 
-      if (this.addons[i][afterMethod]?.(value) === false) {
-        return false;
-      }
+      updateStage = updateStage && afterMethodResult.updateStage && beforeMethodResult.updateStage;
 
-      if (this.addons[i][beforeMethod]?.(this._stage) === false) {
+      if (afterMethodResult.continueExecution === false || beforeMethodResult.continueExecution === false) {
         return false;
       }
     }
 
-    this._stage = value;
+    if (updateStage) {
+      this._stage = value;
+    }
+
     return true;
   }
 
@@ -252,16 +259,21 @@ export class Game {
   /**
    * Start next round
    */
-  protected startNextRound(): void {
+  protected startNextRound(): boolean {
+    if (this.nextVote(true) === false) {
+      return false;
+    }
+
     this.round += 1;
     this.currentMission.activateMission();
-    this.nextVote(true);
+
+    return true;
   }
 
   /**
    * Finish active round
    */
-  protected finishCurrentRound(): void {
+  finishCurrentRound(): void {
     this.clearSendPlayers();
     this.history.push(this.currentMission);
   }
@@ -279,7 +291,11 @@ export class Game {
    * Move vote to next stage
    * @param reset - if true clear stage to 0
    */
-  protected nextVote(reset?: true): void {
+  protected nextVote(reset?: true): boolean {
+    if (this.updateStage('selectTeam') === false) {
+      return false;
+    }
+
     this.clearSendPlayers();
     this.moveLeader();
 
@@ -289,7 +305,7 @@ export class Game {
       this.turn += 1;
     }
 
-    this.updateStage('selectTeam');
+    return true;
   }
 
   /**
@@ -373,26 +389,38 @@ export class Game {
   /**
    * Switches the game to the correct status after the end of the mission
    */
-  protected finishMission(): void {
-    this.finishCurrentRound();
-    let needEndGame = false;
+  finishMission(): void {
+    const winner = this.calculateCurrentWinner();
 
+    if (winner) {
+      if (this.updateStage('end') === false) {
+        return;
+      }
+
+      this.winner = winner;
+    } else {
+      if (this.startNextRound() === false) {
+        return;
+      }
+    }
+
+    this.finishCurrentRound();
+    this.stateObserver.gameStateChanged();
+  }
+
+  /**
+   * Calculates the results of the winner according to the missions
+   *
+   * @returns Current winning team
+   */
+  calculateCurrentWinner(): TLoyalty | undefined {
     if (this.missions.filter((mission) => mission.data.result === 'fail').length === 3) {
-      this.winner = 'evil';
-      needEndGame = true;
+      return 'evil';
     }
 
     if (this.missions.filter((mission) => mission.data.result === 'success').length === 3) {
-      this.winner = 'good';
-      needEndGame = true;
+      return 'good';
     }
-
-    if (needEndGame) {
-      this.updateStage('end');
-      return;
-    }
-
-    this.startNextRound();
   }
 
   /**
@@ -403,7 +431,7 @@ export class Game {
     player.features.waitForAction = false;
 
     if (this.currentMission.makeAction(player, result)) {
-      this.finishMission();
+      return this.finishMission();
     }
 
     this.stateObserver.gameStateChanged();
@@ -425,7 +453,10 @@ export class Game {
         this.startMission();
       } else {
         this.history.push(this.vote);
-        this.nextVote();
+
+        if (this.nextVote() === false) {
+          return;
+        }
       }
     }
 

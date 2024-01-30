@@ -4,8 +4,10 @@ import type { TGameStage } from '@avalon/types';
 export type TBeforeMethods = `before${Capitalize<TGameStage>}`;
 export type TAfterMethods = `after${Capitalize<TGameStage>}`;
 
-export type TBefore = Partial<Record<TBeforeMethods, (prev: TGameStage) => boolean>>;
-export type TAfter = Partial<Record<TAfterMethods, (next: TGameStage) => boolean>>;
+export type TAddonMethodResult = { continueExecution: boolean; updateStage: boolean };
+
+export type TBefore = Partial<Record<TBeforeMethods, (prev: TGameStage) => TAddonMethodResult>>;
+export type TAfter = Partial<Record<TAfterMethods, (next: TGameStage) => TAddonMethodResult>>;
 
 export type TRolesWithAddons = 'merlin' | 'merlinPure';
 
