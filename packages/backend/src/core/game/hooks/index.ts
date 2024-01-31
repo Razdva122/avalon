@@ -1,5 +1,9 @@
+import type { THooksDictionary, THookNames } from '@/core/game/hooks/interface';
+
+export * from '@/core/game/hooks/interface';
+
 export class GameHooks {
-  hooks = {
+  hooks: THooksDictionary = {
     afterInit: [],
     beforeSelectTeam: [],
     afterSelectTeam: [],
@@ -7,12 +11,14 @@ export class GameHooks {
     afterSentTeam: [],
     beforeVoteForTeam: [],
     afterVoteForTeam: [],
+    beforeStartMission: [],
+    afterStartMission: [],
     beforeEndMission: [],
     afterEndMission: [],
     beforeEndGame: [],
   };
 
-  callHook(hookName: string): boolean {
+  callHook(hookName: THookNames): boolean {
     for (const method of this.hooks[hookName]) {
       if (!method()) {
         return false;

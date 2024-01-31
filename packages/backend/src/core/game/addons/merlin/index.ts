@@ -3,7 +3,6 @@ import * as _ from 'lodash';
 import { IGameAddon } from '@/core/game/addons/interface';
 import { Assassinate } from '@/core/game/addons/merlin/assassinate';
 import { Game } from '@/core/game';
-import { TGameStage } from '@avalon/types';
 
 export class MerlinAddon implements IGameAddon {
   game: Game;
@@ -12,22 +11,18 @@ export class MerlinAddon implements IGameAddon {
     this.game = game;
   }
 
-  afterInitialization() {
+  afterInit() {
     // On select merlin stage all minions are visible
     this.game.stageVisibilityChange.selectMerlin = (_stage, role) => role.loyalty === 'evil';
     // On select merlin stage assassin can select players
     this.game.selectAvailable.selectMerlin = (player) => Boolean(player.features.isAssassin);
 
-    return { continueExecution: true, updateStage: true };
+    return true;
   }
 
-  beforeEnd(prevStage: TGameStage) {
-    if (prevStage === 'selectMerlin') {
-      return { continueExecution: true, updateStage: true };
-    }
-
+  beforeEndGame() {
     if (this.game.calculateCurrentWinner() === 'good') {
-      this.game.updateStage('selectMerlin');
+      this.game.stage = 'selectMerlin';
 
       // Generate assassin
       const assassin = _.sample(this.game.players.filter((player) => player.role.loyalty === 'evil'))!;
@@ -36,10 +31,10 @@ export class MerlinAddon implements IGameAddon {
       assassin.features.waitForAction = true;
 
       this.game.stateObserver.gameStateChanged();
-      return { continueExecution: true, updateStage: false };
+      return false;
     }
 
-    return { continueExecution: true, updateStage: true };
+    return true;
   }
 
   /**
@@ -65,7 +60,7 @@ export class MerlinAddon implements IGameAddon {
     const assassinate = new Assassinate(assassin);
     assassin.features.waitForAction = false;
 
-    this.game.updateStage('end');
+    this.game.stage = 'end';
 
     if (assassinate.assassinatePlayer(selectedPlayer) === 'hit') {
       this.game.winner = 'evil';

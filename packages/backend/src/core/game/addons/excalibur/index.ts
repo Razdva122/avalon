@@ -1,6 +1,5 @@
 import { IGameAddon } from '@/core/game/addons/interface';
 import { Game } from '@/core/game';
-import { TGameStage } from '@avalon/types';
 
 export class ExcaliburAddon implements IGameAddon {
   game: Game;
@@ -9,40 +8,32 @@ export class ExcaliburAddon implements IGameAddon {
     this.game = game;
   }
 
-  afterInitialization() {
+  afterInit() {
     // On give excalibur leader should select player
     this.game.selectAvailable.giveExcalibur = (player) => Boolean(player.features.isLeader);
 
     // On use excalibur user with excalibur should select player
     this.game.selectAvailable.useExcalibur = (player) => Boolean(player.features.excalibur);
 
-    return { continueExecution: true, updateStage: true };
+    return true;
   }
 
-  afterSelectTeam(nextStage: TGameStage) {
-    if (nextStage === 'giveExcalibur') {
-      return { continueExecution: true, updateStage: true };
-    }
-
+  afterSentTeam() {
     this.game.leader.features.waitForAction = true;
-    this.game.updateStage('giveExcalibur');
+    this.game.stage = 'giveExcalibur';
     this.game.stateObserver.gameStateChanged();
 
-    return { continueExecution: false, updateStage: false };
+    return false;
   }
 
-  afterOnMission(nextStage: TGameStage) {
-    if (nextStage === 'useExcalibur') {
-      return { continueExecution: true, updateStage: true };
-    }
-
+  beforeEndMission() {
     const playerWithExcalibur = this.game.players.find((player) => player.features.excalibur)!;
     playerWithExcalibur.features.waitForAction = true;
 
-    this.game.updateStage('useExcalibur');
+    this.game.stage = 'useExcalibur';
     this.game.stateObserver.gameStateChanged();
 
-    return { continueExecution: false, updateStage: false };
+    return false;
   }
 
   giveExcalibur(executorID: string) {
@@ -65,6 +56,7 @@ export class ExcaliburAddon implements IGameAddon {
     }
 
     selectedPlayer.features.excalibur = true;
+    selectedPlayer.features.isSelected = false;
 
     this.game.sentTeamNextStage();
     this.game.stateObserver.gameStateChanged();
@@ -98,8 +90,13 @@ export class ExcaliburAddon implements IGameAddon {
 
       action.value = action.value === 'fail' ? 'success' : 'fail';
       mission.finishMission();
-      this.game.finishMission();
+
+      selectedPlayer.features.isSelected = false;
     }
+
+    ownerOfExcalibur.features.excalibur = false;
+
+    this.game.finishMission();
 
     this.game.stateObserver.gameStateChanged();
   }

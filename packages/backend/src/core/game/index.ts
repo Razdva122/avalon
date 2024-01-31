@@ -19,14 +19,7 @@ import type {
   IGameOptions,
 } from '@avalon/types';
 
-import type {
-  TRolesAddonsData,
-  TAfterMethods,
-  TBeforeMethods,
-  TRolesWithAddons,
-  TAdditionalAddons,
-  TAdditionalAddonsData,
-} from '@/core/game/addons';
+import type { TRolesAddonsData, TRolesWithAddons, TAdditionalAddons, TAdditionalAddonsData } from '@/core/game/addons';
 
 import { rolesWithAddons, addons } from '@/core/game/const';
 
@@ -38,7 +31,7 @@ import { gamesSettings } from '@/core/game/const';
 
 import { generateRolesForGame } from '@/core/game/helpers';
 
-import { GameHooks } from '@/core/game/hooks';
+import { GameHooks, THookNames } from '@/core/game/hooks';
 
 export * from '@/core/game/interface';
 export * from '@/core/game/const';
@@ -123,40 +116,7 @@ export class Game extends GameHooks {
     return this.players.find((player) => player.features.isLeader)!;
   }
 
-  private _stage: TGameStage = 'initialization';
-
-  get stage() {
-    return this._stage;
-  }
-
-  /**
-   * Trying to update the stage, addons may take over control
-   * @returns false if addon has taken control
-   */
-  updateStage(value: TGameStage): boolean {
-    const afterMethod = `after${_.upperFirst(this._stage)}` as TAfterMethods;
-    const beforeMethod = `before${_.upperFirst(value)}` as TBeforeMethods;
-    const defaultResult = { continueExecution: true, updateStage: true };
-
-    let updateStage = true;
-
-    for (let i = 0; i < this.addons.length; i += 1) {
-      const afterMethodResult = this.addons[i][afterMethod]?.(value) || defaultResult;
-      const beforeMethodResult = this.addons[i][beforeMethod]?.(this._stage) || defaultResult;
-
-      updateStage = updateStage && afterMethodResult.updateStage && beforeMethodResult.updateStage;
-
-      if (afterMethodResult.continueExecution === false || beforeMethodResult.continueExecution === false) {
-        return false;
-      }
-    }
-
-    if (updateStage) {
-      this._stage = value;
-    }
-
-    return true;
-  }
+  stage: TGameStage = 'initialization';
 
   constructor(users: User[], options: IGameOptions, stateObserver: IStateObserver) {
     super();
@@ -228,9 +188,20 @@ export class Game extends GameHooks {
       }
     });
 
-    this.callHook('afterInit');
+    for (const addon of this.addons) {
+      (<THookNames[]>Object.keys(this.hooks)).forEach((hookName) => {
+        const addonMethod = addon[hookName];
+        if (addonMethod) {
+          this.hooks[hookName].push(addonMethod.bind(addon));
+        }
+      });
+    }
 
-    this.updateStage('selectTeam');
+    if (!this.callHook('afterInit') || !this.callHook('beforeSelectTeam')) {
+      return;
+    }
+
+    this.stage = 'selectTeam';
   }
 
   /**
@@ -265,15 +236,10 @@ export class Game extends GameHooks {
   /**
    * Start next round
    */
-  protected startNextRound(): boolean {
-    if (this.nextVote(true) === false) {
-      return false;
-    }
-
+  protected startNextRound() {
     this.round += 1;
     this.currentMission.activateMission();
-
-    return true;
+    this.nextVote(true);
   }
 
   /**
@@ -297,11 +263,7 @@ export class Game extends GameHooks {
    * Move vote to next stage
    * @param reset - if true clear stage to 0
    */
-  protected nextVote(reset?: true): boolean {
-    if (this.updateStage('selectTeam') === false) {
-      return false;
-    }
-
+  protected nextVote(reset?: true): void {
     this.clearSendPlayers();
     this.moveLeader();
 
@@ -311,7 +273,11 @@ export class Game extends GameHooks {
       this.turn += 1;
     }
 
-    return true;
+    if (!this.callHook('beforeSelectTeam')) {
+      return;
+    }
+
+    this.stage = 'selectTeam';
   }
 
   /**
@@ -345,6 +311,10 @@ export class Game extends GameHooks {
       );
     }
 
+    if (!this.callHook('afterSelectTeam') || !this.callHook('beforeSentTeam')) {
+      return;
+    }
+
     this.selectedPlayers.forEach((player) => {
       player.features.isSent = true;
     });
@@ -352,6 +322,14 @@ export class Game extends GameHooks {
     this.leader.features.waitForAction = false;
 
     this.vote = new Vote(this.players, this.leader, this.turn, this.turn === 4 ? true : undefined);
+
+    this.players.forEach((player) => {
+      player.features.isSelected = false;
+    });
+
+    if (!this.callHook('afterSentTeam')) {
+      return;
+    }
 
     this.sentTeamNextStage();
 
@@ -362,20 +340,14 @@ export class Game extends GameHooks {
    * Moves the game to the next stage after sending the team
    */
   sentTeamNextStage(): void {
-    this.players.forEach((player) => {
-      player.features.isSelected = false;
-    });
-
     if (this.turn === 4) {
       this.startMission();
     } else {
-      if (this.updateStage('votingForTeam') === false) {
-        return;
-      }
-
       this.players.forEach((player) => {
         player.features.waitForAction = true;
       });
+
+      this.stage = 'votingForTeam';
     }
   }
 
@@ -383,13 +355,21 @@ export class Game extends GameHooks {
    * Start mission
    */
   protected startMission(): void {
+    if (!this.callHook('beforeStartMission')) {
+      return;
+    }
+
     this.history.push(this.vote!);
     this.currentMission.startMission(this.sentPlayers, this.leader);
-    this.updateStage('onMission');
+    this.stage = 'onMission';
 
     this.sentPlayers.forEach((player) => {
       player.features.waitForAction = true;
     });
+
+    if (!this.callHook('afterStartMission')) {
+      return;
+    }
   }
 
   /**
@@ -398,20 +378,24 @@ export class Game extends GameHooks {
   finishMission(): void {
     const winner = this.calculateCurrentWinner();
 
+    this.finishCurrentRound();
+
     if (winner) {
-      if (!this.updateStage('end')) {
+      if (!this.callHook('beforeEndGame')) {
         return;
       }
 
       this.winner = winner;
+      this.stage = 'end';
     } else {
-      if (this.startNextRound() === false) {
-        return;
-      }
+      this.startNextRound();
     }
 
-    this.finishCurrentRound();
     this.stateObserver.gameStateChanged();
+
+    if (!this.callHook('afterEndMission')) {
+      return;
+    }
   }
 
   /**
@@ -437,6 +421,10 @@ export class Game extends GameHooks {
     player.features.waitForAction = false;
 
     if (this.currentMission.makeAction(player, result)) {
+      if (!this.callHook('beforeEndMission')) {
+        return;
+      }
+
       return this.finishMission();
     }
 
@@ -459,10 +447,7 @@ export class Game extends GameHooks {
         this.startMission();
       } else {
         this.history.push(this.vote);
-
-        if (this.nextVote() === false) {
-          return;
-        }
+        this.nextVote();
       }
     }
 

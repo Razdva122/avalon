@@ -1,7 +1,7 @@
 import { IGameAddon } from '@/core/game/addons/interface';
 import { CheckLoyalty } from '@/core/game/addons/lady-of-lake/check-loyalty';
 import { Game } from '@/core/game';
-import { TGameStage, TLoyalty } from '@avalon/types';
+import { TLoyalty } from '@avalon/types';
 
 export class LadyOfLakeAddon implements IGameAddon {
   game: Game;
@@ -10,7 +10,7 @@ export class LadyOfLakeAddon implements IGameAddon {
     this.game = game;
   }
 
-  afterInitialization() {
+  afterInit() {
     // On check loyalty user with lady of lake can select players
     this.game.selectAvailable.checkLoyalty = (player) => player.features.ladyOfLake === 'has';
 
@@ -22,21 +22,21 @@ export class LadyOfLakeAddon implements IGameAddon {
     // Right player from leader get ladyOfLake
     lastPlayer.features.ladyOfLake = 'has';
 
-    return { continueExecution: true, updateStage: true };
+    return true;
   }
 
-  beforeSelectTeam(prevStage: TGameStage) {
-    if (this.game.turn === 0 && this.game.round >= 2 && prevStage !== 'announceLoyalty') {
+  beforeSelectTeam() {
+    if (this.game.turn === 0 && this.game.round >= 2) {
       this.game.players.forEach((player) => {
         player.features.waitForAction = player.features.ladyOfLake === 'has';
       });
 
-      this.game.updateStage('checkLoyalty');
+      this.game.stage = 'checkLoyalty';
       this.game.stateObserver.gameStateChanged();
-      return { continueExecution: true, updateStage: false };
+      return false;
     }
 
-    return { continueExecution: true, updateStage: true };
+    return true;
   }
 
   checkLoyalty(executorID: string) {
@@ -60,7 +60,7 @@ export class LadyOfLakeAddon implements IGameAddon {
       throw new Error("You can't use the lady of the lake on the previous owner or yourself");
     }
 
-    this.game.updateStage('announceLoyalty');
+    this.game.stage = 'announceLoyalty';
 
     this.game.stateObserver.gameStateChanged();
   }
@@ -105,7 +105,7 @@ export class LadyOfLakeAddon implements IGameAddon {
 
     this.game.leader.features.waitForAction = true;
 
-    this.game.updateStage('selectTeam');
+    this.game.stage = 'selectTeam';
 
     this.game.stateObserver.gameStateChanged();
   }

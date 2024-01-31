@@ -30,8 +30,8 @@ export class GameTestHelper {
     });
   }
 
-  selectPlayersOnMission(evil: number = 0): this {
-    const amount = this.game.currentMission.data.settings.players;
+  selectPlayersOnMission(evil: number = 0, extraPlayers = 0): this {
+    const amount = this.game.currentMission.data.settings.players + extraPlayers;
     const evilPlayers = this.game.players.filter((player) => player.role.loyalty === 'evil');
 
     for (let i = 0; i < amount; i += 1) {
@@ -131,14 +131,16 @@ export class GameTestHelper {
     return this;
   }
 
-  useExcalibur(useOnSuccess: boolean = true): this {
-    const actionWithCorrectRes = this.game.currentMission.data.actions.find((action) => {
-      return useOnSuccess ? action.value === 'success' : action.value === 'fail' && !action.player.features.excalibur;
-    })!;
-
+  useExcalibur(useExcalibur: boolean = true, useOnSuccess: boolean = true): this {
     const playerWithExcaliburId = this.game.players.find((player) => player.features.excalibur)!.user.id;
 
-    this.game.selectPlayer(playerWithExcaliburId, actionWithCorrectRes.player.user.id);
+    if (useExcalibur) {
+      const actionWithCorrectRes = this.game.currentMission.data.actions.find((action) => {
+        return useOnSuccess ? action.value === 'success' : action.value === 'fail' && !action.player.features.excalibur;
+      })!;
+
+      this.game.selectPlayer(playerWithExcaliburId, actionWithCorrectRes.player.user.id);
+    }
 
     this.game.addons.excalibur!.useExcalibur(playerWithExcaliburId);
 

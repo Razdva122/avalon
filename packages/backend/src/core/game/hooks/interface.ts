@@ -6,6 +6,12 @@ export type THookNames =
   | 'afterSentTeam'
   | 'beforeVoteForTeam'
   | 'afterVoteForTeam'
+  | 'beforeStartMission'
+  | 'afterStartMission'
   | 'beforeEndMission'
   | 'afterEndMission'
   | 'beforeEndGame';
+
+export type THooksDictionary = {
+  [key in THookNames]: (() => boolean)[];
+};

@@ -37,4 +37,44 @@ describe('Excalibur logic', () => {
     expect(game.missions[0].data.fails).toBe(1);
     expect(game.missions[0].data.result).toBe('fail');
   });
+
+  test('Use excalibur on single fail should win mission', () => {
+    const evilToFail = game.players.find((player) => player.role.loyalty === 'evil' && !player.features.isLeader)!;
+    game.selectPlayer(game.leader.user.id, evilToFail.user.id);
+    gameHelper.selectPlayersOnMission(0, -1).sentSelectedPlayers();
+
+    const playerId = game.players.find(
+      (player) => !player.features.isLeader && player.features.isSent && player !== evilToFail,
+    )!.user.id;
+
+    gameHelper.giveExcalibur(playerId).makeVotes().makeActions(1).useExcalibur(true, false);
+
+    expect(game.stage).toBe('selectTeam');
+    expect(game.missions[1].data.fails).toBe(0);
+    expect(game.missions[1].data.result).toBe('success');
+  });
+
+  test('Game should ended but excalibur save game', () => {
+    gameHelper
+      .selectPlayersOnMission(1)
+      .sentSelectedPlayers()
+      .giveExcalibur(true)
+      .makeVotes()
+      .makeActions(1)
+      .useExcalibur(false);
+
+    expect(game.stage).toBe('selectTeam');
+    expect(game.missions[2].data.fails).toBe(1);
+
+    gameHelper
+      .selectPlayersOnMission(2)
+      .sentSelectedPlayers()
+      .giveExcalibur(true)
+      .makeVotes()
+      .makeActions(2)
+      .useExcalibur(true, false);
+
+    expect(game.stage).toBe('selectTeam');
+    expect(game.missions[3].data.fails).toBe(1);
+  });
 });
