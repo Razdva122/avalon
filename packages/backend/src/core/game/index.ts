@@ -38,10 +38,12 @@ import { gamesSettings } from '@/core/game/const';
 
 import { generateRolesForGame } from '@/core/game/helpers';
 
+import { GameHooks } from '@/core/game/hooks';
+
 export * from '@/core/game/interface';
 export * from '@/core/game/const';
 
-export class Game {
+export class Game extends GameHooks {
   winner?: TLoyalty;
 
   /**
@@ -157,6 +159,8 @@ export class Game {
   }
 
   constructor(users: User[], options: IGameOptions, stateObserver: IStateObserver) {
+    super();
+
     if (users.length < 5 || users.length > 10) {
       throw new Error(`Invalid players count. Players count: ${users.length}`);
     }
@@ -223,6 +227,8 @@ export class Game {
         this.addons.push(this.addons[addonData.key]!);
       }
     });
+
+    this.callHook('afterInit');
 
     this.updateStage('selectTeam');
   }
@@ -393,7 +399,7 @@ export class Game {
     const winner = this.calculateCurrentWinner();
 
     if (winner) {
-      if (this.updateStage('end') === false) {
+      if (!this.updateStage('end')) {
         return;
       }
 
