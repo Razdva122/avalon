@@ -100,14 +100,11 @@ export default defineComponent({
         return;
       }
 
-      if (roomState.value.game.stage === 'end') {
-        return;
-      }
-
       const userCanSelect =
         (roomState.value.game.stage === 'selectTeam' && playerInGame.value?.features.isLeader) ||
         (roomState.value.game.stage === 'giveExcalibur' && playerInGame.value?.features.isLeader) ||
         (roomState.value.game.stage === 'selectMerlin' && playerInGame.value?.features.isAssassin) ||
+        (roomState.value.game.stage === 'useExcalibur' && playerInGame.value?.features.excalibur) ||
         (roomState.value.game.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfLake === 'has');
 
       if (userCanSelect) {

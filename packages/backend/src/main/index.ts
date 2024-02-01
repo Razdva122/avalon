@@ -182,5 +182,10 @@ export class Manager {
       console.log(`Player ${userName} giveExcalibur in game ${uuid}`);
       getRoomManager(uuid).callGameMethods(userID, { method: 'giveExcalibur' });
     });
+
+    socket.on('useExcalibur', (uuid) => {
+      console.log(`Player ${userName} useExcalibur in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'useExcalibur' });
+    });
   }
 }

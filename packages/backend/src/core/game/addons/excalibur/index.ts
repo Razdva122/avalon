@@ -55,6 +55,10 @@ export class ExcaliburAddon implements IGameAddon {
       throw new Error('You cant give excalibur to your self');
     }
 
+    if (!selectedPlayer.features.isSent) {
+      throw new Error('You cant give excalibur to player outside of mission');
+    }
+
     selectedPlayer.features.excalibur = true;
     selectedPlayer.features.isSelected = false;
 
@@ -95,6 +99,7 @@ export class ExcaliburAddon implements IGameAddon {
     }
 
     ownerOfExcalibur.features.excalibur = false;
+    ownerOfExcalibur.features.waitForAction = false;
 
     this.game.finishMission();
 

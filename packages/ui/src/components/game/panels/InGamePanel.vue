@@ -1,6 +1,6 @@
 <template>
   <template v-if="game.stage === 'selectTeam' && isUserLeader">
-    <v-btn color="warning" :disabled="isSendTeamDisabled" @click="onSendTeamClick"> Send Team </v-btn>
+    <v-btn color="warning" :disabled="isSendTeamDisabled" @click="emitClick('sentSelectedPlayers')"> Send Team </v-btn>
   </template>
   <template v-if="game.stage === 'votingForTeam'">
     <v-btn color="success" :disabled="!isPlayerActive" @click="() => onVoteClick('approve')" class="mb-2">
@@ -19,13 +19,23 @@
     </Spoiler>
   </template>
   <template v-if="game.stage === 'selectMerlin' && isUserAssassin">
-    <v-btn color="error" :disabled="!isSinglePlayerSelected" @click="onExecuteMerlinClick">Execute merlin</v-btn>
+    <v-btn color="error" :disabled="!isSinglePlayerSelected" @click="emitClick('selectMerlin')">Execute merlin</v-btn>
   </template>
   <template v-if="game.stage === 'checkLoyalty' && isUserLadyOwner">
-    <v-btn color="warning" :disabled="!isLadyAvailable" @click="onCheckLoyaltyClick">Check Loyalty</v-btn>
+    <v-btn color="warning" :disabled="!isLadyAvailable" @click="emitClick('checkLoyalty')">Check Loyalty</v-btn>
   </template>
   <template v-if="game.stage === 'giveExcalibur' && isUserLeader">
-    <v-btn color="warning" :disabled="!isGiveExcaliburAvailable" @click="onGiveExcaliburClick">Give excalibur</v-btn>
+    <v-btn color="warning" :disabled="!isGiveExcaliburAvailable" @click="emitClick('giveExcalibur')"
+      >Give excalibur</v-btn
+    >
+  </template>
+  <template v-if="game.stage === 'useExcalibur' && isUserExcaliburOwner">
+    <v-btn
+      :color="isZeroPlayerSelected ? 'warning' : 'error'"
+      :disabled="!isUseExcaliburAvailable"
+      @click="emitClick('useExcalibur')"
+      >{{ isZeroPlayerSelected ? 'Skip excalibur' : 'Use excalibur' }}</v-btn
+    >
   </template>
 </template>
 
@@ -35,6 +45,8 @@ import type { IVisualGameState, TMissionResult, TVoteOption } from '@avalon/type
 import { useStore } from '@/store';
 import { socket } from '@/api/socket';
 import Spoiler from '@/components/feedback/Spoiler.vue';
+
+type TMethodsWithoutParams = 'sentSelectedPlayers' | 'selectMerlin' | 'checkLoyalty' | 'giveExcalibur' | 'useExcalibur';
 
 export default defineComponent({
   name: 'InGamePanel',
@@ -79,6 +91,10 @@ export default defineComponent({
       return player.value?.features.ladyOfLake === 'has';
     });
 
+    const isUserExcaliburOwner = computed(() => {
+      return Boolean(player.value?.features.excalibur);
+    });
+
     const isSendTeamDisabled = computed(() => {
       const needPlayers = game.value.settings.missions[game.value.mission].players;
       return game.value.players.filter((player) => player.features.isSelected).length !== needPlayers;
@@ -88,9 +104,13 @@ export default defineComponent({
       return game.value.players.filter((player) => player.features.isSelected).length === 1;
     });
 
+    const isZeroPlayerSelected = computed(() => {
+      return game.value.players.filter((player) => player.features.isSelected).length === 0;
+    });
+
     const isLadyAvailable = computed(() => {
       return (
-        isSinglePlayerSelected &&
+        isSinglePlayerSelected.value &&
         Boolean(
           game.value.players.find((player) => player.features.isSelected && player.features.ladyOfLake === undefined),
         )
@@ -98,15 +118,27 @@ export default defineComponent({
     });
 
     const isGiveExcaliburAvailable = computed(() => {
-      const selectedPlayers = game.value.players.filter((player) => player.features.isSelected);
       return (
-        selectedPlayers.length === 1 && !selectedPlayers[0].features.isLeader && selectedPlayers[0].features.isSent
+        isSinglePlayerSelected.value &&
+        Boolean(
+          game.value.players.find(
+            (player) => player.features.isSelected && !player.features.isLeader && player.features.isSent,
+          ),
+        )
       );
     });
 
-    const onSendTeamClick = () => {
-      socket.emit('sentSelectedPlayers', game.value.uuid);
-    };
+    const isUseExcaliburAvailable = computed(() => {
+      return (
+        isZeroPlayerSelected.value ||
+        (isSinglePlayerSelected.value &&
+          Boolean(
+            game.value.players.find(
+              (player) => player.features.isSelected && !player.features.excalibur && player.features.isSent,
+            ),
+          ))
+      );
+    });
 
     const onVoteClick = (option: TVoteOption) => {
       socket.emit('voteForMission', game.value.uuid, option);
@@ -116,37 +148,29 @@ export default defineComponent({
       socket.emit('actionOnMission', game.value.uuid, result);
     };
 
-    const onExecuteMerlinClick = () => {
-      socket.emit('selectMerlin', game.value.uuid);
-    };
-
-    const onCheckLoyaltyClick = () => {
-      socket.emit('checkLoyalty', game.value.uuid);
-    };
-
-    const onGiveExcaliburClick = () => {
-      socket.emit('giveExcalibur', game.value.uuid);
+    const emitClick = (methodName: TMethodsWithoutParams) => {
+      socket.emit(methodName, game.value.uuid);
     };
 
     return {
       isUserLeader,
       isUserAssassin,
       isUserLadyOwner,
+      isUserExcaliburOwner,
       isPlayerOnMission,
       isPlayerActive,
       isPlayerCanFail,
       isSinglePlayerSelected,
+      isZeroPlayerSelected,
       isLadyAvailable,
       isGiveExcaliburAvailable,
+      isUseExcaliburAvailable,
 
       isSendTeamDisabled,
 
-      onSendTeamClick,
       onVoteClick,
       onMissionClick,
-      onExecuteMerlinClick,
-      onCheckLoyaltyClick,
-      onGiveExcaliburClick,
+      emitClick,
     };
   },
 });

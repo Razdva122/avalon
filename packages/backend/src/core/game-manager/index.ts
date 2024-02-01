@@ -215,6 +215,15 @@ export class GameManager {
         this.game.addons.excalibur.giveExcalibur(userID);
         break;
       }
+
+      case 'useExcalibur': {
+        if (!this.game.addons.excalibur) {
+          throw new Error('You cant use excalibur in game without excalibur');
+        }
+
+        this.game.addons.excalibur.useExcalibur(userID);
+        break;
+      }
     }
   }
 
