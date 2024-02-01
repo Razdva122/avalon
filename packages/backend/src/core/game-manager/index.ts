@@ -206,6 +206,15 @@ export class GameManager {
 
         this.game.addons.ladyOfLake.announceLoyalty(userID, params.loyalty);
         break;
+
+      case 'giveExcalibur': {
+        if (!this.game.addons.excalibur) {
+          throw new Error('You cant give excalibur in game without excalibur');
+        }
+
+        this.game.addons.excalibur.giveExcalibur(userID);
+        break;
+      }
     }
   }
 

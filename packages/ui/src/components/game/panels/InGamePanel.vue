@@ -24,6 +24,9 @@
   <template v-if="game.stage === 'checkLoyalty' && isUserLadyOwner">
     <v-btn color="warning" :disabled="!isLadyAvailable" @click="onCheckLoyaltyClick">Check Loyalty</v-btn>
   </template>
+  <template v-if="game.stage === 'giveExcalibur' && isUserLeader">
+    <v-btn color="warning" :disabled="!isGiveExcaliburAvailable" @click="onGiveExcaliburClick">Give excalibur</v-btn>
+  </template>
 </template>
 
 <script lang="ts">
@@ -94,6 +97,13 @@ export default defineComponent({
       );
     });
 
+    const isGiveExcaliburAvailable = computed(() => {
+      const selectedPlayers = game.value.players.filter((player) => player.features.isSelected);
+      return (
+        selectedPlayers.length === 1 && !selectedPlayers[0].features.isLeader && selectedPlayers[0].features.isSent
+      );
+    });
+
     const onSendTeamClick = () => {
       socket.emit('sentSelectedPlayers', game.value.uuid);
     };
@@ -114,6 +124,10 @@ export default defineComponent({
       socket.emit('checkLoyalty', game.value.uuid);
     };
 
+    const onGiveExcaliburClick = () => {
+      socket.emit('giveExcalibur', game.value.uuid);
+    };
+
     return {
       isUserLeader,
       isUserAssassin,
@@ -123,6 +137,7 @@ export default defineComponent({
       isPlayerCanFail,
       isSinglePlayerSelected,
       isLadyAvailable,
+      isGiveExcaliburAvailable,
 
       isSendTeamDisabled,
 
@@ -131,6 +146,7 @@ export default defineComponent({
       onMissionClick,
       onExecuteMerlinClick,
       onCheckLoyaltyClick,
+      onGiveExcaliburClick,
     };
   },
 });

@@ -177,5 +177,10 @@ export class Manager {
       console.log(`Player ${userName} getLoyalty in game ${uuid}`);
       cb(getRoomManager(uuid).getGameData(userID, { method: 'getLoyalty' }));
     });
+
+    socket.on('giveExcalibur', (uuid) => {
+      console.log(`Player ${userName} giveExcalibur in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'giveExcalibur' });
+    });
   }
 }

@@ -198,6 +198,11 @@ export default defineComponent({
   border-color: rgba(255, 255, 255, 0.8);
 }
 
+.player-feature-isSent.player-feature-isSelected .player-icon {
+  outline: 3px solid rgba(255, 245, 50, 0.642);
+  border-width: 3px;
+}
+
 .player-feature-isLeader .player-crown {
   display: block;
 }

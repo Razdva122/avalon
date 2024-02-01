@@ -77,4 +77,18 @@ describe('Excalibur logic', () => {
     expect(game.stage).toBe('selectTeam');
     expect(game.missions[3].data.fails).toBe(1);
   });
+
+  test('Game should win but excalibur lose game', () => {
+    gameHelper
+      .selectPlayersOnMission()
+      .sentSelectedPlayers()
+      .giveExcalibur(true)
+      .makeVotes()
+      .makeActions()
+      .useExcalibur(true, true);
+
+    expect(game.stage).toBe('end');
+    expect(game.winner).toBe('evil');
+    expect(game.missions[4].data.fails).toBe(1);
+  });
 });

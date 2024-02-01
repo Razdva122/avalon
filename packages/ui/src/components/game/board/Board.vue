@@ -106,6 +106,7 @@ export default defineComponent({
 
       const userCanSelect =
         (roomState.value.game.stage === 'selectTeam' && playerInGame.value?.features.isLeader) ||
+        (roomState.value.game.stage === 'giveExcalibur' && playerInGame.value?.features.isLeader) ||
         (roomState.value.game.stage === 'selectMerlin' && playerInGame.value?.features.isAssassin) ||
         (roomState.value.game.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfLake === 'has');
 

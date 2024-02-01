@@ -21,7 +21,8 @@ export type TGameMethodsParams =
   | TActionOnMissionParams
   | TSelectMerlinParams
   | TCheckLoyaltyParams
-  | TAnnounceLoyaltyParams;
+  | TAnnounceLoyaltyParams
+  | TGiveExcaliburParams;
 
 export type TSelectPlayerParams = {
   method: 'selectPlayer';
@@ -53,6 +54,10 @@ export type TCheckLoyaltyParams = {
 export type TAnnounceLoyaltyParams = {
   method: 'announceLoyalty';
   loyalty: TLoyalty;
+};
+
+export type TGiveExcaliburParams = {
+  method: 'giveExcalibur';
 };
 
 export type TGetLoyaltyData = {

@@ -36,6 +36,8 @@ export interface ClientToServerEvents {
   checkLoyalty: (uuid: string) => void;
   getLoyalty: (uuid: string, callback: (loyalty: TLoyalty) => void) => void;
   announceLoyalty: (uuid: string, loualty: TLoyalty) => void;
+
+  giveExcalibur: (uuid: string) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;
