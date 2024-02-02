@@ -18,7 +18,7 @@
           <div>
             Team:
             <template v-for="(el, index) in historyEl.actions">
-              <span :class="{ fail: 'text-error', success: 'text-success' }[(el as TActionWithResult).value]">
+              <span :class="{ fail: 'text-error', success: 'text-success' }[(el as IActionWithResult).value]">
                 {{ calculateNameByID(el.playerID) }}
               </span>
               <span>
@@ -89,6 +89,20 @@
             <span :class="historyEl.result === 'evil' ? 'text-error' : 'text-success'"> {{ historyEl.result }}</span>
           </div>
         </div>
+        <div v-if="historyEl.type === 'switchResult'">
+          <div v-if="historyEl.targetID">
+            <b>{{ calculateNameByID(historyEl.switcherID) }}</b> use excalibur to switch
+            <b>{{ calculateNameByID(historyEl.targetID) }}</b> action
+            <template v-if="historyEl.result">
+              <span :class="historyEl.result === 'fail' ? 'text-error' : 'text-success'"
+                >to {{ historyEl.result }}</span
+              >
+            </template>
+          </div>
+          <div v-else>
+            <b>{{ calculateNameByID(historyEl.switcherID) }}</b> decided not to use excalibur
+          </div>
+        </div>
         <v-divider :thickness="3"></v-divider>
       </div>
     </div>
@@ -97,7 +111,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { THistoryResults, IPlayer, TActionWithResult } from '@avalon/types';
+import { THistoryResults, IPlayer, IActionWithResult } from '@avalon/types';
 
 export default defineComponent({
   props: {

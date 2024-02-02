@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import * as _ from 'lodash';
-import type { IVisualGameState, THistoryMission, THistoryResults } from '@avalon/types';
+import type { IVisualGameState, IHistoryMission, THistoryResults } from '@avalon/types';
 import type { IMissionWithResult } from '@/components/game/board/interface';
 import { defineComponent, PropType } from 'vue';
 import Mission from '@/components/game/board/modules/Mission.vue';
@@ -49,7 +49,7 @@ export default defineComponent({
       const missions: IMissionWithResult[] = _.cloneDeep(this.game.settings.missions);
 
       this.game.history
-        .filter((el): el is THistoryMission => el.type === 'mission')
+        .filter((el): el is IHistoryMission => el.type === 'mission')
         .forEach((mission, index) => {
           missions[index].result = mission.result;
           missions[index].fails = mission.fails;

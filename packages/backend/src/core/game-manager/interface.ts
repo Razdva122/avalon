@@ -6,10 +6,14 @@ import type {
   TVoteOption,
   TMissionResult,
   TLoyalty,
+  THistoryResults,
 } from '@avalon/types';
 
-export type TRoomState = Omit<IVisualGameState, 'players'> & {
+import type { TDataForManagerOptions } from '@/core/game/history';
+
+export type TRoomState = Omit<IVisualGameState, 'players' | 'history'> & {
   players: Pick<IPlayer, 'features' | 'id' | 'name'>[];
+  history: ((options: TDataForManagerOptions) => THistoryResults)[];
   roles: Dictionary<TVisibleRole[]>;
   publicRoles: TVisibleRole[];
 };

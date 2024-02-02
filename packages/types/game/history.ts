@@ -6,7 +6,7 @@ import type { TLoyalty } from './roles';
 /**
  * Possible history element
  */
-export type THistoryType = 'mission' | 'vote' | 'assassinate' | 'checkLoyalty';
+export type THistoryType = 'mission' | 'vote' | 'assassinate' | 'checkLoyalty' | 'switchResult';
 
 /**
  * History element stages
@@ -14,52 +14,59 @@ export type THistoryType = 'mission' | 'vote' | 'assassinate' | 'checkLoyalty';
  */
 export type THistoryStage = 'active' | 'inactive' | 'progress' | 'finished';
 
-export type THistoryResults = THistoryVote | THistoryMission | THistoryAssassinate | TCheckLoyalty;
+export type THistoryResults = IHistoryVote | IHistoryMission | IHistoryAssassinate | ICheckLoyalty | ISwitchResult;
 
 /**
  * History vote data
  */
-export type THistoryVote = {
+export interface IHistoryVote {
   type: 'vote';
   index: number;
   result: TVoteOption;
   leaderID: string;
   forced: boolean;
   votes: TVote[];
-};
+}
 
 /**
  * History mission data
  */
-export type THistoryMission = {
+export interface IHistoryMission {
   type: 'mission';
   index: number;
   result: TMissionResult;
   settings: IMissionSettings;
   leaderID: string;
-  actions: TAction[] | TActionWithResult[];
+  actions: IAction[] | IActionWithResult[];
   fails: number;
-};
+}
 
 /**
  * History assassinate data
  */
-export type THistoryAssassinate = {
+export interface IHistoryAssassinate {
   type: 'assassinate';
   result: TAssassinateResult;
   assassinID: string;
   killedID: string;
-};
+}
 
 /**
  * Check loyalty data
  */
-export type TCheckLoyalty = {
+export interface ICheckLoyalty {
   type: 'checkLoyalty';
   validatorID: string;
   inspectedID: string;
   result: TLoyalty;
-};
+}
+
+export interface ISwitchResult {
+  type: 'switchResult';
+  switcherID: string;
+  targetID?: string;
+  result?: TMissionResult;
+}
 
 /**
  * Vote of one player
@@ -73,13 +80,13 @@ export type TVote = {
 /**
  * Action of player in mission
  */
-export type TAction = {
+export interface IAction {
   playerID: string;
-};
+}
 
 /**
  * Action of player in mission with result
  */
-export type TActionWithResult = {
+export interface IActionWithResult extends IAction {
   value: TMissionResult;
-} & TAction;
+}

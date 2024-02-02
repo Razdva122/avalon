@@ -2,7 +2,7 @@ import type { IPlayerInGame } from '@/core/game';
 
 import type { IMissionSettings, TMissionResult, THistoryStage } from '@avalon/types';
 
-import type { HistoryElement, THistoryData } from '@/core/game/history';
+import type { HistoryElement, THistoryData, TDataForManagerOptions } from '@/core/game/history';
 
 export * from '@/core/game/history/mission/interface';
 
@@ -90,7 +90,7 @@ export class Mission implements HistoryElement<'mission'> {
     this.data.fails = fails;
   }
 
-  dataForManager(options: { withResult?: boolean }) {
+  dataForManager(options: TDataForManagerOptions) {
     return {
       type: this.type,
       index: this.data.index,
@@ -99,7 +99,7 @@ export class Mission implements HistoryElement<'mission'> {
       leaderID: this.data.leader!.user.id,
       fails: this.data.fails!,
       actions: this.data.actions.map((action) => {
-        if (options.withResult) {
+        if (options.game.stage === 'end') {
           return {
             playerID: action.player.user.id,
             value: action.value,

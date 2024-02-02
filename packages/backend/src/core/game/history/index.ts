@@ -1,5 +1,6 @@
+import { Game } from '@/core/game';
 import { THistoryData, THistoryDataForManager } from '@/core/game/history/interface';
-import type { THistoryType, THistoryStage, Dictionary } from '@avalon/types';
+import type { THistoryType, THistoryStage } from '@avalon/types';
 
 export * from '@/core/game/history/interface';
 
@@ -11,5 +12,5 @@ export abstract class HistoryElement<T extends THistoryType = THistoryType> {
   /**
    * Data converted for frontend and database
    */
-  abstract dataForManager(options: Dictionary<unknown>): THistoryDataForManager[T];
+  abstract dataForManager(options: { game: Game; userID?: string }): THistoryDataForManager[T];
 }

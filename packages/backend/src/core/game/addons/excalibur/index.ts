@@ -1,5 +1,7 @@
 import { IGameAddon } from '@/core/game/addons/interface';
 import { Game } from '@/core/game';
+import { SwitchResult } from '@/core/game/addons/excalibur/switch-result';
+import { TMissionResult } from '@avalon/types';
 
 export class ExcaliburAddon implements IGameAddon {
   game: Game;
@@ -83,6 +85,8 @@ export class ExcaliburAddon implements IGameAddon {
 
     const selectedPlayer = this.game.selectedPlayers[0];
 
+    let switchResult: TMissionResult | undefined;
+
     if (selectedPlayer) {
       const mission = this.game.currentMission;
 
@@ -92,11 +96,16 @@ export class ExcaliburAddon implements IGameAddon {
         throw new Error('You cant use excalibur on player not on a mission');
       }
 
-      action.value = action.value === 'fail' ? 'success' : 'fail';
+      switchResult = action.value === 'fail' ? 'success' : 'fail';
+      action.value = switchResult;
       mission.finishMission();
 
       selectedPlayer.features.isSelected = false;
     }
+
+    const switchHistory = new SwitchResult(ownerOfExcalibur, selectedPlayer, switchResult);
+
+    this.game.history.push(switchHistory);
 
     ownerOfExcalibur.features.excalibur = false;
     ownerOfExcalibur.features.waitForAction = false;

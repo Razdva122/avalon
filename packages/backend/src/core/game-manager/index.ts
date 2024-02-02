@@ -29,14 +29,7 @@ export class GameManager {
       vote: this.game.turn,
       mission: this.game.round,
       settings: this.game.settings,
-      players: this.game.players.map((player) => {
-        return {
-          id: player.user.id,
-          name: player.user.name,
-          features: player.features,
-        };
-      }),
-      history: this.prepareHistoryForView(),
+      ...this.prepareHistoryAndPlayerForRoomState(),
       ...this.calculatePlayersRoles(this.game.stage),
     };
   }
@@ -57,21 +50,29 @@ export class GameManager {
 
     this.roomState.stage = this.game.stage;
 
-    this.roomState.players = this.game.players.map((player) => {
-      return {
-        id: player.user.id,
-        name: player.user.name,
-        features: player.features,
-      };
-    });
-
-    this.roomState.history = this.prepareHistoryForView();
+    this.roomState = {
+      ...this.roomState,
+      ...this.prepareHistoryAndPlayerForRoomState(),
+    };
 
     this.roomState.vote = this.game.turn;
 
     this.roomState.mission = this.game.round;
 
     this.sendNewStateToUsers();
+  }
+
+  prepareHistoryAndPlayerForRoomState(): Pick<TRoomState, 'history' | 'players'> {
+    return {
+      history: this.game.history.map((el) => el.dataForManager.bind(el)),
+      players: this.game.players.map((player) => {
+        return {
+          id: player.user.id,
+          name: player.user.name,
+          features: player.features,
+        };
+      }),
+    };
   }
 
   /**
@@ -126,25 +127,12 @@ export class GameManager {
   }
 
   /**
-   * Transforms the history data into a format for display
-   */
-  prepareHistoryForView() {
-    return this.game.history.map((el) => {
-      if (el.type === 'mission' && this.game.stage === 'end') {
-        return el.dataForManager({ withResult: true });
-      }
-
-      return el.dataForManager({});
-    });
-  }
-
-  /**
    * Transform a state of rooms into a state for a specific user
    *
-   * @param [userId] - the ID of the user to prepare the state for
+   * @param [userID] - the ID of the user to prepare the state for
    */
-  prepareStateForUser(userId?: string): IVisualGameState {
-    const roles = userId && this.roomState.roles[userId] ? this.roomState.roles[userId] : this.roomState.publicRoles;
+  prepareStateForUser(userID?: string): IVisualGameState {
+    const roles = userID && this.roomState.roles[userID] ? this.roomState.roles[userID] : this.roomState.publicRoles;
 
     return {
       uuid: this.roomState.uuid,
@@ -152,11 +140,11 @@ export class GameManager {
       vote: this.roomState.vote,
       mission: this.roomState.mission,
       settings: this.roomState.settings,
-      history: this.roomState.history,
+      history: this.roomState.history.map((el) => el({ game: this.game, userID })),
       players: this.roomState.players.map((player, index) => {
         const playerData: IPlayer = { ...player, role: roles[index] };
 
-        if (player.id === userId) {
+        if (player.id === userID) {
           playerData.validMissionsResult = this.game.players[index].role.validMissionResult;
         }
 

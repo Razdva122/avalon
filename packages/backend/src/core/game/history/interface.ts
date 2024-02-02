@@ -1,16 +1,17 @@
 import type { IVote } from '@/core/game/history/vote';
 import type { IMissionAction } from '@/core/game/history/mission';
-import type { IPlayerInGame } from '@/core/game';
+import type { IPlayerInGame, Game } from '@/core/game';
 import type {
   TAssassinateResult,
   TMissionResult,
   IMissionSettings,
   TVoteOption,
-  THistoryVote,
-  THistoryMission,
-  THistoryAssassinate,
+  IHistoryVote,
+  IHistoryMission,
+  IHistoryAssassinate,
+  ISwitchResult,
   TLoyalty,
-  TCheckLoyalty,
+  ICheckLoyalty,
 } from '@avalon/types';
 
 export type THistoryData = {
@@ -39,11 +40,22 @@ export type THistoryData = {
     inspected: IPlayerInGame;
     result: TLoyalty;
   };
+  switchResult: {
+    switcher: IPlayerInGame;
+    target?: IPlayerInGame;
+    result?: TMissionResult;
+  };
 };
 
 export type THistoryDataForManager = {
-  vote: THistoryVote;
-  mission: THistoryMission;
-  assassinate: THistoryAssassinate;
-  checkLoyalty: TCheckLoyalty;
+  vote: IHistoryVote;
+  mission: IHistoryMission;
+  assassinate: IHistoryAssassinate;
+  checkLoyalty: ICheckLoyalty;
+  switchResult: ISwitchResult;
+};
+
+export type TDataForManagerOptions = {
+  game: Game;
+  userID?: string;
 };
