@@ -39,6 +39,7 @@ export type THistoryData = {
     validator: IPlayerInGame;
     inspected: IPlayerInGame;
     result: TLoyalty;
+    realLoyalty: TLoyalty;
   };
   switchResult: {
     switcher: IPlayerInGame;

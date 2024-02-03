@@ -59,6 +59,7 @@ export interface ICheckLoyalty {
   validatorID: string;
   inspectedID: string;
   result: TLoyalty;
+  realLoyalty?: TLoyalty;
 }
 
 export interface ISwitchResult {

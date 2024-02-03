@@ -94,7 +94,7 @@ export class LadyOfLakeAddon implements IGameAddon {
 
     const selectedPlayer = this.game.selectedPlayers[0];
 
-    const loyaltyCheck = new CheckLoyalty(ownerOfLady, selectedPlayer, loyalty);
+    const loyaltyCheck = new CheckLoyalty(ownerOfLady, selectedPlayer, loyalty, selectedPlayer.role.loyalty);
 
     this.game.history.push(loyaltyCheck);
 

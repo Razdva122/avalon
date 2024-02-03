@@ -22,19 +22,19 @@ export class SwitchResult implements HistoryElement<'switchResult'> {
     const switcherID = this.data.switcher.user.id;
     const targetID = this.data.target?.user.id;
 
-    if (options.game.stage === 'end' || options.userID === targetID || options.userID === switcherID) {
-      return {
-        type: this.type,
-        result: this.data.result,
-        switcherID: this.data.switcher.user.id,
-        targetID: this.data.target?.user.id,
-      };
-    }
-
-    return {
+    const switchData = {
       type: this.type,
+      result: this.data.result,
       switcherID: this.data.switcher.user.id,
       targetID: this.data.target?.user.id,
     };
+
+    if (options.game.stage === 'end' || options.userID === targetID || options.userID === switcherID) {
+      return switchData;
+    }
+
+    delete switchData['result'];
+
+    return switchData;
   }
 }
