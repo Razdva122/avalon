@@ -1,93 +1,101 @@
 <template>
-  <div :title="role" class="player-role-icon" :class="'role-' + role"></div>
+  <div :title="icon" class="player-icon-image" :class="'icon-' + icon"></div>
 </template>
 
 <script lang="ts">
 import { TVisibleRole } from '@avalon/types';
 import { defineComponent, PropType } from 'vue';
 
+export type TPlayerIcon = TVisibleRole | 'excalibur';
+
 export default defineComponent({
   props: {
-    role: {
+    icon: {
       required: true,
-      type: String as PropType<TVisibleRole>,
+      type: String as PropType<TPlayerIcon>,
     },
   },
 });
 </script>
 
 <style scoped lang="scss">
-.player-role-icon {
+.player-icon-image {
   border-radius: 50%;
   background-size: 160%;
 }
 
-.role-merlin {
+.icon-merlin {
   background-image: url('@/assets/roles/merlin.png');
   background-position: 45% 0%;
 }
 
-.role-merlinPure {
+.icon-merlinPure {
   background-image: url('@/assets/roles/merlin_pure.png');
   background-position: 55% 0%;
 }
 
-.role-morgana {
+.icon-morgana {
   background-image: url('@/assets/roles/morgana.png');
   background-position: 47% 35%;
   background-size: 180%;
 }
 
-.role-percival {
+.icon-percival {
   background-image: url('@/assets/roles/percival.png');
   background-position: 50% 15%;
   background-size: 170%;
 }
 
-.role-mysteryWizard {
+.icon-mysteryWizard {
   background-image: url('@/assets/roles/mystery.png');
   background-position: 50% 5%;
 }
 
-.role-minion {
+.icon-minion {
   background-image: url('@/assets/roles/minion.png');
   background-position: 40% 0%;
   background-size: 150%;
 }
 
-.role-servant {
+.icon-servant {
   background-image: url('@/assets/roles/servant.png');
   background-position: 48% 25%;
   background-size: 150%;
 }
 
-.role-mordred {
+.icon-mordred {
   background-image: url('@/assets/roles/mordred.png');
   background-position: 45% 0%;
   background-size: 170%;
 }
 
-.role-oberon {
+.icon-oberon {
   background-image: url('@/assets/roles/oberon.png');
   background-position: 54% 50%;
   background-size: 154%;
 }
 
-.role-evil {
+.icon-evil {
   background-image: url('@/assets/red_team_no_background.png');
   background-position: 50% 52%;
   background-size: 135%;
 }
 
-.role-good {
+.icon-good {
   background-image: url('@/assets/blue_team_no_background.png');
   background-position: 50% 52%;
   background-size: 100%;
 }
 
-.role-unknown {
+.icon-unknown {
   background-image: url('@/assets/player-frame.png');
   background-position: center;
   background-size: 135%;
+}
+
+.icon-excalibur {
+  background-image: url('@/assets/features/excalibur.png');
+  background-position: center;
+  background-size: 100%;
 }
 </style>

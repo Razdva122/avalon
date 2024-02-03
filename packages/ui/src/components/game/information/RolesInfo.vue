@@ -16,7 +16,7 @@
       </div>
       <v-divider :thickness="3" class="mt-1 mb-1 w-100"></v-divider>
       <template v-if="selectedRole">
-        <Role class="big-role mt-4 mb-4" :class="'role-loyalty-' + roleInfo.loyalty" :role="selectedRole" />
+        <PlayerIcon class="big-role mt-4 mb-4" :class="'role-loyalty-' + roleInfo.loyalty" :icon="selectedRole" />
         <div class="role-info">{{ roleInfo.info }}</div>
         <div v-if="roleInfo.loyalty" :class="'icon-loyalty-' + roleInfo.loyalty"></div>
       </template>
@@ -24,18 +24,18 @@
         <div class="loyalty-container" v-if="mode === 'real'" v-for="loyalty in ['good', 'evil'] as const">
           <div v-for="role in gameRoles[loyalty]">
             <div class="role-name">{{ role }}</div>
-            <Role @click="selectRole(role)" class="role" :class="'role-loyalty-' + loyalty" :role="role" />
+            <PlayerIcon @click="selectRole(role)" class="role" :class="'role-loyalty-' + loyalty" :icon="role" />
           </div>
           <v-divider v-if="loyalty === 'good'" :thickness="2" class="mt-2 mb-2"></v-divider>
         </div>
         <div class="loyalty-container" v-else>
           <div v-for="role in visibleRolesInfo">
             <div class="role-name">{{ role.name }}</div>
-            <Role
+            <PlayerIcon
               @click="selectRole(role.name)"
               class="role"
               :class="'role-loyalty-' + role.loyalty"
-              :role="role.name"
+              :icon="role.name"
             />
           </div>
         </div>
@@ -56,12 +56,12 @@
 <script lang="ts">
 import type { TGameRoles, TVisibleRole } from '@avalon/types';
 import { defineComponent, PropType } from 'vue';
-import Role from '@/components/game/information/Role.vue';
+import PlayerIcon from '@/components/game/information/PlayerIcon.vue';
 import { rolesShortInfo } from '@/components/game/information/const';
 
 export default defineComponent({
   components: {
-    Role,
+    PlayerIcon,
   },
   props: {
     gameRoles: {

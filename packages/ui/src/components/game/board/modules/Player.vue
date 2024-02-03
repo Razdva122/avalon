@@ -2,7 +2,7 @@
   <div class="player-container" :class="playerClasses" @click="$emit('playerClick', player.id)">
     <img class="player-frame" alt="frame" src="@/assets/player-frame.png" />
     <div class="player-icon"></div>
-    <Role v-if="'role' in player" class="role-container" :role="player.role" />
+    <PlayerIcon v-if="'role' in player" class="role-container" :icon="player.role" />
     <img class="player-crown" alt="crown" src="@/assets/crown.png" />
     <div class="player-actions-features">
       <img class="lady-of-lake" alt="lady" src="@/assets/features/lady_of_lake.png" />
@@ -19,15 +19,19 @@ import * as _ from 'lodash';
 import { defineComponent, PropType, inject } from 'vue';
 import type { IPlayerWithVote, TRoomPlayer, THistoryResults } from '@avalon/types';
 import { roomStateKey } from '@/pages/room/const';
-import Role from '@/components/game/information/Role.vue';
+import PlayerIcon, { TPlayerIcon } from '@/components/game/information/PlayerIcon.vue';
+
+interface IFrontendPlayer extends Omit<IPlayerWithVote, 'role'> {
+  role: TPlayerIcon;
+}
 
 export default defineComponent({
   components: {
-    Role,
+    PlayerIcon,
   },
   props: {
     playerState: {
-      type: Object as PropType<IPlayerWithVote | TRoomPlayer>,
+      type: Object as PropType<IFrontendPlayer | TRoomPlayer>,
       required: true,
     },
     visibleHistory: {
@@ -35,7 +39,7 @@ export default defineComponent({
     },
   },
   computed: {
-    player(): IPlayerWithVote | TRoomPlayer {
+    player(): IFrontendPlayer | TRoomPlayer {
       const clone = _.cloneDeep(this.playerState);
       const roomState = inject(roomStateKey)!;
 
@@ -54,8 +58,6 @@ export default defineComponent({
           clone.features.isSent = userVote.onMission;
           clone.features.vote = userVote.value;
           clone.features.waitForAction = false;
-
-          return clone;
         }
 
         if (this.visibleHistory?.type === 'checkLoyalty' && this.visibleHistory.result) {
@@ -71,8 +73,21 @@ export default defineComponent({
           if (clone.id === this.visibleHistory.validatorID) {
             clone.features.waitForAction = true;
           }
+        }
 
-          return clone;
+        if (this.visibleHistory?.type === 'switchResult' && this.visibleHistory.targetID) {
+          if (clone.features.isLeader) {
+            clone.features.waitForAction = false;
+          }
+
+          if (clone.id === this.visibleHistory.targetID) {
+            clone.role = 'excalibur';
+            clone.features.isSelected = true;
+          }
+
+          if (clone.id === this.visibleHistory.switcherID) {
+            clone.features.waitForAction = true;
+          }
         }
       }
 

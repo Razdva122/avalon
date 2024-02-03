@@ -122,7 +122,11 @@ export default defineComponent({
       if ('game' in roomState.value) {
         const lastElement = _.last(roomState.value.game.history);
 
-        if (lastElement?.type === 'vote' || (lastElement?.type === 'checkLoyalty' && lastElement.result)) {
+        if (
+          lastElement?.type === 'vote' ||
+          (lastElement?.type === 'checkLoyalty' && lastElement.result) ||
+          (lastElement?.type === 'switchResult' && lastElement.targetID)
+        ) {
           const timeoutTime = 10000;
           visibleHistory.value = lastElement;
           timerDuration.value = timeoutTime;

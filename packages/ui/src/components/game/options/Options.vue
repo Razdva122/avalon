@@ -10,7 +10,7 @@
       <v-form>
         <h2>Roles</h2>
         <div class="option" v-for="role in rolesSettings">
-          <Role class="role" :role="role.role" />
+          <PlayerIcon class="role" :icon="role.role" />
           <v-checkbox
             :disabled="role.disabled"
             v-model="roles[role.role]"
@@ -34,12 +34,12 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import Role from '@/components/game/information/Role.vue';
+import PlayerIcon from '@/components/game/information/PlayerIcon.vue';
 import type { TGameOptionsRoles, TGameOptionsAddons } from '@avalon/types';
 
 export default defineComponent({
   components: {
-    Role,
+    PlayerIcon,
   },
   props: {
     roles: {
