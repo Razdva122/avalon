@@ -5,12 +5,8 @@
     </template>
     <template v-else>
       <v-btn v-if="displayRestartButton" @click="restartGame">Restart game</v-btn>
-      <Board />
-      <RolesInfo
-        v-if="roomState.stage === 'started'"
-        :game-roles="roomState.game.settings.roles"
-        :visible-roles="visibleRoles"
-      />
+      <Board :room-state="roomState as unknown as TAvailableRoomStateRef" />
+      <RolesInfo v-if="roomState.stage === 'started'" :game-roles="game.settings.roles" :visible-roles="visibleRoles" />
     </template>
   </div>
 </template>
@@ -19,10 +15,10 @@
 import { useRouter } from 'vue-router';
 import { defineComponent, ref, provide, Ref, computed } from 'vue';
 import Board from '@/components/game/board/Board.vue';
-import type { TRoomState, TVisibleRole } from '@avalon/types';
+import type { TRoomState, TVisibleRole, IVisualGameState } from '@avalon/types';
 import { socket } from '@/api/socket';
-import { roomStateKey, TAvailableRoomState } from '@/pages/room/const';
-import { mutateRoomGameForPosition } from '@/pages/room/helpers';
+import { gameStateKey, TPageRoomStateRef, TAvailableRoomStateRef } from '@/pages/room/const';
+import { mutateRoomGameForPosition, mutateRoomState } from '@/pages/room/helpers';
 import { useStore } from '@/store';
 import RolesInfo from '@/components/game/information/RolesInfo.vue';
 
@@ -39,12 +35,18 @@ export default defineComponent({
     },
   },
   async setup(props) {
-    let roomState = ref() as Ref<TRoomState>;
+    let roomState = ref() as TPageRoomStateRef;
     const alert = ref<boolean>(true);
     const store = useStore();
     const router = useRouter();
 
-    provide(roomStateKey, <TAvailableRoomState>roomState);
+    const game = computed(() => {
+      if (roomState.value.stage === 'started') {
+        return roomState.value.gameStates[roomState.value.pointer];
+      }
+    }) as Ref<IVisualGameState>;
+
+    provide(gameStateKey, game);
 
     const initState = async (uuid: string) => {
       const stateFromBackend = await socket.emitWithAck('joinRoom', uuid);
@@ -64,7 +66,7 @@ export default defineComponent({
         mutateRoomGameForPosition(state.game, userID);
       }
 
-      roomState.value = state;
+      mutateRoomState({ roomState, newRoomState: state });
     }
 
     socket.on('roomUpdated', (state) => {
@@ -74,7 +76,7 @@ export default defineComponent({
     socket.on('gameUpdated', (game) => {
       if (roomState.value.stage === 'started') {
         mutateRoomGameForPosition(game, userID);
-        roomState.value.game = game;
+        mutateRoomState({ roomState, newGameState: game });
       }
     });
 
@@ -84,11 +86,7 @@ export default defineComponent({
     });
 
     const displayRestartButton = computed(() => {
-      return (
-        roomState.value.stage === 'started' &&
-        roomState.value.game.stage === 'end' &&
-        roomState.value.leaderID === userID
-      );
+      return roomState.value.stage === 'started' && game.value.stage === 'end' && roomState.value.leaderID === userID;
     });
 
     const restartGame = () => {
@@ -99,7 +97,7 @@ export default defineComponent({
 
     const visibleRoles = computed(() => {
       if (roomState.value.stage === 'started') {
-        return roomState.value.game.players.reduce<TVisibleRole[]>((acc, el) => {
+        return game.value.players.reduce<TVisibleRole[]>((acc, el) => {
           if (!acc.includes(el.role)) {
             acc.push(el.role);
           }
@@ -116,6 +114,7 @@ export default defineComponent({
       displayRestartButton,
       visibleRoles,
       alert,
+      game,
       restartGame,
     };
   },

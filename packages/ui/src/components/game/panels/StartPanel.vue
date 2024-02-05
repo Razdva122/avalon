@@ -18,9 +18,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, computed, ref } from 'vue';
+import { defineComponent, computed, ref, PropType, toRefs } from 'vue';
 import { useStore } from '@/store';
-import { roomStateKey } from '@/pages/room/const';
+import { TAvailableRoomStateRef } from '@/pages/room/const';
 import { socket } from '@/api/socket';
 import type { TGameOptionsRoles, TGameOptionsAddons } from '@avalon/types';
 import Options from '@/components/game/options/Options.vue';
@@ -30,8 +30,14 @@ export default defineComponent({
   components: {
     Options,
   },
-  setup() {
-    const roomState = inject(roomStateKey)!;
+  props: {
+    roomState: {
+      type: Object as PropType<TAvailableRoomStateRef>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const { roomState } = toRefs(props);
     const store = useStore();
     const roles = ref<TGameOptionsRoles>({
       merlinPure: 0,

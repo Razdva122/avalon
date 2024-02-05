@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent, inject, Ref, ref } from 'vue';
 import { socket } from '@/api/socket';
-import { roomStateKey } from '@/pages/room/const';
+import { gameStateKey } from '@/pages/room/const';
 import { TLoyalty } from '@avalon/types';
 import Spoiler from '@/components/feedback/Spoiler.vue';
 
@@ -22,12 +22,12 @@ export default defineComponent({
     Spoiler,
   },
   async setup() {
-    const roomState = inject(roomStateKey)!;
+    const gameState = inject(gameStateKey)!;
     const loyalty = ref() as Ref<TLoyalty>;
-    loyalty.value = await socket.emitWithAck('getLoyalty', roomState.value.roomID);
+    loyalty.value = await socket.emitWithAck('getLoyalty', gameState.value.uuid);
 
     const announceLoyalty = (loyalty: TLoyalty) => {
-      socket.emit('announceLoyalty', roomState.value.roomID, loyalty);
+      socket.emit('announceLoyalty', gameState.value.uuid, loyalty);
     };
 
     return {

@@ -18,7 +18,7 @@
 import * as _ from 'lodash';
 import { defineComponent, PropType, inject } from 'vue';
 import type { IPlayerWithVote, TRoomPlayer, THistoryResults } from '@avalon/types';
-import { roomStateKey } from '@/pages/room/const';
+import { gameStateKey } from '@/pages/room/const';
 import PlayerIcon, { TPlayerIcon } from '@/components/game/information/PlayerIcon.vue';
 
 interface IFrontendPlayer extends Omit<IPlayerWithVote, 'role'> {
@@ -41,10 +41,10 @@ export default defineComponent({
   computed: {
     player(): IFrontendPlayer | TRoomPlayer {
       const clone = _.cloneDeep(this.playerState);
-      const roomState = inject(roomStateKey)!;
+      const gameState = inject(gameStateKey)!;
 
       if ('features' in clone) {
-        const isGameEnded = roomState.value.stage === 'started' && roomState.value.game.stage === 'end';
+        const isGameEnded = gameState.value.stage === 'end';
 
         if (this.$store.state.hideSpoilers && !isGameEnded) {
           clone.role = 'unknown';

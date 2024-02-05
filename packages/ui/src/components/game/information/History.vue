@@ -86,8 +86,8 @@
             <span v-if="historyEl.realLoyalty">
               is
               <span :class="historyEl.realLoyalty === 'evil' ? 'text-error' : 'text-success'">
-                {{ historyEl.realLoyalty }}</span
-              >
+                {{ historyEl.realLoyalty }}
+              </span>
             </span>
           </div>
           <div>
@@ -100,9 +100,9 @@
             <b>{{ calculateNameByID(historyEl.switcherID) }}</b> use excalibur to switch
             <b>{{ calculateNameByID(historyEl.targetID) }}</b> action
             <template v-if="historyEl.result">
-              <span :class="historyEl.result === 'fail' ? 'text-error' : 'text-success'"
-                >to {{ historyEl.result }}</span
-              >
+              <span :class="historyEl.result === 'fail' ? 'text-error' : 'text-success'">
+                to {{ historyEl.result }}
+              </span>
             </template>
           </div>
           <div v-else>

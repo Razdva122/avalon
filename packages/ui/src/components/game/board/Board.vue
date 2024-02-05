@@ -5,19 +5,14 @@
     <div class="actions-container d-flex flex-column justify-center">
       <template v-if="roomState.stage !== 'started'">
         <div class="button-panel d-flex flex-column align-center">
-          <StartPanel />
+          <StartPanel :room-state="roomState as unknown as TAvailableRoomStateRef" />
         </div>
       </template>
       <template v-else>
-        <template v-if="roomState.game.stage === 'announceLoyalty' && playerInGame?.features.ladyOfLake === 'has'">
+        <template v-if="gameState.stage === 'announceLoyalty' && playerInGame?.features.ladyOfLake === 'has'">
           <AnnounceLoyalty />
         </template>
-        <Game
-          v-else
-          :game="roomState.game"
-          :inGamePanel="Boolean(playerInGame)"
-          :visible-history="visibleHistory"
-        ></Game>
+        <Game v-else :game="gameState" :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory"></Game>
       </template>
     </div>
     <div
@@ -38,7 +33,7 @@
 
 <script lang="ts">
 import * as _ from 'lodash';
-import { defineComponent, computed, inject, watch, ref } from 'vue';
+import { defineComponent, computed, inject, watch, ref, PropType, toRefs } from 'vue';
 import Player from '@/components/game/board/modules/Player.vue';
 import Timer from '@/components/feedback/Timer.vue';
 import Game from '@/components/game/board/modules/Game.vue';
@@ -47,7 +42,7 @@ import AnnounceLoyalty from './modules/AnnounceLoyalty.vue';
 import { THistoryResults } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
-import { roomStateKey } from '@/pages/room/const';
+import { gameStateKey, TAvailableRoomStateRef } from '@/pages/room/const';
 
 export default defineComponent({
   name: 'Board',
@@ -58,21 +53,26 @@ export default defineComponent({
     Timer,
     AnnounceLoyalty,
   },
-  setup() {
-    const roomState = inject(roomStateKey)!;
+  props: {
+    roomState: {
+      type: Object as PropType<TAvailableRoomStateRef>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const { roomState } = toRefs(props);
+    const gameState = inject(gameStateKey)!;
     const store = useStore();
     const visibleHistory = ref<THistoryResults>();
     const timerDuration = ref(0);
 
     const playerInGame = computed(() => {
-      if (roomState.value.stage === 'started') {
-        return roomState.value.game.players.find((player) => player.id === store.state.user?.id);
-      }
+      return gameState.value.players.find((player) => player.id === store.state.user?.id);
     });
 
     const players = computed(() => {
       if (roomState.value.stage === 'started') {
-        return roomState.value.game.players;
+        return gameState.value.players;
       }
 
       return roomState.value.players;
@@ -101,41 +101,40 @@ export default defineComponent({
       }
 
       const userCanSelect =
-        (roomState.value.game.stage === 'selectTeam' && playerInGame.value?.features.isLeader) ||
-        (roomState.value.game.stage === 'giveExcalibur' && playerInGame.value?.features.isLeader) ||
-        (roomState.value.game.stage === 'selectMerlin' && playerInGame.value?.features.isAssassin) ||
-        (roomState.value.game.stage === 'useExcalibur' && playerInGame.value?.features.excalibur) ||
-        (roomState.value.game.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfLake === 'has');
+        (gameState.value.stage === 'selectTeam' && playerInGame.value?.features.isLeader) ||
+        (gameState.value.stage === 'giveExcalibur' && playerInGame.value?.features.isLeader) ||
+        (gameState.value.stage === 'selectMerlin' && playerInGame.value?.features.isAssassin) ||
+        (gameState.value.stage === 'useExcalibur' && playerInGame.value?.features.excalibur) ||
+        (gameState.value.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfLake === 'has');
 
       if (userCanSelect) {
-        socket.emit('selectPlayer', roomState.value.roomID, uuid);
+        socket.emit('selectPlayer', gameState.value.uuid, uuid);
       }
     };
 
     const gameHistoryLength = computed(() => {
-      if (roomState.value.stage === 'started') {
-        return roomState.value.game.history.length;
+      if (gameState.value) {
+        return gameState.value.history.length;
       }
     });
 
     watch(gameHistoryLength, () => {
-      if ('game' in roomState.value) {
-        const lastElement = _.last(roomState.value.game.history);
+      const lastElement = _.last(gameState.value.history);
 
-        if (
-          lastElement?.type === 'vote' ||
-          (lastElement?.type === 'checkLoyalty' && lastElement.result) ||
-          (lastElement?.type === 'switchResult' && lastElement.targetID)
-        ) {
-          const timeoutTime = 10000;
-          visibleHistory.value = lastElement;
-          timerDuration.value = timeoutTime;
-        }
+      if (
+        lastElement?.type === 'vote' ||
+        (lastElement?.type === 'checkLoyalty' && lastElement.result) ||
+        (lastElement?.type === 'switchResult' && lastElement.targetID)
+      ) {
+        const timeoutTime = 10000;
+        visibleHistory.value = lastElement;
+        timerDuration.value = timeoutTime;
       }
     });
 
     return {
       roomState,
+      gameState,
       players,
       playerInGame,
       visibleHistory,
