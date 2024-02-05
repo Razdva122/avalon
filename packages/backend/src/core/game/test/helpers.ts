@@ -118,7 +118,7 @@ export class GameTestHelper {
     return this;
   }
 
-  giveExcalibur(giveExcalibur: true | string): this {
+  giveExcalibur(giveExcalibur: true | string = true): this {
     const playerToExcalibur =
       giveExcalibur === true
         ? this.game.players.find((player) => player.features.isSent && !player.features.isLeader)

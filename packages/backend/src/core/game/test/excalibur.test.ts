@@ -17,7 +17,7 @@ describe('Excalibur logic', () => {
   });
 
   test('Give excalibur to player', () => {
-    gameHelper.giveExcalibur(true);
+    gameHelper.giveExcalibur();
 
     expect(game.stage).toBe('votingForTeam');
     expect(game.players.filter((player) => player.features.excalibur).length).toBe(1);
@@ -54,11 +54,17 @@ describe('Excalibur logic', () => {
     expect(game.missions[1].data.result).toBe('success');
   });
 
+  test('Reject voting excalibur should be expired', () => {
+    gameHelper.selectPlayersOnMission().sentSelectedPlayers().giveExcalibur().makeVotes(game.players.length);
+
+    expect(game.players.filter((player) => player.features.excalibur).length).toBe(0);
+  });
+
   test('Game should ended but excalibur save game', () => {
     gameHelper
       .selectPlayersOnMission(1)
       .sentSelectedPlayers()
-      .giveExcalibur(true)
+      .giveExcalibur()
       .makeVotes()
       .makeActions(1)
       .useExcalibur(false);
@@ -69,7 +75,7 @@ describe('Excalibur logic', () => {
     gameHelper
       .selectPlayersOnMission(2)
       .sentSelectedPlayers()
-      .giveExcalibur(true)
+      .giveExcalibur()
       .makeVotes()
       .makeActions(2)
       .useExcalibur(true, false);
@@ -82,7 +88,7 @@ describe('Excalibur logic', () => {
     gameHelper
       .selectPlayersOnMission()
       .sentSelectedPlayers()
-      .giveExcalibur(true)
+      .giveExcalibur()
       .makeVotes()
       .makeActions()
       .useExcalibur(true, true);

@@ -28,6 +28,14 @@ export class ExcaliburAddon implements IGameAddon {
     return false;
   }
 
+  afterVoteForTeam() {
+    if (this.game.stage !== 'onMission') {
+      this.game.players.forEach((player) => (player.features.excalibur = false));
+    }
+
+    return true;
+  }
+
   beforeEndMission() {
     const playerWithExcalibur = this.game.players.find((player) => player.features.excalibur)!;
     playerWithExcalibur.features.waitForAction = true;

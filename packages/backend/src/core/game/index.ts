@@ -449,6 +449,10 @@ export class Game extends GameHooks {
         this.history.push(this.vote);
         this.nextVote();
       }
+
+      if (!this.callHook('afterVoteForTeam')) {
+        return;
+      }
     }
 
     this.stateObserver.gameStateChanged();
