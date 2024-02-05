@@ -1,6 +1,6 @@
 <template>
   <div class="board-container mt-16">
-    <img class="game-board" alt="board" src="@/assets/board.png" />
+    <div class="game-board" alt="board"></div>
     <Timer class="timer" @timerEnd="clearHistoryElement" :duration="timerDuration" />
     <div class="actions-container d-flex flex-column justify-center">
       <template v-if="roomState.stage !== 'started'">
@@ -166,7 +166,12 @@ export default defineComponent({
 }
 
 .game-board {
+  background-image: url('@/assets/board.png');
   width: 600px;
+  height: 600px;
+  background-position: center;
+  border-radius: 50%;
+  background-size: 137%;
 }
 
 .player-container {
