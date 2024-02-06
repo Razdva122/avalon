@@ -14,13 +14,13 @@
 
 <script lang="ts">
 import { useRouter } from 'vue-router';
-import { defineComponent, ref, provide, Ref, computed } from 'vue';
+import { defineComponent, ref, provide, computed } from 'vue';
 import Board from '@/components/game/board/Board.vue';
-import type { TRoomState, TVisibleRole, IVisualGameState } from '@avalon/types';
+import type { TVisibleRole } from '@avalon/types';
 import { socket } from '@/api/socket';
-import { gameStateKey, TPageRoomStateRef, TAvailableRoomStateRef } from '@/pages/room/const';
-import { mutateRoomGameForPosition, mutateRoomState } from '@/pages/room/helpers';
+import { gameStateKey, TAvailableRoomStateRef } from '@/pages/room/const';
 import { useStore } from '@/store';
+import { GameStateManager } from '@/pages/room/game-state-manager';
 import RolesInfo from '@/components/game/information/RolesInfo.vue';
 
 export default defineComponent({
@@ -36,48 +36,32 @@ export default defineComponent({
     },
   },
   async setup(props) {
-    let roomState = ref() as TPageRoomStateRef;
+    const stateManager = new GameStateManager();
     const alert = ref<boolean>(true);
     const store = useStore();
     const router = useRouter();
 
-    const game = computed(() => {
-      if (roomState.value.stage === 'started') {
-        return roomState.value.gameStates[roomState.value.pointer];
-      }
-    }) as Ref<IVisualGameState>;
+    const roomState = stateManager.state;
+    const game = stateManager.game;
 
     provide(gameStateKey, game);
 
+    const userID = store.state.user?.id;
+
     const initState = async (uuid: string) => {
       const stateFromBackend = await socket.emitWithAck('joinRoom', uuid);
-      syncState(stateFromBackend);
+      stateManager.mutateRoomState({ newRoomState: stateFromBackend, userID });
     };
 
     await initState(props.uuid);
 
-    const userID = store.state.user?.id;
-
-    function syncState(state: TRoomState) {
-      if (state.stage !== 'unavailable') {
-        mutateRoomGameForPosition(state, userID);
-      }
-
-      if ('game' in state) {
-        mutateRoomGameForPosition(state.game, userID);
-      }
-
-      mutateRoomState({ roomState, newRoomState: state });
-    }
-
     socket.on('roomUpdated', (state) => {
-      syncState(state);
+      stateManager.mutateRoomState({ newRoomState: state, userID });
     });
 
     socket.on('gameUpdated', (game) => {
       if (roomState.value.stage === 'started') {
-        mutateRoomGameForPosition(game, userID);
-        mutateRoomState({ roomState, newGameState: game });
+        stateManager.mutateRoomState({ newGameState: game, userID });
       }
     });
 
