@@ -14,13 +14,12 @@
 
 <script lang="ts">
 import { useRouter } from 'vue-router';
-import { defineComponent, ref, provide, computed } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import Board from '@/components/game/board/Board.vue';
 import type { TVisibleRole } from '@avalon/types';
 import { socket } from '@/api/socket';
-import { gameStateKey, TAvailableRoomStateRef } from '@/pages/room/const';
 import { useStore } from '@/store';
-import { GameStateManager } from '@/pages/room/game-state-manager';
+import { GameStateManager, TAvailableRoomStateRef } from '@/pages/room/game-state-manager';
 import RolesInfo from '@/components/game/information/RolesInfo.vue';
 
 export default defineComponent({
@@ -43,8 +42,6 @@ export default defineComponent({
 
     const roomState = stateManager.state;
     const game = stateManager.game;
-
-    provide(gameStateKey, game);
 
     const userID = store.state.user?.id;
 

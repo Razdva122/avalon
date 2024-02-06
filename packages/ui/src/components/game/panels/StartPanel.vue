@@ -20,7 +20,7 @@
 <script lang="ts">
 import { defineComponent, computed, ref, PropType, toRefs } from 'vue';
 import { useStore } from '@/store';
-import { TAvailableRoomStateRef } from '@/pages/room/const';
+import { TAvailableRoomStateRef } from '@/pages/room/game-state-manager';
 import { socket } from '@/api/socket';
 import type { TGameOptionsRoles, TGameOptionsAddons } from '@avalon/types';
 import Options from '@/components/game/options/Options.vue';

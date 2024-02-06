@@ -10,7 +10,13 @@
         </div>
       </template>
       <template v-else>
-        <template v-if="gameState.stage === 'announceLoyalty' && playerInGame?.features.ladyOfLake === 'has'">
+        <template
+          v-if="
+            gameState.stage === 'announceLoyalty' &&
+            playerInGame?.features.ladyOfLake === 'has' &&
+            visibleHistory?.type !== 'checkLoyalty'
+          "
+        >
           <AnnounceLoyalty />
         </template>
         <Game v-else :game="gameState" :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory"></Game>
@@ -43,7 +49,7 @@ import AnnounceLoyalty from './modules/AnnounceLoyalty.vue';
 import { THistoryResults } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
-import { gameStateKey, TAvailableRoomStateRef } from '@/pages/room/const';
+import { gameStateKey, stateManagerKey, TAvailableRoomStateRef } from '@/pages/room/game-state-manager';
 
 export default defineComponent({
   name: 'Board',
@@ -63,6 +69,7 @@ export default defineComponent({
   setup(props) {
     const { roomState } = toRefs(props);
     const gameState = inject(gameStateKey)!;
+    const stateManager = inject(stateManagerKey)!;
     const store = useStore();
     const visibleHistory = ref<THistoryResults>();
     const timerDuration = ref(0);
@@ -90,6 +97,7 @@ export default defineComponent({
     const clearHistoryElement = () => {
       visibleHistory.value = undefined;
       timerDuration.value = 0;
+      stateManager.moveToNextStage();
     };
 
     const onPlayerClick = (uuid: string) => {
@@ -122,14 +130,18 @@ export default defineComponent({
     watch(gameHistoryLength, () => {
       const lastElement = _.last(gameState.value.history);
 
-      if (
-        lastElement?.type === 'vote' ||
-        (lastElement?.type === 'checkLoyalty' && lastElement.result) ||
-        (lastElement?.type === 'switchResult' && lastElement.targetID)
-      ) {
-        const timeoutTime = 10000;
-        visibleHistory.value = lastElement;
-        timerDuration.value = timeoutTime;
+      if (lastElement) {
+        if (
+          lastElement.type === 'vote' ||
+          (lastElement.type === 'checkLoyalty' && lastElement.result) ||
+          (lastElement.type === 'switchResult' && lastElement.targetID)
+        ) {
+          const timeoutTime = 10000;
+          visibleHistory.value = lastElement;
+          timerDuration.value = timeoutTime;
+        } else {
+          stateManager.moveToNextStage();
+        }
       }
     });
 

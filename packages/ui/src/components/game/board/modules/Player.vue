@@ -18,7 +18,7 @@
 import * as _ from 'lodash';
 import { defineComponent, PropType, inject } from 'vue';
 import type { IPlayerWithVote, TRoomPlayer, THistoryResults } from '@avalon/types';
-import { gameStateKey } from '@/pages/room/const';
+import { gameStateKey } from '@/pages/room/game-state-manager';
 import PlayerIcon, { TPlayerIcon } from '@/components/game/information/PlayerIcon.vue';
 
 interface IFrontendPlayer extends Omit<IPlayerWithVote, 'role'> {
@@ -53,40 +53,19 @@ export default defineComponent({
         if (this.visibleHistory?.type === 'vote') {
           const userVote = this.visibleHistory.votes.find((player) => player.playerID === clone.id)!;
 
-          clone.features.isLeader = this.visibleHistory.leaderID === clone.id;
-          clone.features.isSelected = false;
-          clone.features.isSent = userVote.onMission;
           clone.features.vote = userVote.value;
           clone.features.waitForAction = false;
         }
 
         if (this.visibleHistory?.type === 'checkLoyalty' && this.visibleHistory.result) {
-          if (clone.features.isLeader) {
-            clone.features.waitForAction = false;
-          }
-
           if (clone.id === this.visibleHistory.inspectedID) {
             clone.role = this.visibleHistory.result;
-            clone.features.isSelected = true;
-          }
-
-          if (clone.id === this.visibleHistory.validatorID) {
-            clone.features.waitForAction = true;
           }
         }
 
         if (this.visibleHistory?.type === 'switchResult' && this.visibleHistory.targetID) {
-          if (clone.features.isLeader) {
-            clone.features.waitForAction = false;
-          }
-
           if (clone.id === this.visibleHistory.targetID) {
             clone.role = 'excalibur';
-            clone.features.isSelected = true;
-          }
-
-          if (clone.id === this.visibleHistory.switcherID) {
-            clone.features.waitForAction = true;
           }
         }
       }

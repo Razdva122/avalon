@@ -1,6 +1,11 @@
-import type { TPageRoomStateRef } from '@/pages/room/const';
 import type { IVisualGameState, TRoomState, TAvailableRoom } from '@avalon/types';
-import { Ref, computed, ref } from 'vue';
+import { Ref, computed, ref, provide, InjectionKey } from 'vue';
+import { TPageRoomStateRef } from '@/pages/room/game-state-manager/interface';
+
+export const gameStateKey = Symbol() as InjectionKey<Ref<IVisualGameState>>;
+export const stateManagerKey = Symbol() as InjectionKey<GameStateManager>;
+
+export * from '@/pages/room/game-state-manager/interface';
 
 export class GameStateManager {
   state: TPageRoomStateRef;
@@ -14,6 +19,9 @@ export class GameStateManager {
         return this.state.value.gameStates[this.state.value.pointer];
       }
     }) as Ref<IVisualGameState>;
+
+    provide(gameStateKey, this.game);
+    provide(stateManagerKey, this);
   }
 
   moveToNextStage(): void {
@@ -73,7 +81,6 @@ export class GameStateManager {
             this.state.value.gameStates.length,
           );
           this.state.value.gameStates.push(newGameState);
-          this.moveToNextStage();
         }
       }
     }
