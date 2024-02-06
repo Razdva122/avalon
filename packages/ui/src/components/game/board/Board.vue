@@ -5,7 +5,8 @@
     <div class="actions-container d-flex flex-column justify-center">
       <template v-if="roomState.stage !== 'started'">
         <div class="button-panel d-flex flex-column align-center">
-          <StartPanel :room-state="roomState as unknown as TAvailableRoomStateRef" />
+          <!-- prettier-ignore -->
+          <StartPanel :room-state="(roomState as unknown as TAvailableRoomStateRef)" />
         </div>
       </template>
       <template v-else>
