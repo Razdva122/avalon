@@ -5,7 +5,8 @@
     </template>
     <template v-else>
       <v-btn v-if="displayRestartButton" @click="restartGame">Restart game</v-btn>
-      <Board :room-state="roomState as unknown as TAvailableRoomStateRef" />
+      <!-- prettier-ignore -->
+      <Board :room-state="(roomState as unknown as TAvailableRoomStateRef)" />
       <RolesInfo v-if="roomState.stage === 'started'" :game-roles="game.settings.roles" :visible-roles="visibleRoles" />
     </template>
   </div>
