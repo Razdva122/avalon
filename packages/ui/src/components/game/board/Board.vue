@@ -19,7 +19,7 @@
         >
           <AnnounceLoyalty />
         </template>
-        <Game v-else :game="gameState" :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory"></Game>
+        <Game v-else :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory" />
       </template>
     </div>
     <div
@@ -31,7 +31,7 @@
       <Player
         :player-state="player"
         :visible-history="visibleHistory"
-        :style="{ transform: 'translateY(-50%) ' + calculateRotate(i, true) }"
+        :style="{ transform: calculateRotate(i, true), translate: '0 -50%' }"
         @player-click="onPlayerClick"
       />
     </div>
@@ -196,6 +196,7 @@ export default defineComponent({
   top: 0;
   width: 600px;
   height: 600px;
+  transition: transform 0.5s;
 }
 
 .button-panel > button {

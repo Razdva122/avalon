@@ -10,6 +10,7 @@ export * from '@/pages/room/game-state-manager/interface';
 export class GameStateManager {
   state: TPageRoomStateRef;
   game: Ref<IVisualGameState>;
+  viewMode: Ref<'live' | 'history'> = ref('live');
 
   constructor() {
     this.state = ref() as TPageRoomStateRef;
@@ -82,6 +83,17 @@ export class GameStateManager {
           );
           this.state.value.gameStates.push(newGameState);
         }
+      }
+    }
+  }
+
+  toggleViewMode(): void {
+    if (this.state.value.stage === 'started') {
+      if (this.viewMode.value === 'history') {
+        this.viewMode.value = 'live';
+        this.state.value.pointer = this.state.value.gameStates.length - 1;
+      } else {
+        this.viewMode.value = 'history';
       }
     }
   }

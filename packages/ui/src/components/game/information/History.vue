@@ -1,5 +1,5 @@
 <template>
-  <v-btn @click="overlay = !overlay" class="mb-8">
+  <v-btn @click="overlay = !overlay" class="mr-2">
     <template v-slot:prepend>
       <span class="material-icons"> history </span>
     </template>
