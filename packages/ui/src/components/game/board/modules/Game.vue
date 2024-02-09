@@ -1,12 +1,12 @@
 <template>
   <div>
     <template v-if="gameState.history.length">
-      <div class="mb-8 d-flex flex-row justify-center text-white align-center">
+      <div class="mb-8 d-flex flex-row justify-center text-white align-center history-actions">
         <template v-if="stateManager.viewMode.value === 'live'">
           <History :history="gameState.history" :players="gameState.players" />
           <v-btn
             @click="() => stateManager.toggleViewMode()"
-            class="pause-icon"
+            class="action-icon"
             density="comfortable"
             icon="pause_circle_outline"
             variant="plain"
@@ -14,10 +14,30 @@
           ></v-btn>
         </template>
         <template v-else>
-          <div class="mr-2">History mode</div>
+          <v-btn
+            @click="stateManager.moveToPrevStage()"
+            :disabled="roomState.pointer === 0"
+            class="action-icon navigate-icon"
+            density="comfortable"
+            icon="navigate_before"
+            size="large"
+            variant="text"
+            color="yellow"
+          ></v-btn>
+          <div class="history-hint">History mode</div>
+          <v-btn
+            @click="stateManager.moveToNextStage()"
+            :disabled="roomState.pointer === roomState.gameStates.length - 1"
+            class="action-icon navigate-icon"
+            density="comfortable"
+            icon="navigate_next"
+            size="large"
+            variant="text"
+            color="yellow"
+          ></v-btn>
           <v-btn
             @click="() => stateManager.toggleViewMode()"
-            class="pause-icon"
+            class="action-icon"
             density="comfortable"
             icon="play_circle_outline"
             variant="plain"
@@ -31,7 +51,7 @@
     </div>
     <div class="text-white mb-4">Vote stage: {{ gameState.vote + 1 }} / 5</div>
     <div class="button-panel mb-4 d-flex flex-column align-center">
-      <InGamePanel v-if="inGamePanel && !visibleHistory" :game="gameState" />
+      <InGamePanel v-if="inGamePanel && !visibleHistory && stateManager.viewMode.value === 'live'" :game="gameState" />
     </div>
     <div class="teams text-white font-weight-bold">
       <span class="text-info">{{ gameState.settings.players.good }}</span> vs
@@ -69,6 +89,7 @@ export default defineComponent({
   setup() {
     const gameState = inject(gameStateKey)!;
     const stateManager = inject(stateManagerKey)!;
+    const roomState = stateManager.getStartedRoomState();
 
     const missions = computed(() => {
       const missions: IMissionWithResult[] = _.cloneDeep(gameState.value.settings.missions);
@@ -87,6 +108,7 @@ export default defineComponent({
       missions,
       gameState,
       stateManager,
+      roomState,
     };
   },
 });
@@ -97,7 +119,19 @@ export default defineComponent({
   font-size: larger;
 }
 
-.pause-icon {
+.action-icon {
   font-size: 24px;
+}
+
+.navigate-icon {
+  font-size: 30px;
+}
+
+.history-hint {
+  width: 100px;
+}
+
+.history-actions {
+  height: 44px;
 }
 </style>

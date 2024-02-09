@@ -12,6 +12,7 @@
       <template v-else>
         <template
           v-if="
+            stateManager.viewMode.value === 'live' &&
             gameState.stage === 'announceLoyalty' &&
             playerInGame?.features.ladyOfLake === 'has' &&
             visibleHistory?.type !== 'checkLoyalty'
@@ -127,21 +128,36 @@ export default defineComponent({
       }
     });
 
-    watch(gameHistoryLength, () => {
-      const lastElement = _.last(gameState.value.history);
+    watch(gameHistoryLength, (newLength) => {
+      if (!newLength) {
+        return;
+      }
 
-      if (lastElement) {
-        if (
-          lastElement.type === 'vote' ||
-          (lastElement.type === 'checkLoyalty' && lastElement.result) ||
-          (lastElement.type === 'switchResult' && lastElement.targetID)
-        ) {
+      const lastElement = _.last(gameState.value.history)!;
+      const isVisibleElement =
+        lastElement.type === 'vote' ||
+        (lastElement.type === 'checkLoyalty' && lastElement.result) ||
+        (lastElement.type === 'switchResult' && lastElement.targetID);
+
+      if (isVisibleElement) {
+        visibleHistory.value = lastElement;
+
+        if (stateManager.viewMode.value === 'live') {
           const timeoutTime = 10000;
-          visibleHistory.value = lastElement;
           timerDuration.value = timeoutTime;
-        } else {
-          stateManager.moveToNextStage();
         }
+      } else {
+        if (stateManager.viewMode.value === 'live') {
+          stateManager.moveToNextStage();
+        } else {
+          visibleHistory.value = undefined;
+        }
+      }
+    });
+
+    watch(stateManager.viewMode, (newViewMode) => {
+      if (newViewMode === 'live') {
+        visibleHistory.value = undefined;
       }
     });
 
@@ -151,6 +167,7 @@ export default defineComponent({
       players,
       playerInGame,
       visibleHistory,
+      stateManager,
 
       timerDuration,
       clearHistoryElement,

@@ -1,5 +1,5 @@
 <template>
-  <v-btn @click="overlay = !overlay" class="mr-2">
+  <v-btn @click="overlay = !overlay" class="mr-2 history-button">
     <template v-slot:prepend>
       <span class="material-icons"> history </span>
     </template>
@@ -142,6 +142,10 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.history-button {
+  width: 180px;
+}
+
 .history {
   background-color: white;
   width: 400px;

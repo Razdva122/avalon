@@ -1,6 +1,8 @@
-import type { IVisualGameState, TRoomState, TAvailableRoom } from '@avalon/types';
+import * as _ from 'lodash';
+
+import type { IVisualGameState, TRoomState, TAvailableRoom, THistoryResults } from '@avalon/types';
 import { Ref, computed, ref, provide, InjectionKey } from 'vue';
-import { TPageRoomStateRef } from '@/pages/room/game-state-manager/interface';
+import { TPageRoomStateRef, TStartedPageRoomState } from '@/pages/room/game-state-manager/interface';
 
 export const gameStateKey = Symbol() as InjectionKey<Ref<IVisualGameState>>;
 export const stateManagerKey = Symbol() as InjectionKey<GameStateManager>;
@@ -27,7 +29,21 @@ export class GameStateManager {
 
   moveToNextStage(): void {
     if (this.state.value.stage === 'started') {
+      if (this.state.value.pointer === this.state.value.gameStates.length - 1) {
+        return;
+      }
+
       this.state.value.pointer += 1;
+    }
+  }
+
+  moveToPrevStage(): void {
+    if (this.state.value.stage === 'started') {
+      if (this.state.value.pointer === 0) {
+        return;
+      }
+
+      this.state.value.pointer -= 1;
     }
   }
 
@@ -63,8 +79,11 @@ export class GameStateManager {
         this.state.value = {
           ...newRoomState,
           pointer: 0,
-          gameStates: [game],
+          gameStates: [],
         };
+
+        this.generateGameStatesFromHistory(this.state.value.gameStates, game.history, game);
+        this.state.value.pointer = this.state.value.gameStates.length - 1;
       } else {
         this.state.value = {
           ...newRoomState,
@@ -76,14 +95,25 @@ export class GameStateManager {
       if (this.state.value.gameStates.length - 1 === newGameState.history.length) {
         this.state.value.gameStates[this.state.value.gameStates.length - 1] = newGameState;
       } else {
-        while (this.state.value.gameStates.length - 1 !== newGameState.history.length) {
-          this.state.value.gameStates[this.state.value.gameStates.length - 1].history = newGameState.history.slice(
-            0,
-            this.state.value.gameStates.length,
-          );
-          this.state.value.gameStates.push(newGameState);
-        }
+        this.generateGameStatesFromHistory(this.state.value.gameStates, newGameState.history, newGameState);
       }
+    }
+  }
+
+  generateGameStatesFromHistory(
+    gameStates: IVisualGameState[],
+    history: THistoryResults[],
+    newState: IVisualGameState,
+  ): void {
+    while (gameStates.length - 1 !== history.length) {
+      const state = _.cloneDeep(newState);
+      const prevState = gameStates[gameStates.length - 1];
+
+      if (prevState) {
+        prevState.history = history.slice(0, gameStates.length);
+      }
+
+      gameStates.push(state);
     }
   }
 
@@ -96,6 +126,14 @@ export class GameStateManager {
         this.viewMode.value = 'history';
       }
     }
+  }
+
+  getStartedRoomState(): Ref<TStartedPageRoomState> {
+    if (this.state.value.stage !== 'started') {
+      throw new Error('You cant get started room state');
+    }
+
+    return this.state as Ref<TStartedPageRoomState>;
   }
 
   protected mutateRoomGameForPosition<T extends TAvailableRoom | IVisualGameState>(roomOrGame: T, userID?: string): T {
