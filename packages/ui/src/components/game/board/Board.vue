@@ -128,11 +128,7 @@ export default defineComponent({
       }
     });
 
-    watch(gameHistoryLength, (newLength) => {
-      if (!newLength) {
-        return;
-      }
-
+    const lastVisibleElement = computed(() => {
       const lastElement = _.last(gameState.value.history)!;
       const isVisibleElement =
         lastElement.type === 'vote' ||
@@ -140,16 +136,45 @@ export default defineComponent({
         (lastElement.type === 'switchResult' && lastElement.targetID);
 
       if (isVisibleElement) {
-        visibleHistory.value = lastElement;
+        return lastElement;
+      }
+    });
 
-        if (stateManager.viewMode.value === 'live') {
-          const timeoutTime = 10000;
-          timerDuration.value = timeoutTime;
-        }
+    watch(gameHistoryLength, (newLength) => {
+      if (!newLength || stateManager.viewMode.value === 'history') {
+        return;
+      }
+
+      if (lastVisibleElement.value) {
+        visibleHistory.value = lastVisibleElement.value;
+        const timeoutTime = 10000;
+        timerDuration.value = timeoutTime;
       } else {
-        if (stateManager.viewMode.value === 'live') {
-          stateManager.moveToNextStage();
-        } else {
+        stateManager.moveToNextStage();
+      }
+    });
+
+    const gamePointer = computed(() => {
+      if (roomState.value.stage !== 'started') {
+        return 0;
+      }
+
+      return roomState.value.pointer;
+    });
+
+    watch(gamePointer, (pointer) => {
+      if (stateManager.viewMode.value === 'live') {
+        return;
+      }
+
+      if (lastVisibleElement.value) {
+        visibleHistory.value = lastVisibleElement.value;
+      } else {
+        visibleHistory.value = undefined;
+      }
+
+      if (stateManager.state.value.stage === 'started') {
+        if (pointer === stateManager.state.value.gameStates.length - 1) {
           visibleHistory.value = undefined;
         }
       }
@@ -157,6 +182,7 @@ export default defineComponent({
 
     watch(stateManager.viewMode, (newViewMode) => {
       if (newViewMode === 'live') {
+        timerDuration.value = 0;
         visibleHistory.value = undefined;
       }
     });

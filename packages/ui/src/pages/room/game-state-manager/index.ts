@@ -120,15 +120,15 @@ export class GameStateManager {
   toggleViewMode(): void {
     if (this.state.value.stage === 'started') {
       if (this.viewMode.value === 'history') {
-        this.viewMode.value = 'live';
         this.state.value.pointer = this.state.value.gameStates.length - 1;
+        this.viewMode.value = 'live';
       } else {
         this.viewMode.value = 'history';
       }
     }
   }
 
-  getStartedRoomState(): Ref<TStartedPageRoomState> {
+  get startedRoomState(): Ref<TStartedPageRoomState> {
     if (this.state.value.stage !== 'started') {
       throw new Error('You cant get started room state');
     }

@@ -1,5 +1,5 @@
 <template>
-  <div class="lobby ma-5">
+  <div class="lobby">
     <v-btn color="info" @click="createRoom"> Create room </v-btn>
   </div>
 </template>
@@ -17,3 +17,12 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped lang="scss">
+.lobby {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+</style>

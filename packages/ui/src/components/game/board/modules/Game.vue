@@ -96,7 +96,7 @@ export default defineComponent({
   setup() {
     const gameState = inject(gameStateKey)!;
     const stateManager = inject(stateManagerKey)!;
-    const roomState = stateManager.getStartedRoomState();
+    const roomState = stateManager.startedRoomState;
 
     const missions = computed(() => {
       const missions: IMissionWithResult[] = _.cloneDeep(gameState.value.settings.missions);
@@ -112,7 +112,7 @@ export default defineComponent({
     });
 
     const historyTextArray = computed(() => {
-      const roomState = stateManager.getStartedRoomState();
+      const roomState = stateManager.startedRoomState;
 
       function calculateTextFromPointer(pointer: number): string | undefined {
         if (pointer > roomState.value.gameStates.length - 1 || pointer < 0) {
