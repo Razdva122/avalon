@@ -1,8 +1,8 @@
 <template>
   <div>
     <template v-if="gameState.history.length">
-      <div class="mb-8 d-flex flex-row justify-center text-white align-center history-actions">
-        <template v-if="stateManager.viewMode.value === 'live'">
+      <div class="mb-8 d-flex flex-column justify-end text-white history-actions">
+        <div class="mb-1" v-if="stateManager.viewMode.value === 'live'">
           <History :history="gameState.history" :players="gameState.players" />
           <v-btn
             @click="() => stateManager.toggleViewMode()"
@@ -12,37 +12,44 @@
             variant="plain"
             color="white"
           ></v-btn>
-        </template>
+        </div>
         <template v-else>
-          <v-btn
-            @click="stateManager.moveToPrevStage()"
-            :disabled="roomState.pointer === 0"
-            class="action-icon navigate-icon"
-            density="comfortable"
-            icon="navigate_before"
-            size="large"
-            variant="text"
-            color="yellow"
-          ></v-btn>
-          <div class="history-hint">History mode</div>
-          <v-btn
-            @click="stateManager.moveToNextStage()"
-            :disabled="roomState.pointer === roomState.gameStates.length - 1"
-            class="action-icon navigate-icon"
-            density="comfortable"
-            icon="navigate_next"
-            size="large"
-            variant="text"
-            color="yellow"
-          ></v-btn>
-          <v-btn
-            @click="() => stateManager.toggleViewMode()"
-            class="action-icon"
-            density="comfortable"
-            icon="play_circle_outline"
-            variant="plain"
-            color="white"
-          ></v-btn>
+          <div class="d-flex align-center justify-center">
+            <div class="history-text left-text text-grey">{{ historyTextArray[0] }}</div>
+            <div class="history-text">{{ historyTextArray[1] }}</div>
+            <div class="history-text right-text text-grey">{{ historyTextArray[2] }}</div>
+          </div>
+          <div class="d-flex flex-row justify-center align-center">
+            <v-btn
+              @click="stateManager.moveToPrevStage()"
+              :disabled="roomState.pointer === 0"
+              class="action-icon navigate-icon"
+              density="comfortable"
+              icon="navigate_before"
+              size="large"
+              variant="text"
+              color="yellow"
+            ></v-btn>
+            <div class="history-hint">History mode</div>
+            <v-btn
+              @click="stateManager.moveToNextStage()"
+              :disabled="roomState.pointer === roomState.gameStates.length - 1"
+              class="action-icon navigate-icon"
+              density="comfortable"
+              icon="navigate_next"
+              size="large"
+              variant="text"
+              color="yellow"
+            ></v-btn>
+            <v-btn
+              @click="() => stateManager.toggleViewMode()"
+              class="action-icon"
+              density="comfortable"
+              icon="play_circle_outline"
+              variant="plain"
+              color="white"
+            ></v-btn>
+          </div>
         </template>
       </div>
     </template>
@@ -104,11 +111,44 @@ export default defineComponent({
       return missions;
     });
 
+    const historyTextArray = computed(() => {
+      const roomState = stateManager.getStartedRoomState();
+
+      function calculateTextFromPointer(pointer: number): string | undefined {
+        if (pointer > roomState.value.gameStates.length - 1 || pointer < 0) {
+          return;
+        }
+
+        if (pointer === roomState.value.gameStates.length - 1) {
+          return 'Live';
+        }
+
+        const historyText: { [key in THistoryResults['type']]: string } = {
+          vote: 'Vote',
+          checkLoyalty: 'Lady',
+          mission: 'Mission',
+          assassinate: 'Assassinate',
+          switchResult: 'Excalibur',
+        };
+
+        const lastElement = _.last(roomState.value.gameStates[pointer].history)!;
+
+        return historyText[lastElement.type];
+      }
+
+      return [
+        calculateTextFromPointer(roomState.value.pointer - 1),
+        calculateTextFromPointer(roomState.value.pointer),
+        calculateTextFromPointer(roomState.value.pointer + 1),
+      ];
+    });
+
     return {
       missions,
       gameState,
       stateManager,
       roomState,
+      historyTextArray,
     };
   },
 });
@@ -132,6 +172,21 @@ export default defineComponent({
 }
 
 .history-actions {
-  height: 44px;
+  height: 68px;
+}
+
+.history-text {
+  flex: 1;
+  text-align: center;
+  font-size: 20px;
+  display: inline-block;
+}
+
+.left-text {
+  text-align: end;
+}
+
+.right-text {
+  text-align: start;
 }
 </style>
