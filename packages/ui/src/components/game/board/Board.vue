@@ -185,8 +185,10 @@ export default defineComponent({
 
     watch(stateManager.viewMode, (newViewMode) => {
       if (newViewMode === 'live') {
-        timerDuration.value = 0;
-        visibleHistory.value = undefined;
+        nextTick(() => {
+          timerDuration.value = 0;
+          visibleHistory.value = undefined;
+        });
       }
     });
 
