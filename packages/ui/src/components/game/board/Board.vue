@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import * as _ from 'lodash';
-import { defineComponent, computed, inject, watch, ref, PropType, toRefs } from 'vue';
+import { defineComponent, computed, inject, watch, ref, PropType, toRefs, nextTick } from 'vue';
 import Player from '@/components/game/board/modules/Player.vue';
 import Timer from '@/components/feedback/Timer.vue';
 import Game from '@/components/game/board/modules/Game.vue';
@@ -133,7 +133,8 @@ export default defineComponent({
       const isVisibleElement =
         lastElement.type === 'vote' ||
         (lastElement.type === 'checkLoyalty' && lastElement.result) ||
-        (lastElement.type === 'switchResult' && lastElement.targetID);
+        (lastElement.type === 'switchResult' && lastElement.targetID) ||
+        lastElement.type === 'mission';
 
       if (isVisibleElement) {
         return lastElement;
@@ -146,9 +147,11 @@ export default defineComponent({
       }
 
       if (lastVisibleElement.value) {
-        visibleHistory.value = lastVisibleElement.value;
-        const timeoutTime = 10000;
-        timerDuration.value = timeoutTime;
+        nextTick(() => {
+          visibleHistory.value = lastVisibleElement.value;
+          const timeoutTime = 10000;
+          timerDuration.value = timeoutTime;
+        });
       } else {
         stateManager.moveToNextStage();
       }

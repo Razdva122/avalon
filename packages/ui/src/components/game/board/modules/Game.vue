@@ -60,6 +60,14 @@
     <div class="button-panel mb-4 d-flex flex-column align-center">
       <InGamePanel v-if="inGamePanel && !visibleHistory && stateManager.viewMode.value === 'live'" :game="gameState" />
     </div>
+    <div class="d-flex flex-row align-center justify-center mb-4" v-if="visibleHistory?.type === 'mission'">
+      <template v-for="i in visibleHistory.settings.players">
+        <div
+          class="mission-result-element"
+          :class="'icon-loyalty-' + (i <= visibleHistory.fails ? 'evil' : 'good')"
+        ></div>
+      </template>
+    </div>
     <div class="teams text-white font-weight-bold">
       <span class="text-info">{{ gameState.settings.players.good }}</span> vs
       <span class="text-error">{{ gameState.settings.players.evil }}</span>
@@ -188,5 +196,23 @@ export default defineComponent({
 
 .right-text {
   text-align: start;
+}
+.mission-result-element {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.icon-loyalty-good {
+  background-image: url('@/assets/blue_team_no_background.png');
+  border: 2px solid rgb(var(--v-theme-info));
+  background-size: contain;
+}
+
+.icon-loyalty-evil {
+  background-image: url('@/assets/red_team_no_background.png');
+  border: 2px solid rgb(var(--v-theme-error));
+  background-size: contain;
 }
 </style>
