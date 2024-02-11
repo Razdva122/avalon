@@ -1,6 +1,6 @@
 <template>
   <div class="board-container mt-16">
-    <div class="game-board" alt="board"></div>
+    <div class="game-board" alt="board" :class="'game-end-' + gameResult"></div>
     <Timer class="timer" @timerEnd="clearHistoryElement" :duration="timerDuration" />
     <div class="actions-container d-flex flex-column justify-center">
       <template v-if="roomState.stage !== 'started'">
@@ -32,6 +32,7 @@
       <Player
         :player-state="player"
         :visible-history="visibleHistory"
+        :current-stage="roomState.stage === 'started' ? gameState.stage : undefined"
         :style="{ transform: calculateRotate(i, true), translate: '0 -50%' }"
         @player-click="onPlayerClick"
       />
@@ -40,7 +41,6 @@
 </template>
 
 <script lang="ts">
-import * as _ from 'lodash';
 import { defineComponent, computed, inject, watch, ref, PropType, toRefs, nextTick } from 'vue';
 import Player from '@/components/game/board/modules/Player.vue';
 import Timer from '@/components/feedback/Timer.vue';
@@ -51,6 +51,7 @@ import { THistoryResults } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { gameStateKey, stateManagerKey, TAvailableRoomStateRef } from '@/pages/room/game-state-manager';
+import { calculateVisualElement } from '@/components/game/board/helpers';
 
 export default defineComponent({
   name: 'Board',
@@ -129,16 +130,7 @@ export default defineComponent({
     });
 
     const lastVisibleElement = computed(() => {
-      const lastElement = _.last(gameState.value.history)!;
-      const isVisibleElement =
-        lastElement.type === 'vote' ||
-        (lastElement.type === 'checkLoyalty' && lastElement.result) ||
-        (lastElement.type === 'switchResult' && lastElement.targetID) ||
-        lastElement.type === 'mission';
-
-      if (isVisibleElement) {
-        return lastElement;
-      }
+      return calculateVisualElement(gameState.value.history);
     });
 
     watch(gameHistoryLength, (newLength) => {
@@ -146,11 +138,10 @@ export default defineComponent({
         return;
       }
 
-      if (lastVisibleElement.value) {
+      if (lastVisibleElement.value.element && lastVisibleElement.value.timeout > 0) {
         nextTick(() => {
-          visibleHistory.value = lastVisibleElement.value;
-          const timeoutTime = 10000;
-          timerDuration.value = timeoutTime;
+          visibleHistory.value = lastVisibleElement.value.element;
+          timerDuration.value = lastVisibleElement.value.timeout;
         });
       } else {
         stateManager.moveToNextStage();
@@ -170,8 +161,8 @@ export default defineComponent({
         return;
       }
 
-      if (lastVisibleElement.value) {
-        visibleHistory.value = lastVisibleElement.value;
+      if (lastVisibleElement.value.element) {
+        visibleHistory.value = lastVisibleElement.value.element;
       } else {
         visibleHistory.value = undefined;
       }
@@ -192,6 +183,12 @@ export default defineComponent({
       }
     });
 
+    const gameResult = computed(() => {
+      if (roomState.value.stage === 'started') {
+        return gameState.value.winner;
+      }
+    });
+
     return {
       roomState,
       gameState,
@@ -199,6 +196,7 @@ export default defineComponent({
       playerInGame,
       visibleHistory,
       stateManager,
+      gameResult,
 
       timerDuration,
       clearHistoryElement,
@@ -233,6 +231,24 @@ export default defineComponent({
   background-position: center;
   border-radius: 50%;
   background-size: 137%;
+}
+
+.game-end-evil {
+  box-shadow:
+    rgba(255, 25, 25, 0.4) 8px 8px,
+    rgba(255, 25, 25, 0.3) 16px 16px,
+    rgba(255, 25, 25, 0.2) 24px 24px,
+    rgba(255, 25, 25, 0.1) 32px 32px,
+    rgba(255, 25, 25, 0.05) 40px 40px;
+}
+
+.game-end-good {
+  box-shadow:
+    rgba(0, 85, 184, 0.4) 8px 8px,
+    rgba(0, 85, 184, 0.3) 16px 16px,
+    rgba(0, 85, 184, 0.2) 24px 24px,
+    rgba(0, 85, 184, 0.1) 32px 32px,
+    rgba(0, 85, 184, 0.05) 40px 40px;
 }
 
 .player-container {

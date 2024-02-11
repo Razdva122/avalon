@@ -17,7 +17,7 @@
 <script lang="ts">
 import * as _ from 'lodash';
 import { defineComponent, PropType, inject } from 'vue';
-import type { IPlayerWithVote, TRoomPlayer, THistoryResults } from '@avalon/types';
+import type { IPlayerWithVote, TRoomPlayer, THistoryResults, Dictionary, TGameStage } from '@avalon/types';
 import { gameStateKey } from '@/pages/room/game-state-manager';
 import PlayerIcon, { TPlayerIcon } from '@/components/game/information/PlayerIcon.vue';
 
@@ -36,6 +36,9 @@ export default defineComponent({
     },
     visibleHistory: {
       type: Object as PropType<THistoryResults>,
+    },
+    currentStage: {
+      type: String as PropType<TGameStage>,
     },
   },
   computed: {
@@ -79,19 +82,35 @@ export default defineComponent({
     },
 
     playerClasses() {
-      if ('features' in this.player) {
-        return Object.entries(this.player.features).reduce<{ [key: string]: boolean }>((acc, [key, value]) => {
-          if (typeof value === 'string') {
-            acc[`player-feature-${key}-${value}`] = true;
-          } else {
-            acc[`player-feature-${key}`] = value;
-          }
+      let classes: Dictionary<string | boolean> = {};
 
-          return acc;
-        }, {});
+      if ('features' in this.player) {
+        classes = {
+          ...Object.entries(this.player.features).reduce<{ [key: string]: boolean }>((acc, [key, value]) => {
+            if (typeof value === 'string') {
+              acc[`player-feature-${key}-${value}`] = true;
+            } else {
+              acc[`player-feature-${key}`] = value;
+            }
+
+            return acc;
+          }, {}),
+          ...classes,
+        };
+
+        if (
+          this.currentStage === 'checkLoyalty' ||
+          (this.currentStage === 'announceLoyalty' && this.player.features.ladyOfLake === 'has')
+        ) {
+          classes['player-lady-active'] = true;
+        }
+
+        if (this.currentStage === 'useExcalibur' && this.player.features.excalibur) {
+          classes['player-excalibur-active'] = true;
+        }
       }
 
-      return {};
+      return classes;
     },
   },
 });
@@ -238,5 +257,10 @@ export default defineComponent({
 
 .player-feature-excalibur .excalibur {
   display: block;
+}
+
+.player-excalibur-active .excalibur,
+.player-lady-active .lady-of-lake {
+  border-color: rgba(65, 105, 225, 0.8);
 }
 </style>
