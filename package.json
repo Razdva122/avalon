@@ -11,7 +11,7 @@
     "test": "npm run test --workspace=packages/backend",
     "build:ui": "NODE_ENV=production npm run build --workspace=packages/ui",
     "start:backend": "NODE_ENV=production npm run start --workspace=packages/backend",
-    "version": "npm run test && npm version $npm_package_version --no-git-tag-version --workspaces && git add . && npm run image:build",
+    "version": "docker version && npm run test && npm version $npm_package_version --no-git-tag-version --workspaces && git add . && npm run image:build",
     "image:ui": "docker build --tag razdva12/nginx-avalon:V$npm_package_version --file ui.Dockerfile . && docker push razdva12/nginx-avalon:V$npm_package_version",
     "image:backend": "docker build --tag razdva12/backend-avalon:V$npm_package_version --file backend.Dockerfile . && docker push razdva12/backend-avalon:V$npm_package_version",
     "image:build": "npm run image:ui && npm run image:backend"

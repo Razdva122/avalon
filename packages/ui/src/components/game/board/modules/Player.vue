@@ -68,6 +68,11 @@ export default defineComponent({
             clone.role = 'excalibur';
           }
         }
+
+        if (this.visibleHistory?.type === 'mission') {
+          clone.features.waitForAction = false;
+          clone.features.isSelected = false;
+        }
       }
 
       return clone;

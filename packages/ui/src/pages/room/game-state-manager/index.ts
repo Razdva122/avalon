@@ -105,15 +105,21 @@ export class GameStateManager {
     history: THistoryResults[],
     newState: IVisualGameState,
   ): void {
+    const prevState = gameStates[gameStates.length - 1];
+
     while (gameStates.length - 1 !== history.length) {
       const state = _.cloneDeep(newState);
-      const prevState = gameStates[gameStates.length - 1];
+      const prevStateClone = _.cloneDeep(prevState);
 
-      if (prevState) {
-        prevState.history = history.slice(0, gameStates.length);
+      if (gameStates[gameStates.length - 1]) {
+        gameStates[gameStates.length - 1].history = history.slice(0, gameStates.length);
       }
 
-      gameStates.push(state);
+      if (gameStates.length === history.length) {
+        gameStates.push(state);
+      } else {
+        gameStates.push(prevStateClone);
+      }
     }
   }
 
