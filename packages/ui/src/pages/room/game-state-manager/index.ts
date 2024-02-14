@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import type { IVisualGameState, TRoomState, TAvailableRoom, THistoryResults } from '@avalon/types';
+import type { IVisualGameState, TRoomState, TAvailableRoom, THistoryResults, TGameStage } from '@avalon/types';
 import { Ref, computed, ref, provide, InjectionKey } from 'vue';
 import { TPageRoomStateRef, TStartedPageRoomState } from '@/pages/room/game-state-manager/interface';
 
@@ -105,7 +105,7 @@ export class GameStateManager {
     history: THistoryResults[],
     newState: IVisualGameState,
   ): void {
-    const prevState = gameStates[gameStates.length - 1];
+    const prevState = gameStates[gameStates.length - 1] ?? newState;
 
     while (gameStates.length - 1 !== history.length) {
       const state = _.cloneDeep(newState);
@@ -113,6 +113,9 @@ export class GameStateManager {
 
       if (gameStates[gameStates.length - 1]) {
         gameStates[gameStates.length - 1].history = history.slice(0, gameStates.length);
+        gameStates[gameStates.length - 1].stage = this.getStageFromHistory(
+          _.last(gameStates[gameStates.length - 1].history)!,
+        );
       }
 
       if (gameStates.length === history.length) {
@@ -121,6 +124,18 @@ export class GameStateManager {
         gameStates.push(prevStateClone);
       }
     }
+  }
+
+  getStageFromHistory(history: THistoryResults): TGameStage {
+    return (
+      {
+        vote: 'votingForTeam',
+        assassinate: 'selectMerlin',
+        checkLoyalty: 'useExcalibur',
+        mission: 'onMission',
+        switchResult: 'useExcalibur',
+      } as const
+    )[history.type];
   }
 
   toggleViewMode(): void {
