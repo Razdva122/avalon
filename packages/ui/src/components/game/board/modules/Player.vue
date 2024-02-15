@@ -164,23 +164,23 @@ export default defineComponent({
   left: 16px;
 }
 
-.player-name {
-  width: 125px;
-}
-
 .player-frame {
   width: 115px;
+  height: 115px;
+  margin-bottom: 10px;
 }
 
 .player-name {
+  width: 115px;
   @include text-overflow(1);
   background-image: url('@/assets/name-frame.png');
-  background-size: contain;
+  background-size: 100% 100%;
   color: white;
+  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.5)) drop-shadow(-1px 1px 0 rgba(0, 0, 0, 0.5))
+    drop-shadow(1px -1px 0 rgba(0, 0, 0, 0.5)) drop-shadow(-1px -1px 0 rgba(0, 0, 0, 0.5));
 }
 
-.player-icon,
-.player-name {
+.player-icon {
   border-width: 6px;
   border-style: solid;
   border-color: rgba(0, 0, 0, 0);
@@ -209,7 +209,8 @@ export default defineComponent({
 }
 
 .player-feature-waitForAction .player-name {
-  border-color: rgba(65, 105, 225, 0.8);
+  filter: drop-shadow(2px 2px 0 rgba(65, 105, 225, 0.8)) drop-shadow(-2px 2px 0 rgba(65, 105, 225, 0.8))
+    drop-shadow(2px -2px 0 rgba(65, 105, 225, 0.8)) drop-shadow(-2px -2px 0 rgba(65, 105, 225, 0.8));
 }
 
 .player-feature-isAssassin .player-name {
