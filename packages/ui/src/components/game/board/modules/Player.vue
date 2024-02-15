@@ -75,6 +75,14 @@ export default defineComponent({
         if (this.visibleHistory?.type === 'mission') {
           clone.features.waitForAction = false;
           clone.features.isSelected = false;
+
+          const switchedAction = this.visibleHistory.actions.find(
+            (action) => action.playerID === clone.id && action.switched === true,
+          );
+
+          if (switchedAction) {
+            clone.role = 'excalibur';
+          }
         }
       }
 

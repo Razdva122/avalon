@@ -83,6 +83,7 @@ export type TVote = {
  */
 export interface IAction {
   playerID: string;
+  switched?: boolean;
 }
 
 /**

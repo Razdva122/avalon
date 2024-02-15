@@ -82,6 +82,23 @@ export class Mission implements HistoryElement<'mission'> {
     return false;
   }
 
+  switchAction(player: IPlayerInGame): TMissionResult {
+    const action = this.data.actions.find((el) => el.player === player);
+
+    if (action === undefined) {
+      throw new Error(`Player dont make action in this mission`);
+    }
+
+    if (action.value === 'unvoted') {
+      throw new Error(`You cant switch unvoted result`);
+    }
+
+    action.value = action.value === 'fail' ? 'success' : 'fail';
+    action.switched = true;
+
+    return action.value;
+  }
+
   finishMission() {
     this.stage = 'finished';
     const fails = this.data.actions.filter((action) => action.value === 'fail').length;
@@ -102,11 +119,12 @@ export class Mission implements HistoryElement<'mission'> {
         if (options.game.stage === 'end') {
           return {
             playerID: action.player.user.id,
+            switched: action.switched,
             value: action.value,
           };
         }
 
-        return { playerID: action.player.user.id };
+        return { playerID: action.player.user.id, switched: action.switched };
       }),
     };
   }

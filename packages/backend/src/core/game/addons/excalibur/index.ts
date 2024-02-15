@@ -98,14 +98,7 @@ export class ExcaliburAddon implements IGameAddon {
     if (selectedPlayer) {
       const mission = this.game.currentMission;
 
-      const action = mission.data.actions.find((action) => action.player === selectedPlayer);
-
-      if (!action) {
-        throw new Error('You cant use excalibur on player not on a mission');
-      }
-
-      switchResult = action.value === 'fail' ? 'success' : 'fail';
-      action.value = switchResult;
+      switchResult = mission.switchAction(selectedPlayer);
       mission.finishMission();
 
       selectedPlayer.features.isSelected = false;
