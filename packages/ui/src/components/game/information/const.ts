@@ -33,6 +33,14 @@ export const rolesShortInfo: { [key in TVisibleRole]: { loyalty: TLoyalty | 'unk
     loyalty: 'evil',
     info: 'Minion of Mordred',
   },
+  isolde: {
+    loyalty: 'good',
+    info: 'Knows Tristan, must remain hidden',
+  },
+  tristan: {
+    loyalty: 'good',
+    info: 'Knows Isolde, must remain hidden',
+  },
   evil: {
     loyalty: 'evil',
     info: 'Evil player with an unknown role',

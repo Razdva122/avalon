@@ -75,6 +75,18 @@ export default defineComponent({
   background-size: 154%;
 }
 
+.icon-tristan {
+  background-image: url('@/assets/roles/tristan.png');
+  background-position: 40% 5%;
+  background-size: 145%;
+}
+
+.icon-isolde {
+  background-image: url('@/assets/roles/isolde.png');
+  background-position: 53% 0%;
+  background-size: 165%;
+}
+
 .icon-evil {
   background-image: url('@/assets/red_team_no_background.png');
   background-position: 50% 52%;

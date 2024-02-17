@@ -8,13 +8,8 @@ export class Morgana extends Character {
   loyalty: TLoyalty = 'evil';
 
   visibility: TVisibility = {
-    servant: 'unknown',
     minion: 'evil',
-    merlin: 'unknown',
-    merlinPure: 'unknown',
     morgana: 'evil',
-    oberon: 'unknown',
     mordred: 'evil',
-    percival: 'unknown',
   };
 }

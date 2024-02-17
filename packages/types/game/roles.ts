@@ -12,7 +12,7 @@ export type TUnknownRoles = 'unknown' | 'mysteryWizard';
 /**
  * Good optional roles
  */
-export type TGoodOptionalRoles = 'merlin' | 'percival' | 'merlinPure';
+export type TGoodOptionalRoles = 'merlin' | 'percival' | 'merlinPure' | 'tristan' | 'isolde';
 
 /**
  * Good required roles

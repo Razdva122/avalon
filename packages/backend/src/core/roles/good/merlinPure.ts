@@ -8,13 +8,8 @@ export class MerlinPure extends Character {
   loyalty: TLoyalty = 'good';
 
   visibility: TVisibility = {
-    merlinPure: 'unknown',
-    servant: 'unknown',
     minion: 'minion',
-    merlin: 'unknown',
     morgana: 'morgana',
     oberon: 'oberon',
-    mordred: 'unknown',
-    percival: 'unknown',
   };
 }

@@ -8,13 +8,6 @@ export class Oberon extends Character {
   loyalty: TLoyalty = 'evil';
 
   visibility: TVisibility = {
-    servant: 'unknown',
-    minion: 'unknown',
-    merlin: 'unknown',
-    merlinPure: 'unknown',
-    morgana: 'unknown',
     oberon: 'evil',
-    mordred: 'unknown',
-    percival: 'unknown',
   };
 }

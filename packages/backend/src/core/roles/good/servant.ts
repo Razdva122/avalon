@@ -7,14 +7,5 @@ export class Servant extends Character {
   selfRole: TRoles = 'servant';
   loyalty: TLoyalty = 'good';
 
-  visibility: TVisibility = {
-    servant: 'unknown',
-    minion: 'unknown',
-    merlin: 'unknown',
-    merlinPure: 'unknown',
-    morgana: 'unknown',
-    oberon: 'unknown',
-    mordred: 'unknown',
-    percival: 'unknown',
-  };
+  visibility: TVisibility = {};
 }

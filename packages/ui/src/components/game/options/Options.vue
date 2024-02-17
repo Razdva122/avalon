@@ -12,6 +12,7 @@
         <div class="option" v-for="role in rolesSettings">
           <PlayerIcon class="role" :icon="role.role" />
           <v-checkbox
+            @input="onRoleUpdate(role.role)"
             :disabled="role.disabled"
             v-model="roles[role.role]"
             :true-value="1"
@@ -67,6 +68,8 @@ export default defineComponent({
           disabled: !this.roles.merlin && !this.roles.merlinPure,
           color: 'success',
         },
+        { role: 'tristan', label: 'Tristan', disabled: false, color: 'success' },
+        { role: 'isolde', label: 'Isolde', disabled: false, color: 'success' },
         {
           role: 'morgana',
           label: 'Morgana',
@@ -89,19 +92,22 @@ export default defineComponent({
       this.roles.morgana = 0;
       this.roles.percival = 0;
     },
-  },
-  watch: {
-    roles: {
-      handler() {
-        if (!this.roles.merlin && !this.roles.merlinPure) {
-          this.removeMerlinAdditionalRoles();
-        }
+    onRoleUpdate(roleName: string) {
+      if (roleName === 'isolde') {
+        this.roles.tristan = this.roles.isolde;
+      }
 
-        if (!this.roles.percival) {
-          this.roles.morgana = 0;
-        }
-      },
-      deep: true,
+      if (roleName === 'tristan') {
+        this.roles.isolde = this.roles.tristan;
+      }
+
+      if (roleName === 'percival' && !this.roles.percival) {
+        this.roles.morgana = 0;
+      }
+
+      if ((roleName === 'merlin' || roleName === 'merlinPure') && !this.roles[roleName]) {
+        this.removeMerlinAdditionalRoles();
+      }
     },
   },
 });

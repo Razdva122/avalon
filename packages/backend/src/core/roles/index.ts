@@ -25,12 +25,16 @@ import { Servant } from '@/core/roles/good/servant';
 import { Merlin } from '@/core/roles/good/merlin';
 import { MerlinPure } from '@/core/roles/good/merlinPure';
 import { Percival } from '@/core/roles/good/percival';
+import { Tristan } from '@/core/roles/good/tristan';
+import { Isolde } from '@/core/roles/good/isolde';
 
 export const goodRoles = {
   servant: Servant,
   merlin: Merlin,
   merlinPure: MerlinPure,
   percival: Percival,
+  tristan: Tristan,
+  isolde: Isolde,
 } as const;
 
 const roles = {
@@ -57,5 +61,7 @@ export const goodRolesImportance: { [key in TGoodRoles]: number } = {
   merlin: 1,
   merlinPure: 2,
   percival: 3,
+  tristan: 10,
+  isolde: 11,
   servant: 100,
 };

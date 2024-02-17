@@ -117,7 +117,7 @@ export class GameManager {
           return target.role.selfRole;
         }
 
-        return observer.role.visibility[target.role.role];
+        return observer.role.visibility[target.role.role] || 'unknown';
       });
 
       return acc;

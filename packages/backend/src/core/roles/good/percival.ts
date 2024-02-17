@@ -8,13 +8,8 @@ export class Percival extends Character {
   loyalty: TLoyalty = 'good';
 
   visibility: TVisibility = {
-    servant: 'unknown',
-    minion: 'unknown',
     merlin: 'mysteryWizard',
     merlinPure: 'mysteryWizard',
     morgana: 'mysteryWizard',
-    oberon: 'unknown',
-    mordred: 'unknown',
-    percival: 'unknown',
   };
 }

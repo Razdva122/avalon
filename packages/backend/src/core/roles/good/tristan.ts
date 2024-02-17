@@ -2,14 +2,12 @@ import { Character } from '@/core/roles/abstract';
 import type { TVisibility } from '@/core/roles/interface';
 import type { TLoyalty, TRoles } from '@avalon/types';
 
-export class Mordred extends Character {
-  role: TRoles = 'mordred';
-  selfRole: TRoles = 'mordred';
-  loyalty: TLoyalty = 'evil';
+export class Tristan extends Character {
+  role: TRoles = 'tristan';
+  selfRole: TRoles = 'tristan';
+  loyalty: TLoyalty = 'good';
 
   visibility: TVisibility = {
-    minion: 'evil',
-    morgana: 'evil',
-    mordred: 'evil',
+    isolde: 'isolde',
   };
 }
