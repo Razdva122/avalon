@@ -1,12 +1,11 @@
 <template>
   <div class="room d-flex flex-column align-center mt-8">
-    <template v-if="roomState.stage === 'unavailable'">
-      <h1 class="text-white">This is wrong uuid</h1>
+    <template v-if="errorMessage">
+      <h1 class="text-white">{{ errorMessage.error }}</h1>
     </template>
     <template v-else>
       <v-btn v-if="displayRestartButton" @click="restartGame">Restart game</v-btn>
-      <!-- prettier-ignore -->
-      <Board :room-state="(roomState as unknown as TAvailableRoomStateRef)" />
+      <Board :room-state="roomState" />
       <RolesInfo v-if="roomState.stage === 'started'" :game-roles="game.settings.roles" :visible-roles="visibleRoles" />
     </template>
   </div>
@@ -16,10 +15,10 @@
 import { useRouter } from 'vue-router';
 import { defineComponent, ref, computed } from 'vue';
 import Board from '@/components/game/board/Board.vue';
-import type { TVisibleRole } from '@avalon/types';
+import type { TVisibleRole, ISocketError } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
-import { GameStateManager, TAvailableRoomStateRef } from '@/pages/room/game-state-manager';
+import { GameStateManager } from '@/pages/room/game-state-manager';
 import RolesInfo from '@/components/game/information/RolesInfo.vue';
 
 export default defineComponent({
@@ -37,6 +36,7 @@ export default defineComponent({
   async setup(props) {
     const stateManager = new GameStateManager();
     const alert = ref<boolean>(true);
+    const errorMessage = ref<ISocketError>();
     const store = useStore();
     const router = useRouter();
 
@@ -47,7 +47,12 @@ export default defineComponent({
 
     const initState = async (uuid: string) => {
       const stateFromBackend = await socket.emitWithAck('joinRoom', uuid);
-      stateManager.mutateRoomState({ newRoomState: stateFromBackend, userID });
+
+      if ('error' in stateFromBackend) {
+        errorMessage.value = stateFromBackend;
+      } else {
+        stateManager.mutateRoomState({ newRoomState: stateFromBackend, userID });
+      }
     };
 
     await initState(props.uuid);
@@ -71,11 +76,7 @@ export default defineComponent({
       return roomState.value.stage === 'started' && game.value.stage === 'end' && roomState.value.leaderID === userID;
     });
 
-    const restartGame = () => {
-      if (roomState.value.stage !== 'unavailable') {
-        return socket.emit('restartGame', roomState.value.roomID);
-      }
-    };
+    const restartGame = () => socket.emit('restartGame', roomState.value.roomID);
 
     const visibleRoles = computed(() => {
       if (roomState.value.stage === 'started') {
@@ -93,6 +94,7 @@ export default defineComponent({
 
     return {
       roomState,
+      errorMessage,
       displayRestartButton,
       visibleRoles,
       alert,

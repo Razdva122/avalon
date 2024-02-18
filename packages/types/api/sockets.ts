@@ -8,6 +8,9 @@ import type { TVoteOption } from '../game/vote';
 import type { TMissionResult } from '../game/mission';
 import type { TLoyalty } from '../game/roles';
 
+import type { IRoomUnavailableError } from './errors';
+export type { ISocketError } from './errors';
+
 export interface ServerToClientEvents {
   roomUpdated: (state: TRoomState) => void;
   gameUpdated: (state: IVisualGameState) => void;
@@ -17,7 +20,7 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
   createRoom: (callback: (uuid: string) => void) => void;
-  joinRoom: (uuid: string, callback: (state: TRoomState) => void) => void;
+  joinRoom: (uuid: string, callback: (state: TRoomState | IRoomUnavailableError) => void) => void;
   lockRoom: (uuid: string) => void;
   kickPlayer: (uuid: string, userID: string) => void;
   leaveRoom: (uuid: string) => void;

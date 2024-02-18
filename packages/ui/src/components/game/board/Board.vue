@@ -5,8 +5,7 @@
     <div class="actions-container d-flex flex-column justify-center">
       <template v-if="roomState.stage !== 'started'">
         <div class="button-panel d-flex flex-column align-center">
-          <!-- prettier-ignore -->
-          <StartPanel :room-state="(roomState as unknown as TAvailableRoomStateRef)" />
+          <StartPanel :room-state="roomState" />
         </div>
       </template>
       <template v-else>
@@ -50,7 +49,7 @@ import AnnounceLoyalty from './modules/AnnounceLoyalty.vue';
 import { THistoryResults } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
-import { gameStateKey, stateManagerKey, TAvailableRoomStateRef } from '@/pages/room/game-state-manager';
+import { gameStateKey, stateManagerKey, TPageRoomState } from '@/pages/room/game-state-manager';
 import { calculateVisualElement } from '@/components/game/board/helpers';
 
 export default defineComponent({
@@ -64,7 +63,7 @@ export default defineComponent({
   },
   props: {
     roomState: {
-      type: Object as PropType<TAvailableRoomStateRef>,
+      type: Object as PropType<TPageRoomState>,
       required: true,
     },
   },
@@ -209,6 +208,15 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+@mixin gameEndShadow($color) {
+  box-shadow:
+    rgba($color, 0.4) 8px 8px,
+    rgba($color, 0.3) 16px 16px,
+    rgba($color, 0.2) 24px 24px,
+    rgba($color, 0.1) 32px 32px,
+    rgba($color, 0.05) 40px 40px;
+}
+
 .board-container {
   user-select: none;
   display: flex;
@@ -234,21 +242,11 @@ export default defineComponent({
 }
 
 .game-end-evil {
-  box-shadow:
-    rgba(255, 25, 25, 0.4) 8px 8px,
-    rgba(255, 25, 25, 0.3) 16px 16px,
-    rgba(255, 25, 25, 0.2) 24px 24px,
-    rgba(255, 25, 25, 0.1) 32px 32px,
-    rgba(255, 25, 25, 0.05) 40px 40px;
+  @include gameEndShadow(rgb(255, 25, 25));
 }
 
 .game-end-good {
-  box-shadow:
-    rgba(0, 85, 184, 0.4) 8px 8px,
-    rgba(0, 85, 184, 0.3) 16px 16px,
-    rgba(0, 85, 184, 0.2) 24px 24px,
-    rgba(0, 85, 184, 0.1) 32px 32px,
-    rgba(0, 85, 184, 0.05) 40px 40px;
+  @include gameEndShadow(rgb(0, 85, 184));
 }
 
 .player-container {

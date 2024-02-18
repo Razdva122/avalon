@@ -125,6 +125,11 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+@mixin dropShadowBorder($color, $size) {
+  filter: drop-shadow($size $size 0 $color) drop-shadow(-$size $size 0 $color) drop-shadow($size (-$size) 0 $color)
+    drop-shadow((-$size) (-$size) 0 $color);
+}
+
 .player-container {
   width: 125px;
   height: 150px;
@@ -176,8 +181,7 @@ export default defineComponent({
   background-image: url('@/assets/name-frame.png');
   background-size: 100% 100%;
   color: white;
-  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.5)) drop-shadow(-1px 1px 0 rgba(0, 0, 0, 0.5))
-    drop-shadow(1px -1px 0 rgba(0, 0, 0, 0.5)) drop-shadow(-1px -1px 0 rgba(0, 0, 0, 0.5));
+  @include dropShadowBorder(rgba(0, 0, 0, 0.5), 1px);
 }
 
 .player-icon {
@@ -209,12 +213,11 @@ export default defineComponent({
 }
 
 .player-feature-waitForAction .player-name {
-  filter: drop-shadow(2px 2px 0 rgba(65, 105, 225, 0.8)) drop-shadow(-2px 2px 0 rgba(65, 105, 225, 0.8))
-    drop-shadow(2px -2px 0 rgba(65, 105, 225, 0.8)) drop-shadow(-2px -2px 0 rgba(65, 105, 225, 0.8));
+  @include dropShadowBorder(rgba(65, 105, 225, 0.8), 2px);
 }
 
 .player-feature-isAssassin .player-name {
-  border-color: rgba(220, 20, 60, 0.6);
+  @include dropShadowBorder(rgba(220, 20, 60, 0.6), 2px);
 }
 
 .player-feature-isSelected .player-icon {

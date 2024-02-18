@@ -1,7 +1,6 @@
 import type { IVisualGameState } from '../game/state';
 
-export type TRoomState = TCreatedRoomState | TLockedRoomState | TStartedRoomState | TUnavailableState;
-export type TAvailableRoom = Exclude<TRoomState, TUnavailableState>;
+export type TRoomState = TCreatedRoomState | TLockedRoomState | TStartedRoomState;
 
 type TMetaRoomState = {
   roomID: string;
@@ -21,10 +20,6 @@ export type TCreatedRoomState = {
 export type TLockedRoomState = {
   stage: 'locked';
 } & TMetaRoomState;
-
-export type TUnavailableState = {
-  stage: 'unavailable';
-};
 
 export type TStartedRoomState = {
   stage: 'started';

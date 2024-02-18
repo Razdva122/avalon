@@ -60,7 +60,7 @@ export class Manager {
           socket.join(uuid);
           cb(this.rooms[uuid].calculateRoomState(userID));
         } else {
-          cb({ stage: 'unavailable' });
+          cb({ error: 'This is wrong uuid' });
         }
       });
 

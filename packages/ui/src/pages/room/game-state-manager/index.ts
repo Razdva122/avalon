@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import type { IVisualGameState, TRoomState, TAvailableRoom, THistoryResults, TGameStage } from '@avalon/types';
+import type { IVisualGameState, TRoomState, THistoryResults, TGameStage } from '@avalon/types';
 import { Ref, computed, ref, provide, InjectionKey } from 'vue';
 import { TPageRoomStateRef, TStartedPageRoomState } from '@/pages/room/game-state-manager/interface';
 
@@ -58,9 +58,7 @@ export class GameStateManager {
   }): void {
     if (userID) {
       if (newRoomState) {
-        if (newRoomState.stage !== 'unavailable') {
-          this.mutateRoomGameForPosition(newRoomState, userID);
-        }
+        this.mutateRoomGameForPosition(newRoomState, userID);
 
         if ('game' in newRoomState) {
           this.mutateRoomGameForPosition(newRoomState.game, userID);
@@ -157,7 +155,7 @@ export class GameStateManager {
     return this.state as Ref<TStartedPageRoomState>;
   }
 
-  protected mutateRoomGameForPosition<T extends TAvailableRoom | IVisualGameState>(roomOrGame: T, userID?: string): T {
+  protected mutateRoomGameForPosition<T extends TRoomState | IVisualGameState>(roomOrGame: T, userID?: string): T {
     if (userID) {
       const indexOfPlayer = roomOrGame.players.findIndex((player) => player.id === userID);
 
