@@ -10,6 +10,11 @@
     </div>
     <i class="material-icons action-icon close text-error"></i>
     <i class="material-icons action-icon check text-success"></i>
+    <div class="switch-image">
+      <div class="icon-good-mission"></div>
+      <i class="material-icons icon-switch arrow_forward"></i>
+      <div class="icon-evil-mission"></div>
+    </div>
     <span class="player-name">{{ player.name }}</span>
   </div>
 </template>
@@ -17,13 +22,10 @@
 <script lang="ts">
 import * as _ from 'lodash';
 import { defineComponent, PropType, inject } from 'vue';
-import type { IPlayerWithVote, TRoomPlayer, THistoryResults, Dictionary, TGameStage } from '@avalon/types';
+import type { TRoomPlayer, THistoryResults, Dictionary, TGameStage, IActionWithResult } from '@avalon/types';
+import type { IFrontendPlayer } from '@/components/game/board/interface';
 import { gameStateKey } from '@/pages/room/game-state-manager';
-import PlayerIcon, { TPlayerIcon } from '@/components/game/information/PlayerIcon.vue';
-
-interface IFrontendPlayer extends Omit<IPlayerWithVote, 'role'> {
-  role: TPlayerIcon;
-}
+import PlayerIcon from '@/components/game/information/PlayerIcon.vue';
 
 export default defineComponent({
   components: {
@@ -77,10 +79,18 @@ export default defineComponent({
           clone.features.isSelected = false;
 
           const switchedAction = this.visibleHistory.actions.find(
-            (action) => action.playerID === clone.id && action.switched === true,
+            (action) => action.playerID === clone.id && action.switchedBy,
           );
 
-          if (switchedAction) {
+          const visibleAction = this.visibleHistory.actions.find(
+            (action) => action.playerID === clone.id && 'value' in action,
+          ) as IActionWithResult;
+
+          if (switchedAction && visibleAction) {
+            clone.features.switch = visibleAction.value === 'fail' ? 'toFail' : 'toSuccess';
+          } else if (visibleAction) {
+            clone.role = visibleAction.value === 'fail' ? 'evil' : 'good';
+          } else if (switchedAction) {
             clone.role = 'excalibur';
           }
         }
@@ -246,7 +256,8 @@ export default defineComponent({
 }
 
 .close,
-.check {
+.check,
+.switch-image {
   display: none;
 }
 
@@ -274,5 +285,55 @@ export default defineComponent({
 .player-excalibur-active .excalibur,
 .player-lady-active .lady-of-lake {
   border-color: rgba(65, 105, 225, 0.8);
+}
+
+.player-feature-switch-toSuccess {
+  .icon-evil-mission {
+    order: -1;
+  }
+
+  .icon-good-mission {
+    order: 1;
+  }
+
+  .icon-switch {
+    color: rgb(var(--v-theme-info));
+  }
+}
+
+.icon-switch {
+  font-size: 40px;
+  color: rgb(var(--v-theme-error));
+  @include dropShadowBorder(rgba(255, 255, 255, 1), 0.5px);
+}
+
+.player-feature-switch-toSuccess,
+.player-feature-switch-toFail {
+  .switch-image {
+    display: flex;
+    position: absolute;
+    justify-content: space-between;
+    align-items: center;
+    top: 35px;
+  }
+}
+
+.icon-evil-mission,
+.icon-good-mission {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.icon-good-mission {
+  background-image: url('@/assets/blue_team_no_background.png');
+  border: 2px solid rgb(var(--v-theme-info));
+  background-size: contain;
+}
+
+.icon-evil-mission {
+  background-image: url('@/assets/red_team_no_background.png');
+  border: 2px solid rgb(var(--v-theme-error));
+  background-size: contain;
 }
 </style>

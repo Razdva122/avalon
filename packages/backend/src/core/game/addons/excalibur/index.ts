@@ -98,7 +98,7 @@ export class ExcaliburAddon implements IGameAddon {
     if (selectedPlayer) {
       const mission = this.game.currentMission;
 
-      switchResult = mission.switchAction(selectedPlayer);
+      switchResult = mission.switchAction(selectedPlayer, ownerOfExcalibur);
       mission.finishMission();
 
       selectedPlayer.features.isSelected = false;

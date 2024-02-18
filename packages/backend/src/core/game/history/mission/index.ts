@@ -82,7 +82,7 @@ export class Mission implements HistoryElement<'mission'> {
     return false;
   }
 
-  switchAction(player: IPlayerInGame): TMissionResult {
+  switchAction(player: IPlayerInGame, switchedBy: IPlayerInGame): TMissionResult {
     const action = this.data.actions.find((el) => el.player === player);
 
     if (action === undefined) {
@@ -94,7 +94,7 @@ export class Mission implements HistoryElement<'mission'> {
     }
 
     action.value = action.value === 'fail' ? 'success' : 'fail';
-    action.switched = true;
+    action.switchedBy = switchedBy.user.id;
 
     return action.value;
   }
@@ -116,15 +116,19 @@ export class Mission implements HistoryElement<'mission'> {
       leaderID: this.data.leader!.user.id,
       fails: this.data.fails!,
       actions: this.data.actions.map((action) => {
-        if (options.game.stage === 'end') {
+        const isGameEnded = options.game.stage === 'end';
+        const isUserAction = action.player.user.id === options.userID;
+        const isSwitchedByPlayer = action.switchedBy === options.userID;
+
+        if (isGameEnded || isUserAction || isSwitchedByPlayer) {
           return {
             playerID: action.player.user.id,
-            switched: action.switched,
+            switchedBy: action.switchedBy,
             value: action.value,
           };
         }
 
-        return { playerID: action.player.user.id, switched: action.switched };
+        return { playerID: action.player.user.id, switchedBy: action.switchedBy };
       }),
     };
   }

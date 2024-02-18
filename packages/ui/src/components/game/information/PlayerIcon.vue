@@ -3,10 +3,9 @@
 </template>
 
 <script lang="ts">
-import { TVisibleRole } from '@avalon/types';
 import { defineComponent, PropType } from 'vue';
 
-export type TPlayerIcon = TVisibleRole | 'excalibur';
+import type { TPlayerIcon } from '@/components/game/information/interface';
 
 export default defineComponent({
   props: {
