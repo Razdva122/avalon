@@ -1,7 +1,7 @@
 import type { IPlayer } from './player';
 import type { THistoryResults } from './history';
 import type { IGameSettingsWithRoles } from './settings';
-import type { TAddonsStages } from './addons';
+import type { TAddonsStages, TAddonsData } from './addons';
 import type { TLoyalty } from '../game/roles';
 
 export interface IVisualGameState {
@@ -13,6 +13,7 @@ export interface IVisualGameState {
   settings: IGameSettingsWithRoles;
   history: THistoryResults[];
   players: IPlayer[];
+  addonsData: TAddonsData;
 }
 
 /**

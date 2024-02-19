@@ -17,6 +17,7 @@ import type {
   TGameStage,
   IGameSettingsWithRoles,
   IGameOptions,
+  TAddonsData,
 } from '@avalon/types';
 
 import type { TRolesAddonsData, TRolesWithAddons, TAdditionalAddons, TAdditionalAddonsData } from '@/core/game/addons';
@@ -220,6 +221,19 @@ export class Game extends GameHooks {
    */
   get selectedPlayers() {
     return this.players.filter((player) => player.features.isSelected);
+  }
+
+  /**
+   * Data for the operation of addons
+   */
+  get addonsData(): TAddonsData {
+    return this.addons.reduce<TAddonsData>((acc, addon) => {
+      if (addon.addonData) {
+        acc = { ...acc, ...addon.addonData };
+      }
+
+      return acc;
+    }, {});
   }
 
   /**

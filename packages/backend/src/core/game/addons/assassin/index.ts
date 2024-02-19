@@ -4,19 +4,28 @@ import { IGameAddon } from '@/core/game/addons/interface';
 import { Assassinate } from '@/core/game/addons/assassin/assassinate';
 import { Game } from '@/core/game';
 
-import type { TAssassinateType } from '@avalon/types';
+import type { TAssassinateType, TAssassinAddonData } from '@avalon/types';
 
 import type { TAssassinateOptions } from '@/core/game/addons/assassin/interface';
 
 export * from '@/core/game/addons/assassin/interface';
 
 export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
+  addonName = 'assassin';
   game: Game;
   options: TAssassinateOptions;
 
   constructor(game: Game, options: TAssassinateOptions) {
     this.game = game;
     this.options = options;
+  }
+
+  get addonData(): TAssassinAddonData {
+    return {
+      assassin: {
+        assassinateTargets: <TAssassinateType[]>Object.keys(this.options),
+      },
+    };
   }
 
   updateOptions(options: TAssassinateOptions) {

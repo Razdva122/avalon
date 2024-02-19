@@ -4,6 +4,7 @@ import { Game } from '@/core/game';
 import { TLoyalty } from '@avalon/types';
 
 export class LadyOfLakeAddon implements IGameAddon {
+  addonName = 'ladyOfLake';
   game: Game;
 
   constructor(game: Game) {

@@ -30,6 +30,7 @@ export class GameManager {
       mission: this.game.round,
       settings: this.game.settings,
       winner: this.game.winner,
+      addonsData: this.game.addonsData,
       ...this.prepareHistoryAndPlayerForRoomState(),
       ...this.calculatePlayersRoles(this.game.stage),
     };
@@ -144,6 +145,7 @@ export class GameManager {
       vote: this.roomState.vote,
       mission: this.roomState.mission,
       settings: this.roomState.settings,
+      addonsData: this.roomState.addonsData,
       history: this.roomState.history.map((el) => el({ game: this.game, userID })),
       players: this.roomState.players.map((player, index) => {
         const playerData: IPlayer = { ...player, role: roles[index] };

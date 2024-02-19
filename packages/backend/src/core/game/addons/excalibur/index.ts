@@ -4,6 +4,7 @@ import { SwitchResult } from '@/core/game/addons/excalibur/switch-result';
 import { TMissionResult } from '@avalon/types';
 
 export class ExcaliburAddon implements IGameAddon {
+  addonName = 'excalibur';
   game: Game;
 
   constructor(game: Game) {

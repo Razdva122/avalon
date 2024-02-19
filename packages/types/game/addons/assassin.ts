@@ -19,3 +19,12 @@ export type TAssassinAddonFeatures = {
  * Possible assassinate targets
  */
 export type TAssassinateType = 'merlin' | 'lovers';
+
+/**
+ * Data for game
+ */
+export type TAssassinAddonData = {
+  assassin: {
+    assassinateTargets: TAssassinateType[];
+  };
+};
