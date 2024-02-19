@@ -19,7 +19,7 @@
     </Spoiler>
   </template>
   <template v-if="game.stage === 'assassinate' && isUserAssassin">
-    <v-btn color="error" :disabled="!isSinglePlayerSelected" @click="onAssassinateClick">Assassinate</v-btn>
+    <AssassinateControl :game="game" />
   </template>
   <template v-if="game.stage === 'checkLoyalty' && isUserLadyOwner">
     <v-btn color="warning" :disabled="!isLadyAvailable" @click="emitClick('checkLoyalty')">Check Loyalty</v-btn>
@@ -45,6 +45,7 @@ import type { IVisualGameState, TMissionResult, TVoteOption } from '@avalon/type
 import { useStore } from '@/store';
 import { socket } from '@/api/socket';
 import Spoiler from '@/components/feedback/Spoiler.vue';
+import AssassinateControl from '@/components/game/panels/controls/AssassinateControl.vue';
 
 type TMethodsWithoutParams = 'sentSelectedPlayers' | 'checkLoyalty' | 'giveExcalibur' | 'useExcalibur';
 
@@ -52,6 +53,7 @@ export default defineComponent({
   name: 'InGamePanel',
   components: {
     Spoiler,
+    AssassinateControl,
   },
   props: {
     game: {
