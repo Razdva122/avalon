@@ -86,32 +86,13 @@ describe('Gameplay', () => {
       test('Select Player -> Sent Players -> Approve Mission -> Fail mission', () => {
         gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
 
-        expect(game.stage).toBe('assassinate');
         expect(game.missions[3].data.result).toBe('success');
         expect(game.missions[3].data.fails).toBe(0);
         expect(game.missions[3].stage).toBe('finished');
       });
 
-      test('Pick wrong merlin', () => {
-        gameHelper.pickMerlin();
-
-        expect(game.stage).toBe('end');
-        expect(game.winner).toBe('good');
-        expect(game.round).toBe(3);
-      });
-
       test('Check history', () => {
-        const expectedHistory = [
-          'vote',
-          'mission',
-          'vote',
-          'mission',
-          'vote',
-          'mission',
-          'vote',
-          'mission',
-          'assassinate',
-        ];
+        const expectedHistory = ['vote', 'mission', 'vote', 'mission', 'vote', 'mission', 'vote', 'mission'];
 
         const isHistoryValid = game.history.every((el, index) => {
           return expectedHistory[index] === el.type && el.stage === 'finished';

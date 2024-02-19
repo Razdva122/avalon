@@ -18,4 +18,4 @@ export type TAssassinAddonFeatures = {
 /**
  * Possible assassinate targets
  */
-export type TAssassinateType = 'merlin';
+export type TAssassinateType = 'merlin' | 'lovers';

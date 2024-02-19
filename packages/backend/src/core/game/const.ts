@@ -116,6 +116,16 @@ export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsData> = {
       merlin: [(player: IPlayerInGame) => player.role.role === 'merlinPure'],
     },
   },
+  tristan: {
+    addon: AssassinAddon,
+    key: 'assassin',
+    options: {
+      lovers: [
+        (player: IPlayerInGame) => player.role.role === 'tristan',
+        (player: IPlayerInGame) => player.role.role === 'isolde',
+      ],
+    },
+  },
 };
 
 /**

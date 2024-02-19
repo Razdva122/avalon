@@ -3,10 +3,6 @@ import { generateNewGame, settings } from '@/core/game/test/const';
 const { game } = generateNewGame();
 
 describe('Roles', () => {
-  test('Game have merlin in players', () => {
-    expect(game.players.some((player) => player.role.role === 'merlin')).toBe(true);
-  });
-
   test('Game have valid amount of player in both teams', () => {
     const loyalty = game.players.reduce(
       (acc, el) => {

@@ -4,7 +4,7 @@ let { game, gameHelper } = generateNewGame();
 
 describe('Wait for action', () => {
   beforeEach(() => {
-    const restart = generateNewGame();
+    const restart = generateNewGame({}, { merlin: 1 });
     game = restart.game;
     gameHelper = restart.gameHelper;
   });

@@ -97,6 +97,34 @@ export class GameTestHelper {
     return this;
   }
 
+  pickLovers(correctLovers: Array<'isolde' | 'tristan'> = []): this {
+    const ids: string[] = [];
+
+    correctLovers.forEach((el) => {
+      ids.push(this.game.players.find((player) => player.role.role === el)!.user.id);
+    });
+
+    const assassinID = this.game.players.find((player) => {
+      return player.features.isAssassin;
+    })!.user.id;
+
+    ids.forEach((id) => {
+      this.game.selectPlayer(assassinID, id);
+    });
+
+    while (this.game.selectedPlayers.length < 2) {
+      const playerToSelectId = this.game.players.find(
+        (player) => player.role.role !== 'isolde' && player.role.role !== 'tristan' && !player.features.isSelected,
+      )!.user.id;
+
+      this.game.selectPlayer(assassinID, playerToSelectId);
+    }
+
+    this.game.addons.assassin!.assassinate(assassinID, 'lovers');
+
+    return this;
+  }
+
   useLadyOfLake(): this {
     const randomPlayerID = this.game.players.find((player) => player.features.ladyOfLake === undefined)!.user.id;
 
