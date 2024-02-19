@@ -113,7 +113,7 @@ export default defineComponent({
       const userCanSelect =
         (gameState.value.stage === 'selectTeam' && playerInGame.value?.features.isLeader) ||
         (gameState.value.stage === 'giveExcalibur' && playerInGame.value?.features.isLeader) ||
-        (gameState.value.stage === 'selectMerlin' && playerInGame.value?.features.isAssassin) ||
+        (gameState.value.stage === 'assassinate' && playerInGame.value?.features.isAssassin) ||
         (gameState.value.stage === 'useExcalibur' && playerInGame.value?.features.excalibur) ||
         (gameState.value.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfLake === 'has');
 

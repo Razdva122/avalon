@@ -9,6 +9,8 @@ import type { TMissionResult } from '../game/mission';
 import type { TLoyalty } from '../game/roles';
 
 import type { IRoomUnavailableError } from './errors';
+import type { TAssassinateType } from '../game/addons';
+
 export type { ISocketError } from './errors';
 
 export interface ServerToClientEvents {
@@ -34,7 +36,7 @@ export interface ClientToServerEvents {
   sentSelectedPlayers: (uuid: string) => void;
   voteForMission: (uuid: string, option: TVoteOption) => void;
   actionOnMission: (uuid: string, result: TMissionResult) => void;
-  selectMerlin: (uuid: string) => void;
+  assassinate: (uuid: string, type: TAssassinateType) => void;
 
   checkLoyalty: (uuid: string) => void;
   getLoyalty: (uuid: string, callback: (loyalty: TLoyalty) => void) => void;

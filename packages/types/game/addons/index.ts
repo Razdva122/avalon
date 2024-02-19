@@ -1,15 +1,15 @@
 import type { TLadyOfLakeStages, TLadyOfLakeFeatures } from './lady-of-lake';
-import type { TMerlinAddonStages, TMerlinAddonFeatures } from './merlin';
 import type { TExcaliburStages, TExcaliburFeatures } from './excalibur';
+import type { TAssassinAddonStages, TAssassinAddonFeatures } from './assassin';
 
-export type { TAssassinateResult } from './merlin';
+export type { TAssassinateResult, TAssassinateType } from './assassin';
 
 /**
  * Possible addons stages
  */
-export type TAddonsStages = TMerlinAddonStages | TLadyOfLakeStages | TExcaliburStages;
+export type TAddonsStages = TLadyOfLakeStages | TExcaliburStages | TAssassinAddonStages;
 
 /**
  * Player features added with addons
  */
-export type TAddonsFeatures = TLadyOfLakeFeatures & TMerlinAddonFeatures & TExcaliburFeatures;
+export type TAddonsFeatures = TLadyOfLakeFeatures & TExcaliburFeatures & TAssassinAddonFeatures;

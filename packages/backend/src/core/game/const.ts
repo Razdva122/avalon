@@ -1,8 +1,8 @@
-import type { IPresetsForGame } from '@/core/game/interface';
+import type { IPlayerInGame, IPresetsForGame } from '@/core/game/interface';
 import {
   TAdditionalAddonsData,
   TRolesAddonsData,
-  MerlinAddon,
+  AssassinAddon,
   LadyOfLakeAddon,
   ExcaliburAddon,
 } from '@/core/game/addons';
@@ -103,12 +103,18 @@ export const gamesSettings: IPresetsForGame = {
  */
 export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsData> = {
   merlin: {
-    addon: MerlinAddon,
-    key: 'merlin',
+    addon: AssassinAddon,
+    key: 'assassin',
+    options: {
+      merlin: [(player: IPlayerInGame) => player.role.role === 'merlin'],
+    },
   },
   merlinPure: {
-    addon: MerlinAddon,
-    key: 'merlin',
+    addon: AssassinAddon,
+    key: 'assassin',
+    options: {
+      merlin: [(player: IPlayerInGame) => player.role.role === 'merlinPure'],
+    },
   },
 };
 

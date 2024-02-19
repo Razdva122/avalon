@@ -7,6 +7,7 @@ import type {
   TMissionResult,
   TLoyalty,
   THistoryResults,
+  TAssassinateType,
 } from '@avalon/types';
 
 import type { TDataForManagerOptions } from '@/core/game/history';
@@ -23,7 +24,7 @@ export type TGameMethodsParams =
   | TVoteParams
   | TSentPlayersParams
   | TActionOnMissionParams
-  | TSelectMerlinParams
+  | TAssassinateParams
   | TCheckLoyaltyParams
   | TAnnounceLoyaltyParams
   | TGiveExcaliburParams
@@ -48,8 +49,9 @@ export type TActionOnMissionParams = {
   result: TMissionResult;
 };
 
-export type TSelectMerlinParams = {
-  method: 'selectMerlin';
+export type TAssassinateParams = {
+  method: 'assassinate';
+  type: TAssassinateType;
 };
 
 export type TCheckLoyaltyParams = {

@@ -1,4 +1,4 @@
-import type { ExcaliburAddon, IGameAddon, LadyOfLakeAddon, MerlinAddon } from '@/core/game/addons';
+import type { ExcaliburAddon, IGameAddon, LadyOfLakeAddon, AssassinAddon } from '@/core/game/addons';
 import type { Character } from '@/core/roles';
 import type { User } from '@/user';
 
@@ -20,10 +20,11 @@ export interface IPlayerInGame {
   features: IPlayerFeatures;
 }
 
-export type TAddonsArray = IGameAddon[];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type TAddonsArray = IGameAddon<any>[];
 
 export interface IGameAddons extends TAddonsArray {
-  merlin?: MerlinAddon;
+  assassin?: AssassinAddon;
   ladyOfLake?: LadyOfLakeAddon;
   excalibur?: ExcaliburAddon;
 }

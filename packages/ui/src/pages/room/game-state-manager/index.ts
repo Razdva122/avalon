@@ -128,7 +128,7 @@ export class GameStateManager {
     return (
       {
         vote: 'votingForTeam',
-        assassinate: 'selectMerlin',
+        assassinate: 'assassinate',
         checkLoyalty: 'useExcalibur',
         mission: 'onMission',
         switchResult: 'useExcalibur',

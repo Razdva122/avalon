@@ -29,10 +29,12 @@
         </div>
         <div v-if="historyEl.type === 'assassinate'">
           <div>
-            {{ calculateNameByID(historyEl.assassinID) }} assassinate {{ calculateNameByID(historyEl.killedID) }}
+            {{ calculateNameByID(historyEl.assassinID) }} assassinate
+            {{ historyEl.killedIDs.map(calculateNameByID).join(', ') }}
           </div>
           <div>
-            {{ calculateNameByID(historyEl.killedID) }} {{ historyEl.result === 'hit' ? 'is' : 'is not' }} Merlin
+            {{ historyEl.killedIDs.map(calculateNameByID).join(', ') }}
+            {{ historyEl.result === 'hit' ? 'is' : 'is not' }} {{ historyEl.assassinateType }}
           </div>
         </div>
         <div v-if="historyEl.type === 'vote'">

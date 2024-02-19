@@ -2,6 +2,7 @@ import type { TMissionResult, IMissionSettings } from './mission';
 import type { TVoteOption } from './vote';
 import type { TAssassinateResult } from './addons';
 import type { TLoyalty } from './roles';
+import type { TAssassinateType } from './addons/assassin';
 
 /**
  * Possible history element
@@ -48,7 +49,8 @@ export interface IHistoryAssassinate {
   type: 'assassinate';
   result: TAssassinateResult;
   assassinID: string;
-  killedID: string;
+  assassinateType: TAssassinateType;
+  killedIDs: string[];
 }
 
 /**

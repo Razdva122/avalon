@@ -170,8 +170,12 @@ export class Game extends GameHooks {
       const [role, addonData] = <[TRolesWithAddons, TRolesAddonsData]>data;
 
       if (options.roles[role]) {
-        acc[addonData.key] = new addonData.addon(this);
-        acc.push(acc[addonData.key]!);
+        if (!acc[addonData.key]) {
+          acc[addonData.key] = new addonData.addon(this, addonData.options!);
+          acc.push(acc[addonData.key]!);
+        } else {
+          acc[addonData.key]?.updateOptions(addonData.options!);
+        }
       }
 
       return acc;

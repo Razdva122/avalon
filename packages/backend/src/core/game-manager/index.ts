@@ -175,12 +175,12 @@ export class GameManager {
         this.game.actionOnMission(userID, params.result);
         break;
 
-      case 'selectMerlin':
-        if (!this.game.addons.merlin) {
-          throw new Error('You cant select merlin in game without merlin addon');
+      case 'assassinate':
+        if (!this.game.addons.assassin) {
+          throw new Error('You cant assassinate in game without assassinate addon');
         }
 
-        this.game.addons.merlin.selectMerlin(userID);
+        this.game.addons.assassin.assassinate(userID, params.type);
         break;
 
       case 'checkLoyalty':

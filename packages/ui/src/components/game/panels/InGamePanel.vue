@@ -18,8 +18,8 @@
       </v-btn>
     </Spoiler>
   </template>
-  <template v-if="game.stage === 'selectMerlin' && isUserAssassin">
-    <v-btn color="error" :disabled="!isSinglePlayerSelected" @click="emitClick('selectMerlin')">Execute merlin</v-btn>
+  <template v-if="game.stage === 'assassinate' && isUserAssassin">
+    <v-btn color="error" :disabled="!isSinglePlayerSelected" @click="onAssassinateClick">Assassinate</v-btn>
   </template>
   <template v-if="game.stage === 'checkLoyalty' && isUserLadyOwner">
     <v-btn color="warning" :disabled="!isLadyAvailable" @click="emitClick('checkLoyalty')">Check Loyalty</v-btn>
@@ -46,7 +46,7 @@ import { useStore } from '@/store';
 import { socket } from '@/api/socket';
 import Spoiler from '@/components/feedback/Spoiler.vue';
 
-type TMethodsWithoutParams = 'sentSelectedPlayers' | 'selectMerlin' | 'checkLoyalty' | 'giveExcalibur' | 'useExcalibur';
+type TMethodsWithoutParams = 'sentSelectedPlayers' | 'checkLoyalty' | 'giveExcalibur' | 'useExcalibur';
 
 export default defineComponent({
   name: 'InGamePanel',
@@ -148,6 +148,10 @@ export default defineComponent({
       socket.emit('actionOnMission', game.value.uuid, result);
     };
 
+    const onAssassinateClick = () => {
+      socket.emit('assassinate', game.value.uuid, 'merlin');
+    };
+
     const emitClick = (methodName: TMethodsWithoutParams) => {
       socket.emit(methodName, game.value.uuid);
     };
@@ -170,6 +174,7 @@ export default defineComponent({
 
       onVoteClick,
       onMissionClick,
+      onAssassinateClick,
       emitClick,
     };
   },

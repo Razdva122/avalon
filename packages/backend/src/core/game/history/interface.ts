@@ -12,6 +12,7 @@ import type {
   ISwitchResult,
   TLoyalty,
   ICheckLoyalty,
+  TAssassinateType,
 } from '@avalon/types';
 
 export type THistoryData = {
@@ -33,7 +34,8 @@ export type THistoryData = {
   assassinate: {
     result?: TAssassinateResult;
     assassin: IPlayerInGame;
-    killed?: IPlayerInGame;
+    assassinateType: TAssassinateType;
+    killed?: IPlayerInGame[];
   };
   checkLoyalty: {
     validator: IPlayerInGame;

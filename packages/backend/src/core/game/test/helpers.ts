@@ -92,7 +92,7 @@ export class GameTestHelper {
     })!.user.id;
 
     this.game.selectPlayer(assassinID, id);
-    this.game.addons.merlin!.selectMerlin(assassinID);
+    this.game.addons.assassin!.assassinate(assassinID, 'merlin');
 
     return this;
   }

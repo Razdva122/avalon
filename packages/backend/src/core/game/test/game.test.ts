@@ -86,7 +86,7 @@ describe('Gameplay', () => {
       test('Select Player -> Sent Players -> Approve Mission -> Fail mission', () => {
         gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
 
-        expect(game.stage).toBe('selectMerlin');
+        expect(game.stage).toBe('assassinate');
         expect(game.missions[3].data.result).toBe('success');
         expect(game.missions[3].data.fails).toBe(0);
         expect(game.missions[3].stage).toBe('finished');
