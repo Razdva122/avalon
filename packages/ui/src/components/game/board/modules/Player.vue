@@ -9,7 +9,7 @@
       <img class="excalibur" alt="excalibur" src="@/assets/features/excalibur.png" />
     </div>
     <i class="material-icons action-icon close text-error"></i>
-    <i class="material-icons action-icon check text-success"></i>
+    <i class="material-icons action-icon check"></i>
     <div class="switch-image">
       <div class="icon-good-mission"></div>
       <i class="material-icons icon-switch arrow_forward"></i>
@@ -58,7 +58,12 @@ export default defineComponent({
         if (this.visibleHistory?.type === 'vote') {
           const userVote = this.visibleHistory.votes.find((player) => player.playerID === clone.id)!;
 
-          clone.features.vote = userVote.value;
+          if (this.visibleHistory.forced) {
+            clone.features.vote = 'forced-approve';
+          } else {
+            clone.features.vote = userVote.value;
+          }
+
           clone.features.waitForAction = false;
         }
 
@@ -266,6 +271,12 @@ export default defineComponent({
 }
 
 .player-feature-vote-approve .check {
+  color: rgb(var(--v-theme-success));
+  display: block;
+}
+
+.player-feature-vote-forced-approve .check {
+  color: rgb(var(--v-theme-info));
   display: block;
 }
 

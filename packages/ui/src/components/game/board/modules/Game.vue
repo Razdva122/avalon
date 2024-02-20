@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <template v-if="gameState.history.length">
-      <div class="mb-8 d-flex flex-column justify-end text-white history-actions">
+  <div class="game-container">
+    <div class="history-actions mb-4 d-flex flex-column justify-end">
+      <div class="d-flex flex-column justify-end text-white" v-if="gameState.history.length">
         <div class="mb-1" v-if="stateManager.viewMode.value === 'live'">
           <History :history="gameState.history" :players="gameState.players" />
           <v-btn
@@ -52,25 +52,30 @@
           </div>
         </template>
       </div>
-    </template>
+    </div>
     <div class="d-flex flex-row mb-4">
       <Mission v-for="mission in missions" :mission="mission" />
     </div>
     <div class="text-white mb-4">Vote stage: {{ gameState.vote + 1 }} / 5</div>
-    <div class="button-panel mb-4 d-flex flex-column align-center">
+    <div class="button-panel actions-or-info mb-4 d-flex flex-column align-center">
       <InGamePanel v-if="inGamePanel && !visibleHistory && stateManager.viewMode.value === 'live'" :game="gameState" />
+      <div class="d-flex flex-row align-center justify-center" v-if="visibleHistory?.type === 'mission'">
+        <template v-for="i in visibleHistory.settings.players">
+          <div
+            class="mission-result-element"
+            :class="'icon-loyalty-' + (i <= visibleHistory.fails ? 'evil' : 'good')"
+          ></div>
+        </template>
+      </div>
     </div>
-    <div class="d-flex flex-row align-center justify-center mb-4" v-if="visibleHistory?.type === 'mission'">
-      <template v-for="i in visibleHistory.settings.players">
-        <div
-          class="mission-result-element"
-          :class="'icon-loyalty-' + (i <= visibleHistory.fails ? 'evil' : 'good')"
-        ></div>
-      </template>
-    </div>
-    <div class="teams text-white font-weight-bold">
-      <span class="text-info">{{ gameState.settings.players.good }}</span> vs
-      <span class="text-error">{{ gameState.settings.players.evil }}</span>
+    <div class="meta-info text-white font-weight-bold d-flex justify-space-between">
+      <div>
+        <span>stage: {{ stageText }}</span>
+      </div>
+      <div>
+        <span class="text-info">{{ gameState.settings.players.good }}</span> vs
+        <span class="text-error">{{ gameState.settings.players.evil }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -151,10 +156,26 @@ export default defineComponent({
       ];
     });
 
+    const stageText = computed(() => {
+      return {
+        votingForTeam: 'voting',
+        useExcalibur: 'excalibur',
+        selectTeam: 'team building',
+        onMission: 'mission',
+        initialization: 'initialization',
+        giveExcalibur: 'excalibur',
+        checkLoyalty: 'lady of lake',
+        end: 'end',
+        assassinate: 'assassinate',
+        announceLoyalty: 'lady of lake',
+      }[gameState.value.stage];
+    });
+
     return {
       missions,
       gameState,
       stateManager,
+      stageText,
       roomState,
       historyTextArray,
     };
@@ -163,8 +184,16 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.teams {
+.meta-info {
   font-size: larger;
+}
+
+.game-container {
+  max-height: 340px;
+}
+
+.actions-or-info {
+  height: 90px;
 }
 
 .action-icon {
@@ -180,7 +209,7 @@ export default defineComponent({
 }
 
 .history-actions {
-  height: 68px;
+  height: 74px;
 }
 
 .history-text {

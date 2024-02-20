@@ -1,13 +1,6 @@
 <template>
   <div v-if="assassinateTargets.length > 1">
-    <v-radio-group
-      class="text-white mb-2"
-      v-model="selectedTarget"
-      :hide-details="true"
-      color="error"
-      inline
-      label="Select target"
-    >
+    <v-radio-group class="text-white mb-2" v-model="selectedTarget" :hide-details="true" color="error" inline>
       <v-radio v-for="target in assassinateTargets" :label="target" :value="target" :hide-details="true" />
     </v-radio-group>
   </div>

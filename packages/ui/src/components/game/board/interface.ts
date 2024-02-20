@@ -11,5 +11,5 @@ export interface IFrontendPlayer extends Omit<IPlayerWithVote, 'role'> {
 }
 
 export interface IPlayerWithVote extends IPlayer {
-  features: IPlayerFeatures & { vote?: TVoteOption } & { switch?: 'toFail' | 'toSuccess' };
+  features: IPlayerFeatures & { vote?: TVoteOption | 'forced-approve' } & { switch?: 'toFail' | 'toSuccess' };
 }

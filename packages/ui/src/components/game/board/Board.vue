@@ -1,7 +1,9 @@
 <template>
-  <div class="board-container mt-16">
+  <div class="board-container mt-16" :class="'view-mode-' + stateManager.viewMode.value">
     <div class="game-board" alt="board" :class="'game-end-' + gameResult"></div>
-    <Timer class="timer" @timerEnd="clearHistoryElement" :duration="timerDuration" />
+    <div class="timer">
+      <Timer @timerEnd="clearHistoryElement" :duration="timerDuration" />
+    </div>
     <div class="actions-container d-flex flex-column justify-center">
       <template v-if="roomState.stage !== 'started'">
         <div class="button-panel d-flex flex-column align-center">
@@ -51,6 +53,7 @@ import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { gameStateKey, stateManagerKey, TPageRoomState } from '@/pages/room/game-state-manager';
 import { calculateVisualElement } from '@/components/game/board/helpers';
+import { time } from 'console';
 
 export default defineComponent({
   name: 'Board',
@@ -227,7 +230,8 @@ export default defineComponent({
 }
 
 .actions-container {
-  height: 300px;
+  top: 140px;
+  height: 340px;
   z-index: 1;
   position: absolute;
 }
@@ -265,9 +269,17 @@ export default defineComponent({
   width: 200px;
 }
 
+.view-mode-history {
+  .timer {
+    display: none;
+  }
+}
+
 .timer {
   position: absolute;
   top: 120px;
   font-size: 28px;
+  width: 100px;
+  height: 30px;
 }
 </style>
