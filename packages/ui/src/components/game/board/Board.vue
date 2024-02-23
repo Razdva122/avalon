@@ -230,7 +230,7 @@ export default defineComponent({
 }
 
 .actions-container {
-  top: 140px;
+  top: 120px;
   height: 340px;
   z-index: 1;
   position: absolute;
@@ -259,9 +259,9 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   position: absolute;
-  top: 0;
-  width: 600px;
-  height: 600px;
+  top: -10px;
+  width: 620px;
+  height: 620px;
   transition: transform 0.5s;
 }
 
@@ -277,7 +277,7 @@ export default defineComponent({
 
 .timer {
   position: absolute;
-  top: 120px;
+  top: 100px;
   font-size: 28px;
   width: 100px;
   height: 30px;

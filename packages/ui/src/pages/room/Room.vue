@@ -4,7 +4,7 @@
       <h1 class="text-white">{{ errorMessage.error }}</h1>
     </template>
     <template v-else>
-      <v-btn v-if="displayRestartButton" @click="restartGame">Restart game</v-btn>
+      <v-btn v-if="displayRestartButton" @click="restartGame" class="restart-button">Restart game</v-btn>
       <Board :room-state="roomState" />
       <RolesInfo v-if="roomState.stage === 'started'" :game-roles="game.settings.roles" :visible-roles="visibleRoles" />
     </template>
@@ -114,5 +114,11 @@ export default defineComponent({
   width: 500px;
   background-color: white;
   font-size: 18px;
+}
+
+.restart-button {
+  position: absolute;
+  top: 450px;
+  z-index: 10;
 }
 </style>

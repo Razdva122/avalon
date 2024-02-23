@@ -185,6 +185,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .meta-info {
+  margin: 0 12px;
   font-size: larger;
 }
 
@@ -193,7 +194,7 @@ export default defineComponent({
 }
 
 .actions-or-info {
-  height: 90px;
+  height: 80px;
 }
 
 .action-icon {
