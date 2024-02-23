@@ -118,7 +118,7 @@ export class Mission implements HistoryElement<'mission'> {
       actions: this.data.actions.map((action) => {
         const isGameEnded = options.game.stage === 'end';
         const isUserAction = action.player.user.id === options.userID;
-        const isSwitchedByPlayer = action.switchedBy === options.userID;
+        const isSwitchedByPlayer = options.userID && action.switchedBy === options.userID;
 
         if (isGameEnded || isUserAction || isSwitchedByPlayer) {
           return {
