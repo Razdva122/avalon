@@ -255,9 +255,10 @@ export default defineComponent({
 .player-crown {
   display: none;
   position: absolute;
-  top: -18px;
-  left: 20px;
-  width: 48px;
+  top: -45px;
+  left: 5px;
+  width: 80px;
+  transform: rotate(-15deg);
 }
 
 .close,
