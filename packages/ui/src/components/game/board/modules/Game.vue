@@ -194,7 +194,7 @@ export default defineComponent({
 }
 
 .actions-or-info {
-  height: 80px;
+  height: 84px;
 }
 
 .action-icon {

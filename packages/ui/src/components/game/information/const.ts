@@ -35,11 +35,11 @@ export const rolesShortInfo: { [key in TVisibleRole]: { loyalty: TLoyalty | 'unk
   },
   isolde: {
     loyalty: 'good',
-    info: 'Knows Tristan, must remain hidden',
+    info: 'Lover. Knows Tristan, must remain hidden',
   },
   tristan: {
     loyalty: 'good',
-    info: 'Knows Isolde, must remain hidden',
+    info: 'Lover. Knows Isolde, must remain hidden',
   },
   evil: {
     loyalty: 'evil',

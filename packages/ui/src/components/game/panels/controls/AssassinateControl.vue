@@ -1,8 +1,19 @@
 <template>
-  <div v-if="assassinateTargets.length > 1">
-    <v-radio-group class="text-white mb-2" v-model="selectedTarget" :hide-details="true" color="error" inline>
-      <v-radio v-for="target in assassinateTargets" :label="target" :value="target" :hide-details="true" />
-    </v-radio-group>
+  <div class="d-flex mb-2 text-white" v-if="assassinateTargets.length > 1">
+    <v-btn-toggle v-model="selectedTarget" density="comfortable" divided>
+      <v-btn class="button-content" value="merlin" variant="plain">
+        <template v-slot:prepend>
+          <div class="merlin-radio-button radio-button"></div>
+        </template>
+        Merlin
+      </v-btn>
+      <v-btn class="button-content" value="lovers" variant="plain">
+        <template v-slot:prepend>
+          <div class="lovers-radio-button radio-button"></div>
+        </template>
+        Lovers
+      </v-btn>
+    </v-btn-toggle>
   </div>
   <div>
     <v-btn color="error" :disabled="isAssassinateDisabled" @click="onAssassinateClick">Assassinate</v-btn>
@@ -64,4 +75,35 @@ export default defineComponent({
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.radio-button {
+  background-size: 120%;
+  background-position: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid;
+}
+
+.v-btn--active {
+  .radio-button {
+    border-color: rgb(var(--v-theme-error));
+  }
+
+  opacity: 1;
+}
+
+.merlin-radio-button {
+  background-image: url('@/assets/icons/merlin_hat.png');
+}
+
+.lovers-radio-button {
+  background-image: url('@/assets/icons/lovers_rose.png');
+}
+
+.button-content {
+  color: white;
+  text-transform: none;
+  font-size: 20px;
+}
+</style>
