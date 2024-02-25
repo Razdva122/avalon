@@ -51,10 +51,6 @@ export default defineComponent({
       if ('features' in clone) {
         const isGameEnded = gameState.value.stage === 'end';
 
-        if (this.$store.state.hideSpoilers && !isGameEnded) {
-          clone.role = 'unknown';
-        }
-
         if (this.visibleHistory?.type === 'vote') {
           const userVote = this.visibleHistory.votes.find((player) => player.playerID === clone.id)!;
 
@@ -98,6 +94,10 @@ export default defineComponent({
           } else if (switchedAction) {
             clone.role = 'excalibur';
           }
+        }
+
+        if (this.$store.state.hideSpoilers && !isGameEnded) {
+          clone.role = 'unknown';
         }
       }
 

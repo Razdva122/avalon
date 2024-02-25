@@ -1,56 +1,58 @@
 <template>
   <div class="game-container">
     <div class="history-actions mb-4 d-flex flex-column justify-end">
-      <div class="d-flex flex-column justify-end text-white" v-if="gameState.history.length">
-        <div class="mb-1" v-if="stateManager.viewMode.value === 'live'">
-          <History :history="gameState.history" :players="gameState.players" />
-          <v-btn
-            @click="() => stateManager.toggleViewMode()"
-            class="action-icon"
-            density="comfortable"
-            icon="pause_circle_outline"
-            variant="plain"
-            color="white"
-          ></v-btn>
-        </div>
-        <template v-else>
-          <div class="d-flex align-center justify-center">
-            <div class="history-text left-text text-grey">{{ historyTextArray[0] }}</div>
-            <div class="history-text">{{ historyTextArray[1] }}</div>
-            <div class="history-text right-text text-grey">{{ historyTextArray[2] }}</div>
-          </div>
-          <div class="d-flex flex-row justify-center align-center">
-            <v-btn
-              @click="stateManager.moveToPrevStage()"
-              :disabled="roomState.pointer === 0"
-              class="action-icon navigate-icon"
-              density="comfortable"
-              icon="navigate_before"
-              size="large"
-              variant="text"
-              color="yellow"
-            ></v-btn>
-            <div class="history-hint">History mode</div>
-            <v-btn
-              @click="stateManager.moveToNextStage()"
-              :disabled="roomState.pointer === roomState.gameStates.length - 1"
-              class="action-icon navigate-icon"
-              density="comfortable"
-              icon="navigate_next"
-              size="large"
-              variant="text"
-              color="yellow"
-            ></v-btn>
+      <div class="d-flex flex-column align-center justify-end text-white" v-if="gameState.history.length">
+        <Spoiler :size="{ width: '250px', height: '40px' }">
+          <div class="mb-1" v-if="stateManager.viewMode.value === 'live'">
+            <History :history="gameState.history" :players="gameState.players" />
             <v-btn
               @click="() => stateManager.toggleViewMode()"
               class="action-icon"
               density="comfortable"
-              icon="play_circle_outline"
+              icon="pause_circle_outline"
               variant="plain"
               color="white"
             ></v-btn>
           </div>
-        </template>
+          <template v-else>
+            <div class="d-flex align-center justify-center w-100">
+              <div class="history-text left-text text-grey">{{ historyTextArray[0] }}</div>
+              <div class="history-text">{{ historyTextArray[1] }}</div>
+              <div class="history-text right-text text-grey">{{ historyTextArray[2] }}</div>
+            </div>
+            <div class="d-flex flex-row justify-center align-center">
+              <v-btn
+                @click="stateManager.moveToPrevStage()"
+                :disabled="roomState.pointer === 0"
+                class="action-icon navigate-icon"
+                density="comfortable"
+                icon="navigate_before"
+                size="large"
+                variant="text"
+                color="yellow"
+              ></v-btn>
+              <div class="history-hint">History mode</div>
+              <v-btn
+                @click="stateManager.moveToNextStage()"
+                :disabled="roomState.pointer === roomState.gameStates.length - 1"
+                class="action-icon navigate-icon"
+                density="comfortable"
+                icon="navigate_next"
+                size="large"
+                variant="text"
+                color="yellow"
+              ></v-btn>
+              <v-btn
+                @click="() => stateManager.toggleViewMode()"
+                class="action-icon"
+                density="comfortable"
+                icon="play_circle_outline"
+                variant="plain"
+                color="white"
+              ></v-btn>
+            </div>
+          </template>
+        </Spoiler>
       </div>
     </div>
     <div class="d-flex flex-row mb-4">
@@ -88,6 +90,7 @@ import { defineComponent, PropType, computed, inject } from 'vue';
 import Mission from '@/components/game/board/modules/Mission.vue';
 import History from '@/components/game/information/History.vue';
 import InGamePanel from '@/components/game/panels/InGamePanel.vue';
+import Spoiler from '@/components/feedback/Spoiler.vue';
 import { gameStateKey, stateManagerKey } from '@/helpers/game-state-manager';
 
 export default defineComponent({
@@ -96,6 +99,7 @@ export default defineComponent({
     Mission,
     History,
     InGamePanel,
+    Spoiler,
   },
   props: {
     inGamePanel: {
