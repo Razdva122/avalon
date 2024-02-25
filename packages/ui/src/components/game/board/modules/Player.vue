@@ -97,7 +97,11 @@ export default defineComponent({
         }
 
         if (this.$store.state.hideSpoilers && !isGameEnded) {
-          clone.role = 'unknown';
+          if (clone.role !== 'excalibur') {
+            clone.role = 'unknown';
+          }
+
+          clone.features.switch = undefined;
         }
       }
 
