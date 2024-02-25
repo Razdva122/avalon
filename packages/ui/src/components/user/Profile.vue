@@ -28,6 +28,8 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .user {
-  padding: 0px;
+  padding: 0px 2px;
+  text-transform: none;
+  font-size: 16px;
 }
 </style>

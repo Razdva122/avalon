@@ -1,4 +1,10 @@
 <template>
+  <v-btn color="info" class="mb-4" @click="onCopyClick">
+    <template v-slot:prepend>
+      <span class="material-icons"> share </span>
+    </template>
+    Copy link
+  </v-btn>
   <v-btn v-if="isUserInGame" color="warning" @click="onJoinClick"> Leave Game </v-btn>
   <v-btn
     v-else-if="roomState.players.length < 10"
@@ -22,6 +28,7 @@ import { defineComponent, computed, ref, PropType, toRefs } from 'vue';
 import { useStore } from '@/store';
 import { TPageRoomState } from '@/pages/room/game-state-manager';
 import { socket } from '@/api/socket';
+import eventBus from '@/helpers/eventBus';
 import type { TGameOptionsRoles, TGameOptionsAddons } from '@avalon/types';
 import Options from '@/components/game/options/Options.vue';
 
@@ -79,6 +86,11 @@ export default defineComponent({
       socket.emit('startGame', roomState.value.roomID, { roles: roles.value, addons: addons.value });
     };
 
+    const onCopyClick = () => {
+      navigator.clipboard.writeText(window.location.href);
+      eventBus.emit('infoMessage', 'Link has been copied to the clipboard');
+    };
+
     return {
       roomState,
       roles,
@@ -91,6 +103,7 @@ export default defineComponent({
       onJoinClick,
       onLockClick,
       onStartClick,
+      onCopyClick,
     };
   },
 });

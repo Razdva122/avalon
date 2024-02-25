@@ -13,7 +13,7 @@
   <Settings ref="settings" />
   <Profile v-if="user" @usernameClick="usernameClick" class="profile" />
   <ConnectStatus class="connect-status" />
-  <ErrorSnackbar />
+  <InfoSnackbar />
   <Version class="version" />
 </template>
 
@@ -22,14 +22,14 @@ import { defineComponent } from 'vue';
 import Settings from '@/components/user/Settings.vue';
 import Profile from '@/components/user/Profile.vue';
 import ConnectStatus from '@/components/feedback/ConnectStatus.vue';
-import ErrorSnackbar from '@/components/feedback/ErrorSnackbar.vue';
+import InfoSnackbar from '@/components/feedback/InfoSnackbar.vue';
 import Version from '@/components/feedback/Version.vue';
 
 export default defineComponent({
   components: {
     Settings,
     ConnectStatus,
-    ErrorSnackbar,
+    InfoSnackbar,
     Profile,
     Version,
   },
