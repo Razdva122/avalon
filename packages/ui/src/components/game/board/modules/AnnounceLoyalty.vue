@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent, inject, Ref, ref } from 'vue';
 import { socket } from '@/api/socket';
-import { gameStateKey } from '@/pages/room/game-state-manager';
+import { gameStateKey } from '@/helpers/game-state-manager';
 import { TLoyalty } from '@avalon/types';
 import Spoiler from '@/components/feedback/Spoiler.vue';
 

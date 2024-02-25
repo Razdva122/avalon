@@ -24,7 +24,7 @@ import * as _ from 'lodash';
 import { defineComponent, PropType, inject } from 'vue';
 import type { TRoomPlayer, THistoryResults, Dictionary, TGameStage, IActionWithResult } from '@avalon/types';
 import type { IFrontendPlayer } from '@/components/game/board/interface';
-import { gameStateKey } from '@/pages/room/game-state-manager';
+import { gameStateKey } from '@/helpers/game-state-manager';
 import PlayerIcon from '@/components/game/information/PlayerIcon.vue';
 
 export default defineComponent({

@@ -88,7 +88,7 @@ import { defineComponent, PropType, computed, inject } from 'vue';
 import Mission from '@/components/game/board/modules/Mission.vue';
 import History from '@/components/game/information/History.vue';
 import InGamePanel from '@/components/game/panels/InGamePanel.vue';
-import { gameStateKey, stateManagerKey } from '@/pages/room/game-state-manager';
+import { gameStateKey, stateManagerKey } from '@/helpers/game-state-manager';
 
 export default defineComponent({
   name: 'Game',

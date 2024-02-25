@@ -26,9 +26,9 @@
 <script lang="ts">
 import { defineComponent, computed, ref, PropType, toRefs } from 'vue';
 import { useStore } from '@/store';
-import { TPageRoomState } from '@/pages/room/game-state-manager';
+import { TPageRoomState } from '@/helpers/game-state-manager';
 import { socket } from '@/api/socket';
-import eventBus from '@/helpers/eventBus';
+import eventBus from '@/helpers/event-bus';
 import type { TGameOptionsRoles, TGameOptionsAddons } from '@avalon/types';
 import Options from '@/components/game/options/Options.vue';
 

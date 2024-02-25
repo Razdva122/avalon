@@ -2,12 +2,12 @@ import * as _ from 'lodash';
 
 import type { IVisualGameState, TRoomState, THistoryResults, TGameStage } from '@avalon/types';
 import { Ref, computed, ref, provide, InjectionKey } from 'vue';
-import { TPageRoomStateRef, TStartedPageRoomState } from '@/pages/room/game-state-manager/interface';
+import { TPageRoomStateRef, TStartedPageRoomState } from '@/helpers/game-state-manager/interface';
 
 export const gameStateKey = Symbol() as InjectionKey<Ref<IVisualGameState>>;
 export const stateManagerKey = Symbol() as InjectionKey<GameStateManager>;
 
-export * from '@/pages/room/game-state-manager/interface';
+export * from '@/helpers/game-state-manager/interface';
 
 export class GameStateManager {
   state: TPageRoomStateRef;

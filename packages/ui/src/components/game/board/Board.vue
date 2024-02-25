@@ -51,7 +51,7 @@ import AnnounceLoyalty from './modules/AnnounceLoyalty.vue';
 import { THistoryResults } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
-import { gameStateKey, stateManagerKey, TPageRoomState } from '@/pages/room/game-state-manager';
+import { gameStateKey, stateManagerKey, TPageRoomState } from '@/helpers/game-state-manager';
 import { calculateVisualElement } from '@/components/game/board/helpers';
 import { time } from 'console';
 

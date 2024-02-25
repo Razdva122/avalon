@@ -18,7 +18,7 @@ import Board from '@/components/game/board/Board.vue';
 import type { TVisibleRole, ISocketError } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
-import { GameStateManager } from '@/pages/room/game-state-manager';
+import { GameStateManager } from '@/helpers/game-state-manager';
 import RolesInfo from '@/components/game/information/RolesInfo.vue';
 
 export default defineComponent({

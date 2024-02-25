@@ -14,7 +14,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { socket } from '@/api/socket';
-import eventBus from '@/helpers/eventBus';
+import eventBus from '@/helpers/event-bus';
 
 export default defineComponent({
   setup() {
