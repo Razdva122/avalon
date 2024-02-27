@@ -12,7 +12,10 @@
   </RouterView>
   <Settings ref="settings" />
   <Profile v-if="user" @usernameClick="usernameClick" class="profile" />
-  <ConnectStatus class="connect-status" />
+  <div class="header-right-container d-flex align-center">
+    <ConnectStatus class="connect-status mr-4" />
+    <Socials />
+  </div>
   <InfoSnackbar />
   <Version class="version" />
 </template>
@@ -24,6 +27,7 @@ import Profile from '@/components/user/Profile.vue';
 import ConnectStatus from '@/components/feedback/ConnectStatus.vue';
 import InfoSnackbar from '@/components/feedback/InfoSnackbar.vue';
 import Version from '@/components/feedback/Version.vue';
+import Socials from '@/components/feedback/Socials.vue';
 
 export default defineComponent({
   components: {
@@ -32,6 +36,7 @@ export default defineComponent({
     InfoSnackbar,
     Profile,
     Version,
+    Socials,
   },
   data() {
     const { user } = this.$store.state;
@@ -59,9 +64,13 @@ export default defineComponent({
 
 .connect-status {
   font-size: large;
+}
+
+.header-right-container {
+  height: 36px;
   position: fixed;
-  top: 0px;
-  left: 2px;
+  top: 5px;
+  left: 10px;
 }
 
 .profile {

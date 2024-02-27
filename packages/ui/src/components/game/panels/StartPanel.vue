@@ -5,6 +5,12 @@
     </template>
     Copy link
   </v-btn>
+  <v-btn color="info" class="mb-4" @click="onDiscordClick">
+    <div class="d-flex align-center discord-button">
+      <div class="discord-icon mr-2"></div>
+      <span>Discord</span>
+    </div>
+  </v-btn>
   <v-btn v-if="isUserInGame" color="warning" @click="onJoinClick"> Leave Game </v-btn>
   <v-btn
     v-else-if="roomState.players.length < 10"
@@ -91,6 +97,10 @@ export default defineComponent({
       eventBus.emit('infoMessage', 'Link has been copied to the clipboard');
     };
 
+    const onDiscordClick = () => {
+      window.open('https://discord.gg/DR9cEDDNdN', '_blank');
+    };
+
     return {
       roomState,
       roles,
@@ -104,9 +114,22 @@ export default defineComponent({
       onLockClick,
       onStartClick,
       onCopyClick,
+      onDiscordClick,
     };
   },
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.discord-button {
+  text-decoration: none;
+  color: white;
+}
+.discord-icon {
+  width: 30px;
+  height: 30px;
+  background-image: url('@/assets/icons/discord.png');
+  background-position: center;
+  background-size: contain;
+}
+</style>
