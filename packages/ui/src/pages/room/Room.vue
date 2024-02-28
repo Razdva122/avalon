@@ -1,5 +1,5 @@
 <template>
-  <div class="room d-flex flex-column align-center justify-space-around mt-10">
+  <div class="room d-flex flex-column align-center justify-space-around pt-10">
     <template v-if="errorMessage">
       <h1 class="text-white mb-4">{{ errorMessage.error }}</h1>
       <v-btn @click="$router.push({ name: 'lobby' })">Back to lobby</v-btn>
