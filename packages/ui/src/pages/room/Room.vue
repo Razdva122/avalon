@@ -1,7 +1,8 @@
 <template>
-  <div class="room d-flex flex-column align-center mt-8">
+  <div class="room d-flex flex-column align-center justify-space-around mt-10">
     <template v-if="errorMessage">
-      <h1 class="text-white">{{ errorMessage.error }}</h1>
+      <h1 class="text-white mb-4">{{ errorMessage.error }}</h1>
+      <v-btn @click="$router.push({ name: 'lobby' })">Back to lobby</v-btn>
     </template>
     <template v-else>
       <v-btn v-if="displayRestartButton" @click="restartGame" class="restart-button">Restart game</v-btn>
@@ -120,5 +121,10 @@ export default defineComponent({
   position: absolute;
   top: 450px;
   z-index: 10;
+}
+
+.room {
+  width: 100vw;
+  height: calc(100vh - 40px);
 }
 </style>

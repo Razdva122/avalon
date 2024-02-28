@@ -1,5 +1,5 @@
 <template>
-  <div class="board-container mt-16" :class="'view-mode-' + stateManager.viewMode.value">
+  <div class="board-container" :class="'view-mode-' + stateManager.viewMode.value">
     <div class="game-board" alt="board" :class="'game-end-' + gameResult"></div>
     <div class="timer">
       <Timer @timerEnd="clearHistoryElement" :duration="timerDuration" />
@@ -53,7 +53,6 @@ import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { gameStateKey, stateManagerKey, TPageRoomState } from '@/helpers/game-state-manager';
 import { calculateVisualElement } from '@/components/game/board/helpers';
-import { time } from 'console';
 
 export default defineComponent({
   name: 'Board',
@@ -220,31 +219,38 @@ export default defineComponent({
     rgba($color, 0.05) 40px 40px;
 }
 
+@mixin scaleFromSize($size) {
+  $value: $size;
+
+  @while $value > 300px {
+    $newValue: calc($value - 50px);
+
+    @media screen and (max-width: $value) and (min-width: $newValue) {
+      .board-container {
+        transform: scale(calc($newValue / $size));
+      }
+    }
+
+    @media screen and (max-height: $value) and (min-height: $newValue) {
+      .board-container {
+        transform: scale(calc($newValue / $size));
+      }
+    }
+
+    $value: $newValue;
+  }
+}
+
 .board-container {
   user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  margin: 100px 120px;
 }
 
-@media only screen and (max-width: 600px) and (min-width: 500px) {
-  .board-container {
-    transform: scale(0.8);
-  }
-}
-
-@media only screen and (max-width: 500px) and (min-width: 420px) {
-  .board-container {
-    transform: scale(0.7);
-  }
-}
-
-@media only screen and (max-width: 420px) {
-  .board-container {
-    transform: scale(0.6);
-  }
-}
+@include scaleFromSize(840px);
 
 .actions-container {
   top: 120px;

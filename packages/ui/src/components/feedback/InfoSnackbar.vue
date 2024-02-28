@@ -1,5 +1,5 @@
 <template>
-  <div class="text-center ma-2">
+  <div v-if="snackbar" class="text-center ma-2">
     <v-snackbar v-model="snackbar">
       <div class="snackbar-content">
         {{ text }}
