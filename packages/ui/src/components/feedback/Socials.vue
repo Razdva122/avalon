@@ -16,7 +16,7 @@ export default defineComponent({});
 </script>
 
 <style scoped lang="scss">
-.social-button {
+.v-btn.social-button {
   padding: 0px;
   width: 32px;
   height: 32px;

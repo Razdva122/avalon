@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex flex-row align-center justify-center">
     <div :class="state.class" class="rounded-circle circle"></div>
-    <div class="ml-2 text-white">{{ state.text }}</div>
+    <div class="ml-2 text-white connection-state">{{ state.text }}</div>
   </div>
 </template>
 
@@ -40,5 +40,11 @@ export default defineComponent({
 .circle {
   width: 14px;
   height: 14px;
+}
+
+@media only screen and (max-width: 600px) {
+  .connection-state {
+    display: none;
+  }
 }
 </style>

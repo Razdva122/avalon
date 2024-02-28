@@ -226,7 +226,24 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
   position: relative;
-  width: 100vw;
+}
+
+@media only screen and (max-width: 600px) and (min-width: 500px) {
+  .board-container {
+    transform: scale(0.8);
+  }
+}
+
+@media only screen and (max-width: 500px) and (min-width: 420px) {
+  .board-container {
+    transform: scale(0.7);
+  }
+}
+
+@media only screen and (max-width: 420px) {
+  .board-container {
+    transform: scale(0.6);
+  }
 }
 
 .actions-container {
