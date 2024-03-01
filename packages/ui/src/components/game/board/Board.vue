@@ -94,7 +94,7 @@ export default defineComponent({
     });
 
     const calculateRotate = (i: number, negative: boolean = false) => {
-      return `rotate(${negative ? '-' : ''}${(360 / roomState.value.players.length) * i + 180}deg)`;
+      return `rotate(${negative ? '-' : ''}${(360 / players.value.length) * i + 180}deg)`;
     };
 
     const clearHistoryElement = () => {
