@@ -1,5 +1,7 @@
 import type { IVisualGameState } from '../game/state';
 
+export * from './list';
+
 export type TRoomState = TCreatedRoomState | TLockedRoomState | TStartedRoomState;
 
 type TMetaRoomState = {

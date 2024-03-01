@@ -11,9 +11,12 @@ import type { TLoyalty } from '../game/roles';
 import type { IRoomUnavailableError } from './errors';
 import type { TAssassinateType } from '../game/addons';
 
+import type { TRoomsList } from '../room';
+
 export type { ISocketError } from './errors';
 
 export interface ServerToClientEvents {
+  roomsListUpdated: (list: TRoomsList) => void;
   roomUpdated: (state: TRoomState) => void;
   gameUpdated: (state: IVisualGameState) => void;
   restartGame: (uuid: string) => void;
@@ -21,6 +24,8 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
+  getRoomsList: (callback: (list: TRoomsList) => void) => void;
+
   createRoom: (callback: (uuid: string) => void) => void;
   joinRoom: (uuid: string, callback: (state: TRoomState | IRoomUnavailableError) => void) => void;
   lockRoom: (uuid: string) => void;

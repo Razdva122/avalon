@@ -1,6 +1,6 @@
 import { Room } from '@/room';
 import { User } from '@/user';
-import type { Dictionary } from '@avalon/types';
+import type { Dictionary, TRoomInfo, TRoomsList } from '@avalon/types';
 import type { Server, ServerSocket } from '@avalon/types';
 import crypto from 'crypto';
 
@@ -8,15 +8,33 @@ import { parseCookie, handleSocketErrors } from '@/helpers';
 
 export class Manager {
   rooms: Dictionary<Room> = {};
+  roomsList: TRoomsList = [];
   io: Server;
 
   createRoom(uuid: string, leaderID: string, players: User[]) {
     this.rooms[uuid] = new Room(uuid, leaderID, players, this.io);
 
-    // Delete room after 1 day timeout
+    this.updateRoomsList(this.rooms[uuid]);
+
+    // Delete room after 3 day timeout
     setTimeout(() => {
       delete this.rooms[uuid];
-    }, 86400000);
+    }, 86400000 * 3);
+  }
+
+  updateRoomsList(room: Room) {
+    const roomData: TRoomInfo = {
+      host: room.players.find((player) => player.id === room.leaderID)!.name,
+      uuid: room.roomID,
+    };
+
+    if (this.roomsList.length === 10) {
+      this.roomsList.shift();
+    }
+
+    this.roomsList.push(roomData);
+
+    this.io.to('lobby').emit('roomsListUpdated', this.roomsList);
   }
 
   restartRoom(uuid: string) {
@@ -62,6 +80,11 @@ export class Manager {
         } else {
           cb({ error: 'This is wrong uuid' });
         }
+      });
+
+      socket.on('getRoomsList', (cb) => {
+        socket.join('lobby');
+        cb(this.roomsList);
       });
 
       if (userID && userName) {
