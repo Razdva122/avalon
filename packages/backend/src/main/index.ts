@@ -4,7 +4,7 @@ import type { Dictionary, TRoomInfo, TRoomsList } from '@avalon/types';
 import type { Server, ServerSocket } from '@avalon/types';
 import crypto from 'crypto';
 
-import { parseCookie, handleSocketErrors } from '@/helpers';
+import { parseCookie, handleSocketErrors, eventBus } from '@/helpers';
 
 export class Manager {
   rooms: Dictionary<Room> = {};
@@ -16,23 +16,41 @@ export class Manager {
 
     this.updateRoomsList(this.rooms[uuid]);
 
+    // Removes a room from the list if the game has not started after 30 minutes
+    setTimeout(() => {
+      if (this.rooms[uuid].data.stage !== 'started') {
+        this.updateRoomsList(this.rooms[uuid], true);
+      }
+    }, 60000 * 30);
+
     // Delete room after 3 day timeout
     setTimeout(() => {
       delete this.rooms[uuid];
     }, 86400000 * 3);
   }
 
-  updateRoomsList(room: Room) {
-    const roomData: TRoomInfo = {
-      host: room.players.find((player) => player.id === room.leaderID)!.name,
-      uuid: room.roomID,
-    };
+  updateRoomsList(room: Room, removeRoom: boolean = false) {
+    if (removeRoom) {
+      this.roomsList = this.roomsList.filter((el) => el.uuid !== room.roomID);
+    } else {
+      const roomData: TRoomInfo = {
+        host: room.players.find((player) => player.id === room.leaderID)!.name,
+        state: room.data.stage === 'started' ? 'started' : 'created',
+        uuid: room.roomID,
+      };
 
-    if (this.roomsList.length === 10) {
-      this.roomsList.shift();
+      const roomIndex = this.roomsList.findIndex((el) => el.uuid === room.roomID);
+
+      if (roomIndex !== -1) {
+        this.roomsList[roomIndex] = roomData;
+      } else {
+        if (this.roomsList.length === 10) {
+          this.roomsList.pop();
+        }
+
+        this.roomsList.unshift(roomData);
+      }
     }
-
-    this.roomsList.push(roomData);
 
     this.io.to('lobby').emit('roomsListUpdated', this.roomsList);
   }
@@ -60,6 +78,10 @@ export class Manager {
 
   constructor(io: Server) {
     this.io = io;
+
+    eventBus.on('roomUpdated', (room) => {
+      this.updateRoomsList(room);
+    });
 
     io.on('connection', (socket) => {
       handleSocketErrors(socket);
@@ -139,6 +161,7 @@ export class Manager {
       const room = this.rooms[uuid];
       if (room.leaderID === userID) {
         room.startGame(options);
+        eventBus.emit('roomUpdated', room);
       }
     });
 

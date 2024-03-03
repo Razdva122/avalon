@@ -1,14 +1,19 @@
 <template>
   <div class="lobby">
-    <v-btn color="info" @click="createRoom" size="x-large"> Create room </v-btn>
+    <v-btn @click="createRoom" size="x-large"> Create room </v-btn>
 
     <div v-if="roomsList && roomsList.length" class="text-white">
       <div class="list-header mb-5">Games list:</div>
       <div v-for="(game, index) in roomsList" class="game mb-1">
-        <div>
-          {{ index + 1 }}. HOST: <b>{{ game.host }}</b>
+        <div class="mr-2">
+          {{ index + 1 }}.HOST: <b>{{ game.host }}</b>
         </div>
-        <v-btn @click="$router.push({ name: 'room', params: { uuid: game.uuid } })">Join game</v-btn>
+        <v-btn
+          :color="game.state === 'started' ? 'info' : undefined"
+          @click="$router.push({ name: 'room', params: { uuid: game.uuid } })"
+        >
+          {{ game.state === 'started' ? 'Watch game' : 'Join game' }}
+        </v-btn>
       </div>
     </div>
   </div>
@@ -67,7 +72,7 @@ export default defineComponent({
 
 .game {
   padding: 5px;
-  width: 50vw;
+  min-width: 50vw;
   display: flex;
   justify-content: space-between;
   align-items: center;

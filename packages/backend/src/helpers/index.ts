@@ -1,6 +1,7 @@
 import type { Dictionary } from '@avalon/types';
 
 export * from '@/helpers/socket';
+export * from '@/helpers/event-bus';
 
 export const parseCookie = (str: string) =>
   str
