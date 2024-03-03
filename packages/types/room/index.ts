@@ -13,6 +13,7 @@ type TMetaRoomState = {
 export type TRoomPlayer = {
   id: string;
   name: string;
+  isLeader: boolean;
 };
 
 export type TCreatedRoomState = {

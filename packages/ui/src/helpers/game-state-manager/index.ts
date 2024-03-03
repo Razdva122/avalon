@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import type { IVisualGameState, TRoomState, THistoryResults, TGameStage } from '@avalon/types';
+import type { IVisualGameState, TRoomState, THistoryResults, TGameStage, IPlayer, TRoomPlayer } from '@avalon/types';
 import { Ref, computed, ref, provide, InjectionKey } from 'vue';
 import { TPageRoomStateRef, TStartedPageRoomState } from '@/helpers/game-state-manager/interface';
 
@@ -160,7 +160,7 @@ export class GameStateManager {
       const indexOfPlayer = roomOrGame.players.findIndex((player) => player.id === userID);
 
       if (indexOfPlayer !== -1) {
-        roomOrGame.players = [
+        roomOrGame.players = <IPlayer[] | TRoomPlayer[]>[
           ...roomOrGame.players.slice(indexOfPlayer),
           ...roomOrGame.players.slice(0, indexOfPlayer),
         ];

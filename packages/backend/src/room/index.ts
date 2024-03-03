@@ -85,7 +85,7 @@ export class Room {
     const roomState = {
       roomID: this.roomID,
       leaderID: this.leaderID,
-      players: this.players.map(({ name, id }) => ({ name, id })),
+      players: this.players.map(({ name, id }) => ({ name, id, isLeader: id === this.leaderID })),
     };
 
     if (this.data.stage === 'started') {

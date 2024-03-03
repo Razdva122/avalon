@@ -42,6 +42,9 @@ export default defineComponent({
     currentStage: {
       type: String as PropType<TGameStage>,
     },
+    displayKick: {
+      type: Boolean as PropType<boolean>,
+    },
   },
   computed: {
     player(): IFrontendPlayer | TRoomPlayer {
@@ -135,6 +138,11 @@ export default defineComponent({
         if (this.currentStage === 'useExcalibur' && this.player.features.excalibur) {
           classes['player-excalibur-active'] = true;
         }
+      } else {
+        classes = {
+          'player-feature-isLeader': this.player.isLeader,
+          'player-feature-kick': Boolean(this.displayKick),
+        };
       }
 
       return classes;
@@ -273,6 +281,22 @@ export default defineComponent({
 
 .player-feature-vote-reject .close {
   display: block;
+}
+
+.player-feature-kick:hover .close {
+  opacity: 0.8;
+  display: block;
+}
+
+@media (hover: none) {
+  .player-feature-kick .close {
+    opacity: 0.8;
+    display: block;
+  }
+}
+
+.player-feature-kick {
+  cursor: pointer;
 }
 
 .player-feature-vote-approve .check {

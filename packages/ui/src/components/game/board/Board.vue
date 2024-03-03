@@ -32,6 +32,7 @@
     >
       <Player
         :player-state="player"
+        :display-kick="userIsLeader"
         :visible-history="visibleHistory"
         :current-stage="roomState.stage === 'started' ? gameState.stage : undefined"
         :style="{ transform: calculateRotate(i, true), translate: '0 -50%' }"
@@ -198,6 +199,7 @@ export default defineComponent({
       visibleHistory,
       stateManager,
       gameResult,
+      userIsLeader,
 
       timerDuration,
       clearHistoryElement,
