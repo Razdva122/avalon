@@ -1,5 +1,5 @@
 <template>
-  <v-overlay v-model="overlay" :persistent="!isUserExist" class="align-center justify-center">
+  <v-overlay v-model="overlay" :persistent="true" class="align-center justify-center">
     <v-card>
       <v-sheet width="300" class="mx-auto pa-4">
         <v-form @submit.prevent="updateUser" class="d-flex flex-column align-center justify-center">
@@ -10,7 +10,7 @@
           <v-btn type="submit">{{ isUserExist ? 'Update' : 'Submit' }}</v-btn>
         </v-form>
       </v-sheet>
-      <v-btn v-if="isUserExist" @click="closeSettings" class="close" icon="close" variant="text" density="compact" />
+      <v-btn @click="closeSettings" class="close" icon="close" variant="text" density="compact" />
     </v-card>
   </v-overlay>
 </template>
@@ -18,13 +18,14 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
+import eventBus from '@/helpers/event-bus';
 
 export default defineComponent({
   data() {
     const { user } = this.$store.state;
 
     return {
-      overlay: !user,
+      overlay: false,
       username: user?.name || '',
       isUserExist: Boolean(user),
       rules: [
@@ -35,6 +36,11 @@ export default defineComponent({
         },
       ],
     };
+  },
+  mounted() {
+    eventBus.on('openSettings', () => {
+      this.overlay = true;
+    });
   },
   computed: {
     hideSpoilers: {

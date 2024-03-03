@@ -1,6 +1,6 @@
 <template>
-  <div v-if="snackbar" class="text-center ma-2">
-    <v-snackbar v-model="snackbar">
+  <div v-if="snackbar">
+    <v-snackbar v-model="snackbar" class="text-center ma-2">
       <div class="snackbar-content">
         {{ text }}
       </div>

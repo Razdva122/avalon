@@ -81,6 +81,12 @@ export default defineComponent({
     });
 
     const onJoinClick = () => {
+      if (!store.state.user) {
+        eventBus.emit('openSettings');
+        eventBus.emit('infoMessage', 'Log in to join game');
+        return;
+      }
+
       socket.emit(isUserInGame.value ? 'leaveGame' : 'joinGame', roomState.value.roomID);
     };
 

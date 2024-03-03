@@ -22,12 +22,15 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from '@/store';
 import type { TRoomsList } from '@avalon/types';
 import { socket } from '@/api/socket';
+import eventBus from '@/helpers/event-bus';
 
 export default defineComponent({
   async setup() {
     const router = useRouter();
+    const store = useStore();
 
     const roomsList = ref<TRoomsList>();
 
@@ -40,6 +43,12 @@ export default defineComponent({
     await initState();
 
     const createRoom = async () => {
+      if (!store.state.user) {
+        eventBus.emit('openSettings');
+        eventBus.emit('infoMessage', 'Log in to create a game');
+        return;
+      }
+
       const uuid = await socket.emitWithAck('createRoom');
       router.push({ name: 'room', params: { uuid } });
     };
