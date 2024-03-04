@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex mb-2 text-white" v-if="assassinateTargets.length > 1">
+  <div class="d-flex mb-2" v-if="assassinateTargets.length > 1">
     <v-btn-toggle v-model="selectedTarget" density="comfortable" divided>
       <v-btn class="button-content" value="merlin" variant="plain">
         <template v-slot:prepend>

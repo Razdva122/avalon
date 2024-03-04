@@ -12,7 +12,7 @@
       <div>Players: {{ mission.players }}</div>
       <div>Fails: {{ mission.fails }}</div>
     </v-tooltip>
-    <div class="text-white" v-if="mission.failsRequired > 1">Fails: {{ mission.failsRequired }}</div>
+    <div v-if="mission.failsRequired > 1">Fails: {{ mission.failsRequired }}</div>
   </div>
 </template>
 

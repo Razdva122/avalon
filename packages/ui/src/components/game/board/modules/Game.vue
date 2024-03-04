@@ -1,7 +1,7 @@
 <template>
   <div class="game-container">
     <div class="history-actions mb-4 d-flex flex-column justify-end">
-      <div class="d-flex flex-column align-center justify-end text-white" v-if="gameState.history.length">
+      <div class="d-flex flex-column align-center justify-end" v-if="gameState.history.length">
         <Spoiler :size="{ width: '250px', height: '40px' }">
           <div class="mb-1" v-if="stateManager.viewMode.value === 'live'">
             <History :history="gameState.history" :players="gameState.players" />
@@ -58,7 +58,7 @@
     <div class="d-flex flex-row mb-4">
       <Mission v-for="mission in missions" :mission="mission" />
     </div>
-    <div class="text-white mb-4">Vote stage: {{ gameState.vote + 1 }} / 5</div>
+    <div class="mb-4">Vote stage: {{ gameState.vote + 1 }} / 5</div>
     <div class="button-panel actions-or-info mb-4 d-flex flex-column align-center">
       <InGamePanel v-if="inGamePanel && !visibleHistory && stateManager.viewMode.value === 'live'" :game="gameState" />
       <div class="d-flex flex-row align-center justify-center" v-if="visibleHistory?.type === 'mission'">
@@ -70,7 +70,7 @@
         </template>
       </div>
     </div>
-    <div class="meta-info text-white font-weight-bold d-flex justify-space-between">
+    <div class="meta-info font-weight-bold d-flex justify-space-between">
       <div>
         <span>stage: {{ stageText }}</span>
       </div>

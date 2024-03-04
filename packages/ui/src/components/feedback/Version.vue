@@ -1,5 +1,5 @@
 <template>
-  <span class="text-white"> V: {{ APP_VERSION }} </span>
+  <span> V: {{ APP_VERSION }} </span>
 </template>
 
 <script lang="ts">

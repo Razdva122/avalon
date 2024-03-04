@@ -1,8 +1,9 @@
 <template>
   <div class="lobby">
+    <v-btn @click="$router.push({ name: 'about' })" color="info" size="large"> About site </v-btn>
     <v-btn @click="createRoom" size="x-large"> Create room </v-btn>
 
-    <div v-if="roomsList && roomsList.length" class="text-white">
+    <div v-if="roomsList && roomsList.length">
       <div class="list-header mb-5">Games list:</div>
       <div v-for="(game, index) in roomsList" class="game mb-1">
         <div class="mr-2">

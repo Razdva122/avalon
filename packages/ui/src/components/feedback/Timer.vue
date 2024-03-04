@@ -1,6 +1,6 @@
 <template>
   <template v-if="time > 0">
-    <span class="text-white">
+    <span>
       {{ timeInString }}
     </span>
   </template>

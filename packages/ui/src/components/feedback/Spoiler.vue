@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="hideSpoilers"
-    class="text-white rounded-lg bg-blue-grey-darken-1 spoiler"
+    class="rounded-lg bg-blue-grey-darken-1 spoiler"
     title="The content is hidden under the spoiler, as it contains information unknown to other players"
     :style="size ? `width: ${size.width}; height: ${size.height}` : ''"
     @click="clickOnSpoiler"
