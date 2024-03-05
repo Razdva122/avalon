@@ -54,7 +54,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .about {
-  margin-top: 40px;
+  padding-bottom: 20px;
 }
 
 .about > div {

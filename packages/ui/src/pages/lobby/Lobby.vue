@@ -68,12 +68,11 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .lobby {
-  margin-top: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
-  height: calc(100vh - 40px);
+  height: calc(100vh - 50px);
 }
 
 .list-header {

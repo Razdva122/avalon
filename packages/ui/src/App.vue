@@ -1,9 +1,16 @@
 <template>
+  <header class="header">
+    <div class="header-right-container d-flex align-center mr-4 ml-4">
+      <ConnectStatus class="connect-status mr-4" />
+      <Socials />
+    </div>
+    <Profile v-if="user" @usernameClick="usernameClick" class="profile mr-4" />
+  </header>
   <RouterView v-slot="{ Component }">
     <template v-if="Component">
       <Transition mode="out-in">
         <Suspense>
-          <component :is="Component"></component>
+          <component :is="Component" class="page"></component>
 
           <template #fallback> Loading... </template>
         </Suspense>
@@ -11,11 +18,6 @@
     </template>
   </RouterView>
   <Settings ref="settings" />
-  <Profile v-if="user" @usernameClick="usernameClick" class="profile" />
-  <div class="header-right-container d-flex align-center">
-    <ConnectStatus class="connect-status mr-4" />
-    <Socials />
-  </div>
   <InfoSnackbar />
   <Version class="version" />
 </template>
@@ -63,22 +65,30 @@ export default defineComponent({
   height: 100vh;
 }
 
+.header {
+  height: 50px;
+  width: 100%;
+  background-color: #2c3e50;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 100;
+}
+
+.page {
+  padding-top: 50px;
+}
+
 .connect-status {
   font-size: large;
 }
 
-.header-right-container {
-  height: 36px;
-  position: fixed;
-  top: 5px;
-  left: 10px;
-}
-
 .profile {
   font-size: large;
-  position: fixed;
-  top: 5px;
-  right: 10px;
 }
 
 .version {

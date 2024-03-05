@@ -125,6 +125,6 @@ export default defineComponent({
 
 .room {
   width: 100vw;
-  height: calc(100vh - 40px);
+  height: calc(100vh - 50px);
 }
 </style>
