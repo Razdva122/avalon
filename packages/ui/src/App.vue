@@ -4,7 +4,10 @@
       <ConnectStatus class="connect-status mr-4" />
       <Socials />
     </div>
-    <Profile v-if="user" @usernameClick="usernameClick" class="profile mr-4" />
+    <div class="header-left-container d-flex align-center mr-2">
+      <SpoilerEye />
+      <Menu @profileClick="profileClick" />
+    </div>
   </header>
   <RouterView v-slot="{ Component }">
     <template v-if="Component">
@@ -25,20 +28,22 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Settings from '@/components/user/Settings.vue';
-import Profile from '@/components/user/Profile.vue';
+import Menu from '@/components/header/Menu.vue';
 import ConnectStatus from '@/components/feedback/ConnectStatus.vue';
 import InfoSnackbar from '@/components/feedback/InfoSnackbar.vue';
 import Version from '@/components/feedback/Version.vue';
 import Socials from '@/components/feedback/Socials.vue';
+import SpoilerEye from '@/components/feedback/SpoilerEye.vue';
 
 export default defineComponent({
   components: {
     Settings,
     ConnectStatus,
     InfoSnackbar,
-    Profile,
     Version,
     Socials,
+    Menu,
+    SpoilerEye,
   },
   data() {
     const { user } = this.$store.state;
@@ -48,7 +53,7 @@ export default defineComponent({
     };
   },
   methods: {
-    usernameClick() {
+    profileClick() {
       (<InstanceType<typeof Settings>>this.$refs.settings).displaySettings();
     },
   },
@@ -87,7 +92,7 @@ export default defineComponent({
   font-size: large;
 }
 
-.profile {
+.header-left-container {
   font-size: large;
 }
 
