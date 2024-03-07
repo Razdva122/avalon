@@ -25,8 +25,8 @@
     <ul>
       <li><b>8. Using Special Abilities</b>: Special characters may use their abilities at designed points.</li>
       <li>
-        <b>9. Assassination Phase</b>: If the Resistance secures three missions, the Assassin gets a chance to identify
-        Merlin to win for the Spies.
+        <b>9. Assassination Phase</b>: If the good side secures three missions, the Assassin gets a chance to identify
+        Merlin to win for evil side.
       </li>
     </ul>
 
@@ -34,7 +34,7 @@
     <ul>
       <li>
         <b>10. Determine Winner</b>: The game concludes when one side secures three missions or the Assassin correctly
-        identifies Merlin post Resistance victories.
+        identifies Merlin post good side victories.
       </li>
     </ul>
   </div>
