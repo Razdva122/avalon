@@ -6,6 +6,7 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.lobby, component: Lobby },
   { ...routesSeo.about, component: () => import('@/pages/about/About.vue') },
   { ...routesSeo.room, component: () => import('@/pages/room/Room.vue') },
+  { ...routesSeo.wiki, component: () => import('@/pages/wiki/Index.vue') },
 ];
 
 const router = createRouter({

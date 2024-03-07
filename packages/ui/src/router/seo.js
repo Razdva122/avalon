@@ -26,4 +26,12 @@ module.exports.routesSeo = {
       description: "Rooms for online games in 'The Resistance: Avalon'",
     },
   },
+  wiki: {
+    path: '/wiki',
+    name: 'wiki',
+    meta: {
+      title: 'How to play avalon',
+      description: "The basic rules of the board game 'The Resistance: Avalon'. How to play 'The Resistance: Avalon'?",
+    },
+  },
 };

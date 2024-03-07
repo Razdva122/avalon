@@ -3,6 +3,7 @@ import type { TVoteOption } from './vote';
 import type { TAssassinateResult } from './addons';
 import type { TLoyalty } from './roles';
 import type { TAssassinateType } from './addons/assassin';
+import type { TExcaliburFeatures } from './addons/excalibur';
 
 /**
  * Possible history element
@@ -78,7 +79,7 @@ export type TVote = {
   playerID: string;
   onMission: boolean;
   value: TVoteOption;
-};
+} & TExcaliburFeatures;
 
 /**
  * Action of player in mission

@@ -47,6 +47,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .mission {
+  text-align: center;
   width: 65px;
   height: 65px;
   border-radius: 50%;

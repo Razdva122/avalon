@@ -203,6 +203,7 @@ export default defineComponent({
 }
 
 .player-name {
+  text-align: center;
   width: 115px;
   @include text-overflow(1);
   background-image: url('@/assets/name-frame.png');

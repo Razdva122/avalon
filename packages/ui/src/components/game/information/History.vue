@@ -52,7 +52,10 @@
             {{
               historyEl.votes
                 .filter((el) => el.onMission)
-                .map((el) => calculateNameByID(el.playerID))
+                .map((el) => {
+                  const name = calculateNameByID(el.playerID);
+                  return el.excalibur ? name + '(Excalibur)' : name;
+                })
                 .join(', ')
             }}
           </div>

@@ -1,6 +1,6 @@
 <template>
   <div class="about pr-5 pl-5">
-    <div class="title">About</div>
+    <h1 class="title">About</h1>
     <div>
       Welcome to <b>avalon-game.com</b>, your premier destination for playing <b>"The Resistance: Avalon"</b> online
       with friends and fellow enthusiasts. Our platform offers a seamless and immersive gaming experience, entirely free
@@ -15,7 +15,9 @@
       the deductive challenge of discerning allies from foes.
     </div>
 
-    <img class="preview" alt="preview" src="@/assets/images/preview.webp" />
+    <div class="image">
+      <img class="preview" alt="preview" src="@/assets/images/preview.webp" />
+    </div>
 
     <div>
       Our site replicates the full spectrum of roles found in the traditional board game, including <b>Merlin</b>,
@@ -55,6 +57,7 @@ export default defineComponent({
 <style scoped lang="scss">
 .about {
   padding-bottom: 20px;
+  font-size: 18px;
 }
 
 .about > div {
@@ -62,15 +65,20 @@ export default defineComponent({
 }
 
 .socials {
-  font-size: 22px;
+  font-size: 24px;
 }
 
 .title {
-  font-size: 36px;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
 .preview {
   width: 100%;
   max-width: 600px;
+}
+
+.image {
+  text-align: center;
 }
 </style>

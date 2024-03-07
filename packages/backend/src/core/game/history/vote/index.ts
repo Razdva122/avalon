@@ -72,6 +72,7 @@ export class Vote implements HistoryElement<'vote'> {
       votes: this.data.votes.map((el) => ({
         playerID: el.player.user.id,
         onMission: el.onMission,
+        excalibur: el.excalibur,
         value: <TVoteOption>el.value,
       })),
     };

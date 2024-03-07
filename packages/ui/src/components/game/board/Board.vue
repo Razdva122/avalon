@@ -301,6 +301,7 @@ export default defineComponent({
 }
 
 .timer {
+  text-align: center;
   position: absolute;
   top: 100px;
   font-size: 28px;
