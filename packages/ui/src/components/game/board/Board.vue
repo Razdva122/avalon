@@ -229,13 +229,13 @@ export default defineComponent({
 
     @media screen and (max-width: $value) and (min-width: $newValue) {
       .board-container {
-        transform: scale(calc($newValue / $size));
+        transform: scale(calc(($newValue + 40px) / $size));
       }
     }
 
     @media screen and (max-height: $value) and (min-height: $newValue) {
       .board-container {
-        transform: scale(calc($newValue / $size));
+        transform: scale(calc(($newValue - 50px) / $size));
       }
     }
 
@@ -249,7 +249,7 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
   position: relative;
-  margin: 100px 120px;
+  margin: 120px 100px;
 }
 
 @include scaleFromSize(840px);

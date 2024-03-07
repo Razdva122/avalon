@@ -1,5 +1,5 @@
 <template>
-  <div class="room d-flex flex-column align-center justify-space-around pt-10">
+  <div class="room d-flex flex-column align-center justify-space-around">
     <template v-if="errorMessage">
       <h1 class="mb-4">{{ errorMessage.error }}</h1>
       <v-btn size="x-large" @click="$router.push({ name: 'lobby' })">Back to lobby</v-btn>
@@ -125,6 +125,6 @@ export default defineComponent({
 
 .room {
   width: 100vw;
-  height: calc(100vh - 50px);
+  height: 100%;
 }
 </style>
