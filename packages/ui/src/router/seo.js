@@ -34,4 +34,22 @@ module.exports.routesSeo = {
       description: "The basic rules of the board game 'The Resistance: Avalon'. How to play 'The Resistance: Avalon'?",
     },
   },
+  lady: {
+    path: '/wiki/addons/lady',
+    name: 'lady',
+    meta: {
+      title: 'Lady of the Lake - Avalon rules',
+      description:
+        "Rules for 'Lady of the Lake' card in 'The Resistance: Avalon'. Rules for 'Inquisitor Token' card in 'The Resistance'",
+    },
+  },
+  excalibur: {
+    path: '/wiki/addons/excalibur',
+    name: 'excalibur',
+    meta: {
+      title: 'Excalibur - Avalon rules',
+      description:
+        "Rules for 'Excalibur' card in 'The Resistance: Avalon'. Rules for 'Sergeant' card in 'The Resistance'",
+    },
+  },
 };

@@ -1,5 +1,5 @@
 <template>
-  <div class="about pr-5 pl-5">
+  <div class="info-page-content">
     <h1 class="title">About</h1>
     <div>
       Welcome to <b>avalon-game.com</b>, your premier destination for playing <b>"The Resistance: Avalon"</b> online
@@ -55,22 +55,10 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.about {
-  padding-bottom: 20px;
-  font-size: 18px;
-}
-
-.about > div {
-  margin-bottom: 10px;
-}
+@import '@/styles/info-page.scss';
 
 .socials {
   font-size: 24px;
-}
-
-.title {
-  text-align: center;
-  margin-bottom: 10px;
 }
 
 .preview {

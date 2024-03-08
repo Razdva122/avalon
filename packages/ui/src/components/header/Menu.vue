@@ -28,7 +28,7 @@ nav {
   background-color: #2c3e50;
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
-  font-size: 24px;
+  font-size: 20px;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -36,7 +36,6 @@ nav {
   * {
     padding: 5px;
     cursor: pointer;
-    font-weight: bold;
     color: white;
     text-decoration: none;
 

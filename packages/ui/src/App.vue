@@ -73,6 +73,10 @@ ul > li {
   list-style-type: none;
 }
 
+li {
+  list-style-position: inside;
+}
+
 .header {
   height: 50px;
   width: 100%;

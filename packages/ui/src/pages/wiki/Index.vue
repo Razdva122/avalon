@@ -1,5 +1,5 @@
 <template>
-  <div class="wiki-index pr-5 pl-5">
+  <div class="info-page-content">
     <h1 class="title">The Resistance: Avalon - Core Game Logic</h1>
 
     <h2>Game Setup</h2>
@@ -40,26 +40,6 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  async setup() {},
-});
-</script>
-
 <style scoped lang="scss">
-.wiki-index {
-  padding-bottom: 20px;
-  font-size: 18px;
-}
-
-.about > ul {
-  margin-bottom: 8px;
-}
-
-.title {
-  text-align: center;
-  margin-bottom: 16px;
-}
+@import '@/styles/info-page.scss';
 </style>

@@ -1,0 +1,50 @@
+<template>
+  <div class="info-page-content">
+    <h1>Lady of the Lake</h1>
+    <img class="preview-image" src="@/assets/features/lady_of_lake.png" />
+    <p>
+      <strong>"Lady of the Lake"</strong> is an expansion that introduces a new strategic element and provides the
+      ability to gain additional information about the loyalties of other players. It is used in
+      <strong>games with 7 or more</strong> participants and adds more depth to the gameplay.
+    </p>
+
+    <h2>Rules for using "Lady of the Lake" (Inquisitor Token in 'The Resistance'):</h2>
+    <ol>
+      <li>
+        <strong>When to Use It:</strong> The Lady of the Lake comes into play after the second quest is completed. That
+        means it becomes available starting from the third round of the game.
+      </li>
+      <li>
+        <strong>Selecting the Holder:</strong> The player who receives the title of Lady of the Lake (usually determined
+        before the start of the game or selected by the game leader) uses her power at the end of each round (after the
+        second), passing it to another player who has not yet received the Lady of the Lake.
+      </li>
+      <li>
+        <strong>Applying the Ability:</strong> The owner of the Lady of the Lake chooses another player and secretly
+        learns their role — whether that player is a Servant of Arthur (good) or a Minion of Mordred (evil).
+      </li>
+      <li>
+        <strong>Passing the "Lady of the Lake":</strong> After using her ability, the Lady of the Lake's owner passes it
+        to the player whose loyalty was just checked. This player will then use the Lady of the Lake in the next round.
+      </li>
+      <li>
+        <strong>Restriction on Recurrent Checks:</strong> A player who has already been passed the Lady of the Lake
+        cannot be checked again. This rule helps ensure that each round, new information is revealed about a different
+        player.
+      </li>
+      <li>
+        <strong>Strategic Use:</strong> The use of the Lady of the Lake adds strategic possibilities to the game.
+        Players can use the information gained to plan their actions, trying to identify traitors among the
+        participants.
+      </li>
+    </ol>
+  </div>
+</template>
+
+<style scoped lang="scss">
+@import '@/styles/info-page.scss';
+
+h2 {
+  margin-top: 20px;
+}
+</style>
