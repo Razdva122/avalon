@@ -3,6 +3,7 @@
 const { defineConfig } = require('@vue/cli-service');
 const webpack = require('webpack');
 const SitemapPlugin = require('sitemap-webpack-plugin').default;
+const PrerendererWebpackPlugin = require('@prerenderer/webpack-plugin');
 const { routesSeo } = require('./src/router/seo');
 
 const paths = Object.values(routesSeo)
@@ -36,6 +37,11 @@ module.exports = defineConfig({
             changefreq: 'daily',
             priority: 0.8,
           },
+        }),
+        new PrerendererWebpackPlugin({
+          routes: Object.values(routesSeo)
+            .filter((el) => el.meta.prerender)
+            .map((el) => el.path),
         }),
       ],
     };

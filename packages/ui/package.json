@@ -19,6 +19,8 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
+    "@prerenderer/renderer-puppeteer": "^1.2.3",
+    "@prerenderer/webpack-plugin": "^5.3.9",
     "@types/js-cookie": "^3.0.6",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
