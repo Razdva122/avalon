@@ -32,8 +32,19 @@ module.exports.routesSeo = {
     name: 'wiki',
     meta: {
       prerender: true,
-      title: 'How to play avalon',
-      description: "The basic rules of the board game 'The Resistance: Avalon'. How to play 'The Resistance: Avalon'?",
+      title: "Wiki 'The Resistance: Avalon'",
+      description:
+        "Wikipage for board game 'The Resistance: Avalon'. The basic rules of the board game 'The Resistance: Avalon'. How to play 'The Resistance: Avalon'?",
+    },
+  },
+  addons: {
+    path: '/wiki/addons',
+    name: 'addons',
+    meta: {
+      prerender: true,
+      title: "Addons for 'The Resistance: Avalon'",
+      description:
+        "Add-ons and additional cards for the game 'The Resistance: Avalon'. Rules for playing additional cards in a board game Avalon.",
     },
   },
   lady: {

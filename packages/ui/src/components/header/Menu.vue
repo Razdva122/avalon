@@ -11,7 +11,7 @@
     <nav>
       <router-link to="/">Home</router-link>
       <div @click="$emit('profileClick')">Profile</div>
-      <router-link to="/wiki">Rules</router-link>
+      <router-link to="/wiki">Wiki</router-link>
       <router-link to="/about">About</router-link>
     </nav>
   </v-menu>

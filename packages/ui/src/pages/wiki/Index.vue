@@ -1,5 +1,14 @@
 <template>
   <div class="info-page-content">
+    <div class="information">
+      <v-btn size="x-large" @click="$router.push({ name: 'addons' })">
+        Addons
+        <template v-slot:prepend>
+          <span class="material-icons"> castle </span>
+        </template>
+      </v-btn>
+    </div>
+
     <h1 class="title">The Resistance: Avalon - Core Game Logic</h1>
 
     <h2>Game Setup</h2>
@@ -42,4 +51,11 @@
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+
+.information {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 </style>

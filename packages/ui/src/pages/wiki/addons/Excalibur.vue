@@ -1,5 +1,6 @@
 <template>
   <div class="info-page-content">
+    <WikiBreadCrumbs />
     <h1>Excalibur</h1>
     <img class="preview-image" src="@/assets/features/excalibur.png" />
     <p>
@@ -37,6 +38,17 @@
     </ol>
   </div>
 </template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
+
+export default defineComponent({
+  components: {
+    WikiBreadCrumbs,
+  },
+});
+</script>
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';

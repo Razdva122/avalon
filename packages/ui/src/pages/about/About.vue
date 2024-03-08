@@ -38,10 +38,12 @@
     </div>
 
     <div class="socials">
-      The project code can be viewed on <a href="https://github.com/Razdva122/avalon" target="_blank">github</a>.
+      The project code can be viewed on <b><a href="https://github.com/Razdva122/avalon" target="_blank">github</a></b
+      >.
     </div>
     <div class="socials">
-      You can contact me via <a href="https://discord.gg/DR9cEDDNdN" target="_blank">discord</a>.
+      You can contact me via <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">discord</a></b
+      >.
     </div>
   </div>
 </template>

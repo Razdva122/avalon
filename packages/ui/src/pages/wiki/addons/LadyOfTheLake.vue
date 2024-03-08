@@ -1,5 +1,6 @@
 <template>
   <div class="info-page-content">
+    <WikiBreadCrumbs />
     <h1>Lady of the Lake</h1>
     <img class="preview-image" src="@/assets/features/lady_of_lake.png" />
     <p>
@@ -40,6 +41,17 @@
     </ol>
   </div>
 </template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
+
+export default defineComponent({
+  components: {
+    WikiBreadCrumbs,
+  },
+});
+</script>
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';

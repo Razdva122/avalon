@@ -77,6 +77,11 @@ li {
   list-style-position: inside;
 }
 
+a {
+  text-decoration: none;
+  color: white;
+}
+
 .header {
   height: 50px;
   width: 100%;
