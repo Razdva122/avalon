@@ -42,6 +42,7 @@ module.exports = defineConfig({
           routes: Object.values(routesSeo)
             .filter((el) => el.meta.prerender)
             .map((el) => el.path),
+          renderer: '@prerenderer/renderer-jsdom',
         }),
       ],
     };

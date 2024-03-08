@@ -1,6 +1,6 @@
 {
   "name": "@avalon/ui",
-  "version": "11.1.0",
+  "version": "11.2.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -19,7 +19,7 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@prerenderer/renderer-puppeteer": "^1.2.3",
+    "@prerenderer/renderer-jsdom": "^1.1.8",
     "@prerenderer/webpack-plugin": "^5.3.9",
     "@types/js-cookie": "^3.0.6",
     "@vue/cli-plugin-babel": "~5.0.0",
