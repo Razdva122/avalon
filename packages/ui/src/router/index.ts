@@ -10,6 +10,8 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.addons, component: () => import('@/pages/wiki/addons/Index.vue') },
   { ...routesSeo.lady, component: () => import('@/pages/wiki/addons/LadyOfTheLake.vue') },
   { ...routesSeo.excalibur, component: () => import('@/pages/wiki/addons/Excalibur.vue') },
+  { ...routesSeo.notFound, component: () => import('@/pages/empty/NotFound.vue') },
+  { path: '/:catchAll(.*)', redirect: '404' },
 ];
 
 const router = createRouter({
@@ -20,7 +22,7 @@ const router = createRouter({
 const defaultKeywords = ['The Resistance', 'Avalon', 'Online'];
 
 router.beforeEach((to, from, next) => {
-  const keywords = <string[]>to.meta.keywords;
+  const keywords = <string[]>to.meta.keywords ?? [];
   document.title = <string>to.meta.title;
   document.querySelector('head meta[name="description"]')!.setAttribute('content', <string>to.meta.description);
   document

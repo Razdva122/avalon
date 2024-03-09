@@ -5,11 +5,11 @@
     <div class="addons-container">
       <a class="addon" @click="$router.push({ name: 'lady' })">
         <h2>Lady of the Lake</h2>
-        <img class="addon-image" src="@/assets/features/lady_of_lake.png" />
+        <img class="addon-image" src="@/assets/features/lady_of_lake.png" alt="lady" />
       </a>
       <a class="addon" @click="$router.push({ name: 'excalibur' })">
         <h2>Excalibur</h2>
-        <img class="addon-image" src="@/assets/features/excalibur.png" />
+        <img class="addon-image" src="@/assets/features/excalibur.png" alt="excalibur" />
       </a>
     </div>
   </div>

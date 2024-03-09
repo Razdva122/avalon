@@ -22,6 +22,16 @@ module.exports = defineConfig({
     },
   },
   configureWebpack: () => {
+    if (process.env.NODE_ENV !== 'production') {
+      return {
+        plugins: [
+          new webpack.DefinePlugin({
+            APP_VERSION: "'DEV'",
+          }),
+        ],
+      };
+    }
+
     return {
       plugins: [
         new webpack.DefinePlugin({

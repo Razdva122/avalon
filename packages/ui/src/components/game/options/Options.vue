@@ -27,6 +27,7 @@
         <div class="addon" v-for="addon in addonsSettings">
           <div :class="addon.name" class="addon-icon"></div>
           <v-checkbox v-model="addons[addon.name]" :label="addon.label" :hide-details="true" color="info" />
+          <HelpButton :route="addon.route" :content="addon.hint" />
         </div>
       </v-form>
     </div>
@@ -36,11 +37,13 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import PlayerIcon from '@/components/game/information/PlayerIcon.vue';
+import HelpButton from '@/components/feedback/HelpButton.vue';
 import type { TGameOptionsRoles, TGameOptionsAddons } from '@avalon/types';
 
 export default defineComponent({
   components: {
     PlayerIcon,
+    HelpButton,
   },
   props: {
     roles: {
@@ -82,8 +85,18 @@ export default defineComponent({
     },
     addonsSettings() {
       return [
-        { name: 'ladyOfLake', label: 'Lady of the lake' },
-        { name: 'excalibur', label: 'Excalibur' },
+        {
+          name: 'ladyOfLake',
+          label: 'Lady of the lake',
+          route: 'wiki/addons/lady',
+          hint: 'The lady allows you to find out the loyalty of another player',
+        },
+        {
+          name: 'excalibur',
+          label: 'Excalibur',
+          route: 'wiki/addons/excalibur',
+          hint: 'Excalibur allows you to change the decision of one of the participants of the mission',
+        },
       ] as const;
     },
   },

@@ -2,7 +2,7 @@
   <div class="info-page-content">
     <WikiBreadCrumbs />
     <h1>Lady of the Lake</h1>
-    <img class="preview-image" src="@/assets/features/lady_of_lake.png" />
+    <img class="preview-image" src="@/assets/features/lady_of_lake.png" alt="lady" />
     <p>
       <strong>"Lady of the Lake"</strong> is an expansion that introduces a new strategic element and provides the
       ability to gain additional information about the loyalties of other players. It is used in

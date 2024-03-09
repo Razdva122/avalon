@@ -74,4 +74,13 @@ module.exports.routesSeo = {
       keywords: ['Addons', 'Module', 'Excalibur', 'Sergeant', 'Rules'],
     },
   },
+  notFound: {
+    path: '/404',
+    name: 'NotFound',
+    meta: {
+      title: 'The Resistance: Avalon | 404',
+      skipSiteMap: true,
+      description: 'Page not found =(',
+    },
+  },
 };
