@@ -88,13 +88,13 @@ export default defineComponent({
         {
           name: 'ladyOfLake',
           label: 'Lady of the lake',
-          route: 'wiki/addons/lady',
+          route: 'lady',
           hint: 'The lady allows you to find out the loyalty of another player',
         },
         {
           name: 'excalibur',
           label: 'Excalibur',
-          route: 'wiki/addons/excalibur',
+          route: 'excalibur',
           hint: 'Excalibur allows you to change the decision of one of the participants of the mission',
         },
       ] as const;

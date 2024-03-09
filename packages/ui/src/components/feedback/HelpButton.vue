@@ -10,13 +10,11 @@
           size="x-small"
           class="button-help"
         >
-          <template v-slot:prepend>
-            <span class="material-icons"> question_mark </span>
-          </template>
+          <span class="material-icons"> question_mark </span>
         </v-btn>
       </template>
 
-      <div>{{ content }}</div>
+      <div class="content">{{ content }}</div>
     </v-tooltip>
   </div>
 </template>
@@ -49,7 +47,11 @@ export default defineComponent({
 <style scoped lang="scss">
 .v-btn.button-help {
   padding: 0px;
-  width: 25px;
-  height: 25px;
+  width: 36px;
+  height: 36px;
+}
+
+.content {
+  font-size: 16px;
 }
 </style>
