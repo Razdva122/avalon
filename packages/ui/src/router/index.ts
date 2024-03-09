@@ -17,9 +17,15 @@ const router = createRouter({
   routes,
 });
 
+const defaultKeywords = ['The Resistance', 'Avalon', 'Online'];
+
 router.beforeEach((to, from, next) => {
+  const keywords = <string[]>to.meta.keywords;
   document.title = <string>to.meta.title;
   document.querySelector('head meta[name="description"]')!.setAttribute('content', <string>to.meta.description);
+  document
+    .querySelector('head meta[name="keywords"]')!
+    .setAttribute('content', [...keywords, ...defaultKeywords].join(', '));
   next();
 });
 

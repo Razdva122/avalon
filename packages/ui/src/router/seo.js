@@ -5,6 +5,7 @@ module.exports.routesSeo = {
     meta: {
       title: 'Play Avalon Online!',
       description: "A free platform for playing the board game 'The Resistance: Avalon'",
+      keywords: ['Play'],
     },
   },
   about: {
@@ -12,9 +13,10 @@ module.exports.routesSeo = {
     name: 'about',
     meta: {
       prerender: true,
-      title: 'Avalon Game About',
+      title: 'The Resistance: Avalon | About',
       description:
         "Information about the web platform avalon-game.com. The rules of the board game 'The Resistance: Avalon'.",
+      keywords: ['About', 'Information', 'Rules'],
     },
   },
   room: {
@@ -22,9 +24,10 @@ module.exports.routesSeo = {
     props: true,
     name: 'room',
     meta: {
-      title: 'Avalon Game Room',
+      title: 'The Resistance: Avalon | Game',
       skipSiteMap: true,
       description: "Rooms for online games in 'The Resistance: Avalon'",
+      keywords: ['Game'],
     },
   },
   wiki: {
@@ -32,9 +35,10 @@ module.exports.routesSeo = {
     name: 'wiki',
     meta: {
       prerender: true,
-      title: "Wiki 'The Resistance: Avalon'",
+      title: 'The Resistance: Avalon | Wiki',
       description:
         "Wikipage for board game 'The Resistance: Avalon'. The basic rules of the board game 'The Resistance: Avalon'. How to play 'The Resistance: Avalon'?",
+      keywords: ['Wiki', 'Rules', 'How to play'],
     },
   },
   addons: {
@@ -42,9 +46,10 @@ module.exports.routesSeo = {
     name: 'addons',
     meta: {
       prerender: true,
-      title: "Addons for 'The Resistance: Avalon'",
+      title: 'The Resistance: Avalon | Addons for game',
       description:
         "Add-ons and additional cards for the game 'The Resistance: Avalon'. Rules for playing additional cards in a board game Avalon.",
+      keywords: ['Addons', 'Module', 'Rules'],
     },
   },
   lady: {
@@ -52,9 +57,10 @@ module.exports.routesSeo = {
     name: 'lady',
     meta: {
       prerender: true,
-      title: 'Lady of the Lake - Avalon rules',
+      title: 'The Resistance: Avalon | Lady of the Lake',
       description:
         "Rules for 'Lady of the Lake' card in 'The Resistance: Avalon'. Rules for 'Inquisitor Token' card in 'The Resistance'",
+      keywords: ['Addons', 'Module', 'Lady of the Lake', 'Inquisitor Token', 'Rules'],
     },
   },
   excalibur: {
@@ -62,9 +68,10 @@ module.exports.routesSeo = {
     name: 'excalibur',
     meta: {
       prerender: true,
-      title: 'Excalibur - Avalon rules',
+      title: 'The Resistance: Avalon | Excalibur',
       description:
         "Rules for 'Excalibur' card in 'The Resistance: Avalon'. Rules for 'Sergeant' card in 'The Resistance'",
+      keywords: ['Addons', 'Module', 'Excalibur', 'Sergeant', 'Rules'],
     },
   },
 };
