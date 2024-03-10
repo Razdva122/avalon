@@ -11,6 +11,7 @@ export default defineComponent({
       return new URL(window.location.href).pathname
         .split('/')
         .slice(1)
+        .filter(Boolean)
         .map((el) => ({
           to: { name: el },
           title: el,
