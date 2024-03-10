@@ -8,7 +8,9 @@ const { routesSeo } = require('./src/router/seo');
 
 const paths = Object.values(routesSeo)
   .filter((el) => !el.meta.skipSiteMap)
-  .map((el) => ({ path: el.path }));
+  .map((el) => ({ path: el.path.endsWith('/') ? el.path : el.path + '/' }));
+
+console.log(paths);
 
 module.exports = defineConfig({
   transpileDependencies: true,
