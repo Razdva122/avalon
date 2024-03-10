@@ -74,6 +74,37 @@ module.exports.routesSeo = {
       keywords: ['Addons', 'Module', 'Excalibur', 'Sergeant', 'Rules'],
     },
   },
+  roles: {
+    path: '/wiki/roles',
+    name: 'roles',
+    meta: {
+      prerender: true,
+      title: 'The Resistance: Avalon | Roles',
+      description:
+        "All available roles in the board game 'The Resistance: Avalon'. Rules for roles: Merlin, Percival, Morgana, Oberon, Mordred",
+      keywords: ['Roles', 'Rules', 'Merlin', 'Percival', 'Morgana', 'Oberon', 'Mordred', 'Tips'],
+    },
+  },
+  merlin: {
+    path: '/wiki/roles/merlin',
+    name: 'merlin',
+    meta: {
+      prerender: true,
+      title: 'The Resistance: Avalon | Merlin',
+      description: "Rules and Tips for Merlin's role in the board game 'The Resistance: Avalon'",
+      keywords: ['Merlin', 'Role', 'Rules', 'Tips'],
+    },
+  },
+  percival: {
+    path: '/wiki/roles/percival',
+    name: 'percival',
+    meta: {
+      prerender: true,
+      title: 'The Resistance: Avalon | Percival',
+      description: "Rules and Tips for Percival's role in the board game 'The Resistance: Avalon'",
+      keywords: ['Percival', 'Role', 'Rules', 'Tips'],
+    },
+  },
   notFound: {
     path: '/404',
     name: 'NotFound',

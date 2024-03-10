@@ -1,6 +1,13 @@
 <template>
   <div class="info-page-content">
     <div class="information">
+      <v-btn size="x-large" @click="$router.push({ name: 'roles' })" class="mr-4">
+        Roles
+        <template v-slot:prepend>
+          <span class="material-icons"> person </span>
+        </template>
+      </v-btn>
+
       <v-btn size="x-large" @click="$router.push({ name: 'addons' })">
         Addons
         <template v-slot:prepend>

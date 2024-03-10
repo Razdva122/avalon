@@ -8,8 +8,11 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.room, component: () => import('@/pages/room/Room.vue') },
   { ...routesSeo.wiki, component: () => import('@/pages/wiki/Index.vue') },
   { ...routesSeo.addons, component: () => import('@/pages/wiki/addons/Index.vue') },
+  { ...routesSeo.roles, component: () => import('@/pages/wiki/roles/Index.vue') },
   { ...routesSeo.lady, component: () => import('@/pages/wiki/addons/LadyOfTheLake.vue') },
   { ...routesSeo.excalibur, component: () => import('@/pages/wiki/addons/Excalibur.vue') },
+  { ...routesSeo.merlin, component: () => import('@/pages/wiki/roles/Merlin.vue') },
+  { ...routesSeo.percival, component: () => import('@/pages/wiki/roles/Percival.vue') },
   { ...routesSeo.notFound, component: () => import('@/pages/empty/NotFound.vue') },
   { path: '/:catchAll(.*)', redirect: '404' },
 ];
