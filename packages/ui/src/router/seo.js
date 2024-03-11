@@ -91,7 +91,7 @@ module.exports.routesSeo = {
     meta: {
       prerender: true,
       title: 'The Resistance: Avalon | Merlin',
-      description: "Rules and Tips for Merlin's role in the board game 'The Resistance: Avalon'",
+      description: "Rules and Tips for Merlin role in the board game 'The Resistance: Avalon'",
       keywords: ['Merlin', 'Role', 'Rules', 'Tips'],
     },
   },
@@ -101,8 +101,38 @@ module.exports.routesSeo = {
     meta: {
       prerender: true,
       title: 'The Resistance: Avalon | Percival',
-      description: "Rules and Tips for Percival's role in the board game 'The Resistance: Avalon'",
+      description: "Rules and Tips for Percival role in the board game 'The Resistance: Avalon'",
       keywords: ['Percival', 'Role', 'Rules', 'Tips'],
+    },
+  },
+  servant: {
+    path: '/wiki/roles/servant',
+    name: 'servant',
+    meta: {
+      prerender: true,
+      title: 'The Resistance: Avalon | Servant',
+      description: "Rules and Tips for Servant role in the board game 'The Resistance: Avalon'",
+      keywords: ['Servant', 'Role', 'Rules', 'Tips'],
+    },
+  },
+  morgana: {
+    path: '/wiki/roles/morgana',
+    name: 'morgana',
+    meta: {
+      prerender: true,
+      title: 'The Resistance: Avalon | Morgana',
+      description: "Rules and Tips for Morgana role in the board game 'The Resistance: Avalon'",
+      keywords: ['Morgana', 'Role', 'Rules', 'Tips'],
+    },
+  },
+  minion: {
+    path: '/wiki/roles/minion',
+    name: 'minion',
+    meta: {
+      prerender: true,
+      title: 'The Resistance: Avalon | Minion of Mordred',
+      description: "Rules and Tips for  Minion of Mordred role in the board game 'The Resistance: Avalon'",
+      keywords: ['Minion of Mordred', 'Role', 'Rules', 'Tips'],
     },
   },
   notFound: {

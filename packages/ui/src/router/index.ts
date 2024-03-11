@@ -13,6 +13,9 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.excalibur, component: () => import('@/pages/wiki/addons/Excalibur.vue') },
   { ...routesSeo.merlin, component: () => import('@/pages/wiki/roles/Merlin.vue') },
   { ...routesSeo.percival, component: () => import('@/pages/wiki/roles/Percival.vue') },
+  { ...routesSeo.servant, component: () => import('@/pages/wiki/roles/Servant.vue') },
+  { ...routesSeo.morgana, component: () => import('@/pages/wiki/roles/Morgana.vue') },
+  { ...routesSeo.minion, component: () => import('@/pages/wiki/roles/Minion.vue') },
   { ...routesSeo.notFound, component: () => import('@/pages/empty/NotFound.vue') },
   { path: '/:catchAll(.*)', redirect: '404' },
 ];
