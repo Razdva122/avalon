@@ -95,6 +95,26 @@ module.exports.routesSeo = {
       keywords: ['Merlin', 'Role', 'Rules', 'Tips'],
     },
   },
+  merlin_pure: {
+    path: '/wiki/roles/merlin_pure',
+    name: 'merlin_pure',
+    meta: {
+      prerender: true,
+      title: 'The Resistance: Avalon | Merlin Pure',
+      description: "Rules and Tips for Merlin Pure role in the board game 'The Resistance: Avalon'",
+      keywords: ['Merlin Pure', 'Role', 'Rules', 'Tips'],
+    },
+  },
+  lovers: {
+    path: '/wiki/roles/lovers',
+    name: 'lovers',
+    meta: {
+      prerender: true,
+      title: 'The Resistance: Avalon | Lovers (Tristan and Isolde)',
+      description: "Rules and Tips for Lovers (Tristan and Isolde) roles in the board game 'The Resistance: Avalon'",
+      keywords: ['Lovers', 'Tristan', 'Isolde', 'Role', 'Rules', 'Tips'],
+    },
+  },
   percival: {
     path: '/wiki/roles/percival',
     name: 'percival',
@@ -113,6 +133,26 @@ module.exports.routesSeo = {
       title: 'The Resistance: Avalon | Servant',
       description: "Rules and Tips for Servant role in the board game 'The Resistance: Avalon'",
       keywords: ['Servant', 'Role', 'Rules', 'Tips'],
+    },
+  },
+  mordred: {
+    path: '/wiki/roles/mordred',
+    name: 'mordred',
+    meta: {
+      prerender: true,
+      title: 'The Resistance: Avalon | Mordred',
+      description: "Rules and Tips for Mordred role in the board game 'The Resistance: Avalon'",
+      keywords: ['Mordred', 'Role', 'Rules', 'Tips'],
+    },
+  },
+  oberon: {
+    path: '/wiki/roles/oberon',
+    name: 'oberon',
+    meta: {
+      prerender: true,
+      title: 'The Resistance: Avalon | Oberon',
+      description: "Rules and Tips for Oberon role in the board game 'The Resistance: Avalon'",
+      keywords: ['Oberon', 'Role', 'Rules', 'Tips'],
     },
   },
   morgana: {
