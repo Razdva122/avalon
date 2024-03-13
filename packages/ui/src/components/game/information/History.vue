@@ -50,10 +50,9 @@
           <div>
             Team:
             {{
-              historyEl.votes
-                .filter((el) => el.onMission)
+              historyEl.team
                 .map((el) => {
-                  const name = calculateNameByID(el.playerID);
+                  const name = calculateNameByID(el.id);
                   return el.excalibur ? name + '(Excalibur)' : name;
                 })
                 .join(', ')
@@ -63,23 +62,13 @@
             <div>
               Approve:
               <span class="text-success">
-                {{
-                  historyEl.votes
-                    .filter((el) => el.value === 'approve')
-                    .map((el) => calculateNameByID(el.playerID))
-                    .join(', ')
-                }}
+                {{ historyElText(historyEl, 'approve') }}
               </span>
             </div>
             <div>
               Reject:
-              <span class="text-error">
-                {{
-                  historyEl.votes
-                    .filter((el) => el.value === 'reject')
-                    .map((el) => calculateNameByID(el.playerID))
-                    .join(', ')
-                }}
+              <span class="text-success">
+                {{ historyElText(historyEl, 'reject') }}
               </span>
             </div>
           </template>
@@ -122,7 +111,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { THistoryResults, IPlayer, IActionWithResult } from '@avalon/types';
+import { THistoryResults, IPlayer, IActionWithResult, THistoryVote } from '@avalon/types';
 
 export default defineComponent({
   props: {
@@ -141,6 +130,16 @@ export default defineComponent({
   methods: {
     calculateNameByID(playerID: string) {
       return this.players.find((player) => player.id === playerID)!.name;
+    },
+    historyElText(element: THistoryVote, type: 'reject' | 'approve') {
+      if (element.anonymous) {
+        return element.votes[type];
+      }
+
+      return element.votes
+        .filter((el) => el.value === type)
+        .map((el) => this.calculateNameByID(el.playerID))
+        .join(', ');
     },
   },
 });

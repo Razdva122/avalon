@@ -1,8 +1,8 @@
 import type { IPlayerInGame } from '@/core/game';
 
-import type { HistoryElement, THistoryData } from '@/core/game/history';
+import type { HistoryElement, THistoryData, TDataForManagerOptions } from '@/core/game/history';
 
-import type { TVoteOption, THistoryStage } from '@avalon/types';
+import type { TVoteOption, THistoryStage, THistoryVote } from '@avalon/types';
 
 export * from '@/core/game/history/vote/interface';
 
@@ -18,6 +18,7 @@ export class Vote implements HistoryElement<'vote'> {
       leader,
       index,
       forced: Boolean(forced),
+      team: players.filter((player) => player.features.isSent).map((el) => ({ id: el.user.id })),
       votes: players.map((player) => ({
         player,
         onMission: Boolean(player.features.isSent),
@@ -62,19 +63,36 @@ export class Vote implements HistoryElement<'vote'> {
     return false;
   }
 
-  dataForManager() {
-    return {
+  dataForManager(options: TDataForManagerOptions) {
+    const data = <THistoryVote>{
       type: this.type,
       result: this.data.result!,
       index: this.data.index,
       forced: this.data.forced,
       leaderID: this.data.leader.user.id,
-      votes: this.data.votes.map((el) => ({
+      team: this.data.team,
+    };
+
+    if (options.game.stage !== 'end' && options.game.features.anonymousVoting === true) {
+      data.anonymous = true;
+
+      data.votes = this.data.votes.reduce(
+        (acc, el) => {
+          acc[<TVoteOption>el.value] += 1;
+          return acc;
+        },
+        { approve: 0, reject: 0 },
+      );
+    } else {
+      data.anonymous = false;
+      data.votes = this.data.votes.map((el) => ({
         playerID: el.player.user.id,
         onMission: el.onMission,
         excalibur: el.excalibur,
         value: <TVoteOption>el.value,
-      })),
-    };
+      }));
+    }
+
+    return data;
   }
 }

@@ -55,15 +55,17 @@ export default defineComponent({
         const isGameEnded = gameState.value.stage === 'end';
 
         if (this.visibleHistory?.type === 'vote') {
-          const userVote = this.visibleHistory.votes.find((player) => player.playerID === clone.id)!;
+          clone.features.waitForAction = false;
 
           if (this.visibleHistory.forced) {
             clone.features.vote = 'forced-approve';
           } else {
-            clone.features.vote = userVote.value;
-          }
+            if (this.visibleHistory.anonymous !== true) {
+              const userVote = this.visibleHistory.votes.find((player) => player.playerID === clone.id)!;
 
-          clone.features.waitForAction = false;
+              clone.features.vote = userVote.value;
+            }
+          }
         }
 
         if (this.visibleHistory?.type === 'checkLoyalty' && this.visibleHistory.result) {

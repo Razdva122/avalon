@@ -73,8 +73,8 @@ export class ExcaliburAddon implements IGameAddon {
     selectedPlayer.features.excalibur = true;
     selectedPlayer.features.isSelected = false;
 
-    const vote = this.game.vote!.data.votes.find((vote) => vote.player.user.id === selectedPlayer.user.id)!;
-    vote.excalibur = true;
+    const member = this.game.vote!.data.team.find((player) => player.id === selectedPlayer.user.id)!;
+    member.excalibur = true;
 
     this.game.sentTeamNextStage();
     this.game.stateObserver.gameStateChanged();

@@ -17,6 +17,7 @@ import type {
   TGameStage,
   IGameSettingsWithRoles,
   IGameOptions,
+  TGameFeatures,
   TAddonsData,
 } from '@avalon/types';
 
@@ -74,6 +75,11 @@ export class Game extends GameHooks {
    * Enabled addons
    */
   addons: IGameAddons;
+
+  /**
+   * Game features
+   */
+  features: TGameFeatures;
 
   /**
    * State game observer
@@ -137,6 +143,8 @@ export class Game extends GameHooks {
       ...settings,
       roles: rolesInfo.roles,
     };
+
+    this.features = options.features;
 
     const players = users.map((user, index) => ({
       user,

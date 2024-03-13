@@ -16,7 +16,7 @@
         means it becomes available starting from the third round of the game.
       </li>
       <li>
-        <strong>Selecting the Holder:</strong>Initially, the lady of the lake gets the player to the right of the first
+        <strong>Selecting the Holder:</strong> Initially, the lady of the lake gets the player to the right of the first
         leader. The player who receives the title of Lady of the Lake uses her power at the end of each round (after the
         second), passing it to another player who has not yet received the Lady of the Lake.
       </li>

@@ -1,9 +1,8 @@
 import type { TMissionResult, IMissionSettings } from './mission';
-import type { TVoteOption } from './vote';
+import type { TVoteOption, TTeamMember } from './vote';
 import type { TAssassinateResult } from './addons';
 import type { TLoyalty } from './roles';
 import type { TAssassinateType } from './addons/assassin';
-import type { TExcaliburFeatures } from './addons/excalibur';
 
 /**
  * Possible history element
@@ -16,19 +15,23 @@ export type THistoryType = 'mission' | 'vote' | 'assassinate' | 'checkLoyalty' |
  */
 export type THistoryStage = 'active' | 'inactive' | 'progress' | 'finished';
 
-export type THistoryResults = IHistoryVote | IHistoryMission | IHistoryAssassinate | ICheckLoyalty | ISwitchResult;
+export type THistoryResults = THistoryVote | IHistoryMission | IHistoryAssassinate | ICheckLoyalty | ISwitchResult;
 
 /**
  * History vote data
  */
-export interface IHistoryVote {
+export type THistoryVote = {
   type: 'vote';
   index: number;
   result: TVoteOption;
   leaderID: string;
+  team: TTeamMember[];
   forced: boolean;
-  votes: TVote[];
-}
+} & THistoryVoteVisibility;
+
+export type THistoryVoteVisibility =
+  | { anonymous: true; votes: { approve: number; reject: number } }
+  | { anonymous: false; votes: TVote[] };
 
 /**
  * History mission data
@@ -79,7 +82,7 @@ export type TVote = {
   playerID: string;
   onMission: boolean;
   value: TVoteOption;
-} & TExcaliburFeatures;
+};
 
 /**
  * Action of player in mission

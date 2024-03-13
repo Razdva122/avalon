@@ -87,6 +87,7 @@ h2 {
 
 .credits {
   float: right;
+  clear: right;
   font-size: 14px;
   width: 50%;
   max-width: 700px;
