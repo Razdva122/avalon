@@ -69,6 +69,17 @@
           ></div>
         </template>
       </div>
+      <div
+        class="d-flex flex-row align-center justify-center"
+        v-if="visibleHistory?.type === 'vote' && visibleHistory.anonymous"
+      >
+        <template v-for="i in gameState.players.length">
+          <div
+            class="vote-result-element"
+            :class="'icon-vote-' + (i <= visibleHistory.votes.approve ? 'approve' : 'reject')"
+          ></div>
+        </template>
+      </div>
     </div>
     <div class="meta-info font-weight-bold d-flex justify-space-between">
       <div>

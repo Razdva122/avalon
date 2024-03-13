@@ -3,7 +3,7 @@ import { TOptionalRoles } from './roles';
 export interface IGameOptions {
   roles: TGameOptionsRoles;
   addons: TGameOptionsAddons;
-  features: TGameFeatures;
+  features: TGameOptionsFeatures;
 }
 
 export type TGameOptionsRoles = {
@@ -15,6 +15,6 @@ export type TGameOptionsAddons = {
   excalibur?: boolean;
 };
 
-export type TGameFeatures = {
+export type TGameOptionsFeatures = {
   anonymousVoting?: boolean;
 };

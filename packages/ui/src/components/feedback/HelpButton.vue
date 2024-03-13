@@ -9,6 +9,7 @@
           variant="plain"
           size="x-small"
           class="button-help"
+          :class="route ? 'with-route' : undefined"
         >
           <span class="material-icons"> question_mark </span>
         </v-btn>
@@ -28,12 +29,15 @@ export default defineComponent({
       type: String,
     },
     route: {
-      required: true,
       type: String,
     },
   },
   methods: {
     openInNewTab() {
+      if (!this.route) {
+        return;
+      }
+
       const routeData = this.$router.resolve({
         name: this.route,
       });
@@ -49,9 +53,14 @@ export default defineComponent({
   padding: 0px;
   width: 36px;
   height: 36px;
+  cursor: auto;
 }
 
 .content {
   font-size: 16px;
+}
+
+.v-btn.with-route {
+  cursor: pointer;
 }
 </style>

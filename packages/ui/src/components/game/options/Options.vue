@@ -8,27 +8,40 @@
   <v-overlay v-model="overlay" class="align-center justify-center">
     <div class="options pa-4 rounded-lg">
       <v-form>
-        <h2>Roles</h2>
-        <div class="option" v-for="role in rolesSettings">
-          <PlayerIcon class="role" :icon="role.role" />
-          <v-checkbox
-            @input="onRoleUpdate(role.role)"
-            :disabled="role.disabled"
-            v-model="roles[role.role]"
-            :true-value="1"
-            :false-value="0"
-            :hide-details="true"
-            :color="role.color"
-            :label="role.label"
-          >
-          </v-checkbox>
-        </div>
-        <h2>Addons</h2>
-        <div class="addon" v-for="addon in addonsSettings">
-          <div :class="addon.name" class="addon-icon"></div>
-          <v-checkbox v-model="addons[addon.name]" :label="addon.label" :hide-details="true" color="info" />
-          <HelpButton :route="addon.route" :content="addon.hint" />
-        </div>
+        <v-tabs v-model="type" class="tabs">
+          <v-tab value="roles">Roles</v-tab>
+          <v-tab value="addons">Addons</v-tab>
+          <v-tab value="features">Features</v-tab>
+        </v-tabs>
+        <template v-if="type === 'roles'">
+          <div class="option" v-for="role in rolesSettings">
+            <PlayerIcon class="role" :icon="role.role" />
+            <v-checkbox
+              @input="onRoleUpdate(role.role)"
+              :disabled="role.disabled"
+              v-model="roles[role.role]"
+              :true-value="1"
+              :false-value="0"
+              :hide-details="true"
+              :color="role.color"
+              :label="role.label"
+            >
+            </v-checkbox>
+          </div>
+        </template>
+        <template v-if="type === 'addons'">
+          <div class="addon" v-for="addon in addonsSettings">
+            <div :class="addon.name" class="addon-icon"></div>
+            <v-checkbox v-model="addons[addon.name]" :label="addon.label" :hide-details="true" color="info" />
+            <HelpButton :route="addon.route" :content="addon.hint" />
+          </div>
+        </template>
+        <template v-if="type === 'features'">
+          <div class="feature" v-for="feature in featuresSettings">
+            <v-checkbox v-model="features[feature.name]" :label="feature.label" :hide-details="true" color="info" />
+            <HelpButton :content="feature.hint" />
+          </div>
+        </template>
       </v-form>
     </div>
   </v-overlay>
@@ -38,7 +51,7 @@
 import { defineComponent, PropType } from 'vue';
 import PlayerIcon from '@/components/game/information/PlayerIcon.vue';
 import HelpButton from '@/components/feedback/HelpButton.vue';
-import type { TGameOptionsRoles, TGameOptionsAddons } from '@avalon/types';
+import type { TGameOptionsRoles, TGameOptionsAddons, TGameOptionsFeatures } from '@avalon/types';
 
 export default defineComponent({
   components: {
@@ -54,10 +67,15 @@ export default defineComponent({
       required: true,
       type: Object as PropType<TGameOptionsAddons>,
     },
+    features: {
+      required: true,
+      type: Object as PropType<TGameOptionsFeatures>,
+    },
   },
   data() {
     return {
       overlay: false,
+      type: 'roles',
     };
   },
   computed: {
@@ -99,6 +117,15 @@ export default defineComponent({
         },
       ] as const;
     },
+    featuresSettings() {
+      return [
+        {
+          name: 'anonymousVoting',
+          label: 'Anonymous voting',
+          hint: "With anonymous voting, you don't know who approves the mission and who rejects it",
+        },
+      ] as const;
+    },
   },
   methods: {
     removeMerlinAdditionalRoles() {
@@ -129,7 +156,8 @@ export default defineComponent({
 <style scoped lang="scss">
 .options {
   background-color: white;
-  width: 300px;
+  width: 100%;
+  min-height: 530px;
 }
 
 .role,
@@ -140,7 +168,8 @@ export default defineComponent({
 }
 
 .option,
-.addon {
+.addon,
+.feature {
   display: flex;
   align-items: center;
 }
@@ -153,5 +182,9 @@ export default defineComponent({
 .excalibur {
   background-image: url('@/assets/features/excalibur.png');
   background-size: contain;
+}
+
+.tabs {
+  border-radius: 8px;
 }
 </style>

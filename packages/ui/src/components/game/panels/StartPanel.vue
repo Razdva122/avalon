@@ -25,7 +25,7 @@
       {{ roomState.stage === 'created' ? 'Lock Game' : 'Unlock game' }}
     </v-btn>
     <v-btn class="mt-2" color="success" :disabled="isStartGameDisabled" @click="onStartClick"> Start Game </v-btn>
-    <Options :roles="roles" :addons="addons" />
+    <Options :roles="roles" :addons="addons" :features="features" />
   </template>
 </template>
 
@@ -35,8 +35,9 @@ import { useStore } from '@/store';
 import { TPageRoomState } from '@/helpers/game-state-manager';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
-import type { TGameOptionsRoles, TGameOptionsAddons } from '@avalon/types';
+import type { TGameOptionsRoles, TGameOptionsAddons, TGameOptionsFeatures } from '@avalon/types';
 import Options from '@/components/game/options/Options.vue';
+import { features } from 'process';
 
 export default defineComponent({
   name: 'StartPanel',
@@ -64,6 +65,10 @@ export default defineComponent({
     const addons = ref<TGameOptionsAddons>({
       ladyOfLake: false,
       excalibur: false,
+    });
+
+    const features = ref<TGameOptionsFeatures>({
+      anonymousVoting: false,
     });
 
     const isUserInGame = computed(() => {
@@ -111,6 +116,7 @@ export default defineComponent({
       roomState,
       roles,
       addons,
+      features,
 
       isUserInGame,
       isUserLeader,

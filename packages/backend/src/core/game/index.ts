@@ -17,7 +17,7 @@ import type {
   TGameStage,
   IGameSettingsWithRoles,
   IGameOptions,
-  TGameFeatures,
+  TGameOptionsFeatures,
   TAddonsData,
 } from '@avalon/types';
 
@@ -79,7 +79,7 @@ export class Game extends GameHooks {
   /**
    * Game features
    */
-  features: TGameFeatures;
+  features: TGameOptionsFeatures;
 
   /**
    * State game observer
