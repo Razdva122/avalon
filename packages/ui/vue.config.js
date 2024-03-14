@@ -44,7 +44,7 @@ module.exports = defineConfig({
             filename: 'sitemap.xml',
             skipgzip: true,
             lastmod: true,
-            changefreq: 'daily',
+            changefreq: 'weekly',
             priority: 0.8,
           },
         }),
