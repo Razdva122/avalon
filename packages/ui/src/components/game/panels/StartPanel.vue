@@ -100,7 +100,11 @@ export default defineComponent({
     };
 
     const onStartClick = () => {
-      socket.emit('startGame', roomState.value.roomID, { roles: roles.value, addons: addons.value, features: {} });
+      socket.emit('startGame', roomState.value.roomID, {
+        roles: roles.value,
+        addons: addons.value,
+        features: features.value,
+      });
     };
 
     const onCopyClick = () => {

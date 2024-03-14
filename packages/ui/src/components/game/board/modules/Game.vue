@@ -69,15 +69,9 @@
           ></div>
         </template>
       </div>
-      <div
-        class="d-flex flex-row align-center justify-center"
-        v-if="visibleHistory?.type === 'vote' && visibleHistory.anonymous"
-      >
+      <div class="vote-container" v-if="visibleHistory?.type === 'vote' && visibleHistory.anonymous">
         <template v-for="i in gameState.players.length">
-          <div
-            class="vote-result-element"
-            :class="'icon-vote-' + (i <= visibleHistory.votes.approve ? 'approve' : 'reject')"
-          ></div>
+          <i class="material-icons icon-result" :class="i <= visibleHistory.votes.approve ? 'check' : 'close'"></i>
         </template>
       </div>
     </div>
@@ -259,5 +253,29 @@ export default defineComponent({
   background-image: url('@/assets/red_team_no_background.png');
   border: 2px solid rgb(var(--v-theme-error));
   background-size: contain;
+}
+
+.vote-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 220px;
+  flex-wrap: wrap;
+}
+
+.icon-result {
+  font-size: 35px;
+  border-radius: 50%;
+  border: 2px solid white;
+
+  &.check {
+    color: rgb(var(--v-theme-success));
+    border-color: rgb(var(--v-theme-success));
+  }
+
+  &.close {
+    color: rgb(var(--v-theme-error));
+    border-color: rgb(var(--v-theme-error));
+  }
 }
 </style>

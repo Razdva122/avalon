@@ -67,7 +67,7 @@
             </div>
             <div>
               Reject:
-              <span class="text-success">
+              <span class="text-error">
                 {{ historyElText(historyEl, 'reject') }}
               </span>
             </div>
