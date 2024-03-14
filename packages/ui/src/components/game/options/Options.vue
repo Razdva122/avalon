@@ -15,7 +15,7 @@
         </v-tabs>
         <template v-if="type === 'roles'">
           <div class="option" v-for="role in rolesSettings">
-            <PlayerIcon class="role" :icon="role.role" />
+            <PlayerIcon class="role" :icon="role.role" :class="rolesShortInfo[role.role].loyalty" />
             <v-checkbox
               @input="onRoleUpdate(role.role)"
               :disabled="role.disabled"
@@ -27,6 +27,7 @@
               :label="role.label"
             >
             </v-checkbox>
+            <HelpButton :route="'route' in role ? role.route : role.role" :content="rolesShortInfo[role.role].info" />
           </div>
         </template>
         <template v-if="type === 'addons'">
@@ -51,6 +52,7 @@
 import { defineComponent, PropType } from 'vue';
 import PlayerIcon from '@/components/game/information/PlayerIcon.vue';
 import HelpButton from '@/components/feedback/HelpButton.vue';
+import { rolesShortInfo } from '@/components/game/information/const';
 import type { TGameOptionsRoles, TGameOptionsAddons, TGameOptionsFeatures } from '@avalon/types';
 
 export default defineComponent({
@@ -76,29 +78,36 @@ export default defineComponent({
     return {
       overlay: false,
       type: 'roles',
+      rolesShortInfo,
     };
   },
   computed: {
     rolesSettings() {
       return [
         { role: 'merlin', label: 'Merlin', disabled: Boolean(this.roles.merlinPure), color: 'success' },
-        { role: 'merlinPure', label: 'Merlin Pure', disabled: Boolean(this.roles.merlin), color: 'success' },
+        {
+          role: 'merlinPure',
+          label: 'Merlin Pure',
+          disabled: Boolean(this.roles.merlin),
+          color: 'success',
+          route: 'merlin_pure',
+        },
         {
           role: 'percival',
           label: 'Percival',
           disabled: !this.roles.merlin && !this.roles.merlinPure,
           color: 'success',
         },
-        { role: 'tristan', label: 'Tristan', disabled: false, color: 'success' },
-        { role: 'isolde', label: 'Isolde', disabled: false, color: 'success' },
+        { role: 'tristan', label: 'Tristan', disabled: false, color: 'success', route: 'lovers' },
+        { role: 'isolde', label: 'Isolde', disabled: false, color: 'success', route: 'lovers' },
         {
           role: 'morgana',
           label: 'Morgana',
           disabled: (!this.roles.merlin && !this.roles.merlinPure) || !this.roles.percival,
           color: 'warning',
         },
-        { role: 'oberon', label: 'Oberon', disabled: false, color: 'warning' },
         { role: 'mordred', label: 'Mordred', disabled: false, color: 'warning' },
+        { role: 'oberon', label: 'Oberon', disabled: false, color: 'warning' },
       ] as const;
     },
     addonsSettings() {
@@ -164,7 +173,15 @@ export default defineComponent({
 .addon-icon {
   width: 40px;
   height: 40px;
-  border: 1px solid black;
+  border: 2px solid black;
+}
+
+.role.good {
+  border-color: rgb(var(--v-theme-info));
+}
+
+.role.evil {
+  border-color: rgb(var(--v-theme-error));
 }
 
 .option,
