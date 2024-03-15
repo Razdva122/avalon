@@ -69,6 +69,7 @@ export default defineComponent({
 
     const features = ref<TGameOptionsFeatures>({
       anonymousVoting: false,
+      hiddenHistory: false,
     });
 
     const isUserInGame = computed(() => {

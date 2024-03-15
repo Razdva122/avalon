@@ -7,6 +7,7 @@ export class CheckLoyalty implements HistoryElement<'checkLoyalty'> {
   type = 'checkLoyalty' as const;
   data: THistoryData['checkLoyalty'];
   stage: THistoryStage;
+  canBeHidden: boolean = true;
 
   constructor(validator: IPlayerInGame, inspected: IPlayerInGame, result: TLoyalty, realLoyalty: TLoyalty) {
     this.data = {

@@ -50,6 +50,7 @@ export type THistoryData = {
     target?: IPlayerInGame;
     result?: TMissionResult;
   };
+  hidden: Record<string, never>;
 };
 
 export type THistoryDataForManager = {

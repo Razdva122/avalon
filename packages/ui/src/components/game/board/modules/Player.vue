@@ -84,11 +84,11 @@ export default defineComponent({
           clone.features.waitForAction = false;
           clone.features.isSelected = false;
 
-          const switchedAction = this.visibleHistory.actions.find(
+          const switchedAction = this.visibleHistory.actions?.find(
             (action) => action.playerID === clone.id && action.switchedBy,
           );
 
-          const visibleAction = this.visibleHistory.actions.find(
+          const visibleAction = this.visibleHistory.actions?.find(
             (action) => action.playerID === clone.id && 'value' in action,
           ) as IActionWithResult;
 

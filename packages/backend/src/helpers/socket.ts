@@ -13,6 +13,7 @@ export const handleSocketErrors = (socket: ServerSocket) => {
 export const errorHandler = <T extends (...args: any[]) => any | Promise<any>>(handler: T, socket: ServerSocket): T => {
   const handleError = (err: Error) => {
     socket.emit('serverError', err.message);
+    console.log(err);
   };
 
   const func = <T>((...args) => {

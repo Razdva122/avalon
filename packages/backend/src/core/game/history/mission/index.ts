@@ -1,6 +1,6 @@
 import type { IPlayerInGame } from '@/core/game';
 
-import type { IMissionSettings, TMissionResult, THistoryStage } from '@avalon/types';
+import type { IMissionSettings, TMissionResult, THistoryStage, IHistoryMission } from '@avalon/types';
 
 import type { HistoryElement, THistoryData, TDataForManagerOptions } from '@/core/game/history';
 
@@ -10,6 +10,7 @@ export class Mission implements HistoryElement<'mission'> {
   type = 'mission' as const;
   data: THistoryData['mission'];
   stage: THistoryStage;
+  canBeHidden: boolean = false;
 
   constructor(stage: 'active' | 'inactive', settings: IMissionSettings, index: number) {
     this.stage = stage;
@@ -108,14 +109,18 @@ export class Mission implements HistoryElement<'mission'> {
   }
 
   dataForManager(options: TDataForManagerOptions) {
-    return {
+    const data = <IHistoryMission>{
       type: this.type,
       index: this.data.index,
       result: this.data.result!,
       settings: this.data.settings,
       leaderID: this.data.leader!.user.id,
       fails: this.data.fails!,
-      actions: this.data.actions.map((action) => {
+    };
+
+    if (!options.game.features.hiddenHistory || options.game.stage === 'end') {
+      data.leaderID = this.data.leader!.user.id;
+      data.actions = this.data.actions.map((action) => {
         const isGameEnded = options.game.stage === 'end';
         const isUserAction = action.player.user.id === options.userID;
         const isSwitchedByPlayer = options.userID && action.switchedBy === options.userID;
@@ -129,7 +134,9 @@ export class Mission implements HistoryElement<'mission'> {
         }
 
         return { playerID: action.player.user.id, switchedBy: action.switchedBy };
-      }),
-    };
+      });
+    }
+
+    return data;
   }
 }

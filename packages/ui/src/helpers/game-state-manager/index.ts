@@ -132,6 +132,7 @@ export class GameStateManager {
         checkLoyalty: 'useExcalibur',
         mission: 'onMission',
         switchResult: 'useExcalibur',
+        hidden: 'hidden',
       } as const
     )[history.type];
   }

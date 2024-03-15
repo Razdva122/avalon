@@ -8,6 +8,7 @@ export abstract class HistoryElement<T extends THistoryType = THistoryType> {
   abstract type: T;
   abstract stage: THistoryStage;
   abstract data: THistoryData[T];
+  abstract canBeHidden: boolean;
 
   /**
    * Data converted for frontend and database

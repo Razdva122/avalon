@@ -15,7 +15,13 @@ export type THistoryType = 'mission' | 'vote' | 'assassinate' | 'checkLoyalty' |
  */
 export type THistoryStage = 'active' | 'inactive' | 'progress' | 'finished';
 
-export type THistoryResults = THistoryVote | IHistoryMission | IHistoryAssassinate | ICheckLoyalty | ISwitchResult;
+export type THistoryResults =
+  | THistoryVote
+  | IHistoryMission
+  | IHistoryAssassinate
+  | ICheckLoyalty
+  | ISwitchResult
+  | IHiddenHistory;
 
 /**
  * History vote data
@@ -41,8 +47,8 @@ export interface IHistoryMission {
   index: number;
   result: TMissionResult;
   settings: IMissionSettings;
-  leaderID: string;
-  actions: IAction[] | IActionWithResult[];
+  leaderID?: string;
+  actions?: IAction[] | IActionWithResult[];
   fails: number;
 }
 
@@ -68,11 +74,21 @@ export interface ICheckLoyalty {
   realLoyalty?: TLoyalty;
 }
 
+/**
+ * Change of mission action
+ */
 export interface ISwitchResult {
   type: 'switchResult';
   switcherID: string;
   targetID?: string;
   result?: TMissionResult;
+}
+
+/**
+ * Hidden element of history
+ */
+export interface IHiddenHistory {
+  type: 'hidden';
 }
 
 /**

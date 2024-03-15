@@ -1,7 +1,14 @@
 <template>
   <div class="game-container">
     <div class="history-actions mb-4 d-flex flex-column justify-end">
-      <div class="d-flex flex-column align-center justify-end" v-if="gameState.history.length">
+      <div
+        class="d-flex flex-column align-center justify-end"
+        v-if="
+          (!gameState.features.hiddenHistory && gameState.history.length) ||
+          gameState.stage === 'end' ||
+          stateManager.viewMode.value === 'live'
+        "
+      >
         <Spoiler :size="{ width: '250px', height: '40px' }">
           <div class="mb-1" v-if="stateManager.viewMode.value === 'live'">
             <History :history="gameState.history" :players="gameState.players" />
@@ -151,6 +158,7 @@ export default defineComponent({
           mission: 'Mission',
           assassinate: 'Assassinate',
           switchResult: 'Excalibur',
+          hidden: 'Hidden',
         };
 
         const lastElement = _.last(roomState.value.gameStates[pointer].history)!;
@@ -177,6 +185,7 @@ export default defineComponent({
         end: 'end',
         assassinate: 'assassinate',
         announceLoyalty: 'lady of lake',
+        hidden: 'hidden',
       }[gameState.value.stage];
     });
 

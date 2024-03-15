@@ -133,6 +133,11 @@ export default defineComponent({
           label: 'Anonymous voting',
           hint: "With anonymous voting, you don't know who approves the mission and who rejects it",
         },
+        {
+          name: 'hiddenHistory',
+          label: 'Hidden history',
+          hint: 'With a hidden history, past actions in the game are hidden',
+        },
       ] as const;
     },
   },

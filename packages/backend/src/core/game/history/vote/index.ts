@@ -10,6 +10,7 @@ export class Vote implements HistoryElement<'vote'> {
   type = 'vote' as const;
   data: THistoryData['vote'];
   stage: THistoryStage;
+  canBeHidden: boolean = true;
 
   constructor(players: IPlayerInGame[], leader: IPlayerInGame, index: number, forced?: true) {
     this.stage = 'active';

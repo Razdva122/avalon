@@ -8,6 +8,7 @@ export class Assassinate implements HistoryElement<'assassinate'> {
   data: THistoryData['assassinate'];
   stage: THistoryStage;
   validator: TAssassinateValidator;
+  canBeHidden: boolean = true;
 
   constructor(assassin: IPlayerInGame, type: TAssassinateType, validator: TAssassinateValidator) {
     this.data = {

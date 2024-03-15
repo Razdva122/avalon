@@ -7,6 +7,7 @@ export class SwitchResult implements HistoryElement<'switchResult'> {
   type = 'switchResult' as const;
   data: THistoryData['switchResult'];
   stage: THistoryStage;
+  canBeHidden: boolean = true;
 
   constructor(switcher: IPlayerInGame, target?: IPlayerInGame, result?: TMissionResult) {
     this.data = {

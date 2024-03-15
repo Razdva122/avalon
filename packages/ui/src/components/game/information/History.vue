@@ -15,7 +15,7 @@
             </span>
             <span> / fails {{ historyEl.fails }} </span>
           </div>
-          <div>
+          <div v-if="historyEl.actions">
             Team:
             <template v-for="(el, index) in historyEl.actions">
               <span :class="{ fail: 'text-error', success: 'text-success' }[(el as IActionWithResult).value]">

@@ -31,6 +31,7 @@ export class GameManager {
       settings: this.game.settings,
       winner: this.game.winner,
       addonsData: this.game.addonsData,
+      features: this.game.features,
       ...this.prepareHistoryAndPlayerForRoomState(),
       ...this.calculatePlayersRoles(this.game.stage),
     };
@@ -68,7 +69,15 @@ export class GameManager {
 
   prepareHistoryAndPlayerForRoomState(): Pick<TRoomState, 'history' | 'players'> {
     return {
-      history: this.game.history.map((el) => el.dataForManager.bind(el)),
+      history: this.game.history.map((el, index) => {
+        if (this.game.features.hiddenHistory && this.game.stage !== 'end') {
+          if (index !== this.game.history.length - 1 && el.canBeHidden) {
+            return () => ({ type: 'hidden' });
+          }
+        }
+
+        return el.dataForManager.bind(el);
+      }),
       players: this.game.players.map((player) => {
         return {
           id: player.user.id,
@@ -146,6 +155,7 @@ export class GameManager {
       mission: this.roomState.mission,
       settings: this.roomState.settings,
       addonsData: this.roomState.addonsData,
+      features: this.roomState.features,
       history: this.roomState.history.map((el) => el({ game: this.game, userID })),
       players: this.roomState.players.map((player, index) => {
         const playerData: IPlayer = { ...player, role: roles[index] };

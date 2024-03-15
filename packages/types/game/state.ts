@@ -3,6 +3,7 @@ import type { THistoryResults } from './history';
 import type { IGameSettingsWithRoles } from './settings';
 import type { TAddonsStages, TAddonsData } from './addons';
 import type { TLoyalty } from '../game/roles';
+import type { TGameOptionsFeatures } from '../game/options';
 
 export interface IVisualGameState {
   winner?: TLoyalty;
@@ -14,9 +15,17 @@ export interface IVisualGameState {
   history: THistoryResults[];
   players: IPlayer[];
   addonsData: TAddonsData;
+  features: TGameOptionsFeatures;
 }
 
 /**
  * Possible game stages
  */
-export type TGameStage = 'initialization' | 'votingForTeam' | 'onMission' | 'selectTeam' | 'end' | TAddonsStages;
+export type TGameStage =
+  | 'initialization'
+  | 'votingForTeam'
+  | 'hidden'
+  | 'onMission'
+  | 'selectTeam'
+  | 'end'
+  | TAddonsStages;
