@@ -6,7 +6,7 @@
         v-if="
           (!gameState.features.hiddenHistory && gameState.history.length) ||
           gameState.stage === 'end' ||
-          stateManager.viewMode.value === 'live'
+          stateManager.viewMode.value === 'history'
         "
       >
         <Spoiler :size="{ width: '250px', height: '40px' }">

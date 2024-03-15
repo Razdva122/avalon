@@ -71,7 +71,9 @@ export class GameManager {
     return {
       history: this.game.history.map((el, index) => {
         if (this.game.features.hiddenHistory && this.game.stage !== 'end') {
-          if (index !== this.game.history.length - 1 && el.canBeHidden) {
+          const currentHistoryIndex = this.roomState.history.length;
+
+          if (index < currentHistoryIndex && el.canBeHidden) {
             return () => ({ type: 'hidden' });
           }
         }
