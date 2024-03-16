@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 import type { IPlayerInGame } from '@/core/game';
 
 import type { IMissionSettings, TMissionResult, THistoryStage, IHistoryMission } from '@avalon/types';
@@ -118,7 +120,10 @@ export class Mission implements HistoryElement<'mission'> {
       fails: this.data.fails!,
     };
 
-    if (!options.game.features.hiddenHistory || options.game.stage === 'end') {
+    const isLastElement = _.last(options.game.history) === this;
+    const hideElement = options.game.features.hiddenHistory && !isLastElement;
+
+    if (!hideElement || options.game.stage === 'end') {
       data.leaderID = this.data.leader!.user.id;
       data.actions = this.data.actions.map((action) => {
         const isGameEnded = options.game.stage === 'end';

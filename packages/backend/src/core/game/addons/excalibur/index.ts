@@ -116,7 +116,5 @@ export class ExcaliburAddon implements IGameAddon {
     ownerOfExcalibur.features.waitForAction = false;
 
     this.game.finishMission();
-
-    this.game.stateObserver.gameStateChanged();
   }
 }
