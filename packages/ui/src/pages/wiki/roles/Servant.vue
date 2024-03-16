@@ -1,7 +1,10 @@
 <template>
   <div class="info-page-content">
     <WikiBreadCrumbs />
-    <h1>Servant role</h1>
+    <h1>
+      <div class="good-loyalty-icon"></div>
+      Servant role
+    </h1>
     <img class="preview-image" src="@/assets/roles/servant.png" alt="Servant" />
 
     <h2>General Tips:</h2>
@@ -52,9 +55,9 @@
     </ul>
 
     <p>
-      Playing as a Servant, remember the importance of teamwork and collective strategy. Your job is not just to help
-      picking the right teams for missions but also to protect the reputation of "Good" players, easing the path towards
-      victory.
+      Playing as a <RoleLink role="servant" />, remember the importance of teamwork and collective strategy. Your job is
+      not just to help picking the right teams for missions but also to protect the reputation of "Good" players, easing
+      the path towards victory.
     </p>
   </div>
 </template>
@@ -62,10 +65,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
+import RoleLink from '@/components/game/information/RoleLink.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
+    RoleLink,
   },
 });
 </script>

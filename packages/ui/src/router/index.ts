@@ -21,6 +21,8 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.oberon, component: () => import('@/pages/wiki/roles/Oberon.vue') },
   { ...routesSeo.minion, component: () => import('@/pages/wiki/roles/Minion.vue') },
   { ...routesSeo.notFound, component: () => import('@/pages/empty/NotFound.vue') },
+  { path: '/isolde', name: 'isolde', redirect: 'lovers' },
+  { path: '/tristan', name: 'tristan', redirect: 'lovers' },
   { path: '/:catchAll(.*)', redirect: '404' },
 ];
 

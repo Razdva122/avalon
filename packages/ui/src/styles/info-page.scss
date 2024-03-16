@@ -6,6 +6,9 @@
     text-align: center;
     margin-bottom: 16px;
     margin-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   div,
@@ -21,5 +24,26 @@
     max-width: 450px;
     width: 30%;
     border: 2px solid black;
+  }
+
+  .evil-loyalty-icon,
+  .good-loyalty-icon {
+    display: inline-block;
+    margin-bottom: 0px;
+    margin-right: 8px;
+    width: 45px;
+    height: 45px;
+    background-size: contain;
+    border-radius: 50%;
+  }
+
+  .good-loyalty-icon {
+    background-image: url('@/assets/blue_team_no_background.png');
+    border: 1px solid rgb(var(--v-theme-info));
+  }
+
+  .evil-loyalty-icon {
+    background-image: url('@/assets/red_team_no_background.png');
+    border: 1px solid rgb(var(--v-theme-error));
   }
 }

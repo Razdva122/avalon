@@ -1,13 +1,16 @@
 <template>
   <div class="info-page-content">
     <WikiBreadCrumbs />
-    <h1>Oberon Role</h1>
+    <h1>
+      <div class="evil-loyalty-icon"></div>
+      Oberon Role
+    </h1>
     <img class="preview-image" src="@/assets/roles/oberon.png" alt="oberon" />
 
     <p>
-      Playing as Oberon presents unique challenges as you are a Minion of Evil, but you do not know the identities of
-      your fellow minions, and they do not know you. You are tasked with disrupting the forces of good while navigating
-      the game with limited information.
+      Playing as <RoleLink role="oberon" /> presents unique challenges as you are a Minion of Evil, but you do not know
+      the identities of your fellow minions, and they do not know you. You are tasked with disrupting the forces of good
+      while navigating the game with limited information.
     </p>
 
     <h2>General Tips:</h2>
@@ -42,7 +45,7 @@
       </li>
       <li>
         <strong>Be unpredictable:</strong> Vary your gameplay to avoid any patterns that could reveal your role as
-        Oberon.
+        <RoleLink role="oberon" />.
       </li>
       <li>
         <strong>Listen for clues:</strong> Your fellow evil players may inadvertently reveal themselves; use this to
@@ -55,8 +58,9 @@
     </ul>
 
     <p>
-      Playing as Oberon requires cunning, adaptability, and a flair for deception. Your unpredictability is an asset
-      that, if used wisely, can turn the tides of the game. Confuse, deceive, and scheme your way to victory for evil!
+      Playing as <RoleLink role="oberon" /> requires cunning, adaptability, and a flair for deception. Your
+      unpredictability is an asset that, if used wisely, can turn the tides of the game. Confuse, deceive, and scheme
+      your way to victory for evil!
     </p>
   </div>
 </template>
@@ -64,10 +68,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
+import RoleLink from '@/components/game/information/RoleLink.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
+    RoleLink,
   },
 });
 </script>

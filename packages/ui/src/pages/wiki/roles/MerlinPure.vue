@@ -1,13 +1,16 @@
 <template>
   <div class="info-page-content">
     <WikiBreadCrumbs />
-    <h1>Merlin Pure Role</h1>
+    <h1>
+      <div class="good-loyalty-icon"></div>
+      Merlin Pure Role
+    </h1>
     <img class="preview-image" src="@/assets/roles/merlin_pure.png" alt="merlin pure" />
 
     <p>
-      Playing as Merlin Pure grants you the extraordinary power of seeing not only the allegiance but also the exact
-      roles of the evil characters. This advanced knowledge provides you a significant edge, but comes with the
-      increased risk of being exposed and targeted by the Assassin.
+      Playing as <RoleLink role="merlinPure" /> grants you the extraordinary power of seeing not only the allegiance but
+      also the exact roles of the evil characters. This advanced knowledge provides you a significant edge, but comes
+      with the increased risk of being exposed and targeted by the Assassin.
     </p>
 
     <h2>General Tips:</h2>
@@ -22,7 +25,7 @@
       </li>
       <li>
         <strong>Avoid immediate direct accusations:</strong> Given your comprehensive awareness, pointing out evil roles
-        too precisely can quickly unmask you as Merlin Pure.
+        too precisely can quickly unmask you as <RoleLink role="merlinPure" />.
       </li>
       <li>
         <strong>Balance your intel:</strong> It's crucial to alternate between providing guidance and remaining
@@ -59,10 +62,10 @@
     </ul>
 
     <p>
-      Playing as Merlin Pure is a role laden with potency and peril. Your unmatched knowledge of the evils' identities
-      allows you unparalleled ability to steer the course of the game. However, your ultimate success hinges on the
-      mastery of subtlety and the art of the unspoken word. Guide the forces of good to triumph with a deft hand and a
-      watchful eye.
+      Playing as <RoleLink role="merlinPure" /> is a role laden with potency and peril. Your unmatched knowledge of the
+      evils' identities allows you unparalleled ability to steer the course of the game. However, your ultimate success
+      hinges on the mastery of subtlety and the art of the unspoken word. Guide the forces of good to triumph with a
+      deft hand and a watchful eye.
     </p>
   </div>
 </template>
@@ -70,10 +73,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
+import RoleLink from '@/components/game/information/RoleLink.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
+    RoleLink,
   },
 });
 </script>

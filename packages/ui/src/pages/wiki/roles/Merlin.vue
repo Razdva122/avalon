@@ -1,24 +1,32 @@
 <template>
   <div class="info-page-content">
     <WikiBreadCrumbs />
-    <h1>Merlin Role</h1>
+    <h1>
+      <div class="good-loyalty-icon"></div>
+      Merlin Role
+    </h1>
     <img class="preview-image" src="@/assets/roles/merlin.png" alt="merlin" />
 
     <p>
-      Playing as Merlin involves knowing all the minions of evil (except Mordred in classical rules) but not being able
-      to directly reveal this information. The challenge lies in guiding the forces of good to victory without being
-      identified and assassinated by the evil’s assassin at the game's end.
+      Assuming the role of <RoleLink role="merlin" /> necessitates a masterful balancing act: one must possess intimate
+      knowledge of all minions of evil (save for <RoleLink role="mordred" />, in classic gameplay) yet be unable to
+      divulge this information outright. The true challenge lies in covertly shepherding the forces of good toward
+      triumph, all while avoiding detection and a potential assassination by the forces of evil's assassin at the game's
+      conclusion. More intricate still is the necessity to counteract the deceits of <RoleLink role="morgana" /> and to
+      garner the trust of <RoleLink role="percival" />. <RoleLink role="morgana" /> vies to mimic your persona, leading
+      the righteous astray, whereas <RoleLink role="percival" /> endeavours to pierce through the pretense and uncover
+      the verity.
     </p>
 
     <h2>General Tips:</h2>
     <ul>
       <li>
-        <strong>Be cautious with your knowledge:</strong> While Merlin knows who the evil players are, revealing this
-        directly can risk being assassinated. Your goal is to aid the Arthurian side subtly.
+        <strong>Be cautious with your knowledge:</strong> While <RoleLink role="merlin" /> knows who the evil players
+        are, revealing this directly can risk being assassinated. Your goal is to aid the Arthurian side subtly.
       </li>
       <li>
         <strong>Use hints wisely:</strong> Mastering the art of dropping subtle hints to your team without being too
-        obvious is crucial for Merlin.
+        obvious is crucial for <RoleLink role="merlin" />.
       </li>
       <li>
         <strong>Be careful with accusations:</strong> Accusing minions of evil too accurately or quickly can reveal your
@@ -59,8 +67,9 @@
     </ul>
 
     <p>
-      Playing as Merlin is challenging yet highly rewarding. With careful strategy and tactful communication, you can
-      lead the forces of good to victory while staying hidden from the dark clutches of the assassin. Good luck!
+      Playing as <RoleLink role="merlin" /> is challenging yet highly rewarding. With careful strategy and tactful
+      communication, you can lead the forces of good to victory while staying hidden from the dark clutches of the
+      assassin. Good luck!
     </p>
   </div>
 </template>
@@ -68,10 +77,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
+import RoleLink from '@/components/game/information/RoleLink.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
+    RoleLink,
   },
 });
 </script>
