@@ -3,12 +3,17 @@
   font-size: 18px;
 
   h1 {
+    justify-content: center;
     text-align: center;
     margin-bottom: 16px;
     margin-top: 5px;
+  }
+
+  h1,
+  h2,
+  h3 {
     display: flex;
     align-items: center;
-    justify-content: center;
   }
 
   div,

@@ -7,6 +7,7 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.about, component: () => import('@/pages/about/About.vue') },
   { ...routesSeo.room, component: () => import('@/pages/room/Room.vue') },
   { ...routesSeo.wiki, component: () => import('@/pages/wiki/Index.vue') },
+  { ...routesSeo.rules, component: () => import('@/pages/wiki/Rules.vue') },
   { ...routesSeo.addons, component: () => import('@/pages/wiki/addons/Index.vue') },
   { ...routesSeo.roles, component: () => import('@/pages/wiki/roles/Index.vue') },
   { ...routesSeo.lady, component: () => import('@/pages/wiki/addons/LadyOfTheLake.vue') },
@@ -29,6 +30,9 @@ export const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+  scrollBehavior() {
+    return { top: 0 };
+  },
 });
 
 const defaultKeywords = ['The Resistance', 'Avalon', 'Online'];

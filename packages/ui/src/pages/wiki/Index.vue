@@ -1,7 +1,14 @@
 <template>
   <div class="info-page-content">
     <div class="information">
-      <v-btn size="x-large" @click="$router.push({ name: 'roles' })" class="mr-4">
+      <v-btn size="x-large" @click="$router.push({ name: 'rules' })">
+        Rules
+        <template v-slot:prepend>
+          <span class="material-icons"> auto_stories </span>
+        </template>
+      </v-btn>
+
+      <v-btn size="x-large" @click="$router.push({ name: 'roles' })">
         Roles
         <template v-slot:prepend>
           <span class="material-icons"> person </span>
@@ -64,5 +71,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 </style>

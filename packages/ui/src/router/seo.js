@@ -41,6 +41,17 @@ module.exports.routesSeo = {
       keywords: ['Wiki', 'Rules', 'How to play'],
     },
   },
+  rules: {
+    path: '/wiki/rules',
+    name: 'rules',
+    meta: {
+      prerender: true,
+      title: 'The Resistance: Avalon | Rules',
+      description:
+        "Official rules for board game 'The Resistance: Avalon'. Learn the game setup, objectives for Loyal Servants of Arthur and Minions of Mordred. How to play 'The Resistance: Avalon'?. Avalon Roles setup",
+      keywords: ['Wiki', 'Rules', 'How to play'],
+    },
+  },
   addons: {
     path: '/wiki/addons',
     name: 'addons',
