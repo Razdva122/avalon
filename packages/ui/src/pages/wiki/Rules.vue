@@ -13,7 +13,7 @@
 
     <h3>
       Objective for the
-      <div class="good-loyalty-icon"></div>
+      <span class="good-loyalty-icon"></span>
       Loyal Servants of Arthur
     </h3>
     <p>
@@ -24,14 +24,14 @@
 
     <h3>
       Objective for the
-      <div class="evil-loyalty-icon"></div>
+      <span class="evil-loyalty-icon"></span>
       Minions of Mordred
     </h3>
     <p>
       The <RoleLink role="minion" />'s of Mordred aim to sow discord and mistrust among the Loyal
-      <RoleLink role="servant" />. Their goal is to cause three missions to fail by infiltrating teams and sabotaging
-      missions. They must communicate covertly and strategize to mislead the loyalists and cast doubt on the true
-      allegiances of other players.
+      <RoleLink role="servant" />. Their goal is to cause three missions to fail
+      <span class="evil-loyalty-icon"></span> by infiltrating teams and sabotaging missions. They must communicate
+      covertly and strategize to mislead the loyalists and cast doubt on the true allegiances of other players.
     </p>
 
     <h3>Additional Objectives</h3>
@@ -61,7 +61,8 @@
     <h3>2. Mission Phase</h3>
     <ul>
       <li>
-        Once a team has been approved, members of the team secretly choose a Success or Fail card to determine the
+        Once a team has been approved, members of the team secretly choose a Success
+        <span class="good-loyalty-icon"></span> or Fail <span class="evil-loyalty-icon"></span> card to determine the
         outcome of the mission.
       </li>
       <li>
@@ -69,7 +70,8 @@
         card.
       </li>
       <li>
-        The cards are then revealed. For a mission to succeed, all the cards must be Success cards. If one or more Fail
+        The cards are then revealed. For a mission to succeed, all the cards must be Success
+        <span class="good-loyalty-icon"></span> cards. If one or more Fail <span class="evil-loyalty-icon"></span>
         cards are revealed, the mission fails. Certain missions may require two Fail cards to fail, depending on the
         number of players in the game.
       </li>
@@ -171,7 +173,11 @@
       </table>
     </div>
 
-    <p>*<b>Note</b>: On missions marked with an asterisk (*), two Fail cards are required for the mission to fail.</p>
+    <p>
+      <b>Note</b>: On missions marked with an asterisk (*), two Fail <span class="evil-loyalty-icon"></span> cards are
+      required for the mission to fail.
+    </p>
+
     <v-divider :thickness="5"></v-divider>
 
     <h2>Recommended Roles Setup</h2>
@@ -259,9 +265,16 @@ export default defineComponent({
 .rules {
   .evil-loyalty-icon,
   .good-loyalty-icon {
-    margin: 0 4px;
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
+  }
+
+  h3 {
+    .evil-loyalty-icon,
+    .good-loyalty-icon {
+      width: 30px;
+      height: 30px;
+    }
   }
 }
 

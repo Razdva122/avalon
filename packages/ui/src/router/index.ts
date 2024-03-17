@@ -22,8 +22,8 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.oberon, component: () => import('@/pages/wiki/roles/Oberon.vue') },
   { ...routesSeo.minion, component: () => import('@/pages/wiki/roles/Minion.vue') },
   { ...routesSeo.notFound, component: () => import('@/pages/empty/NotFound.vue') },
-  { path: '/isolde', name: 'isolde', redirect: 'lovers' },
-  { path: '/tristan', name: 'tristan', redirect: 'lovers' },
+  { path: '/isolde', name: 'isolde', redirect: { name: 'lovers' } },
+  { path: '/tristan', name: 'tristan', redirect: { name: 'lovers' } },
   { path: '/:catchAll(.*)', redirect: '404' },
 ];
 
@@ -39,11 +39,18 @@ const defaultKeywords = ['The Resistance', 'Avalon', 'Online'];
 
 router.beforeEach((to, from, next) => {
   const keywords = <string[]>to.meta.keywords ?? [];
+  const siteAdress = 'https://avalon-game.com';
+
   document.title = <string>to.meta.title;
   document.querySelector('head meta[name="description"]')!.setAttribute('content', <string>to.meta.description);
   document
     .querySelector('head meta[name="keywords"]')!
     .setAttribute('content', [...keywords, ...defaultKeywords].join(', '));
+
+  document
+    .querySelector('link[rel="canonical"]')!
+    .setAttribute('href', siteAdress + (to.fullPath.endsWith('/') ? to.fullPath : to.fullPath + '/'));
+
   next();
 });
 
