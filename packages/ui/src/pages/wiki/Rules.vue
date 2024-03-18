@@ -17,9 +17,9 @@
       Loyal Servants of Arthur
     </h3>
     <p>
-      The Loyal <RoleLink role="servant" /> of Arthur must successfully complete three out of five missions. They must
-      work together to propose teams for each mission and vote on team compositions, always trying to keep traitors off
-      the teams to prevent missions from failing.
+      The Loyal <PreviewLink target="servant" /> of Arthur must successfully complete three out of five missions. They
+      must work together to propose teams for each mission and vote on team compositions, always trying to keep traitors
+      off the teams to prevent missions from failing.
     </p>
 
     <h3>
@@ -28,17 +28,18 @@
       Minions of Mordred
     </h3>
     <p>
-      The <RoleLink role="minion" />'s of Mordred aim to sow discord and mistrust among the Loyal
-      <RoleLink role="servant" />. Their goal is to cause three missions to fail
+      The <PreviewLink target="minion" />'s of Mordred aim to sow discord and mistrust among the Loyal
+      <PreviewLink target="servant" />. Their goal is to cause three missions to fail
       <span class="evil-loyalty-icon"></span> by infiltrating teams and sabotaging missions. They must communicate
       covertly and strategize to mislead the loyalists and cast doubt on the true allegiances of other players.
     </p>
 
     <h3>Additional Objectives</h3>
     <p>
-      The game intensifies with special roles, such as <RoleLink role="merlin" />, who knows the identities of the
+      The game intensifies with special roles, such as <PreviewLink target="merlin" />, who knows the identities of the
       Minions but must keep his identity secret to avoid assassination at the end of the game. The Minions of Mordred
-      can win by correctly identifying and assassinating <RoleLink role="merlin" /> after three missions have succeeded.
+      can win by correctly identifying and assassinating <PreviewLink target="merlin" /> after three missions have
+      succeeded.
     </p>
     <v-divider :thickness="5"></v-divider>
 
@@ -96,7 +97,7 @@
       The gameplay continues through five missions, with the game ending once either the Loyal Servants of Arthur
       successfully complete three missions or the Minions of Mordred cause three missions to fail. In the case that the
       Loyal Servants of Arthur succeed, the Minions of Mordred have one final opportunity to win by correctly
-      identifying <RoleLink role="merlin" />, if they do so the Minions win.
+      identifying <PreviewLink target="merlin" />, if they do so the Minions win.
     </p>
 
     <p>
@@ -196,60 +197,61 @@
     <p>After the first games, we recommend adding roles in the following order:</p>
 
     <p>
-      <RoleLink role="merlin" /> -> <RoleLink role="percival" /> -> <RoleLink role="morgana" /> ->
-      <RoleLink role="oberon" /> -> <RoleLink role="mordred" /> -> Lady of the lake -> <RoleLink role="tristan" /> +
-      <RoleLink role="isolde" />
+      <PreviewLink target="merlin" /> -> <PreviewLink target="percival" /> -> <PreviewLink target="morgana" /> ->
+      <PreviewLink target="oberon" /> -> <PreviewLink target="mordred" /> -> Lady of the lake ->
+      <PreviewLink target="tristan" /> +
+      <PreviewLink target="isolde" />
     </p>
 
     <div class="game-setup">
       <h3>5 Players:</h3>
-      <strong>Loyal Servants of Arthur:</strong> <RoleLink role="merlin" />, <RoleLink role="percival" />,
-      <RoleLink role="servant" /><br />
-      <strong>Minions of Mordred:</strong> <RoleLink role="mordred" />, <RoleLink role="morgana" />
+      <strong>Loyal Servants of Arthur:</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
+      <PreviewLink target="servant" /><br />
+      <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />
     </div>
 
     <div class="game-setup">
       <h3>6 Players:</h3>
-      <strong>Loyal Servants of Arthur:</strong> <RoleLink role="merlin" />, <RoleLink role="percival" />,
-      <RoleLink role="servant" />, <RoleLink role="servant" /><br />
-      <strong>Minions of Mordred:</strong> <RoleLink role="mordred" />, <RoleLink role="morgana" />
+      <strong>Loyal Servants of Arthur:</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
+      <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
+      <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />
     </div>
 
     <div class="game-setup">
       <h3>7 Players:</h3>
-      <strong>Loyal Servants of Arthur:</strong> <RoleLink role="merlin" />, <RoleLink role="percival" />,
-      <RoleLink role="servant" />, <RoleLink role="servant" /><br />
-      <strong>Minions of Mordred:</strong> <RoleLink role="mordred" />, <RoleLink role="morgana" />,
-      <RoleLink role="minion" /><br />
-      <em>Addons:</em> Lady of the lake
+      <strong>Loyal Servants of Arthur:</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
+      <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
+      <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
+      <PreviewLink target="minion" /><br />
+      <em>Addons:</em> <PreviewLink target="lady" /> of the lake
     </div>
 
     <div class="game-setup">
       <h3>8 Players:</h3>
-      <strong>Loyal Servants of Arthur:</strong> <RoleLink role="merlin" />, <RoleLink role="percival" />,
-      <RoleLink role="servant" />, <RoleLink role="servant" />, <RoleLink role="servant" /><br />
-      <strong>Minions of Mordred:</strong> <RoleLink role="mordred" />, <RoleLink role="morgana" />,
-      <RoleLink role="minion" /><br />
-      <em>Addons:</em> Lady of the lake
+      <strong>Loyal Servants of Arthur:</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
+      <PreviewLink target="servant" />, <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
+      <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
+      <PreviewLink target="minion" /><br />
+      <em>Addons:</em> <PreviewLink target="lady" /> of the lake
     </div>
 
     <div class="game-setup">
       <h3>9 Players:</h3>
-      <strong>Loyal Servants of Arthur:</strong> <RoleLink role="merlin" />, <RoleLink role="percival" />,
-      <RoleLink role="tristan" />, <RoleLink role="isolde" />, <RoleLink role="servant" />,
-      <RoleLink role="servant" /><br />
-      <strong>Minions of Mordred:</strong> <RoleLink role="mordred" />, <RoleLink role="morgana" />,
-      <RoleLink role="minion" /><br />
+      <strong>Loyal Servants of Arthur:</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
+      <PreviewLink target="tristan" />, <PreviewLink target="isolde" />, <PreviewLink target="servant" />,
+      <PreviewLink target="servant" /><br />
+      <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
+      <PreviewLink target="minion" /><br />
     </div>
 
     <div class="game-setup">
       <h3>10 Players:</h3>
-      <strong>Loyal Servants of Arthur:</strong> <RoleLink role="merlin" />, <RoleLink role="percival" />,
-      <RoleLink role="tristan" />, <RoleLink role="isolde" />, <RoleLink role="servant" />,
-      <RoleLink role="servant" /><br />
-      <strong>Minions of Mordred:</strong> <RoleLink role="mordred" />, <RoleLink role="morgana" />,
-      <RoleLink role="minion" />, <RoleLink role="oberon" /><br />
-      <em>Addons:</em> Lady of the lake
+      <strong>Loyal Servants of Arthur:</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
+      <PreviewLink target="tristan" />, <PreviewLink target="isolde" />, <PreviewLink target="servant" />,
+      <PreviewLink target="servant" /><br />
+      <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
+      <PreviewLink target="minion" />, <PreviewLink target="oberon" /><br />
+      <em>Addons:</em> <PreviewLink target="lady" /> of the lake
     </div>
 
     <p>
@@ -259,7 +261,8 @@
 
     <h3>Excalibur:</h3>
     <p>
-      We recommend adding excalibur to games for any number of players, but only in the company of experienced players.
+      We recommend adding <PreviewLink target="excalibur" /> to games for any number of players, but only in the company
+      of experienced players.
     </p>
   </div>
 </template>
@@ -267,12 +270,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import RoleLink from '@/components/game/information/RoleLink.vue';
+import PreviewLink from '@/components/game/information/PreviewLink.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
-    RoleLink,
+    PreviewLink,
   },
 });
 </script>

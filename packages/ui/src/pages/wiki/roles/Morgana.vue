@@ -8,18 +8,18 @@
     <img class="preview-image" src="@/assets/roles/morgana.png" alt="Morgana" />
 
     <p>
-      Playing as <RoleLink role="morgana" /> revolves around deception, specifically making yourself seem like
-      <RoleLink role="merlin" /> to confuse the forces of good. You should aim to bewilder
-      <RoleLink role="percival" /> not only through your actions but also by paying close attention to how
-      <RoleLink role="merlin" /> might be guiding the good forces. Blending in as Merlin could lead
-      <RoleLink role="percival" /> astray, giving the forces of evil an upper hand.
+      Playing as <PreviewLink target="morgana" /> revolves around deception, specifically making yourself seem like
+      <PreviewLink target="merlin" /> to confuse the forces of good. You should aim to bewilder
+      <PreviewLink target="percival" /> not only through your actions but also by paying close attention to how
+      <PreviewLink target="merlin" /> might be guiding the good forces. Blending in as Merlin could lead
+      <PreviewLink target="percival" /> astray, giving the forces of evil an upper hand.
     </p>
 
     <h2>General Tips:</h2>
     <ul>
       <li>
         <strong>Master the art of deception:</strong> Use your actions and words to mimic the role of
-        <RoleLink role="merlin" />, leading the good players away from the truth.
+        <PreviewLink target="merlin" />, leading the good players away from the truth.
       </li>
       <li>
         <strong>Create confusion among good players:</strong> Strategic disinformation can sow doubt and hinder their
@@ -64,9 +64,9 @@
     </ul>
 
     <p>
-      Thriving as <RoleLink role="morgana" /> requires a fine balance between assertiveness and subtlety. Your ability
-      to manipulate the narrative and influence both evil and good players significantly affects your team's chance of
-      victory. Embrace the challenge and enjoy manoeuvring through Avalon's shadowy waters.
+      Thriving as <PreviewLink target="morgana" /> requires a fine balance between assertiveness and subtlety. Your
+      ability to manipulate the narrative and influence both evil and good players significantly affects your team's
+      chance of victory. Embrace the challenge and enjoy manoeuvring through Avalon's shadowy waters.
     </p>
   </div>
 </template>
@@ -74,12 +74,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import RoleLink from '@/components/game/information/RoleLink.vue';
+import PreviewLink from '@/components/game/information/PreviewLink.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
-    RoleLink,
+    PreviewLink,
   },
 });
 </script>

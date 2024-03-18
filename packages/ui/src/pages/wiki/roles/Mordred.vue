@@ -8,16 +8,16 @@
     <img class="preview-image" src="@/assets/roles/mordred.png" alt="mordred" />
 
     <p>
-      Playing as <RoleLink role="mordred" /> gives you the unique advantage of being unknown to
-      <RoleLink role="merlin" /> and leading the minions of evil. Your objective is to disrupt the forces of good and
-      ensure that evil prevails, all while maintaining your disguise as a loyal ally.
+      Playing as <PreviewLink target="mordred" /> gives you the unique advantage of being unknown to
+      <PreviewLink target="merlin" /> and leading the minions of evil. Your objective is to disrupt the forces of good
+      and ensure that evil prevails, all while maintaining your disguise as a loyal ally.
     </p>
 
     <h2>General Tips:</h2>
     <ul>
       <li>
-        <strong>Maintain your hidden identity:</strong> As <RoleLink role="mordred" />, not being known to
-        <RoleLink role="merlin" /> is a huge advantage. Keep it that way by blending in with the good players.
+        <strong>Maintain your hidden identity:</strong> As <PreviewLink target="mordred" />, not being known to
+        <PreviewLink target="merlin" /> is a huge advantage. Keep it that way by blending in with the good players.
       </li>
       <li>
         <strong>Sow distrust subtly:</strong> Use your influence to cast doubt on others without drawing too much
@@ -56,15 +56,15 @@
         benefit the evil cause.
       </li>
       <li>
-        <strong>Identify <RoleLink role="merlin" />:</strong> Try to deduce who <RoleLink role="merlin" /> is without
-        revealing yourself so your assassin can eliminate them at the game's end.
+        <strong>Identify <PreviewLink target="merlin" />:</strong> Try to deduce who <PreviewLink target="merlin" /> is
+        without revealing yourself so your assassin can eliminate them at the game's end.
       </li>
     </ul>
 
     <p>
-      As <RoleLink role="mordred" />, you command the shadows and influence the game from behind the scenes. Employing
-      cunning and deception, you can lead evil to victory and keep the forces of good forever in the dark. Embrace your
-      role and reign supreme!
+      As <PreviewLink target="mordred" />, you command the shadows and influence the game from behind the scenes.
+      Employing cunning and deception, you can lead evil to victory and keep the forces of good forever in the dark.
+      Embrace your role and reign supreme!
     </p>
   </div>
 </template>
@@ -72,12 +72,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import RoleLink from '@/components/game/information/RoleLink.vue';
+import PreviewLink from '@/components/game/information/PreviewLink.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
-    RoleLink,
+    PreviewLink,
   },
 });
 </script>

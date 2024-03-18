@@ -10,10 +10,10 @@
     <div class="credits">credits to: @Vermilion0</div>
 
     <p>
-      Playing as the Lovers, <RoleLink role="tristan" /> and <RoleLink role="isolde" />, adds a romantic twist to the
-      game. Your bond is strong, as you know each other from the start and are working for the side of good. Yet, this
-      love must be kept secret, if you are both identified, the Assassin can choose to eliminate you instead of Merlin
-      at the end of the game.
+      Playing as the Lovers, <PreviewLink target="tristan" /> and <PreviewLink target="isolde" />, adds a romantic twist
+      to the game. Your bond is strong, as you know each other from the start and are working for the side of good. Yet,
+      this love must be kept secret, if you are both identified, the Assassin can choose to eliminate you instead of
+      Merlin at the end of the game.
     </p>
 
     <h2>General Tips:</h2>
@@ -57,11 +57,11 @@
     </ul>
 
     <p>
-      As the Lovers, <RoleLink role="tristan" /> and <RoleLink role="isolde" />, you possess a unique advantage that, if
-      leveraged with skill and subtlety, can greatly aid the forces of good. However, the specter of the Assassin's
-      choice at the game's end looms ever-present. Navigate the treacherous waters of deceit with care, for if your love
-      is unveiled, it may cost you both the ultimate price. Let your bond be your strength, but let discretion be your
-      guide. May your love triumph over evil!
+      As the Lovers, <PreviewLink target="tristan" /> and <PreviewLink target="isolde" />, you possess a unique
+      advantage that, if leveraged with skill and subtlety, can greatly aid the forces of good. However, the specter of
+      the Assassin's choice at the game's end looms ever-present. Navigate the treacherous waters of deceit with care,
+      for if your love is unveiled, it may cost you both the ultimate price. Let your bond be your strength, but let
+      discretion be your guide. May your love triumph over evil!
     </p>
   </div>
 </template>
@@ -69,12 +69,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import RoleLink from '@/components/game/information/RoleLink.vue';
+import PreviewLink from '@/components/game/information/PreviewLink.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
-    RoleLink,
+    PreviewLink,
   },
 });
 </script>

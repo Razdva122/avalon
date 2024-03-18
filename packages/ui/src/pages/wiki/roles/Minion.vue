@@ -53,9 +53,9 @@
     </ul>
 
     <p>
-      As a <RoleLink role="minion" />, your success depends on your ability to deceive and manipulate the "Good" team
-      while coordinating with your "Evil" allies. Your cunning and discretion are key instruments in overthrowing the
-      forces of good and ensuring victory for <RoleLink role="mordred" />.
+      As a <PreviewLink target="minion" />, your success depends on your ability to deceive and manipulate the "Good"
+      team while coordinating with your "Evil" allies. Your cunning and discretion are key instruments in overthrowing
+      the forces of good and ensuring victory for <PreviewLink target="mordred" />.
     </p>
   </div>
 </template>
@@ -63,12 +63,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import RoleLink from '@/components/game/information/RoleLink.vue';
+import PreviewLink from '@/components/game/information/PreviewLink.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
-    RoleLink,
+    PreviewLink,
   },
 });
 </script>

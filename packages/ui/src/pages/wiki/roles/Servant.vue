@@ -55,9 +55,9 @@
     </ul>
 
     <p>
-      Playing as a <RoleLink role="servant" />, remember the importance of teamwork and collective strategy. Your job is
-      not just to help picking the right teams for missions but also to protect the reputation of "Good" players, easing
-      the path towards victory.
+      Playing as a <PreviewLink target="servant" />, remember the importance of teamwork and collective strategy. Your
+      job is not just to help picking the right teams for missions but also to protect the reputation of "Good" players,
+      easing the path towards victory.
     </p>
   </div>
 </template>
@@ -65,12 +65,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import RoleLink from '@/components/game/information/RoleLink.vue';
+import PreviewLink from '@/components/game/information/PreviewLink.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
-    RoleLink,
+    PreviewLink,
   },
 });
 </script>
