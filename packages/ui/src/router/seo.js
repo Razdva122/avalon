@@ -4,7 +4,8 @@ module.exports.routesSeo = {
     name: 'lobby',
     meta: {
       title: 'Play Avalon Online!',
-      description: "A free platform for playing the board game 'The Resistance: Avalon'",
+      description:
+        "A free platform for playing the board game 'Avalon: The Resistance'. Play Avalon Online. Rules for the Avalon game.",
       keywords: ['Play'],
     },
   },
@@ -13,9 +14,9 @@ module.exports.routesSeo = {
     name: 'about',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | About',
+      title: 'Avalon: The Resistance | About',
       description:
-        "Information about the web platform avalon-game.com. The rules of the board game 'The Resistance: Avalon'.",
+        "Information about the web platform avalon-game.com. The rules of the board game 'Avalon: The Resistance'.",
       keywords: ['About', 'Information', 'Rules'],
     },
   },
@@ -24,9 +25,9 @@ module.exports.routesSeo = {
     props: true,
     name: 'room',
     meta: {
-      title: 'The Resistance: Avalon | Game',
+      title: 'Avalon: The Resistance | Game',
       skipSiteMap: true,
-      description: "Rooms for online games in 'The Resistance: Avalon'",
+      description: "Rooms for online games in 'Avalon: The Resistance'",
       keywords: ['Game'],
     },
   },
@@ -35,9 +36,9 @@ module.exports.routesSeo = {
     name: 'wiki',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Wiki',
+      title: 'Avalon: The Resistance | Wiki',
       description:
-        "Wikipage for board game 'The Resistance: Avalon'. The basic rules of the board game 'The Resistance: Avalon'. How to play 'The Resistance: Avalon'?",
+        "Wikipage for board game 'Avalon: The Resistance'. The basic rules of the board game 'Avalon: The Resistance'. How to play 'Avalon: The Resistance'?",
       keywords: ['Wiki', 'Rules', 'How to play'],
     },
   },
@@ -46,9 +47,9 @@ module.exports.routesSeo = {
     name: 'rules',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Rules',
+      title: 'Avalon: The Resistance | Rules',
       description:
-        "Official rules for board game 'The Resistance: Avalon'. Learn the game setup, objectives for Loyal Servants of Arthur and Minions of Mordred. How to play 'The Resistance: Avalon'?. Avalon Roles setup",
+        "Official rules for board game 'Avalon: The Resistance'. Learn the game setup, objectives for Loyal Servants of Arthur and Minions of Mordred. How to play 'Avalon: The Resistance'?. Avalon Roles setup",
       keywords: ['Wiki', 'Rules', 'How to play'],
     },
   },
@@ -57,9 +58,9 @@ module.exports.routesSeo = {
     name: 'addons',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Addons for game',
+      title: 'Avalon: The Resistance | Addons for game',
       description:
-        "Add-ons and additional cards for the game 'The Resistance: Avalon'. Rules for playing additional cards in a board game Avalon.",
+        "Add-ons and additional cards for the game 'Avalon: The Resistance'. Rules for playing additional cards in a board game Avalon.",
       keywords: ['Addons', 'Module', 'Rules'],
     },
   },
@@ -68,9 +69,9 @@ module.exports.routesSeo = {
     name: 'lady',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Lady of the Lake',
+      title: 'Avalon: The Resistance | Lady of the Lake',
       description:
-        "Rules for 'Lady of the Lake' card in 'The Resistance: Avalon'. Rules for 'Inquisitor Token' card in 'The Resistance'",
+        "Rules for 'Lady of the Lake' card in 'Avalon: The Resistance'. Rules for 'Inquisitor Token' card in 'The Resistance'",
       keywords: ['Addons', 'Module', 'Lady of the Lake', 'Inquisitor Token', 'Rules'],
     },
   },
@@ -79,9 +80,9 @@ module.exports.routesSeo = {
     name: 'excalibur',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Excalibur',
+      title: 'Avalon: The Resistance | Excalibur',
       description:
-        "Rules for 'Excalibur' card in 'The Resistance: Avalon'. Rules for 'Sergeant' card in 'The Resistance'",
+        "Rules for 'Excalibur' card in 'Avalon: The Resistance'. Rules for 'Sergeant' card in 'The Resistance'",
       keywords: ['Addons', 'Module', 'Excalibur', 'Sergeant', 'Rules'],
     },
   },
@@ -90,9 +91,9 @@ module.exports.routesSeo = {
     name: 'roles',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Roles',
+      title: 'Avalon: The Resistance | Roles',
       description:
-        "All available roles in the board game 'The Resistance: Avalon'. Rules for roles: Merlin, Percival, Morgana, Oberon, Mordred",
+        "All available roles in the board game 'Avalon: The Resistance'. Rules for roles: Merlin, Percival, Morgana, Oberon, Mordred",
       keywords: ['Roles', 'Rules', 'Merlin', 'Percival', 'Morgana', 'Oberon', 'Mordred', 'Tips'],
     },
   },
@@ -101,8 +102,8 @@ module.exports.routesSeo = {
     name: 'merlin',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Merlin',
-      description: "Rules and Tips for Merlin role in the board game 'The Resistance: Avalon'",
+      title: 'Avalon: The Resistance | Merlin',
+      description: "Rules and Tips for Merlin role in the board game 'Avalon: The Resistance'",
       keywords: ['Merlin', 'Role', 'Rules', 'Tips'],
     },
   },
@@ -111,8 +112,8 @@ module.exports.routesSeo = {
     name: 'merlin_pure',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Merlin Pure',
-      description: "Rules and Tips for Merlin Pure role in the board game 'The Resistance: Avalon'",
+      title: 'Avalon: The Resistance | Merlin Pure',
+      description: "Rules and Tips for Merlin Pure role in the board game 'Avalon: The Resistance'",
       keywords: ['Merlin Pure', 'Role', 'Rules', 'Tips'],
     },
   },
@@ -121,8 +122,8 @@ module.exports.routesSeo = {
     name: 'lovers',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Lovers (Tristan and Isolde)',
-      description: "Rules and Tips for Lovers (Tristan and Isolde) roles in the board game 'The Resistance: Avalon'",
+      title: 'Avalon: The Resistance | Lovers (Tristan and Isolde)',
+      description: "Rules and Tips for Lovers (Tristan and Isolde) roles in the board game 'Avalon: The Resistance'",
       keywords: ['Lovers', 'Tristan', 'Isolde', 'Role', 'Rules', 'Tips'],
     },
   },
@@ -131,8 +132,8 @@ module.exports.routesSeo = {
     name: 'percival',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Percival',
-      description: "Rules and Tips for Percival role in the board game 'The Resistance: Avalon'",
+      title: 'Avalon: The Resistance | Percival',
+      description: "Rules and Tips for Percival role in the board game 'Avalon: The Resistance'",
       keywords: ['Percival', 'Role', 'Rules', 'Tips'],
     },
   },
@@ -141,8 +142,8 @@ module.exports.routesSeo = {
     name: 'servant',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Servant',
-      description: "Rules and Tips for Servant role in the board game 'The Resistance: Avalon'",
+      title: 'Avalon: The Resistance | Servant',
+      description: "Rules and Tips for Servant role in the board game 'Avalon: The Resistance'",
       keywords: ['Servant', 'Role', 'Rules', 'Tips'],
     },
   },
@@ -151,8 +152,8 @@ module.exports.routesSeo = {
     name: 'mordred',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Mordred',
-      description: "Rules and Tips for Mordred role in the board game 'The Resistance: Avalon'",
+      title: 'Avalon: The Resistance | Mordred',
+      description: "Rules and Tips for Mordred role in the board game 'Avalon: The Resistance'",
       keywords: ['Mordred', 'Role', 'Rules', 'Tips'],
     },
   },
@@ -161,8 +162,8 @@ module.exports.routesSeo = {
     name: 'oberon',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Oberon',
-      description: "Rules and Tips for Oberon role in the board game 'The Resistance: Avalon'",
+      title: 'Avalon: The Resistance | Oberon',
+      description: "Rules and Tips for Oberon role in the board game 'Avalon: The Resistance'",
       keywords: ['Oberon', 'Role', 'Rules', 'Tips'],
     },
   },
@@ -171,8 +172,8 @@ module.exports.routesSeo = {
     name: 'morgana',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Morgana',
-      description: "Rules and Tips for Morgana role in the board game 'The Resistance: Avalon'",
+      title: 'Avalon: The Resistance | Morgana',
+      description: "Rules and Tips for Morgana role in the board game 'Avalon: The Resistance'",
       keywords: ['Morgana', 'Role', 'Rules', 'Tips'],
     },
   },
@@ -181,8 +182,8 @@ module.exports.routesSeo = {
     name: 'minion',
     meta: {
       prerender: true,
-      title: 'The Resistance: Avalon | Minion of Mordred',
-      description: "Rules and Tips for  Minion of Mordred role in the board game 'The Resistance: Avalon'",
+      title: 'Avalon: The Resistance | Minion of Mordred',
+      description: "Rules and Tips for  Minion of Mordred role in the board game 'Avalon: The Resistance'",
       keywords: ['Minion of Mordred', 'Role', 'Rules', 'Tips'],
     },
   },
@@ -190,7 +191,7 @@ module.exports.routesSeo = {
     path: '/404',
     name: 'NotFound',
     meta: {
-      title: 'The Resistance: Avalon | 404',
+      title: 'Avalon: The Resistance | 404',
       skipSiteMap: true,
       description: 'Page not found =(',
     },

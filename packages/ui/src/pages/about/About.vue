@@ -2,13 +2,13 @@
   <div class="info-page-content">
     <h1 class="title">About</h1>
     <div>
-      Welcome to <b>avalon-game.com</b>, your premier destination for playing <b>"The Resistance: Avalon"</b> online
+      Welcome to <b>avalon-game.com</b>, your premier destination for playing <b>"Avalon: The Resistance"</b> online
       with friends and fellow enthusiasts. Our platform offers a seamless and immersive gaming experience, entirely free
       of charge and without the distraction of advertisements.
     </div>
 
     <div>
-      <b>"The Resistance: Avalon"</b> is a captivating board game of strategy and deception, set in the legendary era of
+      <b>"Avalon: The Resistance"</b> is a captivating board game of strategy and deception, set in the legendary era of
       King Arthur and his Knights of the Round Table. Designed for 5 to 10 players, it invites you into a divided world
       where you're either a loyal servant of Arthur striving to protect the kingdom or a devious minion of Mordred
       plotting its downfall. The game is celebrated for its incorporation of secret identities, strategic deception, and

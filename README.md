@@ -1,6 +1,6 @@
-# Web Service for The Resistance: Avalon Game
+# Web Service for Avalon: The Resistance Game
 
-Welcome to the repository for the web service of "The Resistance: Avalon" game. This interactive application is designed for online gameplay of "Avalon" allowing players to interact and compete in real-time.
+Welcome to the repository for the web service of "Avalon: The Resistance" game. This interactive application is designed for online gameplay of "Avalon" allowing players to interact and compete in real-time.
 
 ## [Live Version Available at avalon-game.com](http://avalon-game.com/)
 
@@ -38,4 +38,4 @@ The front-end part of the project responsible for the visual presentation of the
 - [Vuetify](https://vuetifyjs.com) – a material component framework for Vue.js.
 - [socket.io](https://socket.io/) – for implementing real-time interaction with the server.
 
-This project serves as a unique platform for fans of "The Resistance: Avalon", allowing them to enjoy their favorite game in an online format.
+This project serves as a unique platform for fans of "Avalon: The Resistance", allowing them to enjoy their favorite game in an online format.

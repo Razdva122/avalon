@@ -23,7 +23,7 @@
       </v-btn>
     </div>
 
-    <h1 class="title">The Resistance: Avalon - Core Game Logic</h1>
+    <h1 class="title">Avalon: The Resistance - Core Game Logic</h1>
 
     <h2>Game Setup</h2>
     <ul>

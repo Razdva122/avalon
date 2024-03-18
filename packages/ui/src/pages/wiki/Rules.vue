@@ -1,12 +1,12 @@
 <template>
   <div class="info-page-content rules">
     <WikiBreadCrumbs />
-    <h1 class="title">The Resistance: Avalon - Official rules</h1>
+    <h1 class="title">Avalon: The Resistance - Official rules</h1>
 
     <h2>Game Objective</h2>
 
     <p>
-      The Resistance: Avalon is a strategic board game where players are tasked with completing a series of missions
+      Avalon: The Resistance is a strategic board game where players are tasked with completing a series of missions
       while dealing with hidden traitors known as Minions of Mordred. The game is set in the legendary world of King
       Arthur and the Knights of the Round Table.
     </p>
@@ -101,7 +101,7 @@
 
     <p>
       Through strategic discussion, careful observation, and clever tactics, each side must do their best to achieve
-      their objectives without revealing their true allegiances, making each round of The Resistance: Avalon play out
+      their objectives without revealing their true allegiances, making each round of Avalon: The Resistance play out
       uniquely and full of suspense.
     </p>
     <v-divider :thickness="5"></v-divider>
@@ -181,6 +181,26 @@
     <v-divider :thickness="5"></v-divider>
 
     <h2>Recommended Roles Setup</h2>
+    <h3>General tips</h3>
+    <p>
+      For an enriching gaming experience, we suggest a group size of <strong>7 to 10 players</strong> where the
+      intricacies and excitement of the game truly shine.
+    </p>
+
+    <p>
+      For newcomers, it's advisable to begin your Avalon journey with the <strong>basic roles</strong>. As you become
+      more accustomed to the gameplay, you can incrementally introduce additional roles, enhancing complexity and
+      engagement <strong>step by step</strong>.
+    </p>
+
+    <p>After the first games, we recommend adding roles in the following order:</p>
+
+    <p>
+      <RoleLink role="merlin" /> -> <RoleLink role="percival" /> -> <RoleLink role="morgana" /> ->
+      <RoleLink role="oberon" /> -> <RoleLink role="mordred" /> -> Lady of the lake -> <RoleLink role="tristan" /> +
+      <RoleLink role="isolde" />
+    </p>
+
     <div class="game-setup">
       <h3>5 Players:</h3>
       <strong>Loyal Servants of Arthur:</strong> <RoleLink role="merlin" />, <RoleLink role="percival" />,
@@ -235,6 +255,11 @@
     <p>
       <b>Note</b>: In the original version, there is a distinct role of the <b>Assassin</b>. We suggest delegating this
       function to any of the evil roles, or alternatively, making the decision collectively among the evil players.
+    </p>
+
+    <h3>Excalibur:</h3>
+    <p>
+      We recommend adding excalibur to games for any number of players, but only in the company of experienced players.
     </p>
   </div>
 </template>
