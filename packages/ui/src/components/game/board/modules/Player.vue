@@ -5,8 +5,8 @@
     <PlayerIcon v-if="'role' in player" class="role-container" :icon="player.role" />
     <img class="player-crown" alt="crown" src="@/assets/crown.webp" />
     <div class="player-actions-features">
-      <img class="lady-of-lake" alt="lady" src="@/assets/features/lady_of_lake.png" />
-      <img class="excalibur" alt="excalibur" src="@/assets/features/excalibur.png" />
+      <img class="lady-of-lake" alt="lady" src="@/assets/features/lady_of_lake.webp" />
+      <img class="excalibur" alt="excalibur" src="@/assets/features/excalibur.webp" />
     </div>
     <i class="material-icons action-icon close text-error"></i>
     <i class="material-icons action-icon check"></i>

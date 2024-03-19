@@ -94,11 +94,11 @@ export default defineComponent({
 }
 
 .merlin-radio-button {
-  background-image: url('@/assets/icons/merlin_hat.png');
+  background-image: url('@/assets/icons/merlin_hat.webp');
 }
 
 .lovers-radio-button {
-  background-image: url('@/assets/icons/lovers_rose.png');
+  background-image: url('@/assets/icons/lovers_rose.webp');
 }
 
 .button-content {

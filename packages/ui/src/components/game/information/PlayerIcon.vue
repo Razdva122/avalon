@@ -105,7 +105,7 @@ export default defineComponent({
 }
 
 .icon-excalibur {
-  background-image: url('@/assets/features/excalibur.png');
+  background-image: url('@/assets/features/excalibur.webp');
   background-position: center;
   background-size: 100%;
 }

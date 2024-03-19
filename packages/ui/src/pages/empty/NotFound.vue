@@ -2,7 +2,7 @@
   <div class="info-page-content">
     <h1 class="title">Oops! Sorry, page not found.</h1>
     <div class="container">
-      <img class="switch" src="@/assets/features/excalibur.png" alt="excalibur" />
+      <img class="switch" src="@/assets/features/excalibur.webp" alt="excalibur" />
       <v-btn size="x-large" @click="$router.push({ name: 'lobby' })">Switch the route</v-btn>
     </div>
   </div>

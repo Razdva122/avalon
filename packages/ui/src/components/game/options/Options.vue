@@ -197,12 +197,12 @@ export default defineComponent({
 }
 
 .ladyOfLake {
-  background-image: url('@/assets/features/lady_of_lake.png');
+  background-image: url('@/assets/features/lady_of_lake.webp');
   background-size: contain;
 }
 
 .excalibur {
-  background-image: url('@/assets/features/excalibur.png');
+  background-image: url('@/assets/features/excalibur.webp');
   background-size: contain;
 }
 

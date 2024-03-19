@@ -2,7 +2,7 @@
   <div class="info-page-content">
     <WikiBreadCrumbs />
     <h1>Excalibur</h1>
-    <img class="preview-image" src="@/assets/features/excalibur.png" alt="excalibur" />
+    <img class="preview-image" src="@/assets/features/excalibur.webp" alt="excalibur" />
     <p>
       <strong>"Excalibur"</strong> introduces an additional layer of strategy and interaction among players. It
       complements the base rules of the game and offers new possibilities throughout the gameplay.

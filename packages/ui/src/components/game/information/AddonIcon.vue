@@ -19,12 +19,12 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .icon-excalibur {
-  background-image: url('@/assets/features/excalibur.png');
+  background-image: url('@/assets/features/excalibur.webp');
   background-size: contain;
 }
 
 .icon-lady {
-  background-image: url('@/assets/features/lady_of_lake.png');
+  background-image: url('@/assets/features/lady_of_lake.webp');
   background-size: contain;
 }
 </style>

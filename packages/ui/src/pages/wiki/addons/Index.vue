@@ -5,11 +5,11 @@
     <div class="addons-container">
       <router-link class="addon" :to="{ name: 'lady' }">
         <h2>Lady of the Lake</h2>
-        <img class="addon-image" src="@/assets/features/lady_of_lake.png" alt="lady" />
+        <img class="addon-image" src="@/assets/features/lady_of_lake.webp" alt="lady" />
       </router-link>
       <router-link class="addon" :to="{ name: 'excalibur' }">
         <h2>Excalibur</h2>
-        <img class="addon-image" src="@/assets/features/excalibur.png" alt="excalibur" />
+        <img class="addon-image" src="@/assets/features/excalibur.webp" alt="excalibur" />
       </router-link>
     </div>
   </div>
