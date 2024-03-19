@@ -1,6 +1,6 @@
 {
   "name": "@avalon/ui",
-  "version": "16.0.0",
+  "version": "16.0.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -19,7 +19,7 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@prerenderer/renderer-jsdom": "^1.1.8",
+    "@prerenderer/renderer-puppeteer": "^1.2.3",
     "@prerenderer/webpack-plugin": "^5.3.9",
     "@types/js-cookie": "^3.0.6",
     "@vue/cli-plugin-babel": "~5.0.0",
@@ -27,6 +27,7 @@
     "@vue/cli-plugin-typescript": "~5.0.0",
     "@vue/cli-plugin-vuex": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "puppeteer": "^22.5.0",
     "sass": "^1.69.5",
     "sass-loader": "^12.6.0",
     "sitemap-webpack-plugin": "^1.1.1",
