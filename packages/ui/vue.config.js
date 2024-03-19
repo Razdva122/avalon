@@ -6,9 +6,7 @@ const SitemapPlugin = require('sitemap-webpack-plugin').default;
 const PrerendererWebpackPlugin = require('@prerenderer/webpack-plugin');
 const { routesSeo } = require('./src/router/seo');
 
-const paths = Object.values(routesSeo)
-  .filter((el) => !el.meta.skipSiteMap)
-  .map((el) => ({ path: el.path.endsWith('/') ? el.path : el.path + '/' }));
+const paths = Object.values(routesSeo).filter((el) => !el.meta.skipSiteMap);
 
 module.exports = defineConfig({
   transpileDependencies: true,

@@ -10,7 +10,7 @@ module.exports.routesSeo = {
     },
   },
   about: {
-    path: '/about',
+    path: '/about/',
     name: 'about',
     meta: {
       prerender: true,
@@ -21,7 +21,7 @@ module.exports.routesSeo = {
     },
   },
   room: {
-    path: '/room/:uuid',
+    path: '/room/:uuid/',
     props: true,
     name: 'room',
     meta: {
@@ -32,7 +32,7 @@ module.exports.routesSeo = {
     },
   },
   wiki: {
-    path: '/wiki',
+    path: '/wiki/',
     name: 'wiki',
     meta: {
       prerender: true,
@@ -43,7 +43,7 @@ module.exports.routesSeo = {
     },
   },
   rules: {
-    path: '/wiki/rules',
+    path: '/wiki/rules/',
     name: 'rules',
     meta: {
       prerender: true,
@@ -54,7 +54,7 @@ module.exports.routesSeo = {
     },
   },
   addons: {
-    path: '/wiki/addons',
+    path: '/wiki/addons/',
     name: 'addons',
     meta: {
       prerender: true,
@@ -65,7 +65,7 @@ module.exports.routesSeo = {
     },
   },
   lady: {
-    path: '/wiki/addons/lady',
+    path: '/wiki/addons/lady/',
     name: 'lady',
     meta: {
       prerender: true,
@@ -76,7 +76,7 @@ module.exports.routesSeo = {
     },
   },
   excalibur: {
-    path: '/wiki/addons/excalibur',
+    path: '/wiki/addons/excalibur/',
     name: 'excalibur',
     meta: {
       prerender: true,
@@ -87,7 +87,7 @@ module.exports.routesSeo = {
     },
   },
   roles: {
-    path: '/wiki/roles',
+    path: '/wiki/roles/',
     name: 'roles',
     meta: {
       prerender: true,
@@ -98,7 +98,7 @@ module.exports.routesSeo = {
     },
   },
   merlin: {
-    path: '/wiki/roles/merlin',
+    path: '/wiki/roles/merlin/',
     name: 'merlin',
     meta: {
       prerender: true,
@@ -108,7 +108,7 @@ module.exports.routesSeo = {
     },
   },
   merlin_pure: {
-    path: '/wiki/roles/merlin_pure',
+    path: '/wiki/roles/merlin_pure/',
     name: 'merlin_pure',
     meta: {
       prerender: true,
@@ -118,7 +118,7 @@ module.exports.routesSeo = {
     },
   },
   lovers: {
-    path: '/wiki/roles/lovers',
+    path: '/wiki/roles/lovers/',
     name: 'lovers',
     meta: {
       prerender: true,
@@ -128,7 +128,7 @@ module.exports.routesSeo = {
     },
   },
   percival: {
-    path: '/wiki/roles/percival',
+    path: '/wiki/roles/percival/',
     name: 'percival',
     meta: {
       prerender: true,
@@ -138,7 +138,7 @@ module.exports.routesSeo = {
     },
   },
   servant: {
-    path: '/wiki/roles/servant',
+    path: '/wiki/roles/servant/',
     name: 'servant',
     meta: {
       prerender: true,
@@ -148,7 +148,7 @@ module.exports.routesSeo = {
     },
   },
   mordred: {
-    path: '/wiki/roles/mordred',
+    path: '/wiki/roles/mordred/',
     name: 'mordred',
     meta: {
       prerender: true,
@@ -158,7 +158,7 @@ module.exports.routesSeo = {
     },
   },
   oberon: {
-    path: '/wiki/roles/oberon',
+    path: '/wiki/roles/oberon/',
     name: 'oberon',
     meta: {
       prerender: true,
@@ -168,7 +168,7 @@ module.exports.routesSeo = {
     },
   },
   morgana: {
-    path: '/wiki/roles/morgana',
+    path: '/wiki/roles/morgana/',
     name: 'morgana',
     meta: {
       prerender: true,
@@ -178,7 +178,7 @@ module.exports.routesSeo = {
     },
   },
   minion: {
-    path: '/wiki/roles/minion',
+    path: '/wiki/roles/minion/',
     name: 'minion',
     meta: {
       prerender: true,
@@ -188,7 +188,7 @@ module.exports.routesSeo = {
     },
   },
   notFound: {
-    path: '/404',
+    path: '/404/',
     name: 'NotFound',
     meta: {
       title: 'Avalon: The Resistance | 404',
