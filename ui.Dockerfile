@@ -4,6 +4,7 @@ RUN mkdir -p ${APP_DIR}
 WORKDIR ${APP_DIR}
 COPY package*.json ./
 RUN npm install
+RUN npx puppeteer browsers install chrome
 COPY . .
 RUN npm run build:ui
 
