@@ -1,26 +1,32 @@
 <template>
   <div class="info-page-content">
     <div class="information">
-      <v-btn size="x-large" @click="$router.push({ name: 'rules' })">
-        Rules
-        <template v-slot:prepend>
-          <span class="material-icons"> auto_stories </span>
-        </template>
-      </v-btn>
+      <router-link :to="{ name: 'rules' }">
+        <v-btn size="x-large">
+          Rules
+          <template v-slot:prepend>
+            <span class="material-icons"> auto_stories </span>
+          </template>
+        </v-btn>
+      </router-link>
 
-      <v-btn size="x-large" @click="$router.push({ name: 'roles' })">
-        Roles
-        <template v-slot:prepend>
-          <span class="material-icons"> person </span>
-        </template>
-      </v-btn>
+      <router-link :to="{ name: 'roles' }">
+        <v-btn size="x-large">
+          Roles
+          <template v-slot:prepend>
+            <span class="material-icons"> person </span>
+          </template>
+        </v-btn>
+      </router-link>
 
-      <v-btn size="x-large" @click="$router.push({ name: 'addons' })">
-        Addons
-        <template v-slot:prepend>
-          <span class="material-icons"> castle </span>
-        </template>
-      </v-btn>
+      <router-link :to="{ name: 'addons' }">
+        <v-btn size="x-large">
+          Addons
+          <template v-slot:prepend>
+            <span class="material-icons"> castle </span>
+          </template>
+        </v-btn>
+      </router-link>
     </div>
 
     <h1 class="title">Avalon: The Resistance - Core Game Logic</h1>

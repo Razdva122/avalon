@@ -20,15 +20,19 @@
     </div>
 
     <div>
-      Our site replicates the full spectrum of roles found in the traditional board game, including <b>Merlin</b>,
-      <b>Percival</b>, <b>Oberon</b>, <b>Mordred</b>, and <b>Morgana</b>, ensuring an authentic Avalon experience. We've
-      also integrated the beloved game expansions, <b>"Lady of the Lake"</b> and <b>"Excalibur"</b> to enrich your
-      gameplay.
+      Our site replicates the full spectrum of roles found in the traditional board game, including
+      <b><PreviewLink target="merlin" /></b>, <b><PreviewLink target="percival" /></b>,
+      <b><PreviewLink target="oberon" /></b>, <b><PreviewLink target="mordred" /></b>, and
+      <b><PreviewLink target="morgana" /></b>, ensuring an authentic Avalon experience. We've also integrated the
+      beloved game expansions, <b>"<PreviewLink target="lady" /> of the Lake"</b> and
+      <b>"<PreviewLink target="excalibur" />"</b> to enrich your gameplay.
     </div>
 
     <div>
-      Exclusive to our platform are additional roles not found in the original game - <b>Merlin the Pure</b> and
-      <b>Tristan + Isolde (the Lovers)</b> - providing new dynamics and strategies for you and your team to explore.
+      Exclusive to our platform are additional roles not found in the original game -
+      <b><PreviewLink target="merlinPure" /></b> and
+      <b><PreviewLink target="tristan" /> + <PreviewLink target="isolde" /> (the Lovers)</b> - providing new dynamics
+      and strategies for you and your team to explore.
     </div>
 
     <div>
@@ -51,8 +55,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+import PreviewLink from '@/components/game/information/PreviewLink.vue';
+
 export default defineComponent({
-  async setup() {},
+  components: {
+    PreviewLink,
+  },
 });
 </script>
 

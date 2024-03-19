@@ -47,9 +47,7 @@ router.beforeEach((to, from, next) => {
     .querySelector('head meta[name="keywords"]')!
     .setAttribute('content', [...keywords, ...defaultKeywords].join(', '));
 
-  document
-    .querySelector('link[rel="canonical"]')!
-    .setAttribute('href', siteAdress + (to.fullPath.endsWith('/') ? to.fullPath : to.fullPath + '/'));
+  document.querySelector('link[rel="canonical"]')!.setAttribute('href', siteAdress + to.path);
 
   next();
 });

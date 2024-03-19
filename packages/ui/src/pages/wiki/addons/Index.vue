@@ -3,14 +3,14 @@
     <WikiBreadCrumbs />
     <h1>Addons</h1>
     <div class="addons-container">
-      <a class="addon" @click="$router.push({ name: 'lady' })">
+      <router-link class="addon" :to="{ name: 'lady' }">
         <h2>Lady of the Lake</h2>
         <img class="addon-image" src="@/assets/features/lady_of_lake.png" alt="lady" />
-      </a>
-      <a class="addon" @click="$router.push({ name: 'excalibur' })">
+      </router-link>
+      <router-link class="addon" :to="{ name: 'excalibur' }">
         <h2>Excalibur</h2>
         <img class="addon-image" src="@/assets/features/excalibur.png" alt="excalibur" />
-      </a>
+      </router-link>
     </div>
   </div>
 </template>

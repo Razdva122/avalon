@@ -3,46 +3,46 @@
     <WikiBreadCrumbs />
     <h1>Roles</h1>
     <div class="roles-container">
-      <a class="role" @click="$router.push({ name: 'merlin' })">
+      <router-link class="role" :to="{ name: 'merlin' }">
         <h2>Merlin</h2>
         <img class="role-image" src="@/assets/roles/merlin.png" alt="merlin" />
-      </a>
-      <a class="role" @click="$router.push({ name: 'merlin_pure' })">
+      </router-link>
+      <router-link class="role" :to="{ name: 'merlin_pure' }">
         <h2>Merlin Pure</h2>
         <img class="role-image" src="@/assets/roles/merlin_pure.png" alt="merlin pure" />
-      </a>
-      <a class="role" @click="$router.push({ name: 'percival' })">
+      </router-link>
+      <router-link class="role" :to="{ name: 'percival' }">
         <h2>Percival</h2>
         <img class="role-image" src="@/assets/roles/percival.png" alt="percival" />
-      </a>
-      <a class="role" @click="$router.push({ name: 'lovers' })">
+      </router-link>
+      <router-link class="role" :to="{ name: 'lovers' }">
         <h2>Tristan</h2>
         <img class="role-image" src="@/assets/roles/tristan.png" alt="tristan" />
-      </a>
-      <a class="role" @click="$router.push({ name: 'lovers' })">
+      </router-link>
+      <router-link class="role" :to="{ name: 'lovers' }">
         <h2>Isolde</h2>
         <img class="role-image" src="@/assets/roles/isolde.png" alt="isolde" />
-      </a>
-      <a class="role" @click="$router.push({ name: 'servant' })">
+      </router-link>
+      <router-link class="role" :to="{ name: 'servant' }">
         <h2>Servant</h2>
         <img class="role-image" src="@/assets/roles/servant.png" alt="servant" />
-      </a>
-      <a class="role" @click="$router.push({ name: 'mordred' })">
+      </router-link>
+      <router-link class="role" :to="{ name: 'mordred' }">
         <h2>Mordred</h2>
         <img class="role-image evil-role" src="@/assets/roles/mordred.png" alt="mordred" />
-      </a>
-      <a class="role" @click="$router.push({ name: 'morgana' })">
+      </router-link>
+      <router-link class="role" :to="{ name: 'morgana' }">
         <h2>Morgana</h2>
         <img class="role-image evil-role" src="@/assets/roles/morgana.png" alt="morgana" />
-      </a>
-      <a class="role" @click="$router.push({ name: 'oberon' })">
+      </router-link>
+      <router-link class="role" :to="{ name: 'oberon' }">
         <h2>Oberon</h2>
         <img class="role-image evil-role" src="@/assets/roles/oberon.png" alt="oberon" />
-      </a>
-      <a class="role" @click="$router.push({ name: 'minion' })">
+      </router-link>
+      <router-link class="role" :to="{ name: 'minion' }">
         <h2>Minion</h2>
         <img class="role-image evil-role" src="@/assets/roles/minion.png" alt="minion" />
-      </a>
+      </router-link>
     </div>
   </div>
 </template>
