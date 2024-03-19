@@ -1,9 +1,9 @@
 <template>
   <div class="player-container" :class="playerClasses" @click="$emit('playerClick', player.id)">
-    <img class="player-frame" alt="frame" src="@/assets/player-frame.png" />
+    <img class="player-frame" alt="frame" src="@/assets/player-frame.webp" />
     <div class="player-icon"></div>
     <PlayerIcon v-if="'role' in player" class="role-container" :icon="player.role" />
-    <img class="player-crown" alt="crown" src="@/assets/crown.png" />
+    <img class="player-crown" alt="crown" src="@/assets/crown.webp" />
     <div class="player-actions-features">
       <img class="lady-of-lake" alt="lady" src="@/assets/features/lady_of_lake.png" />
       <img class="excalibur" alt="excalibur" src="@/assets/features/excalibur.png" />
@@ -208,7 +208,7 @@ export default defineComponent({
   text-align: center;
   width: 115px;
   @include text-overflow(1);
-  background-image: url('@/assets/name-frame.png');
+  background-image: url('@/assets/name-frame.webp');
   background-size: 100% 100%;
   color: white;
   @include dropShadowBorder(rgba(0, 0, 0, 0.5), 1px);
@@ -369,13 +369,13 @@ export default defineComponent({
 }
 
 .icon-good-mission {
-  background-image: url('@/assets/blue_team_no_background.png');
+  background-image: url('@/assets/blue_team_no_background.webp');
   border: 2px solid rgb(var(--v-theme-info));
   background-size: contain;
 }
 
 .icon-evil-mission {
-  background-image: url('@/assets/red_team_no_background.png');
+  background-image: url('@/assets/red_team_no_background.webp');
   border: 2px solid rgb(var(--v-theme-error));
   background-size: contain;
 }

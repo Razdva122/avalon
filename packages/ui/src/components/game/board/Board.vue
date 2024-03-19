@@ -262,7 +262,7 @@ export default defineComponent({
 }
 
 .game-board {
-  background-image: url('@/assets/board.png');
+  background-image: url('@/assets/board.webp');
   width: 600px;
   height: 600px;
   background-position: center;

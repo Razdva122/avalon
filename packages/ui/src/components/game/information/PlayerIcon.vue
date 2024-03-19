@@ -87,19 +87,19 @@ export default defineComponent({
 }
 
 .icon-evil {
-  background-image: url('@/assets/red_team_no_background.png');
+  background-image: url('@/assets/red_team_no_background.webp');
   background-position: 50% 52%;
   background-size: 135%;
 }
 
 .icon-good {
-  background-image: url('@/assets/blue_team_no_background.png');
+  background-image: url('@/assets/blue_team_no_background.webp');
   background-position: 50% 52%;
   background-size: 100%;
 }
 
 .icon-unknown {
-  background-image: url('@/assets/player-frame.png');
+  background-image: url('@/assets/player-frame.webp');
   background-position: center;
   background-size: 135%;
 }

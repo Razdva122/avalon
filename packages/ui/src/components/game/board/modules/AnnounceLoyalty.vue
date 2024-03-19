@@ -50,10 +50,10 @@ export default defineComponent({
 }
 
 .evil {
-  background-image: url('@/assets/red_team_no_background.png');
+  background-image: url('@/assets/red_team_no_background.webp');
 }
 
 .good {
-  background-image: url('@/assets/blue_team_no_background.png');
+  background-image: url('@/assets/blue_team_no_background.webp');
 }
 </style>

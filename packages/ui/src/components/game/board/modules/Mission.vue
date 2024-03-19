@@ -57,12 +57,12 @@ export default defineComponent({
 }
 
 .mission-success {
-  background-image: url('@/assets/blue_team_no_background.png');
+  background-image: url('@/assets/blue_team_no_background.webp');
   background-size: contain;
 }
 
 .mission-fail {
-  background-image: url('@/assets/red_team_no_background.png');
+  background-image: url('@/assets/red_team_no_background.webp');
   background-size: contain;
 }
 </style>
