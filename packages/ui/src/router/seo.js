@@ -5,7 +5,7 @@ module.exports.routesSeo = {
     meta: {
       title: 'Play Avalon Online!',
       description:
-        "A free platform for playing the board game 'Avalon: The Resistance'. Play Avalon Online. Rules for the Avalon game.",
+        "Explore the legendary game of strategic deduction with 'Avalon: The Resistance' — free to play online. Learn the rules, join a spirited community.",
       keywords: ['Play'],
     },
   },
@@ -16,7 +16,7 @@ module.exports.routesSeo = {
       prerender: true,
       title: 'Avalon: The Resistance | About',
       description:
-        "Information about the web platform avalon-game.com. The rules of the board game 'Avalon: The Resistance'.",
+        "Dive into avalon-game.com: a comprehensive platform dedicated to 'Avalon: The Resistance'. Discover the story behind the game, its official rules, and how we bring together Avalon enthusiasts worldwide.",
       keywords: ['About', 'Information', 'Rules'],
     },
   },
@@ -38,7 +38,7 @@ module.exports.routesSeo = {
       prerender: true,
       title: 'Avalon: The Resistance | Wiki',
       description:
-        "Wikipage for board game 'Avalon: The Resistance'. The basic rules of the board game 'Avalon: The Resistance'. How to play Avalon?",
+        "Your go-to 'Avalon: The Resistance' Wiki resource. Find detailed guides on playing Avalon, rules explanation, and strategy tips.",
       keywords: ['Wiki', 'Rules', 'How to play'],
     },
   },
@@ -49,7 +49,7 @@ module.exports.routesSeo = {
       prerender: true,
       title: 'Avalon: The Resistance | Rules',
       description:
-        "Official rules for board game 'Avalon: The Resistance'. How to play 'Avalon: The Resistance'? Avalon Roles setup.",
+        "Master 'Avalon: The Resistance' with a complete guide to the official rulebook. From setting up the game to the intricate roles of each character, get all the knowledge for a winning strategy.",
       keywords: ['Wiki', 'Rules', 'How to play'],
     },
   },
@@ -60,7 +60,7 @@ module.exports.routesSeo = {
       prerender: true,
       title: 'Avalon: The Resistance | Addons for game',
       description:
-        "Add-ons and additional cards for the game 'Avalon: The Resistance'. Rules for playing additional cards in a board game Avalon.",
+        "Enhance 'Avalon: The Resistance' with exciting add-ons and extra cards. Learn how each addition can spice up your game sessions and bring new challenges to the table.",
       keywords: ['Addons', 'Module', 'Rules'],
     },
   },
