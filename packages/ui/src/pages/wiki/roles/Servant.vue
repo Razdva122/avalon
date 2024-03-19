@@ -5,7 +5,7 @@
       <div class="good-loyalty-icon"></div>
       Servant role
     </h1>
-    <img class="preview-image" src="@/assets/roles/servant.png" alt="Servant" />
+    <img class="preview-image" src="@/assets/roles/servant.webp" alt="Servant" />
 
     <h2>General Tips:</h2>
     <ul>

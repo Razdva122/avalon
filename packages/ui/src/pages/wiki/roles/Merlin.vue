@@ -5,7 +5,7 @@
       <div class="good-loyalty-icon"></div>
       Merlin Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/merlin.png" alt="merlin" />
+    <img class="preview-image" src="@/assets/roles/merlin.webp" alt="merlin" />
 
     <p>
       Assuming the role of <PreviewLink target="merlin" /> necessitates a masterful balancing act: one must possess

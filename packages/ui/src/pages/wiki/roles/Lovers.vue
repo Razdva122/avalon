@@ -5,8 +5,8 @@
       <div class="good-loyalty-icon"></div>
       Lovers (Tristan and Isolde) Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/isolde.png" alt="isolde" />
-    <img class="preview-image" src="@/assets/roles/tristan.png" alt="tristan" />
+    <img class="preview-image" src="@/assets/roles/isolde.webp" alt="isolde" />
+    <img class="preview-image" src="@/assets/roles/tristan.webp" alt="tristan" />
     <div class="credits">credits to: @Vermilion0</div>
 
     <p>

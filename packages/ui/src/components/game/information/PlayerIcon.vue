@@ -24,64 +24,64 @@ export default defineComponent({
 }
 
 .icon-merlin {
-  background-image: url('@/assets/roles/merlin.png');
+  background-image: url('@/assets/roles/merlin.webp');
   background-position: 45% 0%;
 }
 
 .icon-merlinPure {
-  background-image: url('@/assets/roles/merlin_pure.png');
+  background-image: url('@/assets/roles/merlin_pure.webp');
   background-position: 55% 0%;
 }
 
 .icon-morgana {
-  background-image: url('@/assets/roles/morgana.png');
+  background-image: url('@/assets/roles/morgana.webp');
   background-position: 47% 35%;
   background-size: 180%;
 }
 
 .icon-percival {
-  background-image: url('@/assets/roles/percival.png');
+  background-image: url('@/assets/roles/percival.webp');
   background-position: 50% 15%;
   background-size: 170%;
 }
 
 .icon-mysteryWizard {
-  background-image: url('@/assets/roles/mystery.png');
+  background-image: url('@/assets/roles/mystery.webp');
   background-position: 50% 5%;
 }
 
 .icon-minion {
-  background-image: url('@/assets/roles/minion.png');
+  background-image: url('@/assets/roles/minion.webp');
   background-position: 40% 0%;
   background-size: 150%;
 }
 
 .icon-servant {
-  background-image: url('@/assets/roles/servant.png');
+  background-image: url('@/assets/roles/servant.webp');
   background-position: 48% 25%;
   background-size: 150%;
 }
 
 .icon-mordred {
-  background-image: url('@/assets/roles/mordred.png');
+  background-image: url('@/assets/roles/mordred.webp');
   background-position: 45% 0%;
   background-size: 170%;
 }
 
 .icon-oberon {
-  background-image: url('@/assets/roles/oberon.png');
+  background-image: url('@/assets/roles/oberon.webp');
   background-position: 54% 50%;
   background-size: 154%;
 }
 
 .icon-tristan {
-  background-image: url('@/assets/roles/tristan.png');
+  background-image: url('@/assets/roles/tristan.webp');
   background-position: 40% 5%;
   background-size: 145%;
 }
 
 .icon-isolde {
-  background-image: url('@/assets/roles/isolde.png');
+  background-image: url('@/assets/roles/isolde.webp');
   background-position: 53% 0%;
   background-size: 165%;
 }

@@ -5,7 +5,7 @@
       <div class="good-loyalty-icon"></div>
       Merlin Pure Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/merlin_pure.png" alt="merlin pure" />
+    <img class="preview-image" src="@/assets/roles/merlin_pure.webp" alt="merlin pure" />
 
     <p>
       Playing as <PreviewLink target="merlinPure" /> grants you the extraordinary power of seeing not only the

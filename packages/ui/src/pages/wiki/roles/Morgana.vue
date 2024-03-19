@@ -5,7 +5,7 @@
       <div class="evil-loyalty-icon"></div>
       Morgana Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/morgana.png" alt="Morgana" />
+    <img class="preview-image" src="@/assets/roles/morgana.webp" alt="Morgana" />
 
     <p>
       Playing as <PreviewLink target="morgana" /> revolves around deception, specifically making yourself seem like

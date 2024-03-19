@@ -5,7 +5,7 @@
       <div class="evil-loyalty-icon"></div>
       Mordred Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/mordred.png" alt="mordred" />
+    <img class="preview-image" src="@/assets/roles/mordred.webp" alt="mordred" />
 
     <p>
       Playing as <PreviewLink target="mordred" /> gives you the unique advantage of being unknown to

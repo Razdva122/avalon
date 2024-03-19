@@ -5,43 +5,43 @@
     <div class="roles-container">
       <router-link class="role" :to="{ name: 'merlin' }">
         <h2>Merlin</h2>
-        <img class="role-image" src="@/assets/roles/merlin.png" alt="merlin" />
+        <img class="role-image" src="@/assets/roles/merlin.webp" alt="merlin" />
       </router-link>
       <router-link class="role" :to="{ name: 'merlin_pure' }">
         <h2>Merlin Pure</h2>
-        <img class="role-image" src="@/assets/roles/merlin_pure.png" alt="merlin pure" />
+        <img class="role-image" src="@/assets/roles/merlin_pure.webp" alt="merlin pure" />
       </router-link>
       <router-link class="role" :to="{ name: 'percival' }">
         <h2>Percival</h2>
-        <img class="role-image" src="@/assets/roles/percival.png" alt="percival" />
+        <img class="role-image" src="@/assets/roles/percival.webp" alt="percival" />
       </router-link>
       <router-link class="role" :to="{ name: 'lovers' }">
         <h2>Tristan</h2>
-        <img class="role-image" src="@/assets/roles/tristan.png" alt="tristan" />
+        <img class="role-image" src="@/assets/roles/tristan.webp" alt="tristan" />
       </router-link>
       <router-link class="role" :to="{ name: 'lovers' }">
         <h2>Isolde</h2>
-        <img class="role-image" src="@/assets/roles/isolde.png" alt="isolde" />
+        <img class="role-image" src="@/assets/roles/isolde.webp" alt="isolde" />
       </router-link>
       <router-link class="role" :to="{ name: 'servant' }">
         <h2>Servant</h2>
-        <img class="role-image" src="@/assets/roles/servant.png" alt="servant" />
+        <img class="role-image" src="@/assets/roles/servant.webp" alt="servant" />
       </router-link>
       <router-link class="role" :to="{ name: 'mordred' }">
         <h2>Mordred</h2>
-        <img class="role-image evil-role" src="@/assets/roles/mordred.png" alt="mordred" />
+        <img class="role-image evil-role" src="@/assets/roles/mordred.webp" alt="mordred" />
       </router-link>
       <router-link class="role" :to="{ name: 'morgana' }">
         <h2>Morgana</h2>
-        <img class="role-image evil-role" src="@/assets/roles/morgana.png" alt="morgana" />
+        <img class="role-image evil-role" src="@/assets/roles/morgana.webp" alt="morgana" />
       </router-link>
       <router-link class="role" :to="{ name: 'oberon' }">
         <h2>Oberon</h2>
-        <img class="role-image evil-role" src="@/assets/roles/oberon.png" alt="oberon" />
+        <img class="role-image evil-role" src="@/assets/roles/oberon.webp" alt="oberon" />
       </router-link>
       <router-link class="role" :to="{ name: 'minion' }">
         <h2>Minion</h2>
-        <img class="role-image evil-role" src="@/assets/roles/minion.png" alt="minion" />
+        <img class="role-image evil-role" src="@/assets/roles/minion.webp" alt="minion" />
       </router-link>
     </div>
   </div>

@@ -5,7 +5,7 @@
       <div class="evil-loyalty-icon"></div>
       Oberon Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/oberon.png" alt="oberon" />
+    <img class="preview-image" src="@/assets/roles/oberon.webp" alt="oberon" />
 
     <p>
       Playing as <PreviewLink target="oberon" /> presents unique challenges as you are a Minion of Evil, but you do not

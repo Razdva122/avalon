@@ -5,7 +5,7 @@
       <div class="evil-loyalty-icon"></div>
       Minion of Mordred Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/minion.png" alt="Minion of Mordred" />
+    <img class="preview-image" src="@/assets/roles/minion.webp" alt="Minion of Mordred" />
 
     <h2>General Tips:</h2>
     <ul>
