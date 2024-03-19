@@ -198,8 +198,8 @@
 
     <p>
       <PreviewLink target="merlin" /> -> <PreviewLink target="percival" /> -> <PreviewLink target="morgana" /> ->
-      <PreviewLink target="oberon" /> -> <PreviewLink target="mordred" /> -> Lady of the lake ->
-      <PreviewLink target="tristan" /> +
+      <PreviewLink target="oberon" /> -> <PreviewLink target="mordred" /> -> <PreviewLink target="lady" /> of the lake
+      -> <PreviewLink target="tristan" /> +
       <PreviewLink target="isolde" />
     </p>
 

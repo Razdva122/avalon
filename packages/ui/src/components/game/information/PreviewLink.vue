@@ -1,23 +1,25 @@
 <template>
-  <template v-if="target in rolesShortInfo">
-    <a
+  <template v-if="targetIsRole(target)">
+    <router-link
       class="preview-link"
-      :class="rolesShortInfo[target as TVisibleRole].loyalty + '-role'"
-      @click="$router.push({ name: target })"
+      :class="rolesShortInfo[target].loyalty + '-role'"
+      :to="{ name: toSnakeCase(target) }"
     >
-      <PlayerIcon class="icon-in-link" :icon="target as TVisibleRole" />
+      <PlayerIcon class="icon-in-link" :icon="target" />
       {{ target }}
-    </a>
+    </router-link>
   </template>
   <template v-else>
-    <a class="preview-link addon" @click="$router.push({ name: target })">
-      <AddonIcon class="icon-in-link" :addon="target as TAddonsName" />
+    <router-link class="preview-link addon" :to="{ name: toSnakeCase(target) }">
+      <AddonIcon class="icon-in-link" :addon="target" />
       {{ target }}
-    </a>
+    </router-link>
   </template>
 </template>
 
 <script lang="ts">
+import * as _ from 'lodash';
+
 import { defineComponent, PropType } from 'vue';
 
 import type { TVisibleRole } from '@avalon/types';
@@ -41,6 +43,14 @@ export default defineComponent({
     target: {
       required: true,
       type: String as PropType<TVisibleRole | TAddonsName>,
+    },
+  },
+  methods: {
+    targetIsRole(target: TVisibleRole | TAddonsName): target is TVisibleRole {
+      return target in rolesShortInfo;
+    },
+    toSnakeCase(str: string): string {
+      return _.snakeCase(str);
     },
   },
 });
