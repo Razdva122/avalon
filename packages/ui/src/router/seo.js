@@ -38,7 +38,7 @@ module.exports.routesSeo = {
       prerender: true,
       title: 'Avalon: The Resistance | Wiki',
       description:
-        "Wikipage for board game 'Avalon: The Resistance'. The basic rules of the board game 'Avalon: The Resistance'. How to play 'Avalon: The Resistance'?",
+        "Wikipage for board game 'Avalon: The Resistance'. The basic rules of the board game 'Avalon: The Resistance'. How to play Avalon?",
       keywords: ['Wiki', 'Rules', 'How to play'],
     },
   },
@@ -49,7 +49,7 @@ module.exports.routesSeo = {
       prerender: true,
       title: 'Avalon: The Resistance | Rules',
       description:
-        "Official rules for board game 'Avalon: The Resistance'. Learn the game setup, objectives for Loyal Servants of Arthur and Minions of Mordred. How to play 'Avalon: The Resistance'?. Avalon Roles setup",
+        "Official rules for board game 'Avalon: The Resistance'. How to play 'Avalon: The Resistance'? Avalon Roles setup.",
       keywords: ['Wiki', 'Rules', 'How to play'],
     },
   },
