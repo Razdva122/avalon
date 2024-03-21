@@ -1,20 +1,36 @@
 <template>
   <div class="lobby">
+    <div class="alert-container">
+      <TemporaryAlert title="Discord" id="discord">
+        Looking for fellow players to delve into 'Avalon'? Join our
+        <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b> community!
+      </TemporaryAlert>
+      <TemporaryAlert title="New player?" id="newbie">
+        New to 'Avalon'? Learn about the game on our
+        <b><router-link :to="{ name: 'wiki' }">Wiki pages</router-link></b> about the
+        <b><router-link :to="{ name: 'rules' }">Rules</router-link></b> and
+        <b><router-link :to="{ name: 'roles' }">Roles</router-link></b
+        >!
+      </TemporaryAlert>
+    </div>
+
     <v-btn @click="createRoom" size="x-large"> Create room </v-btn>
 
-    <div v-if="roomsList && roomsList.length">
-      <div class="list-header mb-5">Games list:</div>
-      <div v-for="(game, index) in roomsList" class="game mb-1">
-        <div class="mr-2">
-          {{ index + 1 }}.HOST: <b>{{ game.host }}</b>
+    <div>
+      <template v-if="roomsList && roomsList.length">
+        <div class="list-header mb-5">Games list:</div>
+        <div v-for="(game, index) in roomsList" class="game mb-1">
+          <div class="mr-2">
+            {{ index + 1 }}.HOST: <b>{{ game.host }}</b>
+          </div>
+          <v-btn
+            :color="game.state === 'started' ? 'info' : undefined"
+            @click="$router.push({ name: 'room', params: { uuid: game.uuid } })"
+          >
+            {{ game.state === 'started' ? 'Watch game' : 'Join game' }}
+          </v-btn>
         </div>
-        <v-btn
-          :color="game.state === 'started' ? 'info' : undefined"
-          @click="$router.push({ name: 'room', params: { uuid: game.uuid } })"
-        >
-          {{ game.state === 'started' ? 'Watch game' : 'Join game' }}
-        </v-btn>
-      </div>
+      </template>
     </div>
   </div>
 </template>
@@ -26,8 +42,12 @@ import { useStore } from '@/store';
 import type { TRoomsList } from '@avalon/types';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
+import TemporaryAlert from '@/components/feedback/TemporaryAlert.vue';
 
 export default defineComponent({
+  components: {
+    TemporaryAlert,
+  },
   async setup() {
     const router = useRouter();
     const store = useStore();
@@ -70,7 +90,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   height: calc(100vh - 50px);
 }
 
@@ -85,5 +105,16 @@ export default defineComponent({
   justify-content: space-between;
   align-items: center;
   font-size: 24px;
+}
+
+.alert-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .text-primary {
+    color: white !important;
+  }
 }
 </style>

@@ -1,5 +1,5 @@
-import { userStoragePath } from '@/store/const';
-import type { IUser } from '@/store/interface';
+import { userStoragePath, alertStoragePath } from '@/store/const';
+import type { IUser, TAlerts } from '@/store/interface';
 import Cookies from 'js-cookie';
 
 export function updateUserData(user: IUser) {
@@ -14,4 +14,8 @@ export function clearUserData() {
   localStorage.removeItem(userStoragePath);
   Cookies.remove('user_id');
   Cookies.remove('user_name');
+}
+
+export function updateUserAlertsData(alerts: TAlerts) {
+  localStorage.setItem(alertStoragePath, JSON.stringify(alerts));
 }

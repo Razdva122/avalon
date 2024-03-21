@@ -1,11 +1,11 @@
 import { InjectionKey } from 'vue';
 import { createStore, Store, useStore as baseUseStore } from 'vuex';
 
-import { updateUserData, clearUserData } from '@/store/persistent';
+import { updateUserData, clearUserData, updateUserAlertsData } from '@/store/persistent';
 import { userStoragePath } from '@/store/const';
-import type { IState, IUser } from '@/store/interface';
+import type { IState, IUser, TAlertsName } from '@/store/interface';
 
-import { userInStorage } from '@/store/init';
+import { userInStorage, alertsInStorage } from '@/store/init';
 
 export * from '@/store/interface';
 
@@ -18,9 +18,15 @@ export const store = createStore<IState>({
     user: userInStorage ? JSON.parse(userInStorage) : null,
     hideSpoilers: false,
     connect: null,
+    alerts: alertsInStorage ? JSON.parse(alertsInStorage) : {},
   },
   getters: {},
   mutations: {
+    updateAlertCounter(state: IState, alert: TAlertsName) {
+      state.alerts[alert] = (state.alerts[alert] ?? 0) + 1;
+      updateUserAlertsData(state.alerts);
+    },
+
     setUserData(state: IState, user: IUser) {
       state.user = user;
       updateUserData(user);

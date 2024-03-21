@@ -3,6 +3,7 @@ module.exports.routesSeo = {
     path: '/',
     name: 'lobby',
     meta: {
+      prerender: true,
       title: 'Play Avalon Online!',
       description:
         "Explore the legendary game of strategic deduction with 'Avalon: The Resistance' — free to play online. Learn the rules, join a spirited community.",
