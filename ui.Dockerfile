@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ghcr.io/puppeteer/puppeteer:latest as build-stage
+FROM --platform=linux/amd64 ghcr.io/puppeteer/puppeteer:22.5.0 as build-stage
 
 ARG APP_DIR=/home/pptruser/app
 RUN mkdir -p ${APP_DIR}
