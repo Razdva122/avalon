@@ -23,6 +23,29 @@ export default defineComponent({
         }));
     },
   },
+  mounted() {
+    document.querySelector('script[type="application/ld+json"]')!.innerHTML = `
+		{
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [${this.items.reduce((acc, item, index, items) => {
+        const el = `{
+					"@type": "ListItem",
+					"position": ${index + 1},
+					"name": "${item.title}",
+					"item": "https://avalon-game.com/${items
+            .slice(0, index + 1)
+            .map((el) => el.title)
+            .join('/')}/"
+				}${index === items.length - 1 ? '' : ','}`;
+        return acc + el;
+      }, '')}]
+    }
+		`;
+  },
+  beforeUnmount() {
+    document.querySelector('script[type="application/ld+json"]')!.innerHTML = ``;
+  },
 });
 </script>
 
