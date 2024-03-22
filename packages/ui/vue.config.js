@@ -5,6 +5,7 @@ const webpack = require('webpack');
 const SitemapPlugin = require('sitemap-webpack-plugin').default;
 const PrerendererWebpackPlugin = require('@prerenderer/webpack-plugin');
 const { routesSeo } = require('./src/router/seo');
+const { yaMetrika, gtag } = require('./const');
 
 const paths = Object.values(routesSeo).filter((el) => !el.meta.skipSiteMap);
 
@@ -18,6 +19,24 @@ module.exports = defineConfig({
         `,
       },
     },
+  },
+  pluginOptions: {
+    someValue: 'My Custom Value',
+  },
+  chainWebpack: (config) => {
+    config.plugin('html').tap((args) => {
+      const templateFunc = args[0].templateParameters;
+
+      args[0].templateParameters = (...args) => {
+        return {
+          ...templateFunc(...args),
+          yaMetrika: process.env.NODE_ENV !== 'production' ? '' : yaMetrika,
+          gtag: process.env.NODE_ENV !== 'production' ? '' : gtag,
+        };
+      };
+
+      return args;
+    });
   },
   configureWebpack: () => {
     if (process.env.NODE_ENV !== 'production') {
