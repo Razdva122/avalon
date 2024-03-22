@@ -70,7 +70,7 @@ export class GameManager {
   prepareHistoryAndPlayerForRoomState(): Pick<TRoomState, 'history' | 'players'> {
     return {
       history: this.game.history.map((el, index) => {
-        if (this.game.features.hiddenHistory && this.game.stage !== 'end') {
+        if (this.game.features.hiddenHistory && this.game.stage !== 'end' && index !== this.game.history.length - 1) {
           const currentHistoryIndex = this.roomState.history.length;
 
           if (index < currentHistoryIndex && el.canBeHidden) {
