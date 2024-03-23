@@ -1,17 +1,17 @@
 <template>
-  <v-btn color="info" @click="overlay = !overlay" class="mt-4">
+  <v-btn color="info" @click="overlay = !overlay">
     <template v-slot:prepend>
       <span class="material-icons"> settings </span>
     </template>
-    Options
+    {{ buttonText }}
   </v-btn>
   <v-overlay v-model="overlay" class="align-center justify-center">
     <div class="options pa-4 rounded-lg">
       <v-form>
         <v-tabs v-model="type" class="tabs">
           <v-tab value="roles">Roles</v-tab>
-          <v-tab value="addons">Addons</v-tab>
-          <v-tab value="features">Features</v-tab>
+          <v-tab value="addons" v-if="addons">Addons</v-tab>
+          <v-tab value="features" v-if="features">Features</v-tab>
         </v-tabs>
         <template v-if="type === 'roles'">
           <div class="option" v-for="role in rolesSettings">
@@ -30,14 +30,14 @@
             <HelpButton :route="'route' in role ? role.route : role.role" :content="rolesShortInfo[role.role].info" />
           </div>
         </template>
-        <template v-if="type === 'addons'">
+        <template v-if="type === 'addons' && addons">
           <div class="addon" v-for="addon in addonsSettings">
             <div :class="addon.name" class="addon-icon"></div>
             <v-checkbox v-model="addons[addon.name]" :label="addon.label" :hide-details="true" color="info" />
             <HelpButton :route="addon.route" :content="addon.hint" />
           </div>
         </template>
-        <template v-if="type === 'features'">
+        <template v-if="type === 'features' && features">
           <div class="feature" v-for="feature in featuresSettings">
             <v-checkbox v-model="features[feature.name]" :label="feature.label" :hide-details="true" color="info" />
             <HelpButton :content="feature.hint" />
@@ -66,12 +66,14 @@ export default defineComponent({
       type: Object as PropType<TGameOptionsRoles>,
     },
     addons: {
-      required: true,
       type: Object as PropType<TGameOptionsAddons>,
     },
     features: {
-      required: true,
       type: Object as PropType<TGameOptionsFeatures>,
+    },
+    buttonText: {
+      default: 'Options',
+      type: String,
     },
   },
   data() {

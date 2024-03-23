@@ -6,13 +6,13 @@
       :to="{ name: toSnakeCase(target) }"
     >
       <PlayerIcon class="icon-in-link" :icon="target" />
-      {{ target }}
+      {{ text ?? target }}
     </router-link>
   </template>
   <template v-else>
     <router-link class="preview-link addon" :to="{ name: toSnakeCase(target) }">
       <AddonIcon class="icon-in-link" :addon="target" />
-      {{ target }}
+      {{ text ?? target }}
     </router-link>
   </template>
 </template>
@@ -43,6 +43,9 @@ export default defineComponent({
     target: {
       required: true,
       type: String as PropType<TVisibleRole | TAddonsName>,
+    },
+    text: {
+      type: String,
     },
   },
   methods: {

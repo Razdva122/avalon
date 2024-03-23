@@ -17,9 +17,9 @@
       Loyal Servants of Arthur
     </h3>
     <p>
-      The Loyal <PreviewLink target="servant" /> of Arthur must successfully complete three out of five missions. They
-      must work together to propose teams for each mission and vote on team compositions, always trying to keep traitors
-      off the teams to prevent missions from failing.
+      The Loyal <PreviewLink target="servant" text="servant of Arthur" /> must successfully complete three out of five
+      missions. They must work together to propose teams for each mission and vote on team compositions, always trying
+      to keep traitors off the teams to prevent missions from failing.
     </p>
 
     <h3>
@@ -28,8 +28,8 @@
       Minions of Mordred
     </h3>
     <p>
-      The <PreviewLink target="minion" />'s of Mordred aim to sow discord and mistrust among the Loyal
-      <PreviewLink target="servant" />. Their goal is to cause three missions to fail
+      The <PreviewLink target="minion" text="minions of Mordred" /> aim to sow discord and mistrust among the
+      <PreviewLink target="servant" text="Loyal servant" />. Their goal is to cause three missions to fail
       <span class="evil-loyalty-icon"></span> by infiltrating teams and sabotaging missions. They must communicate
       covertly and strategize to mislead the loyalists and cast doubt on the true allegiances of other players.
     </p>
@@ -198,8 +198,8 @@
 
     <p>
       <PreviewLink target="merlin" /> -> <PreviewLink target="percival" /> -> <PreviewLink target="morgana" /> ->
-      <PreviewLink target="oberon" /> -> <PreviewLink target="mordred" /> -> <PreviewLink target="lady" /> of the lake
-      -> <PreviewLink target="tristan" /> +
+      <PreviewLink target="oberon" /> -> <PreviewLink target="mordred" /> ->
+      <PreviewLink target="lady" text="Lady of the lake" /> -> <PreviewLink target="tristan" /> +
       <PreviewLink target="isolde" />
     </p>
 
@@ -223,7 +223,7 @@
       <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
       <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" /><br />
-      <em>Addons:</em> <PreviewLink target="lady" /> of the lake
+      <em>Addons:</em> <PreviewLink target="lady" text="Lady of the lake" />
     </div>
 
     <div class="game-setup">
@@ -232,7 +232,7 @@
       <PreviewLink target="servant" />, <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
       <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" /><br />
-      <em>Addons:</em> <PreviewLink target="lady" /> of the lake
+      <em>Addons:</em> <PreviewLink target="lady" text="Lady of the lake" />
     </div>
 
     <div class="game-setup">
@@ -251,7 +251,7 @@
       <PreviewLink target="servant" /><br />
       <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" />, <PreviewLink target="oberon" /><br />
-      <em>Addons:</em> <PreviewLink target="lady" /> of the lake
+      <em>Addons:</em> <PreviewLink target="lady" text="Lady of the lake" />
     </div>
 
     <p>
@@ -264,6 +264,118 @@
       We recommend adding <PreviewLink target="excalibur" /> to games for any number of players, but only in the company
       of experienced players.
     </p>
+
+    <v-divider :thickness="5"></v-divider>
+
+    <h2>Game setup in offline:</h2>
+    <p>
+      The default setup includes characters such as Merlin, Percival, and Morgana. However, you have the flexibility to
+      customize the game by selecting the roles that best fit your group.
+    </p>
+    <Options :roles="roles" buttonText="Roles" />
+    <ol class="mt-2">
+      <li>Everyone close your eyes and extend your hand info a fist in front of you.</li>
+      <li>
+        <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong>
+        <span v-if="roles.oberon">
+          (not <strong><PreviewLink target="oberon" /></strong>)</span
+        >
+        open your eyes and look around so that you know all agents of Evil.
+      </li>
+      <li>
+        <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong> close your eyes.
+      </li>
+      <li>All players should have their eyes closed and hands in a fist in front of them.</li>
+      <template v-if="roles.merlinPure || roles.merlin">
+        <li v-if="roles.merlin">
+          <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong>
+          <span v-if="roles.mordred"
+            >(not <strong><PreviewLink target="mordred" /></strong> himself)</span
+          >
+          - extend your thumb so that
+          <strong><PreviewLink :target="roles.merlin ? 'merlin' : 'merlinPure'" /></strong> will know of you.
+        </li>
+        <template v-if="roles.merlinPure">
+          <li>
+            <strong><PreviewLink target="merlinPure" /></strong>, open your eyes to see the agents of evil.
+          </li>
+          <li v-if="roles.oberon">
+            <strong><PreviewLink target="oberon" /></strong> extend your thumb into the air.
+          </li>
+          <li v-if="roles.morgana">
+            <strong><PreviewLink target="morgana" /></strong> extend your thumb into the air.
+          </li>
+          <li>
+            <span v-if="roles.oberon || roles.morgana">The others </span
+            ><strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong>
+            <span v-if="roles.mordred"
+              >(not <strong><PreviewLink target="mordred" /></strong> himself)</span
+            >
+            - extend your thumb into the air.
+          </li>
+        </template>
+        <li v-if="roles.merlin">
+          <strong><PreviewLink target="merlin" /></strong>, open your eyes and see the agents of evil.
+        </li>
+        <li>
+          <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong> - put your thumbs down and
+          re-form your hands into a fist
+        </li>
+        <li>
+          <strong
+            ><PreviewLink target="merlin" v-if="roles.merlin" /><PreviewLink
+              target="merlinPure"
+              v-if="roles.merlinPure" /></strong
+          >, close your eyes.
+        </li>
+        <template v-if="roles.percival">
+          <li>
+            <strong
+              ><PreviewLink target="merlin" v-if="roles.merlin" /><PreviewLink
+                target="merlinPure"
+                v-if="roles.merlinPure" /></strong
+            ><span v-if="roles.morgana">
+              and <strong><PreviewLink target="morgana" /></strong></span
+            >, extend your thumb into the air so <strong><PreviewLink target="percival" /></strong> will know you.
+          </li>
+          <li>
+            <strong><PreviewLink target="percival" /></strong>, open your eyes and see
+            <strong
+              ><PreviewLink target="merlin" v-if="roles.merlin" /><PreviewLink
+                target="merlinPure"
+                v-if="roles.merlinPure" /></strong
+            ><span v-if="roles.morgana">
+              and <strong><PreviewLink target="morgana" /></strong></span
+            >.
+          </li>
+          <li>
+            <strong
+              ><PreviewLink target="merlin" v-if="roles.merlin" /><PreviewLink
+                target="merlinPure"
+                v-if="roles.merlinPure" /></strong
+            ><span v-if="roles.morgana">
+              and <strong><PreviewLink target="morgana" /></strong
+            ></span>
+            - put your thumbs down and re-form your hands into a fist.
+          </li>
+          <li>
+            <strong><PreviewLink target="percival" /></strong>, close your eyes.
+          </li>
+        </template>
+      </template>
+      <li v-if="roles.tristan">
+        <strong><PreviewLink target="tristan" /></strong> and <strong><PreviewLink target="isolde" /></strong> open your
+        eyes and look around to know each other.
+      </li>
+      <li>All players have their eyes closed and hands in a fist in front of them</li>
+      <li>Everyone open your eyes.</li>
+    </ol>
+
+    <p>
+      <strong>Note</strong>: For the purposes of game setup, the term "<strong
+        ><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong
+      >" refers to all agents of Evil unless otherwise stated.
+    </p>
   </div>
 </template>
 
@@ -271,11 +383,29 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/game/information/PreviewLink.vue';
+import Options from '@/components/game/options/Options.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+    Options,
+  },
+  data() {
+    const roles = {
+      merlinPure: 0,
+      merlin: 1,
+      mordred: 0,
+      morgana: 1,
+      oberon: 0,
+      percival: 1,
+      tristan: 0,
+      isolde: 0,
+    };
+
+    return {
+      roles,
+    };
   },
 });
 </script>

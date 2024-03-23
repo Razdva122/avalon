@@ -24,7 +24,7 @@
     <v-btn class="mt-2" color="info" @click="onLockClick">
       {{ roomState.stage === 'created' ? 'Lock Game' : 'Unlock game' }}
     </v-btn>
-    <v-btn class="mt-2" color="success" :disabled="isStartGameDisabled" @click="onStartClick"> Start Game </v-btn>
+    <v-btn class="mt-2 mb-4" color="success" :disabled="isStartGameDisabled" @click="onStartClick"> Start Game </v-btn>
     <Options :roles="roles" :addons="addons" :features="features" />
   </template>
 </template>
