@@ -24,8 +24,8 @@
       <b><PreviewLink target="merlin" /></b>, <b><PreviewLink target="percival" /></b>,
       <b><PreviewLink target="oberon" /></b>, <b><PreviewLink target="mordred" /></b>, and
       <b><PreviewLink target="morgana" /></b>, ensuring an authentic Avalon experience. We've also integrated the
-      beloved game expansions, <b>"<PreviewLink target="lady" /> of the Lake"</b> and
-      <b>"<PreviewLink target="excalibur" />"</b> to enrich your gameplay.
+      beloved game expansions, <b><PreviewLink target="lady" text='"Lady of the lake"' /></b> and
+      <b><PreviewLink target="excalibur" text='"excalibur"' /></b> to enrich your gameplay.
     </div>
 
     <div>

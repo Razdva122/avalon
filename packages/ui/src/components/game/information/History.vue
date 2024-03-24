@@ -105,6 +105,7 @@
         </div>
         <v-divider :thickness="3"></v-divider>
       </div>
+      <v-btn @click="closeHistory" class="close" icon="close" variant="text" density="compact" />
     </div>
   </v-overlay>
 </template>
@@ -141,11 +142,20 @@ export default defineComponent({
         .map((el) => this.calculateNameByID(el.playerID))
         .join(', ');
     },
+    closeHistory() {
+      this.overlay = false;
+    },
   },
 });
 </script>
 
 <style scoped lang="scss">
+.close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
 .history-button {
   width: 180px;
 }
