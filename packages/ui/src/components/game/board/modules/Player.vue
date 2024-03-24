@@ -15,7 +15,9 @@
       <i class="material-icons icon-switch arrow_forward"></i>
       <div class="icon-evil-mission"></div>
     </div>
-    <span class="player-name">{{ player.name }}</span>
+    <span class="player-name">
+      <span class="player-name-text">{{ player.name }}</span>
+    </span>
   </div>
 </template>
 
@@ -207,11 +209,17 @@ export default defineComponent({
 .player-name {
   text-align: center;
   width: 115px;
-  @include text-overflow(1);
   background-image: url('@/assets/name-frame.webp');
-  background-size: 100% 100%;
+  background-size: 95% 75%;
+  background-position: center;
   color: white;
   @include dropShadowBorder(rgba(0, 0, 0, 0.5), 1px);
+}
+
+.player-name-text {
+  width: 110px;
+  @include text-overflow(1);
+  margin-left: 2.5px;
 }
 
 .player-icon {

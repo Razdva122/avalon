@@ -67,7 +67,7 @@ export class Manager {
         const newUUID = crypto.randomUUID();
         this.createRoom(newUUID, room.leaderID, room.players);
 
-        this.io.emit('restartGame', newUUID);
+        this.io.to(room.roomID).emit('restartGame', newUUID);
       } else {
         throw new Error(`Cant restart game with uuid ${uuid}, room stage ${room.data.manager.game.stage}`);
       }
