@@ -131,6 +131,7 @@ export class GameStateManager {
         assassinate: 'assassinate',
         checkLoyalty: 'useExcalibur',
         mission: 'onMission',
+        switchLancelots: 'switchLancelots',
         switchResult: 'useExcalibur',
         hidden: 'hidden',
       } as const

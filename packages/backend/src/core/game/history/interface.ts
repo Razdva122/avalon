@@ -10,6 +10,7 @@ import type {
   IHistoryMission,
   IHistoryAssassinate,
   ISwitchResult,
+  ISwitchLancelots,
   TLoyalty,
   ICheckLoyalty,
   TAssassinateType,
@@ -50,6 +51,13 @@ export type THistoryData = {
     target?: IPlayerInGame;
     result?: TMissionResult;
   };
+  switchLancelots: {
+    lancelotsIDs: {
+      evil: string;
+      good: string;
+    };
+    result: boolean;
+  };
   hidden: Record<string, never>;
 };
 
@@ -59,6 +67,7 @@ export type THistoryDataForManager = {
   assassinate: IHistoryAssassinate;
   checkLoyalty: ICheckLoyalty;
   switchResult: ISwitchResult;
+  switchLancelots: ISwitchLancelots;
 };
 
 export type TDataForManagerOptions = {

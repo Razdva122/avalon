@@ -49,6 +49,16 @@
       You can contact me via <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">discord</a></b
       >.
     </div>
+
+    <div>
+      <strong>Disclaimer</strong>
+    </div>
+    <div class="disclaimer">
+      This is a fan-based, non-commercial project created for the love of the game. All content, including the rules we
+      follow, is inspired by the original tabletop game, but all graphics and illustrations are uniquely ours. This site
+      is not affiliated with or endorsed by the official publishers. We respect the original creators and recognize that
+      all related trademarks and copyrights belong to their respective owners.
+    </div>
   </div>
 </template>
 
@@ -78,5 +88,9 @@ export default defineComponent({
 
 .image {
   text-align: center;
+}
+
+.disclaimer {
+  font-size: 12px;
 }
 </style>

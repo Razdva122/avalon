@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 let { game, gameHelper } = generateNewGame();
 
-describe('Wait for action', () => {
+describe('Lady of the lake', () => {
   beforeAll(() => {
     const restart = generateNewGame({ ladyOfLake: true });
     game = restart.game;
@@ -51,5 +51,24 @@ describe('Wait for action', () => {
 
   test('Shouldnt start after last mission session', () => {
     expect(game.stage === 'checkLoyalty').toBeFalsy();
+  });
+
+  test('Lancelots should switch before lady of lake', () => {
+    const restart = generateNewGame({ ladyOfLake: true }, { goodLancelot: 1, evilLancelot: 1 });
+    game = restart.game;
+    gameHelper = restart.gameHelper;
+
+    gameHelper
+      .selectPlayersOnMission(1)
+      .sentSelectedPlayers()
+      .makeVotes()
+      .makeActions(1)
+      .selectPlayersOnMission(1)
+      .sentSelectedPlayers()
+      .makeVotes()
+      .makeActions(1);
+
+    expect(game.stage).toBe('checkLoyalty');
+    expect(_.last(game.history)!.type).toBe('switchLancelots');
   });
 });

@@ -158,6 +158,7 @@ export default defineComponent({
           mission: 'Mission',
           assassinate: 'Assassinate',
           switchResult: 'Excalibur',
+          switchLancelots: 'Lancelots',
           hidden: 'Hidden',
         };
 
@@ -183,6 +184,7 @@ export default defineComponent({
         giveExcalibur: 'excalibur',
         checkLoyalty: 'lady of lake',
         end: 'end',
+        switchLancelots: 'lancelots',
         assassinate: 'assassinate',
         announceLoyalty: 'lady of lake',
         hidden: 'hidden',

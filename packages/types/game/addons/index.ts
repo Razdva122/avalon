@@ -1,5 +1,6 @@
 import type { TLadyOfLakeStages, TLadyOfLakeFeatures } from './lady-of-lake';
 import type { TExcaliburStages, TExcaliburFeatures } from './excalibur';
+import type { TLancelotsStages } from './lancelots';
 import type { TAssassinAddonStages, TAssassinAddonFeatures, TAssassinAddonData } from './assassin';
 
 export type { TAssassinateResult, TAssassinateType, TAssassinAddonData } from './assassin';
@@ -7,7 +8,7 @@ export type { TAssassinateResult, TAssassinateType, TAssassinAddonData } from '.
 /**
  * Possible addons stages
  */
-export type TAddonsStages = TLadyOfLakeStages | TExcaliburStages | TAssassinAddonStages;
+export type TAddonsStages = TLadyOfLakeStages | TExcaliburStages | TAssassinAddonStages | TLancelotsStages;
 
 /**
  * Player features added with addons

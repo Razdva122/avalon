@@ -7,7 +7,7 @@ import type { TAssassinateType } from './addons/assassin';
 /**
  * Possible history element
  */
-export type THistoryType = 'mission' | 'vote' | 'assassinate' | 'checkLoyalty' | 'switchResult';
+export type THistoryType = 'mission' | 'vote' | 'assassinate' | 'checkLoyalty' | 'switchResult' | 'switchLancelots';
 
 /**
  * History element stages
@@ -21,7 +21,8 @@ export type THistoryResults =
   | IHistoryAssassinate
   | ICheckLoyalty
   | ISwitchResult
-  | IHiddenHistory;
+  | IHiddenHistory
+  | ISwitchLancelots;
 
 /**
  * History vote data
@@ -113,4 +114,16 @@ export interface IAction {
  */
 export interface IActionWithResult extends IAction {
   value: TMissionResult;
+}
+
+/**
+ * Action of player in mission with result
+ */
+export interface ISwitchLancelots {
+  type: 'switchLancelots';
+  lancelotsIDs?: {
+    good: string;
+    evil: string;
+  };
+  result: boolean;
 }

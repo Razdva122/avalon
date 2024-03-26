@@ -10,12 +10,14 @@ import { Minion } from '@/core/roles/evil/minion';
 import { Morgana } from '@/core/roles/evil/morgana';
 import { Oberon } from '@/core/roles/evil/oberon';
 import { Mordred } from '@/core/roles/evil/mordred';
+import { EvilLancelot } from '@/core/roles/evil/evilLancelot';
 
 export const evilRoles = {
   minion: Minion,
   morgana: Morgana,
   oberon: Oberon,
   mordred: Mordred,
+  evilLancelot: EvilLancelot,
 } as const;
 
 /**
@@ -27,6 +29,7 @@ import { MerlinPure } from '@/core/roles/good/merlinPure';
 import { Percival } from '@/core/roles/good/percival';
 import { Tristan } from '@/core/roles/good/tristan';
 import { Isolde } from '@/core/roles/good/isolde';
+import { GoodLancelot } from '@/core/roles/good/goodLancelot';
 
 export const goodRoles = {
   servant: Servant,
@@ -35,6 +38,7 @@ export const goodRoles = {
   percival: Percival,
   tristan: Tristan,
   isolde: Isolde,
+  goodLancelot: GoodLancelot,
 } as const;
 
 const roles = {
@@ -51,6 +55,7 @@ export const evilRolesImportance: { [key in TEvilRoles]: number } = {
   mordred: 1,
   morgana: 2,
   oberon: 3,
+  evilLancelot: 10,
   minion: 100,
 };
 
@@ -61,6 +66,7 @@ export const goodRolesImportance: { [key in TGoodRoles]: number } = {
   merlin: 1,
   merlinPure: 2,
   percival: 3,
+  goodLancelot: 5,
   tristan: 10,
   isolde: 11,
   servant: 100,

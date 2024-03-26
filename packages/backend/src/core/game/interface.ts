@@ -1,4 +1,4 @@
-import type { ExcaliburAddon, IGameAddon, LadyOfLakeAddon, AssassinAddon } from '@/core/game/addons';
+import type { ExcaliburAddon, IGameAddon, LadyOfLakeAddon, AssassinAddon, LancelotsAddon } from '@/core/game/addons';
 import type { Character } from '@/core/roles';
 import type { User } from '@/user';
 
@@ -27,6 +27,7 @@ export interface IGameAddons extends TAddonsArray {
   assassin?: AssassinAddon;
   ladyOfLake?: LadyOfLakeAddon;
   excalibur?: ExcaliburAddon;
+  lancelots?: LancelotsAddon;
 }
 
 export interface IStateObserver {

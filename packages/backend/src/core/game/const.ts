@@ -5,6 +5,7 @@ import {
   AssassinAddon,
   LadyOfLakeAddon,
   ExcaliburAddon,
+  LancelotsAddon,
 } from '@/core/game/addons';
 import { TRolesWithAddons, TAdditionalAddons } from '@/core/game/addons';
 
@@ -125,6 +126,10 @@ export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsData> = {
         (player: IPlayerInGame) => player.role.role === 'isolde',
       ],
     },
+  },
+  goodLancelot: {
+    addon: LancelotsAddon,
+    key: 'lancelots',
   },
 };
 
