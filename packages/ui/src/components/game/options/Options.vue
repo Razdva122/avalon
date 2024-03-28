@@ -102,6 +102,8 @@ export default defineComponent({
         },
         { role: 'tristan', label: 'Tristan', disabled: false, color: 'success', route: 'lovers' },
         { role: 'isolde', label: 'Isolde', disabled: false, color: 'success', route: 'lovers' },
+        { role: 'goodLancelot', label: 'Good Lancelot', disabled: false, color: 'success' },
+        { role: 'evilLancelot', label: 'Evil Lancelot', disabled: false, color: 'warning' },
         {
           role: 'morgana',
           label: 'Morgana',
@@ -155,6 +157,14 @@ export default defineComponent({
 
       if (roleName === 'tristan') {
         this.roles.isolde = this.roles.tristan;
+      }
+
+      if (roleName === 'evilLancelot') {
+        this.roles.goodLancelot = this.roles.evilLancelot;
+      }
+
+      if (roleName === 'goodLancelot') {
+        this.roles.evilLancelot = this.roles.goodLancelot;
       }
 
       if (roleName === 'percival' && !this.roles.percival) {

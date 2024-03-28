@@ -103,6 +103,20 @@
             <b>{{ calculateNameByID(historyEl.switcherID) }}</b> decided not to use excalibur
           </div>
         </div>
+        <div v-if="historyEl.type === 'switchLancelots'">
+          <div v-if="!historyEl.result">The Lancelots <span class="text-success">remained loyalty</span></div>
+          <div v-else>The Lancelots <span class="text-error">have changed loyalty</span></div>
+          <div v-if="historyEl.lancelotsIDs">
+            <div>
+              <span class="text-success">Good lancelot</span>: {{ calculateNameByID(historyEl.lancelotsIDs.good) }}
+              {{ historyEl.result ? 'became evil' : 'remain loyal' }}
+            </div>
+            <div>
+              <span class="text-error">Evil lancelot</span>: {{ calculateNameByID(historyEl.lancelotsIDs.evil) }}
+              {{ historyEl.result ? 'became good' : 'remain loyal' }}
+            </div>
+          </div>
+        </div>
         <v-divider :thickness="3"></v-divider>
       </div>
       <v-btn @click="closeHistory" class="close" icon="close" variant="text" density="compact" />

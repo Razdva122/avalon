@@ -129,7 +129,7 @@ export class GameStateManager {
       {
         vote: 'votingForTeam',
         assassinate: 'assassinate',
-        checkLoyalty: 'useExcalibur',
+        checkLoyalty: 'checkLoyalty',
         mission: 'onMission',
         switchLancelots: 'switchLancelots',
         switchResult: 'useExcalibur',

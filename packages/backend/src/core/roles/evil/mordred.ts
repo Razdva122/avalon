@@ -10,5 +10,6 @@ export class Mordred extends Character {
   visibility: TVisibility = {
     minion: 'evil',
     morgana: 'evil',
+    evilLancelot: 'evil',
   };
 }
