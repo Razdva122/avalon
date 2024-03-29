@@ -56,7 +56,9 @@ export type THistoryData = {
       evil: string;
       good: string;
     };
+    pointer: number;
     result: boolean;
+    switches: Array<boolean>;
   };
   hidden: Record<string, never>;
 };

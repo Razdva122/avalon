@@ -117,7 +117,7 @@ export interface IActionWithResult extends IAction {
 }
 
 /**
- * Action of player in mission with result
+ * Switch lancelots data
  */
 export interface ISwitchLancelots {
   type: 'switchLancelots';
@@ -125,5 +125,7 @@ export interface ISwitchLancelots {
     good: string;
     evil: string;
   };
+  switches: Array<boolean | null>;
+  pointer: number;
   result: boolean;
 }

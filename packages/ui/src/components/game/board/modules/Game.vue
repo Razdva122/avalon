@@ -81,6 +81,9 @@
           <i class="material-icons icon-result" :class="i <= visibleHistory.votes.approve ? 'check' : 'close'"></i>
         </template>
       </div>
+      <div class="lancelots-container" v-if="visibleHistory?.type === 'switchLancelots'">
+        {{ visibleHistory }}
+      </div>
     </div>
     <div class="meta-info font-weight-bold d-flex justify-space-between">
       <div>

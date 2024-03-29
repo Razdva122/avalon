@@ -9,13 +9,20 @@ export class SwitchLancelots implements HistoryElement<'switchLancelots'> {
   stage: THistoryStage;
   canBeHidden: boolean = true;
 
-  constructor(goodLancelot: IPlayerInGame, evilLancelot: IPlayerInGame, switched: boolean) {
+  constructor(
+    goodLancelot: IPlayerInGame,
+    evilLancelot: IPlayerInGame,
+    switchPointer: number,
+    switches: Array<boolean>,
+  ) {
     this.data = {
       lancelotsIDs: {
         good: goodLancelot.user.id,
         evil: evilLancelot.user.id,
       },
-      result: switched,
+      result: switches[switchPointer],
+      pointer: switchPointer,
+      switches,
     };
 
     this.stage = 'finished';
@@ -31,6 +38,9 @@ export class SwitchLancelots implements HistoryElement<'switchLancelots'> {
       return switchLancelotsData;
     }
 
+    switchLancelotsData.switches = switchLancelotsData.switches.map((el, index) =>
+      index <= this.data.pointer ? el : null,
+    );
     delete switchLancelotsData['lancelotsIDs'];
 
     return switchLancelotsData;

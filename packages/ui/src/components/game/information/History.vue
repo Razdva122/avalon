@@ -104,18 +104,7 @@
           </div>
         </div>
         <div v-if="historyEl.type === 'switchLancelots'">
-          <div v-if="!historyEl.result">The Lancelots <span class="text-success">remained loyalty</span></div>
-          <div v-else>The Lancelots <span class="text-error">have changed loyalty</span></div>
-          <div v-if="historyEl.lancelotsIDs">
-            <div>
-              <span class="text-success">Good lancelot</span>: {{ calculateNameByID(historyEl.lancelotsIDs.good) }}
-              {{ historyEl.result ? 'became evil' : 'remain loyal' }}
-            </div>
-            <div>
-              <span class="text-error">Evil lancelot</span>: {{ calculateNameByID(historyEl.lancelotsIDs.evil) }}
-              {{ historyEl.result ? 'became good' : 'remain loyal' }}
-            </div>
-          </div>
+          <component is="SwitchLancelots" :data="historyEl" :calculateNameByID="calculateNameByID"></component>
         </div>
         <v-divider :thickness="3"></v-divider>
       </div>
@@ -127,8 +116,12 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { THistoryResults, IPlayer, IActionWithResult, THistoryVote } from '@avalon/types';
+import SwitchLancelots from '@/components/game/information/history/SwitchLancelots.vue';
 
 export default defineComponent({
+  components: {
+    SwitchLancelots,
+  },
   props: {
     history: {
       required: true,

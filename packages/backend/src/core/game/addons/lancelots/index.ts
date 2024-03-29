@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 export class LancelotsAddon implements IGameAddon {
   addonName = 'lancelots';
   switches: TSwitchesArray;
+  pointer: number = 0;
   game: Game;
 
   constructor(game: Game) {
@@ -14,31 +15,47 @@ export class LancelotsAddon implements IGameAddon {
     this.switches = _.shuffle([true, true, false, false, false]);
   }
 
+  afterInit() {
+    // On switchLancelots stage roles can change
+    this.game.stageVisibilityChange.switchLancelots = () => false;
+
+    return true;
+  }
+
   beforeSelectTeam() {
     if (this.game.turn === 0 && this.game.round >= 2) {
       this.game.stage = 'switchLancelots';
-      const currentSwitch = this.switches.shift()!;
-      const goodLancelot = this.game.players.find((player) => player.role.role === 'goodLancelot')!;
-      const evilLancelot = this.game.players.find((player) => player.role.role === 'evilLancelot')!;
+      const currentSwitch = this.switches[this.pointer];
+      const goodLancelot = this.game.players.find((player) => player.role.selfRole === 'goodLancelot')!;
+      const evilLancelot = this.game.players.find((player) => player.role.selfRole === 'evilLancelot')!;
 
-      const switchLancelots = new SwitchLancelots(goodLancelot, evilLancelot, currentSwitch);
+      const switchLancelots = new SwitchLancelots(goodLancelot, evilLancelot, this.pointer, this.switches);
 
       this.game.history.push(switchLancelots);
 
       if (currentSwitch) {
-        const goodLancelotRole = goodLancelot.role;
-        const evilLancelotRole = evilLancelot.role;
-        const goodLancelotVisibilty = goodLancelotRole.visibility;
-        const evilLancelotVisibilty = evilLancelotRole.visibility;
-
-        goodLancelot.role = evilLancelotRole;
-        goodLancelot.role.visibility = evilLancelotVisibilty;
-        evilLancelot.role = goodLancelotRole;
-        evilLancelot.role.visibility = goodLancelotVisibilty;
+        goodLancelot.role.selfRole = 'evilLancelot';
+        goodLancelot.role.loyalty = 'evil';
+        evilLancelot.role.selfRole = 'goodLancelot';
+        evilLancelot.role.loyalty = 'good';
       }
 
       this.game.stateObserver.gameStateChanged();
+      this.pointer += 1;
     }
+
+    return true;
+  }
+
+  beforeEndGame() {
+    console.log('beforeEndGame lancelots');
+    const goodLancelot = this.game.players.find((player) => player.role.selfRole === 'goodLancelot')!;
+    const evilLancelot = this.game.players.find((player) => player.role.selfRole === 'evilLancelot')!;
+
+    goodLancelot.role.role = 'goodLancelot';
+    evilLancelot.role.role = 'evilLancelot';
+
+    this.game.stateObserver.gameStateChanged();
 
     return true;
   }

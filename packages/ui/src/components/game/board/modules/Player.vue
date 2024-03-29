@@ -70,6 +70,12 @@ export default defineComponent({
           }
         }
 
+        if (this.visibleHistory?.type === 'switchLancelots') {
+          clone.features.waitForAction = false;
+          clone.features.isSelected = false;
+          clone.features.isSent = false;
+        }
+
         if (this.visibleHistory?.type === 'checkLoyalty' && this.visibleHistory.result) {
           if (clone.id === this.visibleHistory.inspectedID) {
             clone.role = this.visibleHistory.result;
