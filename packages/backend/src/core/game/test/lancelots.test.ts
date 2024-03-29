@@ -12,8 +12,8 @@ describe('Lancelots', () => {
 
   test('After second mission lancelots start switches', () => {
     const switches = game.addons.lancelots!.switches.slice(0, 3);
-    let goodLancelot = game.players.find((player) => player.role.role === 'goodLancelot')!;
-    let evilLancelot = game.players.find((player) => player.role.role === 'evilLancelot')!;
+    let goodLancelot = game.players.find((player) => player.role.selfRole === 'goodLancelot')!;
+    let evilLancelot = game.players.find((player) => player.role.selfRole === 'evilLancelot')!;
 
     gameHelper
       .selectPlayersOnMission(1)
@@ -33,8 +33,8 @@ describe('Lancelots', () => {
 
       expect(goodLancelot.role.loyalty).toBe(switches[i] ? 'evil' : 'good');
       expect(evilLancelot.role.loyalty).toBe(switches[i] ? 'good' : 'evil');
-      expect(goodLancelot.role.role).toBe(switches[i] ? 'evilLancelot' : 'goodLancelot');
-      expect(evilLancelot.role.role).toBe(switches[i] ? 'goodLancelot' : 'evilLancelot');
+      expect(goodLancelot.role.selfRole).toBe(switches[i] ? 'evilLancelot' : 'goodLancelot');
+      expect(evilLancelot.role.selfRole).toBe(switches[i] ? 'goodLancelot' : 'evilLancelot');
 
       if (switches[i]) {
         const temp = goodLancelot;
