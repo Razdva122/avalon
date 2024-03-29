@@ -48,7 +48,6 @@ export class LancelotsAddon implements IGameAddon {
   }
 
   beforeEndGame() {
-    console.log('beforeEndGame lancelots');
     const goodLancelot = this.game.players.find((player) => player.role.selfRole === 'goodLancelot')!;
     const evilLancelot = this.game.players.find((player) => player.role.selfRole === 'evilLancelot')!;
 
