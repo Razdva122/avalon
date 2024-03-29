@@ -33,6 +33,18 @@ export default defineComponent({
   background-position: 55% 0%;
 }
 
+.icon-evilLancelot {
+  background-image: url('@/assets/roles/evil_lancelot.webp');
+  background-size: 140%;
+  background-position: 48% 0%;
+}
+
+.icon-goodLancelot {
+  background-image: url('@/assets/roles/good_lancelot.webp');
+  background-size: 140%;
+  background-position: 48% 0%;
+}
+
 .icon-morgana {
   background-image: url('@/assets/roles/morgana.webp');
   background-position: 47% 35%;

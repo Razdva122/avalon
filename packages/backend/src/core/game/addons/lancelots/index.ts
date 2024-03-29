@@ -27,9 +27,14 @@ export class LancelotsAddon implements IGameAddon {
 
       if (currentSwitch) {
         const goodLancelotRole = goodLancelot.role;
+        const evilLancelotRole = evilLancelot.role;
+        const goodLancelotVisibilty = goodLancelotRole.visibility;
+        const evilLancelotVisibilty = evilLancelotRole.visibility;
 
-        goodLancelot.role = evilLancelot.role;
+        goodLancelot.role = evilLancelotRole;
+        goodLancelot.role.visibility = evilLancelotVisibilty;
         evilLancelot.role = goodLancelotRole;
+        evilLancelot.role.visibility = goodLancelotVisibilty;
       }
 
       this.game.stateObserver.gameStateChanged();
