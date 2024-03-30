@@ -7,9 +7,9 @@
           .map((el, index) => {
             let str;
             if (el === null) {
-              str = 'unknown';
+              str = '?';
             } else {
-              str = el ? 'switch' : 'stay';
+              str = el ? 'switch' : 'empty';
             }
 
             if (index === data.pointer) {

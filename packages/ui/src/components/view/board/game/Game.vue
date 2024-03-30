@@ -81,9 +81,7 @@
           <i class="material-icons icon-result" :class="i <= visibleHistory.votes.approve ? 'check' : 'close'"></i>
         </template>
       </div>
-      <div class="lancelots-container" v-if="visibleHistory?.type === 'switchLancelots'">
-        {{ visibleHistory }}
-      </div>
+      <LancelotsView v-if="visibleHistory?.type === 'switchLancelots'" :data="visibleHistory"></LancelotsView>
     </div>
     <div class="meta-info font-weight-bold d-flex justify-space-between">
       <div>
@@ -107,6 +105,7 @@ import History from '@/components/view/information/History.vue';
 import InGamePanel from '@/components/view/panels/InGamePanel.vue';
 import Spoiler from '@/components/feedback/Spoiler.vue';
 import { gameStateKey, stateManagerKey } from '@/helpers/game-state-manager';
+import LancelotsView from '@/components/view/board/game/modules/LancelotsView.vue';
 
 export default defineComponent({
   name: 'Game',
@@ -115,6 +114,7 @@ export default defineComponent({
     History,
     InGamePanel,
     Spoiler,
+    LancelotsView,
   },
   props: {
     inGamePanel: {

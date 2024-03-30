@@ -54,6 +54,7 @@ export default defineComponent({
   font-size: x-large;
   border: 2px solid #f2d8a9;
   background-color: #f2d8a9;
+  color: black;
 }
 
 .mission-success {
