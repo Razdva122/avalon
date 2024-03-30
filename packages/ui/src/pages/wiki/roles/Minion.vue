@@ -63,7 +63,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import PreviewLink from '@/components/game/information/PreviewLink.vue';
+import PreviewLink from '@/components/view/information/PreviewLink.vue';
 
 export default defineComponent({
   components: {

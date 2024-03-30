@@ -45,7 +45,7 @@ import type { IVisualGameState, TMissionResult, TVoteOption } from '@avalon/type
 import { useStore } from '@/store';
 import { socket } from '@/api/socket';
 import Spoiler from '@/components/feedback/Spoiler.vue';
-import AssassinateControl from '@/components/game/panels/controls/AssassinateControl.vue';
+import AssassinateControl from '@/components/view/panels/controls/AssassinateControl.vue';
 
 type TMethodsWithoutParams = 'sentSelectedPlayers' | 'checkLoyalty' | 'giveExcalibur' | 'useExcalibur';
 

@@ -50,9 +50,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import PlayerIcon from '@/components/game/information/PlayerIcon.vue';
+import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import HelpButton from '@/components/feedback/HelpButton.vue';
-import { rolesShortInfo } from '@/components/game/information/const';
+import { rolesShortInfo } from '@/components/view/information/const';
 import type { TGameOptionsRoles, TGameOptionsAddons, TGameOptionsFeatures } from '@avalon/types';
 
 export default defineComponent({

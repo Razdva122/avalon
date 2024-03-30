@@ -24,12 +24,12 @@ import { defineComponent, PropType } from 'vue';
 
 import type { TVisibleRole } from '@avalon/types';
 
-import { rolesShortInfo } from '@/components/game/information/const';
+import { rolesShortInfo } from '@/components/view/information/const';
 
-import type { TAddonsName } from '@/components/game/information/interface';
+import type { TAddonsName } from '@/components/view/information/interface';
 
-import PlayerIcon from '@/components/game/information/PlayerIcon.vue';
-import AddonIcon from '@/components/game/information/AddonIcon.vue';
+import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
+import AddonIcon from '@/components/view/information/AddonIcon.vue';
 
 export default defineComponent({
   components: {

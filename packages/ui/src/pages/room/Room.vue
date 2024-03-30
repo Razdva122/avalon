@@ -15,12 +15,12 @@
 <script lang="ts">
 import { useRouter } from 'vue-router';
 import { defineComponent, ref, computed } from 'vue';
-import Board from '@/components/game/board/Board.vue';
+import Board from '@/components/view/board/Board.vue';
 import type { TVisibleRole, ISocketError } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { GameStateManager } from '@/helpers/game-state-manager';
-import RolesInfo from '@/components/game/information/RolesInfo.vue';
+import RolesInfo from '@/components/view/information/RolesInfo.vue';
 
 export default defineComponent({
   name: 'Room',

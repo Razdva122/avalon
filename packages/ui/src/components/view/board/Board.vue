@@ -44,16 +44,16 @@
 
 <script lang="ts">
 import { defineComponent, computed, inject, watch, ref, PropType, toRefs, nextTick } from 'vue';
-import Player from '@/components/game/board/modules/Player.vue';
+import Player from '@/components/view/board/modules/Player.vue';
 import Timer from '@/components/feedback/Timer.vue';
-import Game from '@/components/game/board/modules/Game.vue';
-import StartPanel from '@/components/game/panels/StartPanel.vue';
-import AnnounceLoyalty from './modules/AnnounceLoyalty.vue';
+import Game from '@/components/view/board/game/Game.vue';
+import StartPanel from '@/components/view/panels/StartPanel.vue';
+import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
 import { THistoryResults } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { gameStateKey, stateManagerKey, TPageRoomState } from '@/helpers/game-state-manager';
-import { calculateVisualElement } from '@/components/game/board/helpers';
+import { calculateVisualElement } from '@/components/view/board/helpers';
 
 export default defineComponent({
   name: 'Board',

@@ -40,7 +40,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import type { ISwitchLancelots } from '@avalon/types';
-import type { TCalculateNameByID } from '@/components/game/information/history/interface';
+import type { TCalculateNameByID } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {

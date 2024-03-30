@@ -1,5 +1,5 @@
 import type { IMissionSettings, TMissionResult, IPlayer, IPlayerFeatures, TVoteOption } from '@avalon/types';
-import type { TPlayerIcon } from '@/components/game/information/interface';
+import type { TPlayerIcon } from '@/components/view/information/interface';
 
 export interface IMissionWithResult extends IMissionSettings {
   result?: TMissionResult;

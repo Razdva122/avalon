@@ -116,7 +116,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { THistoryResults, IPlayer, IActionWithResult, THistoryVote } from '@avalon/types';
-import SwitchLancelots from '@/components/game/information/history/SwitchLancelots.vue';
+import SwitchLancelots from '@/components/view/information/history/SwitchLancelots.vue';
 
 export default defineComponent({
   components: {

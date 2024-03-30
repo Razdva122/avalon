@@ -382,8 +382,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import PreviewLink from '@/components/game/information/PreviewLink.vue';
-import Options from '@/components/game/options/Options.vue';
+import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import Options from '@/components/view/options/Options.vue';
 
 export default defineComponent({
   components: {

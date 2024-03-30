@@ -5,7 +5,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 
-import type { TAddonsName } from '@/components/game/information/interface';
+import type { TAddonsName } from '@/components/view/information/interface';
 
 export default defineComponent({
   props: {

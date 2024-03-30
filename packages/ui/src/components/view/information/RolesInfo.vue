@@ -56,8 +56,8 @@
 <script lang="ts">
 import type { TGameRoles, TVisibleRole } from '@avalon/types';
 import { defineComponent, PropType } from 'vue';
-import PlayerIcon from '@/components/game/information/PlayerIcon.vue';
-import { rolesShortInfo } from '@/components/game/information/const';
+import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
+import { rolesShortInfo } from '@/components/view/information/const';
 
 export default defineComponent({
   components: {

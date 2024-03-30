@@ -100,11 +100,11 @@
 <script lang="ts">
 import * as _ from 'lodash';
 import type { IHistoryMission, THistoryResults } from '@avalon/types';
-import type { IMissionWithResult } from '@/components/game/board/interface';
+import type { IMissionWithResult } from '@/components/view/board/interface';
 import { defineComponent, PropType, computed, inject } from 'vue';
-import Mission from '@/components/game/board/modules/Mission.vue';
-import History from '@/components/game/information/History.vue';
-import InGamePanel from '@/components/game/panels/InGamePanel.vue';
+import Mission from '@/components/view/board/game/modules/Mission.vue';
+import History from '@/components/view/information/History.vue';
+import InGamePanel from '@/components/view/panels/InGamePanel.vue';
 import Spoiler from '@/components/feedback/Spoiler.vue';
 import { gameStateKey, stateManagerKey } from '@/helpers/game-state-manager';
 
