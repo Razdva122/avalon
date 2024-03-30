@@ -89,22 +89,12 @@
             <span :class="historyEl.result === 'evil' ? 'text-error' : 'text-success'"> {{ historyEl.result }}</span>
           </div>
         </div>
-        <div v-if="historyEl.type === 'switchResult'">
-          <div v-if="historyEl.targetID">
-            <b>{{ calculateNameByID(historyEl.switcherID) }}</b> use excalibur to switch
-            <b>{{ calculateNameByID(historyEl.targetID) }}</b> action
-            <template v-if="historyEl.result">
-              <span :class="historyEl.result === 'fail' ? 'text-error' : 'text-success'">
-                to {{ historyEl.result }}
-              </span>
-            </template>
-          </div>
-          <div v-else>
-            <b>{{ calculateNameByID(historyEl.switcherID) }}</b> decided not to use excalibur
-          </div>
-        </div>
-        <div v-if="historyEl.type === 'switchLancelots'">
-          <component is="SwitchLancelots" :data="historyEl" :calculateNameByID="calculateNameByID"></component>
+        <div v-if="historyEl.type === 'switchLancelots' || historyEl.type === 'switchResult'">
+          <component
+            :is="toKebabCase(historyEl.type)"
+            :data="historyEl"
+            :calculateNameByID="calculateNameByID"
+          ></component>
         </div>
         <v-divider :thickness="3"></v-divider>
       </div>
@@ -114,13 +104,16 @@
 </template>
 
 <script lang="ts">
+import * as _ from 'lodash';
 import { defineComponent, PropType } from 'vue';
 import { THistoryResults, IPlayer, IActionWithResult, THistoryVote } from '@avalon/types';
 import SwitchLancelots from '@/components/view/information/history/SwitchLancelots.vue';
+import SwitchResult from '@/components/view/information/history/SwitchResult.vue';
 
 export default defineComponent({
   components: {
     SwitchLancelots,
+    SwitchResult,
   },
   props: {
     history: {
@@ -151,6 +144,9 @@ export default defineComponent({
     },
     closeHistory() {
       this.overlay = false;
+    },
+    toKebabCase(str: string): string {
+      return _.kebabCase(str);
     },
   },
 });
