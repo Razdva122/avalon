@@ -7,6 +7,7 @@
     </h1>
     <img class="preview-image" src="@/assets/roles/morgana.webp" alt="Morgana" />
 
+    <h2>General Information:</h2>
     <p>
       Playing as <PreviewLink target="morgana" /> revolves around deception, specifically making yourself seem like
       <PreviewLink target="merlin" /> to confuse the forces of good. You should aim to bewilder

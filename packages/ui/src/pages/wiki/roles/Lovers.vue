@@ -9,6 +9,7 @@
     <img class="preview-image" src="@/assets/roles/tristan.webp" alt="tristan" />
     <div class="credits">credits to: @Vermilion0</div>
 
+    <h2>General Information:</h2>
     <p>
       Playing as the Lovers, <PreviewLink target="tristan" /> and <PreviewLink target="isolde" />, adds a romantic twist
       to the game. Your bond is strong, as you know each other from the start and are working for the side of good. Yet,

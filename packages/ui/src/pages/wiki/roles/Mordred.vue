@@ -7,6 +7,7 @@
     </h1>
     <img class="preview-image" src="@/assets/roles/mordred.webp" alt="mordred" />
 
+    <h2>General Information:</h2>
     <p>
       Playing as <PreviewLink target="mordred" /> gives you the unique advantage of being unknown to
       <PreviewLink target="merlin" /> and leading the minions of evil. Your objective is to disrupt the forces of good

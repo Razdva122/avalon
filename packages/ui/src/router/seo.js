@@ -128,6 +128,16 @@ module.exports.routesSeo = {
       keywords: ['Lovers', 'Tristan', 'Isolde', 'Role', 'Rules', 'Tips'],
     },
   },
+  lancelots: {
+    path: '/wiki/roles/lancelots/',
+    name: 'lancelots',
+    meta: {
+      prerender: true,
+      title: 'Avalon: The Resistance | Lancelots',
+      description: "Rules and Tips for Lancelots roles in the board game 'Avalon: The Resistance'",
+      keywords: ['Lancelots', 'Role', 'Rules', 'Tips'],
+    },
+  },
   percival: {
     path: '/wiki/roles/percival/',
     name: 'percival',

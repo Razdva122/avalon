@@ -15,6 +15,7 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.merlin, component: () => import('@/pages/wiki/roles/Merlin.vue') },
   { ...routesSeo['merlin_pure'], component: () => import('@/pages/wiki/roles/MerlinPure.vue') },
   { ...routesSeo.percival, component: () => import('@/pages/wiki/roles/Percival.vue') },
+  { ...routesSeo.lancelots, component: () => import('@/pages/wiki/roles/Lancelots.vue') },
   { ...routesSeo.lovers, component: () => import('@/pages/wiki/roles/Lovers.vue') },
   { ...routesSeo.servant, component: () => import('@/pages/wiki/roles/Servant.vue') },
   { ...routesSeo.morgana, component: () => import('@/pages/wiki/roles/Morgana.vue') },
@@ -22,8 +23,10 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.oberon, component: () => import('@/pages/wiki/roles/Oberon.vue') },
   { ...routesSeo.minion, component: () => import('@/pages/wiki/roles/Minion.vue') },
   { ...routesSeo.notFound, component: () => import('@/pages/empty/NotFound.vue') },
-  { path: '/isolde', name: 'isolde', redirect: { name: 'lovers' } },
-  { path: '/tristan', name: 'tristan', redirect: { name: 'lovers' } },
+  { path: '/isolde/', name: 'isolde', redirect: { name: 'lovers' } },
+  { path: '/tristan/', name: 'tristan', redirect: { name: 'lovers' } },
+  { path: '/evil_lancelot/', name: 'evil_lancelot', redirect: { name: 'lancelots' } },
+  { path: '/good_lancelot/', name: 'good_lancelot', redirect: { name: 'lancelots' } },
   { path: '/:catchAll(.*)', redirect: '404' },
 ];
 

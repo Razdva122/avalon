@@ -7,6 +7,7 @@
     </h1>
     <img class="preview-image" src="@/assets/roles/oberon.webp" alt="oberon" />
 
+    <h2>General Information:</h2>
     <p>
       Playing as <PreviewLink target="oberon" /> presents unique challenges as you are a Minion of Evil, but you do not
       know the identities of your fellow minions, and they do not know you. You are tasked with disrupting the forces of

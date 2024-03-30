@@ -277,13 +277,25 @@
       <li>Everyone close your eyes and extend your hand info a fist in front of you.</li>
       <li>
         <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong>
-        <span v-if="roles.oberon">
-          (not <strong><PreviewLink target="oberon" /></strong>)</span
+        <span v-if="roles.oberon || roles.evilLancelot">
+          (not
+          <strong
+            ><PreviewLink v-if="roles.oberon" target="oberon" />
+            <PreviewLink v-if="roles.evilLancelot" target="evilLancelot" text="Evil Lancelot" /></strong
+          >)</span
         >
         open your eyes and look around so that you know all agents of Evil.
       </li>
+      <li v-if="roles.evilLancelot">
+        <strong><PreviewLink v-if="roles.evilLancelot" target="evilLancelot" text="Evil Lancelot" /></strong> - extend
+        your thumb so <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong> will known of you.
+      </li>
       <li>
         <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong> close your eyes.
+      </li>
+      <li v-if="roles.evilLancelot">
+        <strong><PreviewLink v-if="roles.evilLancelot" target="evilLancelot" text="Evil Lancelot" /></strong> - put your
+        thumb down and re-form your hand into a fist.
       </li>
       <li>All players should have their eyes closed and hands in a fist in front of them.</li>
       <template v-if="roles.merlinPure || roles.merlin">
@@ -302,6 +314,9 @@
           <li v-if="roles.oberon">
             <strong><PreviewLink target="oberon" /></strong> extend your thumb into the air.
           </li>
+          <li v-if="roles.evilLancelot">
+            <strong><PreviewLink target="evilLancelot" text="Evil Lancelot" /></strong> extend your thumb into the air.
+          </li>
           <li v-if="roles.morgana">
             <strong><PreviewLink target="morgana" /></strong> extend your thumb into the air.
           </li>
@@ -319,7 +334,7 @@
         </li>
         <li>
           <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong> - put your thumbs down and
-          re-form your hands into a fist
+          re-form your hands into a fist.
         </li>
         <li>
           <strong
@@ -367,7 +382,7 @@
         <strong><PreviewLink target="tristan" /></strong> and <strong><PreviewLink target="isolde" /></strong> open your
         eyes and look around to know each other.
       </li>
-      <li>All players have their eyes closed and hands in a fist in front of them</li>
+      <li>All players have their eyes closed and hands in a fist in front of them.</li>
       <li>Everyone open your eyes.</li>
     </ol>
 
@@ -401,6 +416,8 @@ export default defineComponent({
       percival: 1,
       tristan: 0,
       isolde: 0,
+      evilLancelot: 0,
+      goodLancelot: 0,
     };
 
     return {

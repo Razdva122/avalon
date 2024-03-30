@@ -6,6 +6,8 @@
       Percival role
     </h1>
     <img class="preview-image" src="@/assets/roles/percival.webp" alt="percival" />
+
+    <h2>General Information:</h2>
     <p>
       Percival's role is to protect and correctly identify <PreviewLink target="merlin" /> to prevent
       <PreviewLink target="merlin" />’s assassination by the Minions of Mordred. Percival sees

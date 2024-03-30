@@ -7,6 +7,7 @@
     </h1>
     <img class="preview-image" src="@/assets/roles/merlin_pure.webp" alt="merlin pure" />
 
+    <h2>General Information:</h2>
     <p>
       Playing as <PreviewLink target="merlinPure" /> grants you the extraordinary power of seeing not only the
       allegiance but also the exact roles of the evil characters. This advanced knowledge provides you a significant

@@ -7,6 +7,7 @@
     </h1>
     <img class="preview-image" src="@/assets/roles/merlin.webp" alt="merlin" />
 
+    <h2>General Information:</h2>
     <p>
       Assuming the role of <PreviewLink target="merlin" /> necessitates a masterful balancing act: one must possess
       intimate knowledge of all minions of evil (save for <PreviewLink target="mordred" />, in classic gameplay) yet be

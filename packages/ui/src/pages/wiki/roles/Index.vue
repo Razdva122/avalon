@@ -27,6 +27,14 @@
         <h2>Servant</h2>
         <img class="role-image" src="@/assets/roles/servant.webp" alt="servant" />
       </router-link>
+      <router-link class="role" :to="{ name: 'lancelots' }">
+        <h2>Good Lancelot</h2>
+        <img class="role-image" src="@/assets/roles/good_lancelot.webp" alt="good lancelot" />
+      </router-link>
+      <router-link class="role" :to="{ name: 'lancelots' }">
+        <h2>Evil Lancelot</h2>
+        <img class="role-image evil-role" src="@/assets/roles/evil_lancelot.webp" alt="evil lancelot" />
+      </router-link>
       <router-link class="role" :to="{ name: 'mordred' }">
         <h2>Mordred</h2>
         <img class="role-image evil-role" src="@/assets/roles/mordred.webp" alt="mordred" />

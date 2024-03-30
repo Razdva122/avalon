@@ -102,8 +102,8 @@ export default defineComponent({
         },
         { role: 'tristan', label: 'Tristan', disabled: false, color: 'success', route: 'lovers' },
         { role: 'isolde', label: 'Isolde', disabled: false, color: 'success', route: 'lovers' },
-        { role: 'goodLancelot', label: 'Good Lancelot', disabled: false, color: 'success' },
-        { role: 'evilLancelot', label: 'Evil Lancelot', disabled: false, color: 'warning' },
+        { role: 'goodLancelot', label: 'Good Lancelot', disabled: false, color: 'success', route: 'lancelots' },
+        { role: 'evilLancelot', label: 'Evil Lancelot', disabled: false, color: 'warning', route: 'lancelots' },
         {
           role: 'morgana',
           label: 'Morgana',
