@@ -22,9 +22,10 @@
     <div>
       Our site replicates the full spectrum of roles found in the traditional board game, including
       <b><PreviewLink target="merlin" /></b>, <b><PreviewLink target="percival" /></b>,
-      <b><PreviewLink target="oberon" /></b>, <b><PreviewLink target="mordred" /></b>, and
-      <b><PreviewLink target="morgana" /></b>, ensuring an authentic Avalon experience. We've also integrated the
-      beloved game expansions, <b><PreviewLink target="lady" text='"Lady of the lake"' /></b> and
+      <b><PreviewLink target="oberon" /></b>, <b><PreviewLink target="mordred" /></b>,
+      <b><PreviewLink target="morgana" /></b>, <b><PreviewLink target="goodLancelot" text="Good Lancelot" /></b> and
+      <b><PreviewLink target="evilLancelot" text="Evil Lancelot" /></b> ensuring an authentic Avalon experience. We've
+      also integrated the beloved game expansions, <b><PreviewLink target="lady" text='"Lady of the lake"' /></b> and
       <b><PreviewLink target="excalibur" text='"excalibur"' /></b> to enrich your gameplay.
     </div>
 

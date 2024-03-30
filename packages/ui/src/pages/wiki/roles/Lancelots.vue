@@ -14,15 +14,25 @@
       Lancelots presents a dynamic challenge in the realm of Avalon. As two players starting on opposite sides, the
       <PreviewLink target="goodLancelot" text="Good Lancelot" /> aligns with the forces of good, while the
       <PreviewLink target="evilLancelot" text="Evil Lancelot" /> conspires with the minions of Mordred. However, the
-      tides of loyalty may turn as the game progresses. Merlin, can see the evil Lancelot among the ranks of Mordred's
-      followers, while the minions of Mordred recognize the presence of an evil Lancelot as well, though they see all
-      allies equally and cannot differentiate who the Lancelot is. Key to the Lancelots' gameplay is the deck of loyalty
-      change, after the second quest, a card is drawn. If a loyalty change card is revealed, the Lancelots switch
-      allegiances along with all corresponding changes (such as the ability to fail a mission, or being subject to the
-      Lady of the Lake's card), whereas if the card drawn is blank, no change occurs. The deck contains five cards, of
-      which two prompt loyalty change, and three are blank. Importantly, a shift in loyalty does not alter how other
-      players perceive you, Merlin and the minions of Mordred will continue to see the originally evil Lancelot as their
-      initial role.
+      tides of loyalty may turn as the game progresses. <PreviewLink target="merlin" />, can see the
+      <PreviewLink target="evilLancelot" text="Evil Lancelot" /> among the ranks of Mordred's followers, while the
+      minions of Mordred recognize the presence of an <PreviewLink target="evilLancelot" text="Evil Lancelot" /> as
+      well, though they see all allies equally and cannot differentiate who the Lancelot is. On the other hand, the
+      <PreviewLink target="evilLancelot" text="Evil Lancelot" /> does not know his allies.
+    </p>
+    <p>
+      Key to the Lancelots' gameplay is the deck of loyalty change, after the second mission, a card is drawn. If a
+      <span class="material-icons icon-swap">swap_horiz</span><b>loyalty change</b> card is revealed, the Lancelots
+      switch allegiances along with all corresponding changes (such as the ability to fail a mission, or being subject
+      to the <PreviewLink target="lady" text="Lady of the lake" /> card), whereas if the card drawn is
+      <span class="material-icons icon-swap">close</span><b>blank</b>, no change occurs. The deck contains
+      <b>five cards</b>, of which two prompt <span class="material-icons icon-swap">swap_horiz</span
+      ><b>loyalty change</b>, and three are <span class="material-icons icon-swap">close</span><b>blank</b>.
+    </p>
+    <p>
+      Importantly, a shift in loyalty does not alter how other players perceive you, <PreviewLink target="merlin" /> and
+      the minions of Mordred will continue to see the originally
+      <PreviewLink target="evilLancelot" text="Evil Lancelot" /> as their initial role.
     </p>
 
     <h2>General Tips:</h2>
@@ -95,5 +105,9 @@ h2 {
     width: 25%;
     max-width: 350px;
   }
+}
+
+.icon-swap {
+  vertical-align: text-bottom;
 }
 </style>
