@@ -37,59 +37,14 @@
             {{ historyEl.result === 'hit' ? 'is' : 'is not' }} {{ historyEl.assassinateType }}
           </div>
         </div>
-        <div v-if="historyEl.type === 'vote'">
-          <div>
-            <span v-if="historyEl.forced" class="text-info"> Forced vote </span>
-            <span v-else :class="historyEl.result === 'reject' ? 'text-error' : 'text-success'">
-              {{ historyEl.index + 1 }} vote
-            </span>
-            <span>
-              team selected by <b>{{ calculateNameByID(historyEl.leaderID) }}</b>
-            </span>
-          </div>
-          <div>
-            Team:
-            {{
-              historyEl.team
-                .map((el) => {
-                  const name = calculateNameByID(el.id);
-                  return el.excalibur ? name + '(Excalibur)' : name;
-                })
-                .join(', ')
-            }}
-          </div>
-          <template v-if="!historyEl.forced">
-            <div>
-              Approve:
-              <span class="text-success">
-                {{ historyElText(historyEl, 'approve') }}
-              </span>
-            </div>
-            <div>
-              Reject:
-              <span class="text-error">
-                {{ historyElText(historyEl, 'reject') }}
-              </span>
-            </div>
-          </template>
-        </div>
-        <div v-if="historyEl.type === 'checkLoyalty'">
-          <div>
-            <b>{{ calculateNameByID(historyEl.validatorID) }}</b> checked
-            <b>{{ calculateNameByID(historyEl.inspectedID) }}</b> loyalty
-            <span v-if="historyEl.realLoyalty">
-              is
-              <span :class="historyEl.realLoyalty === 'evil' ? 'text-error' : 'text-success'">
-                {{ historyEl.realLoyalty }}
-              </span>
-            </span>
-          </div>
-          <div>
-            And declared his loyalty as
-            <span :class="historyEl.result === 'evil' ? 'text-error' : 'text-success'"> {{ historyEl.result }}</span>
-          </div>
-        </div>
-        <div v-if="historyEl.type === 'switchLancelots' || historyEl.type === 'switchResult'">
+        <div
+          v-if="
+            historyEl.type === 'switchLancelots' ||
+            historyEl.type === 'switchResult' ||
+            historyEl.type === 'checkLoyalty' ||
+            historyEl.type === 'vote'
+          "
+        >
           <component
             :is="toKebabCase(historyEl.type)"
             :data="historyEl"
@@ -131,16 +86,6 @@ export default defineComponent({
   methods: {
     calculateNameByID(playerID: string) {
       return this.players.find((player) => player.id === playerID)!.name;
-    },
-    historyElText(element: THistoryVote, type: 'reject' | 'approve') {
-      if (element.anonymous) {
-        return element.votes[type];
-      }
-
-      return element.votes
-        .filter((el) => el.value === type)
-        .map((el) => this.calculateNameByID(el.playerID))
-        .join(', ');
     },
     closeHistory() {
       this.overlay = false;
