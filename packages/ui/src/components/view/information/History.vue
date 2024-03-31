@@ -8,48 +8,8 @@
   <v-overlay v-model="overlay" class="align-center justify-center">
     <div class="history pa-4 rounded-lg">
       <div v-for="historyEl in history">
-        <div class="mission" v-if="historyEl.type === 'mission'">
-          <div>
-            <span :class="historyEl.result === 'fail' ? 'text-error' : 'text-success'">
-              {{ historyEl.index + 1 }} mission
-            </span>
-            <span> / fails {{ historyEl.fails }} </span>
-          </div>
-          <div v-if="historyEl.actions">
-            Team:
-            <template v-for="(el, index) in historyEl.actions">
-              <span :class="{ fail: 'text-error', success: 'text-success' }[(el as IActionWithResult).value]">
-                {{ calculateNameByID(el.playerID) }}
-              </span>
-              <span>
-                {{ index !== historyEl.actions.length - 1 ? ', ' : '' }}
-              </span>
-            </template>
-          </div>
-        </div>
-        <div v-if="historyEl.type === 'assassinate'">
-          <div>
-            {{ calculateNameByID(historyEl.assassinID) }} assassinate
-            {{ historyEl.killedIDs.map(calculateNameByID).join(', ') }}
-          </div>
-          <div>
-            {{ historyEl.killedIDs.map(calculateNameByID).join(', ') }}
-            {{ historyEl.result === 'hit' ? 'is' : 'is not' }} {{ historyEl.assassinateType }}
-          </div>
-        </div>
-        <div
-          v-if="
-            historyEl.type === 'switchLancelots' ||
-            historyEl.type === 'switchResult' ||
-            historyEl.type === 'checkLoyalty' ||
-            historyEl.type === 'vote'
-          "
-        >
-          <component
-            :is="toKebabCase(historyEl.type)"
-            :data="historyEl"
-            :calculateNameByID="calculateNameByID"
-          ></component>
+        <div>
+          <component :is="toKebabCase(historyEl.type)" :data="historyEl" :calculateNameByID="calculateNameByID" />
         </div>
         <v-divider :thickness="3"></v-divider>
       </div>
@@ -61,14 +21,22 @@
 <script lang="ts">
 import * as _ from 'lodash';
 import { defineComponent, PropType } from 'vue';
-import { THistoryResults, IPlayer, IActionWithResult, THistoryVote } from '@avalon/types';
+import { THistoryResults, IPlayer } from '@avalon/types';
 import SwitchLancelots from '@/components/view/information/history/SwitchLancelots.vue';
 import SwitchResult from '@/components/view/information/history/SwitchResult.vue';
+import CheckLoyalty from '@/components/view/information/history/CheckLoyalty.vue';
+import Vote from '@/components/view/information/history/Vote.vue';
+import Assassinate from '@/components/view/information/history/Assassinate.vue';
+import Mission from '@/components/view/information/history/Mission.vue';
 
 export default defineComponent({
   components: {
     SwitchLancelots,
     SwitchResult,
+    CheckLoyalty,
+    Vote,
+    Assassinate,
+    Mission,
   },
   props: {
     history: {
@@ -113,9 +81,5 @@ export default defineComponent({
   width: 400px;
   max-height: 80vh;
   overflow-y: auto;
-}
-
-.mission {
-  font-size: x-large;
 }
 </style>
