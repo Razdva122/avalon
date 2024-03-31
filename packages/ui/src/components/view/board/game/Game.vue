@@ -96,7 +96,8 @@
 </template>
 
 <script lang="ts">
-import * as _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import last from 'lodash/last';
 import type { IHistoryMission, THistoryResults } from '@avalon/types';
 import type { IMissionWithResult } from '@/components/view/board/interface';
 import { defineComponent, PropType, computed, inject } from 'vue';
@@ -131,7 +132,7 @@ export default defineComponent({
     const roomState = stateManager.startedRoomState;
 
     const missions = computed(() => {
-      const missions: IMissionWithResult[] = _.cloneDeep(gameState.value.settings.missions);
+      const missions: IMissionWithResult[] = cloneDeep(gameState.value.settings.missions);
 
       gameState.value.history
         .filter((el): el is IHistoryMission => el.type === 'mission')
@@ -165,7 +166,7 @@ export default defineComponent({
           hidden: 'Hidden',
         };
 
-        const lastElement = _.last(roomState.value.gameStates[pointer].history)!;
+        const lastElement = last(roomState.value.gameStates[pointer].history)!;
 
         return historyText[lastElement.type];
       }

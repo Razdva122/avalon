@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import * as _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { defineComponent, PropType, inject } from 'vue';
 import type { TRoomPlayer, THistoryResults, Dictionary, TGameStage, IActionWithResult } from '@avalon/types';
 import type { IFrontendPlayer } from '@/components/view/board/interface';
@@ -50,7 +50,7 @@ export default defineComponent({
   },
   computed: {
     player(): IFrontendPlayer | TRoomPlayer {
-      const clone = _.cloneDeep(this.playerState);
+      const clone = cloneDeep(this.playerState);
       const gameState = inject(gameStateKey)!;
 
       if ('features' in clone) {

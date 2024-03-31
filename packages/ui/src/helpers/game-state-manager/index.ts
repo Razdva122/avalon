@@ -1,4 +1,5 @@
-import * as _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import last from 'lodash/last';
 
 import type { IVisualGameState, TRoomState, THistoryResults, TGameStage, IPlayer, TRoomPlayer } from '@avalon/types';
 import { Ref, computed, ref, provide, InjectionKey } from 'vue';
@@ -106,13 +107,13 @@ export class GameStateManager {
     const prevState = gameStates[gameStates.length - 1] ?? newState;
 
     while (gameStates.length - 1 !== history.length) {
-      const state = _.cloneDeep(newState);
-      const prevStateClone = _.cloneDeep(prevState);
+      const state = cloneDeep(newState);
+      const prevStateClone = cloneDeep(prevState);
 
       if (gameStates[gameStates.length - 1]) {
         gameStates[gameStates.length - 1].history = history.slice(0, gameStates.length);
         gameStates[gameStates.length - 1].stage = this.getStageFromHistory(
-          _.last(gameStates[gameStates.length - 1].history)!,
+          last(gameStates[gameStates.length - 1].history)!,
         );
       }
 

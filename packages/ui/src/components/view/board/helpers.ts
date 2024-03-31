@@ -1,9 +1,9 @@
 import { THistoryResults } from '@avalon/types';
 
-import * as _ from 'lodash';
+import last from 'lodash/last';
 
 export function calculateVisualElement(history: THistoryResults[]): { element?: THistoryResults; timeout: number } {
-  const lastElement = _.last(history);
+  const lastElement = last(history);
 
   if (
     lastElement?.type === 'vote' ||

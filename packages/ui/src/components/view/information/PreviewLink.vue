@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import * as _ from 'lodash';
+import snakeCase from 'lodash/snakeCase';
 
 import { defineComponent, PropType } from 'vue';
 
@@ -53,7 +53,7 @@ export default defineComponent({
       return target in rolesShortInfo;
     },
     toSnakeCase(str: string): string {
-      return _.snakeCase(str);
+      return snakeCase(str);
     },
   },
 });

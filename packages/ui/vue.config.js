@@ -4,6 +4,7 @@ const { defineConfig } = require('@vue/cli-service');
 const webpack = require('webpack');
 const SitemapPlugin = require('sitemap-webpack-plugin').default;
 const PrerendererWebpackPlugin = require('@prerenderer/webpack-plugin');
+const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 const { routesSeo } = require('./src/router/seo');
 const { yaMetrika, gtag } = require('./const');
 
@@ -45,6 +46,7 @@ module.exports = defineConfig({
           new webpack.DefinePlugin({
             APP_VERSION: "'DEV'",
           }),
+          new VuetifyPlugin(),
         ],
       };
     }
@@ -54,6 +56,7 @@ module.exports = defineConfig({
         new webpack.DefinePlugin({
           APP_VERSION: JSON.stringify(require('./package.json').version),
         }),
+        new VuetifyPlugin(),
         new SitemapPlugin({
           base: 'https://avalon-game.com/',
           paths,

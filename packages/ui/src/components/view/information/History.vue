@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import * as _ from 'lodash';
+import kebabCase from 'lodash/kebabCase';
 import { defineComponent, PropType } from 'vue';
 import { THistoryResults, IPlayer } from '@avalon/types';
 import SwitchLancelots from '@/components/view/information/history/SwitchLancelots.vue';
@@ -59,7 +59,7 @@ export default defineComponent({
       this.overlay = false;
     },
     toKebabCase(str: string): string {
-      return _.kebabCase(str);
+      return kebabCase(str);
     },
   },
 });
