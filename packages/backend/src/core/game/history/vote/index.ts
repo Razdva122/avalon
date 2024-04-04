@@ -49,6 +49,7 @@ export class Vote implements HistoryElement<'vote'> {
       throw new Error(`Player already make voted`);
     }
 
+    player.features.waitForAction = false;
     vote.value = option;
 
     if (this.data.votes.every((vote) => vote.value !== 'unvoted')) {

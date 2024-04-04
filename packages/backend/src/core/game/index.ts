@@ -457,7 +457,6 @@ export class Game extends GameHooks {
    */
   actionOnMission(playerID: string, result: TMissionResult): void {
     const player = this.findPlayerByID(playerID);
-    player.features.waitForAction = false;
 
     if (this.currentMission.makeAction(player, result)) {
       if (!this.callHook('beforeEndMission')) {
@@ -475,7 +474,6 @@ export class Game extends GameHooks {
    */
   voteForMission(playerID: string, option: TVoteOption): void {
     const player = this.findPlayerByID(playerID);
-    player.features.waitForAction = false;
 
     if (!this.vote) {
       throw new Error(`You cant vote for mission on stage ${this.stage}`);

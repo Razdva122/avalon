@@ -74,6 +74,7 @@ export class Mission implements HistoryElement<'mission'> {
       throw new Error(`Player already make action`);
     }
 
+    player.features.waitForAction = false;
     action.value = result;
 
     if (this.data.actions.every((action) => action.value !== 'unvoted')) {
