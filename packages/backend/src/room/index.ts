@@ -134,7 +134,7 @@ export class Room {
       };
     }
 
-    this.updateRoomState();
+    this.updateRoomState(true);
   }
 
   makeVote(userID: string, result: boolean) {
@@ -158,7 +158,7 @@ export class Room {
       this.vote = undefined;
     }
 
-    this.updateRoomState();
+    this.updateRoomState(true);
   }
 
   endVoteFor(target: TVoteTarget) {
