@@ -32,6 +32,10 @@ export interface ClientToServerEvents {
   kickPlayer: (uuid: string, userID: string) => void;
   leaveRoom: (uuid: string) => void;
 
+  endGame: (uuid: string) => void;
+  endAndRestartGame: (uuid: string) => void;
+  voteInRoom: (uuid: string, result: boolean) => void;
+
   joinGame: (uuid: string) => void;
   startGame: (uuid: string, options: IGameOptions) => void;
   leaveGame: (uuid: string) => void;

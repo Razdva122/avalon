@@ -1,29 +1,31 @@
 <template>
   <div class="board-container" :class="'view-mode-' + stateManager.viewMode.value">
     <div class="game-board" alt="board" :class="'game-end-' + gameResult"></div>
-    <div class="timer">
-      <Timer @timerEnd="clearHistoryElement" :duration="timerDuration" />
-    </div>
-    <div class="actions-container d-flex flex-column justify-center">
-      <template v-if="roomState.stage !== 'started'">
-        <div class="button-panel d-flex flex-column align-center">
-          <StartPanel :room-state="roomState" />
-        </div>
-      </template>
-      <template v-else>
-        <template
-          v-if="
-            stateManager.viewMode.value === 'live' &&
-            gameState.stage === 'announceLoyalty' &&
-            playerInGame?.features.ladyOfLake === 'has' &&
-            visibleHistory?.type !== 'checkLoyalty'
-          "
-        >
-          <AnnounceLoyalty />
+    <slot name="content">
+      <div class="timer">
+        <Timer @timerEnd="clearHistoryElement" :duration="timerDuration" />
+      </div>
+      <div class="actions-container d-flex flex-column justify-center">
+        <template v-if="roomState.stage !== 'started'">
+          <div class="button-panel d-flex flex-column align-center">
+            <StartPanel :room-state="roomState" />
+          </div>
         </template>
-        <Game v-else :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory" />
-      </template>
-    </div>
+        <template v-else>
+          <template
+            v-if="
+              stateManager.viewMode.value === 'live' &&
+              gameState.stage === 'announceLoyalty' &&
+              playerInGame?.features.ladyOfLake === 'has' &&
+              visibleHistory?.type !== 'checkLoyalty'
+            "
+          >
+            <AnnounceLoyalty />
+          </template>
+          <Game v-else :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory" />
+        </template>
+      </div>
+    </slot>
     <div
       class="player-container"
       v-for="(player, i) in players"

@@ -430,6 +430,14 @@ export class Game extends GameHooks {
   }
 
   /**
+   * Premature end of the game
+   */
+  endGame(): void {
+    this.stage = 'end';
+    this.stateObserver.gameStateChanged();
+  }
+
+  /**
    * Calculates the results of the winner according to the missions
    *
    * @returns Current winning team

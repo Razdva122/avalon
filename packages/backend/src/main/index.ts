@@ -83,6 +83,10 @@ export class Manager {
       this.updateRoomsList(room);
     });
 
+    eventBus.on('restartRoom', (room) => {
+      this.restartRoom(room.roomID);
+    });
+
     io.on('connection', (socket) => {
       handleSocketErrors(socket);
 
@@ -153,6 +157,30 @@ export class Manager {
       const room = this.rooms[uuid];
       if (room.leaderID === userID) {
         room.toggleLockedState();
+      }
+    });
+
+    socket.on('endGame', (uuid) => {
+      console.log('endGame', uuid);
+      const room = this.rooms[uuid];
+      if (room.leaderID === userID) {
+        room.startVoteFor('endGame');
+      }
+    });
+
+    socket.on('endAndRestartGame', (uuid) => {
+      console.log('endAndRestartGame', uuid);
+      const room = this.rooms[uuid];
+      if (room.leaderID === userID) {
+        room.startVoteFor('endAndRestartGame');
+      }
+    });
+
+    socket.on('voteInRoom', (uuid, result) => {
+      console.log('voteInRoom', uuid);
+      const room = this.rooms[uuid];
+      if (room) {
+        room.makeVote(userID, result);
       }
     });
 

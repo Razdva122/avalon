@@ -1,12 +1,15 @@
 import { User } from '@/user';
-import type { TRoomState, Server, IGameOptions } from '@avalon/types';
+import type { TRoomState, Server, IGameOptions, TVoteTarget, TVoteInRoom } from '@avalon/types';
 import type { TRoomData } from '@/room/interace';
+import { eventBus } from '@/helpers';
+import { votesText } from '@/room/const';
 import { GameManager } from '@/core/game-manager';
 
 export class Room {
   roomID: string;
   players: User[];
   leaderID: string;
+  vote?: TVoteInRoom;
   data: TRoomData = { stage: 'created' };
   maxCapacity = 10;
   io: Server;
@@ -85,6 +88,7 @@ export class Room {
     const roomState = {
       roomID: this.roomID,
       leaderID: this.leaderID,
+      vote: this.vote,
       players: this.players.map(({ name, id }) => ({ name, id, isLeader: id === this.leaderID })),
     };
 
@@ -99,6 +103,77 @@ export class Room {
         ...roomState,
         stage: this.data.stage,
       };
+    }
+  }
+
+  startVoteFor(target: TVoteTarget) {
+    if (target === 'endGame' || target === 'endAndRestartGame') {
+      if (this.data.stage !== 'started' || this.data.manager.game.stage === 'end') {
+        throw new Error(`Cant vote: ${target} in room with stage: ${this.data.stage}`);
+      }
+
+      if (this.vote) {
+        throw new Error(`Cant start vote: ${target} in room with vote: ${this.vote.target}`);
+      }
+
+      this.vote = {
+        target,
+        text: votesText[target],
+        votes: this.players.map(({ name, id }) => ({
+          name,
+          id,
+          isLeader: id === this.leaderID,
+          voteResult: undefined,
+        })),
+        result: {
+          total: this.players.length,
+          yes: 0,
+          no: 0,
+          required: Math.floor(this.players.length / 2) + 1,
+        },
+      };
+    }
+
+    this.updateRoomState();
+  }
+
+  makeVote(userID: string, result: boolean) {
+    if (!this.vote) {
+      throw new Error('There are no active votes');
+    }
+
+    const userVote = this.vote.votes.find((player) => player.id === userID);
+
+    if (!userVote || userVote.voteResult !== undefined) {
+      throw new Error('You cannot participate in this vote');
+    }
+
+    userVote.voteResult = result;
+
+    this.vote.result[result ? 'yes' : 'no'] += 1;
+
+    if (this.vote.result.yes >= this.vote.result.required) {
+      this.endVoteFor(this.vote.target);
+    } else if (this.vote.result.no >= this.vote.result.total - this.vote.result.required + 1) {
+      this.vote = undefined;
+    }
+
+    this.updateRoomState();
+  }
+
+  endVoteFor(target: TVoteTarget) {
+    this.vote = undefined;
+
+    if (target === 'endAndRestartGame' || target === 'endGame') {
+      if (this.data.stage !== 'started' || this.data.manager.game.stage === 'end') {
+        throw new Error(`Cant end vote: ${target} in room with stage: ${this.data.stage}`);
+      }
+
+      this.data.manager.game.endGame();
+    }
+
+    if (target === 'endAndRestartGame') {
+      eventBus.emit('restartRoom', this);
     }
   }
 

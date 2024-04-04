@@ -6,8 +6,13 @@
     </template>
     <template v-else>
       <v-btn v-if="displayRestartButton" @click="restartGame" class="restart-button">Restart game</v-btn>
-      <Board :room-state="roomState" />
+      <Board :room-state="roomState">
+        <template v-slot:content>
+          <RoomVote v-if="roomState.vote" :roomUuid="roomState.roomID" :vote="roomState.vote" />
+        </template>
+      </Board>
       <RolesInfo v-if="roomState.stage === 'started'" :game-roles="game.settings.roles" :visible-roles="visibleRoles" />
+      <HostPanel v-if="displayHostPanel" :roomUuid="roomState.roomID" />
     </template>
   </div>
 </template>
@@ -21,12 +26,16 @@ import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { GameStateManager } from '@/helpers/game-state-manager';
 import RolesInfo from '@/components/view/information/RolesInfo.vue';
+import HostPanel from '@/components/view/information/HostPanel.vue';
+import RoomVote from '@/components/view/panels/RoomVote.vue';
 
 export default defineComponent({
   name: 'Room',
   components: {
     Board,
     RolesInfo,
+    HostPanel,
+    RoomVote,
   },
   props: {
     uuid: {
@@ -73,6 +82,10 @@ export default defineComponent({
       initState(uuid);
     });
 
+    const displayHostPanel = computed(() => {
+      return roomState.value.stage === 'started' && roomState.value.leaderID === userID;
+    });
+
     const displayRestartButton = computed(() => {
       return roomState.value.stage === 'started' && game.value.stage === 'end' && roomState.value.leaderID === userID;
     });
@@ -97,6 +110,7 @@ export default defineComponent({
       roomState,
       errorMessage,
       displayRestartButton,
+      displayHostPanel,
       visibleRoles,
       alert,
       game,
