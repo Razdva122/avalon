@@ -34,6 +34,7 @@ export interface ClientToServerEvents {
 
   endGame: (uuid: string) => void;
   endAndRestartGame: (uuid: string) => void;
+  shuffle: (uuid: string) => void;
   voteInRoom: (uuid: string, result: boolean) => void;
 
   joinGame: (uuid: string) => void;

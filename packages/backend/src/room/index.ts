@@ -4,6 +4,7 @@ import type { TRoomData } from '@/room/interace';
 import { eventBus } from '@/helpers';
 import { votesText } from '@/room/const';
 import { GameManager } from '@/core/game-manager';
+import * as _ from 'lodash';
 
 export class Room {
   roomID: string;
@@ -175,6 +176,16 @@ export class Room {
     if (target === 'endAndRestartGame') {
       eventBus.emit('restartRoom', this);
     }
+  }
+
+  shuffle() {
+    if (this.data.stage === 'started') {
+      throw new Error('You cant shuffle started game');
+    }
+
+    this.players = _.shuffle(this.players);
+
+    this.updateRoomState();
   }
 
   protected destroyRoom() {

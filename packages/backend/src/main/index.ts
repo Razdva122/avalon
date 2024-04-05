@@ -176,6 +176,14 @@ export class Manager {
       }
     });
 
+    socket.on('shuffle', (uuid) => {
+      console.log('shuffle', uuid);
+      const room = this.rooms[uuid];
+      if (room.leaderID === userID) {
+        room.shuffle();
+      }
+    });
+
     socket.on('voteInRoom', (uuid, result) => {
       console.log('voteInRoom', uuid);
       const room = this.rooms[uuid];

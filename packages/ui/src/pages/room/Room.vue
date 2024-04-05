@@ -12,7 +12,7 @@
         </template>
       </Board>
       <RolesInfo v-if="roomState.stage === 'started'" :game-roles="game.settings.roles" :visible-roles="visibleRoles" />
-      <HostPanel v-if="displayHostPanel" :roomUuid="roomState.roomID" />
+      <HostPanel v-if="displayHostPanel" :roomUuid="roomState.roomID" :roomStage="roomState.stage" />
     </template>
   </div>
 </template>
@@ -26,7 +26,7 @@ import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { GameStateManager } from '@/helpers/game-state-manager';
 import RolesInfo from '@/components/view/information/RolesInfo.vue';
-import HostPanel from '@/components/view/information/HostPanel.vue';
+import HostPanel from '@/components/view/panels/HostPanel.vue';
 import RoomVote from '@/components/view/panels/RoomVote.vue';
 
 export default defineComponent({
@@ -83,7 +83,7 @@ export default defineComponent({
     });
 
     const displayHostPanel = computed(() => {
-      return roomState.value.stage === 'started' && roomState.value.leaderID === userID;
+      return roomState.value.leaderID === userID;
     });
 
     const displayRestartButton = computed(() => {
