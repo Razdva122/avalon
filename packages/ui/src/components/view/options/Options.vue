@@ -142,6 +142,11 @@ export default defineComponent({
           label: 'Hidden history',
           hint: 'With a hidden history, past actions in the game are hidden',
         },
+        {
+          name: 'displayIndex',
+          label: 'Display index',
+          hint: 'Displays the index number of each player at the table',
+        },
       ] as const;
     },
   },

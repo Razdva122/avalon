@@ -83,6 +83,7 @@ export class GameManager {
       players: this.game.players.map((player) => {
         return {
           id: player.user.id,
+          index: player.index,
           name: player.user.name,
           features: player.features,
         };

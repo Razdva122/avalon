@@ -13,7 +13,7 @@ import type {
 import type { TDataForManagerOptions } from '@/core/game/history';
 
 export type TRoomState = Omit<IVisualGameState, 'players' | 'history'> & {
-  players: Pick<IPlayer, 'features' | 'id' | 'name'>[];
+  players: Pick<IPlayer, 'features' | 'id' | 'name' | 'index'>[];
   history: ((options: TDataForManagerOptions) => THistoryResults)[];
   roles: Dictionary<TVisibleRole[]>;
   publicRoles: TVisibleRole[];

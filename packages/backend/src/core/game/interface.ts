@@ -9,6 +9,7 @@ export interface IPresetsForGame {
 }
 
 export interface IPlayerInGame {
+  index: number;
   user: User;
   role: Character;
 

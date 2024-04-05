@@ -35,6 +35,7 @@
       <Player
         :player-state="player"
         :display-kick="userIsLeader"
+        :display-index="roomState.stage === 'started' ? gameState.features.displayIndex : false"
         :visible-history="visibleHistory"
         :current-stage="roomState.stage === 'started' ? gameState.stage : undefined"
         :style="{ transform: calculateRotate(i, true), translate: '0 -50%' }"

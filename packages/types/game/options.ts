@@ -18,4 +18,5 @@ export type TGameOptionsAddons = {
 export type TGameOptionsFeatures = {
   anonymousVoting?: boolean;
   hiddenHistory?: boolean;
+  displayIndex?: boolean;
 };

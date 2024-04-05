@@ -3,6 +3,7 @@ import type { TMissionResult } from './mission';
 import type { TAddonsFeatures } from './addons';
 
 export interface IPlayer {
+  index: number;
   id: string;
   name: string;
   role: TVisibleRole;

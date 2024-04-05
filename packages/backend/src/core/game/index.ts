@@ -158,16 +158,26 @@ export class Game extends GameHooks {
 
     const playersWithNext = players.map((player, index) => {
       const next = <IPlayerInGame>(index === players.length - 1 ? players[0] : players[index + 1]);
+      const playerInGame = <IPlayerInGame>player;
 
-      (<IPlayerInGame>player).next = next;
+      playerInGame.next = next;
 
-      return <IPlayerInGame>player;
+      return playerInGame;
     });
 
     this.players = playersWithNext;
 
     this.leader = _.sample(playersWithNext)!;
     this.leader.features.waitForAction = true;
+
+    let index = 1;
+    let currentPlayer = this.leader;
+
+    while (!currentPlayer.index) {
+      currentPlayer.index = index;
+      currentPlayer = currentPlayer.next;
+      index += 1;
+    }
 
     // Generate missions
     this.missions = this.settings.missions.map((el, index) => {

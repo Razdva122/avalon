@@ -16,7 +16,12 @@
       <div class="icon-evil-mission"></div>
     </div>
     <span class="player-name">
-      <span class="player-name-text">{{ player.name }}</span>
+      <span class="player-name-text">
+        <span v-if="'index' in player && displayIndex">
+          <b>{{ `${player.index}.` }}</b>
+        </span>
+        {{ player.name }}
+      </span>
     </span>
   </div>
 </template>
@@ -45,7 +50,10 @@ export default defineComponent({
       type: String as PropType<TGameStage>,
     },
     displayKick: {
-      type: Boolean as PropType<boolean>,
+      type: Boolean,
+    },
+    displayIndex: {
+      type: Boolean,
     },
   },
   computed: {
