@@ -91,6 +91,8 @@ export class GameStateManager {
     }
 
     if (newGameState && this.state.value.stage === 'started') {
+      this.state.value.game = newGameState;
+
       if (this.state.value.gameStates.length - 1 === newGameState.history.length) {
         this.state.value.gameStates[this.state.value.gameStates.length - 1] = newGameState;
       } else {

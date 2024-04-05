@@ -5,7 +5,7 @@ export type TPageRoomStateRef = Ref<TPageRoomState>;
 
 export type TPageRoomState = Exclude<TRoomState, TStartedRoomState> | TStartedPageRoomState;
 
-export type TStartedPageRoomState = Omit<TStartedRoomState, 'game'> & {
+export type TStartedPageRoomState = TStartedRoomState & {
   pointer: number;
   gameStates: IVisualGameState[];
 };

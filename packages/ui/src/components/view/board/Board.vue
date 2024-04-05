@@ -51,6 +51,7 @@ import Timer from '@/components/feedback/Timer.vue';
 import Game from '@/components/view/board/game/Game.vue';
 import StartPanel from '@/components/view/panels/StartPanel.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
+import eventBus from '@/helpers/event-bus';
 import { THistoryResults } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
@@ -149,6 +150,19 @@ export default defineComponent({
         });
       } else {
         stateManager.moveToNextStage();
+      }
+    });
+
+    const playerWaitForActionState = computed(() => {
+      if ('game' in roomState.value) {
+        return roomState.value.game.players.find((player) => player.id === store.state.user?.id)?.features
+          .waitForAction;
+      }
+    });
+
+    watch(playerWaitForActionState, () => {
+      if (playerWaitForActionState && stateManager.viewMode.value === 'history') {
+        eventBus.emit('infoMessage', 'The game updated! We are waiting for your action');
       }
     });
 
