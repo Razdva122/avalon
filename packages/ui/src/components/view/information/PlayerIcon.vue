@@ -45,6 +45,12 @@ export default defineComponent({
   background-position: 48% 0%;
 }
 
+.icon-guinevere {
+  background-image: url('@/assets/roles/guinevere.webp');
+  background-size: 135%;
+  background-position: 42% 15%;
+}
+
 .icon-morgana {
   background-image: url('@/assets/roles/morgana.webp');
   background-position: 47% 35%;

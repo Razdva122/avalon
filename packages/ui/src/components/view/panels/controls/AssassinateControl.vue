@@ -15,7 +15,7 @@
       </v-btn>
       <v-btn v-if="assassinateTargets.includes('guinevere')" class="button-content" value="guinevere" variant="plain">
         <template v-slot:prepend>
-          <div class="lovers-radio-button radio-button"></div>
+          <div class="guinevere-radio-button radio-button"></div>
         </template>
         Guinevere
       </v-btn>
@@ -106,6 +106,10 @@ export default defineComponent({
 
 .lovers-radio-button {
   background-image: url('@/assets/icons/lovers_rose.webp');
+}
+
+.guinevere-radio-button {
+  background-image: url('@/assets/icons/tiara.webp');
 }
 
 .button-content {

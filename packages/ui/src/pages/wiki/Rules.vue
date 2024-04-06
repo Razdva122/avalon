@@ -293,9 +293,21 @@
       <li>
         <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong> close your eyes.
       </li>
+      <template v-if="roles.guinevere">
+        <li>
+          <strong><PreviewLink target="goodLancelot" text="Good Lancelot" /></strong> extend your thumb into the air.
+        </li>
+        <li>
+          <strong><PreviewLink target="guinevere" /></strong>, open your eyes and look around so that you know both
+          lancelots.
+        </li>
+      </template>
       <li v-if="roles.evilLancelot">
-        <strong><PreviewLink v-if="roles.evilLancelot" target="evilLancelot" text="Evil Lancelot" /></strong> - put your
-        thumb down and re-form your hand into a fist.
+        <strong>
+          <PreviewLink v-if="roles.evilLancelot" target="evilLancelot" text="Evil Lancelot" />
+          <template v-if="roles.guinevere"> and <PreviewLink target="goodLancelot" text="Good Lancelot" /> </template>
+        </strong>
+        - put your thumb down and re-form your hand into a fist.
       </li>
       <li>All players should have their eyes closed and hands in a fist in front of them.</li>
       <template v-if="roles.merlinPure || roles.merlin">
@@ -418,6 +430,7 @@ export default defineComponent({
       isolde: 0,
       evilLancelot: 0,
       goodLancelot: 0,
+      guinevere: 0,
     };
 
     return {

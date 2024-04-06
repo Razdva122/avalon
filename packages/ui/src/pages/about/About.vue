@@ -31,7 +31,7 @@
 
     <div>
       Exclusive to our platform are additional roles not found in the original game -
-      <b><PreviewLink target="merlinPure" /></b> and
+      <b><PreviewLink target="merlinPure" /></b>, <b><PreviewLink target="guinevere" /></b> and
       <b><PreviewLink target="tristan" /> + <PreviewLink target="isolde" /> (the Lovers)</b> - providing new dynamics
       and strategies for you and your team to explore.
     </div>
