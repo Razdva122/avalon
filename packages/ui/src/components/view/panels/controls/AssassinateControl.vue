@@ -1,17 +1,23 @@
 <template>
   <div class="d-flex mb-2" v-if="assassinateTargets.length > 1">
     <v-btn-toggle v-model="selectedTarget" density="comfortable" divided>
-      <v-btn class="button-content" value="merlin" variant="plain">
+      <v-btn v-if="assassinateTargets.includes('merlin')" class="button-content" value="merlin" variant="plain">
         <template v-slot:prepend>
           <div class="merlin-radio-button radio-button"></div>
         </template>
         Merlin
       </v-btn>
-      <v-btn class="button-content" value="lovers" variant="plain">
+      <v-btn v-if="assassinateTargets.includes('lovers')" class="button-content" value="lovers" variant="plain">
         <template v-slot:prepend>
           <div class="lovers-radio-button radio-button"></div>
         </template>
         Lovers
+      </v-btn>
+      <v-btn v-if="assassinateTargets.includes('guinevere')" class="button-content" value="guinevere" variant="plain">
+        <template v-slot:prepend>
+          <div class="lovers-radio-button radio-button"></div>
+        </template>
+        Guinevere
       </v-btn>
     </v-btn-toggle>
   </div>
@@ -54,6 +60,7 @@ export default defineComponent({
       const needPlayer: { [key in TAssassinateType]: number } = {
         merlin: 1,
         lovers: 2,
+        guinevere: 1,
       };
 
       return needPlayer[selectedTarget.value] !== players;

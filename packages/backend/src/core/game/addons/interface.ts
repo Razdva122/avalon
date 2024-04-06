@@ -8,7 +8,7 @@ export type TAfterMethods = `after${Capitalize<TGameStage>}`;
 
 export type TMethods = Partial<Record<THookNames, () => boolean>>;
 
-export type TRolesWithAddons = 'merlin' | 'merlinPure' | 'tristan' | 'goodLancelot';
+export type TRolesWithAddons = 'merlin' | 'merlinPure' | 'tristan' | 'goodLancelot' | 'guinevere';
 
 export type TAdditionalAddons = 'ladyOfLake' | 'excalibur';
 

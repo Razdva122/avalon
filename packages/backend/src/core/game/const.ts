@@ -127,6 +127,13 @@ export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsData> = {
       ],
     },
   },
+  guinevere: {
+    addon: AssassinAddon,
+    key: 'assassin',
+    options: {
+      guinevere: [(player: IPlayerInGame) => player.role.role === 'guinevere'],
+    },
+  },
   goodLancelot: {
     addon: LancelotsAddon,
     key: 'lancelots',

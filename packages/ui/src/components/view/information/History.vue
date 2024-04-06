@@ -47,13 +47,18 @@ export default defineComponent({
       required: true,
       type: Object as PropType<IPlayer[]>,
     },
+    displayIndex: {
+      type: Boolean,
+    },
   },
   data: () => ({
     overlay: false,
   }),
   methods: {
     calculateNameByID(playerID: string) {
-      return this.players.find((player) => player.id === playerID)!.name;
+      const player = this.players.find((player) => player.id === playerID)!;
+      const prefix = this.displayIndex ? `${player.index}. ` : '';
+      return prefix + player.name;
     },
     closeHistory() {
       this.overlay = false;

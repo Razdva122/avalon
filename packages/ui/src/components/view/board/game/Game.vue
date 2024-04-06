@@ -11,7 +11,11 @@
       >
         <Spoiler :size="{ width: '250px', height: '40px' }">
           <div class="mb-1" v-if="stateManager.viewMode.value === 'live'">
-            <History :history="gameState.history" :players="gameState.players" />
+            <History
+              :history="gameState.history"
+              :players="gameState.players"
+              :display-index="gameState.features.displayIndex"
+            />
             <v-btn
               @click="() => stateManager.toggleViewMode()"
               class="action-icon"
