@@ -107,7 +107,7 @@ export default defineComponent({
           label: 'Guinevere',
           disabled: !this.roles.goodLancelot,
           color: 'success',
-          route: 'lancelots',
+          route: 'guinevere',
         },
         { role: 'goodLancelot', label: 'Good Lancelot', disabled: false, color: 'success', route: 'lancelots' },
         { role: 'evilLancelot', label: 'Evil Lancelot', disabled: false, color: 'warning', route: 'lancelots' },
