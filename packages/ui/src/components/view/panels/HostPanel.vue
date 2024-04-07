@@ -37,12 +37,15 @@ export default defineComponent({
   }),
   methods: {
     endGame() {
+      this.overlay = false;
       socket.emit('endGame', this.roomUuid);
     },
     restartGame() {
+      this.overlay = false;
       socket.emit('endAndRestartGame', this.roomUuid);
     },
     shuffle() {
+      this.overlay = false;
       socket.emit('shuffle', this.roomUuid);
     },
   },

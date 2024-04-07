@@ -45,6 +45,12 @@ export default defineComponent({
   background-position: 48% 0%;
 }
 
+.icon-unknownLancelot {
+  background-image: url('@/assets/roles/unknown_lancelot.webp');
+  background-size: 140%;
+  background-position: 48% 0%;
+}
+
 .icon-guinevere {
   background-image: url('@/assets/roles/guinevere.webp');
   background-size: 135%;
@@ -53,8 +59,8 @@ export default defineComponent({
 
 .icon-morgana {
   background-image: url('@/assets/roles/morgana.webp');
-  background-position: 47% 35%;
-  background-size: 180%;
+  background-position: 51% 20%;
+  background-size: 165%;
 }
 
 .icon-percival {
@@ -88,8 +94,8 @@ export default defineComponent({
 
 .icon-oberon {
   background-image: url('@/assets/roles/oberon.webp');
-  background-position: 54% 50%;
-  background-size: 154%;
+  background-position: 51% 40%;
+  background-size: 135%;
 }
 
 .icon-tristan {

@@ -68,11 +68,13 @@ export default defineComponent({
     await initState(props.uuid);
 
     socket.on('roomUpdated', (state) => {
-      stateManager.mutateRoomState({ newRoomState: state, userID });
+      if (state.roomID === props.uuid) {
+        stateManager.mutateRoomState({ newRoomState: state, userID });
+      }
     });
 
     socket.on('gameUpdated', (game) => {
-      if (roomState.value.stage === 'started') {
+      if (game.uuid === props.uuid && roomState.value.stage === 'started') {
         stateManager.mutateRoomState({ newGameState: game, userID });
       }
     });

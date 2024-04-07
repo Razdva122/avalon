@@ -69,4 +69,8 @@ export const rolesShortInfo: { [key in TVisibleRole]: { loyalty: TLoyalty | 'unk
     loyalty: 'unknown',
     info: 'One of the two wizards is good (Merlin) or evil (Morgana)',
   },
+  unknownLancelot: {
+    loyalty: 'unknown',
+    info: 'Lancelot, whose loyalty is not known',
+  },
 };

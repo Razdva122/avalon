@@ -22,12 +22,12 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.mordred, component: () => import('@/pages/wiki/roles/Mordred.vue') },
   { ...routesSeo.oberon, component: () => import('@/pages/wiki/roles/Oberon.vue') },
   { ...routesSeo.minion, component: () => import('@/pages/wiki/roles/Minion.vue') },
+  { ...routesSeo.guinevere, component: () => import('@/pages/wiki/roles/Guinevere.vue') },
   { ...routesSeo.notFound, component: () => import('@/pages/empty/NotFound.vue') },
   { path: '/wiki/roles/isolde/', name: 'isolde', redirect: { name: 'lovers' } },
   { path: '/wiki/roles/tristan/', name: 'tristan', redirect: { name: 'lovers' } },
   { path: '/wiki/roles/evil_lancelot/', name: 'evil_lancelot', redirect: { name: 'lancelots' } },
   { path: '/wiki/roles/good_lancelot/', name: 'good_lancelot', redirect: { name: 'lancelots' } },
-  { path: '/wiki/roles/guinevere/', name: 'guinevere', redirect: { name: 'guinevere' } },
   { path: '/:catchAll(.*)', redirect: '404' },
 ];
 

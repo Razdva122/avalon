@@ -11,6 +11,10 @@
         <h2>Merlin Pure</h2>
         <img class="role-image" src="@/assets/roles/merlin_pure.webp" alt="merlin pure" />
       </router-link>
+      <router-link class="role" :to="{ name: 'guinevere' }">
+        <h2>Guinevere</h2>
+        <img class="role-image" src="@/assets/roles/guinevere.webp" alt="guinevere" />
+      </router-link>
       <router-link class="role" :to="{ name: 'percival' }">
         <h2>Percival</h2>
         <img class="role-image" src="@/assets/roles/percival.webp" alt="percival" />
@@ -78,6 +82,7 @@ export default defineComponent({
 
   h2 {
     text-align: center;
+    @include text-overflow(1);
   }
 }
 

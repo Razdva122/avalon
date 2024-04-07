@@ -22,14 +22,14 @@
       </template>
       <template v-else>
         <div class="loyalty-container" v-if="mode === 'real'" v-for="loyalty in ['good', 'evil'] as const">
-          <div v-for="role in gameRoles[loyalty]">
+          <div class="role-container" v-for="role in gameRoles[loyalty]">
             <div class="role-name">{{ role }}</div>
             <PlayerIcon @click="selectRole(role)" class="role" :class="'role-loyalty-' + loyalty" :icon="role" />
           </div>
           <v-divider v-if="loyalty === 'good'" :thickness="2" class="mt-2 mb-2"></v-divider>
         </div>
         <div class="loyalty-container" v-else>
-          <div v-for="role in visibleRolesInfo">
+          <div class="role-container" v-for="role in visibleRolesInfo">
             <div class="role-name">{{ role.name }}</div>
             <PlayerIcon
               @click="selectRole(role.name)"
@@ -198,5 +198,11 @@ export default defineComponent({
   text-align: center;
   text-transform: capitalize;
   font-weight: bold;
+}
+
+.role-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 </style>

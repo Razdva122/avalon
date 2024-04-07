@@ -8,7 +8,7 @@ export class Guinevere extends Character {
   loyalty: TLoyalty = 'good';
 
   visibility: TVisibility = {
-    evilLancelot: 'goodLancelot',
-    goodLancelot: 'goodLancelot',
+    evilLancelot: 'unknownLancelot',
+    goodLancelot: 'unknownLancelot',
   };
 }

@@ -138,6 +138,16 @@ module.exports.routesSeo = {
       keywords: ['Lancelots', 'Role', 'Rules', 'Tips'],
     },
   },
+  guinevere: {
+    path: '/wiki/roles/guinevere/',
+    name: 'guinevere',
+    meta: {
+      prerender: true,
+      title: 'Avalon: The Resistance | Guinevere',
+      description: "Rules and Tips for Guinevere role in the board game 'Avalon: The Resistance'",
+      keywords: ['Guinevere', 'Role', 'Rules', 'Tips'],
+    },
+  },
   percival: {
     path: '/wiki/roles/percival/',
     name: 'percival',
