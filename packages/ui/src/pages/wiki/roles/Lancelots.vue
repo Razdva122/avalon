@@ -18,7 +18,9 @@
       <PreviewLink target="evilLancelot" text="Evil Lancelot" /> among the ranks of Mordred's followers, while the
       minions of Mordred recognize the presence of an <PreviewLink target="evilLancelot" text="Evil Lancelot" /> as
       well, though they see all allies equally and cannot differentiate who the Lancelot is. On the other hand, the
-      <PreviewLink target="evilLancelot" text="Evil Lancelot" /> does not know his allies.
+      <PreviewLink target="evilLancelot" text="Evil Lancelot" /> does not know his allies. If
+      <PreviewLink target="guinevere" /> is present in the game, she knows both Lancelots but does not know their
+      loyatly.
     </p>
     <p>
       Key to the Lancelots' gameplay is the deck of loyalty change, after the second mission, a card is drawn. If a

@@ -10,58 +10,49 @@
 
     <h2>General Information:</h2>
     <p>
-      Playing as the Lovers, <PreviewLink target="tristan" /> and <PreviewLink target="isolde" />, adds a romantic twist
-      to the game. Your bond is strong, as you know each other from the start and are working for the side of good. Yet,
-      this love must be kept secret, if you are both identified, the Assassin can choose to eliminate you instead of
-      Merlin at the end of the game.
+      Taking on the role of <PreviewLink target="guinevere" /> requires a delicate approach: she knows both Lancelots
+      <PreviewLink target="goodLancelot" text="Good Lancelot" /> and
+      <PreviewLink target="evilLancelot" text="Evil Lancelot" /> but does not know their current allegiance. Her
+      objective is to aid the side of good discreetly, as like <PreviewLink target="merlin" />, she may be killed at the
+      game's end if identified by the forces of evil.
     </p>
 
     <h2>General Tips:</h2>
     <ul>
       <li>
-        <strong>Maintain individual personas:</strong> Act independently of each other to avoid creating patterns that
-        could lead to your joint discovery.
+        <strong>Be cautious with your knowledge:</strong> Guinevere must use her awareness to subtly guide her allies
+        towards victory without revealing her role.
       </li>
       <li>
-        <strong>Protect each other:</strong> Be aware of the game's flow, and if suspicion falls on one, the other
-        should deflect subtly, not overtly.
+        <strong>Use hints wisely:</strong> The ability to give subtle hints to your team without being too overt is
+        crucial for Guinevere.
       </li>
       <li>
-        <strong>Disguise your gameplay:</strong> Occasionally vote or argue against each other to dispel any notion of
-        your alliance.
-      </li>
-      <li>
-        <strong>Be careful with meetings:</strong> Avoid private discussions that could be noticed and raise suspicions
-        among other players.
+        <strong>Maintain balance in your gameplay:</strong> Sometimes, it's important not to appear too knowledgeable.
+        Deliberate mistakes or silence can misdirect the forces of evil.
       </li>
     </ul>
 
     <h2>Strategic Tips:</h2>
     <ul>
       <li>
-        <strong>Divide and conquer:</strong> Take on different roles within the forces of good, gathering and sharing
-        information from different angles.
+        <strong>Determine Lancelot's loyalty:</strong> Strive to figure out which Lancelot is true to the cause of good
+        and which may have turned to evil. This knowledge can significantly impact your strategy.
       </li>
       <li>
-        <strong>Coordinate without collusion:</strong> Plan your strategies in a way that does not require constant or
-        obvious coordination.
+        <strong>Strategize with silence:</strong> Sometimes, the best way to conceal your role is to hold back comments,
+        especially in the early stages of the game.
       </li>
       <li>
-        <strong>Establish independent trust:</strong> Each lover should work to gain the trust of other players on their
-        own merits.
-      </li>
-      <li>
-        <strong>Plan for contingency:</strong> Have a strategy in place in case one lover is exposed, to ensure the
-        other can continue effectively.
+        <strong>Build trust:</strong> Convincing other players of your allegiance to good is as vital as revealing evil.
+        Trust can sway team decisions.
       </li>
     </ul>
 
     <p>
-      As the Lovers, <PreviewLink target="tristan" /> and <PreviewLink target="isolde" />, you possess a unique
-      advantage that, if leveraged with skill and subtlety, can greatly aid the forces of good. However, the specter of
-      the Assassin's choice at the game's end looms ever-present. Navigate the treacherous waters of deceit with care,
-      for if your love is unveiled, it may cost you both the ultimate price. Let your bond be your strength, but let
-      discretion be your guide. May your love triumph over evil!
+      Playing as <PreviewLink target="guinevere" /> is challenging but immensely rewarding. With thoughtful strategy and
+      judicious communication, you can lead the forces of good to victory while evading detection by evil's assassin.
+      Good luck!
     </p>
   </div>
 </template>
