@@ -25,12 +25,12 @@
       {{ roomState.stage === 'created' ? 'Lock Game' : 'Unlock game' }}
     </v-btn>
     <v-btn class="mt-2 mb-4" color="success" :disabled="isStartGameDisabled" @click="onStartClick"> Start Game </v-btn>
-    <Options :roles="roles" :addons="addons" :features="features" />
+    <Options :roles="options.roles" :addons="options.addons" :features="options.features" />
   </template>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, PropType, toRefs } from 'vue';
+import { defineComponent, computed, ref, PropType, toRefs, watch } from 'vue';
 import { useStore } from '@/store';
 import { TPageRoomState } from '@/helpers/game-state-manager';
 import { socket } from '@/api/socket';
@@ -53,24 +53,30 @@ export default defineComponent({
   setup(props) {
     const { roomState } = toRefs(props);
     const store = useStore();
-    const roles = ref<TGameOptionsRoles>({
-      merlinPure: 0,
-      merlin: 0,
-      mordred: 0,
-      morgana: 0,
-      oberon: 0,
-      percival: 0,
+
+    const roles = computed(() => {
+      return roomState.value.options.roles;
+    });
+    const addons = computed(() => {
+      return roomState.value.options.addons;
+    });
+    const features = computed(() => {
+      return roomState.value.options.features;
     });
 
-    const addons = ref<TGameOptionsAddons>({
-      ladyOfLake: false,
-      excalibur: false,
+    const options = ref({
+      addons: addons.value,
+      roles: roles.value,
+      features: features.value,
     });
 
-    const features = ref<TGameOptionsFeatures>({
-      anonymousVoting: false,
-      hiddenHistory: false,
-    });
+    watch(
+      options,
+      (options) => {
+        socket.emit('updateOptions', roomState.value.roomID, options);
+      },
+      { deep: true },
+    );
 
     const isUserInGame = computed(() => {
       return roomState.value.players.some((player) => player.id === store.state.user?.id);
@@ -101,11 +107,7 @@ export default defineComponent({
     };
 
     const onStartClick = () => {
-      socket.emit('startGame', roomState.value.roomID, {
-        roles: roles.value,
-        addons: addons.value,
-        features: features.value,
-      });
+      socket.emit('startGame', roomState.value.roomID);
     };
 
     const onCopyClick = () => {
@@ -119,9 +121,7 @@ export default defineComponent({
 
     return {
       roomState,
-      roles,
-      addons,
-      features,
+      options,
 
       isUserInGame,
       isUserLeader,

@@ -21,6 +21,10 @@ export class Assassinate implements HistoryElement<'assassinate'> {
   }
 
   assassinatePlayers(victims: IPlayerInGame[]) {
+    if (victims.some((victim) => victim.role.loyalty === 'evil')) {
+      throw new Error('You cant assassinate evil player');
+    }
+
     const result = victims.every((victim) => this.validator.some((el) => el(victim))) ? 'hit' : 'miss';
     this.data.result = result;
     this.data.killed = victims;

@@ -1,6 +1,6 @@
 import { Room } from '@/room';
 import { User } from '@/user';
-import type { Dictionary, TRoomInfo, TRoomsList } from '@avalon/types';
+import type { Dictionary, TRoomInfo, TRoomsList, IGameOptions } from '@avalon/types';
 import type { Server, ServerSocket } from '@avalon/types';
 import crypto from 'crypto';
 
@@ -11,8 +11,8 @@ export class Manager {
   roomsList: TRoomsList = [];
   io: Server;
 
-  createRoom(uuid: string, leaderID: string, players: User[]) {
-    this.rooms[uuid] = new Room(uuid, leaderID, players, this.io);
+  createRoom(uuid: string, leaderID: string, players: User[], options?: IGameOptions) {
+    this.rooms[uuid] = new Room(uuid, leaderID, players, this.io, options);
 
     this.updateRoomsList(this.rooms[uuid]);
 
@@ -65,7 +65,7 @@ export class Manager {
     if (room.data.stage === 'started') {
       if (room.data.manager.game.stage === 'end') {
         const newUUID = crypto.randomUUID();
-        this.createRoom(newUUID, room.leaderID, room.players);
+        this.createRoom(newUUID, room.leaderID, room.players, room.options);
 
         this.io.to(room.roomID).emit('restartGame', newUUID);
       } else {
@@ -160,6 +160,14 @@ export class Manager {
       }
     });
 
+    socket.on('updateOptions', (uuid, options) => {
+      console.log('updateOptions', uuid, options);
+      const room = this.rooms[uuid];
+      if (room.leaderID === userID) {
+        room.updateOptions(options);
+      }
+    });
+
     socket.on('endGame', (uuid) => {
       console.log('endGame', uuid);
       const room = this.rooms[uuid];
@@ -192,11 +200,11 @@ export class Manager {
       }
     });
 
-    socket.on('startGame', (uuid, options) => {
+    socket.on('startGame', (uuid) => {
       console.log('startGame', uuid);
       const room = this.rooms[uuid];
       if (room.leaderID === userID) {
-        room.startGame(options);
+        room.startGame();
         eventBus.emit('roomUpdated', room);
       }
     });

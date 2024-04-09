@@ -11,15 +11,17 @@ export class Room {
   players: User[];
   leaderID: string;
   vote?: TVoteInRoom;
+  options: IGameOptions;
   data: TRoomData = { stage: 'created' };
   maxCapacity = 10;
   io: Server;
 
-  constructor(roomID: string, leaderID: string, players: User[], io: Server) {
+  constructor(roomID: string, leaderID: string, players: User[], io: Server, options?: IGameOptions) {
     this.io = io;
     this.roomID = roomID;
     this.players = players;
     this.leaderID = leaderID;
+    this.options = options || { addons: {}, roles: {}, features: {} };
   }
 
   joinGame(userID: string, name: string) {
@@ -80,8 +82,8 @@ export class Room {
     }
   }
 
-  startGame(options: IGameOptions) {
-    this.data = { stage: 'started', manager: new GameManager(this.players, options, this.io, this.roomID) };
+  startGame() {
+    this.data = { stage: 'started', manager: new GameManager(this.players, this.options, this.io, this.roomID) };
     this.updateRoomState(true);
   }
 
@@ -90,6 +92,7 @@ export class Room {
       roomID: this.roomID,
       leaderID: this.leaderID,
       vote: this.vote,
+      options: this.options,
       players: this.players.map(({ name, id }) => ({ name, id, isLeader: id === this.leaderID })),
     };
 
@@ -105,6 +108,11 @@ export class Room {
         stage: this.data.stage,
       };
     }
+  }
+
+  updateOptions(options: IGameOptions) {
+    this.options = options;
+    this.updateRoomState();
   }
 
   startVoteFor(target: TVoteTarget) {

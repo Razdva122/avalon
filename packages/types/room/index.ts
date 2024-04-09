@@ -1,4 +1,5 @@
 import type { IVisualGameState } from '../game/state';
+import type { IGameOptions } from '../game/options';
 
 export * from './list';
 
@@ -23,6 +24,7 @@ type TMetaRoomState = {
   leaderID: string;
   players: TRoomPlayer[];
   vote?: TVoteInRoom;
+  options: IGameOptions;
 };
 
 export type TRoomPlayer = {

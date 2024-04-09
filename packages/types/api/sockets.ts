@@ -27,6 +27,7 @@ export interface ClientToServerEvents {
   getRoomsList: (callback: (list: TRoomsList) => void) => void;
 
   createRoom: (callback: (uuid: string) => void) => void;
+  updateOptions: (uuid: string, options: IGameOptions) => void;
   joinRoom: (uuid: string, callback: (state: TRoomState | IRoomUnavailableError) => void) => void;
   lockRoom: (uuid: string) => void;
   kickPlayer: (uuid: string, userID: string) => void;
@@ -38,7 +39,7 @@ export interface ClientToServerEvents {
   voteInRoom: (uuid: string, result: boolean) => void;
 
   joinGame: (uuid: string) => void;
-  startGame: (uuid: string, options: IGameOptions) => void;
+  startGame: (uuid: string) => void;
   leaveGame: (uuid: string) => void;
   restartGame: (uuid: string) => void;
 
