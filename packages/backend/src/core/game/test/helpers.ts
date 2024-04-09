@@ -84,7 +84,9 @@ export class GameTestHelper {
 
   pickMerlin(correctMerlin: boolean = false): this {
     const id = this.game.players.find((player) => {
-      return correctMerlin ? player.role.role === 'merlin' : player.role.role !== 'merlin';
+      return correctMerlin
+        ? player.role.role === 'merlin'
+        : player.role.role !== 'merlin' && player.role.loyalty !== 'evil';
     })!.user.id;
 
     const assassinID = this.game.players.find((player) => {
@@ -114,7 +116,11 @@ export class GameTestHelper {
 
     while (this.game.selectedPlayers.length < 2) {
       const playerToSelectId = this.game.players.find(
-        (player) => player.role.role !== 'isolde' && player.role.role !== 'tristan' && !player.features.isSelected,
+        (player) =>
+          player.role.role !== 'isolde' &&
+          player.role.role !== 'tristan' &&
+          !player.features.isSelected &&
+          player.role.loyalty !== 'evil',
       )!.user.id;
 
       this.game.selectPlayer(assassinID, playerToSelectId);
