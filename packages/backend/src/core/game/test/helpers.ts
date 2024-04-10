@@ -32,14 +32,16 @@ export class GameTestHelper {
 
   selectPlayersOnMission(evil: number = 0, extraPlayers = 0): this {
     const amount = this.game.currentMission.data.settings.players + extraPlayers;
-    const evilPlayers = this.game.players.filter((player) => player.role.loyalty === 'evil');
+    const evilPlayers = this.game.players.filter((player) => player.role.validMissionResult.includes('fail'));
 
     for (let i = 0; i < amount; i += 1) {
       if (evil > 0) {
         evil -= 1;
         this.game.selectPlayer(this.game.leader.user.id, evilPlayers[evil].user.id);
       } else {
-        const unselectedPlayer = this.game.players.find((player) => player.features.isSelected === false)!;
+        const unselectedPlayer = this.game.players.find(
+          (player) => player.features.isSelected === false && player.role.validMissionResult.includes('success'),
+        )!;
         this.game.selectPlayer(this.game.leader.user.id, unselectedPlayer?.user.id);
       }
     }
