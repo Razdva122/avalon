@@ -85,15 +85,15 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
     }
 
     const assassinate = new Assassinate(assassin, type, options);
-    assassin.features.waitForAction = false;
-
-    this.game.stage = 'end';
 
     if (assassinate.assassinatePlayers(this.game.selectedPlayers) === 'hit') {
       this.game.winner = 'evil';
     } else {
       this.game.winner = 'good';
     }
+
+    assassin.features.waitForAction = false;
+    this.game.stage = 'end';
 
     this.game.history.push(assassinate);
     this.game.stateObserver.gameStateChanged();

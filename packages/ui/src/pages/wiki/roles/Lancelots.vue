@@ -15,10 +15,9 @@
       <PreviewLink target="goodLancelot" text="Good Lancelot" /> aligns with the forces of good, while the
       <PreviewLink target="evilLancelot" text="Evil Lancelot" /> conspires with the minions of Mordred. However, the
       tides of loyalty may turn as the game progresses. <PreviewLink target="merlin" />, can see the
-      <PreviewLink target="evilLancelot" text="Evil Lancelot" /> among the ranks of Mordred's followers, while the
-      minions of Mordred recognize the presence of an <PreviewLink target="evilLancelot" text="Evil Lancelot" /> as
-      well, though they see all allies equally and cannot differentiate who the Lancelot is. On the other hand, the
-      <PreviewLink target="evilLancelot" text="Evil Lancelot" /> does not know his allies. If
+      <PreviewLink target="evilLancelot" text="Evil Lancelot" /> among the ranks of Mordred's followers, as well the
+      minions of Mordred recognize the presence of an <PreviewLink target="evilLancelot" text="Evil Lancelot" />. On the
+      other hand, the <PreviewLink target="evilLancelot" text="Evil Lancelot" /> does not know his allies. If
       <PreviewLink target="guinevere" /> is present in the game, she knows both Lancelots but does not know their
       loyatly.
     </p>

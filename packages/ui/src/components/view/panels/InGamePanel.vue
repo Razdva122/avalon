@@ -10,7 +10,12 @@
   </template>
   <template v-if="game.stage === 'onMission' && isPlayerOnMission">
     <Spoiler :size="{ width: '200px', height: '80px' }">
-      <v-btn color="success" :disabled="!isPlayerActive" @click="() => onMissionClick('success')" class="mb-2">
+      <v-btn
+        color="success"
+        :disabled="!isPlayerActive || !isPlayerCanSuccess"
+        @click="() => onMissionClick('success')"
+        class="mb-2"
+      >
         Success
       </v-btn>
       <v-btn color="error" :disabled="!isPlayerActive || !isPlayerCanFail" @click="() => onMissionClick('fail')">
@@ -87,6 +92,10 @@ export default defineComponent({
 
     const isPlayerCanFail = computed(() => {
       return player.value?.validMissionsResult?.includes('fail');
+    });
+
+    const isPlayerCanSuccess = computed(() => {
+      return player.value?.validMissionsResult?.includes('success');
     });
 
     const isUserLadyOwner = computed(() => {
@@ -166,6 +175,7 @@ export default defineComponent({
       isPlayerOnMission,
       isPlayerActive,
       isPlayerCanFail,
+      isPlayerCanSuccess,
       isSinglePlayerSelected,
       isZeroPlayerSelected,
       isLadyAvailable,
