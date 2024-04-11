@@ -5,7 +5,7 @@ let { game, gameHelper } = generateNewGame();
 
 describe('Lancelots', () => {
   beforeAll(() => {
-    const restart = generateNewGame({}, { evilLancelot: 1, goodLancelot: 1 });
+    const restart = generateNewGame({}, { evilLancelot: 1, goodLancelot: 1, guinevere: 1 });
     game = restart.game;
     gameHelper = restart.gameHelper;
   });

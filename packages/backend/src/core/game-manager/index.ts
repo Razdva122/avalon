@@ -44,7 +44,7 @@ export class GameManager {
     /**
      * Recalculate the roles if on a new stage, if there is an override for it
      */
-    if (this.game.stage !== this.roomState.stage && this.game.stageVisibilityChange[this.game.stage]) {
+    if (this.game.stageVisibilityChange[this.game.stage]) {
       this.roomState = {
         ...this.roomState,
         ...this.calculatePlayersRoles(this.game.stage),

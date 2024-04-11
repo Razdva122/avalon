@@ -19,12 +19,14 @@ export class GameHooks {
   };
 
   callHook(hookName: THookNames): boolean {
+    let result = true;
+
     for (const method of this.hooks[hookName]) {
       if (!method()) {
-        return false;
+        result = false;
       }
     }
 
-    return true;
+    return result;
   }
 }
