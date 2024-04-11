@@ -117,6 +117,7 @@ export default defineComponent({
           disabled: (!this.roles.merlin && !this.roles.merlinPure) || !this.roles.percival,
           color: 'warning',
         },
+        { role: 'trickster', label: 'Trickster', disabled: false, color: 'warning' },
         { role: 'mordred', label: 'Mordred', disabled: false, color: 'warning' },
         { role: 'oberon', label: 'Oberon', disabled: false, color: 'warning' },
       ] as const;

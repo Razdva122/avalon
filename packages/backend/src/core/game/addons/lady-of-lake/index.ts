@@ -79,7 +79,7 @@ export class LadyOfLakeAddon implements IGameAddon {
 
     const selectedPlayer = this.game.selectedPlayers[0];
 
-    return selectedPlayer.role.loyalty;
+    return selectedPlayer.role.visibleLoylaty;
   }
 
   announceLoyalty(executorID: string, loyalty: TLoyalty) {

@@ -11,6 +11,7 @@ export class MerlinPure extends Character {
     minion: 'minion',
     morgana: 'morgana',
     oberon: 'oberon',
+    trickster: 'trickster',
     evilLancelot: 'evilLancelot',
   };
 }

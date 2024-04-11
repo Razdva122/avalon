@@ -63,6 +63,12 @@ export default defineComponent({
   background-size: 165%;
 }
 
+.icon-trickster {
+  background-image: url('@/assets/roles/trickster.webp');
+  background-position: 52% 23%;
+  background-size: 165%;
+}
+
 .icon-percival {
   background-image: url('@/assets/roles/percival.webp');
   background-position: 50% 15%;

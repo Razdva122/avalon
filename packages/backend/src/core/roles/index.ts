@@ -11,6 +11,7 @@ import { Morgana } from '@/core/roles/evil/morgana';
 import { Oberon } from '@/core/roles/evil/oberon';
 import { Mordred } from '@/core/roles/evil/mordred';
 import { EvilLancelot } from '@/core/roles/evil/evilLancelot';
+import { Trickster } from '@/core/roles/evil/trickster';
 
 export const evilRoles = {
   minion: Minion,
@@ -18,6 +19,7 @@ export const evilRoles = {
   oberon: Oberon,
   mordred: Mordred,
   evilLancelot: EvilLancelot,
+  trickster: Trickster,
 } as const;
 
 /**
@@ -57,6 +59,7 @@ export const evilRolesImportance: { [key in TEvilRoles]: number } = {
   mordred: 1,
   morgana: 2,
   oberon: 3,
+  trickster: 4,
   evilLancelot: 10,
   minion: 100,
 };

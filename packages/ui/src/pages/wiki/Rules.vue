@@ -329,6 +329,9 @@
           <li v-if="roles.evilLancelot">
             <strong><PreviewLink target="evilLancelot" text="Evil Lancelot" /></strong> extend your thumb into the air.
           </li>
+          <li v-if="roles.trickster">
+            <strong><PreviewLink target="trickster" text="Trickster" /></strong> extend your thumb into the air.
+          </li>
           <li v-if="roles.morgana">
             <strong><PreviewLink target="morgana" /></strong> extend your thumb into the air.
           </li>
@@ -424,6 +427,7 @@ export default defineComponent({
       merlin: 1,
       mordred: 0,
       morgana: 1,
+      trickster: 0,
       oberon: 0,
       percival: 1,
       tristan: 0,

@@ -10,6 +10,7 @@ export class Morgana extends Character {
   visibility: TVisibility = {
     minion: 'evil',
     mordred: 'evil',
+    trickster: 'evil',
     evilLancelot: 'evilLancelot',
   };
 }

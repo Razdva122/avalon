@@ -32,4 +32,11 @@ export abstract class Character {
 
     return ['fail', 'success'];
   }
+
+  /**
+   * Loyalty during various checks
+   */
+  get visibleLoylaty(): TLoyalty {
+    return this.loyalty;
+  }
 }

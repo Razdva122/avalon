@@ -11,6 +11,7 @@ export class Minion extends Character {
     minion: 'evil',
     morgana: 'evil',
     mordred: 'evil',
+    trickster: 'evil',
     evilLancelot: 'evilLancelot',
   };
 }
