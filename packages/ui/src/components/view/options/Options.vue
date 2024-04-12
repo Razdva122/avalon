@@ -10,11 +10,12 @@
       <v-form>
         <v-tabs v-model="type" class="tabs">
           <v-tab value="roles">Roles</v-tab>
+          <v-tab value="extraRoles">Extra roles</v-tab>
           <v-tab value="addons" v-if="addons">Addons</v-tab>
           <v-tab value="features" v-if="features">Features</v-tab>
         </v-tabs>
-        <template v-if="type === 'roles'">
-          <div class="option" v-for="role in rolesSettings">
+        <template v-if="type === 'roles' || type === 'extraRoles'">
+          <div class="option" v-for="role in type === 'roles' ? rolesSettings : extraRolesSettings">
             <PlayerIcon class="role" :icon="role.role" :class="rolesShortInfo[role.role].loyalty" />
             <v-checkbox
               @input="onRoleUpdate(role.role)"
@@ -100,6 +101,18 @@ export default defineComponent({
           disabled: !this.roles.merlin && !this.roles.merlinPure,
           color: 'success',
         },
+        {
+          role: 'morgana',
+          label: 'Morgana',
+          disabled: (!this.roles.merlin && !this.roles.merlinPure) || !this.roles.percival,
+          color: 'warning',
+        },
+        { role: 'mordred', label: 'Mordred', disabled: !this.roles.merlin && !this.roles.merlinPure, color: 'warning' },
+        { role: 'oberon', label: 'Oberon', disabled: false, color: 'warning' },
+      ] as const;
+    },
+    extraRolesSettings() {
+      return [
         { role: 'tristan', label: 'Tristan', disabled: false, color: 'success', route: 'lovers' },
         { role: 'isolde', label: 'Isolde', disabled: false, color: 'success', route: 'lovers' },
         {
@@ -111,15 +124,7 @@ export default defineComponent({
         },
         { role: 'goodLancelot', label: 'Good Lancelot', disabled: false, color: 'success', route: 'lancelots' },
         { role: 'evilLancelot', label: 'Evil Lancelot', disabled: false, color: 'warning', route: 'lancelots' },
-        {
-          role: 'morgana',
-          label: 'Morgana',
-          disabled: (!this.roles.merlin && !this.roles.merlinPure) || !this.roles.percival,
-          color: 'warning',
-        },
         { role: 'trickster', label: 'Trickster', disabled: false, color: 'warning' },
-        { role: 'mordred', label: 'Mordred', disabled: false, color: 'warning' },
-        { role: 'oberon', label: 'Oberon', disabled: false, color: 'warning' },
       ] as const;
     },
     addonsSettings() {
@@ -162,6 +167,7 @@ export default defineComponent({
     removeMerlinAdditionalRoles() {
       this.roles.morgana = 0;
       this.roles.percival = 0;
+      this.roles.mordred = 0;
     },
     onRoleUpdate(roleName: string) {
       if (roleName === 'isolde') {
