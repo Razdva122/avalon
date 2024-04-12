@@ -5,7 +5,7 @@
       <Socials />
     </div>
     <div class="header-left-container d-flex align-center mr-2">
-      <SpoilerEye />
+      <SpoilerEye v-if="currentRoute === 'room'" />
       <Menu @profileClick="profileClick" />
     </div>
   </header>
@@ -51,6 +51,11 @@ export default defineComponent({
     return {
       user,
     };
+  },
+  computed: {
+    currentRoute() {
+      return this.$route.name;
+    },
   },
   methods: {
     profileClick() {

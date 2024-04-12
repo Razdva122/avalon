@@ -178,6 +178,16 @@ module.exports.routesSeo = {
       keywords: ['Mordred', 'Role', 'Rules', 'Tips'],
     },
   },
+  trickster: {
+    path: '/wiki/roles/trickster/',
+    name: 'trickster',
+    meta: {
+      prerender: true,
+      title: 'Avalon: The Resistance | Trickster',
+      description: "Rules and Tips for Trickster role in the board game 'Avalon: The Resistance'",
+      keywords: ['Trickster', 'Role', 'Rules', 'Tips'],
+    },
+  },
   oberon: {
     path: '/wiki/roles/oberon/',
     name: 'oberon',

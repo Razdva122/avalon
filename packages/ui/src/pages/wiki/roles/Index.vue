@@ -43,6 +43,10 @@
         <h2>Mordred</h2>
         <img class="role-image evil-role" src="@/assets/roles/mordred.webp" alt="mordred" />
       </router-link>
+      <router-link class="role" :to="{ name: 'trickster' }">
+        <h2>Trickster</h2>
+        <img class="role-image evil-role" src="@/assets/roles/trickster.webp" alt="trickster" />
+      </router-link>
       <router-link class="role" :to="{ name: 'morgana' }">
         <h2>Morgana</h2>
         <img class="role-image evil-role" src="@/assets/roles/morgana.webp" alt="morgana" />
