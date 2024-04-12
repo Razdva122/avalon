@@ -5,13 +5,6 @@
         Looking for fellow players to delve into 'Avalon'? Join our
         <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b> community!
       </TemporaryAlert>
-      <TemporaryAlert title="New player?" id="newbie">
-        New to 'Avalon'? Learn about the game on our
-        <b><router-link :to="{ name: 'wiki' }">Wiki pages</router-link></b> about the
-        <b><router-link :to="{ name: 'rules' }">Rules</router-link></b> and
-        <b><router-link :to="{ name: 'roles' }">Roles</router-link></b
-        >!
-      </TemporaryAlert>
     </div>
 
     <v-btn @click="createRoom" size="x-large"> Create room </v-btn>

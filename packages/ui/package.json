@@ -27,6 +27,7 @@
     "@vue/cli-plugin-typescript": "~5.0.0",
     "@vue/cli-plugin-vuex": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "copy-webpack-plugin": "^12.0.2",
     "puppeteer": "^22.5.0",
     "sass": "^1.69.5",
     "sass-loader": "^12.6.0",

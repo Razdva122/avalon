@@ -3,6 +3,7 @@
 const { defineConfig } = require('@vue/cli-service');
 const webpack = require('webpack');
 const SitemapPlugin = require('sitemap-webpack-plugin').default;
+const CopyPlugin = require('copy-webpack-plugin');
 const PrerendererWebpackPlugin = require('@prerenderer/webpack-plugin');
 const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 const { routesSeo } = require('./src/router/seo');
@@ -16,13 +17,10 @@ module.exports = defineConfig({
     loaderOptions: {
       sass: {
         additionalData: `
-          @import "@/assets/scss/main.scss";
+          @import "@/helpers/scss/main.scss";
         `,
       },
     },
-  },
-  pluginOptions: {
-    someValue: 'My Custom Value',
   },
   chainWebpack: (config) => {
     config.plugin('html').tap((args) => {
@@ -67,6 +65,14 @@ module.exports = defineConfig({
             changefreq: 'weekly',
             priority: 0.8,
           },
+        }),
+        new CopyPlugin({
+          patterns: [
+            {
+              from: 'src/assets',
+              to: 'static',
+            },
+          ],
         }),
         new PrerendererWebpackPlugin({
           routes: Object.values(routesSeo)
