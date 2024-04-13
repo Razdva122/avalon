@@ -39,6 +39,17 @@ export const store = createStore<IState>({
       }
     },
 
+    updateUserSettings<T extends keyof IUser['settings']>(
+      state: IState,
+      { key, value }: { key: T; value: IUser['settings'][T] },
+    ) {
+      if (state.user) {
+        state.user.settings = state.user.settings || {};
+        state.user.settings[key] = value;
+        updateUserData(state.user, false);
+      }
+    },
+
     clearUserData() {
       localStorage.removeItem(userStoragePath);
       clearUserData();

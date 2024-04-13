@@ -8,6 +8,9 @@ export interface IState {
 export interface IUser {
   id: string;
   name: string;
+  settings?: {
+    hideIndexInHistory?: boolean;
+  };
 }
 
 export type TAlerts = {

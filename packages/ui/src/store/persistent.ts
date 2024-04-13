@@ -2,12 +2,15 @@ import { userStoragePath, alertStoragePath } from '@/store/const';
 import type { IUser, TAlerts } from '@/store/interface';
 import Cookies from 'js-cookie';
 
-export function updateUserData(user: IUser) {
+export function updateUserData(user: IUser, withCookie: boolean = true) {
   localStorage.setItem(userStoragePath, JSON.stringify(user));
-  Cookies.remove('user_id');
-  Cookies.remove('user_name');
-  Cookies.set('user_id', user.id);
-  Cookies.set('user_name', user.name);
+
+  if (withCookie) {
+    Cookies.remove('user_id');
+    Cookies.remove('user_name');
+    Cookies.set('user_id', user.id);
+    Cookies.set('user_name', user.name);
+  }
 }
 
 export function clearUserData() {

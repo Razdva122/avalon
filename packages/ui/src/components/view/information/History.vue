@@ -57,7 +57,8 @@ export default defineComponent({
   methods: {
     calculateNameByID(playerID: string) {
       const player = this.players.find((player) => player.id === playerID)!;
-      const prefix = this.displayIndex ? `${player.index}. ` : '';
+      const hideIndexInHistory = this.$store.state.user?.settings?.hideIndexInHistory;
+      const prefix = this.displayIndex && !hideIndexInHistory ? `${player.index}. ` : '';
       return prefix + player.name;
     },
     closeHistory() {

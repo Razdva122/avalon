@@ -7,6 +7,13 @@
           <v-text-field v-model="username" :rules="rules" label="Username" class="w-100 mb-2"></v-text-field>
           <v-checkbox v-if="isUserExist" v-model="hideSpoilers" :hide-details="true" label="Hide spoilers">
           </v-checkbox>
+          <v-checkbox
+            v-if="isUserExist"
+            v-model="hideIndexInHistory"
+            :hide-details="true"
+            label="Hide Indexes In History"
+          >
+          </v-checkbox>
           <v-btn type="submit">{{ isUserExist ? 'Update' : 'Submit' }}</v-btn>
         </v-form>
       </v-sheet>
@@ -49,6 +56,14 @@ export default defineComponent({
       },
       set(value: boolean) {
         this.$store.commit('updateHideSpoilers', value);
+      },
+    },
+    hideIndexInHistory: {
+      get() {
+        return Boolean(this.$store.state.user?.settings?.hideIndexInHistory);
+      },
+      set(value: boolean) {
+        this.$store.commit('updateUserSettings', { key: 'hideIndexInHistory', value });
       },
     },
   },
