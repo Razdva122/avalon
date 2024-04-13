@@ -44,15 +44,23 @@ const defaultKeywords = ['The Resistance', 'Avalon', 'Online'];
 
 router.beforeEach((to, from, next) => {
   const keywords = <string[]>to.meta.keywords ?? [];
+  const image = <string>to.meta.image || 'roles/merlin.webp';
   const siteAdress = 'https://avalon-game.com';
 
+  document.querySelector('head meta[property="og:image"]')!.setAttribute('content', `${siteAdress}/static/${image}`);
+
   document.title = <string>to.meta.title;
+  document.querySelector('head meta[property="og:title"]')!.setAttribute('content', <string>to.meta.title);
+
   document.querySelector('head meta[name="description"]')!.setAttribute('content', <string>to.meta.description);
+  document.querySelector('head meta[property="og:description"]')!.setAttribute('content', <string>to.meta.description);
+
   document
     .querySelector('head meta[name="keywords"]')!
     .setAttribute('content', [...keywords, ...defaultKeywords].join(', '));
 
   document.querySelector('link[rel="canonical"]')!.setAttribute('href', siteAdress + to.path);
+  document.querySelector('head meta[property="og:url"]')!.setAttribute('content', siteAdress + to.path);
 
   next();
 });

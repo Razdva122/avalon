@@ -63,6 +63,7 @@ module.exports.routesSeo = {
       description:
         "Enhance 'Avalon: The Resistance' with exciting add-ons and extra cards. Learn how each addition can spice up your game sessions and bring new challenges to the table.",
       keywords: ['Addons', 'Module', 'Rules'],
+      image: 'features/lady_of_lake.webp',
     },
   },
   lady: {
@@ -74,6 +75,7 @@ module.exports.routesSeo = {
       description:
         "Rules for 'Lady of the Lake' card in 'Avalon: The Resistance'. Rules for 'Inquisitor Token' card in 'The Resistance'",
       keywords: ['Addons', 'Module', 'Lady of the Lake', 'Inquisitor Token', 'Rules'],
+      image: 'features/lady_of_lake.webp',
     },
   },
   excalibur: {
@@ -85,6 +87,7 @@ module.exports.routesSeo = {
       description:
         "Rules for 'Excalibur' card in 'Avalon: The Resistance'. Rules for 'Sergeant' card in 'The Resistance'",
       keywords: ['Addons', 'Module', 'Excalibur', 'Sergeant', 'Rules'],
+      image: 'features/excalibur.webp',
     },
   },
   roles: {
@@ -106,6 +109,7 @@ module.exports.routesSeo = {
       title: 'Avalon: The Resistance | Merlin',
       description: "Rules and Tips for Merlin role in the board game 'Avalon: The Resistance'",
       keywords: ['Merlin', 'Role', 'Rules', 'Tips'],
+      image: 'roles/merlin.webp',
     },
   },
   merlin_pure: {
@@ -116,6 +120,7 @@ module.exports.routesSeo = {
       title: 'Avalon: The Resistance | Merlin Pure',
       description: "Rules and Tips for Merlin Pure role in the board game 'Avalon: The Resistance'",
       keywords: ['Merlin Pure', 'Role', 'Rules', 'Tips'],
+      image: 'roles/merlin_pure.webp',
     },
   },
   lovers: {
@@ -126,6 +131,7 @@ module.exports.routesSeo = {
       title: 'Avalon: The Resistance | Lovers (Tristan and Isolde)',
       description: "Rules and Tips for Lovers (Tristan and Isolde) roles in the board game 'Avalon: The Resistance'",
       keywords: ['Lovers', 'Tristan', 'Isolde', 'Role', 'Rules', 'Tips'],
+      image: 'roles/tristan.webp',
     },
   },
   lancelots: {
@@ -136,6 +142,7 @@ module.exports.routesSeo = {
       title: 'Avalon: The Resistance | Lancelots',
       description: "Rules and Tips for Lancelots roles in the board game 'Avalon: The Resistance'",
       keywords: ['Lancelots', 'Role', 'Rules', 'Tips'],
+      image: 'roles/unknown_lancelot.webp',
     },
   },
   guinevere: {
@@ -146,6 +153,7 @@ module.exports.routesSeo = {
       title: 'Avalon: The Resistance | Guinevere',
       description: "Rules and Tips for Guinevere role in the board game 'Avalon: The Resistance'",
       keywords: ['Guinevere', 'Role', 'Rules', 'Tips'],
+      image: 'roles/guinevere.webp',
     },
   },
   percival: {
@@ -156,6 +164,7 @@ module.exports.routesSeo = {
       title: 'Avalon: The Resistance | Percival',
       description: "Rules and Tips for Percival role in the board game 'Avalon: The Resistance'",
       keywords: ['Percival', 'Role', 'Rules', 'Tips'],
+      image: 'roles/percival.webp',
     },
   },
   servant: {
@@ -166,6 +175,7 @@ module.exports.routesSeo = {
       title: 'Avalon: The Resistance | Servant',
       description: "Rules and Tips for Servant role in the board game 'Avalon: The Resistance'",
       keywords: ['Servant', 'Role', 'Rules', 'Tips'],
+      image: 'roles/servant.webp',
     },
   },
   mordred: {
@@ -176,6 +186,7 @@ module.exports.routesSeo = {
       title: 'Avalon: The Resistance | Mordred',
       description: "Rules and Tips for Mordred role in the board game 'Avalon: The Resistance'",
       keywords: ['Mordred', 'Role', 'Rules', 'Tips'],
+      image: 'roles/mordred.webp',
     },
   },
   trickster: {
@@ -186,6 +197,7 @@ module.exports.routesSeo = {
       title: 'Avalon: The Resistance | Trickster',
       description: "Rules and Tips for Trickster role in the board game 'Avalon: The Resistance'",
       keywords: ['Trickster', 'Role', 'Rules', 'Tips'],
+      image: 'roles/trickster.webp',
     },
   },
   oberon: {
@@ -196,6 +208,7 @@ module.exports.routesSeo = {
       title: 'Avalon: The Resistance | Oberon',
       description: "Rules and Tips for Oberon role in the board game 'Avalon: The Resistance'",
       keywords: ['Oberon', 'Role', 'Rules', 'Tips'],
+      image: 'roles/oberon.webp',
     },
   },
   morgana: {
@@ -207,6 +220,7 @@ module.exports.routesSeo = {
       description: "Rules and Tips for Morgana role in the board game 'Avalon: The Resistance'",
       keywords: ['Morgana', 'Role', 'Rules', 'Tips'],
     },
+    image: 'roles/morgana.webp',
   },
   minion: {
     path: '/wiki/roles/minion/',
@@ -217,6 +231,7 @@ module.exports.routesSeo = {
       description: "Rules and Tips for  Minion of Mordred role in the board game 'Avalon: The Resistance'",
       keywords: ['Minion of Mordred', 'Role', 'Rules', 'Tips'],
     },
+    image: 'roles/minion.webp',
   },
   notFound: {
     path: '/404/',
