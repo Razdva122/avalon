@@ -10,6 +10,7 @@ export interface IUser {
   name: string;
   settings?: {
     hideIndexInHistory?: boolean;
+    style?: 'default' | 'anime';
   };
 }
 

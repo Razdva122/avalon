@@ -14,6 +14,7 @@
             label="Hide Indexes In History"
           >
           </v-checkbox>
+          <v-checkbox v-if="isUserExist" v-model="style" :hide-details="true" label="Anime mode"> </v-checkbox>
           <v-btn type="submit">{{ isUserExist ? 'Update' : 'Submit' }}</v-btn>
         </v-form>
       </v-sheet>
@@ -64,6 +65,14 @@ export default defineComponent({
       },
       set(value: boolean) {
         this.$store.commit('updateUserSettings', { key: 'hideIndexInHistory', value });
+      },
+    },
+    style: {
+      get() {
+        return this.$store.state.user?.settings?.style === 'anime';
+      },
+      set(value: boolean) {
+        this.$store.commit('updateUserSettings', { key: 'style', value: value ? 'anime' : 'default' });
       },
     },
   },

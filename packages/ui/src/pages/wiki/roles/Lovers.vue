@@ -5,8 +5,8 @@
       <div class="good-loyalty-icon"></div>
       Lovers (Tristan and Isolde) Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/isolde.webp" alt="isolde" />
-    <img class="preview-image" src="@/assets/roles/tristan.webp" alt="tristan" />
+    <img class="preview-image" :src="calculateRoleUrl('isolde')" alt="isolde" />
+    <img class="preview-image" :src="calculateRoleUrl('tristan')" alt="tristan" />
     <div class="credits">credits to: @Vermilion0</div>
 
     <h2>General Information:</h2>
@@ -71,11 +71,15 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+  },
+  methods: {
+    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>

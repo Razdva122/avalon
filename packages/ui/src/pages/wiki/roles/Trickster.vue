@@ -5,7 +5,7 @@
       <div class="evil-loyalty-icon"></div>
       Trickster Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/trickster.webp" alt="trickster" />
+    <img class="preview-image" :src="calculateRoleUrl('trickster')" alt="trickster" />
 
     <h2>General Information:</h2>
     <p>
@@ -62,11 +62,15 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+  },
+  methods: {
+    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>

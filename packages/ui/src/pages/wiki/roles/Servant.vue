@@ -5,7 +5,7 @@
       <div class="good-loyalty-icon"></div>
       Servant role
     </h1>
-    <img class="preview-image" src="@/assets/roles/servant.webp" alt="Servant" />
+    <img class="preview-image" :src="calculateRoleUrl('servant')" alt="Servant" />
 
     <h2>General Tips:</h2>
     <ul>
@@ -66,11 +66,15 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+  },
+  methods: {
+    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>

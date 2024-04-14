@@ -5,7 +5,7 @@
       <div class="good-loyalty-icon"></div>
       Merlin Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/merlin.webp" alt="merlin" />
+    <img class="preview-image" :src="calculateRoleUrl('merlin')" alt="merlin" />
 
     <h2>General Information:</h2>
     <p>
@@ -79,11 +79,15 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+  },
+  methods: {
+    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>

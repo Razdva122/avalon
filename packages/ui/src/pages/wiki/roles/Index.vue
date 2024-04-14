@@ -5,59 +5,59 @@
     <div class="roles-container">
       <router-link class="role" :to="{ name: 'merlin' }">
         <h2>Merlin</h2>
-        <img class="role-image" src="@/assets/roles/merlin.webp" alt="merlin" />
+        <img class="role-image" :src="calculateRoleUrl('merlin')" alt="merlin" />
       </router-link>
       <router-link class="role" :to="{ name: 'merlin_pure' }">
         <h2>Merlin Pure</h2>
-        <img class="role-image" src="@/assets/roles/merlin_pure.webp" alt="merlin pure" />
+        <img class="role-image" :src="calculateRoleUrl('merlinPure')" alt="merlin pure" />
       </router-link>
       <router-link class="role" :to="{ name: 'guinevere' }">
         <h2>Guinevere</h2>
-        <img class="role-image" src="@/assets/roles/guinevere.webp" alt="guinevere" />
+        <img class="role-image" :src="calculateRoleUrl('guinevere')" alt="guinevere" />
       </router-link>
       <router-link class="role" :to="{ name: 'percival' }">
         <h2>Percival</h2>
-        <img class="role-image" src="@/assets/roles/percival.webp" alt="percival" />
+        <img class="role-image" :src="calculateRoleUrl('percival')" alt="percival" />
       </router-link>
       <router-link class="role" :to="{ name: 'lovers' }">
         <h2>Tristan</h2>
-        <img class="role-image" src="@/assets/roles/tristan.webp" alt="tristan" />
+        <img class="role-image" :src="calculateRoleUrl('tristan')" alt="tristan" />
       </router-link>
       <router-link class="role" :to="{ name: 'lovers' }">
         <h2>Isolde</h2>
-        <img class="role-image" src="@/assets/roles/isolde.webp" alt="isolde" />
+        <img class="role-image" :src="calculateRoleUrl('isolde')" alt="isolde" />
       </router-link>
       <router-link class="role" :to="{ name: 'servant' }">
         <h2>Servant</h2>
-        <img class="role-image" src="@/assets/roles/servant.webp" alt="servant" />
+        <img class="role-image" :src="calculateRoleUrl('servant')" alt="servant" />
       </router-link>
       <router-link class="role" :to="{ name: 'lancelots' }">
         <h2>Good Lancelot</h2>
-        <img class="role-image" src="@/assets/roles/good_lancelot.webp" alt="good lancelot" />
+        <img class="role-image" :src="calculateRoleUrl('goodLancelot')" alt="good lancelot" />
       </router-link>
       <router-link class="role" :to="{ name: 'lancelots' }">
         <h2>Evil Lancelot</h2>
-        <img class="role-image evil-role" src="@/assets/roles/evil_lancelot.webp" alt="evil lancelot" />
+        <img class="role-image evil-role" :src="calculateRoleUrl('evilLancelot')" alt="evil lancelot" />
       </router-link>
       <router-link class="role" :to="{ name: 'mordred' }">
         <h2>Mordred</h2>
-        <img class="role-image evil-role" src="@/assets/roles/mordred.webp" alt="mordred" />
+        <img class="role-image evil-role" :src="calculateRoleUrl('mordred')" alt="mordred" />
       </router-link>
       <router-link class="role" :to="{ name: 'trickster' }">
         <h2>Trickster</h2>
-        <img class="role-image evil-role" src="@/assets/roles/trickster.webp" alt="trickster" />
+        <img class="role-image evil-role" :src="calculateRoleUrl('trickster')" alt="trickster" />
       </router-link>
       <router-link class="role" :to="{ name: 'morgana' }">
         <h2>Morgana</h2>
-        <img class="role-image evil-role" src="@/assets/roles/morgana.webp" alt="morgana" />
+        <img class="role-image evil-role" :src="calculateRoleUrl('morgana')" alt="morgana" />
       </router-link>
       <router-link class="role" :to="{ name: 'oberon' }">
         <h2>Oberon</h2>
-        <img class="role-image evil-role" src="@/assets/roles/oberon.webp" alt="oberon" />
+        <img class="role-image evil-role" :src="calculateRoleUrl('oberon')" alt="oberon" />
       </router-link>
       <router-link class="role" :to="{ name: 'minion' }">
         <h2>Minion</h2>
-        <img class="role-image evil-role" src="@/assets/roles/minion.webp" alt="minion" />
+        <img class="role-image evil-role" :src="calculateRoleUrl('minion')" alt="minion" />
       </router-link>
     </div>
   </div>
@@ -66,10 +66,14 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
+import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
+  },
+  methods: {
+    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>

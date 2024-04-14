@@ -5,7 +5,7 @@
       <div class="evil-loyalty-icon"></div>
       Minion of Mordred Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/minion.webp" alt="Minion of Mordred" />
+    <img class="preview-image" :src="calculateRoleUrl('minion')" alt="Minion of Mordred" />
 
     <h2>General Tips:</h2>
     <ul>
@@ -64,11 +64,15 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+  },
+  methods: {
+    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>

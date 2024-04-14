@@ -1,5 +1,5 @@
 <template>
-  <div :title="icon" class="player-icon-image" :class="'icon-' + icon"></div>
+  <div :title="icon" class="player-icon-image" :class="classes"></div>
 </template>
 
 <script lang="ts">
@@ -12,6 +12,11 @@ export default defineComponent({
     icon: {
       required: true,
       type: String as PropType<TPlayerIcon>,
+    },
+  },
+  computed: {
+    classes() {
+      return `icon-${this.icon} style-${this.$store.state.user?.settings?.style}`;
     },
   },
 });
@@ -138,5 +143,91 @@ export default defineComponent({
   background-image: url('@/assets/features/excalibur.webp');
   background-position: center;
   background-size: 100%;
+}
+
+.style-anime {
+  &.icon-merlin {
+    background-image: url('@/assets/roles/anime/merlin.webp');
+    background-size: 175%;
+    background-position: 40% 0%;
+  }
+
+  &.icon-merlinPure {
+    background-image: url('@/assets/roles/anime/merlin_pure.webp');
+    background-size: 155%;
+    background-position: 33% 0%;
+  }
+
+  &.icon-minion {
+    background-image: url('@/assets/roles/anime/minion.webp');
+    background-size: 190%;
+    background-position: 43% 0%;
+  }
+
+  &.icon-servant {
+    background-image: url('@/assets/roles/anime/servant.webp');
+    background-size: 190%;
+    background-position: 55% 0%;
+  }
+
+  &.icon-percival {
+    background-image: url('@/assets/roles/anime/percival.webp');
+    background-size: 215%;
+    background-position: 50% 0%;
+  }
+
+  &.icon-morgana {
+    background-image: url('@/assets/roles/anime/morgana.webp');
+    background-size: 140%;
+    background-position: 50% 0%;
+  }
+
+  &.icon-mordred {
+    background-image: url('@/assets/roles/anime/mordred.webp');
+    background-size: 220%;
+    background-position: 50% 0%;
+  }
+
+  &.icon-oberon {
+    background-image: url('@/assets/roles/anime/oberon.webp');
+    background-size: 175%;
+    background-position: 50% 0%;
+  }
+
+  &.icon-tristan {
+    background-image: url('@/assets/roles/anime/tristan.webp');
+    background-size: 210%;
+    background-position: 50% 5%;
+  }
+
+  &.icon-isolde {
+    background-image: url('@/assets/roles/anime/isolde.webp');
+    background-size: 160%;
+    background-position: 41% 0%;
+  }
+
+  &.icon-evilLancelot {
+    background-image: url('@/assets/roles/anime/evil_lancelot.webp');
+    background-size: 150%;
+    background-position: 52% 0%;
+  }
+
+  &.icon-goodLancelot {
+    background-image: url('@/assets/roles/anime/good_lancelot.webp');
+    background-size: 150%;
+    background-position: 45% 0%;
+  }
+
+  &.icon-guinevere {
+    background-size: 160%;
+    background-position: 50% 0%;
+    background-image: url('@/assets/roles/anime/guinevere.webp');
+  }
+
+  &.icon-trickster {
+    background-image: url('@/assets/roles/anime/trickster.webp');
+    background-size: 195%;
+    background-position: 56% 20%;
+  }
 }
 </style>

@@ -6,8 +6,8 @@
       <div class="evil-loyalty-icon"></div>
       Lancelots
     </h1>
-    <img class="preview-image" src="@/assets/roles/evil_lancelot.webp" alt="evil lancelot" />
-    <img class="preview-image" src="@/assets/roles/good_lancelot.webp" alt="good lancelot" />
+    <img class="preview-image" :src="calculateRoleUrl('evilLancelot')" alt="evil lancelot" />
+    <img class="preview-image" :src="calculateRoleUrl('goodLancelot')" alt="good lancelot" />
 
     <h2>General Information:</h2>
     <p>
@@ -85,11 +85,15 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+  },
+  methods: {
+    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>

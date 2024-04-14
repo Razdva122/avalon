@@ -5,7 +5,7 @@
       <div class="evil-loyalty-icon"></div>
       Oberon Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/oberon.webp" alt="oberon" />
+    <img class="preview-image" :src="calculateRoleUrl('oberon')" alt="oberon" />
 
     <h2>General Information:</h2>
     <p>
@@ -70,11 +70,15 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+  },
+  methods: {
+    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>

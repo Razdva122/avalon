@@ -5,7 +5,7 @@
       <div class="good-loyalty-icon"></div>
       Guinevere Role
     </h1>
-    <img class="preview-image" src="@/assets/roles/guinevere.webp" alt="guinevere" />
+    <img class="preview-image" :src="calculateRoleUrl('guinevere')" alt="guinevere" />
     <div class="credits">credits to: @Robrun</div>
 
     <h2>General Information:</h2>
@@ -61,11 +61,15 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+  },
+  methods: {
+    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>
