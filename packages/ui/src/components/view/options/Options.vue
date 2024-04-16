@@ -115,6 +115,7 @@ export default defineComponent({
       return [
         { role: 'tristan', label: 'Tristan', disabled: false, color: 'success', route: 'lovers' },
         { role: 'isolde', label: 'Isolde', disabled: false, color: 'success', route: 'lovers' },
+        { role: 'troublemaker', label: 'Troublemaker', disabled: false, color: 'success' },
         {
           role: 'guinevere',
           label: 'Guinevere',

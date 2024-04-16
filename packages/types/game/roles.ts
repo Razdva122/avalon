@@ -19,7 +19,8 @@ export type TGoodOptionalRoles =
   | 'tristan'
   | 'isolde'
   | 'goodLancelot'
-  | 'guinevere';
+  | 'guinevere'
+  | 'troublemaker';
 
 /**
  * Good required roles

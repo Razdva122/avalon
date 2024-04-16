@@ -121,6 +121,12 @@ export default defineComponent({
   background-size: 165%;
 }
 
+.icon-troublemaker {
+  background-image: url('@/assets/roles/troublemaker.webp');
+  background-position: 53% 0%;
+  background-size: 165%;
+}
+
 .icon-evil {
   background-image: url('@/assets/red_team_no_background.webp');
   background-position: 50% 52%;
@@ -166,8 +172,8 @@ export default defineComponent({
 
   &.icon-servant {
     background-image: url('@/assets/roles/anime/servant.webp');
-    background-size: 190%;
-    background-position: 55% 0%;
+    background-size: 180%;
+    background-position: 45% 0%;
   }
 
   &.icon-percival {
@@ -180,6 +186,12 @@ export default defineComponent({
     background-image: url('@/assets/roles/anime/morgana.webp');
     background-size: 140%;
     background-position: 50% 0%;
+  }
+
+  &.icon-mysteryWizard {
+    background-image: url('@/assets/roles/anime/mystery.webp');
+    background-position: 50% 8%;
+    background-size: 190%;
   }
 
   &.icon-mordred {
@@ -216,6 +228,18 @@ export default defineComponent({
     background-image: url('@/assets/roles/anime/good_lancelot.webp');
     background-size: 150%;
     background-position: 45% 0%;
+  }
+
+  &.icon-unknownLancelot {
+    background-image: url('@/assets/roles/anime/unknown_lancelot.webp');
+    background-size: 150%;
+    background-position: 45% 0%;
+  }
+
+  &.icon-troublemaker {
+    background-image: url('@/assets/roles/anime/troublemaker.webp');
+    background-position: 43% 0%;
+    background-size: 230%;
   }
 
   &.icon-guinevere {

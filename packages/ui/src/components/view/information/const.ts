@@ -17,6 +17,10 @@ export const rolesShortInfo: { [key in TVisibleRole]: { loyalty: TLoyalty | 'unk
     loyalty: 'good',
     info: 'Loyal Servant of Arthur',
   },
+  troublemaker: {
+    loyalty: 'good',
+    info: 'Obliged to lie about his loyalty',
+  },
   guinevere: {
     loyalty: 'good',
     info: 'Knows two Lancelots but does not know their loyalty',
