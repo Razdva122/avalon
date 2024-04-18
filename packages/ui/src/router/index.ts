@@ -17,6 +17,7 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.percival, component: () => import('@/pages/wiki/roles/Percival.vue') },
   { ...routesSeo.lancelots, component: () => import('@/pages/wiki/roles/Lancelots.vue') },
   { ...routesSeo.lovers, component: () => import('@/pages/wiki/roles/Lovers.vue') },
+  { ...routesSeo.troublemaker, component: () => import('@/pages/wiki/roles/Troublemaker.vue') },
   { ...routesSeo.servant, component: () => import('@/pages/wiki/roles/Servant.vue') },
   { ...routesSeo.morgana, component: () => import('@/pages/wiki/roles/Morgana.vue') },
   { ...routesSeo.mordred, component: () => import('@/pages/wiki/roles/Mordred.vue') },

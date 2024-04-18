@@ -27,6 +27,10 @@
         <h2>Isolde</h2>
         <img class="role-image" :src="calculateRoleUrl('isolde')" alt="isolde" />
       </router-link>
+      <router-link class="role" :to="{ name: 'troublemaker' }">
+        <h2>Troublemaker</h2>
+        <img class="role-image" :src="calculateRoleUrl('troublemaker')" alt="troublemaker" />
+      </router-link>
       <router-link class="role" :to="{ name: 'servant' }">
         <h2>Servant</h2>
         <img class="role-image" :src="calculateRoleUrl('servant')" alt="servant" />

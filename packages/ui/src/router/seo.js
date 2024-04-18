@@ -178,6 +178,17 @@ module.exports.routesSeo = {
       image: 'roles/servant.webp',
     },
   },
+  troublemaker: {
+    path: '/wiki/roles/troublemaker/',
+    name: 'troublemaker',
+    meta: {
+      prerender: true,
+      title: 'Avalon: The Resistance | Troublemaker',
+      description: "Rules and Tips for Troublemaker role in the board game 'Avalon: The Resistance'",
+      keywords: ['Troublemaker', 'Role', 'Rules', 'Tips'],
+      image: 'roles/troublemaker.webp',
+    },
+  },
   mordred: {
     path: '/wiki/roles/mordred/',
     name: 'mordred',
