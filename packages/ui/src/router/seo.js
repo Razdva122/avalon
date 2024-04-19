@@ -2,6 +2,7 @@ module.exports.routesSeo = {
   lobby: {
     path: '/',
     name: 'lobby',
+    priority: 1,
     meta: {
       prerender: true,
       title: 'Play Avalon Online!',
@@ -13,6 +14,7 @@ module.exports.routesSeo = {
   about: {
     path: '/about/',
     name: 'about',
+    priority: 0.7,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | About',
@@ -35,6 +37,7 @@ module.exports.routesSeo = {
   wiki: {
     path: '/wiki/',
     name: 'wiki',
+    priority: 0.8,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Wiki',
@@ -46,6 +49,7 @@ module.exports.routesSeo = {
   rules: {
     path: '/wiki/rules/',
     name: 'rules',
+    priority: 1,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Rules',
@@ -57,6 +61,7 @@ module.exports.routesSeo = {
   addons: {
     path: '/wiki/addons/',
     name: 'addons',
+    priority: 0.7,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Addons for game',
@@ -69,6 +74,7 @@ module.exports.routesSeo = {
   lady: {
     path: '/wiki/addons/lady/',
     name: 'lady',
+    priority: 0.6,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Lady of the Lake',
@@ -81,6 +87,7 @@ module.exports.routesSeo = {
   excalibur: {
     path: '/wiki/addons/excalibur/',
     name: 'excalibur',
+    priority: 0.5,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Excalibur',
@@ -93,6 +100,7 @@ module.exports.routesSeo = {
   roles: {
     path: '/wiki/roles/',
     name: 'roles',
+    priority: 0.7,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Roles',
@@ -104,6 +112,7 @@ module.exports.routesSeo = {
   merlin: {
     path: '/wiki/roles/merlin/',
     name: 'merlin',
+    priority: 0.7,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Merlin',
@@ -115,6 +124,7 @@ module.exports.routesSeo = {
   merlin_pure: {
     path: '/wiki/roles/merlin_pure/',
     name: 'merlin_pure',
+    priority: 0.3,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Merlin Pure',
@@ -126,6 +136,7 @@ module.exports.routesSeo = {
   lovers: {
     path: '/wiki/roles/lovers/',
     name: 'lovers',
+    priority: 0.3,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Lovers (Tristan and Isolde)',
@@ -137,6 +148,7 @@ module.exports.routesSeo = {
   lancelots: {
     path: '/wiki/roles/lancelots/',
     name: 'lancelots',
+    priority: 0.6,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Lancelots',
@@ -148,6 +160,7 @@ module.exports.routesSeo = {
   guinevere: {
     path: '/wiki/roles/guinevere/',
     name: 'guinevere',
+    priority: 0.3,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Guinevere',
@@ -159,6 +172,7 @@ module.exports.routesSeo = {
   percival: {
     path: '/wiki/roles/percival/',
     name: 'percival',
+    priority: 0.7,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Percival',
@@ -170,6 +184,7 @@ module.exports.routesSeo = {
   servant: {
     path: '/wiki/roles/servant/',
     name: 'servant',
+    priority: 0.6,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Servant',
@@ -181,6 +196,7 @@ module.exports.routesSeo = {
   troublemaker: {
     path: '/wiki/roles/troublemaker/',
     name: 'troublemaker',
+    priority: 0.2,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Troublemaker',
@@ -192,6 +208,7 @@ module.exports.routesSeo = {
   mordred: {
     path: '/wiki/roles/mordred/',
     name: 'mordred',
+    priority: 0.7,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Mordred',
@@ -203,6 +220,7 @@ module.exports.routesSeo = {
   trickster: {
     path: '/wiki/roles/trickster/',
     name: 'trickster',
+    priority: 0.2,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Trickster',
@@ -214,6 +232,7 @@ module.exports.routesSeo = {
   oberon: {
     path: '/wiki/roles/oberon/',
     name: 'oberon',
+    priority: 0.6,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Oberon',
@@ -225,6 +244,7 @@ module.exports.routesSeo = {
   morgana: {
     path: '/wiki/roles/morgana/',
     name: 'morgana',
+    priority: 0.7,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Morgana',
@@ -236,6 +256,7 @@ module.exports.routesSeo = {
   minion: {
     path: '/wiki/roles/minion/',
     name: 'minion',
+    priority: 0.5,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Minion of Mordred',
