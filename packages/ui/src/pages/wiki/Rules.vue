@@ -326,6 +326,9 @@
           <li v-if="roles.oberon">
             <strong><PreviewLink target="oberon" /></strong> extend your thumb into the air.
           </li>
+          <li v-if="roles.lunatic">
+            <strong><PreviewLink target="lunatic" /></strong> extend your thumb into the air.
+          </li>
           <li v-if="roles.evilLancelot">
             <strong><PreviewLink target="evilLancelot" text="Evil Lancelot" /></strong> extend your thumb into the air.
           </li>
@@ -435,6 +438,7 @@ export default defineComponent({
       evilLancelot: 0,
       goodLancelot: 0,
       guinevere: 0,
+      lunatic: 0,
     };
 
     return {
