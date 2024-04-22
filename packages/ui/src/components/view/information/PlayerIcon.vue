@@ -109,6 +109,12 @@ export default defineComponent({
   background-size: 135%;
 }
 
+.icon-lunatic {
+  background-image: url('@/assets/roles/lunatic.webp');
+  background-position: 52% 15%;
+  background-size: 140%;
+}
+
 .icon-tristan {
   background-image: url('@/assets/roles/tristan.webp');
   background-position: 40% 5%;
@@ -204,6 +210,12 @@ export default defineComponent({
     background-image: url('@/assets/roles/anime/oberon.webp');
     background-size: 175%;
     background-position: 50% 0%;
+  }
+
+  &.icon-lunatic {
+    background-image: url('@/assets/roles/anime/lunatic.webp');
+    background-size: 145%;
+    background-position: 55% 5%;
   }
 
   &.icon-tristan {

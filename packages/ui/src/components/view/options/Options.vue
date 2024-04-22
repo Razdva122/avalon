@@ -101,6 +101,8 @@ export default defineComponent({
           disabled: !this.roles.merlin && !this.roles.merlinPure,
           color: 'success',
         },
+        { role: 'tristan', label: 'Tristan', disabled: false, color: 'success', route: 'lovers' },
+        { role: 'isolde', label: 'Isolde', disabled: false, color: 'success', route: 'lovers' },
         {
           role: 'morgana',
           label: 'Morgana',
@@ -113,8 +115,6 @@ export default defineComponent({
     },
     extraRolesSettings() {
       return [
-        { role: 'tristan', label: 'Tristan', disabled: false, color: 'success', route: 'lovers' },
-        { role: 'isolde', label: 'Isolde', disabled: false, color: 'success', route: 'lovers' },
         { role: 'troublemaker', label: 'Troublemaker', disabled: false, color: 'success' },
         {
           role: 'guinevere',
@@ -125,7 +125,8 @@ export default defineComponent({
         },
         { role: 'goodLancelot', label: 'Good Lancelot', disabled: false, color: 'success', route: 'lancelots' },
         { role: 'evilLancelot', label: 'Evil Lancelot', disabled: false, color: 'warning', route: 'lancelots' },
-        { role: 'trickster', label: 'Trickster', disabled: false, color: 'warning' },
+        { role: 'trickster', label: 'Trickster', disabled: false, color: 'warning', route: 'trickster' },
+        { role: 'lunatic', label: 'Lunatic', disabled: false, color: 'warning', route: 'lunatic' },
       ] as const;
     },
     addonsSettings() {

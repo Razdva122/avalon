@@ -1,17 +1,21 @@
 import { Character } from '@/core/roles/abstract';
 import type { TVisibility } from '@/core/roles/interface';
-import type { TLoyalty, TRoles } from '@avalon/types';
+import type { TLoyalty, TRoles, TMissionResult } from '@avalon/types';
 
-export class Mordred extends Character {
-  role: TRoles = 'mordred';
-  selfRole: TRoles = 'mordred';
+export class Lunatic extends Character {
+  role: TRoles = 'lunatic';
+  selfRole: TRoles = 'lunatic';
   loyalty: TLoyalty = 'evil';
 
   visibility: TVisibility = {
     minion: 'evil',
     morgana: 'evil',
+    mordred: 'evil',
     trickster: 'evil',
-    lunatic: 'evil',
     evilLancelot: 'evilLancelot',
   };
+
+  override get validMissionResult(): TMissionResult[] {
+    return ['fail'];
+  }
 }

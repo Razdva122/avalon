@@ -25,6 +25,7 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.minion, component: () => import('@/pages/wiki/roles/Minion.vue') },
   { ...routesSeo.guinevere, component: () => import('@/pages/wiki/roles/Guinevere.vue') },
   { ...routesSeo.trickster, component: () => import('@/pages/wiki/roles/Trickster.vue') },
+  { ...routesSeo.lunatic, component: () => import('@/pages/wiki/roles/Lunatic.vue') },
   { ...routesSeo.notFound, component: () => import('@/pages/empty/NotFound.vue') },
   { path: '/wiki/roles/isolde/', name: 'isolde', redirect: { name: 'lovers' } },
   { path: '/wiki/roles/tristan/', name: 'tristan', redirect: { name: 'lovers' } },

@@ -11,6 +11,7 @@ export class Trickster extends Character {
     minion: 'evil',
     morgana: 'evil',
     mordred: 'evil',
+    lunatic: 'evil',
     evilLancelot: 'evilLancelot',
   };
 

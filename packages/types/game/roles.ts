@@ -30,7 +30,7 @@ export type TGoodRequiredRoles = 'servant';
 /**
  * Evil optional roles
  */
-export type TEvilOptionalRoles = 'morgana' | 'oberon' | 'mordred' | 'evilLancelot' | 'trickster';
+export type TEvilOptionalRoles = 'morgana' | 'oberon' | 'mordred' | 'evilLancelot' | 'trickster' | 'lunatic';
 
 /**
  * Evil required roles
