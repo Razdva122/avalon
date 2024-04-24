@@ -323,24 +323,23 @@
           <li>
             <strong><PreviewLink target="merlinPure" /></strong>, open your eyes to see the agents of evil.
           </li>
-          <li v-if="roles.oberon">
-            <strong><PreviewLink target="oberon" /></strong> extend your thumb into the air.
-          </li>
-          <li v-if="roles.lunatic">
-            <strong><PreviewLink target="lunatic" /></strong> extend your thumb into the air.
-          </li>
-          <li v-if="roles.evilLancelot">
-            <strong><PreviewLink target="evilLancelot" text="Evil Lancelot" /></strong> extend your thumb into the air.
-          </li>
-          <li v-if="roles.trickster">
-            <strong><PreviewLink target="trickster" text="Trickster" /></strong> extend your thumb into the air.
-          </li>
-          <li v-if="roles.morgana">
-            <strong><PreviewLink target="morgana" /></strong> extend your thumb into the air.
-          </li>
+          <template
+            v-for="role in [
+              { target: 'oberon' },
+              { target: 'lunatic' },
+              { target: 'brute' },
+              { target: 'evilLancelot', text: 'Evil Lancelot' },
+              { target: 'trickster' },
+              { target: 'morgana' },
+            ] as const"
+          >
+            <li v-if="roles[role.target]">
+              <strong><PreviewLink :target="role.target" :text="'text' in role ? role.text : role.target" /></strong>
+              extend your thumb into the air.
+            </li>
+          </template>
           <li>
-            <span v-if="roles.oberon || roles.morgana">The others </span
-            ><strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong>
+            <span>Ordinary </span><strong><PreviewLink target="minion" text="Minions" /></strong>
             <span v-if="roles.mordred"
               >(not <strong><PreviewLink target="mordred" /></strong> himself)</span
             >
@@ -439,6 +438,7 @@ export default defineComponent({
       goodLancelot: 0,
       guinevere: 0,
       lunatic: 0,
+      brute: 0,
     };
 
     return {

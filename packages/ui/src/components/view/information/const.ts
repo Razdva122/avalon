@@ -73,6 +73,10 @@ export const rolesShortInfo: { [key in TVisibleRole]: { loyalty: TLoyalty | 'unk
     loyalty: 'evil',
     info: 'Must fail on every mission',
   },
+  brute: {
+    loyalty: 'evil',
+    info: 'May fail only first three missions',
+  },
   unknown: {
     loyalty: 'unknown',
     info: 'Unknown role',

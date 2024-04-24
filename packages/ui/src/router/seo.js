@@ -124,7 +124,7 @@ module.exports.routesSeo = {
   merlin_pure: {
     path: '/wiki/roles/merlin_pure/',
     name: 'merlin_pure',
-    priority: 0.3,
+    priority: 0.2,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Merlin Pure',
@@ -172,13 +172,25 @@ module.exports.routesSeo = {
   lunatic: {
     path: '/wiki/roles/lunatic/',
     name: 'lunatic',
-    priority: 0.3,
+    priority: 0.2,
     meta: {
       prerender: true,
       title: 'Avalon: The Resistance | Lunatic',
       description: "Rules and Tips for Lunatic role in the board game 'Avalon: The Resistance'",
       keywords: ['Lunatic', 'Role', 'Rules', 'Tips'],
       image: 'roles/lunatic.webp',
+    },
+  },
+  brute: {
+    path: '/wiki/roles/brute/',
+    name: 'brute',
+    priority: 0.2,
+    meta: {
+      prerender: true,
+      title: 'Avalon: The Resistance | Brute',
+      description: "Rules and Tips for Brute role in the board game 'Avalon: The Resistance'",
+      keywords: ['Brute', 'Role', 'Rules', 'Tips'],
+      image: 'roles/brute.webp',
     },
   },
   percival: {

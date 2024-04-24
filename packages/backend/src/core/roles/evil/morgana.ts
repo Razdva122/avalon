@@ -12,6 +12,7 @@ export class Morgana extends Character {
     mordred: 'evil',
     trickster: 'evil',
     lunatic: 'evil',
+    brute: 'evil',
     evilLancelot: 'evilLancelot',
   };
 }

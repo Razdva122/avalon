@@ -2,9 +2,9 @@ import { Character } from '@/core/roles/abstract';
 import type { TVisibility } from '@/core/roles/interface';
 import type { TLoyalty, TRoles, TMissionResult } from '@avalon/types';
 
-export class Lunatic extends Character {
-  role: TRoles = 'lunatic';
-  selfRole: TRoles = 'lunatic';
+export class Brute extends Character {
+  role: TRoles = 'brute';
+  selfRole: TRoles = 'brute';
   loyalty: TLoyalty = 'evil';
 
   visibility: TVisibility = {
@@ -12,11 +12,15 @@ export class Lunatic extends Character {
     morgana: 'evil',
     mordred: 'evil',
     trickster: 'evil',
-    brute: 'evil',
+    lunatic: 'evil',
     evilLancelot: 'evilLancelot',
   };
 
   override get validMissionResult(): TMissionResult[] {
-    return ['fail'];
+    if (this.game.round >= 3) {
+      return ['success'];
+    }
+
+    return ['fail', 'success'];
   }
 }

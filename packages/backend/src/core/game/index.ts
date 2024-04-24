@@ -137,7 +137,7 @@ export class Game extends GameHooks {
     const settings = gamesSettings[users.length];
 
     // Generates roles
-    const rolesInfo = generateRolesForGame(settings, options);
+    const rolesInfo = generateRolesForGame(settings, options, this);
 
     this.settings = {
       ...settings,

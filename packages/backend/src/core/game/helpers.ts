@@ -4,6 +4,8 @@ import type { TRoles, IGameSettings, IGameOptions, TGameRoles, TEvilRoles, TGood
 
 import type { Character } from '@/core/roles';
 
+import type { Game } from '@/core/game';
+
 import roles from '@/core/roles';
 
 import { evilRolesImportance, goodRolesImportance } from '@/core/roles';
@@ -16,7 +18,7 @@ type TGenerateRolesResult = {
 /**
  * Generate roles for game
  */
-export function generateRolesForGame(settings: IGameSettings, options: IGameOptions): TGenerateRolesResult {
+export function generateRolesForGame(settings: IGameSettings, options: IGameOptions, game: Game): TGenerateRolesResult {
   const gameRoles: Character[] = [];
 
   const loyalty = { ...settings.players };
@@ -25,8 +27,8 @@ export function generateRolesForGame(settings: IGameSettings, options: IGameOpti
     const [roleName, inGame] = <[TRoles, number]>role;
 
     for (let i = 0; i < inGame; i += 1) {
-      const character = new roles[roleName]();
-      gameRoles.push(new roles[roleName]());
+      const character = new roles[roleName](game);
+      gameRoles.push(new roles[roleName](game));
       loyalty[character.loyalty] -= 1;
     }
   });
@@ -36,11 +38,11 @@ export function generateRolesForGame(settings: IGameSettings, options: IGameOpti
   }
 
   for (let i = 0; i < loyalty.evil; i += 1) {
-    gameRoles.push(new roles.minion());
+    gameRoles.push(new roles.minion(game));
   }
 
   for (let i = 0; i < loyalty.good; i += 1) {
-    gameRoles.push(new roles.servant());
+    gameRoles.push(new roles.servant(game));
   }
 
   const characters = _.shuffle(gameRoles);

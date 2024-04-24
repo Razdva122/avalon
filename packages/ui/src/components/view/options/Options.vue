@@ -127,6 +127,7 @@ export default defineComponent({
         { role: 'evilLancelot', label: 'Evil Lancelot', disabled: false, color: 'warning', route: 'lancelots' },
         { role: 'trickster', label: 'Trickster', disabled: false, color: 'warning', route: 'trickster' },
         { role: 'lunatic', label: 'Lunatic', disabled: false, color: 'warning', route: 'lunatic' },
+        { role: 'brute', label: 'Brute', disabled: false, color: 'warning', route: 'brute' },
       ] as const;
     },
     addonsSettings() {

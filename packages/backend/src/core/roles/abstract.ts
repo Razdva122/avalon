@@ -1,4 +1,5 @@
 import type { TVisibility } from '@/core/roles/interface';
+import type { Game } from '@/core/game';
 import type { TRoles, TLoyalty, TMissionResult } from '@avalon/types';
 
 export abstract class Character {
@@ -21,6 +22,15 @@ export abstract class Character {
    * Visibility of other roles for this character
    */
   abstract visibility: TVisibility;
+
+  /**
+   * Instance of game
+   */
+  protected game: Game;
+
+  constructor(game: Game) {
+    this.game = game;
+  }
 
   /**
    * Possible mission results

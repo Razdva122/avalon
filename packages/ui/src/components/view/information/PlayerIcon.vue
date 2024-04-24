@@ -127,6 +127,12 @@ export default defineComponent({
   background-size: 165%;
 }
 
+.icon-brute {
+  background-image: url('@/assets/roles/brute.webp');
+  background-position: 51% 10%;
+  background-size: 145%;
+}
+
 .icon-troublemaker {
   background-image: url('@/assets/roles/troublemaker.webp');
   background-position: 53% 0%;
@@ -228,6 +234,12 @@ export default defineComponent({
     background-image: url('@/assets/roles/anime/isolde.webp');
     background-size: 160%;
     background-position: 41% 0%;
+  }
+
+  &.icon-brute {
+    background-image: url('@/assets/roles/anime/brute.webp');
+    background-size: 175%;
+    background-position: 48% 0%;
   }
 
   &.icon-evilLancelot {

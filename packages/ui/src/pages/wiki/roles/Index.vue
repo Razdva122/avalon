@@ -63,6 +63,10 @@
         <h2>Lunatic</h2>
         <img class="role-image evil-role" :src="calculateRoleUrl('lunatic')" alt="lunatic" />
       </router-link>
+      <router-link class="role" :to="{ name: 'brute' }">
+        <h2>Brute</h2>
+        <img class="role-image evil-role" :src="calculateRoleUrl('brute')" alt="brute" />
+      </router-link>
       <router-link class="role" :to="{ name: 'minion' }">
         <h2>Minion</h2>
         <img class="role-image evil-role" :src="calculateRoleUrl('minion')" alt="minion" />
