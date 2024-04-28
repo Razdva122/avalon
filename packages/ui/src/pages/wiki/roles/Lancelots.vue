@@ -25,7 +25,7 @@
       Key to the Lancelots' gameplay is the deck of loyalty change, after the second mission, a card is drawn. If a
       <span class="material-icons icon-swap">swap_horiz</span><b>loyalty change</b> card is revealed, the Lancelots
       switch allegiances along with all corresponding changes (such as the ability to fail a mission, or being subject
-      to the <PreviewLink target="lady" text="Lady of the lake" /> card), whereas if the card drawn is
+      to the <PreviewLink target="ladyOfLake" text="Lady of the lake" /> card), whereas if the card drawn is
       <span class="material-icons icon-swap">close</span><b>blank</b>, no change occurs. The deck contains
       <b>five cards</b>, of which two prompt <span class="material-icons icon-swap">swap_horiz</span
       ><b>loyalty change</b>, and three are <span class="material-icons icon-swap">close</span><b>blank</b>.

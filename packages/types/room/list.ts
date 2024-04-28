@@ -1,7 +1,11 @@
+import type { IGameOptions } from '@avalon/types';
+
 export type TRoomsList = TRoomInfo[];
 
 export type TRoomInfo = {
   host: string;
-  state: 'created' | 'started';
+  players: number;
+  state: 'created' | 'started' | 'locked';
   uuid: string;
+  options: IGameOptions;
 };

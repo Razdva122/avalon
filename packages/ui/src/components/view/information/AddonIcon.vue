@@ -23,7 +23,7 @@ export default defineComponent({
   background-size: contain;
 }
 
-.icon-lady {
+.icon-ladyOfLake {
   background-image: url('@/assets/features/lady_of_lake.webp');
   background-size: contain;
 }

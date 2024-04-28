@@ -73,7 +73,7 @@ module.exports.routesSeo = {
   },
   lady: {
     path: '/wiki/addons/lady/',
-    name: 'lady',
+    name: 'lady_of_lake',
     priority: 0.6,
     meta: {
       prerender: true,

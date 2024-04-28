@@ -135,7 +135,7 @@ export default defineComponent({
         {
           name: 'ladyOfLake',
           label: 'Lady of the lake',
-          route: 'lady',
+          route: 'ladyOfLake',
           hint: 'The lady allows you to find out the loyalty of another player',
         },
         {

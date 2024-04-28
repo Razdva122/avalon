@@ -35,8 +35,10 @@ export class Manager {
     } else {
       const roomData: TRoomInfo = {
         host: room.players.find((player) => player.id === room.leaderID)!.name,
-        state: room.data.stage === 'started' ? 'started' : 'created',
+        state: room.data.stage,
+        options: room.options,
         uuid: room.roomID,
+        players: room.players.length,
       };
 
       const roomIndex = this.roomsList.findIndex((el) => el.uuid === room.roomID);
@@ -144,12 +146,22 @@ export class Manager {
 
     socket.on('joinGame', (uuid) => {
       console.log('joinGame', uuid);
-      this.rooms[uuid].joinGame(userID, userName);
+      const room = this.rooms[uuid];
+
+      if (room) {
+        room.joinGame(userID, userName);
+        eventBus.emit('roomUpdated', room);
+      }
     });
 
     socket.on('leaveGame', (uuid) => {
       console.log('leaveGame', uuid);
-      this.rooms[uuid].leaveGame(userID);
+      const room = this.rooms[uuid];
+
+      if (room) {
+        room.leaveGame(userID);
+        eventBus.emit('roomUpdated', room);
+      }
     });
 
     socket.on('lockRoom', (uuid) => {
@@ -157,6 +169,7 @@ export class Manager {
       const room = this.rooms[uuid];
       if (room.leaderID === userID) {
         room.toggleLockedState();
+        eventBus.emit('roomUpdated', room);
       }
     });
 
@@ -165,6 +178,7 @@ export class Manager {
       const room = this.rooms[uuid];
       if (room.leaderID === userID) {
         room.updateOptions(options);
+        eventBus.emit('roomUpdated', room);
       }
     });
 

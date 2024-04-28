@@ -3,7 +3,7 @@
     <WikiBreadCrumbs />
     <h1>Addons</h1>
     <div class="addons-container">
-      <router-link class="addon" :to="{ name: 'lady' }">
+      <router-link class="addon" :to="{ name: 'lady_of_lake' }">
         <h2>Lady of the Lake</h2>
         <img class="addon-image" src="@/assets/features/lady_of_lake.webp" alt="lady" />
       </router-link>

@@ -13,15 +13,35 @@
       <template v-if="roomsList && roomsList.length">
         <div class="list-header mb-5">Games list:</div>
         <div v-for="(game, index) in roomsList" class="game mb-1">
-          <div class="mr-2">
-            {{ index + 1 }}.HOST: <b>{{ game.host }}</b>
+          <div>{{ index + 1 }}.</div>
+          <div class="game-container">
+            <div class="game-left">
+              <div class="mr-2 game-name">
+                <b>{{ game.host }}</b>
+              </div>
+              <div class="game-options">
+                <div v-for="(amount, role) of game.options.roles">
+                  <div v-if="amount" class="mr-1 d-flex">
+                    <PreviewLink :target="role" text="" />
+                  </div>
+                </div>
+                <div v-for="(amount, addon) of game.options.addons">
+                  <div v-if="amount" class="mr-1 d-flex">
+                    <PreviewLink :target="addon" text="" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="game-right">
+              <div class="players-amount mr-2" v-if="game.state === 'created'">{{ game.players }} / 10</div>
+              <v-btn
+                :color="game.state === 'created' ? undefined : 'info'"
+                @click="$router.push({ name: 'room', params: { uuid: game.uuid } })"
+              >
+                {{ game.state === 'created' ? 'Join' : 'Watch' }}
+              </v-btn>
+            </div>
           </div>
-          <v-btn
-            :color="game.state === 'started' ? 'info' : undefined"
-            @click="$router.push({ name: 'room', params: { uuid: game.uuid } })"
-          >
-            {{ game.state === 'started' ? 'Watch game' : 'Join game' }}
-          </v-btn>
         </div>
       </template>
     </div>
@@ -36,10 +56,12 @@ import type { TRoomsList } from '@avalon/types';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import TemporaryAlert from '@/components/feedback/TemporaryAlert.vue';
+import PreviewLink from '@/components/view/information/PreviewLink.vue';
 
 export default defineComponent({
   components: {
     TemporaryAlert,
+    PreviewLink,
   },
   async setup() {
     const router = useRouter();
@@ -95,9 +117,29 @@ export default defineComponent({
   padding: 5px;
   min-width: 50vw;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   font-size: 24px;
+}
+
+.game-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.game-right,
+.game-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.game-name {
+  @include text-overflow(1);
+}
+
+.game-options {
+  display: flex;
 }
 
 .alert-container {

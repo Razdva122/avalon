@@ -13,12 +13,20 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   computed: {
     items() {
+      const normalizeName = (el: string): string => {
+        if (el === 'lady') {
+          return 'lady_of_lake';
+        }
+
+        return el;
+      };
+
       return new URL(window.location.href).pathname
         .split('/')
         .slice(1)
         .filter(Boolean)
         .map((el) => ({
-          to: { name: el },
+          to: { name: normalizeName(el) },
           title: el,
         }));
     },

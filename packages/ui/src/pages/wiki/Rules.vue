@@ -199,7 +199,7 @@
     <p>
       <PreviewLink target="merlin" /> -> <PreviewLink target="percival" /> -> <PreviewLink target="morgana" /> ->
       <PreviewLink target="oberon" /> -> <PreviewLink target="mordred" /> ->
-      <PreviewLink target="lady" text="Lady of the lake" /> -> <PreviewLink target="tristan" /> +
+      <PreviewLink target="ladyOfLake" text="Lady of the lake" /> -> <PreviewLink target="tristan" /> +
       <PreviewLink target="isolde" />
     </p>
 
@@ -223,7 +223,7 @@
       <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
       <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" /><br />
-      <em>Addons:</em> <PreviewLink target="lady" text="Lady of the lake" />
+      <em>Addons:</em> <PreviewLink target="ladyOfLake" text="Lady of the lake" />
     </div>
 
     <div class="game-setup">
@@ -232,7 +232,7 @@
       <PreviewLink target="servant" />, <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
       <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" /><br />
-      <em>Addons:</em> <PreviewLink target="lady" text="Lady of the lake" />
+      <em>Addons:</em> <PreviewLink target="ladyOfLake" text="Lady of the lake" />
     </div>
 
     <div class="game-setup">
@@ -251,7 +251,7 @@
       <PreviewLink target="servant" /><br />
       <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" />, <PreviewLink target="oberon" /><br />
-      <em>Addons:</em> <PreviewLink target="lady" text="Lady of the lake" />
+      <em>Addons:</em> <PreviewLink target="ladyOfLake" text="Lady of the lake" />
     </div>
 
     <p>
