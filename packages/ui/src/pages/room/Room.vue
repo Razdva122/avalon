@@ -142,5 +142,6 @@ export default defineComponent({
 .room {
   width: 100vw;
   height: 100%;
+  overflow-y: hidden;
 }
 </style>

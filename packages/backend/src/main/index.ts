@@ -34,7 +34,7 @@ export class Manager {
       this.roomsList = this.roomsList.filter((el) => el.uuid !== room.roomID);
     } else {
       const roomData: TRoomInfo = {
-        host: room.players.find((player) => player.id === room.leaderID)!.name,
+        host: room.players.find((player) => player.id === room.leaderID)?.name ?? 'unknown',
         state: room.data.stage,
         options: room.options,
         uuid: room.roomID,
