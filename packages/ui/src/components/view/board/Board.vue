@@ -7,6 +7,10 @@
       </div>
       <div class="actions-container d-flex flex-column justify-center">
         <template v-if="roomState.stage !== 'started'">
+          <div class="options-panel mb-4 bg-primary">
+            <div class="options-title">Roles and addons</div>
+            <OptionsPreview :roles="roomState.options.roles" :addons="roomState.options.addons" />
+          </div>
           <div class="button-panel d-flex flex-column align-center">
             <StartPanel :room-state="roomState" />
           </div>
@@ -51,6 +55,7 @@ import Player from '@/components/view/board/modules/Player.vue';
 import Timer from '@/components/feedback/Timer.vue';
 import Game from '@/components/view/board/game/Game.vue';
 import StartPanel from '@/components/view/panels/StartPanel.vue';
+import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
 import eventBus from '@/helpers/event-bus';
 import { THistoryResults } from '@avalon/types';
@@ -67,6 +72,7 @@ export default defineComponent({
     StartPanel,
     Timer,
     AnnounceLoyalty,
+    OptionsPreview,
   },
   props: {
     roomState: {
@@ -309,6 +315,17 @@ export default defineComponent({
 
 .button-panel > button {
   width: 200px;
+}
+
+.options-panel {
+  padding: 6px;
+  border-radius: 12px;
+  background: gray;
+}
+
+.options-title {
+  text-align: center;
+  font-size: 24px;
 }
 
 .view-mode-history {

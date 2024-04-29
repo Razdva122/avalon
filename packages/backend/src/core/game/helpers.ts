@@ -1,14 +1,21 @@
 import * as _ from 'lodash';
 
-import type { TRoles, IGameSettings, IGameOptions, TGameRoles, TEvilRoles, TGoodRoles } from '@avalon/types';
+import {
+  TRoles,
+  IGameSettings,
+  IGameOptions,
+  TGameRoles,
+  TEvilRoles,
+  TGoodRoles,
+  evilRolesImportance,
+  goodRolesImportance,
+} from '@avalon/types';
 
 import type { Character } from '@/core/roles';
 
 import type { Game } from '@/core/game';
 
 import roles from '@/core/roles';
-
-import { evilRolesImportance, goodRolesImportance } from '@/core/roles';
 
 type TGenerateRolesResult = {
   characters: Character[];

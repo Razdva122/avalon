@@ -1,8 +1,6 @@
 export * from '@/core/roles/interface';
 export * from '@/core/roles/abstract';
 
-import type { TEvilRoles, TGoodRoles } from '@avalon/types';
-
 /**
  * Evil roles
  */
@@ -57,32 +55,3 @@ const roles = {
 } as const;
 
 export default roles;
-
-/**
- * The index of the role that displays its importance relative to the rest
- */
-export const evilRolesImportance: { [key in TEvilRoles]: number } = {
-  mordred: 1,
-  morgana: 2,
-  oberon: 3,
-  trickster: 4,
-  evilLancelot: 10,
-  lunatic: 50,
-  brute: 51,
-  minion: 100,
-};
-
-/**
- * The index of the role that displays its importance relative to the rest
- */
-export const goodRolesImportance: { [key in TGoodRoles]: number } = {
-  merlin: 1,
-  merlinPure: 2,
-  guinevere: 3,
-  percival: 4,
-  goodLancelot: 5,
-  tristan: 10,
-  isolde: 11,
-  troublemaker: 50,
-  servant: 100,
-};
