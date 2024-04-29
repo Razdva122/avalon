@@ -7,9 +7,13 @@
       </div>
       <div class="actions-container d-flex flex-column justify-center">
         <template v-if="roomState.stage !== 'started'">
-          <div class="options-panel mb-4 bg-primary">
+          <div class="options-panel mb-4">
             <div class="options-title">Roles and addons</div>
-            <OptionsPreview :roles="roomState.options.roles" :addons="roomState.options.addons" />
+            <OptionsPreview
+              :roles="roomState.options.roles"
+              :addons="roomState.options.addons"
+              class="options-preview"
+            />
           </div>
           <div class="button-panel d-flex flex-column align-center">
             <StartPanel :room-state="roomState" />
@@ -320,7 +324,12 @@ export default defineComponent({
 .options-panel {
   padding: 6px;
   border-radius: 12px;
-  background: gray;
+}
+
+.options-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .options-title {
