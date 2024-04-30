@@ -29,7 +29,7 @@ export class GameManager {
       vote: this.game.turn,
       mission: this.game.round,
       settings: this.game.settings,
-      winner: this.game.winner,
+      result: this.game.result,
       addonsData: this.game.addonsData,
       features: this.game.features,
       ...this.prepareHistoryAndPlayerForRoomState(),
@@ -62,7 +62,7 @@ export class GameManager {
 
     this.roomState.mission = this.game.round;
 
-    this.roomState.winner = this.game.winner;
+    this.roomState.result = this.game.result;
 
     this.sendNewStateToUsers();
   }
@@ -151,7 +151,7 @@ export class GameManager {
     const roles = userID && this.roomState.roles[userID] ? this.roomState.roles[userID] : this.roomState.publicRoles;
 
     return {
-      winner: this.roomState.winner,
+      result: this.roomState.result,
       uuid: this.roomState.uuid,
       stage: this.roomState.stage,
       vote: this.roomState.vote,

@@ -94,7 +94,8 @@ describe('Excalibur logic', () => {
       .useExcalibur(true, true);
 
     expect(game.stage).toBe('end');
-    expect(game.winner).toBe('evil');
+    expect(game.result?.winner).toBe('evil');
+    expect(game.result?.reason).toBe('evilTeamMissions');
     expect(game.missions[4].data.fails).toBe(1);
   });
 });

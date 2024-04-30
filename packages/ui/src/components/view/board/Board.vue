@@ -214,7 +214,7 @@ export default defineComponent({
 
     const gameResult = computed(() => {
       if (roomState.value.stage === 'started') {
-        return gameState.value.winner;
+        return gameState.value.result?.winner;
       }
     });
 

@@ -19,6 +19,7 @@ import type {
   IGameOptions,
   TGameOptionsFeatures,
   TAddonsData,
+  TGameResults,
 } from '@avalon/types';
 
 import type { TRolesAddonsData, TRolesWithAddons, TAdditionalAddons, TAdditionalAddonsData } from '@/core/game/addons';
@@ -39,7 +40,7 @@ export * from '@/core/game/interface';
 export * from '@/core/game/const';
 
 export class Game extends GameHooks {
-  winner?: TLoyalty;
+  result?: TGameResults;
 
   /**
    * Each round is a mission that has happened
@@ -426,7 +427,7 @@ export class Game extends GameHooks {
         return;
       }
 
-      this.winner = winner;
+      this.result = { winner, reason: winner === 'evil' ? 'evilTeamMissions' : 'goodTeamMissions' };
       this.stage = 'end';
     } else {
       this.startNextRound();
@@ -443,6 +444,9 @@ export class Game extends GameHooks {
    * Premature end of the game
    */
   endGame(): void {
+    this.result = {
+      reason: 'manualy',
+    };
     this.stage = 'end';
     this.stateObserver.gameStateChanged();
   }

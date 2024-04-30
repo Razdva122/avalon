@@ -148,7 +148,8 @@ describe('Gameplay', () => {
     test('Game result', () => {
       expect(game.round).toBe(4);
       expect(game.history.length).toBe(10);
-      expect(game.winner).toBe('evil');
+      expect(game.result?.winner).toBe('evil');
+      expect(game.result?.reason).toBe('evilTeamMissions');
       expect(game.stage).toBe('end');
     });
   });

@@ -19,14 +19,16 @@ describe('Assassinate logic', () => {
       gameHelper.pickMerlin();
 
       expect(game.stage).toBe('end');
-      expect(game.winner).toBe('good');
+      expect(game.result?.winner).toBe('good');
+      expect(game.result?.reason).toBe('missMerlin');
     });
 
     test('Pick correct merlin', () => {
       gameHelper.pickMerlin(true);
 
       expect(game.stage).toBe('end');
-      expect(game.winner).toBe('evil');
+      expect(game.result?.winner).toBe('evil');
+      expect(game.result?.reason).toBe('killMerlin');
     });
   });
 
@@ -35,28 +37,32 @@ describe('Assassinate logic', () => {
       gameHelper.pickLovers(['isolde', 'tristan']);
 
       expect(game.stage).toBe('end');
-      expect(game.winner).toBe('evil');
+      expect(game.result?.winner).toBe('evil');
+      expect(game.result?.reason).toBe('killLovers');
     });
 
     test('Select isolde and miss tristan', () => {
       gameHelper.pickLovers(['isolde']);
 
       expect(game.stage).toBe('end');
-      expect(game.winner).toBe('good');
+      expect(game.result?.winner).toBe('good');
+      expect(game.result?.reason).toBe('missLovers');
     });
 
     test('Select tristan and miss isolde', () => {
       gameHelper.pickLovers(['tristan']);
 
       expect(game.stage).toBe('end');
-      expect(game.winner).toBe('good');
+      expect(game.result?.winner).toBe('good');
+      expect(game.result?.reason).toBe('missLovers');
     });
 
     test('Miss tristan and isolde', () => {
       gameHelper.pickLovers([]);
 
       expect(game.stage).toBe('end');
-      expect(game.winner).toBe('good');
+      expect(game.result?.winner).toBe('good');
+      expect(game.result?.reason).toBe('missLovers');
     });
   });
 });

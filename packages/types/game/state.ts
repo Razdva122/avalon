@@ -6,7 +6,7 @@ import type { TLoyalty } from '../game/roles';
 import type { TGameOptionsFeatures } from '../game/options';
 
 export interface IVisualGameState {
-  winner?: TLoyalty;
+  result?: TGameResults;
   uuid: string;
   stage: TGameStage;
   vote: number;
@@ -17,6 +17,11 @@ export interface IVisualGameState {
   addonsData: TAddonsData;
   features: TGameOptionsFeatures;
 }
+
+export type TGameResults = {
+  winner?: TLoyalty;
+  reason: TGameEndReasons;
+};
 
 /**
  * Possible game stages
@@ -29,3 +34,17 @@ export type TGameStage =
   | 'selectTeam'
   | 'end'
   | TAddonsStages;
+
+/**
+ * Possible game results
+ */
+export type TGameEndReasons =
+  | 'manualy'
+  | 'evilTeamMissions'
+  | 'goodTeamMissions'
+  | 'missMerlin'
+  | 'killMerlin'
+  | 'missGuinevere'
+  | 'killGuinevere'
+  | 'missLovers'
+  | 'killLovers';

@@ -4,7 +4,7 @@ import { IGameAddon } from '@/core/game/addons/interface';
 import { Assassinate } from '@/core/game/addons/assassin/assassinate';
 import { Game } from '@/core/game';
 
-import type { TAssassinateType, TAssassinAddonData } from '@avalon/types';
+import type { TAssassinateType, TAssassinAddonData, TGameEndReasons } from '@avalon/types';
 
 import type { TAssassinateOptions } from '@/core/game/addons/assassin/interface';
 
@@ -87,9 +87,15 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
     const assassinate = new Assassinate(assassin, type, options);
 
     if (assassinate.assassinatePlayers(this.game.selectedPlayers) === 'hit') {
-      this.game.winner = 'evil';
+      this.game.result = {
+        winner: 'evil',
+        reason: <TGameEndReasons>`kill${_.capitalize(type)}`,
+      };
     } else {
-      this.game.winner = 'good';
+      this.game.result = {
+        winner: 'good',
+        reason: <TGameEndReasons>`miss${_.capitalize(type)}`,
+      };
     }
 
     assassin.features.waitForAction = false;
