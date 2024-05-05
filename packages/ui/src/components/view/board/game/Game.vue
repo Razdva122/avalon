@@ -86,6 +86,19 @@
         </template>
       </div>
       <LancelotsView v-if="visibleHistory?.type === 'switchLancelots'" :data="visibleHistory"></LancelotsView>
+      <div v-if="gameState.result" class="game-result">
+        <div v-if="gameState.result.winner">
+          Winner:
+          <span :class="gameState.result.winner === 'evil' ? 'text-error' : 'text-info'" class="winner-text"
+            ><b>{{ gameState.result.winner }}</b></span
+          >
+        </div>
+        <div v-else>Game is ended.</div>
+        <div>
+          {{ endReason }}
+        </div>
+      </div>
+      <slot name="restart"></slot>
     </div>
     <div class="meta-info font-weight-bold d-flex justify-space-between">
       <div>
@@ -102,7 +115,7 @@
 <script lang="ts">
 import cloneDeep from 'lodash/cloneDeep';
 import last from 'lodash/last';
-import type { IHistoryMission, THistoryResults } from '@avalon/types';
+import type { IHistoryMission, THistoryResults, TGameEndReasons } from '@avalon/types';
 import type { IMissionWithResult } from '@/components/view/board/interface';
 import { defineComponent, PropType, computed, inject } from 'vue';
 import Mission from '@/components/view/board/game/modules/Mission.vue';
@@ -146,6 +159,24 @@ export default defineComponent({
         });
 
       return missions;
+    });
+
+    const endReason = computed(() => {
+      if (gameState.value.result) {
+        const resultText: { [key in TGameEndReasons]: string } = {
+          manualy: 'The game is finished manually',
+          evilTeamMissions: 'The evil team failed 3 missions',
+          goodTeamMissions: 'The good team successes 3 missions',
+          missMerlin: 'The evil team tried to kill Merlin but missed',
+          missGuinevere: 'The evil team tried to kill Guinevere but missed',
+          missLovers: 'The evil team tried to kill Lovers but missed',
+          killGuinevere: 'The evil team killed Guinevere',
+          killLovers: 'The evil team killed Lovers',
+          killMerlin: 'The evil team killed Merlin',
+        };
+
+        return resultText[gameState.value.result.reason];
+      }
     });
 
     const historyTextArray = computed(() => {
@@ -203,6 +234,7 @@ export default defineComponent({
       missions,
       gameState,
       stateManager,
+      endReason,
       stageText,
       roomState,
       historyTextArray,
@@ -255,11 +287,16 @@ export default defineComponent({
 .right-text {
   text-align: start;
 }
+
 .mission-result-element {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   margin-right: 4px;
+}
+
+.game-result {
+  font-size: 18px;
 }
 
 .icon-loyalty-good {
@@ -280,6 +317,10 @@ export default defineComponent({
   gap: 4px;
   max-width: 220px;
   flex-wrap: wrap;
+}
+
+.winner-text {
+  text-transform: uppercase;
 }
 
 .icon-result {

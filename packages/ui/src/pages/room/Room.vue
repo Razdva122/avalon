@@ -1,14 +1,16 @@
 <template>
-  <div class="room d-flex flex-column align-center justify-space-around">
+  <div class="room d-flex align-center justify-space-around">
     <template v-if="errorMessage">
       <h1 class="mb-4">{{ errorMessage.error }}</h1>
       <v-btn size="x-large" @click="$router.push({ name: 'lobby' })">Back to lobby</v-btn>
     </template>
     <template v-else>
-      <v-btn v-if="displayRestartButton" @click="restartGame" class="restart-button">Restart game</v-btn>
       <Board :room-state="roomState">
         <template v-slot:content>
           <RoomVote v-if="roomState.vote" :roomUuid="roomState.roomID" :vote="roomState.vote" />
+        </template>
+        <template v-slot:restart>
+          <v-btn v-if="displayRestartButton" @click="restartGame" class="restart-button">Restart game</v-btn>
         </template>
       </Board>
       <RolesInfo v-if="roomState.stage === 'started'" :game-roles="game.settings.roles" :visible-roles="visibleRoles" />
@@ -134,8 +136,7 @@ export default defineComponent({
 }
 
 .restart-button {
-  position: absolute;
-  top: 450px;
+  margin-top: 10px;
   z-index: 10;
 }
 

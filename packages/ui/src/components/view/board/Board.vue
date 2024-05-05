@@ -30,7 +30,11 @@
           >
             <AnnounceLoyalty />
           </template>
-          <Game v-else :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory" />
+          <Game v-else :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory">
+            <template v-slot:restart>
+              <slot name="restart"></slot>
+            </template>
+          </Game>
         </template>
       </div>
     </slot>
