@@ -86,7 +86,7 @@
         </template>
       </div>
       <LancelotsView v-if="visibleHistory?.type === 'switchLancelots'" :data="visibleHistory"></LancelotsView>
-      <div v-if="gameState.result" class="game-result">
+      <div v-if="gameState.result && stateManager.viewMode.value === 'live'" class="game-result">
         <div v-if="gameState.result.winner">
           Winner:
           <span :class="gameState.result.winner === 'evil' ? 'text-error' : 'text-info'" class="winner-text"

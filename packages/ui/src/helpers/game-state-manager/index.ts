@@ -107,16 +107,14 @@ export class GameStateManager {
     newState: IVisualGameState,
   ): void {
     const prevState = gameStates[gameStates.length - 1] ?? newState;
+    const indexStart = gameStates.length;
 
     while (gameStates.length - 1 !== history.length) {
       const state = cloneDeep(newState);
-      const prevStateClone = cloneDeep(prevState);
+      const prevStateClone = this.normalizeState(cloneDeep(prevState));
 
       if (gameStates[gameStates.length - 1]) {
-        gameStates[gameStates.length - 1].history = history.slice(0, gameStates.length);
-        gameStates[gameStates.length - 1].stage = this.getStageFromHistory(
-          last(gameStates[gameStates.length - 1].history)!,
-        );
+        this.mutateStateForHistory(gameStates[gameStates.length - 1], gameStates.length, history);
       }
 
       if (gameStates.length === history.length) {
@@ -125,6 +123,149 @@ export class GameStateManager {
         gameStates.push(prevStateClone);
       }
     }
+
+    this.calculateViewFromHistory(gameStates, indexStart);
+  }
+
+  normalizeState(state: IVisualGameState): IVisualGameState {
+    state.players.forEach((player) => {
+      player.features.isAssassin = false;
+      player.features.isSelected = false;
+      player.features.isSent = false;
+      player.features.waitForAction = false;
+    });
+
+    return state;
+  }
+
+  mutateStateForHistory(state: IVisualGameState, index: number, history: THistoryResults[]): void {
+    state.history = history.slice(0, index);
+    state.stage = this.getStageFromHistory(last(state.history)!);
+  }
+
+  calculateViewFromHistory(gameStates: IVisualGameState[], startIndex: number): void {
+    let index = gameStates.length - 1;
+    let current: IVisualGameState;
+    let prev: IVisualGameState | undefined;
+    let next: IVisualGameState | undefined;
+    let skipedFirstCrown = false;
+
+    while (index > startIndex) {
+      index -= 1;
+      current = gameStates[index];
+      prev = gameStates[index - 1];
+      next = gameStates[index + 1];
+
+      if ((current.stage === 'votingForTeam' && prev?.stage === 'votingForTeam') || prev?.stage === 'onMission') {
+        if (skipedFirstCrown === false) {
+          skipedFirstCrown = true;
+        } else {
+          let mutateIndex = index;
+
+          while (mutateIndex >= startIndex) {
+            const players = gameStates[mutateIndex].players;
+            const leader = players.find((player) => player.features.isLeader)!;
+            leader.features.isLeader = false;
+            const prevLeader = this.getClosePlayer(players, leader, -1);
+            prevLeader.features.isLeader = true;
+            mutateIndex -= 1;
+          }
+        }
+      }
+
+      if (current.stage === 'checkLoyalty') {
+        let mutateIndex = index;
+
+        const history = last(current.history)!;
+
+        if (history.type !== 'checkLoyalty') {
+          return;
+        }
+
+        const target = current.players.find((player) => player.id === history.inspectedID)!;
+        target.features.isSelected = true;
+        const validator = current.players.find((player) => player.id === history.validatorID)!;
+        validator.features.waitForAction = true;
+
+        while (mutateIndex >= startIndex) {
+          const players = gameStates[mutateIndex].players;
+          const target = players.find((player) => player.id === history.inspectedID)!;
+          const validator = players.find((player) => player.id === history.validatorID)!;
+          target.features.ladyOfLake = undefined;
+          validator.features.ladyOfLake = 'has';
+          mutateIndex -= 1;
+        }
+      }
+
+      if (current.stage === 'onMission') {
+        const history = last(current.history)!;
+        const excaliburHistory = prev.stage === 'useExcalibur' ? last(prev.history) : undefined;
+        const excaliburOwnerID = excaliburHistory?.type === 'switchResult' ? excaliburHistory.switcherID : undefined;
+
+        current.players.forEach((player) => {
+          if (history.type === 'mission') {
+            const action = history.actions?.find((action) => action.playerID === player.id);
+
+            if (action) {
+              player.features.isSent = true;
+
+              if (player.id === excaliburOwnerID) {
+                player.features.excalibur = true;
+              }
+            }
+          }
+        });
+      }
+
+      if (current.stage === 'votingForTeam') {
+        const history = last(current.history)!;
+
+        if (history.type === 'vote') {
+          history.team.forEach((teamMember) => {
+            const player = current.players.find((player) => teamMember.id === player.id);
+
+            if (player) {
+              player.features.excalibur = teamMember.excalibur;
+              player.features.isSent = true;
+            }
+          });
+        }
+
+        if (next.stage === 'useExcalibur') {
+          next.players = cloneDeep(current.players);
+        }
+      }
+
+      if (current.stage === 'assassinate') {
+        const history = last(current.history)!;
+
+        if (history.type === 'assassinate') {
+          current.players.forEach((player) => {
+            if (player.id === history.assassinID) {
+              player.features.isAssassin = true;
+            }
+
+            if (history.killedIDs.includes(player.id)) {
+              player.features.isSelected = true;
+            }
+          });
+        }
+      }
+    }
+  }
+
+  getClosePlayer(players: IPlayer[], closeTo: IPlayer, shift: number): IPlayer {
+    let index = players.findIndex((player) => player === closeTo) + shift;
+
+    if (index === -1) {
+      index = players.length - 1;
+    }
+
+    if (index === players.length) {
+      index = 0;
+    }
+
+    return players[index];
   }
 
   getStageFromHistory(history: THistoryResults): TGameStage {
