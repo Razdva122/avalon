@@ -1,9 +1,10 @@
 import { User } from '@/user';
 import type { TRoomState, Server, IGameOptions, TVoteTarget, TVoteInRoom } from '@avalon/types';
-import type { TRoomData } from '@/room/interace';
+import type { TRoomData } from '@/room/interface';
 import { eventBus } from '@/helpers';
 import { votesText } from '@/room/const';
 import { GameManager } from '@/core/game-manager';
+import { Chat } from '@/room/chat';
 import * as _ from 'lodash';
 
 export class Room {
@@ -11,6 +12,7 @@ export class Room {
   players: User[];
   leaderID: string;
   vote?: TVoteInRoom;
+  chat: Chat;
   options: IGameOptions;
   data: TRoomData = { stage: 'created' };
   maxCapacity = 10;
@@ -21,6 +23,7 @@ export class Room {
     this.roomID = roomID;
     this.players = players;
     this.leaderID = leaderID;
+    this.chat = new Chat();
     this.options = options || { addons: {}, roles: {}, features: {} };
   }
 
@@ -54,6 +57,11 @@ export class Room {
       }
     }
 
+    this.updateRoomState();
+  }
+
+  addMessage(userID: string, userName: string, message: string) {
+    this.chat.addMessage(message, userID, userName);
     this.updateRoomState();
   }
 
@@ -92,6 +100,7 @@ export class Room {
       roomID: this.roomID,
       leaderID: this.leaderID,
       vote: this.vote,
+      chat: this.chat.history,
       options: this.options,
       players: this.players.map(({ name, id }) => ({ name, id, isLeader: id === this.leaderID })),
     };

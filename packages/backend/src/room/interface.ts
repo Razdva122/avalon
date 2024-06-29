@@ -14,3 +14,12 @@ export type TStartedRoomData = {
   stage: 'started';
   manager: GameManager;
 };
+
+export type TChatMessage = {
+  user: {
+    id: string;
+    name: string;
+  };
+  message: string;
+  timestamp: number;
+};

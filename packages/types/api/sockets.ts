@@ -29,6 +29,7 @@ export interface ClientToServerEvents {
   createRoom: (callback: (uuid: string) => void) => void;
   updateOptions: (uuid: string, options: IGameOptions) => void;
   joinRoom: (uuid: string, callback: (state: TRoomState | IRoomUnavailableError) => void) => void;
+  sendMessage: (uuid: string, message: string) => void;
   lockRoom: (uuid: string) => void;
   kickPlayer: (uuid: string, userID: string) => void;
   leaveRoom: (uuid: string) => void;

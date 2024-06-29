@@ -25,6 +25,7 @@ type TMetaRoomState = {
   players: TRoomPlayer[];
   vote?: TVoteInRoom;
   options: IGameOptions;
+  chat: TChatMessage[];
 };
 
 export type TRoomPlayer = {
@@ -45,3 +46,12 @@ export type TStartedRoomState = {
   stage: 'started';
   game: IVisualGameState;
 } & TMetaRoomState;
+
+export type TChatMessage = {
+  user: {
+    id: string;
+    name: string;
+  };
+  message: string;
+  timestamp: number;
+};

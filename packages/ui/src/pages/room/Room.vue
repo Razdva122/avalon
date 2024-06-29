@@ -15,6 +15,7 @@
       </Board>
       <RolesInfo v-if="roomState.stage === 'started'" :game-roles="game.settings.roles" :visible-roles="visibleRoles" />
       <HostPanel v-if="displayHostPanel" :roomUuid="roomState.roomID" :roomStage="roomState.stage" />
+      <Chat class="chat" :messages="roomState.chat" :roomUuid="roomState.roomID" />
     </template>
   </div>
 </template>
@@ -30,6 +31,7 @@ import { GameStateManager } from '@/helpers/game-state-manager';
 import RolesInfo from '@/components/view/information/RolesInfo.vue';
 import HostPanel from '@/components/view/panels/HostPanel.vue';
 import RoomVote from '@/components/view/panels/RoomVote.vue';
+import Chat from '@/components/feedback/Chat.vue';
 
 export default defineComponent({
   name: 'Room',
@@ -38,6 +40,7 @@ export default defineComponent({
     RolesInfo,
     HostPanel,
     RoomVote,
+    Chat,
   },
   props: {
     uuid: {
@@ -144,5 +147,11 @@ export default defineComponent({
   width: 100vw;
   height: 100%;
   overflow-y: hidden;
+}
+
+.chat {
+  position: fixed;
+  bottom: 30px;
+  right: 5px;
 }
 </style>

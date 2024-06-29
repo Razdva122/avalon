@@ -144,6 +144,15 @@ export class Manager {
       console.log(`user ${userName} leave room uuid: ${uuid}`);
     });
 
+    socket.on('sendMessage', (uuid, message) => {
+      console.log(`sendMessage to ${uuid}`, message);
+      const room = this.rooms[uuid];
+
+      if (room) {
+        room.addMessage(userID, userName, message);
+      }
+    });
+
     socket.on('joinGame', (uuid) => {
       console.log('joinGame', uuid);
       const room = this.rooms[uuid];
