@@ -88,6 +88,10 @@ export class Room {
     } else {
       this.io.to(this.roomID).emit('roomUpdated', this.calculateRoomState());
     }
+
+    if (this.data.stage === 'started' && this.data.manager.roomState.result) {
+      eventBus.emit('roomUpdated', this);
+    }
   }
 
   startGame() {

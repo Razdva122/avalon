@@ -41,6 +41,10 @@ export class Manager {
         players: room.players.length,
       };
 
+      if (room.data.stage === 'started') {
+        roomData.result = room.data.manager.game.result;
+      }
+
       const roomIndex = this.roomsList.findIndex((el) => el.uuid === room.roomID);
 
       if (roomIndex !== -1) {

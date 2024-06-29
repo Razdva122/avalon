@@ -1,4 +1,4 @@
-import type { IGameOptions } from '@avalon/types';
+import type { IGameOptions, TGameResults } from '@avalon/types';
 
 export type TRoomsList = TRoomInfo[];
 
@@ -8,4 +8,5 @@ export type TRoomInfo = {
   state: 'created' | 'started' | 'locked';
   uuid: string;
   options: IGameOptions;
+  result?: TGameResults;
 };

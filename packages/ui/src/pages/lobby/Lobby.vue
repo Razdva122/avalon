@@ -17,6 +17,7 @@
           <div class="game-container">
             <div class="game-left">
               <div class="mr-2 game-name">
+                <span v-if="game.result?.winner" :class="`${game.result.winner}-loyalty-icon`" class="mr-1"></span>
                 <b>{{ game.host }}</b>
               </div>
               <OptionsPreview :roles="game.options.roles" :addons="game.options.addons" />
@@ -127,6 +128,8 @@ export default defineComponent({
 
 .game-name {
   @include text-overflow(1);
+  display: flex;
+  align-items: center;
 }
 
 .players-amount {
@@ -142,5 +145,13 @@ export default defineComponent({
   .text-primary {
     color: white !important;
   }
+}
+
+@import '@/styles/loyalty-icons.scss';
+
+.evil-loyalty-icon,
+.good-loyalty-icon {
+  width: 25px;
+  height: 25px;
 }
 </style>

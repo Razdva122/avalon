@@ -1,0 +1,18 @@
+.evil-loyalty-icon,
+.good-loyalty-icon {
+  display: inline-block;
+  margin-bottom: 0;
+  background-size: contain;
+  vertical-align: text-bottom;
+  border-radius: 50%;
+}
+
+.good-loyalty-icon {
+  background-image: url('@/assets/blue_team_no_background.webp');
+  border: 1px solid rgb(var(--v-theme-info));
+}
+
+.evil-loyalty-icon {
+  background-image: url('@/assets/red_team_no_background.webp');
+  border: 1px solid rgb(var(--v-theme-error));
+}
