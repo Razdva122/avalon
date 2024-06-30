@@ -20,7 +20,11 @@
                 <span v-if="game.result?.winner" :class="`${game.result.winner}-loyalty-icon`" class="mr-1"></span>
                 <b>{{ game.host }}</b>
               </div>
-              <OptionsPreview :roles="game.options.roles" :addons="game.options.addons" />
+              <OptionsPreview
+                v-if="displayOptions(game.options.roles, game.options.addons)"
+                :roles="game.options.roles"
+                :addons="game.options.addons"
+              />
             </div>
             <div class="game-right">
               <div class="players-amount mr-2">
@@ -49,6 +53,7 @@ import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import TemporaryAlert from '@/components/feedback/TemporaryAlert.vue';
 import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
+import type { TGameOptionsRoles, TGameOptionsAddons } from '@avalon/types';
 
 export default defineComponent({
   components: {
@@ -84,8 +89,13 @@ export default defineComponent({
       roomsList.value = list;
     });
 
+    const displayOptions = (roles: TGameOptionsRoles, addons: TGameOptionsAddons) => {
+      return [...Object.values(roles), ...Object.values(addons)].some((el) => Boolean(el));
+    };
+
     return {
       createRoom,
+      displayOptions,
       roomsList,
     };
   },

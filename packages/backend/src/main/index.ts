@@ -29,7 +29,13 @@ export class Manager {
     }, 86400000 * 3);
   }
 
-  updateRoomsList(room: Room, removeRoom: boolean = false) {
+  updateRoomsList(roomOrID: Room | string, removeRoom: boolean = false) {
+    const room = typeof roomOrID === 'string' ? this.rooms[roomOrID] : roomOrID;
+
+    if (!room) {
+      return;
+    }
+
     if (removeRoom) {
       this.roomsList = this.roomsList.filter((el) => el.uuid !== room.roomID);
     } else {

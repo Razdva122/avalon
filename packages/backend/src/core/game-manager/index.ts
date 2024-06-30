@@ -1,6 +1,7 @@
 import { Game } from '@/core/game';
 import type { User } from '@/user';
 import type { TRoomState, TGameMethodsParams, TGetLoyaltyData } from '@/core/game-manager/interface';
+import { eventBus } from '@/helpers';
 
 import { TGameStage, Server, IVisualGameState, IPlayer, IGameOptions } from '@avalon/types';
 
@@ -63,6 +64,10 @@ export class GameManager {
     this.roomState.mission = this.game.round;
 
     this.roomState.result = this.game.result;
+
+    if (this.game.result) {
+      eventBus.emit('roomUpdated', this.roomID);
+    }
 
     this.sendNewStateToUsers();
   }

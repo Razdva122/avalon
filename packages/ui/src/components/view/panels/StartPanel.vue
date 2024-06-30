@@ -35,9 +35,7 @@ import { useStore } from '@/store';
 import { TPageRoomState } from '@/helpers/game-state-manager';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
-import type { TGameOptionsRoles, TGameOptionsAddons, TGameOptionsFeatures } from '@avalon/types';
 import Options from '@/components/view/options/Options.vue';
-import { features } from 'process';
 
 export default defineComponent({
   name: 'StartPanel',
