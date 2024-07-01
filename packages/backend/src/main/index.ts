@@ -142,7 +142,7 @@ export class Manager {
         } else {
           const startTime = new Date(el.startTime);
 
-          return (Number(currentTime) - Number(startTime)) / minutes < 600 || el.result;
+          return (Number(currentTime) - Number(startTime)) / minutes < 600 || el.result?.winner;
         }
       });
     }, 60000 * 30);
