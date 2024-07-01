@@ -16,17 +16,10 @@ export class Manager {
 
     this.updateRoomsList(this.rooms[uuid]);
 
-    // Removes a room from the list if the game has not started after 30 minutes
-    setTimeout(() => {
-      if (this.rooms[uuid].data.stage !== 'started') {
-        this.updateRoomsList(this.rooms[uuid], true);
-      }
-    }, 60000 * 30);
-
-    // Delete room after 3 day timeout
+    // Delete room after 10 day timeout
     setTimeout(() => {
       delete this.rooms[uuid];
-    }, 86400000 * 3);
+    }, 86400000 * 10);
   }
 
   updateRoomsList(roomOrID: Room | string, removeRoom: boolean = false) {
@@ -43,6 +36,8 @@ export class Manager {
         host: room.players.find((player) => player.id === room.leaderID)?.name ?? 'unknown',
         state: room.data.stage,
         options: room.options,
+        startTime: room.startTime,
+        createTime: room.createTime,
         uuid: room.roomID,
         players: room.players.length,
       };
@@ -56,7 +51,7 @@ export class Manager {
       if (roomIndex !== -1) {
         this.roomsList[roomIndex] = roomData;
       } else {
-        if (this.roomsList.length === 10) {
+        if (this.roomsList.length === 20) {
           this.roomsList.pop();
         }
 
@@ -64,7 +59,7 @@ export class Manager {
       }
     }
 
-    this.io.to('lobby').emit('roomsListUpdated', this.roomsList);
+    this.io.to('lobby').emit('roomsListUpdated', this.roomsList.slice(0, 10));
   }
 
   restartRoom(uuid: string) {
@@ -134,6 +129,23 @@ export class Manager {
         console.log('user disconnected');
       });
     });
+
+    setInterval(() => {
+      const currentTime = new Date();
+
+      this.roomsList = this.roomsList.filter((el) => {
+        const createTime = new Date(el.createTime);
+        const minutes = 60 * 1000;
+
+        if (!el.startTime) {
+          return (Number(currentTime) - Number(createTime)) / minutes < 30;
+        } else {
+          const startTime = new Date(el.startTime);
+
+          return (Number(currentTime) - Number(startTime)) / minutes < 600 || el.result;
+        }
+      });
+    }, 60000 * 30);
   }
 
   createMethodsForAuthUsers(socket: ServerSocket, userID: string, userName: string): void {

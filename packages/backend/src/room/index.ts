@@ -16,6 +16,8 @@ export class Room {
   options: IGameOptions;
   data: TRoomData = { stage: 'created' };
   maxCapacity = 10;
+  createTime: string;
+  startTime?: string;
   io: Server;
 
   constructor(roomID: string, leaderID: string, players: User[], io: Server, options?: IGameOptions) {
@@ -25,6 +27,7 @@ export class Room {
     this.leaderID = leaderID;
     this.chat = new Chat();
     this.options = options || { addons: {}, roles: {}, features: {} };
+    this.createTime = String(new Date());
   }
 
   joinGame(userID: string, name: string) {
@@ -92,6 +95,7 @@ export class Room {
 
   startGame() {
     this.data = { stage: 'started', manager: new GameManager(this.players, this.options, this.io, this.roomID) };
+    this.startTime = String(new Date());
     this.updateRoomState(true);
   }
 
