@@ -59,7 +59,7 @@ export class Manager {
       }
     }
 
-    this.io.to('lobby').emit('roomsListUpdated', this.roomsList.slice(0, 10));
+    this.io.to('lobby').emit('roomsListUpdated', this.roomsList.slice(0, 11));
   }
 
   restartRoom(uuid: string) {
@@ -117,7 +117,7 @@ export class Manager {
 
       socket.on('getRoomsList', (cb) => {
         socket.join('lobby');
-        cb(this.roomsList);
+        cb(this.roomsList.slice(0, 11));
       });
 
       if (userID && userName) {
