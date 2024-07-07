@@ -11,6 +11,10 @@ export class Manager {
   roomsList: TRoomsList = [];
   io: Server;
 
+  get roomListCutted() {
+    return this.roomsList.slice(0, 21);
+  }
+
   createRoom(uuid: string, leaderID: string, players: User[], options?: IGameOptions) {
     this.rooms[uuid] = new Room(uuid, leaderID, players, this.io, options);
 
@@ -51,7 +55,7 @@ export class Manager {
       if (roomIndex !== -1) {
         this.roomsList[roomIndex] = roomData;
       } else {
-        if (this.roomsList.length === 20) {
+        if (this.roomsList.length === 50) {
           this.roomsList.pop();
         }
 
@@ -59,7 +63,7 @@ export class Manager {
       }
     }
 
-    this.io.to('lobby').emit('roomsListUpdated', this.roomsList.slice(0, 11));
+    this.io.to('lobby').emit('roomsListUpdated', this.roomListCutted);
   }
 
   restartRoom(uuid: string) {
@@ -117,7 +121,7 @@ export class Manager {
 
       socket.on('getRoomsList', (cb) => {
         socket.join('lobby');
-        cb(this.roomsList.slice(0, 11));
+        cb(this.roomListCutted);
       });
 
       if (userID && userName) {
