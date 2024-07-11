@@ -12,7 +12,7 @@ export class Manager {
   io: Server;
 
   get roomListCutted() {
-    return this.roomsList.slice(0, 21);
+    return this.roomsList.slice(0, 20);
   }
 
   createRoom(uuid: string, leaderID: string, players: User[], options?: IGameOptions) {
