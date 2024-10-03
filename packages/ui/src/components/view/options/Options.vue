@@ -9,10 +9,10 @@
     <div class="options pa-4 rounded-lg">
       <v-form>
         <v-tabs v-model="type" class="tabs">
-          <v-tab value="roles">Roles</v-tab>
-          <v-tab value="extraRoles">Extra roles</v-tab>
-          <v-tab value="addons" v-if="addons">Addons</v-tab>
-          <v-tab value="features" v-if="features">Features</v-tab>
+          <v-tab value="roles">{{ $t('options.roles') }}</v-tab>
+          <v-tab value="extraRoles">{{ $t('options.extraRoles') }}</v-tab>
+          <v-tab value="addons" v-if="addons">{{ $t('options.addons') }}</v-tab>
+          <v-tab value="features" v-if="features">{{ $t('options.features') }}</v-tab>
         </v-tabs>
         <template v-if="type === 'roles' || type === 'extraRoles'">
           <div class="option" v-for="role in type === 'roles' ? rolesSettings : extraRolesSettings">
@@ -73,7 +73,7 @@ export default defineComponent({
       type: Object as PropType<TGameOptionsFeatures>,
     },
     buttonText: {
-      default: 'Options',
+      required: true,
       type: String,
     },
   },

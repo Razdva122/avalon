@@ -3,29 +3,36 @@
     <template v-slot:prepend>
       <span class="material-icons"> share </span>
     </template>
-    Copy link
+    {{ $t('startPanel.copyLink') }}
   </v-btn>
   <v-btn color="info" class="mb-4" @click="onDiscordClick">
     <div class="d-flex align-center discord-button">
       <div class="discord-icon mr-2"></div>
-      <span>Discord</span>
+      <span>{{ $t('startPanel.discord') }}</span>
     </div>
   </v-btn>
-  <v-btn v-if="isUserInGame" color="warning" @click="onJoinClick"> Leave Game </v-btn>
+  <v-btn v-if="isUserInGame" color="warning" @click="onJoinClick"> {{ $t('startPanel.leaveGame') }} </v-btn>
   <v-btn
     v-else-if="roomState.players.length < 10"
     color="info"
     :disabled="roomState.stage !== 'created'"
     @click="onJoinClick"
   >
-    Join Game
+    {{ $t('startPanel.joinGame') }}
   </v-btn>
   <template v-if="isUserLeader">
     <v-btn class="mt-2" color="info" @click="onLockClick">
-      {{ roomState.stage === 'created' ? 'Lock Game' : 'Unlock game' }}
+      {{ roomState.stage === 'created' ? $t('startPanel.lockGame') : $t('startPanel.unlockGame') }}
     </v-btn>
-    <v-btn class="mt-2 mb-4" color="success" :disabled="isStartGameDisabled" @click="onStartClick"> Start Game </v-btn>
-    <Options :roles="options.roles" :addons="options.addons" :features="options.features" />
+    <v-btn class="mt-2 mb-4" color="success" :disabled="isStartGameDisabled" @click="onStartClick">
+      {{ $t('startPanel.startGame') }}
+    </v-btn>
+    <Options
+      :roles="options.roles"
+      :addons="options.addons"
+      :features="options.features"
+      :buttonText="$t('startPanel.options')"
+    />
   </template>
 </template>
 
