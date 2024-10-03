@@ -5,14 +5,14 @@
         <template v-slot:append>
           <span class="material-icons"> menu </span>
         </template>
-        Menu
+        {{ $t('menu.menu') }}
       </v-btn>
     </template>
     <nav>
-      <router-link to="/">Home</router-link>
-      <div @click="$emit('profileClick')">Profile</div>
-      <router-link :to="{ name: 'wiki' }">Wiki</router-link>
-      <router-link :to="{ name: 'about' }">About</router-link>
+      <router-link to="/">{{ $t('menu.home') }}</router-link>
+      <div @click="$emit('profileClick')">{{ $t('menu.profile') }}</div>
+      <router-link :to="{ name: 'wiki' }">{{ $t('menu.wiki') }}</router-link>
+      <router-link :to="{ name: 'about' }">{{ $t('menu.about') }}</router-link>
     </nav>
   </v-menu>
 </template>

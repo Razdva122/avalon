@@ -5,6 +5,7 @@
         <v-form @submit.prevent="updateUser" class="d-flex flex-column align-center justify-center">
           <span class="mb-2">Select your username for game</span>
           <v-text-field v-model="username" :rules="rules" label="Username" class="w-100 mb-2"></v-text-field>
+          <v-select label="Language" :items="availableLocales" class="w-100 mb-2" v-model="locale"></v-select>
           <v-checkbox v-if="isUserExist" v-model="hideSpoilers" :hide-details="true" label="Hide spoilers">
           </v-checkbox>
           <v-checkbox
@@ -27,6 +28,7 @@
 import { defineComponent } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import eventBus from '@/helpers/event-bus';
+import { LanguageMap, TLanguage } from '@/helpers/i18n';
 
 export default defineComponent({
   data() {
@@ -36,6 +38,10 @@ export default defineComponent({
       overlay: false,
       username: user?.name || '',
       isUserExist: Boolean(user),
+      availableLocales: this.$i18n.availableLocales.map((el) => ({
+        value: el,
+        title: LanguageMap[<TLanguage>el],
+      })),
       rules: [
         (value: string | undefined) => {
           if (value) return true;
@@ -57,6 +63,15 @@ export default defineComponent({
       },
       set(value: boolean) {
         this.$store.commit('updateHideSpoilers', value);
+      },
+    },
+    locale: {
+      get() {
+        return LanguageMap[this.$store.state.user?.settings?.locale?.value || 'en'];
+      },
+      set(value: string) {
+        this.$store.commit('updateUserSettings', { key: 'locale', value: { value, isDefault: false } });
+        (<unknown>this.$i18n.locale) = value;
       },
     },
     hideIndexInHistory: {

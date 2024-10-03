@@ -3,7 +3,7 @@
     <div class="information">
       <router-link :to="{ name: 'rules' }">
         <v-btn size="x-large">
-          Rules
+          {{ $t('wiki.rules') }}
           <template v-slot:prepend>
             <span class="material-icons"> auto_stories </span>
           </template>
@@ -12,7 +12,7 @@
 
       <router-link :to="{ name: 'roles' }">
         <v-btn size="x-large">
-          Roles
+          {{ $t('wiki.roles') }}
           <template v-slot:prepend>
             <span class="material-icons"> person </span>
           </template>
@@ -21,7 +21,7 @@
 
       <router-link :to="{ name: 'addons' }">
         <v-btn size="x-large">
-          Addons
+          {{ $t('wiki.addons') }}
           <template v-slot:prepend>
             <span class="material-icons"> castle </span>
           </template>

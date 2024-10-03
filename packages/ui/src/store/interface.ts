@@ -1,3 +1,5 @@
+import type { TLanguage } from '@/helpers/i18n';
+
 export interface IState {
   user: IUser | null;
   hideSpoilers: boolean;
@@ -9,6 +11,7 @@ export interface IUser {
   id: string;
   name: string;
   settings?: {
+    locale?: { value: TLanguage; isDefault: boolean };
     hideIndexInHistory?: boolean;
     style?: 'default' | 'anime';
   };

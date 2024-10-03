@@ -1,9 +1,13 @@
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
 
 import { createApp } from 'vue';
+import { createI18n } from 'vue-i18n';
+
 import App from '@/App.vue';
 import router from '@/router';
 import { store, key } from '@/store';
+
+import { selectLocale, translates } from '@/helpers/i18n';
 
 import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
@@ -29,4 +33,10 @@ const vuetify = createVuetify({
   },
 });
 
-createApp(App).use(store, key).use(router).use(vuetify).mount('#app');
+const i18n = createI18n({
+  locale: selectLocale(),
+  fallbackLocale: 'en',
+  messages: translates,
+});
+
+createApp(App).use(i18n).use(store, key).use(router).use(vuetify).mount('#app');

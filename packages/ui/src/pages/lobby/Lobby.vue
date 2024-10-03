@@ -7,11 +7,11 @@
       </TemporaryAlert>
     </div>
 
-    <v-btn @click="createRoom" size="x-large"> Create room </v-btn>
+    <v-btn @click="createRoom" size="x-large"> {{ $t('mainPage.createRoom') }} </v-btn>
 
     <div>
       <template v-if="roomsList && roomsList.length">
-        <div class="list-header mb-5">Games list:</div>
+        <div class="list-header mb-5">{{ $t('mainPage.gamesList') }}:</div>
         <div v-for="(game, index) in roomsList" class="game mb-1">
           <div>{{ index + 1 }}.</div>
           <div class="game-container">
@@ -34,7 +34,7 @@
                 :color="game.state === 'created' ? undefined : 'info'"
                 @click="$router.push({ name: 'room', params: { uuid: game.uuid } })"
               >
-                {{ game.state === 'created' ? 'Join' : 'Watch' }}
+                {{ game.state === 'created' ? $t('mainPage.join') : $t('mainPage.watch') }}
               </v-btn>
             </div>
           </div>
