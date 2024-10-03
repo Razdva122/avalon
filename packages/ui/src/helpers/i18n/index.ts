@@ -10,6 +10,7 @@ export const LanguageMap: { [key in TLanguage]: string } = {
   en: 'English',
   ru: 'Russian',
   zh_TW: 'Traditional Chinese',
+  zh_CN: 'Simplified Chinese',
 };
 
 export function selectLocale(): TLanguage {
