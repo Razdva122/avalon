@@ -4,71 +4,71 @@
     <h1>Roles</h1>
     <div class="roles-container">
       <router-link class="role" :to="{ name: 'merlin' }">
-        <h2>Merlin</h2>
+        <h2>{{ $t('roles.merlin') }}</h2>
         <img class="role-image" :src="calculateRoleUrl('merlin')" alt="merlin" />
       </router-link>
       <router-link class="role" :to="{ name: 'merlin_pure' }">
-        <h2>Merlin Pure</h2>
+        <h2>{{ $t('roles.merlinPure') }}</h2>
         <img class="role-image" :src="calculateRoleUrl('merlinPure')" alt="merlin pure" />
       </router-link>
       <router-link class="role" :to="{ name: 'guinevere' }">
-        <h2>Guinevere</h2>
+        <h2>{{ $t('roles.guinevere') }}</h2>
         <img class="role-image" :src="calculateRoleUrl('guinevere')" alt="guinevere" />
       </router-link>
       <router-link class="role" :to="{ name: 'percival' }">
-        <h2>Percival</h2>
+        <h2>{{ $t('roles.percival') }}</h2>
         <img class="role-image" :src="calculateRoleUrl('percival')" alt="percival" />
       </router-link>
       <router-link class="role" :to="{ name: 'lovers' }">
-        <h2>Tristan</h2>
+        <h2>{{ $t('roles.tristan') }}</h2>
         <img class="role-image" :src="calculateRoleUrl('tristan')" alt="tristan" />
       </router-link>
       <router-link class="role" :to="{ name: 'lovers' }">
-        <h2>Isolde</h2>
+        <h2>{{ $t('roles.isolde') }}</h2>
         <img class="role-image" :src="calculateRoleUrl('isolde')" alt="isolde" />
       </router-link>
       <router-link class="role" :to="{ name: 'troublemaker' }">
-        <h2>Troublemaker</h2>
+        <h2>{{ $t('roles.troublemaker') }}</h2>
         <img class="role-image" :src="calculateRoleUrl('troublemaker')" alt="troublemaker" />
       </router-link>
       <router-link class="role" :to="{ name: 'servant' }">
-        <h2>Servant</h2>
+        <h2>{{ $t('roles.servant') }}</h2>
         <img class="role-image" :src="calculateRoleUrl('servant')" alt="servant" />
       </router-link>
       <router-link class="role" :to="{ name: 'lancelots' }">
-        <h2>Good Lancelot</h2>
+        <h2>{{ $t('roles.goodLancelot') }}</h2>
         <img class="role-image" :src="calculateRoleUrl('goodLancelot')" alt="good lancelot" />
       </router-link>
       <router-link class="role" :to="{ name: 'lancelots' }">
-        <h2>Evil Lancelot</h2>
+        <h2>{{ $t('roles.evilLancelot') }}</h2>
         <img class="role-image evil-role" :src="calculateRoleUrl('evilLancelot')" alt="evil lancelot" />
       </router-link>
       <router-link class="role" :to="{ name: 'mordred' }">
-        <h2>Mordred</h2>
+        <h2>{{ $t('roles.mordred') }}</h2>
         <img class="role-image evil-role" :src="calculateRoleUrl('mordred')" alt="mordred" />
       </router-link>
       <router-link class="role" :to="{ name: 'trickster' }">
-        <h2>Trickster</h2>
+        <h2>{{ $t('roles.trickster') }}</h2>
         <img class="role-image evil-role" :src="calculateRoleUrl('trickster')" alt="trickster" />
       </router-link>
       <router-link class="role" :to="{ name: 'morgana' }">
-        <h2>Morgana</h2>
+        <h2>{{ $t('roles.morgana') }}</h2>
         <img class="role-image evil-role" :src="calculateRoleUrl('morgana')" alt="morgana" />
       </router-link>
       <router-link class="role" :to="{ name: 'oberon' }">
-        <h2>Oberon</h2>
+        <h2>{{ $t('roles.oberon') }}</h2>
         <img class="role-image evil-role" :src="calculateRoleUrl('oberon')" alt="oberon" />
       </router-link>
       <router-link class="role" :to="{ name: 'lunatic' }">
-        <h2>Lunatic</h2>
+        <h2>{{ $t('roles.lunatic') }}</h2>
         <img class="role-image evil-role" :src="calculateRoleUrl('lunatic')" alt="lunatic" />
       </router-link>
       <router-link class="role" :to="{ name: 'brute' }">
-        <h2>Brute</h2>
+        <h2>{{ $t('roles.brute') }}</h2>
         <img class="role-image evil-role" :src="calculateRoleUrl('brute')" alt="brute" />
       </router-link>
       <router-link class="role" :to="{ name: 'minion' }">
-        <h2>Minion</h2>
+        <h2>{{ $t('roles.minion') }}</h2>
         <img class="role-image evil-role" :src="calculateRoleUrl('minion')" alt="minion" />
       </router-link>
     </div>

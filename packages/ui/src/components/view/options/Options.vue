@@ -87,62 +87,79 @@ export default defineComponent({
   computed: {
     rolesSettings() {
       return [
-        { role: 'merlin', label: 'Merlin', disabled: Boolean(this.roles.merlinPure), color: 'success' },
+        { role: 'merlin', label: this.$t('roles.merlin'), disabled: Boolean(this.roles.merlinPure), color: 'success' },
         {
           role: 'merlinPure',
-          label: 'Merlin Pure',
+          label: this.$t('roles.merlinPure'),
           disabled: Boolean(this.roles.merlin),
           color: 'success',
           route: 'merlin_pure',
         },
         {
           role: 'percival',
-          label: 'Percival',
+          label: this.$t('roles.percival'),
           disabled: !this.roles.merlin && !this.roles.merlinPure,
           color: 'success',
         },
-        { role: 'tristan', label: 'Tristan', disabled: false, color: 'success', route: 'lovers' },
-        { role: 'isolde', label: 'Isolde', disabled: false, color: 'success', route: 'lovers' },
+        { role: 'tristan', label: this.$t('roles.tristan'), disabled: false, color: 'success', route: 'lovers' },
+        { role: 'isolde', label: this.$t('roles.isolde'), disabled: false, color: 'success', route: 'lovers' },
         {
           role: 'morgana',
-          label: 'Morgana',
+          label: this.$t('roles.morgana'),
           disabled: (!this.roles.merlin && !this.roles.merlinPure) || !this.roles.percival,
           color: 'warning',
         },
-        { role: 'mordred', label: 'Mordred', disabled: !this.roles.merlin && !this.roles.merlinPure, color: 'warning' },
-        { role: 'oberon', label: 'Oberon', disabled: false, color: 'warning' },
+        {
+          role: 'mordred',
+          label: this.$t('roles.mordred'),
+          disabled: !this.roles.merlin && !this.roles.merlinPure,
+          color: 'warning',
+        },
+        { role: 'oberon', label: this.$t('roles.oberon'), disabled: false, color: 'warning' },
       ] as const;
     },
     extraRolesSettings() {
       return [
-        { role: 'troublemaker', label: 'Troublemaker', disabled: false, color: 'success' },
+        { role: 'troublemaker', label: this.$t('roles.troublemaker'), disabled: false, color: 'success' },
         {
           role: 'guinevere',
-          label: 'Guinevere',
+          label: this.$t('roles.guinevere'),
           disabled: !this.roles.goodLancelot,
           color: 'success',
           route: 'guinevere',
         },
-        { role: 'goodLancelot', label: 'Good Lancelot', disabled: false, color: 'success', route: 'lancelots' },
-        { role: 'evilLancelot', label: 'Evil Lancelot', disabled: false, color: 'warning', route: 'lancelots' },
-        { role: 'trickster', label: 'Trickster', disabled: false, color: 'warning', route: 'trickster' },
-        { role: 'lunatic', label: 'Lunatic', disabled: false, color: 'warning', route: 'lunatic' },
-        { role: 'brute', label: 'Brute', disabled: false, color: 'warning', route: 'brute' },
+        {
+          role: 'goodLancelot',
+          label: this.$t('roles.goodLancelot'),
+          disabled: false,
+          color: 'success',
+          route: 'lancelots',
+        },
+        {
+          role: 'evilLancelot',
+          label: this.$t('roles.evilLancelot'),
+          disabled: false,
+          color: 'warning',
+          route: 'lancelots',
+        },
+        { role: 'trickster', label: this.$t('roles.trickster'), disabled: false, color: 'warning', route: 'trickster' },
+        { role: 'lunatic', label: this.$t('roles.lunatic'), disabled: false, color: 'warning', route: 'lunatic' },
+        { role: 'brute', label: this.$t('roles.brute'), disabled: false, color: 'warning', route: 'brute' },
       ] as const;
     },
     addonsSettings() {
       return [
         {
           name: 'ladyOfLake',
-          label: 'Lady of the lake',
+          label: this.$t('addons.ladyOfLake'),
           route: 'ladyOfLake',
-          hint: 'The lady allows you to find out the loyalty of another player',
+          hint: this.$t('options.ladyHint'),
         },
         {
           name: 'excalibur',
-          label: 'Excalibur',
+          label: this.$t('addons.excalibur'),
           route: 'excalibur',
-          hint: 'Excalibur allows you to change the decision of one of the participants of the mission',
+          hint: this.$t('options.excaliburHint'),
         },
       ] as const;
     },
@@ -150,18 +167,18 @@ export default defineComponent({
       return [
         {
           name: 'anonymousVoting',
-          label: 'Anonymous voting',
-          hint: "With anonymous voting, you don't know who approves the mission and who rejects it",
+          label: this.$t('options.anonymousVoting'),
+          hint: this.$t('options.anonymousVotingHint'),
         },
         {
           name: 'hiddenHistory',
-          label: 'Hidden history',
-          hint: 'With a hidden history, past actions in the game are hidden',
+          label: this.$t('options.hiddenHistory'),
+          hint: this.$t('options.hiddenHistoryHint'),
         },
         {
           name: 'displayIndex',
-          label: 'Display index',
-          hint: 'Displays the index number of each player at the table',
+          label: this.$t('options.displayIndex'),
+          hint: this.$t('options.displayIndexHint'),
         },
       ] as const;
     },

@@ -16,7 +16,7 @@
           >
           </v-checkbox>
           <v-checkbox v-if="isUserExist" v-model="style" :hide-details="true" label="Anime mode"> </v-checkbox>
-          <v-btn type="submit">{{ isUserExist ? 'Update' : 'Submit' }}</v-btn>
+          <v-btn :disabled="!username.length" type="submit">{{ isUserExist ? 'Update' : 'Submit' }}</v-btn>
         </v-form>
       </v-sheet>
       <v-btn @click="closeSettings" class="close" icon="close" variant="text" density="compact" />
@@ -67,7 +67,7 @@ export default defineComponent({
     },
     locale: {
       get() {
-        return LanguageMap[this.$store.state.user?.settings?.locale?.value || 'en'];
+        return LanguageMap[<TLanguage>(<unknown>this.$i18n.locale)];
       },
       set(value: string) {
         this.$store.commit('updateUserSettings', { key: 'locale', value: { value, isDefault: false } });

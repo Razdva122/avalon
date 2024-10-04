@@ -8,7 +8,7 @@
       <div class="actions-container d-flex flex-column justify-center">
         <template v-if="roomState.stage !== 'started'">
           <div class="options-panel mb-4">
-            <div class="options-title">Roles and addons</div>
+            <div class="options-title">{{ $t('game.rolesAndAddons') }}</div>
             <OptionsPreview
               :roles="roomState.options.roles"
               :addons="roomState.options.addons"
