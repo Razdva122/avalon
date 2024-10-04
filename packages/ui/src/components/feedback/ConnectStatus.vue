@@ -16,20 +16,20 @@ export default defineComponent({
       if (connect === null) {
         return {
           class: 'bg-warning',
-          text: 'Connecting...',
+          text: this.$t('onlineStatus.connecting'),
         };
       }
 
       if (connect === true) {
         return {
           class: 'bg-success',
-          text: 'Connected',
+          text: this.$t('onlineStatus.connected'),
         };
       }
 
       return {
         class: 'bg-error',
-        text: 'Error',
+        text: this.$t('onlineStatus.error'),
       };
     },
   },
