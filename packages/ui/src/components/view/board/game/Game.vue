@@ -42,7 +42,7 @@
                 variant="text"
                 color="yellow"
               ></v-btn>
-              <div class="history-hint">{{ $t('historyMode') }}</div>
+              <div class="history-hint">{{ $t('game.historyMode') }}</div>
               <v-btn
                 @click="stateManager.moveToNextStage()"
                 :disabled="roomState.pointer === roomState.gameStates.length - 1"
@@ -69,7 +69,7 @@
     <div class="d-flex flex-row mb-4">
       <Mission v-for="mission in missions" :mission="mission" />
     </div>
-    <div class="mb-4">{{ $t('voteStage') }}: {{ gameState.vote + 1 }} / 5</div>
+    <div class="mb-4">{{ $t('game.voteStage') }}: {{ gameState.vote + 1 }} / 5</div>
     <div class="button-panel actions-or-info mb-4 d-flex flex-column align-center">
       <InGamePanel v-if="inGamePanel && !visibleHistory && stateManager.viewMode.value === 'live'" :game="gameState" />
       <div class="d-flex flex-row align-center justify-center" v-if="visibleHistory?.type === 'mission'">
@@ -90,7 +90,7 @@
         <div v-if="gameState.result.winner">
           {{ $t('game.winner') }}:
           <span :class="gameState.result.winner === 'evil' ? 'text-error' : 'text-info'" class="winner-text"
-            ><b>{{ $t(gameState.result.winner) }}</b></span
+            ><b>{{ $t('game.' + gameState.result.winner) }}</b></span
           >
         </div>
         <div v-else>{{ $t('game.gameIsEnded') }}.</div>
@@ -102,7 +102,7 @@
     </div>
     <div class="meta-info font-weight-bold d-flex justify-space-between">
       <div>
-        <span>{{ $t('stage') + ':' + $t(stageText) }}</span>
+        <span>{{ $t('game.stage') + ':' + $t('game.' + stageText) }}</span>
       </div>
       <div>
         <span class="text-info">{{ gameState.settings.players.good }}</span> vs
