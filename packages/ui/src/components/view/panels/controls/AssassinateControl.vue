@@ -5,24 +5,26 @@
         <template v-slot:prepend>
           <div class="merlin-radio-button radio-button"></div>
         </template>
-        Merlin
+        {{ $t('roles.merlin') }}
       </v-btn>
       <v-btn v-if="assassinateTargets.includes('lovers')" class="button-content" value="lovers" variant="plain">
         <template v-slot:prepend>
           <div class="lovers-radio-button radio-button"></div>
         </template>
-        Lovers
+        {{ $t('assassinate.lovers') }}
       </v-btn>
       <v-btn v-if="assassinateTargets.includes('guinevere')" class="button-content" value="guinevere" variant="plain">
         <template v-slot:prepend>
           <div class="guinevere-radio-button radio-button"></div>
         </template>
-        Guinevere
+        {{ $t('roles.guinevere') }}
       </v-btn>
     </v-btn-toggle>
   </div>
   <div>
-    <v-btn color="error" :disabled="isAssassinateDisabled" @click="onAssassinateClick">Assassinate</v-btn>
+    <v-btn color="error" :disabled="isAssassinateDisabled" @click="onAssassinateClick">{{
+      $t('assassinate.assassinate')
+    }}</v-btn>
   </div>
 </template>
 

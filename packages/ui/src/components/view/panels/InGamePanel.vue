@@ -1,12 +1,16 @@
 <template>
   <template v-if="game.stage === 'selectTeam' && isUserLeader">
-    <v-btn color="warning" :disabled="isSendTeamDisabled" @click="emitClick('sentSelectedPlayers')"> Send Team </v-btn>
+    <v-btn color="warning" :disabled="isSendTeamDisabled" @click="emitClick('sentSelectedPlayers')">
+      {{ $t('inGame.sendTeam') }}
+    </v-btn>
   </template>
   <template v-if="game.stage === 'votingForTeam'">
     <v-btn color="success" :disabled="!isPlayerActive" @click="() => onVoteClick('approve')" class="mb-2">
-      Approve
+      {{ $t('inGame.approve') }}
     </v-btn>
-    <v-btn color="error" :disabled="!isPlayerActive" @click="() => onVoteClick('reject')"> Reject </v-btn>
+    <v-btn color="error" :disabled="!isPlayerActive" @click="() => onVoteClick('reject')">
+      {{ $t('inGame.reject') }}
+    </v-btn>
   </template>
   <template v-if="game.stage === 'onMission' && isPlayerOnMission">
     <Spoiler :size="{ width: '200px', height: '80px' }">
@@ -16,10 +20,10 @@
         @click="() => onMissionClick('success')"
         class="mb-2"
       >
-        Success
+        {{ $t('inGame.success') }}
       </v-btn>
       <v-btn color="error" :disabled="!isPlayerActive || !isPlayerCanFail" @click="() => onMissionClick('fail')">
-        Fail
+        {{ $t('inGame.fail') }}
       </v-btn>
     </Spoiler>
   </template>
@@ -27,19 +31,21 @@
     <AssassinateControl :game="game" />
   </template>
   <template v-if="game.stage === 'checkLoyalty' && isUserLadyOwner">
-    <v-btn color="warning" :disabled="!isLadyAvailable" @click="emitClick('checkLoyalty')">Check Loyalty</v-btn>
+    <v-btn color="warning" :disabled="!isLadyAvailable" @click="emitClick('checkLoyalty')">{{
+      $t('inGame.checkLoyalty')
+    }}</v-btn>
   </template>
   <template v-if="game.stage === 'giveExcalibur' && isUserLeader">
-    <v-btn color="warning" :disabled="!isGiveExcaliburAvailable" @click="emitClick('giveExcalibur')"
-      >Give excalibur</v-btn
-    >
+    <v-btn color="warning" :disabled="!isGiveExcaliburAvailable" @click="emitClick('giveExcalibur')">{{
+      $t('inGame.giveExcalibur')
+    }}</v-btn>
   </template>
   <template v-if="game.stage === 'useExcalibur' && isUserExcaliburOwner">
     <v-btn
       :color="isZeroPlayerSelected ? 'warning' : 'error'"
       :disabled="!isUseExcaliburAvailable"
       @click="emitClick('useExcalibur')"
-      >{{ isZeroPlayerSelected ? 'Skip excalibur' : 'Use excalibur' }}</v-btn
+      >{{ isZeroPlayerSelected ? $t('inGame.skipExcalibur') : $t('inGame.useExcalibur') }}</v-btn
     >
   </template>
 </template>

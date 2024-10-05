@@ -3,20 +3,38 @@
     <v-card>
       <v-sheet width="300" class="mx-auto pa-4">
         <v-form @submit.prevent="updateUser" class="d-flex flex-column align-center justify-center">
-          <span class="mb-2">Select your username for game</span>
-          <v-text-field v-model="username" :rules="rules" label="Username" class="w-100 mb-2"></v-text-field>
-          <v-select label="Language" :items="availableLocales" class="w-100 mb-2" v-model="locale"></v-select>
-          <v-checkbox v-if="isUserExist" v-model="hideSpoilers" :hide-details="true" label="Hide spoilers">
+          <span class="mb-2">{{ $t('settings.usernameHint') }}</span>
+          <v-text-field
+            v-model="username"
+            :rules="rules"
+            :label="$t('settings.username')"
+            class="w-100 mb-2"
+          ></v-text-field>
+          <v-select
+            :label="$t('settings.language')"
+            :items="availableLocales"
+            class="w-100 mb-2"
+            v-model="locale"
+          ></v-select>
+          <v-checkbox
+            v-if="isUserExist"
+            v-model="hideSpoilers"
+            :hide-details="true"
+            :label="$t('settings.hideSpoilersHint')"
+          >
           </v-checkbox>
           <v-checkbox
             v-if="isUserExist"
             v-model="hideIndexInHistory"
             :hide-details="true"
-            label="Hide Indexes In History"
+            :label="$t('settings.hideIndexHint')"
           >
           </v-checkbox>
-          <v-checkbox v-if="isUserExist" v-model="style" :hide-details="true" label="Anime mode"> </v-checkbox>
-          <v-btn :disabled="!username.length" type="submit">{{ isUserExist ? 'Update' : 'Submit' }}</v-btn>
+          <v-checkbox v-if="isUserExist" v-model="style" :hide-details="true" :label="$t('settings.animeMode')">
+          </v-checkbox>
+          <v-btn :disabled="!username.length" type="submit">{{
+            isUserExist ? $t('settings.update') : $t('settings.submit')
+          }}</v-btn>
         </v-form>
       </v-sheet>
       <v-btn @click="closeSettings" class="close" icon="close" variant="text" density="compact" />
@@ -46,7 +64,7 @@ export default defineComponent({
         (value: string | undefined) => {
           if (value) return true;
 
-          return 'You must enter a username.';
+          return this.$t('settings.usernameRequired');
         },
       ],
     };
