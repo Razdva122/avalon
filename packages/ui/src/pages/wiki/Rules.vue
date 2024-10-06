@@ -17,9 +17,9 @@
       Loyal Servants of Arthur
     </h3>
     <p>
-      The Loyal <PreviewLink target="servant" text="servant of Arthur" /> must successfully complete three out of five
-      missions. They must work together to propose teams for each mission and vote on team compositions, always trying
-      to keep traitors off the teams to prevent missions from failing.
+      The Loyal <PreviewLink target="servant" /> must successfully complete three out of five missions. They must work
+      together to propose teams for each mission and vote on team compositions, always trying to keep traitors off the
+      teams to prevent missions from failing.
     </p>
 
     <h3>
@@ -28,10 +28,10 @@
       Minions of Mordred
     </h3>
     <p>
-      The <PreviewLink target="minion" text="minions of Mordred" /> aim to sow discord and mistrust among the
-      <PreviewLink target="servant" text="Loyal servant" />. Their goal is to cause three missions to fail
-      <span class="evil-loyalty-icon"></span> by infiltrating teams and sabotaging missions. They must communicate
-      covertly and strategize to mislead the loyalists and cast doubt on the true allegiances of other players.
+      The <PreviewLink target="minion" /> aim to sow discord and mistrust among the <PreviewLink target="servant" />.
+      Their goal is to cause three missions to fail <span class="evil-loyalty-icon"></span> by infiltrating teams and
+      sabotaging missions. They must communicate covertly and strategize to mislead the loyalists and cast doubt on the
+      true allegiances of other players.
     </p>
 
     <h3>Additional Objectives</h3>
@@ -198,8 +198,8 @@
 
     <p>
       <PreviewLink target="merlin" /> -> <PreviewLink target="percival" /> -> <PreviewLink target="morgana" /> ->
-      <PreviewLink target="oberon" /> -> <PreviewLink target="mordred" /> ->
-      <PreviewLink target="ladyOfLake" text="Lady of the lake" /> -> <PreviewLink target="tristan" /> +
+      <PreviewLink target="oberon" /> -> <PreviewLink target="mordred" /> -> <PreviewLink target="ladyOfLake" /> ->
+      <PreviewLink target="tristan" /> +
       <PreviewLink target="isolde" />
     </p>
 
@@ -223,7 +223,7 @@
       <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
       <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" /><br />
-      <em>Addons:</em> <PreviewLink target="ladyOfLake" text="Lady of the lake" />
+      <em>Addons:</em> <PreviewLink target="ladyOfLake" />
     </div>
 
     <div class="game-setup">
@@ -232,7 +232,7 @@
       <PreviewLink target="servant" />, <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
       <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" /><br />
-      <em>Addons:</em> <PreviewLink target="ladyOfLake" text="Lady of the lake" />
+      <em>Addons:</em> <PreviewLink target="ladyOfLake" />
     </div>
 
     <div class="game-setup">
@@ -251,7 +251,7 @@
       <PreviewLink target="servant" /><br />
       <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" />, <PreviewLink target="oberon" /><br />
-      <em>Addons:</em> <PreviewLink target="ladyOfLake" text="Lady of the lake" />
+      <em>Addons:</em> <PreviewLink target="ladyOfLake" />
     </div>
 
     <p>
@@ -281,21 +281,21 @@
           (not
           <strong
             ><PreviewLink v-if="roles.oberon" target="oberon" />
-            <PreviewLink v-if="roles.evilLancelot" target="evilLancelot" text="Evil Lancelot" /></strong
+            <PreviewLink v-if="roles.evilLancelot" target="evilLancelot" /></strong
           >)</span
         >
         open your eyes and look around so that you know all agents of Evil.
       </li>
       <li v-if="roles.evilLancelot">
-        <strong><PreviewLink v-if="roles.evilLancelot" target="evilLancelot" text="Evil Lancelot" /></strong> - extend
-        your thumb so <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong> will known of you.
+        <strong><PreviewLink v-if="roles.evilLancelot" target="evilLancelot" /></strong> - extend your thumb so
+        <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong> will known of you.
       </li>
       <li>
         <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong> close your eyes.
       </li>
       <template v-if="roles.guinevere">
         <li>
-          <strong><PreviewLink target="goodLancelot" text="Good Lancelot" /></strong> extend your thumb into the air.
+          <strong><PreviewLink target="goodLancelot" /></strong> extend your thumb into the air.
         </li>
         <li>
           <strong><PreviewLink target="guinevere" /></strong>, open your eyes and look around so that you know both
@@ -304,8 +304,8 @@
       </template>
       <li v-if="roles.evilLancelot">
         <strong>
-          <PreviewLink v-if="roles.evilLancelot" target="evilLancelot" text="Evil Lancelot" />
-          <template v-if="roles.guinevere"> and <PreviewLink target="goodLancelot" text="Good Lancelot" /> </template>
+          <PreviewLink v-if="roles.evilLancelot" target="evilLancelot" />
+          <template v-if="roles.guinevere"> and <PreviewLink target="goodLancelot" /> </template>
         </strong>
         - put your thumb down and re-form your hand into a fist.
       </li>

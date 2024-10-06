@@ -1,92 +1,96 @@
+import { i18n } from '@/plugins/i18n';
+
+const { t } = i18n.global;
+
 import { TLoyalty, TVisibleRole } from '@avalon/types';
 
 export const rolesShortInfo: { [key in TVisibleRole]: { loyalty: TLoyalty | 'unknown'; info: string } } = {
   merlin: {
     loyalty: 'good',
-    info: 'Knows evil, must remain hidden',
+    info: t('rolesInfo.merlinInfo'),
   },
   merlinPure: {
     loyalty: 'good',
-    info: 'Knows evil and their roles, must remain hidden',
+    info: t('rolesInfo.merlinPureInfo'),
   },
   percival: {
     loyalty: 'good',
-    info: 'Knows two wizards (Merlin and Morgana), but does not know which of them is which',
+    info: t('rolesInfo.percivalInfo'),
   },
   servant: {
     loyalty: 'good',
-    info: 'Loyal Servant of Arthur',
+    info: t('rolesInfo.servantInfo'),
   },
   troublemaker: {
     loyalty: 'good',
-    info: 'Obliged to lie about his loyalty',
+    info: t('rolesInfo.troublemakerInfo'),
   },
   guinevere: {
     loyalty: 'good',
-    info: 'Knows two Lancelots but does not know their loyalty',
+    info: t('rolesInfo.guinevereInfo'),
   },
   goodLancelot: {
     loyalty: 'good',
-    info: 'Good lancelot, can switch role to evil in game',
+    info: t('rolesInfo.goodLancelotInfo'),
   },
   evilLancelot: {
     loyalty: 'evil',
-    info: 'Evil lancelot, can switch role to good in game',
+    info: t('rolesInfo.evilLancelotInfo'),
   },
   mordred: {
     loyalty: 'evil',
-    info: 'Unknown to Merlin',
+    info: t('rolesInfo.mordredInfo'),
   },
   morgana: {
     loyalty: 'evil',
-    info: 'Appears as Merlin for Percival',
+    info: t('rolesInfo.morganaInfo'),
   },
   oberon: {
     loyalty: 'evil',
-    info: 'Unknown to Evil',
+    info: t('rolesInfo.oberonInfo'),
   },
   minion: {
     loyalty: 'evil',
-    info: 'Minion of Mordred',
+    info: t('rolesInfo.minionInfo'),
   },
   isolde: {
     loyalty: 'good',
-    info: 'Lover. Knows Tristan, must remain hidden',
+    info: t('rolesInfo.isoldeInfo'),
   },
   tristan: {
     loyalty: 'good',
-    info: 'Lover. Knows Isolde, must remain hidden',
+    info: t('rolesInfo.tristanInfo'),
   },
   evil: {
     loyalty: 'evil',
-    info: 'Evil player with an unknown role',
+    info: t('rolesInfo.evilInfo'),
   },
   good: {
     loyalty: 'good',
-    info: 'Good player with an unknown role',
+    info: t('rolesInfo.goodInfo'),
   },
   trickster: {
     loyalty: 'evil',
-    info: 'Lying about his loyalty',
+    info: t('rolesInfo.tricksterInfo'),
   },
   lunatic: {
     loyalty: 'evil',
-    info: 'Must fail on every mission',
+    info: t('rolesInfo.lunaticInfo'),
   },
   brute: {
     loyalty: 'evil',
-    info: 'May fail only first three missions',
+    info: t('rolesInfo.bruteInfo'),
   },
   unknown: {
     loyalty: 'unknown',
-    info: 'Unknown role',
+    info: t('rolesInfo.unknownInfo'),
   },
   mysteryWizard: {
     loyalty: 'unknown',
-    info: 'One of the two wizards is good (Merlin) or evil (Morgana)',
+    info: t('rolesInfo.mysteryWizardInfo'),
   },
   unknownLancelot: {
     loyalty: 'unknown',
-    info: 'Lancelot, whose loyalty is not known',
+    info: t('rolesInfo.unknownLancelotInfo'),
   },
 };

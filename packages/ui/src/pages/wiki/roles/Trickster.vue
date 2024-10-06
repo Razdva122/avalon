@@ -9,9 +9,8 @@
 
     <h2>General Information:</h2>
     <p>
-      As a <PreviewLink target="trickster" />, you lie when your loyalty is checked
-      <PreviewLink target="ladyOfLake" text="Lady of the lake" />, positioning yourself perfectly as a trusted member of
-      the good side.
+      As a <PreviewLink target="trickster" />, you lie when your loyalty is checked <PreviewLink target="ladyOfLake" />,
+      positioning yourself perfectly as a trusted member of the good side.
     </p>
 
     <h2>General Tips:</h2>

@@ -25,11 +25,10 @@
       <b><PreviewLink target="troublemaker" /></b>, <b><PreviewLink target="oberon" /></b>,
       <b><PreviewLink target="lunatic" /></b>, <b><PreviewLink target="brute" /></b>,
       <b><PreviewLink target="mordred" /></b>, <b><PreviewLink target="morgana" /></b>,
-      <b><PreviewLink target="trickster" /></b>, <b><PreviewLink target="goodLancelot" text="Good Lancelot" /></b> and
-      <b><PreviewLink target="evilLancelot" text="Evil Lancelot" /></b> ensuring an authentic Avalon experience. We've
-      also integrated the beloved game expansions,
-      <b><PreviewLink target="ladyOfLake" text='"Lady of the lake"' /></b> and
-      <b><PreviewLink target="excalibur" text='"excalibur"' /></b> to enrich your gameplay.
+      <b><PreviewLink target="trickster" /></b>, <b><PreviewLink target="goodLancelot" /></b> and
+      <b><PreviewLink target="evilLancelot" /></b> ensuring an authentic Avalon experience. We've also integrated the
+      beloved game expansions, <b><PreviewLink target="ladyOfLake" /></b> and
+      <b><PreviewLink target="excalibur" /></b> to enrich your gameplay.
     </div>
 
     <div>

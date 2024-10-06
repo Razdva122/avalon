@@ -11,10 +11,9 @@
     <h2>General Information:</h2>
     <p>
       Taking on the role of <PreviewLink target="guinevere" /> requires a delicate approach: she knows both Lancelots
-      <PreviewLink target="goodLancelot" text="Good Lancelot" /> and
-      <PreviewLink target="evilLancelot" text="Evil Lancelot" /> but does not know their current allegiance. Her
-      objective is to aid the side of good discreetly, as like <PreviewLink target="merlin" />, she may be killed at the
-      game's end if identified by the forces of evil.
+      <PreviewLink target="goodLancelot" /> and <PreviewLink target="evilLancelot" /> but does not know their current
+      allegiance. Her objective is to aid the side of good discreetly, as like <PreviewLink target="merlin" />, she may
+      be killed at the game's end if identified by the forces of evil.
     </p>
 
     <h2>General Tips:</h2>

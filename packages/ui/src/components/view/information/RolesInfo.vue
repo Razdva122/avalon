@@ -1,9 +1,9 @@
 <template>
-  <v-btn class="roles" color="info" @click="overlay = !overlay"> Roles </v-btn>
+  <v-btn class="roles" color="info" @click="overlay = !overlay"> {{ $t('rolesInfo.roles') }} </v-btn>
   <v-overlay v-model="overlay" class="align-center justify-center">
     <div class="roles-info d-flex flex-column align-center pa-4 rounded-lg">
       <div class="d-flex flex-row align-center">
-        <h2 class="title">{{ selectedRole ? selectedRole : 'Roles' }}</h2>
+        <h2 class="title">{{ selectedRole ? $t('roles.' + selectedRole) : $t('rolesInfo.roles') }}</h2>
         <v-switch
           v-if="!selectedRole && visibleRolesInfo.length > 2"
           v-model="mode"
@@ -11,7 +11,7 @@
           true-value="real"
           false-value="visible"
           class="ml-4"
-          :label="`${mode == 'real' ? 'Roles in game' : 'Roles visible to you'}`"
+          :label="`${mode == 'real' ? $t('rolesInfo.inGameRoles') : $t('rolesInfo.visibleRoles')}`"
         ></v-switch>
       </div>
       <v-divider :thickness="3" class="mt-1 mb-1 w-100"></v-divider>
@@ -23,14 +23,14 @@
       <template v-else>
         <div class="loyalty-container" v-if="mode === 'real'" v-for="loyalty in ['good', 'evil'] as const">
           <div class="role-container" v-for="role in gameRoles[loyalty]">
-            <div class="role-name">{{ role }}</div>
+            <div class="role-name">{{ $t('roles.' + role) }}</div>
             <PlayerIcon @click="selectRole(role)" class="role" :class="'role-loyalty-' + loyalty" :icon="role" />
           </div>
           <v-divider v-if="loyalty === 'good'" :thickness="2" class="mt-2 mb-2"></v-divider>
         </div>
         <div class="loyalty-container" v-else>
           <div class="role-container" v-for="role in visibleRolesInfo">
-            <div class="role-name">{{ role.name }}</div>
+            <div class="role-name">{{ $t('roles.' + role.name) }}</div>
             <PlayerIcon
               @click="selectRole(role.name)"
               class="role"

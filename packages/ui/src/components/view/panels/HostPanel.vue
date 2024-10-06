@@ -1,16 +1,16 @@
 <template>
-  <v-btn class="host-panel" color="grey" @click="overlay = !overlay"> Host </v-btn>
+  <v-btn class="host-panel" color="grey" @click="overlay = !overlay"> {{ $t('hostMenu.host') }} </v-btn>
   <v-overlay v-model="overlay" class="align-center justify-center">
     <div class="host-actions d-flex flex-column align-center pa-4 rounded-lg">
-      <h2 class="mb-4">Host panel</h2>
+      <h2 class="mb-4">{{ $t('hostMenu.hostPanel') }}</h2>
       <div class="button-container" v-if="roomStage === 'started'">
-        <div class="hint">The buttons will start voting for the end or restart of the game</div>
-        <v-btn color="info mb-2" @click="endGame"> End game </v-btn>
-        <v-btn color="info" @click="restartGame"> Restart game </v-btn>
+        <div class="hint">{{ $t('hostMenu.endRestartGameHint') }}</div>
+        <v-btn color="info mb-2" @click="endGame"> {{ $t('hostMenu.endGame') }} </v-btn>
+        <v-btn color="info" @click="restartGame"> {{ $t('hostMenu.restartGame') }} </v-btn>
       </div>
       <div class="button-container" v-else>
-        <div class="hint">Shuffle players positions in lobby</div>
-        <v-btn color="info" @click="shuffle"> Shuffle </v-btn>
+        <div class="hint">{{ $t('hostMenu.shuffleHint') }}</div>
+        <v-btn color="info" @click="shuffle"> {{ $t('hostMenu.shuffle') }} </v-btn>
       </div>
     </div>
   </v-overlay>

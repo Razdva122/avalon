@@ -6,13 +6,13 @@
       :to="{ name: toSnakeCase(target) }"
     >
       <PlayerIcon class="icon-in-link" :icon="target" />
-      {{ text ?? target }}
+      {{ text ?? $t('roles.' + target) }}
     </router-link>
   </template>
   <template v-else>
     <router-link class="preview-link addon" :to="{ name: toSnakeCase(target) }">
       <AddonIcon class="icon-in-link" :addon="target" />
-      {{ text ?? target }}
+      {{ text ?? $t('addons.' + target) }}
     </router-link>
   </template>
 </template>
