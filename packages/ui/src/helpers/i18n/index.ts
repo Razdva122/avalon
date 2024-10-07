@@ -1,4 +1,5 @@
 import { userInStorage } from '@/store/init';
+import locale from 'locale';
 import type { IUser } from '@/store/interface';
 
 import type { TLanguage } from '@/helpers/i18n/interface';
@@ -22,7 +23,7 @@ export function selectLocale(): TLanguage {
     }
   }
 
-  const lang = <TLanguage>navigator.language;
+  const parsedLocales = new locale.Locales(navigator.languages);
 
-  return LanguageMap[lang] ? lang : 'en';
+  return <TLanguage>parsedLocales.best(new locale.Locales(Object.keys(LanguageMap))).language;
 }
