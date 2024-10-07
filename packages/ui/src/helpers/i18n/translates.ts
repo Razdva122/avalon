@@ -155,6 +155,13 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       shuffle: 'Shuffle',
       shuffleHint: 'Shuffle players positions in lobby',
     },
+    history: {
+      history: 'History',
+    },
+    mission: {
+      players: 'Players',
+      fails: 'Fails',
+    },
   },
   ru: {
     menu: {
@@ -308,6 +315,13 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       restartGame: 'Перезапустить игру',
       shuffle: 'Перемешать',
       shuffleHint: 'Перемешать игроков в лобби',
+    },
+    history: {
+      history: 'История',
+    },
+    mission: {
+      players: 'Игроков',
+      fails: 'Провалов',
     },
   },
   zh_TW: {
@@ -463,6 +477,13 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       shuffle: '???',
       shuffleHint: '???',
     },
+    history: {
+      history: '???',
+    },
+    mission: {
+      players: '???',
+      fails: '???',
+    },
   },
   zh_CN: {
     menu: {
@@ -616,6 +637,13 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       restartGame: '???',
       shuffle: '???',
       shuffleHint: '???',
+    },
+    history: {
+      history: '???',
+    },
+    mission: {
+      players: '???',
+      fails: '???',
     },
   },
 };

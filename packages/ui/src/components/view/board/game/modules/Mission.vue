@@ -9,10 +9,10 @@
         </div>
       </template>
 
-      <div>Players: {{ mission.players }}</div>
-      <div>Fails: {{ mission.fails }}</div>
+      <div>{{ $t('mission.players') }}: {{ mission.players }}</div>
+      <div>{{ $t('mission.fails') }}: {{ mission.fails }}</div>
     </v-tooltip>
-    <div v-if="mission.failsRequired > 1">Fails: {{ mission.failsRequired }}</div>
+    <div v-if="mission.failsRequired > 1">{{ $t('mission.fails') }}: {{ mission.failsRequired }}</div>
   </div>
 </template>
 

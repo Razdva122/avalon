@@ -3,7 +3,7 @@
     <template v-slot:prepend>
       <span class="material-icons"> history </span>
     </template>
-    History
+    {{ $t('history.history') }}
   </v-btn>
   <v-overlay v-model="overlay" class="align-center justify-center">
     <div class="history pa-4 rounded-lg">
