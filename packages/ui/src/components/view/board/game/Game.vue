@@ -257,6 +257,7 @@ export default defineComponent({
 
 .history-hint {
   width: 100px;
+  text-align: center;
 }
 
 .history-actions {

@@ -196,6 +196,7 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       loginToJoin: 'Log in to join game',
       linkCopied: 'Link has been copied to the clipboard',
       loginToCreate: 'Log in to create a game',
+      close: 'Close',
     },
     votes: {
       yes: 'Yes',
@@ -398,6 +399,7 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       loginToJoin: 'Войдите, чтобы присоединиться к игре',
       linkCopied: 'Ссылка скопирована',
       loginToCreate: 'Войдите, чтобы создать игру',
+      close: 'Закрыть',
     },
     votes: {
       yes: 'За',
@@ -600,6 +602,7 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       loginToJoin: '???',
       linkCopied: '???',
       loginToCreate: '???',
+      close: '???',
     },
     votes: {
       yes: '???',
@@ -802,6 +805,7 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       loginToJoin: '???',
       linkCopied: '???',
       loginToCreate: '???',
+      close: '???',
     },
     votes: {
       yes: '???',

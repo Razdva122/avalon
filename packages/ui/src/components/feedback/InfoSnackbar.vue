@@ -5,7 +5,7 @@
         {{ text }}
       </div>
       <template v-slot:actions>
-        <v-btn color="pink" variant="text" @click="snackbar = false"> Close </v-btn>
+        <v-btn color="pink" variant="text" @click="snackbar = false"> {{ $t('infoMessage.close') }} </v-btn>
       </template>
     </v-snackbar>
   </div>
