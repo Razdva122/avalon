@@ -2,7 +2,6 @@ import { User } from '@/user';
 import type { TRoomState, Server, IGameOptions, TVoteTarget, TVoteInRoom } from '@avalon/types';
 import type { TRoomData } from '@/room/interface';
 import { eventBus } from '@/helpers';
-import { votesText } from '@/room/const';
 import { GameManager } from '@/core/game-manager';
 import { Chat } from '@/room/chat';
 import * as _ from 'lodash';
@@ -140,7 +139,6 @@ export class Room {
 
       this.vote = {
         target,
-        text: votesText[target],
         votes: this.players.map(({ name, id }) => ({
           name,
           id,

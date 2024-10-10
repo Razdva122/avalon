@@ -28,7 +28,7 @@ export default defineComponent({
   },
   methods: {
     clickOnSpoiler() {
-      eventBus.emit('infoMessage', 'Disable the "hide spoiler" option to see the content');
+      eventBus.emit('infoMessage', this.$t('infoMessage.disableSpoilers'));
     },
   },
 });

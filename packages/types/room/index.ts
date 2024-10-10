@@ -9,7 +9,6 @@ export type TVoteTarget = 'endGame' | 'endAndRestartGame';
 
 export type TVoteInRoom = {
   target: TVoteTarget;
-  text: string;
   votes: (TRoomPlayer & { voteResult?: boolean })[];
   result: {
     total: number;

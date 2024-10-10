@@ -2,7 +2,7 @@
   <div class="container">
     <div class="vote-text mb-5">
       <div>
-        {{ vote.text }}
+        {{ $t('votes.' + vote.target) }}
       </div>
     </div>
     <div class="vote-results mb-5">
@@ -11,8 +11,8 @@
       </template>
     </div>
     <div class="vote-buttons" v-if="canUserVote">
-      <v-btn size="large" class="mr-10" color="info" @click="voteClick(true)"> Yes </v-btn>
-      <v-btn size="large" color="info" @click="voteClick(false)"> No </v-btn>
+      <v-btn size="large" class="mr-10" color="info" @click="voteClick(true)"> {{ $t('votes.yes') }} </v-btn>
+      <v-btn size="large" color="info" @click="voteClick(false)"> {{ $t('votes.no') }} </v-btn>
     </div>
   </div>
 </template>

@@ -115,6 +115,7 @@
 <script lang="ts">
 import cloneDeep from 'lodash/cloneDeep';
 import last from 'lodash/last';
+import { useI18n } from 'vue-i18n';
 import type { IHistoryMission, THistoryResults, TGameEndReasons } from '@avalon/types';
 import type { IMissionWithResult } from '@/components/view/board/interface';
 import { defineComponent, PropType, computed, inject } from 'vue';
@@ -144,6 +145,7 @@ export default defineComponent({
     },
   },
   setup() {
+    const { t } = useI18n();
     const gameState = inject(gameStateKey)!;
     const stateManager = inject(stateManagerKey)!;
     const roomState = stateManager.startedRoomState;
@@ -163,19 +165,7 @@ export default defineComponent({
 
     const endReason = computed(() => {
       if (gameState.value.result) {
-        const resultText: { [key in TGameEndReasons]: string } = {
-          manualy: 'The game is finished manually',
-          evilTeamMissions: 'The evil team failed 3 missions',
-          goodTeamMissions: 'The good team successes 3 missions',
-          missMerlin: 'The evil team tried to kill Merlin but missed',
-          missGuinevere: 'The evil team tried to kill Guinevere but missed',
-          missLovers: 'The evil team tried to kill Lovers but missed',
-          killGuinevere: 'The evil team killed Guinevere',
-          killLovers: 'The evil team killed Lovers',
-          killMerlin: 'The evil team killed Merlin',
-        };
-
-        return resultText[gameState.value.result.reason];
+        return t('endReason.' + gameState.value.result.reason);
       }
     });
 

@@ -15,6 +15,7 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       watch: 'Watch',
       join: 'Join',
       gamesList: 'Games list',
+      players: 'Players',
     },
     game: {
       winner: 'Winner',
@@ -35,6 +36,17 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       historyMode: 'History mode',
       gameIsEnded: 'Game is ended',
       rolesAndAddons: 'Roles and addons',
+    },
+    endReason: {
+      manualy: 'The game is finished manually',
+      evilTeamMissions: 'The evil team failed 3 missions',
+      goodTeamMissions: 'The good team successes 3 missions',
+      missMerlin: 'The evil team tried to kill Merlin but missed',
+      missGuinevere: 'The evil team tried to kill Guinevere but missed',
+      missLovers: 'The evil team tried to kill Lovers but missed',
+      killGuinevere: 'The evil team killed Guinevere',
+      killLovers: 'The evil team killed Lovers',
+      killMerlin: 'The evil team killed Merlin',
     },
     roles: {
       merlin: 'Merlin',
@@ -58,6 +70,10 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
     addons: {
       ladyOfLake: 'Lady of the lake',
       excalibur: 'Excalibur',
+    },
+    lady: {
+      announceGood: 'Announce Good',
+      announceEvil: 'Announce Evil',
     },
     options: {
       roles: 'Roles',
@@ -157,10 +173,35 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
     },
     history: {
       history: 'History',
+      live: 'Live',
+      vote: 'Vote',
+      checkLoyalty: 'Lady',
+      mission: 'Mission',
+      assassinate: 'Assassinate',
+      switchResult: 'Excalibur',
+      switchLancelots: 'Lancelots',
+      hidden: 'Hidden',
     },
     mission: {
       players: 'Players',
       fails: 'Fails',
+    },
+    chat: {
+      message: 'message',
+    },
+    infoMessage: {
+      loginToMessage: 'Log in to send a message',
+      disableSpoilers: 'Disable the "hide spoiler" option to see the content',
+      waitForAction: 'The game updated! We are waiting for your action',
+      loginToJoin: 'Log in to join game',
+      linkCopied: 'Link has been copied to the clipboard',
+      loginToCreate: 'Log in to create a game',
+    },
+    votes: {
+      yes: 'Yes',
+      no: 'No',
+      endGame: 'Voting to end the game',
+      endAndRestartGame: 'Voting to end the game and start a new one',
     },
   },
   ru: {
@@ -176,6 +217,7 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       watch: 'Смотреть',
       join: 'Присоединиться',
       gamesList: 'Список игр',
+      players: 'игроков',
     },
     game: {
       winner: 'Победитель',
@@ -184,7 +226,7 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       stage: 'этап',
       voteStage: 'Этап голосования',
       voting: 'голосование',
-      excalibur: 'экскалибур',
+      excalibur: 'Экскалибур',
       'team building': 'сбор команды',
       mission: 'поход',
       initialization: 'начало',
@@ -196,6 +238,17 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       historyMode: 'Режим истории',
       gameIsEnded: 'Игра завершена',
       rolesAndAddons: 'Роли и дополнения',
+    },
+    endReason: {
+      manualy: 'Игра завершена вручную',
+      evilTeamMissions: 'Команда сил тьмы провалила 3 похода',
+      goodTeamMissions: 'Команда сил света успешно выполнила 3 похода',
+      missMerlin: 'Команда сил тьмы пыталась убить Мерлина, но промахнулась',
+      missGuinevere: 'Команда сил тьмы пыталась убить Гвиневру, но промахнулась',
+      missLovers: 'Команда сил тьмы пыталась убить Любовников, но промахнулась',
+      killGuinevere: 'Команда сил тьмы убила Гвиневру',
+      killLovers: 'Команда сил тьмы убила Любовников',
+      killMerlin: 'Команда сил тьмы убила Мерлина',
     },
     roles: {
       merlin: 'Мерлин',
@@ -220,6 +273,10 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       ladyOfLake: 'Леди озера',
       excalibur: 'Экскалибур',
     },
+    lady: {
+      announceGood: 'Объявить добром',
+      announceEvil: 'Объявить злом',
+    },
     options: {
       roles: 'Роли',
       extraRoles: 'Дополнительные роли',
@@ -230,7 +287,7 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       anonymousVoting: 'Анонимное голосование',
       anonymousVotingHint: 'При анонимном голосовании игроки не знают, кто проголосовал за, а кто против',
       hiddenHistory: 'Скрытая история',
-      hiddenHistoryHint: 'При скрытой истории, прошлые действия в игре нельзя посмотреть',
+      hiddenHistoryHint: 'В игре невозможно просмотреть предыдущие действия',
       displayIndex: 'Отобразить порядковый номер',
       displayIndexHint: 'Показывает порядковые номера игроков за столом',
     },
@@ -255,7 +312,7 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       error: 'Ошибка',
     },
     settings: {
-      username: 'Имя',
+      username: 'Имя пользователя',
       usernameRequired: 'Имя обязательное поле',
       language: 'Язык',
       usernameHint: 'Выберите имя для игры',
@@ -272,9 +329,9 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       success: 'Успех',
       fail: 'Провал',
       checkLoyalty: 'Проверить лояльность',
-      giveExcalibur: 'Дать экскалибур',
-      skipExcalibur: 'Не использовать экскалибур',
-      useExcalibur: 'Применить экскалибур',
+      giveExcalibur: 'Дать Экскалибур',
+      skipExcalibur: 'Не использовать Экскалибур',
+      useExcalibur: 'Применить Экскалибур',
     },
     assassinate: {
       lovers: 'Любовники',
@@ -310,7 +367,7 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
     hostMenu: {
       host: 'Админ',
       hostPanel: 'Админ панель',
-      endRestartGameHint: 'С помощью кнопок начнется голосование за окончание или перезапуск игры',
+      endRestartGameHint: 'Кнопки используются для голосования за окончание или перезапуск игры',
       endGame: 'Закончить игру',
       restartGame: 'Перезапустить игру',
       shuffle: 'Перемешать',
@@ -318,10 +375,35 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
     },
     history: {
       history: 'История',
+      live: 'Сейчас',
+      vote: 'Голосование',
+      checkLoyalty: 'Леди',
+      mission: 'Поход',
+      assassinate: 'Убийство',
+      switchResult: 'Экскалибур',
+      switchLancelots: 'Ланселоты',
+      hidden: 'Скрыто',
     },
     mission: {
-      players: 'Игроков',
-      fails: 'Провалов',
+      players: 'Количество игроков',
+      fails: 'Количество провалов',
+    },
+    chat: {
+      message: 'сообщение',
+    },
+    infoMessage: {
+      loginToMessage: 'Войдите, чтобы отправить сообщение',
+      disableSpoilers: "Отключите 'Скрыть спойлеры', чтобы видеть контент",
+      waitForAction: 'Игра обновлена! Игроки ожидают твоего действия',
+      loginToJoin: 'Войдите, чтобы присоединиться к игре',
+      linkCopied: 'Ссылка скопирована',
+      loginToCreate: 'Войдите, чтобы создать игру',
+    },
+    votes: {
+      yes: 'За',
+      no: 'Против',
+      endGame: 'Голосование за окончание игры',
+      endAndRestartGame: 'Голосование за окончание игры и начало новой',
     },
   },
   zh_TW: {
@@ -337,6 +419,7 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       watch: '觀戰',
       join: '加入',
       gamesList: '遊戲列表',
+      players: '???',
     },
     game: {
       winner: '勝利方',
@@ -357,6 +440,17 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       historyMode: '記錄階段',
       gameIsEnded: '遊戲結束',
       rolesAndAddons: '角色與插件',
+    },
+    endReason: {
+      manualy: '???',
+      evilTeamMissions: '???',
+      goodTeamMissions: '???',
+      missMerlin: '???',
+      missGuinevere: '???',
+      missLovers: '???',
+      killGuinevere: '???',
+      killLovers: '???',
+      killMerlin: '???',
     },
     roles: {
       merlin: '梅林',
@@ -380,6 +474,10 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
     addons: {
       ladyOfLake: '湖中仙女',
       excalibur: '神劍',
+    },
+    lady: {
+      announceGood: '???',
+      announceEvil: '???',
     },
     options: {
       roles: '角色',
@@ -479,10 +577,35 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
     },
     history: {
       history: '記錄',
+      live: '???',
+      vote: '???',
+      checkLoyalty: '???',
+      mission: '???',
+      assassinate: '???',
+      switchResult: '???',
+      switchLancelots: '???',
+      hidden: '???',
     },
     mission: {
       players: '玩家',
       fails: '失敗',
+    },
+    chat: {
+      message: '訊息',
+    },
+    infoMessage: {
+      loginToMessage: '???',
+      disableSpoilers: '???',
+      waitForAction: '???',
+      loginToJoin: '???',
+      linkCopied: '???',
+      loginToCreate: '???',
+    },
+    votes: {
+      yes: '???',
+      no: '???',
+      endGame: '???',
+      endAndRestartGame: '???',
     },
   },
   zh_CN: {
@@ -498,6 +621,7 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       watch: '观战',
       join: '加入',
       gamesList: '游戏列表',
+      players: '???',
     },
     game: {
       winner: '胜利方',
@@ -518,6 +642,17 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
       historyMode: '记录阶段',
       gameIsEnded: '游戏结束',
       rolesAndAddons: '角色与插件',
+    },
+    endReason: {
+      manualy: '???',
+      evilTeamMissions: '???',
+      goodTeamMissions: '???',
+      missMerlin: '???',
+      missGuinevere: '???',
+      missLovers: '???',
+      killGuinevere: '???',
+      killLovers: '???',
+      killMerlin: '???',
     },
     roles: {
       merlin: '梅林',
@@ -541,6 +676,10 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
     addons: {
       ladyOfLake: '湖中仙女',
       excalibur: '神剑',
+    },
+    lady: {
+      announceGood: '???',
+      announceEvil: '???',
     },
     options: {
       roles: '角色',
@@ -640,10 +779,35 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
     },
     history: {
       history: '记录',
+      live: '???',
+      vote: '???',
+      checkLoyalty: '???',
+      mission: '???',
+      assassinate: '???',
+      switchResult: '???',
+      switchLancelots: '???',
+      hidden: '???',
     },
     mission: {
       players: '玩家',
       fails: '失败',
+    },
+    chat: {
+      message: '信息',
+    },
+    infoMessage: {
+      loginToMessage: '???',
+      disableSpoilers: '???',
+      waitForAction: '???',
+      loginToJoin: '???',
+      linkCopied: '???',
+      loginToCreate: '???',
+    },
+    votes: {
+      yes: '???',
+      no: '???',
+      endGame: '???',
+      endAndRestartGame: '???',
     },
   },
 };

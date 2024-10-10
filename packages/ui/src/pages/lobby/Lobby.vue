@@ -28,7 +28,7 @@
             </div>
             <div class="game-right">
               <div class="players-amount mr-2">
-                {{ game.state === 'created' ? `${game.players}/10` : `${game.players} players` }}
+                {{ game.state === 'created' ? `${game.players}/10` : `${game.players} ${$t('mainPage.players')}` }}
               </div>
               <v-btn
                 :color="game.state === 'created' ? undefined : 'info'"
@@ -46,6 +46,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
 import type { TRoomsList } from '@avalon/types';
@@ -61,6 +62,7 @@ export default defineComponent({
     OptionsPreview,
   },
   async setup() {
+    const { t } = useI18n();
     const router = useRouter();
     const store = useStore();
 
@@ -77,7 +79,7 @@ export default defineComponent({
     const createRoom = async () => {
       if (!store.state.user) {
         eventBus.emit('openSettings');
-        eventBus.emit('infoMessage', 'Log in to create a game');
+        eventBus.emit('infoMessage', t('infoMessage.loginToCreate'));
         return;
       }
 

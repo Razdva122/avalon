@@ -26,7 +26,7 @@
         class="input"
         v-model="currentMessage"
         hide-details="auto"
-        label="message"
+        :label="$t('chat.message')"
         append-inner-icon="send"
         @keyup.enter="sendMessage"
         @click:append-inner="sendMessage"
@@ -82,7 +82,7 @@ export default defineComponent({
     sendMessage() {
       if (!this.$store.state.user) {
         eventBus.emit('openSettings');
-        eventBus.emit('infoMessage', 'Log in to send a message');
+        eventBus.emit('infoMessage', this.$t('infoMessage.loginToMessage'));
         return;
       }
 

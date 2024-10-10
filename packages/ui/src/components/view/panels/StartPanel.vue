@@ -38,6 +38,7 @@
 
 <script lang="ts">
 import { defineComponent, computed, ref, PropType, toRefs, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
 import { TPageRoomState } from '@/helpers/game-state-manager';
 import { socket } from '@/api/socket';
@@ -56,6 +57,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const { t } = useI18n();
     const { roomState } = toRefs(props);
     const store = useStore();
 
@@ -100,7 +102,7 @@ export default defineComponent({
     const onJoinClick = () => {
       if (!store.state.user) {
         eventBus.emit('openSettings');
-        eventBus.emit('infoMessage', 'Log in to join game');
+        eventBus.emit('infoMessage', t('infoMessage.loginToJoin'));
         return;
       }
 
@@ -117,7 +119,7 @@ export default defineComponent({
 
     const onCopyClick = () => {
       navigator.clipboard.writeText(window.location.href);
-      eventBus.emit('infoMessage', 'Link has been copied to the clipboard');
+      eventBus.emit('infoMessage', t('infoMessage.linkCopied'));
     };
 
     const onDiscordClick = () => {

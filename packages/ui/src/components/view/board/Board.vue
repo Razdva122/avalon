@@ -59,6 +59,7 @@
 
 <script lang="ts">
 import { defineComponent, computed, inject, watch, ref, PropType, toRefs, nextTick } from 'vue';
+import { useI18n } from 'vue-i18n';
 import Player from '@/components/view/board/modules/Player.vue';
 import Timer from '@/components/feedback/Timer.vue';
 import Game from '@/components/view/board/game/Game.vue';
@@ -89,6 +90,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const { t } = useI18n();
     const { roomState } = toRefs(props);
     const gameState = inject(gameStateKey)!;
     const stateManager = inject(stateManagerKey)!;
@@ -177,7 +179,7 @@ export default defineComponent({
 
     watch(playerWaitForActionState, () => {
       if (playerWaitForActionState && stateManager.viewMode.value === 'history') {
-        eventBus.emit('infoMessage', 'The game updated! We are waiting for your action');
+        eventBus.emit('infoMessage', t('infoMessage.waitForAction'));
       }
     });
 
