@@ -120,7 +120,7 @@ export default defineComponent({
 }
 
 .input {
-  color: black;
+  color: rgb(var(--v-theme-surface-variant));
 }
 
 .messages-container {
@@ -131,9 +131,10 @@ export default defineComponent({
 }
 
 .message-author {
-  font-size: 10px;
-  color: gray;
-  padding: 5px;
+  font-size: 12px;
+  color: rgb(var(--v-theme-surface-variant));
+  font-weight: 800;
+  padding: 8px 5px 0px 5px;
 }
 
 .message-text {
@@ -142,18 +143,19 @@ export default defineComponent({
   word-wrap: break-word;
   border-radius: 10px;
   padding: 5px 5px 0px 5px;
-  background-color: #f0f0f0;
+  color: rgb(var(--v-theme-surface-variant));
+  background-color: rgb(var(--v-theme-on-surface-variant));
 }
 
 .message-from-author {
   text-align: right;
 
   .message-author {
-    color: #6e95f0;
+    color: rgb(var(--v-theme-primary));
   }
 
   .message-text {
-    background-color: #d1e8f0;
+    background-color: rgb(var(--v-theme-on-surface-variant));
   }
 }
 

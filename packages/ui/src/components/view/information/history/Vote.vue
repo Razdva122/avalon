@@ -1,31 +1,33 @@
 <template>
   <div>
-    <span v-if="data.forced" class="text-info"> Forced vote </span>
-    <span v-else :class="data.result === 'reject' ? 'text-error' : 'text-success'"> {{ data.index + 1 }} vote </span>
+    <span v-if="data.forced" class="text-info"> {{ $t('vote.forcedVote') }} </span>
+    <span v-else :class="data.result === 'reject' ? 'text-error' : 'text-success'">
+      {{ $t('vote.voteIndex', { index: data.index + 1 }) }}
+    </span>
     <span>
-      team selected by <b>{{ calculateNameByID(data.leaderID) }}</b>
+      {{ $t('vote.teamSelected') }} <b>{{ calculateNameByID(data.leaderID) }}</b>
     </span>
   </div>
   <div>
-    Team:
+    {{ $t('vote.team') }}
     {{
       data.team
         .map((el) => {
           const name = calculateNameByID(el.id);
-          return el.excalibur ? name + '(Excalibur)' : name;
+          return el.excalibur ? name + $t('vote.excaliburOwner') : name;
         })
         .join(', ')
     }}
   </div>
   <template v-if="!data.forced">
     <div>
-      Approve:
+      {{ $t('vote.approve') }}
       <span class="text-success">
         {{ historyElText(data, 'approve') }}
       </span>
     </div>
     <div>
-      Reject:
+      {{ $t('vote.reject') }}
       <span class="text-error">
         {{ historyElText(data, 'reject') }}
       </span>

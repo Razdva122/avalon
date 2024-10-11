@@ -220,4 +220,17 @@ export const ru = {
     'Minions of Mordred(*)': 'Приспешники Мордреда(*)',
     Minions: 'Приспешники',
   },
+  spoiler: {
+    spoiler: 'Спойлер',
+    spoilerHint: 'Контент скрыт под спойлером, так как содержит информацию, неизвестную другим игрокам',
+  },
+  vote: {
+    forcedVote: 'Принудительное голосование',
+    voteIndex: '{index} голосование',
+    teamSelected: 'команда собрана',
+    team: 'команда',
+    excaliburOwner: '(Экскалибур)',
+    approve: 'За:',
+    reject: 'Против:',
+  },
 };

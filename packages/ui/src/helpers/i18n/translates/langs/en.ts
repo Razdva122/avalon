@@ -220,4 +220,17 @@ export const en = {
     'Minions of Mordred(*)': 'Minions of Mordred(*)',
     Minions: 'Minions',
   },
+  spoiler: {
+    spoiler: 'Spoiler',
+    spoilerHint: 'The content is hidden under the spoiler, as it contains information unknown to other players',
+  },
+  vote: {
+    forcedVote: 'Forced vote',
+    voteIndex: '{index} vote',
+    teamSelected: 'team selected by',
+    team: 'team',
+    excaliburOwner: '(Excalibur)',
+    approve: 'Approve:',
+    reject: 'Reject:',
+  },
 };

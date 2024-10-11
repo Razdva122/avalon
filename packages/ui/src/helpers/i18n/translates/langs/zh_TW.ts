@@ -220,4 +220,17 @@ export const zh_TW = {
     'Minions of Mordred(*)': '???',
     Minions: '???',
   },
+  spoiler: {
+    spoiler: '???',
+    spoilerHint: '???',
+  },
+  vote: {
+    forcedVote: '???',
+    voteIndex: '???',
+    teamSelected: '???',
+    team: '???',
+    excaliburOwner: '???',
+    approve: '???',
+    reject: '???',
+  },
 };

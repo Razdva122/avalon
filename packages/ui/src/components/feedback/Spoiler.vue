@@ -2,11 +2,11 @@
   <div
     v-if="hideSpoilers"
     class="rounded-lg bg-blue-grey-darken-1 spoiler"
-    title="The content is hidden under the spoiler, as it contains information unknown to other players"
+    :title="$t('spoiler.spoilerHint')"
     :style="size ? `width: ${size.width}; height: ${size.height}` : ''"
     @click="clickOnSpoiler"
   >
-    Spoiler
+    {{ $t('spoiler.spoiler') }}
   </div>
   <slot v-else></slot>
 </template>
