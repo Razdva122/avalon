@@ -3,7 +3,7 @@
     <WikiBreadCrumbs />
     <h1>
       <div class="good-loyalty-icon"></div>
-      Servant role
+      {{ $t('roles.servant') }} Role
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('servant')" alt="Servant" />
 

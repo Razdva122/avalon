@@ -3,7 +3,7 @@
     <WikiBreadCrumbs />
     <h1>
       <div class="good-loyalty-icon"></div>
-      Percival role
+      {{ $t('roles.percival') }} Role
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('percival')" alt="percival" />
 

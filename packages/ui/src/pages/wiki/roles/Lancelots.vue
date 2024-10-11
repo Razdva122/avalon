@@ -4,7 +4,7 @@
     <h1>
       <div class="good-loyalty-icon"></div>
       <div class="evil-loyalty-icon"></div>
-      Lancelots
+      {{ $t('roles.lancelots') }} Role
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('evilLancelot')" alt="evil lancelot" />
     <img class="preview-image" :src="calculateRoleUrl('goodLancelot')" alt="good lancelot" />

@@ -3,7 +3,7 @@
     <WikiBreadCrumbs />
     <h1>
       <div class="evil-loyalty-icon"></div>
-      Morgana Role
+      {{ $t('roles.morgana') }} Role
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('morgana')" alt="Morgana" />
 

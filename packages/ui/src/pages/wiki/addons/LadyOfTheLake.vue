@@ -1,15 +1,15 @@
 <template>
   <div class="info-page-content">
     <WikiBreadCrumbs />
-    <h1>Lady of the Lake</h1>
+    <h1>{{ $t('addons.ladyOfLake') }}</h1>
     <img class="preview-image" src="@/assets/features/lady_of_lake.webp" alt="lady" />
     <p>
-      <strong>"Lady of the Lake"</strong> is an expansion that introduces a new strategic element and provides the
-      ability to gain additional information about the loyalties of other players. It is used in
+      <strong>"{{ $t('addons.ladyOfLake') }}"</strong> is an expansion that introduces a new strategic element and
+      provides the ability to gain additional information about the loyalties of other players. It is used in
       <strong>games with 7 or more</strong> participants and adds more depth to the gameplay.
     </p>
 
-    <h2>Rules for using "Lady of the Lake" (Inquisitor Token in 'The Resistance'):</h2>
+    <h2>Rules for using "{{ $t('addons.ladyOfLake') }}" (Inquisitor Token in 'The Resistance'):</h2>
     <ol>
       <li>
         <strong>When to Use It:</strong> The <PreviewLink target="ladyOfLake" /> comes into play after the second quest

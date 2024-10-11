@@ -3,5 +3,5 @@ export interface ISocketError {
 }
 
 export interface IRoomUnavailableError extends ISocketError {
-  error: 'This is wrong uuid';
+  error: 'errorNotFound';
 }

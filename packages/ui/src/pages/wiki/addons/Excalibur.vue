@@ -1,20 +1,19 @@
 <template>
   <div class="info-page-content">
     <WikiBreadCrumbs />
-    <h1>Excalibur</h1>
+    <h1>{{ $t('addons.excalibur') }}</h1>
     <img class="preview-image" src="@/assets/features/excalibur.webp" alt="excalibur" />
     <p>
-      <strong><PreviewLink target="excalibur" text='"excalibur"' /></strong> introduces an additional layer of strategy
-      and interaction among players. It complements the base rules of the game and offers new possibilities throughout
-      the gameplay.
+      <strong><PreviewLink target="excalibur" /></strong> introduces an additional layer of strategy and interaction
+      among players. It complements the base rules of the game and offers new possibilities throughout the gameplay.
     </p>
 
-    <h2>Rules for using "Excalibur" (Sergeant in 'The Resistance'):</h2>
+    <h2>Rules for using "{{ $t('addons.excalibur') }}" (Sergeant in 'The Resistance'):</h2>
     <ol>
       <li>
-        <strong>Assigning "Excalibur"</strong>: Before the mission starts, the mission leader selects a participant from
-        those assigned to the mission to receive <PreviewLink target="excalibur" />. The leader must pass
-        <PreviewLink target="excalibur" /> to someone else on the mission besides themselves.
+        <strong>Assigning "{{ $t('addons.excalibur') }}"</strong>: Before the mission starts, the mission leader selects
+        a participant from those assigned to the mission to receive <PreviewLink target="excalibur" />. The leader must
+        pass <PreviewLink target="excalibur" /> to someone else on the mission besides themselves.
       </li>
       <li>
         <strong>Voting for the Mission</strong>: All players at the table are aware of to whom
@@ -32,10 +31,10 @@
         know what the original vote was. The rest of the players can only speculate based on the mission outcome.
       </li>
       <li>
-        <strong>Strategic Value</strong>: Possessing <PreviewLink target="excalibur" text='"excalibur"' /> adds
-        strategic depth to the game by allowing one player to potentially alter the course of the game by influencing
-        the actions of both good and evil characters. <PreviewLink target="excalibur" text='"excalibur"' /> can be a
-        pivotal factor in the outcomes of mission votes, especially during critical moments in the game.
+        <strong>Strategic Value</strong>: Possessing <PreviewLink target="excalibur" /> adds strategic depth to the game
+        by allowing one player to potentially alter the course of the game by influencing the actions of both good and
+        evil characters. <PreviewLink target="excalibur" /> can be a pivotal factor in the outcomes of mission votes,
+        especially during critical moments in the game.
       </li>
     </ol>
   </div>

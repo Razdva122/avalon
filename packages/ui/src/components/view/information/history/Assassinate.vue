@@ -1,11 +1,19 @@
 <template>
   <div>
-    {{ calculateNameByID(data.assassinID) }} assassinate
-    {{ data.killedIDs.map(calculateNameByID).join(', ') }}
+    {{
+      $t('assassinate.shot', {
+        killerName: calculateNameByID(data.assassinID),
+        killedName: data.killedIDs.map(calculateNameByID).join(', '),
+      })
+    }}
   </div>
   <div>
-    {{ data.killedIDs.map(calculateNameByID).join(', ') }}
-    {{ data.result === 'hit' ? 'is' : 'is not' }} {{ data.assassinateType }}
+    {{
+      $t(data.result === 'hit' ? 'assassinate.shotResultHit' : 'assassinate.shotResultMiss', {
+        killedName: data.killedIDs.map(calculateNameByID).join(', '),
+        roleName: data.assassinateType,
+      })
+    }}
   </div>
 </template>
 

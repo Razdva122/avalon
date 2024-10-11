@@ -3,7 +3,7 @@
     <WikiBreadCrumbs />
     <h1>
       <div class="evil-loyalty-icon"></div>
-      Lunatic Role
+      {{ $t('roles.lunatic') }} Role
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('lunatic')" alt="lunatic" />
 

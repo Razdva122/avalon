@@ -1,8 +1,8 @@
 <template>
   <div class="room d-flex align-center justify-space-around">
     <template v-if="errorMessage">
-      <h1 class="mb-4">{{ errorMessage.error }}</h1>
-      <v-btn size="x-large" @click="$router.push({ name: 'lobby' })">Back to lobby</v-btn>
+      <h1 class="mb-4">{{ $t('room.' + errorMessage.error) }}</h1>
+      <v-btn size="x-large" @click="$router.push({ name: 'lobby' })">{{ $t('room.backToLobby') }}</v-btn>
     </template>
     <template v-else>
       <Board :room-state="roomState">
@@ -10,7 +10,9 @@
           <RoomVote v-if="roomState.vote" :roomUuid="roomState.roomID" :vote="roomState.vote" />
         </template>
         <template v-slot:restart>
-          <v-btn v-if="displayRestartButton" @click="restartGame" class="restart-button">Restart game</v-btn>
+          <v-btn v-if="displayRestartButton" @click="restartGame" class="restart-button">{{
+            $t('room.restartGame')
+          }}</v-btn>
         </template>
       </Board>
       <RolesInfo v-if="roomState.stage === 'started'" :game-roles="game.settings.roles" :visible-roles="visibleRoles" />

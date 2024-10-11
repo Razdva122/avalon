@@ -178,22 +178,12 @@ export default defineComponent({
         }
 
         if (pointer === roomState.value.gameStates.length - 1) {
-          return 'Live';
+          return t('history.live');
         }
-
-        const historyText: { [key in THistoryResults['type']]: string } = {
-          vote: 'Vote',
-          checkLoyalty: 'Lady',
-          mission: 'Mission',
-          assassinate: 'Assassinate',
-          switchResult: 'Excalibur',
-          switchLancelots: 'Lancelots',
-          hidden: 'Hidden',
-        };
 
         const lastElement = last(roomState.value.gameStates[pointer].history)!;
 
-        return historyText[lastElement.type];
+        return t(`history.${lastElement.type}`);
       }
 
       return [

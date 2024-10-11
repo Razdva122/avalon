@@ -115,7 +115,7 @@ export class Manager {
           socket.join(uuid);
           cb(this.rooms[uuid].calculateRoomState(userID));
         } else {
-          cb({ error: 'This is wrong uuid' });
+          cb({ error: 'errorNotFound' });
         }
       });
 

@@ -18,7 +18,7 @@
           ></v-select>
           <v-select
             :label="$t('settings.colorTheme')"
-            :items="['default', 'dark']"
+            :items="availableThemes"
             class="w-100 mb-2"
             v-model="colorTheme"
           ></v-select>
@@ -123,6 +123,18 @@ export default defineComponent({
       set(value: boolean) {
         this.$store.commit('updateUserSettings', { key: 'style', value: value ? 'anime' : 'default' });
       },
+    },
+    availableThemes() {
+      return [
+        {
+          value: 'light',
+          title: this.$t('settings.lightTheme'),
+        },
+        {
+          value: 'dark',
+          title: this.$t('settings.darkTheme'),
+        },
+      ];
     },
   },
   methods: {

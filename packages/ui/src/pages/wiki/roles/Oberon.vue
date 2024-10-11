@@ -3,7 +3,7 @@
     <WikiBreadCrumbs />
     <h1>
       <div class="evil-loyalty-icon"></div>
-      Oberon Role
+      {{ $t('roles.oberon') }} Role
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('oberon')" alt="oberon" />
 

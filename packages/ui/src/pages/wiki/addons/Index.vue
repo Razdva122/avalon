@@ -1,14 +1,14 @@
 <template>
   <div class="info-page-content">
     <WikiBreadCrumbs />
-    <h1>Addons</h1>
+    <h1>{{ $t('wiki.addons') }}</h1>
     <div class="addons-container">
       <router-link class="addon" :to="{ name: 'lady_of_lake' }">
-        <h2>Lady of the Lake</h2>
+        <h2>{{ $t('addons.ladyOfLake') }}</h2>
         <img class="addon-image" src="@/assets/features/lady_of_lake.webp" alt="lady" />
       </router-link>
       <router-link class="addon" :to="{ name: 'excalibur' }">
-        <h2>Excalibur</h2>
+        <h2>{{ $t('addons.excalibur') }}</h2>
         <img class="addon-image" src="@/assets/features/excalibur.webp" alt="excalibur" />
       </router-link>
     </div>

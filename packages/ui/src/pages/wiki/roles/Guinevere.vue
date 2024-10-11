@@ -3,7 +3,7 @@
     <WikiBreadCrumbs />
     <h1>
       <div class="good-loyalty-icon"></div>
-      Guinevere Role
+      {{ $t('roles.guinevere') }} Role
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('guinevere')" alt="guinevere" />
     <div class="credits">credits to: @Robrun</div>

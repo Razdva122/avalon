@@ -1,9 +1,9 @@
 <template>
   <div class="info-page-content">
-    <h1 class="title">Oops! Sorry, page not found.</h1>
+    <h1 class="title">{{ $t('notFound.error') }}</h1>
     <div class="container">
       <img class="switch" src="@/assets/features/excalibur.webp" alt="excalibur" />
-      <v-btn size="x-large" @click="$router.push({ name: 'lobby' })">Switch the route</v-btn>
+      <v-btn size="x-large" @click="$router.push({ name: 'lobby' })">{{ $t('notFound.switch') }}</v-btn>
     </div>
   </div>
 </template>
