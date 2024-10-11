@@ -191,8 +191,8 @@ export const ru = {
     hidden: 'Скрыто',
   },
   mission: {
-    players: 'Количество игроков',
-    fails: 'Количество провалов',
+    players: 'Игроков',
+    fails: 'Провалов',
   },
   chat: {
     message: 'сообщение',

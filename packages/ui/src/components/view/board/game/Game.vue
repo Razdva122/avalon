@@ -231,6 +231,7 @@ export default defineComponent({
 
 .game-container {
   max-height: 340px;
+  max-width: 380px;
 }
 
 .actions-or-info {

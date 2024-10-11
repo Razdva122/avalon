@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mission-container">
     <v-tooltip :disabled="!mission.result" location="top center" origin="auto" no-click-animation>
       <template v-slot:activator="{ props: tooltip }">
         <div v-bind="tooltip" class="mission mr-2 d-flex flex-column justify-center" :class="missionClasses">
@@ -12,7 +12,7 @@
       <div>{{ $t('mission.players') }}: {{ mission.players }}</div>
       <div>{{ $t('mission.fails') }}: {{ mission.fails }}</div>
     </v-tooltip>
-    <div v-if="mission.failsRequired > 1">{{ $t('mission.fails') }}: {{ mission.failsRequired }}</div>
+    <div class="fails" v-if="mission.failsRequired > 1">{{ $t('mission.fails') }}: {{ mission.failsRequired }}</div>
   </div>
 </template>
 
@@ -65,5 +65,13 @@ export default defineComponent({
 .mission-fail {
   background-image: url('@/assets/red_team_no_background.webp');
   background-size: contain;
+}
+
+.mission-container {
+  max-width: 73px;
+}
+
+.fails {
+  white-space: nowrap;
 }
 </style>
