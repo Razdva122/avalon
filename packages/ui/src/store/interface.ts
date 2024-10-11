@@ -13,6 +13,7 @@ export interface IUser {
   settings?: {
     locale?: { value: TLanguage; isDefault: boolean };
     hideIndexInHistory?: boolean;
+    colorTheme?: 'light' | 'dark';
     style?: 'default' | 'anime';
   };
 }

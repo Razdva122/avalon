@@ -228,7 +228,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .options {
-  background-color: white;
+  background-color: rgb(var(--v-theme-surface));
   width: 100%;
   min-height: 530px;
 }

@@ -106,7 +106,7 @@ export default defineComponent({
 }
 
 .chat-window {
-  background-color: white;
+  background-color: rgb(var(--v-theme-surface));
   width: 300px;
   height: 450px;
   border-radius: 8px;

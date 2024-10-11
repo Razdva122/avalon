@@ -83,7 +83,7 @@ export default defineComponent({
 }
 
 .history {
-  background-color: white;
+  background-color: rgb(var(--v-theme-surface));
   width: 400px;
   max-height: 80vh;
   overflow-y: auto;

@@ -61,7 +61,7 @@ export default defineComponent({
 }
 
 .host-actions {
-  background-color: white;
+  background-color: rgb(var(--v-theme-surface));
   width: 300px;
   max-height: 80vh;
   overflow-y: auto;

@@ -70,7 +70,7 @@ export default defineComponent({
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+  color: rgb(var(--v-theme-bgHeader));
   height: 100vh;
 }
 
@@ -90,7 +90,7 @@ a {
 .header {
   height: 50px;
   width: 100%;
-  background-color: #2c3e50;
+  background-color: rgb(var(--v-theme-bgHeader));
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
   display: flex;
@@ -122,6 +122,6 @@ a {
 }
 
 body {
-  background-color: #635f57;
+  background-color: rgb(var(--v-theme-bgApp));
 }
 </style>

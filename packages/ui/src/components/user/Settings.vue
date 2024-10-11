@@ -16,6 +16,12 @@
             class="w-100 mb-2"
             v-model="locale"
           ></v-select>
+          <v-select
+            :label="$t('settings.colorTheme')"
+            :items="['default', 'dark']"
+            class="w-100 mb-2"
+            v-model="colorTheme"
+          ></v-select>
           <v-checkbox
             v-if="isUserExist"
             v-model="hideSpoilers"
@@ -98,6 +104,16 @@ export default defineComponent({
       },
       set(value: boolean) {
         this.$store.commit('updateUserSettings', { key: 'hideIndexInHistory', value });
+      },
+    },
+    colorTheme: {
+      get() {
+        return this.$store.state.user?.settings?.colorTheme || 'light';
+      },
+      set(value: 'light' | 'dark') {
+        this.$store.commit('updateUserSettings', { key: 'colorTheme', value });
+        // @ts-ignore
+        this.$vuetify.theme.global.name = value === 'dark' ? 'darkTheme' : 'lightTheme';
       },
     },
     style: {

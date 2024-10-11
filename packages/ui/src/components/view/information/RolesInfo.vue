@@ -119,7 +119,7 @@ export default defineComponent({
 }
 
 .roles-info {
-  background-color: white;
+  background-color: rgb(var(--v-theme-surface));
   width: 400px;
   min-height: 500px;
   max-height: 80vh;
