@@ -64,7 +64,7 @@ export class Room {
 
   addMessage(userID: string, userName: string, message: string) {
     this.chat.addMessage(message, userID, userName);
-    this.updateRoomState();
+    this.updateRoomState(true);
   }
 
   toggleLockedState() {

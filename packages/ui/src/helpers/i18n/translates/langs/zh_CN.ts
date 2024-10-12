@@ -7,9 +7,9 @@ export const zh_CN = {
     about: '关于',
   },
   room: {
-    errorNotFound: '???',
-    backToLobby: '???',
-    restartGame: '???',
+    errorNotFound: '这是错误的uuid',
+    backToLobby: '返回大厅',
+    restartGame: '重开游戏',
   },
   mainPage: {
     createRoom: '创建房间',
@@ -121,9 +121,9 @@ export const zh_CN = {
     animeMode: '动漫模式',
     submit: '提交',
     update: '更新',
-    colorTheme: '選擇主題',
-    darkTheme: '黑暗主題',
-    lightTheme: '光亮主題',
+    colorTheme: '选择主题',
+    darkTheme: '黑暗主题',
+    lightTheme: '光亮主题',
   },
   inGame: {
     sendTeam: '发送组队',
@@ -139,9 +139,9 @@ export const zh_CN = {
   assassinate: {
     lovers: '恋人',
     assassinate: '暗杀',
-    shot: '{killerName} {killedName} ???',
-    shotResultHit: '{killedName} {roleName} ???',
-    shotResultMiss: '{killedName} {roleName} ???',
+    shot: '{killerName} 暗杀 {killedName}',
+    shotResultHit: '{killedName} 是 {roleName}',
+    shotResultMiss: '{killedName} 不是 {roleName}',
   },
   rolesInfo: {
     roles: '角色',
@@ -193,6 +193,9 @@ export const zh_CN = {
   mission: {
     players: '玩家',
     fails: '失败',
+    indexMission: '{index} ???',
+    failsCount: '??? {count}',
+    team: '???',
   },
   chat: {
     message: '讯息',
@@ -213,23 +216,23 @@ export const zh_CN = {
     endAndRestartGame: '投票结束游戏并开始新的游戏',
   },
   notFound: {
-    error: '???',
-    switch: '???',
+    error: '哎呀!抱歉,找不到页面',
+    switch: '切换路线',
   },
   previewLink: {
-    'Minions of Mordred(*)': '???',
-    Minions: '???',
+    'Minions of Mordred(*)': '莫德雷德的爪牙(*)',
+    Minions: '士兵',
   },
   spoiler: {
-    spoiler: '???',
-    spoilerHint: '???',
+    spoiler: '劇透',
+    spoilerHint: '該內容隱藏在劇透下方,因為它包含其他玩家不知道的訊息',
   },
   vote: {
     forcedVote: '???',
-    voteIndex: '???',
+    voteIndex: '{index} ???',
     teamSelected: '???',
     team: '???',
-    excaliburOwner: '???',
+    excaliburOwner: '(Excalibur)',
     approve: '???',
     reject: '???',
   },

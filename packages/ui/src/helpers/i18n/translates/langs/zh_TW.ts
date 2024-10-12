@@ -7,9 +7,9 @@ export const zh_TW = {
     about: '關於',
   },
   room: {
-    errorNotFound: '???',
-    backToLobby: '???',
-    restartGame: '???',
+    errorNotFound: '這是錯誤的uuid',
+    backToLobby: '返回大廳',
+    restartGame: '重開遊戲',
   },
   mainPage: {
     createRoom: '創建房間',
@@ -139,9 +139,9 @@ export const zh_TW = {
   assassinate: {
     lovers: '戀人',
     assassinate: '暗殺',
-    shot: '{killerName} {killedName} ???',
-    shotResultHit: '{killedName} {roleName} ???',
-    shotResultMiss: '{killedName} {roleName} ???',
+    shot: '{killerName} 暗殺 {killedName}',
+    shotResultHit: '{killedName} 是 {roleName}',
+    shotResultMiss: '{killedName} 不是 {roleName}',
   },
   rolesInfo: {
     roles: '角色',
@@ -193,6 +193,9 @@ export const zh_TW = {
   mission: {
     players: '玩家',
     fails: '失敗',
+    indexMission: '{index} ???',
+    failsCount: '??? {count}',
+    team: '???',
   },
   chat: {
     message: '訊息',
@@ -213,24 +216,24 @@ export const zh_TW = {
     endAndRestartGame: '投票結束遊戲並開始新的遊戲',
   },
   notFound: {
-    error: '???',
-    switch: '???',
+    error: '哎呀!抱歉,找不到頁面',
+    switch: '切換路線',
   },
   previewLink: {
-    'Minions of Mordred(*)': '???',
-    Minions: '???',
+    'Minions of Mordred(*)': '莫德雷德的爪牙(*)',
+    Minions: '士兵',
   },
   spoiler: {
-    spoiler: '???',
-    spoilerHint: '???',
+    spoiler: '劇透',
+    spoilerHint: '該內容隱藏在劇透下方,因為它包含其他玩家不知道的訊息',
   },
   vote: {
-    forcedVote: '???',
-    voteIndex: '???',
-    teamSelected: '???',
-    team: '???',
-    excaliburOwner: '???',
-    approve: '???',
-    reject: '???',
+    forcedVote: '強制投票',
+    voteIndex: '{index} 投票',
+    teamSelected: '團隊選擇者',
+    team: '團隊',
+    excaliburOwner: '(Excalibur)',
+    approve: '同意:',
+    reject: '拒絕:',
   },
 };

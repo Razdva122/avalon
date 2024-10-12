@@ -133,7 +133,7 @@ export const ru = {
     fail: 'Провал',
     checkLoyalty: 'Проверить лояльность',
     giveExcalibur: 'Дать Экскалибур',
-    skipExcalibur: 'Не использовать Экскалибур',
+    skipExcalibur: 'Пропустить Экскалибур',
     useExcalibur: 'Применить Экскалибур',
   },
   assassinate: {
@@ -193,6 +193,9 @@ export const ru = {
   mission: {
     players: 'Игроков',
     fails: 'Провалов',
+    indexMission: '{index} поход',
+    failsCount: 'провалов {count}',
+    team: 'Team:',
   },
   chat: {
     message: 'сообщение',
@@ -228,7 +231,7 @@ export const ru = {
     forcedVote: 'Принудительное голосование',
     voteIndex: '{index} голосование',
     teamSelected: 'команда собрана',
-    team: 'команда',
+    team: 'Команда',
     excaliburOwner: '(Экскалибур)',
     approve: 'За:',
     reject: 'Против:',

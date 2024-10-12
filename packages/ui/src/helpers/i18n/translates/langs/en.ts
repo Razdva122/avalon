@@ -193,6 +193,9 @@ export const en = {
   mission: {
     players: 'Players',
     fails: 'Fails',
+    indexMission: '{index} mission',
+    failsCount: 'fails {count}',
+    team: 'Team:',
   },
   chat: {
     message: 'message',
@@ -228,7 +231,7 @@ export const en = {
     forcedVote: 'Forced vote',
     voteIndex: '{index} vote',
     teamSelected: 'team selected by',
-    team: 'team',
+    team: 'Team',
     excaliburOwner: '(Excalibur)',
     approve: 'Approve:',
     reject: 'Reject:',

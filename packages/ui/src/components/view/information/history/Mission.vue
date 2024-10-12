@@ -1,11 +1,13 @@
 <template>
   <div class="mission">
     <div>
-      <span :class="data.result === 'fail' ? 'text-error' : 'text-success'"> {{ data.index + 1 }} mission </span>
-      <span> / fails {{ data.fails }} </span>
+      <span :class="data.result === 'fail' ? 'text-error' : 'text-success'">
+        {{ $t('mission.indexMission', { index: data.index + 1 }) }}
+      </span>
+      <span> / {{ $t('mission.failsCount', { count: data.fails }) }} </span>
     </div>
     <div v-if="data.actions">
-      Team:
+      {{ $t('mission.team') }}
       <template v-for="(el, index) in data.actions">
         <span :class="{ fail: 'text-error', success: 'text-success' }[(el as IActionWithResult).value]">
           {{ calculateNameByID(el.playerID) }}

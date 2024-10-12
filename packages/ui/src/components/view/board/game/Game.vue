@@ -102,7 +102,7 @@
     </div>
     <div class="meta-info font-weight-bold d-flex justify-space-between">
       <div>
-        <span>{{ $t('game.stage') + ':' + $t('game.' + stageText) }}</span>
+        <span>{{ $t('game.stage') + ': ' + $t('game.' + stageText) }}</span>
       </div>
       <div>
         <span class="text-info">{{ gameState.settings.players.good }}</span> vs
