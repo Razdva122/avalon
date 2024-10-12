@@ -231,7 +231,7 @@ export const ru = {
     forcedVote: 'Принудительное голосование',
     voteIndex: '{index} голосование',
     teamSelected: 'команда собрана',
-    team: 'Команда',
+    team: 'Команда:',
     excaliburOwner: '(Экскалибур)',
     approve: 'За:',
     reject: 'Против:',

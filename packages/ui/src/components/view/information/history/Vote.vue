@@ -5,7 +5,7 @@
       {{ $t('vote.voteIndex', { index: data.index + 1 }) }}
     </span>
     <span>
-      {{ $t('vote.teamSelected') }}&nbsp;<b>{{ calculateNameByID(data.leaderID) }}</b>
+      {{ ' ' + $t('vote.teamSelected') + ' ' }}<b>{{ calculateNameByID(data.leaderID) }}</b>
     </span>
   </div>
   <div>

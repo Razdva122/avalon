@@ -5,10 +5,12 @@ import type { Server, ServerSocket } from '@avalon/types';
 import crypto from 'crypto';
 
 import { parseCookie, handleSocketErrors, eventBus } from '@/helpers';
+import { fakeGames } from '@/helpers/mocks/game';
+import { fakeRooms } from '@/helpers/mocks/rooms';
 
 export class Manager {
   rooms: Dictionary<Room> = {};
-  roomsList: TRoomsList = [];
+  roomsList: TRoomsList = fakeRooms;
   io: Server;
 
   get roomListCutted() {
@@ -109,6 +111,14 @@ export class Manager {
 
       socket.on('joinRoom', (uuid, cb) => {
         console.log(`user ${userName} join room uuid: ${uuid}`);
+
+        const fakeGame = fakeGames.find((el) => el.roomID === uuid);
+
+        if (fakeGame) {
+          cb(fakeGame);
+          return;
+        }
+
         const room = this.rooms[uuid];
 
         if (room) {
