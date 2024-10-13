@@ -50,6 +50,7 @@ export default defineComponent({
 
     return {
       user,
+      currentLocale: this.$i18n.locale,
     };
   },
   computed: {
@@ -61,6 +62,9 @@ export default defineComponent({
     profileClick() {
       (<InstanceType<typeof Settings>>this.$refs.settings).displaySettings();
     },
+  },
+  created() {
+    document.documentElement.lang = this.currentLocale;
   },
 });
 </script>

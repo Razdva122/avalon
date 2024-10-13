@@ -15,6 +15,14 @@ export const LanguageMap: { [key in TLanguage]: string } = {
 };
 
 export function selectLocale(): TLanguage {
+  const localeFromRoute = document.location.pathname.split('/')[1];
+
+  const validLanguage = Object.keys(LanguageMap).find((el) => el.toLowerCase() === localeFromRoute.toLocaleLowerCase());
+
+  if (validLanguage) {
+    return <TLanguage>validLanguage;
+  }
+
   if (userInStorage) {
     const user: IUser = JSON.parse(userInStorage);
 

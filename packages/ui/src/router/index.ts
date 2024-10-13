@@ -1,9 +1,13 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { routesSeo } from '@/router/seo';
 import Lobby from '@/pages/lobby/Lobby.vue';
+import type { TLanguage } from '@/helpers/i18n';
 
 export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.lobby, component: Lobby },
+  { ...routesSeo.lobbyRu, component: Lobby },
+  { ...routesSeo.lobbyZh_CN, component: Lobby },
+  { ...routesSeo.lobbyZh_TW, component: Lobby },
   { ...routesSeo.about, component: () => import('@/pages/about/About.vue') },
   { ...routesSeo.room, component: () => import('@/pages/room/Room.vue') },
   { ...routesSeo.wiki, component: () => import('@/pages/wiki/Index.vue') },
@@ -43,7 +47,12 @@ const router = createRouter({
   },
 });
 
-const defaultKeywords = ['The Resistance', 'Avalon', 'Online'];
+const defaultKeywords: { [key in TLanguage]: string[] } = {
+  en: ['The Resistance', 'Avalon', 'Online', 'Board Game'],
+  ru: ['Сопротивление', 'Авалон', 'Онлайн', 'Настольная Игра'],
+  zh_TW: ['反抗勢力', '亞瓦隆', '在線', '桌遊'],
+  zh_CN: ['反抗组织', '阿瓦隆', '在线', '桌游'],
+};
 
 router.beforeEach((to, from, next) => {
   const keywords = <string[]>to.meta.keywords ?? [];
@@ -60,7 +69,7 @@ router.beforeEach((to, from, next) => {
 
   document
     .querySelector('head meta[name="keywords"]')!
-    .setAttribute('content', [...keywords, ...defaultKeywords].join(', '));
+    .setAttribute('content', [...keywords, ...defaultKeywords[<TLanguage>to.meta.lang || 'en']].join(', '));
 
   document.querySelector('link[rel="canonical"]')!.setAttribute('href', siteAdress + to.path);
   document.querySelector('head meta[property="og:url"]')!.setAttribute('content', siteAdress + to.path);
