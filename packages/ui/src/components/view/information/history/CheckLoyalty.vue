@@ -1,16 +1,23 @@
 <template>
   <div>
-    <b>{{ calculateNameByID(data.validatorID) }}</b> checked <b>{{ calculateNameByID(data.inspectedID) }}</b> loyalty
+    <span
+      v-html="
+        $t('checkLoyalty.checkInfo', {
+          ladyOwner: calculateNameByID(data.validatorID),
+          ladyTarget: calculateNameByID(data.inspectedID),
+        })
+      "
+    ></span>
     <span v-if="data.realLoyalty">
-      is
+      -
       <span :class="data.realLoyalty === 'evil' ? 'text-error' : 'text-success'">
-        {{ data.realLoyalty }}
+        {{ $t('game.' + data.realLoyalty) }}
       </span>
     </span>
   </div>
   <div>
-    And declared his loyalty as
-    <span :class="data.result === 'evil' ? 'text-error' : 'text-success'"> {{ data.result }}</span>
+    {{ $t('checkLoyalty.declareInfo') }}
+    <span :class="data.result === 'evil' ? 'text-error' : 'text-success'"> {{ $t('game.' + data.result) }}</span>
   </div>
 </template>
 

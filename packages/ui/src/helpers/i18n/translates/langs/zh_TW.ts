@@ -236,4 +236,20 @@ export const zh_TW = {
     approve: '同意:',
     reject: '拒絕:',
   },
+  checkLoyalty: {
+    checkInfo: '<b>{ladyOwner}</b> ??? <b>{ladyTarget}</b>',
+    declareInfo: '???',
+  },
+  lancelots: {
+    becameEvil: '???',
+    becomeGood: '???',
+    lancelotSaveLoyalty: '???',
+    lancelotsLoyal: '???',
+    lancelotsSwap: '???',
+    cards: '???:',
+  },
+  switch: {
+    skip: '???',
+    switchInfo: '<b>{switcher}</b> ??? <b>{target}</b> ???',
+  },
 };

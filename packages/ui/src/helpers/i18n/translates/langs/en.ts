@@ -236,4 +236,20 @@ export const en = {
     approve: 'Approve:',
     reject: 'Reject:',
   },
+  checkLoyalty: {
+    checkInfo: '<b>{ladyOwner}</b> checked <b>{ladyTarget}</b> loyalty',
+    declareInfo: 'And declared his loyalty as',
+  },
+  lancelots: {
+    becameEvil: 'became evil',
+    becomeGood: 'become good',
+    lancelotSaveLoyalty: 'remain loyal',
+    lancelotsLoyal: 'remained loyalty',
+    lancelotsSwap: 'have changed loyalty',
+    cards: 'Cards:',
+  },
+  switch: {
+    skip: 'decided not to use excalibur',
+    switchInfo: '<b>{switcher}</b> use excalibur to switch<b>{target}</b> action to',
+  },
 };

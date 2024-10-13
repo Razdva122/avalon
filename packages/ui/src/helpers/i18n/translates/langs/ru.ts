@@ -195,7 +195,7 @@ export const ru = {
     fails: 'Провалов',
     indexMission: '{index} поход',
     failsCount: 'провалов {count}',
-    team: 'Team:',
+    team: 'Команда:',
   },
   chat: {
     message: 'сообщение',
@@ -235,5 +235,21 @@ export const ru = {
     excaliburOwner: '(Экскалибур)',
     approve: 'За:',
     reject: 'Против:',
+  },
+  checkLoyalty: {
+    checkInfo: '<b>{ladyOwner}</b> проверил лояльность <b>{ladyTarget}</b>',
+    declareInfo: 'и сказал что его лояльность -',
+  },
+  lancelots: {
+    becameEvil: 'стал темным',
+    becomeGood: 'стал светлым',
+    lancelotSaveLoyalty: 'сохранил лояльность',
+    lancelotsLoyal: 'сохранили лояльность',
+    lancelotsSwap: 'сменили лояльность',
+    cards: 'Карты:',
+  },
+  switch: {
+    skip: 'решил не использовать Экскалибур',
+    switchInfo: '<b>{switcher}</b> использовал Экскалибур и изменил решение <b>{target}</b> на',
   },
 };
