@@ -1,3 +1,5 @@
+import pages from '@/helpers/i18n/translates/langs/pages';
+
 export const en = {
   menu: {
     menu: 'Menu',
@@ -100,11 +102,6 @@ export const en = {
     unlockGame: 'Unlock game',
     startGame: 'Start Game',
     options: 'Options',
-  },
-  wiki: {
-    rules: 'Rules',
-    roles: 'Roles',
-    addons: 'Addons',
   },
   onlineStatus: {
     connecting: 'Connecting...',
@@ -252,4 +249,5 @@ export const en = {
     skip: 'decided not to use excalibur',
     switchInfo: '<b>{switcher}</b> use excalibur to switch<b>{target}</b> action to',
   },
+  ...pages.en,
 };

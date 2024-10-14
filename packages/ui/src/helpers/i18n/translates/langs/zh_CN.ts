@@ -1,3 +1,5 @@
+import pages from '@/helpers/i18n/translates/langs/pages';
+
 export const zh_CN = {
   menu: {
     menu: '选单',
@@ -100,11 +102,6 @@ export const zh_CN = {
     unlockGame: '解锁游戏',
     startGame: '开始游戏',
     options: '选项',
-  },
-  wiki: {
-    rules: '规则',
-    roles: '角色',
-    addons: '插件',
   },
   onlineStatus: {
     connecting: '连线中...',
@@ -252,4 +249,5 @@ export const zh_CN = {
     skip: '???',
     switchInfo: '<b>{switcher}</b> ??? <b>{target}</b> ???',
   },
+  ...pages.zh_CN,
 };

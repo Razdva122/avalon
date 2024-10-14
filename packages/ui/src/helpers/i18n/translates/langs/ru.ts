@@ -1,3 +1,5 @@
+import pages from '@/helpers/i18n/translates/langs/pages';
+
 export const ru = {
   menu: {
     menu: 'Меню',
@@ -100,11 +102,6 @@ export const ru = {
     unlockGame: 'Открыть игру',
     startGame: 'Начать игру',
     options: 'Настройки',
-  },
-  wiki: {
-    rules: 'Правила',
-    roles: 'Роли',
-    addons: 'Дополнения',
   },
   onlineStatus: {
     connecting: 'Подключение...',
@@ -252,4 +249,5 @@ export const ru = {
     skip: 'решил не использовать Экскалибур',
     switchInfo: '<b>{switcher}</b> использовал Экскалибур и изменил решение <b>{target}</b> на',
   },
+  ...pages.ru,
 };
