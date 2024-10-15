@@ -15,20 +15,20 @@ export const LanguageMap: { [key in TLanguage]: string } = {
 };
 
 export function selectLocale(): TLanguage {
-  const localeFromRoute = document.location.pathname.split('/')[1];
-
-  const validLanguage = Object.keys(LanguageMap).find((el) => el.toLowerCase() === localeFromRoute.toLocaleLowerCase());
-
-  if (validLanguage) {
-    return <TLanguage>validLanguage;
-  }
-
   if (userInStorage) {
     const user: IUser = JSON.parse(userInStorage);
 
     if (user.settings?.locale?.isDefault === false) {
       return user.settings.locale.value;
     }
+  }
+
+  const localeFromRoute = document.location.pathname.split('/')[1];
+
+  const validLanguage = Object.keys(LanguageMap).find((el) => el.toLowerCase() === localeFromRoute.toLocaleLowerCase());
+
+  if (validLanguage) {
+    return <TLanguage>validLanguage;
   }
 
   const parsedLocales = new locale.Locales(navigator.languages);

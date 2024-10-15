@@ -1,13 +1,15 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { routesSeo } from '@/router/seo';
+import type { TMultiLangRoute, TNormalizedLangRoute } from '@/router/seo';
 import Lobby from '@/pages/lobby/Lobby.vue';
-import type { TLanguage } from '@/helpers/i18n';
+import cloneDeep from 'lodash/cloneDeep';
+import { TLanguage, LanguageMap } from '@/helpers/i18n';
+
+const routeComponentMap = {
+  lobby: Lobby,
+};
 
 export const routes: Array<RouteRecordRaw> = [
-  { ...routesSeo.lobby, component: Lobby },
-  { ...routesSeo.lobbyRu, component: Lobby },
-  { ...routesSeo.lobbyZh_CN, component: Lobby },
-  { ...routesSeo.lobbyZh_TW, component: Lobby },
   { ...routesSeo.about, component: () => import('@/pages/about/About.vue') },
   { ...routesSeo.room, component: () => import('@/pages/room/Room.vue') },
   { ...routesSeo.wiki, component: () => import('@/pages/wiki/Index.vue') },
@@ -39,6 +41,37 @@ export const routes: Array<RouteRecordRaw> = [
   { path: '/:catchAll(.*)', redirect: '404' },
 ];
 
+Object.values(routesSeo).forEach((route) => {
+  if ('multiLanguage' in route.meta) {
+    const multiLangRoute = <TMultiLangRoute>route;
+
+    routes.push(
+      ...Object.keys(multiLangRoute.meta.multiLanguage).map((lang) => {
+        const clone = cloneDeep(multiLangRoute);
+
+        // @ts-ignore
+        delete clone.meta.multiLanguage;
+
+        // @ts-ignore
+        (<TNormalizedLangRoute>(<unknown>clone)).meta = {
+          ...clone.meta,
+          availableLocales: <TLanguage[]>Object.keys(multiLangRoute.meta.multiLanguage).filter((el) => el !== lang),
+          lang: <TLanguage>lang,
+          id: clone.name,
+          ...multiLangRoute.meta.multiLanguage[<TLanguage>lang],
+        };
+
+        if (lang !== 'en') {
+          clone.name += lang;
+          clone.path = `/${lang}${clone.path}`;
+        }
+
+        return <RouteRecordRaw>{ ...clone, component: routeComponentMap[<keyof typeof routeComponentMap>route.name] };
+      }),
+    );
+  }
+});
+
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
@@ -55,24 +88,77 @@ const defaultKeywords: { [key in TLanguage]: string[] } = {
 };
 
 router.beforeEach((to, from, next) => {
-  const keywords = <string[]>to.meta.keywords ?? [];
-  const image = <string>to.meta.image || 'roles/merlin.webp';
-  const siteAdress = 'https://avalon-game.com';
+  let toLangName = to.path.split('/')[1].toLowerCase();
+  const documentLang = document.documentElement.lang.toLowerCase();
 
-  document.querySelector('head meta[property="og:image"]')!.setAttribute('content', `${siteAdress}/static/${image}`);
+  if (Object.keys(LanguageMap).find((el) => el.toLowerCase() === toLangName) && toLangName !== documentLang) {
+    const path = to.path.split('/');
+    path.splice(1);
+    next(path.join('/'));
+    return;
+  }
 
-  document.title = <string>to.meta.title;
-  document.querySelector('head meta[property="og:title"]')!.setAttribute('content', <string>to.meta.title);
+  let meta = to.meta;
 
-  document.querySelector('head meta[name="description"]')!.setAttribute('content', <string>to.meta.description);
-  document.querySelector('head meta[property="og:description"]')!.setAttribute('content', <string>to.meta.description);
+  if ((to.meta.lang === undefined || to.meta.lang === 'en') && documentLang !== 'en') {
+    meta =
+      routes.find((route) => {
+        if (route.meta?.id !== meta.id) {
+          return false;
+        }
+
+        return route.meta?.lang && documentLang === (<string>route.meta.lang).toLowerCase();
+      })?.meta || meta;
+  }
+
+  const keywords = <string[]>meta.keywords ?? [];
+  const image = <string>meta.image || 'roles/merlin.webp';
+  const url = 'https://avalon-game.com';
+
+  document.querySelector('head meta[property="og:image"]')!.setAttribute('content', `${url}/static/${image}`);
+
+  document.title = <string>meta.title;
+  document.querySelector('head meta[property="og:title"]')!.setAttribute('content', <string>meta.title);
+
+  document.querySelector('head meta[name="description"]')!.setAttribute('content', <string>meta.description);
+  document.querySelector('head meta[property="og:description"]')!.setAttribute('content', <string>meta.description);
 
   document
     .querySelector('head meta[name="keywords"]')!
-    .setAttribute('content', [...keywords, ...defaultKeywords[<TLanguage>to.meta.lang || 'en']].join(', '));
+    .setAttribute('content', [...keywords, ...defaultKeywords[<TLanguage>meta.lang || 'en']].join(', '));
 
-  document.querySelector('link[rel="canonical"]')!.setAttribute('href', siteAdress + to.path);
-  document.querySelector('head meta[property="og:url"]')!.setAttribute('content', siteAdress + to.path);
+  document.querySelector('link[rel="canonical"]')!.setAttribute('href', url + to.path);
+  document.querySelector('head meta[property="og:url"]')!.setAttribute('content', url + to.path);
+
+  const existingLinks = document.querySelectorAll('link[rel="alternate"]');
+  existingLinks.forEach((link) => link.parentNode?.removeChild(link));
+
+  if (meta.availableLocales) {
+    const path = to.path.toLowerCase();
+
+    (<Array<string>>meta.availableLocales).forEach((language) => {
+      const link = document.createElement('link');
+      link.rel = 'alternate';
+      link.hreflang = language;
+
+      const langString = `/${(<string>meta.lang).toLowerCase()}`;
+      const langInUrl = language === 'en' ? '' : `/${language}`;
+
+      if (path.includes(langString)) {
+        link.href = url + path.replace(langString, langInUrl);
+      } else {
+        link.href = url + langInUrl + path;
+      }
+
+      document.head.appendChild(link);
+    });
+
+    const link = document.createElement('link');
+    link.rel = 'alternate';
+    link.hreflang = 'x-default';
+    link.href = url + path.replace(`/${(<string>meta.lang).toLowerCase()}`, '');
+    document.head.appendChild(link);
+  }
 
   next();
 });
