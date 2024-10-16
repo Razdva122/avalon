@@ -1,4 +1,4 @@
-const { lobby } = require('../../src/helpers/i18n/translates/langs/pages/seo/lobby');
+const { lobby, wiki } = require('../../src/helpers/i18n/translates/langs/pages/seo');
 
 module.exports.routesSeo = {
   lobby: {
@@ -43,11 +43,9 @@ module.exports.routesSeo = {
     priority: 0.8,
     meta: {
       prerender: true,
-      multiLanguage: false,
-      title: 'Avalon: The Resistance | Wiki',
-      description:
-        "Your go-to 'Avalon: The Resistance' Wiki resource. Find detailed guides on playing Avalon, rules explanation, and strategy tips.",
-      keywords: ['Wiki', 'Rules', 'How to play'],
+      multiLanguage: {
+        ...wiki,
+      },
     },
   },
   rules: {

@@ -9,7 +9,30 @@ const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 const { routesSeo } = require('./src/router/seo');
 const { yaMetrika, gtag } = require('./const');
 
-const paths = Object.values(routesSeo).filter((el) => !el.meta.skipSiteMap);
+const multiLangRoutes = Object.values(routesSeo).reduce((acc, el) => {
+  if (el.meta.multiLanguage) {
+    acc.push(
+      ...Object.keys(el.meta.multiLanguage).map((lang) => {
+        return {
+          ...el,
+          path: lang === 'en' ? el.path : `/${lang}${el.path}`,
+        };
+      }),
+    );
+  } else {
+    acc.push(el);
+  }
+
+  return acc;
+}, []);
+
+const paths = multiLangRoutes.filter((el) => !el.meta.skipSiteMap);
+
+console.log('paths', paths);
+console.log(
+  'prerender',
+  multiLangRoutes.filter((el) => el.meta.prerender).map((el) => el.path),
+);
 
 module.exports = defineConfig({
   transpileDependencies: true,
@@ -75,9 +98,7 @@ module.exports = defineConfig({
           ],
         }),
         new PrerendererWebpackPlugin({
-          routes: Object.values(routesSeo)
-            .filter((el) => el.meta.prerender)
-            .map((el) => el.path),
+          routes: multiLangRoutes.filter((el) => el.meta.prerender).map((el) => el.path),
         }),
       ],
     };
