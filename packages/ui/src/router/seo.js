@@ -1,4 +1,4 @@
-const { lobby, wiki } = require('../../src/helpers/i18n/translates/langs/pages/seo');
+const { lobby, wiki, game, notFound } = require('../../src/helpers/i18n/translates/langs/pages/seo');
 
 module.exports.routesSeo = {
   lobby: {
@@ -30,11 +30,10 @@ module.exports.routesSeo = {
     props: true,
     name: 'room',
     meta: {
-      title: 'Avalon: The Resistance | Game',
-      multiLanguage: false,
+      multiLanguage: {
+        ...game,
+      },
       skipSiteMap: true,
-      description: "Rooms for online games in 'Avalon: The Resistance'",
-      keywords: ['Game'],
     },
   },
   wiki: {
@@ -313,12 +312,12 @@ module.exports.routesSeo = {
   },
   notFound: {
     path: '/404/',
-    name: 'NotFound',
+    name: 'notFound',
     meta: {
-      title: 'Avalon: The Resistance | 404',
-      multiLanguage: false,
+      multiLanguage: {
+        ...notFound,
+      },
       skipSiteMap: true,
-      description: 'Page not found =(',
     },
   },
 };

@@ -28,12 +28,6 @@ const multiLangRoutes = Object.values(routesSeo).reduce((acc, el) => {
 
 const paths = multiLangRoutes.filter((el) => !el.meta.skipSiteMap);
 
-console.log('paths', paths);
-console.log(
-  'prerender',
-  multiLangRoutes.filter((el) => el.meta.prerender).map((el) => el.path),
-);
-
 module.exports = defineConfig({
   transpileDependencies: true,
   css: {
