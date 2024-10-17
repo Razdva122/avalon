@@ -10,13 +10,13 @@ const routeComponentMap = {
   wiki: () => import('@/pages/wiki/Index.vue'),
   notFound: () => import('@/pages/empty/NotFound.vue'),
   room: () => import('@/pages/room/Room.vue'),
+  roles: () => import('@/pages/wiki/roles/Index.vue'),
+  addons: () => import('@/pages/wiki/addons/Index.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.about, component: () => import('@/pages/about/About.vue') },
   { ...routesSeo.rules, component: () => import('@/pages/wiki/Rules.vue') },
-  { ...routesSeo.addons, component: () => import('@/pages/wiki/addons/Index.vue') },
-  { ...routesSeo.roles, component: () => import('@/pages/wiki/roles/Index.vue') },
   { ...routesSeo.lady, component: () => import('@/pages/wiki/addons/LadyOfTheLake.vue') },
   { ...routesSeo.excalibur, component: () => import('@/pages/wiki/addons/Excalibur.vue') },
   { ...routesSeo.merlin, component: () => import('@/pages/wiki/roles/Merlin.vue') },
@@ -71,6 +71,8 @@ Object.values(routesSeo).forEach((route) => {
     );
   }
 });
+
+console.log(routes);
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),

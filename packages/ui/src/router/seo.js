@@ -1,4 +1,4 @@
-const { lobby, wiki, game, notFound } = require('../../src/helpers/i18n/translates/langs/pages/seo');
+const { lobby, wiki, game, notFound, roles, addons } = require('../../src/helpers/i18n/translates/langs/pages/seo');
 
 module.exports.routesSeo = {
   lobby: {
@@ -66,11 +66,9 @@ module.exports.routesSeo = {
     priority: 0.7,
     meta: {
       prerender: true,
-      multiLanguage: false,
-      title: 'Avalon: The Resistance | Addons for game',
-      description:
-        "Enhance 'Avalon: The Resistance' with exciting add-ons and extra cards. Learn how each addition can spice up your game sessions and bring new challenges to the table.",
-      keywords: ['Addons', 'Module', 'Rules'],
+      multiLanguage: {
+        ...addons,
+      },
       image: 'features/lady_of_lake.webp',
     },
   },
@@ -108,11 +106,9 @@ module.exports.routesSeo = {
     priority: 0.7,
     meta: {
       prerender: true,
-      multiLanguage: false,
-      title: 'Avalon: The Resistance | Roles',
-      description:
-        "All available roles in the board game 'Avalon: The Resistance'. Rules for roles: Merlin, Percival, Morgana, Oberon, Mordred",
-      keywords: ['Roles', 'Rules', 'Merlin', 'Percival', 'Morgana', 'Oberon', 'Mordred', 'Tips'],
+      multiLanguage: {
+        ...roles,
+      },
     },
   },
   merlin: {

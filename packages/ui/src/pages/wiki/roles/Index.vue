@@ -1,7 +1,7 @@
 <template>
   <div class="info-page-content">
     <WikiBreadCrumbs />
-    <h1>Roles</h1>
+    <h1>{{ $t('wiki.roles') }}</h1>
     <div class="roles-container">
       <router-link class="role" :to="{ name: 'merlin' }">
         <h2>{{ $t('roles.merlin') }}</h2>
