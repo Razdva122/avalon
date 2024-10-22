@@ -1,9 +1,10 @@
-const { lobby } = require('../seo/lobby');
-const { wiki } = require('../seo/wiki');
-const { game } = require('../seo/game');
-const { notFound } = require('../seo/notFound');
-const { roles } = require('../seo/roles');
-const { addons } = require('../seo/addons');
+const { lobby } = require('./lobby');
+const { wiki } = require('./wiki');
+const { game } = require('./game');
+const { notFound } = require('./notFound');
+const { roles } = require('./roles');
+const { addons } = require('./addons');
+const { lancelots } = require('./lancelots');
 
 module.exports = {
   lobby,
@@ -12,4 +13,5 @@ module.exports = {
   notFound,
   roles,
   addons,
+  lancelots,
 };

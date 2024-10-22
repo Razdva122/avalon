@@ -70,6 +70,7 @@ export const en = {
     lunatic: 'Lunatic',
     brute: 'Brute',
     minion: 'Minion',
+    role: 'Role',
   },
   addons: {
     ladyOfLake: 'Lady of the lake',

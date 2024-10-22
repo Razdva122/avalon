@@ -128,4 +128,8 @@ a {
 body {
   background-color: rgb(var(--v-theme-bgApp));
 }
+
+.icon-swap {
+  vertical-align: text-bottom;
+}
 </style>

@@ -70,6 +70,7 @@ export const zh_CN = {
     lunatic: '疯子',
     brute: '野蛮人',
     minion: '士兵',
+    role: '角色',
   },
   addons: {
     ladyOfLake: '湖中仙女',

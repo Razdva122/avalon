@@ -12,6 +12,7 @@ const routeComponentMap = {
   room: () => import('@/pages/room/Room.vue'),
   roles: () => import('@/pages/wiki/roles/Index.vue'),
   addons: () => import('@/pages/wiki/addons/Index.vue'),
+  lancelots: () => import('@/pages/wiki/roles/Lancelots.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
@@ -22,7 +23,6 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.merlin, component: () => import('@/pages/wiki/roles/Merlin.vue') },
   { ...routesSeo['merlin_pure'], component: () => import('@/pages/wiki/roles/MerlinPure.vue') },
   { ...routesSeo.percival, component: () => import('@/pages/wiki/roles/Percival.vue') },
-  { ...routesSeo.lancelots, component: () => import('@/pages/wiki/roles/Lancelots.vue') },
   { ...routesSeo.lovers, component: () => import('@/pages/wiki/roles/Lovers.vue') },
   { ...routesSeo.troublemaker, component: () => import('@/pages/wiki/roles/Troublemaker.vue') },
   { ...routesSeo.servant, component: () => import('@/pages/wiki/roles/Servant.vue') },
@@ -71,8 +71,6 @@ Object.values(routesSeo).forEach((route) => {
     );
   }
 });
-
-console.log(routes);
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),

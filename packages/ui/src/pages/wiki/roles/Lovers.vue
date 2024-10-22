@@ -3,7 +3,7 @@
     <WikiBreadCrumbs />
     <h1>
       <div class="good-loyalty-icon"></div>
-      Lovers (Tristan and Isolde) Role
+      Lovers (Tristan and Isolde) {{ $t('roles.role') }}
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('isolde')" alt="isolde" />
     <img class="preview-image" :src="calculateRoleUrl('tristan')" alt="tristan" />

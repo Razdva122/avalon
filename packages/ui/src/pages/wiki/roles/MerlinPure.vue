@@ -3,7 +3,7 @@
     <WikiBreadCrumbs />
     <h1>
       <div class="good-loyalty-icon"></div>
-      {{ $t('roles.merlinPure') }} Role
+      {{ $t('roles.merlinPure') }} {{ $t('roles.role') }}
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('merlinPure')" alt="merlin pure" />
 

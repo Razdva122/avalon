@@ -1,4 +1,12 @@
-const { lobby, wiki, game, notFound, roles, addons } = require('../../src/helpers/i18n/translates/langs/pages/seo');
+const {
+  lobby,
+  wiki,
+  game,
+  notFound,
+  roles,
+  addons,
+  lancelots,
+} = require('../../src/helpers/i18n/translates/langs/pages/seo');
 
 module.exports.routesSeo = {
   lobby: {
@@ -156,10 +164,9 @@ module.exports.routesSeo = {
     priority: 0.6,
     meta: {
       prerender: true,
-      multiLanguage: false,
-      title: 'Avalon: The Resistance | Lancelots',
-      description: "Rules and Tips for Lancelots roles in the board game 'Avalon: The Resistance'",
-      keywords: ['Lancelots', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...lancelots,
+      },
       image: 'roles/unknown_lancelot.webp',
     },
   },
