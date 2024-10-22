@@ -5,6 +5,7 @@ const webpack = require('webpack');
 const SitemapPlugin = require('sitemap-webpack-plugin').default;
 const CopyPlugin = require('copy-webpack-plugin');
 const PrerendererWebpackPlugin = require('@prerenderer/webpack-plugin');
+const PuppeteerRenderer = require('@prerenderer/renderer-puppeteer');
 const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 const { routesSeo } = require('./src/router/seo');
 const { yaMetrika, gtag } = require('./const');
@@ -96,6 +97,9 @@ module.exports = defineConfig({
         }),
         new PrerendererWebpackPlugin({
           routes: multiLangRoutes.filter((el) => el.meta.prerender).map((el) => el.path),
+          renderer: new PuppeteerRenderer({
+            timeout: 60000, // Таймаут в 60 секунд
+          }),
         }),
       ],
     };
