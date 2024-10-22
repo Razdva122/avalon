@@ -52,7 +52,7 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     determineWinner:
       '<b>10. Определение победителя</b>: Игра завершается, когда одна из сторон выполнит три миссии или Убийца правильно убьет Мерлина после победы светлой стороны.',
   },
-  zh_CN: {
+  'zh-CN': {
     rules: '规则',
     roles: '角色',
     addons: '插件',
@@ -73,7 +73,7 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     victoryConditions: '胜利条件',
     determineWinner: '<b>10. 确定胜者</b>: 当一方完成三个任务或刺客在好的一方获胜后正确识别梅林时，游戏结束。',
   },
-  zh_TW: {
+  'zh-TW': {
     rules: '規則',
     roles: '角色',
     addons: '插件',

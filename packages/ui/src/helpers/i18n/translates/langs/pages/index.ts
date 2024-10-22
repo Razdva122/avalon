@@ -7,8 +7,8 @@ import { lancelots } from '@/helpers/i18n/translates/langs/pages/lancelots';
 export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
   en: {},
   ru: {},
-  zh_CN: {},
-  zh_TW: {},
+  'zh-CN': {},
+  'zh-TW': {},
 };
 
 Object.entries({ wiki: wiki, lancelots: lancelots }).forEach(([key, value]) => {

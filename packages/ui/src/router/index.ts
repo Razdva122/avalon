@@ -87,13 +87,13 @@ const router = createRouter({
 const defaultKeywords: { [key in Lowercase<TLanguage>]: string[] } = {
   en: ['The Resistance', 'Avalon', 'Online', 'Board Game'],
   ru: ['Сопротивление', 'Авалон', 'Онлайн', 'Настольная Игра'],
-  zh_tw: ['反抗勢力', '亞瓦隆', '在線', '桌遊'],
-  zh_cn: ['反抗组织', '阿瓦隆', '在线', '桌游'],
+  'zh-tw': ['反抗勢力', '亞瓦隆', '在線', '桌遊'],
+  'zh-cn': ['反抗组织', '阿瓦隆', '在线', '桌游'],
 };
 
 router.beforeEach((to, from, next) => {
   let toLangName = to.path.split('/')[1].toLowerCase();
-  const documentLang = document.documentElement.lang.toLowerCase().split('-').join('_');
+  const documentLang = document.documentElement.lang.toLowerCase();
 
   if (Object.keys(LanguageMap).find((el) => el.toLowerCase() === toLangName) && toLangName !== documentLang) {
     const path = to.path.split('/');
@@ -144,7 +144,7 @@ router.beforeEach((to, from, next) => {
     (<Array<string>>meta.availableLocales).forEach((language) => {
       const link = document.createElement('link');
       link.rel = 'alternate';
-      link.hreflang = language.split('_').join('-');
+      link.hreflang = language;
 
       const langString = `/${(<string>meta.lang).toLowerCase()}`;
       const langInUrl = `/${language}`.toLowerCase();

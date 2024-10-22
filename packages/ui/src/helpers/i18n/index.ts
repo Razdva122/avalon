@@ -10,8 +10,8 @@ export * from '@/helpers/i18n/translates';
 export const LanguageMap: { [key in TLanguage]: string } = {
   en: 'English',
   ru: 'Русский',
-  zh_TW: '繁體中文',
-  zh_CN: '简体中文',
+  'zh-TW': '繁體中文',
+  'zh-CN': '简体中文',
 };
 
 export function selectLocale(): TLanguage {

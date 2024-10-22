@@ -9,12 +9,12 @@ module.exports.game = {
     description: "Комната для игры в 'Авалон: Сопротивление'",
     keywords: ['Игра'],
   },
-  zh_TW: {
+  'zh-TW': {
     title: '阿瓦隆：反抗勢力 | 遊戲',
     description: '『阿瓦隆：反抗勢力』的在線遊戲房間',
     keywords: ['遊戲'],
   },
-  zh_CN: {
+  'zh-CN': {
     title: '阿瓦隆：反抗组织 | 游戏',
     description: '《阿瓦隆：反抗组织》的在线游戏房间',
     keywords: ['游戏'],

@@ -88,7 +88,7 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
     servingAsLancelotDescription:
       'Будучи Ланселотом, вы обладаете мощной способностью сменить лояльность, которая может кардинально изменить ход игры в Авалоне. С возможностью смены лояльности, ваша роль предполагает стратегическую глубину, не похожую на другие. Будьте осторожны, ведь баланс добра и зла лежит на ваших бронированных плечах.',
   },
-  zh_CN: {
+  'zh-CN': {
     generalInformationTitle: '一般信息：',
     introduction:
       '兰斯洛特在阿瓦隆的领域中提出了一个动态的挑战。作为两个从对立面开始的玩家，{goodLancelot} 与善的一方结盟，而 {evilLancelot} 与莫德雷德的爪牙密谋。',
@@ -125,7 +125,7 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
     servingAsLancelotDescription:
       '作为兰斯洛特，你拥有强大的双重身份，可以显著改变阿瓦隆中的游戏进程。随着忠诚的潜在变化，你的角色提供了独特的战略深度。谨慎行事，因为善与恶的平衡掌握在你的装甲肩膀上。',
   },
-  zh_TW: {
+  'zh-TW': {
     generalInformationTitle: '一般信息：',
     introduction:
       '蘭斯洛特在阿瓦隆的領域中提出了一個動態的挑戰。作為兩個從對立面開始的玩家，{goodLancelot} 與善的一方結盟，而 {evilLancelot} 與莫德雷德的爪牙密謀。',

@@ -9,6 +9,6 @@ import { zh_TW } from '@/helpers/i18n/translates/langs/zh_TW';
 export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
   en,
   ru,
-  zh_CN,
-  zh_TW,
+  'zh-CN': zh_CN,
+  'zh-TW': zh_TW,
 };

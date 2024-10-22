@@ -250,5 +250,5 @@ export const zh_TW = {
     skip: '決定不使用 神劍',
     switchInfo: '<b>{switcher}</b> 使用 神劍 將 <b>{target}</b> 的動作更改為',
   },
-  ...pages.zh_TW,
+  ...pages['zh-TW'],
 };

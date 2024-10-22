@@ -96,7 +96,7 @@ export default defineComponent({
       set(value: string) {
         this.$store.commit('updateUserSettings', { key: 'locale', value: { value, isDefault: false } });
         (<unknown>this.$i18n.locale) = value;
-        document.documentElement.lang = value.split('_').join('-');
+        document.documentElement.lang = value;
       },
     },
     hideIndexInHistory: {
