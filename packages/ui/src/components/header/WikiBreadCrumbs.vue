@@ -27,7 +27,8 @@ export default defineComponent({
         .filter(Boolean)
         .map((el) => ({
           to: { name: normalizeName(el) },
-          title: el,
+          id: el,
+          title: this.$t(`breadCrumbs.${el}`),
         }));
     },
   },
@@ -43,7 +44,7 @@ export default defineComponent({
 					"name": "${item.title}",
 					"item": "https://avalon-game.com/${items
             .slice(0, index + 1)
-            .map((el) => el.title)
+            .map((el) => el.id)
             .join('/')}/"
 				}${index === items.length - 1 ? '' : ','}`;
         return acc + el;
