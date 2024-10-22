@@ -15,7 +15,7 @@ const multiLangRoutes = Object.values(routesSeo).reduce((acc, el) => {
       ...Object.keys(el.meta.multiLanguage).map((lang) => {
         return {
           ...el,
-          path: lang === 'en' ? el.path : `/${lang}${el.path}`,
+          path: (lang === 'en' ? el.path : `/${lang}${el.path}`).toLowerCase(),
         };
       }),
     );
@@ -27,6 +27,8 @@ const multiLangRoutes = Object.values(routesSeo).reduce((acc, el) => {
 }, []);
 
 const paths = multiLangRoutes.filter((el) => !el.meta.skipSiteMap);
+
+console.log(paths);
 
 module.exports = defineConfig({
   transpileDependencies: true,
