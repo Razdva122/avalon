@@ -64,7 +64,7 @@ export default defineComponent({
     },
   },
   created() {
-    document.documentElement.lang = this.currentLocale;
+    document.documentElement.lang = this.currentLocale.split('_').join('-');
   },
 });
 </script>

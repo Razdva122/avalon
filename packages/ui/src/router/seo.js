@@ -26,7 +26,6 @@ module.exports.routesSeo = {
     priority: 0.7,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | About',
       description:
         "Dive into avalon-game.com: a comprehensive platform dedicated to 'Avalon: The Resistance'. Discover the story behind the game, its official rules, and how we bring together Avalon enthusiasts worldwide.",
@@ -61,7 +60,6 @@ module.exports.routesSeo = {
     priority: 1,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Rules',
       description:
         "Master 'Avalon: The Resistance' with a complete guide to the official rulebook. From setting up the game to the intricate roles of each character, get all the knowledge for a winning strategy.",
@@ -86,7 +84,6 @@ module.exports.routesSeo = {
     priority: 0.6,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Lady of the Lake',
       description:
         "Rules for 'Lady of the Lake' card in 'Avalon: The Resistance'. Rules for 'Inquisitor Token' card in 'The Resistance'",
@@ -100,7 +97,6 @@ module.exports.routesSeo = {
     priority: 0.5,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Excalibur',
       description:
         "Rules for 'Excalibur' card in 'Avalon: The Resistance'. Rules for 'Sergeant' card in 'The Resistance'",
@@ -125,7 +121,6 @@ module.exports.routesSeo = {
     priority: 0.7,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Merlin',
       description: "Rules and Tips for Merlin role in the board game 'Avalon: The Resistance'",
       keywords: ['Merlin', 'Role', 'Rules', 'Tips'],
@@ -138,7 +133,6 @@ module.exports.routesSeo = {
     priority: 0.2,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Merlin Pure',
       description: "Rules and Tips for Merlin Pure role in the board game 'Avalon: The Resistance'",
       keywords: ['Merlin Pure', 'Role', 'Rules', 'Tips'],
@@ -151,7 +145,6 @@ module.exports.routesSeo = {
     priority: 0.3,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Lovers (Tristan and Isolde)',
       description: "Rules and Tips for Lovers (Tristan and Isolde) roles in the board game 'Avalon: The Resistance'",
       keywords: ['Lovers', 'Tristan', 'Isolde', 'Role', 'Rules', 'Tips'],
@@ -176,7 +169,6 @@ module.exports.routesSeo = {
     priority: 0.3,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Guinevere',
       description: "Rules and Tips for Guinevere role in the board game 'Avalon: The Resistance'",
       keywords: ['Guinevere', 'Role', 'Rules', 'Tips'],
@@ -189,7 +181,6 @@ module.exports.routesSeo = {
     priority: 0.2,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Lunatic',
       description: "Rules and Tips for Lunatic role in the board game 'Avalon: The Resistance'",
       keywords: ['Lunatic', 'Role', 'Rules', 'Tips'],
@@ -202,7 +193,6 @@ module.exports.routesSeo = {
     priority: 0.2,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Brute',
       description: "Rules and Tips for Brute role in the board game 'Avalon: The Resistance'",
       keywords: ['Brute', 'Role', 'Rules', 'Tips'],
@@ -215,7 +205,6 @@ module.exports.routesSeo = {
     priority: 0.7,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Percival',
       description: "Rules and Tips for Percival role in the board game 'Avalon: The Resistance'",
       keywords: ['Percival', 'Role', 'Rules', 'Tips'],
@@ -228,7 +217,6 @@ module.exports.routesSeo = {
     priority: 0.6,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Servant',
       description: "Rules and Tips for Servant role in the board game 'Avalon: The Resistance'",
       keywords: ['Servant', 'Role', 'Rules', 'Tips'],
@@ -241,7 +229,6 @@ module.exports.routesSeo = {
     priority: 0.2,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Troublemaker',
       description: "Rules and Tips for Troublemaker role in the board game 'Avalon: The Resistance'",
       keywords: ['Troublemaker', 'Role', 'Rules', 'Tips'],
@@ -254,7 +241,6 @@ module.exports.routesSeo = {
     priority: 0.7,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Mordred',
       description: "Rules and Tips for Mordred role in the board game 'Avalon: The Resistance'",
       keywords: ['Mordred', 'Role', 'Rules', 'Tips'],
@@ -267,7 +253,6 @@ module.exports.routesSeo = {
     priority: 0.2,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Trickster',
       description: "Rules and Tips for Trickster role in the board game 'Avalon: The Resistance'",
       keywords: ['Trickster', 'Role', 'Rules', 'Tips'],
@@ -280,7 +265,6 @@ module.exports.routesSeo = {
     priority: 0.6,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Oberon',
       description: "Rules and Tips for Oberon role in the board game 'Avalon: The Resistance'",
       keywords: ['Oberon', 'Role', 'Rules', 'Tips'],
@@ -293,7 +277,6 @@ module.exports.routesSeo = {
     priority: 0.7,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Morgana',
       description: "Rules and Tips for Morgana role in the board game 'Avalon: The Resistance'",
       keywords: ['Morgana', 'Role', 'Rules', 'Tips'],
@@ -306,7 +289,6 @@ module.exports.routesSeo = {
     priority: 0.5,
     meta: {
       prerender: true,
-      multiLanguage: false,
       title: 'Avalon: The Resistance | Minion of Mordred',
       description: "Rules and Tips for  Minion of Mordred role in the board game 'Avalon: The Resistance'",
       keywords: ['Minion of Mordred', 'Role', 'Rules', 'Tips'],

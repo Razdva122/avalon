@@ -42,12 +42,13 @@ export const routes: Array<RouteRecordRaw> = [
 ];
 
 Object.values(routesSeo).forEach((route) => {
-  if ('multiLanguage' in route.meta) {
+  if ('multiLanguage' in route.meta && route.meta.multiLanguage) {
     const multiLangRoute = <TMultiLangRoute>route;
 
     routes.push(
-      ...Object.keys(multiLangRoute.meta.multiLanguage).map((lang) => {
+      ...[...Object.keys(multiLangRoute.meta.multiLanguage), ''].map((lang) => {
         const clone = cloneDeep(multiLangRoute);
+        const langNormalized = lang.toLowerCase();
 
         // @ts-ignore
         delete clone.meta.multiLanguage;
@@ -55,15 +56,16 @@ Object.values(routesSeo).forEach((route) => {
         // @ts-ignore
         (<TNormalizedLangRoute>(<unknown>clone)).meta = {
           ...clone.meta,
-          availableLocales: <TLanguage[]>Object.keys(multiLangRoute.meta.multiLanguage).filter((el) => el !== lang),
-          lang: <TLanguage>lang,
+          availableLocales: <TLanguage[]>Object.keys(multiLangRoute.meta.multiLanguage),
+          lang: <TLanguage>langNormalized || 'en',
           id: clone.name,
-          ...multiLangRoute.meta.multiLanguage[<TLanguage>lang],
+          ...multiLangRoute.meta.multiLanguage[<TLanguage>lang || 'en'],
         };
 
-        if (lang !== 'en') {
-          clone.name += lang;
-          clone.path = `/${lang}${clone.path}`;
+        clone.name += langNormalized;
+
+        if (langNormalized) {
+          clone.path = `/${langNormalized}${clone.path}`;
         }
 
         return <RouteRecordRaw>{ ...clone, component: routeComponentMap[<keyof typeof routeComponentMap>route.name] };
@@ -71,6 +73,8 @@ Object.values(routesSeo).forEach((route) => {
     );
   }
 });
+
+console.log(routes);
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
@@ -80,16 +84,16 @@ const router = createRouter({
   },
 });
 
-const defaultKeywords: { [key in TLanguage]: string[] } = {
+const defaultKeywords: { [key in Lowercase<TLanguage>]: string[] } = {
   en: ['The Resistance', 'Avalon', 'Online', 'Board Game'],
   ru: ['Сопротивление', 'Авалон', 'Онлайн', 'Настольная Игра'],
-  zh_TW: ['反抗勢力', '亞瓦隆', '在線', '桌遊'],
-  zh_CN: ['反抗组织', '阿瓦隆', '在线', '桌游'],
+  zh_tw: ['反抗勢力', '亞瓦隆', '在線', '桌遊'],
+  zh_cn: ['反抗组织', '阿瓦隆', '在线', '桌游'],
 };
 
 router.beforeEach((to, from, next) => {
   let toLangName = to.path.split('/')[1].toLowerCase();
-  const documentLang = document.documentElement.lang.toLowerCase();
+  const documentLang = document.documentElement.lang.toLowerCase().split('-').join('_');
 
   if (Object.keys(LanguageMap).find((el) => el.toLowerCase() === toLangName) && toLangName !== documentLang) {
     const path = to.path.split('/');
@@ -100,7 +104,7 @@ router.beforeEach((to, from, next) => {
 
   let meta = to.meta;
 
-  if ((to.meta.lang === undefined || to.meta.lang === 'en') && documentLang !== 'en') {
+  if (to.meta.lang === 'en' && documentLang !== 'en') {
     meta =
       routes.find((route) => {
         if (route.meta?.id !== meta.id) {
@@ -125,7 +129,8 @@ router.beforeEach((to, from, next) => {
 
   document
     .querySelector('head meta[name="keywords"]')!
-    .setAttribute('content', [...keywords, ...defaultKeywords[<TLanguage>meta.lang || 'en']].join(', '));
+    // @ts-ignore
+    .setAttribute('content', [...keywords, ...defaultKeywords[(meta.lang || 'en').toLowerCase()]].join(', '));
 
   document.querySelector('link[rel="canonical"]')!.setAttribute('href', url + to.path);
   document.querySelector('head meta[property="og:url"]')!.setAttribute('content', url + to.path);
@@ -139,10 +144,10 @@ router.beforeEach((to, from, next) => {
     (<Array<string>>meta.availableLocales).forEach((language) => {
       const link = document.createElement('link');
       link.rel = 'alternate';
-      link.hreflang = language;
+      link.hreflang = language.split('_').join('-');
 
       const langString = `/${(<string>meta.lang).toLowerCase()}`;
-      const langInUrl = language === 'en' ? '' : `/${language}`;
+      const langInUrl = `/${language}`.toLowerCase();
 
       if (path.includes(langString)) {
         link.href = url + path.replace(langString, langInUrl);
