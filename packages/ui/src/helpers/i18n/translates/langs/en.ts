@@ -19,6 +19,7 @@ export const en = {
     join: 'Join',
     gamesList: 'Games list',
     players: 'Players',
+    loading: 'Loading...',
   },
   game: {
     winner: 'Winner',

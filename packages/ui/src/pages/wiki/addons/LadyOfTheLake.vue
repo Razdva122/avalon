@@ -4,43 +4,36 @@
     <h1>{{ $t('addons.ladyOfLake') }}</h1>
     <img class="preview-image" src="@/assets/features/lady_of_lake.webp" alt="lady" />
     <p>
-      <strong>"{{ $t('addons.ladyOfLake') }}"</strong> is an expansion that introduces a new strategic element and
-      provides the ability to gain additional information about the loyalties of other players. It is used in
-      <strong>games with 7 or more</strong> participants and adds more depth to the gameplay.
+      <strong>{{ $t('addons.ladyOfLake') }}</strong>
+      <span v-html="$t('lady.intro')"></span>
     </p>
 
-    <h2>Rules for using "{{ $t('addons.ladyOfLake') }}" (Inquisitor Token in 'The Resistance'):</h2>
+    <h2>{{ $t('lady.title') }}</h2>
+
     <ol>
       <li>
-        <strong>When to Use It:</strong> The <PreviewLink target="ladyOfLake" /> comes into play after the second quest
-        is completed. That means it becomes available starting from the third round of the game.
+        <strong>{{ $t('lady.whenToUseIt') }}</strong>
+        <LocalizedTextWrapper keypath="lady.comesIntoPlay" />
       </li>
       <li>
-        <strong>Selecting the Holder:</strong> Initially, the <PreviewLink target="ladyOfLake" /> gets the player to the
-        right of the first leader. The player who receives the title of <PreviewLink target="ladyOfLake" /> uses her
-        power at the end of each round (after the second), passing it to another player who has not yet received the
-        <PreviewLink target="ladyOfLake" />.
+        <strong>{{ $t('lady.selectingTheHolder') }}</strong>
+        <LocalizedTextWrapper keypath="lady.initiallyGetsPlayer" />
       </li>
       <li>
-        <strong>Applying the Ability:</strong> The owner of the <PreviewLink target="ladyOfLake" /> chooses another
-        player and secretly learns their role — whether that player is a Servant of Arthur (good) or a Minion of Mordred
-        (evil).
+        <strong>{{ $t('lady.applyingTheAbility') }}</strong>
+        <LocalizedTextWrapper keypath="lady.choosesPlayer" />
       </li>
       <li>
-        <strong>Passing the "Lady of the Lake":</strong> After using her ability, the
-        <PreviewLink target="ladyOfLake" />'s owner passes it to the player whose loyalty was just checked. This player
-        will then use the <PreviewLink target="ladyOfLake" /> in the next round.
+        <strong>{{ $t('lady.passingTheLady') }}</strong>
+        <LocalizedTextWrapper keypath="lady.passesToChecked" />
       </li>
       <li>
-        <strong>Restriction on Recurrent Checks:</strong> A player who has already been passed the
-        <PreviewLink target="ladyOfLake" />
-        cannot be checked again. This rule helps ensure that each round, new information is revealed about a different
-        player.
+        <strong>{{ $t('lady.restrictionRecurrent') }}</strong>
+        <LocalizedTextWrapper keypath="lady.cannotCheckAgain" />
       </li>
       <li>
-        <strong>Strategic Use:</strong> The use of the <PreviewLink target="ladyOfLake" /> adds strategic possibilities
-        to the game. Players can use the information gained to plan their actions, trying to identify traitors among the
-        participants.
+        <strong>{{ $t('lady.strategicUse') }}</strong>
+        <LocalizedTextWrapper keypath="lady.strategicPossibilities" />
       </li>
     </ol>
   </div>

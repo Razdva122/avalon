@@ -6,6 +6,7 @@ const {
   roles,
   addons,
   lancelots,
+  lady,
 } = require('../../src/helpers/i18n/translates/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -84,10 +85,9 @@ module.exports.routesSeo = {
     priority: 0.6,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Lady of the Lake',
-      description:
-        "Rules for 'Lady of the Lake' card in 'Avalon: The Resistance'. Rules for 'Inquisitor Token' card in 'The Resistance'",
-      keywords: ['Addons', 'Module', 'Lady of the Lake', 'Inquisitor Token', 'Rules'],
+      multiLanguage: {
+        ...lady,
+      },
       image: 'features/lady_of_lake.webp',
     },
   },

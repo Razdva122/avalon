@@ -15,7 +15,7 @@
         <Suspense>
           <component :is="Component" class="page"></component>
 
-          <template #fallback> Loading... </template>
+          <template #fallback> {{ $t('mainPage.loading') }} </template>
         </Suspense>
       </Transition>
     </template>

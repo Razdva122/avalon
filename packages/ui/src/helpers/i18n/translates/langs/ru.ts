@@ -19,6 +19,7 @@ export const ru = {
     join: 'Присоединиться',
     gamesList: 'Список игр',
     players: 'игроков',
+    loading: 'Loading...',
   },
   game: {
     winner: 'Победитель',

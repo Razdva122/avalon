@@ -5,6 +5,7 @@ const { notFound } = require('./notFound');
 const { roles } = require('./roles');
 const { addons } = require('./addons');
 const { lancelots } = require('./lancelots');
+const { lady } = require('./lady');
 
 module.exports = {
   lobby,
@@ -14,4 +15,5 @@ module.exports = {
   roles,
   addons,
   lancelots,
+  lady,
 };

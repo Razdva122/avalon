@@ -9,6 +9,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { LanguageMap } from '@/helpers/i18n';
 
 export default defineComponent({
   computed: {
@@ -24,7 +25,7 @@ export default defineComponent({
       return new URL(window.location.href).pathname
         .split('/')
         .slice(1)
-        .filter(Boolean)
+        .filter((el) => el && !Object.keys(LanguageMap).find((lang) => lang.toLowerCase() === el.toLowerCase()))
         .map((el) => ({
           to: { name: normalizeName(el) },
           id: el,

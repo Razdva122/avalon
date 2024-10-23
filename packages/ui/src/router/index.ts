@@ -13,12 +13,12 @@ const routeComponentMap = {
   roles: () => import('@/pages/wiki/roles/Index.vue'),
   addons: () => import('@/pages/wiki/addons/Index.vue'),
   lancelots: () => import('@/pages/wiki/roles/Lancelots.vue'),
+  lady_of_lake: () => import('@/pages/wiki/addons/LadyOfTheLake.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.about, component: () => import('@/pages/about/About.vue') },
   { ...routesSeo.rules, component: () => import('@/pages/wiki/Rules.vue') },
-  { ...routesSeo.lady, component: () => import('@/pages/wiki/addons/LadyOfTheLake.vue') },
   { ...routesSeo.excalibur, component: () => import('@/pages/wiki/addons/Excalibur.vue') },
   { ...routesSeo.merlin, component: () => import('@/pages/wiki/roles/Merlin.vue') },
   { ...routesSeo['merlin_pure'], component: () => import('@/pages/wiki/roles/MerlinPure.vue') },
@@ -96,8 +96,7 @@ router.beforeEach((to, from, next) => {
   const documentLang = document.documentElement.lang.toLowerCase();
 
   if (Object.keys(LanguageMap).find((el) => el.toLowerCase() === toLangName) && toLangName !== documentLang) {
-    const path = to.path.split('/');
-    path.splice(1);
+    const path = to.path.split('/').splice(2);
     next(path.join('/'));
     return;
   }

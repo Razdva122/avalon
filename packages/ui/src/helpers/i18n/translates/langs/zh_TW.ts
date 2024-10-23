@@ -19,6 +19,7 @@ export const zh_TW = {
     join: '加入',
     gamesList: '遊戲列表',
     players: '位玩家',
+    loading: '加載中...',
   },
   game: {
     winner: '勝利方',
