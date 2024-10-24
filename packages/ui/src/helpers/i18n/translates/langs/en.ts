@@ -14,12 +14,21 @@ export const en = {
     restartGame: 'Restart game',
   },
   mainPage: {
+    header: 'Welcome to the "Avalon" online board game website!',
     createRoom: 'Create room',
     watch: 'Watch',
     join: 'Join',
     gamesList: 'Games list',
     players: 'Players',
     loading: 'Loading...',
+  },
+  alert: {
+    titlediscord: 'Discord',
+    titletranslate: 'Translate',
+    contentdiscord:
+      'Looking for fellow players to delve into \'Avalon\'? Join our <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b> community!',
+    contenttranslate:
+      'We will be glad if you help us translate our website into your language. Contact us via <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b>!',
   },
   game: {
     winner: 'Winner',

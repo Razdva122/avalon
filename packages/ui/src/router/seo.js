@@ -7,6 +7,7 @@ const {
   addons,
   lancelots,
   lady,
+  excalibur,
 } = require('../../src/helpers/i18n/translates/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -97,10 +98,9 @@ module.exports.routesSeo = {
     priority: 0.5,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Excalibur',
-      description:
-        "Rules for 'Excalibur' card in 'Avalon: The Resistance'. Rules for 'Sergeant' card in 'The Resistance'",
-      keywords: ['Addons', 'Module', 'Excalibur', 'Sergeant', 'Rules'],
+      multiLanguage: {
+        ...excalibur,
+      },
       image: 'features/excalibur.webp',
     },
   },

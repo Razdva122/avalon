@@ -14,12 +14,12 @@ const routeComponentMap = {
   addons: () => import('@/pages/wiki/addons/Index.vue'),
   lancelots: () => import('@/pages/wiki/roles/Lancelots.vue'),
   lady_of_lake: () => import('@/pages/wiki/addons/LadyOfTheLake.vue'),
+  excalibur: () => import('@/pages/wiki/addons/Excalibur.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.about, component: () => import('@/pages/about/About.vue') },
   { ...routesSeo.rules, component: () => import('@/pages/wiki/Rules.vue') },
-  { ...routesSeo.excalibur, component: () => import('@/pages/wiki/addons/Excalibur.vue') },
   { ...routesSeo.merlin, component: () => import('@/pages/wiki/roles/Merlin.vue') },
   { ...routesSeo['merlin_pure'], component: () => import('@/pages/wiki/roles/MerlinPure.vue') },
   { ...routesSeo.percival, component: () => import('@/pages/wiki/roles/Percival.vue') },
@@ -73,8 +73,6 @@ Object.values(routesSeo).forEach((route) => {
     );
   }
 });
-
-console.log(routes);
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),

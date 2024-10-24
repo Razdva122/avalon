@@ -1,13 +1,17 @@
 <template>
   <div class="lobby">
     <div class="alert-container">
-      <TemporaryAlert title="Discord" id="discord">
-        Looking for fellow players to delve into 'Avalon'? Join our
-        <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b> community!
+      <TemporaryAlert id="discord">
+        <div v-html="$t('alert.contentdiscord')"></div>
+      </TemporaryAlert>
+      <TemporaryAlert id="translate">
+        <div v-html="$t('alert.contenttranslate')"></div>
       </TemporaryAlert>
     </div>
 
-    <v-btn @click="createRoom" size="x-large"> {{ $t('mainPage.createRoom') }} </v-btn>
+    <h1 class="lobby-header">Welcome to the Avalon online board game website!</h1>
+
+    <v-btn class="mb-5" @click="createRoom" size="x-large"> {{ $t('mainPage.createRoom') }} </v-btn>
 
     <div>
       <template v-if="roomsList && roomsList.length">
@@ -113,6 +117,11 @@ export default defineComponent({
   height: calc(100vh - 50px);
 }
 
+.lobby-header {
+  text-align: center;
+  margin: 10px;
+}
+
 .list-header {
   font-size: 30px;
 }
@@ -150,6 +159,8 @@ export default defineComponent({
 
 .alert-container {
   margin-top: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
   display: flex;
   flex-direction: column;
   gap: 12px;

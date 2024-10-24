@@ -14,12 +14,21 @@ export const zh_TW = {
     restartGame: '重開遊戲',
   },
   mainPage: {
+    header: '歡迎來到《阿瓦隆》線上棋盤遊戲網站！',
     createRoom: '創建房間',
     watch: '觀戰',
     join: '加入',
     gamesList: '遊戲列表',
     players: '位玩家',
     loading: '加載中...',
+  },
+  alert: {
+    titlediscord: 'Discord',
+    titletranslate: '翻譯',
+    contentdiscord:
+      '想找人一起探索《阿瓦隆》嗎？加入我們的 <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b> 社區！',
+    contenttranslate:
+      '如果您能幫助我們將網站翻譯成您的語言，我們將非常高興。請通過 <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b> 聯繫我們！',
   },
   game: {
     winner: '勝利方',

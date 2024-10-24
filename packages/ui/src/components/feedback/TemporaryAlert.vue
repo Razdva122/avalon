@@ -1,5 +1,13 @@
 <template>
-  <v-alert v-model="alert" rounded="lg" color="indigo-darken-3" icon="$info" :title="title" density="compact" closable>
+  <v-alert
+    v-model="alert"
+    rounded="lg"
+    color="indigo-darken-3"
+    icon="$info"
+    :title="$t('alert.title' + id)"
+    density="compact"
+    closable
+  >
     <slot></slot>
     <template v-slot:close>
       <v-btn @click="alert = false" color="white" size="regular">
@@ -23,9 +31,6 @@ export default defineComponent({
       type: String as PropType<TAlertsName>,
       required: true,
     },
-    title: {
-      type: String,
-    },
     maxVisibleCounter: {
       type: Number,
       default: 3,
@@ -43,7 +48,6 @@ export default defineComponent({
 
     return {
       alert,
-      title: props.title,
     };
   },
 });

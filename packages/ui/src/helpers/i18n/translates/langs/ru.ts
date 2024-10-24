@@ -14,12 +14,21 @@ export const ru = {
     restartGame: 'Перезапустить игру',
   },
   mainPage: {
+    header: 'Приветствуем на сайте для онлайн игры в настольную игру "Авалон"!',
     createRoom: 'Создать комнату',
     watch: 'Смотреть',
     join: 'Присоединиться',
     gamesList: 'Список игр',
     players: 'игроков',
-    loading: 'Loading...',
+    loading: 'Загрузка...',
+  },
+  alert: {
+    titlediscord: 'Discord',
+    titletranslate: 'Перевод',
+    contentdiscord:
+      'Ищете товарищей для игры в \'Авалон\'? Присоединяйтесь к нашему сообществу в <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b>!',
+    contenttranslate:
+      'Мы будем рады, если вы поможете нам перевести наш сайт на ваш язык. Свяжитесь с нами через <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b>!',
   },
   game: {
     winner: 'Победитель',
