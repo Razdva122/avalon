@@ -98,7 +98,7 @@ module.exports = defineConfig({
         new PrerendererWebpackPlugin({
           routes: multiLangRoutes.filter((el) => el.meta.prerender).map((el) => el.path),
           renderer: new PuppeteerRenderer({
-            timeout: 60000, // Таймаут в 60 секунд
+            timeout: 100000, // Таймаут в 100 секунд
           }),
         }),
       ],
