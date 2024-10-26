@@ -223,7 +223,7 @@
       <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
       <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" /><br />
-      <em>Addons:</em> <PreviewLink target="ladyOfLake" />
+      <em>Expansions:</em> <PreviewLink target="ladyOfLake" />
     </div>
 
     <div class="game-setup">
@@ -232,7 +232,7 @@
       <PreviewLink target="servant" />, <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
       <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" /><br />
-      <em>Addons:</em> <PreviewLink target="ladyOfLake" />
+      <em>Expansions:</em> <PreviewLink target="ladyOfLake" />
     </div>
 
     <div class="game-setup">
@@ -251,7 +251,7 @@
       <PreviewLink target="servant" /><br />
       <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" />, <PreviewLink target="oberon" /><br />
-      <em>Addons:</em> <PreviewLink target="ladyOfLake" />
+      <em>Expansions:</em> <PreviewLink target="ladyOfLake" />
     </div>
 
     <p>

@@ -9,7 +9,7 @@
       </TemporaryAlert>
     </div>
 
-    <h1 class="lobby-header">Welcome to the Avalon online board game website!</h1>
+    <h1 class="lobby-header">{{ $t('mainPage.header') }}</h1>
 
     <v-btn class="mb-5" @click="createRoom" size="x-large"> {{ $t('mainPage.createRoom') }} </v-btn>
 

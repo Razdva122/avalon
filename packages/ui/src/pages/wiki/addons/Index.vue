@@ -1,7 +1,10 @@
 <template>
   <div class="info-page-content">
     <WikiBreadCrumbs />
-    <h1>{{ $t('wiki.addons') }}</h1>
+    <h1>{{ $t('wiki.addonsTitle') }}</h1>
+    <div>
+      <LocalizedTextWrapper keypath="wiki.addonsInfo" />
+    </div>
     <div class="addons-container">
       <router-link class="addon" :to="{ name: 'lady_of_lake' }">
         <h2>{{ $t('addons.ladyOfLake') }}</h2>

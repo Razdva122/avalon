@@ -3,7 +3,7 @@ const { wiki } = require('./wiki');
 const { game } = require('./game');
 const { notFound } = require('./notFound');
 const { roles } = require('./roles');
-const { addons } = require('./addons');
+const { expansions } = require('./expansions');
 const { lancelots } = require('./lancelots');
 const { lady } = require('./lady');
 const { excalibur } = require('./excalibur');
@@ -14,7 +14,7 @@ module.exports = {
   game,
   notFound,
   roles,
-  addons,
+  expansions,
   lancelots,
   lady,
   excalibur,

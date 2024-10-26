@@ -99,7 +99,7 @@ export const zh_CN = {
     brute: '野蛮人',
     minion: '士兵',
     wiki: '维基',
-    addons: '插件',
+    expansions: '插件',
     roles: '角色',
     lady: '湖中仙女',
     excalibur: '神剑',

@@ -19,7 +19,7 @@
         </v-btn>
       </router-link>
 
-      <router-link :to="{ name: 'addons' }">
+      <router-link :to="{ name: 'expansions' }">
         <v-btn size="x-large">
           {{ $t('wiki.addons') }}
           <template v-slot:prepend>

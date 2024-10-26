@@ -4,7 +4,7 @@ const {
   game,
   notFound,
   roles,
-  addons,
+  expansions,
   lancelots,
   lady,
   excalibur,
@@ -68,20 +68,20 @@ module.exports.routesSeo = {
       keywords: ['Wiki', 'Rules', 'How to play'],
     },
   },
-  addons: {
-    path: '/wiki/addons/',
-    name: 'addons',
+  expansions: {
+    path: '/wiki/expansions/',
+    name: 'expansions',
     priority: 0.7,
     meta: {
       prerender: true,
       multiLanguage: {
-        ...addons,
+        ...expansions,
       },
       image: 'features/lady_of_lake.webp',
     },
   },
   lady: {
-    path: '/wiki/addons/lady/',
+    path: '/wiki/expansions/lady/',
     name: 'lady_of_lake',
     priority: 0.6,
     meta: {
@@ -93,7 +93,7 @@ module.exports.routesSeo = {
     },
   },
   excalibur: {
-    path: '/wiki/addons/excalibur/',
+    path: '/wiki/expansions/excalibur/',
     name: 'excalibur',
     priority: 0.5,
     meta: {

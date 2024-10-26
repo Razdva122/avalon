@@ -5,7 +5,13 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   en: {
     rules: 'Rules',
     roles: 'Roles',
-    addons: 'Addons',
+    rolesTitle: 'All Roles in the Board Game Avalon',
+    rolesInfo:
+      'Each role has its own characteristics and objectives, making the game diverse and exciting. Below are all the available roles in the board game Avalon.',
+    addons: 'Expansions',
+    addonsTitle: 'Expansions for the Board Game Avalon',
+    addonsInfo:
+      'Adding elements such as {ladyOfLake} and {excalibur} deepens strategic possibilities and brings more intrigue to the gameplay. Below are the pages for each expansion.',
     title: 'Avalon: The Resistance - Core Game Logic',
     setup: 'Game Setup',
     playerAssignment:
@@ -30,7 +36,13 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   ru: {
     rules: 'Правила',
     roles: 'Роли',
+    rolesTitle: 'Все роли в настольной игре Avalon',
+    rolesInfo:
+      'Каждая роль имеет свои особенности и задачи, что делает игру разнообразной и увлекательной. Ниже представлены все доступные роли в настольной игре Avalon.',
     addons: 'Дополнения',
+    addonsTitle: 'Дополнения для настольной игры Avalon',
+    addonsInfo:
+      'Добавление элементов, таких как {ladyOfLake} и {excalibur}, углубляет стратегические возможности и вносит больше интриги в игровой процесс. Ниже представлены страницы по каждому дополнению.',
     title: 'Авалон: Сопротивление - Основная Логика Игры',
     setup: 'Подготовка к Игре',
     playerAssignment:
@@ -55,7 +67,12 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   'zh-CN': {
     rules: '规则',
     roles: '角色',
+    rolesTitle: '桌游《阿瓦隆》的所有角色',
+    rolesInfo: '每个角色都有其独特的特性和任务，使游戏变得多样而有趣。以下是桌游《阿瓦隆》中所有可用的角色。',
     addons: '插件',
+    addonsTitle: '桌游《阿瓦隆》的扩展包',
+    addonsInfo:
+      '添加像 {ladyOfLake} 和 {excalibur} 这样的元素加深了战略可能性，并为游戏过程带来更多的阴谋。以下是每个扩展包的介绍页。',
     title: '阿瓦隆：反抗组织 - 核心游戏逻辑',
     setup: '游戏设置',
     playerAssignment: '<b>1. 玩家分配</b>: 给每位玩家分配一个随机角色，决定他们的阵营。',
@@ -76,7 +93,12 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   'zh-TW': {
     rules: '規則',
     roles: '角色',
+    rolesTitle: '桌遊《阿瓦隆》的所有角色',
+    rolesInfo: '每個角色都有其獨特的特性和任務，使遊戲變得多樣而有趣。以下是桌遊《阿瓦隆》中所有可用的角色。',
     addons: '插件',
+    addonsTitle: '桌遊《阿瓦隆》的擴充包',
+    addonsInfo:
+      '添加像 {ladyOfLake} 和 {excalibur} 這樣的元素加深了戰略可能性，並為遊戲過程帶來更多的陰謀。以下是每個擴充包的介紹頁。',
     title: '阿瓦隆：反抗勢力 - 核心遊戲邏輯',
     setup: '遊戲設置',
     playerAssignment: '<b>1. 玩家分配</b>: 指派每位玩家一個隨機角色，決定他們的陣營。',

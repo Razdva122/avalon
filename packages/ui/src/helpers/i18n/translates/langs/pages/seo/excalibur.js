@@ -3,13 +3,13 @@ module.exports.excalibur = {
     title: 'Avalon: The Resistance | Excalibur',
     description:
       "Rules for 'Excalibur' card in 'Avalon: The Resistance'. Rules for 'Sergeant' card in 'The Resistance'",
-    keywords: ['Addons', 'Module', 'Excalibur', 'Sergeant', 'Rules'],
+    keywords: ['Expansions', 'Addons', 'Module', 'Excalibur', 'Sergeant', 'Rules'],
   },
   ru: {
     title: 'Авалон: Сопротивление | Экскалибур',
     description:
       "Правила для карты 'Экскалибур' в 'Авалон: Сопротивление'. Правила для карты 'Сержант' в 'Сопротивление'.",
-    keywords: ['Дополнения', 'Модуль', 'Экскалибур', 'Сержант', 'Правила'],
+    keywords: ['Дополнения', 'Аддоны', 'Модуль', 'Экскалибур', 'Сержант', 'Правила'],
   },
   'zh-CN': {
     title: '阿瓦隆：反抗组织 | 神剑',
@@ -19,6 +19,6 @@ module.exports.excalibur = {
   'zh-TW': {
     title: '阿瓦隆：反抗勢力 | 神劍',
     description: '《阿瓦隆：反抗勢力》中“神劍”卡牌規則。《反抗組織》中“軍士”卡牌規則。',
-    keywords: ['擴充', '模組', '神劍', '軍士', '規則'],
+    keywords: ['扩展', '附加组件', '附加組件', '模組', '神劍', '軍士', '規則'],
   },
 };

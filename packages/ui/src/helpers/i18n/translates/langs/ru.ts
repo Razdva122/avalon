@@ -99,7 +99,7 @@ export const ru = {
     brute: 'Брут',
     minion: 'Миньон',
     wiki: 'Вики',
-    addons: 'Дополнения',
+    expansions: 'Дополнения',
     roles: 'Роли',
     lady: 'Леди озера',
     excalibur: 'Экскалибур',

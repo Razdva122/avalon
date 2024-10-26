@@ -99,7 +99,7 @@ export const en = {
     brute: 'Brute',
     minion: 'Minion',
     wiki: 'Wiki',
-    addons: 'Addons',
+    expansions: 'Expansions',
     roles: 'Roles',
     lady: 'Lady',
     excalibur: 'Excalibur',
