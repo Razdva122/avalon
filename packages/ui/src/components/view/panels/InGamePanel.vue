@@ -48,6 +48,14 @@
       >{{ isZeroPlayerSelected ? $t('inGame.skipExcalibur') : $t('inGame.useExcalibur') }}</v-btn
     >
   </template>
+  <template v-if="game.stage === 'witchAbility' && isUserWitch">
+    <v-btn color="success" @click="() => witchAbilityClick(true)" class="mb-2">
+      {{ $t('inGame.useWitchAbility') }}
+    </v-btn>
+    <v-btn color="warning" @click="() => witchAbilityClick(false)">
+      {{ $t('inGame.skipWitchAbility') }}
+    </v-btn>
+  </template>
 </template>
 
 <script lang="ts">
@@ -86,6 +94,10 @@ export default defineComponent({
 
     const isUserAssassin = computed(() => {
       return player.value?.features.isAssassin;
+    });
+
+    const isUserWitch = computed(() => {
+      return player.value?.role === 'witch';
     });
 
     const isPlayerOnMission = computed(() => {
@@ -173,9 +185,14 @@ export default defineComponent({
       socket.emit(methodName, game.value.uuid);
     };
 
+    const witchAbilityClick = (use: boolean) => {
+      socket.emit('useWitchAbility', game.value.uuid, use);
+    };
+
     return {
       isUserLeader,
       isUserAssassin,
+      isUserWitch,
       isUserLadyOwner,
       isUserExcaliburOwner,
       isPlayerOnMission,
@@ -194,6 +211,7 @@ export default defineComponent({
       onMissionClick,
       onAssassinateClick,
       emitClick,
+      witchAbilityClick,
     };
   },
 });

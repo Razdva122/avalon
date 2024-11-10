@@ -1,6 +1,6 @@
 <template>
   <div>
-    {{ $t('lancelots.cards') }}
+    {{ $t('lancelotsHistory.cards') }}
     <span
       v-html="
         data.switches
@@ -23,21 +23,21 @@
     ></span>
   </div>
   <div v-if="!data.result">
-    {{ $t('roles.lancelots') }}<span class="text-success">{{ $t('lancelots.lancelotsLoyal') }}</span>
+    {{ $t('roles.lancelots') }}<span class="text-success">{{ $t('lancelotsHistory.lancelotsLoyal') }}</span>
   </div>
   <div v-else>
-    {{ $t('roles.lancelots') }} <span class="text-error">{{ $t('lancelots.lancelotsSwap') }}</span>
+    {{ $t('roles.lancelots') }} <span class="text-error">{{ $t('lancelotsHistory.lancelotsSwap') }}</span>
   </div>
   <div v-if="data.lancelotsIDs">
     <div>
       <span class="text-success">{{ $t('roles.goodLancelot') }}</span
       >: {{ calculateNameByID(data.lancelotsIDs.good) }}
-      {{ data.result ? $t('lancelots.becameEvil') : $t('lancelots.lancelotSaveLoyalty') }}
+      {{ data.result ? $t('lancelotsHistory.becameEvil') : $t('lancelotsHistory.lancelotSaveLoyalty') }}
     </div>
     <div>
       <span class="text-error">{{ $t('roles.evilLancelot') }}</span
       >: {{ calculateNameByID(data.lancelotsIDs.evil) }}
-      {{ data.result ? $t('lancelots.becameGood') : $t('lancelots.lancelotSaveLoyalty') }}
+      {{ data.result ? $t('lancelotsHistory.becameGood') : $t('lancelotsHistory.lancelotSaveLoyalty') }}
     </div>
   </div>
 </template>

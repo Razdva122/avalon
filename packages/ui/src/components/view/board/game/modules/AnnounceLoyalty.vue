@@ -3,8 +3,10 @@
     <div class="d-flex flex-column align-center justify-center" v-if="loyalty">
       <div class="mb-8" :class="loyalty"></div>
       <div>
-        <v-btn class="mr-4" color="success" @click="announceLoyalty('good')"> {{ $t('lady.announceGood') }} </v-btn>
-        <v-btn color="error" @click="announceLoyalty('evil')"> {{ $t('lady.announceEvil') }} </v-btn>
+        <v-btn class="mr-4" color="success" @click="announceLoyalty('good')">
+          {{ $t('ladyModule.announceGood') }}
+        </v-btn>
+        <v-btn color="error" @click="announceLoyalty('evil')"> {{ $t('ladyModule.announceEvil') }} </v-btn>
       </div>
     </div>
   </Spoiler>

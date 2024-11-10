@@ -28,7 +28,8 @@ export type TGameMethodsParams =
   | TCheckLoyaltyParams
   | TAnnounceLoyaltyParams
   | TGiveExcaliburParams
-  | TUseExcaliburParams;
+  | TUseExcaliburParams
+  | TWitchAbilityParams;
 
 export type TSelectPlayerParams = {
   method: 'selectPlayer';
@@ -38,6 +39,11 @@ export type TSelectPlayerParams = {
 export type TVoteParams = {
   method: 'voteForMission';
   option: TVoteOption;
+};
+
+export type TWitchAbilityParams = {
+  method: 'witchAbility';
+  result: boolean;
 };
 
 export type TSentPlayersParams = {

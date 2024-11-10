@@ -7,7 +7,7 @@ import type {
   IMissionSettings,
   TVoteOption,
   THistoryVote,
-  IHistoryMission,
+  THistoryMission,
   IHistoryAssassinate,
   ISwitchResult,
   ISwitchLancelots,
@@ -33,6 +33,7 @@ export type THistoryData = {
     leader?: IPlayerInGame;
     actions: IMissionAction[];
     fails?: number;
+    hidden?: boolean;
   };
   assassinate: {
     result?: TAssassinateResult;
@@ -65,7 +66,7 @@ export type THistoryData = {
 
 export type THistoryDataForManager = {
   vote: THistoryVote;
-  mission: IHistoryMission;
+  mission: THistoryMission;
   assassinate: IHistoryAssassinate;
   checkLoyalty: ICheckLoyalty;
   switchResult: ISwitchResult;

@@ -2,10 +2,13 @@ import { IGameAddon } from '@/core/game/addons/interface';
 import { Game } from '@/core/game';
 import { SwitchResult } from '@/core/game/addons/excalibur/switch-result';
 import { TMissionResult } from '@avalon/types';
+import { Subject, of } from 'rxjs';
 
 export class ExcaliburAddon implements IGameAddon {
   addonName = 'excalibur';
   game: Game;
+  giveExcaliburSubject: Subject<boolean> = new Subject();
+  useExcaliburSubject: Subject<boolean> = new Subject();
 
   constructor(game: Game) {
     this.game = game;
@@ -18,7 +21,7 @@ export class ExcaliburAddon implements IGameAddon {
     // On use excalibur user with excalibur should select player
     this.game.selectAvailable.useExcalibur = (player) => Boolean(player.features.excalibur);
 
-    return true;
+    return of(true);
   }
 
   afterSentTeam() {
@@ -26,7 +29,7 @@ export class ExcaliburAddon implements IGameAddon {
     this.game.stage = 'giveExcalibur';
     this.game.stateObserver.gameStateChanged();
 
-    return false;
+    return this.giveExcaliburSubject.asObservable();
   }
 
   afterVoteForTeam() {
@@ -34,7 +37,7 @@ export class ExcaliburAddon implements IGameAddon {
       this.game.players.forEach((player) => (player.features.excalibur = false));
     }
 
-    return true;
+    return of(true);
   }
 
   beforeEndMission() {
@@ -44,7 +47,7 @@ export class ExcaliburAddon implements IGameAddon {
     this.game.stage = 'useExcalibur';
     this.game.stateObserver.gameStateChanged();
 
-    return false;
+    return this.useExcaliburSubject.asObservable();
   }
 
   giveExcalibur(executorID: string) {
@@ -78,6 +81,8 @@ export class ExcaliburAddon implements IGameAddon {
 
     this.game.sentTeamNextStage();
     this.game.stateObserver.gameStateChanged();
+
+    this.useExcaliburSubject.next(false);
   }
 
   useExcalibur(executorID: string) {
@@ -103,7 +108,6 @@ export class ExcaliburAddon implements IGameAddon {
       const mission = this.game.currentMission;
 
       switchResult = mission.switchAction(selectedPlayer, ownerOfExcalibur);
-      mission.finishMission();
 
       selectedPlayer.features.isSelected = false;
     }
@@ -115,6 +119,6 @@ export class ExcaliburAddon implements IGameAddon {
     ownerOfExcalibur.features.excalibur = false;
     ownerOfExcalibur.features.waitForAction = false;
 
-    this.game.finishMission();
+    this.useExcaliburSubject.next(true);
   }
 }

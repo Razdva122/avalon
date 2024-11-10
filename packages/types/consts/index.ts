@@ -11,6 +11,7 @@ export const evilRolesImportance: { [key in TEvilRoles]: number } = {
   evilLancelot: 10,
   lunatic: 50,
   brute: 51,
+  witch: 75,
   minion: 100,
 };
 

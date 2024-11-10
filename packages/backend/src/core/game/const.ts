@@ -6,6 +6,7 @@ import {
   LadyOfLakeAddon,
   ExcaliburAddon,
   LancelotsAddon,
+  WitchAddon,
 } from '@/core/game/addons';
 import { TRolesWithAddons, TAdditionalAddons } from '@/core/game/addons';
 
@@ -137,6 +138,10 @@ export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsData> = {
   goodLancelot: {
     addon: LancelotsAddon,
     key: 'lancelots',
+  },
+  witch: {
+    addon: WitchAddon,
+    key: 'witch',
   },
 };
 

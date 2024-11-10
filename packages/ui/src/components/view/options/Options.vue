@@ -145,6 +145,7 @@ export default defineComponent({
         { role: 'trickster', label: this.$t('roles.trickster'), disabled: false, color: 'warning', route: 'trickster' },
         { role: 'lunatic', label: this.$t('roles.lunatic'), disabled: false, color: 'warning', route: 'lunatic' },
         { role: 'brute', label: this.$t('roles.brute'), disabled: false, color: 'warning', route: 'brute' },
+        { role: 'witch', label: this.$t('roles.witch'), disabled: false, color: 'warning', route: 'witch' },
       ] as const;
     },
     addonsSettings() {

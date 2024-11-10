@@ -439,6 +439,7 @@ export default defineComponent({
       guinevere: 0,
       lunatic: 0,
       brute: 0,
+      witch: 0,
     };
 
     return {

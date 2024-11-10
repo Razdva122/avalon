@@ -42,6 +42,7 @@ export const zh_CN = {
     mission: '任务',
     initialization: '初始化',
     'lady of lake': '湖中验人',
+    witch: '巫婆',
     end: '完结',
     lancelots: '兰斯洛特',
     assassinate: '暗杀',
@@ -79,6 +80,7 @@ export const zh_CN = {
     oberon: '奥伯伦',
     lunatic: '疯子',
     brute: '野蛮人',
+    witch: '巫婆',
     minion: '士兵',
     role: '角色',
   },
@@ -97,6 +99,7 @@ export const zh_CN = {
     oberon: '奥伯伦',
     lunatic: '疯子',
     brute: '野蛮人',
+    witch: '巫婆',
     minion: '士兵',
     wiki: '维基',
     expansions: '插件',
@@ -109,7 +112,7 @@ export const zh_CN = {
     ladyOfLake: '湖中仙女',
     excalibur: '神剑',
   },
-  lady: {
+  ladyModule: {
     announceGood: '宣告好人方',
     announceEvil: '宣告坏人方',
   },
@@ -166,6 +169,8 @@ export const zh_CN = {
     giveExcalibur: '给予神剑',
     skipExcalibur: '跳过神剑',
     useExcalibur: '使用神剑',
+    useWitchAbility: '隐藏任务',
+    skipWitchAbility: '跳过',
   },
   assassinate: {
     lovers: '恋人',
@@ -197,6 +202,7 @@ export const zh_CN = {
     tricksterInfo: '对他的忠诚撒谎',
     lunaticInfo: '每个任务都必须失败',
     bruteInfo: '可能只会失败前三个任务',
+    witchInfo: '可以隐藏一个任务的结果',
     unknownInfo: '未知角色',
     mysteryWizardInfo: '两个玩家之一是好人方的(梅林)还是坏人的(莫甘娜)',
     unknownLancelotInfo: '兰斯洛特,谁的忠诚无人知晓',
@@ -226,6 +232,7 @@ export const zh_CN = {
     fails: '失败',
     indexMission: '{index} 任务',
     failsCount: '失败 {count}',
+    hidden: '由女巫隐藏',
     team: '团队：',
   },
   chat: {
@@ -271,7 +278,7 @@ export const zh_CN = {
     checkInfo: '<b>{ladyOwner}</b> 检查了 <b>{ladyTarget}</b> 的忠诚',
     declareInfo: '并宣布他的忠诚为',
   },
-  lancelots: {
+  lancelotsHistory: {
     becameEvil: '变得邪恶',
     becomeGood: '变得善良',
     lancelotSaveLoyalty: '保持忠诚',

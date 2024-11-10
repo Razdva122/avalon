@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { IGameAddon } from '@/core/game/addons/interface';
 import { Assassinate } from '@/core/game/addons/assassin/assassinate';
 import { Game } from '@/core/game';
+import { Subject, of } from 'rxjs';
 
 import type { TAssassinateType, TAssassinAddonData, TGameEndReasons } from '@avalon/types';
 
@@ -12,6 +13,7 @@ export * from '@/core/game/addons/assassin/interface';
 
 export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
   addonName = 'assassin';
+  assassinateSubject: Subject<boolean> = new Subject();
   game: Game;
   options: TAssassinateOptions;
 
@@ -38,7 +40,7 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
     // On assassinate stage assassin can select players
     this.game.selectAvailable.assassinate = (player) => Boolean(player.features.isAssassin);
 
-    return true;
+    return of(true);
   }
 
   beforeEndGame() {
@@ -52,10 +54,10 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
       assassin.features.waitForAction = true;
 
       this.game.stateObserver.gameStateChanged();
-      return false;
+      return this.assassinateSubject.asObservable();
     }
 
-    return true;
+    return of(true);
   }
 
   /**
@@ -103,5 +105,6 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
 
     this.game.history.push(assassinate);
     this.game.stateObserver.gameStateChanged();
+    this.assassinateSubject.next(false);
   }
 }

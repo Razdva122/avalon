@@ -13,6 +13,7 @@ export class Mordred extends Character {
     trickster: 'evil',
     lunatic: 'evil',
     brute: 'evil',
+    witch: 'evil',
     evilLancelot: 'evilLancelot',
   };
 }

@@ -44,6 +44,7 @@ export const en = {
     'lady of lake': 'lady of lake',
     end: 'end',
     lancelots: 'lancelots',
+    witch: 'witch',
     assassinate: 'assassinate',
     hidden: 'hidden',
     historyMode: 'History mode',
@@ -80,6 +81,7 @@ export const en = {
     lunatic: 'Lunatic',
     brute: 'Brute',
     minion: 'Minion',
+    witch: 'Witch',
     role: 'Role',
   },
   breadCrumbs: {
@@ -97,6 +99,7 @@ export const en = {
     oberon: 'Oberon',
     lunatic: 'Lunatic',
     brute: 'Brute',
+    witch: 'Witch',
     minion: 'Minion',
     wiki: 'Wiki',
     expansions: 'Expansions',
@@ -109,7 +112,7 @@ export const en = {
     ladyOfLake: 'Lady of the lake',
     excalibur: 'Excalibur',
   },
-  lady: {
+  ladyModule: {
     announceGood: 'Announce Good',
     announceEvil: 'Announce Evil',
   },
@@ -166,6 +169,8 @@ export const en = {
     giveExcalibur: 'Give excalibur',
     skipExcalibur: 'Skip excalibur',
     useExcalibur: 'Use excalibur',
+    useWitchAbility: 'Hide mission',
+    skipWitchAbility: 'Skip',
   },
   assassinate: {
     lovers: 'Lovers',
@@ -197,6 +202,7 @@ export const en = {
     tricksterInfo: 'Lying about his loyalty',
     lunaticInfo: 'Must fail on every mission',
     bruteInfo: 'May fail only first three missions',
+    witchInfo: 'Can hide the result of one mission',
     unknownInfo: 'Unknown role',
     mysteryWizardInfo: 'One of the two wizards is good (Merlin) or evil (Morgana)',
     unknownLancelotInfo: 'Lancelot, whose loyalty is not known',
@@ -226,6 +232,7 @@ export const en = {
     fails: 'Fails',
     indexMission: '{index} mission',
     failsCount: 'fails {count}',
+    hidden: 'hidden by Witch',
     team: 'Team:',
   },
   chat: {
@@ -271,7 +278,7 @@ export const en = {
     checkInfo: '<b>{ladyOwner}</b> checked <b>{ladyTarget}</b> loyalty',
     declareInfo: 'And declared his loyalty as',
   },
-  lancelots: {
+  lancelotsHistory: {
     becameEvil: 'became evil',
     becomeGood: 'become good',
     lancelotSaveLoyalty: 'remain loyal',

@@ -75,9 +75,11 @@
       <div class="d-flex flex-row align-center justify-center" v-if="visibleHistory?.type === 'mission'">
         <template v-for="i in visibleHistory.settings.players">
           <div
+            v-if="visibleHistory.fails !== undefined"
             class="mission-result-element"
             :class="'icon-loyalty-' + (i <= visibleHistory.fails ? 'evil' : 'good')"
           ></div>
+          <div v-else class="mission-result-element icon-witch-hidden"></div>
         </template>
       </div>
       <div class="vote-container" v-if="visibleHistory?.type === 'vote' && visibleHistory.anonymous">
@@ -116,7 +118,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 import last from 'lodash/last';
 import { useI18n } from 'vue-i18n';
-import type { IHistoryMission, THistoryResults, TGameEndReasons } from '@avalon/types';
+import type { THistoryMission, THistoryResults } from '@avalon/types';
 import type { IMissionWithResult } from '@/components/view/board/interface';
 import { defineComponent, PropType, computed, inject } from 'vue';
 import Mission from '@/components/view/board/game/modules/Mission.vue';
@@ -154,10 +156,11 @@ export default defineComponent({
       const missions: IMissionWithResult[] = cloneDeep(gameState.value.settings.missions);
 
       gameState.value.history
-        .filter((el): el is IHistoryMission => el.type === 'mission')
+        .filter((el): el is THistoryMission => el.type === 'mission')
         .forEach((mission, index) => {
           missions[index].result = mission.result;
           missions[index].fails = mission.fails;
+          missions[index].hidden = mission.hidden;
         });
 
       return missions;
@@ -207,6 +210,7 @@ export default defineComponent({
         assassinate: 'assassinate',
         announceLoyalty: 'lady of lake',
         hidden: 'hidden',
+        witchAbility: 'witch',
       }[gameState.value.stage];
     });
 
@@ -290,6 +294,12 @@ export default defineComponent({
 .icon-loyalty-evil {
   background-image: url('@/assets/red_team_no_background.webp');
   border: 2px solid rgb(var(--v-theme-error));
+  background-size: contain;
+}
+
+.icon-witch-hidden {
+  background-image: url('@/assets/roles/witch.webp');
+  border: 2px solid rgb(var(--v-theme-warning));
   background-size: contain;
 }
 

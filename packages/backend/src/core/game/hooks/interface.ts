@@ -1,3 +1,5 @@
+import type { Observable } from 'rxjs';
+
 export type THookNames =
   | 'afterInit'
   | 'beforeSelectTeam'
@@ -13,5 +15,9 @@ export type THookNames =
   | 'beforeEndGame';
 
 export type THooksDictionary = {
-  [key in THookNames]: (() => boolean)[];
+  [key in THookNames]: {
+    high: (() => Observable<boolean>)[];
+    medium: (() => Observable<boolean>)[];
+    low: (() => Observable<boolean>)[];
+  };
 };

@@ -2,9 +2,9 @@ import { Character } from '@/core/roles/abstract';
 import type { TVisibility } from '@/core/roles/interface';
 import type { TLoyalty, TRoles } from '@avalon/types';
 
-export class Trickster extends Character {
-  role: TRoles = 'trickster';
-  selfRole: TRoles = 'trickster';
+export class Witch extends Character {
+  role: TRoles = 'witch';
+  selfRole: TRoles = 'witch';
   loyalty: TLoyalty = 'evil';
 
   visibility: TVisibility = {
@@ -12,12 +12,8 @@ export class Trickster extends Character {
     morgana: 'evil',
     mordred: 'evil',
     lunatic: 'evil',
+    trickster: 'evil',
     brute: 'evil',
-    witch: 'evil',
     evilLancelot: 'evilLancelot',
   };
-
-  override get visibleLoylaty(): TLoyalty {
-    return 'good';
-  }
 }

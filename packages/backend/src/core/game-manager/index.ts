@@ -236,6 +236,15 @@ export class GameManager {
         this.game.addons.excalibur.useExcalibur(userID);
         break;
       }
+
+      case 'witchAbility': {
+        if (!this.game.addons.witch) {
+          throw new Error('You cant use witch ability in game without witch');
+        }
+
+        this.game.addons.witch.useWitchAbility(userID, params.result);
+        break;
+      }
     }
   }
 

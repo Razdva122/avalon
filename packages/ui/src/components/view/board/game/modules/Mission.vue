@@ -1,6 +1,6 @@
 <template>
   <div class="mission-container">
-    <v-tooltip :disabled="!mission.result" location="top center" origin="auto" no-click-animation>
+    <v-tooltip :disabled="!mission.result && !mission.hidden" location="top center" origin="auto" no-click-animation>
       <template v-slot:activator="{ props: tooltip }">
         <div v-bind="tooltip" class="mission mr-2 d-flex flex-column justify-center" :class="missionClasses">
           <div v-if="!mission.result">
@@ -10,7 +10,7 @@
       </template>
 
       <div>{{ $t('mission.players') }}: {{ mission.players }}</div>
-      <div>{{ $t('mission.fails') }}: {{ mission.fails }}</div>
+      <div>{{ $t('mission.fails') }}: {{ mission.fails === undefined ? '?' : mission.fails }}</div>
     </v-tooltip>
     <div class="fails" v-if="mission.failsRequired > 1">{{ $t('mission.fails') }}: {{ mission.failsRequired }}</div>
   </div>
@@ -35,6 +35,8 @@ export default defineComponent({
         classes.push('mission-fail');
       } else if (this.mission.result === 'success') {
         classes.push('mission-success');
+      } else if (this.mission.hidden === true) {
+        classes.push('mission-hidden');
       } else {
         classes.push('mission-empty');
       }
@@ -64,6 +66,11 @@ export default defineComponent({
 
 .mission-fail {
   background-image: url('@/assets/red_team_no_background.webp');
+  background-size: contain;
+}
+
+.mission-hidden {
+  background-image: url('@/assets/roles/witch.webp');
   background-size: contain;
 }
 

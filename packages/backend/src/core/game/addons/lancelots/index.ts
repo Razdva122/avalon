@@ -3,6 +3,7 @@ import { Game } from '@/core/game';
 import type { TSwitchesArray } from '@/core/game/addons/lancelots/interface';
 import { SwitchLancelots } from '@/core/game/addons/lancelots/switch-lancelots';
 import * as _ from 'lodash';
+import { of } from 'rxjs';
 
 export class LancelotsAddon implements IGameAddon {
   addonName = 'lancelots';
@@ -19,7 +20,7 @@ export class LancelotsAddon implements IGameAddon {
     // On switchLancelots stage roles can change
     this.game.stageVisibilityChange.switchLancelots = () => false;
 
-    return true;
+    return of(true);
   }
 
   beforeSelectTeam() {
@@ -44,7 +45,7 @@ export class LancelotsAddon implements IGameAddon {
       this.pointer += 1;
     }
 
-    return true;
+    return of(true);
   }
 
   beforeEndGame() {
@@ -56,6 +57,6 @@ export class LancelotsAddon implements IGameAddon {
 
     this.game.stateObserver.gameStateChanged();
 
-    return true;
+    return of(true);
   }
 }

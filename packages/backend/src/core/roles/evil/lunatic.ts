@@ -13,6 +13,7 @@ export class Lunatic extends Character {
     mordred: 'evil',
     trickster: 'evil',
     brute: 'evil',
+    witch: 'evil',
     evilLancelot: 'evilLancelot',
   };
 

@@ -12,6 +12,7 @@ import { EvilLancelot } from '@/core/roles/evil/evilLancelot';
 import { Trickster } from '@/core/roles/evil/trickster';
 import { Lunatic } from '@/core/roles/evil/lunatic';
 import { Brute } from '@/core/roles/evil/brute';
+import { Witch } from '@/core/roles/evil/witch';
 
 export const evilRoles = {
   minion: Minion,
@@ -22,6 +23,7 @@ export const evilRoles = {
   trickster: Trickster,
   lunatic: Lunatic,
   brute: Brute,
+  witch: Witch,
 } as const;
 
 /**

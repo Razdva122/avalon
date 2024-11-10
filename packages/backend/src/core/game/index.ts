@@ -221,16 +221,13 @@ export class Game extends GameHooks {
       (<THookNames[]>Object.keys(this.hooks)).forEach((hookName) => {
         const addonMethod = addon[hookName];
         if (addonMethod) {
-          this.hooks[hookName].push(addonMethod.bind(addon));
+          const stage = addon.priority?.[hookName] || 'medium';
+          this.hooks[hookName][stage].push(addonMethod.bind(addon));
         }
       });
     }
 
-    if (!this.callHook('afterInit') || !this.callHook('beforeSelectTeam')) {
-      return;
-    }
-
-    this.stage = 'selectTeam';
+    this.initGame();
   }
 
   /**
@@ -315,11 +312,18 @@ export class Game extends GameHooks {
       this.turn += 1;
     }
 
-    if (!this.callHook('beforeSelectTeam')) {
-      return;
-    }
+    this.callHooks('beforeSelectTeam', () => {
+      this.stage = 'selectTeam';
+    });
+  }
 
-    this.stage = 'selectTeam';
+  /**
+   * Init game
+   */
+  protected initGame(): void {
+    this.callHooks(['afterInit', 'beforeSelectTeam'], () => {
+      this.stage = 'selectTeam';
+    });
   }
 
   /**
@@ -353,29 +357,25 @@ export class Game extends GameHooks {
       );
     }
 
-    if (!this.callHook('afterSelectTeam') || !this.callHook('beforeSentTeam')) {
-      return;
-    }
+    this.callHooks(['afterSelectTeam', 'beforeSentTeam'], () => {
+      this.selectedPlayers.forEach((player) => {
+        player.features.isSent = true;
+      });
 
-    this.selectedPlayers.forEach((player) => {
-      player.features.isSent = true;
+      this.leader.features.waitForAction = false;
+
+      this.vote = new Vote(this.players, this.leader, this.turn, this.turn === 4 ? true : undefined);
+
+      this.players.forEach((player) => {
+        player.features.isSelected = false;
+      });
+
+      this.callHooks('afterSentTeam', () => {
+        this.sentTeamNextStage();
+
+        this.stateObserver.gameStateChanged();
+      });
     });
-
-    this.leader.features.waitForAction = false;
-
-    this.vote = new Vote(this.players, this.leader, this.turn, this.turn === 4 ? true : undefined);
-
-    this.players.forEach((player) => {
-      player.features.isSelected = false;
-    });
-
-    if (!this.callHook('afterSentTeam')) {
-      return;
-    }
-
-    this.sentTeamNextStage();
-
-    this.stateObserver.gameStateChanged();
   }
 
   /**
@@ -397,21 +397,17 @@ export class Game extends GameHooks {
    * Start mission
    */
   protected startMission(): void {
-    if (!this.callHook('beforeStartMission')) {
-      return;
-    }
+    this.callHooks('beforeStartMission', () => {
+      this.history.push(this.vote!);
+      this.currentMission.startMission(this.sentPlayers, this.leader);
+      this.stage = 'onMission';
 
-    this.history.push(this.vote!);
-    this.currentMission.startMission(this.sentPlayers, this.leader);
-    this.stage = 'onMission';
+      this.sentPlayers.forEach((player) => {
+        player.features.waitForAction = true;
+      });
 
-    this.sentPlayers.forEach((player) => {
-      player.features.waitForAction = true;
+      this.callHooks('afterStartMission');
     });
-
-    if (!this.callHook('afterStartMission')) {
-      return;
-    }
   }
 
   /**
@@ -423,20 +419,19 @@ export class Game extends GameHooks {
     this.finishCurrentRound();
 
     if (winner) {
-      if (!this.callHook('beforeEndGame')) {
-        return;
-      }
+      this.callHooks('beforeEndGame', () => {
+        this.result = { winner, reason: winner === 'evil' ? 'evilTeamMissions' : 'goodTeamMissions' };
+        this.stage = 'end';
 
-      this.result = { winner, reason: winner === 'evil' ? 'evilTeamMissions' : 'goodTeamMissions' };
-      this.stage = 'end';
+        this.stateObserver.gameStateChanged();
+        this.callHooks('afterEndMission');
+      });
     } else {
       this.startNextRound();
-    }
 
-    this.stateObserver.gameStateChanged();
+      this.stateObserver.gameStateChanged();
 
-    if (!this.callHook('afterEndMission')) {
-      return;
+      this.callHooks('afterEndMission');
     }
   }
 
@@ -473,14 +468,13 @@ export class Game extends GameHooks {
     const player = this.findPlayerByID(playerID);
 
     if (this.currentMission.makeAction(player, result)) {
-      if (!this.callHook('beforeEndMission')) {
-        return;
-      }
-
-      return this.finishMission();
+      this.callHooks('beforeEndMission', () => {
+        this.currentMission.finishMission();
+        this.finishMission();
+      });
+    } else {
+      this.stateObserver.gameStateChanged();
     }
-
-    this.stateObserver.gameStateChanged();
   }
 
   /**
@@ -501,12 +495,12 @@ export class Game extends GameHooks {
         this.nextVote();
       }
 
-      if (!this.callHook('afterVoteForTeam')) {
-        return;
-      }
+      this.callHooks('afterVoteForTeam', () => {
+        this.stateObserver.gameStateChanged();
+      });
+    } else {
+      this.stateObserver.gameStateChanged();
     }
-
-    this.stateObserver.gameStateChanged();
   }
 
   /**

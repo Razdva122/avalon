@@ -2,6 +2,7 @@ import type { IMissionSettings, TMissionResult, IPlayer, IPlayerFeatures, TVoteO
 import type { TPlayerIcon } from '@/components/view/information/interface';
 
 export interface IMissionWithResult extends IMissionSettings {
+  hidden?: boolean;
   result?: TMissionResult;
   fails?: number;
 }

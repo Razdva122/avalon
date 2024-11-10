@@ -235,6 +235,18 @@ module.exports.routesSeo = {
       image: 'roles/troublemaker.webp',
     },
   },
+  witch: {
+    path: '/wiki/roles/witch/',
+    name: 'witch',
+    priority: 0.2,
+    meta: {
+      prerender: true,
+      title: 'Avalon: The Resistance | Witch',
+      description: "Rules and Tips for Witch role in the board game 'Avalon: The Resistance'",
+      keywords: ['Witch', 'Role', 'Rules', 'Tips'],
+      image: 'roles/witch.webp',
+    },
+  },
   mordred: {
     path: '/wiki/roles/mordred/',
     name: 'mordred',

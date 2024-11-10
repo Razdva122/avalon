@@ -2,9 +2,11 @@ import { IGameAddon } from '@/core/game/addons/interface';
 import { CheckLoyalty } from '@/core/game/addons/lady-of-lake/check-loyalty';
 import { Game } from '@/core/game';
 import { TLoyalty } from '@avalon/types';
+import { Subject, of } from 'rxjs';
 
 export class LadyOfLakeAddon implements IGameAddon {
   addonName = 'ladyOfLake';
+  checkLoyaltySubject: Subject<boolean> = new Subject();
   game: Game;
 
   constructor(game: Game) {
@@ -23,7 +25,7 @@ export class LadyOfLakeAddon implements IGameAddon {
     // Right player from leader get ladyOfLake
     lastPlayer.features.ladyOfLake = 'has';
 
-    return true;
+    return of(true);
   }
 
   beforeSelectTeam() {
@@ -34,10 +36,10 @@ export class LadyOfLakeAddon implements IGameAddon {
 
       this.game.stage = 'checkLoyalty';
       this.game.stateObserver.gameStateChanged();
-      return false;
+      return this.checkLoyaltySubject.asObservable();
     }
 
-    return true;
+    return of(true);
   }
 
   checkLoyalty(executorID: string) {
@@ -109,5 +111,7 @@ export class LadyOfLakeAddon implements IGameAddon {
     this.game.stage = 'selectTeam';
 
     this.game.stateObserver.gameStateChanged();
+
+    this.checkLoyaltySubject.next(false);
   }
 }

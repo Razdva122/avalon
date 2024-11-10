@@ -139,6 +139,12 @@ export default defineComponent({
   background-size: 165%;
 }
 
+.icon-witch {
+  background-image: url('@/assets/roles/witch.webp');
+  background-position: 40% 15%;
+  background-size: 130%;
+}
+
 .icon-evil {
   background-image: url('@/assets/red_team_no_background.webp');
   background-position: 50% 52%;

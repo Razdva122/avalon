@@ -56,6 +56,8 @@ export interface ClientToServerEvents {
 
   giveExcalibur: (uuid: string) => void;
   useExcalibur: (uuid: string) => void;
+
+  useWitchAbility: (uuid: string, result: boolean) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;

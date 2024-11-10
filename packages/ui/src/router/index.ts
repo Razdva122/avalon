@@ -34,6 +34,7 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.trickster, component: () => import('@/pages/wiki/roles/Trickster.vue') },
   { ...routesSeo.lunatic, component: () => import('@/pages/wiki/roles/Lunatic.vue') },
   { ...routesSeo.brute, component: () => import('@/pages/wiki/roles/Brute.vue') },
+  { ...routesSeo.witch, component: () => import('@/pages/wiki/roles/Witch.vue') },
   { path: '/wiki/roles/isolde/', name: 'isolde', redirect: { name: 'lovers' } },
   { path: '/wiki/roles/tristan/', name: 'tristan', redirect: { name: 'lovers' } },
   { path: '/wiki/roles/evil_lancelot/', name: 'evil_lancelot', redirect: { name: 'lancelots' } },

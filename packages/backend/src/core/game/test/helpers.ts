@@ -182,4 +182,12 @@ export class GameTestHelper {
 
     return this;
   }
+
+  useWitchAbility(result: boolean = true): this {
+    const playerWitchId = this.game.players.find((player) => player.role.role === 'witch')!.user.id;
+
+    this.game.addons.witch!.useWitchAbility(playerWitchId, result);
+
+    return this;
+  }
 }

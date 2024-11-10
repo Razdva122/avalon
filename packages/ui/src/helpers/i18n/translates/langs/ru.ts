@@ -42,6 +42,7 @@ export const ru = {
     mission: 'поход',
     initialization: 'начало',
     'lady of lake': 'леди озера',
+    witch: 'ведьма',
     end: 'конец',
     lancelots: 'ланселоты',
     assassinate: 'убийство',
@@ -79,6 +80,7 @@ export const ru = {
     oberon: 'Оберон',
     lunatic: 'Лунатик',
     brute: 'Брут',
+    witch: 'Ведьма',
     minion: 'Миньон',
     role: 'Роль',
   },
@@ -97,6 +99,7 @@ export const ru = {
     oberon: 'Оберон',
     lunatic: 'Лунатик',
     brute: 'Брут',
+    witch: 'Ведьма',
     minion: 'Миньон',
     wiki: 'Вики',
     expansions: 'Дополнения',
@@ -109,7 +112,7 @@ export const ru = {
     ladyOfLake: 'Леди озера',
     excalibur: 'Экскалибур',
   },
-  lady: {
+  ladyModule: {
     announceGood: 'Объявить добром',
     announceEvil: 'Объявить злом',
   },
@@ -166,6 +169,8 @@ export const ru = {
     giveExcalibur: 'Дать Экскалибур',
     skipExcalibur: 'Пропустить Экскалибур',
     useExcalibur: 'Применить Экскалибур',
+    useWitchAbility: 'Скрыть поход',
+    skipWitchAbility: 'Пропустить',
   },
   assassinate: {
     lovers: 'Любовники',
@@ -197,6 +202,7 @@ export const ru = {
     tricksterInfo: 'Врет о своей лояльности',
     lunaticInfo: 'Обязан проваливать каждый поход',
     bruteInfo: 'Может провалить только три первых похода',
+    witchInfo: 'Может скрыть результат одного похода',
     unknownInfo: 'Неизвестная роль',
     mysteryWizardInfo: 'Один из двух волшебников - сил света (Мерлин) или сил тьмы (Моргана).',
     unknownLancelotInfo: 'Ланселот, чья верность не известна',
@@ -226,6 +232,7 @@ export const ru = {
     fails: 'Провалов',
     indexMission: '{index} поход',
     failsCount: 'провалов {count}',
+    hidden: 'поход скрыт Ведьмой',
     team: 'Команда:',
   },
   chat: {
@@ -271,7 +278,7 @@ export const ru = {
     checkInfo: '<b>{ladyOwner}</b> проверил лояльность <b>{ladyTarget}</b>',
     declareInfo: 'и сказал что его лояльность -',
   },
-  lancelots: {
+  lancelotsHistory: {
     becameEvil: 'стал темным',
     becomeGood: 'стал светлым',
     lancelotSaveLoyalty: 'сохранил лояльность',
