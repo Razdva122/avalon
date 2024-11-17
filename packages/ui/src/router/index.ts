@@ -15,6 +15,8 @@ const routeComponentMap = {
   lancelots: () => import('@/pages/wiki/roles/Lancelots.vue'),
   lady_of_lake: () => import('@/pages/wiki/addons/LadyOfTheLake.vue'),
   excalibur: () => import('@/pages/wiki/addons/Excalibur.vue'),
+  morgana: () => import('@/pages/wiki/roles/Morgana.vue'),
+  percival: () => import('@/pages/wiki/roles/Percival.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
@@ -22,11 +24,9 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.rules, component: () => import('@/pages/wiki/Rules.vue') },
   { ...routesSeo.merlin, component: () => import('@/pages/wiki/roles/Merlin.vue') },
   { ...routesSeo['merlin_pure'], component: () => import('@/pages/wiki/roles/MerlinPure.vue') },
-  { ...routesSeo.percival, component: () => import('@/pages/wiki/roles/Percival.vue') },
   { ...routesSeo.lovers, component: () => import('@/pages/wiki/roles/Lovers.vue') },
   { ...routesSeo.troublemaker, component: () => import('@/pages/wiki/roles/Troublemaker.vue') },
   { ...routesSeo.servant, component: () => import('@/pages/wiki/roles/Servant.vue') },
-  { ...routesSeo.morgana, component: () => import('@/pages/wiki/roles/Morgana.vue') },
   { ...routesSeo.mordred, component: () => import('@/pages/wiki/roles/Mordred.vue') },
   { ...routesSeo.oberon, component: () => import('@/pages/wiki/roles/Oberon.vue') },
   { ...routesSeo.minion, component: () => import('@/pages/wiki/roles/Minion.vue') },

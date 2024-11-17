@@ -8,6 +8,8 @@ const {
   lancelots,
   lady,
   excalibur,
+  morgana,
+  percival,
 } = require('../../src/helpers/i18n/translates/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -205,9 +207,9 @@ module.exports.routesSeo = {
     priority: 0.7,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Percival',
-      description: "Rules and Tips for Percival role in the board game 'Avalon: The Resistance'",
-      keywords: ['Percival', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...percival,
+      },
       image: 'roles/percival.webp',
     },
   },
@@ -289,11 +291,11 @@ module.exports.routesSeo = {
     priority: 0.7,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Morgana',
-      description: "Rules and Tips for Morgana role in the board game 'Avalon: The Resistance'",
-      keywords: ['Morgana', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...morgana,
+      },
+      image: 'roles/morgana.webp',
     },
-    image: 'roles/morgana.webp',
   },
   minion: {
     path: '/wiki/roles/minion/',
@@ -304,8 +306,8 @@ module.exports.routesSeo = {
       title: 'Avalon: The Resistance | Minion of Mordred',
       description: "Rules and Tips for  Minion of Mordred role in the board game 'Avalon: The Resistance'",
       keywords: ['Minion of Mordred', 'Role', 'Rules', 'Tips'],
+      image: 'roles/minion.webp',
     },
-    image: 'roles/minion.webp',
   },
   notFound: {
     path: '/404/',
