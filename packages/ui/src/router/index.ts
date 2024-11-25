@@ -17,11 +17,11 @@ const routeComponentMap = {
   excalibur: () => import('@/pages/wiki/addons/Excalibur.vue'),
   morgana: () => import('@/pages/wiki/roles/Morgana.vue'),
   percival: () => import('@/pages/wiki/roles/Percival.vue'),
+  rules: () => import('@/pages/wiki/Rules.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.about, component: () => import('@/pages/about/About.vue') },
-  { ...routesSeo.rules, component: () => import('@/pages/wiki/Rules.vue') },
   { ...routesSeo.merlin, component: () => import('@/pages/wiki/roles/Merlin.vue') },
   { ...routesSeo['merlin_pure'], component: () => import('@/pages/wiki/roles/MerlinPure.vue') },
   { ...routesSeo.lovers, component: () => import('@/pages/wiki/roles/Lovers.vue') },

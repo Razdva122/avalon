@@ -10,6 +10,7 @@ const {
   excalibur,
   morgana,
   percival,
+  rules,
 } = require('../../src/helpers/i18n/translates/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -64,10 +65,9 @@ module.exports.routesSeo = {
     priority: 1,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Rules',
-      description:
-        "Master 'Avalon: The Resistance' with a complete guide to the official rulebook. From setting up the game to the intricate roles of each character, get all the knowledge for a winning strategy.",
-      keywords: ['Wiki', 'Rules', 'How to play'],
+      multiLanguage: {
+        ...rules,
+      },
     },
   },
   expansions: {

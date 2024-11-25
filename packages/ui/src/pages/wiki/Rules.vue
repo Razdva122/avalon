@@ -1,14 +1,12 @@
 <template>
   <div class="info-page-content rules">
     <WikiBreadCrumbs />
-    <h1 class="title">Avalon: The Resistance - Official rules</h1>
+    <h1 class="title">{{ $t('rules.title') }}</h1>
 
-    <h2>Game Objective</h2>
+    <h2>{{ $t('rules.gameObjective') }}</h2>
 
     <p>
-      Avalon: The Resistance is a strategic board game where players are tasked with completing a series of missions
-      while dealing with hidden traitors known as Minions of Mordred. The game is set in the legendary world of King
-      Arthur and the Knights of the Round Table.
+      {{ $t('rules.gameDescription') }}
     </p>
 
     <h3>
@@ -43,67 +41,52 @@
     </p>
     <v-divider :thickness="5"></v-divider>
 
-    <h2>Gameplay Rules</h2>
+    <h2>{{ $t('rules.gameplayRules') }}</h2>
 
-    <h3>1. Team Proposal and Voting</h3>
+    <h3>1. {{ $t('rules.teamProposalAndVoting') }}</h3>
     <ul>
       <li>
-        The player with the Leader token proposes a team of players for the mission. The number of players required for
-        the team depends on the current mission and the total number of players in the game.
+        {{ $t('rules.teamProposalDescription') }}
       </li>
       <li>
-        All players, including the Leader, then vote on the proposed team. A simple majority is required for the
-        proposal to be accepted. If the proposal is rejected, the Leader token passes to the next player and a new
-        proposal begins. If five proposals are rejected in a row, the fifth Leader has the power to choose the quest
-        team without a vote.
+        {{ $t('rules.votingDescription') }}
       </li>
     </ul>
 
-    <h3>2. Mission Phase</h3>
+    <h3>2. {{ $t('rules.missionPhaseTitle') }}</h3>
     <ul>
-      <li>
-        Once a team has been approved, members of the team secretly choose a Success
-        <span class="good-loyalty-icon"></span> or Fail <span class="evil-loyalty-icon"></span> card to determine the
-        outcome of the mission.
-      </li>
-      <li>
-        All players submit their chosen cards to the Leader, who shuffles them to conceal which player submitted which
-        card.
-      </li>
-      <li>
-        The cards are then revealed. For a mission to succeed, all the cards must be Success
-        <span class="good-loyalty-icon"></span> cards. If one or more Fail <span class="evil-loyalty-icon"></span>
-        cards are revealed, the mission fails. Certain missions may require two Fail cards to fail, depending on the
-        number of players in the game.
-      </li>
+      <i18n-t keypath="rules.teamApproved" tag="li">
+        <template v-slot:goodLoyaltyIcon>
+          <span class="good-loyalty-icon"></span>
+        </template>
+        <template v-slot:evilLoyaltyIcon>
+          <span class="evil-loyalty-icon"></span>
+        </template>
+      </i18n-t>
+      <li>{{ $t('rules.submitCardsToLeader') }}</li>
+      <i18n-t keypath="rules.cardsRevealed" tag="li">
+        <template v-slot:goodLoyaltyIcon>
+          <span class="good-loyalty-icon"></span>
+        </template>
+        <template v-slot:evilLoyaltyIcon>
+          <span class="evil-loyalty-icon"></span>
+        </template>
+      </i18n-t>
     </ul>
 
-    <h3>3. Progression of Play</h3>
+    <h3>3. {{ $t('rules.progressionOfPlayTitle') }}</h3>
     <ul>
-      <li>
-        After the outcome of the mission has been determined, the Leader token moves to the next player in clockwise
-        order.
-      </li>
-      <li>A new round begins with a new team proposal, and the same process repeats for a total of five missions.</li>
-      <li>
-        Players must use their powers of persuasion, deduction, and bluffing to influence team selection, the vote, and
-        discussion to further their side's agenda.
-      </li>
+      <li>{{ $t('rules.leaderTokenMove') }}</li>
+      <li>{{ $t('rules.newRound') }}</li>
+      <li>{{ $t('rules.playersUseSkills') }}</li>
     </ul>
     <v-divider :thickness="5"></v-divider>
 
-    <h2>Conclusion of Gameplay</h2>
-    <p>
-      The gameplay continues through five missions, with the game ending once either the Loyal Servants of Arthur
-      successfully complete three missions or the Minions of Mordred cause three missions to fail. In the case that the
-      Loyal Servants of Arthur succeed, the Minions of Mordred have one final opportunity to win by correctly
-      identifying <PreviewLink target="merlin" />, if they do so the Minions win.
-    </p>
+    <h2>{{ $t('rules.conclusionOfGameplayTitle') }}</h2>
+    <p><LocalizedTextWrapper keypath="rules.gameplayEndsCondition" /></p>
 
     <p>
-      Through strategic discussion, careful observation, and clever tactics, each side must do their best to achieve
-      their objectives without revealing their true allegiances, making each round of Avalon: The Resistance play out
-      uniquely and full of suspense.
+      {{ $t('rules.strategicDiscussion') }}
     </p>
     <v-divider :thickness="5"></v-divider>
 
@@ -113,17 +96,17 @@
       <table>
         <thead>
           <tr>
-            <th>Number of Players</th>
-            <th>Mission 1</th>
-            <th>Mission 2</th>
-            <th>Mission 3</th>
-            <th>Mission 4</th>
-            <th>Mission 5</th>
+            <th>{{ $t('rules.numberOfPlayers') }}</th>
+            <th>{{ $t('rules.missionNumber', { number: 1 }) }}</th>
+            <th>{{ $t('rules.missionNumber', { number: 2 }) }}</th>
+            <th>{{ $t('rules.missionNumber', { number: 3 }) }}</th>
+            <th>{{ $t('rules.missionNumber', { number: 4 }) }}</th>
+            <th>{{ $t('rules.missionNumber', { number: 5 }) }}</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>5 Players</td>
+            <th>{{ $t('rules.countPlayers', { count: 5 }) }}</th>
             <td>2</td>
             <td>3</td>
             <td>2</td>
@@ -131,7 +114,7 @@
             <td>3</td>
           </tr>
           <tr>
-            <td>6 Players</td>
+            <th>{{ $t('rules.countPlayers', { count: 6 }) }}</th>
             <td>2</td>
             <td>3</td>
             <td>4</td>
@@ -139,7 +122,7 @@
             <td>4</td>
           </tr>
           <tr>
-            <td>7 Players</td>
+            <th>{{ $t('rules.countPlayers', { count: 7 }) }}</th>
             <td>2</td>
             <td>3</td>
             <td>3</td>
@@ -147,7 +130,7 @@
             <td>4</td>
           </tr>
           <tr>
-            <td>8 Players</td>
+            <th>{{ $t('rules.countPlayers', { count: 8 }) }}</th>
             <td>3</td>
             <td>4</td>
             <td>4</td>
@@ -155,7 +138,7 @@
             <td>5</td>
           </tr>
           <tr>
-            <td>9 Players</td>
+            <th>{{ $t('rules.countPlayers', { count: 9 }) }}</th>
             <td>3</td>
             <td>4</td>
             <td>4</td>
@@ -163,7 +146,7 @@
             <td>5</td>
           </tr>
           <tr>
-            <td>10 Players</td>
+            <th>{{ $t('rules.countPlayers', { count: 10 }) }}</th>
             <td>3</td>
             <td>4</td>
             <td>4</td>
@@ -175,8 +158,8 @@
     </div>
 
     <p>
-      <b>Note</b>: On missions marked with an asterisk (*), two Fail <span class="evil-loyalty-icon"></span> cards are
-      required for the mission to fail.
+      <b>{{ $t('rules.note') }}</b> On missions marked with an asterisk (*), two Fail
+      <span class="evil-loyalty-icon"></span> cards are required for the mission to fail.
     </p>
 
     <v-divider :thickness="5"></v-divider>
@@ -204,62 +187,61 @@
     </p>
 
     <div class="game-setup">
-      <h3>5 Players:</h3>
-      <strong>Loyal Servants of Arthur:</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
+      <h3>{{ $t('rules.countPlayers', { count: 5 }) }}:</h3>
+      <strong>{{ $t('rules.servantTeam') }}</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
       <PreviewLink target="servant" /><br />
-      <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />
+      <strong>{{ $t('rules.mordredTeam') }}</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />
     </div>
 
     <div class="game-setup">
-      <h3>6 Players:</h3>
-      <strong>Loyal Servants of Arthur:</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
+      <h3>{{ $t('rules.countPlayers', { count: 6 }) }}:</h3>
+      <strong>{{ $t('rules.servantTeam') }}</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
       <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
-      <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />
+      <strong>{{ $t('rules.mordredTeam') }}</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />
     </div>
 
     <div class="game-setup">
-      <h3>7 Players:</h3>
-      <strong>Loyal Servants of Arthur:</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
+      <h3>{{ $t('rules.countPlayers', { count: 7 }) }}:</h3>
+      <strong>{{ $t('rules.servantTeam') }}</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
       <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
-      <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
+      <strong>{{ $t('rules.mordredTeam') }}</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" /><br />
-      <em>Expansions:</em> <PreviewLink target="ladyOfLake" />
+      <em>{{ $t('rules.expansions') }}</em> <PreviewLink target="ladyOfLake" />
     </div>
 
     <div class="game-setup">
-      <h3>8 Players:</h3>
-      <strong>Loyal Servants of Arthur:</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
+      <h3>{{ $t('rules.countPlayers', { count: 8 }) }}:</h3>
+      <strong>{{ $t('rules.servantTeam') }}</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
       <PreviewLink target="servant" />, <PreviewLink target="servant" />, <PreviewLink target="servant" /><br />
-      <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
+      <strong>{{ $t('rules.mordredTeam') }}</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" /><br />
-      <em>Expansions:</em> <PreviewLink target="ladyOfLake" />
+      <em>{{ $t('rules.expansions') }}</em> <PreviewLink target="ladyOfLake" />
     </div>
 
     <div class="game-setup">
-      <h3>9 Players:</h3>
-      <strong>Loyal Servants of Arthur:</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
+      <h3>{{ $t('rules.countPlayers', { count: 9 }) }}:</h3>
+      <strong>{{ $t('rules.servantTeam') }}</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
       <PreviewLink target="tristan" />, <PreviewLink target="isolde" />, <PreviewLink target="servant" />,
       <PreviewLink target="servant" /><br />
-      <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
+      <strong>{{ $t('rules.mordredTeam') }}</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" /><br />
     </div>
 
     <div class="game-setup">
-      <h3>10 Players:</h3>
-      <strong>Loyal Servants of Arthur:</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
+      <h3>{{ $t('rules.countPlayers', { count: 10 }) }}:</h3>
+      <strong>{{ $t('rules.servantTeam') }}</strong> <PreviewLink target="merlin" />, <PreviewLink target="percival" />,
       <PreviewLink target="tristan" />, <PreviewLink target="isolde" />, <PreviewLink target="servant" />,
       <PreviewLink target="servant" /><br />
-      <strong>Minions of Mordred:</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
+      <strong>{{ $t('rules.mordredTeam') }}</strong> <PreviewLink target="mordred" />, <PreviewLink target="morgana" />,
       <PreviewLink target="minion" />, <PreviewLink target="oberon" /><br />
-      <em>Expansions:</em> <PreviewLink target="ladyOfLake" />
+      <em>{{ $t('rules.expansions') }}</em> <PreviewLink target="ladyOfLake" />
     </div>
 
     <p>
-      <b>Note</b>: In the original version, there is a distinct role of the <b>Assassin</b>. We suggest delegating this
-      function to any of the evil roles, or alternatively, making the decision collectively among the evil players.
+      <b>{{ $t('rules.note') }}</b> <span v-html="$t('rules.assassinNote')"></span>
     </p>
 
-    <h3>Excalibur:</h3>
+    <h3>{{ $t('addons.excalibur') }}:</h3>
     <p>
       We recommend adding <PreviewLink target="excalibur" /> to games for any number of players, but only in the company
       of experienced players.
@@ -404,7 +386,7 @@
     </ol>
 
     <p>
-      <strong>Note</strong>: For the purposes of game setup, the term "<strong
+      <strong>{{ $t('rules.note') }}</strong> For the purposes of game setup, the term "<strong
         ><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong
       >" refers to all agents of Evil unless otherwise stated.
     </p>

@@ -9,6 +9,7 @@ const { lady } = require('./lady');
 const { excalibur } = require('./excalibur');
 const { morgana } = require('./morgana');
 const { percival } = require('./percival');
+const { rules } = require('./rules');
 
 module.exports = {
   lobby,
@@ -22,4 +23,5 @@ module.exports = {
   excalibur,
   morgana,
   percival,
+  rules,
 };
