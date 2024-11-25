@@ -9,35 +9,29 @@
       {{ $t('rules.gameDescription') }}
     </p>
 
-    <h3>
-      Objective for the
-      <span class="good-loyalty-icon"></span>
-      Loyal Servants of Arthur
-    </h3>
+    <i18n-t keypath="rules.objectiveArthur" tag="h3">
+      <template v-slot:goodLoyaltyIcon>
+        <span class="good-loyalty-icon"></span>
+      </template>
+    </i18n-t>
+
     <p>
-      The Loyal <PreviewLink target="servant" /> must successfully complete three out of five missions. They must work
-      together to propose teams for each mission and vote on team compositions, always trying to keep traitors off the
-      teams to prevent missions from failing.
+      <LocalizedTextWrapper keypath="rules.missionObjective" />
     </p>
 
-    <h3>
-      Objective for the
-      <span class="evil-loyalty-icon"></span>
-      Minions of Mordred
-    </h3>
+    <i18n-t keypath="rules.objectiveMordred" tag="h3">
+      <template v-slot:evilLoyaltyIcon>
+        <span class="evil-loyalty-icon"></span>
+      </template>
+    </i18n-t>
+
     <p>
-      The <PreviewLink target="minion" /> aim to sow discord and mistrust among the <PreviewLink target="servant" />.
-      Their goal is to cause three missions to fail <span class="evil-loyalty-icon"></span> by infiltrating teams and
-      sabotaging missions. They must communicate covertly and strategize to mislead the loyalists and cast doubt on the
-      true allegiances of other players.
+      <LocalizedTextWrapper keypath="rules.minionObjective" />
     </p>
 
-    <h3>Additional Objectives</h3>
+    <h3>{{ $t('rules.additionalObjectivesTitle') }}</h3>
     <p>
-      The game intensifies with special roles, such as <PreviewLink target="merlin" />, who knows the identities of the
-      Minions but must keep his identity secret to avoid assassination at the end of the game. The Minions of Mordred
-      can win by correctly identifying and assassinating <PreviewLink target="merlin" /> after three missions have
-      succeeded.
+      <LocalizedTextWrapper keypath="rules.additionalObjectivesDescription" />
     </p>
     <v-divider :thickness="5"></v-divider>
 
@@ -90,7 +84,7 @@
     </p>
     <v-divider :thickness="5"></v-divider>
 
-    <h2>Mission Team Size</h2>
+    <h2>{{ $t('rules.missionSizes') }}</h2>
 
     <div class="table">
       <table>
@@ -158,26 +152,21 @@
     </div>
 
     <p>
-      <b>{{ $t('rules.note') }}</b> On missions marked with an asterisk (*), two Fail
-      <span class="evil-loyalty-icon"></span> cards are required for the mission to fail.
+      <b>{{ $t('rules.note') }}</b>
+      <i18n-t keypath="rules.twoFailsNote" tag="span">
+        <template v-slot:evilLoyaltyIcon>
+          <span class="evil-loyalty-icon"></span>
+        </template>
+      </i18n-t>
     </p>
 
     <v-divider :thickness="5"></v-divider>
 
-    <h2>Recommended Roles Setup</h2>
-    <h3>General tips</h3>
-    <p>
-      For an enriching gaming experience, we suggest a group size of <strong>7 to 10 players</strong> where the
-      intricacies and excitement of the game truly shine.
-    </p>
-
-    <p>
-      For newcomers, it's advisable to begin your Avalon journey with the <strong>basic roles</strong>. As you become
-      more accustomed to the gameplay, you can incrementally introduce additional roles, enhancing complexity and
-      engagement <strong>step by step</strong>.
-    </p>
-
-    <p>After the first games, we recommend adding roles in the following order:</p>
+    <h2>{{ $t('rules.recommendTitle') }}</h2>
+    <h3>{{ $t('rules.generalTipsTitle') }}</h3>
+    <p v-html="$t('rules.generalTipsText')"></p>
+    <p v-html="$t('rules.newcomersAdvice')"></p>
+    <p>{{ $t('rules.recommendationAfterFirstGames') }}</p>
 
     <p>
       <PreviewLink target="merlin" /> -> <PreviewLink target="percival" /> -> <PreviewLink target="morgana" /> ->
@@ -243,18 +232,16 @@
 
     <h3>{{ $t('addons.excalibur') }}:</h3>
     <p>
-      We recommend adding <PreviewLink target="excalibur" /> to games for any number of players, but only in the company
-      of experienced players.
+      <LocalizedTextWrapper keypath="rules.excaliburHint" />
     </p>
 
     <v-divider :thickness="5"></v-divider>
 
-    <h2>Game setup in offline:</h2>
+    <h2>{{ $t('rules.offlineSetup') }}</h2>
     <p>
-      The default setup includes characters such as Merlin, Percival, and Morgana. However, you have the flexibility to
-      customize the game by selecting the roles that best fit your group.
+      <LocalizedTextWrapper keypath="rules.defaultSetup" />
     </p>
-    <Options :roles="roles" buttonText="Roles" />
+    <Options :roles="roles" :buttonText="$t('options.roles')" />
     <ol class="mt-2">
       <li>Everyone close your eyes and extend your hand info a fist in front of you.</li>
       <li>

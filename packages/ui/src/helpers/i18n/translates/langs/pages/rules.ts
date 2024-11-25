@@ -9,7 +9,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     servantTeam: 'Loyal Servants of Arthur:',
     mordredTeam: 'Minions of Mordred:',
     expansions: 'Expansions:',
-    note: 'Note:',
+    note: 'Note: ',
     title: 'Avalon: The Resistance - Official rules',
     gameObjective: 'Game Objective',
     gameDescription:
@@ -40,6 +40,30 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       'Through strategic discussion, careful observation, and clever tactics, each side must do their best to achieve their objectives without revealing their true allegiances, making each round of Avalon: The Resistance play out uniquely and full of suspense.',
     assassinNote:
       'In the original version, there is a distinct role of the <b>Assassin</b>. We suggest delegating this function to any of the evil roles, or alternatively, making the decision collectively among the evil players.',
+    objectiveArthur: 'Objective for the { goodLoyaltyIcon } Loyal Servants of Arthur',
+    objectiveMordred: 'Objective for the { evilLoyaltyIcon } Minions of Mordred',
+    missionObjective:
+      'The Loyal { servant } must successfully complete three out of five missions. They must work together to propose teams for each mission and vote on team compositions, always trying to keep traitors off the teams to prevent missions from failing.',
+    minionObjective:
+      'The { minion } aim to sow discord and mistrust among the { servant }. Their goal is to cause three missions to fail by infiltrating teams and sabotaging missions. They must communicate covertly and strategize to mislead the loyalists and cast doubt on the true allegiances of other players.',
+    additionalObjectivesTitle: 'Additional Objectives',
+    additionalObjectivesDescription:
+      'The game intensifies with special roles, such as { merlin }, who knows the identities of the Minions but must keep his identity secret to avoid assassination at the end of the game. The Minions of Mordred can win by correctly identifying and assassinating { merlin } after three missions have succeeded.',
+    twoFailsNote:
+      'On missions marked with an asterisk (*), two Fail { evilLoyaltyIcon } cards are required for the mission to fail.',
+    missionSizes: 'Mission Team Size',
+    excaliburHint:
+      'We recommend adding {excalibur} to games for any number of players, but only in the company of experienced players.',
+    recommendTitle: 'Recommended Roles Setup',
+    generalTipsTitle: 'General tips',
+    generalTipsText:
+      'For an enriching gaming experience, we suggest a group size of <strong>7 to 10 players</strong> where the intricacies and excitement of the game truly shine.',
+    newcomersAdvice:
+      "For newcomers, it's advisable to begin your Avalon journey with the <strong>basic roles</strong>. As you become more accustomed to the gameplay, you can incrementally introduce additional roles, enhancing complexity and engagement <strong>step by step</strong>.",
+    recommendationAfterFirstGames: 'After the first games, we recommend adding roles in the following order:',
+    offlineSetup: 'Game setup in offline:',
+    defaultSetup:
+      'The default setup includes characters such as { merlin }, { percival }, and { morgana }. However, you have the flexibility to customize the game by selecting the roles that best fit your group.',
   },
   ru: {
     numberOfPlayers: 'Количество игроков',
@@ -48,7 +72,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     servantTeam: 'Верные слуги Артура:',
     mordredTeam: 'Миньоны Мордреда:',
     expansions: 'Дополнения:',
-    note: 'Примечание:',
+    note: 'Примечание: ',
     title: 'Авалон: Сопротивление - Официальные правила',
     gameObjective: 'Цель игры',
     gameDescription:
@@ -80,6 +104,29 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       'Посредством стратегических обсуждений, внимательных наблюдений и хитроумных тактик каждая сторона должна делать всё возможное, чтобы достичь своих целей, не раскрывая свою истинную принадлежность, делая каждый раунд игры Avalon: The Resistance уникальным и полным напряжения.',
     assassinNote:
       'В оригинальной версии существует отдельная роль <b>Убийцы</b>. Мы предлагаем отдать эту возможность любому из злых персонажей или принимать решение коллективно всей команды Мордреда.',
+    objectiveArthur: 'Цель для {goodLoyaltyIcon} Cлуг Артура',
+    objectiveMordred: 'Цель для {evilLoyaltyIcon} Миньонов Мордреда',
+    missionObjective:
+      'Верные { servant } должны успешно завершить три из пяти миссий. Они должны работать вместе, чтобы предлагать команды для каждой миссии и голосовать за их состав, всегда стараясь исключить предателей из команд, чтобы предотвратить провал миссий.',
+    minionObjective:
+      '{ minion } стремятся сеять раздор и недоверие среди { servant }. Их цель — провалить три миссии, внедряясь в команды и саботируя их. Они должны тайно общаться и разрабатывать стратегии, чтобы вводить в заблуждение слуг Артура и вызывать сомнения в истинных намерениях других игроков.',
+    additionalObjectivesTitle: 'Дополнительные Задачи',
+    additionalObjectivesDescription:
+      'Игра усложняется с особыми ролями, такими как { merlin }, который знает личности Миньонов, но должен сохранить свою личность в тайне, чтобы избежать убийства в конце игры. Миньоны Мордреда могут победить, правильно идентифицировав и убив { merlin } если силы света успешно закончили три миссии.',
+    twoFailsNote: 'Для провала миссии, отмеченной звездочкой (*), требуются две карты Провал { evilLoyaltyIcon }.',
+    missionSizes: 'Размер команды на миссии',
+    excaliburHint:
+      'Мы рекомендуем добавлять {excalibur} в игры для любого количества игроков, но только в компании опытных игроков.',
+    recommendTitle: 'Рекомендуемая Настройка Ролей',
+    generalTipsTitle: 'Общие советы',
+    generalTipsText:
+      'Для насыщенного игрового опыта мы предлагаем размер группы от <strong>7 до 10 игроков</strong>, где сложные моменты и волнение от игры проявляются в полной мере.',
+    newcomersAdvice:
+      'Новичкам рекомендуется начинать свое путешествие в Avalon с <strong>основных ролей</strong>. По мере того, как вы привыкаете к процессу игры, вы можете постепенно вводить дополнительные роли, повышая сложность и вовлеченность <strong>шаг за шагом</strong>.',
+    recommendationAfterFirstGames: 'После первых игр мы рекомендуем добавлять роли в следующем порядке:',
+    offlineSetup: 'Настройка игры в оффлайне:',
+    defaultSetup:
+      'Настройка по умолчанию включает персонажей, таких как { merlin }, { percival } и { morgana }. Однако у вас есть возможность настроить игру, выбрав роли, которые наилучшим образом подходят вашей группе.',
   },
   'zh-CN': {
     numberOfPlayers: '玩家人数',
@@ -88,7 +135,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     servantTeam: '忠诚的亚瑟随从:',
     mordredTeam: '莫德雷德的爪牙:',
     expansions: '扩展:',
-    note: '注意:',
+    note: '注意: ',
     title: '阿瓦隆: 抵抗 - 官方规则',
     gameObjective: '游戏目标',
     gameDescription:
@@ -116,6 +163,28 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       '通过战略讨论、仔细观察和聪明的战术，每一方都必须尽力实现他们的目标，而不暴露他们的真实效忠，使每一轮《阿瓦隆：反抗组织》的游戏过程独特而充满悬念。',
     assassinNote:
       '在原版中，有一个单独的角色是<b>刺客</b>。我们建议将此功能委派给任何一个邪恶角色，或者由邪恶玩家共同决定。',
+    objectiveArthur: '{goodLoyaltyIcon} 亚瑟忠诚仆人的目标',
+    objectiveMordred: '{evilLoyaltyIcon} 莫德雷德爪牙的目标',
+    missionObjective:
+      '忠诚的{ servant }必须成功完成五个任务中的三个。他们必须共同合作，为每个任务提议小组，并对小组构成进行投票，始终努力将叛徒排除在团队之外，以防止任务失败。',
+    minionObjective:
+      '{ minion }旨在制造{ servant }之间的不和与不信任。他们的目标是通过潜入团队和破坏任务，使三个任务失败。他们必须秘密沟通并制定战略，误导忠诚者并对其他玩家的真正忠诚度产生怀疑。',
+    additionalObjectivesTitle: '附加目标',
+    additionalObjectivesDescription:
+      '游戏因特殊角色而变得更加激烈，例如{ merlin }，他知道爪牙的身份，但必须保持自己的身份秘密，以避免在游戏结束时被暗杀。莫德雷德的爪牙可以通过正确识别并暗杀{ merlin }在三个任务成功后获得胜利。',
+    twoFailsNote: '在标有星号 (*) 的任务中，需要两张失败 { evilLoyaltyIcon } 卡才能导致任务失败。',
+    missionSizes: '任务小组人数',
+    excaliburHint: '我们建议将{excalibur}加入任意玩家数量的游戏中，但仅限于有经验玩家的陪伴下使用。',
+    recommendTitle: '推荐角色设置',
+    generalTipsTitle: '一般提示',
+    generalTipsText:
+      '为了丰富的游戏体验，我们建议 <strong>7 到 10 名玩家</strong> 的小组规模，在这里游戏的复杂性和兴奋性真正展现。',
+    newcomersAdvice:
+      '对于新手，建议从 <strong>基本角色</strong> 开始您的 Avalon 之旅。随着您越来越习惯于游戏玩法，可以逐渐引入额外角色，逐步提高复杂性和参与度 <strong>一步一步</strong>。',
+    recommendationAfterFirstGames: '在第一次游戏之后，我们建议按以下顺序添加角色：',
+    offlineSetup: '离线游戏设置：',
+    defaultSetup:
+      '默认设置包括角色：{ merlin }、{ percival } 和 { morgana }。不过，您可以灵活定制游戏，选择最适合您团队的角色。',
   },
   'zh-TW': {
     numberOfPlayers: '玩家人數',
@@ -124,7 +193,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     servantTeam: '忠誠的亞瑟隨從:',
     mordredTeam: '莫德雷德的爪牙:',
     expansions: '擴展:',
-    note: '注意:',
+    note: '注意: ',
     title: '阿瓦隆: 抵抗 - 官方規則',
     gameObjective: '遊戲目標',
     gameDescription:
@@ -152,5 +221,27 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       '通過戰略討論、仔細觀察和聰明的策略，每一方都必須盡力實現他們的目標，而不暴露他們的真實效忠，讓每一輪《阿瓦隆：反抗勢力》的遊戲過程獨特而充滿懸念。',
     assassinNote:
       '在原版中，有一個單獨的角色是<b>刺客</b>。我們建議將此功能委派給任何一個邪惡角色，或由邪惡玩家共同決定。',
+    objectiveArthur: '{goodLoyaltyIcon} 亞瑟忠誠僕人的目標',
+    objectiveMordred: '{evilLoyaltyIcon} 莫德雷德爪牙的目標',
+    missionObjective:
+      '忠誠的{ servant }必須成功完成五個任務中的三個。他們必須共同合作，為每個任務提出小組建議，並對小組組成進行投票，始終努力將叛徒排除在團隊之外，以防止任務失敗。',
+    minionObjective:
+      '{ minion }旨在製造{ servant }之間的不和與不信任。他們的目標是通過潛入團隊和破壞任務，使三個任務失敗。他們必須秘密溝通並制定戰略，誤導忠誠者並對其他玩家的真正忠誠度產生懷疑。',
+    additionalObjectivesTitle: '附加目標',
+    additionalObjectivesDescription:
+      '遊戲因特殊角色而變得更加激烈，例如{ merlin }，他知道爪牙的身份，但必須保持自己的身份秘密，以避免在遊戲結束時被暗殺。莫德雷德的爪牙可以通過正確識別並暗殺{ merlin }在三個任務成功後獲得勝利。',
+    twoFailsNote: '在標有星號 (*) 的任務中，需要兩張失敗 { evilLoyaltyIcon } 卡才能導致任務失敗。',
+    missionSizes: '任務小組人數',
+    excaliburHint: '我們建議將{excalibur}加入任意玩家數量的遊戲中，但僅限於有經驗玩家的陪伴下使用。',
+    recommendTitle: '推薦角色設置',
+    generalTipsTitle: '一般提示',
+    generalTipsText:
+      '為了豐富的遊戲體驗，我們建議 <strong>7 到 10 名玩家</strong> 的小組規模，在這裡遊戲的複雜性和興奮性真正展現。',
+    newcomersAdvice:
+      '對於新手，建議從 <strong>基本角色</strong> 開始您的 Avalon 之旅。隨著您越來越習慣於遊戲玩法，可以逐漸引入額外角色，逐步提高複雜性和參與度 <strong>一步一步</strong>。',
+    recommendationAfterFirstGames: '在第一次遊戲之後，我們建議按以下順序添加角色：',
+    offlineSetup: '離線遊戲設置：',
+    defaultSetup:
+      '默認設置包括角色：{ merlin }、{ percival } 和 { morgana }。不過，您可以靈活定制遊戲，選擇最適合您團隊的角色。',
   },
 };
