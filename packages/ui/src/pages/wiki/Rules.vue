@@ -243,139 +243,146 @@
     </p>
     <Options :roles="roles" :buttonText="$t('options.roles')" />
     <ol class="mt-2">
-      <li>Everyone close your eyes and extend your hand info a fist in front of you.</li>
+      <li>{{ $t('rules.closeEyesExtendHand') }}</li>
       <li>
-        <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong>
+        <strong><PreviewLink target="minion" /></strong>
         <span v-if="roles.oberon || roles.evilLancelot">
-          (not
-          <strong
-            ><PreviewLink v-if="roles.oberon" target="oberon" />
-            <PreviewLink v-if="roles.evilLancelot" target="evilLancelot" /></strong
-          >)</span
-        >
-        open your eyes and look around so that you know all agents of Evil.
+          ({{ $t('rules.except') }}
+          <strong>
+            <PreviewLink v-if="roles.oberon" target="oberon" />
+            <PreviewLink v-if="roles.evilLancelot" target="evilLancelot" /> </strong
+          >)
+        </span>
+        {{ $t('rules.seeAllAgentsOfEvil') }}
       </li>
       <li v-if="roles.evilLancelot">
-        <strong><PreviewLink v-if="roles.evilLancelot" target="evilLancelot" /></strong> - extend your thumb so
-        <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong> will known of you.
+        <strong><PreviewLink target="evilLancelot" /></strong> {{ $t('rules.extendYourThumbSo') }}
+        <strong><PreviewLink target="minion" /></strong> {{ $t('rules.willKnowOfYou') }}
       </li>
       <li>
-        <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong> close your eyes.
+        <strong><PreviewLink target="minion" /></strong> {{ $t('rules.closeEyes') }}
       </li>
       <template v-if="roles.guinevere">
         <li>
-          <strong><PreviewLink target="goodLancelot" /></strong> extend your thumb into the air.
+          <strong><PreviewLink target="goodLancelot" /></strong> {{ $t('rules.extendYourThumbSo') }}
         </li>
         <li>
-          <strong><PreviewLink target="guinevere" /></strong>, open your eyes and look around so that you know both
-          lancelots.
+          <strong><PreviewLink target="guinevere" /></strong> {{ $t('rules.guinevereLookAround') }}
         </li>
       </template>
       <li v-if="roles.evilLancelot">
         <strong>
-          <PreviewLink v-if="roles.evilLancelot" target="evilLancelot" />
-          <template v-if="roles.guinevere"> and <PreviewLink target="goodLancelot" /> </template>
+          <PreviewLink target="evilLancelot" />
+          <template v-if="roles.guinevere">&nbsp;<PreviewLink target="goodLancelot" /> </template>
         </strong>
-        - put your thumb down and re-form your hand into a fist.
+        {{ $t('rules.putYourThumbDown') }}
       </li>
-      <li>All players should have their eyes closed and hands in a fist in front of them.</li>
+      <li>{{ $t('rules.allPlayersShouldHaveEyedClosed') }}</li>
       <template v-if="roles.merlinPure || roles.merlin">
         <li v-if="roles.merlin">
-          <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong>
+          <strong><PreviewLink target="minion" /></strong>
           <span v-if="roles.mordred"
-            >(not <strong><PreviewLink target="mordred" /></strong> himself)</span
+            >&nbsp;({{ $t('rules.except') }} <strong><PreviewLink target="mordred" /></strong>)</span
           >
-          - extend your thumb so that
-          <strong><PreviewLink :target="roles.merlin ? 'merlin' : 'merlinPure'" /></strong> will know of you.
+          {{ $t('rules.extendYourThumbSo') }}
+          <span v-if="roles.merlin"
+            ><strong><PreviewLink target="merlin" /></strong
+          ></span>
+          {{ $t('rules.willKnowOfYou') }}
         </li>
         <template v-if="roles.merlinPure">
           <li>
-            <strong><PreviewLink target="merlinPure" /></strong>, open your eyes to see the agents of evil.
+            <strong><PreviewLink target="merlinPure" /></strong> {{ $t('rules.merlinOpenEyes') }}
           </li>
           <template
             v-for="role in [
               { target: 'oberon' },
               { target: 'lunatic' },
               { target: 'brute' },
-              { target: 'evilLancelot', text: 'Evil Lancelot' },
+              { target: 'evilLancelot' },
               { target: 'trickster' },
               { target: 'morgana' },
+              { target: 'witch' },
             ] as const"
           >
             <li v-if="roles[role.target]">
-              <strong><PreviewLink :target="role.target" :text="'text' in role ? role.text : role.target" /></strong>
-              extend your thumb into the air.
+              <strong><PreviewLink :target="role.target" /></strong>
+              {{ $t('rules.extendYourThumb') }}
             </li>
           </template>
           <li>
-            <span>Ordinary </span><strong><PreviewLink target="minion" text="Minions" /></strong>
-            <span v-if="roles.mordred"
-              >(not <strong><PreviewLink target="mordred" /></strong> himself)</span
-            >
-            - extend your thumb into the air.
+            <span> {{ $t('rules.ordinaryMinion') }}</span
+            >&nbsp;<strong><PreviewLink target="minion" /></strong> {{ $t('rules.extendYourThumb') }}
           </li>
         </template>
         <li v-if="roles.merlin">
-          <strong><PreviewLink target="merlin" /></strong>, open your eyes and see the agents of evil.
+          <strong><PreviewLink target="merlin" /></strong> {{ $t('rules.merlinOpenEyes') }}
         </li>
         <li>
-          <strong><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong> - put your thumbs down and
-          re-form your hands into a fist.
+          <strong><PreviewLink target="minion" /></strong> {{ $t('rules.putYourThumbDown') }}
         </li>
         <li>
-          <strong
-            ><PreviewLink target="merlin" v-if="roles.merlin" /><PreviewLink
-              target="merlinPure"
-              v-if="roles.merlinPure" /></strong
-          >, close your eyes.
+          <span v-if="roles.merlin"
+            ><strong><PreviewLink target="merlin" /></strong
+          ></span>
+          <span v-if="roles.merlinPure"
+            ><strong><PreviewLink target="merlinPure" /></strong
+          ></span>
+          {{ $t('rules.closeEyes') }}
         </li>
         <template v-if="roles.percival">
           <li>
-            <strong
-              ><PreviewLink target="merlin" v-if="roles.merlin" /><PreviewLink
-                target="merlinPure"
-                v-if="roles.merlinPure" /></strong
-            ><span v-if="roles.morgana">
-              and <strong><PreviewLink target="morgana" /></strong></span
-            >, extend your thumb into the air so <strong><PreviewLink target="percival" /></strong> will know you.
+            <span v-if="roles.merlin"
+              ><strong><PreviewLink target="merlin" /></strong
+            ></span>
+            <span v-if="roles.merlinPure"
+              ><strong><PreviewLink target="merlinPure" /></strong
+            ></span>
+            <span v-if="roles.morgana"
+              ><strong>&nbsp;<PreviewLink target="morgana" /></strong
+            ></span>
+            {{ $t('rules.extendYourThumbSo') }} <strong><PreviewLink target="percival" /></strong>
+            {{ $t('rules.willKnowOfYou') }}
           </li>
           <li>
-            <strong><PreviewLink target="percival" /></strong>, open your eyes and see
-            <strong
-              ><PreviewLink target="merlin" v-if="roles.merlin" /><PreviewLink
-                target="merlinPure"
-                v-if="roles.merlinPure" /></strong
-            ><span v-if="roles.morgana">
-              and <strong><PreviewLink target="morgana" /></strong></span
+            <strong><PreviewLink target="percival" /></strong> {{ $t('rules.percivalOpenEyes') }}
+            <span v-if="roles.merlin"
+              ><strong><PreviewLink target="merlin" /></strong
+            ></span>
+            <span v-if="roles.merlinPure"
+              ><strong><PreviewLink target="merlinPure" /></strong
+            ></span>
+            <span v-if="roles.morgana"
+              ><strong>&nbsp;<PreviewLink target="morgana" /></strong></span
             >.
           </li>
           <li>
-            <strong
-              ><PreviewLink target="merlin" v-if="roles.merlin" /><PreviewLink
-                target="merlinPure"
-                v-if="roles.merlinPure" /></strong
-            ><span v-if="roles.morgana">
-              and <strong><PreviewLink target="morgana" /></strong
+            <span v-if="roles.merlin"
+              ><strong><PreviewLink target="merlin" /></strong
             ></span>
-            - put your thumbs down and re-form your hands into a fist.
+            <span v-if="roles.merlinPure"
+              ><strong><PreviewLink target="merlinPure" /></strong
+            ></span>
+            <span v-if="roles.morgana"
+              ><strong>&nbsp;<PreviewLink target="morgana" /></strong
+            ></span>
+            {{ $t('rules.putYourThumbDown') }}
           </li>
           <li>
-            <strong><PreviewLink target="percival" /></strong>, close your eyes.
+            <strong><PreviewLink target="percival" /></strong> {{ $t('rules.closeEyes') }}
           </li>
         </template>
       </template>
       <li v-if="roles.tristan">
-        <strong><PreviewLink target="tristan" /></strong> and <strong><PreviewLink target="isolde" /></strong> open your
-        eyes and look around to know each other.
+        <strong><PreviewLink target="tristan" /> <PreviewLink target="isolde" /></strong>
+        {{ $t('rules.loversOpenEyes') }}
       </li>
-      <li>All players have their eyes closed and hands in a fist in front of them.</li>
-      <li>Everyone open your eyes.</li>
+      <li>{{ $t('rules.allPlayersShouldHaveEyedClosed') }}</li>
+      <li>{{ $t('rules.everyoneOpenEyes') }}</li>
     </ol>
 
     <p>
-      <strong>{{ $t('rules.note') }}</strong> For the purposes of game setup, the term "<strong
-        ><PreviewLink target="minion" text="Minions of Mordred(*)" /></strong
-      >" refers to all agents of Evil unless otherwise stated.
+      <strong>{{ $t('rules.note') }}</strong> <LocalizedTextWrapper keypath="rules.gameSetupNote" />
     </p>
   </div>
 </template>
