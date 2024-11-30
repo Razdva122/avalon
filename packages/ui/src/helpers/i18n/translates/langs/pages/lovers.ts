@@ -4,7 +4,7 @@ import { Dictionary } from '@avalon/types';
 export const lovers: { [key in TLanguage]: Dictionary<string> } = {
   en: {
     title: 'Lovers (Tristan and Isolde)',
-    credits: 'credits to: @Vermilion0',
+    credits: "credits to: {'@'}Vermilion0",
     generalInformation: 'General Information:',
     playingAsTheLovers:
       'Playing as the Lovers, {tristan} and {isolde}, adds a romantic twist to the game. Your bond is strong, as you know each other from the start and are working for the side of good. Yet, this love must be kept secret, if you are both identified, the Assassin can choose to eliminate you instead of Merlin at the end of the game.',
@@ -31,7 +31,7 @@ export const lovers: { [key in TLanguage]: Dictionary<string> } = {
   },
   ru: {
     title: 'Любовники (Тристан и Изольда)',
-    credits: 'благодарность: @Vermilion0',
+    credits: "благодарность: {'@'}Vermilion0",
     generalInformation: 'Общая информация:',
     playingAsTheLovers:
       'Играя в роли любовников, {tristan} и {isolde}, вы добавляете романтический элемент в игру. Ваша связь сильна, так как вы знаете друг друга с самого начала и работаете на стороне добра. Однако эту любовь нужно держать в секрете, если вас обоих идентифицируют, убийца может убить вас вместо Мерлина в конце игры.',
@@ -58,7 +58,7 @@ export const lovers: { [key in TLanguage]: Dictionary<string> } = {
   },
   'zh-CN': {
     title: '恋人（特里斯坦和伊索尔德）',
-    credits: '鸣谢：@Vermilion0',
+    credits: "鸣谢：{'@'}Vermilion0",
     generalInformation: '一般信息：',
     playingAsTheLovers:
       '扮演恋人，{tristan} 和 {isolde}，为游戏添加了浪漫的色彩。你们的关系很牢固，因为从一开始就互相熟识并为善的一方工作。然而，这份爱必须保密，如果你们双方被识别，刺客可以选择在游戏结束时消灭你们而不是梅林。',
@@ -78,7 +78,7 @@ export const lovers: { [key in TLanguage]: Dictionary<string> } = {
   },
   'zh-TW': {
     title: '戀人（特里斯坦和伊索德）',
-    credits: '鳴謝：@Vermilion0',
+    credits: "鳴謝：{'@'}Vermilion0",
     generalInformation: '一般資訊：',
     playingAsTheLovers:
       '扮演戀人，{tristan} 和 {isolde}，為遊戲添加了浪漫的色彩。你們的關係很牢固，因為從一開始就互相熟識並為善的一方工作。然而，這份愛必須保密，如果你們雙方被識別，刺客可以選擇在遊戲結束時消滅你們而不是梅林。',
