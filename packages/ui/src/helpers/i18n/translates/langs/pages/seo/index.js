@@ -10,6 +10,7 @@ const { excalibur } = require('./excalibur');
 const { morgana } = require('./morgana');
 const { percival } = require('./percival');
 const { rules } = require('./rules');
+const { lovers } = require('./lovers');
 
 module.exports = {
   lobby,
@@ -24,4 +25,5 @@ module.exports = {
   morgana,
   percival,
   rules,
+  lovers,
 };

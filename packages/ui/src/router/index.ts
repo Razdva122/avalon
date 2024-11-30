@@ -18,13 +18,13 @@ const routeComponentMap = {
   morgana: () => import('@/pages/wiki/roles/Morgana.vue'),
   percival: () => import('@/pages/wiki/roles/Percival.vue'),
   rules: () => import('@/pages/wiki/Rules.vue'),
+  lovers: () => import('@/pages/wiki/roles/Lovers.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.about, component: () => import('@/pages/about/About.vue') },
   { ...routesSeo.merlin, component: () => import('@/pages/wiki/roles/Merlin.vue') },
   { ...routesSeo['merlin_pure'], component: () => import('@/pages/wiki/roles/MerlinPure.vue') },
-  { ...routesSeo.lovers, component: () => import('@/pages/wiki/roles/Lovers.vue') },
   { ...routesSeo.troublemaker, component: () => import('@/pages/wiki/roles/Troublemaker.vue') },
   { ...routesSeo.servant, component: () => import('@/pages/wiki/roles/Servant.vue') },
   { ...routesSeo.mordred, component: () => import('@/pages/wiki/roles/Mordred.vue') },

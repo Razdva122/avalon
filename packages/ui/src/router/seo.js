@@ -11,6 +11,7 @@ const {
   morgana,
   percival,
   rules,
+  lovers,
 } = require('../../src/helpers/i18n/translates/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -147,10 +148,10 @@ module.exports.routesSeo = {
     priority: 0.3,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Lovers (Tristan and Isolde)',
-      description: "Rules and Tips for Lovers (Tristan and Isolde) roles in the board game 'Avalon: The Resistance'",
-      keywords: ['Lovers', 'Tristan', 'Isolde', 'Role', 'Rules', 'Tips'],
-      image: 'roles/tristan.webp',
+      multiLanguage: {
+        ...lovers,
+      },
+      image: 'roles/isolde.webp',
     },
   },
   lancelots: {

@@ -3,66 +3,34 @@
     <WikiBreadCrumbs />
     <h1>
       <div class="good-loyalty-icon"></div>
-      Lovers (Tristan and Isolde) {{ $t('roles.role') }}
+      {{ $t('lovers.title') }} {{ $t('roles.role') }}
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('isolde')" alt="isolde" />
     <img class="preview-image" :src="calculateRoleUrl('tristan')" alt="tristan" />
-    <div class="credits">credits to: @Vermilion0</div>
+    <div class="credits">{{ $t('lovers.credits') }}</div>
 
-    <h2>General Information:</h2>
+    <h2>{{ $t('lovers.generalInformation') }}</h2>
     <p>
-      Playing as the Lovers, <PreviewLink target="tristan" /> and <PreviewLink target="isolde" />, adds a romantic twist
-      to the game. Your bond is strong, as you know each other from the start and are working for the side of good. Yet,
-      this love must be kept secret, if you are both identified, the Assassin can choose to eliminate you instead of
-      Merlin at the end of the game.
+      <LocalizedTextWrapper keypath="lovers.playingAsTheLovers" />
     </p>
 
-    <h2>General Tips:</h2>
+    <h2>{{ $t('lovers.generalTips') }}</h2>
     <ul>
-      <li>
-        <strong>Maintain individual personas:</strong> Act independently of each other to avoid creating patterns that
-        could lead to your joint discovery.
-      </li>
-      <li>
-        <strong>Protect each other:</strong> Be aware of the game's flow, and if suspicion falls on one, the other
-        should deflect subtly, not overtly.
-      </li>
-      <li>
-        <strong>Disguise your gameplay:</strong> Occasionally vote or argue against each other to dispel any notion of
-        your alliance.
-      </li>
-      <li>
-        <strong>Be careful with meetings:</strong> Avoid private discussions that could be noticed and raise suspicions
-        among other players.
-      </li>
+      <li v-html="$t('lovers.maintainIndividualPersonas')"></li>
+      <li v-html="$t('lovers.protectEachOther')"></li>
+      <li v-html="$t('lovers.disguiseYourGameplay')"></li>
+      <li v-html="$t('lovers.beCarefulWithMeetings')"></li>
     </ul>
 
-    <h2>Strategic Tips:</h2>
+    <h2>{{ $t('lovers.strategicTips') }}</h2>
     <ul>
-      <li>
-        <strong>Divide and conquer:</strong> Take on different roles within the forces of good, gathering and sharing
-        information from different angles.
-      </li>
-      <li>
-        <strong>Coordinate without collusion:</strong> Plan your strategies in a way that does not require constant or
-        obvious coordination.
-      </li>
-      <li>
-        <strong>Establish independent trust:</strong> Each lover should work to gain the trust of other players on their
-        own merits.
-      </li>
-      <li>
-        <strong>Plan for contingency:</strong> Have a strategy in place in case one lover is exposed, to ensure the
-        other can continue effectively.
-      </li>
+      <li v-html="$t('lovers.divideAndConquer')"></li>
+      <li v-html="$t('lovers.coordinateWithoutCollusion')"></li>
+      <li v-html="$t('lovers.establishIndependentTrust')"></li>
+      <li v-html="$t('lovers.planForContingency')"></li>
     </ul>
-
     <p>
-      As the Lovers, <PreviewLink target="tristan" /> and <PreviewLink target="isolde" />, you possess a unique
-      advantage that, if leveraged with skill and subtlety, can greatly aid the forces of good. However, the specter of
-      the Assassin's choice at the game's end looms ever-present. Navigate the treacherous waters of deceit with care,
-      for if your love is unveiled, it may cost you both the ultimate price. Let your bond be your strength, but let
-      discretion be your guide. May your love triumph over evil!
+      <LocalizedTextWrapper keypath="lovers.uniqueAdvantage" />
     </p>
   </div>
 </template>

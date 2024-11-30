@@ -8,6 +8,7 @@ import { excalibur } from '@/helpers/i18n/translates/langs/pages/excalibur';
 import { morgana } from '@/helpers/i18n/translates/langs/pages/morgana';
 import { percival } from '@/helpers/i18n/translates/langs/pages/percival';
 import { rules } from '@/helpers/i18n/translates/langs/pages/rules';
+import { lovers } from '@/helpers/i18n/translates/langs/pages/lovers';
 
 export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
   en: {},
@@ -24,6 +25,7 @@ Object.entries({
   morgana: morgana,
   percival: percival,
   rules: rules,
+  lovers: lovers,
 }).forEach(([key, value]) => {
   Object.keys(pages).forEach((lang) => {
     pages[<TLanguage>lang][key] = value[<TLanguage>lang];
