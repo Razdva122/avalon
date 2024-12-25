@@ -12,6 +12,7 @@ const {
   percival,
   rules,
   lovers,
+  merlin,
 } = require('../../src/helpers/i18n/translates/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -124,9 +125,9 @@ module.exports.routesSeo = {
     priority: 0.7,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Merlin',
-      description: "Rules and Tips for Merlin role in the board game 'Avalon: The Resistance'",
-      keywords: ['Merlin', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...merlin,
+      },
       image: 'roles/merlin.webp',
     },
   },
