@@ -3,7 +3,7 @@
     <img class="player-frame" alt="frame" src="@/assets/player-frame.webp" />
     <div class="player-icon"></div>
     <PlayerIcon v-if="'role' in player" class="role-container" :icon="player.role" />
-    <img class="player-crown" alt="crown" src="@/assets/crown.webp" />
+    <div class="player-crown" alt="crown"></div>
     <div class="player-actions-features">
       <img class="lady-of-lake" alt="lady" src="@/assets/features/lady_of_lake.webp" />
       <img class="excalibur" alt="excalibur" src="@/assets/features/excalibur.webp" />
@@ -291,10 +291,14 @@ export default defineComponent({
 
 .player-crown {
   display: none;
+  background-image: url('@/assets/crown.webp');
+  background-size: contain;
+  background-position: center;
   position: absolute;
   top: -45px;
   left: 5px;
   width: 80px;
+  height: 80px;
   transform: rotate(-15deg);
 }
 

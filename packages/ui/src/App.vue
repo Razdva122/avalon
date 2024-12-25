@@ -34,6 +34,7 @@ import InfoSnackbar from '@/components/feedback/InfoSnackbar.vue';
 import Version from '@/components/feedback/Version.vue';
 import Socials from '@/components/feedback/Socials.vue';
 import SpoilerEye from '@/components/feedback/SpoilerEye.vue';
+import { isHolidays } from '@/helpers/utility';
 
 export default defineComponent({
   components: {
@@ -65,6 +66,11 @@ export default defineComponent({
   },
   created() {
     document.documentElement.lang = this.currentLocale;
+
+    if (isHolidays()) {
+      document.querySelector('#app')?.classList.add('holidays-active');
+      document.querySelector('#overlay')?.classList.add('holidays-active');
+    }
   },
 });
 </script>
@@ -131,5 +137,28 @@ body {
 
 .icon-swap {
   vertical-align: text-bottom;
+}
+
+#app.holidays-active {
+  .player-crown {
+    background-image: url('@/assets/santa-hat.webp');
+    width: 90px;
+    height: 90px;
+    left: 20px;
+  }
+}
+
+#overlay.holidays-active {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('@/assets/holidays-background.webp');
+  background-attachment: fixed;
+  background-size: cover;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.1;
 }
 </style>
