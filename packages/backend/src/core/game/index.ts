@@ -20,6 +20,8 @@ import type {
   TGameOptionsFeatures,
   TAddonsData,
   TGameResults,
+  TVisibleRole,
+  Dictionary,
 } from '@avalon/types';
 
 import type { TRolesAddonsData, TRolesWithAddons, TAdditionalAddons, TAdditionalAddonsData } from '@/core/game/addons';
@@ -93,11 +95,9 @@ export class Game extends GameHooks {
   settings: IGameSettingsWithRoles;
 
   /**
-   * On some stages of the game, the visibility of the roles may change
+   * The intermediate storage where the visible roles opened during the game are stored
    */
-  stageVisibilityChange: TStageVisibilityChange = {
-    end: () => true,
-  };
+  visibleRolesState: Dictionary<Dictionary<TVisibleRole>> = {};
 
   /**
    * A map with a calculation of which role can make a choice at this stage
@@ -420,8 +420,19 @@ export class Game extends GameHooks {
 
     if (winner) {
       this.callHooks('beforeEndGame', () => {
-        this.result = { winner, reason: winner === 'evil' ? 'evilTeamMissions' : 'goodTeamMissions' };
+        if (!this.result) {
+          this.result = { winner, reason: winner === 'evil' ? 'evilTeamMissions' : 'goodTeamMissions' };
+        }
+
         this.stage = 'end';
+
+        this.updateVisibleRolesState(
+          'all',
+          this.players.reduce<Dictionary<TVisibleRole>>((acc, el) => {
+            acc[el.user.id] = el.role.role;
+            return acc;
+          }, {}),
+        );
 
         this.stateObserver.gameStateChanged();
         this.callHooks('afterEndMission');
@@ -501,6 +512,23 @@ export class Game extends GameHooks {
     } else {
       this.stateObserver.gameStateChanged();
     }
+  }
+
+  /**
+   * Updates visible roles state
+   */
+  updateVisibleRolesState(target: string, visiblePlayers: Dictionary<TVisibleRole>): void {
+    this.visibleRolesState[target] = {
+      ...this.visibleRolesState[target],
+      ...visiblePlayers,
+    };
+  }
+
+  /**
+   * Get visible roles state
+   */
+  getVisibleRoleState(observer: string, target: string): TVisibleRole | undefined {
+    return this.visibleRolesState[observer]?.[target];
   }
 
   /**

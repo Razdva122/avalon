@@ -3,7 +3,7 @@ import type { User } from '@/user';
 import type { TRoomState, TGameMethodsParams, TGetLoyaltyData } from '@/core/game-manager/interface';
 import { eventBus } from '@/helpers';
 
-import { TGameStage, Server, IVisualGameState, IPlayer, IGameOptions } from '@avalon/types';
+import { Server, IVisualGameState, IPlayer, IGameOptions, TVisibleRole } from '@avalon/types';
 
 export * from '@/core/game-manager/interface';
 
@@ -34,7 +34,6 @@ export class GameManager {
       addonsData: this.game.addonsData,
       features: this.game.features,
       ...this.prepareHistoryAndPlayerForRoomState(),
-      ...this.calculatePlayersRoles(this.game.stage),
     };
   }
 
@@ -42,16 +41,6 @@ export class GameManager {
    * Handler, the state of the game has changed, need to update the state of the room
    */
   gameStateChanged(): void {
-    /**
-     * Recalculate the roles if on a new stage, if there is an override for it
-     */
-    if (this.game.stageVisibilityChange[this.game.stage]) {
-      this.roomState = {
-        ...this.roomState,
-        ...this.calculatePlayersRoles(this.game.stage),
-      };
-    }
-
     this.roomState.stage = this.game.stage;
 
     this.roomState = {
@@ -111,50 +100,11 @@ export class GameManager {
   }
 
   /**
-   * Calculates the visible roles for all players in the game and available to everyone
-   *
-   * @param newStage - the stage of the game for which you need to calculate the roles
-   */
-  calculatePlayersRoles(newStage: TGameStage): Pick<TRoomState, 'publicRoles' | 'roles'> {
-    const overrideMethod = this.game.stageVisibilityChange[newStage];
-
-    const publicRoles = this.game.players.map((player) => {
-      const overrideRole = overrideMethod ? overrideMethod(newStage, player.role) : false;
-      return overrideRole ? player.role.role : 'unknown';
-    });
-
-    const roles = this.game.players.reduce<TRoomState['roles']>((acc, observer) => {
-      acc[observer.user.id] = this.game.players.map((target) => {
-        const overrideRole = overrideMethod ? overrideMethod(newStage, target.role) : false;
-
-        if (overrideRole) {
-          return target.role.role;
-        }
-
-        if (target === observer) {
-          return target.role.selfRole;
-        }
-
-        return observer.role.visibility[target.role.role] || 'unknown';
-      });
-
-      return acc;
-    }, {});
-
-    return {
-      publicRoles,
-      roles,
-    };
-  }
-
-  /**
    * Transform a state of rooms into a state for a specific user
    *
    * @param [userID] - the ID of the user to prepare the state for
    */
   prepareStateForUser(userID?: string): IVisualGameState {
-    const roles = userID && this.roomState.roles[userID] ? this.roomState.roles[userID] : this.roomState.publicRoles;
-
     return {
       result: this.roomState.result,
       uuid: this.roomState.uuid,
@@ -166,7 +116,7 @@ export class GameManager {
       features: this.roomState.features,
       history: this.roomState.history.map((el) => el({ game: this.game, userID })),
       players: this.roomState.players.map((player, index) => {
-        const playerData: IPlayer = { ...player, role: roles[index] };
+        const playerData: IPlayer = { ...player, role: this.getPlayerVisibleRole(player.id, userID) };
 
         if (player.id === userID) {
           playerData.validMissionsResult = this.game.players[index].role.validMissionResult;
@@ -175,6 +125,28 @@ export class GameManager {
         return playerData;
       }),
     };
+  }
+
+  getPlayerVisibleRole(playerID: string, userID?: string): TVisibleRole {
+    // Role known for all -> Role known for user -> Self Role -> Role known for role -> unknown
+    let role: TVisibleRole | undefined = this.game.getVisibleRoleState('all', playerID);
+
+    if (!role && userID && this.game.players.some((player) => player.user.id === userID)) {
+      const user = this.game.findPlayerByID(userID);
+      const player = this.game.findPlayerByID(playerID);
+
+      if (this.game.getVisibleRoleState(userID, playerID)) {
+        role = this.game.getVisibleRoleState(userID, playerID);
+      } else if (playerID === userID) {
+        role = player.role.selfRole;
+      } else {
+        role = user.role.visibility[player.role.role];
+      }
+    }
+
+    role = role ?? 'unknown';
+
+    return role;
   }
 
   callGameMethods(userID: string, params: TGameMethodsParams): void {

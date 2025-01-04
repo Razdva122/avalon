@@ -280,7 +280,7 @@ export const en = {
   },
   lancelotsHistory: {
     becameEvil: 'became evil',
-    becomeGood: 'become good',
+    becameGood: 'became good',
     lancelotSaveLoyalty: 'remain loyal',
     lancelotsLoyal: 'remained loyalty',
     lancelotsSwap: 'have changed loyalty',

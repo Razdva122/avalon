@@ -4,6 +4,7 @@ import type { IGameSettingsWithRoles } from './settings';
 import type { TAddonsStages, TAddonsData } from './addons';
 import type { TLoyalty } from '../game/roles';
 import type { TGameOptionsFeatures } from '../game/options';
+import { Dictionary } from '../utils';
 
 export interface IVisualGameState {
   result?: TGameResults;
@@ -16,6 +17,7 @@ export interface IVisualGameState {
   players: IPlayer[];
   addonsData: TAddonsData;
   features: TGameOptionsFeatures;
+  debug?: Dictionary<unknown>;
 }
 
 export type TGameResults = {

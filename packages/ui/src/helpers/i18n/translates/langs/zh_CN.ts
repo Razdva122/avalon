@@ -280,7 +280,7 @@ export const zh_CN = {
   },
   lancelotsHistory: {
     becameEvil: '变得邪恶',
-    becomeGood: '变得善良',
+    becameGood: '变得善良',
     lancelotSaveLoyalty: '保持忠诚',
     lancelotsLoyal: '保持忠诚',
     lancelotsSwap: '更改了忠诚',

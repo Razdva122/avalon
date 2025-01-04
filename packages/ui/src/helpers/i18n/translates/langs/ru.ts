@@ -280,7 +280,7 @@ export const ru = {
   },
   lancelotsHistory: {
     becameEvil: 'стал темным',
-    becomeGood: 'стал светлым',
+    becameGood: 'стал светлым',
     lancelotSaveLoyalty: 'сохранил лояльность',
     lancelotsLoyal: 'сохранили лояльность',
     lancelotsSwap: 'сменили лояльность',

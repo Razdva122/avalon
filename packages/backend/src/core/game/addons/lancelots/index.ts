@@ -1,4 +1,4 @@
-import { IGameAddon } from '@/core/game/addons/interface';
+import { IGameAddon, TAddonPriority } from '@/core/game/addons/interface';
 import { Game } from '@/core/game';
 import type { TSwitchesArray } from '@/core/game/addons/lancelots/interface';
 import { SwitchLancelots } from '@/core/game/addons/lancelots/switch-lancelots';
@@ -11,16 +11,13 @@ export class LancelotsAddon implements IGameAddon {
   pointer: number = 0;
   game: Game;
 
+  priority: TAddonPriority = {
+    beforeEndGame: 'high',
+  };
+
   constructor(game: Game) {
     this.game = game;
     this.switches = _.shuffle([true, true, false, false, false]);
-  }
-
-  afterInit() {
-    // On switchLancelots stage roles can change
-    this.game.stageVisibilityChange.switchLancelots = () => false;
-
-    return of(true);
   }
 
   beforeSelectTeam() {

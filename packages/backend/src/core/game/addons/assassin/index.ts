@@ -5,7 +5,7 @@ import { Assassinate } from '@/core/game/addons/assassin/assassinate';
 import { Game } from '@/core/game';
 import { Subject, of } from 'rxjs';
 
-import type { TAssassinateType, TAssassinAddonData, TGameEndReasons } from '@avalon/types';
+import type { TAssassinateType, TAssassinAddonData, TGameEndReasons, Dictionary, TVisibleRole } from '@avalon/types';
 
 import type { TAssassinateOptions } from '@/core/game/addons/assassin/interface';
 
@@ -35,8 +35,6 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
   }
 
   afterInit() {
-    // On assassinate stage all minions are visible
-    this.game.stageVisibilityChange.assassinate = (_stage, role) => role.loyalty === 'evil';
     // On assassinate stage assassin can select players
     this.game.selectAvailable.assassinate = (player) => Boolean(player.features.isAssassin);
 
@@ -52,6 +50,15 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
 
       assassin.features.isAssassin = true;
       assassin.features.waitForAction = true;
+
+      const visibleEvil = this.game.players
+        .filter((player) => player.role.loyalty === 'evil')
+        .reduce<Dictionary<TVisibleRole>>((acc, el) => {
+          acc[el.user.id] = el.role.role;
+          return acc;
+        }, {});
+
+      this.game.updateVisibleRolesState('all', visibleEvil);
 
       this.game.stateObserver.gameStateChanged();
       return this.assassinateSubject.asObservable();
@@ -101,10 +108,9 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
     }
 
     assassin.features.waitForAction = false;
-    this.game.stage = 'end';
 
     this.game.history.push(assassinate);
     this.game.stateObserver.gameStateChanged();
-    this.assassinateSubject.next(false);
+    this.assassinateSubject.next(true);
   }
 }
