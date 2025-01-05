@@ -21,4 +21,10 @@ module.exports.excalibur = {
     description: '《阿瓦隆：反抗勢力》中“神劍”卡牌規則。《反抗組織》中“軍士”卡牌規則。',
     keywords: ['扩展', '附加组件', '附加組件', '模組', '神劍', '軍士', '規則'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Excalibur',
+    description:
+      "Reglas para la carta 'Excalibur' en 'Avalon: La Resistencia'. Reglas para la carta 'Sargento' en 'La Resistencia'",
+    keywords: ['Expansiones', 'Complementos', 'Módulo', 'Excalibur', 'Sargento', 'Reglas'],
+  },
 };

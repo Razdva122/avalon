@@ -23,4 +23,10 @@ module.exports.expansions = {
       '通过令人兴奋的扩展包和额外卡牌来增强《阿瓦隆：反抗组织》。了解每个扩展如何让你的游戏更加精彩，并带来新的挑战。',
     keywords: ['扩展', '附加组件', '模块', '规则'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Expansiones para el juego',
+    description:
+      "Mejora 'Avalon: La Resistencia' con emocionantes expansiones y cartas adicionales. Descubre cómo cada adición puede animar tus sesiones de juego y traer nuevos desafíos a la mesa.",
+    keywords: ['Expansiones', 'Complementos', 'Módulo', 'Reglas'],
+  },
 };

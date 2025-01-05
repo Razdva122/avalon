@@ -21,4 +21,10 @@ module.exports.wiki = {
     description: '您的一站式「阿瓦隆：反抗组织」维基资源。查找有关玩阿瓦隆的详细指南、规则解释和策略提示。',
     keywords: ['维基', '规则', '怎么玩'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Wiki',
+    description:
+      "Su recurso confiable de wiki para 'Avalon: La Resistencia'. Encuentre guías detalladas sobre cómo jugar Avalon, explicaciones de las reglas y consejos de estrategia.",
+    keywords: ['Wiki', 'Reglas', 'Cómo jugar'],
+  },
 };

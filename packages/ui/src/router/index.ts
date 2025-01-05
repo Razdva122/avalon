@@ -88,6 +88,7 @@ const defaultKeywords: { [key in Lowercase<TLanguage>]: string[] } = {
   ru: ['Сопротивление', 'Авалон', 'Онлайн', 'Настольная Игра'],
   'zh-tw': ['反抗勢力', '亞瓦隆', '在線', '桌遊'],
   'zh-cn': ['反抗组织', '阿瓦隆', '在线', '桌游'],
+  es: ['La Resistencia', 'Avalon', 'En línea', 'Juego de mesa'],
 };
 
 router.beforeEach((to, from, next) => {

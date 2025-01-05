@@ -21,4 +21,10 @@ module.exports.roles = {
     description: '桌游《阿瓦隆：反抗组织》的所有可用角色。角色规则：梅林、派西维尔、莫甘娜、奥伯伦、莫德雷德',
     keywords: ['角色', '规则', '梅林', '派西维尔', '莫甘娜', '奥伯伦', '莫德雷德', '提示'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Roles',
+    description:
+      "Todos los roles disponibles en el juego de mesa 'Avalon: La Resistencia'. Reglas para los roles: Merlín, Perceval, Morgana, Oberón, Mordred",
+    keywords: ['Roles', 'Reglas', 'Merlín', 'Perceval', 'Morgana', 'Oberón', 'Mordred', 'Consejos'],
+  },
 };

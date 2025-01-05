@@ -162,4 +162,47 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
     servingAsLancelotDescription:
       '作為蘭斯洛特，你擁有強大的雙重身份，可以顯著改變阿瓦隆中的遊戲進程。隨著忠誠的潛在變化，你的角色提供了獨特的戰略深度。謹慎行事，因為善與惡的平衡掌握在你的裝甲肩膀上。',
   },
+  es: {
+    generalInformationTitle: 'Información General:',
+    introduction:
+      'Los Lancelots presentan un desafío dinámico en el reino de Avalon. Siendo dos jugadores que comienzan en lados opuestos, el {goodLancelot} se alinea con las fuerzas del bien, mientras que el {evilLancelot} conspira con los secuaces de Mordred.',
+    loyaltyTides:
+      'Sin embargo, las mareas de lealtad pueden cambiar a medida que avanza el juego. {merlin} puede ver al {evilLancelot} entre las filas de los seguidores de Mordred, y los secuaces de Mordred reconocen la presencia de un {evilLancelot}.',
+    goodAndEvilRecognition: 'Por otro lado, el {evilLancelot} no conoce a sus aliados.',
+    guinevereKnowledge:
+      'Si {guinevere} está presente en el juego, ella conoce a ambos Lancelots pero no conoce su lealtad.',
+    gameplayKeyConcept:
+      'El elemento clave del juego de los Lancelots es el mazo de cambio de lealtad. Después de la segunda misión, se roba una carta.',
+    loyaltyChangeMechanism:
+      "Si se revela una carta de <span class='material-icons icon-swap'>swap_horiz</span><b>cambio de lealtad</b>, los Lancelots cambian de bando junto con todos los cambios correspondientes (como la habilidad de fallar una misión, o estar sujeto a la carta de la Dama del Lago).",
+    deckComposition:
+      "Mientras que, si la carta robada es <span class='material-icons icon-swap'>close</span><b>en blanco</b>, no ocurre ningún cambio. El mazo contiene <b>cinco cartas</b>, de las cuales dos provocan un <span class='material-icons icon-swap'>swap_horiz</span><b>cambio de lealtad</b>, y tres son <span class='material-icons icon-swap'>close</span><b>en blanco</b>.",
+    loyaltyShiftDescription:
+      'Es importante destacar que un cambio de lealtad no altera cómo los otros jugadores te perciben, {merlin} y los secuaces de Mordred seguirán viendo al {evilLancelot} original en su rol inicial.',
+    generalTipsTitle: 'Consejos Generales:',
+    embraceUnpredictabilityTitle: 'Abraza la imprevisibilidad:',
+    embraceUnpredictabilityDescription:
+      'Como un Lancelot, la imprevisibilidad es tu elemento. Usa el potencial de cambiar de bando a tu favor.',
+    dualityOfRolesTitle: 'Dualidad de roles:',
+    dualityOfRolesDescription:
+      'Recuerda tu rol inicial pero adáptate rápidamente si se roba una carta de cambio de lealtad. Tu nuevo rol debe ser jugado de manera convincente para evitar sospechas.',
+    observeAndAdaptTitle: 'Observa y adapta:',
+    observeAndAdaptDescription:
+      'Ambos Lancelots deben monitorear de cerca la narrativa del juego para realinear efectivamente sus estrategias tras cualquier cambio de lealtad.',
+    subtlePlaysTitle: 'Jugadas sutiles:',
+    subtlePlaysDescription:
+      'Ya sea socavando una misión sutilmente como malvado o reforzándola como bueno, el arte del disfraz es crucial. Pasa desapercibido en tus acciones para preservar tu nueva lealtad.',
+    strategicTipsTitle: 'Consejos Estratégicos:',
+    merlinsPerceptionTitle: 'Percepción de Merlin:',
+    merlinsPerceptionDescription:
+      'Si eres el {evilLancelot} y te vuelves bueno, recuerda que {merlin} todavía te percibe como parte del mal. Usa esto a tu favor.',
+    balanceTheScalesTitle: 'Equilibra las balanzas:',
+    balanceTheScalesDescription:
+      'Juega un papel activo en las votaciones y propuestas de misiones para ejercer influencia sutilmente, inclinando las balanzas a favor de tu lado actual.',
+    maintainYourCoverTitle: 'Mantén tu cobertura:',
+    maintainYourCoverDescription:
+      'Si cambias al lado del mal, ten cuidado de no cambiar abruptamente tu comportamiento. Los cambios graduales son menos visibles.',
+    servingAsLancelotDescription:
+      'Sirviendo como un Lancelot, mantienes una poderosa doble identidad que puede cambiar dramáticamente el curso del juego en Avalon. Con el potencial de cambiar de lealtades, tu rol invita a una profundidad estratégica como ninguna otra. Avanza con precaución, pues el equilibrio del bien y del mal recae sobre tus hombros acorazados.',
+  },
 };

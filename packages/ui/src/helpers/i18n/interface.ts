@@ -1,1 +1,1 @@
-export type TLanguage = 'en' | 'zh-TW' | 'zh-CN' | 'ru';
+export type TLanguage = 'en' | 'zh-TW' | 'zh-CN' | 'ru' | 'es';

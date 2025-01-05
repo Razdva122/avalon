@@ -21,4 +21,10 @@ module.exports.lady = {
     description: '《阿瓦隆：反抗组织》中「湖中仙女」卡牌的规则。《反抗势力》中的「审问标记」卡牌规则。',
     keywords: ['扩展', '附加组件', '模块', '湖中仙女', '审问标记', '规则'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Dama del Lago',
+    description:
+      "Reglas para la carta 'Dama del Lago' en 'Avalon: La Resistencia'. Reglas para la carta 'Ficha de Inquisidor' en 'La Resistencia'",
+    keywords: ['Expansiones', 'Complementos', 'Módulo', 'Dama del Lago', 'Ficha de Inquisidor', 'Reglas'],
+  },
 };

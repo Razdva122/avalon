@@ -19,4 +19,9 @@ module.exports.game = {
     description: '《阿瓦隆：反抗组织》的在线游戏房间',
     keywords: ['游戏'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Juego',
+    description: "Salas para juegos en línea en 'Avalon: La Resistencia'",
+    keywords: ['Juego'],
+  },
 };

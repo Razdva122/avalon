@@ -23,4 +23,10 @@ module.exports.about = {
       '探索 avalon-game.com：这是一个专注于“阿瓦隆：反抗组织”的综合平台。了解我们的网站、其功能，以及我们如何聚集全球的阿瓦隆爱好者。',
     keywords: ['关于我们', '信息', '规则'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Sobre nosotros',
+    description:
+      "Sumérgete en avalon-game.com: una plataforma integral dedicada a 'Avalon: La Resistencia'. Descubre la historia detrás del juego, sus reglas oficiales y cómo reunimos a entusiastas de Avalon en todo el mundo.",
+    keywords: ['Sobre nosotros', 'Información', 'Reglas'],
+  },
 };

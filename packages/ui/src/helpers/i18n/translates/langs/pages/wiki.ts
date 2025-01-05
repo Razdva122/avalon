@@ -116,4 +116,37 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     victoryConditions: '勝利條件',
     determineWinner: '<b>10. 確定贏家</b>: 當一方完成三次任務或刺客在好方獲勝後正確識別梅林時，遊戲結束。',
   },
+  es: {
+    rules: 'Reglas',
+    roles: 'Roles',
+    rolesTitle: 'Todos los Roles en el Juego de Mesa Avalon',
+    rolesInfo:
+      'Cada rol tiene sus propias características y objetivos, haciendo que el juego sea diverso y emocionante. A continuación se presentan todos los roles disponibles en el juego de mesa Avalon.',
+    addons: 'Expansiones',
+    addonsTitle: 'Expansiones para el Juego de Mesa Avalon',
+    addonsInfo:
+      'Añadir elementos como {ladyOfLake} y {excalibur} amplía las posibilidades estratégicas y aporta más intriga al juego. A continuación se muestran las páginas para cada expansión.',
+    title: 'Avalon: La Resistencia - Lógica Central del Juego',
+    setup: 'Configuración del Juego',
+    playerAssignment:
+      '<b>1. Asignación de Jugadores</b>: Asigna a cada jugador un rol de personaje aleatorio, determinando su lealtad.',
+    revealPhase:
+      '<b>2. Fase de Revelación</b>: Los jugadores obtienen información según las habilidades de su personaje.',
+    missionSelection: 'Selección de Misión',
+    leaderSelection: '<b>3. Selección de Líder</b>: Rota el papel de líder entre los jugadores.',
+    teamProposal: '<b>4. Propuesta de Equipo</b>: El líder actual propone un equipo para la misión.',
+    voteTeam: '<b>5. Votación sobre el Equipo</b>: Todos los jugadores votan sobre si aprueban el equipo de la misión.',
+    missionPhase: 'Fase de Misión',
+    missionOutcome:
+      '<b>6. Resultado de la Misión</b>: Los miembros del equipo asignado eligen en secreto el resultado de la misión.',
+    revealMissionResult: '<b>7. Revelar Resultado de la Misión</b>: Se anuncia el éxito o fracaso de la misión.',
+    specialRolesInteractions: 'Interacciones de Roles Especiales',
+    usingSpecialAbilities:
+      '<b>8. Uso de Habilidades Especiales</b>: Los personajes especiales pueden usar sus habilidades en momentos designados.',
+    assassinationPhase:
+      '<b>9. Fase de Asesinato</b>: Si el lado bueno asegura tres misiones, el Asesino tiene la oportunidad de identificar a Merlín para ganar para el lado malvado.',
+    victoryConditions: 'Condiciones de Victoria',
+    determineWinner:
+      '<b>10. Determinar Ganador</b>: El juego concluye cuando un lado asegura tres misiones o el Asesino identifica correctamente a Merlín después de las victorias del lado bueno.',
+  },
 };

@@ -19,4 +19,9 @@ module.exports.merlin = {
     description: '桌游《阿瓦隆：反抗组织》中梅林角色的规则和建议',
     keywords: ['梅林', '角色', '规则', '建议'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Merlín',
+    description: "Reglas y consejos para el rol de Merlín en el juego de mesa 'Avalon: La Resistencia'",
+    keywords: ['Merlín', 'Rol', 'Reglas', 'Consejos'],
+  },
 };

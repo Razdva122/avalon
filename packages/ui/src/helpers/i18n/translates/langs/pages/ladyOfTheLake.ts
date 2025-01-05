@@ -91,4 +91,27 @@ export const lady: { [key in TLanguage]: Dictionary<string> } = {
     strategicPossibilities:
       ' 使用{ladyOfLake}為游戏增添了戰略性的可能性。玩家可以使用獲得的信息制定行動計劃，試圖識別參加者中的叛徒。',
   },
+  es: {
+    intro:
+      ' es una expansión que introduce un nuevo elemento estratégico y proporciona la capacidad de obtener información adicional sobre las lealtades de otros jugadores. Se utiliza en <strong>juegos con 7 o más</strong> participantes y añade más profundidad al juego.',
+    title: 'Reglas para usar "Dama del Lago" (Ficha de Inquisidor en \'La Resistencia\'):',
+    whenToUseIt: 'Cuándo Usarla:',
+    comesIntoPlay:
+      ' La {ladyOfLake} entra en juego después de que se completa la segunda misión. Esto significa que está disponible a partir de la tercera ronda del juego.',
+    selectingTheHolder: 'Seleccionando al Portador:',
+    initiallyGetsPlayer:
+      ' Inicialmente, la {ladyOfLake} es otorgada al jugador a la derecha del primer líder. El jugador que recibe el título de {ladyOfLake} utiliza su poder al final de cada ronda (después de la segunda), pasándola a otro jugador que aún no haya recibido la {ladyOfLake}.',
+    applyingTheAbility: 'Aplicación de la Habilidad:',
+    choosesPlayer:
+      ' El dueño de la {ladyOfLake} elige a otro jugador y aprende secretamente su rol — si ese jugador es un Servidor de Arturo (bueno) o un Secuaz de Mordred (malo).',
+    passingTheLady: 'Pasando la "Dama del Lago":',
+    passesToChecked:
+      ' Después de usar su habilidad, el dueño de {ladyOfLake} la pasa al jugador cuya lealtad acaba de ser comprobada. Este jugador usará entonces {ladyOfLake} en la siguiente ronda.',
+    restrictionRecurrent: 'Restricción sobre Comprobaciones Recurrentes:',
+    cannotCheckAgain:
+      ' Un jugador que ya ha recibido la {ladyOfLake} no puede ser comprobado de nuevo. Esta regla ayuda a asegurar que en cada ronda se revele nueva información sobre un jugador diferente.',
+    strategicUse: 'Uso Estratégico:',
+    strategicPossibilities:
+      ' El uso de la {ladyOfLake} añade posibilidades estratégicas al juego. Los jugadores pueden usar la información obtenida para planificar sus acciones, tratando de identificar a los traidores entre los participantes.',
+  },
 };

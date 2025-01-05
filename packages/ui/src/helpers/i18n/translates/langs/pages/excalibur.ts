@@ -80,4 +80,24 @@ export const excalibur: { [key in TLanguage]: Dictionary<string> } = {
     strategicInstructions:
       '擁有 {excalibur} 為遊戲增加了戰略深度，使一個玩家可以通過影響好和壞角色的行為，潛在地改變遊戲進程。{excalibur} 可以成為影響任務投票結果的關鍵因素，特別是在遊戲的重要時刻。',
   },
+  es: {
+    intro:
+      '{excalibur} introduce una capa adicional de estrategia e interacción entre los jugadores. Complementa las reglas básicas del juego y ofrece nuevas posibilidades a lo largo de la partida.',
+    title: 'Reglas para usar "Excalibur" (Sargento en \'La Resistencia\'):',
+    assign: 'Asignación de "Excalibur":',
+    leaderInstructions:
+      ' Antes de que comience la misión, el líder de la misión selecciona a un participante de los asignados a la misión para recibir {excalibur}. El líder debe pasar {excalibur} a alguien más en la misión además de ellos mismos.',
+    voting: 'Votación para la Misión:',
+    votingInstructions:
+      ' Todos los jugadores en la mesa saben a quién se le ha dado {excalibur} y proceden a votar a favor o en contra de la misión.',
+    usage: 'Uso de Excalibur:',
+    usageInstructions:
+      ' Después de que todos los participantes de la misión hayan hecho su elección (éxito o fracaso), es el turno del poseedor de {excalibur}, quien tiene la oportunidad de cambiar el voto presentado de cualquier participante.',
+    transparency: 'Transparencia de Excalibur:',
+    transparencyInstructions:
+      ' Todos en la mesa pueden ver si {excalibur} fue utilizado. Si {excalibur} fue desplegado, todos los jugadores saben sobre quién se utilizó, pero solo el poseedor de {excalibur} y la persona objetivo saben cuál fue el voto original. El resto de los jugadores solo puede especular basándose en el resultado de la misión.',
+    strategicValue: 'Valor Estratégico:',
+    strategicInstructions:
+      ' Poseer {excalibur} agrega profundidad estratégica al juego al permitir que un jugador potencialmente altere el curso del juego al influir en las acciones de personajes tanto buenos como malos. {excalibur} puede ser un factor decisivo en los resultados de las votaciones de misiones, especialmente durante momentos críticos en el juego.',
+  },
 };

@@ -19,4 +19,10 @@ module.exports.lovers = {
     description: '桌遊《阿瓦隆：反抗勢力》中戀人（特里斯坦和伊索爾德）角色的規則和建議。',
     keywords: ['戀人', '特里斯坦', '伊索爾德', '角色', '規則', '提示'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Amantes (Tristán e Isolda)',
+    description:
+      "Reglas y consejos para los roles de Amantes (Tristán e Isolda) en el juego de mesa 'Avalon: La Resistencia'",
+    keywords: ['Amantes', 'Tristán', 'Isolda', 'Rol', 'Reglas', 'Consejos'],
+  },
 };

@@ -231,6 +231,7 @@ export default defineComponent({
 .options {
   background-color: rgb(var(--v-theme-surface));
   width: 100%;
+  max-width: 100vw;
   min-height: 530px;
 }
 

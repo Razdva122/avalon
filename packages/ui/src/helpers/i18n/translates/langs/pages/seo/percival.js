@@ -19,4 +19,9 @@ module.exports.percival = {
     description: '桌游《阿瓦隆：反抗组织》中派西维尔角色的规则和建议',
     keywords: ['派西维尔', '角色', '规则', '建议'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Perceval',
+    description: "Reglas y consejos para el rol de Perceval en el juego de mesa 'Avalon: La Resistencia'",
+    keywords: ['Perceval', 'Rol', 'Reglas', 'Consejos'],
+  },
 };

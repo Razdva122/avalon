@@ -15,4 +15,8 @@ module.exports.notFound = {
     title: '阿瓦隆：反抗组织 | 404',
     description: '页面未找到 =(',
   },
+  es: {
+    title: 'Avalon: La Resistencia | 404',
+    description: 'Página no encontrada =(',
+  },
 };

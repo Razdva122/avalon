@@ -17,6 +17,7 @@ export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
   ru: {},
   'zh-CN': {},
   'zh-TW': {},
+  es: {},
 };
 
 Object.entries({

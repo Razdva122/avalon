@@ -19,4 +19,9 @@ module.exports.lancelots = {
     description: '桌游《阿瓦隆：反抗组织》中兰斯洛特角色的规则和建议',
     keywords: ['兰斯洛特', '角色', '规则', '建议'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Lancelots',
+    description: "Reglas y consejos para los roles de Lancelots en el juego de mesa 'Avalon: La Resistencia'",
+    keywords: ['Lancelots', 'Rol', 'Reglas', 'Consejos'],
+  },
 };

@@ -21,4 +21,10 @@ module.exports.lobby = {
     description: '探索传说中的策略推理游戏「阿瓦隆：反抗组织」——免费在线游戏。学习规则，加入充满活力的社群。',
     keywords: ['玩'],
   },
+  es: {
+    title: '¡Juega a Avalon en línea!',
+    description:
+      "Explora el legendario juego de deducción estratégica con 'Avalon: La Resistencia' — gratis para jugar en línea. Aprende las reglas, únete a una comunidad llena de energía.",
+    keywords: ['Jugar'],
+  },
 };

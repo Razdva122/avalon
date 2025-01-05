@@ -19,4 +19,9 @@ module.exports.morgana = {
     description: '桌游《阿瓦隆：反抗组织》中莫甘娜角色的规则和建议',
     keywords: ['莫甘娜', '角色', '规则', '建议'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Morgana',
+    description: "Reglas y consejos para el rol de Morgana en el juego de mesa 'Avalon: La Resistencia'",
+    keywords: ['Morgana', 'Rol', 'Reglas', 'Consejos'],
+  },
 };

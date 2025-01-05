@@ -74,4 +74,22 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
     disclaimerContent:
       '这是一个基于爱好的粉丝，非商业项目。所有内容，包括我们遵循的规则，均受原始桌面游戏启发，但所有图形和插图均由我们独自创造。本站与正式发布商无关，也未经授权。我们尊重原创作者并认识到所有相关商标和版权属于其各自所有者。',
   },
+  es: {
+    title: 'Acerca de',
+    content:
+      'Bienvenido a <b>avalon-game.com</b>, tu principal destino para jugar <b>"Avalon: La Resistencia"</b> en línea con amigos y otros entusiastas. Nuestra plataforma ofrece una experiencia de juego fluida e inmersiva, completamente gratuita y sin distracciones de anuncios.',
+    description:
+      '<b>"Avalon: La Resistencia"</b> es un fascinante juego de mesa de estrategia y engaño, ambientado en la legendaria era del Rey Arturo y sus Caballeros de la Mesa Redonda. Diseñado para 5 a 10 jugadores, te invita a un mundo dividido donde eres un leal servidor de Arturo esforzándote por proteger el reino o un astuto secuaz de Mordred tramando su caída. El juego es célebre por incorporar identidades secretas, el engaño estratégico y el desafío deductivo de discernir aliados de enemigos.',
+    roles:
+      'Nuestro sitio replica todo el espectro de roles encontrados en el juego de mesa tradicional, incluyendo {merlin}, {percival}, {troublemaker}, {oberon}, {lunatic}, {brute}, {mordred}, {morgana}, {trickster}, {goodLancelot} y {evilLancelot}, asegurando una experiencia auténtica de Avalon. También hemos integrado las expansiones del juego, {ladyOfLake} y {excalibur} para enriquecer tu experiencia de juego.',
+    extraRoles:
+      'Exclusivamente en nuestra plataforma hay roles adicionales que no están en el juego original - {merlinPure}, {guinevere}, {witch} y {tristan} + {isolde} (los Amantes) - aportando nuevas dinámicas y estrategias para que tú y tu equipo exploren.',
+    features:
+      'Para mejorar tu juego estratégico, ofrecemos una función de Historia, que permite a los jugadores revisar movimientos pasados y mejorar su estrategia contra la oposición. Además, nuestro Modo Spoiler asegura que puedas jugar en el mismo espacio físico que otros jugadores sin revelar tu rol ni comprometer el resultado del juego.',
+    code: 'El código del proyecto se puede ver en ',
+    contact: 'Puedes contactarme a través de ',
+    disclaimerTitle: 'Aviso legal',
+    disclaimerContent:
+      'Este es un proyecto no comercial creado por fans por amor al juego. Todo el contenido, incluidas las reglas que seguimos, está inspirado en el juego de mesa original, pero todos los gráficos e ilustraciones son únicos nuestros. Este sitio no está afiliado ni respaldado por los editores oficiales. Respetamos a los creadores originales y reconocemos que todas las marcas registradas y derechos de autor relacionados pertenecen a sus respectivos propietarios.',
+  },
 };

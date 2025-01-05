@@ -96,4 +96,31 @@ export const lovers: { [key in TLanguage]: Dictionary<string> } = {
     uniqueAdvantage:
       '作為戀人，{tristan} 和 {isolde}，你們擁有獨特的優勢，如果能夠巧妙地運用，將大大幫助善良力量。然而，刺客在遊戲結束時的選擇始終存在。小心航行於詭譎的欺騙之海，因為如果你的愛被揭示，這可能會讓你們付出最高的代價。讓你的關係成為你的力量，但要讓謹慎成為你的指引。願你的愛超越邪惡！',
   },
+  es: {
+    title: 'Amantes (Tristán e Isolda)',
+    credits: "créditos a: {'@'}Vermilion0",
+    generalInformation: 'Información General:',
+    playingAsTheLovers:
+      'Jugar como los Amantes, {tristan} y {isolde}, añade un giro romántico al juego. Tu vínculo es fuerte, ya que se conocen desde el principio y trabajan para el lado del bien. Sin embargo, este amor debe mantenerse en secreto; si ambos son identificados, el Asesino puede elegir eliminarlos a ustedes en lugar de a Merlín al final del juego.',
+    generalTips: 'Consejos Generales:',
+    maintainIndividualPersonas:
+      '<strong>Mantener personalidades individuales:</strong> Actúen de manera independiente para evitar crear patrones que puedan llevar a su descubrimiento conjunto.',
+    protectEachOther:
+      '<strong>Protéjanse mutuamente:</strong> Estén atentos al flujo del juego, y si la sospecha recae sobre uno, el otro debe desviar sutilmente, no de manera obvia.',
+    disguiseYourGameplay:
+      '<strong>Disfarzar su juego:</strong> De vez en cuando voten o discutan en contra del otro para disipar cualquier noción de su alianza.',
+    beCarefulWithMeetings:
+      '<strong>Cuidado con las reuniones:</strong> Eviten discusiones privadas que podrían ser notadas y levantar sospechas entre otros jugadores.',
+    strategicTips: 'Consejos Estratégicos:',
+    divideAndConquer:
+      '<strong>Divide y vencerás:</strong> Asuman diferentes roles dentro de las fuerzas del bien, reuniendo y compartiendo información desde diferentes ángulos.',
+    coordinateWithoutCollusion:
+      '<strong>Coordinen sin colusión:</strong> Planifiquen sus estrategias de manera que no requieran coordinación constante u obvia.',
+    establishIndependentTrust:
+      '<strong>Establezcan confianza independiente:</strong> Cada amante debería trabajar para ganar la confianza de otros jugadores por sus propios méritos.',
+    planForContingency:
+      '<strong>Plan para contingencias:</strong> Tengan una estrategia en caso de que uno de los amantes sea descubierto, para asegurar que el otro pueda continuar efectivamente.',
+    uniqueAdvantage:
+      'Como los Amantes, {tristan} y {isolde}, poseen una ventaja única que, si se maneja con habilidad y sutileza, puede ayudar en gran medida a las fuerzas del bien. Sin embargo, la sombra de la elección del Asesino al final del juego siempre está presente. Naveguen con cuidado por las traicioneras aguas del engaño, porque si su amor se revela, puede costarles el precio máximo. Que su vínculo sea su fuerza, pero que la discreción sea su guía. ¡Que su amor triunfe sobre el mal!',
+  },
 };

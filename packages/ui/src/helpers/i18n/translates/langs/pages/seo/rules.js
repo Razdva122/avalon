@@ -23,4 +23,10 @@ module.exports.rules = {
       '了解桌游“阿瓦隆：反抗组织”的完整规则，包括针对不同玩家数量的游戏设置指南、角色组合以及胜利的基本原则。便捷的离线游戏设置选项将帮助您创造理想的游戏条件，并充分发挥这款经典策略游戏的潜力。',
     keywords: ['维基', '规则', '怎么玩'],
   },
+  es: {
+    title: 'Avalon: La Resistencia | Reglas',
+    description:
+      "Descubre las reglas completas del juego de mesa 'Avalon: La Resistencia', incluyendo una guía para configurar el juego para diferentes números de jugadores, combinaciones de roles y los principios básicos de la victoria. Opciones de configuración convenientes para tus juegos offline te ayudarán a crear las condiciones perfectas de juego y a desbloquear todo el potencial de este clásico juego de estrategia.",
+    keywords: ['Wiki', 'Reglas', 'Cómo jugar'],
+  },
 };
