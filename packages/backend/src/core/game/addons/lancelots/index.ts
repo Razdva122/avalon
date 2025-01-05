@@ -32,6 +32,7 @@ export class LancelotsAddon implements IGameAddon {
       this.game.history.push(switchLancelots);
 
       if (currentSwitch) {
+        this.updateRolesVisibility();
         goodLancelot.role.selfRole = 'evilLancelot';
         goodLancelot.role.loyalty = 'evil';
         evilLancelot.role.selfRole = 'goodLancelot';
@@ -43,6 +44,18 @@ export class LancelotsAddon implements IGameAddon {
     }
 
     return of(true);
+  }
+
+  updateRolesVisibility() {
+    this.game.players.forEach((player) => {
+      if (player.role.visibility.evilLancelot === 'evilLancelot') {
+        player.role.visibility.evilLancelot = 'goodLancelot';
+      }
+
+      if (player.role.visibility.goodLancelot === 'goodLancelot') {
+        player.role.visibility.goodLancelot = 'evilLancelot';
+      }
+    });
   }
 
   beforeEndGame() {

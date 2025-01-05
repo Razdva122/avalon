@@ -426,13 +426,7 @@ export class Game extends GameHooks {
 
         this.stage = 'end';
 
-        this.updateVisibleRolesState(
-          'all',
-          this.players.reduce<Dictionary<TVisibleRole>>((acc, el) => {
-            acc[el.user.id] = el.role.role;
-            return acc;
-          }, {}),
-        );
+        this.openAllRoles();
 
         this.stateObserver.gameStateChanged();
         this.callHooks('afterEndMission');
@@ -454,6 +448,7 @@ export class Game extends GameHooks {
       reason: 'manualy',
     };
     this.stage = 'end';
+    this.openAllRoles();
     this.stateObserver.gameStateChanged();
   }
 
@@ -529,6 +524,19 @@ export class Game extends GameHooks {
    */
   getVisibleRoleState(observer: string, target: string): TVisibleRole | undefined {
     return this.visibleRolesState[observer]?.[target];
+  }
+
+  /**
+   * Open roles to everyone
+   */
+  openAllRoles(): void {
+    this.updateVisibleRolesState(
+      'all',
+      this.players.reduce<Dictionary<TVisibleRole>>((acc, el) => {
+        acc[el.user.id] = el.role.role;
+        return acc;
+      }, {}),
+    );
   }
 
   /**

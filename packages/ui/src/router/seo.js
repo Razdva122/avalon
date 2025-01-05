@@ -13,6 +13,7 @@ const {
   rules,
   lovers,
   merlin,
+  about,
 } = require('../../src/helpers/i18n/translates/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -33,10 +34,9 @@ module.exports.routesSeo = {
     priority: 0.7,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | About',
-      description:
-        "Dive into avalon-game.com: a comprehensive platform dedicated to 'Avalon: The Resistance'. Discover the story behind the game, its official rules, and how we bring together Avalon enthusiasts worldwide.",
-      keywords: ['About', 'Information', 'Rules'],
+      multiLanguage: {
+        ...about,
+      },
     },
   },
   room: {

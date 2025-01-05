@@ -12,6 +12,7 @@ const { percival } = require('./percival');
 const { rules } = require('./rules');
 const { lovers } = require('./lovers');
 const { merlin } = require('./merlin');
+const { about } = require('./about');
 
 module.exports = {
   lobby,
@@ -28,4 +29,5 @@ module.exports = {
   rules,
   lovers,
   merlin,
+  about,
 };

@@ -1,7 +1,7 @@
 import { IGameAddon } from '@/core/game/addons/interface';
 import { CheckLoyalty } from '@/core/game/addons/lady-of-lake/check-loyalty';
-import { Game } from '@/core/game';
-import { TLoyalty } from '@avalon/types';
+import { Game, IPlayerInGame } from '@/core/game';
+import { Dictionary, TLoyalty, TVisibleRole } from '@avalon/types';
 import { Subject, of } from 'rxjs';
 
 export class LadyOfLakeAddon implements IGameAddon {
@@ -106,6 +106,8 @@ export class LadyOfLakeAddon implements IGameAddon {
     selectedPlayer.features.ladyOfLake = 'has';
     selectedPlayer.features.isSelected = false;
 
+    this.updateVisibleRoles(ownerOfLady, selectedPlayer);
+
     this.game.leader.features.waitForAction = true;
 
     this.game.stage = 'selectTeam';
@@ -113,5 +115,36 @@ export class LadyOfLakeAddon implements IGameAddon {
     this.game.stateObserver.gameStateChanged();
 
     this.checkLoyaltySubject.next(false);
+  }
+
+  updateVisibleRoles(owner: IPlayerInGame, selectedPlayer: IPlayerInGame): void {
+    const ownerRole = owner.role.role;
+    const selectedPlayerRole = selectedPlayer.role.role;
+
+    if (ownerRole === 'percival') {
+      if (selectedPlayerRole.startsWith('merlin') || selectedPlayerRole === 'morgana') {
+        const merlin = this.game.players.find((player) => player.role.role.startsWith('merlin'));
+        const morgana = this.game.players.find((player) => player.role.role === 'morgana');
+
+        const roles: Dictionary<TVisibleRole> = {};
+
+        if (merlin) {
+          roles[merlin.user.id] = merlin.role.role;
+        }
+
+        if (morgana) {
+          roles[morgana.user.id] = morgana.role.role;
+        }
+
+        this.game.updateVisibleRolesState(owner.user.id, roles);
+      }
+    }
+
+    if (ownerRole === 'guinevere') {
+      if (selectedPlayerRole === 'evilLancelot' || selectedPlayerRole === 'goodLancelot') {
+        owner.role.visibility.evilLancelot = 'evilLancelot';
+        owner.role.visibility.goodLancelot = 'goodLancelot';
+      }
+    }
   }
 }

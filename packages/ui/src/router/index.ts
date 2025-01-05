@@ -20,10 +20,10 @@ const routeComponentMap = {
   rules: () => import('@/pages/wiki/Rules.vue'),
   lovers: () => import('@/pages/wiki/roles/Lovers.vue'),
   merlin: () => import('@/pages/wiki/roles/Merlin.vue'),
+  about: () => import('@/pages/about/About.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
-  { ...routesSeo.about, component: () => import('@/pages/about/About.vue') },
   { ...routesSeo['merlin_pure'], component: () => import('@/pages/wiki/roles/MerlinPure.vue') },
   { ...routesSeo.troublemaker, component: () => import('@/pages/wiki/roles/Troublemaker.vue') },
   { ...routesSeo.servant, component: () => import('@/pages/wiki/roles/Servant.vue') },
