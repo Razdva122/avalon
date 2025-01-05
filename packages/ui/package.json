@@ -1,6 +1,6 @@
 {
   "name": "@avalon/ui",
-  "version": "36.1.0",
+  "version": "37.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
