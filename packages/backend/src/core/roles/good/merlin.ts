@@ -15,5 +15,6 @@ export class Merlin extends Character {
     evilLancelot: 'evil',
     lunatic: 'evil',
     brute: 'evil',
+    witch: 'evil',
   };
 }
