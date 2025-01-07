@@ -11,6 +11,7 @@ import { rules } from '@/helpers/i18n/translates/langs/pages/rules';
 import { lovers } from '@/helpers/i18n/translates/langs/pages/lovers';
 import { about } from '@/helpers/i18n/translates/langs/pages/about';
 import { merlin } from '@/helpers/i18n/translates/langs/pages/merlin';
+import { oberon } from '@/helpers/i18n/translates/langs/pages/oberon';
 
 export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
   en: {},
@@ -31,6 +32,7 @@ Object.entries({
   lovers: lovers,
   merlin: merlin,
   about: about,
+  oberon: oberon,
 }).forEach(([key, value]) => {
   Object.keys(pages).forEach((lang) => {
     pages[<TLanguage>lang][key] = value[<TLanguage>lang];

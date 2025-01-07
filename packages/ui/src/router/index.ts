@@ -21,6 +21,7 @@ const routeComponentMap = {
   lovers: () => import('@/pages/wiki/roles/Lovers.vue'),
   merlin: () => import('@/pages/wiki/roles/Merlin.vue'),
   about: () => import('@/pages/about/About.vue'),
+  oberon: () => import('@/pages/wiki/roles/Oberon.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
@@ -28,7 +29,6 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.troublemaker, component: () => import('@/pages/wiki/roles/Troublemaker.vue') },
   { ...routesSeo.servant, component: () => import('@/pages/wiki/roles/Servant.vue') },
   { ...routesSeo.mordred, component: () => import('@/pages/wiki/roles/Mordred.vue') },
-  { ...routesSeo.oberon, component: () => import('@/pages/wiki/roles/Oberon.vue') },
   { ...routesSeo.minion, component: () => import('@/pages/wiki/roles/Minion.vue') },
   { ...routesSeo.guinevere, component: () => import('@/pages/wiki/roles/Guinevere.vue') },
   { ...routesSeo.trickster, component: () => import('@/pages/wiki/roles/Trickster.vue') },

@@ -2,7 +2,7 @@
   <div class="info-page-content">
     <WikiBreadCrumbs />
     <h1>
-      <div class="good-loyalty-icon"></div>
+      <div class="evil-loyalty-icon"></div>
       {{ $t('roles.witch') }} {{ $t('roles.role') }}
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('witch')" alt="witch" />
