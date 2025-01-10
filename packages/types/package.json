@@ -1,6 +1,6 @@
 {
   "name": "@avalon/types",
-  "version": "37.1.0",
+  "version": "37.2.3",
   "description": "Typings for sharing between ui and backend",
   "main": "index.js",
   "devDependencies": {},
