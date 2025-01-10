@@ -26,6 +26,7 @@ jobs:
       - name: build and publish container in Docker Hub
         uses: docker/build-push-action@v6
         with:
+          push: true
           context: ./
           file: backend.Dockerfile
           tags: ${{ vars.DOCKER_HUB_USERNAME }}/backend-avalon:${{ github.ref_name }}
@@ -48,6 +49,7 @@ jobs:
       - name: build and publish container in Docker Hub
         uses: docker/build-push-action@v6
         with:
+          push: true
           context: ./
           file: ui.Dockerfile
           tags: ${{ vars.DOCKER_HUB_USERNAME }}/nginx-avalon:${{ github.ref_name }}
