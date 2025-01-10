@@ -15,5 +15,6 @@ export class Witch extends Character {
     trickster: 'evil',
     brute: 'evil',
     evilLancelot: 'evilLancelot',
+    revealer: 'evil',
   };
 }

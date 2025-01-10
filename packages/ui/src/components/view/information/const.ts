@@ -85,6 +85,14 @@ export const rolesShortInfo: { [key in TVisibleRole]: { loyalty: TLoyalty | 'unk
     loyalty: 'evil',
     info: t('rolesInfo.witchInfo'),
   },
+  revealer: {
+    loyalty: 'evil',
+    info: t('rolesInfo.revealerInfo'),
+  },
+  cleric: {
+    loyalty: 'good',
+    info: t('rolesInfo.clericInfo'),
+  },
   unknown: {
     loyalty: 'unknown',
     info: t('rolesInfo.unknownInfo'),

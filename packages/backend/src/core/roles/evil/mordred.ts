@@ -15,5 +15,6 @@ export class Mordred extends Character {
     brute: 'evil',
     witch: 'evil',
     evilLancelot: 'evilLancelot',
+    revealer: 'evil',
   };
 }

@@ -11,6 +11,7 @@ export const evilRolesImportance: { [key in TEvilRoles]: number } = {
   evilLancelot: 10,
   lunatic: 50,
   brute: 51,
+  revealer: 52,
   witch: 75,
   minion: 100,
 };
@@ -24,6 +25,7 @@ export const goodRolesImportance: { [key in TGoodRoles]: number } = {
   percival: 3,
   guinevere: 4,
   goodLancelot: 5,
+  cleric: 6,
   tristan: 10,
   isolde: 11,
   troublemaker: 50,

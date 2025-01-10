@@ -203,6 +203,8 @@ export const zh_TW = {
     lunaticInfo: '每個任務都必須失敗',
     bruteInfo: '可能只會失敗前三個任務',
     witchInfo: '可以隱藏一個任務的結果',
+    revealerInfo: '在第二次任務失敗後顯露身份',
+    clericInfo: '知道第一次任務領導者的效忠情況。必須保持隱藏',
     unknownInfo: '未知角色',
     mysteryWizardInfo: '兩個玩家之一是好人方的(梅林)還是壞人的(莫甘娜)',
     unknownLancelotInfo: '蘭斯洛特,誰的忠誠無人知曉',

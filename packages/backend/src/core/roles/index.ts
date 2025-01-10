@@ -13,6 +13,7 @@ import { Trickster } from '@/core/roles/evil/trickster';
 import { Lunatic } from '@/core/roles/evil/lunatic';
 import { Brute } from '@/core/roles/evil/brute';
 import { Witch } from '@/core/roles/evil/witch';
+import { Revealer } from '@/core/roles/evil/revealer';
 
 export const evilRoles = {
   minion: Minion,
@@ -24,6 +25,7 @@ export const evilRoles = {
   lunatic: Lunatic,
   brute: Brute,
   witch: Witch,
+  revealer: Revealer,
 } as const;
 
 /**
@@ -38,6 +40,7 @@ import { Isolde } from '@/core/roles/good/isolde';
 import { GoodLancelot } from '@/core/roles/good/goodLancelot';
 import { Guinevere } from '@/core/roles/good/guinevere';
 import { Troublemaker } from '@/core/roles/good/troublemaker';
+import { Cleric } from '@/core/roles/good/cleric';
 
 export const goodRoles = {
   servant: Servant,
@@ -49,6 +52,7 @@ export const goodRoles = {
   goodLancelot: GoodLancelot,
   guinevere: Guinevere,
   troublemaker: Troublemaker,
+  cleric: Cleric,
 } as const;
 
 const roles = {
