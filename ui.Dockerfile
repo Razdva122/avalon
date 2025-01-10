@@ -7,6 +7,10 @@ WORKDIR ${APP_DIR}
 RUN chown pptruser:pptruser ${APP_DIR}
 
 COPY --chown=pptruser:pptruser package*.json ${APP_DIR}/
+COPY --chown=pptruser:pptruser packages/ui/package.json ${APP_DIR}/packages/ui/
+COPY --chown=pptruser:pptruser packages/types/package.json ${APP_DIR}/packages/types/
+COPY --chown=pptruser:pptruser packages/backend/package.json ${APP_DIR}/packages/backend/
+
 USER pptruser
 RUN npm install
 
