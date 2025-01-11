@@ -7,6 +7,10 @@ WORKDIR ${APP_DIR}
 
 # Install
 COPY package*.json ./
+COPY packages/types/package.json ./packages/types/
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/ui/package.json ./packages/ui/
+
 RUN npm install
 
 # Copy
