@@ -4,7 +4,7 @@ export const handleSocketErrors = (socket: ServerSocket) => {
   const originalOn = socket.on.bind(socket);
 
   socket.on = (key, listener) => {
-    // @ts-expect-error too hard to fix typings
+    // @ts-ignore too hard to fix typings
     return originalOn(key, errorHandler(listener, socket));
   };
 };
