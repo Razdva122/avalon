@@ -82,6 +82,8 @@ export const zh_TW = {
     brute: '野蠻人',
     witch: '巫婆',
     minion: '士兵',
+    cleric: '牧師',
+    revealer: '被揭示者',
     role: '角色',
   },
   breadCrumbs: {
@@ -118,7 +120,9 @@ export const zh_TW = {
   },
   options: {
     roles: '角色',
-    extraRoles: '額外角色',
+    coreRoles: '核心',
+    extraRoles: '額外',
+    experimentalRoles: '實驗性',
     addons: '插件',
     features: '功能',
     ladyHint: '湖中仙女可以讓你了解其他玩家的忠誠度',
@@ -203,7 +207,7 @@ export const zh_TW = {
     lunaticInfo: '每個任務都必須失敗',
     bruteInfo: '可能只會失敗前三個任務',
     witchInfo: '可以隱藏一個任務的結果',
-    revealerInfo: '在第二次任務失敗後顯露身份',
+    revealerInfo: '在第二次任務失敗後揭露自己',
     clericInfo: '知道第一次任務領導者的效忠情況。必須保持隱藏',
     unknownInfo: '未知角色',
     mysteryWizardInfo: '兩個玩家之一是好人方的(梅林)還是壞人的(莫甘娜)',

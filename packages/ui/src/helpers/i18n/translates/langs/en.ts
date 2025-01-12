@@ -82,6 +82,8 @@ export const en = {
     brute: 'Brute',
     minion: 'Minion',
     witch: 'Witch',
+    cleric: 'Cleric',
+    revealer: 'Revealer',
     role: 'Role',
   },
   breadCrumbs: {
@@ -118,7 +120,9 @@ export const en = {
   },
   options: {
     roles: 'Roles',
-    extraRoles: 'Extra roles',
+    coreRoles: 'Core',
+    extraRoles: 'Additional',
+    experimentalRoles: 'Experimental',
     addons: 'Addons',
     features: 'Features',
     ladyHint: 'The lady allows you to find out the loyalty of another player',
@@ -203,7 +207,7 @@ export const en = {
     lunaticInfo: 'Must fail on every mission',
     bruteInfo: 'May fail only first three missions',
     witchInfo: 'Can hide the result of one mission',
-    revealerInfo: 'Reveal himself after second failed mission',
+    revealerInfo: 'Reveal herself after second failed mission',
     clericInfo: 'Knows loyalty of the leader of the first mission. Must remain hidden',
     unknownInfo: 'Unknown role',
     mysteryWizardInfo: 'One of the two wizards is good (Merlin) or evil (Morgana)',

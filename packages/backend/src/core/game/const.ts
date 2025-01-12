@@ -7,6 +7,8 @@ import {
   ExcaliburAddon,
   LancelotsAddon,
   WitchAddon,
+  RevealerAddon,
+  ClericAddon,
 } from '@/core/game/addons';
 import { TRolesWithAddons, TAdditionalAddons } from '@/core/game/addons';
 
@@ -142,6 +144,14 @@ export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsData> = {
   witch: {
     addon: WitchAddon,
     key: 'witch',
+  },
+  revealer: {
+    addon: RevealerAddon,
+    key: 'revealer',
+  },
+  cleric: {
+    addon: ClericAddon,
+    key: 'cleric',
   },
 };
 

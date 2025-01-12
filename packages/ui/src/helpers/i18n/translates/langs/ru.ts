@@ -82,6 +82,8 @@ export const ru = {
     brute: 'Брут',
     witch: 'Ведьма',
     minion: 'Миньон',
+    cleric: 'Клирик',
+    revealer: 'Разоблаченная',
     role: 'Роль',
   },
   breadCrumbs: {
@@ -118,7 +120,9 @@ export const ru = {
   },
   options: {
     roles: 'Роли',
-    extraRoles: 'Дополнительные роли',
+    coreRoles: 'Основные',
+    extraRoles: 'Дополнительные',
+    experimentalRoles: 'Экспериментальные',
     addons: 'Дополнения',
     features: 'Опции',
     ladyHint: 'Леди позволяет проверить сторону другого игрока',

@@ -3,7 +3,7 @@
     <router-link
       class="preview-link"
       :class="rolesShortInfo[target].loyalty + '-role'"
-      :to="{ name: toSnakeCase(target) }"
+      :to="{ name: toSnakeCase(normalizeRoleRoute) }"
     >
       <PlayerIcon class="icon-in-link" :icon="target" />
       <template v-if="text !== ''">
@@ -50,6 +50,15 @@ export default defineComponent({
     },
     text: {
       type: String,
+    },
+  },
+  computed: {
+    normalizeRoleRoute(): string {
+      if (['cleric', 'revealer'].includes(this.target)) {
+        return 'roles';
+      }
+
+      return this.target;
     },
   },
   methods: {

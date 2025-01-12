@@ -5,6 +5,8 @@ import type {
   AssassinAddon,
   LancelotsAddon,
   WitchAddon,
+  ClericAddon,
+  RevealerAddon,
 } from '@/core/game/addons';
 import type { Character } from '@/core/roles';
 import type { User } from '@/user';
@@ -37,6 +39,8 @@ export interface IGameAddons extends TAddonsArray {
   excalibur?: ExcaliburAddon;
   lancelots?: LancelotsAddon;
   witch?: WitchAddon;
+  cleric?: ClericAddon;
+  revealer?: RevealerAddon;
 }
 
 export interface IStateObserver {

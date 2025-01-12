@@ -303,6 +303,7 @@
               { target: 'trickster' },
               { target: 'morgana' },
               { target: 'witch' },
+              { target: 'revealer' },
             ] as const"
           >
             <li v-if="roles[role.target]">
@@ -416,6 +417,8 @@ export default defineComponent({
       lunatic: 0,
       brute: 0,
       witch: 0,
+      revealer: 0,
+      cleric: 0,
     };
 
     return {

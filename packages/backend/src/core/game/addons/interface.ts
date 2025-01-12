@@ -9,7 +9,15 @@ export type TAfterMethods = `after${Capitalize<TGameStage>}`;
 
 export type TMethods = Partial<Record<THookNames, () => Observable<boolean>>>;
 
-export type TRolesWithAddons = 'merlin' | 'merlinPure' | 'tristan' | 'goodLancelot' | 'guinevere' | 'witch';
+export type TRolesWithAddons =
+  | 'merlin'
+  | 'merlinPure'
+  | 'tristan'
+  | 'goodLancelot'
+  | 'guinevere'
+  | 'witch'
+  | 'cleric'
+  | 'revealer';
 
 export type TAdditionalAddons = 'ladyOfLake' | 'excalibur';
 

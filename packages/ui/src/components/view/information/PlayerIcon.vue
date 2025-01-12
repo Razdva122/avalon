@@ -145,6 +145,18 @@ export default defineComponent({
   background-size: 130%;
 }
 
+.icon-revealer {
+  background-image: url('@/assets/roles/revealer.webp');
+  background-position: 50% 10%;
+  background-size: 150%;
+}
+
+.icon-cleric {
+  background-image: url('@/assets/roles/cleric.webp');
+  background-position: 50% 5%;
+  background-size: 145%;
+}
+
 .icon-evil {
   background-image: url('@/assets/red_team_no_background.webp');
   background-position: 50% 52%;

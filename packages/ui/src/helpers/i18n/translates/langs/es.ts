@@ -82,6 +82,8 @@ export const es = {
     brute: 'Bruto',
     minion: 'Secuaz',
     witch: 'Bruja',
+    cleric: 'Clérigo',
+    revealer: 'Revelada',
     role: 'Rol',
   },
   breadCrumbs: {
@@ -118,7 +120,9 @@ export const es = {
   },
   options: {
     roles: 'Roles',
-    extraRoles: 'Roles adicionales',
+    coreRoles: 'Básicos',
+    extraRoles: 'Adicionales',
+    experimentalRoles: 'Experimentales',
     addons: 'Expansiones',
     features: 'Características',
     ladyHint: 'La dama te permite conocer la lealtad de otro jugador',
@@ -203,7 +207,7 @@ export const es = {
     lunaticInfo: 'Debe fallar en todas las misiones',
     bruteInfo: 'Solo puede fallar en las tres primeras misiones',
     witchInfo: 'Puede ocultar el resultado de una misión',
-    revealerInfo: 'Se revela después de la segunda misión fallida',
+    revealerInfo: 'Revelarse después de la segunda misión fallida',
     clericInfo: 'Conoce la lealtad del líder de la primera misión. Debe permanecer oculto',
     unknownInfo: 'Rol desconocido',
     mysteryWizardInfo: 'Uno de los dos magos es bueno (Merlín) o malo (Morgana)',

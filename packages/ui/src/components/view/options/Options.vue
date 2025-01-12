@@ -10,12 +10,16 @@
       <v-form>
         <v-tabs v-model="type" class="tabs">
           <v-tab value="roles">{{ $t('options.roles') }}</v-tab>
-          <v-tab value="extraRoles">{{ $t('options.extraRoles') }}</v-tab>
           <v-tab value="addons" v-if="addons">{{ $t('options.addons') }}</v-tab>
           <v-tab value="features" v-if="features">{{ $t('options.features') }}</v-tab>
         </v-tabs>
-        <template v-if="type === 'roles' || type === 'extraRoles'">
-          <div class="option" v-for="role in type === 'roles' ? rolesSettings : extraRolesSettings">
+        <v-tabs v-if="type === 'roles'" v-model="roleTypes">
+          <v-tab value="core">{{ $t('options.coreRoles') }}</v-tab>
+          <v-tab value="extra">{{ $t('options.extraRoles') }}</v-tab>
+          <v-tab value="experimental">{{ $t('options.experimentalRoles') }}</v-tab>
+        </v-tabs>
+        <template v-if="type === 'roles'">
+          <div class="option" v-for="role in rolesSettings">
             <PlayerIcon class="role" :icon="role.role" :class="rolesShortInfo[role.role].loyalty" />
             <v-checkbox
               @input="onRoleUpdate(role.role)"
@@ -81,11 +85,12 @@ export default defineComponent({
     return {
       overlay: false,
       type: 'roles',
+      roleTypes: 'core' as 'core' | 'extra' | 'experimental',
       rolesShortInfo,
     };
   },
   computed: {
-    rolesSettings() {
+    coreRolesSettings() {
       return [
         { role: 'merlin', label: this.$t('roles.merlin'), disabled: Boolean(this.roles.merlinPure), color: 'success' },
         {
@@ -145,6 +150,12 @@ export default defineComponent({
         { role: 'trickster', label: this.$t('roles.trickster'), disabled: false, color: 'warning', route: 'trickster' },
         { role: 'lunatic', label: this.$t('roles.lunatic'), disabled: false, color: 'warning', route: 'lunatic' },
         { role: 'brute', label: this.$t('roles.brute'), disabled: false, color: 'warning', route: 'brute' },
+      ] as const;
+    },
+    experimentalRolesSettings() {
+      return [
+        { role: 'cleric', label: this.$t('roles.cleric'), disabled: false, color: 'success', route: 'roles' },
+        { role: 'revealer', label: this.$t('roles.revealer'), disabled: false, color: 'warning', route: 'roles' },
         { role: 'witch', label: this.$t('roles.witch'), disabled: false, color: 'warning', route: 'witch' },
       ] as const;
     },
@@ -182,6 +193,9 @@ export default defineComponent({
           hint: this.$t('options.displayIndexHint'),
         },
       ] as const;
+    },
+    rolesSettings() {
+      return this[`${this.roleTypes}RolesSettings`];
     },
   },
   methods: {
