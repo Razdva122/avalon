@@ -16,5 +16,6 @@ export class Minion extends Character {
     brute: 'evil',
     witch: 'evil',
     evilLancelot: 'evilLancelot',
+    revealer: 'evil',
   };
 }

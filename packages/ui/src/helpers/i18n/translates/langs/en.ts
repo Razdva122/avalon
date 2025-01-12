@@ -203,6 +203,8 @@ export const en = {
     lunaticInfo: 'Must fail on every mission',
     bruteInfo: 'May fail only first three missions',
     witchInfo: 'Can hide the result of one mission',
+    revealerInfo: 'Reveal himself after second failed mission',
+    clericInfo: 'Knows loyalty of the leader of the first mission. Must remain hidden',
     unknownInfo: 'Unknown role',
     mysteryWizardInfo: 'One of the two wizards is good (Merlin) or evil (Morgana)',
     unknownLancelotInfo: 'Lancelot, whose loyalty is not known',

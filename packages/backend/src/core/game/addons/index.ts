@@ -12,11 +12,16 @@ import { LadyOfLakeAddon } from '@/core/game/addons/lady-of-lake';
 import { ExcaliburAddon } from '@/core/game/addons/excalibur';
 import { LancelotsAddon } from '@/core/game/addons/lancelots';
 import { WitchAddon } from '@/core/game/addons/witch';
+import { ClericAddon } from '@/core/game/addons/cleric';
 
 export type TAdditionalAddonsConstructor = typeof LadyOfLakeAddon | typeof ExcaliburAddon;
-export type TRolesAddonsConstructor = typeof AssassinAddon | typeof LancelotsAddon | typeof WitchAddon;
+export type TRolesAddonsConstructor =
+  | typeof AssassinAddon
+  | typeof LancelotsAddon
+  | typeof WitchAddon
+  | typeof ClericAddon;
 
-export type TRolesAddonsKeys = 'assassin' | 'lancelots' | 'witch';
+export type TRolesAddonsKeys = 'assassin' | 'lancelots' | 'witch' | 'cleric';
 
 export type TAdditionalAddonsKeys = 'ladyOfLake' | 'excalibur';
 

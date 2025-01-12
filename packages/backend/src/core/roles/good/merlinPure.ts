@@ -16,5 +16,6 @@ export class MerlinPure extends Character {
     lunatic: 'lunatic',
     brute: 'brute',
     witch: 'witch',
+    revealer: 'revealer',
   };
 }

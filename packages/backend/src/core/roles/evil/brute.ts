@@ -14,6 +14,7 @@ export class Brute extends Character {
     trickster: 'evil',
     lunatic: 'evil',
     witch: 'evil',
+    revealer: 'evil',
     evilLancelot: 'evilLancelot',
   };
 

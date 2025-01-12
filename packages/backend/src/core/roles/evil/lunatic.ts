@@ -15,6 +15,7 @@ export class Lunatic extends Character {
     brute: 'evil',
     witch: 'evil',
     evilLancelot: 'evilLancelot',
+    revealer: 'evil',
   };
 
   override get validMissionResult(): TMissionResult[] {

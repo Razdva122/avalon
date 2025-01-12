@@ -20,7 +20,8 @@ export type TGoodOptionalRoles =
   | 'isolde'
   | 'goodLancelot'
   | 'guinevere'
-  | 'troublemaker';
+  | 'troublemaker'
+  | 'cleric';
 
 /**
  * Good required roles
@@ -38,7 +39,8 @@ export type TEvilOptionalRoles =
   | 'trickster'
   | 'lunatic'
   | 'brute'
-  | 'witch';
+  | 'witch'
+  | 'revealer';
 
 /**
  * Evil required roles
