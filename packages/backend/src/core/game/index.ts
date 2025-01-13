@@ -2,13 +2,7 @@ import * as _ from 'lodash';
 
 import type { User } from '@/user';
 
-import type {
-  IPlayerInGame,
-  IGameAddons,
-  IStateObserver,
-  TStageVisibilityChange,
-  TSelectAvailable,
-} from '@/core/game/interface';
+import type { IPlayerInGame, IGameAddons, IStateObserver, TSelectAvailable } from '@/core/game/interface';
 
 import type {
   TMissionResult,
@@ -226,6 +220,22 @@ export class Game extends GameHooks {
         }
       });
     }
+
+    this.players.forEach((player) => {
+      const visibility = this.players.reduce<Dictionary<TVisibleRole>>((acc, el) => {
+        const visibleRole = player.role.visibility[el.role.role];
+
+        if (el === player) {
+          acc[el.user.id] = el.role.selfRole;
+        } else if (visibleRole) {
+          acc[el.user.id] = visibleRole;
+        }
+
+        return acc;
+      }, {});
+
+      this.updateVisibleRolesState(player.user.id, visibility);
+    });
 
     this.initGame();
   }

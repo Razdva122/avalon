@@ -18,6 +18,9 @@ describe('Cleric', () => {
 
     gameHelper.selectPlayersOnMission(1).sentSelectedPlayers().makeVotes().makeActions();
 
-    expect(game.visibleRolesState).toStrictEqual({ [clericId]: { [leader.user.id]: leader.role.visibleLoylaty } });
+    expect(game.visibleRolesState[clericId]).toStrictEqual({
+      [leader.user.id]: leader.role.visibleLoylaty,
+      [clericId]: 'cleric',
+    });
   });
 });

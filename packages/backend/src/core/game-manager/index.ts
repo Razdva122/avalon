@@ -131,17 +131,8 @@ export class GameManager {
     // Role known for all -> Role known for user -> Self Role -> Role known for role -> unknown
     let role: TVisibleRole | undefined = this.game.getVisibleRoleState('all', playerID);
 
-    if (!role && userID && this.game.players.some((player) => player.user.id === userID)) {
-      const user = this.game.findPlayerByID(userID);
-      const player = this.game.findPlayerByID(playerID);
-
-      if (this.game.getVisibleRoleState(userID, playerID)) {
-        role = this.game.getVisibleRoleState(userID, playerID);
-      } else if (playerID === userID) {
-        role = player.role.selfRole;
-      } else {
-        role = user.role.visibility[player.role.role];
-      }
+    if (!role && userID) {
+      role = this.game.getVisibleRoleState(userID, playerID);
     }
 
     role = role ?? 'unknown';
