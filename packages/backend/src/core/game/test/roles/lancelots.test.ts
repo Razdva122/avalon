@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 let { game, gameHelper } = generateNewGame();
 
 describe('Lancelots', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     const restart = generateNewGame({}, { evilLancelot: 1, goodLancelot: 1, guinevere: 1 });
     game = restart.game;
     gameHelper = restart.gameHelper;
@@ -44,5 +44,26 @@ describe('Lancelots', () => {
 
       gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
     }
+  });
+
+  test('If lancelots change roles minions should see new state', () => {
+    const minions = game.players.filter((player) => player.role.role === 'minion');
+    const evilLancelotId = game.players.find((player) => player.role.selfRole === 'evilLancelot')!.user.id;
+
+    game.addons.lancelots!.switches = [true, true, true, false, false];
+
+    gameHelper
+      .selectPlayersOnMission(1)
+      .sentSelectedPlayers()
+      .makeVotes()
+      .makeActions(1)
+      .selectPlayersOnMission(1)
+      .sentSelectedPlayers()
+      .makeVotes()
+      .makeActions(1);
+
+    minions.forEach((minion) => {
+      expect(game.visibleRolesState[minion.user.id][evilLancelotId]).toBe('goodLancelot');
+    });
   });
 });

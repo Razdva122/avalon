@@ -23,7 +23,7 @@ describe('Revealer', () => {
 
     const revealerId = game.players.find((player) => player.role.role === 'revealer')!.user.id;
 
-    expect(game.visibleRolesState).toStrictEqual({ all: { [revealerId]: 'revealer' } });
+    expect(game.visibleRolesState.all).toStrictEqual({ [revealerId]: 'revealer' });
   });
 
   test('Should skip success missions reveal after second fail mission', () => {
@@ -37,12 +37,12 @@ describe('Revealer', () => {
       .makeVotes()
       .makeActions();
 
-    expect(game.visibleRolesState).toStrictEqual({});
+    expect(game.visibleRolesState.all).toStrictEqual(undefined);
 
     gameHelper.selectPlayersOnMission(1).sentSelectedPlayers().makeVotes().makeActions(1);
 
     const revealerId = game.players.find((player) => player.role.role === 'revealer')!.user.id;
 
-    expect(game.visibleRolesState).toStrictEqual({ all: { [revealerId]: 'revealer' } });
+    expect(game.visibleRolesState.all).toStrictEqual({ [revealerId]: 'revealer' });
   });
 });

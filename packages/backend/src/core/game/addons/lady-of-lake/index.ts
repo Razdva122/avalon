@@ -142,8 +142,13 @@ export class LadyOfLakeAddon implements IGameAddon {
 
     if (ownerRole === 'guinevere') {
       if (selectedPlayerRole === 'evilLancelot' || selectedPlayerRole === 'goodLancelot') {
-        owner.role.visibility.evilLancelot = 'evilLancelot';
-        owner.role.visibility.goodLancelot = 'goodLancelot';
+        const goodLancelot = this.game.players.find((player) => player.role.role === 'goodLancelot')!;
+        const evilLancelot = this.game.players.find((player) => player.role.role === 'evilLancelot')!;
+
+        this.game.updateVisibleRolesState(owner.user.id, {
+          [goodLancelot.user.id]: 'goodLancelot',
+          [evilLancelot.user.id]: 'evilLancelot',
+        });
       }
     }
   }

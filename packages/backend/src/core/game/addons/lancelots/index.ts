@@ -1,4 +1,4 @@
-import { IGameAddon, TAddonPriority } from '@/core/game/addons/interface';
+import { IGameAddon } from '@/core/game/addons/interface';
 import { Game } from '@/core/game';
 import type { TSwitchesArray } from '@/core/game/addons/lancelots/interface';
 import { SwitchLancelots } from '@/core/game/addons/lancelots/switch-lancelots';
@@ -10,10 +10,6 @@ export class LancelotsAddon implements IGameAddon {
   switches: TSwitchesArray;
   pointer: number = 0;
   game: Game;
-
-  priority: TAddonPriority = {
-    beforeEndGame: 'high',
-  };
 
   constructor(game: Game) {
     this.game = game;
@@ -32,11 +28,13 @@ export class LancelotsAddon implements IGameAddon {
       this.game.history.push(switchLancelots);
 
       if (currentSwitch) {
-        this.updateRolesVisibility();
+        goodLancelot.role.role = 'evilLancelot';
         goodLancelot.role.selfRole = 'evilLancelot';
         goodLancelot.role.loyalty = 'evil';
+        evilLancelot.role.role = 'goodLancelot';
         evilLancelot.role.selfRole = 'goodLancelot';
         evilLancelot.role.loyalty = 'good';
+        this.updateRolesVisibility();
       }
 
       this.game.stateObserver.gameStateChanged();
@@ -47,26 +45,16 @@ export class LancelotsAddon implements IGameAddon {
   }
 
   updateRolesVisibility() {
-    this.game.players.forEach((player) => {
-      if (player.role.visibility.evilLancelot === 'evilLancelot') {
-        player.role.visibility.evilLancelot = 'goodLancelot';
-      }
+    Object.entries(this.game.visibleRolesState).forEach(([id, value]) => {
+      Object.entries(value).forEach(([targetId, role]) => {
+        if (role === 'evilLancelot') {
+          this.game.updateVisibleRolesState(id, { [targetId]: 'goodLancelot' });
+        }
 
-      if (player.role.visibility.goodLancelot === 'goodLancelot') {
-        player.role.visibility.goodLancelot = 'evilLancelot';
-      }
+        if (role === 'goodLancelot') {
+          this.game.updateVisibleRolesState(id, { [targetId]: 'evilLancelot' });
+        }
+      });
     });
-  }
-
-  beforeEndGame() {
-    const goodLancelot = this.game.players.find((player) => player.role.selfRole === 'goodLancelot')!;
-    const evilLancelot = this.game.players.find((player) => player.role.selfRole === 'evilLancelot')!;
-
-    goodLancelot.role.role = 'goodLancelot';
-    evilLancelot.role.role = 'evilLancelot';
-
-    this.game.stateObserver.gameStateChanged();
-
-    return of(true);
   }
 }

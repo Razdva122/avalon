@@ -133,15 +133,22 @@ export class GameTestHelper {
     return this;
   }
 
-  useLadyOfLake(): this {
-    const randomPlayerID = this.game.players.find((player) => player.features.ladyOfLake === undefined)!.user.id;
+  useLadyOfLake(userID?: string): this {
+    const playerID = userID ?? this.game.players.find((player) => player.features.ladyOfLake === undefined)!.user.id;
 
     const ownerID = this.game.players.find((player) => {
       return player.features.ladyOfLake == 'has';
     })!.user.id;
 
-    this.game.selectPlayer(ownerID, randomPlayerID);
+    this.game.selectPlayer(ownerID, playerID);
     this.game.addons.ladyOfLake!.checkLoyalty(ownerID);
+    return this;
+  }
+
+  moveLadyOfLake(ownerID: string): this {
+    this.game.players.find((player) => player.features.ladyOfLake === 'has')!.features.ladyOfLake = undefined;
+    this.game.players.find((player) => player.user.id === ownerID)!.features.ladyOfLake = 'has';
+
     return this;
   }
 
