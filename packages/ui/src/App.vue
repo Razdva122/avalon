@@ -70,6 +70,9 @@ export default defineComponent({
     if (isHolidays()) {
       document.querySelector('#app')?.classList.add('holidays-active');
       document.querySelector('#overlay')?.classList.add('holidays-active');
+    } else {
+      document.querySelector('#app')?.classList.remove('holidays-active');
+      document.querySelector('#overlay')?.classList.remove('holidays-active');
     }
   },
 });

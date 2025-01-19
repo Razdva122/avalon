@@ -28,7 +28,8 @@
 
 <script lang="ts">
 import cloneDeep from 'lodash/cloneDeep';
-import { defineComponent, PropType, inject } from 'vue';
+import { defineComponent, PropType, inject, computed, toRefs } from 'vue';
+import { useStore } from '@/store';
 import type { TRoomPlayer, THistoryResults, Dictionary, TGameStage, IActionWithResult } from '@avalon/types';
 import type { IFrontendPlayer } from '@/components/view/board/interface';
 import { gameStateKey } from '@/helpers/game-state-manager';
@@ -56,55 +57,58 @@ export default defineComponent({
       type: Boolean,
     },
   },
-  computed: {
-    player(): IFrontendPlayer | TRoomPlayer {
-      const clone = cloneDeep(this.playerState);
-      const gameState = inject(gameStateKey)!;
+  setup(props) {
+    const gameState = inject(gameStateKey)!;
+    const store = useStore();
+    const { playerState, visibleHistory, currentStage, displayKick } = toRefs(props);
+
+    const player = computed(() => {
+      const clone = cloneDeep(playerState.value);
 
       if ('features' in clone) {
         const isGameEnded = gameState.value.stage === 'end';
 
-        if (this.visibleHistory?.type === 'vote') {
+        if (visibleHistory.value?.type === 'vote') {
           clone.features.waitForAction = false;
 
-          if (this.visibleHistory.forced) {
+          if (visibleHistory.value.forced) {
             clone.features.vote = 'forced-approve';
           } else {
-            if (this.visibleHistory.anonymous !== true) {
-              const userVote = this.visibleHistory.votes.find((player) => player.playerID === clone.id)!;
+            if (visibleHistory.value.anonymous !== true) {
+              const userVote = visibleHistory.value.votes.find((player) => player.playerID === clone.id)!;
 
               clone.features.vote = userVote.value;
             }
           }
         }
 
-        if (this.visibleHistory?.type === 'switchLancelots') {
+        if (visibleHistory.value?.type === 'switchLancelots') {
           clone.features.waitForAction = false;
           clone.features.isSelected = false;
           clone.features.isSent = false;
         }
 
-        if (this.visibleHistory?.type === 'checkLoyalty' && this.visibleHistory.result) {
-          if (clone.id === this.visibleHistory.inspectedID) {
-            clone.role = this.visibleHistory.result;
+        if (visibleHistory.value?.type === 'checkLoyalty' && visibleHistory.value.result) {
+          if (clone.id === visibleHistory.value.inspectedID) {
+            clone.role = visibleHistory.value.result;
           }
         }
 
-        if (this.visibleHistory?.type === 'switchResult' && this.visibleHistory.targetID) {
-          if (clone.id === this.visibleHistory.targetID) {
+        if (visibleHistory.value?.type === 'switchResult' && visibleHistory.value.targetID) {
+          if (clone.id === visibleHistory.value.targetID) {
             clone.role = 'excalibur';
           }
         }
 
-        if (this.visibleHistory?.type === 'mission') {
+        if (visibleHistory.value?.type === 'mission') {
           clone.features.waitForAction = false;
           clone.features.isSelected = false;
 
-          const switchedAction = this.visibleHistory.actions?.find(
+          const switchedAction = visibleHistory.value.actions?.find(
             (action) => action.playerID === clone.id && action.switchedBy,
           );
 
-          const visibleAction = this.visibleHistory.actions?.find(
+          const visibleAction = visibleHistory.value.actions?.find(
             (action) => action.playerID === clone.id && 'value' in action,
           ) as IActionWithResult;
 
@@ -117,7 +121,7 @@ export default defineComponent({
           }
         }
 
-        if (this.$store.state.hideSpoilers && !isGameEnded) {
+        if (store.state.hideSpoilers && !isGameEnded) {
           if (clone.role !== 'excalibur') {
             clone.role = 'unknown';
           }
@@ -127,14 +131,14 @@ export default defineComponent({
       }
 
       return clone;
-    },
+    });
 
-    playerClasses() {
+    const playerClasses = computed(() => {
       let classes: Dictionary<string | boolean> = {};
 
-      if ('features' in this.player) {
+      if ('features' in player.value) {
         classes = {
-          ...Object.entries(this.player.features).reduce<{ [key: string]: boolean }>((acc, [key, value]) => {
+          ...Object.entries(player.value.features).reduce<{ [key: string]: boolean }>((acc, [key, value]) => {
             if (typeof value === 'string') {
               acc[`player-feature-${key}-${value}`] = true;
             } else {
@@ -147,24 +151,29 @@ export default defineComponent({
         };
 
         if (
-          this.currentStage === 'checkLoyalty' ||
-          (this.currentStage === 'announceLoyalty' && this.player.features.ladyOfLake === 'has')
+          currentStage.value === 'checkLoyalty' ||
+          (currentStage.value === 'announceLoyalty' && player.value.features.ladyOfLake === 'has')
         ) {
           classes['player-lady-active'] = true;
         }
 
-        if (this.currentStage === 'useExcalibur' && this.player.features.excalibur) {
+        if (currentStage.value === 'useExcalibur' && player.value.features.excalibur) {
           classes['player-excalibur-active'] = true;
         }
       } else {
         classes = {
-          'player-feature-isLeader': this.player.isLeader,
-          'player-feature-kick': Boolean(this.displayKick),
+          'player-feature-isLeader': player.value.isLeader,
+          'player-feature-kick': Boolean(displayKick.value),
         };
       }
 
       return classes;
-    },
+    });
+
+    return {
+      player,
+      playerClasses,
+    };
   },
 });
 </script>
