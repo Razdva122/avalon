@@ -20,6 +20,7 @@ export interface ServerToClientEvents {
   roomUpdated: (state: TRoomState) => void;
   gameUpdated: (state: IVisualGameState) => void;
   restartGame: (uuid: string) => void;
+  destroyRoom: (uuid: string) => void;
   serverError: (error: string) => void;
 }
 

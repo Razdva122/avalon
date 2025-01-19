@@ -24,7 +24,7 @@ export class Manager {
 
     // Delete room after 10 day timeout
     setTimeout(() => {
-      delete this.rooms[uuid];
+      this.destroyRoom(uuid);
     }, 86400000 * 10);
   }
 
@@ -76,8 +76,13 @@ export class Manager {
     }
 
     if (room.data.stage === 'started') {
+      if (room.nextRoomID) {
+        throw new Error(`Cant restart game with uuid ${uuid}, game already restarted ${room.nextRoomID}`);
+      }
+
       if (room.data.manager.game.stage === 'end') {
         const newUUID = crypto.randomUUID();
+        room.nextRoomID = newUUID;
         this.createRoom(newUUID, room.leaderID, room.players, room.options);
 
         this.io.to(room.roomID).emit('restartGame', newUUID);
@@ -89,6 +94,12 @@ export class Manager {
     }
   }
 
+  destroyRoom(uuid: string) {
+    this.updateRoomsList(uuid, true);
+    this.io.to(uuid).emit('destroyRoom', uuid);
+    delete this.rooms[uuid];
+  }
+
   constructor(io: Server) {
     this.io = io;
 
@@ -98,6 +109,10 @@ export class Manager {
 
     eventBus.on('restartRoom', (room) => {
       this.restartRoom(room.roomID);
+    });
+
+    eventBus.on('destroyRoom', (room) => {
+      this.destroyRoom(room.roomID);
     });
 
     io.on('connection', (socket) => {
@@ -205,7 +220,10 @@ export class Manager {
 
       if (room) {
         room.leaveGame(userID);
-        eventBus.emit('roomUpdated', room);
+
+        if (this.rooms[uuid]) {
+          eventBus.emit('roomUpdated', room);
+        }
       }
     });
 

@@ -91,6 +91,12 @@ export default defineComponent({
       initState(uuid);
     });
 
+    socket.on('destroyRoom', (gameUUID) => {
+      if (gameUUID === props.uuid) {
+        router.push({ name: 'lobby' });
+      }
+    });
+
     const displayHostPanel = computed(() => {
       return roomState.value.leaderID === userID;
     });

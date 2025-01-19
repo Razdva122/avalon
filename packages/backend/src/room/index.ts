@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 
 export class Room {
   roomID: string;
+  nextRoomID?: string;
   players: User[];
   leaderID: string;
   vote?: TVoteInRoom;
@@ -54,6 +55,7 @@ export class Room {
     if (userID === this.leaderID) {
       if (this.players.length === 0) {
         this.destroyRoom();
+        return;
       } else {
         this.leaderID = this.players[0].id;
       }
@@ -208,6 +210,6 @@ export class Room {
   }
 
   protected destroyRoom() {
-    // TODO
+    eventBus.emit('destroyRoom', this);
   }
 }
