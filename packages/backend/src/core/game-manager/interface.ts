@@ -6,6 +6,7 @@ import type {
   TLoyalty,
   THistoryResults,
   TAssassinateType,
+  TRoles,
 } from '@avalon/types';
 
 import type { TDataForManagerOptions } from '@/core/game/history';
@@ -54,6 +55,7 @@ export type TActionOnMissionParams = {
 export type TAssassinateParams = {
   method: 'assassinate';
   type: TAssassinateType;
+  customRole?: TRoles;
 };
 
 export type TCheckLoyaltyParams = {

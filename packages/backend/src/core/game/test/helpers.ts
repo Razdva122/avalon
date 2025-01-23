@@ -1,5 +1,5 @@
 import { Game } from '@/core/game';
-import { IGameOptions, TLoyalty } from '@avalon/types';
+import { IGameOptions, TLoyalty, TAssassinateType, TRoles } from '@avalon/types';
 import { User } from '@/user';
 
 const users = [
@@ -84,11 +84,9 @@ export class GameTestHelper {
     return this;
   }
 
-  pickMerlin(correctMerlin: boolean = false): this {
+  pickRole(role: TAssassinateType, correct: boolean = false): this {
     const id = this.game.players.find((player) => {
-      return correctMerlin
-        ? player.role.role === 'merlin'
-        : player.role.role !== 'merlin' && player.role.loyalty !== 'evil';
+      return correct ? player.role.role === role : player.role.role !== role && player.role.loyalty !== 'evil';
     })!.user.id;
 
     const assassinID = this.game.players.find((player) => {
@@ -96,7 +94,23 @@ export class GameTestHelper {
     })!.user.id;
 
     this.game.selectPlayer(assassinID, id);
-    this.game.addons.assassin!.assassinate(assassinID, 'merlin');
+    this.game.addons.assassin!.assassinate(assassinID, role);
+
+    return this;
+  }
+
+  pickCustomRole(roleName: TRoles, type: TAssassinateType, correct: boolean = false): this {
+    const id = this.game.players.find((player) => {
+      return correct ? player.role.role === roleName : player.role.role !== roleName && player.role.loyalty !== 'evil';
+    })!.user.id;
+
+    const assassinID = this.game.players.find((player) => {
+      return player.features.isAssassin;
+    })!.user.id;
+
+    this.game.selectPlayer(assassinID, id);
+
+    this.game.addons.assassin!.assassinate(assassinID, type, roleName);
 
     return this;
   }

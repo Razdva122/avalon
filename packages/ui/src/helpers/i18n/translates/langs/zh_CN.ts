@@ -58,6 +58,8 @@ export const zh_CN = {
     missMerlin: '坏人方暗杀梅林失败',
     missGuinevere: '坏人方暗杀女皇失败',
     missLovers: '坏人方暗杀恋人失败',
+    missCleric: '邪恶团队尝试杀死牧师 + 1 但失败了',
+    killCleric: '邪恶团队杀死了牧师 + 1',
     killGuinevere: '坏人方暗杀女皇成功',
     killLovers: '坏人方暗杀恋人成功',
     killMerlin: '坏人方暗杀梅林成功',

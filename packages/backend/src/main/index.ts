@@ -326,9 +326,9 @@ export class Manager {
       getRoomManager(uuid).callGameMethods(userID, { method: 'actionOnMission', result });
     });
 
-    socket.on('assassinate', (uuid, type) => {
+    socket.on('assassinate', (uuid, type, role) => {
       console.log(`Player ${userName} assassinate in game ${uuid}`);
-      getRoomManager(uuid).callGameMethods(userID, { method: 'assassinate', type });
+      getRoomManager(uuid).callGameMethods(userID, { method: 'assassinate', type, customRole: role });
     });
 
     socket.on('checkLoyalty', (uuid) => {

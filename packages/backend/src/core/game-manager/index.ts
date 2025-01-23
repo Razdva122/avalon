@@ -54,6 +54,8 @@ export class GameManager {
 
     this.roomState.result = this.game.result;
 
+    this.roomState.addonsData = this.game.addonsData;
+
     if (this.game.result) {
       eventBus.emit('roomUpdated', this.roomID);
     }
@@ -163,7 +165,7 @@ export class GameManager {
           throw new Error('You cant assassinate in game without assassinate addon');
         }
 
-        this.game.addons.assassin.assassinate(userID, params.type);
+        this.game.addons.assassin.assassinate(userID, params.type, params.customRole);
         break;
 
       case 'checkLoyalty':

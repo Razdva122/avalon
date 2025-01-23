@@ -18,7 +18,10 @@ export class ClericAddon implements IGameAddon {
     if (this.game.round === 0) {
       const clericId = this.game.players.find((player) => player.role.role === 'cleric')!.user.id;
       const leader = this.game.leader;
-      this.game.updateVisibleRolesState(clericId, { [leader.user.id]: leader.role.visibleLoylaty });
+
+      if (clericId !== leader.user.id) {
+        this.game.updateVisibleRolesState(clericId, { [leader.user.id]: leader.role.visibleLoylaty });
+      }
     }
 
     return of(true);

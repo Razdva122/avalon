@@ -181,21 +181,23 @@ export class Game extends GameHooks {
 
     // Generate roles addons
     this.addons = Object.entries(rolesWithAddons).reduce<IGameAddons>((acc, data) => {
-      const [role, addonData] = <[TRolesWithAddons, TRolesAddonsData]>data;
+      const [role, addons] = <[TRolesWithAddons, TRolesAddonsData[]]>data;
 
-      if (options.roles[role]) {
-        const addon = acc[addonData.key];
+      addons.forEach((addonData) => {
+        if (options.roles[role]) {
+          const addon = acc[addonData.key];
 
-        if (!addon) {
-          // @ts-expect-error in order not to write if for each individual addon
-          acc[addonData.key] = new addonData.addon(this, addonData.options);
-          acc.push(acc[addonData.key]!);
-        } else {
-          if ('updateOptions' in addon) {
-            addon.updateOptions(addonData.options!);
+          if (!addon) {
+            // @ts-expect-error in order not to write if for each individual addon
+            acc[addonData.key] = new addonData.addon(this, addonData.options);
+            acc.push(acc[addonData.key]!);
+          } else {
+            if ('updateOptions' in addon) {
+              addon.updateOptions(addonData.options!);
+            }
           }
         }
-      }
+      });
 
       return acc;
     }, []);
@@ -302,9 +304,18 @@ export class Game extends GameHooks {
   /**
    * Remove features from all players
    */
-  protected clearSendPlayers(): void {
+  clearSendPlayers(): void {
     this.players.forEach((player) => {
       player.features.isSent = false;
+    });
+  }
+
+  /**
+   * Clear selected from all players
+   */
+  clearSelectedPlayers(): void {
+    this.players.forEach((player) => {
+      player.features.isSelected = false;
     });
   }
 
@@ -376,9 +387,7 @@ export class Game extends GameHooks {
 
       this.vote = new Vote(this.players, this.leader, this.turn, this.turn === 4 ? true : undefined);
 
-      this.players.forEach((player) => {
-        player.features.isSelected = false;
-      });
+      this.clearSelectedPlayers();
 
       this.callHooks('afterSentTeam', () => {
         this.sentTeamNextStage();

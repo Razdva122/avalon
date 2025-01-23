@@ -105,54 +105,87 @@ export const gamesSettings: IPresetsForGame = {
 /**
  * Roles with addons for main game
  */
-export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsData> = {
-  merlin: {
-    addon: AssassinAddon,
-    key: 'assassin',
-    options: {
-      merlin: [(player: IPlayerInGame) => player.role.role === 'merlin'],
+export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsData[]> = {
+  merlin: [
+    {
+      addon: AssassinAddon,
+      key: 'assassin',
+      options: {
+        merlin: [[(player: IPlayerInGame) => player.role.role === 'merlin']],
+      },
     },
-  },
-  merlinPure: {
-    addon: AssassinAddon,
-    key: 'assassin',
-    options: {
-      merlin: [(player: IPlayerInGame) => player.role.role === 'merlinPure'],
+  ],
+  merlinPure: [
+    {
+      addon: AssassinAddon,
+      key: 'assassin',
+      options: {
+        merlin: [[(player: IPlayerInGame) => player.role.role === 'merlinPure']],
+      },
     },
-  },
-  tristan: {
-    addon: AssassinAddon,
-    key: 'assassin',
-    options: {
-      lovers: [
-        (player: IPlayerInGame) => player.role.role === 'tristan',
-        (player: IPlayerInGame) => player.role.role === 'isolde',
-      ],
+  ],
+  tristan: [
+    {
+      addon: AssassinAddon,
+      key: 'assassin',
+      options: {
+        lovers: [
+          [
+            (player: IPlayerInGame) => player.role.role === 'tristan',
+            (player: IPlayerInGame) => player.role.role === 'isolde',
+          ],
+        ],
+      },
     },
-  },
-  guinevere: {
-    addon: AssassinAddon,
-    key: 'assassin',
-    options: {
-      guinevere: [(player: IPlayerInGame) => player.role.role === 'guinevere'],
+  ],
+  guinevere: [
+    {
+      addon: AssassinAddon,
+      key: 'assassin',
+      options: {
+        guinevere: [[(player: IPlayerInGame) => player.role.role === 'guinevere']],
+      },
     },
-  },
-  goodLancelot: {
-    addon: LancelotsAddon,
-    key: 'lancelots',
-  },
-  witch: {
-    addon: WitchAddon,
-    key: 'witch',
-  },
-  revealer: {
-    addon: RevealerAddon,
-    key: 'revealer',
-  },
-  cleric: {
-    addon: ClericAddon,
-    key: 'cleric',
-  },
+  ],
+  goodLancelot: [
+    {
+      addon: LancelotsAddon,
+      key: 'lancelots',
+    },
+  ],
+  witch: [
+    {
+      addon: WitchAddon,
+      key: 'witch',
+    },
+  ],
+  revealer: [
+    {
+      addon: RevealerAddon,
+      key: 'revealer',
+    },
+  ],
+  cleric: [
+    {
+      addon: ClericAddon,
+      key: 'cleric',
+    },
+    {
+      addon: AssassinAddon,
+      key: 'assassin',
+      options: {
+        cleric: [
+          [(player: IPlayerInGame) => player.role.role === 'cleric'],
+          {
+            type: 'custom',
+            creator: (role) => {
+              return role !== 'cleric' && !role.startsWith('merlin') && role !== 'guinevere';
+            },
+          },
+        ],
+      },
+    },
+  ],
 };
 
 /**

@@ -58,6 +58,8 @@ export const zh_TW = {
     missMerlin: '壞人方暗殺梅林失敗',
     missGuinevere: '壞人方暗殺女皇失敗',
     missLovers: '壞人方暗殺戀人失敗',
+    missCleric: '邪惡團隊嘗試殺死牧師 + 1 但失敗了',
+    killCleric: '邪惡團隊殺死了牧師 + 1',
     killGuinevere: '壞人方暗殺女皇成功',
     killLovers: '壞人方暗殺戀人成功',
     killMerlin: '壞人方暗殺梅林成功',

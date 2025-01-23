@@ -4,7 +4,7 @@ import type { TLancelotsStages } from './lancelots';
 import type { TWitchStages } from './witch';
 import type { TAssassinAddonStages, TAssassinAddonFeatures, TAssassinAddonData } from './assassin';
 
-export type { TAssassinateResult, TAssassinateType, TAssassinAddonData } from './assassin';
+export type { TAssassinateResult, TAssassinateType, TAssassinAddonData, TAssassinateProgressData } from './assassin';
 
 /**
  * Possible addons stages

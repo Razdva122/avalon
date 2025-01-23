@@ -43,7 +43,7 @@ describe('Wait for action', () => {
 
     expect(game.players.find((player) => player.features.isAssassin && player.features.waitForAction)).toBeTruthy();
 
-    gameHelper.pickMerlin(true);
+    gameHelper.pickRole('merlin', true);
 
     expect(game.players.find((player) => player.features.isAssassin && player.features.waitForAction)).toBeFalsy();
   });

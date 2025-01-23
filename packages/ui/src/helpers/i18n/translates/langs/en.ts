@@ -58,6 +58,8 @@ export const en = {
     missMerlin: 'The evil team tried to kill Merlin but missed',
     missGuinevere: 'The evil team tried to kill Guinevere but missed',
     missLovers: 'The evil team tried to kill Lovers but missed',
+    missCleric: 'The evil team tried to kill Cleric + 1 but missed',
+    killCleric: 'The evil team to killed Cleric + 1',
     killGuinevere: 'The evil team killed Guinevere',
     killLovers: 'The evil team killed Lovers',
     killMerlin: 'The evil team killed Merlin',

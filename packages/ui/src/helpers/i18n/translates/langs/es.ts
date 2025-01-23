@@ -58,6 +58,8 @@ export const es = {
     missMerlin: 'El equipo malvado intentó matar a Merlín pero falló',
     missGuinevere: 'El equipo malvado intentó matar a Ginebra pero falló',
     missLovers: 'El equipo malvado intentó matar a los Amantes pero falló',
+    missCleric: 'El equipo maligno intentó matar al Clérigo + 1 pero falló',
+    killCleric: 'El equipo maligno mató al Clérigo + 1',
     killGuinevere: 'El equipo malvado mató a Ginebra',
     killLovers: 'El equipo malvado mató a los Amantes',
     killMerlin: 'El equipo malvado mató a Merlín',

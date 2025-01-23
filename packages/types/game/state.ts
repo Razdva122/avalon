@@ -49,4 +49,6 @@ export type TGameEndReasons =
   | 'missGuinevere'
   | 'killGuinevere'
   | 'missLovers'
-  | 'killLovers';
+  | 'killLovers'
+  | 'missCleric'
+  | 'killCleric';

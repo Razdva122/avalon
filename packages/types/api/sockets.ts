@@ -6,7 +6,7 @@ import type { Server as SuperServer, Socket as SuperServerSocket } from 'socket.
 import type { Socket as SuperSocket } from 'socket.io-client';
 import type { TVoteOption } from '../game/vote';
 import type { TMissionResult } from '../game/mission';
-import type { TLoyalty } from '../game/roles';
+import type { TLoyalty, TRoles } from '../game/roles';
 
 import type { IRoomUnavailableError } from './errors';
 import type { TAssassinateType } from '../game/addons';
@@ -49,11 +49,11 @@ export interface ClientToServerEvents {
   sentSelectedPlayers: (uuid: string) => void;
   voteForMission: (uuid: string, option: TVoteOption) => void;
   actionOnMission: (uuid: string, result: TMissionResult) => void;
-  assassinate: (uuid: string, type: TAssassinateType) => void;
+  assassinate: (uuid: string, type: TAssassinateType, role?: TRoles) => void;
 
   checkLoyalty: (uuid: string) => void;
   getLoyalty: (uuid: string, callback: (loyalty: TLoyalty) => void) => void;
-  announceLoyalty: (uuid: string, loualty: TLoyalty) => void;
+  announceLoyalty: (uuid: string, loyalty: TLoyalty) => void;
 
   giveExcalibur: (uuid: string) => void;
   useExcalibur: (uuid: string) => void;
