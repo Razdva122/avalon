@@ -179,7 +179,7 @@ export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsData[]> = {
           {
             type: 'custom',
             creator: (role) => {
-              return role !== 'cleric' && !role.startsWith('merlin') && role !== 'guinevere';
+              return role !== 'cleric' && !role.startsWith('merlin') && role !== 'guinevere' && role !== 'goodLancelot';
             },
           },
         ],
