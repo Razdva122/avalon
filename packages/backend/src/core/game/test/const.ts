@@ -8,7 +8,7 @@ export const settings = gamesSettings[defaultOptions[0]];
 const gameHelper = new GameTestHelper(...defaultOptions);
 let game = gameHelper.game;
 
-export function generateNewGame(addons?: IGameOptions['addons'], roles?: IGameOptions['roles']) {
+export function generateNewGame(addons?: IGameOptions['addons'], roles?: IGameOptions['roles'], players?: number) {
   const clone = _.cloneDeep(defaultOptions);
 
   if (addons) {
@@ -17,6 +17,10 @@ export function generateNewGame(addons?: IGameOptions['addons'], roles?: IGameOp
 
   if (roles) {
     clone[1].roles = _.merge(clone[1].roles, roles);
+  }
+
+  if (players) {
+    clone[0] = players;
   }
 
   gameHelper.restartGame(...clone);

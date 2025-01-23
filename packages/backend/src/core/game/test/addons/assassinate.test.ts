@@ -4,7 +4,7 @@ let { game, gameHelper } = generateNewGame();
 
 describe('Assassinate logic', () => {
   beforeEach(() => {
-    const restart = generateNewGame({}, { merlin: 1, isolde: 1, tristan: 1, cleric: 1 });
+    const restart = generateNewGame({}, { merlin: 1, isolde: 1, tristan: 1, cleric: 1 }, 8);
     game = restart.game;
     gameHelper = restart.gameHelper;
 
@@ -75,28 +75,28 @@ describe('Assassinate logic', () => {
       expect(game.result?.reason).toBe('missCleric');
     });
 
-    test('Select correct cleric and wrong merlin', () => {
+    test('Select correct cleric and wrong servant', () => {
       gameHelper.pickRole('cleric', true);
 
       expect(game.stage).toBe('assassinate');
 
       expect(game.selectedPlayers.length).toBe(0);
 
-      gameHelper.pickCustomRole('merlin', 'cleric');
+      gameHelper.pickCustomRole('servant', 'cleric');
 
       expect(game.stage).toBe('end');
       expect(game.result?.winner).toBe('good');
       expect(game.result?.reason).toBe('missCleric');
     });
 
-    test('Select correct cleric and correct merlin', () => {
+    test('Select correct cleric and correct servant', () => {
       gameHelper.pickRole('cleric', true);
 
       expect(game.stage).toBe('assassinate');
 
       expect(game.selectedPlayers.length).toBe(0);
 
-      gameHelper.pickCustomRole('merlin', 'cleric', true);
+      gameHelper.pickCustomRole('servant', 'cleric', true);
 
       expect(game.stage).toBe('end');
       expect(game.result?.winner).toBe('evil');
