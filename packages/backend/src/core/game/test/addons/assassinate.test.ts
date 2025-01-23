@@ -108,7 +108,7 @@ describe('Assassinate logic', () => {
 
       expect(game.stage).toBe('assassinate');
 
-      expect(() => gameHelper.pickCustomRole('goodLancelot', 'cleric')).toThrow('valid roles merlin, tristan, isolde');
+      expect(() => gameHelper.pickCustomRole('goodLancelot', 'cleric')).toThrow('valid roles tristan, isolde');
     });
   });
 });
