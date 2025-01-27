@@ -16,6 +16,8 @@ const {
   about,
   oberon,
   mordred,
+  troublemaker,
+  trickster,
 } = require('../../src/helpers/i18n/translates/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -235,9 +237,9 @@ module.exports.routesSeo = {
     priority: 0.2,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Troublemaker',
-      description: "Rules and Tips for Troublemaker role in the board game 'Avalon: The Resistance'",
-      keywords: ['Troublemaker', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...troublemaker,
+      },
       image: 'roles/troublemaker.webp',
     },
   },
@@ -271,9 +273,9 @@ module.exports.routesSeo = {
     priority: 0.2,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Trickster',
-      description: "Rules and Tips for Trickster role in the board game 'Avalon: The Resistance'",
-      keywords: ['Trickster', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...trickster,
+      },
       image: 'roles/trickster.webp',
     },
   },

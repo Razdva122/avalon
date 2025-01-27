@@ -7,52 +7,45 @@
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('trickster')" alt="trickster" />
 
-    <h2>General Information:</h2>
+    <h2>{{ $t('trickster.generalInformation') }}</h2>
     <p>
-      As a <PreviewLink target="trickster" />, you lie when your loyalty is checked <PreviewLink target="ladyOfLake" />,
-      positioning yourself perfectly as a trusted member of the good side.
+      <LocalizedTextWrapper keypath="trickster.intro" />
     </p>
 
-    <h2>General Tips:</h2>
+    <h2>{{ $t('trickster.generalTipsTitle') }}</h2>
     <ul>
       <li>
-        <strong>Cultivate a trustworthy persona:</strong> Successfully fooling other players requires building
-        credibility. Act consistently and help complete quests to gain trust.
+        <strong>{{ $t('trickster.generalTipsCultivateTrustTitle') }}</strong>
+        {{ $t('trickster.generalTipsCultivateTrust') }}
       </li>
       <li>
-        <strong>Deceive selectively:</strong> Use your ability to lie about your loyalty sparingly and strategically to
-        avoid detection.
+        <strong>{{ $t('trickster.generalTipsCreateConfusionTitle') }}</strong>
+        {{ $t('trickster.generalTipsCreateConfusion') }}
       </li>
       <li>
-        <strong>Create confusion:</strong> Sow seeds of doubt about other's roles subtly, drawing suspicion away from
-        yourself and onto actual members of the good side.
-      </li>
-      <li>
-        <strong>Monitor your influence:</strong> Keep track of how others perceive you and adjust your strategy to
-        maintain your disguise.
+        <strong>{{ $t('trickster.generalTipsMonitorInfluenceTitle') }}</strong>
+        {{ $t('trickster.generalTipsMonitorInfluence') }}
       </li>
     </ul>
 
-    <h2>Strategic Tips:</h2>
+    <h2>{{ $t('trickster.strategicTipsTitle') }}</h2>
     <ul>
       <li>
-        <strong>Manipulate voting patterns:</strong> Your votes on proposals can send signals to observant players.
-        Think carefully about when to support or oppose missions.
+        <strong>{{ $t('trickster.strategicTipsManipulateVotingTitle') }}</strong>
+        {{ $t('trickster.strategicTipsManipulateVoting') }}
       </li>
       <li>
-        <strong>Control information flow:</strong> As you gain trust, other players will likely share insights with you.
-        Use this information to benefit your team without revealing your source.
+        <strong>{{ $t('trickster.strategicTipsControlInformationFlowTitle') }}</strong>
+        {{ $t('trickster.strategicTipsControlInformationFlow') }}
       </li>
       <li>
-        <strong>Prepare a credible defense:</strong> If suspicion falls on you, be ready with plausible explanations for
-        your actions that fit with your constructed persona as a good player.
+        <strong>{{ $t('trickster.strategicTipsPrepareDefenseTitle') }}</strong>
+        {{ $t('trickster.strategicTipsPrepareDefense') }}
       </li>
     </ul>
 
     <p>
-      Playing as the Trickster allows you to weave a web of deceit. Embrace the complexities of your role and you can
-      shift the balance in favor of evil, manipulating key outcomes and leaving the forces of good puzzled and paranoid.
-      Strike a balance between overt actions and subtle manipulations to master the art of deception.
+      <LocalizedTextWrapper keypath="trickster.conclusion" />
     </p>
   </div>
 </template>

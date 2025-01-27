@@ -23,15 +23,15 @@ const routeComponentMap = {
   about: () => import('@/pages/about/About.vue'),
   oberon: () => import('@/pages/wiki/roles/Oberon.vue'),
   mordred: () => import('@/pages/wiki/roles/Mordred.vue'),
+  troublemaker: () => import('@/pages/wiki/roles/Troublemaker.vue'),
+  trickster: () => import('@/pages/wiki/roles/Trickster.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo['merlin_pure'], component: () => import('@/pages/wiki/roles/MerlinPure.vue') },
-  { ...routesSeo.troublemaker, component: () => import('@/pages/wiki/roles/Troublemaker.vue') },
   { ...routesSeo.servant, component: () => import('@/pages/wiki/roles/Servant.vue') },
   { ...routesSeo.minion, component: () => import('@/pages/wiki/roles/Minion.vue') },
   { ...routesSeo.guinevere, component: () => import('@/pages/wiki/roles/Guinevere.vue') },
-  { ...routesSeo.trickster, component: () => import('@/pages/wiki/roles/Trickster.vue') },
   { ...routesSeo.lunatic, component: () => import('@/pages/wiki/roles/Lunatic.vue') },
   { ...routesSeo.brute, component: () => import('@/pages/wiki/roles/Brute.vue') },
   { ...routesSeo.witch, component: () => import('@/pages/wiki/roles/Witch.vue') },
