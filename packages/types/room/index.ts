@@ -54,3 +54,8 @@ export type TChatMessage = {
   message: string;
   timestamp: number;
 };
+
+export type TMessage = {
+  text: string;
+  author: string;
+};

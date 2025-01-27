@@ -11,7 +11,7 @@ import type { TLoyalty, TRoles } from '../game/roles';
 import type { IRoomUnavailableError } from './errors';
 import type { TAssassinateType } from '../game/addons';
 
-import type { TRoomsList } from '../room';
+import type { TRoomsList, TMessage } from '../room';
 
 export type { ISocketError } from './errors';
 
@@ -19,6 +19,7 @@ export interface ServerToClientEvents {
   roomsListUpdated: (list: TRoomsList) => void;
   roomUpdated: (state: TRoomState) => void;
   gameUpdated: (state: IVisualGameState) => void;
+  newMessage: (message: TMessage) => void;
   restartGame: (uuid: string) => void;
   destroyRoom: (uuid: string) => void;
   serverError: (error: string) => void;

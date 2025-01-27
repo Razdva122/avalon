@@ -15,6 +15,7 @@
       <i class="material-icons icon-switch arrow_forward"></i>
       <div class="icon-evil-mission"></div>
     </div>
+    <div class="message-container" v-if="chatMessage?.message">{{ chatMessage?.message }}</div>
     <span class="player-name">
       <span class="player-name-text">
         <span v-if="'index' in player && displayIndex">
@@ -28,7 +29,8 @@
 
 <script lang="ts">
 import cloneDeep from 'lodash/cloneDeep';
-import { defineComponent, PropType, inject, computed, toRefs } from 'vue';
+import { defineComponent, PropType, inject, computed, toRefs, ref } from 'vue';
+import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import type { TRoomPlayer, THistoryResults, Dictionary, TGameStage, IActionWithResult } from '@avalon/types';
 import type { IFrontendPlayer } from '@/components/view/board/interface';
@@ -61,6 +63,21 @@ export default defineComponent({
     const gameState = inject(gameStateKey)!;
     const store = useStore();
     const { playerState, visibleHistory, currentStage, displayKick } = toRefs(props);
+    const chatMessage = ref<{ message?: string; timeoutId?: number }>();
+
+    socket.on('newMessage', (message) => {
+      if (message.author === playerState.value.id) {
+        if (chatMessage.value?.timeoutId) {
+          window.clearTimeout(chatMessage.value?.timeoutId);
+        }
+
+        const timeoutId = window.setTimeout(() => {
+          chatMessage.value = {};
+        }, 5000);
+
+        chatMessage.value = { message: message.text, timeoutId };
+      }
+    });
 
     const player = computed(() => {
       const clone = cloneDeep(playerState.value);
@@ -173,6 +190,7 @@ export default defineComponent({
     return {
       player,
       playerClasses,
+      chatMessage,
     };
   },
 });
@@ -413,5 +431,15 @@ export default defineComponent({
   background-image: url('@/assets/red_team_no_background.webp');
   border: 2px solid rgb(var(--v-theme-error));
   background-size: contain;
+}
+
+.message-container {
+  border-radius: 8px;
+  text-align: center;
+  padding: 2px 6px;
+  background-color: rgb(var(--v-theme-surface-variant));
+  position: absolute;
+  bottom: 30px;
+  @include text-overflow(5);
 }
 </style>
