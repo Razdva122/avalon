@@ -2614,4 +2614,737 @@ export const fakeGames: TRoomState[] = [
       ],
     },
   },
+  {
+    roomID: '123-456-789-1',
+    leaderID: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+    chat: [],
+    options: {
+      addons: {},
+      roles: {
+        merlin: 1,
+        percival: 1,
+        mordred: 1,
+        goodLancelot: 1,
+        evilLancelot: 1,
+        guinevere: 1,
+      },
+      features: {
+        anonymousVoting: true,
+      },
+    },
+    players: [
+      {
+        name: 'evie ',
+        id: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+        isLeader: true,
+      },
+      {
+        name: 'Rajesh Gaire',
+        id: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+        isLeader: false,
+      },
+      {
+        name: 'Zahraa',
+        id: 'c93192d6-030f-480d-a1e6-160db4311e5f',
+        isLeader: false,
+      },
+      {
+        name: 'Ishfaaq',
+        id: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+        isLeader: false,
+      },
+      {
+        name: 'George Le Fay',
+        id: 'bd213310-377d-481f-b26c-829d27fb00c4',
+        isLeader: false,
+      },
+      {
+        name: 'Ze You',
+        id: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+        isLeader: false,
+      },
+      {
+        name: 'Yash',
+        id: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+        isLeader: false,
+      },
+      {
+        name: 'ivy',
+        id: '90c12cf0-4880-44da-becf-634fc0650ebc',
+        isLeader: false,
+      },
+    ],
+    stage: 'started',
+    game: {
+      result: {
+        winner: 'evil',
+        reason: 'evilTeamMissions',
+      },
+      uuid: 'f810d660-4087-4eb5-b928-fb45c4672450',
+      stage: 'end',
+      vote: 0,
+      mission: 3,
+      settings: {
+        missions: [
+          {
+            players: 3,
+            failsRequired: 1,
+          },
+          {
+            players: 4,
+            failsRequired: 1,
+          },
+          {
+            players: 4,
+            failsRequired: 1,
+          },
+          {
+            players: 5,
+            failsRequired: 2,
+          },
+          {
+            players: 5,
+            failsRequired: 1,
+          },
+        ],
+        players: {
+          good: 5,
+          evil: 3,
+        },
+        total: 8,
+        roles: {
+          evil: ['mordred', 'evilLancelot', 'minion'],
+          good: ['merlin', 'percival', 'guinevere', 'goodLancelot', 'servant'],
+        },
+      },
+      addonsData: {
+        assassin: {
+          assassinateTargets: ['merlin', 'guinevere'],
+        },
+      },
+      features: {
+        anonymousVoting: true,
+      },
+      history: [
+        {
+          type: 'vote',
+          result: 'approve',
+          index: 0,
+          forced: false,
+          leaderID: '90c12cf0-4880-44da-becf-634fc0650ebc',
+          team: [
+            {
+              id: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+            },
+            {
+              id: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+            },
+            {
+              id: '90c12cf0-4880-44da-becf-634fc0650ebc',
+            },
+          ],
+          anonymous: false,
+          votes: [
+            {
+              playerID: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+              onMission: false,
+              value: 'approve',
+            },
+            {
+              playerID: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+              onMission: false,
+              value: 'reject',
+            },
+            {
+              playerID: 'c93192d6-030f-480d-a1e6-160db4311e5f',
+              onMission: false,
+              value: 'approve',
+            },
+            {
+              playerID: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+              onMission: false,
+              value: 'approve',
+            },
+            {
+              playerID: 'bd213310-377d-481f-b26c-829d27fb00c4',
+              onMission: false,
+              value: 'reject',
+            },
+            {
+              playerID: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+              onMission: true,
+              value: 'reject',
+            },
+            {
+              playerID: '90c12cf0-4880-44da-becf-634fc0650ebc',
+              onMission: true,
+              value: 'approve',
+            },
+          ],
+        },
+        {
+          type: 'mission',
+          index: 0,
+          result: 'fail',
+          settings: {
+            players: 3,
+            failsRequired: 1,
+          },
+          leaderID: '90c12cf0-4880-44da-becf-634fc0650ebc',
+          fails: 1,
+          actions: [
+            {
+              playerID: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+              value: 'success',
+            },
+            {
+              playerID: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+              value: 'success',
+            },
+            {
+              playerID: '90c12cf0-4880-44da-becf-634fc0650ebc',
+              value: 'fail',
+            },
+          ],
+        },
+        {
+          type: 'vote',
+          result: 'reject',
+          index: 0,
+          forced: false,
+          leaderID: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+          team: [
+            {
+              id: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+            },
+            {
+              id: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+            },
+            {
+              id: 'bd213310-377d-481f-b26c-829d27fb00c4',
+            },
+            {
+              id: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+            },
+          ],
+          anonymous: false,
+          votes: [
+            {
+              playerID: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+              onMission: true,
+              value: 'reject',
+            },
+            {
+              playerID: 'c93192d6-030f-480d-a1e6-160db4311e5f',
+              onMission: false,
+              value: 'reject',
+            },
+            {
+              playerID: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+              onMission: false,
+              value: 'approve',
+            },
+            {
+              playerID: 'bd213310-377d-481f-b26c-829d27fb00c4',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+              onMission: true,
+              value: 'reject',
+            },
+            {
+              playerID: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+              onMission: false,
+              value: 'reject',
+            },
+            {
+              playerID: '90c12cf0-4880-44da-becf-634fc0650ebc',
+              onMission: false,
+              value: 'reject',
+            },
+          ],
+        },
+        {
+          type: 'vote',
+          result: 'approve',
+          index: 1,
+          forced: false,
+          leaderID: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+          team: [
+            {
+              id: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+            },
+            {
+              id: 'bd213310-377d-481f-b26c-829d27fb00c4',
+            },
+            {
+              id: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+            },
+            {
+              id: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+            },
+          ],
+          anonymous: false,
+          votes: [
+            {
+              playerID: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+              onMission: false,
+              value: 'reject',
+            },
+            {
+              playerID: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: 'c93192d6-030f-480d-a1e6-160db4311e5f',
+              onMission: false,
+              value: 'approve',
+            },
+            {
+              playerID: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+              onMission: false,
+              value: 'reject',
+            },
+            {
+              playerID: 'bd213310-377d-481f-b26c-829d27fb00c4',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: '90c12cf0-4880-44da-becf-634fc0650ebc',
+              onMission: false,
+              value: 'reject',
+            },
+          ],
+        },
+        {
+          type: 'mission',
+          index: 1,
+          result: 'success',
+          settings: {
+            players: 4,
+            failsRequired: 1,
+          },
+          leaderID: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+          fails: 0,
+          actions: [
+            {
+              playerID: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+              value: 'success',
+            },
+            {
+              playerID: 'bd213310-377d-481f-b26c-829d27fb00c4',
+              value: 'success',
+            },
+            {
+              playerID: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+              value: 'success',
+            },
+            {
+              playerID: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+              value: 'success',
+            },
+          ],
+        },
+        {
+          type: 'switchLancelots',
+          lancelotsIDs: {
+            good: 'bd213310-377d-481f-b26c-829d27fb00c4',
+            evil: '90c12cf0-4880-44da-becf-634fc0650ebc',
+          },
+          result: true,
+          pointer: 0,
+          switches: [true, false, false, true, false],
+        },
+        {
+          type: 'vote',
+          result: 'reject',
+          index: 0,
+          forced: false,
+          leaderID: 'c93192d6-030f-480d-a1e6-160db4311e5f',
+          team: [
+            {
+              id: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+            },
+            {
+              id: 'c93192d6-030f-480d-a1e6-160db4311e5f',
+            },
+            {
+              id: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+            },
+            {
+              id: 'bd213310-377d-481f-b26c-829d27fb00c4',
+            },
+          ],
+          anonymous: false,
+          votes: [
+            {
+              playerID: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+              onMission: false,
+              value: 'reject',
+            },
+            {
+              playerID: 'c93192d6-030f-480d-a1e6-160db4311e5f',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: 'bd213310-377d-481f-b26c-829d27fb00c4',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+              onMission: false,
+              value: 'reject',
+            },
+            {
+              playerID: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+              onMission: false,
+              value: 'reject',
+            },
+            {
+              playerID: '90c12cf0-4880-44da-becf-634fc0650ebc',
+              onMission: false,
+              value: 'reject',
+            },
+          ],
+        },
+        {
+          type: 'vote',
+          result: 'approve',
+          index: 1,
+          forced: false,
+          leaderID: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+          team: [
+            {
+              id: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+            },
+            {
+              id: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+            },
+            {
+              id: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+            },
+            {
+              id: '90c12cf0-4880-44da-becf-634fc0650ebc',
+            },
+          ],
+          anonymous: false,
+          votes: [
+            {
+              playerID: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+              onMission: false,
+              value: 'approve',
+            },
+            {
+              playerID: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: 'c93192d6-030f-480d-a1e6-160db4311e5f',
+              onMission: false,
+              value: 'reject',
+            },
+            {
+              playerID: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: 'bd213310-377d-481f-b26c-829d27fb00c4',
+              onMission: false,
+              value: 'reject',
+            },
+            {
+              playerID: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+              onMission: false,
+              value: 'approve',
+            },
+            {
+              playerID: '90c12cf0-4880-44da-becf-634fc0650ebc',
+              onMission: true,
+              value: 'approve',
+            },
+          ],
+        },
+        {
+          type: 'mission',
+          index: 2,
+          result: 'fail',
+          settings: {
+            players: 4,
+            failsRequired: 1,
+          },
+          leaderID: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+          fails: 1,
+          actions: [
+            {
+              playerID: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+              value: 'success',
+            },
+            {
+              playerID: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+              value: 'fail',
+            },
+            {
+              playerID: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+              value: 'success',
+            },
+            {
+              playerID: '90c12cf0-4880-44da-becf-634fc0650ebc',
+              value: 'success',
+            },
+          ],
+        },
+        {
+          type: 'switchLancelots',
+          lancelotsIDs: {
+            good: '90c12cf0-4880-44da-becf-634fc0650ebc',
+            evil: 'bd213310-377d-481f-b26c-829d27fb00c4',
+          },
+          result: false,
+          pointer: 1,
+          switches: [true, false, false, true, false],
+        },
+        {
+          type: 'vote',
+          result: 'approve',
+          index: 0,
+          forced: false,
+          leaderID: 'bd213310-377d-481f-b26c-829d27fb00c4',
+          team: [
+            {
+              id: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+            },
+            {
+              id: 'c93192d6-030f-480d-a1e6-160db4311e5f',
+            },
+            {
+              id: 'bd213310-377d-481f-b26c-829d27fb00c4',
+            },
+            {
+              id: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+            },
+            {
+              id: '90c12cf0-4880-44da-becf-634fc0650ebc',
+            },
+          ],
+          anonymous: false,
+          votes: [
+            {
+              playerID: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+              onMission: true,
+              value: 'reject',
+            },
+            {
+              playerID: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+              onMission: false,
+              value: 'approve',
+            },
+            {
+              playerID: 'c93192d6-030f-480d-a1e6-160db4311e5f',
+              onMission: true,
+              value: 'reject',
+            },
+            {
+              playerID: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+              onMission: false,
+              value: 'reject',
+            },
+            {
+              playerID: 'bd213310-377d-481f-b26c-829d27fb00c4',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+              onMission: false,
+              value: 'approve',
+            },
+            {
+              playerID: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+              onMission: true,
+              value: 'approve',
+            },
+            {
+              playerID: '90c12cf0-4880-44da-becf-634fc0650ebc',
+              onMission: true,
+              value: 'approve',
+            },
+          ],
+        },
+        {
+          type: 'mission',
+          index: 3,
+          result: 'fail',
+          settings: {
+            players: 5,
+            failsRequired: 2,
+          },
+          leaderID: 'bd213310-377d-481f-b26c-829d27fb00c4',
+          fails: 2,
+          actions: [
+            {
+              playerID: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+              value: 'fail',
+            },
+            {
+              playerID: 'c93192d6-030f-480d-a1e6-160db4311e5f',
+              value: 'success',
+            },
+            {
+              playerID: 'bd213310-377d-481f-b26c-829d27fb00c4',
+              value: 'fail',
+            },
+            {
+              playerID: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+              value: 'success',
+            },
+            {
+              playerID: '90c12cf0-4880-44da-becf-634fc0650ebc',
+              value: 'success',
+            },
+          ],
+        },
+      ],
+      players: [
+        {
+          id: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+          index: 2,
+          name: 'evie ',
+          features: {
+            isSelected: false,
+            isLeader: false,
+            isSent: false,
+            waitForAction: false,
+          },
+          role: 'minion',
+        },
+        {
+          id: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
+          index: 3,
+          name: 'Rajesh Gaire',
+          features: {
+            isSelected: false,
+            isLeader: false,
+            isSent: false,
+            waitForAction: false,
+          },
+          role: 'percival',
+        },
+        {
+          id: 'c93192d6-030f-480d-a1e6-160db4311e5f',
+          index: 4,
+          name: 'Zahraa',
+          features: {
+            isSelected: false,
+            isLeader: false,
+            isSent: false,
+            waitForAction: false,
+          },
+          role: 'guinevere',
+        },
+        {
+          id: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
+          index: 5,
+          name: 'Ishfaaq',
+          features: {
+            isSelected: false,
+            isLeader: false,
+            isSent: false,
+            waitForAction: false,
+          },
+          role: 'mordred',
+        },
+        {
+          id: 'bd213310-377d-481f-b26c-829d27fb00c4',
+          index: 6,
+          name: 'George Le Fay',
+          features: {
+            isSelected: false,
+            isLeader: true,
+            isSent: false,
+            waitForAction: false,
+          },
+          role: 'evilLancelot',
+        },
+        {
+          id: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
+          index: 7,
+          name: 'Ze You',
+          features: {
+            isSelected: false,
+            isLeader: false,
+            isSent: false,
+            waitForAction: false,
+          },
+          role: 'servant',
+        },
+        {
+          id: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
+          index: 8,
+          name: 'Yash',
+          features: {
+            isSelected: false,
+            isLeader: false,
+            isSent: false,
+            waitForAction: false,
+          },
+          role: 'merlin',
+        },
+        {
+          id: '90c12cf0-4880-44da-becf-634fc0650ebc',
+          index: 1,
+          name: 'ivy',
+          features: {
+            isSelected: false,
+            isLeader: false,
+            isSent: false,
+            waitForAction: false,
+          },
+          role: 'goodLancelot',
+        },
+      ],
+    },
+  },
 ];

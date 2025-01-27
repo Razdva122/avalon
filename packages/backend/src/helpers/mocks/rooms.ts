@@ -2,6 +2,32 @@ import type { TRoomsList } from '@avalon/types';
 
 export const fakeRooms: TRoomsList = [
   {
+    host: 'evie ',
+    state: 'started',
+    options: {
+      addons: {},
+      roles: {
+        merlin: 1,
+        percival: 1,
+        mordred: 1,
+        goodLancelot: 1,
+        evilLancelot: 1,
+        guinevere: 1,
+      },
+      features: {
+        anonymousVoting: true,
+      },
+    },
+    startTime: 'Sun Jan 26 2025 22:26:00 GMT+0000 (Coordinated Universal Time)',
+    createTime: 'Sun Jan 26 2025 22:25:55 GMT+0000 (Coordinated Universal Time)',
+    uuid: '123-456-789-1',
+    players: 8,
+    result: {
+      winner: 'evil',
+      reason: 'evilTeamMissions',
+    },
+  },
+  {
     host: 'Dmitrii',
     state: 'started',
     options: {

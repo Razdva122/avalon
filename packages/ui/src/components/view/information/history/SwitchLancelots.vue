@@ -23,7 +23,7 @@
     ></span>
   </div>
   <div v-if="!data.result">
-    {{ $t('roles.lancelots') }}<span class="text-success">{{ $t('lancelotsHistory.lancelotsLoyal') }}</span>
+    {{ $t('roles.lancelots') }} <span class="text-success">{{ $t('lancelotsHistory.lancelotsLoyal') }}</span>
   </div>
   <div v-else>
     {{ $t('roles.lancelots') }} <span class="text-error">{{ $t('lancelotsHistory.lancelotsSwap') }}</span>

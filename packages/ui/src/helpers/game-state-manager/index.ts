@@ -251,6 +251,23 @@ export class GameStateManager {
           });
         }
       }
+
+      if (current.stage === 'switchLancelots') {
+        const history = last(current.history)!;
+
+        if (history.type === 'switchLancelots' && history.result === true) {
+          let mutateIndex = index - 1;
+
+          while (mutateIndex >= startIndex) {
+            const players = gameStates[mutateIndex].players;
+            const goodLancelot = players.find((player) => player.role === 'goodLancelot')!;
+            goodLancelot.role = 'evilLancelot';
+            const evilLancelot = players.find((player) => player.role === 'evilLancelot')!;
+            evilLancelot.role = 'goodLancelot';
+            mutateIndex -= 1;
+          }
+        }
+      }
     }
   }
 
