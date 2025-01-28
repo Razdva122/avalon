@@ -291,7 +291,10 @@ export class Manager {
       const room = this.rooms[uuid];
       if (room.leaderID === userID) {
         room.leaveGame(kickUserID);
-        eventBus.emit('roomUpdated', room);
+
+        if (this.rooms[uuid]) {
+          eventBus.emit('roomUpdated', room);
+        }
       }
     });
   }
