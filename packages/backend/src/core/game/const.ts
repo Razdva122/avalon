@@ -4,6 +4,7 @@ import {
   TRolesAddonsData,
   AssassinAddon,
   LadyOfLakeAddon,
+  LadyOfSeaAddon,
   ExcaliburAddon,
   LancelotsAddon,
   WitchAddon,
@@ -195,6 +196,10 @@ export const addons: Record<TAdditionalAddons, TAdditionalAddonsData> = {
   ladyOfLake: {
     addon: LadyOfLakeAddon,
     key: 'ladyOfLake',
+  },
+  ladyOfSea: {
+    addon: LadyOfSeaAddon,
+    key: 'ladyOfSea',
   },
   excalibur: {
     addon: ExcaliburAddon,

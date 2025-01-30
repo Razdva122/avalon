@@ -53,8 +53,8 @@ export interface ClientToServerEvents {
   assassinate: (uuid: string, type: TAssassinateType, role?: TRoles) => void;
 
   checkLoyalty: (uuid: string) => void;
-  getLoyalty: (uuid: string, callback: (loyalty: TLoyalty) => void) => void;
-  announceLoyalty: (uuid: string, loyalty: TLoyalty) => void;
+  getLoyalty: (uuid: string, callback: (loyalty: TLoyalty | TRoles) => void) => void;
+  announceLoyalty: (uuid: string, loyalty: TLoyalty | TRoles) => void;
 
   giveExcalibur: (uuid: string) => void;
   useExcalibur: (uuid: string) => void;

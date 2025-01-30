@@ -64,7 +64,7 @@ export type TCheckLoyaltyParams = {
 
 export type TAnnounceLoyaltyParams = {
   method: 'announceLoyalty';
-  loyalty: TLoyalty;
+  loyalty: TLoyalty | TRoles;
 };
 
 export type TGiveExcaliburParams = {
@@ -79,5 +79,5 @@ export type TGetLoyaltyData = {
   params: {
     method: 'getLoyalty';
   };
-  result: TLoyalty;
+  result: TLoyalty | TRoles;
 };

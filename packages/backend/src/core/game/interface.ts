@@ -7,6 +7,7 @@ import type {
   WitchAddon,
   ClericAddon,
   RevealerAddon,
+  LadyOfSeaAddon,
 } from '@/core/game/addons';
 import type { Character } from '@/core/roles';
 import type { User } from '@/user';
@@ -36,6 +37,7 @@ export type TAddonsArray = IGameAddon<any>[];
 export interface IGameAddons extends TAddonsArray {
   assassin?: AssassinAddon;
   ladyOfLake?: LadyOfLakeAddon;
+  ladyOfSea?: LadyOfSeaAddon;
   excalibur?: ExcaliburAddon;
   lancelots?: LancelotsAddon;
   witch?: WitchAddon;

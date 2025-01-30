@@ -114,11 +114,13 @@ export const zh_TW = {
   },
   addons: {
     ladyOfLake: '湖中仙女',
+    ladyOfSea: '海中仙女',
     excalibur: '神劍',
   },
   ladyModule: {
     announceGood: '宣告好人方',
     announceEvil: '宣告壞人方',
+    announce: '公告',
   },
   options: {
     roles: '角色',
@@ -128,6 +130,7 @@ export const zh_TW = {
     addons: '插件',
     features: '功能',
     ladyHint: '湖中仙女可以讓你了解其他玩家的忠誠度',
+    ladySeaHint: '湖中仙女的類似角色，但如果你檢查邪惡力量的玩家，你將看到他的角色。',
     excaliburHint: '神劍讓您改變任務參與者之一的決定',
     anonymousVoting: '匿名投票',
     anonymousVotingHint: '透過匿名投票,您不知道誰批准任務、誰拒絕任務',

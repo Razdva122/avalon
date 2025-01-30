@@ -117,7 +117,7 @@ export default defineComponent({
     });
 
     const isUserLadyOwner = computed(() => {
-      return player.value?.features.ladyOfLake === 'has';
+      return player.value?.features.ladyOfLake === 'has' || player.value?.features.ladyOfSea === 'has';
     });
 
     const isUserExcaliburOwner = computed(() => {
@@ -141,7 +141,12 @@ export default defineComponent({
       return (
         isSinglePlayerSelected.value &&
         Boolean(
-          game.value.players.find((player) => player.features.isSelected && player.features.ladyOfLake === undefined),
+          game.value.players.find(
+            (player) =>
+              player.features.isSelected &&
+              player.features.ladyOfLake === undefined &&
+              player.features.ladyOfSea === undefined,
+          ),
         )
       );
     });

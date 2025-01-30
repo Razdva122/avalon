@@ -15,6 +15,7 @@ import type {
   ICheckLoyalty,
   TAssassinateType,
   TTeamMember,
+  TRoles,
 } from '@avalon/types';
 
 export type THistoryData = {
@@ -44,8 +45,8 @@ export type THistoryData = {
   checkLoyalty: {
     validator: IPlayerInGame;
     inspected: IPlayerInGame;
-    result: TLoyalty;
-    realLoyalty: TLoyalty;
+    result: TLoyalty | TRoles;
+    visibleLoyalty: TLoyalty | TRoles;
   };
   switchResult: {
     switcher: IPlayerInGame;

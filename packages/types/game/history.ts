@@ -1,7 +1,7 @@
 import type { TMissionResult, IMissionSettings } from './mission';
 import type { TVoteOption, TTeamMember } from './vote';
 import type { TAssassinateResult } from './addons';
-import type { TLoyalty } from './roles';
+import type { TLoyalty, TRoles } from './roles';
 import type { TAssassinateType } from './addons/assassin';
 
 /**
@@ -92,8 +92,8 @@ export interface ICheckLoyalty {
   type: 'checkLoyalty';
   validatorID: string;
   inspectedID: string;
-  result: TLoyalty;
-  realLoyalty?: TLoyalty;
+  result: TLoyalty | TRoles;
+  visibleLoyalty?: TLoyalty | TRoles;
 }
 
 /**

@@ -1,6 +1,7 @@
 export * from '@/core/game/addons/interface';
 export * from '@/core/game/addons/assassin';
 export * from '@/core/game/addons/lady-of-lake';
+export * from '@/core/game/addons/lady-of-sea';
 export * from '@/core/game/addons/excalibur';
 export * from '@/core/game/addons/lancelots';
 export * from '@/core/game/addons/witch';
@@ -16,8 +17,9 @@ import { LancelotsAddon } from '@/core/game/addons/lancelots';
 import { WitchAddon } from '@/core/game/addons/witch';
 import { ClericAddon } from '@/core/game/addons/cleric';
 import { RevealerAddon } from '@/core/game/addons/revealer';
+import { LadyOfSeaAddon } from '@/core/game/addons/lady-of-sea';
 
-export type TAdditionalAddonsConstructor = typeof LadyOfLakeAddon | typeof ExcaliburAddon;
+export type TAdditionalAddonsConstructor = typeof LadyOfLakeAddon | typeof ExcaliburAddon | typeof LadyOfSeaAddon;
 export type TRolesAddonsConstructor =
   | typeof AssassinAddon
   | typeof LancelotsAddon
@@ -27,7 +29,7 @@ export type TRolesAddonsConstructor =
 
 export type TRolesAddonsKeys = 'assassin' | 'lancelots' | 'witch' | 'cleric' | 'revealer';
 
-export type TAdditionalAddonsKeys = 'ladyOfLake' | 'excalibur';
+export type TAdditionalAddonsKeys = 'ladyOfLake' | 'excalibur' | 'ladyOfSea';
 
 export type TRolesAddonsData = {
   key: TRolesAddonsKeys;

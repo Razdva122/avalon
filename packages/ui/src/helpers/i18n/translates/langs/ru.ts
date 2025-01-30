@@ -114,11 +114,13 @@ export const ru = {
   },
   addons: {
     ladyOfLake: 'Леди озера',
+    ladyOfSea: 'Леди моря',
     excalibur: 'Экскалибур',
   },
   ladyModule: {
     announceGood: 'Объявить добром',
     announceEvil: 'Объявить злом',
+    announce: 'Объявить',
   },
   options: {
     roles: 'Роли',
@@ -128,6 +130,7 @@ export const ru = {
     addons: 'Дополнения',
     features: 'Опции',
     ladyHint: 'Леди позволяет проверить сторону другого игрока',
+    ladySeaHint: 'Аналог Леди озера, но если вы проверите игрока сил зла, вы увидите его роль.',
     excaliburHint: 'Экскалибур позволяет изменить решение одного из участников похода',
     anonymousVoting: 'Анонимное голосование',
     anonymousVotingHint: 'При анонимном голосовании игроки не знают, кто проголосовал за, а кто против',

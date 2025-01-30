@@ -114,11 +114,13 @@ export const es = {
   },
   addons: {
     ladyOfLake: 'Dama del Lago',
+    ladyOfSea: 'Dama del Mar',
     excalibur: 'Excalibur',
   },
   ladyModule: {
     announceGood: 'Anunciar Bueno',
     announceEvil: 'Anunciar Malvado',
+    announce: 'Anunciar',
   },
   options: {
     roles: 'Roles',
@@ -128,6 +130,7 @@ export const es = {
     addons: 'Expansiones',
     features: 'Características',
     ladyHint: 'La dama te permite conocer la lealtad de otro jugador',
+    ladySeaHint: 'Un análogo de la Dama del Lago, pero si revisas al jugador de las fuerzas del mal, verás su rol.',
     excaliburHint: 'Excalibur te permite cambiar la decisión de uno de los participantes de la misión',
     anonymousVoting: 'Votación anónima',
     anonymousVotingHint: 'Con la votación anónima, no sabes quién aprueba la misión y quién la rechaza',

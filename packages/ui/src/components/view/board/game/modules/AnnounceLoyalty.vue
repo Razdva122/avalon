@@ -1,39 +1,75 @@
 <template>
   <Spoiler :size="{ width: '300px', height: '200px' }">
     <div class="d-flex flex-column align-center justify-center" v-if="loyalty">
-      <div class="mb-8" :class="loyalty"></div>
-      <div>
-        <v-btn class="mr-4" color="success" @click="announceLoyalty('good')">
-          {{ $t('ladyModule.announceGood') }}
+      <PlayerIcon :icon="loyalty" class="mb-8 role-icon" />
+      <template v-if="isLadyOfSea">
+        <v-btn-toggle v-model="selectedLoyalty" density="comfortable" divided>
+          <v-btn
+            v-for="role in possibleSeaTargets"
+            :value="role"
+            size="x-small"
+            variant="plain"
+            class="button-content button-small"
+          >
+            <template v-slot:prepend>
+              <PlayerIcon :icon="role" class="small-role-icon radio-button" />
+            </template>
+          </v-btn>
+        </v-btn-toggle>
+
+        <v-btn :disabled="!selectedLoyalty" color="success" @click="announceLoyalty(selectedLoyalty!)">
+          {{ $t('ladyModule.announce') }}
         </v-btn>
-        <v-btn color="error" @click="announceLoyalty('evil')"> {{ $t('ladyModule.announceEvil') }} </v-btn>
-      </div>
+      </template>
+      <template v-else>
+        <div>
+          <v-btn class="mr-4" color="success" @click="announceLoyalty('good')">
+            {{ $t('ladyModule.announceGood') }}
+          </v-btn>
+          <v-btn color="error" @click="announceLoyalty('evil')"> {{ $t('ladyModule.announceEvil') }} </v-btn>
+        </div>
+      </template>
     </div>
   </Spoiler>
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, Ref, ref } from 'vue';
+import { defineComponent, inject, Ref, ref, computed } from 'vue';
 import { socket } from '@/api/socket';
 import { gameStateKey } from '@/helpers/game-state-manager';
-import { TLoyalty } from '@avalon/types';
+import { TLoyalty, TRoles } from '@avalon/types';
+import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import Spoiler from '@/components/feedback/Spoiler.vue';
 
 export default defineComponent({
   components: {
     Spoiler,
+    PlayerIcon,
   },
   async setup() {
     const gameState = inject(gameStateKey)!;
-    const loyalty = ref() as Ref<TLoyalty>;
+    const loyalty = ref() as Ref<TLoyalty | TRoles>;
+    const selectedLoyalty = ref<TRoles | TLoyalty | undefined>(undefined);
+
     loyalty.value = await socket.emitWithAck('getLoyalty', gameState.value.uuid);
 
-    const announceLoyalty = (loyalty: TLoyalty) => {
+    const announceLoyalty = (loyalty: TLoyalty | TRoles) => {
       socket.emit('announceLoyalty', gameState.value.uuid, loyalty);
     };
 
+    const isLadyOfSea = computed(() => {
+      return gameState.value.addonsData.ladyOfSea;
+    });
+
+    const possibleSeaTargets = computed(() => {
+      return gameState.value.addonsData.ladyOfSea?.loyaltyTargets || [];
+    });
+
     return {
+      isLadyOfSea,
       loyalty,
+      selectedLoyalty,
+      possibleSeaTargets,
 
       announceLoyalty,
     };
@@ -42,8 +78,7 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.evil,
-.good {
+.role-icon {
   width: 200px;
   height: 200px;
   background-size: contain;
@@ -51,11 +86,26 @@ export default defineComponent({
   border: 3px solid white;
 }
 
-.evil {
-  background-image: url('@/assets/red_team_no_background.webp');
+.small-role-icon {
+  width: 40px;
+  height: 40px;
+  border: 3px solid;
 }
 
-.good {
-  background-image: url('@/assets/blue_team_no_background.webp');
+.radio-button {
+  background-size: 120%;
+  background-position: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid;
+}
+
+.v-btn--active {
+  .radio-button {
+    border-color: rgb(var(--v-theme-error));
+  }
+
+  opacity: 1;
 }
 </style>

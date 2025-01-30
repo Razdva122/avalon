@@ -114,11 +114,13 @@ export const en = {
   },
   addons: {
     ladyOfLake: 'Lady of the lake',
+    ladyOfSea: 'Lady of the sea',
     excalibur: 'Excalibur',
   },
   ladyModule: {
     announceGood: 'Announce Good',
     announceEvil: 'Announce Evil',
+    announce: 'Announce',
   },
   options: {
     roles: 'Roles',
@@ -128,6 +130,8 @@ export const en = {
     addons: 'Addons',
     features: 'Features',
     ladyHint: 'The lady allows you to find out the loyalty of another player',
+    ladySeaHint:
+      'An analogue of the Lady of the lake, but if you check the player of the forces of evil, you will see his role.',
     excaliburHint: 'Excalibur allows you to change the decision of one of the participants of the mission',
     anonymousVoting: 'Anonymous voting',
     anonymousVotingHint: "With anonymous voting, you don't know who approves the mission and who rejects it",

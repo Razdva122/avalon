@@ -168,6 +168,12 @@ export default defineComponent({
           hint: this.$t('options.ladyHint'),
         },
         {
+          name: 'ladyOfSea',
+          label: this.$t('addons.ladyOfSea'),
+          route: 'ladyOfSea',
+          hint: this.$t('options.ladySeaHint'),
+        },
+        {
           name: 'excalibur',
           label: this.$t('addons.excalibur'),
           route: 'excalibur',

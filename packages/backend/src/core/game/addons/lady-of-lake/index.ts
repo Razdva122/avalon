@@ -1,11 +1,11 @@
 import { IGameAddon } from '@/core/game/addons/interface';
 import { CheckLoyalty } from '@/core/game/addons/lady-of-lake/check-loyalty';
 import { Game, IPlayerInGame } from '@/core/game';
-import { Dictionary, TLoyalty, TVisibleRole } from '@avalon/types';
+import { Dictionary, TLoyalty, TRoles, TVisibleRole } from '@avalon/types';
 import { Subject, of } from 'rxjs';
 
 export class LadyOfLakeAddon implements IGameAddon {
-  addonName = 'ladyOfLake';
+  addonName: 'ladyOfLake' | 'ladyOfSea' = 'ladyOfLake';
   checkLoyaltySubject: Subject<boolean> = new Subject();
   game: Game;
 
@@ -15,7 +15,7 @@ export class LadyOfLakeAddon implements IGameAddon {
 
   afterInit() {
     // On check loyalty user with lady of lake can select players
-    this.game.selectAvailable.checkLoyalty = (player) => player.features.ladyOfLake === 'has';
+    this.game.selectAvailable.checkLoyalty = (player) => player.features[this.addonName] === 'has';
 
     let lastPlayer = this.game.leader;
     while (lastPlayer.next !== this.game.leader) {
@@ -23,7 +23,7 @@ export class LadyOfLakeAddon implements IGameAddon {
     }
 
     // Right player from leader get ladyOfLake
-    lastPlayer.features.ladyOfLake = 'has';
+    lastPlayer.features[this.addonName] = 'has';
 
     return of(true);
   }
@@ -31,7 +31,7 @@ export class LadyOfLakeAddon implements IGameAddon {
   beforeSelectTeam() {
     if (this.game.turn === 0 && this.game.round >= 2) {
       this.game.players.forEach((player) => {
-        player.features.waitForAction = player.features.ladyOfLake === 'has';
+        player.features.waitForAction = player.features[this.addonName] === 'has';
       });
 
       this.game.stage = 'checkLoyalty';
@@ -47,10 +47,10 @@ export class LadyOfLakeAddon implements IGameAddon {
       throw new Error(`You cant check loyalty on stage ${this.game.stage}`);
     }
 
-    const ownerOfLady = this.game.players.find((player) => player.features.ladyOfLake === 'has')!;
+    const ownerOfLady = this.game.players.find((player) => player.features[this.addonName] === 'has')!;
 
     if (ownerOfLady.user.id !== executorID) {
-      throw new Error('Only owner of lady of the lake can check loyalty');
+      throw new Error(`Only owner of ${this.addonName} can check loyalty`);
     }
 
     if (this.game.selectedPlayers.length !== 1) {
@@ -59,8 +59,8 @@ export class LadyOfLakeAddon implements IGameAddon {
 
     const selectedPlayer = this.game.selectedPlayers[0];
 
-    if (selectedPlayer.features.ladyOfLake !== undefined) {
-      throw new Error("You can't use the lady of the lake on the previous owner or yourself");
+    if (selectedPlayer.features[this.addonName] !== undefined) {
+      throw new Error(`You can't use the ${this.addonName} on the previous owner or yourself`);
     }
 
     this.game.stage = 'announceLoyalty';
@@ -68,42 +68,46 @@ export class LadyOfLakeAddon implements IGameAddon {
     this.game.stateObserver.gameStateChanged();
   }
 
-  getLoyalty(executorID: string): TLoyalty {
+  getLoyalty(executorID: string): TLoyalty | TRoles {
     if (this.game.stage !== 'announceLoyalty') {
       throw new Error(`You cant get loyalty on stage ${this.game.stage}`);
     }
 
-    const ownerOfLady = this.game.players.find((player) => player.features.ladyOfLake === 'has')!;
+    const ownerOfLady = this.game.players.find((player) => player.features[this.addonName] === 'has')!;
 
     if (ownerOfLady.user.id !== executorID) {
-      throw new Error('Only owner of lady of the lake can check loyalty');
+      throw new Error(`Only owner of ${this.addonName} can check loyalty`);
     }
 
+    return this.calculateLoyalty();
+  }
+
+  protected calculateLoyalty(): TLoyalty | TRoles {
     const selectedPlayer = this.game.selectedPlayers[0];
 
     return selectedPlayer.role.visibleLoylaty;
   }
 
-  announceLoyalty(executorID: string, loyalty: TLoyalty) {
+  announceLoyalty(executorID: string, loyalty: TLoyalty | TRoles) {
     if (this.game.stage !== 'announceLoyalty') {
       throw new Error(`You cant announce loyalty on stage ${this.game.stage}`);
     }
 
-    const ownerOfLady = this.game.players.find((player) => player.features.ladyOfLake === 'has')!;
+    const ownerOfLady = this.game.players.find((player) => player.features[this.addonName] === 'has')!;
 
     if (ownerOfLady.user.id !== executorID) {
-      throw new Error('Only owner of lady of the lake can announce loyalty');
+      throw new Error(`Only owner of ${this.addonName} can announce loyalty`);
     }
 
     const selectedPlayer = this.game.selectedPlayers[0];
 
-    const loyaltyCheck = new CheckLoyalty(ownerOfLady, selectedPlayer, loyalty, selectedPlayer.role.loyalty);
+    const loyaltyCheck = new CheckLoyalty(ownerOfLady, selectedPlayer, loyalty, this.getLoyalty(executorID));
 
     this.game.history.push(loyaltyCheck);
 
-    ownerOfLady.features.ladyOfLake = 'used';
+    ownerOfLady.features[this.addonName] = 'used';
     ownerOfLady.features.waitForAction = false;
-    selectedPlayer.features.ladyOfLake = 'has';
+    selectedPlayer.features[this.addonName] = 'has';
     selectedPlayer.features.isSelected = false;
 
     this.updateVisibleRoles(ownerOfLady, selectedPlayer);

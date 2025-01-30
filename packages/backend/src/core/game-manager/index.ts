@@ -169,20 +169,28 @@ export class GameManager {
         break;
 
       case 'checkLoyalty':
-        if (!this.game.addons.ladyOfLake) {
-          throw new Error('You cant use lady of lake in game without lady addon');
+        if (this.game.addons.ladyOfLake) {
+          this.game.addons.ladyOfLake.checkLoyalty(userID);
         }
 
-        this.game.addons.ladyOfLake.checkLoyalty(userID);
-        break;
+        if (this.game.addons.ladyOfSea) {
+          this.game.addons.ladyOfSea.checkLoyalty(userID);
+        }
+
+        throw new Error('You cant use lady in game without lady addon');
 
       case 'announceLoyalty':
-        if (!this.game.addons.ladyOfLake) {
-          throw new Error('You cant use lady of lake in game without lady addon');
+        if (this.game.addons.ladyOfLake) {
+          this.game.addons.ladyOfLake.announceLoyalty(userID, params.loyalty);
+          break;
         }
 
-        this.game.addons.ladyOfLake.announceLoyalty(userID, params.loyalty);
-        break;
+        if (this.game.addons.ladyOfSea) {
+          this.game.addons.ladyOfSea.announceLoyalty(userID, params.loyalty);
+          break;
+        }
+
+        throw new Error('You cant use lady in game without lady addon');
 
       case 'giveExcalibur': {
         if (!this.game.addons.excalibur) {
@@ -216,11 +224,15 @@ export class GameManager {
   getGameData<T extends TGetLoyaltyData>(userID: string, params: T['params']): T['result'] {
     switch (params.method) {
       case 'getLoyalty':
-        if (!this.game.addons.ladyOfLake) {
-          throw new Error('You cant use lady of lake in game without lady addon');
+        if (this.game.addons.ladyOfLake) {
+          return this.game.addons.ladyOfLake.getLoyalty(userID);
         }
 
-        return this.game.addons.ladyOfLake.getLoyalty(userID);
+        if (this.game.addons.ladyOfSea) {
+          return this.game.addons.ladyOfSea.getLoyalty(userID);
+        }
+
+        throw new Error('You cant use lady in game without lady addon');
     }
   }
 }

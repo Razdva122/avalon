@@ -14,6 +14,10 @@
         <h2>{{ $t('addons.excalibur') }}</h2>
         <img class="addon-image" src="@/assets/features/excalibur.webp" alt="excalibur" />
       </router-link>
+      <router-link class="addon" :to="{ name: 'lady_of_sea' }">
+        <h2>{{ $t('addons.ladyOfSea') }}</h2>
+        <img class="addon-image" src="@/assets/features/lady_of_lake.webp" alt="ladyOfSea" />
+      </router-link>
     </div>
   </div>
 </template>

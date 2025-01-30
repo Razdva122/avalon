@@ -24,7 +24,7 @@
             v-if="
               stateManager.viewMode.value === 'live' &&
               gameState.stage === 'announceLoyalty' &&
-              playerInGame?.features.ladyOfLake === 'has' &&
+              (playerInGame?.features.ladyOfLake === 'has' || playerInGame?.features.ladyOfSea === 'has') &&
               visibleHistory?.type !== 'checkLoyalty'
             "
           >

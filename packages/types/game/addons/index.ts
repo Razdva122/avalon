@@ -1,4 +1,5 @@
 import type { TLadyOfLakeStages, TLadyOfLakeFeatures } from './lady-of-lake';
+import type { TLadyOfSeaAddonData, TLadyOfSeaFeatures } from './lady-of-sea';
 import type { TExcaliburStages, TExcaliburFeatures } from './excalibur';
 import type { TLancelotsStages } from './lancelots';
 import type { TWitchStages } from './witch';
@@ -19,9 +20,9 @@ export type TAddonsStages =
 /**
  * Player features added with addons
  */
-export type TAddonsFeatures = TLadyOfLakeFeatures & TExcaliburFeatures & TAssassinAddonFeatures;
+export type TAddonsFeatures = TLadyOfLakeFeatures & TLadyOfSeaFeatures & TExcaliburFeatures & TAssassinAddonFeatures;
 
 /**
  * Addons data
  */
-export type TAddonsData = Partial<TAssassinAddonData>;
+export type TAddonsData = Partial<TAssassinAddonData & TLadyOfSeaAddonData>;

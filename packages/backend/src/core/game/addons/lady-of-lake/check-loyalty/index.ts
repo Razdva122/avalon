@@ -1,5 +1,5 @@
 import type { HistoryElement, THistoryData } from '@/core/game/history';
-import type { THistoryStage, TLoyalty, ICheckLoyalty } from '@avalon/types';
+import type { THistoryStage, TLoyalty, ICheckLoyalty, TRoles } from '@avalon/types';
 import type { IPlayerInGame } from '@/core/game';
 import type { TDataForManagerOptions } from '@/core/game/history';
 
@@ -9,12 +9,17 @@ export class CheckLoyalty implements HistoryElement<'checkLoyalty'> {
   stage: THistoryStage;
   canBeHidden: boolean = true;
 
-  constructor(validator: IPlayerInGame, inspected: IPlayerInGame, result: TLoyalty, realLoyalty: TLoyalty) {
+  constructor(
+    validator: IPlayerInGame,
+    inspected: IPlayerInGame,
+    result: TLoyalty | TRoles,
+    visibleLoyalty: TLoyalty | TRoles,
+  ) {
     this.data = {
       validator,
       inspected,
       result,
-      realLoyalty,
+      visibleLoyalty,
     };
 
     this.stage = 'finished';
@@ -27,7 +32,7 @@ export class CheckLoyalty implements HistoryElement<'checkLoyalty'> {
     const checkLoyaltyData: ICheckLoyalty = {
       type: this.type,
       result: this.data.result,
-      realLoyalty: this.data.realLoyalty,
+      visibleLoyalty: this.data.visibleLoyalty,
       validatorID: validatorID,
       inspectedID: inspectedID,
     };
@@ -36,7 +41,7 @@ export class CheckLoyalty implements HistoryElement<'checkLoyalty'> {
       return checkLoyaltyData;
     }
 
-    delete checkLoyaltyData['realLoyalty'];
+    delete checkLoyaltyData['visibleLoyalty'];
 
     return checkLoyaltyData;
   }

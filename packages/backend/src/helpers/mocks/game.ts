@@ -811,7 +811,7 @@ export const fakeGames: TRoomState[] = [
         {
           type: 'checkLoyalty',
           result: 'good',
-          realLoyalty: 'good',
+          visibleLoyalty: 'good',
           validatorID: '4e77db6a-6643-4379-92a6-0a9b8e678c44',
           inspectedID: '336fdc47-e426-46e8-8bed-25b6ec6e9300',
         },
@@ -1179,7 +1179,7 @@ export const fakeGames: TRoomState[] = [
         {
           type: 'checkLoyalty',
           result: 'good',
-          realLoyalty: 'good',
+          visibleLoyalty: 'good',
           validatorID: '336fdc47-e426-46e8-8bed-25b6ec6e9300',
           inspectedID: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
         },
@@ -1294,7 +1294,7 @@ export const fakeGames: TRoomState[] = [
         {
           type: 'checkLoyalty',
           result: 'good',
-          realLoyalty: 'good',
+          visibleLoyalty: 'good',
           validatorID: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
           inspectedID: 'ec262bd3-c78f-4929-9659-fc98c36337b8',
         },
@@ -2417,7 +2417,7 @@ export const fakeGames: TRoomState[] = [
         {
           type: 'checkLoyalty',
           result: 'good',
-          realLoyalty: 'good',
+          visibleLoyalty: 'good',
           validatorID: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
           inspectedID: '4e77db6a-6643-4379-92a6-0a9b8e678c44',
         },

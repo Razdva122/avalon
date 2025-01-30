@@ -12,6 +12,7 @@ export type TGameOptionsRoles = {
 
 export type TGameOptionsAddons = {
   ladyOfLake?: boolean;
+  ladyOfSea?: boolean;
   excalibur?: boolean;
 };
 
