@@ -159,6 +159,18 @@ export class GameTestHelper {
     return this;
   }
 
+  useLadyOfSea(userID?: string): this {
+    const playerID = userID ?? this.game.players.find((player) => player.features.ladyOfSea === undefined)!.user.id;
+
+    const ownerID = this.game.players.find((player) => {
+      return player.features.ladyOfSea == 'has';
+    })!.user.id;
+
+    this.game.selectPlayer(ownerID, playerID);
+    this.game.addons.ladyOfSea!.checkLoyalty(ownerID);
+    return this;
+  }
+
   moveLadyOfLake(ownerID: string): this {
     this.game.players.find((player) => player.features.ladyOfLake === 'has')!.features.ladyOfLake = undefined;
     this.game.players.find((player) => player.user.id === ownerID)!.features.ladyOfLake = 'has';
@@ -166,12 +178,12 @@ export class GameTestHelper {
     return this;
   }
 
-  announceLoyalty(loyalty: TLoyalty): this {
+  announceLoyalty(loyalty: TLoyalty | TRoles): this {
     const id = this.game.players.find((player) => {
-      return player.features.ladyOfLake == 'has';
+      return player.features.ladyOfLake == 'has' || player.features.ladyOfSea === 'has';
     })!.user.id;
 
-    this.game.addons.ladyOfLake!.announceLoyalty(id, loyalty);
+    (this.game.addons.ladyOfLake || this.game.addons.ladyOfSea)!.announceLoyalty(id, loyalty);
     return this;
   }
 
