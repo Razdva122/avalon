@@ -19,6 +19,10 @@ export default defineComponent({
           return 'lady_of_lake';
         }
 
+        if (el === 'lady_sea') {
+          return 'lady_of_sea';
+        }
+
         return el;
       };
 

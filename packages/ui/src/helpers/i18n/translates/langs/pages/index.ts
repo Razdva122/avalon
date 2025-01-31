@@ -15,6 +15,7 @@ import { oberon } from '@/helpers/i18n/translates/langs/pages/oberon';
 import { mordred } from '@/helpers/i18n/translates/langs/pages/mordred';
 import { troublemaker } from '@/helpers/i18n/translates/langs/pages/troublemaker';
 import { trickster } from '@/helpers/i18n/translates/langs/pages/trickster';
+import { ladySea } from '@/helpers/i18n/translates/langs/pages/ladyOfTheSea';
 
 export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
   en: {},
@@ -28,6 +29,7 @@ Object.entries({
   wiki: wiki,
   lancelots: lancelots,
   lady: lady,
+  ladySea: ladySea,
   excalibur: excalibur,
   morgana: morgana,
   percival: percival,

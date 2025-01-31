@@ -109,6 +109,7 @@ export const zh_CN = {
     expansions: '插件',
     roles: '角色',
     lady: '湖中仙女',
+    lady_sea: '海中仙女',
     excalibur: '神剑',
     rules: '规则',
   },

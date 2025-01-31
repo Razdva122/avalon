@@ -171,10 +171,12 @@ export class GameManager {
       case 'checkLoyalty':
         if (this.game.addons.ladyOfLake) {
           this.game.addons.ladyOfLake.checkLoyalty(userID);
+          break;
         }
 
         if (this.game.addons.ladyOfSea) {
           this.game.addons.ladyOfSea.checkLoyalty(userID);
+          break;
         }
 
         throw new Error('You cant use lady in game without lady addon');

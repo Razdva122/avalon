@@ -6,6 +6,7 @@
     <div class="player-crown" alt="crown"></div>
     <div class="player-actions-features">
       <img class="lady-of-lake" alt="lady" src="@/assets/features/lady_of_lake.webp" />
+      <img class="lady-of-sea" alt="ladySea" src="@/assets/features/lady_of_sea.webp" />
       <img class="excalibur" alt="excalibur" src="@/assets/features/excalibur.webp" />
     </div>
     <i class="material-icons action-icon close text-error"></i>
@@ -169,7 +170,8 @@ export default defineComponent({
 
         if (
           currentStage.value === 'checkLoyalty' ||
-          (currentStage.value === 'announceLoyalty' && player.value.features.ladyOfLake === 'has')
+          (currentStage.value === 'announceLoyalty' &&
+            (player.value.features.ladyOfLake === 'has' || player.value.features.ladyOfSea === 'has'))
         ) {
           classes['player-lady-active'] = true;
         }
@@ -222,6 +224,7 @@ export default defineComponent({
 }
 
 .lady-of-lake,
+.lady-of-sea,
 .excalibur {
   display: none;
   height: 30px;
@@ -365,12 +368,14 @@ export default defineComponent({
   display: block;
 }
 
-.player-feature-ladyOfLake-used .lady-of-lake {
+.player-feature-ladyOfLake-used .lady-of-lake,
+.player-feature-ladyOfSea-used .lady-of-sea {
   display: block;
   filter: grayscale(1);
 }
 
-.player-feature-ladyOfLake-has .lady-of-lake {
+.player-feature-ladyOfLake-has .lady-of-lake,
+.player-feature-ladyOfSea-has .lady-of-sea {
   display: block;
 }
 
@@ -379,7 +384,8 @@ export default defineComponent({
 }
 
 .player-excalibur-active .excalibur,
-.player-lady-active .lady-of-lake {
+.player-lady-active .lady-of-lake,
+.player-lady-active .lady-of-sea {
   border-color: rgba(65, 105, 225, 0.8);
 }
 

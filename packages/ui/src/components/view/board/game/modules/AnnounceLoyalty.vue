@@ -1,9 +1,9 @@
 <template>
   <Spoiler :size="{ width: '300px', height: '200px' }">
     <div class="d-flex flex-column align-center justify-center" v-if="loyalty">
-      <PlayerIcon :icon="loyalty" class="mb-8 role-icon" />
+      <PlayerIcon :icon="loyalty" class="mb-4 role-icon" />
       <template v-if="isLadyOfSea">
-        <v-btn-toggle v-model="selectedLoyalty" density="comfortable" divided>
+        <v-btn-toggle class="mb-2 btn-sections" v-model="selectedLoyalty" density="default" divided>
           <v-btn
             v-for="role in possibleSeaTargets"
             :value="role"
@@ -87,16 +87,16 @@ export default defineComponent({
 }
 
 .small-role-icon {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border: 3px solid;
 }
 
 .radio-button {
   background-size: 120%;
   background-position: center;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   border: 3px solid;
 }
@@ -107,5 +107,9 @@ export default defineComponent({
   }
 
   opacity: 1;
+}
+
+.btn-sections {
+  height: 50px;
 }
 </style>

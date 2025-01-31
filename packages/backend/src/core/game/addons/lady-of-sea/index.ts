@@ -3,8 +3,8 @@ import * as _ from 'lodash';
 import { evilRolesImportance } from '@avalon/types';
 
 import { IGameAddon } from '@/core/game/addons/interface';
-import { Game } from '@/core/game';
-import { TLoyalty, TRoles, TEvilRoles } from '@avalon/types';
+import { Game, IPlayerInGame } from '@/core/game';
+import { Dictionary, TLoyalty, TRoles, TEvilRoles, TVisibleRole } from '@avalon/types';
 import { LadyOfLakeAddon } from '@/core/game/addons/lady-of-lake';
 import { TLadyOfSeaAddonData } from '@avalon/types/game/addons/lady-of-sea';
 
@@ -45,5 +45,17 @@ export class LadyOfSeaAddon extends LadyOfLakeAddon implements IGameAddon {
     }
 
     return selectedPlayer.role.role;
+  }
+
+  override updateVisibleRoles(owner: IPlayerInGame, selectedPlayer: IPlayerInGame): void {
+    super.updateVisibleRoles(owner, selectedPlayer);
+
+    const visibleRole = this.calculateLoyalty();
+
+    if (visibleRole !== 'good') {
+      const roles: Dictionary<TVisibleRole> = { [selectedPlayer.user.id]: visibleRole };
+
+      this.game.updateVisibleRolesState(owner.user.id, roles);
+    }
   }
 }

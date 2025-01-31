@@ -109,6 +109,7 @@ export const es = {
     expansions: 'Expansiones',
     roles: 'Roles',
     lady: 'Dama',
+    lady_sea: 'Dama del Mar',
     excalibur: 'Excalibur',
     rules: 'Reglas',
   },

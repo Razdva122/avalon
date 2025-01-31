@@ -109,6 +109,7 @@ export const ru = {
     expansions: 'Дополнения',
     roles: 'Роли',
     lady: 'Леди озера',
+    lady_sea: 'Леди моря',
     excalibur: 'Экскалибур',
     rules: 'Правила',
   },

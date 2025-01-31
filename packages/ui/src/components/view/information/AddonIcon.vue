@@ -29,7 +29,7 @@ export default defineComponent({
 }
 
 .icon-ladyOfSea {
-  background-image: url('@/assets/features/lady_of_lake.webp');
+  background-image: url('@/assets/features/lady_of_sea.webp');
   background-size: contain;
 }
 </style>

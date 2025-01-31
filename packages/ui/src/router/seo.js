@@ -7,6 +7,7 @@ const {
   expansions,
   lancelots,
   lady,
+  ladySea,
   excalibur,
   morgana,
   percival,
@@ -98,6 +99,18 @@ module.exports.routesSeo = {
         ...lady,
       },
       image: 'features/lady_of_lake.webp',
+    },
+  },
+  ladySea: {
+    path: '/wiki/expansions/lady_sea/',
+    name: 'lady_of_sea',
+    priority: 0.2,
+    meta: {
+      prerender: true,
+      multiLanguage: {
+        ...ladySea,
+      },
+      image: 'features/lady_of_sea.webp',
     },
   },
   excalibur: {

@@ -138,7 +138,8 @@ export default defineComponent({
         (gameState.value.stage === 'giveExcalibur' && playerInGame.value?.features.isLeader) ||
         (gameState.value.stage === 'assassinate' && playerInGame.value?.features.isAssassin) ||
         (gameState.value.stage === 'useExcalibur' && playerInGame.value?.features.excalibur) ||
-        (gameState.value.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfLake === 'has');
+        (gameState.value.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfLake === 'has') ||
+        (gameState.value.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfSea === 'has');
 
       if (userCanSelect) {
         socket.emit('selectPlayer', gameState.value.uuid, uuid);

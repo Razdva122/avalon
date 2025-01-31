@@ -282,6 +282,11 @@ export default defineComponent({
   background-size: contain;
 }
 
+.ladyOfSea {
+  background-image: url('@/assets/features/lady_of_sea.webp');
+  background-size: contain;
+}
+
 .excalibur {
   background-image: url('@/assets/features/excalibur.webp');
   background-size: contain;

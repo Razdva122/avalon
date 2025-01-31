@@ -6,6 +6,7 @@ const { roles } = require('./roles');
 const { expansions } = require('./expansions');
 const { lancelots } = require('./lancelots');
 const { lady } = require('./lady');
+const { ladySea } = require('./ladySea');
 const { excalibur } = require('./excalibur');
 const { morgana } = require('./morgana');
 const { percival } = require('./percival');
@@ -27,6 +28,7 @@ module.exports = {
   expansions,
   lancelots,
   lady,
+  ladySea,
   excalibur,
   morgana,
   percival,
