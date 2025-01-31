@@ -16,9 +16,10 @@ import type {
   TGameResults,
   TVisibleRole,
   Dictionary,
+  TAddonsName,
 } from '@avalon/types';
 
-import type { TRolesAddonsData, TRolesWithAddons, TAdditionalAddons, TAdditionalAddonsData } from '@/core/game/addons';
+import type { TRolesAddonsData, TRolesWithAddons, TAdditionalAddonsData } from '@/core/game/addons';
 
 import { rolesWithAddons, addons } from '@/core/game/const';
 
@@ -204,7 +205,7 @@ export class Game extends GameHooks {
 
     // Generate roles-independent addons
     Object.entries(addons).forEach((data) => {
-      const [name, addonData] = <[TAdditionalAddons, TAdditionalAddonsData]>data;
+      const [name, addonData] = <[TAddonsName, TAdditionalAddonsData]>data;
 
       if (options.addons[name]) {
         // @ts-expect-error in order not to write if for each individual addon

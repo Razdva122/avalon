@@ -1,4 +1,5 @@
 import type { IPlayerInGame, IPresetsForGame } from '@/core/game/interface';
+import type { TAddonsName } from '@avalon/types';
 import {
   TAdditionalAddonsData,
   TRolesAddonsData,
@@ -11,7 +12,7 @@ import {
   RevealerAddon,
   ClericAddon,
 } from '@/core/game/addons';
-import { TRolesWithAddons, TAdditionalAddons } from '@/core/game/addons';
+import { TRolesWithAddons } from '@/core/game/addons';
 
 /**
  * Game settings with different number of players
@@ -192,7 +193,7 @@ export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsData[]> = {
 /**
  * Role-independent addons
  */
-export const addons: Record<TAdditionalAddons, TAdditionalAddonsData> = {
+export const addons: Record<TAddonsName, TAdditionalAddonsData> = {
   ladyOfLake: {
     addon: LadyOfLakeAddon,
     key: 'ladyOfLake',

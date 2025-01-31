@@ -19,8 +19,6 @@ export type TRolesWithAddons =
   | 'cleric'
   | 'revealer';
 
-export type TAdditionalAddons = 'ladyOfLake' | 'excalibur' | 'ladyOfSea';
-
 export type TAddonPriority = Partial<Record<THookNames, 'high' | 'medium' | 'low'>>;
 
 export type TAddonsOptions = TAssassinateOptions;

@@ -30,7 +30,7 @@ import type { TVisibleRole } from '@avalon/types';
 
 import { rolesShortInfo } from '@/components/view/information/const';
 
-import type { TAddonsName } from '@/components/view/information/interface';
+import type { TAddonsName } from '@avalon/types';
 
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import AddonIcon from '@/components/view/information/AddonIcon.vue';

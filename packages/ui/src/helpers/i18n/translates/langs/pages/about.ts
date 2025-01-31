@@ -11,7 +11,7 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
     roles:
       "Our site replicates the full spectrum of roles found in the traditional board game, including {merlin}, {percival}, {troublemaker}, {oberon}, {lunatic}, {brute}, {mordred}, {morgana}, {trickster}, {goodLancelot} and {evilLancelot} ensuring an authentic Avalon experience. We've also integrated the beloved game expansions, {ladyOfLake} and {excalibur} to enrich your gameplay.",
     extraRoles:
-      'Exclusive to our platform are additional roles not found in the original game - {merlinPure}, {guinevere}, {witch} and {tristan} + {isolde} (the Lovers) - providing new dynamics and strategies for you and your team to explore.',
+      'Exclusive to our platform are additional roles not found in the original game - {merlinPure}, {guinevere}, {witch}, {cleric}, {revealer} and {tristan} + {isolde} (the Lovers) - providing new dynamics and strategies for you and your team to explore.',
     features:
       "To enhance your strategic play, we offer a History feature, allowing players to review past moves and better strategize against the opposition. Additionally, our Spoiler Mode ensures that you can play in the same physical space as other players without revealing your role or compromising the game's outcome.",
     code: 'The project code can be viewed on ',
@@ -29,7 +29,7 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
     roles:
       'Наш сайт имеет большую часть доступных ролей, найденных в традиционной настольной игре, включая {merlin}, {percival}, {troublemaker}, {oberon}, {lunatic}, {brute}, {mordred}, {morgana}, {trickster}, {goodLancelot} и {evilLancelot}, обеспечивая подлинный опыт игры в Avalon. Мы также интегрировали популярные расширения игры, {ladyOfLake} и {excalibur}, чтобы обогатить ваш игровой процесс.',
     extraRoles:
-      'Эксклюзивно для нашей платформы добавлены дополнительные роли, отсутствующие в оригинальной игре — {merlinPure}, {guinevere}, {witch} и {tristan} + {isolde} (влюблённые), — предоставляя новые динамики и стратегии для изучения вами и вашей командой.',
+      'Эксклюзивно для нашей платформы добавлены дополнительные роли, отсутствующие в оригинальной игре — {merlinPure}, {guinevere}, {witch}, {cleric}, {revealer} и {tristan} + {isolde} (влюблённые), — предоставляя новые динамики и стратегии для изучения вами и вашей командой.',
     features:
       'Для улучшения вашей стратегической игры мы предлагаем функцию Истории, позволяющую игрокам просматривать прошлые ходы и лучше выстраивать стратегию против оппонентов. Кроме того, наш режим Спойлера обеспечивает возможность играть в одной физической зоне с другими игроками, не раскрывая свою роль и не компрометируя итоги игры.',
     code: 'Код проекта можно увидеть на ',
@@ -47,7 +47,7 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
     roles:
       '我們的網站複製了傳統桌上遊戲中所有的角色，包括 {merlin}, {percival}, {troublemaker}, {oberon}, {lunatic}, {brute}, {mordred}, {morgana}, {trickster}, {goodLancelot} 和 {evilLancelot}，確保真實的阿瓦隆體驗。我們還整合了受歡迎的遊戲擴展， {ladyOfLake} 和 {excalibur}，以豐富您的遊戲體驗。',
     extraRoles:
-      '我們平台獨有的原始遊戲中未出現的附加角色 - {merlinPure}, {guinevere}, {witch} 和 {tristan} + {isolde}（戀人） - 為您和您的團隊提供新的動態和策略探索。',
+      '我們平台獨有的原始遊戲中未出現的附加角色 - {merlinPure}, {guinevere}, {witch}, {cleric}, {revealer} 和 {tristan} + {isolde}（戀人） - 為您和您的團隊提供新的動態和策略探索。',
     features:
       '為增強您的策略遊戲，我們提供歷史功能，允許玩家查看過去的動作，以便更好地針對對手策略。此外，我們的劇透模式可確保您能與其他玩家在同一實體空間中遊玩，而不會洩露您的角色或影響遊戲結果。',
     code: '項目的代碼可以在上查看 ',
@@ -65,7 +65,7 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
     roles:
       '我们的网站复制了传统桌面游戏中的所有角色，包括 {merlin}, {percival}, {troublemaker}, {oberon}, {lunatic}, {brute}, {mordred}, {morgana}, {trickster}, {goodLancelot} 和 {evilLancelot}，确保真实的阿瓦隆体验。我们还整合了受欢迎的游戏扩展， {ladyOfLake} 和 {excalibur}，以丰富您的游戏体验。',
     extraRoles:
-      '我们平台独有的原始游戏中未出现的附加角色 - {merlinPure}, {guinevere}, {witch} 和 {tristan} + {isolde}（恋人） - 为您和您的团队提供新的动态和策略探索。',
+      '我们平台独有的原始游戏中未出现的附加角色 - {merlinPure}, {guinevere}, {witch}, {cleric}, {revealer} 和 {tristan} + {isolde}（恋人） - 为您和您的团队提供新的动态和策略探索。',
     features:
       '为增强您的策略游戏，我们提供历史功能，允许玩家查看过去的动作，以便更好地针对对手策略。此外，我们的剧透模式可确保您能与其他玩家在同一实体空间中游玩，而不会泄露您的角色或影响游戏结果。',
     code: '项目的代码可以在上查看 ',
@@ -83,7 +83,7 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
     roles:
       'Nuestro sitio replica todo el espectro de roles encontrados en el juego de mesa tradicional, incluyendo {merlin}, {percival}, {troublemaker}, {oberon}, {lunatic}, {brute}, {mordred}, {morgana}, {trickster}, {goodLancelot} y {evilLancelot}, asegurando una experiencia auténtica de Avalon. También hemos integrado las expansiones del juego, {ladyOfLake} y {excalibur} para enriquecer tu experiencia de juego.',
     extraRoles:
-      'Exclusivamente en nuestra plataforma hay roles adicionales que no están en el juego original - {merlinPure}, {guinevere}, {witch} y {tristan} + {isolde} (los Amantes) - aportando nuevas dinámicas y estrategias para que tú y tu equipo exploren.',
+      'Exclusivamente en nuestra plataforma hay roles adicionales que no están en el juego original - {merlinPure}, {guinevere}, {witch}, {cleric}, {revealer} y {tristan} + {isolde} (los Amantes) - aportando nuevas dinámicas y estrategias para que tú y tu equipo exploren.',
     features:
       'Para mejorar tu juego estratégico, ofrecemos una función de Historia, que permite a los jugadores revisar movimientos pasados y mejorar su estrategia contra la oposición. Además, nuestro Modo Spoiler asegura que puedas jugar en el mismo espacio físico que otros jugadores sin revelar tu rol ni comprometer el resultado del juego.',
     code: 'El código del proyecto se puede ver en ',

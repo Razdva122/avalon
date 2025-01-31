@@ -16,7 +16,7 @@ export class LadyOfSeaAddon extends LadyOfLakeAddon implements IGameAddon {
   constructor(game: Game) {
     super(game);
 
-    const validEvilRoles = game.settings.roles.evil
+    const validEvilRoles = _.uniq(game.settings.roles.evil)
       .filter((role) => role !== 'trickster')
       .sort((a, b) => evilRolesImportance[<TEvilRoles>a] - evilRolesImportance[<TEvilRoles>b]);
 
@@ -32,9 +32,7 @@ export class LadyOfSeaAddon extends LadyOfLakeAddon implements IGameAddon {
     };
   }
 
-  protected override calculateLoyalty(): TLoyalty | TRoles {
-    const selectedPlayer = this.game.selectedPlayers[0];
-
+  protected override calculateLoyalty(selectedPlayer: IPlayerInGame): TLoyalty | TRoles {
     if (selectedPlayer.role.visibleLoylaty === 'good') {
       return 'good';
     }
@@ -50,7 +48,7 @@ export class LadyOfSeaAddon extends LadyOfLakeAddon implements IGameAddon {
   override updateVisibleRoles(owner: IPlayerInGame, selectedPlayer: IPlayerInGame): void {
     super.updateVisibleRoles(owner, selectedPlayer);
 
-    const visibleRole = this.calculateLoyalty();
+    const visibleRole = this.calculateLoyalty(selectedPlayer);
 
     if (visibleRole !== 'good') {
       const roles: Dictionary<TVisibleRole> = { [selectedPlayer.user.id]: visibleRole };

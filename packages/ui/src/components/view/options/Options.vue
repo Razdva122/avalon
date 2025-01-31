@@ -38,7 +38,13 @@
         <template v-if="type === 'addons' && addons">
           <div class="addon" v-for="addon in addonsSettings">
             <div :class="addon.name" class="addon-icon"></div>
-            <v-checkbox v-model="addons[addon.name]" :label="addon.label" :hide-details="true" color="info" />
+            <v-checkbox
+              @input="onAddonUpdate(addon.name)"
+              v-model="addons[addon.name]"
+              :label="addon.label"
+              :hide-details="true"
+              color="info"
+            />
             <HelpButton :route="addon.route" :content="addon.hint" />
           </div>
         </template>
@@ -58,7 +64,7 @@ import { defineComponent, PropType } from 'vue';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import HelpButton from '@/components/feedback/HelpButton.vue';
 import { rolesShortInfo } from '@/components/view/information/const';
-import type { TGameOptionsRoles, TGameOptionsAddons, TGameOptionsFeatures } from '@avalon/types';
+import type { TGameOptionsRoles, TGameOptionsAddons, TGameOptionsFeatures, TRoles, TAddonsName } from '@avalon/types';
 
 export default defineComponent({
   components: {
@@ -210,7 +216,7 @@ export default defineComponent({
       this.roles.percival = 0;
       this.roles.mordred = 0;
     },
-    onRoleUpdate(roleName: string) {
+    onRoleUpdate(roleName: TRoles) {
       if (roleName === 'isolde') {
         this.roles.tristan = this.roles.isolde;
       }
@@ -241,6 +247,17 @@ export default defineComponent({
 
       if ((roleName === 'merlin' || roleName === 'merlinPure') && !this.roles[roleName]) {
         this.removeMerlinAdditionalRoles();
+      }
+    },
+    onAddonUpdate(addonName: TAddonsName) {
+      if (this.addons) {
+        if (addonName === 'ladyOfLake' && this.addons.ladyOfLake) {
+          this.addons.ladyOfSea = false;
+        }
+
+        if (addonName === 'ladyOfSea' && this.addons.ladyOfSea) {
+          this.addons.ladyOfLake = false;
+        }
       }
     },
   },

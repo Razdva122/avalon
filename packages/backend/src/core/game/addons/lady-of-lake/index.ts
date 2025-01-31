@@ -79,12 +79,10 @@ export class LadyOfLakeAddon implements IGameAddon {
       throw new Error(`Only owner of ${this.addonName} can check loyalty`);
     }
 
-    return this.calculateLoyalty();
+    return this.calculateLoyalty(this.game.selectedPlayers[0]);
   }
 
-  protected calculateLoyalty(): TLoyalty | TRoles {
-    const selectedPlayer = this.game.selectedPlayers[0];
-
+  protected calculateLoyalty(selectedPlayer: IPlayerInGame): TLoyalty | TRoles {
     return selectedPlayer.role.visibleLoylaty;
   }
 
@@ -105,12 +103,12 @@ export class LadyOfLakeAddon implements IGameAddon {
 
     this.game.history.push(loyaltyCheck);
 
+    this.updateVisibleRoles(ownerOfLady, selectedPlayer);
+
     ownerOfLady.features[this.addonName] = 'used';
     ownerOfLady.features.waitForAction = false;
     selectedPlayer.features[this.addonName] = 'has';
     selectedPlayer.features.isSelected = false;
-
-    this.updateVisibleRoles(ownerOfLady, selectedPlayer);
 
     this.game.leader.features.waitForAction = true;
 

@@ -26,3 +26,8 @@ export type TAddonsFeatures = TLadyOfLakeFeatures & TLadyOfSeaFeatures & TExcali
  * Addons data
  */
 export type TAddonsData = Partial<TAssassinAddonData & TLadyOfSeaAddonData>;
+
+/**
+ * Addons names
+ */
+export type TAddonsName = 'ladyOfLake' | 'excalibur' | 'ladyOfSea';

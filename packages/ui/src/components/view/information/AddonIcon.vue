@@ -5,7 +5,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 
-import type { TAddonsName } from '@/components/view/information/interface';
+import type { TAddonsName } from '@avalon/types';
 
 export default defineComponent({
   props: {

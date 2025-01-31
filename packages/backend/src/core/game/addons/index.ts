@@ -19,6 +19,8 @@ import { ClericAddon } from '@/core/game/addons/cleric';
 import { RevealerAddon } from '@/core/game/addons/revealer';
 import { LadyOfSeaAddon } from '@/core/game/addons/lady-of-sea';
 
+import type { TAddonsName } from '@avalon/types';
+
 export type TAdditionalAddonsConstructor = typeof LadyOfLakeAddon | typeof ExcaliburAddon | typeof LadyOfSeaAddon;
 export type TRolesAddonsConstructor =
   | typeof AssassinAddon
@@ -29,8 +31,6 @@ export type TRolesAddonsConstructor =
 
 export type TRolesAddonsKeys = 'assassin' | 'lancelots' | 'witch' | 'cleric' | 'revealer';
 
-export type TAdditionalAddonsKeys = 'ladyOfLake' | 'excalibur' | 'ladyOfSea';
-
 export type TRolesAddonsData = {
   key: TRolesAddonsKeys;
   addon: TRolesAddonsConstructor;
@@ -38,6 +38,6 @@ export type TRolesAddonsData = {
 };
 
 export type TAdditionalAddonsData = {
-  key: TAdditionalAddonsKeys;
+  key: TAddonsName;
   addon: TAdditionalAddonsConstructor;
 };
