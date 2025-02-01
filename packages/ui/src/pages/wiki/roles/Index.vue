@@ -62,6 +62,10 @@
         <h2>{{ $t('roles.oberon') }}</h2>
         <img class="role-image evil-role" :src="calculateRoleUrl('oberon')" alt="oberon" />
       </router-link>
+      <router-link class="role" :to="{ name: 'witch' }">
+        <h2>{{ $t('roles.witch') }}</h2>
+        <img class="role-image evil-role" :src="calculateRoleUrl('witch')" alt="witch" />
+      </router-link>
       <router-link class="role" :to="{ name: 'lunatic' }">
         <h2>{{ $t('roles.lunatic') }}</h2>
         <img class="role-image evil-role" :src="calculateRoleUrl('lunatic')" alt="lunatic" />

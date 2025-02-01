@@ -141,8 +141,8 @@ export default defineComponent({
 
 .icon-witch {
   background-image: url('@/assets/roles/witch.webp');
-  background-position: 40% 15%;
-  background-size: 130%;
+  background-position: 45% 5%;
+  background-size: 120%;
 }
 
 .icon-revealer {
@@ -294,6 +294,12 @@ export default defineComponent({
     background-image: url('@/assets/roles/anime/trickster.webp');
     background-size: 195%;
     background-position: 56% 20%;
+  }
+
+  &.icon-witch {
+    background-image: url('@/assets/roles/anime/witch.webp');
+    background-position: 55% 0%;
+    background-size: 130%;
   }
 }
 </style>
