@@ -244,7 +244,7 @@ export const zh_TW = {
     fails: '失敗',
     indexMission: '{index} 任務',
     failsCount: '失敗 {count}',
-    hidden: '由女巫隱藏',
+    hidden: '由巫婆隱藏',
     team: '團隊：',
   },
   chat: {

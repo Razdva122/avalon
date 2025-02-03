@@ -88,7 +88,7 @@ export const trickster: { [key in TLanguage]: Dictionary<string> } = {
 		`,
   },
   'zh-CN': {
-    generalInformation: '基本信息: ',
+    generalInformation: '一般信息：',
     intro: `
 		 作为{trickster}，当你被{ladyOfLake}或{cleric}检查忠诚时，撒谎，
 		 完美地将自己定位为被信任的正义方成员。
@@ -125,7 +125,7 @@ export const trickster: { [key in TLanguage]: Dictionary<string> } = {
 		`,
   },
   'zh-TW': {
-    generalInformation: '基本資訊: ',
+    generalInformation: '一般信息：',
     intro: `
 		 身為{trickster}，當你的忠誠受到{ladyOfLake}或{cleric}檢查時，你要撒謊，
 		 使自己完美地成為被信任的正義方成員。

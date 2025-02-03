@@ -79,7 +79,7 @@ export const lovers: { [key in TLanguage]: Dictionary<string> } = {
   'zh-TW': {
     title: '戀人（特里斯坦和伊索德）',
     credits: "鳴謝：{'@'}Vermilion0",
-    generalInformation: '一般資訊：',
+    generalInformation: '一般信息：',
     playingAsTheLovers:
       '扮演戀人，{tristan} 和 {isolde}，為遊戲添加了浪漫的色彩。你們的關係很牢固，因為從一開始就互相熟識並為善的一方工作。然而，這份愛必須保密，如果你們雙方被識別，刺客可以選擇在遊戲結束時消滅你們而不是梅林。',
     generalTips: '一般提示：',

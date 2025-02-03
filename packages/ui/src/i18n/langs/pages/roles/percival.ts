@@ -63,7 +63,7 @@ export const percival: { [key in TLanguage]: Dictionary<string> } = {
       'Игра в роли Персиваля в Avalon предлагает уникальную задачу и требует комбинации скрытности, проницательности и стратегического отвлечения. Ваша роль чрезвычайно важна для защиты {merlin} и обеспечения успеха сил добра. Будьте бдительны, стратегичны и, прежде всего, защищайте {merlin} любой ценой.',
   },
   'zh-CN': {
-    generalInformation: '基本信息：',
+    generalInformation: '一般信息：',
     percivalRole:
       '派西维尔的角色是保护并正确识别{merlin}，以防止{merlin}被莫德雷德的爪牙刺杀。派西维尔在游戏开始时会看到{merlin}和{morgana}，但必须辨别谁是谁而不暴露他们的身份。',
     generalTips: '一般提示：',
@@ -91,7 +91,7 @@ export const percival: { [key in TLanguage]: Dictionary<string> } = {
       '在Avalon中扮演派西维尔是一个独特的挑战，需要结合细微技巧、洞察力和战略误导。你的角色对于保护{merlin}并确保正义力量的胜利至关重要。保持警惕，制定策略，最重要的是，务必不惜一切代价保护{merlin}。',
   },
   'zh-TW': {
-    generalInformation: '基本資訊：',
+    generalInformation: '一般信息：',
     percivalRole:
       '派西維爾的角色是保護並正確識別{merlin}，以防止{merlin}被莫德雷德的爪牙刺殺。派西維爾在遊戲開始時會看到{merlin}和{morgana}，但必須辨別誰是誰而不透露他們的身份。',
     generalTips: '一般提示：',

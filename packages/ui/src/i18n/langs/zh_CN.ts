@@ -244,7 +244,7 @@ export const zh_CN = {
     fails: '失败',
     indexMission: '{index} 任务',
     failsCount: '失败 {count}',
-    hidden: '由女巫隐藏',
+    hidden: '由巫婆隐藏',
     team: '团队：',
   },
   chat: {

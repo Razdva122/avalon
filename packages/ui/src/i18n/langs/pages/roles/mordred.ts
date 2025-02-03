@@ -80,7 +80,7 @@ export const mordred: { [key in TLanguage]: Dictionary<string> } = {
       'Вы обладаете властью влиять на обсуждения и решения. Используйте это благополучно для зла. Направляя диалог, вы формируете направление игры.',
   },
   'zh-CN': {
-    generalInformation: '基本信息:',
+    generalInformation: '一般信息：',
     playingAsMordred:
       '作为{mordred}，您拥有不被{merlin}发现的独特优势，并领导邪恶的仆从。您的目标是破坏正义的力量，确保邪恶占上风，同时保持自己为忠诚盟友的伪装。',
     generalTips: '一般提示:',
@@ -110,7 +110,7 @@ export const mordred: { [key in TLanguage]: Dictionary<string> } = {
     controlNarrativeContent: '您拥有影响讨论和决策的力量。将其明智地用于邪恶的事业。通过引导对话，您塑造了游戏的方向。',
   },
   'zh-TW': {
-    generalInformation: '基本資訊:',
+    generalInformation: '一般信息：',
     playingAsMordred:
       '作為{mordred}，您擁有不被{merlin}發現的獨特優勢，並領導邪惡的追隨者。您的目標是擾亂正義的力量，確保邪惡占上風，同時維持您作為忠誠盟友的假象。',
     generalTips: '一般建議:',

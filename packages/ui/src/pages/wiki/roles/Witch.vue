@@ -7,54 +7,46 @@
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('witch')" alt="witch" />
 
-    <h2>General Information:</h2>
-    <p>
-      Playing as <PreviewLink target="witch" /> gives you a unique power within the minions of evil: the ability to hide
-      the outcome of one mission. Your goal is to create uncertainty and chaos among the forces of good, ensuring that
-      they remain in doubt, ultimately tilting the game in favor of evil while maintaining your cover.
-    </p>
+    <h2>{{ $t('witch.generalInformation') }}</h2>
+    <p><LocalizedTextWrapper keypath="witch.intro" /></p>
 
-    <h2>General Tips:</h2>
+    <h2>{{ $t('witch.generalTipsTitle') }}</h2>
     <ul>
       <li>
-        <strong>Sow seeds of confusion:</strong> Utilize your skill to keep players uncertain about mission outcomes,
-        causing doubt and indecision within the ranks of good.
+        <strong>{{ $t('witch.sowSeedsTitle') }}</strong>
+        {{ $t('witch.sowSeedsText') }}
       </li>
       <li>
-        <strong>Collaborate with fellow evildoers:</strong> Work closely with other evil players to synchronize your
-        actions and maximize the impact of your hidden missions.
+        <strong>{{ $t('witch.collaborateTitle') }}</strong>
+        {{ $t('witch.collaborateText') }}
       </li>
       <li>
-        <strong>Utilize your power strategically:</strong> Timing is crucial when deciding to hide a mission's result.
-        Choose the moment that will best serve the interests of the evil team.
+        <strong>{{ $t('witch.utilizePowerTitle') }}</strong>
+        {{ $t('witch.utilizePowerText') }}
       </li>
       <li>
-        <strong>Maintain your disguise:</strong> Avoid giving away any hints that could reveal your true allegiance or
-        arouse suspicion about your intentions.
+        <strong>{{ $t('witch.maintainDisguiseTitle') }}</strong>
+        {{ $t('witch.maintainDisguiseText') }}
       </li>
     </ul>
 
-    <h2>Strategic Tips:</h2>
+    <h2>{{ $t('witch.strategicTipsTitle') }}</h2>
     <ul>
       <li>
-        <strong>Create uncertainty:</strong> Your ability to obscure mission results leaves good players in the dark,
-        making it difficult for them to strategize effectively.
+        <strong>{{ $t('witch.createUncertaintyTitle') }}</strong>
+        {{ $t('witch.createUncertaintyText') }}
       </li>
       <li>
-        <strong>Influence gameplay:</strong> Encourage doubt and discord among good players, steering discussions and
-        decisions in a direction favorable to evil.
+        <strong>{{ $t('witch.influenceGameplayTitle') }}</strong>
+        {{ $t('witch.influenceGameplayText') }}
       </li>
       <li>
-        <strong>Hide early missions:</strong> The most logical choice is to hide the results of the first or second
-        mission to introduce confusion early and shake the foundation of trust among good players.
+        <strong>{{ $t('witch.hideEarlyMissionsTitle') }}</strong>
+        {{ $t('witch.hideEarlyMissionsText') }}
       </li>
     </ul>
 
-    <p>
-      As <PreviewLink target="witch" />, you weave uncertainty and misdirection into the fabric of the game. By masking
-      the truth, you can destabilize the forces of good and steer the tide of battle in evil's favor. Embrace your role
-      and let chaos reign supreme!
-    </p>
+    <p><LocalizedTextWrapper keypath="witch.conclusion" /></p>
   </div>
 </template>
 

@@ -86,7 +86,7 @@ export const merlin: { [key in TLanguage]: Dictionary<string> } = {
       'Играть за {merlin} сложно, но очень интересно. С помощью осторожной стратегии и тактичной коммуникации вы можете привести силы добра к победе, оставаясь скрытым от тёмных лап убийцы. Удачи!',
   },
   'zh-CN': {
-    generalInformationTitle: '一般信息:',
+    generalInformationTitle: '一般信息：',
     generalInformationText: `担任{merlin}的角色需要精妙的平衡：必须对所有邪恶手下有深入了解（在经典游戏中，除{mordred}外），但无法直接透露这些信息。真正的挑战在于秘密地引导善良势力取得胜利，同时避免被邪恶势力的刺客在游戏结束时暗杀。更为复杂的是，需要对抗{morgana}的欺骗，并获得{percival}的信任。{morgana}模仿你的角色，误导正义之士，而{percival}努力揭穿伪装，找出真相。`,
 
     generalTipsTitle: '一般提示:',
@@ -119,7 +119,7 @@ export const merlin: { [key in TLanguage]: Dictionary<string> } = {
       '作为 {merlin} 游戏既具有挑战性又充满回报。通过小心的策略和巧妙的沟通，你可以在隐藏于刺客的眼皮底下带领正义的力量走向胜利。祝好运！',
   },
   'zh-TW': {
-    generalInformationTitle: '一般資訊:',
+    generalInformationTitle: '一般信息：',
     generalInformationText: `擔任{merlin}的角色需要精妙的平衡：必須對所有邪惡手下有深入了解（在經典遊戲中，除{mordred}外），但無法直接透露這些信息。真正的挑戰在於秘密地引導善良勢力取得勝利，同時避免被邪惡勢力的刺客在遊戲結束時暗殺。更為複雜的是，需要對抗{morgana}的欺騙，並獲得{percival}的信任。{morgana} 模仿你的角色，誤導正義之士，而{percival}努力揭穿偽裝，找出真相。`,
 
     generalTipsTitle: '一般提示:',

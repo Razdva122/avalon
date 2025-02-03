@@ -19,6 +19,7 @@ const {
   mordred,
   troublemaker,
   trickster,
+  witch,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -262,9 +263,9 @@ module.exports.routesSeo = {
     priority: 0.2,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Witch',
-      description: "Rules and Tips for Witch role in the board game 'Avalon: The Resistance'",
-      keywords: ['Witch', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...witch,
+      },
       image: 'roles/witch.webp',
     },
   },

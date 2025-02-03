@@ -71,7 +71,7 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
       'Слишком активный стиль игры может вызвать подозрения. Вместо этого сосредоточьтесь на ключевых действиях, которые могут изменить исход игры.',
   },
   'zh-CN': {
-    generalInformation: '基本信息:',
+    generalInformation: '一般信息：',
     playingAsOberon:
       '作为 {oberon} 进行游戏会带来独特的挑战，因为你是邪恶的爪牙，但你不知道其他爪牙的身份，他们也不知道你。你的任务是以有限的信息破坏善良势力。',
     generalTips: '一般技巧:',
@@ -98,7 +98,7 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     focusOnKeyPlays: '过于活跃的游戏风格可能会引起怀疑。相反，专注于改变游戏结果的关键游戏。',
   },
   'zh-TW': {
-    generalInformation: '基本信息:',
+    generalInformation: '一般信息：',
     playingAsOberon:
       '作為 {oberon} 進行遊戲會帶來獨特的挑戰，因為你是邪惡的爪牙，但你不知道其他爪牙的身份，他們也不知道你。你的任務是以有限的信息破壞善良勢力。',
     generalTips: '一般技巧:',

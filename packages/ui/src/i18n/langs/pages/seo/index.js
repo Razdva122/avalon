@@ -18,6 +18,7 @@ const { oberon } = require('./oberon');
 const { mordred } = require('./mordred');
 const { troublemaker } = require('./troublemaker');
 const { trickster } = require('./trickster');
+const { witch } = require('./witch');
 
 module.exports = {
   lobby,
@@ -40,4 +41,5 @@ module.exports = {
   mordred,
   troublemaker,
   trickster,
+  witch,
 };

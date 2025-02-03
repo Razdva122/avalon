@@ -78,7 +78,7 @@ export const morgana: { [key in TLanguage]: Dictionary<string> } = {
       'Находясь в роли {morgana}, важно найти баланс между напористостью и утонченностью. Ваша способность манипулировать нарративом и влиять как на злые, так и на добрые силы значительно влияет на шансы вашей команды на победу. Примите вызов и наслаждайтесь маневрированием в тенистых водах Авалона.',
   },
   'zh-CN': {
-    generalInformation: '基本信息：',
+    generalInformation: '一般信息：',
     playingAsMorgana:
       '扮演 {morgana} 的角色时，你需要进行欺骗，特别是让自己看起来像 {merlin} ，以迷惑善良的力量。你的目标是通过自己的行动迷惑 {percival}，同时密切注意 {merlin} 如何可能引导善良的力量。伪装成梅林可能会误导 {percival}，从而给邪恶势力带来优势。',
     generalTips: '一般提示：',
@@ -107,7 +107,7 @@ export const morgana: { [key in TLanguage]: Dictionary<string> } = {
       '成功扮演 {morgana} 角色需要在果断和微妙之间找到平衡。你操控叙事和影响邪恶与善良玩家的能力会显著影响你团队的胜算。接受挑战，并享受在阿瓦隆的阴影中穿梭的乐趣。',
   },
   'zh-TW': {
-    generalInformation: '基本資訊：',
+    generalInformation: '一般信息：',
     playingAsMorgana:
       '扮演 {morgana} 的角色時，你需要進行欺騙，特別是讓自己看起來像 {merlin} ，以迷惑善良的力量。你的目標是通過自己的行動迷惑 {percival}，同時密切注意 {merlin} 如何可能引導善良的力量。偽裝成梅林可能會誤導 {percival}，從而給邪惡勢力帶來優勢。',
     generalTips: '一般提示：',
