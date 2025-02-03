@@ -1,4 +1,4 @@
-import pages from '@/helpers/i18n/translates/langs/pages';
+import pages from '@/i18n/langs/pages';
 
 export const en = {
   menu: {

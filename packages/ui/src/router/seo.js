@@ -19,7 +19,7 @@ const {
   mordred,
   troublemaker,
   trickster,
-} = require('../../src/helpers/i18n/translates/langs/pages/seo');
+} = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
   lobby: {

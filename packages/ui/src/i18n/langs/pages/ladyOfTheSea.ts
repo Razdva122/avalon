@@ -1,4 +1,4 @@
-import type { TLanguage } from '@/helpers/i18n/interface';
+import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const ladySea: { [key in TLanguage]: Dictionary<string> } = {

@@ -2,10 +2,10 @@ import { userInStorage } from '@/store/init';
 import locale from 'locale';
 import type { IUser } from '@/store/interface';
 
-import type { TLanguage } from '@/helpers/i18n/interface';
-export * from '@/helpers/i18n/interface';
+import type { TLanguage } from '@/i18n/interface';
+export * from '@/i18n/interface';
 
-export * from '@/helpers/i18n/translates';
+export * from '@/i18n';
 
 export const LanguageMap: { [key in TLanguage]: string } = {
   en: 'English',
