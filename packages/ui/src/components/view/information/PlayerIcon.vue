@@ -153,8 +153,8 @@ export default defineComponent({
 
 .icon-cleric {
   background-image: url('@/assets/roles/cleric.webp');
-  background-position: 50% 5%;
-  background-size: 145%;
+  background-position: 60% 10%;
+  background-size: 125%;
 }
 
 .icon-evil {
@@ -300,6 +300,12 @@ export default defineComponent({
     background-image: url('@/assets/roles/anime/witch.webp');
     background-position: 55% 0%;
     background-size: 130%;
+  }
+
+  &.icon-cleric {
+    background-image: url('@/assets/roles/anime/cleric.webp');
+    background-position: 50% 3%;
+    background-size: 200%;
   }
 }
 </style>
