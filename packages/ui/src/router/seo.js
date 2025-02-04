@@ -20,6 +20,7 @@ const {
   troublemaker,
   trickster,
   witch,
+  brute,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -215,9 +216,9 @@ module.exports.routesSeo = {
     priority: 0.2,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Brute',
-      description: "Rules and Tips for Brute role in the board game 'Avalon: The Resistance'",
-      keywords: ['Brute', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...brute,
+      },
       image: 'roles/brute.webp',
     },
   },

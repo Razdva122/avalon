@@ -27,6 +27,7 @@ const routeComponentMap = {
   troublemaker: () => import('@/pages/wiki/roles/Troublemaker.vue'),
   trickster: () => import('@/pages/wiki/roles/Trickster.vue'),
   witch: () => import('@/pages/wiki/roles/Witch.vue'),
+  brute: () => import('@/pages/wiki/roles/Brute.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
@@ -35,7 +36,6 @@ export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo.minion, component: () => import('@/pages/wiki/roles/Minion.vue') },
   { ...routesSeo.guinevere, component: () => import('@/pages/wiki/roles/Guinevere.vue') },
   { ...routesSeo.lunatic, component: () => import('@/pages/wiki/roles/Lunatic.vue') },
-  { ...routesSeo.brute, component: () => import('@/pages/wiki/roles/Brute.vue') },
   { path: '/wiki/roles/isolde/', name: 'isolde', redirect: { name: 'lovers' } },
   { path: '/wiki/roles/tristan/', name: 'tristan', redirect: { name: 'lovers' } },
   { path: '/wiki/roles/evil_lancelot/', name: 'evil_lancelot', redirect: { name: 'lancelots' } },
