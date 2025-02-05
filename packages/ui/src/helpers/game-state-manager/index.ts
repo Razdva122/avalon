@@ -262,10 +262,14 @@ export class GameStateManager {
 
           while (mutateIndex >= startIndex) {
             const players = gameStates[mutateIndex].players;
-            const goodLancelot = players.find((player) => player.role === 'goodLancelot')!;
-            goodLancelot.role = 'evilLancelot';
-            const evilLancelot = players.find((player) => player.role === 'evilLancelot')!;
-            evilLancelot.role = 'goodLancelot';
+            const goodLancelot = players.find((player) => player.role === 'goodLancelot');
+            const evilLancelot = players.find((player) => player.role === 'evilLancelot');
+
+            if (goodLancelot && evilLancelot) {
+              goodLancelot.role = 'evilLancelot';
+              evilLancelot.role = 'goodLancelot';
+            }
+
             mutateIndex -= 1;
           }
         }

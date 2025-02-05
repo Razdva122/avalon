@@ -79,7 +79,7 @@
             class="mission-result-element"
             :class="'icon-loyalty-' + (i <= visibleHistory.fails ? 'evil' : 'good')"
           ></div>
-          <div v-else class="mission-result-element icon-witch-hidden"></div>
+          <div v-else class="mission-result-element icon-witch-hidden" :class="computedStyles()"></div>
         </template>
       </div>
       <div class="vote-container" v-if="visibleHistory?.type === 'vote' && visibleHistory.anonymous">
@@ -127,6 +127,7 @@ import InGamePanel from '@/components/view/panels/InGamePanel.vue';
 import Spoiler from '@/components/feedback/Spoiler.vue';
 import { gameStateKey, stateManagerKey } from '@/helpers/game-state-manager';
 import LancelotsView from '@/components/view/board/game/modules/LancelotsView.vue';
+import { computedStyles } from '@/helpers/styles';
 
 export default defineComponent({
   name: 'Game',
@@ -222,6 +223,7 @@ export default defineComponent({
       stageText,
       roomState,
       historyTextArray,
+      computedStyles,
     };
   },
 });
@@ -295,6 +297,10 @@ export default defineComponent({
   background-image: url('@/assets/red_team_no_background.webp');
   border: 2px solid rgb(var(--v-theme-error));
   background-size: contain;
+}
+
+.anime-style.icon-witch-hidden {
+  background-image: url('@/assets/roles/anime/witch.webp');
 }
 
 .icon-witch-hidden {

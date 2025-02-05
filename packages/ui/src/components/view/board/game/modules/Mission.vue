@@ -18,6 +18,7 @@
 
 <script lang="ts">
 import type { IMissionWithResult } from '@/components/view/board/interface';
+import { computedStyles } from '@/helpers/styles';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
@@ -40,6 +41,8 @@ export default defineComponent({
       } else {
         classes.push('mission-empty');
       }
+
+      classes.push(computedStyles());
 
       return classes;
     },
@@ -67,6 +70,10 @@ export default defineComponent({
 .mission-fail {
   background-image: url('@/assets/red_team_no_background.webp');
   background-size: contain;
+}
+
+.anime-style.mission-hidden {
+  background-image: url('@/assets/roles/anime/witch.webp');
 }
 
 .mission-hidden {

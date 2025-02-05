@@ -12,3 +12,11 @@ export function calculateRoleUrl(role: TVisibleRole): string {
 
   return require(`@/assets/roles${prefix}/${snakeCase(role)}.webp`);
 }
+
+export function computedStyles(): string[] {
+  if (store.state.user?.settings?.style === 'anime') {
+    return ['anime-style'];
+  }
+
+  return [];
+}
