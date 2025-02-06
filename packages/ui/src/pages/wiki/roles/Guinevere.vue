@@ -6,53 +6,44 @@
       {{ $t('roles.guinevere') }} {{ $t('roles.role') }}
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('guinevere')" alt="guinevere" />
-    <div class="credits">credits to: @Robrun</div>
+    <div class="credits">{{ $t('guinevere.credits') }}</div>
 
-    <h2>General Information:</h2>
-    <p>
-      Taking on the role of <PreviewLink target="guinevere" /> requires a delicate approach: she knows both Lancelots
-      <PreviewLink target="goodLancelot" /> and <PreviewLink target="evilLancelot" /> but does not know their current
-      allegiance. Her objective is to aid the side of good discreetly, as like <PreviewLink target="merlin" />, she may
-      be killed at the game's end if identified by the forces of evil.
-    </p>
+    <h2>{{ $t('guinevere.generalInformationTitle') }}</h2>
+    <p><LocalizedTextWrapper keypath="guinevere.generalInformationText" /></p>
 
-    <h2>General Tips:</h2>
+    <h2>{{ $t('guinevere.generalTipsTitle') }}</h2>
     <ul>
       <li>
-        <strong>Be cautious with your knowledge:</strong> Guinevere must use her awareness to subtly guide her allies
-        towards victory without revealing her role.
+        <strong>{{ $t('guinevere.cautiousKnowledgeTitle') }}</strong>
+        {{ $t('guinevere.cautiousKnowledgeText') }}
       </li>
       <li>
-        <strong>Use hints wisely:</strong> The ability to give subtle hints to your team without being too overt is
-        crucial for Guinevere.
+        <strong>{{ $t('guinevere.useHintsTitle') }}</strong>
+        {{ $t('guinevere.useHintsText') }}
       </li>
       <li>
-        <strong>Maintain balance in your gameplay:</strong> Sometimes, it's important not to appear too knowledgeable.
-        Deliberate mistakes or silence can misdirect the forces of evil.
+        <strong>{{ $t('guinevere.balanceGameplayTitle') }}</strong>
+        {{ $t('guinevere.balanceGameplayText') }}
       </li>
     </ul>
 
-    <h2>Strategic Tips:</h2>
+    <h2>{{ $t('guinevere.strategicTipsTitle') }}</h2>
     <ul>
       <li>
-        <strong>Determine Lancelot's loyalty:</strong> Strive to figure out which Lancelot is true to the cause of good
-        and which may have turned to evil. This knowledge can significantly impact your strategy.
+        <strong>{{ $t('guinevere.determineLancelotLoyaltyTitle') }}</strong>
+        <LocalizedTextWrapper keypath="guinevere.determineLancelotLoyaltyText" />
       </li>
       <li>
-        <strong>Strategize with silence:</strong> Sometimes, the best way to conceal your role is to hold back comments,
-        especially in the early stages of the game.
+        <strong>{{ $t('guinevere.strategizeSilenceTitle') }}</strong>
+        {{ $t('guinevere.strategizeSilenceText') }}
       </li>
       <li>
-        <strong>Build trust:</strong> Convincing other players of your allegiance to good is as vital as revealing evil.
-        Trust can sway team decisions.
+        <strong>{{ $t('guinevere.buildTrustTitle') }}</strong>
+        {{ $t('guinevere.buildTrustText') }}
       </li>
     </ul>
 
-    <p>
-      Playing as <PreviewLink target="guinevere" /> is challenging but immensely rewarding. With thoughtful strategy and
-      judicious communication, you can lead the forces of good to victory while evading detection by evil's assassin.
-      Good luck!
-    </p>
+    <p><LocalizedTextWrapper keypath="guinevere.conclusionText" /></p>
   </div>
 </template>
 

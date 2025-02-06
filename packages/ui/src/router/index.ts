@@ -29,13 +29,13 @@ const routeComponentMap = {
   witch: () => import('@/pages/wiki/roles/Witch.vue'),
   brute: () => import('@/pages/wiki/roles/Brute.vue'),
   lunatic: () => import('@/pages/wiki/roles/Lunatic.vue'),
+  guinevere: () => import('@/pages/wiki/roles/Guinevere.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
   { ...routesSeo['merlin_pure'], component: () => import('@/pages/wiki/roles/MerlinPure.vue') },
   { ...routesSeo.servant, component: () => import('@/pages/wiki/roles/Servant.vue') },
   { ...routesSeo.minion, component: () => import('@/pages/wiki/roles/Minion.vue') },
-  { ...routesSeo.guinevere, component: () => import('@/pages/wiki/roles/Guinevere.vue') },
   { path: '/wiki/roles/isolde/', name: 'isolde', redirect: { name: 'lovers' } },
   { path: '/wiki/roles/tristan/', name: 'tristan', redirect: { name: 'lovers' } },
   { path: '/wiki/roles/evil_lancelot/', name: 'evil_lancelot', redirect: { name: 'lancelots' } },

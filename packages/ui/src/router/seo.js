@@ -22,6 +22,7 @@ const {
   witch,
   brute,
   lunatic,
+  guinevere,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -193,9 +194,9 @@ module.exports.routesSeo = {
     priority: 0.3,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Guinevere',
-      description: "Rules and Tips for Guinevere role in the board game 'Avalon: The Resistance'",
-      keywords: ['Guinevere', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...guinevere,
+      },
       image: 'roles/guinevere.webp',
     },
   },
