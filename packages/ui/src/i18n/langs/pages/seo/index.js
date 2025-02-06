@@ -20,6 +20,7 @@ const { troublemaker } = require('./troublemaker');
 const { trickster } = require('./trickster');
 const { witch } = require('./witch');
 const { brute } = require('./brute');
+const { lunatic } = require('./lunatic');
 
 module.exports = {
   lobby,
@@ -44,4 +45,5 @@ module.exports = {
   trickster,
   witch,
   brute,
+  lunatic,
 };

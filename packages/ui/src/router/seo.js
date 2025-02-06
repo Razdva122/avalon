@@ -21,6 +21,7 @@ const {
   trickster,
   witch,
   brute,
+  lunatic,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -204,9 +205,9 @@ module.exports.routesSeo = {
     priority: 0.2,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Lunatic',
-      description: "Rules and Tips for Lunatic role in the board game 'Avalon: The Resistance'",
-      keywords: ['Lunatic', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...lunatic,
+      },
       image: 'roles/lunatic.webp',
     },
   },

@@ -18,6 +18,7 @@ import { trickster } from '@/i18n/langs/pages/roles/trickster';
 import { ladySea } from '@/i18n/langs/pages/ladyOfTheSea';
 import { witch } from '@/i18n/langs/pages/roles/witch';
 import { brute } from '@/i18n/langs/pages/roles/brute';
+import { lunatic } from '@/i18n/langs/pages/roles/luntaic';
 
 export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
   en: {},
@@ -45,6 +46,7 @@ Object.entries({
   trickster: trickster,
   witch: witch,
   brute: brute,
+  lunatic: lunatic,
 }).forEach(([key, value]) => {
   Object.keys(pages).forEach((lang) => {
     pages[<TLanguage>lang][key] = value[<TLanguage>lang];
