@@ -103,7 +103,7 @@ export const lady: { [key in TLanguage]: Dictionary<string> } = {
       ' Inicialmente, la {ladyOfLake} es otorgada al jugador a la derecha del primer líder. El jugador que recibe el título de {ladyOfLake} utiliza su poder al final de cada ronda (después de la segunda), pasándola a otro jugador que aún no haya recibido la {ladyOfLake}.',
     applyingTheAbility: 'Aplicación de la Habilidad:',
     choosesPlayer:
-      ' El dueño de la {ladyOfLake} elige a otro jugador y aprende secretamente su rol — si ese jugador es un Servidor de Arturo (bueno) o un Secuaz de Mordred (malo).',
+      ' El dueño de la {ladyOfLake} elige a otro jugador y aprende secretamente su rol — si ese jugador es un Servidor de Arturo (bueno) o un Esbirros de Mordred (malo).',
     passingTheLady: 'Pasando la "Dama del Lago":',
     passesToChecked:
       ' Después de usar su habilidad, el dueño de {ladyOfLake} la pasa al jugador cuya lealtad acaba de ser comprobada. Este jugador usará entonces {ladyOfLake} en la siguiente ronda.',

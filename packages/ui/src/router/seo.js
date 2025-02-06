@@ -23,6 +23,9 @@ const {
   brute,
   lunatic,
   guinevere,
+  minion,
+  servant,
+  merlinPure,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -158,9 +161,9 @@ module.exports.routesSeo = {
     priority: 0.2,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Merlin Pure',
-      description: "Rules and Tips for Merlin Pure role in the board game 'Avalon: The Resistance'",
-      keywords: ['Merlin Pure', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...merlinPure,
+      },
       image: 'roles/merlin_pure.webp',
     },
   },
@@ -242,9 +245,9 @@ module.exports.routesSeo = {
     priority: 0.6,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Servant',
-      description: "Rules and Tips for Servant role in the board game 'Avalon: The Resistance'",
-      keywords: ['Servant', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...servant,
+      },
       image: 'roles/servant.webp',
     },
   },
@@ -326,9 +329,9 @@ module.exports.routesSeo = {
     priority: 0.5,
     meta: {
       prerender: true,
-      title: 'Avalon: The Resistance | Minion of Mordred',
-      description: "Rules and Tips for  Minion of Mordred role in the board game 'Avalon: The Resistance'",
-      keywords: ['Minion of Mordred', 'Role', 'Rules', 'Tips'],
+      multiLanguage: {
+        ...minion,
+      },
       image: 'roles/minion.webp',
     },
   },

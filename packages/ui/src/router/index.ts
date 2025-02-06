@@ -30,12 +30,12 @@ const routeComponentMap = {
   brute: () => import('@/pages/wiki/roles/Brute.vue'),
   lunatic: () => import('@/pages/wiki/roles/Lunatic.vue'),
   guinevere: () => import('@/pages/wiki/roles/Guinevere.vue'),
+  merlin_pure: () => import('@/pages/wiki/roles/MerlinPure.vue'),
+  servant: () => import('@/pages/wiki/roles/Servant.vue'),
+  minion: () => import('@/pages/wiki/roles/Minion.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
-  { ...routesSeo['merlin_pure'], component: () => import('@/pages/wiki/roles/MerlinPure.vue') },
-  { ...routesSeo.servant, component: () => import('@/pages/wiki/roles/Servant.vue') },
-  { ...routesSeo.minion, component: () => import('@/pages/wiki/roles/Minion.vue') },
   { path: '/wiki/roles/isolde/', name: 'isolde', redirect: { name: 'lovers' } },
   { path: '/wiki/roles/tristan/', name: 'tristan', redirect: { name: 'lovers' } },
   { path: '/wiki/roles/evil_lancelot/', name: 'evil_lancelot', redirect: { name: 'lancelots' } },
