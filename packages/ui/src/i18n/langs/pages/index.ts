@@ -20,6 +20,7 @@ import { witch } from '@/i18n/langs/pages/roles/witch';
 import { brute } from '@/i18n/langs/pages/roles/brute';
 import { lunatic } from '@/i18n/langs/pages/roles/luntaic';
 import { guinevere } from '@/i18n/langs/pages/roles/guinevere';
+import { merlinPure } from '@/i18n/langs/pages/roles/merlinPure';
 
 export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
   en: {},
@@ -30,25 +31,26 @@ export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
 };
 
 Object.entries({
-  wiki: wiki,
-  lancelots: lancelots,
-  lady: lady,
-  ladySea: ladySea,
-  excalibur: excalibur,
-  morgana: morgana,
-  percival: percival,
-  rules: rules,
-  lovers: lovers,
-  merlin: merlin,
-  about: about,
-  oberon: oberon,
-  mordred: mordred,
-  troublemaker: troublemaker,
-  trickster: trickster,
-  witch: witch,
-  brute: brute,
-  lunatic: lunatic,
-  guinevere: guinevere,
+  wiki,
+  lancelots,
+  lady,
+  ladySea,
+  excalibur,
+  morgana,
+  percival,
+  rules,
+  lovers,
+  merlin,
+  about,
+  oberon,
+  mordred,
+  troublemaker,
+  trickster,
+  witch,
+  brute,
+  lunatic,
+  guinevere,
+  merlinPure,
 }).forEach(([key, value]) => {
   Object.keys(pages).forEach((lang) => {
     pages[<TLanguage>lang][key] = value[<TLanguage>lang];

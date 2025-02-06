@@ -7,67 +7,58 @@
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('merlinPure')" alt="merlin pure" />
 
-    <h2>General Information:</h2>
-    <p>
-      Playing as <PreviewLink target="merlinPure" /> grants you the extraordinary power of seeing not only the
-      allegiance but also the exact roles of the evil characters. This advanced knowledge provides you a significant
-      edge, but comes with the increased risk of being exposed and targeted by the Assassin.
-    </p>
+    <h2>{{ $t('merlinPure.generalInformationTitle') }}</h2>
+    <p><LocalizedTextWrapper keypath="merlinPure.generalInformationText" /></p>
 
-    <h2>General Tips:</h2>
+    <h2>{{ $t('merlinPure.generalTipsTitle') }}</h2>
     <ul>
       <li>
-        <strong>Exercise maximum discretion:</strong> Your deep knowledge is both a gift and a curse. Be extremely
-        cautious in sharing any information to avoid revealing your identity.
+        <strong>{{ $t('merlinPure.tipDiscretionTitle') }}</strong>
+        {{ $t('merlinPure.tipDiscretionText') }}
       </li>
       <li>
-        <strong>Navigate with nuanced hints:</strong> You must become adept at hinting your teammates towards the truth
-        without being explicit, as the stakes of being identified are even higher for you.
+        <strong>{{ $t('merlinPure.tipNuancedHintsTitle') }}</strong>
+        {{ $t('merlinPure.tipNuancedHintsText') }}
       </li>
       <li>
-        <strong>Avoid immediate direct accusations:</strong> Given your comprehensive awareness, pointing out evil roles
-        too precisely can quickly unmask you as <PreviewLink target="merlinPure" />.
+        <strong>{{ $t('merlinPure.tipAvoidAccusationsTitle') }}</strong>
+        <LocalizedTextWrapper keypath="merlinPure.tipAvoidAccusationsText" />
       </li>
       <li>
-        <strong>Balance your intel:</strong> It's crucial to alternate between providing guidance and remaining
-        inconspicuous, as your full spectrum insight can easily betray you if not handled with care.
+        <strong>{{ $t('merlinPure.tipBalanceIntelTitle') }}</strong>
+        {{ $t('merlinPure.tipBalanceIntelText') }}
       </li>
       <li>
-        <strong>Keep an eye on the Assassin:</strong> More than ever, the Assassin's sole ambition is to identify you;
-        moving too confidently could spell your doom.
+        <strong>{{ $t('merlinPure.tipWatchAssassinTitle') }}</strong>
+        {{ $t('merlinPure.tipWatchAssassinText') }}
       </li>
     </ul>
 
-    <h2>Strategic Tips:</h2>
+    <h2>{{ $t('merlinPure.strategicTipsTitle') }}</h2>
     <ul>
       <li>
-        <strong>Utilize strategic ambiguity:</strong> With your specific role knowledge, you can create complex
-        scenarios to mislead evil players on multiple levels.
+        <strong>{{ $t('merlinPure.tipAmbiguityTitle') }}</strong>
+        {{ $t('merlinPure.tipAmbiguityText') }}
       </li>
       <li>
-        <strong>Reveal roles gradually and indirectly:</strong> Guide your team towards understanding the roles of evil
-        players through a carefully orchestrated series of hints.
+        <strong>{{ $t('merlinPure.tipGradualRevealTitle') }}</strong>
+        {{ $t('merlinPure.tipGradualRevealText') }}
       </li>
       <li>
-        <strong>Hint at roles, don't declare them:</strong> Instead of stating roles, drop hints that nudge your
-        teammates to make the deductions themselves.
+        <strong>{{ $t('merlinPure.tipHintNotDeclareTitle') }}</strong>
+        {{ $t('merlinPure.tipHintNotDeclareText') }}
       </li>
       <li>
-        <strong>Address the roles without confirmation:</strong> Engage in discussions about roles in a way that
-        provokes thought without affirming your knowledge.
+        <strong>{{ $t('merlinPure.tipAddressWithoutConfirmTitle') }}</strong>
+        {{ $t('merlinPure.tipAddressWithoutConfirmText') }}
       </li>
       <li>
-        <strong>Support your team's discovery:</strong> Empower your teammates to come to conclusions that you've
-        already made, reinforcing their confidence in their own deduction skills.
+        <strong>{{ $t('merlinPure.tipSupportDiscoveryTitle') }}</strong>
+        {{ $t('merlinPure.tipSupportDiscoveryText') }}
       </li>
     </ul>
 
-    <p>
-      Playing as <PreviewLink target="merlinPure" /> is a role laden with potency and peril. Your unmatched knowledge of
-      the evils' identities allows you unparalleled ability to steer the course of the game. However, your ultimate
-      success hinges on the mastery of subtlety and the art of the unspoken word. Guide the forces of good to triumph
-      with a deft hand and a watchful eye.
-    </p>
+    <p><LocalizedTextWrapper keypath="merlinPure.conclusionText" /></p>
   </div>
 </template>
 
