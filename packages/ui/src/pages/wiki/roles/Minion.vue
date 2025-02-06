@@ -6,57 +6,52 @@
       {{ $t('roles.minion') }} {{ $t('roles.role') }}
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('minion')" alt="Minion of Mordred" />
+    <h2>{{ $t('minion.generalTipsTitle') }}</h2>
 
-    <h2>General Tips:</h2>
     <ul>
       <li>
-        <strong>Role:</strong> You are part of the "Evil" team, with the main objective to thwart the "Good" team's
-        missions or ensure your presence on successful ones.
+        <strong>{{ $t('minion.tipRoleTitle') }}</strong>
+        {{ $t('minion.tipRoleText') }}
       </li>
       <li>
-        <strong>Knowledge:</strong> At the beginning of the game, you know who your fellow "Evil" allies are, except for
-        roles hidden from you by game rules.
+        <strong>{{ $t('minion.tipKnowledgeTitle') }}</strong>
+        {{ $t('minion.tipKnowledgeText') }}
       </li>
       <li>
-        <strong>Objective:</strong> Your ultimate goal is to cause three out of five missions to fail or to sow enough
-        distrust among the "Good" team to lead your evil team to victory.
+        <strong>{{ $t('minion.tipObjectiveTitle') }}</strong>
+        {{ $t('minion.tipObjectiveText') }}
       </li>
     </ul>
 
-    <h2>Strategic Tips:</h2>
+    <h2>{{ $t('minion.strategicTipsTitle') }}</h2>
     <ul>
       <li>
-        <strong>Discreet Collaboration:</strong> Work closely with your "Evil" teammates in secret. Plan how to approach
-        each mission and who will take the risk of causing a mission to fail.
+        <strong>{{ $t('minion.tipDiscreetCollaborationTitle') }}</strong>
+        {{ $t('minion.tipDiscreetCollaborationText') }}
       </li>
       <li>
-        <strong>Deception:</strong> Perfect the art of deception. Blending in as one of the "Good" can help you
-        influence their decisions and protect your identity.
+        <strong>{{ $t('minion.tipDeceptionTitle') }}</strong>
+        {{ $t('minion.tipDeceptionText') }}
       </li>
       <li>
-        <strong>Public Demeanor:</strong> Be mindful of your public actions and words. Try to avoid suspicion by not
-        being too defensive or too aggressive.
+        <strong>{{ $t('minion.tipPublicDemeanorTitle') }}</strong>
+        {{ $t('minion.tipPublicDemeanorText') }}
       </li>
       <li>
-        <strong>Undermine Trust:</strong> Subtly question the actions and decisions of the "Good" players to create an
-        atmosphere of distrust and confusion.
+        <strong>{{ $t('minion.tipUndermineTrustTitle') }}</strong>
+        {{ $t('minion.tipUndermineTrustText') }}
       </li>
       <li>
-        <strong>Suspect Management:</strong> If suspicion falls on you, cleverly redirect it without bringing too much
-        attention to yourself. Use logical arguments to defend yourself but avoid being too convincing as to not raise
-        further suspicion.
+        <strong>{{ $t('minion.tipSuspectManagementTitle') }}</strong>
+        {{ $t('minion.tipSuspectManagementText') }}
       </li>
       <li>
-        <strong>Strategic Sacrifice:</strong> It may be beneficial to sacrifice an "Evil" team member to gain the trust
-        of the "Good" team, particularly if it can lead to an "Evil" majority on critical missions.
+        <strong>{{ $t('minion.tipStrategicSacrificeTitle') }}</strong>
+        {{ $t('minion.tipStrategicSacrificeText') }}
       </li>
     </ul>
 
-    <p>
-      As a <PreviewLink target="minion" />, your success depends on your ability to deceive and manipulate the "Good"
-      team while coordinating with your "Evil" allies. Your cunning and discretion are key instruments in overthrowing
-      the forces of good and ensuring victory for <PreviewLink target="mordred" />.
-    </p>
+    <p><LocalizedTextWrapper keypath="minion.conclusionText" /></p>
   </div>
 </template>
 

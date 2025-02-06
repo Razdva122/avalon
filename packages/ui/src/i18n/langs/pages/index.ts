@@ -21,6 +21,8 @@ import { brute } from '@/i18n/langs/pages/roles/brute';
 import { lunatic } from '@/i18n/langs/pages/roles/luntaic';
 import { guinevere } from '@/i18n/langs/pages/roles/guinevere';
 import { merlinPure } from '@/i18n/langs/pages/roles/merlinPure';
+import { minion } from '@/i18n/langs/pages/roles/minion';
+import { servant } from '@/i18n/langs/pages/roles/servant';
 
 export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
   en: {},
@@ -51,6 +53,8 @@ Object.entries({
   lunatic,
   guinevere,
   merlinPure,
+  minion,
+  servant,
 }).forEach(([key, value]) => {
   Object.keys(pages).forEach((lang) => {
     pages[<TLanguage>lang][key] = value[<TLanguage>lang];
