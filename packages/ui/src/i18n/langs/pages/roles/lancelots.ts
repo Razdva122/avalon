@@ -17,8 +17,8 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
       "If a <span class='material-icons icon-swap'>swap_horiz</span><b>loyalty change</b> card is revealed, the Lancelots switch allegiances along with all corresponding changes (such as the ability to fail a mission, or being subject to the Lady of Lake card).",
     deckComposition:
       "Whereas, if the card drawn is <span class='material-icons icon-swap'>close</span><b>blank</b>, no change occurs. The deck contains <b>five cards</b>, of which two prompt <span class='material-icons icon-swap'>swap_horiz</span><b>loyalty change</b>, and three are <span class='material-icons icon-swap'>close</span><b>blank</b>.",
-    loyaltyShiftDescription:
-      'Importantly, a shift in loyalty does not alter how other players perceive you, {merlin} and the minions of Mordred will continue to see the originally {evilLancelot} as their initial role.',
+    possibleResults:
+      'Every Lancelot has a restriction on which outcome they can choose during the mission: {evilLancelot} may only fail, while {goodLancelot} may only success.',
     generalTipsTitle: 'General Tips:',
     embraceUnpredictabilityTitle: 'Embrace unpredictability:',
     embraceUnpredictabilityDescription:
@@ -60,8 +60,8 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
       "Если открывается карта <span class='material-icons icon-swap'>swap_horiz</span><b>смена лояльности</b>, Ланселоты меняют стороны со всеми соответствующими изменениями (например, возможность провалить миссию или быть подверженным влиянию карты Леди Озера).",
     deckComposition:
       "Если вытянута <span class='material-icons icon-swap'>close</span><b>пустая</b> карта, изменения не происходит. Колода содержит <b>пять карт</b>, из которых две вызывают <span class='material-icons icon-swap'>swap_horiz</span><b>смену лояльности</b>, а три — <span class='material-icons icon-swap'>close</span><b>пустые</b>.",
-    loyaltyShiftDescription:
-      'Важно, что изменение лояльности не изменяет то, как другие игроки воспринимают вас. {merlin} и приспешники Мордреда будут по-прежнему считать изначально {evilLancelot} своей начальной ролью.',
+    possibleResults:
+      'Каждый Ланселот имеет ограничение на то, какой результат он может выбрать во время миссии: {evilLancelot} может выбрать только провал, а {goodLancelot} — только успех.',
     generalTipsTitle: 'Общие советы:',
     embraceUnpredictabilityTitle: 'Примите непредсказуемость:',
     embraceUnpredictabilityDescription:
@@ -101,8 +101,8 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
       "如果显示 <span class='material-icons icon-swap'>swap_horiz</span><b>忠诚变化</b> 卡片，兰斯洛特将切换阵营，并随之进行所有相应的变化（例如完成或失败任务，或被 湖中仙女 卡影响）。",
     deckComposition:
       "而如果抽出的卡是 <span class='material-icons icon-swap'>close</span><b>空白</b>，则不发生变化。牌堆包含 <b>五张卡片</b>，其中两张促使 <span class='material-icons icon-swap'>swap_horiz</span><b>忠诚变化</b>，三张为空白。",
-    loyaltyShiftDescription:
-      '重要的是，忠诚度的变化不会改变其他玩家对你的看法。{merlin} 和莫德雷德的爪牙将继续将最初的 {evilLancelot} 视为他们的初始角色。',
+    possibleResults:
+      '每个兰斯洛特在任务中都有选择结果的限制:{evilLancelot} 只能选择失败,而 {goodLancelot} 只能选择成功.',
     generalTipsTitle: '一般提示：',
     embraceUnpredictabilityTitle: '接受不可预测性：',
     embraceUnpredictabilityDescription: '作为兰斯洛特，不可预测性是你的元素。利用可能的换边来为自己谋利。',
@@ -138,8 +138,8 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
       "如果顯示 <span class='material-icons icon-swap'>swap_horiz</span><b>忠誠變化</b> 卡片，蘭斯洛特將切換陣營，並隨之進行所有相應的變化（例如完成或失敗任務，或被 湖中仙女 卡影響）。",
     deckComposition:
       "而如果抽出的卡是 <span class='material-icons icon-swap'>close</span><b>空白</b>，則不發生變化。牌堆包含 <b>五張卡片</b>，其中兩張促使 <span class='material-icons icon-swap'>swap_horiz</span><b>忠誠變化</b>，三張為空白。",
-    loyaltyShiftDescription:
-      '重要的是，忠誠度的變化不會改變其他玩家對你的看法。{merlin} 和莫德雷德的爪牙將繼續將最初的 {evilLancelot} 視為他們的初始角色。',
+    possibleResults:
+      '每個蘭斯洛特在任務中都有選擇結果的限制:{evilLancelot} 只能選擇失敗,而 {goodLancelot} 只能選擇成功.',
     generalTipsTitle: '一般提示：',
     embraceUnpredictabilityTitle: '接受不可預測性：',
     embraceUnpredictabilityDescription: '作為蘭斯洛特，不可預測性是你的元素。利用可能的換邊來為自己謀利。',
@@ -177,8 +177,8 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
       "Si se revela una carta de <span class='material-icons icon-swap'>swap_horiz</span><b>cambio de lealtad</b>, los Lancelots cambian de bando junto con todos los cambios correspondientes (como la habilidad de fallar una misión, o estar sujeto a la carta de la Dama del Lago).",
     deckComposition:
       "Mientras que, si la carta robada es <span class='material-icons icon-swap'>close</span><b>en blanco</b>, no ocurre ningún cambio. El mazo contiene <b>cinco cartas</b>, de las cuales dos provocan un <span class='material-icons icon-swap'>swap_horiz</span><b>cambio de lealtad</b>, y tres son <span class='material-icons icon-swap'>close</span><b>en blanco</b>.",
-    loyaltyShiftDescription:
-      'Es importante destacar que un cambio de lealtad no altera cómo los otros jugadores te perciben, {merlin} y los secuaces de Mordred seguirán viendo al {evilLancelot} original en su rol inicial.',
+    possibleResults:
+      'Cada Lancelot tiene una restricción sobre el resultado que puede elegir durante la misión: {evilLancelot} solo puede elegir el fracaso, mientras que {goodLancelot} solo puede elegir el éxito.',
     generalTipsTitle: 'Consejos Generales:',
     embraceUnpredictabilityTitle: 'Abraza la imprevisibilidad:',
     embraceUnpredictabilityDescription:

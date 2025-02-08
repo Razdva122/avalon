@@ -22,7 +22,7 @@
       <span v-html="$t('lancelots.deckComposition')"></span>
     </p>
     <p>
-      <LocalizedTextWrapper keypath="lancelots.loyaltyShiftDescription" />
+      <LocalizedTextWrapper keypath="lancelots.possibleResults" />
     </p>
 
     <h2>{{ $t('lancelots.generalTipsTitle') }}</h2>
