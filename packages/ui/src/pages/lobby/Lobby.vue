@@ -9,6 +9,8 @@
       </TemporaryAlert>
     </div>
 
+    <span class="online">Online: {{ online }}</span>
+
     <h1 class="lobby-header">{{ $t('mainPage.header') }}</h1>
 
     <v-btn class="mb-5" @click="createRoom" size="x-large"> {{ $t('mainPage.createRoom') }} </v-btn>
@@ -71,6 +73,11 @@ export default defineComponent({
     const store = useStore();
 
     const roomsList = ref<TRoomsList>();
+    const online = ref<number>();
+
+    socket.emitWithAck('getOnlineCounter', 'lobby').then((counter) => {
+      online.value = counter;
+    });
 
     const initState = async () => {
       const data = await socket.emitWithAck('getRoomsList');
@@ -99,9 +106,14 @@ export default defineComponent({
       return [...Object.values(roles), ...Object.values(addons)].some((el) => Boolean(el));
     };
 
+    socket.on('onlineCounterUpdated', (counter) => {
+      online.value = counter;
+    });
+
     return {
       createRoom,
       displayOptions,
+      online,
       roomsList,
     };
   },
@@ -109,6 +121,14 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.online {
+  opacity: 30%;
+  font-size: large;
+  position: fixed;
+  top: 60px;
+  right: 10px;
+}
+
 .lobby {
   display: flex;
   flex-direction: column;

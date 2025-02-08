@@ -17,6 +17,8 @@ export type { ISocketError } from './errors';
 
 export interface ServerToClientEvents {
   roomsListUpdated: (list: TRoomsList) => void;
+  onlineCounterUpdated: (counter: number) => void;
+  roomOnlineUpdated: (counter: number) => void;
   roomUpdated: (state: TRoomState) => void;
   gameUpdated: (state: IVisualGameState) => void;
   newMessage: (message: TMessage) => void;
@@ -27,6 +29,7 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
   getRoomsList: (callback: (list: TRoomsList) => void) => void;
+  getOnlineCounter: (id: string, callback: (counter: number) => void) => void;
 
   createRoom: (callback: (uuid: string) => void) => void;
   updateOptions: (uuid: string, options: IGameOptions) => void;

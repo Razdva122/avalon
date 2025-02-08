@@ -12,6 +12,7 @@ export class Manager {
   rooms: Dictionary<Room> = {};
   roomsList: TRoomsList = fakeRooms;
   io: Server;
+  onlineCounter: Dictionary<number> = {};
 
   get roomListCutted() {
     return this.roomsList.slice(0, 20);
@@ -117,6 +118,7 @@ export class Manager {
 
     io.on('connection', (socket) => {
       handleSocketErrors(socket);
+      this.updateOnlineCounter('lobby', 1);
 
       const { user_id: userID, user_name: userName } = parseCookie(socket.handshake.headers.cookie || '');
 
@@ -128,20 +130,29 @@ export class Manager {
         console.log(`user ${userName} join room uuid: ${uuid}`);
 
         const fakeGame = fakeGames.find((el) => el.roomID === uuid);
+        const room = this.rooms[uuid];
+
+        if (fakeGame || room) {
+          socket.join(uuid);
+          this.updateOnlineCounter(uuid, 1);
+        }
 
         if (fakeGame) {
           cb(fakeGame);
           return;
         }
 
-        const room = this.rooms[uuid];
-
         if (room) {
-          socket.join(uuid);
           cb(this.rooms[uuid].calculateRoomState(userID));
         } else {
           cb({ error: 'errorNotFound' });
         }
+      });
+
+      socket.on('leaveRoom', (uuid) => {
+        socket.leave(uuid);
+        this.updateOnlineCounter(uuid, -1);
+        console.log(`user ${userName} leave room uuid: ${uuid}`);
       });
 
       socket.on('getRoomsList', (cb) => {
@@ -149,13 +160,23 @@ export class Manager {
         cb(this.roomListCutted);
       });
 
+      socket.on('getOnlineCounter', (id, cb) => {
+        cb(this.onlineCounter[id]);
+      });
+
       if (userID && userName) {
         this.createMethodsForAuthUsers(socket, userID, userName);
         this.createMethodsForGame(socket, userID, userName);
       }
 
-      socket.on('disconnect', () => {
-        console.log('user disconnected');
+      socket.on('disconnecting', () => {
+        Array.from(socket.rooms).forEach((room) => {
+          this.updateOnlineCounter(room, -1);
+        });
+
+        if (!socket.rooms.has('lobby')) {
+          this.updateOnlineCounter('lobby', -1);
+        }
       });
     });
 
@@ -188,11 +209,6 @@ export class Manager {
     socket.on('restartGame', (uuid) => {
       console.log(`restart room with uuid: ${uuid}`);
       this.restartRoom(uuid);
-    });
-
-    socket.on('leaveRoom', (uuid) => {
-      socket.leave(uuid);
-      console.log(`user ${userName} leave room uuid: ${uuid}`);
     });
 
     socket.on('sendMessage', (uuid, message) => {
@@ -363,5 +379,16 @@ export class Manager {
       console.log(`Player ${userName} useWitchAbility in game ${uuid}`);
       getRoomManager(uuid).callGameMethods(userID, { method: 'witchAbility', result });
     });
+  }
+
+  updateOnlineCounter(id: string, diff: -1 | 1): void {
+    if (diff === -1 && !this.onlineCounter[id]) {
+      return;
+    }
+
+    this.onlineCounter[id] = this.onlineCounter[id] || 0;
+    this.onlineCounter[id] += diff;
+    const emitName = id === 'lobby' ? 'onlineCounterUpdated' : 'roomOnlineUpdated';
+    this.io.to(id).emit(emitName, this.onlineCounter[id]);
   }
 }

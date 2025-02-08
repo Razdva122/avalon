@@ -1,5 +1,6 @@
 <template>
   <div class="room d-flex align-center justify-space-around">
+    <span class="online">Online: {{ online }}</span>
     <template v-if="errorMessage">
       <h1 class="mb-4">{{ $t('room.' + errorMessage.error) }}</h1>
       <v-btn size="x-large" @click="$router.push({ name: 'lobby' })">{{ $t('room.backToLobby') }}</v-btn>
@@ -56,6 +57,7 @@ export default defineComponent({
     const errorMessage = ref<ISocketError>();
     const store = useStore();
     const router = useRouter();
+    const online = ref<number>();
 
     const roomState = stateManager.state;
     const game = stateManager.game;
@@ -73,6 +75,10 @@ export default defineComponent({
     };
 
     await initState(props.uuid);
+
+    socket.emitWithAck('getOnlineCounter', props.uuid).then((counter) => {
+      online.value = counter;
+    });
 
     socket.on('roomUpdated', (state) => {
       if (state.roomID === props.uuid) {
@@ -95,6 +101,10 @@ export default defineComponent({
       if (gameUUID === props.uuid) {
         router.push({ name: 'lobby' });
       }
+    });
+
+    socket.on('roomOnlineUpdated', (counter) => {
+      online.value = counter;
     });
 
     const displayHostPanel = computed(() => {
@@ -129,6 +139,7 @@ export default defineComponent({
       visibleRoles,
       alert,
       game,
+      online,
       restartGame,
     };
   },
@@ -140,6 +151,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.online {
+  opacity: 30%;
+  font-size: large;
+  position: fixed;
+  top: 60px;
+  right: 10px;
+}
+
 .game-stage {
   width: 500px;
   background-color: white;
@@ -155,6 +174,7 @@ export default defineComponent({
   width: 100vw;
   height: 100%;
   overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 .chat {

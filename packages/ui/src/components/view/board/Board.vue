@@ -1,58 +1,60 @@
 <template>
-  <div class="board-container" :class="'view-mode-' + stateManager.viewMode.value">
-    <div class="game-board" alt="board" :class="'game-end-' + gameResult"></div>
-    <slot name="content">
-      <div class="timer">
-        <Timer @timerEnd="clearHistoryElement" :duration="timerDuration" />
-      </div>
-      <div class="actions-container d-flex flex-column justify-center">
-        <template v-if="roomState.stage !== 'started'">
-          <div class="options-panel mb-4">
-            <div class="options-title">{{ $t('game.rolesAndAddons') }}</div>
-            <OptionsPreview
-              :roles="roomState.options.roles"
-              :addons="roomState.options.addons"
-              class="options-preview"
-            />
-          </div>
-          <div class="button-panel d-flex flex-column align-center">
-            <StartPanel :room-state="roomState" />
-          </div>
-        </template>
-        <template v-else>
-          <template
-            v-if="
-              stateManager.viewMode.value === 'live' &&
-              gameState.stage === 'announceLoyalty' &&
-              (playerInGame?.features.ladyOfLake === 'has' || playerInGame?.features.ladyOfSea === 'has') &&
-              visibleHistory?.type !== 'checkLoyalty'
-            "
-          >
-            <AnnounceLoyalty />
+  <div class="wrapper">
+    <div class="board-container" :class="'view-mode-' + stateManager.viewMode.value">
+      <div class="game-board" alt="board" :class="'game-end-' + gameResult"></div>
+      <slot name="content">
+        <div class="timer">
+          <Timer @timerEnd="clearHistoryElement" :duration="timerDuration" />
+        </div>
+        <div class="actions-container d-flex flex-column justify-center">
+          <template v-if="roomState.stage !== 'started'">
+            <div class="options-panel mb-4">
+              <div class="options-title">{{ $t('game.rolesAndAddons') }}</div>
+              <OptionsPreview
+                :roles="roomState.options.roles"
+                :addons="roomState.options.addons"
+                class="options-preview"
+              />
+            </div>
+            <div class="button-panel d-flex flex-column align-center">
+              <StartPanel :room-state="roomState" />
+            </div>
           </template>
-          <Game v-else :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory">
-            <template v-slot:restart>
-              <slot name="restart"></slot>
+          <template v-else>
+            <template
+              v-if="
+                stateManager.viewMode.value === 'live' &&
+                gameState.stage === 'announceLoyalty' &&
+                (playerInGame?.features.ladyOfLake === 'has' || playerInGame?.features.ladyOfSea === 'has') &&
+                visibleHistory?.type !== 'checkLoyalty'
+              "
+            >
+              <AnnounceLoyalty />
             </template>
-          </Game>
-        </template>
+            <Game v-else :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory">
+              <template v-slot:restart>
+                <slot name="restart"></slot>
+              </template>
+            </Game>
+          </template>
+        </div>
+      </slot>
+      <div
+        class="player-container"
+        v-for="(player, i) in players"
+        :style="{ transform: calculateRotate(i) }"
+        :key="player.id"
+      >
+        <Player
+          :player-state="player"
+          :display-kick="userIsLeader"
+          :display-index="roomState.stage === 'started' ? gameState.features.displayIndex : false"
+          :visible-history="visibleHistory"
+          :current-stage="roomState.stage === 'started' ? gameState.stage : undefined"
+          :style="{ transform: calculateRotate(i, true), translate: '0 -50%' }"
+          @player-click="onPlayerClick"
+        />
       </div>
-    </slot>
-    <div
-      class="player-container"
-      v-for="(player, i) in players"
-      :style="{ transform: calculateRotate(i) }"
-      :key="player.id"
-    >
-      <Player
-        :player-state="player"
-        :display-kick="userIsLeader"
-        :display-index="roomState.stage === 'started' ? gameState.features.displayIndex : false"
-        :visible-history="visibleHistory"
-        :current-stage="roomState.stage === 'started' ? gameState.stage : undefined"
-        :style="{ transform: calculateRotate(i, true), translate: '0 -50%' }"
-        @player-click="onPlayerClick"
-      />
     </div>
   </div>
 </template>
@@ -265,11 +267,21 @@ export default defineComponent({
       .board-container {
         transform: scale(calc(($newValue + 40px) / $size));
       }
+
+      .wrapper {
+        width: $newValue;
+        height: $newValue;
+      }
     }
 
     @media screen and (max-height: $value) and (min-height: $newValue) {
       .board-container {
         transform: scale(calc(($newValue - 50px) / $size));
+      }
+
+      .wrapper {
+        width: $newValue;
+        height: $newValue;
       }
     }
 
@@ -287,6 +299,12 @@ export default defineComponent({
 }
 
 @include scaleFromSize(840px);
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .actions-container {
   top: 120px;

@@ -86,6 +86,7 @@ export default defineComponent({
 }
 
 .fails {
+  font-weight: bold;
   white-space: nowrap;
 }
 </style>
