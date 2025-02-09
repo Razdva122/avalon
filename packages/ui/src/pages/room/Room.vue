@@ -147,6 +147,10 @@ export default defineComponent({
   beforeRouteLeave() {
     socket.emit('leaveRoom', this.$props.uuid);
   },
+
+  beforeRouteUpdate() {
+    socket.emit('leaveRoom', this.$props.uuid);
+  },
 });
 </script>
 

@@ -105,6 +105,7 @@ export const zh_CN = {
     brute: '野蛮人',
     witch: '巫婆',
     minion: '士兵',
+    cleric: '牧师',
     wiki: '维基',
     expansions: '插件',
     roles: '角色',

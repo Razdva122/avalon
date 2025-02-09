@@ -105,6 +105,7 @@ export const zh_TW = {
     brute: '野蠻人',
     witch: '巫婆',
     minion: '士兵',
+    cleric: '牧師',
     wiki: '維基',
     expansions: '插件',
     roles: '角色',

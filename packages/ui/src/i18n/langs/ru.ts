@@ -105,6 +105,7 @@ export const ru = {
     brute: 'Брут',
     witch: 'Ведьма',
     minion: 'Миньон',
+    cleric: 'Клирик',
     wiki: 'Вики',
     expansions: 'Дополнения',
     roles: 'Роли',

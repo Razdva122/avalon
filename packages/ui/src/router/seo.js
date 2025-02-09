@@ -26,6 +26,7 @@ const {
   minion,
   servant,
   merlinPure,
+  cleric,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -297,6 +298,18 @@ module.exports.routesSeo = {
         ...trickster,
       },
       image: 'roles/trickster.webp',
+    },
+  },
+  cleric: {
+    path: '/wiki/roles/cleric/',
+    name: 'cleric',
+    priority: 0.2,
+    meta: {
+      prerender: true,
+      multiLanguage: {
+        ...cleric,
+      },
+      image: 'roles/cleric.webp',
     },
   },
   oberon: {

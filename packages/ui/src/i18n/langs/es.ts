@@ -105,6 +105,7 @@ export const es = {
     brute: 'Bruto',
     witch: 'Bruja',
     minion: 'Secuaz',
+    cleric: 'Clérigo',
     wiki: 'Wiki',
     expansions: 'Expansiones',
     roles: 'Roles',

@@ -25,6 +25,7 @@ const { guinevere } = require('./guinevere');
 const { minion } = require('./minion');
 const { servant } = require('./servant');
 const { merlinPure } = require('./merlinPure');
+const { cleric } = require('./cleric');
 
 module.exports = {
   lobby,
@@ -54,4 +55,5 @@ module.exports = {
   minion,
   servant,
   merlinPure,
+  cleric,
 };

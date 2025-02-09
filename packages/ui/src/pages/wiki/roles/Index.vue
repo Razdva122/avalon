@@ -30,6 +30,10 @@
         <h2>{{ $t('roles.isolde') }}</h2>
         <img class="role-image" :src="calculateRoleUrl('isolde')" alt="isolde" />
       </router-link>
+      <router-link class="role" :to="{ name: 'cleric' }">
+        <h2>{{ $t('roles.cleric') }}</h2>
+        <img class="role-image" :src="calculateRoleUrl('cleric')" alt="cleric" />
+      </router-link>
       <router-link class="role" :to="{ name: 'troublemaker' }">
         <h2>{{ $t('roles.troublemaker') }}</h2>
         <img class="role-image" :src="calculateRoleUrl('troublemaker')" alt="troublemaker" />

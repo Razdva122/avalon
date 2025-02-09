@@ -33,6 +33,7 @@ const routeComponentMap = {
   merlin_pure: () => import('@/pages/wiki/roles/MerlinPure.vue'),
   servant: () => import('@/pages/wiki/roles/Servant.vue'),
   minion: () => import('@/pages/wiki/roles/Minion.vue'),
+  cleric: () => import('@/pages/wiki/roles/Cleric.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
