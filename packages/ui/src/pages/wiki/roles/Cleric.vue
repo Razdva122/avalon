@@ -7,50 +7,50 @@
     </h1>
     <img class="preview-image" :src="calculateRoleUrl('cleric')" alt="cleric" />
 
-    <h2>{{ $t('percival.generalInformation') }}</h2>
-    <p>
-      <LocalizedTextWrapper keypath="percival.percivalRole" />
-    </p>
+    <section>
+      <h2>{{ $t('cleric.informationHeader') }}</h2>
+      <p><LocalizedTextWrapper keypath="cleric.generalInformation" /></p>
+    </section>
 
-    <h2>{{ $t('percival.generalTips') }}</h2>
-    <ul>
-      <li>
-        <strong>{{ $t('percival.understandYourRole') }}</strong>
-        <LocalizedTextWrapper keypath="percival.youAreProtector" />
-      </li>
-      <li>
-        <strong>{{ $t('percival.payAttentionToBehavior') }}</strong>
-        <LocalizedTextWrapper keypath="percival.observeBehaviors" />
-      </li>
-      <li>
-        <strong>{{ $t('percival.beSubtle') }}</strong>
-        <LocalizedTextWrapper keypath="percival.beCarefulWithDefense" />
-      </li>
-    </ul>
+    <section>
+      <h2>{{ $t('cleric.generalTipsHeader') }}</h2>
+      <ul>
+        <li>
+          <strong>{{ $t('cleric.generalTipsRoleUnderstandingHeading') }}</strong>
+          {{ $t('cleric.generalTipsRoleUnderstandingText') }}
+        </li>
+        <li>
+          <strong>{{ $t('cleric.generalTipsLoyaltyCautionHeading') }}</strong>
+          {{ $t('cleric.generalTipsLoyaltyCautionText') }}
+        </li>
+        <li>
+          <strong>{{ $t('cleric.generalTipsStealthHeading') }}</strong>
+          {{ $t('cleric.generalTipsStealthText') }}
+        </li>
+      </ul>
+    </section>
 
-    <h2>{{ $t('percival.strategicTips') }}</h2>
-    <ul>
-      <li>
-        <strong>{{ $t('percival.createAmbiguity') }}</strong>
-        <LocalizedTextWrapper keypath="percival.actingUnsure" />
-      </li>
-      <li>
-        <strong>{{ $t('percival.communicateThroughVotes') }}</strong>
-        <LocalizedTextWrapper keypath="percival.votingPatterns" />
-      </li>
-      <li>
-        <strong>{{ $t('percival.guideQuietly') }}</strong>
-        <LocalizedTextWrapper keypath="percival.subtlyGuide" />
-      </li>
-      <li>
-        <strong>{{ $t('percival.protectMerlinToTheEnd') }}</strong>
-        <LocalizedTextWrapper keypath="percival.takingSuspicion" />
-      </li>
-    </ul>
+    <section>
+      <h2>{{ $t('cleric.strategicTipsHeader') }}</h2>
+      <ul>
+        <li>
+          <strong>{{ $t('cleric.informationSafetyHeading') }}</strong>
+          {{ $t('cleric.informationSafetyText') }}
+        </li>
+        <li>
+          <strong>{{ $t('cleric.tacticalRevealHeading') }}</strong>
+          {{ $t('cleric.tacticalRevealText') }}
+        </li>
+        <li>
+          <strong>{{ $t('cleric.actionCommunicationHeading') }}</strong>
+          {{ $t('cleric.actionCommunicationText') }}
+        </li>
+      </ul>
+    </section>
 
-    <p>
-      <LocalizedTextWrapper keypath="percival.playingAsPercival" />
-    </p>
+    <section>
+      <p><LocalizedTextWrapper keypath="cleric.conclusion" /></p>
+    </section>
   </div>
 </template>
 
