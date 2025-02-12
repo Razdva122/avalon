@@ -161,7 +161,7 @@ export default defineComponent({
     experimentalRolesSettings() {
       return [
         { role: 'cleric', label: this.$t('roles.cleric'), disabled: false, color: 'success', route: 'cleric' },
-        { role: 'revealer', label: this.$t('roles.revealer'), disabled: false, color: 'warning', route: 'roles' },
+        { role: 'revealer', label: this.$t('roles.revealer'), disabled: false, color: 'warning', route: 'revealer' },
         { role: 'witch', label: this.$t('roles.witch'), disabled: false, color: 'warning', route: 'witch' },
       ] as const;
     },

@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import { useRouter } from 'vue-router';
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, watch } from 'vue';
 import Board from '@/components/view/board/Board.vue';
 import type { TVisibleRole, ISocketError } from '@avalon/types';
 import { socket } from '@/api/socket';
@@ -94,7 +94,6 @@ export default defineComponent({
 
     socket.on('restartGame', (uuid) => {
       router.push({ name: 'room', params: { uuid } });
-      initState(uuid);
     });
 
     socket.on('destroyRoom', (gameUUID) => {
@@ -106,6 +105,13 @@ export default defineComponent({
     socket.on('roomOnlineUpdated', (counter) => {
       online.value = counter;
     });
+
+    watch(
+      () => props.uuid,
+      (newUUID) => {
+        initState(newUUID);
+      },
+    );
 
     const displayHostPanel = computed(() => {
       return roomState.value.leaderID === userID;
