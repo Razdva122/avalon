@@ -21,6 +21,7 @@ export const ru = {
     gamesList: 'Список игр',
     players: 'игроков',
     loading: 'Загрузка...',
+    online: 'Онлайн: {count}',
   },
   alert: {
     titlediscord: 'Discord',

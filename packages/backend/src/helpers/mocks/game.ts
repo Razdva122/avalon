@@ -68,6 +68,38 @@ export const fakeGames: TRoomState[] = [
       stage: 'end',
       vote: 3,
       mission: 4,
+      missionState: [
+        {
+          players: 3,
+          failsRequired: 1,
+          fails: 0,
+          result: 'success',
+        },
+        {
+          players: 4,
+          failsRequired: 1,
+          fails: 1,
+          result: 'fail',
+        },
+        {
+          players: 4,
+          failsRequired: 1,
+          fails: 1,
+          result: 'fail',
+        },
+        {
+          players: 5,
+          failsRequired: 2,
+          fails: 1,
+          result: 'success',
+        },
+        {
+          players: 5,
+          failsRequired: 1,
+          fails: 2,
+          result: 'fail',
+        },
+      ],
       settings: {
         missions: [
           {
@@ -1816,6 +1848,34 @@ export const fakeGames: TRoomState[] = [
       stage: 'end',
       vote: 0,
       mission: 2,
+      missionState: [
+        {
+          players: 3,
+          failsRequired: 1,
+          fails: 0,
+          result: 'success',
+        },
+        {
+          players: 4,
+          failsRequired: 1,
+          fails: 0,
+          result: 'success',
+        },
+        {
+          players: 4,
+          failsRequired: 1,
+          fails: 0,
+          result: 'success',
+        },
+        {
+          players: 5,
+          failsRequired: 2,
+        },
+        {
+          players: 5,
+          failsRequired: 1,
+        },
+      ],
       settings: {
         missions: [
           {
@@ -2684,6 +2744,36 @@ export const fakeGames: TRoomState[] = [
       stage: 'end',
       vote: 0,
       mission: 3,
+      missionState: [
+        {
+          players: 3,
+          failsRequired: 1,
+          fails: 1,
+          result: 'fail',
+        },
+        {
+          players: 4,
+          failsRequired: 1,
+          fails: 0,
+          result: 'success',
+        },
+        {
+          players: 4,
+          failsRequired: 1,
+          fails: 1,
+          result: 'fail',
+        },
+        {
+          players: 5,
+          failsRequired: 2,
+          fails: 2,
+          result: 'fail',
+        },
+        {
+          players: 5,
+          failsRequired: 1,
+        },
+      ],
       settings: {
         missions: [
           {

@@ -146,6 +146,18 @@ export default defineComponent({
 
           clone.features.switch = undefined;
         }
+
+        if (clone.role === 'revealer') {
+          const amountOfFailMissions = gameState.value.missionState.filter((el) => el.result === 'fail').length;
+
+          if (amountOfFailMissions === 0) {
+            clone.role = 'revealer_hidden';
+          }
+
+          if (amountOfFailMissions === 1) {
+            clone.role = 'revealer_progress';
+          }
+        }
       }
 
       return clone;

@@ -4,6 +4,7 @@ import type { IGameSettingsWithRoles } from './settings';
 import type { TAddonsStages, TAddonsData } from './addons';
 import type { TLoyalty } from '../game/roles';
 import type { TGameOptionsFeatures } from '../game/options';
+import type { IMissionWithResult } from './mission';
 import { Dictionary } from '../utils';
 
 export interface IVisualGameState {
@@ -12,6 +13,7 @@ export interface IVisualGameState {
   stage: TGameStage;
   vote: number;
   mission: number;
+  missionState: IMissionWithResult[];
   settings: IGameSettingsWithRoles;
   history: THistoryResults[];
   players: IPlayer[];

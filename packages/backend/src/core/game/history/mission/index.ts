@@ -115,24 +115,32 @@ export class Mission implements HistoryElement<'mission'> {
     this.data.fails = fails;
   }
 
+  calculateMissionData(): Pick<THistoryMission, 'hidden' | 'fails' | 'result'> {
+    if (this.data.hidden) {
+      return {
+        hidden: true,
+        fails: undefined,
+        result: undefined,
+      };
+    }
+
+    return {
+      fails: this.data.fails,
+      result: this.data.result,
+    };
+  }
+
   dataForManager(options: TDataForManagerOptions) {
     const data = <THistoryMission>{
       type: this.type,
       index: this.data.index,
-      result: this.data.result!,
       settings: this.data.settings,
       leaderID: this.data.leader!.user.id,
-      fails: this.data.fails!,
+      ...this.calculateMissionData(),
     };
 
     const isLastElement = _.last(options.game.history) === this;
     const hideElement = options.game.features.hiddenHistory && !isLastElement;
-
-    if (this.data.hidden === true) {
-      data.hidden = true;
-      data.fails = undefined;
-      data.result = undefined;
-    }
 
     if (!hideElement || options.game.stage === 'end') {
       data.leaderID = this.data.leader!.user.id;

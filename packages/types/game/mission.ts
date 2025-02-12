@@ -14,3 +14,9 @@ export interface IMissionSettings {
    */
   failsRequired: number;
 }
+
+export interface IMissionWithResult extends IMissionSettings {
+  hidden?: boolean;
+  result?: TMissionResult;
+  fails?: number;
+}

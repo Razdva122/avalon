@@ -9,7 +9,7 @@
       </TemporaryAlert>
     </div>
 
-    <span class="online">Online: {{ online }}</span>
+    <span class="online">{{ $t('mainPage.online', { count: online }) }}</span>
 
     <h1 class="lobby-header">{{ $t('mainPage.header') }}</h1>
 

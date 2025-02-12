@@ -1,6 +1,6 @@
 <template>
   <div class="room d-flex align-center justify-space-around">
-    <span class="online">Online: {{ online }}</span>
+    <span class="online">{{ $t('mainPage.online', { count: online }) }}</span>
     <template v-if="errorMessage">
       <h1 class="mb-4">{{ $t('room.' + errorMessage.error) }}</h1>
       <v-btn size="x-large" @click="$router.push({ name: 'lobby' })">{{ $t('room.backToLobby') }}</v-btn>

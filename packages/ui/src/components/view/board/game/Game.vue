@@ -67,7 +67,7 @@
       </div>
     </div>
     <div class="d-flex flex-row mb-4">
-      <Mission v-for="mission in missions" :mission="mission" />
+      <Mission v-for="mission in gameState.missionState" :mission="mission" />
     </div>
     <div class="mb-4">{{ $t('game.voteStage') }}: {{ gameState.vote + 1 }} / 5</div>
     <div class="button-panel actions-or-info mb-4 d-flex flex-column align-center">
@@ -118,8 +118,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 import last from 'lodash/last';
 import { useI18n } from 'vue-i18n';
-import type { THistoryMission, THistoryResults } from '@avalon/types';
-import type { IMissionWithResult } from '@/components/view/board/interface';
+import type { THistoryMission, THistoryResults, IMissionWithResult } from '@avalon/types';
 import { defineComponent, PropType, computed, inject } from 'vue';
 import Mission from '@/components/view/board/game/modules/Mission.vue';
 import History from '@/components/view/information/History.vue';
@@ -152,20 +151,6 @@ export default defineComponent({
     const gameState = inject(gameStateKey)!;
     const stateManager = inject(stateManagerKey)!;
     const roomState = stateManager.startedRoomState;
-
-    const missions = computed(() => {
-      const missions: IMissionWithResult[] = cloneDeep(gameState.value.settings.missions);
-
-      gameState.value.history
-        .filter((el): el is THistoryMission => el.type === 'mission')
-        .forEach((mission, index) => {
-          missions[index].result = mission.result;
-          missions[index].fails = mission.fails;
-          missions[index].hidden = mission.hidden;
-        });
-
-      return missions;
-    });
 
     const endReason = computed(() => {
       if (gameState.value.result) {
@@ -216,7 +201,6 @@ export default defineComponent({
     });
 
     return {
-      missions,
       gameState,
       stateManager,
       endReason,

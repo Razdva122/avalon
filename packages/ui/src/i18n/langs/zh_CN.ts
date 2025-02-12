@@ -21,6 +21,7 @@ export const zh_CN = {
     gamesList: '游戏列表',
     players: '位玩家',
     loading: '加载中...',
+    online: '在线: {count}',
   },
   alert: {
     titlediscord: 'Discord',

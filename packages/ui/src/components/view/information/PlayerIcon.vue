@@ -145,10 +145,23 @@ export default defineComponent({
   background-size: 120%;
 }
 
+.icon-revealer,
+.icon-revealer_hidden,
+.icon-revealer_progress {
+  background-position: 43% 35%;
+  background-size: 130%;
+}
+
 .icon-revealer {
   background-image: url('@/assets/roles/revealer.webp');
-  background-position: 50% 10%;
-  background-size: 150%;
+}
+
+.icon-revealer_hidden {
+  background-image: url('@/assets/roles/revealer_hidden.webp');
+}
+
+.icon-revealer_progress {
+  background-image: url('@/assets/roles/revealer_progress.webp');
 }
 
 .icon-cleric {

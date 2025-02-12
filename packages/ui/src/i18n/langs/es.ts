@@ -21,6 +21,7 @@ export const es = {
     gamesList: 'Lista de juegos',
     players: 'Jugadores',
     loading: 'Cargando...',
+    online: 'En línea: {count}',
   },
   alert: {
     titlediscord: 'Discord',

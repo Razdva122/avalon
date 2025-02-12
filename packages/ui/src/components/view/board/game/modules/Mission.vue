@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import type { IMissionWithResult } from '@/components/view/board/interface';
+import type { IMissionWithResult } from '@avalon/types';
 import { computedStyles } from '@/helpers/styles';
 import { defineComponent, PropType } from 'vue';
 

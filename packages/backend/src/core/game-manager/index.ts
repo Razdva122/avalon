@@ -2,8 +2,19 @@ import { Game } from '@/core/game';
 import type { User } from '@/user';
 import type { TRoomState, TGameMethodsParams, TGetLoyaltyData } from '@/core/game-manager/interface';
 import { eventBus } from '@/helpers';
+import { Mission } from '@/core/game/history/mission';
 
-import { Server, IVisualGameState, IPlayer, IGameOptions, TVisibleRole } from '@avalon/types';
+import * as _ from 'lodash';
+
+import {
+  Server,
+  IVisualGameState,
+  IPlayer,
+  IGameOptions,
+  TVisibleRole,
+  IMissionWithResult,
+  THistoryMission,
+} from '@avalon/types';
 
 export * from '@/core/game-manager/interface';
 
@@ -24,7 +35,7 @@ export class GameManager {
    * Initializing the state room
    */
   initRoomState(): void {
-    this.roomState = {
+    (<Partial<TRoomState>>this.roomState) = {
       uuid: this.roomID,
       stage: this.game.stage,
       vote: this.game.turn,
@@ -33,6 +44,10 @@ export class GameManager {
       result: this.game.result,
       addonsData: this.game.addonsData,
       features: this.game.features,
+    };
+
+    this.roomState = {
+      ...this.roomState,
       ...this.prepareHistoryAndPlayerForRoomState(),
     };
   }
@@ -63,7 +78,19 @@ export class GameManager {
     this.sendNewStateToUsers();
   }
 
-  prepareHistoryAndPlayerForRoomState(): Pick<TRoomState, 'history' | 'players'> {
+  prepareHistoryAndPlayerForRoomState(): Pick<TRoomState, 'history' | 'players' | 'missionState'> {
+    const missionsState: IMissionWithResult[] = _.cloneDeep(this.roomState.settings.missions);
+
+    this.game.history
+      .filter((el): el is Mission => el.type === 'mission')
+      .forEach((mission, index) => {
+        const data = mission.calculateMissionData();
+
+        missionsState[index].hidden = data.hidden;
+        missionsState[index].fails = data.fails;
+        missionsState[index].result = data.result;
+      });
+
     return {
       history: this.game.history.map((el, index) => {
         if (this.game.features.hiddenHistory && this.game.stage !== 'end' && index !== this.game.history.length - 1) {
@@ -76,6 +103,7 @@ export class GameManager {
 
         return el.dataForManager.bind(el);
       }),
+      missionState: missionsState,
       players: this.game.players.map((player) => {
         return {
           id: player.user.id,
@@ -116,6 +144,7 @@ export class GameManager {
       settings: this.roomState.settings,
       addonsData: this.roomState.addonsData,
       features: this.roomState.features,
+      missionState: this.roomState.missionState,
       history: this.roomState.history.map((el) => el({ game: this.game, userID })),
       players: this.roomState.players.map((player, index) => {
         const playerData: IPlayer = { ...player, role: this.getPlayerVisibleRole(player.id, userID) };
