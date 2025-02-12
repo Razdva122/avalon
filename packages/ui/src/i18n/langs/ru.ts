@@ -100,6 +100,7 @@ export const ru = {
     lancelots: 'Ланселоты',
     mordred: 'Мордред',
     trickster: 'Трикстер',
+    revealer: 'Разоблаченная',
     morgana: 'Моргана',
     oberon: 'Оберон',
     lunatic: 'Лунатик',

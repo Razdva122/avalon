@@ -100,6 +100,7 @@ export const es = {
     lancelots: 'Lancelotes',
     mordred: 'Mordred',
     trickster: 'Tramposo',
+    revealer: 'Revelada',
     morgana: 'Morgana',
     oberon: 'Oberón',
     lunatic: 'Lunático',

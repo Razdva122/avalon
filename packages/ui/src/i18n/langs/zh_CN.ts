@@ -101,6 +101,7 @@ export const zh_CN = {
     mordred: '莫德雷德',
     trickster: '骗子',
     morgana: '莫甘娜',
+    revealer: '被揭示者',
     oberon: '奥伯伦',
     lunatic: '疯子',
     brute: '野蛮人',

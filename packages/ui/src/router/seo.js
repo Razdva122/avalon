@@ -27,6 +27,7 @@ const {
   servant,
   merlinPure,
   cleric,
+  revealer,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -262,6 +263,18 @@ module.exports.routesSeo = {
         ...troublemaker,
       },
       image: 'roles/troublemaker.webp',
+    },
+  },
+  revealer: {
+    path: '/wiki/roles/revealer/',
+    name: 'revealer',
+    priority: 0.2,
+    meta: {
+      prerender: true,
+      multiLanguage: {
+        ...revealer,
+      },
+      image: 'roles/revealer.webp',
     },
   },
   witch: {

@@ -100,6 +100,7 @@ export const zh_TW = {
     lancelots: '蘭斯洛特',
     mordred: '莫德雷德',
     trickster: '騙子',
+    revealer: '被揭示者',
     morgana: '莫甘娜',
     oberon: '奧伯倫',
     lunatic: '瘋子',

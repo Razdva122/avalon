@@ -320,5 +320,24 @@ export default defineComponent({
     background-position: 50% 3%;
     background-size: 200%;
   }
+
+  &.icon-revealer,
+  &.icon-revealer_hidden,
+  &.icon-revealer_progress {
+    background-position: 50% 0%;
+    background-size: 120%;
+  }
+
+  &.icon-revealer {
+    background-image: url('@/assets/roles/anime/revealer.webp');
+  }
+
+  &.icon-revealer_hidden {
+    background-image: url('@/assets/roles/anime/revealer_hidden.webp');
+  }
+
+  &.icon-revealer_progress {
+    background-image: url('@/assets/roles/anime/revealer_progress.webp');
+  }
 }
 </style>

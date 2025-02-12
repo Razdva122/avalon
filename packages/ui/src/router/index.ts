@@ -34,6 +34,7 @@ const routeComponentMap = {
   servant: () => import('@/pages/wiki/roles/Servant.vue'),
   minion: () => import('@/pages/wiki/roles/Minion.vue'),
   cleric: () => import('@/pages/wiki/roles/Cleric.vue'),
+  revealer: () => import('@/pages/wiki/roles/Revealer.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [

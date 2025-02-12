@@ -3,11 +3,11 @@ import { Dictionary } from '@avalon/types';
 
 export const cleric: { [key in TLanguage]: Dictionary<string> } = {
   en: {
-    informationHeader: 'General Information',
+    informationHeader: 'General Information:',
     generalInformation:
       '{cleric} is a key figure in the ranks of the forces of light, helping to uncover the true intentions of the players. After the first expedition, {cleric} receives a unique opportunity – to learn the loyalty of the leader of that expedition. However, if {cleric} turns out to be the leader himself, no information is provided. Unlike {merlin}, when attempting to eliminate the cleric, the forces of darkness must guess the role of another civilian. This role requires a cautious and well-thought-out approach: in critical situations, revealing the role may be justified if it manages to mislead the opponents and maintain balance within the team.',
 
-    generalTipsHeader: 'General Tips',
+    generalTipsHeader: 'General Tips:',
     generalTipsRoleUnderstandingHeading: 'Clear Understanding of the Role:',
     generalTipsRoleUnderstandingText:
       "Remember that your main task is to support the forces of light by gathering information about the opponents' loyalties and confirming the friendly intentions of your allies.",
@@ -20,7 +20,7 @@ export const cleric: { [key in TLanguage]: Dictionary<string> } = {
     generalTipsStealthText:
       'Play covertly and carefully. Reveal your role only in situations where it will help prevent a loss or save the team from a dangerous move by the opponents.',
 
-    strategicTipsHeader: 'Strategic Tips',
+    strategicTipsHeader: 'Strategic Tips:',
     informationSafetyHeading: 'Balance between Information and Safety:',
     informationSafetyText:
       'Use your knowledge of the leader’s loyalty from the first expedition to build trust among the players, but do not reveal all your information at once. Your goal is to retain the ability to influence the game while remaining undetected.',
@@ -37,11 +37,11 @@ export const cleric: { [key in TLanguage]: Dictionary<string> } = {
       '{cleric} is not just an informer, but a strategist balancing between revealing and concealing information. Play smartly, watch the players carefully, and use all available insights to keep the forces of light intact until the very end.',
   },
   ru: {
-    informationHeader: 'Общая информация',
+    informationHeader: 'Общая информация:',
     generalInformation:
       '{cleric} является ключевой фигурой в рядах сил света, способствуя выявлению истинных намерений игроков. После первого похода {cleric} получает уникальную возможность – узнать лояльность лидера этого похода. Однако, если он сам окажется лидером, информации ему не поступает. В отличии от {merlin}, при попытке устранить клирика команда сил тьмы должна будет угадать роль ещё одного мирного игрока. Его роль требует осторожной и продуманной игры: в критических ситуациях раскрытие роли может оказаться оправданным, если таким образом удастся ввести в заблуждение противников и сохранить баланс в команде.',
 
-    generalTipsHeader: 'Общие советы',
+    generalTipsHeader: 'Общие советы:',
     generalTipsRoleUnderstandingHeading: 'Четкое понимание роли:',
     generalTipsRoleUnderstandingText:
       'Помните, что ваша главная задача – поддерживать силы света, собирая информацию о лояльности противников и подтверждая доброжелательные намерения союзников.',
@@ -54,7 +54,7 @@ export const cleric: { [key in TLanguage]: Dictionary<string> } = {
     generalTipsStealthText:
       'Ведите игру тайно и аккуратно. Раскрывать свою роль следует только в тех случаях, когда это поможет предотвратить проигрыш или спасти команду от опасного хода противника.',
 
-    strategicTipsHeader: 'Стратегические советы',
+    strategicTipsHeader: 'Стратегические советы:',
     informationSafetyHeading: 'Баланс между информацией и безопасностью:',
     informationSafetyText:
       'Используйте знание о лояльности лидера первого похода для установления доверия между игроками, но не выдавайте всю свою информацию сразу. Ваша цель – сохранить возможность влиять на игру, оставаясь незамеченным.',
@@ -139,11 +139,11 @@ export const cleric: { [key in TLanguage]: Dictionary<string> } = {
       '{cleric} 不僅僅是一位情報提供者,而是一位在揭露與隱藏資訊間取得平衡的策略家。精明地遊玩、仔細觀察其他玩家,並運用所有可利用的見解,直至最後都保持光明勢力的完整。',
   },
   es: {
-    informationHeader: 'Información General',
+    informationHeader: 'Información General:',
     generalInformation:
       '{cleric} es una figura clave en las filas de las fuerzas de la luz, ayudando a descubrir las verdaderas intenciones de los jugadores. Tras la primera expedición, {cleric} recibe una oportunidad única: conocer la lealtad del líder de esa expedición. Sin embargo, si {cleric} resulta ser el propio líder, no se proporciona información. A diferencia de {merlin}, al intentar eliminar al clérigo, las fuerzas de la oscuridad deben adivinar el rol de otro civil. Este rol requiere un enfoque cauteloso y bien pensado: en situaciones críticas, revelar el rol puede estar justificado si logra engañar a los oponentes y mantener el equilibrio en el equipo.',
 
-    generalTipsHeader: 'Consejos Generales',
+    generalTipsHeader: 'Consejos Generales:',
     generalTipsRoleUnderstandingHeading: 'Entendimiento Claro del Rol:',
     generalTipsRoleUnderstandingText:
       'Recuerda que tu tarea principal es apoyar a las fuerzas de la luz recopilando información sobre la lealtad de los oponentes y comprobando las intenciones amistosas de tus aliados.',
@@ -156,7 +156,7 @@ export const cleric: { [key in TLanguage]: Dictionary<string> } = {
     generalTipsStealthText:
       'Actúa de manera encubierta y cuidadosa. Revela tu rol solo en situaciones en las que ayude a prevenir una derrota o a salvar al equipo de un movimiento peligroso por parte de los oponentes.',
 
-    strategicTipsHeader: 'Consejos Estratégicos',
+    strategicTipsHeader: 'Consejos Estratégicos:',
     informationSafetyHeading: 'Equilibrio entre Información y Seguridad:',
     informationSafetyText:
       'Utiliza el conocimiento sobre la lealtad del líder de la primera expedición para generar confianza entre los jugadores, pero no reveles toda tu información de inmediato. Tu objetivo es conservar la capacidad de influir en el juego mientras permaneces desapercibido.',

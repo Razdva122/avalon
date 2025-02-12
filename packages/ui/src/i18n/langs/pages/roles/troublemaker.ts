@@ -6,8 +6,8 @@ export const troublemaker: { [key in TLanguage]: Dictionary<string> } = {
     generalInformation: 'General Information: ',
     intro:
       'As a {troublemaker}, you play a crucial balancing act. You must present yourself as a straightforward good member, yet when your loyalty is tested and revealed falsely due to your unique role, you need to skillfully manage the situation. Your challenge is to maintain the trust of your team despite the deceitful evidence while blocking any evil members attempting to impersonate your role.',
-    generalTips: 'General Tips',
-    strategicTips: 'Strategic Tips',
+    generalTips: 'General Tips:',
+    strategicTips: 'Strategic Tips:',
     generalTipsRevealTitle: 'Reveal strategically',
     generalTipsRevealDesc:
       'If your false alignment is exposed or likely to be questioned, calmly reveal your true role as the {troublemaker} to maintain trust within your team.',
@@ -33,8 +33,8 @@ export const troublemaker: { [key in TLanguage]: Dictionary<string> } = {
     generalInformation: 'Общая информация: ',
     intro:
       'В качестве {troublemaker} вам необходимо балансировать на грани. Вы должны представлять себя как простого добросовестного участника, но когда ваша лояльность проверяется и оказывается ложной из-за вашей уникальной роли, вы должны умело справляться с ситуацией. Ваша задача — сохранить доверие вашей команды, несмотря на обманчивые доказательства, блокируя при этом любые злые попытки других игроков выдать себя за вашу роль.',
-    generalTips: 'Общие советы',
-    strategicTips: 'Стратегические советы',
+    generalTips: 'Общие советы:',
+    strategicTips: 'Стратегические советы:',
     generalTipsRevealTitle: 'Раскрывайте стратегически',
     generalTipsRevealDesc:
       'Если ваше ложное стремление к добру раскрыто или может быть подвергнуто сомнению, спокойно раскройте свою истинную роль как {troublemaker}, чтобы сохранить доверие вашей команды.',
@@ -60,8 +60,8 @@ export const troublemaker: { [key in TLanguage]: Dictionary<string> } = {
     generalInformation: '一般信息：',
     intro:
       '作为一个{troublemaker}，您玩的是一个重要的平衡游戏。您必须表现得像一个简单而优秀的成员，但当您的忠诚被测试并因您独特的角色而错误揭示时，您需要巧妙地管理局势。您的挑战是保持团队的信任，尽管有欺骗性证据，并阻止任何试图冒充您角色的邪恶成员。',
-    generalTips: '一般提示',
-    strategicTips: '战略提示',
+    generalTips: '一般提示：',
+    strategicTips: '战略提示：',
     generalTipsRevealTitle: '战略性揭示',
     generalTipsRevealDesc:
       '如果您的虚假对善的对立被揭露或可能受到质疑，请冷静地揭示您作为{troublemaker}的真实角色，以保持团队的信任。',
@@ -84,8 +84,8 @@ export const troublemaker: { [key in TLanguage]: Dictionary<string> } = {
     generalInformation: '一般信息：',
     intro:
       '作為一個{troublemaker}，您玩的是一個重要的平衡遊戲。您必須表現得像一個簡單而優秀的成員，但當您的忠誠被測試並因您獨特的角色而錯誤揭露時，您需要巧妙地管理局勢。您的挑戰是保持團隊的信任，儘管有欺騙性證據，並阻止任何試圖冒充您角色的邪惡成員。',
-    generalTips: '一般提示',
-    strategicTips: '戰略提示',
+    generalTips: '一般提示：',
+    strategicTips: '戰略提示：',
     generalTipsRevealTitle: '戰略性揭示',
     generalTipsRevealDesc:
       '如果您的虛假對善的對立被揭露或可能受到質疑，請冷靜地揭示您作為{troublemaker}的真實角色，以保持團隊的信任。',
@@ -108,8 +108,8 @@ export const troublemaker: { [key in TLanguage]: Dictionary<string> } = {
     generalInformation: 'Información general:',
     intro:
       'Como un {troublemaker}, juegas un papel crucial de equilibrio. Debes presentarte como un miembro honesto, pero cuando tu lealtad es puesta a prueba y se revela falsamente debido a tu rol único, necesitas administrar la situación hábilmente. Tu desafío es mantener la confianza de tu equipo a pesar de la evidencia engañosa mientras bloqueas a cualquier miembro maligno que intente hacerse pasar por tu rol.',
-    generalTips: 'Consejos Generales',
-    strategicTips: 'Consejos Estratégicos',
+    generalTips: 'Consejos Generales:',
+    strategicTips: 'Consejos Estratégicos:',
     generalTipsRevealTitle: 'Revela estratégicamente',
     generalTipsRevealDesc:
       'Si se expone tu alineación falsa o es probable que se cuestione, revela calmadamente tu verdadero rol como el {troublemaker} para mantener la confianza dentro de tu equipo.',
