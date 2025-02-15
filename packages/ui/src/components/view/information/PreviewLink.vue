@@ -54,10 +54,6 @@ export default defineComponent({
   },
   computed: {
     normalizeRoleRoute(): string {
-      if (['cleric', 'revealer'].includes(this.target)) {
-        return 'roles';
-      }
-
       return this.target;
     },
   },
