@@ -3,7 +3,7 @@
     <template v-if="isHidden">
       <v-btn class="chat-bubble" density="comfortable" @click="toggleChat" icon="chat" variant="plain" color="white">
         <span class="material-icons"> chat </span>
-        <div v-if="messages.length" class="pointer"></div>
+        <div v-if="counter" class="pointer">{{ counter }}</div>
       </v-btn>
     </template>
     <div v-else class="chat-window">
@@ -56,11 +56,16 @@ export default defineComponent({
     return {
       isHidden: true,
       currentMessage: '',
+      counter: 0,
     };
   },
   watch: {
-    messages() {
+    messages(current, prev) {
       this.scrollChatToBottom();
+
+      if (this.isHidden) {
+        this.counter += current.length - prev.length;
+      }
     },
   },
   methods: {
@@ -68,6 +73,7 @@ export default defineComponent({
       this.isHidden = !this.isHidden;
 
       if (!this.isHidden) {
+        this.counter = 0;
         this.scrollChatToBottom();
       }
     },
@@ -160,12 +166,16 @@ export default defineComponent({
 }
 
 .pointer {
-  width: 10px;
-  height: 10px;
-  background-color: red;
+  display: inline-block;
+  padding: 2px 4px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  background-color: #e74c3c;
+  border-radius: 12px;
+  line-height: 1;
   position: absolute;
-  border-radius: 50%;
-  top: 10px;
-  right: 10px;
+  top: 7px;
+  right: 7px;
 }
 </style>
