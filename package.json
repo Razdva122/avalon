@@ -1,6 +1,6 @@
 {
   "name": "avalon-monorepo",
-  "version": "41.3.0",
+  "version": "41.4.0",
   "description": "A monorepo for avalon",
   "private": true,
   "workspaces": [
