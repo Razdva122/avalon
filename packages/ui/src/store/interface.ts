@@ -22,4 +22,4 @@ export type TAlerts = {
   [key in TAlertsName]?: number;
 };
 
-export type TAlertsName = 'discord' | 'translate';
+export type TAlertsName = 'discord';

@@ -25,11 +25,8 @@ export const en = {
   },
   alert: {
     titlediscord: 'Discord',
-    titletranslate: 'Translate',
     contentdiscord:
       'Looking for fellow players to delve into \'Avalon\'? Join our <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b> community!',
-    contenttranslate:
-      'We will be glad if you help us translate our website into your language. Contact us via <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b>!',
   },
   game: {
     winner: 'Winner',

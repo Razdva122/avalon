@@ -25,11 +25,8 @@ export const es = {
   },
   alert: {
     titlediscord: 'Discord',
-    titletranslate: 'Traducir',
     contentdiscord:
       '¿Buscas compañeros jugadores para adentrarte en "Avalon"? ¡Únete a nuestra comunidad de <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b>!',
-    contenttranslate:
-      'Nos encantaría que nos ayudases a traducir nuestro sitio web a tu idioma. ¡Contáctanos a través de <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b>!',
   },
   game: {
     winner: 'Ganador',

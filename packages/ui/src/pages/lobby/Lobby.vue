@@ -4,9 +4,6 @@
       <TemporaryAlert id="discord">
         <div v-html="$t('alert.contentdiscord')"></div>
       </TemporaryAlert>
-      <TemporaryAlert id="translate">
-        <div v-html="$t('alert.contenttranslate')"></div>
-      </TemporaryAlert>
     </div>
 
     <span class="online">{{ $t('mainPage.online', { count: online }) }}</span>

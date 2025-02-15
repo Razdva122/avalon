@@ -25,11 +25,8 @@ export const zh_CN = {
   },
   alert: {
     titlediscord: 'Discord',
-    titletranslate: '翻译',
     contentdiscord:
       '想找人一起探索《阿瓦隆》吗？加入我们的 <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b> 社区！',
-    contenttranslate:
-      '如果您能帮助我们将网站翻译成您的语言，我们将非常高兴。请通过 <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b> 联系我们！',
   },
   game: {
     winner: '胜利方',
