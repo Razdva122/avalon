@@ -301,7 +301,7 @@ export const en = {
   },
   switch: {
     skip: 'decided not to use excalibur',
-    switchInfo: '<b>{switcher}</b> use excalibur to switch<b>{target}</b> action to',
+    switchInfo: '<b>{switcher}</b> use excalibur to switch <b>{target}</b> action to',
   },
   ...pages.en,
 };

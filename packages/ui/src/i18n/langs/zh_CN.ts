@@ -300,7 +300,7 @@ export const zh_CN = {
   },
   switch: {
     skip: '决定不使用 神剑',
-    switchInfo: '<b>{switcher}</b> 使用 神剑 将<b>{target}</b> 的行动更改为',
+    switchInfo: '<b>{switcher}</b> 使用 神剑 将 <b>{target}</b> 的行动更改为',
   },
   ...pages['zh-CN'],
 };
