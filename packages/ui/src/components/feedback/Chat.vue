@@ -64,7 +64,11 @@ export default defineComponent({
       this.scrollChatToBottom();
 
       if (this.isHidden) {
-        this.counter += current.length - prev.length;
+        if (current.length === 0) {
+          this.counter = 0;
+        } else {
+          this.counter += current.length - prev.length;
+        }
       }
     },
   },
