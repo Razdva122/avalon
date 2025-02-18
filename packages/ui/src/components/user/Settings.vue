@@ -53,6 +53,7 @@ import { defineComponent } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import eventBus from '@/helpers/event-bus';
 import { LanguageMap, TLanguage } from '@/helpers/i18n';
+import { Dictionary } from '@avalon/types';
 
 export default defineComponent({
   data() {
@@ -73,6 +74,7 @@ export default defineComponent({
           return this.$t('settings.usernameRequired');
         },
       ],
+      updatedSettings: <Array<{ key: string; value: unknown }>>[],
     };
   },
   mounted() {
@@ -97,6 +99,7 @@ export default defineComponent({
         this.$store.commit('updateUserSettings', { key: 'locale', value: { value, isDefault: false } });
         (<unknown>this.$i18n.locale) = value;
         document.documentElement.lang = value;
+        this.updatedSettings.push({ key: 'locale', value: { value, isDefault: false } });
       },
     },
     hideIndexInHistory: {
@@ -115,6 +118,7 @@ export default defineComponent({
         this.$store.commit('updateUserSettings', { key: 'colorTheme', value });
         // @ts-ignore
         this.$vuetify.theme.global.name = value === 'dark' ? 'darkTheme' : 'lightTheme';
+        this.updatedSettings.push({ key: 'colorTheme', value });
       },
     },
     style: {
@@ -144,7 +148,14 @@ export default defineComponent({
         if (this.isUserExist) {
           this.$store.commit('updateUserName', this.username);
         } else {
-          this.$store.commit('setUserData', { id: uuidv4(), name: this.username });
+          this.$store.commit('setUserData', {
+            id: uuidv4(),
+            name: this.username,
+            settings: this.updatedSettings.reduce<Dictionary<unknown>>((acc, el) => {
+              acc[el.key] = el.value;
+              return acc;
+            }, {}),
+          });
         }
 
         document.location.reload();
