@@ -7,7 +7,7 @@
       </v-btn>
     </template>
     <div v-else class="chat-window">
-      <div id="messages-container" class="messages-container">
+      <div v-if="mode === 'full'" id="messages-container" class="messages-container">
         <div
           v-for="message in messages"
           class="message-element"
@@ -21,6 +21,13 @@
           </div>
         </div>
       </div>
+      <v-btn
+        @click="toggleMode"
+        class="compact"
+        :icon="mode === 'compact' ? 'arrow_upward' : 'arrow_downward'"
+        variant="text"
+        density="compact"
+      />
       <v-btn @click="toggleChat" class="close" icon="close" variant="text" density="compact" />
       <v-text-field
         class="input"
@@ -55,6 +62,7 @@ export default defineComponent({
   data() {
     return {
       isHidden: true,
+      mode: 'full',
       currentMessage: '',
       counter: 0,
     };
@@ -79,6 +87,13 @@ export default defineComponent({
       if (!this.isHidden) {
         this.counter = 0;
         this.scrollChatToBottom();
+      }
+    },
+    toggleMode() {
+      if (this.mode === 'full') {
+        this.mode = 'compact';
+      } else {
+        this.mode = 'full';
       }
     },
     scrollChatToBottom() {
@@ -118,7 +133,7 @@ export default defineComponent({
 .chat-window {
   background-color: rgb(var(--v-theme-surface));
   width: 300px;
-  height: 450px;
+  max-height: 450px;
   border-radius: 8px;
   padding-top: 30px;
 }
@@ -127,6 +142,12 @@ export default defineComponent({
   position: absolute;
   top: 4px;
   right: 4px;
+}
+
+.compact {
+  position: absolute;
+  top: 4px;
+  right: 30px;
 }
 
 .input {
