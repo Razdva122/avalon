@@ -22,6 +22,7 @@ The project is organized as an [NPM mono-repository](https://docs.npmjs.com/cli/
 This section contains all the server-side logic. The main technologies used are:
 
 - [ts-node](https://github.com/TypeStrong/ts-node) for server-side TypeScript.
+- [RxJS](https://rxjs.dev/) for game stage system.
 - [express](https://expressjs.com/) – a popular framework for web applications on Node.js.
 - [socket.io](https://socket.io/) for real-time data exchange between clients and the server.
 
