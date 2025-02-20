@@ -57,7 +57,7 @@
 
 <script lang="ts">
 import { defineComponent, computed, PropType, toRefs, ref } from 'vue';
-import type { IVisualGameState, TAssassinateType, TRoles } from '@avalon/types';
+import type { VisualGameState, TAssassinateType, TRoles } from '@avalon/types';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import { socket } from '@/api/socket';
 
@@ -66,7 +66,7 @@ export default defineComponent({
   props: {
     game: {
       required: true,
-      type: Object as PropType<IVisualGameState>,
+      type: Object as PropType<VisualGameState>,
     },
   },
   components: {

@@ -1,4 +1,4 @@
-import type { IGameOptions, TGameResults } from '@avalon/types';
+import type { IGameOptions, GameResults } from '@avalon/types';
 
 export type TRoomsList = TRoomInfo[];
 
@@ -10,5 +10,5 @@ export type TRoomInfo = {
   options: IGameOptions;
   createTime: string;
   startTime?: string;
-  result?: TGameResults;
+  result?: GameResults;
 };

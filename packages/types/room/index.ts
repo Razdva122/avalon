@@ -1,4 +1,4 @@
-import type { IVisualGameState } from '../game/state';
+import type { VisualGameState } from '../game/state';
 import type { IGameOptions } from '../game/options';
 
 export * from './list';
@@ -43,7 +43,7 @@ export type TLockedRoomState = {
 
 export type TStartedRoomState = {
   stage: 'started';
-  game: IVisualGameState;
+  game: VisualGameState;
 } & TMetaRoomState;
 
 export type TChatMessage = {

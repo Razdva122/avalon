@@ -7,7 +7,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run serve --workspace=packages/ui & npm run dev --workspace=packages/backend",
+    "dev": "npm run docker:mongo && npm run dev:lite",
+    "dev:lite": "npm run serve --workspace=packages/ui & npm run dev --workspace=packages/backend",
+    "docker:mongo": "docker-compose -f docker-compose.dev.yml up -d && npx wait-port localhost:27017 --timeout 30000",
     "test": "npm run test --workspace=packages/backend",
     "build:ui": "NODE_ENV=production npm run build --workspace=packages/ui",
     "start:backend": "NODE_ENV=production npm run start --workspace=packages/backend",

@@ -6,15 +6,7 @@ import { Mission } from '@/core/game/history/mission';
 
 import * as _ from 'lodash';
 
-import {
-  Server,
-  IVisualGameState,
-  IPlayer,
-  IGameOptions,
-  TVisibleRole,
-  IMissionWithResult,
-  THistoryMission,
-} from '@avalon/types';
+import { Server, VisualGameState, Player, IGameOptions, TVisibleRole, IMissionWithResult } from '@avalon/types';
 
 export * from '@/core/game-manager/interface';
 
@@ -134,7 +126,7 @@ export class GameManager {
    *
    * @param [userID] - the ID of the user to prepare the state for
    */
-  prepareStateForUser(userID?: string): IVisualGameState {
+  prepareStateForUser(userID?: string): VisualGameState {
     return {
       result: this.roomState.result,
       uuid: this.roomState.uuid,
@@ -147,7 +139,7 @@ export class GameManager {
       missionState: this.roomState.missionState,
       history: this.roomState.history.map((el) => el({ game: this.game, userID })),
       players: this.roomState.players.map((player, index) => {
-        const playerData: IPlayer = { ...player, role: this.getPlayerVisibleRole(player.id, userID) };
+        const playerData: Player = { ...player, role: this.getPlayerVisibleRole(player.id, userID) };
 
         if (player.id === userID) {
           playerData.validMissionsResult = this.game.players[index].role.validMissionResult;

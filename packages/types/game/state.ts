@@ -1,31 +1,59 @@
-import type { IPlayer } from './player';
+import { prop } from '@typegoose/typegoose';
+
+import { Player } from './player';
 import type { THistoryResults } from './history';
 import type { IGameSettingsWithRoles } from './settings';
 import type { TAddonsStages, TAddonsData } from './addons';
 import type { TLoyalty } from '../game/roles';
 import type { TGameOptionsFeatures } from '../game/options';
 import type { IMissionWithResult } from './mission';
-import { Dictionary } from '../utils';
+import type { Dictionary } from '../utils';
 
-export interface IVisualGameState {
-  result?: TGameResults;
-  uuid: string;
-  stage: TGameStage;
-  vote: number;
-  mission: number;
-  missionState: IMissionWithResult[];
-  settings: IGameSettingsWithRoles;
-  history: THistoryResults[];
-  players: IPlayer[];
-  addonsData: TAddonsData;
-  features: TGameOptionsFeatures;
-  debug?: Dictionary<unknown>;
+export class GameResults {
+  @prop()
+  winner?: TLoyalty;
+
+  @prop({ required: true })
+  reason!: TGameEndReasons;
 }
 
-export type TGameResults = {
-  winner?: TLoyalty;
-  reason: TGameEndReasons;
-};
+export class VisualGameState {
+  @prop()
+  public result?: GameResults;
+
+  @prop({ unique: true, required: true })
+  public uuid!: string;
+
+  @prop({ required: true })
+  public stage!: string;
+
+  @prop({ required: true })
+  public vote!: number;
+
+  @prop({ required: true })
+  public mission!: number;
+
+  @prop({ required: true })
+  public missionState!: IMissionWithResult[];
+
+  @prop({ required: true })
+  public settings!: IGameSettingsWithRoles;
+
+  @prop({ required: true })
+  public history!: THistoryResults[];
+
+  @prop({ required: true, type: () => [Player] })
+  public players!: Player[];
+
+  @prop({ required: true })
+  public addonsData!: TAddonsData;
+
+  @prop({ required: true })
+  public features!: TGameOptionsFeatures;
+
+  @prop()
+  public debug?: Dictionary<unknown>;
+}
 
 /**
  * Possible game stages

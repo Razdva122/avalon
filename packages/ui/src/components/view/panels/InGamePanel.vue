@@ -60,7 +60,7 @@
 
 <script lang="ts">
 import { defineComponent, computed, PropType, toRefs } from 'vue';
-import type { IVisualGameState, TMissionResult, TVoteOption } from '@avalon/types';
+import type { VisualGameState, TMissionResult, TVoteOption } from '@avalon/types';
 import { useStore } from '@/store';
 import { socket } from '@/api/socket';
 import Spoiler from '@/components/feedback/Spoiler.vue';
@@ -77,7 +77,7 @@ export default defineComponent({
   props: {
     game: {
       required: true,
-      type: Object as PropType<IVisualGameState>,
+      type: Object as PropType<VisualGameState>,
     },
   },
   setup(props) {

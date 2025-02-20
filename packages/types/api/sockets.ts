@@ -1,5 +1,5 @@
 import type { TRoomState } from '../room';
-import type { IVisualGameState } from '../game/state';
+import type { VisualGameState } from '../game/state';
 import type { IGameOptions } from '../game/options';
 
 import type { Server as SuperServer, Socket as SuperServerSocket } from 'socket.io';
@@ -20,7 +20,7 @@ export interface ServerToClientEvents {
   onlineCounterUpdated: (counter: number) => void;
   roomOnlineUpdated: (counter: number) => void;
   roomUpdated: (state: TRoomState) => void;
-  gameUpdated: (state: IVisualGameState) => void;
+  gameUpdated: (state: VisualGameState) => void;
   newMessage: (message: TMessage) => void;
   restartGame: (uuid: string) => void;
   destroyRoom: (uuid: string) => void;

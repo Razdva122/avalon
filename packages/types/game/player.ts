@@ -1,13 +1,26 @@
+import { prop } from '@typegoose/typegoose';
+
 import type { TVisibleRole } from './roles';
 import type { TMissionResult } from './mission';
 import type { TAddonsFeatures } from './addons';
 
-export interface IPlayer {
-  index: number;
-  id: string;
-  name: string;
-  role: TVisibleRole;
-  features: IPlayerFeatures;
+export class Player {
+  @prop({ required: true })
+  index!: number;
+
+  @prop({ required: true })
+  id!: string;
+
+  @prop({ required: true })
+  name!: string;
+
+  @prop({ required: true })
+  role!: TVisibleRole;
+
+  @prop({ required: true })
+  features!: IPlayerFeatures;
+
+  @prop({ type: () => [String] })
   validMissionsResult?: TMissionResult[];
 }
 

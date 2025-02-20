@@ -6,6 +6,8 @@ import cors from 'cors';
 
 import { backendPort, frontendURL } from '@/const';
 
+import { connectDB } from '@/db';
+
 import { Manager } from '@/main';
 
 const app = express();
@@ -22,6 +24,8 @@ new Manager(io);
 
 app.use(CookieParser());
 app.use(cors(corsOpts.cors));
+
+connectDB();
 
 server.listen(backendPort, () => {
   console.log(`server running at http://localhost:${backendPort}`);

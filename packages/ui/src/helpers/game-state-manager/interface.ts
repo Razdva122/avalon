@@ -1,5 +1,5 @@
 import type { Ref } from 'vue';
-import type { IVisualGameState, TStartedRoomState, TRoomState } from '@avalon/types';
+import type { VisualGameState, TStartedRoomState, TRoomState } from '@avalon/types';
 
 export type TPageRoomStateRef = Ref<TPageRoomState>;
 
@@ -7,5 +7,5 @@ export type TPageRoomState = Exclude<TRoomState, TStartedRoomState> | TStartedPa
 
 export type TStartedPageRoomState = TStartedRoomState & {
   pointer: number;
-  gameStates: IVisualGameState[];
+  gameStates: VisualGameState[];
 };

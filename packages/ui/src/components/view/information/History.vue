@@ -21,7 +21,7 @@
 <script lang="ts">
 import kebabCase from 'lodash/kebabCase';
 import { defineComponent, PropType } from 'vue';
-import { THistoryResults, IPlayer } from '@avalon/types';
+import { THistoryResults, Player } from '@avalon/types';
 import SwitchLancelots from '@/components/view/information/history/SwitchLancelots.vue';
 import SwitchResult from '@/components/view/information/history/SwitchResult.vue';
 import CheckLoyalty from '@/components/view/information/history/CheckLoyalty.vue';
@@ -45,7 +45,7 @@ export default defineComponent({
     },
     players: {
       required: true,
-      type: Object as PropType<IPlayer[]>,
+      type: Object as PropType<Player[]>,
     },
     displayIndex: {
       type: Boolean,

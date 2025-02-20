@@ -1,6 +1,6 @@
 import type {
-  IPlayer,
-  IVisualGameState,
+  Player,
+  VisualGameState,
   TVoteOption,
   TMissionResult,
   TLoyalty,
@@ -11,8 +11,8 @@ import type {
 
 import type { TDataForManagerOptions } from '@/core/game/history';
 
-export type TRoomState = Omit<IVisualGameState, 'players' | 'history'> & {
-  players: Pick<IPlayer, 'features' | 'id' | 'name' | 'index'>[];
+export type TRoomState = Omit<VisualGameState, 'players' | 'history'> & {
+  players: Pick<Player, 'features' | 'id' | 'name' | 'index'>[];
   history: ((options: TDataForManagerOptions) => THistoryResults)[];
 };
 

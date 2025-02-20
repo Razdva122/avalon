@@ -1,18 +1,18 @@
 import cloneDeep from 'lodash/cloneDeep';
 import last from 'lodash/last';
 
-import type { IVisualGameState, TRoomState, THistoryResults, TGameStage, IPlayer, TRoomPlayer } from '@avalon/types';
+import type { VisualGameState, TRoomState, THistoryResults, TGameStage, Player, TRoomPlayer } from '@avalon/types';
 import { Ref, computed, ref, provide, InjectionKey } from 'vue';
 import { TPageRoomStateRef, TStartedPageRoomState } from '@/helpers/game-state-manager/interface';
 
-export const gameStateKey = Symbol() as InjectionKey<Ref<IVisualGameState>>;
+export const gameStateKey = Symbol() as InjectionKey<Ref<VisualGameState>>;
 export const stateManagerKey = Symbol() as InjectionKey<GameStateManager>;
 
 export * from '@/helpers/game-state-manager/interface';
 
 export class GameStateManager {
   state: TPageRoomStateRef;
-  game: Ref<IVisualGameState>;
+  game: Ref<VisualGameState>;
   viewMode: Ref<'live' | 'history'> = ref('live');
 
   constructor() {
@@ -22,7 +22,7 @@ export class GameStateManager {
       if (this.state.value.stage === 'started') {
         return this.state.value.gameStates[this.state.value.pointer];
       }
-    }) as Ref<IVisualGameState>;
+    }) as Ref<VisualGameState>;
 
     provide(gameStateKey, this.game);
     provide(stateManagerKey, this);
@@ -54,7 +54,7 @@ export class GameStateManager {
     userID,
   }: {
     newRoomState?: TRoomState;
-    newGameState?: IVisualGameState;
+    newGameState?: VisualGameState;
     userID?: string;
   }): void {
     if (userID) {
@@ -102,9 +102,9 @@ export class GameStateManager {
   }
 
   generateGameStatesFromHistory(
-    gameStates: IVisualGameState[],
+    gameStates: VisualGameState[],
     history: THistoryResults[],
-    newState: IVisualGameState,
+    newState: VisualGameState,
   ): void {
     const prevState = gameStates[gameStates.length - 1] ?? newState;
     const indexStart = gameStates.length;
@@ -127,7 +127,7 @@ export class GameStateManager {
     this.calculateViewFromHistory(gameStates, indexStart);
   }
 
-  normalizeState(state: IVisualGameState): IVisualGameState {
+  normalizeState(state: VisualGameState): VisualGameState {
     state.players.forEach((player) => {
       player.features.isAssassin = false;
       player.features.isSelected = false;
@@ -138,16 +138,16 @@ export class GameStateManager {
     return state;
   }
 
-  mutateStateForHistory(state: IVisualGameState, index: number, history: THistoryResults[]): void {
+  mutateStateForHistory(state: VisualGameState, index: number, history: THistoryResults[]): void {
     state.history = history.slice(0, index);
     state.stage = this.getStageFromHistory(last(state.history)!);
   }
 
-  calculateViewFromHistory(gameStates: IVisualGameState[], startIndex: number): void {
+  calculateViewFromHistory(gameStates: VisualGameState[], startIndex: number): void {
     let index = gameStates.length - 1;
-    let current: IVisualGameState;
-    let prev: IVisualGameState | undefined;
-    let next: IVisualGameState | undefined;
+    let current: VisualGameState;
+    let prev: VisualGameState | undefined;
+    let next: VisualGameState | undefined;
     let skipedFirstCrown = false;
 
     while (index > startIndex) {
@@ -277,7 +277,7 @@ export class GameStateManager {
     }
   }
 
-  getClosePlayer(players: IPlayer[], closeTo: IPlayer, shift: number): IPlayer {
+  getClosePlayer(players: Player[], closeTo: Player, shift: number): Player {
     let index = players.findIndex((player) => player === closeTo) + shift;
 
     if (index === -1) {
@@ -324,12 +324,12 @@ export class GameStateManager {
     return this.state as Ref<TStartedPageRoomState>;
   }
 
-  protected mutateRoomGameForPosition<T extends TRoomState | IVisualGameState>(roomOrGame: T, userID?: string): T {
+  protected mutateRoomGameForPosition<T extends TRoomState | VisualGameState>(roomOrGame: T, userID?: string): T {
     if (userID) {
       const indexOfPlayer = roomOrGame.players.findIndex((player) => player.id === userID);
 
       if (indexOfPlayer !== -1) {
-        roomOrGame.players = <IPlayer[] | TRoomPlayer[]>[
+        roomOrGame.players = <Player[] | TRoomPlayer[]>[
           ...roomOrGame.players.slice(indexOfPlayer),
           ...roomOrGame.players.slice(0, indexOfPlayer),
         ];

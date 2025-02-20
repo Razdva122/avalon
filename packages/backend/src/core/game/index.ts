@@ -13,7 +13,7 @@ import type {
   IGameOptions,
   TGameOptionsFeatures,
   TAddonsData,
-  TGameResults,
+  GameResults,
   TVisibleRole,
   Dictionary,
   TAddonsName,
@@ -37,7 +37,7 @@ export * from '@/core/game/interface';
 export * from '@/core/game/const';
 
 export class Game extends GameHooks {
-  result?: TGameResults;
+  result?: GameResults;
 
   /**
    * Each round is a mission that has happened
