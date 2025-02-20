@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ghcr.io/puppeteer/puppeteer:22.5.0 as build-stage
+FROM --platform=${BUILDPLATFORM} ghcr.io/puppeteer/puppeteer:22.5.0 as build-stage
 
 ARG APP_DIR=/home/pptruser/app
 RUN mkdir -p ${APP_DIR}
@@ -17,7 +17,7 @@ RUN npm install
 COPY --chown=pptruser:pptruser . .
 RUN npm run build:ui
 
-FROM --platform=linux/amd64 nginx as production-stage
+FROM --platform=${BUILDPLATFORM} nginx as production-stage
 RUN mkdir /app
 COPY --from=build-stage /home/pptruser/app/packages/ui/dist /app
 COPY nginx.conf /etc/nginx/nginx.conf

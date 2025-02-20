@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:21-slim
+FROM --platform=${BUILDPLATFORM} node:21-slim
 
 # App directory
 ARG APP_DIR=app
