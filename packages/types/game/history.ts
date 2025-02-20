@@ -1,4 +1,4 @@
-import type { TMissionResult, IMissionSettings } from './mission';
+import type { TMissionResult, MissionSettings } from './mission';
 import type { TVoteOption, TTeamMember } from './vote';
 import type { TAssassinateResult } from './addons';
 import type { TLoyalty, TRoles } from './roles';
@@ -46,7 +46,7 @@ export type THistoryVoteVisibility =
 interface IHistoryMissionCore {
   type: 'mission';
   index: number;
-  settings: IMissionSettings;
+  settings: MissionSettings;
   leaderID?: string;
   actions?: IAction[] | IActionWithResult[];
 }

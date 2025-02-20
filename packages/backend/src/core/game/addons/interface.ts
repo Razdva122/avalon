@@ -1,5 +1,5 @@
 import { Game } from '@/core/game';
-import type { TAddonsData, TGameStage } from '@avalon/types';
+import type { AddonsData, TGameStage } from '@avalon/types';
 import type { TAssassinateOptions } from '@/core/game/addons/assassin/interface';
 import type { THookNames } from '@/core/game/hooks';
 import type { Observable } from 'rxjs';
@@ -27,6 +27,6 @@ export interface IGameAddon<T extends TAssassinateOptions | undefined = undefine
   addonName: string;
   game: Game;
   options?: T;
-  addonData?: TAddonsData;
+  addonData?: AddonsData;
   priority?: TAddonPriority;
 }

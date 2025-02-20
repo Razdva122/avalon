@@ -9,6 +9,7 @@
   "author": "@Razdva122",
   "license": "ISC",
   "dependencies": {
-    "@typegoose/typegoose": "^12.11.0"
+    "@typegoose/typegoose": "^12.11.0",
+    "mongoose": "^8.10.1"
   }
 }

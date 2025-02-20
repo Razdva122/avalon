@@ -1,22 +1,40 @@
+import { prop } from '@typegoose/typegoose';
+
 /**
  * Possible result of Mission
  */
 export type TMissionResult = 'success' | 'fail';
 
-export interface IMissionSettings {
+export class MissionSettings {
   /**
    * Amount of players going to mission
    */
-  players: number;
+  @prop({ required: true })
+  public players!: number;
 
   /**
    * Amount of fails required to fail mission
    */
-  failsRequired: number;
+  @prop({ required: true })
+  public failsRequired!: number;
 }
 
-export interface IMissionWithResult extends IMissionSettings {
-  hidden?: boolean;
-  result?: TMissionResult;
-  fails?: number;
+export class MissionWithResult extends MissionSettings {
+  /**
+   * Indicates whether the mission is hidden
+   */
+  @prop()
+  public hidden?: boolean;
+
+  /**
+   * Result of mission
+   */
+  @prop()
+  public result?: TMissionResult;
+
+  /**
+   * Amount of fails on mission
+   */
+  @prop()
+  public fails?: number;
 }

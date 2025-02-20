@@ -64,7 +64,7 @@ import { defineComponent, PropType } from 'vue';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import HelpButton from '@/components/feedback/HelpButton.vue';
 import { rolesShortInfo } from '@/components/view/information/const';
-import type { TGameOptionsRoles, TGameOptionsAddons, TGameOptionsFeatures, TRoles, TAddonsName } from '@avalon/types';
+import type { TGameOptionsRoles, TGameOptionsAddons, GameOptionsFeatures, TRoles, TAddonsName } from '@avalon/types';
 
 export default defineComponent({
   components: {
@@ -80,7 +80,7 @@ export default defineComponent({
       type: Object as PropType<TGameOptionsAddons>,
     },
     features: {
-      type: Object as PropType<TGameOptionsFeatures>,
+      type: Object as PropType<GameOptionsFeatures>,
     },
     buttonText: {
       required: true,

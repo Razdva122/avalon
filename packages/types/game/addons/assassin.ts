@@ -1,4 +1,20 @@
+import { prop } from '@typegoose/typegoose';
+
 import { TRoles } from '../roles';
+
+/**
+ * Data for assassinate in progress
+ */
+export class AssassinateProgressData {
+  @prop({ required: true })
+  public type!: TAssassinateType;
+
+  @prop({ required: true })
+  public stage!: number;
+
+  @prop({ type: [String] })
+  public possibleTargets?: TRoles[]; // Предполагается, что TRoles это строка
+}
 
 /**
  * Possible assassinate result
@@ -25,18 +41,10 @@ export type TAssassinateType = 'merlin' | 'lovers' | 'guinevere' | 'cleric';
 /**
  * Data for game
  */
-export type TAssassinAddonData = {
-  assassin: {
-    assassinateTargets: TAssassinateType[];
-    progressData?: TAssassinateProgressData;
-  };
-};
+export class AssassinAddonData {
+  @prop({ required: true, type: () => [String] })
+  public assassinateTargets!: TAssassinateType[];
 
-/**
- * Data for assassinate in progress
- */
-export type TAssassinateProgressData = {
-  type: TAssassinateType;
-  stage: number;
-  possibleTargets?: TRoles[];
-};
+  @prop()
+  public progressData?: AssassinateProgressData;
+}

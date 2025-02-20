@@ -1,8 +1,8 @@
-import type { IMissionSettings } from './mission';
+import type { MissionSettings } from './mission';
 import type { TGoodRoles, TEvilRoles, TLoyalty } from './roles';
 
 export interface IGameSettings {
-  missions: IMissionSettings[];
+  missions: MissionSettings[];
   players: {
     [key in TLoyalty]: number;
   };

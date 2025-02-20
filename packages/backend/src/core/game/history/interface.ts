@@ -4,7 +4,7 @@ import type { IPlayerInGame, Game } from '@/core/game';
 import type {
   TAssassinateResult,
   TMissionResult,
-  IMissionSettings,
+  MissionSettings,
   TVoteOption,
   THistoryVote,
   THistoryMission,
@@ -30,7 +30,7 @@ export type THistoryData = {
   mission: {
     index: number;
     result?: TMissionResult;
-    settings: IMissionSettings;
+    settings: MissionSettings;
     leader?: IPlayerInGame;
     actions: IMissionAction[];
     fails?: number;

@@ -1,3 +1,5 @@
+import { prop } from '@typegoose/typegoose';
+
 import { TLoyalty, TRoles } from '../roles';
 
 export type TLadyOfSeaFeatures = {
@@ -10,8 +12,7 @@ export type TLadyOfSeaFeatures = {
 /**
  * Data for game
  */
-export type TLadyOfSeaAddonData = {
-  ladyOfSea: {
-    loyaltyTargets: Array<TRoles | TLoyalty>;
-  };
-};
+export class LadyOfSeaAddonData {
+  @prop({ required: true, type: () => [String] })
+  public loyaltyTargets!: Array<TRoles | TLoyalty>;
+}

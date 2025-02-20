@@ -7,11 +7,11 @@ import { Subject, of } from 'rxjs';
 
 import type {
   TAssassinateType,
-  TAssassinAddonData,
+  AddonsData,
   TGameEndReasons,
   Dictionary,
   TVisibleRole,
-  TAssassinateProgressData,
+  AssassinateProgressData,
   TRoles,
   TGoodRoles,
 } from '@avalon/types';
@@ -27,14 +27,14 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
   assassinateSubject: Subject<boolean> = new Subject();
   game: Game;
   options: TAssassinateOptions;
-  progressData?: TAssassinateProgressData;
+  progressData?: AssassinateProgressData;
 
   constructor(game: Game, options: TAssassinateOptions) {
     this.game = game;
     this.options = options;
   }
 
-  get addonData(): TAssassinAddonData {
+  get addonData(): AddonsData {
     return {
       assassin: {
         assassinateTargets: <TAssassinateType[]>Object.keys(this.options),
@@ -188,9 +188,9 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
   }
 
   calculateValidRolesForCustom(type: TAssassinateType, stage: number): TRoles[] | undefined {
-    const option = this.options[type]?.[stage]!;
+    const option = this.options[type]?.[stage];
 
-    if ('type' in option && option.type === 'custom') {
+    if (option && 'type' in option && option.type === 'custom') {
       return this.game.players
         .reduce<TRoles[]>((acc, el) => {
           if (el.role.loyalty === 'good' && option.creator(el.role.role) && !acc.includes(el.role.role)) {

@@ -4,9 +4,8 @@ import { evilRolesImportance } from '@avalon/types';
 
 import { IGameAddon } from '@/core/game/addons/interface';
 import { Game, IPlayerInGame } from '@/core/game';
-import { Dictionary, TLoyalty, TRoles, TEvilRoles, TVisibleRole } from '@avalon/types';
+import { Dictionary, TLoyalty, TRoles, TEvilRoles, TVisibleRole, AddonsData } from '@avalon/types';
 import { LadyOfLakeAddon } from '@/core/game/addons/lady-of-lake';
-import { TLadyOfSeaAddonData } from '@avalon/types/game/addons/lady-of-sea';
 
 export class LadyOfSeaAddon extends LadyOfLakeAddon implements IGameAddon {
   override addonName: LadyOfLakeAddon['addonName'] = 'ladyOfSea';
@@ -24,7 +23,7 @@ export class LadyOfSeaAddon extends LadyOfLakeAddon implements IGameAddon {
     this.fakeEvilRole = _.sample(validEvilRoles)!;
   }
 
-  get addonData(): TLadyOfSeaAddonData {
+  get addonData(): AddonsData {
     return {
       ladyOfSea: {
         loyaltyTargets: this.loyaltyTargets,

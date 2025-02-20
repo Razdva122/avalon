@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import type { IPlayerInGame } from '@/core/game';
 
-import type { IMissionSettings, TMissionResult, THistoryStage, THistoryMission } from '@avalon/types';
+import type { MissionSettings, TMissionResult, THistoryStage, THistoryMission } from '@avalon/types';
 
 import type { HistoryElement, THistoryData, TDataForManagerOptions } from '@/core/game/history';
 
@@ -14,7 +14,7 @@ export class Mission implements HistoryElement<'mission'> {
   stage: THistoryStage;
   canBeHidden: boolean = false;
 
-  constructor(stage: 'active' | 'inactive', settings: IMissionSettings, index: number) {
+  constructor(stage: 'active' | 'inactive', settings: MissionSettings, index: number) {
     this.stage = stage;
     this.data = {
       settings,

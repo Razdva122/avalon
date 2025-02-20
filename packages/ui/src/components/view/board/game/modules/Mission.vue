@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import type { IMissionWithResult } from '@avalon/types';
+import type { MissionWithResult } from '@avalon/types';
 import { computedStyles } from '@/helpers/styles';
 import { defineComponent, PropType } from 'vue';
 
@@ -25,7 +25,7 @@ export default defineComponent({
   props: {
     mission: {
       required: true,
-      type: Object as PropType<IMissionWithResult>,
+      type: Object as PropType<MissionWithResult>,
     },
   },
   computed: {

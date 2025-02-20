@@ -115,10 +115,9 @@
 </template>
 
 <script lang="ts">
-import cloneDeep from 'lodash/cloneDeep';
 import last from 'lodash/last';
 import { useI18n } from 'vue-i18n';
-import type { THistoryMission, THistoryResults, IMissionWithResult } from '@avalon/types';
+import type { THistoryResults } from '@avalon/types';
 import { defineComponent, PropType, computed, inject } from 'vue';
 import Mission from '@/components/view/board/game/modules/Mission.vue';
 import History from '@/components/view/information/History.vue';

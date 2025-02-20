@@ -1,12 +1,13 @@
 import { prop } from '@typegoose/typegoose';
+import { Schema } from 'mongoose';
 
 import { Player } from './player';
+import { MissionWithResult } from './mission';
 import type { THistoryResults } from './history';
 import type { IGameSettingsWithRoles } from './settings';
-import type { TAddonsStages, TAddonsData } from './addons';
+import type { TAddonsStages, AddonsData } from './addons';
 import type { TLoyalty } from '../game/roles';
-import type { TGameOptionsFeatures } from '../game/options';
-import type { IMissionWithResult } from './mission';
+import type { GameOptionsFeatures } from '../game/options';
 import type { Dictionary } from '../utils';
 
 export class GameResults {
@@ -33,8 +34,8 @@ export class VisualGameState {
   @prop({ required: true })
   public mission!: number;
 
-  @prop({ required: true })
-  public missionState!: IMissionWithResult[];
+  @prop({ required: true, type: () => [MissionWithResult] })
+  public missionState!: MissionWithResult[];
 
   @prop({ required: true })
   public settings!: IGameSettingsWithRoles;
@@ -46,12 +47,12 @@ export class VisualGameState {
   public players!: Player[];
 
   @prop({ required: true })
-  public addonsData!: TAddonsData;
+  public addonsData!: AddonsData;
 
   @prop({ required: true })
-  public features!: TGameOptionsFeatures;
+  public features!: GameOptionsFeatures;
 
-  @prop()
+  @prop({ type: Schema.Types.Mixed })
   public debug?: Dictionary<unknown>;
 }
 

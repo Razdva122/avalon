@@ -6,7 +6,7 @@ import { Mission } from '@/core/game/history/mission';
 
 import * as _ from 'lodash';
 
-import { Server, VisualGameState, Player, IGameOptions, TVisibleRole, IMissionWithResult } from '@avalon/types';
+import { Server, VisualGameState, Player, IGameOptions, TVisibleRole, MissionWithResult } from '@avalon/types';
 
 export * from '@/core/game-manager/interface';
 
@@ -71,7 +71,7 @@ export class GameManager {
   }
 
   prepareHistoryAndPlayerForRoomState(): Pick<TRoomState, 'history' | 'players' | 'missionState'> {
-    const missionsState: IMissionWithResult[] = _.cloneDeep(this.roomState.settings.missions);
+    const missionsState: MissionWithResult[] = _.cloneDeep(this.roomState.settings.missions);
 
     this.game.history
       .filter((el): el is Mission => el.type === 'mission')

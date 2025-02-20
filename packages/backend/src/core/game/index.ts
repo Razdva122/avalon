@@ -11,8 +11,8 @@ import type {
   TGameStage,
   IGameSettingsWithRoles,
   IGameOptions,
-  TGameOptionsFeatures,
-  TAddonsData,
+  GameOptionsFeatures,
+  AddonsData,
   GameResults,
   TVisibleRole,
   Dictionary,
@@ -77,7 +77,7 @@ export class Game extends GameHooks {
   /**
    * Game features
    */
-  features: TGameOptionsFeatures;
+  features: GameOptionsFeatures;
 
   /**
    * State game observer
@@ -260,8 +260,8 @@ export class Game extends GameHooks {
   /**
    * Data for the operation of addons
    */
-  get addonsData(): TAddonsData {
-    return this.addons.reduce<TAddonsData>((acc, addon) => {
+  get addonsData(): AddonsData {
+    return this.addons.reduce<AddonsData>((acc, addon) => {
       if (addon.addonData) {
         acc = { ...acc, ...addon.addonData };
       }

@@ -1,9 +1,11 @@
 import { TOptionalRoles } from './roles';
 
+import { prop } from '@typegoose/typegoose';
+
 export interface IGameOptions {
   roles: TGameOptionsRoles;
   addons: TGameOptionsAddons;
-  features: TGameOptionsFeatures;
+  features: GameOptionsFeatures;
 }
 
 export type TGameOptionsRoles = {
@@ -16,8 +18,13 @@ export type TGameOptionsAddons = {
   excalibur?: boolean;
 };
 
-export type TGameOptionsFeatures = {
-  anonymousVoting?: boolean;
-  hiddenHistory?: boolean;
-  displayIndex?: boolean;
-};
+export class GameOptionsFeatures {
+  @prop()
+  public anonymousVoting?: boolean;
+
+  @prop()
+  public hiddenHistory?: boolean;
+
+  @prop()
+  public displayIndex?: boolean;
+}
