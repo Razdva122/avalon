@@ -45,14 +45,14 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 
-import type { ISwitchLancelots } from '@avalon/types';
+import type { SwitchLancelots } from '@avalon/types';
 import type { TCalculateNameByID } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
     data: {
       required: true,
-      type: Object as PropType<ISwitchLancelots>,
+      type: Object as PropType<SwitchLancelots>,
     },
     calculateNameByID: {
       required: true,

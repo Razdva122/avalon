@@ -2,9 +2,9 @@ import * as _ from 'lodash';
 
 import {
   TRoles,
-  IGameSettings,
+  GameSettings,
   IGameOptions,
-  TGameRoles,
+  GameRoles,
   TEvilRoles,
   TGoodRoles,
   evilRolesImportance,
@@ -19,13 +19,13 @@ import roles from '@/core/roles';
 
 type TGenerateRolesResult = {
   characters: Character[];
-  roles: TGameRoles;
+  roles: GameRoles;
 };
 
 /**
  * Generate roles for game
  */
-export function generateRolesForGame(settings: IGameSettings, options: IGameOptions, game: Game): TGenerateRolesResult {
+export function generateRolesForGame(settings: GameSettings, options: IGameOptions, game: Game): TGenerateRolesResult {
   const gameRoles: Character[] = [];
 
   const loyalty = { ...settings.players };
@@ -63,8 +63,8 @@ export function generateRolesForGame(settings: IGameSettings, options: IGameOpti
 /**
  * Generate roles view in info section
  */
-export function calculateRolesForView(characters: Character[]): TGameRoles {
-  const rolesInGame = characters.reduce<TGameRoles>(
+export function calculateRolesForView(characters: Character[]): GameRoles {
+  const rolesInGame = characters.reduce<GameRoles>(
     (acc, el) => {
       if (el.loyalty === 'evil') {
         const loyalty = acc[el.loyalty];

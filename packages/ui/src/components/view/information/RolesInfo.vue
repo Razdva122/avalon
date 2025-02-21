@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import type { TGameRoles, TVisibleRole } from '@avalon/types';
+import type { GameRoles, TVisibleRole } from '@avalon/types';
 import { defineComponent, PropType } from 'vue';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import { rolesShortInfo } from '@/components/view/information/const';
@@ -66,7 +66,7 @@ export default defineComponent({
   props: {
     gameRoles: {
       required: true,
-      type: Object as PropType<TGameRoles>,
+      type: Object as PropType<GameRoles>,
     },
     visibleRoles: {
       required: true,

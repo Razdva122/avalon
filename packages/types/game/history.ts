@@ -1,3 +1,6 @@
+import { prop } from '@typegoose/typegoose';
+import { Schema } from 'mongoose';
+
 import type { TMissionResult, MissionSettings } from './mission';
 import type { TVoteOption, TTeamMember } from './vote';
 import type { TAssassinateResult } from './addons';
@@ -19,10 +22,10 @@ export type THistoryResults =
   | THistoryVote
   | THistoryMission
   | IHistoryAssassinate
-  | ICheckLoyalty
-  | ISwitchResult
-  | IHiddenHistory
-  | ISwitchLancelots;
+  | CheckLoyalty
+  | SwitchResult
+  | HiddenHistory
+  | SwitchLancelots;
 
 /**
  * History vote data
@@ -88,29 +91,46 @@ export interface IHistoryAssassinate {
 /**
  * Check loyalty data
  */
-export interface ICheckLoyalty {
-  type: 'checkLoyalty';
-  validatorID: string;
-  inspectedID: string;
-  result: TLoyalty | TRoles;
+export class CheckLoyalty {
+  @prop({ required: true })
+  type!: 'checkLoyalty';
+
+  @prop({ required: true })
+  validatorID!: string;
+
+  @prop({ required: true })
+  inspectedID!: string;
+
+  @prop({ required: true })
+  result!: TLoyalty | TRoles;
+
+  @prop()
   visibleLoyalty?: TLoyalty | TRoles;
 }
 
 /**
  * Change of mission action
  */
-export interface ISwitchResult {
-  type: 'switchResult';
-  switcherID: string;
+export class SwitchResult {
+  @prop({ required: true })
+  type!: 'switchResult';
+
+  @prop({ required: true })
+  switcherID!: string;
+
+  @prop()
   targetID?: string;
+
+  @prop()
   result?: TMissionResult;
 }
 
 /**
  * Hidden element of history
  */
-export interface IHiddenHistory {
-  type: 'hidden';
+export class HiddenHistory {
+  @prop({ required: true })
+  type!: 'hidden';
 }
 
 /**
@@ -137,16 +157,30 @@ export interface IActionWithResult extends IAction {
   value: TMissionResult;
 }
 
+export class LancelotsIDs {
+  @prop({ required: true })
+  good!: string;
+
+  @prop({ required: true })
+  evil!: string;
+}
+
 /**
  * Switch lancelots data
  */
-export interface ISwitchLancelots {
-  type: 'switchLancelots';
-  lancelotsIDs?: {
-    good: string;
-    evil: string;
-  };
-  switches: Array<boolean | null>;
-  pointer: number;
-  result: boolean;
+export class SwitchLancelots {
+  @prop({ required: true })
+  type!: 'switchLancelots';
+
+  @prop()
+  lancelotsIDs?: LancelotsIDs;
+
+  @prop({ required: true, type: Schema.Types.Mixed })
+  switches!: Array<boolean | null>;
+
+  @prop({ required: true })
+  pointer!: number;
+
+  @prop({ required: true })
+  result!: boolean;
 }

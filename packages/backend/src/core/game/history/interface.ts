@@ -9,10 +9,10 @@ import type {
   THistoryVote,
   THistoryMission,
   IHistoryAssassinate,
-  ISwitchResult,
-  ISwitchLancelots,
+  SwitchResult,
+  SwitchLancelots,
   TLoyalty,
-  ICheckLoyalty,
+  CheckLoyalty,
   TAssassinateType,
   TTeamMember,
   TRoles,
@@ -69,9 +69,9 @@ export type THistoryDataForManager = {
   vote: THistoryVote;
   mission: THistoryMission;
   assassinate: IHistoryAssassinate;
-  checkLoyalty: ICheckLoyalty;
-  switchResult: ISwitchResult;
-  switchLancelots: ISwitchLancelots;
+  checkLoyalty: CheckLoyalty;
+  switchResult: SwitchResult;
+  switchLancelots: SwitchLancelots;
 };
 
 export type TDataForManagerOptions = {

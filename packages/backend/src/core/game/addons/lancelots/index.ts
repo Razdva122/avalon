@@ -1,7 +1,7 @@
 import { IGameAddon } from '@/core/game/addons/interface';
 import { Game } from '@/core/game';
 import type { TSwitchesArray } from '@/core/game/addons/lancelots/interface';
-import { SwitchLancelots } from '@/core/game/addons/lancelots/switch-lancelots';
+import { SwitchLancelotsHistory } from '@/core/game/addons/lancelots/switch-lancelots';
 import * as _ from 'lodash';
 import { of } from 'rxjs';
 
@@ -23,7 +23,7 @@ export class LancelotsAddon implements IGameAddon {
       const goodLancelot = this.game.players.find((player) => player.role.selfRole === 'goodLancelot')!;
       const evilLancelot = this.game.players.find((player) => player.role.selfRole === 'evilLancelot')!;
 
-      const switchLancelots = new SwitchLancelots(goodLancelot, evilLancelot, this.pointer, this.switches);
+      const switchLancelots = new SwitchLancelotsHistory(goodLancelot, evilLancelot, this.pointer, this.switches);
 
       this.game.history.push(switchLancelots);
 

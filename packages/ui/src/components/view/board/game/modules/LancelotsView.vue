@@ -20,7 +20,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
-import type { ISwitchLancelots } from '@avalon/types';
+import type { SwitchLancelots } from '@avalon/types';
 
 export default defineComponent({
   components: {
@@ -29,7 +29,7 @@ export default defineComponent({
   props: {
     data: {
       required: true,
-      type: Object as PropType<ISwitchLancelots>,
+      type: Object as PropType<SwitchLancelots>,
     },
   },
 });

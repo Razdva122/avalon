@@ -9,7 +9,7 @@ import type {
   TLoyalty,
   TVoteOption,
   TGameStage,
-  IGameSettingsWithRoles,
+  GameSettingsWithRoles,
   IGameOptions,
   GameOptionsFeatures,
   AddonsData,
@@ -87,7 +87,7 @@ export class Game extends GameHooks {
   /**
    * Game settings
    */
-  settings: IGameSettingsWithRoles;
+  settings: GameSettingsWithRoles;
 
   /**
    * The intermediate storage where the visible roles opened during the game are stored

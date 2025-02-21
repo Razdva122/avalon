@@ -22,14 +22,14 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 
-import type { ISwitchResult } from '@avalon/types';
+import type { SwitchResult } from '@avalon/types';
 import type { TCalculateNameByID } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
     data: {
       required: true,
-      type: Object as PropType<ISwitchResult>,
+      type: Object as PropType<SwitchResult>,
     },
     calculateNameByID: {
       required: true,

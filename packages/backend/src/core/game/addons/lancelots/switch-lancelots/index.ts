@@ -1,9 +1,9 @@
 import type { HistoryElement, THistoryData } from '@/core/game/history';
-import type { THistoryStage, ISwitchLancelots } from '@avalon/types';
+import type { THistoryStage, SwitchLancelots } from '@avalon/types';
 import type { IPlayerInGame } from '@/core/game';
 import type { TDataForManagerOptions } from '@/core/game/history';
 
-export class SwitchLancelots implements HistoryElement<'switchLancelots'> {
+export class SwitchLancelotsHistory implements HistoryElement<'switchLancelots'> {
   type = 'switchLancelots' as const;
   data: THistoryData['switchLancelots'];
   stage: THistoryStage;
@@ -29,7 +29,7 @@ export class SwitchLancelots implements HistoryElement<'switchLancelots'> {
   }
 
   dataForManager(options: TDataForManagerOptions) {
-    const switchLancelotsData: ISwitchLancelots = {
+    const switchLancelotsData: SwitchLancelots = {
       type: 'switchLancelots',
       ...this.data,
     };

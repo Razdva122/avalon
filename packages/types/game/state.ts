@@ -4,7 +4,7 @@ import { Schema } from 'mongoose';
 import { Player } from './player';
 import { MissionWithResult } from './mission';
 import type { THistoryResults } from './history';
-import type { IGameSettingsWithRoles } from './settings';
+import type { GameSettingsWithRoles } from './settings';
 import type { TAddonsStages, AddonsData } from './addons';
 import type { TLoyalty } from '../game/roles';
 import type { GameOptionsFeatures } from '../game/options';
@@ -38,7 +38,7 @@ export class VisualGameState {
   public missionState!: MissionWithResult[];
 
   @prop({ required: true })
-  public settings!: IGameSettingsWithRoles;
+  public settings!: GameSettingsWithRoles;
 
   @prop({ required: true })
   public history!: THistoryResults[];

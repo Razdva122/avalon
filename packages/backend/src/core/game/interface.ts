@@ -12,10 +12,10 @@ import type {
 import type { Character } from '@/core/roles';
 import type { User } from '@/user';
 
-import type { TGameStage, IPlayerFeatures, IGameSettings } from '@avalon/types';
+import type { TGameStage, IPlayerFeatures, GameSettings } from '@avalon/types';
 
 export interface IPresetsForGame {
-  [key: number]: IGameSettings;
+  [key: number]: GameSettings;
 }
 
 export interface IPlayerInGame {

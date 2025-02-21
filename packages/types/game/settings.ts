@@ -1,19 +1,36 @@
-import type { MissionSettings } from './mission';
-import type { TGoodRoles, TEvilRoles, TLoyalty } from './roles';
+import { prop } from '@typegoose/typegoose';
 
-export interface IGameSettings {
-  missions: MissionSettings[];
-  players: {
-    [key in TLoyalty]: number;
-  };
-  total: number;
+import { MissionSettings } from './mission';
+import type { TGoodRoles, TEvilRoles } from './roles';
+
+export class PlayersSettings {
+  @prop({ required: true })
+  evil!: number;
+
+  @prop({ required: true })
+  good!: number;
 }
 
-export interface IGameSettingsWithRoles extends IGameSettings {
-  roles: TGameRoles;
+export class GameRoles {
+  @prop({ required: true, type: () => [String] })
+  evil!: TEvilRoles[];
+
+  @prop({ required: true, type: () => [String] })
+  good!: TGoodRoles[];
 }
 
-export interface TGameRoles {
-  evil: TEvilRoles[];
-  good: TGoodRoles[];
+export class GameSettings {
+  @prop({ required: true, type: () => [MissionSettings] })
+  missions!: MissionSettings[];
+
+  @prop({ required: true })
+  players!: PlayersSettings;
+
+  @prop({ required: true })
+  total!: number;
+}
+
+export class GameSettingsWithRoles extends GameSettings {
+  @prop({ required: true })
+  roles!: GameRoles;
 }

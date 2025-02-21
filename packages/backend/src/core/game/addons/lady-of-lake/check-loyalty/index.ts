@@ -1,9 +1,9 @@
 import type { HistoryElement, THistoryData } from '@/core/game/history';
-import type { THistoryStage, TLoyalty, ICheckLoyalty, TRoles } from '@avalon/types';
+import type { THistoryStage, TLoyalty, CheckLoyalty, TRoles } from '@avalon/types';
 import type { IPlayerInGame } from '@/core/game';
 import type { TDataForManagerOptions } from '@/core/game/history';
 
-export class CheckLoyalty implements HistoryElement<'checkLoyalty'> {
+export class CheckLoyaltyHistory implements HistoryElement<'checkLoyalty'> {
   type = 'checkLoyalty' as const;
   data: THistoryData['checkLoyalty'];
   stage: THistoryStage;
@@ -29,7 +29,7 @@ export class CheckLoyalty implements HistoryElement<'checkLoyalty'> {
     const validatorID = this.data.validator.user.id;
     const inspectedID = this.data.inspected.user.id;
 
-    const checkLoyaltyData: ICheckLoyalty = {
+    const checkLoyaltyData: CheckLoyalty = {
       type: this.type,
       result: this.data.result,
       visibleLoyalty: this.data.visibleLoyalty,

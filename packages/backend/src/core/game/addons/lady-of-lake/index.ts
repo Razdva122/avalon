@@ -1,5 +1,5 @@
 import { IGameAddon } from '@/core/game/addons/interface';
-import { CheckLoyalty } from '@/core/game/addons/lady-of-lake/check-loyalty';
+import { CheckLoyaltyHistory } from '@/core/game/addons/lady-of-lake/check-loyalty';
 import { Game, IPlayerInGame } from '@/core/game';
 import { Dictionary, TLoyalty, TRoles, TVisibleRole } from '@avalon/types';
 import { Subject, of } from 'rxjs';
@@ -99,7 +99,7 @@ export class LadyOfLakeAddon implements IGameAddon {
 
     const selectedPlayer = this.game.selectedPlayers[0];
 
-    const loyaltyCheck = new CheckLoyalty(ownerOfLady, selectedPlayer, loyalty, this.getLoyalty(executorID));
+    const loyaltyCheck = new CheckLoyaltyHistory(ownerOfLady, selectedPlayer, loyalty, this.getLoyalty(executorID));
 
     this.game.history.push(loyaltyCheck);
 
