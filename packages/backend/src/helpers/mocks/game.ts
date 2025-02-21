@@ -459,6 +459,7 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'mission',
+          hidden: false,
           index: 0,
           result: 'success',
           settings: {
@@ -813,6 +814,7 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'mission',
+          hidden: false,
           index: 1,
           result: 'fail',
           settings: {
@@ -1180,6 +1182,7 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'mission',
+          hidden: false,
           index: 2,
           result: 'fail',
           settings: {
@@ -1291,6 +1294,7 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'mission',
+          hidden: false,
           index: 3,
           result: 'success',
           settings: {
@@ -1610,6 +1614,7 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'mission',
+          hidden: false,
           index: 4,
           result: 'fail',
           settings: {
@@ -2195,6 +2200,7 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'mission',
+          hidden: false,
           index: 0,
           result: 'success',
           settings: {
@@ -2450,6 +2456,7 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'mission',
+          hidden: false,
           index: 1,
           result: 'success',
           settings: {
@@ -2544,6 +2551,7 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'mission',
+          hidden: false,
           index: 2,
           result: 'success',
           settings: {
@@ -2879,6 +2887,7 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'mission',
+          hidden: false,
           index: 0,
           result: 'fail',
           settings: {
@@ -3032,6 +3041,7 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'mission',
+          hidden: false,
           index: 1,
           result: 'success',
           settings: {
@@ -3199,6 +3209,7 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'mission',
+          hidden: false,
           index: 2,
           result: 'fail',
           settings: {
@@ -3305,6 +3316,7 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'mission',
+          hidden: false,
           index: 3,
           result: 'fail',
           settings: {
