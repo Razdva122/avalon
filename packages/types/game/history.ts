@@ -1,8 +1,9 @@
-import { prop } from '@typegoose/typegoose';
+import { prop, modelOptions } from '@typegoose/typegoose';
 import { Schema } from 'mongoose';
 
 import type { TMissionResult, MissionSettings } from './mission';
-import type { TVoteOption, TTeamMember } from './vote';
+import { TeamMember } from './vote';
+import type { TVoteOption } from './vote';
 import type { TAssassinateResult } from './addons';
 import type { TLoyalty, TRoles } from './roles';
 import type { TAssassinateType } from './addons/assassin';
@@ -18,129 +19,210 @@ export type THistoryType = 'mission' | 'vote' | 'assassinate' | 'checkLoyalty' |
  */
 export type THistoryStage = 'active' | 'inactive' | 'progress' | 'finished';
 
+@modelOptions({
+  schemaOptions: {
+    discriminatorKey: 'type',
+  },
+})
+export class HistoryBase {
+  @prop({ required: true })
+  public type!: 'vote' | 'mission' | 'assassinate' | 'switchLancelots' | 'checkLoyalty' | 'switchResult' | 'hidden';
+}
+
 export type THistoryResults =
   | THistoryVote
   | THistoryMission
-  | IHistoryAssassinate
+  | HistoryAssassinate
   | CheckLoyalty
   | SwitchResult
   | HiddenHistory
   | SwitchLancelots;
 
 /**
+ * Result of anonymous voting
+ */
+export class AnonymousVoteResult {
+  @prop({ required: true })
+  public approve!: number;
+
+  @prop({ required: true })
+  public reject!: number;
+}
+
+@modelOptions({
+  schemaOptions: {
+    discriminatorKey: 'anonymous',
+  },
+})
+export class HistoryVoteBase extends HistoryBase {
+  declare type: 'vote';
+
+  @prop({ required: true })
+  public anonymous!: boolean;
+
+  @prop({ required: true })
+  public index!: number;
+
+  @prop({ required: true })
+  public result!: TVoteOption;
+
+  @prop({ required: true })
+  public leaderID!: string;
+
+  @prop({ required: true, type: () => [TeamMember] })
+  public team!: TeamMember[];
+
+  @prop({ required: true })
+  public forced!: boolean;
+}
+
+export class AnonymousHistoryVote extends HistoryVoteBase {
+  declare public anonymous: true;
+
+  @prop({ required: true })
+  public votes!: AnonymousVoteResult;
+}
+
+export class CommonHistoryVote extends HistoryVoteBase {
+  declare public anonymous: false;
+
+  @prop({ required: true, type: () => [Vote] })
+  public votes!: Vote[];
+}
+
+/**
  * History vote data
  */
-export type THistoryVote = {
-  type: 'vote';
-  index: number;
-  result: TVoteOption;
-  leaderID: string;
-  team: TTeamMember[];
-  forced: boolean;
-} & THistoryVoteVisibility;
-
-export type THistoryVoteVisibility =
-  | { anonymous: true; votes: { approve: number; reject: number } }
-  | { anonymous: false; votes: TVote[] };
+export type THistoryVote = AnonymousHistoryVote | CommonHistoryVote;
 
 /**
  * General history mission data
  */
-interface IHistoryMissionCore {
-  type: 'mission';
-  index: number;
-  settings: MissionSettings;
-  leaderID?: string;
-  actions?: IAction[] | IActionWithResult[];
+@modelOptions({
+  schemaOptions: {
+    discriminatorKey: 'hidden',
+  },
+})
+export class HistoryMissionBase extends HistoryBase {
+  declare type: 'mission';
+
+  @prop({ required: true })
+  public hidden!: boolean;
+
+  @prop({ required: true })
+  public index!: number;
+
+  @prop({ required: true })
+  public settings!: MissionSettings;
+
+  @prop()
+  public leaderID?: string;
+
+  @prop({ required: true, type: Schema.Types.Mixed })
+  public actions!: IAction[] | IActionWithResult[];
 }
 
 /**
  * Complete history mission data
  */
-export interface IHistoryMissionComplete extends IHistoryMissionCore {
-  hidden?: undefined;
-  result: TMissionResult;
-  fails: number;
+export class HistoryMissionComplete extends HistoryMissionBase {
+  declare hidden: false;
+
+  @prop({ required: true })
+  public result!: TMissionResult;
+
+  @prop({ required: true })
+  public fails!: number;
 }
 
 /**
  * Hidden history mission data
  */
-export interface IHistoryMissionHidden extends IHistoryMissionCore {
-  hidden: true;
-  result: undefined;
-  fails: undefined;
+export class HistoryMissionHidden extends HistoryMissionBase {
+  declare hidden: true;
+  declare result: undefined;
+  declare fails: undefined;
 }
 
 /**
  * History mission data
  */
-export type THistoryMission = IHistoryMissionHidden | IHistoryMissionComplete;
+export type THistoryMission = HistoryMissionHidden | HistoryMissionComplete;
 
 /**
  * History assassinate data
  */
-export interface IHistoryAssassinate {
-  type: 'assassinate';
-  result: TAssassinateResult;
-  assassinID: string;
-  assassinateType: TAssassinateType;
-  killedIDs: string[];
+export class HistoryAssassinate extends HistoryBase {
+  declare type: 'assassinate';
+
+  @prop({ required: true })
+  public result!: TAssassinateResult;
+
+  @prop({ required: true })
+  public assassinID!: string;
+
+  @prop({ required: true })
+  public assassinateType!: TAssassinateType;
+
+  @prop({ required: true, type: () => [String] })
+  public killedIDs!: string[];
 }
 
 /**
  * Check loyalty data
  */
-export class CheckLoyalty {
-  @prop({ required: true })
-  type!: 'checkLoyalty';
+export class CheckLoyalty extends HistoryBase {
+  declare type: 'checkLoyalty';
 
   @prop({ required: true })
-  validatorID!: string;
+  public validatorID!: string;
 
   @prop({ required: true })
-  inspectedID!: string;
+  public inspectedID!: string;
 
   @prop({ required: true })
-  result!: TLoyalty | TRoles;
+  public result!: TLoyalty | TRoles;
 
   @prop()
-  visibleLoyalty?: TLoyalty | TRoles;
+  public visibleLoyalty?: TLoyalty | TRoles;
 }
 
 /**
  * Change of mission action
  */
-export class SwitchResult {
-  @prop({ required: true })
-  type!: 'switchResult';
+export class SwitchResult extends HistoryBase {
+  declare type: 'switchResult';
 
   @prop({ required: true })
-  switcherID!: string;
+  public switcherID!: string;
 
   @prop()
-  targetID?: string;
+  public targetID?: string;
 
   @prop()
-  result?: TMissionResult;
+  public result?: TMissionResult;
 }
 
 /**
  * Hidden element of history
  */
-export class HiddenHistory {
-  @prop({ required: true })
-  type!: 'hidden';
+export class HiddenHistory extends HistoryBase {
+  declare type: 'hidden';
 }
 
 /**
  * Vote of one player
  */
-export type TVote = {
-  playerID: string;
-  onMission: boolean;
-  value: TVoteOption;
-};
+export class Vote {
+  @prop({ required: true })
+  public playerID!: string;
+
+  @prop({ required: true })
+  public onMission!: boolean;
+
+  @prop({ required: true })
+  public value!: TVoteOption;
+}
 
 /**
  * Action of player in mission
@@ -159,28 +241,27 @@ export interface IActionWithResult extends IAction {
 
 export class LancelotsIDs {
   @prop({ required: true })
-  good!: string;
+  public good!: string;
 
   @prop({ required: true })
-  evil!: string;
+  public evil!: string;
 }
 
 /**
  * Switch lancelots data
  */
-export class SwitchLancelots {
-  @prop({ required: true })
-  type!: 'switchLancelots';
+export class SwitchLancelots extends HistoryBase {
+  declare type: 'switchLancelots';
 
   @prop()
-  lancelotsIDs?: LancelotsIDs;
+  public lancelotsIDs?: LancelotsIDs;
 
   @prop({ required: true, type: Schema.Types.Mixed })
-  switches!: Array<boolean | null>;
+  public switches!: Array<boolean | null>;
 
   @prop({ required: true })
-  pointer!: number;
+  public pointer!: number;
 
   @prop({ required: true })
-  result!: boolean;
+  public result!: boolean;
 }

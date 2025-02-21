@@ -8,13 +8,13 @@ import type {
   TVoteOption,
   THistoryVote,
   THistoryMission,
-  IHistoryAssassinate,
+  HistoryAssassinate,
   SwitchResult,
   SwitchLancelots,
   TLoyalty,
   CheckLoyalty,
   TAssassinateType,
-  TTeamMember,
+  TeamMember,
   TRoles,
 } from '@avalon/types';
 
@@ -24,7 +24,7 @@ export type THistoryData = {
     result?: TVoteOption;
     forced: boolean;
     leader: IPlayerInGame;
-    team: TTeamMember[];
+    team: TeamMember[];
     votes: IVote[];
   };
   mission: {
@@ -68,7 +68,7 @@ export type THistoryData = {
 export type THistoryDataForManager = {
   vote: THistoryVote;
   mission: THistoryMission;
-  assassinate: IHistoryAssassinate;
+  assassinate: HistoryAssassinate;
   checkLoyalty: CheckLoyalty;
   switchResult: SwitchResult;
   switchLancelots: SwitchLancelots;

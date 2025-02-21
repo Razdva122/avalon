@@ -20,14 +20,14 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 
-import type { IHistoryAssassinate } from '@avalon/types';
+import type { HistoryAssassinate } from '@avalon/types';
 import type { TCalculateNameByID } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
     data: {
       required: true,
-      type: Object as PropType<IHistoryAssassinate>,
+      type: Object as PropType<HistoryAssassinate>,
     },
     calculateNameByID: {
       required: true,

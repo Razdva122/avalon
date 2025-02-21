@@ -3,6 +3,16 @@ import { Schema } from 'mongoose';
 
 import { Player } from './player';
 import { MissionWithResult } from './mission';
+import {
+  HistoryBase,
+  HistoryAssassinate,
+  CheckLoyalty,
+  SwitchResult,
+  HiddenHistory,
+  SwitchLancelots,
+  HistoryVoteBase,
+  HistoryMissionBase,
+} from './history';
 import type { THistoryResults } from './history';
 import type { GameSettingsWithRoles } from './settings';
 import type { TAddonsStages, AddonsData } from './addons';
@@ -40,7 +50,19 @@ export class VisualGameState {
   @prop({ required: true })
   public settings!: GameSettingsWithRoles;
 
-  @prop({ required: true })
+  @prop({
+    type: () => [HistoryBase],
+    discriminators: () => [
+      { type: HistoryVoteBase },
+      { type: HistoryMissionBase },
+      { type: HistoryAssassinate },
+      { type: CheckLoyalty },
+      { type: SwitchResult },
+      { type: HiddenHistory },
+      { type: SwitchLancelots },
+    ],
+    _id: false,
+  })
   public history!: THistoryResults[];
 
   @prop({ required: true, type: () => [Player] })

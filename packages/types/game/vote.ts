@@ -1,4 +1,4 @@
-import type { TExcaliburFeatures } from './addons/excalibur';
+import { prop } from '@typegoose/typegoose';
 
 /**
  * Possible vote option
@@ -8,4 +8,10 @@ export type TVoteOption = 'approve' | 'reject';
 /**
  * Team member
  */
-export type TTeamMember = { id: string } & TExcaliburFeatures;
+export class TeamMember {
+  @prop({ required: true })
+  public id!: string;
+
+  @prop()
+  public excalibur?: boolean;
+}

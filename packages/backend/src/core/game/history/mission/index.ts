@@ -125,6 +125,7 @@ export class Mission implements HistoryElement<'mission'> {
     }
 
     return {
+      hidden: false,
       fails: this.data.fails,
       result: this.data.result,
     };
