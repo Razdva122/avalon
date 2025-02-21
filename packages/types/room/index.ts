@@ -1,5 +1,7 @@
+import { prop } from '@typegoose/typegoose';
+
 import type { VisualGameState } from '../game/state';
-import type { IGameOptions } from '../game/options';
+import type { GameOptions } from '../game/options';
 
 export * from './list';
 
@@ -23,8 +25,8 @@ type TMetaRoomState = {
   leaderID: string;
   players: TRoomPlayer[];
   vote?: TVoteInRoom;
-  options: IGameOptions;
-  chat: TChatMessage[];
+  options: GameOptions;
+  chat: ChatMessage[];
 };
 
 export type TRoomPlayer = {
@@ -46,14 +48,24 @@ export type TStartedRoomState = {
   game: VisualGameState;
 } & TMetaRoomState;
 
-export type TChatMessage = {
-  user: {
-    id: string;
-    name: string;
-  };
-  message: string;
-  timestamp: number;
-};
+export class User {
+  @prop({ required: true, unique: true })
+  public id!: string;
+
+  @prop({ required: true })
+  public name!: string;
+}
+
+export class ChatMessage {
+  @prop({ required: true })
+  public user!: User;
+
+  @prop({ required: true })
+  public message!: string;
+
+  @prop({ required: true })
+  public timestamp!: number;
+}
 
 export type TMessage = {
   text: string;

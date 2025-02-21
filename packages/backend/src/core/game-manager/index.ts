@@ -6,7 +6,7 @@ import { Mission } from '@/core/game/history/mission';
 
 import * as _ from 'lodash';
 
-import { Server, VisualGameState, Player, IGameOptions, TVisibleRole, MissionWithResult } from '@avalon/types';
+import { Server, VisualGameState, Player, GameOptions, TVisibleRole, MissionWithResult } from '@avalon/types';
 
 export * from '@/core/game-manager/interface';
 
@@ -16,7 +16,7 @@ export class GameManager {
   io: Server;
   roomID: string;
 
-  constructor(users: User[], options: IGameOptions, io: Server, roomID: string) {
+  constructor(users: User[], options: GameOptions, io: Server, roomID: string) {
     this.roomID = roomID;
     this.io = io;
     this.game = new Game(users, options, { gameStateChanged: () => this.gameStateChanged() });

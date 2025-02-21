@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { TChatMessage } from '@avalon/types';
+import { ChatMessage } from '@avalon/types';
 import { defineComponent, PropType } from 'vue';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
@@ -56,7 +56,7 @@ export default defineComponent({
     },
     messages: {
       required: true,
-      type: Array as PropType<TChatMessage[]>,
+      type: Array as PropType<ChatMessage[]>,
     },
   },
   data() {

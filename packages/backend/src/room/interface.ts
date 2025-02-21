@@ -15,7 +15,7 @@ export type TStartedRoomData = {
   manager: GameManager;
 };
 
-export type TChatMessage = {
+export type ChatMessage = {
   user: {
     id: string;
     name: string;

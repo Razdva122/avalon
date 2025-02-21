@@ -1,6 +1,6 @@
 import { Room } from '@/room';
 import { User } from '@/user';
-import type { Dictionary, TRoomInfo, TRoomsList, IGameOptions } from '@avalon/types';
+import type { Dictionary, TRoomInfo, TRoomsList, GameOptions } from '@avalon/types';
 import type { Server, ServerSocket } from '@avalon/types';
 import crypto from 'crypto';
 
@@ -18,7 +18,7 @@ export class Manager {
     return this.roomsList.slice(0, 20);
   }
 
-  createRoom(uuid: string, leaderID: string, players: User[], options?: IGameOptions) {
+  createRoom(uuid: string, leaderID: string, players: User[], options?: GameOptions) {
     this.rooms[uuid] = new Room(uuid, leaderID, players, this.io, options);
 
     this.updateRoomsList(this.rooms[uuid]);

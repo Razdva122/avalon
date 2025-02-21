@@ -1,5 +1,5 @@
 import { Game } from '@/core/game';
-import { IGameOptions, TLoyalty, TAssassinateType, TRoles } from '@avalon/types';
+import { GameOptions, TLoyalty, TAssassinateType, TRoles } from '@avalon/types';
 import { User } from '@/user';
 
 const users = [
@@ -19,11 +19,11 @@ export class GameTestHelper {
   game!: Game;
   stateChangedNumber: number = 0;
 
-  constructor(playersAmount: number, options: IGameOptions) {
+  constructor(playersAmount: number, options: GameOptions) {
     this.restartGame(playersAmount, options);
   }
 
-  restartGame(playersAmount: number, options: IGameOptions) {
+  restartGame(playersAmount: number, options: GameOptions) {
     this.stateChangedNumber = 0;
     this.game = new Game(users.slice(0, playersAmount), options, {
       gameStateChanged: () => (this.stateChangedNumber += 1),

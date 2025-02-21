@@ -1,14 +1,14 @@
 import * as _ from 'lodash';
 import { GameTestHelper } from '@/core/game/test/helpers';
-import { IGameOptions } from '@avalon/types';
+import { GameOptions } from '@avalon/types';
 import { gamesSettings } from '@/core/game';
 
-export const defaultOptions = [7, { roles: {}, addons: {} }] as [number, IGameOptions];
+export const defaultOptions = [7, { roles: {}, addons: {} }] as [number, GameOptions];
 export const settings = gamesSettings[defaultOptions[0]];
 const gameHelper = new GameTestHelper(...defaultOptions);
 let game = gameHelper.game;
 
-export function generateNewGame(addons?: IGameOptions['addons'], roles?: IGameOptions['roles'], players?: number) {
+export function generateNewGame(addons?: GameOptions['addons'], roles?: GameOptions['roles'], players?: number) {
   const clone = _.cloneDeep(defaultOptions);
 
   if (addons) {

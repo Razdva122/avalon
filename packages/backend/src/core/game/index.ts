@@ -10,7 +10,7 @@ import type {
   TVoteOption,
   TGameStage,
   GameSettingsWithRoles,
-  IGameOptions,
+  GameOptions,
   GameOptionsFeatures,
   AddonsData,
   GameResults,
@@ -121,7 +121,7 @@ export class Game extends GameHooks {
 
   stage: TGameStage = 'initialization';
 
-  constructor(users: User[], options: IGameOptions, stateObserver: IStateObserver) {
+  constructor(users: User[], options: GameOptions, stateObserver: IStateObserver) {
     super();
 
     if (users.length < 5 || users.length > 10) {

@@ -57,7 +57,7 @@ import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import TemporaryAlert from '@/components/feedback/TemporaryAlert.vue';
 import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
-import type { TGameOptionsRoles, TGameOptionsAddons } from '@avalon/types';
+import type { GameOptionsRoles, GameOptionsAddons } from '@avalon/types';
 
 export default defineComponent({
   components: {
@@ -99,7 +99,7 @@ export default defineComponent({
       roomsList.value = list;
     });
 
-    const displayOptions = (roles: TGameOptionsRoles, addons: TGameOptionsAddons) => {
+    const displayOptions = (roles: GameOptionsRoles, addons: GameOptionsAddons) => {
       return [...Object.values(roles), ...Object.values(addons)].some((el) => Boolean(el));
     };
 

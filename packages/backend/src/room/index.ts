@@ -1,5 +1,5 @@
 import { User } from '@/user';
-import type { TRoomState, Server, IGameOptions, TVoteTarget, TVoteInRoom } from '@avalon/types';
+import type { TRoomState, Server, GameOptions, TVoteTarget, TVoteInRoom } from '@avalon/types';
 import type { TRoomData } from '@/room/interface';
 import { eventBus } from '@/helpers';
 import { GameManager } from '@/core/game-manager';
@@ -13,14 +13,14 @@ export class Room {
   leaderID: string;
   vote?: TVoteInRoom;
   chat: Chat;
-  options: IGameOptions;
+  options: GameOptions;
   data: TRoomData = { stage: 'created' };
   maxCapacity = 10;
   createTime: string;
   startTime?: string;
   io: Server;
 
-  constructor(roomID: string, leaderID: string, players: User[], io: Server, options?: IGameOptions) {
+  constructor(roomID: string, leaderID: string, players: User[], io: Server, options?: GameOptions) {
     this.io = io;
     this.roomID = roomID;
     this.players = players;
@@ -125,7 +125,7 @@ export class Room {
     }
   }
 
-  updateOptions(options: IGameOptions) {
+  updateOptions(options: GameOptions) {
     this.options = options;
     this.updateRoomState();
   }

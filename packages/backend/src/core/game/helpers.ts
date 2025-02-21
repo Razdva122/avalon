@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import {
   TRoles,
   GameSettings,
-  IGameOptions,
+  GameOptions,
   GameRoles,
   TEvilRoles,
   TGoodRoles,
@@ -25,7 +25,7 @@ type TGenerateRolesResult = {
 /**
  * Generate roles for game
  */
-export function generateRolesForGame(settings: GameSettings, options: IGameOptions, game: Game): TGenerateRolesResult {
+export function generateRolesForGame(settings: GameSettings, options: GameOptions, game: Game): TGenerateRolesResult {
   const gameRoles: Character[] = [];
 
   const loyalty = { ...settings.players };

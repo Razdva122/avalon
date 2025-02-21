@@ -16,8 +16,8 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import {
-  TGameOptionsRoles,
-  TGameOptionsAddons,
+  GameOptionsRoles,
+  GameOptionsAddons,
   evilRolesImportance,
   goodRolesImportance,
   TGoodRoles,
@@ -34,11 +34,11 @@ export default defineComponent({
   props: {
     roles: {
       required: true,
-      type: Object as PropType<TGameOptionsRoles>,
+      type: Object as PropType<GameOptionsRoles>,
     },
     addons: {
       required: true,
-      type: Object as PropType<TGameOptionsAddons>,
+      type: Object as PropType<GameOptionsAddons>,
     },
   },
   computed: {

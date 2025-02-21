@@ -1,7 +1,7 @@
-import type { TChatMessage } from '@avalon/types';
+import type { ChatMessage } from '@avalon/types';
 
 export class Chat {
-  history: TChatMessage[] = [];
+  history: ChatMessage[] = [];
 
   addMessage(message: string, userID: string, userName: string) {
     this.history.push({

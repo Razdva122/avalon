@@ -2,21 +2,90 @@ import { TOptionalRoles } from './roles';
 
 import { prop } from '@typegoose/typegoose';
 
-export interface IGameOptions {
-  roles: TGameOptionsRoles;
-  addons: TGameOptionsAddons;
-  features: GameOptionsFeatures;
+// Validation type helper
+type CheckRoleKeys<T> = keyof T extends TOptionalRoles
+  ? TOptionalRoles extends keyof T
+    ? T
+    : 'Missing properties in class: ' & Exclude<TOptionalRoles, keyof T>
+  : 'Extra properties in class: ' & Exclude<keyof T, TOptionalRoles>;
+
+export class GameOptions {
+  @prop({ required: true })
+  public roles!: GameOptionsRoles;
+
+  @prop({ required: true })
+  public addons!: GameOptionsAddons;
+
+  @prop({ required: true })
+  public features!: GameOptionsFeatures;
 }
 
-export type TGameOptionsRoles = {
-  [key in TOptionalRoles]?: number;
-};
+export class GameOptionsRoles implements CheckRoleKeys<GameOptionsRoles> {
+  @prop()
+  public merlin?: number;
 
-export type TGameOptionsAddons = {
-  ladyOfLake?: boolean;
-  ladyOfSea?: boolean;
-  excalibur?: boolean;
-};
+  @prop()
+  public percival?: number;
+
+  @prop()
+  public merlinPure?: number;
+
+  @prop()
+  public tristan?: number;
+
+  @prop()
+  public isolde?: number;
+
+  @prop()
+  public goodLancelot?: number;
+
+  @prop()
+  public guinevere?: number;
+
+  @prop()
+  public troublemaker?: number;
+
+  @prop()
+  public cleric?: number;
+
+  @prop()
+  public morgana?: number;
+
+  @prop()
+  public oberon?: number;
+
+  @prop()
+  public mordred?: number;
+
+  @prop()
+  public evilLancelot?: number;
+
+  @prop()
+  public trickster?: number;
+
+  @prop()
+  public lunatic?: number;
+
+  @prop()
+  public brute?: number;
+
+  @prop()
+  public witch?: number;
+
+  @prop()
+  public revealer?: number;
+}
+
+export class GameOptionsAddons {
+  @prop()
+  public ladyOfLake?: boolean;
+
+  @prop()
+  public ladyOfSea?: boolean;
+
+  @prop()
+  public excalibur?: boolean;
+}
 
 export class GameOptionsFeatures {
   @prop()

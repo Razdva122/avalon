@@ -1,6 +1,6 @@
 import type { TRoomState } from '../room';
 import type { VisualGameState } from '../game/state';
-import type { IGameOptions } from '../game/options';
+import type { GameOptions } from '../game/options';
 
 import type { Server as SuperServer, Socket as SuperServerSocket } from 'socket.io';
 import type { Socket as SuperSocket } from 'socket.io-client';
@@ -32,7 +32,7 @@ export interface ClientToServerEvents {
   getOnlineCounter: (id: string, callback: (counter: number) => void) => void;
 
   createRoom: (callback: (uuid: string) => void) => void;
-  updateOptions: (uuid: string, options: IGameOptions) => void;
+  updateOptions: (uuid: string, options: GameOptions) => void;
   joinRoom: (uuid: string, callback: (state: TRoomState | IRoomUnavailableError) => void) => void;
   sendMessage: (uuid: string, message: string) => void;
   lockRoom: (uuid: string) => void;
