@@ -1,4 +1,4 @@
-import { prop, modelOptions } from '@typegoose/typegoose';
+import { prop, modelOptions, Severity } from '@typegoose/typegoose';
 import { Schema } from 'mongoose';
 
 import type { TMissionResult, MissionSettings } from './mission';
@@ -26,17 +26,20 @@ export type THistoryStage = 'active' | 'inactive' | 'progress' | 'finished';
 })
 export class HistoryBase {
   @prop({ required: true })
-  public type!: 'vote' | 'mission' | 'assassinate' | 'switchLancelots' | 'checkLoyalty' | 'switchResult' | 'hidden';
+  public type!: THistoryType | 'hidden';
 }
 
 export type THistoryResults =
-  | THistoryVote
-  | THistoryMission
+  | AnonymousHistoryVote
+  | HistoryVote
+  | HistoryMission
+  | HistoryMissionHidden
   | HistoryAssassinate
   | CheckLoyalty
   | SwitchResult
   | HiddenHistory
-  | SwitchLancelots;
+  | SwitchLancelots
+  | HiddenHistory;
 
 /**
  * Result of anonymous voting
@@ -50,8 +53,8 @@ export class AnonymousVoteResult {
 }
 
 @modelOptions({
-  schemaOptions: {
-    discriminatorKey: 'anonymous',
+  options: {
+    allowMixed: Severity.ALLOW,
   },
 })
 export class HistoryVoteBase extends HistoryBase {
@@ -69,38 +72,41 @@ export class HistoryVoteBase extends HistoryBase {
   @prop({ required: true })
   public leaderID!: string;
 
-  @prop({ required: true, type: () => [TeamMember] })
+  @prop({ required: true, type: () => [TeamMember], _id: false })
   public team!: TeamMember[];
 
   @prop({ required: true })
   public forced!: boolean;
+
+  @prop({ required: true, type: Schema.Types.Mixed, _id: false })
+  public votes!: AnonymousVoteResult | Vote[];
 }
 
 export class AnonymousHistoryVote extends HistoryVoteBase {
   declare public anonymous: true;
 
-  @prop({ required: true })
-  public votes!: AnonymousVoteResult;
+  @prop({ required: true, _id: false })
+  declare votes: AnonymousVoteResult;
 }
 
-export class CommonHistoryVote extends HistoryVoteBase {
+export class HistoryVote extends HistoryVoteBase {
   declare public anonymous: false;
 
-  @prop({ required: true, type: () => [Vote] })
-  public votes!: Vote[];
+  @prop({ required: true, type: () => [Vote], _id: false })
+  declare votes: Vote[];
 }
 
 /**
  * History vote data
  */
-export type THistoryVote = AnonymousHistoryVote | CommonHistoryVote;
+export type THistoryVote = AnonymousHistoryVote | HistoryVote;
 
 /**
  * General history mission data
  */
 @modelOptions({
-  schemaOptions: {
-    discriminatorKey: 'hidden',
+  options: {
+    allowMixed: Severity.ALLOW,
   },
 })
 export class HistoryMissionBase extends HistoryBase {
@@ -112,27 +118,29 @@ export class HistoryMissionBase extends HistoryBase {
   @prop({ required: true })
   public index!: number;
 
-  @prop({ required: true })
+  @prop({ required: true, _id: false })
   public settings!: MissionSettings;
 
   @prop()
   public leaderID?: string;
 
-  @prop({ required: true, type: Schema.Types.Mixed })
+  @prop({ required: true, type: Schema.Types.Mixed, _id: false })
   public actions!: IAction[] | IActionWithResult[];
+
+  @prop()
+  public result?: TMissionResult;
+
+  @prop()
+  public fails?: number;
 }
 
 /**
  * Complete history mission data
  */
-export class HistoryMissionComplete extends HistoryMissionBase {
+export class HistoryMission extends HistoryMissionBase {
   declare hidden: false;
-
-  @prop({ required: true })
-  public result!: TMissionResult;
-
-  @prop({ required: true })
-  public fails!: number;
+  declare result: TMissionResult;
+  declare fails: number;
 }
 
 /**
@@ -147,7 +155,7 @@ export class HistoryMissionHidden extends HistoryMissionBase {
 /**
  * History mission data
  */
-export type THistoryMission = HistoryMissionHidden | HistoryMissionComplete;
+export type THistoryMission = HistoryMissionHidden | HistoryMission;
 
 /**
  * History assassinate data
@@ -250,6 +258,11 @@ export class LancelotsIDs {
 /**
  * Switch lancelots data
  */
+@modelOptions({
+  options: {
+    allowMixed: Severity.ALLOW,
+  },
+})
 export class SwitchLancelots extends HistoryBase {
   declare type: 'switchLancelots';
 

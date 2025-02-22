@@ -4,6 +4,8 @@ export const fakeGames: TRoomState[] = [
   {
     roomID: '123-456-789',
     leaderID: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
+    startAt: 'Sat Oct 12 2024 10:58:57 GMT+0000 (Coordinated Universal Time)',
+    createAt: 'Sat Oct 12 2024 10:58:44 GMT+0000 (Coordinated Universal Time)',
     chat: [],
     options: {
       addons: {
@@ -1764,6 +1766,8 @@ export const fakeGames: TRoomState[] = [
   {
     roomID: '123-456-789-0',
     leaderID: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
+    startAt: 'Sat Oct 12 2024 09:43:21 GMT+0000 (Coordinated Universal Time)',
+    createAt: 'Sat Oct 12 2024 09:35:31 GMT+0000 (Coordinated Universal Time)',
     chat: [
       {
         message: 'я могу сыграть если что  ',
@@ -2685,6 +2689,8 @@ export const fakeGames: TRoomState[] = [
   {
     roomID: '123-456-789-1',
     leaderID: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
+    startAt: 'Sun Jan 26 2025 22:26:00 GMT+0000 (Coordinated Universal Time)',
+    createAt: 'Sun Jan 26 2025 22:25:55 GMT+0000 (Coordinated Universal Time)',
     chat: [],
     options: {
       addons: {},

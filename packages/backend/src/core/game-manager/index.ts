@@ -65,6 +65,7 @@ export class GameManager {
 
     if (this.game.result) {
       eventBus.emit('roomUpdated', this.roomID);
+      eventBus.emit('gameEnded', this.roomID);
     }
 
     this.sendNewStateToUsers();

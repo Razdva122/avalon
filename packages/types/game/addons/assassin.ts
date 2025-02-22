@@ -26,13 +26,6 @@ export type TAssassinateResult = 'miss' | 'hit';
  */
 export type TAssassinAddonStages = 'assassinate';
 
-export type TAssassinAddonFeatures = {
-  /**
-   * True if player assassin
-   */
-  isAssassin?: boolean;
-};
-
 /**
  * Possible assassinate targets
  */
@@ -45,6 +38,6 @@ export class AssassinAddonData {
   @prop({ required: true, type: () => [String] })
   public assassinateTargets!: TAssassinateType[];
 
-  @prop()
+  @prop({ _id: false })
   public progressData?: AssassinateProgressData;
 }

@@ -20,10 +20,10 @@ export class GameRoles {
 }
 
 export class GameSettings {
-  @prop({ required: true, type: () => [MissionSettings] })
+  @prop({ required: true, type: () => [MissionSettings], _id: false })
   missions!: MissionSettings[];
 
-  @prop({ required: true })
+  @prop({ required: true, _id: false })
   players!: PlayersSettings;
 
   @prop({ required: true })
@@ -31,6 +31,6 @@ export class GameSettings {
 }
 
 export class GameSettingsWithRoles extends GameSettings {
-  @prop({ required: true })
+  @prop({ required: true, _id: false })
   roles!: GameRoles;
 }

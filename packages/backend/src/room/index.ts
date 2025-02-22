@@ -1,5 +1,5 @@
 import { User } from '@/user';
-import type { TRoomState, Server, GameOptions, TVoteTarget, TVoteInRoom } from '@avalon/types';
+import type { TRoomState, Server, GameOptions, TVoteTarget, VoteInRoom } from '@avalon/types';
 import type { TRoomData } from '@/room/interface';
 import { eventBus } from '@/helpers';
 import { GameManager } from '@/core/game-manager';
@@ -11,13 +11,13 @@ export class Room {
   nextRoomID?: string;
   players: User[];
   leaderID: string;
-  vote?: TVoteInRoom;
+  vote?: VoteInRoom;
   chat: Chat;
   options: GameOptions;
   data: TRoomData = { stage: 'created' };
   maxCapacity = 10;
-  createTime: string;
-  startTime?: string;
+  createAt: string;
+  startAt?: string;
   io: Server;
 
   constructor(roomID: string, leaderID: string, players: User[], io: Server, options?: GameOptions) {
@@ -27,7 +27,7 @@ export class Room {
     this.leaderID = leaderID;
     this.chat = new Chat();
     this.options = options || { addons: {}, roles: {}, features: {} };
-    this.createTime = String(new Date());
+    this.createAt = String(new Date());
   }
 
   joinGame(userID: string, name: string) {
@@ -96,8 +96,12 @@ export class Room {
   }
 
   startGame() {
-    this.data = { stage: 'started', manager: new GameManager(this.players, this.options, this.io, this.roomID) };
-    this.startTime = String(new Date());
+    this.startAt = String(new Date());
+    this.data = {
+      stage: 'started',
+      startAt: this.startAt,
+      manager: new GameManager(this.players, this.options, this.io, this.roomID),
+    };
     this.updateRoomState(true);
   }
 
@@ -109,11 +113,13 @@ export class Room {
       chat: this.chat.history,
       options: this.options,
       players: this.players.map(({ name, id }) => ({ name, id, isLeader: id === this.leaderID })),
+      createAt: this.createAt,
     };
 
     if (this.data.stage === 'started') {
       return {
         ...roomState,
+        startAt: this.data.startAt,
         stage: this.data.stage,
         game: this.data.manager.prepareStateForUser(userID),
       };

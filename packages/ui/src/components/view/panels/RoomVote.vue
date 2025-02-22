@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import type { TVoteInRoom } from '@avalon/types';
+import type { VoteInRoom } from '@avalon/types';
 import { socket } from '@/api/socket';
 
 export default defineComponent({
@@ -29,7 +29,7 @@ export default defineComponent({
       required: true,
     },
     vote: {
-      type: Object as PropType<TVoteInRoom>,
+      type: Object as PropType<VoteInRoom>,
       required: true,
     },
   },

@@ -6,7 +6,7 @@ import cors from 'cors';
 
 import { backendPort, frontendURL } from '@/const';
 
-import { connectDB } from '@/db';
+import { connectDB, DBManager } from '@/db';
 
 import { Manager } from '@/main';
 
@@ -20,12 +20,12 @@ const corsOpts = {
 };
 const io = new Server(server, corsOpts);
 
-new Manager(io);
-
 app.use(CookieParser());
 app.use(cors(corsOpts.cors));
 
-connectDB();
+connectDB().then((mongoose) => {
+  new Manager(io, new DBManager(mongoose));
+});
 
 server.listen(backendPort, () => {
   console.log(`server running at http://localhost:${backendPort}`);

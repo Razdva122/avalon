@@ -1,7 +1,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 import last from 'lodash/last';
 
-import type { VisualGameState, TRoomState, THistoryResults, TGameStage, Player, TRoomPlayer } from '@avalon/types';
+import type { VisualGameState, TRoomState, THistoryResults, TGameStage, Player, RoomPlayer } from '@avalon/types';
 import { Ref, computed, ref, provide, InjectionKey } from 'vue';
 import { TPageRoomStateRef, TStartedPageRoomState } from '@/helpers/game-state-manager/interface';
 
@@ -329,7 +329,7 @@ export class GameStateManager {
       const indexOfPlayer = roomOrGame.players.findIndex((player) => player.id === userID);
 
       if (indexOfPlayer !== -1) {
-        roomOrGame.players = <Player[] | TRoomPlayer[]>[
+        roomOrGame.players = <Player[] | RoomPlayer[]>[
           ...roomOrGame.players.slice(indexOfPlayer),
           ...roomOrGame.players.slice(0, indexOfPlayer),
         ];

@@ -33,7 +33,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { defineComponent, PropType, inject, computed, toRefs, ref } from 'vue';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
-import type { TRoomPlayer, THistoryResults, Dictionary, TGameStage, IActionWithResult } from '@avalon/types';
+import type { RoomPlayer, THistoryResults, Dictionary, TGameStage, IActionWithResult } from '@avalon/types';
 import type { IFrontendPlayer } from '@/components/view/board/interface';
 import { gameStateKey } from '@/helpers/game-state-manager';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
@@ -44,7 +44,7 @@ export default defineComponent({
   },
   props: {
     playerState: {
-      type: Object as PropType<IFrontendPlayer | TRoomPlayer>,
+      type: Object as PropType<IFrontendPlayer | RoomPlayer>,
       required: true,
     },
     visibleHistory: {

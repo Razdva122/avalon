@@ -9,17 +9,6 @@ type CheckRoleKeys<T> = keyof T extends TOptionalRoles
     : 'Missing properties in class: ' & Exclude<TOptionalRoles, keyof T>
   : 'Extra properties in class: ' & Exclude<keyof T, TOptionalRoles>;
 
-export class GameOptions {
-  @prop({ required: true })
-  public roles!: GameOptionsRoles;
-
-  @prop({ required: true })
-  public addons!: GameOptionsAddons;
-
-  @prop({ required: true })
-  public features!: GameOptionsFeatures;
-}
-
 export class GameOptionsRoles implements CheckRoleKeys<GameOptionsRoles> {
   @prop()
   public merlin?: number;
@@ -96,4 +85,15 @@ export class GameOptionsFeatures {
 
   @prop()
   public displayIndex?: boolean;
+}
+
+export class GameOptions {
+  @prop({ required: true, type: () => GameOptionsRoles, _id: false })
+  public roles!: GameOptionsRoles;
+
+  @prop({ required: true, type: () => GameOptionsAddons, _id: false })
+  public addons!: GameOptionsAddons;
+
+  @prop({ required: true, type: () => GameOptionsFeatures, _id: false })
+  public features!: GameOptionsFeatures;
 }

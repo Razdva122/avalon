@@ -1,11 +1,11 @@
 import { prop } from '@typegoose/typegoose';
 
-import type { TLadyOfLakeStages, TLadyOfLakeFeatures } from './lady-of-lake';
-import type { LadyOfSeaAddonData, TLadyOfSeaFeatures } from './lady-of-sea';
-import type { TExcaliburStages, TExcaliburFeatures } from './excalibur';
+import type { TLadyOfLakeStages } from './lady-of-lake';
+import type { LadyOfSeaAddonData } from './lady-of-sea';
+import type { TExcaliburStages } from './excalibur';
 import type { TLancelotsStages } from './lancelots';
 import type { TWitchStages } from './witch';
-import type { TAssassinAddonStages, TAssassinAddonFeatures } from './assassin';
+import type { TAssassinAddonStages } from './assassin';
 import { AssassinAddonData } from './assassin';
 
 export type { TAssassinateResult, TAssassinateType, AssassinAddonData, AssassinateProgressData } from './assassin';
@@ -23,16 +23,40 @@ export type TAddonsStages =
 /**
  * Player features added with addons
  */
-export type TAddonsFeatures = TLadyOfLakeFeatures & TLadyOfSeaFeatures & TExcaliburFeatures & TAssassinAddonFeatures;
+export class AddonsFeatures {
+  /**
+   * A sign that the player has the Lady of the Lake ability or not
+   */
+  @prop()
+  ladyOfLake?: 'has' | 'used';
+
+  /**
+   * A sign that the player has the Lady of the sea ability or not
+   */
+  @prop()
+  ladyOfSea?: 'has' | 'used';
+
+  /**
+   * A sign that the player has the excalibur
+   */
+  @prop()
+  excalibur?: boolean;
+
+  /**
+   * True if player assassin
+   */
+  @prop()
+  isAssassin?: boolean;
+}
 
 /**
  * Addons data
  */
 export class AddonsData {
-  @prop()
+  @prop({ _id: false })
   public assassin?: AssassinAddonData;
 
-  @prop()
+  @prop({ _id: false })
   public ladyOfSea?: LadyOfSeaAddonData;
 }
 

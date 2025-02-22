@@ -1,17 +1,18 @@
 import { Room } from '@/room';
 import { User } from '@/user';
-import type { Dictionary, TRoomInfo, TRoomsList, GameOptions } from '@avalon/types';
+import type { Dictionary, TRoomInfo, TRoomsList, GameOptions, StartedRoomState } from '@avalon/types';
 import type { Server, ServerSocket } from '@avalon/types';
 import crypto from 'crypto';
 
 import { parseCookie, handleSocketErrors, eventBus } from '@/helpers';
 import { fakeGames } from '@/helpers/mocks/game';
-import { fakeRooms } from '@/helpers/mocks/rooms';
+import { DBManager } from '@/db';
 
 export class Manager {
   rooms: Dictionary<Room> = {};
-  roomsList: TRoomsList = fakeRooms;
+  roomsList: TRoomsList = [];
   io: Server;
+  dbManager: DBManager;
   onlineCounter: Dictionary<number> = {};
 
   get roomListCutted() {
@@ -43,8 +44,8 @@ export class Manager {
         host: room.players.find((player) => player.id === room.leaderID)?.name ?? 'unknown',
         state: room.data.stage,
         options: room.options,
-        startTime: room.startTime,
-        createTime: room.createTime,
+        startAt: room.startAt,
+        createAt: room.createAt,
         uuid: room.roomID,
         players: room.players.length,
       };
@@ -67,6 +68,22 @@ export class Manager {
     }
 
     this.io.to('lobby').emit('roomsListUpdated', this.roomListCutted);
+  }
+
+  generateRoomsListFromDB(rooms: StartedRoomState[]) {
+    const roomsInfo = rooms.map<TRoomInfo>((room) => {
+      return {
+        host: room.players.find((player) => player.id === room.leaderID)?.name ?? 'unknown',
+        state: 'started',
+        options: room.options,
+        startAt: room.startAt,
+        createAt: room.createAt,
+        uuid: room.roomID,
+        players: room.players.length,
+      };
+    });
+
+    this.roomsList.unshift(...roomsInfo);
   }
 
   restartRoom(uuid: string) {
@@ -101,11 +118,33 @@ export class Manager {
     delete this.rooms[uuid];
   }
 
-  constructor(io: Server) {
+  saveRoomToDB(room: Room) {
+    const state = room.calculateRoomState();
+
+    if (state.stage === 'started') {
+      this.dbManager.saveRoomToDB(state);
+    }
+  }
+
+  constructor(io: Server, dbManager: DBManager) {
     this.io = io;
+    this.dbManager = dbManager;
+
+    this.dbManager.getLastRooms(10).then((rooms) => {
+      this.generateRoomsListFromDB(rooms);
+    });
 
     eventBus.on('roomUpdated', (room) => {
       this.updateRoomsList(room);
+    });
+
+    eventBus.on('gameEnded', (roomID) => {
+      const room = this.rooms[roomID];
+
+      if (room) {
+        this.saveRoomToDB(room);
+        delete this.rooms[roomID];
+      }
     });
 
     eventBus.on('restartRoom', (room) => {
@@ -126,19 +165,19 @@ export class Manager {
         socket.join(userID);
       }
 
-      socket.on('joinRoom', (uuid, cb) => {
+      socket.on('joinRoom', async (uuid, cb) => {
         console.log(`user ${userName} join room uuid: ${uuid}`);
 
-        const fakeGame = fakeGames.find((el) => el.roomID === uuid);
         const room = this.rooms[uuid];
+        const gameFromDB = await this.dbManager.getRoomFromDB(uuid);
 
-        if (fakeGame || room) {
+        if (room || gameFromDB) {
           socket.join(uuid);
           this.updateOnlineCounter(uuid, 1);
         }
 
-        if (fakeGame) {
-          cb(fakeGame);
+        if (gameFromDB) {
+          cb(gameFromDB);
           return;
         }
 
@@ -184,15 +223,15 @@ export class Manager {
       const currentTime = new Date();
 
       this.roomsList = this.roomsList.filter((el) => {
-        const createTime = new Date(el.createTime);
+        const createAt = new Date(el.createAt);
         const minutes = 60 * 1000;
 
-        if (!el.startTime) {
-          return (Number(currentTime) - Number(createTime)) / minutes < 30;
+        if (!el.startAt) {
+          return (Number(currentTime) - Number(createAt)) / minutes < 30;
         } else {
-          const startTime = new Date(el.startTime);
+          const startAt = new Date(el.startAt);
 
-          return (Number(currentTime) - Number(startTime)) / minutes < 600 || el.result?.winner;
+          return (Number(currentTime) - Number(startAt)) / minutes < 600 || el.result?.winner;
         }
       });
     }, 60000 * 30);

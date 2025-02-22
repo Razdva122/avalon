@@ -8,7 +8,7 @@ export type TRoomInfo = {
   state: 'created' | 'started' | 'locked';
   uuid: string;
   options: GameOptions;
-  createTime: string;
-  startTime?: string;
+  createAt: string;
+  startAt?: string;
   result?: GameResults;
 };

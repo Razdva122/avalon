@@ -18,8 +18,8 @@ export const fakeRooms: TRoomsList = [
         anonymousVoting: true,
       },
     },
-    startTime: 'Sun Jan 26 2025 22:26:00 GMT+0000 (Coordinated Universal Time)',
-    createTime: 'Sun Jan 26 2025 22:25:55 GMT+0000 (Coordinated Universal Time)',
+    startAt: 'Sun Jan 26 2025 22:26:00 GMT+0000 (Coordinated Universal Time)',
+    createAt: 'Sun Jan 26 2025 22:25:55 GMT+0000 (Coordinated Universal Time)',
     uuid: '123-456-789-1',
     players: 8,
     result: {
@@ -46,8 +46,8 @@ export const fakeRooms: TRoomsList = [
         anonymousVoting: false,
       },
     },
-    startTime: 'Sat Oct 12 2024 10:58:57 GMT+0000 (Coordinated Universal Time)',
-    createTime: 'Sat Oct 12 2024 10:58:44 GMT+0000 (Coordinated Universal Time)',
+    startAt: 'Sat Oct 12 2024 10:58:57 GMT+0000 (Coordinated Universal Time)',
+    createAt: 'Sat Oct 12 2024 10:58:44 GMT+0000 (Coordinated Universal Time)',
     uuid: '123-456-789',
     players: 8,
     result: {
@@ -74,8 +74,8 @@ export const fakeRooms: TRoomsList = [
         anonymousVoting: false,
       },
     },
-    startTime: 'Sat Oct 12 2024 09:43:21 GMT+0000 (Coordinated Universal Time)',
-    createTime: 'Sat Oct 12 2024 09:35:31 GMT+0000 (Coordinated Universal Time)',
+    startAt: 'Sat Oct 12 2024 09:43:21 GMT+0000 (Coordinated Universal Time)',
+    createAt: 'Sat Oct 12 2024 09:35:31 GMT+0000 (Coordinated Universal Time)',
     uuid: '123-456-789-0',
     players: 7,
     result: {

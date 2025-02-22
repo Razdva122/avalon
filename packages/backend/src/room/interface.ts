@@ -12,6 +12,7 @@ export type TLockedRoomData = {
 
 export type TStartedRoomData = {
   stage: 'started';
+  startAt: string;
   manager: GameManager;
 };
 

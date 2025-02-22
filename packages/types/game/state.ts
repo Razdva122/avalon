@@ -1,4 +1,4 @@
-import { prop } from '@typegoose/typegoose';
+import { prop, Severity, modelOptions } from '@typegoose/typegoose';
 import { Schema } from 'mongoose';
 
 import { Player } from './player';
@@ -14,10 +14,10 @@ import {
   HistoryMissionBase,
 } from './history';
 import type { THistoryResults } from './history';
-import type { GameSettingsWithRoles } from './settings';
-import type { TAddonsStages, AddonsData } from './addons';
+import { GameSettingsWithRoles } from './settings';
+import { TAddonsStages, AddonsData } from './addons';
 import type { TLoyalty } from '../game/roles';
-import type { GameOptionsFeatures } from '../game/options';
+import { GameOptionsFeatures } from '../game/options';
 import type { Dictionary } from '../utils';
 
 export class GameResults {
@@ -28,15 +28,20 @@ export class GameResults {
   reason!: TGameEndReasons;
 }
 
+@modelOptions({
+  options: {
+    allowMixed: Severity.ALLOW,
+  },
+})
 export class VisualGameState {
-  @prop()
+  @prop({ _id: false })
   public result?: GameResults;
 
-  @prop({ unique: true, required: true })
+  @prop({ required: true })
   public uuid!: string;
 
   @prop({ required: true })
-  public stage!: string;
+  public stage!: TGameStage;
 
   @prop({ required: true })
   public vote!: number;
@@ -44,37 +49,37 @@ export class VisualGameState {
   @prop({ required: true })
   public mission!: number;
 
-  @prop({ required: true, type: () => [MissionWithResult] })
+  @prop({ required: true, type: () => [MissionWithResult], _id: false })
   public missionState!: MissionWithResult[];
 
-  @prop({ required: true })
+  @prop({ required: true, _id: false })
   public settings!: GameSettingsWithRoles;
 
   @prop({
+    _id: false,
     type: () => [HistoryBase],
     discriminators: () => [
-      { type: HistoryVoteBase },
-      { type: HistoryMissionBase },
-      { type: HistoryAssassinate },
-      { type: CheckLoyalty },
-      { type: SwitchResult },
-      { type: HiddenHistory },
-      { type: SwitchLancelots },
+      { type: HistoryVoteBase, value: 'vote' },
+      { type: HistoryMissionBase, value: 'mission' },
+      { type: HistoryAssassinate, value: 'assassinate' },
+      { type: CheckLoyalty, value: 'checkLoyalty' },
+      { type: SwitchResult, value: 'switchResult' },
+      { type: HiddenHistory, value: 'hiddenHistory' },
+      { type: SwitchLancelots, value: 'switchLancelots' },
     ],
-    _id: false,
   })
   public history!: THistoryResults[];
 
-  @prop({ required: true, type: () => [Player] })
+  @prop({ required: true, type: () => [Player], _id: false })
   public players!: Player[];
 
-  @prop({ required: true })
+  @prop({ required: true, _id: false })
   public addonsData!: AddonsData;
 
-  @prop({ required: true })
+  @prop({ required: true, _id: false })
   public features!: GameOptionsFeatures;
 
-  @prop({ type: Schema.Types.Mixed })
+  @prop({ type: Schema.Types.Mixed, _id: false })
   public debug?: Dictionary<unknown>;
 }
 

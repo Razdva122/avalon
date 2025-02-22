@@ -12,7 +12,7 @@ import type {
 import type { Character } from '@/core/roles';
 import type { User } from '@/user';
 
-import type { TGameStage, IPlayerFeatures, GameSettings } from '@avalon/types';
+import type { TGameStage, PlayerFeatures, GameSettings } from '@avalon/types';
 
 export interface IPresetsForGame {
   [key: number]: GameSettings;
@@ -28,7 +28,7 @@ export interface IPlayerInGame {
    */
   next: IPlayerInGame;
 
-  features: IPlayerFeatures;
+  features: PlayerFeatures;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
