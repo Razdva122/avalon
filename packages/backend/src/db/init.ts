@@ -11,11 +11,8 @@ export const connectDB = async () => {
     const prodSettings =
       process.env.NODE_ENV === 'production'
         ? ({
-            ssl: true,
-            sslValidate: true,
             authMechanism: 'DEFAULT',
             retryWrites: true,
-            w: 'majority',
           } as const)
         : {};
 
