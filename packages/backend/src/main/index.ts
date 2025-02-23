@@ -142,7 +142,6 @@ export class Manager {
 
       if (room) {
         this.saveRoomToDB(room);
-        delete this.rooms[roomID];
       }
     });
 
