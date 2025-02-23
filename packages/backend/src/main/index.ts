@@ -5,7 +5,6 @@ import type { Server, ServerSocket } from '@avalon/types';
 import crypto from 'crypto';
 
 import { parseCookie, handleSocketErrors, eventBus } from '@/helpers';
-import { fakeGames } from '@/helpers/mocks/game';
 import { DBManager } from '@/db';
 
 export class Manager {

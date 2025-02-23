@@ -2,15 +2,7 @@ import mongoose from 'mongoose';
 import { getModelForClass } from '@typegoose/typegoose';
 import { StartedRoomState } from '@avalon/types';
 
-export const connectDB = async () => {
-  try {
-    const mongooseInsatnce = await mongoose.connect('mongodb://admin:secret@localhost:27017/avalon?authSource=admin');
-    console.log('✅ MongoDB Connected');
-    return mongooseInsatnce;
-  } catch (error) {
-    console.error('❌ MongoDB Connection Error:', error);
-  }
-};
+export * from '@/db/init';
 
 export class DBManager {
   roomModel = getModelForClass(StartedRoomState);

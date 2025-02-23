@@ -8,15 +8,16 @@
   ],
   "scripts": {
     "dev": "npm run docker:mongo && npm run dev:lite",
-    "dev:lite": "npm run serve --workspace=packages/ui & npm run dev --workspace=packages/backend",
-    "docker:mongo": "docker-compose -f docker-compose.dev.yml up -d && npx wait-port localhost:27017 --timeout 30000",
+    "dev:lite": "cross-env NODE_ENV=development npm run serve --workspace=packages/ui & npm run dev --workspace=packages/backend",
+    "docker:mongo": "docker-compose -f docker-compose.dev.yml --env-file packages/backend/.env.development up -d && npx wait-port localhost:27017 --timeout 30000",
     "test": "npm run test --workspace=packages/backend",
-    "build:ui": "NODE_ENV=production npm run build --workspace=packages/ui",
-    "start:backend": "NODE_ENV=production npm run start --workspace=packages/backend",
+    "build:ui": "cross-env NODE_ENV=production npm run build --workspace=packages/ui",
+    "start:backend": "cross-env NODE_ENV=production npm run start --workspace=packages/backend",
     "version": "npm run test && npm version $npm_package_version --no-git-tag-version --workspaces && git add .",
     "postversion": "git push && git push origin tag v$npm_package_version"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
     "eventemitter3": "^5.0.1",
     "lodash": "^4.17.21",
     "typescript": "^5.3.3"
@@ -28,6 +29,7 @@
     "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.55.0",
     "jest": "^29.7.0",
     "jest-junit": "^16.0.0",
