@@ -79,6 +79,7 @@ export class Manager {
         createAt: room.createAt,
         uuid: room.roomID,
         players: room.players.length,
+        result: room.game.result,
       };
     });
 
