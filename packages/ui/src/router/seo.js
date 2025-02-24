@@ -28,6 +28,7 @@ const {
   merlinPure,
   cleric,
   revealer,
+  stats,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -359,6 +360,16 @@ module.exports.routesSeo = {
         ...minion,
       },
       image: 'roles/minion.webp',
+    },
+  },
+  stats: {
+    path: '/stats/',
+    name: 'stats',
+    meta: {
+      multiLanguage: {
+        ...stats,
+      },
+      skipSiteMap: true,
     },
   },
   notFound: {

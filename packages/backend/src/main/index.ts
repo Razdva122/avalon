@@ -202,6 +202,12 @@ export class Manager {
         cb(this.onlineCounter[id]);
       });
 
+      socket.on('getTotalStats', async (cb) => {
+        const stats = await dbManager.getFullStats();
+
+        cb(stats);
+      });
+
       if (userID && userName) {
         this.createMethodsForAuthUsers(socket, userID, userName);
         this.createMethodsForGame(socket, userID, userName);

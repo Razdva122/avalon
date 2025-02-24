@@ -12,6 +12,7 @@ import type { IRoomUnavailableError } from './errors';
 import type { TAssassinateType } from '../game/addons';
 
 import type { TRoomsList, TMessage } from '../room';
+import { TTotalWinrateStats } from '../stats';
 
 export type { ISocketError } from './errors';
 
@@ -28,6 +29,7 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
+  getTotalStats: (callback: (stats: TTotalWinrateStats) => void) => void;
   getRoomsList: (callback: (list: TRoomsList) => void) => void;
   getOnlineCounter: (id: string, callback: (counter: number) => void) => void;
 

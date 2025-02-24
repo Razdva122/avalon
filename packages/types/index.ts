@@ -11,3 +11,4 @@ export * from './api/sockets';
 export * from './room';
 export * from './utils';
 export * from './consts';
+export * from './stats';

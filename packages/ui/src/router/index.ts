@@ -35,6 +35,7 @@ const routeComponentMap = {
   minion: () => import('@/pages/wiki/roles/Minion.vue'),
   cleric: () => import('@/pages/wiki/roles/Cleric.vue'),
   revealer: () => import('@/pages/wiki/roles/Revealer.vue'),
+  stats: () => import('@/pages/stats/Stats.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
