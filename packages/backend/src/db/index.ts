@@ -30,7 +30,7 @@ export class DBManager {
 
   async getFullStats(): Promise<TTotalWinrateStats> {
     const result = await this.roomModel.aggregate([
-      { $match: { 'game.stage': 'end', 'game.result.reason': { $ne: 'manual' } } },
+      { $match: { 'game.stage': 'end', 'game.result.reason': { $ne: 'manualy' } } },
 
       {
         $addFields: {

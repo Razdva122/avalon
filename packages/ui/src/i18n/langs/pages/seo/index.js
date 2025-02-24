@@ -27,6 +27,7 @@ const { servant } = require('./servant');
 const { merlinPure } = require('./merlinPure');
 const { cleric } = require('./cleric');
 const { revealer } = require('./revealer');
+const { stats } = require('./stats');
 
 module.exports = {
   lobby,
@@ -58,4 +59,5 @@ module.exports = {
   merlinPure,
   cleric,
   revealer,
+  stats,
 };
