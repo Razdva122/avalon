@@ -56,20 +56,47 @@
           </tbody>
         </table>
       </div>
+
+      <template v-for="side in <const>['good', 'evil']">
+        <div :class="side + '-role-stats'" v-if="roles[side].length > 0">
+          <h2>Статистика по {{ side }} ролям</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Роль</th>
+                <th>Кол-во игр</th>
+                <th>Влияние на победу</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(stats, index) in roles[side]" :key="index">
+                <td><PreviewLink :target="stats.role" /></td>
+                <td>{{ stats.gamesCount }}</td>
+                <td :class="stats.diff > 0 ? 'profit' : stats.diff < 0 ? 'loss' : ''">{{ stats.diff }}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
     </template>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import type { TTotalWinrateStats } from '@avalon/types';
+import { defineComponent, ref, computed } from 'vue';
+import { TTotalWinrateStats, goodRolesImportance, TRoleStats } from '@avalon/types';
 import { socket } from '@/api/socket';
 import PlayerCountsStats from '@/components/stats/PlayerCountsStats.vue';
+import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import { Stats } from 'fs';
+
+type TRolesStatsWithDiff = TRoleStats & { diff: number };
 
 export default defineComponent({
   name: 'Stats',
   components: {
     PlayerCountsStats,
+    PreviewLink,
   },
   async setup() {
     const state = ref<TTotalWinrateStats>();
@@ -82,8 +109,29 @@ export default defineComponent({
 
     await initState();
 
+    const roles = computed(() => {
+      const sideStats = state.value!.roleStats.reduce<{ good: TRolesStatsWithDiff[]; evil: TRolesStatsWithDiff[] }>(
+        (acc, el) => {
+          if (el.role in goodRolesImportance) {
+            acc.good.push({ ...el, diff: state.value!.total.goodWinPercentage - el.goodWinPercentage });
+          } else {
+            acc.evil.push({ ...el, diff: state.value!.total.evilWinPercentage - el.evilWinPercentage });
+          }
+
+          return acc;
+        },
+        { good: [], evil: [] },
+      );
+
+      sideStats.evil.sort((a, b) => b.gamesCount - a.gamesCount);
+      sideStats.good.sort((a, b) => b.gamesCount - a.gamesCount);
+
+      return sideStats;
+    });
+
     return {
       state,
+      roles,
     };
   },
 });
@@ -113,25 +161,37 @@ export default defineComponent({
   text-align: left;
 }
 
-.player-stats table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
+.player-stats,
+.good-role-stats,
+.evil-role-stats {
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  table thead th {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  table tbody td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  table tbody tr:hover {
+    background-color: #f1f1f1;
+  }
 }
 
-.player-stats table thead th {
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: center;
+.profit {
+  color: rgb(var(--v-theme-success));
 }
 
-.player-stats table tbody td {
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: center;
-}
-
-.player-stats table tbody tr:hover {
-  background-color: #f1f1f1;
+.loss {
+  color: rgb(var(--v-theme-error));
 }
 </style>

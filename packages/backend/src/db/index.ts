@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { getModelForClass } from '@typegoose/typegoose';
 import { StartedRoomState, TTotalWinrateStats, TWinrateStats } from '@avalon/types';
+import { query } from '@/db/query';
 
 export * from '@/db/init';
 
@@ -29,59 +30,12 @@ export class DBManager {
   }
 
   async getFullStats(): Promise<TTotalWinrateStats> {
-    const result = await this.roomModel.aggregate([
-      { $match: { 'game.stage': 'end', 'game.result.reason': { $ne: 'manualy' } } },
-
-      {
-        $addFields: {
-          playerCount: { $size: '$players' },
-        },
-      },
-
-      {
-        $group: {
-          _id: { playerCount: '$playerCount', winner: '$game.result.winner' },
-          totalGames: { $sum: 1 },
-        },
-      },
-
-      {
-        $group: {
-          _id: '$_id.playerCount',
-          gamesCount: { $sum: '$totalGames' },
-          goodWins: {
-            $sum: {
-              $cond: [{ $eq: ['$_id.winner', 'good'] }, '$totalGames', 0],
-            },
-          },
-          evilWins: {
-            $sum: {
-              $cond: [{ $eq: ['$_id.winner', 'evil'] }, '$totalGames', 0],
-            },
-          },
-        },
-      },
-
-      {
-        $project: {
-          _id: 0,
-          playerCount: '$_id',
-          gamesCount: 1,
-          goodWinPercentage: {
-            $multiply: [{ $divide: ['$goodWins', { $add: ['$goodWins', '$evilWins'] }] }, 100],
-          },
-          evilWinPercentage: {
-            $multiply: [{ $divide: ['$evilWins', { $add: ['$goodWins', '$evilWins'] }] }, 100],
-          },
-          goodWins: '$goodWins',
-          evilWins: '$evilWins',
-        },
-      },
-
-      { $sort: { playerCount: 1 } },
+    const results = await Promise.all([
+      this.roomModel.aggregate(query.statsByPlayers),
+      this.roomModel.aggregate(query.rolesStats),
     ]);
 
-    const totalGamesResult = result.reduce<Omit<TWinrateStats, 'goodWinPercentage' | 'evilWinPercentage'>>(
+    const totalGamesResult = results[0].reduce<Omit<TWinrateStats, 'goodWinPercentage' | 'evilWinPercentage'>>(
       (acc, el) => {
         acc.gamesCount += el.gamesCount;
         acc.evilWins += el.evilWins;
@@ -98,7 +52,8 @@ export class DBManager {
         goodWinPercentage: (totalGamesResult.goodWins / totalGamesResult.gamesCount) * 100,
         evilWinPercentage: (totalGamesResult.evilWins / totalGamesResult.gamesCount) * 100,
       },
-      byPlayers: result,
+      byPlayers: results[0],
+      roleStats: results[1],
     };
   }
 }
