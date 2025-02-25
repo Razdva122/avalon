@@ -27,6 +27,10 @@
         </table>
       </div>
 
+      <div>
+        <PlayerCountsStats :statsByPlayer="state.byPlayers" />
+      </div>
+
       <div class="player-stats" v-if="state.byPlayers.length > 0">
         <h2>Статистика по Количество Игроков</h2>
         <table>
@@ -60,9 +64,13 @@
 import { defineComponent, ref } from 'vue';
 import type { TTotalWinrateStats } from '@avalon/types';
 import { socket } from '@/api/socket';
+import PlayerCountsStats from '@/components/stats/PlayerCountsStats.vue';
 
 export default defineComponent({
   name: 'Stats',
+  components: {
+    PlayerCountsStats,
+  },
   async setup() {
     const state = ref<TTotalWinrateStats>();
 
