@@ -17,11 +17,11 @@
             </tr>
             <tr>
               <td>Побед "good":</td>
-              <td>{{ state.total.goodWins }} ({{ state.total.goodWinPercentage }}%)</td>
+              <td>{{ state.total.goodWins }} ({{ pretifyPercent(state.total.goodWinPercentage) }}%)</td>
             </tr>
             <tr>
               <td>Побед "evil":</td>
-              <td>{{ state.total.evilWins }} ({{ state.total.evilWinPercentage }}%)</td>
+              <td>{{ state.total.evilWins }} ({{ pretifyPercent(state.total.evilWinPercentage) }}%)</td>
             </tr>
           </tbody>
         </table>
@@ -50,8 +50,8 @@
               <td>{{ stats.gamesCount }}</td>
               <td>{{ stats.goodWins }}</td>
               <td>{{ stats.evilWins }}</td>
-              <td>{{ stats.goodWinPercentage }}%</td>
-              <td>{{ stats.evilWinPercentage }}%</td>
+              <td>{{ pretifyPercent(stats.goodWinPercentage) }}%</td>
+              <td>{{ pretifyPercent(stats.evilWinPercentage) }}%</td>
             </tr>
           </tbody>
         </table>
@@ -72,7 +72,12 @@
               <tr v-for="(stats, index) in roles[side]" :key="index">
                 <td><PreviewLink :target="stats.role" /></td>
                 <td>{{ stats.gamesCount }}</td>
-                <td :class="stats.diff > 0 ? 'profit' : stats.diff < 0 ? 'loss' : ''">{{ stats.diff }}%</td>
+                <template v-if="stats.diff > 0">
+                  <td class="profit">+{{ pretifyPercent(stats.diff) }}%</td>
+                </template>
+                <template v-else>
+                  <td :class="stats.diff < 0 ? 'loss' : ''">{{ pretifyPercent(stats.diff) }}%</td>
+                </template>
               </tr>
             </tbody>
           </table>
@@ -88,7 +93,6 @@ import { TTotalWinrateStats, goodRolesImportance, TRoleStats } from '@avalon/typ
 import { socket } from '@/api/socket';
 import PlayerCountsStats from '@/components/stats/PlayerCountsStats.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
-import { Stats } from 'fs';
 
 type TRolesStatsWithDiff = TRoleStats & { diff: number };
 
@@ -113,9 +117,9 @@ export default defineComponent({
       const sideStats = state.value!.roleStats.reduce<{ good: TRolesStatsWithDiff[]; evil: TRolesStatsWithDiff[] }>(
         (acc, el) => {
           if (el.role in goodRolesImportance) {
-            acc.good.push({ ...el, diff: state.value!.total.goodWinPercentage - el.goodWinPercentage });
+            acc.good.push({ ...el, diff: el.goodWinPercentage - state.value!.total.goodWinPercentage });
           } else {
-            acc.evil.push({ ...el, diff: state.value!.total.evilWinPercentage - el.evilWinPercentage });
+            acc.evil.push({ ...el, diff: el.evilWinPercentage - state.value!.total.evilWinPercentage });
           }
 
           return acc;
@@ -129,9 +133,12 @@ export default defineComponent({
       return sideStats;
     });
 
+    const pretifyPercent = (percent: number) => percent.toFixed(2);
+
     return {
       state,
       roles,
+      pretifyPercent,
     };
   },
 });
