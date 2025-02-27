@@ -366,6 +366,7 @@ module.exports.routesSeo = {
     path: '/stats/',
     name: 'stats',
     meta: {
+      prerender: true,
       multiLanguage: {
         ...stats,
       },
