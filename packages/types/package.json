@@ -1,6 +1,6 @@
 {
   "name": "@avalon/types",
-  "version": "43.4.1",
+  "version": "44.0.0",
   "description": "Typings for sharing between ui and backend",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
