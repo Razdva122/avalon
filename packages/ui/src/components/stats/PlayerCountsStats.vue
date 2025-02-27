@@ -78,7 +78,7 @@ export default defineComponent({
                 borderDash: [25],
                 borderWidth: 2,
                 label: {
-                  backgroundColor: theme.current.value.colors.warning,
+                  backgroundColor: 'rgba(251, 140, 0, 0.75)',
                   content: '50% winrate',
                   display: true,
                 },

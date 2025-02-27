@@ -164,4 +164,14 @@ body {
   z-index: -1;
   opacity: 0.1;
 }
+
+.v-data-table {
+  background-color: rgb(var(--v-theme-bgApp)) !important;
+  color: white !important;
+  font-size: 18px !important;
+
+  .v-data-table__th:hover {
+    color: white !important;
+  }
+}
 </style>

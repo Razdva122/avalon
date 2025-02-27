@@ -1,86 +1,36 @@
 <template>
-  <div class="">
+  <div class="info-page-content">
     <template v-if="state">
       <div class="total-stats">
+        <h1>Avalon - статистика игр</h1>
         <h2>Общая Статистика</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Параметр</th>
-              <th>Значение</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Всего игр:</td>
-              <td>{{ state.total.gamesCount }}</td>
-            </tr>
-            <tr>
-              <td>Побед "good":</td>
-              <td>{{ state.total.goodWins }} ({{ pretifyPercent(state.total.goodWinPercentage) }}%)</td>
-            </tr>
-            <tr>
-              <td>Побед "evil":</td>
-              <td>{{ state.total.evilWins }} ({{ pretifyPercent(state.total.evilWinPercentage) }}%)</td>
-            </tr>
-          </tbody>
-        </table>
+        <v-data-table :headers="generalTable.headers" :items="generalTable.data" hide-default-footer> </v-data-table>
       </div>
 
-      <div>
-        <PlayerCountsStats :statsByPlayer="state.byPlayers" />
+      <div class="d-flex justify-center">
+        <PlayerCountsStats class="chart" :statsByPlayer="state.byPlayers" />
       </div>
 
       <div class="player-stats" v-if="state.byPlayers.length > 0">
-        <h2>Статистика по Количество Игроков</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Кол-во Игроков</th>
-              <th>Всего Игры</th>
-              <th>Побед "good"</th>
-              <th>Побед "evil"</th>
-              <th>% Побед "good"</th>
-              <th>% Побед "evil"</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(stats, index) in state.byPlayers" :key="index">
-              <td>{{ stats.playerCount }}</td>
-              <td>{{ stats.gamesCount }}</td>
-              <td>{{ stats.goodWins }}</td>
-              <td>{{ stats.evilWins }}</td>
-              <td>{{ pretifyPercent(stats.goodWinPercentage) }}%</td>
-              <td>{{ pretifyPercent(stats.evilWinPercentage) }}%</td>
-            </tr>
-          </tbody>
-        </table>
+        <h2>Статистика по Количеству Игроков</h2>
+        <v-data-table :headers="byPlayersHeaders" :items="state.byPlayers" hide-default-footer>
+          <template v-slot:item.goodWinPercentage="{ value }"> {{ pretifyPercent(value) }} % </template>
+          <template v-slot:item.evilWinPercentage="{ value }"> {{ pretifyPercent(value) }} % </template>
+        </v-data-table>
       </div>
 
       <template v-for="side in <const>['good', 'evil']">
-        <div :class="side + '-role-stats'" v-if="roles[side].length > 0">
-          <h2>Статистика по {{ side }} ролям</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Роль</th>
-                <th>Кол-во игр</th>
-                <th>Влияние на победу</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(stats, index) in roles[side]" :key="index">
-                <td><PreviewLink :target="stats.role" /></td>
-                <td>{{ stats.gamesCount }}</td>
-                <template v-if="stats.diff > 0">
-                  <td class="profit">+{{ pretifyPercent(stats.diff) }}%</td>
-                </template>
-                <template v-else>
-                  <td :class="stats.diff < 0 ? 'loss' : ''">{{ pretifyPercent(stats.diff) }}%</td>
-                </template>
-              </tr>
-            </tbody>
-          </table>
+        <div>
+          <h2 v-if="side === 'evil'">Статистика по ролям Сил Света</h2>
+          <h2 v-else>Статистика по ролям Сил Тьмы</h2>
+          <v-data-table :headers="rolesTables.headers" :items="rolesTables[side]" hide-default-footer>
+            <template v-slot:item.role="{ value }">
+              <PreviewLink :target="value" />
+            </template>
+            <template v-slot:item.diff="{ value }">
+              <v-chip :color="getColorWinrate(value)"> {{ value > 0 ? '+' : '' }}{{ pretifyPercent(value) }} % </v-chip>
+            </template>
+          </v-data-table>
         </div>
       </template>
     </template>
@@ -113,18 +63,32 @@ export default defineComponent({
 
     await initState();
 
-    const roles = computed(() => {
-      const sideStats = state.value!.roleStats.reduce<{ good: TRolesStatsWithDiff[]; evil: TRolesStatsWithDiff[] }>(
+    const rolesTables = computed(() => {
+      const sideStats = state.value!.roleStats.reduce<{
+        headers: { title: string; key: string }[];
+        good: TRolesStatsWithDiff[];
+        evil: TRolesStatsWithDiff[];
+      }>(
         (acc, el) => {
-          if (el.role in goodRolesImportance) {
-            acc.good.push({ ...el, diff: el.goodWinPercentage - state.value!.total.goodWinPercentage });
-          } else {
-            acc.evil.push({ ...el, diff: el.evilWinPercentage - state.value!.total.evilWinPercentage });
+          if (el.gamesCount > 10) {
+            if (el.role in goodRolesImportance) {
+              acc.good.push({ ...el, diff: el.goodWinPercentage - state.value!.total.goodWinPercentage });
+            } else {
+              acc.evil.push({ ...el, diff: el.evilWinPercentage - state.value!.total.evilWinPercentage });
+            }
           }
 
           return acc;
         },
-        { good: [], evil: [] },
+        {
+          headers: [
+            { title: 'Роль', key: 'role' },
+            { title: 'Кол-во игр', key: 'gamesCount' },
+            { title: 'Влияние на победу', key: 'diff' },
+          ],
+          good: [],
+          evil: [],
+        },
       );
 
       sideStats.evil.sort((a, b) => b.gamesCount - a.gamesCount);
@@ -133,72 +97,64 @@ export default defineComponent({
       return sideStats;
     });
 
+    const generalTable = computed(() => {
+      const stateData = state.value!;
+      return {
+        headers: [
+          { title: 'Всего игр', key: 'gamesCount' },
+          { title: 'Побед Сил Света', key: 'goodWins' },
+          { title: 'Побед Сил Тьмы', key: 'evilWins' },
+        ],
+        data: [
+          {
+            gamesCount: stateData.total.gamesCount,
+            goodWins: `${stateData.total.goodWins} (${pretifyPercent(stateData.total.goodWinPercentage)}%)`,
+            evilWins: `${stateData.total.evilWins} (${pretifyPercent(stateData.total.evilWinPercentage)}%)`,
+          },
+        ],
+      };
+    });
+
     const pretifyPercent = (percent: number) => percent.toFixed(2);
+
+    const getColorWinrate = (winrate: number) => {
+      if (winrate === 0) {
+        return 'orange';
+      }
+
+      if (winrate > 0) {
+        return 'green';
+      }
+
+      return 'red';
+    };
+
+    const byPlayersHeaders = [
+      { title: 'Кол-во Игроков', key: 'playerCount' },
+      { title: 'Всего Игр', key: 'gamesCount' },
+      { title: 'Побед Сил Света', key: 'goodWins' },
+      { title: 'Побед Сил Тьмы', key: 'evilWins' },
+      { title: '% Побед Сил Света', key: 'goodWinPercentage' },
+      { title: '% Побед Сил Тьмы', key: 'evilWinPercentage' },
+    ];
 
     return {
       state,
-      roles,
+      rolesTables,
+      byPlayersHeaders,
+      generalTable,
       pretifyPercent,
+      getColorWinrate,
     };
   },
 });
 </script>
 
 <style scoped lang="scss">
-.statistics-container {
-  font-family: Arial, sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
+@import '@/styles/info-page.scss';
 
-.total-stats table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.total-stats table th,
-.total-stats table td {
-  padding: 10px;
-  border: 1px solid #ddd;
-}
-
-.total-stats table th {
-  text-align: left;
-}
-
-.player-stats,
-.good-role-stats,
-.evil-role-stats {
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-
-  table thead th {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-  }
-
-  table tbody td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-  }
-
-  table tbody tr:hover {
-    background-color: #f1f1f1;
-  }
-}
-
-.profit {
-  color: rgb(var(--v-theme-success));
-}
-
-.loss {
-  color: rgb(var(--v-theme-error));
+.chart {
+  max-width: 700px;
+  max-height: 350px;
 }
 </style>
