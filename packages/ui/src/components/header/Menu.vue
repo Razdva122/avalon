@@ -12,6 +12,7 @@
       <router-link to="/">{{ $t('menu.home') }}</router-link>
       <div @click="$emit('profileClick')">{{ $t('menu.profile') }}</div>
       <router-link :to="{ name: 'wiki' }">{{ $t('menu.wiki') }}</router-link>
+      <router-link :to="{ name: 'stats' }">{{ $t('menu.stats') }}</router-link>
       <router-link :to="{ name: 'about' }">{{ $t('menu.about') }}</router-link>
     </nav>
   </v-menu>

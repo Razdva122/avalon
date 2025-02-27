@@ -7,6 +7,7 @@ export const ru = {
     profile: 'Профиль',
     wiki: 'Вики',
     about: 'О сайте',
+    stats: 'Статистика',
   },
   room: {
     errorNotFound: 'Такой игры не существует',
@@ -301,6 +302,13 @@ export const ru = {
   switch: {
     skip: 'решил не использовать Экскалибур',
     switchInfo: '<b>{switcher}</b> использовал Экскалибур и изменил решение <b>{target}</b> на',
+  },
+  chartStats: {
+    countPlayer: '{playerCount} игроков',
+    evilWinrate: 'Процент побед Сил Тьмы',
+    goodWinrate: 'Процент побед Сил Света',
+    winrateByTeamSize: 'Процент побед в зависимости от размера команды',
+    halfWinrate: '50% побед',
   },
   ...pages.ru,
 };

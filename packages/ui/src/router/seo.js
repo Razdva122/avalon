@@ -369,7 +369,6 @@ module.exports.routesSeo = {
       multiLanguage: {
         ...stats,
       },
-      skipSiteMap: true,
     },
   },
   notFound: {

@@ -7,6 +7,7 @@ export const es = {
     profile: 'Perfil',
     wiki: 'Wiki',
     about: 'Acerca de',
+    stats: 'Estadísticas',
   },
   room: {
     errorNotFound: 'Este UUID es incorrecto',
@@ -302,6 +303,13 @@ export const es = {
   switch: {
     skip: 'decidió no usar excalibur',
     switchInfo: '<b>{switcher}</b> usó excalibur para cambiar la acción de <b>{target}</b> a',
+  },
+  chartStats: {
+    countPlayer: '{playerCount} jugadores',
+    evilWinrate: 'Tasa de victoria del Lado del Mal',
+    goodWinrate: 'Tasa de victoria del Lado del Bien',
+    winrateByTeamSize: 'Tasa de victorias por tamaño del equipo',
+    halfWinrate: '50% tasa de victoria',
   },
   ...pages.es,
 };

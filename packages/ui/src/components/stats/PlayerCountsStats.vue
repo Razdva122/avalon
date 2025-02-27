@@ -1,5 +1,5 @@
 <template>
-  <Bar id="my-chart-id" :options="chartOptions" :data="chartData" />
+  <Bar id="my-chart-id" :options="settings.chartOptions" :data="settings.chartData" />
 </template>
 
 <script lang="ts">
@@ -16,7 +16,8 @@ import {
   LineElement,
 } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
-import { defineComponent, PropType } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useTheme } from 'vuetify';
 import type { TTotalWinrateStats } from '@avalon/types';
 
@@ -41,69 +42,73 @@ export default defineComponent({
       type: Object as PropType<TTotalWinrateStats['byPlayers']>,
     },
   },
-  data() {
+  setup(props) {
     const theme = useTheme();
+    const { t } = useI18n();
 
-    const settings: { chartData: ChartProps<'bar'>['data']; chartOptions: ChartProps<'bar'>['options'] } = {
-      chartData: {
-        labels: this.statsByPlayer.map((el) => `${el.playerCount} players`),
-        datasets: [
-          {
-            type: 'bar',
-            label: 'Evil winrate',
-            data: this.statsByPlayer.map((el) => el.evilWinPercentage),
-            backgroundColor: theme.current.value.colors.error,
+    const settings = computed(
+      () =>
+        <{ chartData: ChartProps<'bar'>['data']; chartOptions: ChartProps<'bar'>['options'] }>{
+          chartData: {
+            labels: props.statsByPlayer.map((el) => t('chartStats.countPlayer', { playerCount: el.playerCount })),
+            datasets: [
+              {
+                type: 'bar',
+                label: t('chartStats.evilWinrate'),
+                data: props.statsByPlayer.map((el) => el.evilWinPercentage),
+                backgroundColor: theme.current.value.colors.error,
+              },
+              {
+                type: 'bar',
+                label: t('chartStats.goodWinrate'),
+                data: props.statsByPlayer.map((el) => el.goodWinPercentage),
+                backgroundColor: theme.current.value.colors.info,
+              },
+            ],
           },
-          {
-            type: 'bar',
-            label: 'Good winrate',
-            data: this.statsByPlayer.map((el) => el.goodWinPercentage),
-            backgroundColor: theme.current.value.colors.info,
-          },
-        ],
-      },
-      chartOptions: {
-        plugins: {
-          title: {
-            display: true,
-            text: 'Winrates by team size',
-          },
-          annotation: {
-            annotations: {
-              line1: {
-                type: 'line',
-                yMin: 50,
-                yMax: 50,
-                borderColor: theme.current.value.colors.warning,
-                borderDash: [25],
-                borderWidth: 2,
-                label: {
-                  backgroundColor: 'rgba(251, 140, 0, 0.75)',
-                  content: '50% winrate',
-                  display: true,
+          chartOptions: {
+            plugins: {
+              title: {
+                display: true,
+                text: t('chartStats.winrateByTeamSize'),
+              },
+              annotation: {
+                annotations: {
+                  line1: {
+                    type: 'line',
+                    yMin: 50,
+                    yMax: 50,
+                    borderColor: theme.current.value.colors.warning,
+                    borderDash: [25],
+                    borderWidth: 2,
+                    label: {
+                      backgroundColor: 'rgba(251, 140, 0, 0.75)',
+                      content: t('chartStats.halfWinrate'),
+                      display: true,
+                    },
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                stacked: true,
+              },
+              y: {
+                stacked: true,
+                min: 0,
+                max: 100,
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 10,
                 },
               },
             },
           },
         },
-        scales: {
-          x: {
-            stacked: true,
-          },
-          y: {
-            stacked: true,
-            min: 0,
-            max: 100,
-            beginAtZero: true,
-            ticks: {
-              stepSize: 10,
-            },
-          },
-        },
-      },
-    };
+    );
 
-    return settings;
+    return { settings };
   },
 });
 </script>

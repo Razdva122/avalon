@@ -130,7 +130,7 @@ export class Manager {
     this.io = io;
     this.dbManager = dbManager;
 
-    this.dbManager.getLastRooms(10).then((rooms) => {
+    this.dbManager.getLastRooms(20).then((rooms) => {
       this.generateRoomsListFromDB(rooms);
     });
 

@@ -7,6 +7,7 @@ export const en = {
     profile: 'Profile',
     wiki: 'Wiki',
     about: 'About',
+    stats: 'Statistics',
   },
   room: {
     errorNotFound: 'This is wrong uuid',
@@ -302,6 +303,13 @@ export const en = {
   switch: {
     skip: 'decided not to use excalibur',
     switchInfo: '<b>{switcher}</b> use excalibur to switch <b>{target}</b> action to',
+  },
+  chartStats: {
+    countPlayer: '{playerCount} players',
+    evilWinrate: 'Evil winrate',
+    goodWinrate: 'Good winrate',
+    winrateByTeamSize: 'Winrates by team size',
+    halfWinrate: '50% winrate',
   },
   ...pages.en,
 };

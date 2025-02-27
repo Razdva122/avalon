@@ -7,6 +7,7 @@ export const zh_TW = {
     profile: '設定',
     wiki: '維基',
     about: '關於',
+    stats: '統計',
   },
   room: {
     errorNotFound: '這是錯誤的uuid',
@@ -301,6 +302,13 @@ export const zh_TW = {
   switch: {
     skip: '決定不使用 神劍',
     switchInfo: '<b>{switcher}</b> 使用 神劍 將 <b>{target}</b> 的動作更改為',
+  },
+  chartStats: {
+    countPlayer: '{playerCount} 名玩家',
+    evilWinrate: '黑暗陣營勝率',
+    goodWinrate: '光明陣營勝率',
+    winrateByTeamSize: '根據隊伍規模的勝率',
+    halfWinrate: '50% 勝率',
   },
   ...pages['zh-TW'],
 };

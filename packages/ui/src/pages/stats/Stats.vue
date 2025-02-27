@@ -2,27 +2,25 @@
   <div class="info-page-content">
     <template v-if="state">
       <div class="total-stats">
-        <h1>Avalon - статистика игр</h1>
-        <h2>Общая Статистика</h2>
+        <h1>{{ $t('stats.title') }}</h1>
+        <h2>{{ $t('stats.generalStatsTitle') }}</h2>
         <v-data-table :headers="generalTable.headers" :items="generalTable.data" hide-default-footer> </v-data-table>
       </div>
-
       <div class="d-flex justify-center">
         <PlayerCountsStats class="chart" :statsByPlayer="state.byPlayers" />
       </div>
-
       <div class="player-stats" v-if="state.byPlayers.length > 0">
-        <h2>Статистика по Количеству Игроков</h2>
+        <h2>{{ $t('stats.playerCountStatsTitle') }}</h2>
         <v-data-table :headers="byPlayersHeaders" :items="state.byPlayers" hide-default-footer>
           <template v-slot:item.goodWinPercentage="{ value }"> {{ pretifyPercent(value) }} % </template>
           <template v-slot:item.evilWinPercentage="{ value }"> {{ pretifyPercent(value) }} % </template>
         </v-data-table>
       </div>
-
-      <template v-for="side in <const>['good', 'evil']">
+      <template v-for="side in <const>['good', 'evil']" :key="side">
         <div>
-          <h2 v-if="side === 'evil'">Статистика по ролям Сил Света</h2>
-          <h2 v-else>Статистика по ролям Сил Тьмы</h2>
+          <h2 v-if="side === 'good'">{{ $t('stats.goodRolesStatsTitle') }}</h2>
+          <h2 v-else>{{ $t('stats.evilRolesStatsTitle') }}</h2>
+
           <v-data-table :headers="rolesTables.headers" :items="rolesTables[side]" hide-default-footer>
             <template v-slot:item.role="{ value }">
               <PreviewLink :target="value" />
@@ -39,6 +37,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { TTotalWinrateStats, goodRolesImportance, TRoleStats } from '@avalon/types';
 import { socket } from '@/api/socket';
 import PlayerCountsStats from '@/components/stats/PlayerCountsStats.vue';
@@ -55,9 +54,10 @@ export default defineComponent({
   async setup() {
     const state = ref<TTotalWinrateStats>();
 
+    const { t } = useI18n();
+
     const initState = async () => {
       const stateFromBackend = await socket.emitWithAck('getTotalStats');
-
       state.value = stateFromBackend;
     };
 
@@ -77,23 +77,20 @@ export default defineComponent({
               acc.evil.push({ ...el, diff: el.evilWinPercentage - state.value!.total.evilWinPercentage });
             }
           }
-
           return acc;
         },
         {
           headers: [
-            { title: 'Роль', key: 'role' },
-            { title: 'Кол-во игр', key: 'gamesCount' },
-            { title: 'Влияние на победу', key: 'diff' },
+            { title: t('stats.role'), key: 'role' },
+            { title: t('stats.gamesCount'), key: 'gamesCount' },
+            { title: t('stats.winrateImpact'), key: 'diff' },
           ],
           good: [],
           evil: [],
         },
       );
-
       sideStats.evil.sort((a, b) => b.gamesCount - a.gamesCount);
       sideStats.good.sort((a, b) => b.gamesCount - a.gamesCount);
-
       return sideStats;
     });
 
@@ -101,9 +98,9 @@ export default defineComponent({
       const stateData = state.value!;
       return {
         headers: [
-          { title: 'Всего игр', key: 'gamesCount' },
-          { title: 'Побед Сил Света', key: 'goodWins' },
-          { title: 'Побед Сил Тьмы', key: 'evilWins' },
+          { title: t('stats.totalGames'), key: 'gamesCount' },
+          { title: t('stats.goodWins'), key: 'goodWins' },
+          { title: t('stats.evilWins'), key: 'evilWins' },
         ],
         data: [
           {
@@ -116,27 +113,24 @@ export default defineComponent({
     });
 
     const pretifyPercent = (percent: number) => percent.toFixed(2);
-
     const getColorWinrate = (winrate: number) => {
       if (winrate === 0) {
         return 'orange';
       }
-
       if (winrate > 0) {
         return 'green';
       }
-
       return 'red';
     };
 
-    const byPlayersHeaders = [
-      { title: 'Кол-во Игроков', key: 'playerCount' },
-      { title: 'Всего Игр', key: 'gamesCount' },
-      { title: 'Побед Сил Света', key: 'goodWins' },
-      { title: 'Побед Сил Тьмы', key: 'evilWins' },
-      { title: '% Побед Сил Света', key: 'goodWinPercentage' },
-      { title: '% Побед Сил Тьмы', key: 'evilWinPercentage' },
-    ];
+    const byPlayersHeaders = computed(() => [
+      { title: t('stats.playerCount'), key: 'playerCount' },
+      { title: t('stats.totalGames'), key: 'gamesCount' },
+      { title: t('stats.goodWins'), key: 'goodWins' },
+      { title: t('stats.evilWins'), key: 'evilWins' },
+      { title: t('stats.goodWinPercentage'), key: 'goodWinPercentage' },
+      { title: t('stats.evilWinPercentage'), key: 'evilWinPercentage' },
+    ]);
 
     return {
       state,

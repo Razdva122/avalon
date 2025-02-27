@@ -7,6 +7,7 @@ export const zh_CN = {
     profile: '设定',
     wiki: '维基',
     about: '关于',
+    stats: '统计',
   },
   room: {
     errorNotFound: '这是错误的uuid',
@@ -301,6 +302,13 @@ export const zh_CN = {
   switch: {
     skip: '决定不使用 神剑',
     switchInfo: '<b>{switcher}</b> 使用 神剑 将 <b>{target}</b> 的行动更改为',
+  },
+  chartStats: {
+    countPlayer: '{playerCount} 名玩家',
+    evilWinrate: '黑暗阵营胜率',
+    goodWinrate: '光明阵营胜率',
+    winrateByTeamSize: '根据队伍规模的胜率',
+    halfWinrate: '50% 胜率',
   },
   ...pages['zh-CN'],
 };
