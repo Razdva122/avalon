@@ -25,7 +25,9 @@
               v-if="
                 stateManager.viewMode.value === 'live' &&
                 gameState.stage === 'announceLoyalty' &&
-                (playerInGame?.features.ladyOfLake === 'has' || playerInGame?.features.ladyOfSea === 'has') &&
+                (playerInGame?.features.ladyOfLake === 'has' ||
+                  playerInGame?.features.ladyOfSea === 'has' ||
+                  playerInGame?.features.witchLoyalty === true) &&
                 visibleHistory?.type !== 'checkLoyalty'
               "
             >
@@ -141,7 +143,8 @@ export default defineComponent({
         (gameState.value.stage === 'assassinate' && playerInGame.value?.features.isAssassin) ||
         (gameState.value.stage === 'useExcalibur' && playerInGame.value?.features.excalibur) ||
         (gameState.value.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfLake === 'has') ||
-        (gameState.value.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfSea === 'has');
+        (gameState.value.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfSea === 'has') ||
+        (gameState.value.stage === 'witchLoyalty' && playerInGame.value?.features.witchLoyalty);
 
       if (userCanSelect) {
         socket.emit('selectPlayer', gameState.value.uuid, uuid);

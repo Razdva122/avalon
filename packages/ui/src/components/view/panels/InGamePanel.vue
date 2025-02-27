@@ -30,8 +30,8 @@
   <template v-if="game.stage === 'assassinate' && isUserAssassin">
     <AssassinateControl :game="game" />
   </template>
-  <template v-if="game.stage === 'checkLoyalty' && isUserLadyOwner">
-    <v-btn color="warning" :disabled="!isLadyAvailable" @click="emitClick('checkLoyalty')">{{
+  <template v-if="(game.stage === 'checkLoyalty' || game.stage === 'witchLoyalty') && isUserCheckOwner">
+    <v-btn color="warning" :disabled="!isCheckAvailable" @click="emitClick('checkLoyalty')">{{
       $t('inGame.checkLoyalty')
     }}</v-btn>
   </template>
@@ -116,7 +116,11 @@ export default defineComponent({
       return player.value?.validMissionsResult?.includes('success');
     });
 
-    const isUserLadyOwner = computed(() => {
+    const isUserCheckOwner = computed(() => {
+      if (game.value.stage === 'witchLoyalty') {
+        return player.value?.features.witchLoyalty;
+      }
+
       return player.value?.features.ladyOfLake === 'has' || player.value?.features.ladyOfSea === 'has';
     });
 
@@ -137,18 +141,23 @@ export default defineComponent({
       return game.value.players.filter((player) => player.features.isSelected).length === 0;
     });
 
-    const isLadyAvailable = computed(() => {
-      return (
-        isSinglePlayerSelected.value &&
-        Boolean(
+    const isCheckAvailable = computed(() => {
+      if (!isSinglePlayerSelected.value) {
+        return false;
+      }
+
+      if (game.value.stage === 'checkLoyalty') {
+        return Boolean(
           game.value.players.find(
             (player) =>
               player.features.isSelected &&
               player.features.ladyOfLake === undefined &&
               player.features.ladyOfSea === undefined,
           ),
-        )
-      );
+        );
+      }
+
+      return true;
     });
 
     const isGiveExcaliburAvailable = computed(() => {
@@ -198,7 +207,7 @@ export default defineComponent({
       isUserLeader,
       isUserAssassin,
       isUserWitch,
-      isUserLadyOwner,
+      isUserCheckOwner,
       isUserExcaliburOwner,
       isPlayerOnMission,
       isPlayerActive,
@@ -206,7 +215,7 @@ export default defineComponent({
       isPlayerCanSuccess,
       isSinglePlayerSelected,
       isZeroPlayerSelected,
-      isLadyAvailable,
+      isCheckAvailable,
       isGiveExcaliburAvailable,
       isUseExcaliburAvailable,
 

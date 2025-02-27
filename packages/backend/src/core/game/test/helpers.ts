@@ -223,4 +223,25 @@ export class GameTestHelper {
 
     return this;
   }
+
+  announceWitchLoyalty(result: TLoyalty = 'good'): this {
+    const playerWitchCheckID = this.game.players.find((player) => player.features.witchLoyalty)!.user.id;
+
+    this.game.addons.witch!.announceLoyalty(playerWitchCheckID, result);
+
+    return this;
+  }
+
+  useWitchCheck(userID?: string): this {
+    const playerID = userID ?? this.game.players.find((player) => !player.features.witchLoyalty)!.user.id;
+
+    const ownerID = this.game.players.find((player) => {
+      return player.features.witchLoyalty === true;
+    })!.user.id;
+
+    this.game.selectPlayer(ownerID, playerID);
+    this.game.addons.witch!.checkLoyalty(ownerID);
+
+    return this;
+  }
 }

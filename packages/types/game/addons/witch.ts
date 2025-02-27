@@ -1,4 +1,4 @@
 /**
  * Possible witch stages
  */
-export type TWitchStages = 'witchAbility';
+export type TWitchStages = 'witchAbility' | 'witchLoyalty';

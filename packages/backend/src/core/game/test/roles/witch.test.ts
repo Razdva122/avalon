@@ -25,8 +25,22 @@ describe('Witch', () => {
     expect(_.last(game.history)?.type).toBe('vote');
   });
 
+  test('Should change stage to witch stage', () => {
+    gameHelper.useWitchAbility();
+    const ownerOfLoyaltyCheck = game.players.find((player) => player.features.witchLoyalty)!;
+
+    expect(game.stage).toBe('witchLoyalty');
+    expect(ownerOfLoyaltyCheck.features.waitForAction).toBe(true);
+  });
+
   test('Should skip stage if already used ability', async () => {
-    gameHelper.useWitchAbility().selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions(1);
+    gameHelper
+      .useWitchCheck()
+      .announceWitchLoyalty()
+      .selectPlayersOnMission()
+      .sentSelectedPlayers()
+      .makeVotes()
+      .makeActions(1);
 
     expect(game.missions[1].data.hidden).toBeTruthy();
     expect(game.stage).toBe('selectTeam');

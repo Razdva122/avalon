@@ -8,6 +8,8 @@ import type { TWitchStages } from './witch';
 import type { TAssassinAddonStages } from './assassin';
 import { AssassinAddonData } from './assassin';
 
+export * from './loyalty';
+
 export type { TAssassinateResult, TAssassinateType, AssassinAddonData, AssassinateProgressData } from './assassin';
 
 /**
@@ -47,6 +49,12 @@ export class AddonsFeatures {
    */
   @prop()
   isAssassin?: boolean;
+
+  /**
+   * True if player get witch loyalty
+   */
+  @prop()
+  witchLoyalty?: boolean;
 }
 
 /**

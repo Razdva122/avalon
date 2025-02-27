@@ -48,13 +48,14 @@ export default defineComponent({
   },
   async setup() {
     const gameState = inject(gameStateKey)!;
+    const type = gameState.value.players.some((player) => player.features.witchLoyalty) ? 'witch' : 'lady';
     const loyalty = ref() as Ref<TLoyalty | TRoles>;
     const selectedLoyalty = ref<TRoles | TLoyalty | undefined>(undefined);
 
-    loyalty.value = await socket.emitWithAck('getLoyalty', gameState.value.uuid);
+    loyalty.value = await socket.emitWithAck('getLoyalty', gameState.value.uuid, type);
 
     const announceLoyalty = (loyalty: TLoyalty | TRoles) => {
-      socket.emit('announceLoyalty', gameState.value.uuid, loyalty);
+      socket.emit('announceLoyalty', gameState.value.uuid, loyalty, type);
     };
 
     const isLadyOfSea = computed(() => {

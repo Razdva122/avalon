@@ -9,6 +9,8 @@ import { LadyOfLakeAddon } from '@/core/game/addons/lady-of-lake';
 
 export class LadyOfSeaAddon extends LadyOfLakeAddon implements IGameAddon {
   override addonName: LadyOfLakeAddon['addonName'] = 'ladyOfSea';
+  override featureName: LadyOfLakeAddon['featureName'] = 'ladyOfSea';
+
   loyaltyTargets: Array<TRoles | 'good'>;
   fakeEvilRole: TRoles;
 

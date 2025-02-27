@@ -7,6 +7,7 @@ import type { Socket as SuperSocket } from 'socket.io-client';
 import type { TVoteOption } from '../game/vote';
 import type { TMissionResult } from '../game/mission';
 import type { TLoyalty, TRoles } from '../game/roles';
+import type { TLoyaltyType } from '../game/addons/loyalty';
 
 import type { IRoomUnavailableError } from './errors';
 import type { TAssassinateType } from '../game/addons';
@@ -58,8 +59,8 @@ export interface ClientToServerEvents {
   assassinate: (uuid: string, type: TAssassinateType, role?: TRoles) => void;
 
   checkLoyalty: (uuid: string) => void;
-  getLoyalty: (uuid: string, callback: (loyalty: TLoyalty | TRoles) => void) => void;
-  announceLoyalty: (uuid: string, loyalty: TLoyalty | TRoles) => void;
+  getLoyalty: (uuid: string, type: TLoyaltyType, callback: (loyalty: TLoyalty | TRoles) => void) => void;
+  announceLoyalty: (uuid: string, loyalty: TLoyalty | TRoles, type: TLoyaltyType) => void;
 
   giveExcalibur: (uuid: string) => void;
   useExcalibur: (uuid: string) => void;
