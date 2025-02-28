@@ -11,10 +11,10 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
     sowSeedsText: `Utilize your skill to keep players uncertain about mission outcomes, causing doubt and indecision within the ranks of good.`,
 
     collaborateTitle: `Collaborate with fellow evildoers:`,
-    collaborateText: `Work closely with other evil players to synchronize your actions and maximize the impact of your hidden missions.`,
+    collaborateText: `Carefully consider the consequences of hiding a mission, and only do so when it benefits you and your allies.`,
 
     utilizePowerTitle: `Utilize your power strategically:`,
-    utilizePowerText: `Timing is crucial when deciding to hide a mission's result. Choose the moment that will best serve the interests of the evil team.`,
+    utilizePowerText: `Timing is crucial as you can only use your power once. When hiding a mission's result, a random non-witch player gets a loyalty check. Choose the moment that maximizes confusion while protecting your allies.`,
 
     maintainDisguiseTitle: `Maintain your disguise:`,
     maintainDisguiseText: `Avoid giving away any hints that could reveal your true allegiance or arouse suspicion about your intentions.`,
@@ -28,9 +28,9 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
     influenceGameplayText: `Encourage doubt and discord among good players, steering discussions and decisions in a direction favorable to evil.`,
 
     hideEarlyMissionsTitle: `Hide early missions:`,
-    hideEarlyMissionsText: `The most logical choice is to hide the results of the first or second mission to introduce confusion early and shake the foundation of trust among good players.`,
+    hideEarlyMissionsText: `Consider hiding early missions to create confusion, but remember this triggers a loyalty check. Coordinate with allies to ensure the check doesn't expose them, while casting suspicion on key opponents.`,
 
-    conclusion: `As {witch}, you weave uncertainty and misdirection into the fabric of the game. By masking the truth, you can destabilize the forces of good and steer the tide of battle in evil's favor. Embrace your role and let chaos reign supreme!`,
+    conclusion: `As {witch}, you weave uncertainty through hidden missions and forced loyalty checks. Your single powerful move can expose others while protecting yourself. Use it to create paradoxes that fracture the good team's trust!`,
   },
   ru: {
     generalInformation: 'Общая информация: ',
@@ -44,11 +44,11 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
 
     collaborateTitle: 'Сотрудничайте с другими злодеями:',
     collaborateText:
-      'Работайте в тесном сотрудничестве с другими игроками зла, чтобы синхронизировать ваши действия и максимизировать влияние ваших скрытых миссий.',
+      'Продумывайте последствия скрытия похода и делайте это только тогда, когда это выгодно вам и вашим союзникам.',
 
     utilizePowerTitle: 'Используйте свою силу стратегически:',
     utilizePowerText:
-      'Время имеет решающее значение при выборе, когда скрыть результат миссии. Выбирайте момент, который лучше всего послужит интересам команды зла.',
+      'Время решает всё — вы можете использовать способность лишь раз. Скрывая результат миссии, вы провоцируете проверку лояльности у другого игрока. Выбирайте момент, который максимизирует хаос, защищая своих соратников.',
 
     maintainDisguiseTitle: 'Сохраняйте маскировку:',
     maintainDisguiseText:
@@ -66,10 +66,10 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
 
     hideEarlyMissionsTitle: 'Скрывайте результаты ранних миссий:',
     hideEarlyMissionsText:
-      'Наиболее логичным выбором будет скрыть результаты первой или второй миссии, чтобы ввести путаницу на раннем этапе и поколебать доверие среди добрых игроков.',
+      'Сокрытие ранних миссий создаёт неразбериху, но запускает проверку. Координируйтесь с союзниками, чтобы проверка не раскрыла их, одновременно бросая тень подозрения на ключевых противников.',
 
     conclusion:
-      'Как {witch}, вы внедряете неуверенность и ошибки в игру. Скрывая правду, вы можете дестабилизировать силы добра и направить ход битвы в пользу зла. Примите свою роль и позвольте хаосу властвовать!',
+      'Как {witch}, вы сеете хаос через скрытые миссии и вынужденные проверки. Ваш единственный ход может раскрыть других, защищая вас. Используйте его, чтобы создать неразрешимые противоречия в стане добрых!',
   },
   'zh-CN': {
     generalInformation: '一般信息：',
@@ -81,10 +81,11 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
     sowSeedsText: '利用你的技能让玩家对任务结果产生不确定性，在善良力量的行列中引起怀疑和犹豫。',
 
     collaborateTitle: '与其他邪恶势力合作：',
-    collaborateText: '与其他邪恶玩家紧密合作，以同步你的行动并最大化你隐藏任务的影响。',
+    collaborateText: '隐藏任务前务必权衡后果，仅在对己方有利时使用此能力。',
 
     utilizePowerTitle: '战略性地使用你的能力：',
-    utilizePowerText: '在决定何时隐藏任务结果时，时机至关重要。选择对邪恶团队利益最大化的时机。',
+    utilizePowerText:
+      '时机决定一切——你只能使用一次能力。隐藏任务结果时，会触发其他玩家的忠诚检验。选择最能制造混乱并保护盟友的时机。',
 
     maintainDisguiseTitle: '保持你的伪装：',
     maintainDisguiseText: '避免透露可能揭露你真实意图的任何线索，或者引起怀疑。',
@@ -98,10 +99,11 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
     influenceGameplayText: '鼓励善良玩家之间的疑虑和不和谐，引导讨论和决策朝着有利于邪恶的方向发展。',
 
     hideEarlyMissionsTitle: '隐藏早期任务：',
-    hideEarlyMissionsText: '最合理的选择是隐藏第一或第二个任务的结果，以便早期引导混乱，并动摇善良玩家间的信任基础。',
+    hideEarlyMissionsText:
+      '隐藏早期任务可制造混乱，但会触发检验。与盟友协调，确保检验不会暴露他们，同时将嫌疑引向关键对手。',
 
     conclusion:
-      '作为 {witch}，你将不确定性和误导编织成游戏的一部分。通过掩盖事实，你能不稳定善良的力量并将战斗的潮流导向邪恶的一方。接受你的角色，让混乱无比壮大！',
+      '作为{witch}，你通过隐藏任务和强制检验散播混乱。你唯一的能力既可揭露他人，又能保护自己。用它创造正义阵营无法破解的矛盾！',
   },
   'zh-TW': {
     generalInformation: '一般信息：',
@@ -113,10 +115,11 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
     sowSeedsText: '利用你的技能使玩家對任務結果感到不確定，在善良力量的行列中造成懷疑和猶豫。',
 
     collaborateTitle: '與其他邪惡的人合作：',
-    collaborateText: '與其他邪惡玩家密切合作，以協調你的行動並最大化隱藏任務的影響。',
+    collaborateText: '隱藏任務前務必權衡後果，僅在對己方有利時使用此能力。',
 
     utilizePowerTitle: '戰略性地運用你的力量：',
-    utilizePowerText: '在決定隱藏任務結果時，時機至關重要。選擇最符合邪惡團隊利益的時機。',
+    utilizePowerText:
+      '時機決定一切——你只能使用一次能力。隱藏任務結果時，會觸發其他玩家的忠誠檢驗。選擇最能製造混亂並保護盟友的時機。',
 
     maintainDisguiseTitle: '保持你的偽裝：',
     maintainDisguiseText: '避免透露可能揭示你真正意圖的任何提示或引起懷疑。',
@@ -130,10 +133,11 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
     influenceGameplayText: '鼓勵善良玩家之間的懷疑和不和，將討論和決策引向對邪惡有利的方向。',
 
     hideEarlyMissionsTitle: '隱藏早期任務：',
-    hideEarlyMissionsText: '最明智的選擇是隱藏第一或第二任務的結果，在早期引入混亂，並動搖善良玩家間的信任基礎。',
+    hideEarlyMissionsText:
+      '隱藏早期任務可製造混亂，但會觸發檢驗。與盟友協調，確保檢驗不會暴露他們，同時將嫌疑引向關鍵對手。',
 
     conclusion:
-      '作為 {witch}，你將不確定性和誤導編織成遊戲的一部分。通過掩蓋真相，你能夠破壞善良的力量並引導戰鬥的潮流朝向邪惡的方向。擁抱你的角色，讓混亂覆蓋一切！',
+      '作為{witch}，你通過隱藏任務和強制檢驗散播混亂。你唯一的能力既可揭露他人，又能保護自己。用它創造正義陣營無法破解的矛盾！',
   },
   es: {
     generalInformation: 'Información General: ',
@@ -147,11 +151,11 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
 
     collaborateTitle: 'Colabora con otros malvados:',
     collaborateText:
-      'Trabaja estrechamente con otros jugadores malvados para sincronizar tus acciones y maximizar el impacto de tus misiones ocultas.',
+      'Evalúa cuidadosamente las consecuencias de ocultar una misión, y hazlo solo cuando beneficie a ti y a tus aliados.',
 
     utilizePowerTitle: 'Utiliza tu poder estratégicamente:',
     utilizePowerText:
-      'El momento es crucial a la hora de decidir ocultar el resultado de una misión. Elige el momento que mejor sirva a los intereses del equipo malvado.',
+      'El momento lo es todo — solo puedes usar tu habilidad una vez. Al ocultar un resultado, provocas una verificación en otro jugador. Elige el momento que maximice el caos protegiendo a tus aliados.',
 
     maintainDisguiseTitle: 'Mantén tu disfraz:',
     maintainDisguiseText:
@@ -170,9 +174,9 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
 
     hideEarlyMissionsTitle: 'Oculta las primeras misiones:',
     hideEarlyMissionsText:
-      'La elección más lógica es ocultar los resultados de la primera o segunda misión para introducir confusión temprana y sacudir la base de confianza entre los jugadores del bien.',
+      'Ocultar misiones tempranas genera confusión, pero activa una verificación. Coordina con aliados para que la verificación no los exponga, mientras señalas a oponentes clave.',
 
     conclusion:
-      'Como {witch}, tejes incertidumbre y desinformación en el tejido del juego. Al enmascarar la verdad, puedes desestabilizar a las fuerzas del bien y orientar la marea de la batalla a favor del mal. ¡Abraza tu rol y deja que el caos reine supremo!',
+      '¡Como {witch}, siembras caos mediante misiones ocultas y verificaciones forzadas. Tu único movimiento puede exponer a otros mientras te proteges. Úsalo para crear paradojas que fracturen la confianza del equipo bueno!',
   },
 };

@@ -216,7 +216,7 @@ export const zh_TW = {
     tricksterInfo: '對他的忠誠撒謊',
     lunaticInfo: '每個任務都必須失敗',
     bruteInfo: '可能只會失敗前三個任務',
-    witchInfo: '可以隱藏一個任務的結果',
+    witchInfo: '可以隱藏一次任務的結果，但這會給一個隨機玩家忠誠檢測',
     revealerInfo: '在第二次任務失敗後揭露自己',
     clericInfo: '知道第一次任務領導者的效忠情況。必須保持隱藏',
     unknownInfo: '未知角色',

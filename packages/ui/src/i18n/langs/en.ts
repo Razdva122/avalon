@@ -217,7 +217,7 @@ export const en = {
     tricksterInfo: 'Lying about his loyalty',
     lunaticInfo: 'Must fail on every mission',
     bruteInfo: 'May fail only first three missions',
-    witchInfo: 'Can hide the result of one mission',
+    witchInfo: 'Can hide the result of one mission, but this will give a loyalty check to a random player',
     revealerInfo: 'Reveal herself after second failed mission',
     clericInfo: 'Knows loyalty of the leader of the first mission. Must remain hidden',
     unknownInfo: 'Unknown role',

@@ -216,7 +216,8 @@ export const es = {
     tricksterInfo: 'Mintiendo sobre su lealtad',
     lunaticInfo: 'Debe fallar en todas las misiones',
     bruteInfo: 'Solo puede fallar en las tres primeras misiones',
-    witchInfo: 'Puede ocultar el resultado de una misión',
+    witchInfo:
+      'Puede ocultar el resultado de una misión, pero esto dará una verificación de lealtad a un jugador aleatorio',
     revealerInfo: 'Revelarse después de la segunda misión fallida',
     clericInfo: 'Conoce la lealtad del líder de la primera misión. Debe permanecer oculto',
     unknownInfo: 'Rol desconocido',

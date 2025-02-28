@@ -216,7 +216,7 @@ export const zh_CN = {
     tricksterInfo: '对他的忠诚撒谎',
     lunaticInfo: '每个任务都必须失败',
     bruteInfo: '可能只会失败前三个任务',
-    witchInfo: '可以隐藏一个任务的结果',
+    witchInfo: '可以隐藏一次任务的结果，但这会给一个随机玩家忠诚检测',
     revealerInfo: '在第二次任务失败后揭露自己',
     clericInfo: '知道第一次任务领导者的忠诚情况。必须保持隐藏',
     unknownInfo: '未知角色',
