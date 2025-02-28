@@ -33,6 +33,7 @@ export class DBManager {
     const results = await Promise.all([
       this.roomModel.aggregate(query.statsByPlayers),
       this.roomModel.aggregate(query.rolesStats),
+      this.roomModel.aggregate(query.addonsStats),
     ]);
 
     const totalGamesResult = results[0].reduce<Omit<TWinrateStats, 'goodWinPercentage' | 'evilWinPercentage'>>(
@@ -54,6 +55,7 @@ export class DBManager {
       },
       byPlayers: results[0],
       roleStats: results[1],
+      addonsStats: results[2],
     };
   }
 }

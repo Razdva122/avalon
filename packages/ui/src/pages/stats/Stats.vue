@@ -1,5 +1,5 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content stats-page">
     <template v-if="state">
       <div class="total-stats">
         <h1>{{ $t('stats.title') }}</h1>
@@ -11,26 +11,31 @@
       </div>
       <div class="player-stats" v-if="state.byPlayers.length > 0">
         <h2>{{ $t('stats.playerCountStatsTitle') }}</h2>
-        <v-data-table :headers="byPlayersHeaders" :items="state.byPlayers" hide-default-footer>
-          <template v-slot:item.goodWinPercentage="{ value }"> {{ pretifyPercent(value) }} % </template>
-          <template v-slot:item.evilWinPercentage="{ value }"> {{ pretifyPercent(value) }} % </template>
+        <v-data-table :headers="byPlayersTable.headers" :items="byPlayersTable.data" hide-default-footer>
         </v-data-table>
       </div>
-      <template v-for="side in <const>['good', 'evil']" :key="side">
-        <div>
-          <h2 v-if="side === 'good'">{{ $t('stats.goodRolesStatsTitle') }}</h2>
-          <h2 v-else>{{ $t('stats.evilRolesStatsTitle') }}</h2>
+      <div v-for="side in <const>['good', 'evil']" :key="side">
+        <h2 v-if="side === 'good'"><span class="good-loyalty-icon"></span> {{ $t('stats.goodRolesStatsTitle') }}</h2>
+        <h2 v-else><span class="evil-loyalty-icon"></span> {{ $t('stats.evilRolesStatsTitle') }}</h2>
 
-          <v-data-table :headers="rolesTables.headers" :items="rolesTables[side]" hide-default-footer>
-            <template v-slot:item.role="{ value }">
-              <PreviewLink :target="value" />
-            </template>
-            <template v-slot:item.diff="{ value }">
-              <v-chip :color="getColorWinrate(value)"> {{ value > 0 ? '+' : '' }}{{ pretifyPercent(value) }} % </v-chip>
-            </template>
-          </v-data-table>
-        </div>
-      </template>
+        <v-data-table :headers="rolesTables.headers" :items="rolesTables[side]" hide-default-footer>
+          <template v-slot:item.role="{ value }">
+            <PreviewLink :target="value" />
+          </template>
+          <template v-slot:item.winrate="{ value }"> {{ pretifyPercent(value) }} % </template>
+          <template v-slot:item.diff="{ value }">
+            <v-chip :color="getColorWinrate(value)"> {{ value > 0 ? '+' : '' }}{{ pretifyPercent(value) }} % </v-chip>
+          </template>
+        </v-data-table>
+      </div>
+      <div>
+        <h2>{{ $t('stats.addonsStatsTitle') }}</h2>
+        <v-data-table :headers="addonsTable.headers" :items="addonsTable.data" hide-default-footer>
+          <template v-slot:item.addon="{ value }">
+            <PreviewLink :target="value" />
+          </template>
+        </v-data-table>
+      </div>
     </template>
   </div>
 </template>
@@ -43,7 +48,7 @@ import { socket } from '@/api/socket';
 import PlayerCountsStats from '@/components/stats/PlayerCountsStats.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 
-type TRolesStatsWithDiff = TRoleStats & { diff: number };
+type TRolesStatsWithDiff = TRoleStats & { diff: number; winrate: number };
 
 export default defineComponent({
   name: 'Stats',
@@ -70,11 +75,19 @@ export default defineComponent({
         evil: TRolesStatsWithDiff[];
       }>(
         (acc, el) => {
-          if (el.gamesCount > 10) {
+          if (el.gamesCount >= 10) {
             if (el.role in goodRolesImportance) {
-              acc.good.push({ ...el, diff: el.goodWinPercentage - state.value!.total.goodWinPercentage });
+              acc.good.push({
+                ...el,
+                diff: el.goodWinPercentage - state.value!.total.goodWinPercentage,
+                winrate: el.goodWinPercentage,
+              });
             } else {
-              acc.evil.push({ ...el, diff: el.evilWinPercentage - state.value!.total.evilWinPercentage });
+              acc.evil.push({
+                ...el,
+                diff: el.evilWinPercentage - state.value!.total.evilWinPercentage,
+                winrate: el.evilWinPercentage,
+              });
             }
           }
           return acc;
@@ -83,6 +96,7 @@ export default defineComponent({
           headers: [
             { title: t('stats.role'), key: 'role' },
             { title: t('stats.gamesCount'), key: 'gamesCount' },
+            { title: t('stats.winrate'), key: 'winrate' },
             { title: t('stats.winrateImpact'), key: 'diff' },
           ],
           good: [],
@@ -92,6 +106,26 @@ export default defineComponent({
       sideStats.evil.sort((a, b) => b.gamesCount - a.gamesCount);
       sideStats.good.sort((a, b) => b.gamesCount - a.gamesCount);
       return sideStats;
+    });
+
+    const addonsTable = computed(() => {
+      return {
+        headers: [
+          { title: t('stats.addon'), key: 'addon' },
+          { title: t('stats.totalGames'), key: 'gamesCount' },
+          { title: t('stats.goodWins'), key: 'goodWins' },
+          { title: t('stats.evilWins'), key: 'evilWins' },
+        ],
+        data: state
+          .value!.addonsStats.filter((el) => el.gamesCount >= 10)
+          .map((el) => ({
+            addon: el.addon,
+            gamesCount: el.gamesCount,
+            goodWins: `${el.goodWins} (${pretifyPercent(el.goodWinPercentage)} %)`,
+            evilWins: `${el.evilWins} (${pretifyPercent(el.evilWinPercentage)} %)`,
+          }))
+          .sort((a, b) => b.gamesCount - a.gamesCount),
+      };
     });
 
     const generalTable = computed(() => {
@@ -123,20 +157,27 @@ export default defineComponent({
       return 'red';
     };
 
-    const byPlayersHeaders = computed(() => [
-      { title: t('stats.playerCount'), key: 'playerCount' },
-      { title: t('stats.totalGames'), key: 'gamesCount' },
-      { title: t('stats.goodWins'), key: 'goodWins' },
-      { title: t('stats.evilWins'), key: 'evilWins' },
-      { title: t('stats.goodWinPercentage'), key: 'goodWinPercentage' },
-      { title: t('stats.evilWinPercentage'), key: 'evilWinPercentage' },
-    ]);
+    const byPlayersTable = computed(() => ({
+      headers: [
+        { title: t('stats.playerCount'), key: 'playerCount' },
+        { title: t('stats.totalGames'), key: 'gamesCount' },
+        { title: t('stats.goodWins'), key: 'goodWins' },
+        { title: t('stats.evilWins'), key: 'evilWins' },
+      ],
+      data: state.value!.byPlayers.map((el) => ({
+        playerCount: el.playerCount,
+        gamesCount: el.gamesCount,
+        goodWins: `${el.goodWins} (${pretifyPercent(el.goodWinPercentage)} %)`,
+        evilWins: `${el.evilWins} (${pretifyPercent(el.evilWinPercentage)} %)`,
+      })),
+    }));
 
     return {
       state,
       rolesTables,
-      byPlayersHeaders,
+      byPlayersTable,
       generalTable,
+      addonsTable,
       pretifyPercent,
       getColorWinrate,
     };
@@ -150,5 +191,13 @@ export default defineComponent({
 .chart {
   max-width: 700px;
   max-height: 350px;
+}
+
+.stats-page {
+  .good-loyalty-icon,
+  .evil-loyalty-icon {
+    width: 36px;
+    height: 36px;
+  }
 }
 </style>

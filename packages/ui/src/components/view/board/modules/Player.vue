@@ -74,7 +74,7 @@ export default defineComponent({
 
         const timeoutId = window.setTimeout(() => {
           chatMessage.value = {};
-        }, 5000);
+        }, 6000);
 
         chatMessage.value = { message: message.text, timeoutId };
       }
@@ -453,6 +453,7 @@ export default defineComponent({
 
 .message-container {
   border-radius: 8px;
+  font-size: 18px;
   text-align: center;
   padding: 2px 6px;
   background-color: rgb(var(--v-theme-surface-variant));
