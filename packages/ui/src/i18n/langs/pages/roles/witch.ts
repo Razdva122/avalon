@@ -4,7 +4,7 @@ import { Dictionary } from '@avalon/types';
 export const witch: { [key in TLanguage]: Dictionary<string> } = {
   en: {
     generalInformation: 'General Information: ',
-    intro: `Playing as {witch} gives you a unique power within the minions of evil: the ability to hide the outcome of one mission. Your goal is to create uncertainty and chaos among the forces of good, ensuring that they remain in doubt, ultimately tilting the game in favor of evil while maintaining your cover.`,
+    intro: `As {witch}, you wield a unique power among evil's minions: hiding one mission's outcome while triggering a loyalty check on a random non-{witch} player. Though this gives good forces intel, your goal is to weaponize it — breed chaos, turn allies against each other, and sway the game to evil's favor, all while maintaining your cover.`,
     generalTipsTitle: `General Tips:`,
 
     sowSeedsTitle: `Sow seeds of confusion:`,
@@ -35,7 +35,7 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
   ru: {
     generalInformation: 'Общая информация: ',
     intro:
-      'Играя за {witch}, вы получаете уникальную власть среди приспешников зла: способность скрывать результат одной миссии. Ваша цель — посеять неуверенность и хаос среди сил добра, заставить их сомневаться и в конечном итоге привести игру в пользу зла, при этом оставаясь в тени.',
+      'Играя за {witch}, вы получаете уникальную способность среди приспешников зла: скрыть результат одной миссии, активируя проверку лояльности у случайного игрока (не {witch}). Это даёт силам добра информацию, но ваша цель — обратить её против них: посеять хаос, заставить сомневаться в союзниках и склонить игру в пользу зла, сохраняя свою скрытность.',
     generalTipsTitle: 'Общие советы:',
 
     sowSeedsTitle: 'Посейте семена сомнений:',
@@ -74,7 +74,7 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
   'zh-CN': {
     generalInformation: '一般信息：',
     intro:
-      '作为{witch}，你拥有一项独特的力量，可以隐藏任务的结果。你的目标是在人群中制造不确定性和混乱，并确保他们持续怀疑，最终让游戏朝向有利于邪恶的一方，同时维持你的掩饰。',
+      '身为{witch}，你掌握邪恶阵营独有的能力：隐藏一次任务结果并触发随机玩家（非{witch}）的忠诚检验。尽管这会让正义方获得情报，但你的真正目的是将其化为武器——制造混乱、挑拨盟友互疑，在隐藏身份的同时将游戏导向邪恶的胜利。',
     generalTipsTitle: '一般提示：',
 
     sowSeedsTitle: '播下困惑的种子：',
@@ -108,7 +108,7 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
   'zh-TW': {
     generalInformation: '一般信息：',
     intro:
-      '作為 {witch}，你擁有一項獨特的力量，可以隱藏一項任務的結果。你的目標是在人群中製造不確定性和混亂，並確保他們繼續懷疑，最終在維持你的掩護的同時，將勝利推向邪惡的一方。',
+      '身為{witch}，你掌握邪惡陣營獨有的能力：隱藏一次任務結果並觸發隨機玩家（非{witch}）的忠誠檢驗。儘管這會讓正義方獲得情報，但你的真正目的是將其化為武器——製造混亂、挑撥盟友互疑，在隱藏身份的同時將遊戲導向邪惡的勝利。',
     generalTipsTitle: '一般提示：',
 
     sowSeedsTitle: '播下混亂的種子：',
@@ -142,7 +142,7 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
   es: {
     generalInformation: 'Información General: ',
     intro:
-      'Jugando como {witch} tienes un poder único dentro de los secuaces del mal: la capacidad de ocultar el resultado de una misión. Tu objetivo es crear incertidumbre y caos entre las fuerzas del bien, asegurándote de que permanezcan en duda, inclinando finalmente el juego a favor del mal mientras mantienes tu cobertura.',
+      'Como {witch}, posees un poder único entre los siervos del mal: ocultar el resultado de una misión mientras activas una verificación de lealtad en un jugador aleatorio (no {witch}). Aunque esto da información al bando bueno, tu objetivo es usarla como arma: sembrar caos, poner aliados en contra y llevar el juego hacia el mal, manteniendo tu tapadera.',
     generalTipsTitle: 'Consejos Generales:',
 
     sowSeedsTitle: 'Siembra semillas de confusión:',
