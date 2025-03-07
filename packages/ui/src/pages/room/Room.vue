@@ -62,7 +62,7 @@ export default defineComponent({
     const roomState = stateManager.state;
     const game = stateManager.game;
 
-    const userID = store.state.user?.id;
+    const userID = store.state.profile?.id;
 
     const initState = async (uuid: string) => {
       const stateFromBackend = await socket.emitWithAck('joinRoom', uuid);

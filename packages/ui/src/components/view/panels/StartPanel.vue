@@ -86,11 +86,11 @@ export default defineComponent({
     );
 
     const isUserInGame = computed(() => {
-      return roomState.value.players.some((player) => player.id === store.state.user?.id);
+      return roomState.value.players.some((player) => player.id === store.state.profile?.id);
     });
 
     const isUserLeader = computed(() => {
-      return roomState.value.leaderID === store.state.user?.id;
+      return roomState.value.leaderID === store.state.profile?.id;
     });
 
     const isStartGameDisabled = computed(() => {
@@ -100,8 +100,8 @@ export default defineComponent({
     });
 
     const onJoinClick = () => {
-      if (!store.state.user) {
-        eventBus.emit('openSettings');
+      if (!store.state.profile) {
+        eventBus.emit('openAuthModal');
         eventBus.emit('infoMessage', t('infoMessage.loginToJoin'));
         return;
       }

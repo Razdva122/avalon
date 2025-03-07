@@ -85,7 +85,7 @@ export default defineComponent({
     const store = useStore();
 
     const player = computed(() => {
-      return game.value.players.find((player) => player.id === store.state.user?.id);
+      return game.value.players.find((player) => player.id === store.state.profile?.id);
     });
 
     const isUserLeader = computed(() => {

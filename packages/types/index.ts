@@ -12,3 +12,4 @@ export * from './room';
 export * from './utils';
 export * from './consts';
 export * from './stats';
+export * from './user';

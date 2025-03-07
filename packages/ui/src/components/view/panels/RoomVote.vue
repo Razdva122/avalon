@@ -61,7 +61,7 @@ export default defineComponent({
   },
   computed: {
     canUserVote() {
-      const userVote = this.vote.votes.find((el) => el.id === this.$store.state.user?.id);
+      const userVote = this.vote.votes.find((el) => el.id === this.$store.state.profile?.id);
 
       if (userVote && userVote.voteResult === undefined) {
         return true;

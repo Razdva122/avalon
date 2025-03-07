@@ -28,6 +28,7 @@ const { merlinPure } = require('./merlinPure');
 const { cleric } = require('./cleric');
 const { revealer } = require('./revealer');
 const { stats } = require('./stats');
+const { profile } = require('./profile');
 
 module.exports = {
   lobby,
@@ -60,4 +61,5 @@ module.exports = {
   cleric,
   revealer,
   stats,
+  profile,
 };

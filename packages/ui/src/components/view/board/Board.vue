@@ -103,7 +103,7 @@ export default defineComponent({
     const timerDuration = ref(0);
 
     const playerInGame = computed(() => {
-      return gameState.value.players.find((player) => player.id === store.state.user?.id);
+      return gameState.value.players.find((player) => player.id === store.state.profile?.id);
     });
 
     const players = computed(() => {
@@ -115,7 +115,7 @@ export default defineComponent({
     });
 
     const userIsLeader = computed(() => {
-      return store.state.user?.id === roomState.value.leaderID;
+      return store.state.profile?.id === roomState.value.leaderID;
     });
 
     const calculateRotate = (i: number, negative: boolean = false) => {
@@ -178,7 +178,7 @@ export default defineComponent({
 
     const playerWaitForActionState = computed(() => {
       if ('game' in roomState.value) {
-        return roomState.value.game.players.find((player) => player.id === store.state.user?.id)?.features
+        return roomState.value.game.players.find((player) => player.id === store.state.profile?.id)?.features
           .waitForAction;
       }
     });

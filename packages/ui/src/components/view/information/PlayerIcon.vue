@@ -16,7 +16,7 @@ export default defineComponent({
   },
   computed: {
     classes() {
-      return `icon-${this.icon} style-${this.$store.state.user?.settings?.style}`;
+      return `icon-${this.icon} style-${this.$store.state.settings?.style}`;
     },
   },
 });

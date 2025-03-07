@@ -14,6 +14,7 @@ import type { TAssassinateType } from '../game/addons';
 
 import type { TRoomsList, TMessage } from '../room';
 import { TTotalWinrateStats } from '../stats';
+import { UserForUI, UserProfile } from '../user';
 
 export type { ISocketError } from './errors';
 
@@ -27,9 +28,18 @@ export interface ServerToClientEvents {
   restartGame: (uuid: string) => void;
   destroyRoom: (uuid: string) => void;
   serverError: (error: string) => void;
+  renewJWT: () => void;
 }
 
-export interface ClientToServerEvents {
+export interface ClientToServerUserEvents {
+  registerUser: (user: UserProfile, callback: (user: UserForUI & { token: string }) => void) => void;
+  updateUserName: (name: string) => void;
+  updateUserEmail: (password: string, email: string, callback: (result: boolean) => void) => void;
+  updateUserPassword: (password: string, newPassword: string, callback: (result: boolean) => void) => void;
+  login: (email: string, password: string, callback: (user: UserForUI & { token: string }) => void) => void;
+}
+
+export interface ClientToServerEvents extends ClientToServerUserEvents {
   getTotalStats: (callback: (stats: TTotalWinrateStats) => void) => void;
   getRoomsList: (callback: (list: TRoomsList) => void) => void;
   getOnlineCounter: (id: string, callback: (counter: number) => void) => void;

@@ -28,6 +28,9 @@ export const en = {
     titlediscord: 'Discord',
     contentdiscord:
       'Looking for fellow players to delve into \'Avalon\'? Join our <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b> community!',
+    titleregistration: 'Registration and personal statistics',
+    contentregistration:
+      'Authorization/registration has been added to the site, this will allow us to display your personal statistics with victories in different roles and overall win rate',
   },
   game: {
     winner: 'Winner',
@@ -160,19 +163,34 @@ export const en = {
     connected: 'Connected',
     error: 'Error',
   },
-  settings: {
+  profile: {
     username: 'Username',
-    usernameRequired: 'You must enter a username.',
+    logout: 'Logout',
     language: 'Language',
-    usernameHint: 'Select your username for game',
     hideSpoilersHint: 'Hide spoilers',
     hideIndexHint: 'Hide Indexes In History',
     animeMode: 'Anime mode',
-    submit: 'Submit',
     update: 'Update',
     colorTheme: 'Color theme',
     darkTheme: 'Dark theme',
     lightTheme: 'Light theme',
+    profile: 'Profile',
+    settings: 'Settings',
+  },
+  authModal: {
+    username: 'Username',
+    usernameHint: 'Select your username for game',
+    loginTab: 'Login',
+    registrationTab: 'Registration',
+    loginButton: 'Sign in',
+    registrationButton: 'Sign up',
+    emailHint: 'Will be used for authorization',
+    password: 'Password',
+    email: 'Email',
+    requiredField: 'Required field',
+    minCharacters: 'Min {count} characters',
+    logout: 'Logout',
+    spacesForbidden: 'Spaces are not allowed',
   },
   inGame: {
     sendTeam: 'Send Team',

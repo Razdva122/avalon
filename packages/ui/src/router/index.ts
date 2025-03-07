@@ -36,6 +36,7 @@ const routeComponentMap = {
   cleric: () => import('@/pages/wiki/roles/Cleric.vue'),
   revealer: () => import('@/pages/wiki/roles/Revealer.vue'),
   stats: () => import('@/pages/stats/Stats.vue'),
+  profile: () => import('@/pages/profile/Profile.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
@@ -96,7 +97,7 @@ const defaultKeywords: { [key in Lowercase<TLanguage>]: string[] } = {
 };
 
 router.beforeEach((to, from, next) => {
-  let toLangName = to.path.split('/')[1].toLowerCase();
+  const toLangName = to.path.split('/')[1].toLowerCase();
   const documentLang = document.documentElement.lang.toLowerCase();
 
   if (Object.keys(LanguageMap).find((el) => el.toLowerCase() === toLangName) && toLangName !== documentLang) {

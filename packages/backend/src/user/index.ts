@@ -1,3 +1,5 @@
+export * from '@/user/helpers';
+
 export class User {
   id: string;
   name: string;

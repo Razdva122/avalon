@@ -1,15 +1,19 @@
 import mongoose from 'mongoose';
+
 import { getModelForClass } from '@typegoose/typegoose';
 import { StartedRoomState, TTotalWinrateStats, TWinrateStats } from '@avalon/types';
 import { query } from '@/db/query';
 
+import { UserLayer } from '@/db/user';
+
 export * from '@/db/init';
 
-export class DBManager {
+export class DBManager extends UserLayer {
   roomModel = getModelForClass(StartedRoomState);
   dbInstance: mongoose.Mongoose | undefined;
 
   constructor(dbInstance: mongoose.Mongoose | undefined) {
+    super();
     this.dbInstance = dbInstance;
   }
 

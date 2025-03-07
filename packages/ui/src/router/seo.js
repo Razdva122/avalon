@@ -29,6 +29,7 @@ const {
   cleric,
   revealer,
   stats,
+  profile,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -59,6 +60,7 @@ module.exports.routesSeo = {
     props: true,
     name: 'room',
     meta: {
+      prerender: true,
       multiLanguage: {
         ...game,
       },
@@ -370,6 +372,17 @@ module.exports.routesSeo = {
       multiLanguage: {
         ...stats,
       },
+    },
+  },
+  profile: {
+    path: '/profile/',
+    name: 'profile',
+    meta: {
+      prerender: true,
+      multiLanguage: {
+        ...profile,
+      },
+      skipSiteMap: true,
     },
   },
   notFound: {

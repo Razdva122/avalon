@@ -105,8 +105,8 @@ export default defineComponent({
       });
     },
     sendMessage() {
-      if (!this.$store.state.user) {
-        eventBus.emit('openSettings');
+      if (!this.$store.state.profile) {
+        eventBus.emit('openAuthModal');
         eventBus.emit('infoMessage', this.$t('infoMessage.loginToMessage'));
         return;
       }
@@ -117,7 +117,7 @@ export default defineComponent({
       }
     },
     isUserMessage(userID: string) {
-      return this.$store.state.user?.id === userID;
+      return this.$store.state.profile?.id === userID;
     },
   },
 });

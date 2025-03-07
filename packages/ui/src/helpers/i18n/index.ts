@@ -1,6 +1,6 @@
-import { userInStorage } from '@/store/init';
+import { userSettingsInStorage } from '@/store/init';
 import locale from 'locale';
-import type { IUser } from '@/store/interface';
+import type { IUserSettings } from '@/store/interface';
 
 import type { TLanguage } from '@/i18n/interface';
 export * from '@/i18n/interface';
@@ -16,11 +16,11 @@ export const LanguageMap: { [key in TLanguage]: string } = {
 };
 
 export function selectLocale(): TLanguage {
-  if (userInStorage) {
-    const user: IUser = JSON.parse(userInStorage);
+  if (userSettingsInStorage) {
+    const settings: IUserSettings = JSON.parse(userSettingsInStorage);
 
-    if (user.settings?.locale?.isDefault === false) {
-      return user.settings.locale.value;
+    if (settings.locale?.isDefault === false) {
+      return settings.locale.value;
     }
   }
 

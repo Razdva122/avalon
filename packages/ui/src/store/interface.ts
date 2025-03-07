@@ -2,9 +2,25 @@ import type { TLanguage } from '@/helpers/i18n';
 
 export interface IState {
   user: IUser | null;
+  profile: IUserProfile | null;
+  settings: IUserSettings | null;
   hideSpoilers: boolean;
   connect: boolean | null;
   alerts: TAlerts;
+}
+
+export interface IUserProfile {
+  id: string;
+  name: string;
+  token: string;
+  email: string;
+}
+
+export interface IUserSettings {
+  locale?: { value: TLanguage; isDefault: boolean };
+  hideIndexInHistory?: boolean;
+  colorTheme?: 'light' | 'dark';
+  style?: 'default' | 'anime';
 }
 
 export interface IUser {
@@ -22,4 +38,4 @@ export type TAlerts = {
   [key in TAlertsName]?: number;
 };
 
-export type TAlertsName = 'discord';
+export type TAlertsName = 'discord' | 'registration';

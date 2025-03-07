@@ -1,22 +1,23 @@
-import { userStoragePath, alertStoragePath } from '@/store/const';
-import type { IUser, TAlerts } from '@/store/interface';
-import Cookies from 'js-cookie';
+import { userStoragePath, userProfilePath, alertStoragePath, userSettingsPath } from '@/store/const';
+import type { IUser, IUserSettings, TAlerts } from '@/store/interface';
+import { updateAuthToken } from '@/api/socket';
 
-export function updateUserData(user: IUser, withCookie: boolean = true) {
-  localStorage.setItem(userStoragePath, JSON.stringify(user));
-
-  if (withCookie) {
-    Cookies.remove('user_id');
-    Cookies.remove('user_name');
-    Cookies.set('user_id', user.id);
-    Cookies.set('user_name', user.name);
-  }
+export function updateUserProfile(user: IUser) {
+  localStorage.setItem(userProfilePath, JSON.stringify(user));
+  updateAuthToken();
 }
 
-export function clearUserData() {
+export function updateUserSettings(settings: IUserSettings) {
+  localStorage.setItem(userSettingsPath, JSON.stringify(settings));
+}
+
+export function clearUserOldStorage() {
   localStorage.removeItem(userStoragePath);
-  Cookies.remove('user_id');
-  Cookies.remove('user_name');
+}
+
+export function clearUserProfile() {
+  localStorage.removeItem(userProfilePath);
+  updateAuthToken();
 }
 
 export function updateUserAlertsData(alerts: TAlerts) {

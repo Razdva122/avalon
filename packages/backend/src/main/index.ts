@@ -4,8 +4,9 @@ import type { Dictionary, TRoomInfo, TRoomsList, GameOptions, StartedRoomState }
 import type { Server, ServerSocket } from '@avalon/types';
 import crypto from 'crypto';
 
-import { parseCookie, handleSocketErrors, eventBus } from '@/helpers';
+import { handleSocketErrors, eventBus } from '@/helpers';
 import { DBManager } from '@/db';
+import { validateJWT } from '@/user';
 
 export class Manager {
   rooms: Dictionary<Room> = {};
@@ -158,7 +159,19 @@ export class Manager {
       handleSocketErrors(socket);
       this.updateOnlineCounter('lobby', 1);
 
-      const { user_id: userID, user_name: userName } = parseCookie(socket.handshake.headers.cookie || '');
+      const { token } = socket.handshake.auth;
+      let userID: string | undefined;
+      let userName: string | undefined;
+
+      if (token) {
+        try {
+          const tokenValue = validateJWT(token);
+          userID = tokenValue.id;
+          userName = tokenValue.name;
+        } catch (e) {
+          socket.emit('renewJWT');
+        }
+      }
 
       if (userID) {
         socket.join(userID);
@@ -183,6 +196,7 @@ export class Manager {
         if (room) {
           cb(this.rooms[uuid].calculateRoomState(userID));
         } else {
+          throw new Error('errorNotFound');
           cb({ error: 'errorNotFound' });
         }
       });
@@ -206,6 +220,18 @@ export class Manager {
         const stats = await dbManager.getFullStats();
 
         cb(stats);
+      });
+
+      socket.on('registerUser', async (user, cb) => {
+        const userForUI = await dbManager.registerUser(user);
+
+        cb(userForUI);
+      });
+
+      socket.on('login', async (email, password, cb) => {
+        const userForUI = await dbManager.login(email, password);
+
+        cb(userForUI);
       });
 
       if (userID && userName) {
@@ -243,6 +269,22 @@ export class Manager {
   }
 
   createMethodsForAuthUsers(socket: ServerSocket, userID: string, userName: string): void {
+    socket.on('updateUserPassword', async (password, newPassword, cb) => {
+      const result = await this.dbManager.updateUserCredentials(userID, password, 'password', newPassword);
+
+      cb(result);
+    });
+
+    socket.on('updateUserEmail', async (password, email, cb) => {
+      const result = await this.dbManager.updateUserCredentials(userID, password, 'email', email);
+
+      cb(result);
+    });
+
+    socket.on('updateUserName', (name) => {
+      this.dbManager.updateUserName(userID, name);
+    });
+
     socket.on('createRoom', (cb) => {
       const uuid = crypto.randomUUID();
       console.log('createRoom', uuid);

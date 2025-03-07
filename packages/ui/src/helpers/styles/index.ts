@@ -6,7 +6,7 @@ import { TVisibleRole } from '@avalon/types';
 export function calculateRoleUrl(role: TVisibleRole): string {
   let prefix: string = '';
 
-  if (store.state.user?.settings?.style === 'anime') {
+  if (store.state.settings?.style === 'anime') {
     prefix = '/anime';
   }
 
@@ -14,7 +14,7 @@ export function calculateRoleUrl(role: TVisibleRole): string {
 }
 
 export function computedStyles(): string[] {
-  if (store.state.user?.settings?.style === 'anime') {
+  if (store.state.settings?.style === 'anime') {
     return ['anime-style'];
   }
 

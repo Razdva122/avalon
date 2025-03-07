@@ -1,11 +1,18 @@
 import { InjectionKey } from 'vue';
 import { createStore, Store, useStore as baseUseStore } from 'vuex';
 
-import { updateUserData, clearUserData, updateUserAlertsData } from '@/store/persistent';
-import { userStoragePath } from '@/store/const';
-import type { IState, IUser, TAlertsName } from '@/store/interface';
+import { v4 as uuidv4 } from 'uuid';
 
-import { userInStorage, alertsInStorage } from '@/store/init';
+import {
+  updateUserProfile,
+  updateUserAlertsData,
+  clearUserProfile,
+  updateUserSettings,
+  clearUserOldStorage,
+} from '@/store/persistent';
+import type { IState, TAlertsName, IUserSettings, IUserProfile } from '@/store/interface';
+
+import { userInStorage, alertsInStorage, userProfileInStorage, userSettingsInStorage } from '@/store/init';
 
 export * from '@/store/interface';
 
@@ -16,6 +23,8 @@ export const key: InjectionKey<Store<IState>> = Symbol();
 export const store = createStore<IState>({
   state: {
     user: userInStorage ? JSON.parse(userInStorage) : null,
+    profile: userProfileInStorage ? JSON.parse(userProfileInStorage) : null,
+    settings: userSettingsInStorage ? JSON.parse(userSettingsInStorage) : null,
     hideSpoilers: false,
     connect: null,
     alerts: alertsInStorage ? JSON.parse(alertsInStorage) : {},
@@ -27,32 +36,26 @@ export const store = createStore<IState>({
       updateUserAlertsData(state.alerts);
     },
 
-    setUserData(state: IState, user: IUser) {
-      state.user = user;
-      updateUserData(user);
+    updateUserProfile(state: IState, profile: IUserProfile) {
+      state.profile = profile;
+      updateUserProfile(profile);
     },
 
-    updateUserName(state: IState, name: string) {
-      if (state.user) {
-        state.user.name = name;
-        updateUserData(state.user);
-      }
-    },
-
-    updateUserSettings<T extends keyof IUser['settings']>(
+    updateUserSettings<T extends keyof IUserSettings>(
       state: IState,
-      { key, value }: { key: T; value: IUser['settings'][T] },
+      { key, value }: { key: T; value: IUserSettings[T] },
     ) {
-      if (state.user) {
-        state.user.settings = state.user.settings || {};
-        state.user.settings[key] = value;
-        updateUserData(state.user, false);
+      if (!state.settings) {
+        state.settings = {};
       }
+
+      state.settings[key] = value;
+      updateUserSettings(state.settings);
     },
 
-    clearUserData() {
-      localStorage.removeItem(userStoragePath);
-      clearUserData();
+    clearUserProfile(state: IState) {
+      state.profile = null;
+      clearUserProfile();
     },
 
     updateConnectState(state: IState, value: boolean) {
@@ -63,7 +66,52 @@ export const store = createStore<IState>({
       state.hideSpoilers = value;
     },
   },
-  actions: {},
+  actions: {
+    async login({ commit }, { email, password }): Promise<void> {
+      const user = await socket.emitWithAck('login', email, password);
+      commit('updateUserProfile', user);
+    },
+    async registerUser({ commit, state }, { password, name, email }): Promise<void> {
+      let id = uuidv4();
+
+      if (state.user?.id) {
+        id = state.user?.id;
+      }
+
+      const user = await socket.emitWithAck('registerUser', {
+        password,
+        id,
+        name,
+        email,
+      });
+
+      if (state.user) {
+        clearUserOldStorage();
+      }
+
+      commit('updateUserProfile', user);
+    },
+    updateUserPassword({ state }, { password, newPassword }): void {
+      if (state.profile) {
+        socket.emitWithAck('updateUserPassword', password, newPassword);
+      }
+    },
+    updateUserName({ commit, state }, { name }): void {
+      if (state.profile) {
+        socket.emit('updateUserName', name);
+        commit('updateUserProfile', { ...state.profile, name });
+      }
+    },
+    async updateUserEmail({ commit, state }, { email, password }): Promise<void> {
+      if (state.profile) {
+        const result = await socket.emitWithAck('updateUserEmail', email, password);
+
+        if (result) {
+          commit('updateUserProfile', { ...state.profile, email });
+        }
+      }
+    },
+  },
   modules: {},
 });
 
@@ -73,6 +121,10 @@ socket.on('connect', () => {
 
 socket.on('disconnect', () => {
   store.commit('updateConnectState', false);
+});
+
+socket.on('renewJWT', () => {
+  store.commit('clearUserProfile');
 });
 
 export function useStore() {

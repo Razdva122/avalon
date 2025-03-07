@@ -20,14 +20,14 @@
       </Transition>
     </template>
   </RouterView>
-  <Settings ref="settings" />
+  <AuthModal />
   <InfoSnackbar />
   <Version class="version" />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Settings from '@/components/user/Settings.vue';
+import AuthModal from '@/components/user/AuthModal.vue';
 import Menu from '@/components/header/Menu.vue';
 import ConnectStatus from '@/components/feedback/ConnectStatus.vue';
 import InfoSnackbar from '@/components/feedback/InfoSnackbar.vue';
@@ -35,10 +35,11 @@ import Version from '@/components/feedback/Version.vue';
 import Socials from '@/components/feedback/Socials.vue';
 import SpoilerEye from '@/components/feedback/SpoilerEye.vue';
 import { isHolidays } from '@/helpers/utility';
+import eventBus from '@/helpers/event-bus';
 
 export default defineComponent({
   components: {
-    Settings,
+    AuthModal,
     ConnectStatus,
     InfoSnackbar,
     Version,
@@ -47,10 +48,7 @@ export default defineComponent({
     SpoilerEye,
   },
   data() {
-    const { user } = this.$store.state;
-
     return {
-      user,
       currentLocale: this.$i18n.locale,
     };
   },
@@ -61,7 +59,11 @@ export default defineComponent({
   },
   methods: {
     profileClick() {
-      (<InstanceType<typeof Settings>>this.$refs.settings).displaySettings();
+      if (this.$store.state.profile) {
+        this.$router.push({ name: 'profile' });
+      } else {
+        eventBus.emit('openAuthModal');
+      }
     },
   },
   created() {

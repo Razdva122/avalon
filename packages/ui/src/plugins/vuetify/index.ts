@@ -1,15 +1,15 @@
 import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
 import { aliases, md } from 'vuetify/iconsets/md';
-import { userInStorage } from '@/store/init';
+import { userSettingsInStorage } from '@/store/init';
 
-import type { IUser } from '@/store/interface';
+import type { IUserSettings } from '@/store/interface';
 
 function selectTheme(): 'lightTheme' | 'darkTheme' {
-  if (userInStorage) {
-    const user: IUser = JSON.parse(userInStorage);
+  if (userSettingsInStorage) {
+    const settings: IUserSettings = JSON.parse(userSettingsInStorage);
 
-    return user.settings?.colorTheme === 'dark' ? 'darkTheme' : 'lightTheme';
+    return settings.colorTheme === 'dark' ? 'darkTheme' : 'lightTheme';
   }
 
   return 'lightTheme';
