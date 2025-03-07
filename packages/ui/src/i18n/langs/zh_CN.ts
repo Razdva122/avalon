@@ -166,7 +166,7 @@ export const zh_CN = {
     logout: '退出登录',
     language: '语言',
     hideSpoilersHint: '隐藏剧透',
-    hideIndexesHint: '隐藏历史索引',
+    hideIndexHint: '隐藏历史索引',
     animeMode: '动漫模式',
     update: '更新',
     colorTheme: '色彩主题',

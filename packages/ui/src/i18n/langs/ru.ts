@@ -167,7 +167,7 @@ export const ru = {
     logout: 'Выйти',
     language: 'Язык',
     hideSpoilersHint: 'Скрыть спойлеры',
-    hideIndexesHint: 'Скрывать индексы в истории',
+    hideIndexHint: 'Скрывать индексы в истории',
     animeMode: 'Аниме-режим',
     update: 'Обновить',
     colorTheme: 'Цветовая тема',

@@ -167,7 +167,7 @@ export const es = {
     logout: 'Cerrar sesión',
     language: 'Idioma',
     hideSpoilersHint: 'Ocultar spoilers',
-    hideIndexesHint: 'Ocultar índices en el historial',
+    hideIndexHint: 'Ocultar índices en el historial',
     animeMode: 'Modo anime',
     update: 'Actualizar',
     colorTheme: 'Tema de color',

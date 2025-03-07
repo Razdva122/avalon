@@ -166,7 +166,7 @@ export const zh_TW = {
     logout: '登出',
     language: '語言',
     hideSpoilersHint: '隱藏劇透',
-    hideIndexesHint: '隱藏歷史索引',
+    hideIndexHint: '隱藏歷史索引',
     animeMode: '動漫模式',
     update: '更新',
     colorTheme: '色彩主題',
