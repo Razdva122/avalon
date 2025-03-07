@@ -58,11 +58,10 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
     const online = ref<number>();
+    const userID = computed(() => store.state.profile?.id);
 
     const roomState = stateManager.state;
     const game = stateManager.game;
-
-    const userID = store.state.profile?.id;
 
     const initState = async (uuid: string) => {
       const stateFromBackend = await socket.emitWithAck('joinRoom', uuid);
@@ -70,7 +69,7 @@ export default defineComponent({
       if ('error' in stateFromBackend) {
         errorMessage.value = stateFromBackend;
       } else {
-        stateManager.mutateRoomState({ newRoomState: stateFromBackend, userID });
+        stateManager.mutateRoomState({ newRoomState: stateFromBackend, userID: userID.value });
       }
     };
 
@@ -82,13 +81,13 @@ export default defineComponent({
 
     socket.on('roomUpdated', (state) => {
       if (state.roomID === props.uuid) {
-        stateManager.mutateRoomState({ newRoomState: state, userID });
+        stateManager.mutateRoomState({ newRoomState: state, userID: userID.value });
       }
     });
 
     socket.on('gameUpdated', (game) => {
       if (game.uuid === props.uuid && roomState.value.stage === 'started') {
-        stateManager.mutateRoomState({ newGameState: game, userID });
+        stateManager.mutateRoomState({ newGameState: game, userID: userID.value });
       }
     });
 
@@ -113,12 +112,18 @@ export default defineComponent({
       },
     );
 
+    watch(userID, () => {
+      initState(props.uuid);
+    });
+
     const displayHostPanel = computed(() => {
-      return roomState.value.leaderID === userID;
+      return roomState.value.leaderID === userID.value;
     });
 
     const displayRestartButton = computed(() => {
-      return roomState.value.stage === 'started' && game.value.stage === 'end' && roomState.value.leaderID === userID;
+      return (
+        roomState.value.stage === 'started' && game.value.stage === 'end' && roomState.value.leaderID === userID.value
+      );
     });
 
     const restartGame = () => socket.emit('restartGame', roomState.value.roomID);

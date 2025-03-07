@@ -196,7 +196,6 @@ export class Manager {
         if (room) {
           cb(this.rooms[uuid].calculateRoomState(userID));
         } else {
-          throw new Error('errorNotFound');
           cb({ error: 'errorNotFound' });
         }
       });
