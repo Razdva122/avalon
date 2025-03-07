@@ -378,7 +378,6 @@ module.exports.routesSeo = {
     path: '/profile/',
     name: 'profile',
     meta: {
-      prerender: true,
       multiLanguage: {
         ...profile,
       },
