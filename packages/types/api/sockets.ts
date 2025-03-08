@@ -41,6 +41,7 @@ export interface ClientToServerUserEvents {
 
 export interface ClientToServerEvents extends ClientToServerUserEvents {
   getTotalStats: (callback: (stats: TTotalWinrateStats) => void) => void;
+  getPlayerGames: (uuid: string, callback: (games: VisualGameState[]) => void) => void;
   getRoomsList: (callback: (list: TRoomsList) => void) => void;
   getOnlineCounter: (id: string, callback: (counter: number) => void) => void;
 

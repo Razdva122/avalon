@@ -30,6 +30,7 @@ const {
   revealer,
   stats,
   profile,
+  userStats,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -60,7 +61,6 @@ module.exports.routesSeo = {
     props: true,
     name: 'room',
     meta: {
-      prerender: true,
       multiLanguage: {
         ...game,
       },
@@ -372,6 +372,17 @@ module.exports.routesSeo = {
       multiLanguage: {
         ...stats,
       },
+    },
+  },
+  user_stats: {
+    path: '/stats/user/:uuid/',
+    props: true,
+    name: 'user_stats',
+    meta: {
+      multiLanguage: {
+        ...userStats,
+      },
+      skipSiteMap: true,
     },
   },
   profile: {

@@ -1,0 +1,55 @@
+import type { TLanguage } from '@/i18n/interface';
+import { Dictionary } from '@avalon/types';
+
+export const userStats: { [key in TLanguage]: Dictionary<string> } = {
+  en: {
+    userStatsTitle: 'User statistics:',
+    side: 'Side',
+    sideevil: 'Evil team',
+    sidegood: 'Good team',
+    sidetotal: 'All',
+    gamesCount: 'Games count',
+    wins: 'Wins',
+    role: 'Role',
+  },
+  ru: {
+    userStatsTitle: 'Статистика пользователя:',
+    side: 'Сторона',
+    sideevil: 'Команда зла',
+    sidegood: 'Команда добра',
+    sidetotal: 'Всего',
+    gamesCount: 'Количество игр',
+    wins: 'Победы',
+    role: 'Роль',
+  },
+  es: {
+    userStatsTitle: 'Estadísticas del usuario:',
+    side: 'Equipo',
+    sideevil: 'Equipo del mal',
+    sidegood: 'Equipo del bien',
+    sidetotal: 'Total',
+    gamesCount: 'Partidas jugadas',
+    wins: 'Victorias',
+    role: 'Rol',
+  },
+  'zh-TW': {
+    userStatsTitle: '用戶統計：',
+    side: '陣營',
+    sideevil: '邪惡陣營',
+    sidegood: '正義陣營',
+    sidetotal: '總計',
+    gamesCount: '遊戲場數',
+    wins: '勝利次數',
+    role: '角色',
+  },
+  'zh-CN': {
+    userStatsTitle: '用户统计：',
+    side: '阵营',
+    sideevil: '邪恶阵营',
+    sidegood: '正义阵营',
+    sidetotal: '总计',
+    gamesCount: '游戏场数',
+    wins: '胜利次数',
+    role: '角色',
+  },
+};

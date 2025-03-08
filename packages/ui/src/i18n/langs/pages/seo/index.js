@@ -1,3 +1,4 @@
+/* eslint-disable */
 const { lobby } = require('./lobby');
 const { wiki } = require('./wiki');
 const { game } = require('./game');
@@ -29,6 +30,7 @@ const { cleric } = require('./cleric');
 const { revealer } = require('./revealer');
 const { stats } = require('./stats');
 const { profile } = require('./profile');
+const { userStats } = require('./userStats');
 
 module.exports = {
   lobby,
@@ -62,4 +64,5 @@ module.exports = {
   revealer,
   stats,
   profile,
+  userStats,
 };

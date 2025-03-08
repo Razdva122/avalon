@@ -221,6 +221,11 @@ export class Manager {
         cb(stats);
       });
 
+      socket.on('getPlayerGames', async (uuid, cb) => {
+        const games = await dbManager.getPlayerGames(uuid);
+        cb(games);
+      });
+
       socket.on('registerUser', async (user, cb) => {
         const userForUI = await dbManager.registerUser(user);
 

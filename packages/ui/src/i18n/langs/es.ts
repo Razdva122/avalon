@@ -164,6 +164,7 @@ export const es = {
   },
   profile: {
     username: 'Nombre de usuario',
+    stats: 'Estadísticas',
     logout: 'Cerrar sesión',
     language: 'Idioma',
     hideSpoilersHint: 'Ocultar spoilers',

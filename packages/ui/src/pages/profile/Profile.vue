@@ -2,7 +2,13 @@
   <div class="info-page-content profile-page">
     <div class="profile-section">
       <h2>{{ $t('profile.profile') }}</h2>
-      Email: {{ $store.state.profile?.email }}
+      <v-btn class="mb-4 w-100" size="large" @click="goToStats">
+        <template v-slot:prepend>
+          <span class="material-icons"> insert_chart_outlined </span>
+        </template>
+        {{ $t('profile.stats') }}
+      </v-btn>
+      <div class="mb-2">Email: {{ $store.state.profile?.email }}</div>
       <v-text-field v-model="username" :label="$t('profile.username')" class="w-100 mb-2"></v-text-field>
       <div class="d-flex justify-space-between">
         <v-btn :disabled="!updateAvailable" @click="update">{{ $t('profile.update') }}</v-btn>
@@ -116,6 +122,9 @@ export default defineComponent({
     logout() {
       this.$store.commit('clearUserProfile');
       this.$router.push({ name: 'lobby' });
+    },
+    goToStats() {
+      this.$router.push({ name: 'user_stats', params: { uuid: this.$store.state.profile!.id } });
     },
     update() {
       this.$store.dispatch('updateUserName', { name: this.username });

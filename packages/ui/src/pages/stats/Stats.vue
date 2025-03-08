@@ -45,6 +45,7 @@ import { defineComponent, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { TTotalWinrateStats, goodRolesImportance, TRoleStats } from '@avalon/types';
 import { socket } from '@/api/socket';
+import { pretifyPercent } from '@/helpers/stats';
 import PlayerCountsStats from '@/components/stats/PlayerCountsStats.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 
@@ -146,7 +147,6 @@ export default defineComponent({
       };
     });
 
-    const pretifyPercent = (percent: number) => percent.toFixed(2);
     const getColorWinrate = (winrate: number) => {
       if (winrate === 0) {
         return 'orange';

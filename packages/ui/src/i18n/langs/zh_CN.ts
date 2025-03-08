@@ -163,6 +163,7 @@ export const zh_CN = {
   },
   profile: {
     username: '用户名',
+    stats: '统计',
     logout: '退出登录',
     language: '语言',
     hideSpoilersHint: '隐藏剧透',

@@ -163,6 +163,7 @@ export const zh_TW = {
   },
   profile: {
     username: '使用者名稱',
+    stats: '統計',
     logout: '登出',
     language: '語言',
     hideSpoilersHint: '隱藏劇透',

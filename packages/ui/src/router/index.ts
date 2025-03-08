@@ -37,6 +37,7 @@ const routeComponentMap = {
   revealer: () => import('@/pages/wiki/roles/Revealer.vue'),
   stats: () => import('@/pages/stats/Stats.vue'),
   profile: () => import('@/pages/profile/Profile.vue'),
+  user_stats: () => import('@/pages/stats/UserStats.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [

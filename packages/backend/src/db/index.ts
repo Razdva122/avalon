@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 import { getModelForClass } from '@typegoose/typegoose';
-import { StartedRoomState, TTotalWinrateStats, TWinrateStats } from '@avalon/types';
+import { StartedRoomState, TTotalWinrateStats, TWinrateStats, VisualGameState } from '@avalon/types';
 import { query } from '@/db/query';
 
 import { UserLayer } from '@/db/user';
@@ -25,6 +25,11 @@ export class DBManager extends UserLayer {
   async getRoomFromDB(roomID: string): Promise<StartedRoomState | null> {
     const room = await this.roomModel.findOne({ roomID });
     return room;
+  }
+
+  async getPlayerGames(playerID: string): Promise<VisualGameState[]> {
+    const rooms = await this.roomModel.find({ 'players.id': playerID });
+    return rooms.map((el) => el.game);
   }
 
   async getLastRooms(amount: number): Promise<StartedRoomState[]> {

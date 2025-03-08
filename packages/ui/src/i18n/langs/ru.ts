@@ -164,6 +164,7 @@ export const ru = {
   },
   profile: {
     username: 'Имя пользователя',
+    stats: 'Статистика',
     logout: 'Выйти',
     language: 'Язык',
     hideSpoilersHint: 'Скрыть спойлеры',
