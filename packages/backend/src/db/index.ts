@@ -28,7 +28,12 @@ export class DBManager extends UserLayer {
   }
 
   async getPlayerGames(playerID: string): Promise<VisualGameState[]> {
-    const rooms = await this.roomModel.find({ 'players.id': playerID });
+    const rooms = await this.roomModel.find({
+      'players.id': playerID,
+      'game.stage': 'end',
+      'game.result.reason': { $ne: 'manualy' },
+    });
+
     return rooms.map((el) => el.game);
   }
 

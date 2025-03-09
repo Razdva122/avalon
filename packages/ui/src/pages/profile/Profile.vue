@@ -9,7 +9,12 @@
         {{ $t('profile.stats') }}
       </v-btn>
       <div class="mb-2">Email: {{ $store.state.profile?.email }}</div>
-      <v-text-field v-model="username" :label="$t('profile.username')" class="w-100 mb-2"></v-text-field>
+      <v-text-field
+        hide-details="auto"
+        v-model="username"
+        :label="$t('profile.username')"
+        class="w-100 mb-2"
+      ></v-text-field>
       <div class="d-flex justify-space-between">
         <v-btn :disabled="!updateAvailable" @click="update">{{ $t('profile.update') }}</v-btn>
         <v-btn @click="logout">{{ $t('profile.logout') }}</v-btn>
@@ -20,14 +25,16 @@
       <v-select
         :label="$t('profile.language')"
         :items="availableLocales"
-        class="w-100 mb-2"
+        class="w-100 mb-4"
         v-model="locale"
+        hide-details="auto"
       ></v-select>
       <v-select
         :label="$t('profile.colorTheme')"
         :items="availableThemes"
-        class="w-100 mb-2"
+        class="w-100 mb-4"
         v-model="colorTheme"
+        hide-details="auto"
       ></v-select>
       <v-checkbox v-model="hideSpoilers" :hide-details="true" :label="$t('profile.hideSpoilersHint')"> </v-checkbox>
       <v-checkbox v-model="hideIndexInHistory" :hide-details="true" :label="$t('profile.hideIndexHint')"> </v-checkbox>

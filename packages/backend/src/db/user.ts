@@ -1,18 +1,28 @@
 import bcrypt from 'bcrypt';
 import { getModelForClass } from '@typegoose/typegoose';
-import { UserProfile, UserForUI } from '@avalon/types';
+import { UserProfile, ArgumentOfCallback } from '@avalon/types';
 import { generateJWT } from '@/user';
 
 export class UserLayer {
   hashRounds = 12;
   userProfileModel = getModelForClass(UserProfile);
 
-  async registerUser(user: UserProfile): Promise<UserForUI & { token: string }> {
+  async registerUser(user: UserProfile): Promise<ArgumentOfCallback<'registerUser'>> {
     const passHash = await bcrypt.hash(user.password, this.hashRounds);
 
     const userModel = new this.userProfileModel({ ...user, password: passHash });
 
-    await userModel.save();
+    try {
+      await userModel.save();
+    } catch (err) {
+      if (err instanceof Error && 'code' in err && err.code === 11000) {
+        return {
+          error: 'emailAlreadyExist',
+        };
+      }
+
+      throw err;
+    }
 
     const userForUi = {
       id: user.id,
@@ -57,17 +67,17 @@ export class UserLayer {
     return false;
   }
 
-  async login(email: string, password: string): Promise<UserForUI & { token: string }> {
+  async login(email: string, password: string): Promise<ArgumentOfCallback<'login'>> {
     const user = await this.userProfileModel.findOne({ email });
 
     if (!user) {
-      throw new Error(`User with email: ${email} does not exist`);
+      return { error: 'emailNotExist' };
     }
 
     const isPassValid = await this.validateUserPassword(user, password);
 
     if (!isPassValid) {
-      throw new Error(`Wrong password`);
+      return { error: 'wrongPassword' };
     }
 
     const userForUi = {

@@ -10,6 +10,7 @@ import {
   updateUserSettings,
   clearUserOldStorage,
 } from '@/store/persistent';
+
 import type { IState, TAlertsName, IUserSettings, IUserProfile } from '@/store/interface';
 
 import { userInStorage, alertsInStorage, userProfileInStorage, userSettingsInStorage } from '@/store/init';
@@ -17,6 +18,8 @@ import { userInStorage, alertsInStorage, userProfileInStorage, userSettingsInSto
 export * from '@/store/interface';
 
 import { socket } from '@/api/socket';
+
+import type { ArgumentOfCallback } from '@avalon/types';
 
 export const key: InjectionKey<Store<IState>> = Symbol();
 
@@ -67,11 +70,16 @@ export const store = createStore<IState>({
     },
   },
   actions: {
-    async login({ commit }, { email, password }): Promise<void> {
+    async login({ commit }, { email, password }): Promise<ArgumentOfCallback<'login'>> {
       const user = await socket.emitWithAck('login', email, password);
-      commit('updateUserProfile', user);
+
+      if (!('error' in user)) {
+        commit('updateUserProfile', user);
+      }
+
+      return user;
     },
-    async registerUser({ commit, state }, { password, name, email }): Promise<void> {
+    async registerUser({ commit, state }, { password, name, email }): Promise<ArgumentOfCallback<'registerUser'>> {
       let id = uuidv4();
 
       if (state.user?.id) {
@@ -85,11 +93,15 @@ export const store = createStore<IState>({
         email,
       });
 
-      if (state.user) {
-        clearUserOldStorage();
+      if (!('error' in user)) {
+        if (state.user) {
+          clearUserOldStorage();
+        }
+
+        commit('updateUserProfile', user);
       }
 
-      commit('updateUserProfile', user);
+      return user;
     },
     updateUserPassword({ state }, { password, newPassword }): void {
       if (state.profile) {

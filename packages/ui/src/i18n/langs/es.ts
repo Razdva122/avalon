@@ -162,6 +162,11 @@ export const es = {
     connected: 'Conectado',
     error: 'Error',
   },
+  errors: {
+    wrongPassword: 'Contraseña incorrecta',
+    emailNotExist: 'Usuario con este correo electrónico no encontrado',
+    emailAlreadyExist: 'Un usuario con este correo ya está registrado',
+  },
   profile: {
     username: 'Nombre de usuario',
     stats: 'Estadísticas',

@@ -161,6 +161,11 @@ export const zh_TW = {
     connected: '上線',
     error: '連線失敗',
   },
+  errors: {
+    wrongPassword: '密碼錯誤',
+    emailNotExist: '找不到使用此電子郵件的用戶',
+    emailAlreadyExist: '此電子郵件已被註冊',
+  },
   profile: {
     username: '使用者名稱',
     stats: '統計',

@@ -163,6 +163,11 @@ export const en = {
     connected: 'Connected',
     error: 'Error',
   },
+  errors: {
+    wrongPassword: 'Wrong password',
+    emailNotExist: 'User with this email not found',
+    emailAlreadyExist: 'A user with this email is already registered',
+  },
   profile: {
     username: 'Username',
     stats: 'Statistics',

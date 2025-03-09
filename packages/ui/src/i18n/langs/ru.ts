@@ -162,6 +162,11 @@ export const ru = {
     connected: 'Онлайн',
     error: 'Ошибка',
   },
+  errors: {
+    wrongPassword: 'Неверный пароль',
+    emailNotExist: 'Пользователь с таким email не найден',
+    emailAlreadyExist: 'Пользователь с таким email уже зарегистрирован',
+  },
   profile: {
     username: 'Имя пользователя',
     stats: 'Статистика',

@@ -161,6 +161,11 @@ export const zh_CN = {
     connected: '上线',
     error: '连线失败',
   },
+  errors: {
+    wrongPassword: '密码错误',
+    emailNotExist: '找不到使用此电子邮件的用户',
+    emailAlreadyExist: '此电子邮件已被注册',
+  },
   profile: {
     username: '用户名',
     stats: '统计',

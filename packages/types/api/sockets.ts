@@ -9,14 +9,15 @@ import type { TMissionResult } from '../game/mission';
 import type { TLoyalty, TRoles } from '../game/roles';
 import type { TLoyaltyType } from '../game/addons/loyalty';
 
-import type { IRoomUnavailableError } from './errors';
+import type { IRoomUnavailableError, ILoginError, IRegisterError } from './errors';
 import type { TAssassinateType } from '../game/addons';
 
 import type { TRoomsList, TMessage } from '../room';
 import { TTotalWinrateStats } from '../stats';
 import { UserForUI, UserProfile } from '../user';
 
-export type { ISocketError } from './errors';
+export type { ISocketError, ILoginError, IRegisterError } from './errors';
+export type { ArgumentOfCallback } from './helpers';
 
 export interface ServerToClientEvents {
   roomsListUpdated: (list: TRoomsList) => void;
@@ -32,11 +33,15 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerUserEvents {
-  registerUser: (user: UserProfile, callback: (user: UserForUI & { token: string }) => void) => void;
+  registerUser: (user: UserProfile, callback: (user: (UserForUI & { token: string }) | IRegisterError) => void) => void;
   updateUserName: (name: string) => void;
   updateUserEmail: (password: string, email: string, callback: (result: boolean) => void) => void;
   updateUserPassword: (password: string, newPassword: string, callback: (result: boolean) => void) => void;
-  login: (email: string, password: string, callback: (user: UserForUI & { token: string }) => void) => void;
+  login: (
+    email: string,
+    password: string,
+    callback: (user: (UserForUI & { token: string }) | ILoginError) => void,
+  ) => void;
 }
 
 export interface ClientToServerEvents extends ClientToServerUserEvents {

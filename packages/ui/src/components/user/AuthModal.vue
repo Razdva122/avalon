@@ -6,6 +6,9 @@
           <v-tab value="auth">{{ $t('authModal.loginTab') }}</v-tab>
           <v-tab value="registration">{{ $t('authModal.registrationTab') }}</v-tab>
         </v-tabs>
+        <div v-if="error" class="error-message mb-2 ml-2">
+          {{ $t('errors.' + error) }}
+        </div>
         <v-form
           ref="loginForm"
           @input="updateFormValidity('loginForm')"
@@ -93,6 +96,7 @@ export default defineComponent({
       visiblePass: false,
       password: '',
       email: '',
+      error: '',
       availableLocales: this.$i18n.availableLocales.map((el) => ({
         value: el,
         title: LanguageMap[<TLanguage>el],
@@ -176,8 +180,15 @@ export default defineComponent({
       ];
     },
   },
+  watch: {
+    mode() {
+      this.error = '';
+    },
+  },
   methods: {
     async updateFormValidity(type: 'loginForm' | 'registrationForm') {
+      this.error = '';
+
       const requiredFields = {
         loginForm: ['email', 'password'],
         registrationForm: ['password', 'email', 'username'],
@@ -195,12 +206,26 @@ export default defineComponent({
       this.formValid[type] = valid;
     },
     async loginInAccount() {
-      await this.$store.dispatch('login', { email: this.email, password: this.password });
-      this.closeAuthModal();
+      const userOrError = await this.$store.dispatch('login', { email: this.email, password: this.password });
+
+      if ('error' in userOrError) {
+        this.error = userOrError.error;
+      } else {
+        this.closeAuthModal();
+      }
     },
     async registerUser() {
-      await this.$store.dispatch('registerUser', { email: this.email, password: this.password, name: this.username });
-      this.closeAuthModal();
+      const userOrError = await this.$store.dispatch('registerUser', {
+        email: this.email,
+        password: this.password,
+        name: this.username,
+      });
+
+      if ('error' in userOrError) {
+        this.error = userOrError.error;
+      } else {
+        this.closeAuthModal();
+      }
     },
     closeAuthModal() {
       this.overlay = false;
@@ -226,5 +251,9 @@ export default defineComponent({
 .form {
   display: flex;
   flex-direction: column;
+}
+
+.error-message {
+  color: rgb(var(--v-theme-error));
 }
 </style>

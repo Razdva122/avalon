@@ -63,6 +63,7 @@
 
 <script lang="ts">
 import { defineComponent, computed, inject, watch, ref, PropType, toRefs, nextTick } from 'vue';
+import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import Player from '@/components/view/board/modules/Player.vue';
 import Timer from '@/components/feedback/Timer.vue';
@@ -95,6 +96,7 @@ export default defineComponent({
   },
   setup(props) {
     const { t } = useI18n();
+    const router = useRouter();
     const { roomState } = toRefs(props);
     const gameState = inject(gameStateKey)!;
     const stateManager = inject(stateManagerKey)!;
@@ -129,6 +131,11 @@ export default defineComponent({
     };
 
     const onPlayerClick = (uuid: string) => {
+      if (roomState.value.stage === 'started' && roomState.value.game.stage === 'end') {
+        router.push({ name: 'user_stats', params: { uuid } });
+        return;
+      }
+
       if (roomState.value.stage !== 'started') {
         if (userIsLeader.value) {
           socket.emit('kickPlayer', roomState.value.roomID, uuid);
