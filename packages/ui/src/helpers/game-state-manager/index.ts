@@ -187,15 +187,17 @@ export class GameStateManager {
         const validator = current.players.find((player) => player.id === history.validatorID)!;
         validator.features.waitForAction = true;
 
-        const typeOfLady = validator.features.ladyOfLake ? 'ladyOfLake' : 'ladyOfSea';
+        if (validator.features.ladyOfSea || validator.features.ladyOfSea) {
+          const typeOfLady = validator.features.ladyOfLake ? 'ladyOfLake' : 'ladyOfSea';
 
-        while (mutateIndex >= startIndex) {
-          const players = gameStates[mutateIndex].players;
-          const target = players.find((player) => player.id === history.inspectedID)!;
-          const validator = players.find((player) => player.id === history.validatorID)!;
-          target.features[typeOfLady] = undefined;
-          validator.features[typeOfLady] = 'has';
-          mutateIndex -= 1;
+          while (mutateIndex >= startIndex) {
+            const players = gameStates[mutateIndex].players;
+            const target = players.find((player) => player.id === history.inspectedID)!;
+            const validator = players.find((player) => player.id === history.validatorID)!;
+            target.features[typeOfLady] = undefined;
+            validator.features[typeOfLady] = 'has';
+            mutateIndex -= 1;
+          }
         }
       }
 
