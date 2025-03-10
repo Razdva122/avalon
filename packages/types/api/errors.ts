@@ -13,3 +13,11 @@ export interface ILoginError extends ISocketError {
 export interface IRegisterError extends ISocketError {
   error: 'emailAlreadyExist';
 }
+
+export interface IUpdateEmailError extends ISocketError {
+  error: 'emailAlreadyExist' | 'wrongPassword';
+}
+
+export interface IUpdatePasswordError extends ISocketError {
+  error: 'wrongPassword';
+}

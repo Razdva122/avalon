@@ -21,6 +21,7 @@
     </template>
   </RouterView>
   <AuthModal />
+  <CredentialsModal />
   <InfoSnackbar />
   <Version class="version" />
 </template>
@@ -28,6 +29,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import AuthModal from '@/components/user/AuthModal.vue';
+import CredentialsModal from '@/components/user/CredentialsModal.vue';
 import Menu from '@/components/header/Menu.vue';
 import ConnectStatus from '@/components/feedback/ConnectStatus.vue';
 import InfoSnackbar from '@/components/feedback/InfoSnackbar.vue';
@@ -46,6 +48,7 @@ export default defineComponent({
     Socials,
     Menu,
     SpoilerEye,
+    CredentialsModal,
   },
   data() {
     return {

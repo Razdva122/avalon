@@ -180,8 +180,14 @@ export const zh_CN = {
     lightTheme: '浅色主题',
     profile: '个人资料',
     settings: '设置',
+    updatePassword: '更新密码',
   },
-  authModal: {
+  validators: {
+    requiredField: '必填项',
+    minCharacters: '最少{count}个字符',
+    spacesForbidden: '禁止使用空格',
+  },
+  modal: {
     username: '用户名',
     usernameHint: '选择您的游戏名称',
     loginTab: '登录',
@@ -191,10 +197,9 @@ export const zh_CN = {
     emailHint: '将用于身份验证',
     password: '密码',
     email: '电子邮件',
-    requiredField: '必填项',
-    minCharacters: '最少{count}个字符',
-    logout: '退出登录',
-    spacesForbidden: '禁止使用空格',
+    updateButton: '更新',
+    newPassword: '新密码',
+    newEmail: '新电子邮件',
   },
   inGame: {
     sendTeam: '发送组队',

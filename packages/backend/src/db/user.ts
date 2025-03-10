@@ -53,18 +53,45 @@ export class UserLayer {
   async updateUserCredentials(
     id: string,
     password: string,
+    type: 'password',
+    value: string,
+  ): Promise<ArgumentOfCallback<'updateUserPassword'>>;
+  async updateUserCredentials(
+    id: string,
+    password: string,
+    type: 'email',
+    value: string,
+  ): Promise<ArgumentOfCallback<'updateUserEmail'>>;
+  async updateUserCredentials(
+    id: string,
+    password: string,
     type: 'email' | 'password',
     value: string,
-  ): Promise<boolean> {
+  ): Promise<ArgumentOfCallback<'updateUserEmail' | 'updateUserPassword'>> {
     const user = await this.getUserByID(id);
     const isPassValid = await this.validateUserPassword(user, password);
 
     if (isPassValid) {
-      await this.userProfileModel.findOneAndUpdate({ id: user.id }, { [type]: value });
+      if (type === 'email') {
+        try {
+          await this.userProfileModel.findOneAndUpdate({ id: user.id }, { email: value }, { runValidators: true });
+        } catch (err) {
+          if (err instanceof Error && 'code' in err && err.code === 11000) {
+            // @ts-expect-error - email not checked if we change password
+            return { error: 'emailAlreadyExist' };
+          }
+
+          throw err;
+        }
+      } else {
+        const passHash = await bcrypt.hash(value, this.hashRounds);
+        await this.userProfileModel.findOneAndUpdate({ id: user.id }, { password: passHash });
+      }
+
       return true;
     }
 
-    return false;
+    return { error: 'wrongPassword' };
   }
 
   async login(email: string, password: string): Promise<ArgumentOfCallback<'login'>> {

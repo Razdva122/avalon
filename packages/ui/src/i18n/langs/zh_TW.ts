@@ -179,9 +179,15 @@ export const zh_TW = {
     darkTheme: '深色主題',
     lightTheme: '淺色主題',
     profile: '個人資料',
+    updatePassword: '更新密碼',
     settings: '設定',
   },
-  authModal: {
+  validators: {
+    requiredField: '必填欄位',
+    minCharacters: '最少{count}個字元',
+    spacesForbidden: '禁止使用空格',
+  },
+  modal: {
     username: '使用者名稱',
     usernameHint: '選擇您的遊戲名稱',
     loginTab: '登入',
@@ -191,10 +197,9 @@ export const zh_TW = {
     emailHint: '將用於身份驗證',
     password: '密碼',
     email: '電子郵件',
-    requiredField: '必填欄位',
-    minCharacters: '最少{count}個字元',
-    logout: '登出',
-    spacesForbidden: '禁止使用空格',
+    updateButton: '更新',
+    newPassword: '新密碼',
+    newEmail: '新電子郵件',
   },
   inGame: {
     sendTeam: '發送組隊',

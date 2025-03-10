@@ -181,8 +181,14 @@ export const es = {
     lightTheme: 'Tema claro',
     profile: 'Perfil',
     settings: 'Configuración',
+    updatePassword: 'Actualizar contraseña',
   },
-  authModal: {
+  validators: {
+    requiredField: 'Campo obligatorio',
+    minCharacters: 'Mínimo {count} caracteres',
+    spacesForbidden: 'No se permiten espacios',
+  },
+  modal: {
     username: 'Nombre de usuario',
     usernameHint: 'Elige tu nombre para el juego',
     loginTab: 'Iniciar sesión',
@@ -192,10 +198,9 @@ export const es = {
     emailHint: 'Se usará para autorización',
     password: 'Contraseña',
     email: 'Correo electrónico',
-    requiredField: 'Campo obligatorio',
-    minCharacters: 'Mínimo {count} caracteres',
-    logout: 'Cerrar sesión',
-    spacesForbidden: 'No se permiten espacios',
+    updateButton: 'Actualizar',
+    newPassword: 'Nueva contraseña',
+    newEmail: 'Nuevo correo electrónico',
   },
   inGame: {
     sendTeam: 'Enviar equipo',

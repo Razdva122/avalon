@@ -181,8 +181,14 @@ export const ru = {
     lightTheme: 'Светлая тема',
     profile: 'Профиль',
     settings: 'Настройки',
+    updatePassword: 'Обновить пароль',
   },
-  authModal: {
+  validators: {
+    requiredField: 'Обязательное поле',
+    minCharacters: 'Минимум {count} символов',
+    spacesForbidden: 'Пробелы запрещены',
+  },
+  modal: {
     username: 'Имя пользователя',
     usernameHint: 'Выберите игровое имя',
     loginTab: 'Вход',
@@ -191,11 +197,10 @@ export const ru = {
     registrationButton: 'Зарегистрироваться',
     emailHint: 'Будет использоваться для авторизации',
     password: 'Пароль',
+    updateButton: 'Обновить',
+    newPassword: 'Новый пароль',
     email: 'Email',
-    requiredField: 'Обязательное поле',
-    minCharacters: 'Минимум {count} символов',
-    logout: 'Выйти',
-    spacesForbidden: 'Пробелы запрещены',
+    newEmail: 'Новый email',
   },
   inGame: {
     sendTeam: 'Отправить поход',

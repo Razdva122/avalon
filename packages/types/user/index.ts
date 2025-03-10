@@ -15,6 +15,9 @@ export class UserForUI {
   @prop({ required: true })
   public name!: string;
 
+  @prop()
+  public avatar?: string;
+
   @prop({
     required: true,
     unique: true,

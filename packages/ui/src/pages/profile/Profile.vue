@@ -8,7 +8,11 @@
         </template>
         {{ $t('profile.stats') }}
       </v-btn>
-      <div class="mb-2">Email: {{ $store.state.profile?.email }}</div>
+      <div class="mb-2">
+        Email: {{ $store.state.profile?.email }}
+        <span @click="updateEmail" class="material-icons email-change-icon"> edit </span>
+      </div>
+      <v-btn class="mb-4" @click="updatePassword">{{ $t('profile.updatePassword') }}</v-btn>
       <v-text-field
         hide-details="auto"
         v-model="username"
@@ -127,8 +131,14 @@ export default defineComponent({
   },
   methods: {
     logout() {
-      this.$store.commit('clearUserProfile');
       this.$router.push({ name: 'lobby' });
+      this.$store.commit('clearUserProfile');
+    },
+    updateEmail() {
+      eventBus.emit('openCredentialsModal', 'email');
+    },
+    updatePassword() {
+      eventBus.emit('openCredentialsModal', 'password');
     },
     goToStats() {
       this.$router.push({ name: 'user_stats', params: { uuid: this.$store.state.profile!.id } });
@@ -155,6 +165,12 @@ export default defineComponent({
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
+}
+
+.email-change-icon {
+  cursor: pointer;
+  padding: 4px;
+  font-size: 18px;
 }
 
 @media (max-width: 600px) {

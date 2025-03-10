@@ -103,10 +103,9 @@ export const store = createStore<IState>({
 
       return user;
     },
-    updateUserPassword({ state }, { password, newPassword }): void {
-      if (state.profile) {
-        socket.emitWithAck('updateUserPassword', password, newPassword);
-      }
+    async updateUserPassword(_state, { password, newPassword }): Promise<ArgumentOfCallback<'updateUserPassword'>> {
+      const result = socket.emitWithAck('updateUserPassword', password, newPassword);
+      return result;
     },
     updateUserName({ commit, state }, { name }): void {
       if (state.profile) {
@@ -114,14 +113,16 @@ export const store = createStore<IState>({
         commit('updateUserProfile', { ...state.profile, name });
       }
     },
-    async updateUserEmail({ commit, state }, { email, password }): Promise<void> {
-      if (state.profile) {
-        const result = await socket.emitWithAck('updateUserEmail', email, password);
+    async updateUserEmail({ commit, state }, { email, password }): Promise<ArgumentOfCallback<'updateUserEmail'>> {
+      const result = await socket.emitWithAck('updateUserEmail', password, email);
 
-        if (result) {
+      if (state.profile) {
+        if (result === true) {
           commit('updateUserProfile', { ...state.profile, email });
         }
       }
+
+      return result;
     },
   },
   modules: {},
