@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
-import { ArgumentOfCallback, UserProfile, UserProfileModel } from '@avalon/types';
+import { ArgumentOfCallback, UserProfile } from '@avalon/types';
+import { userProfileModel } from '@/db/models';
 import { generateJWT } from '@/user';
 
 export class UserLayer {
@@ -10,7 +11,7 @@ export class UserLayer {
   ): Promise<ArgumentOfCallback<'registerUser'>> {
     const passHash = await bcrypt.hash(user.password, this.hashRounds);
 
-    const userModel = new UserProfileModel({ ...user, password: passHash });
+    const userModel = new userProfileModel({ ...user, password: passHash });
 
     try {
       await userModel.save();
@@ -39,7 +40,7 @@ export class UserLayer {
   }
 
   async getUserByID(id: string): Promise<UserProfile> {
-    const user = await UserProfileModel.findOne({ id });
+    const user = await userProfileModel.findOne({ id });
 
     if (!user) {
       throw new Error(`user with ${id} does not exist`);
@@ -49,11 +50,11 @@ export class UserLayer {
   }
 
   async updateUserName(id: string, name: string): Promise<void> {
-    await UserProfileModel.findOneAndUpdate({ id }, { $set: { name } });
+    await userProfileModel.findOneAndUpdate({ id }, { $set: { name } });
   }
 
   async updateUserAvatar(userID: string, avatarID: string): Promise<void> {
-    await UserProfileModel.findOneAndUpdate({ id: userID }, { $set: { avatar: avatarID } });
+    await userProfileModel.findOneAndUpdate({ id: userID }, { $set: { avatar: avatarID } });
   }
 
   async updateUserCredentials(
@@ -69,7 +70,7 @@ export class UserLayer {
       if (type === 'email' || type === 'login') {
         try {
           const params = type === 'email' ? { email: value } : { login: value };
-          await UserProfileModel.findOneAndUpdate({ id: user.id }, params, { runValidators: true });
+          await userProfileModel.findOneAndUpdate({ id: user.id }, params, { runValidators: true });
         } catch (err) {
           if (err instanceof Error && 'code' in err && err.code === 11000) {
             // @ts-expect-error - email/login not checked if we change password
@@ -80,7 +81,7 @@ export class UserLayer {
         }
       } else {
         const passHash = await bcrypt.hash(value, this.hashRounds);
-        await UserProfileModel.findOneAndUpdate({ id: user.id }, { password: passHash });
+        await userProfileModel.findOneAndUpdate({ id: user.id }, { password: passHash });
       }
 
       return true;
@@ -92,9 +93,9 @@ export class UserLayer {
   async login(type: 'email' | 'login', loginOrEmail: string, password: string): Promise<ArgumentOfCallback<'login'>> {
     let user;
     if (type === 'email') {
-      user = await UserProfileModel.findOne({ email: loginOrEmail });
+      user = await userProfileModel.findOne({ email: loginOrEmail });
     } else {
-      user = await UserProfileModel.findOne({ login: loginOrEmail });
+      user = await userProfileModel.findOne({ login: loginOrEmail });
     }
 
     if (!user) {

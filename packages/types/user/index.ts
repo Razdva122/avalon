@@ -1,4 +1,4 @@
-import { prop, modelOptions, getModelForClass } from '@typegoose/typegoose';
+import { prop, modelOptions } from '@typegoose/typegoose';
 
 @modelOptions({
   schemaOptions: {
@@ -47,7 +47,6 @@ export class UserForUI {
 export class UserProfile extends UserForUI {
   @prop({
     required: true,
-    type: Date,
     default: () => new Date().toISOString(),
   })
   public registrationDate!: string;
@@ -55,5 +54,3 @@ export class UserProfile extends UserForUI {
   @prop({ required: true })
   public password!: string;
 }
-
-export const UserProfileModel = getModelForClass(UserProfile);

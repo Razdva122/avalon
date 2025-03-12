@@ -9,11 +9,11 @@
         {{ $t('profile.stats') }}
       </v-btn>
       <div class="mb-2">
-        Login: {{ $store.state.profile?.login }}
+        {{ $t('modal.login') }}: {{ $store.state.profile?.login }}
         <span @click="updateLogin" class="material-icons email-change-icon"> edit </span>
       </div>
       <div class="mb-2">
-        Email: {{ $store.state.profile?.email }}
+        {{ $t('modal.email') }}: {{ $store.state.profile?.email }}
         <span @click="updateEmail" class="material-icons email-change-icon"> edit </span>
       </div>
       <v-btn class="mb-4" @click="updatePassword">{{ $t('profile.updatePassword') }}</v-btn>

@@ -7,6 +7,13 @@
       </v-tabs>
     </template>
 
+    <div v-if="mode === 'auth'">
+      <v-radio-group v-model="loginType" inline>
+        <v-radio :label="$t('modal.email')" value="email"></v-radio>
+        <v-radio :label="$t('modal.login')" value="login"></v-radio>
+      </v-radio-group>
+    </div>
+
     <v-form
       ref="emailForm"
       @input="updateFormValidity('emailForm')"
@@ -134,6 +141,9 @@ export default defineComponent({
     mode() {
       this.error = '';
     },
+    loginType() {
+      this.error = '';
+    },
   },
   methods: {
     async updateFormValidity(type: 'loginForm' | 'emailForm' | 'registrationForm') {
@@ -174,6 +184,7 @@ export default defineComponent({
         email: this.email,
         password: this.password,
         name: this.username,
+        login: this.login,
       });
 
       if ('error' in userOrError) {

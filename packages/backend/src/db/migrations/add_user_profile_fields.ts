@@ -1,11 +1,10 @@
-import { UserProfileModel } from '@avalon/types';
+import { userProfileModel } from '@/db/models';
 import { Migration } from '@/db/migrations/interface';
 
 export const addUserProfileFields: Migration = {
   name: 'add-user-profile-fields',
   async up() {
-    await UserProfileModel.updateMany(
-      {},
+    await userProfileModel.updateMany({}, [
       {
         $set: {
           login: '$email',
@@ -13,6 +12,6 @@ export const addUserProfileFields: Migration = {
           registrationDate: new Date().toISOString(),
         },
       },
-    );
+    ]);
   },
 };

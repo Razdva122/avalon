@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { StartedRoomState, TTotalWinrateStats, TWinrateStats, VisualGameState, roomModel } from '@avalon/types';
+import { StartedRoomState, TTotalWinrateStats, TWinrateStats, VisualGameState } from '@avalon/types';
+import { roomModel } from '@/db/models/';
 import { query } from '@/db/query';
 import { UserLayer } from '@/db/user';
 

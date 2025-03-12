@@ -1,4 +1,4 @@
-import { prop, getModelForClass } from '@typegoose/typegoose';
+import { prop } from '@typegoose/typegoose';
 
 import { VisualGameState } from '../game/state';
 import { GameOptions } from '../game/options';
@@ -111,5 +111,3 @@ export type TMessage = {
   text: string;
   author: string;
 };
-
-export const roomModel = getModelForClass(StartedRoomState);
