@@ -164,8 +164,10 @@ export const es = {
   },
   errors: {
     wrongPassword: 'Contraseña incorrecta',
-    emailNotExist: 'Usuario con este correo electrónico no encontrado',
-    emailAlreadyExist: 'Un usuario con este correo ya está registrado',
+    emailNotExist: 'Usuario con este email no encontrado',
+    loginNotExist: 'Usuario con este login no encontrado',
+    emailAlreadyExist: 'Un usuario con este email ya está registrado',
+    loginAlreadyExist: 'Un usuario con este login ya está registrado',
   },
   profile: {
     username: 'Nombre de usuario',
@@ -196,6 +198,7 @@ export const es = {
     loginButton: 'Ingresar',
     registrationButton: 'Registrarse',
     loginHint: 'Se usará para autorización',
+    login: 'Usuario',
     password: 'Contraseña',
     email: 'Correo electrónico',
     updateButton: 'Actualizar',

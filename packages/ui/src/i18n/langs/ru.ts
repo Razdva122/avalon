@@ -163,9 +163,11 @@ export const ru = {
     error: 'Ошибка',
   },
   errors: {
-    wrongPassword: 'Неверный пароль',
+    loginNotExist: 'Пользователь с таким логином не найден',
+    loginAlreadyExist: 'Пользователь с таким логином уже зарегистрирован',
     emailNotExist: 'Пользователь с таким email не найден',
     emailAlreadyExist: 'Пользователь с таким email уже зарегистрирован',
+    wrongPassword: 'Неверный пароль',
   },
   profile: {
     username: 'Имя пользователя',
@@ -192,6 +194,7 @@ export const ru = {
     username: 'Имя пользователя',
     usernameHint: 'Выберите игровое имя',
     loginTab: 'Вход',
+    login: 'Логин',
     registrationTab: 'Регистрация',
     loginButton: 'Войти',
     registrationButton: 'Зарегистрироваться',

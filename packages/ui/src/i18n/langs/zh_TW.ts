@@ -165,6 +165,8 @@ export const zh_TW = {
     wrongPassword: '密碼錯誤',
     emailNotExist: '找不到使用此電子郵件的用戶',
     emailAlreadyExist: '此電子郵件已被註冊',
+    loginNotExist: '找不到使用此账号的用户',
+    loginAlreadyExist: '此账号已被注册',
   },
   profile: {
     username: '使用者名稱',
@@ -197,6 +199,7 @@ export const zh_TW = {
     loginHint: '將用於身份驗證',
     password: '密碼',
     email: '電子郵件',
+    login: '帳號',
     updateButton: '更新',
     newPassword: '新密碼',
     newEmail: '新電子郵件',

@@ -165,6 +165,8 @@ export const zh_CN = {
     wrongPassword: '密码错误',
     emailNotExist: '找不到使用此电子邮件的用户',
     emailAlreadyExist: '此电子邮件已被注册',
+    loginNotExist: '找不到使用此帳號的用戶',
+    loginAlreadyExist: '此帳號已被註冊',
   },
   profile: {
     username: '用户名',
@@ -197,6 +199,7 @@ export const zh_CN = {
     loginHint: '将用于身份验证',
     password: '密码',
     email: '电子邮件',
+    login: '账号',
     updateButton: '更新',
     newPassword: '新密码',
     newEmail: '新电子邮件',
