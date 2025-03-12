@@ -1,116 +1,93 @@
 <template>
-  <v-overlay v-model="overlay" :persistent="true" class="align-center justify-center">
-    <v-card>
-      <v-sheet width="300" class="mx-auto pa-4">
-        <v-tabs v-model="mode" class="tabs mb-4" align-tabs="center">
-          <v-tab value="auth">{{ $t('modal.loginTab') }}</v-tab>
-          <v-tab value="registration">{{ $t('modal.registrationTab') }}</v-tab>
-        </v-tabs>
-        <div v-if="error" class="error-message mb-2 ml-2">
-          {{ $t('errors.' + error) }}
-        </div>
-        <v-form
-          ref="emailForm"
-          @input="updateFormValidity('emailForm')"
-          @submit.prevent="loginInAccount"
-          class="form"
-          v-if="mode === 'auth' && loginType === 'email'"
-        >
-          <v-text-field
-            v-model="email"
-            autocomplete="email"
-            :rules="[validators.required, validators.spacesForbidden]"
-            :label="$t('modal.email')"
-            class="w-100 mb-2"
-          ></v-text-field>
-          <v-text-field
-            v-model="password"
-            autocomplete="password"
-            :append-inner-icon="visiblePass ? 'visibility_off' : 'visibility'"
-            :type="visiblePass ? 'text' : 'password'"
-            :rules="[validators.required, validators.spacesForbidden]"
-            :label="$t('modal.password')"
-            class="w-100 mb-2"
-            @click:append-inner="visiblePass = !visiblePass"
-          ></v-text-field>
-          <v-btn :disabled="!formValid.emailForm" type="submit">{{ $t('modal.loginButton') }}</v-btn>
-        </v-form>
-        <v-form
-          ref="loginForm"
-          @input="updateFormValidity('loginForm')"
-          @submit.prevent="loginInAccount"
-          class="form"
-          v-if="mode === 'auth' && loginType === 'login'"
-        >
-          <v-text-field
-            v-model="login"
-            autocomplete="login"
-            :rules="[validators.required, validators.spacesForbidden]"
-            :label="$t('modal.login')"
-            class="w-100 mb-2"
-          ></v-text-field>
-          <v-text-field
-            v-model="password"
-            autocomplete="password"
-            :append-inner-icon="visiblePass ? 'visibility_off' : 'visibility'"
-            :type="visiblePass ? 'text' : 'password'"
-            :rules="[validators.required, validators.spacesForbidden]"
-            :label="$t('modal.password')"
-            class="w-100 mb-2"
-            @click:append-inner="visiblePass = !visiblePass"
-          ></v-text-field>
-          <v-btn :disabled="!formValid.loginForm" type="submit">{{ $t('modal.loginButton') }}</v-btn>
-        </v-form>
-        <v-form
-          ref="registrationForm"
-          @input="updateFormValidity('registrationForm')"
-          @submit.prevent="registerUser"
-          class="form"
-          v-else
-        >
-          <span class="mb-2">{{ $t('modal.loginHint') }}</span>
-          <v-text-field
-            v-model="login"
-            autocomplete="login"
-            :rules="[validators.required, validators.spacesForbidden]"
-            :label="$t('modal.login')"
-            type="login"
-            class="w-100 mb-2"
-          ></v-text-field>
-          <v-text-field
-            v-model="email"
-            autocomplete="email"
-            :rules="[validators.required, validators.email, validators.spacesForbidden]"
-            :label="$t('modal.email')"
-            type="email"
-            class="w-100 mb-2"
-          ></v-text-field>
-          <v-text-field
-            v-model="password"
-            autocomplete="password"
-            :append-inner-icon="visiblePass ? 'visibility_off' : 'visibility'"
-            :type="visiblePass ? 'text' : 'password'"
-            :rules="[validators.required, validators.min8, validators.spacesForbidden]"
-            :label="$t('modal.password')"
-            :hint="$t('validators.minCharacters', { count: 8 })"
-            class="w-100 mb-2"
-            counter
-            @click:append-inner="visiblePass = !visiblePass"
-          ></v-text-field>
-          <span class="mb-2">{{ $t('modal.usernameHint') }}</span>
-          <v-text-field
-            autocomplete="nickname"
-            v-model="username"
-            :rules="[validators.required]"
-            :label="$t('modal.username')"
-            class="w-100 mb-2"
-          ></v-text-field>
-          <v-btn :disabled="!formValid.registrationForm" type="submit">{{ $t('modal.registrationButton') }}</v-btn>
-        </v-form>
-      </v-sheet>
-      <v-btn @click="closeAuthModal" class="close" icon="close" variant="text" density="compact" />
-    </v-card>
-  </v-overlay>
+  <BaseModal v-model="overlay" :error="error" @close="closeAuthModal">
+    <template #header>
+      <v-tabs v-model="mode" class="tabs mb-4" align-tabs="center">
+        <v-tab value="auth">{{ $t('modal.loginTab') }}</v-tab>
+        <v-tab value="registration">{{ $t('modal.registrationTab') }}</v-tab>
+      </v-tabs>
+    </template>
+
+    <v-form
+      ref="emailForm"
+      @input="updateFormValidity('emailForm')"
+      @submit.prevent="loginInAccount"
+      class="form"
+      v-if="mode === 'auth' && loginType === 'email'"
+    >
+      <TextField
+        v-model="email"
+        autocomplete="email"
+        :rules="[validators.required, validators.spacesForbidden]"
+        :label="$t('modal.email')"
+      />
+      <PasswordField
+        v-model="password"
+        :rules="[validators.required, validators.spacesForbidden]"
+        :label="$t('modal.password')"
+      />
+      <v-btn :disabled="!formValid.emailForm" type="submit">{{ $t('modal.loginButton') }}</v-btn>
+    </v-form>
+
+    <v-form
+      ref="loginForm"
+      @input="updateFormValidity('loginForm')"
+      @submit.prevent="loginInAccount"
+      class="form"
+      v-else-if="mode === 'auth' && loginType === 'login'"
+    >
+      <TextField
+        v-model="login"
+        autocomplete="login"
+        :rules="[validators.required, validators.spacesForbidden]"
+        :label="$t('modal.login')"
+      />
+      <PasswordField
+        v-model="password"
+        :rules="[validators.required, validators.spacesForbidden]"
+        :label="$t('modal.password')"
+      />
+      <v-btn :disabled="!formValid.loginForm" type="submit">{{ $t('modal.loginButton') }}</v-btn>
+    </v-form>
+
+    <v-form
+      ref="registrationForm"
+      @input="updateFormValidity('registrationForm')"
+      @submit.prevent="registerUser"
+      class="form"
+      v-else
+    >
+      <span class="mb-2">{{ $t('modal.loginHint') }}</span>
+      <TextField
+        v-model="login"
+        autocomplete="login"
+        :rules="[validators.required, validators.spacesForbidden]"
+        :label="$t('modal.login')"
+        type="login"
+      />
+      <TextField
+        v-model="email"
+        autocomplete="email"
+        :rules="[validators.required, validators.email, validators.spacesForbidden]"
+        :label="$t('modal.email')"
+        type="email"
+      />
+      <PasswordField
+        v-model="password"
+        :rules="[validators.required, validators.min8, validators.spacesForbidden]"
+        :label="$t('modal.password')"
+        :hint="$t('validators.minCharacters', { count: 8 })"
+        counter
+      />
+      <span class="mb-2">{{ $t('modal.usernameHint') }}</span>
+      <TextField
+        v-model="username"
+        autocomplete="nickname"
+        :rules="[validators.required]"
+        :label="$t('modal.username')"
+      />
+      <v-btn :disabled="!formValid.registrationForm" type="submit">{{ $t('modal.registrationButton') }}</v-btn>
+    </v-form>
+  </BaseModal>
 </template>
 
 <script lang="ts">
@@ -118,8 +95,16 @@ import { defineComponent } from 'vue';
 import eventBus from '@/helpers/event-bus';
 import { validators } from '@/helpers/validators';
 import type { VForm } from 'vuetify/components';
+import BaseModal from '@/components/user/BaseModal.vue';
+import PasswordField from '@/components/modals/PasswordField.vue';
+import TextField from '@/components/modals/TextField.vue';
 
 export default defineComponent({
+  components: {
+    BaseModal,
+    PasswordField,
+    TextField,
+  },
   data() {
     const { profile } = this.$store.state;
 
@@ -127,7 +112,6 @@ export default defineComponent({
       overlay: false,
       mode: 'auth',
       username: profile?.name || '',
-      visiblePass: false,
       password: '',
       email: '',
       error: '',
@@ -146,7 +130,6 @@ export default defineComponent({
       this.displayAuthModal();
     });
   },
-  computed: {},
   watch: {
     mode() {
       this.error = '';
@@ -210,12 +193,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.close {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-}
-
 .tabs {
   border-radius: 8px;
 }
@@ -223,9 +200,5 @@ export default defineComponent({
 .form {
   display: flex;
   flex-direction: column;
-}
-
-.error-message {
-  color: rgb(var(--v-theme-error));
 }
 </style>

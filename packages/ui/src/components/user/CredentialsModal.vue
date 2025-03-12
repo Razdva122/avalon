@@ -1,99 +1,72 @@
 <template>
-  <v-overlay v-model="overlay" :persistent="true" class="align-center justify-center">
-    <v-card>
-      <v-sheet width="300" class="mx-auto pa-4">
-        <div v-if="error" class="error-message mb-2 ml-2">
-          {{ $t('errors.' + error) }}
-        </div>
-        <v-form
-          ref="emailForm"
-          @input="updateFormValidity('emailForm')"
-          @submit.prevent="updateEmail"
-          class="form"
-          v-if="mode === 'email'"
-        >
-          <v-text-field
-            v-model="password"
-            autocomplete="password"
-            :append-inner-icon="visiblePass ? 'visibility_off' : 'visibility'"
-            :type="visiblePass ? 'text' : 'password'"
-            :rules="[validators.required, validators.spacesForbidden]"
-            :label="$t('modal.password')"
-            class="w-100 mb-2"
-            @click:append-inner="visiblePass = !visiblePass"
-          ></v-text-field>
-          <v-text-field
-            v-model="email"
-            autocomplete="email"
-            :rules="[validators.required, validators.spacesForbidden, validators.email]"
-            :label="$t('modal.newEmail')"
-            class="w-100 mb-2"
-          ></v-text-field>
-          <v-btn :disabled="!formValid.emailForm" type="submit">{{ $t('modal.updateButton') }}</v-btn>
-        </v-form>
-        <v-form
-          ref="loginForm"
-          @input="updateFormValidity('loginForm')"
-          @submit.prevent="updateLogin"
-          class="form"
-          v-if="mode === 'login'"
-        >
-          <v-text-field
-            v-model="password"
-            autocomplete="password"
-            :append-inner-icon="visiblePass ? 'visibility_off' : 'visibility'"
-            :type="visiblePass ? 'text' : 'password'"
-            :rules="[validators.required, validators.spacesForbidden]"
-            :label="$t('modal.password')"
-            class="w-100 mb-2"
-            @click:append-inner="visiblePass = !visiblePass"
-          ></v-text-field>
-          <v-text-field
-            v-model="login"
-            autocomplete="login"
-            :rules="[validators.required, validators.spacesForbidden]"
-            :label="$t('modal.login')"
-            class="w-100 mb-2"
-          ></v-text-field>
-          <v-btn :disabled="!formValid.emailForm" type="submit">{{ $t('modal.updateButton') }}</v-btn>
-        </v-form>
-        <v-form
-          ref="passwordForm"
-          @input="updateFormValidity('passwordForm')"
-          @submit.prevent="updatePassword"
-          class="form"
-          v-else
-        >
-          <v-text-field
-            v-model="password"
-            autocomplete="password"
-            :append-inner-icon="visiblePass ? 'visibility_off' : 'visibility'"
-            :type="visiblePass ? 'text' : 'password'"
-            :rules="[validators.required, validators.min8, validators.spacesForbidden]"
-            :label="$t('modal.password')"
-            :hint="$t('validators.minCharacters', { count: 8 })"
-            class="w-100 mb-2"
-            counter
-            @click:append-inner="visiblePass = !visiblePass"
-          ></v-text-field>
-          <v-text-field
-            v-model="newPassword"
-            autocomplete="new-password"
-            :append-inner-icon="visiblePass ? 'visibility_off' : 'visibility'"
-            :type="visiblePass ? 'text' : 'password'"
-            :rules="[validators.required, validators.min8, validators.spacesForbidden]"
-            :label="$t('modal.newPassword')"
-            :hint="$t('validators.minCharacters', { count: 8 })"
-            class="w-100 mb-2"
-            counter
-            @click:append-inner="visiblePass = !visiblePass"
-          ></v-text-field>
-          <v-btn :disabled="!formValid.passwordForm" type="submit">{{ $t('modal.updateButton') }}</v-btn>
-        </v-form>
-      </v-sheet>
-      <v-btn @click="closeModal" class="close" icon="close" variant="text" density="compact" />
-    </v-card>
-  </v-overlay>
+  <BaseModal v-model="overlay" :error="error" @close="closeModal">
+    <v-form
+      ref="emailForm"
+      @input="updateFormValidity('emailForm')"
+      @submit.prevent="updateEmail"
+      class="form"
+      v-if="mode === 'email'"
+    >
+      <PasswordField
+        v-model="password"
+        :rules="[validators.required, validators.spacesForbidden]"
+        :label="$t('modal.password')"
+      />
+      <TextField
+        v-model="email"
+        autocomplete="email"
+        :rules="[validators.required, validators.spacesForbidden, validators.email]"
+        :label="$t('modal.newEmail')"
+      />
+      <v-btn :disabled="!formValid.emailForm" type="submit">{{ $t('modal.updateButton') }}</v-btn>
+    </v-form>
+
+    <v-form
+      ref="loginForm"
+      @input="updateFormValidity('loginForm')"
+      @submit.prevent="updateLogin"
+      class="form"
+      v-else-if="mode === 'login'"
+    >
+      <PasswordField
+        v-model="password"
+        :rules="[validators.required, validators.spacesForbidden]"
+        :label="$t('modal.password')"
+      />
+      <TextField
+        v-model="login"
+        autocomplete="login"
+        :rules="[validators.required, validators.spacesForbidden]"
+        :label="$t('modal.login')"
+      />
+      <v-btn :disabled="!formValid.loginForm" type="submit">{{ $t('modal.updateButton') }}</v-btn>
+    </v-form>
+
+    <v-form
+      ref="passwordForm"
+      @input="updateFormValidity('passwordForm')"
+      @submit.prevent="updatePassword"
+      class="form"
+      v-else
+    >
+      <PasswordField
+        v-model="password"
+        :rules="[validators.required, validators.min8, validators.spacesForbidden]"
+        :label="$t('modal.password')"
+        :hint="$t('validators.minCharacters', { count: 8 })"
+        counter
+      />
+      <PasswordField
+        v-model="newPassword"
+        autocomplete="new-password"
+        :rules="[validators.required, validators.min8, validators.spacesForbidden]"
+        :label="$t('modal.newPassword')"
+        :hint="$t('validators.minCharacters', { count: 8 })"
+        counter
+      />
+      <v-btn :disabled="!formValid.passwordForm" type="submit">{{ $t('modal.updateButton') }}</v-btn>
+    </v-form>
+  </BaseModal>
 </template>
 
 <script lang="ts">
@@ -101,13 +74,20 @@ import { defineComponent } from 'vue';
 import eventBus from '@/helpers/event-bus';
 import { validators } from '@/helpers/validators';
 import type { VForm } from 'vuetify/components';
+import BaseModal from '@/components/user/BaseModal.vue';
+import PasswordField from '@/components/modals/PasswordField.vue';
+import TextField from '@/components/modals/TextField.vue';
 
 export default defineComponent({
+  components: {
+    BaseModal,
+    PasswordField,
+    TextField,
+  },
   data() {
     return {
       mode: 'email',
       overlay: false,
-      visiblePass: false,
       password: '',
       newPassword: '',
       email: '',
@@ -194,18 +174,8 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.close {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-}
-
 .form {
   display: flex;
   flex-direction: column;
-}
-
-.error-message {
-  color: rgb(var(--v-theme-error));
 }
 </style>
