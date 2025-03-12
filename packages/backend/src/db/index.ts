@@ -1,15 +1,11 @@
 import mongoose from 'mongoose';
-
-import { getModelForClass } from '@typegoose/typegoose';
-import { StartedRoomState, TTotalWinrateStats, TWinrateStats, VisualGameState } from '@avalon/types';
+import { StartedRoomState, TTotalWinrateStats, TWinrateStats, VisualGameState, roomModel } from '@avalon/types';
 import { query } from '@/db/query';
-
 import { UserLayer } from '@/db/user';
 
 export * from '@/db/init';
 
 export class DBManager extends UserLayer {
-  roomModel = getModelForClass(StartedRoomState);
   dbInstance: mongoose.Mongoose | undefined;
 
   constructor(dbInstance: mongoose.Mongoose | undefined) {
@@ -18,17 +14,17 @@ export class DBManager extends UserLayer {
   }
 
   async saveRoomToDB(roomState: StartedRoomState): Promise<void> {
-    const room = new this.roomModel(roomState);
-    room.save();
+    const room = new roomModel(roomState);
+    await room.save();
   }
 
   async getRoomFromDB(roomID: string): Promise<StartedRoomState | null> {
-    const room = await this.roomModel.findOne({ roomID });
+    const room = await roomModel.findOne({ roomID });
     return room;
   }
 
   async getPlayerGames(playerID: string): Promise<VisualGameState[]> {
-    const rooms = await this.roomModel.find({
+    const rooms = await roomModel.find({
       'players.id': playerID,
       'game.stage': 'end',
       'game.result.reason': { $ne: 'manualy' },
@@ -38,16 +34,15 @@ export class DBManager extends UserLayer {
   }
 
   async getLastRooms(amount: number): Promise<StartedRoomState[]> {
-    const rooms = await this.roomModel.find().sort({ _id: -1 }).limit(amount);
-
+    const rooms = await roomModel.find().sort({ _id: -1 }).limit(amount);
     return rooms;
   }
 
   async getFullStats(): Promise<TTotalWinrateStats> {
     const results = await Promise.all([
-      this.roomModel.aggregate(query.statsByPlayers),
-      this.roomModel.aggregate(query.rolesStats),
-      this.roomModel.aggregate(query.addonsStats),
+      roomModel.aggregate(query.statsByPlayers),
+      roomModel.aggregate(query.rolesStats),
+      roomModel.aggregate(query.addonsStats),
     ]);
 
     const totalGamesResult = results[0].reduce<Omit<TWinrateStats, 'goodWinPercentage' | 'evilWinPercentage'>>(

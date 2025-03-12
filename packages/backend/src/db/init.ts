@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { config } from '@/config';
+import { MigrationManager } from '@/db/migrations';
 
 export const connectDB = async () => {
   try {
@@ -19,6 +20,9 @@ export const connectDB = async () => {
     const instance = await mongoose.connect(config.MONGODB_URI, { ...connectionParams, ...prodSettings });
 
     console.log(`✅ MongoDB Connected [${config.DB_NAME}]`);
+
+    MigrationManager.runMigrations();
+
     return instance;
   } catch (error) {
     console.error('❌ MongoDB Connection Error:', error);

@@ -1,18 +1,16 @@
 import bcrypt from 'bcrypt';
-import { getModelForClass } from '@typegoose/typegoose';
-import { UserProfile, ArgumentOfCallback } from '@avalon/types';
+import { ArgumentOfCallback, UserProfile, UserProfileModel } from '@avalon/types';
 import { generateJWT } from '@/user';
 
 export class UserLayer {
   hashRounds = 12;
-  userProfileModel = getModelForClass(UserProfile);
 
   async registerUser(
     user: Omit<UserProfile, 'avatar' | 'registrationDate'>,
   ): Promise<ArgumentOfCallback<'registerUser'>> {
     const passHash = await bcrypt.hash(user.password, this.hashRounds);
 
-    const userModel = new this.userProfileModel({ ...user, password: passHash });
+    const userModel = new UserProfileModel({ ...user, password: passHash });
 
     try {
       await userModel.save();
@@ -41,7 +39,7 @@ export class UserLayer {
   }
 
   async getUserByID(id: string): Promise<UserProfile> {
-    const user = await this.userProfileModel.findOne({ id });
+    const user = await UserProfileModel.findOne({ id });
 
     if (!user) {
       throw new Error(`user with ${id} does not exist`);
@@ -51,11 +49,11 @@ export class UserLayer {
   }
 
   async updateUserName(id: string, name: string): Promise<void> {
-    await this.userProfileModel.findOneAndUpdate({ id }, { $set: { name } });
+    await UserProfileModel.findOneAndUpdate({ id }, { $set: { name } });
   }
 
   async updateUserAvatar(userID: string, avatarID: string): Promise<void> {
-    await this.userProfileModel.findOneAndUpdate({ id: userID }, { $set: { avatar: avatarID } });
+    await UserProfileModel.findOneAndUpdate({ id: userID }, { $set: { avatar: avatarID } });
   }
 
   async updateUserCredentials(
@@ -71,10 +69,10 @@ export class UserLayer {
       if (type === 'email' || type === 'login') {
         try {
           const params = type === 'email' ? { email: value } : { login: value };
-          await this.userProfileModel.findOneAndUpdate({ id: user.id }, params, { runValidators: true });
+          await UserProfileModel.findOneAndUpdate({ id: user.id }, params, { runValidators: true });
         } catch (err) {
           if (err instanceof Error && 'code' in err && err.code === 11000) {
-            // @ts-expect-error - email not checked if we change password
+            // @ts-expect-error - email/login not checked if we change password
             return type === 'email' ? { error: 'emailAlreadyExist' } : { error: 'loginAlreadyExist' };
           }
 
@@ -82,7 +80,7 @@ export class UserLayer {
         }
       } else {
         const passHash = await bcrypt.hash(value, this.hashRounds);
-        await this.userProfileModel.findOneAndUpdate({ id: user.id }, { password: passHash });
+        await UserProfileModel.findOneAndUpdate({ id: user.id }, { password: passHash });
       }
 
       return true;
@@ -94,9 +92,9 @@ export class UserLayer {
   async login(type: 'email' | 'login', loginOrEmail: string, password: string): Promise<ArgumentOfCallback<'login'>> {
     let user;
     if (type === 'email') {
-      user = await this.userProfileModel.findOne({ email: loginOrEmail });
+      user = await UserProfileModel.findOne({ email: loginOrEmail });
     } else {
-      user = await this.userProfileModel.findOne({ login: loginOrEmail });
+      user = await UserProfileModel.findOne({ login: loginOrEmail });
     }
 
     if (!user) {
