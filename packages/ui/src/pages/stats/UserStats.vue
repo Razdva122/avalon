@@ -1,6 +1,33 @@
 <template>
   <div class="info-page-content stats-page">
-    <h1>{{ $t('userStats.userStatsTitle') }} {{ $props.uuid }}</h1>
+    <h1>{{ $t('userStats.userStatsTitle') }}</h1>
+    <div v-if="userForUi" class="preview-profile">
+      <Avatar class="avatar mr-2" :avatarID="userForUi.avatar" />
+      <div class="profile-info">
+        <div class="profile-username">
+          {{ userForUi.name }}
+        </div>
+        <div class="info-hint">id: {{ $props.uuid }}</div>
+        <div class="profile-games">
+          <div class="profile-games-counter">
+            <span class="games-wins">
+              {{ state?.teams.total.wins }}
+            </span>
+            -
+            <span class="games-loses">
+              {{ state?.teams.total.lose }}
+            </span>
+          </div>
+          <div class="info-hint">games</div>
+        </div>
+        <div>
+          <div class="profile-winrate">
+            {{ `${state?.teams.total.winrate} %` }}
+          </div>
+          <div class="info-hint">winrate</div>
+        </div>
+      </div>
+    </div>
     <h2>{{ $t('stats.generalStatsTitle') }}</h2>
     <v-data-table class="general-table" :headers="generalTable.headers" :items="generalTable.data" hide-default-footer>
       <template v-slot:item.side="{ value }">
@@ -28,7 +55,8 @@ import { useI18n } from 'vue-i18n';
 import { TUserStats, prepareUserStats } from '@/helpers/stats';
 import { socket } from '@/api/socket';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
-import { TRoles } from '@avalon/types';
+import { TRoles, UserForUI } from '@avalon/types';
+import Avatar from '@/components/user/Avatar.vue';
 
 type TRoleStats = {
   role: TRoles;
@@ -40,6 +68,7 @@ export default defineComponent({
   name: 'UserStats',
   components: {
     PreviewLink,
+    Avatar,
   },
   props: {
     uuid: {
@@ -49,12 +78,18 @@ export default defineComponent({
   },
   async setup(props) {
     const state = ref<TUserStats>();
+    const userForUi = ref<UserForUI>();
 
     const { t } = useI18n();
 
     const initState = async (uuid: string) => {
-      const stateFromBackend = await socket.emitWithAck('getPlayerGames', uuid);
-      state.value = prepareUserStats(stateFromBackend, uuid);
+      const [games, profile] = await Promise.all([
+        socket.emitWithAck('getPlayerGames', uuid),
+        socket.emitWithAck('getUserProfile', uuid),
+      ]);
+
+      state.value = prepareUserStats(games, uuid);
+      userForUi.value = profile;
     };
 
     await initState(props.uuid);
@@ -67,13 +102,15 @@ export default defineComponent({
           { title: t('userStats.gamesCount'), key: 'gamesCount' },
           { title: t('userStats.wins'), key: 'wins' },
         ],
-        data: Object.entries(stateData.teams).map(([name, value]) => {
-          return {
-            side: name,
-            gamesCount: value.total,
-            wins: `${value.wins} (${value.winrate} %)`,
-          };
-        }),
+        data: Object.entries(stateData.teams)
+          .filter(([name]) => name !== 'total')
+          .map(([name, value]) => {
+            return {
+              side: name,
+              gamesCount: value.total,
+              wins: `${value.wins} (${value.winrate} %)`,
+            };
+          }),
       };
     });
 
@@ -112,6 +149,7 @@ export default defineComponent({
       state,
       generalTable,
       rolesTables,
+      userForUi,
     };
   },
 });
@@ -134,5 +172,43 @@ export default defineComponent({
     width: 24px;
     height: 24px;
   }
+}
+
+.avatar {
+  width: 150px;
+  height: 150px;
+}
+
+.preview-profile {
+  display: flex;
+}
+
+.profile-info div {
+  margin-bottom: 0px;
+}
+
+.profile-username {
+  font-size: 24px;
+}
+
+.info-hint {
+  font-size: 14px;
+  opacity: 0.8;
+  margin-top: -2px;
+}
+
+.games-wins {
+  color: rgb(var(--v-theme-success));
+}
+
+.games-loses {
+  color: rgb(var(--v-theme-error));
+}
+
+.profile-games-counter {
+  background-color: rgb(var(--v-theme-bgHeader));
+  width: fit-content;
+  padding: 0px 8px;
+  border-radius: 8px;
 }
 </style>

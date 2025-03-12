@@ -190,7 +190,7 @@ export default defineComponent({
 
 .chart {
   max-width: 700px;
-  max-height: 350px;
+  height: 400px;
 }
 
 .stats-page {

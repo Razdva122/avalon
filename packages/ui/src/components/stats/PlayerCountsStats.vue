@@ -90,6 +90,7 @@ export default defineComponent({
                 },
               },
             },
+            maintainAspectRatio: false,
             scales: {
               x: {
                 stacked: true,

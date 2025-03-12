@@ -179,4 +179,10 @@ body {
     color: white !important;
   }
 }
+
+@media (max-width: 600px) {
+  .v-data-table {
+    font-size: 14px !important;
+  }
+}
 </style>

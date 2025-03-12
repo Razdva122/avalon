@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { ArgumentOfCallback, UserProfile } from '@avalon/types';
+import { ArgumentOfCallback, UserForUI, UserProfile } from '@avalon/types';
 import { userProfileModel } from '@/db/models';
 import { generateJWT } from '@/user';
 
@@ -47,6 +47,18 @@ export class UserLayer {
     }
 
     return user;
+  }
+
+  async getUserProfile(id: string): Promise<UserForUI> {
+    const user = await this.getUserByID(id);
+
+    return {
+      id: user.id,
+      email: user.email,
+      login: user.login,
+      avatar: user.avatar,
+      name: user.name,
+    };
   }
 
   async updateUserName(id: string, name: string): Promise<void> {

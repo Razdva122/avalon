@@ -1,17 +1,17 @@
 <template>
   <div class="info-page-content profile-page">
     <div class="profile-section">
-      <h2>{{ $t('profile.profile') }}</h2>
+      <h2>
+        {{ $t('profile.profile') }}: {{ $store.state.profile?.login }}
+        <span @click="updateLogin" class="material-icons email-change-icon"> edit </span>
+      </h2>
+      <Avatar class="avatar" :avatarID="$store.state.profile!.avatar" />
       <v-btn class="mb-4 w-100" size="large" @click="goToStats">
         <template v-slot:prepend>
           <span class="material-icons"> insert_chart_outlined </span>
         </template>
         {{ $t('profile.stats') }}
       </v-btn>
-      <div class="mb-2">
-        {{ $t('modal.login') }}: {{ $store.state.profile?.login }}
-        <span @click="updateLogin" class="material-icons email-change-icon"> edit </span>
-      </div>
       <div class="mb-2">
         {{ $t('modal.email') }}: {{ $store.state.profile?.email }}
         <span @click="updateEmail" class="material-icons email-change-icon"> edit </span>
@@ -57,10 +57,13 @@ import { LanguageMap, TLanguage } from '@/helpers/i18n';
 import { store } from '@/store';
 import eventBus from '@/helpers/event-bus';
 import { RouteLocationNormalized, NavigationGuardNext } from 'vue-router';
+import Avatar from '@/components/user/Avatar.vue';
 
 export default defineComponent({
   name: 'Profile',
-  components: {},
+  components: {
+    Avatar,
+  },
   data() {
     const { profile } = this.$store.state;
 
@@ -178,6 +181,11 @@ export default defineComponent({
   cursor: pointer;
   padding: 4px;
   font-size: 18px;
+}
+
+.avatar {
+  height: 200px;
+  width: 200px;
 }
 
 @media (max-width: 600px) {

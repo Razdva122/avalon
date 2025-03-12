@@ -238,6 +238,12 @@ export class Manager {
         cb(userForUI);
       });
 
+      socket.on('getUserProfile', async (id, cb) => {
+        const userForUI = await dbManager.getUserProfile(id);
+
+        cb(userForUI);
+      });
+
       if (userID && userName) {
         this.createMethodsForAuthUsers(socket, userID, userName);
         this.createMethodsForGame(socket, userID, userName);
