@@ -15,8 +15,12 @@ export class UserForUI {
   @prop({ required: true })
   public name!: string;
 
-  @prop()
-  public avatar?: string;
+  @prop({
+    required: true,
+    type: Date,
+    default: () => 'servant',
+  })
+  public avatar!: string;
 
   @prop({
     required: true,
@@ -24,6 +28,13 @@ export class UserForUI {
     set: (v: string) => v.toLowerCase().trim(),
   })
   public email!: string;
+
+  @prop({
+    required: true,
+    unique: true,
+    set: (v: string) => v.toLowerCase().trim(),
+  })
+  public login!: string;
 }
 
 @modelOptions({
@@ -35,6 +46,13 @@ export class UserForUI {
   },
 })
 export class UserProfile extends UserForUI {
+  @prop({
+    required: true,
+    type: Date,
+    default: () => new Date().toISOString(),
+  })
+  public registrationDate!: string;
+
   @prop({ required: true })
   public password!: string;
 }

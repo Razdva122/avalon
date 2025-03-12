@@ -195,7 +195,7 @@ export const ru = {
     registrationTab: 'Регистрация',
     loginButton: 'Войти',
     registrationButton: 'Зарегистрироваться',
-    emailHint: 'Будет использоваться для авторизации',
+    loginHint: 'Будет использоваться для авторизации',
     password: 'Пароль',
     updateButton: 'Обновить',
     newPassword: 'Новый пароль',

@@ -194,7 +194,7 @@ export const zh_CN = {
     registrationTab: '注册',
     loginButton: '登录',
     registrationButton: '注册',
-    emailHint: '将用于身份验证',
+    loginHint: '将用于身份验证',
     password: '密码',
     email: '电子邮件',
     updateButton: '更新',

@@ -7,7 +7,9 @@ export class UserLayer {
   hashRounds = 12;
   userProfileModel = getModelForClass(UserProfile);
 
-  async registerUser(user: UserProfile): Promise<ArgumentOfCallback<'registerUser'>> {
+  async registerUser(
+    user: Omit<UserProfile, 'avatar' | 'registrationDate'>,
+  ): Promise<ArgumentOfCallback<'registerUser'>> {
     const passHash = await bcrypt.hash(user.password, this.hashRounds);
 
     const userModel = new this.userProfileModel({ ...user, password: passHash });
@@ -28,6 +30,8 @@ export class UserLayer {
       id: user.id,
       name: user.name,
       email: user.email,
+      login: user.login,
+      avatar: 'servant',
     };
 
     return {
@@ -50,35 +54,28 @@ export class UserLayer {
     await this.userProfileModel.findOneAndUpdate({ id }, { $set: { name } });
   }
 
+  async updateUserAvatar(userID: string, avatarID: string): Promise<void> {
+    await this.userProfileModel.findOneAndUpdate({ id: userID }, { $set: { avatar: avatarID } });
+  }
+
   async updateUserCredentials(
     id: string,
     password: string,
-    type: 'password',
-    value: string,
-  ): Promise<ArgumentOfCallback<'updateUserPassword'>>;
-  async updateUserCredentials(
-    id: string,
-    password: string,
-    type: 'email',
-    value: string,
-  ): Promise<ArgumentOfCallback<'updateUserEmail'>>;
-  async updateUserCredentials(
-    id: string,
-    password: string,
-    type: 'email' | 'password',
+    type: 'email' | 'password' | 'login',
     value: string,
   ): Promise<ArgumentOfCallback<'updateUserEmail' | 'updateUserPassword'>> {
     const user = await this.getUserByID(id);
     const isPassValid = await this.validateUserPassword(user, password);
 
     if (isPassValid) {
-      if (type === 'email') {
+      if (type === 'email' || type === 'login') {
         try {
-          await this.userProfileModel.findOneAndUpdate({ id: user.id }, { email: value }, { runValidators: true });
+          const params = type === 'email' ? { email: value } : { login: value };
+          await this.userProfileModel.findOneAndUpdate({ id: user.id }, params, { runValidators: true });
         } catch (err) {
           if (err instanceof Error && 'code' in err && err.code === 11000) {
             // @ts-expect-error - email not checked if we change password
-            return { error: 'emailAlreadyExist' };
+            return type === 'email' ? { error: 'emailAlreadyExist' } : { error: 'loginAlreadyExist' };
           }
 
           throw err;
@@ -94,11 +91,16 @@ export class UserLayer {
     return { error: 'wrongPassword' };
   }
 
-  async login(email: string, password: string): Promise<ArgumentOfCallback<'login'>> {
-    const user = await this.userProfileModel.findOne({ email });
+  async login(type: 'email' | 'login', loginOrEmail: string, password: string): Promise<ArgumentOfCallback<'login'>> {
+    let user;
+    if (type === 'email') {
+      user = await this.userProfileModel.findOne({ email: loginOrEmail });
+    } else {
+      user = await this.userProfileModel.findOne({ login: loginOrEmail });
+    }
 
     if (!user) {
-      return { error: 'emailNotExist' };
+      return { error: type === 'email' ? 'emailNotExist' : 'loginNotExist' };
     }
 
     const isPassValid = await this.validateUserPassword(user, password);
@@ -111,6 +113,8 @@ export class UserLayer {
       id: user.id,
       name: user.name,
       email: user.email,
+      login: user.login,
+      avatar: user.avatar,
     };
 
     return {

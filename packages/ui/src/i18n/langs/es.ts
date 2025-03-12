@@ -195,7 +195,7 @@ export const es = {
     registrationTab: 'Registro',
     loginButton: 'Ingresar',
     registrationButton: 'Registrarse',
-    emailHint: 'Se usará para autorización',
+    loginHint: 'Se usará para autorización',
     password: 'Contraseña',
     email: 'Correo electrónico',
     updateButton: 'Actualizar',

@@ -7,15 +7,19 @@ export interface IRoomUnavailableError extends ISocketError {
 }
 
 export interface ILoginError extends ISocketError {
-  error: 'emailNotExist' | 'wrongPassword';
+  error: 'emailNotExist' | 'loginNotExist' | 'wrongPassword';
 }
 
 export interface IRegisterError extends ISocketError {
-  error: 'emailAlreadyExist';
+  error: 'emailAlreadyExist' | 'loginAlreadyExist';
 }
 
 export interface IUpdateEmailError extends ISocketError {
   error: 'emailAlreadyExist' | 'wrongPassword';
+}
+
+export interface IUpdateLoginError extends ISocketError {
+  error: 'loginAlreadyExist' | 'wrongPassword';
 }
 
 export interface IUpdatePasswordError extends ISocketError {

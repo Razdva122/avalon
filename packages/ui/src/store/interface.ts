@@ -14,6 +14,8 @@ export interface IUserProfile {
   name: string;
   token: string;
   email: string;
+  login: string;
+  avatar: string;
 }
 
 export interface IUserSettings {

@@ -70,8 +70,8 @@ export const store = createStore<IState>({
     },
   },
   actions: {
-    async login({ commit }, { email, password }): Promise<ArgumentOfCallback<'login'>> {
-      const user = await socket.emitWithAck('login', email, password);
+    async login({ commit }, { loginOrEmail, password, type }): Promise<ArgumentOfCallback<'login'>> {
+      const user = await socket.emitWithAck('login', type, loginOrEmail, password);
 
       if (!('error' in user)) {
         commit('updateUserProfile', user);
@@ -79,7 +79,10 @@ export const store = createStore<IState>({
 
       return user;
     },
-    async registerUser({ commit, state }, { password, name, email }): Promise<ArgumentOfCallback<'registerUser'>> {
+    async registerUser(
+      { commit, state },
+      { password, name, email, login },
+    ): Promise<ArgumentOfCallback<'registerUser'>> {
       let id = uuidv4();
 
       if (state.user?.id) {
@@ -91,6 +94,7 @@ export const store = createStore<IState>({
         id,
         name,
         email,
+        login,
       });
 
       if (!('error' in user)) {

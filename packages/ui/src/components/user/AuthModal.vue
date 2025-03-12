@@ -10,17 +10,43 @@
           {{ $t('errors.' + error) }}
         </div>
         <v-form
-          ref="loginForm"
-          @input="updateFormValidity('loginForm')"
+          ref="emailForm"
+          @input="updateFormValidity('emailForm')"
           @submit.prevent="loginInAccount"
           class="form"
-          v-if="mode === 'auth'"
+          v-if="mode === 'auth' && loginType === 'email'"
         >
           <v-text-field
             v-model="email"
             autocomplete="email"
             :rules="[validators.required, validators.spacesForbidden]"
             :label="$t('modal.email')"
+            class="w-100 mb-2"
+          ></v-text-field>
+          <v-text-field
+            v-model="password"
+            autocomplete="password"
+            :append-inner-icon="visiblePass ? 'visibility_off' : 'visibility'"
+            :type="visiblePass ? 'text' : 'password'"
+            :rules="[validators.required, validators.spacesForbidden]"
+            :label="$t('modal.password')"
+            class="w-100 mb-2"
+            @click:append-inner="visiblePass = !visiblePass"
+          ></v-text-field>
+          <v-btn :disabled="!formValid.emailForm" type="submit">{{ $t('modal.loginButton') }}</v-btn>
+        </v-form>
+        <v-form
+          ref="loginForm"
+          @input="updateFormValidity('loginForm')"
+          @submit.prevent="loginInAccount"
+          class="form"
+          v-if="mode === 'auth' && loginType === 'login'"
+        >
+          <v-text-field
+            v-model="login"
+            autocomplete="login"
+            :rules="[validators.required, validators.spacesForbidden]"
+            :label="$t('modal.login')"
             class="w-100 mb-2"
           ></v-text-field>
           <v-text-field
@@ -42,7 +68,15 @@
           class="form"
           v-else
         >
-          <span class="mb-2">{{ $t('modal.emailHint') }}</span>
+          <span class="mb-2">{{ $t('modal.loginHint') }}</span>
+          <v-text-field
+            v-model="login"
+            autocomplete="login"
+            :rules="[validators.required, validators.spacesForbidden]"
+            :label="$t('modal.login')"
+            type="login"
+            class="w-100 mb-2"
+          ></v-text-field>
           <v-text-field
             v-model="email"
             autocomplete="email"
@@ -97,9 +131,12 @@ export default defineComponent({
       password: '',
       email: '',
       error: '',
+      login: '',
+      loginType: 'email',
       validators,
       formValid: {
         loginForm: false,
+        emailForm: false,
         registrationForm: false,
       },
     };
@@ -116,11 +153,12 @@ export default defineComponent({
     },
   },
   methods: {
-    async updateFormValidity(type: 'loginForm' | 'registrationForm') {
+    async updateFormValidity(type: 'loginForm' | 'emailForm' | 'registrationForm') {
       this.error = '';
 
       const requiredFields = {
-        loginForm: ['email', 'password'],
+        loginForm: ['login', 'password'],
+        emailForm: ['email', 'password'],
         registrationForm: ['password', 'email', 'username'],
       } as const;
 
@@ -136,7 +174,11 @@ export default defineComponent({
       this.formValid[type] = valid;
     },
     async loginInAccount() {
-      const userOrError = await this.$store.dispatch('login', { email: this.email, password: this.password });
+      const params =
+        this.loginType === 'email'
+          ? { loginOrEmail: this.email, type: this.loginType }
+          : { loginOrEmail: this.login, type: this.loginType };
+      const userOrError = await this.$store.dispatch('login', { ...params, password: this.password });
 
       if ('error' in userOrError) {
         this.error = userOrError.error;

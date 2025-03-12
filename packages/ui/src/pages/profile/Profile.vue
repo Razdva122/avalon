@@ -9,6 +9,10 @@
         {{ $t('profile.stats') }}
       </v-btn>
       <div class="mb-2">
+        Login: {{ $store.state.profile?.login }}
+        <span @click="updateLogin" class="material-icons email-change-icon"> edit </span>
+      </div>
+      <div class="mb-2">
         Email: {{ $store.state.profile?.email }}
         <span @click="updateEmail" class="material-icons email-change-icon"> edit </span>
       </div>
@@ -136,6 +140,9 @@ export default defineComponent({
     },
     updateEmail() {
       eventBus.emit('openCredentialsModal', 'email');
+    },
+    updateLogin() {
+      eventBus.emit('openCredentialsModal', 'login');
     },
     updatePassword() {
       eventBus.emit('openCredentialsModal', 'password');

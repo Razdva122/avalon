@@ -194,7 +194,7 @@ export const zh_TW = {
     registrationTab: '註冊',
     loginButton: '登入',
     registrationButton: '註冊',
-    emailHint: '將用於身份驗證',
+    loginHint: '將用於身份驗證',
     password: '密碼',
     email: '電子郵件',
     updateButton: '更新',

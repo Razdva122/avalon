@@ -25,8 +25,34 @@
           <v-text-field
             v-model="email"
             autocomplete="email"
-            :rules="[validators.required, validators.spacesForbidden]"
+            :rules="[validators.required, validators.spacesForbidden, validators.email]"
             :label="$t('modal.newEmail')"
+            class="w-100 mb-2"
+          ></v-text-field>
+          <v-btn :disabled="!formValid.emailForm" type="submit">{{ $t('modal.updateButton') }}</v-btn>
+        </v-form>
+        <v-form
+          ref="loginForm"
+          @input="updateFormValidity('loginForm')"
+          @submit.prevent="updateLogin"
+          class="form"
+          v-if="mode === 'login'"
+        >
+          <v-text-field
+            v-model="password"
+            autocomplete="password"
+            :append-inner-icon="visiblePass ? 'visibility_off' : 'visibility'"
+            :type="visiblePass ? 'text' : 'password'"
+            :rules="[validators.required, validators.spacesForbidden]"
+            :label="$t('modal.password')"
+            class="w-100 mb-2"
+            @click:append-inner="visiblePass = !visiblePass"
+          ></v-text-field>
+          <v-text-field
+            v-model="login"
+            autocomplete="login"
+            :rules="[validators.required, validators.spacesForbidden]"
+            :label="$t('modal.login')"
             class="w-100 mb-2"
           ></v-text-field>
           <v-btn :disabled="!formValid.emailForm" type="submit">{{ $t('modal.updateButton') }}</v-btn>
@@ -85,11 +111,13 @@ export default defineComponent({
       password: '',
       newPassword: '',
       email: '',
+      login: '',
       error: '',
       validators,
       formValid: {
         emailForm: false,
         passwordForm: false,
+        loginForm: false,
       },
     };
   },
@@ -105,11 +133,12 @@ export default defineComponent({
     },
   },
   methods: {
-    async updateFormValidity(type: 'emailForm' | 'passwordForm') {
+    async updateFormValidity(type: 'emailForm' | 'passwordForm' | 'loginForm') {
       this.error = '';
 
       const requiredFields = {
         emailForm: ['password', 'email'],
+        loginForm: ['password', 'login'],
         passwordForm: ['password', 'newPassword'],
       } as const;
 
@@ -138,6 +167,15 @@ export default defineComponent({
     },
     async updateEmail() {
       const result = await this.$store.dispatch('updateUserEmail', { email: this.email, password: this.password });
+
+      if (result === true) {
+        this.closeModal();
+      } else {
+        this.error = result.error;
+      }
+    },
+    async updateLogin() {
+      const result = await this.$store.dispatch('updateUserLogin', { login: this.login, password: this.password });
 
       if (result === true) {
         this.closeModal();

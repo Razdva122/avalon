@@ -15,6 +15,7 @@ import type {
   IRegisterError,
   IUpdateEmailError,
   IUpdatePasswordError,
+  IUpdateLoginError,
 } from './errors';
 import type { TAssassinateType } from '../game/addons';
 
@@ -22,7 +23,14 @@ import type { TRoomsList, TMessage } from '../room';
 import { TTotalWinrateStats } from '../stats';
 import { UserForUI, UserProfile } from '../user';
 
-export type { ISocketError, ILoginError, IRegisterError, IUpdateEmailError, IUpdatePasswordError } from './errors';
+export type {
+  ISocketError,
+  ILoginError,
+  IRegisterError,
+  IUpdateEmailError,
+  IUpdatePasswordError,
+  IUpdateLoginError,
+} from './errors';
 export type { ArgumentOfCallback } from './helpers';
 
 export interface ServerToClientEvents {
@@ -39,16 +47,21 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerUserEvents {
-  registerUser: (user: UserProfile, callback: (user: (UserForUI & { token: string }) | IRegisterError) => void) => void;
+  registerUser: (
+    user: Omit<UserProfile, 'avatar' | 'registrationDate'>,
+    callback: (user: (UserForUI & { token: string }) | IRegisterError) => void,
+  ) => void;
   updateUserName: (name: string) => void;
   updateUserEmail: (password: string, email: string, callback: (result: true | IUpdateEmailError) => void) => void;
+  updateUserLogin: (password: string, login: string, callback: (result: true | IUpdateLoginError) => void) => void;
   updateUserPassword: (
     password: string,
     newPassword: string,
     callback: (result: true | IUpdatePasswordError) => void,
   ) => void;
   login: (
-    email: string,
+    type: 'email' | 'login',
+    loginOrEmail: string,
     password: string,
     callback: (user: (UserForUI & { token: string }) | ILoginError) => void,
   ) => void;

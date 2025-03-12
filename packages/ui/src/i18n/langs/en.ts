@@ -166,7 +166,9 @@ export const en = {
   errors: {
     wrongPassword: 'Wrong password',
     emailNotExist: 'User with this email not found',
+    loginNotExist: 'User with this login not found',
     emailAlreadyExist: 'A user with this email is already registered',
+    loginAlreadyExist: 'A user with this login is already registered',
   },
   profile: {
     username: 'Username',
@@ -194,11 +196,12 @@ export const en = {
     usernameHint: 'Select your username for game',
     loginTab: 'Login',
     registrationTab: 'Registration',
+    login: 'Login',
     loginButton: 'Sign in',
     registrationButton: 'Sign up',
     updateButton: 'Update',
     newPassword: 'New password',
-    emailHint: 'Will be used for authorization',
+    loginHint: 'Will be used for authorization',
     password: 'Password',
     email: 'Email',
     newEmail: 'New email',

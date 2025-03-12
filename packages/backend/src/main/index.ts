@@ -232,8 +232,8 @@ export class Manager {
         cb(userForUI);
       });
 
-      socket.on('login', async (email, password, cb) => {
-        const userForUI = await dbManager.login(email, password);
+      socket.on('login', async (type, loginOrEmail, password, cb) => {
+        const userForUI = await dbManager.login(type, loginOrEmail, password);
 
         cb(userForUI);
       });
@@ -281,6 +281,12 @@ export class Manager {
 
     socket.on('updateUserEmail', async (password, email, cb) => {
       const result = await this.dbManager.updateUserCredentials(userID, password, 'email', email);
+
+      cb(result);
+    });
+
+    socket.on('updateUserLogin', async (password, login, cb) => {
+      const result = await this.dbManager.updateUserCredentials(userID, password, 'login', login);
 
       cb(result);
     });
