@@ -1,8 +1,8 @@
-import { addUserProfileFields } from '@/db/migrations/add_user_profile_fields';
+import type { Migration } from '@/db/migrations/interface';
 
 export class MigrationManager {
   static async runMigrations(): Promise<void> {
-    const migrations = [addUserProfileFields];
+    const migrations: Migration[] = [];
 
     for (const migration of migrations) {
       await migration.up();
