@@ -28,8 +28,6 @@ export const zh_CN = {
     titlediscord: 'Discord',
     contentdiscord:
       '想找人一起探索《阿瓦隆》吗？加入我们的 <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b> 社区！',
-    titleregistration: '注册与个人统计',
-    contentregistration: '网站新增登录/注册功能，该功能将显示您在不同角色中的胜利次数及总体胜率的个人统计数据',
   },
   game: {
     winner: '胜利方',

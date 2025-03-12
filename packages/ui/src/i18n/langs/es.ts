@@ -28,9 +28,6 @@ export const es = {
     titlediscord: 'Discord',
     contentdiscord:
       '¿Buscas compañeros jugadores para adentrarte en "Avalon"? ¡Únete a nuestra comunidad de <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b>!',
-    titleregistration: 'Registro y estadísticas personales',
-    contentregistration:
-      'Se ha añadido autorización/registro al sitio, lo que nos permitirá mostrar tus estadísticas personales con victorias en diferentes roles y tu tasa de victorias general',
   },
   game: {
     winner: 'Ganador',

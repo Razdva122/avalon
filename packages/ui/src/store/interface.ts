@@ -40,4 +40,4 @@ export type TAlerts = {
   [key in TAlertsName]?: number;
 };
 
-export type TAlertsName = 'discord' | 'registration';
+export type TAlertsName = 'discord';

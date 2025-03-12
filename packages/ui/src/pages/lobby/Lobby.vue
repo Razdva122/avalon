@@ -4,9 +4,6 @@
       <TemporaryAlert id="discord">
         <div v-html="$t('alert.contentdiscord')"></div>
       </TemporaryAlert>
-      <TemporaryAlert id="registration" :max-visible-counter="1">
-        <div v-html="$t('alert.contentregistration')"></div>
-      </TemporaryAlert>
     </div>
 
     <span class="online">{{ $t('mainPage.online', { count: online }) }}</span>

@@ -28,9 +28,6 @@ export const ru = {
     titlediscord: 'Discord',
     contentdiscord:
       'Ищете товарищей для игры в \'Авалон\'? Присоединяйтесь к нашему сообществу в <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b>!',
-    titleregistration: 'Регистрация и личная статистика',
-    contentregistration:
-      'На сайте добавлена авторизация/регистрация — это позволит отображать вашу личную статистику с победами в разных ролях и общим процентом побед',
   },
   game: {
     winner: 'Победитель',
