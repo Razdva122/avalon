@@ -4,11 +4,12 @@
       <h1 class="modal-header">{{ $t('avatars.modalHeader') }}</h1>
     </template>
     <div class="avatars-container">
-      <Avatar
-        @click="selectAvatar(avatar)"
-        :class="calculateAvatarClasses(avatar)"
+      <AvatarPreview
         v-for="avatar in state"
-        :avatarID="avatar.id"
+        :key="avatar.id"
+        :isSelected="avatar.id === selectedAvatar"
+        :avatar="avatar"
+        :selectAvatar="selectAvatar"
       />
     </div>
   </BaseModal>
@@ -21,12 +22,14 @@ import BaseModal from '@/components/user/BaseModal.vue';
 import { socket } from '@/api/socket';
 import { IAvatarInfo } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
+import AvatarPreview from '@/components/user/AvatarPreview.vue';
 import { useStore } from '@/store';
 
 export default defineComponent({
   components: {
     BaseModal,
     Avatar,
+    AvatarPreview,
   },
   setup() {
     const overlay = ref<boolean>(false);
@@ -76,20 +79,6 @@ export default defineComponent({
       }
     };
 
-    const calculateAvatarClasses = (avatar: IAvatarInfo) => {
-      const classes = ['avatar-preview'];
-
-      if (avatar.id === selectedAvatar.value) {
-        classes.push('avatar-selected');
-      }
-
-      if (!avatar.available) {
-        classes.push('avatar-not-available');
-      }
-
-      return classes;
-    };
-
     return {
       state,
       overlay,
@@ -99,7 +88,6 @@ export default defineComponent({
       additionalError,
       selectAvatar,
       displayModal,
-      calculateAvatarClasses,
     };
   },
 });
@@ -109,19 +97,6 @@ export default defineComponent({
 .form {
   display: flex;
   flex-direction: column;
-}
-
-.avatar-preview {
-  width: 100px;
-  height: 100px;
-}
-
-.avatar-selected {
-  border: 4px solid rgb(var(--v-theme-info));
-}
-
-.avatar-not-available {
-  filter: grayscale(1);
 }
 
 .avatars-container {

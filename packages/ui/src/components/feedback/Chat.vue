@@ -13,8 +13,13 @@
           class="message-element"
           :class="isUserMessage(message.user.id) ? 'message-from-author' : ''"
         >
-          <div class="message-author">
-            {{ message.user.name }}
+          <div class="author-container">
+            <template v-if="users[message.user.id]">
+              <Avatar class="message-author-avatar" :avatarID="users[message.user.id]!.avatar" />
+            </template>
+            <div @click="onUserClick(message.user)" class="message-author">
+              {{ users[message.user.id]?.name ?? message.user.name }}
+            </div>
           </div>
           <div class="message-text">
             {{ message.message }}
@@ -43,12 +48,16 @@
 </template>
 
 <script lang="ts">
-import { ChatMessage } from '@avalon/types';
+import { ChatMessage, Dictionary, User, UserForUI } from '@avalon/types';
 import { defineComponent, PropType } from 'vue';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
+import Avatar from '@/components/user/Avatar.vue';
 
 export default defineComponent({
+  components: {
+    Avatar,
+  },
   props: {
     roomUuid: {
       required: true,
@@ -65,19 +74,32 @@ export default defineComponent({
       mode: 'full',
       currentMessage: '',
       counter: 0,
+      users: <Dictionary<UserForUI | null>>{},
     };
   },
   watch: {
-    messages(current, prev) {
-      this.scrollChatToBottom();
+    messages: {
+      handler(current, prev) {
+        this.scrollChatToBottom();
 
-      if (this.isHidden) {
-        if (current.length === 0) {
-          this.counter = 0;
-        } else {
-          this.counter += current.length - prev.length;
+        (<ChatMessage[]>current).forEach((message) => {
+          if (this.users[message.user.id] === null || this.users[message.user.id]) {
+            return;
+          }
+
+          this.users[message.user.id] = null;
+          socket.emitWithAck('getUserProfile', message.user.id).then((user) => (this.users[message.user.id] = user));
+        });
+
+        if (this.isHidden) {
+          if (current.length === 0) {
+            this.counter = 0;
+          } else {
+            this.counter += current.length - prev?.length;
+          }
         }
-      }
+      },
+      immediate: true,
     },
   },
   methods: {
@@ -115,6 +137,9 @@ export default defineComponent({
         socket.emit('sendMessage', this.roomUuid, this.currentMessage);
         this.currentMessage = '';
       }
+    },
+    onUserClick(user: User) {
+      this.$router.push({ name: 'user_stats', params: { uuid: user.id } });
     },
     isUserMessage(userID: string) {
       return this.$store.state.profile?.id === userID;
@@ -162,10 +187,24 @@ export default defineComponent({
 }
 
 .message-author {
+  cursor: pointer;
   font-size: 12px;
   color: rgb(var(--v-theme-surface-variant));
   font-weight: 800;
-  padding: 8px 5px 0px 5px;
+}
+
+.message-author-avatar {
+  margin-right: 4px;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+}
+
+.author-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+  padding: 8px 0px 0px 0px;
 }
 
 .message-text {
@@ -180,6 +219,10 @@ export default defineComponent({
 
 .message-from-author {
   text-align: right;
+
+  .author-container {
+    justify-content: flex-end;
+  }
 
   .message-author {
     color: rgb(var(--v-theme-primary));
