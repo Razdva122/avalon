@@ -18,20 +18,20 @@ export class LadyAvatar {
   }
 }
 
-export class MerlinAvatar {
-  static id = 'merlin';
+export class MerlinPureAvatar {
+  static id = 'merlin_pure';
 
   static isAvailableForUser({ features }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
     return Boolean(features && features.isHelper);
   }
 }
 
-export class AnimeMerlinAvatar {
-  static id = 'anime/merlin';
+export class AnimeMerlinPureAvatar {
+  static id = 'anime/merlin_pure';
 
   static isAvailableForUser({ features }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
     return Boolean(features && features.isContributor);
   }
 }
 
-export const commonAvatars: IAvatar[] = [ServantAvatar, LadyAvatar, MerlinAvatar, AnimeMerlinAvatar];
+export const commonAvatars: IAvatar[] = [ServantAvatar, LadyAvatar, MerlinPureAvatar, AnimeMerlinPureAvatar];
