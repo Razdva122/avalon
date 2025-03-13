@@ -4,6 +4,8 @@ import { Dictionary } from '@avalon/types';
 export const userStats: { [key in TLanguage]: Dictionary<string> } = {
   en: {
     userStatsTitle: 'User statistics:',
+    lastGamesStatsTitle: 'Last games',
+    game: 'Game',
     side: 'Side',
     sideevil: 'Evil team',
     sidegood: 'Good team',
@@ -17,6 +19,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
   },
   ru: {
     userStatsTitle: 'Статистика пользователя:',
+    lastGamesStatsTitle: 'Последние игры',
+    game: 'Игра',
     result: 'Результат',
     side: 'Сторона',
     sideevil: 'Команда зла',
@@ -30,6 +34,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
   },
   es: {
     userStatsTitle: 'Estadísticas del usuario:',
+    lastGamesStatsTitle: 'Últimos juegos',
+    game: 'Juego',
     side: 'Equipo',
     sideevil: 'Equipo del mal',
     sidegood: 'Equipo del bien',
@@ -43,6 +49,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
   },
   'zh-TW': {
     userStatsTitle: '用戶統計：',
+    lastGamesStatsTitle: '最近遊戲',
+    game: '遊戲',
     side: '陣營',
     sideevil: '邪惡陣營',
     sidegood: '正義陣營',
@@ -56,6 +64,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
   },
   'zh-CN': {
     userStatsTitle: '用户统计：',
+    lastGamesStatsTitle: '最近游戏',
+    game: '游戏',
     side: '阵营',
     sideevil: '邪恶阵营',
     sidegood: '正义阵营',

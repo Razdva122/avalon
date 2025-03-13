@@ -37,12 +37,19 @@
       </template>
     </v-data-table>
 
+    <h2>{{ $t('userStats.lastGamesStatsTitle') }}</h2>
     <v-data-table :headers="lastGamesHeaders" :items="lastGames" hide-default-footer>
       <template v-slot:item.role="{ value }">
         <PreviewLink :target="value" />
       </template>
       <template v-slot:item.isWin="{ value }">
-        {{ value ? $t('userStats.winResult') : $t('userStats.loseResult') }}
+        <v-chip v-if="value" color="green"> {{ $t('userStats.winResult') }}</v-chip>
+        <v-chip v-else color="red"> {{ $t('userStats.loseResult') }}</v-chip>
+      </template>
+      <template v-slot:item.gameID="{ value }">
+        <div class="gameID" @click="$router.push({ name: 'room', params: { uuid: value } })">
+          {{ value }}
+        </div>
       </template>
     </v-data-table>
 
@@ -162,7 +169,7 @@ export default defineComponent({
       return [
         { title: t('userStats.role'), key: 'role' },
         { title: t('userStats.result'), key: 'isWin' },
-        { title: t('stats.playerCount'), key: 'playersCount' },
+        { title: t('userStats.game'), key: 'gameID' },
       ];
     });
 
@@ -234,5 +241,9 @@ export default defineComponent({
   width: fit-content;
   padding: 0px 8px;
   border-radius: 8px;
+}
+
+.gameID {
+  cursor: pointer;
 }
 </style>

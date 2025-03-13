@@ -70,7 +70,7 @@ export function prepareGamesForView(games: VisualGameState[], userID: string, am
     return {
       role,
       isWin,
-      playersCount: game.players.length,
+      gameID: game.uuid,
     };
   });
 }
