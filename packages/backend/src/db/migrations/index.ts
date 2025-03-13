@@ -1,9 +1,8 @@
 import type { Migration } from '@/db/migrations/interface';
-import { addUserFeatures } from './addUserFeatures';
 
 export class MigrationManager {
   static async runMigrations(): Promise<void> {
-    const migrations: Migration[] = [addUserFeatures];
+    const migrations: Migration[] = [];
 
     for (const migration of migrations) {
       await migration.up();
