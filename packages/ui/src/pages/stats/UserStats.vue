@@ -37,6 +37,15 @@
       </template>
     </v-data-table>
 
+    <v-data-table :headers="lastGamesHeaders" :items="lastGames" hide-default-footer>
+      <template v-slot:item.role="{ value }">
+        <PreviewLink :target="value" />
+      </template>
+      <template v-slot:item.isWin="{ value }">
+        {{ value ? $t('userStats.winResult') : $t('userStats.loseResult') }}
+      </template>
+    </v-data-table>
+
     <div v-for="side in <const>['good', 'evil']" :key="side">
       <h2 v-if="side === 'good'"><span class="good-loyalty-icon mt-5"></span> {{ $t('stats.goodRolesStatsTitle') }}</h2>
       <h2 v-else><span class="evil-loyalty-icon mt-5"></span> {{ $t('stats.evilRolesStatsTitle') }}</h2>
@@ -52,10 +61,10 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { TUserStats, prepareUserStats } from '@/helpers/stats';
+import { TGameView, TUserStats, prepareUserStats, prepareGamesForView } from '@/helpers/stats';
 import { socket } from '@/api/socket';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
-import { TRoles, UserForUI } from '@avalon/types';
+import { TRoles, UserForUI, VisualGameState } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
 
 type TRoleStats = {
@@ -79,6 +88,8 @@ export default defineComponent({
   async setup(props) {
     const state = ref<TUserStats>();
     const userForUi = ref<UserForUI>();
+    const gamesState = ref<VisualGameState[]>();
+    const lastGames = ref<TGameView[]>();
 
     const { t } = useI18n();
 
@@ -89,6 +100,8 @@ export default defineComponent({
       ]);
 
       state.value = prepareUserStats(games, uuid);
+      lastGames.value = prepareGamesForView(games, uuid, 5);
+      gamesState.value = games;
       userForUi.value = profile;
     };
 
@@ -145,8 +158,19 @@ export default defineComponent({
       return sideStats;
     });
 
+    const lastGamesHeaders = computed(() => {
+      return [
+        { title: t('userStats.role'), key: 'role' },
+        { title: t('userStats.result'), key: 'isWin' },
+        { title: t('stats.playerCount'), key: 'playersCount' },
+      ];
+    });
+
     return {
       state,
+      gamesState,
+      lastGames,
+      lastGamesHeaders,
       generalTable,
       rolesTables,
       userForUi,

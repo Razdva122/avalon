@@ -16,6 +16,12 @@ export type TUserStats<T extends TWinsStats = TWinsStatsWithWinrate> = {
   };
 };
 
+export type TGameView = {
+  role: TRoles;
+  isWin: boolean;
+  playersCount: number;
+};
+
 export type TWinsStatsWithWinrate = {
   winrate: string;
 } & TWinsStats;

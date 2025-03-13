@@ -160,19 +160,19 @@ export default defineComponent({
 }
 
 .merlin-radio-button {
-  background-image: url('@/assets/icons/merlin_hat.webp');
+  background-image: getIconPathByName('merlin_hat.webp');
 }
 
 .lovers-radio-button {
-  background-image: url('@/assets/icons/lovers_rose.webp');
+  background-image: getIconPathByName('lovers_rose.webp');
 }
 
 .guinevere-radio-button {
-  background-image: url('@/assets/icons/tiara.webp');
+  background-image: getIconPathByName('tiara.webp');
 }
 
 .cleric-radio-button {
-  background-image: url('@/assets/icons/cleric_cross.webp');
+  background-image: getIconPathByName('cleric_cross.webp');
 }
 
 .button-content {

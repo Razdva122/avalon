@@ -1,6 +1,6 @@
 <template>
   <div class="player-container" :class="playerClasses" @click="$emit('playerClick', player.id)">
-    <img class="player-frame" alt="frame" src="@/assets/player-frame.webp" />
+    <img class="player-frame" alt="frame" :src="getImagePathByID('core', 'player-frame')" />
     <div class="player-icon"></div>
     <PlayerIcon v-if="'role' in player" class="role-container" :icon="player.role" />
     <div class="player-crown" alt="crown"></div>
@@ -267,7 +267,7 @@ export default defineComponent({
 .player-name {
   text-align: center;
   width: 115px;
-  background-image: url('@/assets/name-frame.webp');
+  background-image: getImagePathByID('core', 'name-frame');
   background-size: 95% 75%;
   background-position: center;
   color: white;
@@ -335,7 +335,7 @@ export default defineComponent({
 
 .player-crown {
   display: none;
-  background-image: url('@/assets/crown.webp');
+  background-image: getImagePathByID('core', 'crown');
   background-size: contain;
   background-position: center;
   position: absolute;
@@ -442,13 +442,13 @@ export default defineComponent({
 }
 
 .icon-good-mission {
-  background-image: url('@/assets/blue_team_no_background.webp');
+  background-image: getImagePathByID('core', 'blue_team_no_background');
   border: 2px solid rgb(var(--v-theme-info));
   background-size: contain;
 }
 
 .icon-evil-mission {
-  background-image: url('@/assets/red_team_no_background.webp');
+  background-image: getImagePathByID('core', 'red_team_no_background');
   border: 2px solid rgb(var(--v-theme-error));
   background-size: contain;
 }

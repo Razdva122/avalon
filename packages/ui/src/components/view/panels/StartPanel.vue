@@ -152,7 +152,7 @@ export default defineComponent({
 .discord-icon {
   width: 30px;
   height: 30px;
-  background-image: url('@/assets/icons/discord.png');
+  background-image: getIconPathByName('github.png');
   background-position: center;
   background-size: contain;
 }

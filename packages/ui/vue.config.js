@@ -87,14 +87,6 @@ module.exports = defineConfig({
             priority: 0.8,
           },
         }),
-        new CopyPlugin({
-          patterns: [
-            {
-              from: 'src/assets',
-              to: 'static',
-            },
-          ],
-        }),
         new PrerendererWebpackPlugin({
           routes: multiLangRoutes.filter((el) => el.meta.prerender).map((el) => el.path),
           renderer: new PuppeteerRenderer({

@@ -324,7 +324,7 @@ export default defineComponent({
 }
 
 .game-board {
-  background-image: url('@/assets/board.webp');
+  background-image: getImagePathByID('core', 'board');
   width: 600px;
   height: 600px;
   background-position: center;

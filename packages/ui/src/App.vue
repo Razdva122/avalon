@@ -149,7 +149,7 @@ body {
 
 #app.holidays-active {
   .player-crown {
-    background-image: url('@/assets/santa-hat.webp');
+    background-image: getImagePathByID('core', 'santa-hat');
     width: 90px;
     height: 90px;
     left: 20px;
@@ -162,7 +162,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-image: url('@/assets/holidays-background.webp');
+  background-image: getImagePathByID('core', 'holidays-background');
   background-attachment: fixed;
   background-size: cover;
   pointer-events: none;

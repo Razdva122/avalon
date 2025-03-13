@@ -6,7 +6,7 @@
     <div v-html="$t('about.description')"></div>
 
     <div class="image">
-      <img class="preview" alt="preview" src="@/assets/images/preview.webp" />
+      <img class="preview" alt="preview" :src="getImagePathByID('other', 'preview')" />
     </div>
 
     <div>
@@ -41,12 +41,18 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { getImagePathByID } from '@/helpers/images';
 
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 
 export default defineComponent({
   components: {
     PreviewLink,
+  },
+  data() {
+    return {
+      getImagePathByID,
+    };
   },
 });
 </script>

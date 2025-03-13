@@ -272,13 +272,13 @@ export default defineComponent({
 }
 
 .icon-loyalty-good {
-  background-image: url('@/assets/blue_team_no_background.webp');
+  background-image: getImagePathByID('core', 'blue_team_no_background');
   border: 2px solid rgb(var(--v-theme-info));
   background-size: contain;
 }
 
 .icon-loyalty-evil {
-  background-image: url('@/assets/red_team_no_background.webp');
+  background-image: getImagePathByID('core', 'red_team_no_background');
   border: 2px solid rgb(var(--v-theme-error));
   background-size: contain;
 }

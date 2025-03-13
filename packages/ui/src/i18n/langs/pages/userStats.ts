@@ -7,6 +7,9 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     side: 'Side',
     sideevil: 'Evil team',
     sidegood: 'Good team',
+    winResult: 'Win',
+    loseResult: 'Lose',
+    result: 'Result',
     sidetotal: 'All',
     gamesCount: 'Games count',
     wins: 'Wins',
@@ -14,6 +17,7 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
   },
   ru: {
     userStatsTitle: 'Статистика пользователя:',
+    result: 'Результат',
     side: 'Сторона',
     sideevil: 'Команда зла',
     sidegood: 'Команда добра',
@@ -21,6 +25,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     gamesCount: 'Количество игр',
     wins: 'Победы',
     role: 'Роль',
+    winResult: 'Победа',
+    loseResult: 'Поражение',
   },
   es: {
     userStatsTitle: 'Estadísticas del usuario:',
@@ -31,6 +37,9 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     gamesCount: 'Partidas jugadas',
     wins: 'Victorias',
     role: 'Rol',
+    result: 'Resultado',
+    winResult: 'Victoria',
+    loseResult: 'Derrota',
   },
   'zh-TW': {
     userStatsTitle: '用戶統計：',
@@ -41,6 +50,9 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     gamesCount: '遊戲場數',
     wins: '勝利次數',
     role: '角色',
+    result: '结果',
+    winResult: '胜利',
+    loseResult: '失败',
   },
   'zh-CN': {
     userStatsTitle: '用户统计：',
@@ -51,5 +63,7 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     gamesCount: '游戏场数',
     wins: '胜利次数',
     role: '角色',
+    winResult: '胜利',
+    loseResult: '失败',
   },
 };

@@ -30,11 +30,11 @@ export default defineComponent({});
 }
 
 .discord-icon {
-  background-image: url('@/assets/icons/discord.png');
+  background-image: getIconPathByName('discord.png');
 }
 
 .github-icon {
   background-size: 115%;
-  background-image: url('@/assets/icons/github.png');
+  background-image: getIconPathByName('github.png');
 }
 </style>

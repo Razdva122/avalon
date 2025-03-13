@@ -8,11 +8,11 @@
 }
 
 .good-loyalty-icon {
-  background-image: url('@/assets/blue_team_no_background.webp');
+  background-image: getImagePathByID('core', 'blue_team_no_background');
   border: 1px solid rgb(var(--v-theme-info));
 }
 
 .evil-loyalty-icon {
-  background-image: url('@/assets/red_team_no_background.webp');
+  background-image: getImagePathByID('core', 'red_team_no_background');
   border: 1px solid rgb(var(--v-theme-error));
 }

@@ -8,7 +8,12 @@
 }
 
 $s3ImagesPath: 'https://storage.yandexcloud.net/avalon-game/images/';
+$s3IconsPath: 'https://storage.yandexcloud.net/avalon-game/icons/';
 
 @function getImagePathByID($type, $id) {
   @return url('#{$s3ImagesPath}#{$type}/#{$id}.webp');
+}
+
+@function getIconPathByName($name) {
+  @return url('#{$s3IconsPath}#{$name}');
 }

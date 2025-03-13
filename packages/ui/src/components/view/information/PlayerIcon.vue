@@ -171,13 +171,13 @@ export default defineComponent({
 }
 
 .icon-evil {
-  background-image: getImagePathByID('roles', 'red_team_no_background');
+  background-image: getImagePathByID('core', 'red_team_no_background');
   background-position: 50% 52%;
   background-size: 135%;
 }
 
 .icon-good {
-  background-image: getImagePathByID('roles', 'blue_team_no_background');
+  background-image: getImagePathByID('core', 'blue_team_no_background');
   background-position: 50% 52%;
   background-size: 100%;
 }
