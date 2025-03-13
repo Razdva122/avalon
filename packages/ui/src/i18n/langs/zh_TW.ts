@@ -348,8 +348,8 @@ export const zh_TW = {
     modalHeader: '選擇頭像',
     servantHint: '預設頭像',
     lady_of_lakeHint: '頒發給2025年註冊的用戶',
-    merlinHint: '頒發給幫助項目反饋/幫助尋找錯誤的用戶',
-    'anime/merlinHint': '頒發給在GitHub上對項目代碼做出任何貢獻的用戶',
+    merlin_pureHint: '頒發給幫助項目反饋/幫助尋找錯誤的用戶',
+    'anime/merlin_pureHint': '頒發給在GitHub上對項目代碼做出任何貢獻的用戶',
   },
   ...pages['zh-TW'],
 };

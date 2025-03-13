@@ -350,8 +350,8 @@ export const es = {
     modalHeader: 'Seleccionar avatar',
     servantHint: 'Avatar predeterminado',
     lady_of_lakeHint: 'Otorgado a los usuarios registrados en 2025',
-    merlinHint: 'Otorgado por ayudar al proyecto con comentarios / ayudar a encontrar errores',
-    'anime/merlinHint': 'Otorgado por hacer cualquier contribución al código del proyecto en GitHub',
+    merlin_pureHint: 'Otorgado por ayudar al proyecto con comentarios / ayudar a encontrar errores',
+    'anime/merlin_pureHint': 'Otorgado por hacer cualquier contribución al código del proyecto en GitHub',
   },
   ...pages.es,
 };

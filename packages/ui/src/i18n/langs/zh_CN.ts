@@ -348,8 +348,8 @@ export const zh_CN = {
     modalHeader: '选择头像',
     servantHint: '默认头像',
     lady_of_lakeHint: '颁发给2025年注册的用户',
-    merlinHint: '颁发给帮助项目反馈/帮助寻找错误的用户',
-    'anime/merlinHint': '颁发给在GitHub上对项目代码做出任何贡献的用户',
+    merlin_pureHint: '颁发给帮助项目反馈/帮助寻找错误的用户',
+    'anime/merlin_pureHint': '颁发给在GitHub上对项目代码做出任何贡献的用户',
   },
   ...pages['zh-CN'],
 };

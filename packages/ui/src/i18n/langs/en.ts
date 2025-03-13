@@ -173,8 +173,8 @@ export const en = {
     modalHeader: 'Select avatar',
     servantHint: 'Default Avatar',
     lady_of_lakeHint: 'Awarded to users registered in 2025',
-    merlinHint: 'Awarded for helping the project with feedback / help in finding bugs',
-    'anime/merlinHint': 'Awarded for making any contribution to the project code on github',
+    merlin_pureHint: 'Awarded for helping the project with feedback / help in finding bugs',
+    'anime/merlin_pureHint': 'Awarded for making any contribution to the project code on github',
   },
   profile: {
     username: 'Username',
