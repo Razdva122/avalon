@@ -3,6 +3,7 @@
 </template>
 
 <script lang="ts">
+import { getImagePathByID } from '@/helpers/images';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -16,8 +17,8 @@ export default defineComponent({
   computed: {
     srcPath() {
       const paths: { [key: string]: string } = {
-        lady_of_lake: 'https://storage.yandexcloud.net/avalon-game/images/features/lady_of_lake.webp',
-        servant: 'https://storage.yandexcloud.net/avalon-game/images/roles/servant.webp',
+        lady_of_lake: getImagePathByID('features', 'lady_of_lake'),
+        servant: getImagePathByID('roles', 'servant'),
       };
 
       return paths[this.avatarID];

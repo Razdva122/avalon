@@ -5,9 +5,9 @@
     <PlayerIcon v-if="'role' in player" class="role-container" :icon="player.role" />
     <div class="player-crown" alt="crown"></div>
     <div class="player-actions-features">
-      <img class="lady-of-lake" alt="lady" src="@/assets/features/lady_of_lake.webp" />
-      <img class="lady-of-sea" alt="ladySea" src="@/assets/features/lady_of_sea.webp" />
-      <img class="excalibur" alt="excalibur" src="@/assets/features/excalibur.webp" />
+      <img class="lady-of-lake" alt="lady" :src="getImagePathByID('features', 'lady_of_lake')" />
+      <img class="lady-of-sea" alt="ladySea" :src="getImagePathByID('features', 'lady_of_sea')" />
+      <img class="excalibur" alt="excalibur" :src="getImagePathByID('features', 'excalibur')" />
     </div>
     <i class="material-icons action-icon close text-error"></i>
     <i class="material-icons action-icon check"></i>
@@ -37,6 +37,7 @@ import type { RoomPlayer, THistoryResults, Dictionary, TGameStage, IActionWithRe
 import type { IFrontendPlayer } from '@/components/view/board/interface';
 import { gameStateKey } from '@/helpers/game-state-manager';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
+import { getImagePathByID } from '@/helpers/images';
 
 export default defineComponent({
   components: {
@@ -205,6 +206,7 @@ export default defineComponent({
       player,
       playerClasses,
       chatMessage,
+      getImagePathByID,
     };
   },
 });

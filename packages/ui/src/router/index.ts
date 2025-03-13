@@ -4,6 +4,7 @@ import type { TMultiLangRoute, TNormalizedLangRoute } from '@/router/seo';
 import Lobby from '@/pages/lobby/Lobby.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { TLanguage, LanguageMap } from '@/helpers/i18n';
+import { s3ImagesPath } from '@/helpers/images';
 
 const routeComponentMap = {
   lobby: Lobby,
@@ -124,7 +125,7 @@ router.beforeEach((to, from, next) => {
   const image = <string>meta.image || 'roles/merlin.webp';
   const url = 'https://avalon-game.com';
 
-  document.querySelector('head meta[property="og:image"]')!.setAttribute('content', `${url}/static/${image}`);
+  document.querySelector('head meta[property="og:image"]')!.setAttribute('content', `${s3ImagesPath}${image}`);
 
   document.title = <string>meta.title;
   document.querySelector('head meta[property="og:title"]')!.setAttribute('content', <string>meta.title);

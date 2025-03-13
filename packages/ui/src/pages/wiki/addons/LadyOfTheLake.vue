@@ -2,7 +2,7 @@
   <div class="info-page-content">
     <WikiBreadCrumbs />
     <h1>{{ $t('addons.ladyOfLake') }}</h1>
-    <img class="preview-image" src="@/assets/features/lady_of_lake.webp" alt="lady" />
+    <img class="preview-image" :src="getImagePathByID('features', 'lady_of_lake')" alt="lady" />
     <p>
       <strong>{{ $t('addons.ladyOfLake') }}</strong>
       <span v-html="$t('lady.intro')"></span>
@@ -43,11 +43,17 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import { getImagePathByID } from '@/helpers/images';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+  },
+  data() {
+    return {
+      getImagePathByID,
+    };
   },
 });
 </script>

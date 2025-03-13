@@ -19,17 +19,17 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .icon-excalibur {
-  background-image: url('@/assets/features/excalibur.webp');
+  background-image: getImagePathByID('features', 'excalibur');
   background-size: contain;
 }
 
 .icon-ladyOfLake {
-  background-image: url('@/assets/features/lady_of_lake.webp');
+  background-image: getImagePathByID('features', 'lady_of_lake');
   background-size: contain;
 }
 
 .icon-ladyOfSea {
-  background-image: url('@/assets/features/lady_of_sea.webp');
+  background-image: getImagePathByID('features', 'lady_of_sea');
   background-size: contain;
 }
 </style>

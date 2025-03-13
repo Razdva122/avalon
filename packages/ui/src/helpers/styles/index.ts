@@ -1,16 +1,17 @@
 import snakeCase from 'lodash/snakeCase';
+import { getImagePathByID } from '@/helpers/images';
 
 import { store } from '@/store';
 import { TVisibleRole } from '@avalon/types';
 
 export function calculateRoleUrl(role: TVisibleRole): string {
-  let prefix: string = '';
+  let type: 'roles' | 'roles/anime' = 'roles';
 
   if (store.state.settings?.style === 'anime') {
-    prefix = '/anime';
+    type = 'roles/anime';
   }
 
-  return require(`@/assets/roles${prefix}/${snakeCase(role)}.webp`);
+  return getImagePathByID(type, snakeCase(role));
 }
 
 export function computedStyles(): string[] {

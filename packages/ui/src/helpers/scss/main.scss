@@ -6,3 +6,9 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: $lines;
 }
+
+$s3ImagesPath: 'https://storage.yandexcloud.net/avalon-game/images/';
+
+@function getImagePathByID($type, $id) {
+  @return url('#{$s3ImagesPath}#{$type}/#{$id}.webp');
+}

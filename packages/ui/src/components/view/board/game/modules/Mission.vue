@@ -73,11 +73,11 @@ export default defineComponent({
 }
 
 .anime-style.mission-hidden {
-  background-image: url('@/assets/roles/anime/witch.webp');
+  background-image: getImagePathByID('roles/anime', 'witch');
 }
 
 .mission-hidden {
-  background-image: url('@/assets/roles/witch.webp');
+  background-image: getImagePathByID('roles', 'witch');
   background-size: contain;
 }
 

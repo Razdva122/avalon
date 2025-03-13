@@ -284,11 +284,11 @@ export default defineComponent({
 }
 
 .anime-style.icon-witch-hidden {
-  background-image: url('@/assets/roles/anime/witch.webp');
+  background-image: getImagePathByID('roles/anime', 'witch');
 }
 
 .icon-witch-hidden {
-  background-image: url('@/assets/roles/witch.webp');
+  background-image: getImagePathByID('roles', 'witch');
   border: 2px solid rgb(var(--v-theme-warning));
   background-size: contain;
 }
