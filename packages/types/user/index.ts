@@ -1,5 +1,7 @@
 import { prop, modelOptions } from '@typegoose/typegoose';
 
+export * from './avatars';
+
 @modelOptions({
   schemaOptions: {
     collation: {
@@ -53,4 +55,15 @@ export class UserProfile extends UserForUI {
 
   @prop({ required: true })
   public password!: string;
+}
+
+export class UserFeatures {
+  @prop({ required: true, unique: true })
+  public userID!: string;
+
+  @prop()
+  public isContributor?: boolean;
+
+  @prop()
+  public isHelper?: boolean;
 }

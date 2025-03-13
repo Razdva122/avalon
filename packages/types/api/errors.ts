@@ -22,6 +22,10 @@ export interface IUpdateLoginError extends ISocketError {
   error: 'loginAlreadyExist' | 'wrongPassword';
 }
 
+export interface IUpdateAvatarError extends ISocketError {
+  error: 'avatarNotExist' | 'avatarNotAvailable';
+}
+
 export interface IUpdatePasswordError extends ISocketError {
   error: 'wrongPassword';
 }

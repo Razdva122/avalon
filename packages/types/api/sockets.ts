@@ -16,12 +16,13 @@ import type {
   IUpdateEmailError,
   IUpdatePasswordError,
   IUpdateLoginError,
+  IUpdateAvatarError,
 } from './errors';
 import type { TAssassinateType } from '../game/addons';
 
 import type { TRoomsList, TMessage } from '../room';
 import { TTotalWinrateStats } from '../stats';
-import { UserForUI, UserProfile } from '../user';
+import { UserForUI, UserProfile, IAvatarInfo } from '../user';
 
 export type {
   ISocketError,
@@ -30,6 +31,7 @@ export type {
   IUpdateEmailError,
   IUpdatePasswordError,
   IUpdateLoginError,
+  IUpdateAvatarError,
 } from './errors';
 export type { ArgumentOfCallback } from './helpers';
 
@@ -59,12 +61,14 @@ export interface ClientToServerUserEvents {
     newPassword: string,
     callback: (result: true | IUpdatePasswordError) => void,
   ) => void;
+  updateUserAvatar: (avatarID: string, callback: (result: true | IUpdateAvatarError) => void) => void;
   login: (
     type: 'email' | 'login',
     loginOrEmail: string,
     password: string,
     callback: (user: (UserForUI & { token: string }) | ILoginError) => void,
   ) => void;
+  getUserAvatars: (callback: (avatars: IAvatarInfo[]) => void) => void;
 }
 
 export interface ClientToServerEvents extends ClientToServerUserEvents {

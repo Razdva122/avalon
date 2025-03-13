@@ -165,6 +165,8 @@ export const es = {
     loginNotExist: 'Usuario con este login no encontrado',
     emailAlreadyExist: 'Un usuario con este email ya está registrado',
     loginAlreadyExist: 'Un usuario con este login ya está registrado',
+    avatarNotExist: 'El avatar no existe',
+    avatarNotAvailable: 'Este avatar no está disponible para ti',
   },
   profile: {
     username: 'Nombre de usuario',
@@ -343,6 +345,13 @@ export const es = {
     goodWinrate: 'Tasa de victoria del Lado del Bien',
     winrateByTeamSize: 'Tasa de victorias por tamaño del equipo',
     halfWinrate: '50% tasa de victoria',
+  },
+  avatars: {
+    modalHeader: 'Seleccionar avatar',
+    servantHint: 'Avatar predeterminado',
+    lady_of_lakeHint: 'Otorgado a los usuarios registrados en 2025',
+    merlinHint: 'Otorgado por ayudar al proyecto con comentarios / ayudar a encontrar errores',
+    'anime/merlinHint': 'Otorgado por hacer cualquier contribución al código del proyecto en GitHub',
   },
   ...pages.es,
 };

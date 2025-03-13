@@ -166,6 +166,15 @@ export const en = {
     loginNotExist: 'User with this login not found',
     emailAlreadyExist: 'A user with this email is already registered',
     loginAlreadyExist: 'A user with this login is already registered',
+    avatarNotExist: 'Avatar not exist',
+    avatarNotAvailable: 'This avatar is not available for you',
+  },
+  avatars: {
+    modalHeader: 'Select avatar',
+    servantHint: 'Default Avatar',
+    lady_of_lakeHint: 'Awarded to users registered in 2025',
+    merlinHint: 'Awarded for helping the project with feedback / help in finding bugs',
+    'anime/merlinHint': 'Awarded for making any contribution to the project code on github',
   },
   profile: {
     username: 'Username',

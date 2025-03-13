@@ -165,6 +165,8 @@ export const zh_TW = {
     emailAlreadyExist: '此電子郵件已被註冊',
     loginNotExist: '找不到使用此账号的用户',
     loginAlreadyExist: '此账号已被注册',
+    avatarNotExist: '頭像不存在',
+    avatarNotAvailable: '此頭像對您不可用',
   },
   profile: {
     username: '使用者名稱',
@@ -341,6 +343,13 @@ export const zh_TW = {
     goodWinrate: '光明陣營勝率',
     winrateByTeamSize: '根據隊伍規模的勝率',
     halfWinrate: '50% 勝率',
+  },
+  avatars: {
+    modalHeader: '選擇頭像',
+    servantHint: '預設頭像',
+    lady_of_lakeHint: '頒發給2025年註冊的用戶',
+    merlinHint: '頒發給幫助項目反饋/幫助尋找錯誤的用戶',
+    'anime/merlinHint': '頒發給在GitHub上對項目代碼做出任何貢獻的用戶',
   },
   ...pages['zh-TW'],
 };

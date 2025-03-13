@@ -1,5 +1,5 @@
 <template>
-  <BaseModal v-model="overlay" :error="error" @close="closeAuthModal">
+  <BaseModal v-model="overlay" :error="error" :width="300" :persistent="true" @close="closeAuthModal">
     <template #header>
       <v-tabs v-model="mode" class="tabs mb-4" align-tabs="center">
         <v-tab value="auth">{{ $t('modal.loginTab') }}</v-tab>

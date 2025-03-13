@@ -1,5 +1,4 @@
 import { IAvatar } from '@/user/avatars/abstract';
-import { UserProfile } from '@avalon/types';
 
 export class ServantAvatar {
   static id = 'servant';
@@ -12,11 +11,27 @@ export class ServantAvatar {
 export class LadyAvatar {
   static id = 'lady_of_lake';
 
-  static isAvailableForUser(user: UserProfile): boolean {
+  static isAvailableForUser({ user }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
     const registrationDate = new Date(user.registrationDate);
 
     return registrationDate < new Date(Date.UTC(2026, 0, 1));
   }
 }
 
-export const commonAvatars: IAvatar[] = [ServantAvatar, LadyAvatar];
+export class MerlinAvatar {
+  static id = 'merlin';
+
+  static isAvailableForUser({ features }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
+    return Boolean(features && features.isHelper);
+  }
+}
+
+export class AnimeMerlinAvatar {
+  static id = 'anime/merlin';
+
+  static isAvailableForUser({ features }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
+    return Boolean(features && features.isContributor);
+  }
+}
+
+export const commonAvatars: IAvatar[] = [ServantAvatar, LadyAvatar, MerlinAvatar, AnimeMerlinAvatar];

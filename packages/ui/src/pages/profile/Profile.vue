@@ -5,7 +5,7 @@
         {{ $t('profile.profile') }}: {{ $store.state.profile?.login }}
         <span @click="updateLogin" class="material-icons email-change-icon"> edit </span>
       </h2>
-      <Avatar class="avatar" :avatarID="$store.state.profile!.avatar" />
+      <Avatar @click="openAvatarModal" class="avatar" :avatarID="$store.state.profile!.avatar" />
       <v-btn class="mb-4 w-100" size="large" @click="goToStats">
         <template v-slot:prepend>
           <span class="material-icons"> insert_chart_outlined </span>
@@ -48,6 +48,7 @@
       <v-checkbox v-model="hideIndexInHistory" :hide-details="true" :label="$t('profile.hideIndexHint')"> </v-checkbox>
       <v-checkbox v-model="style" :hide-details="true" :label="$t('profile.animeMode')"> </v-checkbox>
     </div>
+    <AvatarModal ref="avatarModal" />
   </div>
 </template>
 
@@ -58,11 +59,13 @@ import { store } from '@/store';
 import eventBus from '@/helpers/event-bus';
 import { RouteLocationNormalized, NavigationGuardNext } from 'vue-router';
 import Avatar from '@/components/user/Avatar.vue';
+import AvatarModal from '@/components/user/AvatarModal.vue';
 
 export default defineComponent({
   name: 'Profile',
   components: {
     Avatar,
+    AvatarModal,
   },
   data() {
     const { profile } = this.$store.state;
@@ -137,6 +140,9 @@ export default defineComponent({
     },
   },
   methods: {
+    openAvatarModal() {
+      (this.$refs.avatarModal as typeof AvatarModal).displayModal();
+    },
     logout() {
       this.$router.push({ name: 'lobby' });
       this.$store.commit('clearUserProfile');

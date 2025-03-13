@@ -128,6 +128,17 @@ export const store = createStore<IState>({
 
       return result;
     },
+    async updateUserAvatar({ commit, state }, { avatarID }): Promise<ArgumentOfCallback<'updateUserAvatar'>> {
+      const result = await socket.emitWithAck('updateUserAvatar', avatarID);
+
+      if (state.profile) {
+        if (result === true) {
+          commit('updateUserProfile', { ...state.profile, avatar: avatarID });
+        }
+      }
+
+      return result;
+    },
     async updateUserLogin({ commit, state }, { login, password }): Promise<ArgumentOfCallback<'updateUserLogin'>> {
       const result = await socket.emitWithAck('updateUserLogin', password, login);
 

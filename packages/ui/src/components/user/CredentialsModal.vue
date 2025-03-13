@@ -1,5 +1,5 @@
 <template>
-  <BaseModal v-model="overlay" :error="error" @close="closeModal">
+  <BaseModal v-model="overlay" :error="error" :width="300" @close="closeModal">
     <v-form
       ref="emailForm"
       @input="updateFormValidity('emailForm')"

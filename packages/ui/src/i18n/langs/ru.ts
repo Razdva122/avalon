@@ -165,6 +165,8 @@ export const ru = {
     emailNotExist: 'Пользователь с таким email не найден',
     emailAlreadyExist: 'Пользователь с таким email уже зарегистрирован',
     wrongPassword: 'Неверный пароль',
+    avatarNotExist: 'Аватар не существует',
+    avatarNotAvailable: 'Этот аватар недоступен для вас',
   },
   profile: {
     username: 'Имя пользователя',
@@ -341,6 +343,13 @@ export const ru = {
     goodWinrate: 'Процент побед Сил Света',
     winrateByTeamSize: 'Процент побед в зависимости от размера команды',
     halfWinrate: '50% побед',
+  },
+  avatars: {
+    modalHeader: 'Выбор аватара',
+    servantHint: 'Стандартный аватар',
+    lady_of_lakeHint: 'Вручается пользователям, зарегистрированным в 2025 году',
+    merlinHint: 'Вручается за помощь проекту с отзывами / помощь в поиске ошибок',
+    'anime/merlinHint': 'Вручается за любой вклад в код проекта на GitHub',
   },
   ...pages.ru,
 };

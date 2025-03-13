@@ -1,10 +1,13 @@
 <template>
-  <v-overlay v-model="overlay" :persistent="true" class="align-center justify-center">
+  <v-overlay v-model="overlay" :persistent="persistent" class="align-center justify-center">
     <v-card>
-      <v-sheet width="300" class="mx-auto pa-4">
+      <v-sheet :width="$props.width" class="mx-auto pa-4">
         <slot name="header"></slot>
         <div v-if="error" class="error-message mb-2 ml-2">
           {{ $t('errors.' + error) }}
+          <div v-if="additionalError">
+            {{ additionalError }}
+          </div>
         </div>
         <slot></slot>
       </v-sheet>
@@ -21,11 +24,19 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Boolean,
-      default: false,
     },
     error: {
       type: String,
       default: '',
+    },
+    additionalError: {
+      type: String,
+    },
+    width: {
+      type: Number,
+    },
+    persistent: {
+      type: Boolean,
     },
   },
   emits: ['update:modelValue', 'close'],

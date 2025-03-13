@@ -7,12 +7,14 @@ import crypto from 'crypto';
 import { handleSocketErrors, eventBus } from '@/helpers';
 import { DBManager } from '@/db';
 import { validateJWT } from '@/user';
+import { AvatarsManager } from '@/user/avatars';
 
 export class Manager {
   rooms: Dictionary<Room> = {};
   roomsList: TRoomsList = [];
   io: Server;
   dbManager: DBManager;
+  avatarsManager: AvatarsManager;
   onlineCounter: Dictionary<number> = {};
 
   get roomListCutted() {
@@ -130,6 +132,7 @@ export class Manager {
   constructor(io: Server, dbManager: DBManager) {
     this.io = io;
     this.dbManager = dbManager;
+    this.avatarsManager = new AvatarsManager(dbManager);
 
     this.dbManager.getLastRooms(20).then((rooms) => {
       this.generateRoomsListFromDB(rooms);
@@ -282,6 +285,16 @@ export class Manager {
     socket.on('updateUserPassword', async (password, newPassword, cb) => {
       const result = await this.dbManager.updateUserCredentials(userID, password, 'password', newPassword);
 
+      cb(result);
+    });
+
+    socket.on('getUserAvatars', async (cb) => {
+      const avatars = await this.avatarsManager.getAvailableAvatarsForUser(userID);
+      cb(avatars);
+    });
+
+    socket.on('updateUserAvatar', async (avatarID, cb) => {
+      const result = await this.avatarsManager.updateUserAvatar(userID, avatarID);
       cb(result);
     });
 

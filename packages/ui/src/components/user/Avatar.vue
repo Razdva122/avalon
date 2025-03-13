@@ -1,5 +1,5 @@
 <template>
-  <img class="addon-image" :src="srcPath" alt="lady" />
+  <img :src="srcPath" :alt="avatarID" />
 </template>
 
 <script lang="ts">
@@ -16,12 +16,11 @@ export default defineComponent({
   },
   computed: {
     srcPath() {
-      const paths: { [key: string]: string } = {
-        lady_of_lake: getImagePathByID('features', 'lady_of_lake'),
-        servant: getImagePathByID('roles', 'servant'),
-      };
+      if (['lady_of_lake', 'lady_of_sea', 'excailbur'].includes(this.avatarID)) {
+        return getImagePathByID('features', this.avatarID);
+      }
 
-      return paths[this.avatarID];
+      return getImagePathByID('roles', this.avatarID);
     },
   },
 });

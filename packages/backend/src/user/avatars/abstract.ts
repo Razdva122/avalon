@@ -1,7 +1,7 @@
-import { UserProfile } from '@avalon/types';
+import { UserFeatures, UserProfile } from '@avalon/types';
 
 export interface IAvatar {
   id: string;
 
-  isAvailableForUser(user: UserProfile): boolean;
+  isAvailableForUser(options: { user: UserProfile; features: UserFeatures | null }): boolean;
 }
