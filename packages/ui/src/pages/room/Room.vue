@@ -11,7 +11,7 @@
           <RoomVote v-if="roomState.vote" :roomUuid="roomState.roomID" :vote="roomState.vote" />
         </template>
         <template v-slot:restart>
-          <v-btn v-if="displayRestartButton" @click="restartGame" class="restart-button">{{
+          <v-btn color="primary" v-if="displayRestartButton" @click="restartGame" class="restart-button">{{
             $t('room.restartGame')
           }}</v-btn>
         </template>

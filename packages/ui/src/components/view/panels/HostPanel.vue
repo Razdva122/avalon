@@ -5,7 +5,7 @@
       <h2 class="mb-4">{{ $t('hostMenu.hostPanel') }}</h2>
       <div class="button-container" v-if="roomStage === 'started'">
         <div class="hint">{{ $t('hostMenu.endRestartGameHint') }}</div>
-        <v-btn color="info mb-2" @click="endGame"> {{ $t('hostMenu.endGame') }} </v-btn>
+        <v-btn color="info" class="mb-2" @click="endGame"> {{ $t('hostMenu.endGame') }} </v-btn>
         <v-btn color="info" @click="restartGame"> {{ $t('hostMenu.restartGame') }} </v-btn>
       </div>
       <div class="button-container" v-else>

@@ -306,6 +306,7 @@ export default defineComponent({
   justify-content: center;
   position: relative;
   margin: 120px 100px;
+  color: white;
 }
 
 @include scaleFromSize(840px);

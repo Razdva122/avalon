@@ -11,9 +11,7 @@ import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue
 import { vuetify } from '@/plugins/vuetify';
 import { i18n } from '@/plugins/i18n';
 
-import { Chart } from 'chart.js';
-
-Chart.defaults.color = '#FFFFFF';
+import '@/plugins/chart.js';
 
 createApp(App)
   .component('LocalizedTextWrapper', LocalizedTextWrapper)

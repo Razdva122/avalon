@@ -1,11 +1,11 @@
 <template>
   <div class="info-page-content profile-page">
-    <div class="profile-section">
+    <div v-if="$store.state.profile" class="profile-section">
       <h2>
-        {{ $t('profile.profile') }}: {{ $store.state.profile?.login }}
+        {{ $t('profile.profile') }}: {{ $store.state.profile.login }}
         <span @click="updateLogin" class="material-icons email-change-icon"> edit </span>
       </h2>
-      <Avatar @click="openAvatarModal" class="avatar" :avatarID="$store.state.profile!.avatar" />
+      <Avatar @click="openAvatarModal" class="avatar" :avatarID="$store.state.profile.avatar" />
       <v-btn class="mb-4 w-100" size="large" @click="goToStats">
         <template v-slot:prepend>
           <span class="material-icons"> insert_chart_outlined </span>
@@ -13,10 +13,10 @@
         {{ $t('profile.stats') }}
       </v-btn>
       <div class="mb-2">
-        {{ $t('modal.email') }}: {{ $store.state.profile?.email }}
+        {{ $t('modal.email') }}: {{ $store.state.profile.email }}
         <span @click="updateEmail" class="material-icons email-change-icon"> edit </span>
       </div>
-      <v-btn class="mb-4" @click="updatePassword">{{ $t('profile.updatePassword') }}</v-btn>
+      <v-btn class="mb-4" @click="updatePassword">{{ $t('profile.changePassword') }}</v-btn>
       <v-text-field
         hide-details="auto"
         v-model="username"
@@ -24,7 +24,7 @@
         class="w-100 mb-2"
       ></v-text-field>
       <div class="d-flex justify-space-between">
-        <v-btn :disabled="!updateAvailable" @click="update">{{ $t('profile.update') }}</v-btn>
+        <v-btn :disabled="!updateAvailable" @click="update">{{ $t('profile.change') }}</v-btn>
         <v-btn @click="logout">{{ $t('profile.logout') }}</v-btn>
       </div>
     </div>

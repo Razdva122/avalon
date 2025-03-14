@@ -8,12 +8,12 @@
   <v-overlay v-model="overlay" class="align-center justify-center">
     <div class="options pa-4 rounded-lg">
       <v-form>
-        <v-tabs v-model="type" class="tabs">
+        <v-tabs v-model="type" class="tabs" color="text-primary">
           <v-tab value="roles">{{ $t('options.roles') }}</v-tab>
           <v-tab value="addons" v-if="addons">{{ $t('options.addons') }}</v-tab>
           <v-tab value="features" v-if="features">{{ $t('options.features') }}</v-tab>
         </v-tabs>
-        <v-tabs v-if="type === 'roles'" v-model="roleTypes">
+        <v-tabs v-if="type === 'roles'" v-model="roleTypes" color="text-primary">
           <v-tab value="core">{{ $t('options.coreRoles') }}</v-tab>
           <v-tab value="extra">{{ $t('options.extraRoles') }}</v-tab>
           <v-tab value="experimental">{{ $t('options.experimentalRoles') }}</v-tab>

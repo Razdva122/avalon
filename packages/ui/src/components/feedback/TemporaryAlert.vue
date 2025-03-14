@@ -1,8 +1,8 @@
 <template>
   <v-alert
     v-model="alert"
+    class="alert"
     rounded="lg"
-    color="indigo-darken-3"
     icon="$info"
     :title="$t('alert.title' + id)"
     density="compact"
@@ -10,7 +10,7 @@
   >
     <slot></slot>
     <template v-slot:close>
-      <v-btn @click="alert = false" color="white" size="regular">
+      <v-btn @click="alert = false" size="regular" color="text-primary">
         <template v-slot:prepend>
           <span class="material-icons"> close </span>
         </template>
@@ -52,3 +52,5 @@ export default defineComponent({
   },
 });
 </script>
+
+<style></style>

@@ -15,7 +15,11 @@
     <div>
       <template v-if="roomsList && roomsList.length">
         <div class="list-header mb-5">{{ $t('mainPage.gamesList') }}:</div>
-        <div v-for="(game, index) in roomsList" class="game mb-1">
+        <div
+          v-for="(game, index) in roomsList"
+          class="game mb-1"
+          @click="$router.push({ name: 'room', params: { uuid: game.uuid } })"
+        >
           <div>{{ index + 1 }}.</div>
           <div class="game-container">
             <div class="game-left">
@@ -33,12 +37,6 @@
               <div class="players-amount mr-2">
                 {{ game.state === 'created' ? `${game.players}/10` : `${game.players} ${$t('mainPage.players')}` }}
               </div>
-              <v-btn
-                :color="game.state === 'created' ? undefined : 'info'"
-                @click="$router.push({ name: 'room', params: { uuid: game.uuid } })"
-              >
-                {{ game.state === 'created' ? $t('mainPage.join') : $t('mainPage.watch') }}
-              </v-btn>
             </div>
           </div>
         </div>
@@ -144,11 +142,20 @@ export default defineComponent({
 }
 
 .game {
-  padding: 5px;
+  background-color: rgb(var(--v-theme-surface-light));
+  border-radius: 12px;
+  padding: 5px 10px;
   min-width: 50vw;
   display: flex;
   align-items: center;
   font-size: 24px;
+  border: 1px solid rgba(255, 255, 255, 0);
+}
+
+.game:hover {
+  background-color: rgb(var(--v-theme-inset-hover));
+  cursor: pointer;
+  border: 1px solid;
 }
 
 .game-container {
@@ -181,10 +188,6 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 12px;
-
-  .text-primary {
-    color: white !important;
-  }
 }
 
 @import '@/styles/loyalty-icons.scss';

@@ -1,5 +1,5 @@
 <template>
-  <v-btn @click="overlay = !overlay" class="mr-2 history-button">
+  <v-btn @click="overlay = !overlay" color="primary" class="mr-2 history-button">
     <template v-slot:prepend>
       <span class="material-icons"> history </span>
     </template>
@@ -13,7 +13,7 @@
         </div>
         <v-divider :thickness="3"></v-divider>
       </div>
-      <v-btn @click="closeHistory" class="close" icon="close" variant="text" density="compact" />
+      <v-btn @click="closeHistory" class="close" icon="close" variant="text" density="compact" color="text-primary" />
     </div>
   </v-overlay>
 </template>

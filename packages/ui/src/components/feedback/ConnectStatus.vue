@@ -6,32 +6,41 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
+import { useStore } from '@/store';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
-  computed: {
-    state() {
-      const { connect } = this.$store.state;
+  setup() {
+    const store = useStore();
+    const { t } = useI18n();
+
+    const state = computed(() => {
+      const connect = store.state.connect;
 
       if (connect === null) {
         return {
           class: 'bg-warning',
-          text: this.$t('onlineStatus.connecting'),
+          text: t('onlineStatus.connecting'),
         };
       }
 
       if (connect === true) {
         return {
           class: 'bg-success',
-          text: this.$t('onlineStatus.connected'),
+          text: t('onlineStatus.connected'),
         };
       }
 
       return {
         class: 'bg-error',
-        text: this.$t('onlineStatus.error'),
+        text: t('onlineStatus.error'),
       };
-    },
+    });
+
+    return {
+      state,
+    };
   },
 });
 </script>

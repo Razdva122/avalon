@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="isHidden">
-      <v-btn class="chat-bubble" density="comfortable" @click="toggleChat" icon="chat" variant="plain" color="white">
+      <v-btn class="chat-bubble" density="comfortable" @click="toggleChat" icon="chat" variant="plain">
         <span class="material-icons"> chat </span>
         <div v-if="counter" class="pointer">{{ counter }}</div>
       </v-btn>
@@ -31,9 +31,10 @@
         class="compact"
         :icon="mode === 'compact' ? 'arrow_upward' : 'arrow_downward'"
         variant="text"
+        color="text-primary"
         density="compact"
       />
-      <v-btn @click="toggleChat" class="close" icon="close" variant="text" density="compact" />
+      <v-btn @click="toggleChat" class="close" icon="close" variant="text" color="text-primary" density="compact" />
       <v-text-field
         class="input"
         v-model="currentMessage"
@@ -157,6 +158,7 @@ export default defineComponent({
 
 .chat-window {
   background-color: rgb(var(--v-theme-surface));
+  border: 1px solid rgba(var(--v-theme-text-primary), 0.5);
   width: 300px;
   max-height: 450px;
   border-radius: 8px;

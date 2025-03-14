@@ -1,7 +1,7 @@
 <template>
   <BaseModal v-model="overlay" :error="error" :width="300" :persistent="true" @close="closeAuthModal">
     <template #header>
-      <v-tabs v-model="mode" class="tabs mb-4" align-tabs="center">
+      <v-tabs v-model="mode" class="tabs mb-4" color="text-primary" align-tabs="center">
         <v-tab value="auth">{{ $t('modal.loginTab') }}</v-tab>
         <v-tab value="registration">{{ $t('modal.registrationTab') }}</v-tab>
       </v-tabs>

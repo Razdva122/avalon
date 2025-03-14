@@ -31,10 +31,12 @@ export default defineComponent({});
 
 .discord-icon {
   background-image: getIconPathByName('discord.png');
+  filter: invert(var(--v-icon-invert));
 }
 
 .github-icon {
   background-size: 115%;
   background-image: getIconPathByName('github.png');
+  filter: invert(var(--v-icon-invert));
 }
 </style>

@@ -147,8 +147,8 @@ export default defineComponent({
 <style scoped lang="scss">
 .discord-button {
   text-decoration: none;
-  color: white;
 }
+
 .discord-icon {
   width: 30px;
   height: 30px;

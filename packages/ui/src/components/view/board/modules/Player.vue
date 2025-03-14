@@ -270,7 +270,6 @@ export default defineComponent({
   background-image: getImagePathByID('core', 'name-frame');
   background-size: 95% 75%;
   background-position: center;
-  color: white;
   @include dropShadowBorder(rgba(0, 0, 0, 0.5), 1px);
 }
 

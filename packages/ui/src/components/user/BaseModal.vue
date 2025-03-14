@@ -11,7 +11,7 @@
         </div>
         <slot></slot>
       </v-sheet>
-      <v-btn @click="closeModal" class="close" icon="close" variant="text" density="compact" />
+      <v-btn @click="closeModal" class="close" icon="close" color="text-primary" variant="text" density="compact" />
     </v-card>
   </v-overlay>
 </template>

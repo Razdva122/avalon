@@ -1,5 +1,8 @@
 <template>
   <BaseModal v-model="overlay" :error="error" :width="300" @close="closeModal">
+    <template #header>
+      <h2 class="modal-header mb-2">{{ $t('modal.change' + mode) }}</h2>
+    </template>
     <v-form
       ref="emailForm"
       @input="updateFormValidity('emailForm')"
@@ -18,7 +21,7 @@
         :rules="[validators.required, validators.spacesForbidden, validators.email]"
         :label="$t('modal.newEmail')"
       />
-      <v-btn :disabled="!formValid.emailForm" type="submit">{{ $t('modal.updateButton') }}</v-btn>
+      <v-btn :disabled="!formValid.emailForm" type="submit">{{ $t('modal.changeButton') }}</v-btn>
     </v-form>
 
     <v-form
@@ -39,7 +42,7 @@
         :rules="[validators.required, validators.spacesForbidden]"
         :label="$t('modal.login')"
       />
-      <v-btn :disabled="!formValid.loginForm" type="submit">{{ $t('modal.updateButton') }}</v-btn>
+      <v-btn :disabled="!formValid.loginForm" type="submit">{{ $t('modal.changeButton') }}</v-btn>
     </v-form>
 
     <v-form
@@ -64,7 +67,7 @@
         :hint="$t('validators.minCharacters', { count: 8 })"
         counter
       />
-      <v-btn :disabled="!formValid.passwordForm" type="submit">{{ $t('modal.updateButton') }}</v-btn>
+      <v-btn :disabled="!formValid.passwordForm" type="submit">{{ $t('modal.changeButton') }}</v-btn>
     </v-form>
   </BaseModal>
 </template>
@@ -177,5 +180,9 @@ export default defineComponent({
 .form {
   display: flex;
   flex-direction: column;
+}
+
+.modal-header {
+  text-align: center;
 }
 </style>

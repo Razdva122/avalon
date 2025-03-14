@@ -1,11 +1,12 @@
 <template>
   <header class="header">
-    <div class="header-right-container d-flex align-center mr-4 ml-4">
+    <div class="header-left-container d-flex align-center mr-4 ml-4">
       <ConnectStatus class="connect-status mr-4" />
       <Socials />
     </div>
-    <div class="header-left-container d-flex align-center mr-2">
+    <div class="header-right-container d-flex align-center mr-2">
       <SpoilerEye v-if="currentRoute === 'room'" />
+      <ThemeToggle />
       <Menu @profileClick="profileClick" />
     </div>
   </header>
@@ -36,6 +37,7 @@ import InfoSnackbar from '@/components/feedback/InfoSnackbar.vue';
 import Version from '@/components/feedback/Version.vue';
 import Socials from '@/components/feedback/Socials.vue';
 import SpoilerEye from '@/components/feedback/SpoilerEye.vue';
+import ThemeToggle from '@/components/feedback/ThemeToggle.vue';
 import { isHolidays } from '@/helpers/utility';
 import eventBus from '@/helpers/event-bus';
 
@@ -48,6 +50,7 @@ export default defineComponent({
     Socials,
     Menu,
     SpoilerEye,
+    ThemeToggle,
     CredentialsModal,
   },
   data() {
@@ -84,11 +87,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+body {
+  color: rgb(var(--v-theme-text-primary));
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: rgb(var(--v-theme-bgHeader));
   height: 100vh;
 }
 
@@ -102,13 +108,13 @@ li {
 
 a {
   text-decoration: none;
-  color: white;
+  color: rgb(var(--v-theme-text-primary));
 }
 
 .header {
   height: 50px;
   width: 100%;
-  background-color: rgb(var(--v-theme-bgHeader));
+  background-color: rgb(var(--v-theme-bg-header));
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
   display: flex;
@@ -117,6 +123,7 @@ a {
   top: 0px;
   left: 0px;
   z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .page {
@@ -127,7 +134,7 @@ a {
   font-size: large;
 }
 
-.header-left-container {
+.header-right-container {
   font-size: large;
 }
 
@@ -140,7 +147,7 @@ a {
 }
 
 body {
-  background-color: rgb(var(--v-theme-bgApp));
+  background-color: rgb(var(--v-theme-bg-app));
 }
 
 .icon-swap {
@@ -171,12 +178,12 @@ body {
 }
 
 .v-data-table {
-  background-color: rgb(var(--v-theme-bgApp)) !important;
-  color: white !important;
+  background-color: rgb(var(--v-theme-bg-app)) !important;
+  color: rgb(var(--v-theme-text-primary)) !important;
   font-size: 18px !important;
 
   .v-data-table__th:hover {
-    color: white !important;
+    color: rgb(var(--v-theme-text-primary)) !important;
   }
 }
 

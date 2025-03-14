@@ -237,7 +237,8 @@ export default defineComponent({
 }
 
 .profile-games-counter {
-  background-color: rgb(var(--v-theme-bgHeader));
+  background-color: rgb(var(--v-theme-inset));
+  font-weight: 500;
   width: fit-content;
   padding: 0px 8px;
   border-radius: 8px;

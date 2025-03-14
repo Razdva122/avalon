@@ -1,7 +1,7 @@
 <template>
   <v-menu :eager="true">
     <template v-slot:activator="{ props }">
-      <v-btn color="white" size="large" variant="plain" v-bind="props">
+      <v-btn color="text-primary" size="large" variant="plain" v-bind="props">
         <template v-slot:append>
           <span class="material-icons"> menu </span>
         </template>
@@ -10,7 +10,7 @@
     </template>
     <nav>
       <router-link to="/">{{ $t('menu.home') }}</router-link>
-      <div @click="$emit('profileClick')">{{ $t('menu.profile') }}</div>
+      <router-link @click="$emit('profileClick')" :to="{ name: 'profile' }">{{ $t('menu.profile') }}</router-link>
       <router-link :to="{ name: 'wiki' }">{{ $t('menu.wiki') }}</router-link>
       <router-link :to="{ name: 'stats' }">{{ $t('menu.stats') }}</router-link>
       <router-link :to="{ name: 'about' }">{{ $t('menu.about') }}</router-link>
@@ -26,7 +26,7 @@ export default defineComponent({});
 
 <style scoped lang="scss">
 nav {
-  background-color: rgb(var(--v-theme-bgHeader));
+  background-color: rgb(var(--v-theme-bg-header));
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
   font-size: 20px;
@@ -37,11 +37,10 @@ nav {
   * {
     padding: 5px;
     cursor: pointer;
-    color: white;
     text-decoration: none;
 
     &.router-link-exact-active {
-      color: skyblue;
+      color: rgb(var(--v-theme-info));
     }
   }
 }

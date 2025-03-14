@@ -25,8 +25,14 @@ const lightTheme = {
     info: '#2196F3',
     success: '#4CAF50',
     warning: '#fb8c00',
-    bgApp: '#635f57',
-    bgHeader: '#2c3e50',
+    'text-primary': '#333333',
+    'bg-app': '#CFD8DC',
+    'bg-header': '#D1D5DB',
+    inset: '#EFF2F5',
+    'inset-hover': '#D1D9E0',
+  },
+  variables: {
+    'icon-invert': 1,
   },
 };
 
@@ -40,8 +46,14 @@ const darkTheme = {
     info: '#2196F3',
     success: '#4CAF50',
     warning: '#fb8c00',
-    bgApp: '#1E1E1E',
-    bgHeader: '#0D0D0D',
+    'bg-app': '#1E1E1E',
+    'bg-header': '#0D0D0D',
+    'text-primary': '#FFFFFF',
+    inset: '#262C36',
+    'inset-hover': '#2A313C',
+  },
+  variables: {
+    'icon-invert': 0,
   },
 };
 
@@ -55,8 +67,7 @@ export const vuetify = createVuetify({
   },
   defaults: {
     VBtn: {
-      color: 'primary',
-      variants: 'tonal',
+      color: 'inset',
       rounded: 'lg',
     },
   },

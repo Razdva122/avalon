@@ -9,6 +9,7 @@
           variant="plain"
           size="x-small"
           class="button-help"
+          color="text-primary"
           :class="route ? 'with-route' : undefined"
         >
           <span class="material-icons"> question_mark </span>

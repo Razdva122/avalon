@@ -1,5 +1,11 @@
 <template>
-  <v-btn density="comfortable" @click="toggleSpoilerStatus" :icon="iconName" variant="plain" color="white"></v-btn>
+  <v-btn
+    density="comfortable"
+    @click="toggleSpoilerStatus"
+    :icon="iconName"
+    variant="plain"
+    color="text-primary"
+  ></v-btn>
 </template>
 
 <script lang="ts">
