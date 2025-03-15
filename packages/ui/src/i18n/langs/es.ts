@@ -189,6 +189,7 @@ export const es = {
     requiredField: 'Campo obligatorio',
     minCharacters: 'Mínimo {count} caracteres',
     spacesForbidden: 'No se permiten espacios',
+    loginSymbols: 'Caracteres permitidos: a-z, 0-9, _ . -',
   },
   modal: {
     username: 'Nombre de usuario',

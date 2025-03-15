@@ -70,8 +70,8 @@ export const store = createStore<IState>({
     },
   },
   actions: {
-    async login({ commit }, { loginOrEmail, password, type }): Promise<ArgumentOfCallback<'login'>> {
-      const user = await socket.emitWithAck('login', type, loginOrEmail, password);
+    async login({ commit }, { loginOrEmail, password }): Promise<ArgumentOfCallback<'login'>> {
+      const user = await socket.emitWithAck('login', loginOrEmail, password);
 
       if (!('error' in user)) {
         commit('updateUserProfile', user);

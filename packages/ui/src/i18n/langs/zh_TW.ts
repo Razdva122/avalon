@@ -189,6 +189,7 @@ export const zh_TW = {
     requiredField: '必填欄位',
     minCharacters: '最少{count}個字元',
     spacesForbidden: '禁止使用空格',
+    loginSymbols: '允許符號：a-z、0-9、_ . -',
   },
   modal: {
     username: '使用者名稱',

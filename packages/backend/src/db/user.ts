@@ -107,8 +107,10 @@ export class UserLayer {
     return { error: 'wrongPassword' };
   }
 
-  async login(type: 'email' | 'login', loginOrEmail: string, password: string): Promise<ArgumentOfCallback<'login'>> {
+  async login(loginOrEmail: string, password: string): Promise<ArgumentOfCallback<'login'>> {
+    const type = loginOrEmail.match(/^[a-zA-Z0-9_.-]+$/) ? 'login' : 'email';
     let user;
+
     if (type === 'email') {
       user = await userProfileModel.findOne({ email: loginOrEmail });
     } else {

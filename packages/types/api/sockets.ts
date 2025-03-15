@@ -63,7 +63,6 @@ export interface ClientToServerUserEvents {
   ) => void;
   updateUserAvatar: (avatarID: string, callback: (result: true | IUpdateAvatarError) => void) => void;
   login: (
-    type: 'email' | 'login',
     loginOrEmail: string,
     password: string,
     callback: (user: (UserForUI & { token: string }) | ILoginError) => void,

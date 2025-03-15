@@ -196,6 +196,7 @@ export const en = {
     requiredField: 'Required field',
     minCharacters: 'Min {count} characters',
     spacesForbidden: 'Spaces are not allowed',
+    loginSymbols: 'Allowed: a-z, 0-9, _ . -',
   },
   modal: {
     username: 'Username',

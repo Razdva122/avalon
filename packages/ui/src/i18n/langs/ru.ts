@@ -189,6 +189,7 @@ export const ru = {
     requiredField: 'Обязательное поле',
     minCharacters: 'Минимум {count} символов',
     spacesForbidden: 'Пробелы запрещены',
+    loginSymbols: 'Допустимые символы: a-z, 0-9, _ . -',
   },
   modal: {
     username: 'Имя пользователя',

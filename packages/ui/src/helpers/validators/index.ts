@@ -8,5 +8,6 @@ export const validators = {
   },
   min8: (value: string) => value.length >= 8 || i18n.global.t('validators.minCharacters', { count: 8 }),
   email: (value: string) => Boolean(value.match(/^\S+@\S+\.\S+$/)) || 'example@email.com',
+  login: (value: string) => Boolean(value.match(/^[a-zA-Z0-9_.-]+$/)) || i18n.global.t('validators.loginSymbols'),
   spacesForbidden: (value: string) => /^\S+$/.test(value) || i18n.global.t('validators.spacesForbidden'),
 };

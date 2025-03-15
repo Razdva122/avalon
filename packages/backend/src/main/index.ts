@@ -235,8 +235,8 @@ export class Manager {
         cb(userForUI);
       });
 
-      socket.on('login', async (type, loginOrEmail, password, cb) => {
-        const userForUI = await dbManager.login(type, loginOrEmail, password);
+      socket.on('login', async (loginOrEmail, password, cb) => {
+        const userForUI = await dbManager.login(loginOrEmail, password);
 
         cb(userForUI);
       });

@@ -39,7 +39,7 @@
       <TextField
         v-model="login"
         autocomplete="login"
-        :rules="[validators.required, validators.spacesForbidden]"
+        :rules="[validators.required, validators.spacesForbidden, validators.login]"
         :label="$t('modal.login')"
       />
       <v-btn :disabled="!formValid.loginForm" type="submit">{{ $t('modal.changeButton') }}</v-btn>

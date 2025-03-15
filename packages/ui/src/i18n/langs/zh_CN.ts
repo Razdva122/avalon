@@ -189,6 +189,7 @@ export const zh_CN = {
     requiredField: '必填项',
     minCharacters: '最少{count}个字符',
     spacesForbidden: '禁止使用空格',
+    loginSymbols: '允许符号：a-z、0-9、_ . -',
   },
   modal: {
     username: '用户名',

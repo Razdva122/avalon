@@ -7,46 +7,18 @@
       </v-tabs>
     </template>
 
-    <div v-if="mode === 'auth'">
-      <v-radio-group v-model="loginType" inline>
-        <v-radio :label="$t('modal.email')" value="email"></v-radio>
-        <v-radio :label="$t('modal.login')" value="login"></v-radio>
-      </v-radio-group>
-    </div>
-
-    <v-form
-      ref="emailForm"
-      @input="updateFormValidity('emailForm')"
-      @submit.prevent="loginInAccount"
-      class="form"
-      v-if="mode === 'auth' && loginType === 'email'"
-    >
-      <TextField
-        v-model="email"
-        autocomplete="email"
-        :rules="[validators.required, validators.spacesForbidden]"
-        :label="$t('modal.email')"
-      />
-      <PasswordField
-        v-model="password"
-        :rules="[validators.required, validators.spacesForbidden]"
-        :label="$t('modal.password')"
-      />
-      <v-btn :disabled="!formValid.emailForm" type="submit">{{ $t('modal.loginButton') }}</v-btn>
-    </v-form>
-
     <v-form
       ref="loginForm"
       @input="updateFormValidity('loginForm')"
       @submit.prevent="loginInAccount"
       class="form"
-      v-else-if="mode === 'auth' && loginType === 'login'"
+      v-if="mode === 'auth'"
     >
       <TextField
         v-model="login"
         autocomplete="login"
         :rules="[validators.required, validators.spacesForbidden]"
-        :label="$t('modal.login')"
+        :label="$t('modal.email') + '/' + $t('modal.login')"
       />
       <PasswordField
         v-model="password"
@@ -67,7 +39,7 @@
       <TextField
         v-model="login"
         autocomplete="login"
-        :rules="[validators.required, validators.spacesForbidden]"
+        :rules="[validators.required, validators.spacesForbidden, validators.login]"
         :label="$t('modal.login')"
         type="login"
       />
@@ -123,11 +95,9 @@ export default defineComponent({
       email: '',
       error: '',
       login: '',
-      loginType: 'email',
       validators,
       formValid: {
         loginForm: false,
-        emailForm: false,
         registrationForm: false,
       },
     };
@@ -146,12 +116,11 @@ export default defineComponent({
     },
   },
   methods: {
-    async updateFormValidity(type: 'loginForm' | 'emailForm' | 'registrationForm') {
+    async updateFormValidity(type: 'loginForm' | 'registrationForm') {
       this.error = '';
 
       const requiredFields = {
         loginForm: ['login', 'password'],
-        emailForm: ['email', 'password'],
         registrationForm: ['password', 'email', 'username'],
       } as const;
 
@@ -167,11 +136,7 @@ export default defineComponent({
       this.formValid[type] = valid;
     },
     async loginInAccount() {
-      const params =
-        this.loginType === 'email'
-          ? { loginOrEmail: this.email, type: this.loginType }
-          : { loginOrEmail: this.login, type: this.loginType };
-      const userOrError = await this.$store.dispatch('login', { ...params, password: this.password });
+      const userOrError = await this.$store.dispatch('login', { loginOrEmail: this.login, password: this.password });
 
       if ('error' in userOrError) {
         this.error = userOrError.error;
