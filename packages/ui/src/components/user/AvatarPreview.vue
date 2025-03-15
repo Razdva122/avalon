@@ -130,7 +130,7 @@ export default defineComponent({
   padding: 4px 8px;
   border-radius: 4px;
   border: 2px solid rgb(var(--v-theme-success));
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 4px rgba(var(--v-theme-text-primary), 0.4);
 }
 
 .not-availiable {

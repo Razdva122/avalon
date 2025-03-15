@@ -29,6 +29,7 @@ const lightTheme = {
     'bg-app': '#CFD8DC',
     'bg-header': '#D1D5DB',
     inset: '#EFF2F5',
+    'inset-reverted': '#262C36',
     'inset-hover': '#D1D9E0',
   },
   variables: {
@@ -50,6 +51,7 @@ const darkTheme = {
     'bg-header': '#0D0D0D',
     'text-primary': '#FFFFFF',
     inset: '#262C36',
+    'inset-reverted': '#EFF2F5',
     'inset-hover': '#2A313C',
   },
   variables: {

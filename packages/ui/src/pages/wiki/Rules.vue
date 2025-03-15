@@ -466,12 +466,12 @@ table {
 
 th,
 td {
-  border: 1px solid black;
+  border: 1px solid rgb(var(--v-theme-text-primary));
   padding: 5px;
 }
 
 th {
-  background-color: #2c3e50;
+  background-color: rgb(var(--v-theme-inset));
 }
 
 @media (max-width: 600px) {

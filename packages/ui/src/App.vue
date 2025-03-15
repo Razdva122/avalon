@@ -123,7 +123,7 @@ a {
   top: 0px;
   left: 0px;
   z-index: 100;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(var(--v-theme-text-primary), 0.1);
 }
 
 .page {

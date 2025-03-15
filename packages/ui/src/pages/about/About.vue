@@ -6,7 +6,11 @@
     <div v-html="$t('about.description')"></div>
 
     <div class="image">
-      <img class="preview" alt="preview" :src="getImagePathByID('other', 'preview')" />
+      <img
+        class="preview"
+        alt="preview"
+        :src="getImagePathByID('other', $store.state.settings?.colorTheme === 'dark' ? 'preview_dark' : 'preview')"
+      />
     </div>
 
     <div>

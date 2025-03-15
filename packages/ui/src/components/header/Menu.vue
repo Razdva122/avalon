@@ -27,6 +27,7 @@ export default defineComponent({});
 <style scoped lang="scss">
 nav {
   background-color: rgb(var(--v-theme-bg-header));
+  box-shadow: 0 2px 4px rgba(var(--v-theme-text-primary), 0.1);
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
   font-size: 20px;

@@ -44,9 +44,9 @@
         v-model="colorTheme"
         hide-details="auto"
       ></v-select>
+      <v-checkbox v-model="style" :hide-details="true" :label="$t('profile.animeMode')"> </v-checkbox>
       <v-checkbox v-model="hideSpoilers" :hide-details="true" :label="$t('profile.hideSpoilersHint')"> </v-checkbox>
       <v-checkbox v-model="hideIndexInHistory" :hide-details="true" :label="$t('profile.hideIndexHint')"> </v-checkbox>
-      <v-checkbox v-model="style" :hide-details="true" :label="$t('profile.animeMode')"> </v-checkbox>
     </div>
     <AvatarModal ref="avatarModal" />
   </div>
@@ -190,8 +190,14 @@ export default defineComponent({
 }
 
 .avatar {
+  cursor: pointer;
   height: 200px;
   width: 200px;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(var(--v-theme-text-primary), 0.5);
 }
 
 @media (max-width: 600px) {
