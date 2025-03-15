@@ -189,7 +189,7 @@ export default defineComponent({
 }
 
 .icon-excalibur {
-  background-image: getImagePathByID('roles', 'excalibur');
+  background-image: getImagePathByID('features', 'excalibur');
   background-position: center;
   background-size: 100%;
 }
