@@ -20,14 +20,7 @@
           class="message-element"
           :class="isUserMessage(message.user.id) ? 'message-from-author' : ''"
         >
-          <div class="author-container">
-            <template v-if="users[message.user.id]">
-              <Avatar class="message-author-avatar" :avatarID="users[message.user.id]!.avatar" />
-            </template>
-            <div @click="onUserClick(message.user)" class="message-author">
-              {{ users[message.user.id]?.name ?? message.user.name }}
-            </div>
-          </div>
+          <MessageAuthor class="message-author" :authorID="message.user.id" @click="onUserClick(message.user)" />
           <div class="message-text">
             {{ message.message }}
           </div>
@@ -57,15 +50,17 @@
 </template>
 
 <script lang="ts">
-import { ChatMessage, Dictionary, PublicUserProfile, User, UserForUI } from '@avalon/types';
+import { ChatMessage, User } from '@avalon/types';
 import { defineComponent, PropType } from 'vue';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import Avatar from '@/components/user/Avatar.vue';
+import MessageAuthor from '@/components/feedback/chat/MessageAuthor.vue';
 
 export default defineComponent({
   components: {
     Avatar,
+    MessageAuthor,
   },
   props: {
     roomUuid: {
@@ -83,22 +78,12 @@ export default defineComponent({
       mode: 'full',
       currentMessage: '',
       counter: 0,
-      users: <Dictionary<PublicUserProfile | null>>{},
     };
   },
   watch: {
     messages: {
       handler(current, prev) {
         this.scrollChatToBottom();
-
-        (<ChatMessage[]>current).forEach((message) => {
-          if (this.users[message.user.id] === null || this.users[message.user.id]) {
-            return;
-          }
-
-          this.users[message.user.id] = null;
-          socket.emitWithAck('getUserProfile', message.user.id).then((user) => (this.users[message.user.id] = user));
-        });
 
         if (this.isHidden) {
           if (current.length === 0) {
@@ -108,7 +93,6 @@ export default defineComponent({
           }
         }
       },
-      immediate: true,
     },
   },
   methods: {

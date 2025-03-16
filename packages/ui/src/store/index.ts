@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { updateUserProfile, updateUserAlertsData, clearUserProfile, updateUserSettings } from '@/store/persistent';
 
-import type { IState, TAlertsName, IUserSettings } from '@/store/interface';
+import type { IState, TAlertsName, IUserSettings, TUserState } from '@/store/interface';
 
 import { alertsInStorage, userProfileInStorage, userSettingsInStorage } from '@/store/init';
 
@@ -23,6 +23,7 @@ export const store = createStore<IState>({
     settings: userSettingsInStorage ? JSON.parse(userSettingsInStorage) : null,
     hideSpoilers: false,
     connect: null,
+    users: {},
     alerts: alertsInStorage ? JSON.parse(alertsInStorage) : {},
   },
   getters: {},
@@ -60,6 +61,10 @@ export const store = createStore<IState>({
 
     updateHideSpoilers(state: IState, value: boolean) {
       state.hideSpoilers = value;
+    },
+
+    updateUsersState(state: IState, { uuid, user }: { uuid: string; user: TUserState }) {
+      state.users[uuid] = user;
     },
   },
   actions: {
@@ -140,6 +145,17 @@ export const store = createStore<IState>({
       }
 
       return result;
+    },
+    async getUserPublicProfile({ state, commit }, { uuid }): Promise<TUserState> {
+      if (!state.users[uuid]) {
+        commit('updateUsersState', { uuid, user: { status: 'loading' } });
+
+        socket.emitWithAck('getUserProfile', uuid).then((profile) => {
+          commit('updateUsersState', { uuid, user: { status: 'ready', profile } });
+        });
+      }
+
+      return state.users[uuid];
     },
   },
   modules: {},

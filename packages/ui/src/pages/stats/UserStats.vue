@@ -1,11 +1,11 @@
 <template>
   <div class="info-page-content stats-page">
     <h1>{{ $t('userStats.userStatsTitle') }}</h1>
-    <div v-if="profileState" class="preview-profile">
-      <Avatar class="avatar mr-2" :avatarID="profileState.avatar" />
+    <div v-if="profileState.status === 'ready'" class="preview-profile">
+      <Avatar class="avatar mr-2" :avatarID="profileState.profile.avatar" />
       <div class="profile-info">
         <div class="profile-username">
-          {{ profileState.name }}
+          {{ profileState.profile.name }}
         </div>
         <div class="info-hint">id: {{ $props.uuid }}</div>
         <div class="profile-games">
@@ -71,8 +71,9 @@ import { useI18n } from 'vue-i18n';
 import { TGameView, TUserStats, prepareUserStats, prepareGamesForView } from '@/helpers/stats';
 import { socket } from '@/api/socket';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
-import { PublicUserProfile, TRoles, UserForUI, VisualGameState } from '@avalon/types';
+import { TRoles, VisualGameState } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
+import { useStore } from '@/store';
 
 type TRoleStats = {
   role: TRoles;
@@ -93,23 +94,20 @@ export default defineComponent({
     },
   },
   async setup(props) {
+    const store = useStore();
     const state = ref<TUserStats>();
-    const profileState = ref<PublicUserProfile>();
     const gamesState = ref<VisualGameState[]>();
     const lastGames = ref<TGameView[]>();
 
     const { t } = useI18n();
 
     const initState = async (uuid: string) => {
-      const [games, profile] = await Promise.all([
-        socket.emitWithAck('getPlayerGames', uuid),
-        socket.emitWithAck('getUserProfile', uuid),
-      ]);
+      store.dispatch('getUserPublicProfile', { uuid });
+      const games = await socket.emitWithAck('getPlayerGames', uuid);
 
       state.value = prepareUserStats(games, uuid);
       lastGames.value = prepareGamesForView(games, uuid, 5);
       gamesState.value = games;
-      profileState.value = profile;
     };
 
     await initState(props.uuid);
@@ -171,6 +169,10 @@ export default defineComponent({
         { title: t('userStats.result'), key: 'isWin' },
         { title: t('userStats.game'), key: 'gameID' },
       ];
+    });
+
+    const profileState = computed(() => {
+      return store.state.users[props.uuid];
     });
 
     return {
