@@ -22,7 +22,7 @@ import type { TAssassinateType } from '../game/addons';
 
 import type { TRoomsList, TMessage } from '../room';
 import { TTotalWinrateStats } from '../stats';
-import { UserForUI, UserProfile, IAvatarInfo, PublicUserProfile } from '../user';
+import { UserForUI, UserProfile, IAvatarInfo, PublicUserProfile, UserWithToken } from '../user';
 
 export type {
   ISocketError,
@@ -51,7 +51,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerUserEvents {
   registerUser: (
     user: Omit<UserProfile, 'avatar' | 'registrationDate'>,
-    callback: (user: (UserForUI & { token: string }) | IRegisterError) => void,
+    callback: (user: UserWithToken | IRegisterError) => void,
   ) => void;
   updateUserName: (name: string) => void;
   updateUserEmail: (password: string, email: string, callback: (result: true | IUpdateEmailError) => void) => void;
@@ -62,11 +62,7 @@ export interface ClientToServerUserEvents {
     callback: (result: true | IUpdatePasswordError) => void,
   ) => void;
   updateUserAvatar: (avatarID: string, callback: (result: true | IUpdateAvatarError) => void) => void;
-  login: (
-    loginOrEmail: string,
-    password: string,
-    callback: (user: (UserForUI & { token: string }) | ILoginError) => void,
-  ) => void;
+  login: (loginOrEmail: string, password: string, callback: (user: UserWithToken | ILoginError) => void) => void;
   getUserAvatars: (callback: (avatars: IAvatarInfo[]) => void) => void;
   getMyProfile: (callback: (user: UserForUI) => void) => void;
 }

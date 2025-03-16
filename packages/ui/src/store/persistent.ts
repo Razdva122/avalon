@@ -1,8 +1,9 @@
 import { userProfilePath, alertStoragePath, userSettingsPath } from '@/store/const';
-import type { IUserProfile, IUserSettings, TAlerts } from '@/store/interface';
+import type { IUserSettings, TAlerts } from '@/store/interface';
 import { updateAuthToken } from '@/api/socket';
+import type { UserWithToken } from '@avalon/types';
 
-export function updateUserProfile(user: IUserProfile) {
+export function updateUserProfile(user: UserWithToken) {
   localStorage.setItem(userProfilePath, JSON.stringify(user));
   updateAuthToken();
 }

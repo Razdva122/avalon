@@ -40,6 +40,10 @@ export class UserForUI extends PublicUserProfile {
   public login!: string;
 }
 
+export interface UserWithToken extends UserForUI {
+  token: string;
+}
+
 @modelOptions({
   schemaOptions: {
     collation: {

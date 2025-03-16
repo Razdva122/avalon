@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { updateUserProfile, updateUserAlertsData, clearUserProfile, updateUserSettings } from '@/store/persistent';
 
-import type { IState, TAlertsName, IUserSettings, IUserProfile } from '@/store/interface';
+import type { IState, TAlertsName, IUserSettings } from '@/store/interface';
 
 import { alertsInStorage, userProfileInStorage, userSettingsInStorage } from '@/store/init';
 
@@ -13,7 +13,7 @@ export * from '@/store/interface';
 
 import { socket } from '@/api/socket';
 
-import type { ArgumentOfCallback } from '@avalon/types';
+import type { ArgumentOfCallback, UserWithToken } from '@avalon/types';
 
 export const key: InjectionKey<Store<IState>> = Symbol();
 
@@ -32,7 +32,7 @@ export const store = createStore<IState>({
       updateUserAlertsData(state.alerts);
     },
 
-    updateUserProfile(state: IState, profile: IUserProfile) {
+    updateUserProfile(state: IState, profile: UserWithToken) {
       state.profile = profile;
       updateUserProfile(profile);
     },

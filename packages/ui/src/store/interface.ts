@@ -1,20 +1,12 @@
 import type { TLanguage } from '@/helpers/i18n';
+import type { UserWithToken } from '@avalon/types';
 
 export interface IState {
-  profile: IUserProfile | null;
+  profile: UserWithToken | null;
   settings: IUserSettings | null;
   hideSpoilers: boolean;
   connect: boolean | null;
   alerts: TAlerts;
-}
-
-export interface IUserProfile {
-  id: string;
-  name: string;
-  token: string;
-  email: string;
-  login: string;
-  avatar: string;
 }
 
 export interface IUserSettings {
