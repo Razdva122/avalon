@@ -78,6 +78,9 @@ export default defineComponent({
       })),
     };
   },
+  mounted() {
+    this.$store.dispatch('refreshProfile');
+  },
   computed: {
     hideSpoilers: {
       get() {

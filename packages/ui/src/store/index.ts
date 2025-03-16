@@ -3,17 +3,11 @@ import { createStore, Store, useStore as baseUseStore } from 'vuex';
 
 import { v4 as uuidv4 } from 'uuid';
 
-import {
-  updateUserProfile,
-  updateUserAlertsData,
-  clearUserProfile,
-  updateUserSettings,
-  clearUserOldStorage,
-} from '@/store/persistent';
+import { updateUserProfile, updateUserAlertsData, clearUserProfile, updateUserSettings } from '@/store/persistent';
 
 import type { IState, TAlertsName, IUserSettings, IUserProfile } from '@/store/interface';
 
-import { userInStorage, alertsInStorage, userProfileInStorage, userSettingsInStorage } from '@/store/init';
+import { alertsInStorage, userProfileInStorage, userSettingsInStorage } from '@/store/init';
 
 export * from '@/store/interface';
 
@@ -25,7 +19,6 @@ export const key: InjectionKey<Store<IState>> = Symbol();
 
 export const store = createStore<IState>({
   state: {
-    user: userInStorage ? JSON.parse(userInStorage) : null,
     profile: userProfileInStorage ? JSON.parse(userProfileInStorage) : null,
     settings: userSettingsInStorage ? JSON.parse(userSettingsInStorage) : null,
     hideSpoilers: false,
@@ -79,15 +72,8 @@ export const store = createStore<IState>({
 
       return user;
     },
-    async registerUser(
-      { commit, state },
-      { password, name, email, login },
-    ): Promise<ArgumentOfCallback<'registerUser'>> {
-      let id = uuidv4();
-
-      if (state.user?.id) {
-        id = state.user?.id;
-      }
+    async registerUser({ commit }, { password, name, email, login }): Promise<ArgumentOfCallback<'registerUser'>> {
+      const id = uuidv4();
 
       const user = await socket.emitWithAck('registerUser', {
         password,
@@ -98,10 +84,6 @@ export const store = createStore<IState>({
       });
 
       if (!('error' in user)) {
-        if (state.user) {
-          clearUserOldStorage();
-        }
-
         commit('updateUserProfile', user);
       }
 
@@ -124,6 +106,15 @@ export const store = createStore<IState>({
         if (result === true) {
           commit('updateUserProfile', { ...state.profile, email });
         }
+      }
+
+      return result;
+    },
+    async refreshProfile({ commit, state }): Promise<ArgumentOfCallback<'getMyProfile'>> {
+      const result = await socket.emitWithAck('getMyProfile');
+
+      if (state.profile) {
+        commit('updateUserProfile', { ...state.profile, ...result });
       }
 
       return result;

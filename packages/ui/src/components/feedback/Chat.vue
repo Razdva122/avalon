@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { ChatMessage, Dictionary, User, UserForUI } from '@avalon/types';
+import { ChatMessage, Dictionary, PublicUserProfile, User, UserForUI } from '@avalon/types';
 import { defineComponent, PropType } from 'vue';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
@@ -83,7 +83,7 @@ export default defineComponent({
       mode: 'full',
       currentMessage: '',
       counter: 0,
-      users: <Dictionary<UserForUI | null>>{},
+      users: <Dictionary<PublicUserProfile | null>>{},
     };
   },
   watch: {

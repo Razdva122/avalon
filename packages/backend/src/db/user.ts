@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { ArgumentOfCallback, UserFeatures, UserForUI, UserProfile } from '@avalon/types';
+import { ArgumentOfCallback, PublicUserProfile, UserFeatures, UserForUI, UserProfile } from '@avalon/types';
 import { userFeaturesModel, userProfileModel } from '@/db/models';
 import { generateJWT } from '@/user';
 
@@ -61,6 +61,16 @@ export class UserLayer {
       id: user.id,
       email: user.email,
       login: user.login,
+      avatar: user.avatar,
+      name: user.name,
+    };
+  }
+
+  async getPublicUserProfile(id: string): Promise<PublicUserProfile> {
+    const user = await this.getUserByID(id);
+
+    return {
+      id: user.id,
       avatar: user.avatar,
       name: user.name,
     };

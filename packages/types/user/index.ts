@@ -2,15 +2,7 @@ import { prop, modelOptions } from '@typegoose/typegoose';
 
 export * from './avatars';
 
-@modelOptions({
-  schemaOptions: {
-    collation: {
-      locale: 'en',
-      strength: 2,
-    },
-  },
-})
-export class UserForUI {
+export class PublicUserProfile {
   @prop({ required: true, unique: true })
   public id!: string;
 
@@ -22,7 +14,17 @@ export class UserForUI {
     default: () => 'servant',
   })
   public avatar!: string;
+}
 
+@modelOptions({
+  schemaOptions: {
+    collation: {
+      locale: 'en',
+      strength: 2,
+    },
+  },
+})
+export class UserForUI extends PublicUserProfile {
   @prop({
     required: true,
     unique: true,

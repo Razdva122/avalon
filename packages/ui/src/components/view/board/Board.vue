@@ -139,6 +139,8 @@ export default defineComponent({
       if (roomState.value.stage !== 'started') {
         if (userIsLeader.value) {
           socket.emit('kickPlayer', roomState.value.roomID, uuid);
+        } else {
+          router.push({ name: 'user_stats', params: { uuid } });
         }
 
         return;

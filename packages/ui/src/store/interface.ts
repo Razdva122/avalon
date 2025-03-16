@@ -1,7 +1,6 @@
 import type { TLanguage } from '@/helpers/i18n';
 
 export interface IState {
-  user: IUser | null;
   profile: IUserProfile | null;
   settings: IUserSettings | null;
   hideSpoilers: boolean;
@@ -23,17 +22,6 @@ export interface IUserSettings {
   hideIndexInHistory?: boolean;
   colorTheme?: 'light' | 'dark';
   style?: 'default' | 'anime';
-}
-
-export interface IUser {
-  id: string;
-  name: string;
-  settings?: {
-    locale?: { value: TLanguage; isDefault: boolean };
-    hideIndexInHistory?: boolean;
-    colorTheme?: 'light' | 'dark';
-    style?: 'default' | 'anime';
-  };
 }
 
 export type TAlerts = {

@@ -163,25 +163,31 @@ export class Manager {
       this.updateOnlineCounter('lobby', 1);
 
       const { token } = socket.handshake.auth;
-      let userID: string | undefined;
-      let userName: string | undefined;
+
+      const userState: {
+        userID: string | undefined;
+        userName: string | undefined;
+      } = {
+        userID: undefined,
+        userName: undefined,
+      };
 
       if (token) {
         try {
           const tokenValue = validateJWT(token);
-          userID = tokenValue.id;
-          userName = tokenValue.name;
+          userState.userID = tokenValue.id;
+          userState.userName = tokenValue.name;
         } catch (e) {
           socket.emit('renewJWT');
         }
       }
 
-      if (userID) {
-        socket.join(userID);
+      if (userState.userID) {
+        socket.join(userState.userID);
       }
 
       socket.on('joinRoom', async (uuid, cb) => {
-        console.log(`user ${userName} join room uuid: ${uuid}`);
+        console.log(`user ${userState.userName} join room uuid: ${uuid}`);
 
         const room = this.rooms[uuid];
         const gameFromDB = await this.dbManager.getRoomFromDB(uuid);
@@ -197,7 +203,7 @@ export class Manager {
         }
 
         if (room) {
-          cb(this.rooms[uuid].calculateRoomState(userID));
+          cb(this.rooms[uuid].calculateRoomState(userState.userID));
         } else {
           cb({ error: 'errorNotFound' });
         }
@@ -206,7 +212,7 @@ export class Manager {
       socket.on('leaveRoom', (uuid) => {
         socket.leave(uuid);
         this.updateOnlineCounter(uuid, -1);
-        console.log(`user ${userName} leave room uuid: ${uuid}`);
+        console.log(`user ${userState.userName} leave room uuid: ${uuid}`);
       });
 
       socket.on('getRoomsList', (cb) => {
@@ -242,14 +248,14 @@ export class Manager {
       });
 
       socket.on('getUserProfile', async (id, cb) => {
-        const userForUI = await dbManager.getUserProfile(id);
+        const publicUser = await dbManager.getPublicUserProfile(id);
 
-        cb(userForUI);
+        cb(publicUser);
       });
 
-      if (userID && userName) {
-        this.createMethodsForAuthUsers(socket, userID, userName);
-        this.createMethodsForGame(socket, userID, userName);
+      if (userState.userID && userState.userName) {
+        this.createMethodsForAuthUsers(socket, userState.userID, userState.userName);
+        this.createMethodsForGame(socket, userState.userID, userState.userName);
       }
 
       socket.on('disconnecting', () => {
@@ -291,6 +297,12 @@ export class Manager {
     socket.on('getUserAvatars', async (cb) => {
       const avatars = await this.avatarsManager.getAvailableAvatarsForUser(userID);
       cb(avatars);
+    });
+
+    socket.on('getMyProfile', async (cb) => {
+      const userForUI = await this.dbManager.getUserProfile(userID);
+
+      cb(userForUI);
     });
 
     socket.on('updateUserAvatar', async (avatarID, cb) => {

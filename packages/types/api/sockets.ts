@@ -22,7 +22,7 @@ import type { TAssassinateType } from '../game/addons';
 
 import type { TRoomsList, TMessage } from '../room';
 import { TTotalWinrateStats } from '../stats';
-import { UserForUI, UserProfile, IAvatarInfo } from '../user';
+import { UserForUI, UserProfile, IAvatarInfo, PublicUserProfile } from '../user';
 
 export type {
   ISocketError,
@@ -68,6 +68,7 @@ export interface ClientToServerUserEvents {
     callback: (user: (UserForUI & { token: string }) | ILoginError) => void,
   ) => void;
   getUserAvatars: (callback: (avatars: IAvatarInfo[]) => void) => void;
+  getMyProfile: (callback: (user: UserForUI) => void) => void;
 }
 
 export interface ClientToServerEvents extends ClientToServerUserEvents {
@@ -75,7 +76,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents {
   getPlayerGames: (uuid: string, callback: (games: VisualGameState[]) => void) => void;
   getRoomsList: (callback: (list: TRoomsList) => void) => void;
   getOnlineCounter: (id: string, callback: (counter: number) => void) => void;
-  getUserProfile: (id: string, callback: (user: UserForUI) => void) => void;
+  getUserProfile: (id: string, callback: (user: PublicUserProfile) => void) => void;
 
   createRoom: (callback: (uuid: string) => void) => void;
   updateOptions: (uuid: string, options: GameOptions) => void;

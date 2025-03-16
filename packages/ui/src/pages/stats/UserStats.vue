@@ -1,11 +1,11 @@
 <template>
   <div class="info-page-content stats-page">
     <h1>{{ $t('userStats.userStatsTitle') }}</h1>
-    <div v-if="userForUi" class="preview-profile">
-      <Avatar class="avatar mr-2" :avatarID="userForUi.avatar" />
+    <div v-if="profileState" class="preview-profile">
+      <Avatar class="avatar mr-2" :avatarID="profileState.avatar" />
       <div class="profile-info">
         <div class="profile-username">
-          {{ userForUi.name }}
+          {{ profileState.name }}
         </div>
         <div class="info-hint">id: {{ $props.uuid }}</div>
         <div class="profile-games">
@@ -71,7 +71,7 @@ import { useI18n } from 'vue-i18n';
 import { TGameView, TUserStats, prepareUserStats, prepareGamesForView } from '@/helpers/stats';
 import { socket } from '@/api/socket';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
-import { TRoles, UserForUI, VisualGameState } from '@avalon/types';
+import { PublicUserProfile, TRoles, UserForUI, VisualGameState } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
 
 type TRoleStats = {
@@ -94,7 +94,7 @@ export default defineComponent({
   },
   async setup(props) {
     const state = ref<TUserStats>();
-    const userForUi = ref<UserForUI>();
+    const profileState = ref<PublicUserProfile>();
     const gamesState = ref<VisualGameState[]>();
     const lastGames = ref<TGameView[]>();
 
@@ -109,7 +109,7 @@ export default defineComponent({
       state.value = prepareUserStats(games, uuid);
       lastGames.value = prepareGamesForView(games, uuid, 5);
       gamesState.value = games;
-      userForUi.value = profile;
+      profileState.value = profile;
     };
 
     await initState(props.uuid);
@@ -180,7 +180,7 @@ export default defineComponent({
       lastGamesHeaders,
       generalTable,
       rolesTables,
-      userForUi,
+      profileState,
     };
   },
 });
