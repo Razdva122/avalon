@@ -343,7 +343,7 @@ export class Manager {
       const room = this.rooms[uuid];
 
       if (room) {
-        room.addMessage(userID, userName, message);
+        room.addMessage(userID, message);
       }
     });
 

@@ -64,8 +64,8 @@ export class Room {
     this.updateRoomState();
   }
 
-  addMessage(userID: string, userName: string, message: string) {
-    this.chat.addMessage(message, userID, userName);
+  addMessage(userID: string, message: string) {
+    this.chat.addMessage(message, userID);
     this.io.to(this.roomID).emit('newMessage', { text: message, author: userID });
     this.updateRoomState(true);
   }

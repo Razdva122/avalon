@@ -1,19 +1,19 @@
 <template>
   <div class="author-container d-flex align-center">
-    <v-skeleton-loader class="loader" v-if="!author || author.status === 'loading'" type="list-item-avatar" />
+    <v-skeleton-loader class="loader" v-if="!userState || userState.status === 'loading'" type="list-item-avatar" />
     <template v-else>
-      <Avatar class="author-avatar" :avatarID="author.profile.avatar" :size="24" />
+      <Avatar class="author-avatar" :avatarID="userState.profile.avatar" :size="24" />
       <div class="author-name ml-2">
-        {{ author.profile.name }}
+        {{ userState.profile.name }}
       </div>
     </template>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent } from 'vue';
 import Avatar from '@/components/user/Avatar.vue';
-import { useStore } from '@/store';
+import { useUserProfile } from '@/helpers/setup';
 
 export default defineComponent({
   components: { Avatar },
@@ -24,16 +24,10 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const store = useStore();
-
-    store.dispatch('getUserPublicProfile', { uuid: props.authorID });
-
-    const author = computed(() => {
-      return store.state.users[props.authorID];
-    });
+    const { userState } = useUserProfile(props.authorID);
 
     return {
-      author,
+      userState,
     };
   },
 });

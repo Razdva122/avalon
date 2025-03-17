@@ -18,9 +18,9 @@
         <div
           v-for="message in messages"
           class="message-element"
-          :class="isUserMessage(message.user.id) ? 'message-from-author' : ''"
+          :class="isUserMessage(message.userID) ? 'message-from-author' : ''"
         >
-          <MessageAuthor class="message-author" :authorID="message.user.id" @click="onUserClick(message.user)" />
+          <MessageAuthor class="message-author" :authorID="message.userID" @click="onUserClick(message.userID)" />
           <div class="message-text">
             {{ message.message }}
           </div>
@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { ChatMessage, User } from '@avalon/types';
+import { ChatMessage } from '@avalon/types';
 import { defineComponent, PropType } from 'vue';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
@@ -131,8 +131,8 @@ export default defineComponent({
         this.currentMessage = '';
       }
     },
-    onUserClick(user: User) {
-      this.$router.push({ name: 'user_stats', params: { uuid: user.id } });
+    onUserClick(userID: string) {
+      this.$router.push({ name: 'user_stats', params: { uuid: userID } });
     },
     isUserMessage(userID: string) {
       return this.$store.state.profile?.id === userID;

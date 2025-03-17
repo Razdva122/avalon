@@ -1,11 +1,11 @@
 <template>
   <div class="info-page-content stats-page">
     <h1>{{ $t('userStats.userStatsTitle') }}</h1>
-    <div v-if="profileState.status === 'ready'" class="preview-profile">
-      <Avatar class="avatar mr-2" :avatarID="profileState.profile.avatar" />
+    <div v-if="userState.status === 'ready'" class="preview-profile">
+      <Avatar class="avatar mr-2" :avatarID="userState.profile.avatar" />
       <div class="profile-info">
         <div class="profile-username">
-          {{ profileState.profile.name }}
+          {{ userState.profile.name }}
         </div>
         <div class="info-hint">id: {{ $props.uuid }}</div>
         <div class="profile-games">
@@ -73,7 +73,7 @@ import { socket } from '@/api/socket';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import { TRoles, VisualGameState } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
-import { useStore } from '@/store';
+import { useUserProfile } from '@/helpers/setup';
 
 type TRoleStats = {
   role: TRoles;
@@ -94,7 +94,7 @@ export default defineComponent({
     },
   },
   async setup(props) {
-    const store = useStore();
+    const { userState } = useUserProfile(props.uuid);
     const state = ref<TUserStats>();
     const gamesState = ref<VisualGameState[]>();
     const lastGames = ref<TGameView[]>();
@@ -102,7 +102,6 @@ export default defineComponent({
     const { t } = useI18n();
 
     const initState = async (uuid: string) => {
-      store.dispatch('getUserPublicProfile', { uuid });
       const games = await socket.emitWithAck('getPlayerGames', uuid);
 
       state.value = prepareUserStats(games, uuid);
@@ -171,10 +170,6 @@ export default defineComponent({
       ];
     });
 
-    const profileState = computed(() => {
-      return store.state.users[props.uuid];
-    });
-
     return {
       state,
       gamesState,
@@ -182,7 +177,7 @@ export default defineComponent({
       lastGamesHeaders,
       generalTable,
       rolesTables,
-      profileState,
+      userState,
     };
   },
 });

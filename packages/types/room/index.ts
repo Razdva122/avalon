@@ -98,7 +98,7 @@ export class VoteOfPlayer extends RoomPlayer {
 
 export class ChatMessage {
   @prop({ required: true })
-  public user!: User;
+  public userID!: string;
 
   @prop({ required: true })
   public message!: string;
