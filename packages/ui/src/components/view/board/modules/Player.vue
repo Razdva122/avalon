@@ -2,6 +2,11 @@
   <div class="player-container" :class="playerClasses" @click="$emit('playerClick', player.id)">
     <img class="player-frame" alt="frame" :src="getImagePathByID('core', 'player-frame')" />
     <div class="player-icon"></div>
+    <Avatar
+      v-if="displayUserAvatar && userState.status === 'ready'"
+      class="role-container"
+      :avatarID="userState.profile.avatar"
+    />
     <PlayerIcon v-if="'role' in player" class="role-container" :icon="player.role" />
     <div class="player-crown" alt="crown"></div>
     <div class="player-actions-features">
@@ -33,15 +38,18 @@ import cloneDeep from 'lodash/cloneDeep';
 import { defineComponent, PropType, inject, computed, toRefs, ref } from 'vue';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
+import { useUserProfile } from '@/helpers/setup';
 import type { RoomPlayer, THistoryResults, Dictionary, TGameStage, IActionWithResult } from '@avalon/types';
 import type { IFrontendPlayer } from '@/components/view/board/interface';
 import { gameStateKey } from '@/helpers/game-state-manager';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import { getImagePathByID } from '@/helpers/images';
+import Avatar from '@/components/user/Avatar.vue';
 
 export default defineComponent({
   components: {
     PlayerIcon,
+    Avatar,
   },
   props: {
     playerState: {
@@ -65,6 +73,7 @@ export default defineComponent({
     const gameState = inject(gameStateKey)!;
     const store = useStore();
     const { playerState, visibleHistory, currentStage, displayKick } = toRefs(props);
+    const { userState } = useUserProfile(playerState.value.id);
     const chatMessage = ref<{ message?: string; timeoutId?: number }>();
 
     socket.on('newMessage', (message) => {
@@ -202,7 +211,13 @@ export default defineComponent({
       return classes;
     });
 
+    const displayUserAvatar = computed(() => {
+      return !gameState.value;
+    });
+
     return {
+      userState,
+      displayUserAvatar,
       player,
       playerClasses,
       chatMessage,
@@ -225,6 +240,7 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   pointer-events: all;
+  cursor: pointer;
 }
 
 .player-actions-features {
@@ -305,6 +321,7 @@ export default defineComponent({
   top: 13px;
   width: 90px;
   height: 90px;
+  border-radius: 50%;
 }
 
 .player-feature-waitForAction .player-name {
@@ -365,10 +382,6 @@ export default defineComponent({
     opacity: 0.8;
     display: block;
   }
-}
-
-.player-feature-kick {
-  cursor: pointer;
 }
 
 .player-feature-vote-approve .check {

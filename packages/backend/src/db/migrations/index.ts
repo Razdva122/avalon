@@ -1,9 +1,8 @@
 import type { Migration } from '@/db/migrations/interface';
-import { updateChatMessages } from './update-chat';
 
 export class MigrationManager {
   static async runMigrations(): Promise<void> {
-    const migrations: Migration[] = [updateChatMessages];
+    const migrations: Migration[] = [];
 
     for (const migration of migrations) {
       await migration.up();
