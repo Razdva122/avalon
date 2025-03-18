@@ -3,7 +3,7 @@ import { TUserStats, TWinsStats, TWinsStatsWithWinrate, TGameView } from '@/help
 
 export * from '@/helpers/stats/interface';
 
-export const pretifyPercent = (percent: number) => percent.toFixed(2);
+export const prettifyPercent = (percent: number) => percent.toFixed(2);
 
 export function prepareUserStats(games: VisualGameState[], userID: string): TUserStats {
   const stats = games.reduce<TUserStats<TWinsStats>>(
@@ -54,26 +54,23 @@ export function prepareUserStats(games: VisualGameState[], userID: string): TUse
     stats.teams.total,
   ].forEach((el) => {
     const updatedEl = <TWinsStatsWithWinrate>el;
-    updatedEl.winrate = pretifyPercent((el.wins / el.total) * 100);
+    updatedEl.winrate = prettifyPercent((el.wins / el.total) * 100);
   });
 
   return <TUserStats>stats;
 }
 
 export function prepareGamesForView(games: VisualGameState[], userID: string, amount: number = 5): TGameView[] {
-  return games
-    .reverse()
-    .slice(0, amount)
-    .map((game) => {
-      const playerInGame = game.players.find((player) => player.id === userID)!;
-      const role = <TRoles>playerInGame.role;
-      const team = role in goodRolesImportance ? 'good' : 'evil';
-      const isWin = game.result!.winner === team;
+  return games.slice(0, amount).map((game) => {
+    const playerInGame = game.players.find((player) => player.id === userID)!;
+    const role = <TRoles>playerInGame.role;
+    const team = role in goodRolesImportance ? 'good' : 'evil';
+    const isWin = game.result!.winner === team;
 
-      return {
-        role,
-        isWin,
-        gameID: game.uuid,
-      };
-    });
+    return {
+      role,
+      isWin,
+      gameID: game.uuid,
+    };
+  });
 }

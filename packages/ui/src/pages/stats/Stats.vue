@@ -22,9 +22,9 @@
           <template v-slot:item.role="{ value }">
             <PreviewLink :target="value" />
           </template>
-          <template v-slot:item.winrate="{ value }"> {{ pretifyPercent(value) }} % </template>
+          <template v-slot:item.winrate="{ value }"> {{ prettifyPercent(value) }} %</template>
           <template v-slot:item.diff="{ value }">
-            <v-chip :color="getColorWinrate(value)"> {{ value > 0 ? '+' : '' }}{{ pretifyPercent(value) }} % </v-chip>
+            <v-chip :color="getColorWinrate(value)"> {{ value > 0 ? '+' : '' }}{{ prettifyPercent(value) }} %</v-chip>
           </template>
         </v-data-table>
       </div>
@@ -45,7 +45,7 @@ import { defineComponent, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { TTotalWinrateStats, goodRolesImportance, TRoleStats } from '@avalon/types';
 import { socket } from '@/api/socket';
-import { pretifyPercent } from '@/helpers/stats';
+import { prettifyPercent } from '@/helpers/stats';
 import PlayerCountsStats from '@/components/stats/PlayerCountsStats.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 
@@ -122,8 +122,8 @@ export default defineComponent({
           .map((el) => ({
             addon: el.addon,
             gamesCount: el.gamesCount,
-            goodWins: `${el.goodWins} (${pretifyPercent(el.goodWinPercentage)} %)`,
-            evilWins: `${el.evilWins} (${pretifyPercent(el.evilWinPercentage)} %)`,
+            goodWins: `${el.goodWins} (${prettifyPercent(el.goodWinPercentage)} %)`,
+            evilWins: `${el.evilWins} (${prettifyPercent(el.evilWinPercentage)} %)`,
           }))
           .sort((a, b) => b.gamesCount - a.gamesCount),
       };
@@ -140,8 +140,8 @@ export default defineComponent({
         data: [
           {
             gamesCount: stateData.total.gamesCount,
-            goodWins: `${stateData.total.goodWins} (${pretifyPercent(stateData.total.goodWinPercentage)}%)`,
-            evilWins: `${stateData.total.evilWins} (${pretifyPercent(stateData.total.evilWinPercentage)}%)`,
+            goodWins: `${stateData.total.goodWins} (${prettifyPercent(stateData.total.goodWinPercentage)}%)`,
+            evilWins: `${stateData.total.evilWins} (${prettifyPercent(stateData.total.evilWinPercentage)}%)`,
           },
         ],
       };
@@ -167,8 +167,8 @@ export default defineComponent({
       data: state.value!.byPlayers.map((el) => ({
         playerCount: el.playerCount,
         gamesCount: el.gamesCount,
-        goodWins: `${el.goodWins} (${pretifyPercent(el.goodWinPercentage)} %)`,
-        evilWins: `${el.evilWins} (${pretifyPercent(el.evilWinPercentage)} %)`,
+        goodWins: `${el.goodWins} (${prettifyPercent(el.goodWinPercentage)} %)`,
+        evilWins: `${el.evilWins} (${prettifyPercent(el.evilWinPercentage)} %)`,
       })),
     }));
 
@@ -178,7 +178,7 @@ export default defineComponent({
       byPlayersTable,
       generalTable,
       addonsTable,
-      pretifyPercent,
+      prettifyPercent,
       getColorWinrate,
     };
   },
