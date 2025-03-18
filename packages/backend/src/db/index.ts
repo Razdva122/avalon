@@ -60,8 +60,10 @@ export class DBManager extends UserLayer {
     return {
       total: {
         ...totalGamesResult,
-        goodWinPercentage: (totalGamesResult.goodWins / totalGamesResult.gamesCount) * 100,
-        evilWinPercentage: (totalGamesResult.evilWins / totalGamesResult.gamesCount) * 100,
+        goodWinPercentage:
+          totalGamesResult.gamesCount > 0 ? (totalGamesResult.goodWins / totalGamesResult.gamesCount) * 100 : 0,
+        evilWinPercentage:
+          totalGamesResult.gamesCount > 0 ? (totalGamesResult.evilWins / totalGamesResult.gamesCount) * 100 : 0,
       },
       byPlayers: results[0],
       roleStats: results[1],
