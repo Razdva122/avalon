@@ -72,4 +72,7 @@ export class UserFeatures {
 
   @prop()
   public isHelper?: boolean;
+
+  @prop()
+  public easterEggRevealed?: boolean;
 }

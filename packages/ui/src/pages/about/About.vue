@@ -33,6 +33,9 @@
       {{ $t('about.contact') }} <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">discord</a></b
       >.
     </div>
+    <div v-if="$store.state.profile" @click="redeemAvatar" class="socials secret-avatar">
+      {{ $t('about.secretAvatar') }}
+    </div>
 
     <div>
       <strong>{{ $t('about.disclaimerTitle') }}</strong>
@@ -46,6 +49,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { getImagePathByID } from '@/helpers/images';
+import { socket } from '@/api/socket';
+import eventBus from '@/helpers/event-bus';
 
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 
@@ -57,6 +62,12 @@ export default defineComponent({
     return {
       getImagePathByID,
     };
+  },
+  methods: {
+    redeemAvatar() {
+      socket.emit('revealEasterEgg');
+      eventBus.emit('infoMessage', this.$t('infoMessage.secretAvatar'));
+    },
   },
 });
 </script>
@@ -71,6 +82,10 @@ export default defineComponent({
 .preview {
   width: 100%;
   max-width: 600px;
+}
+
+.secret-avatar {
+  cursor: pointer;
 }
 
 .image {

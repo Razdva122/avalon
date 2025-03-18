@@ -299,6 +299,10 @@ export const es = {
     linkCopied: 'El enlace ha sido copiado al portapapeles',
     loginToCreate: 'Inicia sesión para crear un juego',
     close: 'Cerrar',
+    secretAvatar: 'Avatar secreto revelado',
+    loginChanged: 'Usuario cambiado',
+    emailChanged: 'Correo electrónico cambiado',
+    passwordChanged: 'Contraseña cambiada',
   },
   votes: {
     yes: 'Sí',
@@ -355,6 +359,7 @@ export const es = {
     modalHeader: 'Seleccionar avatar',
     servantHint: 'Avatar predeterminado',
     lady_of_lakeHint: 'Otorgado a los usuarios registrados en 2025',
+    mysteryHint: 'Otorgado a los usuarios que encuentran el secreto en el sitio',
     merlin_pureHint: 'Otorgado por ayudar al proyecto con comentarios / ayudar a encontrar errores',
     'anime/merlin_pureHint': 'Otorgado por hacer cualquier contribución al código del proyecto en GitHub',
   },

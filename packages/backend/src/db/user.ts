@@ -54,6 +54,10 @@ export class UserLayer {
     return features;
   }
 
+  async revealEasterEgg(id: string): Promise<void> {
+    await userFeaturesModel.findOneAndUpdate({ userID: id }, { easterEggRevealed: true }, { upsert: true });
+  }
+
   async getUserProfile(id: string): Promise<UserForUI> {
     const user = await this.getUserByID(id);
 

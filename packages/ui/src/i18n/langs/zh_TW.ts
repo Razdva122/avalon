@@ -298,6 +298,10 @@ export const zh_TW = {
     linkCopied: '連結已複製到剪貼簿',
     loginToCreate: '登入創建遊戲',
     close: '關閉',
+    secretAvatar: '秘密頭像已解鎖',
+    loginChanged: '帳號已更改',
+    emailChanged: '電子郵件已更改',
+    passwordChanged: '密碼已更改',
   },
   votes: {
     yes: '是',
@@ -355,6 +359,7 @@ export const zh_TW = {
     lady_of_lakeHint: '頒發給2025年註冊的用戶',
     merlin_pureHint: '頒發給幫助項目反饋/幫助尋找錯誤的用戶',
     'anime/merlin_pureHint': '頒發給在GitHub上對項目代碼做出任何貢獻的用戶',
+    mysteryHint: '授予發現網站上秘密的用戶',
   },
   ...pages['zh-TW'],
 };

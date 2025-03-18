@@ -305,6 +305,10 @@ export class Manager {
       cb(userForUI);
     });
 
+    socket.on('revealEasterEgg', () => {
+      this.dbManager.revealEasterEgg(userID);
+    });
+
     socket.on('updateUserAvatar', async (avatarID, cb) => {
       const result = await this.avatarsManager.updateUserAvatar(userID, avatarID);
       cb(result);

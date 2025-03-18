@@ -65,6 +65,7 @@ export interface ClientToServerUserEvents {
   login: (loginOrEmail: string, password: string, callback: (user: UserWithToken | ILoginError) => void) => void;
   getUserAvatars: (callback: (avatars: IAvatarInfo[]) => void) => void;
   getMyProfile: (callback: (user: UserForUI) => void) => void;
+  revealEasterEgg: () => void;
 }
 
 export interface ClientToServerEvents extends ClientToServerUserEvents {

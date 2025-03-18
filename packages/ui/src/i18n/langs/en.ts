@@ -173,6 +173,7 @@ export const en = {
     modalHeader: 'Select avatar',
     servantHint: 'Default Avatar',
     lady_of_lakeHint: 'Awarded to users registered in 2025',
+    mysteryHint: 'Awarded to users who find the secret on the site',
     merlin_pureHint: 'Awarded for helping the project with feedback / help in finding bugs',
     'anime/merlin_pureHint': 'Awarded for making any contribution to the project code on github',
   },
@@ -305,6 +306,10 @@ export const en = {
     linkCopied: 'Link has been copied to the clipboard',
     loginToCreate: 'Log in to create a game',
     close: 'Close',
+    secretAvatar: 'Secret Avatar Revealed',
+    loginChanged: 'Login changed',
+    emailChanged: 'Email changed',
+    passwordChanged: 'Password changed',
   },
   votes: {
     yes: 'Yes',

@@ -34,4 +34,18 @@ export class AnimeMerlinPureAvatar {
   }
 }
 
-export const commonAvatars: IAvatar[] = [ServantAvatar, LadyAvatar, MerlinPureAvatar, AnimeMerlinPureAvatar];
+export class MysteryAvatar {
+  static id = 'mystery';
+
+  static isAvailableForUser({ features }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
+    return Boolean(features && features.easterEggRevealed);
+  }
+}
+
+export const commonAvatars: IAvatar[] = [
+  ServantAvatar,
+  LadyAvatar,
+  MerlinPureAvatar,
+  AnimeMerlinPureAvatar,
+  MysteryAvatar,
+];

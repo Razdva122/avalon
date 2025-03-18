@@ -298,6 +298,10 @@ export const ru = {
     linkCopied: 'Ссылка скопирована',
     loginToCreate: 'Войдите, чтобы создать игру',
     close: 'Закрыть',
+    secretAvatar: 'Секретный аватар раскрыт',
+    loginChanged: 'Логин изменён',
+    emailChanged: 'Email изменён',
+    passwordChanged: 'Пароль изменён',
   },
   votes: {
     yes: 'За',
@@ -353,6 +357,7 @@ export const ru = {
     modalHeader: 'Выбор аватара',
     servantHint: 'Стандартный аватар',
     lady_of_lakeHint: 'Вручается пользователям, зарегистрированным в 2025 году',
+    mysteryHint: 'Выдается пользователям, нашедшим секрет на сайте',
     merlin_pureHint: 'Вручается за помощь проекту с отзывами / помощь в поиске ошибок',
     'anime/merlin_pureHint': 'Вручается за любой вклад в код проекта на GitHub',
   },

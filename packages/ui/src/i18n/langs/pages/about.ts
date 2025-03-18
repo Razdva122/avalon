@@ -16,6 +16,7 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
       "To enhance your strategic play, we offer a History feature, allowing players to review past moves and better strategize against the opposition. Additionally, our Spoiler Mode ensures that you can play in the same physical space as other players without revealing your role or compromising the game's outcome.",
     code: 'The project code can be viewed on ',
     contact: 'You can contact me via ',
+    secretAvatar: "Something went wrong, don't click here.",
     disclaimerTitle: 'Disclaimer',
     disclaimerContent:
       'This is a fan-based, non-commercial project created for the love of the game. All content, including the rules we follow, is inspired by the original tabletop game, but all graphics and illustrations are uniquely ours. This site is not affiliated with or endorsed by the official publishers. We respect the original creators and recognize that all related trademarks and copyrights belong to their respective owners.',
@@ -34,6 +35,7 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
       'Для улучшения вашей стратегической игры мы предлагаем функцию Истории, позволяющую игрокам просматривать прошлые ходы и лучше выстраивать стратегию против оппонентов. Кроме того, наш режим Спойлера обеспечивает возможность играть в одной физической зоне с другими игроками, не раскрывая свою роль и не компрометируя итоги игры.',
     code: 'Код проекта можно увидеть на ',
     contact: 'Вы можете связаться со мной через ',
+    secretAvatar: 'Что-то пошло не так. Не нажимайте сюда.',
     disclaimerTitle: 'Отказ от ответственности',
     disclaimerContent:
       'Это фанатский, некоммерческий проект, созданный из любви к игре. Весь контент, включая соблюдаемые нами правила, вдохновлён оригинальной настольной игрой, но все изображения и иллюстрации уникальны и принадлежат нам. Этот сайт не связан и не поддерживается официальными издателями. Мы уважаем оригинальных создателей и признаем, что все связанные товарные знаки и авторские права принадлежат их владельцам.',
@@ -52,6 +54,7 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
       '為增強您的策略遊戲，我們提供歷史功能，允許玩家查看過去的動作，以便更好地針對對手策略。此外，我們的劇透模式可確保您能與其他玩家在同一實體空間中遊玩，而不會洩露您的角色或影響遊戲結果。',
     code: '項目的代碼可以在上查看 ',
     contact: '您可以通過以下方式聯繫我 ',
+    secretAvatar: '發生錯誤，請勿點擊此處',
     disclaimerTitle: '免責聲明',
     disclaimerContent:
       '這是一個基於愛好的粉絲，非商業項目。所有內容，包括我們遵循的規則，均受原始桌上遊戲啟發，但所有圖形和插圖均由我們獨自創造。本站與正式發布商無關，也未經授權。我們尊重原創作者並認識到所有相關商標和版權屬於其各自所有者。',
@@ -70,6 +73,7 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
       '为增强您的策略游戏，我们提供历史功能，允许玩家查看过去的动作，以便更好地针对对手策略。此外，我们的剧透模式可确保您能与其他玩家在同一实体空间中游玩，而不会泄露您的角色或影响游戏结果。',
     code: '项目的代码可以在上查看 ',
     contact: '您可以通过以下方式联系我 ',
+    secretAvatar: '发生错误，请勿点击此处',
     disclaimerTitle: '免责声明',
     disclaimerContent:
       '这是一个基于爱好的粉丝，非商业项目。所有内容，包括我们遵循的规则，均受原始桌面游戏启发，但所有图形和插图均由我们独自创造。本站与正式发布商无关，也未经授权。我们尊重原创作者并认识到所有相关商标和版权属于其各自所有者。',
@@ -88,6 +92,7 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
       'Para mejorar tu juego estratégico, ofrecemos una función de Historia, que permite a los jugadores revisar movimientos pasados y mejorar su estrategia contra la oposición. Además, nuestro Modo Spoiler asegura que puedas jugar en el mismo espacio físico que otros jugadores sin revelar tu rol ni comprometer el resultado del juego.',
     code: 'El código del proyecto se puede ver en ',
     contact: 'Puedes contactarme a través de ',
+    secretAvatar: 'Algo salió mal. No haga clic aquí.',
     disclaimerTitle: 'Aviso legal',
     disclaimerContent:
       'Este es un proyecto no comercial creado por fans por amor al juego. Todo el contenido, incluidas las reglas que seguimos, está inspirado en el juego de mesa original, pero todos los gráficos e ilustraciones son únicos nuestros. Este sitio no está afiliado ni respaldado por los editores oficiales. Respetamos a los creadores originales y reconocemos que todas las marcas registradas y derechos de autor relacionados pertenecen a sus respectivos propietarios.',

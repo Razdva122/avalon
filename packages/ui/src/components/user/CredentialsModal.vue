@@ -144,6 +144,7 @@ export default defineComponent({
 
       if (result === true) {
         this.closeModal();
+        eventBus.emit('infoMessage', this.$t('infoMessage.passwordChanged'));
       } else {
         this.error = result.error;
       }
@@ -153,6 +154,7 @@ export default defineComponent({
 
       if (result === true) {
         this.closeModal();
+        eventBus.emit('infoMessage', this.$t('infoMessage.emailChanged'));
       } else {
         this.error = result.error;
       }
@@ -162,6 +164,7 @@ export default defineComponent({
 
       if (result === true) {
         this.closeModal();
+        eventBus.emit('infoMessage', this.$t('infoMessage.loginChanged'));
       } else {
         this.error = result.error;
       }
