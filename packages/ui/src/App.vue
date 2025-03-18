@@ -1,8 +1,11 @@
 <template>
   <header class="header">
     <div class="header-left-container d-flex align-center mr-4 ml-4">
-      <ConnectStatus class="connect-status mr-4" />
-      <Socials />
+      <v-btn class="mr-2" density="comfortable" variant="plain" color="invert" to="/" icon>
+        <v-icon size="x-large">home</v-icon>
+      </v-btn>
+      <Socials class="mr-4" />
+      <ConnectStatus class="connect-status" />
     </div>
     <div class="header-right-container d-flex align-center mr-2">
       <SpoilerEye v-if="currentRoute === 'room'" />

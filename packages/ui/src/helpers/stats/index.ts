@@ -3,7 +3,7 @@ import { TUserStats, TWinsStats, TWinsStatsWithWinrate, TGameView } from '@/help
 
 export * from '@/helpers/stats/interface';
 
-export const pretifyPercent = (percent: number) => percent.toFixed(2);
+export const prettifyPercent = (percent: number) => percent.toFixed(2);
 
 export function prepareUserStats(games: VisualGameState[], userID: string): TUserStats {
   const stats = games.reduce<TUserStats<TWinsStats>>(
@@ -54,7 +54,7 @@ export function prepareUserStats(games: VisualGameState[], userID: string): TUse
     stats.teams.total,
   ].forEach((el) => {
     const updatedEl = <TWinsStatsWithWinrate>el;
-    updatedEl.winrate = pretifyPercent((el.wins / el.total) * 100);
+    updatedEl.winrate = prettifyPercent((el.wins / el.total) * 100);
   });
 
   return <TUserStats>stats;
