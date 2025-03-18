@@ -19,19 +19,18 @@ export default defineComponent({});
 .social-icon {
   width: 36px;
   height: 32px;
-  mask-position: center;
-  mask-size: contain;
-  mask-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 .discord-icon {
-  mask-image: getIconPathByName('discord.png');
-  background-color: rgb(var(--v-theme-text-primary));
+  background-image: getIconPathByName('discord.png');
+  filter: invert(var(--v-icon-invert));
 }
 
 .github-icon {
-  mask-size: 115%;
-  mask-image: getIconPathByName('github.png');
-  background-color: rgb(var(--v-theme-text-primary));
+  background-size: 115%;
+  background-image: getIconPathByName('github.png');
+  filter: invert(var(--v-icon-invert));
 }
 </style>
