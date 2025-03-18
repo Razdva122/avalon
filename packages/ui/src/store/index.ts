@@ -35,7 +35,7 @@ export const store = createStore<IState>({
 
     updateUserProfile(state: IState, profile: UserWithToken) {
       state.profile = profile;
-      updateUserProfile(profile);
+      updateUserProfile(profile, { updateToken: true });
     },
 
     updateUserSettings<T extends keyof IUserSettings>(
