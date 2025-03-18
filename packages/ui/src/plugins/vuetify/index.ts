@@ -1,6 +1,8 @@
 import 'vuetify/styles';
+import '@fortawesome/fontawesome-free/css/all.css';
 import { createVuetify } from 'vuetify';
 import { aliases, md } from 'vuetify/iconsets/md';
+import { fa } from 'vuetify/iconsets/fa';
 import { userSettingsInStorage } from '@/store/init';
 
 import type { IUserSettings } from '@/store/interface';
@@ -78,6 +80,7 @@ export const vuetify = createVuetify({
     aliases,
     sets: {
       md,
+      fa,
     },
   },
 });
