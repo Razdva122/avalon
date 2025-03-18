@@ -61,16 +61,19 @@ export function prepareUserStats(games: VisualGameState[], userID: string): TUse
 }
 
 export function prepareGamesForView(games: VisualGameState[], userID: string, amount: number = 5): TGameView[] {
-  return games.slice(0, amount).map((game) => {
-    const playerInGame = game.players.find((player) => player.id === userID)!;
-    const role = <TRoles>playerInGame.role;
-    const team = role in goodRolesImportance ? 'good' : 'evil';
-    const isWin = game.result!.winner === team;
+  return games
+    .reverse()
+    .slice(0, amount)
+    .map((game) => {
+      const playerInGame = game.players.find((player) => player.id === userID)!;
+      const role = <TRoles>playerInGame.role;
+      const team = role in goodRolesImportance ? 'good' : 'evil';
+      const isWin = game.result!.winner === team;
 
-    return {
-      role,
-      isWin,
-      gameID: game.uuid,
-    };
-  });
+      return {
+        role,
+        isWin,
+        gameID: game.uuid,
+      };
+    });
 }
