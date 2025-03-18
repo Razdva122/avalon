@@ -1,8 +1,8 @@
 <template>
   <header class="header">
     <div class="header-left-container d-flex align-center mr-4 ml-4">
-      <v-btn class="mr-2" density="comfortable" variant="plain" color="invert" to="/" icon>
-        <v-icon size="x-large">home</v-icon>
+      <v-btn class="mr-1" density="comfortable" variant="plain" color="invert" size="large" to="/" icon>
+        <v-icon class="home-icon" size="large" icon="fa:fa-solid fa-house" />
       </v-btn>
       <Socials class="mr-4" />
       <ConnectStatus class="connect-status" />
@@ -194,5 +194,13 @@ body {
   .v-data-table {
     font-size: 14px !important;
   }
+}
+
+.home-icon {
+  width: 32px;
+}
+
+.header-left-container {
+  font-size: 36px;
 }
 </style>
