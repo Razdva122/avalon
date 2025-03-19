@@ -23,9 +23,68 @@ export type TAddonsStages =
   | TWitchStages;
 
 /**
+ * Features for plot cards addon
+ */
+export class PlotCardsFeatures {
+  /**
+   * Voting first
+   */
+  @prop()
+  chargeCard?: boolean;
+
+  /**
+   * Take plot card from another player
+   */
+  @prop()
+  restoreHonorCard?: boolean;
+
+  /**
+   * Leader reveal loyalty to some one
+   */
+  @prop()
+  showStrengthCard?: boolean;
+
+  /**
+   * Player reveal loyalty to some one
+   */
+  @prop()
+  showNatureCard?: boolean;
+
+  /**
+   * Player check loyalty of right or left player
+   */
+  @prop()
+  areYouTheOneCard?: boolean;
+
+  /**
+   * Player become a leader
+   */
+  @prop()
+  takingChargeCard?: boolean;
+
+  /**
+   * Check mission card of one player
+   */
+  @prop()
+  stayingAlertCard?: boolean;
+
+  /**
+   * Сancel the previous mission and pass the leader to the next player
+   */
+  @prop()
+  kingReturnsCard?: boolean;
+
+  /**
+   * Select player after success voting he play mission card open
+   */
+  @prop()
+  weFoundYouCard?: boolean;
+}
+
+/**
  * Player features added with addons
  */
-export class AddonsFeatures {
+export class AddonsFeatures extends PlotCardsFeatures {
   /**
    * A sign that the player has the Lady of the Lake ability or not
    */
