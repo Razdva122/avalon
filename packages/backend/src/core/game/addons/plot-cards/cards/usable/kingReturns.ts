@@ -13,6 +13,7 @@ import { IUsablePlotCard } from '@/core/game/addons/plot-cards/interface';
 export class KingReturnsCard implements IUsablePlotCard {
   name = <const>'kingReturns';
   type = <const>'usable';
+  activate: IUsablePlotCard['activate'] = 'select';
   game: Game;
 
   constructor(game: Game) {

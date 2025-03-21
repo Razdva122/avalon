@@ -12,6 +12,7 @@ import { IUsablePlotCard } from '@/core/game/addons/plot-cards/interface';
  */
 export class WeFoundYouCard implements IUsablePlotCard {
   name = <const>'weFoundYou';
+  activate: IUsablePlotCard['activate'] = 'select';
   type = <const>'usable';
   game: Game;
 

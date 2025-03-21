@@ -13,6 +13,7 @@ import { IEffectPlotCard } from '@/core/game/addons/plot-cards/interface';
 export class ChargeCard implements IEffectPlotCard {
   name = <const>'charge';
   type = <const>'effect';
+  activate: IEffectPlotCard['activate'] = 'select';
   game: Game;
 
   constructor(game: Game) {

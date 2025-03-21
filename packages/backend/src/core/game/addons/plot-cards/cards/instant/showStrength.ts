@@ -13,6 +13,7 @@ import { IInstantPlotCard } from '@/core/game/addons/plot-cards/interface';
 export class ShowStrengthCard implements IInstantPlotCard {
   name = <const>'showStrength';
   type = <const>'instant';
+  activate: IInstantPlotCard['activate'] = 'self';
   game: Game;
 
   constructor(game: Game) {

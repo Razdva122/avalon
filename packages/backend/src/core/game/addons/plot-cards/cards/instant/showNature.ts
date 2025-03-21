@@ -13,6 +13,7 @@ import { IInstantPlotCard } from '@/core/game/addons/plot-cards/interface';
 export class ShowNatureCard implements IInstantPlotCard {
   name = <const>'showNature';
   type = <const>'instant';
+  activate: IInstantPlotCard['activate'] = 'select';
   game: Game;
 
   constructor(game: Game) {

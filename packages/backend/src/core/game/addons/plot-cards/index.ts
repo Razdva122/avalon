@@ -1,7 +1,8 @@
 import { IGameAddon } from '@/core/game/addons/interface';
-import { of } from 'rxjs';
+import { Subject, of } from 'rxjs';
 import * as _ from 'lodash';
 import { Game } from '@/core/game';
+import { Dictionary } from '@avalon/types';
 import { TPlotCard } from '@/core/game/addons/plot-cards/interface';
 
 import {
@@ -23,6 +24,12 @@ export class PlotCardsAddon implements IGameAddon {
   cards: TPlotCard[];
   pointer: number = 0;
   currentCards: TPlotCard[] | undefined;
+  subjects: Dictionary<Subject<boolean>> = {
+    startMission: new Subject(),
+    takingCharge: new Subject(),
+    stayingAlert: new Subject(),
+    charge: new Subject(),
+  };
 
   constructor(game: Game) {
     this.game = game;
@@ -71,22 +78,30 @@ export class PlotCardsAddon implements IGameAddon {
     });
 
     // Card action weFoundYou
-
-    return of(true);
+    return this.subjects.startMission.asObservable();
   }
 
   beforeSelectTeam() {
-    // Card action takingCharge
+    if (this.game.players.some((player) => player.features.takingChargeCard)) {
+      return this.subjects.takingCharge.asObservable();
+    }
+
     return of(true);
   }
 
   beforeEndMission() {
-    // Card action stayingAlert
+    if (this.game.players.some((player) => player.features.stayingAlertCard)) {
+      return this.subjects.stayingAlert.asObservable();
+    }
+
     return of(true);
   }
 
   beforeVoteForTeam() {
-    // Card action chargeCard
+    if (this.game.players.some((player) => player.features.chargeCard)) {
+      return this.subjects.chargeCard.asObservable();
+    }
+
     return of(true);
   }
 }
