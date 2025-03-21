@@ -30,55 +30,55 @@ export class PlotCardsFeatures {
    * Voting first
    */
   @prop()
-  chargeCard?: boolean;
+  chargeCard?: 'has' | 'active';
 
   /**
    * Take plot card from another player
    */
   @prop()
-  restoreHonorCard?: boolean;
+  restoreHonorCard?: 'active';
 
   /**
    * Leader reveal loyalty to some one
    */
   @prop()
-  showStrengthCard?: boolean;
+  showStrengthCard?: 'active';
 
   /**
    * Player reveal loyalty to some one
    */
   @prop()
-  showNatureCard?: boolean;
+  showNatureCard?: 'active';
 
   /**
    * Player check loyalty of right or left player
    */
   @prop()
-  areYouTheOneCard?: boolean;
+  areYouTheOneCard?: 'active';
 
   /**
    * Player become a leader
    */
   @prop()
-  takingChargeCard?: boolean;
+  takingChargeCard?: 'has' | 'active';
 
   /**
    * Check mission card of one player
    */
   @prop()
-  stayingAlertCard?: boolean;
+  stayingAlertCard?: 'has' | 'active';
 
   /**
    * Сancel the previous mission and pass the leader to the next player
    */
   @prop()
-  kingReturnsCard?: boolean;
+  kingReturnsCard?: 'has' | 'active';
 
   /**
    * Select player after success voting he play mission card open
    */
   @prop()
-  weFoundYouCard?: boolean;
+  weFoundYouCard?: 'has' | 'active';
 }
 
 /**

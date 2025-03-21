@@ -390,7 +390,7 @@ export class Game extends GameHooks {
 
       this.clearSelectedPlayers();
 
-      this.callHooks('afterSentTeam', () => {
+      this.callHooks(['afterSentTeam', 'beforeVoteForTeam'], () => {
         this.sentTeamNextStage();
 
         this.stateObserver.gameStateChanged();
