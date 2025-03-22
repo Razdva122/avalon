@@ -1,4 +1,5 @@
 import { Game } from '@/core/game';
+import { Observable } from 'rxjs';
 
 export type TPlotCard = IEffectPlotCard | IUsablePlotCard | IInstantPlotCard;
 
@@ -7,6 +8,7 @@ export interface IEffectPlotCard {
   activate: 'self' | 'select';
   name: 'charge';
   game: Game;
+  play(): Observable<boolean>;
 }
 
 export interface IUsablePlotCard {
@@ -14,6 +16,7 @@ export interface IUsablePlotCard {
   activate: 'self' | 'select';
   name: 'takingCharge' | 'stayingAlert' | 'kingReturns' | 'weFoundYou';
   game: Game;
+  play(): Observable<boolean>;
 }
 
 export interface IInstantPlotCard {
@@ -21,4 +24,5 @@ export interface IInstantPlotCard {
   activate: 'self' | 'select';
   name: 'restoreHonor' | 'showStrength' | 'showNature' | 'areYouTheOne';
   game: Game;
+  play(): Observable<boolean>;
 }

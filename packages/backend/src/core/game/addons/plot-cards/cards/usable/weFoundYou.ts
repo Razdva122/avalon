@@ -1,10 +1,13 @@
 import { Game } from '@/core/game';
 import { IUsablePlotCard } from '@/core/game/addons/plot-cards/interface';
+import { of } from 'rxjs';
 
 /**
  * activate -> leader give card to some one
  * use -> 1 player play mission card visible
  * effect -> after success vote can use or skip
+ *
+ * observable always true
  */
 
 /**
@@ -18,5 +21,9 @@ export class WeFoundYouCard implements IUsablePlotCard {
 
   constructor(game: Game) {
     this.game = game;
+  }
+
+  play() {
+    return of(true);
   }
 }

@@ -1,10 +1,13 @@
 import { Game } from '@/core/game';
 import { IUsablePlotCard } from '@/core/game/addons/plot-cards/interface';
+import { of } from 'rxjs';
 
 /**
  * activate -> leader give card to some one
  * use -> player become leader
  * effect -> before every team selection player can use or skip
+ *
+ * observable false if used
  */
 
 /**
@@ -18,5 +21,9 @@ export class TakingChargeCard implements IUsablePlotCard {
 
   constructor(game: Game) {
     this.game = game;
+  }
+
+  play() {
+    return of(true);
   }
 }

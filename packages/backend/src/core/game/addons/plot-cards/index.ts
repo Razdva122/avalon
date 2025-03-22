@@ -1,5 +1,5 @@
 import { IGameAddon } from '@/core/game/addons/interface';
-import { Subject, of } from 'rxjs';
+import { Observable, Subject, of, concatMap, from, takeWhile, last, defaultIfEmpty } from 'rxjs';
 import * as _ from 'lodash';
 import { Game } from '@/core/game';
 import { Dictionary } from '@avalon/types';
@@ -30,6 +30,8 @@ export class PlotCardsAddon implements IGameAddon {
     stayingAlert: new Subject(),
     charge: new Subject(),
   };
+
+  cardsInGame: { ownerID: string; card: TPlotCard }[] = [];
 
   constructor(game: Game) {
     this.game = game;
@@ -66,42 +68,76 @@ export class PlotCardsAddon implements IGameAddon {
     this.cards = _.shuffle(cards.map((el) => new el(game)));
   }
 
-  beforeStartMission() {
-    // Card action kings returns
-
+  activateCards() {
     this.currentCards = this.cards.slice(this.pointer, this.pointer + this.cardsPerRound);
     this.pointer += this.cardsPerRound;
 
     this.currentCards.forEach((card) => {
-      // play card
-      console.log('card', card);
+      if (card.activate === 'self') {
+        this.cardsInGame.push({ card, ownerID: this.game.leader.user.id });
+      } else {
+        this.giveCardToPlayer(card);
+      }
+
+      if (card.type === 'instant') {
+        this.playCardIfExist(card.name);
+      }
     });
 
-    // Card action weFoundYou
-    return this.subjects.startMission.asObservable();
+    return of(true);
+  }
+
+  giveCardToPlayer(card: TPlotCard) {
+    this.cardsInGame.push({ card, ownerID: 'TODO' });
+    return of(true);
+  }
+
+  beforeStartMission() {
+    return of(true).pipe(
+      concatMap(() => this.playCardIfExist('kingReturns')),
+      concatMap((result) => (result ? this.activateCards() : of(false))),
+      concatMap((result) => (result ? this.playCardIfExist('weFoundYou') : of(false))),
+    );
   }
 
   beforeSelectTeam() {
-    if (this.game.players.some((player) => player.features.takingChargeCard)) {
-      return this.subjects.takingCharge.asObservable();
-    }
-
-    return of(true);
+    return this.playCardIfExist('takingCharge');
   }
 
   beforeEndMission() {
-    if (this.game.players.some((player) => player.features.stayingAlertCard)) {
-      return this.subjects.stayingAlert.asObservable();
-    }
-
-    return of(true);
+    return this.playCardIfExist('stayingAlert');
   }
 
   beforeVoteForTeam() {
-    if (this.game.players.some((player) => player.features.chargeCard)) {
-      return this.subjects.chargeCard.asObservable();
+    return this.playCardIfExist('charge');
+  }
+
+  playCardIfExist(name: TPlotCard['name']): Observable<boolean> {
+    const cards = this.cardsInGame.filter(({ card }) => card.name === name);
+
+    if (cards.length > 1) {
+      const playerOrder: Dictionary<number> = {};
+      let player = this.game.leader;
+      let position = 0;
+
+      for (let i = 0; i < this.game.players.length; i++) {
+        playerOrder[player.user.id] = position++;
+        player = player.next;
+      }
+
+      cards.sort((a, b) => {
+        const posA = playerOrder[a.ownerID] ?? Infinity;
+        const posB = playerOrder[b.ownerID] ?? Infinity;
+
+        return posA - posB;
+      });
     }
 
-    return of(true);
+    return from(cards).pipe(
+      concatMap(({ card }) => card.play()),
+      takeWhile((result) => result === true, true),
+      last(),
+      defaultIfEmpty(true),
+    );
   }
 }

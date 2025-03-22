@@ -1,10 +1,13 @@
 import { Game } from '@/core/game';
 import { IUsablePlotCard } from '@/core/game/addons/plot-cards/interface';
+import { of } from 'rxjs';
 
 /**
  * activate -> leader give card to some one
  * use -> player see mission action of one player
  * effect -> after end of actions can skip or use
+ *
+ * observable always true
  */
 
 /**
@@ -18,5 +21,9 @@ export class StayingAlertCard implements IUsablePlotCard {
 
   constructor(game: Game) {
     this.game = game;
+  }
+
+  play() {
+    return of(true);
   }
 }
