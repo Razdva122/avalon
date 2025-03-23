@@ -31,6 +31,7 @@ const { revealer } = require('./revealer');
 const { stats } = require('./stats');
 const { profile } = require('./profile');
 const { userStats } = require('./userStats');
+const { plotCards } = require('./plotCards');
 
 module.exports = {
   lobby,
@@ -65,4 +66,5 @@ module.exports = {
   stats,
   profile,
   userStats,
+  plotCards,
 };

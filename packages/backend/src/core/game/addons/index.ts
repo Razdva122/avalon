@@ -7,6 +7,7 @@ export * from '@/core/game/addons/lancelots';
 export * from '@/core/game/addons/witch';
 export * from '@/core/game/addons/cleric';
 export * from '@/core/game/addons/revealer';
+export * from '@/core/game/addons/plot-cards';
 
 import type { TAddonsOptions } from '@/core/game/addons/interface';
 
@@ -18,10 +19,15 @@ import { WitchAddon } from '@/core/game/addons/witch';
 import { ClericAddon } from '@/core/game/addons/cleric';
 import { RevealerAddon } from '@/core/game/addons/revealer';
 import { LadyOfSeaAddon } from '@/core/game/addons/lady-of-sea';
+import { PlotCardsAddon } from '@/core/game/addons/plot-cards';
 
 import type { TAddonsName } from '@avalon/types';
 
-export type TAdditionalAddonsConstructor = typeof LadyOfLakeAddon | typeof ExcaliburAddon | typeof LadyOfSeaAddon;
+export type TAdditionalAddonsConstructor =
+  | typeof LadyOfLakeAddon
+  | typeof ExcaliburAddon
+  | typeof LadyOfSeaAddon
+  | typeof PlotCardsAddon;
 export type TRolesAddonsConstructor =
   | typeof AssassinAddon
   | typeof LancelotsAddon

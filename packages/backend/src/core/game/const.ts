@@ -11,6 +11,7 @@ import {
   WitchAddon,
   RevealerAddon,
   ClericAddon,
+  PlotCardsAddon,
 } from '@/core/game/addons';
 import { TRolesWithAddons } from '@/core/game/addons';
 
@@ -205,5 +206,9 @@ export const addons: Record<TAddonsName, TAdditionalAddonsData> = {
   excalibur: {
     addon: ExcaliburAddon,
     key: 'excalibur',
+  },
+  plotCards: {
+    addon: PlotCardsAddon,
+    key: 'plotCards',
   },
 };

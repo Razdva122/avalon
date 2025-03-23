@@ -1,5 +1,5 @@
 import { IGameAddon } from '@/core/game/addons/interface';
-import { Observable, Subject, of, concatMap, from, takeWhile, last, defaultIfEmpty } from 'rxjs';
+import { Observable, of, concatMap, from, takeWhile, last, defaultIfEmpty } from 'rxjs';
 import * as _ from 'lodash';
 import { Game } from '@/core/game';
 import { Dictionary } from '@avalon/types';
@@ -24,13 +24,6 @@ export class PlotCardsAddon implements IGameAddon {
   cards: TPlotCard[];
   pointer: number = 0;
   currentCards: TPlotCard[] | undefined;
-  subjects: Dictionary<Subject<boolean>> = {
-    startMission: new Subject(),
-    takingCharge: new Subject(),
-    stayingAlert: new Subject(),
-    charge: new Subject(),
-  };
-
   cardsInGame: { ownerID: string; card: TPlotCard }[] = [];
 
   constructor(game: Game) {
@@ -68,23 +61,26 @@ export class PlotCardsAddon implements IGameAddon {
     this.cards = _.shuffle(cards.map((el) => new el(game)));
   }
 
-  activateCards() {
+  activateCards(): Observable<boolean> {
     this.currentCards = this.cards.slice(this.pointer, this.pointer + this.cardsPerRound);
     this.pointer += this.cardsPerRound;
 
-    this.currentCards.forEach((card) => {
-      if (card.activate === 'self') {
-        this.cardsInGame.push({ card, ownerID: this.game.leader.user.id });
-      } else {
-        this.giveCardToPlayer(card);
-      }
+    return from(this.currentCards).pipe(
+      concatMap((card) => {
+        let assignObservable = of(true);
 
-      if (card.type === 'instant') {
-        this.playCardIfExist(card.name);
-      }
-    });
+        if (card.activate === 'self') {
+          this.cardsInGame.push({ card, ownerID: this.game.leader.user.id });
+        } else {
+          assignObservable = this.giveCardToPlayer(card);
+        }
 
-    return of(true);
+        return assignObservable.pipe(
+          concatMap(() => (card.type === 'instant' ? this.playCardIfExist(card.name) : of(true))),
+        );
+      }),
+      last(),
+    );
   }
 
   giveCardToPlayer(card: TPlotCard) {
@@ -136,8 +132,8 @@ export class PlotCardsAddon implements IGameAddon {
     return from(cards).pipe(
       concatMap(({ card }) => card.play()),
       takeWhile((result) => result === true, true),
-      last(),
       defaultIfEmpty(true),
+      last(),
     );
   }
 }

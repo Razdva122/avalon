@@ -8,6 +8,7 @@ import type {
   ClericAddon,
   RevealerAddon,
   LadyOfSeaAddon,
+  PlotCardsAddon,
 } from '@/core/game/addons';
 import type { Character } from '@/core/roles';
 import type { User } from '@/user';
@@ -39,6 +40,7 @@ export interface IGameAddons extends TAddonsArray {
   ladyOfLake?: LadyOfLakeAddon;
   ladyOfSea?: LadyOfSeaAddon;
   excalibur?: ExcaliburAddon;
+  plotCards?: PlotCardsAddon;
   lancelots?: LancelotsAddon;
   witch?: WitchAddon;
   cleric?: ClericAddon;

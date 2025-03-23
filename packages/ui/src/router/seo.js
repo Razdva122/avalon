@@ -9,6 +9,7 @@ const {
   lady,
   ladySea,
   excalibur,
+  plotCards,
   morgana,
   percival,
   rules,
@@ -123,6 +124,18 @@ module.exports.routesSeo = {
         ...ladySea,
       },
       image: 'features/lady_of_sea.webp',
+    },
+  },
+  plotCards: {
+    path: '/wiki/expansions/plot_cards/',
+    name: 'plot_cards',
+    priority: 0.5,
+    meta: {
+      prerender: true,
+      multiLanguage: {
+        ...plotCards,
+      },
+      image: 'features/excalibur.webp',
     },
   },
   excalibur: {

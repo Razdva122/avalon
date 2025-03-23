@@ -114,6 +114,7 @@ export const en = {
     roles: 'Roles',
     lady: 'Lady',
     lady_sea: 'Lady Sea',
+    plot_cards: 'Plot Cards',
     excalibur: 'Excalibur',
     rules: 'Rules',
   },
@@ -121,6 +122,7 @@ export const en = {
     ladyOfLake: 'Lady of the lake',
     ladyOfSea: 'Lady of the sea',
     excalibur: 'Excalibur',
+    plotCards: 'Plot Cards',
   },
   ladyModule: {
     announceGood: 'Announce Good',
@@ -135,6 +137,7 @@ export const en = {
     addons: 'Addons',
     features: 'Features',
     ladyHint: 'The lady allows you to find out the loyalty of another player',
+    plotCardsHint: 'Adds plot cards to the game',
     ladySeaHint:
       'An analogue of the Lady of the lake, but if you check the player of the forces of evil, you will see his role.',
     excaliburHint: 'Excalibur allows you to change the decision of one of the participants of the mission',

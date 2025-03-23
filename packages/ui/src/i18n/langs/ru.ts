@@ -114,6 +114,7 @@ export const ru = {
     roles: 'Роли',
     lady: 'Леди озера',
     lady_sea: 'Леди моря',
+    plot_cards: 'Сюжетные карты',
     excalibur: 'Экскалибур',
     rules: 'Правила',
   },
@@ -121,6 +122,7 @@ export const ru = {
     ladyOfLake: 'Леди озера',
     ladyOfSea: 'Леди моря',
     excalibur: 'Экскалибур',
+    plotCards: 'Сюжетные карты',
   },
   ladyModule: {
     announceGood: 'Объявить добром',
@@ -135,6 +137,7 @@ export const ru = {
     addons: 'Дополнения',
     features: 'Опции',
     ladyHint: 'Леди позволяет проверить сторону другого игрока',
+    plotCardsHint: 'Добавляет сюжетные карты в игру',
     ladySeaHint: 'Аналог Леди озера, но если вы проверите игрока сил зла, вы увидите его роль.',
     excaliburHint: 'Экскалибур позволяет изменить решение одного из участников похода',
     anonymousVoting: 'Анонимное голосование',

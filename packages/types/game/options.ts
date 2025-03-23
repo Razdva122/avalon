@@ -74,6 +74,9 @@ export class GameOptionsAddons {
 
   @prop()
   public excalibur?: boolean;
+
+  @prop()
+  public plotCards?: boolean;
 }
 
 export class GameOptionsFeatures {

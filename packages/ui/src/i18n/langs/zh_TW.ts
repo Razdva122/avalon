@@ -114,6 +114,7 @@ export const zh_TW = {
     roles: '角色',
     lady: '湖中仙女',
     lady_sea: '海中仙女',
+    plot_cards: '情節卡',
     excalibur: '神劍',
     rules: '規則',
   },
@@ -121,6 +122,7 @@ export const zh_TW = {
     ladyOfLake: '湖中仙女',
     ladyOfSea: '海中仙女',
     excalibur: '神劍',
+    plotCards: '情節卡',
   },
   ladyModule: {
     announceGood: '宣告好人方',
@@ -135,6 +137,7 @@ export const zh_TW = {
     addons: '插件',
     features: '功能',
     ladyHint: '湖中仙女可以讓你了解其他玩家的忠誠度',
+    plotCardsHint: '在遊戲中加入情節卡',
     ladySeaHint: '湖中仙女的類似角色，但如果你檢查邪惡力量的玩家，你將看到他的角色。',
     excaliburHint: '神劍讓您改變任務參與者之一的決定',
     anonymousVoting: '匿名投票',

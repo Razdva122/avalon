@@ -130,4 +130,4 @@ export class AddonsData {
 /**
  * Addons names
  */
-export type TAddonsName = 'ladyOfLake' | 'excalibur' | 'ladyOfSea';
+export type TAddonsName = 'ladyOfLake' | 'excalibur' | 'ladyOfSea' | 'plotCards';

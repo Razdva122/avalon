@@ -170,13 +170,13 @@ export default defineComponent({
         {
           name: 'ladyOfLake',
           label: this.$t('addons.ladyOfLake'),
-          route: 'ladyOfLake',
+          route: 'lady_of_lake',
           hint: this.$t('options.ladyHint'),
         },
         {
           name: 'ladyOfSea',
           label: this.$t('addons.ladyOfSea'),
-          route: 'ladyOfSea',
+          route: 'lady_of_sea',
           hint: this.$t('options.ladySeaHint'),
         },
         {
@@ -184,6 +184,12 @@ export default defineComponent({
           label: this.$t('addons.excalibur'),
           route: 'excalibur',
           hint: this.$t('options.excaliburHint'),
+        },
+        {
+          name: 'plotCards',
+          label: this.$t('addons.plotCards'),
+          route: 'plot_cards',
+          hint: this.$t('options.plotCardsHint'),
         },
       ] as const;
     },
