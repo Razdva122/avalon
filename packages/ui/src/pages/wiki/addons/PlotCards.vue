@@ -2,7 +2,12 @@
   <div class="info-page-content">
     <WikiBreadCrumbs />
     <h1>{{ $t('addons.excalibur') }}</h1>
-    <img class="preview-image" :src="getImagePathByID('features', 'excalibur')" alt="excalibur" />
+    <SchemaImage
+      class="preview-image"
+      :src="getImagePathByID('features', 'excalibur')"
+      :alt="$t('addons.excalibur')"
+      :description="$t('addons.excalibur')"
+    />
     <p><LocalizedTextWrapper keypath="excalibur.intro" /></p>
 
     <h2>{{ $t('excalibur.title') }}</h2>
@@ -36,12 +41,16 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import SchemaImage from '@/components/view/SchemaImage.vue';
+import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
 import { getImagePathByID } from '@/helpers/images';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+    SchemaImage,
+    LocalizedTextWrapper,
   },
   data() {
     return {

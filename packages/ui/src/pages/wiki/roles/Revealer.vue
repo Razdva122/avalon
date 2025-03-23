@@ -5,7 +5,12 @@
       <div class="evil-loyalty-icon"></div>
       {{ $t('roles.revealer') }} {{ $t('roles.role') }}
     </h1>
-    <img class="preview-image" :src="calculateRoleUrl('revealer')" alt="revealer" />
+    <SchemaImage
+      class="preview-image"
+      :src="calculateRoleUrl('revealer')"
+      :alt="$t('roles.revealer')"
+      :description="$t('roles.revealer')"
+    />
 
     <section>
       <h2>{{ $t('revealer.informationHeader') }}</h2>
@@ -50,12 +55,16 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import SchemaImage from '@/components/view/SchemaImage.vue';
+import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
 import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+    SchemaImage,
+    LocalizedTextWrapper,
   },
   methods: {
     calculateRoleUrl: calculateRoleUrl,

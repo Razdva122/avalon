@@ -2,7 +2,12 @@
   <div class="info-page-content">
     <WikiBreadCrumbs />
     <h1>{{ $t('addons.ladyOfSea') }}</h1>
-    <img class="preview-image" :src="getImagePathByID('features', 'lady_of_sea')" alt="ladySea" />
+    <SchemaImage
+      class="preview-image"
+      :src="getImagePathByID('features', 'lady_of_sea')"
+      :alt="$t('addons.ladyOfSea')"
+      :description="$t('addons.ladyOfSea')"
+    />
     <p>
       <LocalizedTextWrapper keypath="ladySea.intro" />
     </p>
@@ -34,12 +39,16 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import SchemaImage from '@/components/view/SchemaImage.vue';
+import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
 import { getImagePathByID } from '@/helpers/images';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+    SchemaImage,
+    LocalizedTextWrapper,
   },
   data() {
     return {

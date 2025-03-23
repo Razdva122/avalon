@@ -5,7 +5,12 @@
       <div class="good-loyalty-icon"></div>
       {{ $t('roles.merlinPure') }} {{ $t('roles.role') }}
     </h1>
-    <img class="preview-image" :src="calculateRoleUrl('merlinPure')" alt="merlin pure" />
+    <SchemaImage
+      class="preview-image"
+      :src="calculateRoleUrl('merlinPure')"
+      :alt="$t('roles.merlinpure')"
+      :description="$t('roles.merlinpure')"
+    />
 
     <h2>{{ $t('merlinPure.generalInformationTitle') }}</h2>
     <p><LocalizedTextWrapper keypath="merlinPure.generalInformationText" /></p>
@@ -66,12 +71,16 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import SchemaImage from '@/components/view/SchemaImage.vue';
+import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
 import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+    SchemaImage,
+    LocalizedTextWrapper,
   },
   methods: {
     calculateRoleUrl: calculateRoleUrl,

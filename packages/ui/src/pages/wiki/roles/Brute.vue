@@ -5,7 +5,12 @@
       <div class="evil-loyalty-icon"></div>
       {{ $t('roles.brute') }} {{ $t('roles.role') }}
     </h1>
-    <img class="preview-image" :src="calculateRoleUrl('brute')" alt="brute" />
+    <SchemaImage
+      class="preview-image"
+      :src="calculateRoleUrl('brute')"
+      :alt="$t('roles.brute')"
+      :description="$t('roles.brute')"
+    />
 
     <h2>{{ $t('brute.generalInformation') }}</h2>
     <p>
@@ -50,12 +55,16 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import SchemaImage from '@/components/view/SchemaImage.vue';
+import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
 import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+    SchemaImage,
+    LocalizedTextWrapper,
   },
   methods: {
     calculateRoleUrl: calculateRoleUrl,

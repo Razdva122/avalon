@@ -5,7 +5,12 @@
       <div class="good-loyalty-icon"></div>
       {{ $t('roles.guinevere') }} {{ $t('roles.role') }}
     </h1>
-    <img class="preview-image" :src="calculateRoleUrl('guinevere')" alt="guinevere" />
+    <SchemaImage
+      class="preview-image"
+      :src="calculateRoleUrl('guinevere')"
+      :alt="$t('roles.guinevere')"
+      :description="$t('roles.guinevere')"
+    />
     <div class="credits">{{ $t('guinevere.credits') }}</div>
 
     <h2>{{ $t('guinevere.generalInformationTitle') }}</h2>
@@ -51,12 +56,16 @@
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import SchemaImage from '@/components/view/SchemaImage.vue';
+import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
 import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
+    SchemaImage,
+    LocalizedTextWrapper,
   },
   methods: {
     calculateRoleUrl: calculateRoleUrl,
