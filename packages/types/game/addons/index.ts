@@ -2,7 +2,7 @@ import { prop } from '@typegoose/typegoose';
 
 import type { TLadyOfLakeStages } from './lady-of-lake';
 import type { LadyOfSeaAddonData } from './lady-of-sea';
-import type { PlotCardsAddonData } from './plot-cards';
+import type { PlotCardsAddonData, TPlotCardsStages } from './plot-cards';
 import type { TExcaliburStages } from './excalibur';
 import type { TLancelotsStages } from './lancelots';
 import type { TWitchStages } from './witch';
@@ -31,7 +31,8 @@ export type TAddonsStages =
   | TExcaliburStages
   | TAssassinAddonStages
   | TLancelotsStages
-  | TWitchStages;
+  | TWitchStages
+  | TPlotCardsStages;
 
 /**
  * Features for plot cards addon

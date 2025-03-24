@@ -81,6 +81,12 @@ export class PlotCardsAddon implements IGameAddon {
     return this.currentCards.cards[this.currentCards.pointer];
   }
 
+  afterInit() {
+    this.game.selectAvailable.plotCards = (player) => player.features.isLeader === true;
+
+    return of(true);
+  }
+
   activateCards(): Observable<boolean> {
     const newPointer = this.pointer + this.cardsPerRound;
     this.currentCards = {
@@ -88,6 +94,8 @@ export class PlotCardsAddon implements IGameAddon {
       cards: this.cards.slice(this.pointer, newPointer).map((card) => ({ stage: 'pending', card })),
     };
     this.pointer = newPointer;
+    this.game.stage = 'plotCards';
+    this.game.stateObserver.gameStateChanged();
 
     return from(this.currentCards.cards).pipe(
       concatMap((data, index) => {
@@ -116,12 +124,14 @@ export class PlotCardsAddon implements IGameAddon {
 
   waitForGiveCard() {
     this.currentCardState.stage = 'selectionInProgress';
-    this.game.stateObserver.gameStateChanged();
 
     if (this.currentCardState.card.activate === 'self') {
       this.cardsInGame.push({ card: this.currentCardState.card, ownerID: this.game.leader.user.id });
       return of(true);
     }
+
+    this.game.leader.features.waitForAction = true;
+    this.game.stateObserver.gameStateChanged();
 
     return this.giveCardSubject;
   }

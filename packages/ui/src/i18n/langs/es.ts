@@ -44,6 +44,7 @@ export const es = {
     'check loyalty': 'verificar lealtad',
     'witch loyalty': 'lealtad de la bruja',
     'announce loyalty': 'anunciar lealtad',
+    'plot cards': 'cartas de trama',
     end: 'fin',
     lancelots: 'lancelotes',
     witch: 'bruja',

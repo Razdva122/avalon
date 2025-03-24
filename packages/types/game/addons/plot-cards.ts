@@ -36,3 +36,8 @@ export class CardsState {
   @prop({ required: true, type: () => [String] })
   public remainingCards!: Array<TPlotCardNames>;
 }
+
+/**
+ * Possible plot-cards stages
+ */
+export type TPlotCardsStages = 'plotCards';

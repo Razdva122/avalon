@@ -150,7 +150,8 @@ export default defineComponent({
         (stage === 'assassinate' && features.isAssassin) ||
         (stage === 'useExcalibur' && features.excalibur) ||
         (stage === 'checkLoyalty' && (features.ladyOfLake === 'has' || features.ladyOfSea === 'has')) ||
-        (stage === 'witchLoyalty' && features.witchLoyalty)
+        (stage === 'witchLoyalty' && features.witchLoyalty) ||
+        (stage === 'plotCards' && features.isLeader)
       );
     };
 

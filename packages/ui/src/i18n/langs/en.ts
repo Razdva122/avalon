@@ -44,6 +44,7 @@ export const en = {
     'check loyalty': 'check loyalty',
     'witch loyalty': 'witch loyalty',
     'announce loyalty': 'announce loyalty',
+    'plot cards': 'plot cards',
     end: 'end',
     lancelots: 'lancelots',
     witch: 'witch',

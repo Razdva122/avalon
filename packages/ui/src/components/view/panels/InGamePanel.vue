@@ -56,6 +56,9 @@
       {{ $t('inGame.skipWitchAbility') }}
     </v-btn>
   </template>
+  <template v-if="game.stage === 'plotCards' && isUserLeader">
+    <v-btn color="success" @click="givePlotCard" :disabled="!isGivePlotCardAvailable"> Give card </v-btn>
+  </template>
 </template>
 
 <script lang="ts">
@@ -183,6 +186,13 @@ export default defineComponent({
       );
     });
 
+    const isGivePlotCardAvailable = computed(() => {
+      return (
+        isSinglePlayerSelected.value &&
+        game.value.players.find((player) => player.features.isSelected && !player.features.isLeader)
+      );
+    });
+
     const onVoteClick = (option: TVoteOption) => {
       socket.emit('voteForMission', game.value.uuid, option);
     };
@@ -203,6 +213,10 @@ export default defineComponent({
       socket.emit('useWitchAbility', game.value.uuid, use);
     };
 
+    const givePlotCard = () => {
+      socket.emit('givePlotCard', game.value.uuid);
+    };
+
     return {
       isUserLeader,
       isUserAssassin,
@@ -217,6 +231,7 @@ export default defineComponent({
       isZeroPlayerSelected,
       isCheckAvailable,
       isGiveExcaliburAvailable,
+      isGivePlotCardAvailable,
       isUseExcaliburAvailable,
 
       isSendTeamDisabled,
@@ -226,6 +241,7 @@ export default defineComponent({
       onAssassinateClick,
       emitClick,
       witchAbilityClick,
+      givePlotCard,
     };
   },
 });

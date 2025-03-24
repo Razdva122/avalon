@@ -44,6 +44,7 @@ export const ru = {
     'check loyalty': 'проверка верности',
     'witch loyalty': 'верность ведьмы',
     'announce loyalty': 'объявить верность',
+    'plot cards': 'cюжетные карты',
     witch: 'ведьма',
     end: 'конец',
     lancelots: 'ланселоты',

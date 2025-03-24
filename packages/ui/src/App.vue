@@ -8,6 +8,7 @@
       <ConnectStatus class="connect-status" />
     </div>
     <div class="header-right-container d-flex align-center mr-2">
+      <DevPanel />
       <SpoilerEye v-if="currentRoute === 'room'" />
       <ThemeToggle />
       <Menu @profileClick="profileClick" />
@@ -41,6 +42,7 @@ import Version from '@/components/feedback/Version.vue';
 import Socials from '@/components/feedback/Socials.vue';
 import SpoilerEye from '@/components/feedback/SpoilerEye.vue';
 import ThemeToggle from '@/components/feedback/ThemeToggle.vue';
+import DevPanel from '@/components/dev/DevPanel.vue';
 import { isHolidays } from '@/helpers/utility';
 import eventBus from '@/helpers/event-bus';
 
@@ -55,6 +57,7 @@ export default defineComponent({
     SpoilerEye,
     ThemeToggle,
     CredentialsModal,
+    DevPanel,
   },
   data() {
     return {

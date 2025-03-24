@@ -44,6 +44,7 @@ export const zh_CN = {
     'check loyalty': '检查忠诚度',
     'witch loyalty': '女巫的忠诚',
     'announce loyalty': '宣布忠诚',
+    'plot cards': '情节卡',
     witch: '巫婆',
     end: '完结',
     lancelots: '兰斯洛特',
