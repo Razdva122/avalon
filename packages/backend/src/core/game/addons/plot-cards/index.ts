@@ -7,8 +7,8 @@ import { TPlotCard, ICurrentCardsState, ICardState } from '@/core/game/addons/pl
 
 import {
   ChargeCard,
-  TakingChargeCard,
-  StayingAlertCard,
+  LeadToVictoryCard,
+  AmbushCard,
   KingReturnsCard,
   RestoreHonorCard,
   ShowNatureCard,
@@ -31,10 +31,10 @@ export class PlotCardsAddon implements IGameAddon {
     this.game = game;
 
     const cards: Array<new (game: Game) => TPlotCard> = [
-      TakingChargeCard,
-      TakingChargeCard,
-      StayingAlertCard,
-      StayingAlertCard,
+      LeadToVictoryCard,
+      LeadToVictoryCard,
+      AmbushCard,
+      AmbushCard,
       KingReturnsCard,
       RestoreHonorCard,
       ChargeCard,
@@ -172,11 +172,11 @@ export class PlotCardsAddon implements IGameAddon {
   }
 
   beforeSelectTeam() {
-    return this.playCardIfExist('takingCharge');
+    return this.playCardIfExist('leadToVictory');
   }
 
   beforeEndMission() {
-    return this.playCardIfExist('stayingAlert');
+    return this.playCardIfExist('ambush');
   }
 
   beforeVoteForTeam() {

@@ -72,13 +72,13 @@ export class PlotCardsFeatures {
    * Player become a leader
    */
   @prop()
-  takingChargeCard?: 'has' | 'active';
+  leadToVictoryCard?: 'has' | 'active';
 
   /**
    * Check mission card of one player
    */
   @prop()
-  stayingAlertCard?: 'has' | 'active';
+  ambushCard?: 'has' | 'active';
 
   /**
    * Сancel the previous mission and pass the leader to the next player

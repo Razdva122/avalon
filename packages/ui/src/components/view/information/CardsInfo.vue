@@ -3,29 +3,29 @@
   <v-overlay v-model="overlay" class="align-center justify-center">
     <div class="cards-info d-flex flex-column align-center pa-4 rounded-lg">
       <div class="d-flex flex-row align-center">
-        <h2 class="title">{{ selectedCard ? selectedCard : $t('cardsInfo.cards') }}</h2>
+        <h2 class="title">{{ selectedCard ? $t(`cardsInfo.${selectedCard}`) : $t('cardsInfo.cards') }}</h2>
       </div>
       <v-divider :thickness="3" class="mt-1 mb-1 w-100"></v-divider>
       <template v-if="selectedCard">
         <div class="card-image mt-4 mb-4">
-          <div class="card-placeholder">{{ selectedCard }}</div>
+          <div class="card-placeholder">{{ $t(`cardsInfo.${selectedCard}`) }}</div>
         </div>
-        <div class="card-info">TODO DESCRIPTION</div>
+        <div class="card-info">{{ $t(`cardsInfo.${selectedCard}Hint`) }}</div>
       </template>
       <template v-else>
         <div class="cards-container">
           <div class="card-container" v-for="(card, index) in data.usedCards" :key="index">
-            <div class="card-name">{{ card }}</div>
+            <div class="card-name">{{ $t(`cardsInfo.${card}`) }}</div>
             <div @click="selectCard(card)" class="card">
-              <div class="card-placeholder">{{ card }}</div>
+              <div class="card-placeholder">{{ $t(`cardsInfo.${card}`) }}</div>
             </div>
           </div>
         </div>
         <div class="cards-container">
           <div class="card-container" v-for="(card, index) in data.remainingCards" :key="index">
-            <div class="card-name">{{ card }}</div>
+            <div class="card-name">{{ $t(`cardsInfo.${card}`) }}</div>
             <div @click="selectCard(card)" class="card">
-              <div class="card-placeholder">{{ card }}</div>
+              <div class="card-placeholder">{{ $t(`cardsInfo.${card}`) }}</div>
             </div>
           </div>
         </div>

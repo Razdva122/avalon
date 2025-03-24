@@ -4,6 +4,6 @@ export * from '@/core/game/addons/plot-cards/cards/instant/restoreHonor';
 export * from '@/core/game/addons/plot-cards/cards/instant/showNature';
 export * from '@/core/game/addons/plot-cards/cards/instant/showStrength';
 export * from '@/core/game/addons/plot-cards/cards/usable/kingReturns';
-export * from '@/core/game/addons/plot-cards/cards/usable/stayingAlert';
-export * from '@/core/game/addons/plot-cards/cards/usable/takingCharge';
+export * from '@/core/game/addons/plot-cards/cards/usable/ambush';
+export * from '@/core/game/addons/plot-cards/cards/usable/leadToVictory';
 export * from '@/core/game/addons/plot-cards/cards/usable/weFoundYou';

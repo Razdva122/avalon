@@ -8,9 +8,9 @@ Plot Cards are special game-changing cards that can be used during different sta
 
 ### 5+ Player Cards
 
-- **Taking Charge (Strong leader)** - 2x
+- **Lead To Victory (Strong leader)** - 2x
   - Become a leader (playable before team selection)
-- **Staying Alert (Keeping a close eye on you)** - 2x
+- **Ambush (Keeping a close eye on you)** - 2x
   - Check 1 mission card
 - **The King Returns (No Confidence)** - 1x
   - Null a previous approve and change leadership

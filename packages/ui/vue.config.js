@@ -3,7 +3,6 @@
 const { defineConfig } = require('@vue/cli-service');
 const webpack = require('webpack');
 const SitemapPlugin = require('sitemap-webpack-plugin').default;
-const CopyPlugin = require('copy-webpack-plugin');
 const PrerendererWebpackPlugin = require('@prerenderer/webpack-plugin');
 const PuppeteerRenderer = require('@prerenderer/renderer-puppeteer');
 const { VuetifyPlugin } = require('webpack-plugin-vuetify');

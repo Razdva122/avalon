@@ -4,17 +4,17 @@ import { of } from 'rxjs';
 
 /**
  * activate -> leader give card to some one
- * use -> player become leader
- * effect -> before every team selection player can use or skip
+ * use -> player see mission action of one player
+ * effect -> after end of actions can skip or use
  *
- * observable false if used
+ * observable always true
  */
 
 /**
- * Problems: multi taking charge
+ * Problems: multi ambush returns in game, duplicate checks unavailable
  */
-export class TakingChargeCard implements IUsablePlotCard {
-  name = <const>'takingCharge';
+export class AmbushCard implements IUsablePlotCard {
+  name = <const>'ambush';
   type = <const>'usable';
   activate: IUsablePlotCard['activate'] = 'select';
   game: Game;

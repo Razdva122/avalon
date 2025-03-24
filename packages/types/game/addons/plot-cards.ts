@@ -2,7 +2,7 @@ import { prop } from '@typegoose/typegoose';
 
 export type TPlotCardNames = TUsableCardNames | TInstantCardNames | TEffectsCardNames;
 
-export type TUsableCardNames = 'takingCharge' | 'stayingAlert' | 'kingReturns' | 'weFoundYou';
+export type TUsableCardNames = 'leadToVictory' | 'ambush' | 'kingReturns' | 'weFoundYou';
 
 export type TInstantCardNames = 'restoreHonor' | 'showStrength' | 'showNature' | 'areYouTheOne';
 

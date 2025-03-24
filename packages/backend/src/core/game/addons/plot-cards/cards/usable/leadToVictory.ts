@@ -4,17 +4,17 @@ import { of } from 'rxjs';
 
 /**
  * activate -> leader give card to some one
- * use -> player see mission action of one player
- * effect -> after end of actions can skip or use
+ * use -> player become leader
+ * effect -> before every team selection player can use or skip
  *
- * observable always true
+ * observable false if used
  */
 
 /**
- * Problems: multi staying alert returns in game, duplicate checks unavailable
+ * Problems: multi lead to victory
  */
-export class StayingAlertCard implements IUsablePlotCard {
-  name = <const>'stayingAlert';
+export class LeadToVictoryCard implements IUsablePlotCard {
+  name = <const>'leadToVictory';
   type = <const>'usable';
   activate: IUsablePlotCard['activate'] = 'select';
   game: Game;
