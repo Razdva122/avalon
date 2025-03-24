@@ -262,6 +262,9 @@ export const ru = {
     mysteryWizardInfo: 'Один из двух волшебников - сил света (Мерлин) или сил тьмы (Моргана).',
     unknownLancelotInfo: 'Ланселот, чья верность не известна',
   },
+  cardsInfo: {
+    cards: 'Карты',
+  },
   hostMenu: {
     host: 'Админ',
     hostPanel: 'Админ панель',

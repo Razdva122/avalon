@@ -1,9 +1,9 @@
 import { IGameAddon } from '@/core/game/addons/interface';
-import { Observable, of, concatMap, from, takeWhile, last, defaultIfEmpty } from 'rxjs';
+import { Observable, of, concatMap, from, takeWhile, last, defaultIfEmpty, Subject } from 'rxjs';
 import * as _ from 'lodash';
 import { Game } from '@/core/game';
-import { Dictionary } from '@avalon/types';
-import { TPlotCard } from '@/core/game/addons/plot-cards/interface';
+import { Dictionary, AddonsData } from '@avalon/types';
+import { TPlotCard, ICurrentCardsState, ICardState } from '@/core/game/addons/plot-cards/interface';
 
 import {
   ChargeCard,
@@ -23,8 +23,9 @@ export class PlotCardsAddon implements IGameAddon {
   game: Game;
   cards: TPlotCard[];
   pointer: number = 0;
-  currentCards: TPlotCard[] | undefined;
+  currentCards: ICurrentCardsState = { cards: [], pointer: 0 };
   cardsInGame: { ownerID: string; card: TPlotCard }[] = [];
+  giveCardSubject: Subject<true> = new Subject();
 
   constructor(game: Game) {
     this.game = game;
@@ -61,31 +62,73 @@ export class PlotCardsAddon implements IGameAddon {
     this.cards = _.shuffle(cards.map((el) => new el(game)));
   }
 
+  get addonData(): AddonsData {
+    return {
+      plotCards: {
+        cardsState: {
+          usedCards: this.cards.slice(0, this.pointer).map((el) => el.name),
+          remainingCards: this.cards
+            .slice(this.pointer)
+            .map((el) => el.name)
+            .sort(),
+        },
+        activeCards: [],
+      },
+    };
+  }
+
+  get currentCardState(): ICardState {
+    return this.currentCards.cards[this.currentCards.pointer];
+  }
+
   activateCards(): Observable<boolean> {
-    this.currentCards = this.cards.slice(this.pointer, this.pointer + this.cardsPerRound);
-    this.pointer += this.cardsPerRound;
+    const newPointer = this.pointer + this.cardsPerRound;
+    this.currentCards = {
+      pointer: 0,
+      cards: this.cards.slice(this.pointer, newPointer).map((card) => ({ stage: 'pending', card })),
+    };
+    this.pointer = newPointer;
 
-    return from(this.currentCards).pipe(
-      concatMap((card) => {
-        let assignObservable = of(true);
-
-        if (card.activate === 'self') {
-          this.cardsInGame.push({ card, ownerID: this.game.leader.user.id });
-        } else {
-          assignObservable = this.giveCardToPlayer(card);
+    return from(this.currentCards.cards).pipe(
+      concatMap((data, index) => {
+        if (index !== 0) {
+          this.currentCardState.stage === 'used';
+          this.game.stateObserver.gameStateChanged();
         }
 
-        return assignObservable.pipe(
-          concatMap(() => (card.type === 'instant' ? this.playCardIfExist(card.name) : of(true))),
+        this.currentCards.pointer = index;
+
+        return this.waitForGiveCard().pipe(
+          concatMap(() => {
+            if (data.card.type === 'instant') {
+              this.currentCardState.stage = 'active';
+              this.game.stateObserver.gameStateChanged();
+              return this.playCardIfExist(data.card.name);
+            }
+
+            return of(true);
+          }),
         );
       }),
       last(),
     );
   }
 
-  giveCardToPlayer(card: TPlotCard) {
-    this.cardsInGame.push({ card, ownerID: 'TODO' });
-    return of(true);
+  waitForGiveCard() {
+    this.currentCardState.stage = 'selectionInProgress';
+    this.game.stateObserver.gameStateChanged();
+
+    if (this.currentCardState.card.activate === 'self') {
+      this.cardsInGame.push({ card: this.currentCardState.card, ownerID: this.game.leader.user.id });
+      return of(true);
+    }
+
+    return this.giveCardSubject;
+  }
+
+  giveCardToPlayer(playerID: string) {
+    this.cardsInGame.push({ card: this.currentCardState.card, ownerID: playerID });
+    this.giveCardSubject.next(true);
   }
 
   beforeStartMission() {

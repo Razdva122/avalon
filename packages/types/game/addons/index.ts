@@ -2,6 +2,7 @@ import { prop } from '@typegoose/typegoose';
 
 import type { TLadyOfLakeStages } from './lady-of-lake';
 import type { LadyOfSeaAddonData } from './lady-of-sea';
+import type { PlotCardsAddonData } from './plot-cards';
 import type { TExcaliburStages } from './excalibur';
 import type { TLancelotsStages } from './lancelots';
 import type { TWitchStages } from './witch';
@@ -11,6 +12,16 @@ import { AssassinAddonData } from './assassin';
 export * from './loyalty';
 
 export type { TAssassinateResult, TAssassinateType, AssassinAddonData, AssassinateProgressData } from './assassin';
+
+export type {
+  TUsableCardNames,
+  TEffectsCardNames,
+  TInstantCardNames,
+  TPlotCardNames,
+  PlotCardsAddonData,
+  TActiveCardsStages,
+  CardsState,
+} from './plot-cards';
 
 /**
  * Possible addons stages
@@ -125,6 +136,9 @@ export class AddonsData {
 
   @prop({ _id: false })
   public ladyOfSea?: LadyOfSeaAddonData;
+
+  @prop({ _id: false })
+  public plotCards?: PlotCardsAddonData;
 }
 
 /**

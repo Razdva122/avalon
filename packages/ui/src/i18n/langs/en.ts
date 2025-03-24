@@ -270,6 +270,9 @@ export const en = {
     mysteryWizardInfo: 'One of the two wizards is good (Merlin) or evil (Morgana)',
     unknownLancelotInfo: 'Lancelot, whose loyalty is not known',
   },
+  cardsInfo: {
+    cards: 'Cards',
+  },
   hostMenu: {
     host: 'Host',
     hostPanel: 'Host panel',

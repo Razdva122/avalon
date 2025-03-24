@@ -262,6 +262,9 @@ export const zh_TW = {
     mysteryWizardInfo: '兩個玩家之一是好人方的(梅林)還是壞人的(莫甘娜)',
     unknownLancelotInfo: '蘭斯洛特,誰的忠誠無人知曉',
   },
+  cardsInfo: {
+    cards: '卡牌',
+  },
   hostMenu: {
     host: '房主',
     hostPanel: '房主面板',

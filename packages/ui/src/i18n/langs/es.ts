@@ -263,6 +263,9 @@ export const es = {
     mysteryWizardInfo: 'Uno de los dos magos es bueno (Merlín) o malo (Morgana)',
     unknownLancelotInfo: 'Lancelot, cuya lealtad es desconocida',
   },
+  cardsInfo: {
+    cards: 'Cartas',
+  },
   hostMenu: {
     host: 'Anfitrión',
     hostPanel: 'Panel del anfitrión',

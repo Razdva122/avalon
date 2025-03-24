@@ -45,6 +45,7 @@
         v-if="selectedRole"
         @click="selectedRole = undefined"
         class="back"
+        color="text-primary"
         icon="arrow_back"
         variant="text"
         density="compact"
@@ -111,13 +112,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.roles {
-  position: fixed;
-  left: -28px;
-  top: 47%;
-  transform: rotate(90deg);
-}
-
 .roles-info {
   background-color: rgb(var(--v-theme-surface));
   width: 400px;

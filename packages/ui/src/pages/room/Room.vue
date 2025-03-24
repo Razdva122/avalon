@@ -16,7 +16,17 @@
           }}</v-btn>
         </template>
       </Board>
-      <RolesInfo v-if="roomState.stage === 'started'" :game-roles="game.settings.roles" :visible-roles="visibleRoles" />
+      <div class="info-container">
+        <RolesInfo
+          v-if="roomState.stage === 'started'"
+          :game-roles="game.settings.roles"
+          :visible-roles="visibleRoles"
+        />
+        <CardsInfo
+          v-if="roomState.stage === 'started' && game.addonsData.plotCards"
+          :data="game.addonsData.plotCards.cardsState"
+        />
+      </div>
       <HostPanel v-if="displayHostPanel" :roomUuid="roomState.roomID" :roomStage="roomState.stage" />
       <Chat class="chat" :messages="roomState.chat" :roomUuid="roomState.roomID" />
     </template>
@@ -32,6 +42,7 @@ import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { GameStateManager } from '@/helpers/game-state-manager';
 import RolesInfo from '@/components/view/information/RolesInfo.vue';
+import CardsInfo from '@/components/view/information/CardsInfo.vue';
 import HostPanel from '@/components/view/panels/HostPanel.vue';
 import RoomVote from '@/components/view/panels/RoomVote.vue';
 import Chat from '@/components/feedback/Chat.vue';
@@ -41,6 +52,7 @@ export default defineComponent({
   components: {
     Board,
     RolesInfo,
+    CardsInfo,
     HostPanel,
     RoomVote,
     Chat,
@@ -178,6 +190,22 @@ export default defineComponent({
   width: 500px;
   background-color: white;
   font-size: 18px;
+}
+
+.info-container {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+  transform: translateY(-50%);
+}
+
+.info-container > * {
+  transform-origin: left center;
+  transform: rotate(90deg) translateX(-50%);
+  margin-left: 10px;
 }
 
 .restart-button {
