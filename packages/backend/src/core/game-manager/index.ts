@@ -255,6 +255,15 @@ export class GameManager {
         this.game.addons.witch.useWitchAbility(userID, params.result);
         break;
       }
+
+      case 'givePlotCard': {
+        if (!this.game.addons.plotCards) {
+          throw new Error('You cant give plot card in game without plot cards addon');
+        }
+
+        this.game.addons.plotCards.giveCardToPlayer(userID);
+        break;
+      }
     }
   }
 

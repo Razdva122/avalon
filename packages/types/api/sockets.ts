@@ -107,6 +107,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents {
   useExcalibur: (uuid: string) => void;
 
   useWitchAbility: (uuid: string, result: boolean) => void;
+  givePlotCard: (uuid: string) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;

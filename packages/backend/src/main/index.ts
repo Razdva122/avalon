@@ -510,6 +510,11 @@ export class Manager {
       console.log(`Player ${userName} useWitchAbility in game ${uuid}`);
       getRoomManager(uuid).callGameMethods(userID, { method: 'witchAbility', result });
     });
+
+    socket.on('givePlotCard', (uuid) => {
+      console.log(`Player ${userName} givePlotCard in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'givePlotCard' });
+    });
   }
 
   updateOnlineCounter(id: string, diff: -1 | 1): void {

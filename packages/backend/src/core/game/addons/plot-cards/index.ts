@@ -1,8 +1,8 @@
 import { IGameAddon } from '@/core/game/addons/interface';
 import { Observable, of, concatMap, from, takeWhile, last, defaultIfEmpty, Subject } from 'rxjs';
 import * as _ from 'lodash';
-import { Game, IPlayerInGame } from '@/core/game';
-import { Dictionary, AddonsData } from '@avalon/types';
+import { Game } from '@/core/game';
+import { Dictionary, AddonsData, PlotCardsFeatures } from '@avalon/types';
 import { TPlotCard, ICurrentCardsState, ICardState } from '@/core/game/addons/plot-cards/interface';
 
 import {
@@ -126,12 +126,30 @@ export class PlotCardsAddon implements IGameAddon {
     return this.giveCardSubject;
   }
 
-  giveCardToPlayer(leader: IPlayerInGame, player: IPlayerInGame) {
+  giveCardToPlayer(userID: string) {
+    const leader = this.game.players.find((player) => player.user.id === userID);
+
     if (leader !== this.game.leader) {
-      throw new Error('only leader can give cards to player');
+      throw new Error('Only leader can give cards to player');
     }
 
-    this.cardsInGame.push({ card: this.currentCardState.card, ownerID: player.user.id });
+    if (this.game.selectedPlayers.length !== 1) {
+      throw new Error('Only one player can be selected to give a plot card');
+    }
+
+    const selectedPlayer = this.game.selectedPlayers[0];
+
+    if (selectedPlayer === this.game.leader) {
+      throw new Error('You cannot give a plot card to yourself');
+    }
+
+    const featureName = <keyof PlotCardsFeatures>(this.currentCardState.card.name + 'Card');
+
+    if (selectedPlayer.features[featureName]) {
+      throw new Error('Selected player already have this plot card');
+    }
+
+    this.cardsInGame.push({ card: this.currentCardState.card, ownerID: selectedPlayer.user.id });
     this.giveCardSubject.next(true);
   }
 

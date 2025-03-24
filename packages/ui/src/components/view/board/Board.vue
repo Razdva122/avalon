@@ -130,33 +130,47 @@ export default defineComponent({
       stateManager.moveToNextStage();
     };
 
+    const navigateToUserStats = (uuid: string) => {
+      router.push({ name: 'user_stats', params: { uuid } });
+    };
+
+    const kickPlayer = (uuid: string) => {
+      socket.emit('kickPlayer', roomState.value.roomID, uuid);
+    };
+
+    const selectPlayer = (uuid: string) => {
+      socket.emit('selectPlayer', gameState.value.uuid, uuid);
+    };
+
+    const canUserSelectPlayer = () => {
+      if (!playerInGame.value) return false;
+
+      const { stage } = gameState.value;
+      const features = playerInGame.value.features;
+
+      return (
+        (stage === 'selectTeam' && features.isLeader) ||
+        (stage === 'giveExcalibur' && features.isLeader) ||
+        (stage === 'assassinate' && features.isAssassin) ||
+        (stage === 'useExcalibur' && features.excalibur) ||
+        (stage === 'checkLoyalty' && (features.ladyOfLake === 'has' || features.ladyOfSea === 'has')) ||
+        (stage === 'witchLoyalty' && features.witchLoyalty)
+      );
+    };
+
     const onPlayerClick = (uuid: string) => {
       if (roomState.value.stage === 'started' && roomState.value.game.stage === 'end') {
-        router.push({ name: 'user_stats', params: { uuid } });
+        navigateToUserStats(uuid);
         return;
       }
 
       if (roomState.value.stage !== 'started') {
-        if (userIsLeader.value) {
-          socket.emit('kickPlayer', roomState.value.roomID, uuid);
-        } else {
-          router.push({ name: 'user_stats', params: { uuid } });
-        }
-
+        userIsLeader.value ? kickPlayer(uuid) : navigateToUserStats(uuid);
         return;
       }
 
-      const userCanSelect =
-        (gameState.value.stage === 'selectTeam' && playerInGame.value?.features.isLeader) ||
-        (gameState.value.stage === 'giveExcalibur' && playerInGame.value?.features.isLeader) ||
-        (gameState.value.stage === 'assassinate' && playerInGame.value?.features.isAssassin) ||
-        (gameState.value.stage === 'useExcalibur' && playerInGame.value?.features.excalibur) ||
-        (gameState.value.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfLake === 'has') ||
-        (gameState.value.stage === 'checkLoyalty' && playerInGame.value?.features.ladyOfSea === 'has') ||
-        (gameState.value.stage === 'witchLoyalty' && playerInGame.value?.features.witchLoyalty);
-
-      if (userCanSelect) {
-        socket.emit('selectPlayer', gameState.value.uuid, uuid);
+      if (canUserSelectPlayer()) {
+        selectPlayer(uuid);
       }
     };
 
