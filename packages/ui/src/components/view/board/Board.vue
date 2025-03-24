@@ -138,10 +138,6 @@ export default defineComponent({
       socket.emit('kickPlayer', roomState.value.roomID, uuid);
     };
 
-    const selectPlayer = (uuid: string) => {
-      socket.emit('selectPlayer', gameState.value.uuid, uuid);
-    };
-
     const canUserSelectPlayer = () => {
       if (!playerInGame.value) return false;
 
@@ -170,7 +166,7 @@ export default defineComponent({
       }
 
       if (canUserSelectPlayer()) {
-        selectPlayer(uuid);
+        socket.emit('selectPlayer', gameState.value.uuid, uuid);
       }
     };
 
