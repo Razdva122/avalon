@@ -266,6 +266,8 @@ export const es = {
   },
   cardsInfo: {
     cards: 'Cartas',
+    usedCards: 'Cartas Usadas',
+    remainingCards: 'Cartas Restantes',
     leadToVictory: 'Liderar hacia la Victoria',
     leadToVictoryHint: 'Conviértete en líder antes de seleccionar el equipo',
     ambush: 'Emboscada',

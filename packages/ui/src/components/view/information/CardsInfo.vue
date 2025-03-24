@@ -13,22 +13,11 @@
         <div class="card-info">{{ $t(`cardsInfo.${selectedCard}Hint`) }}</div>
       </template>
       <template v-else>
-        <div class="cards-container">
-          <div class="card-container" v-for="(card, index) in data.usedCards" :key="index">
-            <div class="card-name">{{ $t(`cardsInfo.${card}`) }}</div>
-            <div @click="selectCard(card)" class="card">
-              <div class="card-placeholder">{{ $t(`cardsInfo.${card}`) }}</div>
-            </div>
-          </div>
-        </div>
-        <div class="cards-container">
-          <div class="card-container" v-for="(card, index) in data.remainingCards" :key="index">
-            <div class="card-name">{{ $t(`cardsInfo.${card}`) }}</div>
-            <div @click="selectCard(card)" class="card">
-              <div class="card-placeholder">{{ $t(`cardsInfo.${card}`) }}</div>
-            </div>
-          </div>
-        </div>
+        <template v-if="data.usedCards.length">
+          <CardsList :cards="data.usedCards" :title="$t('cardsInfo.usedCards')" @select="selectCard" />
+          <v-divider :thickness="3" class="mt-4 mb-4 w-100"></v-divider>
+        </template>
+        <CardsList :cards="data.remainingCards" :title="$t('cardsInfo.remainingCards')" @select="selectCard" />
       </template>
       <v-btn
         size="x-large"
@@ -46,9 +35,13 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+import CardsList from '@/components/view/information/CardsList.vue';
 import type { CardsState } from '@avalon/types';
 
 export default defineComponent({
+  components: {
+    CardsList,
+  },
   props: {
     data: {
       required: true,

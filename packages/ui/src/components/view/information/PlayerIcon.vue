@@ -183,7 +183,7 @@ export default defineComponent({
 }
 
 .icon-unknown {
-  background-image: getImagePathByID('roles', 'player-frame');
+  background-image: getImagePathByID('core', 'player-frame');
   background-position: center;
   background-size: 135%;
 }

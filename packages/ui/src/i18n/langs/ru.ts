@@ -265,10 +265,12 @@ export const ru = {
   },
   cardsInfo: {
     cards: 'Карты',
+    usedCards: 'Использованные карты',
+    remainingCards: 'Оставшиеся карты',
     leadToVictory: 'Привести к победе',
     leadToVictoryHint: 'Стать лидером перед выбором команды',
     ambush: 'Засада',
-    ambushHint: 'Раскрыть результат одного похода',
+    ambushHint: 'Раскрыть результат одной карты из похода',
     kingReturns: 'Король возвращается',
     kingReturnsHint: 'Отменить последнее одобрение и сменить лидера',
     restoreHonor: 'Восстанови свою честь',

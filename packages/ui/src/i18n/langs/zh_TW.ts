@@ -265,6 +265,8 @@ export const zh_TW = {
   },
   cardsInfo: {
     cards: '卡牌',
+    usedCards: '已使用的卡牌',
+    remainingCards: '剩餘卡牌',
     leadToVictory: '引領勝利',
     leadToVictoryHint: '在隊伍選擇前成為領袖',
     ambush: '埋伏',

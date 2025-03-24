@@ -273,6 +273,8 @@ export const en = {
   },
   cardsInfo: {
     cards: 'Cards',
+    usedCards: 'Used cards',
+    remainingCards: 'Remaining cards',
     leadToVictory: 'Lead To Victory',
     leadToVictoryHint: 'Become leader before team selection',
     ambush: 'Ambush',

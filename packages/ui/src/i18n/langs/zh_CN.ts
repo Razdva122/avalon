@@ -265,6 +265,8 @@ export const zh_CN = {
   },
   cardsInfo: {
     cards: '卡牌',
+    usedCards: '已使用的卡牌',
+    remainingCards: '剩余卡牌',
     leadToVictory: '引领胜利',
     leadToVictoryHint: '在队伍选择前成为领袖',
     ambush: '埋伏',
