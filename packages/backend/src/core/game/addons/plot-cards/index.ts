@@ -1,7 +1,7 @@
 import { IGameAddon } from '@/core/game/addons/interface';
 import { Observable, of, concatMap, from, takeWhile, last, defaultIfEmpty, Subject } from 'rxjs';
 import * as _ from 'lodash';
-import { Game } from '@/core/game';
+import { Game, IPlayerInGame } from '@/core/game';
 import { Dictionary, AddonsData } from '@avalon/types';
 import { TPlotCard, ICurrentCardsState, ICardState } from '@/core/game/addons/plot-cards/interface';
 
@@ -126,8 +126,12 @@ export class PlotCardsAddon implements IGameAddon {
     return this.giveCardSubject;
   }
 
-  giveCardToPlayer(playerID: string) {
-    this.cardsInGame.push({ card: this.currentCardState.card, ownerID: playerID });
+  giveCardToPlayer(leader: IPlayerInGame, player: IPlayerInGame) {
+    if (leader !== this.game.leader) {
+      throw new Error('only leader can give cards to player');
+    }
+
+    this.cardsInGame.push({ card: this.currentCardState.card, ownerID: player.user.id });
     this.giveCardSubject.next(true);
   }
 
