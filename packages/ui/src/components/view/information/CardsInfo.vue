@@ -7,9 +7,7 @@
       </div>
       <v-divider :thickness="3" class="mt-1 mb-1 w-100"></v-divider>
       <template v-if="selectedCard">
-        <div class="card-image mt-4 mb-4">
-          <div class="card-placeholder">{{ $t(`cardsInfo.${selectedCard}`) }}</div>
-        </div>
+        <PlotCard class="card-image mt-4 mb-4" :cardName="selectedCard" />
         <div class="card-info">{{ $t(`cardsInfo.${selectedCard}Hint`) }}</div>
       </template>
       <template v-else>
@@ -36,11 +34,13 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import CardsList from '@/components/view/information/CardsList.vue';
-import type { CardsState } from '@avalon/types';
+import PlotCard from '@/components/view/information/PlotCard.vue';
+import type { CardsState, TPlotCardNames } from '@avalon/types';
 
 export default defineComponent({
   components: {
     CardsList,
+    PlotCard,
   },
   props: {
     data: {
@@ -50,10 +50,10 @@ export default defineComponent({
   },
   data: () => ({
     overlay: false,
-    selectedCard: undefined as string | undefined,
+    selectedCard: undefined as TPlotCardNames | undefined,
   }),
   methods: {
-    selectCard(card: string) {
+    selectCard(card: TPlotCardNames) {
       this.selectedCard = card;
     },
   },
@@ -105,7 +105,7 @@ export default defineComponent({
 }
 
 .card-image {
-  width: 250px;
+  width: 350px;
   height: 350px;
   border-radius: 12px;
   overflow: hidden;

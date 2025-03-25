@@ -4,7 +4,7 @@
     <div class="cards-container">
       <div class="card-container" v-for="(card, index) in cards" :key="index">
         <div @click="$emit('select', card)" class="card">
-          <img class="card-image" />
+          <PlotCard class="card-image" :cardName="card" />
           <div class="card-placeholder">{{ $t(`cardsInfo.${card}`) }}</div>
         </div>
       </div>
@@ -14,8 +14,12 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+import PlotCard from '@/components/view/information/PlotCard.vue';
 
 export default defineComponent({
+  components: {
+    PlotCard,
+  },
   props: {
     cards: {
       type: Array as PropType<string[]>,
@@ -40,7 +44,8 @@ export default defineComponent({
 }
 
 .card {
-  width: 100px;
+  width: 110px;
+  padding-top: 5px;
   border-radius: 8px;
   cursor: pointer;
   display: flex;

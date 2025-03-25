@@ -35,7 +35,7 @@ const lightTheme = {
     'inset-hover': '#D1D9E0',
   },
   variables: {
-    'icon-invert': 1,
+    'icon-invert': 0,
   },
 };
 
@@ -57,7 +57,7 @@ const darkTheme = {
     'inset-hover': '#2A313C',
   },
   variables: {
-    'icon-invert': 0,
+    'icon-invert': 1,
   },
 };
 
