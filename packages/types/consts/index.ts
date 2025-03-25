@@ -1,4 +1,5 @@
 import type { TGoodRoles, TEvilRoles } from '../game/roles';
+import type { TPlotCardNames } from '../game/addons';
 
 /**
  * The index of the role that displays its importance relative to the rest
@@ -30,4 +31,16 @@ export const goodRolesImportance: { [key in TGoodRoles]: number } = {
   isolde: 11,
   troublemaker: 50,
   servant: 100,
+};
+
+export const availablePlotCards: { [key in TPlotCardNames]: true } = {
+  leadToVictory: true,
+  ambush: true,
+  kingReturns: true,
+  weFoundYou: true,
+  restoreHonor: true,
+  showStrength: true,
+  showNature: true,
+  areYouTheOne: true,
+  charge: true,
 };

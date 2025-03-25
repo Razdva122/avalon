@@ -6,10 +6,10 @@
     {{ $t('startPanel.copyLink') }}
   </v-btn>
   <v-btn color="info" class="mb-4" @click="onDiscordClick">
-    <div class="d-flex align-center discord-button">
-      <div class="discord-icon mr-2"></div>
-      <span>{{ $t('startPanel.discord') }}</span>
-    </div>
+    <template v-slot:prepend>
+      <v-icon class="social-icon mr-1" size="large" icon="fa:fa-brands fa-discord" />
+    </template>
+    {{ $t('startPanel.discord') }}
   </v-btn>
   <v-btn v-if="isUserInGame" color="warning" @click="onJoinClick"> {{ $t('startPanel.leaveGame') }} </v-btn>
   <v-btn
@@ -144,16 +144,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped lang="scss">
-.discord-button {
-  text-decoration: none;
-}
-
-.discord-icon {
-  width: 30px;
-  height: 30px;
-  background-image: getIconPathByName('github.png');
-  background-position: center;
-  background-size: contain;
-}
-</style>
+<style scoped lang="scss"></style>

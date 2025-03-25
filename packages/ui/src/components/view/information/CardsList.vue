@@ -71,9 +71,9 @@ export default defineComponent({
 .card-image {
   width: 100px;
   min-height: 100px;
-  background-image: getImagePathByID('core', 'player-frame');
-  background-position: center;
-  background-size: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(var(--v-theme-text-primary), 0.4);
 }
 
 .card-container {

@@ -9,10 +9,22 @@
     />
     <PlayerIcon v-if="'role' in player" class="role-container" :icon="player.role" />
     <div class="player-crown" alt="crown"></div>
-    <div class="player-actions-features">
-      <img class="lady-of-lake" alt="lady" :src="getImagePathByID('features', 'lady_of_lake')" />
-      <img class="lady-of-sea" alt="ladySea" :src="getImagePathByID('features', 'lady_of_sea')" />
-      <img class="excalibur" alt="excalibur" :src="getImagePathByID('features', 'excalibur')" />
+    <div class="player-actions-features" v-if="'features' in player">
+      <img
+        v-for="addon in ['lady-of-lake', 'lady-of-sea', 'excalibur']"
+        :class="addon"
+        :alt="addon"
+        :src="getImagePathByID('features', toSnakeCase(addon))"
+      />
+      <template v-for="cardName in plotCardsNames">
+        <PlotCard
+          :displayTooltip="true"
+          v-if="player.features[<keyof PlotCardsFeatures>(cardName + 'Card')]"
+          class="plot-card"
+          :class="`plot-card-${player.features[<keyof PlotCardsFeatures>(cardName + 'Card')]}`"
+          :cardName="cardName"
+        />
+      </template>
     </div>
     <i class="material-icons action-icon close text-error"></i>
     <i class="material-icons action-icon check"></i>
@@ -39,17 +51,29 @@ import { defineComponent, PropType, inject, computed, toRefs, ref } from 'vue';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { useUserProfile } from '@/helpers/setup';
-import type { RoomPlayer, THistoryResults, Dictionary, TGameStage, IActionWithResult } from '@avalon/types';
+import type {
+  RoomPlayer,
+  THistoryResults,
+  Dictionary,
+  TGameStage,
+  IActionWithResult,
+  TPlotCardNames,
+  PlotCardsFeatures,
+} from '@avalon/types';
+import { availablePlotCards } from '@avalon/types';
 import type { IFrontendPlayer } from '@/components/view/board/interface';
 import { gameStateKey } from '@/helpers/game-state-manager';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import { getImagePathByID } from '@/helpers/images';
 import Avatar from '@/components/user/Avatar.vue';
+import PlotCard from '@/components/view/information/PlotCard.vue';
+import snakeCase from 'lodash/snakeCase';
 
 export default defineComponent({
   components: {
     PlayerIcon,
     Avatar,
+    PlotCard,
   },
   props: {
     playerState: {
@@ -215,6 +239,12 @@ export default defineComponent({
       return !gameState.value;
     });
 
+    const toSnakeCase = (str: string) => {
+      return snakeCase(str);
+    };
+
+    const plotCardsNames = <TPlotCardNames[]>Object.keys(availablePlotCards);
+
     return {
       userState,
       displayUserAvatar,
@@ -222,6 +252,8 @@ export default defineComponent({
       playerClasses,
       chatMessage,
       getImagePathByID,
+      toSnakeCase,
+      plotCardsNames,
     };
   },
 });
@@ -263,7 +295,18 @@ export default defineComponent({
   border: 2px solid grey;
 }
 
-.player-actions-features > img {
+.plot-card {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  border: 2px solid grey;
+}
+
+.plot-card-active {
+  border-color: rgba(65, 105, 225, 0.8);
+}
+
+.player-actions-features > * {
   margin-right: 2px;
 }
 

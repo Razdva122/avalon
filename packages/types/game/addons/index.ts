@@ -21,6 +21,7 @@ export type {
   PlotCardsAddonData,
   TActiveCardsStages,
   CardsState,
+  ActiveCard,
 } from './plot-cards';
 
 /**

@@ -1,9 +1,20 @@
 <template>
-  <div
-    class="plot-card"
-    :title="$t(`cardsInfo.${cardName}`)"
-    :style="{ backgroundImage: `url(${cardImageUrl})` }"
-  ></div>
+  <div>
+    <v-tooltip :disabled="!displayTooltip" location="top center" origin="auto" no-click-animation>
+      <template v-slot:activator="{ props: tooltip }">
+        <div v-bind="tooltip" class="plot-card" :style="{ backgroundImage: `url(${cardImageUrl})` }"></div>
+      </template>
+
+      <div class="card-info d-flex flex-column justify-center">
+        <div class="card-info-title">
+          {{ $t(`cardsInfo.${cardName}`) }}
+        </div>
+        <div class="card-info-description">
+          {{ $t(`cardsInfo.${cardName}Hint`) }}
+        </div>
+      </div>
+    </v-tooltip>
+  </div>
 </template>
 
 <script lang="ts">
@@ -17,6 +28,10 @@ export default defineComponent({
     cardName: {
       type: String as PropType<TPlotCardNames>,
       required: true,
+    },
+    displayTooltip: {
+      type: Boolean,
+      default: false,
     },
   },
   setup(props) {
@@ -33,9 +48,18 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .plot-card {
-  border-radius: 8px;
+  width: 100%;
+  height: 100%;
   background-size: cover;
   background-position: center;
-  box-shadow: 0 4px 8px rgba(var(--v-theme-text-primary), 0.4);
+}
+
+.card-info-title {
+  text-align: center;
+  font-size: 18px;
+}
+
+.card-info-description {
+  font-size: 12px;
 }
 </style>

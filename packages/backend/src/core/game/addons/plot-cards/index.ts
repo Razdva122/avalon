@@ -72,7 +72,7 @@ export class PlotCardsAddon implements IGameAddon {
             .map((el) => el.name)
             .sort(),
         },
-        activeCards: [],
+        activeCards: this.currentCards.cards.map(({ card, stage }) => ({ stage, name: card.name })),
       },
     };
   }

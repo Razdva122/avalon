@@ -108,6 +108,7 @@ export default defineComponent({
   width: 350px;
   height: 350px;
   border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(var(--v-theme-text-primary), 0.4);
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -124,30 +125,6 @@ export default defineComponent({
   font-size: 24px;
   text-align: center;
   margin-top: 20px;
-}
-
-.icon-type-common,
-.icon-type-special,
-.icon-type-rare {
-  position: absolute;
-  right: 100px;
-  top: 250px;
-  width: 75px;
-  height: 75px;
-  border-radius: 50%;
-  background-size: contain;
-}
-
-.icon-type-common {
-  border: 2px solid rgb(var(--v-theme-info));
-}
-
-.icon-type-special {
-  border: 2px solid rgb(var(--v-theme-warning));
-}
-
-.icon-type-rare {
-  border: 2px solid rgb(var(--v-theme-error));
 }
 
 .cards-container {
