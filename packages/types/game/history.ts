@@ -2,7 +2,7 @@ import { prop, modelOptions, Severity } from '@typegoose/typegoose';
 import { Schema } from 'mongoose';
 
 import type { TMissionResult, MissionSettings } from './mission';
-import { TeamMember } from './vote';
+import { TeamMember, PreVoteData } from './vote';
 import type { TVoteOption } from './vote';
 import type { TAssassinateResult } from './addons';
 import type { TLoyalty, TRoles } from './roles';
@@ -18,7 +18,8 @@ export type THistoryType =
   | 'checkLoyalty'
   | 'switchResult'
   | 'switchLancelots'
-  | 'giveCard';
+  | 'giveCard'
+  | 'preVote';
 
 /**
  * History element stages
@@ -47,7 +48,18 @@ export type THistoryResults =
   | HiddenHistory
   | SwitchLancelots
   | HiddenHistory
-  | GiveCard;
+  | GiveCard
+  | PreVote;
+
+/**
+ * Pre-vote data
+ */
+export class PreVote extends HistoryBase {
+  declare type: 'preVote';
+
+  @prop({ required: true, type: () => [PreVoteData], _id: false })
+  public votes!: PreVoteData[];
+}
 
 /**
  * Result of anonymous voting

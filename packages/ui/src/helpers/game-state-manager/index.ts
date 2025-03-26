@@ -297,6 +297,7 @@ export class GameStateManager {
     return (
       {
         vote: 'votingForTeam',
+        preVote: 'votingForTeam',
         assassinate: 'assassinate',
         checkLoyalty: 'checkLoyalty',
         mission: 'onMission',

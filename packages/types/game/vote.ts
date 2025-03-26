@@ -18,3 +18,14 @@ export class TeamMember {
   @prop()
   public preVote?: TVoteOption;
 }
+
+/**
+ * Pre vote
+ */
+export class PreVoteData {
+  @prop({ required: true })
+  public playerID!: string;
+
+  @prop({ required: true })
+  public value!: TVoteOption;
+}

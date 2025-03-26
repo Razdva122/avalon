@@ -1,4 +1,4 @@
-import type { IVote } from '@/core/game/history/vote';
+import type { IVote, IPreVote } from '@/core/game/history/vote';
 import type { IMissionAction } from '@/core/game/history/mission';
 import type { IPlayerInGame, Game } from '@/core/game';
 import type {
@@ -18,6 +18,7 @@ import type {
   TRoles,
   TGiveCardTarget,
   GiveCard,
+  PreVote,
 } from '@avalon/types';
 
 export type THistoryData = {
@@ -70,6 +71,10 @@ export type THistoryData = {
     leader: IPlayerInGame;
     owner: IPlayerInGame;
   };
+  preVote: {
+    result?: undefined;
+    votes: IPreVote[];
+  };
   hidden: Record<string, never>;
 };
 
@@ -81,6 +86,7 @@ export type THistoryDataForManager = {
   switchResult: SwitchResult;
   switchLancelots: SwitchLancelots;
   giveCard: GiveCard;
+  preVote: PreVote;
 };
 
 export type TDataForManagerOptions = {

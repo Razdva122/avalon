@@ -8,3 +8,8 @@ export interface IVote {
   preVote?: TVoteOption;
   value: TVoteOption | 'unvoted';
 }
+
+export interface IPreVote {
+  player: IPlayerInGame;
+  value: TVoteOption | 'unvoted';
+}
