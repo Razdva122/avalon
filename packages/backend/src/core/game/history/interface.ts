@@ -16,6 +16,8 @@ import type {
   TAssassinateType,
   TeamMember,
   TRoles,
+  TGiveCardTarget,
+  GiveCard,
 } from '@avalon/types';
 
 export type THistoryData = {
@@ -62,6 +64,12 @@ export type THistoryData = {
     result: boolean;
     switches: Array<boolean>;
   };
+  giveCard: {
+    result?: undefined;
+    target: TGiveCardTarget;
+    leader: IPlayerInGame;
+    owner: IPlayerInGame;
+  };
   hidden: Record<string, never>;
 };
 
@@ -72,6 +80,7 @@ export type THistoryDataForManager = {
   checkLoyalty: CheckLoyalty;
   switchResult: SwitchResult;
   switchLancelots: SwitchLancelots;
+  giveCard: GiveCard;
 };
 
 export type TDataForManagerOptions = {

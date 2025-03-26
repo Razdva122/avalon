@@ -29,6 +29,11 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.plot-cards-view {
+  display: flex;
+  gap: 10px;
+}
+
 .plot-card {
   width: 60px;
   height: 60px;

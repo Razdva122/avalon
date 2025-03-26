@@ -303,6 +303,7 @@ export class GameStateManager {
         switchLancelots: 'switchLancelots',
         switchResult: 'useExcalibur',
         hidden: 'hidden',
+        giveCard: 'giveCard',
       } as const
     )[history.type];
   }

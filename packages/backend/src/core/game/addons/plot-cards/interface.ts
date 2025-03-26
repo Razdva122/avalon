@@ -4,28 +4,41 @@ import { Observable } from 'rxjs';
 
 export type TPlotCard = IEffectPlotCard | IUsablePlotCard | IInstantPlotCard;
 
-export interface IEffectPlotCard {
+/**
+ * Base interface for all plot cards with common properties
+ */
+export interface IBasePlotCard {
+  /**
+   * Determines how the card is distributed to players:
+   * - 'select': The lobby leader gives the card to a player at their discretion
+   * - 'self': The card is automatically given to the leader themselves
+   */
+  activate: 'self' | 'select';
+
+  /**
+   * Determines how multiple cards of the same type are played:
+   * - 'single': Each card of this type is played sequentially one after another
+   * - 'multiCard': All cards of this type are played simultaneously
+   */
+  playType: 'single' | 'multiCard';
+
+  game: Game;
+  play(ownerID: string): Observable<boolean>;
+}
+
+export interface IEffectPlotCard extends IBasePlotCard {
   type: 'effect';
-  activate: 'self' | 'select';
   name: TEffectsCardNames;
-  game: Game;
-  play(): Observable<boolean>;
 }
 
-export interface IUsablePlotCard {
+export interface IUsablePlotCard extends IBasePlotCard {
   type: 'usable';
-  activate: 'self' | 'select';
   name: TUsableCardNames;
-  game: Game;
-  play(): Observable<boolean>;
 }
 
-export interface IInstantPlotCard {
+export interface IInstantPlotCard extends IBasePlotCard {
   type: 'instant';
-  activate: 'self' | 'select';
   name: TInstantCardNames;
-  game: Game;
-  play(): Observable<boolean>;
 }
 
 export interface ICurrentCardsState {

@@ -14,4 +14,7 @@ export class TeamMember {
 
   @prop()
   public excalibur?: boolean;
+
+  @prop()
+  public preVote?: TVoteOption;
 }

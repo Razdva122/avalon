@@ -5,5 +5,6 @@ export interface IVote {
   player: IPlayerInGame;
   onMission: boolean;
   excalibur?: boolean;
+  preVote?: TVoteOption;
   value: TVoteOption | 'unvoted';
 }

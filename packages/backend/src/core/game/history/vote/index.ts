@@ -15,16 +15,26 @@ export class Vote implements HistoryElement<'vote'> {
   constructor(players: IPlayerInGame[], leader: IPlayerInGame, index: number, forced?: true) {
     this.stage = 'active';
 
+    const votes = players.map((player) => {
+      const vote = {
+        player,
+        onMission: Boolean(player.features.isSent),
+        value: <TVoteOption>(forced ? 'approve' : 'unvoted'),
+      };
+
+      if (player.features.preVote) {
+        vote.value = player.features.preVote;
+      }
+
+      return vote;
+    });
+
     this.data = {
       leader,
       index,
       forced: Boolean(forced),
       team: players.filter((player) => player.features.isSent).map((el) => ({ id: el.user.id })),
-      votes: players.map((player) => ({
-        player,
-        onMission: Boolean(player.features.isSent),
-        value: forced ? 'approve' : 'unvoted',
-      })),
+      votes,
     };
 
     if (forced) {
@@ -91,6 +101,7 @@ export class Vote implements HistoryElement<'vote'> {
         playerID: el.player.user.id,
         onMission: el.onMission,
         excalibur: el.excalibur,
+        preVote: el.preVote,
         value: <TVoteOption>el.value,
       }));
     }

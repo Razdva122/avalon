@@ -2,6 +2,7 @@ import { prop } from '@typegoose/typegoose';
 
 import type { TVisibleRole } from './roles';
 import type { TMissionResult } from './mission';
+import type { TVoteOption } from './vote';
 import { AddonsFeatures } from './addons';
 
 export class PlayerFeatures extends AddonsFeatures {
@@ -28,6 +29,12 @@ export class PlayerFeatures extends AddonsFeatures {
    */
   @prop()
   waitForAction?: boolean;
+
+  /**
+   * Option if user pre-voted or force voted before voting
+   */
+  @prop()
+  preVote?: TVoteOption;
 }
 
 export class Player {

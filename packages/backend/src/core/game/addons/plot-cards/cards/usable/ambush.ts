@@ -1,4 +1,4 @@
-import { Game } from '@/core/game';
+import { AbstractCard } from '@/core/game/addons/plot-cards/cards/abstract';
 import { IUsablePlotCard } from '@/core/game/addons/plot-cards/interface';
 import { of } from 'rxjs';
 
@@ -13,17 +13,13 @@ import { of } from 'rxjs';
 /**
  * Problems: multi ambush returns in game, duplicate checks unavailable
  */
-export class AmbushCard implements IUsablePlotCard {
+export class AmbushCard extends AbstractCard implements IUsablePlotCard {
   name = <const>'ambush';
   type = <const>'usable';
-  activate: IUsablePlotCard['activate'] = 'select';
-  game: Game;
 
-  constructor(game: Game) {
-    this.game = game;
-  }
-
-  play() {
+  play(ownerID: string) {
+    this.activateCard(ownerID);
+    this.game.stateObserver.gameStateChanged();
     return of(true);
   }
 }

@@ -49,25 +49,25 @@ export class PlotCardsFeatures {
    * Take plot card from another player
    */
   @prop()
-  restoreHonorCard?: 'active';
+  restoreHonorCard?: 'has' | 'active';
 
   /**
    * Leader reveal loyalty to some one
    */
   @prop()
-  showStrengthCard?: 'active';
+  showStrengthCard?: 'has' | 'active';
 
   /**
    * Player reveal loyalty to some one
    */
   @prop()
-  showNatureCard?: 'active';
+  showNatureCard?: 'has' | 'active';
 
   /**
    * Player check loyalty of right or left player
    */
   @prop()
-  areYouTheOneCard?: 'active';
+  areYouTheOneCard?: 'has' | 'active';
 
   /**
    * Player become a leader

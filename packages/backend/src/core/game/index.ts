@@ -406,7 +406,8 @@ export class Game extends GameHooks {
       this.startMission();
     } else {
       this.players.forEach((player) => {
-        player.features.waitForAction = true;
+        player.features.waitForAction = player.features.preVote ? false : true;
+        player.features.preVote = undefined;
       });
 
       this.stage = 'votingForTeam';
@@ -417,8 +418,9 @@ export class Game extends GameHooks {
    * Start mission
    */
   protected startMission(): void {
+    this.history.push(this.vote!);
+
     this.callHooks('beforeStartMission', () => {
-      this.history.push(this.vote!);
       this.currentMission.startMission(this.sentPlayers, this.leader);
       this.stage = 'onMission';
 

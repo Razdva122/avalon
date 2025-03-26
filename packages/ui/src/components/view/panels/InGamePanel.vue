@@ -56,7 +56,7 @@
       {{ $t('inGame.skipWitchAbility') }}
     </v-btn>
   </template>
-  <template v-if="game.stage === 'plotCards' && isUserLeader">
+  <template v-if="game.stage === 'giveCard' && isUserLeader">
     <v-btn color="success" @click="givePlotCard" :disabled="!isGivePlotCardAvailable"> Give card </v-btn>
   </template>
 </template>

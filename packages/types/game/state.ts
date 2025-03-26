@@ -12,6 +12,7 @@ import {
   SwitchLancelots,
   HistoryVoteBase,
   HistoryMissionBase,
+  GiveCard,
 } from './history';
 import type { THistoryResults } from './history';
 import { GameSettingsWithRoles } from './settings';
@@ -66,6 +67,7 @@ export class VisualGameState {
       { type: SwitchResult, value: 'switchResult' },
       { type: HiddenHistory, value: 'hiddenHistory' },
       { type: SwitchLancelots, value: 'switchLancelots' },
+      { type: GiveCard, value: 'giveCard' },
     ],
   })
   public history!: THistoryResults[];

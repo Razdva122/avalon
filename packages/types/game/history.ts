@@ -11,7 +11,14 @@ import type { TAssassinateType } from './addons/assassin';
 /**
  * Possible history element
  */
-export type THistoryType = 'mission' | 'vote' | 'assassinate' | 'checkLoyalty' | 'switchResult' | 'switchLancelots';
+export type THistoryType =
+  | 'mission'
+  | 'vote'
+  | 'assassinate'
+  | 'checkLoyalty'
+  | 'switchResult'
+  | 'switchLancelots'
+  | 'giveCard';
 
 /**
  * History element stages
@@ -39,7 +46,8 @@ export type THistoryResults =
   | SwitchResult
   | HiddenHistory
   | SwitchLancelots
-  | HiddenHistory;
+  | HiddenHistory
+  | GiveCard;
 
 /**
  * Result of anonymous voting
@@ -209,6 +217,21 @@ export class SwitchResult extends HistoryBase {
 
   @prop()
   public result?: TMissionResult;
+}
+
+export type TGiveCardTarget = 'self' | 'player';
+
+export class GiveCard extends HistoryBase {
+  declare type: 'giveCard';
+
+  @prop({ required: true })
+  public target!: TGiveCardTarget;
+
+  @prop({ required: true })
+  public leaderID!: string;
+
+  @prop({ required: true })
+  public ownerID!: string;
 }
 
 /**

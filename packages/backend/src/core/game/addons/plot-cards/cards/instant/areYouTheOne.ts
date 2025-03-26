@@ -1,4 +1,4 @@
-import { Game } from '@/core/game';
+import { AbstractCard } from '@/core/game/addons/plot-cards/cards/abstract';
 import { IInstantPlotCard } from '@/core/game/addons/plot-cards/interface';
 import { of } from 'rxjs';
 
@@ -13,17 +13,13 @@ import { of } from 'rxjs';
 /**
  * Problems: -
  */
-export class AreYouTheOneCard implements IInstantPlotCard {
+export class AreYouTheOneCard extends AbstractCard implements IInstantPlotCard {
   name = <const>'areYouTheOne';
   type = <const>'instant';
-  activate: IInstantPlotCard['activate'] = 'select';
-  game: Game;
 
-  constructor(game: Game) {
-    this.game = game;
-  }
-
-  play() {
+  play(ownerID: string) {
+    this.activateCard(ownerID);
+    this.game.stateObserver.gameStateChanged();
     return of(true);
   }
 }

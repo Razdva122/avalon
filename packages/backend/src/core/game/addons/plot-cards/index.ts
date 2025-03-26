@@ -1,5 +1,5 @@
 import { IGameAddon } from '@/core/game/addons/interface';
-import { Observable, of, concatMap, from, takeWhile, last, defaultIfEmpty, Subject } from 'rxjs';
+import { Observable, of, concatMap, from, takeWhile, last, defaultIfEmpty, Subject, tap, take, finalize } from 'rxjs';
 import * as _ from 'lodash';
 import { Game } from '@/core/game';
 import { Dictionary, AddonsData, PlotCardsFeatures } from '@avalon/types';
@@ -16,6 +16,8 @@ import {
   WeFoundYouCard,
   ShowStrengthCard,
 } from '@/core/game/addons/plot-cards/cards';
+
+import { GiveCardHistory } from '@/core/game/addons/plot-cards/history';
 
 export class PlotCardsAddon implements IGameAddon {
   addonName = 'plotCards';
@@ -40,7 +42,7 @@ export class PlotCardsAddon implements IGameAddon {
       ChargeCard,
     ];
 
-    if (this.game.players.length > 6) {
+    if (this.game.players.length > 1) {
       cards.push(
         ...[
           KingReturnsCard,
@@ -54,7 +56,7 @@ export class PlotCardsAddon implements IGameAddon {
         ],
       );
 
-      this.cardsPerRound = this.game.players.length > 8 ? 3 : 2;
+      this.cardsPerRound = this.game.players.length > 1 ? 3 : 2;
     } else {
       this.cardsPerRound = 1;
     }
@@ -82,7 +84,7 @@ export class PlotCardsAddon implements IGameAddon {
   }
 
   afterInit() {
-    this.game.selectAvailable.plotCards = (player) => player.features.isLeader === true;
+    this.game.selectAvailable.giveCard = (player) => player.features.isLeader === true;
 
     return of(true);
   }
@@ -94,19 +96,13 @@ export class PlotCardsAddon implements IGameAddon {
       cards: this.cards.slice(this.pointer, newPointer).map((card) => ({ stage: 'pending', card })),
     };
     this.pointer = newPointer;
-    this.game.stage = 'plotCards';
-    this.game.stateObserver.gameStateChanged();
 
     return from(this.currentCards.cards).pipe(
       concatMap((data, index) => {
-        if (index !== 0) {
-          this.currentCardState.stage === 'used';
-          this.game.stateObserver.gameStateChanged();
-        }
-
         this.currentCards.pointer = index;
 
         return this.waitForGiveCard().pipe(
+          take(1),
           concatMap(() => {
             if (data.card.type === 'instant') {
               this.currentCardState.stage = 'active';
@@ -116,6 +112,10 @@ export class PlotCardsAddon implements IGameAddon {
 
             return of(true);
           }),
+          finalize(() => {
+            this.currentCardState.stage = 'used';
+            this.game.stateObserver.gameStateChanged();
+          }),
         );
       }),
       last(),
@@ -124,16 +124,22 @@ export class PlotCardsAddon implements IGameAddon {
 
   waitForGiveCard() {
     this.currentCardState.stage = 'selectionInProgress';
+    this.game.stage = 'giveCard';
 
     if (this.currentCardState.card.activate === 'self') {
-      this.cardsInGame.push({ card: this.currentCardState.card, ownerID: this.game.leader.user.id });
+      this.addCardInGame(this.game.leader.user.id);
+
+      const giveCardHistory = new GiveCardHistory({ leader: this.game.leader, target: 'self' });
+      this.game.history.push(giveCardHistory);
+      this.game.stateObserver.gameStateChanged();
+
       return of(true);
     }
 
     this.game.leader.features.waitForAction = true;
     this.game.stateObserver.gameStateChanged();
 
-    return this.giveCardSubject;
+    return this.giveCardSubject.asObservable();
   }
 
   giveCardToPlayer(userID: string) {
@@ -159,8 +165,20 @@ export class PlotCardsAddon implements IGameAddon {
       throw new Error('Selected player already have this plot card');
     }
 
-    this.cardsInGame.push({ card: this.currentCardState.card, ownerID: selectedPlayer.user.id });
+    this.addCardInGame(selectedPlayer.user.id);
+    const giveCardHistory = new GiveCardHistory({ leader: this.game.leader, target: 'player', owner: selectedPlayer });
+    this.game.history.push(giveCardHistory);
+    this.game.clearSelectedPlayers();
+    this.game.leader.features.waitForAction = false;
+    this.game.stateObserver.gameStateChanged();
+
     this.giveCardSubject.next(true);
+  }
+
+  addCardInGame(ownerID: string) {
+    this.cardsInGame.push({ card: this.currentCardState.card, ownerID });
+    this.game.findPlayerByID(ownerID).features[<keyof PlotCardsFeatures>(this.currentCardState.card.name + 'Card')] =
+      'has';
   }
 
   beforeStartMission() {
@@ -184,7 +202,11 @@ export class PlotCardsAddon implements IGameAddon {
   }
 
   playCardIfExist(name: TPlotCard['name']): Observable<boolean> {
-    const cards = this.cardsInGame.filter(({ card }) => card.name === name);
+    let cards = this.cardsInGame.filter(({ card }) => card.name === name);
+
+    if (cards.length && cards[0].card.playType === 'single') {
+      cards = [cards[0]];
+    }
 
     if (cards.length > 1) {
       const playerOrder: Dictionary<number> = {};
@@ -205,7 +227,15 @@ export class PlotCardsAddon implements IGameAddon {
     }
 
     return from(cards).pipe(
-      concatMap(({ card }) => card.play()),
+      concatMap((cardState) => {
+        return cardState.card.play(cardState.ownerID).pipe(
+          tap(() => {
+            if (cardState.card.type !== 'effect') {
+              this.cardsInGame = this.cardsInGame.filter((item) => item !== cardState);
+            }
+          }),
+        );
+      }),
       takeWhile((result) => result === true, true),
       defaultIfEmpty(true),
       last(),

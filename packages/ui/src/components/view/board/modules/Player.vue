@@ -299,6 +299,7 @@ export default defineComponent({
   height: 30px;
   width: 30px;
   border-radius: 50%;
+  overflow: hidden;
   border: 2px solid grey;
 }
 
