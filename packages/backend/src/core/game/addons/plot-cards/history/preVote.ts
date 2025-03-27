@@ -24,10 +24,6 @@ export class PreVote implements HistoryElement<'preVote'> {
     };
   }
 
-  /**
-   * Make vote by player
-   * @returns true if vote is completed
-   */
   makeVote(player: IPlayerInGame, option: TVoteOption): boolean {
     const vote = this.data.votes.find((el) => el.player === player);
 
@@ -43,7 +39,6 @@ export class PreVote implements HistoryElement<'preVote'> {
     player.features.preVote = option;
     vote.value = option;
 
-    // Check if all players have voted
     if (this.data.votes.every((vote) => vote.value !== 'unvoted')) {
       this.stage = 'finished';
 

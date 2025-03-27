@@ -3,6 +3,7 @@ import type { User } from '@/user';
 import type { TRoomState, TGameMethodsParams, TGetLoyaltyData } from '@/core/game-manager/interface';
 import { eventBus } from '@/helpers';
 import { Mission } from '@/core/game/history/mission';
+import { isChargeCard } from '@/core/game/addons/plot-cards';
 
 import * as _ from 'lodash';
 
@@ -263,6 +264,25 @@ export class GameManager {
 
         this.game.addons.plotCards.giveCardToPlayer(userID);
         break;
+      }
+
+      case 'preVote': {
+        if (!this.game.addons.plotCards) {
+          throw new Error('You cant pre-vote in game without plot cards addon');
+        }
+
+        const activeCard = this.game.addons.plotCards.activeCard;
+
+        if (!activeCard) {
+          throw new Error('No active card to vote for');
+        }
+
+        if (isChargeCard(activeCard)) {
+          activeCard.makeVote(userID, params.option);
+          break;
+        }
+
+        throw new Error(`Active card ${activeCard.name} does not support pre-voting`);
       }
     }
   }

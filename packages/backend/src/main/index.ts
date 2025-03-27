@@ -515,6 +515,11 @@ export class Manager {
       console.log(`Player ${userName} givePlotCard in game ${uuid}`);
       getRoomManager(uuid).callGameMethods(userID, { method: 'givePlotCard' });
     });
+
+    socket.on('preVote', (uuid, option) => {
+      console.log(`Player ${userName} preVote (${option}) in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'preVote', option });
+    });
   }
 
   updateOnlineCounter(id: string, diff: -1 | 1): void {

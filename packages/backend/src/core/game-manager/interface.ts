@@ -28,7 +28,8 @@ export type TGameMethodsParams =
   | TGiveExcaliburParams
   | TUseExcaliburParams
   | TWitchAbilityParams
-  | TGivePlotCardParams;
+  | TGivePlotCardParams
+  | TPreVoteParams;
 
 export type TSelectPlayerParams = {
   method: 'selectPlayer';
@@ -80,6 +81,11 @@ export type TUseExcaliburParams = {
 
 export type TGivePlotCardParams = {
   method: 'givePlotCard';
+};
+
+export type TPreVoteParams = {
+  method: 'preVote';
+  option: TVoteOption;
 };
 
 export type TGetLoyaltyData = {

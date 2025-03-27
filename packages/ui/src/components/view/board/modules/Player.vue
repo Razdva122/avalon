@@ -134,6 +134,15 @@ export default defineComponent({
           }
         }
 
+        if (visibleHistory.value?.type === 'preVote') {
+          clone.features.waitForAction = false;
+          const userVote = visibleHistory.value.votes.find((player) => player.playerID === clone.id);
+
+          if (userVote) {
+            clone.features.vote = userVote.value;
+          }
+        }
+
         if (visibleHistory.value?.type === 'switchLancelots') {
           clone.features.waitForAction = false;
           clone.features.isSelected = false;

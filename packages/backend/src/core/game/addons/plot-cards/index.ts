@@ -19,6 +19,8 @@ import {
 
 import { GiveCardHistory } from '@/core/game/addons/plot-cards/history';
 
+export * from '@/core/game/addons/plot-cards/helpers';
+
 export class PlotCardsAddon implements IGameAddon {
   addonName = 'plotCards';
   cardsPerRound: number;
@@ -27,6 +29,7 @@ export class PlotCardsAddon implements IGameAddon {
   pointer: number = 0;
   currentCards: ICurrentCardsState = { cards: [], pointer: 0 };
   cardsInGame: { ownerID: string; card: TPlotCard }[] = [];
+  activeCard: TPlotCard | undefined;
   giveCardSubject: Subject<true> = new Subject();
 
   constructor(game: Game) {
@@ -85,6 +88,7 @@ export class PlotCardsAddon implements IGameAddon {
 
   afterInit() {
     this.game.selectAvailable.giveCard = (player) => player.features.isLeader === true;
+    this.game.selectAvailable.preVote = (player) => player.features.waitForAction === true;
 
     return of(true);
   }
@@ -228,8 +232,11 @@ export class PlotCardsAddon implements IGameAddon {
 
     return from(cards).pipe(
       concatMap((cardState) => {
+        this.activeCard = cardState.card;
         return cardState.card.play(cardState.ownerID).pipe(
           tap(() => {
+            this.activeCard = undefined;
+
             if (cardState.card.type !== 'effect') {
               this.cardsInGame = this.cardsInGame.filter((item) => item !== cardState);
             }

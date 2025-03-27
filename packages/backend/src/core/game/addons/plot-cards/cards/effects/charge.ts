@@ -3,7 +3,6 @@ import { IEffectPlotCard } from '@/core/game/addons/plot-cards/interface';
 import { of, Subject } from 'rxjs';
 import { PreVote } from '@/core/game/addons/plot-cards/history/preVote';
 import { TVoteOption } from '@avalon/types';
-import { IPlayerInGame } from '@/core/game';
 
 /**
  * activate -> leader give card to some one
@@ -41,9 +40,15 @@ export class ChargeCard extends AbstractCard implements IEffectPlotCard {
     return this.preVoteSubject.asObservable();
   }
 
-  makeVote(player: IPlayerInGame, option: TVoteOption): boolean {
+  makeVote(playerID: string, option: TVoteOption): boolean {
     if (!this.preVote) {
       throw new Error('No pre-vote in progress');
+    }
+
+    const player = this.game.findPlayerByID(playerID);
+
+    if (!player) {
+      throw new Error(`Player with ID ${playerID} not found`);
     }
 
     const allVoted = this.preVote.makeVote(player, option);

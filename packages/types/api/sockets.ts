@@ -108,6 +108,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents {
 
   useWitchAbility: (uuid: string, result: boolean) => void;
   givePlotCard: (uuid: string) => void;
+  preVote: (uuid: string, option: TVoteOption) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;
