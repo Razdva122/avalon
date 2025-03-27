@@ -44,7 +44,8 @@ export const en = {
     'check loyalty': 'check loyalty',
     'witch loyalty': 'witch loyalty',
     'announce loyalty': 'announce loyalty',
-    'plot cards': 'plot cards',
+    'give card': 'give card',
+    'lead to victory': 'lead to victory',
     end: 'end',
     lancelots: 'lancelots',
     witch: 'witch',
@@ -233,6 +234,9 @@ export const en = {
     useExcalibur: 'Use excalibur',
     useWitchAbility: 'Hide mission',
     skipWitchAbility: 'Skip',
+    giveCard: 'Give card',
+    takeLead: 'Take lead',
+    skip: 'Skip',
   },
   assassinate: {
     lovers: 'Lovers',
@@ -240,6 +244,16 @@ export const en = {
     shot: '{killerName} assassinate {killedName}',
     shotResultHit: '{killedName} is {roleName}',
     shotResultMiss: '{killedName} is not {roleName}',
+  },
+  giveCard: {
+    toPlayer: '<b>{leaderName}</b> gave the card «{cardName}» to <b>{cardOwner}</b>',
+    toSelf: '<b>{leaderName}</b> received the card «{cardName}» himself',
+  },
+  leadToVictory: {
+    history: '<b>{cardOwner}</b> used the card «{cardName}» and took the lead from <b>{prevLeaderName}</b>',
+  },
+  preVote: {
+    title: 'Preliminary voting',
   },
   rolesInfo: {
     roles: 'Roles',

@@ -35,7 +35,7 @@ export class PlotCardsAddon implements IGameAddon {
   constructor(game: Game) {
     this.game = game;
 
-    const cards: Array<new (game: Game) => TPlotCard> = [
+    const cards: Array<new (game: Game, addon: this) => TPlotCard> = [
       LeadToVictoryCard,
       LeadToVictoryCard,
       AmbushCard,
@@ -64,7 +64,7 @@ export class PlotCardsAddon implements IGameAddon {
       this.cardsPerRound = 1;
     }
 
-    this.cards = _.shuffle(cards.map((el) => new el(game)));
+    this.cards = _.shuffle(cards.map((el) => new el(game, this)));
   }
 
   get addonData(): AddonsData {
@@ -122,6 +122,9 @@ export class PlotCardsAddon implements IGameAddon {
           }),
         );
       }),
+      finalize(() => {
+        this.currentCards = { pointer: 0, cards: [] };
+      }),
       last(),
     );
   }
@@ -133,7 +136,11 @@ export class PlotCardsAddon implements IGameAddon {
     if (this.currentCardState.card.activate === 'self') {
       this.addCardInGame(this.game.leader.user.id);
 
-      const giveCardHistory = new GiveCardHistory({ leader: this.game.leader, target: 'self' });
+      const giveCardHistory = new GiveCardHistory({
+        leader: this.game.leader,
+        target: 'self',
+        cardName: this.currentCardState.card.name,
+      });
       this.game.history.push(giveCardHistory);
       this.game.stateObserver.gameStateChanged();
 
@@ -170,7 +177,12 @@ export class PlotCardsAddon implements IGameAddon {
     }
 
     this.addCardInGame(selectedPlayer.user.id);
-    const giveCardHistory = new GiveCardHistory({ leader: this.game.leader, target: 'player', owner: selectedPlayer });
+    const giveCardHistory = new GiveCardHistory({
+      leader: this.game.leader,
+      target: 'player',
+      owner: selectedPlayer,
+      cardName: this.currentCardState.card.name,
+    });
     this.game.history.push(giveCardHistory);
     this.game.clearSelectedPlayers();
     this.game.leader.features.waitForAction = false;
@@ -183,6 +195,15 @@ export class PlotCardsAddon implements IGameAddon {
     this.cardsInGame.push({ card: this.currentCardState.card, ownerID });
     this.game.findPlayerByID(ownerID).features[<keyof PlotCardsFeatures>(this.currentCardState.card.name + 'Card')] =
       'has';
+  }
+
+  removeCardFromGame(card: TPlotCard) {
+    const state = this.cardsInGame.find((el) => el.card === card);
+
+    if (state) {
+      this.cardsInGame = this.cardsInGame.filter((el) => el.card !== card);
+      this.game.findPlayerByID(state.ownerID).features[<keyof PlotCardsFeatures>(state.card.name + 'Card')] = undefined;
+    }
   }
 
   beforeStartMission() {
@@ -236,10 +257,6 @@ export class PlotCardsAddon implements IGameAddon {
         return cardState.card.play(cardState.ownerID).pipe(
           tap(() => {
             this.activeCard = undefined;
-
-            if (cardState.card.type !== 'effect') {
-              this.cardsInGame = this.cardsInGame.filter((item) => item !== cardState);
-            }
           }),
         );
       }),

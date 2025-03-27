@@ -305,6 +305,7 @@ export class GameStateManager {
         switchResult: 'useExcalibur',
         hidden: 'hidden',
         giveCard: 'giveCard',
+        leadToVictory: 'leadToVictory',
       } as const
     )[history.type];
   }

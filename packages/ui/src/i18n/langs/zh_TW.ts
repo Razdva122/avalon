@@ -44,7 +44,8 @@ export const zh_TW = {
     'check loyalty': '檢查忠誠度',
     'witch loyalty': '女巫的忠誠',
     'announce loyalty': '宣布忠誠',
-    'plot cards': '情節卡',
+    'give card': '給卡',
+    'lead to victory': '引領勝利',
     witch: '巫婆',
     end: '完結',
     lancelots: '蘭斯洛特',
@@ -225,6 +226,9 @@ export const zh_TW = {
     useExcalibur: '使用神劍',
     useWitchAbility: '隱藏任務',
     skipWitchAbility: '跳過',
+    giveCard: '給卡',
+    takeLead: '成為領袖',
+    skip: '跳過',
   },
   assassinate: {
     lovers: '戀人',
@@ -232,6 +236,16 @@ export const zh_TW = {
     shot: '{killerName} 暗殺 {killedName}',
     shotResultHit: '{killedName} 是 {roleName}',
     shotResultMiss: '{killedName} 不是 {roleName}',
+  },
+  giveCard: {
+    toPlayer: '<b>{leaderName}</b> 將卡牌 «{cardName}» 給了 <b>{cardOwner}</b>',
+    toSelf: '<b>{leaderName}</b> 自己收到了卡牌 «{cardName}»',
+  },
+  leadToVictory: {
+    history: '<b>{cardOwner}</b> 使用了卡牌 «{cardName}» 並從 <b>{prevLeaderName}</b> 接過了領導權',
+  },
+  preVote: {
+    title: '初步投票',
   },
   rolesInfo: {
     roles: '角色',

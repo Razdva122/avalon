@@ -51,11 +51,11 @@ export class ChargeCard extends AbstractCard implements IEffectPlotCard {
       throw new Error(`Player with ID ${playerID} not found`);
     }
 
+    player.features.chargeCard = 'has';
     const allVoted = this.preVote.makeVote(player, option);
 
     if (allVoted) {
       this.game.history.push(this.preVote);
-      this.game.stateObserver.gameStateChanged();
       this.preVoteSubject.next(true);
     }
 

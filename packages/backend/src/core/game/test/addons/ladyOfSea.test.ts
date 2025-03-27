@@ -1,5 +1,4 @@
 import { generateNewGame } from '@/core/game/test/const';
-import * as _ from 'lodash';
 
 let { game, gameHelper } = generateNewGame();
 

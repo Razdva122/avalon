@@ -1,9 +1,11 @@
 import { Game } from '@/core/game';
 import { TPlotCardNames, PlotCardsFeatures } from '@avalon/types';
+import { PlotCardsAddon } from '@/core/game/addons/plot-cards';
 
 export abstract class AbstractCard {
   abstract name: TPlotCardNames;
   game: Game;
+  plotCardsAddon: PlotCardsAddon;
 
   /**
    * Determines how the card is distributed to players:
@@ -19,8 +21,9 @@ export abstract class AbstractCard {
    */
   playType: 'single' | 'multiCard' = 'multiCard';
 
-  constructor(game: Game) {
+  constructor(game: Game, plotCardsAddon: PlotCardsAddon) {
     this.game = game;
+    this.plotCardsAddon = plotCardsAddon;
   }
 
   activateCard(ownerID: string) {

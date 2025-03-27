@@ -44,7 +44,8 @@ export const ru = {
     'check loyalty': 'проверка верности',
     'witch loyalty': 'верность ведьмы',
     'announce loyalty': 'объявить верность',
-    'plot cards': 'cюжетные карты',
+    'give card': 'передать карту',
+    'lead to victory': 'привести к победе',
     witch: 'ведьма',
     end: 'конец',
     lancelots: 'ланселоты',
@@ -225,6 +226,9 @@ export const ru = {
     useExcalibur: 'Применить Экскалибур',
     useWitchAbility: 'Скрыть поход',
     skipWitchAbility: 'Пропустить',
+    giveCard: 'Передать карту',
+    takeLead: 'Взять лидерство',
+    skip: 'Пропустить',
   },
   assassinate: {
     lovers: 'Любовники',
@@ -232,6 +236,16 @@ export const ru = {
     shot: '{killerName} убил {killedName}',
     shotResultHit: '{killedName} был {roleName}',
     shotResultMiss: '{killedName} не был {roleName}',
+  },
+  giveCard: {
+    toPlayer: '<b>{leaderName}</b> передал карту «{cardName}» игроку <b>{cardOwner}</b>',
+    toSelf: '<b>{leaderName}</b> получил карту «{cardName}» себе',
+  },
+  leadToVictory: {
+    history: '<b>{cardOwner}</b> использовал карту «{cardName}» и забрал лидерство у <b>{prevLeaderName}</b>',
+  },
+  preVote: {
+    title: 'Предварительное голосование',
   },
   rolesInfo: {
     roles: 'Роли',

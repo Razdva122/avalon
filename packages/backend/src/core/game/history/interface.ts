@@ -19,6 +19,8 @@ import type {
   TGiveCardTarget,
   GiveCard,
   PreVote,
+  TPlotCardNames,
+  LeadToVictory,
 } from '@avalon/types';
 
 export type THistoryData = {
@@ -66,6 +68,7 @@ export type THistoryData = {
     switches: Array<boolean>;
   };
   giveCard: {
+    cardName: TPlotCardNames;
     result?: undefined;
     target: TGiveCardTarget;
     leader: IPlayerInGame;
@@ -74,6 +77,11 @@ export type THistoryData = {
   preVote: {
     result?: undefined;
     votes: IPreVote[];
+  };
+  leadToVictory: {
+    result?: undefined;
+    prevLeader: IPlayerInGame;
+    owner: IPlayerInGame;
   };
   hidden: Record<string, never>;
 };
@@ -87,6 +95,7 @@ export type THistoryDataForManager = {
   switchLancelots: SwitchLancelots;
   giveCard: GiveCard;
   preVote: PreVote;
+  leadToVictory: LeadToVictory;
 };
 
 export type TDataForManagerOptions = {

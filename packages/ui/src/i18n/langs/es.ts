@@ -44,7 +44,8 @@ export const es = {
     'check loyalty': 'verificar lealtad',
     'witch loyalty': 'lealtad de la bruja',
     'announce loyalty': 'anunciar lealtad',
-    'plot cards': 'cartas de trama',
+    'give card': 'dar carta',
+    'lead to victory': 'liderar hacia la victoria',
     end: 'fin',
     lancelots: 'lancelotes',
     witch: 'bruja',
@@ -225,6 +226,9 @@ export const es = {
     useExcalibur: 'Usar Excalibur',
     useWitchAbility: 'Ocultar misión',
     skipWitchAbility: 'Omitir',
+    giveCard: 'Dar carta',
+    takeLead: 'Tomar liderazgo',
+    skip: 'Omitir',
   },
   assassinate: {
     lovers: 'Amantes',
@@ -232,6 +236,16 @@ export const es = {
     shot: '{killerName} asesina a {killedName}',
     shotResultHit: '{killedName} es {roleName}',
     shotResultMiss: '{killedName} no es {roleName}',
+  },
+  giveCard: {
+    toPlayer: '<b>{leaderName}</b> dio la carta «{cardName}» a <b>{cardOwner}</b>',
+    toSelf: '<b>{leaderName}</b> se dio la carta «{cardName}» a sí mismo',
+  },
+  leadToVictory: {
+    history: '<b>{cardOwner}</b> usó la carta «{cardName}» y tomó el liderazgo de <b>{prevLeaderName}</b>',
+  },
+  preVote: {
+    title: 'Votación preliminar',
   },
   rolesInfo: {
     roles: 'Roles',

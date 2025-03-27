@@ -29,7 +29,7 @@ export class GameHooks {
     );
   }
 
-  callHooks(hookNameOrNames: THookNames | THookNames[], cb?: Function): void {
+  callHooks(hookNameOrNames: THookNames | THookNames[], cb?: () => void): void {
     const hooks = Array.isArray(hookNameOrNames) ? hookNameOrNames : [hookNameOrNames];
 
     from(hooks)

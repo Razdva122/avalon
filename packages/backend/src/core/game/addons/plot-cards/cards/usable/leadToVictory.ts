@@ -1,13 +1,11 @@
 import { AbstractCard } from '@/core/game/addons/plot-cards/cards/abstract';
 import { IUsablePlotCard } from '@/core/game/addons/plot-cards/interface';
-import { of } from 'rxjs';
+import { Subject, of } from 'rxjs';
 
 /**
  * activate -> leader give card to some one
  * use -> player become leader
  * effect -> before every team selection player can use or skip
- *
- * observable false if used
  */
 
 /**
@@ -16,10 +14,30 @@ import { of } from 'rxjs';
 export class LeadToVictoryCard extends AbstractCard implements IUsablePlotCard {
   name = <const>'leadToVictory';
   type = <const>'usable';
+  leadToVictorySubject: Subject<true> = new Subject();
 
   play(ownerID: string) {
+    if (ownerID === this.game.leader.user.id) {
+      return of(true);
+    }
+
     this.activateCard(ownerID);
+    this.game.stage = 'leadToVictory';
     this.game.stateObserver.gameStateChanged();
-    return of(true);
+    return this.leadToVictorySubject.asObservable();
+  }
+
+  leadToVictory(playerID: string, use: boolean) {
+    const player = this.game.findPlayerByID(playerID);
+    player.features.waitForAction = false;
+    player.features.leadToVictoryCard = 'has';
+
+    if (use) {
+      this.game.leader = player;
+      this.plotCardsAddon.removeCardFromGame(this);
+      this.game.stateObserver.gameStateChanged();
+    }
+
+    this.leadToVictorySubject.next(true);
   }
 }

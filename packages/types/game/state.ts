@@ -14,6 +14,7 @@ import {
   HistoryMissionBase,
   GiveCard,
   PreVote,
+  LeadToVictory,
 } from './history';
 import type { THistoryResults } from './history';
 import { GameSettingsWithRoles } from './settings';
@@ -70,6 +71,7 @@ export class VisualGameState {
       { type: SwitchLancelots, value: 'switchLancelots' },
       { type: GiveCard, value: 'giveCard' },
       { type: PreVote, value: 'preVote' },
+      { type: LeadToVictory, value: 'leadToVictory' },
     ],
   })
   public history!: THistoryResults[];

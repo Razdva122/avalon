@@ -204,7 +204,9 @@ export default defineComponent({
         announceLoyalty: 'announce loyalty',
         hidden: 'hidden',
         witchAbility: 'witch',
-        giveCard: 'plot cards',
+        giveCard: 'give card',
+        preVote: 'voting',
+        leadToVictory: 'lead to victory',
       }[gameState.value.stage];
     });
 

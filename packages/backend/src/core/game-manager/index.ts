@@ -3,7 +3,7 @@ import type { User } from '@/user';
 import type { TRoomState, TGameMethodsParams, TGetLoyaltyData } from '@/core/game-manager/interface';
 import { eventBus } from '@/helpers';
 import { Mission } from '@/core/game/history/mission';
-import { isChargeCard } from '@/core/game/addons/plot-cards';
+import { isChargeCard, isLeadToVictoryCard } from '@/core/game/addons/plot-cards';
 
 import * as _ from 'lodash';
 
@@ -283,6 +283,25 @@ export class GameManager {
         }
 
         throw new Error(`Active card ${activeCard.name} does not support pre-voting`);
+      }
+
+      case 'useLeadToVictory': {
+        if (!this.game.addons.plotCards) {
+          throw new Error('You cant use lead to victory in game without plot cards addon');
+        }
+
+        const activeCard = this.game.addons.plotCards.activeCard;
+
+        if (!activeCard) {
+          throw new Error('No active card');
+        }
+
+        if (isLeadToVictoryCard(activeCard)) {
+          activeCard.leadToVictory(userID, params.use);
+          break;
+        }
+
+        throw new Error(`Active card ${activeCard.name} is not lead to victory`);
       }
     }
   }

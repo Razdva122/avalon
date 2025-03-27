@@ -520,6 +520,11 @@ export class Manager {
       console.log(`Player ${userName} preVote (${option}) in game ${uuid}`);
       getRoomManager(uuid).callGameMethods(userID, { method: 'preVote', option });
     });
+
+    socket.on('useLeadToVictory', (uuid, use) => {
+      console.log(`Player ${userName} useLeadToVictory (used: ${use}) in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'useLeadToVictory', use });
+    });
   }
 
   updateOnlineCounter(id: string, diff: -1 | 1): void {

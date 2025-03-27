@@ -4,7 +4,7 @@ import { Schema } from 'mongoose';
 import type { TMissionResult, MissionSettings } from './mission';
 import { TeamMember, PreVoteData } from './vote';
 import type { TVoteOption } from './vote';
-import type { TAssassinateResult } from './addons';
+import type { TAssassinateResult, TPlotCardNames } from './addons';
 import type { TLoyalty, TRoles } from './roles';
 import type { TAssassinateType } from './addons/assassin';
 
@@ -19,7 +19,8 @@ export type THistoryType =
   | 'switchResult'
   | 'switchLancelots'
   | 'giveCard'
-  | 'preVote';
+  | 'preVote'
+  | 'leadToVictory';
 
 /**
  * History element stages
@@ -49,7 +50,8 @@ export type THistoryResults =
   | SwitchLancelots
   | HiddenHistory
   | GiveCard
-  | PreVote;
+  | PreVote
+  | LeadToVictory;
 
 /**
  * Pre-vote data
@@ -233,6 +235,9 @@ export class SwitchResult extends HistoryBase {
 
 export type TGiveCardTarget = 'self' | 'player';
 
+/**
+ * Activating the plot map
+ */
 export class GiveCard extends HistoryBase {
   declare type: 'giveCard';
 
@@ -241,6 +246,22 @@ export class GiveCard extends HistoryBase {
 
   @prop({ required: true })
   public leaderID!: string;
+
+  @prop({ required: true })
+  public ownerID!: string;
+
+  @prop({ required: true })
+  public cardName!: TPlotCardNames;
+}
+
+/**
+ * Play Lead To Victory card
+ */
+export class LeadToVictory extends HistoryBase {
+  declare type: 'leadToVictory';
+
+  @prop({ required: true })
+  public prevLeaderID!: string;
 
   @prop({ required: true })
   public ownerID!: string;

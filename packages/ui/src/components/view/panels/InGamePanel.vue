@@ -4,7 +4,7 @@
       {{ $t('inGame.sendTeam') }}
     </v-btn>
   </template>
-  <template v-if="game.stage === 'votingForTeam'">
+  <template v-if="game.stage === 'votingForTeam' || (game.stage === 'preVote' && isPlayerActive)">
     <v-btn color="success" :disabled="!isPlayerActive" @click="() => onVoteClick('approve')" class="mb-2">
       {{ $t('inGame.approve') }}
     </v-btn>
@@ -57,7 +57,17 @@
     </v-btn>
   </template>
   <template v-if="game.stage === 'giveCard' && isUserLeader">
-    <v-btn color="success" @click="givePlotCard" :disabled="!isGivePlotCardAvailable"> Give card </v-btn>
+    <v-btn color="success" @click="givePlotCard" :disabled="!isGivePlotCardAvailable">
+      {{ $t('inGame.giveCard') }}
+    </v-btn>
+  </template>
+  <template v-if="game.stage === 'leadToVictory' && isPlayerActive">
+    <v-btn color="success" @click="() => leadToVictoryClick(true)" class="mb-2">
+      {{ $t('inGame.takeLead') }}
+    </v-btn>
+    <v-btn color="warning" @click="() => leadToVictoryClick(false)">
+      {{ $t('inGame.skip') }}
+    </v-btn>
   </template>
 </template>
 
@@ -194,7 +204,7 @@ export default defineComponent({
     });
 
     const onVoteClick = (option: TVoteOption) => {
-      socket.emit('voteForMission', game.value.uuid, option);
+      socket.emit(game.value.stage === 'preVote' ? 'preVote' : 'voteForMission', game.value.uuid, option);
     };
 
     const onMissionClick = (result: TMissionResult) => {
@@ -215,6 +225,10 @@ export default defineComponent({
 
     const givePlotCard = () => {
       socket.emit('givePlotCard', game.value.uuid);
+    };
+
+    const leadToVictoryClick = (use: boolean) => {
+      socket.emit('useLeadToVictory', game.value.uuid, use);
     };
 
     return {
@@ -242,6 +256,7 @@ export default defineComponent({
       emitClick,
       witchAbilityClick,
       givePlotCard,
+      leadToVictoryClick,
     };
   },
 });

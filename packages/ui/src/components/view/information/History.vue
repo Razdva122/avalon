@@ -28,6 +28,9 @@ import CheckLoyalty from '@/components/view/information/history/CheckLoyalty.vue
 import Vote from '@/components/view/information/history/Vote.vue';
 import Assassinate from '@/components/view/information/history/Assassinate.vue';
 import Mission from '@/components/view/information/history/Mission.vue';
+import GiveCard from '@/components/view/information/history/GiveCard.vue';
+import PreVote from '@/components/view/information/history/PreVote.vue';
+import LeadToVictory from '@/components/view/information/history/LeadToVictory.vue';
 
 export default defineComponent({
   components: {
@@ -37,6 +40,9 @@ export default defineComponent({
     Vote,
     Assassinate,
     Mission,
+    GiveCard,
+    PreVote,
+    LeadToVictory,
   },
   props: {
     history: {
