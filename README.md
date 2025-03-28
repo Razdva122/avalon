@@ -45,18 +45,18 @@ The project includes a comprehensive Memory Bank - a structured documentation th
 
 ### Memory Bank Structure
 
-- [Memory Bank Index](memory-bank-index.md) - Main entry point with links to all sections
-- [General Project Information](memory-bank.md) - Overview of the project architecture and key concepts
-- [Database Structure](memory-bank-db.md) - Information about database models and interactions
-- [Game Logic](memory-bank-game.md) - Details about game mechanics, roles, and addons
-- [Frontend Architecture](memory-bank-frontend.md) - Information about UI components and state management
-- [Development Process](memory-bank-development.md) - Guidelines and recommendations for development
+- [Memory Bank Index](memory-bank/memory-bank-index.md) - Main entry point with links to all sections
+- [General Project Information](memory-bank/memory-bank.md) - Overview of the project architecture and key concepts
+- [Database Structure](memory-bank/memory-bank-db.md) - Information about database models and interactions
+- [Game Logic](memory-bank/memory-bank-game.md) - Details about game mechanics, roles, and addons
+- [Frontend Architecture](memory-bank/memory-bank-frontend.md) - Information about UI components and state management
+- [Development Process](memory-bank/memory-bank-development.md) - Guidelines and recommendations for development
 
 ### How to Use Memory Bank
 
 The Memory Bank is designed to help both new and experienced developers:
 
-- **For new developers**: Start with the [Memory Bank Index](memory-bank-index.md) to get a comprehensive overview of the project.
+- **For new developers**: Start with the [Memory Bank Index](memory-bank/memory-bank-index.md) to get a comprehensive overview of the project.
 - **For experienced developers**: Use specific sections as a reference when working on particular features.
 
 Please keep the Memory Bank updated when making significant changes to the project architecture or adding new features.
