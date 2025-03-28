@@ -23,7 +23,7 @@ export default defineComponent({
   },
   computed: {
     targetNames() {
-      return [...Object.keys(rolesShortInfo), 'ladyOfLake', 'ladyOfSea', 'excalibur'];
+      return [...Object.keys(rolesShortInfo), 'ladyOfLake', 'ladyOfSea', 'excalibur', 'plotCards'];
     },
   },
 });

@@ -11,7 +11,7 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     addons: 'Expansions',
     addonsTitle: 'Expansions for the Board Game Avalon',
     addonsInfo:
-      'Adding elements such as {ladyOfLake} and {excalibur} deepens strategic possibilities and brings more intrigue to the gameplay. Below are the pages for each expansion.',
+      'Adding elements such as {ladyOfLake}, {excalibur}, and {plotCards} deepens strategic possibilities and brings more intrigue to the gameplay. Below are the pages for each expansion.',
     title: 'Avalon: The Resistance - Core Game Logic',
     setup: 'Game Setup',
     playerAssignment:
@@ -42,7 +42,7 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     addons: 'Дополнения',
     addonsTitle: 'Дополнения для настольной игры Avalon',
     addonsInfo:
-      'Добавление элементов, таких как {ladyOfLake} и {excalibur}, углубляет стратегические возможности и вносит больше интриги в игровой процесс. Ниже представлены страницы по каждому дополнению.',
+      'Добавление элементов, таких как {ladyOfLake}, {excalibur} и {plotCards}, углубляет стратегические возможности и вносит больше интриги в игровой процесс. Ниже представлены страницы по каждому дополнению.',
     title: 'Авалон: Сопротивление - Основная Логика Игры',
     setup: 'Подготовка к Игре',
     playerAssignment:
@@ -72,7 +72,7 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     addons: '插件',
     addonsTitle: '桌游《阿瓦隆》的扩展包',
     addonsInfo:
-      '添加像 {ladyOfLake} 和 {excalibur} 这样的元素加深了战略可能性，并为游戏过程带来更多的阴谋。以下是每个扩展包的介绍页。',
+      '添加像 {ladyOfLake}、{excalibur} 和 {plotCards} 这样的元素加深了战略可能性，并为游戏过程带来更多的阴谋。以下是每个扩展包的介绍页。',
     title: '阿瓦隆：反抗组织 - 核心游戏逻辑',
     setup: '游戏设置',
     playerAssignment: '<b>1. 玩家分配</b>: 给每位玩家分配一个随机角色，决定他们的阵营。',
@@ -98,7 +98,7 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     addons: '插件',
     addonsTitle: '桌遊《阿瓦隆》的擴充包',
     addonsInfo:
-      '添加像 {ladyOfLake} 和 {excalibur} 這樣的元素加深了戰略可能性，並為遊戲過程帶來更多的陰謀。以下是每個擴充包的介紹頁。',
+      '添加像 {ladyOfLake}、{excalibur} 和 {plotCards} 這樣的元素加深了戰略可能性，並為遊戲過程帶來更多的陰謀。以下是每個擴充包的介紹頁。',
     title: '阿瓦隆：反抗勢力 - 核心遊戲邏輯',
     setup: '遊戲設置',
     playerAssignment: '<b>1. 玩家分配</b>: 指派每位玩家一個隨機角色，決定他們的陣營。',
@@ -125,7 +125,7 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     addons: 'Expansiones',
     addonsTitle: 'Expansiones para el Juego de Mesa Avalon',
     addonsInfo:
-      'Añadir elementos como {ladyOfLake} y {excalibur} amplía las posibilidades estratégicas y aporta más intriga al juego. A continuación se muestran las páginas para cada expansión.',
+      'Añadir elementos como {ladyOfLake}, {excalibur} y {plotCards} amplía las posibilidades estratégicas y aporta más intriga al juego. A continuación se muestran las páginas para cada expansión.',
     title: 'Avalon: La Resistencia - Lógica Central del Juego',
     setup: 'Configuración del Juego',
     playerAssignment:

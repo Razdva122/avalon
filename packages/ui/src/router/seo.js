@@ -135,7 +135,7 @@ module.exports.routesSeo = {
       multiLanguage: {
         ...plotCards,
       },
-      image: 'features/excalibur.webp',
+      image: 'features/plot_cards.webp',
     },
   },
   excalibur: {

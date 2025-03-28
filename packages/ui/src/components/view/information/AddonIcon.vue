@@ -32,4 +32,9 @@ export default defineComponent({
   background-image: getImagePathByID('features', 'lady_of_sea');
   background-size: contain;
 }
+
+.icon-plotCards {
+  background-image: getImagePathByID('features', 'plot_cards');
+  background-size: contain;
+}
 </style>

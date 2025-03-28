@@ -5,6 +5,7 @@ import { wiki } from '@/i18n/langs/pages/wiki';
 import { lancelots } from '@/i18n/langs/pages/roles/lancelots';
 import { lady } from '@/i18n/langs/pages/ladyOfTheLake';
 import { excalibur } from '@/i18n/langs/pages/excalibur';
+import { plotCards } from '@/i18n/langs/pages/plotCards';
 import { morgana } from '@/i18n/langs/pages/roles/morgana';
 import { percival } from '@/i18n/langs/pages/roles/percival';
 import { rules } from '@/i18n/langs/pages/rules';
@@ -42,6 +43,7 @@ Object.entries({
   lady,
   ladySea,
   excalibur,
+  plotCards,
   morgana,
   percival,
   rules,

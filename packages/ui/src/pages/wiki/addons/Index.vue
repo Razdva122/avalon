@@ -24,6 +24,15 @@
           :description="$t('addons.excalibur')"
         />
       </router-link>
+      <router-link class="addon" :to="{ name: 'plot_cards' }">
+        <h2>{{ $t('addons.plotCards') }}</h2>
+        <SchemaImage
+          class="addon-image"
+          :src="getImagePathByID('features', 'plot_cards')"
+          :alt="$t('addons.plotCards')"
+          :description="$t('addons.plotCards')"
+        />
+      </router-link>
       <router-link class="addon" :to="{ name: 'lady_of_sea' }">
         <h2>{{ $t('addons.ladyOfSea') }}</h2>
         <SchemaImage
