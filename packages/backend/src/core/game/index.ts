@@ -405,9 +405,8 @@ export class Game extends GameHooks {
     if (this.turn === 4) {
       this.startMission();
     } else {
-      this.players.forEach((player) => {
-        player.features.waitForAction = player.features.preVote ? false : true;
-        player.features.preVote = undefined;
+      this.vote!.getUnvotedPlayers().forEach((player) => {
+        player.features.waitForAction = true;
       });
 
       this.stage = 'votingForTeam';

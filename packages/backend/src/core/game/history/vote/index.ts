@@ -16,17 +16,11 @@ export class Vote implements HistoryElement<'vote'> {
     this.stage = 'active';
 
     const votes = players.map((player) => {
-      const vote = {
+      return {
         player,
         onMission: Boolean(player.features.isSent),
         value: <TVoteOption>(forced ? 'approve' : 'unvoted'),
       };
-
-      if (player.features.preVote) {
-        vote.value = player.features.preVote;
-      }
-
-      return vote;
     });
 
     this.data = {
@@ -73,6 +67,10 @@ export class Vote implements HistoryElement<'vote'> {
     }
 
     return false;
+  }
+
+  getUnvotedPlayers(): IPlayerInGame[] {
+    return this.data.votes.filter((el) => !el.preVote).map((el) => el.player);
   }
 
   dataForManager(options: TDataForManagerOptions) {

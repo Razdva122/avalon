@@ -56,6 +56,14 @@ export class ChargeCard extends AbstractCard implements IEffectPlotCard {
 
     if (allVoted) {
       this.game.history.push(this.preVote);
+      this.game.vote!.data.votes.forEach((vote) => {
+        const preVoteValue = this.preVote!.data.votes.find((preVote) => preVote.player === vote.player)?.value;
+
+        if (preVoteValue) {
+          vote.value = preVoteValue;
+          vote.preVote = <TVoteOption>preVoteValue;
+        }
+      });
       this.preVoteSubject.next(true);
     }
 

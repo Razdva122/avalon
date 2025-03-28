@@ -255,6 +255,7 @@ export class PlotCardsAddon implements IGameAddon {
       concatMap((cardState) => {
         this.activeCard = cardState.card;
         return cardState.card.play(cardState.ownerID).pipe(
+          take(1),
           tap(() => {
             this.activeCard = undefined;
           }),
