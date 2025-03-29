@@ -231,6 +231,8 @@ export const ru = {
     giveCard: 'Передать карту',
     takeLead: 'Взять лидерство',
     skip: 'Пропустить',
+    useCard: 'Использовать {cardName}',
+    skipCard: 'Пропустить {cardName}',
   },
   assassinate: {
     lovers: 'Любовники',

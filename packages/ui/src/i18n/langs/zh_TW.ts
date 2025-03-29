@@ -231,6 +231,8 @@ export const zh_TW = {
     giveCard: '給卡',
     takeLead: '成為領袖',
     skip: '跳過',
+    useCard: '使用{cardName}',
+    skipCard: '跳過{cardName}',
   },
   assassinate: {
     lovers: '戀人',

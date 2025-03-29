@@ -231,6 +231,8 @@ export const zh_CN = {
     giveCard: '给卡',
     takeLead: '成为领袖',
     skip: '跳过',
+    useCard: '使用{cardName}',
+    skipCard: '跳过{cardName}',
   },
   assassinate: {
     lovers: '恋人',

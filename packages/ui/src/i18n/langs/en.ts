@@ -239,6 +239,8 @@ export const en = {
     giveCard: 'Give card',
     takeLead: 'Take lead',
     skip: 'Skip',
+    useCard: 'Use {cardName}',
+    skipCard: 'Skip {cardName}',
   },
   assassinate: {
     lovers: 'Lovers',

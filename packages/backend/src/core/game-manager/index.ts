@@ -3,7 +3,7 @@ import type { User } from '@/user';
 import type { TRoomState, TGameMethodsParams, TGetLoyaltyData } from '@/core/game-manager/interface';
 import { eventBus } from '@/helpers';
 import { Mission } from '@/core/game/history/mission';
-import { isChargeCard, isLeadToVictoryCard } from '@/core/game/addons/plot-cards';
+import { isChargeCard, isLeadToVictoryCard, isAmbushCard } from '@/core/game/addons/plot-cards';
 
 import * as _ from 'lodash';
 
@@ -302,6 +302,25 @@ export class GameManager {
         }
 
         throw new Error(`Active card ${activeCard.name} is not lead to victory`);
+      }
+
+      case 'useAmbush': {
+        if (!this.game.addons.plotCards) {
+          throw new Error('You cant use ambush in game without plot cards addon');
+        }
+
+        const activeCard = this.game.addons.plotCards.activeCard;
+
+        if (!activeCard) {
+          throw new Error('No active card');
+        }
+
+        if (isAmbushCard(activeCard)) {
+          activeCard.ambush();
+          break;
+        }
+
+        throw new Error(`Active card ${activeCard.name} is not ambush`);
       }
     }
   }

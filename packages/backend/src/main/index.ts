@@ -525,6 +525,11 @@ export class Manager {
       console.log(`Player ${userName} useLeadToVictory (used: ${use}) in game ${uuid}`);
       getRoomManager(uuid).callGameMethods(userID, { method: 'useLeadToVictory', use });
     });
+
+    socket.on('useAmbush', (uuid) => {
+      console.log(`Player ${userName} useAmbush in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'useAmbush' });
+    });
   }
 
   updateOnlineCounter(id: string, diff: -1 | 1): void {

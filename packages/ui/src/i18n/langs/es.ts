@@ -231,6 +231,8 @@ export const es = {
     giveCard: 'Dar carta',
     takeLead: 'Tomar liderazgo',
     skip: 'Omitir',
+    useCard: 'Usar {cardName}',
+    skipCard: 'Omitir {cardName}',
   },
   assassinate: {
     lovers: 'Amantes',

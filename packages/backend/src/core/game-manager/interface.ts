@@ -30,7 +30,8 @@ export type TGameMethodsParams =
   | TWitchAbilityParams
   | TGivePlotCardParams
   | TPreVoteParams
-  | TUseLeadToVictoryParams;
+  | TUseLeadToVictoryParams
+  | TUseAmbushParams;
 
 export type TSelectPlayerParams = {
   method: 'selectPlayer';
@@ -92,6 +93,10 @@ export type TPreVoteParams = {
 export type TUseLeadToVictoryParams = {
   method: 'useLeadToVictory';
   use: boolean;
+};
+
+export type TUseAmbushParams = {
+  method: 'useAmbush';
 };
 
 export type TGetLoyaltyData = {

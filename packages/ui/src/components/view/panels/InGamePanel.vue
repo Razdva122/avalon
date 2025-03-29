@@ -45,7 +45,11 @@
       :color="isZeroPlayerSelected ? 'warning' : 'error'"
       :disabled="!isUseExcaliburAvailable"
       @click="emitClick('useExcalibur')"
-      >{{ isZeroPlayerSelected ? $t('inGame.skipExcalibur') : $t('inGame.useExcalibur') }}</v-btn
+      >{{
+        isZeroPlayerSelected
+          ? $t('inGame.skipCard', { cardName: $t('addons.excalibur') })
+          : $t('inGame.useCard', { cardName: $t('addons.excalibur') })
+      }}</v-btn
     >
   </template>
   <template v-if="game.stage === 'witchAbility' && isUserWitch">
@@ -69,6 +73,18 @@
       {{ $t('inGame.skip') }}
     </v-btn>
   </template>
+  <template v-if="game.stage === 'ambush' && isUserAmbushOwner">
+    <v-btn
+      :color="isZeroPlayerSelected ? 'warning' : 'error'"
+      :disabled="!isUseAmbushAvailable"
+      @click="emitClick('useAmbush')"
+      >{{
+        isZeroPlayerSelected
+          ? $t('inGame.skipCard', { cardName: $t('cardsInfo.ambush') })
+          : $t('inGame.useCard', { cardName: $t('cardsInfo.ambush') })
+      }}</v-btn
+    >
+  </template>
 </template>
 
 <script lang="ts">
@@ -79,7 +95,7 @@ import { socket } from '@/api/socket';
 import Spoiler from '@/components/feedback/Spoiler.vue';
 import AssassinateControl from '@/components/view/panels/controls/AssassinateControl.vue';
 
-type TMethodsWithoutParams = 'sentSelectedPlayers' | 'checkLoyalty' | 'giveExcalibur' | 'useExcalibur';
+type TMethodsWithoutParams = 'sentSelectedPlayers' | 'checkLoyalty' | 'giveExcalibur' | 'useExcalibur' | 'useAmbush';
 
 export default defineComponent({
   name: 'InGamePanel',
@@ -141,6 +157,10 @@ export default defineComponent({
       return Boolean(player.value?.features.excalibur);
     });
 
+    const isUserAmbushOwner = computed(() => {
+      return Boolean(player.value?.features.ambushCard === 'active');
+    });
+
     const isSendTeamDisabled = computed(() => {
       const needPlayers = game.value.settings.missions[game.value.mission].players;
       return game.value.players.filter((player) => player.features.isSelected).length !== needPlayers;
@@ -196,6 +216,19 @@ export default defineComponent({
       );
     });
 
+    const isUseAmbushAvailable = computed(() => {
+      return (
+        isZeroPlayerSelected.value ||
+        (isSinglePlayerSelected.value &&
+          Boolean(
+            game.value.players.find(
+              (player) =>
+                player.features.isSelected && player.features.ambushCard !== 'active' && player.features.isSent,
+            ),
+          ))
+      );
+    });
+
     const isGivePlotCardAvailable = computed(() => {
       return (
         isSinglePlayerSelected.value &&
@@ -237,6 +270,7 @@ export default defineComponent({
       isUserWitch,
       isUserCheckOwner,
       isUserExcaliburOwner,
+      isUserAmbushOwner,
       isPlayerOnMission,
       isPlayerActive,
       isPlayerCanFail,
@@ -247,6 +281,7 @@ export default defineComponent({
       isGiveExcaliburAvailable,
       isGivePlotCardAvailable,
       isUseExcaliburAvailable,
+      isUseAmbushAvailable,
 
       isSendTeamDisabled,
 
