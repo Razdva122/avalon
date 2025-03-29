@@ -143,6 +143,12 @@ export default defineComponent({
           }
         }
 
+        if (visibleHistory.value?.type === 'ambush') {
+          if (clone.id === visibleHistory.value.targetID && visibleHistory.value.result) {
+            clone.role = visibleHistory.value.result === 'fail' ? 'evil' : 'good';
+          }
+        }
+
         if (visibleHistory.value?.type === 'switchLancelots') {
           clone.features.waitForAction = false;
           clone.features.isSelected = false;
