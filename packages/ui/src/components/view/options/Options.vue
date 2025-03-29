@@ -315,6 +315,11 @@ export default defineComponent({
   background-size: contain;
 }
 
+.plotCards {
+  background-image: getImagePathByID('features', 'plot_cards');
+  background-size: contain;
+}
+
 .tabs {
   border-radius: 8px;
 }
