@@ -21,6 +21,7 @@ import type {
   PreVote,
   TPlotCardNames,
   LeadToVictory,
+  RestoreHonor,
 } from '@avalon/types';
 
 export type THistoryData = {
@@ -83,6 +84,12 @@ export type THistoryData = {
     prevLeader: IPlayerInGame;
     owner: IPlayerInGame;
   };
+  restoreHonor: {
+    result?: undefined;
+    prevOwner: IPlayerInGame;
+    newOwner: IPlayerInGame;
+    cardName: TPlotCardNames;
+  };
   hidden: Record<string, never>;
 };
 
@@ -96,6 +103,7 @@ export type THistoryDataForManager = {
   giveCard: GiveCard;
   preVote: PreVote;
   leadToVictory: LeadToVictory;
+  restoreHonor: RestoreHonor;
 };
 
 export type TDataForManagerOptions = {

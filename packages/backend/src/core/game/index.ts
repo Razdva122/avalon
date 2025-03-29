@@ -427,6 +427,7 @@ export class Game extends GameHooks {
         player.features.waitForAction = true;
       });
 
+      this.stateObserver.gameStateChanged();
       this.callHooks('afterStartMission');
     });
   }

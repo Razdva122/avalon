@@ -306,6 +306,7 @@ export class GameStateManager {
         hidden: 'hidden',
         giveCard: 'giveCard',
         leadToVictory: 'leadToVictory',
+        restoreHonor: 'restoreHonor',
       } as const
     )[history.type];
   }

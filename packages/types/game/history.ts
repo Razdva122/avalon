@@ -20,7 +20,8 @@ export type THistoryType =
   | 'switchLancelots'
   | 'giveCard'
   | 'preVote'
-  | 'leadToVictory';
+  | 'leadToVictory'
+  | 'restoreHonor';
 
 /**
  * History element stages
@@ -51,7 +52,8 @@ export type THistoryResults =
   | HiddenHistory
   | GiveCard
   | PreVote
-  | LeadToVictory;
+  | LeadToVictory
+  | RestoreHonor;
 
 /**
  * Pre-vote data
@@ -265,6 +267,22 @@ export class LeadToVictory extends HistoryBase {
 
   @prop({ required: true })
   public ownerID!: string;
+}
+
+/**
+ * Restore Honor card history
+ */
+export class RestoreHonor extends HistoryBase {
+  declare type: 'restoreHonor';
+
+  @prop({ required: true })
+  public prevOwnerID!: string;
+
+  @prop({ required: true })
+  public newOwnerID!: string;
+
+  @prop({ required: true })
+  public cardName!: TPlotCardNames;
 }
 
 /**

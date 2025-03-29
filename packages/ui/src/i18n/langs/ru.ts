@@ -46,6 +46,7 @@ export const ru = {
     'announce loyalty': 'объявить верность',
     'give card': 'передать карту',
     'lead to victory': 'привести к победе',
+    'restore honor': 'восстанови свою честь',
     witch: 'ведьма',
     end: 'конец',
     lancelots: 'ланселоты',
@@ -240,6 +241,9 @@ export const ru = {
   giveCard: {
     toPlayer: '<b>{leaderName}</b> передал карту «{cardName}» игроку <b>{cardOwner}</b>',
     toSelf: '<b>{leaderName}</b> получил карту «{cardName}» себе',
+  },
+  restoreHonor: {
+    transfer: '<b>{newOwnerName}</b> забрал карту «{cardName}» у <b>{prevOwnerName}</b>',
   },
   leadToVictory: {
     history: '<b>{cardOwner}</b> использовал карту «{cardName}» и забрал лидерство у <b>{prevLeaderName}</b>',

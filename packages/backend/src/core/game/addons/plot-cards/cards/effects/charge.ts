@@ -18,6 +18,7 @@ import { TVoteOption } from '@avalon/types';
 export class ChargeCard extends AbstractCard implements IEffectPlotCard {
   name = <const>'charge';
   type = <const>'effect';
+  playType: AbstractCard['playType'] = 'single';
   preVoteSubject: Subject<true> = new Subject();
   preVote: PreVote | null = null;
 
@@ -53,6 +54,7 @@ export class ChargeCard extends AbstractCard implements IEffectPlotCard {
 
     player.features.chargeCard = 'has';
     const allVoted = this.preVote.makeVote(player, option);
+    this.game.stateObserver.gameStateChanged();
 
     if (allVoted) {
       this.game.history.push(this.preVote);

@@ -46,6 +46,7 @@ export const zh_TW = {
     'announce loyalty': '宣布忠誠',
     'give card': '給卡',
     'lead to victory': '引領勝利',
+    'restore honor': '恢復榮譽',
     witch: '巫婆',
     end: '完結',
     lancelots: '蘭斯洛特',
@@ -240,6 +241,9 @@ export const zh_TW = {
   giveCard: {
     toPlayer: '<b>{leaderName}</b> 將卡牌 «{cardName}» 給了 <b>{cardOwner}</b>',
     toSelf: '<b>{leaderName}</b> 自己收到了卡牌 «{cardName}»',
+  },
+  restoreHonor: {
+    transfer: '<b>{newOwnerName}</b> 從 <b>{prevOwnerName}</b> 那裡拿走了卡牌 «{cardName}»',
   },
   leadToVictory: {
     history: '<b>{cardOwner}</b> 使用了卡牌 «{cardName}» 並從 <b>{prevLeaderName}</b> 接過了領導權',

@@ -207,6 +207,7 @@ export default defineComponent({
         giveCard: 'give card',
         preVote: 'voting',
         leadToVictory: 'lead to victory',
+        restoreHonor: 'restore honor',
       }[gameState.value.stage];
     });
 

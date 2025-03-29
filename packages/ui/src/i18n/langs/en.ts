@@ -46,6 +46,7 @@ export const en = {
     'announce loyalty': 'announce loyalty',
     'give card': 'give card',
     'lead to victory': 'lead to victory',
+    'restore honor': 'restore honor',
     end: 'end',
     lancelots: 'lancelots',
     witch: 'witch',
@@ -248,6 +249,9 @@ export const en = {
   giveCard: {
     toPlayer: '<b>{leaderName}</b> gave the card «{cardName}» to <b>{cardOwner}</b>',
     toSelf: '<b>{leaderName}</b> received the card «{cardName}» himself',
+  },
+  restoreHonor: {
+    transfer: '<b>{newOwnerName}</b> took the card «{cardName}» from <b>{prevOwnerName}</b>',
   },
   leadToVictory: {
     history: '<b>{cardOwner}</b> used the card «{cardName}» and took the lead from <b>{prevLeaderName}</b>',

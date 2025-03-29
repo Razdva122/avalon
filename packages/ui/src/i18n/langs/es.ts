@@ -46,6 +46,7 @@ export const es = {
     'announce loyalty': 'anunciar lealtad',
     'give card': 'dar carta',
     'lead to victory': 'liderar hacia la victoria',
+    'restore honor': 'restaura tu honor',
     end: 'fin',
     lancelots: 'lancelotes',
     witch: 'bruja',
@@ -240,6 +241,9 @@ export const es = {
   giveCard: {
     toPlayer: '<b>{leaderName}</b> dio la carta «{cardName}» a <b>{cardOwner}</b>',
     toSelf: '<b>{leaderName}</b> se dio la carta «{cardName}» a sí mismo',
+  },
+  restoreHonor: {
+    transfer: '<b>{newOwnerName}</b> tomó la carta «{cardName}» de <b>{prevOwnerName}</b>',
   },
   leadToVictory: {
     history: '<b>{cardOwner}</b> usó la carta «{cardName}» y tomó el liderazgo de <b>{prevLeaderName}</b>',

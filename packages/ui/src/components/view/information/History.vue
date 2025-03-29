@@ -31,6 +31,7 @@ import Mission from '@/components/view/information/history/Mission.vue';
 import GiveCard from '@/components/view/information/history/GiveCard.vue';
 import PreVote from '@/components/view/information/history/PreVote.vue';
 import LeadToVictory from '@/components/view/information/history/LeadToVictory.vue';
+import RestoreHonor from '@/components/view/information/history/RestoreHonor.vue';
 
 export default defineComponent({
   components: {
@@ -43,6 +44,7 @@ export default defineComponent({
     GiveCard,
     PreVote,
     LeadToVictory,
+    RestoreHonor,
   },
   props: {
     history: {

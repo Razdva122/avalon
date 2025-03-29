@@ -22,8 +22,9 @@ describe('Game state', () => {
 
     const selectPlayersAndSent = settings.missions[0].players + 1;
     const votes = settings.total;
+    const beforeMissionStart = 1;
     const actions = settings.missions[0].players;
 
-    expect(gameHelper.stateChangedNumber).toEqual(selectPlayersAndSent + votes + actions);
+    expect(gameHelper.stateChangedNumber).toEqual(selectPlayersAndSent + votes + beforeMissionStart + actions);
   });
 });
