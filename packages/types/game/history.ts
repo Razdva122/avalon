@@ -21,7 +21,8 @@ export type THistoryType =
   | 'giveCard'
   | 'preVote'
   | 'leadToVictory'
-  | 'restoreHonor';
+  | 'restoreHonor'
+  | 'ambush';
 
 /**
  * History element stages
@@ -53,7 +54,8 @@ export type THistoryResults =
   | GiveCard
   | PreVote
   | LeadToVictory
-  | RestoreHonor;
+  | RestoreHonor
+  | Ambush;
 
 /**
  * Pre-vote data
@@ -283,6 +285,22 @@ export class RestoreHonor extends HistoryBase {
 
   @prop({ required: true })
   public cardName!: TPlotCardNames;
+}
+
+/**
+ * Ambush card history
+ */
+export class Ambush extends HistoryBase {
+  declare type: 'ambush';
+
+  @prop({ required: true })
+  public ownerID!: string;
+
+  @prop({ required: true })
+  public targetID!: string;
+
+  @prop()
+  public result?: TMissionResult;
 }
 
 /**

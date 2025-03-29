@@ -47,6 +47,7 @@ export const zh_CN = {
     'give card': '给卡',
     'lead to victory': '引领胜利',
     'restore honor': '恢复荣誉',
+    ambush: '埋伏',
     witch: '巫婆',
     end: '完结',
     lancelots: '兰斯洛特',
@@ -244,6 +245,10 @@ export const zh_CN = {
   },
   restoreHonor: {
     transfer: '<b>{newOwnerName}</b> 从 <b>{prevOwnerName}</b> 那里拿走了卡牌 «{cardName}»',
+  },
+  ambush: {
+    history: '<b>{ownerName}</b> 对 <b>{targetName}</b> 使用了伏击卡并看到了他们的行动: {result}',
+    resultHidden: '隐藏',
   },
   leadToVictory: {
     history: '<b>{cardOwner}</b> 使用了卡牌 «{cardName}» 并从 <b>{prevLeaderName}</b> 接过了领导权',

@@ -208,6 +208,7 @@ export default defineComponent({
         preVote: 'voting',
         leadToVictory: 'lead to victory',
         restoreHonor: 'restore honor',
+        ambush: 'ambush',
       }[gameState.value.stage];
     });
 

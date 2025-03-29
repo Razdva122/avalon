@@ -47,6 +47,7 @@ export const ru = {
     'give card': 'передать карту',
     'lead to victory': 'привести к победе',
     'restore honor': 'восстанови свою честь',
+    ambush: 'засада',
     witch: 'ведьма',
     end: 'конец',
     lancelots: 'ланселоты',
@@ -244,6 +245,10 @@ export const ru = {
   },
   restoreHonor: {
     transfer: '<b>{newOwnerName}</b> забрал карту «{cardName}» у <b>{prevOwnerName}</b>',
+  },
+  ambush: {
+    history: '<b>{ownerName}</b> использовал карту Засада на <b>{targetName}</b> и увидел их действие: {result}',
+    resultHidden: 'скрыто',
   },
   leadToVictory: {
     history: '<b>{cardOwner}</b> использовал карту «{cardName}» и забрал лидерство у <b>{prevLeaderName}</b>',

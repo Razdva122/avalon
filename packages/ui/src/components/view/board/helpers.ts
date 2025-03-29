@@ -10,7 +10,8 @@ export function calculateVisualElement(history: THistoryResults[]): { element?: 
     lastElement?.type === 'preVote' ||
     (lastElement?.type === 'checkLoyalty' && lastElement.result) ||
     lastElement?.type === 'mission' ||
-    lastElement?.type === 'switchLancelots'
+    lastElement?.type === 'switchLancelots' ||
+    lastElement?.type === 'ambush'
   ) {
     return {
       element: lastElement,

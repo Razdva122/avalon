@@ -47,6 +47,7 @@ export const en = {
     'give card': 'give card',
     'lead to victory': 'lead to victory',
     'restore honor': 'restore honor',
+    ambush: 'ambush',
     end: 'end',
     lancelots: 'lancelots',
     witch: 'witch',
@@ -252,6 +253,10 @@ export const en = {
   },
   restoreHonor: {
     transfer: '<b>{newOwnerName}</b> took the card «{cardName}» from <b>{prevOwnerName}</b>',
+  },
+  ambush: {
+    history: '<b>{ownerName}</b> used Ambush card on <b>{targetName}</b> and saw their action: {result}',
+    resultHidden: 'hidden',
   },
   leadToVictory: {
     history: '<b>{cardOwner}</b> used the card «{cardName}» and took the lead from <b>{prevLeaderName}</b>',

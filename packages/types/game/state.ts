@@ -15,6 +15,8 @@ import {
   GiveCard,
   PreVote,
   LeadToVictory,
+  Ambush,
+  RestoreHonor,
 } from './history';
 import type { THistoryResults } from './history';
 import { GameSettingsWithRoles } from './settings';
@@ -72,6 +74,8 @@ export class VisualGameState {
       { type: GiveCard, value: 'giveCard' },
       { type: PreVote, value: 'preVote' },
       { type: LeadToVictory, value: 'leadToVictory' },
+      { type: RestoreHonor, value: 'restoreHonor' },
+      { type: Ambush, value: 'ambush' },
     ],
   })
   public history!: THistoryResults[];

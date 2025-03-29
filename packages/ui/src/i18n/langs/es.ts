@@ -47,6 +47,7 @@ export const es = {
     'give card': 'dar carta',
     'lead to victory': 'liderar hacia la victoria',
     'restore honor': 'restaura tu honor',
+    ambush: 'Emboscada',
     end: 'fin',
     lancelots: 'lancelotes',
     witch: 'bruja',
@@ -244,6 +245,10 @@ export const es = {
   },
   restoreHonor: {
     transfer: '<b>{newOwnerName}</b> tomó la carta «{cardName}» de <b>{prevOwnerName}</b>',
+  },
+  ambush: {
+    history: '<b>{ownerName}</b> usó la carta Emboscada en <b>{targetName}</b> y vio su acción: {result}',
+    resultHidden: 'oculto',
   },
   leadToVictory: {
     history: '<b>{cardOwner}</b> usó la carta «{cardName}» y tomó el liderazgo de <b>{prevLeaderName}</b>',
