@@ -50,6 +50,7 @@ export class AmbushCard extends AbstractCard implements IUsablePlotCard {
     }
 
     ownerOfAmbush.features.waitForAction = false;
+    ownerOfAmbush.features.ambushCard = 'has';
     this.ambushSubject.next(true);
   }
 }

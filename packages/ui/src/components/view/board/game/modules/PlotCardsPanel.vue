@@ -21,26 +21,40 @@
       </v-btn>
     </template>
 
-    <template v-if="game.stage === 'leadToVictory' && isUserLeadToVictoryOwner">
-      <v-btn color="success" @click="() => leadToVictoryClick(true)" class="mb-2">
-        {{ $t('inGame.takeLead') }}
-      </v-btn>
-      <v-btn color="warning" @click="() => leadToVictoryClick(false)">
-        {{ $t('inGame.skip') }}
-      </v-btn>
+    <template v-if="game.stage === 'leadToVictory'">
+      <template v-if="isUserLeadToVictoryOwner">
+        <v-btn color="success" @click="() => leadToVictoryClick(true)" class="mb-2">
+          {{ $t('inGame.takeLead') }}
+        </v-btn>
+        <v-btn color="warning" @click="() => leadToVictoryClick(false)">
+          {{ $t('inGame.skip') }}
+        </v-btn>
+      </template>
+      <template v-else>
+        <PlotCard :display-tooltip="true" class="plot-card" card-name="leadToVictory"></PlotCard>
+      </template>
+    </template>
+
+    <template v-if="game.stage === 'preVote' && !isPlayerActive">
+      <PlotCard :display-tooltip="true" class="plot-card" card-name="charge"></PlotCard>
     </template>
 
     <template v-if="game.stage === 'ambush' && isUserAmbushOwner">
-      <v-btn
-        :color="isZeroPlayerSelected ? 'warning' : 'success'"
-        :disabled="!isUseAmbushAvailable"
-        @click="emitClick('useAmbush')"
-        >{{
-          isZeroPlayerSelected
-            ? $t('inGame.skipCard', { cardName: $t('cardsInfo.ambush') })
-            : $t('inGame.useCard', { cardName: $t('cardsInfo.ambush') })
-        }}</v-btn
-      >
+      <template v-if="isUserAmbushOwner">
+        <v-btn
+          :color="isZeroPlayerSelected ? 'warning' : 'success'"
+          :disabled="!isUseAmbushAvailable"
+          @click="emitClick('useAmbush')"
+          >{{
+            isZeroPlayerSelected
+              ? $t('inGame.skipCard', { cardName: $t('cardsInfo.ambush') })
+              : $t('inGame.useCard', { cardName: $t('cardsInfo.ambush') })
+          }}</v-btn
+        >
+      </template>
+      <template v-else>
+        <PlotCard :display-tooltip="true" class="plot-card" card-name="ambush"></PlotCard>
+      </template>
     </template>
   </div>
 </template>
@@ -163,6 +177,7 @@ export default defineComponent({
 
 .plot-cards-panel {
   display: flex;
+  align-items: center;
   flex-direction: column;
 }
 </style>
