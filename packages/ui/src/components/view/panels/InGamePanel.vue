@@ -60,42 +60,17 @@
       {{ $t('inGame.skipWitchAbility') }}
     </v-btn>
   </template>
-  <template v-if="game.stage === 'giveCard' && isUserLeader">
-    <v-btn color="success" @click="givePlotCard" :disabled="!isGivePlotCardAvailable">
-      {{ $t('inGame.giveCard') }}
-    </v-btn>
-  </template>
-  <template v-if="game.stage === 'leadToVictory' && isPlayerActive">
-    <v-btn color="success" @click="() => leadToVictoryClick(true)" class="mb-2">
-      {{ $t('inGame.takeLead') }}
-    </v-btn>
-    <v-btn color="warning" @click="() => leadToVictoryClick(false)">
-      {{ $t('inGame.skip') }}
-    </v-btn>
-  </template>
-  <template v-if="game.stage === 'ambush' && isUserAmbushOwner">
-    <v-btn
-      :color="isZeroPlayerSelected ? 'warning' : 'error'"
-      :disabled="!isUseAmbushAvailable"
-      @click="emitClick('useAmbush')"
-      >{{
-        isZeroPlayerSelected
-          ? $t('inGame.skipCard', { cardName: $t('cardsInfo.ambush') })
-          : $t('inGame.useCard', { cardName: $t('cardsInfo.ambush') })
-      }}</v-btn
-    >
-  </template>
 </template>
 
 <script lang="ts">
 import { defineComponent, computed, PropType, toRefs } from 'vue';
 import type { VisualGameState, TMissionResult, TVoteOption } from '@avalon/types';
-import { useStore } from '@/store';
 import { socket } from '@/api/socket';
 import Spoiler from '@/components/feedback/Spoiler.vue';
 import AssassinateControl from '@/components/view/panels/controls/AssassinateControl.vue';
+import { useGamePlayerState } from '@/helpers/composables/useGamePlayerState';
 
-type TMethodsWithoutParams = 'sentSelectedPlayers' | 'checkLoyalty' | 'giveExcalibur' | 'useExcalibur' | 'useAmbush';
+type TMethodsWithoutParams = 'sentSelectedPlayers' | 'checkLoyalty' | 'giveExcalibur' | 'useExcalibur';
 
 export default defineComponent({
   name: 'InGamePanel',
@@ -111,15 +86,10 @@ export default defineComponent({
   },
   setup(props) {
     const { game } = toRefs(props);
-    const store = useStore();
+    const gameComputed = computed(() => game.value);
 
-    const player = computed(() => {
-      return game.value.players.find((player) => player.id === store.state.profile?.id);
-    });
-
-    const isUserLeader = computed(() => {
-      return player.value?.features.isLeader;
-    });
+    const { player, isUserLeader, isPlayerActive, isZeroPlayerSelected, isSinglePlayerSelected } =
+      useGamePlayerState(gameComputed);
 
     const isUserAssassin = computed(() => {
       return player.value?.features.isAssassin;
@@ -131,10 +101,6 @@ export default defineComponent({
 
     const isPlayerOnMission = computed(() => {
       return player.value?.features.isSent;
-    });
-
-    const isPlayerActive = computed(() => {
-      return player.value?.features.waitForAction;
     });
 
     const isPlayerCanFail = computed(() => {
@@ -157,21 +123,9 @@ export default defineComponent({
       return Boolean(player.value?.features.excalibur);
     });
 
-    const isUserAmbushOwner = computed(() => {
-      return Boolean(player.value?.features.ambushCard === 'active');
-    });
-
     const isSendTeamDisabled = computed(() => {
       const needPlayers = game.value.settings.missions[game.value.mission].players;
       return game.value.players.filter((player) => player.features.isSelected).length !== needPlayers;
-    });
-
-    const isSinglePlayerSelected = computed(() => {
-      return game.value.players.filter((player) => player.features.isSelected).length === 1;
-    });
-
-    const isZeroPlayerSelected = computed(() => {
-      return game.value.players.filter((player) => player.features.isSelected).length === 0;
     });
 
     const isCheckAvailable = computed(() => {
@@ -216,26 +170,6 @@ export default defineComponent({
       );
     });
 
-    const isUseAmbushAvailable = computed(() => {
-      return (
-        isZeroPlayerSelected.value ||
-        (isSinglePlayerSelected.value &&
-          Boolean(
-            game.value.players.find(
-              (player) =>
-                player.features.isSelected && player.features.ambushCard !== 'active' && player.features.isSent,
-            ),
-          ))
-      );
-    });
-
-    const isGivePlotCardAvailable = computed(() => {
-      return (
-        isSinglePlayerSelected.value &&
-        game.value.players.find((player) => player.features.isSelected && !player.features.isLeader)
-      );
-    });
-
     const onVoteClick = (option: TVoteOption) => {
       socket.emit(game.value.stage === 'preVote' ? 'preVote' : 'voteForMission', game.value.uuid, option);
     };
@@ -256,21 +190,12 @@ export default defineComponent({
       socket.emit('useWitchAbility', game.value.uuid, use);
     };
 
-    const givePlotCard = () => {
-      socket.emit('givePlotCard', game.value.uuid);
-    };
-
-    const leadToVictoryClick = (use: boolean) => {
-      socket.emit('useLeadToVictory', game.value.uuid, use);
-    };
-
     return {
       isUserLeader,
       isUserAssassin,
       isUserWitch,
       isUserCheckOwner,
       isUserExcaliburOwner,
-      isUserAmbushOwner,
       isPlayerOnMission,
       isPlayerActive,
       isPlayerCanFail,
@@ -279,19 +204,13 @@ export default defineComponent({
       isZeroPlayerSelected,
       isCheckAvailable,
       isGiveExcaliburAvailable,
-      isGivePlotCardAvailable,
       isUseExcaliburAvailable,
-      isUseAmbushAvailable,
-
       isSendTeamDisabled,
-
       onVoteClick,
       onMissionClick,
       onAssassinateClick,
       emitClick,
       witchAbilityClick,
-      givePlotCard,
-      leadToVictoryClick,
     };
   },
 });
