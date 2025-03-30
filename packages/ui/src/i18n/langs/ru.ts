@@ -255,7 +255,7 @@ export const ru = {
     transfer: '<b>{newOwnerName}</b> забрал карту «{cardName}» у <b>{prevOwnerName}</b>',
   },
   ambush: {
-    history: '<b>{ownerName}</b> использовал карту Засада на <b>{targetName}</b> и увидел их действие: {result}',
+    history: '<b>{ownerName}</b> использовал карту Засада на <b>{targetName}</b> и увидел его действие: {result}',
     resultHidden: 'скрыто',
   },
   leadToVictory: {

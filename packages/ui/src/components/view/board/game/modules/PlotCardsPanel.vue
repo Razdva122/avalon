@@ -31,15 +31,19 @@
         </v-btn>
       </template>
       <template v-else>
-        <PlotCard :display-tooltip="true" class="plot-card" card-name="leadToVictory"></PlotCard>
+        <PlotCard
+          :display-tooltip="true"
+          class="plot-card plot-card-selectionInProgress"
+          card-name="leadToVictory"
+        ></PlotCard>
       </template>
     </template>
 
     <template v-if="game.stage === 'preVote' && !isPlayerActive">
-      <PlotCard :display-tooltip="true" class="plot-card" card-name="charge"></PlotCard>
+      <PlotCard :display-tooltip="true" class="plot-card plot-card-selectionInProgress" card-name="charge"></PlotCard>
     </template>
 
-    <template v-if="game.stage === 'ambush' && isUserAmbushOwner">
+    <template v-if="game.stage === 'ambush'">
       <template v-if="isUserAmbushOwner">
         <v-btn
           :color="isZeroPlayerSelected ? 'warning' : 'success'"
@@ -53,7 +57,7 @@
         >
       </template>
       <template v-else>
-        <PlotCard :display-tooltip="true" class="plot-card" card-name="ambush"></PlotCard>
+        <PlotCard :display-tooltip="true" class="plot-card plot-card-selectionInProgress" card-name="ambush"></PlotCard>
       </template>
     </template>
   </div>

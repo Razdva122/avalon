@@ -47,10 +47,11 @@ export class AmbushCard extends AbstractCard implements IUsablePlotCard {
       selectedPlayer.features.isSelected = false;
 
       this.plotCardsAddon.removeCardFromGame(this);
+    } else {
+      ownerOfAmbush.features.ambushCard = 'has';
     }
 
     ownerOfAmbush.features.waitForAction = false;
-    ownerOfAmbush.features.ambushCard = 'has';
     this.ambushSubject.next(true);
   }
 }

@@ -23,21 +23,24 @@ export class LeadToVictoryCard extends AbstractCard implements IUsablePlotCard {
 
     this.activateCard(ownerID);
     this.game.stage = 'leadToVictory';
+    this.game.leader.features.waitForAction = false;
     this.game.stateObserver.gameStateChanged();
     return this.leadToVictorySubject.asObservable();
   }
 
   leadToVictory(playerID: string, use: boolean) {
     const player = this.game.findPlayerByID(playerID);
-    player.features.waitForAction = false;
     player.features.leadToVictoryCard = 'has';
 
     if (use) {
       this.game.leader = player;
       this.plotCardsAddon.removeCardFromGame(this);
-      this.game.stateObserver.gameStateChanged();
+    } else {
+      player.features.waitForAction = false;
+      this.game.leader.features.waitForAction = true;
     }
 
+    this.game.stateObserver.gameStateChanged();
     this.leadToVictorySubject.next(true);
   }
 }
