@@ -69,6 +69,7 @@ export const es = {
     killGuinevere: 'El equipo malvado mató a Ginebra',
     killLovers: 'El equipo malvado mató a los Amantes',
     killMerlin: 'El equipo malvado mató a Merlín',
+    rejectedVote: 'El equipo malvado saboteó la votación',
   },
   roles: {
     merlin: 'Merlín',

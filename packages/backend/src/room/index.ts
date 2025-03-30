@@ -198,7 +198,7 @@ export class Room {
         throw new Error(`Cant end vote: ${target} in room with stage: ${this.data.stage}`);
       }
 
-      this.data.manager.game.endGame();
+      this.data.manager.game.endGame('manualy');
     }
 
     if (target === 'endAndRestartGame') {

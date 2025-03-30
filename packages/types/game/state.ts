@@ -17,6 +17,7 @@ import {
   LeadToVictory,
   Ambush,
   RestoreHonor,
+  KingReturns,
 } from './history';
 import type { THistoryResults } from './history';
 import { GameSettingsWithRoles } from './settings';
@@ -76,6 +77,7 @@ export class VisualGameState {
       { type: LeadToVictory, value: 'leadToVictory' },
       { type: RestoreHonor, value: 'restoreHonor' },
       { type: Ambush, value: 'ambush' },
+      { type: KingReturns, value: 'kingReturns' },
     ],
   })
   public history!: THistoryResults[];
@@ -119,4 +121,5 @@ export type TGameEndReasons =
   | 'missLovers'
   | 'killLovers'
   | 'missCleric'
-  | 'killCleric';
+  | 'killCleric'
+  | 'rejectedVote';

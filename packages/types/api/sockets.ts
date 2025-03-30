@@ -114,6 +114,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents {
   useLeadToVictory: (uuid: string, use: boolean) => void;
   useAmbush: (uuid: string) => void;
   useRestoreHonor: (uuid: string, cardName: TPlotCardNames) => void;
+  useKingReturns: (uuid: string, use: boolean) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;

@@ -205,6 +205,7 @@ export default defineComponent({
         leadToVictory: 'lead to victory',
         restoreHonor: 'restore honor',
         ambush: 'ambush',
+        kingReturns: 'king returns',
       }[gameState.value.stage];
     });
 

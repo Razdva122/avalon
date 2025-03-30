@@ -328,7 +328,7 @@ export class Game extends GameHooks {
    * Move vote to next stage
    * @param reset - if true clear stage to 0
    */
-  protected nextVote(reset?: true): void {
+  nextVote(reset?: true): void {
     this.clearSendPlayers();
     this.moveLeader();
 
@@ -336,6 +336,10 @@ export class Game extends GameHooks {
       this.turn = 0;
     } else {
       this.turn += 1;
+
+      if (this.turn === 5) {
+        return this.endGame('rejectedVote');
+      }
     }
 
     this.callHooks('beforeSelectTeam', () => {
@@ -470,10 +474,18 @@ export class Game extends GameHooks {
   /**
    * Premature end of the game
    */
-  endGame(): void {
-    this.result = {
-      reason: 'manualy',
-    };
+  endGame(reason: 'manualy' | 'rejectedVote'): void {
+    if (reason === 'manualy') {
+      this.result = {
+        reason: 'manualy',
+      };
+    } else {
+      this.result = {
+        reason: 'rejectedVote',
+        winner: 'evil',
+      };
+    }
+
     this.stage = 'end';
     this.openAllRoles();
     this.stateObserver.gameStateChanged();

@@ -30,7 +30,6 @@ export class LeadToVictoryCard extends AbstractCard implements IUsablePlotCard {
 
   leadToVictory(playerID: string, use: boolean) {
     const player = this.game.findPlayerByID(playerID);
-    player.features.leadToVictoryCard = 'has';
 
     if (use) {
       this.game.leader = player;
@@ -38,6 +37,7 @@ export class LeadToVictoryCard extends AbstractCard implements IUsablePlotCard {
     } else {
       player.features.waitForAction = false;
       this.game.leader.features.waitForAction = true;
+      player.features.leadToVictoryCard = 'has';
     }
 
     this.game.stateObserver.gameStateChanged();

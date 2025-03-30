@@ -69,6 +69,7 @@ export const en = {
     killGuinevere: 'The evil team killed Guinevere',
     killLovers: 'The evil team killed Lovers',
     killMerlin: 'The evil team killed Merlin',
+    rejectedVote: 'The evil team sabotaged the voting',
   },
   roles: {
     merlin: 'Merlin',
@@ -268,6 +269,9 @@ export const en = {
   },
   leadToVictory: {
     history: '<b>{cardOwner}</b> used the card «{cardName}» and took the lead from <b>{prevLeaderName}</b>',
+  },
+  kingReturns: {
+    history: '<b>{cardOwner}</b> used the card «{cardName}» to cancel the last vote and change leadership',
   },
   preVote: {
     title: 'Preliminary voting',

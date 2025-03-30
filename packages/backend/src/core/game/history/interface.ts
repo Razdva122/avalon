@@ -23,6 +23,7 @@ import type {
   LeadToVictory,
   RestoreHonor,
   Ambush,
+  KingReturns,
 } from '@avalon/types';
 
 export type THistoryData = {
@@ -96,6 +97,10 @@ export type THistoryData = {
     target: IPlayerInGame;
     result?: TMissionResult;
   };
+  kingReturns: {
+    owner: IPlayerInGame;
+    result?: undefined;
+  };
   hidden: Record<string, never>;
 };
 
@@ -111,6 +116,7 @@ export type THistoryDataForManager = {
   leadToVictory: LeadToVictory;
   restoreHonor: RestoreHonor;
   ambush: Ambush;
+  kingReturns: KingReturns;
 };
 
 export type TDataForManagerOptions = {

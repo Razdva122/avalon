@@ -535,6 +535,11 @@ export class Manager {
       console.log(`Player ${userName} useRestoreHonor (card: ${cardName}) in game ${uuid}`);
       getRoomManager(uuid).callGameMethods(userID, { method: 'useRestoreHonor', cardName });
     });
+
+    socket.on('useKingReturns', (uuid, use) => {
+      console.log(`Player ${userName} useKingReturns (used: ${use}) in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'useKingReturns', use });
+    });
   }
 
   updateOnlineCounter(id: string, diff: -1 | 1): void {

@@ -69,6 +69,7 @@ export const zh_CN = {
     killGuinevere: '坏人方暗杀女皇成功',
     killLovers: '坏人方暗杀恋人成功',
     killMerlin: '坏人方暗杀梅林成功',
+    rejectedVote: '坏人方破坏了投票',
   },
   roles: {
     merlin: '梅林',

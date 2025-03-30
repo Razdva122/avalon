@@ -186,6 +186,7 @@ These addons can be enabled regardless of the roles in play:
   - Cards include: Charge, Restore Honor, Show Strength, Show Nature, Are You The One, Lead to Victory, Ambush, King Returns, We Found You
   - Cards can affect voting, team composition, and other aspects of the game
   - Implementation: `/packages/backend/src/core/game/addons/plot-cards/index.ts`
+  - For detailed instructions on adding new plot cards, see [Adding Plot Cards](adding-plot-cards.md)
 
 ## Hook System
 
@@ -255,3 +256,4 @@ Game settings are determined by the number of players:
 4. Update game history for all significant events
 5. Use types from the `types` package for type safety
 6. Test new functionality thoroughly to ensure game balance
+7. When adding new plot cards, follow the detailed guide in [Adding Plot Cards](adding-plot-cards.md)

@@ -22,7 +22,8 @@ export type THistoryType =
   | 'preVote'
   | 'leadToVictory'
   | 'restoreHonor'
-  | 'ambush';
+  | 'ambush'
+  | 'kingReturns';
 
 /**
  * History element stages
@@ -55,7 +56,8 @@ export type THistoryResults =
   | PreVote
   | LeadToVictory
   | RestoreHonor
-  | Ambush;
+  | Ambush
+  | KingReturns;
 
 /**
  * Pre-vote data
@@ -301,6 +303,16 @@ export class Ambush extends HistoryBase {
 
   @prop()
   public result?: TMissionResult;
+}
+
+/**
+ * King Returns card history
+ */
+export class KingReturns extends HistoryBase {
+  declare type: 'kingReturns';
+
+  @prop({ required: true })
+  public ownerID!: string;
 }
 
 /**

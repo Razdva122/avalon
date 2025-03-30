@@ -60,6 +60,24 @@
         <PlotCard :display-tooltip="true" class="plot-card plot-card-selectionInProgress" card-name="ambush"></PlotCard>
       </template>
     </template>
+
+    <template v-if="game.stage === 'kingReturns'">
+      <template v-if="isUserKingReturnsOwner">
+        <v-btn color="success" @click="() => kingReturnsClick(true)" class="mb-2">
+          {{ $t('inGame.useCard', { cardName: $t('cardsInfo.kingReturns') }) }}
+        </v-btn>
+        <v-btn color="warning" @click="() => kingReturnsClick(false)">
+          {{ $t('inGame.skipCard', { cardName: $t('cardsInfo.kingReturns') }) }}
+        </v-btn>
+      </template>
+      <template v-else>
+        <PlotCard
+          :display-tooltip="true"
+          class="plot-card plot-card-selectionInProgress"
+          card-name="kingReturns"
+        ></PlotCard>
+      </template>
+    </template>
   </div>
 </template>
 
@@ -107,6 +125,10 @@ export default defineComponent({
       return Boolean(player.value?.features.restoreHonorCard === 'active');
     });
 
+    const isUserKingReturnsOwner = computed(() => {
+      return Boolean(player.value?.features.kingReturnsCard === 'active');
+    });
+
     const isGivePlotCardAvailable = computed(() => {
       return (
         isSinglePlayerSelected.value &&
@@ -135,6 +157,10 @@ export default defineComponent({
       socket.emit('useLeadToVictory', game.value.uuid, use);
     };
 
+    const kingReturnsClick = (use: boolean) => {
+      socket.emit('useKingReturns', game.value.uuid, use);
+    };
+
     const emitClick = (methodName: TMethodsWithoutParams) => {
       socket.emit(methodName, game.value.uuid);
     };
@@ -146,10 +172,12 @@ export default defineComponent({
       isUserAmbushOwner,
       isUserLeadToVictoryOwner,
       isUserRestoreHonorOwner,
+      isUserKingReturnsOwner,
       isGivePlotCardAvailable,
       isUseAmbushAvailable,
       givePlotCard,
       leadToVictoryClick,
+      kingReturnsClick,
       emitClick,
     };
   },

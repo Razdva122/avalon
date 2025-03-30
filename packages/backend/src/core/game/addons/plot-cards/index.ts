@@ -92,6 +92,7 @@ export class PlotCardsAddon implements IGameAddon {
     this.game.selectAvailable.ambush = (player) => player.features.ambushCard === 'active';
     this.game.selectAvailable.leadToVictory = (player) => player.features.leadToVictoryCard === 'active';
     this.game.selectAvailable.restoreHonor = (player) => player.features.restoreHonorCard === 'active';
+    this.game.selectAvailable.kingReturns = (player) => player.features.kingReturnsCard === 'active';
 
     return of(true);
   }

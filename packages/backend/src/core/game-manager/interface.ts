@@ -33,7 +33,8 @@ export type TGameMethodsParams =
   | TPreVoteParams
   | TUseLeadToVictoryParams
   | TUseAmbushParams
-  | TUseRestoreHonorParams;
+  | TUseRestoreHonorParams
+  | TUseKingReturnsParams;
 
 export type TSelectPlayerParams = {
   method: 'selectPlayer';
@@ -104,6 +105,11 @@ export type TUseAmbushParams = {
 export type TUseRestoreHonorParams = {
   method: 'useRestoreHonor';
   cardName: TPlotCardNames;
+};
+
+export type TUseKingReturnsParams = {
+  method: 'useKingReturns';
+  use: boolean;
 };
 
 export type TGetLoyaltyData = {

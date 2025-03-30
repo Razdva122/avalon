@@ -3,7 +3,13 @@ import type { User } from '@/user';
 import type { TRoomState, TGameMethodsParams, TGetLoyaltyData } from '@/core/game-manager/interface';
 import { eventBus } from '@/helpers';
 import { Mission } from '@/core/game/history/mission';
-import { isChargeCard, isLeadToVictoryCard, isAmbushCard, isRestoreHonorCard } from '@/core/game/addons/plot-cards';
+import {
+  isChargeCard,
+  isLeadToVictoryCard,
+  isAmbushCard,
+  isRestoreHonorCard,
+  isKingReturnsCard,
+} from '@/core/game/addons/plot-cards';
 
 import * as _ from 'lodash';
 
@@ -348,6 +354,25 @@ export class GameManager {
         }
 
         throw new Error(`Active card ${activeCard.name} is not restore honor`);
+      }
+
+      case 'useKingReturns': {
+        if (!this.game.addons.plotCards) {
+          throw new Error('You cant use king returns in game without plot cards addon');
+        }
+
+        const activeCard = this.game.addons.plotCards.activeCard;
+
+        if (!activeCard) {
+          throw new Error('No active card');
+        }
+
+        if (isKingReturnsCard(activeCard)) {
+          activeCard.kingReturns(params.use);
+          break;
+        }
+
+        throw new Error(`Active card ${activeCard.name} is not king returns`);
       }
     }
   }
