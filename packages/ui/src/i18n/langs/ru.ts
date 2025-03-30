@@ -233,6 +233,12 @@ export const ru = {
     skip: 'Пропустить',
     useCard: 'Использовать {cardName}',
     skipCard: 'Пропустить {cardName}',
+    selectPlayer: 'Выберите игрока',
+    selectSinglePlayer: 'Пожалуйста, выберите только одного игрока',
+    cannotSelectSelf: 'Вы не можете выбрать себя',
+    takeCard: 'Взять карту',
+    selectCard: 'Выберите карту',
+    noAvailableCards: 'Нет доступных карт',
   },
   assassinate: {
     lovers: 'Любовники',

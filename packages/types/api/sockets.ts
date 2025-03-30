@@ -8,6 +8,7 @@ import type { TVoteOption } from '../game/vote';
 import type { TMissionResult } from '../game/mission';
 import type { TLoyalty, TRoles } from '../game/roles';
 import type { TLoyaltyType } from '../game/addons/loyalty';
+import type { TPlotCardNames } from '../game/addons/plot-cards';
 
 import type {
   IRoomUnavailableError,
@@ -112,6 +113,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents {
   preVote: (uuid: string, option: TVoteOption) => void;
   useLeadToVictory: (uuid: string, use: boolean) => void;
   useAmbush: (uuid: string) => void;
+  useRestoreHonor: (uuid: string, cardName: TPlotCardNames) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;

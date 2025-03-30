@@ -28,6 +28,7 @@ export type TAdditionalAddonsConstructor =
   | typeof ExcaliburAddon
   | typeof LadyOfSeaAddon
   | typeof PlotCardsAddon;
+
 export type TRolesAddonsConstructor =
   | typeof AssassinAddon
   | typeof LancelotsAddon

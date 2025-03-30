@@ -3,7 +3,7 @@ import type { User } from '@/user';
 import type { TRoomState, TGameMethodsParams, TGetLoyaltyData } from '@/core/game-manager/interface';
 import { eventBus } from '@/helpers';
 import { Mission } from '@/core/game/history/mission';
-import { isChargeCard, isLeadToVictoryCard, isAmbushCard } from '@/core/game/addons/plot-cards';
+import { isChargeCard, isLeadToVictoryCard, isAmbushCard, isRestoreHonorCard } from '@/core/game/addons/plot-cards';
 
 import * as _ from 'lodash';
 
@@ -321,6 +321,33 @@ export class GameManager {
         }
 
         throw new Error(`Active card ${activeCard.name} is not ambush`);
+      }
+
+      case 'useRestoreHonor': {
+        if (!this.game.addons.plotCards) {
+          throw new Error('You cant use restore honor in game without plot cards addon');
+        }
+
+        const activeCard = this.game.addons.plotCards.activeCard;
+
+        if (!activeCard) {
+          throw new Error('No active card');
+        }
+
+        if (isRestoreHonorCard(activeCard)) {
+          // Get the selected player from the game
+          const selectedPlayers = this.game.players.filter((player) => player.features.isSelected);
+
+          if (selectedPlayers.length !== 1) {
+            throw new Error('You must select exactly one player to use restore honor');
+          }
+
+          const targetPlayerId = selectedPlayers[0].user.id;
+          activeCard.restoreHonor(params.cardName, targetPlayerId, userID);
+          break;
+        }
+
+        throw new Error(`Active card ${activeCard.name} is not restore honor`);
       }
     }
   }

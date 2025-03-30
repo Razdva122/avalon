@@ -1,6 +1,10 @@
 <template>
-  <div>
-    <div v-if="data?.length" class="plot-cards-view mb-2">
+  <div class="plot-cards-panel">
+    <template v-if="game.stage === 'restoreHonor' && isUserRestoreHonorOwner">
+      <RestoreHonorView :game="game" />
+    </template>
+
+    <div v-else-if="data?.length" class="plot-cards-view mb-2">
       <PlotCard
         :display-tooltip="true"
         class="plot-card"
@@ -17,7 +21,7 @@
       </v-btn>
     </template>
 
-    <template v-if="game.stage === 'leadToVictory' && isPlayerActive">
+    <template v-if="game.stage === 'leadToVictory' && isUserLeadToVictoryOwner">
       <v-btn color="success" @click="() => leadToVictoryClick(true)" class="mb-2">
         {{ $t('inGame.takeLead') }}
       </v-btn>
@@ -42,8 +46,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, toRefs, computed } from 'vue';
+import { defineComponent, PropType, toRefs, computed, ref } from 'vue';
 import PlotCard from '@/components/view/information/PlotCard.vue';
+import RestoreHonorView from '@/components/view/board/game/modules/RestoreHonorView.vue';
 import type { ActiveCard, VisualGameState } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useGamePlayerState } from '@/helpers/composables/useGamePlayerState';
@@ -54,6 +59,7 @@ export default defineComponent({
   name: 'PlotCardsPanel',
   components: {
     PlotCard,
+    RestoreHonorView,
   },
   props: {
     data: {
@@ -73,6 +79,14 @@ export default defineComponent({
 
     const isUserAmbushOwner = computed(() => {
       return Boolean(player.value?.features.ambushCard === 'active');
+    });
+
+    const isUserLeadToVictoryOwner = computed(() => {
+      return Boolean(player.value?.features.leadToVictoryCard === 'active');
+    });
+
+    const isUserRestoreHonorOwner = computed(() => {
+      return Boolean(player.value?.features.restoreHonorCard === 'active');
     });
 
     const isGivePlotCardAvailable = computed(() => {
@@ -112,6 +126,8 @@ export default defineComponent({
       isPlayerActive,
       isZeroPlayerSelected,
       isUserAmbushOwner,
+      isUserLeadToVictoryOwner,
+      isUserRestoreHonorOwner,
       isGivePlotCardAvailable,
       isUseAmbushAvailable,
       givePlotCard,
@@ -143,5 +159,10 @@ export default defineComponent({
 
 .plot-card-used {
   opacity: 50%;
+}
+
+.plot-cards-panel {
+  display: flex;
+  flex-direction: column;
 }
 </style>

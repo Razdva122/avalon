@@ -241,6 +241,12 @@ export const en = {
     skip: 'Skip',
     useCard: 'Use {cardName}',
     skipCard: 'Skip {cardName}',
+    selectPlayer: 'Select a player',
+    selectSinglePlayer: 'Please select only one player',
+    cannotSelectSelf: 'You cannot select yourself',
+    takeCard: 'Take card',
+    selectCard: 'Select a card',
+    noAvailableCards: 'No available cards',
   },
   assassinate: {
     lovers: 'Lovers',

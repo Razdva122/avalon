@@ -22,6 +22,7 @@ export class RestoreHonorCard extends AbstractCard implements IInstantPlotCard {
 
   play(ownerID: string) {
     if (!this.gameHaveCardsToSteal(ownerID)) {
+      this.plotCardsAddon.removeCardFromGame(this);
       return of(true);
     }
 
@@ -53,7 +54,9 @@ export class RestoreHonorCard extends AbstractCard implements IInstantPlotCard {
     const featureName = <keyof PlotCardsFeatures>(cardName + 'Card');
 
     owner.features[featureName] = undefined;
+    owner.features.isSelected = false;
     newOwner.features[featureName] = 'has';
+    newOwner.features.waitForAction = false;
 
     this.game.history.push(new RestoreHonorHistory(owner, newOwner, cardName));
 

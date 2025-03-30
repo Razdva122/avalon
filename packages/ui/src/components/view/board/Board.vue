@@ -151,7 +151,10 @@ export default defineComponent({
         (stage === 'useExcalibur' && features.excalibur) ||
         (stage === 'checkLoyalty' && (features.ladyOfLake === 'has' || features.ladyOfSea === 'has')) ||
         (stage === 'witchLoyalty' && features.witchLoyalty) ||
-        (stage === 'giveCard' && features.isLeader)
+        (stage === 'giveCard' && features.isLeader) ||
+        (stage === 'ambush' && features.ambushCard === 'active') ||
+        (stage === 'leadToVictory' && features.leadToVictoryCard === 'active') ||
+        (stage === 'restoreHonor' && features.restoreHonorCard === 'active')
       );
     };
 

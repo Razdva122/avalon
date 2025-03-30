@@ -30,7 +30,7 @@ export class AmbushCard extends AbstractCard implements IUsablePlotCard {
 
   ambush() {
     const selectedPlayer = this.game.selectedPlayers[0];
-    const ownerOfAmbush = this.game.players.find((player) => player.features.ambushCard === 'has')!;
+    const ownerOfAmbush = this.game.players.find((player) => player.features.ambushCard === 'active')!;
 
     if (selectedPlayer) {
       const mission = this.game.currentMission;
@@ -49,6 +49,7 @@ export class AmbushCard extends AbstractCard implements IUsablePlotCard {
       this.plotCardsAddon.removeCardFromGame(this);
     }
 
+    ownerOfAmbush.features.waitForAction = false;
     this.ambushSubject.next(true);
   }
 }

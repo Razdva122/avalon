@@ -233,6 +233,12 @@ export const zh_TW = {
     skip: '跳過',
     useCard: '使用{cardName}',
     skipCard: '跳過{cardName}',
+    selectPlayer: '選擇一名玩家',
+    selectSinglePlayer: '請只選擇一名玩家',
+    cannotSelectSelf: '你不能選擇自己',
+    takeCard: '拿取卡牌',
+    selectCard: '選擇一張卡牌',
+    noAvailableCards: '沒有可用的卡牌',
   },
   assassinate: {
     lovers: '戀人',

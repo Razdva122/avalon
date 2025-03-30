@@ -128,6 +128,10 @@ export class Game extends GameHooks {
       throw new Error(`Invalid players count. Players count: ${users.length}`);
     }
 
+    if (users.length > 6 && options.addons.plotCards) {
+      throw new Error(`Plot cards currently available only in games for 5 and 6 players`);
+    }
+
     this.stateObserver = stateObserver;
 
     const settings = gamesSettings[users.length];
@@ -336,6 +340,7 @@ export class Game extends GameHooks {
 
     this.callHooks('beforeSelectTeam', () => {
       this.stage = 'selectTeam';
+      this.stateObserver.gameStateChanged();
     });
   }
 

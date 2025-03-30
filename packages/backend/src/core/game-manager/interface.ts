@@ -8,6 +8,7 @@ import type {
   TAssassinateType,
   TRoles,
   TLoyaltyType,
+  TPlotCardNames,
 } from '@avalon/types';
 
 import type { TDataForManagerOptions } from '@/core/game/history';
@@ -31,7 +32,8 @@ export type TGameMethodsParams =
   | TGivePlotCardParams
   | TPreVoteParams
   | TUseLeadToVictoryParams
-  | TUseAmbushParams;
+  | TUseAmbushParams
+  | TUseRestoreHonorParams;
 
 export type TSelectPlayerParams = {
   method: 'selectPlayer';
@@ -97,6 +99,11 @@ export type TUseLeadToVictoryParams = {
 
 export type TUseAmbushParams = {
   method: 'useAmbush';
+};
+
+export type TUseRestoreHonorParams = {
+  method: 'useRestoreHonor';
+  cardName: TPlotCardNames;
 };
 
 export type TGetLoyaltyData = {

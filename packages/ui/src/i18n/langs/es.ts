@@ -233,6 +233,12 @@ export const es = {
     skip: 'Omitir',
     useCard: 'Usar {cardName}',
     skipCard: 'Omitir {cardName}',
+    selectPlayer: 'Seleccionar un jugador',
+    selectSinglePlayer: 'Por favor, seleccione solo un jugador',
+    cannotSelectSelf: 'No puedes seleccionarte a ti mismo',
+    takeCard: 'Tomar carta',
+    selectCard: 'Seleccionar una carta',
+    noAvailableCards: 'No hay cartas disponibles',
   },
   assassinate: {
     lovers: 'Amantes',

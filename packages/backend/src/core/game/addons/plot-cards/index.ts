@@ -45,7 +45,7 @@ export class PlotCardsAddon implements IGameAddon {
       ChargeCard,
     ];
 
-    if (this.game.players.length > 1) {
+    if (this.game.players.length > 6) {
       cards.push(
         ...[
           KingReturnsCard,
@@ -59,7 +59,7 @@ export class PlotCardsAddon implements IGameAddon {
         ],
       );
 
-      this.cardsPerRound = this.game.players.length > 1 ? 3 : 2;
+      this.cardsPerRound = this.game.players.length > 8 ? 3 : 2;
     } else {
       this.cardsPerRound = 1;
     }
@@ -89,6 +89,9 @@ export class PlotCardsAddon implements IGameAddon {
   afterInit() {
     this.game.selectAvailable.giveCard = (player) => player.features.isLeader === true;
     this.game.selectAvailable.preVote = (player) => player.features.waitForAction === true;
+    this.game.selectAvailable.ambush = (player) => player.features.ambushCard === 'active';
+    this.game.selectAvailable.leadToVictory = (player) => player.features.leadToVictoryCard === 'active';
+    this.game.selectAvailable.restoreHonor = (player) => player.features.restoreHonorCard === 'active';
 
     return of(true);
   }
