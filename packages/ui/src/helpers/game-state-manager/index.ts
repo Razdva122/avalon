@@ -308,6 +308,7 @@ export class GameStateManager {
         leadToVictory: 'leadToVictory',
         restoreHonor: 'restoreHonor',
         ambush: 'ambush',
+        kingReturns: 'kingReturns',
       } as const
     )[history.type];
   }

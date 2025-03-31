@@ -47,6 +47,7 @@ export const en = {
     'give card': 'give card',
     'lead to victory': 'lead to victory',
     'restore honor': 'restore honor',
+    'king returns': 'king returns',
     ambush: 'ambush',
     end: 'end',
     lancelots: 'lancelots',

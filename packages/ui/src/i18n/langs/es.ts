@@ -47,7 +47,8 @@ export const es = {
     'give card': 'dar carta',
     'lead to victory': 'liderar hacia la victoria',
     'restore honor': 'restaura tu honor',
-    ambush: 'Emboscada',
+    'king returns': 'el rey regresa',
+    ambush: 'emboscada',
     end: 'fin',
     lancelots: 'lancelotes',
     witch: 'bruja',
@@ -261,6 +262,9 @@ export const es = {
   },
   leadToVictory: {
     history: '<b>{cardOwner}</b> usó la carta «{cardName}» y tomó el liderazgo de <b>{prevLeaderName}</b>',
+  },
+  kingReturns: {
+    history: '<b>{cardOwner}</b> usó la carta «{cardName}» para cancelar la última votación y cambiar el liderazgo',
   },
   preVote: {
     title: 'Votación preliminar',

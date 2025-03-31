@@ -28,15 +28,17 @@ export class KingReturnsCard extends AbstractCard implements IUsablePlotCard {
 
   kingReturns(use: boolean) {
     const owner = this.game.players.find((player) => player.features.kingReturnsCard === 'active')!;
+    owner.features.waitForAction = false;
 
     if (use) {
       const kingReturnsHistory = new KingReturns(owner);
       this.game.history.push(kingReturnsHistory);
 
       this.plotCardsAddon.removeCardFromGame(this);
-      this.game.nextVote();
+      this.game.moveVote();
       this.kingReturnsSubject.next(false);
     } else {
+      owner.features.kingReturnsCard = 'has';
       this.kingReturnsSubject.next(true);
     }
   }

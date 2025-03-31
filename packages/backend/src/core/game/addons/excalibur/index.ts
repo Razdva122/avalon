@@ -32,10 +32,8 @@ export class ExcaliburAddon implements IGameAddon {
     return this.giveExcaliburSubject.asObservable();
   }
 
-  afterVoteForTeam() {
-    if (this.game.stage !== 'onMission') {
-      this.game.players.forEach((player) => (player.features.excalibur = false));
-    }
+  beforeSelectTeam() {
+    this.game.players.forEach((player) => (player.features.excalibur = false));
 
     return of(true);
   }

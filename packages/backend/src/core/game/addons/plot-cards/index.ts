@@ -3,7 +3,7 @@ import { Observable, of, concatMap, from, takeWhile, last, defaultIfEmpty, Subje
 import * as _ from 'lodash';
 import { Game } from '@/core/game';
 import { Dictionary, AddonsData, PlotCardsFeatures } from '@avalon/types';
-import { TPlotCard, ICurrentCardsState, ICardState } from '@/core/game/addons/plot-cards/interface';
+import { TPlotCard, ICurrentCardsState, ICardState, ICrossCardsStorage } from '@/core/game/addons/plot-cards/interface';
 
 import {
   ChargeCard,
@@ -25,6 +25,9 @@ export class PlotCardsAddon implements IGameAddon {
   addonName = 'plotCards';
   cardsPerRound: number;
   game: Game;
+  crossCardsStorage: ICrossCardsStorage = {
+    ambushUsedOn: [],
+  };
   cards: TPlotCard[];
   pointer: number = 0;
   currentCards: ICurrentCardsState = { cards: [], pointer: 0 };
@@ -43,6 +46,12 @@ export class PlotCardsAddon implements IGameAddon {
       KingReturnsCard,
       RestoreHonorCard,
       ChargeCard,
+      LeadToVictoryCard,
+      LeadToVictoryCard,
+      AmbushCard,
+      AmbushCard,
+      KingReturnsCard,
+      RestoreHonorCard,
     ];
 
     if (this.game.players.length > 6) {
@@ -61,7 +70,7 @@ export class PlotCardsAddon implements IGameAddon {
 
       this.cardsPerRound = this.game.players.length > 8 ? 3 : 2;
     } else {
-      this.cardsPerRound = 1;
+      this.cardsPerRound = 3;
     }
 
     this.cards = _.shuffle(cards.map((el) => new el(game, this)));
@@ -128,6 +137,8 @@ export class PlotCardsAddon implements IGameAddon {
       }),
       finalize(() => {
         this.currentCards = { pointer: 0, cards: [] };
+        this.game.leader.features.waitForAction = true;
+        this.game.stateObserver.gameStateChanged();
       }),
       last(),
     );
@@ -211,15 +222,30 @@ export class PlotCardsAddon implements IGameAddon {
   }
 
   beforeStartMission() {
+    this.crossCardsStorage.ambushUsedOn = [];
+
     return of(true).pipe(
       concatMap(() => this.playCardIfExist('kingReturns')),
-      concatMap((result) => (result ? this.activateCards() : of(false))),
       concatMap((result) => (result ? this.playCardIfExist('weFoundYou') : of(false))),
     );
   }
 
   beforeSelectTeam() {
-    return this.playCardIfExist('leadToVictory');
+    return of(true).pipe(
+      concatMap(() => this.playCardIfExist('leadToVictory')),
+      concatMap((result) => {
+        if (this.game.turn === 0 && result) {
+          return this.activateCards();
+        }
+
+        return of(result);
+      }),
+    );
+  }
+
+  afterVoteForTeam() {
+    this.crossCardsStorage.isLeadToVictoryDisabled = false;
+    return of(true);
   }
 
   beforeEndMission() {

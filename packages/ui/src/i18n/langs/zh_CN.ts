@@ -47,6 +47,7 @@ export const zh_CN = {
     'give card': '给卡',
     'lead to victory': '引领胜利',
     'restore honor': '恢复荣誉',
+    'king returns': '王者归来',
     ambush: '埋伏',
     witch: '巫婆',
     end: '完结',
@@ -261,6 +262,9 @@ export const zh_CN = {
   },
   leadToVictory: {
     history: '<b>{cardOwner}</b> 使用了卡牌 «{cardName}» 并从 <b>{prevLeaderName}</b> 接过了领导权',
+  },
+  kingReturns: {
+    history: '<b>{cardOwner}</b> 使用了卡牌 «{cardName}» 取消了最后一次投票并更换了领导权',
   },
   preVote: {
     title: '初步投票',

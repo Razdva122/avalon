@@ -58,6 +58,8 @@ export class RestoreHonorCard extends AbstractCard implements IInstantPlotCard {
     newOwner.features[featureName] = 'has';
     newOwner.features.waitForAction = false;
 
+    card.ownerID = newOwnerID;
+
     this.game.history.push(new RestoreHonorHistory(owner, newOwner, cardName));
 
     this.plotCardsAddon.removeCardFromGame(this);

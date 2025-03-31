@@ -50,3 +50,8 @@ export interface ICardState {
   stage: TActiveCardsStages;
   card: TPlotCard;
 }
+
+export interface ICrossCardsStorage {
+  isLeadToVictoryDisabled?: boolean;
+  ambushUsedOn: string[];
+}

@@ -66,6 +66,10 @@ export class GameManager {
    * Handler, the state of the game has changed, need to update the state of the room
    */
   gameStateChanged(): void {
+    if (!this.roomState || !this.game) {
+      return;
+    }
+
     this.roomState.stage = this.game.stage;
 
     this.roomState = {

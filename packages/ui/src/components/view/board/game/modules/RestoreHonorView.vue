@@ -46,7 +46,7 @@
 <script lang="ts">
 import { defineComponent, PropType, computed, ref, watch } from 'vue';
 import PlotCard from '@/components/view/information/PlotCard.vue';
-import type { VisualGameState, TPlotCardNames } from '@avalon/types';
+import type { VisualGameState, TPlotCardNames, Player } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useGamePlayerState } from '@/helpers/composables/useGamePlayerState';
 import { useStore } from '@/store';
@@ -92,26 +92,27 @@ export default defineComponent({
     const availableCards = computed(() => {
       if (!selectedPlayer.value) return [];
 
+      // Helper function to get player's cards
+      const getPlayerCards = (player: Player) => {
+        if (!player) return [];
+
+        const cards: { name: TPlotCardNames; stage: string }[] = [];
+
+        Object.entries(player.features).forEach(([key, value]) => {
+          if (key.endsWith('Card') && (value === 'has' || value === 'active')) {
+            const cardName = key.replace('Card', '') as TPlotCardNames;
+            cards.push({ name: cardName, stage: 'active' });
+          }
+        });
+
+        return cards;
+      };
+
       // Get the current player's cards
-      const currentPlayerCards =
-        props.game.addonsData.plotCards?.activeCards.filter((card) => card.stage === 'active') || [];
+      const currentPlayerCards = getPlayerCards(currentPlayer.value!);
 
       // Get the selected player's cards
-      const selectedPlayerCards = props.game.players
-        .filter((p) => p.id === selectedPlayer.value?.id)
-        .flatMap((p) => {
-          const cards: { name: TPlotCardNames; stage: string }[] = [];
-
-          // Check each card feature and add if it's 'has' or 'active'
-          Object.entries(p.features).forEach(([key, value]) => {
-            if (key.endsWith('Card') && (value === 'has' || value === 'active')) {
-              const cardName = key.replace('Card', '') as TPlotCardNames;
-              cards.push({ name: cardName, stage: 'active' });
-            }
-          });
-
-          return cards;
-        });
+      const selectedPlayerCards = getPlayerCards(selectedPlayer.value);
 
       // Filter out cards that the current player already has
       return selectedPlayerCards.filter(
@@ -169,6 +170,7 @@ export default defineComponent({
 }
 
 .message-section {
+  font-size: 18px;
   width: 100%;
   display: flex;
   flex-direction: column;

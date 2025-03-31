@@ -47,6 +47,7 @@ export const ru = {
     'give card': 'передать карту',
     'lead to victory': 'привести к победе',
     'restore honor': 'восстанови свою честь',
+    'king returns': 'король возвращается',
     ambush: 'засада',
     witch: 'ведьма',
     end: 'конец',
@@ -261,6 +262,9 @@ export const ru = {
   },
   leadToVictory: {
     history: '<b>{cardOwner}</b> использовал карту «{cardName}» и забрал лидерство у <b>{prevLeaderName}</b>',
+  },
+  kingReturns: {
+    history: '<b>{cardOwner}</b> использовал карту «{cardName}» для отмены последнего голосования и смены лидерства',
   },
   preVote: {
     title: 'Предварительное голосование',

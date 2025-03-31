@@ -295,7 +295,7 @@ export class Game extends GameHooks {
   protected startNextRound() {
     this.round += 1;
     this.currentMission.activateMission();
-    this.nextVote(true);
+    this.moveVote(true);
   }
 
   /**
@@ -328,7 +328,7 @@ export class Game extends GameHooks {
    * Move vote to next stage
    * @param reset - if true clear stage to 0
    */
-  nextVote(reset?: true): void {
+  moveVote(reset?: true): void {
     this.clearSendPlayers();
     this.moveLeader();
 
@@ -354,6 +354,7 @@ export class Game extends GameHooks {
   protected initGame(): void {
     this.callHooks(['afterInit', 'beforeSelectTeam'], () => {
       this.stage = 'selectTeam';
+      this.stateObserver.gameStateChanged();
     });
   }
 
@@ -533,14 +534,14 @@ export class Game extends GameHooks {
     }
 
     if (this.vote.makeVote(player, option)) {
-      if (this.vote.data.result === 'approve') {
-        this.startMission();
-      } else {
-        this.history.push(this.vote);
-        this.nextVote();
-      }
+      this.callHooks(['afterVoteForTeam'], () => {
+        if (this.vote!.data.result === 'approve') {
+          this.startMission();
+        } else {
+          this.history.push(this.vote!);
+          this.moveVote();
+        }
 
-      this.callHooks('afterVoteForTeam', () => {
         this.stateObserver.gameStateChanged();
       });
     } else {

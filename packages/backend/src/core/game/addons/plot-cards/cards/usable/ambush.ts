@@ -41,10 +41,15 @@ export class AmbushCard extends AbstractCard implements IUsablePlotCard {
         throw new Error('The card can only be used to a mission participant');
       }
 
+      if (this.plotCardsAddon.crossCardsStorage.ambushUsedOn.includes(selectedPlayer.user.id)) {
+        throw new Error('This player has already been checked by another «ambush» card.');
+      }
+
       const ambushHistory = new Ambush(ownerOfAmbush, selectedPlayer, selectedPlayerAction.value as TMissionResult);
 
       this.game.history.push(ambushHistory);
       selectedPlayer.features.isSelected = false;
+      this.plotCardsAddon.crossCardsStorage.ambushUsedOn.push(selectedPlayer.user.id);
 
       this.plotCardsAddon.removeCardFromGame(this);
     } else {

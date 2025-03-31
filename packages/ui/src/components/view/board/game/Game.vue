@@ -71,7 +71,7 @@
     </div>
     <div class="mb-4">{{ $t('game.voteStage') }}: {{ gameState.vote + 1 }} / 5</div>
     <div class="button-panel actions-or-info mb-4 d-flex flex-column align-center">
-      <PlotCardsPanel :data="gameState.addonsData.plotCards?.activeCards" :game="gameState" />
+      <PlotCardsPanel v-if="!visibleHistory" :data="gameState.addonsData.plotCards?.activeCards" :game="gameState" />
       <InGamePanel v-if="inGamePanel && !visibleHistory && stateManager.viewMode.value === 'live'" :game="gameState" />
       <div class="d-flex flex-row align-center justify-center" v-if="visibleHistory?.type === 'mission'">
         <template v-for="i in visibleHistory.settings.players">

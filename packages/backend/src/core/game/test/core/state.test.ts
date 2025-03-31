@@ -14,7 +14,7 @@ describe('Game state', () => {
     game.selectPlayer(game.leader.user.id, '1');
     game.selectPlayer(game.leader.user.id, '1');
 
-    expect(gameHelper.stateChangedNumber).toEqual(3);
+    expect(gameHelper.stateChangedNumber).toEqual(4);
   });
 
   test('1 mission game state changes', () => {
@@ -22,9 +22,9 @@ describe('Game state', () => {
 
     const selectPlayersAndSent = settings.missions[0].players + 1;
     const votes = settings.total;
-    const beforeMissionStart = 1;
+    const beforeActionsStateChanged = 3;
     const actions = settings.missions[0].players;
 
-    expect(gameHelper.stateChangedNumber).toEqual(selectPlayersAndSent + votes + beforeMissionStart + actions);
+    expect(gameHelper.stateChangedNumber).toEqual(selectPlayersAndSent + votes + beforeActionsStateChanged + actions);
   });
 });
