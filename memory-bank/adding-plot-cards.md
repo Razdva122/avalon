@@ -328,27 +328,33 @@ callGameMethods(userID: string, params: TGameMethodsParams): void {
   switch (params.method) {
     // Other cases...
 
-    case 'useYourCardName': {
-      if (!this.game.addons.plotCards) {
-        throw new Error('You cant use your card in game without plot cards addon');
-      }
-
-      const activeCard = this.game.addons.plotCards.activeCard;
-
-      if (!activeCard) {
-        throw new Error('No active card');
-      }
-
-      if (isYourCardNameCard(activeCard)) {
-        activeCard.yourCardMethod(params.use);
-        break;
-      }
-
-      throw new Error(`Active card ${activeCard.name} is not your card`);
-    }
+    case 'useYourCardName':
+      this.handlePlotCardAction(
+        'your card',
+        isYourCardNameCard,
+        (card) => card.yourCardMethod(params.use)
+      );
+      break;
   }
 }
 ```
+
+Also, make sure to add the type guard in `packages/backend/src/core/game/addons/plot-cards/helpers.ts`:
+
+```typescript
+export function isYourCardNameCard(card: TPlotCard): card is YourCardNameCard {
+  return card.name === 'yourCardName' && card instanceof YourCardNameCard;
+}
+```
+
+The `handlePlotCardAction` helper method handles all the common validation logic:
+
+- Checking if the plot cards addon exists
+- Getting the active card
+- Validating the card type
+- Executing the action or throwing an appropriate error
+
+````
 
 ### 4. Add a type guard in `packages/backend/src/core/game/addons/plot-cards/helpers.ts`:
 
@@ -356,7 +362,7 @@ callGameMethods(userID: string, params: TGameMethodsParams): void {
 export function isYourCardNameCard(card: TPlotCard): card is YourCardNameCard {
   return card.name === 'yourCardName' && card instanceof YourCardNameCard;
 }
-```
+````
 
 ### 5. Add a socket handler in `packages/backend/src/main/index.ts`:
 
@@ -395,7 +401,60 @@ const stageText = computed(() => {
 });
 ```
 
-### 3. Add UI components for your card in `packages/ui/src/components/view/board/game/modules/PlotCardsPanel.vue`:
+### 3. Create a history view component in `packages/ui/src/components/view/information/history/YourCardName.vue`:
+
+```vue
+<template>
+  <div>
+    <span
+      v-html="
+        $t('yourCardName.history', {
+          cardName: $t('cardsInfo.yourCardName'),
+          cardOwner: calculateNameByID(data.ownerID),
+        })
+      "
+    >
+    </span>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, PropType } from 'vue';
+
+import type { YourCardHistory } from '@avalon/types';
+import type { TCalculateNameByID } from '@/components/view/information/history/interface';
+
+export default defineComponent({
+  props: {
+    data: {
+      required: true,
+      type: Object as PropType<YourCardHistory>,
+    },
+    calculateNameByID: {
+      required: true,
+      type: Function as PropType<TCalculateNameByID>,
+    },
+  },
+});
+</script>
+
+<style scoped lang="scss"></style>
+```
+
+### 4. Register the history component in `packages/ui/src/components/view/information/History.vue`:
+
+```typescript
+// Import the component
+import YourCardName from '@/components/view/information/history/YourCardName.vue';
+
+// Add it to the components section
+components: {
+  // Other components...
+  YourCardName,
+},
+```
+
+### 5. Add UI components for your card in `packages/ui/src/components/view/board/game/modules/PlotCardsPanel.vue`:
 
 ```vue
 <template>
@@ -451,8 +510,9 @@ export default defineComponent({
 
 1. Start the game and make sure your card is included in the deck
 2. Test the card's functionality to ensure it works as expected
-3. Check that the history entries are correctly recorded and displayed
+3. Check that the history entries are correctly recorded and displayed in the history panel
 4. Verify that the UI components are displayed correctly
+5. Test the history view component by clicking on the History button and checking that your card's history entries are properly displayed
 
 ## Conclusion
 

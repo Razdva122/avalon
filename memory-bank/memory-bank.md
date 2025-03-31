@@ -197,7 +197,10 @@ The game supports various addons:
 ### Adding New API Methods for Addons
 
 1. Add a new parameter type in `TGameMethodsParams` in `/packages/backend/src/core/game-manager/interface.ts`
-2. Add handling for the new method in the `callGameMethods` method in `/packages/backend/src/core/game-manager/index.ts`
+2. Add handling for the new method in the `callGameMethods` method in `/packages/backend/src/core/game-manager/index.ts`:
+   - For plot card methods, use the `handlePlotCardAction` helper method
+   - For loyalty-related methods, use the `handleLoyaltyAction` helper method
+   - For addon-specific methods, use the `ensureAddonExists` helper method
 3. Add a new socket handler in the `createMethodsForGame` method in `/packages/backend/src/main/index.ts`
 4. Add a new method in the `ClientToServerEvents` interface in `/packages/types/api/sockets.ts`
 

@@ -40,6 +40,22 @@ The GameManager class (`/packages/backend/src/core/game-manager/index.ts`) manag
 - Processing game methods
 - Ending games
 
+The `callGameMethods` function in GameManager processes all game actions from players:
+
+- It uses a switch statement to route different method types to appropriate handlers
+- Helper methods are used to reduce code duplication:
+  - `ensureAddonExists`: Validates that a required addon is available
+  - `getActivePlotCard`: Retrieves and validates the active plot card
+  - `handlePlotCardAction`: Processes plot card actions with type checking
+  - `handleLoyaltyAction`: Handles loyalty-related actions for different addons
+
+Methods are organized by categories:
+
+- Core game methods (voting, player selection)
+- Addon-specific methods (assassinate, excalibur)
+- Loyalty-related methods (checking and announcing loyalty)
+- Plot card methods (various card actions)
+
 ### Game Stages
 
 The game progresses through several stages:
