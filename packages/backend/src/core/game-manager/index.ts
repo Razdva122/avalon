@@ -10,10 +10,21 @@ import {
   isRestoreHonorCard,
   isKingReturnsCard,
 } from '@/core/game/addons/plot-cards';
+import type { TPlotCard } from '@/core/game/addons/plot-cards/interface';
 
 import * as _ from 'lodash';
 
-import { Server, VisualGameState, Player, GameOptions, TVisibleRole, MissionWithResult } from '@avalon/types';
+import {
+  Server,
+  VisualGameState,
+  Player,
+  GameOptions,
+  TVisibleRole,
+  MissionWithResult,
+  TLoyalty,
+  TRoles,
+  TLoyaltyType,
+} from '@avalon/types';
 
 export * from '@/core/game-manager/interface';
 
@@ -176,6 +187,7 @@ export class GameManager {
 
   callGameMethods(userID: string, params: TGameMethodsParams): void {
     switch (params.method) {
+      // Core game methods
       case 'voteForMission':
         this.game.voteForMission(userID, params.option);
         break;
@@ -192,155 +204,68 @@ export class GameManager {
         this.game.actionOnMission(userID, params.result);
         break;
 
+      // Addon-specific methods
       case 'assassinate':
-        if (!this.game.addons.assassin) {
-          throw new Error('You cant assassinate in game without assassinate addon');
-        }
-
+        this.ensureAddonExists(this.game.addons.assassin, 'assassin');
         this.game.addons.assassin.assassinate(userID, params.type, params.customRole);
         break;
 
-      case 'checkLoyalty':
-        if (this.game.addons.witch && this.game.stage === 'witchLoyalty') {
-          this.game.addons.witch.checkLoyalty(userID);
-          break;
-        }
-
-        if (this.game.addons.ladyOfLake) {
-          this.game.addons.ladyOfLake.checkLoyalty(userID);
-          break;
-        }
-
-        if (this.game.addons.ladyOfSea) {
-          this.game.addons.ladyOfSea.checkLoyalty(userID);
-          break;
-        }
-
-        throw new Error('You cant use check loyalty in this game');
-
-      case 'announceLoyalty':
-        if (this.game.addons.witch && params.type === 'witch') {
-          this.game.addons.witch.announceLoyalty(userID, params.loyalty);
-          break;
-        }
-
-        if (this.game.addons.ladyOfLake) {
-          this.game.addons.ladyOfLake.announceLoyalty(userID, params.loyalty);
-          break;
-        }
-
-        if (this.game.addons.ladyOfSea) {
-          this.game.addons.ladyOfSea.announceLoyalty(userID, params.loyalty);
-          break;
-        }
-
-        throw new Error('You cant announce loyalty in this game');
-
-      case 'giveExcalibur': {
-        if (!this.game.addons.excalibur) {
-          throw new Error('You cant give excalibur in game without excalibur');
-        }
-
+      case 'giveExcalibur':
+        this.ensureAddonExists(this.game.addons.excalibur, 'excalibur');
         this.game.addons.excalibur.giveExcalibur(userID);
         break;
-      }
 
-      case 'useExcalibur': {
-        if (!this.game.addons.excalibur) {
-          throw new Error('You cant use excalibur in game without excalibur');
-        }
-
+      case 'useExcalibur':
+        this.ensureAddonExists(this.game.addons.excalibur, 'excalibur');
         this.game.addons.excalibur.useExcalibur(userID);
         break;
-      }
 
-      case 'witchAbility': {
-        if (!this.game.addons.witch) {
-          throw new Error('You cant use witch ability in game without witch');
-        }
-
+      case 'witchAbility':
+        this.ensureAddonExists(this.game.addons.witch, 'witch');
         this.game.addons.witch.useWitchAbility(userID, params.result);
         break;
-      }
 
-      case 'givePlotCard': {
-        if (!this.game.addons.plotCards) {
-          throw new Error('You cant give plot card in game without plot cards addon');
-        }
-
+      case 'givePlotCard':
+        this.ensureAddonExists(this.game.addons.plotCards, 'plot cards');
         this.game.addons.plotCards.giveCardToPlayer(userID);
         break;
-      }
 
+      // Loyalty-related methods
+      case 'checkLoyalty':
+        this.handleLoyaltyAction(userID, 'checkLoyalty');
+        break;
+
+      case 'announceLoyalty':
+        this.handleLoyaltyAction(userID, 'announceLoyalty', {
+          loyalty: params.loyalty,
+          type: params.type,
+        });
+        break;
+
+      // Plot card methods
       case 'preVote': {
-        if (!this.game.addons.plotCards) {
-          throw new Error('You cant pre-vote in game without plot cards addon');
-        }
-
-        const activeCard = this.game.addons.plotCards.activeCard;
-
-        if (!activeCard) {
-          throw new Error('No active card to vote for');
-        }
+        const activeCard = this.getActivePlotCard();
 
         if (isChargeCard(activeCard)) {
           activeCard.makeVote(userID, params.option);
-          break;
+        } else {
+          throw new Error(`Active card ${activeCard.name} does not support pre-voting`);
         }
-
-        throw new Error(`Active card ${activeCard.name} does not support pre-voting`);
+        break;
       }
 
-      case 'useLeadToVictory': {
-        if (!this.game.addons.plotCards) {
-          throw new Error('You cant use lead to victory in game without plot cards addon');
-        }
+      case 'useLeadToVictory':
+        this.handlePlotCardAction('lead to victory', isLeadToVictoryCard, (card) =>
+          card.leadToVictory(userID, params.use),
+        );
+        break;
 
-        const activeCard = this.game.addons.plotCards.activeCard;
-
-        if (!activeCard) {
-          throw new Error('No active card');
-        }
-
-        if (isLeadToVictoryCard(activeCard)) {
-          activeCard.leadToVictory(userID, params.use);
-          break;
-        }
-
-        throw new Error(`Active card ${activeCard.name} is not lead to victory`);
-      }
-
-      case 'useAmbush': {
-        if (!this.game.addons.plotCards) {
-          throw new Error('You cant use ambush in game without plot cards addon');
-        }
-
-        const activeCard = this.game.addons.plotCards.activeCard;
-
-        if (!activeCard) {
-          throw new Error('No active card');
-        }
-
-        if (isAmbushCard(activeCard)) {
-          activeCard.ambush();
-          break;
-        }
-
-        throw new Error(`Active card ${activeCard.name} is not ambush`);
-      }
+      case 'useAmbush':
+        this.handlePlotCardAction('ambush', isAmbushCard, (card) => card.ambush());
+        break;
 
       case 'useRestoreHonor': {
-        if (!this.game.addons.plotCards) {
-          throw new Error('You cant use restore honor in game without plot cards addon');
-        }
-
-        const activeCard = this.game.addons.plotCards.activeCard;
-
-        if (!activeCard) {
-          throw new Error('No active card');
-        }
-
-        if (isRestoreHonorCard(activeCard)) {
+        this.handlePlotCardAction('restore honor', isRestoreHonorCard, (card) => {
           // Get the selected player from the game
           const selectedPlayers = this.game.players.filter((player) => player.features.isSelected);
 
@@ -349,32 +274,100 @@ export class GameManager {
           }
 
           const targetPlayerId = selectedPlayers[0].user.id;
-          activeCard.restoreHonor(params.cardName, targetPlayerId, userID);
-          break;
-        }
-
-        throw new Error(`Active card ${activeCard.name} is not restore honor`);
+          card.restoreHonor(params.cardName, targetPlayerId, userID);
+        });
+        break;
       }
 
-      case 'useKingReturns': {
-        if (!this.game.addons.plotCards) {
-          throw new Error('You cant use king returns in game without plot cards addon');
-        }
+      case 'useKingReturns':
+        this.handlePlotCardAction('king returns', isKingReturnsCard, (card) => card.kingReturns(params.use));
+        break;
+    }
+  }
 
-        const activeCard = this.game.addons.plotCards.activeCard;
+  /**
+   * Ensures that an addon exists, throws an error if it doesn't
+   */
+  private ensureAddonExists<T>(addon: T | undefined, addonName: string): asserts addon is T {
+    if (!addon) {
+      throw new Error(`You can't use ${addonName} in game without ${addonName} addon`);
+    }
+  }
 
-        if (!activeCard) {
-          throw new Error('No active card');
-        }
+  /**
+   * Gets the active plot card and ensures it exists
+   */
+  private getActivePlotCard(): TPlotCard {
+    this.ensureAddonExists(this.game.addons.plotCards, 'plot cards');
 
-        if (isKingReturnsCard(activeCard)) {
-          activeCard.kingReturns(params.use);
-          break;
-        }
+    const activeCard = this.game.addons.plotCards.activeCard;
 
-        throw new Error(`Active card ${activeCard.name} is not king returns`);
+    if (!activeCard) {
+      throw new Error('No active card');
+    }
+
+    return activeCard;
+  }
+
+  /**
+   * Validates and executes a plot card action
+   */
+  private handlePlotCardAction<T extends TPlotCard>(
+    cardName: string,
+    typeGuard: (card: TPlotCard) => card is T,
+    action: (card: T) => void,
+  ): void {
+    const activeCard = this.getActivePlotCard();
+
+    if (typeGuard(activeCard)) {
+      action(activeCard);
+    } else {
+      throw new Error(`Active card ${activeCard.name} is not ${cardName}`);
+    }
+  }
+
+  /**
+   * Handles loyalty-related actions
+   */
+  private handleLoyaltyAction(
+    userID: string,
+    method: 'checkLoyalty' | 'announceLoyalty',
+    params?: { loyalty: TLoyalty | TRoles; type: TLoyaltyType },
+  ): void {
+    // For witch loyalty check
+    if (this.game.addons.witch && (this.game.stage === 'witchLoyalty' || params?.type === 'witch')) {
+      if (method === 'checkLoyalty') {
+        this.game.addons.witch.checkLoyalty(userID);
+        return;
+      } else if (method === 'announceLoyalty' && params) {
+        this.game.addons.witch.announceLoyalty(userID, params.loyalty);
+        return;
       }
     }
+
+    // For Lady of Lake
+    if (this.game.addons.ladyOfLake) {
+      if (method === 'checkLoyalty') {
+        this.game.addons.ladyOfLake.checkLoyalty(userID);
+        return;
+      } else if (method === 'announceLoyalty' && params) {
+        this.game.addons.ladyOfLake.announceLoyalty(userID, params.loyalty);
+        return;
+      }
+    }
+
+    // For Lady of Sea
+    if (this.game.addons.ladyOfSea) {
+      if (method === 'checkLoyalty') {
+        this.game.addons.ladyOfSea.checkLoyalty(userID);
+        return;
+      } else if (method === 'announceLoyalty' && params) {
+        this.game.addons.ladyOfSea.announceLoyalty(userID, params.loyalty);
+        return;
+      }
+    }
+
+    throw new Error(`You can't use ${method} in this game`);
   }
 
   getGameData<T extends TGetLoyaltyData>(userID: string, params: T['params']): T['result'] {
