@@ -278,7 +278,7 @@ export class GameManager {
           }
 
           const targetPlayerId = selectedPlayers[0].user.id;
-          card.restoreHonor(params.cardName, targetPlayerId, userID);
+          card.restoreHonor(params.cardID, targetPlayerId, userID);
         });
         break;
       }

@@ -4,12 +4,12 @@
       <div v-if="selectedPlayer && availableCards.length > 0" class="plot-cards-view">
         <PlotCard
           v-for="card in availableCards"
-          :key="card.name"
+          :key="card.id"
           :card-name="card.name"
           :display-tooltip="true"
           class="plot-card"
-          :class="{ 'plot-card-selected': selectedCard === card.name }"
-          @click="selectCard(card.name)"
+          :class="{ 'plot-card-selected': selectedCard === card.id }"
+          @click="selectCard(card.id)"
         ></PlotCard>
       </div>
     </div>
@@ -46,10 +46,10 @@
 <script lang="ts">
 import { defineComponent, PropType, computed, ref, watch } from 'vue';
 import PlotCard from '@/components/view/information/PlotCard.vue';
-import type { VisualGameState, TPlotCardNames, Player } from '@avalon/types';
+import type { VisualGameState } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useGamePlayerState } from '@/helpers/composables/useGamePlayerState';
-import { useStore } from '@/store';
+import { getPlayerCards } from '@/helpers/plot-cards';
 
 export default defineComponent({
   name: 'RestoreHonorView',
@@ -63,7 +63,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const store = useStore();
     const gameComputed = computed(() => props.game);
     const { player: currentPlayer } = useGamePlayerState(gameComputed);
 
@@ -83,49 +82,25 @@ export default defineComponent({
       return selectedPlayer.value?.id === currentPlayer.value?.id;
     });
 
-    const selectedCard = ref<TPlotCardNames | null>(null);
+    const selectedCard = ref<string | null>(null);
 
     watch(selectedPlayers, () => {
       selectedCard.value = null;
     });
 
     const availableCards = computed(() => {
-      if (!selectedPlayer.value) return [];
+      if (!selectedPlayer.value || !currentPlayer.value) return [];
 
-      // Helper function to get player's cards
-      const getPlayerCards = (player: Player) => {
-        if (!player) return [];
-
-        const cards: { name: TPlotCardNames; stage: string }[] = [];
-
-        Object.entries(player.features).forEach(([key, value]) => {
-          if (key.endsWith('Card') && (value === 'has' || value === 'active')) {
-            const cardName = key.replace('Card', '') as TPlotCardNames;
-            cards.push({ name: cardName, stage: 'active' });
-          }
-        });
-
-        return cards;
-      };
-
-      // Get the current player's cards
-      const currentPlayerCards = getPlayerCards(currentPlayer.value!);
-
-      // Get the selected player's cards
-      const selectedPlayerCards = getPlayerCards(selectedPlayer.value);
-
-      // Filter out cards that the current player already has
-      return selectedPlayerCards.filter(
-        (selectedCard) => !currentPlayerCards.some((currentCard) => currentCard.name === selectedCard.name),
-      );
+      return getPlayerCards(props.game, selectedPlayer.value.id);
     });
 
     const canRestoreHonor = computed(() => {
       return selectedPlayer.value && selectedCard.value && !isMultiplePlayersSelected.value && !isSelfSelected.value;
     });
 
-    const selectCard = (cardName: TPlotCardNames) => {
-      selectedCard.value = selectedCard.value === cardName ? null : cardName;
+    const selectCard = (cardId: string | undefined) => {
+      if (!cardId) return;
+      selectedCard.value = selectedCard.value === cardId ? null : cardId;
     };
 
     const onRestoreHonor = () => {
@@ -135,6 +110,7 @@ export default defineComponent({
       }
 
       if (selectedCard.value) {
+        // Use the card ID as the identifier
         socket.emit('useRestoreHonor', props.game.uuid, selectedCard.value);
         selectedCard.value = null;
       }

@@ -8,7 +8,6 @@ import type {
   TAssassinateType,
   TRoles,
   TLoyaltyType,
-  TPlotCardNames,
 } from '@avalon/types';
 
 import type { TDataForManagerOptions } from '@/core/game/history';
@@ -104,7 +103,7 @@ export type TUseAmbushParams = {
 
 export type TUseRestoreHonorParams = {
   method: 'useRestoreHonor';
-  cardName: TPlotCardNames;
+  cardID: string;
 };
 
 export type TUseKingReturnsParams = {

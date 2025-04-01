@@ -1,6 +1,6 @@
-# Adding New Plot Cards to Avalon
+# Adding New Plot Cards to Avalon - Updated Guide
 
-This guide provides step-by-step instructions for adding new plot cards to the Avalon game. Plot cards are special cards that can be used by players to influence the game in various ways.
+This guide provides updated instructions for adding new plot cards to the Avalon game, reflecting the new implementation that uses `addonsData.cardsInGame` instead of `player.features`.
 
 ## Types of Plot Cards
 
@@ -77,9 +77,10 @@ export class YourCardNameCard extends AbstractCard implements IUsablePlotCard {
 
   yourCardMethod(use: boolean) {
     // Find the player who owns the card
-    const owner = this.game.players.find((player) => player.features.yourCardNameCard === 'active');
+    const owner = this.game.findPlayerByID(this.ownerID!);
+    owner.features.waitForAction = false;
 
-    if (use && owner) {
+    if (use) {
       // Create history entry
       const cardHistory = new YourCardHistory(owner);
       this.game.history.push(cardHistory);
@@ -91,6 +92,8 @@ export class YourCardNameCard extends AbstractCard implements IUsablePlotCard {
       this.plotCardsAddon.removeCardFromGame(this);
       this.yourCardSubject.next(false);
     } else {
+      // If not used, set stage back to 'has'
+      this.stage = 'has';
       this.yourCardSubject.next(true);
     }
   }
@@ -244,23 +247,7 @@ export type THistoryDataForManager = {
 };
 ```
 
-## Step 7: Add Player Features
-
-Update the `PlotCardsFeatures` class in `packages/types/game/addons/index.ts` to add a feature for your card:
-
-```typescript
-export class PlotCardsFeatures {
-  // Other features...
-
-  /**
-   * Your card description
-   */
-  @prop()
-  yourCardNameCard?: 'has' | 'active';
-}
-```
-
-## Step 8: Add Card to the Plot Cards Addon
+## Step 7: Add Card to the Plot Cards Addon
 
 Update the `PlotCardsAddon` constructor in `packages/backend/src/core/game/addons/plot-cards/index.ts` to include your card:
 
@@ -289,13 +276,13 @@ If needed, add a selectAvailable handler for your card:
 ```typescript
 afterInit() {
   // Other handlers...
-  this.game.selectAvailable.yourCardName = (player) => player.features.yourCardNameCard === 'active';
+  this.game.selectAvailable.yourCardName = isCardActive('yourCardName');
 
   return of(true);
 }
 ```
 
-## Step 9: Add API Support
+## Step 8: Add API Support
 
 ### 1. Add a method to the `ClientToServerEvents` interface in `packages/types/api/sockets.ts`:
 
@@ -339,30 +326,13 @@ callGameMethods(userID: string, params: TGameMethodsParams): void {
 }
 ```
 
-Also, make sure to add the type guard in `packages/backend/src/core/game/addons/plot-cards/helpers.ts`:
-
-```typescript
-export function isYourCardNameCard(card: TPlotCard): card is YourCardNameCard {
-  return card.name === 'yourCardName' && card instanceof YourCardNameCard;
-}
-```
-
-The `handlePlotCardAction` helper method handles all the common validation logic:
-
-- Checking if the plot cards addon exists
-- Getting the active card
-- Validating the card type
-- Executing the action or throwing an appropriate error
-
-````
-
 ### 4. Add a type guard in `packages/backend/src/core/game/addons/plot-cards/helpers.ts`:
 
 ```typescript
 export function isYourCardNameCard(card: TPlotCard): card is YourCardNameCard {
   return card.name === 'yourCardName' && card instanceof YourCardNameCard;
 }
-````
+```
 
 ### 5. Add a socket handler in `packages/backend/src/main/index.ts`:
 
@@ -373,7 +343,7 @@ socket.on('useYourCardName', (uuid, use) => {
 });
 ```
 
-## Step 10: Add Frontend Support
+## Step 9: Add Frontend Support
 
 ### 1. Add a translation for your card in `packages/ui/src/i18n/langs/en.ts`:
 
@@ -488,8 +458,14 @@ export default defineComponent({
   setup(props) {
     // ...
 
+    // Use the new method to check if the player has the card
     const isUserYourCardNameOwner = computed(() => {
-      return Boolean(player.value?.features.yourCardNameCard === 'active');
+      const playerID = player.value?.id;
+      return Boolean(
+        game.value.addonsData?.plotCards?.cardsInGame?.some(
+          (card) => card.name === 'yourCardName' && card.ownerID === playerID && card.stage === 'active',
+        ),
+      );
     });
 
     const yourCardNameClick = (use: boolean) => {
@@ -506,16 +482,41 @@ export default defineComponent({
 </script>
 ```
 
-## Step 11: Test Your Card
+## Step 10: Testing Your Card
 
-1. Start the game and make sure your card is included in the deck
-2. Test the card's functionality to ensure it works as expected
-3. Check that the history entries are correctly recorded and displayed in the history panel
-4. Verify that the UI components are displayed correctly
-5. Test the history view component by clicking on the History button and checking that your card's history entries are properly displayed
+1. Test the card distribution during the game
+2. Test the card activation and usage
+3. Verify that the history is correctly recorded
+4. Check that the UI correctly displays the card state
+5. Test edge cases and interactions with other cards
 
-## Conclusion
+## Helper Functions for Frontend Components
 
-Adding a new plot card to Avalon involves multiple steps across different parts of the codebase. By following this guide, you can ensure that your card is properly integrated into the game's systems and works correctly.
+To simplify card checks in frontend components, you can create these helper functions:
 
-Remember to test your card thoroughly to ensure it doesn't introduce any bugs or unintended behavior.
+```typescript
+// Check if a player has a card (any stage)
+const hasCard = (playerID, cardName) => {
+  return Boolean(
+    game.value.addonsData?.plotCards?.cardsInGame?.some((card) => card.name === cardName && card.ownerID === playerID),
+  );
+};
+
+// Check if a player has an active card
+const hasActiveCard = (playerID, cardName) => {
+  return Boolean(
+    game.value.addonsData?.plotCards?.cardsInGame?.some(
+      (card) => card.name === cardName && card.ownerID === playerID && card.stage === 'active',
+    ),
+  );
+};
+
+// Get all cards owned by a player
+const getPlayerCards = (playerID) => {
+  if (!playerID || !game.value.addonsData?.plotCards?.cardsInGame) return [];
+
+  return game.value.addonsData.plotCards.cardsInGame
+    .filter((card) => card.ownerID === playerID)
+    .map((card) => ({ name: card.name, stage: card.stage }));
+};
+```

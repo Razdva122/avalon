@@ -27,7 +27,7 @@ export class KingReturnsCard extends AbstractCard implements IUsablePlotCard {
   }
 
   kingReturns(use: boolean) {
-    const owner = this.game.players.find((player) => player.features.kingReturnsCard === 'active')!;
+    const owner = this.game.findPlayerByID(this.ownerID!);
     owner.features.waitForAction = false;
 
     if (use) {
@@ -38,7 +38,7 @@ export class KingReturnsCard extends AbstractCard implements IUsablePlotCard {
       this.game.moveVote();
       this.kingReturnsSubject.next(false);
     } else {
-      owner.features.kingReturnsCard = 'has';
+      this.stage = 'has';
       this.kingReturnsSubject.next(true);
     }
   }

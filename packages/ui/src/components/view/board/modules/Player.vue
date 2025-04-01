@@ -16,14 +16,8 @@
         :alt="addon"
         :src="getImagePathByID('features', toSnakeCase(addon))"
       />
-      <template v-for="cardName in plotCardsNames">
-        <PlotCard
-          :displayTooltip="true"
-          v-if="player.features[<keyof PlotCardsFeatures>(cardName + 'Card')]"
-          class="plot-card"
-          :class="`plot-card-${player.features[<keyof PlotCardsFeatures>(cardName + 'Card')]}`"
-          :cardName="cardName"
-        />
+      <template v-for="card in playerCards" :key="card.name">
+        <PlotCard :displayTooltip="true" class="plot-card" :class="`plot-card-${card.stage}`" :cardName="card.name" />
       </template>
     </div>
     <i class="material-icons action-icon close text-error"></i>
@@ -58,9 +52,9 @@ import type {
   TGameStage,
   IActionWithResult,
   TPlotCardNames,
-  PlotCardsFeatures,
 } from '@avalon/types';
 import { availablePlotCards } from '@avalon/types';
+import { getPlayerCards } from '@/helpers/plot-cards';
 import type { IFrontendPlayer } from '@/components/view/board/interface';
 import { gameStateKey } from '@/helpers/game-state-manager';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
@@ -260,6 +254,15 @@ export default defineComponent({
 
     const plotCardsNames = <TPlotCardNames[]>Object.keys(availablePlotCards);
 
+    // Get player cards using our helper function
+    const playerCards = computed(() => {
+      if (!player.value || !('id' in player.value) || !gameState.value) {
+        return [];
+      }
+
+      return getPlayerCards(gameState.value, player.value.id);
+    });
+
     return {
       userState,
       displayUserAvatar,
@@ -269,6 +272,7 @@ export default defineComponent({
       getImagePathByID,
       toSnakeCase,
       plotCardsNames,
+      playerCards,
     };
   },
 });

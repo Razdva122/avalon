@@ -199,10 +199,56 @@ These addons can be enabled regardless of the roles in play:
   - Implementation: `/packages/backend/src/core/game/addons/excalibur/index.ts`
 
 - **Plot Cards**: Adds special cards with unique effects
+
   - Cards include: Charge, Restore Honor, Show Strength, Show Nature, Are You The One, Lead to Victory, Ambush, King Returns, We Found You
   - Cards can affect voting, team composition, and other aspects of the game
   - Implementation: `/packages/backend/src/core/game/addons/plot-cards/index.ts`
   - For detailed instructions on adding new plot cards, see [Adding Plot Cards](adding-plot-cards.md)
+
+  Plot cards use a centralized data structure in the `addonsData.plotCards` object:
+
+  - `cardsInGame`: An array of cards currently in play, each with:
+    - `name`: The card name (e.g., 'leadToVictory', 'ambush')
+    - `ownerID`: The ID of the player who owns the card
+    - `stage`: The current stage of the card ('has' or 'active')
+  - `activeCards`: Cards that are currently in the active state
+  - `cardsState`: Contains information about used and remaining cards
+
+  Frontend components check the `addonsData.cardsInGame` array to determine if a player has a specific card:
+
+  ```typescript
+  // Example of checking if a player has an active ambush card
+  const isUserAmbushOwner = computed(() => {
+    const playerID = player.value?.id;
+    return Boolean(
+      game.value.addonsData?.plotCards?.cardsInGame?.some(
+        (card) => card.name === 'ambush' && card.ownerID === playerID && card.stage === 'active',
+      ),
+    );
+  });
+  ```
+
+  Helper functions are available in `packages/ui/src/helpers/plot-cards/index.ts` to simplify these checks:
+
+  ```typescript
+  // Check if a player has an active card
+  const hasActiveCard = (game, playerID, cardName) => {
+    return Boolean(
+      game.addonsData?.plotCards?.cardsInGame?.some(
+        (card) => card.name === cardName && card.ownerID === playerID && card.stage === 'active',
+      ),
+    );
+  };
+
+  // Get all cards owned by a player
+  const getPlayerCards = (game, playerID) => {
+    if (!playerID || !game.addonsData?.plotCards?.cardsInGame) return [];
+
+    return game.addonsData.plotCards.cardsInGame
+      .filter((card) => card.ownerID === playerID)
+      .map((card) => ({ name: card.name, stage: card.stage }));
+  };
+  ```
 
 ## Hook System
 
@@ -273,3 +319,11 @@ Game settings are determined by the number of players:
 5. Use types from the `types` package for type safety
 6. Test new functionality thoroughly to ensure game balance
 7. When adding new plot cards, follow the detailed guide in [Adding Plot Cards](adding-plot-cards.md)
+
+### Recommendations for Working with Plot Cards
+
+1. Use helper functions from `packages/ui/src/helpers/plot-cards/index.ts` to check card ownership and status
+2. Access cards through the `addonsData.plotCards.cardsInGame` array instead of using `player.features` properties
+3. When adding new cards, follow the existing pattern in the backend
+4. Update frontend components to use the helper functions for consistent card handling
+5. Test thoroughly to ensure all card functionality works correctly

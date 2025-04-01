@@ -8,6 +8,10 @@ export type TPlotCard = IEffectPlotCard | IUsablePlotCard | IInstantPlotCard;
  * Base interface for all plot cards with common properties
  */
 export interface IBasePlotCard {
+  id: string;
+  ownerID: string | undefined;
+  stage: 'has' | 'active' | undefined;
+
   /**
    * Determines how the card is distributed to players:
    * - 'select': The lobby leader gives the card to a player at their discretion

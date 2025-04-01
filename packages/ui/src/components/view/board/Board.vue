@@ -73,6 +73,7 @@ import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
 import eventBus from '@/helpers/event-bus';
 import { THistoryResults } from '@avalon/types';
+import { hasActiveCard } from '@/helpers/plot-cards';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { gameStateKey, stateManagerKey, TPageRoomState } from '@/helpers/game-state-manager';
@@ -143,6 +144,7 @@ export default defineComponent({
 
       const { stage } = gameState.value;
       const features = playerInGame.value.features;
+      const playerID = playerInGame.value.id;
 
       return (
         (stage === 'selectTeam' && features.isLeader) ||
@@ -152,9 +154,9 @@ export default defineComponent({
         (stage === 'checkLoyalty' && (features.ladyOfLake === 'has' || features.ladyOfSea === 'has')) ||
         (stage === 'witchLoyalty' && features.witchLoyalty) ||
         (stage === 'giveCard' && features.isLeader) ||
-        (stage === 'ambush' && features.ambushCard === 'active') ||
-        (stage === 'leadToVictory' && features.leadToVictoryCard === 'active') ||
-        (stage === 'restoreHonor' && features.restoreHonorCard === 'active')
+        (stage === 'ambush' && hasActiveCard(gameState.value, playerID, 'ambush')) ||
+        (stage === 'leadToVictory' && hasActiveCard(gameState.value, playerID, 'leadToVictory')) ||
+        (stage === 'restoreHonor' && hasActiveCard(gameState.value, playerID, 'restoreHonor'))
       );
     };
 

@@ -1,6 +1,5 @@
 import { AbstractCard } from '@/core/game/addons/plot-cards/cards/abstract';
 import { IInstantPlotCard } from '@/core/game/addons/plot-cards/interface';
-import { TPlotCardNames, PlotCardsFeatures } from '@avalon/types';
 import { of, Subject } from 'rxjs';
 import { RestoreHonorHistory } from '@/core/game/addons/plot-cards/history';
 
@@ -33,34 +32,23 @@ export class RestoreHonorCard extends AbstractCard implements IInstantPlotCard {
   }
 
   gameHaveCardsToSteal(ownerID: string): boolean {
-    const ownerCards = this.plotCardsAddon.cardsInGame.filter((state) => state.ownerID === ownerID);
-
-    return this.plotCardsAddon.cardsInGame.some((state) => {
-      return ownerCards.every((ownerCardState) => state.card.name !== ownerCardState.card.name);
-    });
+    return this.plotCardsAddon.cardsInGame.some((el) => el.ownerID !== ownerID);
   }
 
-  restoreHonor(cardName: TPlotCardNames, ownerID: string, newOwnerID: string) {
-    const card = this.plotCardsAddon.cardsInGame.find(
-      (state) => state.card.name === cardName && state.ownerID === ownerID,
-    );
+  restoreHonor(cardID: string, ownerID: string, newOwnerID: string) {
+    const card = this.plotCardsAddon.cardsInGame.find((card) => card.id === cardID);
     const owner = this.game.findPlayerByID(ownerID);
     const newOwner = this.game.findPlayerByID(newOwnerID);
 
     if (!card) {
-      throw new Error(`Player with ID ${ownerID} dont have card ${cardName}`);
+      throw new Error(`Card with id: ${cardID} not in game`);
     }
 
-    const featureName = <keyof PlotCardsFeatures>(cardName + 'Card');
-
-    owner.features[featureName] = undefined;
     owner.features.isSelected = false;
-    newOwner.features[featureName] = 'has';
+    card.ownerID = newOwnerID;
     newOwner.features.waitForAction = false;
 
-    card.ownerID = newOwnerID;
-
-    this.game.history.push(new RestoreHonorHistory(owner, newOwner, cardName));
+    this.game.history.push(new RestoreHonorHistory(owner, newOwner, card.name));
 
     this.plotCardsAddon.removeCardFromGame(this);
 

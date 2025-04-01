@@ -27,7 +27,9 @@ export class ChargeCard extends AbstractCard implements IEffectPlotCard {
       return of(true);
     }
 
-    const playersWithCharge = this.game.players.filter((player) => player.features.chargeCard === 'has');
+    const playersWithCharge = this.plotCardsAddon.cardsInGame
+      .filter((card) => card.name === 'charge')
+      .map((card) => this.game.findPlayerByID(card.ownerID!));
 
     this.preVote = new PreVote(playersWithCharge);
 
@@ -52,7 +54,16 @@ export class ChargeCard extends AbstractCard implements IEffectPlotCard {
       throw new Error(`Player with ID ${playerID} not found`);
     }
 
-    player.features.chargeCard = 'has';
+    const chargeCard = this.plotCardsAddon.cardsInGame.find(
+      (card) => card.name === 'charge' && card.ownerID === playerID,
+    );
+
+    if (!chargeCard) {
+      throw new Error(`Player with ID ${playerID} dont have charge card`);
+    }
+
+    chargeCard.stage = 'has';
+
     const allVoted = this.preVote.makeVote(player, option);
     this.game.stateObserver.gameStateChanged();
 

@@ -531,9 +531,9 @@ export class Manager {
       getRoomManager(uuid).callGameMethods(userID, { method: 'useAmbush' });
     });
 
-    socket.on('useRestoreHonor', (uuid, cardName) => {
-      console.log(`Player ${userName} useRestoreHonor (card: ${cardName}) in game ${uuid}`);
-      getRoomManager(uuid).callGameMethods(userID, { method: 'useRestoreHonor', cardName });
+    socket.on('useRestoreHonor', (uuid, cardID) => {
+      console.log(`Player ${userName} useRestoreHonor (card: ${cardID}) in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'useRestoreHonor', cardID });
     });
 
     socket.on('useKingReturns', (uuid, use) => {

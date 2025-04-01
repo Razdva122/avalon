@@ -1,9 +1,13 @@
 import { Game } from '@/core/game';
-import { TPlotCardNames, PlotCardsFeatures } from '@avalon/types';
+import { TPlotCardNames } from '@avalon/types';
 import { PlotCardsAddon } from '@/core/game/addons/plot-cards';
+import { v4 as uuidv4 } from 'uuid';
 
 export abstract class AbstractCard {
   abstract name: TPlotCardNames;
+  id: string = uuidv4();
+  ownerID: string | undefined;
+  stage: 'has' | 'active' | undefined;
   game: Game;
   plotCardsAddon: PlotCardsAddon;
 
@@ -29,6 +33,7 @@ export abstract class AbstractCard {
   activateCard(ownerID: string) {
     const owner = this.game.findPlayerByID(ownerID);
     owner.features.waitForAction = true;
-    owner.features[<keyof PlotCardsFeatures>(this.name + 'Card')] = 'active';
+    this.ownerID = ownerID;
+    this.stage = 'active';
   }
 }

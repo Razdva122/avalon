@@ -1,8 +1,8 @@
 import { IGameAddon } from '@/core/game/addons/interface';
 import { Observable, of, concatMap, from, takeWhile, last, defaultIfEmpty, Subject, tap, take, finalize } from 'rxjs';
 import * as _ from 'lodash';
-import { Game } from '@/core/game';
-import { Dictionary, AddonsData, PlotCardsFeatures } from '@avalon/types';
+import { Game, IPlayerInGame } from '@/core/game';
+import { Dictionary, AddonsData, TPlotCardNames } from '@avalon/types';
 import { TPlotCard, ICurrentCardsState, ICardState, ICrossCardsStorage } from '@/core/game/addons/plot-cards/interface';
 
 import {
@@ -31,27 +31,31 @@ export class PlotCardsAddon implements IGameAddon {
   cards: TPlotCard[];
   pointer: number = 0;
   currentCards: ICurrentCardsState = { cards: [], pointer: 0 };
-  cardsInGame: { ownerID: string; card: TPlotCard }[] = [];
+  cardsInGame: TPlotCard[] = [];
   activeCard: TPlotCard | undefined;
   giveCardSubject: Subject<true> = new Subject();
 
   constructor(game: Game) {
     this.game = game;
 
+    // const cards: Array<new (game: Game, addon: this) => TPlotCard> = [
+    //   LeadToVictoryCard,
+    //   LeadToVictoryCard,
+    //   AmbushCard,
+    //   AmbushCard,
+    //   KingReturnsCard,
+    //   RestoreHonorCard,
+    //   ChargeCard,
+    // ];
+
     const cards: Array<new (game: Game, addon: this) => TPlotCard> = [
       LeadToVictoryCard,
       LeadToVictoryCard,
       AmbushCard,
       AmbushCard,
-      KingReturnsCard,
       RestoreHonorCard,
-      ChargeCard,
-      LeadToVictoryCard,
-      LeadToVictoryCard,
-      AmbushCard,
-      AmbushCard,
-      KingReturnsCard,
       RestoreHonorCard,
+      KingReturnsCard,
     ];
 
     if (this.game.players.length > 6) {
@@ -86,6 +90,12 @@ export class PlotCardsAddon implements IGameAddon {
             .map((el) => el.name)
             .sort(),
         },
+        cardsInGame: this.cardsInGame.map((el) => ({
+          ownerID: el.ownerID!,
+          stage: el.stage!,
+          name: el.name,
+          id: el.id,
+        })),
         activeCards: this.currentCards.cards.map(({ card, stage }) => ({ stage, name: card.name })),
       },
     };
@@ -98,10 +108,16 @@ export class PlotCardsAddon implements IGameAddon {
   afterInit() {
     this.game.selectAvailable.giveCard = (player) => player.features.isLeader === true;
     this.game.selectAvailable.preVote = (player) => player.features.waitForAction === true;
-    this.game.selectAvailable.ambush = (player) => player.features.ambushCard === 'active';
-    this.game.selectAvailable.leadToVictory = (player) => player.features.leadToVictoryCard === 'active';
-    this.game.selectAvailable.restoreHonor = (player) => player.features.restoreHonorCard === 'active';
-    this.game.selectAvailable.kingReturns = (player) => player.features.kingReturnsCard === 'active';
+
+    const isCardActive = (cardName: TPlotCardNames) => (player: IPlayerInGame) =>
+      this.cardsInGame.some(
+        (card) => card.name === cardName && card.ownerID === player.user.id && card.stage === 'active',
+      );
+
+    this.game.selectAvailable.ambush = isCardActive('ambush');
+    this.game.selectAvailable.leadToVictory = isCardActive('leadToVictory');
+    this.game.selectAvailable.restoreHonor = isCardActive('restoreHonor');
+    this.game.selectAvailable.kingReturns = isCardActive('kingReturns');
 
     return of(true);
   }
@@ -185,12 +201,6 @@ export class PlotCardsAddon implements IGameAddon {
       throw new Error('You cannot give a plot card to yourself');
     }
 
-    const featureName = <keyof PlotCardsFeatures>(this.currentCardState.card.name + 'Card');
-
-    if (selectedPlayer.features[featureName]) {
-      throw new Error('Selected player already have this plot card');
-    }
-
     this.addCardInGame(selectedPlayer.user.id);
     const giveCardHistory = new GiveCardHistory({
       leader: this.game.leader,
@@ -207,17 +217,18 @@ export class PlotCardsAddon implements IGameAddon {
   }
 
   addCardInGame(ownerID: string) {
-    this.cardsInGame.push({ card: this.currentCardState.card, ownerID });
-    this.game.findPlayerByID(ownerID).features[<keyof PlotCardsFeatures>(this.currentCardState.card.name + 'Card')] =
-      'has';
+    this.currentCardState.card.ownerID = ownerID;
+    this.currentCardState.card.stage = 'has';
+    this.cardsInGame.push(this.currentCardState.card);
   }
 
   removeCardFromGame(card: TPlotCard) {
-    const state = this.cardsInGame.find((el) => el.card === card);
+    const cardInGame = this.cardsInGame.find((el) => el === card);
 
-    if (state) {
-      this.cardsInGame = this.cardsInGame.filter((el) => el.card !== card);
-      this.game.findPlayerByID(state.ownerID).features[<keyof PlotCardsFeatures>(state.card.name + 'Card')] = undefined;
+    if (cardInGame) {
+      cardInGame.ownerID = undefined;
+      cardInGame.stage = undefined;
+      this.cardsInGame = this.cardsInGame.filter((el) => el !== card);
     }
   }
 
@@ -257,9 +268,9 @@ export class PlotCardsAddon implements IGameAddon {
   }
 
   playCardIfExist(name: TPlotCard['name']): Observable<boolean> {
-    let cards = this.cardsInGame.filter(({ card }) => card.name === name);
+    let cards = this.cardsInGame.filter((card) => card.name === name);
 
-    if (cards.length && cards[0].card.playType === 'single') {
+    if (cards.length && cards[0].playType === 'single') {
       cards = [cards[0]];
     }
 
@@ -274,20 +285,22 @@ export class PlotCardsAddon implements IGameAddon {
       }
 
       cards.sort((a, b) => {
-        const posA = playerOrder[a.ownerID] ?? Infinity;
-        const posB = playerOrder[b.ownerID] ?? Infinity;
+        const posA = a.ownerID ? playerOrder[a.ownerID] : Infinity;
+        const posB = b.ownerID ? playerOrder[b.ownerID] : Infinity;
 
         return posA - posB;
       });
     }
 
     return from(cards).pipe(
-      concatMap((cardState) => {
-        this.activeCard = cardState.card;
-        return cardState.card.play(cardState.ownerID).pipe(
+      concatMap((card) => {
+        this.activeCard = card;
+        return card.play(card.ownerID!).pipe(
           take(1),
           tap(() => {
-            this.activeCard = undefined;
+            if (this.activeCard === card) {
+              this.activeCard = undefined;
+            }
           }),
         );
       }),

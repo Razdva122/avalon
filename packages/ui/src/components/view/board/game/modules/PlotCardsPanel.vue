@@ -82,12 +82,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, toRefs, computed, ref } from 'vue';
+import { defineComponent, PropType, toRefs, computed } from 'vue';
 import PlotCard from '@/components/view/information/PlotCard.vue';
 import RestoreHonorView from '@/components/view/board/game/modules/RestoreHonorView.vue';
 import type { ActiveCard, VisualGameState } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useGamePlayerState } from '@/helpers/composables/useGamePlayerState';
+import { useHasActiveCard, hasActiveCard } from '@/helpers/plot-cards';
 
 type TMethodsWithoutParams = 'useAmbush';
 
@@ -113,21 +114,13 @@ export default defineComponent({
     const { player, isUserLeader, isPlayerActive, isZeroPlayerSelected, isSinglePlayerSelected } =
       useGamePlayerState(gameComputed);
 
-    const isUserAmbushOwner = computed(() => {
-      return Boolean(player.value?.features.ambushCard === 'active');
-    });
+    // Create a computed property for the player ID
+    const playerID = computed(() => player.value?.id);
 
-    const isUserLeadToVictoryOwner = computed(() => {
-      return Boolean(player.value?.features.leadToVictoryCard === 'active');
-    });
-
-    const isUserRestoreHonorOwner = computed(() => {
-      return Boolean(player.value?.features.restoreHonorCard === 'active');
-    });
-
-    const isUserKingReturnsOwner = computed(() => {
-      return Boolean(player.value?.features.kingReturnsCard === 'active');
-    });
+    const isUserAmbushOwner = useHasActiveCard(game, playerID, 'ambush');
+    const isUserLeadToVictoryOwner = useHasActiveCard(game, playerID, 'leadToVictory');
+    const isUserRestoreHonorOwner = useHasActiveCard(game, playerID, 'restoreHonor');
+    const isUserKingReturnsOwner = useHasActiveCard(game, playerID, 'kingReturns');
 
     const isGivePlotCardAvailable = computed(() => {
       return (
@@ -143,7 +136,7 @@ export default defineComponent({
           Boolean(
             game.value.players.find(
               (player) =>
-                player.features.isSelected && player.features.ambushCard !== 'active' && player.features.isSent,
+                player.features.isSelected && !hasActiveCard(game.value, player.id, 'ambush') && player.features.isSent,
             ),
           ))
       );

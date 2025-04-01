@@ -17,6 +17,9 @@ export class PlotCardsAddonData {
   @prop({ required: true, type: () => [ActiveCard] })
   public activeCards!: Array<ActiveCard>;
 
+  @prop({ required: true, type: () => [CardInGame] })
+  public cardsInGame!: Array<CardInGame>;
+
   @prop({ required: true, type: () => CardsState })
   public cardsState!: CardsState;
 }
@@ -27,6 +30,20 @@ export class ActiveCard {
 
   @prop({ required: true })
   public name!: TPlotCardNames;
+}
+
+export class CardInGame {
+  @prop({ required: true })
+  public name!: TPlotCardNames;
+
+  @prop({ required: true })
+  public ownerID!: string;
+
+  @prop({ required: true })
+  public stage!: 'has' | 'active';
+
+  @prop({ required: true })
+  public id!: string;
 }
 
 export class CardsState {

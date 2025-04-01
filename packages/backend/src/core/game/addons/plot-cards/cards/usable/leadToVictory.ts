@@ -38,7 +38,7 @@ export class LeadToVictoryCard extends AbstractCard implements IUsablePlotCard {
     } else {
       player.features.waitForAction = false;
       this.game.leader.features.waitForAction = true;
-      player.features.leadToVictoryCard = 'has';
+      this.stage = 'has';
     }
 
     this.game.stateObserver.gameStateChanged();
