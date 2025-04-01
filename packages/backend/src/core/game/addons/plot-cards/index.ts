@@ -38,24 +38,14 @@ export class PlotCardsAddon implements IGameAddon {
   constructor(game: Game) {
     this.game = game;
 
-    // const cards: Array<new (game: Game, addon: this) => TPlotCard> = [
-    //   LeadToVictoryCard,
-    //   LeadToVictoryCard,
-    //   AmbushCard,
-    //   AmbushCard,
-    //   KingReturnsCard,
-    //   RestoreHonorCard,
-    //   ChargeCard,
-    // ];
-
     const cards: Array<new (game: Game, addon: this) => TPlotCard> = [
       LeadToVictoryCard,
       LeadToVictoryCard,
       AmbushCard,
       AmbushCard,
-      RestoreHonorCard,
-      RestoreHonorCard,
       KingReturnsCard,
+      RestoreHonorCard,
+      ChargeCard,
     ];
 
     if (this.game.players.length > 6) {
@@ -74,7 +64,7 @@ export class PlotCardsAddon implements IGameAddon {
 
       this.cardsPerRound = this.game.players.length > 8 ? 3 : 2;
     } else {
-      this.cardsPerRound = 3;
+      this.cardsPerRound = 1;
     }
 
     this.cards = _.shuffle(cards.map((el) => new el(game, this)));
