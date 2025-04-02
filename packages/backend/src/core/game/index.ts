@@ -121,7 +121,7 @@ export class Game extends GameHooks {
 
   stage: TGameStage = 'initialization';
 
-  constructor(users: User[], options: GameOptions, stateObserver: IStateObserver) {
+  constructor(users: User[], options: GameOptions, stateObserver: IStateObserver, preInit?: (game: Game) => void) {
     super();
 
     if (users.length < 5 || users.length > 10) {
@@ -243,6 +243,10 @@ export class Game extends GameHooks {
 
       this.updateVisibleRolesState(player.user.id, visibility);
     });
+
+    if (preInit) {
+      preInit(this);
+    }
 
     this.initGame();
   }

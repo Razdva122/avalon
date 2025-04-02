@@ -1,6 +1,7 @@
 import { AbstractCard } from '@/core/game/addons/plot-cards/cards/abstract';
 import { IUsablePlotCard } from '@/core/game/addons/plot-cards/interface';
 import { Subject, of } from 'rxjs';
+import { LeadToVictoryHistory } from '@/core/game/addons/plot-cards/history/leadToVictory';
 
 /**
  * activate -> leader give card to some one
@@ -32,6 +33,7 @@ export class LeadToVictoryCard extends AbstractCard implements IUsablePlotCard {
     const player = this.game.findPlayerByID(playerID);
 
     if (use) {
+      this.game.history.push(new LeadToVictoryHistory(player, this.game.leader));
       this.game.leader = player;
       this.plotCardsAddon.crossCardsStorage.isLeadToVictoryDisabled = true;
       this.plotCardsAddon.removeCardFromGame(this);

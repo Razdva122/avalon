@@ -1,6 +1,11 @@
-import { Game } from '@/core/game';
-import { GameOptions, TLoyalty, TAssassinateType, TRoles } from '@avalon/types';
+import { Game, IPlayerInGame } from '@/core/game';
+import { GameOptions, TLoyalty, TAssassinateType, TRoles, TVoteOption, TPlotCardNames } from '@avalon/types';
 import { User } from '@/user';
+import { LeadToVictoryCard } from '@/core/game/addons/plot-cards/cards/usable/leadToVictory';
+import { KingReturnsCard } from '@/core/game/addons/plot-cards/cards/usable/kingReturns';
+import { AmbushCard } from '@/core/game/addons/plot-cards/cards/usable/ambush';
+import { RestoreHonorCard } from '@/core/game/addons/plot-cards/cards/instant/restoreHonor';
+import { ChargeCard } from '@/core/game/addons/plot-cards/cards/effects/charge';
 
 const users = [
   new User('1', 'Misha'),
@@ -19,15 +24,20 @@ export class GameTestHelper {
   game!: Game;
   stateChangedNumber: number = 0;
 
-  constructor(playersAmount: number, options: GameOptions) {
-    this.restartGame(playersAmount, options);
+  constructor(playersAmount: number, options: GameOptions, preInit?: (game: Game) => void) {
+    this.restartGame(playersAmount, options, preInit);
   }
 
-  restartGame(playersAmount: number, options: GameOptions) {
+  restartGame(playersAmount: number, options: GameOptions, preInit?: (game: Game) => void) {
     this.stateChangedNumber = 0;
-    this.game = new Game(users.slice(0, playersAmount), options, {
-      gameStateChanged: () => (this.stateChangedNumber += 1),
-    });
+    this.game = new Game(
+      users.slice(0, playersAmount),
+      options,
+      {
+        gameStateChanged: () => (this.stateChangedNumber += 1),
+      },
+      preInit,
+    );
   }
 
   selectPlayersOnMission(evil: number = 0, extraPlayers = 0): this {
@@ -118,8 +128,8 @@ export class GameTestHelper {
   pickLovers(correctLovers: Array<'isolde' | 'tristan'> = []): this {
     const ids: string[] = [];
 
-    correctLovers.forEach((el) => {
-      ids.push(this.game.players.find((player) => player.role.role === el)!.user.id);
+    correctLovers.forEach((loverRole) => {
+      ids.push(this.game.players.find((player) => player.role.role === loverRole)!.user.id);
     });
 
     const assassinID = this.game.players.find((player) => {
@@ -241,6 +251,141 @@ export class GameTestHelper {
 
     this.game.selectPlayer(ownerID, playerID);
     this.game.addons.witch!.checkLoyalty(ownerID);
+
+    return this;
+  }
+
+  // Plot Cards methods
+  giveCard(cardName: TPlotCardNames, targetPlayerId?: string): this {
+    // Find the card by name
+    const foundCard = this.game.addons.plotCards!.cards.find(
+      (plotCard) => plotCard.name === cardName && plotCard.ownerID === undefined,
+    );
+
+    if (!foundCard) {
+      throw new Error(`Card with name ${cardName} not found`);
+    }
+
+    // Add the card to currentCards
+    this.game.addons.plotCards!.currentCards.cards.push({
+      stage: 'pending',
+      card: foundCard,
+    });
+
+    // Set the pointer to the added card
+    this.game.addons.plotCards!.currentCards.pointer = this.game.addons.plotCards!.currentCards.cards.length - 1;
+
+    // If no target is specified, give the card to a non-leader player
+    const targetPlayer = targetPlayerId
+      ? this.game.players.find((player) => player.user.id === targetPlayerId)
+      : this.game.players.find((player) => player !== this.game.leader);
+
+    this.game.selectPlayer(this.game.leader.user.id, targetPlayer!.user.id);
+    this.game.addons.plotCards!.giveCardToPlayer(this.game.leader.user.id);
+
+    return this;
+  }
+
+  getActiveCardPlayer(): IPlayerInGame {
+    const ownerID = this.game.addons.plotCards!.cardsInGame.find((card) => card.stage === 'active')!.ownerID!;
+    return this.game.findPlayerByID(ownerID);
+  }
+
+  useLeadToVictory(use: boolean = true): this {
+    const playerWithCard = this.getActiveCardPlayer();
+
+    const leadToVictoryCard = this.game.addons.plotCards!.cardsInGame.find(
+      (plotCard) => plotCard.name === 'leadToVictory' && plotCard.ownerID === playerWithCard.user.id,
+    )!;
+    (leadToVictoryCard as LeadToVictoryCard).leadToVictory(playerWithCard.user.id, use);
+
+    return this;
+  }
+
+  useKingReturns(use: boolean = true): this {
+    const playerWithCard = this.getActiveCardPlayer();
+
+    if (playerWithCard) {
+      const kingReturnsCard = this.game.addons.plotCards!.cardsInGame.find(
+        (plotCard) => plotCard.name === 'kingReturns' && plotCard.ownerID === playerWithCard.user.id,
+      )!;
+      (kingReturnsCard as KingReturnsCard).kingReturns(use);
+    }
+
+    return this;
+  }
+
+  useAmbush(targetPlayerId?: string): this {
+    const playerWithCard = this.getActiveCardPlayer();
+
+    const targetPlayer = targetPlayerId
+      ? this.game.players.find((player) => player.user.id === targetPlayerId)!
+      : this.game.currentMission.data.actions[0]?.player;
+
+    this.game.selectPlayer(playerWithCard.user.id, targetPlayer.user.id);
+
+    const ambushCard = this.game.addons.plotCards!.cardsInGame.find(
+      (plotCard) => plotCard.name === 'ambush' && plotCard.ownerID === playerWithCard.user.id,
+    )!;
+    (ambushCard as AmbushCard).ambush();
+
+    return this;
+  }
+
+  useRestoreHonor(targetPlayerId?: string, cardId?: string): this {
+    const playerWithCard = this.getActiveCardPlayer();
+
+    if (playerWithCard) {
+      // If no target is specified, select the first player who has a card
+      const targetPlayer = targetPlayerId
+        ? this.game.players.find((player) => player.user.id === targetPlayerId)
+        : this.game.players.find((player) => {
+            return (
+              player !== playerWithCard &&
+              this.game.addons.plotCards!.cardsInGame.some((plotCard) => plotCard.ownerID === player.user.id)
+            );
+          });
+
+      if (targetPlayer) {
+        this.game.selectPlayer(playerWithCard.user.id, targetPlayer.user.id);
+
+        // If no card ID is specified, use the first card the target player has
+        const cardToSteal = cardId
+          ? this.game.addons.plotCards!.cardsInGame.find((plotCard) => plotCard.id === cardId)
+          : this.game.addons.plotCards!.cardsInGame.find(
+              (plotCard) => plotCard.ownerID === targetPlayer.user.id && plotCard.name !== 'restoreHonor',
+            );
+
+        if (cardToSteal) {
+          const restoreHonorCard = this.game.addons.plotCards!.cardsInGame.find(
+            (plotCard) => plotCard.name === 'restoreHonor' && plotCard.ownerID === playerWithCard.user.id,
+          )!;
+          (restoreHonorCard as RestoreHonorCard).restoreHonor(
+            cardToSteal.id,
+            targetPlayer.user.id,
+            playerWithCard.user.id,
+          );
+        }
+      }
+    }
+
+    return this;
+  }
+
+  makePreVote(option: TVoteOption = 'approve'): this {
+    const playerWithCharge = this.game.players.find((player) => {
+      const playerCard = this.game.addons.plotCards!.cardsInGame.find(
+        (plotCard) => plotCard.name === 'charge' && plotCard.ownerID === player.user.id,
+      );
+      return playerCard !== undefined;
+    });
+
+    if (playerWithCharge) {
+      const chargeCard = this.game.addons.plotCards!.cardsInGame.find(
+        (plotCard) => plotCard.name === 'charge' && plotCard.ownerID === playerWithCharge.user.id,
+      )!;
+      (chargeCard as ChargeCard).makeVote(playerWithCharge.user.id, option);
+    }
 
     return this;
   }
