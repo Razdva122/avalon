@@ -74,5 +74,11 @@ export default defineComponent({
   width: fit-content;
   padding: 0px 8px;
   border-radius: 8px;
+  white-space: nowrap;
+
+  @media (max-width: 600px) {
+    padding: 0px 4px;
+    font-size: 14px;
+  }
 }
 </style>

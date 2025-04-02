@@ -29,7 +29,13 @@
       </div>
     </div>
     <h2>{{ $t('stats.generalStatsTitle') }}</h2>
-    <v-data-table class="general-table" :headers="generalTable.headers" :items="generalTable.data" hide-default-footer>
+    <v-data-table
+      class="general-table"
+      :headers="generalTable.headers"
+      :items="generalTable.data"
+      hide-default-footer
+      disable-sort
+    >
       <template v-slot:item.side="{ value }">
         <span v-if="value === 'good'" class="good-loyalty-icon"></span>
         <span v-if="value === 'evil'" class="evil-loyalty-icon"></span>
@@ -38,7 +44,7 @@
     </v-data-table>
 
     <h2>{{ $t('userStats.lastGamesStatsTitle') }}</h2>
-    <v-data-table :headers="lastGamesHeaders" :items="lastGames" hide-default-footer>
+    <v-data-table :headers="lastGamesHeaders" :items="lastGames" hide-default-footer disable-sort>
       <template v-slot:item.role="{ value }">
         <PreviewLink :target="value" />
       </template>
@@ -56,7 +62,13 @@
     <div class="stats-container d-flex flex-column flex-md-row justify-space-between">
       <div class="teammates-container">
         <h2>{{ $t('userStats.teammatesStatsTitle') }}</h2>
-        <v-data-table class="teammates-table" :headers="simplifiedHeaders" :items="teammates" hide-default-footer>
+        <v-data-table
+          class="teammates-table"
+          :headers="simplifiedHeaders"
+          :items="teammates"
+          hide-default-footer
+          disable-sort
+        >
           <template v-slot:item="{ item }">
             <tr class="teammate-row" @click="navigateToPlayerStats(item.id)">
               <td>
@@ -73,7 +85,13 @@
 
       <div class="enemies-container">
         <h2>{{ $t('userStats.enemiesStatsTitle') }}</h2>
-        <v-data-table class="enemies-table" :headers="simplifiedHeaders" :items="enemies" hide-default-footer>
+        <v-data-table
+          class="enemies-table"
+          :headers="simplifiedHeaders"
+          :items="enemies"
+          hide-default-footer
+          disable-sort
+        >
           <template v-slot:item="{ item }">
             <tr class="enemy-row" @click="navigateToPlayerStats(item.id)">
               <td>
@@ -92,7 +110,7 @@
     <div v-for="side in <const>['good', 'evil']" :key="side">
       <h2 v-if="side === 'good'"><span class="good-loyalty-icon mt-5"></span> {{ $t('stats.goodRolesStatsTitle') }}</h2>
       <h2 v-else><span class="evil-loyalty-icon mt-5"></span> {{ $t('stats.evilRolesStatsTitle') }}</h2>
-      <v-data-table :headers="rolesTables.headers" :items="rolesTables[side]" hide-default-footer>
+      <v-data-table :headers="rolesTables.headers" :items="rolesTables[side]" hide-default-footer disable-sort>
         <template v-slot:item.role="{ value }">
           <PreviewLink :target="value" />
         </template>
@@ -313,6 +331,10 @@ export default defineComponent({
 
 .stats-container {
   gap: 20px;
+
+  @media (max-width: 600px) {
+    gap: 30px;
+  }
 }
 
 .teammates-container,
@@ -347,22 +369,43 @@ export default defineComponent({
 .enemies-table :deep(td) {
   height: 70px;
   padding: 8px 16px;
+
+  @media (max-width: 600px) {
+    height: 60px;
+    padding: 6px 8px;
+  }
 }
 
 .teammates-table :deep(td:first-child),
 .enemies-table :deep(td:first-child) {
   width: 250px;
   min-width: 250px;
+
+  @media (max-width: 600px) {
+    width: 140px;
+    min-width: 140px;
+  }
 }
 
 .teammates-table :deep(td:nth-child(2)),
 .enemies-table :deep(td:nth-child(2)) {
   width: 100px;
+
+  @media (max-width: 600px) {
+    width: 30px;
+    font-size: 14px;
+  }
 }
 
 .teammates-table :deep(td:nth-child(3)),
 .enemies-table :deep(td:nth-child(3)) {
   width: 100px;
+
+  @media (max-width: 600px) {
+    width: 80px;
+    font-size: 14px;
+    text-align: center;
+  }
 }
 
 .profile-username {
