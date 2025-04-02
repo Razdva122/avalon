@@ -53,6 +53,42 @@
       </template>
     </v-data-table>
 
+    <div class="stats-container d-flex flex-column flex-md-row justify-space-between">
+      <div class="teammates-container">
+        <h2>{{ $t('userStats.teammatesStatsTitle') }}</h2>
+        <v-data-table class="teammates-table" :headers="simplifiedHeaders" :items="teammates" hide-default-footer>
+          <template v-slot:item="{ item }">
+            <tr class="teammate-row" @click="navigateToPlayerStats(item.id)">
+              <td>
+                <TeammateProfile :teammateID="item.id" />
+              </td>
+              <td>{{ item.gamesCount }}</td>
+              <td>
+                <WinrateDisplay :winrate="item.winrate" />
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+      </div>
+
+      <div class="enemies-container">
+        <h2>{{ $t('userStats.enemiesStatsTitle') }}</h2>
+        <v-data-table class="enemies-table" :headers="simplifiedHeaders" :items="enemies" hide-default-footer>
+          <template v-slot:item="{ item }">
+            <tr class="enemy-row" @click="navigateToPlayerStats(item.id)">
+              <td>
+                <TeammateProfile :teammateID="item.id" />
+              </td>
+              <td>{{ item.gamesCount }}</td>
+              <td>
+                <WinrateDisplay :winrate="item.winrate" />
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+      </div>
+    </div>
+
     <div v-for="side in <const>['good', 'evil']" :key="side">
       <h2 v-if="side === 'good'"><span class="good-loyalty-icon mt-5"></span> {{ $t('stats.goodRolesStatsTitle') }}</h2>
       <h2 v-else><span class="evil-loyalty-icon mt-5"></span> {{ $t('stats.evilRolesStatsTitle') }}</h2>
@@ -66,14 +102,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { TGameView, TUserStats, prepareUserStats, prepareGamesForView } from '@/helpers/stats';
+import { useRouter } from 'vue-router';
+import {
+  TGameView,
+  TUserStats,
+  TTeammateStats,
+  prepareUserStats,
+  prepareGamesForView,
+  preparePlayerStats,
+} from '@/helpers/stats';
 import { socket } from '@/api/socket';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import TeammateProfile from '@/components/stats/TeammateProfile.vue';
+import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
 import { TRoles, VisualGameState } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
-import { useUserProfile } from '@/helpers/setup';
+import { useStore } from '@/store';
 
 type TRoleStats = {
   role: TRoles;
@@ -86,6 +132,8 @@ export default defineComponent({
   components: {
     PreviewLink,
     Avatar,
+    TeammateProfile,
+    WinrateDisplay,
   },
   props: {
     uuid: {
@@ -94,19 +142,44 @@ export default defineComponent({
     },
   },
   async setup(props) {
-    const { userState } = useUserProfile(props.uuid);
     const state = ref<TUserStats>();
     const gamesState = ref<VisualGameState[]>();
     const lastGames = ref<TGameView[]>();
+    const teammates = ref<TTeammateStats[]>();
+    const enemies = ref<TTeammateStats[]>();
+    const store = useStore();
+
+    const userState = computed(() => {
+      return store.state.users[props.uuid] || { status: 'loading' };
+    });
 
     const { t } = useI18n();
 
     const initState = async (uuid: string) => {
       const games = await socket.emitWithAck('getPlayerGames', uuid);
-
       state.value = prepareUserStats(games, uuid);
       lastGames.value = prepareGamesForView(games, uuid, 5);
+
+      // Use the new combined function with different relation parameters
+      teammates.value = preparePlayerStats(games, uuid, 'teammate');
+      enemies.value = preparePlayerStats(games, uuid, 'enemy');
+
+      store.dispatch('getUserPublicProfile', { uuid });
+
       gamesState.value = games;
+    };
+
+    watch(
+      () => props.uuid,
+      (newUUID) => {
+        initState(newUUID);
+      },
+    );
+
+    const router = useRouter();
+
+    const navigateToPlayerStats = (playerID: string) => {
+      router.push({ name: 'user_stats', params: { uuid: playerID } });
     };
 
     await initState(props.uuid);
@@ -170,6 +243,24 @@ export default defineComponent({
       ];
     });
 
+    const teammatesHeaders = computed(() => {
+      return [
+        { title: t('userStats.playerName'), key: 'id' },
+        { title: t('userStats.gamesCount'), key: 'gamesCount' },
+        { title: t('userStats.wins'), key: 'wins' },
+        { title: t('userStats.lose'), key: 'lose' },
+        { title: t('userStats.winrate'), key: 'winrate' },
+      ];
+    });
+
+    const simplifiedHeaders = computed(() => {
+      return [
+        { title: t('userStats.playerName'), key: 'id' },
+        { title: t('userStats.gamesCount'), key: 'gamesCount' },
+        { title: t('userStats.winrate'), key: 'winrate' },
+      ];
+    });
+
     return {
       state,
       gamesState,
@@ -178,6 +269,11 @@ export default defineComponent({
       generalTable,
       rolesTables,
       userState,
+      navigateToPlayerStats,
+      enemies,
+      teammates,
+      teammatesHeaders,
+      simplifiedHeaders,
     };
   },
 });
@@ -213,6 +309,60 @@ export default defineComponent({
 
 .profile-info div {
   margin-bottom: 0px;
+}
+
+.stats-container {
+  gap: 20px;
+}
+
+.teammates-container,
+.enemies-container {
+  width: 100%;
+}
+
+@media (min-width: 960px) {
+  .teammates-container,
+  .enemies-container {
+    width: 48%;
+  }
+}
+
+.teammates-table,
+.enemies-table {
+  margin-bottom: 20px;
+}
+
+.teammate-row,
+.enemy-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.teammate-row:hover,
+.enemy-row:hover {
+  background-color: rgba(var(--v-theme-primary), 0.1);
+}
+
+.teammates-table :deep(td),
+.enemies-table :deep(td) {
+  height: 70px;
+  padding: 8px 16px;
+}
+
+.teammates-table :deep(td:first-child),
+.enemies-table :deep(td:first-child) {
+  width: 250px;
+  min-width: 250px;
+}
+
+.teammates-table :deep(td:nth-child(2)),
+.enemies-table :deep(td:nth-child(2)) {
+  width: 100px;
+}
+
+.teammates-table :deep(td:nth-child(3)),
+.enemies-table :deep(td:nth-child(3)) {
+  width: 100px;
 }
 
 .profile-username {

@@ -22,6 +22,14 @@ export type TGameView = {
   gameID: string;
 };
 
+export type TTeammateStats = {
+  id: string;
+  gamesCount: number;
+  wins: number;
+  lose: number;
+  winrate: string;
+};
+
 export type TWinsStatsWithWinrate = {
   winrate: string;
 } & TWinsStats;
