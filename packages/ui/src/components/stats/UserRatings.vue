@@ -27,7 +27,7 @@
             </td>
 
             <td>
-              {{ item.rating }}
+              {{ item.rating === 0 ? '???' : item.rating }}
             </td>
 
             <td>
@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent, ref, computed, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
@@ -94,10 +94,10 @@ export default defineComponent({
       { title: t('stats.rank'), value: 'rank' },
     ]);
 
-    const fetchUserRatings = () => {
+    const fetchUserRatings = (uuid: string) => {
       loading.value = true;
 
-      socket.emit('getUserRatings', props.userID, (response) => {
+      socket.emit('getUserRatings', uuid, (response) => {
         if ('error' in response) {
           console.error('Error from API:', response.error);
         } else {
@@ -123,7 +123,14 @@ export default defineComponent({
       }
     };
 
-    onMounted(fetchUserRatings);
+    watch(
+      () => props.userID,
+      (newUUID) => {
+        fetchUserRatings(newUUID);
+      },
+    );
+
+    fetchUserRatings(props.userID);
 
     return {
       userRatings,

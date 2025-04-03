@@ -128,7 +128,7 @@ import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import TeammateProfile from '@/components/stats/TeammateProfile.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
 import UserRatings from '@/components/stats/UserRatings.vue';
-import { TRoles, VisualGameState } from '@avalon/types';
+import { VisualGameState } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
 import { useStore } from '@/store';
 

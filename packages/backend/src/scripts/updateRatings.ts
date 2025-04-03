@@ -69,7 +69,7 @@ export async function updateRatings(): Promise<void> {
           ? Math.max(0.85, 1 - Math.pow(Math.min(daysSinceLastPlayed, MAX_DECAY_DAYS) / MAX_DECAY_DAYS, 2) * MAX_DECAY)
           : 1;
 
-      const finalRating = Math.ceil(baseRating * decayFactor * 100);
+      const finalRating = player.gamesCount > 10 ? Math.ceil(baseRating * decayFactor * 100) : 0;
 
       const ratingData: RatingData = {
         userID: player.userID,
