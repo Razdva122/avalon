@@ -5,6 +5,7 @@ import type { Server, ServerSocket } from '@avalon/types';
 import crypto from 'crypto';
 
 import { handleSocketErrors, eventBus } from '@/helpers';
+import { registerRatingEndpoints } from '@/scripts/ratingEndpoints';
 import { DBManager } from '@/db';
 import { validateJWT } from '@/user';
 import { AvatarsManager } from '@/user/avatars';
@@ -159,6 +160,8 @@ export class Manager {
     });
 
     io.on('connection', (socket) => {
+      // Register rating endpoints
+      registerRatingEndpoints(socket);
       handleSocketErrors(socket);
       this.updateOnlineCounter('lobby', 1);
 

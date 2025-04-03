@@ -21,7 +21,7 @@ import type {
 import type { TAssassinateType } from '../game/addons';
 
 import type { TRoomsList, TMessage } from '../room';
-import { TTotalWinrateStats } from '../stats';
+import { TTotalWinrateStats, RoleRating } from '../stats';
 import { UserForUI, UserProfile, IAvatarInfo, PublicUserProfile, UserWithToken } from '../user';
 
 export type {
@@ -74,6 +74,15 @@ export interface ClientToServerEvents extends ClientToServerUserEvents {
   getRoomsList: (callback: (list: TRoomsList) => void) => void;
   getOnlineCounter: (id: string, callback: (counter: number) => void) => void;
   getUserProfile: (id: string, callback: (user: PublicUserProfile) => void) => void;
+
+  // Rating system endpoints
+  getRoleLeaderboard: (role: TRoles, callback: (leaderboard: RoleRating[] | { error: string }) => void) => void;
+  getUserRatings: (userID: string, callback: (ratings: RoleRating[] | { error: string }) => void) => void;
+  getRatingHistory: (
+    userID: string,
+    role: TRoles,
+    callback: (history: { date: Date; rating: number | null; rank: number | null }[] | { error: string }) => void,
+  ) => void;
 
   createRoom: (callback: (uuid: string) => void) => void;
   updateOptions: (uuid: string, options: GameOptions) => void;

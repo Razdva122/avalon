@@ -36,6 +36,10 @@
           </template>
         </v-data-table>
       </div>
+
+      <div>
+        <RoleRatings />
+      </div>
     </template>
   </div>
 </template>
@@ -48,6 +52,7 @@ import { socket } from '@/api/socket';
 import { prettifyPercent } from '@/helpers/stats';
 import PlayerCountsStats from '@/components/stats/PlayerCountsStats.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import RoleRatings from '@/components/stats/RoleRatings.vue';
 
 type TRolesStatsWithDiff = TRoleStats & { diff: number; winrate: number };
 
@@ -56,6 +61,7 @@ export default defineComponent({
   components: {
     PlayerCountsStats,
     PreviewLink,
+    RoleRatings,
   },
   async setup() {
     const state = ref<TTotalWinrateStats>();

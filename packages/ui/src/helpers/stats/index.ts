@@ -10,7 +10,7 @@ export function prepareUserStats(games: VisualGameState[], userID: string): TUse
     (acc, game) => {
       const playerInGame = game.players.find((player) => player.id === userID)!;
       const role = <TRoles>playerInGame.role;
-      const team = role in goodRolesImportance ? 'good' : 'evil';
+      const team = Object.keys(goodRolesImportance).includes(role) ? 'good' : 'evil';
       const isWin = game.result!.winner === team;
 
       if (!acc.roles[team][role]) {
@@ -67,7 +67,7 @@ export function prepareGamesForView(games: VisualGameState[], userID: string, am
     .map((game) => {
       const playerInGame = game.players.find((player) => player.id === userID)!;
       const role = <TRoles>playerInGame.role;
-      const team = role in goodRolesImportance ? 'good' : 'evil';
+      const team = Object.keys(goodRolesImportance).includes(role) ? 'good' : 'evil';
       const isWin = game.result!.winner === team;
 
       return {
@@ -110,14 +110,14 @@ export function preparePlayerStats(
 
     // Determine the user's team (good or evil)
     const userRole = <TRoles>currentPlayer.role;
-    const userTeam = userRole in goodRolesImportance ? 'good' : 'evil';
+    const userTeam = Object.keys(goodRolesImportance).includes(userRole) ? 'good' : 'evil';
     const isWin = game.result?.winner === userTeam;
 
     // Find players based on relation (teammates or enemies)
     const players = game.players.filter((player) => {
       if (player.id === userID) return false; // Skip the user
       const playerRole = <TRoles>player.role;
-      const playerTeam = playerRole in goodRolesImportance ? 'good' : 'evil';
+      const playerTeam = Object.keys(goodRolesImportance).includes(playerRole) ? 'good' : 'evil';
 
       // For teammates, return players on the same team
       // For enemies, return players on the opposite team

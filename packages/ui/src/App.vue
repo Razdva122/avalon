@@ -206,4 +206,9 @@ body {
 .header-left-container {
   font-size: 36px;
 }
+
+/* Override for skeleton loaders to have transparent background */
+.v-skeleton-loader {
+  background-color: transparent !important;
+}
 </style>

@@ -1,4 +1,5 @@
 import { TAddonsName, TOptionalRoles } from '@avalon/types';
+export * from './models';
 
 export type TTotalWinrateStats = {
   total: TWinrateStats;

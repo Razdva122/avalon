@@ -59,6 +59,8 @@
       </template>
     </v-data-table>
 
+    <UserRatings :userID="uuid" />
+
     <div class="stats-container d-flex flex-column flex-md-row justify-space-between">
       <div class="teammates-container">
         <h2>{{ $t('userStats.teammatesStatsTitle') }}</h2>
@@ -106,16 +108,6 @@
         </v-data-table>
       </div>
     </div>
-
-    <div v-for="side in <const>['good', 'evil']" :key="side">
-      <h2 v-if="side === 'good'"><span class="good-loyalty-icon mt-5"></span> {{ $t('stats.goodRolesStatsTitle') }}</h2>
-      <h2 v-else><span class="evil-loyalty-icon mt-5"></span> {{ $t('stats.evilRolesStatsTitle') }}</h2>
-      <v-data-table :headers="rolesTables.headers" :items="rolesTables[side]" hide-default-footer disable-sort>
-        <template v-slot:item.role="{ value }">
-          <PreviewLink :target="value" />
-        </template>
-      </v-data-table>
-    </div>
   </div>
 </template>
 
@@ -135,15 +127,10 @@ import { socket } from '@/api/socket';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import TeammateProfile from '@/components/stats/TeammateProfile.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
+import UserRatings from '@/components/stats/UserRatings.vue';
 import { TRoles, VisualGameState } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
 import { useStore } from '@/store';
-
-type TRoleStats = {
-  role: TRoles;
-  gamesCount: number;
-  wins: string;
-};
 
 export default defineComponent({
   name: 'UserStats',
@@ -152,6 +139,7 @@ export default defineComponent({
     Avatar,
     TeammateProfile,
     WinrateDisplay,
+    UserRatings,
   },
   props: {
     uuid: {
@@ -222,37 +210,6 @@ export default defineComponent({
       };
     });
 
-    const rolesTables = computed(() => {
-      const sideStats = Object.entries(state.value!.roles).reduce<{
-        headers: { title: string; key: string }[];
-        good: TRoleStats[];
-        evil: TRoleStats[];
-      }>(
-        (acc, [side, el]) => {
-          const roles = Object.entries(el).map(([roleName, value]) => ({
-            role: <TRoles>roleName,
-            gamesCount: value.total,
-            wins: `${value.wins} (${value.winrate} %)`,
-          }));
-
-          acc[<'good' | 'evil'>side].push(...roles);
-          return acc;
-        },
-        {
-          headers: [
-            { title: t('userStats.role'), key: 'role' },
-            { title: t('userStats.gamesCount'), key: 'gamesCount' },
-            { title: t('userStats.wins'), key: 'wins' },
-          ],
-          good: [],
-          evil: [],
-        },
-      );
-      sideStats.evil.sort((a, b) => b.gamesCount - a.gamesCount);
-      sideStats.good.sort((a, b) => b.gamesCount - a.gamesCount);
-      return sideStats;
-    });
-
     const lastGamesHeaders = computed(() => {
       return [
         { title: t('userStats.role'), key: 'role' },
@@ -285,7 +242,6 @@ export default defineComponent({
       lastGames,
       lastGamesHeaders,
       generalTable,
-      rolesTables,
       userState,
       navigateToPlayerStats,
       enemies,
