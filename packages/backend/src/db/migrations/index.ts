@@ -1,9 +1,8 @@
 import type { Migration } from '@/db/migrations/interface';
-import { removeGamesWithInvalidUsers } from './removeGamesWithInvalidUsers';
 
 export class MigrationManager {
   static async runMigrations(): Promise<void> {
-    const migrations: Migration[] = [removeGamesWithInvalidUsers];
+    const migrations: Migration[] = [];
 
     for (const migration of migrations) {
       await migration.up();
