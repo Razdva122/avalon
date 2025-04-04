@@ -34,6 +34,18 @@ export class AnimeMerlinPureAvatar {
   }
 }
 
+export class AnimeWitchAvatar {
+  static id = 'anime/witch';
+
+  static isAvailableForUser({ features }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
+    return Boolean(features && features.top1info);
+  }
+
+  static getInfo({ features }: Parameters<IAvatar['isAvailableForUser']>[0]): string | undefined {
+    return features?.top1info;
+  }
+}
+
 export class MysteryAvatar {
   static id = 'mystery';
 
@@ -48,4 +60,5 @@ export const commonAvatars: IAvatar[] = [
   MerlinPureAvatar,
   AnimeMerlinPureAvatar,
   MysteryAvatar,
+  AnimeWitchAvatar,
 ];

@@ -75,4 +75,7 @@ export class UserFeatures {
 
   @prop()
   public easterEggRevealed?: boolean;
+
+  @prop()
+  public top1info?: string;
 }

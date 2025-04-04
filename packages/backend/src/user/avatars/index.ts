@@ -23,6 +23,7 @@ export class AvatarsManager {
       return {
         id: avatar.id,
         available,
+        info: avatar.getInfo?.({ user, features }),
       };
     });
   }

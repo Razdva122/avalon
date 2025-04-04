@@ -433,6 +433,7 @@ export const zh_CN = {
     lady_of_lakeHint: '颁发给2025年注册的用户',
     merlin_pureHint: '颁发给帮助项目反馈/帮助寻找错误的用户',
     'anime/merlin_pureHint': '颁发给在GitHub上对项目代码做出任何贡献的用户',
+    'anime/witchHint': '授予在任何角色上获得第一名评分的玩家',
     mysteryHint: '授予發現網站上秘密的用戶',
   },
   ...pages['zh-CN'],

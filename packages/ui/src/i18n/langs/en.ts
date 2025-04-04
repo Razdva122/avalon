@@ -185,6 +185,7 @@ export const en = {
     mysteryHint: 'Awarded to users who find the secret on the site',
     merlin_pureHint: 'Awarded for helping the project with feedback / help in finding bugs',
     'anime/merlin_pureHint': 'Awarded for making any contribution to the project code on github',
+    'anime/witchHint': 'Awarded for achieving top-1 rating on any role',
   },
   profile: {
     username: 'Username',

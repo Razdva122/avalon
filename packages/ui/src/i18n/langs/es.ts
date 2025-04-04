@@ -436,6 +436,7 @@ export const es = {
     mysteryHint: 'Otorgado a los usuarios que encuentran el secreto en el sitio',
     merlin_pureHint: 'Otorgado por ayudar al proyecto con comentarios / ayudar a encontrar errores',
     'anime/merlin_pureHint': 'Otorgado por hacer cualquier contribución al código del proyecto en GitHub',
+    'anime/witchHint': 'Otorgado por alcanzar el primer puesto en cualquier rol',
   },
   ...pages.es,
 };

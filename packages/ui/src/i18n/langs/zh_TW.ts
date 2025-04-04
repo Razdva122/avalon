@@ -433,6 +433,7 @@ export const zh_TW = {
     lady_of_lakeHint: '頒發給2025年註冊的用戶',
     merlin_pureHint: '頒發給幫助項目反饋/幫助尋找錯誤的用戶',
     'anime/merlin_pureHint': '頒發給在GitHub上對項目代碼做出任何貢獻的用戶',
+    'anime/witchHint': '授予在任何角色上獲得第一名評分的玩家',
     mysteryHint: '授予發現網站上秘密的用戶',
   },
   ...pages['zh-TW'],

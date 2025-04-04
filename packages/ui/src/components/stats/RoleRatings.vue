@@ -111,7 +111,7 @@ export default defineComponent({
         if ('error' in response) {
           console.error('Error from API:', response.error);
         } else {
-          leaderboard.value = response as LeaderboardItem[];
+          leaderboard.value = response.filter((el) => el.rating > 0);
         }
 
         loading.value = false;

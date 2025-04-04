@@ -18,7 +18,7 @@
         ref="floating"
         :style="floatingStyles"
       >
-        {{ $t('avatars.' + avatar.id + 'Hint') }}
+        {{ avatar.available && avatar.info ? avatar.info : $t('avatars.' + avatar.id + 'Hint') }}
       </div>
     </div>
   </div>
