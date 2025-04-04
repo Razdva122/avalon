@@ -273,7 +273,6 @@ describe('Plot Cards Logic', () => {
         game.addons.plotCards!.cards.unshift(ambushCard);
       });
 
-      // Get two different players
       const player1 = game.players.find((player) => player !== game.leader)!;
       const player2 = game.players.find((player) => player !== game.leader && player !== player1)!;
 
@@ -288,19 +287,39 @@ describe('Plot Cards Logic', () => {
         (card) => card.name === 'ambush' && card.ownerID === player1.user.id,
       );
 
-      // Use restoreHonor card to take ambush card from player1
       gameHelper.useRestoreHonor(player1.user.id, ambushCard!.id);
 
-      // Verify ambush card now belongs to player2
       expect(ambushCard!.ownerID).toBe(player2.user.id);
 
-      // Verify restoreHonor card has been removed from the game
       expect(game.addons.plotCards!.cardsInGame.find((card) => card.name === 'restoreHonor')).toBeUndefined();
 
-      // Check that the history contains a restoreHonor entry
-      const lastHistoryEl = _.last(game.history.filter((h) => h.type === 'restoreHonor'))!;
-      expect(lastHistoryEl).toBeDefined();
-      expect(lastHistoryEl.type).toBe('restoreHonor');
+      const lastHistoryEl = _.last(game.history);
+      expect(lastHistoryEl?.type).toBe('restoreHonor');
+    });
+
+    test('Should skip stage if for player dont have cards to steal (For example leader give card to player who only have card)', () => {
+      const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
+        game.addons.plotCards!.cardsPerRound = 2;
+
+        const restoreHonorIndex = game.addons.plotCards!.cards.findIndex((card) => card.name === 'restoreHonor');
+        const restoreHonorCard = game.addons.plotCards!.cards.splice(restoreHonorIndex, 1)[0];
+        game.addons.plotCards!.cards.unshift(restoreHonorCard);
+
+        const ambushIndex = game.addons.plotCards!.cards.findIndex((card) => card.name === 'ambush');
+        const ambushCard = game.addons.plotCards!.cards.splice(ambushIndex, 1)[0];
+        game.addons.plotCards!.cards.unshift(ambushCard);
+      });
+
+      const player1 = game.players.find((player) => player !== game.leader)!;
+
+      gameHelper.giveCard([
+        ['ambush', player1.user.id],
+        ['restoreHonor', player1.user.id],
+      ]);
+
+      expect(game.addons.plotCards!.cardsInGame.find((card) => card.name === 'restoreHonor')).toBeUndefined();
+
+      expect(game.addons.plotCards!.cardsInGame.length).toBe(1);
     });
   });
 });
