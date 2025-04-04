@@ -36,6 +36,10 @@ export class RestoreHonorCard extends AbstractCard implements IInstantPlotCard {
   }
 
   restoreHonor(cardID: string, ownerID: string, newOwnerID: string) {
+    if (this.game.stage !== 'restoreHonor') {
+      throw new Error(`You cant use restoreHonor on stage: ${this.game.stage}`);
+    }
+
     const card = this.plotCardsAddon.cardsInGame.find((card) => card.id === cardID);
     const owner = this.game.findPlayerByID(ownerID);
     const newOwner = this.game.findPlayerByID(newOwnerID);

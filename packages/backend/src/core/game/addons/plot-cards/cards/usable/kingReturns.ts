@@ -27,6 +27,10 @@ export class KingReturnsCard extends AbstractCard implements IUsablePlotCard {
   }
 
   kingReturns(use: boolean) {
+    if (this.game.stage !== 'kingReturns') {
+      throw new Error(`You cant use kingReturns on stage: ${this.game.stage}`);
+    }
+
     const owner = this.game.findPlayerByID(this.ownerID!);
     owner.features.waitForAction = false;
 

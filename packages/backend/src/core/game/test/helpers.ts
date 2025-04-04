@@ -256,32 +256,45 @@ export class GameTestHelper {
   }
 
   // Plot Cards methods
-  giveCard(cardName: TPlotCardNames, targetPlayerId?: string): this {
-    // Find the card by name
-    const foundCard = this.game.addons.plotCards!.cards.find(
-      (plotCard) => plotCard.name === cardName && plotCard.ownerID === undefined,
-    );
+  giveCard(
+    cardNameOrArray: TPlotCardNames | Array<[TPlotCardNames, string | undefined]>,
+    targetPlayerId?: string,
+  ): this {
+    const arr: Array<[TPlotCardNames, string | undefined]> = Array.isArray(cardNameOrArray)
+      ? cardNameOrArray
+      : [[cardNameOrArray, targetPlayerId]];
 
-    if (!foundCard) {
-      throw new Error(`Card with name ${cardName} not found`);
-    }
+    this.game.addons.plotCards!.currentCards.cards = [];
 
-    // Add the card to currentCards
-    this.game.addons.plotCards!.currentCards.cards.push({
-      stage: 'pending',
-      card: foundCard,
+    arr.forEach(([cardName]) => {
+      // Find the card by name
+      const foundCard = this.game.addons.plotCards!.cards.find(
+        (plotCard) =>
+          plotCard.name === cardName &&
+          plotCard.ownerID === undefined &&
+          this.game.addons.plotCards!.currentCards.cards.every(({ card }) => card !== plotCard),
+      );
+
+      if (!foundCard) {
+        throw new Error(`Card with name ${cardName} not found`);
+      }
+
+      // Add the card to currentCards
+      this.game.addons.plotCards!.currentCards.cards.push({
+        stage: 'pending',
+        card: foundCard,
+      });
     });
 
-    // Set the pointer to the added card
-    this.game.addons.plotCards!.currentCards.pointer = this.game.addons.plotCards!.currentCards.cards.length - 1;
+    arr.forEach(([, targetPlayerId]) => {
+      // If no target is specified, give the card to a non-leader player
+      const targetPlayer = targetPlayerId
+        ? this.game.players.find((player) => player.user.id === targetPlayerId)
+        : this.game.players.find((player) => player !== this.game.leader);
 
-    // If no target is specified, give the card to a non-leader player
-    const targetPlayer = targetPlayerId
-      ? this.game.players.find((player) => player.user.id === targetPlayerId)
-      : this.game.players.find((player) => player !== this.game.leader);
-
-    this.game.selectPlayer(this.game.leader.user.id, targetPlayer!.user.id);
-    this.game.addons.plotCards!.giveCardToPlayer(this.game.leader.user.id);
+      this.game.selectPlayer(this.game.leader.user.id, targetPlayer!.user.id);
+      this.game.addons.plotCards!.giveCardToPlayer(this.game.leader.user.id);
+    });
 
     return this;
   }
@@ -305,12 +318,10 @@ export class GameTestHelper {
   useKingReturns(use: boolean = true): this {
     const playerWithCard = this.getActiveCardPlayer();
 
-    if (playerWithCard) {
-      const kingReturnsCard = this.game.addons.plotCards!.cardsInGame.find(
-        (plotCard) => plotCard.name === 'kingReturns' && plotCard.ownerID === playerWithCard.user.id,
-      )!;
-      (kingReturnsCard as KingReturnsCard).kingReturns(use);
-    }
+    const kingReturnsCard = this.game.addons.plotCards!.cardsInGame.find(
+      (plotCard) => plotCard.name === 'kingReturns' && plotCard.ownerID === playerWithCard.user.id,
+    )!;
+    (kingReturnsCard as KingReturnsCard).kingReturns(use);
 
     return this;
   }

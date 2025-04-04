@@ -30,6 +30,10 @@ export class LeadToVictoryCard extends AbstractCard implements IUsablePlotCard {
   }
 
   leadToVictory(playerID: string, use: boolean) {
+    if (this.game.stage !== 'leadToVictory') {
+      throw new Error(`You cant use leadToVictory on stage: ${this.game.stage}`);
+    }
+
     const player = this.game.findPlayerByID(playerID);
 
     if (use) {

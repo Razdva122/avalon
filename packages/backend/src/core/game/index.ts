@@ -515,6 +515,10 @@ export class Game extends GameHooks {
    * Make action on mission
    */
   actionOnMission(playerID: string, result: TMissionResult): void {
+    if (this.stage !== 'onMission') {
+      throw new Error(`You cant make action on stage ${this.stage}`);
+    }
+
     const player = this.findPlayerByID(playerID);
 
     if (this.currentMission.makeAction(player, result)) {

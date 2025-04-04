@@ -29,6 +29,10 @@ export class AmbushCard extends AbstractCard implements IUsablePlotCard {
   }
 
   ambush() {
+    if (this.game.stage !== 'ambush') {
+      throw new Error(`You cant use ambush on stage: ${this.game.stage}`);
+    }
+
     const selectedPlayer = this.game.selectedPlayers[0];
     const ownerOfAmbush = this.game.findPlayerByID(this.ownerID!);
 
