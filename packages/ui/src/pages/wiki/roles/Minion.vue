@@ -13,6 +13,8 @@
     />
     <h2>{{ $t('minion.generalTipsTitle') }}</h2>
 
+    <TopRolePlayer role="minion" class="my-4" />
+
     <ul>
       <li>
         <strong>{{ $t('minion.tipRoleTitle') }}</strong>
@@ -66,6 +68,7 @@ import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
+import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
 import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
@@ -74,6 +77,7 @@ export default defineComponent({
     PreviewLink,
     SchemaImage,
     LocalizedTextWrapper,
+    TopRolePlayer,
   },
   methods: {
     calculateRoleUrl: calculateRoleUrl,

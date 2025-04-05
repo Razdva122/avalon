@@ -5,6 +5,7 @@
       <div class="good-loyalty-icon"></div>
       {{ $t('roles.servant') }} {{ $t('roles.role') }}
     </h1>
+
     <SchemaImage
       class="preview-image"
       :src="calculateRoleUrl('servant')"
@@ -27,6 +28,8 @@
         {{ $t('servant.tipObjectiveText') }}
       </li>
     </ul>
+
+    <TopRolePlayer role="servant" class="my-4" />
 
     <h2>{{ $t('servant.strategicTipsTitle') }}</h2>
     <ul>
@@ -66,6 +69,7 @@ import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
+import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
 import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
@@ -74,6 +78,7 @@ export default defineComponent({
     PreviewLink,
     SchemaImage,
     LocalizedTextWrapper,
+    TopRolePlayer,
   },
   methods: {
     calculateRoleUrl: calculateRoleUrl,

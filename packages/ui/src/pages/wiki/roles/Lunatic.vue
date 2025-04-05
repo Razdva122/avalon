@@ -17,6 +17,8 @@
       <LocalizedTextWrapper keypath="lunatic.roleDescription" />
     </p>
 
+    <TopRolePlayer role="lunatic" class="my-4" />
+
     <h2>{{ $t('lunatic.generalTipsHeader') }}</h2>
     <ul>
       <li>
@@ -58,6 +60,7 @@ import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
 import { calculateRoleUrl } from '@/helpers/styles';
+import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
 
 export default defineComponent({
   components: {
@@ -65,6 +68,7 @@ export default defineComponent({
     PreviewLink,
     SchemaImage,
     LocalizedTextWrapper,
+    TopRolePlayer,
   },
   methods: {
     calculateRoleUrl: calculateRoleUrl,

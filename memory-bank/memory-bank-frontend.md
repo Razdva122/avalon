@@ -225,3 +225,106 @@ Global styles are defined in:
 6. Use Vuex for global state management
 7. Use the GameStateManager for game state handling
 8. Follow the existing routing patterns for new pages
+
+## Rating and Statistics Display
+
+The frontend includes components for displaying player ratings and statistics:
+
+### Rating Components
+
+- `/src/components/stats/` contains components for displaying ratings and leaderboards
+- Ratings are displayed per role, showing rank, rating score, winrate, and games count
+- Players with rank 1 in any role get a special "TOP-1" badge on their profile
+
+### Rating API Interaction
+
+The frontend interacts with the rating system through socket events:
+
+- `getRoleLeaderboard`: Fetches the top 20 players for a specific role
+- `getUserRatings`: Fetches all ratings for the current user
+- `getRatingHistory`: Fetches rating history for a user and role over the last 30 days
+
+### Rating Visualization
+
+- Rating history is displayed using charts
+- Leaderboards show player rankings with visual indicators
+- Player profiles display their best roles and achievements
+
+## Role Page Top Player Component
+
+A component has been added to display the top-rated player for each role on the role's wiki page:
+
+### TopRolePlayer Component
+
+- Located at `/src/components/stats/TopRolePlayer.vue`
+- Displays the top-ranked player for a specific role
+- Shows player avatar, name, rating, winrate, and games count
+- Automatically fetches data using the `getRoleLeaderboard` socket event
+- Uses inset and inset-hover colors for consistent styling with the wiki pages
+
+### Integration with Role Pages
+
+The component should be placed after the general information section on role pages:
+
+```vue
+<template>
+  <div class="info-page-content">
+    <h1>Role Name</h1>
+    <SchemaImage ... />
+
+    <h2>General Information</h2>
+    <p>General information about the role...</p>
+
+    <!-- Place the TopRolePlayer component after general information -->
+    <TopRolePlayer role="roleName" class="my-4" />
+
+    <!-- Rest of the page content -->
+  </div>
+</template>
+
+<script>
+import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
+
+export default {
+  components: {
+    TopRolePlayer,
+    // Other components
+  },
+};
+</script>
+```
+
+### Styling and Empty State
+
+The component uses Vuetify's inset and inset-hover colors for consistent styling with the wiki pages:
+
+```scss
+.top-player-card {
+  background-color: var(--v-inset-base);
+
+  &:hover {
+    background-color: var(--v-inset-hover);
+  }
+}
+```
+
+When there are no players with a rating greater than 0, the component displays a styled "no data" card instead of just text:
+
+```vue
+<v-card v-else class="top-player-card no-data-card">
+  <div class="d-flex align-center pa-3">
+    <div class="no-data-icon mr-2">🏆</div>
+    <div class="no-data-text">
+      {{ $t('stats.noTopPlayerData') }}
+    </div>
+  </div>
+</v-card>
+```
+
+### Translations
+
+The component uses the following translation keys in the `stats` namespace:
+
+- `topPlayerTitle`: Title for the component ("Top Player")
+- `gamesPlayed`: Text showing games count ("{count} games")
+- `noTopPlayerData`: Text shown when no data is available

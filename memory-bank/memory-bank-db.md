@@ -136,4 +136,70 @@ Main database queries are encapsulated in separate files:
 4. Handle database errors with try/catch
 5. Use indexes for query optimization
 6. When adding new fields to models, update corresponding types in the `types` package
+
+## Rating System
+
+The Avalon project includes a sophisticated rating system that tracks player performance with different roles.
+
+### Rating Models
+
+#### RoleRating
+
+Stores ratings for each user and role combination:
+
+- `userID`: user identifier
+- `role`: game role (e.g., 'merlin', 'servant')
+- `winrate`: percentage of games won with this role
+- `gamesCount`: total number of games played with this role
+- `rating`: calculated rating score
+- `rank`: position in the leaderboard
+- `lastPlayedAt`: date when the role was last played
+- `updatedAt`: date when the rating was last updated
+
+#### RoleRankings
+
+Stores historical snapshots of all ratings:
+
+- `date`: date of the snapshot
+- `ratings`: array of RoleRating objects
+
+### Rating Calculation
+
+Ratings are calculated using the following algorithm:
+
+1. **Base Rating**: Combines winrate (70% weight) and games count (30% weight)
+
+   - Games count uses a logarithmic scale to prevent inflation
+   - Formula: `baseRating = winrate * 0.7 + logFactor * 0.3 * 100`
+
+2. **Time Decay**: Ratings decay over time if a player hasn't played recently
+
+   - Quadratic decay formula: `1 - (days/MAX_DECAY_DAYS)^2 * MAX_DECAY`
+   - Maximum decay is 20% after 60 days
+
+3. **Minimum Games**: Players need at least 10 games with a role to have a rating
+
+### Top-1 Recognition
+
+Players who achieve rank 1 in any role get a special recognition:
+
+- The `top1info` field in UserFeatures is updated with "TOP-1 'Rolename' DD.MM.YYYY"
+- This information can be displayed on the player's profile
+
+### Rating Updates
+
+Ratings are updated automatically:
+
+- A scheduler runs the update process daily at 1 AM
+- The process analyzes all completed games
+- Historical snapshots are stored for tracking rating changes over time
+
+### API Endpoints
+
+The following socket endpoints are available for accessing rating data:
+
+- `getRoleLeaderboard`: Get top 20 players for a specific role
+- `getUserRatings`: Get all ratings for a specific user
+- `getRatingHistory`: Get rating history for a user and role over the last 30 days
+
 7. Follow the single responsibility principle when creating database queries

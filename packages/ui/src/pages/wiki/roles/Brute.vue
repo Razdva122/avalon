@@ -17,6 +17,8 @@
       <LocalizedTextWrapper keypath="brute.roleDescription" />
     </p>
 
+    <TopRolePlayer role="brute" class="my-4" />
+
     <h2>{{ $t('brute.generalTips') }}</h2>
     <ul>
       <li>
@@ -57,6 +59,7 @@ import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
+import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
 import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
@@ -65,6 +68,7 @@ export default defineComponent({
     PreviewLink,
     SchemaImage,
     LocalizedTextWrapper,
+    TopRolePlayer,
   },
   methods: {
     calculateRoleUrl: calculateRoleUrl,

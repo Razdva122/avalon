@@ -24,6 +24,8 @@ This document serves as an entry point for all Memory Bank files of the Avalon p
    - Migrations
    - Queries
    - Database Interaction Schema
+   - Rating System
+
    - Database Recommendations
 
 3. [Game Logic](memory-bank-game.md)
@@ -60,9 +62,16 @@ This document serves as an entry point for all Memory Bank files of the Avalon p
    - Frontend Recommendations
 
 5. [Development Process](memory-bank-development.md)
+
    - Development Process
    - Workflow
    - Code Conventions
+   - Troubleshooting Common Issues
+
+6. [Progress Log](progress.md)
+
+   - Updates and Changes
+
    - Local Development
    - Development Recommendations
    - Troubleshooting Common Issues

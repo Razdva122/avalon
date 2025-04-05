@@ -126,6 +126,8 @@ The game supports various addons:
 - Excalibur - the Excalibur sword provides special abilities
 - Plot Cards - plot cards with special effects
 - Lancelots - Lancelots can switch sides during the game
+- Rating System - player performance tracking and leaderboards
+
 - Witch - Witch with special abilities
 
 ## Technical Stack

@@ -19,6 +19,15 @@
       <LocalizedTextWrapper keypath="lovers.playingAsTheLovers" />
     </p>
 
+    <div class="d-flex flex-wrap">
+      <div class="flex-grow-1">
+        <TopRolePlayer role="tristan" :displayRole="true" class="my-4" />
+      </div>
+      <div class="flex-grow-1">
+        <TopRolePlayer role="isolde" :displayRole="true" class="my-4" />
+      </div>
+    </div>
+
     <h2>{{ $t('lovers.generalTips') }}</h2>
     <ul>
       <li v-html="$t('lovers.maintainIndividualPersonas')"></li>
@@ -46,6 +55,7 @@ import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
+import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
 import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
@@ -54,6 +64,7 @@ export default defineComponent({
     PreviewLink,
     SchemaImage,
     LocalizedTextWrapper,
+    TopRolePlayer,
   },
   methods: {
     calculateRoleUrl: calculateRoleUrl,

@@ -15,6 +15,8 @@
     <section>
       <h2>{{ $t('revealer.informationHeader') }}</h2>
       <p><LocalizedTextWrapper keypath="revealer.generalInformation" /></p>
+
+      <TopRolePlayer role="revealer" class="my-4" />
     </section>
 
     <section>
@@ -47,6 +49,10 @@
 
     <section>
       <p><LocalizedTextWrapper keypath="revealer.description" /></p>
+
+      <TopRolePlayer role="revealer" class="my-4" />
+
+      <TopRolePlayer role="revealer" class="my-4" />
     </section>
   </div>
 </template>
@@ -57,6 +63,7 @@ import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
+import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
 import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
@@ -65,6 +72,7 @@ export default defineComponent({
     PreviewLink,
     SchemaImage,
     LocalizedTextWrapper,
+    TopRolePlayer,
   },
   methods: {
     calculateRoleUrl: calculateRoleUrl,

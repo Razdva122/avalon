@@ -28,6 +28,10 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     rating: 'Rating',
     rank: 'Rank',
     player: 'Player',
+    topPlayerTitle: 'Top Player',
+    gamesPlayed: '{count} games',
+    noTopPlayerData: 'No top player data available',
+
     noRatingHistory: 'No rating history available',
   },
   ru: {
@@ -56,6 +60,10 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     rating: 'Рейтинг',
     rank: 'Ранг',
     player: 'Игрок',
+    topPlayerTitle: 'Лучший игрок',
+    gamesPlayed: '{count} игр',
+    noTopPlayerData: 'Нет данных о лучшем игроке',
+
     noRatingHistory: 'История рейтинга недоступна',
   },
   'zh-CN': {
@@ -84,6 +92,10 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     rating: '评分',
     rank: '排名',
     player: '玩家',
+    topPlayerTitle: '顶尖玩家',
+    gamesPlayed: '{count} 场游戏',
+    noTopPlayerData: '没有顶尖玩家数据',
+
     noRatingHistory: '没有评分历史',
   },
   'zh-TW': {
@@ -112,6 +124,10 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     rating: '評分',
     rank: '排名',
     player: '玩家',
+    topPlayerTitle: '頂尖玩家',
+    gamesPlayed: '{count} 場遊戲',
+    noTopPlayerData: '沒有頂尖玩家數據',
+
     noRatingHistory: '沒有評分歷史',
   },
   es: {
@@ -140,6 +156,10 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     rating: 'Clasificación',
     rank: 'Rango',
     player: 'Jugador',
+    topPlayerTitle: 'Mejor Jugador',
+    gamesPlayed: '{count} juegos',
+    noTopPlayerData: 'No hay datos del mejor jugador disponibles',
+
     noRatingHistory: 'No hay historial de clasificación disponible',
   },
 };

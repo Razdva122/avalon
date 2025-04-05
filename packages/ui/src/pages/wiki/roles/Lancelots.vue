@@ -21,6 +21,15 @@
       <LocalizedTextWrapper keypath="lancelots.goodAndEvilRecognition" />
       <LocalizedTextWrapper keypath="lancelots.guinevereKnowledge" />
     </p>
+
+    <div class="d-flex flex-wrap">
+      <div class="flex-grow-1">
+        <TopRolePlayer role="goodLancelot" :displayRole="true" class="my-4" />
+      </div>
+      <div class="flex-grow-1">
+        <TopRolePlayer role="evilLancelot" :displayRole="true" class="my-4" />
+      </div>
+    </div>
     <p>
       <span v-html="$t('lancelots.gameplayKeyConcept')"></span>
       <span v-html="$t('lancelots.loyaltyChangeMechanism')"></span>
@@ -78,6 +87,7 @@ import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
+import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
 import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
@@ -86,6 +96,7 @@ export default defineComponent({
     PreviewLink,
     SchemaImage,
     LocalizedTextWrapper,
+    TopRolePlayer,
   },
   methods: {
     calculateRoleUrl: calculateRoleUrl,
