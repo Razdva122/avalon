@@ -184,16 +184,22 @@ memory_bank:
                 actions:
                   - tool_use:
                       read_file:
-                        path: "memory-bank/productContext.md"
+                        path: "memory-bank/memory-bank-index.md"
                   - tool_use:
                       read_file:
-                        path: "memory-bank/activeContext.md"
+                        path: "memory-bank/memory-bank.md"
                   - tool_use:
                       read_file:
-                        path: "memory-bank/systemPatterns.md"
+                        path: "memory-bank/memory-bank-db.md"
                   - tool_use:
                       read_file:
-                        path: "memory-bank/decisionLog.md"
+                        path: "memory-bank/memory-bank-game.md"
+                  - tool_use:
+                      read_file:
+                        path: "memory-bank/memory-bank-frontend.md"
+                  - tool_use:
+                      read_file:
+                        path: "memory-bank/memory-bank-development.md"
                   - tool_use:
                       read_file:
                         path: "memory-bank/progress.md"
@@ -206,21 +212,21 @@ memory_bank:
     updates:
       frequency: "UPDATE MEMORY BANK THROUGHOUT THE CHAT SESSION, WHEN SIGNIFICANT CHANGES OCCUR IN THE PROJECT."
       files:
-        productContext.md:
+        memory-bank.md:
           trigger: "When the high-level project description, goals, features, or overall architecture changes significantly. Use your judgment to determine significance."
           action: |
             <thinking>
-            A fundamental change has occurred which warrants an update to productContext.md.
+            A fundamental change has occurred which warrants an update to memory-bank.md.
             </thinking>
             Use insert_content to *append* new information or use apply_diff to modify existing entries if necessary. Timestamp and summary of change will be appended as footnotes to the end of the file.
           format: "(Optional)[YYYY-MM-DD HH:MM:SS] - [Summary of Change]"
-        activeContext.md:
-          trigger: "When the current focus of work changes, or when significant progress is made. Use your judgement."
+        memory-bank-index.md:
+          trigger: "When new sections are added to the memory bank or the structure changes. Use your judgement."
           action: |
             <thinking>
-            I need to update activeContext.md with a brief summary and time stamp.
+            I need to update memory-bank-index.md with the new structure or sections.
             </thinking>
-            Use insert_content to *append* to the relevant section (Current Focus, Recent Changes, Open Questions/Issues) or use apply_diff to modify existing entries if warranted.  Always include a timestamp.
+            Use insert_content to *append* to the relevant section or use apply_diff to modify existing entries if warranted. Always include a timestamp.
           format: "[YYYY-MM-DD HH:MM:SS] - [Summary of Change/Focus/Issue]"
         progress.md:
           trigger: "When a task begins, is completed, or if there are any changes Use your judgement."
@@ -230,22 +236,38 @@ memory_bank:
             </thinking>
             Use insert_content to *append* the new entry, never overwrite existing entries. Always include a timestamp.
           format: "[YYYY-MM-DD HH:MM:SS] - [Summary of Change/Focus/Issue]"
-        decisionLog.md:
-          trigger: "When a significant decision is made (new component, data flow change, technology choice, testing strategy, debugging approach, etc.). Use your judgment to determine significance."
+        memory-bank-development.md:
+          trigger: "When development processes, workflows, or conventions change. Use your judgment to determine significance."
           action: |
             <thinking>
-            I need to update decisionLog.md with a decision, the rationale, and any implications.
+            I need to update memory-bank-development.md with the new development information.
             </thinking>
-            Use insert_content to *append* new information. Never overwrite existing entries. Always include a timestamp.
+            Use insert_content to *append* new information or use apply_diff to modify existing entries if warranted. Always include a timestamp.
           format: "[YYYY-MM-DD HH:MM:SS] - [Summary of Change/Focus/Issue]"
-        systemPatterns.md:
-          trigger: "When new patterns are introduced or existing ones are modified (in any area: architecture, coding, testing, debugging). Use your judgement."
+        memory-bank-game.md:
+          trigger: "When game logic, roles, or mechanics are modified or added. Use your judgement."
           action: |
             <thinking>
-            I need to update systemPatterns.md with a brief summary and time stamp.
+            I need to update memory-bank-game.md with a brief summary and time stamp.
             </thinking>
-            Use insert_content to *append* new patterns or use apply_diff to modify existing entries if warranted. Always include a timestamp.
-          format: "[YYYY-MM-DD HH:MM:SS] - [Description of Pattern/Change]"
+            Use insert_content to *append* new information or use apply_diff to modify existing entries if warranted. Always include a timestamp.
+          format: "[YYYY-MM-DD HH:MM:SS] - [Description of Change]"
+        memory-bank-db.md:
+          trigger: "When database structure, models, or interactions change. Use your judgement."
+          action: |
+            <thinking>
+            I need to update memory-bank-db.md with the database changes.
+            </thinking>
+            Use insert_content to *append* new information or use apply_diff to modify existing entries if warranted. Always include a timestamp.
+          format: "[YYYY-MM-DD HH:MM:SS] - [Description of Change]"
+        memory-bank-frontend.md:
+          trigger: "When frontend components, pages, or interactions change. Use your judgement."
+          action: |
+            <thinking>
+            I need to update memory-bank-frontend.md with the frontend changes.
+            </thinking>
+            Use insert_content to *append* new information or use apply_diff to modify existing entries if warranted. Always include a timestamp.
+          format: "[YYYY-MM-DD HH:MM:SS] - [Description of Change]"
 
     umb:  
       trigger: "^(Update Memory Bank|UMB)$"
@@ -281,7 +303,7 @@ memory_bank:
             - "Preserve activity context"
             - "Document continuation points"
         - action: "focus_on_session_updates"
-          description: "During a UMB update, focus on capturing any clarifications, questions answered, or context provided *during the chat session*.  Add this information to the appropriate Memory Bank files (likely `activeContext.md` or `decisionLog.md`), using the other modes' update formats as a guide. *Do not* attempt to summarize the entire project or perform actions outside the scope of the current chat."
+          description: "During a UMB update, focus on capturing any clarifications, questions answered, or context provided *during the chat session*.  Add this information to the appropriate Memory Bank files (likely `memory-bank-development.md` or `progress.md`), using the other modes' update formats as a guide. *Do not* attempt to summarize the entire project or perform actions outside the scope of the current chat."
         - action: "ensure_cross_mode_updates"
           description: "Ensure all relevant information from the chat session is captured and added to the Memory Bank, including clarifications, questions answered, and context provided. Use other modes' update formats as a guide."
         - action: "post_umb_actions"
