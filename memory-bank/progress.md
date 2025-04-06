@@ -53,4 +53,9 @@ This document tracks significant updates and changes to the Avalon project.
 - Translated all role-specific content (brute, cleric, merlin, witch, etc.)
 - Added SEO translations for all pages and roles
 - Added Portuguese default keywords for SEO
+
+[2025-04-06 19:57:48] - Создан план по выделению общей логики проверки лояльности для plot cards. План включает создание базового класса LoyaltyChecker, модификацию существующего CheckLoyaltyAbstractAddon и создание специального класса PlotCardLoyaltyChecker для карт. Детали в файле memory-bank/loyalty-checker-plan.md.
+
+[2025-04-06 21:22:42] - Разработан план интеграции механизма проверки лояльности с UI для plot cards. План включает расширение типов, обработчиков в GameManager, модификацию компонентов UI, обновление логики выбора игроков и локализации. Детали в файле memory-bank/loyalty-checker-ui-integration.md.
+
 - Updated checklist to track translation progress
