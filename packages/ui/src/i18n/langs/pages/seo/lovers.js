@@ -1,4 +1,10 @@
 module.exports.lovers = {
+  pt: {
+    title: 'Avalon: The Resistance | Amantes (Tristão e Isolda)',
+    description:
+      "Regras e dicas para os papéis de Amantes (Tristão e Isolda) no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Amantes', 'Tristão', 'Isolda', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Lovers (Tristan and Isolde)',
     description: "Rules and Tips for Lovers (Tristan and Isolde) roles in the board game 'Avalon: The Resistance'",

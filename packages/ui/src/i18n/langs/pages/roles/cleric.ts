@@ -14,7 +14,7 @@ export const cleric: { [key in TLanguage]: Dictionary<string> } = {
 
     generalTipsLoyaltyCautionHeading: 'Caution in Revealing Loyalty:',
     generalTipsLoyaltyCautionText:
-      'Use the information about the leader’s loyalty from the first expedition, but do not rush into making public statements or accusations, as this might attract unwanted attention from the forces of darkness.',
+      "Use the information about the leader's loyalty from the first expedition, but do not rush into making public statements or accusations, as this might attract unwanted attention from the forces of darkness.",
 
     generalTipsStealthHeading: 'Stealth until Critical Moments:',
     generalTipsStealthText:
@@ -23,7 +23,7 @@ export const cleric: { [key in TLanguage]: Dictionary<string> } = {
     strategicTipsHeader: 'Strategic Tips:',
     informationSafetyHeading: 'Balance between Information and Safety:',
     informationSafetyText:
-      'Use your knowledge of the leader’s loyalty from the first expedition to build trust among the players, but do not reveal all your information at once. Your goal is to retain the ability to influence the game while remaining undetected.',
+      "Use your knowledge of the leader's loyalty from the first expedition to build trust among the players, but do not reveal all your information at once. Your goal is to retain the ability to influence the game while remaining undetected.",
 
     tacticalRevealHeading: 'Tactical Role Reveal:',
     tacticalRevealText:
@@ -171,5 +171,39 @@ export const cleric: { [key in TLanguage]: Dictionary<string> } = {
 
     conclusion:
       '{cleric} no es solo un informante, sino un estratega que equilibra entre revelar y ocultar información. Juega de manera inteligente, observa cuidadosamente a los jugadores y utiliza todas las ideas disponibles para mantener a las fuerzas de la luz intactas hasta el final.',
+  },
+  pt: {
+    informationHeader: 'Informações Gerais:',
+    generalInformation:
+      '{cleric} é uma figura-chave nas fileiras das forças da luz, ajudando a descobrir as verdadeiras intenções dos jogadores. Após a primeira expedição, {cleric} recebe uma oportunidade única – conhecer a lealdade do líder daquela expedição. No entanto, se {cleric} for o próprio líder, nenhuma informação é fornecida. Diferentemente de {merlin}, ao tentar eliminar o clérigo, as forças das trevas devem adivinhar o papel de outro civil. Este papel requer uma abordagem cautelosa e bem pensada: em situações críticas, revelar o papel pode ser justificado se conseguir enganar os oponentes e manter o equilíbrio dentro da equipe.',
+
+    generalTipsHeader: 'Dicas Gerais:',
+    generalTipsRoleUnderstandingHeading: 'Entendimento Claro do Papel:',
+    generalTipsRoleUnderstandingText:
+      'Lembre-se que sua principal tarefa é apoiar as forças da luz, coletando informações sobre as lealdades dos oponentes e confirmando as intenções amigáveis de seus aliados.',
+
+    generalTipsLoyaltyCautionHeading: 'Cautela ao Revelar Lealdade:',
+    generalTipsLoyaltyCautionText:
+      'Use as informações sobre a lealdade do líder da primeira expedição, mas não se apresse em fazer declarações públicas ou acusações, pois isso pode atrair atenção indesejada das forças das trevas.',
+
+    generalTipsStealthHeading: 'Sigilo até Momentos Críticos:',
+    generalTipsStealthText:
+      'Jogue de forma encoberta e cuidadosa. Revele seu papel apenas em situações onde isso ajudará a prevenir uma derrota ou salvar a equipe de um movimento perigoso dos oponentes.',
+
+    strategicTipsHeader: 'Dicas Estratégicas:',
+    informationSafetyHeading: 'Equilíbrio entre Informação e Segurança:',
+    informationSafetyText:
+      'Use seu conhecimento sobre a lealdade do líder da primeira expedição para construir confiança entre os jogadores, mas não revele todas as suas informações de uma vez. Seu objetivo é manter a capacidade de influenciar o jogo enquanto permanece não detectado.',
+
+    tacticalRevealHeading: 'Revelação Tática do Papel:',
+    tacticalRevealText:
+      'Em situações críticas quando as apostas são altas, pode ser vantajoso revelar seu papel para confundir as forças das trevas. No entanto, avalie o risco cuidadosamente: se os oponentes adivinharem o papel do segundo civil, isso pode favorecer as forças das trevas.',
+
+    actionCommunicationHeading: 'Comunicação através de Ações:',
+    actionCommunicationText:
+      'Participe ativamente em discussões e votações, direcionando silenciosamente o jogo na direção certa, mas evite dicas óbvias sobre suas informações reveladas. Sua tarefa é convencer as forças da luz de que suas ações visam o bem comum.',
+
+    conclusion:
+      '{cleric} não é apenas um informante, mas um estrategista equilibrando entre revelar e ocultar informações. Jogue de forma inteligente, observe os jogadores cuidadosamente e use todos os insights disponíveis para manter as forças da luz intactas até o final.',
   },
 };

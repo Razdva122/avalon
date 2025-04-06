@@ -40,6 +40,45 @@ export const morgana: { [key in TLanguage]: Dictionary<string> } = {
     thrivingAsMorgana:
       "Thriving as {morgana} requires a fine balance between assertiveness and subtlety. Your ability to manipulate the narrative and influence both evil and good players significantly affects your team's chance of victory. Embrace the challenge and enjoy manoeuvring through Avalon's shadowy waters.",
   },
+  pt: {
+    generalInformation: 'Informações Gerais: ',
+    playingAsMorgana:
+      'Jogar como {morgana} gira em torno do engano, especificamente fazendo-se parecer com {merlin} para confundir as forças do bem. Você deve tentar confundir {percival} não apenas através de suas ações, mas também prestando muita atenção em como {merlin} pode estar guiando as forças do bem. Misturar-se como Merlin pode desviar {percival}, dando às forças do mal uma vantagem.',
+    generalTips: 'Dicas Gerais: ',
+    masterArtOfDeceptionTitle: 'Domine a arte do engano: ',
+    masterArtOfDeceptionDescription:
+      'Use suas ações e palavras para imitar o papel de {merlin}, afastando os jogadores do bem da verdade.',
+    createConfusionTitle: 'Crie confusão entre os jogadores do bem: ',
+    createConfusionDescription:
+      'A desinformação estratégica pode semear dúvidas e dificultar a tomada de decisões deles.',
+    coordinateEvilPlayersTitle: 'Coordene com jogadores do mal discretamente: ',
+    coordinateEvilPlayersDescription:
+      'Trabalhe junto com seus companheiros de equipe do mal, mas faça isso com cautela para evitar levantar suspeitas.',
+    stayComposedTitle: 'Mantenha a compostura: ',
+    stayComposedDescription:
+      'Mesmo que a suspeita recaia sobre você, manter uma atitude calma e controlada pode ajudar a dissuadir os outros de acreditar que eles identificaram você corretamente.',
+    adaptStrategyTitle: 'Adapte sua estratégia: ',
+    adaptStrategyDescription:
+      'Seja reativo à progressão do jogo e esteja pronto para mudar de táticas para manter as forças do bem adivinhando.',
+    strategicTips: 'Dicas Estratégicas: ',
+    emphasizePlausibleDeniabilityTitle: 'Enfatize a negação plausível: ',
+    emphasizePlausibleDeniabilityDescription:
+      'Faça declarações que ajudem seu caso sem se comprometer muito fortemente com qualquer curso particular que possa expor você.',
+    divertAttentionTitle: 'Desvie a atenção com elegância: ',
+    divertAttentionDescription:
+      'Se você sentir que o foco está se voltando para você, redirecione habilmente a conversa ou suspeita para outro lugar.',
+    imitateMerlinsConcernTitle: 'Imite a preocupação de Merlin: ',
+    imitateMerlinsConcernDescription:
+      'Mostre aparente preocupação com o sucesso da equipe do bem enquanto discretamente os guia para o fracasso.',
+    questionOthersTitle: 'Questione os outros: ',
+    questionOthersDescription:
+      'Faça perguntas estratégicas que façam os outros revelar mais sobre seus papéis e estratégias, que você pode então usar para sua vantagem.',
+    fakeTrustworthinessTitle: 'Simule confiabilidade: ',
+    fakeTrustworthinessDescription:
+      'Construir uma fachada de confiabilidade pode fortalecer suas sugestões enganosas, tornando-as mais propensas a serem seguidas.',
+    thrivingAsMorgana:
+      'Prosperar como {morgana} requer um equilíbrio fino entre assertividade e sutileza. Sua capacidade de manipular a narrativa e influenciar tanto jogadores do mal quanto do bem afeta significativamente a chance de vitória da sua equipe. Abrace o desafio e aproveite a manobra através das águas sombrias de Avalon.',
+  },
   ru: {
     generalInformation: 'Общая информация: ',
     playingAsMorgana:

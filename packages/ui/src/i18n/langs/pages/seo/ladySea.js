@@ -1,4 +1,9 @@
 module.exports.ladySea = {
+  pt: {
+    title: 'Avalon: The Resistance | Dama do Mar',
+    description: "Regras para a carta 'Dama do Mar' no jogo de tabuleiro 'Avalon: The Resistance'.",
+    keywords: ['Expansões', 'Complementos', 'Módulo', 'Dama do Mar', 'Regras'],
+  },
   en: {
     title: 'Avalon: The Resistance | Lady of the Sea',
     description: "Rules for the 'Lady of the Sea' card in the board game 'Avalon: The Resistance'.",

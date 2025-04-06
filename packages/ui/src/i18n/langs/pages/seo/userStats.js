@@ -1,4 +1,9 @@
 module.exports.userStats = {
+  pt: {
+    title: 'Avalon: The Resistance | Estatísticas Pessoais',
+    description: "Estatísticas pessoais para jogos online em 'Avalon: The Resistance'",
+    keywords: ['Estatísticas', 'Dados', 'Taxa de vitória'],
+  },
   en: {
     title: 'Avalon: The Resistance | Personal Statistics',
     description: "Personal statistics for online games in 'Avalon: The Resistance'",

@@ -71,55 +71,55 @@ export const minion: { [key in TLanguage]: Dictionary<string> } = {
   'zh-CN': {
     generalTipsTitle: '基本提示:',
     tipRoleTitle: '角色:',
-    tipRoleText: '你是“邪恶”团队的一员,主要目标是阻挠“正义”团队的任务,或确保你参与那些成功的任务。',
+    tipRoleText: '你是"邪恶"团队的一员,主要目标是阻挠"正义"团队的任务,或确保你参与那些成功的任务。',
     tipKnowledgeTitle: '知识:',
-    tipKnowledgeText: '在游戏开始时,你知道你的“邪恶”盟友是谁,但那些根据游戏规则而隐藏的角色除外。',
+    tipKnowledgeText: '在游戏开始时,你知道你的"邪恶"盟友是谁,但那些根据游戏规则而隐藏的角色除外。',
     tipObjectiveTitle: '目标:',
     tipObjectiveText:
-      '你的终极目标是让五次任务中有三次失败,或在“正义”团队中制造足够的不信任,从而帮助你的邪恶团队获胜。',
+      '你的终极目标是让五次任务中有三次失败,或在"正义"团队中制造足够的不信任,从而帮助你的邪恶团队获胜。',
     strategicTipsTitle: '策略提示:',
     tipDiscreetCollaborationTitle: '谨慎合作:',
-    tipDiscreetCollaborationText: '与你的“邪恶”队友密切合作,秘密策划如何执行每一项任务,以及谁将冒险使任务失败。',
+    tipDiscreetCollaborationText: '与你的"邪恶"队友密切合作,秘密策划如何执行每一项任务,以及谁将冒险使任务失败。',
     tipDeceptionTitle: '欺骗:',
-    tipDeceptionText: '精通欺骗的艺术。伪装成“正义”一员可以帮助你影响对方决策并保护你的身份。',
+    tipDeceptionText: '精通欺骗的艺术。伪装成"正义"一员可以帮助你影响对方决策并保护你的身份。',
     tipPublicDemeanorTitle: '公共形象:',
     tipPublicDemeanorText: '注意你的公开言行。尽量避免过分防备或过于激进,以免引起他人怀疑。',
     tipUndermineTrustTitle: '破坏信任:',
-    tipUndermineTrustText: '巧妙地质疑“正义”玩家的行为和决策,营造出一种不信任与混乱的氛围。',
+    tipUndermineTrustText: '巧妙地质疑"正义"玩家的行为和决策,营造出一种不信任与混乱的氛围。',
     tipSuspectManagementTitle: '疑点处理:',
     tipSuspectManagementText:
       '如果有人对你产生怀疑,请巧妙地转移注意力,避免让自己过于引人注目。使用逻辑为自己辩护,但不要过于有说服力,以免激起更多怀疑。',
     tipStrategicSacrificeTitle: '策略性牺牲:',
     tipStrategicSacrificeText:
-      '有时牺牲一位“邪恶”队友以赢得“正义”团队的信任是有利的,尤其是在这能使“邪恶”在关键任务中占据多数时。',
+      '有时牺牲一位"邪恶"队友以赢得"正义"团队的信任是有利的,尤其是在这能使"邪恶"在关键任务中占据多数时。',
     conclusionText:
-      '作为{minion},你的成功取决于你欺骗和操纵“正义”团队的能力,同时与你的“邪恶”盟友协同作战。你的狡猾与谨慎是推翻正义力量、确保{mordred}胜利的关键。',
+      '作为{minion},你的成功取决于你欺骗和操纵"正义"团队的能力,同时与你的"邪恶"盟友协同作战。你的狡猾与谨慎是推翻正义力量、确保{mordred}胜利的关键。',
   },
   'zh-TW': {
     generalTipsTitle: '基本提示:',
     tipRoleTitle: '角色:',
-    tipRoleText: '你是“邪惡”團隊的一員,主要目標是阻撓“正義”團隊的任務,或確保你參與那些成功的任務。',
+    tipRoleText: '你是"邪惡"團隊的一員,主要目標是阻撓"正義"團隊的任務,或確保你參與那些成功的任務。',
     tipKnowledgeTitle: '知識:',
-    tipKnowledgeText: '在遊戲開始時,你知道你的“邪惡”盟友是誰,但根據規則隱藏的角色除外。',
+    tipKnowledgeText: '在遊戲開始時,你知道你的"邪惡"盟友是誰,但根據規則隱藏的角色除外。',
     tipObjectiveTitle: '目標:',
-    tipObjectiveText: '你的最終目標是讓五次任務中有三次失敗,或在“正義”團隊中播下足夠的不信任,以幫助你的邪惡團隊獲勝。',
+    tipObjectiveText: '你的最終目標是讓五次任務中有三次失敗,或在"正義"團隊中播下足夠的不信任,以幫助你的邪惡團隊獲勝。',
     strategicTipsTitle: '策略提示:',
     tipDiscreetCollaborationTitle: '謹慎合作:',
-    tipDiscreetCollaborationText: '與你的“邪惡”隊友密切合作,秘密策劃如何執行每一項任務,以及誰將冒險使任務失敗。',
+    tipDiscreetCollaborationText: '與你的"邪惡"隊友密切合作,秘密策劃如何執行每一項任務,以及誰將冒險使任務失敗。',
     tipDeceptionTitle: '欺騙:',
-    tipDeceptionText: '精通欺騙的藝術。假扮成“正義”一員能幫助你影響他們的決策並保護你的身份。',
+    tipDeceptionText: '精通欺騙的藝術。假扮成"正義"一員能幫助你影響他們的決策並保護你的身份。',
     tipPublicDemeanorTitle: '公開形象:',
     tipPublicDemeanorText: '注意你的公開言行。避免過分防備或過於激進,以免引起他人懷疑。',
     tipUndermineTrustTitle: '破壞信任:',
-    tipUndermineTrustText: '巧妙地質疑“正義”玩家的行動和決策,營造一種不信任與混亂的氛圍。',
+    tipUndermineTrustText: '巧妙地質疑"正義"玩家的行動和決策,營造一種不信任與混亂的氛圍。',
     tipSuspectManagementTitle: '疑點處理:',
     tipSuspectManagementText:
       '若有懷疑指向你,請巧妙地轉移注意力,避免過於引人注目。運用邏輯為自己辯護,但不要過於強烈,以免引發新一輪懷疑。',
     tipStrategicSacrificeTitle: '策略性犧牲:',
     tipStrategicSacrificeText:
-      '有時犧牲一位“邪惡”隊友以贏得“正義”團隊的信任是明智的,尤其是在這能在關鍵任務中使“邪惡”佔多數時。',
+      '有時犧牲一位"邪惡"隊友以贏得"正義"團隊的信任是明智的,尤其是在這能在關鍵任務中使"邪惡"佔多數時。',
     conclusionText:
-      '作為{minion},你的成功取決於你欺騙和操縱“正義”團隊的能力,同時與你的“邪惡”盟友協同作戰。你的狡猾與謹慎是推翻正義力量、確保{mordred}勝利的關鍵。',
+      '作為{minion},你的成功取決於你欺騙和操縱"正義"團隊的能力,同時與你的"邪惡"盟友協同作戰。你的狡猾與謹慎是推翻正義力量、確保{mordred}勝利的關鍵。',
   },
   es: {
     generalTipsTitle: 'Consejos Generales:',
@@ -153,5 +153,38 @@ export const minion: { [key in TLanguage]: Dictionary<string> } = {
       "Puede ser beneficioso sacrificar a un miembro del equipo 'Malvado' para ganarte la confianza del equipo 'Bueno', especialmente si esto puede conducir a una mayoría malvada en misiones críticas.",
     conclusionText:
       "Como {minion}, tu éxito depende de tu habilidad para engañar y manipular al equipo 'Bueno' mientras coordinas con tus aliados 'Malvados'. Tu astucia y discreción son herramientas clave para derrocar a las fuerzas del bien y asegurar la victoria para {mordred}.",
+  },
+  pt: {
+    generalTipsTitle: 'Dicas Gerais:',
+    tipRoleTitle: 'Função:',
+    tipRoleText:
+      "Você faz parte da equipe do 'Mal', com o objetivo principal de frustrar as missões da equipe do 'Bem' ou garantir sua presença nas missões bem-sucedidas.",
+    tipKnowledgeTitle: 'Conhecimento:',
+    tipKnowledgeText:
+      "No início do jogo, você sabe quem são seus aliados do 'Mal', exceto os papéis ocultos de você pelas regras do jogo.",
+    tipObjectiveTitle: 'Objetivo:',
+    tipObjectiveText:
+      "Seu objetivo final é fazer com que três das cinco missões falhem ou semear desconfiança suficiente entre a equipe do 'Bem' para levar sua equipe do mal à vitória.",
+    strategicTipsTitle: 'Dicas Estratégicas:',
+    tipDiscreetCollaborationTitle: 'Colaboração Discreta:',
+    tipDiscreetCollaborationText:
+      "Trabalhe em estreita colaboração com seus companheiros do 'Mal' em segredo. Planeje como abordar cada missão e quem assumirá o risco de fazer uma missão falhar.",
+    tipDeceptionTitle: 'Engano:',
+    tipDeceptionText:
+      "Aperfeiçoe a arte do engano. Misturar-se como um dos membros do 'Bem' pode ajudá-lo a influenciar suas decisões e proteger sua identidade.",
+    tipPublicDemeanorTitle: 'Comportamento Público:',
+    tipPublicDemeanorText:
+      'Esteja atento às suas ações e palavras públicas. Tente evitar suspeitas não sendo muito defensivo ou muito agressivo.',
+    tipUndermineTrustTitle: 'Minar a Confiança:',
+    tipUndermineTrustText:
+      "Questione sutilmente as ações e decisões dos jogadores do 'Bem' para criar uma atmosfera de desconfiança e confusão.",
+    tipSuspectManagementTitle: 'Gerenciamento de Suspeitas:',
+    tipSuspectManagementText:
+      'Se a suspeita recair sobre você, redirecione-a habilmente sem chamar muita atenção para si mesmo. Use argumentos lógicos para se defender, mas evite ser muito convincente para não levantar mais suspeitas.',
+    tipStrategicSacrificeTitle: 'Sacrifício Estratégico:',
+    tipStrategicSacrificeText:
+      "Pode ser benéfico sacrificar um membro da equipe do 'Mal' para ganhar a confiança da equipe do 'Bem', particularmente se isso puder levar a uma maioria do 'Mal' em missões críticas.",
+    conclusionText:
+      "Como um {minion}, seu sucesso depende da sua capacidade de enganar e manipular a equipe do 'Bem' enquanto coordena com seus aliados do 'Mal'. Sua astúcia e discrição são instrumentos-chave para derrubar as forças do bem e garantir a vitória para {mordred}.",
   },
 };

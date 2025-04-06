@@ -2,6 +2,26 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const userStats: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    userStatsTitle: 'Estatísticas do usuário:',
+    lastGamesStatsTitle: 'Últimos jogos',
+    game: 'Jogo',
+    side: 'Lado',
+    sideevil: 'Equipe do mal',
+    sidegood: 'Equipe do bem',
+    winResult: 'Vitória',
+    loseResult: 'Derrota',
+    result: 'Resultado',
+    sidetotal: 'Total',
+    gamesCount: 'Quantidade de jogos',
+    wins: 'Vitórias',
+    role: 'Papel',
+    lose: 'Derrotas',
+    winrate: 'Taxa de vitória',
+    playerName: 'Jogador',
+    teammatesStatsTitle: 'Companheiros de equipe',
+    enemiesStatsTitle: 'Inimigos',
+  },
   en: {
     userStatsTitle: 'User statistics:',
     lastGamesStatsTitle: 'Last games',

@@ -2,6 +2,22 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const ladySea: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    intro:
+      '{ladyOfSea} é um análogo da expansão {ladyOfLake}, com a seguinte exceção: ao verificar um jogador da equipe do mal, você vê o papel dele, não apenas sua lealdade. Ao verificar um jogador da equipe do bem, tudo permanece o mesmo que com a {ladyOfLake}.',
+    title: 'Regras e dicas para a "Dama do Mar":',
+    howToUseTitle: 'Como usar: ',
+    howToUseContent:
+      ' Ao verificar jogadores, o portador da Dama tem a opção de anunciar uma equipe do bem ou um papel específico do mal',
+    complicationTitle: 'Complicação para a equipe do mal: ',
+    complicationContent:
+      'Torna-se mais difícil para os jogadores do mal mentir sobre seu papel, pois eles devem não apenas nomear seu lado, mas também escolher um papel, o que dá à equipe do bem a oportunidade de descobrir a mentira.',
+    additionalInformationTitle: 'Informação adicional para a equipe do mal: ',
+    additionalInformationContent: 'Usar a Dama permite que a equipe do mal entenda o papel de seus aliados.',
+    rolesTitle: 'Interação com papéis: ',
+    rolesContent:
+      'Ao verificar o {troublemaker}, você verá um papel aleatório do mal disponível no jogo. Ao verificar o {trickster}, você simplesmente verá a equipe do bem.',
+  },
   en: {
     intro:
       '{ladyOfSea} is an analogue of the {ladyOfLake} expansion, with the following exception: when checking a player of the evil team, you see their role, not just their loyalty. When checking a player of the good team, everything remains the same as with the {ladyOfLake}.',

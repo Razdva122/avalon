@@ -180,4 +180,42 @@ export const mordred: { [key in TLanguage]: Dictionary<string> } = {
     controlNarrativeContent:
       'Tienes el poder de guiar las discusiones y decisiones. Úsalo sabiamente para beneficiar la causa del mal. Al guiar el diálogo, puedes moldear la dirección del juego.',
   },
+  pt: {
+    generalInformation: 'Informações Gerais:',
+    playingAsMordred:
+      'Jogar como {mordred} lhe dá a vantagem única de ser desconhecido para {merlin} e liderar os lacaios do mal. Seu objetivo é perturbar as forças do bem e garantir que o mal prevaleça, tudo enquanto mantém seu disfarce como um aliado leal.',
+    generalTips: 'Dicas Gerais:',
+    hiddenIdentity: 'Mantenha sua identidade oculta:',
+    hiddenIdentityContent:
+      'Como {mordred}, não ser conhecido por {merlin} é uma grande vantagem. Mantenha isso misturando-se com os jogadores do bem.',
+    distrust: 'Semeie desconfiança sutilmente:',
+    distrustContent: 'Use sua influência para lançar dúvidas sobre os outros sem chamar muita atenção para si mesmo.',
+    commandTheShadows:
+      'Como {mordred}, você comanda as sombras e influencia o jogo nos bastidores. Empregando astúcia e engano, você pode levar o mal à vitória e manter as forças do bem para sempre na escuridão. Abrace seu papel e reine supremo!',
+    identifyMerlin: 'Identifique {merlin}:',
+    identifyMerlinContent:
+      'Tente deduzir quem é {merlin} sem se revelar para que seu assassino possa eliminá-lo no final do jogo.',
+    coordinateMinions: 'Coordene com seus lacaios:',
+    coordinateMinionsContent:
+      'Trabalhe junto com os outros jogadores do mal para elaborar estratégias e perturbar os planos dos jogadores do bem. Comunicação e coordenação são fundamentais.',
+    leadShadows: 'Lidere das sombras:',
+    leadShadowsContent:
+      'Como líder do mal, lidere os lacaios sutilmente e nunca revele seu verdadeiro papel. Influencie os resultados sem chamar atenção para si mesmo.',
+    protectIdentity: 'Proteja sua identidade:',
+    protectIdentityContent:
+      'Evite dar a {merlin} quaisquer pistas sobre seu papel ou os papéis de seus companheiros lacaios do mal. Mantenha seus movimentos calculados e suas intenções ocultas.',
+    strategicTips: 'Dicas Estratégicas',
+    confusePlayers: 'Confunda os jogadores do bem:',
+    confusePlayersContent:
+      'Tome decisões que possam confundir os jogadores do bem e dificultar que Merlin os guie. Nublar o julgamento deles é essencial.',
+    useDisinformation: 'Use desinformação:',
+    useDisinformationContent:
+      'Engane os jogadores do bem com informações incorretas para afastá-los da verdade. Isso pode desviar a atenção deles e perturbar suas estratégias.',
+    cultivateAlliances: 'Cultive alianças:',
+    cultivateAlliancesContent:
+      'Alinhe-se falsamente com jogadores do bem para ganhar sua confiança e manipular o jogo a favor do mal. Este papel duplo pode ser fundamental para influenciar decisões.',
+    controlNarrative: 'Controle a narrativa:',
+    controlNarrativeContent:
+      'Você tem o poder de direcionar discussões e decisões. Use-o sabiamente para beneficiar a causa do mal. Ao guiar o diálogo, você molda a direção do jogo.',
+  },
 };

@@ -146,7 +146,7 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     takeRisks: 'Toma riesgos:',
     needToMakeBoldMoves:
       'Es posible que necesites hacer movimientos audaces para ganar la confianza de cualquiera de los lados y perturbar los planes de los jugadores buenos.',
-    'strategicTips:': 'Consejos estratégicos',
+    strategicTips: 'Consejos estratégicos:',
     createUncertainty: 'Crea incertidumbre:',
     aimToDestabilize: 'Siempre apunta a desestabilizar la confianza que los jugadores buenos tienen entre sí.',
     beUnpredictable: 'Sé impredecible: ',
@@ -157,5 +157,39 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     avoidDrawingAttention: 'Evita llamar la atención:',
     focusOnKeyPlays:
       'Un estilo de juego demasiado activo puede levantar sospechas. En su lugar, concéntrate en realizar jugadas clave que puedan cambiar el resultado del juego.',
+  },
+  pt: {
+    generalInformation: 'Informações Gerais:',
+    playingAsOberon:
+      'Jogar como {oberon} apresenta desafios únicos, pois você é um Lacaio do Mal, mas não conhece as identidades de seus companheiros lacaios, e eles não conhecem você. Sua tarefa é perturbar as forças do bem enquanto navega pelo jogo com informações limitadas.',
+    generalTips: 'Dicas Gerais:',
+    playingСonclusion:
+      'Jogar como {oberon} requer astúcia, adaptabilidade e um talento para o engano. Sua imprevisibilidade é um trunfo que, se usado com sabedoria, pode mudar o rumo do jogo. Confunda, engane e planeje seu caminho para a vitória do mal!',
+    embraceMystery: 'Abrace seu mistério:',
+    useUnknownStatus:
+      'Use seu status desconhecido para criar confusão entre todos os jogadores, tanto bons quanto maus.',
+    observeClosely: 'Observe atentamente:',
+    payAttention:
+      'Preste atenção ao comportamento e às decisões de outros jogadores para tentar deduzir as identidades de seus companheiros lacaios.',
+    actIndependently: 'Aja independentemente:',
+    withoutCoordination:
+      'Sem coordenação direta de outros lacaios, faça movimentos que você acredita que beneficiarão o lado do mal.',
+    misleadSubtly: 'Engane sutilmente:',
+    makeStatements:
+      'Faça declarações e tome ações que semeiem dúvidas entre os jogadores do bem, sem revelar sua verdadeira lealdade.',
+    takeRisks: 'Assuma riscos:',
+    needToMakeBoldMoves:
+      'Você pode precisar fazer movimentos ousados para ganhar a confiança de qualquer lado e perturbar os planos dos jogadores do bem.',
+    strategicTips: 'Dicas Estratégicas:',
+    createUncertainty: 'Crie incerteza:',
+    aimToDestabilize: 'Sempre busque desestabilizar a confiança que os jogadores do bem têm uns nos outros.',
+    beUnpredictable: 'Seja imprevisível: ',
+    varyGameplay: 'Varie sua jogabilidade para evitar qualquer padrão que possa revelar seu papel como {oberon}.',
+    listenForClues: 'Ouça pistas:',
+    useToAdvantage:
+      'Seus companheiros jogadores do mal podem inadvertidamente revelar-se; use isso a seu favor para colaborar indiretamente.',
+    avoidDrawingAttention: 'Evite chamar atenção:',
+    focusOnKeyPlays:
+      'Um estilo de jogo muito ativo pode levantar suspeitas. Em vez disso, concentre-se em fazer jogadas-chave que possam influenciar o resultado do jogo.',
   },
 };

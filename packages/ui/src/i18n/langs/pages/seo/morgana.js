@@ -1,4 +1,9 @@
 module.exports.morgana = {
+  pt: {
+    title: 'Avalon: The Resistance | Morgana',
+    description: "Regras e dicas para o papel de Morgana no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Morgana', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Morgana',
     description: "Rules and Tips for Morgana role in the board game 'Avalon: The Resistance'",

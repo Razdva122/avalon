@@ -19,7 +19,7 @@ import { trickster } from '@/i18n/langs/pages/roles/trickster';
 import { ladySea } from '@/i18n/langs/pages/ladyOfTheSea';
 import { witch } from '@/i18n/langs/pages/roles/witch';
 import { brute } from '@/i18n/langs/pages/roles/brute';
-import { lunatic } from '@/i18n/langs/pages/roles/luntaic';
+import { lunatic } from '@/i18n/langs/pages/roles/lunatic';
 import { guinevere } from '@/i18n/langs/pages/roles/guinevere';
 import { merlinPure } from '@/i18n/langs/pages/roles/merlinPure';
 import { minion } from '@/i18n/langs/pages/roles/minion';
@@ -35,6 +35,7 @@ export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
   'zh-CN': {},
   'zh-TW': {},
   es: {},
+  pt: {},
 };
 
 Object.entries({

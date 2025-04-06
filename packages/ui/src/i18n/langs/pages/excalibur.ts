@@ -2,6 +2,26 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const excalibur: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    intro:
+      '{excalibur} introduz uma camada adicional de estratégia e interação entre os jogadores. Ele complementa as regras básicas do jogo e oferece novas possibilidades durante toda a jogabilidade.',
+    title: 'Regras para usar "Excalibur" (Sargento em \'The Resistance\'):',
+    assign: 'Atribuindo "Excalibur":',
+    leaderInstructions:
+      ' Antes do início da missão, o líder da missão seleciona um participante dentre aqueles designados para a missão para receber {excalibur}. O líder deve passar {excalibur} para outra pessoa na missão além de si mesmo.',
+    voting: 'Votação para a Missão:',
+    votingInstructions:
+      ' Todos os jogadores à mesa sabem a quem {excalibur} foi dado, e eles prosseguem para votar a favor ou contra a missão.',
+    usage: 'Usando Excalibur:',
+    usageInstructions:
+      ' Depois que todos os participantes da missão fizeram sua escolha (sucesso ou falha), é a vez do portador de {excalibur}, que tem a oportunidade de mudar o voto submetido de qualquer um dos participantes.',
+    transparency: 'Transparência de Excalibur:',
+    transparencyInstructions:
+      ' Todos à mesa podem ver se {excalibur} foi usado. Se {excalibur} foi utilizado, todos os jogadores sabem sobre quem foi usado, mas apenas o portador de {excalibur} e o indivíduo alvo sabem qual era o voto original. O resto dos jogadores só pode especular com base no resultado da missão.',
+    strategicValue: 'Valor Estratégico:',
+    strategicInstructions:
+      ' Possuir {excalibur} adiciona profundidade estratégica ao jogo, permitindo que um jogador potencialmente altere o curso do jogo influenciando as ações de personagens bons e maus. {excalibur} pode ser um fator crucial nos resultados das votações de missão, especialmente durante momentos críticos no jogo.',
+  },
   en: {
     intro:
       '{excalibur} introduces an additional layer of strategy and interaction among players. It complements the base rules of the game and offers new possibilities throughout the gameplay.',

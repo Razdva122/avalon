@@ -1,4 +1,10 @@
 module.exports.wiki = {
+  pt: {
+    title: 'Avalon: The Resistance | Wiki',
+    description:
+      "Seu recurso Wiki confiável para 'Avalon: The Resistance'. Encontre guias detalhados sobre como jogar Avalon, explicações das regras e dicas de estratégia.",
+    keywords: ['Wiki', 'Regras', 'Como jogar'],
+  },
   en: {
     title: 'Avalon: The Resistance | Wiki',
     description:

@@ -1,4 +1,10 @@
 module.exports.roles = {
+  pt: {
+    title: 'Avalon: The Resistance | Papéis',
+    description:
+      "Todos os papéis disponíveis no jogo de tabuleiro 'Avalon: The Resistance'. Regras para papéis: Merlin, Percival, Morgana, Oberon, Mordred",
+    keywords: ['Papéis', 'Regras', 'Merlin', 'Percival', 'Morgana', 'Oberon', 'Mordred', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Roles',
     description:

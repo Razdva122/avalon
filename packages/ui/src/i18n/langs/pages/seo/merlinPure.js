@@ -1,4 +1,9 @@
 module.exports.merlinPure = {
+  pt: {
+    title: 'Avalon: The Resistance | Merlin Puro',
+    description: "Regras e dicas para o papel de Merlin Puro no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Merlin Puro', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Merlin Pure',
     description: "Rules and Tips for Merlin Pure role in the board game 'Avalon: The Resistance'",

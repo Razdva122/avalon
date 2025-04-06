@@ -1,4 +1,9 @@
 module.exports.revealer = {
+  pt: {
+    title: 'Avalon: The Resistance | Revelador',
+    description: "Regras e dicas para o papel de Revelador no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Revelador', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Revealer',
     description: "Rules and Tips for Revealer role in the board game 'Avalon: The Resistance'",

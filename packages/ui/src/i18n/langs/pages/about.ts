@@ -2,6 +2,25 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const about: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    title: 'Sobre',
+    content:
+      'Bem-vindo ao <b>avalon-game.com</b>, seu principal destino para jogar <b>"Avalon: The Resistance"</b> online com amigos e outros entusiastas. Nossa plataforma oferece uma experiência de jogo fluida e imersiva, totalmente gratuita e sem a distração de anúncios.',
+    description:
+      '<b>"Avalon: The Resistance"</b> é um jogo de tabuleiro cativante de estratégia e engano, ambientado na lendária era do Rei Arthur e seus Cavaleiros da Távola Redonda. Projetado para 5 a 10 jogadores, ele convida você a um mundo dividido onde você é um servo leal de Arthur lutando para proteger o reino ou um astuto servo de Mordred tramando sua queda. O jogo é celebrado por sua incorporação de identidades secretas, engano estratégico e o desafio dedutivo de discernir aliados de inimigos.',
+    roles:
+      'Nosso site replica todo o espectro de papéis encontrados no jogo de tabuleiro tradicional, incluindo {merlin}, {percival}, {troublemaker}, {oberon}, {lunatic}, {brute}, {mordred}, {morgana}, {trickster}, {goodLancelot} e {evilLancelot}, garantindo uma experiência autêntica de Avalon. Também integramos as expansões populares do jogo, {ladyOfLake} e {excalibur} para enriquecer sua jogabilidade.',
+    extraRoles:
+      'Exclusivos da nossa plataforma são papéis adicionais não encontrados no jogo original - {merlinPure}, {guinevere}, {witch}, {cleric}, {revealer} e {tristan} + {isolde} (os Amantes) - proporcionando novas dinâmicas e estratégias para você e sua equipe explorarem.',
+    features:
+      'Para aprimorar seu jogo estratégico, oferecemos um recurso de Histórico, permitindo que os jogadores revisem movimentos passados e elaborem melhores estratégias contra a oposição. Além disso, nosso Modo Spoiler garante que você possa jogar no mesmo espaço físico que outros jogadores sem revelar seu papel ou comprometer o resultado do jogo.',
+    code: 'O código do projeto pode ser visualizado em ',
+    contact: 'Você pode me contatar via ',
+    secretAvatar: 'Algo deu errado, não clique aqui.',
+    disclaimerTitle: 'Aviso Legal',
+    disclaimerContent:
+      'Este é um projeto não comercial criado por fãs por amor ao jogo. Todo o conteúdo, incluindo as regras que seguimos, é inspirado no jogo de tabuleiro original, mas todos os gráficos e ilustrações são exclusivamente nossos. Este site não é afiliado ou endossado pelos editores oficiais. Respeitamos os criadores originais e reconhecemos que todas as marcas registradas e direitos autorais relacionados pertencem aos seus respectivos proprietários.',
+  },
   en: {
     title: 'About',
     content:

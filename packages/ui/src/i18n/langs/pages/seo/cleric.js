@@ -1,4 +1,9 @@
 module.exports.cleric = {
+  pt: {
+    title: 'Avalon: The Resistance | Clérigo',
+    description: "Regras e dicas para o papel de Clérigo no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Clérigo', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Cleric',
     description: "Rules and Tips for Cleric role in the board game 'Avalon: The Resistance'",

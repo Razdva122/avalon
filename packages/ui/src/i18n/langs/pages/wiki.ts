@@ -2,6 +2,39 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const wiki: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    rules: 'Regras',
+    roles: 'Papéis',
+    rolesTitle: 'Todos os Papéis no Jogo de Tabuleiro Avalon',
+    rolesInfo:
+      'Cada papel tem suas próprias características e objetivos, tornando o jogo diversificado e emocionante. Abaixo estão todos os papéis disponíveis no jogo de tabuleiro Avalon.',
+    addons: 'Expansões',
+    addonsTitle: 'Expansões para o Jogo de Tabuleiro Avalon',
+    addonsInfo:
+      'Adicionar elementos como {ladyOfLake}, {excalibur} e {plotCards} aprofunda as possibilidades estratégicas e traz mais intriga para a jogabilidade. Abaixo estão as páginas para cada expansão.',
+    title: 'Avalon: The Resistance - Lógica Central do Jogo',
+    setup: 'Configuração do Jogo',
+    playerAssignment:
+      '<b>1. Atribuição de Jogadores</b>: Atribua a cada jogador um papel de personagem aleatório, determinando sua lealdade.',
+    revealPhase:
+      '<b>2. Fase de Revelação</b>: Os jogadores obtêm informações com base nas habilidades de seus personagens.',
+    missionSelection: 'Seleção de Missão',
+    leaderSelection: '<b>3. Seleção de Líder</b>: Alterne o papel de líder entre os jogadores.',
+    teamProposal: '<b>4. Proposta de Equipe</b>: O líder atual propõe uma equipe para a missão.',
+    voteTeam: '<b>5. Votação da Equipe</b>: Todos os jogadores votam se aprovam a equipe da missão.',
+    missionPhase: 'Fase da Missão',
+    missionOutcome:
+      '<b>6. Resultado da Missão</b>: Os membros da equipe designada escolhem secretamente o resultado da missão.',
+    revealMissionResult: '<b>7. Revelar Resultado da Missão</b>: Anuncie o sucesso ou fracasso da missão.',
+    specialRolesInteractions: 'Interações de Papéis Especiais',
+    usingSpecialAbilities:
+      '<b>8. Usando Habilidades Especiais</b>: Personagens especiais podem usar suas habilidades em momentos designados.',
+    assassinationPhase:
+      '<b>9. Fase de Assassinato</b>: Se o lado do bem garantir três missões, o Assassino tem a chance de identificar Merlin para vencer pelo lado do mal.',
+    victoryConditions: 'Condições de Vitória',
+    determineWinner:
+      '<b>10. Determinar Vencedor</b>: O jogo conclui quando um lado garante três missões ou o Assassino identifica corretamente Merlin após as vitórias do lado do bem.',
+  },
   en: {
     rules: 'Rules',
     roles: 'Roles',

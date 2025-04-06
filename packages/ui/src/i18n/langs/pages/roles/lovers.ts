@@ -2,6 +2,33 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const lovers: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    title: 'Amantes (Tristão e Isolda)',
+    credits: "créditos para: {'@'}Vermilion0",
+    generalInformation: 'Informações Gerais:',
+    playingAsTheLovers:
+      'Jogar como os Amantes, {tristan} e {isolde}, adiciona um toque romântico ao jogo. Seu vínculo é forte, pois vocês se conhecem desde o início e trabalham pelo lado do bem. No entanto, este amor deve ser mantido em segredo; se ambos forem identificados, o Assassino pode escolher eliminá-los em vez de Merlin no final do jogo.',
+    generalTips: 'Dicas Gerais:',
+    maintainIndividualPersonas:
+      '<strong>Mantenha personalidades individuais:</strong> Ajam independentemente um do outro para evitar criar padrões que possam levar à descoberta conjunta.',
+    protectEachOther:
+      '<strong>Protejam-se mutuamente:</strong> Estejam atentos ao fluxo do jogo, e se a suspeita recair sobre um, o outro deve desviar sutilmente, não de forma óbvia.',
+    disguiseYourGameplay:
+      '<strong>Disfarce seu jogo:</strong> Ocasionalmente votem ou discutam um contra o outro para dissipar qualquer noção de aliança.',
+    beCarefulWithMeetings:
+      '<strong>Cuidado com reuniões:</strong> Evitem discussões privadas que possam ser notadas e levantar suspeitas entre outros jogadores.',
+    strategicTips: 'Dicas Estratégicas:',
+    divideAndConquer:
+      '<strong>Dividir e conquistar:</strong> Assumam diferentes papéis dentro das forças do bem, coletando e compartilhando informações de diferentes ângulos.',
+    coordinateWithoutCollusion:
+      '<strong>Coordenem sem conluio:</strong> Planejem suas estratégias de forma que não exijam coordenação constante ou óbvia.',
+    establishIndependentTrust:
+      '<strong>Estabeleçam confiança independente:</strong> Cada amante deve trabalhar para ganhar a confiança de outros jogadores por seus próprios méritos.',
+    planForContingency:
+      '<strong>Planejem para contingências:</strong> Tenham uma estratégia caso um dos amantes seja exposto, para garantir que o outro possa continuar efetivamente.',
+    uniqueAdvantage:
+      'Como os Amantes, {tristan} e {isolde}, vocês possuem uma vantagem única que, se aproveitada com habilidade e sutileza, pode ajudar muito as forças do bem. No entanto, a ameaça da escolha do Assassino no final do jogo está sempre presente. Naveguem com cuidado pelas águas traiçoeiras do engano, pois se o seu amor for revelado, isso pode custar a ambos o preço máximo. Que seu vínculo seja sua força, mas que a discrição seja seu guia. Que seu amor triunfe sobre o mal!',
+  },
   en: {
     title: 'Lovers (Tristan and Isolde)',
     credits: "credits to: {'@'}Vermilion0",

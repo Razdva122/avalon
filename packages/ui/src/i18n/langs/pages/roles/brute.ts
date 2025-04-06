@@ -120,4 +120,28 @@ export const brute: { [key in TLanguage]: Dictionary<string> } = {
     embraceCapabilities:
       'Aprovecha al máximo las capacidades únicas del rol de {brute}. Tu enfoque en las etapas tempranas y tardías del juego puede afectar significativamente los resultados, ayudando a las fuerzas del mal a tejer una red de engaños y estrategias.',
   },
+  pt: {
+    generalInformation: 'Informações Gerais:',
+    roleDescription:
+      'O papel de {brute} introduz uma dinâmica única entre os Lacaios do Mal. Durante as três primeiras missões, {brute} tem a flexibilidade de escolher entre "Sucesso" ou "Falha" em seus votos de missão, enquanto nas missões quatro e cinco, {brute} está restrito a votar apenas "Sucesso".',
+    generalTips: 'Dicas Gerais:',
+    earlyMissionFlexibility: 'Utilize a flexibilidade das missões iniciais:',
+    earlyMissionFlexibilityDescription:
+      'Como {brute} pode votar de ambas as formas nas missões iniciais, use isso para confundir os servos leais sobre sua lealdade.',
+    maintainUnpredictability: 'Mantenha a imprevisibilidade:',
+    maintainUnpredictabilityDescription:
+      'Agir de forma inconsistente durante as missões iniciais pode ajudar a mascarar sua identidade, tornando difícil para os outros deduzir que você é um {brute}.',
+    strategicSuccessLater: 'Busque o sucesso estratégico mais tarde:',
+    strategicSuccessLaterDescription:
+      'Nas missões posteriores, onde apenas votos de "Sucesso" são permitidos para {brute}, concentre-se em ganhar confiança e influenciar favoravelmente a direção do jogo para os Lacaios do Mal.',
+    strategicTips: 'Dicas Estratégicas:',
+    earlyMissionAmbiguities: 'Aproveite as ambiguidades das missões iniciais:',
+    earlyMissionAmbiguitiesDescription:
+      'Aproveite sua flexibilidade de voto nas três primeiras missões para criar confusão sobre seu verdadeiro papel e interromper as estratégias das forças do Bem.',
+    buildTrustEndgame: 'Construa confiança para o final do jogo:',
+    buildTrustEndgameDescription:
+      'À medida que você transita para poder votar apenas "Sucesso", trabalhe para estabelecer confusão ou confiança suficiente para desviar a suspeita de você nas missões finais cruciais.',
+    embraceCapabilities:
+      'Abrace as capacidades únicas do papel de {brute}. Sua abordagem nos estágios iniciais e finais do jogo pode afetar significativamente os resultados, ajudando as forças do Mal a tecer uma teia de engano e estratégia.',
+  },
 };

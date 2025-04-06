@@ -2,6 +2,84 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const plotCards: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    intro:
+      ' é uma expansão que adiciona uma nova camada de estratégia e intriga ao jogo. As Cartas de Enredo fornecem aos jogadores habilidades especiais que podem ser usadas em momentos estratégicos para obter informações, influenciar resultados do jogo ou mudar o curso da partida.',
+    howItWorks: 'Como Funcionam as Cartas de Enredo',
+    mechanics:
+      'O número de Cartas de Enredo incluídas no jogo depende do número de jogadores: 7 cartas para 5-6 jogadores, e todas as 15 cartas para 7+ jogadores. As Cartas de Enredo não são secretas e são mantidas viradas para cima durante todo o jogo. No início de cada Rodada (há 5 Rodadas no total), o líder compra Cartas de Enredo (1 carta para 5-6 jogadores, 2 cartas para 7-8 jogadores e 3 cartas para 9-10 jogadores) e as distribui para outros jogadores (não para si mesmo). As Cartas de Enredo vêm em três tipos diferentes, cada um com tempos e efeitos únicos.',
+    cardTypes: 'Tipos de Cartas de Enredo',
+    typesIntro:
+      'As Cartas de Enredo são divididas em três categorias: Cartas Utilizáveis, Cartas Instantâneas e Cartas de Efeitos. Cada tipo tem diferentes condições de ativação e aplicações estratégicas.',
+    cardsInGame: 'Cartas Usadas no Jogo',
+    fiveToSixPlayers: 'Para 5-6 Jogadores (7 cartas)',
+    sevenPlusPlayers: 'Para 7+ Jogadores (15 cartas)',
+    additionalCards: 'Cartas adicionais usadas com 7+ jogadores:',
+    usableCards: 'Cartas Utilizáveis',
+    usableIntro:
+      'Cartas Utilizáveis podem ser ativadas em momentos específicos durante o jogo, fornecendo habilidades poderosas que podem impactar significativamente a jogabilidade.',
+    instantCards: 'Cartas Instantâneas',
+    instantIntro:
+      'Cartas Instantâneas fornecem informações imediatas ao portador, permitindo que obtenham insights valiosos sobre outros jogadores.',
+    effectsCards: 'Cartas de Efeitos',
+    effectsIntro:
+      'Cartas de Efeitos modificam mecânicas do jogo, adicionando novos estágios ou alterando os existentes para criar situações de jogo únicas.',
+
+    // Card Descriptions
+    leadToVictoryDesc:
+      'O jogador que recebe esta carta pode usá-la para se tornar o Líder. Quando "Liderar para a Vitória" é jogada, outra carta "Liderar para a Vitória" não pode ser jogada até que uma votação tenha ocorrido.',
+
+    ambushDesc:
+      'O jogador que recebe esta carta pode usá-la para examinar uma carta de missão jogada. O jogador não precisa anunciar que usará esta carta antes que as cartas de missão sejam jogadas. Esta carta não afeta a carta de missão verificada. Várias cartas de missão podem ser verificadas em uma única rodada, mas não mais de um jogador pode verificar a carta de missão de um único jogador em uma missão.',
+
+    kingReturnsDesc:
+      'O jogador que recebe esta carta pode usá-la para rejeitar uma Equipe aprovada (votação bem-sucedida). Usar esta carta conta como uma votação fracassada para a rodada e pode acionar a regra de cinco votações consecutivas fracassadas. A carta deve ser declarada antes que o Líder atual tome qualquer ação, como comprar cartas de Enredo ou distribuir fichas de Equipe.',
+
+    weFoundYouDesc:
+      'O jogador que recebe esta carta pode usá-la para forçar um jogador a jogar sua carta de missão com a face para cima. O jogador que joga esta carta deve declarar seu uso e o jogador alvo antes que qualquer jogador na Equipe selecione sua carta de missão.',
+
+    restoreHonorDesc: 'O jogador que recebe esta carta deve pegar uma Carta de Enredo de qualquer outro jogador.',
+
+    showStrengthDesc:
+      'O Líder deve passar uma carta de Lealdade para qualquer outro jogador examinar. Isso permite que os jogadores obtenham informações verificadas sobre a lealdade de outro jogador.',
+
+    showNatureDesc:
+      'O jogador que recebe esta carta deve passar uma carta de Lealdade para qualquer outro jogador (incluindo o Líder) examinar. Isso revela a lealdade do portador da carta para outro jogador.',
+
+    areYouTheOneDesc:
+      'O jogador que recebe esta carta pode verificar a lealdade de um jogador adjacente usando cartas de Lealdade. Isso fornece informações direcionadas sobre jogadores sentados ao lado do portador da carta.',
+
+    chargeDesc:
+      'O jogador que recebe esta carta deve selecionar e revelar sua ficha de voto antes que quaisquer outros jogadores tenham selecionado suas fichas de voto. Esta carta permanece em efeito até o final do jogo. Se duas cartas "Avante!" estiverem em jogo, esses jogadores devem revelar seus votos simultaneamente.',
+
+    gameplayTips: 'Dicas Estratégicas de Jogo',
+    strategicUse: 'Uso Estratégico de Cartas:',
+    strategicTips:
+      'O momento é crucial ao usar Cartas de Enredo. Jogadores bons podem querer usar cartas de coleta de informações cedo para identificar jogadores maus, enquanto jogadores maus podem guardar suas cartas para momentos críticos para sabotar missões ou criar confusão.',
+    timing: 'Momento Ideal:',
+    timingTips:
+      'Considere o estado do jogo antes de usar sua carta. Algumas cartas são mais eficazes nas rodadas iniciais quando a informação é escassa, enquanto outras podem mudar o jogo nas rodadas finais quando as tensões estão altas.',
+    information: 'Gerenciamento de Informações:',
+    informationTips:
+      'Informações obtidas das Cartas de Enredo devem ser compartilhadas estrategicamente. Jogadores bons precisam compartilhar informações para coordenar, mas tenha cuidado para não revelar demais aos jogadores maus.',
+    deception: 'Táticas de Engano:',
+    deceptionTips:
+      'Jogadores maus podem usar Cartas de Enredo para criar narrativas falsas ou lançar suspeitas sobre jogadores bons. Considere como o uso da sua carta será percebido pelos outros e como você pode aproveitá-lo para enganar.',
+
+    faq: 'Perguntas Frequentes',
+    canCombine: 'As Cartas de Enredo podem ser combinadas com outras expansões?',
+    canCombineAnswer:
+      'Sim, as Cartas de Enredo podem ser combinadas com outras expansões como {ladyOfLake} ou {excalibur}. Isso cria uma jogabilidade mais complexa com múltiplas camadas estratégicas.',
+    whenDistributed: 'Como as Cartas de Enredo são distribuídas no jogo?',
+    whenDistributedAnswer:
+      'No início de cada Rodada (há 5 Rodadas no total), o líder compra Cartas de Enredo (1 carta para 5-6 jogadores, 2 cartas para 7-8 jogadores e 3 cartas para 9-10 jogadores) e as distribui para outros jogadores (não para si mesmo). O número de Cartas de Enredo incluídas no jogo depende do número de jogadores: 7 cartas para 5-6 jogadores, e todas as 15 cartas para 7+ jogadores.',
+    seeOthers: 'Os jogadores podem ver quais Cartas de Enredo os outros têm?',
+    seeOthersAnswer:
+      'Sim, todas as Cartas de Enredo permanecem viradas para cima após a distribuição, então todos os jogadores podem ver quais cartas outros jogadores receberam.',
+    mustUse: 'Os jogadores devem usar suas Cartas de Enredo?',
+    mustUseAnswer:
+      'Depende do tipo de carta. Cartas de Efeito são ativadas automaticamente, Cartas Instantâneas são usadas imediatamente após serem dadas a um jogador, enquanto Cartas Utilizáveis podem ser usadas a critério do jogador - eles podem escolher quando usá-las ou não usá-las de todo.',
+  },
   en: {
     intro:
       ' is an expansion that adds a new layer of strategy and intrigue to the game. Plot Cards provide players with special abilities that can be used at strategic moments to gain information, influence game outcomes, or change the course of play.',

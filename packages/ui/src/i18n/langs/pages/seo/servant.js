@@ -1,4 +1,9 @@
 module.exports.servant = {
+  pt: {
+    title: 'Avalon: The Resistance | Servo',
+    description: "Regras e dicas para o papel de Servo no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Servo', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Servant',
     description: "Rules and Tips for Servant role in the board game 'Avalon: The Resistance'",

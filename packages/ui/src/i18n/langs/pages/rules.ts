@@ -2,6 +2,88 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const rules: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    numberOfPlayers: 'Número de Jogadores',
+    missionNumber: 'Missão {number}',
+    countPlayers: '{count} Jogadores',
+    servantTeam: 'Servos Leais de Arthur:',
+    mordredTeam: 'Servos de Mordred:',
+    expansions: 'Expansões:',
+    note: 'Nota: ',
+    title: 'Avalon: The Resistance - Regras oficiais',
+    gameObjective: 'Objetivo do Jogo',
+    gameDescription:
+      'Avalon: The Resistance é um jogo de tabuleiro estratégico onde os jogadores são encarregados de completar uma série de missões enquanto lidam com traidores ocultos conhecidos como Servos de Mordred. O jogo é ambientado no mundo lendário do Rei Arthur e os Cavaleiros da Távola Redonda.',
+    gameplayRules: 'Regras de Jogo',
+    teamProposalAndVoting: 'Proposta de Equipe e Votação',
+    teamProposalDescription:
+      'O jogador com o token de Líder propõe uma equipe de jogadores para a missão. O número de jogadores necessários para a equipe depende da missão atual e do número total de jogadores no jogo.',
+    votingDescription:
+      'Todos os jogadores, incluindo o Líder, então votam na equipe proposta. Uma maioria simples é necessária para que a proposta seja aceita. Se a proposta for rejeitada, o token de Líder passa para o próximo jogador e uma nova proposta começa. Se quatro propostas forem rejeitadas em sequência, o quinto Líder tem o poder de escolher a equipe da missão sem votação.',
+    progressionOfPlayTitle: 'Progressão do Jogo',
+    leaderTokenMove:
+      'Após o resultado da missão ter sido determinado, o token de Líder move-se para o próximo jogador no sentido horário.',
+    newRound:
+      'Uma nova rodada começa com uma nova proposta de equipe, e o mesmo processo se repete para um total de cinco missões.',
+    playersUseSkills:
+      'Os jogadores devem usar seus poderes de persuasão, dedução e blefe para influenciar a seleção da equipe, a votação e a discussão para promover a agenda do seu lado.',
+    missionPhaseTitle: 'Fase da Missão',
+    teamApproved:
+      'Uma vez que uma equipe tenha sido aprovada, os membros da equipe escolhem secretamente uma carta de Sucesso { goodLoyaltyIcon } ou Falha { evilLoyaltyIcon } para determinar o resultado da missão.',
+    submitCardsToLeader:
+      'Todos os jogadores submetem suas cartas escolhidas ao Líder, que as embaralha para ocultar qual jogador submeteu qual carta.',
+    cardsRevealed:
+      'As cartas são então reveladas. Para uma missão ter sucesso, todas as cartas devem ser cartas de Sucesso { goodLoyaltyIcon }. Se uma ou mais cartas de Falha { evilLoyaltyIcon } forem reveladas, a missão falha. Certas missões podem exigir duas cartas de Falha para falhar, dependendo do número de jogadores no jogo.',
+    conclusionOfGameplayTitle: 'Conclusão do Jogo',
+    gameplayEndsCondition:
+      'O jogo continua por cinco missões, terminando quando os Servos Leais de Arthur completam com sucesso três missões ou os Servos de Mordred fazem com que três missões falhem. No caso de os Servos Leais de Arthur terem sucesso, os Servos de Mordred têm uma última oportunidade de vencer identificando corretamente {merlin}; se o fizerem, os Servos de Mordred vencem.',
+    strategicDiscussion:
+      'Através de discussão estratégica, observação cuidadosa e táticas inteligentes, cada lado deve fazer o seu melhor para alcançar seus objetivos sem revelar suas verdadeiras lealdades, fazendo com que cada rodada de Avalon: The Resistance se desenrole de maneira única e cheia de suspense.',
+    assassinNote:
+      'Na versão original, há um papel distinto do <b>Assassino</b>. Sugerimos delegar esta função a qualquer um dos papéis do mal, ou alternativamente, tomar a decisão coletivamente entre os jogadores do mal.',
+    objectiveArthur: 'Objetivo para os { goodLoyaltyIcon } Servos Leais de Arthur',
+    objectiveMordred: 'Objetivo para os { evilLoyaltyIcon } Servos de Mordred',
+    missionObjective:
+      'Os Leais { servant } devem completar com sucesso três das cinco missões. Eles devem trabalhar juntos para propor equipes para cada missão e votar nas composições das equipes, sempre tentando manter os traidores fora das equipes para evitar que as missões falhem.',
+    minionObjective:
+      'Os { minion } visam semear discórdia e desconfiança entre os { servant }. Seu objetivo é fazer com que três missões falhem infiltrando-se nas equipes e sabotando missões. Eles devem se comunicar secretamente e elaborar estratégias para enganar os leais e lançar dúvidas sobre as verdadeiras lealdades de outros jogadores.',
+    additionalObjectivesTitle: 'Objetivos Adicionais',
+    additionalObjectivesDescription:
+      'O jogo se intensifica com papéis especiais, como { merlin }, que conhece as identidades dos Servos de Mordred mas deve manter sua identidade em segredo para evitar o assassinato no final do jogo. Os Servos de Mordred podem vencer identificando corretamente e assassinando { merlin } depois que três missões tiverem sido bem-sucedidas.',
+    twoFailsNote:
+      'Em missões marcadas com um asterisco (*), duas cartas de Falha { evilLoyaltyIcon } são necessárias para que a missão falhe.',
+    missionSizes: 'Tamanho da Equipe da Missão',
+    excaliburHint:
+      'Recomendamos adicionar {excalibur} a jogos para qualquer número de jogadores, mas apenas na companhia de jogadores experientes.',
+    recommendTitle: 'Configuração de Papéis Recomendada',
+    generalTipsTitle: 'Dicas Gerais',
+    generalTipsText:
+      'Para uma experiência de jogo enriquecedora, sugerimos um grupo de <strong>7 a 10 jogadores</strong>, onde as complexidades e a emoção do jogo realmente brilham.',
+    newcomersAdvice:
+      'Para iniciantes, é aconselhável começar sua jornada em Avalon com os <strong>papéis básicos</strong>. À medida que você se acostuma com o jogo, pode introduzir gradualmente papéis adicionais, aumentando a complexidade e o envolvimento <strong>passo a passo</strong>.',
+    recommendationAfterFirstGames: 'Após os primeiros jogos, recomendamos adicionar papéis na seguinte ordem:',
+    offlineSetup: 'Configuração do jogo offline:',
+    defaultSetup:
+      'A configuração padrão inclui personagens como { merlin }, { percival } e { morgana }. No entanto, você tem a flexibilidade de personalizar o jogo selecionando os papéis que melhor se adequam ao seu grupo.',
+    closeEyesExtendHand: 'Todos fechem os olhos e estendam a mão em forma de punho à sua frente.',
+    except: 'exceto',
+    seeAllAgentsOfEvil: 'abra seus olhos e olhe ao redor para que você conheça todos os agentes do Mal.',
+    extendYourThumb: 'estenda seu polegar para o ar',
+    extendYourThumbSo: 'estenda seu polegar para o ar para que',
+    willKnowOfYou: 'saiba de você',
+    closeEyes: 'feche os olhos',
+    guinevereLookAround: 'abra seus olhos e olhe ao redor para que você conheça ambos os lancelots',
+    allPlayersShouldHaveEyedClosed:
+      'Todos os jogadores devem estar com os olhos fechados e as mãos em punho à sua frente',
+    putYourThumbDown: 'abaixe seu polegar e reforme sua mão em punho',
+    merlinOpenEyes: 'abra seus olhos para ver os agentes do mal',
+    gameSetupNote:
+      'Para fins de configuração do jogo, o termo "{minion}" refere-se a todos os agentes do Mal, a menos que indicado de outra forma',
+    ordinaryMinion: 'Comum (sem papéis adicionais)',
+    everyoneOpenEyes: 'Todos abram os olhos',
+    percivalOpenEyes: 'abra seus olhos e veja',
+    loversOpenEyes: 'abram seus olhos e olhem ao redor para conhecerem um ao outro',
+  },
   en: {
     numberOfPlayers: 'Number of Players',
     missionNumber: 'Mission {number}',

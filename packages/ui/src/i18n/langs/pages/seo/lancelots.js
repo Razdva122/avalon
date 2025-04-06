@@ -1,4 +1,9 @@
 module.exports.lancelots = {
+  pt: {
+    title: 'Avalon: The Resistance | Lancelots',
+    description: "Regras e dicas para os papéis de Lancelots no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Lancelots', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Lancelots',
     description: "Rules and Tips for Lancelots roles in the board game 'Avalon: The Resistance'",

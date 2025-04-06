@@ -1,4 +1,10 @@
 module.exports.expansions = {
+  pt: {
+    title: 'Avalon: The Resistance | Expansões para o jogo',
+    description:
+      "Aprimore 'Avalon: The Resistance' com expansões emocionantes e cartas extras. Aprenda como cada adição pode apimentar suas sessões de jogo e trazer novos desafios à mesa.",
+    keywords: ['Expansões', 'Complementos', 'Módulo', 'Regras'],
+  },
   en: {
     title: 'Avalon: The Resistance | Expansions for game',
     description:

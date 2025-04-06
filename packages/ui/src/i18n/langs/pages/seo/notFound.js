@@ -1,4 +1,8 @@
 module.exports.notFound = {
+  pt: {
+    title: 'Avalon: The Resistance | 404',
+    description: 'Página não encontrada =(',
+  },
   en: {
     title: 'Avalon: The Resistance | 404',
     description: 'Page not found =(',

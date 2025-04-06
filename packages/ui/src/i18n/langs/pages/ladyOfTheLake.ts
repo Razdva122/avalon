@@ -2,6 +2,29 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const lady: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    intro:
+      ' é uma expansão que introduz um novo elemento estratégico e proporciona a capacidade de obter informações adicionais sobre as lealdades de outros jogadores. É usada em <strong>jogos com 7 ou mais</strong> participantes e adiciona mais profundidade à jogabilidade.',
+    title: 'Regras para usar a "Dama do Lago" (Token do Inquisidor em \'The Resistance\'):',
+    whenToUseIt: 'Quando Usar:',
+    comesIntoPlay:
+      ' A {ladyOfLake} entra em jogo após a conclusão da segunda missão. Isso significa que ela se torna disponível a partir da terceira rodada do jogo.',
+    selectingTheHolder: 'Selecionando o Portador:',
+    initiallyGetsPlayer:
+      ' Inicialmente, a {ladyOfLake} vai para o jogador à direita do primeiro líder. O jogador que recebe o título {ladyOfLake} usa seu poder no final de cada rodada (após a segunda), passando-o para outro jogador que ainda não recebeu a {ladyOfLake}.',
+    applyingTheAbility: 'Aplicando a Habilidade:',
+    choosesPlayer:
+      ' O proprietário da {ladyOfLake} escolhe outro jogador e secretamente descobre seu papel — se esse jogador é um Servo de Arthur (bom) ou um Servo de Mordred (mau).',
+    passingTheLady: 'Passando a "Dama do Lago":',
+    passesToChecked:
+      ' Após usar sua habilidade, o proprietário da {ladyOfLake} a passa para o jogador cuja lealdade acabou de ser verificada. Este jogador então usará a {ladyOfLake} na próxima rodada.',
+    restrictionRecurrent: 'Restrição sobre Verificações Recorrentes:',
+    cannotCheckAgain:
+      ' Um jogador que já recebeu a {ladyOfLake} não pode ser verificado novamente. Esta regra ajuda a garantir que a cada rodada, novas informações sejam reveladas sobre um jogador diferente.',
+    strategicUse: 'Uso Estratégico:',
+    strategicPossibilities:
+      ' O uso da {ladyOfLake} adiciona possibilidades estratégicas ao jogo. Os jogadores podem usar as informações obtidas para planejar suas ações, tentando identificar traidores entre os participantes.',
+  },
   en: {
     intro:
       ' is an expansion that introduces a new strategic element and provides the ability to gain additional information about the loyalties of other players. It is used in <strong>games with 7 or more</strong> participants and adds more depth to the gameplay.',

@@ -1,4 +1,9 @@
 module.exports.minion = {
+  pt: {
+    title: 'Avalon: The Resistance | Lacaio de Mordred',
+    description: "Regras e dicas para o papel de Lacaio de Mordred no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Lacaio de Mordred', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Minion of Mordred',
     description: "Rules and Tips for Minion of Mordred role in the board game 'Avalon: The Resistance'",

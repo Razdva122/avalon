@@ -1,4 +1,10 @@
 module.exports.lobby = {
+  pt: {
+    title: 'Jogue Avalon Online!',
+    description:
+      "Explore o lendário jogo de dedução estratégica com 'Avalon: The Resistance' — grátis para jogar online. Aprenda as regras, junte-se a uma comunidade animada.",
+    keywords: ['Jogar'],
+  },
   en: {
     title: 'Play Avalon Online!',
     description:

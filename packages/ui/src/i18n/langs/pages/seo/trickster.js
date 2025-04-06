@@ -1,4 +1,9 @@
 module.exports.trickster = {
+  pt: {
+    title: 'Avalon: The Resistance | Trapaceiro',
+    description: "Regras e dicas para o papel de Trapaceiro no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Trapaceiro', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Trickster',
     description: "Rules and Tips for Trickster role in the board game 'Avalon: The Resistance'",

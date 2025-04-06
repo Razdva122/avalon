@@ -1,4 +1,9 @@
 module.exports.percival = {
+  pt: {
+    title: 'Avalon: The Resistance | Percival',
+    description: "Regras e dicas para o papel de Percival no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Percival', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Percival',
     description: "Rules and Tips for Percival role in the board game 'Avalon: The Resistance'",

@@ -1,4 +1,9 @@
 module.exports.witch = {
+  pt: {
+    title: 'Avalon: The Resistance | Bruxa',
+    description: "Regras e dicas para o papel de Bruxa no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Bruxa', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Witch',
     description: "Rules and Tips for Witch role in the board game 'Avalon: The Resistance'",

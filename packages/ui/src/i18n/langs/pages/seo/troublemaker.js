@@ -1,4 +1,9 @@
 module.exports.troublemaker = {
+  pt: {
+    title: 'Avalon: The Resistance | Encrenqueiro',
+    description: "Regras e dicas para o papel de Encrenqueiro no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Encrenqueiro', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Troublemaker',
     description: "Rules and Tips for Troublemaker role in the board game 'Avalon: The Resistance'",

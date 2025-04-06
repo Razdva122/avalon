@@ -6,6 +6,7 @@ import { ru } from '@/i18n/langs/ru';
 import { es } from '@/i18n/langs/es';
 import { zh_CN } from '@/i18n/langs/zh_CN';
 import { zh_TW } from '@/i18n/langs/zh_TW';
+import { pt } from '@/i18n/langs/pt';
 
 export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
   en,
@@ -13,4 +14,5 @@ export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } 
   es,
   'zh-CN': zh_CN,
   'zh-TW': zh_TW,
+  pt,
 };

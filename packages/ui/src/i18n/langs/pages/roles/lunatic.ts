@@ -53,10 +53,10 @@ export const lunatic: { [key in TLanguage]: Dictionary<string> } = {
   'zh-CN': {
     generalInformation: '一般信息：',
     roleDescription:
-      '在桌游《阿瓦隆》中,{lunatic}这一角色为邪恶爪牙的标准玩法增添了一丝新意。与其他爪牙不同,{lunatic}在参与的每个任务中都必须投票“失败”,以模拟毫不妥协的破坏行为。这一强制行动增加了邪恶势力面临的挑战,因为如果处理不当,可能会暴露{lunatic}的身份。',
+      '在桌游《阿瓦隆》中,{lunatic}这一角色为邪恶爪牙的标准玩法增添了一丝新意。与其他爪牙不同,{lunatic}在参与的每个任务中都必须投票"失败",以模拟毫不妥协的破坏行为。这一强制行动增加了邪恶势力面临的挑战,因为如果处理不当,可能会暴露{lunatic}的身份。',
     generalTipsHeader: '基本提示:',
     strategicFailure: '战略性地融入强制失败:',
-    strategicFailureDetails: '虽然在任务中你必须始终投票“失败”,但在其他方面需要采用策略以避免立即被发现。',
+    strategicFailureDetails: '虽然在任务中你必须始终投票"失败",但在其他方面需要采用策略以避免立即被发现。',
     deceiveWithBluff: '有效地虚张声势:',
     bluffTechnique: '通过参与讨论和策略制定,假装你有选择权,从而掩盖你被迫失败的事实,并保持一种不可预测的氛围。',
     covertSupportAllies: '巧妙地与其他爪牙协调:',
@@ -113,5 +113,29 @@ export const lunatic: { [key in TLanguage]: Dictionary<string> } = {
       'Aunque siempre debes hacer fracasar las misiones, varía tu comportamiento en debates y decisiones que no se relacionen con las misiones para confundir a los demás sobre tu verdadero rol.',
     roleConclusion:
       'Abraza el rol de {lunatic} con astucia y sutileza. Tu desafío no es solo interrumpir las misiones, sino también sembrar el desorden mientras mantienes tu disfraz entre los enemigos.',
+  },
+  pt: {
+    generalInformation: 'Informações Gerais:',
+    roleDescription:
+      'O papel do {lunatic} no jogo de tabuleiro Avalon adiciona uma reviravolta à jogabilidade padrão dos Lacaios do Mal. Diferente de outros lacaios, um {lunatic} deve votar "Falha" em cada missão da qual participa, simulando uma sabotagem intransigente. Esta ação obrigatória aumenta o desafio para as forças do mal, pois pode revelar a identidade do {lunatic} se não for gerenciada com sabedoria.',
+    generalTipsHeader: 'Dicas Gerais:',
+    strategicFailure: 'Incorpore a falha obrigatória estrategicamente:',
+    strategicFailureDetails:
+      'Embora você deva sempre votar "Falha" quando estiver em uma missão, seja estratégico em outros aspectos do seu jogo para evitar detecção imediata.',
+    deceiveWithBluff: 'Blefe efetivamente:',
+    bluffTechnique:
+      'Oculte sua falha obrigatória participando de discussões e estratégias como se tivesse escolha, mantendo um ar de imprevisibilidade.',
+    covertSupportAllies: 'Alinhe-se com outros lacaios sutilmente:',
+    subtleAlignment:
+      'Embora seu papel exija sabotagem aberta, procure oportunidades para apoiar outros lacaios de maneiras mais encobertas.',
+    strategicAdviceHeader: 'Dicas Estratégicas:',
+    monitorGameFlow: 'Monitore o fluxo:',
+    disruptiveTiming:
+      'Preste muita atenção a como o jogo está se desenvolvendo. Suas falhas forçadas devem idealmente ocorrer em momentos que causem máxima confusão e perturbação.',
+    avoidBehaviorPatterns: 'Evite padrões:',
+    confuseThroughInconsistency:
+      'Embora você deva sempre falhar nas missões, varie seu comportamento em discussões e decisões não relacionadas às missões para confundir os outros sobre seu verdadeiro papel.',
+    roleConclusion:
+      'Abrace o papel de {lunatic} com astúcia e sutileza. Seu desafio não é apenas perturbar as missões, mas também semear discórdia enquanto mantém seu disfarce entre os inimigos.',
   },
 };

@@ -20,7 +20,7 @@ export const merlin: { [key in TLanguage]: Dictionary<string> } = {
 
     maintainBalanceTitle: 'Maintain balance in your gameplay: ',
     maintainBalanceText:
-      'It’s important to not appear too knowledgeable. Sometimes, making deliberate mistakes or staying silent can throw evil players off.',
+      'It is important to not appear too knowledgeable. Sometimes, making deliberate mistakes or staying silent can throw evil players off.',
 
     attentionAssassinTitle: 'Pay attention to the assassin: ',
     attentionAssassinText:
@@ -39,7 +39,7 @@ export const merlin: { [key in TLanguage]: Dictionary<string> } = {
       'Apart from revealing evil, convincing other players of your allegiance to good is vital. Establishing trust can influence team decisions.',
     supportAlliesTitle: 'Support your allies:',
     supportAllies:
-      "Sometimes it's more effective to back up correct suggestions from others than to constantly push your own ideas.",
+      'Sometimes it is more effective to back up correct suggestions from others than to constantly push your own ideas.',
     playingAsMerlin:
       'Playing as {merlin} is challenging yet highly rewarding. With careful strategy and tactful communication, you can lead the forces of good to victory while staying hidden from the dark clutches of the assassin. Good luck!',
   },
@@ -193,5 +193,48 @@ export const merlin: { [key in TLanguage]: Dictionary<string> } = {
       'A veces, es más efectivo respaldar sugerencias correctas de otros que impulsar constantemente tus propias ideas.',
     playingAsMerlin:
       'Jugar como {merlin} es desafiante pero muy gratificante. Con una estrategia cuidadosa y una comunicación hábil, puedes llevar a las fuerzas del bien a la victoria mientras permaneces oculto de las oscuras garras del asesino. ¡Buena suerte!',
+  },
+  pt: {
+    generalInformationTitle: 'Informações Gerais:',
+    generalInformationText: `Assumir o papel de {merlin} exige um ato de equilíbrio magistral: é preciso possuir conhecimento íntimo de todos os lacaios do mal (exceto {mordred}, no jogo clássico), mas ser incapaz de divulgar essa informação diretamente. O verdadeiro desafio está em conduzir secretamente as forças do bem ao triunfo, enquanto evita ser detectado e potencialmente assassinado pelo assassino das forças do mal no final do jogo. Mais complexa ainda é a necessidade de contrariar os enganos de {morgana} e conquistar a confiança de {percival}. {morgana} tenta imitar sua persona, desviando os justos do caminho, enquanto {percival} se esforça para ver através da farsa e descobrir a verdade.`,
+
+    generalTipsTitle: 'Dicas Gerais:',
+    cautiousKnowledgeTitle: 'Seja cauteloso com seu conhecimento: ',
+    cautiousKnowledgeText:
+      'Embora {merlin} saiba quem são os jogadores do mal, revelar isso diretamente pode resultar em ser assassinado. Seu objetivo é ajudar o lado de Arthur sutilmente.',
+
+    useHintsWiselyTitle: 'Use dicas com sabedoria: ',
+    useHintsWiselyText:
+      'Dominar a arte de dar dicas sutis para sua equipe sem ser muito óbvio é crucial para {merlin}.',
+
+    carefulAccusationsTitle: 'Seja cuidadoso com acusações: ',
+    carefulAccusationsText:
+      'Acusar lacaios do mal com muita precisão ou rapidez pode revelar seu papel. O equilíbrio é fundamental.',
+
+    maintainBalanceTitle: 'Mantenha equilíbrio em seu jogo: ',
+    maintainBalanceText:
+      'É importante não parecer muito conhecedor. Às vezes, cometer erros deliberados ou ficar em silêncio pode confundir os jogadores do mal.',
+
+    attentionAssassinTitle: 'Preste atenção ao assassino: ',
+    attentionAssassinText:
+      'Lembre-se, um assassino tentará identificar {merlin} no final do jogo se o bem prevalecer. Ser muito óbvio com suas dicas pode levar à sua queda.',
+
+    strategicTipsTitle: 'Dicas Estratégicas:',
+    strategizeSilenceTitle: 'Estrategize seu silêncio:',
+    strategizeSilence:
+      'Às vezes, a melhor maneira de esconder seu papel é retendo comentários, especialmente nos estágios iniciais do jogo.',
+    revealEvilsTitle: 'Revele jogadores do mal gradualmente:',
+    revealEvils: 'Guie seus aliados à verdade gradualmente, evitando acusações severas.',
+    utilizeAmbiguityTitle: 'Utilize ambiguidade:',
+    utilizeAmbiguity:
+      'Faça comentários que possam ser interpretados de várias maneiras, mantendo os jogadores do mal adivinhando.',
+    buildTrustTitle: 'Construa confiança:',
+    buildTrust:
+      'Além de revelar o mal, convencer outros jogadores de sua lealdade ao bem é vital. Estabelecer confiança pode influenciar decisões da equipe.',
+    supportAlliesTitle: 'Apoie seus aliados:',
+    supportAllies:
+      'Às vezes é mais eficaz apoiar sugestões corretas de outros do que constantemente impor suas próprias ideias.',
+    playingAsMerlin:
+      'Jogar como {merlin} é desafiador, mas muito gratificante. Com estratégia cuidadosa e comunicação tática, você pode levar as forças do bem à vitória enquanto permanece escondido das garras sombrias do assassino. Boa sorte!',
   },
 };

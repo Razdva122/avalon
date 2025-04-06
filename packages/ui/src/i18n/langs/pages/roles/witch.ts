@@ -2,6 +2,36 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const witch: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    generalInformation: 'Informações Gerais: ',
+    intro: `Como {witch}, você possui um poder único entre os servos do mal: ocultar o resultado de uma missão enquanto ativa uma verificação de lealdade em um jogador aleatório não-{witch}. Embora isso forneça informações às forças do bem, seu objetivo é transformá-las em arma — semear caos, virar aliados uns contra os outros e inclinar o jogo a favor do mal, tudo enquanto mantém seu disfarce.`,
+    generalTipsTitle: `Dicas Gerais:`,
+
+    sowSeedsTitle: `Semeie confusão:`,
+    sowSeedsText: `Utilize sua habilidade para manter os jogadores incertos sobre os resultados das missões, causando dúvida e indecisão nas fileiras do bem.`,
+
+    collaborateTitle: `Colabore com outros malfeitores:`,
+    collaborateText: `Considere cuidadosamente as consequências de ocultar uma missão, e só o faça quando beneficiar você e seus aliados.`,
+
+    utilizePowerTitle: `Utilize seu poder estrategicamente:`,
+    utilizePowerText: `O momento é crucial, pois você só pode usar seu poder uma vez. Ao ocultar o resultado de uma missão, um jogador aleatório não-bruxa recebe uma verificação de lealdade. Escolha o momento que maximize a confusão enquanto protege seus aliados.`,
+
+    maintainDisguiseTitle: `Mantenha seu disfarce:`,
+    maintainDisguiseText: `Evite dar qualquer pista que possa revelar sua verdadeira lealdade ou despertar suspeitas sobre suas intenções.`,
+
+    strategicTipsTitle: `Dicas Estratégicas:`,
+
+    createUncertaintyTitle: `Crie incerteza:`,
+    createUncertaintyText: `Sua capacidade de obscurecer resultados de missões deixa os jogadores do bem no escuro, dificultando que eles elaborem estratégias eficazes.`,
+
+    influenceGameplayTitle: `Influencie o jogo:`,
+    influenceGameplayText: `Incentive a dúvida e a discórdia entre os jogadores do bem, direcionando discussões e decisões em uma direção favorável ao mal.`,
+
+    hideEarlyMissionsTitle: `Oculte missões iniciais:`,
+    hideEarlyMissionsText: `Considere ocultar missões iniciais para criar confusão, mas lembre-se que isso ativa uma verificação de lealdade. Coordene com aliados para garantir que a verificação não os exponha, enquanto lança suspeitas sobre oponentes-chave.`,
+
+    conclusion: `Como {witch}, você tece incerteza através de missões ocultas e verificações de lealdade forçadas. Seu único movimento poderoso pode expor outros enquanto protege a si mesmo. Use-o para criar paradoxos que fraturem a confiança da equipe do bem!`,
+  },
   en: {
     generalInformation: 'General Information: ',
     intro: `As {witch}, you wield a unique power among evil's minions: hiding one mission's outcome while triggering a loyalty check on a random non-{witch} player. Though this gives good forces intel, your goal is to weaponize it — breed chaos, turn allies against each other, and sway the game to evil's favor, all while maintaining your cover.`,

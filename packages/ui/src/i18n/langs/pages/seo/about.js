@@ -1,4 +1,10 @@
 module.exports.about = {
+  pt: {
+    title: 'Avalon: The Resistance | Sobre',
+    description:
+      "Mergulhe no avalon-game.com: uma plataforma abrangente dedicada a 'Avalon: The Resistance'. Descubra a história por trás do jogo, suas regras oficiais e como reunimos entusiastas de Avalon em todo o mundo.",
+    keywords: ['Sobre', 'Informação', 'Regras'],
+  },
   en: {
     title: 'Avalon: The Resistance | About',
     description:

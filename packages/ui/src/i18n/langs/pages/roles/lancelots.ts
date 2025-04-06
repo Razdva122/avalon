@@ -205,4 +205,47 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
     servingAsLancelotDescription:
       'Sirviendo como un Lancelot, mantienes una poderosa doble identidad que puede cambiar dramáticamente el curso del juego en Avalon. Con el potencial de cambiar de lealtades, tu rol invita a una profundidad estratégica como ninguna otra. Avanza con precaución, pues el equilibrio del bien y del mal recae sobre tus hombros acorazados.',
   },
+  pt: {
+    generalInformationTitle: 'Informações Gerais:',
+    introduction:
+      'Os Lancelots apresentam um desafio dinâmico no reino de Avalon. Como dois jogadores começando em lados opostos, o {goodLancelot} se alinha com as forças do bem, enquanto o {evilLancelot} conspira com os lacaios de Mordred.',
+    loyaltyTides:
+      'No entanto, as marés de lealdade podem mudar conforme o jogo avança. {merlin} pode ver o {evilLancelot} entre as fileiras dos seguidores de Mordred, e os lacaios de Mordred reconhecem a presença de um {evilLancelot}.',
+    goodAndEvilRecognition: 'Por outro lado, o {evilLancelot} não conhece seus aliados.',
+    guinevereKnowledge:
+      'Se {guinevere} estiver presente no jogo, ela conhece ambos os Lancelots, mas não sabe a lealdade deles.',
+    gameplayKeyConcept:
+      'A chave para a jogabilidade dos Lancelots é o baralho de mudança de lealdade. Após a segunda missão, uma carta é sacada.',
+    loyaltyChangeMechanism:
+      "Se uma carta de <span class='material-icons icon-swap'>swap_horiz</span><b>mudança de lealdade</b> for revelada, os Lancelots trocam de lealdade junto com todas as mudanças correspondentes (como a capacidade de falhar uma missão, ou estar sujeito à carta da Dama do Lago).",
+    deckComposition:
+      "Enquanto que, se a carta sacada for <span class='material-icons icon-swap'>close</span><b>em branco</b>, nenhuma mudança ocorre. O baralho contém <b>cinco cartas</b>, das quais duas provocam <span class='material-icons icon-swap'>swap_horiz</span><b>mudança de lealdade</b>, e três são <span class='material-icons icon-swap'>close</span><b>em branco</b>.",
+    possibleResults:
+      'Cada Lancelot tem uma restrição sobre qual resultado pode escolher durante a missão: {evilLancelot} só pode falhar, enquanto {goodLancelot} só pode ter sucesso.',
+    generalTipsTitle: 'Dicas Gerais:',
+    embraceUnpredictabilityTitle: 'Abrace a imprevisibilidade:',
+    embraceUnpredictabilityDescription:
+      'Como um Lancelot, a imprevisibilidade é seu elemento. Use o potencial de trocar de lado a seu favor.',
+    dualityOfRolesTitle: 'Dualidade de papéis:',
+    dualityOfRolesDescription:
+      'Lembre-se do seu papel inicial, mas adapte-se rapidamente se a carta de mudança de lealdade for sacada. Seu novo papel precisa ser interpretado de forma convincente para evitar suspeitas.',
+    observeAndAdaptTitle: 'Observe e adapte-se:',
+    observeAndAdaptDescription:
+      'Ambos os Lancelots devem monitorar de perto a narrativa do jogo para realinhar efetivamente suas estratégias após qualquer mudança de lealdade.',
+    subtlePlaysTitle: 'Jogadas sutis:',
+    subtlePlaysDescription:
+      'Seja minando sutilmente uma missão como mal ou reforçando-a como bem, a arte do disfarce é crucial. Passe despercebido em suas ações para preservar sua nova lealdade.',
+    strategicTipsTitle: 'Dicas Estratégicas:',
+    merlinsPerceptionTitle: 'Percepção de Merlin:',
+    merlinsPerceptionDescription:
+      'Se você é o {evilLancelot} e se torna bom, lembre-se que {merlin} ainda o percebe como parte do mal. Use isso a seu favor.',
+    balanceTheScalesTitle: 'Equilibre as balanças:',
+    balanceTheScalesDescription:
+      'Desempenhe um papel ativo em votações e propostas de missão para exercer influência sutilmente, inclinando a balança a favor do seu lado atual.',
+    maintainYourCoverTitle: 'Mantenha sua cobertura:',
+    maintainYourCoverDescription:
+      'Se você mudar para o lado do mal, cuidado para não mudar abruptamente seu comportamento. Mudanças graduais são menos conspícuas.',
+    servingAsLancelotDescription:
+      'Servindo como um Lancelot, você possui uma poderosa identidade dupla que pode mudar dramaticamente o curso do jogo em Avalon. Com o potencial de mudar lealdades, seu papel convida a uma profundidade estratégica como nenhum outro. Caminhe com cautela, pois o equilíbrio do bem e do mal repousa sobre seus ombros blindados.',
+  },
 };

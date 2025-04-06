@@ -5,11 +5,11 @@ export const percival: { [key in TLanguage]: Dictionary<string> } = {
   en: {
     generalInformation: 'General Information: ',
     percivalRole:
-      "Percival's role is to protect and correctly identify {merlin} to prevent {merlin}’s assassination by the Minions of Mordred. Percival sees {merlin} and {morgana} at the beginning of the game but must discern which is which without revealing their identities to others.",
+      "Percival's role is to protect and correctly identify {merlin} to prevent {merlin}'s assassination by the Minions of Mordred. Percival sees {merlin} and {morgana} at the beginning of the game but must discern which is which without revealing their identities to others.",
     generalTips: 'General Tips: ',
     understandYourRole: 'Understand Your Role: ',
     youAreProtector:
-      "Knowing that you are one of {merlin}'s primary protectors, your main goal is to obscure {merlin}’s identity.",
+      "Knowing that you are one of {merlin}'s primary protectors, your main goal is to obscure {merlin}'s identity.",
     payAttentionToBehavior: 'Pay Attention to Behavior: ',
     observeBehaviors:
       'Observe the behaviors and suggestions of the two players identified as {merlin} and {morgana}. Try to deduce who the real {merlin} is based on how they guide the team.',
@@ -19,10 +19,10 @@ export const percival: { [key in TLanguage]: Dictionary<string> } = {
     strategicTips: 'Strategic Tips: ',
     createAmbiguity: 'Create Ambiguity: ',
     actingUnsure:
-      "Sometimes, acting unsure or casting doubt can help protect {merlin}'s identity. If evil players are unsure who {merlin} is, it’s harder for them to win the game by assassinating {merlin}.",
+      "Sometimes, acting unsure or casting doubt can help protect {merlin}'s identity. If evil players are unsure who {merlin} is, it's harder for them to win the game by assassinating {merlin}.",
     communicateThroughVotes: 'Communicate Through Votes: ',
     votingPatterns:
-      'Voting patterns can be a subtle way to communicate. Percival can show agreement or disagreement with {merlin}’s suspected choices through voting, without openly discussing it.',
+      "Voting patterns can be a subtle way to communicate. Percival can show agreement or disagreement with {merlin}'s suspected choices through voting, without openly discussing it.",
     guideQuietly: 'Guide Quietly: ',
     subtlyGuide:
       'Percival often knows who the good players are. Guide them towards the right decisions subtly without exposing {merlin} or yourself.',
@@ -147,5 +147,35 @@ export const percival: { [key in TLanguage]: Dictionary<string> } = {
       'Al final del juego, prepárate para asumir la sospecha sobre ti mismo para proteger la identidad de {merlin}, especialmente si te has establecido como un jugador bueno de confianza.',
     playingAsPercival:
       'Jugar como Percival en Avalon ofrece un desafío único y requiere una combinación de sutileza, discernimiento y desorientación estratégica. Tu rol es crucial para proteger a {merlin} y asegurar el éxito de las fuerzas del bien. Sé vigilante, sé estratégico y, sobre todo, protege a {merlin} a toda costa.',
+  },
+  pt: {
+    generalInformation: 'Informações Gerais: ',
+    percivalRole:
+      'O papel de Percival é proteger e identificar corretamente {merlin} para evitar o assassinato de {merlin} pelos Lacaios de Mordred. Percival vê {merlin} e {morgana} no início do jogo, mas deve discernir quem é quem sem revelar suas identidades aos outros.',
+    generalTips: 'Dicas Gerais: ',
+    understandYourRole: 'Entenda Seu Papel: ',
+    youAreProtector:
+      'Sabendo que você é um dos principais protetores de {merlin}, seu objetivo principal é ocultar a identidade de {merlin}.',
+    payAttentionToBehavior: 'Preste Atenção ao Comportamento: ',
+    observeBehaviors:
+      'Observe os comportamentos e sugestões dos dois jogadores identificados como {merlin} e {morgana}. Tente deduzir quem é o verdadeiro {merlin} com base em como eles guiam a equipe.',
+    beSubtle: 'Seja Sutil: ',
+    beCarefulWithDefense:
+      'Ao defender ou seguir o conselho de quem você acredita ser {merlin}, seja sutil. A defesa direta de {merlin} pode levar {morgana} e os lacaios de Mordred a identificá-lo e posteriormente assassiná-lo.',
+    strategicTips: 'Dicas Estratégicas: ',
+    createAmbiguity: 'Crie Ambiguidade: ',
+    actingUnsure:
+      'Às vezes, agir com incerteza ou lançar dúvidas pode ajudar a proteger a identidade de {merlin}. Se os jogadores do mal não têm certeza de quem é {merlin}, é mais difícil para eles vencerem o jogo assassinando {merlin}.',
+    communicateThroughVotes: 'Comunique-se Através de Votos: ',
+    votingPatterns:
+      'Padrões de votação podem ser uma forma sutil de comunicação. Percival pode mostrar concordância ou discordância com as escolhas suspeitas de {merlin} através da votação, sem discutir abertamente.',
+    guideQuietly: 'Guie Silenciosamente: ',
+    subtlyGuide:
+      'Percival frequentemente sabe quem são os jogadores do bem. Guie-os para as decisões corretas sutilmente sem expor {merlin} ou a si mesmo.',
+    protectMerlinToTheEnd: 'Proteja Merlin Até o Fim: ',
+    takingSuspicion:
+      'No final do jogo, esteja pronto para atrair suspeitas sobre si mesmo para proteger a identidade de {merlin}, especialmente se você se estabeleceu como um jogador bom confiável.',
+    playingAsPercival:
+      'Jogar como Percival em Avalon oferece um desafio único e requer uma combinação de sutileza, discernimento e desorientação estratégica. Seu papel é crucial para proteger {merlin} e garantir o sucesso das forças do bem. Seja vigilante, seja estratégico e, acima de tudo, proteja {merlin} a todo custo.',
   },
 };

@@ -2,6 +2,49 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const trickster: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    generalInformation: 'Informações Gerais: ',
+    intro: `
+			Como um {trickster}, você mente quando sua lealdade é verificada com {ladyOfLake} ou {cleric},
+			posicionando-se perfeitamente como um membro confiável do lado do bem.
+		`,
+    generalTipsTitle: 'Dicas Gerais:',
+    generalTipsCultivateTrustTitle: 'Cultive uma persona confiável:',
+    generalTipsCultivateTrust: `
+			Enganar outros jogadores com sucesso requer construir credibilidade. Aja de forma consistente e ajude a completar
+			missões para ganhar confiança.
+		`,
+    generalTipsCreateConfusionTitle: 'Crie confusão:',
+    generalTipsCreateConfusion: `
+			Semeie dúvidas sobre os papéis dos outros sutilmente, desviando a suspeita de si mesmo e direcionando-a
+			para membros reais do lado do bem.
+		`,
+    generalTipsMonitorInfluenceTitle: 'Monitore sua influência:',
+    generalTipsMonitorInfluence: `
+			Acompanhe como os outros o percebem e ajuste sua estratégia para manter seu disfarce.
+		`,
+    strategicTipsTitle: 'Dicas Estratégicas:',
+    strategicTipsManipulateVotingTitle: 'Manipule padrões de votação:',
+    strategicTipsManipulateVoting: `
+			Seus votos em propostas podem enviar sinais para jogadores observadores. Pense cuidadosamente sobre quando apoiar
+			ou se opor a missões.
+		`,
+    strategicTipsControlInformationFlowTitle: 'Controle o fluxo de informações:',
+    strategicTipsControlInformationFlow: `
+			À medida que ganha confiança, outros jogadores provavelmente compartilharão insights com você. Use essas informações para beneficiar
+			sua equipe sem revelar sua fonte.
+		`,
+    strategicTipsPrepareDefenseTitle: 'Prepare uma defesa credível:',
+    strategicTipsPrepareDefense: `
+			Se a suspeita recair sobre você, esteja pronto com explicações plausíveis para suas ações que se encaixem com sua
+			persona construída como um jogador do bem.
+		`,
+    conclusion: `
+			Jogar como {trickster} permite que você teça uma teia de enganos. Abrace as complexidades do seu papel e
+			você pode mudar o equilíbrio a favor do mal, manipulando resultados-chave e deixando as forças do bem confusas
+			e paranóicas. Encontre um equilíbrio entre ações evidentes e manipulações sutis para dominar a arte do engano.
+		`,
+  },
   en: {
     generalInformation: 'General Information: ',
     intro: `

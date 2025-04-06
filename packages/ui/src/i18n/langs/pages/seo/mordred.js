@@ -1,4 +1,9 @@
 module.exports.mordred = {
+  pt: {
+    title: 'Avalon: The Resistance | Mordred',
+    description: "Regras e dicas para o papel de Mordred no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Mordred', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Mordred',
     description: "Rules and Tips for Mordred role in the board game 'Avalon: The Resistance'",

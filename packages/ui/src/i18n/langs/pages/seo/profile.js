@@ -1,4 +1,9 @@
 module.exports.profile = {
+  pt: {
+    title: 'Avalon: The Resistance | Perfil e Configurações',
+    description: "Perfil e configurações para o perfil do jogo em 'Avalon: The Resistance'",
+    keywords: ['Perfil', 'Configurações', 'Conta'],
+  },
   en: {
     title: 'Avalon: The Resistance | Profile and Settings',
     description: "Profile and settings for game profile on 'Avalon: The Resistance'",

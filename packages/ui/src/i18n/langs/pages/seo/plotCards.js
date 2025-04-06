@@ -1,4 +1,10 @@
 module.exports.plotCards = {
+  pt: {
+    title: 'Avalon: The Resistance | Cartas de Enredo',
+    description:
+      "Regras para a expansão 'Cartas de Enredo' no jogo de tabuleiro 'Avalon: The Resistance'. Expansão 'O Enredo se Complica' para o jogo de tabuleiro 'The Resistance'.",
+    keywords: ['Expansões', 'Complementos', 'Módulo', 'Cartas de Enredo', 'O Enredo se Complica', 'Regras'],
+  },
   en: {
     title: 'Avalon: The Resistance | Plot Cards',
     description:

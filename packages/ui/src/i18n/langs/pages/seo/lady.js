@@ -1,4 +1,10 @@
 module.exports.lady = {
+  pt: {
+    title: 'Avalon: The Resistance | Dama do Lago',
+    description:
+      "Regras para a carta 'Dama do Lago' no jogo de tabuleiro 'Avalon: The Resistance'. Regras para a carta 'Ficha de Inquisidor' no jogo de tabuleiro 'The Resistance'.",
+    keywords: ['Expansões', 'Complementos', 'Módulo', 'Dama do Lago', 'Ficha de Inquisidor', 'Regras'],
+  },
   en: {
     title: 'Avalon: The Resistance | Lady of the Lake',
     description:

@@ -2,6 +2,27 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const revealer: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    informationHeader: 'Informações Gerais:',
+    generalInformation:
+      'O papel de {revealer} torna-se disponível para todos os jogadores após as forças das trevas falharem em duas missões. Tenha em mente que, uma vez revelado, sua verdadeira lealdade se tornará aparente, por isso é importante planejar sua estratégia com antecedência para usar essa reviravolta a seu favor e trazer o máximo benefício para a equipe.',
+    commonAdviceTitle: 'Conselhos Gerais:',
+    commonAdviceTakeResponsibilityHeading: 'Assuma a Responsabilidade:',
+    commonAdviceTakeResponsibilityText:
+      'Sabendo que após a segunda falha seu papel será público, tente tomar a iniciativa durante as missões fracassadas para proteger seus aliados e garantir o sucesso geral da equipe.',
+    commonAdviceConfuseOpponentsHeading: 'Confunda os Oponentes Mesmo Após a Revelação:',
+    commonAdviceConfuseOpponentsText:
+      'Depois que seu papel for revelado, continue semeando confusão entre os oponentes, manipulando fluxos de informação para apoiar seus aliados e criar desordem entre os inimigos.',
+    strategicAdviceTitle: 'Conselhos Estratégicos:',
+    strategicAdviceControlMissionsHeading: 'Controle as Missões:',
+    strategicAdviceControlMissionsText:
+      'Use seu papel para influenciar ativamente a seleção de missões e os resultados das votações, direcionando o jogo na direção desejada.',
+    strategicAdvicePlanAheadHeading: 'Planeje Seus Movimentos com Antecedência:',
+    strategicAdvicePlanAheadText:
+      'Pense em vários movimentos à frente, considerando como a revelação do seu papel pode afetar a dinâmica do jogo.',
+    description:
+      'O papel de {revealer} representa uma combinação única de participação ativa em missões fracassadas e a necessidade de confundir os oponentes após ser revelado. Sua tarefa é apoiar seus aliados através de suas ações e influência no progresso do jogo. Use sua posição para neutralizar suspeitas e criar condições para a vitória da equipe.',
+  },
   en: {
     informationHeader: 'General Information:',
     generalInformation:

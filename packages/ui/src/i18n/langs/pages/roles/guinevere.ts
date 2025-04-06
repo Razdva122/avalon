@@ -131,4 +131,31 @@ export const guinevere: { [key in TLanguage]: Dictionary<string> } = {
     conclusionText:
       'Jugar como {guinevere} es un desafío, pero inmensamente gratificante. Con una estrategia reflexiva y una comunicación juiciosa, puedes llevar las fuerzas del bien a la victoria mientras esquivas al asesino del mal. ¡Buena suerte!',
   },
+  pt: {
+    credits: "créditos para: {'@'}Robrun",
+    generalInformationTitle: 'Informações Gerais:',
+    generalInformationText:
+      'Assumir o papel de {guinevere} requer uma abordagem delicada: ela conhece tanto o {goodLancelot} quanto o {evilLancelot}, mas não sabe qual é a lealdade atual deles. Seu objetivo é ajudar discretamente o lado do bem, pois, assim como {merlin}, ela pode ser morta no final do jogo se for identificada pelas forças do mal.',
+    generalTipsTitle: 'Dicas Gerais:',
+    cautiousKnowledgeTitle: 'Seja cautelosa com seu conhecimento:',
+    cautiousKnowledgeText:
+      '{guinevere} deve usar sua percepção para sutilmente guiar seus aliados em direção à vitória sem revelar seu papel.',
+    useHintsTitle: 'Use dicas com sabedoria:',
+    useHintsText: 'A capacidade de dar dicas sutis à sua equipe sem ser muito óbvia é crucial para {guinevere}.',
+    balanceGameplayTitle: 'Mantenha equilíbrio em sua jogabilidade:',
+    balanceGameplayText:
+      'Às vezes, é importante não parecer muito conhecedora. Erros deliberados ou silêncio podem desorientar as forças do mal.',
+    strategicTipsTitle: 'Dicas Estratégicas:',
+    determineLancelotLoyaltyTitle: 'Determine a lealdade de Lancelot:',
+    determineLancelotLoyaltyText:
+      'Esforce-se para descobrir qual {goodLancelot} é fiel à causa do bem e qual pode ter se voltado para o {evilLancelot}. Este conhecimento pode impactar significativamente sua estratégia.',
+    strategizeSilenceTitle: 'Estrategize com o silêncio:',
+    strategizeSilenceText:
+      'Às vezes, a melhor maneira de ocultar seu papel é conter comentários, especialmente nos estágios iniciais do jogo.',
+    buildTrustTitle: 'Construa confiança:',
+    buildTrustText:
+      'Convencer outros jogadores de sua lealdade ao bem é tão vital quanto revelar o mal. A confiança pode influenciar decisões da equipe.',
+    conclusionText:
+      'Jogar como {guinevere} é desafiador, mas imensamente gratificante. Com estratégia cuidadosa e comunicação judiciosa, você pode levar as forças do bem à vitória enquanto evita ser detectada pelo assassino do mal. Boa sorte!',
+  },
 };

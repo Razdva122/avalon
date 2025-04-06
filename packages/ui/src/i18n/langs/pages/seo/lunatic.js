@@ -1,4 +1,9 @@
 module.exports.lunatic = {
+  pt: {
+    title: 'Avalon: The Resistance | Lunático',
+    description: "Regras e dicas para o papel de Lunático no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Lunático', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Lunatic',
     description: "Rules and Tips for Lunatic role in the board game 'Avalon: The Resistance'",

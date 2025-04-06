@@ -1,4 +1,10 @@
 module.exports.rules = {
+  pt: {
+    title: 'Avalon: The Resistance | Regras',
+    description:
+      "Descubra as regras completas do jogo de tabuleiro 'Avalon: The Resistance', incluindo um guia para configurar o jogo para diferentes números de jogadores, combinações de papéis e os princípios básicos da vitória. Opções de configuração convenientes para seus jogos offline ajudarão você a criar as condições perfeitas de jogo e a desbloquear todo o potencial deste clássico jogo de estratégia.",
+    keywords: ['Wiki', 'Regras', 'Como jogar'],
+  },
   en: {
     title: 'Avalon: The Resistance | Rules',
     description:

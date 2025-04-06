@@ -1,4 +1,9 @@
 module.exports.game = {
+  pt: {
+    title: 'Avalon: The Resistance | Jogo',
+    description: "Salas para jogos online em 'Avalon: The Resistance'",
+    keywords: ['Jogo'],
+  },
   en: {
     title: 'Avalon: The Resistance | Game',
     description: "Rooms for online games in 'Avalon: The Resistance'",

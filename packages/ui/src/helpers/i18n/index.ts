@@ -13,6 +13,7 @@ export const LanguageMap: { [key in TLanguage]: string } = {
   'zh-TW': '繁體中文',
   'zh-CN': '简体中文',
   es: 'Español',
+  pt: 'Português',
 };
 
 export function selectLocale(): TLanguage {

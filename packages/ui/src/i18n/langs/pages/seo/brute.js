@@ -1,4 +1,9 @@
 module.exports.brute = {
+  pt: {
+    title: 'Avalon: The Resistance | Bruto',
+    description: "Regras e dicas para o papel de Bruto no jogo de tabuleiro 'Avalon: The Resistance'",
+    keywords: ['Bruto', 'Papel', 'Regras', 'Dicas'],
+  },
   en: {
     title: 'Avalon: The Resistance | Brute',
     description: "Rules and Tips for Brute role in the board game 'Avalon: The Resistance'",

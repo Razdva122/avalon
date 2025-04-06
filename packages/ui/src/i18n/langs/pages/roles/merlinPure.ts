@@ -177,4 +177,43 @@ export const merlinPure: { [key in TLanguage]: Dictionary<string> } = {
     conclusionText:
       'Jugar como {merlinPure} es un rol cargado de poder y peligro. Tu conocimiento inigualable de las identidades malignas te brinda una habilidad extraordinaria para guiar el curso del juego, pero tu éxito final depende del dominio de la sutileza y el arte del silencio. Con una mano hábil y una mirada vigilante, guía a las fuerzas del bien hacia la victoria.',
   },
+  pt: {
+    generalInformationTitle: 'Informações Gerais:',
+    generalInformationText:
+      'Jogar como {merlinPure} concede a você o poder extraordinário de ver não apenas a lealdade, mas também os papéis exatos dos personagens do mal. Este conhecimento avançado proporciona uma vantagem significativa, mas vem com o risco aumentado de ser exposto e alvo do Assassino.',
+    generalTipsTitle: 'Dicas Gerais:',
+    tipDiscretionTitle: 'Exerça máxima discrição:',
+    tipDiscretionText:
+      'Seu conhecimento profundo é tanto um presente quanto uma maldição. Seja extremamente cauteloso ao compartilhar qualquer informação para evitar revelar sua identidade.',
+    tipNuancedHintsTitle: 'Navegue com dicas sutis:',
+    tipNuancedHintsText:
+      'Você deve se tornar hábil em dar dicas aos seus companheiros de equipe em direção à verdade sem ser explícito, já que os riscos de ser identificado são ainda maiores para você.',
+    tipAvoidAccusationsTitle: 'Evite acusações diretas imediatas:',
+    tipAvoidAccusationsText:
+      'Dado seu conhecimento abrangente, apontar papéis do mal com muita precisão pode rapidamente desmascarar você como {merlinPure}.',
+    tipBalanceIntelTitle: 'Equilibre suas informações:',
+    tipBalanceIntelText:
+      'É crucial alternar entre fornecer orientação e permanecer discreto, pois sua visão completa pode facilmente traí-lo se não for tratada com cuidado.',
+    tipWatchAssassinTitle: 'Fique de olho no Assassino:',
+    tipWatchAssassinText:
+      'Mais do que nunca, a única ambição do Assassino é identificá-lo; mover-se com muita confiança pode significar sua ruína.',
+    strategicTipsTitle: 'Dicas Estratégicas:',
+    tipAmbiguityTitle: 'Utilize ambiguidade estratégica:',
+    tipAmbiguityText:
+      'Com seu conhecimento específico de papéis, você pode criar cenários complexos para enganar jogadores do mal em múltiplos níveis.',
+    tipGradualRevealTitle: 'Revele papéis gradual e indiretamente:',
+    tipGradualRevealText:
+      'Guie sua equipe para a compreensão dos papéis dos jogadores do mal através de uma série cuidadosamente orquestrada de dicas.',
+    tipHintNotDeclareTitle: 'Sugira papéis, não os declare:',
+    tipHintNotDeclareText:
+      'Em vez de afirmar papéis, dê dicas que incentivem seus companheiros de equipe a fazer as deduções por conta própria.',
+    tipAddressWithoutConfirmTitle: 'Aborde os papéis sem confirmação:',
+    tipAddressWithoutConfirmText:
+      'Participe de discussões sobre papéis de uma maneira que provoque reflexão sem afirmar seu conhecimento.',
+    tipSupportDiscoveryTitle: 'Apoie a descoberta da sua equipe:',
+    tipSupportDiscoveryText:
+      'Capacite seus companheiros de equipe a chegar a conclusões que você já fez, reforçando a confiança deles em suas próprias habilidades de dedução.',
+    conclusionText:
+      'Jogar como {merlinPure} é um papel carregado de potência e perigo. Seu conhecimento incomparável das identidades do mal permite uma capacidade sem paralelo de direcionar o curso do jogo. No entanto, seu sucesso final depende do domínio da sutileza e da arte da palavra não dita. Guie as forças do bem para o triunfo com uma mão hábil e um olhar atento.',
+  },
 };

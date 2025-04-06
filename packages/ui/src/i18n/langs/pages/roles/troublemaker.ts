@@ -2,6 +2,33 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const troublemaker: { [key in TLanguage]: Dictionary<string> } = {
+  pt: {
+    generalInformation: 'Informações Gerais: ',
+    intro:
+      'Como um {troublemaker}, você desempenha um ato crucial de equilíbrio. Você deve se apresentar como um membro honesto do bem, mas quando sua lealdade é testada e revelada falsamente devido ao seu papel único, você precisa gerenciar habilmente a situação. Seu desafio é manter a confiança da sua equipe apesar das evidências enganosas, enquanto bloqueia qualquer membro do mal que tente se passar pelo seu papel.',
+    generalTips: 'Dicas Gerais:',
+    strategicTips: 'Dicas Estratégicas:',
+    generalTipsRevealTitle: 'Revele estrategicamente',
+    generalTipsRevealDesc:
+      'Se sua falsa lealdade for exposta ou provavelmente questionada, revele calmamente seu verdadeiro papel como {troublemaker} para manter a confiança dentro da sua equipe.',
+    generalTipsCounteractTitle: 'Neutralize personificações malignas',
+    generalTipsCounteractDesc:
+      'Se um jogador do mal afirmar ser o {troublemaker}, desafie rapidamente sua declaração e esclareça a situação para evitar confusão.',
+    strategicTipsMonitorTitle: 'Monitore testes de lealdade',
+    strategicTipsMonitorDesc:
+      'Fique atento a situações onde verificações de lealdade são realizadas e esteja pronto para intervir se os resultados puderem ser enganosos devido a alguém se passando por você.',
+    strategicTipsControlTitle: 'Controle a narrativa',
+    strategicTipsControlDesc:
+      'Se revelado, direcione a conversa para a compreensão das vantagens estratégicas do seu papel, explicando como ter um {troublemaker} não revelado pode beneficiar o lado do bem.',
+    strategicTipsAlliancesTitle: 'Forme alianças claras',
+    strategicTipsAlliancesDesc:
+      'Construa relacionamentos fortes com jogadores confiáveis e influentes. Ter aliados pode ajudar a validar suas afirmações se seu papel for questionado.',
+    strategicTipsAdaptTitle: 'Adapte-se à suspeita',
+    strategicTipsAdaptDesc:
+      'Se surgirem suspeitas, aborde-as diretamente com explicações lógicas e reafirme o alinhamento de suas ações com os objetivos da equipe para dissipar dúvidas.',
+    conclusion:
+      'Jogar como {troublemaker} requer uma fina mistura de sigilo e franqueza. Você precisa navegar pelo jogo mantendo seu papel vital discreto até o momento crítico, então revelá-lo para manter a confiança e frustrar estratégias malignas. Tais revelações estratégicas podem mudar profundamente a dinâmica do jogo, garantindo que o lado do bem continue a se beneficiar da sua contribuição oculta, mas indispensável.',
+  },
   en: {
     generalInformation: 'General Information: ',
     intro:
