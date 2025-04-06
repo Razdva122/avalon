@@ -43,3 +43,14 @@ This document tracks significant updates and changes to the Avalon project.
 - Added the component to Lovers page with separate components for Tristan and Isolde
 - Added the component to all role pages: Merlin, Servant, Mordred, MerlinPure, Morgana, Brute, Cleric, Guinevere, Minion, Oberon, Percival, Revealer, Trickster, Troublemaker, and Witch
 - Positioned the component after the general information section on each page
+
+[06.04.2025 11:56:00] - **Implemented Portuguese Translation**
+
+- Added Portuguese language support to the application
+- Updated configuration files to include 'pt' language option
+- Created main Portuguese translation file with all UI sections
+- Translated all page-specific content (about, excalibur, rules, stats, wiki, etc.)
+- Translated all role-specific content (brute, cleric, merlin, witch, etc.)
+- Added SEO translations for all pages and roles
+- Added Portuguese default keywords for SEO
+- Updated checklist to track translation progress

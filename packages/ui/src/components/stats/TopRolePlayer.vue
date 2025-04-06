@@ -27,7 +27,7 @@
       </div>
     </v-card>
 
-    <v-skeleton-loader v-else-if="loading" type="card" class="top-player-skeleton"></v-skeleton-loader>
+    <v-skeleton-loader v-else-if="loading" type="image" class="top-player-skeleton"></v-skeleton-loader>
 
     <v-card v-else class="top-player-card no-data-card">
       <div class="d-flex align-center pa-3">
@@ -42,7 +42,6 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, PropType } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { socket } from '@/api/socket';
 import TeammateProfile from '@/components/stats/TeammateProfile.vue';
@@ -173,6 +172,13 @@ export default defineComponent({
 
 .top-player-skeleton {
   height: 80px;
+}
+
+:deep(.v-skeleton-loader__image) {
+  margin: 0px;
+  border-radius: 8px;
+  height: 80px !important;
+  min-height: 80px !important;
 }
 
 .no-data-card {

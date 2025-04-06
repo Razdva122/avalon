@@ -126,6 +126,7 @@ Supported languages:
 - Chinese (Simplified) (zh-CN)
 - Chinese (Traditional) (zh-TW)
 - Spanish (es)
+- Portuguese (pt)
 
 Language selection is based on:
 
@@ -215,12 +216,45 @@ Global styles are defined in:
 
 - `/src/styles/` - global style files
 
+## Portuguese Translation Implementation
+
+The project has been extended with Portuguese language support:
+
+### Translation Files
+
+- `/src/i18n/langs/pt.ts` - Main Portuguese translation file containing all UI strings
+- `/src/i18n/langs/pages/pt.ts` - Portuguese translations for pages
+- Individual page and role translation files have been updated with Portuguese translations
+
+### Configuration Updates
+
+- Added 'pt' to TLanguage type in `/src/i18n/interface.ts`
+- Added 'pt': 'Português' to LanguageMap in `/src/helpers/i18n/index.ts`
+- Updated translations export in `/src/i18n/index.ts`
+- Added Portuguese default keywords for SEO in `/src/router/index.ts`
+
+### SEO Optimization
+
+- All SEO files in `/src/i18n/langs/pages/seo/` have been updated with Portuguese translations
+- Meta tags, titles, and descriptions are now available in Portuguese
+- Default keywords for Portuguese: ['The Resistance', 'Avalon', 'Online', 'Jogo de tabuleiro']
+
+### Translation Coverage
+
+The Portuguese translation covers:
+
+- All UI elements and navigation
+- All game mechanics and instructions
+- All role descriptions and wiki content
+- All error messages and notifications
+- All SEO metadata
+
 ## Frontend Recommendations
 
 1. Use Composition API for new components
 2. Follow the single responsibility principle for components
 3. Use types from the `types` package for type safety
-4. Add new localization strings to all language files
+4. Add new localization strings to all language files (including Portuguese)
 5. Test the interface on various devices and screen resolutions
 6. Use Vuex for global state management
 7. Use the GameStateManager for game state handling
