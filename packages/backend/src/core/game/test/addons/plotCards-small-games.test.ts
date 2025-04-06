@@ -1,4 +1,5 @@
 import { generateNewGame } from '@/core/game/test/const';
+import type { Vote } from '@/core/game/history/vote';
 import * as _ from 'lodash';
 
 let { game, gameHelper } = generateNewGame();
@@ -320,6 +321,59 @@ describe('Plot Cards Logic', () => {
       expect(game.addons.plotCards!.cardsInGame.find((card) => card.name === 'restoreHonor')).toBeUndefined();
 
       expect(game.addons.plotCards!.cardsInGame.length).toBe(1);
+    });
+  });
+
+  describe('Charge card (preVote functionality)', () => {
+    test('Should allow player to vote before regular voting phase', () => {
+      const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
+        const chargeIndex = game.addons.plotCards!.cards.findIndex((card) => card.name === 'charge');
+        const chargeCard = game.addons.plotCards!.cards.splice(chargeIndex, 1)[0];
+        game.addons.plotCards!.cards.unshift(chargeCard);
+      });
+
+      const playerWithCharge = game.players.find((player) => player !== game.leader)!;
+
+      gameHelper.giveCard('charge', playerWithCharge.user.id);
+
+      expect(
+        game.addons.plotCards!.cardsInGame.find(
+          (card) => card.name === 'charge' && card.ownerID === playerWithCharge.user.id,
+        ),
+      ).toBeDefined();
+
+      gameHelper.selectPlayersOnMission().sentSelectedPlayers();
+
+      expect(game.stage).toBe('preVote');
+
+      expect(playerWithCharge.features.waitForAction).toBe(true);
+
+      gameHelper.makePreVote('reject');
+
+      expect(game.stage).toBe('votingForTeam');
+
+      game.players.forEach((player) => {
+        if (player.user.id === playerWithCharge.user.id) {
+          expect(player.features.waitForAction).toBe(false);
+        } else {
+          expect(player.features.waitForAction).toBe(true);
+        }
+      });
+
+      expect(playerWithCharge.features.preVote).toBe('reject');
+
+      gameHelper.makeVotes();
+
+      const lastHistoryEl = _.last(game.history)!;
+
+      expect(lastHistoryEl.type).toBe('vote');
+      expect(game.history[game.history.length - 2].type).toBe('preVote');
+
+      const playerVote = (lastHistoryEl as Vote).data.votes.find(
+        (vote) => vote.player.user.id === playerWithCharge.user.id,
+      );
+
+      expect(playerVote?.value).toBe('reject');
     });
   });
 });
