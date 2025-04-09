@@ -2,9 +2,9 @@
   <div>
     <span
       v-html="
-        $t('checkLoyalty.checkInfo', {
-          ladyOwner: calculateNameByID(data.validatorID),
-          ladyTarget: calculateNameByID(data.inspectedID),
+        $t('revealLoyalty.revealInfo', {
+          revealer: calculateNameByID(data.revealerID),
+          target: calculateNameByID(data.targetID),
         })
       "
     ></span>
@@ -14,14 +14,14 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 
-import type { CheckLoyalty } from '@avalon/types';
+import type { RevealLoyalty } from '@avalon/types';
 import type { TCalculateNameByID } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
     data: {
       required: true,
-      type: Object as PropType<CheckLoyalty>,
+      type: Object as PropType<RevealLoyalty>,
     },
     calculateNameByID: {
       required: true,

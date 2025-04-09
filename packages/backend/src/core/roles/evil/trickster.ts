@@ -18,7 +18,7 @@ export class Trickster extends Character {
     revealer: 'evil',
   };
 
-  override get visibleLoylaty(): TLoyalty {
+  override get visibleLoyalty(): TLoyalty {
     return 'good';
   }
 }

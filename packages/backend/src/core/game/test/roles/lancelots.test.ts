@@ -1,5 +1,6 @@
 import { generateNewGame } from '@/core/game/test/const';
 import * as _ from 'lodash';
+import { SwitchLancelotsHistory } from '@/core/game/addons/lancelots/switch-lancelots';
 
 let { game, gameHelper } = generateNewGame();
 
@@ -29,7 +30,7 @@ describe('Lancelots', () => {
       const lastHistoryEl = _.last(game.history)!;
 
       expect(lastHistoryEl.type).toBe('switchLancelots');
-      expect(lastHistoryEl.data.result).toBe(switches[i]);
+      expect((<SwitchLancelotsHistory>lastHistoryEl).data.result).toBe(switches[i]);
 
       expect(goodLancelot.role.loyalty).toBe(switches[i] ? 'evil' : 'good');
       expect(evilLancelot.role.loyalty).toBe(switches[i] ? 'good' : 'evil');

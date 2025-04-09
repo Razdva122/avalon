@@ -57,4 +57,14 @@ export class CardsState {
 /**
  * Possible plot-cards stages
  */
-export type TPlotCardsStages = 'giveCard' | 'preVote' | 'leadToVictory' | 'restoreHonor' | 'ambush' | 'kingReturns';
+export type TPlotCardsStages =
+  | 'giveCard'
+  | 'preVote'
+  | 'leadToVictory'
+  | 'restoreHonor'
+  | 'ambush'
+  | 'kingReturns'
+  | 'revealLoyalty'
+  | 'checkLoyalty'
+  | 'announceLoyalty'
+  | 'playCard';

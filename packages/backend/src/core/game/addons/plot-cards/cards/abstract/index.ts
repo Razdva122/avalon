@@ -1,10 +1,14 @@
-import { Game } from '@/core/game';
+import { Game, IPlayerInGame } from '@/core/game';
 import { TPlotCardNames } from '@avalon/types';
 import { PlotCardsAddon } from '@/core/game/addons/plot-cards';
+import { ILoyaltyActionHandler } from '@/core/game/addons/check-loyalty/interface';
+import { TPlotCard } from '@/core/game/addons/plot-cards/interface';
+import { LoyaltyChecker } from '@/core/game/addons/check-loyalty/loyalty-checker';
 import { v4 as uuidv4 } from 'uuid';
 
 export abstract class AbstractCard {
   abstract name: TPlotCardNames;
+  abstract type: 'instant' | 'usable' | 'effect';
   id: string = uuidv4();
   ownerID: string | undefined;
   stage: 'has' | 'active' | undefined;
@@ -35,5 +39,26 @@ export abstract class AbstractCard {
     owner.features.waitForAction = true;
     this.ownerID = ownerID;
     this.stage = 'active';
+  }
+}
+
+export abstract class LoyaltyPlotCard extends AbstractCard implements ILoyaltyActionHandler {
+  abstract loyaltyType: 'checkLoyalty' | 'revealLoyalty';
+  loyaltyChecker: LoyaltyChecker;
+
+  constructor(game: Game, addon: PlotCardsAddon) {
+    super(game, addon);
+    this.loyaltyChecker = new LoyaltyChecker(game, this);
+  }
+
+  play(ownerID: string) {
+    this.activateCard(ownerID);
+    return this.loyaltyChecker.startChecking(this.loyaltyType);
+  }
+
+  postAnnounceAction(ownerOfCheck: IPlayerInGame, selectedPlayer: IPlayerInGame): void {
+    ownerOfCheck.features.waitForAction = false;
+    selectedPlayer.features.isSelected = false;
+    this.plotCardsAddon.removeCardFromGame(<TPlotCard>this);
   }
 }

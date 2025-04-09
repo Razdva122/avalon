@@ -90,7 +90,7 @@ export default defineComponent({
   setup(props) {
     const gameState = inject(gameStateKey)!;
     const store = useStore();
-    const { playerState, visibleHistory, currentStage, displayKick } = toRefs(props);
+    const { playerState, visibleHistory, displayKick } = toRefs(props);
     const { userState } = useUserProfile(playerState.value.id);
     const chatMessage = ref<{ message?: string; timeoutId?: number }>();
 
@@ -149,9 +149,9 @@ export default defineComponent({
           clone.features.isSent = false;
         }
 
-        if (visibleHistory.value?.type === 'checkLoyalty' && visibleHistory.value.result) {
-          if (clone.id === visibleHistory.value.inspectedID) {
-            clone.role = visibleHistory.value.result;
+        if (visibleHistory.value?.type === 'announceLoyalty' && visibleHistory.value.announced) {
+          if (clone.id === visibleHistory.value.targetID) {
+            clone.role = visibleHistory.value.announced;
           }
         }
 
@@ -222,18 +222,6 @@ export default defineComponent({
           }, {}),
           ...classes,
         };
-
-        if (
-          currentStage.value === 'checkLoyalty' ||
-          (currentStage.value === 'announceLoyalty' &&
-            (player.value.features.ladyOfLake === 'has' || player.value.features.ladyOfSea === 'has'))
-        ) {
-          classes['player-lady-active'] = true;
-        }
-
-        if (currentStage.value === 'useExcalibur' && player.value.features.excalibur) {
-          classes['player-excalibur-active'] = true;
-        }
       } else {
         classes = {
           'player-feature-isLeader': player.value.isLeader,
@@ -311,7 +299,7 @@ export default defineComponent({
   height: 30px;
   width: 30px;
   border-radius: 50%;
-  border: 2px solid grey;
+  border: 3px solid grey;
 }
 
 .plot-card {
@@ -319,7 +307,7 @@ export default defineComponent({
   width: 30px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid grey;
+  border: 3px solid grey;
 }
 
 .plot-card-active {
@@ -464,17 +452,15 @@ export default defineComponent({
 }
 
 .player-feature-ladyOfLake-has .lady-of-lake,
-.player-feature-ladyOfSea-has .lady-of-sea {
+.player-feature-ladyOfSea-has .lady-of-sea,
+.player-feature-excalibur-has .excalibur {
   display: block;
 }
 
-.player-feature-excalibur .excalibur {
+.player-feature-excalibur-active .excalibur,
+.player-feature-ladyOfLake-active .lady-of-lake,
+.player-feature-ladyOfSea-active .lady-of-sea {
   display: block;
-}
-
-.player-excalibur-active .excalibur,
-.player-lady-active .lady-of-lake,
-.player-lady-active .lady-of-sea {
   border-color: rgba(65, 105, 225, 0.8);
 }
 

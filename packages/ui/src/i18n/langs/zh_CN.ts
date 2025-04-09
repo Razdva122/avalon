@@ -241,6 +241,7 @@ export const zh_CN = {
     takeCard: '拿取卡牌',
     selectCard: '选择一张卡牌',
     noAvailableCards: '没有可用的卡牌',
+    revealLoyalty: '揭示忠诚',
   },
   assassinate: {
     lovers: '恋人',
@@ -265,6 +266,9 @@ export const zh_CN = {
   },
   kingReturns: {
     history: '<b>{cardOwner}</b> 使用了卡牌 «{cardName}» 取消了最后一次投票并更换了领导权',
+  },
+  playCard: {
+    history: '<b>{cardOwner}</b> 使用了卡牌 «{cardName}»',
   },
   preVote: {
     title: '初步投票',
@@ -406,7 +410,14 @@ export const zh_CN = {
   },
   checkLoyalty: {
     checkInfo: '<b>{ladyOwner}</b> 检查了 <b>{ladyTarget}</b> 的忠诚',
+  },
+  revealLoyalty: {
+    revealInfo: '<b>{revealer}</b> 向 <b>{target}</b> 揭示了自己的忠诚',
+  },
+  announceLoyalty: {
+    announceInfo: '<b>{announcer}</b> 宣布了 <b>{target}</b> 的忠诚',
     declareInfo: '并宣布他的忠诚为',
+    actualInfo: '实际上',
   },
   lancelotsHistory: {
     becameEvil: '变得邪恶',

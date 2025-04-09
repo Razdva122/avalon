@@ -241,6 +241,7 @@ export const ru = {
     takeCard: 'Взять карту',
     selectCard: 'Выберите карту',
     noAvailableCards: 'Нет доступных карт',
+    revealLoyalty: 'Показать лояльность',
   },
   assassinate: {
     lovers: 'Любовники',
@@ -265,6 +266,9 @@ export const ru = {
   },
   kingReturns: {
     history: '<b>{cardOwner}</b> использовал карту «{cardName}» для отмены последнего голосования и смены лидерства',
+  },
+  playCard: {
+    history: '<b>{cardOwner}</b> сыграл карту «{cardName}»',
   },
   preVote: {
     title: 'Предварительное голосование',
@@ -406,7 +410,14 @@ export const ru = {
   },
   checkLoyalty: {
     checkInfo: '<b>{ladyOwner}</b> проверил лояльность <b>{ladyTarget}</b>',
+  },
+  revealLoyalty: {
+    revealInfo: '<b>{revealer}</b> показал свою лояльность <b>{target}</b>',
+  },
+  announceLoyalty: {
+    announceInfo: '<b>{announcer}</b> объявил лояльность <b>{target}</b>',
     declareInfo: 'и сказал что его лояльность -',
+    actualInfo: 'на самом деле',
   },
   lancelotsHistory: {
     becameEvil: 'стал темным',

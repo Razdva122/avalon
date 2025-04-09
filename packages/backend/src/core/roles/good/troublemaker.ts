@@ -9,7 +9,7 @@ export class Troublemaker extends Character {
 
   visibility: TVisibility = {};
 
-  override get visibleLoylaty(): TLoyalty {
+  override get visibleLoyalty(): TLoyalty {
     return 'evil';
   }
 }

@@ -1,4 +1,5 @@
 import { generateNewGame } from '@/core/game/test/const';
+import { movePlotCardsToStart } from '@/core/game/test/helpers';
 import type { Vote } from '@/core/game/history/vote';
 import * as _ from 'lodash';
 
@@ -70,14 +71,16 @@ describe('Plot Cards Logic', () => {
   // Test for LeadToVictory card
   describe('LeadToVictory card', () => {
     test('Should allow player to become leader', () => {
-      const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5);
+      const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
+        movePlotCardsToStart(game, ['leadToVictory']);
+      });
 
       const originalLeader = game.leader;
       const nonLeaderPlayer = game.players.find(
         (player) => !player.features.isLeader && originalLeader.next !== player,
       )!;
 
-      gameHelper.giveCard('leadToVictory', nonLeaderPlayer.user.id);
+      gameHelper.giveCard([nonLeaderPlayer.user.id]);
 
       expect(
         game.addons.plotCards!.cardsInGame.find(
@@ -104,11 +107,13 @@ describe('Plot Cards Logic', () => {
   // Test for Ambush card
   describe('Ambush card', () => {
     test("Should allow player to see another player's mission action", () => {
-      const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5);
+      const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
+        movePlotCardsToStart(game, ['ambush']);
+      });
 
       const playerWithAmbush = game.players.find((player) => player !== game.leader)!;
 
-      gameHelper.giveCard('ambush', playerWithAmbush.user.id);
+      gameHelper.giveCard([playerWithAmbush.user.id]);
 
       expect(
         game.addons.plotCards!.cardsInGame.find(
@@ -136,15 +141,7 @@ describe('Plot Cards Logic', () => {
       const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
         game.addons.plotCards!.cardsPerRound = 2;
 
-        const ambushIndex = game.addons.plotCards!.cards.findIndex((card) => card.name === 'ambush');
-        const ambushCard = game.addons.plotCards!.cards.splice(ambushIndex, 1)[0];
-        game.addons.plotCards!.cards.unshift(ambushCard);
-
-        const ambushIndex2 = game.addons.plotCards!.cards.findIndex(
-          (card) => card.name === 'ambush' && card !== ambushCard,
-        );
-        const ambushCard2 = game.addons.plotCards!.cards.splice(ambushIndex2, 1)[0];
-        game.addons.plotCards!.cards.unshift(ambushCard2);
+        movePlotCardsToStart(game, ['ambush', 'ambush']);
       });
 
       const playerWithFirstAmbush = game.players.find((player) => player !== game.leader)!;
@@ -152,10 +149,7 @@ describe('Plot Cards Logic', () => {
         (player) => player !== game.leader && player.user.id !== playerWithFirstAmbush.user.id,
       )!;
 
-      gameHelper.giveCard([
-        ['ambush', playerWithFirstAmbush.user.id],
-        ['ambush', playerWithSecondAmbush.user.id],
-      ]);
+      gameHelper.giveCard([playerWithFirstAmbush.user.id, playerWithSecondAmbush.user.id]);
 
       gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
 
@@ -177,11 +171,13 @@ describe('Plot Cards Logic', () => {
   // Test for KingReturns card
   describe('KingReturns card', () => {
     test('Should allow player to decline voting and move leader', () => {
-      const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5);
+      const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
+        movePlotCardsToStart(game, ['kingReturns']);
+      });
 
       const playerWithKingReturns = game.players.find((player) => player !== game.leader)!;
 
-      gameHelper.giveCard('kingReturns', playerWithKingReturns.user.id);
+      gameHelper.giveCard([playerWithKingReturns.user.id]);
 
       expect(
         game.addons.plotCards!.cardsInGame.find(
@@ -204,11 +200,13 @@ describe('Plot Cards Logic', () => {
     });
 
     test('Should allow player to skip using the kingReturns card', () => {
-      const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5);
+      const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
+        movePlotCardsToStart(game, ['kingReturns']);
+      });
 
       const playerWithKingReturns = game.players.find((player) => player !== game.leader)!;
 
-      gameHelper.giveCard('kingReturns', playerWithKingReturns.user.id);
+      gameHelper.giveCard([playerWithKingReturns.user.id]);
 
       gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes();
 
@@ -229,9 +227,11 @@ describe('Plot Cards Logic', () => {
     });
 
     test('Should end game if 5 vote will be rejected', () => {
-      const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5);
+      const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
+        movePlotCardsToStart(game, ['kingReturns']);
+      });
 
-      gameHelper.giveCard('kingReturns');
+      gameHelper.giveCard([undefined]);
 
       for (let i = 0; i < 4; i += 1) {
         gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes(5);
@@ -249,12 +249,10 @@ describe('Plot Cards Logic', () => {
   describe('RestoreHonor card', () => {
     test('Should skip stage if cards for steal does not exist', () => {
       const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
-        const restoreHonorIndex = game.addons.plotCards!.cards.findIndex((card) => card.name === 'restoreHonor');
-        const restoreHonorCard = game.addons.plotCards!.cards.splice(restoreHonorIndex, 1)[0];
-        game.addons.plotCards!.cards.unshift(restoreHonorCard);
+        movePlotCardsToStart(game, ['restoreHonor']);
       });
 
-      gameHelper.giveCard('restoreHonor');
+      gameHelper.giveCard([undefined]);
 
       expect(game.addons.plotCards!.cardsInGame.length).toBe(0);
 
@@ -265,22 +263,13 @@ describe('Plot Cards Logic', () => {
       const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
         game.addons.plotCards!.cardsPerRound = 2;
 
-        const restoreHonorIndex = game.addons.plotCards!.cards.findIndex((card) => card.name === 'restoreHonor');
-        const restoreHonorCard = game.addons.plotCards!.cards.splice(restoreHonorIndex, 1)[0];
-        game.addons.plotCards!.cards.unshift(restoreHonorCard);
-
-        const ambushIndex = game.addons.plotCards!.cards.findIndex((card) => card.name === 'ambush');
-        const ambushCard = game.addons.plotCards!.cards.splice(ambushIndex, 1)[0];
-        game.addons.plotCards!.cards.unshift(ambushCard);
+        movePlotCardsToStart(game, ['restoreHonor', 'ambush']);
       });
 
       const player1 = game.players.find((player) => player !== game.leader)!;
       const player2 = game.players.find((player) => player !== game.leader && player !== player1)!;
 
-      gameHelper.giveCard([
-        ['ambush', player1.user.id],
-        ['restoreHonor', player2.user.id],
-      ]);
+      gameHelper.giveCard([player1.user.id, player2.user.id]);
 
       expect(game.stage).toBe('restoreHonor');
 
@@ -302,21 +291,12 @@ describe('Plot Cards Logic', () => {
       const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
         game.addons.plotCards!.cardsPerRound = 2;
 
-        const restoreHonorIndex = game.addons.plotCards!.cards.findIndex((card) => card.name === 'restoreHonor');
-        const restoreHonorCard = game.addons.plotCards!.cards.splice(restoreHonorIndex, 1)[0];
-        game.addons.plotCards!.cards.unshift(restoreHonorCard);
-
-        const ambushIndex = game.addons.plotCards!.cards.findIndex((card) => card.name === 'ambush');
-        const ambushCard = game.addons.plotCards!.cards.splice(ambushIndex, 1)[0];
-        game.addons.plotCards!.cards.unshift(ambushCard);
+        movePlotCardsToStart(game, ['restoreHonor', 'ambush']);
       });
 
       const player1 = game.players.find((player) => player !== game.leader)!;
 
-      gameHelper.giveCard([
-        ['ambush', player1.user.id],
-        ['restoreHonor', player1.user.id],
-      ]);
+      gameHelper.giveCard([player1.user.id, player1.user.id]);
 
       expect(game.addons.plotCards!.cardsInGame.find((card) => card.name === 'restoreHonor')).toBeUndefined();
 
@@ -327,14 +307,12 @@ describe('Plot Cards Logic', () => {
   describe('Charge card (preVote functionality)', () => {
     test('Should allow player to vote before regular voting phase', () => {
       const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
-        const chargeIndex = game.addons.plotCards!.cards.findIndex((card) => card.name === 'charge');
-        const chargeCard = game.addons.plotCards!.cards.splice(chargeIndex, 1)[0];
-        game.addons.plotCards!.cards.unshift(chargeCard);
+        movePlotCardsToStart(game, ['charge']);
       });
 
       const playerWithCharge = game.players.find((player) => player !== game.leader)!;
 
-      gameHelper.giveCard('charge', playerWithCharge.user.id);
+      gameHelper.giveCard([playerWithCharge.user.id]);
 
       expect(
         game.addons.plotCards!.cardsInGame.find(

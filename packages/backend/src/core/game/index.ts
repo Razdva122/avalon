@@ -97,8 +97,8 @@ export class Game extends GameHooks {
   /**
    * A map with a calculation of which role can make a choice at this stage
    */
-  selectAvailable: TSelectAvailable = {
-    selectTeam: (player) => Boolean(player.features.isLeader),
+  private selectAvailable: TSelectAvailable = {
+    selectTeam: [(player) => Boolean(player.features.isLeader)],
   };
 
   set leader({ user: { id } }: IPlayerInGame) {
@@ -285,6 +285,11 @@ export class Game extends GameHooks {
     return this.players.filter((player) => player.features.isSent);
   }
 
+  addSelectAvailableStage(stage: TGameStage, checker: (player: IPlayerInGame) => boolean): void {
+    this.selectAvailable[stage] = this.selectAvailable[stage] || [];
+    this.selectAvailable[stage].push(checker);
+  }
+
   /**
    * Move leader to next player
    */
@@ -369,7 +374,7 @@ export class Game extends GameHooks {
   selectPlayer(executorID: string, playerID: string): void {
     const executor = this.findPlayerByID(executorID);
 
-    if (this.selectAvailable[this.stage]?.(executor)) {
+    if (this.selectAvailable[this.stage]?.some((check) => check(executor))) {
       const selectedPlayer = this.findPlayerByID(playerID);
 
       selectedPlayer.features.isSelected = !selectedPlayer.features.isSelected;

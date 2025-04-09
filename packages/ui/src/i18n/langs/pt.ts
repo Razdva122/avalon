@@ -249,6 +249,7 @@ export const pt = {
     takeCard: 'Pegar carta',
     selectCard: 'Selecione uma carta',
     noAvailableCards: 'Sem cartas disponíveis',
+    revealLoyalty: 'Revelar Lealdade',
   },
   assassinate: {
     lovers: 'Amantes',
@@ -273,6 +274,9 @@ export const pt = {
   },
   kingReturns: {
     history: '<b>{cardOwner}</b> usou a carta «{cardName}» para cancelar a última votação e mudar a liderança',
+  },
+  playCard: {
+    history: '<b>{cardOwner}</b> jogou a carta «{cardName}»',
   },
   preVote: {
     title: 'Votação preliminar',
@@ -415,7 +419,14 @@ export const pt = {
   },
   checkLoyalty: {
     checkInfo: '<b>{ladyOwner}</b> verificou a lealdade de <b>{ladyTarget}</b>',
+  },
+  revealLoyalty: {
+    revealInfo: '<b>{revealer}</b> revelou sua lealdade para <b>{target}</b>',
+  },
+  announceLoyalty: {
+    announceInfo: '<b>{announcer}</b> anunciou a lealdade de <b>{target}</b>',
     declareInfo: 'E declarou sua lealdade como',
+    actualInfo: 'na verdade',
   },
   lancelotsHistory: {
     becameEvil: 'tornou-se mau',

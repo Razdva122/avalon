@@ -214,7 +214,7 @@ export class GameStateManager {
               player.features.isSent = true;
 
               if (player.id === excaliburOwnerID) {
-                player.features.excalibur = true;
+                player.features.excalibur = 'active';
               }
             }
           }
@@ -229,7 +229,7 @@ export class GameStateManager {
             const player = current.players.find((player) => teamMember.id === player.id);
 
             if (player) {
-              player.features.excalibur = teamMember.excalibur;
+              player.features.excalibur = 'has';
               player.features.isSent = true;
             }
           });
@@ -309,6 +309,9 @@ export class GameStateManager {
         restoreHonor: 'restoreHonor',
         ambush: 'ambush',
         kingReturns: 'kingReturns',
+        announceLoyalty: 'announceLoyalty',
+        revealLoyalty: 'revealLoyalty',
+        playCard: 'playCard',
       } as const
     )[history.type];
   }

@@ -65,6 +65,15 @@ export const useHasActiveCard = (
   return computed(() => hasActiveCard(game.value, playerID.value, cardName));
 };
 
+export const useHaveActiveLoyaltyCard = (game: Ref<VisualGameState>, playerID: Ref<string | undefined>) => {
+  return computed(
+    () =>
+      hasActiveCard(game.value, playerID.value, 'showNature') ||
+      hasActiveCard(game.value, playerID.value, 'areYouTheOne') ||
+      hasActiveCard(game.value, playerID.value, 'showStrength'),
+  );
+};
+
 /**
  * Create a computed property that checks if a player has a card (any stage)
  * @param game Ref to the game state

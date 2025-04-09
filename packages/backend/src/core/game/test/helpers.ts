@@ -6,6 +6,7 @@ import { KingReturnsCard } from '@/core/game/addons/plot-cards/cards/usable/king
 import { AmbushCard } from '@/core/game/addons/plot-cards/cards/usable/ambush';
 import { RestoreHonorCard } from '@/core/game/addons/plot-cards/cards/instant/restoreHonor';
 import { ChargeCard } from '@/core/game/addons/plot-cards/cards/effects/charge';
+import { TPlotCard } from '../addons/plot-cards/interface';
 
 const users = [
   new User('1', 'Misha'),
@@ -161,7 +162,7 @@ export class GameTestHelper {
     const playerID = userID ?? this.game.players.find((player) => player.features.ladyOfLake === undefined)!.user.id;
 
     const ownerID = this.game.players.find((player) => {
-      return player.features.ladyOfLake == 'has';
+      return player.features.ladyOfLake == 'active';
     })!.user.id;
 
     this.game.selectPlayer(ownerID, playerID);
@@ -173,7 +174,7 @@ export class GameTestHelper {
     const playerID = userID ?? this.game.players.find((player) => player.features.ladyOfSea === undefined)!.user.id;
 
     const ownerID = this.game.players.find((player) => {
-      return player.features.ladyOfSea == 'has';
+      return player.features.ladyOfSea === 'active';
     })!.user.id;
 
     this.game.selectPlayer(ownerID, playerID);
@@ -190,7 +191,7 @@ export class GameTestHelper {
 
   announceLoyalty(loyalty: TLoyalty | TRoles): this {
     const id = this.game.players.find((player) => {
-      return player.features.ladyOfLake == 'has' || player.features.ladyOfSea === 'has';
+      return player.features.ladyOfLake == 'active' || player.features.ladyOfSea === 'active';
     })!.user.id;
 
     (this.game.addons.ladyOfLake || this.game.addons.ladyOfSea)!.announceLoyalty(id, loyalty);
@@ -246,7 +247,7 @@ export class GameTestHelper {
     const playerID = userID ?? this.game.players.find((player) => !player.features.witchLoyalty)!.user.id;
 
     const ownerID = this.game.players.find((player) => {
-      return player.features.witchLoyalty === true;
+      return player.features.witchLoyalty === 'active';
     })!.user.id;
 
     this.game.selectPlayer(ownerID, playerID);
@@ -256,37 +257,8 @@ export class GameTestHelper {
   }
 
   // Plot Cards methods
-  giveCard(
-    cardNameOrArray: TPlotCardNames | Array<[TPlotCardNames, string | undefined]>,
-    targetPlayerId?: string,
-  ): this {
-    const arr: Array<[TPlotCardNames, string | undefined]> = Array.isArray(cardNameOrArray)
-      ? cardNameOrArray
-      : [[cardNameOrArray, targetPlayerId]];
-
-    this.game.addons.plotCards!.currentCards.cards = [];
-
-    arr.forEach(([cardName]) => {
-      // Find the card by name
-      const foundCard = this.game.addons.plotCards!.cards.find(
-        (plotCard) =>
-          plotCard.name === cardName &&
-          plotCard.ownerID === undefined &&
-          this.game.addons.plotCards!.currentCards.cards.every(({ card }) => card !== plotCard),
-      );
-
-      if (!foundCard) {
-        throw new Error(`Card with name ${cardName} not found`);
-      }
-
-      // Add the card to currentCards
-      this.game.addons.plotCards!.currentCards.cards.push({
-        stage: 'pending',
-        card: foundCard,
-      });
-    });
-
-    arr.forEach(([, targetPlayerId]) => {
+  giveCard(targetPlayerIDs: Array<string | undefined>): this {
+    targetPlayerIDs.forEach((targetPlayerId) => {
       // If no target is specified, give the card to a non-leader player
       const targetPlayer = targetPlayerId
         ? this.game.players.find((player) => player.user.id === targetPlayerId)
@@ -400,4 +372,17 @@ export class GameTestHelper {
 
     return this;
   }
+}
+
+export function movePlotCardsToStart(game: Game, cards: TPlotCardNames[]) {
+  const movedCards: TPlotCard[] = [];
+
+  cards.forEach((cardName) => {
+    const cardIndex = game.addons.plotCards!.cards.findIndex(
+      (card) => card.name === cardName && !movedCards.includes(card),
+    );
+    const card = game.addons.plotCards!.cards.splice(cardIndex, 1)[0];
+    game.addons.plotCards!.cards.unshift(card);
+    movedCards.push(card);
+  });
 }

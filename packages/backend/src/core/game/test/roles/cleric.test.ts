@@ -1,5 +1,4 @@
 import { generateNewGame } from '@/core/game/test/const';
-import * as _ from 'lodash';
 
 let { game, gameHelper } = generateNewGame();
 
@@ -26,7 +25,7 @@ describe('Cleric', () => {
       };
     } else {
       expected = {
-        [leader.user.id]: leader.role.visibleLoylaty,
+        [leader.user.id]: leader.role.visibleLoyalty,
         [clericId]: 'cleric',
       };
     }

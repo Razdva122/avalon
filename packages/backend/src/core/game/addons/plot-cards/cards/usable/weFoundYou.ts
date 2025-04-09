@@ -1,5 +1,7 @@
 import { AbstractCard } from '@/core/game/addons/plot-cards/cards/abstract';
 import { IUsablePlotCard } from '@/core/game/addons/plot-cards/interface';
+import { Game } from '@/core/game';
+import { PlotCardsAddon } from '@/core/game/addons/plot-cards';
 import { of } from 'rxjs';
 
 /**
@@ -17,9 +19,12 @@ export class WeFoundYouCard extends AbstractCard implements IUsablePlotCard {
   name = <const>'weFoundYou';
   type = <const>'usable';
 
+  constructor(game: Game, addon: PlotCardsAddon) {
+    super(game, addon);
+  }
+
   play(ownerID: string) {
     this.activateCard(ownerID);
-    this.game.stateObserver.gameStateChanged();
     return of(true);
   }
 }

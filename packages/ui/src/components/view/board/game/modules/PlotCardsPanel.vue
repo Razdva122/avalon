@@ -15,6 +15,10 @@
       ></PlotCard>
     </div>
 
+    <template v-if="isLoyaltyCheckStage && isUserLoyaltyCardOwner && activeCard">
+      <LoyaltyCardActions :card-name="activeCard.name" :stage="game.stage" :game-uuid="game.uuid" />
+    </template>
+
     <template v-if="game.stage === 'giveCard' && isUserLeader">
       <v-btn color="success" @click="givePlotCard" :disabled="!isGivePlotCardAvailable">
         {{ $t('inGame.giveCard') }}
@@ -85,10 +89,12 @@
 import { defineComponent, PropType, toRefs, computed } from 'vue';
 import PlotCard from '@/components/view/information/PlotCard.vue';
 import RestoreHonorView from '@/components/view/board/game/modules/RestoreHonorView.vue';
+import LoyaltyCardActions from '@/components/view/board/game/modules/LoyaltyCardActions.vue';
+import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
 import type { ActiveCard, VisualGameState } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useGamePlayerState } from '@/helpers/composables/useGamePlayerState';
-import { useHasActiveCard, hasActiveCard } from '@/helpers/plot-cards';
+import { useHasActiveCard, hasActiveCard, useHaveActiveLoyaltyCard } from '@/helpers/plot-cards';
 
 type TMethodsWithoutParams = 'useAmbush';
 
@@ -97,6 +103,8 @@ export default defineComponent({
   components: {
     PlotCard,
     RestoreHonorView,
+    LoyaltyCardActions,
+    AnnounceLoyalty,
   },
   props: {
     data: {
@@ -121,6 +129,15 @@ export default defineComponent({
     const isUserLeadToVictoryOwner = useHasActiveCard(game, playerID, 'leadToVictory');
     const isUserRestoreHonorOwner = useHasActiveCard(game, playerID, 'restoreHonor');
     const isUserKingReturnsOwner = useHasActiveCard(game, playerID, 'kingReturns');
+    const isUserLoyaltyCardOwner = useHaveActiveLoyaltyCard(game, playerID);
+
+    const isLoyaltyCheckStage = computed(() => {
+      return ['checkLoyalty', 'revealLoyalty'].includes(game.value.stage);
+    });
+
+    const activeCard = computed(() => {
+      return game.value.addonsData.plotCards?.cardsInGame.find((card) => card.stage === 'active');
+    });
 
     const isGivePlotCardAvailable = computed(() => {
       return (
@@ -168,6 +185,9 @@ export default defineComponent({
       isUserKingReturnsOwner,
       isGivePlotCardAvailable,
       isUseAmbushAvailable,
+      isLoyaltyCheckStage,
+      isUserLoyaltyCardOwner,
+      activeCard,
       givePlotCard,
       leadToVictoryClick,
       kingReturnsClick,

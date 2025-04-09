@@ -8,7 +8,7 @@ export function calculateVisualElement(history: THistoryResults[]): { element?: 
   if (
     lastElement?.type === 'vote' ||
     lastElement?.type === 'preVote' ||
-    (lastElement?.type === 'checkLoyalty' && lastElement.result) ||
+    (lastElement?.type === 'announceLoyalty' && lastElement.announced) ||
     lastElement?.type === 'mission' ||
     lastElement?.type === 'switchLancelots' ||
     lastElement?.type === 'ambush'

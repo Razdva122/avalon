@@ -16,10 +16,10 @@ export class ExcaliburAddon implements IGameAddon {
 
   afterInit() {
     // On give excalibur leader should select player
-    this.game.selectAvailable.giveExcalibur = (player) => Boolean(player.features.isLeader);
+    this.game.addSelectAvailableStage('giveExcalibur', (player) => Boolean(player.features.isLeader));
 
     // On use excalibur user with excalibur should select player
-    this.game.selectAvailable.useExcalibur = (player) => Boolean(player.features.excalibur);
+    this.game.addSelectAvailableStage('useExcalibur', (player) => Boolean(player.features.excalibur));
 
     return of(true);
   }
@@ -33,7 +33,7 @@ export class ExcaliburAddon implements IGameAddon {
   }
 
   beforeSelectTeam() {
-    this.game.players.forEach((player) => (player.features.excalibur = false));
+    this.game.players.forEach((player) => (player.features.excalibur = undefined));
 
     return of(true);
   }
@@ -41,6 +41,7 @@ export class ExcaliburAddon implements IGameAddon {
   beforeEndMission() {
     const playerWithExcalibur = this.game.players.find((player) => player.features.excalibur)!;
     playerWithExcalibur.features.waitForAction = true;
+    playerWithExcalibur.features.excalibur = 'active';
 
     this.game.stage = 'useExcalibur';
     this.game.stateObserver.gameStateChanged();
@@ -71,7 +72,7 @@ export class ExcaliburAddon implements IGameAddon {
       throw new Error('You cant give excalibur to player outside of mission');
     }
 
-    selectedPlayer.features.excalibur = true;
+    selectedPlayer.features.excalibur = 'has';
     selectedPlayer.features.isSelected = false;
 
     const member = this.game.vote!.data.team.find((player) => player.id === selectedPlayer.user.id)!;
@@ -111,7 +112,7 @@ export class ExcaliburAddon implements IGameAddon {
 
     this.game.history.push(switchHistory);
 
-    ownerOfExcalibur.features.excalibur = false;
+    ownerOfExcalibur.features.excalibur = undefined;
     ownerOfExcalibur.features.waitForAction = false;
 
     this.useExcaliburSubject.next(true);

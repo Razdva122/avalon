@@ -18,6 +18,9 @@ import {
   Ambush,
   RestoreHonor,
   KingReturns,
+  AnnounceLoyalty,
+  RevealLoyalty,
+  PlayCard,
 } from './history';
 import type { THistoryResults } from './history';
 import { GameSettingsWithRoles } from './settings';
@@ -69,6 +72,8 @@ export class VisualGameState {
       { type: HistoryMissionBase, value: 'mission' },
       { type: HistoryAssassinate, value: 'assassinate' },
       { type: CheckLoyalty, value: 'checkLoyalty' },
+      { type: AnnounceLoyalty, value: 'announceLoyalty' },
+      { type: RevealLoyalty, value: 'revealLoyalty' },
       { type: SwitchResult, value: 'switchResult' },
       { type: HiddenHistory, value: 'hiddenHistory' },
       { type: SwitchLancelots, value: 'switchLancelots' },
@@ -78,6 +83,7 @@ export class VisualGameState {
       { type: RestoreHonor, value: 'restoreHonor' },
       { type: Ambush, value: 'ambush' },
       { type: KingReturns, value: 'kingReturns' },
+      { type: PlayCard, value: 'playCard' },
     ],
   })
   public history!: THistoryResults[];

@@ -9,8 +9,6 @@ import type { TWitchStages } from './witch';
 import type { TAssassinAddonStages } from './assassin';
 import { AssassinAddonData } from './assassin';
 
-export * from './loyalty';
-
 export type { TAssassinateResult, TAssassinateType, AssassinAddonData, AssassinateProgressData } from './assassin';
 
 export type {
@@ -43,19 +41,19 @@ export class AddonsFeatures {
    * A sign that the player has the Lady of the Lake ability or not
    */
   @prop()
-  ladyOfLake?: 'has' | 'used';
+  ladyOfLake?: 'has' | 'active' | 'used';
 
   /**
    * A sign that the player has the Lady of the sea ability or not
    */
   @prop()
-  ladyOfSea?: 'has' | 'used';
+  ladyOfSea?: 'has' | 'active' | 'used';
 
   /**
    * A sign that the player has the excalibur
    */
   @prop()
-  excalibur?: boolean;
+  excalibur?: 'has' | 'active';
 
   /**
    * True if player assassin
@@ -64,10 +62,10 @@ export class AddonsFeatures {
   isAssassin?: boolean;
 
   /**
-   * True if player get witch loyalty
+   * Active if player get witch loyalty
    */
   @prop()
-  witchLoyalty?: boolean;
+  witchLoyalty?: 'active';
 }
 
 /**

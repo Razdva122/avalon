@@ -52,5 +52,5 @@ export interface IStateObserver {
 }
 
 export type TSelectAvailable = {
-  [key in TGameStage]?: (player: IPlayerInGame) => boolean;
+  [key in TGameStage]?: Array<(player: IPlayerInGame) => boolean>;
 };

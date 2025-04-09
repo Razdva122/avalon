@@ -49,7 +49,7 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
 
   afterInit() {
     // On assassinate stage assassin can select players
-    this.game.selectAvailable.assassinate = (player) => Boolean(player.features.isAssassin);
+    this.game.addSelectAvailableStage('assassinate', (player) => Boolean(player.features.isAssassin));
 
     return of(true);
   }

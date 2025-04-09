@@ -17,7 +17,7 @@ import {
   ShowStrengthCard,
 } from '@/core/game/addons/plot-cards/cards';
 
-import { GiveCardHistory } from '@/core/game/addons/plot-cards/history';
+import { GiveCardHistory, PlayCardHistory } from '@/core/game/addons/plot-cards/history';
 
 export * from '@/core/game/addons/plot-cards/helpers';
 
@@ -96,18 +96,21 @@ export class PlotCardsAddon implements IGameAddon {
   }
 
   afterInit() {
-    this.game.selectAvailable.giveCard = (player) => player.features.isLeader === true;
-    this.game.selectAvailable.preVote = (player) => player.features.waitForAction === true;
+    this.game.addSelectAvailableStage('giveCard', (player) => player.features.isLeader === true);
+    this.game.addSelectAvailableStage('preVote', (player) => player.features.waitForAction === true);
 
     const isCardActive = (cardName: TPlotCardNames) => (player: IPlayerInGame) =>
       this.cardsInGame.some(
         (card) => card.name === cardName && card.ownerID === player.user.id && card.stage === 'active',
       );
 
-    this.game.selectAvailable.ambush = isCardActive('ambush');
-    this.game.selectAvailable.leadToVictory = isCardActive('leadToVictory');
-    this.game.selectAvailable.restoreHonor = isCardActive('restoreHonor');
-    this.game.selectAvailable.kingReturns = isCardActive('kingReturns');
+    this.game.addSelectAvailableStage('ambush', isCardActive('ambush'));
+    this.game.addSelectAvailableStage('leadToVictory', isCardActive('leadToVictory'));
+    this.game.addSelectAvailableStage('restoreHonor', isCardActive('restoreHonor'));
+    this.game.addSelectAvailableStage('kingReturns', isCardActive('kingReturns'));
+    this.game.addSelectAvailableStage('checkLoyalty', isCardActive('areYouTheOne'));
+    this.game.addSelectAvailableStage('revealLoyalty', isCardActive('showNature'));
+    this.game.addSelectAvailableStage('revealLoyalty', isCardActive('showStrength'));
 
     return of(true);
   }
@@ -128,6 +131,8 @@ export class PlotCardsAddon implements IGameAddon {
           take(1),
           concatMap(() => {
             if (data.card.type === 'instant') {
+              const owner = this.game.findPlayerByID(data.card.ownerID!);
+              this.game.history.push(new PlayCardHistory({ owner, cardName: data.card.name }));
               this.currentCardState.stage = 'active';
               this.game.stateObserver.gameStateChanged();
               return this.playCardIfExist(data.card.name);

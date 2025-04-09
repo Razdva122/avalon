@@ -193,11 +193,12 @@ export default defineComponent({
         initialization: 'initialization',
         giveExcalibur: 'excalibur',
         checkLoyalty: 'check loyalty',
+        announceLoyalty: 'announce loyalty',
+        revealLoyalty: 'reveal loyalty',
         witchLoyalty: 'witch loyalty',
         end: 'end',
         switchLancelots: 'lancelots',
         assassinate: 'assassinate',
-        announceLoyalty: 'announce loyalty',
         hidden: 'hidden',
         witchAbility: 'witch',
         giveCard: 'give card',
@@ -206,6 +207,7 @@ export default defineComponent({
         restoreHonor: 'restore honor',
         ambush: 'ambush',
         kingReturns: 'king returns',
+        playCard: 'play card',
       }[gameState.value.stage];
     });
 

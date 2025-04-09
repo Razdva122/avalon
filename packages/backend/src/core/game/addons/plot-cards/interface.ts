@@ -1,6 +1,7 @@
 import { Game } from '@/core/game';
 import { TEffectsCardNames, TUsableCardNames, TInstantCardNames, TActiveCardsStages } from '@avalon/types';
 import { Observable } from 'rxjs';
+import { LoyaltyChecker } from '@/core/game/addons/check-loyalty/loyalty-checker';
 
 export type TPlotCard = IEffectPlotCard | IUsablePlotCard | IInstantPlotCard;
 
@@ -25,6 +26,11 @@ export interface IBasePlotCard {
    * - 'multiCard': All cards of this type are played simultaneously
    */
   playType: 'single' | 'multiCard';
+
+  /**
+   * Loyalty checker for cards that check loyalty
+   */
+  loyaltyChecker?: LoyaltyChecker;
 
   game: Game;
   play(ownerID: string): Observable<boolean>;

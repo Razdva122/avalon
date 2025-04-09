@@ -23,7 +23,6 @@ import {
   MissionWithResult,
   TLoyalty,
   TRoles,
-  TLoyaltyType,
 } from '@avalon/types';
 
 export * from '@/core/game-manager/interface';
@@ -239,10 +238,13 @@ export class GameManager {
         this.handleLoyaltyAction(userID, 'checkLoyalty');
         break;
 
+      case 'revealLoyalty':
+        this.handleLoyaltyAction(userID, 'revealLoyalty');
+        break;
+
       case 'announceLoyalty':
         this.handleLoyaltyAction(userID, 'announceLoyalty', {
           loyalty: params.loyalty,
-          type: params.type,
         });
         break;
 
@@ -335,65 +337,122 @@ export class GameManager {
    */
   private handleLoyaltyAction(
     userID: string,
-    method: 'checkLoyalty' | 'announceLoyalty',
-    params?: { loyalty: TLoyalty | TRoles; type: TLoyaltyType },
+    method: 'checkLoyalty' | 'revealLoyalty' | 'announceLoyalty',
+    params?: { loyalty: TLoyalty | TRoles },
   ): void {
-    // For witch loyalty check
-    if (this.game.addons.witch && (this.game.stage === 'witchLoyalty' || params?.type === 'witch')) {
+    const activeType = this.getActiveLoyaltyCheckerType();
+
+    if (activeType === 'plot-card') {
       if (method === 'checkLoyalty') {
-        this.game.addons.witch.checkLoyalty(userID);
+        this.checkLoyaltyFromCard(userID);
+        return;
+      } else if (method === 'revealLoyalty') {
+        this.revealLoyaltyFromCard(userID);
         return;
       } else if (method === 'announceLoyalty' && params) {
-        this.game.addons.witch.announceLoyalty(userID, params.loyalty);
+        this.announceLoyaltyFromCard(userID, params.loyalty);
+        return;
+      }
+
+      return;
+    }
+
+    if (this.game.addons[activeType]) {
+      if (method === 'checkLoyalty') {
+        this.game.addons[activeType].checkLoyalty(userID);
+        return;
+      } else if (method === 'announceLoyalty' && params) {
+        this.game.addons[activeType].announceLoyalty(userID, params.loyalty);
         return;
       }
     }
 
-    // For Lady of Lake
-    if (this.game.addons.ladyOfLake) {
-      if (method === 'checkLoyalty') {
-        this.game.addons.ladyOfLake.checkLoyalty(userID);
-        return;
-      } else if (method === 'announceLoyalty' && params) {
-        this.game.addons.ladyOfLake.announceLoyalty(userID, params.loyalty);
-        return;
+    throw new Error(`You can't use ${method} in this game with the current active features`);
+  }
+
+  /**
+   * Gets the active loyalty checker type
+   */
+  private getActiveLoyaltyCheckerType() {
+    // Check player features first
+    for (const player of this.game.players) {
+      if (player.features.ladyOfLake === 'active') {
+        return 'ladyOfLake';
+      }
+      if (player.features.ladyOfSea === 'active') {
+        return 'ladyOfSea';
+      }
+      if (player.features.witchLoyalty === 'active') {
+        return 'witch';
       }
     }
 
-    // For Lady of Sea
-    if (this.game.addons.ladyOfSea) {
-      if (method === 'checkLoyalty') {
-        this.game.addons.ladyOfSea.checkLoyalty(userID);
-        return;
-      } else if (method === 'announceLoyalty' && params) {
-        this.game.addons.ladyOfSea.announceLoyalty(userID, params.loyalty);
-        return;
-      }
+    // Check for plot cards with loyalty checker
+    if (this.game.addons.plotCards?.activeCard?.loyaltyChecker) {
+      return 'plot-card';
     }
 
-    throw new Error(`You can't use ${method} in this game`);
+    throw new Error('There is no active loyalty check');
+  }
+
+  /**
+   * Checks loyalty from a plot card
+   */
+  private checkLoyaltyFromCard(userID: string): void {
+    const card = this.game.addons.plotCards!.activeCard!;
+
+    const owner = this.game.findPlayerByID(card.ownerID!);
+    if (this.game.selectedPlayers.length !== 1) {
+      throw new Error('Only one player can be selected to check loyalty');
+    }
+
+    card.loyaltyChecker!.checkLoyalty(userID, owner, this.game.selectedPlayers[0]);
+  }
+
+  /**
+   * Reveals loyalty from a plot card
+   */
+  private revealLoyaltyFromCard(userID: string): void {
+    const card = this.game.addons.plotCards!.activeCard!;
+
+    const owner = this.game.findPlayerByID(card.ownerID!);
+    if (this.game.selectedPlayers.length !== 1) {
+      throw new Error('Only one player can be selected to reveal loyalty to');
+    }
+
+    card.loyaltyChecker!.revealLoyalty(userID, owner, this.game.selectedPlayers[0]);
+  }
+
+  /**
+   * Gets loyalty from a plot card
+   */
+  private getLoyaltyFromCard(userID: string): TLoyalty | TRoles {
+    const card = this.game.addons.plotCards!.activeCard!;
+    return card.loyaltyChecker!.getLoyalty(userID, this.game.selectedPlayers[0]);
+  }
+
+  /**
+   * Announces loyalty from a plot card
+   */
+  private announceLoyaltyFromCard(userID: string, loyalty: TLoyalty | TRoles): void {
+    const card = this.game.addons.plotCards!.activeCard!;
+    card.loyaltyChecker!.announceLoyalty(userID, this.game.selectedPlayers[0], loyalty);
   }
 
   getGameData<T extends TGetLoyaltyData>(userID: string, params: T['params']): T['result'] {
+    const activeType = this.getActiveLoyaltyCheckerType();
+
     switch (params.method) {
       case 'getLoyalty':
-        if (params.type === 'witch') {
-          if (this.game.addons.witch) {
-            return this.game.addons.witch.getLoyalty(userID);
-          }
-
-          throw new Error('You cant get loyalty of witch in game without witch addon');
+        if (activeType === 'plot-card') {
+          return this.getLoyaltyFromCard(userID);
         }
 
-        if (this.game.addons.ladyOfLake) {
-          return this.game.addons.ladyOfLake.getLoyalty(userID);
+        if (this.game.addons[activeType]) {
+          return this.game.addons[activeType].getLoyalty(userID);
         }
 
-        if (this.game.addons.ladyOfSea) {
-          return this.game.addons.ladyOfSea.getLoyalty(userID);
-        }
-
-        throw new Error('You cant use lady in game without lady addon');
+        throw new Error('You cant get loyalty');
     }
   }
 }

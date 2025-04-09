@@ -46,7 +46,7 @@ export abstract class Character {
   /**
    * Loyalty during various checks
    */
-  get visibleLoylaty(): TLoyalty {
+  get visibleLoyalty(): TLoyalty {
     return this.loyalty;
   }
 }

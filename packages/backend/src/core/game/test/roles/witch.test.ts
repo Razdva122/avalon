@@ -25,11 +25,11 @@ describe('Witch', () => {
     expect(_.last(game.history)?.type).toBe('vote');
   });
 
-  test('Should change stage to witch stage', () => {
+  test('Should change stage to check loyalty stage', () => {
     gameHelper.useWitchAbility();
     const ownerOfLoyaltyCheck = game.players.find((player) => player.features.witchLoyalty)!;
 
-    expect(game.stage).toBe('witchLoyalty');
+    expect(game.stage).toBe('checkLoyalty');
     expect(ownerOfLoyaltyCheck.features.waitForAction).toBe(true);
   });
 

@@ -13,6 +13,8 @@ import type {
   SwitchLancelots,
   TLoyalty,
   CheckLoyalty,
+  RevealLoyalty,
+  AnnounceLoyalty,
   TAssassinateType,
   TeamMember,
   TRoles,
@@ -24,6 +26,7 @@ import type {
   RestoreHonor,
   Ambush,
   KingReturns,
+  PlayCard,
 } from '@avalon/types';
 
 export type THistoryData = {
@@ -53,8 +56,16 @@ export type THistoryData = {
   checkLoyalty: {
     validator: IPlayerInGame;
     inspected: IPlayerInGame;
-    result: TLoyalty | TRoles;
-    visibleLoyalty: TLoyalty | TRoles;
+  };
+  revealLoyalty: {
+    revealer: IPlayerInGame;
+    target: IPlayerInGame;
+  };
+  announceLoyalty: {
+    announcer: IPlayerInGame;
+    target: IPlayerInGame;
+    announced: TLoyalty | TRoles;
+    actual: TLoyalty | TRoles;
   };
   switchResult: {
     switcher: IPlayerInGame;
@@ -72,22 +83,18 @@ export type THistoryData = {
   };
   giveCard: {
     cardName: TPlotCardNames;
-    result?: undefined;
     target: TGiveCardTarget;
     leader: IPlayerInGame;
     owner: IPlayerInGame;
   };
   preVote: {
-    result?: undefined;
     votes: IPreVote[];
   };
   leadToVictory: {
-    result?: undefined;
     prevLeader: IPlayerInGame;
     owner: IPlayerInGame;
   };
   restoreHonor: {
-    result?: undefined;
     prevOwner: IPlayerInGame;
     newOwner: IPlayerInGame;
     cardName: TPlotCardNames;
@@ -99,7 +106,10 @@ export type THistoryData = {
   };
   kingReturns: {
     owner: IPlayerInGame;
-    result?: undefined;
+  };
+  playCard: {
+    owner: IPlayerInGame;
+    cardName: TPlotCardNames;
   };
   hidden: Record<string, never>;
 };
@@ -109,6 +119,8 @@ export type THistoryDataForManager = {
   mission: THistoryMission;
   assassinate: HistoryAssassinate;
   checkLoyalty: CheckLoyalty;
+  revealLoyalty: RevealLoyalty;
+  announceLoyalty: AnnounceLoyalty;
   switchResult: SwitchResult;
   switchLancelots: SwitchLancelots;
   giveCard: GiveCard;
@@ -117,6 +129,7 @@ export type THistoryDataForManager = {
   restoreHonor: RestoreHonor;
   ambush: Ambush;
   kingReturns: KingReturns;
+  playCard: PlayCard;
 };
 
 export type TDataForManagerOptions = {

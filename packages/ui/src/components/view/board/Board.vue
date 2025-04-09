@@ -21,16 +21,7 @@
             </div>
           </template>
           <template v-else>
-            <template
-              v-if="
-                stateManager.viewMode.value === 'live' &&
-                gameState.stage === 'announceLoyalty' &&
-                (playerInGame?.features.ladyOfLake === 'has' ||
-                  playerInGame?.features.ladyOfSea === 'has' ||
-                  playerInGame?.features.witchLoyalty === true) &&
-                visibleHistory?.type !== 'checkLoyalty'
-              "
-            >
+            <template v-if="shouldShowAnnounceLoyalty">
               <AnnounceLoyalty />
             </template>
             <Game v-else :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory">
@@ -73,7 +64,7 @@ import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
 import eventBus from '@/helpers/event-bus';
 import { THistoryResults } from '@avalon/types';
-import { hasActiveCard } from '@/helpers/plot-cards';
+import { hasActiveCard, useHaveActiveLoyaltyCard } from '@/helpers/plot-cards';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { gameStateKey, stateManagerKey, TPageRoomState } from '@/helpers/game-state-manager';
@@ -151,12 +142,15 @@ export default defineComponent({
         (stage === 'giveExcalibur' && features.isLeader) ||
         (stage === 'assassinate' && features.isAssassin) ||
         (stage === 'useExcalibur' && features.excalibur) ||
-        (stage === 'checkLoyalty' && (features.ladyOfLake === 'has' || features.ladyOfSea === 'has')) ||
-        (stage === 'witchLoyalty' && features.witchLoyalty) ||
+        (stage === 'checkLoyalty' && (features.ladyOfLake === 'active' || features.ladyOfSea === 'active')) ||
+        (stage === 'checkLoyalty' && features.witchLoyalty === 'active') ||
         (stage === 'giveCard' && features.isLeader) ||
         (stage === 'ambush' && hasActiveCard(gameState.value, playerID, 'ambush')) ||
         (stage === 'leadToVictory' && hasActiveCard(gameState.value, playerID, 'leadToVictory')) ||
-        (stage === 'restoreHonor' && hasActiveCard(gameState.value, playerID, 'restoreHonor'))
+        (stage === 'restoreHonor' && hasActiveCard(gameState.value, playerID, 'restoreHonor')) ||
+        (stage === 'checkLoyalty' && hasActiveCard(gameState.value, playerID, 'areYouTheOne')) ||
+        (stage === 'revealLoyalty' && hasActiveCard(gameState.value, playerID, 'showNature')) ||
+        (stage === 'revealLoyalty' && hasActiveCard(gameState.value, playerID, 'showStrength'))
       );
     };
 
@@ -255,6 +249,32 @@ export default defineComponent({
       }
     });
 
+    const playerID = computed(() => playerInGame.value?.id);
+
+    const isUserLoyaltyAnnouncer = computed(() => {
+      if (!playerInGame.value) {
+        return false;
+      }
+
+      return (
+        playerInGame.value.features.ladyOfLake === 'active' ||
+        playerInGame.value.features.ladyOfSea === 'active' ||
+        playerInGame.value.features.witchLoyalty === 'active' ||
+        (useHaveActiveLoyaltyCard(gameState, playerID) && playerInGame.value.features.waitForAction === true)
+      );
+    });
+
+    const shouldShowAnnounceLoyalty = computed(() => {
+      if (gameState.value.stage !== 'announceLoyalty') {
+        return false;
+      }
+      if (stateManager.viewMode.value !== 'live' || visibleHistory.value?.type === 'announceLoyalty') {
+        return false;
+      }
+
+      return isUserLoyaltyAnnouncer.value;
+    });
+
     return {
       roomState,
       gameState,
@@ -264,6 +284,7 @@ export default defineComponent({
       stateManager,
       gameResult,
       userIsLeader,
+      shouldShowAnnounceLoyalty,
 
       timerDuration,
       clearHistoryElement,

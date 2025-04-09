@@ -48,6 +48,7 @@ export const es = {
     'lead to victory': 'liderar hacia la victoria',
     'restore honor': 'restaura tu honor',
     'king returns': 'el rey regresa',
+    'play card': 'jugar carta',
     ambush: 'emboscada',
     end: 'fin',
     lancelots: 'lancelotes',
@@ -241,6 +242,7 @@ export const es = {
     takeCard: 'Tomar carta',
     selectCard: 'Seleccionar una carta',
     noAvailableCards: 'No hay cartas disponibles',
+    revealLoyalty: 'Revelar Lealtad',
   },
   assassinate: {
     lovers: 'Amantes',
@@ -265,6 +267,9 @@ export const es = {
   },
   kingReturns: {
     history: '<b>{cardOwner}</b> usó la carta «{cardName}» para cancelar la última votación y cambiar el liderazgo',
+  },
+  playCard: {
+    history: '<b>{cardOwner}</b> jugó la carta «{cardName}»',
   },
   preVote: {
     title: 'Votación preliminar',
@@ -348,6 +353,7 @@ export const es = {
     restoreHonor: 'Honor',
     ambush: 'Emboscada',
     kingReturns: 'Rey',
+    playCard: 'Jugar',
     charge: 'Acusación',
     showNature: 'Naturaleza',
     areYouTheOne: 'Elegido',
@@ -408,7 +414,14 @@ export const es = {
   },
   checkLoyalty: {
     checkInfo: '<b>{ladyOwner}</b> verificó la lealtad de <b>{ladyTarget}</b>',
+  },
+  revealLoyalty: {
+    revealInfo: '<b>{revealer}</b> reveló su lealtad a <b>{target}</b>',
+  },
+  announceLoyalty: {
+    announceInfo: '<b>{announcer}</b> anunció la lealtad de <b>{target}</b>',
     declareInfo: 'Y declaró su lealtad como',
+    actualInfo: 'en realidad',
   },
   lancelotsHistory: {
     becameEvil: 'se volvió malvado',

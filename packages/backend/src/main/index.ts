@@ -489,14 +489,19 @@ export class Manager {
       getRoomManager(uuid).callGameMethods(userID, { method: 'checkLoyalty' });
     });
 
-    socket.on('announceLoyalty', (uuid, loyalty, type) => {
-      console.log(`Player ${userName} announceLoyalty in game ${uuid}`);
-      getRoomManager(uuid).callGameMethods(userID, { method: 'announceLoyalty', loyalty, type });
+    socket.on('revealLoyalty', (uuid) => {
+      console.log(`Player ${userName} revealLoyalty in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'revealLoyalty' });
     });
 
-    socket.on('getLoyalty', (uuid, type, cb) => {
+    socket.on('announceLoyalty', (uuid, loyalty) => {
+      console.log(`Player ${userName} announceLoyalty in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'announceLoyalty', loyalty });
+    });
+
+    socket.on('getLoyalty', (uuid, cb) => {
       console.log(`Player ${userName} getLoyalty in game ${uuid}`);
-      cb(getRoomManager(uuid).getGameData(userID, { method: 'getLoyalty', type }));
+      cb(getRoomManager(uuid).getGameData(userID, { method: 'getLoyalty' }));
     });
 
     socket.on('giveExcalibur', (uuid) => {

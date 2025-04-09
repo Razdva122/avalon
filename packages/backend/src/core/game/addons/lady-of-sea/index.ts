@@ -4,7 +4,7 @@ import { evilRolesImportance } from '@avalon/types';
 
 import { IGameAddon } from '@/core/game/addons/interface';
 import { Game, IPlayerInGame } from '@/core/game';
-import { Dictionary, TLoyalty, TRoles, TEvilRoles, TVisibleRole, AddonsData } from '@avalon/types';
+import { TLoyalty, TRoles, TEvilRoles, AddonsData, TVisibleRole, Dictionary } from '@avalon/types';
 import { LadyOfLakeAddon } from '@/core/game/addons/lady-of-lake';
 
 export class LadyOfSeaAddon extends LadyOfLakeAddon implements IGameAddon {
@@ -33,22 +33,20 @@ export class LadyOfSeaAddon extends LadyOfLakeAddon implements IGameAddon {
     };
   }
 
-  protected override calculateLoyalty(selectedPlayer: IPlayerInGame): TLoyalty | TRoles {
-    if (selectedPlayer.role.visibleLoylaty === 'good') {
+  calculateLoyalty(selectedPlayer: IPlayerInGame): TLoyalty | TRoles {
+    if (selectedPlayer.role.visibleLoyalty === 'good') {
       return 'good';
     }
 
     // Generate random evil role from game
-    if (selectedPlayer.role.visibleLoylaty === 'evil' && selectedPlayer.role.loyalty === 'good') {
+    if (selectedPlayer.role.visibleLoyalty === 'evil' && selectedPlayer.role.loyalty === 'good') {
       return this.fakeEvilRole;
     }
 
     return selectedPlayer.role.role;
   }
 
-  override updateVisibleRoles(owner: IPlayerInGame, selectedPlayer: IPlayerInGame): void {
-    super.updateVisibleRoles(owner, selectedPlayer);
-
+  updateVisibleRoles(owner: IPlayerInGame, selectedPlayer: IPlayerInGame): void {
     const visibleRole = this.calculateLoyalty(selectedPlayer);
 
     if (visibleRole !== 'good') {

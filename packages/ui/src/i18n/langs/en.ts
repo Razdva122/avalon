@@ -48,6 +48,7 @@ export const en = {
     'lead to victory': 'lead to victory',
     'restore honor': 'restore honor',
     'king returns': 'king returns',
+    'play card': 'play card',
     ambush: 'ambush',
     end: 'end',
     lancelots: 'lancelots',
@@ -250,6 +251,7 @@ export const en = {
     takeCard: 'Take card',
     selectCard: 'Select a card',
     noAvailableCards: 'No available cards',
+    revealLoyalty: 'Reveal Loyalty',
   },
   assassinate: {
     lovers: 'Lovers',
@@ -274,6 +276,9 @@ export const en = {
   },
   kingReturns: {
     history: '<b>{cardOwner}</b> used the card «{cardName}» to cancel the last vote and change leadership',
+  },
+  playCard: {
+    history: '<b>{cardOwner}</b> played the card «{cardName}»',
   },
   preVote: {
     title: 'Preliminary voting',
@@ -355,6 +360,7 @@ export const en = {
     restoreHonor: 'Honor',
     ambush: 'Ambush',
     kingReturns: 'King',
+    playCard: 'Play',
     charge: 'Charge',
     showNature: 'Nature',
     areYouTheOne: 'Check',
@@ -415,7 +421,14 @@ export const en = {
   },
   checkLoyalty: {
     checkInfo: '<b>{ladyOwner}</b> checked <b>{ladyTarget}</b> loyalty',
-    declareInfo: 'And declared his loyalty as',
+  },
+  revealLoyalty: {
+    revealInfo: '<b>{revealer}</b> revealed their loyalty to <b>{target}</b>',
+  },
+  announceLoyalty: {
+    announceInfo: '<b>{announcer}</b> announced <b>{target}</b> loyalty',
+    declareInfo: 'And declared their loyalty as',
+    actualInfo: 'actually',
   },
   lancelotsHistory: {
     becameEvil: 'became evil',

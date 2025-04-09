@@ -30,7 +30,7 @@
   <template v-if="game.stage === 'assassinate' && isUserAssassin">
     <AssassinateControl :game="game" />
   </template>
-  <template v-if="(game.stage === 'checkLoyalty' || game.stage === 'witchLoyalty') && isUserCheckOwner">
+  <template v-if="game.stage === 'checkLoyalty' && isUserCheckOwner">
     <v-btn color="warning" :disabled="!isCheckAvailable" @click="emitClick('checkLoyalty')">{{
       $t('inGame.checkLoyalty')
     }}</v-btn>
@@ -112,11 +112,11 @@ export default defineComponent({
     });
 
     const isUserCheckOwner = computed(() => {
-      if (game.value.stage === 'witchLoyalty') {
-        return player.value?.features.witchLoyalty;
-      }
-
-      return player.value?.features.ladyOfLake === 'has' || player.value?.features.ladyOfSea === 'has';
+      return (
+        player.value?.features.ladyOfLake === 'active' ||
+        player.value?.features.ladyOfSea === 'active' ||
+        player.value?.features.witchLoyalty === 'active'
+      );
     });
 
     const isUserExcaliburOwner = computed(() => {

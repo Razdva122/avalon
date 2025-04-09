@@ -1,5 +1,6 @@
 import { generateNewGame } from '@/core/game/test/const';
 import * as _ from 'lodash';
+import { AnnounceLoyaltyHistory } from '@/core/game/addons/check-loyalty/history';
 
 let { game, gameHelper } = generateNewGame();
 
@@ -42,8 +43,8 @@ describe('Lady of the lake', () => {
 
       const lastHistoryEl = _.last(game.history)!;
 
-      expect(lastHistoryEl.type).toBe('checkLoyalty');
-      expect(lastHistoryEl.data.result).toBe('evil');
+      expect(lastHistoryEl.type).toBe('announceLoyalty');
+      expect((<AnnounceLoyaltyHistory>lastHistoryEl).data.announced).toBe('evil');
 
       gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
     }

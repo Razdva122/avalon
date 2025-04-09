@@ -7,7 +7,6 @@ import type {
   THistoryResults,
   TAssassinateType,
   TRoles,
-  TLoyaltyType,
 } from '@avalon/types';
 
 import type { TDataForManagerOptions } from '@/core/game/history';
@@ -24,6 +23,7 @@ export type TGameMethodsParams =
   | TActionOnMissionParams
   | TAssassinateParams
   | TCheckLoyaltyParams
+  | TRevealLoyaltyParams
   | TAnnounceLoyaltyParams
   | TGiveExcaliburParams
   | TUseExcaliburParams
@@ -69,10 +69,13 @@ export type TCheckLoyaltyParams = {
   method: 'checkLoyalty';
 };
 
+export type TRevealLoyaltyParams = {
+  method: 'revealLoyalty';
+};
+
 export type TAnnounceLoyaltyParams = {
   method: 'announceLoyalty';
   loyalty: TLoyalty | TRoles;
-  type: TLoyaltyType;
 };
 
 export type TGiveExcaliburParams = {
@@ -114,7 +117,6 @@ export type TUseKingReturnsParams = {
 export type TGetLoyaltyData = {
   params: {
     method: 'getLoyalty';
-    type: TLoyaltyType;
   };
   result: TLoyalty | TRoles;
 };

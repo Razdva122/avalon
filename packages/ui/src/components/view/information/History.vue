@@ -25,6 +25,8 @@ import { THistoryResults, Player } from '@avalon/types';
 import SwitchLancelots from '@/components/view/information/history/SwitchLancelots.vue';
 import SwitchResult from '@/components/view/information/history/SwitchResult.vue';
 import CheckLoyalty from '@/components/view/information/history/CheckLoyalty.vue';
+import RevealLoyalty from '@/components/view/information/history/RevealLoyalty.vue';
+import AnnounceLoyalty from '@/components/view/information/history/AnnounceLoyalty.vue';
 import Vote from '@/components/view/information/history/Vote.vue';
 import Assassinate from '@/components/view/information/history/Assassinate.vue';
 import Mission from '@/components/view/information/history/Mission.vue';
@@ -34,12 +36,15 @@ import LeadToVictory from '@/components/view/information/history/LeadToVictory.v
 import RestoreHonor from '@/components/view/information/history/RestoreHonor.vue';
 import Ambush from '@/components/view/information/history/Ambush.vue';
 import KingReturns from '@/components/view/information/history/KingReturns.vue';
+import PlayCard from '@/components/view/information/history/PlayCard.vue';
 
 export default defineComponent({
   components: {
     SwitchLancelots,
     SwitchResult,
     CheckLoyalty,
+    RevealLoyalty,
+    AnnounceLoyalty,
     Vote,
     Assassinate,
     Mission,
@@ -49,6 +54,7 @@ export default defineComponent({
     RestoreHonor,
     Ambush,
     KingReturns,
+    PlayCard,
   },
   props: {
     history: {

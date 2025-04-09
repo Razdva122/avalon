@@ -1,6 +1,5 @@
-import { AbstractCard } from '@/core/game/addons/plot-cards/cards/abstract';
+import { LoyaltyPlotCard } from '@/core/game/addons/plot-cards/cards/abstract';
 import { IInstantPlotCard } from '@/core/game/addons/plot-cards/interface';
-import { of } from 'rxjs';
 
 /**
  * activate -> leader give card to some one
@@ -13,13 +12,8 @@ import { of } from 'rxjs';
 /**
  * Problems: -
  */
-export class ShowNatureCard extends AbstractCard implements IInstantPlotCard {
+export class ShowNatureCard extends LoyaltyPlotCard implements IInstantPlotCard {
   name = <const>'showNature';
   type = <const>'instant';
-
-  play(ownerID: string) {
-    this.activateCard(ownerID);
-    this.game.stateObserver.gameStateChanged();
-    return of(true);
-  }
+  loyaltyType = <const>'revealLoyalty';
 }
