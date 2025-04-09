@@ -64,18 +64,23 @@ export default defineComponent({
     const history = ref<HistoryItem[]>([]);
     const loading = ref(true);
 
-    const hasData = computed(() => history.value.length > 0 && history.value.some((h) => h.rating !== null));
+    const hasData = computed(
+      () => history.value.length > 0 && history.value.some((h) => h.rating !== null && h.rating > 0),
+    );
 
     const chartData = computed(() => {
-      const labels = history.value.map((h) => {
+      // Filter out entries with zero or null ratings to start from the first actual rating
+      const filteredHistory = history.value.filter((h) => h.rating !== null && h.rating > 0);
+
+      const labels = filteredHistory.map((h) => {
         const date = new Date(h.date);
         return date.toLocaleDateString();
       });
 
-      const ratings = history.value.map((h) => h.rating);
+      const ratings = filteredHistory.map((h) => h.rating);
 
       // Create a second dataset for rank (if we have rank data)
-      const hasRankData = history.value.some((h) => h.rank !== null);
+      const hasRankData = filteredHistory.some((h) => h.rank !== null);
 
       // Use direct color values for better visibility in both themes
       const primaryColor = '#1E88E5'; // Bright blue
@@ -101,7 +106,7 @@ export default defineComponent({
 
       // Add rank dataset if we have rank data
       if (hasRankData) {
-        const ranks = history.value.map((h) => h.rank);
+        const ranks = filteredHistory.map((h) => h.rank);
         datasets.push({
           label: t('stats.rank'),
           data: ranks,

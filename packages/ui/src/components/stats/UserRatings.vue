@@ -31,8 +31,8 @@
             </td>
 
             <td>
-              <v-chip :color="getRankColor(item.rank)" small>
-                {{ item.rank }}
+              <v-chip :color="getRankColor(item.rank, item.rating)" small>
+                {{ item.rating === 0 ? '???' : item.rank }}
               </v-chip>
             </td>
           </tr>
@@ -108,8 +108,12 @@ export default defineComponent({
       });
     };
 
-    const getRankColor = (rank: number) => {
-      if (rank <= 3) return 'orange accent-3'; // More visible in dark theme
+    const getRankColor = (rank: number, rating: number) => {
+      if (rating === 0) {
+        return 'grey';
+      }
+
+      if (rank <= 3) return 'orange accent-3';
       if (rank <= 10) return 'blue';
       if (rank <= 50) return 'green';
       return 'grey';

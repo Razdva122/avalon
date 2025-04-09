@@ -37,7 +37,7 @@ export function registerRatingEndpoints(socket: ServerSocket): void {
     try {
       roleRatingModel
         .find({ userID })
-        .sort({ rating: -1 })
+        .sort({ rating: -1, gamesCount: -1 })
         .lean()
         .then((ratings) => {
           callback(ratings);

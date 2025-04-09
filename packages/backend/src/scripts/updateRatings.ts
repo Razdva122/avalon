@@ -180,6 +180,7 @@ async function getAllCompletedGames(): Promise<ExtendedGameState[]> {
   const rooms = await roomModel
     .find({
       'game.result': { $exists: true },
+      'game.result.reason': { $ne: 'manualy' },
     })
     .lean();
 
