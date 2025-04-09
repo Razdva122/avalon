@@ -92,3 +92,16 @@ export class PlayCard extends HistoryBase {
   @prop({ required: true })
   public cardName!: TPlotCardNames;
 }
+
+/**
+ * We Found You card history
+ */
+export class WeFoundYou extends HistoryBase {
+  declare type: 'weFoundYou';
+
+  @prop({ required: true })
+  public ownerID!: string;
+
+  @prop({ required: true })
+  public selectedPlayerID!: string;
+}

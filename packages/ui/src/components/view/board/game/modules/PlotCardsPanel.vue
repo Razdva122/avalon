@@ -82,6 +82,28 @@
         ></PlotCard>
       </template>
     </template>
+
+    <template v-if="game.stage === 'weFoundYou'">
+      <template v-if="isUserWeFoundYouOwner">
+        <v-btn
+          :color="isZeroPlayerSelected ? 'warning' : 'success'"
+          @click="weFoundYouClick"
+          class="mb-2"
+          :disabled="!isSinglePlayerSelected && !isZeroPlayerSelected"
+        >
+          {{
+            $t(isZeroPlayerSelected ? 'inGame.skipCard' : 'inGame.useCard', { cardName: $t('cardsInfo.weFoundYou') })
+          }}
+        </v-btn>
+      </template>
+      <template v-else>
+        <PlotCard
+          :display-tooltip="true"
+          class="plot-card plot-card-selectionInProgress"
+          card-name="weFoundYou"
+        ></PlotCard>
+      </template>
+    </template>
   </div>
 </template>
 
@@ -129,6 +151,7 @@ export default defineComponent({
     const isUserLeadToVictoryOwner = useHasActiveCard(game, playerID, 'leadToVictory');
     const isUserRestoreHonorOwner = useHasActiveCard(game, playerID, 'restoreHonor');
     const isUserKingReturnsOwner = useHasActiveCard(game, playerID, 'kingReturns');
+    const isUserWeFoundYouOwner = useHasActiveCard(game, playerID, 'weFoundYou');
     const isUserLoyaltyCardOwner = useHaveActiveLoyaltyCard(game, playerID);
 
     const isLoyaltyCheckStage = computed(() => {
@@ -171,6 +194,10 @@ export default defineComponent({
       socket.emit('useKingReturns', game.value.uuid, use);
     };
 
+    const weFoundYouClick = () => {
+      socket.emit('useWeFoundYou', game.value.uuid, isZeroPlayerSelected ? false : true);
+    };
+
     const emitClick = (methodName: TMethodsWithoutParams) => {
       socket.emit(methodName, game.value.uuid);
     };
@@ -179,10 +206,12 @@ export default defineComponent({
       isUserLeader,
       isPlayerActive,
       isZeroPlayerSelected,
+      isSinglePlayerSelected,
       isUserAmbushOwner,
       isUserLeadToVictoryOwner,
       isUserRestoreHonorOwner,
       isUserKingReturnsOwner,
+      isUserWeFoundYouOwner,
       isGivePlotCardAvailable,
       isUseAmbushAvailable,
       isLoyaltyCheckStage,
@@ -191,6 +220,7 @@ export default defineComponent({
       givePlotCard,
       leadToVictoryClick,
       kingReturnsClick,
+      weFoundYouClick,
       emitClick,
     };
   },

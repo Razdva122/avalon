@@ -548,6 +548,11 @@ export class Manager {
       console.log(`Player ${userName} useKingReturns (used: ${use}) in game ${uuid}`);
       getRoomManager(uuid).callGameMethods(userID, { method: 'useKingReturns', use });
     });
+
+    socket.on('useWeFoundYou', (uuid, use) => {
+      console.log(`Player ${userName} useWeFoundYou (used: ${use}) in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'useWeFoundYou', use });
+    });
   }
 
   updateOnlineCounter(id: string, diff: -1 | 1): void {

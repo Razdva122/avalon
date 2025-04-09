@@ -35,6 +35,12 @@ export class PlayerFeatures extends AddonsFeatures {
    */
   @prop()
   preVote?: TVoteOption;
+
+  /**
+   * Option if user plays a mission card face up
+   */
+  @prop()
+  openAction?: boolean;
 }
 
 export class Player {

@@ -9,6 +9,7 @@ import {
   isAmbushCard,
   isRestoreHonorCard,
   isKingReturnsCard,
+  isWeFoundYouCard,
 } from '@/core/game/addons/plot-cards';
 import type { TPlotCard } from '@/core/game/addons/plot-cards/interface';
 
@@ -287,6 +288,24 @@ export class GameManager {
 
       case 'useKingReturns':
         this.handlePlotCardAction('king returns', isKingReturnsCard, (card) => card.kingReturns(params.use));
+        break;
+
+      case 'useWeFoundYou':
+        this.handlePlotCardAction('we found you', isWeFoundYouCard, (card) => {
+          if (params.use) {
+            // Get the selected player if use is true
+            const selectedPlayers = this.game.players.filter((player) => player.features.isSelected);
+
+            if (selectedPlayers.length !== 1) {
+              throw new Error('You must select exactly one player to use We Found You');
+            }
+
+            const selectedPlayer = this.game.findPlayerByID(selectedPlayers[0].user.id);
+            card.weFoundYou(userID, true, selectedPlayer);
+          } else {
+            card.weFoundYou(userID, false, undefined);
+          }
+        });
         break;
     }
   }

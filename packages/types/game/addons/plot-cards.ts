@@ -67,4 +67,5 @@ export type TPlotCardsStages =
   | 'revealLoyalty'
   | 'checkLoyalty'
   | 'announceLoyalty'
-  | 'playCard';
+  | 'playCard'
+  | 'weFoundYou';

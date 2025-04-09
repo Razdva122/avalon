@@ -18,7 +18,8 @@ export type THistoryType =
   | 'restoreHonor'
   | 'ambush'
   | 'kingReturns'
-  | 'playCard';
+  | 'playCard'
+  | 'weFoundYou';
 
 /**
  * History element stages

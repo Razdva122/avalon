@@ -33,7 +33,8 @@ export type TGameMethodsParams =
   | TUseLeadToVictoryParams
   | TUseAmbushParams
   | TUseRestoreHonorParams
-  | TUseKingReturnsParams;
+  | TUseKingReturnsParams
+  | TUseWeFoundYouParams;
 
 export type TSelectPlayerParams = {
   method: 'selectPlayer';
@@ -111,6 +112,11 @@ export type TUseRestoreHonorParams = {
 
 export type TUseKingReturnsParams = {
   method: 'useKingReturns';
+  use: boolean;
+};
+
+export type TUseWeFoundYouParams = {
+  method: 'useWeFoundYou';
   use: boolean;
 };
 

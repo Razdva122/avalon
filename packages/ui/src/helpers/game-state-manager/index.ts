@@ -313,6 +313,7 @@ export class GameStateManager {
         announceLoyalty: 'announceLoyalty',
         revealLoyalty: 'revealLoyalty',
         playCard: 'playCard',
+        weFoundYou: 'weFoundYou',
       } as const
     )[history.type];
   }

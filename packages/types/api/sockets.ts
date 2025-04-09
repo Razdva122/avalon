@@ -123,6 +123,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents {
   useAmbush: (uuid: string) => void;
   useRestoreHonor: (uuid: string, cardID: string) => void;
   useKingReturns: (uuid: string, use: boolean) => void;
+  useWeFoundYou: (uuid: string, use: boolean) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;

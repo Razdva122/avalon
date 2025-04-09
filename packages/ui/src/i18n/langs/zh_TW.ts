@@ -267,6 +267,9 @@ export const zh_TW = {
   kingReturns: {
     history: '<b>{cardOwner}</b> 使用了卡牌 «{cardName}» 取消了最後一次投票並更換了領導權',
   },
+  weFoundYou: {
+    history: '<b>{cardOwner}</b> 對 <b>{selectedPlayer}</b> 使用了卡牌 «{cardName}»，迫使他公開打出任務卡',
+  },
   playCard: {
     history: '<b>{cardOwner}</b> 使用了卡牌 «{cardName}»',
   },

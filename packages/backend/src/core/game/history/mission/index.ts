@@ -150,7 +150,7 @@ export class Mission implements HistoryElement<'mission'> {
         const isUserAction = action.player.user.id === options.userID;
         const isSwitchedByPlayer = options.userID && action.switchedBy === options.userID;
 
-        if (isGameEnded || isUserAction || isSwitchedByPlayer) {
+        if (isGameEnded || isUserAction || isSwitchedByPlayer || action.openToEveryone) {
           return {
             playerID: action.player.user.id,
             switchedBy: action.switchedBy,

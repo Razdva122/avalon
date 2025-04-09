@@ -208,6 +208,7 @@ export default defineComponent({
         ambush: 'ambush',
         kingReturns: 'king returns',
         playCard: 'play card',
+        weFoundYou: 'we found you',
       }[gameState.value.stage];
     });
 

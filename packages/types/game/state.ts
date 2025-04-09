@@ -21,6 +21,7 @@ import {
   AnnounceLoyalty,
   RevealLoyalty,
   PlayCard,
+  WeFoundYou,
 } from './history';
 import type { THistoryResults } from './history';
 import { GameSettingsWithRoles } from './settings';
@@ -84,6 +85,7 @@ export class VisualGameState {
       { type: Ambush, value: 'ambush' },
       { type: KingReturns, value: 'kingReturns' },
       { type: PlayCard, value: 'playCard' },
+      { type: WeFoundYou, value: 'weFoundYou' },
     ],
   })
   public history!: THistoryResults[];

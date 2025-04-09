@@ -11,7 +11,7 @@ import { HiddenHistory } from './base';
 import { AnonymousHistoryVote, HistoryVote, PreVote } from './vote';
 import { HistoryMission, HistoryMissionHidden, SwitchResult } from './mission';
 import { CheckLoyalty, RevealLoyalty, AnnounceLoyalty } from './loyalty';
-import { GiveCard, LeadToVictory, RestoreHonor, Ambush, KingReturns, PlayCard } from './cards';
+import { GiveCard, LeadToVictory, RestoreHonor, Ambush, KingReturns, PlayCard, WeFoundYou } from './cards';
 import { HistoryAssassinate, SwitchLancelots } from './special';
 
 export type THistoryResults =
@@ -32,4 +32,5 @@ export type THistoryResults =
   | RestoreHonor
   | Ambush
   | KingReturns
-  | PlayCard;
+  | PlayCard
+  | WeFoundYou;

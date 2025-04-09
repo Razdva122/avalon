@@ -27,6 +27,7 @@ import type {
   Ambush,
   KingReturns,
   PlayCard,
+  WeFoundYou,
 } from '@avalon/types';
 
 export type THistoryData = {
@@ -111,6 +112,10 @@ export type THistoryData = {
     owner: IPlayerInGame;
     cardName: TPlotCardNames;
   };
+  weFoundYou: {
+    owner: IPlayerInGame;
+    selectedPlayer: IPlayerInGame;
+  };
   hidden: Record<string, never>;
 };
 
@@ -130,6 +135,7 @@ export type THistoryDataForManager = {
   ambush: Ambush;
   kingReturns: KingReturns;
   playCard: PlayCard;
+  weFoundYou: WeFoundYou;
 };
 
 export type TDataForManagerOptions = {

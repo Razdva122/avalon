@@ -275,6 +275,10 @@ export const pt = {
   kingReturns: {
     history: '<b>{cardOwner}</b> usou a carta «{cardName}» para cancelar a última votação e mudar a liderança',
   },
+  weFoundYou: {
+    history:
+      '<b>{cardOwner}</b> usou a carta «{cardName}» em <b>{selectedPlayer}</b>, forçando-o a jogar sua carta de missão abertamente',
+  },
   playCard: {
     history: '<b>{cardOwner}</b> jogou a carta «{cardName}»',
   },

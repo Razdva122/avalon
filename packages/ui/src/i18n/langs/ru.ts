@@ -267,6 +267,10 @@ export const ru = {
   kingReturns: {
     history: '<b>{cardOwner}</b> использовал карту «{cardName}» для отмены последнего голосования и смены лидерства',
   },
+  weFoundYou: {
+    history:
+      '<b>{cardOwner}</b> использовал карту «{cardName}» на <b>{selectedPlayer}</b>, заставив его сыграть карту похода открыто',
+  },
   playCard: {
     history: '<b>{cardOwner}</b> сыграл карту «{cardName}»',
   },

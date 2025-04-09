@@ -37,6 +37,7 @@ import RestoreHonor from '@/components/view/information/history/RestoreHonor.vue
 import Ambush from '@/components/view/information/history/Ambush.vue';
 import KingReturns from '@/components/view/information/history/KingReturns.vue';
 import PlayCard from '@/components/view/information/history/PlayCard.vue';
+import WeFoundYou from '@/components/view/information/history/WeFoundYou.vue';
 
 export default defineComponent({
   components: {
@@ -55,6 +56,7 @@ export default defineComponent({
     Ambush,
     KingReturns,
     PlayCard,
+    WeFoundYou,
   },
   props: {
     history: {
