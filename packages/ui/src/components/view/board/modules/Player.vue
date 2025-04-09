@@ -33,7 +33,9 @@
         <span v-if="'index' in player && displayIndex">
           <b>{{ `${player.index}.` }}</b>
         </span>
-        {{ player.name }}
+        <span :title="player.name">
+          {{ player.name }}
+        </span>
       </span>
     </span>
   </div>
