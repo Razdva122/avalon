@@ -205,6 +205,7 @@ export class GameStateManager {
         const history = last(current.history)!;
         const excaliburHistory = prev.stage === 'useExcalibur' ? last(prev.history) : undefined;
         const excaliburOwnerID = excaliburHistory?.type === 'switchResult' ? excaliburHistory.switcherID : undefined;
+        const isExcaliburUsed = Boolean(excaliburHistory?.type === 'switchResult' && excaliburHistory.targetID);
 
         current.players.forEach((player) => {
           if (history.type === 'mission') {
@@ -214,7 +215,7 @@ export class GameStateManager {
               player.features.isSent = true;
 
               if (player.id === excaliburOwnerID) {
-                player.features.excalibur = 'active';
+                player.features.excalibur = isExcaliburUsed ? 'active' : 'has';
               }
             }
           }
@@ -229,7 +230,7 @@ export class GameStateManager {
             const player = current.players.find((player) => teamMember.id === player.id);
 
             if (player) {
-              player.features.excalibur = 'has';
+              player.features.excalibur = teamMember.excalibur ? 'has' : undefined;
               player.features.isSent = true;
             }
           });
