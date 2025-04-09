@@ -31,6 +31,8 @@ export class LadyOfLakeAddon extends CheckLoyaltyAbstractAddon implements IGameA
         }
       });
 
+      this.game.leader.features.waitForAction = false;
+
       return this.loyaltyChecker.startChecking('checkLoyalty');
     }
 

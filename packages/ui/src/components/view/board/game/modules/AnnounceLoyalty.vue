@@ -59,7 +59,10 @@ export default defineComponent({
     };
 
     const isLadyOfSea = computed(() => {
-      return gameState.value.addonsData.ladyOfSea;
+      return (
+        gameState.value.addonsData.ladyOfSea &&
+        gameState.value.players.some((player) => player.features.ladyOfSea === 'active')
+      );
     });
 
     const possibleSeaTargets = computed(() => {

@@ -133,7 +133,13 @@ export default defineComponent({
         return false;
       }
 
-      if (game.value.stage === 'checkLoyalty') {
+      if (player.value?.features.witchLoyalty) {
+        return Boolean(
+          game.value.players.find(
+            (playerInGame) => playerInGame.features.isSelected && playerInGame.id !== player.value?.id,
+          ),
+        );
+      } else {
         return Boolean(
           game.value.players.find(
             (player) =>
@@ -143,8 +149,6 @@ export default defineComponent({
           ),
         );
       }
-
-      return true;
     });
 
     const isGiveExcaliburAvailable = computed(() => {
