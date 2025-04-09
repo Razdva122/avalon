@@ -375,12 +375,42 @@ export default defineComponent({
   border-radius: 50%;
 }
 
+@keyframes pulse-blue {
+  0% {
+    @include dropShadowBorder(rgba(65, 105, 225, 0.4), 2px);
+  }
+  25% {
+    @include dropShadowBorder(rgba(65, 105, 225, 0.8), 2px);
+  }
+  75% {
+    @include dropShadowBorder(rgba(65, 105, 225, 0.8), 2px);
+  }
+  100% {
+    @include dropShadowBorder(rgba(65, 105, 225, 0.4), 2px);
+  }
+}
+
+@keyframes pulse-red {
+  0% {
+    @include dropShadowBorder(rgba(220, 20, 60, 0.3), 2px);
+  }
+  25% {
+    @include dropShadowBorder(rgba(220, 20, 60, 0.6), 2px);
+  }
+  75% {
+    @include dropShadowBorder(rgba(220, 20, 60, 0.6), 2px);
+  }
+  100% {
+    @include dropShadowBorder(rgba(220, 20, 60, 0.3), 2px);
+  }
+}
+
 .player-feature-waitForAction .player-name {
-  @include dropShadowBorder(rgba(65, 105, 225, 0.8), 2px);
+  animation: pulse-blue 3s infinite ease-in-out;
 }
 
 .player-feature-isAssassin .player-name {
-  @include dropShadowBorder(rgba(220, 20, 60, 0.6), 2px);
+  animation: pulse-red 3s infinite ease-in-out;
 }
 
 .player-feature-isSelected .player-icon {
