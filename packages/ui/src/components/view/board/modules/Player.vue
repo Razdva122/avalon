@@ -28,12 +28,14 @@
       <div class="icon-evil-mission"></div>
     </div>
     <div class="message-container" v-if="chatMessage?.message">{{ chatMessage?.message }}</div>
-    <span class="player-name">
+    <span class="player-name" :title="player.name">
       <span class="player-name-text">
         <span v-if="'index' in player && displayIndex">
           <b>{{ `${player.index}.` }}</b>
         </span>
-        {{ player.name }}
+        <span>
+          {{ player.name }}
+        </span>
       </span>
     </span>
   </div>
