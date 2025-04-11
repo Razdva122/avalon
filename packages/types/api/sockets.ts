@@ -77,6 +77,14 @@ export interface ClientToServerEvents extends ClientToServerUserEvents {
   // Rating system endpoints
   getRoleLeaderboard: (role: TRoles, callback: (leaderboard: RoleRating[] | { error: string }) => void) => void;
   getUserRatings: (userID: string, callback: (ratings: RoleRating[] | { error: string }) => void) => void;
+  getPopularRoles: (
+    minPlayers: number,
+    callback: (roles: { role: TRoles; playerCount: number }[] | { error: string }) => void,
+  ) => void;
+  getTopPlayersForPopularRoles: (
+    minPlayers: number,
+    callback: (result: { role: TRoles; topPlayer: RoleRating | null }[] | { error: string }) => void,
+  ) => void;
   getRatingHistory: (
     userID: string,
     role: TRoles,

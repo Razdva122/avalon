@@ -50,6 +50,32 @@ export function registerRatingEndpoints(socket: ServerSocket): void {
     }
   });
 
+  // Get popular roles with at least minPlayers players
+  socket.on('getPopularRoles', (minPlayers: number, callback) => {
+    console.log(`Getting popular roles with at least ${minPlayers} players`);
+    try {
+      // Aggregate to count players per role with rating > 0
+      roleRatingModel
+        .aggregate([
+          { $match: { rating: { $gt: 0 } } },
+          { $group: { _id: '$role', playerCount: { $sum: 1 } } },
+          { $match: { playerCount: { $gte: minPlayers } } },
+          { $project: { role: '$_id', playerCount: 1, _id: 0 } },
+          { $sort: { playerCount: -1 } },
+        ])
+        .then((popularRoles) => {
+          callback(popularRoles);
+        })
+        .catch((error) => {
+          console.error('Error fetching popular roles:', error);
+          callback({ error: 'Failed to fetch popular roles' });
+        });
+    } catch (error) {
+      console.error('Error fetching popular roles:', error);
+      callback({ error: 'Failed to fetch popular roles' });
+    }
+  });
+
   // Get rating history for a user and role
   socket.on('getRatingHistory', (userID: string, role: TRoles, callback) => {
     console.log(`Getting rating history for user: ${userID}, role: ${role}, days: 30`);
@@ -82,6 +108,36 @@ export function registerRatingEndpoints(socket: ServerSocket): void {
     } catch (error) {
       console.error('Error fetching rating history:', error);
       callback({ error: 'Failed to fetch rating history' });
+    }
+  });
+
+  // Get top players for all popular roles in a single request
+  socket.on('getTopPlayersForPopularRoles', async (minPlayers: number, callback) => {
+    console.log(`Getting top players for popular roles with at least ${minPlayers} players`);
+    try {
+      // First, get all popular roles
+      const popularRoles = await roleRatingModel.aggregate([
+        { $match: { rating: { $gt: 0 } } },
+        { $group: { _id: '$role', playerCount: { $sum: 1 } } },
+        { $match: { playerCount: { $gte: minPlayers } } },
+        { $project: { role: '$_id', playerCount: 1, _id: 0 } },
+        { $sort: { playerCount: -1 } },
+      ]);
+
+      // Then, for each popular role, get the top player
+      const result = await Promise.all(
+        popularRoles.map(async ({ role }) => {
+          const topPlayers = await roleRatingModel.find({ role }).sort({ rank: 1 }).limit(1).lean();
+
+          const topPlayer = topPlayers.length > 0 ? topPlayers[0] : null;
+          return { role, topPlayer };
+        }),
+      );
+
+      callback(result);
+    } catch (error) {
+      console.error('Error fetching top players for popular roles:', error);
+      callback({ error: 'Failed to fetch top players for popular roles' });
     }
   });
 }

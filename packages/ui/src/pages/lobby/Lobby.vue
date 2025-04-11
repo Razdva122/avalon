@@ -10,6 +10,10 @@
 
     <h1 class="lobby-header">{{ $t('mainPage.header') }}</h1>
 
+    <div class="top-player-container">
+      <RotatingTopPlayer />
+    </div>
+
     <v-btn class="mb-5" @click="createRoom" size="x-large"> {{ $t('mainPage.createRoom') }} </v-btn>
 
     <div>
@@ -55,12 +59,14 @@ import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import TemporaryAlert from '@/components/feedback/TemporaryAlert.vue';
 import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
+import RotatingTopPlayer from '@/components/stats/RotatingTopPlayer.vue'; // Import the new component
 import type { GameOptionsRoles, GameOptionsAddons } from '@avalon/types';
 
 export default defineComponent({
   components: {
     TemporaryAlert,
     OptionsPreview,
+    RotatingTopPlayer, // Add the new component
   },
   async setup() {
     const { t } = useI18n();
@@ -135,6 +141,14 @@ export default defineComponent({
 .lobby-header {
   text-align: center;
   margin: 10px;
+}
+
+.top-player-container {
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  justify-content: center;
 }
 
 .list-header {
