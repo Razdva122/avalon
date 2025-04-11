@@ -10,11 +10,12 @@ This file tracks significant architectural decisions, technology choices, and de
 - Rationale: The memory bank was not activating properly due to missing expected files
 - Implications: Improved context retention and knowledge sharing across different assistant modes
 
-[11.04.2025 12:20:57] - **Plot Cards Implementation**
+[11.04.2025 11:57:40] - **Plot Cards Implementation**
 
-- Decision: Implemented plot cards as modular, pluggable components
-- Rationale: Allows for easy addition of new card types and effects
-- Implications: More flexible game mechanics and enhanced gameplay variety
+- Decision: Implemented plot cards as modular, pluggable components with three distinct types (usable, instant, effect)
+- Rationale: Allows for easy addition of new card types and effects while maintaining a consistent interface
+- Implementation: Created a comprehensive addon system with standardized lifecycle hooks
+- Implications: More flexible game mechanics, enhanced gameplay variety, and simplified process for adding new cards
 
 ## Technology Choices
 

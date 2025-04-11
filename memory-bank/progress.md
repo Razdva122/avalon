@@ -55,3 +55,20 @@ This document tracks significant updates and changes to the Avalon project.
 - Added Portuguese default keywords for SEO
 
 - Updated checklist to track translation progress
+
+[11.04.2025 11:58:03] - **Plot Cards Implementation**
+
+- Implemented core plot cards system with three card types (usable, instant, effect)
+- Created nine different plot cards with unique gameplay effects:
+  - Lead To Victory: Allows player to become leader before team selection
+  - Ambush: Reveals one mission card outcome
+  - King Returns: Cancels last approval and changes leadership
+  - Restore Honor: Takes a plot card from any player
+  - Charge: Forces player to vote publicly
+  - Show Nature: Reveals player's loyalty to another player
+  - Are You The One: Checks loyalty of adjacent player
+  - We Found You: Forces player to play mission card face up
+  - Show Strength: Leader reveals loyalty to a player
+- Added Portuguese translations for all plot cards
+- Created comprehensive documentation for adding new plot cards
+- Implemented frontend components for card display and interaction

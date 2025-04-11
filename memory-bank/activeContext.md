@@ -40,3 +40,10 @@ This file tracks the current focus of work, recent changes, and open questions/i
 
 - Ensuring memory bank is properly activated across all modes
 - Creating required files for memory bank functionality
+  [11.04.2025 11:57:16] - **Plot Cards Implementation Progress**
+
+- Implementing various plot card types (usable, instant, effect)
+- Current cards include: Lead To Victory, Ambush, King Returns, Restore Honor, Charge, Show Nature, Are You The One, We Found You, Show Strength
+- Frontend components for card display and interaction are in place
+- Portuguese translations for all plot cards have been added
+- Comprehensive documentation for adding new plot cards has been created

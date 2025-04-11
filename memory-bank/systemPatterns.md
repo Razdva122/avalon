@@ -42,6 +42,15 @@ This file documents architectural patterns, design patterns, and coding conventi
 - Used for implementing different game addons and role abilities
 - Allows for pluggable game mechanics and variations
 
+[11.04.2025 11:57:50] - **Addon Pattern for Game Extensions**
+
+- Game addons (like plot cards, excalibur) follow a consistent interface pattern
+- Each addon implements the `IGameAddon` interface with lifecycle hooks:
+  - `afterInit()` - Setup stage-specific handlers and game state
+  - `beforeStartMission()`, `afterSentTeam()`, etc. - Hooks into game flow
+- Observable pattern used for asynchronous game flow control
+- Addons can modify game state, add new stages, and introduce new mechanics
+
 ## Internationalization
 
 [06.04.2025 11:56:00] - **Multi-language Support**
