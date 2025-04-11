@@ -1,5 +1,6 @@
 import { LoyaltyPlotCard } from '@/core/game/addons/plot-cards/cards/abstract';
 import { IInstantPlotCard } from '@/core/game/addons/plot-cards/interface';
+import { IPlayerInGame } from '@/core/game';
 
 /**
  * activate -> leader give card to some one
@@ -16,4 +17,12 @@ export class AreYouTheOneCard extends LoyaltyPlotCard implements IInstantPlotCar
   name = <const>'areYouTheOne';
   type = <const>'instant';
   loyaltyType = <const>'checkLoyalty';
+
+  preCheckAction(_executorID: string, ownerOfCheck: IPlayerInGame, selectedPlayer: IPlayerInGame): void {
+    const isAdjacentPlayer = ownerOfCheck.next === selectedPlayer || selectedPlayer.next === ownerOfCheck;
+
+    if (!isAdjacentPlayer) {
+      throw new Error('The check can only be used on an adjacent player');
+    }
+  }
 }

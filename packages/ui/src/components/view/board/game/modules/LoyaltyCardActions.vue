@@ -1,13 +1,14 @@
 <template>
-  <v-btn color="warning" :disabled="!isCheckAvailable" @click="checkLoyalty">
+  <v-btn color="success" :disabled="!isCheckAvailable" @click="checkLoyalty">
     {{ stage === 'checkLoyalty' ? $t('inGame.checkLoyalty') : $t('inGame.revealLoyalty') }}
   </v-btn>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 import { socket } from '@/api/socket';
 import { TPlotCardNames } from '@avalon/types';
+import { gameStateKey } from '@/helpers/game-state-manager';
 
 const props = defineProps<{
   cardName: TPlotCardNames;
@@ -15,8 +16,13 @@ const props = defineProps<{
   gameUuid: string;
 }>();
 
+// Get the game state
+const gameState = inject(gameStateKey)!;
+
 const isCheckAvailable = computed(() => {
-  return true;
+  const selectedPlayersCount = gameState.value.players.filter((player) => player.features.isSelected).length;
+
+  return selectedPlayersCount === 1;
 });
 
 const checkLoyalty = () => {

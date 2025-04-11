@@ -263,7 +263,7 @@ describe('Plot Cards Logic', () => {
       const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 5, (game) => {
         game.addons.plotCards!.cardsPerRound = 2;
 
-        movePlotCardsToStart(game, ['restoreHonor', 'ambush']);
+        movePlotCardsToStart(game, ['ambush', 'restoreHonor']);
       });
 
       const player1 = game.players.find((player) => player !== game.leader)!;

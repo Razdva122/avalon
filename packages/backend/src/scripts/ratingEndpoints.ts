@@ -25,9 +25,7 @@ export function registerRatingEndpoints(socket: ServerSocket): void {
         });
     } catch (error) {
       console.error('Error fetching role leaderboard:', error);
-      if (typeof callback === 'function') {
-        callback({ error: 'Failed to fetch leaderboard' });
-      }
+      callback({ error: 'Failed to fetch leaderboard' });
     }
   });
 
@@ -48,9 +46,7 @@ export function registerRatingEndpoints(socket: ServerSocket): void {
         });
     } catch (error) {
       console.error('Error fetching user ratings:', error);
-      if (typeof callback === 'function') {
-        callback({ error: 'Failed to fetch user ratings' });
-      }
+      callback({ error: 'Failed to fetch user ratings' });
     }
   });
 
@@ -85,9 +81,7 @@ export function registerRatingEndpoints(socket: ServerSocket): void {
         });
     } catch (error) {
       console.error('Error fetching rating history:', error);
-      if (typeof callback === 'function') {
-        callback({ error: 'Failed to fetch rating history' });
-      }
+      callback({ error: 'Failed to fetch rating history' });
     }
   });
 }

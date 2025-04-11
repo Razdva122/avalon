@@ -1,2 +1,5 @@
 User-agent: *
 Disallow: /room/*
+Disallow: /profile/*
+Disallow: /stats/user/*
+Disallow: /404/

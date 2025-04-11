@@ -6,7 +6,8 @@ import { KingReturnsCard } from '@/core/game/addons/plot-cards/cards/usable/king
 import { AmbushCard } from '@/core/game/addons/plot-cards/cards/usable/ambush';
 import { RestoreHonorCard } from '@/core/game/addons/plot-cards/cards/instant/restoreHonor';
 import { ChargeCard } from '@/core/game/addons/plot-cards/cards/effects/charge';
-import { TPlotCard } from '../addons/plot-cards/interface';
+import { TPlotCard } from '@/core/game/addons/plot-cards/interface';
+import { WeFoundYouCard } from '@/core/game/addons/plot-cards/cards';
 
 const users = [
   new User('1', 'Misha'),
@@ -315,6 +316,28 @@ export class GameTestHelper {
     return this;
   }
 
+  useWeFoundYou(targetPlayerId?: string, use: boolean = false): this {
+    const playerWithCard = this.getActiveCardPlayer();
+
+    const weFoundYouCard = this.game.addons.plotCards!.cardsInGame.find(
+      (plotCard) => plotCard.name === 'weFoundYou' && plotCard.ownerID === playerWithCard.user.id,
+    )!;
+
+    if (use === true) {
+      const targetPlayer = targetPlayerId
+        ? this.game.players.find((player) => player.user.id === targetPlayerId)!
+        : this.game.currentMission.data.actions[0]?.player;
+
+      this.game.selectPlayer(playerWithCard.user.id, targetPlayer.user.id);
+
+      (weFoundYouCard as WeFoundYouCard).weFoundYou(playerWithCard.user.id, use, targetPlayer);
+    } else {
+      (weFoundYouCard as WeFoundYouCard).weFoundYou(playerWithCard.user.id, use, undefined);
+    }
+
+    return this;
+  }
+
   useRestoreHonor(targetPlayerId?: string, cardId?: string): this {
     const playerWithCard = this.getActiveCardPlayer();
 
@@ -377,7 +400,7 @@ export class GameTestHelper {
 export function movePlotCardsToStart(game: Game, cards: TPlotCardNames[]) {
   const movedCards: TPlotCard[] = [];
 
-  cards.forEach((cardName) => {
+  cards.reverse().forEach((cardName) => {
     const cardIndex = game.addons.plotCards!.cards.findIndex(
       (card) => card.name === cardName && !movedCards.includes(card),
     );

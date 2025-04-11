@@ -77,6 +77,11 @@ export class Mission implements HistoryElement<'mission'> {
     player.features.waitForAction = false;
     action.value = result;
 
+    if (player.features.openAction) {
+      player.features.openAction = false;
+      action.openToEveryone = true;
+    }
+
     if (this.data.actions.every((action) => action.value !== 'unvoted')) {
       this.finishMission();
 

@@ -24,14 +24,14 @@ export class LadyOfLakeAddon extends CheckLoyaltyAbstractAddon implements IGameA
 
   beforeSelectTeam() {
     if (this.game.turn === 0 && this.game.round >= 2) {
+      this.game.leader.features.waitForAction = false;
+
       this.game.players.forEach((player) => {
         if (player.features[this.addonName] === 'has') {
           player.features.waitForAction = true;
           player.features[this.addonName] = 'active';
         }
       });
-
-      this.game.leader.features.waitForAction = false;
 
       return this.loyaltyChecker.startChecking('checkLoyalty');
     }

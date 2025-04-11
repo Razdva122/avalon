@@ -51,6 +51,39 @@ export const getPlayerCards = (game: VisualGameState, playerID?: string) => {
 };
 
 /**
+ * Check if a player is adjacent (left or right) to another player
+ * @param game The game state
+ * @param playerID The ID of the player
+ * @param targetPlayerID The ID of the target player to check adjacency with
+ * @returns Boolean indicating if the target player is adjacent to the player
+ */
+export const isAdjacentPlayer = (game: VisualGameState, playerID?: string, targetPlayerID?: string): boolean => {
+  if (!playerID || !targetPlayerID || playerID === targetPlayerID) {
+    return false;
+  }
+
+  const players = game.players;
+
+  // Find the indices of both players
+  const playerIndex = players.findIndex((player) => player.id === playerID);
+  const targetIndex = players.findIndex((player) => player.id === targetPlayerID);
+
+  if (playerIndex === -1 || targetIndex === -1) {
+    return false;
+  }
+
+  const playerCount = players.length;
+
+  // Check if target is to the right (next)
+  const rightIndex = (playerIndex + 1) % playerCount;
+
+  // Check if target is to the left (previous)
+  const leftIndex = (playerIndex - 1 + playerCount) % playerCount;
+
+  return targetIndex === rightIndex || targetIndex === leftIndex;
+};
+
+/**
  * Create a computed property that checks if a player has an active card
  * @param game Ref to the game state
  * @param playerID Ref to the player ID
@@ -93,4 +126,19 @@ export const useHasCard = (game: Ref<VisualGameState>, playerID: Ref<string | un
  */
 export const usePlayerCards = (game: Ref<VisualGameState>, playerID: Ref<string | undefined>) => {
   return computed(() => getPlayerCards(game.value, playerID.value));
+};
+
+/**
+ * Create a computed property that checks if a player is adjacent to another player
+ * @param game Ref to the game state
+ * @param playerID Ref to the player ID
+ * @param targetPlayerID Ref to the target player ID
+ * @returns Computed boolean indicating if the target player is adjacent to the player
+ */
+export const useIsAdjacentPlayer = (
+  game: Ref<VisualGameState>,
+  playerID: Ref<string | undefined>,
+  targetPlayerID: Ref<string | undefined>,
+) => {
+  return computed(() => isAdjacentPlayer(game.value, playerID.value, targetPlayerID.value));
 };

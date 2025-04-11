@@ -108,7 +108,10 @@ export class PlotCardsAddon implements IGameAddon {
     this.game.addSelectAvailableStage('leadToVictory', isCardActive('leadToVictory'));
     this.game.addSelectAvailableStage('restoreHonor', isCardActive('restoreHonor'));
     this.game.addSelectAvailableStage('kingReturns', isCardActive('kingReturns'));
+    this.game.addSelectAvailableStage('weFoundYou', isCardActive('weFoundYou'));
+
     this.game.addSelectAvailableStage('checkLoyalty', isCardActive('areYouTheOne'));
+
     this.game.addSelectAvailableStage('revealLoyalty', isCardActive('showNature'));
     this.game.addSelectAvailableStage('revealLoyalty', isCardActive('showStrength'));
 

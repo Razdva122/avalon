@@ -26,6 +26,10 @@ export class LoyaltyChecker {
   }
 
   checkLoyalty(executorID: string, ownerOfCheck: IPlayerInGame, selectedPlayer: IPlayerInGame): void {
+    if (this.actionHandler?.preCheckAction) {
+      this.actionHandler?.preCheckAction(executorID, ownerOfCheck, selectedPlayer);
+    }
+
     if (this.game.stage !== 'checkLoyalty') {
       throw new Error(`You cant check loyalty on stage ${this.game.stage}`);
     }

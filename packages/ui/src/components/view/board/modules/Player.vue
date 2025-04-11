@@ -56,7 +56,7 @@ import type {
   TPlotCardNames,
 } from '@avalon/types';
 import { availablePlotCards } from '@avalon/types';
-import { getPlayerCards } from '@/helpers/plot-cards';
+import { getPlayerCards, isAdjacentPlayer, hasActiveCard } from '@/helpers/plot-cards';
 import type { IFrontendPlayer } from '@/components/view/board/interface';
 import { gameStateKey } from '@/helpers/game-state-manager';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
@@ -224,6 +224,16 @@ export default defineComponent({
           }, {}),
           ...classes,
         };
+
+        if (gameState.value.stage === 'checkLoyalty') {
+          const cardOwner = gameState.value.players.find((p) => hasActiveCard(gameState.value, p.id, 'areYouTheOne'));
+
+          const anyPlayerSelected = gameState.value.players.some((p) => p.features.isSelected);
+
+          if (cardOwner && !anyPlayerSelected) {
+            classes['player-adjacent'] = isAdjacentPlayer(gameState.value, cardOwner.id, player.value.id);
+          }
+        }
       } else {
         classes = {
           'player-feature-isLeader': player.value.isLeader,
@@ -494,6 +504,23 @@ export default defineComponent({
 .player-feature-ladyOfSea-active .lady-of-sea {
   display: block;
   border-color: rgba(65, 105, 225, 0.8);
+}
+
+/* Style for adjacent players when areYouTheOne card is active */
+.player-adjacent .player-icon {
+  animation: pulse-gold 2s infinite ease-in-out;
+}
+
+@keyframes pulse-gold {
+  0% {
+    border-color: rgba(255, 245, 50, 0.3);
+  }
+  50% {
+    border-color: rgba(255, 245, 50, 0.642);
+  }
+  100% {
+    border-color: rgba(255, 245, 50, 0.3);
+  }
 }
 
 .player-feature-switch-toSuccess {
