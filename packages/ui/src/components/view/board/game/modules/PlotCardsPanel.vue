@@ -19,7 +19,7 @@
       <LoyaltyCardActions :card-name="activeCard.name" :stage="game.stage" :game-uuid="game.uuid" />
     </template>
 
-    <template v-if="game.stage === 'giveCard' && isUserLeader">
+    <template v-if="game.stage === 'giveCard' && stateManager.viewMode.value === 'live' && isUserLeader">
       <v-btn color="success" @click="givePlotCard" :disabled="!isGivePlotCardAvailable">
         {{ $t('inGame.giveCard') }}
       </v-btn>
@@ -108,7 +108,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, toRefs, computed } from 'vue';
+import { defineComponent, PropType, toRefs, computed, inject } from 'vue';
 import PlotCard from '@/components/view/information/PlotCard.vue';
 import RestoreHonorView from '@/components/view/board/game/modules/RestoreHonorView.vue';
 import LoyaltyCardActions from '@/components/view/board/game/modules/LoyaltyCardActions.vue';
@@ -117,6 +117,7 @@ import type { ActiveCard, VisualGameState } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useGamePlayerState } from '@/helpers/composables/useGamePlayerState';
 import { useHasActiveCard, hasActiveCard, useHaveActiveLoyaltyCard } from '@/helpers/plot-cards';
+import { stateManagerKey } from '@/helpers/game-state-manager';
 
 type TMethodsWithoutParams = 'useAmbush';
 
@@ -140,6 +141,7 @@ export default defineComponent({
   setup(props) {
     const { game } = toRefs(props);
     const gameComputed = computed(() => game.value);
+    const stateManager = inject(stateManagerKey)!;
 
     const { player, isUserLeader, isPlayerActive, isZeroPlayerSelected, isSinglePlayerSelected } =
       useGamePlayerState(gameComputed);
@@ -222,6 +224,7 @@ export default defineComponent({
       kingReturnsClick,
       weFoundYouClick,
       emitClick,
+      stateManager,
     };
   },
 });

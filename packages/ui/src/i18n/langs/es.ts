@@ -49,6 +49,8 @@ export const es = {
     'restore honor': 'restaura tu honor',
     'king returns': 'el rey regresa',
     'play card': 'jugar carta',
+    'reveal loyalty': 'revelar lealtad',
+    'we found you': 'te encontramos',
     ambush: 'emboscada',
     end: 'fin',
     lancelots: 'lancelotes',
@@ -359,6 +361,8 @@ export const es = {
     areYouTheOne: 'Elegido',
     weFoundYou: 'Encontrado',
     showStrength: 'Fuerza',
+    revealLoyalty: 'Revelar',
+    announceLoyalty: 'Anunciar',
   },
   mission: {
     players: 'Jugadores',

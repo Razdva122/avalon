@@ -49,6 +49,8 @@ export const en = {
     'restore honor': 'restore honor',
     'king returns': 'king returns',
     'play card': 'play card',
+    'reveal loyalty': 'reveal loyalty',
+    'we found you': 'we found you',
     ambush: 'ambush',
     end: 'end',
     lancelots: 'lancelots',
@@ -366,6 +368,8 @@ export const en = {
     areYouTheOne: 'Check',
     weFoundYou: 'Found',
     showStrength: 'Strength',
+    revealLoyalty: 'Reveal',
+    announceLoyalty: 'Announce',
     hidden: 'Hidden',
   },
   mission: {
