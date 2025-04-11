@@ -48,7 +48,7 @@ export class PlotCardsAddon implements IGameAddon {
       ChargeCard,
     ];
 
-    if (this.game.players.length > 1) {
+    if (this.game.players.length > 6) {
       cards.push(
         ...[
           KingReturnsCard,
@@ -62,7 +62,7 @@ export class PlotCardsAddon implements IGameAddon {
         ],
       );
 
-      this.cardsPerRound = this.game.players.length > 8 ? 3 : 5;
+      this.cardsPerRound = this.game.players.length > 8 ? 3 : 2;
     } else {
       this.cardsPerRound = 1;
     }
