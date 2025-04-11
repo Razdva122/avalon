@@ -1,33 +1,7 @@
 <template>
   <div class="info-page-content stats-page">
     <h1>{{ $t('userStats.userStatsTitle') }}</h1>
-    <div v-if="userState.status === 'ready'" class="preview-profile">
-      <Avatar class="avatar mr-2" :avatarID="userState.profile.avatar" />
-      <div class="profile-info">
-        <div class="profile-username">
-          {{ userState.profile.name }}
-        </div>
-        <div class="info-hint">id: {{ $props.uuid }}</div>
-        <div class="profile-games">
-          <div class="profile-games-counter">
-            <span class="games-wins">
-              {{ state?.teams.total.wins }}
-            </span>
-            -
-            <span class="games-loses">
-              {{ state?.teams.total.lose }}
-            </span>
-          </div>
-          <div class="info-hint">games</div>
-        </div>
-        <div>
-          <div class="profile-winrate">
-            {{ `${state?.teams.total.winrate} %` }}
-          </div>
-          <div class="info-hint">winrate</div>
-        </div>
-      </div>
-    </div>
+    <UserProfileHeader :uuid="$props.uuid" :gameStats="state" />
     <h2>{{ $t('stats.generalStatsTitle') }}</h2>
     <v-data-table
       class="general-table"
@@ -130,6 +104,7 @@ import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
 import UserRatings from '@/components/stats/UserRatings.vue';
 import { VisualGameState } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
+import UserProfileHeader from '@/components/stats/UserProfileHeader.vue';
 import { useStore } from '@/store';
 
 export default defineComponent({
@@ -140,6 +115,7 @@ export default defineComponent({
     TeammateProfile,
     WinrateDisplay,
     UserRatings,
+    UserProfileHeader,
   },
   props: {
     uuid: {
@@ -155,10 +131,6 @@ export default defineComponent({
     const enemies = ref<TTeammateStats[]>();
     const store = useStore();
 
-    const userState = computed(() => {
-      return store.state.users[props.uuid] || { status: 'loading' };
-    });
-
     const { t } = useI18n();
 
     const initState = async (uuid: string) => {
@@ -169,8 +141,6 @@ export default defineComponent({
       // Use the new combined function with different relation parameters
       teammates.value = preparePlayerStats(games, uuid, 'teammate');
       enemies.value = preparePlayerStats(games, uuid, 'enemy');
-
-      store.dispatch('getUserPublicProfile', { uuid });
 
       gamesState.value = games;
     };
@@ -242,7 +212,6 @@ export default defineComponent({
       lastGames,
       lastGamesHeaders,
       generalTable,
-      userState,
       navigateToPlayerStats,
       enemies,
       teammates,
@@ -270,19 +239,6 @@ export default defineComponent({
     width: 24px;
     height: 24px;
   }
-}
-
-.avatar {
-  width: 150px;
-  height: 150px;
-}
-
-.preview-profile {
-  display: flex;
-}
-
-.profile-info div {
-  margin-bottom: 0px;
 }
 
 .stats-container {
@@ -362,32 +318,6 @@ export default defineComponent({
     font-size: 14px;
     text-align: center;
   }
-}
-
-.profile-username {
-  font-size: 24px;
-}
-
-.info-hint {
-  font-size: 14px;
-  opacity: 0.8;
-  margin-top: -2px;
-}
-
-.games-wins {
-  color: rgb(var(--v-theme-success));
-}
-
-.games-loses {
-  color: rgb(var(--v-theme-error));
-}
-
-.profile-games-counter {
-  background-color: rgb(var(--v-theme-inset));
-  font-weight: 500;
-  width: fit-content;
-  padding: 0px 8px;
-  border-radius: 8px;
 }
 
 .gameID {

@@ -4,6 +4,13 @@ This file tracks significant architectural decisions, technology choices, and de
 
 ## Architectural Decisions
 
+[12.04.2025 00:06:44] - **User Profile Loading Refactoring**
+
+- Decision: Create a UserProfileHeader component to standardize user profile data loading
+- Rationale: Currently, UserStats.vue uses a different approach for loading user profile data compared to other components
+- Implementation: New component will use useUserProfile composable instead of direct store dispatch
+- Implications: Improved code consistency, better maintainability, and automatic handling of uuid changes
+
 [11.04.2025 12:20:57] - **Memory Bank Structure**
 
 - Decision: Created standardized memory bank files to ensure consistent activation across all modes
