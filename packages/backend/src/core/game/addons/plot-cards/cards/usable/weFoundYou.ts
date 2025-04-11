@@ -45,6 +45,7 @@ export class WeFoundYouCard extends AbstractCard implements IUsablePlotCard {
       this.game.history.push(new WeFoundYouHistory(player, selectedPlayer));
       player.features.waitForAction = false;
       selectedPlayer.features.openAction = true;
+      selectedPlayer.features.isSelected = false;
       this.plotCardsAddon.removeCardFromGame(this);
     } else {
       player.features.waitForAction = false;

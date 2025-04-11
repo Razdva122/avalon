@@ -3,3 +3,4 @@ Disallow: /room/*
 Disallow: /profile/*
 Disallow: /stats/user/*
 Disallow: /404/
+Disallow: en/*

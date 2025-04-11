@@ -187,7 +187,6 @@ describe('Plot Cards Individual Tests', () => {
 describe('Plot Cards Interactions', () => {
   test('Should handle multiple active cards in the correct order', () => {
     const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 7, (game) => {
-      game.addons.plotCards!.cardsPerRound = 2;
       movePlotCardsToStart(game, ['kingReturns', 'ambush']);
     });
 
@@ -218,5 +217,24 @@ describe('Plot Cards Interactions', () => {
     const missionIndex = historyTypes.lastIndexOf('mission');
 
     expect(kingReturnsIndex).toBeLessThan(missionIndex);
+  });
+
+  test('Two charge cards to same player should work', () => {
+    const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 7, (game) => {
+      movePlotCardsToStart(game, ['charge', 'charge']);
+    });
+
+    const playerWithCharge = game.players.find((player) => player !== game.leader)!;
+
+    gameHelper.giveCard([playerWithCharge.user.id, playerWithCharge.user.id]);
+
+    // Complete a round to trigger card activation
+    gameHelper.selectPlayersOnMission().sentSelectedPlayers();
+
+    gameHelper.makePreVote('approve');
+
+    gameHelper.makeVotes();
+
+    expect(game.stage).toBe('onMission');
   });
 });

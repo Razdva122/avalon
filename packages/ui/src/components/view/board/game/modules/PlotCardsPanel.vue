@@ -195,7 +195,7 @@ export default defineComponent({
     };
 
     const weFoundYouClick = () => {
-      socket.emit('useWeFoundYou', game.value.uuid, isZeroPlayerSelected ? false : true);
+      socket.emit('useWeFoundYou', game.value.uuid, isZeroPlayerSelected.value ? false : true);
     };
 
     const emitClick = (methodName: TMethodsWithoutParams) => {

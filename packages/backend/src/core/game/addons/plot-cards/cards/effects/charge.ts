@@ -3,6 +3,7 @@ import { IEffectPlotCard } from '@/core/game/addons/plot-cards/interface';
 import { of, Subject } from 'rxjs';
 import { PreVote } from '@/core/game/addons/plot-cards/history/preVote';
 import { TVoteOption } from '@avalon/types';
+import _ from 'lodash';
 
 /**
  * activate -> leader give card to some one
@@ -27,9 +28,12 @@ export class ChargeCard extends AbstractCard implements IEffectPlotCard {
       return of(true);
     }
 
-    const playersWithCharge = this.plotCardsAddon.cardsInGame
-      .filter((card) => card.name === 'charge')
-      .map((card) => this.game.findPlayerByID(card.ownerID!));
+    const playersWithCharge = _.uniqBy(
+      this.plotCardsAddon.cardsInGame
+        .filter((card) => card.name === 'charge')
+        .map((card) => this.game.findPlayerByID(card.ownerID!)),
+      'id',
+    );
 
     this.preVote = new PreVote(playersWithCharge);
 

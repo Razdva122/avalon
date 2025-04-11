@@ -64,7 +64,7 @@ import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
 import eventBus from '@/helpers/event-bus';
 import { THistoryResults } from '@avalon/types';
-import { hasActiveCard, useHaveActiveLoyaltyCard, isAdjacentPlayer } from '@/helpers/plot-cards';
+import { hasActiveCard, useHaveActiveLoyaltyCard, isAdjacentPlayer, isPlayerOnMission } from '@/helpers/plot-cards';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { gameStateKey, stateManagerKey, TPageRoomState } from '@/helpers/game-state-manager';
@@ -130,7 +130,7 @@ export default defineComponent({
       socket.emit('kickPlayer', roomState.value.roomID, uuid);
     };
 
-    const canUserSelectPlayer = (targetPlayerID?: string) => {
+    const canUserSelectPlayer = (targetPlayerID: string) => {
       if (!playerInGame.value) return false;
 
       const { stage } = gameState.value;
@@ -138,22 +138,27 @@ export default defineComponent({
       const playerID = playerInGame.value.id;
 
       // Special case for areYouTheOne card - can only select adjacent players
-      if (stage === 'checkLoyalty' && hasActiveCard(gameState.value, playerID, 'areYouTheOne') && targetPlayerID) {
+      if (stage === 'checkLoyalty' && hasActiveCard(gameState.value, playerID, 'areYouTheOne')) {
         return isAdjacentPlayer(gameState.value, playerID, targetPlayerID);
+      }
+
+      if (
+        (stage === 'weFoundYou' && hasActiveCard(gameState.value, playerID, 'weFoundYou')) ||
+        (stage === 'useExcalibur' && features.excalibur) ||
+        (stage === 'ambush' && hasActiveCard(gameState.value, playerID, 'ambush'))
+      ) {
+        return isPlayerOnMission(gameState.value, targetPlayerID);
       }
 
       return (
         (stage === 'selectTeam' && features.isLeader) ||
         (stage === 'giveExcalibur' && features.isLeader) ||
         (stage === 'assassinate' && features.isAssassin) ||
-        (stage === 'useExcalibur' && features.excalibur) ||
         (stage === 'checkLoyalty' && (features.ladyOfLake === 'active' || features.ladyOfSea === 'active')) ||
         (stage === 'checkLoyalty' && features.witchLoyalty === 'active') ||
         (stage === 'giveCard' && features.isLeader) ||
-        (stage === 'ambush' && hasActiveCard(gameState.value, playerID, 'ambush')) ||
         (stage === 'leadToVictory' && hasActiveCard(gameState.value, playerID, 'leadToVictory')) ||
         (stage === 'restoreHonor' && hasActiveCard(gameState.value, playerID, 'restoreHonor')) ||
-        (stage === 'checkLoyalty' && hasActiveCard(gameState.value, playerID, 'areYouTheOne')) ||
         (stage === 'revealLoyalty' && hasActiveCard(gameState.value, playerID, 'showNature')) ||
         (stage === 'revealLoyalty' && hasActiveCard(gameState.value, playerID, 'showStrength'))
       );

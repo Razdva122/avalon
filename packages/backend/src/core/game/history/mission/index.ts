@@ -2,7 +2,14 @@ import * as _ from 'lodash';
 
 import type { IPlayerInGame } from '@/core/game';
 
-import type { MissionSettings, TMissionResult, THistoryStage, THistoryMission } from '@avalon/types';
+import type {
+  MissionSettings,
+  TMissionResult,
+  THistoryStage,
+  THistoryMission,
+  IAction,
+  IActionWithResult,
+} from '@avalon/types';
 
 import type { HistoryElement, THistoryData, TDataForManagerOptions } from '@/core/game/history';
 
@@ -149,21 +156,18 @@ export class Mission implements HistoryElement<'mission'> {
     const hideElement = options.game.features.hiddenHistory && !isLastElement;
 
     if (!hideElement || options.game.stage === 'end') {
-      data.leaderID = this.data.leader!.user.id;
       data.actions = this.data.actions.map((action) => {
         const isGameEnded = options.game.stage === 'end';
         const isUserAction = action.player.user.id === options.userID;
         const isSwitchedByPlayer = options.userID && action.switchedBy === options.userID;
 
+        const data: IAction = { playerID: action.player.user.id, switchedBy: action.switchedBy };
+
         if (isGameEnded || isUserAction || isSwitchedByPlayer || action.openToEveryone) {
-          return {
-            playerID: action.player.user.id,
-            switchedBy: action.switchedBy,
-            value: action.value,
-          };
+          (<IActionWithResult>data).value = <TMissionResult>action.value;
         }
 
-        return { playerID: action.player.user.id, switchedBy: action.switchedBy };
+        return data;
       });
     }
 

@@ -129,6 +129,35 @@ export const usePlayerCards = (game: Ref<VisualGameState>, playerID: Ref<string 
 };
 
 /**
+ * Check if a player is on the current mission (has isSent feature)
+ * @param game The game state
+ * @param playerID The ID of the player to check
+ * @returns Boolean indicating if the player is on the current mission
+ */
+export const isPlayerOnMission = (game: VisualGameState, playerID?: string): boolean => {
+  if (!playerID) {
+    return false;
+  }
+
+  const player = game.players.find((player) => player.id === playerID);
+
+  if (!player) {
+    return false;
+  }
+
+  return player.features.isSent === true;
+};
+
+/**
+ * Create a computed property that checks if a player is on the current mission
+ * @param game Ref to the game state
+ * @param playerID Ref to the player ID
+ * @returns Computed boolean indicating if the player is on the current mission
+ */
+export const useIsPlayerOnMission = (game: Ref<VisualGameState>, playerID: Ref<string | undefined>) => {
+  return computed(() => isPlayerOnMission(game.value, playerID.value));
+};
+/**
  * Create a computed property that checks if a player is adjacent to another player
  * @param game Ref to the game state
  * @param playerID Ref to the player ID
