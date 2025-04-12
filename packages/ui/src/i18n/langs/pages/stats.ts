@@ -31,7 +31,8 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     topPlayerTitle: 'Top Player',
     gamesPlayed: '{count} games',
     noTopPlayerData: 'No top player data available',
-
+    topRoles: 'Top Roles',
+    noRolesData: 'No role data available',
     noRatingHistory: 'No rating history available',
   },
   pt: {
@@ -63,6 +64,8 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     topPlayerTitle: 'Melhor Jogador',
     gamesPlayed: '{count} jogos',
     noTopPlayerData: 'Não há dados disponíveis sobre o melhor jogador',
+    topRoles: 'Melhores Funções',
+    noRolesData: 'Não há dados de funções disponíveis',
 
     noRatingHistory: 'Não há histórico de classificação disponível',
   },
@@ -95,6 +98,8 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     topPlayerTitle: 'Лучший игрок',
     gamesPlayed: '{count} игр',
     noTopPlayerData: 'Нет данных о лучшем игроке',
+    topRoles: 'Лучшие роли',
+    noRolesData: 'Нет данных о ролях',
 
     noRatingHistory: 'История рейтинга недоступна',
   },
@@ -127,6 +132,8 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     topPlayerTitle: '顶尖玩家',
     gamesPlayed: '{count} 场游戏',
     noTopPlayerData: '没有顶尖玩家数据',
+    topRoles: '最佳角色',
+    noRolesData: '没有角色数据',
 
     noRatingHistory: '没有评分历史',
   },
@@ -159,6 +166,8 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     topPlayerTitle: '頂尖玩家',
     gamesPlayed: '{count} 場遊戲',
     noTopPlayerData: '沒有頂尖玩家數據',
+    topRoles: '最佳角色',
+    noRolesData: '沒有角色數據',
 
     noRatingHistory: '沒有評分歷史',
   },
@@ -191,6 +200,8 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     topPlayerTitle: 'Mejor Jugador',
     gamesPlayed: '{count} juegos',
     noTopPlayerData: 'No hay datos del mejor jugador disponibles',
+    topRoles: 'Mejores Roles',
+    noRolesData: 'No hay datos de roles disponibles',
 
     noRatingHistory: 'No hay historial de clasificación disponible',
   },

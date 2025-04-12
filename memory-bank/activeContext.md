@@ -1,63 +1,27 @@
 # Active Context
 
-This file tracks the current focus of work, recent changes, and open questions/issues for the Avalon project.
+This file tracks the project's current status, including recent changes, current goals, and open questions.
+2025-04-13 00:04:12 - Log of updates made.
+
+-
 
 ## Current Focus
 
-[12.04.2025 00:07:03] - **User Profile Loading Refactoring**
-
-- Planning the refactoring of user profile data loading in UserStats.vue
-- Creating a new UserProfileHeader component to standardize the approach
-- Ensuring consistent use of useUserProfile composable across the application
-- Detailed implementation plan created in memory-bank/implementation-plan.md
-
-[11.04.2025 12:20:24] - **Plot Cards Implementation**
-
-- Working on plot cards functionality and testing
-- Implementing and testing various plot card types
-- Ensuring proper integration with the game system
+- Adapting the UserHoverCard component for mobile devices where hover interactions are not available
+- Implementing a long press gesture using @vueuse/core to trigger the UserHoverCard on mobile
+- Ensuring the existing click functionality for player selection remains intact
+- Providing visual feedback for long press interactions on mobile devices
 
 ## Recent Changes
 
-[12.04.2025 00:06:44] - **User Profile Loading Design Decision**
-
-- Decided to create a UserProfileHeader component to standardize user profile data loading
-- Component will use useUserProfile composable instead of direct store dispatch
-- Will improve code consistency and maintainability
-
-[06.04.2025 11:56:00] - **Implemented Portuguese Translation**
-
-- Added Portuguese language support to the application
-- Created translation files for all UI sections and content
-- Added SEO translations for all pages and roles
-
-[05.04.2025 10:49:10] - **Added TopRolePlayer to All Role Pages**
-
-- Added the component to all role pages with appropriate positioning
-- Implemented separate components for special roles like Lancelots and Lovers
-
-[05.04.2025 10:13:56] - **Added Rating System Documentation**
-
-- Added detailed documentation about the rating system
-- Documented the rating calculation algorithm, models, and API endpoints
+- Created detailed implementation plan for mobile adaptation of UserHoverCard
+- Evaluated multiple approaches: custom directive, @vueuse/core, and Vuetify components
+- Selected @vueuse/core solution for its balance of simplicity and functionality
+- Documented mobile adaptation patterns in systemPatterns.md for future reference
 
 ## Open Questions/Issues
 
-[12.04.2025 00:07:03] - **User Profile Loading Implementation**
-
-- Need to implement the UserProfileHeader component as designed
-- Need to modify UserStats.vue to use the new component
-- Need to test the changes to ensure everything works as expected
-
-[11.04.2025 12:20:24] - **Memory Bank Activation**
-
-- Ensuring memory bank is properly activated across all modes
-- Creating required files for memory bank functionality
-
-[11.04.2025 11:57:16] - **Plot Cards Implementation Progress**
-
-- Implementing various plot card types (usable, instant, effect)
-- Current cards include: Lead To Victory, Ambush, King Returns, Restore Honor, Charge, Show Nature, Are You The One, We Found You, Show Strength
-- Frontend components for card display and interaction are in place
-- Portuguese translations for all plot cards have been added
-- Comprehensive documentation for adding new plot cards has been created
+- Test the long press implementation on various mobile devices to ensure consistent behavior
+- Consider if the 600ms delay for long press is appropriate for the user experience
+- Evaluate if additional visual feedback is needed during the long press interaction
+- Determine if any performance optimizations are needed for the modal dialog on lower-end devices

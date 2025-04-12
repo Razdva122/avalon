@@ -85,3 +85,21 @@ This file documents architectural patterns, design patterns, and coding conventi
 - Unit tests for core game logic
 - Integration tests for addon functionality
 - Test helpers for common testing scenarios
+
+## Mobile Adaptation Patterns
+
+[13.04.2025 00:03:24] - **Long Press for Mobile Hover Alternatives**
+
+- For components that use hover interactions on desktop (like tooltips and hover cards):
+  - Use `useLongPress` from `@vueuse/core` to detect long press gestures on mobile
+  - Show content in modals or dialogs on mobile devices
+  - Maintain separate interaction paths for desktop (hover) and mobile (long press)
+  - Use media queries like `@media (hover: none)` to target touch devices specifically
+  - Provide visual feedback during long press interactions
+
+[13.04.2025 00:03:24] - **Responsive UI Components**
+
+- Components adapt their behavior based on device capabilities:
+  - Check for touch support using `window.matchMedia('(hover: none)').matches`
+  - Use Vuetify's responsive components (v-dialog, v-bottom-sheet) for mobile interfaces
+  - Optimize layout and sizing for different screen sizes

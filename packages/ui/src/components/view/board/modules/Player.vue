@@ -1,49 +1,75 @@
 <template>
-  <div class="player-container" :class="playerClasses" @click="$emit('playerClick', player.id)">
-    <img class="player-frame" alt="frame" :src="getImagePathByID('core', 'player-frame')" />
-    <div class="player-icon"></div>
-    <Avatar
-      v-if="displayUserAvatar && userState.status === 'ready'"
-      class="role-container"
-      :avatarID="userState.profile.avatar"
-    />
-    <PlayerIcon v-if="'role' in player" class="role-container" :icon="player.role" />
-    <div class="player-crown" alt="crown"></div>
-    <div class="player-actions-features" v-if="'features' in player">
-      <img
-        v-for="addon in ['lady-of-lake', 'lady-of-sea', 'excalibur']"
-        :class="addon"
-        :alt="addon"
-        :src="getImagePathByID('features', toSnakeCase(addon))"
-      />
-      <template v-for="card in playerCards" :key="card.name">
-        <PlotCard :displayTooltip="true" class="plot-card" :class="`plot-card-${card.stage}`" :cardName="card.name" />
+  <div class="player-container" :class="playerClasses" @click="$emit('playerClick', player.id)" ref="playerRef">
+    <v-tooltip
+      :open-delay="2500"
+      :close-delay="0"
+      location="top"
+      :disabled="!player.id || isMobileDevice"
+      max-width="350"
+      content-class="user-hover-tooltip"
+    >
+      <template v-slot:activator="{ props: tooltip }">
+        <div v-bind="tooltip" class="player-content">
+          <img class="player-frame" alt="frame" :src="getImagePathByID('core', 'player-frame')" />
+          <div class="player-icon"></div>
+          <Avatar
+            v-if="displayUserAvatar && userState.status === 'ready'"
+            class="role-container"
+            :avatarID="userState.profile.avatar"
+          />
+          <PlayerIcon v-if="'role' in player" class="role-container" :icon="player.role" />
+          <div class="player-crown" alt="crown"></div>
+          <div class="player-actions-features" v-if="'features' in player">
+            <img
+              v-for="addon in ['lady-of-lake', 'lady-of-sea', 'excalibur']"
+              :class="addon"
+              :alt="addon"
+              :src="getImagePathByID('features', toSnakeCase(addon))"
+            />
+            <template v-for="card in playerCards" :key="card.name">
+              <PlotCard
+                :displayTooltip="true"
+                class="plot-card"
+                :class="`plot-card-${card.stage}`"
+                :cardName="card.name"
+              />
+            </template>
+          </div>
+          <i class="material-icons action-icon close text-error"></i>
+          <i class="material-icons action-icon check"></i>
+          <div class="switch-image">
+            <div class="icon-good-mission"></div>
+            <i class="material-icons icon-switch arrow_forward"></i>
+            <div class="icon-evil-mission"></div>
+          </div>
+          <div class="message-container" v-if="chatMessage?.message">{{ chatMessage?.message }}</div>
+          <span class="player-name" :title="player.name">
+            <span class="player-name-text">
+              <span v-if="'index' in player && displayIndex">
+                <b>{{ `${player.index}.` }}</b>
+              </span>
+              <span>
+                {{ player.name }}
+              </span>
+            </span>
+          </span>
+        </div>
       </template>
-    </div>
-    <i class="material-icons action-icon close text-error"></i>
-    <i class="material-icons action-icon check"></i>
-    <div class="switch-image">
-      <div class="icon-good-mission"></div>
-      <i class="material-icons icon-switch arrow_forward"></i>
-      <div class="icon-evil-mission"></div>
-    </div>
-    <div class="message-container" v-if="chatMessage?.message">{{ chatMessage?.message }}</div>
-    <span class="player-name" :title="player.name">
-      <span class="player-name-text">
-        <span v-if="'index' in player && displayIndex">
-          <b>{{ `${player.index}.` }}</b>
-        </span>
-        <span>
-          {{ player.name }}
-        </span>
-      </span>
-    </span>
+
+      <UserHoverCard v-if="player.id" :userID="player.id" />
+    </v-tooltip>
+
+    <!-- Модальное окно для мобильных устройств -->
+    <v-dialog v-model="showUserCardDialog" max-width="350" content-class="user-card-dialog">
+      <UserHoverCard v-if="player.id && showUserCardDialog" :userID="player.id" />
+    </v-dialog>
   </div>
 </template>
 
 <script lang="ts">
 import cloneDeep from 'lodash/cloneDeep';
-import { defineComponent, PropType, inject, computed, toRefs, ref } from 'vue';
+import { defineComponent, PropType, inject, computed, toRefs, ref, onMounted } from 'vue';
+import { onLongPress } from '@vueuse/core';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { useUserProfile } from '@/helpers/setup';
@@ -63,6 +89,7 @@ import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import { getImagePathByID } from '@/helpers/images';
 import Avatar from '@/components/user/Avatar.vue';
 import PlotCard from '@/components/view/information/PlotCard.vue';
+import UserHoverCard from '@/components/user/UserHoverCard.vue';
 import snakeCase from 'lodash/snakeCase';
 
 export default defineComponent({
@@ -70,6 +97,7 @@ export default defineComponent({
     PlayerIcon,
     Avatar,
     PlotCard,
+    UserHoverCard,
   },
   props: {
     playerState: {
@@ -89,12 +117,30 @@ export default defineComponent({
       type: Boolean,
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const gameState = inject(gameStateKey)!;
     const store = useStore();
     const { playerState, visibleHistory, displayKick } = toRefs(props);
     const { userState } = useUserProfile(playerState.value.id);
     const chatMessage = ref<{ message?: string; timeoutId?: number }>();
+    const playerRef = ref(null);
+    const showUserCardDialog = ref(false);
+
+    const isMobileDevice = computed(() => {
+      return window.matchMedia && window.matchMedia('(hover: none)').matches;
+    });
+
+    onMounted(() => {
+      onLongPress(
+        playerRef,
+        () => {
+          if (isMobileDevice.value && player.value.id) {
+            showUserCardDialog.value = true;
+          }
+        },
+        { delay: 600 },
+      );
+    });
 
     socket.on('newMessage', (message) => {
       if (message.author === playerState.value.id) {
@@ -273,6 +319,9 @@ export default defineComponent({
       toSnakeCase,
       plotCardsNames,
       playerCards,
+      playerRef,
+      showUserCardDialog,
+      isMobileDevice,
     };
   },
 });
@@ -292,6 +341,24 @@ export default defineComponent({
   align-items: center;
   pointer-events: all;
   cursor: pointer;
+  position: relative;
+}
+
+.player-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+:deep(.user-hover-tooltip) {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
 }
 
 .player-actions-features {
@@ -453,6 +520,45 @@ export default defineComponent({
   width: 80px;
   height: 80px;
   transform: rotate(-15deg);
+}
+
+:deep(.user-card-dialog) {
+  margin: 0;
+  padding: 0;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+@media (hover: none) {
+  .player-container {
+    position: relative;
+
+    &:active {
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(var(--v-theme-primary), 0.1);
+        border-radius: 8px;
+        animation: pulse-touch 0.6s ease-in-out;
+      }
+    }
+  }
+
+  @keyframes pulse-touch {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.3;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
 }
 
 .close,
