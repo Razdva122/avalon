@@ -381,7 +381,7 @@ export class GameTestHelper {
   makePreVote(option: TVoteOption = 'approve'): this {
     const playerWithCharge = this.game.players.find((player) => {
       const playerCard = this.game.addons.plotCards!.cardsInGame.find(
-        (plotCard) => plotCard.name === 'charge' && plotCard.ownerID === player.user.id,
+        (plotCard) => plotCard.name === 'charge' && plotCard.ownerID === player.user.id && plotCard.stage === 'active',
       );
       return playerCard !== undefined;
     });
