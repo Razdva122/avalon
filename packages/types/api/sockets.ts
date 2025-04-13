@@ -115,10 +115,14 @@ export interface ClientToServerEvents extends ClientToServerUserEvents {
   actionOnMission: (uuid: string, result: TMissionResult) => void;
   assassinate: (uuid: string, type: TAssassinateType, role?: TRoles) => void;
 
-  checkLoyalty: (uuid: string) => void;
-  revealLoyalty: (uuid: string) => void;
+  checkLoyalty: (uuid: string, cardID?: string) => void;
+  checkLoyaltyWithCard: (uuid: string, cardID: string) => void;
+  revealLoyalty: (uuid: string, cardID?: string) => void;
+  revealLoyaltyWithCard: (uuid: string, cardID: string) => void;
   getLoyalty: (uuid: string, callback: (loyalty: TLoyalty | TRoles) => void) => void;
+  getLoyaltyWithCard: (uuid: string, cardID: string, callback: (loyalty: TLoyalty | TRoles) => void) => void;
   announceLoyalty: (uuid: string, loyalty: TLoyalty | TRoles) => void;
+  announceLoyaltyWithCard: (uuid: string, loyalty: TLoyalty | TRoles, cardID: string) => void;
 
   giveExcalibur: (uuid: string) => void;
   useExcalibur: (uuid: string) => void;
@@ -126,12 +130,12 @@ export interface ClientToServerEvents extends ClientToServerUserEvents {
   useWitchAbility: (uuid: string, result: boolean) => void;
 
   givePlotCard: (uuid: string) => void;
-  preVote: (uuid: string, option: TVoteOption) => void;
-  useLeadToVictory: (uuid: string, use: boolean) => void;
-  useAmbush: (uuid: string) => void;
-  useRestoreHonor: (uuid: string, cardID: string) => void;
-  useKingReturns: (uuid: string, use: boolean) => void;
-  useWeFoundYou: (uuid: string, use: boolean) => void;
+  preVote: (uuid: string, option: TVoteOption, cardID: string) => void;
+  useLeadToVictory: (uuid: string, use: boolean, cardID: string) => void;
+  useAmbush: (uuid: string, cardID: string) => void;
+  useRestoreHonor: (uuid: string, restoreHonorCardID: string, cardID: string) => void;
+  useKingReturns: (uuid: string, use: boolean, cardID: string) => void;
+  useWeFoundYou: (uuid: string, use: boolean, cardID: string) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;

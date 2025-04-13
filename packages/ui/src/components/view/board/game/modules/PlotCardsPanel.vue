@@ -1,7 +1,7 @@
 <template>
   <div class="plot-cards-panel">
     <template v-if="game.stage === 'restoreHonor' && isUserRestoreHonorOwner">
-      <RestoreHonorView :game="game" />
+      <RestoreHonorView :game="game" :cardID="getActiveCardByType('restoreHonor').id" />
     </template>
 
     <div v-else-if="data?.length" class="plot-cards-view mb-2">
@@ -113,13 +113,14 @@ import PlotCard from '@/components/view/information/PlotCard.vue';
 import RestoreHonorView from '@/components/view/board/game/modules/RestoreHonorView.vue';
 import LoyaltyCardActions from '@/components/view/board/game/modules/LoyaltyCardActions.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
-import type { ActiveCard, VisualGameState } from '@avalon/types';
+import type { ActiveCard, TPlotCardNames, VisualGameState } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useGamePlayerState } from '@/helpers/composables/useGamePlayerState';
 import { useHasActiveCard, hasActiveCard, useHaveActiveLoyaltyCard } from '@/helpers/plot-cards';
 import { stateManagerKey } from '@/helpers/game-state-manager';
 
-type TMethodsWithoutParams = 'useAmbush';
+// Update the type to include the cardID parameter
+type TMethodName = 'useAmbush';
 
 export default defineComponent({
   name: 'PlotCardsPanel',
@@ -154,6 +155,13 @@ export default defineComponent({
     const isUserRestoreHonorOwner = useHasActiveCard(game, playerID, 'restoreHonor');
     const isUserKingReturnsOwner = useHasActiveCard(game, playerID, 'kingReturns');
     const isUserWeFoundYouOwner = useHasActiveCard(game, playerID, 'weFoundYou');
+
+    const getActiveCardByType = (cardName: TPlotCardNames) => {
+      return game.value.addonsData.plotCards?.cardsInGame.find(
+        (card) => card.name === cardName && card.stage === 'active' && card.ownerID === playerID.value,
+      )!;
+    };
+
     const isUserLoyaltyCardOwner = useHaveActiveLoyaltyCard(game, playerID);
 
     const isLoyaltyCheckStage = computed(() => {
@@ -189,19 +197,25 @@ export default defineComponent({
     };
 
     const leadToVictoryClick = (use: boolean) => {
-      socket.emit('useLeadToVictory', game.value.uuid, use);
+      const card = getActiveCardByType('leadToVictory');
+      socket.emit('useLeadToVictory', game.value.uuid, use, card.id);
     };
 
     const kingReturnsClick = (use: boolean) => {
-      socket.emit('useKingReturns', game.value.uuid, use);
+      const card = getActiveCardByType('kingReturns');
+      socket.emit('useKingReturns', game.value.uuid, use, card.id);
     };
 
     const weFoundYouClick = () => {
-      socket.emit('useWeFoundYou', game.value.uuid, isZeroPlayerSelected.value ? false : true);
+      const card = getActiveCardByType('weFoundYou');
+      socket.emit('useWeFoundYou', game.value.uuid, isZeroPlayerSelected.value ? false : true, card.id);
     };
 
-    const emitClick = (methodName: TMethodsWithoutParams) => {
-      socket.emit(methodName, game.value.uuid);
+    const emitClick = (methodName: TMethodName) => {
+      if (methodName === 'useAmbush') {
+        const card = getActiveCardByType('ambush');
+        socket.emit(methodName, game.value.uuid, card.id);
+      }
     };
 
     return {
@@ -219,6 +233,7 @@ export default defineComponent({
       isLoyaltyCheckStage,
       isUserLoyaltyCardOwner,
       activeCard,
+      getActiveCardByType,
       givePlotCard,
       leadToVictoryClick,
       kingReturnsClick,

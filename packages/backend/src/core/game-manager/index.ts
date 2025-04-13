@@ -251,10 +251,10 @@ export class GameManager {
 
       // Plot card methods
       case 'preVote': {
-        const activeCard = this.getActivePlotCard();
+        const activeCard = this.getActivePlotCard(params.cardID, userID);
 
         if (isChargeCard(activeCard)) {
-          activeCard.makeVote(userID, params.option);
+          activeCard.makeVote(params.option);
         } else {
           throw new Error(`Active card ${activeCard.name} does not support pre-voting`);
         }
@@ -262,50 +262,72 @@ export class GameManager {
       }
 
       case 'useLeadToVictory':
-        this.handlePlotCardAction('lead to victory', isLeadToVictoryCard, (card) =>
-          card.leadToVictory(userID, params.use),
+        this.handlePlotCardAction(
+          'lead to victory',
+          isLeadToVictoryCard,
+          (card) => card.leadToVictory(userID, params.use),
+          params.cardID,
+          userID,
         );
         break;
 
       case 'useAmbush':
-        this.handlePlotCardAction('ambush', isAmbushCard, (card) => card.ambush());
+        this.handlePlotCardAction('ambush', isAmbushCard, (card) => card.ambush(), params.cardID, userID);
         break;
 
       case 'useRestoreHonor': {
-        this.handlePlotCardAction('restore honor', isRestoreHonorCard, (card) => {
-          // Get the selected player from the game
-          const selectedPlayers = this.game.players.filter((player) => player.features.isSelected);
+        this.handlePlotCardAction(
+          'restore honor',
+          isRestoreHonorCard,
+          (card) => {
+            // Get the selected player from the game
+            const selectedPlayers = this.game.players.filter((player) => player.features.isSelected);
 
-          if (selectedPlayers.length !== 1) {
-            throw new Error('You must select exactly one player to use restore honor');
-          }
+            if (selectedPlayers.length !== 1) {
+              throw new Error('You must select exactly one player to use restore honor');
+            }
 
-          const targetPlayerId = selectedPlayers[0].user.id;
-          card.restoreHonor(params.cardID, targetPlayerId, userID);
-        });
+            const targetPlayerId = selectedPlayers[0].user.id;
+            card.restoreHonor(params.cardID, targetPlayerId, userID);
+          },
+          params.restoreHonorCardID,
+          userID,
+        );
         break;
       }
 
       case 'useKingReturns':
-        this.handlePlotCardAction('king returns', isKingReturnsCard, (card) => card.kingReturns(params.use));
+        this.handlePlotCardAction(
+          'king returns',
+          isKingReturnsCard,
+          (card) => card.kingReturns(params.use),
+          params.cardID,
+          userID,
+        );
         break;
 
       case 'useWeFoundYou':
-        this.handlePlotCardAction('we found you', isWeFoundYouCard, (card) => {
-          if (params.use) {
-            // Get the selected player if use is true
-            const selectedPlayers = this.game.players.filter((player) => player.features.isSelected);
+        this.handlePlotCardAction(
+          'we found you',
+          isWeFoundYouCard,
+          (card) => {
+            if (params.use) {
+              // Get the selected player if use is true
+              const selectedPlayers = this.game.players.filter((player) => player.features.isSelected);
 
-            if (selectedPlayers.length !== 1) {
-              throw new Error('You must select exactly one player to use We Found You');
+              if (selectedPlayers.length !== 1) {
+                throw new Error('You must select exactly one player to use We Found You');
+              }
+
+              const selectedPlayer = this.game.findPlayerByID(selectedPlayers[0].user.id);
+              card.weFoundYou(userID, true, selectedPlayer);
+            } else {
+              card.weFoundYou(userID, false, undefined);
             }
-
-            const selectedPlayer = this.game.findPlayerByID(selectedPlayers[0].user.id);
-            card.weFoundYou(userID, true, selectedPlayer);
-          } else {
-            card.weFoundYou(userID, false, undefined);
-          }
-        });
+          },
+          params.cardID,
+          userID,
+        );
         break;
     }
   }
@@ -322,18 +344,49 @@ export class GameManager {
   /**
    * Gets the active plot card and ensures it exists
    */
-  private getActivePlotCard(): TPlotCard {
+  /**
+   * Gets the active plot card with the specified ID and ensures it exists
+   */
+  private getActivePlotCard(cardID?: string, playerID?: string): TPlotCard {
     this.ensureAddonExists(this.game.addons.plotCards, 'plot cards');
 
-    const activeCard = this.game.addons.plotCards.activeCard;
+    // If no cardID is provided, maintain backward compatibility
+    if (!cardID) {
+      // Find any active card for the player if playerID is provided
+      if (playerID) {
+        const playerCards = this.game.addons.plotCards.activeCards.filter((card) => card.ownerID === playerID);
 
-    if (!activeCard) {
-      throw new Error('No active card');
+        if (playerCards.length > 0) {
+          return playerCards[0];
+        }
+      }
+
+      // Otherwise, just return the first active card
+      if (this.game.addons.plotCards.activeCards.length > 0) {
+        return this.game.addons.plotCards.activeCards[0];
+      }
+
+      throw new Error('No active cards found');
     }
 
-    return activeCard;
+    // Find the specific card with the given ID
+    const card = this.game.addons.plotCards.activeCards.find((card) => card.id === cardID);
+
+    if (!card) {
+      throw new Error(`No active card found with ID ${cardID}`);
+    }
+
+    // If playerID is provided, validate ownership
+    if (playerID && card.ownerID !== playerID) {
+      throw new Error(`Card with ID ${cardID} is not owned by player ${playerID}`);
+    }
+
+    return card;
   }
 
+  /**
+   * Validates and executes a plot card action
+   */
   /**
    * Validates and executes a plot card action
    */
@@ -341,8 +394,10 @@ export class GameManager {
     cardName: string,
     typeGuard: (card: TPlotCard) => card is T,
     action: (card: T) => void,
+    cardID: string,
+    playerID: string,
   ): void {
-    const activeCard = this.getActivePlotCard();
+    const activeCard = this.getActivePlotCard(cardID, playerID);
 
     if (typeGuard(activeCard)) {
       action(activeCard);
@@ -357,19 +412,19 @@ export class GameManager {
   private handleLoyaltyAction(
     userID: string,
     method: 'checkLoyalty' | 'revealLoyalty' | 'announceLoyalty',
-    params?: { loyalty: TLoyalty | TRoles },
+    params?: { loyalty: TLoyalty | TRoles; cardID?: string },
   ): void {
     const activeType = this.getActiveLoyaltyCheckerType();
 
     if (activeType === 'plot-card') {
       if (method === 'checkLoyalty') {
-        this.checkLoyaltyFromCard(userID);
+        this.checkLoyaltyFromCard(userID, params?.cardID);
         return;
       } else if (method === 'revealLoyalty') {
-        this.revealLoyaltyFromCard(userID);
+        this.revealLoyaltyFromCard(userID, params?.cardID);
         return;
       } else if (method === 'announceLoyalty' && params) {
-        this.announceLoyaltyFromCard(userID, params.loyalty);
+        this.announceLoyaltyFromCard(userID, params.loyalty, params.cardID);
         return;
       }
 
@@ -407,7 +462,7 @@ export class GameManager {
     }
 
     // Check for plot cards with loyalty checker
-    if (this.game.addons.plotCards?.activeCard?.loyaltyChecker) {
+    if (this.game.addons.plotCards?.activeCards.some((card) => card.loyaltyChecker)) {
       return 'plot-card';
     }
 
@@ -417,8 +472,16 @@ export class GameManager {
   /**
    * Checks loyalty from a plot card
    */
-  private checkLoyaltyFromCard(userID: string): void {
-    const card = this.game.addons.plotCards!.activeCard!;
+  private checkLoyaltyFromCard(userID: string, cardID?: string): void {
+    // Find the card with the loyalty checker
+    const cards = this.game.addons.plotCards!.activeCards.filter((card) => card.loyaltyChecker);
+
+    // If cardID is provided, find that specific card
+    const card = cardID ? cards.find((c) => c.id === cardID) : cards[0];
+
+    if (!card) {
+      throw new Error('No active card with loyalty checker found');
+    }
 
     const owner = this.game.findPlayerByID(card.ownerID!);
     if (this.game.selectedPlayers.length !== 1) {
@@ -431,8 +494,16 @@ export class GameManager {
   /**
    * Reveals loyalty from a plot card
    */
-  private revealLoyaltyFromCard(userID: string): void {
-    const card = this.game.addons.plotCards!.activeCard!;
+  private revealLoyaltyFromCard(userID: string, cardID?: string): void {
+    // Find the card with the loyalty checker
+    const cards = this.game.addons.plotCards!.activeCards.filter((card) => card.loyaltyChecker);
+
+    // If cardID is provided, find that specific card
+    const card = cardID ? cards.find((c) => c.id === cardID) : cards[0];
+
+    if (!card) {
+      throw new Error('No active card with loyalty checker found');
+    }
 
     const owner = this.game.findPlayerByID(card.ownerID!);
     if (this.game.selectedPlayers.length !== 1) {
@@ -445,16 +516,34 @@ export class GameManager {
   /**
    * Gets loyalty from a plot card
    */
-  private getLoyaltyFromCard(userID: string): TLoyalty | TRoles {
-    const card = this.game.addons.plotCards!.activeCard!;
+  private getLoyaltyFromCard(userID: string, cardID?: string): TLoyalty | TRoles {
+    // Find the card with the loyalty checker
+    const cards = this.game.addons.plotCards!.activeCards.filter((card) => card.loyaltyChecker);
+
+    // If cardID is provided, find that specific card
+    const card = cardID ? cards.find((c) => c.id === cardID) : cards[0];
+
+    if (!card) {
+      throw new Error('No active card with loyalty checker found');
+    }
+
     return card.loyaltyChecker!.getLoyalty(userID, this.game.selectedPlayers[0]);
   }
 
   /**
    * Announces loyalty from a plot card
    */
-  private announceLoyaltyFromCard(userID: string, loyalty: TLoyalty | TRoles): void {
-    const card = this.game.addons.plotCards!.activeCard!;
+  private announceLoyaltyFromCard(userID: string, loyalty: TLoyalty | TRoles, cardID?: string): void {
+    // Find the card with the loyalty checker
+    const cards = this.game.addons.plotCards!.activeCards.filter((card) => card.loyaltyChecker);
+
+    // If cardID is provided, find that specific card
+    const card = cardID ? cards.find((c) => c.id === cardID) : cards[0];
+
+    if (!card) {
+      throw new Error('No active card with loyalty checker found');
+    }
+
     card.loyaltyChecker!.announceLoyalty(userID, this.game.selectedPlayers[0], loyalty);
   }
 
@@ -464,7 +553,7 @@ export class GameManager {
     switch (params.method) {
       case 'getLoyalty':
         if (activeType === 'plot-card') {
-          return this.getLoyaltyFromCard(userID);
+          return this.getLoyaltyFromCard(userID, params.cardID);
         }
 
         if (this.game.addons[activeType]) {

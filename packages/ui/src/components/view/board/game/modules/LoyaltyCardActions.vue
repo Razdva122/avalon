@@ -26,10 +26,15 @@ const isCheckAvailable = computed(() => {
 });
 
 const checkLoyalty = () => {
+  // Get the active card ID
+  const activeCard = gameState.value.addonsData.plotCards?.cardsInGame.find(
+    (card) => card.name === props.cardName && card.stage === 'active',
+  )!;
+
   if (props.stage === 'revealLoyalty') {
-    socket.emit('revealLoyalty', props.gameUuid);
+    socket.emit('revealLoyaltyWithCard', props.gameUuid, activeCard.id);
   } else {
-    socket.emit('checkLoyalty', props.gameUuid);
+    socket.emit('checkLoyaltyWithCard', props.gameUuid, activeCard.id);
   }
 };
 </script>

@@ -68,15 +68,18 @@ export type TAssassinateParams = {
 
 export type TCheckLoyaltyParams = {
   method: 'checkLoyalty';
+  cardID?: string;
 };
 
 export type TRevealLoyaltyParams = {
   method: 'revealLoyalty';
+  cardID?: string;
 };
 
 export type TAnnounceLoyaltyParams = {
   method: 'announceLoyalty';
   loyalty: TLoyalty | TRoles;
+  cardID?: string;
 };
 
 export type TGiveExcaliburParams = {
@@ -94,35 +97,42 @@ export type TGivePlotCardParams = {
 export type TPreVoteParams = {
   method: 'preVote';
   option: TVoteOption;
+  cardID: string;
 };
 
 export type TUseLeadToVictoryParams = {
   method: 'useLeadToVictory';
   use: boolean;
+  cardID: string;
 };
 
 export type TUseAmbushParams = {
   method: 'useAmbush';
+  cardID: string;
 };
 
 export type TUseRestoreHonorParams = {
   method: 'useRestoreHonor';
+  restoreHonorCardID: string;
   cardID: string;
 };
 
 export type TUseKingReturnsParams = {
   method: 'useKingReturns';
   use: boolean;
+  cardID: string;
 };
 
 export type TUseWeFoundYouParams = {
   method: 'useWeFoundYou';
   use: boolean;
+  cardID: string;
 };
 
 export type TGetLoyaltyData = {
   params: {
     method: 'getLoyalty';
+    cardID?: string;
   };
   result: TLoyalty | TRoles;
 };

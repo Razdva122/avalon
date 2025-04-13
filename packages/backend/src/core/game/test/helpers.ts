@@ -273,8 +273,15 @@ export class GameTestHelper {
   }
 
   getActiveCardPlayer(): IPlayerInGame {
-    const ownerID = this.game.addons.plotCards!.cardsInGame.find((card) => card.stage === 'active')!.ownerID!;
-    return this.game.findPlayerByID(ownerID);
+    const activeCard =
+      this.game.addons.plotCards!.activeCards[0] ||
+      this.game.addons.plotCards!.cardsInGame.find((card) => card.stage === 'active');
+
+    if (!activeCard) {
+      throw new Error('No active card found');
+    }
+
+    return this.game.findPlayerByID(activeCard.ownerID!);
   }
 
   useLeadToVictory(use: boolean = true): this {
@@ -390,7 +397,7 @@ export class GameTestHelper {
       const chargeCard = this.game.addons.plotCards!.cardsInGame.find(
         (plotCard) => plotCard.name === 'charge' && plotCard.ownerID === playerWithCharge.user.id,
       )!;
-      (chargeCard as ChargeCard).makeVote(playerWithCharge.user.id, option);
+      (chargeCard as ChargeCard).makeVote(option);
     }
 
     return this;

@@ -257,6 +257,9 @@ describe('Plot Cards Interactions', () => {
 
     gameHelper.makePreVote('approve');
 
-    expect(game.stage).toBe('votingForMission');
+    expect(game.stage).toBe('votingForTeam');
+
+    expect(playerWithCharge.features.waitForAction).toBeFalsy();
+    expect(player2WithCharge.features.waitForAction).toBeFalsy();
   });
 });

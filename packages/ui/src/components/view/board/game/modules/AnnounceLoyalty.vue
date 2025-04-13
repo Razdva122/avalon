@@ -52,10 +52,26 @@ export default defineComponent({
     const loyalty = ref() as Ref<TLoyalty | TRoles>;
     const selectedLoyalty = ref<TRoles | TLoyalty | undefined>(undefined);
 
-    loyalty.value = await socket.emitWithAck('getLoyalty', gameState.value.uuid);
+    const activeCard = computed(() => {
+      return gameState.value.addonsData.plotCards?.cardsInGame.find(
+        (card) =>
+          (card.name === 'showNature' || card.name === 'areYouTheOne' || card.name === 'showStrength') &&
+          card.stage === 'active',
+      );
+    });
+
+    if (activeCard.value) {
+      loyalty.value = await socket.emitWithAck('getLoyaltyWithCard', gameState.value.uuid, activeCard.value.id);
+    } else {
+      loyalty.value = await socket.emitWithAck('getLoyalty', gameState.value.uuid);
+    }
 
     const announceLoyalty = (loyalty: TLoyalty | TRoles) => {
-      socket.emit('announceLoyalty', gameState.value.uuid, loyalty);
+      if (activeCard.value) {
+        socket.emit('announceLoyaltyWithCard', gameState.value.uuid, loyalty, activeCard.value.id);
+      } else {
+        socket.emit('announceLoyalty', gameState.value.uuid, loyalty);
+      }
     };
 
     const isLadyOfSea = computed(() => {

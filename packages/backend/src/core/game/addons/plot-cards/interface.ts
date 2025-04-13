@@ -2,6 +2,7 @@ import { Game } from '@/core/game';
 import { TEffectsCardNames, TUsableCardNames, TInstantCardNames, TActiveCardsStages } from '@avalon/types';
 import { Observable } from 'rxjs';
 import { LoyaltyChecker } from '@/core/game/addons/check-loyalty/loyalty-checker';
+import { PreVote } from '@/core/game/addons/plot-cards/history/preVote';
 
 export type TPlotCard = IEffectPlotCard | IUsablePlotCard | IInstantPlotCard;
 
@@ -22,10 +23,10 @@ export interface IBasePlotCard {
 
   /**
    * Determines how multiple cards of the same type are played:
-   * - 'single': Each card of this type is played sequentially one after another
-   * - 'multiCard': All cards of this type are played simultaneously
+   * - 'sequentially': Each card of this type is played sequentially one after another
+   * - 'parallel': All cards of this type are played simultaneously
    */
-  playType: 'single' | 'multiCard';
+  playType: 'parallel' | 'sequentially';
 
   /**
    * Loyalty checker for cards that check loyalty
@@ -63,5 +64,6 @@ export interface ICardState {
 
 export interface ICrossCardsStorage {
   isLeadToVictoryDisabled?: boolean;
+  chargePreVote?: PreVote;
   ambushUsedOn: string[];
 }

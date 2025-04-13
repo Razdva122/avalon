@@ -19,15 +19,30 @@ import _ from 'lodash';
 export class ChargeCard extends AbstractCard implements IEffectPlotCard {
   name = <const>'charge';
   type = <const>'effect';
-  playType: AbstractCard['playType'] = 'single';
+  playType: AbstractCard['playType'] = 'parallel';
   preVoteSubject: Subject<true> = new Subject();
-  preVote: PreVote | null = null;
 
-  play() {
+  override activateCard(ownerID: string): void {
+    const anotherCardAlreadyActivated = this.plotCardsAddon.cardsInGame.find(
+      (card) => card.name === 'charge' && card.ownerID === ownerID && card.stage === 'active',
+    );
+
+    if (!anotherCardAlreadyActivated) {
+      super.activateCard(ownerID);
+    }
+  }
+
+  play(ownerID: string) {
     if (this.game.turn === 4) {
       return of(true);
     }
 
+    this.activateCard(ownerID);
+
+    return this.preVoteSubject.asObservable();
+  }
+
+  postPlayAction() {
     const playersWithCharge = _.uniqBy(
       this.plotCardsAddon.cardsInGame
         .filter((card) => card.name === 'charge')
@@ -35,52 +50,41 @@ export class ChargeCard extends AbstractCard implements IEffectPlotCard {
       'user.id',
     );
 
-    this.preVote = new PreVote(playersWithCharge);
-
-    playersWithCharge.forEach((player) => {
-      this.activateCard(player.user.id);
-    });
+    this.plotCardsAddon.crossCardsStorage.chargePreVote = new PreVote(playersWithCharge);
 
     this.game.stage = <const>'preVote';
     this.game.stateObserver.gameStateChanged();
-
-    return this.preVoteSubject.asObservable();
   }
 
-  makeVote(playerID: string, option: TVoteOption): boolean {
-    if (!this.preVote) {
+  makeVote(option: TVoteOption): boolean {
+    const preVote = this.plotCardsAddon.crossCardsStorage.chargePreVote;
+
+    if (!preVote) {
       throw new Error('No pre-vote in progress');
     }
 
-    const player = this.game.findPlayerByID(playerID);
+    const player = this.game.findPlayerByID(this.ownerID!);
 
     if (!player) {
-      throw new Error(`Player with ID ${playerID} not found`);
+      throw new Error(`Player with ID ${this.ownerID} not found`);
     }
 
-    const chargeCard = this.plotCardsAddon.cardsInGame.find(
-      (card) => card.name === 'charge' && card.ownerID === playerID,
-    );
+    this.stage = 'has';
 
-    if (!chargeCard) {
-      throw new Error(`Player with ID ${playerID} dont have charge card`);
-    }
-
-    chargeCard.stage = 'has';
-
-    const allVoted = this.preVote.makeVote(player, option);
+    const allVoted = preVote.makeVote(player, option);
     this.game.stateObserver.gameStateChanged();
 
     if (allVoted) {
-      this.game.history.push(this.preVote);
+      this.game.history.push(preVote);
       this.game.vote!.data.votes.forEach((vote) => {
-        const preVoteValue = this.preVote!.data.votes.find((preVote) => preVote.player === vote.player)?.value;
+        const preVoteValue = preVote.data.votes.find((preVote) => preVote.player === vote.player)?.value;
 
         if (preVoteValue) {
           vote.value = preVoteValue;
           vote.preVote = <TVoteOption>preVoteValue;
         }
       });
+      this.plotCardsAddon.crossCardsStorage.chargePreVote = undefined;
       this.preVoteSubject.next(true);
     }
 

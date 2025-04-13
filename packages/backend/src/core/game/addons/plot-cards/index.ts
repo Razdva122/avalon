@@ -1,5 +1,18 @@
 import { IGameAddon } from '@/core/game/addons/interface';
-import { Observable, of, concatMap, from, takeWhile, last, defaultIfEmpty, Subject, tap, take, finalize } from 'rxjs';
+import {
+  Observable,
+  of,
+  concatMap,
+  from,
+  takeWhile,
+  last,
+  defaultIfEmpty,
+  Subject,
+  tap,
+  take,
+  finalize,
+  race,
+} from 'rxjs';
 import * as _ from 'lodash';
 import { Game, IPlayerInGame } from '@/core/game';
 import { Dictionary, AddonsData, TPlotCardNames } from '@avalon/types';
@@ -32,7 +45,7 @@ export class PlotCardsAddon implements IGameAddon {
   pointer: number = 0;
   currentCards: ICurrentCardsState = { cards: [], pointer: 0 };
   cardsInGame: TPlotCard[] = [];
-  activeCard: TPlotCard | undefined;
+  activeCards: TPlotCard[] = [];
   giveCardSubject: Subject<true> = new Subject();
 
   constructor(game: Game) {
@@ -266,12 +279,18 @@ export class PlotCardsAddon implements IGameAddon {
   }
 
   playCardIfExist(name: TPlotCard['name']): Observable<boolean> {
-    let cards = this.cardsInGame.filter((card) => card.name === name);
+    const cards = this.cardsInGame.filter((card) => card.name === name);
 
-    if (cards.length && cards[0].playType === 'single') {
-      cards = [cards[0]];
+    if (cards.length === 0) {
+      return of(true);
     }
 
+    // Check if cards are parallel type
+    if (cards[0].playType === 'parallel') {
+      return this.playParallelCards(cards);
+    }
+
+    // For sequential cards, sort them by player order
     if (cards.length > 1) {
       const playerOrder: Dictionary<number> = {};
       let player = this.game.leader;
@@ -290,21 +309,45 @@ export class PlotCardsAddon implements IGameAddon {
       });
     }
 
+    // Play sequential cards one after another
     return from(cards).pipe(
       concatMap((card) => {
-        this.activeCard = card;
+        this.activeCards.push(card);
         return card.play(card.ownerID!).pipe(
           take(1),
           tap(() => {
-            if (this.activeCard === card) {
-              this.activeCard = undefined;
-            }
+            this.activeCards = this.activeCards.filter((activeCard) => activeCard !== card);
           }),
         );
       }),
       takeWhile((result) => result === true, true),
       defaultIfEmpty(true),
       last(),
+    );
+  }
+
+  /**
+   * Handles playing cards with playType === 'parallel'
+   * All cards are added to activeCards, then we wait for any card to emit a result
+   * After that, all cards are removed from activeCards
+   */
+  private playParallelCards(cards: TPlotCard[]): Observable<boolean> {
+    cards.forEach((card) => {
+      this.activeCards.push(card);
+    });
+
+    const cardObservables = cards.map((card) => card.play(card.ownerID!));
+
+    (<ChargeCard>cards[0]).postPlayAction();
+
+    return race(...cardObservables).pipe(
+      take(1),
+      tap(() => {
+        cards.forEach((card) => {
+          this.activeCards = this.activeCards.filter((activeCard) => activeCard !== card);
+        });
+      }),
+      defaultIfEmpty(true),
     );
   }
 }

@@ -1,6 +1,15 @@
 import { Room } from '@/room';
 import { User } from '@/user';
-import type { Dictionary, TRoomInfo, TRoomsList, GameOptions, StartedRoomState } from '@avalon/types';
+import type {
+  Dictionary,
+  TRoomInfo,
+  TRoomsList,
+  GameOptions,
+  StartedRoomState,
+  TLoyalty,
+  TRoles,
+  TVoteOption,
+} from '@avalon/types';
 import type { Server, ServerSocket } from '@avalon/types';
 import crypto from 'crypto';
 
@@ -484,24 +493,44 @@ export class Manager {
       getRoomManager(uuid).callGameMethods(userID, { method: 'assassinate', type, customRole: role });
     });
 
-    socket.on('checkLoyalty', (uuid) => {
+    socket.on('checkLoyalty', (uuid: string) => {
       console.log(`Player ${userName} checkLoyalty in game ${uuid}`);
       getRoomManager(uuid).callGameMethods(userID, { method: 'checkLoyalty' });
     });
 
-    socket.on('revealLoyalty', (uuid) => {
+    socket.on('checkLoyaltyWithCard', (uuid: string, cardID: string) => {
+      console.log(`Player ${userName} checkLoyalty with card ${cardID} in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'checkLoyalty', cardID });
+    });
+
+    socket.on('revealLoyalty', (uuid: string) => {
       console.log(`Player ${userName} revealLoyalty in game ${uuid}`);
       getRoomManager(uuid).callGameMethods(userID, { method: 'revealLoyalty' });
     });
 
-    socket.on('announceLoyalty', (uuid, loyalty) => {
+    socket.on('revealLoyaltyWithCard', (uuid: string, cardID: string) => {
+      console.log(`Player ${userName} revealLoyalty with card ${cardID} in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'revealLoyalty', cardID });
+    });
+
+    socket.on('announceLoyalty', (uuid: string, loyalty: TLoyalty | TRoles) => {
       console.log(`Player ${userName} announceLoyalty in game ${uuid}`);
       getRoomManager(uuid).callGameMethods(userID, { method: 'announceLoyalty', loyalty });
     });
 
-    socket.on('getLoyalty', (uuid, cb) => {
+    socket.on('announceLoyaltyWithCard', (uuid: string, loyalty: TLoyalty | TRoles, cardID: string) => {
+      console.log(`Player ${userName} announceLoyalty with card ${cardID} in game ${uuid}`);
+      getRoomManager(uuid).callGameMethods(userID, { method: 'announceLoyalty', loyalty, cardID });
+    });
+
+    socket.on('getLoyalty', (uuid: string, cb: (loyalty: TLoyalty | TRoles) => void) => {
       console.log(`Player ${userName} getLoyalty in game ${uuid}`);
       cb(getRoomManager(uuid).getGameData(userID, { method: 'getLoyalty' }));
+    });
+
+    socket.on('getLoyaltyWithCard', (uuid: string, cardID: string, cb: (loyalty: TLoyalty | TRoles) => void) => {
+      console.log(`Player ${userName} getLoyalty with card ${cardID} in game ${uuid}`);
+      cb(getRoomManager(uuid).getGameData(userID, { method: 'getLoyalty', cardID }));
     });
 
     socket.on('giveExcalibur', (uuid) => {
@@ -524,34 +553,34 @@ export class Manager {
       getRoomManager(uuid).callGameMethods(userID, { method: 'givePlotCard' });
     });
 
-    socket.on('preVote', (uuid, option) => {
+    socket.on('preVote', (uuid: string, option: TVoteOption, cardID: string) => {
       console.log(`Player ${userName} preVote (${option}) in game ${uuid}`);
-      getRoomManager(uuid).callGameMethods(userID, { method: 'preVote', option });
+      getRoomManager(uuid).callGameMethods(userID, { method: 'preVote', option, cardID });
     });
 
-    socket.on('useLeadToVictory', (uuid, use) => {
+    socket.on('useLeadToVictory', (uuid: string, use: boolean, cardID: string) => {
       console.log(`Player ${userName} useLeadToVictory (used: ${use}) in game ${uuid}`);
-      getRoomManager(uuid).callGameMethods(userID, { method: 'useLeadToVictory', use });
+      getRoomManager(uuid).callGameMethods(userID, { method: 'useLeadToVictory', use, cardID });
     });
 
-    socket.on('useAmbush', (uuid) => {
+    socket.on('useAmbush', (uuid: string, cardID: string) => {
       console.log(`Player ${userName} useAmbush in game ${uuid}`);
-      getRoomManager(uuid).callGameMethods(userID, { method: 'useAmbush' });
+      getRoomManager(uuid).callGameMethods(userID, { method: 'useAmbush', cardID });
     });
 
-    socket.on('useRestoreHonor', (uuid, cardID) => {
+    socket.on('useRestoreHonor', (uuid, restoreHonorCardID, cardID) => {
       console.log(`Player ${userName} useRestoreHonor (card: ${cardID}) in game ${uuid}`);
-      getRoomManager(uuid).callGameMethods(userID, { method: 'useRestoreHonor', cardID });
+      getRoomManager(uuid).callGameMethods(userID, { method: 'useRestoreHonor', cardID, restoreHonorCardID });
     });
 
-    socket.on('useKingReturns', (uuid, use) => {
+    socket.on('useKingReturns', (uuid: string, use: boolean, cardID: string) => {
       console.log(`Player ${userName} useKingReturns (used: ${use}) in game ${uuid}`);
-      getRoomManager(uuid).callGameMethods(userID, { method: 'useKingReturns', use });
+      getRoomManager(uuid).callGameMethods(userID, { method: 'useKingReturns', use, cardID });
     });
 
-    socket.on('useWeFoundYou', (uuid, use) => {
+    socket.on('useWeFoundYou', (uuid: string, use: boolean, cardID: string) => {
       console.log(`Player ${userName} useWeFoundYou (used: ${use}) in game ${uuid}`);
-      getRoomManager(uuid).callGameMethods(userID, { method: 'useWeFoundYou', use });
+      getRoomManager(uuid).callGameMethods(userID, { method: 'useWeFoundYou', use, cardID });
     });
   }
 

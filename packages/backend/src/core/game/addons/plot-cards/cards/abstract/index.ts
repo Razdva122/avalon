@@ -24,10 +24,10 @@ export abstract class AbstractCard {
 
   /**
    * Determines how multiple cards of the same type are played:
-   * - 'single': Each card of this type is played sequentially one after another
-   * - 'multiCard': All cards of this type are played simultaneously
+   * - 'sequentially': Each card of this type is played sequentially one after another
+   * - 'parallel': All cards of this type are played simultaneously
    */
-  playType: 'single' | 'multiCard' = 'multiCard';
+  playType: 'parallel' | 'sequentially' = 'sequentially';
 
   constructor(game: Game, plotCardsAddon: PlotCardsAddon) {
     this.game = game;

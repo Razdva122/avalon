@@ -1,5 +1,28 @@
 # Decision Log
 
+[2025-04-13 15:17:27] - **Plot Cards Refactoring Decision**
+
+**Decision:** Refactor the plot cards system to use an array of active cards (`activeCards`) instead of a single active card (`activeCard`), and add support for passing card IDs from the frontend to the backend.
+
+**Rationale:**
+
+- The previous implementation only supported one active card at a time, which limited gameplay possibilities
+- By using an array of active cards and identifying them by ID, we can support multiple active cards of the same type simultaneously
+- This change enables more complex game scenarios and interactions between cards
+
+**Implementation Approach:**
+
+1. Update backend interfaces to include optional `cardID` parameters for backward compatibility
+2. Modify methods to find specific cards in the `activeCards` array based on the provided ID
+3. Update socket handlers and type definitions to support the new parameters
+4. Ensure test helpers work with the new system
+
+**Implications:**
+
+- Frontend code will need to be updated to pass card IDs when calling plot card-related methods
+- This change maintains backward compatibility while enabling new functionality
+- The system is now more flexible and can support more complex game scenarios
+
 This file records architectural and implementation decisions using a list format.
 2025-04-13 00:04:28 - Log of updates made.
 

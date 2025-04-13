@@ -61,6 +61,10 @@ export default defineComponent({
       required: true,
       type: Object as PropType<VisualGameState>,
     },
+    cardID: {
+      required: true,
+      type: String,
+    },
   },
   setup(props) {
     const gameComputed = computed(() => props.game);
@@ -105,13 +109,11 @@ export default defineComponent({
 
     const onRestoreHonor = () => {
       if (isMultiplePlayersSelected.value || isSelfSelected.value) {
-        // Do nothing if multiple players are selected or self is selected
         return;
       }
 
       if (selectedCard.value) {
-        // Use the card ID as the identifier
-        socket.emit('useRestoreHonor', props.game.uuid, selectedCard.value);
+        socket.emit('useRestoreHonor', props.game.uuid, props.cardID, selectedCard.value);
         selectedCard.value = null;
       }
     };
