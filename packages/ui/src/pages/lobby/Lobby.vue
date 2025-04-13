@@ -149,6 +149,8 @@ export default defineComponent({
   max-width: 500px;
   display: flex;
   justify-content: center;
+  align-self: center; /* Ensure container is centered in the flex column */
+  padding: 0 16px; /* Add padding for smaller screens */
 }
 
 .list-header {

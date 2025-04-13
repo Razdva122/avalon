@@ -98,6 +98,9 @@ export const ru = {
     cleric: 'Клирик',
     revealer: 'Разоблаченная',
     role: 'Роль',
+    unknown: 'Неизвестная роль',
+    mysteryWizard: 'Таинственный волшебник',
+    unknownLancelot: 'Неизвестный Ланселот',
   },
   breadCrumbs: {
     merlin: 'Мерлин',

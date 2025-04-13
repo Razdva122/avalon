@@ -98,6 +98,9 @@ export const zh_CN = {
     cleric: '牧师',
     revealer: '被揭示者',
     role: '角色',
+    unknown: '未知角色',
+    mysteryWizard: '神秘法师',
+    unknownLancelot: '未知兰斯洛特',
   },
   breadCrumbs: {
     merlin: '梅林',

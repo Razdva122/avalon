@@ -96,8 +96,6 @@ export default defineComponent({
     const topPlayer = ref<any>(null);
     let rotationTimer: number | null = null;
 
-    // We're using lodash's shuffle function instead of a custom implementation
-
     const fetchTopPlayersForPopularRoles = () => {
       loading.value = true;
 
@@ -106,14 +104,11 @@ export default defineComponent({
           console.error('Error fetching top players for popular roles:', response.error);
           topPlayersData.value = [];
         } else {
-          // Store the full data with roles and top players
           topPlayersData.value = response.filter((item) => item.topPlayer !== null);
 
           if (topPlayersData.value.length > 0) {
-            // Extract just the roles for shuffling
             const roles = topPlayersData.value.map((item) => item.role);
 
-            // Initialize with shuffled roles
             remainingRoles.value = shuffle([...roles]);
             rotateRole();
           }
@@ -126,22 +121,18 @@ export default defineComponent({
     const rotateRole = () => {
       if (topPlayersData.value.length === 0) return;
 
-      // If we've shown all roles, reshuffle the array
       if (remainingRoles.value.length === 0) {
         const roles = topPlayersData.value.map((item) => item.role);
         remainingRoles.value = shuffle([...roles]);
       }
 
-      // Get the next role and remove it from the remaining roles
       const nextRole = remainingRoles.value.shift();
       if (nextRole) {
         currentRole.value = nextRole;
 
-        // Find the top player data for this role from our cached data
         const roleData = topPlayersData.value.find((item) => item.role === nextRole);
         topPlayer.value = roleData ? roleData.topPlayer : null;
 
-        // No need to fetch data for each role - we already have it!
         loading.value = false;
       }
     };
@@ -185,7 +176,8 @@ export default defineComponent({
 <style scoped lang="scss">
 .rotating-top-player {
   margin: 16px 0;
-  width: 450px; /* Fixed width instead of max-width */
+  width: 100%;
+  max-width: 100%;
 }
 
 .top-player-title {
@@ -203,6 +195,7 @@ export default defineComponent({
     background-color 0.2s ease;
   background-color: rgb(var(--v-theme-surface-light));
   width: 100%;
+  max-width: 100%;
   height: 160px; /* Increased height to fit all content */
 
   &:hover {
@@ -238,7 +231,8 @@ export default defineComponent({
 
 .teammate-profile-container {
   flex-grow: 1;
-  width: 200px; /* Fixed width for username container */
+  min-width: 0; /* Allow container to shrink below min-content */
+  max-width: 100%; /* Prevent overflow */
   overflow: hidden; /* Hide overflow text */
 }
 
@@ -247,16 +241,17 @@ export default defineComponent({
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 180px;
+  max-width: 100%; /* Make it responsive */
 }
 
 .stats-container {
   text-align: right;
-  min-width: 120px; /* Increased min-width */
+  min-width: 100px; /* Slightly reduced min-width for better responsiveness */
   display: flex;
   flex-direction: column;
   justify-content: center;
   height: 80px; /* Fixed height to ensure all content is visible */
+  margin-left: 8px; /* Add some spacing from the username */
 }
 
 .rating-value {
@@ -280,6 +275,7 @@ export default defineComponent({
 .top-player-skeleton {
   height: 160px; /* Match the card height */
   width: 100%;
+  max-width: 100%;
 }
 
 :deep(.v-skeleton-loader__image) {
@@ -288,11 +284,14 @@ export default defineComponent({
   height: 160px !important; /* Match the card height */
   min-height: 160px !important;
   width: 100%;
+  max-width: 100%;
 }
 
 .no-data-card {
   cursor: default;
   height: 160px; /* Match the card height */
+  width: 100%;
+  max-width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;

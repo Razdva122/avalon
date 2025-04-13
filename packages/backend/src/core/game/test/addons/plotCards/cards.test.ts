@@ -237,4 +237,26 @@ describe('Plot Cards Interactions', () => {
 
     expect(game.stage).toBe('onMission');
   });
+
+  test('Two charge cards to different players player should work', () => {
+    const { game, gameHelper } = generateNewGame({ plotCards: true }, {}, 7, (game) => {
+      movePlotCardsToStart(game, ['charge', 'charge']);
+    });
+
+    const playerWithCharge = game.players.find((player) => player !== game.leader)!;
+    const player2WithCharge = game.players.find((player) => player !== game.leader && player !== playerWithCharge)!;
+
+    gameHelper.giveCard([playerWithCharge.user.id, player2WithCharge.user.id]);
+
+    // Complete a round to trigger card activation
+    gameHelper.selectPlayersOnMission().sentSelectedPlayers();
+
+    gameHelper.makePreVote('approve');
+
+    expect(game.stage).toBe('preVote');
+
+    gameHelper.makePreVote('approve');
+
+    expect(game.stage).toBe('votingForMission');
+  });
 });

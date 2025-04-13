@@ -98,6 +98,9 @@ export const es = {
     cleric: 'Clérigo',
     revealer: 'Revelada',
     role: 'Rol',
+    unknown: 'Rol desconocido',
+    mysteryWizard: 'Mago misterioso',
+    unknownLancelot: 'Lancelot desconocido',
   },
   breadCrumbs: {
     merlin: 'Merlín',

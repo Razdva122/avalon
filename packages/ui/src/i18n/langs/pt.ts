@@ -98,6 +98,9 @@ export const pt = {
     cleric: 'Clérigo',
     revealer: 'Revelador',
     role: 'Papel',
+    unknown: 'Papel desconhecido',
+    mysteryWizard: 'Mago misterioso',
+    unknownLancelot: 'Lancelot desconhecido',
   },
   breadCrumbs: {
     merlin: 'Merlin',

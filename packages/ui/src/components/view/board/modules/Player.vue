@@ -60,7 +60,7 @@
     </v-tooltip>
 
     <!-- Модальное окно для мобильных устройств -->
-    <v-dialog v-model="showUserCardDialog" max-width="350" content-class="user-card-dialog">
+    <v-dialog v-model="showUserCardDialog" content-class="user-card-dialog">
       <UserHoverCard v-if="player.id && showUserCardDialog" :userID="player.id" />
     </v-dialog>
   </div>
@@ -523,6 +523,7 @@ export default defineComponent({
 }
 
 :deep(.user-card-dialog) {
+  width: auto;
   margin: 0;
   padding: 0;
   background-color: transparent !important;

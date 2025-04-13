@@ -32,7 +32,7 @@ export class ChargeCard extends AbstractCard implements IEffectPlotCard {
       this.plotCardsAddon.cardsInGame
         .filter((card) => card.name === 'charge')
         .map((card) => this.game.findPlayerByID(card.ownerID!)),
-      'id',
+      'user.id',
     );
 
     this.preVote = new PreVote(playersWithCharge);
