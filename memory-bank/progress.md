@@ -80,6 +80,17 @@ Updated the system to make cardID a required parameter in all plot card-related 
 
 This approach ensures type safety by making cardID a required parameter throughout the system, eliminating the need for null checks on the backend.
 
+[2025-04-13 22:20:26] - **Updated Memory Bank Documentation for Plot Cards CardID Requirement**
+
+Created a dedicated documentation file `plot-cards-cardid-update.md` that provides comprehensive information about the cardID requirement for plot cards:
+
+1. Detailed explanation of the cardID requirement and its purpose
+2. Examples of frontend implementation showing how to retrieve and pass the cardID
+3. Information about backend processing of the cardID parameter
+4. Developer guidelines for implementing new plot cards or modifying existing ones
+
+This documentation will help developers understand the importance of including the cardID when using plot cards and provide guidance on how to implement it correctly.
+
 This file tracks the project's progress using a task list format.
 2023-04-12 05:28:00 - Log of updates made.
 
