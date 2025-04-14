@@ -332,7 +332,6 @@ describe('Plot Cards Logic', () => {
       game.players.forEach((player) => {
         if (player.userID === playerWithCharge.userID) {
           expect(player.features.waitForAction).toBe(false);
-          expect(player.features.waitForAction).toBe(false);
         } else {
           expect(player.features.waitForAction).toBe(true);
         }

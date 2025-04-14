@@ -52,7 +52,7 @@ export class Manager {
       this.roomsList = this.roomsList.filter((el) => el.uuid !== room.roomID);
     } else {
       const roomData: TRoomInfo = {
-        hostID: room.players.find((id) => id === room.leaderID),
+        hostID: room.leaderID,
         state: room.data.stage,
         options: room.options,
         startAt: room.startAt,

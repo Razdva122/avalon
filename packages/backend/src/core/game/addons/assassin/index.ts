@@ -92,7 +92,6 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
     const assassin = this.game.players.find((player) => player.features.isAssassin)!;
     if (assassin.userID !== executorID) {
       throw new Error('Only assassin can assassinate');
-      throw new Error('Only assassin can assassinate');
     }
 
     const options = this.options[type];

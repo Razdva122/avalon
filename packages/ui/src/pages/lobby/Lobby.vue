@@ -110,12 +110,8 @@ export default defineComponent({
 
     const roomsListHosts = computed(() => {
       return (roomsList.value || []).map((room) => {
-        if (room.hostID) {
-          const { userName } = useUserProfile(room.hostID);
-          return userName;
-        }
-
-        return 'unknown';
+        const { userName } = useUserProfile(room.hostID);
+        return userName;
       });
     });
 
