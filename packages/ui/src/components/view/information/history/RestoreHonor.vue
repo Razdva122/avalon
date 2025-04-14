@@ -4,8 +4,8 @@
       v-html="
         $t('restoreHonor.transfer', {
           cardName: $t('cardsInfo.' + data.cardName),
-          prevOwnerName: calculateNameByID(data.prevOwnerID),
-          newOwnerName: calculateNameByID(data.newOwnerID),
+          prevOwnerName: playerNames[data.prevOwnerID],
+          newOwnerName: playerNames[data.newOwnerID],
         })
       "
     >
@@ -17,7 +17,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import type { RestoreHonor } from '@avalon/types';
-import type { TCalculateNameByID } from '@/components/view/information/history/interface';
+import type { TPlayerNames } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
@@ -25,9 +25,9 @@ export default defineComponent({
       required: true,
       type: Object as PropType<RestoreHonor>,
     },
-    calculateNameByID: {
+    playerNames: {
       required: true,
-      type: Function as PropType<TCalculateNameByID>,
+      type: Object as PropType<TPlayerNames>,
     },
   },
 });

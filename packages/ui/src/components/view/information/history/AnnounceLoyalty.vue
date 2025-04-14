@@ -3,8 +3,8 @@
     <span
       v-html="
         $t('announceLoyalty.announceInfo', {
-          announcer: calculateNameByID(data.announcerID),
-          target: calculateNameByID(data.targetID),
+          announcer: playerNames[data.announcerID],
+          target: playerNames[data.targetID],
         })
       "
     ></span>
@@ -24,7 +24,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import type { AnnounceLoyalty, TLoyalty, TRoles } from '@avalon/types';
-import type { TCalculateNameByID } from '@/components/view/information/history/interface';
+import type { TPlayerNames } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
@@ -32,9 +32,9 @@ export default defineComponent({
       required: true,
       type: Object as PropType<AnnounceLoyalty>,
     },
-    calculateNameByID: {
+    playerNames: {
       required: true,
-      type: Function as PropType<TCalculateNameByID>,
+      type: Object as PropType<TPlayerNames>,
     },
   },
   methods: {

@@ -34,7 +34,7 @@ export class LoyaltyChecker {
       throw new Error(`You cant check loyalty on stage ${this.game.stage}`);
     }
 
-    if (ownerOfCheck.user.id !== executorID) {
+    if (ownerOfCheck.userID !== executorID) {
       throw new Error(`Only owner of check can check loyalty`);
     }
 
@@ -53,7 +53,7 @@ export class LoyaltyChecker {
       throw new Error(`You cant reveal loyalty on stage ${this.game.stage}`);
     }
 
-    if (ownerOfReveal.user.id !== executorID) {
+    if (ownerOfReveal.userID !== executorID) {
       throw new Error(`Only owner of reveal can reveal loyalty`);
     }
 
@@ -126,14 +126,14 @@ export class LoyaltyChecker {
         const roles: Dictionary<TVisibleRole> = {};
 
         if (merlin) {
-          roles[merlin.user.id] = merlin.role.role;
+          roles[merlin.userID] = merlin.role.role;
         }
 
         if (morgana) {
-          roles[morgana.user.id] = morgana.role.role;
+          roles[morgana.userID] = morgana.role.role;
         }
 
-        this.game.updateVisibleRolesState(owner.user.id, roles);
+        this.game.updateVisibleRolesState(owner.userID, roles);
       }
     }
 
@@ -142,9 +142,9 @@ export class LoyaltyChecker {
         const goodLancelot = this.game.players.find((player) => player.role.role === 'goodLancelot')!;
         const evilLancelot = this.game.players.find((player) => player.role.role === 'evilLancelot')!;
 
-        this.game.updateVisibleRolesState(owner.user.id, {
-          [goodLancelot.user.id]: 'goodLancelot',
-          [evilLancelot.user.id]: 'evilLancelot',
+        this.game.updateVisibleRolesState(owner.userID, {
+          [goodLancelot.userID]: 'goodLancelot',
+          [evilLancelot.userID]: 'evilLancelot',
         });
       }
     }

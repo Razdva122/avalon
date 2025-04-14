@@ -1,7 +1,5 @@
 import * as _ from 'lodash';
 
-import type { User } from '@/user';
-
 import type { IPlayerInGame, IGameAddons, IStateObserver, TSelectAvailable } from '@/core/game/interface';
 
 import type {
@@ -101,15 +99,15 @@ export class Game extends GameHooks {
     selectTeam: [(player) => Boolean(player.features.isLeader)],
   };
 
-  set leader({ user: { id } }: IPlayerInGame) {
+  set leader({ userID }: IPlayerInGame) {
     if (this.leader) {
       this.leader.features.isLeader = false;
     }
 
-    const nextLeader = this.players.find((player) => player.user.id === id);
+    const nextLeader = this.players.find((player) => player.userID === userID);
 
     if (!nextLeader) {
-      throw new Error(`Cant set new leader with id: ${id}`);
+      throw new Error(`Cant set new leader with id: ${userID}`);
     }
 
     nextLeader.features.isLeader = true;
@@ -121,16 +119,16 @@ export class Game extends GameHooks {
 
   stage: TGameStage = 'initialization';
 
-  constructor(users: User[], options: GameOptions, stateObserver: IStateObserver, preInit?: (game: Game) => void) {
+  constructor(userIDs: string[], options: GameOptions, stateObserver: IStateObserver, preInit?: (game: Game) => void) {
     super();
 
-    if (users.length < 5 || users.length > 10) {
-      throw new Error(`Invalid players count. Players count: ${users.length}`);
+    if (userIDs.length < 5 || userIDs.length > 10) {
+      throw new Error(`Invalid players count. Players count: ${userIDs.length}`);
     }
 
     this.stateObserver = stateObserver;
 
-    const settings = gamesSettings[users.length];
+    const settings = gamesSettings[userIDs.length];
 
     // Generates roles
     const rolesInfo = generateRolesForGame(settings, options, this);
@@ -142,8 +140,8 @@ export class Game extends GameHooks {
 
     this.features = options.features;
 
-    const players = users.map((user, index) => ({
-      user,
+    const players = userIDs.map((userID, index) => ({
+      userID,
       role: rolesInfo.characters[index],
       features: {
         isSelected: false,
@@ -229,15 +227,15 @@ export class Game extends GameHooks {
         const visibleRole = player.role.visibility[el.role.role];
 
         if (el === player) {
-          acc[el.user.id] = el.role.selfRole;
+          acc[el.userID] = el.role.selfRole;
         } else if (visibleRole) {
-          acc[el.user.id] = visibleRole;
+          acc[el.userID] = visibleRole;
         }
 
         return acc;
       }, {});
 
-      this.updateVisibleRolesState(player.user.id, visibility);
+      this.updateVisibleRolesState(player.userID, visibility);
     });
 
     if (preInit) {
@@ -384,7 +382,7 @@ export class Game extends GameHooks {
    * Leader sent selected players on vote
    */
   sentSelectedPlayers(executorID: string): void {
-    if (this.leader.user.id !== executorID) {
+    if (this.leader.userID !== executorID) {
       throw new Error('Only leader can send selected players');
     }
 
@@ -582,7 +580,7 @@ export class Game extends GameHooks {
     this.updateVisibleRolesState(
       'all',
       this.players.reduce<Dictionary<TVisibleRole>>((acc, el) => {
-        acc[el.user.id] = el.role.role;
+        acc[el.userID] = el.role.role;
         return acc;
       }, {}),
     );
@@ -593,7 +591,7 @@ export class Game extends GameHooks {
    * If player doesnot exist throw error
    */
   findPlayerByID(id: string): IPlayerInGame {
-    const player = this.players.find((player) => player.user.id === id);
+    const player = this.players.find((player) => player.userID === id);
 
     if (!player) {
       throw new Error(`Player with id: ${id} not exist in game`);

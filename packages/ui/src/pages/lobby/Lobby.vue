@@ -29,7 +29,7 @@
             <div class="game-left">
               <div class="mr-2 game-name">
                 <span v-if="game.result?.winner" :class="`${game.result.winner}-loyalty-icon`" class="mr-1"></span>
-                <b>{{ game.host }}</b>
+                <b>{{ roomsListHosts?.[index] }}</b>
               </div>
               <OptionsPreview
                 v-if="displayOptions(game.options.roles, game.options.addons)"
@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
@@ -61,6 +61,7 @@ import TemporaryAlert from '@/components/feedback/TemporaryAlert.vue';
 import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 import RotatingTopPlayer from '@/components/stats/RotatingTopPlayer.vue'; // Import the new component
 import type { GameOptionsRoles, GameOptionsAddons } from '@avalon/types';
+import { useUserProfile } from '@/helpers/composables';
 
 export default defineComponent({
   components: {
@@ -107,6 +108,17 @@ export default defineComponent({
       return [...Object.values(roles), ...Object.values(addons)].some((el) => Boolean(el));
     };
 
+    const roomsListHosts = computed(() => {
+      return (roomsList.value || []).map((room) => {
+        if (room.hostID) {
+          const { userName } = useUserProfile(room.hostID);
+          return userName;
+        }
+
+        return 'unknown';
+      });
+    });
+
     socket.on('onlineCounterUpdated', (counter) => {
       online.value = counter;
     });
@@ -116,6 +128,7 @@ export default defineComponent({
       displayOptions,
       online,
       roomsList,
+      roomsListHosts,
     };
   },
 });

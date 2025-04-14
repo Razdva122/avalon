@@ -36,8 +36,8 @@ export class GiveCardHistory implements HistoryElement<'giveCard'> {
     return {
       type: <const>'giveCard',
       cardName: this.data.cardName,
-      leaderID: this.data.leader.user.id,
-      ownerID: this.data.owner.user.id,
+      leaderID: this.data.leader.userID,
+      ownerID: this.data.owner.userID,
       target: this.data.target,
     };
   }

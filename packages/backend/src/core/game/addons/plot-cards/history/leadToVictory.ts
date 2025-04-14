@@ -20,8 +20,8 @@ export class LeadToVictoryHistory implements HistoryElement<'leadToVictory'> {
   dataForManager() {
     return {
       type: <const>'leadToVictory',
-      prevLeaderID: this.data.prevLeader.user.id,
-      ownerID: this.data.owner.user.id,
+      prevLeaderID: this.data.prevLeader.userID,
+      ownerID: this.data.owner.userID,
     };
   }
 }

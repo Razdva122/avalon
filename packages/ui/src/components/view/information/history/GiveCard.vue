@@ -5,8 +5,8 @@
       v-html="
         $t('giveCard.toPlayer', {
           cardName: $t('cardsInfo.' + data.cardName),
-          leaderName: calculateNameByID(data.leaderID),
-          cardOwner: calculateNameByID(data.ownerID),
+          leaderName: playerNames[data.leaderID],
+          cardOwner: playerNames[data.ownerID],
         })
       "
     >
@@ -16,7 +16,7 @@
       v-html="
         $t('giveCard.toSelf', {
           cardName: $t('cardsInfo.' + data.cardName),
-          leaderName: calculateNameByID(data.leaderID),
+          leaderName: playerNames[data.leaderID],
         })
       "
     >
@@ -28,7 +28,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import type { GiveCard } from '@avalon/types';
-import type { TCalculateNameByID } from '@/components/view/information/history/interface';
+import type { TPlayerNames } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
@@ -36,9 +36,9 @@ export default defineComponent({
       required: true,
       type: Object as PropType<GiveCard>,
     },
-    calculateNameByID: {
+    playerNames: {
       required: true,
-      type: Function as PropType<TCalculateNameByID>,
+      type: Object as PropType<TPlayerNames>,
     },
   },
 });

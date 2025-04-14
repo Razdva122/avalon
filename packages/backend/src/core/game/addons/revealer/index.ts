@@ -15,7 +15,7 @@ export class RevealerAddon implements IGameAddon {
     const lastMissionIsFail = this.game.missions[this.game.round - 1].data.result === 'fail';
 
     if (isTwoMissionFailed && lastMissionIsFail) {
-      const revealerId = this.game.players.find((player) => player.role.role === 'revealer')!.user.id;
+      const revealerId = this.game.players.find((player) => player.role.role === 'revealer')!.userID;
       this.game.updateVisibleRolesState('all', { [revealerId]: 'revealer' });
       this.game.stateObserver.gameStateChanged();
     }

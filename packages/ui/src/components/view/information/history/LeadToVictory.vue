@@ -4,8 +4,8 @@
       v-html="
         $t('leadToVictory.history', {
           cardName: $t('cardsInfo.leadToVictory'),
-          prevLeaderName: calculateNameByID(data.prevLeaderID),
-          cardOwner: calculateNameByID(data.ownerID),
+          prevLeaderName: playerNames[data.prevLeaderID],
+          cardOwner: playerNames[data.ownerID],
         })
       "
     >
@@ -17,7 +17,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import type { LeadToVictory } from '@avalon/types';
-import type { TCalculateNameByID } from '@/components/view/information/history/interface';
+import type { TPlayerNames } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
@@ -25,9 +25,9 @@ export default defineComponent({
       required: true,
       type: Object as PropType<LeadToVictory>,
     },
-    calculateNameByID: {
+    playerNames: {
       required: true,
-      type: Function as PropType<TCalculateNameByID>,
+      type: Object as PropType<TPlayerNames>,
     },
   },
 });

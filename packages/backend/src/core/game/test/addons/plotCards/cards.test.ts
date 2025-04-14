@@ -12,12 +12,12 @@ describe('Plot Cards Individual Tests', () => {
       });
 
       const playerWithCard = game.players.find((player) => player !== game.leader)!;
-      gameHelper.giveCard([playerWithCard.user.id]);
+      gameHelper.giveCard([playerWithCard.userID]);
 
       // Verify card was given
       expect(
         game.addons.plotCards!.cardsInGame.find(
-          (card) => card.name === 'areYouTheOne' && card.ownerID === playerWithCard.user.id,
+          (card) => card.name === 'areYouTheOne' && card.ownerID === playerWithCard.userID,
         ),
       ).toBeDefined();
 
@@ -28,7 +28,7 @@ describe('Plot Cards Individual Tests', () => {
       const targetPlayer = playerWithCard.next; // Adjacent player
 
       // Select the player to check
-      game.selectPlayer(playerWithCard.user.id, targetPlayer.user.id);
+      game.selectPlayer(playerWithCard.userID, targetPlayer.userID);
 
       // Get the active card
       const activeCard = game.addons.plotCards!.cardsInGame.find(
@@ -36,10 +36,10 @@ describe('Plot Cards Individual Tests', () => {
       ) as LoyaltyPlotCard;
 
       // Use the card by calling the loyalty checker directly
-      activeCard.loyaltyChecker.checkLoyalty(playerWithCard.user.id, playerWithCard, targetPlayer);
+      activeCard.loyaltyChecker.checkLoyalty(playerWithCard.userID, playerWithCard, targetPlayer);
 
       // Announce the loyalty
-      activeCard.loyaltyChecker.announceLoyalty(playerWithCard.user.id, targetPlayer, targetPlayer.role.loyalty);
+      activeCard.loyaltyChecker.announceLoyalty(playerWithCard.userID, targetPlayer, targetPlayer.role.loyalty);
 
       // Verify the card was used and removed
       expect(game.addons.plotCards!.cardsInGame.find((card) => card.name === 'areYouTheOne')).toBeUndefined();
@@ -55,7 +55,7 @@ describe('Plot Cards Individual Tests', () => {
       });
 
       const playerWithCard = game.players.find((player) => player !== game.leader)!;
-      gameHelper.giveCard([playerWithCard.user.id]);
+      gameHelper.giveCard([playerWithCard.userID]);
 
       // Find a non-adjacent player (not next and not previous)
       const nonAdjacentPlayer = game.players.find(
@@ -63,7 +63,7 @@ describe('Plot Cards Individual Tests', () => {
       )!;
 
       // Select the non-adjacent player
-      game.selectPlayer(playerWithCard.user.id, nonAdjacentPlayer.user.id);
+      game.selectPlayer(playerWithCard.userID, nonAdjacentPlayer.userID);
 
       // Get the active card
       const activeCard = game.addons.plotCards!.cardsInGame.find(
@@ -72,7 +72,7 @@ describe('Plot Cards Individual Tests', () => {
 
       // Attempt to use the card with a non-adjacent player should throw an error
       expect(() => {
-        activeCard.loyaltyChecker.checkLoyalty(playerWithCard.user.id, playerWithCard, nonAdjacentPlayer);
+        activeCard.loyaltyChecker.checkLoyalty(playerWithCard.userID, playerWithCard, nonAdjacentPlayer);
       }).toThrow('The check can only be used on an adjacent player');
     });
   });
@@ -86,7 +86,7 @@ describe('Plot Cards Individual Tests', () => {
 
       // Give card to a player
       const playerWithCard = game.players.find((player) => player !== game.leader)!;
-      gameHelper.giveCard([playerWithCard.user.id]);
+      gameHelper.giveCard([playerWithCard.userID]);
 
       // Check that the card is activated
       expect(game.stage).toBe('revealLoyalty');
@@ -95,7 +95,7 @@ describe('Plot Cards Individual Tests', () => {
       const targetPlayer = game.players.find((player) => player !== playerWithCard)!;
 
       // Select the player to reveal
-      game.selectPlayer(playerWithCard.user.id, targetPlayer.user.id);
+      game.selectPlayer(playerWithCard.userID, targetPlayer.userID);
 
       // Get the active card
       const activeCard = game.addons.plotCards!.cardsInGame.find(
@@ -103,10 +103,10 @@ describe('Plot Cards Individual Tests', () => {
       ) as LoyaltyPlotCard;
 
       // Use the card by calling the loyalty checker directly
-      activeCard.loyaltyChecker.revealLoyalty(playerWithCard.user.id, playerWithCard, targetPlayer);
+      activeCard.loyaltyChecker.revealLoyalty(playerWithCard.userID, playerWithCard, targetPlayer);
 
       // Announce the loyalty
-      activeCard.loyaltyChecker.announceLoyalty(targetPlayer.user.id, playerWithCard, playerWithCard.role.loyalty);
+      activeCard.loyaltyChecker.announceLoyalty(targetPlayer.userID, playerWithCard, playerWithCard.role.loyalty);
 
       // Verify the card was used and removed
       expect(game.addons.plotCards!.cardsInGame.find((card) => card.name === 'showNature')).toBeUndefined();
@@ -134,7 +134,7 @@ describe('Plot Cards Individual Tests', () => {
       const targetPlayer = game.players.find((player) => player !== playerWithCard)!;
 
       // Select the player to reveal
-      game.selectPlayer(playerWithCard.user.id, targetPlayer.user.id);
+      game.selectPlayer(playerWithCard.userID, targetPlayer.userID);
 
       // Get the active card
       const activeCard = game.addons.plotCards!.cardsInGame.find(
@@ -142,10 +142,10 @@ describe('Plot Cards Individual Tests', () => {
       ) as LoyaltyPlotCard;
 
       // Use the card by calling the loyalty checker directly
-      activeCard.loyaltyChecker.revealLoyalty(playerWithCard.user.id, playerWithCard, targetPlayer);
+      activeCard.loyaltyChecker.revealLoyalty(playerWithCard.userID, playerWithCard, targetPlayer);
 
       // Announce the loyalty
-      activeCard.loyaltyChecker.announceLoyalty(targetPlayer.user.id, playerWithCard, playerWithCard.role.loyalty);
+      activeCard.loyaltyChecker.announceLoyalty(targetPlayer.userID, playerWithCard, playerWithCard.role.loyalty);
 
       // Verify the card was used and removed
       expect(game.addons.plotCards!.cardsInGame.find((card) => card.name === 'showStrength')).toBeUndefined();
@@ -166,7 +166,7 @@ describe('Plot Cards Individual Tests', () => {
 
       // Give card to a player
       const playerWithCard = game.players.find((player) => player !== game.leader)!;
-      gameHelper.giveCard([playerWithCard.user.id]);
+      gameHelper.giveCard([playerWithCard.userID]);
 
       gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes();
 
@@ -175,7 +175,7 @@ describe('Plot Cards Individual Tests', () => {
 
       const targetPlayer = game.players.find((player) => player.features.isSent);
 
-      gameHelper.useWeFoundYou(targetPlayer?.user.id, true).makeActions();
+      gameHelper.useWeFoundYou(targetPlayer?.userID, true).makeActions();
 
       // Verify the card was removed
       expect(game.addons.plotCards!.cardsInGame.find((card) => card.name === 'weFoundYou')).toBeUndefined();
@@ -194,7 +194,7 @@ describe('Plot Cards Interactions', () => {
     const player1 = game.players.find((player) => player !== game.leader)!;
     const player2 = game.players.find((player) => player !== game.leader && player !== player1)!;
 
-    gameHelper.giveCard([player1.user.id, player2.user.id]);
+    gameHelper.giveCard([player1.userID, player2.userID]);
 
     // Complete a round to trigger card activation
     gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes();
@@ -226,7 +226,7 @@ describe('Plot Cards Interactions', () => {
 
     const playerWithCharge = game.players.find((player) => player !== game.leader)!;
 
-    gameHelper.giveCard([playerWithCharge.user.id, playerWithCharge.user.id]);
+    gameHelper.giveCard([playerWithCharge.userID, playerWithCharge.userID]);
 
     // Complete a round to trigger card activation
     gameHelper.selectPlayersOnMission().sentSelectedPlayers();
@@ -246,7 +246,7 @@ describe('Plot Cards Interactions', () => {
     const playerWithCharge = game.players.find((player) => player !== game.leader)!;
     const player2WithCharge = game.players.find((player) => player !== game.leader && player !== playerWithCharge)!;
 
-    gameHelper.giveCard([playerWithCharge.user.id, player2WithCharge.user.id]);
+    gameHelper.giveCard([playerWithCharge.userID, player2WithCharge.userID]);
 
     // Complete a round to trigger card activation
     gameHelper.selectPlayersOnMission().sentSelectedPlayers();

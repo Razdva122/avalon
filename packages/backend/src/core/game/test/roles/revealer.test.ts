@@ -20,7 +20,7 @@ describe('Revealer', () => {
       .makeVotes()
       .makeActions(1);
 
-    const revealerId = game.players.find((player) => player.role.role === 'revealer')!.user.id;
+    const revealerId = game.players.find((player) => player.role.role === 'revealer')!.userID;
 
     expect(game.visibleRolesState.all).toStrictEqual({ [revealerId]: 'revealer' });
   });
@@ -40,7 +40,7 @@ describe('Revealer', () => {
 
     gameHelper.selectPlayersOnMission(1).sentSelectedPlayers().makeVotes().makeActions(1);
 
-    const revealerId = game.players.find((player) => player.role.role === 'revealer')!.user.id;
+    const revealerId = game.players.find((player) => player.role.role === 'revealer')!.userID;
 
     expect(game.visibleRolesState.all).toStrictEqual({ [revealerId]: 'revealer' });
   });

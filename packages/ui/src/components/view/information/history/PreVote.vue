@@ -22,7 +22,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import type { PreVote } from '@avalon/types';
-import type { TCalculateNameByID } from '@/components/view/information/history/interface';
+import type { TPlayerNames } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
@@ -30,16 +30,16 @@ export default defineComponent({
       required: true,
       type: Object as PropType<PreVote>,
     },
-    calculateNameByID: {
+    playerNames: {
       required: true,
-      type: Function as PropType<TCalculateNameByID>,
+      type: Object as PropType<TPlayerNames>,
     },
   },
   methods: {
     historyElText(element: PreVote, type: 'reject' | 'approve') {
       return element.votes
         .filter((el) => el.value === type)
-        .map((el) => this.calculateNameByID(el.playerID))
+        .map((el) => this.playerNames[el.playerID])
         .join(', ');
     },
   },

@@ -55,7 +55,7 @@ export class PreVote implements HistoryElement<'preVote'> {
     return {
       type: <const>'preVote',
       votes: this.data.votes.map((el) => ({
-        playerID: el.player.user.id,
+        playerID: el.player.userID,
         value: <TVoteOption>el.value,
       })),
     };

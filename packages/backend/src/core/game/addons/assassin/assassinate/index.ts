@@ -39,8 +39,8 @@ export class Assassinate implements HistoryElement<'assassinate'> {
       type: this.type,
       assassinateType: this.data.assassinateType,
       result: this.data.result!,
-      assassinID: this.data.assassin.user.id,
-      killedIDs: this.data.killed!.map((player) => player.user.id),
+      assassinID: this.data.assassin.userID,
+      killedIDs: this.data.killed!.map((player) => player.userID),
     };
   }
 }

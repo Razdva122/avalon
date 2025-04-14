@@ -17,7 +17,7 @@ export class KingReturns implements HistoryElement<'kingReturns'> {
   }
 
   dataForManager() {
-    const ownerID = this.data.owner.user.id;
+    const ownerID = this.data.owner.userID;
 
     return {
       type: this.type,

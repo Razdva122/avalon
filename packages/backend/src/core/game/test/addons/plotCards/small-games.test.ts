@@ -80,11 +80,11 @@ describe('Plot Cards Logic', () => {
         (player) => !player.features.isLeader && originalLeader.next !== player,
       )!;
 
-      gameHelper.giveCard([nonLeaderPlayer.user.id]);
+      gameHelper.giveCard([nonLeaderPlayer.userID]);
 
       expect(
         game.addons.plotCards!.cardsInGame.find(
-          (card) => card.name === 'leadToVictory' && card.ownerID === nonLeaderPlayer.user.id,
+          (card) => card.name === 'leadToVictory' && card.ownerID === nonLeaderPlayer.userID,
         ),
       ).toBeDefined();
 
@@ -113,11 +113,11 @@ describe('Plot Cards Logic', () => {
 
       const playerWithAmbush = game.players.find((player) => player !== game.leader)!;
 
-      gameHelper.giveCard([playerWithAmbush.user.id]);
+      gameHelper.giveCard([playerWithAmbush.userID]);
 
       expect(
         game.addons.plotCards!.cardsInGame.find(
-          (card) => card.name === 'ambush' && card.ownerID === playerWithAmbush.user.id,
+          (card) => card.name === 'ambush' && card.ownerID === playerWithAmbush.userID,
         ),
       ).toBeDefined();
 
@@ -127,14 +127,14 @@ describe('Plot Cards Logic', () => {
 
       const targetPlayer = game.currentMission.data.actions[0].player;
 
-      gameHelper.useAmbush(targetPlayer.user.id);
+      gameHelper.useAmbush(targetPlayer.userID);
 
       const lastHistoryEl = _.last(game.history)!;
       expect(lastHistoryEl.type).toBe('mission');
       expect(game.history[game.history.length - 2].type).toBe('ambush');
 
       expect(game.addons.plotCards!.cardsInGame.find((card) => card.name === 'ambush')).toBeUndefined();
-      expect(game.addons.plotCards!.crossCardsStorage.ambushUsedOn).toContain(targetPlayer.user.id);
+      expect(game.addons.plotCards!.crossCardsStorage.ambushUsedOn).toContain(targetPlayer.userID);
     });
 
     test('Should not allow using Ambush on a player who was already targeted', () => {
@@ -146,10 +146,10 @@ describe('Plot Cards Logic', () => {
 
       const playerWithFirstAmbush = game.players.find((player) => player !== game.leader)!;
       const playerWithSecondAmbush = game.players.find(
-        (player) => player !== game.leader && player.user.id !== playerWithFirstAmbush.user.id,
+        (player) => player !== game.leader && player.userID !== playerWithFirstAmbush.userID,
       )!;
 
-      gameHelper.giveCard([playerWithFirstAmbush.user.id, playerWithSecondAmbush.user.id]);
+      gameHelper.giveCard([playerWithFirstAmbush.userID, playerWithSecondAmbush.userID]);
 
       gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
 
@@ -157,12 +157,12 @@ describe('Plot Cards Logic', () => {
 
       const targetPlayer = game.currentMission.data.actions[0].player;
 
-      gameHelper.useAmbush(targetPlayer.user.id);
+      gameHelper.useAmbush(targetPlayer.userID);
 
-      expect(game.addons.plotCards!.crossCardsStorage.ambushUsedOn).toContain(targetPlayer.user.id);
+      expect(game.addons.plotCards!.crossCardsStorage.ambushUsedOn).toContain(targetPlayer.userID);
       expect(game.stage).toBe('ambush');
 
-      expect(() => gameHelper.useAmbush(targetPlayer.user.id)).toThrow(
+      expect(() => gameHelper.useAmbush(targetPlayer.userID)).toThrow(
         'This player has already been checked by another «ambush» card.',
       );
     });
@@ -177,11 +177,11 @@ describe('Plot Cards Logic', () => {
 
       const playerWithKingReturns = game.players.find((player) => player !== game.leader)!;
 
-      gameHelper.giveCard([playerWithKingReturns.user.id]);
+      gameHelper.giveCard([playerWithKingReturns.userID]);
 
       expect(
         game.addons.plotCards!.cardsInGame.find(
-          (card) => card.name === 'kingReturns' && card.ownerID === playerWithKingReturns.user.id,
+          (card) => card.name === 'kingReturns' && card.ownerID === playerWithKingReturns.userID,
         ),
       ).toBeDefined();
 
@@ -206,7 +206,7 @@ describe('Plot Cards Logic', () => {
 
       const playerWithKingReturns = game.players.find((player) => player !== game.leader)!;
 
-      gameHelper.giveCard([playerWithKingReturns.user.id]);
+      gameHelper.giveCard([playerWithKingReturns.userID]);
 
       gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes();
 
@@ -217,7 +217,7 @@ describe('Plot Cards Logic', () => {
       expect(game.stage).toBe('onMission');
 
       const kingReturnsCard = game.addons.plotCards!.cardsInGame.find(
-        (card) => card.name === 'kingReturns' && card.ownerID === playerWithKingReturns.user.id,
+        (card) => card.name === 'kingReturns' && card.ownerID === playerWithKingReturns.userID,
       );
       expect(kingReturnsCard).toBeDefined();
       expect(kingReturnsCard!.stage).toBe('has');
@@ -269,17 +269,17 @@ describe('Plot Cards Logic', () => {
       const player1 = game.players.find((player) => player !== game.leader)!;
       const player2 = game.players.find((player) => player !== game.leader && player !== player1)!;
 
-      gameHelper.giveCard([player1.user.id, player2.user.id]);
+      gameHelper.giveCard([player1.userID, player2.userID]);
 
       expect(game.stage).toBe('restoreHonor');
 
       const ambushCard = game.addons.plotCards!.cardsInGame.find(
-        (card) => card.name === 'ambush' && card.ownerID === player1.user.id,
+        (card) => card.name === 'ambush' && card.ownerID === player1.userID,
       );
 
-      gameHelper.useRestoreHonor(player1.user.id, ambushCard!.id);
+      gameHelper.useRestoreHonor(player1.userID, ambushCard!.id);
 
-      expect(ambushCard!.ownerID).toBe(player2.user.id);
+      expect(ambushCard!.ownerID).toBe(player2.userID);
 
       expect(game.addons.plotCards!.cardsInGame.find((card) => card.name === 'restoreHonor')).toBeUndefined();
 
@@ -296,7 +296,7 @@ describe('Plot Cards Logic', () => {
 
       const player1 = game.players.find((player) => player !== game.leader)!;
 
-      gameHelper.giveCard([player1.user.id, player1.user.id]);
+      gameHelper.giveCard([player1.userID, player1.userID]);
 
       expect(game.addons.plotCards!.cardsInGame.find((card) => card.name === 'restoreHonor')).toBeUndefined();
 
@@ -312,11 +312,11 @@ describe('Plot Cards Logic', () => {
 
       const playerWithCharge = game.players.find((player) => player !== game.leader)!;
 
-      gameHelper.giveCard([playerWithCharge.user.id]);
+      gameHelper.giveCard([playerWithCharge.userID]);
 
       expect(
         game.addons.plotCards!.cardsInGame.find(
-          (card) => card.name === 'charge' && card.ownerID === playerWithCharge.user.id,
+          (card) => card.name === 'charge' && card.ownerID === playerWithCharge.userID,
         ),
       ).toBeDefined();
 
@@ -329,9 +329,9 @@ describe('Plot Cards Logic', () => {
       gameHelper.makePreVote('reject');
 
       expect(game.stage).toBe('votingForTeam');
-
       game.players.forEach((player) => {
-        if (player.user.id === playerWithCharge.user.id) {
+        if (player.userID === playerWithCharge.userID) {
+          expect(player.features.waitForAction).toBe(false);
           expect(player.features.waitForAction).toBe(false);
         } else {
           expect(player.features.waitForAction).toBe(true);
@@ -348,7 +348,7 @@ describe('Plot Cards Logic', () => {
       expect(game.history[game.history.length - 2].type).toBe('preVote');
 
       const playerVote = (lastHistoryEl as Vote).data.votes.find(
-        (vote) => vote.player.user.id === playerWithCharge.user.id,
+        (vote) => vote.player.userID === playerWithCharge.userID,
       );
 
       expect(playerVote?.value).toBe('reject');

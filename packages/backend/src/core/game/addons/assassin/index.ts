@@ -67,7 +67,7 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
       const visibleEvil = this.game.players
         .filter((player) => player.role.loyalty === 'evil')
         .reduce<Dictionary<TVisibleRole>>((acc, el) => {
-          acc[el.user.id] = el.role.role;
+          acc[el.userID] = el.role.role;
           return acc;
         }, {});
 
@@ -90,8 +90,8 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
 
     const stage = this.progressData?.stage || 0;
     const assassin = this.game.players.find((player) => player.features.isAssassin)!;
-
-    if (assassin.user.id !== executorID) {
+    if (assassin.userID !== executorID) {
+      throw new Error('Only assassin can assassinate');
       throw new Error('Only assassin can assassinate');
     }
 
@@ -162,7 +162,7 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
         const player = this.game.players.find((player) => player.role.role === type);
 
         if (player) {
-          this.game.updateVisibleRolesState('all', { [player.user.id]: player.role.role });
+          this.game.updateVisibleRolesState('all', { [player.userID]: player.role.role });
         }
 
         this.progressData = {

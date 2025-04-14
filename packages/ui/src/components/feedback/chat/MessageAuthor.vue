@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Avatar from '@/components/user/Avatar.vue';
-import { useUserProfile } from '@/helpers/setup';
+import { useUserProfile } from '@/helpers/composables';
 
 export default defineComponent({
   components: { Avatar },

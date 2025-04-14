@@ -18,7 +18,7 @@ export class LeadToVictoryCard extends AbstractCard implements IUsablePlotCard {
   leadToVictorySubject: Subject<true> = new Subject();
 
   play(ownerID: string) {
-    if (ownerID === this.game.leader.user.id || this.plotCardsAddon.crossCardsStorage.isLeadToVictoryDisabled) {
+    if (ownerID === this.game.leader.userID || this.plotCardsAddon.crossCardsStorage.isLeadToVictoryDisabled) {
       return of(true);
     }
 

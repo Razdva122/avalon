@@ -2,15 +2,15 @@
   <div>
     {{
       $t('assassinate.shot', {
-        killerName: calculateNameByID(data.assassinID),
-        killedName: data.killedIDs.map(calculateNameByID).join(', '),
+        killerName: playerNames[data.assassinID],
+        killedName: data.killedIDs.map((id) => playerNames[id]).join(', '),
       })
     }}
   </div>
   <div>
     {{
       $t(data.result === 'hit' ? 'assassinate.shotResultHit' : 'assassinate.shotResultMiss', {
-        killedName: data.killedIDs.map(calculateNameByID).join(', '),
+        killedName: data.killedIDs.map((id) => playerNames[id]).join(', '),
         roleName: data.assassinateType,
       })
     }}
@@ -21,7 +21,6 @@
 import { defineComponent, PropType } from 'vue';
 
 import type { HistoryAssassinate } from '@avalon/types';
-import type { TCalculateNameByID } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
@@ -29,9 +28,9 @@ export default defineComponent({
       required: true,
       type: Object as PropType<HistoryAssassinate>,
     },
-    calculateNameByID: {
+    playerNames: {
       required: true,
-      type: Function as PropType<TCalculateNameByID>,
+      type: Object as PropType<Record<string, string>>,
     },
   },
 });

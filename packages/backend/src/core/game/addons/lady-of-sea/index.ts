@@ -50,9 +50,9 @@ export class LadyOfSeaAddon extends LadyOfLakeAddon implements IGameAddon {
     const visibleRole = this.calculateLoyalty(selectedPlayer);
 
     if (visibleRole !== 'good') {
-      const roles: Dictionary<TVisibleRole> = { [selectedPlayer.user.id]: visibleRole };
+      const roles: Dictionary<TVisibleRole> = { [selectedPlayer.userID]: visibleRole };
 
-      this.game.updateVisibleRolesState(owner.user.id, roles);
+      this.game.updateVisibleRolesState(owner.userID, roles);
     }
   }
 }

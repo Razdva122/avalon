@@ -13,19 +13,19 @@ describe('Cleric', () => {
     gameHelper.selectPlayersOnMission(1).sentSelectedPlayers().makeVotes(4);
 
     const leader = game.leader;
-    const clericId = game.players.find((player) => player.role.role === 'cleric')!.user.id;
+    const clericId = game.players.find((player) => player.role.role === 'cleric')!.userID;
 
     gameHelper.selectPlayersOnMission(1).sentSelectedPlayers().makeVotes().makeActions();
 
     let expected;
 
-    if (clericId === leader.user.id) {
+    if (clericId === leader.userID) {
       expected = {
         [clericId]: 'cleric',
       };
     } else {
       expected = {
-        [leader.user.id]: leader.role.visibleLoyalty,
+        [leader.userID]: leader.role.visibleLoyalty,
         [clericId]: 'cleric',
       };
     }

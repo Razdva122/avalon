@@ -51,9 +51,6 @@ export class Player {
   id!: string;
 
   @prop({ required: true })
-  name!: string;
-
-  @prop({ required: true })
   role!: TVisibleRole;
 
   @prop({ required: true, _id: false })

@@ -20,8 +20,8 @@ export class WeFoundYouHistory implements HistoryElement<'weFoundYou'> {
   dataForManager() {
     return {
       type: <const>'weFoundYou',
-      ownerID: this.data.owner.user.id,
-      selectedPlayerID: this.data.selectedPlayer.user.id,
+      ownerID: this.data.owner.userID,
+      selectedPlayerID: this.data.selectedPlayer.userID,
     };
   }
 }

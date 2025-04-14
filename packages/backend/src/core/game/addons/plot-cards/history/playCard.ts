@@ -21,7 +21,7 @@ export class PlayCardHistory implements HistoryElement<'playCard'> {
     return {
       type: <const>'playCard',
       cardName: this.data.cardName,
-      ownerID: this.data.owner.user.id,
+      ownerID: this.data.owner.userID,
     };
   }
 }

@@ -20,14 +20,14 @@ export class SwitchResult implements HistoryElement<'switchResult'> {
   }
 
   dataForManager(options: TDataForManagerOptions) {
-    const switcherID = this.data.switcher.user.id;
-    const targetID = this.data.target?.user.id;
+    const switcherID = this.data.switcher.userID;
+    const targetID = this.data.target?.userID;
 
     const switchData = {
       type: this.type,
       result: this.data.result,
-      switcherID: this.data.switcher.user.id,
-      targetID: this.data.target?.user.id,
+      switcherID: this.data.switcher.userID,
+      targetID: this.data.target?.userID,
     };
 
     if (options.game.stage === 'end' || options.userID === targetID || options.userID === switcherID) {

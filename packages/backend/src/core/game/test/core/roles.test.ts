@@ -2,12 +2,12 @@ import { generateNewGame, settings } from '@/core/game/test/const';
 
 const { game, gameHelper } = generateNewGame({}, { merlin: 1, percival: 1, mordred: 1, morgana: 1 });
 
-const servantId = game.players.find((player) => player.role.role === 'servant')!.user.id;
-const merlinId = game.players.find((player) => player.role.role === 'merlin')!.user.id;
-const morganaId = game.players.find((player) => player.role.role === 'morgana')!.user.id;
-const minionId = game.players.find((player) => player.role.role === 'minion')!.user.id;
-const mordredId = game.players.find((player) => player.role.role === 'mordred')!.user.id;
-const percivalId = game.players.find((player) => player.role.role === 'percival')!.user.id;
+const servantId = game.players.find((player) => player.role.role === 'servant')!.userID;
+const merlinId = game.players.find((player) => player.role.role === 'merlin')!.userID;
+const morganaId = game.players.find((player) => player.role.role === 'morgana')!.userID;
+const minionId = game.players.find((player) => player.role.role === 'minion')!.userID;
+const mordredId = game.players.find((player) => player.role.role === 'mordred')!.userID;
+const percivalId = game.players.find((player) => player.role.role === 'percival')!.userID;
 
 describe('Roles', () => {
   test('Game have valid amount of player in both teams', () => {
@@ -60,7 +60,7 @@ describe('Roles', () => {
     }
 
     const roles = game.players.reduce<any>((acc, el) => {
-      acc[el.user.id] = el.role.role;
+      acc[el.userID] = el.role.role;
       return acc;
     }, {});
 

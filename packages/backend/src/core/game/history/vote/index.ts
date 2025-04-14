@@ -27,7 +27,7 @@ export class Vote implements HistoryElement<'vote'> {
       leader,
       index,
       forced: Boolean(forced),
-      team: players.filter((player) => player.features.isSent).map((el) => ({ id: el.user.id })),
+      team: players.filter((player) => player.features.isSent).map((el) => ({ id: el.userID })),
       votes,
     };
 
@@ -79,7 +79,7 @@ export class Vote implements HistoryElement<'vote'> {
       result: this.data.result!,
       index: this.data.index,
       forced: this.data.forced,
-      leaderID: this.data.leader.user.id,
+      leaderID: this.data.leader.userID,
       team: this.data.team,
     };
 
@@ -96,7 +96,7 @@ export class Vote implements HistoryElement<'vote'> {
     } else {
       data.anonymous = false;
       data.votes = this.data.votes.map((el) => ({
-        playerID: el.player.user.id,
+        playerID: el.player.userID,
         onMission: el.onMission,
         excalibur: el.excalibur,
         preVote: el.preVote,

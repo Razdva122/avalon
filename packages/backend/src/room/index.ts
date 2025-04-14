@@ -1,4 +1,3 @@
-import { User } from '@/user';
 import type { TRoomState, Server, GameOptions, TVoteTarget, VoteInRoom } from '@avalon/types';
 import type { TRoomData } from '@/room/interface';
 import { eventBus } from '@/helpers';
@@ -9,7 +8,7 @@ import * as _ from 'lodash';
 export class Room {
   roomID: string;
   nextRoomID?: string;
-  players: User[];
+  players: string[];
   leaderID: string;
   vote?: VoteInRoom;
   chat: Chat;
@@ -20,7 +19,7 @@ export class Room {
   startAt?: string;
   io: Server;
 
-  constructor(roomID: string, leaderID: string, players: User[], io: Server, options?: GameOptions) {
+  constructor(roomID: string, leaderID: string, players: string[], io: Server, options?: GameOptions) {
     this.io = io;
     this.roomID = roomID;
     this.players = players;
@@ -30,13 +29,13 @@ export class Room {
     this.createAt = String(new Date());
   }
 
-  joinGame(userID: string, name: string) {
+  joinGame(userID: string) {
     if (this.data.stage !== 'created') {
       throw new Error(`${userID} try to join game with id ${this.roomID} with stage ${this.data.stage}`);
     }
 
-    if (!this.players.find((player) => player.id === userID) && this.players.length < this.maxCapacity) {
-      this.players.push(new User(userID, name));
+    if (!this.players.find((id) => id === userID) && this.players.length < this.maxCapacity) {
+      this.players.push(userID);
       this.updateRoomState();
     }
   }
@@ -46,7 +45,7 @@ export class Room {
       throw new Error(`${userID} try to leave game with id ${this.roomID} with stage 'started'`);
     }
 
-    const userIndex = this.players.findIndex((player) => player.id === userID);
+    const userIndex = this.players.findIndex((id) => id === userID);
 
     if (userIndex !== -1) {
       this.players.splice(userIndex, 1);
@@ -57,7 +56,7 @@ export class Room {
         this.destroyRoom();
         return;
       } else {
-        this.leaderID = this.players[0].id;
+        this.leaderID = this.players[0];
       }
     }
 
@@ -82,14 +81,11 @@ export class Room {
 
   updateRoomState(direct: boolean = false) {
     if (direct) {
-      this.players.forEach((player) => {
-        this.io.to(player.id).emit('roomUpdated', this.calculateRoomState(player.id));
+      this.players.forEach((playerID) => {
+        this.io.to(playerID).emit('roomUpdated', this.calculateRoomState(playerID));
       });
 
-      this.io
-        .except(this.players.map((player) => player.id))
-        .to(this.roomID)
-        .emit('roomUpdated', this.calculateRoomState());
+      this.io.except(this.players).to(this.roomID).emit('roomUpdated', this.calculateRoomState());
     } else {
       this.io.to(this.roomID).emit('roomUpdated', this.calculateRoomState());
     }
@@ -112,7 +108,7 @@ export class Room {
       vote: this.vote,
       chat: this.chat.history,
       options: this.options,
-      players: this.players.map(({ name, id }) => ({ name, id, isLeader: id === this.leaderID })),
+      players: this.players.map((id) => ({ id, isLeader: id === this.leaderID })),
       createAt: this.createAt,
     };
 
@@ -148,8 +144,7 @@ export class Room {
 
       this.vote = {
         target,
-        votes: this.players.map(({ name, id }) => ({
-          name,
+        votes: this.players.map((id) => ({
           id,
           isLeader: id === this.leaderID,
           voteResult: undefined,

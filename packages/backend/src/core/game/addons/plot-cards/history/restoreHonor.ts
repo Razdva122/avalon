@@ -21,8 +21,8 @@ export class RestoreHonorHistory implements HistoryElement<'restoreHonor'> {
   dataForManager() {
     return {
       type: <const>'restoreHonor',
-      prevOwnerID: this.data.prevOwner.user.id,
-      newOwnerID: this.data.newOwner.user.id,
+      prevOwnerID: this.data.prevOwner.userID,
+      newOwnerID: this.data.newOwner.userID,
       cardName: this.data.cardName,
     };
   }

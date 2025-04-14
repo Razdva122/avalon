@@ -5,7 +5,7 @@
       {{ $t('vote.voteIndex', { index: data.index + 1 }) }}
     </span>
     <span>
-      {{ ' ' + $t('vote.teamSelected') + ' ' }}<b>{{ calculateNameByID(data.leaderID) }}</b>
+      {{ ' ' + $t('vote.teamSelected') + ' ' }}<b>{{ playerNames[data.leaderID] }}</b>
     </span>
   </div>
   <div>
@@ -13,7 +13,7 @@
     {{
       data.team
         .map((el) => {
-          const name = calculateNameByID(el.id);
+          const name = playerNames[el.id];
           return el.excalibur ? name + $t('vote.excaliburOwner') : name;
         })
         .join(', ')
@@ -39,7 +39,6 @@
 import { defineComponent, PropType } from 'vue';
 
 import type { THistoryVote } from '@avalon/types';
-import type { TCalculateNameByID } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
@@ -47,9 +46,9 @@ export default defineComponent({
       required: true,
       type: Object as PropType<THistoryVote>,
     },
-    calculateNameByID: {
+    playerNames: {
       required: true,
-      type: Function as PropType<TCalculateNameByID>,
+      type: Object as PropType<Record<string, string>>,
     },
   },
   methods: {
@@ -60,7 +59,7 @@ export default defineComponent({
 
       return element.votes
         .filter((el) => el.value === type)
-        .map((el) => this.calculateNameByID(el.playerID))
+        .map((el) => this.playerNames[el.playerID])
         .join(', ');
     },
   },

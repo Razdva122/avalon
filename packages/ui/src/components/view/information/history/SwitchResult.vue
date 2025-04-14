@@ -3,8 +3,8 @@
     <span
       v-html="
         $t('switch.switchInfo', {
-          switcher: calculateNameByID(data.switcherID),
-          target: calculateNameByID(data.targetID),
+          switcher: playerNames[data.switcherID],
+          target: playerNames[data.targetID],
         })
       "
     ></span>
@@ -15,7 +15,7 @@
     <span v-else>???</span>
   </div>
   <div v-else>
-    <b>{{ calculateNameByID(data.switcherID) }}</b> {{ $t('switch.skip') }}
+    <b>{{ playerNames[data.switcherID] }}</b> {{ $t('switch.skip') }}
   </div>
 </template>
 
@@ -23,7 +23,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import type { SwitchResult } from '@avalon/types';
-import type { TCalculateNameByID } from '@/components/view/information/history/interface';
+import type { TPlayerNames } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
@@ -31,9 +31,9 @@ export default defineComponent({
       required: true,
       type: Object as PropType<SwitchResult>,
     },
-    calculateNameByID: {
+    playerNames: {
       required: true,
-      type: Function as PropType<TCalculateNameByID>,
+      type: Object as PropType<TPlayerNames>,
     },
   },
 });

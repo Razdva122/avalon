@@ -78,7 +78,7 @@ describe('Lady of the lake', () => {
     game = restart.game;
     gameHelper = restart.gameHelper;
 
-    const guinevereId = game.players.find((player) => player.role.role === 'guinevere')!.user.id;
+    const guinevereId = game.players.find((player) => player.role.role === 'guinevere')!.userID;
 
     gameHelper
       .moveLadyOfLake(guinevereId)
@@ -91,8 +91,8 @@ describe('Lady of the lake', () => {
       .makeVotes()
       .makeActions(1);
 
-    const evilLancelotId = game.players.find((player) => player.role.role === 'evilLancelot')!.user.id;
-    const goodLancelotId = game.players.find((player) => player.role.role === 'goodLancelot')!.user.id;
+    const evilLancelotId = game.players.find((player) => player.role.role === 'evilLancelot')!.userID;
+    const goodLancelotId = game.players.find((player) => player.role.role === 'goodLancelot')!.userID;
 
     gameHelper.useLadyOfLake(goodLancelotId).announceLoyalty('good');
 
@@ -105,9 +105,9 @@ describe('Lady of the lake', () => {
     game = restart.game;
     gameHelper = restart.gameHelper;
 
-    const percivalId = game.players.find((player) => player.role.role === 'percival')!.user.id;
-    const merlinId = game.players.find((player) => player.role.role === 'merlin')!.user.id;
-    const morganaId = game.players.find((player) => player.role.role === 'morgana')!.user.id;
+    const percivalId = game.players.find((player) => player.role.role === 'percival')!.userID;
+    const merlinId = game.players.find((player) => player.role.role === 'merlin')!.userID;
+    const morganaId = game.players.find((player) => player.role.role === 'morgana')!.userID;
 
     gameHelper
       .moveLadyOfLake(percivalId)

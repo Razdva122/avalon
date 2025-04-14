@@ -110,7 +110,7 @@ export class Mission implements HistoryElement<'mission'> {
     }
 
     action.value = action.value === 'fail' ? 'success' : 'fail';
-    action.switchedBy = switchedBy.user.id;
+    action.switchedBy = switchedBy.userID;
 
     return action.value;
   }
@@ -148,7 +148,7 @@ export class Mission implements HistoryElement<'mission'> {
       type: this.type,
       index: this.data.index,
       settings: this.data.settings,
-      leaderID: this.data.leader!.user.id,
+      leaderID: this.data.leader!.userID,
       ...this.calculateMissionData(),
     };
 
@@ -158,10 +158,10 @@ export class Mission implements HistoryElement<'mission'> {
     if (!hideElement || options.game.stage === 'end') {
       data.actions = this.data.actions.map((action) => {
         const isGameEnded = options.game.stage === 'end';
-        const isUserAction = action.player.user.id === options.userID;
+        const isUserAction = action.player.userID === options.userID;
         const isSwitchedByPlayer = options.userID && action.switchedBy === options.userID;
 
-        const data: IAction = { playerID: action.player.user.id, switchedBy: action.switchedBy };
+        const data: IAction = { playerID: action.player.userID, switchedBy: action.switchedBy };
 
         if (isGameEnded || isUserAction || isSwitchedByPlayer || action.openToEveryone) {
           (<IActionWithResult>data).value = <TMissionResult>action.value;

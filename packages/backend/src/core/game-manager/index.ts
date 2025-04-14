@@ -1,5 +1,4 @@
 import { Game } from '@/core/game';
-import type { User } from '@/user';
 import type { TRoomState, TGameMethodsParams, TGetLoyaltyData } from '@/core/game-manager/interface';
 import { eventBus } from '@/helpers';
 import { Mission } from '@/core/game/history/mission';
@@ -34,10 +33,10 @@ export class GameManager {
   io: Server;
   roomID: string;
 
-  constructor(users: User[], options: GameOptions, io: Server, roomID: string) {
+  constructor(userIDs: string[], options: GameOptions, io: Server, roomID: string) {
     this.roomID = roomID;
     this.io = io;
-    this.game = new Game(users, options, { gameStateChanged: () => this.gameStateChanged() });
+    this.game = new Game(userIDs, options, { gameStateChanged: () => this.gameStateChanged() });
     this.initRoomState();
   }
 
@@ -124,9 +123,9 @@ export class GameManager {
       missionState: missionsState,
       players: this.game.players.map((player) => {
         return {
-          id: player.user.id,
+          id: player.userID,
           index: player.index,
-          name: player.user.name,
+          name: '', // Placeholder, will be filled on frontend
           features: player.features,
         };
       }),
@@ -138,11 +137,11 @@ export class GameManager {
    */
   sendNewStateToUsers(): void {
     this.game.players.forEach((player) => {
-      this.io.to(player.user.id).emit('gameUpdated', this.prepareStateForUser(player.user.id));
+      this.io.to(player.userID).emit('gameUpdated', this.prepareStateForUser(player.userID));
     });
 
     this.io
-      .except(this.game.players.map((player) => player.user.id))
+      .except(this.game.players.map((player) => player.userID))
       .to(this.roomID)
       .emit('gameUpdated', this.prepareStateForUser());
   }
@@ -287,7 +286,7 @@ export class GameManager {
               throw new Error('You must select exactly one player to use restore honor');
             }
 
-            const targetPlayerId = selectedPlayers[0].user.id;
+            const targetPlayerId = selectedPlayers[0].userID;
             card.restoreHonor(params.cardID, targetPlayerId, userID);
           },
           params.restoreHonorCardID,
@@ -319,7 +318,7 @@ export class GameManager {
                 throw new Error('You must select exactly one player to use We Found You');
               }
 
-              const selectedPlayer = this.game.findPlayerByID(selectedPlayers[0].user.id);
+              const selectedPlayer = this.game.findPlayerByID(selectedPlayers[0].userID);
               card.weFoundYou(userID, true, selectedPlayer);
             } else {
               card.weFoundYou(userID, false, undefined);

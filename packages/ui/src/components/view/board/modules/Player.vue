@@ -59,7 +59,6 @@
       <UserHoverCard v-if="player.id" :userID="player.id" />
     </v-tooltip>
 
-    <!-- Модальное окно для мобильных устройств -->
     <v-dialog v-model="showUserCardDialog" content-class="user-card-dialog">
       <UserHoverCard v-if="player.id && showUserCardDialog" :userID="player.id" />
     </v-dialog>
@@ -68,11 +67,11 @@
 
 <script lang="ts">
 import cloneDeep from 'lodash/cloneDeep';
-import { defineComponent, PropType, inject, computed, toRefs, ref, onMounted } from 'vue';
+import { defineComponent, PropType, inject, computed, toRefs, ref, onMounted, ComputedRef, watch } from 'vue';
 import { onLongPress } from '@vueuse/core';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
-import { useUserProfile } from '@/helpers/setup';
+import { useUserProfile } from '@/helpers/composables';
 import type {
   RoomPlayer,
   THistoryResults,
@@ -117,11 +116,11 @@ export default defineComponent({
       type: Boolean,
     },
   },
-  setup(props, { emit }) {
+  setup(props) {
     const gameState = inject(gameStateKey)!;
     const store = useStore();
     const { playerState, visibleHistory, displayKick } = toRefs(props);
-    const { userState } = useUserProfile(playerState.value.id);
+    const { userState, userName } = useUserProfile(playerState.value.id);
     const chatMessage = ref<{ message?: string; timeoutId?: number }>();
     const playerRef = ref(null);
     const showUserCardDialog = ref(false);
@@ -156,8 +155,10 @@ export default defineComponent({
       }
     });
 
-    const player = computed(() => {
-      const clone = cloneDeep(playerState.value);
+    const player: ComputedRef<(IFrontendPlayer | RoomPlayer) & { name: string }> = computed(() => {
+      const clone = cloneDeep(playerState.value) as (IFrontendPlayer | RoomPlayer) & { name: string };
+
+      clone.name = userName.value;
 
       if ('features' in clone) {
         const isGameEnded = gameState.value.stage === 'end';

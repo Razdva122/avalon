@@ -3,8 +3,8 @@
     <span
       v-html="
         $t('ambush.history', {
-          ownerName: calculateNameByID(data.ownerID),
-          targetName: calculateNameByID(data.targetID),
+          ownerName: playerNames[data.ownerID],
+          targetName: playerNames[data.targetID],
           result: data.result ? $t('inGame.' + data.result) : $t('ambush.resultHidden'),
         })
       "
@@ -17,7 +17,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import type { Ambush } from '@avalon/types';
-import type { TCalculateNameByID } from '@/components/view/information/history/interface';
+import type { TPlayerNames } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
@@ -25,9 +25,9 @@ export default defineComponent({
       required: true,
       type: Object as PropType<Ambush>,
     },
-    calculateNameByID: {
+    playerNames: {
       required: true,
-      type: Function as PropType<TCalculateNameByID>,
+      type: Object as PropType<TPlayerNames>,
     },
   },
 });

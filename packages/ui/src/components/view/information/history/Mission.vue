@@ -15,7 +15,7 @@
       {{ $t('mission.team') }}
       <template v-for="(el, index) in data.actions">
         <span :class="{ fail: 'text-error', success: 'text-success' }[(el as IActionWithResult).value]">
-          {{ calculateNameByID(el.playerID) }}
+          {{ playerNames[el.playerID] }}
         </span>
         <span>
           {{ index !== data.actions.length - 1 ? ', ' : '' }}
@@ -29,7 +29,6 @@
 import { defineComponent, PropType } from 'vue';
 
 import type { THistoryMission, IActionWithResult } from '@avalon/types';
-import type { TCalculateNameByID } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
@@ -37,9 +36,9 @@ export default defineComponent({
       required: true,
       type: Object as PropType<THistoryMission>,
     },
-    calculateNameByID: {
+    playerNames: {
       required: true,
-      type: Function as PropType<TCalculateNameByID>,
+      type: Object as PropType<Record<string, string>>,
     },
   },
 });

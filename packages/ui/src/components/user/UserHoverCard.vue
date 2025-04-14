@@ -57,7 +57,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType, ref, computed, watch, onMounted } from 'vue';
-import { useUserProfile } from '@/helpers/setup';
+import { useUserProfile } from '@/helpers/composables';
 import { socket } from '@/api/socket';
 import Avatar from '@/components/user/Avatar.vue';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';

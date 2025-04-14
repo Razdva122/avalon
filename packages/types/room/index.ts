@@ -81,9 +81,6 @@ export class StartedRoomState extends BaseRoomState {
 export class User {
   @prop({ required: true })
   public id!: string;
-
-  @prop({ required: true })
-  public name!: string;
 }
 
 export class RoomPlayer extends User {

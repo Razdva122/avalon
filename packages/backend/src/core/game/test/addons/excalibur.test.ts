@@ -40,12 +40,12 @@ describe('Excalibur logic', () => {
 
   test('Use excalibur on single fail should win mission', () => {
     const evilToFail = game.players.find((player) => player.role.loyalty === 'evil' && !player.features.isLeader)!;
-    game.selectPlayer(game.leader.user.id, evilToFail.user.id);
+    game.selectPlayer(game.leader.userID, evilToFail.userID);
     gameHelper.selectPlayersOnMission(0, -1).sentSelectedPlayers();
 
     const playerId = game.players.find(
       (player) => !player.features.isLeader && player.features.isSent && player !== evilToFail,
-    )!.user.id;
+    )!.userID;
 
     gameHelper.giveExcalibur(playerId).makeVotes().makeActions(1).useExcalibur(true, false);
 

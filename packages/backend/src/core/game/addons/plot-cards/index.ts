@@ -114,7 +114,7 @@ export class PlotCardsAddon implements IGameAddon {
 
     const isCardActive = (cardName: TPlotCardNames) => (player: IPlayerInGame) =>
       this.cardsInGame.some(
-        (card) => card.name === cardName && card.ownerID === player.user.id && card.stage === 'active',
+        (card) => card.name === cardName && card.ownerID === player.userID && card.stage === 'active',
       );
 
     this.game.addSelectAvailableStage('ambush', isCardActive('ambush'));
@@ -176,7 +176,7 @@ export class PlotCardsAddon implements IGameAddon {
     this.game.stage = 'giveCard';
 
     if (this.currentCardState.card.activate === 'self') {
-      this.addCardInGame(this.game.leader.user.id);
+      this.addCardInGame(this.game.leader.userID);
 
       const giveCardHistory = new GiveCardHistory({
         leader: this.game.leader,
@@ -196,7 +196,7 @@ export class PlotCardsAddon implements IGameAddon {
   }
 
   giveCardToPlayer(userID: string) {
-    const leader = this.game.players.find((player) => player.user.id === userID);
+    const leader = this.game.players.find((player) => player.userID === userID);
 
     if (leader !== this.game.leader) {
       throw new Error('Only leader can give cards to player');
@@ -212,7 +212,7 @@ export class PlotCardsAddon implements IGameAddon {
       throw new Error('You cannot give a plot card to yourself');
     }
 
-    this.addCardInGame(selectedPlayer.user.id);
+    this.addCardInGame(selectedPlayer.userID);
     const giveCardHistory = new GiveCardHistory({
       leader: this.game.leader,
       target: 'player',
@@ -297,7 +297,7 @@ export class PlotCardsAddon implements IGameAddon {
       let position = 0;
 
       for (let i = 0; i < this.game.players.length; i++) {
-        playerOrder[player.user.id] = position++;
+        playerOrder[player.userID] = position++;
         player = player.next;
       }
 

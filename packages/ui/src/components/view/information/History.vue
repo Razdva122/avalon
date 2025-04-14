@@ -9,7 +9,7 @@
     <div class="history pa-4 rounded-lg">
       <div v-for="historyEl in history">
         <div>
-          <component :is="toKebabCase(historyEl.type)" :data="historyEl" :calculateNameByID="calculateNameByID" />
+          <component :is="toKebabCase(historyEl.type)" :data="historyEl" :playerNames="playerNames" />
         </div>
         <v-divider :thickness="3"></v-divider>
       </div>
@@ -20,8 +20,11 @@
 
 <script lang="ts">
 import kebabCase from 'lodash/kebabCase';
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, PropType, ref, computed, toRefs, watch, ComputedRef } from 'vue';
 import { THistoryResults, Player } from '@avalon/types';
+import { useUserProfile } from '@/helpers/composables/useUserProfile';
+import { useStore } from '@/store';
+
 import SwitchLancelots from '@/components/view/information/history/SwitchLancelots.vue';
 import SwitchResult from '@/components/view/information/history/SwitchResult.vue';
 import CheckLoyalty from '@/components/view/information/history/CheckLoyalty.vue';
@@ -71,22 +74,64 @@ export default defineComponent({
       type: Boolean,
     },
   },
-  data: () => ({
-    overlay: false,
-  }),
-  methods: {
-    calculateNameByID(playerID: string) {
-      const player = this.players.find((player) => player.id === playerID)!;
-      const hideIndexInHistory = this.$store.state.settings?.hideIndexInHistory;
-      const prefix = this.displayIndex && !hideIndexInHistory ? `${player.index}. ` : '';
-      return prefix + player.name;
-    },
-    closeHistory() {
-      this.overlay = false;
-    },
-    toKebabCase(str: string): string {
+  setup(props) {
+    const { players, displayIndex } = toRefs(props);
+    const store = useStore();
+    const overlay = ref(false);
+    const userNamesMap = ref<Record<string, string>>({});
+
+    watch(
+      () => players.value,
+      (newPlayers) => {
+        if (newPlayers && newPlayers.length) {
+          newPlayers.forEach((player) => {
+            const { userName } = useUserProfile(player.id);
+
+            watch(
+              userName,
+              (newName) => {
+                userNamesMap.value[player.id] = newName;
+              },
+              { immediate: true },
+            );
+          });
+        }
+      },
+      { immediate: true },
+    );
+
+    // Create a computed property that maps player IDs to their names
+    const playerNames = computed(() => {
+      const names: Record<string, string> = {};
+
+      if (players.value && players.value.length) {
+        players.value.forEach((player) => {
+          const hideIndexInHistory = store.state.settings?.hideIndexInHistory;
+          const prefix = displayIndex.value && !hideIndexInHistory ? `${player.index}. ` : '';
+
+          names[player.id] = prefix + (userNamesMap.value[player.id] || '???');
+        });
+      }
+
+      return names;
+    });
+
+    // Function to close history overlay
+    const closeHistory = () => {
+      overlay.value = false;
+    };
+
+    // Function to convert string to kebab case
+    const toKebabCase = (str: string): string => {
       return kebabCase(str);
-    },
+    };
+
+    return {
+      overlay,
+      playerNames,
+      closeHistory,
+      toKebabCase,
+    };
   },
 });
 </script>

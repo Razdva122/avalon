@@ -31,12 +31,12 @@
   <div v-if="data.lancelotsIDs">
     <div>
       <span class="text-success">{{ $t('roles.goodLancelot') }}</span
-      >: {{ calculateNameByID(data.lancelotsIDs.good) }}
+      >: {{ playerNames[data.lancelotsIDs.good] }}
       {{ data.result ? $t('lancelotsHistory.becameEvil') : $t('lancelotsHistory.lancelotSaveLoyalty') }}
     </div>
     <div>
       <span class="text-error">{{ $t('roles.evilLancelot') }}</span
-      >: {{ calculateNameByID(data.lancelotsIDs.evil) }}
+      >: {{ playerNames[data.lancelotsIDs.evil] }}
       {{ data.result ? $t('lancelotsHistory.becameGood') : $t('lancelotsHistory.lancelotSaveLoyalty') }}
     </div>
   </div>
@@ -46,7 +46,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import type { SwitchLancelots } from '@avalon/types';
-import type { TCalculateNameByID } from '@/components/view/information/history/interface';
+import type { TPlayerNames } from '@/components/view/information/history/interface';
 
 export default defineComponent({
   props: {
@@ -54,9 +54,9 @@ export default defineComponent({
       required: true,
       type: Object as PropType<SwitchLancelots>,
     },
-    calculateNameByID: {
+    playerNames: {
       required: true,
-      type: Function as PropType<TCalculateNameByID>,
+      type: Object as PropType<TPlayerNames>,
     },
   },
 });

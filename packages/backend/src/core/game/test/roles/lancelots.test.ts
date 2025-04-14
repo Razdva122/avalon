@@ -49,7 +49,7 @@ describe('Lancelots', () => {
 
   test('If lancelots change roles minions should see new state', () => {
     const minions = game.players.filter((player) => player.role.role === 'minion');
-    const evilLancelotId = game.players.find((player) => player.role.selfRole === 'evilLancelot')!.user.id;
+    const evilLancelotId = game.players.find((player) => player.role.selfRole === 'evilLancelot')!.userID;
 
     game.addons.lancelots!.switches = [true, true, true, false, false];
 
@@ -64,7 +64,7 @@ describe('Lancelots', () => {
       .makeActions(1);
 
     minions.forEach((minion) => {
-      expect(game.visibleRolesState[minion.user.id][evilLancelotId]).toBe('goodLancelot');
+      expect(game.visibleRolesState[minion.userID][evilLancelotId]).toBe('goodLancelot');
     });
   });
 });

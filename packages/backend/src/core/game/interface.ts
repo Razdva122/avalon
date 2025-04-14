@@ -11,7 +11,6 @@ import type {
   PlotCardsAddon,
 } from '@/core/game/addons';
 import type { Character } from '@/core/roles';
-import type { User } from '@/user';
 
 import type { TGameStage, PlayerFeatures, GameSettings } from '@avalon/types';
 
@@ -21,7 +20,7 @@ export interface IPresetsForGame {
 
 export interface IPlayerInGame {
   index: number;
-  user: User;
+  userID: string;
   role: Character;
 
   /**

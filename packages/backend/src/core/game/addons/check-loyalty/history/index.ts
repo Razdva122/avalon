@@ -19,8 +19,8 @@ export class CheckLoyaltyHistory implements HistoryElement<'checkLoyalty'> {
   }
 
   dataForManager() {
-    const validatorID = this.data.validator.user.id;
-    const inspectedID = this.data.inspected.user.id;
+    const validatorID = this.data.validator.userID;
+    const inspectedID = this.data.inspected.userID;
 
     const checkLoyaltyData: CheckLoyalty = {
       type: this.type,
@@ -48,8 +48,8 @@ export class RevealLoyaltyHistory implements HistoryElement<'revealLoyalty'> {
   }
 
   dataForManager() {
-    const revealerID = this.data.revealer.user.id;
-    const targetID = this.data.target.user.id;
+    const revealerID = this.data.revealer.userID;
+    const targetID = this.data.target.userID;
 
     const revealLoyaltyData: RevealLoyalty = {
       type: this.type,
@@ -84,8 +84,8 @@ export class AnnounceLoyaltyHistory implements HistoryElement<'announceLoyalty'>
   }
 
   dataForManager(options: TDataForManagerOptions) {
-    const announcerID = this.data.announcer.user.id;
-    const targetID = this.data.target.user.id;
+    const announcerID = this.data.announcer.userID;
+    const targetID = this.data.target.userID;
 
     const announceLoyaltyData: AnnounceLoyalty = {
       type: this.type,

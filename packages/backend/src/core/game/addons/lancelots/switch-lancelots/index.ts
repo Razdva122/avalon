@@ -17,8 +17,8 @@ export class SwitchLancelotsHistory implements HistoryElement<'switchLancelots'>
   ) {
     this.data = {
       lancelotsIDs: {
-        good: goodLancelot.user.id,
-        evil: evilLancelot.user.id,
+        good: goodLancelot.userID,
+        evil: evilLancelot.userID,
       },
       result: switches[switchPointer],
       pointer: switchPointer,

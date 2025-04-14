@@ -16,13 +16,13 @@ describe('Wait for action', () => {
     expect(game.players.every((player) => player.features.waitForAction)).toBeTruthy();
 
     game.voteForMission('1', 'approve');
-    expect(game.players.find((player) => player.user.id === '1')?.features.waitForAction).toBeFalsy();
+    expect(game.players.find((player) => player.userID === '1')?.features.waitForAction).toBeFalsy();
 
     gameHelper.makeVotes();
     expect(game.players.every((player) => player.features.isSent === player.features.waitForAction)).toBeTruthy();
 
     const playerFromMission = game.players.find((player) => player.features.isSent)!;
-    game.actionOnMission(playerFromMission.user.id, 'success');
+    game.actionOnMission(playerFromMission.userID, 'success');
     expect(playerFromMission.features.waitForAction).toBeFalsy();
   });
 

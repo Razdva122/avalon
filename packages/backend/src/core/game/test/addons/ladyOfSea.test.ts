@@ -13,7 +13,7 @@ describe('Lady of the sea', () => {
     const evilPlayer = game.players.find(
       (player) => player.role.loyalty === 'evil' && player.features.ladyOfSea === undefined,
     )!;
-    const ownerLadyId = game.players.find((player) => player.features.ladyOfSea === 'has')!.user.id;
+    const ownerLadyId = game.players.find((player) => player.features.ladyOfSea === 'has')!.userID;
 
     gameHelper
       .selectPlayersOnMission(1)
@@ -24,9 +24,9 @@ describe('Lady of the sea', () => {
       .sentSelectedPlayers()
       .makeVotes()
       .makeActions(1)
-      .useLadyOfSea(evilPlayer.user.id)
+      .useLadyOfSea(evilPlayer.userID)
       .announceLoyalty('good');
 
-    expect(game.visibleRolesState[ownerLadyId][evilPlayer.user.id]).toBe(evilPlayer.role.role);
+    expect(game.visibleRolesState[ownerLadyId][evilPlayer.userID]).toBe(evilPlayer.role.role);
   });
 });

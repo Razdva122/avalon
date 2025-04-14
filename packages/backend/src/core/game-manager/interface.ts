@@ -12,7 +12,7 @@ import type {
 import type { TDataForManagerOptions } from '@/core/game/history';
 
 export type TRoomState = Omit<VisualGameState, 'players' | 'history'> & {
-  players: Pick<Player, 'features' | 'id' | 'name' | 'index'>[];
+  players: Pick<Player, 'features' | 'id' | 'index'>[];
   history: ((options: TDataForManagerOptions) => THistoryResults)[];
 };
 

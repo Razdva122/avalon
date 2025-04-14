@@ -54,7 +54,7 @@ export class ExcaliburAddon implements IGameAddon {
       throw new Error(`You cant give excalibur on stage ${this.game.stage}`);
     }
 
-    if (this.game.leader.user.id !== executorID) {
+    if (this.game.leader.userID !== executorID) {
       throw new Error('Only leader can give excalibur');
     }
 
@@ -76,7 +76,7 @@ export class ExcaliburAddon implements IGameAddon {
     selectedPlayer.features.isSelected = false;
     this.game.leader.features.waitForAction = false;
 
-    const member = this.game.vote!.data.team.find((player) => player.id === selectedPlayer.user.id)!;
+    const member = this.game.vote!.data.team.find((player) => player.id === selectedPlayer.userID)!;
     member.excalibur = true;
 
     this.giveExcaliburSubject.next(true);
@@ -89,7 +89,7 @@ export class ExcaliburAddon implements IGameAddon {
 
     const ownerOfExcalibur = this.game.players.find((player) => player.features.excalibur)!;
 
-    if (ownerOfExcalibur.user.id !== executorID) {
+    if (ownerOfExcalibur.userID !== executorID) {
       throw new Error('Only owner of excalibur can use it');
     }
 

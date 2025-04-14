@@ -39,7 +39,7 @@ export class WitchAddon extends CheckLoyaltyAbstractAddon implements IGameAddon 
 
     const witch = this.game.players.find((player) => player.role.role === 'witch')!;
 
-    if (witch.user.id !== executorID) {
+    if (witch.userID !== executorID) {
       throw new Error('Only witch can use witch ability');
     }
 
