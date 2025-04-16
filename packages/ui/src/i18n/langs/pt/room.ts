@@ -17,6 +17,7 @@ export default {
     players: 'Jogadores',
     loading: 'Carregando...',
     online: 'Online: {count}',
+    lookingForPlayers: 'Procurando jogadores',
   },
   alert: {
     titlediscord: 'Discord',

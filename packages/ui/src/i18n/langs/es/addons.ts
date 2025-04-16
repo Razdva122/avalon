@@ -31,5 +31,6 @@ export default {
     hiddenHistoryHint: 'Con la historia oculta, las acciones pasadas en el juego están escondidas',
     displayIndex: 'Mostrar índice',
     displayIndexHint: 'Muestra el número de índice de cada jugador en la mesa',
+    lookingForPlayersHint: 'Mostrar un banner verde indicando que estás buscando más jugadores',
   },
 };

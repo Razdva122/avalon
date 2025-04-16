@@ -17,6 +17,7 @@ export default {
     players: '位玩家',
     loading: '加載中...',
     online: '線上: {count}',
+    lookingForPlayers: '尋找玩家',
   },
   alert: {
     titlediscord: 'Discord',

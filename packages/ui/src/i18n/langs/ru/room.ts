@@ -17,6 +17,7 @@ export default {
     players: 'игроков',
     loading: 'Загрузка...',
     online: 'Онлайн: {count}',
+    lookingForPlayers: 'Ищем игроков',
   },
   alert: {
     titlediscord: 'Discord',

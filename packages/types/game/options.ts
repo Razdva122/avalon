@@ -88,6 +88,9 @@ export class GameOptionsFeatures {
 
   @prop()
   public displayIndex?: boolean;
+
+  @prop()
+  public lookingForPlayers?: boolean;
 }
 
 export class GameOptions {

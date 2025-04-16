@@ -32,5 +32,6 @@ export default {
     hiddenHistoryHint: 'With a hidden history, past actions in the game are hidden',
     displayIndex: 'Display index',
     displayIndexHint: 'Displays the index number of each player at the table',
+    lookingForPlayersHint: 'Show a green banner indicating you are looking for more players',
   },
 };

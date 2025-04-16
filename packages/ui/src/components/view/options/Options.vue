@@ -196,6 +196,11 @@ export default defineComponent({
     featuresSettings() {
       return [
         {
+          name: 'lookingForPlayers',
+          label: this.$t('mainPage.lookingForPlayers'),
+          hint: this.$t('options.lookingForPlayersHint'),
+        },
+        {
           name: 'anonymousVoting',
           label: this.$t('options.anonymousVoting'),
           hint: this.$t('options.anonymousVotingHint'),

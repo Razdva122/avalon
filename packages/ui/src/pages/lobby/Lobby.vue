@@ -38,8 +38,17 @@
               />
             </div>
             <div class="game-right">
-              <div class="players-amount mr-2">
-                {{ game.state === 'created' ? `${game.players}/10` : `${game.players} ${$t('mainPage.players')}` }}
+              <div class="game-right-content">
+                <v-chip
+                  v-if="game.state === 'created' && game.options.features && game.options.features.lookingForPlayers"
+                  color="green"
+                  variant="flat"
+                >
+                  {{ $t('mainPage.lookingForPlayers') }}
+                </v-chip>
+                <div class="players-amount mr-2">
+                  {{ game.state === 'created' ? `${game.players}/10` : `${game.players} ${$t('mainPage.players')}` }}
+                </div>
               </div>
             </div>
           </div>
@@ -194,6 +203,12 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+}
+
+.game-right-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .game-name {

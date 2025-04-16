@@ -31,5 +31,6 @@ export default {
     hiddenHistoryHint: '透過隱藏記錄,遊戲中過去的動作被隱藏',
     displayIndex: '顯示索引',
     displayIndexHint: '顯示牌桌上每位玩家的索引號',
+    lookingForPlayersHint: '顯示綠色橫幅，表示您正在尋找更多玩家',
   },
 };
