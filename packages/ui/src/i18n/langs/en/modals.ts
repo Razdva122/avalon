@@ -40,4 +40,11 @@ export default {
     endGame: 'Voting to end the game',
     endAndRestartGame: 'Voting to end the game and start a new one',
   },
+  notFound: {
+    error: 'Oops! Sorry, page not found.',
+    switch: 'Switch path',
+  },
+  chat: {
+    message: 'message',
+  },
 };
