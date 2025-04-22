@@ -203,3 +203,73 @@ The following socket endpoints are available for accessing rating data:
 - `getRatingHistory`: Get rating history for a user and role over the last 30 days
 
 7. Follow the single responsibility principle when creating database queries
+
+## TrueSkill Rating System
+
+The Avalon project has implemented a TrueSkill rating system alongside the existing ELO system to provide a more sophisticated approach to player skill measurement.
+
+### TrueSkill Models
+
+#### PlayerTrueSkillRating
+
+Stores TrueSkill ratings for each player:
+
+- `userID`: user identifier (unique)
+- `mu`: mean skill value (default 6000)
+- `sigma`: skill uncertainty (default 1500)
+- `conservativeRating`: calculated as mu - 3\*sigma
+- `gamesCount`: total number of games played
+- `wins`: number of games won
+- `losses`: number of games lost
+- `lastPlayedAt`: date when the player last played
+- `updatedAt`: date when the rating was last updated
+
+#### GameTrueSkillResult
+
+Stores TrueSkill rating changes for each game:
+
+- `gameID`: unique game identifier
+- `playedAt`: date when the game was played
+- `playerChanges`: array of player rating changes
+
+#### TrueSkillRatingHistory
+
+Stores historical snapshots of TrueSkill ratings:
+
+- `date`: date of the snapshot
+- `ratings`: array of player ratings with ranks
+
+### TrueSkill Calculation
+
+TrueSkill ratings are calculated using the following approach:
+
+1. **Team-Based Calculation**: Ratings are calculated based on team performance, with normalization to handle different team sizes.
+
+2. **Skill and Uncertainty**: Each player has both a skill value (mu) and an uncertainty value (sigma).
+
+   - Higher sigma means faster adaptation to new performance levels
+   - Sigma decreases as more games are played, stabilizing the rating
+
+3. **Conservative Rating**: Public display uses a conservative rating (mu - 3\*sigma) to ensure 99.7% confidence.
+
+4. **Skill Adjustment Factors**:
+
+   - Winners: Higher skilled players get smaller gains, lower skilled players get larger gains
+   - Losers: Higher skilled players get larger penalties, lower skilled players get smaller penalties
+
+5. **Minimum Games**: Players need at least 10 games to appear on the leaderboard.
+
+### API Endpoints
+
+The following socket endpoints are available for accessing TrueSkill data:
+
+- `getTrueSkillRating`: Get TrueSkill rating for a specific player
+- `getTrueSkillLeaderboard`: Get top players by TrueSkill rating
+- `getMatchTrueSkillChanges`: Get rating changes for a specific game
+
+### Rating Updates
+
+TrueSkill ratings are updated:
+
+- Immediately when a game ends via `updateTrueSkillForGame`
+- Historical snapshots are created periodically via `createTrueSkillRatingSnapshot`

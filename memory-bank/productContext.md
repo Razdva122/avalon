@@ -11,7 +11,7 @@ Avalon is an online implementation of the popular social deduction game "The Res
 - Real-time multiplayer gameplay
 - Role-based gameplay mechanics
 - Various game addons and modifications
-- Rating system for player performance
+- Dual rating systems (ELO and TrueSkill) for accurate player performance measurement
 - Internationalization support (English, Russian, Chinese, Spanish, Portuguese)
 - Statistics tracking
 

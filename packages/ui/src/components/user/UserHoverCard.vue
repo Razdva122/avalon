@@ -1,16 +1,21 @@
 <template>
   <v-card class="user-hover-card" elevation="4">
     <div class="user-header pa-3">
-      <div class="d-flex align-center">
-        <div class="avatar-container mr-3">
-          <Avatar v-if="userState.status === 'ready'" :avatarID="userState.profile.avatar" class="user-avatar" />
-          <v-skeleton-loader v-else type="avatar" class="user-avatar-skeleton" />
-        </div>
-        <div class="user-info">
-          <div class="username" v-if="userState.status === 'ready'">
-            {{ userState.profile.name }}
+      <div class="d-flex justify-space-between">
+        <div class="d-flex align-center">
+          <div class="avatar-container mr-3">
+            <Avatar v-if="userState.status === 'ready'" :avatarID="userState.profile.avatar" class="user-avatar" />
+            <v-skeleton-loader v-else type="avatar" class="user-avatar-skeleton" />
           </div>
-          <v-skeleton-loader v-else type="text" width="120" />
+          <div class="user-info">
+            <div class="username" v-if="userState.status === 'ready'">
+              {{ userState.profile.name }}
+            </div>
+            <v-skeleton-loader v-else type="text" width="120" />
+          </div>
+        </div>
+        <div class="trueskill-rating">
+          <UserTrueSkillRating :userID="userID" />
         </div>
       </div>
     </div>
@@ -56,12 +61,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, computed, watch, onMounted } from 'vue';
+import { defineComponent, ref, computed, watch, onMounted } from 'vue';
 import { useUserProfile } from '@/helpers/composables';
 import { socket } from '@/api/socket';
 import Avatar from '@/components/user/Avatar.vue';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
+import UserTrueSkillRating from '@/components/stats/UserTrueSkillRating.vue';
 import { RoleRating } from '@avalon/types';
 
 export default defineComponent({
@@ -70,6 +76,7 @@ export default defineComponent({
     Avatar,
     PlayerIcon,
     WinrateDisplay,
+    UserTrueSkillRating,
   },
   props: {
     userID: {
@@ -163,10 +170,14 @@ export default defineComponent({
   width: 300px;
   box-shadow: 0 4px 8px rgba(var(--v-theme-shadow), 0.5) !important; /* Stronger shadow for better visibility */
   border: 3px solid rgba(var(--v-theme-on-surface), 0.1);
+}
 
-  // Оптимизация для мобильных устройств
+.trueskill-rating {
+  display: flex;
+  align-items: flex-start;
+  margin-left: 8px;
+
   @media (max-width: 600px) {
-    width: 90vw; // Использование viewport width для лучшего отображения на мобильных
     max-width: 300px;
   }
 }

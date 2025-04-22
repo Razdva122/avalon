@@ -1,5 +1,5 @@
 <template>
-  <v-chip :color="chipColor" :variant="chipVariant" size="small" class="font-weight-medium">
+  <v-chip :color="chipColor" :variant="chipVariant" size="default" class="font-weight-medium">
     {{ `${winrate} %` }}
   </v-chip>
 </template>

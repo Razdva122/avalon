@@ -34,6 +34,15 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     topRoles: 'Top Roles',
     noRolesData: 'No role data available',
     noRatingHistory: 'No rating history available',
+    // TrueSkill rating changes modal
+    result: 'Result',
+    goodTeam: 'Good Team',
+    evilTeam: 'Evil Team',
+    win: 'WIN',
+    loss: 'LOSS',
+    oldRating: 'Old Rating',
+    newRating: 'New Rating',
+    change: 'Change',
   },
   pt: {
     title: 'Avalon — Estatísticas do Jogo',
@@ -68,6 +77,15 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     noRolesData: 'Não há dados de funções disponíveis',
 
     noRatingHistory: 'Não há histórico de classificação disponível',
+    // TrueSkill rating changes modal
+    result: 'Resultado',
+    goodTeam: 'Equipe do Bem',
+    evilTeam: 'Equipe do Mal',
+    win: 'VITÓRIA',
+    loss: 'DERROTA',
+    oldRating: 'Classificação Antiga',
+    newRating: 'Classificação Nova',
+    change: 'Alteração',
   },
   ru: {
     title: 'Avalon — статистика игр',
@@ -100,8 +118,16 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     noTopPlayerData: 'Нет данных о лучшем игроке',
     topRoles: 'Лучшие роли',
     noRolesData: 'Нет данных о ролях',
-
     noRatingHistory: 'История рейтинга недоступна',
+    // TrueSkill rating changes modal
+    result: 'Результат',
+    goodTeam: 'Команда Света',
+    evilTeam: 'Команда Тьмы',
+    win: 'ПОБЕДА',
+    loss: 'ПОРАЖЕНИЕ',
+    oldRating: 'Старый рейтинг',
+    newRating: 'Новый рейтинг',
+    change: 'Изменение',
   },
   'zh-CN': {
     title: 'Avalon — 游戏统计',
@@ -136,6 +162,15 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     noRolesData: '没有角色数据',
 
     noRatingHistory: '没有评分历史',
+    // TrueSkill rating changes modal
+    result: '结果',
+    goodTeam: '光明阵营',
+    evilTeam: '黑暗阵营',
+    win: '胜利',
+    loss: '失败',
+    oldRating: '旧评分',
+    newRating: '新评分',
+    change: '变化',
   },
   'zh-TW': {
     title: 'Avalon — 遊戲統計',
@@ -170,6 +205,15 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     noRolesData: '沒有角色數據',
 
     noRatingHistory: '沒有評分歷史',
+    // TrueSkill rating changes modal
+    result: '結果',
+    goodTeam: '光明陣營',
+    evilTeam: '黑暗陣營',
+    win: '勝利',
+    loss: '失敗',
+    oldRating: '舊評分',
+    newRating: '新評分',
+    change: '變化',
   },
   es: {
     title: 'Avalon — Estadísticas de Juegos',
@@ -204,5 +248,14 @@ export const stats: { [key in TLanguage]: Dictionary<string> } = {
     noRolesData: 'No hay datos de roles disponibles',
 
     noRatingHistory: 'No hay historial de clasificación disponible',
+    // TrueSkill rating changes modal
+    result: 'Resultado',
+    goodTeam: 'Equipo del Bien',
+    evilTeam: 'Equipo del Mal',
+    win: 'VICTORIA',
+    loss: 'DERROTA',
+    oldRating: 'Clasificación Anterior',
+    newRating: 'Clasificación Nueva',
+    change: 'Cambio',
   },
 };

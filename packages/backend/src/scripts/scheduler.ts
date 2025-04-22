@@ -1,103 +1,120 @@
 import { updateRatings } from './updateRatings';
-import { roleRatingModel } from '../db/models';
+import { createTrueSkillRatingSnapshot } from './updateTrueSkillRatings';
 
 /**
- * Scheduler for running the ratings update at 1 AM every day
+ * Scheduler for running ratings updates
+ * Role-based ratings update at 1 AM every day
+ * TrueSkill ratings snapshot at 2 AM every day
  */
 export class RatingScheduler {
-  private timer: NodeJS.Timeout | null = null;
+  // Timer for role-based ratings
+  private roleTimer: NodeJS.Timeout | null = null;
+  // Timer for TrueSkill ratings
+  private trueSkillTimer: NodeJS.Timeout | null = null;
 
   /**
    * Start the scheduler
    */
   public async start(): Promise<void> {
-    console.log('Starting rating scheduler...');
+    console.log('Starting rating schedulers...');
 
-    // Check if ratings database exists and initialize if needed
-    await this.initializeRatingsIfNeeded();
-
-    // Calculate time until next 1 AM
-    const nextRunTime = this.calculateNextRunTime();
-    console.log(`Next rating update scheduled for: ${nextRunTime.toLocaleString()}`);
+    // Schedule role-based ratings update at 1 AM
+    const nextRoleRunTime = this.calculateNextRunTime(1); // 1 AM
+    console.log(`Next role-based rating update scheduled for: ${nextRoleRunTime.toLocaleString()}`);
 
     // Set timeout to run at 1 AM
-    this.timer = setTimeout(() => {
-      this.runAndScheduleNext();
-    }, nextRunTime.getTime() - Date.now());
+    this.roleTimer = setTimeout(() => {
+      this.runRoleRatingsAndScheduleNext();
+    }, nextRoleRunTime.getTime() - Date.now());
+
+    // Schedule TrueSkill ratings snapshot at 2 AM
+    const nextTrueSkillRunTime = this.calculateNextRunTime(2); // 2 AM
+    console.log(`Next TrueSkill rating snapshot scheduled for: ${nextTrueSkillRunTime.toLocaleString()}`);
+
+    // Set timeout to run at 2 AM
+    this.trueSkillTimer = setTimeout(() => {
+      this.runTrueSkillSnapshotAndScheduleNext();
+    }, nextTrueSkillRunTime.getTime() - Date.now());
   }
 
   /**
-   * Stop the scheduler
+   * Stop the schedulers
    */
   public stop(): void {
-    if (this.timer) {
-      clearTimeout(this.timer);
-      this.timer = null;
-      console.log('Rating scheduler stopped');
+    if (this.roleTimer) {
+      clearTimeout(this.roleTimer);
+      this.roleTimer = null;
+      console.log('Role-based rating scheduler stopped');
+    }
+
+    if (this.trueSkillTimer) {
+      clearTimeout(this.trueSkillTimer);
+      this.trueSkillTimer = null;
+      console.log('TrueSkill rating scheduler stopped');
     }
   }
 
   /**
-   * Run the ratings update and schedule the next run
+   * Run the role-based ratings update and schedule the next run
    */
-  /**
-   * Check if ratings database exists and initialize if needed
-   */
-  private async initializeRatingsIfNeeded(): Promise<void> {
+  private async runRoleRatingsAndScheduleNext(): Promise<void> {
     try {
-      // Check if any ratings exist
-      const ratingsCount = await roleRatingModel.countDocuments();
-
-      if (ratingsCount === 0) {
-        console.log('No ratings found in database. Running initial ratings calculation...');
-        await updateRatings();
-        console.log('Initial ratings calculation completed.');
-      } else {
-        console.log(`Found ${ratingsCount} existing ratings in database.`);
-      }
-    } catch (error) {
-      console.error('Error checking ratings database:', error);
-    }
-  }
-
-  /**
-   * Run the ratings update and schedule the next run
-   */
-  private async runAndScheduleNext(): Promise<void> {
-    try {
-      console.log('Running scheduled ratings update...');
+      console.log('Running scheduled role-based ratings update...');
       await updateRatings();
-      console.log('Scheduled ratings update completed');
+      console.log('Scheduled role-based ratings update completed');
     } catch (error) {
-      console.error('Error during scheduled ratings update:', error);
+      console.error('Error during scheduled role-based ratings update:', error);
     }
 
     // Schedule next run
-    const nextRunTime = this.calculateNextRunTime();
-    console.log(`Next rating update scheduled for: ${nextRunTime.toLocaleString()}`);
+    const nextRunTime = this.calculateNextRunTime(1); // 1 AM
+    console.log(`Next role-based rating update scheduled for: ${nextRunTime.toLocaleString()}`);
 
-    this.timer = setTimeout(() => {
-      this.runAndScheduleNext();
+    this.roleTimer = setTimeout(() => {
+      this.runRoleRatingsAndScheduleNext();
     }, nextRunTime.getTime() - Date.now());
   }
 
   /**
-   * Calculate the next 1 AM time
+   * Run the TrueSkill ratings snapshot and schedule the next run
    */
-  private calculateNextRunTime(): Date {
+  private async runTrueSkillSnapshotAndScheduleNext(): Promise<void> {
+    try {
+      console.log('Running scheduled TrueSkill ratings snapshot...');
+      await createTrueSkillRatingSnapshot();
+      console.log('Scheduled TrueSkill ratings snapshot completed');
+    } catch (error) {
+      console.error('Error during scheduled TrueSkill ratings snapshot:', error);
+    }
+
+    // Schedule next run
+    const nextRunTime = this.calculateNextRunTime(2); // 2 AM
+    console.log(`Next TrueSkill rating snapshot scheduled for: ${nextRunTime.toLocaleString()}`);
+
+    this.trueSkillTimer = setTimeout(() => {
+      this.runTrueSkillSnapshotAndScheduleNext();
+    }, nextRunTime.getTime() - Date.now());
+  }
+
+  /**
+   * Calculate the next run time
+   * @param hour Hour (0-23)
+   * @param minute Minute (0-59), defaults to 0
+   */
+  private calculateNextRunTime(hour: number, minute: number = 0): Date {
     const now = new Date();
     const nextRun = new Date(
       now.getFullYear(),
       now.getMonth(),
       now.getDate(),
-      1, // 1 AM
-      0, // 0 minutes
+      hour,
+      minute,
       0, // 0 seconds
       0, // 0 milliseconds
     );
 
-    // If it's already past 1 AM, schedule for tomorrow
-    if (now.getHours() >= 1) {
+    // If it's already past the specified time, schedule for tomorrow
+    if (now.getHours() > hour || (now.getHours() === hour && now.getMinutes() >= minute)) {
       nextRun.setDate(nextRun.getDate() + 1);
     }
 

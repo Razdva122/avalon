@@ -20,7 +20,7 @@
           class="message-element"
           :class="isUserMessage(message.userID) ? 'message-from-author' : ''"
         >
-          <MessageAuthor class="message-author" :authorID="message.userID" @click="onUserClick(message.userID)" />
+          <UserPreview class="message-author" :userID="message.userID" @click="onUserClick(message.userID)" />
           <div class="message-text">
             {{ message.message }}
           </div>
@@ -55,12 +55,12 @@ import { defineComponent, PropType } from 'vue';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import Avatar from '@/components/user/Avatar.vue';
-import MessageAuthor from '@/components/feedback/chat/MessageAuthor.vue';
+import UserPreview from '@/components/user/UserPreview.vue';
 
 export default defineComponent({
   components: {
     Avatar,
-    MessageAuthor,
+    UserPreview,
   },
   props: {
     roomUuid: {

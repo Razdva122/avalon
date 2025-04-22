@@ -11,9 +11,11 @@
           <RoomVote v-if="roomState.vote" :roomUuid="roomState.roomID" :vote="roomState.vote" />
         </template>
         <template v-slot:restart>
-          <v-btn color="primary" v-if="displayRestartButton" @click="restartGame" class="restart-button">{{
-            $t('room.restartGame')
-          }}</v-btn>
+          <div class="d-flex flex-column align-center">
+            <v-btn color="primary" v-if="displayRestartButton" @click="restartGame" class="restart-button">{{
+              $t('room.restartGame')
+            }}</v-btn>
+          </div>
         </template>
       </Board>
       <div class="info-container">
@@ -27,7 +29,14 @@
           :data="game.addonsData.plotCards.cardsState"
         />
       </div>
-      <HostPanel v-if="displayHostPanel" :roomUuid="roomState.roomID" :roomStage="roomState.stage" />
+      <div class="right-info-container">
+        <RatingChangesPanel
+          v-if="roomState.stage === 'started' && game.stage === 'end'"
+          :gameID="roomState.roomID"
+          :gameState="game"
+        />
+        <HostPanel v-if="displayHostPanel" :roomUuid="roomState.roomID" :roomStage="roomState.stage" />
+      </div>
       <Chat class="chat" :messages="roomState.chat" :roomUuid="roomState.roomID" />
     </template>
   </div>
@@ -46,6 +55,7 @@ import CardsInfo from '@/components/view/information/CardsInfo.vue';
 import HostPanel from '@/components/view/panels/HostPanel.vue';
 import RoomVote from '@/components/view/panels/RoomVote.vue';
 import Chat from '@/components/feedback/Chat.vue';
+import RatingChangesPanel from '@/components/stats/RatingChangesPanel.vue';
 
 export default defineComponent({
   name: 'Room',
@@ -56,6 +66,7 @@ export default defineComponent({
     HostPanel,
     RoomVote,
     Chat,
+    RatingChangesPanel,
   },
   props: {
     uuid: {
@@ -129,7 +140,7 @@ export default defineComponent({
     });
 
     const displayHostPanel = computed(() => {
-      return roomState.value.leaderID === userID.value;
+      return roomState.value.leaderID === userID.value && game.value && game.value.stage !== 'end';
     });
 
     const displayRestartButton = computed(() => {
@@ -200,6 +211,22 @@ export default defineComponent({
   flex-direction: column;
   gap: 60px;
   transform: translateY(-50%);
+}
+
+.right-info-container {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 100px;
+  transform: translateY(-50%);
+}
+
+.right-info-container > * {
+  transform-origin: center right;
+  transform: rotate(270deg) translateX(50%);
+  margin-right: 10px;
 }
 
 .info-container > * {
