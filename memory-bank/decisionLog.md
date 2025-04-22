@@ -1,5 +1,33 @@
 # Decision Log
 
+[2025-04-22 19:40:26] - Implemented TrueSkill Rating System
+
+**Decision**: Implement a TrueSkill rating system alongside the existing ELO system to provide a more accurate measurement of player skill in team-based games.
+
+**Rationale**:
+
+1. The TrueSkill system is specifically designed for team-based games, making it more suitable for Avalon than traditional ELO.
+2. TrueSkill tracks both skill (mu) and uncertainty (sigma), allowing for better handling of new players and skill changes.
+3. The system can normalize teams of different sizes, ensuring fair rating calculations regardless of team composition.
+4. TrueSkill provides more nuanced rating adjustments based on individual performance relative to team average.
+
+**Implementation Details**:
+
+- Used the ts-trueskill library as the foundation
+- Customized parameters: mu (6000), sigma (1500), beta (1200), tau (35)
+- Added team normalization to handle different team sizes
+- Implemented skill adjustment factors to provide fair rating changes
+- Created database models for storing ratings, game results, and history
+- Added API endpoints for accessing TrueSkill data
+- Integrated TrueSkill display in user profiles and hover cards
+
+**Implications**:
+
+- Players will have two separate ratings (ELO and TrueSkill)
+- TrueSkill provides a more accurate representation of player skill in team games
+- The system will adapt more quickly to skill changes, especially for new players
+- Rating changes will be more fair, with adjustments based on relative team performance
+
 [2025-04-13 15:17:27] - **Plot Cards Refactoring Decision**
 
 **Decision:** Refactor the plot cards system to use an array of active cards (`activeCards`) instead of a single active card (`activeCard`), and add support for passing card IDs from the frontend to the backend.
@@ -81,3 +109,95 @@ This file records architectural and implementation decisions using a list format
 - Simplify the UserHoverCard component by removing positioning styles
 - Ensure consistent styling with other tooltips in the application
 - Remove manual timer handling since v-tooltip has built-in delay functionality
+  [2025-04-16 22:18:16] - **ELO Rating System Enhancement**
+
+**Decision:** Enhance the ELO rating system to better account for team strength differences when calculating rating changes.
+
+**Rationale:**
+
+- The previous implementation had minimal team influence on rating changes (±1 point deviation)
+- Strong players weren't sufficiently rewarded for winning with weaker teammates
+- Team composition should have a meaningful impact on rating adjustments
+
+**Implementation Approach:**
+
+1. Calculate the difference between average ratings of opposing team and player's team
+2. Apply a team strength factor (15% influence) to adjust the base rating change
+3. Scale the adjustment proportionally to the team rating difference
+4. Document the changes thoroughly with diagrams and implementation guides
+
+**Technical Details:**
+
+- Team Strength Factor = 1 + (Team Rating Difference / 2000) \* 0.15
+- Adjusted Rating Change = Base Rating Change \* Team Strength Factor
+- Created comprehensive documentation in:
+  - elo-rating-system-updates.md
+  - elo-rating-system-diagram.md
+  - elo-implementation-guide.md
+  - rating-systems-comparison.md
+
+**Implications:**
+
+- Players on weaker teams will gain more points for winning and lose fewer for losing
+- Players on stronger teams will gain fewer points for winning and lose more for losing
+- The system now better reflects individual performance within team dynamics
+- The 15% influence factor can be adjusted if needed based on player feedback
+
+[2025-04-17 00:03:47] - **ELO Expected Score Calculation Adjustment**
+
+**Decision:** Modify the ELO expected score calculation to provide more realistic win probabilities for games with large rating differences.
+
+**Rationale:**
+
+- The standard ELO formula gives unrealistically high win probabilities for large rating differences
+- A player with a 1000 rating advantage had ~95% expected win probability
+- This led to minimal rating gains for wins and excessive penalties for losses
+- User feedback indicated that a ~70% win probability would be more realistic for a 1000 rating difference
+
+**Implementation Approach:**
+
+1. Change the divisor in the ELO formula from 400 to 800
+2. This flattens the probability curve, giving more balanced expected outcomes
+3. Update all documentation to reflect this change
+
+**Technical Details:**
+
+- Modified the `calculateExpectedScore` method in `eloCalculator.ts`
+- Changed formula from: 1 / (1 + 10^((opponentRating - playerRating) / 400))
+- To: 1 / (1 + 10^((opponentRating - playerRating) / 800))
+- Updated all documentation to reflect the new formula and its effects
+
+**Implications:**
+
+- A player with a 1000 rating advantage now has ~70% expected win probability instead of ~95%
+- Players will gain more points for winning and lose fewer points for losing when there's a large rating difference
+- This creates more balanced rating changes and better reflects actual game outcomes
+- The divisor (800) can be further adjusted if needed based on player feedback
+
+[2025-04-21 12:42:58] - **TrueSkill API Method Refactoring**
+
+**Decision:** Replace `getPlayerTrueSkillChanges` with `getMatchTrueSkillChanges` in TrueSkill rating endpoints.
+
+**Rationale:**
+
+- The previous implementation required fetching all player games and then filtering by game ID
+- This was inefficient when displaying game-specific rating changes in the UserStats view
+- A direct method to get changes by match UUID is more efficient and logical
+
+**Implementation Approach:**
+
+1. Add new `getMatchTrueSkillChanges` method to the TrueSkill socket events interface
+2. Implement the backend endpoint to retrieve TrueSkill changes by game ID
+3. Update UserStats.vue to use the new method for each game in the last games list
+
+**Technical Details:**
+
+- Added new method to `TrueSkillSocketEvents` interface in trueskill-sockets.ts
+- Implemented backend handler in trueSkillRatingEndpoints.ts
+- Modified UserStats.vue to make one API call per game instead of one call for all player games
+
+**Implications:**
+
+- Improved performance by reducing unnecessary data transfer
+- More logical API design that follows the principle of specific endpoints for specific data
+- Better code organization and maintainability

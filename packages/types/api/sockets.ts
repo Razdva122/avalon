@@ -7,6 +7,7 @@ import type { Socket as SuperSocket } from 'socket.io-client';
 import type { TVoteOption } from '../game/vote';
 import type { TMissionResult } from '../game/mission';
 import type { TLoyalty, TRoles } from '../game/roles';
+import type { TrueSkillSocketEvents } from './trueskill-sockets';
 
 import type {
   IRoomUnavailableError,
@@ -67,7 +68,7 @@ export interface ClientToServerUserEvents {
   revealEasterEgg: () => void;
 }
 
-export interface ClientToServerEvents extends ClientToServerUserEvents {
+export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkillSocketEvents {
   getTotalStats: (callback: (stats: TTotalWinrateStats) => void) => void;
   getPlayerGames: (uuid: string, callback: (games: VisualGameState[]) => void) => void;
   getRoomsList: (callback: (list: TRoomsList) => void) => void;

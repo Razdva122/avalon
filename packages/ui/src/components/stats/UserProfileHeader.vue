@@ -6,23 +6,26 @@
         {{ userState.profile.name }}
       </div>
       <div class="info-hint">id: {{ uuid }}</div>
-      <div v-if="gameStats" class="profile-games">
-        <div class="profile-games-counter">
-          <span class="games-wins">
-            {{ gameStats.teams.total.wins }}
-          </span>
-          -
-          <span class="games-loses">
-            {{ gameStats.teams.total.lose }}
-          </span>
+      <div class="profile-stats-container">
+        <div class="profile-stats-item">
+          <UserTrueSkillRating :userID="uuid" />
         </div>
-        <div class="info-hint">games</div>
-      </div>
-      <div v-if="gameStats">
-        <div class="profile-winrate">
-          {{ `${gameStats.teams.total.winrate} %` }}
+        <div v-if="gameStats" class="profile-stats-item">
+          <WinrateDisplay :winrate="gameStats.teams.total.winrate.toString()" />
+          <div class="info-hint">winrate</div>
         </div>
-        <div class="info-hint">winrate</div>
+        <div v-if="gameStats" class="profile-stats-item">
+          <v-chip color="inset" variant="flat" size="default" class="font-weight-medium">
+            <span class="games-wins">
+              {{ gameStats.teams.total.wins }}
+            </span>
+            -
+            <span class="games-loses">
+              {{ gameStats.teams.total.lose }}
+            </span>
+          </v-chip>
+          <div class="info-hint">games</div>
+        </div>
       </div>
     </div>
   </div>
@@ -34,6 +37,8 @@
 <script lang="ts">
 import { defineComponent, PropType, watch, computed } from 'vue';
 import Avatar from '@/components/user/Avatar.vue';
+import UserTrueSkillRating from '@/components/stats/UserTrueSkillRating.vue';
+import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
 import { useStore } from '@/store';
 import { TUserStats } from '@/helpers/stats/interface';
 
@@ -41,6 +46,8 @@ export default defineComponent({
   name: 'UserProfileHeader',
   components: {
     Avatar,
+    UserTrueSkillRating,
+    WinrateDisplay,
   },
   props: {
     uuid: {
@@ -82,6 +89,13 @@ export default defineComponent({
   height: 150px;
 }
 
+.profile-stats-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+}
+
 .preview-profile {
   display: flex;
 }
@@ -106,14 +120,6 @@ export default defineComponent({
 
 .games-loses {
   color: rgb(var(--v-theme-error));
-}
-
-.profile-games-counter {
-  background-color: rgb(var(--v-theme-inset));
-  font-weight: 500;
-  width: fit-content;
-  padding: 0px 8px;
-  border-radius: 8px;
 }
 
 .preview-profile-loading {

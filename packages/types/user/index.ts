@@ -78,4 +78,7 @@ export class UserFeatures {
 
   @prop()
   public top1info?: string;
+
+  @prop({ type: Date })
+  public lastEloResetAt?: Date;
 }

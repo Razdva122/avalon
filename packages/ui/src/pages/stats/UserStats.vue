@@ -26,6 +26,11 @@
         <v-chip v-if="value" color="green"> {{ $t('userStats.winResult') }}</v-chip>
         <v-chip v-else color="red"> {{ $t('userStats.loseResult') }}</v-chip>
       </template>
+      <template v-slot:item.ratingChange="{ value }">
+        <v-chip v-if="value.change > 0" color="success" variant="flat" size="small">{{ value.string }}</v-chip>
+        <v-chip v-else-if="value.change < 0" color="error" variant="flat" size="small">{{ value.string }}</v-chip>
+        <span v-else>—</span>
+      </template>
       <template v-slot:item.gameID="{ value }">
         <div class="gameID" @click="$router.push({ name: 'room', params: { uuid: value } })">
           {{ value }}
@@ -136,7 +141,41 @@ export default defineComponent({
     const initState = async (uuid: string) => {
       const games = await socket.emitWithAck('getPlayerGames', uuid);
       state.value = prepareUserStats(games, uuid);
-      lastGames.value = prepareGamesForView(games, uuid, 5);
+
+      // Prepare last games view
+      const lastGamesData = prepareGamesForView(games, uuid, 5);
+
+      // Fetch TrueSkill changes for each game
+      const lastGamesWithRating = await Promise.all(
+        lastGamesData.map(async (game) => {
+          try {
+            // Get all TrueSkill changes for this specific game
+            const result = await socket.emitWithAck('getMatchTrueSkillChanges', game.gameID);
+
+            if (!result.success || result.error) {
+              return { ...game, ratingChange: null };
+            }
+
+            // Find the TrueSkill change for the current user
+            const userRatingChange = result.gameResult?.playerChanges.find((change) => change.userID === uuid);
+
+            return {
+              ...game,
+              ratingChange: userRatingChange
+                ? {
+                    string: `${Math.round(userRatingChange.newMu)} (${userRatingChange.muChange > 0 ? '+' : ''}${Math.round(userRatingChange.muChange)})`,
+                    change: userRatingChange.muChange,
+                  }
+                : null,
+            };
+          } catch (error) {
+            console.error('Error fetching TrueSkill change for game:', game.gameID, error);
+            return { ...game, ratingChange: null };
+          }
+        }),
+      );
+
+      lastGames.value = lastGamesWithRating;
 
       // Use the new combined function with different relation parameters
       teammates.value = preparePlayerStats(games, uuid, 'teammate');
@@ -184,6 +223,7 @@ export default defineComponent({
       return [
         { title: t('userStats.role'), key: 'role' },
         { title: t('userStats.result'), key: 'isWin' },
+        { title: t('userStats.rating'), key: 'ratingChange' },
         { title: t('userStats.game'), key: 'gameID' },
       ];
     });

@@ -1,5 +1,7 @@
 import { TAddonsName, TOptionalRoles } from '@avalon/types';
 export * from './models';
+export * from './trueskill';
+export * from './trueskill-constants';
 
 export type TTotalWinrateStats = {
   total: TWinrateStats;

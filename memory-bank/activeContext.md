@@ -63,21 +63,66 @@ This file tracks the project's current status, including recent changes, current
 
 ## Current Focus
 
-- Adapting the UserHoverCard component for mobile devices where hover interactions are not available
-- Implementing a long press gesture using @vueuse/core to trigger the UserHoverCard on mobile
-- Ensuring the existing click functionality for player selection remains intact
-- Providing visual feedback for long press interactions on mobile devices
+- Enhancing the ELO rating system to better account for team dynamics
+- Adjusting expected win probabilities to be more realistic for games with large rating differences
+- Implementing team strength adjustment factor to make rating changes more fair
+- Creating comprehensive documentation for the ELO system changes
+- Monitoring the effects of the changes on player ratings
 
 ## Recent Changes
 
-- Created detailed implementation plan for mobile adaptation of UserHoverCard
-- Evaluated multiple approaches: custom directive, @vueuse/core, and Vuetify components
-- Selected @vueuse/core solution for its balance of simplicity and functionality
-- Documented mobile adaptation patterns in systemPatterns.md for future reference
+- Modified the expected score calculation in `eloCalculator.ts` to use a divisor of 800 instead of 400
+- Enhanced the ELO rating calculation to include team strength factor
+- Added team rating difference calculation to adjust rating changes based on team composition
+- Created detailed documentation including diagrams and implementation guides
+- Updated Memory Bank with the new ELO system design decisions
+- Refactored TrueSkill API to use `getMatchTrueSkillChanges` instead of `getPlayerTrueSkillChanges`
 
 ## Open Questions/Issues
 
-- Test the long press implementation on various mobile devices to ensure consistent behavior
-- Consider if the 600ms delay for long press is appropriate for the user experience
-- Evaluate if additional visual feedback is needed during the long press interaction
-- Determine if any performance optimizations are needed for the modal dialog on lower-end devices
+- Monitor how the 15% influence factor affects rating changes in real games
+- Gather player feedback on whether the adjusted system feels more fair
+- Consider if additional role-specific adjustments would be beneficial
+- Evaluate if the scaling divisor (2000) is appropriate for the 0-10000 rating scale
+- Determine if any additional UI changes are needed to better explain rating changes to players
+- Evaluate performance improvements from the TrueSkill API refactoring
+- Implement TrueSkill rating system as an alternative to the ELO system
+
+[2025-04-22 19:39:43] - Implemented TrueSkill rating system to provide a more accurate skill measurement for players. The implementation includes:
+
+1. Core TrueSkill calculation system in `trueSkillCalculator.ts` with:
+
+   - Team normalization to handle different team sizes fairly
+   - Skill adjustment factors that give higher/lower rating changes based on player performance relative to team
+   - Conservative rating calculation (mu - 3\*sigma) for public display
+
+2. Database models and migrations:
+
+   - `PlayerTrueSkillRating` - Stores player TrueSkill ratings (mu, sigma, conservative rating)
+   - `GameTrueSkillResult` - Stores rating changes for each game
+   - `TrueSkillRatingHistory` - Stores historical snapshots for tracking progress
+
+3. API endpoints in `trueSkillRatingEndpoints.ts`:
+
+   - `getTrueSkillRating` - Get rating for a specific player
+   - `getTrueSkillLeaderboard` - Get top players by TrueSkill rating
+   - `getMatchTrueSkillChanges` - Get rating changes for a specific game
+
+4. Frontend components:
+
+   - `UserTrueSkillRating.vue` - Display player TrueSkill rating
+   - Integration with user profile and hover cards
+   - Internationalization support for TrueSkill-related UI elements
+
+5. Constants and configuration:
+   - Default mu (6000) and sigma (1500) values
+   - Beta value (1200) for skill difference calculation
+   - TAU value (35) for dynamic adaptation
+   - Conservative rating factor (3) for public display
+
+The TrueSkill system provides several advantages over the previous ELO system:
+
+- Better handling of team games with different team sizes
+- Uncertainty tracking through sigma parameter
+- More accurate skill representation for new players
+- Faster adaptation to skill changes

@@ -53,13 +53,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.host-panel {
-  position: fixed;
-  right: -28px;
-  top: 47%;
-  transform: rotate(270deg);
-}
-
 .host-actions {
   background-color: rgb(var(--v-theme-surface));
   width: 300px;

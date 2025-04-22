@@ -21,6 +21,7 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     playerName: 'Jogador',
     teammatesStatsTitle: 'Companheiros de equipe',
     enemiesStatsTitle: 'Inimigos',
+    rating: 'Classificação',
   },
   en: {
     userStatsTitle: 'User statistics:',
@@ -41,6 +42,7 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     playerName: 'Player',
     teammatesStatsTitle: 'Teammates',
     enemiesStatsTitle: 'Enemies',
+    rating: 'Rating',
   },
   ru: {
     userStatsTitle: 'Статистика пользователя:',
@@ -61,6 +63,7 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     playerName: 'Игрок',
     teammatesStatsTitle: 'Тиммейты',
     enemiesStatsTitle: 'Противники',
+    rating: 'Рейтинг',
   },
   es: {
     userStatsTitle: 'Estadísticas del usuario:',
@@ -81,6 +84,7 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     playerName: 'Jugador',
     teammatesStatsTitle: 'Compañeros de equipo',
     enemiesStatsTitle: 'Enemigos',
+    rating: 'Clasificación',
   },
   'zh-TW': {
     userStatsTitle: '用戶統計：',
@@ -101,6 +105,7 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     playerName: '玩家',
     teammatesStatsTitle: '队友',
     enemiesStatsTitle: '对手',
+    rating: '評分',
   },
   'zh-CN': {
     userStatsTitle: '用户统计：',
@@ -120,5 +125,6 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     playerName: '玩家',
     teammatesStatsTitle: '队友',
     enemiesStatsTitle: '对手',
+    rating: '评分',
   },
 };
