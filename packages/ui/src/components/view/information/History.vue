@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import kebabCase from 'lodash/kebabCase';
-import { defineComponent, PropType, ref, computed, toRefs, watch, ComputedRef } from 'vue';
+import { defineComponent, PropType, ref, computed, toRefs, watch, onMounted } from 'vue';
 import { THistoryResults, Player } from '@avalon/types';
 import { useUserProfile } from '@/helpers/composables/useUserProfile';
 import { useStore } from '@/store';
@@ -80,25 +80,19 @@ export default defineComponent({
     const overlay = ref(false);
     const userNamesMap = ref<Record<string, string>>({});
 
-    watch(
-      () => players.value,
-      (newPlayers) => {
-        if (newPlayers && newPlayers.length) {
-          newPlayers.forEach((player) => {
-            const { userName } = useUserProfile(player.id);
+    onMounted(() => {
+      players.value.forEach((player) => {
+        const { userName } = useUserProfile(player.id);
 
-            watch(
-              userName,
-              (newName) => {
-                userNamesMap.value[player.id] = newName;
-              },
-              { immediate: true },
-            );
-          });
-        }
-      },
-      { immediate: true },
-    );
+        watch(
+          userName,
+          (newName) => {
+            userNamesMap.value[player.id] = newName;
+          },
+          { immediate: true },
+        );
+      });
+    });
 
     // Create a computed property that maps player IDs to their names
     const playerNames = computed(() => {
