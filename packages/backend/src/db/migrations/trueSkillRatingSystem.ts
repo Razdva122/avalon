@@ -11,6 +11,7 @@ import { VisualGameState } from '@avalon/types';
 export const trueSkillRatingSystem: Migration = {
   name: 'trueSkillRatingSystem',
   async up() {
+    await this.down?.();
     console.log('Starting TrueSkill rating system migration...');
 
     // Check if collections have documents - if they do, assume migration has already run
