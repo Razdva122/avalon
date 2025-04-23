@@ -1,7 +1,7 @@
 # Progress
 
 This file tracks the project's progress using a task list format.
-2025-04-23 14:53:30 - Log of updates made.
+2025-04-23 16:07:00 - Log of updates made.
 
 -
 
@@ -12,18 +12,20 @@ This file tracks the project's progress using a task list format.
 - Integrated TrueSkill display in user profiles and hover cards
 - Added detailed logging for TrueSkill calculations
 - Created implementation plan for new TrueSkill team balancing approach
-- Documented the new approach in the Memory Bank
+- Implemented the new team balancing approach in trueSkillCalculator.ts
+- Removed unnecessary normalization methods
+- Reintroduced a simplified adjustment factor to make rating changes more proportional to player ratings
+- Updated Memory Bank documentation with the latest changes
 
 ## Current Tasks
 
-- Implement the new team balancing approach in trueSkillCalculator.ts
-- Remove unnecessary normalization and adjustment methods
-- Test the implementation with various game scenarios
-- Monitor the results to ensure they align with expectations
+- Monitor the effects of the new adjustment factor on rating changes
+- Gather user feedback on the new rating system
+- Consider fine-tuning the adjustment factor based on real-world data
 
 ## Next Steps
 
 - Consider adding visualization of rating changes in the UI
-- Gather user feedback on the new rating system
 - Potentially adjust TrueSkill parameters based on real-world data
 - Explore additional statistics that could be derived from TrueSkill data
+- Consider implementing a rating history graph to show player progress over time

@@ -1,5 +1,33 @@
 # Decision Log
 
+[2025-04-23 16:03:00] - **TrueSkill Rating Adjustment Factor Reintroduction**
+
+**Decision**: Reintroduce a simplified adjustment factor to make TrueSkill rating changes more proportional to player ratings.
+
+**Rationale**:
+
+1. Initial testing of the new team balancing approach showed that players with very different ratings were receiving similar rating changes
+2. This behavior was counterintuitive to users who expected higher-rated players to lose more points when losing
+3. A simplified adjustment factor (30% influence) was added to make rating changes more proportional to player ratings
+4. The adjustment factor considers a player's rating relative to their team's average
+
+**Implementation Details**:
+
+- Added calculation of team average mu in the `processTeamChanges` method
+- Introduced a relative skill factor that compares player's rating to team average
+- Applied different adjustment rules for winners and losers:
+  - Winners: Higher skilled players get smaller gains, lower skilled players get larger gains
+  - Losers: Higher skilled players get larger penalties, lower skilled players get smaller penalties
+- Limited the adjustment factor to a reasonable range (0.7 to 1.3)
+- Applied the adjustment factor to mu changes while keeping sigma changes as calculated by TrueSkill
+
+**Implications**:
+
+- Rating changes will now be more intuitive and proportional to player ratings
+- Higher-rated players will lose more points when losing and gain fewer points when winning
+- Lower-rated players will lose fewer points when losing and gain more points when winning
+- The system maintains the core TrueSkill algorithm while adding a layer of intuitive adjustment
+
 [2025-04-23 14:48:00] - **TrueSkill Team Balancing Redesign**
 
 **Decision**: Implement a new team balancing approach for TrueSkill rating calculations by adding fake players to the evil team with average ratings of real evil players.

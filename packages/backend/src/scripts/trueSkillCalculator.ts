@@ -183,25 +183,67 @@ export class TrueSkillCalculator {
     teamType: 'good' | 'evil',
     isWinningTeam: boolean,
   ): void {
+    // Calculate team average mu
+    const teamAverageMu =
+      teamRatingsWithPlayers.reduce((sum, item) => sum + item.rating.mu, 0) / teamRatingsWithPlayers.length;
+
     teamRatingsWithPlayers.forEach((item, index) => {
       const oldRating = item.rating;
       const player = item.player;
       const newRating = newRatings[index];
 
+      // Calculate base mu change
+      const baseMuChange = newRating.mu - oldRating.mu;
+
+      // Calculate relative skill (how much better/worse the player is compared to team average)
+      const relativeSkill = (oldRating.mu - teamAverageMu) / teamAverageMu;
+
+      // Calculate adjustment factor based on relative skill and whether team won or lost
+      let adjustmentFactor = 1.0;
+
+      if (isWinningTeam) {
+        // WINNER: Higher skilled players get smaller gains, lower skilled players get larger gains
+        if (relativeSkill > 0) {
+          // Player is better than team average - reduce factor (smaller gains)
+          adjustmentFactor = 1.0 - relativeSkill * 0.4; // 30% influence
+        } else {
+          // Player is worse than team average - increase factor (larger gains)
+          adjustmentFactor = 1.0 + Math.abs(relativeSkill) * 0.4; // 30% influence
+        }
+      } else {
+        // LOSER: Higher skilled players get larger penalties, lower skilled players get smaller penalties
+        if (relativeSkill > 0) {
+          // Player is better than team average - increase factor (larger penalties)
+          adjustmentFactor = 1.0 + relativeSkill * 0.4; // 30% influence
+        } else {
+          // Player is worse than team average - reduce factor (smaller penalties)
+          adjustmentFactor = 1.0 - Math.abs(relativeSkill) * 0.4; // 30% influence
+        }
+      }
+
+      // Ensure factor stays within reasonable bounds
+      adjustmentFactor = Math.max(0.6, Math.min(1.4, adjustmentFactor));
+
+      // Apply adjustment to mu change
+      const adjustedMuChange = baseMuChange * adjustmentFactor;
+
+      // Calculate adjusted new mu
+      const adjustedNewMu = oldRating.mu + adjustedMuChange;
+
       // Calculate conservative ratings
       const oldConservativeRating = this.calculateConservativeRating(oldRating.mu, oldRating.sigma);
-      const newConservativeRating = this.calculateConservativeRating(newRating.mu, newRating.sigma);
+      const adjustedNewConservativeRating = this.calculateConservativeRating(adjustedNewMu, newRating.sigma);
 
       changes.push({
         userID: player.id,
         oldMu: oldRating.mu,
         oldSigma: oldRating.sigma,
-        newMu: newRating.mu,
+        newMu: adjustedNewMu,
         newSigma: newRating.sigma,
         oldRating: oldConservativeRating,
-        newRating: newConservativeRating,
-        change: newConservativeRating - oldConservativeRating,
-        muChange: newRating.mu - oldRating.mu,
+        newRating: adjustedNewConservativeRating,
+        change: adjustedNewConservativeRating - oldConservativeRating,
+        muChange: adjustedMuChange,
         role: teamType === 'good' ? (player.role as TGoodRoles) : (player.role as TEvilRoles),
         team: teamType,
         won: isWinningTeam,

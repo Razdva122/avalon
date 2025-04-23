@@ -1,24 +1,27 @@
 # Active Context
 
 This file tracks the project's current status, including recent changes, current goals, and open questions.
-2025-04-23 14:53:00 - Log of updates made.
+2025-04-23 16:06:00 - Log of updates made.
 
 -
 
 ## Current Focus
 
-- Implementing a new team balancing approach for TrueSkill rating calculations
-- Simplifying the TrueSkill algorithm implementation by removing complex normalization
-- Addressing the inherent team size imbalance in Avalon (evil team is always smaller than good team)
+- Improving the TrueSkill rating system to make rating changes more intuitive and proportional to player ratings
+- Balancing teams in TrueSkill calculations by adding fake players to the evil team
+- Ensuring fair rating adjustments based on player skill relative to team average
 
 ## Recent Changes
 
-- Created detailed implementation plan for TrueSkill team balancing in [trueskill-team-balancing-implementation.md](./trueskill-team-balancing-implementation.md)
-- Updated decision log with the rationale and implementation details for the new approach
-- Designed a solution that adds fake players to the evil team with average ratings of real evil players
+- Implemented a new team balancing approach for TrueSkill by adding fake players to the evil team
+- Reintroduced a simplified adjustment factor (30% influence) to make rating changes more proportional to player ratings
+- Made higher-rated players lose more points when losing and gain fewer points when winning
+- Made lower-rated players lose fewer points when losing and gain more points when winning
+- Removed detailed logging that was used for debugging
 
 ## Open Questions/Issues
 
-- How will the new balancing approach affect rating changes compared to the current normalization?
-- Should we maintain any aspects of the current adjustment system in the future if needed?
-- Will this approach provide more intuitive and fair rating changes for players?
+- How will the new adjustment factor affect rating changes in practice?
+- Is the 30% influence factor appropriate, or should it be adjusted based on player feedback?
+- Should we consider additional factors beyond relative skill when adjusting rating changes?
+- How will these changes affect player perception of the fairness of the rating system?
