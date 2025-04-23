@@ -29,6 +29,7 @@ export default {
     unknown: 'Неизвестная роль',
     mysteryWizard: 'Таинственный волшебник',
     unknownLancelot: 'Неизвестный Ланселот',
+    wraith: 'Призрак',
   },
   rolesInfo: {
     roles: 'Роли',
@@ -59,5 +60,6 @@ export default {
     unknownInfo: 'Неизвестная роль',
     mysteryWizardInfo: 'Один из двух волшебников - сил света (Мерлин) или сил тьмы (Моргана).',
     unknownLancelotInfo: 'Ланселот, чья верность не известна',
+    wraithInfo: 'Неизвестен силам тьмы и Мерлину',
   },
 };

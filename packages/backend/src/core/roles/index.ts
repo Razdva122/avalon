@@ -14,6 +14,7 @@ import { Lunatic } from '@/core/roles/evil/lunatic';
 import { Brute } from '@/core/roles/evil/brute';
 import { Witch } from '@/core/roles/evil/witch';
 import { Revealer } from '@/core/roles/evil/revealer';
+import { Wraith } from '@/core/roles/evil/wraith';
 
 export const evilRoles = {
   minion: Minion,
@@ -26,6 +27,7 @@ export const evilRoles = {
   brute: Brute,
   witch: Witch,
   revealer: Revealer,
+  wraith: Wraith,
 } as const;
 
 /**

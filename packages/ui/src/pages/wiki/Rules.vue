@@ -408,6 +408,7 @@ export default defineComponent({
       morgana: 1,
       trickster: 0,
       oberon: 0,
+      wraith: 0,
       percival: 1,
       tristan: 0,
       isolde: 0,

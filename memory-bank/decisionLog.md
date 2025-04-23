@@ -1,5 +1,40 @@
 # Decision Log
 
+[2025-04-23 18:36:45] - **Updated Wraith Role Text in All Languages**
+
+Updated the Wraith role text in all language files to use the consistent description "Unknown to Evil and Merlin" with appropriate translations:
+
+- English: "Unknown to Evil and Merlin"
+- Russian: "неизвестен силам тьмы и Мерлину"
+- Spanish: "Desconocido para los Malvados y Merlín"
+- Portuguese: "Desconhecido para o Mal e Merlin"
+- Chinese (Simplified): "坏人方和梅林都不知道你的存在"
+- Chinese (Traditional): "壞人方和梅林都不知道你的存在"
+
+This ensures consistent role description across all supported languages.
+
+[2025-04-23 18:20:56] - **Added Wraith Role Text and Information**
+
+**Decision**: Added text for the Wraith role and updated rolesInfo to include wraithInfo with the text "неизвестен силам тьмы и Мерлину" (unknown to the forces of darkness and Merlin).
+
+**Rationale**:
+
+1. The Wraith role was already implemented in the backend but lacked proper text in the UI
+2. The role needed a description that explains its unique position in the game
+3. The text needed to be added to the Russian language file to maintain consistency
+
+**Implementation Details**:
+
+- Added "wraith" role name to the Russian language file as "Призрак"
+- Added "wraithInfo" with the text "неизвестен силам тьмы и Мерлину"
+- The Wraith is a servant of Mordred who is hidden from both the forces of darkness and Merlin
+
+**Implications**:
+
+- The Wraith adds a new layer of complexity to the game
+- Neither Merlin nor the evil players can identify the Wraith
+- This creates interesting gameplay dynamics where even evil players don't know all their teammates
+
 [2025-04-23 16:03:00] - **TrueSkill Rating Adjustment Factor Reintroduction**
 
 **Decision**: Reintroduce a simplified adjustment factor to make TrueSkill rating changes more proportional to player ratings.

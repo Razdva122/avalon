@@ -11,6 +11,7 @@ const optionalRoles: { [key in TOptionalRoles]: true } = {
   cleric: true,
   morgana: true,
   oberon: true,
+  wraith: true,
   mordred: true,
   evilLancelot: true,
   percival: true,

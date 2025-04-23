@@ -45,6 +45,7 @@ const routeComponentMap = {
 export const routes: Array<RouteRecordRaw> = [
   { path: '/wiki/roles/isolde/', name: 'isolde', redirect: { name: 'lovers' } },
   { path: '/wiki/roles/tristan/', name: 'tristan', redirect: { name: 'lovers' } },
+  { path: '/wiki/roles/wraith/', name: 'wraith', redirect: { name: 'oberon' } },
   { path: '/wiki/roles/evil_lancelot/', name: 'evil_lancelot', redirect: { name: 'lancelots' } },
   { path: '/wiki/roles/good_lancelot/', name: 'good_lancelot', redirect: { name: 'lancelots' } },
   { path: '/:catchAll(.*)', redirect: '404' },

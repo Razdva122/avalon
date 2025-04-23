@@ -76,7 +76,7 @@ export default defineComponent({
   components: {
     TemporaryAlert,
     OptionsPreview,
-    RotatingTopPlayer, // Add the new component
+    RotatingTopPlayer,
   },
   async setup() {
     const { t } = useI18n();

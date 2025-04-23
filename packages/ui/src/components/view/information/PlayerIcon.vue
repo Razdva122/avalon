@@ -105,8 +105,14 @@ export default defineComponent({
 
 .icon-oberon {
   background-image: getImagePathByID('roles', 'oberon');
-  background-position: 51% 40%;
-  background-size: 135%;
+  background-position: 50% 40%;
+  background-size: 145%;
+}
+
+.icon-wraith {
+  background-image: getImagePathByID('roles', 'wraith');
+  background-position: 50% 30%;
+  background-size: 155%;
 }
 
 .icon-lunatic {

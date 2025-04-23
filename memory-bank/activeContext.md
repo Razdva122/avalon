@@ -13,6 +13,10 @@ This file tracks the project's current status, including recent changes, current
 
 ## Recent Changes
 
+- Updated the Wraith role text in all language files to use the consistent description "Unknown to Evil and Merlin" with appropriate translations
+
+- Added text for the Wraith role and updated rolesInfo to include wraithInfo with the text "неизвестен силам тьмы и Мерлину"
+
 - Implemented a new team balancing approach for TrueSkill by adding fake players to the evil team
 - Reintroduced a simplified adjustment factor (30% influence) to make rating changes more proportional to player ratings
 - Made higher-rated players lose more points when losing and gain fewer points when winning

@@ -29,6 +29,7 @@ export default {
     unknown: 'Unknown Role',
     mysteryWizard: 'Mystery Wizard',
     unknownLancelot: 'Unknown Lancelot',
+    wraith: 'Wraith',
   },
   rolesInfo: {
     roles: 'Roles',
@@ -59,5 +60,6 @@ export default {
     unknownInfo: 'Unknown role',
     mysteryWizardInfo: 'One of the two wizards is good (Merlin) or evil (Morgana)',
     unknownLancelotInfo: 'Lancelot, whose loyalty is not known',
+    wraithInfo: 'Unknown to Evil and Merlin',
   },
 };

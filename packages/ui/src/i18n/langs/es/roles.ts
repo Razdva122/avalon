@@ -29,6 +29,7 @@ export default {
     unknown: 'Rol desconocido',
     mysteryWizard: 'Mago misterioso',
     unknownLancelot: 'Lancelot desconocido',
+    wraith: 'Espectro',
   },
   rolesInfo: {
     roles: 'Roles',
@@ -60,5 +61,6 @@ export default {
     unknownInfo: 'Rol desconocido',
     mysteryWizardInfo: 'Uno de los dos magos es bueno (Merlín) o malo (Morgana)',
     unknownLancelotInfo: 'Lancelot, cuya lealtad es desconocida',
+    wraithInfo: 'Desconocido para los Malvados y Merlín',
   },
 };

@@ -112,8 +112,7 @@ export default defineComponent({
           disabled: !this.roles.merlin && !this.roles.merlinPure,
           color: 'success',
         },
-        { role: 'tristan', label: this.$t('roles.tristan'), disabled: false, color: 'success', route: 'lovers' },
-        { role: 'isolde', label: this.$t('roles.isolde'), disabled: false, color: 'success', route: 'lovers' },
+        { role: 'cleric', label: this.$t('roles.cleric'), disabled: false, color: 'success', route: 'cleric' },
         {
           role: 'morgana',
           label: this.$t('roles.morgana'),
@@ -132,6 +131,8 @@ export default defineComponent({
     extraRolesSettings() {
       return [
         { role: 'troublemaker', label: this.$t('roles.troublemaker'), disabled: false, color: 'success' },
+        { role: 'tristan', label: this.$t('roles.tristan'), disabled: false, color: 'success', route: 'lovers' },
+        { role: 'isolde', label: this.$t('roles.isolde'), disabled: false, color: 'success', route: 'lovers' },
         {
           role: 'guinevere',
           label: this.$t('roles.guinevere'),
@@ -160,9 +161,9 @@ export default defineComponent({
     },
     experimentalRolesSettings() {
       return [
-        { role: 'cleric', label: this.$t('roles.cleric'), disabled: false, color: 'success', route: 'cleric' },
         { role: 'revealer', label: this.$t('roles.revealer'), disabled: false, color: 'warning', route: 'revealer' },
         { role: 'witch', label: this.$t('roles.witch'), disabled: false, color: 'warning', route: 'witch' },
+        { role: 'wraith', label: this.$t('roles.wraith'), disabled: false, color: 'warning', route: 'oberon' },
       ] as const;
     },
     addonsSettings() {

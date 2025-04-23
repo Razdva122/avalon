@@ -29,6 +29,7 @@ export default {
     unknown: '未知角色',
     mysteryWizard: '神秘法师',
     unknownLancelot: '未知兰斯洛特',
+    wraith: '幽灵',
   },
   rolesInfo: {
     roles: '角色',
@@ -59,5 +60,6 @@ export default {
     unknownInfo: '未知角色',
     mysteryWizardInfo: '两个玩家之一是好人方的(梅林)还是坏人的(莫甘娜)',
     unknownLancelotInfo: '兰斯洛特,谁的忠诚无人知晓',
+    wraithInfo: '坏人方和梅林都不知道你的存在',
   },
 };

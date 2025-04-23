@@ -108,6 +108,8 @@ Roles define the abilities and information available to players. The game suppor
 - **Lunatic** (`lunatic`): Special evil role
 - **Brute** (`brute`): Special evil role
 - **Witch** (`witch`): Special role with unique abilities
+- **Wraith** (`wraith`): Hidden from both Merlin and other evil players
+
 - **Revealer** (`revealer`): Special role with unique abilities
 
 ### Role Visibility

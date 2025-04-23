@@ -40,7 +40,8 @@ export type TEvilOptionalRoles =
   | 'lunatic'
   | 'brute'
   | 'witch'
-  | 'revealer';
+  | 'revealer'
+  | 'wraith';
 
 /**
  * Evil required roles

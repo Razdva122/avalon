@@ -44,6 +44,9 @@ export class GameOptionsRoles implements CheckRoleKeys<GameOptionsRoles> {
   public oberon?: number;
 
   @prop()
+  public wraith?: number;
+
+  @prop()
   public mordred?: number;
 
   @prop()
