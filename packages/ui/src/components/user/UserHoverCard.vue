@@ -83,6 +83,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    isVisible: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props) {
     const { userState } = useUserProfile(props.userID);
@@ -138,18 +142,26 @@ export default defineComponent({
       });
     };
 
+    // Watch for visibility changes and only fetch data when the card becomes visible
+    watch(
+      () => props.isVisible,
+      (isVisible) => {
+        if (isVisible && props.userID && loading.value) {
+          fetchUserRatings(props.userID);
+        }
+      },
+      { immediate: true },
+    );
+
+    // Also watch for userID changes, but only fetch if the card is visible
     watch(
       () => props.userID,
       (newUserID) => {
-        if (newUserID) {
+        if (props.isVisible && newUserID) {
           fetchUserRatings(newUserID);
         }
       },
     );
-
-    onMounted(() => {
-      fetchUserRatings(props.userID);
-    });
 
     return {
       userState,

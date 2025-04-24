@@ -7,6 +7,7 @@
       :disabled="!player.id || isMobileDevice"
       max-width="350"
       content-class="user-hover-tooltip"
+      v-model="tooltipOpen"
     >
       <template v-slot:activator="{ props: tooltip }">
         <div v-bind="tooltip" class="player-content">
@@ -56,11 +57,11 @@
         </div>
       </template>
 
-      <UserHoverCard v-if="player.id" :userID="player.id" />
+      <UserHoverCard v-if="player.id" :userID="player.id" :isVisible="tooltipOpen" />
     </v-tooltip>
 
     <v-dialog v-model="showUserCardDialog" content-class="user-card-dialog">
-      <UserHoverCard v-if="player.id && showUserCardDialog" :userID="player.id" />
+      <UserHoverCard v-if="player.id && showUserCardDialog" :userID="player.id" :isVisible="showUserCardDialog" />
     </v-dialog>
   </div>
 </template>
@@ -124,6 +125,7 @@ export default defineComponent({
     const chatMessage = ref<{ message?: string; timeoutId?: number }>();
     const playerRef = ref(null);
     const showUserCardDialog = ref(false);
+    const tooltipOpen = ref(false);
 
     const isMobileDevice = computed(() => {
       return window.matchMedia && window.matchMedia('(hover: none)').matches;
@@ -323,6 +325,7 @@ export default defineComponent({
       playerRef,
       showUserCardDialog,
       isMobileDevice,
+      tooltipOpen,
     };
   },
 });
