@@ -51,13 +51,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, watch } from 'vue';
+import { defineComponent, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
 import RatingHistory from '@/components/stats/RatingHistory.vue';
-import { TRoles } from '@avalon/types';
+import { TRoles, RoleRating } from '@avalon/types';
 
 export default defineComponent({
   name: 'UserRatings',
@@ -75,16 +75,10 @@ export default defineComponent({
   setup(props) {
     const { t } = useI18n();
 
-    interface UserRatingItem {
-      role: TRoles;
-      winrate: number;
-      gamesCount: number;
-      rating: number;
-      rank: number;
-    }
-    const userRatings = ref<UserRatingItem[]>([]);
+    const userRatings = ref<RoleRating[]>([]);
     const loading = ref(true);
     const expandedRole = ref<TRoles | null>(null);
+    const userID = ref<string>(props.userID);
 
     const headers = computed(() => [
       { title: t('stats.role'), value: 'role' },
@@ -130,6 +124,8 @@ export default defineComponent({
     watch(
       () => props.userID,
       (newUUID) => {
+        userID.value = newUUID;
+        expandedRole.value = null;
         fetchUserRatings(newUUID);
       },
     );
@@ -143,7 +139,7 @@ export default defineComponent({
       getRankColor,
       expandedRole,
       toggleExpandRow,
-      userID: props.userID,
+      userID,
     };
   },
 });

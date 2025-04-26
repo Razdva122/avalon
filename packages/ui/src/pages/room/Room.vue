@@ -140,7 +140,7 @@ export default defineComponent({
     });
 
     const displayHostPanel = computed(() => {
-      return roomState.value.leaderID === userID.value && game.value && game.value.stage !== 'end';
+      return roomState.value.leaderID === userID.value;
     });
 
     const displayRestartButton = computed(() => {
