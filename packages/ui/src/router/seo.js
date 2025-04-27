@@ -32,6 +32,7 @@ const {
   stats,
   profile,
   userStats,
+  leaderboard,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -385,6 +386,17 @@ module.exports.routesSeo = {
       multiLanguage: {
         ...stats,
       },
+    },
+  },
+  leaderboard: {
+    path: '/leaderboard/',
+    name: 'leaderboard',
+    priority: 0.8,
+    meta: {
+      multiLanguage: {
+        ...leaderboard,
+      },
+      skipSiteMap: true,
     },
   },
   user_stats: {

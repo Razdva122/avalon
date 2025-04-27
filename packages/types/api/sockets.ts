@@ -76,6 +76,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
   getUserProfile: (id: string, callback: (user: PublicUserProfile) => void) => void;
 
   // Rating system endpoints
+  getRolesWithRatings: (callback: (roles: TRoles[] | { error: string }) => void) => void;
   getRoleLeaderboard: (role: TRoles, callback: (leaderboard: RoleRating[] | { error: string }) => void) => void;
   getUserRatings: (userID: string, callback: (ratings: RoleRating[] | { error: string }) => void) => void;
   getPopularRoles: (

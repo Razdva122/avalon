@@ -40,6 +40,7 @@ const routeComponentMap = {
   stats: () => import('@/pages/stats/Stats.vue'),
   profile: () => import('@/pages/profile/Profile.vue'),
   user_stats: () => import('@/pages/stats/UserStats.vue'),
+  leaderboard: () => import('@/pages/leaderboard/Leaderboard.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [
@@ -49,6 +50,7 @@ export const routes: Array<RouteRecordRaw> = [
   { path: '/wiki/roles/evil_lancelot/', name: 'evil_lancelot', redirect: { name: 'lancelots' } },
   { path: '/wiki/roles/good_lancelot/', name: 'good_lancelot', redirect: { name: 'lancelots' } },
   { path: '/:catchAll(.*)', redirect: '404' },
+  { path: '/leaderboard', name: 'leaderboard', component: routeComponentMap.leaderboard },
 ];
 
 Object.values(routesSeo).forEach((route) => {

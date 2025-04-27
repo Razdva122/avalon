@@ -29,16 +29,17 @@ export function registerTrueSkillRatingEndpoints(socket: ServerSocket): void {
   // Get TrueSkill leaderboard
   socket.on('getTrueSkillLeaderboard', async (callback) => {
     // Get all ratings for players with at least 10 games
-    const ratings = await playerTrueSkillRatingModel.find({ gamesCount: { $gte: 10 } }).lean();
+    const ratings = await playerTrueSkillRatingModel
+      .find({ gamesCount: { $gte: 10 } })
+      .sort({ mu: -1 })
+      .limit(50)
+      .lean();
 
     // Calculate conservative rating and sort
     const ratingsWithConservative = ratings.map((r) => ({
       ...r,
       conservativeRating: trueSkillCalculator.calculateConservativeRating(r.mu, r.sigma),
     }));
-
-    // Sort by conservative rating (mu - 3*sigma)
-    ratingsWithConservative.sort((a, b) => b.conservativeRating - a.conservativeRating);
 
     // Create leaderboard entries with rank
     const leaderboard: TrueSkillLeaderboardEntry[] = ratingsWithConservative.map((rating, index) => {

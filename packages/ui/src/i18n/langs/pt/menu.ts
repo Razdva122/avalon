@@ -10,5 +10,6 @@ export default {
     wiki: 'Wiki',
     about: 'Sobre',
     stats: 'Estatísticas',
+    leaderboard: 'Classificação',
   },
 };

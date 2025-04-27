@@ -34,7 +34,7 @@
             </td>
 
             <td class="text-center" style="width: 100px">
-              {{ item.gamesCount }}
+              <div class="rating-cell">{{ item.rating }}</div>
             </td>
 
             <td class="text-center" style="width: 150px">
@@ -42,7 +42,7 @@
             </td>
 
             <td class="text-center" style="width: 100px">
-              <div class="rating-cell">{{ item.rating }}</div>
+              {{ item.gamesCount }}
             </td>
           </tr>
         </template>
@@ -81,27 +81,21 @@ export default defineComponent({
     const leaderboard = ref<LeaderboardItem[]>([]);
     const loading = ref(true);
     const selectedRole = ref<TRoles>('merlin');
+    const rolesWithRatings = ref<TRoles[]>([]);
 
     const availableRoles = computed(() => {
-      const goodRoles = Object.keys(goodRolesImportance).map((role) => ({
+      return rolesWithRatings.value.map((role) => ({
         label: t(`roles.${role}`),
         value: role,
       }));
-
-      const evilRoles = Object.keys(evilRolesImportance).map((role) => ({
-        label: t(`roles.${role}`),
-        value: role,
-      }));
-
-      return [...goodRoles, ...evilRoles];
     });
 
     const headers = computed(() => [
       { title: t('stats.rank'), value: 'rank' },
       { title: t('stats.player'), value: 'userID' },
-      { title: t('stats.games'), value: 'gamesCount' },
-      { title: t('stats.winrate'), value: 'winrate' },
       { title: t('stats.rating'), value: 'rating' },
+      { title: t('stats.winrate'), value: 'winrate' },
+      { title: t('stats.games'), value: 'gamesCount' },
     ]);
 
     const fetchLeaderboard = (role: TRoles) => {
@@ -123,11 +117,26 @@ export default defineComponent({
       return roleItem ? roleItem.label : role;
     };
 
+    const fetchRolesWithRatings = () => {
+      socket.emit('getRolesWithRatings', (response) => {
+        if ('error' in response) {
+          console.error('Error from API:', response.error);
+        } else {
+          rolesWithRatings.value = response;
+          // If no roles are available or the selected role is not in the list, select the first available role
+          if (rolesWithRatings.value.length > 0 && !rolesWithRatings.value.includes(selectedRole.value)) {
+            selectedRole.value = rolesWithRatings.value[0];
+          }
+        }
+      });
+    };
+
     watch(selectedRole, (newRole) => {
       fetchLeaderboard(newRole);
     });
 
     // Initial fetch
+    fetchRolesWithRatings();
     fetchLeaderboard(selectedRole.value);
 
     const navigateToPlayerStats = (item: LeaderboardItem) => {
@@ -139,6 +148,7 @@ export default defineComponent({
       loading,
       selectedRole,
       availableRoles,
+      rolesWithRatings,
       headers,
       formatRoleName,
       navigateToPlayerStats,

@@ -10,5 +10,6 @@ export default {
     wiki: '维基',
     about: '关于',
     stats: '统计',
+    leaderboard: '排行榜',
   },
 };

@@ -1,6 +1,7 @@
 User-agent: *
 Disallow: /room/*
 Disallow: /profile/*
+Disallow: /leaderboard/*
 Disallow: /stats/user/*
 Disallow: /404/
 Disallow: /en/*

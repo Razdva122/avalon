@@ -7,6 +7,30 @@ import { ServerSocket } from '@avalon/types';
  * @param socket The socket instance
  */
 export function registerRatingEndpoints(socket: ServerSocket): void {
+  // Get roles that have users with ratings
+  socket.on('getRolesWithRatings', (callback) => {
+    console.log('Getting roles with ratings');
+    try {
+      roleRatingModel
+        .aggregate([
+          { $match: { rating: { $gt: 0 } } },
+          { $group: { _id: '$role' } },
+          { $project: { role: '$_id', _id: 0 } },
+          { $sort: { role: 1 } },
+        ])
+        .then((roles) => {
+          callback(roles.map((r) => r.role));
+        })
+        .catch((error) => {
+          console.error('Error fetching roles with ratings:', error);
+          callback({ error: 'Failed to fetch roles with ratings' });
+        });
+    } catch (error) {
+      console.error('Error fetching roles with ratings:', error);
+      callback({ error: 'Failed to fetch roles with ratings' });
+    }
+  });
+
   // Get leaderboard for a specific role
   socket.on('getRoleLeaderboard', (role: TRoles, callback) => {
     console.log(`Getting leaderboard for role: ${role}, limit: 20`);

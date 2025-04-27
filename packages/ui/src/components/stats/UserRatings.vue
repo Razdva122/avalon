@@ -19,11 +19,9 @@
             </td>
 
             <td>
-              {{ item.gamesCount }}
-            </td>
-
-            <td>
-              <WinrateDisplay :winrate="item.winrate.toFixed(2)" />
+              <v-chip :color="getRankColor(item.rank, item.rating)" small>
+                {{ item.rating === 0 ? '???' : item.rank }}
+              </v-chip>
             </td>
 
             <td>
@@ -31,9 +29,11 @@
             </td>
 
             <td>
-              <v-chip :color="getRankColor(item.rank, item.rating)" small>
-                {{ item.rating === 0 ? '???' : item.rank }}
-              </v-chip>
+              <WinrateDisplay :winrate="item.winrate.toFixed(2)" />
+            </td>
+
+            <td>
+              {{ item.gamesCount }}
             </td>
           </tr>
 
@@ -82,10 +82,10 @@ export default defineComponent({
 
     const headers = computed(() => [
       { title: t('stats.role'), value: 'role' },
-      { title: t('stats.games'), value: 'gamesCount' }, // Changed from gamesCount to games
-      { title: t('stats.winrate'), value: 'winrate' },
-      { title: t('stats.rating'), value: 'rating' },
       { title: t('stats.rank'), value: 'rank' },
+      { title: t('stats.rating'), value: 'rating' },
+      { title: t('stats.winrate'), value: 'winrate' },
+      { title: t('stats.games'), value: 'gamesCount' },
     ]);
 
     const fetchUserRatings = (uuid: string) => {

@@ -32,6 +32,7 @@ const { stats } = require('./stats');
 const { profile } = require('./profile');
 const { userStats } = require('./userStats');
 const { plotCards } = require('./plotCards');
+const { leaderboard } = require('./leaderboard');
 
 module.exports = {
   lobby,
@@ -67,4 +68,5 @@ module.exports = {
   profile,
   userStats,
   plotCards,
+  leaderboard,
 };

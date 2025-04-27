@@ -10,5 +10,6 @@ export default {
     wiki: 'Вики',
     about: 'О сайте',
     stats: 'Статистика',
+    leaderboard: 'Таблица лидеров',
   },
 };
