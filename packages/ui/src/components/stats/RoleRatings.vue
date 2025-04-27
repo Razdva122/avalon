@@ -58,7 +58,7 @@ import { useRouter } from 'vue-router';
 import { socket } from '@/api/socket';
 import TeammateProfile from '@/components/stats/TeammateProfile.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
-import { TRoles, goodRolesImportance, evilRolesImportance } from '@avalon/types';
+import { TRoles, goodRolesImportance, evilRolesImportance, RoleRating } from '@avalon/types';
 
 export default defineComponent({
   name: 'RoleRatings',
@@ -70,15 +70,7 @@ export default defineComponent({
     const router = useRouter();
     const { t } = useI18n();
 
-    interface LeaderboardItem {
-      rank: number;
-      userID: string;
-      winrate: number;
-      gamesCount: number;
-      rating: number;
-    }
-
-    const leaderboard = ref<LeaderboardItem[]>([]);
+    const leaderboard = ref<RoleRating[]>([]);
     const loading = ref(true);
     const selectedRole = ref<TRoles>('merlin');
     const rolesWithRatings = ref<TRoles[]>([]);
@@ -117,12 +109,39 @@ export default defineComponent({
       return roleItem ? roleItem.label : role;
     };
 
+    const sortRolesByImportance = (roles: TRoles[]): TRoles[] => {
+      // Separate good and evil roles
+      const goodRoles = roles.filter((role) => role in goodRolesImportance);
+      const evilRoles = roles.filter((role) => role in evilRolesImportance);
+
+      // Sort good roles by importance (lower number = higher importance)
+      const sortedGoodRoles = goodRoles.sort((a, b) => {
+        return (
+          goodRolesImportance[a as keyof typeof goodRolesImportance] -
+          goodRolesImportance[b as keyof typeof goodRolesImportance]
+        );
+      });
+
+      // Sort evil roles by importance (lower number = higher importance)
+      const sortedEvilRoles = evilRoles.sort((a, b) => {
+        return (
+          evilRolesImportance[a as keyof typeof evilRolesImportance] -
+          evilRolesImportance[b as keyof typeof evilRolesImportance]
+        );
+      });
+
+      // Return good roles first, then evil roles
+      return [...sortedGoodRoles, ...sortedEvilRoles];
+    };
+
     const fetchRolesWithRatings = () => {
       socket.emit('getRolesWithRatings', (response) => {
         if ('error' in response) {
           console.error('Error from API:', response.error);
         } else {
-          rolesWithRatings.value = response;
+          // Sort roles by importance
+          rolesWithRatings.value = sortRolesByImportance(response);
+
           // If no roles are available or the selected role is not in the list, select the first available role
           if (rolesWithRatings.value.length > 0 && !rolesWithRatings.value.includes(selectedRole.value)) {
             selectedRole.value = rolesWithRatings.value[0];
@@ -139,7 +158,7 @@ export default defineComponent({
     fetchRolesWithRatings();
     fetchLeaderboard(selectedRole.value);
 
-    const navigateToPlayerStats = (item: LeaderboardItem) => {
+    const navigateToPlayerStats = (item: RoleRating) => {
       router.push({ name: 'user_stats', params: { uuid: item.userID } });
     };
 
