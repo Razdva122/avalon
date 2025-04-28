@@ -6,6 +6,11 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     generalInformation: 'General Information:',
     playingAsOberon:
       'Playing as {oberon} presents unique challenges as you are a Minion of Evil, but you do not know the identities of your fellow minions, and they do not know you. You are tasked with disrupting the forces of good while navigating the game with limited information.',
+    archetypes: 'Archetypes:',
+    archetypesDescription: '{oberon} has variants that share its core mechanic of being unknown to other players:',
+    wraithArchetype: 'Wraith:',
+    wraithDescription:
+      'The {wraith} is an archetype of {oberon} that is also unknown to {merlin}, making it completely hidden from both sides.',
     generalTips: 'General Tips:',
     playingСonclusion:
       'Playing as {oberon} requires cunning, adaptability, and a flair for deception. Your unpredictability is an asset that, if used wisely, can turn the tides of the game. Confuse, deceive, and scheme your way to victory for evil!',
@@ -39,6 +44,12 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     generalInformation: 'Общая информация:',
     playingAsOberon:
       'Игра за {oberon} представляет уникальные вызовы, так как вы являетесь Миньоном Зла, но не знаете личностей своих соратников, и они не знают вас. Ваша задача — мешать силам добра, ориентируясь в игре с ограниченной информацией.',
+    archetypes: 'Архетипы:',
+    archetypesDescription:
+      'У {oberon} есть варианты, которые разделяют его основной механизм быть неизвестным другим игрокам:',
+    wraithArchetype: 'Призрак:',
+    wraithDescription:
+      '{wraith} является архетипом {oberon}, который также неизвестен {merlin}, что делает его полностью скрытым от обеих сторон.',
     generalTips: 'Общие советы:',
     playingСonclusion:
       'Игра за {oberon} требует хитрости, адаптивности и склонности к обману. Ваша непредсказуемость — это актив, который, если использовать разумно, может изменить ход игры. Запутайте, обманите и интригуйте, чтобы привести зло к победе!',
@@ -74,6 +85,10 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     generalInformation: '一般信息：',
     playingAsOberon:
       '作为 {oberon} 进行游戏会带来独特的挑战，因为你是邪恶的爪牙，但你不知道其他爪牙的身份，他们也不知道你。你的任务是以有限的信息破坏善良势力。',
+    archetypes: '原型：',
+    archetypesDescription: '{oberon}有一些变体，它们共享其对其他玩家未知的核心机制：',
+    wraithArchetype: '幽灵：',
+    wraithDescription: '{wraith} 是{oberon}的一个原型，它对{merlin}也是未知的，使其完全对双方隐藏。',
     generalTips: '一般技巧:',
     playingСonclusion:
       '作为 {oberon} 进行游戏需要狡猾、适应性和骗局的技巧。你的不可预测性是一种资产，如果用得当，可以改变游戏的潮流。迷惑、欺骗和策划以为邪恶争取胜利！',
@@ -101,6 +116,10 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     generalInformation: '一般信息：',
     playingAsOberon:
       '作為 {oberon} 進行遊戲會帶來獨特的挑戰，因為你是邪惡的爪牙，但你不知道其他爪牙的身份，他們也不知道你。你的任務是以有限的信息破壞善良勢力。',
+    archetypes: '原型：',
+    archetypesDescription: '{oberon}有一些變體，它們共享其對其他玩家未知的核心機制：',
+    wraithArchetype: '幽靈：',
+    wraithDescription: '{wraith} 是{oberon}的一個原型，它對{merlin}也是未知的，使其完全對雙方隱藏。',
     generalTips: '一般技巧:',
     playingСonclusion:
       '作為 {oberon} 進行遊戲需要狡猾、適應性和騙局的技巧。你的不可預測性是一種資產，如果用得當，可以改變遊戲的潮流。迷惑、欺騙和策劃以為邪惡爭取勝利！',
@@ -128,6 +147,12 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     generalInformation: 'Información general:',
     playingAsOberon:
       'Jugar como {oberon} presenta desafíos únicos ya que eres un esbirro del mal, pero no conoces las identidades de tus compañeros esbirros, y ellos no te conocen a ti. Tu tarea es interrumpir las fuerzas del bien mientras navegas por el juego con información limitada.',
+    archetypes: 'Arquetipos:',
+    archetypesDescription:
+      '{oberon} tiene variantes que comparten su mecánica principal de ser desconocido para otros jugadores:',
+    wraithArchetype: 'Espectro:',
+    wraithDescription:
+      'El {wraith} es un arquetipo de {oberon} que también es desconocido para {merlin}, lo que lo hace completamente oculto para ambos bandos.',
     generalTips: 'Consejos generales:',
     playingСonclusion:
       'Jugar como {oberon} requiere astucia, adaptabilidad y un toque para el engaño. Tu imprevisibilidad es un activo que, si se usa sabiamente, puede cambiar el curso del juego. Confunde, engaña y trama tu camino hacia la victoria para el mal!',
@@ -162,6 +187,12 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     generalInformation: 'Informações Gerais:',
     playingAsOberon:
       'Jogar como {oberon} apresenta desafios únicos, pois você é um Lacaio do Mal, mas não conhece as identidades de seus companheiros lacaios, e eles não conhecem você. Sua tarefa é perturbar as forças do bem enquanto navega pelo jogo com informações limitadas.',
+    archetypes: 'Arquétipos:',
+    archetypesDescription:
+      '{oberon} tem variantes que compartilham seu mecanismo principal de ser desconhecido para outros jogadores:',
+    wraithArchetype: 'Espectro:',
+    wraithDescription:
+      'O {wraith} é um arquétipo de {oberon} que também é desconhecido para {merlin}, tornando-o completamente oculto para ambos os lados.',
     generalTips: 'Dicas Gerais:',
     playingСonclusion:
       'Jogar como {oberon} requer astúcia, adaptabilidade e um talento para o engano. Sua imprevisibilidade é um trunfo que, se usado com sabedoria, pode mudar o rumo do jogo. Confunda, engane e planeje seu caminho para a vitória do mal!',

@@ -327,6 +327,12 @@ export default defineComponent({
     background-size: 200%;
   }
 
+  &.icon-wraith {
+    background-image: getImagePathByID('roles/anime', 'wraith');
+    background-position: 52% 20%;
+    background-size: 155%;
+  }
+
   &.icon-revealer,
   &.icon-revealer_hidden,
   &.icon-revealer_progress {

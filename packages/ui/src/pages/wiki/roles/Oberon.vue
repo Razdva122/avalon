@@ -17,6 +17,23 @@
       <LocalizedTextWrapper keypath="oberon.playingAsOberon" />
     </p>
 
+    <h2>{{ $t('oberon.archetypes') }}</h2>
+    <div>
+      <LocalizedTextWrapper keypath="oberon.archetypesDescription" />
+    </div>
+    <ul>
+      <SchemaImage
+        class="archetype-image evil-role"
+        :src="calculateRoleUrl('wraith')"
+        :alt="$t('roles.wraith')"
+        :description="$t('roles.wraith')"
+      />
+      <li>
+        <strong>{{ $t('oberon.wraithArchetype') }}</strong>
+        <LocalizedTextWrapper keypath="oberon.wraithDescription" />
+      </li>
+    </ul>
+
     <TopRolePlayer role="oberon" class="my-4" />
 
     <h2>{{ $t('oberon.generalTips') }}</h2>
