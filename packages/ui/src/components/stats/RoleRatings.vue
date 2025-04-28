@@ -25,24 +25,28 @@
       >
         <template v-slot:item="{ item }">
           <tr class="hoverable-row" @click="navigateToPlayerStats(item)">
-            <td class="text-center" style="width: 50px">
+            <td class="text-center">
               <div class="rank-cell">{{ item.rank }}</div>
             </td>
 
-            <td>
+            <td :class="{ 'teammate-profile-cell': isMobile }">
               <TeammateProfile :teammateID="item.userID" />
             </td>
 
-            <td class="text-center" style="width: 100px">
+            <td class="text-center">
               <div class="rating-cell">{{ item.rating }}</div>
             </td>
 
-            <td class="text-center" style="width: 150px">
-              <WinrateDisplay :winrate="item.winrate.toFixed(2)" />
+            <td class="text-center">
+              <div class="winrate-cell">
+                <WinrateDisplay :winrate="item.winrate.toFixed(2)" />
+              </div>
             </td>
 
-            <td class="text-center" style="width: 100px">
-              {{ item.gamesCount }}
+            <td v-if="!isMobile" class="text-center">
+              <div class="games-count-cell">
+                {{ item.gamesCount }}
+              </div>
             </td>
           </tr>
         </template>
@@ -59,6 +63,7 @@ import { socket } from '@/api/socket';
 import TeammateProfile from '@/components/stats/TeammateProfile.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
 import { TRoles, goodRolesImportance, evilRolesImportance, RoleRating } from '@avalon/types';
+import { useResponsive } from '@/helpers/composables';
 
 export default defineComponent({
   name: 'RoleRatings',
@@ -69,6 +74,7 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const { t } = useI18n();
+    const { isMobile } = useResponsive();
 
     const leaderboard = ref<RoleRating[]>([]);
     const loading = ref(true);
@@ -82,13 +88,46 @@ export default defineComponent({
       }));
     });
 
-    const headers = computed(() => [
-      { title: t('stats.rank'), value: 'rank' },
-      { title: t('stats.player'), value: 'userID' },
-      { title: t('stats.rating'), value: 'rating' },
-      { title: t('stats.winrate'), value: 'winrate' },
-      { title: t('stats.games'), value: 'gamesCount' },
-    ]);
+    const headers = computed(() => {
+      const rankHeader = {
+        title: '#',
+        value: 'rank',
+        width: '40px',
+      };
+
+      const userIDHeader = {
+        title: t('stats.player'),
+        value: 'userID',
+        ...(isMobile.value && { width: '130px' }),
+      };
+
+      const ratingHeader = {
+        title: t('stats.rating'),
+        value: 'rating',
+        width: '150px',
+      };
+
+      const winrateHeader = {
+        title: t('stats.winrate'),
+        value: 'winrate',
+        width: '100px',
+      };
+
+      const gamesCountHeader = {
+        title: t('stats.games'),
+        value: 'gamesCount',
+        width: '100px',
+      };
+
+      const baseHeaders = [rankHeader, userIDHeader, ratingHeader, winrateHeader];
+
+      // Add gamesCount column only on desktop
+      if (!isMobile.value) {
+        baseHeaders.push(gamesCountHeader);
+      }
+
+      return baseHeaders;
+    });
 
     const fetchLeaderboard = (role: TRoles) => {
       loading.value = true;
@@ -171,6 +210,7 @@ export default defineComponent({
       headers,
       formatRoleName,
       navigateToPlayerStats,
+      isMobile,
     };
   },
 });
@@ -203,5 +243,33 @@ export default defineComponent({
 
 .leaderboard-table {
   margin-top: 16px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.rating-cell {
+  font-weight: bold;
+  text-align: center;
+}
+
+.winrate-cell {
+  text-align: center;
+}
+
+.games-count-cell {
+  white-space: nowrap;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .teammate-profile-cell {
+    width: 130px;
+    max-width: 130px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
 </style>

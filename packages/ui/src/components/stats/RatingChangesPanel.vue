@@ -136,13 +136,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch, onUnmounted } from 'vue';
+import { defineComponent, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
 import type { VisualGameState, GameTrueSkillResult } from '@avalon/types';
 import UserPreview from '@/components/user/UserPreview.vue';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
+import { useResponsive } from '@/helpers/composables';
 
 export default defineComponent({
   name: 'RatingChangesPanel',
@@ -176,16 +177,8 @@ export default defineComponent({
       return props.gameState.result?.winner || '';
     });
 
-    // Check if we're on mobile
-    const isMobile = ref(window.innerWidth < 700);
-
-    // Update isMobile on window resize
-    const updateIsMobile = () => {
-      isMobile.value = window.innerWidth < 700;
-    };
-
-    // Add resize event listener
-    window.addEventListener('resize', updateIsMobile);
+    // Use the responsive composable
+    const { isMobile } = useResponsive();
 
     // Headers for the good team data table
     const goodTeamHeaders = computed(() => {
@@ -264,11 +257,6 @@ export default defineComponent({
       if (isOpen && gameFinished.value) {
         fetchRatingChanges();
       }
-    });
-
-    // Clean up event listener on component unmount
-    onUnmounted(() => {
-      window.removeEventListener('resize', updateIsMobile);
     });
 
     return {

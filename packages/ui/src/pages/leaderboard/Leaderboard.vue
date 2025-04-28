@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <v-window v-model="activeTab" class="mt-4">
+    <v-window v-model="activeTab" class="mt-4" :touch="false">
       <v-window-item value="trueskill">
         <TrueSkillLeaderboard />
       </v-window-item>

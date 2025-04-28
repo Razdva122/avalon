@@ -23,6 +23,7 @@ import { useTheme } from 'vuetify';
 import { socket } from '@/api/socket';
 import { TRoles } from '@avalon/types';
 import { Line as LineChart } from 'vue-chartjs';
+import { useResponsive } from '@/helpers/composables';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -54,6 +55,7 @@ export default defineComponent({
   setup(props) {
     const { t } = useI18n();
     const theme = useTheme();
+    const { isMobile } = useResponsive();
 
     interface HistoryItem {
       date: Date;
@@ -141,15 +143,15 @@ export default defineComponent({
             position: 'left' as const,
             beginAtZero: false,
             title: {
-              display: window.innerWidth >= 600,
+              display: !isMobile.value,
               text: t('stats.rating'),
               color: '#1E88E5', // Bright blue
             },
             ticks: {
               // Make the ticks more readable on small screens
-              maxTicksLimit: window.innerWidth < 600 ? 5 : 10,
+              maxTicksLimit: isMobile.value ? 5 : 10,
               font: {
-                size: window.innerWidth < 600 ? 10 : 12,
+                size: isMobile.value ? 10 : 12,
               },
               color: '#64B5F6', // Lighter blue
             },
@@ -309,7 +311,7 @@ export default defineComponent({
   margin-top: 16px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .rating-history {
     margin-top: 8px;
     margin-bottom: 8px;
