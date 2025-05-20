@@ -81,4 +81,7 @@ export class UserFeatures {
 
   @prop({ type: Date })
   public lastEloResetAt?: Date;
+
+  @prop({ type: Date })
+  public lastGameDate?: Date;
 }

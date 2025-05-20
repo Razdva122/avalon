@@ -160,17 +160,15 @@ export class Manager {
         // Save room to DB
         this.saveRoomToDB(room);
 
-        // Calculate and store rating changes for this game only
-        // (Daily snapshots are handled by the scheduler)
-        try {
-          const gameState = room.calculateRoomState();
-          if (gameState.stage === 'started' && gameState.game.result && gameState.game.result.reason !== 'manualy') {
-            // Update TrueSkill ratings
-            await updateTrueSkillForGame(gameState.game);
-            console.log(`TrueSkill ratings updated for game ${gameState.game.uuid}`);
-          }
-        } catch (error) {
-          console.error('Error updating ratings for game:', error);
+        const gameState = room.calculateRoomState();
+
+        if (gameState.stage === 'started' && gameState.game.result && gameState.game.result.reason !== 'manualy') {
+          const gameDate = new Date(gameState.startAt);
+          const playerIds = gameState.players.map((player) => player.id);
+          await this.dbManager.updateLastGameDate(playerIds, gameDate);
+
+          await updateTrueSkillForGame(gameState.game);
+          console.log(`TrueSkill ratings updated for game ${gameState.game.uuid}`);
         }
       }
     });

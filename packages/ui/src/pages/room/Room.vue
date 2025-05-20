@@ -56,6 +56,7 @@ import HostPanel from '@/components/view/panels/HostPanel.vue';
 import RoomVote from '@/components/view/panels/RoomVote.vue';
 import Chat from '@/components/feedback/Chat.vue';
 import RatingChangesPanel from '@/components/stats/RatingChangesPanel.vue';
+import eventBus from '@/helpers/event-bus';
 
 export default defineComponent({
   name: 'Room',
@@ -138,6 +139,17 @@ export default defineComponent({
     watch(userID, () => {
       initState(props.uuid);
     });
+
+    watch(
+      () => game.value?.result?.winner,
+      (newWinner, oldWinner) => {
+        if (newWinner && !oldWinner) {
+          setTimeout(() => {
+            eventBus.emit('showRatingPanel');
+          }, 1500);
+        }
+      },
+    );
 
     const displayHostPanel = computed(() => {
       return roomState.value.leaderID === userID.value;

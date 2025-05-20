@@ -180,6 +180,10 @@ export default defineComponent({
   padding: 12px;
 }
 
+.message-element {
+  margin-bottom: 4px;
+}
+
 .message-author {
   cursor: pointer;
   font-size: 12px;
@@ -212,6 +216,9 @@ export default defineComponent({
 }
 
 .message-from-author {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
   text-align: right;
 
   .author-container {
