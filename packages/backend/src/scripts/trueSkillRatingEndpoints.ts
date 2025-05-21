@@ -28,9 +28,15 @@ export function registerTrueSkillRatingEndpoints(socket: ServerSocket): void {
 
   // Get TrueSkill leaderboard
   socket.on('getTrueSkillLeaderboard', async (callback) => {
-    // Get all ratings for players with at least 10 games
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    // Get all ratings for players with at least 10 games and who played in the last month
     const ratings = await playerTrueSkillRatingModel
-      .find({ gamesCount: { $gte: 10 } })
+      .find({
+        gamesCount: { $gte: 10 },
+        lastPlayedAt: { $gte: oneMonthAgo },
+      })
       .sort({ mu: -1 })
       .limit(50)
       .lean();

@@ -41,7 +41,6 @@ This document serves as an entry point for all Memory Bank files of the Avalon p
    - Game Hooks
    - Frontend Interaction
    - Game Logic Recommendations
-   - [Adding Plot Cards](adding-plot-cards.md)
 
 4. [Frontend](memory-bank-frontend.md)
 
