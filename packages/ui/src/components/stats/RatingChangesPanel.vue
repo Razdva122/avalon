@@ -254,14 +254,12 @@ export default defineComponent({
       }
     };
 
-    // Обработчик события showRatingPanel
     const handleShowRatingPanel = () => {
       if (gameFinished.value) {
         dialog.value = true;
       }
     };
 
-    // Регистрируем и удаляем обработчик события
     onMounted(() => {
       eventBus.on('showRatingPanel', handleShowRatingPanel);
     });

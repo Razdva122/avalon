@@ -60,6 +60,20 @@ export const store = createStore<IState>({
       state.connect = value;
     },
 
+    updateUserAchievements(state: IState, achievementNameOrArray: string | string[]) {
+      if (state.profile) {
+        state.profile.knownAchievements = state.profile.knownAchievements || [];
+
+        if (Array.isArray(achievementNameOrArray)) {
+          state.profile.knownAchievements = achievementNameOrArray;
+        } else if (!state.profile.knownAchievements.includes(achievementNameOrArray)) {
+          state.profile.knownAchievements.push(achievementNameOrArray);
+        }
+
+        updateUserProfile(state.profile, { updateToken: false });
+      }
+    },
+
     updateHideSpoilers(state: IState, value: boolean) {
       state.hideSpoilers = value;
     },
@@ -172,6 +186,14 @@ socket.on('disconnect', () => {
 
 socket.on('renewJWT', () => {
   store.commit('clearUserProfile');
+});
+
+socket.on('achievementUnlocked', (achievementID: string) => {
+  store.commit('updateUserAchievements', achievementID);
+});
+
+socket.on('hiddenAchievementsList', (achievements: string[]) => {
+  store.commit('updateUserAchievements', achievements);
 });
 
 export function useStore() {

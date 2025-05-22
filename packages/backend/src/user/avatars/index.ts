@@ -12,13 +12,14 @@ export class AvatarsManager {
   }
 
   async getAvailableAvatarsForUser(userID: string): Promise<ArgumentOfCallback<'getUserAvatars'>> {
-    const [user, features] = await Promise.all([
+    const [user, features, achievements] = await Promise.all([
       this.dbManager.getUserByID(userID),
       this.dbManager.getUserFeatures(userID),
+      this.dbManager.getUserCompletedAchievements(userID),
     ]);
 
     return this.avatars.map((avatar) => {
-      const available = avatar.isAvailableForUser({ user, features });
+      const available = avatar.isAvailableForUser({ user, features, achievements });
 
       return {
         id: avatar.id,
@@ -35,12 +36,13 @@ export class AvatarsManager {
       return { error: 'avatarNotExist' };
     }
 
-    const [user, features] = await Promise.all([
+    const [user, features, achievements] = await Promise.all([
       this.dbManager.getUserByID(userID),
       this.dbManager.getUserFeatures(userID),
+      this.dbManager.getUserCompletedAchievements(userID),
     ]);
 
-    if (!avatar.isAvailableForUser({ user, features })) {
+    if (!avatar.isAvailableForUser({ user, features, achievements })) {
       return { error: 'avatarNotAvailable' };
     }
 

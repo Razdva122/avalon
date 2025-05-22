@@ -4,14 +4,14 @@ import type { Dictionary, Socket } from '@avalon/types';
 
 import { socketURL } from '@/api/const';
 
-import { userProfilePath } from '@/store/const';
-
 function getAuthToken(): string | undefined {
   const userProfileInStorage = localStorage.getItem(userProfilePath);
   const profile = userProfileInStorage ? JSON.parse(userProfileInStorage) : null;
 
   return profile?.token;
 }
+
+import { userProfilePath } from '@/store/const';
 
 export const socket: Socket = io(socketURL, {
   withCredentials: true,

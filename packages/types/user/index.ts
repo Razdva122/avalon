@@ -42,6 +42,7 @@ export class UserForUI extends PublicUserProfile {
 
 export interface UserWithToken extends UserForUI {
   token: string;
+  knownAchievements?: string[];
 }
 
 @modelOptions({

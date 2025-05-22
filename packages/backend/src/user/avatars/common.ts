@@ -1,4 +1,5 @@
 import { IAvatar } from '@/user/avatars/abstract';
+import { ACHIEVEMENT_TOP_PLAYER, ACHIEVEMENT_SECRET_HUNTER } from '@avalon/types';
 
 export class ServantAvatar {
   static id = 'servant';
@@ -37,20 +38,16 @@ export class AnimeMerlinPureAvatar {
 export class AnimeWitchAvatar {
   static id = 'anime/witch';
 
-  static isAvailableForUser({ features }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
-    return Boolean(features && features.top1info);
-  }
-
-  static getInfo({ features }: Parameters<IAvatar['isAvailableForUser']>[0]): string | undefined {
-    return features?.top1info;
+  static isAvailableForUser({ achievements }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
+    return achievements.includes(ACHIEVEMENT_TOP_PLAYER);
   }
 }
 
 export class MysteryAvatar {
   static id = 'mystery';
 
-  static isAvailableForUser({ features }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
-    return Boolean(features && features.easterEggRevealed);
+  static isAvailableForUser({ achievements }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
+    return achievements.includes(ACHIEVEMENT_SECRET_HUNTER);
   }
 }
 
