@@ -76,25 +76,6 @@ export class UserLayer {
     await userFeaturesModel.bulkWrite(bulkOps);
   }
 
-  /**
-   * Обновляет дату последней игры для списка игроков
-   * @param playerIds Список ID игроков
-   * @param gameDate Дата игры
-   */
-  async updateLastGameDate(playerIds: string[], gameDate: Date): Promise<void> {
-    const bulkOps = playerIds.map((playerId) => ({
-      updateOne: {
-        filter: { userID: playerId },
-        update: {
-          $max: { lastGameDate: gameDate },
-        },
-        upsert: true,
-      },
-    }));
-
-    await userFeaturesModel.bulkWrite(bulkOps);
-  }
-
   async getUserProfile(id: string): Promise<UserForUI> {
     const user = await this.getUserByID(id);
 
