@@ -1,7 +1,9 @@
 import bcrypt from 'bcrypt';
 import { ArgumentOfCallback, PublicUserProfile, UserFeatures, UserForUI, UserProfile } from '@avalon/types';
-import { userFeaturesModel, userProfileModel } from '@/db/models';
+import { userFeaturesModel, userProfileModel, userAchievementModel } from '@/db/models';
 import { generateJWT } from '@/user';
+import { AchievementType } from '@avalon/types/stats/achievements';
+import { achievementsData } from '@/achievements/data';
 
 export class UserLayer {
   hashRounds = 12;
@@ -36,6 +38,7 @@ export class UserLayer {
     return {
       ...userForUi,
       token: generateJWT(userForUi),
+      knownAchievements: [],
     };
   }
 
@@ -54,8 +57,23 @@ export class UserLayer {
     return features;
   }
 
-  async revealEasterEgg(id: string): Promise<void> {
-    await userFeaturesModel.findOneAndUpdate({ userID: id }, { easterEggRevealed: true }, { upsert: true });
+  /**
+   * Обновляет дату последней игры для списка игроков
+   * @param playerIds Список ID игроков
+   * @param gameDate Дата игры
+   */
+  async updateLastGameDate(playerIds: string[], gameDate: Date): Promise<void> {
+    const bulkOps = playerIds.map((playerId) => ({
+      updateOne: {
+        filter: { userID: playerId },
+        update: {
+          $max: { lastGameDate: gameDate },
+        },
+        upsert: true,
+      },
+    }));
+
+    await userFeaturesModel.bulkWrite(bulkOps);
   }
 
   async getUserProfile(id: string): Promise<UserForUI> {
@@ -149,10 +167,32 @@ export class UserLayer {
       avatar: user.avatar,
     };
 
+    const knownAchievements = await this.getUserCompletedAchievements(user.id, 'hidden');
+
     return {
       ...userForUi,
       token: generateJWT(userForUi),
+      knownAchievements,
     };
+  }
+
+  async getUserCompletedAchievements(userID: string, type?: 'hidden'): Promise<string[]> {
+    const userAchievements = await userAchievementModel.find({
+      userID: userID,
+      completed: true,
+    });
+
+    if (type !== 'hidden') {
+      return userAchievements.map((el) => el.achievementID);
+    }
+
+    return userAchievements.reduce<string[]>((acc, el) => {
+      if (achievementsData.find((data) => data.type === AchievementType.HIDDEN && data.id === el.achievementID)) {
+        acc.push(el.achievementID);
+      }
+
+      return acc;
+    }, []);
   }
 
   async validateUserPassword(user: UserProfile, password: string): Promise<boolean> {

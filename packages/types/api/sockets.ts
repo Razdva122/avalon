@@ -21,8 +21,16 @@ import type {
 import type { TAssassinateType } from '../game/addons';
 
 import type { TRoomsList, TMessage } from '../room';
-import { TTotalWinrateStats, RoleRating } from '../stats';
+import { TTotalWinrateStats, RoleRating, Achievement, UserAchievement, AchievementStats } from '../stats';
 import { UserForUI, UserProfile, IAvatarInfo, PublicUserProfile, UserWithToken } from '../user';
+
+export interface AchievementResponse {
+  success: boolean;
+  achievements?: Achievement[];
+  userAchievements?: UserAchievement[];
+  stats?: AchievementStats[];
+  error?: string;
+}
 
 export type {
   ISocketError,
@@ -46,6 +54,9 @@ export interface ServerToClientEvents {
   destroyRoom: (uuid: string) => void;
   serverError: (error: string) => void;
   renewJWT: () => void;
+  achievementUnlocked: (achievementId: string) => void;
+  achievementProgress: (data: { achievementID: string; currentProgress: number; requirement: number }) => void;
+  hiddenAchievementsList: (achievements: string[]) => void;
 }
 
 export interface ClientToServerUserEvents {
@@ -92,6 +103,11 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
     role: TRoles,
     callback: (history: { date: Date; rating: number | null; rank: number | null }[] | { error: string }) => void,
   ) => void;
+
+  // Achievement system endpoints
+  getAllAchievements: (callback: (response: AchievementResponse) => void) => void;
+  getUserAchievements: (userID: string, callback: (response: AchievementResponse) => void) => void;
+  getAchievementStats: (callback: (response: AchievementResponse) => void) => void;
 
   createRoom: (callback: (uuid: string) => void) => void;
   updateOptions: (uuid: string, options: GameOptions) => void;

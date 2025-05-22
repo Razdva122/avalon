@@ -15,9 +15,11 @@ import crypto from 'crypto';
 import { handleSocketErrors, eventBus } from '@/helpers';
 import { registerRatingEndpoints } from '@/scripts/ratingEndpoints';
 import { registerTrueSkillRatingEndpoints } from '@/scripts/trueSkillRatingEndpoints';
+import { registerAchievementEndpoints } from '@/scripts/achievementEndpoints';
 import { updateTrueSkillForGame } from '@/scripts/updateTrueSkillRatings';
 import { DBManager } from '@/db';
 import { validateJWT } from '@/user';
+import { AchievementManager } from '@/achievements';
 import { AvatarsManager } from '@/user/avatars';
 
 export class Manager {
@@ -26,6 +28,7 @@ export class Manager {
   io: Server;
   dbManager: DBManager;
   avatarsManager: AvatarsManager;
+  achievementManager: AchievementManager;
   onlineCounter: Dictionary<number> = {};
 
   get roomListCutted() {
@@ -144,6 +147,7 @@ export class Manager {
     this.io = io;
     this.dbManager = dbManager;
     this.avatarsManager = new AvatarsManager(dbManager);
+    this.achievementManager = new AchievementManager(io);
 
     this.dbManager.getLastRooms(20).then((rooms) => {
       this.generateRoomsListFromDB(rooms);
@@ -165,9 +169,16 @@ export class Manager {
         try {
           const gameState = room.calculateRoomState();
           if (gameState.stage === 'started' && gameState.game.result && gameState.game.result.reason !== 'manualy') {
+            const gameDate = new Date(gameState.startAt);
+            const playerIds = gameState.players.map((player) => player.id);
+            await this.dbManager.updateLastGameDate(playerIds, gameDate);
+
             // Update TrueSkill ratings
             await updateTrueSkillForGame(gameState.game);
             console.log(`TrueSkill ratings updated for game ${gameState.game.uuid}`);
+
+            await this.achievementManager.achievementHandlers.handleGameEnd(gameState.game);
+            console.log(`Achievements processed directly for game: ${gameState.game.uuid}`);
           }
         } catch (error) {
           console.error('Error updating ratings for game:', error);
@@ -184,9 +195,10 @@ export class Manager {
     });
 
     io.on('connection', (socket) => {
-      // Register rating endpoints
+      // Register endpoints
       registerRatingEndpoints(socket);
       registerTrueSkillRatingEndpoints(socket);
+      registerAchievementEndpoints(socket);
       handleSocketErrors(socket);
       this.updateOnlineCounter('lobby', 1);
 
@@ -202,6 +214,9 @@ export class Manager {
         try {
           const tokenValue = validateJWT(token);
           userState.userID = tokenValue.id;
+          this.dbManager.getUserCompletedAchievements(tokenValue.id, 'hidden').then((achievements) => {
+            socket.emit('hiddenAchievementsList', achievements);
+          });
         } catch (e) {
           socket.emit('renewJWT');
         }
@@ -328,7 +343,7 @@ export class Manager {
     });
 
     socket.on('revealEasterEgg', () => {
-      this.dbManager.revealEasterEgg(userID);
+      eventBus.emit('playerRevealSecret', userID);
     });
 
     socket.on('updateUserAvatar', async (avatarID, cb) => {

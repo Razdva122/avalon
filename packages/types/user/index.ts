@@ -42,6 +42,7 @@ export class UserForUI extends PublicUserProfile {
 
 export interface UserWithToken extends UserForUI {
   token: string;
+  knownAchievements?: string[];
 }
 
 @modelOptions({
@@ -81,4 +82,7 @@ export class UserFeatures {
 
   @prop({ type: Date })
   public lastEloResetAt?: Date;
+
+  @prop({ type: Date })
+  public lastGameDate?: Date;
 }

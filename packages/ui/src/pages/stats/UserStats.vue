@@ -31,7 +31,7 @@
         <v-chip v-else-if="value.change < 0" color="error" variant="flat" size="small">{{ value.string }}</v-chip>
         <span v-else>—</span>
       </template>
-      <template v-slot:item.gameID="{ value }">
+      <template v-slot:item.gameID="{ value }" v-if="!isMobile">
         <div class="gameID" @click="$router.push({ name: 'room', params: { uuid: value } })">
           {{ value }}
         </div>
@@ -94,6 +94,7 @@
 import { defineComponent, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { useResponsive } from '@/helpers/composables';
 import {
   TGameView,
   TUserStats,
@@ -110,7 +111,6 @@ import UserRatings from '@/components/stats/UserRatings.vue';
 import { VisualGameState } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
 import UserProfileHeader from '@/components/stats/UserProfileHeader.vue';
-import { useStore } from '@/store';
 
 export default defineComponent({
   name: 'UserStats',
@@ -134,9 +134,8 @@ export default defineComponent({
     const lastGames = ref<TGameView[]>();
     const teammates = ref<TTeammateStats[]>();
     const enemies = ref<TTeammateStats[]>();
-    const store = useStore();
-
     const { t } = useI18n();
+    const { isMobile } = useResponsive();
 
     const initState = async (uuid: string) => {
       const games = await socket.emitWithAck('getPlayerGames', uuid);
@@ -220,12 +219,17 @@ export default defineComponent({
     });
 
     const lastGamesHeaders = computed(() => {
-      return [
+      const baseHeaders = [
         { title: t('userStats.role'), key: 'role' },
         { title: t('userStats.result'), key: 'isWin' },
         { title: t('userStats.rating'), key: 'ratingChange' },
-        { title: t('userStats.game'), key: 'gameID' },
       ];
+
+      if (!isMobile.value) {
+        baseHeaders.push({ title: t('userStats.game'), key: 'gameID' });
+      }
+
+      return baseHeaders;
     });
 
     const teammatesHeaders = computed(() => {
@@ -257,6 +261,7 @@ export default defineComponent({
       teammates,
       teammatesHeaders,
       simplifiedHeaders,
+      isMobile,
     };
   },
 });

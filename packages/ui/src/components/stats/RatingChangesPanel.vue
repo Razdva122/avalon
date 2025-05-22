@@ -136,7 +136,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from 'vue';
+import { defineComponent, ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
 import type { VisualGameState, GameTrueSkillResult } from '@avalon/types';
@@ -144,6 +144,7 @@ import UserPreview from '@/components/user/UserPreview.vue';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import { useResponsive } from '@/helpers/composables';
+import eventBus from '@/helpers/event-bus';
 
 export default defineComponent({
   name: 'RatingChangesPanel',
@@ -252,6 +253,20 @@ export default defineComponent({
         loading.value = false;
       }
     };
+
+    const handleShowRatingPanel = () => {
+      if (gameFinished.value) {
+        dialog.value = true;
+      }
+    };
+
+    onMounted(() => {
+      eventBus.on('showRatingPanel', handleShowRatingPanel);
+    });
+
+    onBeforeUnmount(() => {
+      eventBus.off('showRatingPanel', handleShowRatingPanel);
+    });
 
     watch(dialog, (isOpen) => {
       if (isOpen && gameFinished.value) {

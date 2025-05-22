@@ -1,13 +1,14 @@
 {
   "name": "@avalon/backend",
-  "version": "53.6.1",
+  "version": "53.7.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "lint": "eslint . --ext .ts",
     "test": "jest --detectOpenHandles --colors",
     "start": "npx ts-node ./src/index.ts",
-    "dev": "npx nodemon"
+    "dev": "npx nodemon",
+    "init-achievements": "npx ts-node ./src/scripts/initAchievements.ts"
   },
   "keywords": [],
   "author": "@Razdva122",
