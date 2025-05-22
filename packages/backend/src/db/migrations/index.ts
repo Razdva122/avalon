@@ -1,12 +1,8 @@
 import type { Migration } from '@/db/migrations/interface';
-import { userFeaturesEventsMigration } from '@/db/migrations/userFeaturesEvents';
 
 export class MigrationManager {
   static async runMigrations(): Promise<void> {
-    const migrations: Migration[] = [
-      // Миграция для обработки пользовательских фич и вызова событий
-      userFeaturesEventsMigration,
-    ];
+    const migrations: Migration[] = [];
 
     for (const migration of migrations) {
       await migration.up();

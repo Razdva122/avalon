@@ -179,13 +179,6 @@ Ratings are calculated using the following algorithm:
 
 3. **Minimum Games**: Players need at least 10 games with a role to have a rating
 
-### Top-1 Recognition
-
-Players who achieve rank 1 in any role get a special recognition:
-
-- The `top1info` field in UserFeatures is updated with "TOP-1 'Rolename' DD.MM.YYYY"
-- This information can be displayed on the player's profile
-
 ### Rating Updates
 
 Ratings are updated automatically:

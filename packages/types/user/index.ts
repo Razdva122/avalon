@@ -74,12 +74,6 @@ export class UserFeatures {
   @prop()
   public isHelper?: boolean;
 
-  @prop()
-  public easterEggRevealed?: boolean;
-
-  @prop()
-  public top1info?: string;
-
   @prop({ type: Date })
   public lastEloResetAt?: Date;
 

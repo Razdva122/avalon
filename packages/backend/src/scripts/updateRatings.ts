@@ -102,14 +102,13 @@ export async function updateRatings(): Promise<void> {
   // Store a snapshot of all ratings for this date
   await storeRankingsSnapshot(new Date(), allRatings);
 
-  // Update top1info for users who have achieved rank 1
   await updateTop1Info(allRatings);
 
   console.log('Ratings update completed');
 }
 
 /**
- * Updates the top1info field for users who have achieved rank 1 in any role
+ * Emits playerReachTop1, for every player who got top-1
  */
 async function updateTop1Info(ratings: RatingData[]): Promise<void> {
   // Filter for users with rank 1 and rating > 0
