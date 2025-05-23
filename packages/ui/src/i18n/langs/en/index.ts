@@ -11,6 +11,7 @@ import history from './history';
 import ui from './ui';
 import errors from './errors';
 import modals from './modals';
+import achievements from './achievements';
 import pages from '@/i18n/langs/pages';
 
 export const en = {
@@ -23,5 +24,6 @@ export const en = {
   ...ui,
   ...errors,
   ...modals,
+  ...achievements,
   ...pages.en,
 };

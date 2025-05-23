@@ -16,7 +16,15 @@ export default defineComponent({
   },
   computed: {
     srcPath() {
-      if (['lady_of_lake', 'lady_of_sea', 'excailbur'].includes(this.avatarID)) {
+      if (this.avatarID === 'evil') {
+        return getImagePathByID('core', 'red_team_no_background');
+      }
+
+      if (this.avatarID === 'good') {
+        return getImagePathByID('core', 'blue_team_no_background');
+      }
+
+      if (['lady_of_lake', 'lady_of_sea', 'excalibur'].includes(this.avatarID)) {
         return getImagePathByID('features', this.avatarID);
       }
 

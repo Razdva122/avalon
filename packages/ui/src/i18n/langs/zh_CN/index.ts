@@ -12,6 +12,7 @@ import history from './history';
 import ui from './ui';
 import errors from './errors';
 import modals from './modals';
+import achievements from './achievements';
 
 export const zh_CN = {
   ...menu,
@@ -23,5 +24,6 @@ export const zh_CN = {
   ...ui,
   ...errors,
   ...modals,
+  ...achievements,
   ...pages['zh-CN'],
 };

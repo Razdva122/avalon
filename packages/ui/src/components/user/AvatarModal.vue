@@ -46,7 +46,13 @@ export default defineComponent({
     const initState = async () => {
       const avatars = await socket.emitWithAck('getUserAvatars');
 
-      state.value = avatars;
+      const sortedAvatars = [...avatars].sort((a, b) => {
+        if (a.available && !b.available) return -1;
+        if (!a.available && b.available) return 1;
+        return 0;
+      });
+
+      state.value = sortedAvatars;
     };
 
     onMounted(() => {

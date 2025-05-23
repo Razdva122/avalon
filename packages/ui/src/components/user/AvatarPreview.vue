@@ -87,6 +87,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .avatar-preview {
+  background-color: gray;
   width: 100px;
   height: 100px;
 }

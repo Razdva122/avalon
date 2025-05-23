@@ -2,10 +2,11 @@ import { DBManager } from '@/db';
 import { IAvatar } from '@/user/avatars/abstract';
 import { commonAvatars } from '@/user/avatars/common';
 import { ArgumentOfCallback } from '@avalon/types';
+import { achievementsAvatars } from '@/user/avatars/achievements';
 
 export class AvatarsManager {
   dbManager: DBManager;
-  avatars: IAvatar[] = [...commonAvatars];
+  avatars: IAvatar[] = [...commonAvatars, ...achievementsAvatars];
 
   constructor(dbManager: DBManager) {
     this.dbManager = dbManager;

@@ -1,5 +1,4 @@
 import { IAvatar } from '@/user/avatars/abstract';
-import { ACHIEVEMENT_TOP_PLAYER, ACHIEVEMENT_SECRET_HUNTER } from '@avalon/types';
 
 export class ServantAvatar {
   static id = 'servant';
@@ -35,27 +34,4 @@ export class AnimeMerlinPureAvatar {
   }
 }
 
-export class AnimeWitchAvatar {
-  static id = 'anime/witch';
-
-  static isAvailableForUser({ achievements }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
-    return achievements.includes(ACHIEVEMENT_TOP_PLAYER);
-  }
-}
-
-export class MysteryAvatar {
-  static id = 'mystery';
-
-  static isAvailableForUser({ achievements }: Parameters<IAvatar['isAvailableForUser']>[0]): boolean {
-    return achievements.includes(ACHIEVEMENT_SECRET_HUNTER);
-  }
-}
-
-export const commonAvatars: IAvatar[] = [
-  ServantAvatar,
-  LadyAvatar,
-  MerlinPureAvatar,
-  AnimeMerlinPureAvatar,
-  MysteryAvatar,
-  AnimeWitchAvatar,
-];
+export const commonAvatars: IAvatar[] = [ServantAvatar, LadyAvatar, MerlinPureAvatar, AnimeMerlinPureAvatar];
