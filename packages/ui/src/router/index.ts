@@ -41,6 +41,8 @@ const routeComponentMap = {
   profile: () => import('@/pages/profile/Profile.vue'),
   user_stats: () => import('@/pages/stats/UserStats.vue'),
   leaderboard: () => import('@/pages/leaderboard/Leaderboard.vue'),
+  user_achievements: () => import('@/pages/achievements/UserAchievements.vue'),
+  global_achievements: () => import('@/pages/achievements/GlobalAchievements.vue'),
 };
 
 export const routes: Array<RouteRecordRaw> = [

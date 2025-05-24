@@ -11,5 +11,6 @@ export default {
     about: 'О сайте',
     stats: 'Статистика',
     leaderboard: 'Таблица лидеров',
+    achievements: 'Достижения',
   },
 };

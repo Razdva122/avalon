@@ -11,5 +11,6 @@ export default {
     about: '关于',
     stats: '统计',
     leaderboard: '排行榜',
+    achievements: '成就',
   },
 };

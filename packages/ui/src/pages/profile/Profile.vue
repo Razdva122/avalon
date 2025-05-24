@@ -12,6 +12,12 @@
         </template>
         {{ $t('profile.stats') }}
       </v-btn>
+      <v-btn class="mb-4 w-100" size="large" @click="goToAchievements">
+        <template v-slot:prepend>
+          <span class="material-icons"> star </span>
+        </template>
+        {{ $t('menu.achievements') }}
+      </v-btn>
       <div class="mb-2">
         {{ $t('modal.email') }}: {{ $store.state.profile.email }}
         <span @click="updateEmail" class="material-icons email-change-icon"> edit </span>
@@ -161,6 +167,9 @@ export default defineComponent({
     },
     goToStats() {
       this.$router.push({ name: 'user_stats', params: { uuid: this.$store.state.profile!.id } });
+    },
+    goToAchievements() {
+      this.$router.push({ name: 'user_achievements', params: { uuid: this.$store.state.profile!.id } });
     },
     update() {
       this.$store.dispatch('updateUserName', { name: this.username });

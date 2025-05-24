@@ -11,5 +11,6 @@ export default {
     about: 'Acerca de',
     stats: 'Estadísticas',
     leaderboard: 'Tabla de clasificación',
+    achievements: 'Logros',
   },
 };

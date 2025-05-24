@@ -3,11 +3,26 @@
  */
 export default {
   achievements: {
+    // Page titles
+    userAchievementsTitle: 'User Achievements',
+    globalAchievementsTitle: 'Global Achievements',
+    viewPersonalAchievements: 'My Achievements',
+    viewGlobalAchievements: 'Global Statistics',
+
+    // Common achievement interface elements
+    summary: 'Achievement Summary',
+    completed: 'Completed',
+    openAchievements: 'Open Achievements',
+    hiddenAchievements: 'Hidden Achievements',
+    globalSummary: 'Global Achievement Statistics',
+    totalUsers: 'Total Players',
+    globalCompletion: '{percentage}% of players have unlocked this achievement',
+
     // Unlocked achievements
     light_wins: "There's nothing to fear but fear itself!",
-    light_wins_description: 'Win 5 times on the side of the forces of light',
+    light_wins_description: 'Win 10 times on the side of the forces of light',
     dark_wins: 'The Coming of Darkness',
-    dark_wins_description: 'Win 5 times on the side of the forces of darkness',
+    dark_wins_description: 'Win 10 times on the side of the forces of darkness',
     all_standard_roles: 'Jack of All Trades',
     all_standard_roles_description:
       'Win as @:roles.merlin , @:roles.percival , @:roles.mordred , @:roles.morgana , @:roles.oberon , @:roles.servant , @:roles.minion',
@@ -41,5 +56,11 @@ export default {
     bodyguard_description: 'While playing as @:roles.percival , be shot instead of @:roles.merlin',
     seer: 'Eren Kruger',
     seer_description: 'While playing as @:roles.servant , never take a dark side team member during the game',
+  },
+
+  // Achievement popups
+  achievementsPopup: {
+    unlocked: 'Achievement Unlocked',
+    progress: 'Achievement Progress',
   },
 };

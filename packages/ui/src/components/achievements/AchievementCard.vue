@@ -1,0 +1,206 @@
+<template>
+  <v-card
+    class="achievement-card"
+    :class="{
+      'achievement-card--locked': !isUnlocked && !isOpen,
+      'achievement-card--in-progress': !isUnlocked && isInProgress,
+    }"
+  >
+    <div class="achievement-card__content">
+      <div class="achievement-card__icon">
+        <v-icon v-if="!achievement.icon" size="large" icon="fa:fa-solid fa-trophy" />
+        <img v-else :src="achievement.icon" alt="Achievement icon" />
+      </div>
+      <div class="achievement-card__info">
+        <div class="achievement-card__name">{{ achievement.name }}</div>
+        <div class="achievement-card__description">{{ achievement.description }}</div>
+        <div v-if="showProgress && progress && shouldShowProgressBar" class="achievement-card__progress">
+          <v-progress-linear
+            :model-value="(progress.currentValue / progress.maxValue) * 100"
+            color="primary"
+            height="10"
+          />
+          <div class="achievement-card__progress-text">{{ progress.currentValue }} / {{ progress.maxValue }}</div>
+        </div>
+      </div>
+    </div>
+    <div v-if="showGlobalStats && globalStats" class="achievement-card__global-stats">
+      <div class="achievement-card__global-progress">
+        <v-progress-linear :model-value="globalStats.completionPercentage" color="primary" height="10" />
+      </div>
+      <div class="achievement-card__global-text">
+        {{ $t('achievements.globalCompletion', { percentage: globalStats.completionPercentage.toFixed(1) }) }}
+      </div>
+    </div>
+  </v-card>
+</template>
+
+<script lang="ts">
+import { getAchievementsText } from '@/helpers/achievements';
+import { defineComponent, computed, PropType } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { AchievementStats } from '@avalon/types';
+
+export interface AchievementProgress {
+  currentValue: number;
+  maxValue: number;
+}
+
+export default defineComponent({
+  name: 'AchievementCard',
+  props: {
+    achievementID: {
+      type: String,
+      required: true,
+    },
+    isUnlocked: {
+      type: Boolean,
+      default: false,
+    },
+    isOpen: {
+      type: Boolean,
+      default: false,
+    },
+    progress: {
+      type: Object as PropType<AchievementProgress>,
+      required: false,
+      default: null,
+    },
+    showProgress: {
+      type: Boolean,
+      default: true,
+    },
+    globalStats: {
+      type: Object as PropType<AchievementStats>,
+      required: false,
+      default: null,
+    },
+    showGlobalStats: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(props) {
+    const { t } = useI18n();
+
+    const achievement = computed(() => {
+      return {
+        name: t(`achievements.${props.achievementID}`),
+        description: getAchievementsText(props.achievementID, t(`achievements.${props.achievementID}_description`)),
+        icon: undefined,
+      };
+    });
+
+    // Определяем, находится ли достижение в процессе выполнения
+    const isInProgress = computed(() => {
+      return props.progress && props.progress.currentValue < props.progress.maxValue;
+    });
+
+    // Определяем, нужно ли показывать полоску прогресса
+    const shouldShowProgressBar = computed(() => {
+      return props.progress && props.progress.maxValue > 1;
+    });
+
+    return {
+      achievement,
+      isInProgress,
+      shouldShowProgressBar,
+    };
+  },
+});
+</script>
+
+<style scoped lang="scss">
+.achievement-card {
+  width: 100%;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+
+  &__content {
+    display: flex;
+    padding: 16px;
+  }
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    color: rgb(var(--v-theme-primary));
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &__info {
+    flex: 1;
+  }
+
+  &__name {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: rgb(var(--v-theme-text-primary));
+  }
+
+  &__description {
+    font-size: 14px;
+    color: rgb(var(--v-theme-text-secondary));
+    margin-bottom: 8px;
+  }
+
+  &__progress {
+    margin-top: 8px;
+
+    &-text {
+      font-size: 12px;
+      text-align: right;
+      margin-top: 4px;
+      color: rgb(var(--v-theme-text-secondary));
+    }
+  }
+
+  &__global-stats {
+    padding: 8px 16px;
+    font-size: 12px;
+    color: rgb(var(--v-theme-text-secondary));
+    border-top: 1px solid rgba(var(--v-theme-border), 0.12);
+  }
+
+  &__global-progress {
+    margin-bottom: 4px;
+  }
+
+  &__global-text {
+    text-align: right;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  &--in-progress {
+    opacity: 0.85;
+
+    .achievement-card__icon {
+      color: rgb(var(--v-theme-text-secondary));
+    }
+
+    .achievement-card__name,
+    .achievement-card__description {
+      color: rgb(var(--v-theme-text-secondary));
+    }
+  }
+
+  &--locked {
+    opacity: 0.7;
+
+    .achievement-card__icon {
+      color: rgb(var(--v-theme-text-secondary));
+    }
+  }
+}
+</style>

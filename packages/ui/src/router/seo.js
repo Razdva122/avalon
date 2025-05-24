@@ -33,6 +33,8 @@ const {
   profile,
   userStats,
   leaderboard,
+  userAchievements,
+  globalAchievements,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
@@ -426,6 +428,29 @@ module.exports.routesSeo = {
     meta: {
       multiLanguage: {
         ...notFound,
+      },
+      skipSiteMap: true,
+    },
+  },
+  user_achievements: {
+    path: '/achievements/user/:uuid/',
+    props: true,
+    name: 'user_achievements',
+    priority: 0.7,
+    meta: {
+      multiLanguage: {
+        ...userAchievements,
+      },
+      skipSiteMap: true,
+    },
+  },
+  global_achievements: {
+    path: '/achievements/global/',
+    name: 'global_achievements',
+    priority: 0.7,
+    meta: {
+      multiLanguage: {
+        ...globalAchievements,
       },
       skipSiteMap: true,
     },

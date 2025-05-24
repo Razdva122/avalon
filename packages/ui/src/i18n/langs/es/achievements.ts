@@ -3,10 +3,26 @@
  */
 export default {
   achievements: {
+    // Títulos de páginas
+    userAchievementsTitle: 'Logros del usuario',
+    globalAchievementsTitle: 'Logros globales',
+    viewPersonalAchievements: 'Mis logros',
+    viewGlobalAchievements: 'Estadísticas globales',
+
+    // Elementos comunes de la interfaz de logros
+    summary: 'Resumen de logros',
+    completed: 'Completado',
+    openAchievements: 'Logros abiertos',
+    hiddenAchievements: 'Logros ocultos',
+    globalSummary: 'Estadísticas de logros globales',
+    totalUsers: 'Jugadores totales',
+    globalCompletion: '{percentage}% de los jugadores han desbloqueado este logro',
+
+    // Logros desbloqueados
     light_wins: '¡No hay nada que temer, excepto al propio miedo!',
-    light_wins_description: 'Ganar 5 veces del lado de las fuerzas de la luz',
+    light_wins_description: 'Ganar 10 veces del lado de las fuerzas de la luz',
     dark_wins: 'La llegada de la oscuridad',
-    dark_wins_description: 'Ganar 5 veces del lado de las fuerzas de la oscuridad',
+    dark_wins_description: 'Ganar 10 veces del lado de las fuerzas de la oscuridad',
     all_standard_roles: 'Todólogo',
     all_standard_roles_description:
       'Ganar como @:roles.merlin , @:roles.percival , @:roles.mordred , @:roles.morgana , @:roles.oberon , @:roles.servant , @:roles.minion',
@@ -19,6 +35,7 @@ export default {
     secret_hunter: 'Cazador de secretos',
     secret_hunter_description: 'Encontrar un secreto en el sitio',
 
+    // Logros ocultos
     undercover_agent: '¡No puedes manejar la verdad!',
     undercover_agent_description:
       'Jugando como @:roles.merlin , llevar a @:roles.morgana en tu equipo 2 veces durante una partida y ganar',
@@ -39,5 +56,11 @@ export default {
     bodyguard_description: 'Jugando como @:roles.percival , ser disparado en lugar de @:roles.merlin',
     seer: 'Eren Kruger',
     seer_description: 'Jugando como @:roles.servant , nunca llevar a un miembro del lado oscuro durante la partida',
+  },
+
+  // Popups de logros
+  achievementsPopup: {
+    unlocked: 'Logro Desbloqueado',
+    progress: 'Progreso del Logro',
   },
 };

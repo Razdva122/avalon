@@ -3,10 +3,26 @@
  */
 export default {
   achievements: {
+    // Заголовки страниц достижений
+    userAchievementsTitle: 'Достижения пользователя',
+    globalAchievementsTitle: 'Глобальные достижения',
+    viewPersonalAchievements: 'Мои достижения',
+    viewGlobalAchievements: 'Глобальная статистика',
+
+    // Общие элементы интерфейса достижений
+    summary: 'Сводка достижений',
+    completed: 'Выполнено',
+    openAchievements: 'Открытые достижения',
+    hiddenAchievements: 'Скрытые достижения',
+    globalSummary: 'Глобальная статистика достижений',
+    totalUsers: 'Всего игроков',
+    globalCompletion: '{percentage}% игроков разблокировали это достижение',
+
+    // Открытые достижения
     light_wins: 'Бояться нечего кроме самого страха!',
-    light_wins_description: 'Победить 5 раз на стороне сил света',
+    light_wins_description: 'Победить 10 раз на стороне сил света',
     dark_wins: 'Пришествие тьмы',
-    dark_wins_description: 'Победить 5 раз на стороне сил тьмы',
+    dark_wins_description: 'Победить 10 раз на стороне сил тьмы',
     all_standard_roles: 'На все руки мастер',
     all_standard_roles_description:
       'Победить на @:roles.merlin , @:roles.percival , @:roles.mordred , @:roles.morgana , @:roles.oberon , @:roles.servant , @:roles.minion',
@@ -39,5 +55,11 @@ export default {
     bodyguard_description: 'Играя на @:roles.percival быть застреленным вместо @:roles.merlin',
     seer: 'Эрен Крюгер',
     seer_description: 'Играя на @:roles.servant не разу за игру не взять команду сил тьмы',
+  },
+
+  // Попапы достижений
+  achievementsPopup: {
+    unlocked: 'Достижение разблокировано',
+    progress: 'Прогресс достижения',
   },
 };

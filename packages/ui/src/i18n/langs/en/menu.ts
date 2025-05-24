@@ -11,5 +11,6 @@ export default {
     about: 'About',
     stats: 'Statistics',
     leaderboard: 'Leaderboard',
+    achievements: 'Achievements',
   },
 };

@@ -29,6 +29,8 @@ import { revealer } from '@/i18n/langs/pages/roles/revealer';
 import { stats } from '@/i18n/langs/pages/stats';
 import { userStats } from '@/i18n/langs/pages/userStats';
 import { leaderboard } from '@/i18n/langs/pages/leaderboard';
+import { userAchievements } from '@/i18n/langs/pages/userAchievements';
+import { globalAchievements } from '@/i18n/langs/pages/globalAchievements';
 
 export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
   en: {},
@@ -68,6 +70,8 @@ Object.entries({
   stats,
   userStats,
   leaderboard,
+  userAchievements,
+  globalAchievements,
 }).forEach(([key, value]) => {
   Object.keys(pages).forEach((lang) => {
     pages[<TLanguage>lang][key] = value[<TLanguage>lang];

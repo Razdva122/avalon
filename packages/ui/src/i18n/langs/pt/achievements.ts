@@ -1,9 +1,28 @@
+/**
+ * Traduções de conquistas para o idioma português
+ */
 export default {
   achievements: {
+    // Títulos de páginas
+    userAchievementsTitle: 'Conquistas do usuário',
+    globalAchievementsTitle: 'Conquistas globais',
+    viewPersonalAchievements: 'Minhas conquistas',
+    viewGlobalAchievements: 'Estatísticas globais',
+
+    // Elementos comuns da interface de conquistas
+    summary: 'Resumo de conquistas',
+    completed: 'Concluído',
+    openAchievements: 'Conquistas abertas',
+    hiddenAchievements: 'Conquistas ocultas',
+    globalSummary: 'Estatísticas de conquistas globais',
+    totalUsers: 'Total de jogadores',
+    globalCompletion: '{percentage}% dos jogadores desbloquearam esta conquista',
+
+    // Conquistas desbloqueadas
     light_wins: 'Nada a temer além do próprio medo!',
-    light_wins_description: 'Vencer 5 vezes do lado das forças da luz',
+    light_wins_description: 'Vencer 10 vezes do lado das forças da luz',
     dark_wins: 'A chegada da escuridão',
-    dark_wins_description: 'Vencer 5 vezes do lado das forças das trevas',
+    dark_wins_description: 'Vencer 10 vezes do lado das forças das trevas',
     all_standard_roles: 'Faz-tudo',
     all_standard_roles_description:
       'Vencer como @:roles.merlin , @:roles.percival , @:roles.mordred , @:roles.morgana , @:roles.oberon , @:roles.servant , @:roles.minion',
@@ -16,6 +35,7 @@ export default {
     secret_hunter: 'Caçador de segredos',
     secret_hunter_description: 'Encontrar um segredo no site',
 
+    // Conquistas ocultas
     undercover_agent: 'Você não aguenta a verdade!',
     undercover_agent_description:
       'Jogando como @:roles.merlin , levar @:roles.morgana em sua equipe 2 vezes durante um jogo e vencer',
@@ -36,5 +56,11 @@ export default {
     bodyguard_description: 'Jogando como @:roles.percival , ser baleado no lugar de @:roles.merlin',
     seer: 'Eren Kruger',
     seer_description: 'Jogando como @:roles.servant , nunca levar um membro do lado das trevas durante o jogo',
+  },
+
+  // Popups de conquistas
+  achievementsPopup: {
+    unlocked: 'Conquista Desbloqueada',
+    progress: 'Progresso da Conquista',
   },
 };

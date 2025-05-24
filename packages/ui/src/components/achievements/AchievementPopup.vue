@@ -1,5 +1,9 @@
 <template>
-  <div class="achievement-popup" :class="{ 'achievement-popup--progress': type === 'progress' }">
+  <div
+    class="achievement-popup"
+    :class="{ 'achievement-popup--progress': type === 'progress' }"
+    @click="navigateToUserAchievements"
+  >
     <div class="achievement-popup__content">
       <div class="achievement-popup__icon">
         <v-icon v-if="!achievement.icon" size="large" icon="fa:fa-solid fa-trophy" />
@@ -22,7 +26,7 @@
       </div>
     </div>
     <v-btn
-      @click="$emit('close')"
+      @click.stop="$emit('close')"
       class="achievement-popup__close"
       icon="close"
       color="text-primary"
@@ -36,6 +40,8 @@
 import { getAchievementsText } from '@/helpers/achievements';
 import { defineComponent, computed, PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { store } from '@/store';
 
 export interface AchievementProgress {
   currentValue: number;
@@ -63,6 +69,7 @@ export default defineComponent({
   emits: ['close'],
   setup(props) {
     const { t } = useI18n();
+    const router = useRouter();
 
     const achievement = computed(() => {
       return {
@@ -72,8 +79,18 @@ export default defineComponent({
       };
     });
 
+    // Функция для перехода на страницу личных достижений
+    const navigateToUserAchievements = () => {
+      const userID = store.state.profile?.id;
+      if (userID) {
+        router.push(`/achievements/user/${userID}/`);
+      }
+      // Если пользователь не авторизован, ничего не делаем
+    };
+
     return {
       achievement,
+      navigateToUserAchievements,
     };
   },
 });
@@ -89,6 +106,7 @@ export default defineComponent({
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   margin-bottom: 16px;
   animation: slide-in 0.3s ease-out;
+  cursor: pointer;
 
   &__content {
     display: flex;
