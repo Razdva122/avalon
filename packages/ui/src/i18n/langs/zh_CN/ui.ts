@@ -3,6 +3,10 @@
  * This file contains translations for common UI elements
  */
 export default {
+  achievementsPopup: {
+    unlocked: '成就解锁',
+    progress: '成就进度',
+  },
   startPanel: {
     copyLink: '复制连结',
     discord: 'Discord',

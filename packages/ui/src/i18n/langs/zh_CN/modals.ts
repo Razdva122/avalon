@@ -29,7 +29,6 @@ export default {
     linkCopied: '连结已复制到剪贴簿',
     loginToCreate: '登入创建游戏',
     close: '关闭',
-    secretAvatar: '秘密头像已解锁',
     loginChanged: '账号已更改',
     emailChanged: '电子邮件已更改',
     passwordChanged: '密码已更改',

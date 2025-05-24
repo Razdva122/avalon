@@ -38,7 +38,6 @@ export class AchievementHandlers {
 
   constructor(achievementService: AchievementService) {
     this.achievementService = achievementService;
-    eventBus.on('processGame', (game) => this.handleGameEnd(game));
     eventBus.on('playerReachTop1', (playerID) => this.processEvents('top1', playerID));
     eventBus.on('playerRevealSecret', (playerID) => this.processEvents('secret', playerID));
   }

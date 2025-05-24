@@ -29,7 +29,6 @@ export default {
     linkCopied: 'Link foi copiado para a área de transferência',
     loginToCreate: 'Faça login para criar um jogo',
     close: 'Fechar',
-    secretAvatar: 'Avatar Secreto Revelado',
     loginChanged: 'Login alterado',
     emailChanged: 'E-mail alterado',
     passwordChanged: 'Senha alterada',

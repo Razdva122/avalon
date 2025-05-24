@@ -8,7 +8,7 @@ import { zh_CN } from '@/i18n/langs/zh_CN';
 import { zh_TW } from '@/i18n/langs/zh_TW';
 import { pt } from '@/i18n/langs/pt';
 
-export const translates: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
+export const translates: { [key in TLanguage]: Dictionary<Dictionary<string> | Dictionary<Dictionary<string>>> } = {
   en,
   ru,
   es,

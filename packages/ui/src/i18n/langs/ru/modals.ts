@@ -29,7 +29,6 @@ export default {
     linkCopied: 'Ссылка скопирована',
     loginToCreate: 'Войдите, чтобы создать игру',
     close: 'Закрыть',
-    secretAvatar: 'Секретный аватар раскрыт',
     loginChanged: 'Логин изменён',
     emailChanged: 'Email изменён',
     passwordChanged: 'Пароль изменён',

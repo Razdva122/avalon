@@ -24,7 +24,7 @@ import {
 /**
  * Данные для инициализации достижений
  */
-export const achievementsData: Partial<Achievement>[] = [
+export const achievementsData: Achievement[] = [
   // Открытые достижения
   {
     id: ACHIEVEMENT_LIGHT_WINS,

@@ -28,6 +28,7 @@
   <AuthModal />
   <CredentialsModal />
   <InfoSnackbar />
+  <AchievementPopupsContainer />
   <Version class="version" />
 </template>
 
@@ -43,6 +44,7 @@ import Socials from '@/components/feedback/Socials.vue';
 import SpoilerEye from '@/components/feedback/SpoilerEye.vue';
 import ThemeToggle from '@/components/feedback/ThemeToggle.vue';
 import DevPanel from '@/components/dev/DevPanel.vue';
+import AchievementPopupsContainer from '@/components/achievements/AchievementPopupsContainer.vue';
 import { isHolidays } from '@/helpers/utility';
 import eventBus from '@/helpers/event-bus';
 
@@ -58,6 +60,7 @@ export default defineComponent({
     ThemeToggle,
     CredentialsModal,
     DevPanel,
+    AchievementPopupsContainer,
   },
   data() {
     return {

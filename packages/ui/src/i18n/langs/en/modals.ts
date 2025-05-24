@@ -29,7 +29,6 @@ export default {
     linkCopied: 'Link has been copied to the clipboard',
     loginToCreate: 'Log in to create a game',
     close: 'Close',
-    secretAvatar: 'Secret Avatar Revealed',
     loginChanged: 'Login changed',
     emailChanged: 'Email changed',
     passwordChanged: 'Password changed',

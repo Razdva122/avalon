@@ -3,6 +3,10 @@
  * This file contains translations for common UI elements
  */
 export default {
+  achievementsPopup: {
+    unlocked: 'Conquista Desbloqueada',
+    progress: 'Progresso da Conquista',
+  },
   startPanel: {
     copyLink: 'Copiar link',
     discord: 'Discord',
