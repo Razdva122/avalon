@@ -17,6 +17,9 @@ export default {
     globalSummary: 'Estatísticas de conquistas globais',
     totalUsers: 'Total de jogadores',
     globalCompletion: '{percentage}% dos jogadores desbloquearam esta conquista',
+    rolesProgress: 'Progresso por papéis',
+    playerCountsProgress: 'Progresso por número de jogadores',
+    players: 'jogadores',
 
     // Conquistas desbloqueadas
     light_wins: 'Nada a temer além do próprio medo!',

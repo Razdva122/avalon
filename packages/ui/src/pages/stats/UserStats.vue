@@ -19,22 +19,28 @@
 
     <h2>{{ $t('userStats.lastGamesStatsTitle') }}</h2>
     <v-data-table :headers="lastGamesHeaders" :items="lastGames" hide-default-footer disable-sort>
-      <template v-slot:item.role="{ value }">
-        <PreviewLink :target="value" />
-      </template>
-      <template v-slot:item.isWin="{ value }">
-        <v-chip v-if="value" color="green"> {{ $t('userStats.winResult') }}</v-chip>
-        <v-chip v-else color="red"> {{ $t('userStats.loseResult') }}</v-chip>
-      </template>
-      <template v-slot:item.ratingChange="{ value }">
-        <v-chip v-if="value.change > 0" color="success" variant="flat" size="small">{{ value.string }}</v-chip>
-        <v-chip v-else-if="value.change < 0" color="error" variant="flat" size="small">{{ value.string }}</v-chip>
-        <span v-else>—</span>
-      </template>
-      <template v-slot:item.gameID="{ value }" v-if="!isMobile">
-        <div class="gameID" @click="$router.push({ name: 'room', params: { uuid: value } })">
-          {{ value }}
-        </div>
+      <template v-slot:item="{ item }">
+        <tr class="game-row" @click="navigateToGame(item.gameID)">
+          <td>
+            <PreviewLink :target="item.role" />
+          </td>
+          <td>
+            <v-chip v-if="item.isWin" color="green"> {{ $t('userStats.winResult') }}</v-chip>
+            <v-chip v-else color="red"> {{ $t('userStats.loseResult') }}</v-chip>
+          </td>
+          <td>
+            <v-chip v-if="item.ratingChange?.change > 0" color="success" variant="flat" size="small">{{
+              item.ratingChange.string
+            }}</v-chip>
+            <v-chip v-else-if="item.ratingChange?.change < 0" color="error" variant="flat" size="small">{{
+              item.ratingChange.string
+            }}</v-chip>
+            <span v-else>—</span>
+          </td>
+          <td v-if="!isMobile">
+            {{ item.gameID }}
+          </td>
+        </tr>
       </template>
     </v-data-table>
 
@@ -103,6 +109,7 @@ import {
   prepareGamesForView,
   preparePlayerStats,
 } from '@/helpers/stats';
+
 import { socket } from '@/api/socket';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import TeammateProfile from '@/components/stats/TeammateProfile.vue';
@@ -131,7 +138,7 @@ export default defineComponent({
   async setup(props) {
     const state = ref<TUserStats>();
     const gamesState = ref<VisualGameState[]>();
-    const lastGames = ref<TGameView[]>();
+    const lastGames = ref<(TGameView & { ratingChange: { string: string; change: number } })[]>();
     const teammates = ref<TTeammateStats[]>();
     const enemies = ref<TTeammateStats[]>();
     const { t } = useI18n();
@@ -147,30 +154,22 @@ export default defineComponent({
       // Fetch TrueSkill changes for each game
       const lastGamesWithRating = await Promise.all(
         lastGamesData.map(async (game) => {
-          try {
-            // Get all TrueSkill changes for this specific game
-            const result = await socket.emitWithAck('getMatchTrueSkillChanges', game.gameID);
+          // Get all TrueSkill changes for this specific game
+          const result = await socket.emitWithAck('getMatchTrueSkillChanges', game.gameID);
 
-            if (!result.success || result.error) {
-              return { ...game, ratingChange: null };
-            }
+          // Find the TrueSkill change for the current user
+          const userRatingChange = result.gameResult?.playerChanges.find((change) => change.userID === uuid) || {
+            newMu: 0,
+            muChange: 0,
+          };
 
-            // Find the TrueSkill change for the current user
-            const userRatingChange = result.gameResult?.playerChanges.find((change) => change.userID === uuid);
-
-            return {
-              ...game,
-              ratingChange: userRatingChange
-                ? {
-                    string: `${Math.round(userRatingChange.newMu)} (${userRatingChange.muChange > 0 ? '+' : ''}${Math.round(userRatingChange.muChange)})`,
-                    change: userRatingChange.muChange,
-                  }
-                : null,
-            };
-          } catch (error) {
-            console.error('Error fetching TrueSkill change for game:', game.gameID, error);
-            return { ...game, ratingChange: null };
-          }
+          return {
+            ...game,
+            ratingChange: {
+              string: `${Math.round(userRatingChange.newMu)} (${userRatingChange.muChange > 0 ? '+' : ''}${Math.round(userRatingChange.muChange)})`,
+              change: userRatingChange.muChange,
+            },
+          };
         }),
       );
 
@@ -194,6 +193,10 @@ export default defineComponent({
 
     const navigateToPlayerStats = (playerID: string) => {
       router.push({ name: 'user_stats', params: { uuid: playerID } });
+    };
+
+    const navigateToGame = (gameID: string) => {
+      router.push({ name: 'room', params: { uuid: gameID } });
     };
 
     await initState(props.uuid);
@@ -257,6 +260,7 @@ export default defineComponent({
       lastGamesHeaders,
       generalTable,
       navigateToPlayerStats,
+      navigateToGame,
       enemies,
       teammates,
       teammatesHeaders,
@@ -312,13 +316,15 @@ export default defineComponent({
 }
 
 .teammate-row,
-.enemy-row {
+.enemy-row,
+.game-row {
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .teammate-row:hover,
-.enemy-row:hover {
+.enemy-row:hover,
+.game-row:hover {
   background-color: rgba(var(--v-theme-primary), 0.1);
 }
 

@@ -1,8 +1,8 @@
 <template>
   <div class="info-page-content achievements-page">
-    <div class="d-flex justify-space-between align-center mb-4">
+    <div class="page-header mb-4">
       <h1>{{ $t('achievements.userAchievementsTitle') }}</h1>
-      <v-btn color="primary" to="/achievements/global/" variant="outlined">
+      <v-btn color="primary" to="/achievements/global/" variant="outlined" class="navigation-btn">
         {{ $t('achievements.viewGlobalAchievements') }}
       </v-btn>
     </div>
@@ -12,8 +12,10 @@
     </div>
 
     <template v-else>
+      <UserProfileHeader :uuid="uuid" class="mb-4" />
+
       <div class="achievements-summary">
-        <v-card class="mb-4">
+        <v-card class="mb-4 summary-card">
           <v-card-text>
             <div class="d-flex justify-space-between align-center flex-wrap">
               <div class="achievements-summary__stats">
@@ -42,6 +44,9 @@
           :isOpen="true"
           :progress="achievement.progress"
           :showProgress="true"
+          :metadata="achievement.metadata"
+          :state="achievement.state"
+          :showDetailedProgress="shouldShowDetailedProgress(achievement.id)"
         />
       </div>
 
@@ -55,6 +60,9 @@
           :isOpen="false"
           :progress="achievement.progress"
           :showProgress="true"
+          :metadata="achievement.metadata"
+          :state="achievement.state"
+          :showDetailedProgress="shouldShowDetailedProgress(achievement.id)"
         />
       </div>
     </template>
@@ -63,13 +71,12 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { socket } from '@/api/socket';
-import { store } from '@/store';
 import AchievementCard from '@/components/achievements/AchievementCard.vue';
+import UserProfileHeader from '@/components/stats/UserProfileHeader.vue';
 import { Achievement, AchievementType } from '@avalon/types';
-import { OPEN_ACHIEVEMENT_IDS } from '@avalon/types';
+import { ACHIEVEMENT_ALL_STANDARD_ROLES, ACHIEVEMENT_DIFFERENT_PLAYER_COUNT } from '@avalon/types';
 
 interface UserAchievementData {
   id: string;
@@ -79,12 +86,18 @@ interface UserAchievementData {
     currentValue: number;
     maxValue: number;
   };
+  metadata?: {
+    roles?: string[];
+    playerCounts?: number[];
+  };
+  state?: Record<string, boolean>;
 }
 
 export default defineComponent({
   name: 'UserAchievements',
   components: {
     AchievementCard,
+    UserProfileHeader,
   },
   props: {
     uuid: {
@@ -124,6 +137,8 @@ export default defineComponent({
                 currentValue: userAchievement?.currentProgress || 0,
                 maxValue: achievement.requirement,
               },
+              metadata: achievement.metadata as { roles?: string[]; playerCounts?: number[] },
+              state: (userAchievement?.state as Record<string, boolean>) || {},
             };
           });
         }
@@ -175,6 +190,15 @@ export default defineComponent({
       completionPercentage,
     };
   },
+  methods: {
+    /**
+     * Определяет, нужно ли показывать детальный прогресс для достижения
+     */
+    shouldShowDetailedProgress(achievementID: string): boolean {
+      // Показываем детальный прогресс только для достижений с ролями и количеством игроков
+      return [ACHIEVEMENT_ALL_STANDARD_ROLES, ACHIEVEMENT_DIFFERENT_PLAYER_COUNT].includes(achievementID);
+    },
+  },
 });
 </script>
 
@@ -183,6 +207,17 @@ export default defineComponent({
 
 .achievements-page {
   padding-bottom: 40px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .achievements-grid {
@@ -206,5 +241,9 @@ export default defineComponent({
   &__stats {
     margin-right: 16px;
   }
+}
+
+.summary-card {
+  background-color: rgb(var(--v-theme-surface-light));
 }
 </style>

@@ -2,8 +2,18 @@
   <div v-if="userState.status === 'ready'" class="preview-profile">
     <Avatar class="avatar mr-2" :avatarID="userState.profile.avatar" />
     <div class="profile-info">
-      <div class="profile-username">
-        {{ userState.profile.name }}
+      <div class="profile-header-container">
+        <div class="profile-username">
+          {{ userState.profile.name }}
+        </div>
+        <div class="profile-nav-icons">
+          <v-btn icon variant="text" density="comfortable" size="small" :to="`/stats/user/${uuid}`">
+            <span class="material-icons profile-icon">insights</span>
+          </v-btn>
+          <v-btn icon variant="text" density="comfortable" size="small" :to="`/achievements/user/${uuid}`">
+            <span class="material-icons profile-icon">emoji_events</span>
+          </v-btn>
+        </div>
       </div>
       <div class="info-hint">id: {{ uuid }}</div>
       <div class="profile-stats-container">
@@ -87,6 +97,21 @@ export default defineComponent({
 .avatar {
   width: 150px;
   height: 150px;
+}
+
+.profile-header-container {
+  display: flex;
+  align-items: center;
+}
+
+.profile-nav-icons {
+  display: flex;
+  gap: 4px;
+  margin-left: 12px;
+}
+
+.profile-icon {
+  color: rgb(var(--v-theme-text-primary));
 }
 
 .profile-stats-container {

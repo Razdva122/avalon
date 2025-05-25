@@ -17,6 +17,9 @@ export default {
     globalSummary: 'Global Achievement Statistics',
     totalUsers: 'Total Players',
     globalCompletion: '{percentage}% of players have unlocked this achievement',
+    rolesProgress: 'Roles Progress',
+    playerCountsProgress: 'Player Count Progress',
+    players: 'players',
 
     // Unlocked achievements
     light_wins: "There's nothing to fear but fear itself!",

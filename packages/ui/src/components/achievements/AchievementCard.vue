@@ -22,6 +22,46 @@
           />
           <div class="achievement-card__progress-text">{{ progress.currentValue }} / {{ progress.maxValue }}</div>
         </div>
+
+        <!-- Отображение прогресса по ролям -->
+        <div v-if="showDetailedProgress && metadata?.roles && state" class="achievement-card__detailed-progress">
+          <div class="achievement-card__detailed-title">{{ $t('achievements.rolesProgress') }}</div>
+          <div class="achievement-card__detailed-grid">
+            <div
+              v-for="role in metadata.roles"
+              :key="role"
+              class="achievement-card__detailed-item"
+              :class="{ completed: state[role] }"
+            >
+              <v-icon
+                :icon="state[role] ? 'fa:fa-solid fa-check' : 'fa:fa-solid fa-times'"
+                :color="state[role] ? 'success' : 'error'"
+                size="small"
+              />
+              <span>{{ $t(`roles.${role}`) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Отображение прогресса по количеству игроков -->
+        <div v-if="showDetailedProgress && metadata?.playerCounts && state" class="achievement-card__detailed-progress">
+          <div class="achievement-card__detailed-title">{{ $t('achievements.playerCountsProgress') }}</div>
+          <div class="achievement-card__detailed-grid">
+            <div
+              v-for="count in metadata.playerCounts"
+              :key="count"
+              class="achievement-card__detailed-item"
+              :class="{ completed: state[count] }"
+            >
+              <v-icon
+                :icon="state[count] ? 'fa:fa-solid fa-check' : 'fa:fa-solid fa-times'"
+                :color="state[count] ? 'success' : 'error'"
+                size="small"
+              />
+              <span>{{ count }} {{ $t('achievements.players') }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div v-if="showGlobalStats && globalStats" class="achievement-card__global-stats">
@@ -79,6 +119,20 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    metadata: {
+      type: Object as PropType<{ roles?: string[]; playerCounts?: number[] }>,
+      required: false,
+      default: null,
+    },
+    state: {
+      type: Object as PropType<Record<string, boolean>>,
+      required: false,
+      default: () => ({}),
+    },
+    showDetailedProgress: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props) {
     const { t } = useI18n();
@@ -114,6 +168,7 @@ export default defineComponent({
 .achievement-card {
   width: 100%;
   margin-bottom: 16px;
+  background-color: rgb(var(--v-theme-surface-light));
   transition: all 0.3s ease;
 
   &__content {
@@ -162,6 +217,45 @@ export default defineComponent({
       text-align: right;
       margin-top: 4px;
       color: rgb(var(--v-theme-text-secondary));
+    }
+  }
+
+  &__detailed-progress {
+    margin-top: 16px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(var(--v-theme-border), 0.12);
+  }
+
+  &__detailed-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: rgb(var(--v-theme-text-primary));
+  }
+
+  &__detailed-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+
+    @media (min-width: 600px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &__detailed-item {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    padding: 4px;
+    border-radius: 4px;
+
+    &.completed {
+      background-color: rgba(var(--v-theme-success), 0.1);
+    }
+
+    .v-icon {
+      margin-right: 4px;
     }
   }
 

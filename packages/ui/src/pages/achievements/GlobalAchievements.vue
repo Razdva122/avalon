@@ -1,8 +1,14 @@
 <template>
   <div class="info-page-content achievements-page">
-    <div class="d-flex justify-space-between align-center mb-4">
+    <div class="page-header mb-4">
       <h1>{{ $t('achievements.globalAchievementsTitle') }}</h1>
-      <v-btn v-if="isUserLoggedIn" color="primary" :to="`/achievements/user/${userID}/`" variant="outlined">
+      <v-btn
+        v-if="isUserLoggedIn"
+        color="primary"
+        :to="`/achievements/user/${userID}/`"
+        variant="outlined"
+        class="navigation-btn"
+      >
         {{ $t('achievements.viewPersonalAchievements') }}
       </v-btn>
     </div>
@@ -12,19 +18,6 @@
     </div>
 
     <template v-else>
-      <div class="achievements-summary">
-        <v-card class="mb-4">
-          <v-card-text>
-            <div class="d-flex justify-space-between align-center flex-wrap">
-              <div class="achievements-summary__stats">
-                <div class="text-h6">{{ $t('achievements.globalSummary') }}</div>
-                <div class="text-subtitle-1">{{ $t('achievements.totalUsers') }}: {{ totalUsers }}</div>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </div>
-
       <h2>{{ $t('achievements.openAchievements') }}</h2>
       <div class="achievements-grid">
         <achievement-card
@@ -58,7 +51,6 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
 import { store } from '@/store';
 import AchievementCard from '@/components/achievements/AchievementCard.vue';
@@ -76,10 +68,8 @@ export default defineComponent({
     AchievementCard,
   },
   setup() {
-    const { t } = useI18n();
     const loading = ref(true);
     const achievements = ref<GlobalAchievementData[]>([]);
-    const totalUsers = ref(0);
 
     const fetchGlobalAchievements = async () => {
       try {
@@ -94,10 +84,6 @@ export default defineComponent({
           return;
         }
 
-        // Получаем общее количество пользователей
-        // Это может быть получено из другого эндпоинта или вычислено
-        totalUsers.value = statsResponse.stats?.[0]?.totalUsers || 0;
-
         // Преобразуем данные в формат для отображения
         if (achievementsResponse.achievements && statsResponse.stats) {
           achievements.value = achievementsResponse.achievements.map((achievement: Achievement) => {
@@ -108,7 +94,7 @@ export default defineComponent({
               type: achievement.type,
               stats: stats || {
                 achievementID: achievement.id,
-                totalUsers: totalUsers.value,
+                totalUsers: statsResponse.stats?.[0]?.totalUsers || 0,
                 completedUsers: 0,
                 completionPercentage: 0,
               },
@@ -147,7 +133,6 @@ export default defineComponent({
       achievements,
       openAchievements,
       hiddenAchievements,
-      totalUsers,
       isUserLoggedIn,
       userID,
     };
@@ -160,6 +145,17 @@ export default defineComponent({
 
 .achievements-page {
   padding-bottom: 40px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .achievements-grid {

@@ -17,6 +17,9 @@ export default {
     globalSummary: 'Estadísticas de logros globales',
     totalUsers: 'Jugadores totales',
     globalCompletion: '{percentage}% de los jugadores han desbloqueado este logro',
+    rolesProgress: 'Progreso por roles',
+    playerCountsProgress: 'Progreso por número de jugadores',
+    players: 'jugadores',
 
     // Logros desbloqueados
     light_wins: '¡No hay nada que temer, excepto al propio miedo!',

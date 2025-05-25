@@ -17,6 +17,9 @@ export default {
     globalSummary: 'Глобальная статистика достижений',
     totalUsers: 'Всего игроков',
     globalCompletion: '{percentage}% игроков разблокировали это достижение',
+    rolesProgress: 'Прогресс по ролям',
+    playerCountsProgress: 'Прогресс по количеству игроков',
+    players: 'игроков',
 
     // Открытые достижения
     light_wins: 'Бояться нечего кроме самого страха!',

@@ -39,7 +39,7 @@
                 dense
               >
                 <template v-slot:item.userID="{ item }">
-                  <div class="player-cell">
+                  <div class="player-cell" @click="navigateToPlayerStats(item.userID)">
                     <UserPreview :userID="item.userID" size="large"></UserPreview>
                   </div>
                 </template>
@@ -94,7 +94,7 @@
                 dense
               >
                 <template v-slot:item.userID="{ item }">
-                  <div class="player-cell">
+                  <div class="player-cell" @click="navigateToPlayerStats(item.userID)">
                     <UserPreview :userID="item.userID" size="large"></UserPreview>
                   </div>
                 </template>
@@ -138,6 +138,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import { socket } from '@/api/socket';
 import type { VisualGameState, GameTrueSkillResult } from '@avalon/types';
 import UserPreview from '@/components/user/UserPreview.vue';
@@ -165,6 +166,7 @@ export default defineComponent({
   },
   setup(props) {
     const { t } = useI18n();
+    const router = useRouter();
     const dialog = ref(false);
     const loading = ref(false);
     const error = ref('');
@@ -274,6 +276,10 @@ export default defineComponent({
       }
     });
 
+    const navigateToPlayerStats = (uuid: string) => {
+      router.push({ name: 'user_stats', params: { uuid } });
+    };
+
     return {
       dialog,
       loading,
@@ -285,6 +291,7 @@ export default defineComponent({
       gameFinished,
       gameResult,
       isMobile,
+      navigateToPlayerStats,
     };
   },
 });
@@ -365,6 +372,7 @@ export default defineComponent({
 }
 
 .player-cell {
+  cursor: pointer;
   display: flex;
   align-items: center;
 }

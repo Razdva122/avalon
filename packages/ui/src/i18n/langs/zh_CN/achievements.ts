@@ -17,6 +17,9 @@ export default {
     globalSummary: '全球成就统计',
     totalUsers: '总玩家数',
     globalCompletion: '{percentage}%的玩家已解锁此成就',
+    rolesProgress: '角色进度',
+    playerCountsProgress: '玩家数量进度',
+    players: '玩家',
 
     // 公开成就
     light_wins: '除了恐惧本身，别无所惧！',
