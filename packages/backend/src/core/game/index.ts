@@ -314,6 +314,8 @@ export class Game extends GameHooks {
   finishCurrentRound(): void {
     this.clearSendPlayers();
     this.history.push(this.currentMission);
+    // Mark that we need a delay for the next timer (mission results display)
+    this.timer.setHistoryDelay();
   }
 
   /**
@@ -449,6 +451,8 @@ export class Game extends GameHooks {
    */
   protected startMission(): void {
     this.history.push(this.vote!);
+    // Mark that we need a delay for the next timer (vote results display)
+    this.timer.setHistoryDelay();
 
     this.callHooks('beforeStartMission', () => {
       this.currentMission.startMission(this.sentPlayers, this.leader);
@@ -570,6 +574,8 @@ export class Game extends GameHooks {
           this.startMission();
         } else {
           this.history.push(this.vote!);
+          // Mark that we need a delay for the next timer (vote results display)
+          this.timer.setHistoryDelay();
           this.moveVote();
         }
 

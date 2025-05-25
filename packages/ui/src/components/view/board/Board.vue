@@ -3,7 +3,7 @@
     <div class="board-container" :class="'view-mode-' + stateManager.viewMode.value">
       <div class="game-board" alt="board" :class="'game-end-' + gameResult"></div>
       <slot name="content">
-        <div class="timer">
+        <div class="timer" v-if="timerDuration > 0">
           <Timer @timerEnd="clearHistoryElement" :duration="timerDuration" />
         </div>
         <div class="actions-container d-flex flex-column justify-center">
@@ -29,7 +29,10 @@
                 <slot name="restart"></slot>
               </template>
             </Game>
-            <div v-if="gameTimer && gameTimer.active && gameTimer.endTime" class="game-timer">
+            <div
+              v-if="gameTimer && gameTimer.active && gameTimer.endTime && stateManager.viewMode.value === 'live'"
+              class="game-timer"
+            >
               <GameTimer @timerEnd="onGameTimerEnd" :endTime="gameTimer.endTime" />
             </div>
           </template>
@@ -128,7 +131,7 @@ export default defineComponent({
     };
 
     const gameTimer = computed(() => {
-      if (roomState.value.stage === 'started' && gameState.value?.timer) {
+      if (roomState.value.stage === 'started' && gameState.value?.timer && !visibleHistory.value) {
         return gameState.value.timer;
       }
       return null;
@@ -449,10 +452,15 @@ export default defineComponent({
 .timer {
   text-align: center;
   position: absolute;
-  top: 100px;
-  font-size: 28px;
-  width: 100px;
-  height: 30px;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  min-width: 60px;
 }
 
 .game-timer {

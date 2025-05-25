@@ -14,9 +14,17 @@ export class GameTimer {
   private timers: Map<string, NodeJS.Timeout> = new Map();
   private currentTimer?: TimerState;
   private game: Game;
+  private pendingHistoryDelay: boolean = false;
 
   constructor(game: Game) {
     this.game = game;
+  }
+
+  /**
+   * Mark that we need a history delay for the next timer
+   */
+  setHistoryDelay(): void {
+    this.pendingHistoryDelay = true;
   }
 
   /**
@@ -29,18 +37,27 @@ export class GameTimer {
       return;
     }
 
+    // Check if we need to add a history display delay
+    const delay = this.pendingHistoryDelay ? 10000 : 0; // 10 seconds for history display
+    this.pendingHistoryDelay = false;
+
+    // If there's a delay, set the timer to start in the future
     const now = Date.now();
+    const startTime = now + delay;
     this.currentTimer = {
-      startTime: now,
-      endTime: now + duration * 1000,
+      startTime: startTime,
+      endTime: startTime + duration * 1000,
       duration: duration * 1000,
       stage,
       expired: false,
     };
 
-    const timeoutId = setTimeout(() => {
-      this.handleTimerExpired(stage);
-    }, duration * 1000);
+    const timeoutId = setTimeout(
+      () => {
+        this.handleTimerExpired(stage);
+      },
+      delay + duration * 1000,
+    );
 
     this.timers.set(stage, timeoutId);
   }
@@ -186,8 +203,16 @@ export class GameTimer {
     const unvotedPlayers = this.game.vote?.getUnvotedPlayers() || [];
 
     for (const player of unvotedPlayers) {
-      const randomVote: TVoteOption = _.sample(['approve', 'reject'])!;
-      this.game.voteForMission(player.userID, randomVote);
+      try {
+        const randomVote: TVoteOption = _.sample(['approve', 'reject'])!;
+        this.game.voteForMission(player.userID, randomVote);
+      } catch (error) {
+        // Player might have voted while we were processing, skip them
+        console.log(
+          `[Timer] Could not auto-vote for player ${player.userID}:`,
+          error instanceof Error ? error.message : error,
+        );
+      }
     }
   }
 
@@ -199,13 +224,21 @@ export class GameTimer {
 
     for (const missionAction of missionActions) {
       if (missionAction.value === 'unvoted') {
-        let action: TMissionResult = 'success';
+        try {
+          let action: TMissionResult = 'success';
 
-        if (missionAction.player.role.loyalty === 'evil') {
-          action = _.sample(['success', 'fail'])!;
+          if (missionAction.player.role.loyalty === 'evil') {
+            action = _.sample(['success', 'fail'])!;
+          }
+
+          this.game.actionOnMission(missionAction.player.userID, action);
+        } catch (error) {
+          // Player might have acted while we were processing, skip them
+          console.log(
+            `[Timer] Could not auto-act for player ${missionAction.player.userID}:`,
+            error instanceof Error ? error.message : error,
+          );
         }
-
-        this.game.actionOnMission(missionAction.player.userID, action);
       }
     }
   }
