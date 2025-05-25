@@ -113,7 +113,7 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
     if (Array.isArray(optionsForStage)) {
       if (this.game.selectedPlayers.length !== optionsForStage.length) {
         throw new Error(
-          `Invalid selected player count for ${type} assassinate. Expected: ${options.length}, Selected: ${this.game.selectedPlayers.length}`,
+          `Invalid selected player count for ${type} assassinate. Expected: ${optionsForStage.length}, Selected: ${this.game.selectedPlayers.length}`,
         );
       }
 

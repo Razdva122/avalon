@@ -1,5 +1,5 @@
 import type { Game } from '@/core/game';
-import type { TGameStage, TVoteOption, TMissionResult, TAssassinateType } from '@avalon/types';
+import type { TGameStage, TVoteOption, TMissionResult } from '@avalon/types';
 import _ from 'lodash';
 
 export interface TimerState {
@@ -251,11 +251,17 @@ export class GameTimer {
    * Handle give Excalibur timeout - give to random team member
    */
   private handleGiveExcaliburTimeout(): void {
-    const teamMembers = this.game.players.filter((p) => p.features.isSent && p !== this.game.leader);
-    const randomMember = _.sample(teamMembers);
+    // Check if a player is already selected
+    if (this.game.selectedPlayers.length === 0) {
+      const teamMembers = this.game.players.filter((p) => p.features.isSent && p !== this.game.leader);
+      const randomMember = _.sample(teamMembers);
 
-    if (randomMember && this.game.addons.excalibur) {
-      this.game.selectPlayer(this.game.leader.userID, randomMember.userID);
+      if (randomMember && this.game.addons.excalibur) {
+        this.game.selectPlayer(this.game.leader.userID, randomMember.userID);
+      }
+    }
+
+    if (this.game.addons.excalibur) {
       this.game.addons.excalibur.giveExcalibur(this.game.leader.userID);
     }
   }
@@ -325,26 +331,60 @@ export class GameTimer {
     const assassin = this.game.players.find((p) => p.features.isAssassin);
     if (!assassin || !this.game.addons.assassin) return;
 
-    const targets = this.game.addons.assassin.addonData.assassin?.assassinateTargets || [];
+    const progressData = this.game.addons.assassin.progressData;
+    const availableTargets = this.game.addons.assassin.addonData.assassin?.assassinateTargets || [];
+    const goodPlayers = this.game.players.filter((p) => p.role.loyalty === 'good');
 
-    if (targets.length > 0) {
-      const primaryTarget = targets[0];
-      const goodPlayers = this.game.players.filter((p) => p.role.loyalty === 'good');
+    // If no target type has been chosen yet, choose the first available one
+    if (!progressData && availableTargets.length > 0) {
+      const targetType = availableTargets[0];
 
-      if (primaryTarget === 'merlin') {
+      // Select appropriate players based on target type
+      if (targetType === 'merlin') {
+        // Need to select 1 player for merlin
         const randomGood = _.sample(goodPlayers);
         if (randomGood) {
           this.game.selectPlayer(assassin.userID, randomGood.userID);
-          this.game.addons.assassin.assassinate(assassin.userID, primaryTarget as TAssassinateType);
         }
-      } else if (primaryTarget === 'lovers') {
+      } else if (targetType === 'lovers') {
+        // Need to select 2 players for lovers
         const lovers = goodPlayers.filter((p) => p.role.role === 'tristan' || p.role.role === 'isolde');
         const selectedLovers = lovers.length >= 2 ? lovers : _.sampleSize(goodPlayers, 2);
-
         for (const lover of selectedLovers) {
           this.game.selectPlayer(assassin.userID, lover.userID);
         }
-        this.game.addons.assassin.assassinate(assassin.userID, 'lovers');
+      } else if (targetType === 'guinevere' || targetType === 'cleric') {
+        // Need to select 1 player for guinevere or cleric
+        const randomGood = _.sample(goodPlayers);
+        if (randomGood) {
+          this.game.selectPlayer(assassin.userID, randomGood.userID);
+        }
+      }
+
+      // Execute the assassination
+      this.game.addons.assassin.assassinate(assassin.userID, targetType);
+    } else if (progressData) {
+      // If we're in a multi-stage assassination (custom role selection)
+      // Fill in missing selections with random good players
+      const requiredSelections = 1; // Custom role selection requires 1 player
+      const currentSelections = this.game.selectedPlayers.length;
+
+      if (currentSelections < requiredSelections) {
+        // Select additional random good players to meet requirement
+        const unselectedGood = goodPlayers.filter(
+          (p) => !this.game.selectedPlayers.some((sp) => sp.userID === p.userID),
+        );
+        const toSelect = _.sampleSize(unselectedGood, requiredSelections - currentSelections);
+
+        for (const player of toSelect) {
+          this.game.selectPlayer(assassin.userID, player.userID);
+        }
+      }
+
+      // Execute the assassination with a random valid role
+      if (progressData.possibleTargets && progressData.possibleTargets.length > 0) {
+        const randomRole = _.sample(progressData.possibleTargets);
+        this.game.addons.assassin.assassinate(assassin.userID, progressData.type, randomRole);
       }
     }
   }
@@ -356,12 +396,18 @@ export class GameTimer {
     const activePlayer = this.game.players.find((p) => p.features.waitForAction);
     if (!activePlayer) return;
 
-    const otherPlayers = this.game.players.filter((p) => p !== activePlayer);
-    const randomPlayer = _.sample(otherPlayers);
+    // Only select a player if none is selected
+    if (this.game.selectedPlayers.length === 0) {
+      const otherPlayers = this.game.players.filter((p) => p !== activePlayer);
+      const randomPlayer = _.sample(otherPlayers);
 
-    if (randomPlayer) {
-      this.game.selectPlayer(activePlayer.userID, randomPlayer.userID);
+      if (randomPlayer) {
+        this.game.selectPlayer(activePlayer.userID, randomPlayer.userID);
+      }
+    }
 
+    // Execute the action with the selected player
+    if (this.game.selectedPlayers.length > 0) {
       if (this.game.stage === 'checkLoyalty') {
         if (this.game.addons.ladyOfLake) {
           this.game.addons.ladyOfLake.checkLoyalty(activePlayer.userID);
