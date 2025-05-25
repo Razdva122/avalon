@@ -33,5 +33,9 @@ export default {
     displayIndex: 'Display index',
     displayIndexHint: 'Displays the index number of each player at the table',
     lookingForPlayersHint: 'Show a green banner indicating you are looking for more players',
+    timerEnabled: 'Turn timer',
+    timerEnabledHint: 'Limits the time for each player turn. If time runs out, a random valid action will be performed',
+    timerDuration: 'Timer duration',
+    seconds: 'seconds',
   },
 };

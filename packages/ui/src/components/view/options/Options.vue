@@ -53,6 +53,18 @@
             <v-checkbox v-model="features[feature.name]" :label="feature.label" :hide-details="true" color="info" />
             <HelpButton :content="feature.hint" />
           </div>
+          <div class="feature" v-if="features.timerEnabled">
+            <v-text-field
+              v-model.number="features.timerDuration"
+              :label="$t('options.timerDuration')"
+              type="number"
+              :min="30"
+              :max="300"
+              :suffix="$t('options.seconds')"
+              :hide-details="true"
+              density="compact"
+            />
+          </div>
         </template>
       </v-form>
     </div>
@@ -94,6 +106,13 @@ export default defineComponent({
       roleTypes: 'core' as 'core' | 'extra' | 'experimental',
       rolesShortInfo,
     };
+  },
+  watch: {
+    'features.timerEnabled'(newValue: boolean) {
+      if (newValue && this.features && !this.features.timerDuration) {
+        this.features.timerDuration = 60;
+      }
+    },
   },
   computed: {
     coreRolesSettings() {
@@ -215,6 +234,11 @@ export default defineComponent({
           name: 'displayIndex',
           label: this.$t('options.displayIndex'),
           hint: this.$t('options.displayIndexHint'),
+        },
+        {
+          name: 'timerEnabled',
+          label: this.$t('options.timerEnabled'),
+          hint: this.$t('options.timerEnabledHint'),
         },
       ] as const;
     },

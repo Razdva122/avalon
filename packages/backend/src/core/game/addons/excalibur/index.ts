@@ -27,6 +27,11 @@ export class ExcaliburAddon implements IGameAddon {
   afterSentTeam() {
     this.game.leader.features.waitForAction = true;
     this.game.stage = 'giveExcalibur';
+
+    if (this.game.features.timerEnabled && this.game.features.timerDuration) {
+      this.game.timer.startTimer('giveExcalibur', this.game.features.timerDuration);
+    }
+
     this.game.stateObserver.gameStateChanged();
 
     return this.giveExcaliburSubject.asObservable();
@@ -44,6 +49,11 @@ export class ExcaliburAddon implements IGameAddon {
     playerWithExcalibur.features.excalibur = 'active';
 
     this.game.stage = 'useExcalibur';
+
+    if (this.game.features.timerEnabled && this.game.features.timerDuration) {
+      this.game.timer.startTimer('useExcalibur', this.game.features.timerDuration);
+    }
+
     this.game.stateObserver.gameStateChanged();
 
     return this.useExcaliburSubject.asObservable();
@@ -79,6 +89,7 @@ export class ExcaliburAddon implements IGameAddon {
     const member = this.game.vote!.data.team.find((player) => player.id === selectedPlayer.userID)!;
     member.excalibur = true;
 
+    this.game.timer.clearTimer();
     this.giveExcaliburSubject.next(true);
   }
 
@@ -116,6 +127,7 @@ export class ExcaliburAddon implements IGameAddon {
     ownerOfExcalibur.features.excalibur = undefined;
     ownerOfExcalibur.features.waitForAction = false;
 
+    this.game.timer.clearTimer();
     this.useExcaliburSubject.next(true);
   }
 }

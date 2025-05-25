@@ -73,6 +73,10 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
 
       this.game.updateVisibleRolesState('all', visibleEvil);
 
+      if (this.game.features.timerEnabled && this.game.features.timerDuration) {
+        this.game.timer.startTimer('assassinate', this.game.features.timerDuration);
+      }
+
       this.game.stateObserver.gameStateChanged();
       return this.assassinateSubject.asObservable();
     }
@@ -182,6 +186,7 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
 
     if (isLastStage || assassinateResult === 'miss') {
       assassin.features.waitForAction = false;
+      this.game.timer.clearTimer();
       this.assassinateSubject.next(true);
     }
   }

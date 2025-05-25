@@ -30,6 +30,7 @@ import { gamesSettings } from '@/core/game/const';
 import { generateRolesForGame } from '@/core/game/helpers';
 
 import { GameHooks, THookNames } from '@/core/game/hooks';
+import { GameTimer } from '@/core/game/timer';
 
 export * from '@/core/game/interface';
 export * from '@/core/game/const';
@@ -99,6 +100,11 @@ export class Game extends GameHooks {
     selectTeam: [(player) => Boolean(player.features.isLeader)],
   };
 
+  /**
+   * Game timer instance
+   */
+  timer: GameTimer;
+
   set leader({ userID }: IPlayerInGame) {
     if (this.leader) {
       this.leader.features.isLeader = false;
@@ -139,6 +145,7 @@ export class Game extends GameHooks {
     };
 
     this.features = options.features;
+    this.timer = new GameTimer(this);
 
     const players = userIDs.map((userID, index) => ({
       userID,
@@ -347,6 +354,9 @@ export class Game extends GameHooks {
 
     this.callHooks('beforeSelectTeam', () => {
       this.stage = 'selectTeam';
+      if (this.features.timerEnabled && this.features.timerDuration) {
+        this.timer.startTimer('selectTeam', this.features.timerDuration);
+      }
       this.stateObserver.gameStateChanged();
     });
   }
@@ -357,6 +367,9 @@ export class Game extends GameHooks {
   protected initGame(): void {
     this.callHooks(['afterInit', 'beforeSelectTeam'], () => {
       this.stage = 'selectTeam';
+      if (this.features.timerEnabled && this.features.timerDuration) {
+        this.timer.startTimer('selectTeam', this.features.timerDuration);
+      }
       this.stateObserver.gameStateChanged();
     });
   }
@@ -392,6 +405,8 @@ export class Game extends GameHooks {
       );
     }
 
+    this.timer.clearTimer();
+
     this.callHooks(['afterSelectTeam', 'beforeSentTeam'], () => {
       this.selectedPlayers.forEach((player) => {
         player.features.isSent = true;
@@ -423,6 +438,9 @@ export class Game extends GameHooks {
       });
 
       this.stage = 'votingForTeam';
+      if (this.features.timerEnabled && this.features.timerDuration) {
+        this.timer.startTimer('votingForTeam', this.features.timerDuration);
+      }
     }
   }
 
@@ -439,6 +457,10 @@ export class Game extends GameHooks {
       this.sentPlayers.forEach((player) => {
         player.features.waitForAction = true;
       });
+
+      if (this.features.timerEnabled && this.features.timerDuration) {
+        this.timer.startTimer('onMission', this.features.timerDuration);
+      }
 
       this.stateObserver.gameStateChanged();
       this.callHooks('afterStartMission');
@@ -521,6 +543,7 @@ export class Game extends GameHooks {
     const player = this.findPlayerByID(playerID);
 
     if (this.currentMission.makeAction(player, result)) {
+      this.timer.clearTimer();
       this.callHooks('beforeEndMission', () => {
         this.currentMission.finishMission();
         this.finishMission();
@@ -541,6 +564,7 @@ export class Game extends GameHooks {
     }
 
     if (this.vote.makeVote(player, option)) {
+      this.timer.clearTimer();
       this.callHooks(['afterVoteForTeam'], () => {
         if (this.vote!.data.result === 'approve') {
           this.startMission();

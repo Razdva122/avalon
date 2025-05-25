@@ -29,6 +29,9 @@
                 <slot name="restart"></slot>
               </template>
             </Game>
+            <div v-if="gameTimer && gameTimer.active && gameTimer.endTime" class="game-timer">
+              <GameTimer @timerEnd="onGameTimerEnd" :endTime="gameTimer.endTime" />
+            </div>
           </template>
         </div>
       </slot>
@@ -58,6 +61,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import Player from '@/components/view/board/modules/Player.vue';
 import Timer from '@/components/feedback/Timer.vue';
+import GameTimer from '@/components/feedback/GameTimer.vue';
 import Game from '@/components/view/board/game/Game.vue';
 import StartPanel from '@/components/view/panels/StartPanel.vue';
 import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
@@ -77,6 +81,7 @@ export default defineComponent({
     Game,
     StartPanel,
     Timer,
+    GameTimer,
     AnnounceLoyalty,
     OptionsPreview,
   },
@@ -120,6 +125,17 @@ export default defineComponent({
       visibleHistory.value = undefined;
       timerDuration.value = 0;
       stateManager.moveToNextStage();
+    };
+
+    const gameTimer = computed(() => {
+      if (roomState.value.stage === 'started' && gameState.value?.timer) {
+        return gameState.value.timer;
+      }
+      return null;
+    });
+
+    const onGameTimerEnd = () => {
+      // Timer ended, backend will handle the timeout
     };
 
     const navigateToUserStats = (uuid: string) => {
@@ -301,6 +317,8 @@ export default defineComponent({
 
       calculateRotate,
       onPlayerClick,
+      gameTimer,
+      onGameTimerEnd,
     };
   },
 });
@@ -435,5 +453,29 @@ export default defineComponent({
   font-size: 28px;
   width: 100px;
   height: 30px;
+}
+
+.game-timer {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 15px 25px;
+  border-radius: 30px;
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 120px;
+  justify-content: center;
+}
+
+.game-timer::before {
+  content: '⏱️';
+  font-size: 28px;
 }
 </style>

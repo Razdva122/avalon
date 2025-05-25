@@ -53,6 +53,7 @@ export class GameManager {
       result: this.game.result,
       addonsData: this.game.addonsData,
       features: this.game.features,
+      timer: this.game.timer.getTimerState(),
     };
 
     this.roomState = {
@@ -83,6 +84,8 @@ export class GameManager {
     this.roomState.result = this.game.result;
 
     this.roomState.addonsData = this.game.addonsData;
+
+    this.roomState.timer = this.game.timer.getTimerState();
 
     if (this.game.result) {
       eventBus.emit('roomUpdated', this.roomID);
@@ -161,6 +164,7 @@ export class GameManager {
       settings: this.roomState.settings,
       addonsData: this.roomState.addonsData,
       features: this.roomState.features,
+      timer: this.roomState.timer,
       missionState: this.roomState.missionState,
       history: this.roomState.history.map((el) => el({ game: this.game, userID })),
       players: this.roomState.players.map((player, index) => {

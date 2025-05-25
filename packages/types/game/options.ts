@@ -94,6 +94,12 @@ export class GameOptionsFeatures {
 
   @prop()
   public lookingForPlayers?: boolean;
+
+  @prop()
+  public timerEnabled?: boolean;
+
+  @prop()
+  public timerDuration?: number;
 }
 
 export class GameOptions {
