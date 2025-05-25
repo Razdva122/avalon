@@ -46,11 +46,22 @@ export class GameTimer {
     const startTime = now + delay;
     this.currentTimer = {
       startTime: startTime,
-      endTime: startTime + duration * 1000,
+      endTime: now + delay + duration * 1000,
       duration: duration * 1000,
       stage,
       expired: false,
     };
+
+    // If there's a delay, schedule a state update when the timer becomes visible
+    if (delay > 0) {
+      const visibilityTimeoutId = setTimeout(() => {
+        // Notify clients that the timer is now visible
+        this.game.stateObserver.gameStateChanged();
+      }, delay);
+
+      // Store this timeout so we can clear it if needed
+      this.timers.set(`${stage}_visibility`, visibilityTimeoutId);
+    }
 
     const timeoutId = setTimeout(
       () => {
@@ -72,6 +83,14 @@ export class GameTimer {
         clearTimeout(timeoutId);
         this.timers.delete(this.currentTimer.stage);
       }
+
+      // Also clear visibility timeout if it exists
+      const visibilityTimeoutId = this.timers.get(`${this.currentTimer.stage}_visibility`);
+      if (visibilityTimeoutId) {
+        clearTimeout(visibilityTimeoutId);
+        this.timers.delete(`${this.currentTimer.stage}_visibility`);
+      }
+
       this.currentTimer = undefined;
     }
     // Clear all timers to be safe
@@ -102,15 +121,25 @@ export class GameTimer {
       return { active: false };
     }
 
-    // Check if timer has already expired
     const now = Date.now();
+
+    // Check if we're still in the delay period (timer hasn't started yet)
+    if (now < this.currentTimer.startTime) {
+      return { active: false };
+    }
+
+    // Check if timer has already expired
     if (now >= this.currentTimer.endTime) {
       return { active: false };
     }
 
+    // Calculate the visible endTime based on when the timer became visible
+    // This ensures the frontend shows the full duration from when it appears
+    const visibleEndTime = this.currentTimer.startTime + this.currentTimer.duration;
+
     return {
       active: true,
-      endTime: this.currentTimer.endTime,
+      endTime: visibleEndTime,
       stage: this.currentTimer.stage,
     };
   }
