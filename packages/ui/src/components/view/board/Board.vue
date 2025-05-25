@@ -466,7 +466,7 @@ export default defineComponent({
 .game-timer {
   position: fixed;
   bottom: 30px;
-  right: 30px;
+  left: 30px;
   background-color: rgba(0, 0, 0, 0.85);
   color: white;
   padding: 15px 25px;
