@@ -356,8 +356,8 @@ export class Game extends GameHooks {
 
     this.callHooks('beforeSelectTeam', () => {
       this.stage = 'selectTeam';
-      if (this.features.timerEnabled && this.features.timerDuration) {
-        this.timer.startTimer('selectTeam', this.features.timerDuration);
+      if (this.features.timerEnabled) {
+        this.timer.startTimer('selectTeam');
       }
       this.stateObserver.gameStateChanged();
     });
@@ -369,8 +369,8 @@ export class Game extends GameHooks {
   protected initGame(): void {
     this.callHooks(['afterInit', 'beforeSelectTeam'], () => {
       this.stage = 'selectTeam';
-      if (this.features.timerEnabled && this.features.timerDuration) {
-        this.timer.startTimer('selectTeam', this.features.timerDuration);
+      if (this.features.timerEnabled) {
+        this.timer.startTimer('selectTeam');
       }
       this.stateObserver.gameStateChanged();
     });
@@ -440,8 +440,8 @@ export class Game extends GameHooks {
       });
 
       this.stage = 'votingForTeam';
-      if (this.features.timerEnabled && this.features.timerDuration) {
-        this.timer.startTimer('votingForTeam', this.features.timerDuration);
+      if (this.features.timerEnabled) {
+        this.timer.startTimer('votingForTeam');
       }
     }
   }
@@ -462,8 +462,8 @@ export class Game extends GameHooks {
         player.features.waitForAction = true;
       });
 
-      if (this.features.timerEnabled && this.features.timerDuration) {
-        this.timer.startTimer('onMission', this.features.timerDuration);
+      if (this.features.timerEnabled) {
+        this.timer.startTimer('onMission');
       }
 
       this.stateObserver.gameStateChanged();

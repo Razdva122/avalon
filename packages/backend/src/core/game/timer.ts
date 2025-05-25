@@ -16,6 +16,22 @@ export class GameTimer {
   private game: Game;
   private pendingHistoryDelay: boolean = false;
 
+  // Default durations for each stage (in seconds)
+  private static readonly STAGE_DEFAULTS: Record<string, number> = {
+    selectTeam: 90, // 1.5 minutes to select team
+    votingForTeam: 30, // 30 seconds to vote
+    onMission: 60, // 1 minute for mission
+    assassinate: 120, // 2 minutes to assassinate
+    checkLoyalty: 45, // 45 seconds to check loyalty
+    announceLoyalty: 30, // 30 seconds to announce
+    revealLoyalty: 45, // 45 seconds to reveal
+    giveExcalibur: 30, // 30 seconds to give Excalibur
+    useExcalibur: 30, // 30 seconds to use Excalibur
+    giveCard: 30, // 30 seconds to give card
+    switchLancelots: 60, // 1 minute for Lancelots switch
+    witchAbility: 45, // 45 seconds for witch ability
+  };
+
   constructor(game: Game) {
     this.game = game;
   }
@@ -28,14 +44,33 @@ export class GameTimer {
   }
 
   /**
+   * Get stage-specific duration or fall back to default
+   */
+  private getStageSpecificDuration(stage: TGameStage): number {
+    // Check for stage-specific duration from user configuration
+    const stageDuration = this.game.features.timerDurations?.[stage as keyof typeof this.game.features.timerDurations];
+
+    // If stage-specific duration exists, use it
+    if (stageDuration !== undefined && stageDuration > 0) {
+      return stageDuration;
+    }
+
+    // Otherwise, use the default for this stage
+    return GameTimer.STAGE_DEFAULTS[stage] || 60; // Fallback to 60 seconds if stage not found
+  }
+
+  /**
    * Start a timer for the current stage
    */
-  startTimer(stage: TGameStage, duration: number): void {
+  startTimer(stage: TGameStage): void {
     this.clearTimer();
 
-    if (!this.game.features.timerEnabled || !duration) {
+    if (!this.game.features.timerEnabled) {
       return;
     }
+
+    // Get stage-specific duration
+    const duration = this.getStageSpecificDuration(stage);
 
     // Check if we need to add a history display delay
     const delay = this.pendingHistoryDelay ? 10000 : 0; // 10 seconds for history display

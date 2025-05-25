@@ -53,17 +53,38 @@
             <v-checkbox v-model="features[feature.name]" :label="feature.label" :hide-details="true" color="info" />
             <HelpButton :content="feature.hint" />
           </div>
-          <div class="feature" v-if="features.timerEnabled">
-            <v-text-field
-              v-model.number="features.timerDuration"
-              :label="$t('options.timerDuration')"
-              type="number"
-              :min="30"
-              :max="300"
-              :suffix="$t('options.seconds')"
-              :hide-details="true"
-              density="compact"
-            />
+          <div class="feature stage-timers" v-if="features.timerEnabled">
+            <v-data-table
+              :headers="stageTimerHeaders"
+              :items="stageTimerSettings"
+              class="stage-timer-table"
+              hide-default-footer
+              dense
+            >
+              <template #item.duration="{ item }">
+                <v-text-field
+                  :model-value="getStageTimer(item.name)"
+                  @update:model-value="(v) => setStageTimer(item.name, v)"
+                  type="number"
+                  :min="10"
+                  :max="600"
+                  :suffix="$t('options.seconds')"
+                  :placeholder="item.default.toString()"
+                  density="compact"
+                  hide-details
+                />
+              </template>
+              <template #item.actions="{ item }">
+                <v-tooltip location="top">
+                  <template #activator="{ props }">
+                    <v-btn icon v-bind="props" @click="setStageTimer(item.name, null)">
+                      <span class="material-icons">restore</span>
+                    </v-btn>
+                  </template>
+                  <span>{{ $t('options.reset') }}</span>
+                </v-tooltip>
+              </template>
+            </v-data-table>
           </div>
         </template>
       </v-form>
@@ -105,15 +126,10 @@ export default defineComponent({
       type: 'roles',
       roleTypes: 'core' as 'core' | 'extra' | 'experimental',
       rolesShortInfo,
+      stageTimersExpanded: undefined as number | undefined,
     };
   },
-  watch: {
-    'features.timerEnabled'(newValue: boolean) {
-      if (newValue && this.features && !this.features.timerDuration) {
-        this.features.timerDuration = 60;
-      }
-    },
-  },
+  watch: {},
   computed: {
     coreRolesSettings() {
       return [
@@ -242,8 +258,31 @@ export default defineComponent({
         },
       ] as const;
     },
+    stageTimerHeaders() {
+      return [
+        { text: this.$t('options.stage'), value: 'label' },
+        { text: this.$t('options.duration'), value: 'duration' },
+        { text: this.$t('options.actions'), value: 'actions', align: 'center' },
+      ];
+    },
     rolesSettings() {
       return this[`${this.roleTypes}RolesSettings`];
+    },
+    stageTimerSettings() {
+      return [
+        { name: 'selectTeam', label: this.$t('options.stageSelectTeam'), default: 90 },
+        { name: 'votingForTeam', label: this.$t('options.stageVotingForTeam'), default: 30 },
+        { name: 'onMission', label: this.$t('options.stageOnMission'), default: 60 },
+        { name: 'assassinate', label: this.$t('options.stageAssassinate'), default: 120 },
+        { name: 'checkLoyalty', label: this.$t('options.stageCheckLoyalty'), default: 45 },
+        { name: 'announceLoyalty', label: this.$t('options.stageAnnounceLoyalty'), default: 30 },
+        { name: 'revealLoyalty', label: this.$t('options.stageRevealLoyalty'), default: 45 },
+        { name: 'giveExcalibur', label: this.$t('options.stageGiveExcalibur'), default: 30 },
+        { name: 'useExcalibur', label: this.$t('options.stageUseExcalibur'), default: 30 },
+        { name: 'giveCard', label: this.$t('options.stageGiveCard'), default: 30 },
+        { name: 'switchLancelots', label: this.$t('options.stageSwitchLancelots'), default: 60 },
+        { name: 'witchAbility', label: this.$t('options.stageWitchAbility'), default: 45 },
+      ] as const;
     },
   },
   methods: {
@@ -293,6 +332,26 @@ export default defineComponent({
 
         if (addonName === 'ladyOfSea' && this.addons.ladyOfSea) {
           this.addons.ladyOfLake = false;
+        }
+      }
+    },
+    getStageTimer(stageName: string): number | undefined {
+      return this.features?.timerDurations?.[stageName as keyof typeof this.features.timerDurations];
+    },
+    setStageTimer(stageName: string, value: number | string | undefined | null) {
+      if (!this.features) return;
+
+      if (!this.features.timerDurations) {
+        this.features.timerDurations = {};
+      }
+
+      if (value === undefined || value === null || value === '') {
+        if (this.features.timerDurations) {
+          delete this.features.timerDurations[stageName as keyof typeof this.features.timerDurations];
+        }
+      } else {
+        if (this.features.timerDurations) {
+          this.features.timerDurations[stageName as keyof typeof this.features.timerDurations] = Number(value);
         }
       }
     },
@@ -352,5 +411,49 @@ export default defineComponent({
 
 .tabs {
   border-radius: 8px;
+}
+
+.stage-timers {
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.stage-timer-table {
+  background-color: transparent;
+  width: 100%;
+  margin-top: 16px;
+
+  ::v-deep .v-data-table__wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  ::v-deep td {
+    padding: 4px 8px !important;
+  }
+
+  ::v-deep th {
+    background-color: rgba(var(--v-theme-primary), 0.1);
+    font-weight: 600;
+    text-align: left;
+    color: rgb(var(--v-theme-on-surface));
+  }
+
+  td {
+    padding: 8px 0;
+  }
+}
+
+// hide native spinner controls on number inputs
+.stage-timer-table input[type='number']::-webkit-outer-spin-button,
+.stage-timer-table input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.stage-timer-table input[type='number'] {
+  -moz-appearance: textfield;
 }
 </style>

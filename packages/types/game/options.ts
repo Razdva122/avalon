@@ -99,7 +99,20 @@ export class GameOptionsFeatures {
   public timerEnabled?: boolean;
 
   @prop()
-  public timerDuration?: number;
+  public timerDurations?: {
+    selectTeam?: number;
+    votingForTeam?: number;
+    onMission?: number;
+    assassinate?: number;
+    checkLoyalty?: number;
+    announceLoyalty?: number;
+    revealLoyalty?: number;
+    giveExcalibur?: number;
+    useExcalibur?: number;
+    giveCard?: number;
+    switchLancelots?: number;
+    witchAbility?: number;
+  };
 }
 
 export class GameOptions {
