@@ -214,6 +214,9 @@ export class GameTimer {
           case 'revealLoyalty':
             this.handleLoyaltyCheckTimeout();
             break;
+          case 'giveCard':
+            this.handleGiveCardTimeout();
+            break;
         }
       } finally {
         // Ensure state is updated even if an error occurs
@@ -251,13 +254,41 @@ export class GameTimer {
    * Handle give Excalibur timeout - give to random team member
    */
   private handleGiveExcaliburTimeout(): void {
-    // Check if a player is already selected
-    if (this.game.selectedPlayers.length === 0) {
+    // Filter selected players to only those on mission
+    const selectedOnMission = this.game.selectedPlayers.filter((p) => p.features.isSent && p !== this.game.leader);
+
+    // If no valid players selected, we need to handle two cases:
+    // 1. No players selected at all
+    // 2. Players selected but none are valid (need to deselect them first)
+    if (selectedOnMission.length === 0) {
+      // First, deselect any invalid selections
+      if (this.game.selectedPlayers.length > 0) {
+        for (const player of this.game.selectedPlayers) {
+          this.game.selectPlayer(this.game.leader.userID, player.userID);
+        }
+      }
+
+      // Then select a random team member
       const teamMembers = this.game.players.filter((p) => p.features.isSent && p !== this.game.leader);
       const randomMember = _.sample(teamMembers);
 
-      if (randomMember && this.game.addons.excalibur) {
+      if (randomMember) {
         this.game.selectPlayer(this.game.leader.userID, randomMember.userID);
+      }
+    } else if (selectedOnMission.length > 1) {
+      // Too many valid players selected, keep only the first one
+      // First deselect all selected players
+      for (const player of this.game.selectedPlayers) {
+        if (player !== selectedOnMission[0]) {
+          this.game.selectPlayer(this.game.leader.userID, player.userID);
+        }
+      }
+    } else if (this.game.selectedPlayers.length > selectedOnMission.length) {
+      // Some selected players are not on mission, deselect them
+      for (const player of this.game.selectedPlayers) {
+        if (!player.features.isSent || player === this.game.leader) {
+          this.game.selectPlayer(this.game.leader.userID, player.userID);
+        }
       }
     }
 
@@ -365,9 +396,21 @@ export class GameTimer {
       this.game.addons.assassin.assassinate(assassin.userID, targetType);
     } else if (progressData) {
       // If we're in a multi-stage assassination (custom role selection)
+      // Filter out any evil players from selection
+      const validSelections = this.game.selectedPlayers.filter((p) => p.role.loyalty === 'good');
+
+      // If evil players were selected, deselect them
+      if (this.game.selectedPlayers.length > validSelections.length) {
+        for (const player of this.game.selectedPlayers) {
+          if (player.role.loyalty === 'evil') {
+            this.game.selectPlayer(assassin.userID, player.userID);
+          }
+        }
+      }
+
       // Fill in missing selections with random good players
       const requiredSelections = 1; // Custom role selection requires 1 player
-      const currentSelections = this.game.selectedPlayers.length;
+      const currentSelections = validSelections.length;
 
       if (currentSelections < requiredSelections) {
         // Select additional random good players to meet requirement
@@ -378,6 +421,11 @@ export class GameTimer {
 
         for (const player of toSelect) {
           this.game.selectPlayer(assassin.userID, player.userID);
+        }
+      } else if (currentSelections > requiredSelections) {
+        // Too many selected, keep only the first one
+        for (let i = 1; i < validSelections.length; i++) {
+          this.game.selectPlayer(assassin.userID, validSelections[i].userID);
         }
       }
 
@@ -390,19 +438,71 @@ export class GameTimer {
   }
 
   /**
+   * Handle give card timeout - give to random player
+   */
+  private handleGiveCardTimeout(): void {
+    // Filter out invalid selections (can't give card to self)
+    const validSelections = this.game.selectedPlayers.filter((p) => p !== this.game.leader);
+
+    // Ensure exactly one valid player is selected
+    if (validSelections.length === 0) {
+      const eligiblePlayers = this.game.players.filter((p) => p !== this.game.leader);
+      const randomPlayer = _.sample(eligiblePlayers);
+
+      if (randomPlayer) {
+        this.game.selectPlayer(this.game.leader.userID, randomPlayer.userID);
+      }
+    } else if (validSelections.length > 1) {
+      // Too many valid players selected, keep only the first one
+      // Deselect all players except the first valid one
+      for (const player of this.game.selectedPlayers) {
+        if (player !== validSelections[0]) {
+          this.game.selectPlayer(this.game.leader.userID, player.userID);
+        }
+      }
+    } else if (this.game.selectedPlayers.length > validSelections.length) {
+      // Leader is selected, deselect them
+      if (this.game.selectedPlayers.some((p) => p === this.game.leader)) {
+        this.game.selectPlayer(this.game.leader.userID, this.game.leader.userID);
+      }
+    }
+
+    // Give card to the selected player
+    if (this.game.selectedPlayers.length === 1 && this.game.addons.plotCards) {
+      this.game.addons.plotCards.giveCardToPlayer(this.game.leader.userID);
+    }
+  }
+
+  /**
    * Handle loyalty check timeout - select random player
    */
   private handleLoyaltyCheckTimeout(): void {
     const activePlayer = this.game.players.find((p) => p.features.waitForAction);
     if (!activePlayer) return;
 
-    // Only select a player if none is selected
-    if (this.game.selectedPlayers.length === 0) {
+    // Filter out invalid selections (can't check/reveal own loyalty)
+    const validSelections = this.game.selectedPlayers.filter((p) => p !== activePlayer);
+
+    // Ensure exactly one valid player is selected
+    if (validSelections.length === 0) {
       const otherPlayers = this.game.players.filter((p) => p !== activePlayer);
       const randomPlayer = _.sample(otherPlayers);
 
       if (randomPlayer) {
         this.game.selectPlayer(activePlayer.userID, randomPlayer.userID);
+      }
+    } else if (validSelections.length > 1) {
+      // Too many valid players selected, keep only the first one
+      // Deselect all players except the first valid one
+      for (const player of this.game.selectedPlayers) {
+        if (player !== validSelections[0]) {
+          this.game.selectPlayer(activePlayer.userID, player.userID);
+        }
+      }
+    } else if (this.game.selectedPlayers.length > validSelections.length) {
+      // Active player is selected, deselect them
+      if (this.game.selectedPlayers.some((p) => p === activePlayer)) {
+        this.game.selectPlayer(activePlayer.userID, activePlayer.userID);
       }
     }
 
