@@ -61,10 +61,19 @@
               hide-default-footer
               dense
             >
+              <template #item.enabled="{ item }">
+                <v-checkbox
+                  :model-value="getStageTimerEnabled(item.name)"
+                  @update:model-value="(v) => setStageTimerEnabled(item.name, v)"
+                  color="info"
+                  hide-details
+                  density="compact"
+                />
+              </template>
               <template #item.duration="{ item }">
                 <v-text-field
-                  :model-value="getStageTimer(item.name)"
-                  @update:model-value="(v) => setStageTimer(item.name, v)"
+                  :model-value="getStageTimerDuration(item.name)"
+                  @update:model-value="(v) => setStageTimerDuration(item.name, v)"
                   type="number"
                   :min="10"
                   :max="600"
@@ -72,12 +81,13 @@
                   :placeholder="item.default.toString()"
                   density="compact"
                   hide-details
+                  :disabled="!getStageTimerEnabled(item.name)"
                 />
               </template>
               <template #item.actions="{ item }">
                 <v-tooltip location="top">
                   <template #activator="{ props }">
-                    <v-btn icon v-bind="props" @click="setStageTimer(item.name, null)">
+                    <v-btn icon v-bind="props" @click="resetStageTimer(item.name)">
                       <span class="material-icons">restore</span>
                     </v-btn>
                   </template>
@@ -261,6 +271,7 @@ export default defineComponent({
     stageTimerHeaders() {
       return [
         { text: this.$t('options.stage'), value: 'label' },
+        { text: this.$t('options.enabled'), value: 'enabled', align: 'center' },
         { text: this.$t('options.duration'), value: 'duration' },
         { text: this.$t('options.actions'), value: 'actions', align: 'center' },
       ];
@@ -335,25 +346,78 @@ export default defineComponent({
         }
       }
     },
-    getStageTimer(stageName: string): number | undefined {
-      return this.features?.timerDurations?.[stageName as keyof typeof this.features.timerDurations];
+    getStageTimerDuration(stageName: string): number | undefined {
+      const stageConfig = this.features?.timerDurations?.[stageName as keyof typeof this.features.timerDurations];
+      if (typeof stageConfig === 'object' && stageConfig) {
+        return stageConfig.duration;
+      }
+      // Handle legacy format
+      if (typeof stageConfig === 'number') {
+        return stageConfig;
+      }
+      return undefined;
     },
-    setStageTimer(stageName: string, value: number | string | undefined | null) {
+    getStageTimerEnabled(stageName: string): boolean {
+      const stageConfig = this.features?.timerDurations?.[stageName as keyof typeof this.features.timerDurations];
+      if (typeof stageConfig === 'object' && stageConfig) {
+        return stageConfig.enabled !== false; // Default to true if not explicitly false
+      }
+      // For legacy format, default to enabled
+      return true;
+    },
+    setStageTimerDuration(stageName: string, value: number | string | undefined | null) {
       if (!this.features) return;
 
-      if (!this.features.timerDurations) {
-        this.features.timerDurations = {};
-      }
+      this.ensureStageTimerConfig(stageName);
+      const stageConfig = this.features.timerDurations![stageName as keyof typeof this.features.timerDurations] as any;
 
       if (value === undefined || value === null || value === '') {
-        if (this.features.timerDurations) {
-          delete this.features.timerDurations[stageName as keyof typeof this.features.timerDurations];
+        if (typeof stageConfig === 'object') {
+          delete stageConfig.duration;
+          // If no properties left, remove the whole config
+          if (Object.keys(stageConfig).length === 0) {
+            delete this.features.timerDurations![stageName as keyof typeof this.features.timerDurations];
+          }
         }
       } else {
-        if (this.features.timerDurations) {
-          this.features.timerDurations[stageName as keyof typeof this.features.timerDurations] = Number(value);
+        if (typeof stageConfig === 'object') {
+          stageConfig.duration = Number(value);
         }
       }
+    },
+    setStageTimerEnabled(stageName: string, enabled: boolean) {
+      if (!this.features) return;
+
+      this.ensureStageTimerConfig(stageName);
+      const stageConfig = this.features.timerDurations![stageName as keyof typeof this.features.timerDurations] as any;
+
+      if (typeof stageConfig === 'object') {
+        stageConfig.enabled = enabled;
+      }
+    },
+    ensureStageTimerConfig(stageName: string) {
+      if (!this.features || !this.features.timerDurations) {
+        if (this.features) {
+          this.features.timerDurations = {};
+        }
+        return;
+      }
+
+      const currentConfig = this.features.timerDurations[stageName as keyof typeof this.features.timerDurations];
+
+      // Convert legacy format to new format
+      if (typeof currentConfig === 'number') {
+        this.features.timerDurations[stageName as keyof typeof this.features.timerDurations] = {
+          duration: currentConfig,
+          enabled: true,
+        } as any;
+      } else if (!currentConfig) {
+        this.features.timerDurations[stageName as keyof typeof this.features.timerDurations] = {} as any;
+      }
+    },
+    resetStageTimer(stageName: string) {
+      if (!this.features?.timerDurations) return;
+      delete this.features.timerDurations[stageName as keyof typeof this.features.timerDurations];
     },
   },
 });

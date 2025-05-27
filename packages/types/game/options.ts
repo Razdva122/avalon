@@ -100,18 +100,18 @@ export class GameOptionsFeatures {
 
   @prop()
   public timerDurations?: {
-    selectTeam?: number;
-    votingForTeam?: number;
-    onMission?: number;
-    assassinate?: number;
-    checkLoyalty?: number;
-    announceLoyalty?: number;
-    revealLoyalty?: number;
-    giveExcalibur?: number;
-    useExcalibur?: number;
-    giveCard?: number;
-    switchLancelots?: number;
-    witchAbility?: number;
+    selectTeam?: { duration?: number; enabled?: boolean };
+    votingForTeam?: { duration?: number; enabled?: boolean };
+    onMission?: { duration?: number; enabled?: boolean };
+    assassinate?: { duration?: number; enabled?: boolean };
+    checkLoyalty?: { duration?: number; enabled?: boolean };
+    announceLoyalty?: { duration?: number; enabled?: boolean };
+    revealLoyalty?: { duration?: number; enabled?: boolean };
+    giveExcalibur?: { duration?: number; enabled?: boolean };
+    useExcalibur?: { duration?: number; enabled?: boolean };
+    giveCard?: { duration?: number; enabled?: boolean };
+    switchLancelots?: { duration?: number; enabled?: boolean };
+    witchAbility?: { duration?: number; enabled?: boolean };
   };
 }
 

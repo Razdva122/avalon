@@ -48,15 +48,47 @@ export class GameTimer {
    */
   private getStageSpecificDuration(stage: TGameStage): number {
     // Check for stage-specific duration from user configuration
-    const stageDuration = this.game.features.timerDurations?.[stage as keyof typeof this.game.features.timerDurations];
+    const stageConfig = this.game.features.timerDurations?.[stage as keyof typeof this.game.features.timerDurations];
 
     // If stage-specific duration exists, use it
-    if (stageDuration !== undefined && stageDuration > 0) {
-      return stageDuration;
+    if (
+      stageConfig &&
+      typeof stageConfig === 'object' &&
+      stageConfig.duration !== undefined &&
+      stageConfig.duration > 0
+    ) {
+      return stageConfig.duration;
+    }
+    // Handle legacy format (direct number)
+    else if (typeof stageConfig === 'number' && stageConfig > 0) {
+      return stageConfig;
     }
 
     // Otherwise, use the default for this stage
     return GameTimer.STAGE_DEFAULTS[stage] || 60; // Fallback to 60 seconds if stage not found
+  }
+
+  /**
+   * Check if timer is enabled for a specific stage
+   */
+  private isStageTimerEnabled(stage: TGameStage): boolean {
+    // If global timer is disabled, no stage timers should run
+    if (!this.game.features.timerEnabled) {
+      return false;
+    }
+
+    // Check for stage-specific enabled flag
+    const stageConfig = this.game.features.timerDurations?.[stage as keyof typeof this.game.features.timerDurations];
+
+    if (stageConfig && typeof stageConfig === 'object') {
+      // If enabled is explicitly set, use that value
+      if (stageConfig.enabled !== undefined) {
+        return stageConfig.enabled;
+      }
+    }
+
+    // Default to enabled if global timer is enabled and no stage-specific config
+    return true;
   }
 
   /**
@@ -65,7 +97,7 @@ export class GameTimer {
   startTimer(stage: TGameStage): void {
     this.clearTimer();
 
-    if (!this.game.features.timerEnabled) {
+    if (!this.isStageTimerEnabled(stage)) {
       return;
     }
 
@@ -152,7 +184,7 @@ export class GameTimer {
    * Get timer state for frontend
    */
   getTimerState(): { active: boolean; endTime?: number; stage?: TGameStage } {
-    if (!this.currentTimer || !this.game.features.timerEnabled || this.currentTimer.expired) {
+    if (!this.currentTimer || !this.isStageTimerEnabled(this.currentTimer.stage) || this.currentTimer.expired) {
       return { active: false };
     }
 

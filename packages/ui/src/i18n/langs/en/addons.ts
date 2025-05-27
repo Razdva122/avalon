@@ -38,6 +38,7 @@ export default {
     timerDuration: 'Timer duration',
     stageTimers: 'Stage Timers',
     stage: 'Stage',
+    enabled: 'Enabled',
     duration: 'Duration (seconds)',
     actions: 'Actions',
     reset: 'Reset to default',
