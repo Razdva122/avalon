@@ -281,18 +281,18 @@ export default defineComponent({
     },
     stageTimerSettings() {
       return [
-        { name: 'selectTeam', label: this.$t('options.stageSelectTeam'), default: 90 },
-        { name: 'votingForTeam', label: this.$t('options.stageVotingForTeam'), default: 30 },
-        { name: 'onMission', label: this.$t('options.stageOnMission'), default: 60 },
-        { name: 'assassinate', label: this.$t('options.stageAssassinate'), default: 120 },
-        { name: 'checkLoyalty', label: this.$t('options.stageCheckLoyalty'), default: 45 },
-        { name: 'announceLoyalty', label: this.$t('options.stageAnnounceLoyalty'), default: 30 },
-        { name: 'revealLoyalty', label: this.$t('options.stageRevealLoyalty'), default: 45 },
-        { name: 'giveExcalibur', label: this.$t('options.stageGiveExcalibur'), default: 30 },
-        { name: 'useExcalibur', label: this.$t('options.stageUseExcalibur'), default: 30 },
-        { name: 'giveCard', label: this.$t('options.stageGiveCard'), default: 30 },
-        { name: 'switchLancelots', label: this.$t('options.stageSwitchLancelots'), default: 60 },
-        { name: 'witchAbility', label: this.$t('options.stageWitchAbility'), default: 45 },
+        { name: 'selectTeam', label: this.$t('options.stageSelectTeam'), default: 180 },
+        { name: 'votingForTeam', label: this.$t('options.stageVotingForTeam'), default: 45 },
+        { name: 'onMission', label: this.$t('options.stageOnMission'), default: 45 },
+        { name: 'assassinate', label: this.$t('options.stageAssassinate'), default: 300 },
+        { name: 'checkLoyalty', label: this.$t('options.stageCheckLoyalty'), default: 30 },
+        { name: 'announceLoyalty', label: this.$t('options.stageAnnounceLoyalty'), default: 20 },
+        { name: 'revealLoyalty', label: this.$t('options.stageRevealLoyalty'), default: 15 },
+        { name: 'giveExcalibur', label: this.$t('options.stageGiveExcalibur'), default: 20 },
+        { name: 'useExcalibur', label: this.$t('options.stageUseExcalibur'), default: 20 },
+        { name: 'giveCard', label: this.$t('options.stageGiveCard'), default: 20 },
+        { name: 'switchLancelots', label: this.$t('options.stageSwitchLancelots'), default: 45 },
+        { name: 'witchAbility', label: this.$t('options.stageWitchAbility'), default: 30 },
       ] as const;
     },
   },
@@ -363,7 +363,15 @@ export default defineComponent({
         return stageConfig.enabled !== false; // Default to true if not explicitly false
       }
       // For legacy format, default to enabled
-      return true;
+      if (typeof stageConfig === 'number') {
+        return true;
+      }
+
+      // Default enabled stages (high discussion/conversation stages)
+      const defaultEnabledStages = ['assassinate', 'selectTeam', 'votingForTeam'];
+
+      // If no explicit config, use default based on stage type
+      return defaultEnabledStages.includes(stageName);
     },
     setStageTimerDuration(stageName: string, value: number | string | undefined | null) {
       if (!this.features) return;
