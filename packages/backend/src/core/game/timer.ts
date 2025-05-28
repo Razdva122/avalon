@@ -1,5 +1,6 @@
 import type { Game } from '@/core/game';
 import type { TGameStage, TVoteOption, TMissionResult } from '@avalon/types';
+import { STAGE_TIMER_DEFAULTS, DEFAULT_ENABLED_STAGES } from '@avalon/types/game/timer-defaults';
 import _ from 'lodash';
 
 export interface TimerState {
@@ -15,22 +16,6 @@ export class GameTimer {
   private currentTimer?: TimerState;
   private game: Game;
   private pendingHistoryDelay: boolean = false;
-
-  // Default durations for each stage (in seconds)
-  private static readonly STAGE_DEFAULTS: Record<string, number> = {
-    selectTeam: 180, // 3 minutes to select team (allows all players to contribute meaningfully)
-    votingForTeam: 45, // 45 seconds to vote and debate approval
-    onMission: 45, // 45 seconds for individual mission decisions
-    assassinate: 300, // 5 minutes for evil team to discuss and identify Merlin
-    checkLoyalty: 30, // 30 seconds to choose who to check
-    announceLoyalty: 20, // 20 seconds to announce result
-    revealLoyalty: 15, // 15 seconds to reveal (mostly automatic)
-    giveExcalibur: 20, // 20 seconds for leader to give Excalibur
-    useExcalibur: 20, // 20 seconds to decide whether to use Excalibur
-    giveCard: 20, // 20 seconds to give plot card
-    switchLancelots: 45, // 45 seconds for Lancelot switching decision
-    witchAbility: 30, // 30 seconds for witch ability decision
-  };
 
   constructor(game: Game) {
     this.game = game;
@@ -65,7 +50,7 @@ export class GameTimer {
     }
 
     // Otherwise, use the default for this stage
-    return GameTimer.STAGE_DEFAULTS[stage] || 60; // Fallback to 60 seconds if stage not found
+    return STAGE_TIMER_DEFAULTS[stage] || 60; // Fallback to 60 seconds if stage not found
   }
 
   /**
@@ -87,15 +72,8 @@ export class GameTimer {
       }
     }
 
-    // Default enabled stages (high discussion/conversation stages)
-    const defaultEnabledStages: TGameStage[] = [
-      'assassinate', // Most conversation - evil team discusses who Merlin is
-      'selectTeam', // Heavy discussion - players help leader choose team
-      'votingForTeam', // Significant discussion - debate team approval
-    ];
-
     // If no explicit config, use default based on stage type
-    return defaultEnabledStages.includes(stage);
+    return DEFAULT_ENABLED_STAGES.includes(stage);
   }
 
   /**
