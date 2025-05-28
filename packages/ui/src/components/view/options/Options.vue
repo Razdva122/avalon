@@ -575,7 +575,14 @@ export default defineComponent({
           enabled: true,
         } as any;
       } else if (!currentConfig) {
-        this.features.timerDurations[stageName as keyof typeof this.features.timerDurations] = {} as any;
+        // Initialize with explicit enabled property for proper reactivity
+        this.features.timerDurations[stageName as keyof typeof this.features.timerDurations] = {
+          enabled: DEFAULT_ENABLED_STAGES.includes(stageName),
+          // duration is optional, will use default if not set
+        } as any;
+      } else if (typeof currentConfig === 'object' && !currentConfig.hasOwnProperty('enabled')) {
+        // If config exists but doesn't have enabled property, add it
+        currentConfig.enabled = DEFAULT_ENABLED_STAGES.includes(stageName);
       }
     },
     resetStageTimer(stageName: string) {
@@ -583,11 +590,21 @@ export default defineComponent({
       delete this.features.timerDurations[stageName as keyof typeof this.features.timerDurations];
     },
     toggleAllMainTimers(enabled: boolean) {
+      // Ensure all timer configs are initialized before bulk enabling
+      this.defaultEnabledTimers.forEach((stage) => {
+        this.ensureStageTimerConfig(stage.name);
+      });
+      // Now set all enabled states
       this.defaultEnabledTimers.forEach((stage) => {
         this.setStageTimerEnabled(stage.name, enabled);
       });
     },
     toggleAllOtherTimers(enabled: boolean) {
+      // Ensure all timer configs are initialized before bulk enabling
+      this.otherTimers.forEach((stage) => {
+        this.ensureStageTimerConfig(stage.name);
+      });
+      // Now set all enabled states
       this.otherTimers.forEach((stage) => {
         this.setStageTimerEnabled(stage.name, enabled);
       });
