@@ -18,16 +18,16 @@ export default defineComponent({
   },
   emits: ['timerEnd'],
   setup(props, { emit }) {
-    const currentTime = ref(Date.now());
+    const displaySeconds = ref(Math.floor((props.endTime - Date.now()) / 1000));
     let intervalId: number | undefined;
 
     const remainingTime = computed(() => {
-      const remaining = props.endTime - currentTime.value;
+      const remaining = props.endTime - Date.now();
       return Math.max(0, remaining);
     });
 
     const timeInString = computed(() => {
-      const totalSeconds = Math.floor(remainingTime.value / 1000);
+      const totalSeconds = Math.max(0, displaySeconds.value);
       const minutes = Math.floor(totalSeconds / 60);
       const seconds = totalSeconds % 60;
 
@@ -45,14 +45,19 @@ export default defineComponent({
       }
 
       intervalId = window.setInterval(() => {
-        currentTime.value = Date.now();
+        const newSeconds = Math.floor((props.endTime - Date.now()) / 1000);
 
-        if (remainingTime.value <= 0 && intervalId) {
+        // Only update if seconds changed
+        if (newSeconds !== displaySeconds.value) {
+          displaySeconds.value = newSeconds;
+        }
+
+        if (newSeconds < 0 && intervalId) {
           window.clearInterval(intervalId);
           intervalId = undefined;
           emit('timerEnd');
         }
-      }, 100); // Update every 100ms for smoother countdown
+      }, 100); // Check every 100ms but only update when seconds change
     });
 
     onUnmounted(() => {
@@ -71,15 +76,20 @@ export default defineComponent({
             window.clearInterval(intervalId);
           }
 
-          // Reset current time
-          currentTime.value = Date.now();
+          // Reset display seconds
+          displaySeconds.value = Math.floor((newEndTime - Date.now()) / 1000);
 
           // Start new interval if there's time remaining
-          if (remainingTime.value > 0) {
+          if (displaySeconds.value >= 0) {
             intervalId = window.setInterval(() => {
-              currentTime.value = Date.now();
+              const newSeconds = Math.floor((props.endTime - Date.now()) / 1000);
 
-              if (remainingTime.value <= 0 && intervalId) {
+              // Only update if seconds changed
+              if (newSeconds !== displaySeconds.value) {
+                displaySeconds.value = newSeconds;
+              }
+
+              if (newSeconds < 0 && intervalId) {
                 window.clearInterval(intervalId);
                 intervalId = undefined;
                 emit('timerEnd');
