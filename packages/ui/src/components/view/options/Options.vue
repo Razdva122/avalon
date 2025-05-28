@@ -175,7 +175,22 @@ export default defineComponent({
       stageTimersExpanded: undefined as number | undefined,
     };
   },
-  watch: {},
+  watch: {
+    'features.timerEnabled': {
+      handler(enabled: boolean) {
+        if (enabled) {
+          this.initializeAllTimerConfigs();
+        }
+      },
+      immediate: true,
+    },
+  },
+  mounted() {
+    // Initialize timer configs if timer is enabled
+    if (this.features?.timerEnabled) {
+      this.initializeAllTimerConfigs();
+    }
+  },
   computed: {
     coreRolesSettings() {
       return [
@@ -432,18 +447,21 @@ export default defineComponent({
       return DEFAULT_ENABLED_STAGES.includes(stageName);
     },
     setStageTimerDuration(stageName: string, value: number | string | undefined | null) {
-      if (!this.features) return;
+      if (!this.features?.timerDurations) return;
 
-      this.ensureStageTimerConfig(stageName);
-      const stageConfig = this.features.timerDurations![stageName as keyof typeof this.features.timerDurations] as any;
+      const stageConfig = this.features.timerDurations[stageName as keyof typeof this.features.timerDurations] as any;
+
+      if (!stageConfig) {
+        // Config should be pre-initialized, but create if missing
+        this.features.timerDurations[stageName as keyof typeof this.features.timerDurations] = {
+          enabled: this.getDefaultEnabledState(stageName),
+        } as any;
+        return;
+      }
 
       if (value === undefined || value === null || value === '') {
         if (typeof stageConfig === 'object') {
           delete stageConfig.duration;
-          // If no properties left, remove the whole config
-          if (Object.keys(stageConfig).length === 0) {
-            delete this.features.timerDurations![stageName as keyof typeof this.features.timerDurations];
-          }
         }
       } else {
         if (typeof stageConfig === 'object') {
@@ -452,14 +470,47 @@ export default defineComponent({
       }
     },
     setStageTimerEnabled(stageName: string, enabled: boolean) {
-      if (!this.features) return;
+      if (!this.features?.timerDurations) return;
 
-      this.ensureStageTimerConfig(stageName);
-      const stageConfig = this.features.timerDurations![stageName as keyof typeof this.features.timerDurations] as any;
+      const stageConfig = this.features.timerDurations[stageName as keyof typeof this.features.timerDurations] as any;
+
+      if (!stageConfig) {
+        // Config should be pre-initialized, but create if missing
+        this.features.timerDurations[stageName as keyof typeof this.features.timerDurations] = {
+          enabled: enabled,
+        } as any;
+        return;
+      }
 
       if (typeof stageConfig === 'object') {
         stageConfig.enabled = enabled;
       }
+    },
+    initializeAllTimerConfigs() {
+      if (!this.features || !this.features.timerEnabled) return;
+
+      // Ensure timerDurations object exists
+      if (!this.features.timerDurations) {
+        this.features.timerDurations = {};
+      }
+
+      // Initialize all timer configs at once to avoid reactive overhead
+      const timerDurations = this.features.timerDurations;
+      const allStages = this.stageTimerSettings;
+
+      // Batch initialize all configs
+      allStages.forEach((stage) => {
+        const stageName = stage.name as keyof typeof timerDurations;
+        if (!timerDurations[stageName]) {
+          timerDurations[stageName] = {
+            enabled: this.getDefaultEnabledState(stage.name),
+            // duration is optional, will use default if not set
+          } as any;
+        } else if (typeof timerDurations[stageName] === 'object' && !('enabled' in timerDurations[stageName])) {
+          // Add missing enabled property to existing config
+          (timerDurations[stageName] as any).enabled = this.getDefaultEnabledState(stage.name);
+        }
+      });
     },
     ensureTimerDurationsExists() {
       if (!this.features) return false;
@@ -471,46 +522,18 @@ export default defineComponent({
     getDefaultEnabledState(stageName: string): boolean {
       return DEFAULT_ENABLED_STAGES.includes(stageName);
     },
-    createStageTimerConfig(stageName: string) {
-      return {
-        enabled: this.getDefaultEnabledState(stageName),
-        // duration is optional, will use default if not set
-      };
-    },
-    ensureStageTimerConfig(stageName: string) {
-      if (!this.ensureTimerDurationsExists()) return;
-
-      const timerDurations = this.features!.timerDurations!;
-      const currentConfig = timerDurations[stageName as keyof typeof timerDurations] as any;
-
-      if (!currentConfig) {
-        // Initialize new config
-        timerDurations[stageName as keyof typeof timerDurations] = this.createStageTimerConfig(stageName) as any;
-      } else if (typeof currentConfig === 'object' && !('enabled' in currentConfig)) {
-        // Add missing enabled property to existing config
-        currentConfig.enabled = this.getDefaultEnabledState(stageName);
-      }
-    },
     resetStageTimer(stageName: string) {
       if (!this.features?.timerDurations) return;
       delete this.features.timerDurations[stageName as keyof typeof this.features.timerDurations];
     },
     toggleAllMainTimers(enabled: boolean) {
-      // Ensure all timer configs are initialized before bulk enabling
-      this.defaultEnabledTimers.forEach((stage) => {
-        this.ensureStageTimerConfig(stage.name);
-      });
-      // Now set all enabled states
+      // Configs are already initialized, just set enabled states
       this.defaultEnabledTimers.forEach((stage) => {
         this.setStageTimerEnabled(stage.name, enabled);
       });
     },
     toggleAllOtherTimers(enabled: boolean) {
-      // Ensure all timer configs are initialized before bulk enabling
-      this.otherTimers.forEach((stage) => {
-        this.ensureStageTimerConfig(stage.name);
-      });
-      // Now set all enabled states
+      // Configs are already initialized, just set enabled states
       this.otherTimers.forEach((stage) => {
         this.setStageTimerEnabled(stage.name, enabled);
       });
