@@ -53,49 +53,172 @@
             <v-checkbox v-model="features[feature.name]" :label="feature.label" :hide-details="true" color="info" />
             <HelpButton :content="feature.hint" />
           </div>
-          <div class="feature stage-timers" v-if="features.timerEnabled">
-            <v-data-table
-              :headers="stageTimerHeaders"
-              :items="stageTimerSettings"
-              class="stage-timer-table"
-              hide-default-footer
-              dense
-            >
-              <template #item.enabled="{ item }">
-                <v-checkbox
-                  :model-value="getStageTimerEnabled(item.name)"
-                  @update:model-value="(v) => setStageTimerEnabled(item.name, v)"
-                  color="info"
-                  hide-details
-                  density="compact"
-                />
-              </template>
-              <template #item.duration="{ item }">
-                <v-text-field
-                  :model-value="getStageTimerDuration(item.name)"
-                  @update:model-value="(v) => setStageTimerDuration(item.name, v)"
-                  type="number"
-                  :min="10"
-                  :max="600"
-                  :suffix="$t('options.seconds')"
-                  :placeholder="item.default.toString()"
-                  density="compact"
-                  hide-details
-                  :disabled="!getStageTimerEnabled(item.name)"
-                />
-              </template>
-              <template #item.actions="{ item }">
-                <v-tooltip location="top">
-                  <template #activator="{ props }">
-                    <v-btn icon v-bind="props" @click="resetStageTimer(item.name)">
-                      <span class="material-icons">restore</span>
-                    </v-btn>
-                  </template>
-                  <span>{{ $t('options.reset') }}</span>
-                </v-tooltip>
-              </template>
-            </v-data-table>
+        </template>
+
+        <!-- Default Enabled Timers (Always Visible) -->
+        <div class="default-enabled-timers mb-4" v-if="type === 'features' && features && features.timerEnabled">
+          <div class="timer-section-header">
+            <h4 class="timer-section-title">{{ $t('options.mainTimers') }}</h4>
+            <v-checkbox
+              :model-value="allMainTimersEnabled"
+              @update:model-value="toggleAllMainTimers"
+              color="info"
+              hide-details
+              density="compact"
+              :label="$t('options.enableAll')"
+              class="enable-all-checkbox"
+            />
           </div>
+          <div class="stage-timer-list">
+            <div
+              v-for="stage in defaultEnabledTimers"
+              :key="stage.name"
+              class="stage-timer-card"
+              :class="{ disabled: !getStageTimerEnabled(stage.name) }"
+            >
+              <div class="stage-timer-row">
+                <div class="stage-info">
+                  <v-checkbox
+                    :model-value="getStageTimerEnabled(stage.name)"
+                    @update:model-value="(v) => setStageTimerEnabled(stage.name, v)"
+                    color="info"
+                    hide-details
+                    density="compact"
+                    class="stage-checkbox"
+                  />
+                  <div class="stage-label">
+                    {{ stage.label }}
+                  </div>
+                </div>
+
+                <div class="stage-controls">
+                  <div class="duration-input-group">
+                    <v-text-field
+                      :model-value="getStageTimerDuration(stage.name)"
+                      @update:model-value="(v) => setStageTimerDuration(stage.name, v)"
+                      type="number"
+                      :min="10"
+                      :max="600"
+                      :placeholder="stage.default.toString()"
+                      density="compact"
+                      hide-details
+                      :disabled="!getStageTimerEnabled(stage.name)"
+                      class="duration-field"
+                    />
+                    <span class="duration-unit">s</span>
+                  </div>
+
+                  <v-tooltip location="top">
+                    <template #activator="{ props }">
+                      <v-btn
+                        icon
+                        v-bind="props"
+                        @click="resetStageTimer(stage.name)"
+                        size="small"
+                        variant="text"
+                        class="reset-btn"
+                      >
+                        <span class="material-icons">restore</span>
+                      </v-btn>
+                    </template>
+                    <span>{{ $t('options.reset') }}</span>
+                  </v-tooltip>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Timer Settings (Collapsible) -->
+        <template v-if="type === 'features' && features && features.timerEnabled && otherTimers.length > 0">
+          <v-expansion-panels v-model="stageTimersExpanded" class="stage-timer-panels">
+            <v-expansion-panel>
+              <v-expansion-panel-title>
+                <div class="stage-timer-header">
+                  <div class="stage-timer-left">
+                    <span class="material-icons">schedule</span>
+                    <span class="stage-timer-title">{{ $t('options.otherTimers') }}</span>
+                  </div>
+                  <div class="stage-timer-right">
+                    <v-chip size="small" color="info" class="enabled-count-chip">
+                      {{ otherTimers.filter((stage) => getStageTimerEnabled(stage.name)).length }}
+                      {{ $t('options.enabled') }}
+                    </v-chip>
+                    <v-checkbox
+                      :model-value="allOtherTimersEnabled"
+                      @update:model-value="toggleAllOtherTimers"
+                      color="info"
+                      hide-details
+                      density="compact"
+                      :label="$t('options.enableAll')"
+                      class="enable-all-checkbox"
+                      @click.stop
+                    />
+                  </div>
+                </div>
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <div class="stage-timer-list">
+                  <div
+                    v-for="stage in otherTimers"
+                    :key="stage.name"
+                    class="stage-timer-card"
+                    :class="{ disabled: !getStageTimerEnabled(stage.name) }"
+                  >
+                    <div class="stage-timer-row">
+                      <div class="stage-info">
+                        <v-checkbox
+                          :model-value="getStageTimerEnabled(stage.name)"
+                          @update:model-value="(v) => setStageTimerEnabled(stage.name, v)"
+                          color="info"
+                          hide-details
+                          density="compact"
+                          class="stage-checkbox"
+                        />
+                        <div class="stage-label">
+                          {{ stage.label }}
+                        </div>
+                      </div>
+
+                      <div class="stage-controls">
+                        <div class="duration-input-group">
+                          <v-text-field
+                            :model-value="getStageTimerDuration(stage.name)"
+                            @update:model-value="(v) => setStageTimerDuration(stage.name, v)"
+                            type="number"
+                            :min="10"
+                            :max="600"
+                            :placeholder="stage.default.toString()"
+                            density="compact"
+                            hide-details
+                            :disabled="!getStageTimerEnabled(stage.name)"
+                            class="duration-field"
+                          />
+                          <span class="duration-unit">s</span>
+                        </div>
+
+                        <v-tooltip location="top">
+                          <template #activator="{ props }">
+                            <v-btn
+                              icon
+                              v-bind="props"
+                              @click="resetStageTimer(stage.name)"
+                              size="small"
+                              variant="text"
+                              class="reset-btn"
+                            >
+                              <span class="material-icons">restore</span>
+                            </v-btn>
+                          </template>
+                          <span>{{ $t('options.reset') }}</span>
+                        </v-tooltip>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
         </template>
       </v-form>
     </div>
@@ -269,14 +392,6 @@ export default defineComponent({
         },
       ] as const;
     },
-    stageTimerHeaders() {
-      return [
-        { text: this.$t('options.stage'), value: 'label' },
-        { text: this.$t('options.enabled'), value: 'enabled', align: 'center' },
-        { text: this.$t('options.duration'), value: 'duration' },
-        { text: this.$t('options.actions'), value: 'actions', align: 'center' },
-      ];
-    },
     rolesSettings() {
       return this[`${this.roleTypes}RolesSettings`];
     },
@@ -327,6 +442,21 @@ export default defineComponent({
           default: STAGE_TIMER_DEFAULTS.witchAbility,
         },
       ] as const;
+    },
+    enabledStagesCount() {
+      return this.stageTimerSettings.filter((stage) => this.getStageTimerEnabled(stage.name)).length;
+    },
+    defaultEnabledTimers() {
+      return this.stageTimerSettings.filter((stage) => DEFAULT_ENABLED_STAGES.includes(stage.name));
+    },
+    otherTimers() {
+      return this.stageTimerSettings.filter((stage) => !DEFAULT_ENABLED_STAGES.includes(stage.name));
+    },
+    allMainTimersEnabled() {
+      return this.defaultEnabledTimers.every((stage) => this.getStageTimerEnabled(stage.name));
+    },
+    allOtherTimersEnabled() {
+      return this.otherTimers.every((stage) => this.getStageTimerEnabled(stage.name));
     },
   },
   methods: {
@@ -457,6 +587,16 @@ export default defineComponent({
       if (!this.features?.timerDurations) return;
       delete this.features.timerDurations[stageName as keyof typeof this.features.timerDurations];
     },
+    toggleAllMainTimers(enabled: boolean) {
+      this.defaultEnabledTimers.forEach((stage) => {
+        this.setStageTimerEnabled(stage.name, enabled);
+      });
+    },
+    toggleAllOtherTimers(enabled: boolean) {
+      this.otherTimers.forEach((stage) => {
+        this.setStageTimerEnabled(stage.name, enabled);
+      });
+    },
   },
 });
 </script>
@@ -466,7 +606,9 @@ export default defineComponent({
   background-color: rgb(var(--v-theme-surface));
   width: 100%;
   max-width: 100vw;
+  max-height: 90vh;
   min-height: 530px;
+  overflow-y: auto;
 }
 
 .role,
@@ -494,6 +636,238 @@ export default defineComponent({
 .ladyOfLake {
   background-image: getImagePathByID('features', 'lady_of_lake');
   background-size: contain;
+}
+
+// Timer configuration styles
+.default-enabled-timers {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12);
+  border-radius: 8px;
+  background-color: rgba(var(--v-theme-surface), 0.5);
+}
+
+.stage-timer-config {
+  margin-top: 16px;
+}
+
+.timer-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.timer-section-title {
+  margin-bottom: 0;
+  color: rgb(var(--v-theme-primary));
+  font-weight: 500;
+}
+
+.enable-all-checkbox {
+  flex-shrink: 0;
+}
+
+.default-timer-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.default-duration-field {
+  max-width: 150px;
+  min-width: 120px;
+}
+
+.apply-default-btn,
+.enable-recommended-btn {
+  white-space: nowrap;
+}
+
+.stage-timer-panels {
+  margin-top: 16px;
+}
+
+.stage-timer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+}
+
+.stage-timer-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.stage-timer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.stage-timer-title {
+  font-weight: 500;
+}
+
+.enabled-count-chip {
+  flex-shrink: 0;
+}
+
+.stage-timer-list {
+  padding: 8px 0;
+}
+
+.stage-timer-panels .stage-timer-list {
+  padding-bottom: 24px;
+}
+
+.stage-timer-card {
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  padding: 12px;
+  background-color: rgba(var(--v-theme-surface), 0.8);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: rgba(var(--v-theme-primary), 0.3);
+    background-color: rgba(var(--v-theme-surface), 1);
+  }
+
+  &.disabled {
+    opacity: 0.6;
+    background-color: rgba(var(--v-theme-surface), 0.4);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.stage-timer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.stage-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.stage-checkbox {
+  flex-shrink: 0;
+}
+
+.stage-label {
+  font-weight: 500;
+  color: rgb(var(--v-theme-on-surface));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stage-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.duration-input-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.duration-field {
+  width: 60px;
+  min-width: 50px;
+}
+
+.duration-unit {
+  font-size: 14px;
+  color: rgb(var(--v-theme-on-surface));
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+.default-duration-field,
+.duration-field {
+  :deep(input[type='number']) {
+    -moz-appearance: textfield;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+}
+
+.reset-btn {
+  color: rgb(var(--v-theme-primary)) !important;
+  background-color: rgba(var(--v-theme-primary), 0.1) !important;
+
+  &:hover {
+    color: rgb(var(--v-theme-primary)) !important;
+    background-color: rgba(var(--v-theme-primary), 0.2) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .default-timer-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .default-duration-field {
+    max-width: none;
+  }
+
+  .stage-timer-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .enabled-count-chip {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+
+  .stage-timer-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .stage-info {
+    justify-content: flex-start;
+  }
+
+  .stage-controls {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .duration-field {
+    width: auto;
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 .ladyOfSea {

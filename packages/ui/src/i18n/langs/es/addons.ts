@@ -38,6 +38,7 @@ export default {
     timerDuration: 'Duración del temporizador',
     stageTimers: 'Temporizadores por Fase',
     stage: 'Fase',
+    enabled: 'Habilitado',
     duration: 'Duración (segundos)',
     actions: 'Acciones',
     reset: 'Restablecer al predeterminado',
@@ -54,5 +55,8 @@ export default {
     stageSwitchLancelots: 'Cambiar Lancelots',
     stageWitchAbility: 'Habilidad de Bruja',
     seconds: 'segundos',
+    mainTimers: 'Temporizadores principales',
+    otherTimers: 'Otros temporizadores',
+    enableAll: 'Habilitar todo',
   },
 };

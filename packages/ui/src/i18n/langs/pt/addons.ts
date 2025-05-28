@@ -38,6 +38,7 @@ export default {
     timerDuration: 'Duração do timer',
     stageTimers: 'Timers por Fase',
     stage: 'Fase',
+    enabled: 'Ativado',
     duration: 'Duração (segundos)',
     actions: 'Ações',
     reset: 'Restaurar ao padrão',
@@ -54,5 +55,8 @@ export default {
     stageSwitchLancelots: 'Trocar Lancelots',
     stageWitchAbility: 'Habilidade da Bruxa',
     seconds: 'segundos',
+    mainTimers: 'Timers principais',
+    otherTimers: 'Outros timers',
+    enableAll: 'Habilitar tudo',
   },
 };

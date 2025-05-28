@@ -37,6 +37,7 @@ export default {
     timerDuration: '計時器持續時間',
     stageTimers: '階段計時器',
     stage: '階段',
+    enabled: '已啟用',
     duration: '時長（秒）',
     actions: '操作',
     reset: '重置為預設值',
@@ -53,5 +54,8 @@ export default {
     stageSwitchLancelots: '交換蘭斯洛特',
     stageWitchAbility: '女巫能力',
     seconds: '秒',
+    mainTimers: '主要計時器',
+    otherTimers: '其他計時器',
+    enableAll: '啟用全部',
   },
 };

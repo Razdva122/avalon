@@ -55,5 +55,13 @@ export default {
     stageSwitchLancelots: 'Switch Lancelots',
     stageWitchAbility: 'Witch Ability',
     seconds: 'seconds',
+    defaultTimerSettings: 'Default Timer Settings',
+    defaultDuration: 'Default Duration',
+    applyToAll: 'Apply to All',
+    enableRecommended: 'Enable Recommended',
+    stageSpecificTimers: 'Stage-Specific Timers',
+    mainTimers: 'Main Timers',
+    otherTimers: 'Other Timers',
+    enableAll: 'Enable All',
   },
 };

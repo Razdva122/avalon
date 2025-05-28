@@ -37,6 +37,7 @@ export default {
     timerDuration: '计时器持续时间',
     stageTimers: '阶段计时器',
     stage: '阶段',
+    enabled: '已启用',
     duration: '时长（秒）',
     actions: '操作',
     reset: '重置为默认值',
@@ -53,5 +54,8 @@ export default {
     stageSwitchLancelots: '交换兰斯洛特',
     stageWitchAbility: '女巫能力',
     seconds: '秒',
+    mainTimers: '主要计时器',
+    otherTimers: '其他计时器',
+    enableAll: '启用全部',
   },
 };

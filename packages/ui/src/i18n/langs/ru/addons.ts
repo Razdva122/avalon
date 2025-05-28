@@ -38,6 +38,7 @@ export default {
     timerDuration: 'Длительность таймера',
     stageTimers: 'Таймеры по Фазам',
     stage: 'Фаза',
+    enabled: 'Включено',
     duration: 'Длительность (секунд)',
     actions: 'Действия',
     reset: 'Сбросить на стандартное',
@@ -54,5 +55,8 @@ export default {
     stageSwitchLancelots: 'Смена Ланселотов',
     stageWitchAbility: 'Способность Ведьмы',
     seconds: 'секунд',
+    mainTimers: 'Основные таймеры',
+    otherTimers: 'Другие таймеры',
+    enableAll: 'Включить все',
   },
 };
