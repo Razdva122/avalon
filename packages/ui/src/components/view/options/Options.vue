@@ -509,10 +509,6 @@ export default defineComponent({
       if (typeof stageConfig === 'object' && stageConfig) {
         return stageConfig.duration;
       }
-      // Handle legacy format
-      if (typeof stageConfig === 'number') {
-        return stageConfig;
-      }
       return undefined;
     },
     getStageTimerEnabled(stageName: string): boolean {
@@ -520,11 +516,6 @@ export default defineComponent({
       if (typeof stageConfig === 'object' && stageConfig) {
         return stageConfig.enabled !== false; // Default to true if not explicitly false
       }
-      // For legacy format, default to enabled
-      if (typeof stageConfig === 'number') {
-        return true;
-      }
-
       // If no explicit config, use default based on stage type
       return DEFAULT_ENABLED_STAGES.includes(stageName);
     },
@@ -568,13 +559,7 @@ export default defineComponent({
 
       const currentConfig = this.features.timerDurations[stageName as keyof typeof this.features.timerDurations];
 
-      // Convert legacy format to new format
-      if (typeof currentConfig === 'number') {
-        this.features.timerDurations[stageName as keyof typeof this.features.timerDurations] = {
-          duration: currentConfig,
-          enabled: true,
-        } as any;
-      } else if (!currentConfig) {
+      if (!currentConfig) {
         // Initialize with explicit enabled property for proper reactivity
         this.features.timerDurations[stageName as keyof typeof this.features.timerDurations] = {
           enabled: DEFAULT_ENABLED_STAGES.includes(stageName),
