@@ -5,15 +5,14 @@
 export const STAGE_TIMER_DEFAULTS: Record<string, number> = {
   selectTeam: 180, // 3 minutes to select team (allows all players to contribute meaningfully)
   votingForTeam: 45, // 45 seconds to vote and debate approval
-  onMission: 45, // 45 seconds for individual mission decisions
+  onMission: 30, // 30 seconds for individual mission decisions
   assassinate: 300, // 5 minutes for evil team to discuss and identify Merlin
   checkLoyalty: 30, // 30 seconds to choose who to check
-  announceLoyalty: 20, // 20 seconds to announce result
-  revealLoyalty: 15, // 15 seconds to reveal (mostly automatic)
+  announceLoyalty: 15, // 15 seconds to announce result
+  revealLoyalty: 30, // 30 seconds to reveal (mostly automatic)
   giveExcalibur: 20, // 20 seconds for leader to give Excalibur
-  useExcalibur: 20, // 20 seconds to decide whether to use Excalibur
-  giveCard: 20, // 20 seconds to give plot card
-  switchLancelots: 45, // 45 seconds for Lancelot switching decision
+  useExcalibur: 30, // 30 seconds to decide whether to use Excalibur
+  giveCard: 30, // 30 seconds to give plot card
   witchAbility: 30, // 30 seconds for witch ability decision
 };
 

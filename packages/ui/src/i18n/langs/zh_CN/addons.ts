@@ -51,7 +51,6 @@ export default {
     stageGiveExcalibur: '给予神剑',
     stageUseExcalibur: '使用神剑',
     stageGiveCard: '给予卡牌',
-    stageSwitchLancelots: '交换兰斯洛特',
     stageWitchAbility: '女巫能力',
     seconds: '秒',
     mainTimers: '主要计时器',

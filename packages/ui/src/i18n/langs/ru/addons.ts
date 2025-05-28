@@ -52,7 +52,6 @@ export default {
     stageGiveExcalibur: 'Дать Экскалибур',
     stageUseExcalibur: 'Использовать Экскалибур',
     stageGiveCard: 'Дать Карту',
-    stageSwitchLancelots: 'Смена Ланселотов',
     stageWitchAbility: 'Способность Ведьмы',
     seconds: 'секунд',
     mainTimers: 'Основные таймеры',

@@ -52,7 +52,6 @@ export default {
     stageGiveExcalibur: 'Give Excalibur',
     stageUseExcalibur: 'Use Excalibur',
     stageGiveCard: 'Give Card',
-    stageSwitchLancelots: 'Switch Lancelots',
     stageWitchAbility: 'Witch Ability',
     seconds: 'seconds',
     defaultTimerSettings: 'Default Timer Settings',

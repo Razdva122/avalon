@@ -2,6 +2,50 @@ import { TOptionalRoles } from './roles';
 
 import { prop } from '@typegoose/typegoose';
 
+// Типы для таймеров
+export class TimerConfig {
+  @prop()
+  public duration?: number;
+
+  @prop()
+  public enabled?: boolean;
+}
+
+export class TimerDurations {
+  @prop({ type: () => TimerConfig, _id: false })
+  public selectTeam?: TimerConfig;
+
+  @prop({ type: () => TimerConfig, _id: false })
+  public votingForTeam?: TimerConfig;
+
+  @prop({ type: () => TimerConfig, _id: false })
+  public onMission?: TimerConfig;
+
+  @prop({ type: () => TimerConfig, _id: false })
+  public assassinate?: TimerConfig;
+
+  @prop({ type: () => TimerConfig, _id: false })
+  public checkLoyalty?: TimerConfig;
+
+  @prop({ type: () => TimerConfig, _id: false })
+  public announceLoyalty?: TimerConfig;
+
+  @prop({ type: () => TimerConfig, _id: false })
+  public revealLoyalty?: TimerConfig;
+
+  @prop({ type: () => TimerConfig, _id: false })
+  public giveExcalibur?: TimerConfig;
+
+  @prop({ type: () => TimerConfig, _id: false })
+  public useExcalibur?: TimerConfig;
+
+  @prop({ type: () => TimerConfig, _id: false })
+  public giveCard?: TimerConfig;
+
+  @prop({ type: () => TimerConfig, _id: false })
+  public witchAbility?: TimerConfig;
+}
+
 // Validation type helper
 type CheckRoleKeys<T> = keyof T extends TOptionalRoles
   ? TOptionalRoles extends keyof T
@@ -98,21 +142,8 @@ export class GameOptionsFeatures {
   @prop()
   public timerEnabled?: boolean;
 
-  @prop()
-  public timerDurations?: {
-    selectTeam?: { duration?: number; enabled?: boolean };
-    votingForTeam?: { duration?: number; enabled?: boolean };
-    onMission?: { duration?: number; enabled?: boolean };
-    assassinate?: { duration?: number; enabled?: boolean };
-    checkLoyalty?: { duration?: number; enabled?: boolean };
-    announceLoyalty?: { duration?: number; enabled?: boolean };
-    revealLoyalty?: { duration?: number; enabled?: boolean };
-    giveExcalibur?: { duration?: number; enabled?: boolean };
-    useExcalibur?: { duration?: number; enabled?: boolean };
-    giveCard?: { duration?: number; enabled?: boolean };
-    switchLancelots?: { duration?: number; enabled?: boolean };
-    witchAbility?: { duration?: number; enabled?: boolean };
-  };
+  @prop({ type: () => TimerDurations, _id: false })
+  public timerDurations?: TimerDurations;
 }
 
 export class GameOptions {

@@ -388,24 +388,16 @@ export class GameTimer {
       const targetType = availableTargets[0];
 
       // Select appropriate players based on target type
-      if (targetType === 'merlin') {
-        // Need to select 1 player for merlin
+      if (targetType === 'merlin' || targetType === 'guinevere' || targetType === 'cleric') {
+        // Need to select 1 player for merlin/guinevere/cleric
         const randomGood = _.sample(goodPlayers);
         if (randomGood) {
           this.game.selectPlayer(assassin.userID, randomGood.userID);
         }
       } else if (targetType === 'lovers') {
-        // Need to select 2 players for lovers
-        const lovers = goodPlayers.filter((p) => p.role.role === 'tristan' || p.role.role === 'isolde');
-        const selectedLovers = lovers.length >= 2 ? lovers : _.sampleSize(goodPlayers, 2);
+        const selectedLovers = _.sampleSize(goodPlayers, 2);
         for (const lover of selectedLovers) {
           this.game.selectPlayer(assassin.userID, lover.userID);
-        }
-      } else if (targetType === 'guinevere' || targetType === 'cleric') {
-        // Need to select 1 player for guinevere or cleric
-        const randomGood = _.sample(goodPlayers);
-        if (randomGood) {
-          this.game.selectPlayer(assassin.userID, randomGood.userID);
         }
       }
 

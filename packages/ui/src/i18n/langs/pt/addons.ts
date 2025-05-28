@@ -52,7 +52,6 @@ export default {
     stageGiveExcalibur: 'Dar Excalibur',
     stageUseExcalibur: 'Usar Excalibur',
     stageGiveCard: 'Dar Carta',
-    stageSwitchLancelots: 'Trocar Lancelots',
     stageWitchAbility: 'Habilidade da Bruxa',
     seconds: 'segundos',
     mainTimers: 'Timers principais',

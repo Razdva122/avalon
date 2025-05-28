@@ -61,7 +61,7 @@
             <h4 class="timer-section-title">{{ $t('options.mainTimers') }}</h4>
             <v-checkbox
               :model-value="allMainTimersEnabled"
-              @update:model-value="toggleAllMainTimers"
+              @update:model-value="(v) => v !== null && toggleAllMainTimers(v)"
               color="info"
               hide-details
               density="compact"
@@ -80,7 +80,7 @@
                 <div class="stage-info">
                   <v-checkbox
                     :model-value="getStageTimerEnabled(stage.name)"
-                    @update:model-value="(v) => setStageTimerEnabled(stage.name, v)"
+                    @update:model-value="(v) => v !== null && setStageTimerEnabled(stage.name, v)"
                     color="info"
                     hide-details
                     density="compact"
@@ -146,7 +146,7 @@
                     </v-chip>
                     <v-checkbox
                       :model-value="allOtherTimersEnabled"
-                      @update:model-value="toggleAllOtherTimers"
+                      @update:model-value="(v) => v !== null && toggleAllOtherTimers(v)"
                       color="info"
                       hide-details
                       density="compact"
@@ -169,7 +169,7 @@
                       <div class="stage-info">
                         <v-checkbox
                           :model-value="getStageTimerEnabled(stage.name)"
-                          @update:model-value="(v) => setStageTimerEnabled(stage.name, v)"
+                          @update:model-value="(v) => v !== null && setStageTimerEnabled(stage.name, v)"
                           color="info"
                           hide-details
                           density="compact"
@@ -431,11 +431,6 @@ export default defineComponent({
           default: STAGE_TIMER_DEFAULTS.useExcalibur,
         },
         { name: 'giveCard', label: this.$t('options.stageGiveCard'), default: STAGE_TIMER_DEFAULTS.giveCard },
-        {
-          name: 'switchLancelots',
-          label: this.$t('options.stageSwitchLancelots'),
-          default: STAGE_TIMER_DEFAULTS.switchLancelots,
-        },
         {
           name: 'witchAbility',
           label: this.$t('options.stageWitchAbility'),
@@ -901,16 +896,16 @@ export default defineComponent({
   width: 100%;
   margin-top: 16px;
 
-  ::v-deep .v-data-table__wrapper {
+  :deep(.v-data-table__wrapper) {
     max-height: 400px;
     overflow-y: auto;
   }
 
-  ::v-deep td {
+  :deep(td) {
     padding: 4px 8px !important;
   }
 
-  ::v-deep th {
+  :deep(th) {
     background-color: rgba(var(--v-theme-primary), 0.1);
     font-weight: 600;
     text-align: left;
