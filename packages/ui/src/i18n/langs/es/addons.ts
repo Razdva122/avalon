@@ -57,5 +57,7 @@ export default {
     mainTimers: 'Temporizadores principales',
     otherTimers: 'Otros temporizadores',
     enableAll: 'Habilitar todo',
+    timer: 'Temporizador',
+    timerSettings: 'Configuración del temporizador',
   },
 };

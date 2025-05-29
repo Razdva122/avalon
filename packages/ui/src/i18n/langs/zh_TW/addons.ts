@@ -56,5 +56,7 @@ export default {
     mainTimers: '主要計時器',
     otherTimers: '其他計時器',
     enableAll: '啟用全部',
+    timer: '計時器',
+    timerSettings: '計時器設置',
   },
 };

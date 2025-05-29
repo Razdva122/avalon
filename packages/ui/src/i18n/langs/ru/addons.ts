@@ -57,5 +57,7 @@ export default {
     mainTimers: 'Основные таймеры',
     otherTimers: 'Другие таймеры',
     enableAll: 'Включить все',
+    timer: 'Таймер',
+    timerSettings: 'Настройки таймера',
   },
 };

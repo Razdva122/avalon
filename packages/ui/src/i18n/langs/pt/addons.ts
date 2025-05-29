@@ -57,5 +57,7 @@ export default {
     mainTimers: 'Timers principais',
     otherTimers: 'Outros timers',
     enableAll: 'Habilitar tudo',
+    timer: 'Timer',
+    timerSettings: 'Configurações do timer',
   },
 };

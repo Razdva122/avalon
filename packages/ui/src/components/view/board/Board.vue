@@ -423,7 +423,7 @@ export default defineComponent({
   transition: transform 0.5s;
 }
 
-.button-panel > button {
+.button-panel button {
   width: 200px;
 }
 
