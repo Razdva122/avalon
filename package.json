@@ -1,6 +1,6 @@
 {
   "name": "avalon-monorepo",
-  "version": "54.4.0",
+  "version": "54.4.1",
   "description": "A monorepo for avalon",
   "private": true,
   "workspaces": [
@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "npm run docker:mongo && npm run dev:lite",
-    "dev:lite": "cross-env NODE_ENV=development npm run serve --workspace=packages/ui & npm run dev --workspace=packages/backend",
+    "dev:lite": "concurrently \"cross-env NODE_ENV=development npm run serve --workspace=packages/ui\" \"npm run dev --workspace=packages/backend\"",
     "docker:mongo": "docker-compose -f docker-compose.dev.yml --env-file packages/backend/.env.development up -d && npx wait-port localhost:27017 --timeout 30000",
     "test": "npm run test --workspace=packages/backend",
     "build:ui": "cross-env NODE_ENV=production npm run build --workspace=packages/ui",
@@ -29,6 +29,7 @@
     "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
+    "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "eslint": "^8.55.0",
     "jest": "^29.7.0",
