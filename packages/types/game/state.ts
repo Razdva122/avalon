@@ -101,6 +101,13 @@ export class VisualGameState {
 
   @prop({ type: Schema.Types.Mixed, _id: false })
   public debug?: Dictionary<unknown>;
+
+  @prop({ type: Schema.Types.Mixed, _id: false })
+  public timer?: {
+    active: boolean;
+    endTime?: number;
+    stage?: TGameStage;
+  };
 }
 
 /**

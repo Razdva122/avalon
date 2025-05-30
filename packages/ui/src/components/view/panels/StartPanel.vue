@@ -27,12 +27,15 @@
     <v-btn class="mt-2 mb-4" color="success" :disabled="isStartGameDisabled" @click="onStartClick">
       {{ $t('startPanel.startGame') }}
     </v-btn>
-    <Options
-      :roles="options.roles"
-      :addons="options.addons"
-      :features="options.features"
-      :buttonText="$t('startPanel.options')"
-    />
+    <div class="d-flex flex-column gap-2">
+      <Options
+        :roles="options.roles"
+        :addons="options.addons"
+        :features="options.features"
+        :buttonText="$t('startPanel.options')"
+      />
+      <TimerButton :features="options.features" @update:features="updateFeatures" />
+    </div>
   </template>
 </template>
 
@@ -44,11 +47,13 @@ import { TPageRoomState } from '@/helpers/game-state-manager';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import Options from '@/components/view/options/Options.vue';
+import TimerButton from '@/components/view/options/TimerButton.vue';
 
 export default defineComponent({
   name: 'StartPanel',
   components: {
     Options,
+    TimerButton,
   },
   props: {
     roomState: {
@@ -126,6 +131,10 @@ export default defineComponent({
       window.open('https://discord.gg/DR9cEDDNdN', '_blank');
     };
 
+    const updateFeatures = (newFeatures: any) => {
+      options.value.features = newFeatures;
+    };
+
     return {
       roomState,
       options,
@@ -139,6 +148,7 @@ export default defineComponent({
       onStartClick,
       onCopyClick,
       onDiscordClick,
+      updateFeatures,
     };
   },
 });
