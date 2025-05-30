@@ -100,7 +100,7 @@ import { STAGE_TIMER_DEFAULTS, DEFAULT_ENABLED_STAGES } from '@avalon/types/game
 import type { GameOptionsFeatures, TimerConfig, TimerDurations } from '@avalon/types';
 
 interface StageTimerSetting {
-  name: string;
+  name: keyof TimerDurations;
   label: string;
   default: number;
 }
@@ -121,27 +121,6 @@ export default defineComponent({
     const { t } = useI18n();
     const overlay = ref(false);
     const stageTimersExpanded = ref<number | undefined>(undefined);
-
-    const updateTimerEnabled = (enabled: boolean | null) => {
-      if (enabled === null) return;
-
-      const updatedFeatures = { ...props.features, timerEnabled: enabled };
-
-      // Initialize timer durations if enabling timer
-      if (enabled && (!updatedFeatures.timerDurations || Object.keys(updatedFeatures.timerDurations).length === 0)) {
-        updatedFeatures.timerDurations = {} as TimerDurations;
-        stageTimerSettings.value.forEach((stage) => {
-          const stageName = stage.name as keyof TimerDurations;
-          if (updatedFeatures.timerDurations) {
-            (updatedFeatures.timerDurations as any)[stageName] = {
-              enabled: DEFAULT_ENABLED_STAGES.includes(stage.name),
-            };
-          }
-        });
-      }
-
-      emit('update:features', updatedFeatures);
-    };
 
     const stageTimerSettings = computed<StageTimerSetting[]>(() => [
       { name: 'selectTeam', label: t('options.stageSelectTeam'), default: STAGE_TIMER_DEFAULTS.selectTeam },
@@ -175,24 +154,15 @@ export default defineComponent({
 
     const allOtherTimersEnabled = computed(() => otherTimers.value.every((stage) => getStageTimerEnabled(stage.name)));
 
-    const getStageTimerDuration = (stageName: string): number | undefined => {
-      const stageConfig = props.features?.timerDurations?.[stageName as keyof TimerDurations];
-      if (typeof stageConfig === 'object' && stageConfig) {
-        return stageConfig.duration;
-      }
-      return undefined;
+    const getStageTimerDuration = (stageName: keyof TimerDurations): number | undefined => {
+      return props.features?.timerDurations?.[stageName]?.duration;
     };
 
-    const getStageTimerEnabled = (stageName: string): boolean => {
-      const stageConfig = props.features?.timerDurations?.[stageName as keyof TimerDurations];
-      if (typeof stageConfig === 'object' && stageConfig) {
-        return stageConfig.enabled !== false; // Default to true if not explicitly false
-      }
-      // If no explicit config, use default based on stage type
-      return DEFAULT_ENABLED_STAGES.includes(stageName);
+    const getStageTimerEnabled = (stageName: keyof TimerDurations): boolean => {
+      return Boolean(props.features?.timerDurations?.[stageName]?.enabled);
     };
 
-    const setStageTimerDuration = (stageName: string, value: number | string | undefined | null) => {
+    const setStageTimerDuration = (stageName: keyof TimerDurations, value: number | string | undefined | null) => {
       if (!props.features) return;
 
       const updatedFeatures = { ...props.features };
@@ -201,8 +171,7 @@ export default defineComponent({
       }
 
       const timerDurations = { ...updatedFeatures.timerDurations };
-      const stageName_key = stageName as keyof TimerDurations;
-      const stageConfig = (timerDurations as any)[stageName_key] || ({} as TimerConfig);
+      const stageConfig = timerDurations[stageName] || ({} as TimerConfig);
 
       if (value === undefined || value === null || value === '') {
         delete stageConfig.duration;
@@ -210,13 +179,13 @@ export default defineComponent({
         stageConfig.duration = Number(value);
       }
 
-      (timerDurations as any)[stageName_key] = stageConfig;
+      timerDurations[stageName] = stageConfig;
       updatedFeatures.timerDurations = timerDurations;
 
       emit('update:features', updatedFeatures);
     };
 
-    const setStageTimerEnabled = (stageName: string, enabled: boolean) => {
+    const setStageTimerEnabled = (stageName: keyof TimerDurations | (keyof TimerDurations)[], enabled: boolean) => {
       if (!props.features) return;
 
       const updatedFeatures = { ...props.features };
@@ -225,65 +194,48 @@ export default defineComponent({
         updatedFeatures.timerDurations = {} as TimerDurations;
       }
 
-      const timerDurations = { ...updatedFeatures.timerDurations };
-      const stageName_key = stageName as keyof TimerDurations;
-      const stageConfig = (timerDurations as any)[stageName_key] || ({} as TimerConfig);
+      const stageNames = Array.isArray(stageName) ? stageName : [stageName];
 
-      stageConfig.enabled = enabled;
-      (timerDurations as any)[stageName_key] = stageConfig;
-      updatedFeatures.timerDurations = timerDurations;
+      const timerDurations = { ...updatedFeatures.timerDurations };
+
+      stageNames.forEach((el) => {
+        const stageConfig = timerDurations[el] || ({} as TimerConfig);
+
+        stageConfig.enabled = enabled;
+        timerDurations[el] = stageConfig;
+        updatedFeatures.timerDurations = timerDurations;
+      });
 
       emit('update:features', updatedFeatures);
     };
 
-    const resetStageTimer = (stageName: string) => {
+    const resetStageTimer = (stageName: keyof TimerDurations) => {
       if (!props.features) return;
 
       const updatedFeatures = { ...props.features };
       if (!updatedFeatures.timerDurations) return;
 
       const timerDurations = { ...updatedFeatures.timerDurations };
-      const stageName_key = stageName as keyof TimerDurations;
 
-      delete (timerDurations as any)[stageName_key];
+      delete timerDurations[stageName];
       updatedFeatures.timerDurations = timerDurations;
 
       emit('update:features', updatedFeatures);
     };
 
     const toggleAllMainTimers = (enabled: boolean) => {
-      defaultEnabledTimers.value.forEach((stage) => {
-        setStageTimerEnabled(stage.name, enabled);
-      });
+      setStageTimerEnabled(
+        defaultEnabledTimers.value.map((el) => el.name),
+        enabled,
+      );
     };
 
     const toggleAllOtherTimers = (enabled: boolean) => {
-      otherTimers.value.forEach((stage) => {
-        setStageTimerEnabled(stage.name, enabled);
-      });
+      setStageTimerEnabled(
+        otherTimers.value.map((el) => el.name),
+        enabled,
+      );
     };
-
-    // Initialize timer configs if timer is enabled
-    watch(
-      () => props.features?.timerEnabled,
-      (enabled) => {
-        if (enabled && (!props.features.timerDurations || Object.keys(props.features.timerDurations).length === 0)) {
-          const updatedFeatures = { ...props.features, timerDurations: {} as TimerDurations };
-
-          stageTimerSettings.value.forEach((stage) => {
-            const stageName = stage.name as keyof TimerDurations;
-            if (updatedFeatures.timerDurations) {
-              (updatedFeatures.timerDurations as any)[stageName] = {
-                enabled: DEFAULT_ENABLED_STAGES.includes(stage.name),
-              };
-            }
-          });
-
-          emit('update:features', updatedFeatures);
-        }
-      },
-      { immediate: true },
-    );
 
     return {
       overlay,
@@ -300,7 +252,6 @@ export default defineComponent({
       resetStageTimer,
       toggleAllMainTimers,
       toggleAllOtherTimers,
-      updateTimerEnabled,
     };
   },
 });

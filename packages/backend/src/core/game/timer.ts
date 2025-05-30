@@ -57,11 +57,6 @@ export class GameTimer {
    * Check if timer is enabled for a specific stage
    */
   private isStageTimerEnabled(stage: TGameStage): boolean {
-    // If global timer is disabled, no stage timers should run
-    if (!this.game.features.timerEnabled) {
-      return false;
-    }
-
     // Check for stage-specific enabled flag
     const stageConfig = this.game.features.timerDurations?.[stage as keyof typeof this.game.features.timerDurations];
 

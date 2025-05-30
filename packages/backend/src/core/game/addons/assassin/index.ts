@@ -73,7 +73,7 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
 
       this.game.updateVisibleRolesState('all', visibleEvil);
 
-      if (this.game.features.timerEnabled) {
+      if (this.game.isTimerEnabled) {
         this.game.timer.startTimer('assassinate');
       }
 

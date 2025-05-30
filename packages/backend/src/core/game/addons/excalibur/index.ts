@@ -28,7 +28,7 @@ export class ExcaliburAddon implements IGameAddon {
     this.game.leader.features.waitForAction = true;
     this.game.stage = 'giveExcalibur';
 
-    if (this.game.features.timerEnabled) {
+    if (this.game.isTimerEnabled) {
       this.game.timer.startTimer('giveExcalibur');
     }
 
@@ -50,7 +50,7 @@ export class ExcaliburAddon implements IGameAddon {
 
     this.game.stage = 'useExcalibur';
 
-    if (this.game.features.timerEnabled) {
+    if (this.game.isTimerEnabled) {
       this.game.timer.startTimer('useExcalibur');
     }
 
