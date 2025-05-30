@@ -21,9 +21,7 @@ export class LoyaltyChecker {
 
   startChecking(type: 'checkLoyalty' | 'revealLoyalty'): Observable<boolean> {
     this.game.stage = type;
-    if (this.game.isTimerEnabled) {
-      this.game.timer.startTimer(type);
-    }
+    this.game.timer.startTimer(type);
     this.game.stateObserver.gameStateChanged();
     return this.loyaltySubject;
   }
@@ -46,9 +44,7 @@ export class LoyaltyChecker {
     }
 
     this.game.stage = 'announceLoyalty';
-    if (this.game.isTimerEnabled) {
-      this.game.timer.startTimer('announceLoyalty');
-    }
+    this.game.timer.startTimer('announceLoyalty');
     const loyaltyCheck = new CheckLoyaltyHistory(ownerOfCheck, selectedPlayer);
     this.game.history.push(loyaltyCheck);
     this.game.stateObserver.gameStateChanged();
@@ -68,9 +64,7 @@ export class LoyaltyChecker {
     }
 
     this.game.stage = 'announceLoyalty';
-    if (this.game.isTimerEnabled) {
-      this.game.timer.startTimer('announceLoyalty');
-    }
+    this.game.timer.startTimer('announceLoyalty');
     targetPlayer.features.waitForAction = true;
     targetPlayer.features.isSelected = false;
     ownerOfReveal.features.waitForAction = false;

@@ -60,11 +60,8 @@ export class GameTimer {
     // Check for stage-specific enabled flag
     const stageConfig = this.game.features.timerDurations?.[stage as keyof typeof this.game.features.timerDurations];
 
-    if (stageConfig && typeof stageConfig === 'object') {
-      // If enabled is explicitly set, use that value
-      if (stageConfig.enabled !== undefined) {
-        return stageConfig.enabled;
-      }
+    if (stageConfig?.enabled !== undefined) {
+      return stageConfig.enabled;
     }
 
     // If no explicit config, use default based on stage type
