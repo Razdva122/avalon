@@ -65,11 +65,13 @@ export class GameTimer {
     this.clearTimer();
 
     if (!this.isStageTimerEnabled(stage)) {
+      console.log(`[GameTimer] Timer not enabled for stage: ${stage}`);
       return;
     }
 
     // Get stage-specific duration
     const duration = this.getStageSpecificDuration(stage);
+    console.log(`[GameTimer] Starting timer for stage: ${stage}, duration: ${duration}s`);
 
     // Check if we need to add a history display delay
     const delay = this.pendingHistoryDelay ? 10000 : 0; // 10 seconds for history display
@@ -86,6 +88,10 @@ export class GameTimer {
       expired: false,
     };
 
+    if (delay > 0) {
+      console.log(`[GameTimer] Timer for stage: ${stage} has ${delay / 1000}s delay before starting`);
+    }
+
     // If there's a delay, schedule a state update when the timer becomes visible
     if (delay > 0) {
       const visibilityTimeoutId = setTimeout(() => {
@@ -99,6 +105,7 @@ export class GameTimer {
 
     const timeoutId = setTimeout(
       () => {
+        console.log(`[GameTimer] Timer callback triggered for stage: ${stage}`);
         try {
           this.handleTimerExpired(stage);
         } catch (error) {
@@ -119,6 +126,7 @@ export class GameTimer {
    */
   clearTimer(): void {
     if (this.currentTimer) {
+      console.log(`[GameTimer] Clearing timer for stage: ${this.currentTimer.stage}`);
       const timeoutId = this.timers.get(this.currentTimer.stage);
       if (timeoutId) {
         clearTimeout(timeoutId);
@@ -145,10 +153,13 @@ export class GameTimer {
    * Cleanup method to ensure all timers are cleared and references removed
    */
   cleanup(): void {
+    console.log('[GameTimer] Cleanup: Clearing all timers and references');
     try {
+      const activeTimerCount = this.timers.size;
       this.clearTimer();
       this.currentTimer = undefined;
       this.pendingHistoryDelay = false;
+      console.log(`[GameTimer] Cleanup completed: Cleared ${activeTimerCount} active timers`);
     } catch (error) {
       console.error('[GameTimer] Error during cleanup:', error);
     }
@@ -203,12 +214,14 @@ export class GameTimer {
    */
   private handleTimerExpired(stage: TGameStage): void {
     if (this.currentTimer && this.currentTimer.stage === stage && this.game.stage !== 'end') {
+      console.log(`[GameTimer] Timer expired for stage: ${stage}, current game stage: ${this.game.stage}`);
       this.currentTimer.expired = true;
 
       // Clear the timer from our map
       this.timers.delete(stage);
 
       try {
+        console.log(`[GameTimer] Executing timeout handler for stage: ${stage}`);
         switch (stage) {
           case 'selectTeam':
             this.handleSelectTeamTimeout();
@@ -246,10 +259,15 @@ export class GameTimer {
         // Ensure state is updated even if an error occurs
         try {
           this.game.stateObserver.gameStateChanged();
+          console.log(`[GameTimer] Game state updated after timer expiration for stage: ${stage}`);
         } catch (stateError) {
           console.error(`[GameTimer] Error updating game state after timer expiration:`, stateError);
         }
       }
+    } else {
+      console.log(
+        `[GameTimer] Timer expiration ignored - conditions not met. Stage: ${stage}, Game ended: ${this.game.stage === 'end'}`,
+      );
     }
   }
 
@@ -260,6 +278,9 @@ export class GameTimer {
     try {
       const requiredPlayers = this.game.currentMission.data.settings.players;
       const availablePlayers = this.game.players.filter((p) => !p.features.isSelected);
+      console.log(
+        `[GameTimer] SelectTeam timeout: Required players: ${requiredPlayers}, Available: ${availablePlayers.length}, Already selected: ${this.game.selectedPlayers.length}`,
+      );
 
       while (this.game.selectedPlayers.length < requiredPlayers && availablePlayers.length > 0) {
         const randomPlayer = _.sample(availablePlayers);
@@ -277,6 +298,7 @@ export class GameTimer {
       }
 
       this.game.sentSelectedPlayers(this.game.leader.userID);
+      console.log(`[GameTimer] SelectTeam timeout completed: Sent ${this.game.selectedPlayers.length} players`);
     } catch (error) {
       console.error('[GameTimer] Error in handleSelectTeamTimeout:', error);
       console.error(`[GameTimer] Leader: ${this.game.leader?.userID}`);
@@ -335,15 +357,17 @@ export class GameTimer {
    */
   private handleVoteForTeamTimeout(): void {
     const unvotedPlayers = this.game.vote?.getUnvotedPlayers() || [];
+    console.log(`[GameTimer] VoteForTeam timeout: ${unvotedPlayers.length} players haven't voted`);
 
     for (const player of unvotedPlayers) {
       try {
         const randomVote: TVoteOption = _.sample(['approve', 'reject'])!;
         this.game.voteForMission(player.userID, randomVote);
+        console.log(`[GameTimer] Auto-voted ${randomVote} for player ${player.userID}`);
       } catch (error) {
         // Player might have voted while we were processing, skip them
         console.log(
-          `[Timer] Could not auto-vote for player ${player.userID}:`,
+          `[GameTimer] Could not auto-vote for player ${player.userID}:`,
           error instanceof Error ? error.message : error,
         );
       }
@@ -355,6 +379,8 @@ export class GameTimer {
    */
   private handleMissionTimeout(): void {
     const missionActions = this.game.currentMission.data.actions;
+    const unvotedActions = missionActions.filter((a) => a.value === 'unvoted');
+    console.log(`[GameTimer] Mission timeout: ${unvotedActions.length} players haven't made action`);
 
     for (const missionAction of missionActions) {
       if (missionAction.value === 'unvoted') {
@@ -366,10 +392,13 @@ export class GameTimer {
           }
 
           this.game.actionOnMission(missionAction.player.userID, action);
+          console.log(
+            `[GameTimer] Auto-action ${action} for player ${missionAction.player.userID} (${missionAction.player.role.loyalty})`,
+          );
         } catch (error) {
           // Player might have acted while we were processing, skip them
           console.log(
-            `[Timer] Could not auto-act for player ${missionAction.player.userID}:`,
+            `[GameTimer] Could not auto-act for player ${missionAction.player.userID}:`,
             error instanceof Error ? error.message : error,
           );
         }
@@ -394,7 +423,11 @@ export class GameTimer {
   private handleAssassinateTimeout(): void {
     try {
       const assassin = this.game.players.find((p) => p.features.isAssassin);
-      if (!assassin || !this.game.addons.assassin) return;
+      if (!assassin || !this.game.addons.assassin) {
+        console.log(`[GameTimer] Assassinate timeout: No assassin found or addon not available`);
+        return;
+      }
+      console.log(`[GameTimer] Assassinate timeout: Assassin ${assassin.userID} needs to make selection`);
 
       const progressData = this.game.addons.assassin.progressData;
       const availableTargets = this.game.addons.assassin.addonData.assassin?.assassinateTargets || [];
@@ -420,6 +453,9 @@ export class GameTimer {
 
         // Execute the assassination
         this.game.addons.assassin.assassinate(assassin.userID, targetType);
+        console.log(
+          `[GameTimer] Assassinate timeout: Auto-selected ${this.game.selectedPlayers.map((p) => p.userID).join(', ')} for ${targetType}`,
+        );
       } else if (progressData) {
         // If we're in a multi-stage assassination (custom role selection)
         // Filter out any evil players from selection
@@ -459,6 +495,7 @@ export class GameTimer {
         if (progressData.possibleTargets && progressData.possibleTargets.length > 0) {
           const randomRole = _.sample(progressData.possibleTargets);
           this.game.addons.assassin.assassinate(assassin.userID, progressData.type, randomRole);
+          console.log(`[GameTimer] Assassinate timeout: Auto-selected role ${randomRole} for custom assassination`);
         }
       }
     } catch (error) {
@@ -471,6 +508,7 @@ export class GameTimer {
    * Handle give card timeout - give to random player
    */
   private handleGiveCardTimeout(): void {
+    console.log(`[GameTimer] GiveCard timeout: Leader ${this.game.leader.userID} needs to give card`);
     // Filter out invalid selections (can't give card to self)
     const validSelections = this.game.selectedPlayers.filter((p) => p !== this.game.leader);
 
@@ -500,6 +538,7 @@ export class GameTimer {
     // Give card to the selected player
     if (this.game.selectedPlayers.length === 1 && this.game.addons.plotCards) {
       this.game.addons.plotCards.giveCardToPlayer(this.game.leader.userID);
+      console.log(`[GameTimer] GiveCard timeout: Auto-gave card to player ${this.game.selectedPlayers[0].userID}`);
     }
   }
 
@@ -508,7 +547,11 @@ export class GameTimer {
    */
   private handleLoyaltyCheckTimeout(): void {
     const activePlayer = this.game.players.find((p) => p.features.waitForAction);
-    if (!activePlayer) return;
+    if (!activePlayer) {
+      console.log(`[GameTimer] LoyaltyCheck timeout: No active player found`);
+      return;
+    }
+    console.log(`[GameTimer] LoyaltyCheck timeout: Player ${activePlayer.userID} needs to check loyalty`);
 
     // Filter out invalid selections (can't check/reveal own loyalty)
     const validSelections = this.game.selectedPlayers.filter((p) => p !== activePlayer);
@@ -547,6 +590,7 @@ export class GameTimer {
       } else if (this.game.stage === 'announceLoyalty' && this.game.addons.ladyOfLake) {
         const randomLoyalty = _.sample(['good', 'evil'])!;
         this.game.addons.ladyOfLake.announceLoyalty(activePlayer.userID, randomLoyalty as 'good' | 'evil');
+        console.log(`[GameTimer] LoyaltyCheck timeout: Auto-announced ${randomLoyalty} loyalty`);
       }
     }
   }
