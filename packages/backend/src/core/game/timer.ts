@@ -182,7 +182,7 @@ export class GameTimer {
    * Handle timer expiration
    */
   private handleTimerExpired(stage: TGameStage): void {
-    if (this.currentTimer && this.currentTimer.stage === stage) {
+    if (this.currentTimer && this.currentTimer.stage === stage && this.game.stage !== 'end') {
       this.currentTimer.expired = true;
 
       // Clear the timer from our map
