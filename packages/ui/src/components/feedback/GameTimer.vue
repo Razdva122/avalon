@@ -1,6 +1,6 @@
 <template>
   <template v-if="remainingTime > 0">
-    <span :class="{ 'low-time': remainingTime < 10000, 'critical-time': remainingTime < 5000 }">
+    <span class="time" :class="{ 'low-time': Number(timeInString) < 10, 'critical-time': Number(timeInString) < 5 }">
       {{ timeInString }}
     </span>
   </template>
@@ -57,7 +57,7 @@ export default defineComponent({
           intervalId = undefined;
           emit('timerEnd');
         }
-      }, 100); // Check every 100ms but only update when seconds change
+      }, 500); // Check every 500ms but only update when seconds change
     });
 
     onUnmounted(() => {
@@ -94,7 +94,7 @@ export default defineComponent({
                 intervalId = undefined;
                 emit('timerEnd');
               }
-            }, 100);
+            }, 500);
           }
         }
       },
@@ -109,12 +109,16 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.time {
+  color: rgb(var(--v-theme-text-primary));
+}
+
 .low-time {
-  color: #ffcc00;
+  color: rgb(var(--v-theme-warning));
 }
 
 .critical-time {
-  color: #ff4444;
+  color: rgb(var(--v-theme-error));
   animation: pulse 1s infinite;
 }
 

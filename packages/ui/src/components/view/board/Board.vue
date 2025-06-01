@@ -456,7 +456,6 @@ export default defineComponent({
   left: 50%;
   transform: translateX(-50%);
   font-size: 24px;
-  background-color: rgba(0, 0, 0, 0.6);
   color: white;
   padding: 8px 16px;
   border-radius: 20px;
@@ -467,7 +466,7 @@ export default defineComponent({
   position: fixed;
   bottom: 30px;
   left: 30px;
-  background-color: rgba(0, 0, 0, 0.85);
+  background-color: rgb(var(--v-theme-surface-light));
   color: white;
   padding: 15px 25px;
   border-radius: 30px;
