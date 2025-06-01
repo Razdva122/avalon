@@ -281,7 +281,9 @@ export default defineComponent({
   background-color: rgb(var(--v-theme-surface));
   width: 100%;
   max-width: 100vw;
+  max-height: 90vh;
   min-height: 530px;
+  overflow-y: auto;
 }
 
 .role,

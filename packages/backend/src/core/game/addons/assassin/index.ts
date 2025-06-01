@@ -73,6 +73,8 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
 
       this.game.updateVisibleRolesState('all', visibleEvil);
 
+      this.game.timer.startTimer('assassinate');
+
       this.game.stateObserver.gameStateChanged();
       return this.assassinateSubject.asObservable();
     }
@@ -109,7 +111,7 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
     if (Array.isArray(optionsForStage)) {
       if (this.game.selectedPlayers.length !== optionsForStage.length) {
         throw new Error(
-          `Invalid selected player count for ${type} assassinate. Expected: ${options.length}, Selected: ${this.game.selectedPlayers.length}`,
+          `Invalid selected player count for ${type} assassinate. Expected: ${optionsForStage.length}, Selected: ${this.game.selectedPlayers.length}`,
         );
       }
 
@@ -182,6 +184,7 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
 
     if (isLastStage || assassinateResult === 'miss') {
       assassin.features.waitForAction = false;
+      this.game.timer.clearTimer();
       this.assassinateSubject.next(true);
     }
   }

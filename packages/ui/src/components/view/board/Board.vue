@@ -3,7 +3,7 @@
     <div class="board-container" :class="'view-mode-' + stateManager.viewMode.value">
       <div class="game-board" alt="board" :class="'game-end-' + gameResult"></div>
       <slot name="content">
-        <div class="timer">
+        <div class="timer" v-if="timerDuration > 0">
           <Timer @timerEnd="clearHistoryElement" :duration="timerDuration" />
         </div>
         <div class="actions-container d-flex flex-column justify-center">
@@ -29,6 +29,12 @@
                 <slot name="restart"></slot>
               </template>
             </Game>
+            <div
+              v-if="gameTimer && gameTimer.active && gameTimer.endTime && stateManager.viewMode.value === 'live'"
+              class="game-timer"
+            >
+              <GameTimer @timerEnd="onGameTimerEnd" :endTime="gameTimer.endTime" />
+            </div>
           </template>
         </div>
       </slot>
@@ -58,6 +64,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import Player from '@/components/view/board/modules/Player.vue';
 import Timer from '@/components/feedback/Timer.vue';
+import GameTimer from '@/components/feedback/GameTimer.vue';
 import Game from '@/components/view/board/game/Game.vue';
 import StartPanel from '@/components/view/panels/StartPanel.vue';
 import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
@@ -77,6 +84,7 @@ export default defineComponent({
     Game,
     StartPanel,
     Timer,
+    GameTimer,
     AnnounceLoyalty,
     OptionsPreview,
   },
@@ -120,6 +128,17 @@ export default defineComponent({
       visibleHistory.value = undefined;
       timerDuration.value = 0;
       stateManager.moveToNextStage();
+    };
+
+    const gameTimer = computed(() => {
+      if (roomState.value.stage === 'started' && gameState.value?.timer && !visibleHistory.value) {
+        return gameState.value.timer;
+      }
+      return null;
+    });
+
+    const onGameTimerEnd = () => {
+      // Timer ended, backend will handle the timeout
     };
 
     const navigateToUserStats = (uuid: string) => {
@@ -301,6 +320,8 @@ export default defineComponent({
 
       calculateRotate,
       onPlayerClick,
+      gameTimer,
+      onGameTimerEnd,
     };
   },
 });
@@ -402,7 +423,7 @@ export default defineComponent({
   transition: transform 0.5s;
 }
 
-.button-panel > button {
+.button-panel button {
   width: 200px;
 }
 
@@ -431,9 +452,37 @@ export default defineComponent({
 .timer {
   text-align: center;
   position: absolute;
-  top: 100px;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  min-width: 60px;
+}
+
+.game-timer {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  background-color: rgb(var(--v-theme-surface-light));
+  color: white;
+  padding: 15px 25px;
+  border-radius: 30px;
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 120px;
+  justify-content: center;
+}
+
+.game-timer::before {
+  content: '⏱️';
   font-size: 28px;
-  width: 100px;
-  height: 30px;
 }
 </style>
