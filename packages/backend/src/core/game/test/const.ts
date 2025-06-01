@@ -3,7 +3,7 @@ import { GameTestHelper } from '@/core/game/test/helpers';
 import { GameOptions } from '@avalon/types';
 import { gamesSettings, Game } from '@/core/game';
 
-export const defaultOptions = (<unknown>[7, { roles: {}, addons: {} }, () => {}]) as [
+export const defaultOptions = (<unknown>[7, { roles: {}, addons: {}, features: {} }, () => {}]) as [
   number,
   GameOptions,
   (game: Game) => void,

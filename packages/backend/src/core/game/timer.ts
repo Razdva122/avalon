@@ -1,6 +1,6 @@
 import type { Game } from '@/core/game';
 import type { TGameStage, TVoteOption, TMissionResult } from '@avalon/types';
-import { STAGE_TIMER_DEFAULTS, DEFAULT_ENABLED_STAGES } from '@avalon/types/game/timer-defaults';
+import { STAGE_TIMER_DEFAULTS } from '@avalon/types/game/timer-defaults';
 import _ from 'lodash';
 
 export interface TimerState {
@@ -36,17 +36,8 @@ export class GameTimer {
     const stageConfig = this.game.features.timerDurations?.[stage as keyof typeof this.game.features.timerDurations];
 
     // If stage-specific duration exists, use it
-    if (
-      stageConfig &&
-      typeof stageConfig === 'object' &&
-      stageConfig.duration !== undefined &&
-      stageConfig.duration > 0
-    ) {
+    if (stageConfig && stageConfig.duration !== undefined && stageConfig.duration > 0) {
       return stageConfig.duration;
-    }
-    // Handle legacy format (direct number)
-    else if (typeof stageConfig === 'number' && stageConfig > 0) {
-      return stageConfig;
     }
 
     // Otherwise, use the default for this stage
@@ -64,8 +55,7 @@ export class GameTimer {
       return stageConfig.enabled;
     }
 
-    // If no explicit config, use default based on stage type
-    return DEFAULT_ENABLED_STAGES.includes(stage);
+    return false;
   }
 
   /**
