@@ -99,7 +99,14 @@ export class GameTimer {
 
     const timeoutId = setTimeout(
       () => {
-        this.handleTimerExpired(stage);
+        try {
+          this.handleTimerExpired(stage);
+        } catch (error) {
+          console.error(`[GameTimer] Critical error in timer callback for stage ${stage}:`, error);
+          if (error instanceof Error) {
+            console.error(`[GameTimer] Error stack:`, error.stack);
+          }
+        }
       },
       delay + duration * 1000,
     );
@@ -132,6 +139,19 @@ export class GameTimer {
       clearTimeout(timeoutId);
     });
     this.timers.clear();
+  }
+
+  /**
+   * Cleanup method to ensure all timers are cleared and references removed
+   */
+  cleanup(): void {
+    try {
+      this.clearTimer();
+      this.currentTimer = undefined;
+      this.pendingHistoryDelay = false;
+    } catch (error) {
+      console.error('[GameTimer] Error during cleanup:', error);
+    }
   }
 
   /**
@@ -217,9 +237,18 @@ export class GameTimer {
             this.handleGiveCardTimeout();
             break;
         }
+      } catch (error) {
+        console.error(`[GameTimer] Error handling timer expiration for stage ${stage}:`, error);
+        if (error instanceof Error) {
+          console.error(`[GameTimer] Error stack:`, error.stack);
+        }
       } finally {
         // Ensure state is updated even if an error occurs
-        this.game.stateObserver.gameStateChanged();
+        try {
+          this.game.stateObserver.gameStateChanged();
+        } catch (stateError) {
+          console.error(`[GameTimer] Error updating game state after timer expiration:`, stateError);
+        }
       }
     }
   }
@@ -228,25 +257,30 @@ export class GameTimer {
    * Handle select team timeout - select random valid players
    */
   private handleSelectTeamTimeout(): void {
-    const requiredPlayers = this.game.currentMission.data.settings.players;
-    const availablePlayers = this.game.players.filter((p) => !p.features.isSelected);
+    try {
+      const requiredPlayers = this.game.currentMission.data.settings.players;
+      const availablePlayers = this.game.players.filter((p) => !p.features.isSelected);
 
-    while (this.game.selectedPlayers.length < requiredPlayers && availablePlayers.length > 0) {
-      const randomPlayer = _.sample(availablePlayers);
-      if (randomPlayer) {
-        this.game.selectPlayer(this.game.leader.userID, randomPlayer.userID);
-        _.pull(availablePlayers, randomPlayer);
+      while (this.game.selectedPlayers.length < requiredPlayers && availablePlayers.length > 0) {
+        const randomPlayer = _.sample(availablePlayers);
+        if (randomPlayer) {
+          this.game.selectPlayer(this.game.leader.userID, randomPlayer.userID);
+          _.pull(availablePlayers, randomPlayer);
+        }
       }
-    }
 
-    while (this.game.selectedPlayers.length > requiredPlayers) {
-      const randomSelected = _.sample(this.game.selectedPlayers);
-      if (randomSelected) {
-        this.game.selectPlayer(this.game.leader.userID, randomSelected.userID);
+      while (this.game.selectedPlayers.length > requiredPlayers) {
+        const randomSelected = _.sample(this.game.selectedPlayers);
+        if (randomSelected) {
+          this.game.selectPlayer(this.game.leader.userID, randomSelected.userID);
+        }
       }
-    }
 
-    this.game.sentSelectedPlayers(this.game.leader.userID);
+      this.game.sentSelectedPlayers(this.game.leader.userID);
+    } catch (error) {
+      console.error('[GameTimer] Error in handleSelectTeamTimeout:', error);
+      console.error(`[GameTimer] Leader: ${this.game.leader?.userID}`);
+    }
   }
 
   /**
@@ -358,73 +392,78 @@ export class GameTimer {
    * Handle assassinate timeout - select random good player
    */
   private handleAssassinateTimeout(): void {
-    const assassin = this.game.players.find((p) => p.features.isAssassin);
-    if (!assassin || !this.game.addons.assassin) return;
+    try {
+      const assassin = this.game.players.find((p) => p.features.isAssassin);
+      if (!assassin || !this.game.addons.assassin) return;
 
-    const progressData = this.game.addons.assassin.progressData;
-    const availableTargets = this.game.addons.assassin.addonData.assassin?.assassinateTargets || [];
-    const goodPlayers = this.game.players.filter((p) => p.role.loyalty === 'good');
+      const progressData = this.game.addons.assassin.progressData;
+      const availableTargets = this.game.addons.assassin.addonData.assassin?.assassinateTargets || [];
+      const goodPlayers = this.game.players.filter((p) => p.role.loyalty === 'good');
 
-    // If no target type has been chosen yet, choose the first available one
-    if (!progressData && availableTargets.length > 0) {
-      const targetType = availableTargets[0];
+      // If no target type has been chosen yet, choose the first available one
+      if (!progressData && availableTargets.length > 0) {
+        const targetType = availableTargets[0];
 
-      // Select appropriate players based on target type
-      if (targetType === 'merlin' || targetType === 'guinevere' || targetType === 'cleric') {
-        // Need to select 1 player for merlin/guinevere/cleric
-        const randomGood = _.sample(goodPlayers);
-        if (randomGood) {
-          this.game.selectPlayer(assassin.userID, randomGood.userID);
-        }
-      } else if (targetType === 'lovers') {
-        const selectedLovers = _.sampleSize(goodPlayers, 2);
-        for (const lover of selectedLovers) {
-          this.game.selectPlayer(assassin.userID, lover.userID);
-        }
-      }
-
-      // Execute the assassination
-      this.game.addons.assassin.assassinate(assassin.userID, targetType);
-    } else if (progressData) {
-      // If we're in a multi-stage assassination (custom role selection)
-      // Filter out any evil players from selection
-      const validSelections = this.game.selectedPlayers.filter((p) => p.role.loyalty === 'good');
-
-      // If evil players were selected, deselect them
-      if (this.game.selectedPlayers.length > validSelections.length) {
-        for (const player of this.game.selectedPlayers) {
-          if (player.role.loyalty === 'evil') {
-            this.game.selectPlayer(assassin.userID, player.userID);
+        // Select appropriate players based on target type
+        if (targetType === 'merlin' || targetType === 'guinevere' || targetType === 'cleric') {
+          // Need to select 1 player for merlin/guinevere/cleric
+          const randomGood = _.sample(goodPlayers);
+          if (randomGood) {
+            this.game.selectPlayer(assassin.userID, randomGood.userID);
+          }
+        } else if (targetType === 'lovers') {
+          const selectedLovers = _.sampleSize(goodPlayers, 2);
+          for (const lover of selectedLovers) {
+            this.game.selectPlayer(assassin.userID, lover.userID);
           }
         }
-      }
 
-      // Fill in missing selections with random good players
-      const requiredSelections = 1; // Custom role selection requires 1 player
-      const currentSelections = validSelections.length;
+        // Execute the assassination
+        this.game.addons.assassin.assassinate(assassin.userID, targetType);
+      } else if (progressData) {
+        // If we're in a multi-stage assassination (custom role selection)
+        // Filter out any evil players from selection
+        const validSelections = this.game.selectedPlayers.filter((p) => p.role.loyalty === 'good');
 
-      if (currentSelections < requiredSelections) {
-        // Select additional random good players to meet requirement
-        const unselectedGood = goodPlayers.filter(
-          (p) => !this.game.selectedPlayers.some((sp) => sp.userID === p.userID),
-        );
-        const toSelect = _.sampleSize(unselectedGood, requiredSelections - currentSelections);
-
-        for (const player of toSelect) {
-          this.game.selectPlayer(assassin.userID, player.userID);
+        // If evil players were selected, deselect them
+        if (this.game.selectedPlayers.length > validSelections.length) {
+          for (const player of this.game.selectedPlayers) {
+            if (player.role.loyalty === 'evil') {
+              this.game.selectPlayer(assassin.userID, player.userID);
+            }
+          }
         }
-      } else if (currentSelections > requiredSelections) {
-        // Too many selected, keep only the first one
-        for (let i = 1; i < validSelections.length; i++) {
-          this.game.selectPlayer(assassin.userID, validSelections[i].userID);
+
+        // Fill in missing selections with random good players
+        const requiredSelections = 1; // Custom role selection requires 1 player
+        const currentSelections = validSelections.length;
+
+        if (currentSelections < requiredSelections) {
+          // Select additional random good players to meet requirement
+          const unselectedGood = goodPlayers.filter(
+            (p) => !this.game.selectedPlayers.some((sp) => sp.userID === p.userID),
+          );
+          const toSelect = _.sampleSize(unselectedGood, requiredSelections - currentSelections);
+
+          for (const player of toSelect) {
+            this.game.selectPlayer(assassin.userID, player.userID);
+          }
+        } else if (currentSelections > requiredSelections) {
+          // Too many selected, keep only the first one
+          for (let i = 1; i < validSelections.length; i++) {
+            this.game.selectPlayer(assassin.userID, validSelections[i].userID);
+          }
+        }
+
+        // Execute the assassination with a random valid role
+        if (progressData.possibleTargets && progressData.possibleTargets.length > 0) {
+          const randomRole = _.sample(progressData.possibleTargets);
+          this.game.addons.assassin.assassinate(assassin.userID, progressData.type, randomRole);
         }
       }
-
-      // Execute the assassination with a random valid role
-      if (progressData.possibleTargets && progressData.possibleTargets.length > 0) {
-        const randomRole = _.sample(progressData.possibleTargets);
-        this.game.addons.assassin.assassinate(assassin.userID, progressData.type, randomRole);
-      }
+    } catch (error) {
+      console.error('[GameTimer] Error in handleAssassinateTimeout:', error);
+      console.error(`[GameTimer] Assassin: ${this.game.players.find((p) => p.features.isAssassin)?.userID}`);
     }
   }
 
