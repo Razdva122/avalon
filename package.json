@@ -13,7 +13,7 @@
     "test": "npm run test --workspace=packages/backend",
     "build:ui": "cross-env NODE_ENV=production npm run build --workspace=packages/ui",
     "start:backend": "cross-env NODE_ENV=production npm run start --workspace=packages/backend",
-    "version": "npm run test && npm version $npm_package_version --no-git-tag-version --workspaces && git add .",
+    "version": "npm run test && npm version %npm_package_version% --no-git-tag-version --workspaces && git add .",
     "postversion": "git push && git push origin tag v$npm_package_version"
   },
   "dependencies": {
