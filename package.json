@@ -14,7 +14,7 @@
     "build:ui": "cross-env NODE_ENV=production npm run build --workspace=packages/ui",
     "start:backend": "cross-env NODE_ENV=production npm run start --workspace=packages/backend",
     "version": "node scripts/version-handler.js",
-    "postversion": "git push && git push origin tag v$npm_package_version"
+    "postversion": "node scripts/postversion-handler.js"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
