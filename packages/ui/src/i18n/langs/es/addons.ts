@@ -43,6 +43,7 @@ export default {
     actions: 'Acciones',
     reset: 'Restablecer al predeterminado',
     stageSelectTeam: 'Seleccionar Equipo',
+    stageFirstSelectTeam: 'Primera Selección de Equipo',
     stageVotingForTeam: 'Votar por Equipo',
     stageOnMission: 'En Misión',
     stageAssassinate: 'Asesinar',

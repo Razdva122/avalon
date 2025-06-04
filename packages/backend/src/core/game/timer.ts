@@ -1,5 +1,6 @@
 import type { Game } from '@/core/game';
 import type { TGameStage, TVoteOption, TMissionResult } from '@avalon/types';
+import type { TimerDurations } from '@avalon/types';
 import { STAGE_TIMER_DEFAULTS } from '@avalon/types/game/timer-defaults';
 import _ from 'lodash';
 
@@ -32,8 +33,21 @@ export class GameTimer {
    * Get stage-specific duration or fall back to default
    */
   private getStageSpecificDuration(stage: TGameStage): number {
+    // For selectTeam stage, check if it's the first selection
+    if (stage === 'selectTeam' && this.isFirstTeamSelection()) {
+      // Check for first select team configuration
+      const firstSelectConfig = this.game.features.timerDurations?.firstSelectTeam;
+      if (firstSelectConfig && firstSelectConfig.duration !== undefined && firstSelectConfig.duration > 0) {
+        console.log(`[GameTimer] Using configured firstSelectTeam duration: ${firstSelectConfig.duration}s`);
+        return firstSelectConfig.duration;
+      }
+      // Use default first select team duration
+      console.log(`[GameTimer] Using default firstSelectTeam duration: ${STAGE_TIMER_DEFAULTS.firstSelectTeam}s`);
+      return STAGE_TIMER_DEFAULTS.firstSelectTeam || 600;
+    }
+
     // Check for stage-specific duration from user configuration
-    const stageConfig = this.game.features.timerDurations?.[stage as keyof typeof this.game.features.timerDurations];
+    const stageConfig = this.game.features.timerDurations?.[stage as keyof TimerDurations];
 
     // If stage-specific duration exists, use it
     if (stageConfig && stageConfig.duration !== undefined && stageConfig.duration > 0) {
@@ -45,11 +59,35 @@ export class GameTimer {
   }
 
   /**
+   * Check if this is the first team selection
+   */
+  private isFirstTeamSelection(): boolean {
+    // First selection of the game
+    if (this.game.round === 0 && this.game.turn === 0) {
+      return true;
+    }
+    // First selection after a mission (turn resets to 0)
+    if (this.game.turn === 0 && this.game.round > 0) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Check if timer is enabled for a specific stage
    */
   private isStageTimerEnabled(stage: TGameStage): boolean {
+    // For selectTeam stage, check if it's the first selection
+    if (stage === 'selectTeam' && this.isFirstTeamSelection()) {
+      const firstSelectConfig = this.game.features.timerDurations?.firstSelectTeam;
+      if (firstSelectConfig?.enabled !== undefined) {
+        return firstSelectConfig.enabled;
+      }
+      // If firstSelectTeam is not configured, fall back to selectTeam config
+    }
+
     // Check for stage-specific enabled flag
-    const stageConfig = this.game.features.timerDurations?.[stage as keyof typeof this.game.features.timerDurations];
+    const stageConfig = this.game.features.timerDurations?.[stage as keyof TimerDurations];
 
     if (stageConfig?.enabled !== undefined) {
       return stageConfig.enabled;

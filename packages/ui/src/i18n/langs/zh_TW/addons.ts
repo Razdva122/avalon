@@ -42,6 +42,7 @@ export default {
     actions: '操作',
     reset: '重置為預設值',
     stageSelectTeam: '選擇隊伍',
+    stageFirstSelectTeam: '首次選擇隊伍',
     stageVotingForTeam: '隊伍投票',
     stageOnMission: '任務進行中',
     stageAssassinate: '暗殺',
