@@ -13,8 +13,8 @@
     "test": "npm run test --workspace=packages/backend",
     "build:ui": "cross-env NODE_ENV=production npm run build --workspace=packages/ui",
     "start:backend": "cross-env NODE_ENV=production npm run start --workspace=packages/backend",
-    "version": "npm run test && npm version $npm_package_version --no-git-tag-version --workspaces && git add .",
-    "postversion": "git push && git push origin tag v$npm_package_version"
+    "version": "npm run test && cross-env npm version %npm_package_version% --no-git-tag-version --workspaces && git add .",
+    "postversion": "git push && cross-env git push origin tag v%npm_package_version%"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
