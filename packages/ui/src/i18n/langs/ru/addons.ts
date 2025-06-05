@@ -43,6 +43,7 @@ export default {
     actions: 'Действия',
     reset: 'Сбросить на стандартное',
     stageSelectTeam: 'Выбор Команды',
+    stageFirstSelectTeam: 'Первый Выбор Команды',
     stageVotingForTeam: 'Голосование за Команду',
     stageOnMission: 'На Миссии',
     stageAssassinate: 'Убийство',

@@ -478,6 +478,7 @@ export class Game extends GameHooks {
         }
 
         this.stage = 'end';
+        this.timer.clearTimer();
 
         this.openAllRoles();
 
@@ -509,6 +510,7 @@ export class Game extends GameHooks {
     }
 
     this.stage = 'end';
+    this.timer.clearTimer();
     this.openAllRoles();
     this.stateObserver.gameStateChanged();
   }

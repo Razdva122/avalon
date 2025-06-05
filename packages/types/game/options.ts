@@ -16,6 +16,9 @@ export class TimerDurations {
   public selectTeam?: TimerConfig;
 
   @prop({ type: () => TimerConfig, _id: false })
+  public firstSelectTeam?: TimerConfig;
+
+  @prop({ type: () => TimerConfig, _id: false })
   public votingForTeam?: TimerConfig;
 
   @prop({ type: () => TimerConfig, _id: false })

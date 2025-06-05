@@ -124,6 +124,11 @@ export default defineComponent({
 
     const stageTimerSettings = computed<StageTimerSetting[]>(() => [
       { name: 'selectTeam', label: t('options.stageSelectTeam'), default: STAGE_TIMER_DEFAULTS.selectTeam },
+      {
+        name: 'firstSelectTeam',
+        label: t('options.stageFirstSelectTeam'),
+        default: STAGE_TIMER_DEFAULTS.firstSelectTeam,
+      },
       { name: 'votingForTeam', label: t('options.stageVotingForTeam'), default: STAGE_TIMER_DEFAULTS.votingForTeam },
       { name: 'onMission', label: t('options.stageOnMission'), default: STAGE_TIMER_DEFAULTS.onMission },
       { name: 'assassinate', label: t('options.stageAssassinate'), default: STAGE_TIMER_DEFAULTS.assassinate },

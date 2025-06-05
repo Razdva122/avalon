@@ -42,6 +42,7 @@ export default {
     actions: '操作',
     reset: '重置为默认值',
     stageSelectTeam: '选择队伍',
+    stageFirstSelectTeam: '首次选择队伍',
     stageVotingForTeam: '队伍投票',
     stageOnMission: '任务进行中',
     stageAssassinate: '暗杀',
