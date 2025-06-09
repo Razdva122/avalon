@@ -30,6 +30,8 @@ import type { TLoyalty } from '../game/roles';
 import { GameOptionsFeatures } from '../game/options';
 import type { Dictionary } from '../utils';
 
+export type TTimerStage = TGameStage | 'firstSelectTeam';
+
 export class GameResults {
   @prop()
   winner?: TLoyalty;
@@ -106,7 +108,7 @@ export class VisualGameState {
   public timer?: {
     active: boolean;
     endTime?: number;
-    stage?: TGameStage;
+    stage?: TTimerStage;
   };
 }
 

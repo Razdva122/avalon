@@ -1,5 +1,5 @@
 import type { Game } from '@/core/game';
-import type { TGameStage, TVoteOption, TMissionResult } from '@avalon/types';
+import type { TTimerStage, TVoteOption, TMissionResult } from '@avalon/types';
 import type { TimerDurations } from '@avalon/types';
 import { STAGE_TIMER_DEFAULTS } from '@avalon/types/game/timer-defaults';
 import _ from 'lodash';
@@ -8,7 +8,7 @@ export interface TimerState {
   startTime: number;
   endTime: number;
   duration: number;
-  stage: TGameStage;
+  stage: TTimerStage;
   expired: boolean;
 }
 
@@ -32,20 +32,7 @@ export class GameTimer {
   /**
    * Get stage-specific duration or fall back to default
    */
-  private getStageSpecificDuration(stage: TGameStage): number {
-    // For selectTeam stage, check if it's the first selection
-    if (stage === 'selectTeam' && this.isFirstTeamSelection()) {
-      // Check for first select team configuration
-      const firstSelectConfig = this.game.features.timerDurations?.firstSelectTeam;
-      if (firstSelectConfig && firstSelectConfig.duration !== undefined && firstSelectConfig.duration > 0) {
-        console.log(`[GameTimer] Using configured firstSelectTeam duration: ${firstSelectConfig.duration}s`);
-        return firstSelectConfig.duration;
-      }
-      // Use default first select team duration
-      console.log(`[GameTimer] Using default firstSelectTeam duration: ${STAGE_TIMER_DEFAULTS.firstSelectTeam}s`);
-      return STAGE_TIMER_DEFAULTS.firstSelectTeam || 600;
-    }
-
+  private getStageSpecificDuration(stage: TTimerStage): number {
     // Check for stage-specific duration from user configuration
     const stageConfig = this.game.features.timerDurations?.[stage as keyof TimerDurations];
 
@@ -59,33 +46,9 @@ export class GameTimer {
   }
 
   /**
-   * Check if this is the first team selection
-   */
-  private isFirstTeamSelection(): boolean {
-    // First selection of the game
-    if (this.game.round === 0 && this.game.turn === 0) {
-      return true;
-    }
-    // First selection after a mission (turn resets to 0)
-    if (this.game.turn === 0 && this.game.round > 0) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
    * Check if timer is enabled for a specific stage
    */
-  private isStageTimerEnabled(stage: TGameStage): boolean {
-    // For selectTeam stage, check if it's the first selection
-    if (stage === 'selectTeam' && this.isFirstTeamSelection()) {
-      const firstSelectConfig = this.game.features.timerDurations?.firstSelectTeam;
-      if (firstSelectConfig?.enabled !== undefined) {
-        return firstSelectConfig.enabled;
-      }
-      // If firstSelectTeam is not configured, fall back to selectTeam config
-    }
-
+  private isStageTimerEnabled(stage: TTimerStage): boolean {
     // Check for stage-specific enabled flag
     const stageConfig = this.game.features.timerDurations?.[stage as keyof TimerDurations];
 
@@ -99,7 +62,7 @@ export class GameTimer {
   /**
    * Start a timer for the current stage
    */
-  startTimer(stage: TGameStage): void {
+  startTimer(stage: TTimerStage): void {
     this.clearTimer();
 
     if (!this.isStageTimerEnabled(stage)) {
@@ -191,16 +154,11 @@ export class GameTimer {
    * Cleanup method to ensure all timers are cleared and references removed
    */
   cleanup(): void {
-    console.log('[GameTimer] Cleanup: Clearing all timers and references');
-    try {
-      const activeTimerCount = this.timers.size;
-      this.clearTimer();
-      this.currentTimer = undefined;
-      this.pendingHistoryDelay = false;
-      console.log(`[GameTimer] Cleanup completed: Cleared ${activeTimerCount} active timers`);
-    } catch (error) {
-      console.error('[GameTimer] Error during cleanup:', error);
-    }
+    const activeTimerCount = this.timers.size;
+    this.clearTimer();
+    this.currentTimer = undefined;
+    this.pendingHistoryDelay = false;
+    console.log(`[GameTimer] Cleanup completed: Cleared ${activeTimerCount} active timers`);
   }
 
   /**
@@ -219,7 +177,7 @@ export class GameTimer {
   /**
    * Get timer state for frontend
    */
-  getTimerState(): { active: boolean; endTime?: number; stage?: TGameStage } {
+  getTimerState(): { active: boolean; endTime?: number; stage?: TTimerStage } {
     if (!this.currentTimer || !this.isStageTimerEnabled(this.currentTimer.stage) || this.currentTimer.expired) {
       return { active: false };
     }
@@ -250,62 +208,45 @@ export class GameTimer {
   /**
    * Handle timer expiration
    */
-  private handleTimerExpired(stage: TGameStage): void {
-    if (this.currentTimer && this.currentTimer.stage === stage && this.game.stage !== 'end') {
+  private handleTimerExpired(stage: TTimerStage): void {
+    if (this.currentTimer && this.currentTimer.stage === stage) {
       console.log(`[GameTimer] Timer expired for stage: ${stage}, current game stage: ${this.game.stage}`);
       this.currentTimer.expired = true;
 
       // Clear the timer from our map
       this.timers.delete(stage);
 
-      try {
-        console.log(`[GameTimer] Executing timeout handler for stage: ${stage}`);
-        switch (stage) {
-          case 'selectTeam':
-            this.handleSelectTeamTimeout();
-            break;
-          case 'giveExcalibur':
-            this.handleGiveExcaliburTimeout();
-            break;
-          case 'votingForTeam':
-            this.handleVoteForTeamTimeout();
-            break;
-          case 'onMission':
-            this.handleMissionTimeout();
-            break;
-          case 'useExcalibur':
-            this.handleUseExcaliburTimeout();
-            break;
-          case 'assassinate':
-            this.handleAssassinateTimeout();
-            break;
-          case 'checkLoyalty':
-          case 'announceLoyalty':
-          case 'revealLoyalty':
-            this.handleLoyaltyCheckTimeout();
-            break;
-          case 'giveCard':
-            this.handleGiveCardTimeout();
-            break;
-        }
-      } catch (error) {
-        console.error(`[GameTimer] Error handling timer expiration for stage ${stage}:`, error);
-        if (error instanceof Error) {
-          console.error(`[GameTimer] Error stack:`, error.stack);
-        }
-      } finally {
-        // Ensure state is updated even if an error occurs
-        try {
-          this.game.stateObserver.gameStateChanged();
-          console.log(`[GameTimer] Game state updated after timer expiration for stage: ${stage}`);
-        } catch (stateError) {
-          console.error(`[GameTimer] Error updating game state after timer expiration:`, stateError);
-        }
+      switch (stage) {
+        case 'selectTeam':
+        case 'firstSelectTeam':
+          this.handleSelectTeamTimeout();
+          break;
+        case 'giveExcalibur':
+          this.handleGiveExcaliburTimeout();
+          break;
+        case 'votingForTeam':
+          this.handleVoteForTeamTimeout();
+          break;
+        case 'onMission':
+          this.handleMissionTimeout();
+          break;
+        case 'useExcalibur':
+          this.handleUseExcaliburTimeout();
+          break;
+        case 'assassinate':
+          this.handleAssassinateTimeout();
+          break;
+        case 'checkLoyalty':
+        case 'announceLoyalty':
+        case 'revealLoyalty':
+          this.handleLoyaltyCheckTimeout();
+          break;
+        case 'giveCard':
+          this.handleGiveCardTimeout();
+          break;
       }
     } else {
-      console.log(
-        `[GameTimer] Timer expiration ignored - conditions not met. Stage: ${stage}, Game ended: ${this.game.stage === 'end'}`,
-      );
+      console.log(`[GameTimer] Timer expiration ignored - conditions not met. Stage: ${stage}`);
     }
   }
 

@@ -356,7 +356,7 @@ export class Game extends GameHooks {
 
     this.callHooks('beforeSelectTeam', () => {
       this.stage = 'selectTeam';
-      this.timer.startTimer('selectTeam');
+      this.timer.startTimer(this.turn === 0 ? 'firstSelectTeam' : 'selectTeam');
       this.stateObserver.gameStateChanged();
     });
   }
@@ -367,7 +367,7 @@ export class Game extends GameHooks {
   protected initGame(): void {
     this.callHooks(['afterInit', 'beforeSelectTeam'], () => {
       this.stage = 'selectTeam';
-      this.timer.startTimer('selectTeam');
+      this.timer.startTimer(this.turn === 0 ? 'firstSelectTeam' : 'selectTeam');
       this.stateObserver.gameStateChanged();
     });
   }
