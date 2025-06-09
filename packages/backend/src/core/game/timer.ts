@@ -66,7 +66,6 @@ export class GameTimer {
     this.clearTimer();
 
     if (!this.isStageTimerEnabled(stage)) {
-      console.log(`[GameTimer] Timer not enabled for stage: ${stage}`);
       return;
     }
 
