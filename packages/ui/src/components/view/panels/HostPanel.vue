@@ -2,6 +2,14 @@
   <v-btn class="host-panel" color="grey" @click="overlay = !overlay"> {{ $t('hostMenu.host') }} </v-btn>
   <v-overlay v-model="overlay" class="align-center justify-center">
     <div class="host-actions d-flex flex-column align-center pa-4 rounded-lg">
+      <v-btn
+        @click="overlay = false"
+        class="close"
+        icon="close"
+        color="text-primary"
+        variant="text"
+        density="compact"
+      />
       <h2 class="mb-4">{{ $t('hostMenu.hostPanel') }}</h2>
       <div class="button-container" v-if="roomStage === 'started'">
         <div class="hint">{{ $t('hostMenu.endRestartGameHint') }}</div>
@@ -53,6 +61,13 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
 .host-actions {
   background-color: rgb(var(--v-theme-surface));
   width: 300px;

@@ -13,8 +13,6 @@ export const STAGE_TIMER_DEFAULTS: Record<string, number> = {
   revealLoyalty: 30, // 30 seconds to reveal (mostly automatic)
   giveExcalibur: 20, // 20 seconds for leader to give Excalibur
   useExcalibur: 30, // 30 seconds to decide whether to use Excalibur
-  giveCard: 30, // 30 seconds to give plot card
-  witchAbility: 30, // 30 seconds for witch ability decision
 };
 
 /**
@@ -25,4 +23,5 @@ export const DEFAULT_ENABLED_STAGES = [
   'selectTeam', // Heavy discussion - players help leader choose team
   'firstSelectTeam', // Extended discussion - first team selection needs more time
   'votingForTeam', // Significant discussion - debate team approval
+  'onMission',
 ];

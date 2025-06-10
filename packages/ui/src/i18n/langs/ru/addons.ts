@@ -52,8 +52,6 @@ export default {
     stageRevealLoyalty: 'Раскрытие Лояльности',
     stageGiveExcalibur: 'Дать Экскалибур',
     stageUseExcalibur: 'Использовать Экскалибур',
-    stageGiveCard: 'Дать Карту',
-    stageWitchAbility: 'Способность Ведьмы',
     seconds: 'секунд',
     mainTimers: 'Основные таймеры',
     otherTimers: 'Другие таймеры',

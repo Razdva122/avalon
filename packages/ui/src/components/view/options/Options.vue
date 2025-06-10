@@ -7,6 +7,14 @@
   </v-btn>
   <v-overlay v-model="overlay" class="align-center justify-center">
     <div class="options pa-4 rounded-lg">
+      <v-btn
+        @click="overlay = false"
+        class="close"
+        icon="close"
+        color="text-primary"
+        variant="text"
+        density="compact"
+      />
       <v-form>
         <v-tabs v-model="type" class="tabs" color="text-primary">
           <v-tab value="roles">{{ $t('options.roles') }}</v-tab>
@@ -277,6 +285,13 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
 .options {
   background-color: rgb(var(--v-theme-surface));
   width: 100%;

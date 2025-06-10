@@ -52,8 +52,6 @@ export default {
     stageRevealLoyalty: 'Revelar Lealdade',
     stageGiveExcalibur: 'Dar Excalibur',
     stageUseExcalibur: 'Usar Excalibur',
-    stageGiveCard: 'Dar Carta',
-    stageWitchAbility: 'Habilidade da Bruxa',
     seconds: 'segundos',
     mainTimers: 'Timers principais',
     otherTimers: 'Outros timers',

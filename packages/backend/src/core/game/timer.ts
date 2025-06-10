@@ -90,10 +90,7 @@ export class GameTimer {
 
     if (delay > 0) {
       console.log(`[GameTimer] Timer for stage: ${stage} has ${delay / 1000}s delay before starting`);
-    }
 
-    // If there's a delay, schedule a state update when the timer becomes visible
-    if (delay > 0) {
       const visibilityTimeoutId = setTimeout(() => {
         // Notify clients that the timer is now visible
         this.game.stateObserver.gameStateChanged();
@@ -142,22 +139,24 @@ export class GameTimer {
 
       this.currentTimer = undefined;
     }
+
     // Clear all timers to be safe
     this.timers.forEach((timeoutId) => {
       clearTimeout(timeoutId);
     });
+
     this.timers.clear();
+
+    console.log(`[GameTimer] Cleanup completed: Cleared ${this.timers.size} active timers`);
   }
 
   /**
    * Cleanup method to ensure all timers are cleared and references removed
    */
   cleanup(): void {
-    const activeTimerCount = this.timers.size;
     this.clearTimer();
     this.currentTimer = undefined;
     this.pendingHistoryDelay = false;
-    console.log(`[GameTimer] Cleanup completed: Cleared ${activeTimerCount} active timers`);
   }
 
   /**
@@ -240,9 +239,6 @@ export class GameTimer {
         case 'revealLoyalty':
           this.handleLoyaltyCheckTimeout();
           break;
-        case 'giveCard':
-          this.handleGiveCardTimeout();
-          break;
       }
     } else {
       console.log(`[GameTimer] Timer expiration ignored - conditions not met. Stage: ${stage}`);
@@ -260,7 +256,7 @@ export class GameTimer {
         `[GameTimer] SelectTeam timeout: Required players: ${requiredPlayers}, Available: ${availablePlayers.length}, Already selected: ${this.game.selectedPlayers.length}`,
       );
 
-      while (this.game.selectedPlayers.length < requiredPlayers && availablePlayers.length > 0) {
+      while (this.game.selectedPlayers.length < requiredPlayers) {
         const randomPlayer = _.sample(availablePlayers);
         if (randomPlayer) {
           this.game.selectPlayer(this.game.leader.userID, randomPlayer.userID);
@@ -279,7 +275,6 @@ export class GameTimer {
       console.log(`[GameTimer] SelectTeam timeout completed: Sent ${this.game.selectedPlayers.length} players`);
     } catch (error) {
       console.error('[GameTimer] Error in handleSelectTeamTimeout:', error);
-      console.error(`[GameTimer] Leader: ${this.game.leader?.userID}`);
     }
   }
 
@@ -363,11 +358,7 @@ export class GameTimer {
     for (const missionAction of missionActions) {
       if (missionAction.value === 'unvoted') {
         try {
-          let action: TMissionResult = 'success';
-
-          if (missionAction.player.role.loyalty === 'evil') {
-            action = _.sample(['success', 'fail'])!;
-          }
+          const action: TMissionResult = _.sample(missionAction.player.role.validMissionResult)!;
 
           this.game.actionOnMission(missionAction.player.userID, action);
           console.log(
@@ -479,44 +470,6 @@ export class GameTimer {
     } catch (error) {
       console.error('[GameTimer] Error in handleAssassinateTimeout:', error);
       console.error(`[GameTimer] Assassin: ${this.game.players.find((p) => p.features.isAssassin)?.userID}`);
-    }
-  }
-
-  /**
-   * Handle give card timeout - give to random player
-   */
-  private handleGiveCardTimeout(): void {
-    console.log(`[GameTimer] GiveCard timeout: Leader ${this.game.leader.userID} needs to give card`);
-    // Filter out invalid selections (can't give card to self)
-    const validSelections = this.game.selectedPlayers.filter((p) => p !== this.game.leader);
-
-    // Ensure exactly one valid player is selected
-    if (validSelections.length === 0) {
-      const eligiblePlayers = this.game.players.filter((p) => p !== this.game.leader);
-      const randomPlayer = _.sample(eligiblePlayers);
-
-      if (randomPlayer) {
-        this.game.selectPlayer(this.game.leader.userID, randomPlayer.userID);
-      }
-    } else if (validSelections.length > 1) {
-      // Too many valid players selected, keep only the first one
-      // Deselect all players except the first valid one
-      for (const player of this.game.selectedPlayers) {
-        if (player !== validSelections[0]) {
-          this.game.selectPlayer(this.game.leader.userID, player.userID);
-        }
-      }
-    } else if (this.game.selectedPlayers.length > validSelections.length) {
-      // Leader is selected, deselect them
-      if (this.game.selectedPlayers.some((p) => p === this.game.leader)) {
-        this.game.selectPlayer(this.game.leader.userID, this.game.leader.userID);
-      }
-    }
-
-    // Give card to the selected player
-    if (this.game.selectedPlayers.length === 1 && this.game.addons.plotCards) {
-      this.game.addons.plotCards.giveCardToPlayer(this.game.leader.userID);
-      console.log(`[GameTimer] GiveCard timeout: Auto-gave card to player ${this.game.selectedPlayers[0].userID}`);
     }
   }
 

@@ -4,11 +4,12 @@
 
     <v-overlay v-model="isPanelOpen" class="dev-overlay">
       <v-card class="dev-card">
+        <v-btn @click="togglePanel" class="close" icon="close" color="text-primary" variant="text" density="compact" />
         <v-card-title>Developer Tools</v-card-title>
         <v-card-actions>
           <v-btn color="error" @click="resetStore"> Reset Store </v-btn>
           <v-btn color="success" @click="createFakeAccount"> Create Test Account </v-btn>
-          <v-btn color="secondary" @click="togglePanel"> Close </v-btn>
+          <v-btn color="on-surface" @click="togglePanel"> Close </v-btn>
         </v-card-actions>
       </v-card>
     </v-overlay>
@@ -59,6 +60,14 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.close {
+  position: absolute;
+  width: auto !important;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
 .dev-overlay {
   display: flex;
   align-items: center;
@@ -75,7 +84,6 @@ export default defineComponent({
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 16px;
-  color: #333;
 }
 
 .dev-card .v-card-actions {

@@ -7,6 +7,14 @@
   </v-btn>
   <v-overlay v-model="overlay" class="align-center justify-center">
     <div class="timer-options pa-4 rounded-lg">
+      <v-btn
+        @click="overlay = false"
+        class="close"
+        icon="close"
+        color="text-primary"
+        variant="text"
+        density="compact"
+      />
       <v-form>
         <div class="timer-header">
           <h3>{{ $t('options.timerSettings') }}</h3>
@@ -133,16 +141,14 @@ export default defineComponent({
       { name: 'onMission', label: t('options.stageOnMission'), default: STAGE_TIMER_DEFAULTS.onMission },
       { name: 'assassinate', label: t('options.stageAssassinate'), default: STAGE_TIMER_DEFAULTS.assassinate },
       { name: 'checkLoyalty', label: t('options.stageCheckLoyalty'), default: STAGE_TIMER_DEFAULTS.checkLoyalty },
+      { name: 'revealLoyalty', label: t('options.stageRevealLoyalty'), default: STAGE_TIMER_DEFAULTS.revealLoyalty },
       {
         name: 'announceLoyalty',
         label: t('options.stageAnnounceLoyalty'),
         default: STAGE_TIMER_DEFAULTS.announceLoyalty,
       },
-      { name: 'revealLoyalty', label: t('options.stageRevealLoyalty'), default: STAGE_TIMER_DEFAULTS.revealLoyalty },
       { name: 'giveExcalibur', label: t('options.stageGiveExcalibur'), default: STAGE_TIMER_DEFAULTS.giveExcalibur },
       { name: 'useExcalibur', label: t('options.stageUseExcalibur'), default: STAGE_TIMER_DEFAULTS.useExcalibur },
-      { name: 'giveCard', label: t('options.stageGiveCard'), default: STAGE_TIMER_DEFAULTS.giveCard },
-      { name: 'witchAbility', label: t('options.stageWitchAbility'), default: STAGE_TIMER_DEFAULTS.witchAbility },
     ]);
 
     const defaultEnabledTimers = computed(() =>
@@ -263,6 +269,13 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
 .timer-options {
   background-color: rgb(var(--v-theme-surface));
   width: 100%;

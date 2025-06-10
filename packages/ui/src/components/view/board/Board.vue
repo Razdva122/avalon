@@ -29,6 +29,12 @@
                 <slot name="restart"></slot>
               </template>
             </Game>
+            <div
+              v-if="gameTimer && gameTimer.active && gameTimer.endTime && stateManager.viewMode.value === 'live'"
+              class="game-timer"
+            >
+              <GameTimer @timerEnd="onGameTimerEnd" :endTime="gameTimer.endTime" />
+            </div>
           </template>
         </div>
       </slot>
@@ -47,12 +53,6 @@
           :style="{ transform: calculateRotate(i, true), translate: '0 -50%' }"
           @player-click="onPlayerClick"
         />
-      </div>
-      <div
-        v-if="gameTimer && gameTimer.active && gameTimer.endTime && stateManager.viewMode.value === 'live'"
-        class="game-timer"
-      >
-        <GameTimer @timerEnd="onGameTimerEnd" :endTime="gameTimer.endTime" />
       </div>
     </div>
   </div>
@@ -386,8 +386,6 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: visible;
-  padding: 0 100px 100px 100px;
 }
 
 .actions-container {
@@ -467,8 +465,8 @@ export default defineComponent({
 
 .game-timer {
   position: fixed;
-  bottom: 30px;
-  left: 30px;
+  bottom: -50px;
+  left: -100px;
   background-color: rgb(var(--v-theme-surface-light));
   color: white;
   padding: 15px 25px;
@@ -482,15 +480,6 @@ export default defineComponent({
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   min-width: 120px;
   justify-content: center;
-}
-
-/* On smaller screens when board is scaled, position relative to board */
-@media screen and (max-width: 840px), screen and (max-height: 840px) {
-  .game-timer {
-    position: absolute;
-    bottom: -80px;
-    left: -80px;
-  }
 }
 
 .game-timer::before {

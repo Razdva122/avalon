@@ -51,8 +51,6 @@ export default {
     stageRevealLoyalty: '揭示忠诚度',
     stageGiveExcalibur: '给予神剑',
     stageUseExcalibur: '使用神剑',
-    stageGiveCard: '给予卡牌',
-    stageWitchAbility: '女巫能力',
     seconds: '秒',
     mainTimers: '主要计时器',
     otherTimers: '其他计时器',
