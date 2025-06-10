@@ -147,7 +147,9 @@ export class GameTimer {
 
     this.timers.clear();
 
-    console.log(`[GameTimer] Cleanup completed: Cleared ${this.timers.size} active timers`);
+    if (this.timers.size) {
+      console.log(`[GameTimer] Cleanup completed: Cleared ${this.timers.size} active timers`);
+    }
   }
 
   /**
