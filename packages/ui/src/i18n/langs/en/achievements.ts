@@ -20,6 +20,7 @@ export default {
     rolesProgress: 'Roles Progress',
     playerCountsProgress: 'Player Count Progress',
     players: 'players',
+    avatarReward: 'Reward:',
 
     // Unlocked achievements
     light_wins: "There's nothing to fear but fear itself!",

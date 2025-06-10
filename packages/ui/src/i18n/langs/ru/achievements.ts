@@ -20,6 +20,7 @@ export default {
     rolesProgress: 'Прогресс по ролям',
     playerCountsProgress: 'Прогресс по количеству игроков',
     players: 'игроков',
+    avatarReward: 'Награда:',
 
     // Открытые достижения
     light_wins: 'Бояться нечего кроме самого страха!',
@@ -40,7 +41,8 @@ export default {
 
     // Скрытые достижения
     undercover_agent: 'Правда тебе не по зубам!',
-    undercover_agent_description: "Играя на @:{'roles.merlin'} 2 раза за игру взять в команду @:{'roles.morgana'} и победить",
+    undercover_agent_description:
+      "Играя на @:{'roles.merlin'} 2 раза за игру взять в команду @:{'roles.morgana'} и победить",
     useless_role: 'Бесполезная роль?!',
     useless_role_description: "Играя на @:{'roles.cleric'} 5 раз отправить первый поход",
     still_worthy: 'Все еще достоин!',

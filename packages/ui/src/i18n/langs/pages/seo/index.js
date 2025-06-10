@@ -33,6 +33,8 @@ const { profile } = require('./profile');
 const { userStats } = require('./userStats');
 const { plotCards } = require('./plotCards');
 const { leaderboard } = require('./leaderboard');
+const { globalAchievements } = require('./globalAchievements');
+const { userAchievements } = require('./userAchievements');
 
 module.exports = {
   lobby,
@@ -69,4 +71,6 @@ module.exports = {
   userStats,
   plotCards,
   leaderboard,
+  globalAchievements,
+  userAchievements,
 };

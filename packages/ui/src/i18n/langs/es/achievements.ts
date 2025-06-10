@@ -20,6 +20,7 @@ export default {
     rolesProgress: 'Progreso por roles',
     playerCountsProgress: 'Progreso por número de jugadores',
     players: 'jugadores',
+    avatarReward: 'Recompensa:',
 
     // Logros desbloqueados
     light_wins: '¡No hay nada que temer, excepto al propio miedo!',

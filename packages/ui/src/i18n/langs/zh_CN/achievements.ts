@@ -20,6 +20,7 @@ export default {
     rolesProgress: '角色进度',
     playerCountsProgress: '玩家数量进度',
     players: '玩家',
+    avatarReward: '奖励：',
 
     // 公开成就
     light_wins: '除了恐惧本身，别无所惧！',
