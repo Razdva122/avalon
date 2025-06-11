@@ -236,11 +236,6 @@ export class GameTimer {
         case 'assassinate':
           this.handleAssassinateTimeout();
           break;
-        case 'checkLoyalty':
-        case 'announceLoyalty':
-        case 'revealLoyalty':
-          this.handleLoyaltyCheckTimeout();
-          break;
       }
     } else {
       console.log(`[GameTimer] Timer expiration ignored - conditions not met. Stage: ${stage}`);
@@ -287,38 +282,18 @@ export class GameTimer {
     // Filter selected players to only those on mission
     const selectedOnMission = this.game.selectedPlayers.filter((p) => p.features.isSent && p !== this.game.leader);
 
-    // If no valid players selected, we need to handle two cases:
-    // 1. No players selected at all
-    // 2. Players selected but none are valid (need to deselect them first)
-    if (selectedOnMission.length === 0) {
-      // First, deselect any invalid selections
+    if (selectedOnMission.length !== 1) {
       if (this.game.selectedPlayers.length > 0) {
         for (const player of this.game.selectedPlayers) {
           this.game.selectPlayer(this.game.leader.userID, player.userID);
         }
       }
 
-      // Then select a random team member
       const teamMembers = this.game.players.filter((p) => p.features.isSent && p !== this.game.leader);
       const randomMember = _.sample(teamMembers);
 
       if (randomMember) {
         this.game.selectPlayer(this.game.leader.userID, randomMember.userID);
-      }
-    } else if (selectedOnMission.length > 1) {
-      // Too many valid players selected, keep only the first one
-      // First deselect all selected players
-      for (const player of this.game.selectedPlayers) {
-        if (player !== selectedOnMission[0]) {
-          this.game.selectPlayer(this.game.leader.userID, player.userID);
-        }
-      }
-    } else if (this.game.selectedPlayers.length > selectedOnMission.length) {
-      // Some selected players are not on mission, deselect them
-      for (const player of this.game.selectedPlayers) {
-        if (!player.features.isSent || player === this.game.leader) {
-          this.game.selectPlayer(this.game.leader.userID, player.userID);
-        }
       }
     }
 
@@ -382,6 +357,12 @@ export class GameTimer {
    */
   private handleUseExcaliburTimeout(): void {
     const excaliburOwner = this.game.players.find((p) => p.features.excalibur);
+
+    if (this.game.selectedPlayers.length > 0) {
+      for (const player of this.game.selectedPlayers) {
+        this.game.selectPlayer(this.game.leader.userID, player.userID);
+      }
+    }
 
     if (excaliburOwner && this.game.addons.excalibur) {
       this.game.addons.excalibur.useExcalibur(excaliburOwner.userID);
@@ -472,59 +453,6 @@ export class GameTimer {
     } catch (error) {
       console.error('[GameTimer] Error in handleAssassinateTimeout:', error);
       console.error(`[GameTimer] Assassin: ${this.game.players.find((p) => p.features.isAssassin)?.userID}`);
-    }
-  }
-
-  /**
-   * Handle loyalty check timeout - select random player
-   */
-  private handleLoyaltyCheckTimeout(): void {
-    const activePlayer = this.game.players.find((p) => p.features.waitForAction);
-    if (!activePlayer) {
-      console.log(`[GameTimer] LoyaltyCheck timeout: No active player found`);
-      return;
-    }
-    console.log(`[GameTimer] LoyaltyCheck timeout: Player ${activePlayer.userID} needs to check loyalty`);
-
-    // Filter out invalid selections (can't check/reveal own loyalty)
-    const validSelections = this.game.selectedPlayers.filter((p) => p !== activePlayer);
-
-    // Ensure exactly one valid player is selected
-    if (validSelections.length === 0) {
-      const otherPlayers = this.game.players.filter((p) => p !== activePlayer);
-      const randomPlayer = _.sample(otherPlayers);
-
-      if (randomPlayer) {
-        this.game.selectPlayer(activePlayer.userID, randomPlayer.userID);
-      }
-    } else if (validSelections.length > 1) {
-      // Too many valid players selected, keep only the first one
-      // Deselect all players except the first valid one
-      for (const player of this.game.selectedPlayers) {
-        if (player !== validSelections[0]) {
-          this.game.selectPlayer(activePlayer.userID, player.userID);
-        }
-      }
-    } else if (this.game.selectedPlayers.length > validSelections.length) {
-      // Active player is selected, deselect them
-      if (this.game.selectedPlayers.some((p) => p === activePlayer)) {
-        this.game.selectPlayer(activePlayer.userID, activePlayer.userID);
-      }
-    }
-
-    // Execute the action with the selected player
-    if (this.game.selectedPlayers.length > 0) {
-      if (this.game.stage === 'checkLoyalty') {
-        if (this.game.addons.ladyOfLake) {
-          this.game.addons.ladyOfLake.checkLoyalty(activePlayer.userID);
-        } else if (this.game.addons.ladyOfSea) {
-          this.game.addons.ladyOfSea.checkLoyalty(activePlayer.userID);
-        }
-      } else if (this.game.stage === 'announceLoyalty' && this.game.addons.ladyOfLake) {
-        const randomLoyalty = _.sample(['good', 'evil'])!;
-        this.game.addons.ladyOfLake.announceLoyalty(activePlayer.userID, randomLoyalty as 'good' | 'evil');
-        console.log(`[GameTimer] LoyaltyCheck timeout: Auto-announced ${randomLoyalty} loyalty`);
-      }
     }
   }
 }

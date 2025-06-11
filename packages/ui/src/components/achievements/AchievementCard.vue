@@ -94,7 +94,7 @@
 import { getAchievementsText } from '@/helpers/achievements';
 import { defineComponent, computed, PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { AchievementStats } from '@avalon/types';
+import { AchievementStats, ACHIEVEMENT_TO_AVATAR_MAP } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
 
 export interface AchievementProgress {
@@ -166,26 +166,7 @@ export default defineComponent({
 
     // Определяем ID аватарки, которая выдается за достижение
     const avatarReward = computed(() => {
-      const achievementToAvatarMap: Record<string, string> = {
-        top_player: 'anime/witch',
-        secret_hunter: 'mystery',
-        still_worthy: 'excalibur',
-        mistakes_happen: 'evil',
-        seer: 'good',
-        dark_wins: 'oberon',
-        light_wins: 'anime/servant',
-        bodyguard: 'percival',
-        wrong_choice: 'morgana',
-        useless_role: 'cleric',
-        serial_killer: 'lunatic',
-        detective: 'merlin',
-        undercover_agent: 'anime/merlin',
-        assassin_kills: 'minion',
-        different_player_count: 'anime/minion',
-        all_standard_roles: 'anime/troublemaker',
-      };
-
-      return achievementToAvatarMap[props.achievementID];
+      return ACHIEVEMENT_TO_AVATAR_MAP[props.achievementID];
     });
 
     // Определяем, находится ли достижение в процессе выполнения

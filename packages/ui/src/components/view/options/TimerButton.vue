@@ -101,7 +101,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed, ref, watch } from 'vue';
+import { defineComponent, PropType, computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import StageTimerCard from './StageTimerCard.vue';
 import { STAGE_TIMER_DEFAULTS, DEFAULT_ENABLED_STAGES } from '@avalon/types/game/timer-defaults';
@@ -140,13 +140,6 @@ export default defineComponent({
       { name: 'votingForTeam', label: t('options.stageVotingForTeam'), default: STAGE_TIMER_DEFAULTS.votingForTeam },
       { name: 'onMission', label: t('options.stageOnMission'), default: STAGE_TIMER_DEFAULTS.onMission },
       { name: 'assassinate', label: t('options.stageAssassinate'), default: STAGE_TIMER_DEFAULTS.assassinate },
-      { name: 'checkLoyalty', label: t('options.stageCheckLoyalty'), default: STAGE_TIMER_DEFAULTS.checkLoyalty },
-      { name: 'revealLoyalty', label: t('options.stageRevealLoyalty'), default: STAGE_TIMER_DEFAULTS.revealLoyalty },
-      {
-        name: 'announceLoyalty',
-        label: t('options.stageAnnounceLoyalty'),
-        default: STAGE_TIMER_DEFAULTS.announceLoyalty,
-      },
       { name: 'giveExcalibur', label: t('options.stageGiveExcalibur'), default: STAGE_TIMER_DEFAULTS.giveExcalibur },
       { name: 'useExcalibur', label: t('options.stageUseExcalibur'), default: STAGE_TIMER_DEFAULTS.useExcalibur },
     ]);

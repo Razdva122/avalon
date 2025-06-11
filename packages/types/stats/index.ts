@@ -3,6 +3,7 @@ export * from './models';
 export * from './trueskill';
 export * from './trueskill-constants';
 export * from './achievements';
+export * from './achievement-avatars';
 export * from './achievements-constants';
 
 export type TTotalWinrateStats = {

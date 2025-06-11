@@ -8,9 +8,6 @@ export const STAGE_TIMER_DEFAULTS: Record<string, number> = {
   votingForTeam: 45, // 45 seconds to vote and debate approval
   onMission: 30, // 30 seconds for individual mission decisions
   assassinate: 300, // 5 minutes for evil team to discuss and identify Merlin
-  checkLoyalty: 30, // 30 seconds to choose who to check
-  announceLoyalty: 15, // 15 seconds to announce result
-  revealLoyalty: 30, // 30 seconds to reveal (mostly automatic)
   giveExcalibur: 20, // 20 seconds for leader to give Excalibur
   useExcalibur: 30, // 30 seconds to decide whether to use Excalibur
 };

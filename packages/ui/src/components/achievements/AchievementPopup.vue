@@ -23,6 +23,16 @@
           />
           <div class="achievement-popup__progress-text">{{ progress.currentValue }} / {{ progress.maxValue }}</div>
         </div>
+        <div
+          v-if="avatarReward"
+          class="achievement-popup__reward"
+          :class="{ 'achievement-popup__reward--unlocked': type === 'unlocked' }"
+        >
+          <div class="achievement-popup__reward-text">{{ $t('achievements.avatarReward') }}</div>
+          <div class="achievement-popup__reward-icon">
+            <Avatar :avatarID="avatarReward" size="medium" />
+          </div>
+        </div>
       </div>
     </div>
     <v-btn
@@ -42,6 +52,8 @@ import { defineComponent, computed, PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { store } from '@/store';
+import { ACHIEVEMENT_TO_AVATAR_MAP } from '@avalon/types';
+import Avatar from '@/components/user/Avatar.vue';
 
 export interface AchievementProgress {
   currentValue: number;
@@ -50,6 +62,9 @@ export interface AchievementProgress {
 
 export default defineComponent({
   name: 'AchievementPopup',
+  components: {
+    Avatar,
+  },
   props: {
     achievementID: {
       type: String,
@@ -79,6 +94,11 @@ export default defineComponent({
       };
     });
 
+    // Определяем ID аватарки, которая выдается за достижение
+    const avatarReward = computed(() => {
+      return ACHIEVEMENT_TO_AVATAR_MAP[props.achievementID];
+    });
+
     // Функция для перехода на страницу личных достижений
     const navigateToUserAchievements = () => {
       const userID = store.state.profile?.id;
@@ -91,6 +111,7 @@ export default defineComponent({
     return {
       achievement,
       navigateToUserAchievements,
+      avatarReward,
     };
   },
 });
@@ -172,6 +193,46 @@ export default defineComponent({
 
   &--progress {
     background-color: rgb(var(--v-theme-bg-header));
+  }
+
+  &__reward {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin-top: 12px;
+    background-color: rgba(var(--v-theme-primary), 0.1);
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+
+    &--unlocked {
+      background-color: rgba(var(--v-theme-success), 0.15);
+      border: 1px solid rgba(var(--v-theme-success), 0.3);
+    }
+  }
+
+  &__reward-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    :deep(img) {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    &:hover :deep(img) {
+      transform: scale(1.1);
+    }
+  }
+
+  &__reward-text {
+    font-weight: 500;
+    color: rgb(var(--v-theme-text-primary));
   }
 }
 
