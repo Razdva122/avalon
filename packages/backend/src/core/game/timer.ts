@@ -204,6 +204,10 @@ export class GameTimer {
    * Clear the current timer
    */
   clearTimer(): void {
+    if (!this.currentTimer && this.timers.size === 0) {
+      return;
+    }
+
     if (this.currentTimer) {
       console.log(`[GameTimer] Clearing timer for stage: ${this.currentTimer.stage}`);
       const timeoutId = this.timers.get(this.currentTimer.stage);
