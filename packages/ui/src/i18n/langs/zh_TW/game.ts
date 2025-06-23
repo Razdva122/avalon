@@ -34,6 +34,8 @@ export default {
     historyMode: '記錄階段',
     gameIsEnded: '遊戲結束',
     rolesAndAddons: '角色與插件',
+    start: '開始',
+    stop: '停止',
   },
   endReason: {
     manualy: '遊戲已手動完成',

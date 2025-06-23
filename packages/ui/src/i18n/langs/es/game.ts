@@ -34,6 +34,8 @@ export default {
     historyMode: 'Modo historia',
     gameIsEnded: 'El juego ha terminado',
     rolesAndAddons: 'Roles y expansiones',
+    start: 'Iniciar',
+    stop: 'Detener',
   },
   endReason: {
     manualy: 'El juego se terminó manualmente',

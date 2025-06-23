@@ -54,5 +54,9 @@ export default {
     enableAll: '启用全部',
     timer: '计时器',
     timerSettings: '计时器设置',
+    stageTimer: '阶段计时器',
+    customTimer: '常规计时器',
+    timerType: '计时器类型',
+    timerTypeDescription: '选择游戏中使用的计时器类型',
   },
 };

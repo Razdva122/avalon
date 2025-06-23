@@ -20,80 +20,90 @@
           <h3>{{ $t('options.timerSettings') }}</h3>
         </div>
 
-        <!-- Default Enabled Timers (Always Visible) -->
-        <div class="default-enabled-timers mb-4">
-          <div class="timer-section-header">
-            <h4 class="timer-section-title">{{ $t('options.mainTimers') }}</h4>
-            <v-checkbox
-              :model-value="allMainTimersEnabled"
-              @update:model-value="(v: boolean | null) => v !== null && toggleAllMainTimers(v)"
-              color="info"
-              hide-details
-              density="compact"
-              :label="$t('options.enableAll')"
-              class="enable-all-checkbox"
-            />
-          </div>
-          <div class="stage-timer-list">
-            <StageTimerCard
-              v-for="stage in defaultEnabledTimers"
-              :key="stage.name"
-              :label="stage.label"
-              :enabled="getStageTimerEnabled(stage.name)"
-              :duration="getStageTimerDuration(stage.name)"
-              :default-duration="stage.default"
-              @update:enabled="setStageTimerEnabled(stage.name, $event)"
-              @update:duration="setStageTimerDuration(stage.name, $event)"
-              @reset="resetStageTimer(stage.name)"
-            />
-          </div>
+        <!-- Timer Type Selector -->
+        <div class="timer-type-section mb-4">
+          <h4 class="timer-section-title mb-2">{{ $t('options.timerType') }}</h4>
+          <p class="timer-type-description mb-2">{{ $t('options.timerTypeDescription') }}</p>
+          <TimerTypeSelector :features="features" @update:features="updateFeatures" />
         </div>
 
-        <!-- Other Timer Settings (Collapsible) -->
-        <template v-if="otherTimers.length > 0">
-          <v-expansion-panels v-model="stageTimersExpanded" class="stage-timer-panels">
-            <v-expansion-panel>
-              <v-expansion-panel-title>
-                <div class="stage-timer-header">
-                  <div class="stage-timer-left">
-                    <span class="material-icons">schedule</span>
-                    <span class="stage-timer-title">{{ $t('options.otherTimers') }}</span>
+        <!-- Показываем настройки таймеров только если таймер не выключен -->
+        <template v-if="isStageTimerEnabled">
+          <!-- Default Enabled Timers (Always Visible) -->
+          <div class="default-enabled-timers mb-4">
+            <div class="timer-section-header">
+              <h4 class="timer-section-title">{{ $t('options.mainTimers') }}</h4>
+              <v-checkbox
+                :model-value="allMainTimersEnabled"
+                @update:model-value="(v: boolean | null) => v !== null && toggleAllMainTimers(v)"
+                color="info"
+                hide-details
+                density="compact"
+                :label="$t('options.enableAll')"
+                class="enable-all-checkbox"
+              />
+            </div>
+            <div class="stage-timer-list">
+              <StageTimerCard
+                v-for="stage in defaultEnabledTimers"
+                :key="stage.name"
+                :label="stage.label"
+                :enabled="getStageTimerEnabled(stage.name)"
+                :duration="getStageTimerDuration(stage.name)"
+                :default-duration="stage.default"
+                @update:enabled="setStageTimerEnabled(stage.name, $event)"
+                @update:duration="setStageTimerDuration(stage.name, $event)"
+                @reset="resetStageTimer(stage.name)"
+              />
+            </div>
+          </div>
+
+          <!-- Other Timer Settings (Collapsible) -->
+          <template v-if="otherTimers.length > 0">
+            <v-expansion-panels v-model="stageTimersExpanded" class="stage-timer-panels">
+              <v-expansion-panel>
+                <v-expansion-panel-title>
+                  <div class="stage-timer-header">
+                    <div class="stage-timer-left">
+                      <span class="material-icons">schedule</span>
+                      <span class="stage-timer-title">{{ $t('options.otherTimers') }}</span>
+                    </div>
+                    <div class="stage-timer-right">
+                      <v-chip size="small" color="info" class="enabled-count-chip">
+                        {{ otherTimers.filter((stage: any) => getStageTimerEnabled(stage.name)).length }}
+                        {{ $t('options.enabled') }}
+                      </v-chip>
+                      <v-checkbox
+                        :model-value="allOtherTimersEnabled"
+                        @update:model-value="(v: boolean | null) => v !== null && toggleAllOtherTimers(v)"
+                        color="info"
+                        hide-details
+                        density="compact"
+                        :label="$t('options.enableAll')"
+                        class="enable-all-checkbox"
+                        @click.stop
+                      />
+                    </div>
                   </div>
-                  <div class="stage-timer-right">
-                    <v-chip size="small" color="info" class="enabled-count-chip">
-                      {{ otherTimers.filter((stage: any) => getStageTimerEnabled(stage.name)).length }}
-                      {{ $t('options.enabled') }}
-                    </v-chip>
-                    <v-checkbox
-                      :model-value="allOtherTimersEnabled"
-                      @update:model-value="(v: boolean | null) => v !== null && toggleAllOtherTimers(v)"
-                      color="info"
-                      hide-details
-                      density="compact"
-                      :label="$t('options.enableAll')"
-                      class="enable-all-checkbox"
-                      @click.stop
+                </v-expansion-panel-title>
+                <v-expansion-panel-text>
+                  <div class="stage-timer-list">
+                    <StageTimerCard
+                      v-for="stage in otherTimers"
+                      :key="stage.name"
+                      :label="stage.label"
+                      :enabled="getStageTimerEnabled(stage.name)"
+                      :duration="getStageTimerDuration(stage.name)"
+                      :default-duration="stage.default"
+                      @update:enabled="setStageTimerEnabled(stage.name, $event)"
+                      @update:duration="setStageTimerDuration(stage.name, $event)"
+                      @reset="resetStageTimer(stage.name)"
                     />
                   </div>
-                </div>
-              </v-expansion-panel-title>
-              <v-expansion-panel-text>
-                <div class="stage-timer-list">
-                  <StageTimerCard
-                    v-for="stage in otherTimers"
-                    :key="stage.name"
-                    :label="stage.label"
-                    :enabled="getStageTimerEnabled(stage.name)"
-                    :duration="getStageTimerDuration(stage.name)"
-                    :default-duration="stage.default"
-                    @update:enabled="setStageTimerEnabled(stage.name, $event)"
-                    @update:duration="setStageTimerDuration(stage.name, $event)"
-                    @reset="resetStageTimer(stage.name)"
-                  />
-                </div>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-          </v-expansion-panels>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </template>
         </template>
       </v-form>
     </div>
@@ -104,6 +114,7 @@
 import { defineComponent, PropType, computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import StageTimerCard from './StageTimerCard.vue';
+import TimerTypeSelector from './TimerTypeSelector.vue';
 import { STAGE_TIMER_DEFAULTS, DEFAULT_ENABLED_STAGES } from '@avalon/types/game/timer-defaults';
 import type { GameOptionsFeatures, TimerConfig, TimerDurations } from '@avalon/types';
 
@@ -117,6 +128,7 @@ export default defineComponent({
   name: 'TimerButton',
   components: {
     StageTimerCard,
+    TimerTypeSelector,
   },
   props: {
     features: {
@@ -127,8 +139,17 @@ export default defineComponent({
   emits: ['update:features'],
   setup(props, { emit }) {
     const { t } = useI18n();
+
+    // Проверяем, включен ли таймер
+    const isStageTimerEnabled = computed(() => {
+      return props.features.timerDurations && !props.features.useCustomTimer;
+    });
     const overlay = ref(false);
     const stageTimersExpanded = ref<number | undefined>(undefined);
+
+    const updateFeatures = (updatedFeatures: GameOptionsFeatures) => {
+      emit('update:features', updatedFeatures);
+    };
 
     const stageTimerSettings = computed<StageTimerSetting[]>(() => [
       { name: 'selectTeam', label: t('options.stageSelectTeam'), default: STAGE_TIMER_DEFAULTS.selectTeam },
@@ -243,6 +264,7 @@ export default defineComponent({
 
     return {
       overlay,
+      isStageTimerEnabled,
       stageTimersExpanded,
       stageTimerSettings,
       defaultEnabledTimers,
@@ -256,6 +278,7 @@ export default defineComponent({
       resetStageTimer,
       toggleAllMainTimers,
       toggleAllOtherTimers,
+      updateFeatures,
     };
   },
 });
@@ -294,12 +317,18 @@ export default defineComponent({
   flex-shrink: 0;
 }
 
+.timer-type-section,
 .default-enabled-timers {
   margin-top: 16px;
   padding: 16px;
   border: 1px solid rgba(var(--v-theme-on-surface), 0.12);
   border-radius: 8px;
   background-color: rgba(var(--v-theme-surface), 0.5);
+}
+
+.timer-type-description {
+  font-size: 0.9rem;
+  color: rgba(var(--v-theme-on-surface), 0.7);
 }
 
 .timer-section-header {

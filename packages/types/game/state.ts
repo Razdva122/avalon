@@ -30,7 +30,7 @@ import type { TLoyalty } from '../game/roles';
 import { GameOptionsFeatures } from '../game/options';
 import type { Dictionary } from '../utils';
 
-export type TTimerStage = TGameStage | 'firstSelectTeam';
+export type TTimerStage = TGameStage | 'firstSelectTeam' | 'custom';
 
 export class GameResults {
   @prop()
@@ -109,6 +109,7 @@ export class VisualGameState {
     active: boolean;
     endTime?: number;
     stage?: TTimerStage;
+    isCustom?: boolean; // Флаг, указывающий, что это кастомный таймер
   };
 }
 

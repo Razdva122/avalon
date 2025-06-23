@@ -55,5 +55,9 @@ export default {
     enableAll: 'Включить все',
     timer: 'Таймер',
     timerSettings: 'Настройки таймера',
+    stageTimer: 'Таймер этапов',
+    customTimer: 'Обычный таймер',
+    timerType: 'Тип таймера',
+    timerTypeDescription: 'Выберите тип таймера для использования в игре',
   },
 };

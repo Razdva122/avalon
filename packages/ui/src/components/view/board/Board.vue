@@ -30,10 +30,18 @@
               </template>
             </Game>
             <div
-              v-if="gameTimer && gameTimer.active && gameTimer.endTime && stateManager.viewMode.value === 'live'"
+              v-if="gameTimer && (gameTimer.active || gameTimer.isCustom) && stateManager.viewMode.value === 'live'"
               class="game-timer"
             >
-              <GameTimer @timerEnd="onGameTimerEnd" :endTime="gameTimer.endTime" />
+              <GameTimer
+                @timerEnd="onGameTimerEnd"
+                :endTime="gameTimer.endTime || Date.now()"
+                :isCustom="gameTimer.isCustom"
+              >
+                <template v-slot:timer-controls>
+                  <CustomTimerControls v-if="userIsLeader" :roomID="roomState.roomID" :leaderID="roomState.leaderID" />
+                </template>
+              </GameTimer>
             </div>
           </template>
         </div>
@@ -69,6 +77,7 @@ import Game from '@/components/view/board/game/Game.vue';
 import StartPanel from '@/components/view/panels/StartPanel.vue';
 import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
+import CustomTimerControls from '@/components/view/board/modules/CustomTimerControls.vue';
 import eventBus from '@/helpers/event-bus';
 import { THistoryResults } from '@avalon/types';
 import { hasActiveCard, useHaveActiveLoyaltyCard, isAdjacentPlayer, isPlayerOnMission } from '@/helpers/plot-cards';
@@ -87,6 +96,7 @@ export default defineComponent({
     GameTimer,
     AnnounceLoyalty,
     OptionsPreview,
+    CustomTimerControls,
   },
   props: {
     roomState: {
@@ -480,10 +490,5 @@ export default defineComponent({
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   min-width: 120px;
   justify-content: center;
-}
-
-.game-timer::before {
-  content: '⏱️';
-  font-size: 28px;
 }
 </style>

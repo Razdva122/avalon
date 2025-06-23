@@ -55,5 +55,9 @@ export default {
     enableAll: 'Habilitar tudo',
     timer: 'Timer',
     timerSettings: 'Configurações do timer',
+    stageTimer: 'Timer de estágios',
+    customTimer: 'Timer regular',
+    timerType: 'Tipo de timer',
+    timerTypeDescription: 'Selecione o tipo de timer para usar no jogo',
   },
 };

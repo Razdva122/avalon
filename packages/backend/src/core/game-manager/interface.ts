@@ -34,7 +34,10 @@ export type TGameMethodsParams =
   | TUseAmbushParams
   | TUseRestoreHonorParams
   | TUseKingReturnsParams
-  | TUseWeFoundYouParams;
+  | TUseWeFoundYouParams
+  | TStartCustomTimerParams
+  | TAddCustomTimerTimeParams
+  | TStopCustomTimerParams;
 
 export type TSelectPlayerParams = {
   method: 'selectPlayer';
@@ -127,6 +130,20 @@ export type TUseWeFoundYouParams = {
   method: 'useWeFoundYou';
   use: boolean;
   cardID: string;
+};
+
+export type TStartCustomTimerParams = {
+  method: 'startCustomTimer';
+  durationSeconds: number;
+};
+
+export type TAddCustomTimerTimeParams = {
+  method: 'addCustomTimerTime';
+  additionalSeconds: number;
+};
+
+export type TStopCustomTimerParams = {
+  method: 'stopCustomTimer';
 };
 
 export type TGetLoyaltyData = {

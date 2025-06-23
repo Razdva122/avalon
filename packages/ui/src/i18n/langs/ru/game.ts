@@ -34,6 +34,8 @@ export default {
     historyMode: 'Режим истории',
     gameIsEnded: 'Игра завершена',
     rolesAndAddons: 'Роли и дополнения',
+    start: 'Старт',
+    stop: 'Стоп',
   },
   endReason: {
     manualy: 'Игра завершена вручную',

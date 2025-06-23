@@ -55,5 +55,9 @@ export default {
     enableAll: 'Enable All',
     timer: 'Timer',
     timerSettings: 'Timer Settings',
+    stageTimer: 'Stage Timer',
+    customTimer: 'Regular Timer',
+    timerType: 'Timer Type',
+    timerTypeDescription: 'Select the type of timer to use in the game',
   },
 };

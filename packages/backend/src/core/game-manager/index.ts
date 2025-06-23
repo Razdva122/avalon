@@ -299,6 +299,19 @@ export class GameManager {
         break;
       }
 
+      // Custom timer methods
+      case 'startCustomTimer':
+        this.game.timer.startCustomTimer(params.durationSeconds);
+        break;
+
+      case 'addCustomTimerTime':
+        this.game.timer.addCustomTimerTime(params.additionalSeconds);
+        break;
+
+      case 'stopCustomTimer':
+        this.game.timer.clearTimer();
+        break;
+
       case 'useKingReturns':
         this.handlePlotCardAction(
           'king returns',

@@ -1,9 +1,19 @@
 <template>
-  <template v-if="remainingTime > 0">
-    <span class="time" :class="{ 'low-time': Number(timeInString) < 10, 'critical-time': Number(timeInString) < 5 }">
-      {{ timeInString }}
+  <div class="game-timer-container" v-if="remainingTime > 0 || isCustomTimer">
+    <span
+      class="time"
+      :class="{
+        'low-time': Number(timeInString) < 10,
+        'critical-time': Number(timeInString) < 5,
+        'timer-end': Number(timeInString) === 0,
+      }"
+    >
+      {{ '⏱️ ' }}{{ timeInString }}
     </span>
-  </template>
+
+    <!-- Слот для элементов управления таймером -->
+    <slot name="timer-controls"></slot>
+  </div>
 </template>
 
 <script lang="ts">
@@ -14,6 +24,10 @@ export default defineComponent({
     endTime: {
       required: true,
       type: Number,
+    },
+    isCustom: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['timerEnd'],
@@ -100,15 +114,26 @@ export default defineComponent({
       },
     );
 
+    const isCustomTimer = computed(() => {
+      return props.isCustom;
+    });
+
     return {
       remainingTime,
       timeInString,
+      isCustomTimer,
     };
   },
 });
 </script>
 
 <style scoped lang="scss">
+.game-timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .time {
   color: rgb(var(--v-theme-text-primary));
 }
@@ -120,6 +145,10 @@ export default defineComponent({
 .critical-time {
   color: rgb(var(--v-theme-error));
   animation: pulse 1s infinite;
+}
+
+.timer-end {
+  animation: none;
 }
 
 @keyframes pulse {

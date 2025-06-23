@@ -464,6 +464,28 @@ export class Manager {
         }
       }
     });
+
+    // Custom timer events
+    socket.on('startCustomTimer', (uuid: string, durationSeconds: number) => {
+      const room = this.rooms[uuid];
+      if (room.leaderID === userID && room.data.stage === 'started') {
+        room.data.manager.callGameMethods(userID, { method: 'startCustomTimer', durationSeconds });
+      }
+    });
+
+    socket.on('addCustomTimerTime', (uuid: string, additionalSeconds: number) => {
+      const room = this.rooms[uuid];
+      if (room.leaderID === userID && room.data.stage === 'started') {
+        room.data.manager.callGameMethods(userID, { method: 'addCustomTimerTime', additionalSeconds });
+      }
+    });
+
+    socket.on('stopCustomTimer', (uuid: string) => {
+      const room = this.rooms[uuid];
+      if (room.leaderID === userID && room.data.stage === 'started') {
+        room.data.manager.callGameMethods(userID, { method: 'stopCustomTimer' });
+      }
+    });
   }
 
   createMethodsForGame(socket: ServerSocket, userID: string): void {

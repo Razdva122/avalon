@@ -142,6 +142,9 @@ export class GameOptionsFeatures {
   @prop()
   public lookingForPlayers?: boolean;
 
+  @prop()
+  public useCustomTimer?: boolean;
+
   @prop({ type: () => TimerDurations, _id: false })
   public timerDurations?: TimerDurations;
 }

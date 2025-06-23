@@ -55,5 +55,9 @@ export default {
     enableAll: 'Habilitar todo',
     timer: 'Temporizador',
     timerSettings: 'Configuración del temporizador',
+    stageTimer: 'Temporizador de etapas',
+    customTimer: 'Temporizador regular',
+    timerType: 'Tipo de temporizador',
+    timerTypeDescription: 'Seleccione el tipo de temporizador para usar en el juego',
   },
 };

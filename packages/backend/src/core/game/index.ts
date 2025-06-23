@@ -145,7 +145,7 @@ export class Game extends GameHooks {
     };
 
     this.features = options.features;
-    this.timer = new GameTimer(this);
+    this.timer = new GameTimer(this, this.features.useCustomTimer);
 
     const players = userIDs.map((userID, index) => ({
       userID,

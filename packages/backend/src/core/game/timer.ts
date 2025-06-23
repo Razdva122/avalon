@@ -17,9 +17,11 @@ export class GameTimer {
   private currentTimer?: TimerState;
   private game: Game;
   private pendingHistoryDelay: boolean = false;
+  private isCustomTimer: boolean;
 
-  constructor(game: Game) {
+  constructor(game: Game, isCustomTimer?: boolean) {
     this.game = game;
+    this.isCustomTimer = Boolean(isCustomTimer);
   }
 
   /**
@@ -63,6 +65,11 @@ export class GameTimer {
    * Start a timer for the current stage
    */
   startTimer(stage: TTimerStage): void {
+    // Если активен кастомный таймер, не запускаем таймер этапа
+    if (this.isCustomTimer) {
+      return;
+    }
+
     this.clearTimer();
 
     if (!this.isStageTimerEnabled(stage)) {
@@ -119,6 +126,81 @@ export class GameTimer {
   }
 
   /**
+   * Запуск кастомного таймера
+   * @param durationSeconds Продолжительность таймера в секундах
+   */
+  startCustomTimer(durationSeconds: number): void {
+    this.clearTimer();
+
+    console.log(`[GameTimer] Starting custom timer, duration: ${durationSeconds}s`);
+
+    const now = Date.now();
+    this.currentTimer = {
+      startTime: now,
+      endTime: now + durationSeconds * 1000,
+      duration: durationSeconds * 1000,
+      stage: 'custom',
+      expired: false,
+    };
+
+    const timeoutId = setTimeout(() => {
+      console.log(`[GameTimer] Custom timer expired`);
+      if (this.currentTimer) {
+        this.currentTimer.expired = true;
+      }
+      this.timers.delete('custom');
+
+      // Уведомить клиентов об истечении таймера
+      this.game.stateObserver.gameStateChanged();
+    }, durationSeconds * 1000);
+
+    this.timers.set('custom', timeoutId);
+    this.game.stateObserver.gameStateChanged();
+  }
+
+  /**
+   * Добавление времени к кастомному таймеру
+   * @param additionalSeconds Дополнительное время в секундах
+   */
+  addCustomTimerTime(additionalSeconds: number): void {
+    if (!this.currentTimer || !this.isCustomTimer) {
+      return;
+    }
+
+    console.log(`[GameTimer] Adding ${additionalSeconds}s to custom timer`);
+
+    // Очистить текущий таймаут
+    const timeoutId = this.timers.get('custom');
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      this.timers.delete('custom');
+    }
+
+    // Рассчитать новое время окончания
+    const remainingTime = this.getRemainingTime();
+    const newDuration = remainingTime + additionalSeconds * 1000;
+
+    const now = Date.now();
+    this.currentTimer.endTime = now + newDuration;
+    this.currentTimer.duration = newDuration;
+
+    // Создать новый таймаут
+    const newTimeoutId = setTimeout(() => {
+      console.log(`[GameTimer] Custom timer expired`);
+      if (this.currentTimer) {
+        this.currentTimer.expired = true;
+      }
+      this.timers.delete('custom');
+
+      // Уведомить клиентов об истечении таймера
+      this.game.stateObserver.gameStateChanged();
+    }, newDuration);
+
+    this.timers.set('custom', newTimeoutId);
+    this.game.stateObserver.gameStateChanged();
+  }
+
+  /**
    * Clear the current timer
    */
   clearTimer(): void {
@@ -145,11 +227,13 @@ export class GameTimer {
       clearTimeout(timeoutId);
     });
 
-    this.timers.clear();
-
     if (this.timers.size) {
       console.log(`[GameTimer] Cleanup completed: Cleared ${this.timers.size} active timers`);
     }
+
+    this.timers.clear();
+
+    this.game.stateObserver.gameStateChanged();
   }
 
   /**
@@ -177,21 +261,36 @@ export class GameTimer {
   /**
    * Get timer state for frontend
    */
-  getTimerState(): { active: boolean; endTime?: number; stage?: TTimerStage } {
-    if (!this.currentTimer || !this.isStageTimerEnabled(this.currentTimer.stage) || this.currentTimer.expired) {
-      return { active: false };
+  getTimerState(): { active: boolean; endTime?: number; stage?: TTimerStage; isCustom: boolean } {
+    if (!this.currentTimer || this.currentTimer.expired) {
+      return { active: false, isCustom: this.isCustomTimer };
     }
 
     const now = Date.now();
 
     // Check if we're still in the delay period (timer hasn't started yet)
     if (now < this.currentTimer.startTime) {
-      return { active: false };
+      return { active: false, isCustom: this.isCustomTimer };
     }
 
     // Check if timer has already expired
     if (now >= this.currentTimer.endTime) {
-      return { active: false };
+      return { active: false, isCustom: this.isCustomTimer };
+    }
+
+    // Для кастомного таймера
+    if (this.isCustomTimer) {
+      return {
+        active: true,
+        endTime: this.currentTimer.endTime,
+        stage: this.currentTimer.stage,
+        isCustom: this.isCustomTimer,
+      };
+    }
+
+    // Для обычного таймера этапа проверяем, включен ли он
+    if (!this.isStageTimerEnabled(this.currentTimer.stage)) {
+      return { active: false, isCustom: this.isCustomTimer };
     }
 
     // Calculate the visible endTime based on when the timer became visible
@@ -202,6 +301,7 @@ export class GameTimer {
       active: true,
       endTime: visibleEndTime,
       stage: this.currentTimer.stage,
+      isCustom: this.isCustomTimer,
     };
   }
 
@@ -215,6 +315,11 @@ export class GameTimer {
 
       // Clear the timer from our map
       this.timers.delete(stage);
+
+      // Для кастомного таймера не выполняем никаких действий по истечении
+      if (stage === 'custom') {
+        return;
+      }
 
       switch (stage) {
         case 'selectTeam':
