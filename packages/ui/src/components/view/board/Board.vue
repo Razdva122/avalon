@@ -388,6 +388,7 @@ export default defineComponent({
   margin: 120px 100px;
   color: white;
   overflow: visible;
+  transform: scale(1);
 }
 
 @include scaleFromSize(840px);
