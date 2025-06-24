@@ -141,7 +141,12 @@ export default defineComponent({
     };
 
     const gameTimer = computed(() => {
-      if (roomState.value.stage === 'started' && gameState.value?.timer && !visibleHistory.value) {
+      if (
+        roomState.value.stage === 'started' &&
+        gameState.value.stage !== 'end' &&
+        gameState.value?.timer &&
+        !visibleHistory.value
+      ) {
         return gameState.value.timer;
       }
       return null;
