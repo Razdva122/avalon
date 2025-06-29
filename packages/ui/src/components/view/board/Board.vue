@@ -39,7 +39,11 @@
                 :isCustom="gameTimer.isCustom"
               >
                 <template v-slot:timer-controls>
-                  <CustomTimerControls v-if="userIsLeader" :roomID="roomState.roomID" :leaderID="roomState.leaderID" />
+                  <CustomTimerControls
+                    v-if="userIsLeader && gameTimer.isCustom"
+                    :roomID="roomState.roomID"
+                    :leaderID="roomState.leaderID"
+                  />
                 </template>
               </GameTimer>
             </div>
