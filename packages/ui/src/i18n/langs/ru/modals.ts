@@ -20,6 +20,7 @@ export default {
     newPassword: 'Новый пароль',
     email: 'Email',
     newEmail: 'Новый email',
+    cancel: 'Отмена',
   },
   infoMessage: {
     loginToMessage: 'Войдите, чтобы отправить сообщение',
@@ -32,6 +33,8 @@ export default {
     loginChanged: 'Логин изменён',
     emailChanged: 'Email изменён',
     passwordChanged: 'Пароль изменён',
+    ratingReset: 'Рейтинг успешно сброшен',
+    ratingResetError: 'Не удалось сбросить рейтинг',
   },
   votes: {
     yes: 'За',

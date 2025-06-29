@@ -37,6 +37,16 @@ export default {
     changePassword: 'Alterar senha',
     profile: 'Perfil',
     settings: 'Configurações',
+    resetRating: 'Redefinir Classificação',
+    resetRatingHint: 'Redefinir sua classificação para valores padrão',
+    resetRatingConfirmTitle: 'Redefinir Classificação',
+    resetRatingConfirmText:
+      'Tem certeza de que deseja redefinir sua classificação? Esta ação só pode ser realizada uma vez a cada 3 meses.',
+    resetRatingSuccess: 'Sua classificação foi redefinida com sucesso',
+    resetRatingError: 'Falha ao redefinir a classificação',
+    resetRatingCooldown: 'A classificação só pode ser redefinida uma vez a cada 3 meses',
+    nextResetAvailable: 'Próxima redefinição disponível em',
+    currentRating: 'Sua classificação atual',
   },
   breadCrumbs: {
     merlin: 'Merlin',

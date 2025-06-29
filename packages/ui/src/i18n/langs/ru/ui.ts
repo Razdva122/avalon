@@ -38,6 +38,16 @@ export default {
     settings: 'Настройки',
     change: 'Изменить',
     changePassword: 'Изменить пароль',
+    resetRating: 'Сбросить рейтинг',
+    resetRatingHint: 'Сбросить ваш рейтинг до стандартных значений',
+    resetRatingConfirmTitle: 'Сброс рейтинга',
+    resetRatingConfirmText:
+      'Вы уверены, что хотите сбросить свой рейтинг? Это действие можно выполнить только раз в 3 месяца.',
+    resetRatingSuccess: 'Ваш рейтинг был успешно сброшен',
+    resetRatingError: 'Не удалось сбросить рейтинг',
+    resetRatingCooldown: 'Рейтинг можно сбрасывать только раз в 3 месяца',
+    nextResetAvailable: 'Следующий сброс доступен',
+    currentRating: 'Ваш текущий рейтинг',
   },
   breadCrumbs: {
     merlin: 'Мерлин',

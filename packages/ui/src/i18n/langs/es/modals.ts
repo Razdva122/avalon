@@ -20,6 +20,7 @@ export default {
     changelogin: 'Cambiar usuario',
     newPassword: 'Nueva contraseña',
     newEmail: 'Nuevo correo electrónico',
+    cancel: 'Cancelar',
   },
   infoMessage: {
     loginToMessage: 'Inicia sesión para enviar un mensaje',

@@ -34,4 +34,10 @@ export interface TrueSkillSocketEvents {
     gameID: string,
     callback: (result: { success: boolean; gameResult?: GameTrueSkillResult; error?: string }) => void,
   ) => void;
+
+  // Reset TrueSkill rating for a player
+  resetTrueSkillRating: (
+    userID: string,
+    callback: (result: { success: boolean; message?: string; error?: string; nextResetAvailableAt?: Date }) => void,
+  ) => void;
 }

@@ -20,6 +20,7 @@ export default {
     password: 'Senha',
     email: 'E-mail',
     newEmail: 'Novo e-mail',
+    cancel: 'Cancelar',
   },
   infoMessage: {
     loginToMessage: 'Faça login para enviar uma mensagem',

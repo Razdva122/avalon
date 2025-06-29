@@ -20,6 +20,7 @@ export default {
     changelogin: '更改帳號',
     newPassword: '新密碼',
     newEmail: '新電子郵件',
+    cancel: '取消',
   },
   infoMessage: {
     loginToMessage: '登入發送訊息',

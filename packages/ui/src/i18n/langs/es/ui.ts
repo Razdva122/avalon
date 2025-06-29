@@ -38,6 +38,16 @@ export default {
     settings: 'Configuración',
     change: 'Cambiar',
     changePassword: 'Cambiar contraseña',
+    resetRating: 'Restablecer Clasificación',
+    resetRatingHint: 'Restablecer tu clasificación a valores predeterminados',
+    resetRatingConfirmTitle: 'Restablecer Clasificación',
+    resetRatingConfirmText:
+      '¿Estás seguro de que quieres restablecer tu clasificación? Esta acción solo se puede realizar una vez cada 3 meses.',
+    resetRatingSuccess: 'Tu clasificación ha sido restablecida con éxito',
+    resetRatingError: 'No se pudo restablecer la clasificación',
+    resetRatingCooldown: 'La clasificación solo se puede restablecer una vez cada 3 meses',
+    nextResetAvailable: 'Próximo restablecimiento disponible el',
+    currentRating: 'Tu clasificación actual',
   },
   breadCrumbs: {
     merlin: 'Merlín',

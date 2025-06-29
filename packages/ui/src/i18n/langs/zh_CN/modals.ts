@@ -20,6 +20,7 @@ export default {
     changelogin: '更改账号',
     newPassword: '新密码',
     newEmail: '新电子邮件',
+    cancel: '取消',
   },
   infoMessage: {
     loginToMessage: '登入发送讯息',

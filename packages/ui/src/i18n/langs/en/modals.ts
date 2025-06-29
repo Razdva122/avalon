@@ -20,6 +20,7 @@ export default {
     password: 'Password',
     email: 'Email',
     newEmail: 'New email',
+    cancel: 'Cancel',
   },
   infoMessage: {
     loginToMessage: 'Log in to send a message',
@@ -32,6 +33,8 @@ export default {
     loginChanged: 'Login changed',
     emailChanged: 'Email changed',
     passwordChanged: 'Password changed',
+    ratingReset: 'Rating has been reset successfully',
+    ratingResetError: 'Failed to reset rating',
   },
   votes: {
     yes: 'Yes',

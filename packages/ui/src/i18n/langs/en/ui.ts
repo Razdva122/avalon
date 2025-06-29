@@ -37,6 +37,16 @@ export default {
     changePassword: 'Change password',
     profile: 'Profile',
     settings: 'Settings',
+    resetRating: 'Reset Rating',
+    resetRatingHint: 'Reset your rating to default values',
+    resetRatingConfirmTitle: 'Reset Rating',
+    resetRatingConfirmText:
+      'Are you sure you want to reset your rating? This action can only be performed once every 3 months.',
+    resetRatingSuccess: 'Your rating has been reset successfully',
+    resetRatingError: 'Failed to reset rating',
+    resetRatingCooldown: 'Rating can only be reset once every 3 months',
+    nextResetAvailable: 'Next reset available on',
+    currentRating: 'Your current rating',
   },
   breadCrumbs: {
     merlin: 'Merlin',
