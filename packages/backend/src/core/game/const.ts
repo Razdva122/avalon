@@ -1,5 +1,5 @@
 import type { IPlayerInGame, IPresetsForGame } from '@/core/game/interface';
-import type { TAddonsName } from '@avalon/types';
+import type { TAddonsName, TRoles } from '@avalon/types';
 import {
   TAdditionalAddonsData,
   TRolesAddonsData,
@@ -181,8 +181,27 @@ export const rolesWithAddons: Record<TRolesWithAddons, TRolesAddonsData[]> = {
           [(player: IPlayerInGame) => player.role.role === 'cleric'],
           {
             type: 'custom',
-            creator: (role) => {
-              return role !== 'cleric' && !role.startsWith('merlin') && role !== 'guinevere' && role !== 'goodLancelot';
+            creator: (roles) => {
+              let validRoles: TRoles[] = [];
+
+              roles.forEach((el) => {
+                if (
+                  el.loyalty === 'good' &&
+                  !validRoles.includes(el.role) &&
+                  el.role !== 'goodLancelot' &&
+                  el.role !== 'cleric'
+                ) {
+                  validRoles.push(el.role);
+                }
+              });
+
+              const fallbackRoles = ['merlin', 'merlinPure', 'guinevere'];
+
+              if (validRoles.some((role) => !fallbackRoles.includes(role))) {
+                validRoles = validRoles.filter((role) => !fallbackRoles.includes(role));
+              }
+
+              return validRoles;
             },
           },
         ],

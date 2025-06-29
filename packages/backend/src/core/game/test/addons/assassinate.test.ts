@@ -110,5 +110,37 @@ describe('Assassinate logic', () => {
 
       expect(() => gameHelper.pickCustomRole('goodLancelot', 'cleric')).toThrow('valid roles tristan, isolde');
     });
+
+    test('Select correct cleric in low game, merlin should be available', () => {
+      const restart = generateNewGame({}, { merlin: 1, cleric: 1, goodLancelot: 1, evilLancelot: 1 }, 5);
+      game = restart.game;
+      gameHelper = restart.gameHelper;
+
+      gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
+      gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
+      gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
+
+      gameHelper.pickRole('cleric', true);
+
+      expect(game.stage).toBe('assassinate');
+
+      expect(game.addonsData.assassin?.progressData?.possibleTargets).toStrictEqual(['merlin']);
+    });
+
+    test('Select correct cleric in low game, merlin shouldnt be available', () => {
+      const restart = generateNewGame({}, { merlin: 1, cleric: 1 }, 5);
+      game = restart.game;
+      gameHelper = restart.gameHelper;
+
+      gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
+      gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
+      gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
+
+      gameHelper.pickRole('cleric', true);
+
+      expect(game.stage).toBe('assassinate');
+
+      expect(game.addonsData.assassin?.progressData?.possibleTargets).toStrictEqual(['servant']);
+    });
   });
 });

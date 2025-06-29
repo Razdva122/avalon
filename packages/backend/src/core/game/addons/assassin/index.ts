@@ -193,14 +193,8 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
     const option = this.options[type]?.[stage];
 
     if (option && 'type' in option && option.type === 'custom') {
-      return this.game.players
-        .reduce<TRoles[]>((acc, el) => {
-          if (el.role.loyalty === 'good' && option.creator(el.role.role) && !acc.includes(el.role.role)) {
-            acc.push(el.role.role);
-          }
-
-          return acc;
-        }, [])
+      return option
+        .creator(this.game.players.map((el) => el.role))
         .sort((a, b) => goodRolesImportance[<TGoodRoles>a] - goodRolesImportance[<TGoodRoles>b]);
     }
   }
