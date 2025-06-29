@@ -20,8 +20,8 @@ export default {
     lookingForPlayers: 'Looking for players',
   },
   alert: {
-    titlediscord: 'Discord',
-    contentdiscord:
-      'Looking for fellow players to delve into \'Avalon\'? Join our <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">Discord</a></b> community!',
+    titlediscordchat: 'Discord Chat',
+    contentdiscordchat:
+      'Looking for players to join your team or want to join other Avalon players? Use our <b><a href="https://discord.gg/Xdu7ByqQtt" target="_blank">Discord&nbsp;chat</a></b>!',
   },
 };

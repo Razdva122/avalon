@@ -1,8 +1,8 @@
 <template>
   <div class="lobby">
     <div class="alert-container">
-      <TemporaryAlert id="discord">
-        <div v-html="$t('alert.contentdiscord')"></div>
+      <TemporaryAlert id="discordchat">
+        <div v-html="$t('alert.contentdiscordchat')"></div>
       </TemporaryAlert>
     </div>
 
@@ -228,6 +228,8 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 90%;
+  max-width: 800px;
 }
 
 @import '@/styles/loyalty-icons.scss';
