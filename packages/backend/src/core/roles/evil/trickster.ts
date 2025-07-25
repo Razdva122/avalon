@@ -8,6 +8,7 @@ export class Trickster extends Character {
   loyalty: TLoyalty = 'evil';
 
   visibility: TVisibility = {
+    trickster: 'evil',
     minion: 'evil',
     morgana: 'evil',
     mordred: 'evil',

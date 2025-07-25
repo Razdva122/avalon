@@ -8,6 +8,7 @@ export class Mordred extends Character {
   loyalty: TLoyalty = 'evil';
 
   visibility: TVisibility = {
+    mordred: 'evil',
     minion: 'evil',
     morgana: 'evil',
     trickster: 'evil',

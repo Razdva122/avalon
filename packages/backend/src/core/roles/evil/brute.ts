@@ -8,6 +8,7 @@ export class Brute extends Character {
   loyalty: TLoyalty = 'evil';
 
   visibility: TVisibility = {
+    brute: 'evil',
     minion: 'evil',
     morgana: 'evil',
     mordred: 'evil',

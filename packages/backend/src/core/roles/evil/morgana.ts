@@ -8,6 +8,7 @@ export class Morgana extends Character {
   loyalty: TLoyalty = 'evil';
 
   visibility: TVisibility = {
+    morgana: 'evil',
     minion: 'evil',
     mordred: 'evil',
     trickster: 'evil',

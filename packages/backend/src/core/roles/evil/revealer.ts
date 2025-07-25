@@ -1,6 +1,6 @@
 import { Character } from '@/core/roles/abstract';
 import type { TVisibility } from '@/core/roles/interface';
-import type { TLoyalty, TRoles, TMissionResult } from '@avalon/types';
+import type { TLoyalty, TRoles } from '@avalon/types';
 
 export class Revealer extends Character {
   role: TRoles = 'revealer';
@@ -8,6 +8,7 @@ export class Revealer extends Character {
   loyalty: TLoyalty = 'evil';
 
   visibility: TVisibility = {
+    revealer: 'evil',
     minion: 'evil',
     morgana: 'evil',
     mordred: 'evil',
