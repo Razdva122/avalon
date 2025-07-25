@@ -59,5 +59,7 @@ export default {
     customTimer: 'Regular Timer',
     timerType: 'Timer Type',
     timerTypeDescription: 'Select the type of timer to use in the game',
+    wtfMode: 'WTF Mode',
+    wtfModeHint: 'Allows duplicating characters in the game. A counter with +/- buttons appears next to each character',
   },
 };

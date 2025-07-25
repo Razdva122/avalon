@@ -29,10 +29,11 @@
             <div class="game-left">
               <div class="mr-2 game-name">
                 <span v-if="game.result?.winner" :class="`${game.result.winner}-loyalty-icon`" class="mr-1"></span>
-                <b>{{ roomsListHosts?.[index] }}</b>
+                <b class="host-name">{{ roomsListHosts?.[index] }}</b>
               </div>
               <OptionsPreview
                 v-if="displayOptions(game.options.roles, game.options.addons)"
+                :max-view="8"
                 :roles="game.options.roles"
                 :addons="game.options.addons"
               />
@@ -180,6 +181,7 @@ export default defineComponent({
   border-radius: 12px;
   padding: 5px 10px;
   min-width: 50vw;
+  max-width: 80vw;
   display: flex;
   align-items: center;
   font-size: 24px;
@@ -212,9 +214,12 @@ export default defineComponent({
 }
 
 .game-name {
-  @include text-overflow(1);
   display: flex;
   align-items: center;
+}
+
+.host-name {
+  @include text-overflow(1);
 }
 
 .players-amount {

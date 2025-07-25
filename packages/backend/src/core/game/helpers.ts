@@ -30,10 +30,17 @@ export function generateRolesForGame(settings: GameSettings, options: GameOption
 
   const loyalty = { ...settings.players };
 
+  // Roles that cannot be duplicated in wtf-mode
+  const disabledForDuplication = ['witch', 'goodLancelot', 'evilLancelot'];
+
   Object.entries(options.roles).forEach((role) => {
     const [roleName, inGame] = <[TRoles, number]>role;
 
-    for (let i = 0; i < inGame; i += 1) {
+    // If wtf-mode is enabled and this role can be duplicated, use the count from options
+    // Otherwise, ensure only one instance of the role is created (for non-wtf mode or disabled roles)
+    const count = options.features.wtfMode && !disabledForDuplication.includes(roleName) ? inGame : Math.min(inGame, 1);
+
+    for (let i = 0; i < count; i += 1) {
       const character = new roles[roleName](game);
       gameRoles.push(new roles[roleName](game));
       loyalty[character.loyalty] -= 1;

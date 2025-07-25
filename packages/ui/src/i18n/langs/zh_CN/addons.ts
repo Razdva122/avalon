@@ -58,5 +58,7 @@ export default {
     customTimer: '常规计时器',
     timerType: '计时器类型',
     timerTypeDescription: '选择游戏中使用的计时器类型',
+    wtfMode: 'WTF模式',
+    wtfModeHint: '允许在游戏中复制角色。每个角色旁边会出现带有+/-按钮的计数器',
   },
 };

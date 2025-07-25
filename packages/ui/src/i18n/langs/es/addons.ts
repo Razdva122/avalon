@@ -59,5 +59,7 @@ export default {
     customTimer: 'Temporizador regular',
     timerType: 'Tipo de temporizador',
     timerTypeDescription: 'Seleccione el tipo de temporizador para usar en el juego',
+    wtfMode: 'Modo WTF',
+    wtfModeHint: 'Permite duplicar personajes en el juego. Aparece un contador con botones +/- junto a cada personaje',
   },
 };

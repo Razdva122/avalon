@@ -25,7 +25,7 @@ export class Room {
     this.players = players;
     this.leaderID = leaderID;
     this.chat = new Chat();
-    this.options = options || { addons: {}, roles: {}, features: {} };
+    this.options = options || { addons: {}, roles: {}, features: { wtfMode: false } };
     this.createAt = String(new Date());
   }
 

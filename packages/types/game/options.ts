@@ -145,6 +145,9 @@ export class GameOptionsFeatures {
   @prop()
   public useCustomTimer?: boolean;
 
+  @prop()
+  public wtfMode?: boolean;
+
   @prop({ type: () => TimerDurations, _id: false })
   public timerDurations?: TimerDurations;
 }

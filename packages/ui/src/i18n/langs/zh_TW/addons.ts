@@ -58,5 +58,7 @@ export default {
     customTimer: '常規計時器',
     timerType: '計時器類型',
     timerTypeDescription: '選擇遊戲中使用的計時器類型',
+    wtfMode: 'WTF模式',
+    wtfModeHint: '允許在遊戲中複製角色。每個角色旁邊會出現帶有+/-按鈕的計數器',
   },
 };

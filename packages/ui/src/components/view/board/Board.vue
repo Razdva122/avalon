@@ -13,6 +13,7 @@
               <OptionsPreview
                 :roles="roomState.options.roles"
                 :addons="roomState.options.addons"
+                :max-view="10"
                 class="options-preview"
               />
             </div>

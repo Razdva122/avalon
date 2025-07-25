@@ -21,7 +21,7 @@
     "vue-chartjs": "^5.3.2",
     "vue-i18n": "^9.14.0",
     "vue-router": "^4.2.5",
-    "vuetify": "^3.4.7",
+    "vuetify": "^3.5.6",
     "vuex": "^4.1.0"
   },
   "devDependencies": {
@@ -43,6 +43,6 @@
     "sitemap-webpack-plugin": "^1.1.1",
     "webpack-bundle-analyzer": "^4.10.1",
     "webpack-cli": "^5.1.4",
-    "webpack-plugin-vuetify": "^3.0.3"
+    "webpack-plugin-vuetify": "^3.0.4"
   }
 }

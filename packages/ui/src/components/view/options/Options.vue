@@ -29,17 +29,38 @@
         <template v-if="type === 'roles'">
           <div class="option" v-for="role in rolesSettings">
             <PlayerIcon class="role" :icon="role.role" :class="rolesShortInfo[role.role].loyalty" />
-            <v-checkbox
-              @input="onRoleUpdate(role.role)"
-              :disabled="role.disabled"
-              v-model="roles[role.role]"
-              :true-value="1"
-              :false-value="0"
-              :hide-details="true"
-              :color="role.color"
-              :label="role.label"
-            >
-            </v-checkbox>
+            <div class="role-controls">
+              <v-checkbox
+                @change="onRoleCheckboxChange(role.role)"
+                :disabled="role.disabled"
+                :model-value="(roles[role.role] || 0) > 0"
+                :hide-details="true"
+                :color="role.color"
+                :label="role.label"
+              >
+              </v-checkbox>
+
+              <div
+                v-if="features?.wtfMode && !disabledForDuplication.includes(role.role) && roles[role.role]"
+                class="role-counter"
+              >
+                <v-btn
+                  size="small"
+                  icon="remove"
+                  variant="text"
+                  density="compact"
+                  @click="decreaseRoleCount(role.role)"
+                ></v-btn>
+                <span class="role-count">{{ roles[role.role] }}</span>
+                <v-btn
+                  size="small"
+                  icon="add"
+                  variant="text"
+                  density="compact"
+                  @click="increaseRoleCount(role.role)"
+                ></v-btn>
+              </div>
+            </div>
             <HelpButton :route="'route' in role ? role.route : role.role" :content="rolesShortInfo[role.role].info" />
           </div>
         </template>
@@ -101,6 +122,7 @@ export default defineComponent({
       type: 'roles',
       roleTypes: 'core' as 'core' | 'extra' | 'experimental',
       rolesShortInfo,
+      disabledForDuplication: ['witch', 'goodLancelot', 'evilLancelot'] as TRoles[],
     };
   },
   computed: {
@@ -224,6 +246,11 @@ export default defineComponent({
           label: this.$t('options.displayIndex'),
           hint: this.$t('options.displayIndexHint'),
         },
+        {
+          name: 'wtfMode',
+          label: this.$t('options.wtfMode'),
+          hint: this.$t('options.wtfModeHint'),
+        },
       ] as const;
     },
     rolesSettings() {
@@ -236,7 +263,18 @@ export default defineComponent({
       this.roles.percival = 0;
       this.roles.mordred = 0;
     },
-    onRoleUpdate(roleName: TRoles) {
+    increaseRoleCount(role: keyof GameOptionsRoles) {
+      this.roles[role] = (this.roles[role] || 0) + 1;
+    },
+    decreaseRoleCount(role: keyof GameOptionsRoles) {
+      this.roles[role] = (this.roles[role] || 0) - 1;
+    },
+    onRoleCheckboxChange(roleName: keyof GameOptionsRoles) {
+      this.roles[roleName] = this.roles[roleName] ? 0 : 1;
+
+      this.handleRoleDependencies(roleName);
+    },
+    handleRoleDependencies(roleName: TRoles) {
       if (roleName === 'isolde') {
         this.roles.tristan = this.roles.isolde;
       }
@@ -345,5 +383,27 @@ export default defineComponent({
 
 .tabs {
   border-radius: 8px;
+}
+
+.role-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.role-counter {
+  display: flex;
+  align-items: center;
+  background-color: rgba(var(--v-theme-text-primary), 0.4);
+  border-radius: 4px;
+  padding: 4px 6px;
+  margin-left: 8px;
+}
+
+.role-count {
+  min-width: 20px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
 }
 </style>
