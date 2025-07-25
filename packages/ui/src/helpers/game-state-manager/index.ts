@@ -148,7 +148,6 @@ export class GameStateManager {
     let current: VisualGameState;
     let prev: VisualGameState | undefined;
     let next: VisualGameState | undefined;
-    let skipedFirstCrown = false;
 
     while (index > startIndex) {
       index -= 1;
@@ -156,20 +155,16 @@ export class GameStateManager {
       prev = gameStates[index - 1];
       next = gameStates[index + 1];
 
-      if ((current.stage === 'votingForTeam' && prev?.stage === 'votingForTeam') || prev?.stage === 'onMission') {
-        if (skipedFirstCrown === false) {
-          skipedFirstCrown = true;
-        } else {
-          let mutateIndex = index;
+      if (next.stage === 'votingForTeam') {
+        let mutateIndex = index;
 
-          while (mutateIndex >= startIndex) {
-            const players = gameStates[mutateIndex].players;
-            const leader = players.find((player) => player.features.isLeader)!;
-            leader.features.isLeader = false;
-            const prevLeader = this.getClosePlayer(players, leader, -1);
-            prevLeader.features.isLeader = true;
-            mutateIndex -= 1;
-          }
+        while (mutateIndex >= startIndex) {
+          const players = gameStates[mutateIndex].players;
+          const leader = players.find((player) => player.features.isLeader)!;
+          leader.features.isLeader = false;
+          const prevLeader = this.getClosePlayer(players, leader, -1);
+          prevLeader.features.isLeader = true;
+          mutateIndex -= 1;
         }
       }
 
