@@ -230,15 +230,19 @@ export class AchievementHandlers {
       }
     }
 
-    // Обработка достижения "Провидец"
-    // Выдается, когда игрок с ролью 'servant' собрал все походы без мафий
+    // Обработка достижения "Ошибки случаются"
+    // Выдается, когда все игроки сил тьмы нажали fail в миссии
     if (Object.keys(evilRolesImportance).includes(player.role)) {
+      const evilPlayersIDs = game.players
+        .filter((el) => Object.keys(evilRolesImportance).includes(el.role))
+        .map((el) => el.id);
+
       const missions = game.history.filter(
         (history): history is HistoryMission =>
           history.type === 'mission' &&
-          history.result === 'fail' &&
-          history.actions.some((action) => action.playerID === playerID) &&
-          history.actions.every((action) => 'value' in action && action.value === 'fail'),
+          evilPlayersIDs.every((id) =>
+            history.actions.some((action) => action.playerID === id && 'value' in action && action.value === 'fail'),
+          ),
       );
 
       if (missions.length > 0) {

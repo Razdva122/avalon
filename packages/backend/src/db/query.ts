@@ -31,7 +31,10 @@ const addons: { [key in TAddonsName]: true } = {
 
 export const query = {
   statsByPlayers: [
-    { $match: { 'game.stage': 'end', 'game.result.reason': { $ne: 'manualy' } } },
+    {
+      $match: { 'game.stage': 'end', 'game.result.reason': { $ne: 'manualy' } },
+      'game.features.wtfMode': { $ne: true },
+    },
 
     {
       $addFields: {
@@ -82,7 +85,10 @@ export const query = {
     { $sort: { playerCount: <const>1 } },
   ],
   rolesStats: [
-    { $match: { 'game.stage': 'end', 'game.result.reason': { $ne: 'manualy' } } },
+    {
+      $match: { 'game.stage': 'end', 'game.result.reason': { $ne: 'manualy' } },
+      'game.features.wtfMode': { $ne: true },
+    },
     {
       $addFields: {
         rolesArray: { $objectToArray: '$options.roles' },
@@ -153,7 +159,10 @@ export const query = {
     { $sort: { role: <const>1 } },
   ],
   addonsStats: [
-    { $match: { 'game.stage': 'end', 'game.result.reason': { $ne: 'manualy' } } },
+    {
+      $match: { 'game.stage': 'end', 'game.result.reason': { $ne: 'manualy' } },
+      'game.features.wtfMode': { $ne: true },
+    },
     {
       $addFields: {
         addonsArray: { $objectToArray: '$options.addons' },
