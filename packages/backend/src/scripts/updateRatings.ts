@@ -9,8 +9,8 @@ import { eventBus } from '@/helpers';
 const WINRATE_WEIGHT = 0.7;
 const GAMES_COUNT_WEIGHT = 0.3;
 const MAX_LOG_BASE = 100; // Adjust based on expected max games count
-const MAX_DECAY = 0.2; // 20% maximum decay
-const MAX_DECAY_DAYS = 60; // Days after which maximum decay is applied
+const MAX_DECAY = 0.3; // 20% maximum decay
+const MAX_DECAY_DAYS = 90; // Days after which maximum decay is applied
 
 // Extended game state with additional properties for rating calculation
 interface ExtendedGameState extends VisualGameState {
