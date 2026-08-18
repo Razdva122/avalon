@@ -4,6 +4,7 @@ services:
   mongodb:
     image: mongo:6.0
     container_name: avalon_mongodb
+    restart: unless-stopped
     ports:
       - '${MONGODB_PORT}:27017'
     volumes:
@@ -14,9 +15,18 @@ services:
       MONGO_INITDB_DATABASE: ${DB_NAME}
     networks:
       - avalon-net
+    mem_limit: 1g
+    mem_reservation: 256m
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
   mongo-express:
     image: mongo-express:latest
+    restart: unless-stopped
     ports:
       - '8081:8081'
     environment:
@@ -24,9 +34,11 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGODB_PASSWORD}
       ME_CONFIG_MONGODB_URL: mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@mongodb:27017/
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     networks:
       - avalon-net
+    mem_limit: 256m
 
 volumes:
   mongodb_data:

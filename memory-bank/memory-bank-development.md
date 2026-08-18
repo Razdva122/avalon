@@ -259,9 +259,41 @@ docker-compose -f docker-compose.dev.yml down
    - Use aggregation instead of multiple queries
 
 2. **Connection errors**
+
    - Check connection settings
    - Ensure MongoDB is running
    - Check access rights
+
+3. **MongoDB container crashes (Exit code 137)**
+   - Exit code 137 indicates SIGKILL, usually caused by OOM Killer
+   - Check server memory: `free -h && dmesg | grep -i 'killed process' | tail -5`
+   - MongoDB has memory limit of 1GB configured in docker-compose
+   - Backend has automatic reconnection logic (up to 10 attempts with 5s interval)
+   - All containers have `restart: unless-stopped` policy for automatic recovery
+
+### Container Stability
+
+The project uses several mechanisms to ensure container stability:
+
+1. **Restart policies**
+
+   - All services have `restart: unless-stopped` policy
+   - Containers automatically restart after crashes
+
+2. **Memory limits**
+
+   - MongoDB: 1GB limit, 256MB reservation
+   - Prevents OOM Killer from affecting other services
+
+3. **Health checks**
+
+   - MongoDB has healthcheck configured (ping every 30s)
+   - Dependent services wait for MongoDB to be healthy
+
+4. **Graceful reconnection**
+   - Backend automatically reconnects to MongoDB on connection loss
+   - Up to 10 reconnection attempts with 5-second intervals
+   - Process exits after max attempts to trigger container restart
 
 ### Game Logic Issues
 
