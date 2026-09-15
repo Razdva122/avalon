@@ -86,6 +86,18 @@
         <div class="achievement-card__reward-text">{{ $t('achievements.avatarReward') }}</div>
         <Avatar :avatarID="avatarReward" class="achievement-card__reward-icon" />
       </div>
+      <div
+        v-for="sticker in stickerRewards"
+        :key="sticker.id"
+        class="achievement-card__reward"
+        :class="{ 'achievement-card__reward--unlocked': isUnlocked }"
+      >
+        <div class="achievement-card__reward-text">
+          {{ $t('stickers.reward') }}
+          <div class="achievement-card__reward-name">{{ $t(`stickers.${sticker.id}`) }}</div>
+        </div>
+        <StickerImage :id="sticker.id" class="achievement-card__reward-sticker" />
+      </div>
     </div>
   </v-card>
 </template>
@@ -94,7 +106,8 @@
 import { getAchievementsText } from '@/helpers/achievements';
 import { defineComponent, computed, PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { AchievementStats, ACHIEVEMENT_TO_AVATAR_MAP } from '@avalon/types';
+import { AchievementStats, ACHIEVEMENT_TO_AVATAR_MAP, STICKERS } from '@avalon/types';
+import StickerImage from '@/components/stickers/StickerImage.vue';
 import Avatar from '@/components/user/Avatar.vue';
 
 export interface AchievementProgress {
@@ -106,6 +119,7 @@ export default defineComponent({
   name: 'AchievementCard',
   components: {
     Avatar,
+    StickerImage,
   },
   props: {
     achievementID: {
@@ -169,6 +183,8 @@ export default defineComponent({
       return ACHIEVEMENT_TO_AVATAR_MAP[props.achievementID];
     });
 
+    const stickerRewards = computed(() => STICKERS.filter((sticker) => sticker.achievement === props.achievementID));
+
     // Определяем, находится ли достижение в процессе выполнения
     const isInProgress = computed(() => {
       return props.progress && props.progress.currentValue < props.progress.maxValue;
@@ -184,6 +200,7 @@ export default defineComponent({
       isInProgress,
       shouldShowProgressBar,
       avatarReward,
+      stickerRewards,
     };
   },
 });
@@ -266,6 +283,20 @@ export default defineComponent({
       background-color: rgba(var(--v-theme-success), 0.15);
       border-top: 1px solid rgba(var(--v-theme-success), 0.3);
     }
+  }
+
+  &__reward-sticker {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+
+  &__reward-name {
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 400;
+    color: rgb(var(--v-theme-text-secondary));
   }
 
   &__reward-icon {

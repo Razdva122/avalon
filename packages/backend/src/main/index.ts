@@ -1,3 +1,5 @@
+import { registerStickerEndpoints } from '@/stickers/endpoints';
+import { StickersManager } from '@/stickers';
 import { Room } from '@/room';
 import type {
   Dictionary,
@@ -23,6 +25,7 @@ import { AchievementManager } from '@/achievements';
 import { AvatarsManager } from '@/user/avatars';
 
 export class Manager {
+  stickersManager = new StickersManager();
   rooms: Dictionary<Room> = {};
   roomsList: TRoomsList = [];
   io: Server;
@@ -135,11 +138,11 @@ export class Manager {
     delete this.rooms[uuid];
   }
 
-  saveRoomToDB(room: Room) {
+  async saveRoomToDB(room: Room) {
     const state = room.calculateRoomState();
 
     if (state.stage === 'started') {
-      this.dbManager.saveRoomToDB(state);
+      await this.dbManager.saveRoomToDB(state);
     }
   }
 
@@ -162,7 +165,7 @@ export class Manager {
 
       if (room) {
         // Save room to DB
-        this.saveRoomToDB(room);
+        await this.saveRoomToDB(room);
 
         // Calculate and store rating changes for this game only
         // (Daily snapshots are handled by the scheduler)
@@ -177,6 +180,7 @@ export class Manager {
           console.log(`TrueSkill ratings updated for game ${gameState.game.uuid}`);
 
           await this.achievementManager.achievementHandlers.handleGameEnd(gameState.game);
+          gameState.game.players.forEach((player) => this.io.to(player.id).emit('stickersUpdated'));
           console.log(`Achievements processed directly for game: ${gameState.game.uuid}`);
         }
       }
@@ -224,7 +228,7 @@ export class Manager {
 
       socket.on('joinRoom', async (uuid, cb) => {
         const room = this.rooms[uuid];
-        const gameFromDB = await this.dbManager.getRoomFromDB(uuid);
+        const gameFromDB = room ? null : await this.dbManager.getRoomFromDB(uuid);
 
         if (room || gameFromDB) {
           socket.join(uuid);
@@ -372,6 +376,8 @@ export class Manager {
     socket.on('restartGame', (uuid) => {
       this.restartRoom(uuid);
     });
+
+    registerStickerEndpoints(socket, userID, this.stickersManager, (id) => this.rooms[id], this.io);
 
     socket.on('sendMessage', (uuid, message) => {
       const room = this.rooms[uuid];

@@ -94,6 +94,15 @@ export class VoteOfPlayer extends RoomPlayer {
 }
 
 export class ChatMessage {
+  @prop()
+  public id?: string;
+
+  @prop()
+  public kind?: 'text' | 'sticker';
+
+  @prop()
+  public stickerID?: string;
+
   @prop({ required: true })
   public userID!: string;
 

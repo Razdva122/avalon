@@ -1,3 +1,4 @@
+import stickers from '@/i18n/langs/en/stickers';
 /**
  * Main export file for Portuguese translations
  * Imports and combines all feature-specific translation modules
@@ -16,6 +17,7 @@ import achievements from './achievements';
 
 export const pt = {
   ...menu,
+  ...stickers,
   ...room,
   ...game,
   ...roles,

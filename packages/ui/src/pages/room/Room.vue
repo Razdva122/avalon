@@ -37,6 +37,7 @@
         />
         <HostPanel v-if="displayHostPanel" :roomUuid="roomState.roomID" :roomStage="roomState.stage" />
       </div>
+      <StickerPicker class="sticker-picker" :roomID="roomState.roomID" @hide-on-board="hideStickers = $event" />
       <Chat class="chat" :messages="roomState.chat" :roomUuid="roomState.roomID" />
     </template>
   </div>
@@ -54,6 +55,8 @@ import RolesInfo from '@/components/view/information/RolesInfo.vue';
 import CardsInfo from '@/components/view/information/CardsInfo.vue';
 import HostPanel from '@/components/view/panels/HostPanel.vue';
 import RoomVote from '@/components/view/panels/RoomVote.vue';
+import StickerPicker from '@/components/stickers/StickerPicker.vue';
+import { useRoomStickers } from '@/helpers/composables/useRoomStickers';
 import Chat from '@/components/feedback/Chat.vue';
 import RatingChangesPanel from '@/components/stats/RatingChangesPanel.vue';
 import eventBus from '@/helpers/event-bus';
@@ -67,6 +70,7 @@ export default defineComponent({
     HostPanel,
     RoomVote,
     Chat,
+    StickerPicker,
     RatingChangesPanel,
   },
   props: {
@@ -85,6 +89,12 @@ export default defineComponent({
     const userID = computed(() => store.state.profile?.id);
 
     const roomState = stateManager.state;
+    const hideStickers = ref(false);
+    useRoomStickers(
+      () => props.uuid,
+      roomState,
+      () => hideStickers.value,
+    );
     const game = stateManager.game;
 
     const initState = async (uuid: string) => {
@@ -178,6 +188,7 @@ export default defineComponent({
     });
 
     return {
+      hideStickers,
       roomState,
       errorMessage,
       displayRestartButton,
@@ -263,5 +274,14 @@ export default defineComponent({
   position: fixed;
   bottom: 30px;
   right: 5px;
+}
+</style>
+
+<style scoped>
+.sticker-picker {
+  position: fixed;
+  bottom: 30px;
+  right: 66px;
+  z-index: 20;
 }
 </style>

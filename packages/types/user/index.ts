@@ -65,6 +65,15 @@ export class UserProfile extends UserForUI {
 }
 
 export class UserFeatures {
+  @prop({ type: () => [String], default: undefined })
+  public favoriteStickers?: string[];
+
+  @prop({ type: () => [String], default: [] })
+  public seenStickers?: string[];
+
+  @prop({ default: false })
+  public hideStickersOnBoard?: boolean;
+
   @prop({ required: true, unique: true })
   public userID!: string;
 
@@ -80,3 +89,5 @@ export class UserFeatures {
   @prop({ type: Date })
   public lastGameDate?: Date;
 }
+
+export * from './stickers';

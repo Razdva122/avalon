@@ -7,6 +7,8 @@ This file tracks the project's progress using a task list format.
 
 ## Completed Tasks
 
+- 2026-09-15: Added collectible character stickers, achievement/participation rewards, profile collection, ordered favorites and room reactions. See [implementation notes](../plans/stickers-implementation.md) for storage, compatibility and validation.
+
 - Implemented initial TrueSkill rating system with team normalization
 - Added TrueSkill API endpoints and database models
 - Integrated TrueSkill display in user profiles and hover cards

@@ -43,7 +43,13 @@
             <i class="material-icons icon-switch arrow_forward"></i>
             <div class="icon-evil-mission"></div>
           </div>
-          <div class="message-container" v-if="chatMessage?.message">{{ chatMessage?.message }}</div>
+          <Teleport to="body"
+            ><div v-if="stickerReaction" ref="stickerElement" class="player-sticker" :style="stickerStyles">
+              <StickerImage :id="stickerReaction.stickerID" /></div
+          ></Teleport>
+          <div class="message-container" v-if="chatMessage?.message && !stickerReaction">
+            {{ chatMessage?.message }}
+          </div>
           <span class="player-name" :title="player.name">
             <span class="player-name-text">
               <span v-if="'index' in player && displayIndex">
@@ -67,8 +73,22 @@
 </template>
 
 <script lang="ts">
+import { useFloating, autoUpdate, offset, flip, shift } from '@floating-ui/vue';
+import StickerImage from '@/components/stickers/StickerImage.vue';
+import { stickerReactionsKey } from '@/helpers/composables/useRoomStickers';
 import cloneDeep from 'lodash/cloneDeep';
-import { defineComponent, PropType, inject, computed, toRefs, ref, onMounted, ComputedRef, watch } from 'vue';
+import {
+  defineComponent,
+  PropType,
+  inject,
+  computed,
+  toRefs,
+  ref,
+  onMounted,
+  onUnmounted,
+  ComputedRef,
+  watch,
+} from 'vue';
 import { onLongPress } from '@vueuse/core';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
@@ -94,6 +114,7 @@ import snakeCase from 'lodash/snakeCase';
 
 export default defineComponent({
   components: {
+    StickerImage,
     PlayerIcon,
     Avatar,
     PlotCard,
@@ -120,10 +141,19 @@ export default defineComponent({
   setup(props) {
     const gameState = inject(gameStateKey)!;
     const store = useStore();
+    const reactions = inject(stickerReactionsKey, {});
+    const stickerReaction = computed(() => reactions[props.playerState.id]);
     const { playerState, visibleHistory, displayKick } = toRefs(props);
     const { userState, userName } = useUserProfile(playerState.value.id);
     const chatMessage = ref<{ message?: string; timeoutId?: number }>();
     const playerRef = ref(null);
+    const stickerElement = ref<HTMLElement | null>(null);
+    const { floatingStyles: stickerStyles } = useFloating(playerRef, stickerElement, {
+      placement: 'right',
+      strategy: 'fixed',
+      middleware: [offset(8), flip(), shift({ padding: 12 })],
+      whileElementsMounted: autoUpdate,
+    });
     const showUserCardDialog = ref(false);
     const tooltipOpen = ref(false);
 
@@ -143,7 +173,7 @@ export default defineComponent({
       );
     });
 
-    socket.on('newMessage', (message) => {
+    const onMessage = (message: import('@avalon/types').TMessage) => {
       if (message.author === playerState.value.id) {
         if (chatMessage.value?.timeoutId) {
           window.clearTimeout(chatMessage.value?.timeoutId);
@@ -155,6 +185,11 @@ export default defineComponent({
 
         chatMessage.value = { message: message.text, timeoutId };
       }
+    };
+    socket.on('newMessage', onMessage);
+    onUnmounted(() => {
+      socket.off('newMessage', onMessage);
+      window.clearTimeout(chatMessage.value?.timeoutId);
     });
 
     const player: ComputedRef<(IFrontendPlayer | RoomPlayer) & { name: string }> = computed(() => {
@@ -318,11 +353,14 @@ export default defineComponent({
       player,
       playerClasses,
       chatMessage,
+      stickerReaction,
       getImagePathByID,
       toSnakeCase,
       plotCardsNames,
       playerCards,
       playerRef,
+      stickerElement,
+      stickerStyles,
       showUserCardDialog,
       isMobileDevice,
       tooltipOpen,
@@ -693,5 +731,21 @@ export default defineComponent({
   position: absolute;
   bottom: 30px;
   @include text-overflow(5);
+}
+</style>
+
+<style scoped>
+.player-sticker {
+  width: 90px;
+  height: 90px;
+  z-index: 15;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 6px #0008);
+}
+@media (max-width: 600px) {
+  .player-sticker {
+    width: 66px;
+    height: 66px;
+  }
 }
 </style>

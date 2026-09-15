@@ -1,3 +1,4 @@
+import stickers from '@/i18n/langs/en/stickers';
 /**
  * Main export file for Chinese (Traditional) translations
  * Imports and combines all feature-specific translation modules
@@ -16,6 +17,7 @@ import achievements from './achievements';
 
 export const zh_TW = {
   ...menu,
+  ...stickers,
   ...room,
   ...game,
   ...roles,

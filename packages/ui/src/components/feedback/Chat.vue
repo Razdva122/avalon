@@ -21,7 +21,10 @@
           :class="isUserMessage(message.userID) ? 'message-from-author' : ''"
         >
           <UserPreview class="message-author" :userID="message.userID" @click="onUserClick(message.userID)" />
-          <div class="message-text">
+          <div v-if="message.kind === 'sticker' && message.stickerID" class="chat-sticker">
+            <StickerImage :id="message.stickerID" />
+          </div>
+          <div v-else class="message-text">
             {{ message.message }}
           </div>
         </div>
@@ -50,6 +53,7 @@
 </template>
 
 <script lang="ts">
+import StickerImage from '@/components/stickers/StickerImage.vue';
 import { ChatMessage } from '@avalon/types';
 import { defineComponent, PropType } from 'vue';
 import { socket } from '@/api/socket';
@@ -59,6 +63,7 @@ import UserPreview from '@/components/user/UserPreview.vue';
 
 export default defineComponent({
   components: {
+    StickerImage,
     Avatar,
     UserPreview,
   },
@@ -246,5 +251,13 @@ export default defineComponent({
   position: absolute;
   top: 7px;
   right: 7px;
+}
+</style>
+
+<style scoped>
+.chat-sticker {
+  width: 104px;
+  height: 104px;
+  margin: 4px 0;
 }
 </style>

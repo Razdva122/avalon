@@ -23,6 +23,10 @@
           />
           <div class="achievement-popup__progress-text">{{ progress.currentValue }} / {{ progress.maxValue }}</div>
         </div>
+        <div v-if="stickerReward" class="achievement-popup__reward">
+          <div class="achievement-popup__reward-text">{{ $t('stickers.title') }}</div>
+          <div style="width: 64px; height: 64px"><StickerImage :id="stickerReward.id" /></div>
+        </div>
         <div
           v-if="avatarReward"
           class="achievement-popup__reward"
@@ -52,7 +56,8 @@ import { defineComponent, computed, PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { store } from '@/store';
-import { ACHIEVEMENT_TO_AVATAR_MAP } from '@avalon/types';
+import StickerImage from '@/components/stickers/StickerImage.vue';
+import { STICKERS, ACHIEVEMENT_TO_AVATAR_MAP } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
 
 export interface AchievementProgress {
@@ -64,6 +69,7 @@ export default defineComponent({
   name: 'AchievementPopup',
   components: {
     Avatar,
+    StickerImage,
   },
   props: {
     achievementID: {
@@ -95,6 +101,9 @@ export default defineComponent({
     });
 
     // Определяем ID аватарки, которая выдается за достижение
+    const stickerReward = computed(() =>
+      STICKERS.find((s) => s.achievement === props.achievementID && (!s.hidden || props.type === 'unlocked')),
+    );
     const avatarReward = computed(() => {
       return ACHIEVEMENT_TO_AVATAR_MAP[props.achievementID];
     });
@@ -112,6 +121,7 @@ export default defineComponent({
       achievement,
       navigateToUserAchievements,
       avatarReward,
+      stickerReward,
     };
   },
 });

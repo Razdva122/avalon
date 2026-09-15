@@ -41,6 +41,8 @@
         </v-card-text>
       </v-card>
 
+      <v-card class="profile-card mb-6"><StickerCollection /></v-card>
+
       <!-- Секция аккаунта -->
       <v-card class="profile-card mb-6" elevation="2">
         <v-card-title class="card-header">
@@ -201,6 +203,7 @@ import { LanguageMap, TLanguage } from '@/helpers/i18n';
 import { store } from '@/store';
 import eventBus from '@/helpers/event-bus';
 import { RouteLocationNormalized, NavigationGuardNext } from 'vue-router';
+import StickerCollection from '@/components/stickers/StickerCollection.vue';
 import Avatar from '@/components/user/Avatar.vue';
 import AvatarModal from '@/components/user/AvatarModal.vue';
 import { socket } from '@/api/socket';
@@ -210,6 +213,7 @@ import type { PlayerTrueSkillRating } from '@avalon/types';
 export default defineComponent({
   name: 'Profile',
   components: {
+    StickerCollection,
     Avatar,
     AvatarModal,
     UserTrueSkillRating,

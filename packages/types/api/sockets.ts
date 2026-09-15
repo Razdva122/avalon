@@ -1,3 +1,4 @@
+import type { StickerResponse, StickerMessage, StickerError } from '../user/stickers';
 import type { TRoomState } from '../room';
 import type { VisualGameState } from '../game/state';
 import type { GameOptions } from '../game/options';
@@ -44,6 +45,8 @@ export type {
 export type { ArgumentOfCallback } from './helpers';
 
 export interface ServerToClientEvents {
+  stickerSent: (message: StickerMessage) => void;
+  stickersUpdated: () => void;
   roomsListUpdated: (list: TRoomsList) => void;
   onlineCounterUpdated: (counter: number) => void;
   roomOnlineUpdated: (counter: number) => void;
@@ -60,6 +63,10 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerUserEvents {
+  getMyStickers: (cb: (result: StickerResponse) => void) => void;
+  updateStickerPreferences: (favorites: string[], hideOnBoard: boolean, cb: (result: StickerResponse) => void) => void;
+  markStickersSeen: (ids: string[], cb: (result: true | StickerError) => void) => void;
+  sendSticker: (roomID: string, stickerID: string, cb: (result: true | StickerError) => void) => void;
   registerUser: (
     user: Omit<UserProfile, 'avatar' | 'registrationDate'>,
     callback: (user: UserWithToken | IRegisterError) => void,

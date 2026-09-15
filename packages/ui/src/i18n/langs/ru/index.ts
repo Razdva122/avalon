@@ -1,3 +1,4 @@
+import stickers from './stickers';
 /**
  * Main export file for Russian translations
  * Imports and combines all feature-specific translation modules
@@ -16,6 +17,7 @@ import achievements from './achievements';
 
 export const ru = {
   ...menu,
+  ...stickers,
   ...room,
   ...game,
   ...roles,

@@ -1,3 +1,4 @@
+import stickers from './stickers';
 /**
  * Main export file for English translations
  * Imports and combines all feature-specific translation modules
@@ -16,6 +17,7 @@ import pages from '@/i18n/langs/pages';
 
 export const en = {
   ...menu,
+  ...stickers,
   ...room,
   ...game,
   ...roles,
