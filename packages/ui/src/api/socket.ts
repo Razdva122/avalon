@@ -1,11 +1,12 @@
 import { io } from 'socket.io-client';
+import { readStoredObject } from '@/store/init';
 
 import type { Dictionary, Socket } from '@avalon/types';
 
 import { socketURL } from '@/api/const';
 
 function getAuthToken(): string | undefined {
-  const userProfileInStorage = localStorage.getItem(userProfilePath);
+  const userProfileInStorage = readStoredObject(userProfilePath);
   const profile = userProfileInStorage ? JSON.parse(userProfileInStorage) : null;
 
   return profile?.token;

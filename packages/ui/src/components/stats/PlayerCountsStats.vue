@@ -3,6 +3,7 @@
 </template>
 
 <script lang="ts">
+import '@/plugins/chart.js';
 import { Bar, ChartProps } from 'vue-chartjs';
 import {
   Chart as ChartJS,

@@ -40,6 +40,7 @@
 </template>
 
 <script lang="ts">
+import { neutralRoomUrl } from '@/router/paths';
 import { defineComponent, computed, ref, PropType, toRefs, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
@@ -123,7 +124,7 @@ export default defineComponent({
     };
 
     const onCopyClick = () => {
-      navigator.clipboard.writeText(window.location.href);
+      navigator.clipboard.writeText(neutralRoomUrl(window.location.href));
       eventBus.emit('infoMessage', t('infoMessage.linkCopied'));
     };
 

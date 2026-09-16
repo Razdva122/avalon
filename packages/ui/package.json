@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "npm run test:language && vue-cli-service build && npm run check:seo",
+    "test:language": "node --test scripts/language-policy.test.cjs",
+    "check:seo": "node scripts/check-seo.cjs"
   },
   "dependencies": {
     "@floating-ui/vue": "^1.1.6",

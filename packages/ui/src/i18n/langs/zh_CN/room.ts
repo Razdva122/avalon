@@ -9,7 +9,8 @@ export default {
     restartGame: '重开游戏',
   },
   mainPage: {
-    header: '欢迎来到《阿瓦隆》在线棋盘游戏官网！',
+    header: '阿瓦隆在线游戏',
+    intro: '免费在线玩阿瓦隆，适合 5–10 人一起游玩。了解规则与角色，登录后创建房间，再将房间链接分享给朋友。',
     createRoom: '创建房间',
     watch: '观战',
     join: '加入',

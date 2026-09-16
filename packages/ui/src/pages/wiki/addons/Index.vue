@@ -6,7 +6,7 @@
       <LocalizedTextWrapper keypath="wiki.addonsInfo" />
     </div>
     <div class="addons-container">
-      <router-link class="addon" :to="{ name: 'lady_of_lake' }">
+      <LocaleLink class="addon" :to="{ name: 'lady_of_lake' }">
         <h2>{{ $t('addons.ladyOfLake') }}</h2>
         <SchemaImage
           class="addon-image"
@@ -14,8 +14,8 @@
           :alt="$t('addons.ladyOfLake')"
           :description="$t('addons.ladyOfLake')"
         />
-      </router-link>
-      <router-link class="addon" :to="{ name: 'excalibur' }">
+      </LocaleLink>
+      <LocaleLink class="addon" :to="{ name: 'excalibur' }">
         <h2>{{ $t('addons.excalibur') }}</h2>
         <SchemaImage
           class="addon-image"
@@ -23,8 +23,8 @@
           :alt="$t('addons.excalibur')"
           :description="$t('addons.excalibur')"
         />
-      </router-link>
-      <router-link class="addon" :to="{ name: 'plot_cards' }">
+      </LocaleLink>
+      <LocaleLink class="addon" :to="{ name: 'plot_cards' }">
         <h2>{{ $t('addons.plotCards') }}</h2>
         <SchemaImage
           class="addon-image"
@@ -32,8 +32,8 @@
           :alt="$t('addons.plotCards')"
           :description="$t('addons.plotCards')"
         />
-      </router-link>
-      <router-link class="addon" :to="{ name: 'lady_of_sea' }">
+      </LocaleLink>
+      <LocaleLink class="addon" :to="{ name: 'lady_of_sea' }">
         <h2>{{ $t('addons.ladyOfSea') }}</h2>
         <SchemaImage
           class="addon-image"
@@ -41,7 +41,7 @@
           :alt="$t('addons.ladyOfSea')"
           :description="$t('addons.ladyOfSea')"
         />
-      </router-link>
+      </LocaleLink>
     </div>
   </div>
 </template>

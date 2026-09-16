@@ -3,6 +3,11 @@
  * This file contains translations for common UI elements
  */
 export default {
+  languageSuggestion: {
+    message: 'This page is also available in English.',
+    action: 'Read in English',
+    dismiss: 'Not now',
+  },
   achievementsPopup: {
     unlocked: 'Achievement Unlocked',
     progress: 'Achievement Progress',

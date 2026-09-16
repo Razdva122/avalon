@@ -11,10 +11,11 @@ import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue
 import { vuetify } from '@/plugins/vuetify';
 import { i18n } from '@/plugins/i18n';
 
-import '@/plugins/chart.js';
+import LocaleLink from '@/components/feedback/LocaleLink.vue';
 
 createApp(App)
   .component('LocalizedTextWrapper', LocalizedTextWrapper)
+  .component('LocaleLink', LocaleLink)
   .use(i18n)
   .use(store, key)
   .use(router)

@@ -426,6 +426,7 @@ module.exports.routesSeo = {
     path: '/404/',
     name: 'notFound',
     meta: {
+      prerender: true,
       multiLanguage: {
         ...notFound,
       },

@@ -3,7 +3,9 @@
     <h1 class="title">{{ $t('notFound.error') }}</h1>
     <div class="container">
       <img class="switch" :src="getImagePathByID('features', 'excalibur')" alt="excalibur" />
-      <v-btn size="x-large" @click="$router.push({ name: 'lobby' })">{{ $t('notFound.switch') }}</v-btn>
+      <LocaleLink :to="{ name: 'lobby' }"
+        ><v-btn size="x-large">{{ $t('notFound.switch') }}</v-btn></LocaleLink
+      >
     </div>
   </div>
 </template>

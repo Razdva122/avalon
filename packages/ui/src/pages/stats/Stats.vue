@@ -1,8 +1,9 @@
 <template>
   <div class="info-page-content stats-page">
+    <h1>{{ $t('stats.title') }}</h1>
+    <p v-if="!state">{{ $t('mainPage.loading') }}</p>
     <template v-if="state">
       <div class="total-stats">
-        <h1>{{ $t('stats.title') }}</h1>
         <h2>{{ $t('stats.generalStatsTitle') }}</h2>
         <v-data-table :headers="generalTable.headers" :items="generalTable.data" hide-default-footer> </v-data-table>
       </div>
@@ -57,7 +58,7 @@ export default defineComponent({
     PlayerCountsStats,
     PreviewLink,
   },
-  async setup() {
+  setup() {
     const state = ref<TTotalWinrateStats>();
 
     const { t } = useI18n();
@@ -67,7 +68,7 @@ export default defineComponent({
       state.value = stateFromBackend;
     };
 
-    await initState();
+    void initState();
 
     const rolesTables = computed(() => {
       const sideStats = state.value!.roleStats.reduce<{

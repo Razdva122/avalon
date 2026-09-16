@@ -1,6 +1,6 @@
 <template>
   <template v-if="targetIsRole(target)">
-    <router-link
+    <LocaleLink
       class="preview-link"
       :class="rolesShortInfo[target].loyalty + '-role'"
       :to="{ name: toSnakeCase(normalizeRoleRoute) }"
@@ -9,15 +9,15 @@
       <template v-if="text !== ''">
         {{ text ? $t('previewLink.' + text) : $t('roles.' + target) }}
       </template>
-    </router-link>
+    </LocaleLink>
   </template>
   <template v-else>
-    <router-link class="preview-link addon" :to="{ name: toSnakeCase(target) }">
+    <LocaleLink class="preview-link addon" :to="{ name: toSnakeCase(target) }">
       <AddonIcon class="icon-in-link" :addon="target" />
       <template v-if="text !== ''">
         {{ text ? $t('previewLink.' + text) : $t('addons.' + target) }}
       </template>
-    </router-link>
+    </LocaleLink>
   </template>
 </template>
 
@@ -54,6 +54,8 @@ export default defineComponent({
   },
   computed: {
     normalizeRoleRoute(): string {
+      if (this.target === 'tristan' || this.target === 'isolde') return 'lovers';
+      if (this.target === 'goodLancelot' || this.target === 'evilLancelot') return 'lancelots';
       return this.target;
     },
   },

@@ -1,10 +1,15 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { watch } from 'vue';
+import { store } from '@/store';
+import { pageLanguage, preferredLanguage } from '@/helpers/i18n/policy';
+import { createRouter, createWebHistory, RouteRecordRaw, RouteLocationNormalized } from 'vue-router';
 import { routesSeo } from '@/router/seo';
 import type { TMultiLangRoute, TNormalizedLangRoute } from '@/router/seo';
 import Lobby from '@/pages/lobby/Lobby.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { TLanguage, LanguageMap } from '@/helpers/i18n';
 import { s3ImagesPath } from '@/helpers/images';
+import { i18n } from '@/plugins/i18n';
+import { basePath, localizedPath, isNeutralPath } from './paths';
 
 const routeComponentMap = {
   lobby: Lobby,
@@ -45,24 +50,59 @@ const routeComponentMap = {
   global_achievements: () => import('@/pages/achievements/GlobalAchievements.vue'),
 };
 
+const legacyRoutes = {
+  '/wiki/addons/': '/wiki/expansions/',
+  '/wiki/roles/isolde/': '/wiki/roles/lovers/',
+  '/wiki/roles/tristan/': '/wiki/roles/lovers/',
+  '/wiki/roles/wraith/': '/wiki/roles/oberon/',
+  '/wiki/roles/evil_lancelot/': '/wiki/roles/lancelots/',
+  '/wiki/roles/good_lancelot/': '/wiki/roles/lancelots/',
+};
+
 export const routes: Array<RouteRecordRaw> = [
-  { path: '/wiki/roles/isolde/', name: 'isolde', redirect: { name: 'lovers' } },
-  { path: '/wiki/roles/tristan/', name: 'tristan', redirect: { name: 'lovers' } },
-  { path: '/wiki/roles/wraith/', name: 'wraith', redirect: { name: 'oberon' } },
-  { path: '/wiki/roles/evil_lancelot/', name: 'evil_lancelot', redirect: { name: 'lancelots' } },
-  { path: '/wiki/roles/good_lancelot/', name: 'good_lancelot', redirect: { name: 'lancelots' } },
-  { path: '/:catchAll(.*)', redirect: '404' },
-  { path: '/leaderboard', name: 'leaderboard', component: routeComponentMap.leaderboard },
+  {
+    path: '/en/:pathMatch(.*)*',
+    redirect: (to) => ({ path: basePath(to.path), query: to.query, hash: to.hash }),
+  },
+  {
+    path: '/:catchAll(.*)',
+    redirect: (to) => {
+      const language = Object.keys(LanguageMap).find((lang) => lang.toLowerCase() === to.path.split('/')[1]);
+      return localizedPath('/404/', language || 'en');
+    },
+  },
 ];
+
+Object.entries(legacyRoutes).forEach(([path, target]) => {
+  Object.keys(LanguageMap).forEach((language) => {
+    routes.push({
+      path: localizedPath(path, language),
+      // Keep names used by role preview links for the original English aliases.
+      name: language === 'en' ? path.split('/').filter(Boolean).pop() : undefined,
+      redirect: (to) => ({ path: localizedPath(target, language), query: to.query, hash: to.hash }),
+    });
+  });
+});
 
 Object.values(routesSeo).forEach((route) => {
   if ('multiLanguage' in route.meta && route.meta.multiLanguage) {
     const multiLangRoute = <TMultiLangRoute>route;
 
+    const neutral = isNeutralPath(route.path);
+    if (neutral) {
+      Object.keys(multiLangRoute.meta.multiLanguage)
+        .filter((lang) => lang !== 'en')
+        .forEach((lang) => {
+          routes.push({
+            path: localizedPath(route.path, lang),
+            redirect: (to) => ({ path: basePath(to.path), query: to.query, hash: to.hash, replace: true }),
+          });
+        });
+    }
     routes.push(
-      ...[...Object.keys(multiLangRoute.meta.multiLanguage), ''].map((lang) => {
+      ...(neutral ? ['en'] : Object.keys(multiLangRoute.meta.multiLanguage)).map((lang) => {
         const clone = cloneDeep(multiLangRoute);
-        const langNormalized = lang.toLowerCase();
+        const langNormalized = lang === 'en' ? '' : lang.toLowerCase();
 
         // @ts-ignore
         delete clone.meta.multiLanguage;
@@ -71,7 +111,7 @@ Object.values(routesSeo).forEach((route) => {
         (<TNormalizedLangRoute>(<unknown>clone)).meta = {
           ...clone.meta,
           availableLocales: <TLanguage[]>Object.keys(multiLangRoute.meta.multiLanguage),
-          lang: <TLanguage>langNormalized || 'en',
+          lang: <TLanguage>lang,
           id: clone.name,
           ...multiLangRoute.meta.multiLanguage[<TLanguage>lang || 'en'],
         };
@@ -79,7 +119,7 @@ Object.values(routesSeo).forEach((route) => {
         clone.name += langNormalized;
 
         if (langNormalized) {
-          clone.path = `/${langNormalized}${clone.path}`;
+          clone.path = localizedPath(clone.path, lang);
         }
 
         return <RouteRecordRaw>{ ...clone, component: routeComponentMap[<keyof typeof routeComponentMap>route.name] };
@@ -106,27 +146,44 @@ const defaultKeywords: { [key in Lowercase<TLanguage>]: string[] } = {
 };
 
 router.beforeEach((to, from, next) => {
-  const toLangName = to.path.split('/')[1].toLowerCase();
-  const documentLang = document.documentElement.lang.toLowerCase();
-
-  if (Object.keys(LanguageMap).find((el) => el.toLowerCase() === toLangName) && toLangName !== documentLang) {
-    const path = to.path.split('/').splice(2);
-    next(path.join('/'));
+  if (!to.path.endsWith('/')) {
+    next({ path: `${to.path}/`, query: to.query, hash: to.hash, replace: true });
     return;
   }
 
+  next();
+});
+
+router.afterEach((to, _from, failure) => {
+  if (failure) return;
+  i18n.global.locale.value = pageLanguage(
+    to.path,
+    isNeutralPath(to.path),
+    preferredLanguage(store.state.settings, navigator.languages),
+  );
+  updateMetadata(to);
+});
+
+function updateMetadata(to: RouteLocationNormalized) {
   let meta = to.meta;
-
-  if (to.meta.lang === 'en' && documentLang !== 'en') {
-    meta =
-      routes.find((route) => {
-        if (route.meta?.id !== meta.id) {
-          return false;
-        }
-
-        return route.meta?.lang && documentLang === (<string>route.meta.lang).toLowerCase();
-      })?.meta || meta;
+  if (isNeutralPath(to.path)) {
+    // A room URL is shared, but its title and interface use the recipient's language.
+    const source = Object.values(routesSeo).find((route) => route.name === meta.id) as TMultiLangRoute | undefined;
+    meta = {
+      ...meta,
+      ...source?.meta.multiLanguage[i18n.global.locale.value as TLanguage],
+      lang: i18n.global.locale.value,
+    };
   }
+  document.documentElement.lang = i18n.global.locale.value;
+
+  let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+  if (!robots) {
+    robots = document.createElement('meta');
+    robots.name = 'robots';
+    document.head.appendChild(robots);
+  }
+  robots.content = meta.skipSiteMap ? 'noindex, follow' : 'index, follow';
 
   const keywords = <string[]>meta.keywords ?? [];
   const image = <string>meta.image || 'roles/merlin.webp';
@@ -151,34 +208,27 @@ router.beforeEach((to, from, next) => {
   const existingLinks = document.querySelectorAll('link[rel="alternate"]');
   existingLinks.forEach((link) => link.parentNode?.removeChild(link));
 
-  if (meta.availableLocales) {
-    const path = to.path.toLowerCase();
-
+  if (meta.availableLocales && !meta.skipSiteMap) {
     (<Array<string>>meta.availableLocales).forEach((language) => {
       const link = document.createElement('link');
       link.rel = 'alternate';
       link.hreflang = language;
-
-      const langString = `/${(<string>meta.lang).toLowerCase()}`;
-      const langInUrl = `/${language}`.toLowerCase();
-
-      if (path.includes(langString)) {
-        link.href = url + path.replace(langString, langInUrl);
-      } else {
-        link.href = url + langInUrl + path;
-      }
-
+      link.href = url + localizedPath(to.path, language);
       document.head.appendChild(link);
     });
 
     const link = document.createElement('link');
     link.rel = 'alternate';
     link.hreflang = 'x-default';
-    link.href = url + path.replace(`/${(<string>meta.lang).toLowerCase()}`, '');
+    link.href = url + basePath(to.path);
     document.head.appendChild(link);
   }
+}
 
-  next();
+watch(i18n.global.locale, () => {
+  if (router.currentRoute.value.matched.length && isNeutralPath(router.currentRoute.value.path)) {
+    updateMetadata(router.currentRoute.value);
+  }
 });
 
 export default router;

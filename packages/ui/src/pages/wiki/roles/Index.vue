@@ -6,7 +6,7 @@
       {{ $t('wiki.rolesInfo') }}
     </div>
     <div class="roles-container">
-      <router-link class="role" :to="{ name: 'merlin' }">
+      <LocaleLink class="role" :to="{ name: 'merlin' }">
         <h2>{{ $t('roles.merlin') }}</h2>
         <SchemaImage
           class="role-image"
@@ -14,8 +14,8 @@
           :alt="$t('roles.merlin')"
           :description="$t('roles.merlin')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'merlin_pure' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'merlin_pure' }">
         <h2>{{ $t('roles.merlinPure') }}</h2>
         <SchemaImage
           class="role-image"
@@ -23,8 +23,8 @@
           :alt="$t('roles.merlinPure')"
           :description="$t('roles.merlinPure')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'guinevere' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'guinevere' }">
         <h2>{{ $t('roles.guinevere') }}</h2>
         <SchemaImage
           class="role-image"
@@ -32,8 +32,8 @@
           :alt="$t('roles.guinevere')"
           :description="$t('roles.guinevere')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'percival' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'percival' }">
         <h2>{{ $t('roles.percival') }}</h2>
         <SchemaImage
           class="role-image"
@@ -41,8 +41,8 @@
           :alt="$t('roles.percival')"
           :description="$t('roles.percival')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'lovers' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'lovers' }">
         <h2>{{ $t('roles.tristan') }}</h2>
         <SchemaImage
           class="role-image"
@@ -50,8 +50,8 @@
           :alt="$t('roles.tristan')"
           :description="$t('roles.tristan')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'lovers' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'lovers' }">
         <h2>{{ $t('roles.isolde') }}</h2>
         <SchemaImage
           class="role-image"
@@ -59,8 +59,8 @@
           :alt="$t('roles.isolde')"
           :description="$t('roles.isolde')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'cleric' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'cleric' }">
         <h2>{{ $t('roles.cleric') }}</h2>
         <SchemaImage
           class="role-image"
@@ -68,8 +68,8 @@
           :alt="$t('roles.cleric')"
           :description="$t('roles.cleric')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'troublemaker' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'troublemaker' }">
         <h2>{{ $t('roles.troublemaker') }}</h2>
         <SchemaImage
           class="role-image"
@@ -77,8 +77,8 @@
           :alt="$t('roles.troublemaker')"
           :description="$t('roles.troublemaker')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'servant' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'servant' }">
         <h2>{{ $t('roles.servant') }}</h2>
         <SchemaImage
           class="role-image"
@@ -86,8 +86,8 @@
           :alt="$t('roles.servant')"
           :description="$t('roles.servant')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'lancelots' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'lancelots' }">
         <h2>{{ $t('roles.goodLancelot') }}</h2>
         <SchemaImage
           class="role-image"
@@ -95,8 +95,8 @@
           :alt="$t('roles.goodLancelot')"
           :description="$t('roles.goodLancelot')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'lancelots' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'lancelots' }">
         <h2>{{ $t('roles.evilLancelot') }}</h2>
         <SchemaImage
           class="role-image evil-role"
@@ -104,8 +104,8 @@
           :alt="$t('roles.evilLancelot')"
           :description="$t('roles.evilLancelot')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'mordred' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'mordred' }">
         <h2>{{ $t('roles.mordred') }}</h2>
         <SchemaImage
           class="role-image evil-role"
@@ -113,8 +113,8 @@
           :alt="$t('roles.mordred')"
           :description="$t('roles.mordred')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'morgana' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'morgana' }">
         <h2>{{ $t('roles.morgana') }}</h2>
         <SchemaImage
           class="role-image evil-role"
@@ -122,8 +122,8 @@
           :alt="$t('roles.morgana')"
           :description="$t('roles.morgana')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'oberon' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'oberon' }">
         <h2>{{ $t('roles.oberon') }}</h2>
         <SchemaImage
           class="role-image evil-role"
@@ -131,8 +131,8 @@
           :alt="$t('roles.oberon')"
           :description="$t('roles.oberon')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'trickster' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'trickster' }">
         <h2>{{ $t('roles.trickster') }}</h2>
         <SchemaImage
           class="role-image evil-role"
@@ -140,8 +140,8 @@
           :alt="$t('roles.trickster')"
           :description="$t('roles.trickster')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'witch' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'witch' }">
         <h2>{{ $t('roles.witch') }}</h2>
         <SchemaImage
           class="role-image evil-role"
@@ -149,8 +149,8 @@
           :alt="$t('roles.witch')"
           :description="$t('roles.witch')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'revealer' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'revealer' }">
         <h2>{{ $t('roles.revealer') }}</h2>
         <SchemaImage
           class="role-image evil-role"
@@ -158,8 +158,8 @@
           :alt="$t('roles.revealer')"
           :description="$t('roles.revealer')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'lunatic' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'lunatic' }">
         <h2>{{ $t('roles.lunatic') }}</h2>
         <SchemaImage
           class="role-image evil-role"
@@ -167,8 +167,8 @@
           :alt="$t('roles.lunatic')"
           :description="$t('roles.lunatic')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'brute' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'brute' }">
         <h2>{{ $t('roles.brute') }}</h2>
         <SchemaImage
           class="role-image evil-role"
@@ -176,8 +176,8 @@
           :alt="$t('roles.brute')"
           :description="$t('roles.brute')"
         />
-      </router-link>
-      <router-link class="role" :to="{ name: 'minion' }">
+      </LocaleLink>
+      <LocaleLink class="role" :to="{ name: 'minion' }">
         <h2>{{ $t('roles.minion') }}</h2>
         <SchemaImage
           class="role-image evil-role"
@@ -185,7 +185,7 @@
           :alt="$t('roles.minion')"
           :description="$t('roles.minion')"
         />
-      </router-link>
+      </LocaleLink>
     </div>
   </div>
 </template>

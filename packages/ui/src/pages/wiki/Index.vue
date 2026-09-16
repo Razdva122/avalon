@@ -1,32 +1,32 @@
 <template>
   <div class="info-page-content">
     <div class="information">
-      <router-link :to="{ name: 'rules' }">
+      <LocaleLink :to="{ name: 'rules' }">
         <v-btn size="x-large">
           {{ $t('wiki.rules') }}
           <template v-slot:prepend>
             <span class="material-icons"> auto_stories </span>
           </template>
         </v-btn>
-      </router-link>
+      </LocaleLink>
 
-      <router-link :to="{ name: 'roles' }">
+      <LocaleLink :to="{ name: 'roles' }">
         <v-btn size="x-large">
           {{ $t('wiki.roles') }}
           <template v-slot:prepend>
             <span class="material-icons"> person </span>
           </template>
         </v-btn>
-      </router-link>
+      </LocaleLink>
 
-      <router-link :to="{ name: 'expansions' }">
+      <LocaleLink :to="{ name: 'expansions' }">
         <v-btn size="x-large">
           {{ $t('wiki.addons') }}
           <template v-slot:prepend>
             <span class="material-icons"> castle </span>
           </template>
         </v-btn>
-      </router-link>
+      </LocaleLink>
     </div>
 
     <h1 class="title">{{ $t('wiki.title') }}</h1>
