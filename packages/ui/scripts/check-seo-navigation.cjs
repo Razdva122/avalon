@@ -22,7 +22,12 @@ const server = http.createServer((req, res) => {
   try {
     await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
     const origin = `http://127.0.0.1:${server.address().port}`;
-    browser = await puppeteer.launch({ headless: true });
+    browser = await puppeteer.launch({
+      headless: true,
+      // Docker BuildKit cannot provide Chromium's sandbox. This check only loads
+      // our local build; external requests are blocked below. Keep local defaults.
+      ...(process.env.AVALON_BUILD_CONTAINER === '1' ? { args: ['--no-sandbox'] } : {}),
+    });
     const page = await browser.newPage();
     await page.setRequestInterception(true);
     page.on('request', (req) => (req.url().startsWith(origin) ? req.continue() : req.abort()));

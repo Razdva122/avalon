@@ -15,7 +15,7 @@ USER pptruser
 RUN npm install
 
 COPY --chown=pptruser:pptruser . .
-RUN npm run build:ui
+RUN AVALON_BUILD_CONTAINER=1 npm run build:ui
 
 FROM --platform=${BUILDPLATFORM} nginx AS production-stage
 RUN mkdir /app
