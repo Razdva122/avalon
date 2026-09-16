@@ -4,6 +4,7 @@
     :class="{
       'achievement-card--locked': !isUnlocked && !isOpen,
       'achievement-card--in-progress': !isUnlocked && isInProgress,
+      'achievement-card--completed': isUnlocked && !showGlobalStats,
     }"
   >
     <div class="achievement-card__wrapper">
@@ -14,90 +15,114 @@
             <img v-else :src="achievement.icon" alt="Achievement icon" />
           </div>
           <div class="achievement-card__info">
-            <div class="achievement-card__name">{{ achievement.name }}</div>
+            <div v-if="!showGlobalStats" class="achievement-card__status" :class="{ completed: isUnlocked }">
+              <span class="material-icons" aria-hidden="true">{{
+                isUnlocked ? 'check_circle' : isInProgress ? 'timelapse' : 'radio_button_unchecked'
+              }}</span>
+              {{
+                $t(
+                  isUnlocked
+                    ? 'achievements.completed'
+                    : isInProgress
+                      ? 'achievements.inProgress'
+                      : 'achievements.notStarted',
+                )
+              }}
+            </div>
+            <h3 class="achievement-card__name">{{ achievement.name }}</h3>
             <div class="achievement-card__description">{{ achievement.description }}</div>
             <div v-if="showProgress && progress && shouldShowProgressBar" class="achievement-card__progress">
               <v-progress-linear
-                :model-value="(progress.currentValue / progress.maxValue) * 100"
+                :model-value="Math.min(100, Math.max(0, (progress.currentValue / progress.maxValue) * 100))"
+                :aria-label="achievement.name"
                 color="primary"
-                height="10"
+                height="6"
+                rounded
               />
               <div class="achievement-card__progress-text">{{ progress.currentValue }} / {{ progress.maxValue }}</div>
             </div>
 
-            <!-- Отображение прогресса по ролям -->
-            <div v-if="showDetailedProgress && metadata?.roles && state" class="achievement-card__detailed-progress">
-              <div class="achievement-card__detailed-title">{{ $t('achievements.rolesProgress') }}</div>
-              <div class="achievement-card__detailed-grid">
-                <div
-                  v-for="role in metadata.roles"
-                  :key="role"
-                  class="achievement-card__detailed-item"
-                  :class="{ completed: state[role] }"
-                >
-                  <v-icon
-                    :icon="state[role] ? 'fa:fa-solid fa-check' : 'fa:fa-solid fa-times'"
-                    :color="state[role] ? 'success' : 'error'"
-                    size="small"
-                  />
-                  <span>{{ $t(`roles.${role}`) }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Отображение прогресса по количеству игроков -->
-            <div
-              v-if="showDetailedProgress && metadata?.playerCounts && state"
-              class="achievement-card__detailed-progress"
+            <details
+              v-if="showDetailedProgress && (metadata?.roles || metadata?.playerCounts)"
+              class="achievement-card__details"
             >
-              <div class="achievement-card__detailed-title">{{ $t('achievements.playerCountsProgress') }}</div>
-              <div class="achievement-card__detailed-grid">
-                <div
-                  v-for="count in metadata.playerCounts"
-                  :key="count"
-                  class="achievement-card__detailed-item"
-                  :class="{ completed: state[count] }"
-                >
-                  <v-icon
-                    :icon="state[count] ? 'fa:fa-solid fa-check' : 'fa:fa-solid fa-times'"
-                    :color="state[count] ? 'success' : 'error'"
-                    size="small"
-                  />
-                  <span>{{ count }} {{ $t('achievements.players') }}</span>
+              <summary>{{ $t('achievements.progressDetails') }}</summary>
+              <!-- Отображение прогресса по ролям -->
+              <div v-if="showDetailedProgress && metadata?.roles && state" class="achievement-card__detailed-progress">
+                <div class="achievement-card__detailed-title">{{ $t('achievements.rolesProgress') }}</div>
+                <div class="achievement-card__detailed-grid">
+                  <div
+                    v-for="role in metadata.roles"
+                    :key="role"
+                    class="achievement-card__detailed-item"
+                    :class="{ completed: state[role] }"
+                  >
+                    <v-icon
+                      :icon="state[role] ? 'fa:fa-solid fa-check' : 'fa:fa-regular fa-circle'"
+                      :color="state[role] ? 'success' : undefined"
+                      size="small"
+                    />
+                    <span>{{ $t(`roles.${role}`) }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+
+              <!-- Отображение прогресса по количеству игроков -->
+              <div
+                v-if="showDetailedProgress && metadata?.playerCounts && state"
+                class="achievement-card__detailed-progress"
+              >
+                <div class="achievement-card__detailed-title">{{ $t('achievements.playerCountsProgress') }}</div>
+                <div class="achievement-card__detailed-grid">
+                  <div
+                    v-for="count in metadata.playerCounts"
+                    :key="count"
+                    class="achievement-card__detailed-item"
+                    :class="{ completed: state[count] }"
+                  >
+                    <v-icon
+                      :icon="state[count] ? 'fa:fa-solid fa-check' : 'fa:fa-regular fa-circle'"
+                      :color="state[count] ? 'success' : undefined"
+                      size="small"
+                    />
+                    <span>{{ count }} {{ $t('achievements.players') }}</span>
+                  </div>
+                </div>
+              </div>
+            </details>
           </div>
         </div>
         <div v-if="showGlobalStats && globalStats" class="achievement-card__global-stats">
           <div class="achievement-card__global-progress">
-            <v-progress-linear :model-value="globalStats.completionPercentage" color="primary" height="10" />
+            <v-progress-linear :model-value="globalStats.completionPercentage" color="primary" height="6" rounded />
           </div>
           <div class="achievement-card__global-text">
             {{ $t('achievements.globalCompletion', { percentage: globalStats.completionPercentage.toFixed(1) }) }}
           </div>
         </div>
       </div>
-      <div
-        v-if="avatarReward"
-        class="achievement-card__reward"
-        :class="{ 'achievement-card__reward--unlocked': isUnlocked }"
+      <section
+        v-if="avatarReward || stickerRewards.length"
+        class="achievement-card__rewards"
+        :class="{ 'achievement-card__rewards--unlocked': isUnlocked && !showGlobalStats }"
       >
-        <div class="achievement-card__reward-text">{{ $t('achievements.avatarReward') }}</div>
-        <Avatar :avatarID="avatarReward" class="achievement-card__reward-icon" />
-      </div>
-      <div
-        v-for="sticker in stickerRewards"
-        :key="sticker.id"
-        class="achievement-card__reward"
-        :class="{ 'achievement-card__reward--unlocked': isUnlocked }"
-      >
-        <div class="achievement-card__reward-text">
-          {{ $t('stickers.reward') }}
-          <div class="achievement-card__reward-name">{{ $t(`stickers.${sticker.id}`) }}</div>
+        <h4 class="achievement-card__rewards-title">
+          <span class="material-icons" aria-hidden="true">redeem</span>{{ $t('achievements.rewards') }}
+        </h4>
+        <div class="achievement-card__reward-list">
+          <div v-if="avatarReward" class="achievement-card__reward-item">
+            <Avatar :avatarID="avatarReward" class="achievement-card__reward-image" />
+            <span>{{ $t('achievements.avatarType') }}</span>
+          </div>
+          <div v-for="sticker in stickerRewards" :key="sticker.id" class="achievement-card__reward-item">
+            <StickerImage :id="sticker.id" class="achievement-card__reward-image" />
+            <div>
+              <span>{{ $t('achievements.stickerType') }}</span>
+              <div class="achievement-card__reward-name">{{ $t(`stickers.${sticker.id}`) }}</div>
+            </div>
+          </div>
         </div>
-        <StickerImage :id="sticker.id" class="achievement-card__reward-sticker" />
-      </div>
+      </section>
     </div>
   </v-card>
 </template>
@@ -187,7 +212,7 @@ export default defineComponent({
 
     // Определяем, находится ли достижение в процессе выполнения
     const isInProgress = computed(() => {
-      return props.progress && props.progress.currentValue < props.progress.maxValue;
+      return props.progress && props.progress.currentValue > 0 && props.progress.currentValue < props.progress.maxValue;
     });
 
     // Определяем, нужно ли показывать полоску прогресса
@@ -209,8 +234,12 @@ export default defineComponent({
 <style scoped lang="scss">
 .achievement-card {
   width: 100%;
-  margin-bottom: 16px;
-  background-color: rgb(var(--v-theme-surface-light));
+  height: 100%;
+  min-width: 0;
+  border-radius: 16px;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12);
+  box-shadow: none;
+  background-color: rgb(var(--v-theme-inset));
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -218,10 +247,12 @@ export default defineComponent({
   &__wrapper {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    flex: 1;
   }
 
   &__main {
+    display: flex;
+    flex-direction: column;
     flex: 1;
   }
 
@@ -231,12 +262,13 @@ export default defineComponent({
   }
 
   &__icon {
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 16px;
+    margin-right: 12px;
     color: rgb(var(--v-theme-primary));
 
     img {
@@ -256,67 +288,61 @@ export default defineComponent({
     font-size: 16px;
     font-weight: bold;
     margin-bottom: 4px;
-    color: rgb(var(--v-theme-text-primary));
+    color: rgb(var(--v-theme-on-surface));
   }
 
   &__description {
     font-size: 14px;
-    color: rgb(var(--v-theme-text-secondary));
+    color: rgba(var(--v-theme-on-surface), 0.7);
     margin-bottom: 8px;
     overflow-wrap: break-word;
     word-wrap: break-word;
     hyphens: auto;
   }
 
-  &__reward {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 16px;
-    background-color: rgba(var(--v-theme-primary), 0.1);
-    border-top: 1px solid rgba(var(--v-theme-border), 0.12);
-    font-size: 14px;
-    transition: all 0.3s ease;
-    margin-top: auto;
-
+  &__rewards {
+    padding: 12px 16px;
+    background: rgba(var(--v-theme-primary), 0.06);
+    border-top: 1px solid rgba(var(--v-theme-on-surface), 0.12);
     &--unlocked {
-      background-color: rgba(var(--v-theme-success), 0.15);
-      border-top: 1px solid rgba(var(--v-theme-success), 0.3);
+      background: rgba(var(--v-theme-success), 0.08);
     }
   }
-
-  &__reward-sticker {
-    width: 64px;
-    height: 64px;
-    flex-shrink: 0;
-    margin-left: 12px;
-  }
-
-  &__reward-name {
-    margin-top: 4px;
-    font-size: 12px;
-    font-weight: 400;
-    color: rgb(var(--v-theme-text-secondary));
-  }
-
-  &__reward-icon {
+  &__rewards-title {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
-
-    &:hover {
-      transform: scale(1.2);
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: rgba(var(--v-theme-on-surface), 0.7);
+    .material-icons {
+      font-size: 16px;
     }
   }
-
-  &__reward-text {
-    font-weight: 500;
-    color: rgb(var(--v-theme-text-primary));
+  &__reward-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+  }
+  &__reward-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    font-size: 13px;
+  }
+  &__reward-image {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+  &__reward-name {
+    font-size: 12px;
+    color: rgba(var(--v-theme-on-surface), 0.7);
+    overflow-wrap: anywhere;
   }
 
   &__progress {
@@ -326,14 +352,14 @@ export default defineComponent({
       font-size: 12px;
       text-align: right;
       margin-top: 4px;
-      color: rgb(var(--v-theme-text-secondary));
+      color: rgba(var(--v-theme-on-surface), 0.7);
     }
   }
 
   &__detailed-progress {
     margin-top: 16px;
     padding-top: 8px;
-    border-top: 1px dashed rgba(var(--v-theme-border), 0.12);
+    border-top: 1px dashed rgba(var(--v-theme-on-surface), 0.12);
     width: 100%;
     overflow: hidden;
   }
@@ -342,19 +368,15 @@ export default defineComponent({
     font-size: 14px;
     font-weight: bold;
     margin-bottom: 8px;
-    color: rgb(var(--v-theme-text-primary));
+    color: rgb(var(--v-theme-on-surface));
   }
 
   &__detailed-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
     gap: 8px;
     width: 100%;
     overflow: hidden;
-
-    @media (min-width: 600px) {
-      grid-template-columns: repeat(3, 1fr);
-    }
   }
 
   &__detailed-item {
@@ -365,7 +387,8 @@ export default defineComponent({
     border-radius: 4px;
     min-width: 0;
     overflow: hidden;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
     text-overflow: ellipsis;
 
     &.completed {
@@ -384,10 +407,11 @@ export default defineComponent({
   }
 
   &__global-stats {
+    margin-top: auto;
     padding: 8px 16px;
     font-size: 12px;
-    color: rgb(var(--v-theme-text-secondary));
-    border-top: 1px solid rgba(var(--v-theme-border), 0.12);
+    color: rgba(var(--v-theme-on-surface), 0.7);
+    border-top: 1px solid rgba(var(--v-theme-on-surface), 0.12);
   }
 
   &__global-progress {
@@ -400,25 +424,38 @@ export default defineComponent({
     margin-top: 4px;
   }
 
-  &--in-progress {
-    opacity: 0.85;
-
-    .achievement-card__icon {
-      color: rgb(var(--v-theme-text-secondary));
+  &__status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: rgba(var(--v-theme-on-surface), 0.7);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    .material-icons {
+      font-size: 16px;
     }
-
-    .achievement-card__name,
-    .achievement-card__description {
-      color: rgb(var(--v-theme-text-secondary));
+    &.completed {
+      color: rgb(var(--v-theme-success));
     }
   }
-
-  &--locked {
-    opacity: 0.7;
-
-    .achievement-card__icon {
-      color: rgb(var(--v-theme-text-secondary));
-    }
+  &--completed {
+    border-color: rgba(var(--v-theme-success), 0.4);
+  }
+  &__details summary {
+    cursor: pointer;
+    padding: 12px 0;
+    min-height: 44px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgb(var(--v-theme-primary));
+  }
+  &__details summary:focus-visible {
+    outline: 2px solid rgb(var(--v-theme-primary));
+    outline-offset: -2px;
+  }
+  &__description {
+    line-height: 1.5;
   }
 }
 </style>

@@ -3,6 +3,20 @@
  */
 export default {
   achievements: {
+    rewards: 'Recompensas',
+    avatarType: 'Avatar',
+    stickerType: 'Figurinha',
+    emptyCollection: 'Ainda não há conquistas.',
+
+    personalIntro: 'Veja suas recompensas e escolha a próxima conquista.',
+    globalIntro: 'Veja quantos jogadores obtêm cada conquista. As porcentagens são globais, não pessoais.',
+    loading: 'Carregando conquistas',
+    loadError: 'Não foi possível carregar as conquistas. Tente novamente.',
+    retry: 'Tentar novamente',
+    inProgress: 'Em andamento',
+    notStarted: 'Não iniciada',
+    progressDetails: 'Detalhes do progresso',
+
     // Títulos de páginas
     userAchievementsTitle: 'Conquistas do usuário',
     globalAchievementsTitle: 'Conquistas globais',

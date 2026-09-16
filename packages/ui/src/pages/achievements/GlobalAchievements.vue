@@ -1,25 +1,40 @@
 <template>
-  <div class="info-page-content achievements-page">
+  <div class="achievements-page">
     <div class="page-header mb-4">
-      <h1>{{ $t('achievements.globalAchievementsTitle') }}</h1>
+      <div>
+        <h1>{{ $t('achievements.globalAchievementsTitle') }}</h1>
+        <p class="page-description">{{ $t('achievements.globalIntro') }}</p>
+      </div>
       <v-btn
         v-if="isUserLoggedIn"
         color="primary"
         :to="`/achievements/user/${userID}/`"
-        variant="outlined"
+        variant="tonal"
         class="navigation-btn"
       >
         {{ $t('achievements.viewPersonalAchievements') }}
       </v-btn>
     </div>
 
-    <div v-if="loading" class="text-center my-5">
+    <div v-if="loading" class="loading-state" role="status" :aria-label="$t('achievements.loading')">
       <v-progress-circular indeterminate color="primary" />
     </div>
 
+    <v-alert v-else-if="error" type="error" variant="tonal" class="state-message">
+      {{ $t('achievements.loadError') }}
+      <v-btn variant="outlined" @click="fetchGlobalAchievements">{{ $t('achievements.retry') }}</v-btn>
+    </v-alert>
     <template v-else>
-      <h2>{{ $t('achievements.openAchievements') }}</h2>
-      <div class="achievements-grid">
+      <div class="global-summary">
+        <span>{{ $t('achievements.globalSummary') }}</span
+        ><strong>{{ totalCount }} · {{ $t('menu.achievements') }}</strong
+        ><span>{{ $t('achievements.totalUsers') }}: {{ totalUsers }}</span>
+      </div>
+      <p v-if="!achievements.length" class="empty-state">{{ $t('achievements.emptyCollection') }}</p>
+      <h2 v-if="openAchievements.length" class="section-heading">
+        {{ $t('achievements.openAchievements') }} <span>{{ openAchievements.length }}</span>
+      </h2>
+      <div v-if="openAchievements.length" class="achievements-grid">
         <achievement-card
           v-for="achievement in openAchievements"
           :key="achievement.id"
@@ -32,8 +47,10 @@
         />
       </div>
 
-      <h2>{{ $t('achievements.hiddenAchievements') }}</h2>
-      <div class="achievements-grid">
+      <h2 v-if="hiddenAchievements.length" class="section-heading">
+        {{ $t('achievements.hiddenAchievements') }} <span>{{ hiddenAchievements.length }}</span>
+      </h2>
+      <div v-if="hiddenAchievements.length" class="achievements-grid">
         <achievement-card
           v-for="achievement in hiddenAchievements"
           :key="achievement.id"
@@ -51,6 +68,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
+import type { AchievementResponse } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { store } from '@/store';
 import AchievementCard from '@/components/achievements/AchievementCard.vue';
@@ -69,18 +87,28 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(true);
+    const error = ref(false);
+    let requestId = 0;
     const achievements = ref<GlobalAchievementData[]>([]);
 
     const fetchGlobalAchievements = async () => {
+      const currentRequest = ++requestId;
+      error.value = false;
       try {
         loading.value = true;
 
-        // Получаем данные о достижениях и глобальную статистику
-        const achievementsResponse = await socket.emitWithAck('getAllAchievements');
-        const statsResponse = await socket.emitWithAck('getAchievementStats');
-
-        if (!achievementsResponse.success || !statsResponse.success) {
-          console.error('Error fetching achievements data');
+        const [achievementsResponse, statsResponse] = await Promise.all([
+          socket.timeout(10000).emitWithAck('getAllAchievements') as Promise<AchievementResponse>,
+          socket.timeout(10000).emitWithAck('getAchievementStats') as Promise<AchievementResponse>,
+        ]);
+        if (currentRequest !== requestId) return;
+        if (
+          !achievementsResponse.success ||
+          !statsResponse.success ||
+          !achievementsResponse.achievements ||
+          !statsResponse.stats
+        ) {
+          error.value = true;
           return;
         }
 
@@ -101,10 +129,11 @@ export default defineComponent({
             };
           });
         }
-      } catch (error) {
-        console.error('Error fetching global achievements:', error);
+      } catch (cause) {
+        if (currentRequest === requestId) error.value = true;
+        console.error('Error fetching global achievements:', cause);
       } finally {
-        loading.value = false;
+        if (currentRequest === requestId) loading.value = false;
       }
     };
 
@@ -118,6 +147,9 @@ export default defineComponent({
       return achievements.value.filter((achievement) => achievement.type === AchievementType.HIDDEN);
     });
 
+    const totalCount = computed(() => achievements.value.length);
+    const totalUsers = computed(() => achievements.value[0]?.stats.totalUsers || 0);
+
     // Проверяем, авторизован ли пользователь
     const isUserLoggedIn = computed(() => {
       return !!store.state.profile?.id;
@@ -130,6 +162,11 @@ export default defineComponent({
 
     return {
       loading,
+      error,
+      fetchGlobalAchievements,
+      totalCount,
+      totalUsers,
+
       achievements,
       openAchievements,
       hiddenAchievements,
@@ -141,43 +178,5 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/info-page.scss';
-
-.achievements-page {
-  padding-bottom: 40px;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-.achievements-grid {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 16px;
-  margin-bottom: 32px;
-
-  @media (min-width: 600px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (min-width: 960px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.achievements-summary {
-  margin-bottom: 32px;
-
-  &__stats {
-    margin-right: 16px;
-  }
-}
+@import '@/styles/achievements-page.scss';
 </style>

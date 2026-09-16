@@ -3,6 +3,20 @@
  */
 export default {
   achievements: {
+    rewards: '奖励',
+    avatarType: '头像',
+    stickerType: '贴纸',
+    emptyCollection: '暂无成就。',
+
+    personalIntro: '查看已获得的奖励，选择下一个成就。',
+    globalIntro: '查看各成就的获得比例。百分比代表所有玩家，而非个人进度。',
+    loading: '正在加载成就',
+    loadError: '无法加载成就，请重试。',
+    retry: '重试',
+    inProgress: '进行中',
+    notStarted: '未开始',
+    progressDetails: '进度详情',
+
     // 页面标题
     userAchievementsTitle: '用户成就',
     globalAchievementsTitle: '全球成就',

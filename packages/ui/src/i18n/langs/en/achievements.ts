@@ -3,6 +3,21 @@
  */
 export default {
   achievements: {
+    rewards: 'Rewards',
+    avatarType: 'Avatar',
+    stickerType: 'Sticker',
+    emptyCollection: 'No achievements yet.',
+
+    personalIntro: 'Track unlocked rewards and choose your next achievement.',
+    globalIntro:
+      'See how often players unlock each achievement. Percentages describe all players, not your personal progress.',
+    loading: 'Loading achievements',
+    loadError: 'Could not load achievements. Please try again.',
+    retry: 'Retry',
+    inProgress: 'In progress',
+    notStarted: 'Not started',
+    progressDetails: 'Progress details',
+
     // Page titles
     userAchievementsTitle: 'User Achievements',
     globalAchievementsTitle: 'Global Achievements',

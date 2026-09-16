@@ -3,6 +3,20 @@
  */
 export default {
   achievements: {
+    rewards: 'Recompensas',
+    avatarType: 'Avatar',
+    stickerType: 'Sticker',
+    emptyCollection: 'Aún no hay logros.',
+
+    personalIntro: 'Consulta tus recompensas y elige tu próximo logro.',
+    globalIntro: 'Consulta cuántos jugadores obtienen cada logro. Los porcentajes son globales, no personales.',
+    loading: 'Cargando logros',
+    loadError: 'No se pudieron cargar los logros. Inténtalo de nuevo.',
+    retry: 'Reintentar',
+    inProgress: 'En curso',
+    notStarted: 'Sin empezar',
+    progressDetails: 'Detalles del progreso',
+
     // Títulos de páginas
     userAchievementsTitle: 'Logros del usuario',
     globalAchievementsTitle: 'Logros globales',

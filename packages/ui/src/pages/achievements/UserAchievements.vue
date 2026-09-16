@@ -1,16 +1,23 @@
 <template>
-  <div class="info-page-content achievements-page">
+  <div class="achievements-page">
     <div class="page-header mb-4">
-      <h1>{{ $t('achievements.userAchievementsTitle') }}</h1>
-      <v-btn color="primary" to="/achievements/global/" variant="outlined" class="navigation-btn">
+      <div>
+        <h1>{{ $t('achievements.userAchievementsTitle') }}</h1>
+        <p class="page-description">{{ $t('achievements.personalIntro') }}</p>
+      </div>
+      <v-btn color="primary" to="/achievements/global/" variant="tonal" class="navigation-btn">
         {{ $t('achievements.viewGlobalAchievements') }}
       </v-btn>
     </div>
 
-    <div v-if="loading" class="text-center my-5">
+    <div v-if="loading" class="loading-state" role="status" :aria-label="$t('achievements.loading')">
       <v-progress-circular indeterminate color="primary" />
     </div>
 
+    <v-alert v-else-if="error" type="error" variant="tonal" class="state-message">
+      {{ $t('achievements.loadError') }}
+      <v-btn variant="outlined" @click="fetchUserAchievements">{{ $t('achievements.retry') }}</v-btn>
+    </v-alert>
     <template v-else>
       <UserProfileHeader :uuid="uuid" class="mb-4" />
 
@@ -34,8 +41,11 @@
         </v-card>
       </div>
 
-      <h2>{{ $t('achievements.openAchievements') }}</h2>
-      <div class="achievements-grid">
+      <p v-if="!achievements.length" class="empty-state">{{ $t('achievements.emptyCollection') }}</p>
+      <h2 v-if="openAchievements.length" class="section-heading">
+        {{ $t('achievements.openAchievements') }} <span>{{ openAchievements.length }}</span>
+      </h2>
+      <div v-if="openAchievements.length" class="achievements-grid">
         <achievement-card
           v-for="achievement in openAchievements"
           :key="achievement.id"
@@ -50,8 +60,10 @@
         />
       </div>
 
-      <h2>{{ $t('achievements.hiddenAchievements') }}</h2>
-      <div class="achievements-grid">
+      <h2 v-if="hiddenAchievements.length" class="section-heading">
+        {{ $t('achievements.hiddenAchievements') }} <span>{{ hiddenAchievements.length }}</span>
+      </h2>
+      <div v-if="hiddenAchievements.length" class="achievements-grid">
         <achievement-card
           v-for="achievement in hiddenAchievements"
           :key="achievement.id"
@@ -71,7 +83,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import type { AchievementResponse } from '@avalon/types';
 import { socket } from '@/api/socket';
 import AchievementCard from '@/components/achievements/AchievementCard.vue';
 import UserProfileHeader from '@/components/stats/UserProfileHeader.vue';
@@ -106,19 +118,29 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const route = useRoute();
     const loading = ref(true);
+    const error = ref(false);
+    let requestId = 0;
     const achievements = ref<UserAchievementData[]>([]);
 
     const fetchUserAchievements = async () => {
+      const currentRequest = ++requestId;
+      error.value = false;
       try {
         loading.value = true;
 
-        const achievementsResponse = await socket.emitWithAck('getAllAchievements');
-        const userAchievementsResponse = await socket.emitWithAck('getUserAchievements', props.uuid);
-
-        if (!achievementsResponse.success || !userAchievementsResponse.success) {
-          console.error('Error fetching achievements data');
+        const [achievementsResponse, userAchievementsResponse] = await Promise.all([
+          socket.timeout(10000).emitWithAck('getAllAchievements') as Promise<AchievementResponse>,
+          socket.timeout(10000).emitWithAck('getUserAchievements', props.uuid) as Promise<AchievementResponse>,
+        ]);
+        if (currentRequest !== requestId) return;
+        if (
+          !achievementsResponse.success ||
+          !userAchievementsResponse.success ||
+          !achievementsResponse.achievements ||
+          !userAchievementsResponse.userAchievements
+        ) {
+          error.value = true;
           return;
         }
 
@@ -142,10 +164,11 @@ export default defineComponent({
             };
           });
         }
-      } catch (error) {
-        console.error('Error fetching user achievements:', error);
+      } catch (cause) {
+        if (currentRequest === requestId) error.value = true;
+        console.error('Error fetching user achievements:', cause);
       } finally {
-        loading.value = false;
+        if (currentRequest === requestId) loading.value = false;
       }
     };
 
@@ -153,7 +176,7 @@ export default defineComponent({
 
     // Обновляем данные при изменении параметров маршрута
     watch(
-      () => [props.uuid, route.params.uuid],
+      () => props.uuid,
       () => {
         fetchUserAchievements();
       },
@@ -182,6 +205,9 @@ export default defineComponent({
 
     return {
       loading,
+      error,
+      fetchUserAchievements,
+
       achievements,
       openAchievements,
       hiddenAchievements,
@@ -203,47 +229,5 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/info-page.scss';
-
-.achievements-page {
-  padding-bottom: 40px;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-.achievements-grid {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 16px;
-  margin-bottom: 32px;
-
-  @media (min-width: 600px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (min-width: 960px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.achievements-summary {
-  margin-bottom: 32px;
-
-  &__stats {
-    margin-right: 16px;
-  }
-}
-
-.summary-card {
-  background-color: rgb(var(--v-theme-surface-light));
-}
+@import '@/styles/achievements-page.scss';
 </style>

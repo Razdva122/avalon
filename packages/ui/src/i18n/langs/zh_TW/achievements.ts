@@ -3,6 +3,20 @@
  */
 export default {
   achievements: {
+    rewards: '獎勵',
+    avatarType: '頭像',
+    stickerType: '貼圖',
+    emptyCollection: '暫無成就。',
+
+    personalIntro: '查看已獲得的獎勵，選擇下一個成就。',
+    globalIntro: '查看各成就的獲得比例。百分比代表所有玩家，而非個人進度。',
+    loading: '正在載入成就',
+    loadError: '無法載入成就，請重試。',
+    retry: '重試',
+    inProgress: '進行中',
+    notStarted: '未開始',
+    progressDetails: '進度詳情',
+
     // 頁面標題
     userAchievementsTitle: '用戶成就',
     globalAchievementsTitle: '全球成就',
