@@ -4,6 +4,16 @@
  */
 export default {
   history: {
+    listView: 'События',
+    tableView: 'Таблица голосов',
+    noVotes: 'Голосований пока нет',
+    teamMember: 'В команде',
+    teamLeader: 'Лидер',
+    anonymousVotes: 'Анонимный голос',
+    scrollTable: 'Прокрутите по горизонтали, чтобы увидеть все голоса',
+    player: 'Игрок',
+    voteTotals: 'За / Против',
+
     history: 'История',
     live: 'Сейчас',
     vote: 'Голосование',

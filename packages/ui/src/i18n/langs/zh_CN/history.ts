@@ -4,6 +4,16 @@
  */
 export default {
   history: {
+    listView: '事件记录',
+    tableView: '投票表',
+    noVotes: '暂无投票',
+    teamMember: '队员',
+    teamLeader: '队长',
+    anonymousVotes: '匿名投票',
+    scrollTable: '横向滚动以查看所有投票',
+    player: '玩家',
+    voteTotals: '赞成 / 反对',
+
     history: '记录',
     live: '现况',
     vote: '投票',

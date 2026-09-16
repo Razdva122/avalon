@@ -1,37 +1,39 @@
 <template>
   <div class="profile-page-wrapper">
     <div v-if="$store.state.profile" class="profile-page">
+      <h1 class="page-title">{{ $t('profile.profile') }}</h1>
       <!-- Секция профиля -->
-      <v-card class="profile-card mb-6" elevation="2">
-        <v-card-title class="card-header">
-          <span class="material-icons">person</span>
-          {{ $t('profile.profile') }}
-        </v-card-title>
+      <v-card class="profile-card profile-summary" elevation="0">
         <v-card-text>
           <div class="profile-header">
-            <Avatar @click="openAvatarModal" class="avatar" :avatarID="$store.state.profile.avatar" />
+            <button
+              type="button"
+              @click="openAvatarModal"
+              class="avatar-button"
+              :aria-label="$t('profile.changeAvatar')"
+            >
+              <Avatar class="avatar" :avatarID="$store.state.profile.avatar" />
+              <span class="avatar-edit"><span class="material-icons" aria-hidden="true">photo_camera</span></span>
+            </button>
             <div class="profile-info">
-              <div class="profile-name">
-                {{ $store.state.profile.login }}
-                <span @click="updateLogin" class="edit-icon material-icons">edit</span>
-              </div>
-              <div class="profile-email">
-                {{ $store.state.profile.email }}
-                <span @click="updateEmail" class="edit-icon material-icons">edit</span>
-              </div>
+              <h2 class="profile-name">{{ $store.state.profile.name || $store.state.profile.login }}</h2>
+              <div class="profile-login">{{ $store.state.profile.login }}</div>
+              <button type="button" @click="openAvatarModal" class="avatar-link">
+                {{ $t('profile.changeAvatar') }}
+              </button>
               <div v-if="!ratingLoading && trueSkillRating" class="profile-rating">
                 <UserTrueSkillRating :userID="$store.state.profile.id" />
               </div>
             </div>
           </div>
           <div class="profile-actions">
-            <v-btn class="action-btn" size="large" @click="goToStats" variant="elevated" color="primary">
+            <v-btn class="action-btn" size="large" @click="goToStats" variant="tonal" color="primary">
               <template v-slot:prepend>
                 <span class="material-icons">analytics</span>
               </template>
               {{ $t('profile.stats') }}
             </v-btn>
-            <v-btn class="action-btn" size="large" @click="goToAchievements" variant="elevated" color="primary">
+            <v-btn class="action-btn" size="large" @click="goToAchievements" variant="tonal" color="primary">
               <template v-slot:prepend>
                 <span class="material-icons">emoji_events</span>
               </template>
@@ -41,94 +43,130 @@
         </v-card-text>
       </v-card>
 
-      <v-card class="profile-card mb-6"><StickerCollection /></v-card>
-
-      <!-- Секция аккаунта -->
-      <v-card class="profile-card mb-6" elevation="2">
-        <v-card-title class="card-header">
-          <span class="material-icons">manage_accounts</span>
-          {{ $t('profile.account') }}
-        </v-card-title>
-        <v-card-text>
-          <v-text-field
-            hide-details="auto"
-            v-model="username"
-            :label="$t('profile.username')"
-            class="w-100 mb-3"
-            variant="outlined"
-            density="comfortable"
-          >
-            <template v-slot:append-inner>
-              <v-btn :disabled="!updateAvailable" @click="update" size="small" variant="tonal" color="primary">
+      <div class="profile-grid">
+        <!-- Секция аккаунта -->
+        <v-card class="profile-card" elevation="0">
+          <v-card-title tag="h2" class="card-header">
+            <span class="material-icons">manage_accounts</span>
+            {{ $t('profile.account') }}
+          </v-card-title>
+          <v-card-text>
+            <form class="name-form" @submit.prevent="update">
+              <v-text-field
+                hide-details="auto"
+                v-model="username"
+                :label="$t('profile.username')"
+                class="name-field"
+                autocomplete="nickname"
+                variant="outlined"
+                density="comfortable"
+              >
+              </v-text-field>
+              <v-btn :disabled="!updateAvailable" type="submit" variant="tonal" color="primary" class="save-name">
                 {{ $t('profile.change') }}
               </v-btn>
-            </template>
-          </v-text-field>
-          <v-btn variant="outlined" color="primary" @click="updatePassword" class="w-100 password-btn">
-            <template v-slot:prepend>
-              <span class="material-icons">lock</span>
-            </template>
-            {{ $t('profile.changePassword') }}
-          </v-btn>
+            </form>
+            <div class="credential-row">
+              <div class="credential-info">
+                <span class="field-label">{{ $t('modal.login') }}</span
+                ><span>{{ $store.state.profile.login }}</span>
+              </div>
+              <v-btn variant="text" color="primary" @click="updateLogin" :aria-label="$t('modal.changelogin')">{{
+                $t('profile.change')
+              }}</v-btn>
+            </div>
+            <div class="credential-row">
+              <div class="credential-info">
+                <span class="field-label">{{ $t('modal.email') }}</span
+                ><span>{{ $store.state.profile.email }}</span>
+              </div>
+              <v-btn variant="text" color="primary" @click="updateEmail" :aria-label="$t('modal.changeemail')">{{
+                $t('profile.change')
+              }}</v-btn>
+            </div>
+            <v-btn variant="outlined" color="primary" @click="updatePassword" class="w-100 password-btn">
+              <template v-slot:prepend>
+                <span class="material-icons">lock</span>
+              </template>
+              {{ $t('profile.changePassword') }}
+            </v-btn>
+          </v-card-text>
+        </v-card>
+
+        <!-- Секция настроек -->
+        <v-card class="profile-card" elevation="0">
+          <v-card-title tag="h2" class="card-header">
+            <span class="material-icons">settings</span>
+            {{ $t('profile.settings') }}
+          </v-card-title>
+          <v-card-text>
+            <p class="section-hint">{{ $t('profile.autoSaveHint') }}</p>
+            <v-select
+              :label="$t('profile.language')"
+              :items="availableLocales"
+              class="w-100 mb-3"
+              v-model="locale"
+              hide-details="auto"
+              variant="outlined"
+              density="comfortable"
+            ></v-select>
+            <v-select
+              :label="$t('profile.colorTheme')"
+              :items="availableThemes"
+              class="w-100 mb-3"
+              v-model="colorTheme"
+              hide-details="auto"
+              variant="outlined"
+              density="comfortable"
+            ></v-select>
+            <v-select
+              :label="$t('profile.imageStyle')"
+              :items="availableStyles"
+              class="w-100 mb-4"
+              v-model="imageStyle"
+              hide-details="auto"
+              variant="outlined"
+              density="comfortable"
+            ></v-select>
+
+            <div class="settings-divider"></div>
+            <div class="settings-subtitle">{{ $t('profile.gameSettings') }}</div>
+
+            <v-switch
+              color="primary"
+              inset
+              v-model="hideSpoilers"
+              :hide-details="true"
+              :label="$t('profile.hideSpoilersHint')"
+              density="comfortable"
+            ></v-switch>
+            <v-switch
+              color="primary"
+              inset
+              v-model="hideIndexInHistory"
+              :hide-details="true"
+              :label="$t('profile.hideIndexHint')"
+              density="comfortable"
+            ></v-switch>
+          </v-card-text>
+        </v-card>
+      </div>
+      <v-card class="profile-card collection-card" elevation="0"><StickerCollection /></v-card>
+
+      <v-card class="profile-card session-card" elevation="0">
+        <v-card-text class="danger-item">
+          <div class="danger-info">
+            <h2 class="danger-title">{{ $t('profile.logoutTitle') }}</h2>
+            <div class="danger-description">{{ $t('profile.logoutHint') }}</div>
+          </div>
+          <v-btn color="primary" variant="outlined" @click="logout" prepend-icon="logout">{{
+            $t('profile.logout')
+          }}</v-btn>
         </v-card-text>
       </v-card>
-
-      <!-- Секция настроек -->
-      <v-card class="profile-card mb-6" elevation="2">
-        <v-card-title class="card-header">
-          <span class="material-icons">settings</span>
-          {{ $t('profile.settings') }}
-        </v-card-title>
-        <v-card-text>
-          <v-select
-            :label="$t('profile.language')"
-            :items="availableLocales"
-            class="w-100 mb-3"
-            v-model="locale"
-            hide-details="auto"
-            variant="outlined"
-            density="comfortable"
-          ></v-select>
-          <v-select
-            :label="$t('profile.colorTheme')"
-            :items="availableThemes"
-            class="w-100 mb-3"
-            v-model="colorTheme"
-            hide-details="auto"
-            variant="outlined"
-            density="comfortable"
-          ></v-select>
-          <v-select
-            :label="$t('profile.imageStyle')"
-            :items="availableStyles"
-            class="w-100 mb-4"
-            v-model="imageStyle"
-            hide-details="auto"
-            variant="outlined"
-            density="comfortable"
-          ></v-select>
-
-          <div class="settings-divider"></div>
-          <div class="settings-subtitle">{{ $t('profile.gameSettings') }}</div>
-
-          <v-checkbox
-            v-model="hideSpoilers"
-            :hide-details="true"
-            :label="$t('profile.hideSpoilersHint')"
-            density="comfortable"
-          ></v-checkbox>
-          <v-checkbox
-            v-model="hideIndexInHistory"
-            :hide-details="true"
-            :label="$t('profile.hideIndexHint')"
-            density="comfortable"
-          ></v-checkbox>
-        </v-card-text>
-      </v-card>
-
       <!-- Опасная зона -->
-      <v-card class="profile-card danger-zone mb-4" elevation="2">
-        <v-card-title class="card-header danger-header">
+      <v-card v-if="!ratingLoading && trueSkillRating" class="profile-card danger-zone" elevation="0">
+        <v-card-title tag="h2" class="card-header danger-header">
           <span class="material-icons">warning</span>
           {{ $t('profile.dangerZone') }}
         </v-card-title>
@@ -150,22 +188,6 @@
               :loading="ratingResetLoading"
             >
               {{ $t('profile.resetRating') }}
-            </v-btn>
-          </div>
-
-          <div class="settings-divider" v-if="!ratingLoading && trueSkillRating"></div>
-
-          <!-- Выход из аккаунта -->
-          <div class="danger-item">
-            <div class="danger-info">
-              <div class="danger-title">{{ $t('profile.logoutTitle') }}</div>
-              <div class="danger-description">{{ $t('profile.logoutHint') }}</div>
-            </div>
-            <v-btn color="error" variant="outlined" @click="logout">
-              <template v-slot:prepend>
-                <span class="material-icons">logout</span>
-              </template>
-              {{ $t('profile.logout') }}
             </v-btn>
           </div>
         </v-card-text>
@@ -236,7 +258,10 @@ export default defineComponent({
     };
   },
   mounted() {
-    this.$store.dispatch('refreshProfile');
+    const initialName = this.username;
+    this.$store.dispatch('refreshProfile').then(() => {
+      if (this.username === initialName) this.username = this.$store.state.profile?.name || '';
+    });
     // Добавляем проверку возможности сброса рейтинга и загрузку данных о рейтинге
     this.checkResetRatingAvailability();
   },
@@ -251,7 +276,7 @@ export default defineComponent({
     },
     locale: {
       get() {
-        return LanguageMap[<TLanguage>(<unknown>this.$i18n.locale)];
+        return this.$i18n.locale;
       },
       set(value: string) {
         this.$store.commit('updateUserSettings', { key: 'locale', value: { value, isDefault: false } });
@@ -286,7 +311,7 @@ export default defineComponent({
       },
     },
     updateAvailable() {
-      return this.username !== '' && this.$store.state.profile?.name !== this.username;
+      return this.username.trim() !== '' && this.$store.state.profile?.name !== this.username.trim();
     },
     availableThemes() {
       return [
@@ -350,6 +375,8 @@ export default defineComponent({
       this.$router.push({ name: 'user_achievements', params: { uuid: this.$store.state.profile!.id } });
     },
     update() {
+      if (!this.updateAvailable) return;
+      this.username = this.username.trim();
       this.$store.dispatch('updateUserName', { name: this.username });
     },
 
@@ -359,10 +386,8 @@ export default defineComponent({
     },
 
     resetRating() {
+      if (!this.$store.state.profile || this.ratingResetLoading || !this.canResetRating) return;
       this.ratingResetLoading = true;
-
-      // Вызываем сокет-метод для сброса рейтинга
-      if (!this.$store.state.profile) return;
 
       socket.emit('resetTrueSkillRating', this.$store.state.profile.id, (response) => {
         this.ratingResetLoading = false;
@@ -433,8 +458,10 @@ export default defineComponent({
 }
 
 .profile-page {
-  max-width: 600px;
+  max-width: 1040px;
   margin: 0 auto;
+  display: grid;
+  gap: 24px;
 }
 
 .profile-card {
@@ -442,7 +469,8 @@ export default defineComponent({
   overflow: hidden;
   background-color: rgb(var(--v-theme-inset));
   border: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  min-width: 0;
 
   .card-header {
     display: flex;
@@ -451,7 +479,7 @@ export default defineComponent({
     font-size: 18px;
     font-weight: 600;
     padding: 18px 24px;
-    background: rgba(var(--v-theme-primary), 0.08);
+    white-space: normal;
 
     .material-icons {
       font-size: 24px;
@@ -468,13 +496,14 @@ export default defineComponent({
 .profile-header {
   display: flex;
   gap: 24px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
+  align-items: center;
 }
 
 .avatar {
-  cursor: pointer;
-  height: 120px;
-  width: 120px;
+  display: block;
+  height: 104px;
+  width: 104px;
   border-radius: 16px;
   transition: all 0.2s ease;
   flex-shrink: 0;
@@ -489,6 +518,7 @@ export default defineComponent({
 }
 
 .profile-info {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -496,55 +526,32 @@ export default defineComponent({
 }
 
 .profile-name {
-  font-size: 24px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
-
-.profile-email {
-  font-size: 14px;
-  opacity: 0.7;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.profile-login {
+  color: rgba(var(--v-theme-on-surface), 0.65);
+  overflow-wrap: anywhere;
 }
-
 .profile-rating {
   margin-top: 4px;
-}
-
-.edit-icon {
-  cursor: pointer;
-  font-size: 18px;
-  opacity: 0.6;
-  transition: all 0.2s ease;
-  padding: 4px;
-  border-radius: 4px;
-  color: rgb(var(--v-theme-primary));
-
-  &:hover {
-    opacity: 1;
-    background-color: rgba(var(--v-theme-primary), 0.1);
-  }
 }
 
 // Кнопки действий
 .profile-actions {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
 
   .action-btn {
     flex: 1;
     font-weight: 500;
-    letter-spacing: 0.5px;
-    box-shadow: 0 3px 8px rgba(25, 118, 210, 0.35);
+    letter-spacing: 0;
+    text-transform: none;
+    box-shadow: none;
     min-height: 48px;
-
-    &:hover {
-      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.45);
-    }
   }
 }
 
@@ -598,7 +605,8 @@ export default defineComponent({
 }
 
 .danger-title {
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   margin-bottom: 4px;
 }
 
@@ -616,7 +624,7 @@ export default defineComponent({
 // Адаптивность
 @media (max-width: 600px) {
   .profile-page-wrapper {
-    padding: 50px 12px 12px 12px;
+    padding: 50px 12px 24px;
   }
 
   .profile-card {
@@ -629,7 +637,7 @@ export default defineComponent({
     flex-direction: row;
     align-items: center;
     gap: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 0;
   }
 
   .avatar {
@@ -669,7 +677,7 @@ export default defineComponent({
   .danger-item {
     flex-direction: column;
     align-items: stretch;
-    text-align: center;
+    text-align: left;
 
     .v-btn {
       width: 100%;
@@ -712,6 +720,146 @@ export default defineComponent({
       flex: 1;
       min-height: 44px;
     }
+  }
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+.profile-summary :deep(.v-card-text) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+}
+.avatar-button {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 16px;
+  cursor: pointer;
+}
+.avatar-edit {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  border: 3px solid rgb(var(--v-theme-inset));
+}
+.avatar-edit .material-icons {
+  font-size: 18px;
+}
+.avatar-link {
+  align-self: flex-start;
+  min-height: 44px;
+  text-align: left;
+  color: rgb(var(--v-theme-primary));
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.avatar-link:hover {
+  text-decoration: underline;
+}
+.avatar-button:focus-visible,
+.avatar-link:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 4px;
+}
+.name-form {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.name-field {
+  min-width: 0;
+}
+.save-name {
+  min-height: 48px;
+}
+.credential-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.1);
+}
+.credential-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+.field-label,
+.section-hint {
+  color: rgba(var(--v-theme-on-surface), 0.7);
+  font-size: 13px;
+}
+.section-hint {
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.password-btn {
+  margin-top: 12px;
+  min-height: 44px;
+}
+.profile-page :deep(.v-btn) {
+  text-transform: none;
+  letter-spacing: 0;
+  min-height: 44px;
+}
+.profile-page :deep(.v-btn__content) {
+  white-space: normal;
+}
+.profile-page :deep(.v-selection-control__input) {
+  flex-shrink: 0;
+}
+@media (max-width: 760px) {
+  .profile-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .profile-page {
+    gap: 20px;
+  }
+  .profile-summary :deep(.v-card-text) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .profile-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .profile-actions .action-btn {
+    flex: 1 1 160px;
+  }
+}
+@media (max-width: 400px) {
+  .name-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .profile-header {
+    align-items: flex-start;
+  }
+  .profile-name {
+    font-size: 22px;
   }
 }
 </style>

@@ -23,6 +23,8 @@ export default {
     error: 'Ошибка',
   },
   profile: {
+    changeAvatar: 'Изменить аватар',
+    autoSaveHint: 'Настройки применяются сразу — нажимать «Сохранить» не нужно.',
     username: 'Имя пользователя',
     stats: 'Статистика',
     logout: 'Выйти',

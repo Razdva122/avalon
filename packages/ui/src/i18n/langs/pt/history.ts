@@ -4,6 +4,16 @@
  */
 export default {
   history: {
+    listView: 'Eventos',
+    tableView: 'Tabela de votos',
+    noVotes: 'Ainda não há votos',
+    teamMember: 'Na equipe',
+    teamLeader: 'Líder',
+    anonymousVotes: 'Voto anônimo',
+    scrollTable: 'Role horizontalmente para ver todos os votos',
+    player: 'Jogador',
+    voteTotals: 'A favor / Contra',
+
     history: 'Histórico',
     live: 'Ao vivo',
     vote: 'Voto',

@@ -4,6 +4,16 @@
  */
 export default {
   history: {
+    listView: '事件記錄',
+    tableView: '投票表',
+    noVotes: '暫無投票',
+    teamMember: '隊員',
+    teamLeader: '隊長',
+    anonymousVotes: '匿名投票',
+    scrollTable: '橫向捲動以查看所有投票',
+    player: '玩家',
+    voteTotals: '贊成 / 反對',
+
     history: '記錄',
     live: '現況',
     vote: '投票',

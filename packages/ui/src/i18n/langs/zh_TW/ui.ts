@@ -23,6 +23,8 @@ export default {
     error: '連線失敗',
   },
   profile: {
+    changeAvatar: '更換頭像',
+    autoSaveHint: '設定立即生效，無需點擊儲存。',
     username: '使用者名稱',
     stats: '統計',
     logout: '登出',

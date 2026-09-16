@@ -23,6 +23,8 @@ export default {
     error: 'Error',
   },
   profile: {
+    changeAvatar: 'Cambiar avatar',
+    autoSaveHint: 'Los ajustes se aplican de inmediato, sin pulsar Guardar.',
     username: 'Nombre de usuario',
     stats: 'Estadísticas',
     logout: 'Cerrar sesión',

@@ -23,6 +23,8 @@ export default {
     error: '连线失败',
   },
   profile: {
+    changeAvatar: '更换头像',
+    autoSaveHint: '设置立即生效，无需点击保存。',
     username: '用户名',
     stats: '统计',
     logout: '退出登录',
