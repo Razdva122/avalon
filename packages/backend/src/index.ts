@@ -5,7 +5,7 @@ import { Server } from 'socket.io';
 import CookieParser from 'cookie-parser';
 import cors from 'cors';
 
-import { backendPort, frontendURL } from '@/const';
+import { backendPort, frontendOrigin } from '@/const';
 
 import { connectDB, DBManager } from '@/db';
 
@@ -16,7 +16,7 @@ const app = express();
 const server = createServer(app);
 const corsOpts = {
   cors: {
-    origin: frontendURL,
+    origin: frontendOrigin,
     credentials: true,
   },
 };
