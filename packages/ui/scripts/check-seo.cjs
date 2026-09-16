@@ -96,7 +96,10 @@ for (const route of Object.values(routesSeo).filter((route) => route.meta.preren
       assert.match(html, /class="lobby-intro"/, `${pathname}: lobby is still waiting for the backend`);
     }
     if (route.path.startsWith('/wiki/')) {
-      const json = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+      const json = html.match(
+        /<script id="breadcrumb-structured-data" type="application\/ld\+json">([\s\S]*?)<\/script>/,
+      )?.[1];
+      if (route.path !== '/wiki/') assert(json?.trim(), `${pathname}: missing breadcrumb structured data`);
       if (json?.trim()) {
         const breadcrumbs = JSON.parse(json);
         for (const item of breadcrumbs.itemListElement) {

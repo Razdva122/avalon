@@ -10,6 +10,8 @@ import { TLanguage, LanguageMap } from '@/helpers/i18n';
 import { s3ImagesPath } from '@/helpers/images';
 import { i18n, loadLanguage, commitLanguage } from '@/plugins/i18n';
 import { basePath, localizedPath, isNeutralPath } from './paths';
+import { updateStructuredData } from './structuredData';
+import { wikiBreadcrumbs } from './breadcrumbs';
 
 const routeComponentMap = {
   lobby: Lobby,
@@ -186,6 +188,17 @@ function updateMetadata(to: RouteLocationNormalized) {
     };
   }
   document.documentElement.lang = i18n.global.locale.value;
+  const wikiArticle = basePath(to.path).startsWith('/wiki/') && basePath(to.path) !== '/wiki/';
+  updateStructuredData(
+    to.path,
+    {
+      title: meta.title as string,
+      description: meta.description as string,
+      lang: i18n.global.locale.value,
+      skipSiteMap: Boolean(meta.skipSiteMap),
+    },
+    wikiArticle ? wikiBreadcrumbs(to.path, i18n.global.locale.value, (key) => i18n.global.t(key)) : [],
+  );
 
   let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
   if (!robots) {

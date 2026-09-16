@@ -37,3 +37,31 @@ npm run serve
 ```
 npm run build
 ```
+
+## Search and AI crawler visibility
+
+The production build prerenders public pages, including localized rules and roles,
+so their text, canonical links and JSON-LD are available without JavaScript.
+`router/structuredData.ts` describes the website, each public page and the free
+browser game. Wiki breadcrumbs have a separate JSON-LD element so navigation
+cannot overwrite page metadata. Both are updated by the router, avoiding loss of
+breadcrumbs when prerender hydration unmounts components. Private routes and the
+404 page omit this graph.
+
+`npm run build` checks the generated HTML, sitemap and structured data in every
+supported locale, plus Chromium checks for metadata updates during navigation.
+To check a running Nginx deployment, run:
+
+```sh
+SEO_BASE_URL=https://avalon-game.com npm run check:seo:http
+```
+
+This also probes public HTML with Googlebot, OAI-SearchBot and PerplexityBot
+User-Agent headers. It does not authenticate crawler IPs or prove indexing.
+If a CDN or firewall is added, verify its crawler policy separately. The existing
+`robots.txt` allows all crawlers; no separate training policy is introduced here.
+
+After deploying, inspect representative URLs in webmaster tools and monitor
+crawler requests and referral traffic. Crawlability and structured data do not
+guarantee inclusion in AI answers. Google does not require an `llms.txt` file or
+special AI schema: https://developers.google.com/search/docs/appearance/ai-features

@@ -16,6 +16,29 @@ const aliases = {
   '/wiki/roles/evil_lancelot/': '/wiki/roles/lancelots/',
 };
 
+async function checkCrawlerContent() {
+  // User-Agent probes detect simple bot blocking, not verified crawler IP policies.
+  const agents = ['Googlebot', 'OAI-SearchBot', 'PerplexityBot'];
+  for (const language of ['en', 'ru']) {
+    for (const route of ['/', '/wiki/rules/', '/wiki/roles/merlin/']) {
+      const pathname = localizedPath(route, language);
+      for (const agent of agents) {
+        const response = await fetch(origin + pathname, { headers: { 'User-Agent': agent }, redirect: 'manual' });
+        const label = `${agent} ${pathname}`;
+        assert.equal(response.status, 200, `${label}: crawler must receive the page directly`);
+        assert.match(response.headers.get('content-type') || '', /text\/html/, label);
+        assert.doesNotMatch(response.headers.get('x-robots-tag') || '', /noindex|nosnippet|none/i, label);
+        const html = await response.text();
+        assert.match(html, /<h1\b[^>]*>[^]*?<\/h1>/, `${label}: missing heading without JavaScript`);
+        const paragraphs = [...html.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/g)]
+          .map((match) => match[1].replace(/<[^>]+>/g, '').trim())
+          .join(' ');
+        assert(paragraphs.length > 80, `${label}: missing readable content without JavaScript`);
+      }
+    }
+  }
+}
+
 async function check(path, status, redirect, noindex = false) {
   const response = await fetch(origin + path, { redirect: 'manual' });
   assert.equal(response.status, status, `${path}: HTTP status`);
@@ -71,7 +94,10 @@ async function main() {
     await response.arrayBuffer();
   }
   await check('/js/missing.12345678.js', 404, null, true);
-  console.log('HTTP SEO checks passed: all languages, aliases, private routes, query strings and 404 responses.');
+  await checkCrawlerContent();
+  console.log(
+    'HTTP SEO checks passed: all languages, aliases, private routes, query strings, 404 responses and crawler HTML.',
+  );
 }
 
 main().catch((error) => {

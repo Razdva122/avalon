@@ -9,37 +9,13 @@
 
 <script lang="ts">
 import { defineComponent, unref } from 'vue';
-import { basePath, localizedPath } from '@/router/paths';
+import { wikiBreadcrumbs } from '@/router/breadcrumbs';
 
 export default defineComponent({
   computed: {
     items() {
-      const parts = basePath(this.$route.path).split('/').filter(Boolean);
-      return parts.map((el, index) => ({
-        to: localizedPath('/' + parts.slice(0, index + 1).join('/'), unref(this.$i18n.locale)),
-        title: this.$t(`breadCrumbs.${el}`),
-      }));
+      return wikiBreadcrumbs(this.$route.path, unref(this.$i18n.locale), (key) => this.$t(key));
     },
-  },
-  watch: {
-    items: {
-      immediate: true,
-      handler() {
-        document.querySelector('script[type="application/ld+json"]')!.textContent = JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'BreadcrumbList',
-          itemListElement: this.items.map((item, index) => ({
-            '@type': 'ListItem',
-            position: index + 1,
-            name: item.title,
-            item: 'https://avalon-game.com' + item.to,
-          })),
-        });
-      },
-    },
-  },
-  beforeUnmount() {
-    document.querySelector('script[type="application/ld+json"]')!.innerHTML = ``;
   },
 });
 </script>
