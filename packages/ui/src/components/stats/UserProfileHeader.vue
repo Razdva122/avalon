@@ -5,6 +5,7 @@
       <div class="profile-header-container">
         <div class="profile-username">
           {{ userState.profile.name }}
+          <PremiumBadge v-if="userState.profile.premium" />
         </div>
         <div class="profile-nav-icons">
           <v-btn icon variant="text" density="comfortable" size="small" :to="`/stats/user/${uuid}`">
@@ -46,6 +47,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType, watch, computed } from 'vue';
+import PremiumBadge from '@/components/user/PremiumBadge.vue';
 import Avatar from '@/components/user/Avatar.vue';
 import UserTrueSkillRating from '@/components/stats/UserTrueSkillRating.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
@@ -54,11 +56,7 @@ import { TUserStats } from '@/helpers/stats/interface';
 
 export default defineComponent({
   name: 'UserProfileHeader',
-  components: {
-    Avatar,
-    UserTrueSkillRating,
-    WinrateDisplay,
-  },
+  components: { PremiumBadge, Avatar, UserTrueSkillRating, WinrateDisplay },
   props: {
     uuid: {
       type: String,

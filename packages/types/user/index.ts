@@ -3,6 +3,8 @@ import { prop, modelOptions } from '@typegoose/typegoose';
 export * from './avatars';
 
 export class PublicUserProfile {
+  public premium?: boolean;
+
   @prop({ required: true, unique: true })
   public id!: string;
 
@@ -65,6 +67,21 @@ export class UserProfile extends UserForUI {
 }
 
 export class UserFeatures {
+  @prop({ type: Date })
+  public premiumGrantedAt?: Date;
+
+  @prop()
+  public premiumGrantReason?: string;
+
+  @prop({ default: false })
+  public hideSupport?: boolean;
+
+  @prop({ default: true })
+  public showPremiumBadge?: boolean;
+
+  @prop({ type: Date })
+  public lastSupportCheckoutAt?: Date;
+
   @prop({ type: () => [String], default: undefined })
   public favoriteStickers?: string[];
 

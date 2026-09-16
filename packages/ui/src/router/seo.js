@@ -35,9 +35,20 @@ const {
   leaderboard,
   userAchievements,
   globalAchievements,
+  support,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
+  support: {
+    path: '/support/',
+    name: 'support',
+    meta: {
+      skipSiteMap: true,
+      multiLanguage: {
+        ...support,
+      },
+    },
+  },
   lobby: {
     path: '/',
     name: 'lobby',

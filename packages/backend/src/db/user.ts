@@ -1,3 +1,5 @@
+import { hasPremium } from '@/support/premium';
+import { supportTotalCents } from '@/support/repository';
 import bcrypt from 'bcrypt';
 import { ArgumentOfCallback, PublicUserProfile, UserFeatures, UserForUI, UserProfile } from '@avalon/types';
 import { userFeaturesModel, userProfileModel, userAchievementModel } from '@/db/models';
@@ -90,11 +92,13 @@ export class UserLayer {
 
   async getPublicUserProfile(id: string): Promise<PublicUserProfile> {
     const user = await this.getUserByID(id);
+    const features = await this.getUserFeatures(id);
 
     return {
       id: user.id,
       avatar: user.avatar,
       name: user.name,
+      premium: features?.showPremiumBadge !== false && hasPremium(await supportTotalCents(id), features),
     };
   }
 

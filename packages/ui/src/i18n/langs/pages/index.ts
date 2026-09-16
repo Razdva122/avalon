@@ -1,3 +1,4 @@
+import { support } from './support';
 import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
@@ -42,6 +43,7 @@ export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
 };
 
 Object.entries({
+  support,
   wiki,
   lancelots,
   lady,

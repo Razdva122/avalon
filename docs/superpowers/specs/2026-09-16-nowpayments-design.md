@@ -1,0 +1,9 @@
+# NOWPayments support and Premium
+
+The user selected NOWPayments after discussing invoice payments. Build a hosted checkout integration, authenticated support history and privacy controls, the latest ten confirmed donations, a support page, and a lobby card beside Discord. Premium is a permanent supporter status earned at $10 cumulative completed invoices, before processor fees. USDT checkout amount is quoted by NOWPayments; do not describe USD as an exact USDT amount. Initial benefit is the visible Premium badge; do not advertise unimplemented cosmetics.
+
+Use server-created orders bound to JWT-authenticated existing users. Keep API/IPN secrets exclusively on the server. Require explicitly configured USDT currency codes and HTTPS callback/frontend URLs. Disable checkout without complete configuration. The operator confirms three networks available in their merchant account; do not invent popularity rankings.
+
+Verify recursively sorted JSON HMAC-SHA512 signatures with timing-safe comparison. Only fully paid finished payments matching saved invoice ID, order, price, and allowed currency qualify. Incomplete/mismatched payments never grant Premium. Store each completed invoice exactly once with a unique payment identifier. Calculate totals from completed orders so concurrent notifications cannot double count or lose a credit. Persist non-final payment IDs for owner-triggered reconciliation. Keep payment details private; public projection contains donation ID, amount, day, and an optional public name only. Anonymous donor IDs and transaction metadata never leave the backend.
+
+Authenticated users can hide all their donations retroactively and independently hide the public badge. Public status is calculated from the ledger, never trusted from JWT/client. Use the existing MongoDB and Vue application. No production deployment or real charge is included; account activation and a real small payment require operator configuration.

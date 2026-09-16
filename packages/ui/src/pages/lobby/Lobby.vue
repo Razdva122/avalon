@@ -43,6 +43,26 @@
           </div>
           <span class="discord-arrow" aria-hidden="true">↗</span>
         </a>
+        <!-- Enable the support banner after production payment verification. -->
+        <LocaleLink v-if="false" class="support-card" :to="{ name: 'support' }">
+          <span class="support-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none">
+              <path
+                d="m5 10 6 5 5-9 5 9 6-5-3 14H8L5 10Z"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+              />
+              <path d="M10 28h12M11 20h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+              <circle cx="16" cy="4" r="1.5" fill="currentColor" />
+            </svg>
+          </span>
+          <div class="support-card__copy">
+            <h2>{{ $t('support.bannerTitle') }}</h2>
+            <p>{{ $t('support.bannerText') }}</p>
+            <span class="support-card__link">{{ $t('support.bannerLink') }} <span aria-hidden="true">→</span></span>
+          </div>
+        </LocaleLink>
         <div class="leaderboard-panel">
           <RotatingTopPlayer />
           <LocaleLink class="leaderboard-link" :to="{ name: 'leaderboard' }"
@@ -438,6 +458,67 @@ h1 {
   border: 1px solid rgba(var(--v-theme-text-primary), 0.08);
   border-radius: 14px;
   background: rgba(var(--v-theme-inset), 0.65);
+}
+.support-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 22px 18px;
+  border: 1px solid rgba(181, 148, 85, 0.3);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(181, 148, 85, 0.1), rgba(var(--v-theme-inset), 0.45));
+  color: rgb(var(--v-theme-text-primary));
+  transition:
+    border-color 0.18s,
+    background 0.18s;
+}
+.support-card:hover {
+  border-color: rgba(181, 148, 85, 0.7);
+  background: rgba(181, 148, 85, 0.13);
+}
+.support-card:focus-visible {
+  outline: 2px solid #b59455;
+  outline-offset: 4px;
+}
+.support-card__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 48px;
+  color: #b59455;
+  border: 1px solid rgba(181, 148, 85, 0.25);
+  border-radius: 12px 12px 18px 18px;
+  background: rgba(181, 148, 85, 0.08);
+}
+.support-card__icon svg {
+  width: 29px;
+  height: 29px;
+}
+.support-card__copy {
+  min-width: 0;
+}
+.support-card h2 {
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 650;
+}
+.support-card p {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(var(--v-theme-text-primary), 0.65);
+}
+.support-card__link {
+  display: inline-flex;
+  gap: 9px;
+  align-items: center;
+  margin-top: 13px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.support-card__link span {
+  color: #b59455;
 }
 .discord-icon {
   display: grid;

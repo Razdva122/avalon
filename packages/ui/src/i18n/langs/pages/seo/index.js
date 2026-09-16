@@ -36,7 +36,10 @@ const { leaderboard } = require('./leaderboard');
 const { globalAchievements } = require('./globalAchievements');
 const { userAchievements } = require('./userAchievements');
 
+const { support } = require('./support');
+
 module.exports = {
+  support,
   lobby,
   wiki,
   game,

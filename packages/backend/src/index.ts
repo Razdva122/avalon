@@ -10,6 +10,8 @@ import { backendPort, frontendOrigin } from '@/const';
 import { connectDB, DBManager } from '@/db';
 
 import { Manager } from '@/main';
+import { supportRouter } from '@/support/routes';
+import { supportOrderModel } from '@/support/repository';
 import { ratingScheduler } from '@/scripts/scheduler';
 
 const app = express();
@@ -26,6 +28,8 @@ app.use(CookieParser());
 app.use(cors(corsOpts.cors));
 
 connectDB().then(async (mongoose) => {
+  await supportOrderModel.init();
+  app.use('/api/support', supportRouter);
   const dbManager = new DBManager(mongoose);
   new Manager(io, dbManager);
 

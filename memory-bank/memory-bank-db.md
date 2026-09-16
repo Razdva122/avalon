@@ -266,3 +266,13 @@ TrueSkill ratings are updated:
 
 - Immediately when a game ends via `updateTrueSkillForGame`
 - Historical snapshots are created periodically via `createTrueSkillRatingSnapshot`
+
+## Support payments and Premium
+
+`SupportOrder` (Mongoose model in `packages/backend/src/support/repository.ts`) stores account-bound NOWPayments invoices, their selected USDT currency, nominal USD cents, anonymity, provider identifiers and payment status. Unique indexes protect order IDs, invoice IDs and payment IDs. An atomic conditional update completes an invoice once. Subsequent valid payment attempts can complete an unfinished invoice; completed invoices are immutable.
+
+Premium is derived from the total nominal value of completed invoices (threshold 1000 USD cents), before payment processor fees. It is not accepted from the client or JWT. `UserFeatures.hideSupport` hides the name on all donations, `showPremiumBadge` independently controls public badge visibility, and `lastSupportCheckoutAt` enforces a database-backed checkout cooldown. Public donation responses never expose account IDs or blockchain transaction metadata.
+
+The Express support API is mounted at `/api/support`; it uses the existing JWT for account operations and signed IPN for payment updates. Configuration and recovery instructions: `docs/payments/nowpayments.md`. Cosmetics beyond the supporter badge are not implemented. Live merchant setup, network selection and payment validation remain operator steps.
+
+Manual Premium grants use `UserFeatures.premiumGrantedAt` and `premiumGrantReason`. The shared `hasPremium` predicate accepts either a grant or the donation threshold; public badge visibility remains independent. Grants do not create donations or alter payment totals.

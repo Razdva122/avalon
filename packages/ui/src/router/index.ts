@@ -14,6 +14,7 @@ import { updateStructuredData } from './structuredData';
 import { wikiBreadcrumbs } from './breadcrumbs';
 
 const routeComponentMap = {
+  support: () => import('@/pages/support/Support.vue'),
   lobby: Lobby,
   wiki: () => import('@/pages/wiki/Index.vue'),
   notFound: () => import('@/pages/empty/NotFound.vue'),
