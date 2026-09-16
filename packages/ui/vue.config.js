@@ -79,7 +79,15 @@ module.exports = defineConfig({
           renderer: new PuppeteerRenderer({
             timeout: 30000,
             maxConcurrentRoutes: 4,
-            renderAfterElementExists: 'h1',
+            // renderer-puppeteer 1.2.x races the selector against an unreferenced
+            // browser Promise, which Chrome can collect. Await readiness directly.
+            pageHandler: async (page, route) => {
+              try {
+                await page.waitForSelector('h1', { timeout: 30000 });
+              } catch (error) {
+                throw new Error(`Prerender failed for ${route}: ${error.message}`);
+              }
+            },
             injectProperty: '__AVALON_PRERENDER__',
             inject: { prerender: true },
             // Permit the same build on developer machines and in the Docker image.
