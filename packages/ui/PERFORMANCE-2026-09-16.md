@@ -67,3 +67,31 @@ Verification: production build, all 180 prerendered pages / 174 sitemap URLs, hy
 Remaining: publish the new UI image, then perform three mobile Lighthouse runs per page on `/`, `/wiki/rules/`, and `/zh-tw/` and compare medians under identical settings. Keep lab and 28-day field data separate. Initial CSS and heavy role images remain candidates if the new trace still shows blocking; do not infer sub-2.5 s LCP from reduced JavaScript or passing hydration tests. The existing eight build warnings (CSS order and asset/entrypoint size) remain.
 
 One final build attempt timed out waiting for `/zh-tw/stats/`; the preceding and subsequent full builds passed. Added page-state and browser-error diagnostics to prerender failures. The intermittent timeout's cause was not reproduced or established, so build flakiness should still be watched in CI.
+
+## Production 60.2.0 measurement and critical CSS follow-up
+
+On 16 September, three successful PageSpeed mobile runs per URL used Lighthouse 13.4.1 / HeadlessChromium 151, Moto G Power and slow 4G. Failed/deadline-exceeded jobs were excluded. All numbers below are laboratory LCP, not rolling field data.
+
+| URL            | Three LCP results         | Median   | Latest report                                                                                               |
+| -------------- | ------------------------- | -------- | ----------------------------------------------------------------------------------------------------------- |
+| `/wiki/rules/` | 11.191 / 2.501 / 11.162 s | 11.162 s | [Report](https://pagespeed.web.dev/analysis/https-avalon-game-com-wiki-rules/v888wypl45?form_factor=mobile) |
+| `/`            | 7.730 / 7.644 / 7.512 s   | 7.644 s  | [Report](https://pagespeed.web.dev/analysis/https-avalon-game-com/sh98enry8j?form_factor=mobile)            |
+| `/zh-tw/`      | 8.976 / 8.942 / 6.625 s   | 8.942 s  | [Report](https://pagespeed.web.dev/analysis/https-avalon-game-com-zh-tw/6819s7h28y?form_factor=mobile)      |
+
+Rules desktop: LCP 1.015 s, performance 92. The rules median is only slightly below the single 60.1.0 run (11.782 s); the outlier at 2.501 s is not evidence of a stable improvement. The homepage audit identifies 66.6 KiB of blocking CSS and estimates 1.03 s of potential savings. The rules LCP element remains the introductory paragraph.
+
+### Critical CSS implementation
+
+After prerendering, `scripts/critical-css.cjs` uses [Beasties](https://github.com/danielroe/beasties) to inline CSS matching each page's DOM, including responsive rules, and load the complete stylesheets using nonblocking media links. This is DOM-based extraction, not a viewport-specific screenshot heuristic. All 180 pages are processed; the largest combined inline CSS payload (including the existing theme) is 5.6 KiB gzip, with an 8 KiB build budget.
+
+- Keep full shared CSS assets unchanged for navigation, dialogs and private routes. Preserve stylesheet order and all runtime Vuetify theme rules.
+- Keep the original body byte-for-byte, including Vue SSR comments and teleports; use only the processed head.
+- Include stylesheet fallbacks for visitors without JavaScript. Both success and failure settle stylesheet readiness; a failed CSS request must not leave startup waiting forever.
+- Paint the prerendered content immediately, but activate the application only after the complete stylesheets settle, so preferences and interactive components have their styles.
+- Keep existing locale preloads, URL language policy and article hydration. Lobby mounting behavior is unchanged and can still affect its final LCP.
+
+Validation: production build; 180 SEO pages / 174 sitemap URLs; existing article hydration checks; 14 language tests and 2 stylesheet-readiness tests; bundle checks (259.1 KiB startup JS gzip, 287.3 KiB with English). Eight pre-existing CSS-order/size warnings remain. A separate plain `tsc` invocation reports unresolved `.vue` imports under the existing configuration; the Vue CLI production type-check/build passes.
+
+Browser checks compared computed header/heading/paragraph geometry and typography with only inline styles versus the fully loaded application: rules at 1280 px and 390 px; English/Traditional Chinese homepages and Chinese rules at 390 px. These matched. Checked the roles dialog, switching to Russian, and dark-theme persistence after reload; no hydration/runtime warnings were observed on these pages. No live multiplayer game was exercised.
+
+A controlled local experiment delayed every CSS response by 3 seconds, using the same built assets and an otherwise equivalent blocking-stylesheet control. On the rules page, the paragraph's FCP/LCP was 3.196 s in the control and 0.128 s with critical CSS. This demonstrates that initial text can paint independently of full CSS download; it is one local experiment, not mobile PageSpeed or a production improvement claim. Repeat the three-run production protocol after deploying the UI image. Docker Compose changes are not required.

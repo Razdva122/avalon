@@ -16,6 +16,7 @@ import { isNeutralPath } from '@/router/paths';
 import { socket } from '@/api/socket';
 import { prerender, article, hydrateArticle } from '@/helpers/prerender';
 import { userSettingsInStorage } from '@/store/init';
+import { fullStylesReady } from '@/helpers/critical-css';
 
 const root = document.querySelector<HTMLElement>('#app')!;
 const app = (hydrateArticle || (prerender && article) ? createSSRApp : createApp)(App)
@@ -27,7 +28,7 @@ const app = (hydrateArticle || (prerender && article) ? createSSRApp : createApp
   .use(vuetify);
 
 async function start() {
-  await router.isReady();
+  await Promise.all([router.isReady(), fullStylesReady()]);
   if (prerender && article) {
     const { prerenderArticle } = await import('@/helpers/prerender-article');
     await prerenderArticle(app, root);

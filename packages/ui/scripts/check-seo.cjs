@@ -45,6 +45,21 @@ for (const route of Object.values(routesSeo).filter((route) => route.meta.preren
 
     assert.match(html, new RegExp(`<html[^>]*lang="${language}"`, 'i'), `${pathname}: wrong language`);
     const links = [...html.matchAll(/<link\s[^>]*>/g)].map(([tag]) => attributes(tag));
+    const headWithJs = html.slice(0, html.indexOf('</head>')).replace(/<noscript>[\s\S]*?<\/noscript>/g, '');
+    const stylesheets = [...headWithJs.matchAll(/<link\s[^>]*>/g)]
+      .map(([tag]) => attributes(tag))
+      .filter((link) => link.rel === 'stylesheet');
+    assert(stylesheets.length, `${pathname}: missing full stylesheet fallback`);
+    assert.match(headWithJs, /<style>[^<]+<\/style>/, `${pathname}: missing inline critical CSS`);
+    for (const stylesheet of stylesheets) {
+      assert.equal(stylesheet.media, 'print', `${pathname}: render-blocking stylesheet`);
+      assert.equal(stylesheet['data-critical-css'], 'pending', `${pathname}: missing stylesheet readiness`);
+      assert(stylesheet.onload && stylesheet.onerror, `${pathname}: missing stylesheet completion handlers`);
+      assert(
+        [...html.matchAll(/<noscript>([\s\S]*?)<\/noscript>/g)].some((match) => match[1].includes(stylesheet.href)),
+        `${pathname}: missing no-JavaScript stylesheet fallback`,
+      );
+    }
     const localePreloads = links
       .filter((link) => link.rel === 'preload' && link.as === 'script' && /\/locale-/.test(link.href))
       .map((link) => link.href.match(/\/locale-(.+)\.[a-f0-9]+\.js$/)?.[1]);
