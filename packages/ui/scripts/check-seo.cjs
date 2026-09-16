@@ -38,8 +38,22 @@ for (const route of Object.values(routesSeo).filter((route) => route.meta.preren
       `${pathname}: personalized suggestion baked into HTML`,
     );
     assert.match(html, /<h1(?:\s|>)/, `${pathname}: missing prerendered heading`);
+    if (/^\/(wiki(?:\/|$)|about(?:\/|$))/.test(basePath(pathname))) {
+      assert(html.includes(`data-ssr-path="${pathname}"`), `${pathname}: missing hydration marker`);
+      assert(html.includes('<!--[-->'), `${pathname}: missing Vue SSR fragment markers`);
+    }
+
     assert.match(html, new RegExp(`<html[^>]*lang="${language}"`, 'i'), `${pathname}: wrong language`);
     const links = [...html.matchAll(/<link\s[^>]*>/g)].map(([tag]) => attributes(tag));
+    const localePreloads = links
+      .filter((link) => link.rel === 'preload' && link.as === 'script' && /\/locale-/.test(link.href))
+      .map((link) => link.href.match(/\/locale-(.+)\.[a-f0-9]+\.js$/)?.[1]);
+    assert.deepEqual(
+      localePreloads.sort(),
+      [...new Set(['en', language.toLowerCase()])].sort(),
+      `${pathname}: preload only selected locale and English fallback`,
+    );
+
     assert.equal(
       links.find((link) => link.rel === 'canonical')?.href,
       origin + pathname,

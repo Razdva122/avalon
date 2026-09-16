@@ -1,18 +1,14 @@
-import type { TLanguage } from '@/i18n/interface';
-import { Dictionary } from '@avalon/types';
+export interface TranslationMessages {
+  [key: string]: string | TranslationMessages;
+}
+import type { TLanguage } from './interface';
 
-import { en } from '@/i18n/langs/en';
-import { ru } from '@/i18n/langs/ru';
-import { es } from '@/i18n/langs/es';
-import { zh_CN } from '@/i18n/langs/zh_CN';
-import { zh_TW } from '@/i18n/langs/zh_TW';
-import { pt } from '@/i18n/langs/pt';
-
-export const translates: { [key in TLanguage]: Dictionary<Dictionary<string> | Dictionary<Dictionary<string>>> } = {
-  en,
-  ru,
-  es,
-  'zh-CN': zh_CN,
-  'zh-TW': zh_TW,
-  pt,
+// Separate chunks: importing the language list must not load every dictionary.
+export const localeLoaders: Record<TLanguage, () => Promise<TranslationMessages>> = {
+  en: () => import(/* webpackChunkName: "locale-en" */ './generated/en.json').then((m) => m.default),
+  ru: () => import(/* webpackChunkName: "locale-ru" */ './generated/ru.json').then((m) => m.default),
+  es: () => import(/* webpackChunkName: "locale-es" */ './generated/es.json').then((m) => m.default),
+  pt: () => import(/* webpackChunkName: "locale-pt" */ './generated/pt.json').then((m) => m.default),
+  'zh-CN': () => import(/* webpackChunkName: "locale-zh-cn" */ './generated/zh-CN.json').then((m) => m.default),
+  'zh-TW': () => import(/* webpackChunkName: "locale-zh-tw" */ './generated/zh-TW.json').then((m) => m.default),
 };

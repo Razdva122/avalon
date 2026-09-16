@@ -67,15 +67,11 @@
 import { defineComponent, unref } from 'vue';
 import { LanguageMap } from '@/helpers/i18n';
 import { localizedPath, isNeutralPath } from '@/router/paths';
-import { rememberLanguage } from '@/helpers/i18n/preference';
-import { i18n } from '@/plugins/i18n';
+import { rememberLanguage, chooseLanguage } from '@/helpers/i18n/preference';
 
 export default defineComponent({
   methods: {
-    chooseLanguage(value: string) {
-      const language = rememberLanguage(value);
-      if (language) i18n.global.locale.value = language;
-    },
+    chooseLanguage,
     rememberChoice(event: MouseEvent, value: string) {
       if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey)
         rememberLanguage(value);

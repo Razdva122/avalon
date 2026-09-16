@@ -1,5 +1,5 @@
 <template>
-  <div :title="icon" class="player-icon-image" :class="classes"></div>
+  <span :title="icon" class="player-icon-image" :class="classes"></span>
 </template>
 
 <script lang="ts">
@@ -24,6 +24,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .player-icon-image {
+  display: block;
   border-radius: 50%;
   background-size: 160%;
 }

@@ -12,6 +12,7 @@ import { alertsInStorage, userProfileInStorage, userSettingsInStorage } from '@/
 export * from '@/store/interface';
 
 import { socket } from '@/api/socket';
+import { hydrateArticle } from '@/helpers/prerender';
 
 import type { ArgumentOfCallback, UserWithToken } from '@avalon/types';
 
@@ -19,8 +20,8 @@ export const key: InjectionKey<Store<IState>> = Symbol();
 
 export const store = createStore<IState>({
   state: {
-    profile: userProfileInStorage ? JSON.parse(userProfileInStorage) : null,
-    settings: userSettingsInStorage ? JSON.parse(userSettingsInStorage) : null,
+    profile: !hydrateArticle && userProfileInStorage ? JSON.parse(userProfileInStorage) : null,
+    settings: !hydrateArticle && userSettingsInStorage ? JSON.parse(userSettingsInStorage) : null,
     hideSpoilers: false,
     connect: null,
     users: {},
@@ -28,6 +29,10 @@ export const store = createStore<IState>({
   },
   getters: {},
   mutations: {
+    restoreClientPreferences(state: IState) {
+      state.profile = userProfileInStorage ? JSON.parse(userProfileInStorage) : null;
+      state.settings = userSettingsInStorage ? JSON.parse(userSettingsInStorage) : null;
+    },
     updateAlertCounter(state: IState, alert: TAlertsName) {
       state.alerts[alert] = (state.alerts[alert] ?? 0) + 1;
       updateUserAlertsData(state.alerts);

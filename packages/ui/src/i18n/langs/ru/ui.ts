@@ -1,13 +1,10 @@
+import { languageSuggestions } from '../../suggestions';
 /**
  * UI-related translations for Russian language
  * This file contains translations for common UI elements
  */
 export default {
-  languageSuggestion: {
-    message: 'Эта страница доступна на русском.',
-    action: 'Открыть на русском',
-    dismiss: 'Не сейчас',
-  },
+  languageSuggestion: languageSuggestions['ru'],
   achievementsPopup: {
     unlocked: 'Достижение открыто',
     progress: 'Прогресс в достижении',

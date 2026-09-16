@@ -1,13 +1,10 @@
+import { languageSuggestions } from '../../suggestions';
 /**
  * UI-related translations for English language
  * This file contains translations for common UI elements
  */
 export default {
-  languageSuggestion: {
-    message: 'This page is also available in English.',
-    action: 'Read in English',
-    dismiss: 'Not now',
-  },
+  languageSuggestion: languageSuggestions['en'],
   achievementsPopup: {
     unlocked: 'Achievement Unlocked',
     progress: 'Achievement Progress',

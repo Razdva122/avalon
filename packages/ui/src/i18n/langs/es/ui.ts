@@ -1,13 +1,10 @@
+import { languageSuggestions } from '../../suggestions';
 /**
  * UI-related translations for Spanish language
  * This file contains translations for common UI elements
  */
 export default {
-  languageSuggestion: {
-    message: 'Esta página también está disponible en español.',
-    action: 'Leer en español',
-    dismiss: 'Ahora no',
-  },
+  languageSuggestion: languageSuggestions['es'],
   achievementsPopup: {
     unlocked: 'Logro Desbloqueado',
     progress: 'Progreso del Logro',

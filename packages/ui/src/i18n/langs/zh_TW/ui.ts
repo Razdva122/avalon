@@ -1,13 +1,10 @@
+import { languageSuggestions } from '../../suggestions';
 /**
  * UI-related translations for Chinese (Traditional) language
  * This file contains translations for common UI elements
  */
 export default {
-  languageSuggestion: {
-    message: '此頁面也有繁體中文版。',
-    action: '閱讀繁體中文',
-    dismiss: '暫時不用',
-  },
+  languageSuggestion: languageSuggestions['zh-TW'],
   achievementsPopup: {
     unlocked: '成就解鎖',
     progress: '成就進度',

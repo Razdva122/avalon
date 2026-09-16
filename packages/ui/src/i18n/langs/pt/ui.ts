@@ -1,13 +1,10 @@
+import { languageSuggestions } from '../../suggestions';
 /**
  * UI-related translations for Portuguese language
  * This file contains translations for common UI elements
  */
 export default {
-  languageSuggestion: {
-    message: 'Esta página também está disponível em português.',
-    action: 'Ler em português',
-    dismiss: 'Agora não',
-  },
+  languageSuggestion: languageSuggestions['pt'],
   achievementsPopup: {
     unlocked: 'Conquista Desbloqueada',
     progress: 'Progresso da Conquista',

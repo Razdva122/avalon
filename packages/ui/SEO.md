@@ -32,7 +32,7 @@ This policy follows [Google's multilingual site guidance](https://developers.goo
 
 ## Rendering and performance
 
-The lobby and statistics heading render without waiting for a WebSocket acknowledgement. The lobby includes a localized introduction and links to rules and roles. The production prerenderer waits for a heading, and build verification rejects missing content or incorrect metadata.
+The lobby and statistics heading render without waiting for a WebSocket acknowledgement. The lobby includes a localized introduction and links to rules and roles. The production prerenderer waits for rendering and hydration verification to finish, and build verification rejects missing content or incorrect metadata.
 
 Chart.js theme registration is imported by the chart components rather than the application entry point. This keeps the chart library in an asynchronous chunk. This is not a measured claim about production LCP; repeat performance measurements after deployment and inspect the remaining large JavaScript/CSS bundles.
 
@@ -57,3 +57,13 @@ Deploy the generated UI and updated nginx configuration together (the existing U
 After deployment, rerun the HTTP checks, submit the corrected sitemap, and inspect the homepage, `/zh-tw/`, rules and an old redirected URL in Search Console. Compare clicks, impressions and CTR by page/query and monitor Core Web Vitals after new field data is collected. Content editing of the longer translated articles and detailed LCP profiling remain separate follow-up work.
 
 Detailed Yandex findings, build-size comparisons, and LCP measurement limits are recorded in [the performance follow-up](PERFORMANCE-2026-09-16.md).
+
+## Article hydration and lazy locales (60.1.0 follow-up)
+
+Wiki/about pages are rendered with Vue's string renderer during the existing build, including fragment markers. On a direct visit `createSSRApp` attaches to this HTML instead of deleting and recreating the article. Other pages and private room shells retain normal client rendering. This is static generation; no Node rendering server or Docker Compose change is needed.
+
+Every article is hydrated once in the build renderer, which asserts that its headings and paragraphs retain their DOM nodes. The original SSR HTML is then restored for publication. `data-ssr-path` ensures only the correct article is hydrated. Saved theme/profile settings are applied reactively after hydration, and the socket starts after mounting so listeners are ready. No socket is opened in prerendering.
+
+`npm run serve` and `npm run build` generate six independent JSON dictionaries from the existing TypeScript translations via npm lifecycle scripts. Edit `src/i18n/langs`, never `src/i18n/generated` (ignored). If running type checks or webpack directly on a clean checkout, run `node packages/ui/scripts/generate-locales.cjs` first. The selected language and English fallback load before committing navigation. Short language-suggestion strings remain available independently. Failed dictionary requests can be retried; outdated selections cannot override a newer choice.
+
+The HTML preloads only the selected locale and English fallback. Bundle checks reject reintroducing the all-language page dictionary into runtime chunks. Current startup JS including dictionaries is 287.1 KiB gzip for English, 324.0 KiB for Russian, and 317.2 KiB for Traditional Chinese (route-specific chunks excluded, as in the previous initial-bundle comparison). This is not a measured LCP result.

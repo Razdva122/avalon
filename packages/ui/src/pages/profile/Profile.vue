@@ -222,7 +222,7 @@
 <script lang="ts">
 import { localizedPath } from '@/router/paths';
 import { i18n } from '@/plugins/i18n';
-import { rememberLanguage } from '@/helpers/i18n/preference';
+import { chooseLanguage } from '@/helpers/i18n/preference';
 import { defineComponent } from 'vue';
 import { LanguageMap, TLanguage } from '@/helpers/i18n';
 import { store } from '@/store';
@@ -282,8 +282,7 @@ export default defineComponent({
         return this.$i18n.locale;
       },
       set(value: string) {
-        const language = rememberLanguage(value);
-        if (language) i18n.global.locale.value = language;
+        void chooseLanguage(value);
       },
     },
     hideIndexInHistory: {

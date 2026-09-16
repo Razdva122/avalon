@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
-import { useI18n } from 'vue-i18n';
+import { languageSuggestions } from '@/i18n/suggestions';
 import { useStore } from '@/store';
 import { preferredLanguage } from '@/helpers/i18n/policy';
 import { rememberLanguage } from '@/helpers/i18n/preference';
@@ -17,7 +17,6 @@ import { localizedPath } from '@/router/paths';
 
 const route = useRoute();
 const store = useStore();
-const { t } = useI18n();
 const ready = ref(false);
 const dismissed = ref<string[]>([]);
 const storageKey = '__language-suggestion-dismissed__';
@@ -36,11 +35,7 @@ const target = computed(() => ({
   query: route.query,
   hash: route.hash,
 }));
-const copy = computed(() => ({
-  message: t('languageSuggestion.message', {}, { locale: preferred.value }),
-  action: t('languageSuggestion.action', {}, { locale: preferred.value }),
-  dismiss: t('languageSuggestion.dismiss', {}, { locale: preferred.value }),
-}));
+const copy = computed(() => languageSuggestions[preferred.value]);
 
 onMounted(() => {
   // Never bake a build machine's browser-language suggestion into public HTML.

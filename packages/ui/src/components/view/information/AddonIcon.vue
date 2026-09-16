@@ -1,5 +1,5 @@
 <template>
-  <div :title="addon" class="addon-image" :class="'icon-' + addon"></div>
+  <span :title="addon" class="addon-image" :class="'icon-' + addon"></span>
 </template>
 
 <script lang="ts">
@@ -18,6 +18,10 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.addon-image {
+  display: block;
+}
+
 .icon-excalibur {
   background-image: getImagePathByID('features', 'excalibur');
   background-size: contain;

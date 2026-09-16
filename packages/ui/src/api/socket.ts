@@ -16,6 +16,8 @@ import { userProfilePath } from '@/store/const';
 
 export const socket: Socket = io(socketURL, {
   withCredentials: true,
+  // Start after mounting, once listeners are installed; never connect during prerender.
+  autoConnect: false,
   auth: {
     token: getAuthToken(),
   },

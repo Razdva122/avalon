@@ -8,7 +8,7 @@ import Lobby from '@/pages/lobby/Lobby.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { TLanguage, LanguageMap } from '@/helpers/i18n';
 import { s3ImagesPath } from '@/helpers/images';
-import { i18n } from '@/plugins/i18n';
+import { i18n, loadLanguage, commitLanguage } from '@/plugins/i18n';
 import { basePath, localizedPath, isNeutralPath } from './paths';
 
 const routeComponentMap = {
@@ -158,12 +158,18 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
+// Do not change URL/content until both the selected dictionary and fallback
+// are available. This also makes direct room links wait for the recipient locale.
+router.beforeResolve(async (to) => {
+  await loadLanguage(
+    pageLanguage(to.path, isNeutralPath(to.path), preferredLanguage(store.state.settings, navigator.languages)),
+  );
+});
+
 router.afterEach((to, _from, failure) => {
   if (failure) return;
-  i18n.global.locale.value = pageLanguage(
-    to.path,
-    isNeutralPath(to.path),
-    preferredLanguage(store.state.settings, navigator.languages),
+  commitLanguage(
+    pageLanguage(to.path, isNeutralPath(to.path), preferredLanguage(store.state.settings, navigator.languages)),
   );
   updateMetadata(to);
 });

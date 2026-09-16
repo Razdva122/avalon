@@ -62,6 +62,7 @@ module.exports = defineConfig({
       plugins: [
         new webpack.DefinePlugin({
           APP_VERSION: JSON.stringify(require('./package.json').version),
+          __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true,
         }),
         new VuetifyPlugin(),
         new SitemapPlugin({
@@ -83,11 +84,45 @@ module.exports = defineConfig({
             skipThirdPartyRequests: true,
             // renderer-puppeteer 1.2.x races the selector against an unreferenced
             // browser Promise, which Chrome can collect. Await readiness directly.
+            pageSetup: (page, route) => {
+              page.prerenderErrors = [];
+              page.on('pageerror', (error) => page.prerenderErrors.push(error.message));
+              page.on('console', (message) => {
+                if (message.type() === 'error' && !message.text().startsWith('Failed to load resource')) {
+                  page.prerenderErrors.push(message.text());
+                }
+              });
+            },
             pageHandler: async (page, route) => {
               try {
-                await page.waitForSelector('h1', { timeout: 30000 });
+                await page.waitForSelector('#app[data-prerender-ready] h1, #app[data-prerender-error]', {
+                  timeout: 30000,
+                });
+                const error = await page.$eval('#app', (root) => root.dataset.prerenderError);
+                if (error) throw new Error(error);
+                // Avoid a second waterfall for the selected locale and fallback.
+                await page.evaluate(() => {
+                  for (const resource of performance.getEntriesByType('resource')) {
+                    const url = new URL(resource.name);
+                    if (url.origin !== location.origin || !/^\/js\/locale-[^/]+\.js$/.test(url.pathname)) continue;
+                    const link = document.createElement('link');
+                    link.rel = 'preload';
+                    link.as = 'script';
+                    link.href = url.pathname;
+                    document.head.appendChild(link);
+                  }
+                });
               } catch (error) {
-                throw new Error(`Prerender failed for ${route}: ${error.message}`);
+                const state = await page
+                  .$eval('#app', (root) => ({
+                    ready: root.dataset.prerenderReady,
+                    error: root.dataset.prerenderError,
+                    heading: root.querySelector('h1')?.textContent,
+                  }))
+                  .catch(() => null);
+                throw new Error(
+                  `Prerender failed for ${route}: ${error.message}; state=${JSON.stringify(state)}; errors=${page.prerenderErrors.join('; ')}`,
+                );
               }
             },
             injectProperty: '__AVALON_PRERENDER__',
