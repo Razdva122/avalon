@@ -50,10 +50,47 @@ export class NowPayments {
     return (await response.json()) as Record<string, unknown>;
   }
 
+  private async merchantCurrencies(): Promise<string[]> {
+    const result = await this.request('merchant/coins');
+    if (!Array.isArray(result.selectedCurrencies)) throw new Error('invalid_currencies');
+    return result.selectedCurrencies
+      .filter((code): code is string => typeof code === 'string')
+      .map((code) => code.toLowerCase());
+  }
+
+  async networkMinimums() {
+    const available = await this.merchantCurrencies();
+    return Promise.all(
+      this.config.currencies.map(async (currency) => {
+        if (!available.includes(currency)) return { currency, available: false };
+        try {
+          const [estimate, minimum] = await Promise.all([
+            this.request(`estimate?amount=10&currency_from=usd&currency_to=${currency}`),
+            this.request(
+              `min-amount?currency_from=${currency}&fiat_equivalent=usd&is_fixed_rate=false&is_fee_paid_by_user=false`,
+            ),
+          ]);
+          const rate = Number(estimate.estimated_amount);
+          const minimumUSDT = Number(minimum.min_amount);
+          if (!Number.isFinite(rate) || rate <= 0 || !Number.isFinite(minimumUSDT) || minimumUSDT <= 0)
+            throw new Error('invalid_minimum');
+          return {
+            currency,
+            available: true,
+            minimumUSDT,
+            minimumUSD: Math.max(1, Math.ceil((minimumUSDT / rate) * 1000) / 100),
+          };
+        } catch {
+          return { currency, available: false };
+        }
+      }),
+    );
+  }
+
   async createInvoice(order: { orderId: string; amountCents: number; payCurrency: string }) {
     // Check actual merchant availability; network support changes independently of deployments.
-    const available = await this.request('currencies');
-    if (!Array.isArray(available.currencies) || !available.currencies.includes(order.payCurrency)) {
+    const available = await this.merchantCurrencies();
+    if (!available.includes(order.payCurrency)) {
       throw new Error('network_unavailable');
     }
     const [estimate, minimum] = await Promise.all([

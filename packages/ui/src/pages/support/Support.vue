@@ -23,12 +23,50 @@
     <div class="support-columns">
       <section class="support-panel">
         <h2>{{ t('support.checkout') }}</h2>
+        <div v-if="info?.enabled" class="hint" aria-live="polite">
+          <p>{{ t('support.networkMinimumHint') }}</p>
+          <p v-if="networkLoading">{{ t('support.refreshing') }}</p>
+          <ul v-else>
+            <li v-for="code in info.currencies" :key="code">
+              {{ networkName(code) }} —
+              {{
+                networks.find((n) => n.currency === code)?.available
+                  ? t('support.networkMinimum', {
+                      amount: networks.find((n) => n.currency === code)?.minimumUSD?.toFixed(2),
+                      tokens: networks.find((n) => n.currency === code)?.minimumUSDT,
+                    })
+                  : t('support.networkUnavailable')
+              }}
+            </li>
+          </ul>
+          <button type="button" :disabled="networkLoading" @click="loadNetworks">{{ t('support.refresh') }}</button>
+        </div>
         <p v-if="!info && loading" role="status">{{ t('support.refreshing') }}</p>
         <p v-else-if="info && !info.enabled" class="notice">{{ t('support.unavailable') }}</p>
         <p v-else-if="info && !store.state.profile" class="notice">{{ t('support.login') }}</p>
         <form v-else-if="info?.enabled" @submit.prevent="checkout">
           <label for="support-amount">{{ t('support.amount') }}</label>
-          <input id="support-amount" v-model="amount" type="number" min="1" max="10000" step="0.01" required />
+          <input
+            id="support-amount"
+            v-model="amount"
+            type="number"
+            :min="selectedNetwork?.minimumUSD || 1"
+            max="10000"
+            step="0.01"
+            required
+          />
+          <p
+            v-if="selectedNetwork?.available && Number(amount) < (selectedNetwork.minimumUSD || 1)"
+            class="notice"
+            role="status"
+          >
+            {{
+              t('support.networkMinimum', {
+                amount: selectedNetwork.minimumUSD?.toFixed(2),
+                tokens: selectedNetwork.minimumUSDT,
+              })
+            }}
+          </p>
           <div class="presets">
             <button
               v-for="value in [10, 20, 50]"
@@ -42,11 +80,29 @@
           </div>
           <label for="support-network">{{ t('support.network') }}</label>
           <select id="support-network" v-model="currency" required>
-            <option v-for="code in info.currencies" :key="code" :value="code">{{ networkName(code) }}</option>
+            <option
+              v-for="code in info.currencies"
+              :key="code"
+              :value="code"
+              :disabled="!networks.find((n) => n.currency === code)?.available"
+            >
+              {{ networkName(code) }}
+            </option>
           </select>
           <label class="checkbox"><input v-model="anonymous" type="checkbox" />{{ t('support.anonymous') }}</label>
           <p class="hint">{{ t('support.anonymousHint') }}</p>
-          <button class="primary" type="submit" :disabled="busy || loading || !account">
+          <button
+            class="primary"
+            type="submit"
+            :disabled="
+              busy ||
+              loading ||
+              !account ||
+              networkLoading ||
+              !selectedNetwork?.available ||
+              Number(amount) < (selectedNetwork?.minimumUSD || 1)
+            "
+          >
             {{ t(busy ? 'support.refreshing' : 'support.pay') }}
           </button>
           <p class="hint">{{ t('support.paymentHint') }}</p>
@@ -105,7 +161,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
 import { supportRequest, SupportInfo, SupportAccount, SupportError } from '@/api/support';
@@ -123,6 +179,20 @@ const busy = ref(false);
 const saved = ref(false);
 const error = ref('');
 const minimumUSD = ref('');
+const networks = ref<{ currency: string; available: boolean; minimumUSD?: number; minimumUSDT?: number }[]>([]);
+const networkLoading = ref(false);
+const selectedNetwork = computed(() => networks.value.find((n) => n.currency === currency.value));
+async function loadNetworks() {
+  networkLoading.value = true;
+  try {
+    const response = await supportRequest<{ networks: typeof networks.value }>('/networks');
+    networks.value = response.networks;
+  } catch {
+    networks.value = [];
+  } finally {
+    networkLoading.value = false;
+  }
+}
 let generation = 0;
 let timer: ReturnType<typeof setInterval> | undefined;
 const networkName = (code: string) =>
@@ -152,6 +222,7 @@ async function load(syncPrivacy = true) {
     ]);
     if (current !== generation) return;
     info.value = publicInfo;
+    if (syncPrivacy && publicInfo.enabled) void loadNetworks();
     account.value = personal;
     if (!publicInfo.currencies.includes(currency.value)) currency.value = publicInfo.currencies[0] || '';
     if (personal && syncPrivacy) {
@@ -169,6 +240,12 @@ async function checkout() {
     error.value = 'invalidAmount';
     return;
   }
+  if (!selectedNetwork.value?.available) return;
+  if (Number(amount.value) < (selectedNetwork.value.minimumUSD || 1)) {
+    minimumUSD.value = selectedNetwork.value.minimumUSD!.toFixed(2);
+    error.value = 'minimumError';
+    return;
+  }
   busy.value = true;
   error.value = '';
   try {
@@ -182,6 +259,7 @@ async function checkout() {
     window.location.assign(url.href);
   } catch (e) {
     report(e);
+    if (e instanceof SupportError) void loadNetworks();
   } finally {
     busy.value = false;
   }

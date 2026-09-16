@@ -19,8 +19,8 @@ test('creates an account-bound USD invoice payable in the selected USDT network'
     requests.push({ url: String(url), body: options?.body ? JSON.parse(String(options.body)) : undefined });
     return new Response(
       JSON.stringify(
-        String(url).endsWith('/currencies')
-          ? { currencies: ['usdttrc20'] }
+        String(url).endsWith('/merchant/coins')
+          ? { selectedCurrencies: ['USDTTRC20'] }
           : String(url).includes('/estimate?')
             ? { estimated_amount: 10 }
             : String(url).includes('/min-amount?')
@@ -43,7 +43,7 @@ test('creates an account-bound USD invoice payable in the selected USDT network'
   });
 });
 test('rejects unavailable networks and provider-controlled redirect hosts', async () => {
-  global.fetch = jest.fn(async () => new Response(JSON.stringify({ currencies: [] }), { status: 200 }));
+  global.fetch = jest.fn(async () => new Response(JSON.stringify({ selectedCurrencies: [] }), { status: 200 }));
   await expect(
     new NowPayments(config).createInvoice({ orderId: 'x', amountCents: 1000, payCurrency: 'usdttrc20' }),
   ).rejects.toThrow('network_unavailable');
@@ -51,8 +51,8 @@ test('rejects unavailable networks and provider-controlled redirect hosts', asyn
     async (url) =>
       new Response(
         JSON.stringify(
-          String(url).endsWith('/currencies')
-            ? { currencies: ['usdttrc20'] }
+          String(url).endsWith('/merchant/coins')
+            ? { selectedCurrencies: ['USDTTRC20'] }
             : String(url).includes('/estimate?')
               ? { estimated_amount: 10 }
               : String(url).includes('/min-amount?')
@@ -95,8 +95,8 @@ test('rejects below-minimum checkout before an unusable invoice is created', asy
   global.fetch = jest.fn(async (url) => {
     const path = String(url);
     paths.push(path);
-    const payload = path.endsWith('/currencies')
-      ? { currencies: ['usdttrc20'] }
+    const payload = path.endsWith('/merchant/coins')
+      ? { selectedCurrencies: ['USDTTRC20'] }
       : path.includes('/estimate?')
         ? { estimated_amount: 10 }
         : path.includes('/min-amount?')
@@ -108,4 +108,24 @@ test('rejects below-minimum checkout before an unusable invoice is created', asy
     new NowPayments(config).createInvoice({ orderId: 'x', amountCents: 1000, payCurrency: 'usdttrc20' }),
   ).rejects.toMatchObject({ minimumUSD: 15 });
   expect(paths.some((path) => path.endsWith('/invoice'))).toBe(false);
+});
+
+test('network minimums round up and isolate a failing network', async () => {
+  global.fetch = jest.fn(async (url) => {
+    const path = String(url);
+    if (path.includes('usdtbsc')) return new Response('{}', { status: 503 });
+    const body = path.endsWith('/merchant/coins')
+      ? { selectedCurrencies: ['USDTTRC20', 'USDTBSC'] }
+      : path.includes('/estimate?')
+        ? { estimated_amount: '9.9' }
+        : { min_amount: '16.48' };
+    return new Response(JSON.stringify(body), { status: 200 });
+  });
+  expect(
+    await new NowPayments({ ...config, currencies: ['usdttrc20', 'usdtbsc', 'usdterc20'] }).networkMinimums(),
+  ).toEqual([
+    { currency: 'usdttrc20', minimumUSD: 16.65, minimumUSDT: 16.48, available: true },
+    { currency: 'usdtbsc', available: false },
+    { currency: 'usdterc20', available: false },
+  ]);
 });

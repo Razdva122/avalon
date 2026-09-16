@@ -22,6 +22,25 @@ supportRouter.use((_req, res, next) => {
   next();
 });
 
+// Share in-flight requests and briefly cache quotes across visitors and UI polling.
+let networkCache: { key: string; expires: number; result: ReturnType<NowPayments['networkMinimums']> } | undefined;
+supportRouter.get(
+  '/networks',
+  asyncRoute(async (_req, res) => {
+    const config = supportConfig();
+    if (!config) return res.json({ networks: [] });
+    const key = JSON.stringify([config.apiKey, config.currencies]);
+    if (!networkCache || networkCache.key !== key || networkCache.expires < Date.now()) {
+      const result = new NowPayments(config).networkMinimums();
+      networkCache = { key, expires: Date.now() + 60000, result };
+      void result.catch(() => {
+        if (networkCache?.result === result) networkCache = undefined;
+      });
+    }
+    return res.json({ networks: await networkCache.result });
+  }),
+);
+
 supportRouter.get(
   '/',
   asyncRoute(async (_req, res) => {
