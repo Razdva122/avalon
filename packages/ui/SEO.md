@@ -38,7 +38,7 @@ Chart.js theme registration is imported by the chart components rather than the 
 
 ## Checks
 
-`npm run build:ui` runs the language policy tests, production build and `check:seo`. The latter checks every prerendered route for a heading, language, canonical, robots policy and alternate URLs, plus localized wiki links and breadcrumbs. It also checks sitemap completeness and uniqueness.
+`npm run build:ui` runs the language policy tests, production build, `check:seo`, and `check:bundle`. The bundle check prevents database runtimes and full Lodash from entering browser chunks and enforces an initial JavaScript size budget. The latter checks every prerendered route for a heading, language, canonical, robots policy and alternate URLs, plus localized wiki links and breadcrumbs. It also checks sitemap completeness and uniqueness.
 
 On a machine using an already installed browser, set `PUPPETEER_EXECUTABLE_PATH` to the Chrome executable if Puppeteer's downloaded browser is unavailable. The Docker build uses its bundled browser.
 
@@ -55,3 +55,5 @@ This checks canonical pages, English and legacy redirects, query preservation, d
 Deploy the generated UI and updated nginx configuration together (the existing UI Dockerfile already packages both). No production deployment or Search Console submission is part of the local verification.
 
 After deployment, rerun the HTTP checks, submit the corrected sitemap, and inspect the homepage, `/zh-tw/`, rules and an old redirected URL in Search Console. Compare clicks, impressions and CTR by page/query and monitor Core Web Vitals after new field data is collected. Content editing of the longer translated articles and detailed LCP profiling remain separate follow-up work.
+
+Detailed Yandex findings, build-size comparisons, and LCP measurement limits are recorded in [the performance follow-up](PERFORMANCE-2026-09-16.md).

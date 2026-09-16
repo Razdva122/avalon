@@ -57,7 +57,8 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { store } from '@/store';
 import StickerImage from '@/components/stickers/StickerImage.vue';
-import { STICKERS, ACHIEVEMENT_TO_AVATAR_MAP } from '@avalon/types';
+import { STICKERS } from '@avalon/types/user/stickers';
+import { ACHIEVEMENT_TO_AVATAR_MAP } from '@avalon/types/stats/achievement-avatars';
 import Avatar from '@/components/user/Avatar.vue';
 
 export interface AchievementProgress {

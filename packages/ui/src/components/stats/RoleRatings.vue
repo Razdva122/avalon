@@ -62,7 +62,8 @@ import { useRouter } from 'vue-router';
 import { socket } from '@/api/socket';
 import TeammateProfile from '@/components/stats/TeammateProfile.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
-import { TRoles, goodRolesImportance, evilRolesImportance, RoleRating } from '@avalon/types';
+import type { TRoles, RoleRating } from '@avalon/types';
+import { goodRolesImportance, evilRolesImportance } from '@avalon/types/consts';
 import { useResponsive } from '@/helpers/composables';
 
 export default defineComponent({

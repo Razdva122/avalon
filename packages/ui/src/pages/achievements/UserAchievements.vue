@@ -87,8 +87,12 @@ import type { AchievementResponse } from '@avalon/types';
 import { socket } from '@/api/socket';
 import AchievementCard from '@/components/achievements/AchievementCard.vue';
 import UserProfileHeader from '@/components/stats/UserProfileHeader.vue';
-import { Achievement, AchievementType } from '@avalon/types';
-import { ACHIEVEMENT_ALL_STANDARD_ROLES, ACHIEVEMENT_DIFFERENT_PLAYER_COUNT } from '@avalon/types';
+import type { Achievement } from '@avalon/types';
+import { AchievementType } from '@avalon/types/stats/achievement-type';
+import {
+  ACHIEVEMENT_ALL_STANDARD_ROLES,
+  ACHIEVEMENT_DIFFERENT_PLAYER_COUNT,
+} from '@avalon/types/stats/achievements-constants';
 
 interface UserAchievementData {
   id: string;

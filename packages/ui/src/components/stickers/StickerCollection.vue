@@ -121,7 +121,7 @@
   </section>
 </template>
 <script setup lang="ts">
-import { STICKERS } from '@avalon/types';
+import { STICKERS } from '@avalon/types/user/stickers';
 import { useI18n } from 'vue-i18n';
 import { useStickers } from '@/helpers/composables/useStickers';
 import StickerImage from './StickerImage.vue';

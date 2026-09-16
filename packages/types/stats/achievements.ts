@@ -1,12 +1,7 @@
 import { prop, modelOptions, Severity } from '@typegoose/typegoose';
 
-/**
- * Типы достижений
- */
-export enum AchievementType {
-  OPEN = 'open', // Открытые достижения
-  HIDDEN = 'hidden', // Скрытые достижения
-}
+import { AchievementType } from './achievement-type';
+export { AchievementType } from './achievement-type';
 
 /**
  * Mongoose model for Achievement

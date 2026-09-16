@@ -44,7 +44,8 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { TTotalWinrateStats, goodRolesImportance, TRoleStats } from '@avalon/types';
+import type { TTotalWinrateStats, TRoleStats } from '@avalon/types';
+import { goodRolesImportance } from '@avalon/types/consts';
 import { socket } from '@/api/socket';
 import { prettifyPercent } from '@/helpers/stats';
 import PlayerCountsStats from '@/components/stats/PlayerCountsStats.vue';

@@ -67,7 +67,7 @@ import { socket } from '@/api/socket';
 import TeammateProfile from '@/components/stats/TeammateProfile.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
-import { shuffle } from 'lodash';
+import shuffle from 'lodash/shuffle';
 import { TRoles } from '@avalon/types';
 
 export default defineComponent({

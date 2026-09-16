@@ -79,6 +79,8 @@ module.exports = defineConfig({
           renderer: new PuppeteerRenderer({
             timeout: 30000,
             maxConcurrentRoutes: 4,
+            // Analytics and remote images are not needed to prerender text and metadata.
+            skipThirdPartyRequests: true,
             // renderer-puppeteer 1.2.x races the selector against an unreferenced
             // browser Promise, which Chrome can collect. Await readiness directly.
             pageHandler: async (page, route) => {

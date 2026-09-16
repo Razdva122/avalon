@@ -51,6 +51,10 @@ const routeComponentMap = {
 };
 
 const legacyRoutes = {
+  '/wiki/addons/lady/': '/wiki/expansions/lady/',
+  '/wiki/addons/lady_sea/': '/wiki/expansions/lady_sea/',
+  '/wiki/addons/excalibur/': '/wiki/expansions/excalibur/',
+  '/wiki/addons/plot_cards/': '/wiki/expansions/plot_cards/',
   '/wiki/addons/': '/wiki/expansions/',
   '/wiki/roles/isolde/': '/wiki/roles/lovers/',
   '/wiki/roles/tristan/': '/wiki/roles/lovers/',
@@ -78,7 +82,7 @@ Object.entries(legacyRoutes).forEach(([path, target]) => {
     routes.push({
       path: localizedPath(path, language),
       // Keep names used by role preview links for the original English aliases.
-      name: language === 'en' ? path.split('/').filter(Boolean).pop() : undefined,
+      name: language === 'en' && path.startsWith('/wiki/roles/') ? path.split('/').filter(Boolean).pop() : undefined,
       redirect: (to) => ({ path: localizedPath(target, language), query: to.query, hash: to.hash }),
     });
   });

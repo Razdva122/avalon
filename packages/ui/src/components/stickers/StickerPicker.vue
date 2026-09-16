@@ -89,7 +89,7 @@
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from 'vue';
 import { socket } from '@/api/socket';
-import { STICKER_COOLDOWN_MS } from '@avalon/types';
+import { STICKER_COOLDOWN_MS } from '@avalon/types/user/stickers';
 import { useStickers } from '@/helpers/composables/useStickers';
 import StickerImage from './StickerImage.vue';
 import StickerCollection from './StickerCollection.vue';

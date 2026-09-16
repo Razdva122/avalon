@@ -101,7 +101,7 @@ import type {
   IActionWithResult,
   TPlotCardNames,
 } from '@avalon/types';
-import { availablePlotCards } from '@avalon/types';
+import { availablePlotCards } from '@avalon/types/consts';
 import { getPlayerCards, isAdjacentPlayer, hasActiveCard } from '@/helpers/plot-cards';
 import type { IFrontendPlayer } from '@/components/view/board/interface';
 import { gameStateKey } from '@/helpers/game-state-manager';

@@ -1,4 +1,5 @@
-import { TRoles, VisualGameState, goodRolesImportance } from '@avalon/types';
+import type { TRoles, VisualGameState } from '@avalon/types';
+import { goodRolesImportance } from '@avalon/types/consts';
 import { TUserStats, TWinsStats, TWinsStatsWithWinrate, TGameView, TTeammateStats } from '@/helpers/stats/interface';
 
 export * from '@/helpers/stats/interface';

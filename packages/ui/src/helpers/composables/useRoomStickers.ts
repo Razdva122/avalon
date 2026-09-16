@@ -1,5 +1,6 @@
 import { InjectionKey, Ref, onUnmounted, provide, reactive, watch } from 'vue';
-import { STICKERS, STICKER_DURATION_MS, StickerMessage, TRoomState } from '@avalon/types';
+import type { StickerMessage, TRoomState } from '@avalon/types';
+import { STICKERS, STICKER_DURATION_MS } from '@avalon/types/user/stickers';
 import { socket } from '@/api/socket';
 export const stickerReactionsKey: InjectionKey<Record<string, StickerMessage>> = Symbol('stickerReactions');
 export function useRoomStickers(roomID: () => string, state: Ref<TRoomState>, hideOnBoard: () => boolean) {

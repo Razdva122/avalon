@@ -72,7 +72,8 @@ import type { AchievementResponse } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { store } from '@/store';
 import AchievementCard from '@/components/achievements/AchievementCard.vue';
-import { Achievement, AchievementStats, AchievementType } from '@avalon/types';
+import type { Achievement, AchievementStats } from '@avalon/types';
+import { AchievementType } from '@avalon/types/stats/achievement-type';
 
 interface GlobalAchievementData {
   id: string;

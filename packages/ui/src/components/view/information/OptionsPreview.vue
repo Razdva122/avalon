@@ -18,15 +18,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import {
-  GameOptionsRoles,
-  GameOptionsAddons,
-  evilRolesImportance,
-  goodRolesImportance,
-  TGoodRoles,
-  TEvilRoles,
-  TVisibleRole,
-} from '@avalon/types';
+import type { GameOptionsRoles, GameOptionsAddons, TGoodRoles, TEvilRoles, TVisibleRole } from '@avalon/types';
+import { evilRolesImportance, goodRolesImportance } from '@avalon/types/consts';
 
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 

@@ -4,6 +4,10 @@ const { localizedPath } = require('../src/router/paths');
 const origin = process.env.SEO_BASE_URL || 'http://127.0.0.1:18080';
 const languages = ['en', 'ru', 'zh-tw', 'zh-cn', 'es', 'pt'];
 const aliases = {
+  '/wiki/addons/lady/': '/wiki/expansions/lady/',
+  '/wiki/addons/lady_sea/': '/wiki/expansions/lady_sea/',
+  '/wiki/addons/excalibur/': '/wiki/expansions/excalibur/',
+  '/wiki/addons/plot_cards/': '/wiki/expansions/plot_cards/',
   '/wiki/addons/': '/wiki/expansions/',
   '/wiki/roles/isolde/': '/wiki/roles/lovers/',
   '/wiki/roles/tristan/': '/wiki/roles/lovers/',
@@ -55,6 +59,18 @@ async function main() {
   await check('/Order.htm', 404, null, true);
   await check('/robots.txt', 200);
   await check('/sitemap.xml', 200);
+  const home = await fetch(origin + '/');
+  assert.match(home.headers.get('cache-control') || '', /no-cache/, 'HTML must revalidate after releases');
+  const html = await home.text();
+  const assets = [...html.matchAll(/(?:src|href)="(\/(?:js|css)\/[^"]+\.(?:js|css))"/g)].map((match) => match[1]);
+  assert(assets.length > 0, 'No initial assets found');
+  for (const asset of new Set(assets)) {
+    const response = await fetch(origin + asset);
+    assert.equal(response.status, 200, asset);
+    assert.match(response.headers.get('cache-control') || '', /max-age=31536000, immutable/, asset);
+    await response.arrayBuffer();
+  }
+  await check('/js/missing.12345678.js', 404, null, true);
   console.log('HTTP SEO checks passed: all languages, aliases, private routes, query strings and 404 responses.');
 }
 

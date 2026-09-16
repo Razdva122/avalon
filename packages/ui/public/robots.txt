@@ -2,3 +2,9 @@ User-agent: *
 Allow: /
 
 Sitemap: https://avalon-game.com/sitemap.xml
+
+# External sharing/tracking parameters observed in Yandex Webmaster.
+# These parameters do not select application content; retain them for visitors.
+User-agent: Yandex
+Allow: /
+Clean-param: f_link_type&flow_extra&enable_bottom_share_style&hybrid_event_param&use_xbridge3&loader_name&need_sec_link&sec_link_scene&theme&spm&webview_progress_bar&show_loading&push_animated /

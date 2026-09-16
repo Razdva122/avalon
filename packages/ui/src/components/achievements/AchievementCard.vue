@@ -131,7 +131,9 @@
 import { getAchievementsText } from '@/helpers/achievements';
 import { defineComponent, computed, PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { AchievementStats, ACHIEVEMENT_TO_AVATAR_MAP, STICKERS } from '@avalon/types';
+import type { AchievementStats } from '@avalon/types';
+import { ACHIEVEMENT_TO_AVATAR_MAP } from '@avalon/types/stats/achievement-avatars';
+import { STICKERS } from '@avalon/types/user/stickers';
 import StickerImage from '@/components/stickers/StickerImage.vue';
 import Avatar from '@/components/user/Avatar.vue';
 
