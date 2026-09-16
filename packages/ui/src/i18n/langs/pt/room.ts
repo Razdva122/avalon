@@ -9,7 +9,9 @@ export default {
     restartGame: 'Reiniciar jogo',
   },
   mainPage: {
-    header: 'Bem-vindo ao site do jogo de tabuleiro online "Avalon"!',
+    header: 'Jogue Avalon online',
+    intro:
+      'Jogue The Resistance: Avalon online grátis com 5–10 jogadores. Aprenda as regras e os papéis, entre na sua conta para criar uma sala e compartilhe o link com seus amigos.',
     createRoom: 'Criar sala',
     watch: 'Assistir',
     join: 'Entrar',

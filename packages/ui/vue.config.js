@@ -9,25 +9,14 @@ const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 const { routesSeo } = require('./src/router/seo');
 const { yaMetrika, gtag } = require('./const');
 
-const multiLangRoutes = Object.values(routesSeo).reduce((acc, el) => {
-  if (el.meta.multiLanguage) {
-    acc.push(
-      ...Object.keys(el.meta.multiLanguage).map((lang) => {
-        return {
-          ...el,
-          path: `/${lang}${el.path}`.toLowerCase(),
-        };
-      }),
-      {
-        ...el,
-      },
-    );
-  } else {
-    acc.push(el);
-  }
+const { localizedPath } = require('./src/router/paths');
 
-  return acc;
-}, []);
+const multiLangRoutes = Object.values(routesSeo).flatMap((route) =>
+  Object.keys(route.meta.multiLanguage).map((language) => ({
+    ...route,
+    path: localizedPath(route.path, language),
+  })),
+);
 
 const paths = multiLangRoutes.filter((el) => !el.meta.skipSiteMap);
 
@@ -81,7 +70,6 @@ module.exports = defineConfig({
           options: {
             filename: 'sitemap.xml',
             skipgzip: true,
-            lastmod: true,
             changefreq: 'weekly',
             priority: 0.8,
           },
@@ -89,7 +77,13 @@ module.exports = defineConfig({
         new PrerendererWebpackPlugin({
           routes: multiLangRoutes.filter((el) => el.meta.prerender).map((el) => el.path),
           renderer: new PuppeteerRenderer({
-            timeout: 100000, // Таймаут в 100 секунд
+            timeout: 30000,
+            maxConcurrentRoutes: 4,
+            renderAfterElementExists: 'h1',
+            injectProperty: '__AVALON_PRERENDER__',
+            inject: { prerender: true },
+            // Permit the same build on developer machines and in the Docker image.
+            ...(process.env.PUPPETEER_EXECUTABLE_PATH ? { executablePath: process.env.PUPPETEER_EXECUTABLE_PATH } : {}),
           }),
         }),
       ],

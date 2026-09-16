@@ -9,7 +9,8 @@ export default {
     restartGame: '重開遊戲',
   },
   mainPage: {
-    header: '歡迎來到《阿瓦隆》線上棋盤遊戲網站！',
+    header: '阿瓦隆線上遊戲',
+    intro: '免費線上玩阿瓦隆，適合 5–10 人一起遊玩。了解規則與角色，登入後建立房間，再將房間連結分享給朋友。',
     createRoom: '創建房間',
     watch: '觀戰',
     join: '加入',

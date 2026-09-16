@@ -6,9 +6,9 @@ module.exports.rules = {
     keywords: ['Wiki', 'Regras', 'Como jogar'],
   },
   en: {
-    title: 'Avalon: The Resistance | Rules',
+    title: 'Avalon Rules: Setup, Roles & How to Play (5–10 Players)',
     description:
-      "Discover the complete rules of the board game 'Avalon: The Resistance', including a guide for setting up the game for different numbers of players, role combinations, and the basic principles of victory. Convenient setup options for your offline games will help you create the perfect game conditions and unlock the full potential of this classic strategy game.",
+      'Learn how to play The Resistance: Avalon: setup for 5–10 players, role abilities, team voting, mission sizes, and how each side wins.',
     keywords: ['Wiki', 'Rules', 'How to play'],
   },
   ru: {

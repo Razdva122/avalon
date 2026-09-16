@@ -220,6 +220,9 @@
 </template>
 
 <script lang="ts">
+import { localizedPath } from '@/router/paths';
+import { i18n } from '@/plugins/i18n';
+import { rememberLanguage } from '@/helpers/i18n/preference';
 import { defineComponent } from 'vue';
 import { LanguageMap, TLanguage } from '@/helpers/i18n';
 import { store } from '@/store';
@@ -279,9 +282,8 @@ export default defineComponent({
         return this.$i18n.locale;
       },
       set(value: string) {
-        this.$store.commit('updateUserSettings', { key: 'locale', value: { value, isDefault: false } });
-        (<unknown>this.$i18n.locale) = value;
-        document.documentElement.lang = value;
+        const language = rememberLanguage(value);
+        if (language) i18n.global.locale.value = language;
       },
     },
     hideIndexInHistory: {
@@ -356,7 +358,7 @@ export default defineComponent({
       (this.$refs.avatarModal as typeof AvatarModal).displayModal();
     },
     logout() {
-      this.$router.push({ name: 'lobby' });
+      this.$router.push(localizedPath('/', i18n.global.locale.value));
       this.$store.commit('clearUserProfile');
     },
     updateEmail() {
@@ -442,7 +444,7 @@ export default defineComponent({
   },
   beforeRouteEnter(_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) {
     if (!store.state.profile) {
-      next({ name: 'lobby' });
+      next(localizedPath('/', i18n.global.locale.value));
       eventBus.emit('openAuthModal');
     } else {
       next();

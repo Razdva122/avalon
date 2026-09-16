@@ -3,6 +3,11 @@
  * This file contains translations for common UI elements
  */
 export default {
+  languageSuggestion: {
+    message: 'Esta página também está disponível em português.',
+    action: 'Ler em português',
+    dismiss: 'Agora não',
+  },
   achievementsPopup: {
     unlocked: 'Conquista Desbloqueada',
     progress: 'Progresso da Conquista',

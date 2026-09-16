@@ -12,7 +12,11 @@ export function updateUserProfile(user: UserWithToken, options: { updateToken: b
 }
 
 export function updateUserSettings(settings: IUserSettings) {
-  localStorage.setItem(userSettingsPath, JSON.stringify(settings));
+  try {
+    localStorage.setItem(userSettingsPath, JSON.stringify(settings));
+  } catch {
+    // Preferences still apply in this tab when browser storage is unavailable.
+  }
 }
 
 export function clearUserProfile() {

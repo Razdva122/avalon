@@ -9,7 +9,9 @@ export default {
     restartGame: 'Restart game',
   },
   mainPage: {
-    header: 'Welcome to the "Avalon" online board game website!',
+    header: 'Play Avalon Online',
+    intro:
+      'Play The Resistance: Avalon online for free with 5–10 players. Learn the rules and roles, sign in to create a room, and share its link with your friends.',
     createRoom: 'Create room',
     watch: 'Watch',
     join: 'Join',

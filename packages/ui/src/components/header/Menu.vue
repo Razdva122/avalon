@@ -9,45 +9,108 @@
       </v-btn>
     </template>
     <nav>
-      <router-link to="/" class="menu-item">
+      <LocaleLink to="/" class="menu-item">
         <span class="material-icons">home</span>
         <span class="menu-text">{{ $t('menu.home') }}</span>
-      </router-link>
-      <router-link @click="$emit('profileClick')" :to="{ name: 'profile' }" class="menu-item">
+      </LocaleLink>
+      <LocaleLink @click="$emit('profileClick')" :to="{ name: 'profile' }" class="menu-item">
         <span class="material-icons">person</span>
         <span class="menu-text">{{ $t('menu.profile') }}</span>
-      </router-link>
-      <router-link :to="{ name: 'wiki' }" class="menu-item">
+      </LocaleLink>
+      <LocaleLink :to="{ name: 'wiki' }" class="menu-item">
         <span class="material-icons">menu_book</span>
         <span class="menu-text">{{ $t('menu.wiki') }}</span>
-      </router-link>
-      <router-link :to="{ name: 'stats' }" class="menu-item">
+      </LocaleLink>
+      <LocaleLink :to="{ name: 'stats' }" class="menu-item">
         <span class="material-icons">analytics</span>
         <span class="menu-text">{{ $t('menu.stats') }}</span>
-      </router-link>
-      <router-link :to="{ name: 'leaderboard' }" class="menu-item">
+      </LocaleLink>
+      <LocaleLink :to="{ name: 'leaderboard' }" class="menu-item">
         <span class="material-icons">workspace_premium</span>
         <span class="menu-text">{{ $t('menu.leaderboard') }}</span>
-      </router-link>
-      <router-link :to="{ name: 'global_achievements' }" class="menu-item">
+      </LocaleLink>
+      <LocaleLink :to="{ name: 'global_achievements' }" class="menu-item">
         <span class="material-icons">emoji_events</span>
         <span class="menu-text">{{ $t('menu.achievements') }}</span>
-      </router-link>
-      <router-link :to="{ name: 'about' }" class="menu-item">
+      </LocaleLink>
+      <LocaleLink :to="{ name: 'about' }" class="menu-item">
         <span class="material-icons">info</span>
         <span class="menu-text">{{ $t('menu.about') }}</span>
-      </router-link>
+      </LocaleLink>
+      <div class="language-links" :aria-label="$t('profile.language')">
+        <template v-for="language in languageLinks" :key="language.code">
+          <button
+            v-if="neutralPage"
+            type="button"
+            :lang="language.code"
+            :aria-pressed="currentLanguage === language.code"
+            @click="chooseLanguage(language.code)"
+          >
+            {{ language.title }}
+          </button>
+          <router-link
+            v-else
+            :to="{ path: language.path, query: $route.query, hash: $route.hash }"
+            :hreflang="language.code"
+            :lang="language.code"
+            @click="rememberChoice($event, language.code)"
+          >
+            {{ language.title }}
+          </router-link>
+        </template>
+      </div>
     </nav>
   </v-menu>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, unref } from 'vue';
+import { LanguageMap } from '@/helpers/i18n';
+import { localizedPath, isNeutralPath } from '@/router/paths';
+import { rememberLanguage } from '@/helpers/i18n/preference';
+import { i18n } from '@/plugins/i18n';
 
-export default defineComponent({});
+export default defineComponent({
+  methods: {
+    chooseLanguage(value: string) {
+      const language = rememberLanguage(value);
+      if (language) i18n.global.locale.value = language;
+    },
+    rememberChoice(event: MouseEvent, value: string) {
+      if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey)
+        rememberLanguage(value);
+    },
+  },
+  computed: {
+    currentLanguage() {
+      return unref(this.$i18n.locale);
+    },
+    neutralPage() {
+      return isNeutralPath(this.$route.path);
+    },
+    languageLinks() {
+      const path = this.$route.path;
+      return Object.entries(LanguageMap).map(([code, title]) => ({ code, title, path: localizedPath(path, code) }));
+    },
+  },
+});
 </script>
 
 <style scoped lang="scss">
+.language-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 280px;
+  padding: 14px 20px;
+  border-top: 1px solid rgba(var(--v-theme-text-primary), 0.15);
+  font-size: 14px;
+  a,
+  button {
+    text-decoration: underline;
+  }
+}
+
 nav {
   background-color: rgba(var(--v-theme-bg-header), 0.92);
   backdrop-filter: blur(12px);

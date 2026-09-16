@@ -6,9 +6,15 @@
       </TemporaryAlert>
     </div>
 
-    <span class="online">{{ $t('mainPage.online', { count: online }) }}</span>
+    <span v-if="online !== undefined" class="online">{{ $t('mainPage.online', { count: online }) }}</span>
 
     <h1 class="lobby-header">{{ $t('mainPage.header') }}</h1>
+
+    <p class="lobby-intro">{{ $t('mainPage.intro') }}</p>
+    <nav class="lobby-links" :aria-label="$t('menu.wiki')">
+      <LocaleLink :to="{ name: 'rules' }">{{ $t('wiki.rules') }}</LocaleLink>
+      <LocaleLink :to="{ name: 'roles' }">{{ $t('wiki.roles') }}</LocaleLink>
+    </nav>
 
     <div class="top-player-container">
       <RotatingTopPlayer />
@@ -60,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
@@ -79,7 +85,7 @@ export default defineComponent({
     OptionsPreview,
     RotatingTopPlayer,
   },
-  async setup() {
+  setup() {
     const { t } = useI18n();
     const router = useRouter();
     const store = useStore();
@@ -97,7 +103,7 @@ export default defineComponent({
       roomsList.value = data;
     };
 
-    await initState();
+    void initState();
 
     const createRoom = async () => {
       if (!store.state.profile) {
@@ -110,9 +116,10 @@ export default defineComponent({
       router.push({ name: 'room', params: { uuid } });
     };
 
-    socket.on('roomsListUpdated', (list) => {
+    const updateRooms = (list: TRoomsList) => {
       roomsList.value = list;
-    });
+    };
+    socket.on('roomsListUpdated', updateRooms);
 
     const displayOptions = (roles: GameOptionsRoles, addons: GameOptionsAddons) => {
       return [...Object.values(roles), ...Object.values(addons)].some((el) => Boolean(el));
@@ -125,8 +132,13 @@ export default defineComponent({
       });
     });
 
-    socket.on('onlineCounterUpdated', (counter) => {
+    const updateOnline = (counter: number) => {
       online.value = counter;
+    };
+    socket.on('onlineCounterUpdated', updateOnline);
+    onBeforeUnmount(() => {
+      socket.off('roomsListUpdated', updateRooms);
+      socket.off('onlineCounterUpdated', updateOnline);
     });
 
     return {
@@ -141,6 +153,23 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.lobby-intro {
+  max-width: 720px;
+  padding: 0 20px;
+  text-align: center;
+  font-size: 18px;
+}
+.lobby-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin: 16px;
+  a {
+    text-decoration: underline;
+  }
+}
+
 .online {
   opacity: 30%;
   font-size: large;

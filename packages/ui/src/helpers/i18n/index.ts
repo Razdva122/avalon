@@ -1,6 +1,6 @@
 import { userSettingsInStorage } from '@/store/init';
-import locale from 'locale';
-import type { IUserSettings } from '@/store/interface';
+import { pageLanguage, preferredLanguage, parseStoredObject } from './policy';
+import { isNeutralPath } from '@/router/paths';
 
 import type { TLanguage } from '@/i18n/interface';
 export * from '@/i18n/interface';
@@ -17,23 +17,6 @@ export const LanguageMap: { [key in TLanguage]: string } = {
 };
 
 export function selectLocale(): TLanguage {
-  if (userSettingsInStorage) {
-    const settings: IUserSettings = JSON.parse(userSettingsInStorage);
-
-    if (settings.locale?.isDefault === false) {
-      return settings.locale.value;
-    }
-  }
-
-  const localeFromRoute = document.location.pathname.split('/')[1];
-
-  const validLanguage = Object.keys(LanguageMap).find((el) => el.toLowerCase() === localeFromRoute.toLocaleLowerCase());
-
-  if (validLanguage) {
-    return <TLanguage>validLanguage;
-  }
-
-  const parsedLocales = new locale.Locales(navigator.languages);
-
-  return <TLanguage>parsedLocales.best(new locale.Locales(Object.keys(LanguageMap))).language;
+  const preferred = preferredLanguage(parseStoredObject(userSettingsInStorage), navigator.languages);
+  return pageLanguage(document.location.pathname, isNeutralPath(document.location.pathname), preferred);
 }

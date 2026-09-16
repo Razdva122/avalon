@@ -3,7 +3,9 @@
     <span class="online">{{ $t('mainPage.online', { count: online }) }}</span>
     <template v-if="errorMessage">
       <h1 class="mb-4">{{ $t('room.' + errorMessage.error) }}</h1>
-      <v-btn size="x-large" @click="$router.push({ name: 'lobby' })">{{ $t('room.backToLobby') }}</v-btn>
+      <LocaleLink :to="{ name: 'lobby' }"
+        ><v-btn size="x-large">{{ $t('room.backToLobby') }}</v-btn></LocaleLink
+      >
     </template>
     <template v-else>
       <Board :room-state="roomState">
@@ -44,6 +46,8 @@
 </template>
 
 <script lang="ts">
+import { localizedPath } from '@/router/paths';
+import { i18n } from '@/plugins/i18n';
 import { useRouter } from 'vue-router';
 import { defineComponent, ref, computed, watch } from 'vue';
 import Board from '@/components/view/board/Board.vue';
@@ -131,7 +135,7 @@ export default defineComponent({
 
     socket.on('destroyRoom', (gameUUID) => {
       if (gameUUID === props.uuid) {
-        router.push({ name: 'lobby' });
+        router.push(localizedPath('/', i18n.global.locale.value));
       }
     });
 

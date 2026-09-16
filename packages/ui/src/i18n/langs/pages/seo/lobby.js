@@ -6,9 +6,9 @@ module.exports.lobby = {
     keywords: ['Jogar'],
   },
   en: {
-    title: 'Play Avalon Online!',
+    title: 'Play Avalon Online Free with Friends | The Resistance',
     description:
-      "Explore the legendary game of strategic deduction with 'Avalon: The Resistance' — free to play online. Learn the rules, join a spirited community.",
+      'Play The Resistance: Avalon online for free with 5–10 players. Learn the roles and rules, create a room, and invite your friends with a link.',
     keywords: ['Play'],
   },
   ru: {
@@ -18,8 +18,9 @@ module.exports.lobby = {
     keywords: ['Играть'],
   },
   'zh-TW': {
-    title: '在線遊戲阿瓦隆！',
-    description: '探索傳奇的策略推理遊戲「阿瓦隆：反抗勢力」——免費在線玩。學習規則，加入活力四射的社群。',
+    title: '阿瓦隆線上遊戲｜免費與朋友一起玩',
+    description:
+      '免費線上玩阿瓦隆，支援 5–10 人。了解遊戲規則與角色能力，登入後建立房間，分享連結邀請朋友，一起推理、投票並完成任務。',
     keywords: ['遊玩'],
   },
   'zh-CN': {

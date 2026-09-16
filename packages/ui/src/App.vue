@@ -1,7 +1,7 @@
 <template>
   <header class="header">
     <div class="header-left-container d-flex align-center mr-4 ml-4">
-      <v-btn class="mr-1" density="comfortable" variant="plain" color="invert" size="large" to="/" icon>
+      <v-btn class="mr-1" density="comfortable" variant="plain" color="invert" size="large" :to="homePath" icon>
         <v-icon class="home-icon" size="large" icon="fa:fa-solid fa-house" />
       </v-btn>
       <Socials class="mr-4" />
@@ -25,6 +25,7 @@
       </Transition>
     </template>
   </RouterView>
+  <LanguageSuggestion />
   <AuthModal />
   <CredentialsModal />
   <InfoSnackbar />
@@ -33,7 +34,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, unref } from 'vue';
+import { localizedPath } from '@/router/paths';
+import LanguageSuggestion from '@/components/feedback/LanguageSuggestion.vue';
 import AuthModal from '@/components/user/AuthModal.vue';
 import CredentialsModal from '@/components/user/CredentialsModal.vue';
 import Menu from '@/components/header/Menu.vue';
@@ -51,6 +54,7 @@ import eventBus from '@/helpers/event-bus';
 export default defineComponent({
   components: {
     AuthModal,
+    LanguageSuggestion,
     ConnectStatus,
     InfoSnackbar,
     Version,
@@ -68,6 +72,9 @@ export default defineComponent({
     };
   },
   computed: {
+    homePath() {
+      return localizedPath('/', unref(this.$i18n.locale));
+    },
     currentRoute() {
       return this.$route.name;
     },

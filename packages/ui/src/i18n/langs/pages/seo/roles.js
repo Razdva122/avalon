@@ -6,9 +6,9 @@ module.exports.roles = {
     keywords: ['Papéis', 'Regras', 'Merlin', 'Percival', 'Morgana', 'Oberon', 'Mordred', 'Dicas'],
   },
   en: {
-    title: 'Avalon: The Resistance | Roles',
+    title: 'Avalon Roles: Merlin, Percival, Morgana & More',
     description:
-      "All available roles in the board game 'Avalon: The Resistance'. Rules for roles: Merlin, Percival, Morgana, Oberon, Mordred",
+      'Explore Avalon roles, their abilities and allegiances. Learn who Merlin and Percival can see, how evil roles work, and which characters to add to your game.',
     keywords: ['Roles', 'Rules', 'Merlin', 'Percival', 'Morgana', 'Oberon', 'Mordred', 'Tips'],
   },
   ru: {
