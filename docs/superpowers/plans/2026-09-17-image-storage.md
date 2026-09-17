@@ -40,7 +40,7 @@ Files: `packages/ui/scripts/upload-images.cjs`, `packages/ui/scripts/upload-imag
 
 ## Task 3: Integration and setup
 
-Files: `packages/ui/README.md`, `packages/ui/package.json`, `memory-bank/memory-bank-frontend.md`.
+Files: `packages/ui/README.md`, `packages/ui/package.json`.
 
 - [x] Document secret names, least-privilege bucket access, release steps, caching, development and rollback.
 - [x] Run uploader/configuration tests, full production build, artifact audit and focused code review.
