@@ -44,4 +44,11 @@ Files: `packages/ui/README.md`, `packages/ui/package.json`, `memory-bank/memory-
 
 - [x] Document secret names, least-privilege bucket access, release steps, caching, development and rollback.
 - [x] Run uploader/configuration tests, full production build, artifact audit and focused code review.
-- [ ] Run the manual GitHub workflow against this branch and verify all public objects using the configured repository secrets.
+- [x] Run the manual GitHub workflow against this branch and verify all public objects using the configured repository secrets. Run `35208006794` succeeded; an independent local `--verify-only` verified all 99 public images.
+
+## Additional release compatibility checks
+
+- Unchanged image bytes keep the same URL across code-only releases; changed artwork gets a new URL (Webpack integration test).
+- Upload sync uses `--size-only` to skip unchanged hashed objects regardless of rebuild timestamps.
+- On 2026-09-17, the bucket console showed versioning disabled and no lifecycle configuration.
+- CI still publishes artifacts only; live-server rollout remains delayed until games finish.

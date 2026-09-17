@@ -104,3 +104,46 @@ for (const mode of ['cloud', 'local']) {
     );
   });
 }
+
+test('release code changes preserve image URLs; only changed image bytes get a new URL', async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'avalon-image-versions-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const image = path.join(dir, 'art.webp');
+  let build = 0;
+  async function compile(release) {
+    fs.writeFileSync(
+      path.join(dir, 'entry.js'),
+      `exports.release = ${JSON.stringify(release)}; exports.image = require('./art.webp');`,
+    );
+    const filename = `bundle-${++build}.cjs`;
+    const compiler = webpack({
+      mode: 'production',
+      target: 'node',
+      context: dir,
+      entry: './entry.js',
+      output: { path: path.join(dir, 'out'), filename, publicPath: '/', library: { type: 'commonjs2' } },
+      module: {
+        rules: [{ test: /\.webp$/, type: 'asset/resource', generator: imageGenerator({ NODE_ENV: 'production' }) }],
+      },
+      performance: false,
+    });
+    await new Promise((resolve, reject) =>
+      compiler.run((error, stats) =>
+        compiler.close(() => {
+          if (error) reject(error);
+          else if (stats.hasErrors()) reject(new Error(stats.toString({ all: false, errors: true })));
+          else resolve();
+        }),
+      ),
+    );
+    return require(path.join(dir, 'out', filename));
+  }
+  fs.copyFileSync(path.join(ui, 'src/assets/images/roles/merlin.webp'), image);
+  const first = await compile('v1');
+  const second = await compile('v2');
+  assert.notEqual(first.release, second.release);
+  assert.equal(first.image, second.image, 'a code-only release must reuse the existing image URL');
+  fs.copyFileSync(path.join(ui, 'src/assets/images/roles/morgana.webp'), image);
+  const third = await compile('v3');
+  assert.notEqual(second.image, third.image, 'changed artwork must not replace an old cached URL');
+});

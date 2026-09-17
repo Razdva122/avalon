@@ -68,6 +68,10 @@ test('uploads only images with MIME and immutable cache metadata, then verifies 
     assert(args.includes('public, max-age=31536000, immutable'));
     assert(!args.includes('--acl'), 'uploader must not need ACL administration rights');
     assert(!args.includes('--delete'));
+    assert(
+      args.includes('--size-only'),
+      'unchanged hashed objects must not be uploaded again because of build timestamps',
+    );
     assert(!args.some((arg) => arg.includes('test-secret')));
     assert.equal(options.env.AWS_DEFAULT_REGION, 'ru-central1');
   }

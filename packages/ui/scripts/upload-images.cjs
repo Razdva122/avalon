@@ -48,6 +48,8 @@ function uploadCommands(dir, files) {
       '*',
       '--include',
       `*.${ext}`,
+      // Names include the content hash; rebuild timestamps must not cause re-uploads.
+      '--size-only',
       '--cache-control',
       storage.cacheControl,
       '--content-type',

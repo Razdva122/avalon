@@ -79,6 +79,9 @@ filename for SEO metadata. `getIconPathByName(name)` and the SCSS helpers take I
 without the `.webp` extension. Do not add literal storage URLs or component-level
 image imports. Webpack emits separate files with a 16-character content hash;
 image bytes are not embedded in JavaScript. JS, CSS and SEO use the same URLs.
+The hash depends on file contents, not release number or time. Upload sync uses
+`--size-only`, so unchanged hashed objects are skipped even when build timestamps
+change; bucket versioning does not accumulate duplicate uploads for those files.
 
 `image-storage.cjs` is shared by Webpack, release validation and the uploader.
 Production URLs use `https://storage.yandexcloud.net/avalon-game/assets/img/`.
@@ -122,6 +125,10 @@ CI checks every public image URL for HTTP 200, content length, MIME type and cac
 headers. Only then does `ui-release.Dockerfile` package that exact exported build
 into the existing Nginx image. Storage credentials are scoped to the upload step, never Docker build arguments
 or frontend environment variables. Preflight only receives secret-presence booleans.
+
+CI publication does not deploy or restart the live server. Deploy the prepared
+container after current games finish, as before. Old server versions and open
+client tabs retain their original image URLs during this delay and after rollout.
 
 The uploader never deletes historical objects or the legacy `images/` / `icons/`
 prefixes. Keep those objects for old clients and rollbacks. Keep lifecycle rules
