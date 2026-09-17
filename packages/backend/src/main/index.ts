@@ -197,7 +197,6 @@ export class Manager {
     io.on('connection', (socket) => {
       // Register endpoints
       registerRatingEndpoints(socket);
-      registerTrueSkillRatingEndpoints(socket);
       registerAchievementEndpoints(socket);
       handleSocketErrors(socket);
       this.updateOnlineCounter('lobby', 1);
@@ -221,6 +220,8 @@ export class Manager {
           socket.emit('renewJWT');
         }
       }
+
+      registerTrueSkillRatingEndpoints(socket, userState.userID);
 
       if (userState.userID) {
         socket.join(userState.userID);

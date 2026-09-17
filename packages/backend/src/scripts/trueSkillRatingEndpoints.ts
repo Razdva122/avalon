@@ -1,14 +1,35 @@
-import { playerTrueSkillRatingModel, gameTrueSkillResultModel } from '../db/models';
+import { playerTrueSkillRatingModel, gameTrueSkillResultModel, userFeaturesModel } from '../db/models';
+import { hasPremium } from '@/support/premium';
+import { supportTotalCents } from '@/support/repository';
 import { ServerSocket } from '@avalon/types';
 import { trueSkillCalculator } from './trueSkillCalculator';
 import { TrueSkillLeaderboardEntry } from '@avalon/types/api/trueskill-sockets';
 import { DEFAULT_MU, DEFAULT_SIGMA, calculateConservativeRating } from '@avalon/types/stats/trueskill-constants';
 
+async function resetCooldownMonths(userID: string): Promise<1 | 3> {
+  const [total, features] = await Promise.all([
+    supportTotalCents(userID),
+    userFeaturesModel.findOne({ userID }).lean(),
+  ]);
+  return hasPremium(total, features) ? 1 : 3;
+}
+
+function nextResetDate(lastResetAt: Date | undefined, months: number): Date | undefined {
+  if (!lastResetAt) return undefined;
+  const next = new Date(lastResetAt);
+  const day = next.getUTCDate();
+  next.setUTCDate(1);
+  next.setUTCMonth(next.getUTCMonth() + months);
+  const lastDay = new Date(Date.UTC(next.getUTCFullYear(), next.getUTCMonth() + 1, 0)).getUTCDate();
+  next.setUTCDate(Math.min(day, lastDay));
+  return next;
+}
+
 /**
  * Register TrueSkill rating endpoints
  * @param socket The socket instance
  */
-export function registerTrueSkillRatingEndpoints(socket: ServerSocket): void {
+export function registerTrueSkillRatingEndpoints(socket: ServerSocket, authenticatedUserID?: string): void {
   // Get player TrueSkill rating
   socket.on('getTrueSkillRating', async (userID: string, callback) => {
     const rating = await playerTrueSkillRatingModel.findOne({ userID }).lean();
@@ -21,10 +42,19 @@ export function registerTrueSkillRatingEndpoints(socket: ServerSocket): void {
       return;
     }
 
-    callback({
-      success: true,
-      rating,
-    });
+    // Cooldown details are private, independent of public badge visibility.
+    try {
+      const months = userID === authenticatedUserID ? await resetCooldownMonths(userID) : undefined;
+      callback({
+        success: true,
+        rating,
+        ...(months
+          ? { resetCooldownMonths: months, nextResetAvailableAt: nextResetDate(rating.lastResetAt, months) }
+          : {}),
+      });
+    } catch {
+      callback({ success: false, error: 'Failed to load rating reset availability' });
+    }
   });
 
   // Get TrueSkill leaderboard
@@ -95,6 +125,10 @@ export function registerTrueSkillRatingEndpoints(socket: ServerSocket): void {
       callback: (result: { success: boolean; message?: string; error?: string; nextResetAvailableAt?: Date }) => void,
     ) => {
       try {
+        if (!authenticatedUserID || userID !== authenticatedUserID) {
+          callback({ success: false, error: 'Unauthorized' });
+          return;
+        }
         // Получаем текущий рейтинг пользователя
         const rating = await playerTrueSkillRatingModel.findOne({ userID }).lean();
 
@@ -106,34 +140,40 @@ export function registerTrueSkillRatingEndpoints(socket: ServerSocket): void {
           return;
         }
 
-        // Проверяем, прошло ли 3 месяца с момента последнего сброса
-        const threeMonthsAgo = new Date();
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
-        if (rating.lastResetAt && new Date(rating.lastResetAt) > threeMonthsAgo) {
-          callback({
-            success: false,
-            error: 'Rating can only be reset once every 3 months',
-            nextResetAvailableAt: rating.lastResetAt,
-          });
+        const months = await resetCooldownMonths(userID);
+        const now = new Date();
+        const nextResetAvailableAt = nextResetDate(rating.lastResetAt, months);
+        if (nextResetAvailableAt && now < nextResetAvailableAt) {
+          callback({ success: false, error: 'Rating reset cooldown is active', nextResetAvailableAt });
           return;
         }
 
         // Сбрасываем рейтинг на стандартные значения
-        await playerTrueSkillRatingModel.updateOne(
-          { userID },
+        const updated = await playerTrueSkillRatingModel.updateOne(
+          // Compare the reset we read so concurrent requests cannot both reset.
+          { userID, lastResetAt: rating.lastResetAt ?? null },
           {
             $set: {
               mu: DEFAULT_MU,
               sigma: DEFAULT_SIGMA,
               conservativeRating: calculateConservativeRating(DEFAULT_MU, DEFAULT_SIGMA),
-              lastResetAt: new Date(),
+              lastResetAt: now,
             },
           },
         );
 
+        if (!updated.matchedCount) {
+          const current = await playerTrueSkillRatingModel.findOne({ userID }).lean();
+          callback({
+            success: false,
+            error: 'Rating reset cooldown is active',
+            nextResetAvailableAt: nextResetDate(current?.lastResetAt, months),
+          });
+          return;
+        }
         callback({
           success: true,
+          nextResetAvailableAt: nextResetDate(now, months),
           message: 'Rating has been reset successfully',
         });
       } catch (error) {

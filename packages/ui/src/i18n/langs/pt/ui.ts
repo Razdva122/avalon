@@ -47,6 +47,9 @@ export default {
     styleAnime: 'Anime',
     resetRating: 'Redefinir Classificação',
     resetRatingHint: 'Redefinir sua classificação para valores padrão',
+    resetRatingConfirmTextPremium:
+      'Tem certeza de que deseja redefinir sua classificação? Com Premium, você pode fazer isso uma vez por mês.',
+    resetRatingCooldownPremium: 'Com Premium, a classificação pode ser redefinida uma vez por mês',
     resetRatingConfirmTitle: 'Redefinir Classificação',
     resetRatingConfirmText:
       'Tem certeza de que deseja redefinir sua classificação? Esta ação só pode ser realizada uma vez a cada 3 meses.',

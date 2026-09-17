@@ -48,6 +48,9 @@ export default {
     styleAnime: 'Anime',
     resetRating: 'Restablecer Clasificación',
     resetRatingHint: 'Restablecer tu clasificación a valores predeterminados',
+    resetRatingConfirmTextPremium:
+      '¿Seguro que quieres restablecer tu clasificación? Con Premium puedes hacerlo una vez al mes.',
+    resetRatingCooldownPremium: 'Con Premium puedes restablecer la clasificación una vez al mes',
     resetRatingConfirmTitle: 'Restablecer Clasificación',
     resetRatingConfirmText:
       '¿Estás seguro de que quieres restablecer tu clasificación? Esta acción solo se puede realizar una vez cada 3 meses.',

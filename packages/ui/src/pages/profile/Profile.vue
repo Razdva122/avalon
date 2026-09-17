@@ -176,6 +176,11 @@
             <div class="danger-info">
               <div class="danger-title">{{ $t('profile.resetRating') }}</div>
               <div class="danger-description">{{ $t('profile.resetRatingHint') }}</div>
+              <div class="danger-description">
+                {{
+                  $t(resetCooldownMonths === 1 ? 'profile.resetRatingCooldownPremium' : 'profile.resetRatingCooldown')
+                }}
+              </div>
               <div v-if="!canResetRating" class="danger-cooldown">
                 {{ $t('profile.nextResetAvailable') }}: {{ formatNextResetDate }}
               </div>
@@ -204,7 +209,9 @@
           {{ $t('profile.resetRatingConfirmTitle') }}
         </v-card-title>
         <v-card-text class="dialog-text">
-          {{ $t('profile.resetRatingConfirmText') }}
+          {{
+            $t(resetCooldownMonths === 1 ? 'profile.resetRatingConfirmTextPremium' : 'profile.resetRatingConfirmText')
+          }}
         </v-card-text>
         <v-card-actions class="dialog-actions">
           <v-btn color="primary" variant="tonal" @click="resetRatingDialog = false" class="dialog-btn">
@@ -255,6 +262,7 @@ export default defineComponent({
       // Добавляем новые поля для функционала сброса рейтинга
       resetRatingDialog: false,
       nextResetDate: null as Date | null,
+      resetCooldownMonths: 3 as 1 | 3,
       ratingResetLoading: false,
       trueSkillRating: null as PlayerTrueSkillRating | null,
       ratingLoading: true,
@@ -405,15 +413,18 @@ export default defineComponent({
           this.checkResetRatingAvailability();
         } else {
           // Показываем уведомление об ошибке
-          eventBus.emit('infoMessage', response.error || this.$t('infoMessage.ratingResetError'));
+          eventBus.emit(
+            'infoMessage',
+            response.nextResetAvailableAt
+              ? this.$t(
+                  this.resetCooldownMonths === 1 ? 'profile.resetRatingCooldownPremium' : 'profile.resetRatingCooldown',
+                )
+              : this.$t('infoMessage.ratingResetError'),
+          );
 
           // Если есть дата следующего возможного сброса, сохраняем её
           if (response.nextResetAvailableAt) {
-            const lastResetDate = new Date(response.nextResetAvailableAt);
-            const nextResetDate = new Date(lastResetDate);
-            nextResetDate.setMonth(nextResetDate.getMonth() + 3);
-
-            this.nextResetDate = nextResetDate;
+            this.nextResetDate = new Date(response.nextResetAvailableAt);
           }
         }
       });
@@ -430,13 +441,8 @@ export default defineComponent({
         if (response.success && response.rating) {
           this.trueSkillRating = response.rating;
 
-          if (response.rating.lastResetAt) {
-            const lastResetDate = new Date(response.rating.lastResetAt);
-            const nextResetDate = new Date(lastResetDate);
-            nextResetDate.setMonth(nextResetDate.getMonth() + 3);
-
-            this.nextResetDate = nextResetDate;
-          }
+          this.resetCooldownMonths = response.resetCooldownMonths ?? 3;
+          this.nextResetDate = response.nextResetAvailableAt ? new Date(response.nextResetAvailableAt) : null;
         }
       });
     },

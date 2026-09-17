@@ -1,5 +1,5 @@
 const en = {
-  title: 'Mind games',
+  title: 'Avatars and stickers',
   description: 'Two exclusive avatars. Two reactions that say it all. Included with lifetime Premium.',
   avatar: 'Exclusive avatar',
   sticker: 'Exclusive sticker',
@@ -21,7 +21,7 @@ const en = {
   support: 'Unlock Premium',
 };
 const ru: typeof en = {
-  title: 'Игры разума',
+  title: 'Аватары и стикеры',
   description: 'Две эксклюзивные аватарки. Две реакции, которые говорят за вас. Входят в Premium навсегда.',
   avatar: 'Эксклюзивная аватарка',
   sticker: 'Эксклюзивный стикер',
@@ -43,7 +43,7 @@ const ru: typeof en = {
   support: 'Открыть Premium',
 };
 const es: typeof en = {
-  title: 'Juegos mentales',
+  title: 'Avatares y stickers',
   description: 'Dos avatares exclusivos. Dos reacciones que lo dicen todo. Incluidos con Premium de por vida.',
   avatar: 'Avatar exclusivo',
   sticker: 'Sticker exclusivo',
@@ -65,7 +65,7 @@ const es: typeof en = {
   support: 'Obtener Premium',
 };
 const pt: typeof en = {
-  title: 'Jogos mentais',
+  title: 'Avatares e stickers',
   description: 'Dois avatares exclusivos. Duas reações que dizem tudo. Incluídos no Premium permanente.',
   avatar: 'Avatar exclusivo',
   sticker: 'Sticker exclusivo',
@@ -87,7 +87,7 @@ const pt: typeof en = {
   support: 'Obter Premium',
 };
 const zhCN: typeof en = {
-  title: '心理博弈',
+  title: '头像和贴纸',
   description: '两款专属头像，两款传神贴纸。永久 Premium 即可拥有。',
   avatar: '专属头像',
   sticker: '专属贴纸',
@@ -108,7 +108,7 @@ const zhCN: typeof en = {
   support: '解锁 Premium',
 };
 const zhTW: typeof en = {
-  title: '心理博弈',
+  title: '頭像和貼紙',
   description: '兩款專屬頭像，兩款傳神貼圖。永久 Premium 即可擁有。',
   avatar: '專屬頭像',
   sticker: '專屬貼圖',

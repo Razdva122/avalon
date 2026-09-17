@@ -48,6 +48,9 @@ export default {
     styleAnime: 'Аниме',
     resetRating: 'Сбросить рейтинг',
     resetRatingHint: 'Сбросить ваш рейтинг до стандартных значений',
+    resetRatingConfirmTextPremium:
+      'Вы уверены, что хотите сбросить свой рейтинг? С Premium это можно сделать раз в месяц.',
+    resetRatingCooldownPremium: 'С Premium рейтинг можно сбрасывать раз в месяц',
     resetRatingConfirmTitle: 'Сброс рейтинга',
     resetRatingConfirmText:
       'Вы уверены, что хотите сбросить свой рейтинг? Это действие можно выполнить только раз в 3 месяца.',

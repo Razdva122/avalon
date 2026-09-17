@@ -48,6 +48,8 @@ export default {
     styleAnime: '动漫',
     resetRating: '重置评分',
     resetRatingHint: '将您的评分重置为默认值',
+    resetRatingConfirmTextPremium: '确定要重置评分吗？Premium 用户每月可重置一次。',
+    resetRatingCooldownPremium: 'Premium 用户每月可重置一次评分',
     resetRatingConfirmTitle: '重置评分',
     resetRatingConfirmText: '您确定要重置您的评分吗？此操作每3个月只能执行一次。',
     resetRatingSuccess: '您的评分已成功重置',

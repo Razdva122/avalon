@@ -3,7 +3,7 @@
     <div class="collection-heading">
       <div>
         <h3 id="premium-collection-title">{{ t('premiumCosmetics.title') }}</h3>
-        <p>{{ t('premiumCosmetics.description') }}</p>
+        <p v-if="!compact">{{ t('premiumCosmetics.description') }}</p>
       </div>
       <span v-if="active" class="included">{{ t('premiumCosmetics.included') }}</span>
     </div>
@@ -16,12 +16,12 @@
         <div class="exclusive-copy">
           <span class="exclusive-kind">{{ t('premiumCosmetics.' + item.kind) }}</span>
           <h4>{{ t('premiumCosmetics.' + item.id) }}</h4>
-          <p>{{ t('premiumCosmetics.' + item.description) }}</p>
+          <p v-if="!compact">{{ t('premiumCosmetics.' + item.description) }}</p>
         </div>
       </article>
     </div>
-    <footer class="collection-footer">
-      <p>{{ t('premiumCosmetics.activation') }}</p>
+    <footer v-if="!compact" class="collection-footer">
+      <p v-if="!compact">{{ t('premiumCosmetics.activation') }}</p>
       <router-link v-if="active" class="collection-action" :to="{ name: 'profile' }">{{
         t('premiumCosmetics.collection')
       }}</router-link>
@@ -33,7 +33,7 @@
 import { getImagePathByID } from '@/helpers/images';
 import { useI18n } from 'vue-i18n';
 import StickerImage from '@/components/stickers/StickerImage.vue';
-defineProps<{ active: boolean }>();
+defineProps<{ active: boolean; compact?: boolean }>();
 const { t } = useI18n();
 // Marketing previews remain visible even when gameplay cosmetics are disabled.
 const avatarPreviews: Record<string, string> = {

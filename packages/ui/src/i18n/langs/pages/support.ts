@@ -1,4 +1,37 @@
 const en = {
+  patronNamePerk: 'Your name permanently on the About page.',
+  patronContactPerk: 'A Discord or other gaming messenger link on the community page when it launches.',
+  creatorRolePerk: 'A new character developed around your ideas and wishes. We will agree on its abilities together.',
+  creatorAchievementPerk: 'A unique achievement, designed and agreed with you.',
+
+  lifetimePremium: 'Lifetime Premium',
+  rewardConditions: 'Reward details and conditions',
+  resetPreview: 'Reset TrueSkill from your profile once a month. Your games and achievements stay intact.',
+
+  benefitsTitle: 'Support rewards',
+  showBenefits: 'Show all benefits',
+  hideBenefits: 'Hide details',
+  premiumPreview:
+    'Lifetime Premium, exclusive avatars and stickers, a badge, privacy controls and a monthly rating reset.',
+  patronTitle: 'Leave your name in Avalon',
+  patronPreview: 'Your name on the About page forever, plus a gaming contact on the future community page.',
+  creatorTitle: 'A character of your own',
+  creatorPreview: 'A character created for your ideas and a unique achievement agreed with you.',
+  tiersNote:
+    'Contribution levels use your total confirmed support. Each level includes the benefits of the previous ones.',
+  resetTitle: 'A rating reset every month',
+  resetDescription:
+    'Premium lets you use the existing TrueSkill reset once a month instead of once every three months. Reset from your profile; your match history, game statistics and achievements stay intact.',
+  patronDescription:
+    'With $50 in total support, your name will be permanently featured on the About page. You can also add a link to your Discord or another gaming messenger on the community page once it launches.',
+  communitySoon: 'The community page is coming later. Contact links will be added when it is available.',
+  creatorDescription:
+    'With $1,000 in total support, you can request a new game character developed around your ideas and wishes, plus a unique achievement agreed with you. We will work out the character’s abilities and implementation together.',
+  rewardContact:
+    'For the $50 and $1,000 rewards, contact the team to agree on your public name, contact link or character and achievement details. Anonymous donations do not publish your name automatically.',
+  fairDescription:
+    'All roles and game modes remain available to everyone. Premium keeps the same game rules and rating calculation; only the reset cooldown is shorter.',
+
   awaitingNotification:
     'No payment notification has arrived yet. If you have paid, contact the project team with the invoice ID below so they can reconcile the payment.',
   title: 'Keep Avalon online',
@@ -12,8 +45,6 @@ const en = {
   privacyTitle: 'Your choice of visibility',
   privacyDescription: 'Support anonymously and choose whether to display your Premium badge.',
   fairTitle: 'The same game for everyone',
-  fairDescription:
-    'All roles and game modes remain available to everyone. Premium does not change ratings or game rules.',
   checkout: 'Support with cryptocurrency',
   amount: 'Amount (USD)',
   anonymous: 'Make this donation anonymous',
@@ -49,7 +80,7 @@ const en = {
   rateError: 'Please wait one minute before creating another invoice.',
   bannerTitle: 'Become an Avalon patron',
   bannerLink: 'Explore Premium',
-  bannerText: 'Support the project and unlock Premium.',
+  bannerText: 'Exclusive avatars, stickers and a monthly rating reset.',
   creating: 'Creating invoice',
   waiting: 'Awaiting payment',
   confirming: 'Confirming',
@@ -67,6 +98,39 @@ const en = {
   test_paid: 'Test payment completed',
 };
 const ru: typeof en = {
+  patronNamePerk: 'Ваше имя навсегда на странице «О сайте».',
+  patronContactPerk: 'Ссылка на Discord или другой мессенджер для игр на странице комьюнити после её запуска.',
+  creatorRolePerk: 'Новый персонаж по вашим идеям и пожеланиям. Способности и реализацию обсудим вместе.',
+  creatorAchievementPerk: 'Уникальное достижение, разработанное и согласованное с вами.',
+
+  lifetimePremium: 'Premium навсегда',
+  rewardConditions: 'Подробности и условия наград',
+  resetPreview: 'Сбрасывайте TrueSkill в профиле раз в месяц. История игр и достижения сохраняются.',
+
+  benefitsTitle: 'Что даёт поддержка',
+  showBenefits: 'Все преимущества',
+  hideBenefits: 'Скрыть подробности',
+  premiumPreview:
+    'Premium навсегда, особые аватары и стикеры, значок, настройки приватности и сброс рейтинга раз в месяц.',
+  patronTitle: 'Ваше имя в истории Avalon',
+  patronPreview: 'Имя навсегда на странице «О сайте» и игровой контакт на будущей странице комьюнити.',
+  creatorTitle: 'Персонаж по вашей идее',
+  creatorPreview: 'Новый персонаж по вашим пожеланиям и уникальное достижение, согласованное с вами.',
+  tiersNote:
+    'Уровень поддержки определяется общей суммой подтверждённых донатов. Каждый следующий уровень включает преимущества предыдущих.',
+  resetTitle: 'Сброс рейтинга раз в месяц',
+  resetDescription:
+    'С Premium существующий сброс рейтинга TrueSkill доступен раз в месяц вместо одного раза в три месяца. Кнопка находится в профиле; история партий, игровая статистика и достижения сохраняются.',
+  patronDescription:
+    'За поддержку на общую сумму $50 ваше имя навсегда останется на странице «О сайте». Также вы сможете добавить ссылку на свой Discord или другой мессенджер для совместных игр на странице комьюнити после её запуска.',
+  communitySoon: 'Страницу комьюнити мы сделаем позже. Возможность разместить контакт появится с её запуском.',
+  creatorDescription:
+    'За поддержку на общую сумму $1000 вы сможете добавить в игру нового персонажа, разработанного специально по вашим идеям и пожеланиям, а также уникальное достижение, согласованное с вами. Способности персонажа и детали реализации обсудим вместе.',
+  rewardContact:
+    'Чтобы получить награды за $50 и $1000, свяжитесь с командой: согласуем публичное имя, контакт или детали персонажа и достижения. Анонимный донат не публикует ваше имя автоматически.',
+  fairDescription:
+    'Все роли и режимы доступны каждому. Правила игры и расчёт рейтинга одинаковы для всех; Premium сокращает только срок ожидания между сбросами.',
+
   awaitingNotification:
     'Уведомление о платеже пока не поступило. Если вы уже оплатили счёт, передайте его номер ниже команде проекта для проверки.',
   title: 'Помогите Avalon оставаться онлайн',
@@ -81,7 +145,6 @@ const ru: typeof en = {
   privacyTitle: 'Вы управляете видимостью',
   privacyDescription: 'Поддерживайте анонимно и выбирайте, показывать ли значок Premium.',
   fairTitle: 'Общая игра для всех',
-  fairDescription: 'Все роли и режимы доступны каждому. Premium не меняет рейтинг и правила игры.',
   checkout: 'Поддержать криптовалютой',
   amount: 'Сумма (USD)',
   anonymous: 'Поддержать анонимно',
@@ -117,7 +180,7 @@ const ru: typeof en = {
   rateError: 'Перед созданием следующего счёта подождите минуту.',
   bannerTitle: 'Поддержите проект',
   bannerLink: 'Получить Premium',
-  bannerText: 'Поддержите проект и откройте Premium.',
+  bannerText: 'Особые аватары, стикеры и сброс рейтинга раз в месяц.',
   creating: 'Создаём счёт',
   waiting: 'Ожидаем оплату',
   confirming: 'Подтверждаем',
@@ -135,6 +198,39 @@ const ru: typeof en = {
   test_paid: 'Тестовая оплата завершена',
 };
 const es: typeof en = {
+  patronNamePerk: 'Tu nombre para siempre en la página Acerca de.',
+  patronContactPerk: 'Un enlace a Discord u otro mensajero para jugar en la página de comunidad cuando se lance.',
+  creatorRolePerk: 'Un personaje nuevo basado en tus ideas y deseos. Acordaremos juntos sus habilidades.',
+  creatorAchievementPerk: 'Un logro único, diseñado y acordado contigo.',
+
+  lifetimePremium: 'Premium de por vida',
+  rewardConditions: 'Detalles y condiciones',
+  resetPreview: 'Restablece TrueSkill desde tu perfil una vez al mes. Se conservan tus partidas y logros.',
+
+  benefitsTitle: 'Recompensas por apoyar',
+  showBenefits: 'Ver ventajas',
+  hideBenefits: 'Ocultar detalles',
+  premiumPreview:
+    'Premium de por vida, avatares y stickers exclusivos, insignia, privacidad y reinicio mensual de clasificación.',
+  patronTitle: 'Tu nombre en Avalon',
+  patronPreview: 'Tu nombre para siempre en Acerca de y un contacto para jugar en la futura página de comunidad.',
+  creatorTitle: 'Un personaje a tu medida',
+  creatorPreview: 'Un personaje basado en tus ideas y un logro único acordado contigo.',
+  tiersNote:
+    'Los niveles se basan en el total de aportaciones confirmadas. Cada nivel incluye las ventajas anteriores.',
+  resetTitle: 'Reinicio mensual de clasificación',
+  resetDescription:
+    'Con Premium puedes usar el reinicio de TrueSkill una vez al mes en lugar de cada tres meses. Está en tu perfil; se conservan partidas, estadísticas y logros.',
+  patronDescription:
+    'Con $50 de apoyo acumulado, tu nombre aparecerá permanentemente en Acerca de. También podrás añadir un enlace a tu Discord u otro servicio de mensajería para jugar en la página de comunidad cuando esté disponible.',
+  communitySoon: 'La página de comunidad llegará más adelante. Podrás publicar tu contacto cuando se lance.',
+  creatorDescription:
+    'Con $1000 de apoyo acumulado, podrás solicitar un personaje nuevo desarrollado según tus ideas y deseos, y un logro único acordado contigo. Definiremos juntos sus habilidades y los detalles de implementación.',
+  rewardContact:
+    'Para las recompensas de $50 y $1000, contacta con el equipo para acordar el nombre público, contacto o detalles del personaje y logro. Las donaciones anónimas no publican tu nombre automáticamente.',
+  fairDescription:
+    'Todos los roles y modos siguen disponibles para todos. Las reglas y el cálculo de clasificación son iguales; Premium solo acorta la espera entre reinicios.',
+
   awaitingNotification:
     'Aún no hemos recibido ninguna notificación de pago. Si ya has pagado, envía al equipo del proyecto el identificador de la factura que aparece abajo para que compruebe el pago.',
   title: 'Ayuda a mantener Avalon en línea',
@@ -150,8 +246,6 @@ const es: typeof en = {
   privacyTitle: 'Tú eliges qué mostrar',
   privacyDescription: 'Apoya de forma anónima y decide si quieres mostrar tu insignia Premium.',
   fairTitle: 'El mismo juego para todos',
-  fairDescription:
-    'Todos los roles y modos de juego siguen disponibles para todos. Premium no cambia las clasificaciones ni las reglas del juego.',
   checkout: 'Apoyar con criptomonedas',
   amount: 'Importe (USD)',
   anonymous: 'Hacer esta donación anónima',
@@ -188,7 +282,7 @@ const es: typeof en = {
   rateError: 'Espera un minuto antes de crear otra factura.',
   bannerTitle: 'Conviértete en mecenas de Avalon',
   bannerLink: 'Descubre Premium',
-  bannerText: 'Apoya el proyecto y obtén Premium.',
+  bannerText: 'Avatares y stickers exclusivos y reinicio mensual de clasificación.',
   creating: 'Creando factura',
   waiting: 'Esperando el pago',
   confirming: 'Confirmando',
@@ -206,6 +300,39 @@ const es: typeof en = {
   test_paid: 'Pago de prueba completado',
 };
 const pt: typeof en = {
+  patronNamePerk: 'Seu nome para sempre na página Sobre.',
+  patronContactPerk:
+    'Um link do Discord ou outro mensageiro para jogar na página da comunidade quando ela for lançada.',
+  creatorRolePerk: 'Um novo personagem baseado nas suas ideias e desejos. Combinaremos as habilidades juntos.',
+  creatorAchievementPerk: 'Uma conquista única, criada e combinada com você.',
+
+  lifetimePremium: 'Premium vitalício',
+  rewardConditions: 'Detalhes e condições',
+  resetPreview: 'Redefina o TrueSkill pelo perfil uma vez por mês. Suas partidas e conquistas são preservadas.',
+
+  benefitsTitle: 'Recompensas por apoiar',
+  showBenefits: 'Ver benefícios',
+  hideBenefits: 'Ocultar detalhes',
+  premiumPreview:
+    'Premium vitalício, avatares e stickers exclusivos, distintivo, privacidade e redefinição mensal da classificação.',
+  patronTitle: 'Seu nome no Avalon',
+  patronPreview: 'Seu nome para sempre na página Sobre e um contato para jogar na futura página da comunidade.',
+  creatorTitle: 'Um personagem da sua ideia',
+  creatorPreview: 'Um personagem criado a partir das suas ideias e uma conquista única combinada com você.',
+  tiersNote: 'Os níveis consideram o total de doações confirmadas. Cada nível inclui os benefícios anteriores.',
+  resetTitle: 'Redefinição mensal da classificação',
+  resetDescription:
+    'Com Premium, a redefinição existente do TrueSkill pode ser usada uma vez por mês, em vez de a cada três meses. Use seu perfil; partidas, estatísticas e conquistas são preservadas.',
+  patronDescription:
+    'Com $50 de apoio acumulado, seu nome ficará permanentemente na página Sobre. Você também poderá adicionar um link do Discord ou outro mensageiro para jogar na página da comunidade quando ela for lançada.',
+  communitySoon: 'A página da comunidade será criada mais tarde. Os contatos poderão ser publicados após o lançamento.',
+  creatorDescription:
+    'Com $1000 de apoio acumulado, você poderá solicitar um novo personagem desenvolvido a partir das suas ideias e desejos, além de uma conquista única combinada com você. Definiremos juntos as habilidades e os detalhes da implementação.',
+  rewardContact:
+    'Para as recompensas de $50 e $1000, fale com a equipe para combinar nome público, contato ou detalhes do personagem e da conquista. Doações anônimas não publicam seu nome automaticamente.',
+  fairDescription:
+    'Todos os papéis e modos continuam disponíveis para todos. As regras e o cálculo da classificação são iguais; Premium apenas reduz a espera entre redefinições.',
+
   awaitingNotification:
     'Ainda não recebemos uma notificação de pagamento. Se você já pagou, envie à equipe do projeto o identificador da fatura abaixo para que ela verifique o pagamento.',
   title: 'Ajude a manter Avalon online',
@@ -220,8 +347,6 @@ const pt: typeof en = {
   privacyTitle: 'Você escolhe o que mostrar',
   privacyDescription: 'Apoie anonimamente e escolha se deseja exibir seu emblema Premium.',
   fairTitle: 'O mesmo jogo para todos',
-  fairDescription:
-    'Todos os papéis e modos de jogo continuam disponíveis para todos. Premium não altera as classificações nem as regras do jogo.',
   checkout: 'Apoiar com criptomoedas',
   amount: 'Valor (USD)',
   anonymous: 'Fazer esta doação anonimamente',
@@ -258,7 +383,7 @@ const pt: typeof en = {
   rateError: 'Aguarde um minuto antes de criar outra fatura.',
   bannerTitle: 'Torne-se um apoiador de Avalon',
   bannerLink: 'Conheça o Premium',
-  bannerText: 'Apoie o projeto e obtenha Premium.',
+  bannerText: 'Avatares e stickers exclusivos e redefinição mensal da classificação.',
   creating: 'Criando fatura',
   waiting: 'Aguardando pagamento',
   confirming: 'Confirmando',
@@ -276,6 +401,36 @@ const pt: typeof en = {
   test_paid: 'Pagamento de teste concluído',
 };
 const zhCN: typeof en = {
+  patronNamePerk: '你的名字永久展示在关于页面。',
+  patronContactPerk: '社区页面上线后，可添加 Discord 或其他游戏通讯工具链接。',
+  creatorRolePerk: '根据你的创意和需求开发新角色，能力和实现细节将共同商定。',
+  creatorAchievementPerk: '与你共同设计并商定一项专属成就。',
+
+  lifetimePremium: '永久 Premium',
+  rewardConditions: '奖励详情与条件',
+  resetPreview: '每月可在个人资料中重置一次 TrueSkill，保留对局记录和成就。',
+
+  benefitsTitle: '支持奖励',
+  showBenefits: '查看全部权益',
+  hideBenefits: '收起详情',
+  premiumPreview: '永久 Premium、专属头像和贴纸、徽章、隐私设置，以及每月一次的评分重置。',
+  patronTitle: '在 Avalon 留下你的名字',
+  patronPreview: '名字永久展示在关于页面，并可在未来的社区页面添加游戏联系方式。',
+  creatorTitle: '按你的创意设计角色',
+  creatorPreview: '根据你的想法开发新角色，并与你商定专属成就。',
+  tiersNote: '支持等级按已确认捐赠的累计金额计算。每个等级包含之前等级的权益。',
+  resetTitle: '每月重置评分',
+  resetDescription:
+    'Premium 用户可每月使用一次现有的 TrueSkill 评分重置功能，普通用户仍为每三个月一次。可在个人资料页面操作；对局记录、游戏统计和成就均会保留。',
+  patronDescription:
+    '累计支持 $50，你的名字将永久展示在关于页面。社区页面上线后，你还可以添加 Discord 或其他用于组队游戏的通讯工具链接。',
+  communitySoon: '社区页面将在之后推出，届时可添加联系方式。',
+  creatorDescription:
+    '累计支持 $1000，你可以提出新角色的创意和需求，我们将据此开发，并与你商定一项专属成就。角色能力和实现细节将共同讨论。',
+  rewardContact:
+    '领取 $50 或 $1000 奖励时，请联系团队商定公开姓名、联系方式或角色及成就细节。匿名捐赠不会自动公开你的名字。',
+  fairDescription: '所有角色和游戏模式仍向所有人开放。游戏规则和评分算法保持一致；Premium 仅缩短评分重置的等待时间。',
+
   awaitingNotification: '尚未收到付款通知。如果您已付款，请将下方的账单编号提供给项目团队，以便核查。',
   title: '帮助 Avalon 持续运营',
   eyebrow: '支持项目',
@@ -288,7 +443,6 @@ const zhCN: typeof en = {
   privacyTitle: '由您决定是否公开',
   privacyDescription: '您可以匿名支持，并选择是否显示 Premium 徽章。',
   fairTitle: '人人享有公平的游戏',
-  fairDescription: '所有角色和游戏模式仍向所有人开放。Premium 不影响排名或游戏规则。',
   checkout: '使用加密货币支持',
   amount: '金额（美元）',
   anonymous: '匿名捐赠',
@@ -323,7 +477,7 @@ const zhCN: typeof en = {
   rateError: '请等待一分钟后再创建下一张账单。',
   bannerTitle: '成为 Avalon 的支持者',
   bannerLink: '了解 Premium',
-  bannerText: '支持项目，获得 Premium。',
+  bannerText: '专属头像、贴纸，以及每月一次的评分重置。',
   creating: '正在创建账单',
   waiting: '等待付款',
   confirming: '确认中',
@@ -341,6 +495,36 @@ const zhCN: typeof en = {
   test_paid: '测试付款已完成',
 };
 const zhTW: typeof en = {
+  patronNamePerk: '你的名字永久展示於關於頁面。',
+  patronContactPerk: '社群頁面上線後，可加入 Discord 或其他遊戲通訊工具連結。',
+  creatorRolePerk: '依你的創意和需求開發新角色，能力和實作細節將共同商定。',
+  creatorAchievementPerk: '與你共同設計並商定一項專屬成就。',
+
+  lifetimePremium: '永久 Premium',
+  rewardConditions: '獎勵詳情與條件',
+  resetPreview: '每月可於個人資料中重置一次 TrueSkill，保留對局紀錄和成就。',
+
+  benefitsTitle: '支持獎勵',
+  showBenefits: '查看所有權益',
+  hideBenefits: '收起詳情',
+  premiumPreview: '永久 Premium、專屬頭像和貼紙、徽章、隱私設定，以及每月一次的評分重置。',
+  patronTitle: '在 Avalon 留下你的名字',
+  patronPreview: '名字永久展示於關於頁面，並可在未來的社群頁面加入遊戲聯絡方式。',
+  creatorTitle: '依你的創意設計角色',
+  creatorPreview: '根據你的想法開發新角色，並與你商定專屬成就。',
+  tiersNote: '支持等級依已確認捐款的累計金額計算。每個等級包含之前等級的權益。',
+  resetTitle: '每月重置評分',
+  resetDescription:
+    'Premium 使用者可每月使用一次現有的 TrueSkill 評分重置功能，一般使用者仍為每三個月一次。可在個人資料頁面操作；對局紀錄、遊戲統計和成就均會保留。',
+  patronDescription:
+    '累計支持 $50，你的名字將永久展示於關於頁面。社群頁面上線後，你還可以加入 Discord 或其他用於組隊遊戲的通訊工具連結。',
+  communitySoon: '社群頁面將於之後推出，屆時可加入聯絡方式。',
+  creatorDescription:
+    '累計支持 $1000，你可以提出新角色的創意和需求，我們將據此開發，並與你商定一項專屬成就。角色能力和實作細節將共同討論。',
+  rewardContact:
+    '領取 $50 或 $1000 獎勵時，請聯絡團隊商定公開姓名、聯絡方式或角色及成就細節。匿名捐款不會自動公開你的名字。',
+  fairDescription: '所有角色和遊戲模式仍向所有人開放。遊戲規則和評分演算法保持一致；Premium 僅縮短評分重置的等待時間。',
+
   awaitingNotification: '尚未收到付款通知。如果您已付款，請將下方的帳單編號提供給專案團隊，以便核對。',
   title: '幫助 Avalon 持續營運',
   eyebrow: '支持專案',
@@ -353,7 +537,6 @@ const zhTW: typeof en = {
   privacyTitle: '由您決定是否公開',
   privacyDescription: '您可以匿名支持，並選擇是否顯示 Premium 徽章。',
   fairTitle: '人人享有公平的遊戲',
-  fairDescription: '所有角色和遊戲模式仍向所有人開放。Premium 不影響排名或遊戲規則。',
   checkout: '使用加密貨幣支持',
   amount: '金額（美元）',
   anonymous: '匿名捐款',
@@ -388,7 +571,7 @@ const zhTW: typeof en = {
   rateError: '請等待一分鐘後再建立下一張帳單。',
   bannerTitle: '成為 Avalon 的支持者',
   bannerLink: '瞭解 Premium',
-  bannerText: '支持專案，獲得 Premium。',
+  bannerText: '專屬頭像、貼紙，以及每月一次的評分重置。',
   creating: '正在建立帳單',
   waiting: '等待付款',
   confirming: '確認中',

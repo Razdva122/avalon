@@ -47,6 +47,9 @@ export default {
     styleAnime: 'Anime',
     resetRating: 'Reset Rating',
     resetRatingHint: 'Reset your rating to default values',
+    resetRatingConfirmTextPremium:
+      'Are you sure you want to reset your rating? With Premium, you can do this once a month.',
+    resetRatingCooldownPremium: 'With Premium, rating can be reset once a month',
     resetRatingConfirmTitle: 'Reset Rating',
     resetRatingConfirmText:
       'Are you sure you want to reset your rating? This action can only be performed once every 3 months.',

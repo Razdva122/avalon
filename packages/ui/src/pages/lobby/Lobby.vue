@@ -44,23 +44,26 @@
           <span class="discord-arrow" aria-hidden="true">↗</span>
         </a>
         <LocaleLink v-if="PREMIUM_COSMETICS_ENABLED" class="support-card" :to="{ name: 'support' }">
-          <span class="support-card__icon" aria-hidden="true">
-            <svg viewBox="0 0 32 32" fill="none">
-              <path
-                d="m5 10 6 5 5-9 5 9 6-5-3 14H8L5 10Z"
-                stroke="currentColor"
-                stroke-width="1.7"
-                stroke-linejoin="round"
-              />
-              <path d="M10 28h12M11 20h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-              <circle cx="16" cy="4" r="1.5" fill="currentColor" />
-            </svg>
-          </span>
-          <div class="support-card__copy">
+          <div class="support-card__heading">
+            <span class="support-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none">
+                <path
+                  d="m5 10 6 5 5-9 5 9 6-5-3 14H8L5 10Z"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                />
+                <path d="M10 28h12M11 20h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                <circle cx="16" cy="4" r="1.5" fill="currentColor" />
+              </svg>
+            </span>
             <h2>{{ $t('support.bannerTitle') }}</h2>
-            <p>{{ $t('support.bannerText') }}</p>
-            <span class="support-card__link">{{ $t('support.bannerLink') }} <span aria-hidden="true">→</span></span>
           </div>
+          <p>{{ $t('support.bannerText') }}</p>
+          <span class="support-card__offer">{{ $t('support.lifetimePremium') }} · $10</span>
+          <span class="support-card__link"
+            >{{ $t('support.showBenefits') }} <span class="material-icons" aria-hidden="true">arrow_forward</span></span
+          >
         </LocaleLink>
         <div class="leaderboard-panel">
           <RotatingTopPlayer />
@@ -462,24 +465,32 @@ h1 {
 }
 .support-card {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 14px;
-  padding: 22px 18px;
-  border: 1px solid rgba(181, 148, 85, 0.3);
+  padding: 20px;
+  border: 1px solid rgb(var(--v-theme-support-border));
+  border-top: 2px solid rgb(var(--v-theme-support-border));
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(181, 148, 85, 0.1), rgba(var(--v-theme-inset), 0.45));
-  color: rgb(var(--v-theme-text-primary));
+  background: rgb(var(--v-theme-support-surface));
+  color: rgb(var(--v-theme-support-text));
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   transition:
-    border-color 0.18s,
-    background 0.18s;
+    box-shadow 160ms,
+    border-color 160ms;
 }
 .support-card:hover {
-  border-color: rgba(181, 148, 85, 0.7);
-  background: rgba(181, 148, 85, 0.13);
+  border-color: rgb(var(--v-theme-support-accent));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 .support-card:focus-visible {
-  outline: 2px solid #b59455;
+  outline: 3px solid rgb(var(--v-theme-support-accent));
   outline-offset: 4px;
+}
+.support-card__heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 .support-card__icon {
   display: grid;
@@ -487,39 +498,52 @@ h1 {
   flex-shrink: 0;
   width: 44px;
   height: 48px;
-  color: #b59455;
-  border: 1px solid rgba(181, 148, 85, 0.25);
+  color: rgb(var(--v-theme-support-text));
   border-radius: 12px 12px 18px 18px;
-  background: rgba(181, 148, 85, 0.08);
+  background: rgb(var(--v-theme-support-button));
 }
 .support-card__icon svg {
-  width: 29px;
-  height: 29px;
-}
-.support-card__copy {
-  min-width: 0;
+  width: 30px;
+  height: 30px;
 }
 .support-card h2 {
-  font-size: 15px;
-  line-height: 1.4;
-  font-weight: 650;
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 700;
 }
 .support-card p {
-  margin-top: 6px;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.6;
-  color: rgba(var(--v-theme-text-primary), 0.65);
+  color: rgb(var(--v-theme-support-muted));
+}
+.support-card__offer {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(var(--v-theme-support-text));
 }
 .support-card__link {
-  display: inline-flex;
-  gap: 9px;
+  display: flex;
+  gap: 10px;
   align-items: center;
-  margin-top: 13px;
-  font-size: 12px;
-  font-weight: 600;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgb(var(--v-theme-support-button));
+  color: rgb(var(--v-theme-support-text));
+  font-size: 13px;
+  font-weight: 700;
 }
-.support-card__link span {
-  color: #b59455;
+.support-card:hover .support-card__link {
+  box-shadow: inset 0 0 0 1px rgb(var(--v-theme-support-border));
+}
+.support-card__link .material-icons {
+  font-size: 19px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .support-card {
+    transition: none;
+  }
 }
 .discord-icon {
   display: grid;

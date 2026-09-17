@@ -5,18 +5,7 @@
       <h1>{{ t('support.title') }}</h1>
       <p class="intro">{{ t('support.intro') }}</p>
     </header>
-    <section class="premium-panel">
-      <span class="premium-mark">✦ PREMIUM</span>
-      <h2>{{ t('support.premiumTitle') }}</h2>
-      <p>{{ t('support.premiumDescription') }}</p>
-      <PremiumCollection :active="account?.premium === true" />
-      <div class="benefits">
-        <article v-for="kind in ['badge', 'privacy', 'fair']" :key="kind">
-          <h3>{{ t(`support.${kind}Title`) }}</h3>
-          <p>{{ t(`support.${kind}Description`) }}</p>
-        </article>
-      </div>
-    </section>
+    <SupportBenefits :active="account?.premium === true" />
     <p v-if="error" class="error" role="alert">
       {{ t(`support.${error}`) }}
       <button type="button" @click="load()">{{ t('support.retry') }}</button>
@@ -33,7 +22,7 @@
           <input id="support-amount" v-model="amount" type="number" min="1" max="10000" step="0.01" required />
           <div class="presets">
             <button
-              v-for="value in [10, 20, 50]"
+              v-for="value in [10, 50, 1000]"
               :key="value"
               type="button"
               :aria-pressed="amount === String(value)"
@@ -126,7 +115,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
 import Avatar from '@/components/user/Avatar.vue';
-import PremiumCollection from './PremiumCollection.vue';
+import SupportBenefits from './SupportBenefits.vue';
 import { isSupportAmount, safeCheckoutURL } from './checkout';
 import { supportRequest, SupportInfo, SupportAccount } from '@/api/support';
 const { t } = useI18n();
@@ -287,35 +276,12 @@ p {
   font-size: 18px;
   opacity: 0.8;
 }
-.premium-panel,
 .support-panel {
   padding: 26px;
   border: 1px solid rgba(var(--v-theme-text-primary), 0.12);
   border-radius: 18px;
   background: rgba(var(--v-theme-inset), 0.4);
 }
-.premium-panel {
-  border-color: #b3863760;
-  background: linear-gradient(120deg, #b3863714, transparent);
-}
-.premium-mark {
-  display: inline-block;
-  background: #e7c675;
-  color: #382a0c;
-  border-radius: 7px;
-  padding: 5px 10px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  margin-bottom: 16px;
-}
-.benefits {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-top: 26px;
-}
-.benefits p,
 .hint {
   font-size: 13px;
   opacity: 0.75;
@@ -457,15 +423,13 @@ small {
   border-radius: 8px;
 }
 @media (max-width: 700px) {
-  .support-columns,
-  .benefits {
+  .support-columns {
     grid-template-columns: 1fr;
   }
   .support-page {
     padding: 76px 14px 32px;
   }
-  .support-panel,
-  .premium-panel {
+  .support-panel {
     padding: 20px;
   }
   .orders li {

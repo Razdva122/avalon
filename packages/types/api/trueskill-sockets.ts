@@ -21,7 +21,13 @@ export interface TrueSkillSocketEvents {
   // Get TrueSkill rating for a player
   getTrueSkillRating: (
     userID: string,
-    callback: (result: { success: boolean; rating?: PlayerTrueSkillRating; error?: string }) => void,
+    callback: (result: {
+      success: boolean;
+      rating?: PlayerTrueSkillRating;
+      error?: string;
+      resetCooldownMonths?: 1 | 3;
+      nextResetAvailableAt?: Date;
+    }) => void,
   ) => void;
 
   // Get TrueSkill leaderboard

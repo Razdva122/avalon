@@ -20,6 +20,13 @@ function selectTheme(): 'lightTheme' | 'darkTheme' {
 const lightTheme = {
   dark: false,
   colors: {
+    'support-surface': '#eceae3',
+    'support-text': '#38362f',
+    'support-muted': '#625c4e',
+    'support-accent': '#825411',
+    'support-border': '#c3b99f',
+    'support-button': '#ded7c4',
+
     primary: '#1976D2',
     secondary: '#424242',
     accent: '#82B1FF',
@@ -42,6 +49,13 @@ const lightTheme = {
 const darkTheme = {
   dark: true,
   colors: {
+    'support-surface': '#292a28',
+    'support-text': '#ede8dc',
+    'support-muted': '#bdb7a9',
+    'support-accent': '#f0c96d',
+    'support-border': '#555044',
+    'support-button': '#454034',
+
     primary: '#1976D2',
     secondary: '#424242',
     accent: '#82B1FF',

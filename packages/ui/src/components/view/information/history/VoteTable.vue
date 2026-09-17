@@ -35,7 +35,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="player in players" :key="player.id">
+            <tr v-for="player in sortedPlayers" :key="player.id">
               <th class="player-name" scope="row" :title="playerNames[player.id]">{{ playerNames[player.id] }}</th>
               <td
                 v-for="(vote, index) in columns"
@@ -71,6 +71,8 @@ import type { Player, THistoryResults, THistoryVote } from '@avalon/types';
 
 const props = defineProps<{ history: THistoryResults[]; players: Player[]; playerNames: Record<string, string> }>();
 const { t } = useI18n();
+
+const sortedPlayers = computed(() => [...props.players].sort((a, b) => a.index - b.index));
 
 const groups = computed(() => {
   const result: { index: number | null; votes: THistoryVote[]; result?: string }[] = [];
