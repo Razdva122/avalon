@@ -566,33 +566,8 @@ h1 {
 }
 .leaderboard-panel :deep(.top-player-card) {
   box-shadow: none;
-  height: auto;
-  min-height: 140px;
+  padding: 0;
   background: transparent;
-}
-.leaderboard-panel :deep(.top-player-card:hover) {
-  transform: none;
-}
-.leaderboard-panel :deep(.top-player-card > .pa-3) {
-  padding: 0 !important;
-}
-.leaderboard-panel :deep(.role-name) {
-  font-size: 15px;
-}
-.leaderboard-panel :deep(.rating-value) {
-  font-size: 20px;
-}
-.leaderboard-panel :deep(.games-count) {
-  font-size: 12px;
-}
-.leaderboard-panel :deep(.crown-icon) {
-  display: none;
-}
-.leaderboard-panel :deep(.stats-container) {
-  min-width: 80px;
-}
-.leaderboard-panel :deep(.winrate-container) {
-  transform: none;
 }
 .leaderboard-link {
   display: flex;
@@ -678,20 +653,6 @@ a:focus-visible {
   }
   .leaderboard-panel :deep(.top-player-title) {
     margin-bottom: 8px;
-  }
-  .leaderboard-panel :deep(.top-player-card) {
-    min-height: 0;
-  }
-  .leaderboard-panel :deep(.role-header) {
-    margin-bottom: 8px !important;
-    padding-bottom: 6px;
-  }
-  .leaderboard-panel :deep(.role-icon) {
-    width: 28px;
-    height: 28px;
-  }
-  .leaderboard-panel :deep(.stats-container) {
-    height: auto;
   }
   .leaderboard-link {
     margin-top: 4px;

@@ -9,40 +9,20 @@
         v-if="currentRole && topPlayer && !loading"
         :key="currentRole"
         class="top-player-card"
-        @click="navigateToPlayerStats"
+        :to="{ name: 'user_stats', params: { uuid: topPlayer.userID } }"
       >
-        <div class="d-flex flex-column pa-3">
-          <div class="role-header d-flex align-center mb-3">
-            <div class="d-flex align-center">
-              <PlayerIcon :icon="currentRole" class="role-icon mr-2" />
-              <div class="role-name">
-                {{ $t(`roles.${currentRole}`) }}
-              </div>
-            </div>
-
-            <v-spacer></v-spacer>
-
-            <div class="rating-value">{{ topPlayer.rating }}</div>
+        <TeammateProfile :teammateID="topPlayer.userID" class="featured-player" />
+        <div class="featured-role">
+          <PlayerIcon :icon="currentRole" class="role-card-image" aria-hidden="true" />
+          <div class="role-details">
+            <span class="role-label">{{ $t('stats.role') }}</span>
+            <strong class="role-name">{{ $t(`roles.${currentRole}`) }}</strong>
           </div>
-
-          <div class="d-flex align-center">
-            <div class="crown-icon mr-2">🏆</div>
-
-            <div class="teammate-profile-container">
-              <TeammateProfile :teammateID="topPlayer.userID" />
-            </div>
-
-            <v-spacer></v-spacer>
-
-            <div class="stats-container">
-              <div class="winrate-container">
-                <WinrateDisplay :winrate="topPlayer.winrate.toFixed(2)" />
-              </div>
-              <div class="games-count">
-                {{ $t('stats.gamesPlayed', { count: topPlayer.gamesCount }) }}
-              </div>
-            </div>
-          </div>
+        </div>
+        <div class="player-summary">
+          <span>{{ $t('stats.winPercentage', { percent: Math.round(topPlayer.winrate) }) }}</span>
+          <span aria-hidden="true">·</span>
+          <span>{{ $t('stats.gamesPlayed', { count: topPlayer.gamesCount }) }}</span>
         </div>
       </v-card>
 
@@ -62,10 +42,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, onBeforeUnmount, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import { socket } from '@/api/socket';
 import TeammateProfile from '@/components/stats/TeammateProfile.vue';
-import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import shuffle from 'lodash/shuffle';
 import { TRoles } from '@avalon/types';
@@ -74,7 +52,6 @@ export default defineComponent({
   name: 'RotatingTopPlayer',
   components: {
     TeammateProfile,
-    WinrateDisplay,
     PlayerIcon,
   },
   props: {
@@ -88,7 +65,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const router = useRouter();
     const topPlayersData = ref<{ role: TRoles; topPlayer: any }[]>([]);
     const currentRole = ref<TRoles | null>(null);
     const remainingRoles = ref<TRoles[]>([]);
@@ -145,12 +121,6 @@ export default defineComponent({
       }
     };
 
-    const navigateToPlayerStats = () => {
-      if (topPlayer.value) {
-        router.push({ name: 'user_stats', params: { uuid: topPlayer.value.userID } });
-      }
-    };
-
     onMounted(() => {
       fetchTopPlayersForPopularRoles();
     });
@@ -167,7 +137,6 @@ export default defineComponent({
       currentRole,
       topPlayer,
       loading,
-      navigateToPlayerStats,
     };
   },
 });
@@ -177,143 +146,124 @@ export default defineComponent({
 .rotating-top-player {
   margin: 16px 0;
   width: 100%;
-  max-width: 100%;
 }
-
 .top-player-title {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   font-size: 1.2rem;
   font-weight: 500;
 }
-
 .top-player-card {
-  cursor: pointer;
-  border-radius: 12px;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
-  background-color: rgb(var(--v-theme-surface-light));
-  width: 100%;
+  display: block;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgb(var(--v-theme-surface-light));
+  transition: background-color 0.2s ease;
+}
+.top-player-card[href]:hover {
+  background: rgb(var(--v-theme-inset-hover));
+}
+.top-player-card:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 3px;
+}
+.featured-player {
+  display: grid !important;
+  grid-template-columns: 52px minmax(0, 1fr);
+  column-gap: 12px;
+  row-gap: 4px;
+  padding: 0;
+  margin: 0 !important;
+}
+.featured-player :deep(.teammate-avatar-container) {
+  width: 52px;
+  min-width: 52px;
+}
+.featured-player :deep(.teammate-avatar) {
+  width: 52px;
+  height: 52px;
+}
+.featured-player :deep(.teammate-name) {
+  align-self: center;
+  margin: 0;
   max-width: 100%;
-  height: 160px; /* Increased height to fit all content */
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: rgb(var(--v-theme-inset-hover));
-  }
+  font-size: 17px;
+  line-height: 1.3;
 }
-
-.crown-icon {
-  font-size: 1.5rem;
+.featured-player :deep(.loader) {
+  grid-column: 1 / -1;
 }
-
-.role-header {
-  border-bottom: 1px solid rgba(var(--v-border-color), 0.12);
-  padding-bottom: 8px;
+.featured-role {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(var(--v-theme-text-primary), 0.04);
 }
-
-.role-icon {
-  width: 40px;
-  height: 40px;
+.featured-role .role-card-image {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 36px;
+  border-radius: 4px;
+  border: 1px solid rgba(var(--v-theme-text-primary), 0.16);
 }
-
-.role-name {
-  font-weight: bold;
-  color: var(--v-primary-base);
-  font-size: 1.2rem;
-}
-
-.teammate-profile-container {
-  flex-grow: 1;
-  min-width: 0; /* Allow container to shrink below min-content */
-  max-width: 100%; /* Prevent overflow */
-  overflow: hidden; /* Hide overflow text */
-}
-
-/* Add text truncation to the teammate profile */
-:deep(.teammate-name) {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%; /* Make it responsive */
-}
-
-.stats-container {
-  text-align: right;
-  min-width: 100px; /* Slightly reduced min-width for better responsiveness */
+.role-details {
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  height: 80px; /* Fixed height to ensure all content is visible */
-  margin-left: 8px; /* Add some spacing from the username */
+  gap: 2px;
 }
-
-.rating-value {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--v-primary-base);
+.role-label {
+  font-size: 11px;
+  line-height: 1.2;
+  color: rgba(var(--v-theme-text-primary), 0.6);
 }
-
-.winrate-container {
-  margin: 4px 0;
-  transform: scale(1.2); /* Make the winrate chip slightly larger */
-  transform-origin: right center;
+.role-name {
+  font-size: 14px;
+  line-height: 1.3;
+  font-weight: 600;
+  overflow-wrap: anywhere;
 }
-
-.games-count {
-  font-size: 1rem; /* Increased font size */
-  opacity: 0.8; /* Slightly more visible */
-  font-weight: 500;
+.player-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(var(--v-theme-text-primary), 0.65);
 }
-
-.top-player-skeleton {
-  height: 160px; /* Match the card height */
-  width: 100%;
-  max-width: 100%;
-}
-
-:deep(.v-skeleton-loader__image) {
-  margin: 0px;
-  border-radius: 8px;
-  height: 160px !important; /* Match the card height */
-  min-height: 160px !important;
-  width: 100%;
-  max-width: 100%;
-}
-
+.top-player-skeleton,
 .no-data-card {
-  cursor: default;
-  height: 160px; /* Match the card height */
-  width: 100%;
-  max-width: 100%;
+  min-height: 100px;
+}
+.no-data-card {
   display: flex;
   align-items: center;
-  justify-content: center;
 }
-
 .no-data-icon {
   font-size: 1.5rem;
   opacity: 0.7;
 }
-
 .no-data-text {
-  font-style: italic;
+  font-size: 13px;
   opacity: 0.7;
 }
-
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease;
+  transition: opacity 0.25s ease;
 }
-
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-enter-active,
+  .fade-leave-active,
+  .top-player-card {
+    transition: none;
+  }
 }
 </style>

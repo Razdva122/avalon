@@ -8,6 +8,7 @@
       <div class="teammate-name">
         {{ userState.profile.name }}
       </div>
+      <slot />
     </template>
   </div>
 </template>

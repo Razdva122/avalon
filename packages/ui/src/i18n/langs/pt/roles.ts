@@ -39,7 +39,8 @@ export default {
     merlinPureInfo: 'Conhece o mal e seus papéis, deve permanecer oculto',
     percivalInfo: 'Conhece dois magos (Merlin e Morgana), mas não sabe qual é qual',
     servantInfo: 'Servo Leal de Arthur',
-    troublemakerInfo: 'Obrigado a mentir sobre sua lealdade',
+    troublemakerInfo:
+      'Um aliado do Bem que aparece como um jogador do Mal nas verificações da Dama do Lago, da Bruxa ou do Clérigo. O jogador pode dizer a verdade.',
     guinevereInfo: 'Conhece dois Lancelots mas não conhece sua lealdade',
     goodLancelotInfo: 'Lancelot bom, pode mudar para o mal durante o jogo',
     evilLancelotInfo: 'Lancelot mau, pode mudar para o bem durante o jogo',

@@ -1,5 +1,10 @@
 <template>
-  <article class="game" :class="{ 'game--open': canJoin }">
+  <RouterLink
+    class="game"
+    :class="{ 'game--recruiting': isRecruiting }"
+    :to="{ name: 'room', params: { uuid: game.uuid } }"
+    :aria-label="`${$t(`mainPage.${action}`)} — ${userName}. ${$t(`mainPage.${status}`)}`"
+  >
     <div class="game-info">
       <div class="game-name">
         <span v-if="game.result?.winner" :class="`${game.result.winner}-loyalty-icon`" aria-hidden="true"></span>
@@ -8,22 +13,26 @@
         }}</span>
         <span class="host-name">{{ userName }}</span>
       </div>
-      <OptionsPreview v-if="hasOptions" :max-view="5" :roles="game.options.roles" :addons="game.options.addons" />
+      <OptionsPreview
+        v-if="hasOptions"
+        :linked="false"
+        :max-view="5"
+        :roles="game.options.roles"
+        :addons="game.options.addons"
+      />
     </div>
-    <span class="game-status" :class="{ 'game-status--open': canJoin }">{{ $t(`mainPage.${status}`) }}</span>
+    <span class="game-status" :class="{ 'game-status--recruiting': isRecruiting }">
+      <span v-if="isRecruiting" class="material-icons recruitment-icon" aria-hidden="true">person_add</span>
+      <span>{{ $t(`mainPage.${status}`) }}</span>
+    </span>
     <span class="players-amount" :aria-label="`${game.players} ${$t('mainPage.players')}`">
       <span class="material-icons" aria-hidden="true">group</span>
       {{ game.state === 'created' && !game.result ? `${game.players}/10` : game.players }}
     </span>
-    <RouterLink
-      class="room-link"
-      :class="{ 'room-link--join': canJoin }"
-      :to="{ name: 'room', params: { uuid: game.uuid } }"
-      :aria-label="`${$t(`mainPage.${action}`)} — ${userName}`"
-    >
+    <span class="room-link" :class="{ 'room-link--join': canJoin }">
       {{ $t(`mainPage.${action}`) }} <span aria-hidden="true">→</span>
-    </RouterLink>
-  </article>
+    </span>
+  </RouterLink>
 </template>
 
 <script setup lang="ts">
@@ -47,6 +56,7 @@ const status = computed(() => {
   if (game.value.players >= 10) return 'full';
   return game.value.options.features?.lookingForPlayers ? 'lookingForPlayers' : 'waiting';
 });
+const isRecruiting = computed(() => canJoin.value && status.value === 'lookingForPlayers');
 const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 'join' : 'watch'));
 </script>
 
@@ -54,7 +64,7 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
 .game {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 112px 58px 140px;
+  grid-template-columns: minmax(0, 1fr) 132px 58px 140px;
   align-items: center;
   gap: 12px;
   min-height: 58px;
@@ -63,7 +73,7 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
   border-radius: 12px;
   background: rgb(var(--v-theme-inset));
 }
-.game--open {
+.game--recruiting {
   border-left: 3px solid rgb(var(--v-theme-success));
   padding-left: 12px;
 }
@@ -102,12 +112,28 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
   opacity: 0.5;
 }
 .game-status {
+  min-width: 0;
   font-size: 11px;
   color: rgba(var(--v-theme-text-primary), 0.65);
   line-height: 1.4;
 }
-.game-status--open {
+.game-status--recruiting {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+  max-width: 100%;
+  padding: 5px 8px;
+  border: 1px solid rgba(var(--v-theme-success), 0.32);
+  border-radius: 6px;
+  background: rgba(var(--v-theme-success), 0.14);
   color: rgb(var(--v-theme-text-primary));
+  font-weight: 600;
+}
+.recruitment-icon {
+  flex-shrink: 0;
+  font-size: 17px;
+  color: rgb(var(--v-theme-success));
 }
 .players-amount {
   display: inline-flex;
@@ -136,19 +162,11 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
   background: rgb(var(--v-theme-primary));
   color: white;
 }
-.room-link::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-}
-.game:has(.room-link:focus-visible) {
+.game:focus-visible {
   outline: 2px solid rgb(var(--v-theme-text-primary));
   outline-offset: 3px;
 }
 .game :deep(.game-options) {
-  position: relative;
-  z-index: 1;
   flex: 1 1 0;
   min-width: 0;
   flex-wrap: nowrap;
@@ -159,10 +177,6 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
 .game :deep(.game-options > div) {
   flex-shrink: 0;
 }
-.game :deep(.preview-link:focus-visible) {
-  outline: 2px solid rgb(var(--v-theme-text-primary));
-  outline-offset: 3px;
-}
 @import '@/styles/loyalty-icons.scss';
 .evil-loyalty-icon,
 .good-loyalty-icon {
@@ -172,7 +186,7 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
 }
 @media (max-width: 1100px) {
   .game {
-    grid-template-columns: minmax(0, 1fr) 80px 48px 140px;
+    grid-template-columns: minmax(0, 1fr) 112px 48px 140px;
     gap: 8px;
     padding-right: 12px;
   }

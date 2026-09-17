@@ -2,7 +2,7 @@
   <div class="game-options">
     <div v-for="role in visibleRoles">
       <div class="mr-1 d-flex">
-        <PreviewLink :target="role" text="" />
+        <PreviewLink :target="role" :linked="linked" text="" />
       </div>
     </div>
     <div v-if="hiddenRolesCount > 0" class="mr-1 d-flex hidden-roles-indicator">
@@ -10,7 +10,7 @@
     </div>
     <div v-for="(amount, addon) of addons">
       <div v-if="amount" class="mr-1 d-flex">
-        <PreviewLink :target="addon" text="" />
+        <PreviewLink :target="addon" :linked="linked" text="" />
       </div>
     </div>
   </div>
@@ -28,6 +28,10 @@ export default defineComponent({
     PreviewLink,
   },
   props: {
+    linked: {
+      type: Boolean,
+      default: true,
+    },
     roles: {
       required: true,
       type: Object as PropType<GameOptionsRoles>,

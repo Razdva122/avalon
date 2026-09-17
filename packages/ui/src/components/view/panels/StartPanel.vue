@@ -32,7 +32,9 @@
         :roles="options.roles"
         :addons="options.addons"
         :features="options.features"
+        :playerCount="roomState.players.length"
         :buttonText="$t('startPanel.options')"
+        @apply="applyOptions"
       />
       <TimerButton :features="options.features" @update:features="updateFeatures" />
     </div>
@@ -41,7 +43,7 @@
 
 <script lang="ts">
 import { neutralRoomUrl } from '@/router/paths';
-import { defineComponent, computed, ref, PropType, toRefs, watch } from 'vue';
+import { defineComponent, computed, PropType, toRefs } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
 import { TPageRoomState } from '@/helpers/game-state-manager';
@@ -49,6 +51,8 @@ import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import Options from '@/components/view/options/Options.vue';
 import TimerButton from '@/components/view/options/TimerButton.vue';
+import { useRoomOptions } from '@/components/view/options/room-options';
+import type { GameOptionsFeatures } from '@avalon/types';
 
 export default defineComponent({
   name: 'StartPanel',
@@ -67,28 +71,9 @@ export default defineComponent({
     const { roomState } = toRefs(props);
     const store = useStore();
 
-    const roles = computed(() => {
-      return roomState.value.options.roles;
-    });
-    const addons = computed(() => {
-      return roomState.value.options.addons;
-    });
-    const features = computed(() => {
-      return roomState.value.options.features;
-    });
-
-    const options = ref({
-      addons: addons.value,
-      roles: roles.value,
-      features: features.value,
-    });
-
-    watch(
-      options,
-      (options) => {
-        socket.emit('updateOptions', roomState.value.roomID, options);
-      },
-      { deep: true },
+    const { options, applyOptions } = useRoomOptions(
+      () => roomState.value.options,
+      (next) => socket.emit('updateOptions', roomState.value.roomID, next),
     );
 
     const isUserInGame = computed(() => {
@@ -132,8 +117,8 @@ export default defineComponent({
       window.open('https://discord.gg/DR9cEDDNdN', '_blank');
     };
 
-    const updateFeatures = (newFeatures: any) => {
-      options.value.features = newFeatures;
+    const updateFeatures = (newFeatures: GameOptionsFeatures) => {
+      applyOptions({ ...options.value, features: newFeatures });
     };
 
     return {
@@ -150,6 +135,7 @@ export default defineComponent({
       onCopyClick,
       onDiscordClick,
       updateFeatures,
+      applyOptions,
     };
   },
 });

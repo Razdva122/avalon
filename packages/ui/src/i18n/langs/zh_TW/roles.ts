@@ -39,7 +39,7 @@ export default {
     merlinPureInfo: '知道誰是壞人方及角色,必須保持隱藏',
     percivalInfo: '看到兩位角色(梅林/莫甘娜),但不知道誰是真正的梅林',
     servantInfo: '亞瑟王的忠實僕人',
-    troublemakerInfo: '不得不對他的忠誠度撒謊',
+    troublemakerInfo: '正義陣營的盟友，但湖中仙女、女巫或牧師的查驗會將其顯示為邪惡陣營。玩家本人可以說真話。',
     guinevereInfo: '看到兩位角色(蘭斯洛特),但不知道誰是真正的蘭斯洛特',
     goodLancelotInfo: '好人方的蘭斯洛特,可以從角色轉為壞人方',
     evilLancelotInfo: '壞人方的蘭斯洛特,可以從角色轉為好人方',

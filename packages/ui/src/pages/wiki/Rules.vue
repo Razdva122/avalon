@@ -241,7 +241,7 @@
     <p>
       <LocalizedTextWrapper keypath="rules.defaultSetup" />
     </p>
-    <Options :roles="roles" :buttonText="$t('options.roles')" />
+    <Options :roles="roles" :buttonText="$t('options.roles')" @apply="Object.assign(roles, $event.roles)" />
     <ol class="mt-2">
       <li>{{ $t('rules.closeEyesExtendHand') }}</li>
       <li>

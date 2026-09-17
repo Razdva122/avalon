@@ -39,7 +39,8 @@ export default {
     merlinPureInfo: 'Knows evil and their roles, must remain hidden',
     percivalInfo: 'Knows two wizards (Merlin and Morgana), but does not know which of them is which',
     servantInfo: 'Loyal Servant of Arthur',
-    troublemakerInfo: 'Obliged to lie about his loyalty',
+    troublemakerInfo:
+      'An ally of Good who appears Evil when checked by the Lady of the Lake, Witch, or Cleric. The player can tell the truth.',
     guinevereInfo: 'Knows two Lancelots but does not know their loyalty',
     goodLancelotInfo: 'Good lancelot, can switch role to evil in game',
     evilLancelotInfo: 'Evil lancelot, can switch role to good in game',

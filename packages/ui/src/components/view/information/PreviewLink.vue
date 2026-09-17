@@ -1,23 +1,28 @@
 <template>
   <template v-if="targetIsRole(target)">
-    <LocaleLink
+    <component
+      :is="linked ? 'LocaleLink' : 'span'"
       class="preview-link"
       :class="rolesShortInfo[target].loyalty + '-role'"
-      :to="{ name: toSnakeCase(normalizeRoleRoute) }"
+      :to="linked ? { name: toSnakeCase(normalizeRoleRoute) } : undefined"
     >
       <PlayerIcon class="icon-in-link" :icon="target" />
       <template v-if="text !== ''">
         {{ text ? $t('previewLink.' + text) : $t('roles.' + target) }}
       </template>
-    </LocaleLink>
+    </component>
   </template>
   <template v-else>
-    <LocaleLink class="preview-link addon" :to="{ name: toSnakeCase(target) }">
+    <component
+      :is="linked ? 'LocaleLink' : 'span'"
+      class="preview-link addon"
+      :to="linked ? { name: toSnakeCase(target) } : undefined"
+    >
       <AddonIcon class="icon-in-link" :addon="target" />
       <template v-if="text !== ''">
         {{ text ? $t('previewLink.' + text) : $t('addons.' + target) }}
       </template>
-    </LocaleLink>
+    </component>
   </template>
 </template>
 
@@ -44,6 +49,10 @@ export default defineComponent({
     rolesShortInfo,
   }),
   props: {
+    linked: {
+      type: Boolean,
+      default: true,
+    },
     target: {
       required: true,
       type: String as PropType<TVisibleRole | TAddonsName>,
