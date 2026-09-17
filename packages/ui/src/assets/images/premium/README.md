@@ -7,7 +7,7 @@ After verifying donation checkout, set `PREMIUM_COSMETICS_ENABLED` to `true`, re
 The same switch controls the avatar catalog, sticker catalog, existing premium avatar display and home page support banner. The Support page always remains complete, including the actual premium avatar artwork.
 Artwork, translations and saved selections are retained. Both disabled and enabled behavior have backend tests.
 
-Generated with the built-in image_gen tool. Avatars optimized to 512px PNG; stickers to 320px PNG, preserving generated transparency.
+Generated with the built-in image_gen tool. Avatars optimized to 512px WebP (quality 88); stickers to 320px WebP (quality 90, lossless alpha), preserving generated transparency. One file is shared by previews and gameplay.
 
 ## puppeteer
 
@@ -29,7 +29,7 @@ Use case: stylized-concept. Create ONE transparent game reaction sticker for Ava
 
 ## morgana-violin
 
-Artwork: `../stickers/morgana-violin.png`. The file and sticker ID are both `morgana-violin`. Generated with the built-in image_gen tool and resized to 320px with alpha preserved.
+Artwork: `../stickers/morgana-violin.webp`. The file and sticker ID are both `morgana-violin`. Generated with the built-in image_gen tool and resized to 320px with alpha preserved.
 
 Latest prompt (references: Morgana role portrait and previous violin sticker):
 
@@ -37,6 +37,6 @@ Use case: stylized-concept. Edit the second reference sticker: replace the male 
 
 Original generation:
 
-Reference: ../stickers/oberon-laugh.png
+Reference: ../stickers/oberon-laugh.webp
 
 Use case: stylized-concept. Create ONE new transparent Avalon reaction sticker. Reference is Oberon sticker, preserve recognizable hooded dark-haired young man, black cloak and red accents, ivory die-cut outline and painterly rendering. Sarcastic fake sympathy: exaggerated pitying pout, one eyebrow raised and amused eyes, playing an absurdly tiny violin with a tiny bow near his chest, hands very clearly visible and violin readable. Message conveyed: oh, so sad, let me play the world's smallest violin for your excuses. Upper body square composition, full silhouette including hands inside padding. Dark medieval fantasy premium game sticker, readable at 96 pixels. GENUINE TRANSPARENT ALPHA background, no checkerboard, no scenery, no words, no watermark.

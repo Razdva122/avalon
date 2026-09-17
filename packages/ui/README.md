@@ -157,3 +157,21 @@ by the cloud uploader. `npm run serve --workspace=packages/ui` uses local images
 by default. Direct Docker builds with `ui.Dockerfile` reference production cloud
 images, so ensure those images are uploaded before deploying that container;
 the release workflow handles that ordering automatically.
+
+### Small user avatars
+
+`Avatar.vue` uses a shared max-512px WebP preview through `getAvatarPathByID`.
+Full role/wiki images and CSS role icons keep their existing URLs; cropped role
+icons can magnify artwork by up to 230%. The preview supports user avatars up to
+150 CSS pixels at DPR 3 without fetching the full role portrait.
+
+`npm run generate:avatars --workspace=packages/ui` regenerates previews from
+`src/assets/images` using pinned Sharp, quality 85 and lossless alpha. It runs
+before image tests (and therefore production builds), and before the dev server.
+After replacing artwork during a dev session, rerun it or restart the dev server.
+`src/assets/avatars` is generated and ignored by Git; do not edit it manually.
+
+Previews use the existing content-hash URLs, immutable cache and image release
+manifest. Both sizes are uploaded before the UI container is published. Opening a
+role page after an avatar may download the larger image separately. Old bucket
+objects remain available for old clients and delayed deployments.

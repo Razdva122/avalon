@@ -90,8 +90,24 @@ for (const mode of ['cloud', 'local']) {
     ]) {
       assert(url.startsWith(prefix), url);
       const file = url.slice(prefix.length);
-      assert.match(file, /^img\/[^/]+\.[a-f0-9]{16}\.(webp|png)$/);
+      assert.match(file, /^img\/[^/]+\.[a-f0-9]{16}\.webp$/);
       assert(fs.statSync(path.join(out, file)).size > 0);
+    }
+    // Avatars share a small URL across consumers, independent of wiki artwork.
+    const avatar = helpers.getAvatarPathByID('roles', 'merlin');
+    assert.notEqual(avatar, helpers.getImagePathByID('roles', 'merlin'));
+    assert.equal(avatar, helpers.getAvatarPathByID('roles', 'merlin'));
+    for (const [type, id] of [
+      ['roles', 'merlin'],
+      ['core', 'blue_team_no_background'],
+      ['features', 'lady_of_lake'],
+      ['premium', 'puppeteer'],
+    ]) {
+      const url = helpers.getAvatarPathByID(type, id);
+      assert(url.startsWith(prefix));
+      const metadata = await require('sharp')(path.join(out, url.slice(prefix.length))).metadata();
+      assert(metadata.width <= 512 && metadata.height <= 512);
+      assert.equal(metadata.format, 'webp');
     }
     const merlin = helpers.getImagePathByID('roles', 'merlin');
     assert(css.includes(merlin));

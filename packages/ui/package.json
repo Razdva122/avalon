@@ -3,7 +3,7 @@
   "version": "61.3.0",
   "private": true,
   "scripts": {
-    "preserve": "node scripts/generate-locales.cjs",
+    "preserve": "npm run generate:avatars && node scripts/generate-locales.cjs",
     "serve": "vue-cli-service serve",
     "prebuild": "node scripts/generate-locales.cjs",
     "test:support": "node --test scripts/support-checkout.test.cjs",
@@ -17,7 +17,9 @@
     "check:bundle": "node scripts/check-bundle.cjs",
     "build:critical-css": "node scripts/critical-css.cjs",
     "test:critical-css": "node --test scripts/critical-css.test.cjs",
-    "test:avatars": "node --test scripts/avatar-selection.test.cjs"
+    "test:avatars": "node --test scripts/avatar-selection.test.cjs",
+    "generate:avatars": "node scripts/generate-avatars.cjs",
+    "pretest:images": "npm run generate:avatars"
   },
   "dependencies": {
     "@floating-ui/vue": "^1.1.6",
@@ -54,6 +56,7 @@
     "puppeteer": "^22.5.0",
     "sass": "^1.69.5",
     "sass-loader": "^12.6.0",
+    "sharp": "0.34.5",
     "sitemap-webpack-plugin": "^1.1.1",
     "webpack-bundle-analyzer": "^4.10.1",
     "webpack-cli": "^5.1.4",

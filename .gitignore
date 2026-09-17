@@ -28,3 +28,6 @@ pnpm-debug.log*
 
 # Exported UI release used by the publication workflow.
 /ui-release/
+
+# Generated avatar previews; rebuilt before image tests/build and dev startup.
+/packages/ui/src/assets/avatars/
