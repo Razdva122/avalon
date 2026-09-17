@@ -7,13 +7,11 @@
   -webkit-line-clamp: $lines;
 }
 
-$s3ImagesPath: 'https://storage.yandexcloud.net/avalon-game/images/';
-$s3IconsPath: 'https://storage.yandexcloud.net/avalon-game/icons/';
-
+// Resolve the same source files as helpers/images through Webpack's asset pipeline.
 @function getImagePathByID($type, $id) {
-  @return url('#{$s3ImagesPath}#{$type}/#{$id}.webp');
+  @return url('~@/assets/images/#{$type}/#{$id}.webp');
 }
 
 @function getIconPathByName($name) {
-  @return url('#{$s3IconsPath}#{$name}');
+  @return url('~@/assets/icons/#{$name}.webp');
 }

@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # Build-time language dictionaries; edit src/i18n/langs instead.
 /packages/ui/src/i18n/generated/
+
+# Exported UI release used by the publication workflow.
+/ui-release/

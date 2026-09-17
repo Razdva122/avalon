@@ -12,10 +12,14 @@ COPY --chown=pptruser:pptruser packages/types/package.json ${APP_DIR}/packages/t
 COPY --chown=pptruser:pptruser packages/backend/package.json ${APP_DIR}/packages/backend/
 
 USER pptruser
-RUN npm install
+RUN npm ci
 
 COPY --chown=pptruser:pptruser . .
 RUN AVALON_BUILD_CONTAINER=1 npm run build:ui
+
+# Export the exact audited build for upload and packaging in CI.
+FROM scratch AS release-artifact
+COPY --from=build-stage /home/pptruser/app/packages/ui/dist /
 
 FROM --platform=${BUILDPLATFORM} nginx AS production-stage
 RUN mkdir /app
