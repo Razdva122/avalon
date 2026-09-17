@@ -4,109 +4,162 @@ const { t } = i18n.global;
 
 import { TLoyalty, TVisibleRole } from '@avalon/types';
 
+// Resolve descriptions when read: dictionaries load asynchronously and the locale can change.
 export const rolesShortInfo: { [key in TVisibleRole]: { loyalty: TLoyalty | 'unknown'; info: string } } = {
   merlin: {
     loyalty: 'good',
-    info: t('rolesInfo.merlinInfo'),
+    get info() {
+      return t('rolesInfo.merlinInfo');
+    },
   },
   merlinPure: {
     loyalty: 'good',
-    info: t('rolesInfo.merlinPureInfo'),
+    get info() {
+      return t('rolesInfo.merlinPureInfo');
+    },
   },
   percival: {
     loyalty: 'good',
-    info: t('rolesInfo.percivalInfo'),
+    get info() {
+      return t('rolesInfo.percivalInfo');
+    },
   },
   servant: {
     loyalty: 'good',
-    info: t('rolesInfo.servantInfo'),
+    get info() {
+      return t('rolesInfo.servantInfo');
+    },
   },
   troublemaker: {
     loyalty: 'good',
-    info: t('rolesInfo.troublemakerInfo'),
+    get info() {
+      return t('rolesInfo.troublemakerInfo');
+    },
   },
   guinevere: {
     loyalty: 'good',
-    info: t('rolesInfo.guinevereInfo'),
+    get info() {
+      return t('rolesInfo.guinevereInfo');
+    },
   },
   goodLancelot: {
     loyalty: 'good',
-    info: t('rolesInfo.goodLancelotInfo'),
+    get info() {
+      return t('rolesInfo.goodLancelotInfo');
+    },
   },
   evilLancelot: {
     loyalty: 'evil',
-    info: t('rolesInfo.evilLancelotInfo'),
+    get info() {
+      return t('rolesInfo.evilLancelotInfo');
+    },
   },
   mordred: {
     loyalty: 'evil',
-    info: t('rolesInfo.mordredInfo'),
+    get info() {
+      return t('rolesInfo.mordredInfo');
+    },
   },
   morgana: {
     loyalty: 'evil',
-    info: t('rolesInfo.morganaInfo'),
+    get info() {
+      return t('rolesInfo.morganaInfo');
+    },
   },
   oberon: {
     loyalty: 'evil',
-    info: t('rolesInfo.oberonInfo'),
+    get info() {
+      return t('rolesInfo.oberonInfo');
+    },
   },
   wraith: {
     loyalty: 'evil',
-    info: t('rolesInfo.wraithInfo'),
+    get info() {
+      return t('rolesInfo.wraithInfo');
+    },
   },
   minion: {
     loyalty: 'evil',
-    info: t('rolesInfo.minionInfo'),
+    get info() {
+      return t('rolesInfo.minionInfo');
+    },
   },
   isolde: {
     loyalty: 'good',
-    info: t('rolesInfo.isoldeInfo'),
+    get info() {
+      return t('rolesInfo.isoldeInfo');
+    },
   },
   tristan: {
     loyalty: 'good',
-    info: t('rolesInfo.tristanInfo'),
+    get info() {
+      return t('rolesInfo.tristanInfo');
+    },
   },
   evil: {
     loyalty: 'evil',
-    info: t('rolesInfo.evilInfo'),
+    get info() {
+      return t('rolesInfo.evilInfo');
+    },
   },
   good: {
     loyalty: 'good',
-    info: t('rolesInfo.goodInfo'),
+    get info() {
+      return t('rolesInfo.goodInfo');
+    },
   },
   trickster: {
     loyalty: 'evil',
-    info: t('rolesInfo.tricksterInfo'),
+    get info() {
+      return t('rolesInfo.tricksterInfo');
+    },
   },
   lunatic: {
     loyalty: 'evil',
-    info: t('rolesInfo.lunaticInfo'),
+    get info() {
+      return t('rolesInfo.lunaticInfo');
+    },
   },
   brute: {
     loyalty: 'evil',
-    info: t('rolesInfo.bruteInfo'),
+    get info() {
+      return t('rolesInfo.bruteInfo');
+    },
   },
   witch: {
     loyalty: 'evil',
-    info: t('rolesInfo.witchInfo'),
+    get info() {
+      return t('rolesInfo.witchInfo');
+    },
   },
   revealer: {
     loyalty: 'evil',
-    info: t('rolesInfo.revealerInfo'),
+    get info() {
+      return t('rolesInfo.revealerInfo');
+    },
   },
   cleric: {
     loyalty: 'good',
-    info: t('rolesInfo.clericInfo'),
+    get info() {
+      return t('rolesInfo.clericInfo');
+    },
   },
   unknown: {
     loyalty: 'unknown',
-    info: t('rolesInfo.unknownInfo'),
+    get info() {
+      return t('rolesInfo.unknownInfo');
+    },
   },
   mysteryWizard: {
     loyalty: 'unknown',
-    info: t('rolesInfo.mysteryWizardInfo'),
+    get info() {
+      return t('rolesInfo.mysteryWizardInfo');
+    },
   },
   unknownLancelot: {
     loyalty: 'unknown',
-    info: t('rolesInfo.unknownLancelotInfo'),
+    get info() {
+      return t('rolesInfo.unknownLancelotInfo');
+    },
   },
 };
