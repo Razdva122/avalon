@@ -1,12 +1,12 @@
-import type { TRoles, VisualGameState } from '@avalon/types';
+import type { TRoles, PlayerGameSummary } from '@avalon/types';
 import { goodRolesImportance } from '@avalon/types/consts';
-import { TUserStats, TWinsStats, TWinsStatsWithWinrate, TGameView, TTeammateStats } from '@/helpers/stats/interface';
+import { TUserStats, TWinsStats, TWinsStatsWithWinrate, TGameView, TTeammateStats } from './interface';
 
-export * from '@/helpers/stats/interface';
+export * from './interface';
 
 export const prettifyPercent = (percent: number) => percent.toFixed(2);
 
-export function prepareUserStats(games: VisualGameState[], userID: string): TUserStats {
+export function prepareUserStats(games: PlayerGameSummary[], userID: string): TUserStats {
   const stats = games.reduce<TUserStats<TWinsStats>>(
     (acc, game) => {
       const playerInGame = game.players.find((player) => player.id === userID)!;
@@ -55,16 +55,16 @@ export function prepareUserStats(games: VisualGameState[], userID: string): TUse
     stats.teams.total,
   ].forEach((el) => {
     const updatedEl = <TWinsStatsWithWinrate>el;
-    updatedEl.winrate = prettifyPercent((el.wins / el.total) * 100);
+    updatedEl.winrate = prettifyPercent(el.total ? (el.wins / el.total) * 100 : 0);
   });
 
   return <TUserStats>stats;
 }
 
-export function prepareGamesForView(games: VisualGameState[], userID: string, amount: number = 5): TGameView[] {
+export function prepareGamesForView(games: PlayerGameSummary[], userID: string, amount: number = 5): TGameView[] {
   return games
+    .slice(Math.max(0, games.length - amount))
     .reverse()
-    .slice(0, amount)
     .map((game) => {
       const playerInGame = game.players.find((player) => player.id === userID)!;
       const role = <TRoles>playerInGame.role;
@@ -88,7 +88,7 @@ export function prepareGamesForView(games: VisualGameState[], userID: string, am
  * @returns Array of player statistics
  */
 export function preparePlayerStats(
-  games: VisualGameState[],
+  games: PlayerGameSummary[],
   userID: string,
   relation: 'teammate' | 'enemy',
   limit: number = 5,

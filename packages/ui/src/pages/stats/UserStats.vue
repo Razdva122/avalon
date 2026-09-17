@@ -2,102 +2,112 @@
   <div class="info-page-content stats-page">
     <h1>{{ $t('userStats.userStatsTitle') }}</h1>
     <UserProfileHeader :uuid="$props.uuid" :gameStats="state" />
-    <h2>{{ $t('stats.generalStatsTitle') }}</h2>
-    <v-data-table
-      class="general-table"
-      :headers="generalTable.headers"
-      :items="generalTable.data"
-      hide-default-footer
-      disable-sort
-    >
-      <template v-slot:item.side="{ value }">
-        <span v-if="value === 'good'" class="good-loyalty-icon"></span>
-        <span v-if="value === 'evil'" class="evil-loyalty-icon"></span>
-        {{ $t('userStats.side' + value) }}
-      </template>
-    </v-data-table>
-
-    <h2>{{ $t('userStats.lastGamesStatsTitle') }}</h2>
-    <v-data-table :headers="lastGamesHeaders" :items="lastGames" hide-default-footer disable-sort>
-      <template v-slot:item="{ item }">
-        <tr class="game-row" @click="navigateToGame(item.gameID)">
-          <td>
-            <PreviewLink :target="item.role" />
-          </td>
-          <td>
-            <v-chip v-if="item.isWin" color="green"> {{ $t('userStats.winResult') }}</v-chip>
-            <v-chip v-else color="red"> {{ $t('userStats.loseResult') }}</v-chip>
-          </td>
-          <td>
-            <v-chip v-if="item.ratingChange?.change > 0" color="success" variant="flat" size="small">{{
-              item.ratingChange.string
-            }}</v-chip>
-            <v-chip v-else-if="item.ratingChange?.change < 0" color="error" variant="flat" size="small">{{
-              item.ratingChange.string
-            }}</v-chip>
-            <span v-else>—</span>
-          </td>
-          <td v-if="!isMobile">
-            {{ item.gameID }}
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
-
-    <UserRatings :userID="uuid" />
-
-    <div class="stats-container d-flex flex-column flex-md-row justify-space-between">
-      <div class="teammates-container">
-        <h2>{{ $t('userStats.teammatesStatsTitle') }}</h2>
-        <v-data-table
-          class="teammates-table"
-          :headers="simplifiedHeaders"
-          :items="teammates"
-          hide-default-footer
-          disable-sort
-        >
-          <template v-slot:item="{ item }">
-            <tr class="teammate-row" @click="navigateToPlayerStats(item.id)">
-              <td>
-                <TeammateProfile :teammateID="item.id" />
-              </td>
-              <td>{{ item.gamesCount }}</td>
-              <td>
-                <WinrateDisplay :winrate="item.winrate" />
-              </td>
-            </tr>
-          </template>
-        </v-data-table>
-      </div>
-
-      <div class="enemies-container">
-        <h2>{{ $t('userStats.enemiesStatsTitle') }}</h2>
-        <v-data-table
-          class="enemies-table"
-          :headers="simplifiedHeaders"
-          :items="enemies"
-          hide-default-footer
-          disable-sort
-        >
-          <template v-slot:item="{ item }">
-            <tr class="enemy-row" @click="navigateToPlayerStats(item.id)">
-              <td>
-                <TeammateProfile :teammateID="item.id" />
-              </td>
-              <td>{{ item.gamesCount }}</td>
-              <td>
-                <WinrateDisplay :winrate="item.winrate" />
-              </td>
-            </tr>
-          </template>
-        </v-data-table>
-      </div>
+    <div v-if="loading" class="py-8 text-center" role="status" aria-live="polite">
+      <v-progress-circular indeterminate color="primary" class="mr-3" />
+      {{ $t('mainPage.loading') }}
     </div>
+    <v-alert v-else-if="loadError" type="error" variant="tonal" class="my-4">
+      {{ $t('userStats.loadError') }}
+      <v-btn variant="text" @click="retry">{{ $t('userStats.retry') }}</v-btn>
+    </v-alert>
+    <template v-else>
+      <h2>{{ $t('stats.generalStatsTitle') }}</h2>
+      <v-data-table
+        class="general-table"
+        :headers="generalTable.headers"
+        :items="generalTable.data"
+        hide-default-footer
+        disable-sort
+      >
+        <template v-slot:item.side="{ value }">
+          <span v-if="value === 'good'" class="good-loyalty-icon"></span>
+          <span v-if="value === 'evil'" class="evil-loyalty-icon"></span>
+          {{ $t('userStats.side' + value) }}
+        </template>
+      </v-data-table>
+
+      <h2>{{ $t('userStats.lastGamesStatsTitle') }}</h2>
+      <v-data-table :headers="lastGamesHeaders" :items="lastGames" hide-default-footer disable-sort>
+        <template v-slot:item="{ item }">
+          <tr class="game-row" @click="navigateToGame(item.gameID)">
+            <td>
+              <PreviewLink :target="item.role" />
+            </td>
+            <td>
+              <v-chip v-if="item.isWin" color="green"> {{ $t('userStats.winResult') }}</v-chip>
+              <v-chip v-else color="red"> {{ $t('userStats.loseResult') }}</v-chip>
+            </td>
+            <td>
+              <v-chip v-if="item.ratingChange?.change > 0" color="success" variant="flat" size="small">{{
+                item.ratingChange.string
+              }}</v-chip>
+              <v-chip v-else-if="item.ratingChange?.change < 0" color="error" variant="flat" size="small">{{
+                item.ratingChange.string
+              }}</v-chip>
+              <span v-else>—</span>
+            </td>
+            <td v-if="!isMobile">
+              {{ item.gameID }}
+            </td>
+          </tr>
+        </template>
+      </v-data-table>
+
+      <UserRatings :userID="uuid" />
+
+      <div class="stats-container d-flex flex-column flex-md-row justify-space-between">
+        <div class="teammates-container">
+          <h2>{{ $t('userStats.teammatesStatsTitle') }}</h2>
+          <v-data-table
+            class="teammates-table"
+            :headers="simplifiedHeaders"
+            :items="teammates"
+            hide-default-footer
+            disable-sort
+          >
+            <template v-slot:item="{ item }">
+              <tr class="teammate-row" @click="navigateToPlayerStats(item.id)">
+                <td>
+                  <TeammateProfile :teammateID="item.id" />
+                </td>
+                <td>{{ item.gamesCount }}</td>
+                <td>
+                  <WinrateDisplay :winrate="item.winrate" />
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
+        </div>
+
+        <div class="enemies-container">
+          <h2>{{ $t('userStats.enemiesStatsTitle') }}</h2>
+          <v-data-table
+            class="enemies-table"
+            :headers="simplifiedHeaders"
+            :items="enemies"
+            hide-default-footer
+            disable-sort
+          >
+            <template v-slot:item="{ item }">
+              <tr class="enemy-row" @click="navigateToPlayerStats(item.id)">
+                <td>
+                  <TeammateProfile :teammateID="item.id" />
+                </td>
+                <td>{{ item.gamesCount }}</td>
+                <td>
+                  <WinrateDisplay :winrate="item.winrate" />
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from 'vue';
+import { defineComponent, ref, computed, watch, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useResponsive } from '@/helpers/composables';
@@ -111,11 +121,11 @@ import {
 } from '@/helpers/stats';
 
 import { socket } from '@/api/socket';
+import type { PlayerGameSummary, GameTrueSkillResult } from '@avalon/types';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import TeammateProfile from '@/components/stats/TeammateProfile.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
 import UserRatings from '@/components/stats/UserRatings.vue';
-import { VisualGameState } from '@avalon/types';
 import Avatar from '@/components/user/Avatar.vue';
 import UserProfileHeader from '@/components/stats/UserProfileHeader.vue';
 
@@ -135,59 +145,79 @@ export default defineComponent({
       type: String,
     },
   },
-  async setup(props) {
+  setup(props) {
     const state = ref<TUserStats>();
-    const gamesState = ref<VisualGameState[]>();
-    const lastGames = ref<(TGameView & { ratingChange: { string: string; change: number } })[]>();
+    const lastGames = ref<(TGameView & { ratingChange?: { string: string; change: number } })[]>();
     const teammates = ref<TTeammateStats[]>();
     const enemies = ref<TTeammateStats[]>();
     const { t } = useI18n();
     const { isMobile } = useResponsive();
 
+    const loading = ref(true);
+    const loadError = ref(false);
+    let requestId = 0;
+    onUnmounted(() => {
+      requestId++;
+    });
+
     const initState = async (uuid: string) => {
-      const games = await socket.emitWithAck('getPlayerGames', uuid);
-      state.value = prepareUserStats(games, uuid);
+      const currentRequest = ++requestId;
+      loading.value = true;
+      loadError.value = false;
+      state.value = undefined;
+      lastGames.value = [];
+      teammates.value = [];
+      enemies.value = [];
+      try {
+        const games: PlayerGameSummary[] | null = await socket
+          .timeout(20000)
+          .emitWithAck('getPlayerGameSummaries', uuid);
+        if (currentRequest !== requestId) return;
+        if (!games) throw new Error('Player statistics unavailable');
+        state.value = prepareUserStats(games, uuid);
+        lastGames.value = prepareGamesForView(games, uuid, 5);
+        teammates.value = preparePlayerStats(games, uuid, 'teammate');
+        enemies.value = preparePlayerStats(games, uuid, 'enemy');
+        loading.value = false;
 
-      // Prepare last games view
-      const lastGamesData = prepareGamesForView(games, uuid, 5);
-
-      // Fetch TrueSkill changes for each game
-      const lastGamesWithRating = await Promise.all(
-        lastGamesData.map(async (game) => {
-          // Get all TrueSkill changes for this specific game
-          const result = await socket.emitWithAck('getMatchTrueSkillChanges', game.gameID);
-
-          // Find the TrueSkill change for the current user
-          const userRatingChange = result.gameResult?.playerChanges.find((change) => change.userID === uuid) || {
-            newMu: 0,
-            muChange: 0,
-          };
-
-          return {
-            ...game,
-            ratingChange: {
-              string: `${Math.round(userRatingChange.newMu)} (${userRatingChange.muChange > 0 ? '+' : ''}${Math.round(userRatingChange.muChange)})`,
-              change: userRatingChange.muChange,
-            },
-          };
-        }),
-      );
-
-      lastGames.value = lastGamesWithRating;
-
-      // Use the new combined function with different relation parameters
-      teammates.value = preparePlayerStats(games, uuid, 'teammate');
-      enemies.value = preparePlayerStats(games, uuid, 'enemy');
-
-      gamesState.value = games;
+        // Ratings are optional: show the statistics before these requests finish.
+        void Promise.all(
+          lastGames.value.map(async (game) => {
+            try {
+              const result: { gameResult?: GameTrueSkillResult } = await socket
+                .timeout(10000)
+                .emitWithAck('getMatchTrueSkillChanges', game.gameID);
+              if (currentRequest !== requestId) return;
+              const change = result.gameResult?.playerChanges.find((player) => player.userID === uuid);
+              if (!change) return;
+              const row = lastGames.value?.find((row) => row.gameID === game.gameID);
+              if (row)
+                row.ratingChange = {
+                  string: `${Math.round(change.newMu)} (${change.muChange > 0 ? '+' : ''}${Math.round(change.muChange)})`,
+                  change: change.muChange,
+                };
+            } catch {
+              // Keep the game visible when its rating history is unavailable.
+            }
+          }),
+        );
+      } catch {
+        if (currentRequest === requestId) loadError.value = true;
+      } finally {
+        if (currentRequest === requestId) loading.value = false;
+      }
     };
 
     watch(
       () => props.uuid,
-      (newUUID) => {
-        initState(newUUID);
+      (uuid) => {
+        void initState(uuid);
       },
+      { immediate: true },
     );
+    const retry = () => {
+      void initState(props.uuid);
+    };
 
     const router = useRouter();
 
@@ -199,10 +229,8 @@ export default defineComponent({
       router.push({ name: 'room', params: { uuid: gameID } });
     };
 
-    await initState(props.uuid);
-
     const generalTable = computed(() => {
-      const stateData = state.value!;
+      const stateData = state.value || prepareUserStats([], props.uuid);
       return {
         headers: [
           { title: t('userStats.side'), key: 'side' },
@@ -255,7 +283,9 @@ export default defineComponent({
 
     return {
       state,
-      gamesState,
+      loading,
+      loadError,
+      retry,
       lastGames,
       lastGamesHeaders,
       generalTable,

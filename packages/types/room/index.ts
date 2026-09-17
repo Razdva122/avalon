@@ -1,4 +1,4 @@
-import { prop } from '@typegoose/typegoose';
+import { index, prop } from '@typegoose/typegoose';
 
 import { VisualGameState } from '../game/state';
 import { GameOptions } from '../game/options';
@@ -68,6 +68,7 @@ export class LockedRoomState extends BaseRoomState {
   declare stage: 'locked';
 }
 
+@index({ 'players.id': 1, 'game.stage': 1, _id: 1 })
 export class StartedRoomState extends BaseRoomState {
   declare stage: 'started';
 

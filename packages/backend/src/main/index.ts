@@ -267,6 +267,15 @@ export class Manager {
         cb(stats);
       });
 
+      socket.on('getPlayerGameSummaries', async (uuid, cb) => {
+        try {
+          cb(await dbManager.getPlayerGameSummaries(uuid));
+        } catch (error) {
+          console.error('Failed to load player game summaries', error);
+          cb(null);
+        }
+      });
+
       socket.on('getPlayerGames', async (uuid, cb) => {
         const games = await dbManager.getPlayerGames(uuid);
         cb(games);

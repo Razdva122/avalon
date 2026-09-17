@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { StartedRoomState, TTotalWinrateStats, TWinrateStats, VisualGameState } from '@avalon/types';
+import { PlayerGameSummary, StartedRoomState, TTotalWinrateStats, TWinrateStats, VisualGameState } from '@avalon/types';
 import { roomModel } from '@/db/models/';
 import { query } from '@/db/query';
 import { UserLayer } from '@/db/user';
@@ -32,6 +32,17 @@ export class DBManager extends UserLayer {
     });
 
     return rooms.map((el) => el.game);
+  }
+
+  async getPlayerGameSummaries(playerID: string): Promise<PlayerGameSummary[]> {
+    const rooms = await roomModel
+      .find(
+        { 'players.id': playerID, 'game.stage': 'end', 'game.result.reason': { $ne: 'manualy' } },
+        { _id: 0, 'game.uuid': 1, 'game.players.id': 1, 'game.players.role': 1, 'game.result.winner': 1 },
+      )
+      .sort({ _id: 1 })
+      .lean();
+    return rooms.map((room) => room.game);
   }
 
   async getLastRooms(amount: number): Promise<StartedRoomState[]> {

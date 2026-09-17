@@ -1,3 +1,4 @@
+import type { PlayerGameSummary } from '../stats/player-games';
 import type { StickerResponse, StickerMessage, StickerError } from '../user/stickers';
 import type { TRoomState } from '../room';
 import type { VisualGameState } from '../game/state';
@@ -88,6 +89,7 @@ export interface ClientToServerUserEvents {
 
 export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkillSocketEvents {
   getTotalStats: (callback: (stats: TTotalWinrateStats) => void) => void;
+  getPlayerGameSummaries: (uuid: string, callback: (games: PlayerGameSummary[] | null) => void) => void;
   getPlayerGames: (uuid: string, callback: (games: VisualGameState[]) => void) => void;
   getRoomsList: (callback: (list: TRoomsList) => void) => void;
   getOnlineCounter: (id: string, callback: (counter: number) => void) => void;

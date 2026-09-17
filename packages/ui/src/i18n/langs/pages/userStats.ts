@@ -3,6 +3,8 @@ import { Dictionary } from '@avalon/types';
 
 export const userStats: { [key in TLanguage]: Dictionary<string> } = {
   pt: {
+    loadError: 'Não foi possível carregar as estatísticas. Tente novamente.',
+    retry: 'Tentar novamente',
     userStatsTitle: 'Estatísticas do usuário:',
     lastGamesStatsTitle: 'Últimos jogos',
     game: 'Jogo',
@@ -24,6 +26,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     rating: 'Classificação',
   },
   en: {
+    loadError: 'Could not load statistics. Please try again.',
+    retry: 'Try again',
     userStatsTitle: 'User statistics:',
     lastGamesStatsTitle: 'Last games',
     game: 'Game',
@@ -45,6 +49,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     rating: 'Rating',
   },
   ru: {
+    loadError: 'Не удалось загрузить статистику. Попробуйте ещё раз.',
+    retry: 'Повторить',
     userStatsTitle: 'Статистика пользователя:',
     lastGamesStatsTitle: 'Последние игры',
     game: 'Игра',
@@ -66,6 +72,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     rating: 'Рейтинг',
   },
   es: {
+    loadError: 'No se pudieron cargar las estadísticas. Inténtalo de nuevo.',
+    retry: 'Reintentar',
     userStatsTitle: 'Estadísticas del usuario:',
     lastGamesStatsTitle: 'Últimos juegos',
     game: 'Juego',
@@ -87,6 +95,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     rating: 'Clasificación',
   },
   'zh-TW': {
+    loadError: '無法載入統計資料，請重試。',
+    retry: '重試',
     userStatsTitle: '用戶統計：',
     lastGamesStatsTitle: '最近遊戲',
     game: '遊戲',
@@ -108,6 +118,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     rating: '評分',
   },
   'zh-CN': {
+    loadError: '无法加载统计数据，请重试。',
+    retry: '重试',
     userStatsTitle: '用户统计：',
     lastGamesStatsTitle: '最近游戏',
     game: '游戏',
