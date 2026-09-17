@@ -85,6 +85,7 @@ for (const mode of ['cloud', 'local']) {
       helpers.getImagePathByID('roles/anime', 'merlin'),
       helpers.getImagePathByID('premium', 'puppeteer'),
       helpers.getImagePathByID('stickers', 'morgana-violin'),
+      helpers.getImagePathByID('other', 'preview'),
       helpers.getIconPathByName('merlin_hat'),
       helpers.getIconPathByName('plot-cards/ambush'),
     ]) {
@@ -93,6 +94,15 @@ for (const mode of ['cloud', 'local']) {
       assert.match(file, /^img\/[^/]+\.[a-f0-9]{16}\.webp$/);
       assert(fs.statSync(path.join(out, file)).size > 0);
     }
+    const preview = path.join(out, helpers.getImagePathByID('other', 'preview').slice(prefix.length));
+    const previewMetadata = await require('sharp')(preview).metadata();
+    assert.equal(
+      previewMetadata.hasAlpha,
+      true,
+      'About preview must work on both themes with a transparent background',
+    );
+    const corner = await require('sharp')(preview).extract({ left: 0, top: 0, width: 1, height: 1 }).raw().toBuffer();
+    assert.equal(corner[3], 0, 'About preview must not have an opaque rectangular background');
     // Avatars share a small URL across consumers, independent of wiki artwork.
     const avatar = helpers.getAvatarPathByID('roles', 'merlin');
     assert.notEqual(avatar, helpers.getImagePathByID('roles', 'merlin'));
