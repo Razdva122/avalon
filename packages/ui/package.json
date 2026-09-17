@@ -1,6 +1,6 @@
 {
   "name": "@avalon/ui",
-  "version": "61.2.0",
+  "version": "61.3.0",
   "private": true,
   "scripts": {
     "preserve": "node scripts/generate-locales.cjs",
