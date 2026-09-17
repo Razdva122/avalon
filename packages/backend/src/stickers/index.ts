@@ -8,13 +8,15 @@ import {
 import type { StickerCollection, StickerError } from '@avalon/types';
 import { roomModel, userAchievementModel, userFeaturesModel } from '@/db/models';
 import { achievementsData } from '@/achievements/data';
+import { hasPremium } from '@/support/premium';
+import { supportTotalCents } from '@/support/repository';
 
 export class StickersManager {
   private sending = new Set<string>();
   private lastSent = new Map<string, number>();
 
   async collection(userID: string): Promise<StickerCollection> {
-    const [games, achievements, features] = await Promise.all([
+    const [games, achievements, features, total] = await Promise.all([
       roomModel.distinct('roomID', {
         'game.players.id': userID,
         'game.stage': 'end',
@@ -23,10 +25,11 @@ export class StickersManager {
       }),
       userAchievementModel.find({ userID }).lean(),
       userFeaturesModel.findOne({ userID }).lean(),
+      supportTotalCents(userID),
     ]);
     const completed = achievements.filter((a) => a.completed).map((a) => a.achievementID);
     const stickers = STICKERS.map((sticker) => {
-      const available = isStickerAvailable(sticker, games.length, completed);
+      const available = isStickerAvailable(sticker, games.length, completed, hasPremium(total, features));
       const achievement = achievements.find((a) => a.achievementID === sticker.achievement);
       const requirement = sticker.games || achievementsData.find((a) => a.id === sticker.achievement)?.requirement || 1;
       const secret = sticker.hidden && !available;
@@ -38,10 +41,18 @@ export class StickersManager {
           ? 0
           : Math.min(
               requirement,
-              sticker.achievement ? achievement?.currentProgress || 0 : sticker.games ? games.length : 1,
+              sticker.premium
+                ? Number(available)
+                : sticker.achievement
+                  ? achievement?.currentProgress || 0
+                  : sticker.games
+                    ? games.length
+                    : 1,
             ),
         isNew:
-          available && !!(sticker.games || sticker.achievement) && !(features?.seenStickers || []).includes(sticker.id),
+          available &&
+          !!(sticker.games || sticker.achievement || sticker.premium) &&
+          !(features?.seenStickers || []).includes(sticker.id),
       };
     });
     return {

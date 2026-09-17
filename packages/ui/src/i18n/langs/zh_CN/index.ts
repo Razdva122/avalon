@@ -1,3 +1,4 @@
+import { premiumCosmetics } from '../premiumCosmetics';
 import stickers from '@/i18n/langs/en/stickers';
 /**
  * Main export file for Chinese (Simplified) translations
@@ -16,6 +17,7 @@ import modals from './modals';
 import achievements from './achievements';
 
 export const zh_CN = {
+  premiumCosmetics: premiumCosmetics.zh_CN,
   ...menu,
   ...stickers,
   ...room,

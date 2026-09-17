@@ -1,5 +1,7 @@
 export default {
   stickers: {
+    'mordred-puppet': "@:{'premiumCosmetics.mordred-puppet'}",
+    'morgana-violin': "@:{'premiumCosmetics.morgana-violin'}",
     reward: 'Награда: стикер',
     send: 'Отправить',
     title: 'Стикеры',

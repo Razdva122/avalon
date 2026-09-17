@@ -1,3 +1,4 @@
+import { premiumCosmetics } from '../premiumCosmetics';
 import stickers from './stickers';
 /**
  * Main export file for English translations
@@ -16,6 +17,7 @@ import achievements from './achievements';
 import pages from '@/i18n/langs/pages';
 
 export const en = {
+  premiumCosmetics: premiumCosmetics.en,
   ...menu,
   ...stickers,
   ...room,

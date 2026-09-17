@@ -1,11 +1,14 @@
+import { PREMIUM_COSMETICS_ENABLED } from './premium-cosmetics';
+
 export interface StickerDefinition {
   id: string;
   games?: number;
   achievement?: string;
   hidden?: boolean;
+  premium?: boolean;
 }
 
-export const STICKERS: readonly StickerDefinition[] = [
+const STICKER_CATALOG: readonly StickerDefinition[] = [
   { id: 'servant-yes' },
   { id: 'merlin-think' },
   { id: 'morgana-wow' },
@@ -18,11 +21,16 @@ export const STICKERS: readonly StickerDefinition[] = [
   { id: 'minion-oops', achievement: 'mistakes_happen', hidden: true },
   { id: 'servant-victory', achievement: 'light_wins' },
   { id: 'oberon-smirk', achievement: 'dark_wins' },
+  { id: 'mordred-puppet', premium: true },
+  { id: 'morgana-violin', premium: true },
 ];
+export const STICKERS = STICKER_CATALOG.filter((sticker) => PREMIUM_COSMETICS_ENABLED || !sticker.premium);
 export const STICKER_COOLDOWN_MS = 5000;
 export const STICKER_DURATION_MS = 4000;
 export const STICKER_FAVORITES_LIMIT = 6;
-export const DEFAULT_STICKER_FAVORITES = STICKERS.filter((s) => !s.games && !s.achievement).map((s) => s.id);
+export const DEFAULT_STICKER_FAVORITES = STICKERS.filter((s) => !s.games && !s.achievement && !s.premium).map(
+  (s) => s.id,
+);
 export interface StickerInfo {
   id: string;
   available: boolean;
@@ -48,6 +56,12 @@ export interface StickerMessage {
   stickerID: string;
   showOnBoard: boolean;
 }
-export function isStickerAvailable(sticker: StickerDefinition, games: number, completed: string[]): boolean {
+export function isStickerAvailable(
+  sticker: StickerDefinition,
+  games: number,
+  completed: string[],
+  premium = false,
+): boolean {
+  if (sticker.premium && !premium) return false;
   return sticker.achievement ? completed.includes(sticker.achievement) : games >= (sticker.games || 0);
 }

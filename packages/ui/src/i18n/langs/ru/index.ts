@@ -1,3 +1,4 @@
+import { premiumCosmetics } from '../premiumCosmetics';
 import stickers from './stickers';
 /**
  * Main export file for Russian translations
@@ -16,6 +17,7 @@ import modals from './modals';
 import achievements from './achievements';
 
 export const ru = {
+  premiumCosmetics: premiumCosmetics.ru,
   ...menu,
   ...stickers,
   ...room,

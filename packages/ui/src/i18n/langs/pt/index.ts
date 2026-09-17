@@ -1,3 +1,4 @@
+import { premiumCosmetics } from '../premiumCosmetics';
 import stickers from '@/i18n/langs/en/stickers';
 /**
  * Main export file for Portuguese translations
@@ -16,6 +17,7 @@ import modals from './modals';
 import achievements from './achievements';
 
 export const pt = {
+  premiumCosmetics: premiumCosmetics.pt,
   ...menu,
   ...stickers,
   ...room,

@@ -69,13 +69,14 @@
           :class="{ locked: !sticker.available }"
         >
           <span v-if="sticker.isNew" class="new-badge">{{ $t('stickers.new') }}</span>
+          <span v-if="isPremium(sticker.id)" class="premium-label">Premium</span>
           <div class="art">
             <span v-if="secret(sticker.id, sticker.available)" class="secret-art">?</span
             ><StickerImage v-else :id="sticker.id" />
           </div>
           <h4>{{ secret(sticker.id, sticker.available) ? $t('stickers.secret') : $t(`stickers.${sticker.id}`) }}</h4>
           <p class="requirement">{{ requirement(sticker.id, sticker.available) }}</p>
-          <template v-if="!sticker.available && !secret(sticker.id, false)">
+          <template v-if="!sticker.available && !secret(sticker.id, false) && !isPremium(sticker.id)">
             <v-progress-linear
               :model-value="(sticker.progress / sticker.requirement) * 100"
               color="primary"
@@ -104,7 +105,13 @@
             @click="$emit('send', sticker.id)"
             >{{ $t('stickers.send') }}</v-btn
           >
-          <span v-if="!sticker.available" class="locked-label"
+          <router-link
+            v-if="!sticker.available && isPremium(sticker.id)"
+            class="premium-link"
+            :to="{ name: 'support' }"
+            >{{ $t('premiumCosmetics.explore') }}</router-link
+          >
+          <span v-else-if="!sticker.available" class="locked-label"
             ><span class="material-icons">lock</span>{{ $t('stickers.locked') }}</span
           >
         </article>
@@ -130,8 +137,10 @@ defineEmits<{ (event: 'send', id: string): void }>();
 const { t } = useI18n();
 const { collection, loading, error, busy, load, save, markSeen } = useStickers();
 const secret = (id: string, available: boolean) => !available && STICKERS.find((s) => s.id === id)?.hidden;
+const isPremium = (id: string) => STICKERS.find((s) => s.id === id)?.premium;
 const requirement = (id: string, available: boolean) => {
   const def = STICKERS.find((s) => s.id === id)!;
+  if (def.premium) return t(available ? 'premiumCosmetics.included' : 'premiumCosmetics.onlyPremium');
   if (secret(id, available)) return t('stickers.secretHint');
   if (def.games) return t('stickers.games', { count: def.games });
   if (def.achievement) return t(`achievements.${def.achievement}_description`);
@@ -249,6 +258,21 @@ h3 small {
   top: 8px;
   font-size: 10px;
   color: rgb(var(--v-theme-primary));
+}
+.premium-label {
+  align-self: flex-start;
+  background: #e7c675;
+  color: #382a0c;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+}
+.premium-link {
+  margin-top: auto;
+  padding: 12px 4px;
+  color: rgb(var(--v-theme-text-primary));
+  text-underline-offset: 3px;
 }
 @media (max-width: 480px) {
   .sticker-collection {

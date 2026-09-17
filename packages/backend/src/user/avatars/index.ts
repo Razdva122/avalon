@@ -3,28 +3,45 @@ import { IAvatar } from '@/user/avatars/abstract';
 import { commonAvatars } from '@/user/avatars/common';
 import { ArgumentOfCallback } from '@avalon/types';
 import { achievementsAvatars } from '@/user/avatars/achievements';
+import { PREMIUM_AVATAR_IDS } from '@avalon/types/user/avatars';
+import { hasPremium } from '@/support/premium';
+import { supportTotalCents } from '@/support/repository';
+import { PREMIUM_COSMETICS_ENABLED } from '@avalon/types/user/premium-cosmetics';
+
+const premiumAvatars: IAvatar[] = PREMIUM_AVATAR_IDS.map((id) => ({
+  id,
+  premium: true,
+  isAvailableForUser: ({ premium }) => premium === true,
+}));
 
 export class AvatarsManager {
   dbManager: DBManager;
-  avatars: IAvatar[] = [...commonAvatars, ...achievementsAvatars];
+  avatars: IAvatar[] = [...commonAvatars, ...(PREMIUM_COSMETICS_ENABLED ? premiumAvatars : []), ...achievementsAvatars];
 
   constructor(dbManager: DBManager) {
     this.dbManager = dbManager;
   }
 
   async getAvailableAvatarsForUser(userID: string): Promise<ArgumentOfCallback<'getUserAvatars'>> {
-    const [user, features, achievements] = await Promise.all([
+    const [user, features, achievements, total] = await Promise.all([
       this.dbManager.getUserByID(userID),
       this.dbManager.getUserFeatures(userID),
       this.dbManager.getUserCompletedAchievements(userID),
+      supportTotalCents(userID),
     ]);
 
     return this.avatars.map((avatar) => {
-      const available = avatar.isAvailableForUser({ user, features, achievements });
+      const available = avatar.isAvailableForUser({
+        user,
+        features,
+        achievements,
+        premium: hasPremium(total, features),
+      });
 
       return {
         id: avatar.id,
         available,
+        ...(avatar.premium ? { premium: true } : {}),
         info: avatar.getInfo?.({ user, features }),
       };
     });
@@ -37,13 +54,14 @@ export class AvatarsManager {
       return { error: 'avatarNotExist' };
     }
 
-    const [user, features, achievements] = await Promise.all([
+    const [user, features, achievements, total] = await Promise.all([
       this.dbManager.getUserByID(userID),
       this.dbManager.getUserFeatures(userID),
       this.dbManager.getUserCompletedAchievements(userID),
+      avatar.premium ? supportTotalCents(userID) : Promise.resolve(0),
     ]);
 
-    if (!avatar.isAvailableForUser({ user, features, achievements })) {
+    if (!avatar.isAvailableForUser({ user, features, achievements, premium: hasPremium(total, features) })) {
       return { error: 'avatarNotAvailable' };
     }
 

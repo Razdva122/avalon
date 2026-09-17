@@ -9,6 +9,7 @@
       <span class="premium-mark">✦ PREMIUM</span>
       <h2>{{ t('support.premiumTitle') }}</h2>
       <p>{{ t('support.premiumDescription') }}</p>
+      <PremiumCollection :active="account?.premium === true" />
       <div class="benefits">
         <article v-for="kind in ['badge', 'privacy', 'fair']" :key="kind">
           <h3>{{ t(`support.${kind}Title`) }}</h3>
@@ -21,7 +22,7 @@
       <button type="button" @click="load()">{{ t('support.retry') }}</button>
     </p>
     <div class="support-columns">
-      <section class="support-panel">
+      <section id="support-checkout" class="support-panel" tabindex="-1">
         <h2>{{ t('support.checkout') }}</h2>
         <p v-if="info?.enabled && info.sandbox" class="notice" role="status">{{ t('support.sandboxNotice') }}</p>
         <p v-if="!info && loading" role="status">{{ t('support.refreshing') }}</p>
@@ -125,6 +126,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
 import Avatar from '@/components/user/Avatar.vue';
+import PremiumCollection from './PremiumCollection.vue';
 import { isSupportAmount, safeCheckoutURL } from './checkout';
 import { supportRequest, SupportInfo, SupportAccount } from '@/api/support';
 const { t } = useI18n();
@@ -323,6 +325,9 @@ p {
   grid-template-columns: 1.1fr 1fr;
   gap: 20px;
   margin: 24px 0;
+}
+#support-checkout {
+  scroll-margin-top: 80px;
 }
 label {
   display: block;
