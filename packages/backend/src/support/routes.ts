@@ -3,12 +3,13 @@ import express, { Request, Response, NextFunction } from 'express';
 import { randomUUID } from 'crypto';
 import { validateJWT } from '@/user';
 import { userFeaturesModel, userProfileModel } from '@/db/models';
-import { verifySignature, parseAmountCents } from './protocol';
-import { MinimumPaymentError, NowPayments, supportConfig } from './provider';
+import { parseAmountCents } from './protocol';
+import { OxaPay, oxaPayConfig, oxaTrackId, verifyOxaSignature } from './oxapay';
+import { OxaPayService } from './oxapay-service';
 import { MongoSupportRepository, supportOrderModel, supportTotalCents } from './repository';
-import { publicDonation, SupportService } from './service';
+import { publicDonation } from './service';
 
-const service = new SupportService(new MongoSupportRepository());
+const repository = new MongoSupportRepository();
 const asyncRoute =
   (fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>) =>
   (req: Request, res: Response, next: NextFunction) => {
@@ -16,71 +17,61 @@ const asyncRoute =
   };
 
 export const supportRouter = express.Router();
-supportRouter.use(express.json({ limit: '32kb' }));
 supportRouter.use((_req, res, next) => {
   res.setHeader('Cache-Control', 'no-store');
   next();
 });
 
-// Share in-flight requests and briefly cache quotes across visitors and UI polling.
-let networkCache: { key: string; expires: number; result: ReturnType<NowPayments['networkMinimums']> } | undefined;
-supportRouter.get(
-  '/networks',
-  asyncRoute(async (_req, res) => {
-    const config = supportConfig();
-    if (!config) return res.json({ networks: [] });
-    const key = JSON.stringify([config.apiKey, config.currencies]);
-    if (!networkCache || networkCache.key !== key || networkCache.expires < Date.now()) {
-      const result = new NowPayments(config).networkMinimums();
-      networkCache = { key, expires: Date.now() + 60000, result };
-      void result.catch(() => {
-        if (networkCache?.result === result) networkCache = undefined;
-      });
+// OxaPay signs the exact raw request bytes, not a parsed/sorted JSON object.
+supportRouter.post(
+  '/oxapay/ipn',
+  express.raw({ type: 'application/json', limit: '32kb' }),
+  asyncRoute(async (req, res) => {
+    const config = oxaPayConfig();
+    if (!config) return res.status(503).json({ error: 'unavailable' });
+    if (!verifyOxaSignature(req.body, req.get('hmac'), config.apiKey))
+      return res.status(401).json({ error: 'invalid_signature' });
+    const body = JSON.parse(req.body.toString('utf8'));
+    if (!body || body.type !== 'invoice') return res.status(400).json({ error: 'invalid_payment' });
+    let trackId: string;
+    try {
+      trackId = oxaTrackId(body.track_id);
+    } catch {
+      return res.status(400).json({ error: 'invalid_payment' });
     }
-    return res.json({ networks: await networkCache.result });
+    await new OxaPayService(repository, new OxaPay(config)).reconcile(trackId);
+    return res.type('text/plain').send('ok');
   }),
 );
+supportRouter.use(express.json({ limit: '32kb' }));
 
 supportRouter.get(
   '/',
   asyncRoute(async (_req, res) => {
-    const config = supportConfig();
+    const config = oxaPayConfig();
     const orders = await supportOrderModel
-      .find({ status: 'finished' })
+      .find({ status: 'finished', sandbox: false })
       .sort({ confirmedAt: -1, _id: -1 })
       .limit(10)
       .lean();
     const userIDs = orders.filter((order) => !order.anonymous).map((order) => order.userID);
     const [profiles, features] = await Promise.all([
-      userProfileModel.find({ id: { $in: userIDs } }, { id: 1, name: 1 }).lean(),
+      userProfileModel.find({ id: { $in: userIDs } }, { id: 1, name: 1, avatar: 1 }).lean(),
       userFeaturesModel.find({ userID: { $in: userIDs } }, { userID: 1, hideSupport: 1 }).lean(),
     ]);
     res.json({
       enabled: !!config,
-      currencies: config?.currencies || [],
+      provider: 'oxapay',
+      sandbox: config?.sandbox ?? true,
       thresholdUSD: 10,
       donations: orders.map((order) =>
         publicDonation(
           order,
-          profiles.find((user) => user.id === order.userID)?.name || null,
+          profiles.find((user) => user.id === order.userID) || null,
           features.find((user) => user.userID === order.userID)?.hideSupport === true,
         ),
       ),
     });
-  }),
-);
-
-supportRouter.post(
-  '/nowpayments/ipn',
-  asyncRoute(async (req, res) => {
-    const config = supportConfig();
-    if (!config) return res.status(503).json({ error: 'unavailable' });
-    if (!verifySignature(req.body, req.get('x-nowpayments-sig'), config.ipnSecret)) {
-      return res.status(401).json({ error: 'invalid_signature' });
-    }
-    // Return non-2xx on storage failures so the provider retries instead of silently losing a payment.
-    await service.process(req.body);
-    res.json({ ok: true });
   }),
 );
 
@@ -122,7 +113,7 @@ privateRouter.get(
         id: order.orderId,
         amountUSD: order.amountCents / 100,
         status: order.status,
-        currency: order.payCurrency,
+        sandbox: order.sandbox,
         createdAt: order.createdAt,
         checkoutUrl: ['waiting', 'confirming', 'confirmed', 'sending', 'partially_paid'].includes(order.status)
           ? order.checkoutUrl
@@ -151,16 +142,16 @@ privateRouter.patch(
 privateRouter.post(
   '/invoice',
   asyncRoute(async (req, res) => {
-    const config = supportConfig();
+    const config = oxaPayConfig();
     if (!config) return res.status(503).json({ error: 'unavailable' });
-    const { amountUSD, currency, anonymous } = req.body || {};
+    const { amountUSD, anonymous } = req.body || {};
     let amountCents: number;
     try {
       amountCents = parseAmountCents(amountUSD);
     } catch {
       return res.status(400).json({ error: 'invalid_amount' });
     }
-    if (!config.currencies.includes(currency) || typeof anonymous !== 'boolean') {
+    if (typeof anonymous !== 'boolean') {
       return res.status(400).json({ error: 'invalid_invoice' });
     }
     const userID = res.locals.userID as string;
@@ -182,19 +173,19 @@ privateRouter.post(
       orderId,
       userID,
       amountCents,
-      payCurrency: currency,
+      provider: 'oxapay',
+      sandbox: config.sandbox,
+      payCurrency: 'crypto',
       anonymous,
       status: 'creating',
       createdAt: new Date(),
     });
     try {
-      const invoice = await new NowPayments(config).createInvoice({ orderId, amountCents, payCurrency: currency });
+      const invoice = await new OxaPay(config).createInvoice({ orderId, amountCents });
       await supportOrderModel.updateOne({ orderId }, { $set: { ...invoice, status: 'waiting' } });
       res.json({ id: orderId, url: invoice.checkoutUrl });
-    } catch (error) {
+    } catch {
       await supportOrderModel.updateOne({ orderId }, { $set: { status: 'creation_failed' } });
-      if (error instanceof MinimumPaymentError)
-        return res.status(400).json({ error: 'below_minimum', minimumUSD: error.minimumUSD });
       res.status(502).json({ error: 'invoice_failed' });
     }
   }),
@@ -203,17 +194,17 @@ privateRouter.post(
 privateRouter.post(
   '/orders/:id/refresh',
   asyncRoute(async (req, res) => {
-    const config = supportConfig();
+    const config = oxaPayConfig();
     if (!config) return res.status(503).json({ error: 'unavailable' });
     const order = await supportOrderModel.findOne({ orderId: req.params.id, userID: res.locals.userID }).lean();
     if (!order) return res.status(404).json({ error: 'not_found' });
-    if (!order.paymentID) return res.status(409).json({ error: 'awaiting_notification' });
-    if (order.status !== 'finished') {
-      const payment = await new NowPayments(config).getPayment(order.paymentID);
-      if (String(payment.payment_id) !== order.paymentID || payment.order_id !== order.orderId) {
-        return res.status(502).json({ error: 'payment_mismatch' });
-      }
-      await service.process(payment);
+    if (order.provider !== 'oxapay' || !order.providerInvoiceId?.startsWith('oxapay:'))
+      return res.status(409).json({ error: 'awaiting_notification' });
+    if (!['finished', 'test_paid'].includes(order.status)) {
+      await new OxaPayService(repository, new OxaPay(config)).reconcile(
+        order.providerInvoiceId.slice('oxapay:'.length),
+        order.orderId,
+      );
     }
     res.json({ ok: true });
   }),

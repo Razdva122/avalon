@@ -17,93 +17,33 @@
       </div>
     </section>
     <p v-if="error" class="error" role="alert">
-      {{ t(`support.${error}`, { amount: minimumUSD }) }}
+      {{ t(`support.${error}`) }}
       <button type="button" @click="load()">{{ t('support.retry') }}</button>
     </p>
     <div class="support-columns">
       <section class="support-panel">
         <h2>{{ t('support.checkout') }}</h2>
-        <div v-if="info?.enabled" class="hint" aria-live="polite">
-          <p>{{ t('support.networkMinimumHint') }}</p>
-          <p v-if="networkLoading">{{ t('support.refreshing') }}</p>
-          <ul v-else>
-            <li v-for="code in info.currencies" :key="code">
-              {{ networkName(code) }} —
-              {{
-                networks.find((n) => n.currency === code)?.available
-                  ? t('support.networkMinimum', {
-                      amount: networks.find((n) => n.currency === code)?.minimumUSD?.toFixed(2),
-                      tokens: networks.find((n) => n.currency === code)?.minimumUSDT,
-                    })
-                  : t(
-                      networks.find((n) => n.currency === code)?.reason === 'not_enabled'
-                        ? 'support.networkNotEnabled'
-                        : 'support.networkLookupFailed',
-                    )
-              }}
-            </li>
-          </ul>
-          <button type="button" :disabled="networkLoading" @click="loadNetworks">{{ t('support.refresh') }}</button>
-        </div>
+        <p v-if="info?.enabled && info.sandbox" class="notice" role="status">{{ t('support.sandboxNotice') }}</p>
         <p v-if="!info && loading" role="status">{{ t('support.refreshing') }}</p>
         <p v-else-if="info && !info.enabled" class="notice">{{ t('support.unavailable') }}</p>
         <p v-else-if="info && !store.state.profile" class="notice">{{ t('support.login') }}</p>
         <form v-else-if="info?.enabled" @submit.prevent="checkout">
           <label for="support-amount">{{ t('support.amount') }}</label>
-          <input
-            id="support-amount"
-            v-model="amount"
-            type="number"
-            :min="selectedNetwork?.minimumUSD || 1"
-            max="10000"
-            step="0.01"
-            required
-          />
-          <p
-            v-if="selectedNetwork?.available && Number(amount) < (selectedNetwork.minimumUSD || 1)"
-            class="notice"
-            role="status"
-          >
-            {{
-              t('support.networkMinimum', {
-                amount: selectedNetwork.minimumUSD?.toFixed(2),
-                tokens: selectedNetwork.minimumUSDT,
-              })
-            }}
-            <button type="button" @click="amount = selectedNetwork!.minimumUSD!.toFixed(2)">
-              {{ t('support.useMinimum', { amount: selectedNetwork.minimumUSD?.toFixed(2) }) }}
-            </button>
-          </p>
+          <input id="support-amount" v-model="amount" type="number" min="1" max="10000" step="0.01" required />
           <div class="presets">
             <button
               v-for="value in [10, 20, 50]"
               :key="value"
               type="button"
               :aria-pressed="amount === String(value)"
-              :disabled="networkLoading || !canPayAmount(selectedNetwork, value)"
               @click="amount = String(value)"
             >
               ${{ value }}
             </button>
           </div>
-          <label for="support-network">{{ t('support.network') }}</label>
-          <select id="support-network" v-model="currency" required>
-            <option
-              v-for="code in info.currencies"
-              :key="code"
-              :value="code"
-              :disabled="!networks.find((n) => n.currency === code)?.available"
-            >
-              {{ networkName(code) }}
-            </option>
-          </select>
           <label class="checkbox"><input v-model="anonymous" type="checkbox" />{{ t('support.anonymous') }}</label>
           <p class="hint">{{ t('support.anonymousHint') }}</p>
-          <button
-            class="primary"
-            type="submit"
-            :disabled="busy || loading || !account || networkLoading || !canPayAmount(selectedNetwork, Number(amount))"
-          >
+          <button class="primary" type="submit" :disabled="busy || loading || !account || !isSupportAmount(amount)">
             {{ t(busy ? 'support.refreshing' : 'support.pay') }}
           </button>
           <p class="hint">{{ t('support.paymentHint') }}</p>
@@ -114,9 +54,18 @@
         <p v-if="info && !info.donations.length" class="hint">{{ t('support.empty') }}</p>
         <ol class="donations">
           <li v-for="donation in info?.donations || []" :key="donation.id">
-            <span class="donor"
-              >{{ donation.name || t('support.anonymousName') }}<small>{{ donation.date }}</small></span
-            >
+            <div class="donor">
+              <router-link
+                v-if="donation.userID && donation.name"
+                class="donor-account"
+                :to="{ name: 'user_stats', params: { uuid: donation.userID } }"
+              >
+                <Avatar class="donor-avatar" :avatarID="donation.avatar || 'servant'" alt="" />
+                <span class="donor-name">{{ donation.name }}</span>
+              </router-link>
+              <span v-else>{{ t('support.anonymousName') }}</span>
+              <small>{{ donation.date }}</small>
+            </div>
             <strong>${{ donation.amountUSD.toFixed(2) }}</strong>
           </li>
         </ol>
@@ -145,13 +94,23 @@
         <li v-for="order in account.orders" :key="order.id">
           <div>
             <strong>${{ order.amountUSD.toFixed(2) }}</strong> · {{ t(`support.${order.status}`)
-            }}<small>{{ order.id }}</small>
+            }}<small v-if="order.sandbox">{{ t('support.testInvoice') }}</small
+            ><small>{{ order.id }}</small>
           </div>
           <div class="order-actions">
-            <a v-if="order.checkoutUrl" :href="order.checkoutUrl" target="_blank" rel="noopener noreferrer">{{
-              t('support.resume')
-            }}</a>
-            <button v-if="order.status !== 'finished'" type="button" :disabled="busy" @click="refreshOrder(order.id)">
+            <a
+              v-if="safeCheckoutURL(order.checkoutUrl)"
+              :href="safeCheckoutURL(order.checkoutUrl)"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ t('support.resume') }}</a
+            >
+            <button
+              v-if="!['finished', 'test_paid'].includes(order.status)"
+              type="button"
+              :disabled="busy"
+              @click="refreshOrder(order.id)"
+            >
               {{ t('support.refresh') }}
             </button>
           </div>
@@ -162,17 +121,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
-import { canPayAmount, selectSupportNetwork, SupportNetwork } from './checkout';
-import { supportRequest, SupportInfo, SupportAccount, SupportError } from '@/api/support';
+import Avatar from '@/components/user/Avatar.vue';
+import { isSupportAmount, safeCheckoutURL } from './checkout';
+import { supportRequest, SupportInfo, SupportAccount } from '@/api/support';
 const { t } = useI18n();
 const store = useStore();
 const info = ref<SupportInfo | null>(null);
 const account = ref<SupportAccount | null>(null);
 const amount = ref('10');
-const currency = ref('');
 const anonymous = ref(true);
 const hideSupport = ref(false);
 const showBadge = ref(true);
@@ -180,37 +139,11 @@ const loading = ref(false);
 const busy = ref(false);
 const saved = ref(false);
 const error = ref('');
-const minimumUSD = ref('');
-const networks = ref<SupportNetwork[]>([]);
-const networkLoading = ref(false);
-const selectedNetwork = computed(() => networks.value.find((n) => n.currency === currency.value));
-async function loadNetworks() {
-  networkLoading.value = true;
-  try {
-    const response = await supportRequest<{ networks: typeof networks.value }>('/networks');
-    networks.value = response.networks;
-    currency.value = selectSupportNetwork(networks.value, currency.value, Number(amount.value));
-  } catch {
-    networks.value = [];
-  } finally {
-    networkLoading.value = false;
-  }
-}
 let generation = 0;
 let timer: ReturnType<typeof setInterval> | undefined;
-const networkName = (code: string) =>
-  ({
-    usdttrc20: 'USDT · TRON (TRC-20)',
-    usdterc20: 'USDT · Ethereum (ERC-20)',
-    usdtbsc: 'USDT · BNB Smart Chain',
-    usdtton: 'USDT · TON',
-    usdtsol: 'USDT · Solana',
-  })[code] || code.toUpperCase();
 function report(e: unknown) {
-  minimumUSD.value = e instanceof SupportError ? e.minimumUSD?.toFixed(2) || '' : '';
   error.value =
-    e instanceof Error &&
-    ['authError', 'rateError', 'invoiceError', 'minimumError', 'awaitingNotification'].includes(e.message)
+    e instanceof Error && ['authError', 'rateError', 'invoiceError', 'awaitingNotification'].includes(e.message)
       ? e.message
       : 'error';
 }
@@ -225,9 +158,7 @@ async function load(syncPrivacy = true) {
     ]);
     if (current !== generation) return;
     info.value = publicInfo;
-    if (syncPrivacy && publicInfo.enabled) void loadNetworks();
     account.value = personal;
-    if (!publicInfo.currencies.includes(currency.value)) currency.value = '';
     if (personal && syncPrivacy) {
       hideSupport.value = personal.hideSupport;
       showBadge.value = personal.showPremiumBadge;
@@ -239,14 +170,8 @@ async function load(syncPrivacy = true) {
   }
 }
 async function checkout() {
-  if (!/^\d+(\.\d{1,2})?$/.test(amount.value) || Number(amount.value) < 1 || Number(amount.value) > 10000) {
+  if (!isSupportAmount(amount.value)) {
     error.value = 'invalidAmount';
-    return;
-  }
-  if (!selectedNetwork.value?.available) return;
-  if (Number(amount.value) < (selectedNetwork.value.minimumUSD || 1)) {
-    minimumUSD.value = selectedNetwork.value.minimumUSD!.toFixed(2);
-    error.value = 'minimumError';
     return;
   }
   busy.value = true;
@@ -254,15 +179,13 @@ async function checkout() {
   try {
     const invoice = await supportRequest<{ url: string }>('/invoice', 'POST', {
       amountUSD: amount.value,
-      currency: currency.value,
       anonymous: anonymous.value,
     });
-    const url = new URL(invoice.url);
-    if (url.protocol !== 'https:' || url.hostname !== 'nowpayments.io') throw new Error('invoiceError');
-    window.location.assign(url.href);
+    const url = safeCheckoutURL(invoice.url);
+    if (!url) throw new Error('invoiceError');
+    window.location.assign(url);
   } catch (e) {
     report(e);
-    if (e instanceof SupportError) void loadNetworks();
   } finally {
     busy.value = false;
   }
@@ -473,6 +396,28 @@ select:focus-visible {
 .donor {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+.donor-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+.donor-account:hover .donor-name {
+  text-decoration: underline;
+}
+.donor-avatar {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.donor-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 500;
 }
 small {
   display: block;

@@ -1,25 +1,21 @@
-export interface SupportNetwork {
-  currency: string;
-  available: boolean;
-  minimumUSD?: number;
-  minimumUSDT?: number;
-  reason?: 'not_enabled' | 'lookup_failed';
+export function isSupportAmount(value: string): boolean {
+  return /^\d{1,6}(\.\d{1,2})?$/.test(value) && Number(value) >= 1 && Number(value) <= 10000;
 }
 
-export function canPayAmount(network: SupportNetwork | undefined, amount: number): boolean {
-  return !!network?.available && Number.isFinite(network.minimumUSD) && amount >= network.minimumUSD!;
-}
-
-export function selectSupportNetwork(networks: SupportNetwork[], current: string, amount: number): string {
-  const available = networks.filter((network) => canPayAmount(network, Infinity));
-  if (available.some((network) => network.currency === current)) return current;
-  return (
-    (
-      available.find((network) => canPayAmount(network, amount)) ||
-      available.reduce<SupportNetwork | undefined>(
-        (best, network) => (!best || network.minimumUSD! < best.minimumUSD! ? network : best),
-        undefined,
-      )
-    )?.currency || ''
-  );
+export function safeCheckoutURL(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  try {
+    const url = new URL(value);
+    if (
+      url.protocol !== 'https:' ||
+      !['pay.oxapay.com', 'oxapay.com'].includes(url.hostname) ||
+      url.username ||
+      url.password ||
+      url.port
+    )
+      return undefined;
+    return url.href;
+  } catch {
+    return undefined;
+  }
 }

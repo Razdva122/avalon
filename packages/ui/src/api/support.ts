@@ -2,9 +2,17 @@ import { store } from '@/store';
 
 export interface SupportInfo {
   enabled: boolean;
-  currencies: string[];
+  provider: 'oxapay';
+  sandbox: boolean;
   thresholdUSD: number;
-  donations: { id: string; amountUSD: number; date: string; name: string | null }[];
+  donations: {
+    id: string;
+    amountUSD: number;
+    date: string;
+    name: string | null;
+    userID: string | null;
+    avatar: string | null;
+  }[];
 }
 export interface SupportAccount {
   totalUSD: number;
@@ -15,19 +23,10 @@ export interface SupportAccount {
     id: string;
     amountUSD: number;
     status: string;
-    currency: string;
+    sandbox: boolean;
     createdAt: string;
     checkoutUrl?: string;
   }[];
-}
-
-export class SupportError extends Error {
-  constructor(
-    message: string,
-    public minimumUSD?: number,
-  ) {
-    super(message);
-  }
 }
 
 export async function supportRequest<T>(path = '', method = 'GET', body?: unknown): Promise<T> {
@@ -42,9 +41,7 @@ export async function supportRequest<T>(path = '', method = 'GET', body?: unknow
   });
   if (!response.ok) {
     const details = await response.json().catch(() => ({}));
-    if (details.error === 'below_minimum' && Number.isFinite(details.minimumUSD))
-      throw new SupportError('minimumError', details.minimumUSD);
-    if (details.error === 'awaiting_notification') throw new SupportError('awaitingNotification');
+    if (details.error === 'awaiting_notification') throw new Error('awaitingNotification');
     if (response.status === 401) throw new Error('authError');
     if (response.status === 429) throw new Error('rateError');
     throw new Error(method === 'POST' && path === '/invoice' ? 'invoiceError' : 'error');

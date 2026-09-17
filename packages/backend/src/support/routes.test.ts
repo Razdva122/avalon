@@ -3,6 +3,14 @@ import { Server } from 'http';
 import { AddressInfo } from 'net';
 import { createHmac } from 'crypto';
 import { supportRouter } from './routes';
+jest.mock('./oxapay', () => ({
+  ...jest.requireActual('./oxapay'),
+  OxaPay: class {
+    async getPayment() {
+      return { track_id: '123', order_id: 'unknown' };
+    }
+  },
+}));
 
 jest.mock('@/user', () => ({
   validateJWT: (token: string) => {
@@ -13,7 +21,7 @@ jest.mock('@/user', () => ({
 jest.mock('@/db/models', () => ({
   userProfileModel: {
     exists: async () => true,
-    find: () => ({ lean: async () => [{ id: 'donor', name: 'Hidden Name' }] }),
+    find: () => ({ lean: async () => [{ id: 'donor', name: 'Hidden Name', avatar: 'merlin' }] }),
   },
   userFeaturesModel: {
     find: () => ({ lean: async () => [{ userID: 'donor', hideSupport: true }] }),
@@ -58,11 +66,9 @@ let base: string;
 const env = { ...process.env };
 beforeAll(async () => {
   Object.assign(process.env, {
-    NOWPAYMENTS_API_KEY: 'test',
-    NOWPAYMENTS_IPN_SECRET: 'test-secret',
-    NOWPAYMENTS_CALLBACK_URL: 'https://example.com/ipn',
+    OXAPAY_MERCHANT_API_KEY: 'test-secret',
+    OXAPAY_CALLBACK_URL: 'https://example.com/ipn',
     SUPPORT_FRONTEND_URL: 'https://example.com',
-    NOWPAYMENTS_USDT_CURRENCIES: 'usdttrc20',
   });
   const app = express();
   app.use('/api/support', supportRouter);
@@ -85,7 +91,9 @@ test('public feed omits hidden donor identity and private transaction metadata',
   const response = await fetch(base);
   expect(response.headers.get('cache-control')).toBe('no-store');
   const body = await response.json();
-  expect(body.donations).toEqual([{ id: 'public-id', name: null, amountUSD: 10, date: '2026-09-16' }]);
+  expect(body.donations).toEqual([
+    { id: 'public-id', name: null, userID: null, avatar: null, amountUSD: 10, date: '2026-09-16' },
+  ]);
 });
 test('private endpoints reject missing and forged authentication', async () => {
   for (const authorization of ['', 'Bearer forged-token']) {
@@ -94,19 +102,19 @@ test('private endpoints reject missing and forged authentication', async () => {
   }
 });
 test('webhook rejects forged signatures before any order processing', async () => {
-  const response = await fetch(`${base}/nowpayments/ipn`, {
+  const response = await fetch(`${base}/oxapay/ipn`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-nowpayments-sig': 'a'.repeat(128) },
+    headers: { 'Content-Type': 'application/json', hmac: 'a'.repeat(128) },
     body: '{}',
   });
   expect(response.status).toBe(401);
 });
 test('signed unknown orders remain retryable rather than silently acknowledged', async () => {
-  const body = '{"order_id":"unknown"}';
+  const body = '{"type":"invoice","track_id":"123"}';
   const signature = createHmac('sha512', 'test-secret').update(body).digest('hex');
-  const response = await fetch(`${base}/nowpayments/ipn`, {
+  const response = await fetch(`${base}/oxapay/ipn`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-nowpayments-sig': signature },
+    headers: { 'Content-Type': 'application/json', hmac: signature },
     body,
   });
   expect(response.status).toBe(503);

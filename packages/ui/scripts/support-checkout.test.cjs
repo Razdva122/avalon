@@ -1,27 +1,24 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 require('ts-node').register({ transpileOnly: true, compilerOptions: { module: 'CommonJS' } });
-const { selectSupportNetwork, canPayAmount } = require('../src/pages/support/checkout.ts');
-const networks = [
-  { currency: 'usdttrc20', available: true, minimumUSD: 16.54 },
-  { currency: 'usdterc20', available: false },
-  { currency: 'usdtbsc', available: true, minimumUSD: 4.65 },
-];
-test('initial $10 checkout selects an affordable network instead of blocking on TRON', () => {
-  assert.equal(selectSupportNetwork(networks, '', 10), 'usdtbsc');
+const { isSupportAmount, safeCheckoutURL } = require('../src/pages/support/checkout.ts');
+test('checkout accepts USD cents within the backend limits', () => {
+  for (const value of ['1', '10', '12.34', '10000']) assert.equal(isSupportAmount(value), true);
+  for (const value of ['', '0', '0.99', '10000.01', '1.001', '1e2', '-10', 'NaN'])
+    assert.equal(isSupportAmount(value), false);
 });
-test('refresh preserves an explicitly selected available network even below minimum', () => {
-  assert.equal(selectSupportNetwork(networks, 'usdttrc20', 10), 'usdttrc20');
-});
-test('replaces an unavailable selection and chooses lowest minimum when none are affordable', () => {
-  assert.equal(selectSupportNetwork(networks, 'usdterc20', 10), 'usdtbsc');
-  assert.equal(selectSupportNetwork(networks, '', 1), 'usdtbsc');
-  assert.equal(selectSupportNetwork([], 'usdttrc20', 10), '');
-});
-test('payment and presets require an available quote and an amount meeting its minimum', () => {
-  assert.equal(canPayAmount(networks[0], 10), false);
-  assert.equal(canPayAmount(networks[0], 16.54), true);
-  assert.equal(canPayAmount(networks[1], 20), false);
-  assert.equal(canPayAmount(undefined, 20), false);
-  assert.equal(canPayAmount({ currency: 'usdtbsc', available: true }, 10), false);
+test('checkout and history links accept only trusted OxaPay HTTPS hosts', () => {
+  for (const host of ['oxapay.com', 'pay.oxapay.com'])
+    assert.equal(safeCheckoutURL(`https://${host}/invoice/123`), `https://${host}/invoice/123`);
+  for (const value of [
+    undefined,
+    '',
+    'javascript:alert(1)',
+    'https://nowpayments.io/123',
+    'http://pay.oxapay.com',
+    'https://oxapay.com.evil.test',
+    'https://user@oxapay.com/123',
+    'https://pay.oxapay.com:8080/123',
+  ])
+    assert.equal(safeCheckoutURL(value), undefined);
 });

@@ -2,6 +2,8 @@ import mongoose, { Schema } from 'mongoose';
 import { SupportOrder, SupportRepository } from './service';
 
 const schema = new Schema<SupportOrder>({
+  provider: { type: String, required: true, enum: ['oxapay'] },
+  sandbox: { type: Boolean, required: true },
   orderId: { type: String, required: true, unique: true },
   userID: { type: String, required: true, index: true },
   amountCents: { type: Number, required: true },
@@ -27,7 +29,8 @@ export class MongoSupportRepository implements SupportRepository {
     const result = await supportOrderModel.updateOne(
       {
         orderId,
-        status: { $ne: 'finished' },
+        status: { $nin: ['finished', 'test_paid'] },
+        ...(finished ? { sandbox: false } : {}),
         // A hosted invoice can have a new attempt after an expired/failed payment.
         ...(finished ? {} : { $or: [{ paymentID: { $exists: false } }, { paymentID }] }),
       },
@@ -43,7 +46,7 @@ export class MongoSupportRepository implements SupportRepository {
 
 export async function supportTotalCents(userID: string): Promise<number> {
   const result = await supportOrderModel.aggregate<{ total: number }>([
-    { $match: { userID, status: 'finished' } },
+    { $match: { userID, status: 'finished', sandbox: false } },
     { $group: { _id: null, total: { $sum: '$amountCents' } } },
   ]);
   return result[0]?.total || 0;

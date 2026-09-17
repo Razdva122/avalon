@@ -1,23 +1,22 @@
 import '@/init';
 import mongoose from 'mongoose';
 import { config } from '@/config';
-import { supportConfig, NowPayments } from '@/support/provider';
+import { oxaPayConfig, OxaPay, oxaTrackId } from '@/support/oxapay';
 import { MongoSupportRepository, supportOrderModel } from '@/support/repository';
-import { SupportService } from '@/support/service';
+import { OxaPayService } from '@/support/oxapay-service';
 
-// Operator recovery only. This reads NOWPayments and updates a matching local invoice;
+// Operator recovery only. This reads OxaPay and updates a matching local invoice;
 // it cannot create a payment, send funds, or assign a payment to a different user.
 async function main() {
   const paymentID = process.argv[2];
-  const settings = supportConfig();
-  if (!settings || !paymentID || !/^\d+$/.test(paymentID)) {
-    throw new Error('Configure NOWPayments and pass its numeric payment ID (not a transaction hash).');
+  const settings = oxaPayConfig();
+  if (!settings || !paymentID) {
+    throw new Error('Configure OxaPay and pass the invoice track_id (not a transaction hash).');
   }
-  const payment = await new NowPayments(settings).getPayment(paymentID);
-  if (String(payment.payment_id) !== paymentID) throw new Error('Payment ID mismatch');
+  oxaTrackId(paymentID);
   await mongoose.connect(config.MONGODB_URI, { dbName: config.DB_NAME, authSource: 'admin' });
   await supportOrderModel.init();
-  await new SupportService(new MongoSupportRepository()).process(payment);
+  await new OxaPayService(new MongoSupportRepository(), new OxaPay(settings)).reconcile(paymentID);
   console.log('Payment reconciled with its original Avalon invoice.');
 }
 main()
