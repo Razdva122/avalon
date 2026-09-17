@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { spawnSync } = require('node:child_process');
+const { setTimeout: sleep } = require('node:timers/promises');
 const { storage, publicBase } = require('../image-storage.cjs');
 const filenamePattern = /^[a-zA-Z0-9_-]+\.[a-f0-9]{16}\.(png|webp)$/;
 const mime = (name) => (name.endsWith('.png') ? 'image/png' : 'image/webp');
@@ -58,17 +59,34 @@ function uploadCommands(dir, files) {
     ]);
 }
 
-async function verifyImages(files, fetchImpl = fetch) {
+async function fetchImageHeaders(url, fetchImpl, wait) {
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    try {
+      const response = await fetchImpl(url, {
+        method: 'HEAD',
+        redirect: 'error',
+        signal: AbortSignal.timeout(30000),
+      });
+      const transient = [408, 429, 500, 502, 503, 504].includes(response.status);
+      if (!transient || attempt === 4) return response;
+    } catch (error) {
+      if (attempt === 4) {
+        throw new Error(`Unable to verify image ${url} after ${attempt} attempts: ${error.message}`, {
+          cause: error,
+        });
+      }
+    }
+    await wait(500 * 2 ** (attempt - 1));
+  }
+}
+
+async function verifyImages(files, fetchImpl = fetch, options = {}) {
   // Bound concurrency; every image must be publicly available before UI publication.
   for (let offset = 0; offset < files.length; offset += 8) {
     await Promise.all(
       files.slice(offset, offset + 8).map(async (file) => {
         const url = `${publicBase}img/${file.name}`;
-        const response = await fetchImpl(url, {
-          method: 'HEAD',
-          redirect: 'error',
-          signal: AbortSignal.timeout(30000),
-        });
+        const response = await fetchImageHeaders(url, fetchImpl, options.sleep || sleep);
         assert.equal(response.status, 200, `Image is not public: ${url} (${response.status})`);
         assert.equal(response.headers.get('content-length'), String(file.size), `Public image size mismatch: ${url}`);
         assert.equal(response.headers.get('content-type'), mime(file.name), `Public image MIME mismatch: ${url}`);
@@ -125,7 +143,7 @@ async function main() {
 }
 if (require.main === module)
   main().catch((error) => {
-    console.error(error.message);
+    console.error(error);
     process.exitCode = 1;
   });
 module.exports = { readRelease, uploadImages, verifyImages };

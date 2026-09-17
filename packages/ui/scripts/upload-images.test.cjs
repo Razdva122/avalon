@@ -109,3 +109,97 @@ test('public verification rejects missing images, incorrect bytes, MIME or cache
     await assert.rejects(verifyImages([file], async () => response));
   }
 });
+
+test('public verification recovers from network failures with bounded backoff', async () => {
+  const file = { name: 'merlin.0123456789abcdef.webp', size: 12 };
+  const delays = [];
+  let requests = 0;
+  await verifyImages(
+    [file],
+    async () => {
+      if (++requests < 3) throw new TypeError('fetch failed', { cause: new Error('ECONNRESET') });
+      return goodResponse(file);
+    },
+    { sleep: async (ms) => delays.push(ms) },
+  );
+  assert.equal(requests, 3);
+  assert.deepEqual(delays, [500, 1000]);
+});
+
+test('public verification retries transient HTTP failures but still validates the recovered response', async () => {
+  const file = { name: 'merlin.0123456789abcdef.webp', size: 12 };
+  for (const status of [408, 429, 500, 502, 503, 504]) {
+    let requests = 0;
+    await verifyImages([file], async () => (++requests === 1 ? new Response(null, { status }) : goodResponse(file)), {
+      sleep: async () => {},
+    });
+    assert.equal(requests, 2);
+  }
+  let requests = 0;
+  await assert.rejects(
+    verifyImages(
+      [file],
+      async () => {
+        if (++requests === 1) throw new TypeError('fetch failed');
+        return goodResponse({ ...file, size: 13 });
+      },
+      { sleep: async () => {} },
+    ),
+    /size mismatch/,
+  );
+  assert.equal(requests, 2, 'invalid metadata must fail immediately');
+});
+
+test('exhausted network retries identify the image and preserve the underlying cause', async () => {
+  const file = { name: 'merlin.0123456789abcdef.webp', size: 12 };
+  const failure = new TypeError('fetch failed', { cause: new Error('connect ETIMEDOUT') });
+  const delays = [];
+  let requests = 0;
+  await assert.rejects(
+    verifyImages(
+      [file],
+      async () => {
+        requests++;
+        throw failure;
+      },
+      {
+        sleep: async (ms) => delays.push(ms),
+      },
+    ),
+    (error) => {
+      assert(error.message.includes(`${publicBase}img/${file.name}`));
+      assert.match(error.message, /4 attempts/);
+      assert.equal(error.cause, failure);
+      return true;
+    },
+  );
+  assert.equal(requests, 4);
+  assert.deepEqual(delays, [500, 1000, 2000]);
+});
+
+test('persistent HTTP failures stop verification; permanent failures are not retried', async () => {
+  const file = { name: 'merlin.0123456789abcdef.webp', size: 12 };
+  for (const [status, expectedRequests] of [
+    [503, 4],
+    [403, 1],
+    [404, 1],
+  ]) {
+    let requests = 0;
+    await assert.rejects(
+      verifyImages(
+        [file],
+        async () => {
+          requests++;
+          return new Response(null, { status });
+        },
+        { sleep: async () => {} },
+      ),
+      (error) => {
+        assert(error.message.includes(`${publicBase}img/${file.name}`));
+        assert(error.message.includes(String(status)));
+        return true;
+      },
+    );
+    assert.equal(requests, expectedRequests);
+  }
+});
