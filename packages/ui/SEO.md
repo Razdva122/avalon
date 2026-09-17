@@ -38,7 +38,7 @@ Chart.js theme registration is imported by the chart components rather than the 
 
 ## Checks
 
-`npm run build:ui` runs the language policy tests, production build, `check:seo`, and `check:bundle`. The bundle check prevents database runtimes and full Lodash from entering browser chunks and enforces an initial JavaScript size budget. The latter checks every prerendered route for a heading, language, canonical, robots policy and alternate URLs, plus localized wiki links and breadcrumbs. It also checks sitemap completeness and uniqueness.
+`npm run build:ui` runs the UI tests, production build, and `check:build`. The bundle check prevents database runtimes and full Lodash from entering browser chunks and enforces an initial JavaScript size budget. The HTML checks cover every prerendered route for a heading, language, canonical, robots policy and alternate URLs, plus localized wiki links and breadcrumbs. It also checks sitemap completeness and uniqueness.
 
 On a machine using an already installed browser, set `PUPPETEER_EXECUTABLE_PATH` to the Chrome executable if Puppeteer's downloaded browser is unavailable. The Docker build uses its bundled browser.
 

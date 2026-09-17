@@ -2,9 +2,6 @@
   "name": "@avalon/types",
   "version": "61.7.0",
   "description": "Typings for sharing between ui and backend",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [],
   "author": "@Razdva122",
   "license": "ISC",

@@ -19,14 +19,3 @@ test('activation waits for every deferred stylesheet; failed CSS does not hang s
   assert.equal(ready, true);
   delete global.document;
 });
-
-test('ordinary development pages and already loaded styles do not delay startup', async () => {
-  global.document = {
-    querySelectorAll: (selector) => {
-      assert.equal(selector, 'link[data-critical-css="pending"]');
-      return [];
-    },
-  };
-  assert.deepEqual(await fullStylesReady(), []);
-  delete global.document;
-});

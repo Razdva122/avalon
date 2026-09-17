@@ -5,23 +5,13 @@
   "scripts": {
     "preserve": "npm run generate:avatars && node scripts/generate-locales.cjs",
     "serve": "vue-cli-service serve",
-    "prebuild": "node scripts/generate-locales.cjs",
-    "test:support": "node --test scripts/support-checkout.test.cjs",
-    "test:stats": "node --test scripts/user-stats-loading.test.cjs",
-    "test:options": "node --test scripts/game-options.test.cjs",
-    "build": "npm run test:images && npm run test:avatars && npm run test:support && npm run test:options && npm run test:stats && npm run test:language && npm run test:critical-css && vue-cli-service build && npm run build:critical-css && npm run check:seo && npm run check:bundle && npm run check:images",
-    "test:language": "node --test scripts/language-policy.test.cjs scripts/locale-loading.test.cjs",
-    "check:seo": "node scripts/check-seo.cjs && node --test scripts/structured-data.test.cjs && node scripts/check-seo-navigation.cjs",
+    "prebuild": "npm run generate:avatars && node scripts/generate-locales.cjs",
+    "test": "node --test scripts/*.test.cjs",
+    "build": "npm test && vue-cli-service build && node scripts/critical-css.cjs && npm run check:build",
+    "check:build": "node scripts/check-seo.cjs && node --test scripts/check-structured-data.cjs && node scripts/check-seo-navigation.cjs && node scripts/check-bundle.cjs && node scripts/check-images.cjs",
     "check:seo:http": "node scripts/check-seo-http.cjs",
-    "test:images": "node --test scripts/image-storage.test.cjs scripts/upload-images.test.cjs",
     "upload:images": "node scripts/upload-images.cjs",
-    "check:images": "node scripts/check-images.cjs",
-    "check:bundle": "node scripts/check-bundle.cjs",
-    "build:critical-css": "node scripts/critical-css.cjs",
-    "test:critical-css": "node --test scripts/critical-css.test.cjs",
-    "test:avatars": "node --test scripts/avatar-selection.test.cjs",
-    "generate:avatars": "node scripts/generate-avatars.cjs",
-    "pretest:images": "npm run generate:avatars"
+    "generate:avatars": "node scripts/generate-avatars.cjs"
   },
   "dependencies": {
     "@floating-ui/vue": "^1.1.6",

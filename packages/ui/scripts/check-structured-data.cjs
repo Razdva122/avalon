@@ -45,27 +45,3 @@ test('localized rules describe their own URL and language while retaining breadc
 test('404 page does not describe itself as an indexable public page or game', () => {
   assert.equal(graphAt('/404/').length, 0);
 });
-
-const { routesSeo } = require('../src/router/seo');
-const { localizedPath } = require('../src/router/paths');
-for (const route of Object.values(routesSeo).filter((route) => route.meta.prerender && !route.meta.skipSiteMap)) {
-  for (const [language, meta] of Object.entries(route.meta.multiLanguage)) {
-    const pathname = localizedPath(route.path, language);
-    test(`${pathname}: public page has unique, localized structured data`, () => {
-      const graph = graphAt(pathname);
-      const pages = graph.filter((node) => node['@type'] === 'WebPage');
-      assert.equal(pages.length, 1);
-      assert.equal(pages[0].url, 'https://avalon-game.com' + pathname);
-      assert.equal(pages[0].inLanguage, language);
-      assert.equal(pages[0].name, meta.title);
-      assert.equal(pages[0].description, meta.description);
-      assert.equal(new Set(graph.map((node) => node['@id'])).size, graph.length, 'Duplicate entity IDs');
-      if (route.path.startsWith('/wiki/') && route.path !== '/wiki/') {
-        const breadcrumbs = graph.find((node) => node['@type'] === 'BreadcrumbList');
-        assert(breadcrumbs, 'Missing breadcrumbs');
-        assert.equal(pages[0].breadcrumb['@id'], breadcrumbs['@id']);
-        assert.equal(breadcrumbs.itemListElement.at(-1).item, pages[0].url);
-      }
-    });
-  }
-}

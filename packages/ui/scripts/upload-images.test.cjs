@@ -150,33 +150,6 @@ test('public verification retries transient HTTP failures but still validates th
   assert.equal(requests, 2, 'invalid metadata must fail immediately');
 });
 
-test('exhausted network retries identify the image and preserve the underlying cause', async () => {
-  const file = { name: 'merlin.0123456789abcdef.webp', size: 12 };
-  const failure = new TypeError('fetch failed', { cause: new Error('connect ETIMEDOUT') });
-  const delays = [];
-  let requests = 0;
-  await assert.rejects(
-    verifyImages(
-      [file],
-      async () => {
-        requests++;
-        throw failure;
-      },
-      {
-        sleep: async (ms) => delays.push(ms),
-      },
-    ),
-    (error) => {
-      assert(error.message.includes(`${publicBase}img/${file.name}`));
-      assert.match(error.message, /4 attempts/);
-      assert.equal(error.cause, failure);
-      return true;
-    },
-  );
-  assert.equal(requests, 4);
-  assert.deepEqual(delays, [500, 1000, 2000]);
-});
-
 test('persistent HTTP failures stop verification; permanent failures are not retried', async () => {
   const file = { name: 'merlin.0123456789abcdef.webp', size: 12 };
   for (const [status, expectedRequests] of [

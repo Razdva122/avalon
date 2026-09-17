@@ -38,6 +38,17 @@ npm run serve
 npm run build
 ```
 
+## Tests
+
+From the repository root, `npm test` runs backend and UI tests. To run only the UI
+suite, use `npm test --workspace=packages/ui`; it does not require a built `dist`.
+For one file, run `node --test packages/ui/scripts/user-stats-loading.test.cjs`.
+
+Keep tests for game rules, payment integrity and access control, failed requests,
+and concurrent updates. Avoid tests that merely mirror constants, mock call chains,
+or cosmetic details. The production build runs UI tests and then `check:build`
+against the generated HTML, navigation, bundle and image assets.
+
 ## Search and AI crawler visibility
 
 The production build prerenders public pages, including localized rules and roles,
@@ -48,8 +59,8 @@ cannot overwrite page metadata. Both are updated by the router, avoiding loss of
 breadcrumbs when prerender hydration unmounts components. Private routes and the
 404 page omit this graph.
 
-`npm run build` checks the generated HTML, sitemap and structured data in every
-supported locale, plus Chromium checks for metadata updates during navigation.
+`npm run build` checks the generated HTML and sitemap in every supported locale, representative
+structured data, and metadata updates during navigation in Chromium.
 To check a running Nginx deployment, run:
 
 ```sh
@@ -140,7 +151,7 @@ files and recheck all URLs before publication.
 ### Local verification and manual recovery
 
 ```sh
-npm run test:images --workspace=packages/ui
+npm test --workspace=packages/ui
 npm run build:ui
 npm run upload:images --workspace=packages/ui -- --dry-run
 ```

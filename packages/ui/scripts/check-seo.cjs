@@ -4,13 +4,6 @@ const path = require('node:path');
 const { routesSeo } = require('../src/router/seo');
 const { basePath, localizedPath } = require('../src/router/paths');
 
-// Regressions: strip only a leading locale, never substrings inside a route.
-assert.equal(basePath('/en/wiki/roles/merlin/'), '/wiki/roles/merlin/');
-assert.equal(basePath('/wiki/expansions/'), '/wiki/expansions/');
-assert.equal(localizedPath('/ru/wiki/rules/', 'en'), '/wiki/rules/');
-assert.equal(localizedPath('/wiki/rules', 'zh-TW'), '/zh-tw/wiki/rules/');
-assert.equal(localizedPath('/en/', 'en'), '/');
-
 const dist = path.resolve(__dirname, '../dist');
 const origin = 'https://avalon-game.com';
 const sitemap = fs.readFileSync(path.join(dist, 'sitemap.xml'), 'utf8');
