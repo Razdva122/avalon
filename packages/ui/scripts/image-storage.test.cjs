@@ -99,6 +99,13 @@ for (const mode of ['cloud', 'local']) {
     assert.equal(avatar, helpers.getAvatarPathByID('roles', 'merlin'));
     for (const [type, id] of [
       ['roles', 'merlin'],
+      ['roles', 'anime/merlin_pure'],
+      ['roles', 'anime/witch'],
+      ['roles', 'anime/servant'],
+      ['roles', 'anime/merlin'],
+      ['roles', 'anime/minion'],
+      ['roles', 'anime/troublemaker'],
+      ['roles', 'legacy/merlin'],
       ['core', 'blue_team_no_background'],
       ['features', 'lady_of_lake'],
       ['premium', 'puppeteer'],

@@ -16,13 +16,11 @@
   </header>
   <RouterView v-slot="{ Component }">
     <template v-if="Component">
-      <Transition mode="out-in">
-        <Suspense>
-          <component :is="Component" class="page"></component>
+      <Suspense>
+        <component :is="Component" class="page"></component>
 
-          <template #fallback> {{ $t('mainPage.loading') }} </template>
-        </Suspense>
-      </Transition>
+        <template #fallback> {{ $t('mainPage.loading') }} </template>
+      </Suspense>
     </template>
   </RouterView>
   <LanguageSuggestion />

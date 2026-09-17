@@ -29,17 +29,32 @@ const server = http.createServer((req, res) => {
       ...(process.env.AVALON_BUILD_CONTAINER === '1' ? { args: ['--no-sandbox'] } : {}),
     });
     const page = await browser.newPage();
+    const pageErrors = [];
+    page.on('pageerror', (error) => pageErrors.push(error.stack || error.message));
     await page.setRequestInterception(true);
     page.on('request', (req) => (req.url().startsWith(origin) ? req.continue() : req.abort()));
     await page.goto(origin, { waitUntil: 'networkidle0' });
     await page.waitForFunction(() => document.querySelector('#app').__vue_app__);
-    for (const pathname of ['/ru/wiki/rules/', '/ru/wiki/roles/merlin/', '/ru/about/', '/leaderboard/', '/']) {
+    for (const pathname of [
+      '/leaderboard/',
+      '/',
+      '/ru/wiki/rules/',
+      '/ru/wiki/roles/merlin/',
+      '/ru/about/',
+      '/leaderboard/',
+      '/',
+    ]) {
       await page.evaluate(async (route) => {
         const router = document.querySelector('#app').__vue_app__.config.globalProperties.$router;
         await router.push(route);
         // Let Vue finish mounting/unmounting before checking for late cleanup.
         await new Promise((resolve) => requestAnimationFrame(resolve));
       }, pathname);
+      // Metadata can update even when Vue fails to insert the new route's DOM.
+      if (pathname === '/leaderboard/' || pathname === '/') {
+        await page.waitForSelector(pathname === '/leaderboard/' ? '.leaderboard-page' : '.lobby');
+      }
+      assert.deepEqual(pageErrors, [], `Uncaught errors while navigating to ${pathname}`);
       await page.waitForFunction(
         (route) => {
           const raw = document.querySelector('#page-structured-data').textContent;
