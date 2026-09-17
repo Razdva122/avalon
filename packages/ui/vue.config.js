@@ -95,7 +95,21 @@ module.exports = defineConfig({
               page.on('pageerror', (error) => page.prerenderErrors.push(error.message));
               page.on('console', (message) => {
                 if (message.type() === 'error' && !message.text().startsWith('Failed to load resource')) {
-                  page.prerenderErrors.push(message.text());
+                  // ConsoleMessage.text() reduces Error objects to JSHandle@error.
+                  // Preserve their stack and await serialization before reporting.
+                  page.prerenderErrors.push(
+                    Promise.all(
+                      message
+                        .args()
+                        .map((arg) =>
+                          arg
+                            .evaluate((value) =>
+                              value instanceof Error ? value.stack || value.message : String(value),
+                            )
+                            .catch(() => message.text()),
+                        ),
+                    ).then((details) => details.join(' ') || message.text()),
+                  );
                 }
               });
             },
@@ -126,8 +140,9 @@ module.exports = defineConfig({
                     heading: root.querySelector('h1')?.textContent,
                   }))
                   .catch(() => null);
+                const errors = await Promise.all(page.prerenderErrors);
                 throw new Error(
-                  `Prerender failed for ${route}: ${error.message}; state=${JSON.stringify(state)}; errors=${page.prerenderErrors.join('; ')}`,
+                  `Prerender failed for ${route}: ${error.message}; state=${JSON.stringify(state)}; errors=${errors.join('; ')}`,
                 );
               }
             },
