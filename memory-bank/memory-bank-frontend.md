@@ -141,7 +141,7 @@ Helper functions and utilities:
 - `/src/helpers/event-bus/` - simple event bus for specific UI events
 - `/src/helpers/game-state-manager/` - game state management and history navigation
 - `/src/helpers/i18n/` - localization helpers
-- `/src/helpers/images/` - image handling
+- `/src/helpers/images/` - shared image URLs: Webpack emits hashed files, local in development and Yandex Storage in production. `packages/ui/image-storage.cjs` owns the bucket/prefix configuration. Release CI uploads and publicly verifies the exact build images before packaging the UI; see `packages/ui/README.md` for credentials and release setup.
 - `/src/helpers/scss/` - SCSS helper functions
 - `/src/helpers/setup/` - application setup
 - `/src/helpers/stats/` - statistics handling

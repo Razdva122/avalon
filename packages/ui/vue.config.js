@@ -8,6 +8,8 @@ const PuppeteerRenderer = require('@prerenderer/renderer-puppeteer');
 const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 const { routesSeo } = require('./src/router/seo');
 const { yaMetrika, gtag } = require('./const');
+const { imageGenerator } = require('./image-storage.cjs');
+const imageAssets = imageGenerator();
 
 const { localizedPath } = require('./src/router/paths');
 
@@ -32,12 +34,16 @@ module.exports = defineConfig({
     },
   },
   chainWebpack: (config) => {
+    // Keep images out of JavaScript and give every image a cacheable file URL.
+    config.module.rule('images').type('asset/resource').set('generator', imageAssets);
     config.plugin('html').tap((args) => {
       const templateFunc = args[0].templateParameters;
 
       args[0].templateParameters = (...args) => {
         return {
           ...templateFunc(...args),
+          absoluteImageUrl: (url) => new URL(url, 'https://avalon-game.com').href,
+          imageStorageOrigin: imageAssets.publicPath === '/' ? '' : new URL(imageAssets.publicPath).origin,
           yaMetrika: process.env.NODE_ENV !== 'production' ? '' : yaMetrika,
           gtag: process.env.NODE_ENV !== 'production' ? '' : gtag,
         };

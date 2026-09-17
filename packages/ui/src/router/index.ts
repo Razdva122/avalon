@@ -7,7 +7,7 @@ import type { TMultiLangRoute, TNormalizedLangRoute } from '@/router/seo';
 import Lobby from '@/pages/lobby/Lobby.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { TLanguage, LanguageMap } from '@/helpers/i18n';
-import { s3ImagesPath } from '@/helpers/images';
+import { getImagePath } from '@/helpers/images';
 import { i18n, loadLanguage, commitLanguage } from '@/plugins/i18n';
 import { basePath, localizedPath, isNeutralPath } from './paths';
 import { updateStructuredData } from './structuredData';
@@ -213,7 +213,9 @@ function updateMetadata(to: RouteLocationNormalized) {
   const image = <string>meta.image || 'roles/merlin.webp';
   const url = 'https://avalon-game.com';
 
-  document.querySelector('head meta[property="og:image"]')!.setAttribute('content', `${s3ImagesPath}${image}`);
+  document
+    .querySelector('head meta[property="og:image"]')!
+    .setAttribute('content', new URL(getImagePath(image), url).href);
 
   document.title = <string>meta.title;
   document.querySelector('head meta[property="og:title"]')!.setAttribute('content', <string>meta.title);

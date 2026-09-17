@@ -30,14 +30,15 @@
   </section>
 </template>
 <script setup lang="ts">
+import { getImagePathByID } from '@/helpers/images';
 import { useI18n } from 'vue-i18n';
 import StickerImage from '@/components/stickers/StickerImage.vue';
 defineProps<{ active: boolean }>();
 const { t } = useI18n();
 // Marketing previews remain visible even when gameplay cosmetics are disabled.
 const avatarPreviews: Record<string, string> = {
-  puppeteer: require('@/assets/images/premium/puppeteer.png'),
-  'eclipse-queen': require('@/assets/images/premium/eclipse-queen.png'),
+  puppeteer: getImagePathByID('premium', 'puppeteer'),
+  'eclipse-queen': getImagePathByID('premium', 'eclipse-queen'),
 };
 const items = [
   { id: 'puppeteer', kind: 'avatar', description: 'puppeteerDescription' },

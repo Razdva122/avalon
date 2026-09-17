@@ -1,16 +1,18 @@
-name: Publish images to Docker Hub
+name: Publish release containers and game images
 
 concurrency:
-  group: docker-publish
-  cancel-in-progress: true
+  group: docker-publish-${{ github.event_name }}
+  cancel-in-progress: false
 
 on:
+  workflow_dispatch:
   push:
     tags: [v*.*.*]
 
 jobs:
   # Publish backend image
   publish-backend:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: docker/setup-buildx-action@v3
@@ -29,22 +31,59 @@ jobs:
           tags: ${{ vars.DOCKER_HUB_USERNAME }}/backend-avalon:${{ github.ref_name }}
           platforms: linux/amd64
 
-  # Publish ui image
+  # Publish UI only after its exact build assets are public in Object Storage.
   publish-ui:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - uses: docker/setup-buildx-action@v3
 
-      - name: login to Docker Hub
+      - name: Check storage upload prerequisites
+        env:
+          HAS_STORAGE_ACCESS_KEY: ${{ secrets.YC_STORAGE_ACCESS_KEY_ID != '' }}
+          HAS_STORAGE_SECRET_KEY: ${{ secrets.YC_STORAGE_SECRET_ACCESS_KEY != '' }}
+        run: |
+          test "$HAS_STORAGE_ACCESS_KEY" = true || { echo 'Missing YC_STORAGE_ACCESS_KEY_ID repository secret'; exit 1; }
+          test "$HAS_STORAGE_SECRET_KEY" = true || { echo 'Missing YC_STORAGE_SECRET_ACCESS_KEY repository secret'; exit 1; }
+          aws --version
+
+      - name: Build and export the audited UI release
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ui.Dockerfile
+          target: release-artifact
+          outputs: type=local,dest=./ui-release
+          platforms: linux/amd64
+          cache-from: type=gha,scope=ui-build
+          cache-to: type=gha,mode=max,scope=ui-build
+
+      - name: Upload and verify game images in Yandex Storage
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.YC_STORAGE_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_STORAGE_SECRET_ACCESS_KEY }}
+        run: node packages/ui/scripts/upload-images.cjs ./ui-release
+
+      - name: Login to Docker Hub
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: build and publish container in Docker Hub
+      - name: Package and publish the same UI release
+        if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
+          context: .
+          file: ui-release.Dockerfile
           push: true
-          file: ui.Dockerfile
           tags: ${{ vars.DOCKER_HUB_USERNAME }}/nginx-avalon:${{ github.ref_name }}
           platforms: linux/amd64

@@ -7,8 +7,8 @@ import { getImagePathByID } from '@/helpers/images';
 import { defineComponent } from 'vue';
 import { PREMIUM_COSMETICS_ENABLED } from '@avalon/types/user/premium-cosmetics';
 const premiumAvatars: Record<string, string> = {
-  'premium/puppeteer': require('@/assets/images/premium/puppeteer.png'),
-  'premium/eclipse-queen': require('@/assets/images/premium/eclipse-queen.png'),
+  'premium/puppeteer': getImagePathByID('premium', 'puppeteer'),
+  'premium/eclipse-queen': getImagePathByID('premium', 'eclipse-queen'),
 };
 
 export default defineComponent({

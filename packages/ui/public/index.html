@@ -12,18 +12,20 @@
     <meta property="og:type" content="website" />
     <meta
       property="og:logo"
-      content="https://storage.yandexcloud.net/avalon-game/images/core/blue_team_no_background.webp"
+      content="<%= absoluteImageUrl(require('./../src/assets/images/core/blue_team_no_background.webp')) %>"
     />
     <meta property="og:title" content="Play Avalon Online!" />
     <meta property="og:url" content="https://avalon-game.com/" />
-    <meta property="og:image" content="https://storage.yandexcloud.net/avalon-game/images/roles/merlin.webp" />
+    <meta property="og:image" content="<%= absoluteImageUrl(require('./../src/assets/images/roles/merlin.webp')) %>" />
     <meta
       property="og:description"
       content="Explore the legendary game of strategic deduction with 'Avalon: The Resistance' — free to play online. Learn the rules, join a spirited community."
     />
     <meta name="google-site-verification" content="zQwo8szbCjJFTD1Uh_Bq68oXTOwU3CGJ6QYZmGOUxy0" />
     <meta name="yandex-verification" content="33a6da2eb3612fa7" />
-    <link rel="preconnect" href="https://storage.yandexcloud.net" />
+    <% if (imageStorageOrigin) { %>
+    <link rel="preconnect" href="<%= imageStorageOrigin %>" />
+    <% } %>
     <link rel="canonical" href="https://avalon-game.com/" />
     <link rel="apple-touch-icon" sizes="180x180" href="<%= BASE_URL %>apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="<%= BASE_URL %>favicon-32x32.png" />
