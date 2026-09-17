@@ -39,15 +39,52 @@ export class MinimumPaymentError extends Error {
 export class NowPayments {
   constructor(private config: SupportConfig) {}
 
-  private async request(path: string, body?: unknown): Promise<Record<string, unknown>> {
-    const response = await fetch(`https://api.nowpayments.io/v1/${path}`, {
-      method: body ? 'POST' : 'GET',
-      headers: { 'x-api-key': this.config.apiKey, 'Content-Type': 'application/json' },
-      body: body ? JSON.stringify(body) : undefined,
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!response.ok) throw new Error('provider_unavailable');
-    return (await response.json()) as Record<string, unknown>;
+  private async request(path: string, body?: unknown, retried = false): Promise<Record<string, unknown>> {
+    const url = new URL(`https://api.nowpayments.io/v1/${path}`);
+    // Never log request bodies, payment IDs, credentials or raw provider messages.
+    const endpoint = path.split('?')[0].replace(/\/\d+$/, '/:id');
+    const currency = url.searchParams.get('currency_to') || url.searchParams.get('currency_from') || undefined;
+    let status: number | undefined;
+    let code: string | undefined;
+    try {
+      const response = await fetch(url.href, {
+        method: body ? 'POST' : 'GET',
+        headers: { 'x-api-key': this.config.apiKey, 'Content-Type': 'application/json' },
+        body: body ? JSON.stringify(body) : undefined,
+        signal: AbortSignal.timeout(15000),
+      });
+      status = response.status;
+      const result = await response.json().catch(() => null);
+      if (status === 429 && !body && !retried) {
+        const retryAfter = response.headers.get('retry-after');
+        const seconds = retryAfter === null ? 1 : Number(retryAfter);
+        const delay = Number.isFinite(seconds) && seconds >= 0 ? Math.min(seconds * 1000, 5000) : 1000;
+        console.warn('NOWPayments retrying rate-limited GET', { endpoint, currency, status });
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        return this.request(path, undefined, true);
+      }
+      if (!response.ok) {
+        // Only known provider codes may enter logs; arbitrary strings can contain secrets.
+        if (
+          ['INVALID_API_KEY', 'RATE_LIMIT_EXCEEDED', 'AMOUNT_MINIMAL_ERROR', 'CURRENCY_NOT_FOUND'].includes(
+            result?.code,
+          )
+        )
+          code = result.code;
+        throw new Error('provider_unavailable');
+      }
+      if (!result || typeof result !== 'object' || Array.isArray(result)) throw new Error('invalid_response');
+      return result as Record<string, unknown>;
+    } catch (error) {
+      const reason =
+        error instanceof Error && ['TimeoutError', 'AbortError'].includes(error.name)
+          ? 'timeout'
+          : status === undefined
+            ? 'network_error'
+            : 'response_error';
+      console.warn('NOWPayments request failed', { endpoint, currency, status, code, reason });
+      throw new Error('provider_unavailable');
+    }
   }
 
   private async merchantCurrencies(): Promise<string[]> {
@@ -60,31 +97,33 @@ export class NowPayments {
 
   async networkMinimums() {
     const available = await this.merchantCurrencies();
-    return Promise.all(
-      this.config.currencies.map(async (currency) => {
-        if (!available.includes(currency)) return { currency, available: false };
-        try {
-          const [estimate, minimum] = await Promise.all([
-            this.request(`estimate?amount=10&currency_from=usd&currency_to=${currency}`),
-            this.request(
-              `min-amount?currency_from=${currency}&fiat_equivalent=usd&is_fixed_rate=false&is_fee_paid_by_user=false`,
-            ),
-          ]);
-          const rate = Number(estimate.estimated_amount);
-          const minimumUSDT = Number(minimum.min_amount);
-          if (!Number.isFinite(rate) || rate <= 0 || !Number.isFinite(minimumUSDT) || minimumUSDT <= 0)
-            throw new Error('invalid_minimum');
-          return {
-            currency,
-            available: true,
-            minimumUSDT,
-            minimumUSD: Math.max(1, Math.ceil((minimumUSDT / rate) * 1000) / 100),
-          };
-        } catch {
-          return { currency, available: false };
+    const check = async (currency: string) => {
+      if (!available.includes(currency)) return { currency, available: false, reason: 'not_enabled' as const };
+      try {
+        const estimate = await this.request(`estimate?amount=10&currency_from=usd&currency_to=${currency}`);
+        const minimum = await this.request(
+          `min-amount?currency_from=${currency}&fiat_equivalent=usd&is_fixed_rate=false&is_fee_paid_by_user=false`,
+        );
+        const rate = Number(estimate.estimated_amount);
+        const minimumUSDT = Number(minimum.min_amount);
+        if (!Number.isFinite(rate) || rate <= 0 || !Number.isFinite(minimumUSDT) || minimumUSDT <= 0) {
+          console.warn('NOWPayments invalid minimum', { currency });
+          throw new Error('invalid_minimum');
         }
-      }),
-    );
+        return {
+          currency,
+          available: true,
+          minimumUSDT,
+          minimumUSD: Math.max(1, Math.ceil((minimumUSDT / rate) * 1000) / 100),
+        };
+      } catch {
+        return { currency, available: false, reason: 'lookup_failed' as const };
+      }
+    };
+    // NOWPayments rejects concurrent estimates from the production server with HTTP 429.
+    const networks = [];
+    for (const currency of this.config.currencies) networks.push(await check(currency));
+    return networks;
   }
 
   async createInvoice(order: { orderId: string; amountCents: number; payCurrency: string }) {

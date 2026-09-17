@@ -35,7 +35,11 @@
                       amount: networks.find((n) => n.currency === code)?.minimumUSD?.toFixed(2),
                       tokens: networks.find((n) => n.currency === code)?.minimumUSDT,
                     })
-                  : t('support.networkUnavailable')
+                  : t(
+                      networks.find((n) => n.currency === code)?.reason === 'not_enabled'
+                        ? 'support.networkNotEnabled'
+                        : 'support.networkLookupFailed',
+                    )
               }}
             </li>
           </ul>
@@ -66,6 +70,9 @@
                 tokens: selectedNetwork.minimumUSDT,
               })
             }}
+            <button type="button" @click="amount = selectedNetwork!.minimumUSD!.toFixed(2)">
+              {{ t('support.useMinimum', { amount: selectedNetwork.minimumUSD?.toFixed(2) }) }}
+            </button>
           </p>
           <div class="presets">
             <button
@@ -73,6 +80,7 @@
               :key="value"
               type="button"
               :aria-pressed="amount === String(value)"
+              :disabled="networkLoading || !canPayAmount(selectedNetwork, value)"
               @click="amount = String(value)"
             >
               ${{ value }}
@@ -94,14 +102,7 @@
           <button
             class="primary"
             type="submit"
-            :disabled="
-              busy ||
-              loading ||
-              !account ||
-              networkLoading ||
-              !selectedNetwork?.available ||
-              Number(amount) < (selectedNetwork?.minimumUSD || 1)
-            "
+            :disabled="busy || loading || !account || networkLoading || !canPayAmount(selectedNetwork, Number(amount))"
           >
             {{ t(busy ? 'support.refreshing' : 'support.pay') }}
           </button>
@@ -164,6 +165,7 @@
 import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
+import { canPayAmount, selectSupportNetwork, SupportNetwork } from './checkout';
 import { supportRequest, SupportInfo, SupportAccount, SupportError } from '@/api/support';
 const { t } = useI18n();
 const store = useStore();
@@ -179,7 +181,7 @@ const busy = ref(false);
 const saved = ref(false);
 const error = ref('');
 const minimumUSD = ref('');
-const networks = ref<{ currency: string; available: boolean; minimumUSD?: number; minimumUSDT?: number }[]>([]);
+const networks = ref<SupportNetwork[]>([]);
 const networkLoading = ref(false);
 const selectedNetwork = computed(() => networks.value.find((n) => n.currency === currency.value));
 async function loadNetworks() {
@@ -187,6 +189,7 @@ async function loadNetworks() {
   try {
     const response = await supportRequest<{ networks: typeof networks.value }>('/networks');
     networks.value = response.networks;
+    currency.value = selectSupportNetwork(networks.value, currency.value, Number(amount.value));
   } catch {
     networks.value = [];
   } finally {
@@ -224,7 +227,7 @@ async function load(syncPrivacy = true) {
     info.value = publicInfo;
     if (syncPrivacy && publicInfo.enabled) void loadNetworks();
     account.value = personal;
-    if (!publicInfo.currencies.includes(currency.value)) currency.value = publicInfo.currencies[0] || '';
+    if (!publicInfo.currencies.includes(currency.value)) currency.value = '';
     if (personal && syncPrivacy) {
       hideSupport.value = personal.hideSupport;
       showBadge.value = personal.showPremiumBadge;

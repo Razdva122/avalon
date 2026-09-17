@@ -8,7 +8,11 @@ const config: SupportConfig = {
 };
 const originalFetch = global.fetch;
 const originalEnv = { ...process.env };
+beforeEach(() => {
+  jest.spyOn(console, 'warn').mockImplementation(() => {});
+});
 afterEach(() => {
+  jest.restoreAllMocks();
   global.fetch = originalFetch;
   process.env = { ...originalEnv };
 });
@@ -125,7 +129,119 @@ test('network minimums round up and isolate a failing network', async () => {
     await new NowPayments({ ...config, currencies: ['usdttrc20', 'usdtbsc', 'usdterc20'] }).networkMinimums(),
   ).toEqual([
     { currency: 'usdttrc20', minimumUSD: 16.65, minimumUSDT: 16.48, available: true },
-    { currency: 'usdtbsc', available: false },
-    { currency: 'usdterc20', available: false },
+    { currency: 'usdtbsc', available: false, reason: 'lookup_failed' },
+    { currency: 'usdterc20', available: false, reason: 'not_enabled' },
   ]);
+});
+
+test('distinguishes an unselected currency from a failed quote without exposing provider details', async () => {
+  const logs = jest.spyOn(console, 'warn').mockImplementation(() => {});
+  try {
+    global.fetch = jest.fn(async (url) => {
+      if (String(url).endsWith('/merchant/coins'))
+        return new Response(JSON.stringify({ selectedCurrencies: ['USDTTRC20'] }));
+      return new Response(
+        JSON.stringify({ code: 'INVALID_API_KEY', message: config.apiKey, address: 'private-address' }),
+        { status: 401 },
+      );
+    });
+    const result = await new NowPayments({ ...config, currencies: ['usdttrc20', 'usdterc20'] }).networkMinimums();
+    expect(result).toEqual([
+      { currency: 'usdttrc20', available: false, reason: 'lookup_failed' },
+      { currency: 'usdterc20', available: false, reason: 'not_enabled' },
+    ]);
+    const output = JSON.stringify(logs.mock.calls);
+    expect(output).toContain('401');
+    expect(output).toContain('usdttrc20');
+    expect(output).toContain('INVALID_API_KEY');
+    expect(output).not.toContain(config.apiKey);
+    expect(output).not.toContain('private-address');
+  } finally {
+    logs.mockRestore();
+  }
+});
+
+test('loads all networks when the provider rejects overlapping estimate requests', async () => {
+  let estimating = false;
+  global.fetch = jest.fn(async (url) => {
+    const path = String(url);
+    if (path.endsWith('/merchant/coins'))
+      return new Response(JSON.stringify({ selectedCurrencies: ['USDTTRC20', 'USDTBSC'] }));
+    if (path.includes('/estimate?')) {
+      if (estimating) return new Response('{}', { status: 429 });
+      estimating = true;
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      estimating = false;
+      return new Response(JSON.stringify({ estimated_amount: 10 }));
+    }
+    return new Response(JSON.stringify({ min_amount: 4 }));
+  });
+  const result = await new NowPayments({ ...config, currencies: ['usdttrc20', 'usdtbsc'] }).networkMinimums();
+  expect(result.every((network) => network.available)).toBe(true);
+});
+
+test('retries a rate-limited GET once', async () => {
+  let calls = 0;
+  global.fetch = jest.fn(async () =>
+    ++calls === 1
+      ? new Response('{}', { status: 429, headers: { 'Retry-After': '0' } })
+      : new Response(JSON.stringify({ payment_id: 42 })),
+  );
+  await expect(new NowPayments(config).getPayment('42')).resolves.toEqual({ payment_id: 42 });
+});
+
+test('does not repeat a rate-limited invoice POST, preventing duplicate invoices', async () => {
+  let invoices = 0;
+  global.fetch = jest.fn(async (url) => {
+    const path = String(url);
+    if (path.endsWith('/merchant/coins')) return new Response(JSON.stringify({ selectedCurrencies: ['USDTTRC20'] }));
+    if (path.includes('/estimate?')) return new Response(JSON.stringify({ estimated_amount: 10 }));
+    if (path.includes('/min-amount?')) return new Response(JSON.stringify({ min_amount: 4 }));
+    invoices++;
+    return new Response('{}', { status: 429, headers: { 'Retry-After': '0' } });
+  });
+  await expect(
+    new NowPayments(config).createInvoice({ orderId: 'x', amountCents: 1000, payCurrency: 'usdttrc20' }),
+  ).rejects.toThrow('provider_unavailable');
+  expect(invoices).toBe(1);
+});
+
+test('stops after the second rate-limited GET and redacts payment IDs and unknown error codes', async () => {
+  let requests = 0;
+  global.fetch = jest.fn(async () => {
+    requests++;
+    return new Response(JSON.stringify({ code: config.apiKey, message: config.ipnSecret }), {
+      status: 429,
+      headers: { 'Retry-After': '0' },
+    });
+  });
+  await expect(new NowPayments(config).getPayment('123456789')).rejects.toThrow('provider_unavailable');
+  expect(requests).toBe(2);
+  const output = JSON.stringify((console.warn as jest.Mock).mock.calls);
+  expect(output).not.toContain('123456789');
+  expect(output).not.toContain(config.apiKey);
+  expect(output).not.toContain(config.ipnSecret);
+});
+
+test('waits for the in-flight estimate after a minimum failure before starting the next network', async () => {
+  let active = 0;
+  let maximum = 0;
+  global.fetch = jest.fn(async (url) => {
+    const path = String(url);
+    if (path.endsWith('/merchant/coins'))
+      return new Response(JSON.stringify({ selectedCurrencies: ['USDTTRC20', 'USDTBSC'] }));
+    if (path.includes('/estimate?')) {
+      maximum = Math.max(maximum, ++active);
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      active--;
+      return new Response(JSON.stringify({ estimated_amount: 10 }));
+    }
+    return path.includes('usdttrc20')
+      ? new Response('{}', { status: 500 })
+      : new Response(JSON.stringify({ min_amount: 4 }));
+  });
+  const result = await new NowPayments({ ...config, currencies: ['usdttrc20', 'usdtbsc'] }).networkMinimums();
+  expect(maximum).toBe(1);
+  expect(result[0].available).toBe(false);
+  expect(result[1].available).toBe(true);
 });

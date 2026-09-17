@@ -3,6 +3,9 @@ const en = {
   networkMinimumHint:
     'Minimums vary by network and exchange rate. They are checked again at checkout. Amounts shown are before fees.',
   networkUnavailable: 'Unavailable or minimum could not be loaded',
+  networkNotEnabled: 'This network is not enabled for payments',
+  networkLookupFailed: 'Could not load this network. Try refreshing.',
+  useMinimum: 'Use ${amount}',
   minimumError:
     'This network currently requires approximately ${amount} or more. Choose another network or change the amount, then retry in a minute.',
   awaitingNotification:
@@ -75,6 +78,9 @@ const ru: typeof en = {
   networkMinimumHint:
     'Минимум зависит от сети и курса и повторно проверяется при оплате. Суммы указаны до вычета комиссий.',
   networkUnavailable: 'Недоступна или не удалось получить минимум',
+  networkNotEnabled: 'Эта сеть не подключена для оплаты',
+  networkLookupFailed: 'Не удалось загрузить данные сети. Обновите сведения.',
+  useMinimum: 'Установить ${amount}',
   minimumError:
     'Для этой сети сейчас нужно примерно от ${amount}. Выберите другую сеть или измените сумму и повторите через минуту.',
   awaitingNotification:
@@ -147,6 +153,9 @@ const es: typeof en = {
   networkMinimumHint:
     'El mínimo depende de la red y del tipo de cambio y se verifica de nuevo al pagar. Los importes no descuentan las comisiones.',
   networkUnavailable: 'No disponible o no se pudo consultar el mínimo',
+  networkNotEnabled: 'Esta red no está habilitada para pagos',
+  networkLookupFailed: 'No se pudo cargar esta red. Actualiza los datos.',
+  useMinimum: 'Usar ${amount}',
   minimumError:
     'Esta red requiere actualmente unos ${amount} como mínimo. Elige otra red o cambia el importe y vuelve a intentarlo en un minuto.',
   awaitingNotification:
@@ -222,6 +231,9 @@ const pt: typeof en = {
   networkMinimumHint:
     'O mínimo depende da rede e da cotação e é verificado novamente ao pagar. Os valores são anteriores ao desconto das taxas.',
   networkUnavailable: 'Indisponível ou não foi possível consultar o mínimo',
+  networkNotEnabled: 'Esta rede não está habilitada para pagamentos',
+  networkLookupFailed: 'Não foi possível carregar esta rede. Atualize os dados.',
+  useMinimum: 'Usar ${amount}',
   minimumError:
     'Esta rede exige atualmente um valor mínimo de aproximadamente ${amount}. Escolha outra rede ou altere o valor e tente novamente em um minuto.',
   awaitingNotification:
@@ -295,6 +307,9 @@ const zhCN: typeof en = {
   networkMinimum: '最低约 {amount} 美元（最低 {tokens} USDT）',
   networkMinimumHint: '最低金额随网络和汇率变化，付款时会再次核查。所示金额尚未扣除手续费。',
   networkUnavailable: '暂不可用或无法获取最低金额',
+  networkNotEnabled: '此网络未启用付款',
+  networkLookupFailed: '无法加载此网络，请刷新。',
+  useMinimum: '使用 ${amount}',
   minimumError: '此网络目前要求的最低金额约为 {amount} 美元。请选择其他网络或调整金额，一分钟后重试。',
   awaitingNotification: '尚未收到付款通知。如果您已付款，请将下方的账单编号提供给项目团队，以便核查。',
   title: '帮助 Avalon 持续运营',
@@ -363,6 +378,9 @@ const zhTW: typeof en = {
   networkMinimum: '最低約 {amount} 美元（最低 {tokens} USDT）',
   networkMinimumHint: '最低金額隨網路和匯率變動，付款時會再次核對。所示金額尚未扣除手續費。',
   networkUnavailable: '暫不可用或無法取得最低金額',
+  networkNotEnabled: '此網路未啟用付款',
+  networkLookupFailed: '無法載入此網路，請重新整理。',
+  useMinimum: '使用 ${amount}',
   minimumError: '此網路目前要求的最低金額約為 {amount} 美元。請選擇其他網路或調整金額，一分鐘後重試。',
   awaitingNotification: '尚未收到付款通知。如果您已付款，請將下方的帳單編號提供給專案團隊，以便核對。',
   title: '幫助 Avalon 持續營運',
