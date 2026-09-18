@@ -37,8 +37,10 @@ const { globalAchievements } = require('./globalAchievements');
 const { userAchievements } = require('./userAchievements');
 
 const { support } = require('./support');
+const { community } = require('./community');
 
 module.exports = {
+  community,
   support,
   lobby,
   wiki,

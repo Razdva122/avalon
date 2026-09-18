@@ -5,7 +5,13 @@
     </template>
     {{ $t('startPanel.copyLink') }}
   </v-btn>
-  <v-btn color="info" class="mb-4" @click="onDiscordClick">
+  <v-btn v-if="PREMIUM_COSMETICS_ENABLED" :to="communityPath" color="info" class="mb-4">
+    <template v-slot:prepend>
+      <span class="material-icons" aria-hidden="true">groups</span>
+    </template>
+    {{ $t('community.title') }}
+  </v-btn>
+  <v-btn v-else color="info" class="mb-4" @click="onDiscordClick">
     <template v-slot:prepend>
       <v-icon class="social-icon mr-1" size="large" icon="fa:fa-brands fa-discord" />
     </template>
@@ -42,7 +48,8 @@
 </template>
 
 <script lang="ts">
-import { neutralRoomUrl } from '@/router/paths';
+import { PREMIUM_COSMETICS_ENABLED } from '@avalon/types/user/premium-cosmetics';
+import { localizedPath, neutralRoomUrl } from '@/router/paths';
 import { defineComponent, computed, PropType, toRefs } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
@@ -67,7 +74,8 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { t } = useI18n();
+    const { t, locale } = useI18n();
+    const communityPath = computed(() => localizedPath('/community/', locale.value));
     const { roomState } = toRefs(props);
     const store = useStore();
 
@@ -122,6 +130,8 @@ export default defineComponent({
     };
 
     return {
+      PREMIUM_COSMETICS_ENABLED,
+      communityPath,
       roomState,
       options,
 

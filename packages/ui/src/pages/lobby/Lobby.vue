@@ -35,7 +35,15 @@
 
     <div class="lobby-content">
       <aside class="lobby-sidebar">
-        <a class="discord-card" href="https://discord.gg/Xdu7ByqQtt" target="_blank" rel="noopener noreferrer">
+        <LocaleLink v-if="PREMIUM_COSMETICS_ENABLED" class="discord-card" :to="{ name: 'community' }">
+          <span class="discord-icon material-icons" aria-hidden="true">groups</span>
+          <div>
+            <h2>{{ $t('mainPage.findPlayers') }}</h2>
+            <p>{{ $t('community.bannerText') }}</p>
+          </div>
+          <span class="discord-arrow" aria-hidden="true">→</span>
+        </LocaleLink>
+        <a v-else class="discord-card" href="https://discord.gg/Xdu7ByqQtt" target="_blank" rel="noopener noreferrer">
           <span class="discord-icon" aria-hidden="true"><v-icon icon="fa:fa-brands fa-discord" size="22" /></span>
           <div>
             <h2>{{ $t('mainPage.findPlayers') }}</h2>

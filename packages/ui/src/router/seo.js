@@ -36,9 +36,20 @@ const {
   userAchievements,
   globalAchievements,
   support,
+  community,
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
+  community: {
+    path: '/community/',
+    name: 'community',
+    meta: {
+      skipSiteMap: true,
+      multiLanguage: {
+        ...community,
+      },
+    },
+  },
   support: {
     path: '/support/',
     name: 'support',
