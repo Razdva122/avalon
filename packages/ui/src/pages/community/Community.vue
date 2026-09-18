@@ -30,7 +30,12 @@
                 </li>
               </ul>
             </div>
-            <a class="join-link" :href="server.messenger.url" target="_blank" rel="noopener noreferrer">
+            <a
+              class="join-link"
+              :href="server.messenger.url"
+              target="_blank"
+              :rel="server.sponsored ? 'sponsored noopener noreferrer' : 'noopener noreferrer'"
+            >
               <v-icon :icon="server.messenger.icon" size="20" aria-hidden="true" />
               {{ t('community.join', { messenger: server.messenger.name }) }}
               <span class="material-icons" aria-hidden="true">north_east</span>

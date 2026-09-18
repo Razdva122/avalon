@@ -18,7 +18,7 @@ export async function prerenderArticle(app: App, root: HTMLElement) {
   // would otherwise silently turn hydration into a destructive remount.
   const contentNodes = [
     ...root.querySelectorAll(
-      '.info-page-content h1, .info-page-content h2, .info-page-content h3, .info-page-content p',
+      '.info-page-content h1, .info-page-content h2, .info-page-content h3, .info-page-content p, .support-hero h1, .support-hero p, .community-hero h1, .community-hero p',
     ),
   ];
   const content = contentNodes.map((node) => ({ node, firstChild: node.firstChild, text: node.textContent }));

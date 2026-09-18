@@ -20,7 +20,7 @@ async function checkCrawlerContent() {
   // User-Agent probes detect simple bot blocking, not verified crawler IP policies.
   const agents = ['Googlebot', 'OAI-SearchBot', 'PerplexityBot'];
   for (const language of ['en', 'ru']) {
-    for (const route of ['/', '/wiki/rules/', '/wiki/roles/merlin/']) {
+    for (const route of ['/', '/wiki/rules/', '/wiki/roles/merlin/', '/support/', '/community/']) {
       const pathname = localizedPath(route, language);
       for (const agent of agents) {
         const response = await fetch(origin + pathname, { headers: { 'User-Agent': agent }, redirect: 'manual' });
@@ -54,6 +54,16 @@ async function main() {
   for (const language of languages) {
     await check(localizedPath('/', language), 200);
     await check(localizedPath('/wiki/rules/', language), 200);
+    for (const route of ['/support/', '/community/']) {
+      const pathname = localizedPath(route, language);
+      await check(pathname, 200);
+      await check(pathname.slice(0, -1), 301, pathname);
+      const response = await fetch(origin + pathname);
+      assert.doesNotMatch(response.headers.get('x-robots-tag') || '', /noindex/i, pathname);
+      const html = await response.text();
+      assert(html.includes(`href="https://avalon-game.com${pathname}"`), `${pathname}: missing canonical URL`);
+      assert.match(html, /name="robots" content="index, follow"/);
+    }
     await check(localizedPath('/404/', language), 404, null, true);
     await check(localizedPath('/seo-check-does-not-exist/', language), 404, null, true);
     for (const path of [

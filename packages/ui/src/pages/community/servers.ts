@@ -5,6 +5,7 @@ export interface CommunityServer {
   descriptionKey: string;
   languages: { code: string; label: string }[];
   official: boolean;
+  sponsored?: boolean;
   messenger: { name: string; url: string; icon: string };
 }
 

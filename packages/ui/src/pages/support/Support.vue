@@ -169,6 +169,7 @@ import SupportBenefits from './SupportBenefits.vue';
 import NetworkIcon from './NetworkIcon.vue';
 import WalletQR from './WalletQR.vue';
 import { isSupportTxid } from './checkout';
+import { prerender } from '@/helpers/prerender';
 import { supportRequest, SupportInfo, SupportAccount, SupportPayment } from '@/api/support';
 const { t } = useI18n();
 const store = useStore();
@@ -225,6 +226,7 @@ function report(e: unknown) {
       : 'error';
 }
 async function load(syncPrivacy = true) {
+  if (prerender) return;
   const current = ++generation;
   loading.value = true;
   error.value = '';
@@ -314,6 +316,7 @@ watch(
   },
 );
 onMounted(() => {
+  if (prerender) return;
   void load();
   timer = setInterval(() => {
     if (

@@ -43,8 +43,9 @@ module.exports.routesSeo = {
   community: {
     path: '/community/',
     name: 'community',
+    priority: 0.6,
     meta: {
-      skipSiteMap: true,
+      prerender: true,
       multiLanguage: {
         ...community,
       },
@@ -53,8 +54,9 @@ module.exports.routesSeo = {
   support: {
     path: '/support/',
     name: 'support',
+    priority: 0.5,
     meta: {
-      skipSiteMap: true,
+      prerender: true,
       multiLanguage: {
         ...support,
       },

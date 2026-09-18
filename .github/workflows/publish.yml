@@ -65,6 +65,12 @@ jobs:
           cache-from: type=gha,scope=ui-build
           cache-to: type=gha,mode=max,scope=ui-build
 
+      - name: Verify exported pages with production nginx routing
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes nginx
+          SEO_DIST_DIR=./ui-release node packages/ui/scripts/check-seo-nginx.cjs
+
       - name: Upload and verify game images in Yandex Storage
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.YC_STORAGE_ACCESS_KEY_ID }}

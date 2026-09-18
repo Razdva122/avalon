@@ -12,7 +12,7 @@ function localizedPath(path, language) {
 }
 
 function isNeutralPath(path) {
-  return /^\/(?:password-recovery|support|profile|leaderboard|achievements\/global|room\/[^/]+|stats\/user\/[^/]+|achievements\/user\/[^/]+)\/$/.test(
+  return /^\/(?:password-recovery|profile|leaderboard|achievements\/global|room\/[^/]+|stats\/user\/[^/]+|achievements\/user\/[^/]+)\/$/.test(
     basePath(path),
   );
 }

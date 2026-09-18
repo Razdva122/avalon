@@ -45,3 +45,26 @@ test('localized rules describe their own URL and language while retaining breadc
 test('404 page does not describe itself as an indexable public page or game', () => {
   assert.equal(graphAt('/404/').length, 0);
 });
+
+test('support and community deliver localized public content and structured data without private account data', () => {
+  const { routesSeo } = require('../src/router/seo');
+  const { localizedPath } = require('../src/router/paths');
+  const sitemap = fs.readFileSync(path.join(dist, 'sitemap.xml'), 'utf8');
+  for (const name of ['support', 'community']) {
+    for (const [lang, meta] of Object.entries(routesSeo[name].meta.multiLanguage)) {
+      const route = localizedPath(`/${name}/`, lang);
+      const html = fs.readFileSync(path.join(dist, route, 'index.html'), 'utf8');
+      assert(html.includes(`<title>${meta.title}</title>`), route);
+      assert.match(html, new RegExp(`class="${name}-page(?:[ "][^>]*)`), route);
+      assert.match(html, /<h1\b[^>]*>[^<]+<\/h1>/, route);
+      assert.match(html, /name="robots" content="index, follow"/, route);
+      assert(sitemap.includes(`<loc>https://avalon-game.com${route}</loc>`), route);
+      const page = graphAt(route).find((node) => node['@type'] === 'WebPage');
+      assert.equal(page.url, `https://avalon-game.com${route}`);
+      assert.equal(page.inLanguage, lang);
+      if (name === 'support') {
+        assert.doesNotMatch(html, /class="support-panel account"|id="support-txid"|class="orders"/);
+      }
+    }
+  }
+});
