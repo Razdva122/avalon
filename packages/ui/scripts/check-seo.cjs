@@ -31,7 +31,7 @@ for (const route of Object.values(routesSeo).filter((route) => route.meta.preren
       `${pathname}: personalized suggestion baked into HTML`,
     );
     assert.match(html, /<h1(?:\s|>)/, `${pathname}: missing prerendered heading`);
-    if (/^\/(wiki(?:\/|$)|about(?:\/|$))/.test(basePath(pathname))) {
+    if (basePath(pathname) === '/' || /^\/(wiki(?:\/|$)|about(?:\/|$))/.test(basePath(pathname))) {
       assert(html.includes(`data-ssr-path="${pathname}"`), `${pathname}: missing hydration marker`);
       assert(html.includes('<!--[-->'), `${pathname}: missing Vue SSR fragment markers`);
     }

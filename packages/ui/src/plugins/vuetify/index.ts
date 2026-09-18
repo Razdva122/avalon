@@ -2,13 +2,13 @@ import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
 import { aliases, md } from 'vuetify/iconsets/md';
 import { fa } from './icons';
-import { hydrateArticle, article } from '@/helpers/prerender';
+import { hydratePage, ssrPage } from '@/helpers/prerender';
 import { userSettingsInStorage } from '@/store/init';
 
 import type { IUserSettings } from '@/store/interface';
 
 function selectTheme(): 'lightTheme' | 'darkTheme' {
-  if (!hydrateArticle && userSettingsInStorage) {
+  if (!hydratePage && userSettingsInStorage) {
     const settings: IUserSettings = JSON.parse(userSettingsInStorage);
 
     return settings.colorTheme === 'dark' ? 'darkTheme' : 'lightTheme';
@@ -76,7 +76,7 @@ const darkTheme = {
 };
 
 export const vuetify = createVuetify({
-  ssr: article,
+  ssr: ssrPage,
   theme: {
     defaultTheme: selectTheme(),
     themes: {

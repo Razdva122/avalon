@@ -14,12 +14,12 @@ import { i18n } from '@/plugins/i18n';
 import LocaleLink from '@/components/feedback/LocaleLink.vue';
 import { isNeutralPath } from '@/router/paths';
 import { socket } from '@/api/socket';
-import { prerender, article, hydrateArticle } from '@/helpers/prerender';
+import { prerender, ssrPage, hydratePage } from '@/helpers/prerender';
 import { userSettingsInStorage } from '@/store/init';
 import { fullStylesReady } from '@/helpers/critical-css';
 
 const root = document.querySelector<HTMLElement>('#app')!;
-const app = (hydrateArticle || (prerender && article) ? createSSRApp : createApp)(App)
+const app = (hydratePage || (prerender && ssrPage) ? createSSRApp : createApp)(App)
   .component('LocalizedTextWrapper', LocalizedTextWrapper)
   .component('LocaleLink', LocaleLink)
   .use(i18n)
@@ -29,12 +29,12 @@ const app = (hydrateArticle || (prerender && article) ? createSSRApp : createApp
 
 async function start() {
   await Promise.all([router.isReady(), fullStylesReady()]);
-  if (prerender && article) {
-    const { prerenderArticle } = await import('@/helpers/prerender-article');
-    await prerenderArticle(app, root);
+  if (prerender && ssrPage) {
+    const { prerenderPage } = await import('@/helpers/prerender-page');
+    await prerenderPage(app, root);
   } else {
     app.mount(root);
-    if (hydrateArticle) {
+    if (hydratePage) {
       // Hydrate the anonymous/default build state first, then apply the user's
       // settings reactively so Vue patches theme/icon classes as well as text.
       store.commit('restoreClientPreferences');

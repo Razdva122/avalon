@@ -12,7 +12,7 @@ import { alertsInStorage, userProfileInStorage, userSettingsInStorage } from '@/
 export * from '@/store/interface';
 
 import { socket } from '@/api/socket';
-import { hydrateArticle } from '@/helpers/prerender';
+import { hydratePage } from '@/helpers/prerender';
 
 import type { ArgumentOfCallback, UserWithToken } from '@avalon/types';
 
@@ -20,8 +20,8 @@ export const key: InjectionKey<Store<IState>> = Symbol();
 
 export const store = createStore<IState>({
   state: {
-    profile: !hydrateArticle && userProfileInStorage ? JSON.parse(userProfileInStorage) : null,
-    settings: !hydrateArticle && userSettingsInStorage ? JSON.parse(userSettingsInStorage) : null,
+    profile: !hydratePage && userProfileInStorage ? JSON.parse(userProfileInStorage) : null,
+    settings: !hydratePage && userSettingsInStorage ? JSON.parse(userSettingsInStorage) : null,
     hideSpoilers: false,
     connect: null,
     users: {},
