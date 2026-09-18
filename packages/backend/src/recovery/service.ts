@@ -2,7 +2,7 @@ import { randomBytes, randomUUID } from 'crypto';
 import bcrypt from 'bcrypt';
 import { MailConfig, normalizeEmail } from './config';
 import { decrypt, encrypt, privateKey, tokenHash } from './crypto';
-import { Mail, renderMail } from './mail';
+import { Mail, mailLanguage, renderMail } from './mail';
 import { MailJob, MongoRecoveryRepository } from './repository';
 
 const minute = 60000;
@@ -31,7 +31,7 @@ export class RecoveryService {
       state: 'pending',
     };
   }
-  async request(raw: string, ip: string, language: string): Promise<void> {
+  async request(raw: string, ip: string, language: unknown): Promise<void> {
     const now = this.clock();
     if (
       !(await this.repository.take(privateKey(`request:${ip}`, this.config.key), [{ count: 10, ms: 15 * minute }], now))
@@ -55,9 +55,14 @@ export class RecoveryService {
     ]);
     if (!accepted || !user || suppressed || !this.allowed(email)) return;
     const token = randomBytes(32).toString('hex');
-    const job = this.job('reset', { to: user.email, language, token }, now);
+    const locale = mailLanguage(language);
+    const job = this.job('reset', { to: user.email, language: locale, token }, now);
     job.tokenHash = tokenHash(token);
-    await this.repository.enqueue(user, { hash: job.tokenHash, email, expiresAt: job.expiresAt }, job);
+    await this.repository.enqueue(
+      user,
+      { hash: job.tokenHash, email, expiresAt: job.expiresAt, language: locale },
+      job,
+    );
   }
   async reset(token: string, password: string, ip: string): Promise<string> {
     const now = this.clock();
@@ -79,7 +84,8 @@ export class RecoveryService {
     });
     if (!user) throw new Error('invalid_token');
     const passwordHash = await bcrypt.hash(password, 12);
-    const job = this.job('changed', { to: user.email, language: 'en' }, now);
+    const language = mailLanguage(user.recoveryTokens?.find((token) => token.hash === hash)?.language);
+    const job = this.job('changed', { to: user.email, language }, now);
     const changed = await this.repository.consume(hash, passwordHash, job, this.clock());
     if (!changed) throw new Error('invalid_token');
     return changed.id;

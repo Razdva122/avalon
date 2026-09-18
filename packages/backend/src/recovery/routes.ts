@@ -23,7 +23,7 @@ export function createRecoveryRouter(service: RecoveryService | null, onReset: (
       if (!service) return res.status(503).json({ error: 'unavailable' });
       const started = Date.now();
       try {
-        await service.request(req.body?.email, req.ip || 'unknown', req.body?.language === 'ru' ? 'ru' : 'en');
+        await service.request(req.body?.email, req.ip || 'unknown', req.body?.language);
       } finally {
         // Equal work for existing/missing addresses plus a response floor. No SMTP in request path.
         await delay(Math.max(0, 300 - (Date.now() - started)));

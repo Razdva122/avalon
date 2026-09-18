@@ -2,6 +2,7 @@ import { mongo } from 'mongoose';
 import { randomUUID } from 'crypto';
 
 export interface ResetToken {
+  language?: string;
   hash: string;
   email: string;
   expiresAt: Date;

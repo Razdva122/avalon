@@ -331,3 +331,49 @@ test('quota deferrals do not consume the retry budget for temporary SMTP failure
   expect(queue[0].attempts).toBe(1);
   expect(queue[0].state).toBe('pending');
 });
+
+const mailSubjects = [
+  ['en', 'Reset your Avalon password', 'Your Avalon password was changed'],
+  ['ru', 'Восстановление пароля Avalon', 'Пароль Avalon изменён'],
+  ['es', 'Restablece tu contraseña de Avalon', 'Tu contraseña de Avalon ha cambiado'],
+  ['pt', 'Redefina sua senha do Avalon', 'Sua senha do Avalon foi alterada'],
+  ['zh-CN', '重置 Avalon 密码', 'Avalon 密码已更改'],
+  ['zh-TW', '重設 Avalon 密碼', 'Avalon 密碼已變更'],
+];
+
+test.each(mailSubjects)(
+  'both recovery emails retain the requested %s locale',
+  async (language, resetSubject, changedSubject) => {
+    const app = express().use(createRecoveryRouter(service));
+    const server = app.listen(0);
+    try {
+      const response = await fetch(`http://127.0.0.1:${(server.address() as AddressInfo).port}/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'player@example.com', language }),
+      });
+      expect(response.status).toBe(202);
+      const user = await repository.users.findOne({ id: 'player' });
+      const token = JSON.parse(decrypt(user!.mailQueue![0].payload, config.key)).token;
+      await service.deliverOne();
+      expect(sent[0].subject).toBe(resetSubject);
+      expect(sent[0].text).toContain(`/password-recovery/#${token}`);
+      expect(sent[0].text).toContain('30');
+      await service.reset(token, 'new-password', '192.0.2.2');
+      await service.deliverOne();
+      expect(sent[1].subject).toBe(changedSubject);
+      expect(sent[1].text).not.toContain(token);
+    } finally {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
+  },
+);
+
+test('old tokens without a language still reset and notify in English', async () => {
+  const token = await requestToken();
+  await repository.users.updateOne({ id: 'player' }, { $unset: { 'recoveryTokens.0.language': 1 } });
+  await service.deliverOne();
+  await service.reset(token, 'new-password', '192.0.2.2');
+  await service.deliverOne();
+  expect(sent[1].subject).toBe('Your Avalon password was changed');
+});
