@@ -93,6 +93,10 @@ app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, '../dist/index.
     await page.setRequestInterception(true);
     page.on('request', (req) => (req.url().startsWith(origin) ? req.continue() : req.abort()));
     await page.evaluateOnNewDocument(() => {
+      // Neutral pages use the saved language, not the URL prefix. Keep the
+      // browser English (as in CI) so Russian assertions cannot depend on the host.
+      Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+      localStorage.setItem('__user-settings__', JSON.stringify({ locale: { value: 'ru', isDefault: false } }));
       localStorage.setItem(
         '__user-profile__',
         JSON.stringify({
