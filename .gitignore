@@ -31,3 +31,6 @@ pnpm-debug.log*
 
 # Generated avatar previews; rebuilt before image tests/build and dev startup.
 /packages/ui/src/assets/avatars/
+
+# Local production operations notes; never publish.
+/.private-ops/

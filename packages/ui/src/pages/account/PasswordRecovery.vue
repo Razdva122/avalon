@@ -9,7 +9,7 @@
       <v-alert v-if="sent || done" type="success" variant="tonal" role="status" class="mb-4">
         {{ $t(done ? 'passwordRecovery.done' : 'passwordRecovery.sent') }}
       </v-alert>
-      <v-form v-if="enabled && !done && !sent" ref="form" @submit.prevent="submit">
+      <v-form v-if="enabled && !done && !sent && error !== 'invalid_token'" ref="form" @submit.prevent="submit">
         <template v-if="!token">
           <p class="mb-5">{{ $t('passwordRecovery.intro') }}</p>
           <TextField
@@ -43,7 +43,7 @@
         </v-btn>
       </v-form>
       <v-btn
-        v-if="(token || sent) && !done"
+        v-if="(sent || error === 'invalid_token') && !done"
         class="mt-4"
         variant="text"
         color="text-primary"
@@ -125,10 +125,10 @@ export default defineComponent({
   },
   methods: {
     passwordRule(value: string) {
-      return (
-        (value.length >= 8 && new TextEncoder().encode(value).length <= 72 && !/\s/.test(value)) ||
-        this.$t('passwordRecovery.invalid_password')
-      );
+      if (new TextEncoder().encode(value).length > 72) {
+        return this.$t('passwordRecovery.passwordTooLong');
+      }
+      return (value.length >= 8 && !/\s/.test(value)) || this.$t('passwordRecovery.invalid_password');
     },
     confirmRule(value: string) {
       return (!!value && value === this.password) || this.$t('passwordRecovery.mismatch');
