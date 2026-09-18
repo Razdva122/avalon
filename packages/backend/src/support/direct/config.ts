@@ -11,9 +11,10 @@ export interface NetworkConfig {
   apiKey?: string;
 }
 const evmAddress = '0xE37cA64A14dD8e92929B7E71f3DA32267Da5969a';
-const definitions: Omit<NetworkConfig, 'url'>[] = [
+const definitions: NetworkConfig[] = [
   {
     id: 'btc',
+    url: 'https://mempool.space/api',
     label: 'BTC · Bitcoin',
     asset: 'BTC',
     decimals: 8,
@@ -21,6 +22,7 @@ const definitions: Omit<NetworkConfig, 'url'>[] = [
   },
   {
     id: 'tron',
+    url: 'https://api.trongrid.io',
     label: 'USDT · TRON (TRC20)',
     asset: 'USDT',
     decimals: 6,
@@ -29,6 +31,7 @@ const definitions: Omit<NetworkConfig, 'url'>[] = [
   },
   {
     id: 'eth',
+    url: 'https://ethereum-rpc.publicnode.com',
     label: 'USDT · Ethereum (ERC20)',
     asset: 'USDT',
     decimals: 6,
@@ -38,6 +41,7 @@ const definitions: Omit<NetworkConfig, 'url'>[] = [
   },
   {
     id: 'bsc',
+    url: 'https://bsc-rpc.publicnode.com',
     label: 'Binance-Peg USDT · BNB Smart Chain (BEP20)',
     asset: 'USDT',
     decimals: 18,
@@ -47,11 +51,10 @@ const definitions: Omit<NetworkConfig, 'url'>[] = [
   },
 ];
 export function configuredNetworks(env: NodeJS.ProcessEnv = process.env): NetworkConfig[] {
-  if (env.DIRECT_SUPPORT_ENABLED !== 'true') return [];
   return definitions.flatMap((def) => {
     const prefix = `SUPPORT_${def.id.toUpperCase()}`;
     const address = env[`${prefix}_ADDRESS`] ?? def.address;
-    const raw = env[`${prefix}_${def.chainId ? 'RPC' : 'API'}_URL`];
+    const raw = env[`${prefix}_${def.chainId ? 'RPC' : 'API'}_URL`] ?? def.url;
     if (!raw || !validAddress(def.id, address)) return [];
     try {
       const url = new URL(raw);

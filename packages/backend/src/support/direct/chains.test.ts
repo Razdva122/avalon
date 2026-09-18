@@ -3,7 +3,6 @@ import { normalizeTxid, tronHex, formatAtomic } from './protocol';
 import { readTransfer, valueTransfer, networkReady } from './chains';
 
 const env = {
-  DIRECT_SUPPORT_ENABLED: 'true',
   SUPPORT_BTC_API_URL: 'https://btc.example/api',
   SUPPORT_ETH_RPC_URL: 'https://eth.example',
   SUPPORT_BSC_RPC_URL: 'https://bsc.example',
@@ -60,8 +59,17 @@ function evm(id = 'eth') {
   responses['eth_getBlockByNumber:["0x64",false]'] = { number: '0x64', hash: `0x${hash}` };
   return receipt;
 }
-test('configuration is opt-in, validates recipients and never accepts arbitrary networks or URL protocols', () => {
-  expect(configuredNetworks({})).toEqual([]);
+test('configuration defaults to four mainnet providers, validates recipients and never accepts arbitrary networks or URL protocols', () => {
+  expect(configuredNetworks({}).map(({ id, url }) => ({ id, url }))).toEqual([
+    { id: 'btc', url: 'https://mempool.space/api' },
+    { id: 'tron', url: 'https://api.trongrid.io' },
+    { id: 'eth', url: 'https://ethereum-rpc.publicnode.com' },
+    { id: 'bsc', url: 'https://bsc-rpc.publicnode.com' },
+  ]);
+  expect(configuredNetworks({ SUPPORT_BTC_API_URL: '' }).map((n) => n.id)).not.toContain('btc');
+  expect(configuredNetworks({ SUPPORT_TRON_API_KEY: 'test-key' }).find((n) => n.id === 'tron')?.apiKey).toBe(
+    'test-key',
+  );
   expect(configuredNetworks(env)).toHaveLength(4);
   expect(configuredNetworks({ ...env, SUPPORT_ETH_ADDRESS: 'wrong' }).map((n) => n.id)).not.toContain('eth');
   expect(configuredNetworks({ ...env, SUPPORT_BTC_API_URL: 'file:///etc/passwd' }).map((n) => n.id)).not.toContain(

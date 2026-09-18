@@ -17,7 +17,7 @@
 - First verified claim wins; unique database index prevents double credit. Manual reassignment records a reason.
 - USDT at $1; BTC at a fresh Coinbase BTC-USD ticker when processed; truncate to cents using integer arithmetic.
 - Owner update: remove OxaPay entirely; it was never connected. No legacy reconciliation.
-- No private keys, deployment or real transfers. Network requests only to operator-configured endpoints.
+- No private keys, deployment or real transfers. Network requests only to built-in public providers or operator-configured overrides.
 
 ## Task 1: Configuration, validation and chain verification
 

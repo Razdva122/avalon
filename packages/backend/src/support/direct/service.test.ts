@@ -14,7 +14,7 @@ let time: number;
 let result: TransferResult;
 let checks: number;
 let ready: boolean;
-const networks = configuredNetworks({ DIRECT_SUPPORT_ENABLED: 'true', SUPPORT_ETH_RPC_URL: 'https://eth.example' });
+const networks = configuredNetworks({ SUPPORT_ETH_RPC_URL: 'https://eth.example' }).filter((n) => n.id === 'eth');
 const txid = '0x' + 'ab'.repeat(32);
 function makeService() {
   return new DirectService({

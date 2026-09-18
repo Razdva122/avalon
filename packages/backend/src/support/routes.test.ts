@@ -22,9 +22,8 @@ let base: string;
 let time: number;
 const txid = '0x' + 'ab'.repeat(32);
 const networks = configuredNetworks({
-  DIRECT_SUPPORT_ENABLED: 'true',
   SUPPORT_ETH_RPC_URL: 'https://private-rpc.example/secret',
-});
+}).filter((n) => n.id === 'eth');
 beforeAll(async () => {
   mongo = await MongoMemoryServer.create();
   await mongoose.connect(mongo.getUri());

@@ -13,6 +13,8 @@ npm install
 npm run dev
 ```
 
+Environment files and parameter descriptions: [backend environment settings](docs/environment.md).
+
 ## Project Structure
 
 The project is organized as an [NPM mono-repository](https://docs.npmjs.com/cli/v7/using-npm/workspaces), facilitating convenient management of both front-end and back-end components within a single project.
