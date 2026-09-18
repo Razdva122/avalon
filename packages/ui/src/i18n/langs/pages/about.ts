@@ -3,6 +3,11 @@ import { Dictionary } from '@avalon/types';
 
 export const about: { [key in TLanguage]: Dictionary<string> } = {
   pt: {
+    supportersTitle: 'Obrigado pelo apoio',
+    supportersThanks:
+      'Agradecemos a todos os jogadores que apoiaram o projeto, incluindo quem preferiu permanecer anônimo. Sua ajuda mantém o site funcionando e contribui para seu desenvolvimento.',
+    recentSupporters: 'Jogadores que apoiaram recentemente:',
+    supportProject: 'Apoie o projeto',
     title: 'Sobre',
     content:
       'Bem-vindo ao <b>avalon-game.com</b>, seu principal destino para jogar <b>"Avalon: The Resistance"</b> online com amigos e outros entusiastas. Nossa plataforma oferece uma experiência de jogo fluida e imersiva, totalmente gratuita e sem a distração de anúncios.',
@@ -22,6 +27,11 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
       'Este é um projeto não comercial criado por fãs por amor ao jogo. Todo o conteúdo, incluindo as regras que seguimos, é inspirado no jogo de tabuleiro original, mas todos os gráficos e ilustrações são exclusivamente nossos. Este site não é afiliado ou endossado pelos editores oficiais. Respeitamos os criadores originais e reconhecemos que todas as marcas registradas e direitos autorais relacionados pertencem aos seus respectivos proprietários.',
   },
   en: {
+    supportersTitle: 'Thank you for your support',
+    supportersThanks:
+      'Thank you to all the players who have supported the project, including those who chose to remain anonymous. Your help keeps the site running and supports its development.',
+    recentSupporters: 'Players who recently supported us:',
+    supportProject: 'Support the project',
     title: 'About',
     content:
       'Welcome to <b>avalon-game.com</b>, your premier destination for playing <b>"Avalon: The Resistance"</b> online with friends and fellow enthusiasts. Our platform offers a seamless and immersive gaming experience, entirely free of charge and without the distraction of advertisements.',
@@ -41,6 +51,11 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
       'This is a fan-based, non-commercial project created for the love of the game. All content, including the rules we follow, is inspired by the original tabletop game, but all graphics and illustrations are uniquely ours. This site is not affiliated with or endorsed by the official publishers. We respect the original creators and recognize that all related trademarks and copyrights belong to their respective owners.',
   },
   ru: {
+    supportersTitle: 'Спасибо за поддержку',
+    supportersThanks:
+      'Спасибо всем игрокам, которые поддержали проект, в том числе тем, кто предпочёл остаться анонимным. Ваша помощь позволяет поддерживать работу сайта и развивать его.',
+    recentSupporters: 'Недавно проект поддержали:',
+    supportProject: 'Поддержать проект',
     title: 'О сайте',
     content:
       'Добро пожаловать на <b>avalon-game.com</b>, ваше место №1 для игры в <b>"Avalon: The Resistance"</b> онлайн с друзьями и единомышленниками. Наша платформа предлагает беспрепятственное и увлекательное игровое пространство, полностью бесплатно и без отвлекающей рекламы.',
@@ -60,6 +75,10 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
       'Это фанатский, некоммерческий проект, созданный из любви к игре. Весь контент, включая соблюдаемые нами правила, вдохновлён оригинальной настольной игрой, но все изображения и иллюстрации уникальны и принадлежат нам. Этот сайт не связан и не поддерживается официальными издателями. Мы уважаем оригинальных создателей и признаем, что все связанные товарные знаки и авторские права принадлежат их владельцам.',
   },
   'zh-TW': {
+    supportersTitle: '感謝您的支持',
+    supportersThanks: '感謝所有支持本專案的玩家，包括選擇匿名的玩家。您的幫助讓網站持續運作並不斷發展。',
+    recentSupporters: '最近支持我們的玩家：',
+    supportProject: '支持本專案',
     title: '關於',
     content:
       '歡迎來到 <b>avalon-game.com</b>，這是您與朋友及愛好者一同在線上遊玩 <b>"Avalon: The Resistance"</b> 的首選平台。我們的平台提供流暢且沉浸式的遊戲體驗，完全免費且無廣告打擾。',
@@ -79,6 +98,10 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
       '這是一個基於愛好的粉絲，非商業項目。所有內容，包括我們遵循的規則，均受原始桌上遊戲啟發，但所有圖形和插圖均由我們獨自創造。本站與正式發布商無關，也未經授權。我們尊重原創作者並認識到所有相關商標和版權屬於其各自所有者。',
   },
   'zh-CN': {
+    supportersTitle: '感谢您的支持',
+    supportersThanks: '感谢所有支持本项目的玩家，包括选择匿名的玩家。您的帮助让网站持续运行并不断发展。',
+    recentSupporters: '最近支持我们的玩家：',
+    supportProject: '支持本项目',
     title: '关于',
     content:
       '欢迎来到 <b>avalon-game.com</b>，这是您与朋友及爱好者一同在线上游玩 <b>"Avalon: The Resistance"</b> 的首选平台。我们的平台提供流畅且沉浸式的游戏体验，完全免费且无广告打扰。',
@@ -98,6 +121,11 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
       '这是一个基于爱好的粉丝，非商业项目。所有内容，包括我们遵循的规则，均受原始桌面游戏启发，但所有图形和插图均由我们独自创造。本站与正式发布商无关，也未经授权。我们尊重原创作者并认识到所有相关商标和版权属于其各自所有者。',
   },
   es: {
+    supportersTitle: 'Gracias por su apoyo',
+    supportersThanks:
+      'Gracias a todos los jugadores que han apoyado el proyecto, incluidos quienes prefirieron permanecer anónimos. Su ayuda mantiene el sitio en funcionamiento y contribuye a su desarrollo.',
+    recentSupporters: 'Jugadores que nos han apoyado recientemente:',
+    supportProject: 'Apoya el proyecto',
     title: 'Acerca de',
     content:
       'Bienvenido a <b>avalon-game.com</b>, tu principal destino para jugar <b>"Avalon: La Resistencia"</b> en línea con amigos y otros entusiastas. Nuestra plataforma ofrece una experiencia de juego fluida e inmersiva, completamente gratuita y sin distracciones de anuncios.',

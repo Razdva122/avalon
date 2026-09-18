@@ -22,7 +22,11 @@
 
     <v-divider></v-divider>
     <div class="pa-3">
-      <div class="overall-stats mb-2">
+      <div v-if="loadError" class="mb-2" role="alert">
+        {{ $t('userStats.loadError') }}
+        <v-btn variant="text" size="small" @click="retry">{{ $t('support.retry') }}</v-btn>
+      </div>
+      <div v-else class="overall-stats mb-2">
         <div class="d-flex justify-space-between mb-2">
           <div class="stat-label">{{ $t('stats.totalGames') }}:</div>
           <div class="stat-value" v-if="!loading">{{ totalGames }}</div>
@@ -39,7 +43,7 @@
 
       <v-divider class="my-2"></v-divider>
       <div class="top-roles-title mt-2">{{ $t('stats.topRoles') }}</div>
-      <div v-if="!loading && topRoles.length > 0" class="top-roles-list">
+      <div v-if="!ratingsLoading && topRoles.length > 0" class="top-roles-list">
         <div v-for="(role, index) in topRoles" :key="role.role">
           <div class="top-role-item d-flex align-center justify-space-between">
             <div class="d-flex align-center">
@@ -52,7 +56,7 @@
           <v-divider v-if="index < topRoles.length - 1" class="my-1"></v-divider>
         </div>
       </div>
-      <div v-else-if="!loading && topRoles.length === 0" class="no-roles-message">
+      <div v-else-if="!ratingsLoading && topRoles.length === 0" class="no-roles-message">
         {{ $t('stats.noRolesData') }}
       </div>
       <v-skeleton-loader v-else type="list-item-three-line" />
@@ -61,13 +65,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch, onMounted } from 'vue';
+import { defineComponent, ref, computed, watch, onUnmounted, toRef } from 'vue';
 import { useUserProfile } from '@/helpers/composables';
 import { socket } from '@/api/socket';
 import Avatar from '@/components/user/Avatar.vue';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
 import UserTrueSkillRating from '@/components/stats/UserTrueSkillRating.vue';
+import { prepareUserStats } from '@/helpers/stats';
 import { RoleRating } from '@avalon/types';
 
 export default defineComponent({
@@ -89,7 +94,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { userState } = useUserProfile(props.userID);
+    const { userState } = useUserProfile(toRef(props, 'userID'));
     const userRatings = ref<RoleRating[]>([]);
     const loading = ref(true);
     const totalGames = ref(0);
@@ -105,68 +110,80 @@ export default defineComponent({
         .slice(0, 3);
     });
 
-    // Calculate overall stats
-    const calculateOverallStats = (ratings: RoleRating[]) => {
-      if (!ratings || ratings.length === 0) {
-        totalGames.value = 0;
-        overallWinrate.value = 0;
-        return;
-      }
+    const loadError = ref(false);
+    const ratingsLoading = ref(true);
+    let requestId = 0;
+    let loadedUserID = '';
+    let fetching = false;
+    onUnmounted(() => {
+      requestId++;
+    });
 
-      let totalGamesCount = 0;
-      let weightedWinrate = 0;
-
-      ratings.forEach((role) => {
-        totalGamesCount += role.gamesCount;
-        weightedWinrate += role.winrate * role.gamesCount;
-      });
-
-      totalGames.value = totalGamesCount;
-      overallWinrate.value = totalGamesCount > 0 ? parseFloat((weightedWinrate / totalGamesCount).toFixed(2)) : 0;
-    };
-
-    // Fetch user ratings
-    const fetchUserRatings = (userID: string) => {
+    const fetchUserStats = async (userID: string) => {
+      const currentRequest = ++requestId;
+      fetching = true;
       loading.value = true;
-
-      socket.emit('getUserRatings', userID, (response) => {
-        if ('error' in response) {
-          console.error('Error fetching user ratings:', response.error);
-          userRatings.value = [];
-        } else {
-          userRatings.value = response;
-          calculateOverallStats(response);
+      ratingsLoading.value = true;
+      loadError.value = false;
+      userRatings.value = [];
+      // Role rankings are optional and must not determine overall game statistics.
+      void socket
+        .timeout(10000)
+        .emitWithAck('getUserRatings', userID)
+        .then((response) => {
+          if (currentRequest === requestId && !('error' in response)) userRatings.value = response;
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (currentRequest === requestId) ratingsLoading.value = false;
+        });
+      try {
+        const games = await socket.timeout(20000).emitWithAck('getPlayerGameSummaries', userID);
+        if (currentRequest !== requestId) return;
+        if (!games) throw new Error('Player statistics unavailable');
+        const stats = prepareUserStats(games, userID).teams.total;
+        totalGames.value = stats.total;
+        overallWinrate.value = Number(stats.winrate);
+        loadedUserID = userID;
+      } catch {
+        if (currentRequest === requestId) loadError.value = true;
+      } finally {
+        if (currentRequest === requestId) {
+          loading.value = false;
+          fetching = false;
         }
-
-        loading.value = false;
-      });
+      }
     };
 
-    // Watch for visibility changes and only fetch data when the card becomes visible
     watch(
-      () => props.isVisible,
-      (isVisible) => {
-        if (isVisible && props.userID && loading.value) {
-          fetchUserRatings(props.userID);
+      () => [props.userID, props.isVisible] as const,
+      ([userID, isVisible], previous) => {
+        if (!previous || userID !== previous[0]) {
+          requestId++;
+          loadedUserID = '';
+          fetching = false;
+          totalGames.value = 0;
+          overallWinrate.value = 0;
+          userRatings.value = [];
+          loading.value = true;
+          ratingsLoading.value = true;
+          loadError.value = false;
         }
+        if (isVisible && userID && loadedUserID !== userID && !fetching) void fetchUserStats(userID);
       },
       { immediate: true },
     );
-
-    // Also watch for userID changes, but only fetch if the card is visible
-    watch(
-      () => props.userID,
-      (newUserID) => {
-        if (props.isVisible && newUserID) {
-          fetchUserRatings(newUserID);
-        }
-      },
-    );
+    const retry = () => {
+      if (!fetching) void fetchUserStats(props.userID);
+    };
 
     return {
       userState,
       userRatings,
       loading,
+      ratingsLoading,
+      loadError,
+      retry,
       topRoles,
       totalGames,
       overallWinrate,
