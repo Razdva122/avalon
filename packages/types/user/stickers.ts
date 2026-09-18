@@ -1,5 +1,3 @@
-import { PREMIUM_COSMETICS_ENABLED } from './premium-cosmetics';
-
 export interface StickerDefinition {
   id: string;
   games?: number;
@@ -8,7 +6,7 @@ export interface StickerDefinition {
   premium?: boolean;
 }
 
-const STICKER_CATALOG: readonly StickerDefinition[] = [
+export const STICKERS: readonly StickerDefinition[] = [
   { id: 'servant-yes' },
   { id: 'merlin-think' },
   { id: 'morgana-wow' },
@@ -24,7 +22,6 @@ const STICKER_CATALOG: readonly StickerDefinition[] = [
   { id: 'mordred-puppet', premium: true },
   { id: 'morgana-violin', premium: true },
 ];
-export const STICKERS = STICKER_CATALOG.filter((sticker) => PREMIUM_COSMETICS_ENABLED || !sticker.premium);
 export const STICKER_COOLDOWN_MS = 5000;
 export const STICKER_DURATION_MS = 4000;
 export const STICKER_FAVORITES_LIMIT = 6;

@@ -1,7 +1,17 @@
 import { mailLanguage, renderMail } from './mail';
-import { passwordRecovery } from '../../../ui/src/i18n/langs/passwordRecovery';
+import type { MailLanguage } from './mail';
 
-test.each(Object.keys(passwordRecovery))('mail supports the UI locale %s', (language) => {
+// Keep the backend typecheck inside its source tree and cover every mail locale.
+const supportedLocales: Record<MailLanguage, true> = {
+  en: true,
+  ru: true,
+  es: true,
+  pt: true,
+  'zh-CN': true,
+  'zh-TW': true,
+};
+
+test.each(Object.keys(supportedLocales))('mail renders the supported locale %s', (language) => {
   expect(mailLanguage(language)).toBe(language);
   const reset = renderMail('player@example.com', language, 'https://example.com/#token');
   const changed = renderMail('player@example.com', language);

@@ -1,4 +1,3 @@
-import { PREMIUM_COSMETICS_ENABLED } from '@avalon/types/user/premium-cosmetics';
 import { watch } from 'vue';
 import { store } from '@/store';
 import { pageLanguage, preferredLanguage } from '@/helpers/i18n/policy';
@@ -104,7 +103,6 @@ Object.entries(legacyRoutes).forEach(([path, target]) => {
 });
 
 Object.values(routesSeo).forEach((route) => {
-  if (route.name === 'community' && !PREMIUM_COSMETICS_ENABLED) return;
   if ('multiLanguage' in route.meta && route.meta.multiLanguage) {
     const multiLangRoute = <TMultiLangRoute>route;
 

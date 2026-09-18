@@ -33,7 +33,7 @@
         <span class="material-icons">emoji_events</span>
         <span class="menu-text">{{ $t('menu.achievements') }}</span>
       </LocaleLink>
-      <LocaleLink v-if="PREMIUM_COSMETICS_ENABLED" :to="{ name: 'community' }" class="menu-item">
+      <LocaleLink :to="{ name: 'community' }" class="menu-item">
         <span class="material-icons" aria-hidden="true">groups</span>
         <span class="menu-text">{{ $t('community.title') }}</span>
       </LocaleLink>
@@ -68,14 +68,12 @@
 </template>
 
 <script lang="ts">
-import { PREMIUM_COSMETICS_ENABLED } from '@avalon/types/user/premium-cosmetics';
 import { defineComponent, unref } from 'vue';
 import { LanguageMap } from '@/helpers/i18n';
 import { localizedPath, isNeutralPath } from '@/router/paths';
 import { rememberLanguage, chooseLanguage } from '@/helpers/i18n/preference';
 
 export default defineComponent({
-  setup: () => ({ PREMIUM_COSMETICS_ENABLED }),
   methods: {
     chooseLanguage,
     rememberChoice(event: MouseEvent, value: string) {

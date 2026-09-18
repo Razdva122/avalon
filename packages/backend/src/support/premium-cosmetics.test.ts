@@ -4,8 +4,6 @@ import type { DBManager } from '@/db';
 import { DEFAULT_STICKER_FAVORITES } from '@avalon/types';
 
 let total = 0;
-// Keep the future enabled behavior covered while the release flag is off.
-jest.mock('@avalon/types/user/premium-cosmetics', () => ({ PREMIUM_COSMETICS_ENABLED: true }));
 let features: Record<string, unknown> = {};
 let savedAvatar = 'servant';
 jest.mock('@/support/repository', () => ({ supportTotalCents: async () => total }));

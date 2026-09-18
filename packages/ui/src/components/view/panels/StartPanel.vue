@@ -5,17 +5,11 @@
     </template>
     {{ $t('startPanel.copyLink') }}
   </v-btn>
-  <v-btn v-if="PREMIUM_COSMETICS_ENABLED" :to="communityPath" color="info" class="mb-4">
+  <v-btn :to="communityPath" color="info" class="mb-4">
     <template v-slot:prepend>
       <span class="material-icons" aria-hidden="true">groups</span>
     </template>
     {{ $t('community.title') }}
-  </v-btn>
-  <v-btn v-else color="info" class="mb-4" @click="onDiscordClick">
-    <template v-slot:prepend>
-      <v-icon class="social-icon mr-1" size="large" icon="fa:fa-brands fa-discord" />
-    </template>
-    {{ $t('startPanel.discord') }}
   </v-btn>
   <v-btn v-if="isUserInGame" color="warning" @click="onJoinClick"> {{ $t('startPanel.leaveGame') }} </v-btn>
   <v-btn
@@ -48,7 +42,6 @@
 </template>
 
 <script lang="ts">
-import { PREMIUM_COSMETICS_ENABLED } from '@avalon/types/user/premium-cosmetics';
 import { localizedPath, neutralRoomUrl } from '@/router/paths';
 import { defineComponent, computed, PropType, toRefs } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -121,16 +114,11 @@ export default defineComponent({
       eventBus.emit('infoMessage', t('infoMessage.linkCopied'));
     };
 
-    const onDiscordClick = () => {
-      window.open('https://discord.gg/DR9cEDDNdN', '_blank');
-    };
-
     const updateFeatures = (newFeatures: GameOptionsFeatures) => {
       applyOptions({ ...options.value, features: newFeatures });
     };
 
     return {
-      PREMIUM_COSMETICS_ENABLED,
       communityPath,
       roomState,
       options,
@@ -143,7 +131,6 @@ export default defineComponent({
       onLockClick,
       onStartClick,
       onCopyClick,
-      onDiscordClick,
       updateFeatures,
       applyOptions,
     };

@@ -47,6 +47,6 @@ The front-end part of the project responsible for the visual presentation of the
 - [Achievements](packages/backend/src/achievements/README.md)
 - [Plot cards](packages/backend/src/core/game/addons/plot-cards/README.md)
 - [NOWPayments integration](docs/payments/nowpayments.md)
-- [OxaPay integration](docs/payments/oxapay.md)
+- [Direct crypto support](docs/payments/direct-crypto.md)
 
 This project serves as a unique platform for fans of "Avalon: The Resistance", allowing them to enjoy their favorite game in an online format.

@@ -41,6 +41,7 @@ const server = http.createServer((req, res) => {
       '/ru/wiki/rules/',
       '/ru/wiki/roles/merlin/',
       '/ru/about/',
+      '/ru/community/',
       '/leaderboard/',
       '/',
     ]) {
@@ -54,12 +55,17 @@ const server = http.createServer((req, res) => {
       if (pathname === '/leaderboard/' || pathname === '/') {
         await page.waitForSelector(pathname === '/leaderboard/' ? '.leaderboard-page' : '.lobby');
       }
+      if (pathname === '/ru/community/') await page.waitForSelector('.community-page');
+      if (pathname === '/') {
+        assert.match(await page.$eval('.support-card', (el) => new URL(el.href).pathname), /\/support\/$/);
+        assert.match(await page.$eval('.discord-card', (el) => new URL(el.href).pathname), /\/community\/$/);
+      }
       assert.deepEqual(pageErrors, [], `Uncaught errors while navigating to ${pathname}`);
       await page.waitForFunction(
         (route) => {
           const raw = document.querySelector('#page-structured-data').textContent;
           const crumbs = document.querySelector('#breadcrumb-structured-data').textContent;
-          if (route === '/leaderboard/') return raw === '' && crumbs === '';
+          if (route === '/leaderboard/' || route === '/ru/community/') return raw === '' && crumbs === '';
           const node = JSON.parse(raw)['@graph'].find((n) => n['@type'] === 'WebPage');
           return (
             node.url === 'https://avalon-game.com' + route &&
@@ -75,7 +81,7 @@ const server = http.createServer((req, res) => {
         robots: document.querySelector('meta[name=robots]').content,
       }));
       assert.equal(state.canonical, 'https://avalon-game.com' + pathname);
-      if (pathname === '/leaderboard/') assert.equal(state.robots, 'noindex, follow');
+      if (pathname === '/leaderboard/' || pathname === '/ru/community/') assert.equal(state.robots, 'noindex, follow');
       else
         assert.equal(
           JSON.parse(state.graph)['@graph'].find((n) => n['@type'] === 'WebPage').inLanguage,

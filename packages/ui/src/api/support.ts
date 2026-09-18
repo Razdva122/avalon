@@ -1,10 +1,18 @@
 import { store } from '@/store';
-
+import { supportError } from '@/pages/support/checkout';
+export interface SupportNetwork {
+  id: 'btc' | 'tron' | 'eth' | 'bsc';
+  label: string;
+  asset: 'BTC' | 'USDT';
+  address: string;
+  decimals: number;
+  contract?: string;
+}
 export interface SupportInfo {
   enabled: boolean;
-  provider: 'oxapay';
-  sandbox: boolean;
+  provider: 'direct';
   thresholdUSD: number;
+  networks: SupportNetwork[];
   donations: {
     id: string;
     amountUSD: number;
@@ -14,21 +22,24 @@ export interface SupportInfo {
     avatar: string | null;
   }[];
 }
+export interface SupportPayment {
+  id: string;
+  amountUSD: number;
+  status: string;
+  createdAt: string;
+  network?: SupportNetwork['id'];
+  txid?: string;
+  address?: string;
+  asset: string;
+  amountCrypto?: string;
+}
 export interface SupportAccount {
   totalUSD: number;
   premium: boolean;
   hideSupport: boolean;
   showPremiumBadge: boolean;
-  orders: {
-    id: string;
-    amountUSD: number;
-    status: string;
-    sandbox: boolean;
-    createdAt: string;
-    checkoutUrl?: string;
-  }[];
+  orders: SupportPayment[];
 }
-
 export async function supportRequest<T>(path = '', method = 'GET', body?: unknown): Promise<T> {
   const base = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3000';
   const token = store.state.profile?.token;
@@ -36,15 +47,12 @@ export async function supportRequest<T>(path = '', method = 'GET', body?: unknow
     method,
     headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     body: body === undefined ? undefined : JSON.stringify(body),
-    signal: AbortSignal.timeout(60000),
+    signal: AbortSignal.timeout(90000),
     cache: 'no-store',
   });
   if (!response.ok) {
     const details = await response.json().catch(() => ({}));
-    if (details.error === 'awaiting_notification') throw new Error('awaitingNotification');
-    if (response.status === 401) throw new Error('authError');
-    if (response.status === 429) throw new Error('rateError');
-    throw new Error(method === 'POST' && path === '/invoice' ? 'invoiceError' : 'error');
+    throw new Error(supportError(response.status, details.error));
   }
   return response.json();
 }

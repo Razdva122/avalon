@@ -25,37 +25,30 @@ export const fakeGames: TRoomState[] = [
     },
     players: [
       {
-        name: 'Ina S',
         id: '4e77db6a-6643-4379-92a6-0a9b8e678c44',
         isLeader: false,
       },
       {
-        name: 'Dmitrii',
         id: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
         isLeader: true,
       },
       {
-        name: 'компот',
         id: '38ddc7d6-b4fd-4be5-ac41-b000ae03a97f',
         isLeader: false,
       },
       {
-        name: 'vkurilin',
         id: 'ef0d9439-6ca4-4fc8-aa2a-805b63c4581b',
         isLeader: false,
       },
       {
-        name: 'Максон',
         id: 'ec262bd3-c78f-4929-9659-fc98c36337b8',
         isLeader: false,
       },
       {
-        name: 'Birzhan',
         id: '86d0b748-bc9f-4a7c-90f3-b2f3327be004',
         isLeader: false,
       },
       {
-        name: 'anT',
         id: '30a2912c-9030-4c94-bc52-ecc15383cb6c',
         isLeader: false,
       },
@@ -846,8 +839,6 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'checkLoyalty',
-          result: 'good',
-          visibleLoyalty: 'good',
           validatorID: '4e77db6a-6643-4379-92a6-0a9b8e678c44',
           inspectedID: '336fdc47-e426-46e8-8bed-25b6ec6e9300',
         },
@@ -1215,8 +1206,6 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'checkLoyalty',
-          result: 'good',
-          visibleLoyalty: 'good',
           validatorID: '336fdc47-e426-46e8-8bed-25b6ec6e9300',
           inspectedID: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
         },
@@ -1331,8 +1320,6 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'checkLoyalty',
-          result: 'good',
-          visibleLoyalty: 'good',
           validatorID: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
           inspectedID: 'ec262bd3-c78f-4929-9659-fc98c36337b8',
         },
@@ -1654,13 +1641,11 @@ export const fakeGames: TRoomState[] = [
         {
           id: '4e77db6a-6643-4379-92a6-0a9b8e678c44',
           index: 8,
-          name: 'Ina S',
           features: {
             isSelected: false,
             isLeader: false,
             isSent: false,
             ladyOfLake: 'used',
-            excalibur: false,
             waitForAction: false,
           },
           role: 'percival',
@@ -1668,26 +1653,22 @@ export const fakeGames: TRoomState[] = [
         {
           id: '6e9030a7-1281-424b-8173-b5c4497ccd46',
           index: 1,
-          name: 'Ivan',
           features: {
             isSelected: false,
             isLeader: false,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
           },
           role: 'mordred',
         },
         {
           id: '336fdc47-e426-46e8-8bed-25b6ec6e9300',
           index: 2,
-          name: '米莎',
           features: {
             isSelected: false,
             isLeader: false,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
             ladyOfLake: 'used',
           },
           role: 'servant',
@@ -1695,13 +1676,11 @@ export const fakeGames: TRoomState[] = [
         {
           id: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
           index: 3,
-          name: 'Dmitrii',
           features: {
             isSelected: false,
             isLeader: false,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
             ladyOfLake: 'used',
           },
           role: 'servant',
@@ -1710,39 +1689,33 @@ export const fakeGames: TRoomState[] = [
         {
           id: '38ddc7d6-b4fd-4be5-ac41-b000ae03a97f',
           index: 4,
-          name: 'компот',
           features: {
             isSelected: false,
             isLeader: true,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
           },
           role: 'merlin',
         },
         {
           id: 'ef0d9439-6ca4-4fc8-aa2a-805b63c4581b',
           index: 5,
-          name: 'vkurilin',
           features: {
             isSelected: false,
             isLeader: false,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
           },
           role: 'morgana',
         },
         {
           id: 'ec262bd3-c78f-4929-9659-fc98c36337b8',
           index: 6,
-          name: 'Максон',
           features: {
             isSelected: false,
             isLeader: false,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
             ladyOfLake: 'has',
           },
           role: 'servant',
@@ -1750,13 +1723,11 @@ export const fakeGames: TRoomState[] = [
         {
           id: '86d0b748-bc9f-4a7c-90f3-b2f3327be004',
           index: 7,
-          name: 'Birzhan',
           features: {
             isSelected: false,
             isLeader: false,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
           },
           role: 'minion',
         },
@@ -1771,26 +1742,17 @@ export const fakeGames: TRoomState[] = [
     chat: [
       {
         message: 'я могу сыграть если что  ',
-        user: {
-          id: '486c33a4-6284-4880-96d8-e0ee6a3be679',
-          name: 'илияс',
-        },
+        userID: '486c33a4-6284-4880-96d8-e0ee6a3be679',
         timestamp: 1728728517953,
       },
       {
         message: ' вы неиграете уже ?',
-        user: {
-          id: '486c33a4-6284-4880-96d8-e0ee6a3be679',
-          name: 'илияс',
-        },
+        userID: '486c33a4-6284-4880-96d8-e0ee6a3be679',
         timestamp: 1728729116478,
       },
       {
         message: 'У нас пока хватает народу своих, если нужно будет +1 я напишу',
-        user: {
-          id: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
-          name: 'Dmitrii',
-        },
+        userID: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
         timestamp: 1728729277562,
       },
     ],
@@ -1812,37 +1774,30 @@ export const fakeGames: TRoomState[] = [
     },
     players: [
       {
-        name: 'Ina S',
         id: '4e77db6a-6643-4379-92a6-0a9b8e678c44',
         isLeader: false,
       },
       {
-        name: 'Dmitrii',
         id: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
         isLeader: true,
       },
       {
-        name: 'компот',
         id: '38ddc7d6-b4fd-4be5-ac41-b000ae03a97f',
         isLeader: false,
       },
       {
-        name: 'vkurilin',
         id: 'ef0d9439-6ca4-4fc8-aa2a-805b63c4581b',
         isLeader: false,
       },
       {
-        name: 'Максон',
         id: 'ec262bd3-c78f-4929-9659-fc98c36337b8',
         isLeader: false,
       },
       {
-        name: 'Birzhan',
         id: '86d0b748-bc9f-4a7c-90f3-b2f3327be004',
         isLeader: false,
       },
       {
-        name: 'anT',
         id: '30a2912c-9030-4c94-bc52-ecc15383cb6c',
         isLeader: false,
       },
@@ -2487,8 +2442,6 @@ export const fakeGames: TRoomState[] = [
         },
         {
           type: 'checkLoyalty',
-          result: 'good',
-          visibleLoyalty: 'good',
           validatorID: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
           inspectedID: '4e77db6a-6643-4379-92a6-0a9b8e678c44',
         },
@@ -2591,13 +2544,11 @@ export const fakeGames: TRoomState[] = [
         {
           id: '4e77db6a-6643-4379-92a6-0a9b8e678c44',
           index: 4,
-          name: 'Ina S',
           features: {
             isSelected: false,
             isLeader: false,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
             ladyOfLake: 'has',
           },
           role: 'percival',
@@ -2605,39 +2556,33 @@ export const fakeGames: TRoomState[] = [
         {
           id: '6e9030a7-1281-424b-8173-b5c4497ccd46',
           index: 5,
-          name: 'Ivan',
           features: {
             isSelected: false,
             isLeader: false,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
           },
           role: 'servant',
         },
         {
           id: '336fdc47-e426-46e8-8bed-25b6ec6e9300',
           index: 6,
-          name: '米莎',
           features: {
             isSelected: false,
             isLeader: false,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
           },
           role: 'morgana',
         },
         {
           id: 'ae1e897d-b99f-4a09-869f-4ce3c53afab9',
           index: 7,
-          name: 'Dmitrii',
           features: {
             isSelected: true,
             isLeader: false,
             isSent: false,
             ladyOfLake: 'used',
-            excalibur: false,
             waitForAction: false,
           },
           role: 'merlin',
@@ -2646,39 +2591,33 @@ export const fakeGames: TRoomState[] = [
         {
           id: '38ddc7d6-b4fd-4be5-ac41-b000ae03a97f',
           index: 1,
-          name: 'компот',
           features: {
             isSelected: false,
             isLeader: false,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
           },
           role: 'servant',
         },
         {
           id: 'ef0d9439-6ca4-4fc8-aa2a-805b63c4581b',
           index: 2,
-          name: 'vkurilin',
           features: {
             isSelected: false,
             isLeader: false,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
           },
           role: 'mordred',
         },
         {
           id: 'ec262bd3-c78f-4929-9659-fc98c36337b8',
           index: 3,
-          name: 'Максон',
           features: {
             isSelected: false,
             isLeader: true,
             isSent: false,
             waitForAction: false,
-            excalibur: false,
             isAssassin: true,
           },
           role: 'minion',
@@ -2708,42 +2647,34 @@ export const fakeGames: TRoomState[] = [
     },
     players: [
       {
-        name: 'evie ',
         id: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
         isLeader: true,
       },
       {
-        name: 'Rajesh Gaire',
         id: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
         isLeader: false,
       },
       {
-        name: 'Zahraa',
         id: 'c93192d6-030f-480d-a1e6-160db4311e5f',
         isLeader: false,
       },
       {
-        name: 'Ishfaaq',
         id: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
         isLeader: false,
       },
       {
-        name: 'George Le Fay',
         id: 'bd213310-377d-481f-b26c-829d27fb00c4',
         isLeader: false,
       },
       {
-        name: 'Ze You',
         id: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
         isLeader: false,
       },
       {
-        name: 'Yash',
         id: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
         isLeader: false,
       },
       {
-        name: 'ivy',
         id: '90c12cf0-4880-44da-becf-634fc0650ebc',
         isLeader: false,
       },
@@ -3359,7 +3290,6 @@ export const fakeGames: TRoomState[] = [
         {
           id: 'e4b4eb29-7992-40f3-a5c5-181a1d2585c4',
           index: 2,
-          name: 'evie ',
           features: {
             isSelected: false,
             isLeader: false,
@@ -3371,7 +3301,6 @@ export const fakeGames: TRoomState[] = [
         {
           id: 'a5aa652a-2aec-44b2-ab01-b798f7129d9f',
           index: 3,
-          name: 'Rajesh Gaire',
           features: {
             isSelected: false,
             isLeader: false,
@@ -3383,7 +3312,6 @@ export const fakeGames: TRoomState[] = [
         {
           id: 'c93192d6-030f-480d-a1e6-160db4311e5f',
           index: 4,
-          name: 'Zahraa',
           features: {
             isSelected: false,
             isLeader: false,
@@ -3395,7 +3323,6 @@ export const fakeGames: TRoomState[] = [
         {
           id: 'a5b5e85f-7f6d-4a4b-b6f5-2452826743f0',
           index: 5,
-          name: 'Ishfaaq',
           features: {
             isSelected: false,
             isLeader: false,
@@ -3407,7 +3334,6 @@ export const fakeGames: TRoomState[] = [
         {
           id: 'bd213310-377d-481f-b26c-829d27fb00c4',
           index: 6,
-          name: 'George Le Fay',
           features: {
             isSelected: false,
             isLeader: true,
@@ -3419,7 +3345,6 @@ export const fakeGames: TRoomState[] = [
         {
           id: 'fc8d6d17-83b9-417e-adf5-6f749d3823c5',
           index: 7,
-          name: 'Ze You',
           features: {
             isSelected: false,
             isLeader: false,
@@ -3431,7 +3356,6 @@ export const fakeGames: TRoomState[] = [
         {
           id: '162ebe41-1b6e-454f-a622-847a3c3b08d4',
           index: 8,
-          name: 'Yash',
           features: {
             isSelected: false,
             isLeader: false,
@@ -3443,7 +3367,6 @@ export const fakeGames: TRoomState[] = [
         {
           id: '90c12cf0-4880-44da-becf-634fc0650ebc',
           index: 1,
-          name: 'ivy',
           features: {
             isSelected: false,
             isLeader: false,

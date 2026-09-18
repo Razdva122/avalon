@@ -1,21 +1,37 @@
+import { DirectNetwork } from './direct/protocol';
+
+export interface DirectPayment {
+  network: DirectNetwork;
+  txid: string;
+  address: string;
+  contract?: string;
+  decimals: number;
+  amountAtomic?: string;
+  blockHash?: string;
+  blockHeight?: number;
+  usdRate?: string;
+  rateSource?: string;
+  valuedAt?: Date;
+  nextCheckAt?: Date;
+  leaseToken?: string;
+  leaseUntil?: Date;
+  attempts: number;
+  reassignments: { from: string; to: string; reason: string; at: Date }[];
+}
 export interface SupportOrder {
   orderId: string;
-  provider: 'oxapay';
+  provider: 'direct';
   sandbox: boolean;
-  providerInvoiceId?: string;
   amountCents: number;
   payCurrency: string;
   userID: string;
   anonymous: boolean;
   status: string;
-  checkoutUrl?: string;
   paymentID?: string;
+  claimKey?: string;
   createdAt: Date;
   confirmedAt?: Date;
-}
-export interface SupportRepository {
-  find(orderId: string): Promise<SupportOrder | null>;
-  updatePayment(orderId: string, paymentID: string, status: string, finished: boolean): Promise<void>;
+  direct?: DirectPayment;
 }
 
 export function publicDonation(

@@ -1,77 +1,48 @@
 import express from 'express';
 import { Server } from 'http';
 import { AddressInfo } from 'net';
-import { createHmac } from 'crypto';
-import { supportRouter } from './routes';
-jest.mock('./oxapay', () => ({
-  ...jest.requireActual('./oxapay'),
-  OxaPay: class {
-    async getPayment() {
-      return { track_id: '123', order_id: 'unknown' };
-    }
-  },
-}));
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createSupportRouter } from './routes';
+import { DirectService } from './direct/service';
+import { configuredNetworks } from './direct/config';
+import { supportOrderModel } from './repository';
+import { userFeaturesModel, userProfileModel } from '@/db/models';
 
-jest.mock('@/user', () => ({
-  validateJWT: (token: string) => {
-    if (token !== 'valid-token') throw new Error('invalid');
-    return { id: 'authenticated-user' };
+jest.mock('@/user/sessions', () => ({
+  authenticatedUser: async (token: string) => {
+    if (!['alice', 'bob'].includes(token)) throw new Error('unauthorized');
+    return { id: token };
   },
 }));
-jest.mock('@/db/models', () => ({
-  userProfileModel: {
-    exists: async () => true,
-    find: () => ({ lean: async () => [{ id: 'donor', name: 'Hidden Name', avatar: 'merlin' }] }),
-  },
-  userFeaturesModel: {
-    find: () => ({ lean: async () => [{ userID: 'donor', hideSupport: true }] }),
-    updateOne: async () => ({}),
-  },
-}));
-jest.mock('./repository', () => ({
-  MongoSupportRepository: class {
-    async find() {
-      return null;
-    }
-  },
-  supportOrderModel: {
-    find: () => ({
-      sort: () => ({
-        limit: () => ({
-          lean: async () => [
-            {
-              orderId: 'public-id',
-              userID: 'donor',
-              amountCents: 1000,
-              anonymous: false,
-              createdAt: new Date('2026-09-16'),
-              paymentID: 'private-id',
-            },
-          ],
-        }),
-      }),
-    }),
-    findOne: ({ userID, orderId }: { userID: string; orderId: string }) => ({
-      lean: async () =>
-        orderId === 'missing-notification'
-          ? { orderId, status: 'waiting' }
-          : userID === 'victim'
-            ? { paymentID: '123' }
-            : null,
-    }),
-  },
-}));
+jest.setTimeout(120000);
+let mongo: MongoMemoryServer;
 let server: Server;
 let base: string;
-const env = { ...process.env };
+let time: number;
+const txid = '0x' + 'ab'.repeat(32);
+const networks = configuredNetworks({
+  DIRECT_SUPPORT_ENABLED: 'true',
+  SUPPORT_ETH_RPC_URL: 'https://private-rpc.example/secret',
+});
 beforeAll(async () => {
-  Object.assign(process.env, {
-    OXAPAY_MERCHANT_API_KEY: 'test-secret',
-    OXAPAY_CALLBACK_URL: 'https://example.com/ipn',
-    SUPPORT_FRONTEND_URL: 'https://example.com',
+  mongo = await MongoMemoryServer.create();
+  await mongoose.connect(mongo.getUri());
+  await supportOrderModel.init();
+  const service = new DirectService({
+    networks: () => networks,
+    now: () => new Date(time),
+    ready: async () => true,
+    read: async () => ({
+      status: 'verified',
+      amountAtomic: '10500000',
+      blockHash: '0x' + 'cd'.repeat(32),
+      blockHeight: 100,
+    }),
+    value: async () => ({ amountCents: 1050, usdRate: '1', rateSource: 'fixed:USDT-USD', valuedAt: new Date(time) }),
   });
   const app = express();
-  app.use('/api/support', supportRouter);
+  app.use('/api/support', createSupportRouter(service));
   server = app.listen(0, '127.0.0.1');
   await new Promise<void>((resolve, reject) => {
     server.once('listening', resolve);
@@ -79,68 +50,79 @@ beforeAll(async () => {
   });
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}/api/support`;
 });
-afterAll(async () => {
-  process.env = { ...env };
-  if (server?.listening) {
-    server.closeAllConnections();
-    await new Promise<void>((resolve) => server.close(() => resolve()));
-  }
-});
-
-test('public feed omits hidden donor identity and private transaction metadata', async () => {
-  const response = await fetch(base);
-  expect(response.headers.get('cache-control')).toBe('no-store');
-  const body = await response.json();
-  expect(body.donations).toEqual([
-    { id: 'public-id', name: null, userID: null, avatar: null, amountUSD: 10, date: '2026-09-16' },
+beforeEach(async () => {
+  time = Date.now();
+  await Promise.all([
+    supportOrderModel.deleteMany({}),
+    userProfileModel.deleteMany({}),
+    userFeaturesModel.deleteMany({}),
+    mongoose.connection.db!.collection('directsupportlimits').deleteMany({}),
+  ]);
+  await userProfileModel.collection.insertMany([
+    { login: 'alice', email: 'alice@example.test', id: 'alice', name: 'Alice', avatar: 'merlin' },
+    { login: 'bob', email: 'bob@example.test', id: 'bob', name: 'Bob' },
   ]);
 });
-test('private endpoints reject missing and forged authentication', async () => {
-  for (const authorization of ['', 'Bearer forged-token']) {
-    const response = await fetch(`${base}/invoice`, { method: 'POST', headers: { authorization } });
-    expect(response.status).toBe(401);
+afterAll(async () => {
+  if (server) {
+    server.closeAllConnections();
+    await new Promise<void>((r) => server.close(() => r()));
   }
+  await mongoose.disconnect();
+  await mongo?.stop();
 });
-test('webhook rejects forged signatures before any order processing', async () => {
-  const response = await fetch(`${base}/oxapay/ipn`, {
+function submit(token = 'alice', body: unknown = { network: 'eth', txid, anonymous: true }) {
+  return fetch(`${base}/transfers`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', hmac: 'a'.repeat(128) },
-    body: '{}',
+    headers: { authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
   });
-  expect(response.status).toBe(401);
-});
-test('signed unknown orders remain retryable rather than silently acknowledged', async () => {
-  const body = '{"type":"invoice","track_id":"123"}';
-  const signature = createHmac('sha512', 'test-secret').update(body).digest('hex');
-  const response = await fetch(`${base}/oxapay/ipn`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', hmac: signature },
-    body,
+}
+test('public network info contains recipient and contract, never RPC credentials', async () => {
+  const response = await fetch(base);
+  const body = await response.json();
+  expect(response.headers.get('cache-control')).toBe('no-store');
+  expect(body).toMatchObject({
+    enabled: true,
+    provider: 'direct',
+    networks: [{ id: 'eth', address: networks[0].address }],
   });
-  expect(response.status).toBe(503);
+  expect(JSON.stringify(body)).not.toContain('private-rpc');
 });
-test('owner refresh ignores caller supplied user IDs', async () => {
-  const response = await fetch(`${base}/orders/victim-order/refresh`, {
-    method: 'POST',
-    headers: { authorization: 'Bearer valid-token', 'Content-Type': 'application/json' },
-    body: '{"userID":"victim"}',
-  });
-  expect(response.status).toBe(404);
+test('claims require real authentication and ignore client owner and amount', async () => {
+  expect((await submit('forged')).status).toBe(401);
+  const response = await submit('alice', { network: 'eth', txid, anonymous: false, userID: 'bob', amountUSD: 99999 });
+  expect(response.status).toBe(200);
+  const order = await response.json();
+  expect(order).toMatchObject({ status: 'finished', amountUSD: 10.5 });
+  expect(await supportOrderModel.findOne({ orderId: order.id })).toMatchObject({ userID: 'alice', amountCents: 1050 });
 });
-test('privacy endpoint rejects non-boolean values', async () => {
+test('private history includes transfer details, public feed honors privacy', async () => {
+  await submit();
+  const me = await (await fetch(`${base}/me`, { headers: { authorization: 'Bearer alice' } })).json();
+  expect(me).toMatchObject({ totalUSD: 10.5, premium: true, orders: [{ network: 'eth', txid, amountCrypto: '10.5' }] });
+  const feed = await (await fetch(base)).json();
+  expect(feed.donations[0]).toMatchObject({ name: null, userID: null, amountUSD: 10.5 });
+  expect(JSON.stringify(feed)).not.toContain(txid);
+  expect(JSON.stringify(me)).not.toContain('leaseToken');
+});
+test('double claim reveals no owner; refresh enforces ownership', async () => {
+  const first = await (await submit()).json();
+  const conflict = await submit('bob');
+  expect(conflict.status).toBe(409);
+  expect(await conflict.json()).toEqual({ error: 'already_claimed' });
+  expect(
+    (await fetch(`${base}/orders/${first.id}/refresh`, { method: 'POST', headers: { authorization: 'Bearer bob' } }))
+      .status,
+  ).toBe(404);
+});
+test('invalid input returns actionable errors and private settings require booleans', async () => {
+  expect((await submit('alice', { network: 'eth', txid: 'wrong', anonymous: true })).status).toBe(400);
   const response = await fetch(`${base}/privacy`, {
     method: 'PATCH',
-    headers: { authorization: 'Bearer valid-token', 'Content-Type': 'application/json' },
+    headers: { authorization: 'Bearer alice', 'Content-Type': 'application/json' },
     body: '{"hideSupport":"false","showPremiumBadge":true}',
   });
   expect(response.status).toBe(400);
-});
-
-test('refresh explains when recovery needs an operator instead of claiming success', async () => {
-  const response = await fetch(`${base}/orders/missing-notification/refresh`, {
-    method: 'POST',
-    headers: { authorization: 'Bearer valid-token' },
-  });
-  expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ error: 'awaiting_notification' });
+  expect(await supportOrderModel.countDocuments()).toBe(0);
 });

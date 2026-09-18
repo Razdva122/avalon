@@ -6,7 +6,6 @@ import { achievementsAvatars } from '@/user/avatars/achievements';
 import { PREMIUM_AVATAR_IDS } from '@avalon/types/user/avatars';
 import { hasPremium } from '@/support/premium';
 import { supportTotalCents } from '@/support/repository';
-import { PREMIUM_COSMETICS_ENABLED } from '@avalon/types/user/premium-cosmetics';
 
 const premiumAvatars: IAvatar[] = PREMIUM_AVATAR_IDS.map((id) => ({
   id,
@@ -16,7 +15,7 @@ const premiumAvatars: IAvatar[] = PREMIUM_AVATAR_IDS.map((id) => ({
 
 export class AvatarsManager {
   dbManager: DBManager;
-  avatars: IAvatar[] = [...commonAvatars, ...(PREMIUM_COSMETICS_ENABLED ? premiumAvatars : []), ...achievementsAvatars];
+  avatars: IAvatar[] = [...commonAvatars, ...premiumAvatars, ...achievementsAvatars];
 
   constructor(dbManager: DBManager) {
     this.dbManager = dbManager;

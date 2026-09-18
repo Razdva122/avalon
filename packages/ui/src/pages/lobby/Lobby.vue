@@ -35,7 +35,7 @@
 
     <div class="lobby-content">
       <aside class="lobby-sidebar">
-        <LocaleLink v-if="PREMIUM_COSMETICS_ENABLED" class="discord-card" :to="{ name: 'community' }">
+        <LocaleLink class="discord-card" :to="{ name: 'community' }">
           <span class="discord-icon material-icons" aria-hidden="true">groups</span>
           <div>
             <h2>{{ $t('mainPage.findPlayers') }}</h2>
@@ -43,15 +43,7 @@
           </div>
           <span class="discord-arrow" aria-hidden="true">→</span>
         </LocaleLink>
-        <a v-else class="discord-card" href="https://discord.gg/Xdu7ByqQtt" target="_blank" rel="noopener noreferrer">
-          <span class="discord-icon" aria-hidden="true"><v-icon icon="fa:fa-brands fa-discord" size="22" /></span>
-          <div>
-            <h2>{{ $t('mainPage.findPlayers') }}</h2>
-            <p>{{ $t('mainPage.discordHint') }}</p>
-          </div>
-          <span class="discord-arrow" aria-hidden="true">↗</span>
-        </a>
-        <LocaleLink v-if="PREMIUM_COSMETICS_ENABLED" class="support-card" :to="{ name: 'support' }">
+        <LocaleLink class="support-card" :to="{ name: 'support' }">
           <div class="support-card__heading">
             <span class="support-card__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" fill="none">
@@ -123,7 +115,6 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
 import type { TRoomsList } from '@avalon/types';
-import { PREMIUM_COSMETICS_ENABLED } from '@avalon/types/user/premium-cosmetics';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import LobbyRoom from './LobbyRoom.vue';
@@ -200,7 +191,6 @@ export default defineComponent({
     });
 
     return {
-      PREMIUM_COSMETICS_ENABLED,
       createRoom,
       filter,
       visibleLimit,

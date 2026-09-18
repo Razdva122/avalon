@@ -82,9 +82,6 @@ export class UserFeatures {
   @prop({ default: true })
   public showPremiumBadge?: boolean;
 
-  @prop({ type: Date })
-  public lastSupportCheckoutAt?: Date;
-
   @prop({ type: () => [String], default: undefined })
   public favoriteStickers?: string[];
 

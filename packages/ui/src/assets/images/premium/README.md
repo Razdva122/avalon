@@ -1,11 +1,8 @@
 # Premium: Mind games
 
-## Release switch
+## Availability
 
-Premium cosmetics default to enabled only in development and disabled in production (and unspecified/test environments), controlled by `packages/types/user/premium-cosmetics.ts`.
-After verifying donation checkout, set `PREMIUM_COSMETICS_ENABLED` to `true`, rebuild the UI and restart/redeploy the backend together.
-The same switch controls the avatar catalog, sticker catalog, existing premium avatar display and home page support banner. The Support page always remains complete, including the actual premium avatar artwork.
-Artwork, translations and saved selections are retained. Both disabled and enabled behavior have backend tests.
+Premium cosmetics, the community page and support links are released in every environment. The release flag has been removed. Premium avatars and stickers still require paid or manually granted Premium; backend authorization is covered by tests.
 
 Generated with the built-in image_gen tool. Avatars optimized to 512px WebP (quality 88); stickers to 320px WebP (quality 90, lossless alpha), preserving generated transparency. One file is shared by previews and gameplay.
 

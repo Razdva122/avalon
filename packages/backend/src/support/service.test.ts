@@ -2,7 +2,7 @@ import { publicDonation, SupportOrder } from './service';
 test('public donations omit account and provider identifiers and honor anonymity', () => {
   const order: SupportOrder = {
     orderId: 'order-1',
-    provider: 'oxapay',
+    provider: 'direct',
     sandbox: false,
     userID: 'private-user',
     amountCents: 1000,

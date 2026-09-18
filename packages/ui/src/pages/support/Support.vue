@@ -13,30 +13,84 @@
     <div class="support-columns">
       <section id="support-checkout" class="support-panel" tabindex="-1">
         <h2>{{ t('support.checkout') }}</h2>
-        <p v-if="info?.enabled && info.sandbox" class="notice" role="status">{{ t('support.sandboxNotice') }}</p>
         <p v-if="!info && loading" role="status">{{ t('support.refreshing') }}</p>
         <p v-else-if="info && !info.enabled" class="notice">{{ t('support.unavailable') }}</p>
         <p v-else-if="info && !store.state.profile" class="notice">{{ t('support.login') }}</p>
         <form v-else-if="info?.enabled" @submit.prevent="checkout">
-          <label for="support-amount">{{ t('support.amount') }}</label>
-          <input id="support-amount" v-model="amount" type="number" min="1" max="10000" step="0.01" required />
-          <div class="presets">
-            <button
-              v-for="value in [10, 50, 1000]"
-              :key="value"
-              type="button"
-              :aria-pressed="amount === String(value)"
-              @click="amount = String(value)"
-            >
-              ${{ value }}
-            </button>
+          <label for="support-network">{{ t('support.network') }}</label>
+          <div class="network-select">
+            <NetworkIcon v-if="selectedNetwork" :network="selectedNetwork.id" />
+            <select id="support-network" v-model="network" :disabled="busy" required>
+              <option v-if="network && !selectedNetwork" :value="network" disabled>
+                {{ networkLabel(network) }} — {{ t('support.unavailable') }}
+              </option>
+              <option v-for="item in info.networks" :key="item.id" :value="item.id">{{ item.label }}</option>
+            </select>
           </div>
+          <p v-if="network && !selectedNetwork" class="notice" role="status">{{ t('support.unavailable') }}</p>
+          <template v-if="selectedNetwork">
+            <label for="support-address">{{ t('support.recipient') }}</label>
+            <div class="recipient-address">
+              <textarea
+                id="support-address"
+                :value="selectedNetwork.address"
+                readonly
+                :rows="selectedNetwork.id === 'btc' ? 3 : 2"
+              />
+            </div>
+            <div class="address-actions">
+              <button type="button" @click="copyAddress">{{ t(copied ? 'support.copied' : 'support.copy') }}</button>
+              <button type="button" :aria-expanded="showQR" aria-controls="support-qr" @click="showQR = !showQR">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h3v3h3v3h-6zM21 12v3M12 3v3M12 12h3M3 12h3M12 18v3"
+                  />
+                </svg>
+                {{ t(showQR ? 'support.hideQR' : 'support.showQR') }}
+              </button>
+            </div>
+            <WalletQR v-if="showQR" id="support-qr" :address="selectedNetwork.address" :label="selectedNetwork.label" />
+            <p v-if="copyFailed" class="hint" role="status">{{ t('support.copyFailed') }}</p>
+            <p class="hint">{{ t('support.paymentHint') }}</p>
+            <p v-if="selectedNetwork.contract" class="hint token-contract">
+              {{ t('support.tokenContract') }}: {{ selectedNetwork.contract }}
+            </p>
+            <p class="hint">{{ t(network === 'btc' ? 'support.btcConfirmation' : 'support.tokenConfirmation') }}</p>
+          </template>
+          <label for="support-txid">{{ t('support.txid') }}</label>
+          <input
+            id="support-txid"
+            v-model="txid"
+            type="text"
+            maxlength="66"
+            autocomplete="off"
+            spellcheck="false"
+            :disabled="busy"
+            aria-describedby="support-txid-help"
+            required
+          />
+          <p id="support-txid-help" class="hint">{{ t('support.txidHint') }}</p>
           <label class="checkbox"><input v-model="anonymous" type="checkbox" />{{ t('support.anonymous') }}</label>
           <p class="hint">{{ t('support.anonymousHint') }}</p>
-          <button class="primary" type="submit" :disabled="busy || loading || !account || !isSupportAmount(amount)">
+          <button
+            class="primary"
+            type="submit"
+            :disabled="busy || loading || !account || !selectedNetwork || !isSupportTxid(network, txid)"
+          >
             {{ t(busy ? 'support.refreshing' : 'support.pay') }}
           </button>
-          <p class="hint">{{ t('support.paymentHint') }}</p>
+          <p v-if="formError" class="error" role="alert">{{ t(`support.${formError}`) }}</p>
+          <p v-if="submissionStatus" class="notice" role="status">
+            {{ t('support.claimSaved') }} {{ t(`support.${submissionStatus}`) }}
+          </p>
         </form>
       </section>
       <section class="support-panel">
@@ -83,20 +137,16 @@
       <ul class="orders">
         <li v-for="order in account.orders" :key="order.id">
           <div>
-            <strong>${{ order.amountUSD.toFixed(2) }}</strong> · {{ t(`support.${order.status}`)
-            }}<small v-if="order.sandbox">{{ t('support.testInvoice') }}</small
-            ><small>{{ order.id }}</small>
+            <strong v-if="order.status === 'finished'">${{ order.amountUSD.toFixed(2) }}</strong>
+            <span v-if="order.amountCrypto"> · {{ order.amountCrypto }} {{ order.asset }}</span>
+            <span> · {{ t(`support.${order.status}`) }}</span>
+            <small>{{ networkLabel(order.network) }}</small>
+            <small v-if="order.txid">Txid: {{ order.txid }}</small>
+            <small>{{ order.id }}</small>
           </div>
           <div class="order-actions">
-            <a
-              v-if="safeCheckoutURL(order.checkoutUrl)"
-              :href="safeCheckoutURL(order.checkoutUrl)"
-              target="_blank"
-              rel="noopener noreferrer"
-              >{{ t('support.resume') }}</a
-            >
             <button
-              v-if="!['finished', 'test_paid'].includes(order.status)"
+              v-if="!['finished', 'duplicate'].includes(order.status)"
               type="button"
               :disabled="busy"
               @click="refreshOrder(order.id)"
@@ -111,18 +161,54 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
 import Avatar from '@/components/user/Avatar.vue';
 import SupportBenefits from './SupportBenefits.vue';
-import { isSupportAmount, safeCheckoutURL } from './checkout';
-import { supportRequest, SupportInfo, SupportAccount } from '@/api/support';
+import NetworkIcon from './NetworkIcon.vue';
+import WalletQR from './WalletQR.vue';
+import { isSupportTxid } from './checkout';
+import { supportRequest, SupportInfo, SupportAccount, SupportPayment } from '@/api/support';
 const { t } = useI18n();
 const store = useStore();
 const info = ref<SupportInfo | null>(null);
 const account = ref<SupportAccount | null>(null);
-const amount = ref('10');
+const network = ref('');
+const txid = ref('');
+const copied = ref(false);
+const showQR = ref(false);
+const copyFailed = ref(false);
+const formError = ref('');
+const submissionStatus = ref('');
+const selectedNetwork = computed(() => info.value?.networks.find((n) => n.id === network.value));
+function networkLabel(id?: string) {
+  return (
+    (
+      {
+        btc: 'Bitcoin',
+        tron: 'USDT · TRON (TRC20)',
+        eth: 'USDT · Ethereum (ERC20)',
+        bsc: 'Binance-Peg USDT · BNB Smart Chain (BEP20)',
+      } as Record<string, string>
+    )[id || ''] || ''
+  );
+}
+async function copyAddress() {
+  copyFailed.value = false;
+  try {
+    await navigator.clipboard.writeText(selectedNetwork.value!.address);
+    copied.value = true;
+  } catch {
+    copyFailed.value = true;
+  }
+}
+watch(network, () => {
+  copied.value = false;
+  copyFailed.value = false;
+  formError.value = '';
+  submissionStatus.value = '';
+});
 const anonymous = ref(true);
 const hideSupport = ref(false);
 const showBadge = ref(true);
@@ -134,7 +220,7 @@ let generation = 0;
 let timer: ReturnType<typeof setInterval> | undefined;
 function report(e: unknown) {
   error.value =
-    e instanceof Error && ['authError', 'rateError', 'invoiceError', 'awaitingNotification'].includes(e.message)
+    e instanceof Error && ['authError', 'rateError', 'alreadyClaimed', 'invalidTxid', 'unavailable'].includes(e.message)
       ? e.message
       : 'error';
 }
@@ -149,6 +235,7 @@ async function load(syncPrivacy = true) {
     ]);
     if (current !== generation) return;
     info.value = publicInfo;
+    if (!network.value) network.value = publicInfo.networks[0]?.id || '';
     account.value = personal;
     if (personal && syncPrivacy) {
       hideSupport.value = personal.hideSupport;
@@ -161,22 +248,25 @@ async function load(syncPrivacy = true) {
   }
 }
 async function checkout() {
-  if (!isSupportAmount(amount.value)) {
-    error.value = 'invalidAmount';
+  if (!selectedNetwork.value || !isSupportTxid(network.value, txid.value)) {
+    formError.value = 'invalidTxid';
     return;
   }
   busy.value = true;
-  error.value = '';
+  formError.value = '';
+  submissionStatus.value = '';
   try {
-    const invoice = await supportRequest<{ url: string }>('/invoice', 'POST', {
-      amountUSD: amount.value,
+    const payment = await supportRequest<SupportPayment>('/transfers', 'POST', {
+      network: network.value,
+      txid: txid.value.trim(),
       anonymous: anonymous.value,
     });
-    const url = safeCheckoutURL(invoice.url);
-    if (!url) throw new Error('invoiceError');
-    window.location.assign(url);
+    submissionStatus.value = payment.status;
+    await load(false);
   } catch (e) {
     report(e);
+    formError.value = error.value;
+    error.value = '';
   } finally {
     busy.value = false;
   }
@@ -229,7 +319,7 @@ onMounted(() => {
     if (
       !document.hidden &&
       !busy.value &&
-      account.value?.orders.some((order) => ['waiting', 'confirming', 'confirmed', 'sending'].includes(order.status))
+      account.value?.orders.some((order) => ['waiting', 'confirming', 'provider_unavailable'].includes(order.status))
     )
       void load(false);
   }, 15000);
@@ -300,7 +390,8 @@ label {
   font-size: 14px;
   margin: 16px 0 7px;
 }
-input[type='number'],
+input[type='text'],
+textarea,
 select {
   display: block;
   width: 100%;
@@ -326,7 +417,7 @@ button {
 }
 button:disabled {
   opacity: 0.5;
-  cursor: wait;
+  cursor: not-allowed;
 }
 button:focus-visible,
 a:focus-visible,
@@ -342,14 +433,65 @@ select:focus-visible {
   color: #382a0c;
   font-weight: 700;
 }
-.presets {
+.network-select {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.network-select select {
+  min-width: 0;
+}
+.address-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.address-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.recipient-address {
   display: flex;
   gap: 8px;
   margin-top: 10px;
 }
-.presets button[aria-pressed='true'] {
-  border-color: #b38637;
-  background: #b3863720;
+.recipient-address textarea {
+  resize: none;
+  min-width: 0;
+  font-family: monospace;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.recipient-address button {
+  flex-shrink: 0;
+  align-self: center;
+}
+@media (max-width: 700px) {
+  .recipient-address {
+    flex-direction: column;
+  }
+  .recipient-address button {
+    align-self: flex-start;
+  }
+}
+.token-contract {
+  overflow-wrap: anywhere;
+}
+.support-panel {
+  min-width: 0;
+}
+.orders li > div {
+  min-width: 0;
+}
+button {
+  min-height: 44px;
+}
+textarea:focus-visible {
+  outline: 2px solid #b38637;
+  outline-offset: 3px;
 }
 .donations,
 .orders {

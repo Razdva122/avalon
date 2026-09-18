@@ -47,3 +47,11 @@ test('ordinary pages still load both analytics providers', () => {
 test('recovery route uses the visitor language instead of forcing English', () => {
   assert.equal(isNeutralPath('/password-recovery/'), true);
 });
+
+// This cross-package contract belongs to UI tests, not the backend TypeScript source tree.
+require('ts-node').register({ transpileOnly: true, compilerOptions: { module: 'CommonJS' } });
+const { passwordRecovery } = require('../src/i18n/langs/passwordRecovery.ts');
+const { mailLanguage } = require('../../backend/src/recovery/mail.ts');
+test('every recovery UI locale has a matching email locale', () => {
+  for (const language of Object.keys(passwordRecovery)) assert.equal(mailLanguage(language), language);
+});

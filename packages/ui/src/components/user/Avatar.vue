@@ -5,7 +5,6 @@
 <script lang="ts">
 import { getAvatarPathByID } from '@/helpers/images';
 import { defineComponent } from 'vue';
-import { PREMIUM_COSMETICS_ENABLED } from '@avalon/types/user/premium-cosmetics';
 const premiumAvatars: Record<string, string> = {
   'premium/puppeteer': getAvatarPathByID('premium', 'puppeteer'),
   'premium/eclipse-queen': getAvatarPathByID('premium', 'eclipse-queen'),
@@ -22,7 +21,7 @@ export default defineComponent({
   computed: {
     srcPath() {
       if (premiumAvatars[this.avatarID]) {
-        return PREMIUM_COSMETICS_ENABLED ? premiumAvatars[this.avatarID] : getAvatarPathByID('roles', 'servant');
+        return premiumAvatars[this.avatarID];
       }
       if (this.avatarID === 'evil') {
         return getAvatarPathByID('core', 'red_team_no_background');

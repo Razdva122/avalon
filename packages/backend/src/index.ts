@@ -11,6 +11,8 @@ import { connectDB, DBManager } from '@/db';
 
 import { Manager } from '@/main';
 import { supportRouter } from '@/support/routes';
+import { directSupport } from '@/support/direct/service';
+import { startSupportWorker } from '@/support/direct/worker';
 import { supportOrderModel } from '@/support/repository';
 import { ratingScheduler } from '@/scripts/scheduler';
 import { userProfileModel } from '@/db/models';
@@ -44,6 +46,7 @@ app.use(cors(corsOpts.cors));
 
 connectDB().then(async (mongoose) => {
   await supportOrderModel.init();
+  startSupportWorker(directSupport);
   app.use('/api/support', supportRouter);
   let recovery: RecoveryService | null = null;
   if (mailSettings && mongoose?.connection.db) {
