@@ -15,7 +15,13 @@ export class UserLayer {
   ): Promise<ArgumentOfCallback<'registerUser'>> {
     const passHash = await bcrypt.hash(user.password, this.hashRounds);
 
-    const userModel = new userProfileModel({ ...user, password: passHash });
+    const userModel = new userProfileModel({
+      id: user.id,
+      email: user.email,
+      login: user.login,
+      name: user.name,
+      password: passHash,
+    });
 
     try {
       await userModel.save();
@@ -123,7 +129,12 @@ export class UserLayer {
       if (type === 'email' || type === 'login') {
         try {
           const params = type === 'email' ? { email: value } : { login: value };
-          await userProfileModel.findOneAndUpdate({ id: user.id }, params, { runValidators: true });
+          const updated = await userProfileModel.findOneAndUpdate(
+            { id: user.id, password: user.password },
+            { $set: params, ...(type === 'email' ? { $unset: { recoveryTokens: 1 } } : {}) },
+            { runValidators: true, strict: false },
+          );
+          if (!updated) return { error: 'wrongPassword' };
         } catch (err) {
           if (err instanceof Error && 'code' in err && err.code === 11000) {
             // @ts-expect-error - email/login not checked if we change password
@@ -134,7 +145,12 @@ export class UserLayer {
         }
       } else {
         const passHash = await bcrypt.hash(value, this.hashRounds);
-        await userProfileModel.findOneAndUpdate({ id: user.id }, { password: passHash });
+        const updated = await userProfileModel.findOneAndUpdate(
+          { id: user.id, password: user.password },
+          { $set: { password: passHash }, $inc: { authVersion: 1 }, $unset: { recoveryTokens: 1 } },
+          { strict: false },
+        );
+        if (!updated) return { error: 'wrongPassword' };
       }
 
       return true;
@@ -175,7 +191,7 @@ export class UserLayer {
 
     return {
       ...userForUi,
-      token: generateJWT(userForUi),
+      token: generateJWT(userForUi, user.authVersion ?? 0),
       knownAchievements,
     };
   }

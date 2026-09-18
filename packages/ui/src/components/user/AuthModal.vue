@@ -28,6 +28,9 @@
       <v-btn :disabled="!formValid.loginForm" type="submit" color="primary" variant="elevated" class="submit-btn">{{
         $t('modal.loginButton')
       }}</v-btn>
+      <v-btn variant="text" color="text-primary" class="mt-2" to="/password-recovery/" @click="closeAuthModal">
+        {{ $t('passwordRecovery.forgot') }}
+      </v-btn>
     </v-form>
 
     <v-form

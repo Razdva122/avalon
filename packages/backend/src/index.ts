@@ -13,8 +13,23 @@ import { Manager } from '@/main';
 import { supportRouter } from '@/support/routes';
 import { supportOrderModel } from '@/support/repository';
 import { ratingScheduler } from '@/scripts/scheduler';
+import { userProfileModel } from '@/db/models';
+import { mailConfig } from '@/recovery/config';
+import { MongoRecoveryRepository } from '@/recovery/repository';
+import { RecoveryService } from '@/recovery/service';
+import { smtpSender } from '@/recovery/mail';
+import { createRecoveryRouter } from '@/recovery/routes';
+import { startMailWorker } from '@/recovery/worker';
+import { revokeUserSockets } from '@/user/sessions';
 
 const app = express();
+// Only explicit proxy IPs/CIDRs; never trust arbitrary client forwarding headers.
+if (process.env.TRUSTED_PROXY_CIDRS)
+  app.set(
+    'trust proxy',
+    process.env.TRUSTED_PROXY_CIDRS.split(',').map((s) => s.trim()),
+  );
+const mailSettings = mailConfig();
 const server = createServer(app);
 const corsOpts = {
   cors: {
@@ -30,6 +45,17 @@ app.use(cors(corsOpts.cors));
 connectDB().then(async (mongoose) => {
   await supportOrderModel.init();
   app.use('/api/support', supportRouter);
+  let recovery: RecoveryService | null = null;
+  if (mailSettings && mongoose?.connection.db) {
+    const repository = new MongoRecoveryRepository(mongoose.connection.db, userProfileModel.collection.name);
+    await repository.init();
+    recovery = new RecoveryService(repository, mailSettings, smtpSender(mailSettings));
+    startMailWorker(recovery);
+  }
+  app.use(
+    '/api/auth',
+    createRecoveryRouter(recovery, (id) => revokeUserSockets(io, id)),
+  );
   const dbManager = new DBManager(mongoose);
   new Manager(io, dbManager);
 

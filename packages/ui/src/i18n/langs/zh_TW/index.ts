@@ -1,3 +1,4 @@
+import { passwordRecovery } from '../passwordRecovery';
 import { premiumCosmetics } from '../premiumCosmetics';
 import stickers from '@/i18n/langs/en/stickers';
 /**
@@ -17,6 +18,7 @@ import modals from './modals';
 import achievements from './achievements';
 
 export const zh_TW = {
+  passwordRecovery: passwordRecovery['zh-TW'],
   premiumCosmetics: premiumCosmetics.zh_TW,
   ...menu,
   ...stickers,

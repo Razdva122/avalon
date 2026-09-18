@@ -20,7 +20,7 @@ import { registerTrueSkillRatingEndpoints } from '@/scripts/trueSkillRatingEndpo
 import { registerAchievementEndpoints } from '@/scripts/achievementEndpoints';
 import { updateTrueSkillForGame } from '@/scripts/updateTrueSkillRatings';
 import { DBManager } from '@/db';
-import { validateJWT } from '@/user';
+import { installSessionChecks, revokeUserSockets } from '@/user/sessions';
 import { AchievementManager } from '@/achievements';
 import { AvatarsManager } from '@/user/avatars';
 
@@ -194,6 +194,7 @@ export class Manager {
       this.destroyRoom(room.roomID);
     });
 
+    installSessionChecks(io);
     io.on('connection', (socket) => {
       // Register endpoints
       registerRatingEndpoints(socket);
@@ -201,24 +202,18 @@ export class Manager {
       handleSocketErrors(socket);
       this.updateOnlineCounter('lobby', 1);
 
-      const { token } = socket.handshake.auth;
-
       const userState: {
         userID: string | undefined;
       } = {
         userID: undefined,
       };
 
-      if (token) {
-        try {
-          const tokenValue = validateJWT(token);
-          userState.userID = tokenValue.id;
-          this.dbManager.getUserCompletedAchievements(tokenValue.id, 'hidden').then((achievements) => {
-            socket.emit('hiddenAchievementsList', achievements);
-          });
-        } catch (e) {
-          socket.emit('renewJWT');
-        }
+      if (socket.data.authUser) {
+        const tokenValue = socket.data.authUser;
+        userState.userID = tokenValue.id;
+        this.dbManager.getUserCompletedAchievements(tokenValue.id, 'hidden').then((achievements) => {
+          socket.emit('hiddenAchievementsList', achievements);
+        });
       }
 
       registerTrueSkillRatingEndpoints(socket, userState.userID);
@@ -339,6 +334,7 @@ export class Manager {
       const result = await this.dbManager.updateUserCredentials(userID, password, 'password', newPassword);
 
       cb(result);
+      if (result === true) revokeUserSockets(this.io, userID);
     });
 
     socket.on('getUserAvatars', async (cb) => {

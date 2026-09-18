@@ -2,6 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <script>
+      // Keep recovery secrets out of analytics and the address bar before any scripts load.
+      if (/^\/password-recovery\/?$/.test(location.pathname)) {
+        window.__avalonRecoveryToken = location.hash.slice(1);
+        history.replaceState(null, '', location.pathname);
+        var referrerPolicy = document.createElement('meta');
+        referrerPolicy.name = 'referrer';
+        referrerPolicy.content = 'no-referrer';
+        document.head.appendChild(referrerPolicy);
+      }
+    </script>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta

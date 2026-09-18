@@ -1,0 +1,40 @@
+# ФРАГМЕН для ручного объединения с существующим Compose ВМ.
+# Не заменяйте им полную спецификацию! Существующие секреты, MongoDB,
+# volumes и mounts сертификатов сохраните. Подсеть сначала проверьте на ВМ.
+services:
+  ui:
+    # Замените на опубликованный тег ОДНОГО релиза для обоих сервисов.
+    image: razdva12/nginx-avalon:RELEASE_TAG
+    networks:
+      avalon-mail-net:
+        ipv4_address: 172.29.250.10
+  backend:
+    image: razdva12/backend-avalon:RELEASE_TAG
+    # УДАЛИТЕ существующий ports: ['3000:3000']; expose не публикует порт.
+    networks:
+      - avalon-mail-net
+    expose:
+      - '3000'
+    environment:
+      # Добавьте к существующему environment, не заменяйте его целиком.
+      NODE_ENV: production
+      MAIL_ENABLED: 'false'
+      POSTBOX_SMTP_USER: REPLACE_WITH_API_KEY_ID
+      POSTBOX_SMTP_PASSWORD: REPLACE_WITH_API_KEY_SECRET
+      MAIL_FROM: security@avalon-game.com
+      MAIL_FRONTEND_URL: https://avalon-game.com
+      MAIL_ENCRYPTION_KEY: REPLACE_WITH_64_HEX_CHARACTERS
+      MAIL_EVENT_SECRET: REPLACE_WITH_SEPARATE_RANDOM_SECRET
+      MAIL_HOURLY_LIMIT: '20'
+      MAIL_DAILY_LIMIT: '100'
+      TRUSTED_PROXY_CIDRS: 172.29.250.10/32
+  mongodb:
+    # Замените старый список networks и у MongoDB; данные/volumes не меняйте.
+    networks:
+      - avalon-mail-net
+networks:
+  avalon-mail-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.29.250.0/24

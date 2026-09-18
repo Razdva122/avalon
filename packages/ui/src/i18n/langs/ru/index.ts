@@ -1,3 +1,4 @@
+import { passwordRecovery } from '../passwordRecovery';
 import { premiumCosmetics } from '../premiumCosmetics';
 import stickers from './stickers';
 /**
@@ -17,6 +18,7 @@ import modals from './modals';
 import achievements from './achievements';
 
 export const ru = {
+  passwordRecovery: passwordRecovery['ru'],
   premiumCosmetics: premiumCosmetics.ru,
   ...menu,
   ...stickers,

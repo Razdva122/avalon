@@ -1,7 +1,7 @@
 import { hasPremium } from './premium';
 import express, { Request, Response, NextFunction } from 'express';
 import { randomUUID } from 'crypto';
-import { validateJWT } from '@/user';
+import { authenticatedUser } from '@/user/sessions';
 import { userFeaturesModel, userProfileModel } from '@/db/models';
 import { parseAmountCents } from './protocol';
 import { OxaPay, oxaPayConfig, oxaTrackId, verifyOxaSignature } from './oxapay';
@@ -81,7 +81,7 @@ supportRouter.use(
     if (!token) return res.status(401).json({ error: 'unauthorized' });
     let userID: string;
     try {
-      const user = validateJWT(token);
+      const user = await authenticatedUser(token);
       if (typeof user.id !== 'string') throw new Error('invalid_user');
       userID = user.id;
     } catch {

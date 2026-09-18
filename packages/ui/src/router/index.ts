@@ -70,6 +70,16 @@ const legacyRoutes = {
 
 export const routes: Array<RouteRecordRaw> = [
   {
+    path: '/password-recovery/',
+    name: 'passwordRecovery',
+    component: () => import('@/pages/account/PasswordRecovery.vue'),
+    meta: {
+      title: 'Password recovery — Avalon',
+      description: 'Recover access to your Avalon account.',
+      skipSiteMap: true,
+    },
+  },
+  {
     path: '/en/:pathMatch(.*)*',
     redirect: (to) => ({ path: basePath(to.path), query: to.query, hash: to.hash }),
   },

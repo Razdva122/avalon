@@ -21,6 +21,7 @@
         :rules="[validators.required, validators.spacesForbidden, validators.email]"
         :label="$t('modal.newEmail')"
       />
+      <p class="mb-4">{{ $t('passwordRecovery.emailHint') }}</p>
       <v-btn :disabled="!formValid.emailForm" type="submit" color="primary" variant="elevated" class="submit-btn">{{
         $t('modal.changeButton')
       }}</v-btn>

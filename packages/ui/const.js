@@ -1,5 +1,6 @@
 const yaMetrika = `<!-- Yandex.Metrika counter -->
 <script async type="text/javascript" >
+   if (!/^\\/password-recovery\\/?$/.test(location.pathname)) {
    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
    m[i].l=1*new Date();
    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
@@ -11,13 +12,18 @@ const yaMetrika = `<!-- Yandex.Metrika counter -->
         trackLinks:true,
         accurateTrackBounce:true
    });
+   }
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/96679204" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->`;
 
 const gtag = `<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DL67HPGX9T"></script>
 <script>
+  if (!/^\\/password-recovery\\/?$/.test(location.pathname)) {
+  var analyticsScript = document.createElement('script');
+  analyticsScript.async = true;
+  analyticsScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-DL67HPGX9T';
+  document.head.appendChild(analyticsScript);
 	window.dataLayer = window.dataLayer || [];
 	function gtag() {
 		dataLayer.push(arguments);
@@ -25,6 +31,7 @@ const gtag = `<!-- Google tag (gtag.js) -->
 	gtag('js', new Date());
 
 	gtag('config', 'G-DL67HPGX9T');
+  }
 </script>`;
 
 module.exports = {
