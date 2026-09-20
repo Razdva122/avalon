@@ -1,35 +1,25 @@
 <template>
-  <div class="info-page-content">
-    <div class="information">
-      <LocaleLink :to="{ name: 'rules' }">
-        <v-btn size="x-large">
-          {{ $t('wiki.rules') }}
-          <template v-slot:prepend>
-            <span class="material-icons"> auto_stories </span>
-          </template>
-        </v-btn>
-      </LocaleLink>
-
-      <LocaleLink :to="{ name: 'roles' }">
-        <v-btn size="x-large">
-          {{ $t('wiki.roles') }}
-          <template v-slot:prepend>
-            <span class="material-icons"> person </span>
-          </template>
-        </v-btn>
-      </LocaleLink>
-
-      <LocaleLink :to="{ name: 'expansions' }">
-        <v-btn size="x-large">
-          {{ $t('wiki.addons') }}
-          <template v-slot:prepend>
-            <span class="material-icons"> castle </span>
-          </template>
-        </v-btn>
-      </LocaleLink>
-    </div>
-
+  <div class="info-page-content wiki-page">
     <h1 class="title">{{ $t('wiki.title') }}</h1>
+    <p>{{ $t('wiki.introduction') }}</p>
+
+    <nav class="wiki-sections" :aria-label="$t('wiki.title')">
+      <LocaleLink :to="{ name: 'rules' }">
+        <span class="material-icons" aria-hidden="true">auto_stories</span>
+        <strong>{{ $t('wiki.rules') }}</strong>
+        <span>{{ $t('rules.gameplayRules') }}</span>
+      </LocaleLink>
+      <LocaleLink :to="{ name: 'roles' }">
+        <span class="material-icons" aria-hidden="true">person</span>
+        <strong>{{ $t('wiki.roles') }}</strong>
+        <span>{{ $t('wiki.rolesTitle') }}</span>
+      </LocaleLink>
+      <LocaleLink :to="{ name: 'expansions' }">
+        <span class="material-icons" aria-hidden="true">castle</span>
+        <strong>{{ $t('wiki.addons') }}</strong>
+        <span>{{ $t('wiki.addonsTitle') }}</span>
+      </LocaleLink>
+    </nav>
 
     <h2>{{ $t('wiki.setup') }}</h2>
     <ul>
@@ -65,6 +55,7 @@
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 .information {
   margin-top: 10px;
@@ -73,5 +64,43 @@
   justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
+}
+</style>
+
+<style scoped lang="scss">
+.wiki-sections {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 28px 0 40px;
+  a {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 24px;
+    border: 1px solid rgba(var(--v-theme-on-surface), 0.16);
+    border-radius: 16px;
+    text-decoration: none;
+    color: inherit;
+    background: rgba(var(--v-theme-on-surface), 0.025);
+    &:hover {
+      border-color: rgb(var(--v-theme-primary));
+      background: rgba(var(--v-theme-primary), 0.08);
+    }
+  }
+  strong {
+    font-size: 22px;
+  }
+  .material-icons {
+    font-size: 30px;
+    color: rgb(var(--v-theme-primary));
+    margin-bottom: 4px;
+  }
+}
+@media (max-width: 700px) {
+  .wiki-sections {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

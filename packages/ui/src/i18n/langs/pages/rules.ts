@@ -3,6 +3,21 @@ import { Dictionary } from '@avalon/types';
 
 export const rules: { [key in TLanguage]: Dictionary<string> } = {
   pt: {
+    variantNote:
+      'No jogo de tabuleiro original, cinco equipes rejeitadas consecutivamente para a mesma missão dão a vitória ao mal. Nesta plataforma, após quatro rejeições, a quinta equipe normalmente parte sem votação; as cartas de trama podem afetar sua aprovação. No original, o Assassino faz a escolha final; aqui, o assassinato é realizado pela equipe do mal. Antes de uma partida presencial, combinem as regras e os papéis.',
+    variantTitle: 'Regras do jogo de tabuleiro e desta plataforma',
+    roundExample:
+      'O líder escolhe duas pessoas. Se pelo menos três dos cinco jogadores aprovarem a equipe, essas duas pessoas escolhem suas cartas em segredo. Dois Sucessos completam a missão; uma Falha faz a missão fracassar. O sucesso não prova que ambos sejam do bem: um jogador do mal também pode escolher Sucesso.',
+    roundExampleTitle: 'Exemplo: primeira missão com cinco jogadores',
+    quickStep4:
+      'Revele o resultado da missão, passe a liderança e repita a formação da equipe. Após três missões bem-sucedidas, o mal ainda pode vencer ao identificar corretamente Merlin na fase de assassinato.',
+    quickStep3:
+      'Somente os integrantes da equipe escolhem cartas de missão em segredo. No jogo básico, o bem deve escolher Sucesso; o mal pode escolher Sucesso ou Falha. Em geral, uma Falha basta para a missão fracassar; a quarta missão com sete ou mais jogadores exige duas.',
+    quickStep2:
+      'O líder escolhe a equipe conforme a tabela de jogadores abaixo. Todos votam: é preciso mais da metade dos votos a favor. Um empate rejeita a equipe.',
+    quickStep1:
+      'Reúna de 5 a 10 jogadores, distribua os papéis em segredo e revele a cada pessoa as informações permitidas pelo seu papel. O bem precisa de três missões bem-sucedidas; o mal, de três missões fracassadas.',
+    quickStartTitle: 'Como jogar Avalon: guia rápido',
     numberOfPlayers: 'Número de Jogadores',
     missionNumber: 'Missão {number}',
     countPlayers: '{count} Jogadores',
@@ -10,7 +25,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     mordredTeam: 'Servos de Mordred:',
     expansions: 'Expansões:',
     note: 'Nota: ',
-    title: 'Avalon: The Resistance - Regras oficiais',
+    title: 'Regras de Avalon: como jogar com 5–10 jogadores',
     gameObjective: 'Objetivo do Jogo',
     gameDescription:
       'Avalon: The Resistance é um jogo de tabuleiro estratégico onde os jogadores são encarregados de completar uma série de missões enquanto lidam com traidores ocultos conhecidos como Servos de Mordred. O jogo é ambientado no mundo lendário do Rei Arthur e os Cavaleiros da Távola Redonda.',
@@ -85,6 +100,21 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     loversOpenEyes: 'abram seus olhos e olhem ao redor para conhecerem um ao outro',
   },
   en: {
+    quickStartTitle: 'How to play Avalon: a quick start',
+    quickStep1:
+      'Set up 5–10 players, deal secret roles and reveal the information allowed by each role. Good wants three successful missions; evil wants three failed missions.',
+    quickStep2:
+      'The leader chooses a mission team using the player-count table below. Everyone votes: more than half must approve; a tie rejects the team.',
+    quickStep3:
+      'Only the selected team submits mission cards in secret. In the base game, good must choose Success; evil may choose Success or Fail. Most missions fail with one Fail card; mission four needs two Fails with seven or more players.',
+    quickStep4:
+      'Reveal only the mission result, pass leadership and repeat. After three successful missions, evil can still win by correctly identifying Merlin in the assassination phase.',
+    roundExampleTitle: 'Example: the first mission with five players',
+    roundExample:
+      'The leader chooses two players. If three or more of the five players approve, those two submit mission cards. Two Success cards make the mission succeed; one Fail makes it fail. A successful mission does not prove both players are good: an evil player may choose Success.',
+    variantTitle: 'Board-game rules and this platform',
+    variantNote:
+      'In the original board game, five consecutive rejected teams give evil the win. On this platform, the fifth team is normally sent without a vote after four rejections; Plot Cards can affect team approval. The original game assigns the final guess to the Assassin. Here, assassination is handled by the evil team. Agree on the rules and enabled roles before an offline game.',
     numberOfPlayers: 'Number of Players',
     missionNumber: 'Mission {number}',
     countPlayers: '{count} Players',
@@ -92,7 +122,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     mordredTeam: 'Minions of Mordred:',
     expansions: 'Expansions:',
     note: 'Note: ',
-    title: 'Avalon: The Resistance - Official rules',
+    title: 'Avalon Rules: How to Play The Resistance: Avalon',
     gameObjective: 'Game Objective',
     gameDescription:
       'Avalon: The Resistance is a strategic board game where players are tasked with completing a series of missions while dealing with hidden traitors known as Minions of Mordred. The game is set in the legendary world of King Arthur and the Knights of the Round Table.',
@@ -165,6 +195,21 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     loversOpenEyes: 'open your eyes and look around to know each other',
   },
   ru: {
+    variantNote:
+      'В оригинальной настольной игре пять отклонённых команд подряд при сборе одной миссии приносят победу злу. На платформе после четырёх отказов пятая команда обычно отправляется без голосования; карты интриг могут влиять на принятие команды. В оригинале последнее решение принимает Убийца, а здесь убийство выполняет команда зла. Перед офлайн-партией договоритесь о правилах и наборе ролей.',
+    variantTitle: 'Настольные правила и особенности платформы',
+    roundExample:
+      'Лидер выбирает двух участников. Если хотя бы трое из пяти игроков одобряют команду, эти двое тайно выбирают карты миссии. Две карты успеха означают успех; одна карта провала — провал миссии. Успех не доказывает, что оба участника добрые: злой игрок тоже может выбрать успех.',
+    roundExampleTitle: 'Пример: первая миссия в партии на пять игроков',
+    quickStep4:
+      'Объявите результат миссии, передайте лидерство и повторите сбор команды. После трёх успешных миссий зло ещё может победить, правильно определив Мерлина на этапе убийства.',
+    quickStep3:
+      'Только участники миссии тайно выбирают карты. В базовой игре добрые обязаны выбрать «Успех», а злые могут выбрать «Успех» или «Провал». Обычно достаточно одной карты провала; в четвёртой миссии при семи и более игроках нужны две.',
+    quickStep2:
+      'Лидер выбирает участников миссии по таблице ниже. Голосуют все: для принятия команды нужно больше половины голосов «за». При равенстве голосов команда отклоняется.',
+    quickStep1:
+      'Соберите 5–10 игроков, раздайте тайные роли и сообщите каждому информацию, положенную его роли. Добру нужны три успешные миссии, злу — три проваленные.',
+    quickStartTitle: 'Как играть в Авалон: быстрый старт',
     numberOfPlayers: 'Количество игроков',
     missionNumber: 'Миссия {number}',
     countPlayers: '{count} игроков',
@@ -172,7 +217,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     mordredTeam: 'Миньоны Мордреда:',
     expansions: 'Дополнения:',
     note: 'Примечание: ',
-    title: 'Авалон: Сопротивление - Официальные правила',
+    title: 'Правила Авалона: как играть в компании от 5 до 10 человек',
     gameObjective: 'Цель игры',
     gameDescription:
       'Авалон: Сопротивление - это стратегическая настольная игра, в которой игроки должны выполнить серию миссий, сталкиваясь с скрытыми предателями, известными как Миньоны Мордреда. Игра разворачивается в легендарном мире короля Артура и рыцарей Круглого стола.',
@@ -244,6 +289,18 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     loversOpenEyes: 'откройте глаза и оглянитесь, чтобы узнать друг друга',
   },
   'zh-CN': {
+    variantNote:
+      '原版桌游中，同一任务连续五次组队遭否决，坏人立即获胜。本站通常在四次否决后，让第五位队长直接派队，不再投票；阴谋卡可能影响队伍是否通过。原版由刺客做最后指认，本站则由邪恶阵营处理刺杀。线下游玩前，请先确认采用的规则及角色。',
+    variantTitle: '桌游原版与本站玩法的区别',
+    roundExample:
+      '队长选出两名队员。五人中至少三人同意后，这两人秘密出任务牌。两张成功牌代表任务成功；只要一张失败牌，任务就失败。任务成功不代表两人都是好人，因为坏人也能出成功牌。',
+    roundExampleTitle: '示例：五人局的第一次任务',
+    quickStep4: '公布任务结果后更换队长，继续组队。三次任务成功后，坏人仍可在刺杀阶段正确指认梅林，反败为胜。',
+    quickStep3:
+      '只有任务队员秘密提交任务牌。基本规则中，好人只能出成功，坏人可以出成功或失败。通常一张失败牌就会使任务失败；七人以上的第四次任务需要两张失败牌。',
+    quickStep2: '队长依下方人数表选择任务队员，所有玩家投票。超过半数同意才通过，平票视为否决。',
+    quickStep1: '由 5–10 人游玩，秘密分配角色，并依角色能力查看起始信息。好人要让三次任务成功；坏人要让三次任务失败。',
+    quickStartTitle: '阿瓦隆怎么玩？新手快速入门',
     numberOfPlayers: '玩家人数',
     missionNumber: '任务 {number}',
     countPlayers: '{count} 玩家',
@@ -251,7 +308,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     mordredTeam: '莫德雷德的爪牙:',
     expansions: '扩展:',
     note: '注意: ',
-    title: '阿瓦隆: 抵抗 - 官方规则',
+    title: '阿瓦隆规则与玩法：5–10 人新手指南',
     gameObjective: '游戏目标',
     gameDescription:
       '阿瓦隆: 抵抗 是一款战略桌游，玩家需要在与隐藏的叛徒——莫德雷德的爪牙作斗争的同时完成一系列的任务。游戏设定在亚瑟王和圆桌骑士的传奇世界中。',
@@ -318,6 +375,18 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     loversOpenEyes: '睁开眼睛，环顾四周以认识彼此',
   },
   'zh-TW': {
+    quickStartTitle: '阿瓦隆怎麼玩？新手快速入門',
+    quickStep1: '由 5–10 人遊玩，秘密分配角色，並依角色能力查看起始資訊。好人要讓三次任務成功；壞人要讓三次任務失敗。',
+    quickStep2: '隊長依下方人數表選擇任務隊員，所有玩家投票。超過半數同意才通過，平票視為否決。',
+    quickStep3:
+      '只有任務隊員秘密提交任務牌。基本規則中，好人只能出成功，壞人可以出成功或失敗。通常一張失敗牌就會使任務失敗；七人以上的第四次任務需要兩張失敗牌。',
+    quickStep4: '公布任務結果後更換隊長，繼續組隊。三次任務成功後，壞人仍可在刺殺階段正確指認梅林，反敗為勝。',
+    roundExampleTitle: '範例：五人局的第一次任務',
+    roundExample:
+      '隊長選出兩名隊員。五人中至少三人同意後，這兩人秘密出任務牌。兩張成功牌代表任務成功；只要一張失敗牌，任務就失敗。任務成功不代表兩人都是好人，因為壞人也能出成功牌。',
+    variantTitle: '桌遊原版與本站玩法的差異',
+    variantNote:
+      '原版桌遊中，同一任務連續五次組隊遭否決，壞人立即獲勝。本站通常在四次否決後，讓第五位隊長直接派隊，不再投票；陰謀卡可能影響隊伍是否通過。原版由刺客做最後指認，本站則由邪惡陣營處理刺殺。線下遊玩前，請先確認採用的規則及角色。',
     numberOfPlayers: '玩家人數',
     missionNumber: '任務 {number}',
     countPlayers: '{count} 玩家',
@@ -392,6 +461,21 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     loversOpenEyes: '睜開眼睛，環顧四周以認識彼此',
   },
   es: {
+    variantNote:
+      'En el juego de mesa original, cinco equipos rechazados consecutivamente para una misma misión dan la victoria al mal. En esta plataforma, tras cuatro rechazos, el quinto equipo normalmente sale sin votación; las cartas de trama pueden afectar a su aprobación. En el original, el Asesino realiza la acusación final; aquí, el asesinato lo gestiona el equipo del mal. Antes de jugar presencialmente, acordad las reglas y los roles.',
+    variantTitle: 'Reglas del juego de mesa y de esta plataforma',
+    roundExample:
+      'El líder elige a dos personas. Si al menos tres de los cinco jugadores aprueban el equipo, esas dos personas eligen sus cartas en secreto. Dos Éxitos completan la misión; un Fracaso la hace fallar. Una misión exitosa no demuestra que ambos sean buenos: un jugador del mal también puede elegir Éxito.',
+    roundExampleTitle: 'Ejemplo: primera misión con cinco jugadores',
+    quickStep4:
+      'Revela el resultado de la misión, pasa el liderazgo y repite la formación del equipo. Tras tres misiones exitosas, el mal aún puede ganar si identifica correctamente a Merlín en la fase de asesinato.',
+    quickStep3:
+      'Solo los miembros del equipo eligen cartas de misión en secreto. En el juego básico, el bien debe elegir Éxito; el mal puede elegir Éxito o Fracaso. Normalmente basta un Fracaso para fallar; la cuarta misión con siete o más jugadores requiere dos.',
+    quickStep2:
+      'El líder elige el equipo según la tabla de jugadores que aparece abajo. Todos votan: se necesita más de la mitad de los votos a favor. Un empate rechaza el equipo.',
+    quickStep1:
+      'Reúne a 5–10 jugadores, reparte los roles en secreto y revela a cada persona la información que le permite su rol. El bien necesita tres misiones exitosas; el mal, tres misiones fallidas.',
+    quickStartTitle: 'Cómo jugar a Avalon: guía rápida',
     numberOfPlayers: 'Número de Jugadores',
     missionNumber: 'Misión {number}',
     countPlayers: '{count} Jugadores',
@@ -399,7 +483,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     mordredTeam: 'Secuaces de Mordred:',
     expansions: 'Expansiones:',
     note: 'Nota: ',
-    title: 'Avalon: La Resistencia - Reglas oficiales',
+    title: 'Reglas de Avalon: cómo jugar con 5–10 jugadores',
     gameObjective: 'Objetivo del Juego',
     gameDescription:
       'Avalon: La Resistencia es un juego de mesa estratégico donde los jugadores tienen la tarea de completar una serie de misiones mientras lidian con traidores ocultos conocidos como los Secuaces de Mordred. El juego está ambientado en el legendario mundo del Rey Arturo y los Caballeros de la Mesa Redonda.',

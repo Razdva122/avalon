@@ -1,8 +1,8 @@
 module.exports.rules = {
   pt: {
-    title: 'Avalon: The Resistance | Regras',
+    title: 'Regras de Avalon: como jogar e papéis para 5–10 jogadores',
     description:
-      "Descubra as regras completas do jogo de tabuleiro 'Avalon: The Resistance', incluindo um guia para configurar o jogo para diferentes números de jogadores, combinações de papéis e os princípios básicos da vitória. Opções de configuração convenientes para seus jogos offline ajudarão você a criar as condições perfeitas de jogo e a desbloquear todo o potencial deste clássico jogo de estratégia.",
+      'Aprenda a jogar Avalon: guia rápido, exemplo de missão, papéis para 5–10 jogadores, votações, tamanho das equipes, vitória e assassinato de Merlin.',
     keywords: ['Wiki', 'Regras', 'Como jogar'],
   },
   en: {
@@ -12,9 +12,9 @@ module.exports.rules = {
     keywords: ['Wiki', 'Rules', 'How to play'],
   },
   ru: {
-    title: 'Авалон: Сопротивление | Правила',
+    title: 'Правила Авалона: как играть, роли и составы на 5–10 человек',
     description:
-      'Правила Авалона для 5–10 игроков: состав ролей, таблица участников миссий, голосование, условия победы добра и зла и покушение на Мерлина.',
+      'Как играть в Авалон: быстрый старт, пример миссии, роли на 5–10 игроков, голосование, таблица миссий, условия победы и покушение на Мерлина.',
     keywords: ['Вики', 'Правила', 'Как играть'],
   },
   'zh-TW': {
@@ -24,15 +24,15 @@ module.exports.rules = {
     keywords: ['維基', '規則', '玩法'],
   },
   'zh-CN': {
-    title: '阿瓦隆：反抗组织 | 规则',
+    title: '阿瓦隆规则与玩法｜5–10 人配置、任务人数与角色能力',
     description:
-      '了解桌游“阿瓦隆：反抗组织”的完整规则，包括针对不同玩家数量的游戏设置指南、角色组合以及胜利的基本原则。便捷的离线游戏设置选项将帮助您创造理想的游戏条件，并充分发挥这款经典策略游戏的潜力。',
+      '阿瓦隆怎么玩？查看新手入门、任务示例、5–10 人角色配置、任务人数表、组队投票、胜负条件与梅林刺杀规则。',
     keywords: ['维基', '规则', '怎么玩'],
   },
   es: {
-    title: 'Avalon: La Resistencia | Reglas',
+    title: 'Reglas de Avalon: cómo jugar y roles para 5–10 jugadores',
     description:
-      "Descubre las reglas completas del juego de mesa 'Avalon: La Resistencia', incluyendo una guía para configurar el juego para diferentes números de jugadores, combinaciones de roles y los principios básicos de la victoria. Opciones de configuración convenientes para tus juegos offline te ayudarán a crear las condiciones perfectas de juego y a desbloquear todo el potencial de este clásico juego de estrategia.",
+      'Aprende a jugar a Avalon: guía rápida, ejemplo de misión, roles para 5–10 jugadores, votaciones, tamaño de los equipos, victoria y asesinato de Merlín.',
     keywords: ['Wiki', 'Reglas', 'Cómo jugar'],
   },
 };

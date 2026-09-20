@@ -1,36 +1,36 @@
 module.exports.wiki = {
   pt: {
-    title: 'Avalon: The Resistance | Wiki',
+    title: 'Wiki de Avalon: regras, papéis e expansões',
     description:
-      "Seu recurso Wiki confiável para 'Avalon: The Resistance'. Encontre guias detalhados sobre como jogar Avalon, explicações das regras e dicas de estratégia.",
+      'Explore as regras de Avalon, as habilidades dos personagens e as expansões. Aprenda a jogar e consulte os papéis e variantes da sua partida.',
     keywords: ['Wiki', 'Regras', 'Como jogar'],
   },
   en: {
-    title: 'Avalon: The Resistance | Wiki',
+    title: 'Avalon Wiki: Game Rules, Character Roles & Expansions',
     description:
-      "Your go-to 'Avalon: The Resistance' Wiki resource. Find detailed guides on playing Avalon, rules explanation, and strategy tips.",
+      'Explore The Resistance: Avalon rules, character abilities and expansions. Start with the how-to-play guide, then find the roles and variants used in your game.',
     keywords: ['Wiki', 'Rules', 'How to play'],
   },
   ru: {
-    title: 'Авалон: Сопротивление | Вики',
+    title: 'Вики Авалона: правила игры, роли и дополнения',
     description:
-      "Ваш надежный ресурс по игре 'Авалон: Сопротивление'. Найдите подробные руководства по игре в Авалон, объяснения правил и советы по стратегии.",
+      'Изучите правила Авалона, способности персонажей и дополнения. Начните с руководства по игре, затем разберите роли и варианты правил вашей партии.',
     keywords: ['Вики', 'Правила', 'Как играть'],
   },
   'zh-TW': {
-    title: '阿瓦隆：反抗勢力 | 維基',
-    description: '您的首選「阿瓦隆：反抗勢力」維基資源。尋找有關玩阿瓦隆的詳細指南、規則解釋以及策略提示。',
+    title: '阿瓦隆維基：遊戲規則、角色能力與擴充',
+    description: '查閱阿瓦隆遊戲規則、角色能力和擴充玩法。從新手指南開始，再了解本局角色、任務流程與可選規則。',
     keywords: ['維基', '規則', '玩法'],
   },
   'zh-CN': {
-    title: '阿瓦隆：反抗组织 | 维基',
-    description: '您的一站式「阿瓦隆：反抗组织」维基资源。查找有关玩阿瓦隆的详细指南、规则解释和策略提示。',
+    title: '阿瓦隆维基：游戏规则、角色能力与扩展',
+    description: '查阅阿瓦隆游戏规则、角色能力和扩展玩法。从新手指南开始，再了解本局角色、任务流程与可选规则。',
     keywords: ['维基', '规则', '怎么玩'],
   },
   es: {
-    title: 'Avalon: La Resistencia | Wiki',
+    title: 'Wiki de Avalon: reglas, roles y expansiones',
     description:
-      "Su recurso confiable de wiki para 'Avalon: La Resistencia'. Encuentre guías detalladas sobre cómo jugar Avalon, explicaciones de las reglas y consejos de estrategia.",
+      'Explora las reglas de Avalon, las habilidades de los personajes y las expansiones. Aprende a jugar y consulta los roles y variantes de tu partida.',
     keywords: ['Wiki', 'Reglas', 'Cómo jugar'],
   },
 };

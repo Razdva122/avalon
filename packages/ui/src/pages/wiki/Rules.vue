@@ -1,14 +1,34 @@
 <template>
-  <div class="info-page-content rules">
+  <div class="info-page-content wiki-page rules">
     <WikiBreadCrumbs />
     <h1 class="title">{{ $t('rules.title') }}</h1>
 
-    <nav class="rules-contents" :aria-label="$t('wiki.rules')">
+    <nav class="rules-contents wiki-nav" :aria-label="$t('wiki.rules')">
       <a href="#gameplay">{{ $t('rules.gameplayRules') }}</a>
       <a href="#winning">{{ $t('rules.conclusionOfGameplayTitle') }}</a>
       <a href="#mission-sizes">{{ $t('rules.missionSizes') }}</a>
       <a href="#roles-setup">{{ $t('rules.recommendTitle') }}</a>
     </nav>
+
+    <section class="quick-start">
+      <h2>{{ $t('rules.quickStartTitle') }}</h2>
+      <ol class="quick-steps">
+        <li v-for="step in 4" :key="step">{{ $t(`rules.quickStep${step}`) }}</li>
+      </ol>
+      <div class="rules-notes">
+        <section class="wiki-panel example-panel">
+          <h3>{{ $t('rules.roundExampleTitle') }}</h3>
+          <p>{{ $t('rules.roundExample') }}</p>
+        </section>
+        <section class="wiki-panel variant-panel">
+          <h3>{{ $t('rules.variantTitle') }}</h3>
+          <p>{{ $t('rules.variantNote') }}</p>
+        </section>
+      </div>
+      <p class="wiki-nav">
+        <LocaleLink :to="{ name: 'roles' }">{{ $t('wiki.rolesTitle') }}</LocaleLink>
+      </p>
+    </section>
 
     <h2>{{ $t('rules.gameObjective') }}</h2>
 
@@ -451,6 +471,7 @@ h2[id] {
   scroll-margin-top: 80px;
 }
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 .information {
   margin-top: 10px;
@@ -480,7 +501,7 @@ h2 {
 }
 
 table {
-  width: 50%;
+  width: 100%;
   border-collapse: collapse;
   text-align: center;
 }
@@ -504,6 +525,51 @@ th {
 
   .table {
     overflow-x: auto;
+  }
+}
+</style>
+
+<style scoped lang="scss">
+.quick-start {
+  margin: 32px 0 40px;
+}
+.wiki-page ol.quick-steps {
+  list-style: none;
+  padding: 0;
+  counter-reset: step;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  li {
+    counter-increment: step;
+    margin: 0;
+    padding: 22px;
+    border: 1px solid rgba(var(--v-theme-on-surface), 0.14);
+    border-radius: 16px;
+    background: rgba(var(--v-theme-on-surface), 0.025);
+    &::before {
+      content: counter(step, decimal-leading-zero);
+      display: block;
+      color: rgb(var(--v-theme-primary));
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+  }
+}
+.rules-notes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.info-page-content.wiki-page .example-panel {
+  border-inline-start: 3px solid rgb(var(--v-theme-primary));
+}
+@media (max-width: 700px) {
+  .wiki-page ol.quick-steps,
+  .rules-notes {
+    grid-template-columns: 1fr;
   }
 }
 </style>

@@ -1,10 +1,15 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
     <h1>{{ $t('wiki.rolesTitle') }}</h1>
     <div>
       {{ $t('wiki.rolesInfo') }}
     </div>
+    <nav class="wiki-nav" :aria-label="$t('wiki.title')">
+      <LocaleLink :to="{ name: 'rules' }">{{ $t('wiki.rules') }}</LocaleLink>
+      <LocaleLink :to="{ name: 'roles' }">{{ $t('wiki.roles') }}</LocaleLink>
+      <LocaleLink :to="{ name: 'expansions' }">{{ $t('wiki.addons') }}</LocaleLink>
+    </nav>
     <div class="roles-container">
       <LocaleLink class="role" :to="{ name: 'merlin' }">
         <h2>{{ $t('roles.merlin') }}</h2>
@@ -209,6 +214,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 .roles-container {
   display: flex;

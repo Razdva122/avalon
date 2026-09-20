@@ -3,16 +3,18 @@ import { Dictionary } from '@avalon/types';
 
 export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   pt: {
+    introduction:
+      'Primeira partida de Avalon? Comece pelas regras e pela tabela de jogadores por missão, depois consulte os papéis da sua partida. Explore as expansões quando o grupo quiser mais opções.',
     rules: 'Regras',
     roles: 'Papéis',
     rolesTitle: 'Todos os Papéis no Jogo de Tabuleiro Avalon',
     rolesInfo:
-      'Cada papel tem suas próprias características e objetivos, tornando o jogo diversificado e emocionante. Abaixo estão todos os papéis disponíveis no jogo de tabuleiro Avalon.',
+      'Este catálogo reúne os papéis disponíveis nesta plataforma, incluindo papéis opcionais e personalizados. Cada partida usa apenas os papéis selecionados na configuração; não é necessário incluir todos na primeira partida.',
     addons: 'Expansões',
     addonsTitle: 'Expansões para o Jogo de Tabuleiro Avalon',
     addonsInfo:
       'Adicionar elementos como {ladyOfLake}, {excalibur} e {plotCards} aprofunda as possibilidades estratégicas e traz mais intriga para a jogabilidade. Abaixo estão as páginas para cada expansão.',
-    title: 'Avalon: The Resistance - Lógica Central do Jogo',
+    title: 'Wiki de Avalon: regras, papéis e expansões',
     setup: 'Configuração do Jogo',
     playerAssignment:
       '<b>1. Atribuição de Jogadores</b>: Atribua a cada jogador um papel de personagem aleatório, determinando sua lealdade.',
@@ -36,16 +38,18 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
       '<b>10. Determinar Vencedor</b>: O jogo conclui quando um lado garante três missões ou o Assassino identifica corretamente Merlin após as vitórias do lado do bem.',
   },
   en: {
+    introduction:
+      'New to Avalon? Start with the rules and player-count table, then look up the roles in your game. Use the expansions guide when your group is ready to add more options.',
     rules: 'Rules',
     roles: 'Roles',
     rolesTitle: 'All Roles in the Board Game Avalon',
     rolesInfo:
-      'Each role has its own characteristics and objectives, making the game diverse and exciting. Below are all the available roles in the board game Avalon.',
+      'This catalog covers the roles available on this platform, including optional and custom roles. A game uses only the roles selected in its setup; you do not need every role for your first game.',
     addons: 'Expansions',
     addonsTitle: 'Expansions for the Board Game Avalon',
     addonsInfo:
       'Adding elements such as {ladyOfLake}, {excalibur}, and {plotCards} deepens strategic possibilities and brings more intrigue to the gameplay. Below are the pages for each expansion.',
-    title: 'Avalon: The Resistance - Core Game Logic',
+    title: 'Avalon Wiki: Rules, Roles and Expansions',
     setup: 'Game Setup',
     playerAssignment:
       '<b>1. Player Assignment</b>: Assign each player a random character role, determining their allegiance.',
@@ -67,16 +71,18 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
       '<b>10. Determine Winner</b>: The game concludes when one side secures three missions or the Assassin correctly identifies Merlin post good side victories.',
   },
   ru: {
+    introduction:
+      'Впервые играете в Авалон? Начните с правил и таблицы участников миссий, затем изучите роли вашей партии. Когда освоитесь, переходите к дополнениям.',
     rules: 'Правила',
     roles: 'Роли',
     rolesTitle: 'Все роли в настольной игре Avalon',
     rolesInfo:
-      'Каждая роль имеет свои особенности и задачи, что делает игру разнообразной и увлекательной. Ниже представлены все доступные роли в настольной игре Avalon.',
+      'Здесь собраны роли, доступные на платформе, включая дополнительные и авторские. В партии участвуют только роли, выбранные при создании игры; для первой игры не нужны все роли сразу.',
     addons: 'Дополнения',
     addonsTitle: 'Дополнения для настольной игры Avalon',
     addonsInfo:
       'Добавление элементов, таких как {ladyOfLake}, {excalibur} и {plotCards}, углубляет стратегические возможности и вносит больше интриги в игровой процесс. Ниже представлены страницы по каждому дополнению.',
-    title: 'Авалон: Сопротивление - Основная Логика Игры',
+    title: 'Вики Авалона: правила, роли и дополнения',
     setup: 'Подготовка к Игре',
     playerAssignment:
       '<b>1. Распределение ролей</b>: Назначьте каждому игроку случайную роль, определяющую его принадлежность.',
@@ -98,15 +104,18 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
       '<b>10. Определение победителя</b>: Игра завершается, когда одна из сторон выполнит три миссии или Убийца правильно убьет Мерлина после победы светлой стороны.',
   },
   'zh-CN': {
+    introduction:
+      '第一次玩阿瓦隆？先阅读规则和任务人数表，再查看本局使用的角色。熟悉基本玩法后，再选择适合你们的扩展。',
     rules: '规则',
     roles: '角色',
     rolesTitle: '桌游《阿瓦隆》的所有角色',
-    rolesInfo: '每个角色都有其独特的特性和任务，使游戏变得多样而有趣。以下是桌游《阿瓦隆》中所有可用的角色。',
+    rolesInfo:
+      '这里收录本站支持的角色，包括可选角色和自定义角色。每局只使用开局设置中选择的角色，新手不需要一次加入所有角色。',
     addons: '插件',
     addonsTitle: '桌游《阿瓦隆》的扩展包',
     addonsInfo:
       '添加像 {ladyOfLake}、{excalibur} 和 {plotCards} 这样的元素加深了战略可能性，并为游戏过程带来更多的阴谋。以下是每个扩展包的介绍页。',
-    title: '阿瓦隆：反抗组织 - 核心游戏逻辑',
+    title: '阿瓦隆维基：规则、角色与扩展',
     setup: '游戏设置',
     playerAssignment: '<b>1. 玩家分配</b>: 给每位玩家分配一个随机角色，决定他们的阵营。',
     revealPhase: '<b>2. 揭示阶段</b>: 玩家根据自己角色的能力获得信息。',
@@ -124,15 +133,18 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     determineWinner: '<b>10. 确定胜者</b>: 当一方完成三个任务或刺客在好的一方获胜后正确识别梅林时，游戏结束。',
   },
   'zh-TW': {
+    introduction:
+      '第一次玩阿瓦隆？先閱讀規則和任務人數表，再查看本局使用的角色。熟悉基本玩法後，再選擇適合你們的擴充。',
     rules: '規則',
     roles: '角色',
     rolesTitle: '桌遊《阿瓦隆》的所有角色',
-    rolesInfo: '每個角色都有其獨特的特性和任務，使遊戲變得多樣而有趣。以下是桌遊《阿瓦隆》中所有可用的角色。',
+    rolesInfo:
+      '這裡收錄本站支援的角色，包括可選角色和自訂角色。每局只使用開局設定中選擇的角色，新手不需要一次加入所有角色。',
     addons: '插件',
     addonsTitle: '桌遊《阿瓦隆》的擴充包',
     addonsInfo:
       '添加像 {ladyOfLake}、{excalibur} 和 {plotCards} 這樣的元素加深了戰略可能性，並為遊戲過程帶來更多的陰謀。以下是每個擴充包的介紹頁。',
-    title: '阿瓦隆：反抗勢力 - 核心遊戲邏輯',
+    title: '阿瓦隆維基：規則、角色與擴充',
     setup: '遊戲設置',
     playerAssignment: '<b>1. 玩家分配</b>: 指派每位玩家一個隨機角色，決定他們的陣營。',
     revealPhase: '<b>2. 揭示階段</b>: 玩家根據角色的能力獲得信息。',
@@ -150,16 +162,18 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     determineWinner: '<b>10. 確定贏家</b>: 當一方完成三次任務或刺客在好方獲勝後正確識別梅林時，遊戲結束。',
   },
   es: {
+    introduction:
+      '¿Es tu primera partida de Avalon? Empieza por las reglas y la tabla de jugadores por misión, y después consulta los roles de tu partida. Explora las expansiones cuando el grupo quiera añadir más opciones.',
     rules: 'Reglas',
     roles: 'Roles',
     rolesTitle: 'Todos los Roles en el Juego de Mesa Avalon',
     rolesInfo:
-      'Cada rol tiene sus propias características y objetivos, haciendo que el juego sea diverso y emocionante. A continuación se presentan todos los roles disponibles en el juego de mesa Avalon.',
+      'Este catálogo reúne los roles disponibles en esta plataforma, incluidos roles opcionales y personalizados. Cada partida utiliza solo los roles elegidos en la configuración; no necesitas incluirlos todos para empezar.',
     addons: 'Expansiones',
     addonsTitle: 'Expansiones para el Juego de Mesa Avalon',
     addonsInfo:
       'Añadir elementos como {ladyOfLake}, {excalibur} y {plotCards} amplía las posibilidades estratégicas y aporta más intriga al juego. A continuación se muestran las páginas para cada expansión.',
-    title: 'Avalon: La Resistencia - Lógica Central del Juego',
+    title: 'Wiki de Avalon: reglas, roles y expansiones',
     setup: 'Configuración del Juego',
     playerAssignment:
       '<b>1. Asignación de Jugadores</b>: Asigna a cada jugador un rol de personaje aleatorio, determinando su lealtad.',

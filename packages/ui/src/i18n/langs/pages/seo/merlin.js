@@ -1,32 +1,38 @@
 module.exports.merlin = {
   pt: {
-    title: 'Avalon: The Resistance | Merlin',
-    description: "Regras e dicas para o papel de Merlin no jogo de tabuleiro 'Avalon: The Resistance'",
+    title: 'Merlin em Avalon: habilidades, Mordred e estratégia',
+    description:
+      'Saiba quem Merlin vê em Avalon, por que Mordred fica oculto, como Percival e Morgana interagem e como ajudar o bem sem revelar sua identidade.',
     keywords: ['Merlin', 'Papel', 'Regras', 'Dicas'],
   },
   en: {
-    title: 'Avalon: The Resistance | Merlin',
-    description: "Rules and Tips for Merlin role in the board game 'Avalon: The Resistance'",
+    title: 'Merlin in Avalon: Abilities, Mordred Exception & Strategy',
+    description:
+      'Learn who Merlin sees in Avalon, why Mordred stays hidden, how Percival and Morgana interact, and how to guide good without revealing yourself to the Assassin.',
     keywords: ['Merlin', 'Role', 'Rules', 'Tips'],
   },
   ru: {
-    title: 'Авалон: Сопротивление | Мерлин',
-    description: "Правила и советы для роли Мерлина в настольной игре 'Авалон: Сопротивление'",
+    title: 'Мерлин в Авалоне: способности, Мордред и стратегия',
+    description:
+      'Кого видит Мерлин в Авалоне, почему скрыт Мордред, как связаны Персиваль и Моргана и как помочь добру, не выдав себя Убийце.',
     keywords: ['Мерлин', 'Роль', 'Правила', 'Советы'],
   },
   'zh-TW': {
-    title: '阿瓦隆：反抗勢力 | 梅林',
-    description: '「阿瓦隆：反抗勢力」桌遊中梅林的角色規則和攻略建議',
+    title: '阿瓦隆梅林：角色能力、莫德雷德與玩法策略',
+    description:
+      '梅林能看到誰？了解阿瓦隆梅林的能力、莫德雷德隱藏規則、派西維爾與莫甘娜的關係，以及如何幫助好人完成任務並躲過刺殺。',
     keywords: ['梅林', '角色', '規則', '建議'],
   },
   'zh-CN': {
-    title: '阿瓦隆：反抗组织 | 梅林',
-    description: '桌游《阿瓦隆：反抗组织》中梅林角色的规则和建议',
+    title: '阿瓦隆梅林：角色能力、莫德雷德与玩法策略',
+    description:
+      '梅林能看到谁？了解阿瓦隆梅林的能力、莫德雷德隐藏规则、派西维尔与莫甘娜的关系，以及如何帮助好人完成任务并躲过刺杀。',
     keywords: ['梅林', '角色', '规则', '建议'],
   },
   es: {
-    title: 'Avalon: La Resistencia | Merlín',
-    description: "Reglas y consejos para el rol de Merlín en el juego de mesa 'Avalon: La Resistencia'",
+    title: 'Merlín en Avalon: habilidades, Mordred y estrategia',
+    description:
+      'Descubre a quién ve Merlín en Avalon, por qué Mordred permanece oculto, cómo interactúan Percival y Morgana y cómo ayudar al bien sin revelar tu identidad.',
     keywords: ['Merlín', 'Rol', 'Reglas', 'Consejos'],
   },
 };

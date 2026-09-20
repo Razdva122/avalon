@@ -1,10 +1,15 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
     <h1>{{ $t('wiki.addonsTitle') }}</h1>
     <div>
       <LocalizedTextWrapper keypath="wiki.addonsInfo" />
     </div>
+    <nav class="wiki-nav" :aria-label="$t('wiki.title')">
+      <LocaleLink :to="{ name: 'rules' }">{{ $t('wiki.rules') }}</LocaleLink>
+      <LocaleLink :to="{ name: 'roles' }">{{ $t('wiki.roles') }}</LocaleLink>
+      <LocaleLink :to="{ name: 'expansions' }">{{ $t('wiki.addons') }}</LocaleLink>
+    </nav>
     <div class="addons-container">
       <LocaleLink class="addon" :to="{ name: 'lady_of_lake' }">
         <h2>{{ $t('addons.ladyOfLake') }}</h2>
@@ -69,6 +74,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 .addons-container {
   display: flex;
