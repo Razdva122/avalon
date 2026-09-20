@@ -3,6 +3,13 @@
     <WikiBreadCrumbs />
     <h1 class="title">{{ $t('rules.title') }}</h1>
 
+    <nav class="rules-contents" :aria-label="$t('wiki.rules')">
+      <a href="#gameplay">{{ $t('rules.gameplayRules') }}</a>
+      <a href="#winning">{{ $t('rules.conclusionOfGameplayTitle') }}</a>
+      <a href="#mission-sizes">{{ $t('rules.missionSizes') }}</a>
+      <a href="#roles-setup">{{ $t('rules.recommendTitle') }}</a>
+    </nav>
+
     <h2>{{ $t('rules.gameObjective') }}</h2>
 
     <p>
@@ -35,7 +42,7 @@
     </p>
     <v-divider :thickness="5"></v-divider>
 
-    <h2>{{ $t('rules.gameplayRules') }}</h2>
+    <h2 id="gameplay">{{ $t('rules.gameplayRules') }}</h2>
 
     <h3>1. {{ $t('rules.teamProposalAndVoting') }}</h3>
     <ul>
@@ -76,7 +83,7 @@
     </ul>
     <v-divider :thickness="5"></v-divider>
 
-    <h2>{{ $t('rules.conclusionOfGameplayTitle') }}</h2>
+    <h2 id="winning">{{ $t('rules.conclusionOfGameplayTitle') }}</h2>
     <p><LocalizedTextWrapper keypath="rules.gameplayEndsCondition" /></p>
 
     <p>
@@ -84,7 +91,7 @@
     </p>
     <v-divider :thickness="5"></v-divider>
 
-    <h2>{{ $t('rules.missionSizes') }}</h2>
+    <h2 id="mission-sizes">{{ $t('rules.missionSizes') }}</h2>
 
     <div class="table">
       <table>
@@ -162,7 +169,7 @@
 
     <v-divider :thickness="5"></v-divider>
 
-    <h2>{{ $t('rules.recommendTitle') }}</h2>
+    <h2 id="roles-setup">{{ $t('rules.recommendTitle') }}</h2>
     <h3>{{ $t('rules.generalTipsTitle') }}</h3>
     <p v-html="$t('rules.generalTipsText')"></p>
     <p v-html="$t('rules.newcomersAdvice')"></p>
@@ -430,6 +437,19 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.rules-contents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 12px 0 24px;
+  a {
+    color: rgb(var(--v-theme-primary));
+    padding: 8px 0;
+  }
+}
+h2[id] {
+  scroll-margin-top: 80px;
+}
 @import '@/styles/info-page.scss';
 
 .information {

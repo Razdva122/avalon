@@ -106,6 +106,11 @@
         </div>
       </section>
     </div>
+    <nav class="lobby-footer" :aria-label="$t('menu.menu')">
+      <LocaleLink :to="{ name: 'wiki' }">{{ $t('menu.wiki') }}</LocaleLink>
+      <LocaleLink :to="{ name: 'stats' }">{{ $t('menu.stats') }}</LocaleLink>
+      <LocaleLink :to="{ name: 'about' }">{{ $t('menu.about') }}</LocaleLink>
+    </nav>
   </main>
 </template>
 
@@ -205,6 +210,17 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.lobby-footer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-top: 28px;
+  a {
+    color: rgb(var(--v-theme-text-primary));
+    padding: 12px 0;
+  }
+}
 .lobby {
   width: min(1200px, 100%);
   margin: 0 auto;

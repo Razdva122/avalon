@@ -12,6 +12,7 @@ import { i18n, loadLanguage, commitLanguage } from '@/plugins/i18n';
 import { basePath, localizedPath, isNeutralPath } from './paths';
 import { updateStructuredData } from './structuredData';
 import { wikiBreadcrumbs } from './breadcrumbs';
+import { scrollBehavior } from './scroll';
 
 const routeComponentMap = {
   community: () => import('@/pages/community/Community.vue'),
@@ -149,9 +150,7 @@ Object.values(routesSeo).forEach((route) => {
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
-  scrollBehavior() {
-    return { top: 0 };
-  },
+  scrollBehavior,
 });
 
 const defaultKeywords: { [key in Lowercase<TLanguage>]: string[] } = {

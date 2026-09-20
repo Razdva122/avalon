@@ -1,6 +1,6 @@
 const yaMetrika = `<!-- Yandex.Metrika counter -->
 <script async type="text/javascript" >
-   if (!/^\\/password-recovery\\/?$/.test(location.pathname)) {
+   if (!('__AVALON_PRERENDER__' in window) && !/^\\/password-recovery\\/?$/.test(location.pathname)) {
    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
    m[i].l=1*new Date();
    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
@@ -19,7 +19,9 @@ const yaMetrika = `<!-- Yandex.Metrika counter -->
 
 const gtag = `<!-- Google tag (gtag.js) -->
 <script>
-  if (!/^\\/password-recovery\\/?$/.test(location.pathname)) {
+  if (!('__AVALON_PRERENDER__' in window) && !/^\\/password-recovery\\/?$/.test(location.pathname)) {
+  if (!window.__avalonGoogleAnalyticsStarted) {
+  window.__avalonGoogleAnalyticsStarted = true;
   var analyticsScript = document.createElement('script');
   analyticsScript.async = true;
   analyticsScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-DL67HPGX9T';
@@ -31,6 +33,7 @@ const gtag = `<!-- Google tag (gtag.js) -->
 	gtag('js', new Date());
 
 	gtag('config', 'G-DL67HPGX9T');
+  }
   }
 </script>`;
 

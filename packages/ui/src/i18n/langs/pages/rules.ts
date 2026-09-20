@@ -325,10 +325,10 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     mordredTeam: '莫德雷德的爪牙:',
     expansions: '擴展:',
     note: '注意: ',
-    title: '阿瓦隆: 抵抗 - 官方規則',
+    title: '阿瓦隆規則與玩法：5–10 人新手指南',
     gameObjective: '遊戲目標',
     gameDescription:
-      '阿瓦隆: 抵抗 是一款戰略桌遊，玩家需要在與隱藏的叛徒——莫德雷德的爪牙作鬥爭的同時完成一系列的任務。遊戲設定在亞瑟王和圓桌騎士的傳奇世界中。',
+      '阿瓦隆（The Resistance: Avalon）是一款適合 5–10 人的隱藏身分推理遊戲。每輪由隊長提名任務隊伍，全體玩家投票，再由獲准出任務的玩家秘密決定任務成敗。好人需要完成三次任務並保護梅林；壞人可讓三次任務失敗，或在好人完成三次任務後刺殺梅林獲勝。下方可直接查閱各人數的任務表與角色配置。',
     gameplayRules: '遊戲規則',
     teamProposalAndVoting: '團隊提案和投票',
     teamProposalDescription:

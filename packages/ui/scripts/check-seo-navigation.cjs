@@ -47,10 +47,27 @@ const server = http.createServer((req, res) => {
       }
     });
     await page.setRequestInterception(true);
-    page.on('request', (req) => (req.url().startsWith(origin) ? req.continue() : req.abort()));
+    let analyticsRequests = [];
+    page.on('request', (req) => {
+      if (/googletagmanager\.com\/gtag\/js|mc\.yandex\.ru\/metrika\/tag\.js/.test(req.url())) {
+        analyticsRequests.push(req.url());
+      }
+      return req.url().startsWith(origin) ? req.continue() : req.abort();
+    });
     for (const pathname of ['/', '/zh-tw/', '/ru/', '/es/', '/pt/', '/zh-cn/']) {
+      analyticsRequests = [];
       await page.goto(origin + pathname, { waitUntil: 'networkidle0' });
       await page.waitForFunction(() => document.querySelector('#app').__vue_app__);
+      assert.equal(
+        analyticsRequests.filter((url) => url.includes('googletagmanager')).length,
+        1,
+        `${pathname}: Google tag requests`,
+      );
+      assert.equal(
+        analyticsRequests.filter((url) => url.includes('mc.yandex')).length,
+        1,
+        `${pathname}: Metrika requests`,
+      );
       const hero = await page.evaluate(() => ({
         count: window.__initialHero.length,
         retained: window.__initialHero.every(
@@ -171,6 +188,18 @@ const server = http.createServer((req, res) => {
         );
       console.log('SPA structured data OK:', pathname);
     }
+    await page.goto(origin + '/zh-tw/wiki/rules/#mission-sizes', { waitUntil: 'networkidle0' });
+    await page.waitForFunction(() => {
+      const top = document.querySelector('#mission-sizes')?.getBoundingClientRect().top;
+      return top !== undefined && Math.abs(top - 80) < 3;
+    });
+    await page.click('.rules-contents a[href="#winning"]');
+    await page.waitForFunction(() => {
+      const top = document.querySelector('#winning')?.getBoundingClientRect().top;
+      return location.hash === '#winning' && top !== undefined && Math.abs(top - 80) < 3;
+    });
+    assert.deepEqual(pageErrors, [], 'Rules anchors must not cause hydration or navigation errors');
+    console.log('Rules direct fragment and table of contents scrolling OK');
   } finally {
     if (browser) await browser.close();
     server.close();

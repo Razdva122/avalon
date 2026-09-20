@@ -27,6 +27,11 @@ for (const route of Object.values(routesSeo).filter((route) => route.meta.preren
     const html = fs.readFileSync(path.join(dist, pathname, 'index.html'), 'utf8');
     assert.doesNotMatch(
       html,
+      /<script\b[^>]*src="https:\/\/(?:www\.googletagmanager\.com|mc\.yandex\.ru)\//,
+      `${pathname}: analytics loader baked into prerender and loaded twice`,
+    );
+    assert.doesNotMatch(
+      html,
       /<aside[^>]*class="language-suggestion"/,
       `${pathname}: personalized suggestion baked into HTML`,
     );
@@ -87,6 +92,13 @@ for (const route of Object.values(routesSeo).filter((route) => route.meta.preren
     }
     if (route.name === 'lobby') {
       assert.match(html, /class="lobby-intro"/, `${pathname}: lobby is still waiting for the backend`);
+      const main = html.match(/<main\b[\s\S]*?<\/main>/)?.[0] || '';
+      for (const target of ['/about/', '/stats/', '/wiki/']) {
+        assert(
+          main.includes(`href="${localizedPath(target, language)}"`),
+          `${pathname}: missing visible ${target} link`,
+        );
+      }
     }
     if (route.path.startsWith('/wiki/')) {
       const json = html.match(
