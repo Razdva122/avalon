@@ -8,11 +8,15 @@ Generated with the built-in image_gen tool. Avatars optimized to 512px WebP (qua
 
 ## puppeteer
 
+The current asset is animated WebP: 512 × 512, 637,026 bytes, a four-second infinite loop. Golden puppet strings and glints on the mask, glove and chest ornament brighten and fade together. The original portrait stays fixed; only masked light from a built-in image_gen illuminated keyframe is composited. Encoded at WebP quality 92 and copied intact by the avatar generator.
+
 Reference: ../roles/mordred.webp
 
 Use case: stylized-concept. Create ONE square premium avatar portrait for Avalon. Reference is Mordred, use his handsome dark-haired identity and dark fantasy realism. New exclusive Puppeteer persona, elegant black and antique gold half mask over eyes, sly confident smirk visible, black feathered armor with ornate gold detailing, one raised gloved hand at lower foreground with fine luminous gold puppet strings running from fingers. Tight head and shoulders portrait, face dominates and reads at 48px. Smoky black background, gold rim lighting. Rich cinematic painterly realism, polished collectible game portrait. No text, no border, no watermark.
 
 ## eclipse-queen
+
+The current asset is animated WebP: 512 × 512, 631,898 bytes, a four-second infinite loop. The eclipse corona and amethyst highlights brighten and fade together; the portrait stays fixed. The avatar generator copies this optimized animation without recompression. The illuminated keyframe was edited with built-in image_gen and composited over the original portrait, then encoded at WebP quality 92.
 
 Reference: ../roles/morgana.webp
 

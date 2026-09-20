@@ -19,10 +19,19 @@ async function generateAvatars() {
     fs.mkdirSync(path.join(output, group), { recursive: true });
     for (const name of files) {
       fs.mkdirSync(path.dirname(path.join(output, group, name)), { recursive: true });
-      await sharp(path.join(source, group, name))
-        .resize({ width: 512, height: 512, fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: 85, alphaQuality: 100, effort: 4 })
-        .toFile(path.join(output, group, name));
+      const inputPath = path.join(source, group, name);
+      const outputPath = path.join(output, group, name);
+      const metadata = await sharp(inputPath).metadata();
+      const animated = metadata.pages > 1;
+      if (animated && metadata.width <= 512 && (metadata.pageHeight || metadata.height) <= 512) {
+        // Keep optimized animation frames, timing and quality intact.
+        fs.copyFileSync(inputPath, outputPath);
+      } else {
+        await sharp(inputPath, { animated })
+          .resize({ width: 512, height: 512, fit: 'inside', withoutEnlargement: true })
+          .webp({ quality: 85, alphaQuality: 100, effort: 4 })
+          .toFile(outputPath);
+      }
       count++;
     }
   }
