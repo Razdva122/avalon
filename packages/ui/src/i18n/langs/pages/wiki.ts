@@ -36,6 +36,11 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     victoryConditions: 'Condições de Vitória',
     determineWinner:
       '<b>10. Determinar Vencedor</b>: O jogo conclui quando um lado garante três missões ou o Assassino identifica corretamente Merlin após as vitórias do lado do bem.',
+    roleFacts: 'Resumo das habilidades',
+    roleTeam: 'Equipe e objetivo',
+    roleAbility: 'Informações iniciais',
+    roleLimit: 'Limites importantes',
+    roleScenarios: 'Situações práticas',
   },
   en: {
     introduction:
@@ -69,6 +74,11 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     victoryConditions: 'Victory Conditions',
     determineWinner:
       '<b>10. Determine Winner</b>: The game concludes when one side secures three missions or the Assassin correctly identifies Merlin post good side victories.',
+    roleFacts: 'Abilities at a glance',
+    roleTeam: 'Team and objective',
+    roleAbility: 'Starting information',
+    roleLimit: 'Important limits',
+    roleScenarios: 'Practical situations',
   },
   ru: {
     introduction:
@@ -102,6 +112,11 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     victoryConditions: 'Условия Победы',
     determineWinner:
       '<b>10. Определение победителя</b>: Игра завершается, когда одна из сторон выполнит три миссии или Убийца правильно убьет Мерлина после победы светлой стороны.',
+    roleFacts: 'Коротко о способностях',
+    roleTeam: 'Команда и цель',
+    roleAbility: 'Информация в начале игры',
+    roleLimit: 'Ограничения способности',
+    roleScenarios: 'Игровые ситуации',
   },
   'zh-CN': {
     introduction:
@@ -131,6 +146,11 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     assassinationPhase: '<b>9. 刺杀阶段</b>: 如果好的一方完成三个任务，刺客有机会识别梅林来让坏的一方获胜。',
     victoryConditions: '胜利条件',
     determineWinner: '<b>10. 确定胜者</b>: 当一方完成三个任务或刺客在好的一方获胜后正确识别梅林时，游戏结束。',
+    roleFacts: '角色能力速览',
+    roleTeam: '阵营与目标',
+    roleAbility: '开局信息',
+    roleLimit: '能力限制',
+    roleScenarios: '实战场景',
   },
   'zh-TW': {
     introduction:
@@ -160,6 +180,11 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     assassinationPhase: '<b>9. 刺殺階段</b>: 如果好的勢力完成了三次任務，刺客有機會識別梅林以讓壞的勢力獲勝。',
     victoryConditions: '勝利條件',
     determineWinner: '<b>10. 確定贏家</b>: 當一方完成三次任務或刺客在好方獲勝後正確識別梅林時，遊戲結束。',
+    roleFacts: '角色能力速覽',
+    roleTeam: '陣營與目標',
+    roleAbility: '開局資訊',
+    roleLimit: '能力限制',
+    roleScenarios: '實戰情境',
   },
   es: {
     introduction:
@@ -195,5 +220,10 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     victoryConditions: 'Condiciones de Victoria',
     determineWinner:
       '<b>10. Determinar Ganador</b>: El juego concluye cuando un lado asegura tres misiones o el Asesino identifica correctamente a Merlín después de las victorias del lado bueno.',
+    roleFacts: 'Resumen de habilidades',
+    roleTeam: 'Equipo y objetivo',
+    roleAbility: 'Información inicial',
+    roleLimit: 'Límites importantes',
+    roleScenarios: 'Situaciones prácticas',
   },
 };

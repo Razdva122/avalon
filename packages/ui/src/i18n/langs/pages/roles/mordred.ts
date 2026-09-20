@@ -39,6 +39,15 @@ export const mordred: { [key in TLanguage]: Dictionary<string> } = {
     controlNarrative: 'Control the narrative:',
     controlNarrativeContent:
       "You have the power to steer discussions and decisions. Use it wisely to benefit the evil cause. By guiding the dialogue, you shape the game's direction.",
+    seoTeam: 'Evil. Win through three failed missions or a successful assassination of {merlin} after three successes.',
+    seoAbility:
+      '{merlin} does not see Mordred at the start. Mordred knows the other visible evil players in the classic setup, except {oberon}.',
+    seoLimit:
+      'Being hidden from {merlin} does not make Mordred good or immune to deduction. Mission results and votes can still expose him; he may choose Success or Fail.',
+    seoScenario1:
+      'If you are included in a trusted team, decide whether an immediate Fail is worth losing that trust. A Success can preserve your place, but also moves good closer to three successes.',
+    seoScenario2:
+      'If a mission with you fails, explain your choices using the same public evidence as everyone else. Do not assume another player’s earlier support proves they are Merlin: Merlin never received your evil identity.',
   },
   ru: {
     generalInformation: 'Общая информация:',
@@ -78,6 +87,15 @@ export const mordred: { [key in TLanguage]: Dictionary<string> } = {
     controlNarrative: 'Управляйте нарративом:',
     controlNarrativeContent:
       'Вы обладаете властью влиять на обсуждения и решения. Используйте это благополучно для зла. Направляя диалог, вы формируете направление игры.',
+    seoTeam: 'Зло. Победите через три проваленные миссии. После трёх успешных можно победить, если убит {merlin}.',
+    seoAbility:
+      '{merlin} не видит Мордреда в начале игры. В классическом составе Мордред знает остальных видимых злых игроков; исключение — {oberon}.',
+    seoLimit:
+      '{merlin} не видит Мордреда, но это не делает Мордреда добрым и не защищает от выводов по миссиям и голосованиям. На миссии он может выбрать успех или провал.',
+    seoScenario1:
+      'Если вас включили в команду, которой доверяют, решите, стоит ли немедленный провал потери доверия. Успех может сохранить ваше место в команде, но приблизит добро к победе по миссиям.',
+    seoScenario2:
+      'Если миссия с вами провалилась, объясняйте решения общедоступными фактами. Предыдущая поддержка другого игрока не доказывает, что он Мерлин: Мерлин не получил информацию о вашей злой роли.',
   },
   'zh-CN': {
     generalInformation: '一般信息：',
@@ -108,6 +126,14 @@ export const mordred: { [key in TLanguage]: Dictionary<string> } = {
       '假装与正派玩家结盟以获得他们的信任，并操控游戏对邪恶有利。这种双重角色可以在决策中起到关键作用。',
     controlNarrative: '掌控叙事:',
     controlNarrativeContent: '您拥有影响讨论和决策的力量。将其明智地用于邪恶的事业。通过引导对话，您塑造了游戏的方向。',
+    seoTeam: '坏人。让三次任务失败，或在三次成功后刺杀{merlin}获胜。',
+    seoAbility: '{merlin}在开局时看不到莫德雷德。经典配置中，莫德雷德知道其他可见的邪恶玩家，但看不到{oberon}。',
+    seoLimit:
+      '不被{merlin}看到，不等于莫德雷德是好人或无法被推理识破。任务结果和投票仍可能暴露他；他可以出成功或失败。',
+    seoScenario1:
+      '进入受信任的队伍后，判断立刻出失败是否值得失去信任。出成功可能保住下次入队机会，但也让好人更接近三次成功。',
+    seoScenario2:
+      '如果有你参与的任务失败，请用公开证据解释决定。某人之前支持你，不代表他就是梅林：梅林没有得到你的邪恶身份信息。',
   },
   'zh-TW': {
     generalInformation: '一般信息：',
@@ -140,6 +166,14 @@ export const mordred: { [key in TLanguage]: Dictionary<string> } = {
     controlNarrative: '掌控敘事:',
     controlNarrativeContent:
       '您擁有引導討論和決策的力量。明智地利用它來促進邪惡的目的。通過引導對話，您可以塑造遊戲的方向。',
+    seoTeam: '壞人。讓三次任務失敗，或在三次成功後刺殺{merlin}獲勝。',
+    seoAbility: '{merlin}在開局時看不到莫德雷德。經典配置中，莫德雷德知道其他可見的邪惡玩家，但看不到{oberon}。',
+    seoLimit:
+      '不被{merlin}看到，不等於莫德雷德是好人或無法被推理識破。任務結果和投票仍可能暴露他；他可以出成功或失敗。',
+    seoScenario1:
+      '進入受信任的隊伍後，判斷立刻出失敗是否值得失去信任。出成功可能保住下次入隊機會，但也讓好人更接近三次成功。',
+    seoScenario2:
+      '如果有你參與的任務失敗，請用公開證據解釋決定。某人之前支持你，不代表他就是梅林：梅林沒有得到你的邪惡身分資訊。',
   },
   es: {
     generalInformation: 'Información general:',
@@ -179,6 +213,15 @@ export const mordred: { [key in TLanguage]: Dictionary<string> } = {
     controlNarrative: 'Controla la narrativa:',
     controlNarrativeContent:
       'Tienes el poder de guiar las discusiones y decisiones. Úsalo sabiamente para beneficiar la causa del mal. Al guiar el diálogo, puedes moldear la dirección del juego.',
+    seoTeam: 'Mal. Gana con tres misiones fallidas o asesinando a {merlin} después de tres éxitos.',
+    seoAbility:
+      '{merlin} no ve a Mordred al inicio. Mordred conoce a los demás jugadores visibles del mal en la configuración clásica, excepto a {oberon}.',
+    seoLimit:
+      'Estar oculto para {merlin} no hace bueno a Mordred ni impide deducir su identidad. Los resultados y votos pueden delatarlo; puede elegir Éxito o Fracaso.',
+    seoScenario1:
+      'Si entras en un equipo de confianza, decide si un Fracaso inmediato compensa perderla. Un Éxito puede mantenerte en el equipo, pero acerca al bien a completar tres misiones.',
+    seoScenario2:
+      'Si falla una misión contigo, explica tus decisiones con pruebas públicas. Que alguien te apoyara antes no demuestra que sea Merlín: él no recibió información sobre tu lealtad al mal.',
   },
   pt: {
     generalInformation: 'Informações Gerais:',
@@ -217,5 +260,14 @@ export const mordred: { [key in TLanguage]: Dictionary<string> } = {
     controlNarrative: 'Controle a narrativa:',
     controlNarrativeContent:
       'Você tem o poder de direcionar discussões e decisões. Use-o sabiamente para beneficiar a causa do mal. Ao guiar o diálogo, você molda a direção do jogo.',
+    seoTeam: 'Mal. Vença com três missões fracassadas ou assassinando {merlin} após três sucessos.',
+    seoAbility:
+      '{merlin} não vê Mordred no início. Mordred conhece os demais jogadores visíveis do mal na configuração clássica, exceto {oberon}.',
+    seoLimit:
+      'Ficar oculto de {merlin} não torna Mordred bom nem impede deduções. Resultados e votos podem revelar sua lealdade; ele pode escolher Sucesso ou Falha.',
+    seoScenario1:
+      'Se entrar em uma equipe confiável, avalie se uma Falha imediata compensa perder a confiança. Um Sucesso pode manter seu lugar, mas aproxima o bem de completar três missões.',
+    seoScenario2:
+      'Se uma missão com você fracassar, explique suas decisões com evidências públicas. O apoio anterior de alguém não prova que seja Merlin: ele não recebeu sua identidade maligna.',
   },
 };

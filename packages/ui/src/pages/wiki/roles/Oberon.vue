@@ -1,16 +1,11 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
     <h1>
       <div class="evil-loyalty-icon"></div>
       {{ $t('roles.oberon') }} {{ $t('roles.role') }}
     </h1>
-    <SchemaImage
-      class="preview-image"
-      :src="calculateRoleUrl('oberon')"
-      :alt="$t('roles.oberon')"
-      :description="$t('roles.oberon')"
-    />
+    <WikiRoleGuide role="oberon" />
 
     <h2>{{ $t('oberon.generalInformation') }}</h2>
     <p>
@@ -60,26 +55,6 @@
       </li>
     </ul>
 
-    <h2>{{ $t('oberon.strategicTips') }}</h2>
-    <ul>
-      <li>
-        <strong>{{ $t('oberon.createUncertainty') }}</strong>
-        {{ $t('oberon.aimToDestabilize') }}
-      </li>
-      <li>
-        <strong>{{ $t('oberon.beUnpredictable') }}</strong>
-        <LocalizedTextWrapper keypath="oberon.varyGameplay" />
-      </li>
-      <li>
-        <strong>{{ $t('oberon.listenForClues') }}</strong>
-        {{ $t('oberon.useToAdvantage') }}
-      </li>
-      <li>
-        <strong>{{ $t('oberon.avoidDrawingAttention') }}</strong>
-        {{ $t('oberon.focusOnKeyPlays') }}
-      </li>
-    </ul>
-
     <p>
       <LocalizedTextWrapper keypath="oberon.playingСonclusion" />
     </p>
@@ -88,6 +63,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import WikiRoleGuide from '@/components/view/information/WikiRoleGuide.vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
@@ -97,6 +73,7 @@ import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
+    WikiRoleGuide,
     WikiBreadCrumbs,
     PreviewLink,
     SchemaImage,
@@ -111,6 +88,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 h2 {
   margin-top: 20px;

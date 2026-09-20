@@ -25,12 +25,21 @@ export const percival: { [key in TLanguage]: Dictionary<string> } = {
       "Voting patterns can be a subtle way to communicate. Percival can show agreement or disagreement with {merlin}'s suspected choices through voting, without openly discussing it.",
     guideQuietly: 'Guide Quietly: ',
     subtlyGuide:
-      'Percival often knows who the good players are. Guide them towards the right decisions subtly without exposing {merlin} or yourself.',
+      'Percival does not see the other players’ loyalties and has no power to block an assassination. Without {morgana}, the revealed Merlin candidate is unambiguous in the classic setup.',
     protectMerlinToTheEnd: 'Protect Merlin to the End: ',
     takingSuspicion:
       "In the end game, be ready to take suspicion upon yourself to protect {merlin}'s identity, especially if you have established yourself as a trusted good player.",
     playingAsPercival:
       'Playing as Percival in Avalon offers a unique challenge and requires a combination of subtlety, discernment, and strategic misdirection. Your role is crucial in protecting {merlin} and ensuring the success of the forces of good. Be vigilant, be strategic, and above all, protect {merlin} at all costs.',
+    seoTeam: 'Good. Help three missions succeed and keep {merlin} safe from assassination.',
+    seoAbility:
+      'With {morgana} in the classic setup, Percival sees two candidates: {merlin} and {morgana}. Their identities are not distinguished.',
+    seoLimit:
+      'Percival does not see the other players’ loyalties and has no power to block an assassination. Without {morgana}, the revealed Merlin candidate is unambiguous in the classic setup.',
+    seoScenario1:
+      'If the two candidates recommend different teams, compare their reasoning with mission results and votes. Confidence alone does not prove who Merlin is; avoid publicly naming your preferred candidate.',
+    seoScenario2:
+      'If a mission succeeds, do not treat everyone on it as confirmed good. Evil can choose Success. Keep protecting Merlin after the third success, when the assassination can still change the winner.',
   },
   ru: {
     generalInformation: 'Общая информация: ',
@@ -55,12 +64,21 @@ export const percival: { [key in TLanguage]: Dictionary<string> } = {
       'Шаблоны голосования могут быть тонким способом общения. Персиваль может показать согласие или несогласие с предполагаемыми выборами {merlin} через голосование, не обсуждая это открыто.',
     guideQuietly: 'Направляйте тихо: ',
     subtlyGuide:
-      'Персиваль часто знает, кто хорошие игроки. Направляйте их к правильным решениям ненавязчиво, не раскрывая {merlin} или себя.',
+      'Персиваль не видит принадлежность остальных игроков и не может отменить убийство. Если {morgana} отсутствует в классическом составе, показанный кандидат однозначно является Мерлином.',
     protectMerlinToTheEnd: 'Защитите Мерлина до конца: ',
     takingSuspicion:
       'В конце игры будьте готовы взять подозрения на себя, чтобы защитить личность {merlin}, особенно если вы уже зарекомендовали себя как надежный хороший игрок.',
     playingAsPercival:
       'Игра в роли Персиваля в Avalon предлагает уникальную задачу и требует комбинации скрытности, проницательности и стратегического отвлечения. Ваша роль чрезвычайно важна для защиты {merlin} и обеспечения успеха сил добра. Будьте бдительны, стратегичны и, прежде всего, защищайте {merlin} любой ценой.',
+    seoTeam: 'Добро. Помогите выполнить три миссии; {merlin} должен пережить покушение.',
+    seoAbility:
+      'В классическом составе, где есть {morgana}, Персиваль видит двух кандидатов: {merlin} и {morgana}, но не знает, кто из них кто.',
+    seoLimit:
+      'Персиваль не видит принадлежность остальных игроков и не может отменить убийство. Если {morgana} отсутствует в классическом составе, показанный кандидат однозначно является Мерлином.',
+    seoScenario1:
+      'Если кандидаты предлагают разные команды, сравните их доводы с результатами миссий и голосованиями. Уверенность сама по себе не доказывает, кто Мерлин; не называйте своего кандидата открыто.',
+    seoScenario2:
+      'Успешная миссия не доказывает, что все её участники добрые: зло тоже может выбрать успех. Продолжайте скрывать Мерлина после третьей успешной миссии — убийство ещё может изменить победителя.',
   },
   'zh-CN': {
     generalInformation: '一般信息：',
@@ -83,12 +101,20 @@ export const percival: { [key in TLanguage]: Dictionary<string> } = {
     votingPatterns:
       '投票模式可以是细微的沟通方式。派西维尔可以通过投票显示对{merlin}怀疑选择的同意或不同意，而无需公开讨论。',
     guideQuietly: '悄悄指引：',
-    subtlyGuide: '派西维尔通常知道谁是好玩家。细微地引导他们做出正确的决定，而不暴露{merlin}或你自己。',
+    subtlyGuide:
+      '派西维尔看不到其他玩家的阵营，也不能阻止刺杀。在不含{morgana}的经典配置中，显示的梅林候选人没有真假之分。',
     protectMerlinToTheEnd: '保护梅林到底：',
     takingSuspicion:
       '在游戏的最后阶段，要准备好承担怀疑，以保护{merlin}的身份，尤其是当你已经确立自己是一个值得信赖的好人时。',
     playingAsPercival:
       '在Avalon中扮演派西维尔是一个独特的挑战，需要结合细微技巧、洞察力和战略误导。你的角色对于保护{merlin}并确保正义力量的胜利至关重要。保持警惕，制定策略，最重要的是，务必不惜一切代价保护{merlin}。',
+    seoTeam: '好人。帮助三次任务成功，并保护{merlin}免遭刺杀。',
+    seoAbility: '在包含{morgana}的经典配置中，派西维尔看到{merlin}和{morgana}两名候选人，但无法直接区分。',
+    seoLimit:
+      '派西维尔看不到其他玩家的阵营，也不能阻止刺杀。在不含{morgana}的经典配置中，显示的梅林候选人没有真假之分。',
+    seoScenario1:
+      '如果两名候选人推荐不同的队伍，请结合任务结果和投票比较理由。自信并不能证明谁是梅林；不要公开指出你相信的候选人。',
+    seoScenario2: '任务成功不代表所有队员都是好人，坏人也能出成功。第三次成功后仍要保护梅林，因为刺杀仍可能改变胜负。',
   },
   'zh-TW': {
     generalInformation: '一般信息：',
@@ -111,12 +137,20 @@ export const percival: { [key in TLanguage]: Dictionary<string> } = {
     votingPatterns:
       '投票模式可以是細微的溝通方式。派西維爾可以通過投票顯示對{merlin}懷疑選擇的同意或不同意，而不必公開討論。',
     guideQuietly: '悄悄指導：',
-    subtlyGuide: '派西維爾通常知道誰是好玩家。細微地引導他們做出正確的決定，而不暴露{merlin}或你自己。',
+    subtlyGuide:
+      '派西維爾看不到其他玩家的陣營，也不能阻止刺殺。在不含{morgana}的經典配置中，顯示的梅林候選人沒有真假之分。',
     protectMerlinToTheEnd: '保護梅林到底：',
     takingSuspicion:
       '在遊戲的最後階段，要準備好承擔懷疑，以保護{merlin}的身份，尤其是當你已經確立自己是值得信任的好人時。',
     playingAsPercival:
       '在Avalon中扮演派西維爾是一個獨特的挑戰，需要結合細微技巧、洞察力和戰略誤導。你的角色對於保護{merlin}並確保正義力量的勝利至關重要。保持警惕，制定策略，最重要的是，務必不惜一切代價保護{merlin}。',
+    seoTeam: '好人。幫助三次任務成功，並保護{merlin}免遭刺殺。',
+    seoAbility: '在包含{morgana}的經典配置中，派西維爾看到{merlin}和{morgana}兩名候選人，但無法直接區分。',
+    seoLimit:
+      '派西維爾看不到其他玩家的陣營，也不能阻止刺殺。在不含{morgana}的經典配置中，顯示的梅林候選人沒有真假之分。',
+    seoScenario1:
+      '如果兩名候選人推薦不同的隊伍，請結合任務結果和投票比較理由。自信並不能證明誰是梅林；不要公開指出你相信的候選人。',
+    seoScenario2: '任務成功不代表所有隊員都是好人，壞人也能出成功。第三次成功後仍要保護梅林，因為刺殺仍可能改變勝負。',
   },
   es: {
     generalInformation: 'Información General: ',
@@ -141,12 +175,21 @@ export const percival: { [key in TLanguage]: Dictionary<string> } = {
       'Los patrones de votación pueden ser una forma sutil de comunicarte. Percival puede mostrar acuerdo o desacuerdo con las decisiones sospechadas de {merlin} a través del voto, sin discutirlo abiertamente.',
     guideQuietly: 'Guía Silenciosamente: ',
     subtlyGuide:
-      'Percival a menudo sabe quiénes son los jugadores buenos. Guíalos hacia las decisiones correctas sutilmente sin exponer a {merlin} o a ti mismo.',
+      'Percival no ve la lealtad de los demás ni puede bloquear un asesinato. Sin {morgana}, el candidato mostrado es inequívocamente Merlín en la configuración clásica.',
     protectMerlinToTheEnd: 'Protege a Merlin Hasta el Final: ',
     takingSuspicion:
       'Al final del juego, prepárate para asumir la sospecha sobre ti mismo para proteger la identidad de {merlin}, especialmente si te has establecido como un jugador bueno de confianza.',
     playingAsPercival:
       'Jugar como Percival en Avalon ofrece un desafío único y requiere una combinación de sutileza, discernimiento y desorientación estratégica. Tu rol es crucial para proteger a {merlin} y asegurar el éxito de las fuerzas del bien. Sé vigilante, sé estratégico y, sobre todo, protege a {merlin} a toda costa.',
+    seoTeam: 'Bien. Ayuda a completar tres misiones y protege a {merlin} del asesinato.',
+    seoAbility:
+      'Con {morgana} en la configuración clásica, Percival ve a dos candidatos: {merlin} y {morgana}, sin saber cuál es cuál.',
+    seoLimit:
+      'Percival no ve la lealtad de los demás ni puede bloquear un asesinato. Sin {morgana}, el candidato mostrado es inequívocamente Merlín en la configuración clásica.',
+    seoScenario1:
+      'Si los candidatos proponen equipos distintos, compara sus argumentos con los resultados y votos. La seguridad al hablar no demuestra quién es Merlín; evita anunciar públicamente tu candidato.',
+    seoScenario2:
+      'Una misión exitosa no confirma que todos sus miembros sean buenos: el mal también puede elegir Éxito. Sigue protegiendo a Merlín después del tercer éxito, cuando el asesinato aún puede cambiar al ganador.',
   },
   pt: {
     generalInformation: 'Informações Gerais: ',
@@ -171,11 +214,20 @@ export const percival: { [key in TLanguage]: Dictionary<string> } = {
       'Padrões de votação podem ser uma forma sutil de comunicação. Percival pode mostrar concordância ou discordância com as escolhas suspeitas de {merlin} através da votação, sem discutir abertamente.',
     guideQuietly: 'Guie Silenciosamente: ',
     subtlyGuide:
-      'Percival frequentemente sabe quem são os jogadores do bem. Guie-os para as decisões corretas sutilmente sem expor {merlin} ou a si mesmo.',
+      'Percival não vê a lealdade dos demais nem pode bloquear um assassinato. Sem {morgana}, o candidato revelado é claramente Merlin na configuração clássica.',
     protectMerlinToTheEnd: 'Proteja Merlin Até o Fim: ',
     takingSuspicion:
       'No final do jogo, esteja pronto para atrair suspeitas sobre si mesmo para proteger a identidade de {merlin}, especialmente se você se estabeleceu como um jogador bom confiável.',
     playingAsPercival:
       'Jogar como Percival em Avalon oferece um desafio único e requer uma combinação de sutileza, discernimento e desorientação estratégica. Seu papel é crucial para proteger {merlin} e garantir o sucesso das forças do bem. Seja vigilante, seja estratégico e, acima de tudo, proteja {merlin} a todo custo.',
+    seoTeam: 'Bem. Ajude três missões a terem sucesso e proteja {merlin} do assassinato.',
+    seoAbility:
+      'Com {morgana} na configuração clássica, Percival vê dois candidatos: {merlin} e {morgana}, sem saber quem é quem.',
+    seoLimit:
+      'Percival não vê a lealdade dos demais nem pode bloquear um assassinato. Sem {morgana}, o candidato revelado é claramente Merlin na configuração clássica.',
+    seoScenario1:
+      'Se os candidatos sugerirem equipes diferentes, compare seus argumentos com resultados e votos. Falar com confiança não prova quem é Merlin; evite anunciar seu candidato publicamente.',
+    seoScenario2:
+      'Uma missão bem-sucedida não confirma que todos sejam do bem: o mal também pode escolher Sucesso. Continue protegendo Merlin após o terceiro sucesso, quando o assassinato ainda pode mudar o vencedor.',
   },
 };

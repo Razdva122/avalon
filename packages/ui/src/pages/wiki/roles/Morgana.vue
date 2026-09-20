@@ -1,16 +1,11 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
     <h1>
       <div class="evil-loyalty-icon"></div>
       {{ $t('roles.morgana') }} {{ $t('roles.role') }}
     </h1>
-    <SchemaImage
-      class="preview-image"
-      :src="calculateRoleUrl('morgana')"
-      :alt="$t('roles.morgana')"
-      :description="$t('roles.morgana')"
-    />
+    <WikiRoleGuide role="morgana" />
 
     <h2>{{ $t('morgana.generalInformation') }}</h2>
     <p>
@@ -40,27 +35,6 @@
       </li>
     </ul>
 
-    <h2>{{ $t('morgana.strategicTips') }}</h2>
-    <ul>
-      <li>
-        <strong>{{ $t('morgana.emphasizePlausibleDeniabilityTitle') }}</strong>
-        {{ $t('morgana.emphasizePlausibleDeniabilityDescription') }}
-      </li>
-      <li>
-        <strong>{{ $t('morgana.divertAttentionTitle') }}</strong> {{ $t('morgana.divertAttentionDescription') }}
-      </li>
-      <li>
-        <strong>{{ $t('morgana.imitateMerlinsConcernTitle') }}</strong>
-        {{ $t('morgana.imitateMerlinsConcernDescription') }}
-      </li>
-      <li>
-        <strong>{{ $t('morgana.questionOthersTitle') }}</strong> {{ $t('morgana.questionOthersDescription') }}
-      </li>
-      <li>
-        <strong>{{ $t('morgana.fakeTrustworthinessTitle') }}</strong> {{ $t('morgana.fakeTrustworthinessDescription') }}
-      </li>
-    </ul>
-
     <p>
       <LocalizedTextWrapper keypath="morgana.thrivingAsMorgana" />
     </p>
@@ -69,6 +43,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import WikiRoleGuide from '@/components/view/information/WikiRoleGuide.vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
@@ -78,6 +53,7 @@ import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
+    WikiRoleGuide,
     WikiBreadCrumbs,
     PreviewLink,
     SchemaImage,
@@ -92,6 +68,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 h2 {
   margin-top: 20px;

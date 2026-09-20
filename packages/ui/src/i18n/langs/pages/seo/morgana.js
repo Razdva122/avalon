@@ -1,32 +1,36 @@
 module.exports.morgana = {
   pt: {
-    title: 'Avalon: The Resistance | Morgana',
-    description: "Regras e dicas para o papel de Morgana no jogo de tabuleiro 'Avalon: The Resistance'",
+    title: 'Morgana em Avalon: habilidades e estratégia',
+    description:
+      'Morgana em Avalon: por que Percival a vê como candidata a Merlin, por que Merlin sabe que ela é má e como usar o disfarce nas missões.',
     keywords: ['Morgana', 'Papel', 'Regras', 'Dicas'],
   },
   en: {
-    title: 'Avalon: The Resistance | Morgana',
-    description: "Rules and Tips for Morgana role in the board game 'Avalon: The Resistance'",
+    title: 'Morgana in Avalon: Abilities & Strategy',
+    description:
+      'Morgana in Avalon: why Percival sees her as a Merlin candidate, why Merlin still sees her as evil, and how to use the disguise during missions.',
     keywords: ['Morgana', 'Role', 'Rules', 'Tips'],
   },
   ru: {
-    title: 'Авалон: Сопротивление | Моргана',
-    description: "Правила и советы для роли Морганы в настольной игре 'Авалон: Сопротивление'",
+    title: 'Моргана в Авалоне: способности и стратегия',
+    description:
+      'Моргана в Авалоне: почему Персиваль принимает её за кандидата на Мерлина, что видит сам Мерлин и как использовать маскировку на миссиях.',
     keywords: ['Моргана', 'Роль', 'Правила', 'Советы'],
   },
   'zh-TW': {
-    title: '阿瓦隆：反抗勢力 | 莫甘娜',
-    description: '「阿瓦隆：反抗勢力」桌遊中莫甘娜的角色規則和攻略建議',
+    title: '阿瓦隆莫甘娜：角色能力與玩法策略',
+    description: '阿瓦隆莫甘娜：為什麼派西維爾把她視為梅林候選人，梅林為什麼仍知道她是壞人，以及如何在任務中利用偽裝。',
     keywords: ['莫甘娜', '角色', '規則', '建議'],
   },
   'zh-CN': {
-    title: '阿瓦隆：反抗组织 | 莫甘娜',
-    description: '桌游《阿瓦隆：反抗组织》中莫甘娜角色的规则和建议',
+    title: '阿瓦隆莫甘娜：角色能力与玩法策略',
+    description: '阿瓦隆莫甘娜：为什么派西维尔把她视为梅林候选人，梅林为什么仍知道她是坏人，以及如何在任务中利用伪装。',
     keywords: ['莫甘娜', '角色', '规则', '建议'],
   },
   es: {
-    title: 'Avalon: La Resistencia | Morgana',
-    description: "Reglas y consejos para el rol de Morgana en el juego de mesa 'Avalon: La Resistencia'",
+    title: 'Morgana en Avalon: habilidades y estrategia',
+    description:
+      'Morgana en Avalon: por qué Percival la ve como candidata a Merlín, por qué Merlín sabe que es malvada y cómo usar el disfraz durante las misiones.',
     keywords: ['Morgana', 'Rol', 'Reglas', 'Consejos'],
   },
 };

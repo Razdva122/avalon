@@ -39,6 +39,15 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     avoidDrawingAttention: 'Avoid drawing attention:',
     focusOnKeyPlays:
       "A too-active playstyle may draw suspicion. Instead, focus on making key plays that can tilt the game's outcome.",
+    seoTeam: 'Evil. You share evil’s victory conditions even though you do not know your teammates.',
+    seoAbility:
+      'In the classic setup, {oberon} does not see the other evil players, and they do not see him. {merlin} still sees Oberon as evil.',
+    seoLimit:
+      'Oberon is not {mordred}: he is visible to Merlin. The separate {wraith} variant on this platform also hides from Merlin; that is not a standard Oberon ability.',
+    seoScenario1:
+      'If another evil player may be on your mission, you cannot rely on shared starting information to coordinate. Consider that two Fail cards can reveal that more than one evil player joined.',
+    seoScenario2:
+      'If you choose Success to earn trust, remember that you still belong to evil. Use later votes and mission results to infer possible allies; those inferences are not confirmed role information.',
   },
   ru: {
     generalInformation: 'Общая информация:',
@@ -80,6 +89,15 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     avoidDrawingAttention: 'Избегайте привлечения внимания:',
     focusOnKeyPlays:
       'Слишком активный стиль игры может вызвать подозрения. Вместо этого сосредоточьтесь на ключевых действиях, которые могут изменить исход игры.',
+    seoTeam: 'Зло. Вы побеждаете вместе со злом, хотя не знаете своих союзников.',
+    seoAbility:
+      'В классическом составе {oberon} не видит других злых игроков, и они не видят его. При этом {merlin} видит Оберона как злого.',
+    seoLimit:
+      'Оберон — не {mordred}: Мерлин его видит. Отдельный вариант {wraith} на платформе скрыт и от Мерлина; это не обычная способность Оберона.',
+    seoScenario1:
+      'Если на миссии может быть другой злой игрок, вы не можете координироваться через общее стартовое знание. Учтите: две карты провала могут выдать присутствие нескольких злых участников.',
+    seoScenario2:
+      'Выбирая успех ради доверия, помните, что вы всё ещё на стороне зла. Ищите возможных союзников по голосованиям и результатам миссий, но не путайте догадки с подтверждёнными ролями.',
   },
   'zh-CN': {
     generalInformation: '一般信息：',
@@ -111,6 +129,12 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     useToAdvantage: '你的邪恶同伴可能会不小心暴露自己；利用这一点间接合作。',
     avoidDrawingAttention: '避免引起注意:',
     focusOnKeyPlays: '过于活跃的游戏风格可能会引起怀疑。相反，专注于改变游戏结果的关键游戏。',
+    seoTeam: '坏人。即使不知道队友是谁，你仍与邪恶阵营共享胜利。',
+    seoAbility: '经典配置中，{oberon}看不到其他坏人，其他坏人也看不到他。但{merlin}仍能看到奥伯伦是坏人。',
+    seoLimit: '奥伯伦不是{mordred}：梅林能看到他。本站的独立变体{wraith}还会对梅林隐藏；这不是普通奥伯伦的能力。',
+    seoScenario1: '任务中可能有另一名坏人时，你们没有共同的开局信息可供协调。两张失败牌可能暴露队伍中有多名坏人。',
+    seoScenario2:
+      '为了信任而出成功时，记住自己仍属于邪恶阵营。根据后续投票和任务结果推测队友，但不要把推测当成已确认的身份。',
   },
   'zh-TW': {
     generalInformation: '一般信息：',
@@ -142,6 +166,12 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     useToAdvantage: '你的邪惡同伴可能會不小心暴露自己；利用這一點間接合作。',
     avoidDrawingAttention: '避免引起注意:',
     focusOnKeyPlays: '過於活躍的遊戲風格可能會引起懷疑。相反，專注於改變遊戲結果的關鍵進行。',
+    seoTeam: '壞人。即使不知道隊友是誰，你仍與邪惡陣營共享勝利。',
+    seoAbility: '經典配置中，{oberon}看不到其他壞人，其他壞人也看不到他。但{merlin}仍能看到奧伯倫是壞人。',
+    seoLimit: '奧伯倫不是{mordred}：梅林能看到他。本站的獨立變體{wraith}還會對梅林隱藏；這不是普通奧伯倫的能力。',
+    seoScenario1: '任務中可能有另一名壞人時，你們沒有共同的開局資訊可供協調。兩張失敗牌可能暴露隊伍中有多名壞人。',
+    seoScenario2:
+      '為了信任而出成功時，記住自己仍屬於邪惡陣營。根據後續投票和任務結果推測隊友，但不要把推測當成已確認的身分。',
   },
   es: {
     generalInformation: 'Información general:',
@@ -182,6 +212,15 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     avoidDrawingAttention: 'Evita llamar la atención:',
     focusOnKeyPlays:
       'Un estilo de juego demasiado activo puede levantar sospechas. En su lugar, concéntrate en realizar jugadas clave que puedan cambiar el resultado del juego.',
+    seoTeam: 'Mal. Compartes la victoria del mal aunque no conozcas a tus compañeros.',
+    seoAbility:
+      'En la configuración clásica, {oberon} no ve a los demás malvados y ellos no lo ven a él. {merlin} sí ve a Oberon como malvado.',
+    seoLimit:
+      'Oberon no es {mordred}: Merlín puede verlo. La variante {wraith} de esta plataforma también se oculta de Merlín; esa no es una habilidad del Oberon normal.',
+    seoScenario1:
+      'Si puede haber otro malvado en tu misión, no puedes contar con información inicial compartida para coordinarte. Dos cartas de Fracaso pueden revelar la presencia de varios malvados.',
+    seoScenario2:
+      'Si eliges Éxito para ganar confianza, recuerda que sigues siendo del mal. Deduce posibles aliados a partir de votos y resultados, sin confundir esas hipótesis con roles confirmados.',
   },
   pt: {
     generalInformation: 'Informações Gerais:',
@@ -222,5 +261,14 @@ export const oberon: { [key in TLanguage]: Dictionary<string> } = {
     avoidDrawingAttention: 'Evite chamar atenção:',
     focusOnKeyPlays:
       'Um estilo de jogo muito ativo pode levantar suspeitas. Em vez disso, concentre-se em fazer jogadas-chave que possam influenciar o resultado do jogo.',
+    seoTeam: 'Mal. Você compartilha a vitória do mal mesmo sem conhecer seus companheiros.',
+    seoAbility:
+      'Na configuração clássica, {oberon} não vê os outros jogadores do mal, e eles não o veem. {merlin} ainda vê Oberon como mau.',
+    seoLimit:
+      'Oberon não é {mordred}: Merlin consegue vê-lo. A variante {wraith} desta plataforma também se esconde de Merlin; isso não é uma habilidade do Oberon comum.',
+    seoScenario1:
+      'Se houver outro jogador do mal na missão, você não pode contar com informações iniciais compartilhadas para coordenar ações. Duas Falhas podem revelar a presença de vários jogadores do mal.',
+    seoScenario2:
+      'Se escolher Sucesso para ganhar confiança, lembre-se de que continua do mal. Use votos e resultados para deduzir possíveis aliados, sem tratar hipóteses como papéis confirmados.',
   },
 };

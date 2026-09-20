@@ -1,16 +1,11 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
     <h1>
       <div class="good-loyalty-icon"></div>
       {{ $t('roles.percival') }} {{ $t('roles.role') }}
     </h1>
-    <SchemaImage
-      class="preview-image"
-      :src="calculateRoleUrl('percival')"
-      :alt="$t('roles.percival')"
-      :description="$t('roles.percival')"
-    />
+    <WikiRoleGuide role="percival" />
 
     <h2>{{ $t('percival.generalInformation') }}</h2>
     <p>
@@ -35,26 +30,6 @@
       </li>
     </ul>
 
-    <h2>{{ $t('percival.strategicTips') }}</h2>
-    <ul>
-      <li>
-        <strong>{{ $t('percival.createAmbiguity') }}</strong>
-        <LocalizedTextWrapper keypath="percival.actingUnsure" />
-      </li>
-      <li>
-        <strong>{{ $t('percival.communicateThroughVotes') }}</strong>
-        <LocalizedTextWrapper keypath="percival.votingPatterns" />
-      </li>
-      <li>
-        <strong>{{ $t('percival.guideQuietly') }}</strong>
-        <LocalizedTextWrapper keypath="percival.subtlyGuide" />
-      </li>
-      <li>
-        <strong>{{ $t('percival.protectMerlinToTheEnd') }}</strong>
-        <LocalizedTextWrapper keypath="percival.takingSuspicion" />
-      </li>
-    </ul>
-
     <p>
       <LocalizedTextWrapper keypath="percival.playingAsPercival" />
     </p>
@@ -63,6 +38,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import WikiRoleGuide from '@/components/view/information/WikiRoleGuide.vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
@@ -72,6 +48,7 @@ import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
+    WikiRoleGuide,
     WikiBreadCrumbs,
     PreviewLink,
     SchemaImage,
@@ -86,6 +63,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 h2 {
   margin-top: 20px;

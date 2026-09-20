@@ -39,6 +39,15 @@ export const morgana: { [key in TLanguage]: Dictionary<string> } = {
       'Building a facade of trustworthiness can empower your misleading suggestions, making them more likely to be followed.',
     thrivingAsMorgana:
       "Thriving as {morgana} requires a fine balance between assertiveness and subtlety. Your ability to manipulate the narrative and influence both evil and good players significantly affects your team's chance of victory. Embrace the challenge and enjoy manoeuvring through Avalon's shadowy waters.",
+    seoTeam: 'Evil. Help missions fail and keep the final chance to assassinate {merlin}.',
+    seoAbility:
+      'To {percival}, {morgana} and {merlin} appear as indistinguishable candidates. Morgana knows the visible evil players, except {oberon}, in the classic setup.',
+    seoLimit:
+      '{merlin} still sees Morgana as evil. Morgana does not learn who Merlin or Percival is and does not gain Merlin’s information by appearing as a candidate.',
+    seoScenario1:
+      'If you try to sound like Merlin, make recommendations that fit the public discussion. Claiming perfect knowledge or openly identifying evil allies can undermine your disguise.',
+    seoScenario2:
+      'If Percival follows your suggested team, weigh a Fail against maintaining credibility. A Success may sustain the disguise, but it also advances good’s mission score.',
   },
   pt: {
     generalInformation: 'Informações Gerais: ',
@@ -78,6 +87,15 @@ export const morgana: { [key in TLanguage]: Dictionary<string> } = {
       'Construir uma fachada de confiabilidade pode fortalecer suas sugestões enganosas, tornando-as mais propensas a serem seguidas.',
     thrivingAsMorgana:
       'Prosperar como {morgana} requer um equilíbrio fino entre assertividade e sutileza. Sua capacidade de manipular a narrativa e influenciar tanto jogadores do mal quanto do bem afeta significativamente a chance de vitória da sua equipe. Abrace o desafio e aproveite a manobra através das águas sombrias de Avalon.',
+    seoTeam: 'Mal. Ajude missões a fracassarem e preserve a chance final de assassinar {merlin}.',
+    seoAbility:
+      'Para {percival}, {morgana} e {merlin} são candidatos indistinguíveis. Morgana conhece os jogadores visíveis do mal, exceto {oberon}, na configuração clássica.',
+    seoLimit:
+      '{merlin} vê Morgana como má. Morgana não sabe quem é Merlin ou Percival e não recebe as informações de Merlin por aparecer como candidata.',
+    seoScenario1:
+      'Se tentar parecer Merlin, faça propostas coerentes com a discussão pública. Alegar conhecimento perfeito ou revelar aliados abertamente pode destruir o disfarce.',
+    seoScenario2:
+      'Se Percival apoiar sua equipe, compare o benefício de uma Falha com a perda de credibilidade. Um Sucesso pode manter o disfarce, mas também melhora o placar do bem.',
   },
   ru: {
     generalInformation: 'Общая информация: ',
@@ -115,6 +133,15 @@ export const morgana: { [key in TLanguage]: Dictionary<string> } = {
     fakeTrustworthinessDescription: 'Старайтесь выглядеть надежным, чтобы люди верили вашим словам.',
     thrivingAsMorgana:
       'Находясь в роли {morgana}, важно найти баланс между напористостью и утонченностью. Ваша способность манипулировать нарративом и влиять как на злые, так и на добрые силы значительно влияет на шансы вашей команды на победу. Примите вызов и наслаждайтесь маневрированием в тенистых водах Авалона.',
+    seoTeam: 'Зло. Помогайте проваливать миссии. Финальная цель для убийства — {merlin}.',
+    seoAbility:
+      '{percival} видит двух неразличимых кандидатов: {morgana} и {merlin}. В классическом составе Моргана знает видимых злых игроков; исключение — {oberon}.',
+    seoLimit:
+      '{merlin} видит Моргану как злого игрока. Моргана не узнаёт, кто Мерлин или Персиваль, и не получает знания Мерлина из-за сходства с ним.',
+    seoScenario1:
+      'Если изображаете Мерлина, предлагайте решения, согласующиеся с публичным обсуждением. Заявления о безошибочном знании или открытое раскрытие союзников могут разрушить маскировку.',
+    seoScenario2:
+      'Если Персиваль поддержал вашу команду, сопоставьте пользу провала с потерей доверия. Успех может укрепить маскировку, но одновременно улучшит счёт добра по миссиям.',
   },
   'zh-CN': {
     generalInformation: '一般信息：',
@@ -144,6 +171,13 @@ export const morgana: { [key in TLanguage]: Dictionary<string> } = {
     fakeTrustworthinessDescription: '努力看起来可靠，让他人相信你的话。',
     thrivingAsMorgana:
       '成功扮演 {morgana} 角色需要在果断和微妙之间找到平衡。你操控叙事和影响邪恶与善良玩家的能力会显著影响你团队的胜算。接受挑战，并享受在阿瓦隆的阴影中穿梭的乐趣。',
+    seoTeam: '坏人。帮助任务失败，并保留最后刺杀{merlin}的机会。',
+    seoAbility:
+      '在{percival}眼中，{morgana}和{merlin}是无法直接区分的候选人。经典配置中，莫甘娜知道可见的邪恶玩家，但看不到{oberon}。',
+    seoLimit: '{merlin}仍能看到莫甘娜是坏人。莫甘娜不知道谁是梅林或派西维尔，也不会因为伪装成候选人而获得梅林的信息。',
+    seoScenario1: '想表现得像梅林时，建议应符合公开讨论。声称自己掌握全部信息，或公开指出邪恶队友，可能破坏伪装。',
+    seoScenario2:
+      '如果派西维尔支持你推荐的队伍，权衡出失败与维持可信度。出成功可能巩固伪装，但也会增加好人的成功任务数。',
   },
   'zh-TW': {
     generalInformation: '一般信息：',
@@ -173,6 +207,13 @@ export const morgana: { [key in TLanguage]: Dictionary<string> } = {
     fakeTrustworthinessDescription: '努力看起來可靠，讓他人相信你的话。',
     thrivingAsMorgana:
       '成功扮演 {morgana} 角色需要在果斷和微妙之間找到平衡。你操控敘事和影響邪惡與善良玩家的能力會顯著影響你團隊的勝算。接受挑戰，並享受在阿瓦隆的陰影中穿梭的樂趣。',
+    seoTeam: '壞人。幫助任務失敗，並保留最後刺殺{merlin}的機會。',
+    seoAbility:
+      '在{percival}眼中，{morgana}和{merlin}是無法直接區分的候選人。經典配置中，莫甘娜知道可見的邪惡玩家，但看不到{oberon}。',
+    seoLimit: '{merlin}仍能看到莫甘娜是壞人。莫甘娜不知道誰是梅林或派西維爾，也不會因為偽裝成候選人而獲得梅林的資訊。',
+    seoScenario1: '想表現得像梅林時，建議應符合公開討論。聲稱自己掌握全部資訊，或公開指出邪惡隊友，可能破壞偽裝。',
+    seoScenario2:
+      '如果派西維爾支持你推薦的隊伍，權衡出失敗與維持可信度。出成功可能鞏固偽裝，但也會增加好人的成功任務數。',
   },
   es: {
     generalInformation: 'Información General: ',
@@ -212,5 +253,14 @@ export const morgana: { [key in TLanguage]: Dictionary<string> } = {
       'Construir una fachada de confianza puede potenciar tus sugerencias engañosas, haciéndolas más propensas a ser seguidas.',
     thrivingAsMorgana:
       'Prosperar como {morgana} requiere un fino equilibrio entre la asertividad y la sutileza. Tu capacidad para manipular la narrativa e influir tanto en los jugadores del mal como en los buenos afecta significativamente las posibilidades de victoria de tu equipo. Acepta el desafío y disfruta de maniobrar a través de las aguas sombrías de Avalon.',
+    seoTeam: 'Mal. Ayuda a fallar misiones y conserva la oportunidad final de asesinar a {merlin}.',
+    seoAbility:
+      'Para {percival}, {morgana} y {merlin} son candidatos indistinguibles. Morgana conoce a los jugadores visibles del mal, excepto a {oberon}, en la configuración clásica.',
+    seoLimit:
+      '{merlin} sí ve a Morgana como malvada. Morgana no sabe quién es Merlín ni Percival y no recibe la información de Merlín por aparecer como candidata.',
+    seoScenario1:
+      'Si intentas parecer Merlín, haz propuestas coherentes con la discusión pública. Afirmar que lo sabes todo o revelar abiertamente a tus aliados puede destruir el disfraz.',
+    seoScenario2:
+      'Si Percival apoya tu equipo, sopesa un Fracaso frente a mantener la credibilidad. Un Éxito puede sostener el disfraz, pero también mejora el marcador del bien.',
   },
 };
