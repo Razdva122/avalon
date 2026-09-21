@@ -53,7 +53,7 @@
           </div>
           <Teleport to="body">
             <div
-              v-if="chatMessage?.message && showChatPreview"
+              v-if="chatMessage?.message"
               ref="messageElement"
               class="player-message-preview"
               :style="messageStyles"
@@ -102,18 +102,7 @@ import { roomChatKey } from '@/helpers/room-chat-context';
 import StickerImage from '@/components/stickers/StickerImage.vue';
 import { stickerReactionsKey } from '@/helpers/composables/useRoomStickers';
 import cloneDeep from 'lodash/cloneDeep';
-import {
-  defineComponent,
-  PropType,
-  inject,
-  computed,
-  toRefs,
-  ref,
-  onMounted,
-  onUnmounted,
-  ComputedRef,
-  watch,
-} from 'vue';
+import { defineComponent, PropType, inject, computed, toRefs, ref, onMounted, onUnmounted, ComputedRef } from 'vue';
 import { onLongPress } from '@vueuse/core';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
@@ -210,7 +199,6 @@ export default defineComponent({
       left: middlewareData.value.arrow?.x != null ? `${middlewareData.value.arrow.x}px` : undefined,
       top: middlewareData.value.arrow?.y != null ? `${middlewareData.value.arrow.y}px` : undefined,
     }));
-    const showChatPreview = computed(() => !roomChat?.open.value || props.playerState.id === store.state.profile?.id);
     const showUserCardDialog = ref(false);
     const tooltipOpen = ref(false);
 
@@ -231,7 +219,7 @@ export default defineComponent({
     });
 
     const onMessage = (message: import('@avalon/types').TMessage) => {
-      if (!showChatPreview.value || (message.roomID && message.roomID !== roomChat?.roomID())) return;
+      if (message.roomID && message.roomID !== roomChat?.roomID()) return;
       if (message.author === playerState.value.id) {
         if (chatMessage.value?.timeoutId) {
           window.clearTimeout(chatMessage.value?.timeoutId);
@@ -244,12 +232,6 @@ export default defineComponent({
         chatMessage.value = { message: message.text, timeoutId };
       }
     };
-    watch(showChatPreview, (visible) => {
-      if (!visible) {
-        window.clearTimeout(chatMessage.value?.timeoutId);
-        chatMessage.value = {};
-      }
-    });
     socket.on('newMessage', onMessage);
     onUnmounted(() => {
       socket.off('newMessage', onMessage);
@@ -423,7 +405,6 @@ export default defineComponent({
       messageStyles,
       messagePlacement,
       messageArrowStyles,
-      showChatPreview,
       stickerReaction,
       getImagePathByID,
       toSnakeCase,
