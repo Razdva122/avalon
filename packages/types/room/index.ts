@@ -96,6 +96,9 @@ export class VoteOfPlayer extends RoomPlayer {
 
 export class ChatMessage {
   @prop()
+  public requestID?: string;
+
+  @prop()
   public id?: string;
 
   @prop()
@@ -114,7 +117,11 @@ export class ChatMessage {
   public timestamp!: number;
 }
 
+export type ChatSendResult = { message: ChatMessage } | { error: 'invalidMessage' | 'notInRoom' };
+
 export type TMessage = {
+  id?: string;
+  roomID?: string;
   text: string;
   author: string;
 };

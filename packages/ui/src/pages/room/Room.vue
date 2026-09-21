@@ -39,7 +39,7 @@
         />
         <HostPanel v-if="displayHostPanel" :roomUuid="roomState.roomID" :roomStage="roomState.stage" />
       </div>
-      <Chat class="chat" :messages="roomState.chat" :roomUuid="roomState.roomID">
+      <Chat v-model:open="chatOpen" :messages="roomState.chat" :roomUuid="roomState.roomID">
         <template #stickers>
           <StickerPicker :roomID="roomState.roomID" @hide-on-board="hideStickers = $event" />
         </template>
@@ -52,7 +52,7 @@
 import { localizedPath } from '@/router/paths';
 import { i18n } from '@/plugins/i18n';
 import { useRouter } from 'vue-router';
-import { defineComponent, ref, computed, watch } from 'vue';
+import { defineComponent, ref, computed, watch, provide } from 'vue';
 import Board from '@/components/view/board/Board.vue';
 import type { TVisibleRole, ISocketError } from '@avalon/types';
 import { socket } from '@/api/socket';
@@ -63,6 +63,7 @@ import CardsInfo from '@/components/view/information/CardsInfo.vue';
 import HostPanel from '@/components/view/panels/HostPanel.vue';
 import RoomVote from '@/components/view/panels/RoomVote.vue';
 import StickerPicker from '@/components/stickers/StickerPicker.vue';
+import { roomChatKey } from '@/helpers/room-chat-context';
 import { useRoomStickers } from '@/helpers/composables/useRoomStickers';
 import Chat from '@/components/feedback/Chat.vue';
 import RatingChangesPanel from '@/components/stats/RatingChangesPanel.vue';
@@ -97,6 +98,14 @@ export default defineComponent({
 
     const roomState = stateManager.state;
     const hideStickers = ref(false);
+    const chatOpen = ref(false);
+    provide(roomChatKey, { open: chatOpen, roomID: () => props.uuid });
+    watch(
+      () => props.uuid,
+      () => {
+        chatOpen.value = false;
+      },
+    );
     useRoomStickers(
       () => props.uuid,
       roomState,
@@ -196,6 +205,7 @@ export default defineComponent({
 
     return {
       hideStickers,
+      chatOpen,
       roomState,
       errorMessage,
       displayRestartButton,
@@ -275,12 +285,5 @@ export default defineComponent({
   height: 100%;
   overflow-y: hidden;
   overflow-x: hidden;
-}
-
-.chat {
-  z-index: 16;
-  position: fixed;
-  bottom: 30px;
-  right: 5px;
 }
 </style>

@@ -26,8 +26,8 @@ export default defineComponent({
     },
     size: {
       type: String,
-      default: 'medium', // 'small', 'medium', 'large'
-      validator: (value: string) => ['small', 'medium', 'large'].includes(value),
+      default: 'medium', // 'small', 'medium', 'large', 'chat'
+      validator: (value: string) => ['small', 'medium', 'large', 'chat'].includes(value),
     },
   },
   emits: ['click'],
@@ -57,6 +57,20 @@ export default defineComponent({
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* The chat author uses the available row width instead of a short profile label. */
+.user-preview--chat {
+  min-width: 0;
+  .user-preview__name {
+    min-width: 0;
+    font-size: 14px;
+  }
+  .user-preview__avatar {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
 }
 
 /* Size variants */

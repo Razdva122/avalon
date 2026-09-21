@@ -22,7 +22,7 @@ import type {
 } from './errors';
 import type { TAssassinateType } from '../game/addons';
 
-import type { TRoomsList, TMessage } from '../room';
+import type { TRoomsList, TMessage, ChatSendResult } from '../room';
 import { TTotalWinrateStats, RoleRating, Achievement, UserAchievement, AchievementStats } from '../stats';
 import { UserForUI, UserProfile, IAvatarInfo, PublicUserProfile, UserWithToken } from '../user';
 
@@ -121,7 +121,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
   createRoom: (callback: (uuid: string) => void) => void;
   updateOptions: (uuid: string, options: GameOptions) => void;
   joinRoom: (uuid: string, callback: (state: TRoomState | IRoomUnavailableError) => void) => void;
-  sendMessage: (uuid: string, message: string) => void;
+  sendMessage: (uuid: string, message: string, requestID: string, callback: (result: ChatSendResult) => void) => void;
   lockRoom: (uuid: string) => void;
   kickPlayer: (uuid: string, userID: string) => void;
   leaveRoom: (uuid: string) => void;

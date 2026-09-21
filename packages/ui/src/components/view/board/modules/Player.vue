@@ -51,9 +51,19 @@
             <i class="material-icons icon-switch arrow_forward"></i>
             <div class="icon-evil-mission"></div>
           </div>
-          <div class="message-container" v-if="chatMessage?.message && !stickerReaction">
-            {{ chatMessage?.message }}
-          </div>
+          <Teleport to="body">
+            <div
+              v-if="chatMessage?.message && showChatPreview"
+              ref="messageElement"
+              class="player-message-preview"
+              :style="messageStyles"
+              :data-placement="messagePlacement"
+            >
+              <span ref="messageArrow" class="message-arrow" :style="messageArrowStyles" aria-hidden="true"></span>
+              <span class="preview-author">{{ player.name }}</span>
+              <span class="preview-text">{{ chatMessage.message }}</span>
+            </div>
+          </Teleport>
           <span class="player-name" :title="player.name">
             <span class="player-name-text">
               <span v-if="'index' in player && displayIndex">
@@ -71,12 +81,24 @@
     </v-tooltip>
 
     <v-dialog v-model="showUserCardDialog" content-class="user-card-dialog">
-      <UserHoverCard v-if="player.id && showUserCardDialog" :userID="player.id" :isVisible="showUserCardDialog" />
+      <UserHoverCard v-if="player.id && showUserCardDialog" :userID="player.id" :isVisible="showUserCardDialog" compact>
+        <template #actions>
+          <v-btn
+            icon="close"
+            variant="text"
+            color="text-primary"
+            :aria-label="$t('chat.closeProfile')"
+            @click="showUserCardDialog = false"
+          />
+        </template>
+      </UserHoverCard>
     </v-dialog>
   </div>
 </template>
 
 <script lang="ts">
+import { useFloating, autoUpdate, offset, flip, shift, arrow } from '@floating-ui/vue';
+import { roomChatKey } from '@/helpers/room-chat-context';
 import StickerImage from '@/components/stickers/StickerImage.vue';
 import { stickerReactionsKey } from '@/helpers/composables/useRoomStickers';
 import cloneDeep from 'lodash/cloneDeep';
@@ -144,12 +166,51 @@ export default defineComponent({
   setup(props) {
     const gameState = inject(gameStateKey)!;
     const store = useStore();
+    const roomChat = inject(roomChatKey, undefined);
     const reactions = inject(stickerReactionsKey, {});
     const stickerReaction = computed(() => reactions[props.playerState.id]);
     const { playerState, visibleHistory, displayKick } = toRefs(props);
     const { userState, userName } = useUserProfile(playerState.value.id);
     const chatMessage = ref<{ message?: string; timeoutId?: number }>();
-    const playerRef = ref(null);
+    const playerRef = ref<HTMLElement | null>(null);
+    const messageElement = ref<HTMLElement | null>(null);
+    const messageArrow = ref<HTMLElement | null>(null);
+    const {
+      floatingStyles: messageStyles,
+      placement: messagePlacement,
+      middlewareData,
+    } = useFloating(playerRef, messageElement, {
+      strategy: 'fixed',
+      middleware: [
+        {
+          name: 'towardsTable',
+          fn({ elements, placement, middlewareData }) {
+            if (middlewareData.towardsTable?.chosen) return {};
+            const board = playerRef.value?.closest('.board-container')?.getBoundingClientRect();
+            const avatar = elements.reference.getBoundingClientRect();
+            if (!board) return {};
+            const dx = board.x + board.width / 2 - (avatar.x + avatar.width / 2);
+            const dy = board.y + board.height / 2 - (avatar.y + avatar.height / 2);
+            const side = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'bottom' : 'top';
+            return {
+              data: { chosen: true },
+              ...(placement !== side ? { reset: { placement: side as 'left' | 'right' | 'top' | 'bottom' } } : {}),
+            };
+          },
+        },
+        offset(10),
+        flip(),
+        shift({ padding: 12 }),
+        arrow({ element: messageArrow, padding: 14 }),
+      ],
+      whileElementsMounted: (reference, floating, update) =>
+        autoUpdate(reference, floating, update, { animationFrame: true }),
+    });
+    const messageArrowStyles = computed(() => ({
+      left: middlewareData.value.arrow?.x != null ? `${middlewareData.value.arrow.x}px` : undefined,
+      top: middlewareData.value.arrow?.y != null ? `${middlewareData.value.arrow.y}px` : undefined,
+    }));
+    const showChatPreview = computed(() => !roomChat?.open.value || props.playerState.id === store.state.profile?.id);
     const showUserCardDialog = ref(false);
     const tooltipOpen = ref(false);
 
@@ -170,6 +231,7 @@ export default defineComponent({
     });
 
     const onMessage = (message: import('@avalon/types').TMessage) => {
+      if (!showChatPreview.value || (message.roomID && message.roomID !== roomChat?.roomID())) return;
       if (message.author === playerState.value.id) {
         if (chatMessage.value?.timeoutId) {
           window.clearTimeout(chatMessage.value?.timeoutId);
@@ -182,6 +244,12 @@ export default defineComponent({
         chatMessage.value = { message: message.text, timeoutId };
       }
     };
+    watch(showChatPreview, (visible) => {
+      if (!visible) {
+        window.clearTimeout(chatMessage.value?.timeoutId);
+        chatMessage.value = {};
+      }
+    });
     socket.on('newMessage', onMessage);
     onUnmounted(() => {
       socket.off('newMessage', onMessage);
@@ -349,6 +417,13 @@ export default defineComponent({
       player,
       playerClasses,
       chatMessage,
+      roomChat,
+      messageElement,
+      messageArrow,
+      messageStyles,
+      messagePlacement,
+      messageArrowStyles,
+      showChatPreview,
       stickerReaction,
       getImagePathByID,
       toSnakeCase,
@@ -715,17 +790,6 @@ export default defineComponent({
   border: 2px solid rgb(var(--v-theme-error));
   background-size: contain;
 }
-
-.message-container {
-  border-radius: 8px;
-  font-size: 18px;
-  text-align: center;
-  padding: 2px 6px;
-  background-color: rgb(var(--v-theme-surface-variant));
-  position: absolute;
-  bottom: 30px;
-  @include text-overflow(5);
-}
 </style>
 
 <style scoped>
@@ -742,5 +806,66 @@ export default defineComponent({
 .player-sticker :deep(.sticker-image) {
   filter: drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff) drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff)
     drop-shadow(0 2px 3px #0009);
+}
+</style>
+
+<style scoped>
+.player-message-preview {
+  width: min(240px, calc(100vw - 24px));
+  padding: 10px 14px;
+  border: 1px solid #a48b63;
+  border-radius: 12px;
+  background: #fff4df;
+  color: #29251f;
+  text-align: left;
+  box-shadow: 0 4px 12px #0005;
+  z-index: 15;
+  pointer-events: none;
+}
+.preview-author {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #685438;
+}
+.preview-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  font-size: 16px;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+.message-arrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #fff4df;
+  transform: rotate(45deg);
+}
+.player-message-preview[data-placement='right'] .message-arrow {
+  left: -6px;
+  border-left: 1px solid #a48b63;
+  border-bottom: 1px solid #a48b63;
+}
+.player-message-preview[data-placement='left'] .message-arrow {
+  right: -6px;
+  border-right: 1px solid #a48b63;
+  border-top: 1px solid #a48b63;
+}
+.player-message-preview[data-placement='bottom'] .message-arrow {
+  top: -6px;
+  border-left: 1px solid #a48b63;
+  border-top: 1px solid #a48b63;
+}
+.player-message-preview[data-placement='top'] .message-arrow {
+  bottom: -6px;
+  border-right: 1px solid #a48b63;
+  border-bottom: 1px solid #a48b63;
 }
 </style>

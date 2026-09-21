@@ -1,3 +1,4 @@
+import { registerChatEndpoints } from '@/room/chat-endpoints';
 import { registerStickerEndpoints } from '@/stickers/endpoints';
 import { StickersManager } from '@/stickers';
 import { Room } from '@/room';
@@ -385,13 +386,7 @@ export class Manager {
 
     registerStickerEndpoints(socket, userID, this.stickersManager, (id) => this.rooms[id], this.io);
 
-    socket.on('sendMessage', (uuid, message) => {
-      const room = this.rooms[uuid];
-
-      if (room) {
-        room.addMessage(userID, message);
-      }
-    });
+    registerChatEndpoints(socket, userID, (id) => this.rooms[id]);
 
     socket.on('joinGame', (uuid) => {
       const room = this.rooms[uuid];

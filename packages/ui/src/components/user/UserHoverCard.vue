@@ -1,5 +1,10 @@
 <template>
-  <v-card class="user-hover-card" elevation="4">
+  <v-card
+    class="user-hover-card"
+    :class="{ 'compact-profile': compact }"
+    :elevation="compact ? 0 : 4"
+    :rounded="compact ? 'xl' : undefined"
+  >
     <div class="user-header pa-3">
       <div class="d-flex justify-space-between">
         <div class="d-flex align-center">
@@ -14,13 +19,14 @@
             <v-skeleton-loader v-else type="text" width="120" />
           </div>
         </div>
-        <div class="trueskill-rating">
+        <div v-if="!compact" class="trueskill-rating">
           <UserTrueSkillRating :userID="userID" />
         </div>
+        <slot name="actions" />
       </div>
     </div>
 
-    <v-divider></v-divider>
+    <v-divider v-if="!compact"></v-divider>
     <div class="pa-3">
       <div v-if="loadError" class="mb-2" role="alert">
         {{ $t('userStats.loadError') }}
@@ -35,31 +41,34 @@
         <div class="d-flex justify-space-between">
           <div class="stat-label">{{ $t('stats.winrate') }}:</div>
           <div class="stat-value" v-if="!loading">
-            <WinrateDisplay :winrate="overallWinrate.toString()" />
+            <span v-if="compact && totalGames === 0">—</span>
+            <WinrateDisplay v-else :winrate="overallWinrate.toString()" />
           </div>
           <v-skeleton-loader v-else type="text" width="60" />
         </div>
       </div>
 
-      <v-divider class="my-2"></v-divider>
-      <div class="top-roles-title mt-2">{{ $t('stats.topRoles') }}</div>
-      <div v-if="!ratingsLoading && topRoles.length > 0" class="top-roles-list">
-        <div v-for="(role, index) in topRoles" :key="role.role">
-          <div class="top-role-item d-flex align-center justify-space-between">
-            <div class="d-flex align-center">
-              <div class="role-rank">{{ index + 1 }}.</div>
-              <PlayerIcon :icon="role.role" class="role-icon mx-1" />
-              <div class="role-name">{{ $t(`roles.${role.role}`) }}</div>
+      <template v-if="!compact">
+        <v-divider class="my-2"></v-divider>
+        <div class="top-roles-title mt-2">{{ $t('stats.topRoles') }}</div>
+        <div v-if="!ratingsLoading && topRoles.length > 0" class="top-roles-list">
+          <div v-for="(role, index) in topRoles" :key="role.role">
+            <div class="top-role-item d-flex align-center justify-space-between">
+              <div class="d-flex align-center">
+                <div class="role-rank">{{ index + 1 }}.</div>
+                <PlayerIcon :icon="role.role" class="role-icon mx-1" />
+                <div class="role-name">{{ $t(`roles.${role.role}`) }}</div>
+              </div>
+              <div class="role-rating">{{ role.rating }}</div>
             </div>
-            <div class="role-rating">{{ role.rating }}</div>
+            <v-divider v-if="index < topRoles.length - 1" class="my-1"></v-divider>
           </div>
-          <v-divider v-if="index < topRoles.length - 1" class="my-1"></v-divider>
         </div>
-      </div>
-      <div v-else-if="!ratingsLoading && topRoles.length === 0" class="no-roles-message">
-        {{ $t('stats.noRolesData') }}
-      </div>
-      <v-skeleton-loader v-else type="list-item-three-line" />
+        <div v-else-if="!ratingsLoading && topRoles.length === 0" class="no-roles-message">
+          {{ $t('stats.noRolesData') }}
+        </div>
+        <v-skeleton-loader v-else type="list-item-three-line" />
+      </template>
     </div>
   </v-card>
 </template>
@@ -84,6 +93,7 @@ export default defineComponent({
     UserTrueSkillRating,
   },
   props: {
+    compact: { type: Boolean, default: false },
     userID: {
       type: String,
       required: true,
@@ -127,16 +137,18 @@ export default defineComponent({
       loadError.value = false;
       userRatings.value = [];
       // Role rankings are optional and must not determine overall game statistics.
-      void socket
-        .timeout(10000)
-        .emitWithAck('getUserRatings', userID)
-        .then((response) => {
-          if (currentRequest === requestId && !('error' in response)) userRatings.value = response;
-        })
-        .catch(() => {})
-        .finally(() => {
-          if (currentRequest === requestId) ratingsLoading.value = false;
-        });
+      if (!props.compact)
+        void socket
+          .timeout(10000)
+          .emitWithAck('getUserRatings', userID)
+          .then((response) => {
+            if (currentRequest === requestId && !('error' in response)) userRatings.value = response;
+          })
+          .catch(() => {})
+          .finally(() => {
+            if (currentRequest === requestId) ratingsLoading.value = false;
+          });
+      else ratingsLoading.value = false;
       try {
         const games = await socket.timeout(20000).emitWithAck('getPlayerGameSummaries', userID);
         if (currentRequest !== requestId) return;
@@ -296,5 +308,58 @@ export default defineComponent({
   color: rgba(var(--v-theme-on-surface), 0.6);
   text-align: center;
   padding: 8px 0;
+}
+</style>
+
+<style scoped lang="scss">
+.compact-profile {
+  width: min(360px, calc(100vw - 48px));
+  max-width: 100%;
+  margin: auto;
+  border: 1px solid rgba(var(--v-theme-text-primary), 0.15);
+  border-radius: 20px;
+  box-shadow: none !important;
+  color: rgb(var(--v-theme-text-primary));
+  .user-header > div {
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .user-header > div > div:first-child {
+    min-width: 0;
+  }
+  .user-info {
+    min-width: 0;
+  }
+  .username {
+    font-size: 16px;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+  }
+  .avatar-container,
+  .user-avatar,
+  .user-avatar-skeleton {
+    width: 48px;
+    height: 48px;
+  }
+  .overall-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .overall-stats > div {
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 0 !important;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgb(var(--v-theme-inset));
+  }
+  .stat-label {
+    font-size: 12px;
+  }
+  .stat-value {
+    font-size: 20px;
+    font-weight: 600;
+  }
 }
 </style>

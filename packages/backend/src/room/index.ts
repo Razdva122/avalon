@@ -63,10 +63,19 @@ export class Room {
     this.updateRoomState();
   }
 
-  addMessage(userID: string, message: string) {
-    this.chat.addMessage(message, userID);
-    this.io.to(this.roomID).emit('newMessage', { text: message, author: userID });
-    this.updateRoomState(true);
+  addMessage(userID: string, message: string, requestID?: string) {
+    const count = this.chat.history.length;
+    const entry = this.chat.addMessage(message, userID, requestID);
+    if (this.chat.history.length !== count) {
+      this.io.to(this.roomID).emit('newMessage', {
+        id: entry.id,
+        roomID: this.roomID,
+        text: entry.message,
+        author: userID,
+      });
+      this.updateRoomState(true);
+    }
+    return entry;
   }
 
   toggleLockedState() {
