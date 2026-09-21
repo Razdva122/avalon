@@ -63,7 +63,7 @@
       />
       <div class="sticker-grid">
         <article
-          v-for="sticker in collection.stickers"
+          v-for="sticker in sortedStickers"
           :key="sticker.id"
           class="sticker-card"
           :class="{ locked: !sticker.available }"
@@ -128,6 +128,7 @@
   </section>
 </template>
 <script setup lang="ts">
+import { computed } from 'vue';
 import { STICKERS } from '@avalon/types/user/stickers';
 import { useI18n } from 'vue-i18n';
 import { useStickers } from '@/helpers/composables/useStickers';
@@ -138,6 +139,9 @@ const { t } = useI18n();
 const { collection, loading, error, busy, load, save, markSeen } = useStickers();
 const secret = (id: string, available: boolean) => !available && STICKERS.find((s) => s.id === id)?.hidden;
 const isPremium = (id: string) => STICKERS.find((s) => s.id === id)?.premium;
+const sortedStickers = computed(() =>
+  [...(collection.value?.stickers ?? [])].sort((a, b) => Number(!!isPremium(b.id)) - Number(!!isPremium(a.id))),
+);
 const requirement = (id: string, available: boolean) => {
   const def = STICKERS.find((s) => s.id === id)!;
   if (def.premium) return t(available ? 'premiumCosmetics.included' : 'premiumCosmetics.onlyPremium');

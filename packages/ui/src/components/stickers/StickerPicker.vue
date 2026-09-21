@@ -4,11 +4,33 @@
       <template #activator="{ props }">
         <v-btn
           v-bind="props"
-          icon="emoji_emotions"
+          class="sticker-trigger"
+          icon
+          :class="{ 'sticker-trigger-open': open }"
+          variant="text"
           :aria-label="$t('stickers.title')"
           :title="$t('stickers.title')"
-          color="inset"
-        />
+          color="text-primary"
+        >
+          <svg
+            width="26"
+            height="26"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M14 21H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v8Z" />
+            <path d="M14 21v-4a3 3 0 0 1 3-3h4" />
+            <circle cx="8.5" cy="9" r="1" fill="currentColor" stroke="none" />
+            <circle cx="15.5" cy="9" r="1" fill="currentColor" stroke="none" />
+            <path d="M8 13a4 4 0 0 0 5 2" />
+          </svg>
+        </v-btn>
       </template>
       <v-card class="picker" rounded="lg">
         <div class="picker-header">
@@ -42,17 +64,23 @@
         <p v-if="sendError || error" class="status text-error" role="alert">
           {{ $t(`stickers.${sendError || error}`) }}
         </p>
-        <v-btn
-          v-if="$store.state.profile"
-          block
-          variant="text"
-          color="text-primary"
-          @click="
-            open = false;
-            showCollection = true;
-          "
-          >{{ $t('stickers.collection') }}</v-btn
-        >
+        <div v-if="$store.state.profile" class="collection-footer">
+          <v-btn
+            class="collection-button"
+            block
+            variant="flat"
+            color="primary"
+            prepend-icon="collections_bookmark"
+            append-icon="chevron_right"
+            rounded="lg"
+            @click="
+              open = false;
+              showCollection = true;
+            "
+          >
+            {{ $t('stickers.collection') }}
+          </v-btn>
+        </div>
       </v-card>
     </v-menu>
     <v-dialog v-model="showCollection" max-width="820" scrollable>
@@ -205,9 +233,40 @@ onUnmounted(() => {
 });
 </script>
 <style scoped>
+.sticker-trigger {
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 14px;
+  background: rgb(var(--v-theme-inset));
+}
+.sticker-trigger-open {
+  box-shadow: inset 0 0 0 2px rgb(var(--v-theme-primary));
+}
+.sticker-trigger:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 2px;
+}
 .picker {
   width: min(350px, calc(100vw - 24px));
   padding: 12px;
+}
+.collection-footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(var(--v-theme-text-primary), 0.15);
+}
+.collection-button {
+  min-height: 48px;
+  height: auto;
+  padding: 10px 12px;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.collection-button :deep(.v-btn__content) {
+  white-space: normal;
 }
 .picker-header {
   display: flex;

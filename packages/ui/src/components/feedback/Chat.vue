@@ -1,22 +1,10 @@
 <template>
-  <div>
-    <template v-if="isHidden">
-      <v-btn
-        class="chat-bubble"
-        color="inset-reverted"
-        density="comfortable"
-        @click="toggleChat"
-        icon="chat"
-        variant="plain"
-      >
-        <span class="material-icons"> chat </span>
-        <div v-if="counter" class="pointer">{{ counter }}</div>
-      </v-btn>
-    </template>
-    <div v-else class="chat-window">
+  <div :class="{ 'chat-window': !isHidden }">
+    <template v-if="!isHidden">
       <div v-if="mode === 'full'" id="messages-container" class="messages-container">
         <div
           v-for="message in messages"
+          :key="message.id"
           class="message-element"
           :class="isUserMessage(message.userID) ? 'message-from-author' : ''"
         >
@@ -24,9 +12,7 @@
           <div v-if="message.kind === 'sticker' && message.stickerID" class="chat-sticker">
             <StickerImage :id="message.stickerID" />
           </div>
-          <div v-else class="message-text">
-            {{ message.message }}
-          </div>
+          <div v-else class="message-text">{{ message.message }}</div>
         </div>
       </div>
       <v-btn
@@ -38,7 +24,24 @@
         density="compact"
       />
       <v-btn @click="toggleChat" class="close" icon="close" variant="text" color="text-primary" density="compact" />
+    </template>
+    <div class="chat-composer" :class="{ 'chat-launchers': isHidden }">
+      <slot name="stickers" />
+      <v-btn
+        v-if="isHidden"
+        class="chat-bubble"
+        color="inset-reverted"
+        density="comfortable"
+        @click="toggleChat"
+        icon="chat"
+        variant="plain"
+        :aria-label="$t('chat.message')"
+      >
+        <span class="material-icons">chat</span>
+        <div v-if="counter" class="pointer">{{ counter }}</div>
+      </v-btn>
       <v-text-field
+        v-else
         class="input"
         variant="solo-filled"
         v-model="currentMessage"
@@ -47,7 +50,7 @@
         append-inner-icon="send"
         @keyup.enter="sendMessage"
         @click:append-inner="sendMessage"
-      ></v-text-field>
+      />
     </div>
   </div>
 </template>
@@ -156,8 +159,8 @@ export default defineComponent({
 .chat-window {
   background-color: rgb(var(--v-theme-surface));
   border: 1px solid rgba(var(--v-theme-text-primary), 0.5);
-  width: 300px;
-  max-height: 450px;
+  width: min(340px, calc(100vw - 10px));
+  max-height: min(450px, calc(100dvh - 100px));
   border-radius: 8px;
   padding-top: 30px;
 }
@@ -174,12 +177,29 @@ export default defineComponent({
   right: 30px;
 }
 
+.chat-composer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+}
+
+.chat-launchers {
+  gap: 8px;
+  padding: 0;
+}
+
+.chat-composer :deep(.sticker-control) {
+  flex: 0 0 auto;
+}
+
 .input {
+  min-width: 0;
   color: rgb(var(--v-theme-surface-variant));
 }
 
 .messages-container {
-  height: calc(450px - 56px - 30px);
+  height: min(356px, calc(100dvh - 194px));
   color: black;
   overflow-y: scroll;
   padding: 12px;

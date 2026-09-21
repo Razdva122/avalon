@@ -19,6 +19,14 @@
             :avatarID="userState.profile.avatar"
           />
           <PlayerIcon v-if="'role' in player" class="role-container" :icon="player.role" />
+          <div
+            v-if="stickerReaction"
+            class="player-sticker"
+            role="img"
+            :aria-label="`${player.name}: ${$t(`stickers.${stickerReaction.stickerID}`)}`"
+          >
+            <StickerImage :id="stickerReaction.stickerID" aria-hidden="true" />
+          </div>
           <div class="player-crown" alt="crown"></div>
           <div class="player-actions-features" v-if="'features' in player">
             <img
@@ -43,10 +51,6 @@
             <i class="material-icons icon-switch arrow_forward"></i>
             <div class="icon-evil-mission"></div>
           </div>
-          <Teleport to="body"
-            ><div v-if="stickerReaction" ref="stickerElement" class="player-sticker" :style="stickerStyles">
-              <StickerImage :id="stickerReaction.stickerID" /></div
-          ></Teleport>
           <div class="message-container" v-if="chatMessage?.message && !stickerReaction">
             {{ chatMessage?.message }}
           </div>
@@ -73,7 +77,6 @@
 </template>
 
 <script lang="ts">
-import { useFloating, autoUpdate, offset, flip, shift } from '@floating-ui/vue';
 import StickerImage from '@/components/stickers/StickerImage.vue';
 import { stickerReactionsKey } from '@/helpers/composables/useRoomStickers';
 import cloneDeep from 'lodash/cloneDeep';
@@ -147,13 +150,6 @@ export default defineComponent({
     const { userState, userName } = useUserProfile(playerState.value.id);
     const chatMessage = ref<{ message?: string; timeoutId?: number }>();
     const playerRef = ref(null);
-    const stickerElement = ref<HTMLElement | null>(null);
-    const { floatingStyles: stickerStyles } = useFloating(playerRef, stickerElement, {
-      placement: 'right',
-      strategy: 'fixed',
-      middleware: [offset(8), flip(), shift({ padding: 12 })],
-      whileElementsMounted: autoUpdate,
-    });
     const showUserCardDialog = ref(false);
     const tooltipOpen = ref(false);
 
@@ -359,8 +355,6 @@ export default defineComponent({
       plotCardsNames,
       playerCards,
       playerRef,
-      stickerElement,
-      stickerStyles,
       showUserCardDialog,
       isMobileDevice,
       tooltipOpen,
@@ -736,16 +730,17 @@ export default defineComponent({
 
 <style scoped>
 .player-sticker {
-  width: 90px;
-  height: 90px;
-  z-index: 15;
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  width: 110px;
+  height: 110px;
+  transform: translateX(-50%);
   pointer-events: none;
-  filter: drop-shadow(0 3px 6px #0008);
 }
-@media (max-width: 600px) {
-  .player-sticker {
-    width: 66px;
-    height: 66px;
-  }
+
+.player-sticker :deep(.sticker-image) {
+  filter: drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff) drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff)
+    drop-shadow(0 2px 3px #0009);
 }
 </style>

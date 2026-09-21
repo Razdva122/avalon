@@ -39,8 +39,11 @@
         />
         <HostPanel v-if="displayHostPanel" :roomUuid="roomState.roomID" :roomStage="roomState.stage" />
       </div>
-      <StickerPicker class="sticker-picker" :roomID="roomState.roomID" @hide-on-board="hideStickers = $event" />
-      <Chat class="chat" :messages="roomState.chat" :roomUuid="roomState.roomID" />
+      <Chat class="chat" :messages="roomState.chat" :roomUuid="roomState.roomID">
+        <template #stickers>
+          <StickerPicker :roomID="roomState.roomID" @hide-on-board="hideStickers = $event" />
+        </template>
+      </Chat>
     </template>
   </div>
 </template>
@@ -275,17 +278,9 @@ export default defineComponent({
 }
 
 .chat {
+  z-index: 16;
   position: fixed;
   bottom: 30px;
   right: 5px;
-}
-</style>
-
-<style scoped>
-.sticker-picker {
-  position: fixed;
-  bottom: 30px;
-  right: 66px;
-  z-index: 20;
 }
 </style>
