@@ -7,7 +7,7 @@ const PrerendererWebpackPlugin = require('@prerenderer/webpack-plugin');
 const PuppeteerRenderer = require('@prerenderer/renderer-puppeteer');
 const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 const { routesSeo } = require('./src/router/seo');
-const { yaMetrika, gtag } = require('./const');
+const { startup, yaMetrika, gtag } = require('./const');
 const { imageGenerator } = require('./image-storage.cjs');
 const imageAssets = imageGenerator();
 
@@ -42,6 +42,7 @@ module.exports = defineConfig({
       args[0].templateParameters = (...args) => {
         return {
           ...templateFunc(...args),
+          startup,
           absoluteImageUrl: (url) => new URL(url, 'https://avalon-game.com').href,
           imageStorageOrigin: imageAssets.publicPath === '/' ? '' : new URL(imageAssets.publicPath).origin,
           yaMetrika: process.env.NODE_ENV !== 'production' ? '' : yaMetrika,
@@ -120,18 +121,6 @@ module.exports = defineConfig({
                 });
                 const error = await page.$eval('#app', (root) => root.dataset.prerenderError);
                 if (error) throw new Error(error);
-                // Avoid a second waterfall for the selected locale and fallback.
-                await page.evaluate(() => {
-                  for (const resource of performance.getEntriesByType('resource')) {
-                    const url = new URL(resource.name);
-                    if (url.origin !== location.origin || !/^\/js\/locale-[^/]+\.js$/.test(url.pathname)) continue;
-                    const link = document.createElement('link');
-                    link.rel = 'preload';
-                    link.as = 'script';
-                    link.href = url.pathname;
-                    document.head.appendChild(link);
-                  }
-                });
               } catch (error) {
                 const state = await page
                   .$eval('#app', (root) => ({

@@ -14,8 +14,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
-import AchievementPopup, { AchievementProgress } from './AchievementPopup.vue';
+import { defineAsyncComponent, defineComponent, onMounted, onUnmounted, ref } from 'vue';
+import type { AchievementProgress } from './AchievementPopup.vue';
 import { socket } from '@/api/socket';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -29,7 +29,7 @@ export interface AchievementData {
 export default defineComponent({
   name: 'AchievementPopupsContainer',
   components: {
-    AchievementPopup,
+    AchievementPopup: defineAsyncComponent(() => import('@/components/achievements/AchievementPopup.vue')),
   },
   setup() {
     const popups = ref<AchievementData[]>([]);

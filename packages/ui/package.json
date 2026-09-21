@@ -8,7 +8,7 @@
     "prebuild": "npm run generate:avatars && node scripts/generate-locales.cjs",
     "test": "node --test scripts/*.test.cjs",
     "build": "npm test && vue-cli-service build && node scripts/critical-css.cjs && npm run check:build",
-    "check:build": "node scripts/check-seo.cjs && node --test scripts/check-structured-data.cjs && node scripts/check-seo-navigation.cjs && node scripts/check-bundle.cjs && node scripts/check-images.cjs && node scripts/check-password-recovery.cjs && node scripts/check-support.cjs",
+    "check:build": "node scripts/check-seo.cjs && node --test scripts/check-structured-data.cjs && node scripts/check-seo-navigation.cjs && node scripts/check-bundle.cjs && node scripts/check-images.cjs && node scripts/check-password-recovery.cjs && node scripts/check-support.cjs && node scripts/check-startup.cjs",
     "check:seo:nginx": "node scripts/check-seo-nginx.cjs",
     "check:seo:http": "node scripts/check-seo-http.cjs",
     "upload:images": "node scripts/upload-images.cjs",

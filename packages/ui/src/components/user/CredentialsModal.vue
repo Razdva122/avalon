@@ -80,7 +80,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import eventBus from '@/helpers/event-bus';
 import { validators } from '@/helpers/validators';
 import type { VForm } from 'vuetify/components';
@@ -94,10 +94,23 @@ export default defineComponent({
     PasswordField,
     TextField,
   },
+  props: {
+    modelValue: Boolean,
+    mode: { type: String as PropType<'email' | 'login' | 'password'>, default: 'email' },
+  },
+  emits: ['update:modelValue'],
+  computed: {
+    overlay: {
+      get(): boolean {
+        return this.modelValue;
+      },
+      set(value: boolean) {
+        this.$emit('update:modelValue', value);
+      },
+    },
+  },
   data() {
     return {
-      mode: 'email',
-      overlay: false,
       password: '',
       newPassword: '',
       email: '',
@@ -110,12 +123,6 @@ export default defineComponent({
         loginForm: false,
       },
     };
-  },
-  mounted() {
-    eventBus.on('openCredentialsModal', (type) => {
-      this.displayModal();
-      this.mode = type;
-    });
   },
   watch: {
     mode() {

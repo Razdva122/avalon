@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const { yaMetrika, gtag } = require('../const');
+const { startup, yaMetrika, gtag } = require('../const');
 const { isNeutralPath } = require('../src/router/paths');
 
 function scripts(html) {
@@ -11,7 +11,11 @@ function scripts(html) {
 }
 function browser(pathname) {
   const elements = [];
+  const events = new EventTarget();
+  const timers = [];
   const context = {
+    addEventListener: events.addEventListener.bind(events),
+    setTimeout: (callback) => timers.push(callback),
     location: { pathname, hash: '#secret-token' },
     history: {
       replaceState(_state, _title, url) {
@@ -20,6 +24,8 @@ function browser(pathname) {
       },
     },
     document: {
+      addEventListener: events.addEventListener.bind(events),
+      removeEventListener: events.removeEventListener.bind(events),
       scripts: [],
       createElement: (tag) => ({ tag }),
       head: { appendChild: (element) => elements.push(element) },
@@ -27,7 +33,14 @@ function browser(pathname) {
     },
   };
   context.window = context;
-  return { context: vm.createContext(context), elements };
+  return {
+    context: vm.createContext(context),
+    elements,
+    ready() {
+      events.dispatchEvent(new Event('avalon:ready'));
+      while (timers.length) timers.shift()();
+    },
+  };
 }
 test('recovery boot removes URL secrets before analytics and never loads trackers', () => {
   const { context, elements } = browser('/password-recovery/');
@@ -40,8 +53,9 @@ test('recovery boot removes URL secrets before analytics and never loads tracker
   assert.equal(elements.find((element) => element.name === 'referrer').content, 'no-referrer');
 });
 test('ordinary pages still load both analytics providers', () => {
-  const { context, elements } = browser('/');
-  for (const code of scripts(yaMetrika + gtag)) vm.runInContext(code, context);
+  const { context, elements, ready } = browser('/');
+  for (const code of scripts(startup + yaMetrika + gtag)) vm.runInContext(code, context);
+  ready();
   assert.equal(elements.filter((element) => element.tag === 'script').length, 2);
 });
 test('recovery route uses the visitor language instead of forcing English', () => {

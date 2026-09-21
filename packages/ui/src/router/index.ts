@@ -4,7 +4,6 @@ import { pageLanguage, preferredLanguage } from '@/helpers/i18n/policy';
 import { createRouter, createWebHistory, RouteRecordRaw, RouteLocationNormalized } from 'vue-router';
 import { routesSeo } from '@/router/seo';
 import type { TMultiLangRoute, TNormalizedLangRoute } from '@/router/seo';
-import Lobby from '@/pages/lobby/Lobby.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { TLanguage, LanguageMap } from '@/helpers/i18n';
 import { getImagePath } from '@/helpers/images';
@@ -17,7 +16,7 @@ import { scrollBehavior } from './scroll';
 const routeComponentMap = {
   community: () => import('@/pages/community/Community.vue'),
   support: () => import('@/pages/support/Support.vue'),
-  lobby: Lobby,
+  lobby: () => import(/* webpackChunkName: 'lobby' */ '@/pages/lobby/Lobby.vue'),
   wiki: () => import('@/pages/wiki/Index.vue'),
   notFound: () => import('@/pages/empty/NotFound.vue'),
   room: () => import('@/pages/room/Room.vue'),

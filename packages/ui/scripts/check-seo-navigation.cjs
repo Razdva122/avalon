@@ -56,8 +56,13 @@ const server = http.createServer((req, res) => {
     });
     for (const pathname of ['/', '/zh-tw/', '/ru/', '/es/', '/pt/', '/zh-cn/']) {
       analyticsRequests = [];
+      const analyticsLoaded = Promise.all([
+        page.waitForRequest((request) => request.url().includes('googletagmanager.com/gtag/js')),
+        page.waitForRequest((request) => request.url().includes('mc.yandex.ru/metrika/tag.js')),
+      ]);
       await page.goto(origin + pathname, { waitUntil: 'networkidle0' });
       await page.waitForFunction(() => document.querySelector('#app').__vue_app__);
+      await analyticsLoaded;
       assert.equal(
         analyticsRequests.filter((url) => url.includes('googletagmanager')).length,
         1,

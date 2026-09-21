@@ -6,7 +6,7 @@
       :class="rolesShortInfo[target].loyalty + '-role'"
       :to="linked ? { name: toSnakeCase(normalizeRoleRoute) } : undefined"
     >
-      <PlayerIcon class="icon-in-link" :icon="target" />
+      <PlayerIcon thumbnail class="icon-in-link" :icon="target" />
       <template v-if="text !== ''">
         {{ text ? $t('previewLink.' + text) : $t('roles.' + target) }}
       </template>

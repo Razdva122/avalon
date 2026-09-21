@@ -23,22 +23,22 @@ export default defineComponent({
 }
 
 .icon-excalibur {
-  background-image: getImagePathByID('features', 'excalibur');
+  background-image: getThumbnailPathByID('features', 'excalibur');
   background-size: contain;
 }
 
 .icon-ladyOfLake {
-  background-image: getImagePathByID('features', 'lady_of_lake');
+  background-image: getThumbnailPathByID('features', 'lady_of_lake');
   background-size: contain;
 }
 
 .icon-ladyOfSea {
-  background-image: getImagePathByID('features', 'lady_of_sea');
+  background-image: getThumbnailPathByID('features', 'lady_of_sea');
   background-size: contain;
 }
 
 .icon-plotCards {
-  background-image: getImagePathByID('features', 'plot_cards');
+  background-image: getThumbnailPathByID('features', 'plot_cards');
   background-size: contain;
 }
 </style>

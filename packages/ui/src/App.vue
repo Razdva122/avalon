@@ -24,19 +24,17 @@
     </template>
   </RouterView>
   <LanguageSuggestion />
-  <AuthModal />
-  <CredentialsModal />
+  <AuthModal v-if="authRequested" v-model="authOpen" />
+  <CredentialsModal v-if="credentialsRequested" v-model="credentialsOpen" :mode="credentialsMode" />
   <InfoSnackbar />
   <AchievementPopupsContainer />
   <Version class="version" />
 </template>
 
 <script lang="ts">
-import { defineComponent, unref } from 'vue';
+import { defineAsyncComponent, defineComponent, unref } from 'vue';
 import { localizedPath } from '@/router/paths';
 import LanguageSuggestion from '@/components/feedback/LanguageSuggestion.vue';
-import AuthModal from '@/components/user/AuthModal.vue';
-import CredentialsModal from '@/components/user/CredentialsModal.vue';
 import Menu from '@/components/header/Menu.vue';
 import ConnectStatus from '@/components/feedback/ConnectStatus.vue';
 import InfoSnackbar from '@/components/feedback/InfoSnackbar.vue';
@@ -51,7 +49,9 @@ import eventBus from '@/helpers/event-bus';
 
 export default defineComponent({
   components: {
-    AuthModal,
+    AuthModal: defineAsyncComponent(
+      () => import(/* webpackChunkName: 'auth-dialog' */ '@/components/user/AuthModal.vue'),
+    ),
     LanguageSuggestion,
     ConnectStatus,
     InfoSnackbar,
@@ -60,13 +60,20 @@ export default defineComponent({
     Menu,
     SpoilerEye,
     ThemeToggle,
-    CredentialsModal,
+    CredentialsModal: defineAsyncComponent(
+      () => import(/* webpackChunkName: 'credentials-dialog' */ '@/components/user/CredentialsModal.vue'),
+    ),
     DevPanel,
     AchievementPopupsContainer,
   },
   data() {
     return {
       currentLocale: this.$i18n.locale,
+      authRequested: false,
+      authOpen: false,
+      credentialsRequested: false,
+      credentialsOpen: false,
+      credentialsMode: 'email' as 'email' | 'login' | 'password',
     };
   },
   computed: {
@@ -78,6 +85,15 @@ export default defineComponent({
     },
   },
   methods: {
+    openAuthModal() {
+      this.authRequested = true;
+      this.authOpen = true;
+    },
+    openCredentialsModal(mode: 'email' | 'login' | 'password') {
+      this.credentialsRequested = true;
+      this.credentialsMode = mode;
+      this.credentialsOpen = true;
+    },
     profileClick() {
       if (this.$store.state.profile) {
         this.$router.push({ name: 'profile' });
@@ -86,7 +102,13 @@ export default defineComponent({
       }
     },
   },
+  beforeUnmount() {
+    eventBus.off('openAuthModal', this.openAuthModal);
+    eventBus.off('openCredentialsModal', this.openCredentialsModal);
+  },
   created() {
+    eventBus.on('openAuthModal', this.openAuthModal);
+    eventBus.on('openCredentialsModal', this.openCredentialsModal);
     document.documentElement.lang = this.currentLocale;
 
     if (isHolidays()) {

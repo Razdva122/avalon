@@ -6,7 +6,7 @@ const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 const sharp = require('sharp');
 
-test('avatar generation preserves optimized animation bytes and resizes static artwork', async (t) => {
+test('image generation preserves avatar animation and creates 512px avatars plus 128px skin thumbnails', async (t) => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'avalon-avatar-test-'));
   t.after(() => fs.rm(root, { recursive: true, force: true }));
   const source = path.join(root, 'src/assets/images');
@@ -18,6 +18,8 @@ test('avatar generation preserves optimized animation bytes and resizes static a
     .toBuffer();
   for (const name of [
     'roles/merlin',
+    'core/player-frame',
+    'features/plot_cards',
     'core/blue_team_no_background',
     'core/red_team_no_background',
     'features/lady_of_lake',
@@ -26,6 +28,8 @@ test('avatar generation preserves optimized animation bytes and resizes static a
   ]) {
     await fs.writeFile(path.join(source, name + '.webp'), still);
   }
+  await fs.mkdir(path.join(source, 'roles/anime'));
+  await fs.writeFile(path.join(source, 'roles/anime/merlin.webp'), still);
   const animation = await sharp(Buffer.concat([Buffer.alloc(16 * 16 * 3, 20), Buffer.alloc(16 * 16 * 3, 220)]), {
     raw: { width: 16, height: 32, channels: 3, pageHeight: 16 },
   })
@@ -43,4 +47,17 @@ test('avatar generation preserves optimized animation bytes and resizes static a
   const resized = await sharp(path.join(root, 'src/assets/avatars/roles/merlin.webp')).metadata();
   assert.equal(resized.width, 512);
   assert.equal(resized.height, 512);
+  for (const name of [
+    'roles/merlin',
+    'roles/anime/merlin',
+    'core/player-frame',
+    'core/blue_team_no_background',
+    'features/plot_cards',
+  ]) {
+    const thumbnail = path.join(root, 'src/assets/thumbnails', name + '.webp');
+    assert.ok(await fs.stat(thumbnail).catch(() => false), `Missing thumbnail: ${name}`);
+    const metadata = await sharp(thumbnail).metadata();
+    assert.equal(metadata.width, 128);
+    assert.equal(metadata.height, 128);
+  }
 });

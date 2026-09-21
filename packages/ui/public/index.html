@@ -45,7 +45,13 @@
     <title>Play Avalon Online!</title>
     <script id="page-structured-data" type="application/ld+json"></script>
     <script id="breadcrumb-structured-data" type="application/ld+json"></script>
-    <%= yaMetrika %> <%= gtag %>
+    <style>
+      .create-room[aria-busy='true'] {
+        cursor: progress;
+        opacity: 0.65;
+      }
+    </style>
+    <%= startup %> <%= yaMetrika %> <%= gtag %>
   </head>
   <body>
     <noscript>

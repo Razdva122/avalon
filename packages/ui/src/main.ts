@@ -1,4 +1,4 @@
-import 'material-design-icons-iconfont/dist/material-design-icons.css';
+import '@/styles/material-icons.css';
 
 import { createApp, createSSRApp, nextTick } from 'vue';
 
@@ -29,6 +29,21 @@ const app = (hydratePage || (prerender && ssrPage) ? createSSRApp : createApp)(A
 
 async function start() {
   await Promise.all([router.isReady(), fullStylesReady()]);
+  if (prerender) {
+    // Capture runtime dependencies BEFORE importing the build-only SSR renderer.
+    // Publishing its chunks as preloads would make visitors download the renderer.
+    for (const resource of performance.getEntriesByType('resource')) {
+      const url = new URL(resource.name);
+      if (url.origin !== location.origin || !/^\/js\/[^/]+\.js$/.test(url.pathname)) continue;
+      if (document.querySelector(`script[defer][src="${url.pathname}"], link[rel="preload"][href="${url.pathname}"]`))
+        continue;
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'script';
+      link.href = url.pathname;
+      document.head.appendChild(link);
+    }
+  }
   if (prerender && ssrPage) {
     const { prerenderPage } = await import('@/helpers/prerender-page');
     await prerenderPage(app, root);
@@ -45,6 +60,7 @@ async function start() {
   }
   await nextTick();
   if (prerender) root.dataset.prerenderReady = 'true';
+  else window.dispatchEvent(new Event('avalon:ready'));
 }
 
 // A neutral URL receives a lobby shell, which must not be mistaken for room content.

@@ -10,8 +10,18 @@
     <div class="exclusive-grid">
       <article v-for="item in items" :key="item.id" class="exclusive" :class="item.kind">
         <div class="exclusive-art">
-          <img v-if="item.kind === 'avatar'" :src="avatarPreviews[item.id]" :alt="t('premiumCosmetics.' + item.id)" />
-          <StickerImage v-else :id="item.id" />
+          <template v-if="imagesVisible">
+            <img
+              v-if="item.kind === 'avatar'"
+              :src="avatarPreviews[item.id]"
+              :alt="t('premiumCosmetics.' + item.id)"
+              width="512"
+              height="512"
+              loading="lazy"
+              decoding="async"
+            />
+            <StickerImage v-else :id="item.id" width="512" height="512" loading="lazy" decoding="async" />
+          </template>
         </div>
         <div class="exclusive-copy">
           <span class="exclusive-kind">{{ t('premiumCosmetics.' + item.kind) }}</span>
@@ -33,7 +43,7 @@
 import { getImagePathByID } from '@/helpers/images';
 import { useI18n } from 'vue-i18n';
 import StickerImage from '@/components/stickers/StickerImage.vue';
-defineProps<{ active: boolean; compact?: boolean }>();
+withDefaults(defineProps<{ active: boolean; compact?: boolean; imagesVisible?: boolean }>(), { imagesVisible: true });
 const { t } = useI18n();
 // Marketing previews remain visible even when gameplay cosmetics are disabled.
 const avatarPreviews: Record<string, string> = {

@@ -36,6 +36,26 @@ async function generateAvatars() {
     }
   }
   console.log(`Generated ${count} avatar previews (max 512 px).`);
+  const thumbnails = path.resolve(__dirname, '../src/assets/thumbnails');
+  fs.rmSync(thumbnails, { recursive: true, force: true });
+  const thumbnailGroups = {
+    roles: groups.roles,
+    core: [...groups.core, 'player-frame.webp'],
+    features: [...groups.features, 'plot_cards.webp'],
+  };
+  let thumbnailCount = 0;
+  for (const [group, files] of Object.entries(thumbnailGroups)) {
+    for (const name of files) {
+      const destination = path.join(thumbnails, group, name);
+      fs.mkdirSync(path.dirname(destination), { recursive: true });
+      await sharp(path.join(source, group, name))
+        .resize({ width: 128, height: 128, fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 85, alphaQuality: 100, effort: 4 })
+        .toFile(destination);
+      thumbnailCount++;
+    }
+  }
+  console.log(`Generated ${thumbnailCount} icon thumbnails (max 128 px).`);
 }
 
 generateAvatars().catch((error) => {

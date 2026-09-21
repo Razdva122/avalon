@@ -1,5 +1,5 @@
 <template>
-  <details class="support-benefits">
+  <details ref="benefits" class="support-benefits" @toggle="onBenefitsToggle">
     <summary>
       <span class="preview-heading">
         <span class="preview-title">{{ t('support.benefitsTitle') }}</span>
@@ -45,16 +45,26 @@
           >
         </p>
       </div>
-      <PremiumCollection :active="active" compact />
+      <PremiumCollection :active="active" :images-visible="imagesVisible" compact />
     </div>
   </details>
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import PremiumCollection from './PremiumCollection.vue';
 defineProps<{ active: boolean }>();
 const { t } = useI18n();
+const benefits = ref<HTMLDetailsElement>();
+const imagesVisible = ref(false);
+// Native disclosure may already be open from an interaction before hydration.
+onMounted(() => {
+  if (benefits.value?.open) imagesVisible.value = true;
+});
+function onBenefitsToggle(event: Event) {
+  if ((event.target as HTMLDetailsElement).open) imagesVisible.value = true;
+}
 const tiers = [
   {
     key: 'premium',

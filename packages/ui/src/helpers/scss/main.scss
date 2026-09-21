@@ -15,3 +15,7 @@
 @function getIconPathByName($name) {
   @return url('~@/assets/icons/#{$name}.webp');
 }
+
+@function getThumbnailPathByID($type, $id) {
+  @return url('~@/assets/thumbnails/#{$type}/#{$id}.webp');
+}

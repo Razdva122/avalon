@@ -186,3 +186,30 @@ Previews use the existing content-hash URLs, immutable cache and image release
 manifest. Both sizes are uploaded before the UI container is published. Opening a
 role page after an avatar may download the larger image separately. Old bucket
 objects remain available for old clients and delayed deployments.
+
+## Startup performance
+
+The HTML head queues one early **Create room** action until `avalon:ready` fires
+following hydration, preference restoration and Vue's next tick. Account dialogs
+load on demand; App owns their event-bus subscriptions so the opening event cannot
+be lost while a chunk loads. Analytics queues are installed immediately, but SDKs
+start after readiness plus a 1-second delay and idle callback (2-second timeout).
+A hidden-page fallback makes a best-effort attempt to load them for early exits;
+it cannot guarantee delivery when a browser closes the page immediately. Recovery
+pages and prerender never initialize analytics.
+
+Prerender captures route/dictionary preloads before importing its build-only SSR
+renderer. `check-bundle.cjs` validates complete HTML entry dependencies, including
+route chunks and locale fallbacks: 365 KiB gzip JS / 50 KiB gzip CSS per public
+entry, with 480 / 55 KiB for chart pages. It rejects renderer preloads and icon
+fonts over 25 KiB. Third-party SDKs are outside these first-party budgets.
+
+`check-startup.cjs` exercises an early click with JavaScript deliberately held,
+login close/reopen, article chunk isolation, and opening native premium details
+before hydration. Production `check:build` runs this along with existing browser
+checks. Premium copy stays in HTML; its media mounts only after first opening.
+
+Image preparation also generates 128px thumbnails. Small inline role icons,
+addon icons and team badges use them; full portraits and card artwork retain
+originals. The Material Icons subset is checked in; normal builds need no Python.
+See `src/assets/fonts/README.md` when adding icon names or updating Vuetify.

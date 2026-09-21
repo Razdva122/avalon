@@ -43,3 +43,46 @@ assert(!css.includes('Font Awesome'), 'Full icon font stylesheet has returned');
 console.log(
   `Bundle checks passed: no database runtime/full Lodash, initial JS ${(gzipBytes / 1024).toFixed(1)} KiB gzip; with English ${((gzipBytes + localeSizes.en) / 1024).toFixed(1)} KiB.`,
 );
+
+// Count the complete prerendered entry, not only app/vendors: route chunks and
+// both locale dictionaries are part of the visitor's real startup download.
+const compressed = new Map();
+function gzipSize(url) {
+  if (!compressed.has(url)) compressed.set(url, zlib.gzipSync(fs.readFileSync(path.join(dist, url))).length);
+  return compressed.get(url);
+}
+function htmlFiles(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const file = path.join(directory, entry.name);
+    return entry.isDirectory() ? htmlFiles(file) : file.endsWith('.html') ? [file] : [];
+  });
+}
+const buildOnly = new Set(
+  maps
+    .filter((file) => {
+      const { sources } = JSON.parse(fs.readFileSync(path.join(dist, 'js', file), 'utf8'));
+      return sources.some((source) => /@vue\/server-renderer|helpers\/prerender-page/.test(source));
+    })
+    .map((file) => `/js/${file.slice(0, -4)}`),
+);
+let maximum = 0;
+for (const file of htmlFiles(dist)) {
+  const html = fs.readFileSync(file, 'utf8');
+  const urls = [
+    ...new Set([...html.matchAll(/(?:src|href)="(\/(?:js|css)\/[^" ]+\.(?:js|css))"/g)].map((match) => match[1])),
+  ];
+  const js = urls.filter((url) => url.endsWith('.js'));
+  for (const url of js) assert(!buildOnly.has(url), `${file}: build-only renderer preloaded: ${url}`);
+  const jsBytes = js.reduce((sum, url) => sum + gzipSize(url), 0);
+  const cssBytes = urls.filter((url) => url.endsWith('.css')).reduce((sum, url) => sum + gzipSize(url), 0);
+  const charts = path.relative(dist, file).split(path.sep).includes('stats');
+  assert(jsBytes < (charts ? 480 : 365) * 1024, `${file}: route startup JS ${jsBytes} exceeds budget`);
+  assert(cssBytes < (charts ? 55 : 50) * 1024, `${file}: route CSS ${cssBytes} exceeds budget`);
+  maximum = Math.max(maximum, jsBytes);
+}
+const fonts = fs.readdirSync(path.join(dist, 'fonts')).filter((file) => file.endsWith('.woff2'));
+const fontBytes = fonts.reduce((sum, file) => sum + fs.statSync(path.join(dist, 'fonts', file)).size, 0);
+assert(fontBytes < 25 * 1024, `Initial icon fonts exceed 25 KiB: ${fontBytes}`);
+console.log(
+  `Route budgets passed: JS ≤365 KiB (charts ≤480), CSS ≤50 KiB (charts ≤55); font ${(fontBytes / 1024).toFixed(1)} KiB.`,
+);

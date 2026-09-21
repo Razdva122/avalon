@@ -83,7 +83,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import eventBus from '@/helpers/event-bus';
 import { validators } from '@/helpers/validators';
 import type { VForm } from 'vuetify/components';
 import BaseModal from '@/components/user/BaseModal.vue';
@@ -96,11 +95,24 @@ export default defineComponent({
     PasswordField,
     TextField,
   },
+  props: {
+    modelValue: Boolean,
+  },
+  emits: ['update:modelValue'],
+  computed: {
+    overlay: {
+      get(): boolean {
+        return this.modelValue;
+      },
+      set(value: boolean) {
+        this.$emit('update:modelValue', value);
+      },
+    },
+  },
   data() {
     const { profile } = this.$store.state;
 
     return {
-      overlay: false,
       mode: 'auth',
       username: profile?.name || '',
       password: '',
@@ -113,11 +125,6 @@ export default defineComponent({
         registrationForm: false,
       },
     };
-  },
-  mounted() {
-    eventBus.on('openAuthModal', () => {
-      this.displayAuthModal();
-    });
   },
   watch: {
     mode() {

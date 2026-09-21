@@ -34,3 +34,6 @@ pnpm-debug.log*
 
 # Local production operations notes; never publish.
 /.private-ops/
+
+# Generated small role and team icons.
+/packages/ui/src/assets/thumbnails/
