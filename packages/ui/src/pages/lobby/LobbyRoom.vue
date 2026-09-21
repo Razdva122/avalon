@@ -11,7 +11,7 @@
         <span v-else class="material-icons room-icon" aria-hidden="true">{{
           game.result ? 'flag' : canJoin ? 'meeting_room' : 'sports_esports'
         }}</span>
-        <span class="host-name">{{ userName }}</span>
+        <span class="host-name">{{ game.ai ? 'AI Avalon · 7 bots' : userName }}</span>
       </div>
       <OptionsPreview
         v-if="hasOptions"
@@ -45,7 +45,9 @@ const props = defineProps<{ game: TRoomInfo }>();
 const hostID = computed(() => props.game.hostID);
 const { userName } = useUserProfile(hostID);
 const game = toRef(props, 'game');
-const canJoin = computed(() => !game.value.result && game.value.state === 'created' && game.value.players < 10);
+const canJoin = computed(
+  () => !game.value.ai && !game.value.result && game.value.state === 'created' && game.value.players < 10,
+);
 const hasOptions = computed(() =>
   [...Object.values(game.value.options.roles), ...Object.values(game.value.options.addons)].some(Boolean),
 );

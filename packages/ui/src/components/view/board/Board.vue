@@ -132,7 +132,7 @@ export default defineComponent({
     });
 
     const userIsLeader = computed(() => {
-      return store.state.profile?.id === roomState.value.leaderID;
+      return !roomState.value.ai && store.state.profile?.id === roomState.value.leaderID;
     });
 
     const calculateRotate = (i: number, negative: boolean = false) => {

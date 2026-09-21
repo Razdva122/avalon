@@ -3,6 +3,7 @@ import type { GameOptions, GameResults } from '@avalon/types';
 export type TRoomsList = TRoomInfo[];
 
 export type TRoomInfo = {
+  ai?: boolean;
   hostID: string;
   players: number;
   state: 'created' | 'started' | 'locked';

@@ -1,3 +1,5 @@
+import { AiService } from '@/ai/service';
+import { BOT_PROFILES } from '@/ai/room';
 import { registerChatEndpoints } from '@/room/chat-endpoints';
 import { registerStickerEndpoints } from '@/stickers/endpoints';
 import { StickersManager } from '@/stickers';
@@ -26,6 +28,7 @@ import { AchievementManager } from '@/achievements';
 import { AvatarsManager } from '@/user/avatars';
 
 export class Manager {
+  aiService: AiService;
   stickersManager = new StickersManager();
   rooms: Dictionary<Room> = {};
   roomsList: TRoomsList = [];
@@ -61,6 +64,7 @@ export class Manager {
       this.roomsList = this.roomsList.filter((el) => el.uuid !== room.roomID);
     } else {
       const roomData: TRoomInfo = {
+        ai: Boolean(room.ai),
         hostID: room.leaderID,
         state: room.data.stage,
         options: room.options,
@@ -93,6 +97,7 @@ export class Manager {
   generateRoomsListFromDB(rooms: StartedRoomState[]) {
     const roomsInfo = rooms.map<TRoomInfo>((room) => {
       return {
+        ai: Boolean(room.ai),
         hostID: room.leaderID,
         state: 'started',
         options: room.options,
@@ -104,7 +109,11 @@ export class Manager {
       };
     });
 
-    this.roomsList.unshift(...roomsInfo);
+    // Existing live entries take precedence if a room was created during startup loading.
+    this.roomsList = [...new Map([...roomsInfo, ...this.roomsList].map((room) => [room.uuid, room])).values()]
+      .sort((a, b) => Date.parse(b.createAt) - Date.parse(a.createAt))
+      .slice(0, 50);
+    this.io.to('lobby').emit('roomsListUpdated', this.roomListCutted);
   }
 
   restartRoom(uuid: string) {
@@ -113,6 +122,8 @@ export class Manager {
     if (room == null) {
       throw new Error(`Cant find game for restart with uuid ${uuid}`);
     }
+
+    if (room.ai) throw new Error('Create a new AI room with AI controls');
 
     if (room.data.stage === 'started') {
       if (room.nextRoomID) {
@@ -134,6 +145,7 @@ export class Manager {
   }
 
   destroyRoom(uuid: string) {
+    if (this.rooms[uuid]?.ai) return;
     this.updateRoomsList(uuid, true);
     this.io.to(uuid).emit('destroyRoom', uuid);
     delete this.rooms[uuid];
@@ -150,11 +162,17 @@ export class Manager {
   constructor(io: Server, dbManager: DBManager) {
     this.io = io;
     this.dbManager = dbManager;
+    this.aiService = new AiService(this);
     this.avatarsManager = new AvatarsManager(dbManager);
     this.achievementManager = new AchievementManager(io);
 
-    this.dbManager.getLastRooms(20).then((rooms) => {
-      this.generateRoomsListFromDB(rooms);
+    void Promise.allSettled([
+      this.dbManager.getLastRooms(20),
+      this.aiService.repository?.recent(20) || Promise.resolve([]),
+    ]).then((results) => {
+      this.generateRoomsListFromDB(results.flatMap((result) => (result.status === 'fulfilled' ? result.value : [])));
+      if (results.some((result) => result.status === 'rejected'))
+        console.error('Could not load part of the saved rooms list');
     });
 
     eventBus.on('roomUpdated', (room) => {
@@ -164,7 +182,7 @@ export class Manager {
     eventBus.on('gameEnded', async (roomID) => {
       const room = this.rooms[roomID];
 
-      if (room) {
+      if (room && !room.ai) {
         // Save room to DB
         await this.saveRoomToDB(room);
 
@@ -223,9 +241,13 @@ export class Manager {
         socket.join(userState.userID);
       }
 
+      this.aiService.register(socket, userState.userID);
+
       socket.on('joinRoom', async (uuid, cb) => {
         const room = this.rooms[uuid];
-        const gameFromDB = room ? null : await this.dbManager.getRoomFromDB(uuid);
+        const gameFromDB = room
+          ? null
+          : (await this.dbManager.getRoomFromDB(uuid)) || (await this.aiService.repository?.load(uuid));
 
         if (room || gameFromDB) {
           socket.join(uuid);
@@ -291,7 +313,7 @@ export class Manager {
       });
 
       socket.on('getUserProfile', async (id, cb) => {
-        const publicUser = await dbManager.getPublicUserProfile(id);
+        const publicUser = BOT_PROFILES.find((p) => p.id === id) || (await dbManager.getPublicUserProfile(id));
 
         cb(publicUser);
       });
@@ -475,21 +497,21 @@ export class Manager {
     // Custom timer events
     socket.on('startCustomTimer', (uuid: string, durationSeconds: number) => {
       const room = this.rooms[uuid];
-      if (room.leaderID === userID && room.data.stage === 'started') {
+      if (!room.ai && room.leaderID === userID && room.data.stage === 'started') {
         room.data.manager.callGameMethods(userID, { method: 'startCustomTimer', durationSeconds });
       }
     });
 
     socket.on('addCustomTimerTime', (uuid: string, additionalSeconds: number) => {
       const room = this.rooms[uuid];
-      if (room.leaderID === userID && room.data.stage === 'started') {
+      if (!room.ai && room.leaderID === userID && room.data.stage === 'started') {
         room.data.manager.callGameMethods(userID, { method: 'addCustomTimerTime', additionalSeconds });
       }
     });
 
     socket.on('stopCustomTimer', (uuid: string) => {
       const room = this.rooms[uuid];
-      if (room.leaderID === userID && room.data.stage === 'started') {
+      if (!room.ai && room.leaderID === userID && room.data.stage === 'started') {
         room.data.manager.callGameMethods(userID, { method: 'stopCustomTimer' });
       }
     });
@@ -498,6 +520,7 @@ export class Manager {
   createMethodsForGame(socket: ServerSocket, userID: string): void {
     const getRoomManager = (uuid: string) => {
       const room = this.rooms[uuid];
+      if (room?.ai) throw new Error('AI players are controlled by the server');
       if (room.data.stage === 'started') {
         return room.data.manager;
       }

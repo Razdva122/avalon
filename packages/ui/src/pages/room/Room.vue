@@ -8,8 +8,9 @@
       >
     </template>
     <template v-else>
+      <AiRoomPanel v-if="roomState.ai" class="ai-room-status" :ai="roomState.ai" :roomID="roomState.roomID" />
       <Board :room-state="roomState">
-        <template v-slot:content>
+        <template v-if="roomState.vote" v-slot:content>
           <RoomVote v-if="roomState.vote" :roomUuid="roomState.roomID" :vote="roomState.vote" />
         </template>
         <template v-slot:restart>
@@ -33,7 +34,7 @@
       </div>
       <div class="right-info-container">
         <RatingChangesPanel
-          v-if="roomState.stage === 'started' && game.stage === 'end'"
+          v-if="!roomState.ai && roomState.stage === 'started' && game.stage === 'end'"
           :gameID="roomState.roomID"
           :gameState="game"
         />
@@ -60,6 +61,7 @@ import { useStore } from '@/store';
 import { GameStateManager } from '@/helpers/game-state-manager';
 import RolesInfo from '@/components/view/information/RolesInfo.vue';
 import CardsInfo from '@/components/view/information/CardsInfo.vue';
+import AiRoomPanel from '@/components/view/panels/AiRoomPanel.vue';
 import HostPanel from '@/components/view/panels/HostPanel.vue';
 import RoomVote from '@/components/view/panels/RoomVote.vue';
 import StickerPicker from '@/components/stickers/StickerPicker.vue';
@@ -73,6 +75,7 @@ export default defineComponent({
   name: 'Room',
   components: {
     Board,
+    AiRoomPanel,
     RolesInfo,
     CardsInfo,
     HostPanel,
@@ -120,6 +123,7 @@ export default defineComponent({
         errorMessage.value = stateFromBackend;
       } else {
         stateManager.mutateRoomState({ newRoomState: stateFromBackend, userID: userID.value });
+        if (stateFromBackend.ai) chatOpen.value = true;
       }
     };
 
@@ -169,7 +173,7 @@ export default defineComponent({
     watch(
       () => game.value?.result?.winner,
       (newWinner, oldWinner) => {
-        if (newWinner && !oldWinner) {
+        if (newWinner && !oldWinner && !roomState.value.ai) {
           setTimeout(() => {
             eventBus.emit('showRatingPanel');
           }, 1500);
@@ -178,12 +182,15 @@ export default defineComponent({
     );
 
     const displayHostPanel = computed(() => {
-      return roomState.value.leaderID === userID.value;
+      return !roomState.value.ai && roomState.value.leaderID === userID.value;
     });
 
     const displayRestartButton = computed(() => {
       return (
-        roomState.value.stage === 'started' && game.value.stage === 'end' && roomState.value.leaderID === userID.value
+        !roomState.value.ai &&
+        roomState.value.stage === 'started' &&
+        game.value.stage === 'end' &&
+        roomState.value.leaderID === userID.value
       );
     });
 
@@ -229,6 +236,22 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.ai-room-status {
+  position: fixed;
+  top: 65px;
+  left: 12px;
+  z-index: 12;
+  max-width: 330px;
+}
+@media (max-width: 600px) {
+  .ai-room-status {
+    top: 55px;
+    left: 4px;
+    max-width: calc(100vw - 24px);
+    font-size: 12px;
+  }
+}
+
 .online {
   opacity: 30%;
   font-size: large;

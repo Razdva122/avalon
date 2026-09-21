@@ -34,7 +34,16 @@ export class VoteInRoom {
   public result!: VoteRoomResult;
 }
 
+export type AiRoomState = {
+  status: 'ready' | 'running' | 'paused' | 'finished' | 'stopped';
+  costRub: number;
+  fallbacks: number;
+  message: string;
+};
+
 export class BaseRoomState {
+  public ai?: AiRoomState;
+
   @prop({ required: true })
   public stage!: 'created' | 'locked' | 'started';
 

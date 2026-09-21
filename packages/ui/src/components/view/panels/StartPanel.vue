@@ -1,43 +1,45 @@
 <template>
-  <v-btn color="info" class="mb-4" @click="onCopyClick">
-    <template v-slot:prepend>
-      <span class="material-icons"> share </span>
-    </template>
-    {{ $t('startPanel.copyLink') }}
-  </v-btn>
-  <v-btn :to="communityPath" color="info" class="mb-4">
-    <template v-slot:prepend>
-      <span class="material-icons" aria-hidden="true">groups</span>
-    </template>
-    {{ $t('community.title') }}
-  </v-btn>
-  <v-btn v-if="isUserInGame" color="warning" @click="onJoinClick"> {{ $t('startPanel.leaveGame') }} </v-btn>
-  <v-btn
-    v-else-if="roomState.players.length < 10"
-    color="info"
-    :disabled="roomState.stage !== 'created'"
-    @click="onJoinClick"
-  >
-    {{ $t('startPanel.joinGame') }}
-  </v-btn>
-  <template v-if="isUserLeader">
-    <v-btn class="mt-2" color="info" @click="onLockClick">
-      {{ roomState.stage === 'created' ? $t('startPanel.lockGame') : $t('startPanel.unlockGame') }}
+  <template v-if="!roomState.ai">
+    <v-btn color="info" class="mb-4" @click="onCopyClick">
+      <template v-slot:prepend>
+        <span class="material-icons"> share </span>
+      </template>
+      {{ $t('startPanel.copyLink') }}
     </v-btn>
-    <v-btn class="mt-2 mb-4" color="success" :disabled="isStartGameDisabled" @click="onStartClick">
-      {{ $t('startPanel.startGame') }}
+    <v-btn :to="communityPath" color="info" class="mb-4">
+      <template v-slot:prepend>
+        <span class="material-icons" aria-hidden="true">groups</span>
+      </template>
+      {{ $t('community.title') }}
     </v-btn>
-    <div class="d-flex flex-column gap-2">
-      <Options
-        :roles="options.roles"
-        :addons="options.addons"
-        :features="options.features"
-        :playerCount="roomState.players.length"
-        :buttonText="$t('startPanel.options')"
-        @apply="applyOptions"
-      />
-      <TimerButton :features="options.features" @update:features="updateFeatures" />
-    </div>
+    <v-btn v-if="isUserInGame" color="warning" @click="onJoinClick"> {{ $t('startPanel.leaveGame') }} </v-btn>
+    <v-btn
+      v-else-if="roomState.players.length < 10"
+      color="info"
+      :disabled="roomState.stage !== 'created'"
+      @click="onJoinClick"
+    >
+      {{ $t('startPanel.joinGame') }}
+    </v-btn>
+    <template v-if="isUserLeader">
+      <v-btn class="mt-2" color="info" @click="onLockClick">
+        {{ roomState.stage === 'created' ? $t('startPanel.lockGame') : $t('startPanel.unlockGame') }}
+      </v-btn>
+      <v-btn class="mt-2 mb-4" color="success" :disabled="isStartGameDisabled" @click="onStartClick">
+        {{ $t('startPanel.startGame') }}
+      </v-btn>
+      <div class="d-flex flex-column gap-2">
+        <Options
+          :roles="options.roles"
+          :addons="options.addons"
+          :features="options.features"
+          :playerCount="roomState.players.length"
+          :buttonText="$t('startPanel.options')"
+          @apply="applyOptions"
+        />
+        <TimerButton :features="options.features" @update:features="updateFeatures" />
+      </div>
+    </template>
   </template>
 </template>
 

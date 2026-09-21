@@ -6,6 +6,7 @@ import { Chat } from '@/room/chat';
 import * as _ from 'lodash';
 
 export class Room {
+  ai?: import('@avalon/types').AiRoomState;
   roomID: string;
   nextRoomID?: string;
   players: string[];
@@ -112,6 +113,7 @@ export class Room {
 
   calculateRoomState(userID?: string): TRoomState {
     const roomState = {
+      ai: this.ai,
       roomID: this.roomID,
       leaderID: this.leaderID,
       vote: this.vote,

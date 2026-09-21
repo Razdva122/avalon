@@ -9,6 +9,7 @@
         <h1 id="lobby-title">{{ $t('mainPage.header') }}</h1>
         <p class="lobby-intro">{{ $t('mainPage.intro') }}</p>
         <div class="lobby-actions">
+          <AiRoomButton />
           <v-btn class="create-room" color="primary" size="large" elevation="0" @click="createRoom">
             <span class="material-icons" aria-hidden="true">add</span>
             {{ $t('mainPage.createRoom') }}
@@ -123,10 +124,12 @@ import type { TRoomsList } from '@avalon/types';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import LobbyRoom from './LobbyRoom.vue';
+import AiRoomButton from './AiRoomButton.vue';
 import RotatingTopPlayer from '@/components/stats/RotatingTopPlayer.vue';
 
 export default defineComponent({
   components: {
+    AiRoomButton,
     LobbyRoom,
     RotatingTopPlayer,
   },
