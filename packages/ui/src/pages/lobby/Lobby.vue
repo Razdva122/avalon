@@ -198,10 +198,21 @@ export default defineComponent({
       if (roomCategory(room) === 'open') return room.options.features?.lookingForPlayers ? 0 : 1;
       return roomCategory(room) === 'finished' ? 3 : 2;
     };
+    const latestAiRoomID = computed(() => {
+      const aiRooms = (roomsList.value || []).filter((room) => room.ai);
+      return aiRooms.reduce<TRoomsList[number] | undefined>(
+        (latest, room) => (!latest || Date.parse(room.createAt) > Date.parse(latest.createAt) ? room : latest),
+        undefined,
+      )?.uuid;
+    });
     const visibleRooms = computed(() =>
       [...(roomsList.value || [])]
         .filter((room) => filter.value === 'all' || roomCategory(room) === filter.value)
-        .sort((a, b) => roomPriority(a) - roomPriority(b)),
+        .sort(
+          (a, b) =>
+            Number(b.uuid === latestAiRoomID.value) - Number(a.uuid === latestAiRoomID.value) ||
+            roomPriority(a) - roomPriority(b),
+        ),
     );
     const filterCount = (value: string) =>
       (roomsList.value || []).filter((room) => value === 'all' || roomCategory(room) === value).length;
