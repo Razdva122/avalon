@@ -1,6 +1,6 @@
 import { tablePolicy } from './table-policy';
-import { AiOutputLimit, AiPause, compactRequest, systemFor, yandexDecide } from './client';
-import type { BotRequest, Decide, GenerationOptions, DecisionEvidence } from './client';
+import { AiMatchBudgetPause, AiOutputLimit, AiPause, compactRequest, systemFor, yandexDecide } from './client';
+import type { BotReply, BotRequest, Decide, GenerationOptions, DecisionEvidence } from './client';
 import type { AiRepository } from './repository';
 
 // Explicit allowlist: never pass roles, own cards, private checks or decision notes to the speaker.
@@ -156,10 +156,13 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
       }
     }
   };
+  let pending: { key: string; reply: BotReply } | undefined;
   const evidence = new Map<string, DecisionEvidence[]>();
   const notes = new Map<string, { stage: string; mission?: number; proposal?: number; choice: string }[]>();
   return async (request, signal) => {
     try {
+      const key = JSON.stringify(request);
+      if (pending?.key !== key) pending = undefined;
       signal?.throwIfAborted();
       if (request.state.stage === 'onMission' && request.choices.length === 1) return { choice: 0, speech: '' };
       const own = request.state.players?.find((p) => p.id === request.playerID);
@@ -173,32 +176,35 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
       const decisionRequest = { ...request, choices: policy.choices };
       if (policy.publicReason) decisionRequest.task += ` Required public stance: ${policy.publicReason}`;
       const { missions, votes, ...current } = compactRequest(decisionRequest);
-      const reply = await complete(
-        { ...decisionRequest, speak: true },
-        {
-          snapshot: true,
-          phase: finalReview ? 'review' : 'decision',
-          reasoning: finalReview ? 'none' : reasoning,
-          decisionDetails: !finalReview,
-          maxOutput: finalReview ? 384 : reasoning === 'default' ? 4096 : 640,
-          instructions: finalReview
-            ? systemFor(request) +
-              ' Write at most three short factual sentences: outcome and decisive final event; one actual action of yours; one specific correction. Do not claim an earlier mission ended the game. Fail cards are not a limited resource. Distinguish what was known at the time from revealed roles. Do not invent lesson or motive. Select one ID from yourActions and mention that exact action in your review. An automaticProposals entry is NOT a vote you cast. Never recommend an action identical to the one you actually took as a correction. If no justified correction follows from the facts available then, say what remained uncertain instead of inventing a mistake. Evaluate your action using knowledge and legal options available THEN, not newly revealed roles. Lady of the Lake first becomes available after mission 2; never recommend checking earlier. Merlin sees Morgana and ordinary Evil but not Mordred; never claim Merlin was blind to Morgana. Name a feasible improvement to an actual decision; do not invent a mistake just to supply a lesson.'
-            : decisionInstructions(request),
-          context: finalReview
-            ? reviewContext(request)
-            : {
-                ...current,
-                completedMissions: missions,
-                rejectedProposals: (votes || []).filter((v) => v.result === 'reject'),
-                approvedProposals: (votes || []).filter((v) => v.result !== 'reject'),
-                speak: true,
-                previousDecisions: notes.get(request.playerID) || [],
-                modelHypotheses: evidence.get(request.playerID) || [],
-              },
-        },
-        signal,
-      );
+      const reply =
+        pending?.reply ??
+        (await complete(
+          { ...decisionRequest, speak: true },
+          {
+            snapshot: true,
+            phase: finalReview ? 'review' : 'decision',
+            reasoning: finalReview ? 'none' : reasoning,
+            decisionDetails: !finalReview,
+            maxOutput: finalReview ? 384 : reasoning === 'default' ? 4096 : 640,
+            instructions: finalReview
+              ? systemFor(request) +
+                ' Write at most three short factual sentences: outcome and decisive final event; one actual action of yours; one specific correction. Do not claim an earlier mission ended the game. Fail cards are not a limited resource. Distinguish what was known at the time from revealed roles. Do not invent lesson or motive. Select one ID from yourActions and mention that exact action in your review. An automaticProposals entry is NOT a vote you cast. Never recommend an action identical to the one you actually took as a correction. If no justified correction follows from the facts available then, say what remained uncertain instead of inventing a mistake. Evaluate your action using knowledge and legal options available THEN, not newly revealed roles. Lady of the Lake first becomes available after mission 2; never recommend checking earlier. Merlin sees Morgana and ordinary Evil but not Mordred; never claim Merlin was blind to Morgana. Name a feasible improvement to an actual decision; do not invent a mistake just to supply a lesson.'
+              : decisionInstructions(request),
+            context: finalReview
+              ? reviewContext(request)
+              : {
+                  ...current,
+                  completedMissions: missions,
+                  rejectedProposals: (votes || []).filter((v) => v.result === 'reject'),
+                  approvedProposals: (votes || []).filter((v) => v.result !== 'reject'),
+                  speak: true,
+                  previousDecisions: notes.get(request.playerID) || [],
+                  modelHypotheses: evidence.get(request.playerID) || [],
+                },
+          },
+          signal,
+        ));
+      pending = { key, reply };
       signal?.throwIfAborted();
       const choice = policy.choices[reply.choice];
       if (choice === undefined) throw new AiPause('Invalid private decision.');
@@ -247,8 +253,10 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
           },
         ].slice(-4),
       );
+      pending = undefined;
       return { choice: request.choices.indexOf(choice), speech };
     } catch (error) {
+      if (!(error instanceof AiMatchBudgetPause)) pending = undefined;
       // Never execute the room's fallback action after a partial two-call turn.
       throw error instanceof AiPause ? error : new AiPause('AI decision or speech failed. Match paused.');
     }

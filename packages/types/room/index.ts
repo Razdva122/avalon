@@ -36,6 +36,7 @@ export class VoteInRoom {
 
 export type AiRoomState = {
   status: 'ready' | 'running' | 'paused' | 'finished' | 'stopped';
+  canResumeBudget?: boolean;
   costRub?: number;
   model?: string;
   fallbacks: number;

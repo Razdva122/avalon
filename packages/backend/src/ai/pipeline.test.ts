@@ -264,3 +264,16 @@ test('review distinguishes forced acceptance from an actual vote and names real 
   expect(c.yourActions.some((a: { type: string }) => a.type === 'vote')).toBe(false);
   expect(c.automaticProposals).toHaveLength(1);
 });
+
+test('budget resume retries only unpaid public speech and keeps the already paid private choice', async () => {
+  const { AiMatchBudgetPause } = await import('./client');
+  const generate = jest
+    .fn()
+    .mockResolvedValueOnce({ choice: 1, speech: 'Private reason.', publicReason: 'Too little evidence.' })
+    .mockRejectedValueOnce(new AiMatchBudgetPause('Match budget', 1000))
+    .mockResolvedValueOnce({ choice: 0, speech: 'Too little evidence.' });
+  const decide = decisionPipeline(generate);
+  await expect(decide(request)).rejects.toBeInstanceOf(AiMatchBudgetPause);
+  expect(await decide(structuredClone(request))).toEqual({ choice: 1, speech: 'Too little evidence.' });
+  expect(generate.mock.calls.map(([, options]) => options.phase)).toEqual(['decision', 'speech', 'speech']);
+});

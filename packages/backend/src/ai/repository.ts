@@ -1,6 +1,6 @@
 import type { Db } from 'mongodb';
 import type { AiBudgetSnapshot, StartedRoomState, TRoomState } from '@avalon/types';
-import { AiPause } from './client';
+import { AiPause, AiMatchBudgetPause } from './client';
 
 export type AiRequestLog = {
   _id: string;
@@ -43,6 +43,7 @@ type Ledger = {
   _id: string;
   used: number;
   rooms: Record<string, number>;
+  roomLimits?: Record<string, number>;
   owner?: string;
   leaseUntil?: Date;
   anchor?: number;
@@ -129,6 +130,7 @@ export class AiRepository {
     const roomKey = `rooms.${roomID}`;
     const ledger = await this.ledger.findOne({ _id: this.options.ledgerID || 'avalon-ai-v1' });
     if (!ledger || ledger.owner !== roomID) throw new AiPause('Потеряно управление AI-партией.');
+    const matchRub = ledger.roomLimits?.[roomID] ?? this.matchRub;
     const period = this.period(ledger);
     const totalKey = period === undefined ? 'used' : `periods.${period}`;
     const result = await this.ledger.updateOne(
@@ -138,7 +140,7 @@ export class AiRepository {
         $expr: {
           $and: [
             { $lte: [{ $ifNull: [`$${totalKey}`, 0] }, Math.floor(this.totalRub * 10000) - units] },
-            { $lte: [{ $ifNull: [`$${roomKey}`, 0] }, Math.floor(this.matchRub * 10000) - units] },
+            { $lte: [{ $ifNull: [`$${roomKey}`, 0] }, Math.floor(matchRub * 10000) - units] },
           ],
         },
       },
@@ -152,15 +154,46 @@ export class AiRepository {
       if (current?.owner !== roomID) throw new AiPause('Потеряно управление AI-партией.');
       const roomRub = (current.rooms[roomID] || 0) / 10000;
       const budget = await this.budget();
-      if (roomRub + units / 10000 > this.matchRub)
-        throw new AiPause(
-          `Лимит партии ${this.matchRub} ₽: использовано ${roomRub.toFixed(2)} ₽, резерв запроса ${(units / 10000).toFixed(2)} ₽.`,
+      if (roomRub + units / 10000 > matchRub)
+        throw new AiMatchBudgetPause(
+          `Лимит партии ${matchRub} ₽: использовано ${roomRub.toFixed(2)} ₽, резерв запроса ${(units / 10000).toFixed(2)} ₽.`,
+          units,
         );
       throw new AiPause(
         `Лимит бюджета ${this.totalRub} ₽: использовано ${budget.usedRub.toFixed(2)} ₽, резерв запроса ${(units / 10000).toFixed(2)} ₽.`,
       );
     }
     return period === undefined ? undefined : String(period);
+  }
+  async roomLimit(roomID: string) {
+    const ledger = await this.ledger.findOne({ _id: this.options.ledgerID || 'avalon-ai-v1' });
+    return ledger?.roomLimits?.[roomID] ?? this.matchRub;
+  }
+  async doubleMatchLimit(roomID: string, reserveUnits: number) {
+    if (!/^[a-zA-Z0-9-]{1,80}$/.test(roomID) || !Number.isSafeInteger(reserveUnits) || reserveUnits <= 0)
+      throw new AiPause('Invalid resume request');
+    const ledger = await this.ledger.findOne({ _id: this.options.ledgerID || 'avalon-ai-v1' });
+    if (!ledger || ledger.owner !== roomID) throw new AiPause('Потеряно управление AI-партией.');
+    const previous = ledger.roomLimits?.[roomID];
+    const next = (previous ?? this.matchRub) * 2;
+    if (
+      !Number.isSafeInteger(Math.floor(next * 10000)) ||
+      (ledger.rooms[roomID] || 0) + reserveUnits > Math.floor(next * 10000)
+    )
+      throw new AiPause('Удвоенного лимита недостаточно для следующего запроса.');
+    const period = this.period(ledger);
+    const totalKey = period === undefined ? 'used' : `periods.${period}`;
+    const result = await this.ledger.updateOne(
+      {
+        _id: ledger._id,
+        owner: roomID,
+        [`roomLimits.${roomID}`]: previous ?? { $exists: false },
+        $expr: { $lte: [{ $ifNull: [`$${totalKey}`, 0] }, Math.floor(this.totalRub * 10000) - reserveUnits] },
+      },
+      { $set: { [`roomLimits.${roomID}`]: next } },
+    );
+    if (!result.matchedCount) throw new AiPause('Лимит бюджета исчерпан или состояние партии изменилось.');
+    return next;
   }
   async settle(roomID: string, reserved: number, actual: number, period?: string) {
     if (
@@ -227,6 +260,7 @@ export class AiRepository {
     return states;
   }
   private archiveState(state: StartedRoomState) {
+    if (state.ai) state.ai.canResumeBudget = false;
     if (state.ai && ['running', 'paused'].includes(state.ai.status)) {
       state.ai.status = 'stopped';
       state.ai.message = 'Сохранённая незавершённая партия. После перезапуска создайте новую.';

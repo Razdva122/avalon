@@ -9,11 +9,13 @@ export function useAiAccess(roomIDs: Ref<string[]> = computed(() => [])) {
   const canManage = ref(false);
   const costs = ref<Record<string, number>>({});
   const budget = ref<AiBudgetSnapshot>();
+  const limits = ref<Record<string, number>>({});
   let version = 0;
   const clear = () => {
     version++;
     canManage.value = false;
     costs.value = {};
+    limits.value = {};
     budget.value = undefined;
   };
   async function refresh() {
@@ -29,6 +31,7 @@ export function useAiAccess(roomIDs: Ref<string[]> = computed(() => [])) {
       if (!access.canManage) {
         budget.value = undefined;
         costs.value = {};
+        limits.value = {};
         return;
       }
       const summary = await socket.timeout(5000).emitWithAck('getAiBudget');
@@ -41,6 +44,7 @@ export function useAiAccess(roomIDs: Ref<string[]> = computed(() => [])) {
       const ids = roomIDs.value.slice(0, 50);
       if (!ids.length) {
         costs.value = {};
+        limits.value = {};
         return;
       }
       const result = await socket.timeout(5000).emitWithAck('getAiRoomCosts', ids);
@@ -50,6 +54,7 @@ export function useAiAccess(roomIDs: Ref<string[]> = computed(() => [])) {
         return;
       }
       costs.value = result.costs;
+      limits.value = result.limits;
     } catch {
       if (current === version) clear();
     }
@@ -71,5 +76,5 @@ export function useAiAccess(roomIDs: Ref<string[]> = computed(() => [])) {
     socket.off('connect', refresh);
     socket.off('disconnect', clear);
   });
-  return { canManage, costs, budget };
+  return { canManage, costs, limits, budget, refresh };
 }

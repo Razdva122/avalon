@@ -1,4 +1,5 @@
 export default {
+  resumeBudget: '繼續 · 將限額提高至 {limit} ₽（×2）',
   budgetResetIn: '額度重設倒數：{days}天{hours}小時{minutes}分鐘',
   budgetResetPending: '週期已結束，正在更新預算…',
   periodBudget: '30天預算',

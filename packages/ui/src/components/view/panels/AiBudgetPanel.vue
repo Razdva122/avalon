@@ -11,7 +11,7 @@
       {{ $t(resetIn.expired ? 'aiArena.budgetResetPending' : 'aiArena.budgetResetIn', resetIn) }}
     </p>
     <p>
-      {{ $t('aiArena.gameBudget', { limit: budget.matchLimitRub })
+      {{ $t('aiArena.gameBudget', { limit: matchLimit ?? budget.matchLimitRub })
       }}<span v-if="cost !== undefined"> · {{ cost.toFixed(2) }} ₽</span>
     </p>
     <small>{{ $t('aiArena.budgetReserved') }}</small>
@@ -22,7 +22,7 @@ import type { AiBudgetSnapshot } from '@avalon/types';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 import { useNow } from '@vueuse/core';
-const props = defineProps<{ budget: AiBudgetSnapshot; cost?: number }>();
+const props = defineProps<{ budget: AiBudgetSnapshot; cost?: number; matchLimit?: number }>();
 const { locale } = useI18n();
 const now = useNow({ interval: 1000 });
 const resetIn = computed(() => {

@@ -27,6 +27,14 @@ export type DecisionEvidence = {
 export type BotReply = { choice: number; speech: string; publicReason?: string; evidence?: DecisionEvidence[] };
 export type Decide = (request: BotRequest, signal?: AbortSignal) => Promise<BotReply>;
 export class AiPause extends Error {}
+export class AiMatchBudgetPause extends AiPause {
+  constructor(
+    message: string,
+    public reserveUnits: number,
+  ) {
+    super(message);
+  }
+}
 export class AiOutputLimit extends AiPause {
   constructor(limit: number) {
     super(`Qwen исчерпал лимит ответа (${limit} токенов), не завершив решение. Партия приостановлена.`);

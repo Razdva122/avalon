@@ -71,6 +71,7 @@ test('every admin request reads current database permissions, including archived
   const load = jest.fn(async () => ({ ai: { costRub: 18.4 } }));
   service.repository = {
     load,
+    roomLimit: async () => 150,
     budget: async () => ({ limitRub: 3000, usedRub: 40, remainingRub: 2960, matchLimitRub: 150 }),
   } as unknown as AiRepository;
   const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
@@ -89,7 +90,7 @@ test('every admin request reads current database permissions, including archived
   });
   const success = jest.fn();
   await handlers.getAiRoomCosts(['archive'], success);
-  expect(success).toHaveBeenCalledWith({ costs: { archive: 18.4 } });
+  expect(success).toHaveBeenCalledWith({ costs: { archive: 18.4 }, limits: { archive: 150 } });
   for (isAdmin of [false, undefined, 'true', 1]) {
     const access = jest.fn();
     await handlers.getAiRoomAccess(access);
@@ -99,6 +100,7 @@ test('every admin request reads current database permissions, including archived
       ['getAiBudget', []],
       ['controlAiRoom', ['archive', 'start']],
       ['controlAiRoom', ['archive', 'stop']],
+      ['controlAiRoom', ['archive', 'resumeBudget']],
       ['getAiRoomCosts', [['archive']]],
     ] as const) {
       const cb = jest.fn();
@@ -142,4 +144,66 @@ test('spectator reveal is AI-only, returns only roles and never mutates player k
   expect(JSON.stringify(room.calculateRoomState())).toBe(before);
   for (const id of ['normal', 'missing', '__proto__', null, []]) expect(await request(id)).toHaveProperty('error');
   expect(await request('reveal', room.players[0])).toHaveProperty('error');
+});
+
+test('admin budget resume doubles once, waits for old run cleanup and rejects other pause reasons', async () => {
+  const { AiMatchBudgetPause, AiPause } = await import('./client');
+  const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
+  const room = new BotRoom('resume', 'owner', io, async () => {
+    throw new AiMatchBudgetPause('Match budget', 2000);
+  });
+  const host = {
+    rooms: { resume: room },
+    io,
+    updateRoomsList: jest.fn(),
+    dbManager: { getUserByID: async () => ({ isAdmin: true }) },
+  } as unknown as Manager;
+  const service = new AiService(host);
+  let release: () => void = () => {};
+  const doubleMatchLimit = jest.fn(async () => 300);
+  service.repository = {
+    claim: async () => {},
+    save: async () => {},
+    doubleMatchLimit,
+    release: () =>
+      new Promise<void>((resolve) => {
+        release = resolve;
+      }),
+  } as unknown as AiRepository;
+  const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
+  service.register(
+    {
+      on: (name: string, handler: any) => {
+        handlers[name] = handler;
+      },
+    } as unknown as ServerSocket,
+    'owner',
+  );
+  const control = async (action: string) => {
+    const cb = jest.fn();
+    await handlers.controlAiRoom('resume', action, cb);
+    return cb.mock.calls[0][0];
+  };
+  expect(await control('resumeBudget')).toHaveProperty('error');
+  expect(await control('start')).toEqual({ ok: true });
+  await new Promise((resolve) => setImmediate(resolve));
+  expect(room.ai?.canResumeBudget).toBe(true);
+  expect(await control('resumeBudget')).toHaveProperty('error');
+  expect(doubleMatchLimit).not.toHaveBeenCalled();
+  release();
+  await new Promise((resolve) => setImmediate(resolve));
+  const responses = await Promise.all([control('resumeBudget'), control('resumeBudget')]);
+  expect(responses.filter((r) => r.ok)).toHaveLength(1);
+  expect(doubleMatchLimit).toHaveBeenCalledTimes(1);
+  expect(doubleMatchLimit).toHaveBeenCalledWith('resume', 2000);
+  await new Promise((resolve) => setImmediate(resolve));
+  release();
+  await new Promise((resolve) => setImmediate(resolve));
+  const other = new BotRoom('resume', 'owner', io, async () => {
+    throw new AiPause('Context limit');
+  });
+  await other.run();
+  host.rooms.resume = other;
+  expect(await control('resumeBudget')).toHaveProperty('error');
+  expect(doubleMatchLimit).toHaveBeenCalledTimes(1);
 });

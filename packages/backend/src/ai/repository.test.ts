@@ -178,3 +178,23 @@ test('concurrent production reservations enforce the period ceiling independentl
   await expect(repo.reserve('other', 1)).rejects.toThrow('Лимит бюджета');
   expect(await repo.budget()).toMatchObject({ usedRub: 1, remainingRub: 0 });
 });
+
+test('doubling one match cap persists, preserves spending and cannot bypass the shared budget', async () => {
+  const db = client.db('resume-budget');
+  const repo = new AiRepository(db, 3, 1);
+  await repo.claim('match');
+  await repo.reserve('match', 9000);
+  await expect(repo.reserve('match', 2000)).rejects.toMatchObject({ reserveUnits: 2000 });
+  expect(await repo.doubleMatchLimit('match', 2000)).toBe(2);
+  const restarted = new AiRepository(db, 3, 1);
+  expect(await restarted.roomLimit('match')).toBe(2);
+  expect(await restarted.roomLimit('other')).toBe(1);
+  expect(await restarted.roomCost('match')).toBe(0.9);
+  await restarted.reserve('match', 11000);
+  expect(await restarted.doubleMatchLimit('match', 5000)).toBe(4);
+  await restarted.reserve('match', 10000);
+  await expect(restarted.reserve('match', 1)).rejects.toThrow('Лимит бюджета');
+  await expect(restarted.doubleMatchLimit('match', 1)).rejects.toThrow('Лимит бюджета');
+  expect(await restarted.roomLimit('match')).toBe(4);
+  expect((await restarted.budget()).usedRub).toBe(3);
+});

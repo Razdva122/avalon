@@ -1,7 +1,7 @@
 import { Room } from '@/room';
 import type { GameOptions, Server, TRoomState, PublicUserProfile } from '@avalon/types';
 import type { TGameMethodsParams } from '@/core/game-manager';
-import { AiPause, type Decide, type BotRequest, type BotReply } from './client';
+import { AiPause, AiMatchBudgetPause, type Decide, type BotRequest, type BotReply } from './client';
 
 export const BOT_PROFILES: PublicUserProfile[] = ['Alice', 'Ben', 'Clara', 'Daniel', 'Emma', 'Felix', 'Grace'].map(
   (name, i) => ({ id: `avalon-ai-${i + 1}`, name: `${name} · AI`, avatar: 'servant' }),
@@ -29,6 +29,11 @@ function combinations(ids: string[], count: number): string[][] {
 
 export class BotRoom extends Room {
   private cancelled = false;
+  private executing = false;
+  budgetResumeUnits = 0;
+  private discussion?: { votes: Map<string, 'approve' | 'reject'> };
+  private revealedCouncil = 0;
+  private reviewedPlayers = new Set<string>();
   private abort = new AbortController();
   private failures = 0;
   private calls = 0;
@@ -87,6 +92,7 @@ export class BotRoom extends Room {
     this.cancelled = true;
     this.abort.abort();
     this.ai!.status = 'stopped';
+    this.ai!.canResumeBudget = false;
     this.ai!.message = 'Stopped by the administrator.';
     if (this.data.stage === 'started' && this.data.manager.game.stage !== 'end')
       this.data.manager.game.endGame('manualy');
@@ -249,21 +255,26 @@ export class BotRoom extends Room {
   private async discussTeam() {
     const id = this.manager.game.leader.userID;
     const choices = this.teams(id);
-    const proposal = await this.ask(id, 'Propose a team and explain your choice', choices, true);
-    if (!proposal) return;
-    this.apply(id, choices[proposal.choice]);
+    if (!this.discussion) {
+      const proposal = await this.ask(id, 'Propose a team and explain your choice', choices, true);
+      if (!proposal) return;
+      this.apply(id, choices[proposal.choice]);
+      this.discussion = { votes: new Map() };
+    }
     const seats = this.players;
     const offset = seats.indexOf(id);
     const order = [...seats.slice(offset + 1), ...seats.slice(0, offset)];
     if (this.manager.game.turn === 4) {
       this.manager.callGameMethods(id, { method: 'sentSelectedPlayers' });
+      this.discussion = undefined;
       return;
     }
     // One request per voter returns both public argument and the binding vote.
     // Earlier speakers do not revise their vote in this economical single-circle format.
-    const votes = new Map<string, 'approve' | 'reject'>();
+    const votes = this.discussion.votes;
     const choicesForVote = ['approve', 'reject'].map((text) => ({ text, actions: [] }));
     for (const player of [...order, id]) {
+      if (votes.has(player)) continue;
       const answer = await this.ask(
         player,
         player === id
@@ -275,6 +286,7 @@ export class BotRoom extends Room {
       if (!answer) return;
       votes.set(player, answer.choice === 0 ? 'approve' : 'reject');
     }
+    this.discussion = undefined;
     this.manager.callGameMethods(id, { method: 'sentSelectedPlayers' });
     for (const [player, option] of votes) {
       if (this.cancelled || this.manager.game.stage !== 'votingForTeam') break;
@@ -339,6 +351,7 @@ export class BotRoom extends Room {
             actions: [...this.select([p.id]), { method: 'assassinate', type: 'merlin' }],
           }));
         for (const ally of state.players.filter((p) => ['evil', 'mordred', 'morgana', 'minion'].includes(p.role))) {
+          if (this.evilCouncil.some((entry) => entry.seat === this.label(ally.id))) continue;
           const suggestion = await this.ask(
             ally.id,
             'Private Evil council: suggest whom to assassinate, cite the strongest clue and compare an alternative. Respond to earlier teammates. This is advice, not the final shot.',
@@ -367,28 +380,38 @@ export class BotRoom extends Room {
     }
   }
 
-  async run() {
-    if (this.ai!.status !== 'ready') return;
+  async run(resumeBudget = false) {
+    if (
+      this.executing ||
+      (resumeBudget ? this.ai!.status !== 'paused' || !this.ai!.canResumeBudget : this.ai!.status !== 'ready')
+    )
+      return;
+    this.executing = true;
+    this.ai!.canResumeBudget = false;
+    this.budgetResumeUnits = 0;
     this.ai!.status = 'running';
-    super.startGame();
     try {
+      if (!resumeBudget) super.startGame();
       while (!this.cancelled && this.manager.game.stage !== 'end') {
         await this.act();
         await this.checkpoint(this.calculateRoomState());
       }
       if (!this.cancelled) {
-        for (const entry of this.evilCouncil) {
+        for (; this.revealedCouncil < this.evilCouncil.length; this.revealedCouncil++) {
+          const entry = this.evilCouncil[this.revealedCouncil];
           const player = this.manager.game.players.find((p) => `${p.index}` === entry.seat)!;
           await this.publish(player.userID, `Evil council (revealed): Target ${entry.target}. ${entry.reason}`);
         }
         for (const id of this.players) {
           if (this.cancelled) break;
+          if (this.reviewedPlayers.has(id)) continue;
           await this.ask(
             id,
             'Post-game conclusion: explain why YOUR side won or lost using specific mission/vote events, your own mistake or contribution, and one lesson. All roles are now public. Do not invent events.',
             [{ text: 'Write your conclusion', actions: [] }],
             true,
           );
+          this.reviewedPlayers.add(id);
         }
       }
       if (!this.cancelled) {
@@ -396,12 +419,19 @@ export class BotRoom extends Room {
         this.ai!.message = 'Match complete. Roles revealed and discussion saved.';
       }
     } catch (error) {
+      if (this.cancelled) return;
+      this.ai!.canResumeBudget = error instanceof AiMatchBudgetPause;
+      this.budgetResumeUnits = error instanceof AiMatchBudgetPause ? error.reserveUnits : 0;
       this.ai!.status = 'paused';
       this.ai!.message =
         error instanceof AiPause ? error.message : 'Match paused due to an error. No further requests will be made.';
     } finally {
       this.updateRoomState(true);
-      await this.checkpoint(this.calculateRoomState());
+      try {
+        await this.checkpoint(this.calculateRoomState());
+      } finally {
+        this.executing = false;
+      }
     }
   }
 }

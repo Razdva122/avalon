@@ -125,13 +125,13 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
   getAiBudget: (callback: (result: { budget: import('../room').AiBudgetSnapshot } | { error: string }) => void) => void;
   getAiRoomCosts: (
     roomIDs: string[],
-    callback: (result: { costs: Record<string, number> } | { error: string }) => void,
+    callback: (result: { costs: Record<string, number>; limits: Record<string, number> } | { error: string }) => void,
   ) => void;
   getAiRoomAccess: (callback: (result: { canManage: boolean; roomID?: string }) => void) => void;
   createAiRoom: (callback: (result: { roomID: string } | { error: string }) => void) => void;
   controlAiRoom: (
     roomID: string,
-    action: 'start' | 'stop',
+    action: 'start' | 'stop' | 'resumeBudget',
     callback: (result: { ok: true } | { error: string }) => void,
   ) => void;
   createRoom: (callback: (uuid: string) => void) => void;

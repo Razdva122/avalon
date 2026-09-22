@@ -16,6 +16,14 @@
         $t('aiArena.start')
       }}</v-btn>
       <v-btn
+        v-if="ai.status === 'paused' && ai.canResumeBudget && limits[roomID] !== undefined"
+        color="success"
+        :loading="busy"
+        @click="control('resumeBudget')"
+      >
+        {{ $t('aiArena.resumeBudget', { limit: limits[roomID] * 2 }) }}
+      </v-btn>
+      <v-btn
         v-if="['ready', 'running', 'paused'].includes(ai.status)"
         color="warning"
         :disabled="busy"
@@ -23,7 +31,7 @@
         >{{ $t('aiArena.stop') }}</v-btn
       >
     </div>
-    <AiBudgetPanel v-if="canManage && budget" :budget="budget" :cost="costs[roomID]" />
+    <AiBudgetPanel v-if="canManage && budget" :budget="budget" :cost="costs[roomID]" :match-limit="limits[roomID]" />
     <p v-if="error" role="alert">{{ error }}</p>
   </section>
 </template>
@@ -36,7 +44,7 @@ import { socket } from '@/api/socket';
 import type { AiRoomState, TRoles } from '@avalon/types';
 const props = defineProps<{ ai: AiRoomState; roomID: string; canReveal?: boolean; rolesShown?: boolean }>();
 const { t } = useI18n();
-const { canManage, costs, budget } = useAiAccess(computed(() => [props.roomID]));
+const { canManage, costs, limits, budget, refresh } = useAiAccess(computed(() => [props.roomID]));
 const emit = defineEmits<{ roles: [value: Record<string, TRoles>] }>();
 const revealing = ref(false);
 async function toggleRoles() {
@@ -57,12 +65,13 @@ async function toggleRoles() {
 }
 const busy = ref(false);
 const error = ref('');
-async function control(action: 'start' | 'stop') {
+async function control(action: 'start' | 'stop' | 'resumeBudget') {
   busy.value = true;
   error.value = '';
   try {
     const result = await socket.timeout(10000).emitWithAck('controlAiRoom', props.roomID, action);
     if ('error' in result) error.value = result.error;
+    else await refresh();
   } catch {
     error.value = t('aiArena.connectionError');
   } finally {

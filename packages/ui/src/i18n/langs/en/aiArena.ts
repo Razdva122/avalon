@@ -1,4 +1,5 @@
 export default {
+  resumeBudget: 'Continue · raise limit to {limit} ₽ (×2)',
   budgetResetIn: 'Budget resets in: {days}d {hours}h {minutes}m',
   budgetResetPending: 'Period ended. Refreshing budget…',
   periodBudget: '30-day budget',

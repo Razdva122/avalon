@@ -10,6 +10,7 @@ export class AiService {
   repository?: AiRepository;
   private creating = false;
   private starting = false;
+  private running = new Set<string>();
   constructor(private manager: Manager) {
     const db = manager.dbManager.dbInstance?.connection.db;
     if (process.env.AI_ROOMS_ENABLED === 'true' && db && process.env.YANDEX_API_KEY && process.env.YANDEX_FOLDER_ID)
@@ -68,11 +69,15 @@ export class AiService {
         )
           return cb({ error: 'Invalid room IDs' });
         const costs: Record<string, number> = {};
+        const limits: Record<string, number> = {};
         for (const id of new Set(ids)) {
           const state = this.manager.rooms[id] || (await this.repository!.load(id));
-          if (state?.ai && typeof state.ai.costRub === 'number') costs[id] = state.ai.costRub;
+          if (state?.ai && typeof state.ai.costRub === 'number') {
+            costs[id] = state.ai.costRub;
+            limits[id] = await this.repository!.roomLimit(id);
+          }
         }
-        cb({ costs });
+        cb({ costs, limits });
       } catch {
         cb({ error: 'Could not load AI costs' });
       }
@@ -91,7 +96,7 @@ export class AiService {
       try {
         if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
         if (this.active()) return cb({ roomID: this.active()!.roomID });
-        if (this.creating) return cb({ error: 'AI room is being created' });
+        if (this.creating || this.starting || this.running.size) return cb({ error: 'AI room is being created' });
         this.creating = true;
         try {
           const id = randomUUID();
@@ -127,29 +132,48 @@ export class AiService {
       if (typeof cb !== 'function') return;
       try {
         if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        if (typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id)) return cb({ error: 'Invalid room ID' });
         const room = this.manager.rooms[id];
         if (!(room instanceof BotRoom)) return cb({ error: 'AI room not found' });
+        if (this.starting) return cb({ error: 'AI room control in progress' });
         if (action === 'stop') {
           room.stop();
           await this.repository!.save(room.calculateRoomState());
-          await this.repository!.release(id);
+          if (!this.running.has(id)) await this.repository!.release(id);
           this.manager.updateRoomsList(room);
           return cb({ ok: true });
         }
-        if (action !== 'start' || room.ai?.status !== 'ready' || this.starting)
-          return cb({ error: 'AI room is not ready' });
+        const resume = action === 'resumeBudget';
+        if (
+          this.running.size ||
+          this.creating ||
+          (resume
+            ? room.ai?.status !== 'paused' || !room.ai.canResumeBudget
+            : action !== 'start' || room.ai?.status !== 'ready')
+        )
+          return cb({ error: 'AI room is not ready to start or resume' });
         this.starting = true;
         try {
           await this.repository!.claim(id);
+          if (resume) {
+            try {
+              await this.repository!.doubleMatchLimit(id, room.budgetResumeUnits);
+            } catch (error) {
+              await this.repository!.release(id);
+              throw error;
+            }
+          }
+          this.running.add(id);
           // run changes status synchronously before the first await: duplicate starts cannot spend twice.
           void room
-            .run()
+            .run(resume)
             .catch(() => {
               /* room.run already exposes a sanitized paused status */
             })
             .finally(async () => {
               this.manager.updateRoomsList(room);
               await this.repository!.release(id).catch(() => {});
+              this.running.delete(id);
             });
           this.manager.updateRoomsList(room);
           cb({ ok: true });

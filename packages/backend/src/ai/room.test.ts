@@ -313,3 +313,47 @@ test('vote publication retains historical evidence and removes only a conflictin
     votes.every((m) => m.message === 'I vote approve. 4 rejected the previous safe roster. This team excludes 4.'),
   ).toBe(true);
 });
+
+test('budget resume retains the proposed team and completed discussion votes', async () => {
+  const { AiMatchBudgetPause } = await import('./client');
+  const tasks: string[] = [];
+  let paused = false;
+  const room = new BotRoom('resume', 'admin', io, async (request) => {
+    tasks.push(request.task);
+    if (!paused && tasks.length === 4) {
+      paused = true;
+      throw new AiMatchBudgetPause('Match budget', 2000);
+    }
+    return { ...reply(request), choice: request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0 };
+  });
+  await room.run();
+  expect(room.ai?.canResumeBudget).toBe(true);
+  const manager = room.data.stage === 'started' && room.data.manager;
+  const before = room.chat.history.length;
+  await room.run(true);
+  expect(room.data.stage === 'started' && room.data.manager).toBe(manager);
+  expect(room.ai?.status).toBe('finished');
+  expect(room.ai?.canResumeBudget).toBe(false);
+  expect(tasks.filter((task) => task === 'Propose a team and explain your choice')).toHaveLength(3);
+  expect(room.chat.history.length).toBeGreaterThan(before);
+});
+
+test('budget resume does not repeat Evil council advice or completed post-game reviews', async () => {
+  const { AiMatchBudgetPause } = await import('./client');
+  const pauses = new Set<string>();
+  const room = new BotRoom('resume-end', 'admin', io, async (request) => {
+    if (request.privateDiscussion || request.state.stage === 'end') {
+      const key = `${request.state.stage}:${request.playerID}`;
+      if (!pauses.has(key)) {
+        pauses.add(key);
+        throw new AiMatchBudgetPause('Match budget', 1000);
+      }
+    }
+    return { ...reply(request), choice: request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0 };
+  });
+  await room.run();
+  for (let attempt = 0; attempt < 12 && room.ai?.canResumeBudget; attempt++) await room.run(true);
+  expect(room.ai?.status).toBe('finished');
+  expect(room.chat.history.filter((m) => m.message.startsWith('Evil council (revealed):'))).toHaveLength(3);
+  expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(7);
+});

@@ -427,3 +427,11 @@ npx ts-node src/ai/evaluate.ts --production-regressions --reasoning=default
 This uses the local experiment ledger, a 20 RUB per-run cap and existing total cap; it does not start a live game. Six fixtures cover opening votes with/without self, Merlin's fourth-mission threshold with safe/risky teams, Mordred counting himself and Percival voting on the actual roster. They preserve player-visible mission/check facts and recent chat; old voting history is omitted and altered-team controls are labelled variants. This is a diagnostic set, not a general win-rate benchmark. A mismatched expected action sets a failing exit code; explanations still require manual review.
 
 Use `--case=<exact fixture name>` for a single production-regression fixture (5 RUB cap). Diagnostic results and limitations are recorded in `docs/superpowers/plans/2026-09-22-ai-decision-reliability.md`; rationale quality must not be inferred from the expected-choice pass flag.
+
+### Продолжение после лимита партии
+
+Администратор (`isAdmin === true`, проверяется в БД при каждом запросе) может нажать «Продолжить · увеличить лимит … (×2)» для живой партии, приостановленной из-за индивидуального бюджета. `controlAiRoom(..., 'resumeBudget')` удваивает текущий лимит только этой комнаты (150 → 300 → 600 ₽). Индивидуальный лимит хранится в `ai_experiment_budget.roomLimits`; расходы не сбрасываются. Общий бюджет, включая производственные 3000 ₽ за 30 дней, продолжает ограничивать каждый запрос. Если следующему запросу не хватает общего бюджета, лимит партии не меняется.
+
+Продолжение сохраняет движок, состав команды, уже высказанные голоса, совет тёмных и выполненные итоговые обзоры. При паузе перед публичной репликой сохраняется уже оплаченное приватное решение. Одновременные команды запуска/продолжения блокируются до завершения предыдущего игрового цикла и освобождения его резерва управления. Администратор видит индивидуальный лимит через закрытый `getAiRoomCosts`; публичное состояние его не содержит.
+
+Продолжение доступно только пока процесс сервера хранит живую комнату. Существующие архивы после перезапуска содержат публичный replay, а не приватное состояние движка: их восстановление не поддерживается. Ручная остановка завершает игру; паузы из-за ошибок модели, контекста или общего бюджета не разрешают удвоение лимита партии.
