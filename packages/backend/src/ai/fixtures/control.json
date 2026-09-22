@@ -1,0 +1,504 @@
+[
+  {
+    "name": "mordred-critical-card",
+    "request": {
+      "playerID": "7",
+      "name": "7",
+      "style": "brief",
+      "task": "Secretly choose your mission action",
+      "speak": false,
+      "choices": ["fail", "success"],
+      "chat": [
+        {
+          "id": "dc9e333e-d925-4ac4-8b64-b2b4e4f878e8",
+          "name": "7",
+          "text": "I vote reject. We need to verify 6 before trusting them. I will wait for a safer proposal."
+        },
+        {
+          "id": "178cf89a-a32f-41a8-9511-bc59c095f5eb",
+          "name": "1",
+          "text": "I vote approve. This team excludes the confirmed Evil seats 2 and 3. Seat 7 verified my Good alignment. We must progress to win."
+        },
+        {
+          "id": "4d0149dc-6339-48df-893f-c146757ad392",
+          "name": "2",
+          "text": "I vote reject. I reject this proposal because it includes Seat 7, who is a known Evil minion. Including Evil players jeopardizes mission success."
+        },
+        {
+          "id": "367f8a2f-f2f3-41b3-b989-9f708750fd81",
+          "name": "3",
+          "text": "I vote reject. Seat 7 is Evil, so this team cannot succeed."
+        },
+        {
+          "id": "76e3266e-84b7-4255-b321-a2597bc59da0",
+          "name": "4",
+          "text": "I vote approve. The team has no proven Evil members. We must continue to secure the required successes."
+        },
+        {
+          "id": "f9b27139-5780-4e8c-81b4-e6efc31e6e27",
+          "name": "5",
+          "text": "I vote approve. This team includes 4 who succeeded on M2, and 7 who verified 1 Good. We need to progress."
+        },
+        {
+          "id": "ce1f1865-6af1-4717-a067-477d7941e738",
+          "name": "6",
+          "text": "I vote approve. Seat 7 verified Seat 1 as Good. This team includes the verified Good player. We must progress to win."
+        }
+      ],
+      "state": {
+        "stage": "onMission",
+        "mission": 2,
+        "vote": 0,
+        "players": [
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "mordred",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "1",
+            "index": 1,
+            "role": "unknown",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "evil",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "evil",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          }
+        ],
+        "settings": {
+          "missions": [
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            }
+          ]
+        },
+        "history": [
+          {
+            "type": "announceLoyalty",
+            "announcerID": "7",
+            "targetID": "1",
+            "actual": "good",
+            "announced": "good"
+          },
+          {
+            "type": "mission",
+            "index": 0,
+            "leaderID": "4",
+            "result": "success",
+            "fails": 0,
+            "actions": [
+              {
+                "playerID": "4"
+              },
+              {
+                "playerID": "5"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 1,
+            "leaderID": "5",
+            "result": "success",
+            "fails": 0,
+            "actions": [
+              {
+                "playerID": "1"
+              },
+              {
+                "playerID": "4"
+              },
+              {
+                "playerID": "5"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "evil-vote-allies",
+    "request": {
+      "playerID": "2",
+      "name": "2",
+      "style": "brief",
+      "task": "Give your final vote on your unchanged proposal after the discussion; explain it briefly",
+      "speak": true,
+      "choices": ["approve", "reject"],
+      "chat": [
+        {
+          "id": "3636212b-192f-4678-ad7d-bc5023cc592d",
+          "name": "2",
+          "text": "I propose 2, 3. I propose 2 and 3. We need to include the known evil players to ensure this mission fails."
+        },
+        {
+          "id": "ddd40dba-e8c5-4b99-8c70-d0d82ff41371",
+          "name": "3",
+          "text": "I vote approve. I approve 2 and 3. Since 2 is evil, including them increases the chance of failure, which aligns with avoiding a guaranteed win for the good side."
+        },
+        {
+          "id": "d73047a2-e2bb-4e99-b5e6-4dc81eb015b0",
+          "name": "4",
+          "text": "I vote reject. 2 and 3 are identified as Evil. This team includes them."
+        },
+        {
+          "id": "3953fee1-0ef9-4266-8bd5-305b0aae5579",
+          "name": "5",
+          "text": "I vote reject. 2 and 3 are likely Evil based on 1's claim and 2's proposal."
+        },
+        {
+          "id": "cd4a6cd0-a1fd-4897-9946-697b5711b6dd",
+          "name": "6",
+          "text": "I vote reject. Reject. 2 and 3 openly admitted to being evil to sabotage the mission. Including them guarantees failure."
+        },
+        {
+          "id": "ba39a8c2-8f9b-43f1-8a5c-2f5434e829b2",
+          "name": "7",
+          "text": "I vote reject. Including players who admit to being evil is reckless. We should try to find a team without known saboteurs for a better chance of success or at least ambiguity."
+        },
+        {
+          "id": "f7e70b6b-dfba-4960-8992-8db351d1aead",
+          "name": "1",
+          "text": "I vote reject. Reject. The team includes 2 and 3, who are Evil. This guarantees failure. We must find a different team."
+        }
+      ],
+      "state": {
+        "stage": "selectTeam",
+        "mission": 0,
+        "vote": 1,
+        "players": [
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "evil",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "1",
+            "index": 1,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "minion",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "evil",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          }
+        ],
+        "settings": {
+          "missions": [
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 2,
+              "failsRequired": 1
+            }
+          ]
+        },
+        "history": []
+      }
+    }
+  },
+  {
+    "name": "percival-roster",
+    "request": {
+      "playerID": "5",
+      "name": "5",
+      "style": "brief",
+      "task": "Propose a team and explain your choice",
+      "speak": true,
+      "choices": [
+        "6, 7, 1",
+        "6, 7, 2",
+        "6, 7, 3",
+        "6, 7, 4",
+        "6, 7, 5",
+        "6, 1, 2",
+        "6, 1, 3",
+        "6, 1, 4",
+        "6, 1, 5",
+        "6, 2, 3",
+        "6, 2, 4",
+        "6, 2, 5",
+        "6, 3, 4",
+        "6, 3, 5",
+        "6, 4, 5",
+        "7, 1, 2",
+        "7, 1, 3",
+        "7, 1, 4",
+        "7, 1, 5",
+        "7, 2, 3",
+        "7, 2, 4",
+        "7, 2, 5",
+        "7, 3, 4",
+        "7, 3, 5",
+        "7, 4, 5",
+        "1, 2, 3",
+        "1, 2, 4",
+        "1, 2, 5",
+        "1, 3, 4",
+        "1, 3, 5",
+        "1, 4, 5",
+        "2, 3, 4",
+        "2, 3, 5",
+        "2, 4, 5",
+        "3, 4, 5"
+      ],
+      "chat": [
+        {
+          "id": "054f3631-df7a-48b1-bb72-78cbd688a6ea",
+          "name": "5",
+          "text": "I vote approve. 4 proposed us. 1 supported the risky team with 7. We should try [4,5] to avoid known suspects."
+        },
+        {
+          "id": "d891bada-278c-4507-ad6c-6be1a995146f",
+          "name": "6",
+          "text": "I vote approve. I approve 4 and 5. They are untested unknowns. This avoids the likely Evil 2, 3, and the suspicious 1."
+        },
+        {
+          "id": "4b7198d4-1e1c-4364-805b-610a6e89d026",
+          "name": "7",
+          "text": "I vote approve. Approve. 4 and 5 are untested unknowns. This avoids the known Evil 2 and 3, and the suspicious 1. It is a reasonable step to find a working team."
+        },
+        {
+          "id": "80bba0f2-1734-4d04-98a2-e79f70c1f1d1",
+          "name": "1",
+          "text": "I vote approve. Seats 2 and 3 are Evil. Team 4 and 5 avoids them."
+        },
+        {
+          "id": "38194ef1-6dab-4ae8-a323-cb2da8721438",
+          "name": "2",
+          "text": "I vote approve. This team avoids the known Evil 2, 3, and 7, giving us the best chance to find a working group and succeed."
+        },
+        {
+          "id": "9739202e-36f6-433d-bcfb-8c09b5368dbe",
+          "name": "3",
+          "text": "I vote approve. I approve this team of unknowns to progress the game safely while I gather more information."
+        },
+        {
+          "id": "9d9133ce-8b98-405f-9dc8-818dbc97a8bc",
+          "name": "4",
+          "text": "I vote reject. Five approved this risky team with me, which is suspicious. I prefer safer options."
+        }
+      ],
+      "state": {
+        "stage": "selectTeam",
+        "mission": 1,
+        "vote": 0,
+        "players": [
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "1",
+            "index": 1,
+            "role": "mysteryWizard",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "mysteryWizard",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "5",
+            "index": 5,
+            "role": "percival",
+            "features": {
+              "isSelected": false
+            }
+          }
+        ],
+        "settings": {
+          "missions": [
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            }
+          ]
+        },
+        "history": [
+          {
+            "type": "mission",
+            "index": 0,
+            "leaderID": "4",
+            "result": "success",
+            "fails": 0,
+            "actions": [
+              {
+                "playerID": "4"
+              },
+              {
+                "playerID": "5",
+                "value": "success"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]

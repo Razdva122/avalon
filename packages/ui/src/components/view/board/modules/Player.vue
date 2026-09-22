@@ -139,6 +139,7 @@ export default defineComponent({
       type: Object as PropType<IFrontendPlayer | RoomPlayer>,
       required: true,
     },
+    spectatorRole: { type: String as PropType<import('@avalon/types').TRoles> },
     visibleHistory: {
       type: Object as PropType<THistoryResults>,
     },
@@ -321,6 +322,8 @@ export default defineComponent({
 
           clone.features.switch = undefined;
         }
+
+        if (props.spectatorRole && !visibleHistory.value) clone.role = props.spectatorRole;
 
         if (clone.role === 'revealer') {
           const amountOfFailMissions = gameState.value.missionState.filter((el) => el.result === 'fail').length;

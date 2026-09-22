@@ -59,6 +59,7 @@
       >
         <Player
           :player-state="player"
+          :spectator-role="roomState.ai && !playerInGame ? spectatorRoles[player.id] : undefined"
           :display-kick="userIsLeader"
           :display-index="roomState.stage === 'started' ? gameState.features.displayIndex : false"
           :visible-history="visibleHistory"
@@ -84,7 +85,7 @@ import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
 import CustomTimerControls from '@/components/view/board/modules/CustomTimerControls.vue';
 import eventBus from '@/helpers/event-bus';
-import { THistoryResults } from '@avalon/types';
+import { THistoryResults, TRoles } from '@avalon/types';
 import { hasActiveCard, useHaveActiveLoyaltyCard, isAdjacentPlayer, isPlayerOnMission } from '@/helpers/plot-cards';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
@@ -104,6 +105,7 @@ export default defineComponent({
     CustomTimerControls,
   },
   props: {
+    spectatorRoles: { type: Object as PropType<Record<string, TRoles>>, default: () => ({}) },
     roomState: {
       type: Object as PropType<TPageRoomState>,
       required: true,
@@ -120,7 +122,8 @@ export default defineComponent({
     const timerDuration = ref(0);
 
     const playerInGame = computed(() => {
-      return gameState.value.players.find((player) => player.id === store.state.profile?.id);
+      if (roomState.value.stage !== 'started') return undefined;
+      return gameState.value?.players.find((player) => player.id === store.state.profile?.id);
     });
 
     const players = computed(() => {

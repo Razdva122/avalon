@@ -32,6 +32,8 @@ export class BotRoom extends Room {
   private abort = new AbortController();
   private failures = 0;
   private calls = 0;
+  private rolesKnownBeforeReveal = new Map<string, [number, string][]>();
+  private evilCouncil: { seat: string; target: string; reason: string }[] = [];
   constructor(
     id: string,
     owner: string,
@@ -124,6 +126,7 @@ export class BotRoom extends Room {
     choices: Choice[],
     speak: boolean,
     privateCheck?: string,
+    privateDiscussion = false,
   ): Promise<BotReply | null> {
     if (this.cancelled) return null;
     if (!speak && choices.length === 1) return { choice: 0, speech: '' };
@@ -139,11 +142,32 @@ export class BotRoom extends Room {
       state,
       choices: choices.map((c) => c.text),
       privateCheck,
+      privateDiscussion,
+      rolesKnownBeforeReveal: state.stage === 'end' ? this.rolesKnownBeforeReveal.get(id) : undefined,
+      // The room archives every public clue; all Evil revisit it before assassination.
+      // Bound transcript size under the existing request and spending limits.
+      evilEvidence:
+        state.stage === 'assassinate'
+          ? this.chat.history
+              .filter(
+                (m) => BOT_PROFILES.some((p) => p.id === m.userID) && !/^I vote (approve|reject)\.$/.test(m.message),
+              )
+              .slice(0, 350)
+              .map((m) => ({ id: m.id, name: this.label(m.userID), text: m.message }))
+          : undefined,
+      evilCouncil: state.stage === 'assassinate' ? structuredClone(this.evilCouncil) : undefined,
       chat: this.chat.history
         .filter((m) => BOT_PROFILES.some((p) => p.id === m.userID))
-        .slice(-21)
-        .map((m) => ({ name: this.label(m.userID), text: m.message })),
+        .filter((m) => !m.message.startsWith('Post-game:') && !m.message.startsWith('Evil council (revealed):'))
+        .slice(0)
+        .map((m) => ({ id: m.id, name: this.label(m.userID), text: m.message })),
     };
+    if (state.stage !== 'end') {
+      this.rolesKnownBeforeReveal.set(
+        id,
+        state.players.map((p) => [p.index, p.role]),
+      );
+    }
     this.ai!.message = `${BOT_PROFILES[index].name}: ${task}`;
     this.updateRoomState(true);
     let answer: BotReply;
@@ -166,8 +190,36 @@ export class BotRoom extends Room {
       this.ai!.message = 'Model error: a legal fallback action was used.';
     }
     if (this.cancelled || this.manager.game.stage !== state.stage) return null;
-    if (speak && answer.speech.trim()) {
-      const speech = answer.speech.trim().replace(/\bplayers?\s*#?([1-7])\b/gi, '$1');
+    if (privateDiscussion) {
+      this.evilCouncil.push({
+        seat: this.label(id),
+        target: choices[answer.choice].text,
+        reason: answer.speech.trim(),
+      });
+      return answer;
+    }
+    if (speak && (answer.speech.trim() || choices.map((c) => c.text).join(',') === 'approve,reject')) {
+      let speech = answer.speech.trim().replace(/\bplayers?\s*#?([1-7])\b/gi, '$1');
+      if (choices.map((c) => c.text).join(',') === 'approve,reject') {
+        // Preserve evidence about earlier votes; discard conflicting current declarations sentence by sentence.
+        const selectedVote = choices[answer.choice].text;
+        speech = speech
+          .split(/(?<=[.!?])\s+/)
+          .filter((sentence) => {
+            const declaration = sentence.match(
+              /\b(?:I|we)\s+(?:(?:will|would|must|should)\s+)?(?:vote\s+)?(approve|reject)\b/i,
+            );
+            return !declaration || declaration[1].toLowerCase() === selectedVote;
+          })
+          .map((sentence) =>
+            sentence.replace(/^I\s+(?:vote\s+)?(?:approve|reject)(?:\s+this team)?[.!]\s*$/i, '').trim(),
+          )
+          .filter(Boolean)
+          .join(' ');
+        speech = `I vote ${choices[answer.choice].text}. ${speech}`.trim();
+      } else if (task === 'Propose a team and explain your choice') {
+        speech = `I propose ${choices[answer.choice].text}. ${speech}`;
+      }
       await this.publish(id, `${state.stage === 'end' ? 'Post-game: ' : ''}${speech}`);
     } else {
       await this.checkpoint(this.calculateRoomState());
@@ -216,7 +268,7 @@ export class BotRoom extends Room {
         player,
         player === id
           ? 'Give your final vote on your unchanged proposal after the discussion; explain it briefly'
-          : 'Discuss this exact proposed team and cast your binding vote in the SAME answer; choice 0=approve, 1=reject. Explain your vote briefly.',
+          : 'Discuss this exact proposed team and cast your binding vote in the SAME answer; choose approve or reject. Give a brief reason without repeating vote words.',
         choicesForVote,
         true,
       );
@@ -267,7 +319,9 @@ export class BotRoom extends Room {
           }));
         break;
       case 'announceLoyalty':
-        task = 'Announce the inspection result; you may lie';
+        task = ['mordred', 'morgana', 'minion'].includes(own.role)
+          ? 'Announce the Lady result; choose truth or a strategic lie for Evil'
+          : 'Announce privateKnowledge.inspectionResult truthfully by default. Lady explains your knowledge without revealing your role. Do not reverse the result merely to hide Merlin.';
         privateCheck = this.manager.getGameData(id, { method: 'getLoyalty' });
         // Chat is generated from this same choice after applying the announcement.
         choices = ['good', 'evil'].map((loyalty) => ({
@@ -276,13 +330,25 @@ export class BotRoom extends Room {
         }));
         break;
       case 'assassinate':
-        task = 'Choose the player you believe is Merlin';
+        task =
+          'Choose the player you believe is Merlin after reviewing ALL teammates in evilCouncil and the early public clues in evilEvidence';
         choices = state.players
           .filter((p) => !['evil', 'mordred', 'morgana', 'minion'].includes(p.role))
           .map((p) => ({
             text: this.label(p.id),
             actions: [...this.select([p.id]), { method: 'assassinate', type: 'merlin' }],
           }));
+        for (const ally of state.players.filter((p) => ['evil', 'mordred', 'morgana', 'minion'].includes(p.role))) {
+          const suggestion = await this.ask(
+            ally.id,
+            'Private Evil council: suggest whom to assassinate, cite the strongest clue and compare an alternative. Respond to earlier teammates. This is advice, not the final shot.',
+            choices.map((c) => ({ text: c.text, actions: [] })),
+            true,
+            undefined,
+            true,
+          );
+          if (!suggestion) return;
+        }
         break;
       default:
         throw new AiPause('Unsupported game stage.');
@@ -311,6 +377,10 @@ export class BotRoom extends Room {
         await this.checkpoint(this.calculateRoomState());
       }
       if (!this.cancelled) {
+        for (const entry of this.evilCouncil) {
+          const player = this.manager.game.players.find((p) => `${p.index}` === entry.seat)!;
+          await this.publish(player.userID, `Evil council (revealed): Target ${entry.target}. ${entry.reason}`);
+        }
         for (const id of this.players) {
           if (this.cancelled) break;
           await this.ask(

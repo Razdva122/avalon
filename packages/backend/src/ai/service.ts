@@ -3,7 +3,8 @@ import type { Manager } from '@/main';
 import { randomUUID } from 'crypto';
 import { AiRepository } from './repository';
 import { BotRoom } from './room';
-import { AiPause, yandexDecide } from './client';
+import { AiPause } from './client';
+import { separatedDecide } from './pipeline';
 
 export class AiService {
   repository?: AiRepository;
@@ -14,8 +15,9 @@ export class AiService {
     if (process.env.AI_ROOMS_ENABLED === 'true' && db && process.env.YANDEX_API_KEY && process.env.YANDEX_FOLDER_ID)
       this.repository = new AiRepository(
         db,
-        Number(process.env.AI_TOTAL_BUDGET_RUB || 500),
-        Math.min(50, Number(process.env.AI_MATCH_BUDGET_RUB || 50)),
+        Number(process.env.AI_TOTAL_BUDGET_RUB || (process.env.NODE_ENV === 'production' ? 3000 : 700)),
+        Number(process.env.AI_MATCH_BUDGET_RUB || (process.env.NODE_ENV === 'production' ? 150 : 100)),
+        process.env.NODE_ENV === 'production' ? { periodDays: 30, ledgerID: 'avalon-ai-production-v1' } : {},
       );
   }
   private active() {
@@ -23,19 +25,63 @@ export class AiService {
   }
   async canManage(userID?: string): Promise<boolean> {
     if (!this.repository || !userID) return false;
-    const allowed = (process.env.AI_ROOM_ADMIN_LOGINS || '')
-      .split(',')
-      .map((s) => s.trim().toLowerCase())
-      .filter(Boolean);
-    if (!allowed.length) return false;
-    const profile = await this.manager.dbManager.getUserProfile(userID);
-    return allowed.includes(profile.login.toLowerCase());
+    try {
+      const profile = await this.manager.dbManager.getUserByID(userID);
+      return profile.isAdmin === true;
+    } catch {
+      return false;
+    }
   }
+
   register(socket: ServerSocket, userID?: string) {
+    socket.on('getAiSpectatorRoles', (id, cb) => {
+      if (typeof cb !== 'function') return;
+      if (typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id)) return cb({ error: 'Invalid room ID' });
+      const room = this.manager.rooms[id];
+      // Spectating is public, but hidden roles must never be available in human games or to participants.
+      if (
+        !(room instanceof BotRoom) ||
+        !room.ai ||
+        room.data.stage !== 'started' ||
+        (userID !== undefined && room.players.includes(userID))
+      )
+        return cb({ error: 'AI spectator roles unavailable' });
+      cb({ roles: Object.fromEntries(room.data.manager.game.players.map((p) => [p.userID, p.role.role])) });
+    });
+    socket.on('getAiBudget', async (cb) => {
+      if (typeof cb !== 'function') return;
+      try {
+        if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        cb({ budget: await this.repository!.budget() });
+      } catch {
+        cb({ error: 'Could not load AI budget' });
+      }
+    });
+    socket.on('getAiRoomCosts', async (ids, cb) => {
+      if (typeof cb !== 'function') return;
+      try {
+        if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        if (
+          !Array.isArray(ids) ||
+          ids.length > 50 ||
+          ids.some((id) => typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id))
+        )
+          return cb({ error: 'Invalid room IDs' });
+        const costs: Record<string, number> = {};
+        for (const id of new Set(ids)) {
+          const state = this.manager.rooms[id] || (await this.repository!.load(id));
+          if (state?.ai && typeof state.ai.costRub === 'number') costs[id] = state.ai.costRub;
+        }
+        cb({ costs });
+      } catch {
+        cb({ error: 'Could not load AI costs' });
+      }
+    });
     socket.on('getAiRoomAccess', async (cb) => {
       if (typeof cb !== 'function') return;
       try {
-        cb({ canManage: await this.canManage(userID), roomID: this.active()?.roomID });
+        const canManage = await this.canManage(userID);
+        cb(canManage ? { canManage, roomID: this.active()?.roomID } : { canManage });
       } catch {
         cb({ canManage: false });
       }
@@ -50,16 +96,23 @@ export class AiService {
         try {
           const id = randomUUID();
           await this.repository!.claim(id);
+          const model = process.env.YANDEX_MODEL || 'qwen3.6-35b-a3b';
           const room = new BotRoom(
             id,
             userID!,
             this.manager.io,
-            yandexDecide(id, this.repository!, (rub) => {
-              room.ai!.costRub = rub;
-            }),
+            separatedDecide(
+              id,
+              this.repository!,
+              (rub) => {
+                room.ai!.costRub = rub;
+              },
+              model,
+            ),
             (state) => this.repository!.save(state),
-            10000,
+            process.env.NODE_ENV === 'development' ? 2000 : 10000,
           );
+          room.ai!.model = model;
           this.manager.rooms[id] = room;
           this.manager.updateRoomsList(room);
           cb({ roomID: id });

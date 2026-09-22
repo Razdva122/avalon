@@ -1,3 +1,4 @@
+import { publicRoomState } from '@/ai/public-state';
 import { AiService } from '@/ai/service';
 import { BOT_PROFILES } from '@/ai/room';
 import { registerChatEndpoints } from '@/room/chat-endpoints';
@@ -65,6 +66,8 @@ export class Manager {
     } else {
       const roomData: TRoomInfo = {
         ai: Boolean(room.ai),
+        aiStatus: room.ai?.status,
+        aiModel: room.ai?.model,
         hostID: room.leaderID,
         state: room.data.stage,
         options: room.options,
@@ -98,6 +101,8 @@ export class Manager {
     const roomsInfo = rooms.map<TRoomInfo>((room) => {
       return {
         ai: Boolean(room.ai),
+        aiStatus: room.ai?.status,
+        aiModel: room.ai?.model,
         hostID: room.leaderID,
         state: 'started',
         options: room.options,
@@ -255,12 +260,12 @@ export class Manager {
         }
 
         if (gameFromDB) {
-          cb(gameFromDB);
+          cb(publicRoomState(gameFromDB));
           return;
         }
 
         if (room) {
-          cb(this.rooms[uuid].calculateRoomState(userState.userID));
+          cb(publicRoomState(this.rooms[uuid].calculateRoomState(userState.userID)));
         } else {
           cb({ error: 'errorNotFound' });
         }
@@ -433,7 +438,7 @@ export class Manager {
 
     socket.on('lockRoom', (uuid) => {
       const room = this.rooms[uuid];
-      if (room.leaderID === userID) {
+      if (!room.ai && room.leaderID === userID) {
         room.toggleLockedState();
         eventBus.emit('roomUpdated', room);
       }
@@ -441,7 +446,7 @@ export class Manager {
 
     socket.on('updateOptions', (uuid, options) => {
       const room = this.rooms[uuid];
-      if (room.leaderID === userID) {
+      if (!room.ai && room.leaderID === userID) {
         room.updateOptions(options);
         eventBus.emit('roomUpdated', room);
       }
@@ -449,21 +454,21 @@ export class Manager {
 
     socket.on('endGame', (uuid) => {
       const room = this.rooms[uuid];
-      if (room.leaderID === userID) {
+      if (!room.ai && room.leaderID === userID) {
         room.startVoteFor('endGame');
       }
     });
 
     socket.on('endAndRestartGame', (uuid) => {
       const room = this.rooms[uuid];
-      if (room.leaderID === userID) {
+      if (!room.ai && room.leaderID === userID) {
         room.startVoteFor('endAndRestartGame');
       }
     });
 
     socket.on('shuffle', (uuid) => {
       const room = this.rooms[uuid];
-      if (room.leaderID === userID) {
+      if (!room.ai && room.leaderID === userID) {
         room.shuffle();
       }
     });
@@ -477,7 +482,7 @@ export class Manager {
 
     socket.on('startGame', (uuid) => {
       const room = this.rooms[uuid];
-      if (room.leaderID === userID) {
+      if (!room.ai && room.leaderID === userID) {
         room.startGame();
         eventBus.emit('roomUpdated', room);
       }
@@ -485,7 +490,7 @@ export class Manager {
 
     socket.on('kickPlayer', (uuid, kickUserID) => {
       const room = this.rooms[uuid];
-      if (room.leaderID === userID) {
+      if (!room.ai && room.leaderID === userID) {
         room.leaveGame(kickUserID);
 
         if (this.rooms[uuid]) {

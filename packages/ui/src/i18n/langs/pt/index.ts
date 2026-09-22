@@ -1,3 +1,4 @@
+import aiArena from './aiArena';
 import { passwordRecovery } from '../passwordRecovery';
 import { premiumCosmetics } from '../premiumCosmetics';
 import stickers from '@/i18n/langs/en/stickers';
@@ -18,6 +19,7 @@ import modals from './modals';
 import achievements from './achievements';
 
 export const pt = {
+  aiArena,
   passwordRecovery: passwordRecovery['pt'],
   premiumCosmetics: premiumCosmetics.pt,
   ...menu,

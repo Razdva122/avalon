@@ -1,3 +1,4 @@
+import { publicRoomState } from '@/ai/public-state';
 import type { TRoomState, Server, GameOptions, TVoteTarget, VoteInRoom } from '@avalon/types';
 import type { TRoomData } from '@/room/interface';
 import { eventBus } from '@/helpers';
@@ -92,12 +93,12 @@ export class Room {
   updateRoomState(direct: boolean = false) {
     if (direct) {
       this.players.forEach((playerID) => {
-        this.io.to(playerID).emit('roomUpdated', this.calculateRoomState(playerID));
+        this.io.to(playerID).emit('roomUpdated', publicRoomState(this.calculateRoomState(playerID)));
       });
 
-      this.io.except(this.players).to(this.roomID).emit('roomUpdated', this.calculateRoomState());
+      this.io.except(this.players).to(this.roomID).emit('roomUpdated', publicRoomState(this.calculateRoomState()));
     } else {
-      this.io.to(this.roomID).emit('roomUpdated', this.calculateRoomState());
+      this.io.to(this.roomID).emit('roomUpdated', publicRoomState(this.calculateRoomState()));
     }
   }
 

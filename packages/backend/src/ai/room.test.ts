@@ -114,6 +114,12 @@ test('numbered bots each write a post-game conclusion and Lady announcements mat
   expect(room.options.features.displayIndex).toBe(true);
   const conclusions = requests.filter((r) => r.state.stage === 'end');
   expect(conclusions).toHaveLength(7);
+  expect(conclusions.every((r) => r.rolesKnownBeforeReveal?.length === 7)).toBe(true);
+  expect(
+    conclusions.every((r) =>
+      r.chat.every((m) => !m.text.startsWith('Post-game:') && !m.text.startsWith('Evil council (revealed):')),
+    ),
+  ).toBe(true);
   expect(new Set(conclusions.map((r) => r.playerID)).size).toBe(7);
   expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(7);
   expect(room.chat.history.some((m) => m.message.includes('they are Evil'))).toBe(false);
@@ -218,4 +224,92 @@ test('the ten-second interval also covers Lady announcements and all seven concl
   } finally {
     jest.useRealTimers();
   }
+});
+
+test('a conflicting model sentence cannot contradict the announced and recorded vote', async () => {
+  const room = new BotRoom(
+    'vote-text',
+    'admin',
+    io,
+    async () => ({ choice: 0, speech: 'I reject this team.' }),
+    async (state) => {
+      if (state.stage === 'started' && state.game.stage === 'onMission') room.stop();
+    },
+  );
+  await room.run();
+  const announcements = room.chat.history.filter((m) => m.message.startsWith('I vote'));
+  expect(announcements).toHaveLength(7);
+  expect(announcements.every((m) => m.message === 'I vote approve.')).toBe(true);
+  if (room.data.stage !== 'started') throw Error('not started');
+  const vote = room.data.manager.prepareStateForUser().history.find((e) => e.type === 'vote');
+  expect(vote?.type === 'vote' && vote.result).toBe('approve');
+});
+
+test('all three evil players privately deliberate with early evidence before the assassin chooses', async () => {
+  const council: BotRequest[] = [];
+  let final: BotRequest | undefined;
+  let first = true;
+  const room = new BotRoom('council', 'admin', io, async (r) => {
+    if (r.state.stage !== 'end') {
+      expect(room.chat.history.some((m) => m.message.includes('SECRET_COUNCIL'))).toBe(false);
+    }
+    if (r.task.startsWith('Private Evil council')) council.push(r);
+    if (r.task.startsWith('Choose the player you believe is Merlin')) final = r;
+    const speech = first
+      ? 'EARLY_CLUE: I am Merlin.'
+      : r.task.startsWith('Private Evil council')
+        ? 'SECRET_COUNCIL: compare the early claim.'
+        : 'A cautious team.';
+    first = false;
+    return { choice: r.state.stage === 'onMission' ? r.choices.indexOf('success') : 0, speech };
+  });
+  await room.run();
+  expect(room.ai?.status).toBe('finished');
+  expect(council).toHaveLength(3);
+  expect(new Set(council.map((r) => r.playerID)).size).toBe(3);
+  for (const r of council) {
+    expect(['mordred', 'morgana', 'minion']).toContain(r.state.players.find((p) => p.id === r.playerID)!.role);
+    expect(JSON.stringify(r)).toContain('EARLY_CLUE');
+  }
+  expect(JSON.stringify(final)).toContain('SECRET_COUNCIL');
+  expect(room.chat.history.filter((m) => m.message.startsWith('Evil council (revealed):'))).toHaveLength(3);
+});
+
+test('Stop during the private council prevents subsequent advice and assassination', async () => {
+  let councilCalls = 0;
+  let shots = 0;
+  const room = new BotRoom('stop-council', 'admin', io, async (r) => {
+    if (r.task.startsWith('Private Evil council')) {
+      councilCalls++;
+      room.stop();
+    }
+    if (r.task.startsWith('Choose the player you believe is Merlin')) shots++;
+    return { choice: r.state.stage === 'onMission' ? r.choices.indexOf('success') : 0, speech: 'A clue.' };
+  });
+  await room.run();
+  expect(councilCalls).toBe(1);
+  expect(shots).toBe(0);
+  expect(room.ai?.status).toBe('stopped');
+  expect(room.chat.history.some((m) => m.message.startsWith('Evil council'))).toBe(false);
+});
+
+test('vote publication retains historical evidence and removes only a conflicting decision sentence', async () => {
+  const room = new BotRoom(
+    'vote-reasons',
+    'admin',
+    io,
+    async () => ({
+      choice: 0,
+      speech: 'I reject this team. 4 rejected the previous safe roster. This team excludes 4.',
+    }),
+    async (state) => {
+      if (state.stage === 'started' && state.game.stage === 'onMission') room.stop();
+    },
+  );
+  await room.run();
+  const votes = room.chat.history.filter((m) => m.message.startsWith('I vote'));
+  expect(votes).toHaveLength(7);
+  expect(
+    votes.every((m) => m.message === 'I vote approve. 4 rejected the previous safe roster. This team excludes 4.'),
+  ).toBe(true);
 });

@@ -1,0 +1,906 @@
+[
+  {
+    "name": "Percival counts all three Evil slots before voting",
+    "expected": "approve",
+    "request": {
+      "playerID": "avalon-ai-5",
+      "name": "5",
+      "style": "brief",
+      "task": "Cast a binding vote on the exact proposed team [3,5,6].",
+      "speak": true,
+      "state": {
+        "result": null,
+        "uuid": "22c04498-729e-447c-abc5-fc0c42e03bf1",
+        "stage": "votingForTeam",
+        "vote": 3,
+        "mission": 2,
+        "settings": {
+          "missions": [
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 2
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            }
+          ],
+          "players": {
+            "good": 4,
+            "evil": 3
+          },
+          "total": 7,
+          "roles": {
+            "evil": ["mordred", "morgana", "minion"],
+            "good": ["merlin", "percival", "servant", "servant"]
+          }
+        },
+        "addonsData": {
+          "assassin": {
+            "assassinateTargets": ["merlin"],
+            "progressData": null
+          }
+        },
+        "features": {
+          "wtfMode": false,
+          "displayIndex": true
+        },
+        "timer": {
+          "active": false,
+          "isCustom": false
+        },
+        "missionState": [
+          {
+            "players": 2,
+            "failsRequired": 1,
+            "hidden": false,
+            "fails": 2,
+            "result": "fail"
+          },
+          {
+            "players": 3,
+            "failsRequired": 1,
+            "hidden": false,
+            "fails": 1,
+            "result": "fail"
+          },
+          {
+            "players": 3,
+            "failsRequired": 1
+          },
+          {
+            "players": 4,
+            "failsRequired": 2
+          },
+          {
+            "players": 4,
+            "failsRequired": 1
+          }
+        ],
+        "history": [
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "avalon-ai-1",
+            "team": [
+              {
+                "id": "avalon-ai-1"
+              },
+              {
+                "id": "avalon-ai-4"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "avalon-ai-1",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 0,
+            "settings": {
+              "players": 2,
+              "failsRequired": 1
+            },
+            "leaderID": "avalon-ai-1",
+            "hidden": false,
+            "fails": 2,
+            "result": "fail",
+            "actions": [
+              {
+                "playerID": "avalon-ai-1",
+                "switchedBy": null
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "switchedBy": null
+              }
+            ]
+          },
+          {
+            "type": "vote",
+            "result": "reject",
+            "index": 0,
+            "forced": false,
+            "leaderID": "avalon-ai-2",
+            "team": [
+              {
+                "id": "avalon-ai-1"
+              },
+              {
+                "id": "avalon-ai-2"
+              },
+              {
+                "id": "avalon-ai-3"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "avalon-ai-1",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              }
+            ]
+          },
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 1,
+            "forced": false,
+            "leaderID": "avalon-ai-3",
+            "team": [
+              {
+                "id": "avalon-ai-2"
+              },
+              {
+                "id": "avalon-ai-3"
+              },
+              {
+                "id": "avalon-ai-5"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "avalon-ai-1",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 1,
+            "settings": {
+              "players": 3,
+              "failsRequired": 1
+            },
+            "leaderID": "avalon-ai-3",
+            "hidden": false,
+            "fails": 1,
+            "result": "fail",
+            "actions": [
+              {
+                "playerID": "avalon-ai-2",
+                "switchedBy": null
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "switchedBy": null
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "switchedBy": null
+              }
+            ]
+          },
+          {
+            "type": "checkLoyalty",
+            "validatorID": "avalon-ai-7",
+            "inspectedID": "avalon-ai-2"
+          },
+          {
+            "type": "announceLoyalty",
+            "announced": "good",
+            "announcerID": "avalon-ai-7",
+            "targetID": "avalon-ai-2"
+          }
+        ],
+        "players": [
+          {
+            "id": "avalon-ai-1",
+            "index": 1,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": false,
+              "isSent": false,
+              "waitForAction": false
+            },
+            "role": "unknown"
+          },
+          {
+            "id": "avalon-ai-2",
+            "index": 2,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": false,
+              "isSent": false,
+              "waitForAction": false,
+              "ladyOfLake": "has"
+            },
+            "role": "mysteryWizard"
+          },
+          {
+            "id": "avalon-ai-3",
+            "index": 3,
+            "name": "",
+            "features": {
+              "isSelected": true,
+              "isLeader": false,
+              "isSent": true,
+              "waitForAction": false
+            },
+            "role": "unknown"
+          },
+          {
+            "id": "avalon-ai-4",
+            "index": 4,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": false,
+              "isSent": false,
+              "waitForAction": false
+            },
+            "role": "unknown"
+          },
+          {
+            "id": "avalon-ai-5",
+            "index": 5,
+            "name": "",
+            "features": {
+              "isSelected": true,
+              "isLeader": false,
+              "isSent": true,
+              "waitForAction": false
+            },
+            "role": "percival"
+          },
+          {
+            "id": "avalon-ai-6",
+            "index": 6,
+            "name": "",
+            "features": {
+              "isSelected": true,
+              "isLeader": false,
+              "isSent": true,
+              "waitForAction": false
+            },
+            "role": "mysteryWizard"
+          },
+          {
+            "id": "avalon-ai-7",
+            "index": 7,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": true,
+              "isSent": false,
+              "ladyOfLake": "used",
+              "waitForAction": true
+            },
+            "role": "unknown"
+          }
+        ],
+        "turn": 2
+      },
+      "chat": [],
+      "choices": ["approve", "reject"]
+    }
+  },
+  {
+    "name": "Evil rejects a roster with no allies",
+    "expected": "reject",
+    "request": {
+      "playerID": "avalon-ai-1",
+      "name": "1",
+      "style": "brief",
+      "task": "Cast a binding vote on the exact proposed team [3,5,6].",
+      "speak": true,
+      "state": {
+        "result": null,
+        "uuid": "22c04498-729e-447c-abc5-fc0c42e03bf1",
+        "stage": "votingForTeam",
+        "vote": 3,
+        "mission": 2,
+        "settings": {
+          "missions": [
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 2
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            }
+          ],
+          "players": {
+            "good": 4,
+            "evil": 3
+          },
+          "total": 7,
+          "roles": {
+            "evil": ["mordred", "morgana", "minion"],
+            "good": ["merlin", "percival", "servant", "servant"]
+          }
+        },
+        "addonsData": {
+          "assassin": {
+            "assassinateTargets": ["merlin"],
+            "progressData": null
+          }
+        },
+        "features": {
+          "wtfMode": false,
+          "displayIndex": true
+        },
+        "timer": {
+          "active": false,
+          "isCustom": false
+        },
+        "missionState": [
+          {
+            "players": 2,
+            "failsRequired": 1,
+            "hidden": false,
+            "fails": 2,
+            "result": "fail"
+          },
+          {
+            "players": 3,
+            "failsRequired": 1,
+            "hidden": false,
+            "fails": 1,
+            "result": "fail"
+          },
+          {
+            "players": 3,
+            "failsRequired": 1
+          },
+          {
+            "players": 4,
+            "failsRequired": 2
+          },
+          {
+            "players": 4,
+            "failsRequired": 1
+          }
+        ],
+        "history": [
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "avalon-ai-1",
+            "team": [
+              {
+                "id": "avalon-ai-1"
+              },
+              {
+                "id": "avalon-ai-4"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "avalon-ai-1",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 0,
+            "settings": {
+              "players": 2,
+              "failsRequired": 1
+            },
+            "leaderID": "avalon-ai-1",
+            "hidden": false,
+            "fails": 2,
+            "result": "fail",
+            "actions": [
+              {
+                "playerID": "avalon-ai-1",
+                "switchedBy": null
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "switchedBy": null
+              }
+            ]
+          },
+          {
+            "type": "vote",
+            "result": "reject",
+            "index": 0,
+            "forced": false,
+            "leaderID": "avalon-ai-2",
+            "team": [
+              {
+                "id": "avalon-ai-1"
+              },
+              {
+                "id": "avalon-ai-2"
+              },
+              {
+                "id": "avalon-ai-3"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "avalon-ai-1",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              }
+            ]
+          },
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 1,
+            "forced": false,
+            "leaderID": "avalon-ai-3",
+            "team": [
+              {
+                "id": "avalon-ai-2"
+              },
+              {
+                "id": "avalon-ai-3"
+              },
+              {
+                "id": "avalon-ai-5"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "avalon-ai-1",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 1,
+            "settings": {
+              "players": 3,
+              "failsRequired": 1
+            },
+            "leaderID": "avalon-ai-3",
+            "hidden": false,
+            "fails": 1,
+            "result": "fail",
+            "actions": [
+              {
+                "playerID": "avalon-ai-2",
+                "switchedBy": null
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "switchedBy": null
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "switchedBy": null
+              }
+            ]
+          },
+          {
+            "type": "checkLoyalty",
+            "validatorID": "avalon-ai-7",
+            "inspectedID": "avalon-ai-2"
+          },
+          {
+            "type": "announceLoyalty",
+            "announced": "good",
+            "announcerID": "avalon-ai-7",
+            "targetID": "avalon-ai-2"
+          }
+        ],
+        "players": [
+          {
+            "id": "avalon-ai-1",
+            "index": 1,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": false,
+              "isSent": false,
+              "waitForAction": false
+            },
+            "role": "minion"
+          },
+          {
+            "id": "avalon-ai-2",
+            "index": 2,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": false,
+              "isSent": false,
+              "waitForAction": false,
+              "ladyOfLake": "has"
+            },
+            "role": "evil"
+          },
+          {
+            "id": "avalon-ai-3",
+            "index": 3,
+            "name": "",
+            "features": {
+              "isSelected": true,
+              "isLeader": false,
+              "isSent": true,
+              "waitForAction": false
+            },
+            "role": "unknown"
+          },
+          {
+            "id": "avalon-ai-4",
+            "index": 4,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": false,
+              "isSent": false,
+              "waitForAction": false
+            },
+            "role": "evil"
+          },
+          {
+            "id": "avalon-ai-5",
+            "index": 5,
+            "name": "",
+            "features": {
+              "isSelected": true,
+              "isLeader": false,
+              "isSent": true,
+              "waitForAction": false
+            },
+            "role": "unknown"
+          },
+          {
+            "id": "avalon-ai-6",
+            "index": 6,
+            "name": "",
+            "features": {
+              "isSelected": true,
+              "isLeader": false,
+              "isSent": true,
+              "waitForAction": false
+            },
+            "role": "unknown"
+          },
+          {
+            "id": "avalon-ai-7",
+            "index": 7,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": true,
+              "isSent": false,
+              "ladyOfLake": "used",
+              "waitForAction": true
+            },
+            "role": "unknown"
+          }
+        ],
+        "turn": 2
+      },
+      "chat": [],
+      "choices": ["approve", "reject"]
+    }
+  }
+]

@@ -100,7 +100,12 @@
           </button>
         </div>
         <div v-else class="games-list">
-          <LobbyRoom v-for="game in visibleRooms.slice(0, visibleLimit)" :key="game.uuid" :game="game" />
+          <LobbyRoom
+            v-for="game in visibleRooms.slice(0, visibleLimit)"
+            :key="game.uuid"
+            :game="game"
+            :cost="aiCosts[game.uuid]"
+          />
           <button v-if="visibleRooms.length > visibleLimit" class="show-more" @click="visibleLimit += 8">
             {{ $t('mainPage.showMore') }} <span aria-hidden="true">↓</span>
           </button>
@@ -124,6 +129,7 @@ import type { TRoomsList } from '@avalon/types';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import LobbyRoom from './LobbyRoom.vue';
+import { useAiAccess } from '@/helpers/composables/useAiAccess';
 import AiRoomButton from './AiRoomButton.vue';
 import RotatingTopPlayer from '@/components/stats/RotatingTopPlayer.vue';
 
@@ -139,6 +145,9 @@ export default defineComponent({
     const store = useStore();
 
     const roomsList = ref<TRoomsList>();
+    const { costs: aiCosts } = useAiAccess(
+      computed(() => (roomsList.value || []).filter((room) => room.ai).map((room) => room.uuid)),
+    );
     const online = ref<number>();
 
     socket.emitWithAck('getOnlineCounter', 'lobby').then((counter) => {
@@ -176,10 +185,18 @@ export default defineComponent({
     });
     const filters = ['all', 'open', 'playing', 'finished'];
     const roomCategory = (room: TRoomsList[number]) =>
-      room.result ? 'finished' : room.state === 'created' ? (room.players < 10 ? 'open' : 'full') : 'playing';
+      room.result || room.aiStatus === 'stopped' || room.aiStatus === 'finished'
+        ? 'finished'
+        : room.aiStatus === 'paused'
+          ? 'paused'
+          : room.state === 'created'
+            ? room.players < 10
+              ? 'open'
+              : 'full'
+            : 'playing';
     const roomPriority = (room: TRoomsList[number]) => {
       if (roomCategory(room) === 'open') return room.options.features?.lookingForPlayers ? 0 : 1;
-      return room.result ? 3 : 2;
+      return roomCategory(room) === 'finished' ? 3 : 2;
     };
     const visibleRooms = computed(() =>
       [...(roomsList.value || [])]
@@ -200,6 +217,7 @@ export default defineComponent({
 
     return {
       createRoom,
+      aiCosts,
       filter,
       visibleLimit,
       filters,

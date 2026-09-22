@@ -118,6 +118,15 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
   getUserAchievements: (userID: string, callback: (response: AchievementResponse) => void) => void;
   getAchievementStats: (callback: (response: AchievementResponse) => void) => void;
 
+  getAiSpectatorRoles: (
+    roomID: string,
+    callback: (result: { roles: Record<string, TRoles> } | { error: string }) => void,
+  ) => void;
+  getAiBudget: (callback: (result: { budget: import('../room').AiBudgetSnapshot } | { error: string }) => void) => void;
+  getAiRoomCosts: (
+    roomIDs: string[],
+    callback: (result: { costs: Record<string, number> } | { error: string }) => void,
+  ) => void;
   getAiRoomAccess: (callback: (result: { canManage: boolean; roomID?: string }) => void) => void;
   createAiRoom: (callback: (result: { roomID: string } | { error: string }) => void) => void;
   controlAiRoom: (

@@ -8,8 +8,16 @@
       >
     </template>
     <template v-else>
-      <AiRoomPanel v-if="roomState.ai" class="ai-room-status" :ai="roomState.ai" :roomID="roomState.roomID" />
-      <Board :room-state="roomState">
+      <AiRoomPanel
+        v-if="roomState.ai"
+        class="ai-room-status"
+        :ai="roomState.ai"
+        :roomID="roomState.roomID"
+        :canReveal="canRevealRoles"
+        :rolesShown="rolesShown"
+        @roles="spectatorRoles = $event"
+      />
+      <Board :room-state="roomState" :spectator-roles="rolesShown ? spectatorRoles : {}">
         <template v-if="roomState.vote" v-slot:content>
           <RoomVote v-if="roomState.vote" :roomUuid="roomState.roomID" :vote="roomState.vote" />
         </template>
@@ -55,7 +63,7 @@ import { i18n } from '@/plugins/i18n';
 import { useRouter } from 'vue-router';
 import { defineComponent, ref, computed, watch, provide } from 'vue';
 import Board from '@/components/view/board/Board.vue';
-import type { TVisibleRole, ISocketError } from '@avalon/types';
+import type { TVisibleRole, TRoles, ISocketError } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { GameStateManager } from '@/helpers/game-state-manager';
@@ -115,6 +123,19 @@ export default defineComponent({
       () => hideStickers.value,
     );
     const game = stateManager.game;
+    const spectatorRoles = ref<Record<string, TRoles>>({});
+    const canRevealRoles = computed(() =>
+      Boolean(
+        roomState.value?.ai &&
+          roomState.value.stage === 'started' &&
+          game.value.stage !== 'end' &&
+          !game.value.players.some((p) => p.id === userID.value),
+      ),
+    );
+    const rolesShown = computed(() => canRevealRoles.value && Object.keys(spectatorRoles.value).length > 0);
+    watch([() => props.uuid, userID], () => {
+      spectatorRoles.value = {};
+    });
 
     const initState = async (uuid: string) => {
       const stateFromBackend = await socket.emitWithAck('joinRoom', uuid);
@@ -199,8 +220,9 @@ export default defineComponent({
     const visibleRoles = computed(() => {
       if (roomState.value.stage === 'started') {
         return game.value.players.reduce<TVisibleRole[]>((acc, el) => {
-          if (!acc.includes(el.role)) {
-            acc.push(el.role);
+          const role = rolesShown.value ? spectatorRoles.value[el.id] || el.role : el.role;
+          if (!acc.includes(role)) {
+            acc.push(role);
           }
 
           return acc;
@@ -211,6 +233,9 @@ export default defineComponent({
     });
 
     return {
+      spectatorRoles,
+      canRevealRoles,
+      rolesShown,
       hideStickers,
       chatOpen,
       roomState,

@@ -1,0 +1,2228 @@
+[
+  {
+    "name": "mission-five-proven-evil",
+    "request": {
+      "playerID": "3",
+      "name": "3",
+      "style": "brief",
+      "task": "Discuss this exact proposed team and cast your binding vote in the SAME answer; choose approve or reject. Give a brief reason without repeating vote words.",
+      "speak": true,
+      "choices": ["approve", "reject"],
+      "chat": [
+        {
+          "name": "4",
+          "text": "I vote approve. I approve to end the losing streak, leveraging seat 1's confirmed Good status to secure a necessary victory."
+        },
+        {
+          "name": "2",
+          "text": "I inspected 3 and announce: Evil."
+        },
+        {
+          "name": "5",
+          "text": "I propose 3, 4, 5, 6. Seat 3 is confirmed Evil. I need a mission with no known Evil. Seats 4, 5, 6, and 7 are unconfirmed or checked. Including Seat 4, who voted approve on the Evil-led team, is risky. Wait, seat 3 is evil. The proposed tea"
+        },
+        {
+          "name": "6",
+          "text": "I vote approve. I approve this team to secure a victory; although seat 3 is confirmed Evil, I must risk it to end the two-failure streak and pass the forced threshold."
+        },
+        {
+          "name": "7",
+          "text": "I vote reject. I reject because the proposer included the confirmed Evil seat 3, creating an unacceptable risk of mission failure."
+        },
+        {
+          "name": "1",
+          "text": "I vote reject. I reject this team because it includes the confirmed Evil seat 3, ensuring mission failure."
+        },
+        {
+          "name": "2",
+          "text": "I vote approve. I vote approve to secure a victory and end the losing streak, trusting the team composition to succeed despite the risk."
+        }
+      ],
+      "state": {
+        "stage": "selectTeam",
+        "mission": 4,
+        "vote": 0,
+        "players": [
+          {
+            "id": "3",
+            "index": 3,
+            "role": "servant",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": true
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "1",
+            "index": 1,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          }
+        ],
+        "settings": {
+          "missions": [
+            {
+              "players": 4,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            }
+          ]
+        },
+        "history": [
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "1",
+            "team": [
+              {
+                "id": "1"
+              },
+              {
+                "id": "2"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "3",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "4",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "1",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "2",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 0,
+            "settings": {
+              "players": 2,
+              "failsRequired": 1
+            },
+            "leaderID": "1",
+            "hidden": false,
+            "fails": 1,
+            "result": "fail",
+            "actions": [
+              {
+                "playerID": "1",
+                "switchedBy": null
+              },
+              {
+                "playerID": "2",
+                "switchedBy": null
+              }
+            ]
+          },
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "2",
+            "team": [
+              {
+                "id": "5"
+              },
+              {
+                "id": "6"
+              },
+              {
+                "id": "2"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "3",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "4",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "5",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "6",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "1",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "2",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 1,
+            "settings": {
+              "players": 3,
+              "failsRequired": 1
+            },
+            "leaderID": "2",
+            "hidden": false,
+            "fails": 3,
+            "result": "fail",
+            "actions": [
+              {
+                "playerID": "5",
+                "switchedBy": null
+              },
+              {
+                "playerID": "6",
+                "switchedBy": null
+              },
+              {
+                "playerID": "2",
+                "switchedBy": null
+              }
+            ]
+          },
+          {
+            "type": "checkLoyalty",
+            "validatorID": "7",
+            "inspectedID": "1"
+          },
+          {
+            "type": "announceLoyalty",
+            "announced": "good",
+            "announcerID": "7",
+            "targetID": "1"
+          },
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "3",
+            "team": [
+              {
+                "id": "3"
+              },
+              {
+                "id": "4"
+              },
+              {
+                "id": "7"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "3",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "4",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "7",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "1",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "2",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 2,
+            "settings": {
+              "players": 3,
+              "failsRequired": 1
+            },
+            "leaderID": "3",
+            "hidden": false,
+            "fails": 0,
+            "result": "success",
+            "actions": [
+              {
+                "playerID": "3",
+                "switchedBy": null,
+                "value": "success"
+              },
+              {
+                "playerID": "4",
+                "switchedBy": null
+              },
+              {
+                "playerID": "7",
+                "switchedBy": null
+              }
+            ]
+          },
+          {
+            "type": "checkLoyalty",
+            "validatorID": "1",
+            "inspectedID": "2"
+          },
+          {
+            "type": "announceLoyalty",
+            "announced": "evil",
+            "announcerID": "1",
+            "targetID": "2"
+          },
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "4",
+            "team": [
+              {
+                "id": "3"
+              },
+              {
+                "id": "4"
+              },
+              {
+                "id": "7"
+              },
+              {
+                "id": "1"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "3",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "4",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "7",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "1",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "2",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 3,
+            "settings": {
+              "players": 4,
+              "failsRequired": 2
+            },
+            "leaderID": "4",
+            "hidden": false,
+            "fails": 0,
+            "result": "success",
+            "actions": [
+              {
+                "playerID": "3",
+                "switchedBy": null,
+                "value": "success"
+              },
+              {
+                "playerID": "4",
+                "switchedBy": null
+              },
+              {
+                "playerID": "7",
+                "switchedBy": null
+              },
+              {
+                "playerID": "1",
+                "switchedBy": null
+              }
+            ]
+          },
+          {
+            "type": "checkLoyalty",
+            "validatorID": "2",
+            "inspectedID": "3"
+          },
+          {
+            "type": "announceLoyalty",
+            "announced": "evil",
+            "actual": "good",
+            "announcerID": "2",
+            "targetID": "3"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "postulate-servant-2",
+    "request": {
+      "playerID": "1",
+      "name": "1",
+      "style": "brief",
+      "task": "Vote on this proposed team and defend your public position.",
+      "speak": true,
+      "choices": ["approve", "reject"],
+      "chat": [],
+      "state": {
+        "stage": "selectTeam",
+        "mission": 1,
+        "vote": 0,
+        "players": [
+          {
+            "id": "1",
+            "index": 1,
+            "role": "servant",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": true
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          }
+        ],
+        "settings": {
+          "missions": [
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            }
+          ]
+        },
+        "history": [
+          {
+            "type": "mission",
+            "index": 0,
+            "leaderID": "1",
+            "result": "fail",
+            "fails": 1,
+            "actions": [
+              {
+                "playerID": "1",
+                "value": "success"
+              },
+              {
+                "playerID": "2"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "postulate-mordred-2",
+    "request": {
+      "playerID": "1",
+      "name": "1",
+      "style": "brief",
+      "task": "Vote on this proposed team and defend your public position.",
+      "speak": true,
+      "choices": ["approve", "reject"],
+      "chat": [],
+      "state": {
+        "stage": "selectTeam",
+        "mission": 1,
+        "vote": 0,
+        "players": [
+          {
+            "id": "1",
+            "index": 1,
+            "role": "mordred",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": true
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          }
+        ],
+        "settings": {
+          "missions": [
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            }
+          ]
+        },
+        "history": [
+          {
+            "type": "mission",
+            "index": 0,
+            "leaderID": "1",
+            "result": "fail",
+            "fails": 1,
+            "actions": [
+              {
+                "playerID": "1",
+                "value": "fail"
+              },
+              {
+                "playerID": "2"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "postulate-morgana-3",
+    "request": {
+      "playerID": "1",
+      "name": "1",
+      "style": "brief",
+      "task": "Vote on this proposed team and defend your public position.",
+      "speak": true,
+      "choices": ["approve", "reject"],
+      "chat": [],
+      "state": {
+        "stage": "selectTeam",
+        "mission": 1,
+        "vote": 0,
+        "players": [
+          {
+            "id": "1",
+            "index": 1,
+            "role": "morgana",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": true
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          }
+        ],
+        "settings": {
+          "missions": [
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            }
+          ]
+        },
+        "history": [
+          {
+            "type": "mission",
+            "index": 0,
+            "leaderID": "1",
+            "result": "fail",
+            "fails": 2,
+            "actions": [
+              {
+                "playerID": "1",
+                "value": "fail"
+              },
+              {
+                "playerID": "2"
+              },
+              {
+                "playerID": "3"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "self-inclusion-proposal",
+    "request": {
+      "playerID": "3",
+      "name": "3",
+      "style": "brief",
+      "task": "Propose a team and explain your choice",
+      "speak": true,
+      "choices": [
+        "1, 2, 3, 4",
+        "1, 2, 3, 5",
+        "1, 2, 3, 6",
+        "1, 2, 3, 7",
+        "1, 2, 4, 5",
+        "1, 2, 4, 6",
+        "1, 2, 4, 7",
+        "1, 2, 5, 6",
+        "1, 2, 5, 7",
+        "1, 2, 6, 7",
+        "1, 3, 4, 5",
+        "1, 3, 4, 6",
+        "1, 3, 4, 7",
+        "1, 3, 5, 6",
+        "1, 3, 5, 7",
+        "1, 3, 6, 7",
+        "1, 4, 5, 6",
+        "1, 4, 5, 7",
+        "1, 4, 6, 7",
+        "1, 5, 6, 7",
+        "2, 3, 4, 5",
+        "2, 3, 4, 6",
+        "2, 3, 4, 7",
+        "2, 3, 5, 6",
+        "2, 3, 5, 7",
+        "2, 3, 6, 7",
+        "2, 4, 5, 6",
+        "2, 4, 5, 7",
+        "2, 4, 6, 7",
+        "2, 5, 6, 7",
+        "3, 4, 5, 6",
+        "3, 4, 5, 7",
+        "3, 4, 6, 7",
+        "3, 5, 6, 7",
+        "4, 5, 6, 7"
+      ],
+      "chat": [
+        {
+          "name": "4",
+          "text": "I vote approve. I approve to end the losing streak, leveraging seat 1's confirmed Good status to secure a necessary victory."
+        },
+        {
+          "name": "2",
+          "text": "I inspected 3 and announce: Evil."
+        },
+        {
+          "name": "5",
+          "text": "I propose 3, 4, 5, 6. Seat 3 is confirmed Evil. I need a mission with no known Evil. Seats 4, 5, 6, and 7 are unconfirmed or checked. Including Seat 4, who voted approve on the Evil-led team, is risky. Wait, seat 3 is evil. The proposed tea"
+        },
+        {
+          "name": "6",
+          "text": "I vote approve. I approve this team to secure a victory; although seat 3 is confirmed Evil, I must risk it to end the two-failure streak and pass the forced threshold."
+        },
+        {
+          "name": "7",
+          "text": "I vote reject. I reject because the proposer included the confirmed Evil seat 3, creating an unacceptable risk of mission failure."
+        },
+        {
+          "name": "1",
+          "text": "I vote reject. I reject this team because it includes the confirmed Evil seat 3, ensuring mission failure."
+        },
+        {
+          "name": "2",
+          "text": "I vote approve. I vote approve to secure a victory and end the losing streak, trusting the team composition to succeed despite the risk."
+        }
+      ],
+      "state": {
+        "stage": "selectTeam",
+        "mission": 4,
+        "vote": 0,
+        "players": [
+          {
+            "id": "3",
+            "index": 3,
+            "role": "servant",
+            "features": {
+              "isSelected": false,
+              "isLeader": true
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "1",
+            "index": 1,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          }
+        ],
+        "settings": {
+          "missions": [
+            {
+              "players": 4,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            }
+          ]
+        },
+        "history": [
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "1",
+            "team": [
+              {
+                "id": "1"
+              },
+              {
+                "id": "2"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "3",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "4",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "1",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "2",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 0,
+            "settings": {
+              "players": 2,
+              "failsRequired": 1
+            },
+            "leaderID": "1",
+            "hidden": false,
+            "fails": 1,
+            "result": "fail",
+            "actions": [
+              {
+                "playerID": "1",
+                "switchedBy": null
+              },
+              {
+                "playerID": "2",
+                "switchedBy": null
+              }
+            ]
+          },
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "2",
+            "team": [
+              {
+                "id": "5"
+              },
+              {
+                "id": "6"
+              },
+              {
+                "id": "2"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "3",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "4",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "5",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "6",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "1",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "2",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 1,
+            "settings": {
+              "players": 3,
+              "failsRequired": 1
+            },
+            "leaderID": "2",
+            "hidden": false,
+            "fails": 3,
+            "result": "fail",
+            "actions": [
+              {
+                "playerID": "5",
+                "switchedBy": null
+              },
+              {
+                "playerID": "6",
+                "switchedBy": null
+              },
+              {
+                "playerID": "2",
+                "switchedBy": null
+              }
+            ]
+          },
+          {
+            "type": "checkLoyalty",
+            "validatorID": "7",
+            "inspectedID": "1"
+          },
+          {
+            "type": "announceLoyalty",
+            "announced": "good",
+            "announcerID": "7",
+            "targetID": "1"
+          },
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "3",
+            "team": [
+              {
+                "id": "3"
+              },
+              {
+                "id": "4"
+              },
+              {
+                "id": "7"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "3",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "4",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "7",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "1",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "2",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 2,
+            "settings": {
+              "players": 3,
+              "failsRequired": 1
+            },
+            "leaderID": "3",
+            "hidden": false,
+            "fails": 0,
+            "result": "success",
+            "actions": [
+              {
+                "playerID": "3",
+                "switchedBy": null,
+                "value": "success"
+              },
+              {
+                "playerID": "4",
+                "switchedBy": null
+              },
+              {
+                "playerID": "7",
+                "switchedBy": null
+              }
+            ]
+          },
+          {
+            "type": "checkLoyalty",
+            "validatorID": "1",
+            "inspectedID": "2"
+          },
+          {
+            "type": "announceLoyalty",
+            "announced": "evil",
+            "announcerID": "1",
+            "targetID": "2"
+          },
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "4",
+            "team": [
+              {
+                "id": "3"
+              },
+              {
+                "id": "4"
+              },
+              {
+                "id": "7"
+              },
+              {
+                "id": "1"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "3",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "4",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "7",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "1",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "2",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 3,
+            "settings": {
+              "players": 4,
+              "failsRequired": 2
+            },
+            "leaderID": "4",
+            "hidden": false,
+            "fails": 0,
+            "result": "success",
+            "actions": [
+              {
+                "playerID": "3",
+                "switchedBy": null,
+                "value": "success"
+              },
+              {
+                "playerID": "4",
+                "switchedBy": null
+              },
+              {
+                "playerID": "7",
+                "switchedBy": null
+              },
+              {
+                "playerID": "1",
+                "switchedBy": null
+              }
+            ]
+          },
+          {
+            "type": "checkLoyalty",
+            "validatorID": "2",
+            "inspectedID": "3"
+          },
+          {
+            "type": "announceLoyalty",
+            "announced": "evil",
+            "actual": "good",
+            "announcerID": "2",
+            "targetID": "3"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "cheap-final-review",
+    "request": {
+      "playerID": "avalon-ai-1",
+      "name": "3",
+      "style": "brief",
+      "task": "Write your conclusion",
+      "speak": true,
+      "choices": ["Write your conclusion"],
+      "chat": [],
+      "state": {
+        "result": {
+          "winner": "evil",
+          "reason": "evilTeamMissions"
+        },
+        "uuid": "d60b2dc3-f7ad-467e-a504-7f86bce740e0",
+        "stage": "end",
+        "vote": 0,
+        "mission": 4,
+        "settings": {
+          "missions": [
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 2
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            }
+          ],
+          "players": {
+            "good": 4,
+            "evil": 3
+          },
+          "total": 7,
+          "roles": {
+            "evil": ["mordred", "morgana", "minion"],
+            "good": ["merlin", "percival", "servant", "servant"]
+          }
+        },
+        "addonsData": {
+          "assassin": {
+            "assassinateTargets": ["merlin"],
+            "progressData": null
+          }
+        },
+        "features": {
+          "wtfMode": false,
+          "displayIndex": true
+        },
+        "timer": {
+          "active": false,
+          "isCustom": false
+        },
+        "missionState": [
+          {
+            "players": 2,
+            "failsRequired": 1,
+            "hidden": false,
+            "fails": 1,
+            "result": "fail"
+          },
+          {
+            "players": 3,
+            "failsRequired": 1,
+            "hidden": false,
+            "fails": 3,
+            "result": "fail"
+          },
+          {
+            "players": 3,
+            "failsRequired": 1,
+            "hidden": false,
+            "fails": 0,
+            "result": "success"
+          },
+          {
+            "players": 4,
+            "failsRequired": 2,
+            "hidden": false,
+            "fails": 0,
+            "result": "success"
+          },
+          {
+            "players": 4,
+            "failsRequired": 1,
+            "hidden": false,
+            "fails": 2,
+            "result": "fail"
+          }
+        ],
+        "history": [
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "avalon-ai-6",
+            "team": [
+              {
+                "id": "avalon-ai-6"
+              },
+              {
+                "id": "avalon-ai-7"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "avalon-ai-1",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-6",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 0,
+            "settings": {
+              "players": 2,
+              "failsRequired": 1
+            },
+            "leaderID": "avalon-ai-6",
+            "hidden": false,
+            "fails": 1,
+            "result": "fail",
+            "actions": [
+              {
+                "playerID": "avalon-ai-6",
+                "switchedBy": null,
+                "value": "success"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "switchedBy": null,
+                "value": "fail"
+              }
+            ]
+          },
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "avalon-ai-7",
+            "team": [
+              {
+                "id": "avalon-ai-3"
+              },
+              {
+                "id": "avalon-ai-4"
+              },
+              {
+                "id": "avalon-ai-7"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "avalon-ai-1",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 1,
+            "settings": {
+              "players": 3,
+              "failsRequired": 1
+            },
+            "leaderID": "avalon-ai-7",
+            "hidden": false,
+            "fails": 3,
+            "result": "fail",
+            "actions": [
+              {
+                "playerID": "avalon-ai-3",
+                "switchedBy": null,
+                "value": "fail"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "switchedBy": null,
+                "value": "fail"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "switchedBy": null,
+                "value": "fail"
+              }
+            ]
+          },
+          {
+            "type": "checkLoyalty",
+            "validatorID": "avalon-ai-5",
+            "inspectedID": "avalon-ai-6"
+          },
+          {
+            "type": "announceLoyalty",
+            "announced": "good",
+            "actual": "good",
+            "announcerID": "avalon-ai-5",
+            "targetID": "avalon-ai-6"
+          },
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "avalon-ai-1",
+            "team": [
+              {
+                "id": "avalon-ai-1"
+              },
+              {
+                "id": "avalon-ai-2"
+              },
+              {
+                "id": "avalon-ai-5"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "avalon-ai-1",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 2,
+            "settings": {
+              "players": 3,
+              "failsRequired": 1
+            },
+            "leaderID": "avalon-ai-1",
+            "hidden": false,
+            "fails": 0,
+            "result": "success",
+            "actions": [
+              {
+                "playerID": "avalon-ai-1",
+                "switchedBy": null,
+                "value": "success"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "switchedBy": null,
+                "value": "success"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "switchedBy": null,
+                "value": "success"
+              }
+            ]
+          },
+          {
+            "type": "checkLoyalty",
+            "validatorID": "avalon-ai-6",
+            "inspectedID": "avalon-ai-7"
+          },
+          {
+            "type": "announceLoyalty",
+            "announced": "evil",
+            "actual": "evil",
+            "announcerID": "avalon-ai-6",
+            "targetID": "avalon-ai-7"
+          },
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "avalon-ai-2",
+            "team": [
+              {
+                "id": "avalon-ai-1"
+              },
+              {
+                "id": "avalon-ai-2"
+              },
+              {
+                "id": "avalon-ai-5"
+              },
+              {
+                "id": "avalon-ai-6"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "avalon-ai-1",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-6",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 3,
+            "settings": {
+              "players": 4,
+              "failsRequired": 2
+            },
+            "leaderID": "avalon-ai-2",
+            "hidden": false,
+            "fails": 0,
+            "result": "success",
+            "actions": [
+              {
+                "playerID": "avalon-ai-1",
+                "switchedBy": null,
+                "value": "success"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "switchedBy": null,
+                "value": "success"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "switchedBy": null,
+                "value": "success"
+              },
+              {
+                "playerID": "avalon-ai-6",
+                "switchedBy": null,
+                "value": "success"
+              }
+            ]
+          },
+          {
+            "type": "checkLoyalty",
+            "validatorID": "avalon-ai-7",
+            "inspectedID": "avalon-ai-1"
+          },
+          {
+            "type": "announceLoyalty",
+            "announced": "evil",
+            "actual": "good",
+            "announcerID": "avalon-ai-7",
+            "targetID": "avalon-ai-1"
+          },
+          {
+            "type": "vote",
+            "result": "approve",
+            "index": 0,
+            "forced": false,
+            "leaderID": "avalon-ai-3",
+            "team": [
+              {
+                "id": "avalon-ai-1"
+              },
+              {
+                "id": "avalon-ai-2"
+              },
+              {
+                "id": "avalon-ai-3"
+              },
+              {
+                "id": "avalon-ai-4"
+              }
+            ],
+            "anonymous": false,
+            "votes": [
+              {
+                "playerID": "avalon-ai-1",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "onMission": true,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              },
+              {
+                "playerID": "avalon-ai-5",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-6",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "reject"
+              },
+              {
+                "playerID": "avalon-ai-7",
+                "onMission": false,
+                "excalibur": null,
+                "preVote": null,
+                "value": "approve"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 4,
+            "settings": {
+              "players": 4,
+              "failsRequired": 1
+            },
+            "leaderID": "avalon-ai-3",
+            "hidden": false,
+            "fails": 2,
+            "result": "fail",
+            "actions": [
+              {
+                "playerID": "avalon-ai-1",
+                "switchedBy": null,
+                "value": "success"
+              },
+              {
+                "playerID": "avalon-ai-2",
+                "switchedBy": null,
+                "value": "success"
+              },
+              {
+                "playerID": "avalon-ai-3",
+                "switchedBy": null,
+                "value": "fail"
+              },
+              {
+                "playerID": "avalon-ai-4",
+                "switchedBy": null,
+                "value": "fail"
+              }
+            ]
+          }
+        ],
+        "players": [
+          {
+            "id": "avalon-ai-1",
+            "index": 3,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": false,
+              "isSent": false,
+              "waitForAction": false,
+              "ladyOfLake": "has"
+            },
+            "role": "servant"
+          },
+          {
+            "id": "avalon-ai-2",
+            "index": 4,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": false,
+              "isSent": false,
+              "waitForAction": false
+            },
+            "role": "servant"
+          },
+          {
+            "id": "avalon-ai-3",
+            "index": 5,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": true,
+              "isSent": false,
+              "waitForAction": false
+            },
+            "role": "minion"
+          },
+          {
+            "id": "avalon-ai-4",
+            "index": 6,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": false,
+              "isSent": false,
+              "waitForAction": false
+            },
+            "role": "morgana"
+          },
+          {
+            "id": "avalon-ai-5",
+            "index": 7,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": false,
+              "isSent": false,
+              "ladyOfLake": "used",
+              "waitForAction": false
+            },
+            "role": "percival"
+          },
+          {
+            "id": "avalon-ai-6",
+            "index": 1,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": false,
+              "isSent": false,
+              "waitForAction": false,
+              "ladyOfLake": "used"
+            },
+            "role": "merlin"
+          },
+          {
+            "id": "avalon-ai-7",
+            "index": 2,
+            "name": "",
+            "features": {
+              "isSelected": false,
+              "isLeader": false,
+              "isSent": false,
+              "waitForAction": false,
+              "ladyOfLake": "used"
+            },
+            "role": "mordred"
+          }
+        ]
+      }
+    }
+  }
+]

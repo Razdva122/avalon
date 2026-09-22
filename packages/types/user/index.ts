@@ -56,6 +56,9 @@ export interface UserWithToken extends UserForUI {
   },
 })
 export class UserProfile extends UserForUI {
+  @prop({ default: false })
+  public isAdmin?: boolean;
+
   @prop({ default: 0 })
   public authVersion?: number;
 

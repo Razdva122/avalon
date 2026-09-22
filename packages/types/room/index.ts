@@ -36,7 +36,8 @@ export class VoteInRoom {
 
 export type AiRoomState = {
   status: 'ready' | 'running' | 'paused' | 'finished' | 'stopped';
-  costRub: number;
+  costRub?: number;
+  model?: string;
   fallbacks: number;
   message: string;
 };
@@ -133,4 +134,14 @@ export type TMessage = {
   roomID?: string;
   text: string;
   author: string;
+};
+
+export type AiBudgetSnapshot = {
+  limitRub: number;
+  usedRub: number;
+  remainingRub: number;
+  matchLimitRub: number;
+  periodDays?: number;
+  periodStart?: string;
+  periodEnd?: string;
 };
