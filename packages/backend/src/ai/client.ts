@@ -59,7 +59,7 @@ export function systemFor(request: BotRequest): string {
 
 const roleAdvice: Record<string, string> = {
   merlin:
-    'Your survival is part of winning, not an optional final step. Never publicly name your role or quote your secret Evil list. Guide Good with public evidence and cautious suspicions. Do not approve known-Evil teams just to move forward. Unknown may be Mordred, not necessarily Evil.',
+    'Your survival is part of winning, not an optional final step. Never publicly name your role or quote your secret Evil list. Guide Good with public evidence and cautious suspicions. Evaluate the whole roster against failsRequired. With two Fails required, exactly one Evil is SAFE for the mission even if that player always plays Fail; approving it can secure the third success. Reject if a second Evil could be present and a safer roster is available. You see only two Evil in this seven-player setup: Mordred is hidden. Unknown is NOT confirmed Good. Locate the remaining Evil using completed missions; never clear everyone outside your visible Evil list. If a failed mission contained neither visible Evil, hidden Mordred was among its participants. Do not call those suspects likely Good just because you cannot see them. Prefer a roster excluding that suspect group when enough other seats remain, especially alongside one known Evil on a two-Fail mission.',
   percival:
     'Your wizard pair contains Merlin and Morgana; you do NOT know which is which. Treat them as candidates, never label either Morgana as fact without evidence. Track the actual author of Lady claims. Protect likely Merlin without exposing the pair or your certainty. You do not know other alignments.',
   servant:
@@ -181,6 +181,31 @@ export function compactRequest(request: BotRequest) {
     proposedTeam: voting ? team : undefined,
     missionTeam: state.stage === 'onMission' ? team : undefined,
     youAreOnTeam: teamStage && own ? team.includes(own.index) : undefined,
+    // Factual arithmetic only: strategy and deductions about unknown players remain with Qwen.
+    actionFacts:
+      teamStage && own
+        ? {
+            yourSeat: own.index,
+            yourSide: side,
+            team,
+            youAreOnTeam: team.includes(own.index),
+            knownEvilOnTeam: players
+              .filter((p) => team.includes(p.index) && ['evil', 'mordred', 'morgana', 'minion'].includes(p.role))
+              .map((p) => p.index),
+            unresolvedOnTeam: players
+              .filter((p) => team.includes(p.index) && ['unknown', 'mysteryWizard'].includes(p.role))
+              .map((p) => p.index),
+            failsRequired,
+            toleratesFails: failsRequired === undefined ? undefined : failsRequired - 1,
+            openingSelfPreference:
+              side === 'good' &&
+              state.mission === 0 &&
+              voting &&
+              !team.includes(own.index) &&
+              Number.isInteger(state.vote) &&
+              state.vote < 3,
+          }
+        : undefined,
     missionRule:
       teamStage && failsRequired !== undefined
         ? { successWithFails: Array.from({ length: failsRequired }, (_, i) => i), failureAtLeast: failsRequired }

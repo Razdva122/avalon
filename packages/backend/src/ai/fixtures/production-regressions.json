@@ -1,0 +1,1034 @@
+[
+  {
+    "name": "opening-good-outside-prefers-self",
+    "expected": "reject",
+    "source": {
+      "roomID": "a20ee9b2",
+      "traceID": "bbce70e8-06fc-450d-93f1-80501d59d52f",
+      "variant": false,
+      "note": "Player-visible mission/check facts and recent chat; old vote history omitted."
+    },
+    "request": {
+      "playerID": "4",
+      "name": "4",
+      "style": "brief",
+      "task": "Vote on the exact current team.",
+      "speak": false,
+      "choices": ["approve", "reject"],
+      "chat": [
+        {
+          "name": "1",
+          "text": "I propose 1, 2. I volunteer for this mission as I believe seat 2 is reliable based on early dynamics to test loyalty."
+        },
+        {
+          "name": "2",
+          "text": "I vote approve. I am voting approve for this team to secure an easy mission success and gain information on player reliability."
+        },
+        {
+          "name": "3",
+          "text": "I vote reject. I reject this team because the proposal relies on unverified claims about seat 2, which poses an unnecessary risk for our first mission."
+        }
+      ],
+      "state": {
+        "stage": "votingForTeam",
+        "mission": 0,
+        "vote": 0,
+        "settings": {
+          "missions": [
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 2
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            }
+          ],
+          "players": {
+            "good": 4,
+            "evil": 3
+          },
+          "total": 7
+        },
+        "players": [
+          {
+            "id": "1",
+            "index": 1,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": true
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "servant",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          }
+        ],
+        "history": []
+      }
+    }
+  },
+  {
+    "name": "opening-good-inside",
+    "expected": "approve",
+    "source": {
+      "roomID": "a20ee9b2",
+      "traceID": "bbce70e8-06fc-450d-93f1-80501d59d52f",
+      "variant": true,
+      "note": "Player-visible mission/check facts and recent chat; old vote history omitted."
+    },
+    "request": {
+      "playerID": "4",
+      "name": "4",
+      "style": "brief",
+      "task": "Vote on the exact current team.",
+      "speak": false,
+      "choices": ["approve", "reject"],
+      "chat": [],
+      "state": {
+        "stage": "votingForTeam",
+        "mission": 0,
+        "vote": 0,
+        "settings": {
+          "missions": [
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 2
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            }
+          ],
+          "players": {
+            "good": 4,
+            "evil": 3
+          },
+          "total": 7
+        },
+        "players": [
+          {
+            "id": "1",
+            "index": 1,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": true
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "servant",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          }
+        ],
+        "history": []
+      }
+    }
+  },
+  {
+    "name": "merlin-fourth-does-not-invent-past-teammate",
+    "expected": "reject",
+    "source": {
+      "roomID": "a20ee9b2",
+      "traceID": "76ddd73b-83b8-4e7e-a338-f770441934d4",
+      "variant": false,
+      "note": "Player-visible mission/check facts and recent chat; old vote history omitted."
+    },
+    "request": {
+      "playerID": "5",
+      "name": "5",
+      "style": "brief",
+      "task": "Vote on the exact current team.",
+      "speak": false,
+      "choices": ["approve", "reject"],
+      "chat": [
+        {
+          "name": "5",
+          "text": "I vote reject. Seat 3 was publicly flagged as Evil by Seat 7, making this team a guaranteed failure."
+        },
+        {
+          "name": "6",
+          "text": "I vote approve. I approve to advance victory, trusting the publicly checked players and avoiding the obvious failure from earlier missions."
+        },
+        {
+          "name": "7",
+          "text": "I vote reject. My private check confirmed seat 3 is Evil, so including them guarantees mission failure."
+        },
+        {
+          "name": "1",
+          "text": "I vote approve. I insist Good. Seat 2 failed M1 with me, so Seat 2 is Evil. This roster avoids Seat 2. Seats 3 and 6 show promise via checks. I approve for success."
+        },
+        {
+          "name": "2",
+          "text": "I vote reject. I am Good. Mission 1 had 1 Fail card(s); 1 betrayed us. I reject teams with them."
+        },
+        {
+          "name": "3",
+          "text": "I vote approve. This team includes seat 4 who I confirmed as Good, maximizing our chance to succeed."
+        },
+        {
+          "name": "4",
+          "text": "I propose 1, 4, 5, 6. This team excludes confirmed Evil seat 3 and leverages the checked Good status of seat 4 to maximize success chances."
+        }
+      ],
+      "state": {
+        "stage": "votingForTeam",
+        "mission": 3,
+        "vote": 3,
+        "settings": {
+          "missions": [
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 2
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            }
+          ],
+          "players": {
+            "good": 4,
+            "evil": 3
+          },
+          "total": 7
+        },
+        "players": [
+          {
+            "id": "1",
+            "index": 1,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "evil",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": true
+            }
+          },
+          {
+            "id": "5",
+            "index": 5,
+            "role": "merlin",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "evil",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          }
+        ],
+        "history": [
+          {
+            "type": "mission",
+            "index": 0,
+            "leaderID": "1",
+            "result": "fail",
+            "fails": 1,
+            "actions": [
+              {
+                "playerID": "1"
+              },
+              {
+                "playerID": "2"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 1,
+            "leaderID": "5",
+            "result": "success",
+            "fails": 0,
+            "actions": [
+              {
+                "playerID": "4"
+              },
+              {
+                "playerID": "5",
+                "value": "success"
+              },
+              {
+                "playerID": "7"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 2,
+            "leaderID": "7",
+            "result": "success",
+            "fails": 0,
+            "actions": [
+              {
+                "playerID": "4"
+              },
+              {
+                "playerID": "5",
+                "value": "success"
+              },
+              {
+                "playerID": "7"
+              }
+            ]
+          },
+          {
+            "type": "announceLoyalty",
+            "announcerID": "7",
+            "targetID": "3",
+            "announced": "evil"
+          },
+          {
+            "type": "announceLoyalty",
+            "announcerID": "3",
+            "targetID": "4",
+            "announced": "good"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "merlin-fourth-one-known-evil-is-safe",
+    "expected": "approve",
+    "source": {
+      "roomID": "a20ee9b2",
+      "traceID": "76ddd73b-83b8-4e7e-a338-f770441934d4",
+      "variant": true,
+      "note": "Player-visible mission/check facts and recent chat; old vote history omitted."
+    },
+    "request": {
+      "playerID": "5",
+      "name": "5",
+      "style": "brief",
+      "task": "Vote on the exact current team.",
+      "speak": false,
+      "choices": ["approve", "reject"],
+      "chat": [
+        {
+          "name": "5",
+          "text": "I vote reject. Seat 3 was publicly flagged as Evil by Seat 7, making this team a guaranteed failure."
+        },
+        {
+          "name": "6",
+          "text": "I vote approve. I approve to advance victory, trusting the publicly checked players and avoiding the obvious failure from earlier missions."
+        },
+        {
+          "name": "7",
+          "text": "I vote reject. My private check confirmed seat 3 is Evil, so including them guarantees mission failure."
+        },
+        {
+          "name": "1",
+          "text": "I vote approve. I insist Good. Seat 2 failed M1 with me, so Seat 2 is Evil. This roster avoids Seat 2. Seats 3 and 6 show promise via checks. I approve for success."
+        },
+        {
+          "name": "2",
+          "text": "I vote reject. I am Good. Mission 1 had 1 Fail card(s); 1 betrayed us. I reject teams with them."
+        },
+        {
+          "name": "3",
+          "text": "I vote approve. This team includes seat 4 who I confirmed as Good, maximizing our chance to succeed."
+        },
+        {
+          "name": "4",
+          "text": "I propose 1, 4, 5, 6. This team excludes confirmed Evil seat 3 and leverages the checked Good status of seat 4 to maximize success chances."
+        }
+      ],
+      "state": {
+        "stage": "votingForTeam",
+        "mission": 3,
+        "vote": 3,
+        "settings": {
+          "missions": [
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 2
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            }
+          ],
+          "players": {
+            "good": 4,
+            "evil": 3
+          },
+          "total": 7
+        },
+        "players": [
+          {
+            "id": "1",
+            "index": 1,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "evil",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": true
+            }
+          },
+          {
+            "id": "5",
+            "index": 5,
+            "role": "merlin",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "evil",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          }
+        ],
+        "history": [
+          {
+            "type": "mission",
+            "index": 0,
+            "leaderID": "1",
+            "result": "fail",
+            "fails": 1,
+            "actions": [
+              {
+                "playerID": "1"
+              },
+              {
+                "playerID": "2"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 1,
+            "leaderID": "5",
+            "result": "success",
+            "fails": 0,
+            "actions": [
+              {
+                "playerID": "4"
+              },
+              {
+                "playerID": "5",
+                "value": "success"
+              },
+              {
+                "playerID": "7"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 2,
+            "leaderID": "7",
+            "result": "success",
+            "fails": 0,
+            "actions": [
+              {
+                "playerID": "4"
+              },
+              {
+                "playerID": "5",
+                "value": "success"
+              },
+              {
+                "playerID": "7"
+              }
+            ]
+          },
+          {
+            "type": "announceLoyalty",
+            "announcerID": "7",
+            "targetID": "3",
+            "announced": "evil"
+          },
+          {
+            "type": "announceLoyalty",
+            "announcerID": "3",
+            "targetID": "4",
+            "announced": "good"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "mordred-counts-himself-on-winning-team",
+    "expected": "approve",
+    "source": {
+      "roomID": "8dbf08c4",
+      "traceID": "2f219973-d1e0-4057-ab19-989c1f2d3826",
+      "variant": false,
+      "note": "Player-visible mission/check facts and recent chat; old vote history omitted."
+    },
+    "request": {
+      "playerID": "2",
+      "name": "2",
+      "style": "brief",
+      "task": "Vote on the exact current team.",
+      "speak": false,
+      "choices": ["approve", "reject"],
+      "chat": [
+        {
+          "name": "3",
+          "text": "I vote reject. Seat 4 failed Mission 1, creating unacceptable risk for this critical attempt."
+        },
+        {
+          "name": "4",
+          "text": "I vote approve. I approve this team to test its viability and gather information on the players involved."
+        },
+        {
+          "name": "5",
+          "text": "I vote approve. Approving [5,6,7] excludes 1 and 3, avoiding 4's failure to secure a win."
+        },
+        {
+          "name": "6",
+          "text": "I propose 5, 6, 2. Excluding the M1 fail pair 1,4 is key. 3 rejected 4, showing suspicion, while 2 voted for 4, making 2 safer than 3."
+        },
+        {
+          "name": "7",
+          "text": "I inspected 1 and announce: Evil."
+        },
+        {
+          "name": "7",
+          "text": "I propose 5, 7, 2. I detected Seat 1 as Evil. Team [5,7,2] excludes 1 and 4 (M1 fail), minimizing sabotage risk while securing my participation for Good victory."
+        },
+        {
+          "name": "1",
+          "text": "I vote approve. I am Good from M1; Seat 4 failed, so I accuse 4 of Evil and reject rosters with 4. This team excludes 4, so I approve."
+        }
+      ],
+      "state": {
+        "stage": "votingForTeam",
+        "mission": 2,
+        "vote": 0,
+        "settings": {
+          "missions": [
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 2
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            }
+          ],
+          "players": {
+            "good": 4,
+            "evil": 3
+          },
+          "total": 7
+        },
+        "players": [
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": true
+            }
+          },
+          {
+            "id": "1",
+            "index": 1,
+            "role": "evil",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "mordred",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "evil",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          }
+        ],
+        "history": [
+          {
+            "type": "mission",
+            "index": 0,
+            "leaderID": "1",
+            "result": "fail",
+            "fails": 1,
+            "actions": [
+              {
+                "playerID": "1"
+              },
+              {
+                "playerID": "4"
+              }
+            ]
+          },
+          {
+            "type": "mission",
+            "index": 1,
+            "leaderID": "6",
+            "result": "fail",
+            "fails": 1,
+            "actions": [
+              {
+                "playerID": "5"
+              },
+              {
+                "playerID": "6"
+              },
+              {
+                "playerID": "2",
+                "value": "fail"
+              }
+            ]
+          },
+          {
+            "type": "announceLoyalty",
+            "announcerID": "7",
+            "targetID": "1",
+            "announced": "evil"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "percival-votes-on-current-roster",
+    "expected": "approve",
+    "source": {
+      "roomID": "8dbf08c4",
+      "traceID": "95aaea88-2c2c-4bbb-8e37-a235112fa857",
+      "variant": false,
+      "note": "Player-visible mission/check facts and recent chat; old vote history omitted."
+    },
+    "request": {
+      "playerID": "6",
+      "name": "6",
+      "style": "brief",
+      "task": "Vote on the exact current team.",
+      "speak": false,
+      "choices": ["approve", "reject"],
+      "chat": [
+        {
+          "name": "6",
+          "text": "I vote approve. This team avoids Seat 1, who failed Mission 1, and tests Seat 4 for evil status."
+        },
+        {
+          "name": "7",
+          "text": "I vote reject. Seat 4 failed Mission 1, marking them a primary suspect. Including 4 on this team risks a guaranteed failure if they are Evil, which we cannot afford with 0 successes."
+        },
+        {
+          "name": "1",
+          "text": "I vote reject. I am Good. Mission 1 had 1 Fail card(s); 4 betrayed us. I reject teams with them."
+        },
+        {
+          "name": "2",
+          "text": "I vote reject. Seats 4, 5, and 6 lack proven track records. With zero successes, I reject this team to avoid risking the game with untested players."
+        },
+        {
+          "name": "3",
+          "text": "I vote reject. Seat 4 failed Mission 1, so including them risks a failure that we cannot afford."
+        },
+        {
+          "name": "4",
+          "text": "I vote approve. Seat 1 is proven Evil. Team avoids 1. 5,6,4 is the best chance for success. Vote approve."
+        },
+        {
+          "name": "5",
+          "text": "I propose 5, 6, 7. Excluding confirmed evil 1 and 3 ensures a clean team, avoiding the risk of 4's failed history."
+        }
+      ],
+      "state": {
+        "stage": "votingForTeam",
+        "mission": 1,
+        "vote": 3,
+        "settings": {
+          "missions": [
+            {
+              "players": 2,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 3,
+              "failsRequired": 1
+            },
+            {
+              "players": 4,
+              "failsRequired": 2
+            },
+            {
+              "players": 4,
+              "failsRequired": 1
+            }
+          ],
+          "players": {
+            "good": 4,
+            "evil": 3
+          },
+          "total": 7
+        },
+        "players": [
+          {
+            "id": "5",
+            "index": 5,
+            "role": "mysteryWizard",
+            "features": {
+              "isSelected": true,
+              "isLeader": true
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "percival",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": true,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "1",
+            "index": 1,
+            "role": "mysteryWizard",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": false,
+              "isLeader": false
+            }
+          }
+        ],
+        "history": [
+          {
+            "type": "mission",
+            "index": 0,
+            "leaderID": "1",
+            "result": "fail",
+            "fails": 1,
+            "actions": [
+              {
+                "playerID": "1"
+              },
+              {
+                "playerID": "4"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]

@@ -163,7 +163,7 @@ test('evidence outlives four turns and public speech receives only the intended 
   });
   const decide = decisionPipeline(generate);
   for (let i = 0; i < 6; i++) await decide(request);
-  expect(generate.mock.calls[10][1].context.evidence).toHaveLength(1);
+  expect(generate.mock.calls[10][1].context.modelHypotheses).toHaveLength(1);
   expect(generate.mock.calls[1][1].context.publicReason).toBe('Mission 2 exposed 2, 5 and 6.');
   expect(JSON.stringify(generate.mock.calls[1][1].context)).not.toContain('Private reason.');
 });
@@ -208,4 +208,59 @@ test('public speech does not expose avoiding a Good success', () => {
   ]) {
     expect(safePublicSpeech(line, 'reject')).toBe('I need stronger evidence before supporting this team.');
   }
+});
+
+test('recycled model claims never become authority or stored action facts', async () => {
+  const generate = jest.fn().mockResolvedValue({
+    choice: 0,
+    speech: '1 is proven Good because I cannot see Mordred.',
+    evidence: [{ key: 'one', kind: 'deduction', fact: '1 is Good', source: 'model guess', certainty: 'proven' }],
+  });
+  const decide = decisionPipeline(generate);
+  await decide({ ...request, speak: false });
+  await decide({ ...request, speak: false });
+  const context = generate.mock.calls[1][1].context;
+  expect(context).not.toHaveProperty('evidence');
+  expect(context.modelHypotheses).toEqual([expect.objectContaining({ certainty: 'claim' })]);
+  expect(context.previousDecisions).toEqual([expect.objectContaining({ choice: 'approve' })]);
+  expect(context.previousDecisions[0]).not.toHaveProperty('reason');
+});
+
+test('review distinguishes forced acceptance from an actual vote and names real actions', async () => {
+  const generate = jest.fn().mockResolvedValue({ choice: 0, speech: 'We lost.' });
+  const r = {
+    ...request,
+    state: {
+      ...request.state,
+      stage: 'end',
+      history: [
+        {
+          type: 'vote',
+          result: 'approve',
+          forced: true,
+          leaderID: 'evil',
+          team: [{ id: 'evil' }],
+          votes: [{ playerID: 'evil', value: 'approve' }],
+        },
+        {
+          type: 'mission',
+          index: 0,
+          result: 'fail',
+          fails: 1,
+          leaderID: 'evil',
+          actions: [{ playerID: 'evil', value: 'fail' }],
+        },
+      ],
+    },
+  } as BotRequest;
+  await decisionPipeline(generate)(r);
+  const c = generate.mock.calls[0][1].context;
+  expect(c.yourActions).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ id: 'proposal-1-1', type: 'proposal', team: [7] }),
+      expect.objectContaining({ id: 'card-1', type: 'card', value: 'fail' }),
+    ]),
+  );
+  expect(c.yourActions.some((a: { type: string }) => a.type === 'vote')).toBe(false);
+  expect(c.automaticProposals).toHaveLength(1);
 });

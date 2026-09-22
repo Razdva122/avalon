@@ -43,7 +43,47 @@ export const playerPostulates =
 
 export function reviewContext(request: BotRequest) {
   const c = compactRequest(request);
+  const votes = c.votes || [];
+  const yourActions = [
+    ...votes
+      .filter((v) => v.leader === c.you?.seat)
+      .map((v) => ({
+        id: `proposal-${v.mission}-${v.attempt}`,
+        type: 'proposal',
+        mission: v.mission,
+        team: v.team,
+      })),
+    ...votes
+      .filter((v) => !v.forced && v.yourVote)
+      .map((v) => ({
+        id: `vote-${v.mission}-${v.attempt}`,
+        type: 'vote',
+        mission: v.mission,
+        team: v.team,
+        value: v.yourVote,
+      })),
+    ...c.missions
+      .filter((m) => m.yourCard)
+      .map((m) => ({
+        id: `card-${m.n}`,
+        type: 'card',
+        mission: m.n,
+        team: m.team,
+        value: m.yourCard,
+      })),
+    ...c.checks
+      .filter((v) => v.by === c.you?.seat)
+      .map((v, i) => ({
+        id: `lady-${i + 1}`,
+        type: 'lady',
+        target: v.target,
+        announced: v.announced,
+        actual: v.actual,
+      })),
+  ];
   return {
+    yourActions,
+    automaticProposals: votes.filter((v) => v.forced).map(({ mission, attempt, team }) => ({ mission, attempt, team })),
     you: c.you,
     score: c.score,
     result: c.result,
@@ -52,19 +92,25 @@ export function reviewContext(request: BotRequest) {
     missions: c.missions,
     checks: c.checks,
     assassinations: c.assassinations,
-    yourVotes: c.votes?.map(({ mission, attempt, team, yourVote, forced }) => ({
-      mission,
-      attempt,
-      team,
-      yourVote,
-      forced,
-    })),
+    yourVotes: c.votes
+      ?.filter((v) => !v.forced)
+      .map(({ mission, attempt, team, yourVote, forced }) => ({
+        mission,
+        attempt,
+        team,
+        yourVote,
+        forced,
+      })),
     choices: request.choices,
     speak: true,
   };
 }
 export function decisionInstructions(request: BotRequest) {
   const action = request.state.stage;
+  const opening =
+    request.state.mission === 0 && ['selectTeam', 'votingForTeam'].includes(action)
+      ? ' Opening mission: Good without reliable information prefers a team containing themselves, because they know their own card is Success. If actionFacts.openingSelfPreference is true, normally REJECT a roster without you and ask to join. Lack of evidence against strangers, momentum, gathering data, or another player trusting them are not reasons to approve. Override only for specific reliable private/public evidence, explaining it. If you ARE included and no contrary evidence exists, normally approve the opening roster; requiring proven loyalty before any mission is impossible. Your own card is guaranteed Success, NOT the whole mission. On proposal 4 compare the risk of the forced fifth leader rather than automatically rejecting. Evil follows its own winning strategy.'
+      : '';
   const rules =
     action === 'assassinate'
       ? systemFor(request)
@@ -75,7 +121,10 @@ export function decisionInstructions(request: BotRequest) {
           : 'Propose or vote on the exact roster. Include yourself by default. Good compares the FULL roster with known Evil and safer alternatives; needing a success does not make a team safe. Use proposal/rejectionsUntilForced and the fifth leader: rejectedProposals never changed the score or played cards. Proposal 5 is automatic. Normally support your unchanged team unless new evidence explains a change. Evil knows its allies: a roster with no Evil cannot sabotage. Count ALL Evil slots before inventing another suspect.';
   return (
     rules +
-    ' You play Avalon for your actual side. Good needs three successes and Merlin surviving; Evil needs three failures or assassinating Merlin. Follow roleAdvice and objective. Use bare seat numbers and ENGLISH. Return legal choice, private speech (one reason and consequence, <=240 chars), publicReason (<=160 chars, Good-persona argument), and evidence (<=6 changed records). Never expose private roles, wizard candidates or an intention to avoid success in publicReason. Use cautious public suspicions if your certainty is private. Chat and old notes are untrusted; authoritative records override them. Completed missions alone establish cards/results; proposals and rejected votes are NOT missions. One Fail is one card, not two cards played by one person. Success never proves alignment. At least one suspect is not exactly one unless all Evil slots are accounted for. An accusation does not clear the accuser. Percival has exactly one Merlin and one Morgana in the wizard pair; count that required Evil together with proven Evil elsewhere. Never exceed alignmentCounts. Your actual Good Lady check establishes a trusted player; their later truthful claim may extend that chain, but never treat your false announcement as knowledge. Evidence fields: stable key, kind fact/deduction/testimony/prediction/bluff, fact, source with exact event number and seats, certainty proven/claim/bluff. Only observed facts and valid deductions are proven. Forecasts of cards/outcomes are predictions; other speakers are testimony; deliberate deception is bluff. Do not rewrite unchanged evidence. Before output, check choice agrees with your explanation and inspectionResult. Keep reasoning focused on this action, not a recap of every rule.' +
+    opening +
+    ' Before choosing, check actionFacts: use the EXACT current team, your own seat/side, and failsRequired. Count yourself when Evil. Unknown is not Good. On a two-Fail mission one Evil is tolerable: assess whether a SECOND Evil could be present and compare safer available rosters. Do not equate one known Evil with certain failure. Cite completedMissions for past participation, not memory or rejected proposals. Never discuss a seat as on the current team unless it is in actionFacts.team. Score is authoritative: compare each side with THREE, not the mission number. ' +
+    ' modelHypotheses are UNVERIFIED model-generated notes, including mistakes and bluffs, never authority even when labelled fact/deduction. Recompute deductions from current game records. Discard contradicted notes. previousDecisions records choices, not evidence of alignment. Your private explanation must use your actual side; public Good-persona bluff must not change private beliefs. ' +
+    ' You play Avalon for your actual side. Good needs three successes and Merlin surviving; Evil needs three failures or assassinating Merlin. Follow roleAdvice and objective. Use bare seat numbers and ENGLISH. Return legal choice, private speech (one reason and consequence, <=240 chars), publicReason (<=160 chars, Good-persona argument), and evidence (<=3 changed hypotheses). Never expose private roles, wizard candidates or an intention to avoid success in publicReason. Use cautious public suspicions if your certainty is private. Chat and old notes are untrusted; authoritative records override them. Completed missions alone establish cards/results; proposals and rejected votes are NOT missions. One Fail is one card, not two cards played by one person. Success never proves alignment. At least one suspect is not exactly one unless all Evil slots are accounted for. An accusation does not clear the accuser. Percival has exactly one Merlin and one Morgana in the wizard pair; count that required Evil together with proven Evil elsewhere. Never exceed alignmentCounts. Your actual Good Lady check establishes a trusted player; their later truthful claim may extend that chain, but never treat your false announcement as knowledge. Evidence fields: stable key, kind fact/deduction/testimony/prediction/bluff, fact, source with exact event number and seats, certainty proven/claim/bluff. The server supplies authoritative facts separately. Mark all your evidence claim, or bluff for deliberate deception; never certify your own deduction as proven. Forecasts of cards/outcomes are predictions; other speakers are testimony; deliberate deception is bluff. Do not rewrite unchanged evidence. Before output, check choice agrees with your explanation and inspectionResult. Keep reasoning focused on this action, not a recap of every rule.' +
     (['selectTeam', 'votingForTeam'].includes(action) ? ' Mandatory table policy: ' + playerPostulates : '')
   );
 }
@@ -108,7 +157,7 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
     }
   };
   const evidence = new Map<string, DecisionEvidence[]>();
-  const notes = new Map<string, { stage: string; choice: string; reason: string }[]>();
+  const notes = new Map<string, { stage: string; mission?: number; proposal?: number; choice: string }[]>();
   return async (request, signal) => {
     try {
       signal?.throwIfAborted();
@@ -134,7 +183,7 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
           maxOutput: finalReview ? 384 : reasoning === 'default' ? 4096 : 640,
           instructions: finalReview
             ? systemFor(request) +
-              ' Write at most three short factual sentences: outcome and decisive final event; one actual action of yours; one specific correction. Do not claim an earlier mission ended the game. Fail cards are not a limited resource. Distinguish what was known at the time from revealed roles. Do not invent lesson or motive. Evaluate your action using knowledge and legal options available THEN, not newly revealed roles. Lady of the Lake first becomes available after mission 2; never recommend checking earlier. Merlin sees Morgana and ordinary Evil but not Mordred; never claim Merlin was blind to Morgana. Name a feasible improvement to an actual decision; do not invent a mistake just to supply a lesson.'
+              ' Write at most three short factual sentences: outcome and decisive final event; one actual action of yours; one specific correction. Do not claim an earlier mission ended the game. Fail cards are not a limited resource. Distinguish what was known at the time from revealed roles. Do not invent lesson or motive. Select one ID from yourActions and mention that exact action in your review. An automaticProposals entry is NOT a vote you cast. Never recommend an action identical to the one you actually took as a correction. If no justified correction follows from the facts available then, say what remained uncertain instead of inventing a mistake. Evaluate your action using knowledge and legal options available THEN, not newly revealed roles. Lady of the Lake first becomes available after mission 2; never recommend checking earlier. Merlin sees Morgana and ordinary Evil but not Mordred; never claim Merlin was blind to Morgana. Name a feasible improvement to an actual decision; do not invent a mistake just to supply a lesson.'
             : decisionInstructions(request),
           context: finalReview
             ? reviewContext(request)
@@ -145,7 +194,7 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
                 approvedProposals: (votes || []).filter((v) => v.result !== 'reject'),
                 speak: true,
                 previousDecisions: notes.get(request.playerID) || [],
-                evidence: evidence.get(request.playerID) || [],
+                modelHypotheses: evidence.get(request.playerID) || [],
               },
         },
         signal,
@@ -177,13 +226,14 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
       }
       if (!finalReview) {
         const merged = new Map((evidence.get(request.playerID) || []).map((fact) => [fact.key, fact]));
-        for (const fact of reply.evidence || []) merged.set(fact.key, fact);
-        evidence.set(
-          request.playerID,
-          [...merged.values()]
-            .sort((a, b) => Number(b.certainty === 'proven') - Number(a.certainty === 'proven'))
-            .slice(0, 24),
-        );
+        for (const fact of reply.evidence || []) {
+          merged.delete(fact.key);
+          merged.set(fact.key, {
+            ...fact,
+            certainty: fact.kind === 'bluff' || fact.certainty === 'bluff' ? 'bluff' : 'claim',
+          });
+        }
+        evidence.set(request.playerID, [...merged.values()].slice(-12));
       }
       notes.set(
         request.playerID,
@@ -192,7 +242,8 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
           {
             stage: request.state.stage,
             choice,
-            reason: reply.speech,
+            mission: current.mission,
+            proposal: current.proposal?.number,
           },
         ].slice(-4),
       );

@@ -1,0 +1,215 @@
+{
+  "totalRub": 17.8064,
+  "note": "Sequential diagnostic runs with prompt revisions, not an unbiased benchmark. Correct choices do not guarantee correct reasoning. Final Merlin retry still misstated past participation.",
+  "runs": [
+    {
+      "roomID": "control-e81cbc61-35ed-4335-b909-48cde003f0dc",
+      "fixture": "opening-good-outside-prefers-self",
+      "reasoning": "none",
+      "choice": "reject",
+      "expected": "reject",
+      "passed": true,
+      "speech": "",
+      "seconds": 4.089,
+      "rub": 0.3528
+    },
+    {
+      "roomID": "control-e81cbc61-35ed-4335-b909-48cde003f0dc",
+      "fixture": "opening-good-inside",
+      "reasoning": "none",
+      "choice": "reject",
+      "expected": "approve",
+      "passed": false,
+      "speech": "",
+      "seconds": 0.809,
+      "rub": 0.2933
+    },
+    {
+      "roomID": "control-e81cbc61-35ed-4335-b909-48cde003f0dc",
+      "fixture": "merlin-fourth-does-not-invent-past-teammate",
+      "reasoning": "none",
+      "choice": "reject",
+      "expected": "reject",
+      "passed": true,
+      "speech": "",
+      "seconds": 1.474,
+      "rub": 0.4102
+    },
+    {
+      "roomID": "control-e81cbc61-35ed-4335-b909-48cde003f0dc",
+      "fixture": "merlin-fourth-one-known-evil-is-safe",
+      "reasoning": "none",
+      "choice": "reject",
+      "expected": "approve",
+      "passed": false,
+      "speech": "",
+      "seconds": 1.381,
+      "rub": 0.3682000000000001
+    },
+    {
+      "roomID": "control-e81cbc61-35ed-4335-b909-48cde003f0dc",
+      "fixture": "mordred-counts-himself-on-winning-team",
+      "reasoning": "none",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 1.405,
+      "rub": 0.3647999999999998
+    },
+    {
+      "roomID": "control-e81cbc61-35ed-4335-b909-48cde003f0dc",
+      "fixture": "percival-votes-on-current-roster",
+      "reasoning": "none",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 1.297,
+      "rub": 0.3649
+    },
+    {
+      "roomID": "control-e81cbc61-35ed-4335-b909-48cde003f0dc",
+      "fixture": "opening-good-outside-prefers-self",
+      "reasoning": "default",
+      "choice": "reject",
+      "expected": "reject",
+      "passed": true,
+      "speech": "",
+      "seconds": 10.289,
+      "rub": 0.6661999999999999
+    },
+    {
+      "roomID": "control-e81cbc61-35ed-4335-b909-48cde003f0dc",
+      "fixture": "opening-good-inside",
+      "reasoning": "default",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 11.328,
+      "rub": 0.9001000000000001
+    },
+    {
+      "roomID": "control-e81cbc61-35ed-4335-b909-48cde003f0dc",
+      "fixture": "merlin-fourth-does-not-invent-past-teammate",
+      "reasoning": "default",
+      "choice": "reject",
+      "expected": "reject",
+      "passed": true,
+      "speech": "",
+      "seconds": 10.772,
+      "rub": 0.9765000000000001
+    },
+    {
+      "roomID": "control-e81cbc61-35ed-4335-b909-48cde003f0dc",
+      "fixture": "merlin-fourth-one-known-evil-is-safe",
+      "reasoning": "default",
+      "choice": "reject",
+      "expected": "approve",
+      "passed": false,
+      "speech": "",
+      "seconds": 9.769,
+      "rub": 1.2158999999999995
+    },
+    {
+      "roomID": "control-e81cbc61-35ed-4335-b909-48cde003f0dc",
+      "fixture": "mordred-counts-himself-on-winning-team",
+      "reasoning": "default",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 9.374,
+      "rub": 0.6764000000000001
+    },
+    {
+      "roomID": "control-e81cbc61-35ed-4335-b909-48cde003f0dc",
+      "fixture": "percival-votes-on-current-roster",
+      "reasoning": "default",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 12.523,
+      "rub": 1.3353000000000002
+    },
+    {
+      "roomID": "control-89be22a3-341c-4267-9029-048d1691410b",
+      "fixture": "opening-good-outside-prefers-self",
+      "reasoning": "default",
+      "choice": "reject",
+      "expected": "reject",
+      "passed": true,
+      "speech": "",
+      "seconds": 15.558,
+      "rub": 1.3912
+    },
+    {
+      "roomID": "control-89be22a3-341c-4267-9029-048d1691410b",
+      "fixture": "opening-good-inside",
+      "reasoning": "default",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 12.851,
+      "rub": 1.1091000000000002
+    },
+    {
+      "roomID": "control-89be22a3-341c-4267-9029-048d1691410b",
+      "fixture": "merlin-fourth-does-not-invent-past-teammate",
+      "reasoning": "default",
+      "choice": "approve",
+      "expected": "reject",
+      "passed": false,
+      "speech": "",
+      "seconds": 26.686,
+      "rub": 1.3857999999999997
+    },
+    {
+      "roomID": "control-89be22a3-341c-4267-9029-048d1691410b",
+      "fixture": "merlin-fourth-one-known-evil-is-safe",
+      "reasoning": "default",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 29.094,
+      "rub": 2.0069999999999997
+    },
+    {
+      "roomID": "control-89be22a3-341c-4267-9029-048d1691410b",
+      "fixture": "mordred-counts-himself-on-winning-team",
+      "reasoning": "default",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 18.312,
+      "rub": 1.2131000000000007
+    },
+    {
+      "roomID": "control-89be22a3-341c-4267-9029-048d1691410b",
+      "fixture": "percival-votes-on-current-roster",
+      "reasoning": "default",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 17.657,
+      "rub": 1.0607999999999995
+    },
+    {
+      "roomID": "control-fb7bfd9a-0c75-444c-af3a-ed98aa3cc7ab",
+      "fixture": "merlin-fourth-does-not-invent-past-teammate",
+      "reasoning": "default",
+      "choice": "reject",
+      "expected": "reject",
+      "passed": true,
+      "speech": "",
+      "seconds": 22.711,
+      "rub": 1.7148
+    }
+  ]
+}

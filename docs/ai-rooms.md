@@ -405,3 +405,25 @@ advantage. Model error remains possible: categories are not a general logic solv
 
 Two saved-position checks passed with Qwen (2.8061 RUB total). A full production game
 has not been run; this is not evidence that every strategic mistake is eliminated.
+
+### Decision reliability and opening votes (September 22)
+
+Good players without reliable information now prefer joining the opening mission instead of approving a roster of strangers. `actionFacts.openingSelfPreference` marks an early opening vote without the player; the prompt permits evidence-based exceptions and requires comparing the forced fifth leader on proposal four. This is model guidance, not a hard rejection filter. Including oneself does not prove teammates Good or guarantee the mission.
+
+The private decision context includes factual `actionFacts`: exact current team, own seat/side, visible Evil on that team (including oneself when Evil), unresolved members and the mission's Fail threshold. These facts never enter the public speaker's allowlist. Strategy stays with Qwen; there is no backend alignment solver. Merlin's advice explicitly preserves the hidden Mordred possibility and allows a proven single-Evil team on a two-Fail mission.
+
+Model-generated evidence is retained as at most 12 recent `modelHypotheses`, with all non-bluff certainty demoted to `claim`. Raw outputs remain in private traces for audits. The previous four decisions retain only action/stage/mission/proposal, not recycled free-form explanations. This prevents the application from promoting its own model's guesses into authoritative `proven` records, but does not guarantee the model never makes a false deduction.
+
+End reviews receive `yourActions` with stable IDs for actual proposals, non-forced votes, own cards and Lady announcements. Forced fifth proposals are separate from votes. The model is instructed to anchor its review to an actual action and not propose doing what it already did as a correction.
+
+Bounded paid regression command (run from `packages/backend`):
+
+```sh
+npx ts-node src/ai/evaluate.ts --production-regressions
+# One mode only:
+npx ts-node src/ai/evaluate.ts --production-regressions --reasoning=default
+```
+
+This uses the local experiment ledger, a 20 RUB per-run cap and existing total cap; it does not start a live game. Six fixtures cover opening votes with/without self, Merlin's fourth-mission threshold with safe/risky teams, Mordred counting himself and Percival voting on the actual roster. They preserve player-visible mission/check facts and recent chat; old voting history is omitted and altered-team controls are labelled variants. This is a diagnostic set, not a general win-rate benchmark. A mismatched expected action sets a failing exit code; explanations still require manual review.
+
+Use `--case=<exact fixture name>` for a single production-regression fixture (5 RUB cap). Diagnostic results and limitations are recorded in `docs/superpowers/plans/2026-09-22-ai-decision-reliability.md`; rationale quality must not be inferred from the expected-choice pass flag.

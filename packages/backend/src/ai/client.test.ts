@@ -570,3 +570,49 @@ test('predictions and testimony cannot be stored as proven evidence', () => {
     expect(parsed.evidence?.[0].certainty).toBe(kind === 'bluff' ? 'bluff' : 'claim');
   }
 });
+
+const openingRequest = (role: string, selected: boolean, vote = 0): BotRequest => ({
+  ...request,
+  playerID: '1',
+  name: '1',
+  state: {
+    stage: 'votingForTeam',
+    mission: 0,
+    vote,
+    settings: { missions: [{ players: 2, failsRequired: 1 }] },
+    history: [],
+    players: [
+      { id: '1', index: 1, role, features: { isSelected: selected } },
+      { id: '2', index: 2, role: 'unknown', features: { isSelected: !selected, isLeader: true } },
+      { id: '3', index: 3, role: 'unknown', features: { isSelected: true } },
+    ],
+  } as unknown as VisualGameState,
+});
+test('opening self preference applies to uninvolved Good without forcing a late rejection or Evil strategy', () => {
+  expect(compactRequest(openingRequest('servant', false))).toMatchObject({
+    actionFacts: { openingSelfPreference: true, team: [2, 3], youAreOnTeam: false },
+  });
+  for (const r of [
+    openingRequest('servant', true),
+    openingRequest('mordred', false),
+    openingRequest('servant', false, 3),
+  ]) {
+    expect(compactRequest(r)).toMatchObject({ actionFacts: { openingSelfPreference: false } });
+  }
+});
+test('action facts count an Evil player themselves and preserve the two-Fail threshold', () => {
+  const r = openingRequest('mordred', true);
+  r.state.mission = 3;
+  r.state.settings.missions[3] = { players: 4, failsRequired: 2 };
+  expect(compactRequest(r)).toMatchObject({
+    actionFacts: {
+      yourSeat: 1,
+      yourSide: 'evil',
+      youAreOnTeam: true,
+      knownEvilOnTeam: [1],
+      failsRequired: 2,
+      toleratesFails: 1,
+      openingSelfPreference: false,
+    },
+  });
+});
