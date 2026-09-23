@@ -198,3 +198,23 @@ test('doubling one match cap persists, preserves spending and cannot bypass the 
   expect(await restarted.roomLimit('match')).toBe(4);
   expect((await restarted.budget()).usedRub).toBe(3);
 });
+
+test('room lease covers a ten-minute request and is renewed for the next request', async () => {
+  const db = client.db('long-request-lease');
+  const repo = new AiRepository(db);
+  await repo.claim('slow');
+  const collection = db.collection<{ _id: string; leaseUntil: Date }>('ai_experiment_budget');
+  const first = (await collection.findOne({ _id: 'avalon-ai-v1' }))!;
+  expect(first.leaseUntil.getTime() - Date.now()).toBeGreaterThan(10 * 60 * 1000);
+  // A ten-minute wait must leave a safety margin, even with no new reservations.
+  await collection.updateOne(
+    { _id: first._id },
+    { $set: { leaseUntil: new Date(first.leaseUntil.getTime() - 600000) } },
+  );
+  await expect(repo.claim('other')).rejects.toThrow('Другая AI-партия');
+  await repo.reserve('slow', 1000);
+  const renewed = (await collection.findOne({ _id: first._id }))!;
+  expect(renewed.leaseUntil.getTime() - Date.now()).toBeGreaterThan(10 * 60 * 1000);
+  await repo.release('slow');
+  await expect(repo.claim('other')).resolves.toBeUndefined();
+});

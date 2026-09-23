@@ -1,7 +1,15 @@
+import { Agent } from 'undici';
+import { AI_REQUEST_TIMEOUT_MS } from './timing';
 import { aiModel } from './models';
 import { randomUUID } from 'crypto';
 import type { VisualGameState } from '@avalon/types';
 import type { AiRepository, AiRequestLog, AiDecisionTrace } from './repository';
+
+// Scope long network timeouts to AI calls; other services keep their normal defaults.
+const aiDispatcher = new Agent().compose(
+  (dispatch) => (options, handler) =>
+    dispatch({ ...options, headersTimeout: AI_REQUEST_TIMEOUT_MS, bodyTimeout: AI_REQUEST_TIMEOUT_MS }, handler),
+);
 
 export type BotRequest = {
   playerID: string;
@@ -517,11 +525,12 @@ export function yandexDecide(
           `https://ai.api.cloud.yandex.net/v1/${sessionMode ? 'responses' : 'chat/completions'}`,
           {
             method: 'POST',
+            ...{ dispatcher: aiDispatcher },
             headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'OpenAI-Project': folder },
             body: JSON.stringify(payload),
             signal: signal
-              ? AbortSignal.any([signal, AbortSignal.timeout(options.reasoning === 'default' ? 90000 : 35000)])
-              : AbortSignal.timeout(options.reasoning === 'default' ? 90000 : 35000),
+              ? AbortSignal.any([signal, AbortSignal.timeout(AI_REQUEST_TIMEOUT_MS)])
+              : AbortSignal.timeout(AI_REQUEST_TIMEOUT_MS),
           },
         );
         audit.httpStatus = response.status;
@@ -537,6 +546,8 @@ export function yandexDecide(
       } catch (error) {
         // Do not refund ambiguous failures: the provider may have billed the generation.
         onCost(await repository.roomCost(roomID));
+        if (error instanceof Error && error.name === 'TimeoutError')
+          throw new AiPause('Модель не ответила за 10 минут. Партия приостановлена.');
         throw error instanceof AiPause
           ? error
           : sessionMode

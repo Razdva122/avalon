@@ -637,3 +637,25 @@ test('DeepSeek uses its own URI and tariff including cached input; unknown model
   expect(fetch).toHaveBeenCalledTimes(1);
   expect(cost()).toBe(260);
 });
+
+test.each(['none', 'default'] as const)(
+  'allows ten minutes for %s requests and preserves admin cancellation',
+  async (reasoning) => {
+    const { repo } = setup();
+    const controller = new AbortController();
+    const deadline = new AbortController();
+    const timeout = jest.spyOn(AbortSignal, 'timeout').mockReturnValue(deadline.signal);
+    try {
+      global.fetch = jest.fn(async (_url, options) => {
+        expect(options?.signal?.aborted).toBe(false);
+        controller.abort();
+        expect(options?.signal?.aborted).toBe(true);
+        throw Error('cancelled by admin');
+      });
+      await expect(yandexDecide('room', repo, () => {}, { reasoning })(request, controller.signal)).rejects.toThrow();
+      expect(timeout).toHaveBeenCalledWith(600000);
+    } finally {
+      timeout.mockRestore();
+    }
+  },
+);

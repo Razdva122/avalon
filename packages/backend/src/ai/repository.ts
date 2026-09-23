@@ -1,3 +1,4 @@
+import { AI_LEASE_MS } from './timing';
 import type { Db } from 'mongodb';
 import type { AiBudgetSnapshot, StartedRoomState, TRoomState } from '@avalon/types';
 import { AiPause, AiMatchBudgetPause } from './client';
@@ -114,7 +115,7 @@ export class AiRepository {
         _id: this.options.ledgerID || 'avalon-ai-v1',
         $or: [{ owner: { $exists: false } }, { leaseUntil: { $lt: new Date() } }, { owner: roomID }],
       },
-      { $set: { owner: roomID, leaseUntil: new Date(Date.now() + 120000) } },
+      { $set: { owner: roomID, leaseUntil: new Date(Date.now() + AI_LEASE_MS) } },
     );
     if (!result.matchedCount) throw new AiPause('Другая AI-партия уже запущена.');
   }
@@ -146,7 +147,7 @@ export class AiRepository {
       },
       {
         $inc: { used: units, [roomKey]: units, ...(period === undefined ? {} : { [totalKey]: units }) },
-        $set: { leaseUntil: new Date(Date.now() + 120000) },
+        $set: { leaseUntil: new Date(Date.now() + AI_LEASE_MS) },
       },
     );
     if (!result.matchedCount) {
