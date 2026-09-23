@@ -112,7 +112,25 @@ app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, '../dist/index.
     await page.goto(`${origin}/ru/support/`, { waitUntil: 'networkidle0' });
     await page.waitForSelector('#support-txid');
     assert.equal(await page.$eval('#support-address', (el) => el.value), networks[0].address);
-    assert.equal(await page.$$eval('.network-icon', (els) => els.length), 1);
+    assert.deepEqual(
+      await page.$$eval('input[name="support-network"]', (els) => els.map((el) => el.value)),
+      networks.map((network) => network.id),
+    );
+    assert.equal(await page.$$eval('.network-option .network-icon', (els) => els.length), networks.length);
+    assert.equal(await page.$eval('input[name="support-network"]:checked', (el) => el.value), 'btc');
+    async function selectNetwork(id) {
+      const selector = `input[name="support-network"][value="${id}"]`;
+      await page.$eval(selector, (el) => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
+      await page.click(selector);
+      await page.waitForFunction(
+        (id, address) =>
+          document.querySelector('input[name="support-network"]:checked')?.value === id &&
+          document.querySelector('#support-address')?.value === address,
+        {},
+        id,
+        networks.find((network) => network.id === id).address,
+      );
+    }
     await page.click('[aria-controls="support-qr"]');
     await page.waitForSelector('#support-qr canvas');
     async function decodedAddress() {
@@ -125,11 +143,11 @@ app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, '../dist/index.
     }
     assert.equal(await decodedAddress(), networks[0].address);
     for (const item of networks.slice(1)) {
-      await page.select('#support-network', item.id);
+      await selectNetwork(item.id);
       assert.equal(await decodedAddress(), item.address);
       assert.equal(await page.$eval('#support-qr strong', (el) => el.textContent), item.label);
     }
-    await page.select('#support-network', 'btc');
+    await selectNetwork('btc');
     if (process.env.SUPPORT_SCREENSHOT_DIR) {
       await page.$eval('#support-checkout', (el) => el.scrollIntoView());
       await (
@@ -145,7 +163,7 @@ app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, '../dist/index.
       'entire BTC address must be visible',
     );
     await page.setViewport({ width: 390, height: 844 });
-    await page.select('#support-network', 'eth');
+    await selectNetwork('eth');
     assert.equal(await page.$eval('#support-address', (el) => el.value), networks[2].address);
     assert.equal(
       await page.$eval('#support-address', (el) => el.scrollHeight <= el.clientHeight),
@@ -189,10 +207,16 @@ app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, '../dist/index.
     await page.$eval('.account form', (el) =>
       el.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })),
     );
-    await page.waitForSelector('#support-network option:disabled');
-    assert.equal(await page.$eval('#support-network', (el) => el.value), 'eth');
+    await page.waitForFunction(
+      () =>
+        !document.querySelector('input[name="support-network"][value="eth"]') &&
+        document.querySelector('.network-options + .notice[role="status"]'),
+    );
+    assert.equal(await page.$('input[name="support-network"]:checked'), null);
+    assert.equal(await page.$('#support-address'), null, 'unavailable network must not show another recipient');
+    assert.equal(await page.$('#support-qr'), null);
     assert.equal(await page.$eval('.primary', (el) => el.disabled), true);
-    await page.select('#support-network', 'bsc');
+    await selectNetwork('bsc');
     assert.equal(await page.$eval('#support-address', (el) => el.value), networks[3].address);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     await page.evaluate(() => scrollTo(0, 0));
