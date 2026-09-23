@@ -16,6 +16,62 @@ const request: BotRequest = {
   choices: ['approve', 'reject'],
   privateCheck: 'evil',
 };
+test('voting analysis receives off-team votes and mission links without treating forced approval as support', async () => {
+  const players = Array.from({ length: 7 }, (_, i) => ({
+    id: String(i + 1),
+    index: i + 1,
+    role: i === 5 ? 'servant' : 'unknown',
+    features: {},
+  }));
+  const proposal = (team: number[], approvals: number[], result: string, forced = false) => ({
+    type: 'vote',
+    leaderID: String(team[0]),
+    team: team.map((id) => ({ id: String(id) })),
+    result,
+    forced,
+    votes: players.map((p) => ({ playerID: p.id, value: approvals.includes(p.index) ? 'approve' : 'reject' })),
+  });
+  const generate = jest.fn().mockResolvedValue({ choice: 1, speech: 'Compare the repeated voting group.' });
+  await decisionPipeline(generate)({
+    ...request,
+    playerID: '6',
+    speak: false,
+    state: {
+      stage: 'votingForTeam',
+      mission: 1,
+      vote: 0,
+      players,
+      history: [
+        proposal([1, 2], [1, 2, 4], 'reject'),
+        proposal([2, 4], [1, 2, 4], 'reject'),
+        proposal([3, 5], [3, 5], 'reject'),
+        proposal([4, 5], [1, 2, 4, 5], 'approve'),
+        {
+          type: 'mission',
+          index: 0,
+          leaderID: '4',
+          result: 'fail',
+          fails: 1,
+          actions: [{ playerID: '4' }, { playerID: '5' }],
+        },
+        proposal([1, 6, 7], [1, 2, 3, 4, 5, 6, 7], 'approve', true),
+      ],
+    } as unknown as VisualGameState,
+  });
+  const c = generate.mock.calls[0][1].context;
+  expect(c.rejectedProposals.map((p: { mission: number; attempt: number }) => [p.mission, p.attempt])).toEqual([
+    [1, 1],
+    [1, 2],
+    [1, 3],
+  ]);
+  expect(c.rejectedProposals[0].votes).toContainEqual([4, 'approve']);
+  expect(c.rejectedProposals[2].votes).toContainEqual([4, 'reject']);
+  expect(c.approvedProposals[0]).toMatchObject({ mission: 1, attempt: 4, team: [4, 5] });
+  expect(c.completedMissions).toEqual([expect.objectContaining({ n: 1, team: [4, 5], fails: 1 })]);
+  expect(c.approvedProposals[1]).toMatchObject({ mission: 2, forced: true, votes: 'automatic: no vote cast' });
+  expect(c.privateKnowledge.rolesVisibleToYou).toEqual(players.map((p) => [p.index, p.role]));
+  expect(generate.mock.calls[0][0].choices).toEqual(['approve', 'reject']);
+});
 test('speaker receives only public facts and a locked action, never private notes or role', async () => {
   const generate = jest
     .fn()
@@ -35,6 +91,38 @@ test('secret cards need one call and never publish the justification', async () 
   ).toEqual({ choice: 0, speech: '' });
   expect(generate).toHaveBeenCalledTimes(1);
 });
+test.each(['servant', 'mordred'])(
+  'Lady counteraccusation keeps %s private alignment separate from public testimony',
+  async (role) => {
+    const generate = jest
+      .fn()
+      .mockResolvedValueOnce({
+        choice: 1,
+        speech: 'Private assessment.',
+        publicReason: '2 is lying about me. I am Good.',
+      })
+      .mockResolvedValueOnce({ choice: 0, speech: '2 is lying about me. I am Good.' });
+    const r = {
+      ...request,
+      state: {
+        ...request.state,
+        players: [
+          { id: 'evil', index: 7, role, features: {} },
+          { id: 'checker', index: 2, role: 'unknown', features: {} },
+        ],
+        history: [{ type: 'announceLoyalty', announcerID: 'checker', targetID: 'evil', announced: 'evil' }],
+      },
+    } as BotRequest;
+    const reply = await decisionPipeline(generate)(r);
+    const privateContext = generate.mock.calls[0][1].context;
+    expect(privateContext.you.role).toBe(role);
+    expect(privateContext.checks).toEqual([{ by: 2, target: 7, announced: 'evil', actual: undefined }]);
+    const publicContext = generate.mock.calls[1][1].context;
+    expect(JSON.stringify(publicContext)).not.toMatch(/privateKnowledge|mordred|servant/);
+    expect(reply.speech).toBe('2 is lying about me. I am Good.');
+    expect(reply.choice).toBe(1);
+  },
+);
 test('private council stays private and failures pause without a fallback action', async () => {
   const generate = jest.fn().mockResolvedValue({ choice: 0, speech: '1 could be Merlin.' });
   await decisionPipeline(generate)({ ...request, privateDiscussion: true });
