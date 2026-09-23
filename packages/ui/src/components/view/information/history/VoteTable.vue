@@ -36,7 +36,24 @@
           </thead>
           <tbody>
             <tr v-for="player in sortedPlayers" :key="player.id">
-              <th class="player-name" scope="row" :title="playerNames[player.id]">{{ playerNames[player.id] }}</th>
+              <th
+                class="player-name"
+                scope="row"
+                :class="
+                  gameEnded
+                    ? {
+                        'text-info': rolesShortInfo[player.role].loyalty === 'good',
+                        'text-error': rolesShortInfo[player.role].loyalty === 'evil',
+                      }
+                    : undefined
+                "
+                :title="playerNames[player.id]"
+              >
+                {{ playerNames[player.id] }}
+                <span v-if="gameEnded && rolesShortInfo[player.role].loyalty !== 'unknown'" class="sr-only">
+                  — {{ $t(`game.${rolesShortInfo[player.role].loyalty}`) }}
+                </span>
+              </th>
               <td
                 v-for="(vote, index) in columns"
                 :key="index"
@@ -66,10 +83,16 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { rolesShortInfo } from '@/components/view/information/const';
 import { useI18n } from 'vue-i18n';
 import type { Player, THistoryResults, THistoryVote } from '@avalon/types';
 
-const props = defineProps<{ history: THistoryResults[]; players: Player[]; playerNames: Record<string, string> }>();
+const props = defineProps<{
+  history: THistoryResults[];
+  players: Player[];
+  playerNames: Record<string, string>;
+  gameEnded?: boolean;
+}>();
 const { t } = useI18n();
 
 const sortedPlayers = computed(() => [...props.players].sort((a, b) => a.index - b.index));

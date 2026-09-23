@@ -9,6 +9,7 @@ export default {
     restartGame: 'Перезапустить игру',
   },
   mainPage: {
+    retryAi: 'Повторить',
     showMore: 'Показать ещё игры',
     heroCaption: 'Доверие. Обман. Авалон.',
     filterLabel: 'Фильтр игр',

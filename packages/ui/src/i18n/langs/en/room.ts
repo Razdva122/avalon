@@ -9,6 +9,7 @@ export default {
     restartGame: 'Restart game',
   },
   mainPage: {
+    retryAi: 'Retry',
     showMore: 'Show more games',
     heroCaption: 'Trust. Deception. Avalon.',
     filterLabel: 'Filter games',

@@ -264,3 +264,57 @@ test('creation validates selected model before claiming a lease and pins DeepSee
     else process.env.YANDEX_MODEL = previous;
   }
 });
+
+test('public AI list returns latest 20 unique rooms with live state and no private game data', async () => {
+  const archived = Array.from({ length: 25 }, (_, index) => ({
+    roomID: `ai-${index}`,
+    ai: { status: 'finished', model: 'test-model', costRub: 123 },
+    stage: 'started',
+    leaderID: 'host',
+    players: [{ id: 'bot' }],
+    options: {},
+    createAt: new Date(2026, 0, index + 1).toISOString(),
+    game: { result: { winner: 'good' }, secret: 'hidden' },
+    chat: ['private'],
+  }));
+  const live = { ...archived[24], ai: { status: 'running' }, game: {} };
+  const host = {
+    dbManager: {},
+    rooms: {
+      live: { ai: live.ai, calculateRoomState: () => live },
+      human: {
+        calculateRoomState: () => {
+          throw Error('Human room must not be read');
+        },
+      },
+    },
+  } as unknown as Manager;
+  const service = new AiService(host);
+  const recent = jest.fn(async () => archived);
+  service.repository = { recent } as unknown as AiRepository;
+  const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
+  service.register({
+    on: (name: string, handler: any) => {
+      handlers[name] = handler;
+    },
+  } as unknown as ServerSocket);
+  const response = jest.fn();
+  await handlers.getAiRoomsList(response);
+  expect(recent).toHaveBeenCalledWith(20);
+  const { rooms } = response.mock.calls[0][0];
+  expect(rooms).toHaveLength(20);
+  expect(rooms.map((room: any) => room.uuid)).toEqual(
+    archived
+      .slice(5)
+      .reverse()
+      .map((room) => room.roomID),
+  );
+  expect(rooms[0].aiStatus).toBe('running');
+  expect(rooms.every((room: any) => room.ai)).toBe(true);
+  expect(rooms[0]).not.toHaveProperty('game');
+  expect(rooms[0]).not.toHaveProperty('chat');
+  expect(rooms[0]).not.toHaveProperty('ai.costRub');
+  recent.mockRejectedValueOnce(new Error('database private details') as never);
+  await handlers.getAiRoomsList(response);
+  expect(response).toHaveBeenLastCalledWith({ error: 'Could not load AI rooms' });
+});

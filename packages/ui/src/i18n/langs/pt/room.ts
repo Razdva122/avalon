@@ -9,6 +9,7 @@ export default {
     restartGame: 'Reiniciar jogo',
   },
   mainPage: {
+    retryAi: 'Tentar novamente',
     showMore: 'Ver mais jogos',
     heroCaption: 'Confiança. Blefe. Avalon.',
     filterLabel: 'Filtrar jogos',

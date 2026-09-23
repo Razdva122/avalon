@@ -40,7 +40,13 @@
           <span>{{ $t('history.tableView') }}</span>
         </button>
       </div>
-      <VoteTable v-if="view === 'table'" :history="history" :players="players" :player-names="playerNames" />
+      <VoteTable
+        v-if="view === 'table'"
+        :history="history"
+        :players="players"
+        :player-names="playerNames"
+        :game-ended="gameEnded"
+      />
       <template v-else>
         <div v-for="(historyEl, index) in history" :key="index">
           <div>
@@ -107,6 +113,9 @@ export default defineComponent({
     players: {
       required: true,
       type: Object as PropType<Player[]>,
+    },
+    gameEnded: {
+      type: Boolean,
     },
     displayIndex: {
       type: Boolean,

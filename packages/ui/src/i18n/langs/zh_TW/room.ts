@@ -9,6 +9,7 @@ export default {
     restartGame: '重開遊戲',
   },
   mainPage: {
+    retryAi: '重試',
     showMore: '顯示更多遊戲',
     heroCaption: '信任。欺騙。阿瓦隆。',
     filterLabel: '篩選遊戲',

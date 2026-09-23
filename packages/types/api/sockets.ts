@@ -91,6 +91,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
   getTotalStats: (callback: (stats: TTotalWinrateStats) => void) => void;
   getPlayerGameSummaries: (uuid: string, callback: (games: PlayerGameSummary[] | null) => void) => void;
   getPlayerGames: (uuid: string, callback: (games: VisualGameState[]) => void) => void;
+  getAiRoomsList: (callback: (result: { rooms: TRoomsList } | { error: string }) => void) => void;
   getRoomsList: (callback: (list: TRoomsList) => void) => void;
   getOnlineCounter: (id: string, callback: (counter: number) => void) => void;
   getUserProfile: (id: string, callback: (user: PublicUserProfile) => void) => void;

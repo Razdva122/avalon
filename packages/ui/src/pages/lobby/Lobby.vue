@@ -84,17 +84,24 @@
             :key="item"
             type="button"
             :aria-pressed="filter === item"
-            :class="{ selected: filter === item }"
+            :class="{ selected: filter === item, 'ai-filter': item === 'ai-games' }"
             @click="filter = item"
           >
-            {{ $t(`mainPage.filter${item}`) }}
-            <span v-if="roomsList">{{ filterCount(item) }}</span>
+            <span v-if="item === 'ai-games'" class="ai-filter-icon" aria-hidden="true">AI</span>
+            {{ item === 'ai-games' ? 'ai-games' : $t(`mainPage.filter${item}`) }}
+            <span v-if="item === 'ai-games' ? aiRooms !== undefined : roomsList">{{ filterCount(item) }}</span>
           </button>
         </div>
-        <p v-if="!roomsList" class="rooms-message" role="status">{{ $t('mainPage.loading') }}</p>
+        <div v-if="filter === 'ai-games' && aiError" class="rooms-message" role="alert">
+          <p>{{ $t('aiArena.connectionError') }}</p>
+          <button class="reset-filter" @click="loadAiRooms">{{ $t('mainPage.retryAi') }}</button>
+        </div>
+        <p v-else-if="filter === 'ai-games' ? aiLoading || !aiRooms : !roomsList" class="rooms-message" role="status">
+          {{ $t('mainPage.loading') }}
+        </p>
         <div v-else-if="!visibleRooms.length" class="rooms-message" role="status">
           <span class="material-icons empty-icon" aria-hidden="true">meeting_room</span>
-          <p>{{ $t(roomsList.length ? 'mainPage.noMatchingRooms' : 'mainPage.noRooms') }}</p>
+          <p>{{ $t(filter === 'ai-games' || roomsList?.length ? 'mainPage.noMatchingRooms' : 'mainPage.noRooms') }}</p>
           <button v-if="filter !== 'all'" class="reset-filter" @click="filter = 'all'">
             {{ $t('mainPage.showAll') }}
           </button>
@@ -145,8 +152,29 @@ export default defineComponent({
     const store = useStore();
 
     const roomsList = ref<TRoomsList>();
+    const aiRooms = ref<TRoomsList>();
+    const aiLoading = ref(false);
+    const aiError = ref(false);
+    const loadAiRooms = async () => {
+      if (aiLoading.value) return;
+      aiLoading.value = true;
+      aiError.value = false;
+      try {
+        const result = await socket.timeout(10000).emitWithAck('getAiRoomsList');
+        if ('error' in result) throw new Error(result.error);
+        aiRooms.value = result.rooms;
+      } catch {
+        aiError.value = true;
+      } finally {
+        aiLoading.value = false;
+      }
+    };
     const { costs: aiCosts } = useAiAccess(
-      computed(() => (roomsList.value || []).filter((room) => room.ai).map((room) => room.uuid)),
+      computed(() => [
+        ...new Set(
+          [...(roomsList.value || []), ...(aiRooms.value || [])].filter((room) => room.ai).map((room) => room.uuid),
+        ),
+      ]),
     );
     const online = ref<number>();
 
@@ -181,9 +209,10 @@ export default defineComponent({
     const filter = ref('all');
     const visibleLimit = ref(8);
     watch(filter, () => {
-      visibleLimit.value = 8;
+      visibleLimit.value = filter.value === 'ai-games' ? 20 : 8;
+      if (filter.value === 'ai-games') void loadAiRooms();
     });
-    const filters = ['all', 'open', 'playing', 'finished'];
+    const filters = ['all', 'open', 'playing', 'finished', 'ai-games'];
     const roomCategory = (room: TRoomsList[number]) =>
       room.result || room.aiStatus === 'stopped' || room.aiStatus === 'finished'
         ? 'finished'
@@ -206,16 +235,20 @@ export default defineComponent({
       )?.uuid;
     });
     const visibleRooms = computed(() =>
-      [...(roomsList.value || [])]
-        .filter((room) => filter.value === 'all' || roomCategory(room) === filter.value)
-        .sort(
-          (a, b) =>
-            Number(b.uuid === latestAiRoomID.value) - Number(a.uuid === latestAiRoomID.value) ||
-            roomPriority(a) - roomPriority(b),
-        ),
+      filter.value === 'ai-games'
+        ? aiRooms.value || []
+        : [...(roomsList.value || [])]
+            .filter((room) => filter.value === 'all' || roomCategory(room) === filter.value)
+            .sort(
+              (a, b) =>
+                Number(b.uuid === latestAiRoomID.value) - Number(a.uuid === latestAiRoomID.value) ||
+                roomPriority(a) - roomPriority(b),
+            ),
     );
     const filterCount = (value: string) =>
-      (roomsList.value || []).filter((room) => value === 'all' || roomCategory(room) === value).length;
+      value === 'ai-games'
+        ? aiRooms.value?.length || 0
+        : (roomsList.value || []).filter((room) => value === 'all' || roomCategory(room) === value).length;
 
     const updateOnline = (counter: number) => {
       online.value = counter;
@@ -228,6 +261,10 @@ export default defineComponent({
 
     return {
       createRoom,
+      aiRooms,
+      aiLoading,
+      aiError,
+      loadAiRooms,
       aiCosts,
       filter,
       visibleLimit,
@@ -458,6 +495,25 @@ h1 {
 .room-filters button span {
   font-size: 11px;
   opacity: 0.65;
+}
+.room-filters button.ai-filter {
+  border: 1px solid rgba(var(--v-theme-primary), 0.5);
+  background: rgba(var(--v-theme-primary), 0.08);
+  color: rgb(var(--v-theme-primary));
+  font-weight: 700;
+}
+.room-filters button.ai-filter:hover,
+.room-filters button.ai-filter.selected {
+  background: rgba(var(--v-theme-primary), 0.18);
+  box-shadow: inset 0 0 0 1px rgb(var(--v-theme-primary));
+}
+.room-filters button .ai-filter-icon {
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  font-size: 10px;
+  opacity: 1;
 }
 .games-list {
   display: grid;

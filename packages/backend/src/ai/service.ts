@@ -1,5 +1,5 @@
 import { aiModel, AI_MODELS, DEFAULT_AI_MODEL } from './models';
-import type { ServerSocket } from '@avalon/types';
+import type { ServerSocket, TRoomInfo } from '@avalon/types';
 import type { Manager } from '@/main';
 import { randomUUID } from 'crypto';
 import { AiRepository } from './repository';
@@ -36,6 +36,35 @@ export class AiService {
   }
 
   register(socket: ServerSocket, userID?: string) {
+    socket.on('getAiRoomsList', async (cb) => {
+      if (typeof cb !== 'function') return;
+      try {
+        const archived = (await this.repository?.recent(20)) || [];
+        const live = Object.values(this.manager.rooms)
+          .filter((room) => room.ai)
+          .map((room) => room.calculateRoomState());
+        const rooms = [...new Map([...archived, ...live].map((room) => [room.roomID, room])).values()]
+          .filter((room) => room.ai)
+          .sort((a, b) => Date.parse(b.createAt) - Date.parse(a.createAt))
+          .slice(0, 20)
+          .map<TRoomInfo>((room) => ({
+            uuid: room.roomID,
+            ai: true,
+            aiStatus: room.ai?.status,
+            aiModel: room.ai?.model,
+            hostID: room.leaderID,
+            state: room.stage,
+            options: room.options,
+            players: room.players.length,
+            createAt: room.createAt,
+            startAt: room.stage === 'started' ? room.startAt : undefined,
+            result: room.stage === 'started' ? room.game.result : undefined,
+          }));
+        cb({ rooms });
+      } catch {
+        cb({ error: 'Could not load AI rooms' });
+      }
+    });
     socket.on('getAiSpectatorRoles', (id, cb) => {
       if (typeof cb !== 'function') return;
       if (typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id)) return cb({ error: 'Invalid room ID' });

@@ -9,6 +9,7 @@ export default {
     restartGame: 'Reiniciar juego',
   },
   mainPage: {
+    retryAi: 'Reintentar',
     showMore: 'Ver más partidas',
     heroCaption: 'Confianza. Engaño. Avalon.',
     filterLabel: 'Filtrar partidas',

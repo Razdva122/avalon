@@ -13,6 +13,7 @@
           <div class="mb-1" v-if="stateManager.viewMode.value === 'live'">
             <History
               :history="gameState.history"
+              :game-ended="gameState.stage === 'end'"
               :players="gameState.players"
               :display-index="gameState.features.displayIndex"
             />

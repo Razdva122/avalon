@@ -17,16 +17,19 @@
         <p v-else-if="info && !info.enabled" class="notice">{{ t('support.unavailable') }}</p>
         <p v-else-if="info && !store.state.profile" class="notice">{{ t('support.login') }}</p>
         <form v-else-if="info?.enabled" @submit.prevent="checkout">
-          <label for="support-network">{{ t('support.network') }}</label>
-          <div class="network-select">
-            <NetworkIcon v-if="selectedNetwork" :network="selectedNetwork.id" />
-            <select id="support-network" v-model="network" :disabled="busy" required>
-              <option v-if="network && !selectedNetwork" :value="network" disabled>
-                {{ networkLabel(network) }} — {{ t('support.unavailable') }}
-              </option>
-              <option v-for="item in info.networks" :key="item.id" :value="item.id">{{ item.label }}</option>
-            </select>
-          </div>
+          <fieldset class="network-options" :disabled="busy">
+            <legend>{{ t('support.network') }}</legend>
+            <label
+              v-for="item in info.networks"
+              :key="item.id"
+              class="network-option"
+              :class="{ 'is-selected': network === item.id }"
+            >
+              <input v-model="network" type="radio" name="support-network" :value="item.id" required />
+              <NetworkIcon :network="item.id" />
+              <span>{{ item.label }}</span>
+            </label>
+          </fieldset>
           <p v-if="network && !selectedNetwork" class="notice" role="status">{{ t('support.unavailable') }}</p>
           <template v-if="selectedNetwork">
             <label for="support-address">{{ t('support.recipient') }}</label>
@@ -394,8 +397,7 @@ label {
   margin: 16px 0 7px;
 }
 input[type='text'],
-textarea,
-select {
+textarea {
   display: block;
   width: 100%;
   padding: 11px;
@@ -424,8 +426,7 @@ button:disabled {
 }
 button:focus-visible,
 a:focus-visible,
-input:focus-visible,
-select:focus-visible {
+input:focus-visible {
   outline: 2px solid #b38637;
   outline-offset: 3px;
 }
@@ -436,13 +437,41 @@ select:focus-visible {
   color: #382a0c;
   font-weight: 700;
 }
-.network-select {
+.network-options {
+  border: 0;
+  padding: 0;
+  margin: 16px 0;
+  min-width: 0;
+}
+.network-options legend {
+  font-size: 14px;
+  margin-bottom: 7px;
+}
+.network-option {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-height: 52px;
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(var(--v-theme-text-primary), 0.25);
+  border-radius: 8px;
+  cursor: pointer;
 }
-.network-select select {
-  min-width: 0;
+.network-option.is-selected {
+  border-color: #b38637;
+  background: #b3863715;
+}
+.network-option input {
+  accent-color: #a88032;
+  flex-shrink: 0;
+}
+.network-option .network-icon {
+  flex-shrink: 0;
+}
+.network-options:disabled .network-option {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 .address-actions {
   display: flex;
