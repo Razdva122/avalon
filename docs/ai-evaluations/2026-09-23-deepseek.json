@@ -1,0 +1,95 @@
+{
+  "date": "2026-09-23",
+  "model": "deepseek-v4-flash",
+  "totalRub": 9.0368,
+  "results": [
+    {
+      "roomID": "control-ed0f46c7-9409-4e80-96d4-7d08c1a87cdc",
+      "model": "deepseek-v4-flash",
+      "fixture": "opening-good-outside-prefers-self",
+      "reasoning": "default",
+      "choice": "reject",
+      "expected": "reject",
+      "passed": true,
+      "speech": "",
+      "seconds": 4.983,
+      "rub": 0.6812
+    },
+    {
+      "roomID": "control-ed0f46c7-9409-4e80-96d4-7d08c1a87cdc",
+      "model": "deepseek-v4-flash",
+      "fixture": "opening-good-inside",
+      "reasoning": "default",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 10.705,
+      "rub": 0.4570000000000001
+    },
+    {
+      "roomID": "control-ed0f46c7-9409-4e80-96d4-7d08c1a87cdc",
+      "model": "deepseek-v4-flash",
+      "fixture": "merlin-fourth-does-not-invent-past-teammate",
+      "reasoning": "default",
+      "choice": "reject",
+      "expected": "reject",
+      "passed": true,
+      "speech": "",
+      "seconds": 50.819,
+      "rub": 2.0237999999999996
+    },
+    {
+      "roomID": "control-ed0f46c7-9409-4e80-96d4-7d08c1a87cdc",
+      "model": "deepseek-v4-flash",
+      "fixture": "merlin-fourth-one-known-evil-is-safe",
+      "reasoning": "default",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 28.108,
+      "rub": 1.1002
+    },
+    {
+      "roomID": "control-ed0f46c7-9409-4e80-96d4-7d08c1a87cdc",
+      "model": "deepseek-v4-flash",
+      "fixture": "mordred-counts-himself-on-winning-team",
+      "reasoning": "default",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 29.096,
+      "rub": 1.1765999999999996
+    },
+    {
+      "roomID": "control-ed0f46c7-9409-4e80-96d4-7d08c1a87cdc",
+      "model": "deepseek-v4-flash",
+      "fixture": "percival-votes-on-current-roster",
+      "reasoning": "default",
+      "choice": "approve",
+      "expected": "approve",
+      "passed": true,
+      "speech": "",
+      "seconds": 80.16,
+      "rub": 2.714200000000001
+    },
+    {
+      "roomID": "control-aacadc05-03ac-4cc6-9f05-d265ac5f8c41",
+      "model": "deepseek-v4-flash",
+      "fixture": "evil-vote-allies",
+      "reasoning": "none",
+      "choice": "approve",
+      "speech": "No missions have run yet, so I support including myself to gather information and see how the team performs.",
+      "seconds": 2.881,
+      "rub": 0.8838
+    }
+  ],
+  "limitations": [
+    "Six fixed decision fixtures, not a complete game or a statistically reliable model comparison.",
+    "Decision correctness assessed by expected choice; private explanations were not scored.",
+    "One separate fixture tested public speech with reasoning=none.",
+    "Slowest fixture took 80.16 seconds; production model was not changed."
+  ]
+}

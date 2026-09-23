@@ -1,4 +1,5 @@
 export default {
+  selectModel: 'Модель для новой партии',
   resumeBudget: 'Продолжить · увеличить лимит до {limit} ₽ (×2)',
   budgetResetIn: 'До обновления лимита: {days} дн. {hours} ч. {minutes} мин.',
   budgetResetPending: 'Период завершён. Обновляем бюджет…',

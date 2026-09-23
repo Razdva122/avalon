@@ -1,3 +1,4 @@
+import { aiModel } from './models';
 import { tablePolicy } from './table-policy';
 import { AiMatchBudgetPause, AiOutputLimit, AiPause, compactRequest, systemFor, yandexDecide } from './client';
 import type { BotReply, BotRequest, Decide, GenerationOptions, DecisionEvidence } from './client';
@@ -266,7 +267,7 @@ export function separatedDecide(
   roomID: string,
   repository: AiRepository,
   onCost: (rub: number) => void,
-  model = process.env.YANDEX_MODEL || 'qwen3.6-35b-a3b',
+  model = aiModel().id,
 ): Decide {
   return decisionPipeline(
     (request, options, signal) => yandexDecide(roomID, repository, onCost, { ...options, model })(request, signal),

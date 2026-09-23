@@ -1,3 +1,4 @@
+import { aiModel } from './models';
 import { randomUUID } from 'crypto';
 import type { VisualGameState } from '@avalon/types';
 import type { AiRepository, AiRequestLog, AiDecisionTrace } from './repository';
@@ -37,7 +38,7 @@ export class AiMatchBudgetPause extends AiPause {
 }
 export class AiOutputLimit extends AiPause {
   constructor(limit: number) {
-    super(`Qwen исчерпал лимит ответа (${limit} токенов), не завершив решение. Партия приостановлена.`);
+    super(`Модель исчерпала лимит ответа (${limit} токенов), не завершив решение. Партия приостановлена.`);
   }
 }
 
@@ -287,7 +288,7 @@ export function parseDecisionReply(text: string, choices: string[]): BotReply {
         !['proven', 'claim', 'bluff'].includes(item.certainty),
     )
   )
-    throw new AiPause('Qwen returned invalid decision evidence. Match paused.');
+    throw new AiPause('Model returned invalid decision evidence. Match paused.');
   // A forecast or someone else's claim cannot become proof merely by asking for that certainty.
   const evidence = (data.evidence as DecisionEvidence[]).map((item) => ({
     ...item,
@@ -352,12 +353,13 @@ export function yandexDecide(
       const key = process.env.YANDEX_API_KEY;
       const folder = process.env.YANDEX_FOLDER_ID;
       if (!key || !folder) throw new AiPause('Не настроен доступ к модели.');
-      const model = options.model || process.env.YANDEX_MODEL || 'qwen3.6-35b-a3b';
-      const tariffs: Record<string, { input: number; cached: number; output: number }> = {
-        'qwen3.6-35b-a3b': { input: 2, cached: 0.5, output: 3 },
-      };
-      const tariff = tariffs[model];
-      if (!tariff) throw new AiPause('Model tariff is not configured.');
+      let selected;
+      try {
+        selected = aiModel(options.model);
+      } catch (error) {
+        throw new AiPause((error as Error).message);
+      }
+      const { id: model, tariff } = selected;
       const saved = sessionMode ? sessions.get(request.playerID) : undefined;
       const reset = Boolean(saved && (saved.turns >= 4 || saved.bytes >= 12000));
       const previous = reset ? undefined : saved;
@@ -602,7 +604,7 @@ export function yandexDecide(
       }
       if (data.choices?.[0]?.finish_reason === 'length') throw new AiOutputLimit(maxOutput);
       if (data.choices?.[0]?.finish_reason !== 'stop')
-        throw new AiPause('Qwen не вернул завершённый ответ. Партия приостановлена.');
+        throw new AiPause('Модель не вернула завершённый ответ. Партия приостановлена.');
       const reply = options.decisionDetails
         ? parseDecisionReply(data.choices[0].message.content, request.choices)
         : parseReply(data.choices[0].message.content, request.choices);

@@ -39,16 +39,16 @@ test('only database-admin authenticated account can create or control a room, du
   try {
     for (const id of [undefined, 'visitor']) {
       const response = jest.fn();
-      await connect(id).createAiRoom(response);
+      await connect(id).createAiRoom('qwen3.6-35b-a3b', response);
       expect(response.mock.calls[0][0]).toEqual({ error: 'AI room access denied' });
       expect(Object.keys(host.rooms)).toHaveLength(0);
     }
     const admin = connect('owner');
     const created = jest.fn();
-    await admin.createAiRoom(created);
+    await admin.createAiRoom('qwen3.6-35b-a3b', created);
     const id = created.mock.calls[0][0].roomID;
     expect(host.rooms[id]).toBeInstanceOf(BotRoom);
-    await admin.createAiRoom(created);
+    await admin.createAiRoom('qwen3.6-35b-a3b', created);
     expect(created.mock.calls[1][0]).toEqual({ roomID: id });
     expect(Object.keys(host.rooms)).toHaveLength(1);
     const denied = jest.fn();
@@ -96,7 +96,7 @@ test('every admin request reads current database permissions, including archived
     await handlers.getAiRoomAccess(access);
     expect(access).toHaveBeenCalledWith({ canManage: false });
     for (const [event, args] of [
-      ['createAiRoom', []],
+      ['createAiRoom', ['deepseek-v4-flash']],
       ['getAiBudget', []],
       ['controlAiRoom', ['archive', 'start']],
       ['controlAiRoom', ['archive', 'stop']],
@@ -206,4 +206,61 @@ test('admin budget resume doubles once, waits for old run cleanup and rejects ot
   host.rooms.resume = other;
   expect(await control('resumeBudget')).toHaveProperty('error');
   expect(doubleMatchLimit).toHaveBeenCalledTimes(1);
+});
+
+test('creation validates selected model before claiming a lease and pins DeepSeek independently of the default', async () => {
+  const previous = process.env.YANDEX_MODEL;
+  const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
+  const host = {
+    rooms: {},
+    io,
+    updateRoomsList: jest.fn(),
+    dbManager: { getUserByID: async () => ({ isAdmin: true }) },
+  } as unknown as Manager;
+  const service = new AiService(host);
+  const claim = jest.fn(async () => {});
+  service.repository = { claim } as unknown as AiRepository;
+  const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
+  service.register(
+    {
+      on: (name: string, handler: any) => {
+        handlers[name] = handler;
+      },
+    } as unknown as ServerSocket,
+    'owner',
+  );
+  try {
+    process.env.YANDEX_MODEL = 'unknown-model';
+    const access = jest.fn();
+    await handlers.getAiRoomAccess(access);
+    expect(access).toHaveBeenCalledWith({
+      canManage: true,
+      roomID: undefined,
+      defaultModel: 'qwen3.6-35b-a3b',
+      models: [
+        { id: 'qwen3.6-35b-a3b', label: 'Qwen3.6 35B' },
+        { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash' },
+      ],
+    });
+    for (const value of ['unknown-model', '__proto__', '', null, {}, ['deepseek-v4-flash']]) {
+      const denied = jest.fn();
+      await handlers.createAiRoom(value, denied);
+      expect(denied.mock.calls[0][0]).toHaveProperty('error');
+    }
+    expect(claim).not.toHaveBeenCalled();
+    expect(Object.keys(host.rooms)).toHaveLength(0);
+    process.env.YANDEX_MODEL = 'qwen3.6-35b-a3b';
+    const created = jest.fn();
+    await handlers.createAiRoom('deepseek-v4-flash', created);
+    const room = host.rooms[created.mock.calls[0][0].roomID];
+    expect(room.ai?.model).toBe('deepseek-v4-flash');
+    const reopened = jest.fn();
+    await handlers.createAiRoom('qwen3.6-35b-a3b', reopened);
+    expect(reopened).toHaveBeenCalledWith({ roomID: room.roomID });
+    process.env.YANDEX_MODEL = 'qwen3.6-35b-a3b';
+    expect(room.ai?.model).toBe('deepseek-v4-flash');
+  } finally {
+    if (previous === undefined) delete process.env.YANDEX_MODEL;
+    else process.env.YANDEX_MODEL = previous;
+  }
 });

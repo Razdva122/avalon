@@ -1,3 +1,4 @@
+import { aiModel, AI_MODELS, DEFAULT_AI_MODEL } from './models';
 import type { ServerSocket } from '@avalon/types';
 import type { Manager } from '@/main';
 import { randomUUID } from 'crypto';
@@ -86,22 +87,39 @@ export class AiService {
       if (typeof cb !== 'function') return;
       try {
         const canManage = await this.canManage(userID);
-        cb(canManage ? { canManage, roomID: this.active()?.roomID } : { canManage });
+        cb(
+          canManage
+            ? {
+                canManage,
+                roomID: this.active()?.roomID,
+                models: Object.entries(AI_MODELS).map(([id, model]) => ({ id, label: model.label })),
+                defaultModel: Object.prototype.hasOwnProperty.call(AI_MODELS, process.env.YANDEX_MODEL || '')
+                  ? process.env.YANDEX_MODEL
+                  : DEFAULT_AI_MODEL,
+              }
+            : { canManage },
+        );
       } catch {
         cb({ canManage: false });
       }
     });
-    socket.on('createAiRoom', async (cb) => {
+    socket.on('createAiRoom', async (selectedModel, cb) => {
       if (typeof cb !== 'function') return;
       try {
         if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        if (typeof selectedModel !== 'string') return cb({ error: 'Invalid AI model' });
         if (this.active()) return cb({ roomID: this.active()!.roomID });
         if (this.creating || this.starting || this.running.size) return cb({ error: 'AI room is being created' });
         this.creating = true;
         try {
+          let model: string;
+          try {
+            model = aiModel(selectedModel).id;
+          } catch (error) {
+            throw new AiPause((error as Error).message);
+          }
           const id = randomUUID();
           await this.repository!.claim(id);
-          const model = process.env.YANDEX_MODEL || 'qwen3.6-35b-a3b';
           const room = new BotRoom(
             id,
             userID!,

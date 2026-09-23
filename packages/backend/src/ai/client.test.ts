@@ -616,3 +616,24 @@ test('action facts count an Evil player themselves and preserve the two-Fail thr
     },
   });
 });
+
+test('DeepSeek uses its own URI and tariff including cached input; unknown models never spend', async () => {
+  const { repo, cost } = setup();
+  const fetch = jest.fn(async (_url, options) => {
+    expect(JSON.parse(options.body).model).toBe('gpt://folder/deepseek-v4-flash');
+    return new Response(
+      JSON.stringify({
+        usage: { prompt_tokens: 100, prompt_tokens_details: { cached_tokens: 40 }, completion_tokens: 10 },
+        choices: [{ finish_reason: 'stop', message: { content: '{"choice":"approve","speech":"Test."}' } }],
+      }),
+    );
+  });
+  global.fetch = fetch;
+  await yandexDecide('room', repo, () => {}, { model: 'deepseek-v4-flash' })(request);
+  expect(cost()).toBe(260); // 60*3 + 40*.75 + 10*5
+  for (const model of ['unknown', '__proto__', 'constructor']) {
+    await expect(yandexDecide('room', repo, () => {}, { model })(request)).rejects.toThrow();
+  }
+  expect(fetch).toHaveBeenCalledTimes(1);
+  expect(cost()).toBe(260);
+});

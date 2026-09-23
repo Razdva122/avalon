@@ -1,5 +1,6 @@
 // Explicit paid smoke test: run from packages/backend with ts-node and tsconfig-paths/register.
 import '../init';
+import { aiModel } from './models';
 import mongoose from 'mongoose';
 import { randomUUID } from 'crypto';
 import { config } from '../config';
@@ -24,13 +25,18 @@ const fixtures = productionRegression
 async function main() {
   const selectedReasoning = process.argv.find((arg) => arg.startsWith('--reasoning='))?.split('=')[1];
   if (selectedReasoning && !['none', 'default'].includes(selectedReasoning)) throw Error('Invalid reasoning mode');
+  const model = aiModel(process.argv.find((arg) => arg.startsWith('--model='))?.slice('--model='.length)).id;
+  const budgetArg = process.argv.find((arg) => arg.startsWith('--budget-rub='))?.slice('--budget-rub='.length);
+  const budgetRub = budgetArg === undefined ? undefined : Number(budgetArg);
+  if (budgetRub !== undefined && (!Number.isFinite(budgetRub) || budgetRub <= 0 || budgetRub > 20))
+    throw Error('Evaluation budget must be between 0 and 20 RUB');
   await mongoose.connect(config.MONGODB_URI, { dbName: config.DB_NAME, authSource: 'admin' });
   const caseName = process.argv.find((arg) => arg.startsWith('--case='))?.slice('--case='.length);
   const selectedFixtures = caseName ? fixtures.filter((fixture) => fixture.name === caseName) : fixtures;
   const repo = new AiRepository(
     mongoose.connection.db!,
     700,
-    productionRegression ? (caseName ? 5 : 20) : regression ? 8 : 15,
+    budgetRub ?? (productionRegression ? (caseName ? 5 : 20) : regression ? 8 : 15),
   );
   const id = `control-${randomUUID()}`;
   try {
@@ -44,7 +50,7 @@ async function main() {
       for (const fixture of selectedFixtures) {
         const request = fixture.request as unknown as BotRequest;
         const decide = decisionPipeline(
-          (r, options, signal) => yandexDecide(id, repo, () => {}, options)(r, signal),
+          (r, options, signal) => yandexDecide(id, repo, () => {}, { ...options, model })(r, signal),
           reasoning,
         );
         const started = Date.now();
@@ -54,6 +60,7 @@ async function main() {
         console.log(
           JSON.stringify({
             roomID: id,
+            model,
             fixture: fixture.name,
             reasoning,
             choice: request.choices[reply.choice],

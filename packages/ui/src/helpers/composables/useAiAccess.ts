@@ -10,10 +10,16 @@ export function useAiAccess(roomIDs: Ref<string[]> = computed(() => [])) {
   const costs = ref<Record<string, number>>({});
   const budget = ref<AiBudgetSnapshot>();
   const limits = ref<Record<string, number>>({});
+  const models = ref<{ id: string; label: string }[]>([]);
+  const defaultModel = ref('');
+  const activeRoomID = ref<string>();
   let version = 0;
   const clear = () => {
     version++;
     canManage.value = false;
+    models.value = [];
+    defaultModel.value = '';
+    activeRoomID.value = undefined;
     costs.value = {};
     limits.value = {};
     budget.value = undefined;
@@ -28,6 +34,9 @@ export function useAiAccess(roomIDs: Ref<string[]> = computed(() => [])) {
       const access = await socket.timeout(5000).emitWithAck('getAiRoomAccess');
       if (current !== version) return;
       canManage.value = access.canManage;
+      models.value = access.canManage ? access.models || [] : [];
+      defaultModel.value = access.canManage ? access.defaultModel || '' : '';
+      activeRoomID.value = access.canManage ? access.roomID : undefined;
       if (!access.canManage) {
         budget.value = undefined;
         costs.value = {};
@@ -76,5 +85,5 @@ export function useAiAccess(roomIDs: Ref<string[]> = computed(() => [])) {
     socket.off('connect', refresh);
     socket.off('disconnect', clear);
   });
-  return { canManage, costs, limits, budget, refresh };
+  return { canManage, costs, limits, budget, models, defaultModel, activeRoomID, refresh };
 }
