@@ -1,17 +1,11 @@
 <template>
   <div v-if="canManage">
-    <v-select
-      v-if="!activeRoomID"
-      v-model="selectedModel"
-      :items="models"
-      item-title="label"
-      item-value="id"
-      :label="$t('aiArena.selectModel')"
-      :disabled="busy"
-      hide-details
-      density="compact"
-      class="mb-2"
-    />
+    <label v-if="!activeRoomID" class="ai-model-select">
+      <span>{{ $t('aiArena.selectModel') }}</span>
+      <select v-model="selectedModel" :disabled="busy">
+        <option v-for="model in models" :key="model.id" :value="model.id">{{ model.label }}</option>
+      </select>
+    </label>
     <v-btn color="secondary" :loading="busy" :disabled="!activeRoomID && !selectedModel" @click="openRoom">
       {{ $t(activeRoomID ? 'aiArena.watch' : 'aiArena.create') }}
     </v-btn>
@@ -57,3 +51,27 @@ async function openRoom() {
   }
 }
 </script>
+
+<style scoped>
+.ai-model-select {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+select {
+  padding: 8px 12px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  color: rgb(var(--v-theme-on-surface));
+  background: rgb(var(--v-theme-surface));
+  font: inherit;
+  appearance: auto;
+}
+select:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 2px;
+}
+select:disabled {
+  opacity: 0.6;
+}
+</style>
