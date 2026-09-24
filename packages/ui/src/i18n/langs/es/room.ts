@@ -9,6 +9,10 @@ export default {
     restartGame: 'Reiniciar juego',
   },
   mainPage: {
+    socialTitle: 'Avalon está en las redes',
+    socialDescription: 'Memes, traiciones y momentos de la Mesa Redonda.',
+    socialInvitation: 'Síguenos y dale me gusta a tus vídeos favoritos para que más jugadores descubran Avalon.',
+
     retryAi: 'Reintentar',
     showMore: 'Ver más partidas',
     heroCaption: 'Confianza. Engaño. Avalon.',

@@ -14,7 +14,9 @@ function sourceTokens(source, extension) {
   if (extension === '.vue') {
     const { descriptor } = parse(source);
     source = [
-      descriptor.template?.content.replace(/<!--[\s\S]*?-->/g, ''),
+      descriptor.template?.content
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(/\bhref=("https?:[^"]*"|'https?:[^']*')/g, ''),
       ...[descriptor.script, descriptor.scriptSetup]
         .filter(Boolean)
         .map((block) => withoutScriptComments(block.content)),

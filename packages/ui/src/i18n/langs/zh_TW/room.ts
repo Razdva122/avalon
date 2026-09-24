@@ -9,6 +9,10 @@ export default {
     restartGame: '重開遊戲',
   },
   mainPage: {
+    socialTitle: 'Avalon 加入社群平台了',
+    socialDescription: '圓桌旁的趣味梗、背叛與精彩瞬間。',
+    socialInvitation: '追蹤我們的帳號，為喜歡的影片按讚，讓更多玩家發現 Avalon。',
+
     retryAi: '重試',
     showMore: '顯示更多遊戲',
     heroCaption: '信任。欺騙。阿瓦隆。',

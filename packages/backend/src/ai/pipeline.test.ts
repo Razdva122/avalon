@@ -176,7 +176,7 @@ test('public sabotage confessions are replaced but ordinary suspicions remain', 
   expect(safePublicSpeech('I suspect 2 is evil.', 'reject')).toBe('I suspect 2 is evil.');
 });
 
-test('retries a token-limited decision once with identical facts and a bounded non-reasoning retry', async () => {
+test('retries a token-limited decision once with identical facts and preserves reasoning on the bounded retry', async () => {
   const generate = jest
     .fn()
     .mockRejectedValueOnce(new AiOutputLimit(4096))
@@ -186,8 +186,8 @@ test('retries a token-limited decision once with identical facts and a bounded n
   expect(generate).toHaveBeenCalledTimes(3);
   expect(generate.mock.calls[1][1]).toEqual({
     ...generate.mock.calls[0][1],
-    maxOutput: 1024,
-    reasoning: 'none',
+    maxOutput: 8192,
+    reasoning: 'default',
     phase: 'decision-retry',
   });
   expect(generate.mock.calls[1][0]).toEqual(generate.mock.calls[0][0]);
@@ -200,6 +200,15 @@ test('a second token limit pauses with an explicit reason instead of a third att
     .mockRejectedValueOnce(new AiOutputLimit(8192));
   await expect(decisionPipeline(generate)(request)).rejects.toThrow('8192');
   expect(generate).toHaveBeenCalledTimes(2);
+});
+
+test('an explicitly selected non-reasoning mode remains unchanged on retry', async () => {
+  const generate = jest
+    .fn()
+    .mockRejectedValueOnce(new AiOutputLimit(640))
+    .mockResolvedValueOnce({ choice: 1, speech: 'Private reason.' });
+  await decisionPipeline(generate, 'none')({ ...request, speak: false });
+  expect(generate.mock.calls[1][1]).toMatchObject({ reasoning: 'none', maxOutput: 1280, phase: 'decision-retry' });
 });
 
 test('speech retry preserves the already chosen action and never repeats the decision', async () => {

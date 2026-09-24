@@ -12,15 +12,18 @@ import originalFixtures from './fixtures/control.json';
 import postulates from './fixtures/postulates.json';
 import lastGame from './fixtures/last-game.json';
 import productionFixtures from './fixtures/production-regressions.json';
+import votingFixtures from './fixtures/voting-regressions.json';
 const productionRegression = process.argv.includes('--production-regressions');
 const regression = process.argv.includes('--last-game');
-const fixtures = productionRegression
-  ? productionFixtures
-  : regression
-    ? lastGame
-    : process.argv.includes('--postulates')
-      ? postulates
-      : originalFixtures;
+const fixtures = process.argv.includes('--voting-regressions')
+  ? votingFixtures
+  : productionRegression
+    ? productionFixtures
+    : regression
+      ? lastGame
+      : process.argv.includes('--postulates')
+        ? postulates
+        : originalFixtures;
 
 async function main() {
   const selectedReasoning = process.argv.find((arg) => arg.startsWith('--reasoning='))?.split('=')[1];
@@ -49,10 +52,17 @@ async function main() {
         : ['none', 'default']) as ('none' | 'default')[]) {
       for (const fixture of selectedFixtures) {
         const request = fixture.request as unknown as BotRequest;
-        const decide = decisionPipeline(
-          (r, options, signal) => yandexDecide(id, repo, () => {}, { ...options, model })(r, signal),
-          reasoning,
-        );
+        let privateAssessment: string | undefined;
+        const decide = decisionPipeline(async (r, options, signal) => {
+          // Replay the original limited-knowledge payload, including its mistaken hypotheses.
+          const result = await yandexDecide(id, repo, () => {}, {
+            ...options,
+            model,
+            ...('context' in fixture ? { context: fixture.context } : {}),
+          })(r, signal);
+          privateAssessment = result.speech;
+          return result;
+        }, reasoning);
         const started = Date.now();
         const before = await repo.roomCost(id);
         const reply = await decide(request);
@@ -67,6 +77,7 @@ async function main() {
             expected: 'expected' in fixture ? fixture.expected : undefined,
             passed: 'expected' in fixture ? request.choices[reply.choice] === fixture.expected : undefined,
             speech: reply.speech,
+            ...('context' in fixture ? { privateAssessment } : {}),
             seconds: (Date.now() - started) / 1000,
             rub: (await repo.roomCost(id)) - before,
           }),

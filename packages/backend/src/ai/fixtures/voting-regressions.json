@@ -1,0 +1,1065 @@
+[
+  {
+    "name": "fresh-roster-does-not-clear-5",
+    "sourceRoom": "e9f3c680-bd9b-4a39-875e-3e400f2125ea",
+    "sourceTrace": "f45e7659-e067-4f62-b1b5-4c424bdff4e2",
+    "expected": "reject",
+    "request": {
+      "playerID": "6",
+      "name": "6",
+      "style": "brief",
+      "task": "Discuss this exact proposed team and cast your binding vote in the SAME answer; choose approve or reject. Give a brief reason without repeating vote words.",
+      "speak": false,
+      "state": {
+        "stage": "selectTeam",
+        "mission": 1,
+        "vote": 1,
+        "players": [
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "servant",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "1",
+            "index": 1,
+            "role": "unknown",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          }
+        ]
+      },
+      "chat": [],
+      "choices": ["approve", "reject"]
+    },
+    "context": {
+      "you": {
+        "seat": 6,
+        "role": "servant",
+        "side": "good"
+      },
+      "roleAdvice": "You are ALWAYS Good. Deliberate mission failure or helping Evil NEVER benefits you. Infer from mission rosters and public behavior, not invented private knowledge.",
+      "stage": "selectTeam",
+      "task": "Discuss this exact proposed team and cast your binding vote in the SAME answer; choose approve or reject. Give a brief reason without repeating vote words.",
+      "speak": true,
+      "objective": "Win successful missions AND keep Merlin alive.",
+      "privateKnowledge": {
+        "rolesVisibleToYou": [
+          [5, "unknown"],
+          [6, "servant"],
+          [7, "unknown"],
+          [1, "unknown"],
+          [2, "unknown"],
+          [3, "unknown"],
+          [4, "unknown"]
+        ],
+        "checks": []
+      },
+      "score": {
+        "successes": 0,
+        "failures": 1
+      },
+      "proposal": {
+        "number": 2,
+        "fifthLeader": 1,
+        "rejectionsUntilForced": 3,
+        "forced": false
+      },
+      "mission": 2,
+      "teamSize": 3,
+      "proposedTeam": [5, 6, 1],
+      "youAreOnTeam": true,
+      "actionFacts": {
+        "yourSeat": 6,
+        "yourSide": "good",
+        "team": [5, 6, 1],
+        "youAreOnTeam": true,
+        "knownEvilOnTeam": [],
+        "unresolvedOnTeam": [5, 1],
+        "failsRequired": 1,
+        "toleratesFails": 0,
+        "openingSelfPreference": false
+      },
+      "missionRule": {
+        "successWithFails": [0],
+        "failureAtLeast": 1
+      },
+      "alignmentCounts": {
+        "good": 4,
+        "evil": 3
+      },
+      "checks": [],
+      "chat": [
+        {
+          "by": "6",
+          "text": "I vote reject. Mission 1 failed with seat 3 and 4; I'd rather test a roster without a mission-failure participant, so I reject to seek a safer option."
+        },
+        {
+          "by": "7",
+          "text": "I vote approve. We've had one failure and need information. This fresh team includes untested players; approving moves us forward instead of endless rejections."
+        },
+        {
+          "by": "1",
+          "text": "I vote reject. I need stronger evidence before supporting this team."
+        },
+        {
+          "by": "2",
+          "text": "I vote reject. I reject because seat 4 was on the failed Mission 1, and I want a team that includes me so I can verify cards directly."
+        },
+        {
+          "by": "3",
+          "text": "I vote reject. I am Good. Mission 1 had 1 Fail card(s); 4 betrayed us. I reject teams with them."
+        },
+        {
+          "by": "4",
+          "text": "I vote approve. I approve this team because it excludes the player I saw play the Fail on Mission 1 and includes me to gather more mission data."
+        },
+        {
+          "by": "5",
+          "text": "I propose 5, 6, 1. Mission 1 failed with 3 and 4; 4 is highly suspicious. I propose a fresh team with myself and two untested players to gather clean data."
+        }
+      ],
+      "choices": ["approve", "reject"],
+      "completedMissions": [
+        {
+          "n": 1,
+          "leader": 3,
+          "team": [3, 4],
+          "result": "fail",
+          "fails": 1,
+          "participated": false
+        }
+      ],
+      "rejectedProposals": [
+        {
+          "mission": 1,
+          "attempt": 1,
+          "leader": 1,
+          "team": [1, 2],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [6, "reject"],
+            [7, "reject"],
+            [1, "approve"],
+            [2, "approve"],
+            [3, "reject"],
+            [4, "reject"]
+          ],
+          "yourVote": "reject"
+        },
+        {
+          "mission": 1,
+          "attempt": 2,
+          "leader": 2,
+          "team": [2, 3],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [6, "reject"],
+            [7, "reject"],
+            [1, "reject"],
+            [2, "approve"],
+            [3, "approve"],
+            [4, "reject"]
+          ],
+          "yourVote": "reject"
+        },
+        {
+          "mission": 2,
+          "attempt": 1,
+          "leader": 4,
+          "team": [5, 6, 4],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [6, "reject"],
+            [7, "approve"],
+            [1, "reject"],
+            [2, "reject"],
+            [3, "reject"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        }
+      ],
+      "approvedProposals": [
+        {
+          "mission": 1,
+          "attempt": 3,
+          "leader": 3,
+          "team": [3, 4],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [6, "reject"],
+            [7, "approve"],
+            [1, "reject"],
+            [2, "reject"],
+            [3, "approve"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        }
+      ],
+      "previousDecisions": [
+        {
+          "stage": "selectTeam",
+          "choice": "reject",
+          "mission": 1,
+          "proposal": 1
+        },
+        {
+          "stage": "selectTeam",
+          "choice": "reject",
+          "mission": 1,
+          "proposal": 2
+        },
+        {
+          "stage": "selectTeam",
+          "choice": "reject",
+          "mission": 1,
+          "proposal": 3
+        },
+        {
+          "stage": "selectTeam",
+          "choice": "reject",
+          "mission": 2,
+          "proposal": 1
+        }
+      ],
+      "modelHypotheses": [
+        {
+          "key": "no-completed-missions",
+          "fact": "No mission has completed, so there are no card results to inform this vote.",
+          "source": "completedMissions",
+          "kind": "fact",
+          "certainty": "claim"
+        },
+        {
+          "key": "mission1-fail",
+          "fact": "Mission 1 with team [3,4] failed with 1 fail.",
+          "source": "completedMissions n=1",
+          "kind": "fact",
+          "certainty": "claim"
+        },
+        {
+          "key": "mission1-votes",
+          "fact": "Seats 5,7,3,4 approved mission 1 roster; seats 1,2,6 rejected.",
+          "source": "approvedProposals attempt 3",
+          "kind": "fact",
+          "certainty": "claim"
+        },
+        {
+          "key": "seat4-suspicion",
+          "fact": "Seat 4 was on the failed mission; including them again risks another fail.",
+          "source": "completedMissions n=1",
+          "kind": "deduction",
+          "certainty": "claim"
+        }
+      ]
+    }
+  },
+  {
+    "name": "lady-truth-does-not-clear-checker",
+    "sourceRoom": "e9f3c680-bd9b-4a39-875e-3e400f2125ea",
+    "sourceTrace": "a367a1e4-b4b1-421b-8ce4-5cb0f105e73e",
+    "expected": "approve",
+    "request": {
+      "playerID": "2",
+      "name": "2",
+      "style": "brief",
+      "task": "Discuss this exact proposed team and cast your binding vote in the SAME answer; choose approve or reject. Give a brief reason without repeating vote words.",
+      "speak": false,
+      "state": {
+        "stage": "selectTeam",
+        "mission": 2,
+        "vote": 0,
+        "players": [
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "1",
+            "index": 1,
+            "role": "mysteryWizard",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "percival",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "unknown",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "mysteryWizard",
+            "features": {
+              "isSelected": false
+            }
+          }
+        ]
+      },
+      "chat": [],
+      "choices": ["approve", "reject"]
+    },
+    "context": {
+      "you": {
+        "seat": 2,
+        "role": "percival",
+        "side": "good"
+      },
+      "roleAdvice": "Your wizard pair contains Merlin and Morgana; you do NOT know which is which. Treat them as candidates, never label either Morgana as fact without evidence. Track the actual author of Lady claims. Protect likely Merlin without exposing the pair or your certainty. You do not know other alignments.",
+      "stage": "selectTeam",
+      "task": "Discuss this exact proposed team and cast your binding vote in the SAME answer; choose approve or reject. Give a brief reason without repeating vote words.",
+      "speak": true,
+      "objective": "Win successful missions AND keep Merlin alive.",
+      "privateKnowledge": {
+        "rolesVisibleToYou": [
+          [5, "unknown"],
+          [6, "unknown"],
+          [7, "unknown"],
+          [1, "mysteryWizard"],
+          [2, "percival"],
+          [3, "unknown"],
+          [4, "mysteryWizard"]
+        ],
+        "checks": [
+          {
+            "by": 7,
+            "target": 2,
+            "actual": "good"
+          }
+        ]
+      },
+      "score": {
+        "successes": 0,
+        "failures": 2
+      },
+      "proposal": {
+        "number": 1,
+        "fifthLeader": 3,
+        "rejectionsUntilForced": 4,
+        "forced": false
+      },
+      "mission": 3,
+      "teamSize": 3,
+      "proposedTeam": [6, 2, 3],
+      "youAreOnTeam": true,
+      "actionFacts": {
+        "yourSeat": 2,
+        "yourSide": "good",
+        "team": [6, 2, 3],
+        "youAreOnTeam": true,
+        "knownEvilOnTeam": [],
+        "unresolvedOnTeam": [6, 3],
+        "failsRequired": 1,
+        "toleratesFails": 0,
+        "openingSelfPreference": false
+      },
+      "missionRule": {
+        "successWithFails": [0],
+        "failureAtLeast": 1
+      },
+      "alignmentCounts": {
+        "good": 4,
+        "evil": 3
+      },
+      "checks": [
+        {
+          "by": 7,
+          "target": 2,
+          "announced": "good"
+        }
+      ],
+      "chat": [
+        {
+          "by": "3",
+          "text": "I vote reject. I reject because seat 5 has consistently backed risky rosters, and I prefer untested players plus myself for cleaner data."
+        },
+        {
+          "by": "4",
+          "text": "I vote approve. Approve this fresh team: it excludes the failed Mission 1 pair and tests untested players, giving us useful data either way."
+        },
+        {
+          "by": "5",
+          "text": "I vote approve. Fresh team excludes the failed Mission 1 pair and tests two untested players; this gives us clean data."
+        },
+        {
+          "by": "7",
+          "text": "I inspected 2 and announce: Good."
+        },
+        {
+          "by": "6",
+          "text": "I propose 6, 2, 3. I propose a fresh team with me and two untested players to gather clean data without repeating failed pairs."
+        },
+        {
+          "by": "7",
+          "text": "I vote reject. I reject: 2 is trustworthy from my inspection, but 6 and 3 are untested and we already have two fails. I want a more controlled team including myself and 2."
+        },
+        {
+          "by": "1",
+          "text": "I vote reject. Must-win mission; this roster has too many untested seats. I prefer a controlled team with verified 2 and myself."
+        }
+      ],
+      "choices": ["approve", "reject"],
+      "completedMissions": [
+        {
+          "n": 1,
+          "leader": 3,
+          "team": [3, 4],
+          "result": "fail",
+          "fails": 1,
+          "participated": false
+        },
+        {
+          "n": 2,
+          "leader": 5,
+          "team": [5, 6, 1],
+          "result": "fail",
+          "fails": 1,
+          "participated": false
+        }
+      ],
+      "rejectedProposals": [
+        {
+          "mission": 1,
+          "attempt": 1,
+          "leader": 1,
+          "team": [1, 2],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [6, "reject"],
+            [7, "reject"],
+            [1, "approve"],
+            [2, "approve"],
+            [3, "reject"],
+            [4, "reject"]
+          ],
+          "yourVote": "approve"
+        },
+        {
+          "mission": 1,
+          "attempt": 2,
+          "leader": 2,
+          "team": [2, 3],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [6, "reject"],
+            [7, "reject"],
+            [1, "reject"],
+            [2, "approve"],
+            [3, "approve"],
+            [4, "reject"]
+          ],
+          "yourVote": "approve"
+        },
+        {
+          "mission": 2,
+          "attempt": 1,
+          "leader": 4,
+          "team": [5, 6, 4],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [6, "reject"],
+            [7, "approve"],
+            [1, "reject"],
+            [2, "reject"],
+            [3, "reject"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        }
+      ],
+      "approvedProposals": [
+        {
+          "mission": 1,
+          "attempt": 3,
+          "leader": 3,
+          "team": [3, 4],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [6, "reject"],
+            [7, "approve"],
+            [1, "reject"],
+            [2, "reject"],
+            [3, "approve"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        },
+        {
+          "mission": 2,
+          "attempt": 2,
+          "leader": 5,
+          "team": [5, 6, 1],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [6, "approve"],
+            [7, "approve"],
+            [1, "reject"],
+            [2, "reject"],
+            [3, "reject"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        }
+      ],
+      "previousDecisions": [
+        {
+          "stage": "selectTeam",
+          "choice": "approve",
+          "mission": 1,
+          "proposal": 2
+        },
+        {
+          "stage": "selectTeam",
+          "choice": "reject",
+          "mission": 1,
+          "proposal": 3
+        },
+        {
+          "stage": "selectTeam",
+          "choice": "reject",
+          "mission": 2,
+          "proposal": 1
+        },
+        {
+          "stage": "selectTeam",
+          "choice": "reject",
+          "mission": 2,
+          "proposal": 2
+        }
+      ],
+      "modelHypotheses": [
+        {
+          "key": "no_mission_evidence",
+          "fact": "No missions have completed yet, so no alignment is proven.",
+          "source": "game records",
+          "kind": "fact",
+          "certainty": "claim"
+        },
+        {
+          "key": "mission1_participant",
+          "fact": "Seat 4 participated in the failed mission and is now proposed again.",
+          "source": "completedMissions n=1 and proposal",
+          "kind": "deduction",
+          "certainty": "claim"
+        },
+        {
+          "key": "wizard_pair",
+          "fact": "Seats 1 and 4 are the wizard pair (Merlin and Morgana).",
+          "source": "Percival role knowledge",
+          "kind": "deduction",
+          "certainty": "claim"
+        },
+        {
+          "key": "mission1_fail",
+          "fact": "Mission 1 with seats 3 and 4 failed with one Fail.",
+          "source": "completedMissions n=1",
+          "kind": "fact",
+          "certainty": "claim"
+        },
+        {
+          "key": "seat5_backed_fail",
+          "fact": "Seat 5 approved Mission 1 team [3,4] which failed.",
+          "source": "approvedProposals mission=1 attempt=3",
+          "kind": "deduction",
+          "certainty": "claim"
+        }
+      ]
+    }
+  },
+  {
+    "name": "reject-false-lady-trust-core",
+    "sourceRoom": "e9f3c680-bd9b-4a39-875e-3e400f2125ea",
+    "sourceTrace": "b4ccb0cd-d813-4bff-bb26-5b5895185bf0",
+    "expected": "reject",
+    "request": {
+      "playerID": "2",
+      "name": "2",
+      "style": "brief",
+      "task": "Discuss this exact proposed team and cast your binding vote in the SAME answer; choose approve or reject. Give a brief reason without repeating vote words.",
+      "speak": false,
+      "state": {
+        "stage": "selectTeam",
+        "mission": 2,
+        "vote": 1,
+        "players": [
+          {
+            "id": "5",
+            "index": 5,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "6",
+            "index": 6,
+            "role": "unknown",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "7",
+            "index": 7,
+            "role": "unknown",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "1",
+            "index": 1,
+            "role": "mysteryWizard",
+            "features": {
+              "isSelected": false
+            }
+          },
+          {
+            "id": "2",
+            "index": 2,
+            "role": "percival",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "3",
+            "index": 3,
+            "role": "unknown",
+            "features": {
+              "isSelected": true
+            }
+          },
+          {
+            "id": "4",
+            "index": 4,
+            "role": "mysteryWizard",
+            "features": {
+              "isSelected": false
+            }
+          }
+        ]
+      },
+      "chat": [],
+      "choices": ["approve", "reject"]
+    },
+    "context": {
+      "you": {
+        "seat": 2,
+        "role": "percival",
+        "side": "good"
+      },
+      "roleAdvice": "Your wizard pair contains Merlin and Morgana; you do NOT know which is which. Treat them as candidates, never label either Morgana as fact without evidence. Track the actual author of Lady claims. Protect likely Merlin without exposing the pair or your certainty. You do not know other alignments.",
+      "stage": "selectTeam",
+      "task": "Discuss this exact proposed team and cast your binding vote in the SAME answer; choose approve or reject. Give a brief reason without repeating vote words.",
+      "speak": true,
+      "objective": "Win successful missions AND keep Merlin alive.",
+      "privateKnowledge": {
+        "rolesVisibleToYou": [
+          [5, "unknown"],
+          [6, "unknown"],
+          [7, "unknown"],
+          [1, "mysteryWizard"],
+          [2, "percival"],
+          [3, "unknown"],
+          [4, "mysteryWizard"]
+        ],
+        "checks": [
+          {
+            "by": 7,
+            "target": 2,
+            "actual": "good"
+          }
+        ]
+      },
+      "score": {
+        "successes": 0,
+        "failures": 2
+      },
+      "proposal": {
+        "number": 2,
+        "fifthLeader": 3,
+        "rejectionsUntilForced": 3,
+        "forced": false
+      },
+      "mission": 3,
+      "teamSize": 3,
+      "proposedTeam": [7, 2, 3],
+      "youAreOnTeam": true,
+      "actionFacts": {
+        "yourSeat": 2,
+        "yourSide": "good",
+        "team": [7, 2, 3],
+        "youAreOnTeam": true,
+        "knownEvilOnTeam": [],
+        "unresolvedOnTeam": [7, 3],
+        "failsRequired": 1,
+        "toleratesFails": 0,
+        "openingSelfPreference": false
+      },
+      "missionRule": {
+        "successWithFails": [0],
+        "failureAtLeast": 1
+      },
+      "alignmentCounts": {
+        "good": 4,
+        "evil": 3
+      },
+      "checks": [
+        {
+          "by": 7,
+          "target": 2,
+          "announced": "good"
+        }
+      ],
+      "chat": [
+        {
+          "by": "2",
+          "text": "I vote reject. I trust 7's inspection of me, but this team includes two players from our failed missions; with two fails already I cannot risk this combination. Reject for a more controlled roster."
+        },
+        {
+          "by": "3",
+          "text": "I vote approve. I trust 7's check on 2, and this fresh team avoids the failed pairs while testing new players. We must pass now; I support it."
+        },
+        {
+          "by": "4",
+          "text": "I vote reject. I am Good. Mission 1 had 1 Fail card(s); 3 betrayed us. I reject teams with them."
+        },
+        {
+          "by": "5",
+          "text": "I vote reject. We already have two fails and cannot afford a gamble; this fresh team has too many untested seats, so I want a more controlled roster with verified players."
+        },
+        {
+          "by": "6",
+          "text": "I vote approve. We must pass this mission; including verified 2 and testing new players is our best shot, so approve to move forward."
+        },
+        {
+          "by": "7",
+          "text": "I propose 7, 2, 3. We're down 0-2 and need a win; including my verified check on 2 gives us a stable core while testing new players."
+        },
+        {
+          "by": "1",
+          "text": "I vote reject. Down 0-2, this team is too risky: 3 was on failed M1 and 7 is untested; only 2 is checked. Reject for a safer roster with verified 2 and me."
+        }
+      ],
+      "choices": ["approve", "reject"],
+      "completedMissions": [
+        {
+          "n": 1,
+          "leader": 3,
+          "team": [3, 4],
+          "result": "fail",
+          "fails": 1,
+          "participated": false
+        },
+        {
+          "n": 2,
+          "leader": 5,
+          "team": [5, 6, 1],
+          "result": "fail",
+          "fails": 1,
+          "participated": false
+        }
+      ],
+      "rejectedProposals": [
+        {
+          "mission": 1,
+          "attempt": 1,
+          "leader": 1,
+          "team": [1, 2],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [6, "reject"],
+            [7, "reject"],
+            [1, "approve"],
+            [2, "approve"],
+            [3, "reject"],
+            [4, "reject"]
+          ],
+          "yourVote": "approve"
+        },
+        {
+          "mission": 1,
+          "attempt": 2,
+          "leader": 2,
+          "team": [2, 3],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [6, "reject"],
+            [7, "reject"],
+            [1, "reject"],
+            [2, "approve"],
+            [3, "approve"],
+            [4, "reject"]
+          ],
+          "yourVote": "approve"
+        },
+        {
+          "mission": 2,
+          "attempt": 1,
+          "leader": 4,
+          "team": [5, 6, 4],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [6, "reject"],
+            [7, "approve"],
+            [1, "reject"],
+            [2, "reject"],
+            [3, "reject"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        },
+        {
+          "mission": 3,
+          "attempt": 1,
+          "leader": 6,
+          "team": [6, 2, 3],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [6, "approve"],
+            [7, "reject"],
+            [1, "reject"],
+            [2, "reject"],
+            [3, "approve"],
+            [4, "reject"]
+          ],
+          "yourVote": "reject"
+        }
+      ],
+      "approvedProposals": [
+        {
+          "mission": 1,
+          "attempt": 3,
+          "leader": 3,
+          "team": [3, 4],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [6, "reject"],
+            [7, "approve"],
+            [1, "reject"],
+            [2, "reject"],
+            [3, "approve"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        },
+        {
+          "mission": 2,
+          "attempt": 2,
+          "leader": 5,
+          "team": [5, 6, 1],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [6, "approve"],
+            [7, "approve"],
+            [1, "reject"],
+            [2, "reject"],
+            [3, "reject"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        }
+      ],
+      "previousDecisions": [
+        {
+          "stage": "selectTeam",
+          "choice": "reject",
+          "mission": 1,
+          "proposal": 3
+        },
+        {
+          "stage": "selectTeam",
+          "choice": "reject",
+          "mission": 2,
+          "proposal": 1
+        },
+        {
+          "stage": "selectTeam",
+          "choice": "reject",
+          "mission": 2,
+          "proposal": 2
+        },
+        {
+          "stage": "selectTeam",
+          "choice": "reject",
+          "mission": 3,
+          "proposal": 1
+        }
+      ],
+      "modelHypotheses": [
+        {
+          "key": "no_mission_evidence",
+          "fact": "No missions have completed yet, so no alignment is proven.",
+          "source": "game records",
+          "kind": "fact",
+          "certainty": "claim"
+        },
+        {
+          "key": "mission1_participant",
+          "fact": "Seat 4 participated in the failed mission and is now proposed again.",
+          "source": "completedMissions n=1 and proposal",
+          "kind": "deduction",
+          "certainty": "claim"
+        },
+        {
+          "key": "wizard_pair",
+          "fact": "Seats 1 and 4 are the wizard pair (Merlin and Morgana).",
+          "source": "Percival role knowledge",
+          "kind": "deduction",
+          "certainty": "claim"
+        },
+        {
+          "key": "mission1_fail",
+          "fact": "Mission 1 with seats 3 and 4 failed with one Fail.",
+          "source": "completedMissions n=1",
+          "kind": "fact",
+          "certainty": "claim"
+        },
+        {
+          "key": "seat5_backed_fail",
+          "fact": "Seat 5 approved Mission 1 team [3,4] which failed.",
+          "source": "approvedProposals mission=1 attempt=3",
+          "kind": "deduction",
+          "certainty": "claim"
+        },
+        {
+          "key": "seat7_good",
+          "fact": "Seat 7 inspected seat 2 and announced Good; since I am Good and Good reports truthfully, 7 is Good.",
+          "source": "checks by 7 target 2",
+          "kind": "deduction",
+          "certainty": "claim"
+        },
+        {
+          "key": "wizard_pair_one_evil",
+          "fact": "Seats 1 and 4 are the wizard pair with exactly one Evil (Morgana) and one Good (Merlin).",
+          "source": "Percival role knowledge",
+          "kind": "deduction",
+          "certainty": "claim"
+        },
+        {
+          "key": "evil_distribution",
+          "fact": "With 7 Good and me Good, and one Evil among 1/4, the remaining two Evil must be among 3/5/6.",
+          "source": "deduction from role and check",
+          "kind": "deduction",
+          "certainty": "claim"
+        },
+        {
+          "key": "proposal_contains_evil",
+          "fact": "Proposed team [6,2,3] includes 6 and 3, both in suspect set {3,5,6}, so it must contain at least one Evil and would fail.",
+          "source": "proposal mission=3 attempt=1",
+          "kind": "deduction",
+          "certainty": "claim"
+        }
+      ]
+    }
+  }
+]

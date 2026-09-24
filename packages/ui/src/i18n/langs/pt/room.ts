@@ -9,6 +9,10 @@ export default {
     restartGame: 'Reiniciar jogo',
   },
   mainPage: {
+    socialTitle: 'Avalon está nas redes sociais',
+    socialDescription: 'Memes, traições e momentos da Távola Redonda.',
+    socialInvitation: 'Siga nossos canais e curta seus vídeos favoritos para ajudar mais jogadores a descobrir Avalon.',
+
     retryAi: 'Tentar novamente',
     showMore: 'Ver mais jogos',
     heroCaption: 'Confiança. Blefe. Avalon.',

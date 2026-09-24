@@ -37,3 +37,12 @@ test('checked-in font stays small and icon boxes reserve space before font loadi
   assert.match(css, /height: 1em;/);
   for (const name of ['check', 'close', 'question_mark', 'swap_horiz', 'arrow_forward']) assert.ok(included.has(name));
 });
+
+test('external link URLs are not material icon names', () => {
+  const tokens = sourceTokens(
+    '<template><a href="https://www.tiktok.com/@playavalononline">TikTok</a><span class="material-icons">home</span></template>',
+    '.vue',
+  );
+  assert.ok(!tokens.includes('tiktok'));
+  assert.ok(tokens.includes('home'));
+});

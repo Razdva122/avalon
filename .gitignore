@@ -37,3 +37,7 @@ pnpm-debug.log*
 
 # Generated small role and team icons.
 /packages/ui/src/assets/thumbnails/
+
+# Local creative materials, renders, announcements, and their backups.
+/artifacts/
+/announcements/

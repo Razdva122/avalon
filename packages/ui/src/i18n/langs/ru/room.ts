@@ -9,6 +9,10 @@ export default {
     restartGame: 'Перезапустить игру',
   },
   mainPage: {
+    socialTitle: 'Avalon теперь в соцсетях',
+    socialDescription: 'Мемы, предательства и моменты за круглым столом.',
+    socialInvitation: 'Подписывайтесь и ставьте лайки любимым роликам — помогите новым игрокам узнать об Авалоне.',
+
     retryAi: 'Повторить',
     showMore: 'Показать ещё игры',
     heroCaption: 'Доверие. Обман. Авалон.',

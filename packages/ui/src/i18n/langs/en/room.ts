@@ -9,6 +9,10 @@ export default {
     restartGame: 'Restart game',
   },
   mainPage: {
+    socialTitle: 'Avalon is on social media',
+    socialDescription: 'Memes, betrayals, and moments from the Round Table.',
+    socialInvitation: 'Follow our channels and like your favorite videos to help more players discover Avalon.',
+
     retryAi: 'Retry',
     showMore: 'Show more games',
     heroCaption: 'Trust. Deception. Avalon.',

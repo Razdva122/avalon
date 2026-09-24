@@ -1,0 +1,32 @@
+{
+  "sourceRoom": "e9f3c680-bd9b-4a39-875e-3e400f2125ea",
+  "model": "deepseek-v4-flash",
+  "seriesBudgetRub": 20,
+  "spentRub": 8.7223,
+  "results": [
+    {
+      "roomID": "control-cb6cbcee-ebcd-463e-97ad-7ee7c61028b4",
+      "model": "deepseek-v4-flash",
+      "fixture": "fresh-roster-does-not-clear-5",
+      "reasoning": "default",
+      "choice": "reject",
+      "expected": "reject",
+      "passed": true,
+      "speech": "",
+      "privateAssessment": "Reject. 5 supported 4 on both prior proposals, including after Mission 1 failed, then pivots to accuse 4. That flip suggests 5 is Evil distancing; including 5 risks a second fail.",
+      "seconds": 211.2,
+      "rub": 6.0737
+    }
+  ],
+  "incomplete": [
+    {
+      "fixture": "lady-truth-does-not-clear-checker",
+      "reason": "Initial 4096-token response exhausted output; reasoning retry blocked by global experiment budget."
+    },
+    {
+      "fixture": "reject-false-lady-trust-core",
+      "reason": "Not run after budget stop."
+    }
+  ],
+  "limitations": "Single replay per case, not a win-rate measurement. Expected votes are strategic regression targets, not logically forced alignments. Original limited-knowledge context and mistaken notes are retained; no final role reveal is supplied."
+}

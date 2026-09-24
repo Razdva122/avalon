@@ -66,6 +66,7 @@
             >{{ $t('support.showBenefits') }} <span class="material-icons" aria-hidden="true">arrow_forward</span></span
           >
         </LocaleLink>
+        <SocialChannels class="social-desktop" />
         <div class="leaderboard-panel">
           <RotatingTopPlayer />
           <LocaleLink class="leaderboard-link" :to="{ name: 'leaderboard' }"
@@ -118,6 +119,7 @@
           </button>
         </div>
       </section>
+      <SocialChannels class="social-mobile" />
     </div>
     <nav class="lobby-footer" :aria-label="$t('menu.menu')">
       <LocaleLink :to="{ name: 'wiki' }">{{ $t('menu.wiki') }}</LocaleLink>
@@ -136,6 +138,7 @@ import type { TRoomsList } from '@avalon/types';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import LobbyRoom from './LobbyRoom.vue';
+import SocialChannels from './SocialChannels.vue';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
 import AiRoomButton from './AiRoomButton.vue';
 import RotatingTopPlayer from '@/components/stats/RotatingTopPlayer.vue';
@@ -144,6 +147,7 @@ export default defineComponent({
   components: {
     AiRoomButton,
     LobbyRoom,
+    SocialChannels,
     RotatingTopPlayer,
   },
   setup() {
@@ -279,6 +283,9 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.social-mobile {
+  display: none;
+}
 .lobby-footer {
   display: flex;
   justify-content: center;
@@ -723,9 +730,16 @@ a:focus-visible {
   }
 }
 @media (max-width: 760px) {
+  .social-desktop {
+    display: none;
+  }
+  .social-mobile {
+    display: block;
+    grid-area: social;
+  }
   .lobby-content {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: 'community' 'rooms';
+    grid-template-areas: 'community' 'rooms' 'social';
   }
   .lobby-sidebar {
     position: static;
