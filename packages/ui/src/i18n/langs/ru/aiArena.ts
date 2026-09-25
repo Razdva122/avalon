@@ -1,4 +1,6 @@
 export default {
+  controls: 'Управление партией',
+  budgetDetails: 'Расходы и лимиты',
   selectModel: 'Модель для новой партии',
   resumeBudget: 'Продолжить · увеличить лимит до {limit} ₽ (×2)',
   budgetResetIn: 'До обновления лимита: {days} дн. {hours} ч. {minutes} мин.',

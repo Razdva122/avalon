@@ -1,4 +1,6 @@
 export default {
+  controls: '對局控制',
+  budgetDetails: '預算詳情',
   selectModel: '新對局的模型',
   resumeBudget: '繼續 · 將限額提高至 {limit} ₽（×2）',
   budgetResetIn: '額度重設倒數：{days}天{hours}小時{minutes}分鐘',

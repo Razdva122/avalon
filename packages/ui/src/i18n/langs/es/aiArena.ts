@@ -1,4 +1,6 @@
 export default {
+  controls: 'Controles de la partida',
+  budgetDetails: 'Detalles del presupuesto',
   selectModel: 'Modelo para la nueva partida',
   resumeBudget: 'Continuar · aumentar límite a {limit} ₽ (×2)',
   budgetResetIn: 'El límite se renueva en: {days} d {hours} h {minutes} min',

@@ -1,4 +1,6 @@
 export default {
+  controls: 'Match controls',
+  budgetDetails: 'Budget details',
   selectModel: 'Model for the new match',
   resumeBudget: 'Continue · raise limit to {limit} ₽ (×2)',
   budgetResetIn: 'Budget resets in: {days}d {hours}h {minutes}m',

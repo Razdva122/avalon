@@ -265,11 +265,11 @@ test('evidence outlives four turns and public speech receives only the intended 
   expect(JSON.stringify(generate.mock.calls[1][1].context)).not.toContain('Private reason.');
 });
 
-test('post-game review has no reasoning and receives factual results without chat or old notes', async () => {
+test('post-game review has a bounded output and excludes live decision memory', async () => {
   const generate = jest.fn().mockResolvedValue({ choice: 0, speech: 'We lost.' });
   await decisionPipeline(generate)({ ...request, state: { ...request.state, stage: 'end' } });
   expect(generate.mock.calls[0][1].reasoning).toBe('none');
-  expect(generate.mock.calls[0][1].maxOutput).toBeLessThanOrEqual(400);
+  expect(generate.mock.calls[0][1].maxOutput).toBe(768);
   expect(generate.mock.calls[0][1].context).not.toHaveProperty('previousDecisions');
 });
 
@@ -373,4 +373,30 @@ test('budget resume retries only unpaid public speech and keeps the already paid
   await expect(decide(request)).rejects.toBeInstanceOf(AiMatchBudgetPause);
   expect(await decide(structuredClone(request))).toEqual({ choice: 1, speech: 'Too little evidence.' });
   expect(generate.mock.calls.map(([, options]) => options.phase)).toEqual(['decision', 'speech', 'speech']);
+});
+
+test('review receives bounded own decision explanations and knowledge, never another bot notes', async () => {
+  const generate = jest
+    .fn()
+    .mockResolvedValue({ choice: 1, speech: 'I trusted the checker.', publicReason: 'My public claim.' });
+  const decide = decisionPipeline(generate);
+  for (let i = 0; i < 9; i++) await decide({ ...request, speak: false, task: `Decision ${i}` });
+  await decide({ ...request, playerID: 'other', speak: false });
+  await decide({ ...request, state: { ...request.state, stage: 'end' } });
+  const review = generate.mock.calls[generate.mock.calls.length - 1][1].context;
+  expect(review.decisionExamples).toHaveLength(6);
+  expect(review.decisionExamples[0]).toMatchObject({
+    id: 'decision-1',
+    choice: 'reject',
+    reason: 'I trusted the checker.',
+    knowledge: expect.any(Object),
+  });
+  expect(review.decisionExamples.at(-1).id).toBe('decision-9');
+  expect(
+    review.decisionExamples.every(
+      (d: { knowledge: { rolesVisibleToYou: unknown[] } }) => d.knowledge.rolesVisibleToYou.length === 1,
+    ),
+  ).toBe(true);
+  const earlierContext = generate.mock.calls[1][1].context;
+  expect(earlierContext.decisionExamples).toBeUndefined();
 });

@@ -659,3 +659,10 @@ test.each(['none', 'default'] as const)(
     }
   },
 );
+
+test('review parser allows 800 characters only with the explicit review limit', () => {
+  const text = JSON.stringify({ choice: 0, speech: 'x'.repeat(800) });
+  expect(() => parseReply(text, 1)).toThrow();
+  expect(parseReply(text, 1, 800).speech).toHaveLength(800);
+  expect(() => parseReply(JSON.stringify({ choice: 0, speech: 'x'.repeat(801) }), 1, 800)).toThrow();
+});

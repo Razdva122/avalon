@@ -52,9 +52,9 @@ export class AiOutputLimit extends AiPause {
 
 export function systemFor(request: BotRequest): string {
   const format =
-    'Speak ENGLISH ONLY with bare seat numbers, never names or Player prefixes. Return only {"choice":"exact entry from choices","speech":"..."}. Copy a legal choice exactly. When speak=false speech=""; otherwise write complete short sentences, at most 240 characters (400 at end). Facts override testimony; do not invent actions.';
+    'Speak ENGLISH ONLY with bare seat numbers, never names or Player prefixes. Return only {"choice":"exact entry from choices","speech":"..."}. Copy a legal choice exactly. When speak=false speech=""; otherwise write complete short sentences, at most 240 characters (800 at end). Facts override testimony; do not invent actions.';
   if (request.state.stage === 'end')
-    return `${format} Review the finished game honestly. State your side's outcome, the decisive event, one actual action of yours and a useful lesson. Winning does not make every decision correct. Use assassinations and mission cards, not other players' conclusions. Automatic proposals are not voluntary votes. Revealed roles were not necessarily known during play. Admit public role leaks shown in yourStatements. No need to bluff now.`;
+    return `${format} Review the finished game honestly. Explain the cause behind one consequential decision for your side, not just the rule that ended the game. Winning does not make every decision correct. Use assassinations and mission cards, not other players' conclusions. Automatic proposals are not voluntary votes. Revealed roles were not necessarily known during play. Admit public role leaks shown in yourStatements. No need to bluff now.`;
   const rules =
     'Good needs 3 mission successes AND Merlin surviving assassination. Evil needs 3 failures OR killing Merlin after 3 successes. Success never proves alignment. Private knowledge is not public evidence: never reveal Merlin, Percival candidates or Evil allies in public speech. Lady announcements are claims, not verified public alignment. Unknown means unknown. Current privateKnowledge and score override old memory and public claims. A player marked evil in your private knowledge remains Evil regardless of helpful behavior. Percival must use the mysteryWizard pair: exactly one is Merlin and one Morgana, not two unknown ordinary players.';
   const ladyTrust =
@@ -261,7 +261,7 @@ export function compactRequest(request: BotRequest) {
   };
 }
 
-export function parseReply(text: string, choices: number | string[]): BotReply {
+export function parseReply(text: string, choices: number | string[], maxSpeech = 500): BotReply {
   const value = JSON.parse(text.replace(/^```(?:json)?\s*|\s*```$/g, ''));
   if (value && typeof value.choice === 'string' && Array.isArray(choices)) value.choice = choices.indexOf(value.choice);
   if (
@@ -270,7 +270,7 @@ export function parseReply(text: string, choices: number | string[]): BotReply {
     value.choice < 0 ||
     value.choice >= (Array.isArray(choices) ? choices.length : choices) ||
     typeof value.speech !== 'string' ||
-    value.speech.length > 500
+    value.speech.length > maxSpeech
   )
     throw Error('invalid AI reply');
   return { choice: value.choice, speech: value.speech.trim() };
@@ -489,7 +489,7 @@ export function yandexDecide(
                   choice: { type: 'string', enum: request.choices },
                   speech: {
                     type: 'string',
-                    maxLength: request.speak ? (request.state.stage === 'end' ? 400 : 240) : 0,
+                    maxLength: request.speak ? (request.state.stage === 'end' ? 800 : 240) : 0,
                   },
                 },
               },
@@ -594,7 +594,7 @@ export function yandexDecide(
         let reply: BotReply;
         let memory: string;
         try {
-          reply = parseReply(output, request.choices);
+          reply = parseReply(output, request.choices, request.state.stage === 'end' ? 800 : 500);
           const parsed = JSON.parse(output.replace(/^```(?:json)?\s*|\s*```$/g, ''));
           if (typeof parsed.memory !== 'string' || parsed.memory.length > 600) throw Error('Invalid memory');
           memory = parsed.memory.trim();
@@ -618,7 +618,7 @@ export function yandexDecide(
         throw new AiPause('Модель не вернула завершённый ответ. Партия приостановлена.');
       const reply = options.decisionDetails
         ? parseDecisionReply(data.choices[0].message.content, request.choices)
-        : parseReply(data.choices[0].message.content, request.choices);
+        : parseReply(data.choices[0].message.content, request.choices, request.state.stage === 'end' ? 800 : 500);
       Object.assign(trace!, {
         choice: request.choices[reply.choice],
         speech: reply.speech,

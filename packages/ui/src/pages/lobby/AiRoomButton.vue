@@ -1,5 +1,5 @@
 <template>
-  <div v-if="canManage">
+  <div v-if="canManage" class="ai-lobby-controls">
     <label v-if="!activeRoomID" class="ai-model-select">
       <span>{{ $t('aiArena.selectModel') }}</span>
       <select v-model="selectedModel" :disabled="busy">
@@ -9,7 +9,10 @@
     <v-btn color="secondary" :loading="busy" :disabled="!activeRoomID && !selectedModel" @click="openRoom">
       {{ $t(activeRoomID ? 'aiArena.watch' : 'aiArena.create') }}
     </v-btn>
-    <AiBudgetPanel v-if="canManage && budget" :budget="budget" />
+    <details v-if="budget" class="ai-budget-details">
+      <summary>{{ $t('aiArena.budgetDetails') }}</summary>
+      <AiBudgetPanel :budget="budget" />
+    </details>
     <p v-if="error" role="alert">{{ error }}</p>
   </div>
 </template>
@@ -53,6 +56,26 @@ async function openRoom() {
 </script>
 
 <style scoped>
+.ai-lobby-controls {
+  padding: 12px;
+  border: 1px solid rgba(var(--v-theme-primary), 0.3);
+  border-radius: 12px;
+  background: rgb(var(--v-theme-inset));
+  max-width: 100%;
+}
+.ai-lobby-controls > :deep(.v-btn) {
+  min-height: 44px;
+  max-width: 100%;
+}
+.ai-budget-details summary {
+  cursor: pointer;
+  padding: 12px 0;
+  min-height: 44px;
+  font-size: 13px;
+}
+.ai-budget-details summary:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+}
 .ai-model-select {
   display: grid;
   gap: 4px;

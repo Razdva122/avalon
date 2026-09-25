@@ -96,50 +96,64 @@ test('all seven prompts enforce the initial private role visibility', async () =
   }
 });
 
-test('numbered bots each write a post-game conclusion and Lady announcements match the chosen action', async () => {
-  const requests: BotRequest[] = [];
-  const room = new BotRoom('debrief', 'admin', io, async (r) => {
-    requests.push(r);
-    return {
-      choice: r.state.stage === 'onMission' ? r.choices.indexOf('success') : 0,
-      speech:
-        r.state.stage === 'announceLoyalty'
-          ? 'I inspected the player and they are Evil.'
-          : r.state.stage === 'end'
-            ? 'Our side lost because we trusted the wrong team.'
-            : 'Player 1, let us test this team.',
-    };
-  });
-  await room.run();
-  expect(room.options.features.displayIndex).toBe(true);
-  const conclusions = requests.filter((r) => r.state.stage === 'end');
-  expect(conclusions).toHaveLength(7);
-  expect(conclusions.every((r) => r.rolesKnownBeforeReveal?.length === 7)).toBe(true);
-  expect(
-    conclusions.every((r) =>
-      r.chat.every((m) => !m.text.startsWith('Post-game:') && !m.text.startsWith('Evil council (revealed):')),
-    ),
-  ).toBe(true);
-  expect(new Set(conclusions.map((r) => r.playerID)).size).toBe(7);
-  expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(7);
-  expect(room.chat.history.some((m) => m.message.includes('they are Evil'))).toBe(false);
-  expect(room.chat.history.some((m) => /I inspected \d and announce: Good\./.test(m.message))).toBe(true);
-  if (room.data.stage !== 'started') throw Error('not started');
-  const history = room.data.manager.prepareStateForUser().history;
-  for (const event of history) {
-    if (event.type !== 'announceLoyalty') continue;
-    const target = room.data.manager.game.players.find((p) => p.userID === event.targetID)!;
-    const message = room.chat.history.find(
-      (m) => m.userID === event.announcerID && m.message.startsWith(`I inspected ${target.index} and announce:`),
-    );
-    expect(message?.message).toBe(
-      `I inspected ${target.index} and announce: ${event.announced === 'good' ? 'Good' : 'Evil'}.`,
-    );
-  }
-  const first = requests[0];
-  expect(first.name).toMatch(/^\d$/);
-  expect(first.choices.every((c) => !/Alice|Ben|Clara|Daniel|Emma|Felix|Grace/.test(c))).toBe(true);
-});
+test.each([0, 1])(
+  'Lady announcement %s gets a matching target response and complete post-game reviews',
+  async (announcement) => {
+    const requests: BotRequest[] = [];
+    const room = new BotRoom('debrief', 'admin', io, async (r) => {
+      requests.push(r);
+      return {
+        choice:
+          r.state.stage === 'onMission'
+            ? r.choices.indexOf('success')
+            : r.state.stage === 'announceLoyalty'
+              ? announcement
+              : 0,
+        speech:
+          r.state.stage === 'announceLoyalty'
+            ? 'I inspected the player and they are Evil.'
+            : r.state.stage === 'end'
+              ? 'Our side lost because we trusted the wrong team. '.repeat(12)
+              : 'Player 1, let us test this team.',
+      };
+    });
+    await room.run();
+    expect(room.options.features.displayIndex).toBe(true);
+    expect(requests.filter((r) => r.state.stage === 'checkLoyalty').every((r) => r.speak)).toBe(true);
+    expect(room.ai?.fallbacks).toBe(0);
+    const conclusions = requests.filter((r) => r.state.stage === 'end');
+    expect(conclusions).toHaveLength(7);
+    expect(conclusions.every((r) => r.rolesKnownBeforeReveal?.length === 7)).toBe(true);
+    expect(
+      conclusions.every((r) =>
+        r.chat.every((m) => !m.text.startsWith('Post-game:') && !m.text.startsWith('Evil council (revealed):')),
+      ),
+    ).toBe(true);
+    expect(new Set(conclusions.map((r) => r.playerID)).size).toBe(7);
+    expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(7);
+    expect(room.chat.history.some((m) => m.message.includes('they are Evil'))).toBe(false);
+    expect(room.chat.history.some((m) => /I inspected \d and announce: (Good|Evil)\./.test(m.message))).toBe(true);
+    if (room.data.stage !== 'started') throw Error('not started');
+    const history = room.data.manager.prepareStateForUser().history;
+    for (const event of history) {
+      if (event.type !== 'announceLoyalty') continue;
+      const target: { index: number } = room.data.manager.game.players.find((p) => p.userID === event.targetID)!;
+      const message: { id?: string; message: string } | undefined = room.chat.history.find(
+        (m) => m.userID === event.announcerID && m.message.startsWith(`I inspected ${target.index} and announce:`),
+      );
+      const responseIndex = room.chat.history.findIndex((m) => m.id === message?.id) + 1;
+      expect(room.chat.history[responseIndex]?.userID).toBe(event.targetID);
+      expect(room.chat.history[responseIndex]?.message).toContain('I am Good');
+      expect(room.chat.history[responseIndex]?.message).toContain(announcement === 0 ? 'does not prove' : 'is lying');
+      expect(message?.message).toBe(
+        `I inspected ${target.index} and announce: ${event.announced === 'good' ? 'Good' : 'Evil'}.`,
+      );
+    }
+    const first = requests[0];
+    expect(first.name).toMatch(/^\d$/);
+    expect(first.choices.every((c) => !/Alice|Ben|Clara|Daniel|Emma|Felix|Grace/.test(c))).toBe(true);
+  },
+);
 
 test('discussion collects votes in the same calls and applies them to the unchanged team', async () => {
   const calls: BotRequest[] = [];

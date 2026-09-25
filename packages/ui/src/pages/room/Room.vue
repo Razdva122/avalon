@@ -271,8 +271,8 @@ export default defineComponent({
 @media (max-width: 600px) {
   .ai-room-status {
     top: 55px;
-    left: 4px;
-    max-width: calc(100vw - 24px);
+    left: 8px;
+    max-width: calc(100vw - 16px);
     font-size: 12px;
   }
 }

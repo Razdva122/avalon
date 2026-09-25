@@ -161,7 +161,7 @@ export class BotRoom extends Room {
               .slice(0, 350)
               .map((m) => ({ id: m.id, name: this.label(m.userID), text: m.message }))
           : undefined,
-      evilCouncil: state.stage === 'assassinate' ? structuredClone(this.evilCouncil) : undefined,
+      evilCouncil: ['assassinate', 'end'].includes(state.stage) ? structuredClone(this.evilCouncil) : undefined,
       chat: this.chat.history
         .filter((m) => BOT_PROFILES.some((p) => p.id === m.userID))
         .filter((m) => !m.message.startsWith('Post-game:') && !m.message.startsWith('Evil council (revealed):'))
@@ -183,7 +183,7 @@ export class BotRoom extends Room {
         !Number.isInteger(answer.choice) ||
         !choices[answer.choice] ||
         typeof answer.speech !== 'string' ||
-        answer.speech.length > 500
+        answer.speech.length > (state.stage === 'end' ? 800 : 500)
       )
         throw Error('Invalid decision');
       this.failures = 0;
@@ -305,7 +305,7 @@ export class BotRoom extends Room {
     let choices: Choice[];
     let task: string;
     let privateCheck: string | undefined;
-    const speak = false;
+    let speak = false;
     switch (state.stage) {
       case 'votingForTeam':
         task = 'Vote on the proposed team';
@@ -322,7 +322,9 @@ export class BotRoom extends Room {
         }));
         break;
       case 'checkLoyalty':
-        task = 'Choose whom to inspect with the Lady of the Lake';
+        speak = true;
+        task =
+          'Choose whom to inspect with the Lady of the Lake and explain publicly what question this check will resolve. Do not announce a result before inspecting.';
         choices = state.players
           .filter((p) => p.id !== id && !p.features.ladyOfLake)
           .map((p) => ({
@@ -375,6 +377,13 @@ export class BotRoom extends Room {
         await this.publish(
           id,
           `I inspected ${this.label(inspected.id)} and announce: ${result.choice === 0 ? 'Good' : 'Evil'}.`,
+        );
+        // Public Good-persona stance for either side; never changes private alignment knowledge.
+        await this.publish(
+          inspected.id,
+          result.choice === 0
+            ? `I am Good, so ${this.label(id)} reported my alignment correctly. This alone does not prove ${this.label(id)} is Good.`
+            : `I am Good. ${this.label(id)} is lying about my inspection; I accuse ${this.label(id)} of being Evil.`,
         );
       }
     }
