@@ -371,3 +371,44 @@ test('budget resume does not repeat Evil council advice or completed post-game r
   expect(room.chat.history.filter((m) => m.message.startsWith('Evil council (revealed):'))).toHaveLength(3);
   expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(7);
 });
+
+test('technical resume retains the proposed team and completed discussion votes', async () => {
+  const { AiTechnicalPause } = await import('./client');
+  const tasks: string[] = [];
+  let paused = false;
+  const room = new BotRoom('resume', 'admin', io, async (request) => {
+    tasks.push(request.task);
+    if (!paused && tasks.length === 4) {
+      paused = true;
+      throw new AiTechnicalPause('Output limit');
+    }
+    return { ...reply(request), choice: request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0 };
+  });
+  await room.run();
+  expect(room.ai?.canResumeTechnical).toBe(true);
+  const manager = room.data.stage === 'started' && room.data.manager;
+  const before = room.chat.history.length;
+  await room.run(false, true);
+  expect(room.data.stage === 'started' && room.data.manager).toBe(manager);
+  expect(room.ai?.status).toBe('finished');
+  expect(room.ai?.canResumeTechnical).toBe(false);
+  expect(tasks.filter((task) => task === 'Propose a team and explain your choice')).toHaveLength(3);
+  expect(room.chat.history.length).toBeGreaterThan(before);
+});
+
+test('spectators get only each bot latest short reason without leaking it to chat, broadcasts or prompts', async () => {
+  let turn = 0;
+  const requests: BotRequest[] = [];
+  const room = new BotRoom('private-reasons', 'admin', io, async (request) => {
+    requests.push(request);
+    return { ...reply(request), privateReason: `PRIVATE-${++turn}` };
+  });
+  await room.run();
+  const decisions = room.spectatorDecisions;
+  expect(decisions).toHaveLength(7);
+  expect(new Set(decisions.map((d) => d.playerID)).size).toBe(7);
+  expect(decisions[0].reason).toBe(`PRIVATE-${turn}`);
+  expect(JSON.stringify(room.calculateRoomState())).not.toContain('PRIVATE-');
+  expect(JSON.stringify(room.chat.history)).not.toContain('PRIVATE-');
+  expect(JSON.stringify(requests)).not.toContain('PRIVATE-');
+});

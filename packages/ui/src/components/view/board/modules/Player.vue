@@ -1,16 +1,29 @@
 <template>
-  <div class="player-container" :class="playerClasses" @click="$emit('playerClick', player.id)" ref="playerRef">
+  <div
+    class="player-container"
+    :class="playerClasses"
+    @click="privateDecision ? (showUserCardDialog = true) : $emit('playerClick', player.id)"
+    ref="playerRef"
+  >
     <v-tooltip
-      :open-delay="2500"
+      :open-delay="privateDecision ? 300 : 2500"
       :close-delay="0"
       location="top"
-      :disabled="!player.id || isMobileDevice"
+      :disabled="!player.id || isMobileDevice || showUserCardDialog"
       max-width="350"
       content-class="user-hover-tooltip"
       v-model="tooltipOpen"
     >
       <template v-slot:activator="{ props: tooltip }">
-        <div v-bind="tooltip" class="player-content">
+        <div
+          v-bind="tooltip"
+          class="player-content"
+          :tabindex="privateDecision ? 0 : undefined"
+          :role="privateDecision ? 'button' : undefined"
+          :aria-label="privateDecision ? $t('aiArena.privateDecisions') : undefined"
+          @keydown.enter.prevent="privateDecision && (showUserCardDialog = true)"
+          @keydown.space.prevent="privateDecision && (showUserCardDialog = true)"
+        >
           <img class="player-frame" alt="frame" :src="getImagePathByID('core', 'player-frame')" />
           <div class="player-icon"></div>
           <Avatar
@@ -77,11 +90,33 @@
         </div>
       </template>
 
-      <UserHoverCard v-if="player.id" :userID="player.id" :isVisible="tooltipOpen" />
+      <div v-if="privateDecision" class="ai-private-decision">
+        <strong>{{ $t('aiArena.privateDecisions') }}</strong>
+        <p>
+          {{ $t('aiArena.decisionSeat', { seat: privateDecision.seat, mission: privateDecision.mission }) }} ·
+          {{ privateDecision.choice }}
+        </p>
+        <p>{{ privateDecision.reason }}</p>
+      </div>
+      <UserHoverCard v-else-if="player.id" :userID="player.id" :isVisible="tooltipOpen" />
     </v-tooltip>
 
-    <v-dialog v-model="showUserCardDialog" content-class="user-card-dialog">
-      <UserHoverCard v-if="player.id && showUserCardDialog" :userID="player.id" :isVisible="showUserCardDialog" compact>
+    <v-dialog v-model="showUserCardDialog" content-class="user-card-dialog" @click.stop>
+      <v-card v-if="privateDecision" class="ai-private-decision">
+        <strong>{{ $t('aiArena.privateDecisions') }}</strong>
+        <p>
+          {{ $t('aiArena.decisionSeat', { seat: privateDecision.seat, mission: privateDecision.mission }) }} ·
+          {{ privateDecision.choice }}
+        </p>
+        <p>{{ privateDecision.reason }}</p>
+        <v-btn variant="text" @click="showUserCardDialog = false">{{ $t('chat.closeProfile') }}</v-btn>
+      </v-card>
+      <UserHoverCard
+        v-else-if="player.id && showUserCardDialog"
+        :userID="player.id"
+        :isVisible="showUserCardDialog"
+        compact
+      >
         <template #actions>
           <v-btn
             icon="close"
@@ -139,6 +174,7 @@ export default defineComponent({
       type: Object as PropType<IFrontendPlayer | RoomPlayer>,
       required: true,
     },
+    privateDecision: { type: Object as PropType<import('@avalon/types').AiSpectatorDecision> },
     spectatorRole: { type: String as PropType<import('@avalon/types').TRoles> },
     visibleHistory: {
       type: Object as PropType<THistoryResults>,
@@ -851,5 +887,23 @@ export default defineComponent({
   bottom: -6px;
   border-right: 1px solid #a48b63;
   border-bottom: 1px solid #a48b63;
+}
+</style>
+
+<style scoped>
+.ai-private-decision {
+  padding: 16px;
+  max-width: min(350px, calc(100vw - 48px));
+  overflow-wrap: anywhere;
+  white-space: normal;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.ai-private-decision p {
+  margin-top: 8px;
+}
+.player-content[role='button']:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 4px;
 }
 </style>

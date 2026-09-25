@@ -1,4 +1,5 @@
 export default {
+  resumeTechnical: 'Retry · same budget',
   controls: 'Match controls',
   budgetDetails: 'Budget details',
   selectModel: 'Model for the new match',
@@ -12,6 +13,10 @@ export default {
   gameBudget: 'Per game: {limit} ₽',
   budgetReserved: 'Includes reservations for requests in progress. Period end is exclusive.',
 
+  privateDecisions: 'Private explanations',
+  privateDecisionsHint:
+    'Hover over a bot or tap it to see its last private explanation. Model explanations may be mistaken.',
+  decisionSeat: '{seat} · Mission {mission}',
   revealRoles: 'Reveal roles',
   hideRoles: 'Hide roles',
   rolesHint: 'Roles are visible only to you. Bots keep their own knowledge.',

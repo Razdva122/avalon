@@ -1,7 +1,7 @@
 import { Room } from '@/room';
-import type { GameOptions, Server, TRoomState, PublicUserProfile } from '@avalon/types';
+import type { GameOptions, Server, TRoomState, PublicUserProfile, AiSpectatorDecision } from '@avalon/types';
 import type { TGameMethodsParams } from '@/core/game-manager';
-import { AiPause, AiMatchBudgetPause, type Decide, type BotRequest, type BotReply } from './client';
+import { AiPause, AiTechnicalPause, AiMatchBudgetPause, type Decide, type BotRequest, type BotReply } from './client';
 
 export const BOT_PROFILES: PublicUserProfile[] = ['Alice', 'Ben', 'Clara', 'Daniel', 'Emma', 'Felix', 'Grace'].map(
   (name, i) => ({ id: `avalon-ai-${i + 1}`, name: `${name} · AI`, avatar: 'servant' }),
@@ -28,6 +28,8 @@ function combinations(ids: string[], count: number): string[][] {
 }
 
 export class BotRoom extends Room {
+  readonly spectatorDecisions: AiSpectatorDecision[] = [];
+  private decisionSequence = 0;
   private cancelled = false;
   private executing = false;
   budgetResumeUnits = 0;
@@ -93,6 +95,7 @@ export class BotRoom extends Room {
     this.abort.abort();
     this.ai!.status = 'stopped';
     this.ai!.canResumeBudget = false;
+    this.ai!.canResumeTechnical = false;
     this.ai!.message = 'Stopped by the administrator.';
     if (this.data.stage === 'started' && this.data.manager.game.stage !== 'end')
       this.data.manager.game.endGame('manualy');
@@ -196,6 +199,19 @@ export class BotRoom extends Room {
       this.ai!.message = 'Model error: a legal fallback action was used.';
     }
     if (this.cancelled || this.manager.game.stage !== state.stage) return null;
+    if (answer.privateReason?.trim()) {
+      const previous = this.spectatorDecisions.findIndex((decision) => decision.playerID === id);
+      if (previous >= 0) this.spectatorDecisions.splice(previous, 1);
+      this.spectatorDecisions.unshift({
+        playerID: id,
+        id: ++this.decisionSequence,
+        seat: this.label(id),
+        mission: (state.mission ?? 0) + 1,
+        stage: state.stage,
+        choice: choices[answer.choice].text,
+        reason: answer.privateReason.trim().slice(0, 240),
+      });
+    }
     if (privateDiscussion) {
       this.evilCouncil.push({
         seat: this.label(id),
@@ -389,18 +405,21 @@ export class BotRoom extends Room {
     }
   }
 
-  async run(resumeBudget = false) {
+  async run(resumeBudget = false, resumeTechnical = false) {
     if (
       this.executing ||
-      (resumeBudget ? this.ai!.status !== 'paused' || !this.ai!.canResumeBudget : this.ai!.status !== 'ready')
+      (resumeBudget || resumeTechnical
+        ? this.ai!.status !== 'paused' || !(resumeBudget ? this.ai!.canResumeBudget : this.ai!.canResumeTechnical)
+        : this.ai!.status !== 'ready')
     )
       return;
     this.executing = true;
     this.ai!.canResumeBudget = false;
+    this.ai!.canResumeTechnical = false;
     this.budgetResumeUnits = 0;
     this.ai!.status = 'running';
     try {
-      if (!resumeBudget) super.startGame();
+      if (!resumeBudget && !resumeTechnical) super.startGame();
       while (!this.cancelled && this.manager.game.stage !== 'end') {
         await this.act();
         await this.checkpoint(this.calculateRoomState());
@@ -430,6 +449,7 @@ export class BotRoom extends Room {
     } catch (error) {
       if (this.cancelled) return;
       this.ai!.canResumeBudget = error instanceof AiMatchBudgetPause;
+      this.ai!.canResumeTechnical = error instanceof AiTechnicalPause;
       this.budgetResumeUnits = error instanceof AiMatchBudgetPause ? error.reserveUnits : 0;
       this.ai!.status = 'paused';
       this.ai!.message =

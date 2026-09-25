@@ -77,7 +77,10 @@ export class AiService {
         (userID !== undefined && room.players.includes(userID))
       )
         return cb({ error: 'AI spectator roles unavailable' });
-      cb({ roles: Object.fromEntries(room.data.manager.game.players.map((p) => [p.userID, p.role.role])) });
+      cb({
+        roles: Object.fromEntries(room.data.manager.game.players.map((p) => [p.userID, p.role.role])),
+        decisions: room.spectatorDecisions,
+      });
     });
     socket.on('getAiBudget', async (cb) => {
       if (typeof cb !== 'function') return;
@@ -191,11 +194,12 @@ export class AiService {
           return cb({ ok: true });
         }
         const resume = action === 'resumeBudget';
+        const technical = action === 'resumeTechnical';
         if (
           this.running.size ||
           this.creating ||
-          (resume
-            ? room.ai?.status !== 'paused' || !room.ai.canResumeBudget
+          (resume || technical
+            ? room.ai?.status !== 'paused' || !(resume ? room.ai.canResumeBudget : room.ai.canResumeTechnical)
             : action !== 'start' || room.ai?.status !== 'ready')
         )
           return cb({ error: 'AI room is not ready to start or resume' });
@@ -213,7 +217,7 @@ export class AiService {
           this.running.add(id);
           // run changes status synchronously before the first await: duplicate starts cannot spend twice.
           void room
-            .run(resume)
+            .run(resume, technical)
             .catch(() => {
               /* room.run already exposes a sanitized paused status */
             })

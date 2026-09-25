@@ -261,7 +261,10 @@ export class AiRepository {
     return states;
   }
   private archiveState(state: StartedRoomState) {
-    if (state.ai) state.ai.canResumeBudget = false;
+    if (state.ai) {
+      state.ai.canResumeBudget = false;
+      state.ai.canResumeTechnical = false;
+    }
     if (state.ai && ['running', 'paused'].includes(state.ai.status)) {
       state.ai.status = 'stopped';
       state.ai.message = 'Сохранённая незавершённая партия. После перезапуска создайте новую.';

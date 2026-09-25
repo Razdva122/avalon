@@ -33,9 +33,16 @@ export type DecisionEvidence = {
   source: string;
   certainty: 'proven' | 'claim' | 'bluff';
 };
-export type BotReply = { choice: number; speech: string; publicReason?: string; evidence?: DecisionEvidence[] };
+export type BotReply = {
+  choice: number;
+  speech: string;
+  privateReason?: string;
+  publicReason?: string;
+  evidence?: DecisionEvidence[];
+};
 export type Decide = (request: BotRequest, signal?: AbortSignal) => Promise<BotReply>;
 export class AiPause extends Error {}
+export class AiTechnicalPause extends AiPause {}
 export class AiMatchBudgetPause extends AiPause {
   constructor(
     message: string,
@@ -121,6 +128,7 @@ export function compactRequest(request: BotRequest) {
       const action = e.actions.find((a) => a.playerID === request.playerID);
       return {
         n: e.index + 1,
+        failsRequired: e.settings?.failsRequired ?? state.settings?.missions[e.index]?.failsRequired,
         leader: seat(e.leaderID),
         team: e.actions.map((a) => seat(a.playerID)),
         result: e.result,
@@ -296,7 +304,7 @@ export function parseDecisionReply(text: string, choices: string[]): BotReply {
         !['proven', 'claim', 'bluff'].includes(item.certainty),
     )
   )
-    throw new AiPause('Model returned invalid decision evidence. Match paused.');
+    throw new AiTechnicalPause('Model returned invalid decision evidence. Match paused.');
   // A forecast or someone else's claim cannot become proof merely by asking for that certainty.
   const evidence = (data.evidence as DecisionEvidence[]).map((item) => ({
     ...item,
@@ -537,6 +545,8 @@ export function yandexDecide(
         if (!response.ok) {
           if (response.status === 401 || response.status === 403 || response.status === 402)
             throw new AiPause('Проверьте доступ к модели и платёжный аккаунт.');
+          if (response.status === 429 || response.status >= 500)
+            throw new AiTechnicalPause('Временная ошибка провайдера. Можно повторить запрос.');
           throw new AiPause('AI provider rejected the request. Match paused to preserve context.');
         }
         data = await response.json();
@@ -547,7 +557,7 @@ export function yandexDecide(
         // Do not refund ambiguous failures: the provider may have billed the generation.
         onCost(await repository.roomCost(roomID));
         if (error instanceof Error && error.name === 'TimeoutError')
-          throw new AiPause('Модель не ответила за 10 минут. Партия приостановлена.');
+          throw new AiTechnicalPause('Модель не ответила за 10 минут. Партия приостановлена.');
         throw error instanceof AiPause
           ? error
           : sessionMode
@@ -615,7 +625,7 @@ export function yandexDecide(
       }
       if (data.choices?.[0]?.finish_reason === 'length') throw new AiOutputLimit(maxOutput);
       if (data.choices?.[0]?.finish_reason !== 'stop')
-        throw new AiPause('Модель не вернула завершённый ответ. Партия приостановлена.');
+        throw new AiTechnicalPause('Модель не вернула завершённый ответ. Партия приостановлена.');
       const reply = options.decisionDetails
         ? parseDecisionReply(data.choices[0].message.content, request.choices)
         : parseReply(data.choices[0].message.content, request.choices, request.state.stage === 'end' ? 800 : 500);

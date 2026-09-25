@@ -37,6 +37,7 @@ export class VoteInRoom {
 export type AiRoomState = {
   status: 'ready' | 'running' | 'paused' | 'finished' | 'stopped';
   canResumeBudget?: boolean;
+  canResumeTechnical?: boolean;
   costRub?: number;
   model?: string;
   fallbacks: number;
@@ -145,4 +146,15 @@ export type AiBudgetSnapshot = {
   periodDays?: number;
   periodStart?: string;
   periodEnd?: string;
+};
+
+/** Short model-written explanation; only returned through the AI spectator endpoint. */
+export type AiSpectatorDecision = {
+  playerID: string;
+  id: number;
+  seat: string;
+  mission: number;
+  stage: string;
+  choice: string;
+  reason: string;
 };

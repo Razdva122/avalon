@@ -113,7 +113,7 @@ test('every admin request reads current database permissions, including archived
   expect(await service.canManage('admin')).toBe(false);
 });
 
-test('spectator reveal is AI-only, returns only roles and never mutates player knowledge', async () => {
+test('spectator reveal is AI-only, returns spectator details and never mutates player knowledge', async () => {
   const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
   const room = new BotRoom('reveal', 'owner', io, async () => {
     throw Error('pause fixture');
@@ -138,7 +138,8 @@ test('spectator reveal is AI-only, returns only roles and never mutates player k
   };
   const before = JSON.stringify(room.calculateRoomState());
   const response = await request('reveal');
-  expect(Object.keys(response)).toEqual(['roles']);
+  expect(Object.keys(response)).toEqual(['roles', 'decisions']);
+  expect(response.decisions).toEqual([]);
   expect(Object.keys(response.roles)).toHaveLength(7);
   expect(Object.values(response.roles)).toContain('merlin');
   expect(JSON.stringify(room.calculateRoomState())).toBe(before);
@@ -317,4 +318,60 @@ test('public AI list returns latest 20 unique rooms with live state and no priva
   recent.mockRejectedValueOnce(new Error('database private details') as never);
   await handlers.getAiRoomsList(response);
   expect(response).toHaveBeenLastCalledWith({ error: 'Could not load AI rooms' });
+});
+
+test('technical resume requires a current admin, never doubles budgets and rejects budget or stopped rooms', async () => {
+  const { AiTechnicalPause, AiMatchBudgetPause } = await import('./client');
+  const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
+  let admin = true;
+  const room = new BotRoom('technical', 'owner', io, async () => {
+    throw new AiTechnicalPause('Output limit');
+  });
+  await room.run();
+  const host = {
+    rooms: { technical: room },
+    io,
+    updateRoomsList: jest.fn(),
+    dbManager: { getUserByID: async () => ({ isAdmin: admin }) },
+  } as unknown as Manager;
+  const service = new AiService(host);
+  const claim = jest.fn(async () => {});
+  const doubleMatchLimit = jest.fn();
+  service.repository = {
+    claim,
+    doubleMatchLimit,
+    save: async () => {},
+    release: async () => {},
+  } as unknown as AiRepository;
+  const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
+  service.register(
+    {
+      on: (name: string, handler: any) => {
+        handlers[name] = handler;
+      },
+    } as unknown as ServerSocket,
+    'owner',
+  );
+  const control = async () => {
+    const cb = jest.fn();
+    await handlers.controlAiRoom('technical', 'resumeTechnical', cb);
+    return cb.mock.calls[0][0];
+  };
+  admin = false;
+  expect(await control()).toHaveProperty('error');
+  expect(claim).not.toHaveBeenCalled();
+  admin = true;
+  const responses = await Promise.all([control(), control()]);
+  expect(responses.filter((r) => r.ok)).toHaveLength(1);
+  expect(doubleMatchLimit).not.toHaveBeenCalled();
+  await new Promise((resolve) => setImmediate(resolve));
+  room.stop();
+  expect(await control()).toHaveProperty('error');
+  const budgetRoom = new BotRoom('technical', 'owner', io, async () => {
+    throw new AiMatchBudgetPause('Budget', 1);
+  });
+  await budgetRoom.run();
+  host.rooms.technical = budgetRoom;
+  expect(await control()).toHaveProperty('error');
+  expect(claim).toHaveBeenCalledTimes(1);
 });

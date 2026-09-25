@@ -121,7 +121,9 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
 
   getAiSpectatorRoles: (
     roomID: string,
-    callback: (result: { roles: Record<string, TRoles> } | { error: string }) => void,
+    callback: (
+      result: { roles: Record<string, TRoles>; decisions: import('../room').AiSpectatorDecision[] } | { error: string },
+    ) => void,
   ) => void;
   getAiBudget: (callback: (result: { budget: import('../room').AiBudgetSnapshot } | { error: string }) => void) => void;
   getAiRoomCosts: (
@@ -139,7 +141,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
   createAiRoom: (model: string, callback: (result: { roomID: string } | { error: string }) => void) => void;
   controlAiRoom: (
     roomID: string,
-    action: 'start' | 'stop' | 'resumeBudget',
+    action: 'start' | 'stop' | 'resumeBudget' | 'resumeTechnical',
     callback: (result: { ok: true } | { error: string }) => void,
   ) => void;
   createRoom: (callback: (uuid: string) => void) => void;

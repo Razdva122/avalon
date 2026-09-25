@@ -16,10 +16,20 @@
           {{ $t(rolesShown ? 'aiArena.hideRoles' : 'aiArena.revealRoles') }}
         </v-btn>
         <p v-if="rolesShown">{{ $t('aiArena.rolesHint') }}</p>
+        <p v-if="rolesShown">{{ $t('aiArena.privateDecisionsHint') }}</p>
+        <p v-if="rolesShown && decisionsError" role="status">{{ $t('aiArena.connectionError') }}</p>
         <div v-if="canManage" class="ai-controls">
           <v-btn v-if="ai.status === 'ready'" color="success" :loading="busy" @click="control('start')">{{
             $t('aiArena.start')
           }}</v-btn>
+          <v-btn
+            v-if="ai.status === 'paused' && ai.canResumeTechnical"
+            color="success"
+            :loading="busy"
+            @click="control('resumeTechnical')"
+          >
+            {{ $t('aiArena.resumeTechnical') }}
+          </v-btn>
           <v-btn
             v-if="ai.status === 'paused' && ai.canResumeBudget && limits[roomID] !== undefined"
             color="success"
@@ -49,16 +59,48 @@
 </template>
 <script setup lang="ts">
 import AiBudgetPanel from '@/components/view/panels/AiBudgetPanel.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
 import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
-import type { AiRoomState, TRoles } from '@avalon/types';
+import type { AiRoomState, AiSpectatorDecision, TRoles } from '@avalon/types';
 const props = defineProps<{ ai: AiRoomState; roomID: string; canReveal?: boolean; rolesShown?: boolean }>();
 const { t } = useI18n();
 const { canManage, costs, limits, budget, refresh } = useAiAccess(computed(() => [props.roomID]));
-const emit = defineEmits<{ roles: [value: Record<string, TRoles>] }>();
+const emit = defineEmits<{ roles: [value: Record<string, TRoles>]; decisions: [value: AiSpectatorDecision[]] }>();
 const revealing = ref(false);
+
+const decisionsError = ref(false);
+watch(
+  [() => props.rolesShown, () => props.canReveal, () => props.roomID],
+  ([shown, allowed, roomID], _, onCleanup) => {
+    emit('decisions', []);
+    decisionsError.value = false;
+    if (!shown || !allowed) return;
+    let active = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    onCleanup(() => {
+      active = false;
+      clearTimeout(timer);
+    });
+    const refreshDecisions = async () => {
+      try {
+        const result = await socket.timeout(5000).emitWithAck('getAiSpectatorRoles', roomID);
+        if (!active) return;
+        decisionsError.value = 'error' in result;
+        if ('error' in result) emit('decisions', []);
+        else emit('decisions', result.decisions);
+      } catch {
+        if (active) decisionsError.value = true;
+      } finally {
+        if (active) timer = setTimeout(refreshDecisions, 3000);
+      }
+    };
+    void refreshDecisions();
+  },
+  { immediate: true },
+);
+
 async function toggleRoles() {
   error.value = '';
   if (props.rolesShown) return emit('roles', {});
@@ -77,7 +119,7 @@ async function toggleRoles() {
 }
 const busy = ref(false);
 const error = ref('');
-async function control(action: 'start' | 'stop' | 'resumeBudget') {
+async function control(action: 'start' | 'stop' | 'resumeBudget' | 'resumeTechnical') {
   busy.value = true;
   error.value = '';
   try {

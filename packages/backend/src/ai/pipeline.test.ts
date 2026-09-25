@@ -16,6 +16,17 @@ const request: BotRequest = {
   choices: ['approve', 'reject'],
   privateCheck: 'evil',
 };
+test('technical resume requests a fresh decision after an invalid choice', async () => {
+  const generate = jest
+    .fn()
+    .mockResolvedValueOnce({ choice: 99, speech: 'Invalid choice.' })
+    .mockResolvedValueOnce({ choice: 1, speech: 'Reject this team.' });
+  const decide = decisionPipeline(generate);
+  const input = { ...request, speak: false };
+  await expect(decide(input)).rejects.toThrow('Invalid private decision.');
+  await expect(decide(input)).resolves.toMatchObject({ choice: 1 });
+  expect(generate).toHaveBeenCalledTimes(2);
+});
 test('voting analysis receives off-team votes and mission links without treating forced approval as support', async () => {
   const players = Array.from({ length: 7 }, (_, i) => ({
     id: String(i + 1),
@@ -78,7 +89,11 @@ test('speaker receives only public facts and a locked action, never private note
     .mockResolvedValueOnce({ choice: 1, speech: 'My evil allies need cover.' })
     .mockResolvedValueOnce({ choice: 0, speech: 'This team lacks evidence.' });
   const result = await decisionPipeline(generate)(request);
-  expect(result).toEqual({ choice: 1, speech: 'This team lacks evidence.' });
+  expect(result).toEqual({
+    choice: 1,
+    speech: 'This team lacks evidence.',
+    privateReason: 'My evil allies need cover.',
+  });
   const [speechRequest, options] = generate.mock.calls[1];
   expect(speechRequest.choices).toEqual(['reject']);
   expect(JSON.stringify(options.context)).not.toMatch(/mordred|allies|privateKnowledge|previousDecisions/);
@@ -88,7 +103,7 @@ test('secret cards need one call and never publish the justification', async () 
   const generate = jest.fn().mockResolvedValue({ choice: 0, speech: 'Sabotage now.' });
   expect(
     await decisionPipeline(generate)({ ...request, speak: false, state: { ...request.state, stage: 'onMission' } }),
-  ).toEqual({ choice: 0, speech: '' });
+  ).toEqual({ choice: 0, speech: '', privateReason: 'Sabotage now.' });
   expect(generate).toHaveBeenCalledTimes(1);
 });
 test.each(['servant', 'mordred'])(
@@ -154,11 +169,11 @@ test('public mission data strips own card and hidden individual cards', () => {
   expect(JSON.stringify(publicContext(r, 'approve'))).not.toMatch(/yourCard|cards|mordred/);
 });
 
-test('end review uses one call and cancellation prevents publication', async () => {
+test('end review checks its draft and cancellation prevents publication', async () => {
   const generate = jest.fn().mockResolvedValue({ choice: 0, speech: 'We lost.' });
   const end = await decisionPipeline(generate)({ ...request, state: { ...request.state, stage: 'end' } });
   expect(end.speech).toBe('We lost.');
-  expect(generate).toHaveBeenCalledTimes(1);
+  expect(generate).toHaveBeenCalledTimes(2);
   const controller = new AbortController();
   const abort = jest.fn().mockImplementation(async () => {
     controller.abort();
@@ -182,14 +197,22 @@ test('retries a token-limited decision once with identical facts and preserves r
     .mockRejectedValueOnce(new AiOutputLimit(4096))
     .mockResolvedValueOnce({ choice: 1, speech: 'Private reason.' })
     .mockResolvedValueOnce({ choice: 0, speech: 'I need stronger evidence.' });
-  expect(await decisionPipeline(generate)(request)).toEqual({ choice: 1, speech: 'I need stronger evidence.' });
+  expect(await decisionPipeline(generate)(request)).toEqual({
+    choice: 1,
+    speech: 'I need stronger evidence.',
+    privateReason: 'Private reason.',
+  });
   expect(generate).toHaveBeenCalledTimes(3);
-  expect(generate.mock.calls[1][1]).toEqual({
-    ...generate.mock.calls[0][1],
-    maxOutput: 8192,
+  expect(generate.mock.calls[1][1]).toMatchObject({
+    maxOutput: 4096,
     reasoning: 'default',
     phase: 'decision-retry',
   });
+  expect(generate.mock.calls[1][1].instructions.length).toBeLessThan(generate.mock.calls[0][1].instructions.length);
+  expect(generate.mock.calls[1][1].context.modelHypotheses).toBeUndefined();
+  expect(generate.mock.calls[1][1].context.completedMissions).toEqual(
+    generate.mock.calls[0][1].context.completedMissions,
+  );
   expect(generate.mock.calls[1][0]).toEqual(generate.mock.calls[0][0]);
 });
 
@@ -208,7 +231,7 @@ test('an explicitly selected non-reasoning mode remains unchanged on retry', asy
     .mockRejectedValueOnce(new AiOutputLimit(640))
     .mockResolvedValueOnce({ choice: 1, speech: 'Private reason.' });
   await decisionPipeline(generate, 'none')({ ...request, speak: false });
-  expect(generate.mock.calls[1][1]).toMatchObject({ reasoning: 'none', maxOutput: 1280, phase: 'decision-retry' });
+  expect(generate.mock.calls[1][1]).toMatchObject({ reasoning: 'none', maxOutput: 640, phase: 'decision-retry' });
 });
 
 test('speech retry preserves the already chosen action and never repeats the decision', async () => {
@@ -371,7 +394,11 @@ test('budget resume retries only unpaid public speech and keeps the already paid
     .mockResolvedValueOnce({ choice: 0, speech: 'Too little evidence.' });
   const decide = decisionPipeline(generate);
   await expect(decide(request)).rejects.toBeInstanceOf(AiMatchBudgetPause);
-  expect(await decide(structuredClone(request))).toEqual({ choice: 1, speech: 'Too little evidence.' });
+  expect(await decide(structuredClone(request))).toEqual({
+    choice: 1,
+    speech: 'Too little evidence.',
+    privateReason: 'Private reason.',
+  });
   expect(generate.mock.calls.map(([, options]) => options.phase)).toEqual(['decision', 'speech', 'speech']);
 });
 
@@ -399,4 +426,64 @@ test('review receives bounded own decision explanations and knowledge, never ano
   ).toBe(true);
   const earlierContext = generate.mock.calls[1][1].context;
   expect(earlierContext.decisionExamples).toBeUndefined();
+});
+
+test('review publishes the checked version and preserves the paid draft across a budget pause', async () => {
+  const { AiMatchBudgetPause } = await import('./client');
+  const generate = jest
+    .fn()
+    .mockResolvedValueOnce({ choice: 0, speech: 'Wrong draft: mission 5 tolerates one Fail.' })
+    .mockRejectedValueOnce(new AiMatchBudgetPause('Budget', 1000))
+    .mockResolvedValueOnce({ choice: 0, speech: 'Corrected factual review.' });
+  const decide = decisionPipeline(generate);
+  const r = {
+    ...request,
+    choices: ['Write your conclusion'],
+    state: {
+      ...request.state,
+      stage: 'end',
+      history: [
+        {
+          type: 'mission',
+          index: 4,
+          settings: { players: 4, failsRequired: 1 },
+          result: 'fail',
+          fails: 1,
+          actions: [],
+        },
+      ],
+    },
+  } as unknown as BotRequest;
+  await expect(decide(r)).rejects.toBeInstanceOf(AiMatchBudgetPause);
+  expect((await decide(r)).speech).toBe('Corrected factual review.');
+  expect(generate.mock.calls.map(([, options]) => options.phase)).toEqual(['review', 'review-check', 'review-check']);
+  expect(generate.mock.calls[1][1].context.missions[0]).toMatchObject({ n: 5, failsRequired: 1, fails: 1 });
+  expect(generate.mock.calls[1][1].context.draft).toContain('Wrong draft');
+});
+
+test('technical speech retry does not pay again for an already completed private choice', async () => {
+  const { AiTechnicalPause } = await import('./client');
+  const generate = jest
+    .fn()
+    .mockResolvedValueOnce({ choice: 1, speech: 'Private.' })
+    .mockRejectedValueOnce(new AiTechnicalPause('Timeout'))
+    .mockResolvedValueOnce({ choice: 0, speech: 'Public.' });
+  const decide = decisionPipeline(generate);
+  await expect(decide(request)).rejects.toBeInstanceOf(AiTechnicalPause);
+  expect(await decide(request)).toEqual({ choice: 1, speech: 'Public.', privateReason: 'Private.' });
+  expect(generate.mock.calls.map(([, options]) => options.phase)).toEqual(['decision', 'speech', 'speech']);
+});
+
+test('returns the short private explanation separately from public speech', async () => {
+  const generate = jest
+    .fn()
+    .mockResolvedValueOnce({
+      choice: 1,
+      speech: 'PRIVATE: I know the evil team.',
+      publicReason: 'This team is risky.',
+    })
+    .mockResolvedValueOnce({ choice: 0, speech: 'This team is risky.' });
+  const result = await decisionPipeline(generate)(request);
+  expect(result).toMatchObject({ choice: 1, privateReason: 'PRIVATE: I know the evil team.' });
+  expect(result.speech).not.toContain('PRIVATE');
 });

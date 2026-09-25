@@ -1,4 +1,5 @@
 export default {
+  resumeTechnical: 'Повторить · без изменения бюджета',
   controls: 'Управление партией',
   budgetDetails: 'Расходы и лимиты',
   selectModel: 'Модель для новой партии',
@@ -12,6 +13,10 @@ export default {
   gameBudget: 'На игру: {limit} ₽',
   budgetReserved: 'Включает резерв текущих запросов. Дата окончания не входит в период.',
 
+  privateDecisions: 'Приватные объяснения',
+  privateDecisionsHint:
+    'Наведите на бота или нажмите на него, чтобы увидеть последнее приватное объяснение. Модель может ошибаться.',
+  decisionSeat: '{seat} · Поход {mission}',
   revealRoles: 'Раскрыть роли',
   hideRoles: 'Скрыть роли',
   rolesHint: 'Роли раскрыты только для вас. Знания ботов не изменились.',

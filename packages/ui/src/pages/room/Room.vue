@@ -16,8 +16,13 @@
         :canReveal="canRevealRoles"
         :rolesShown="rolesShown"
         @roles="spectatorRoles = $event"
+        @decisions="spectatorDecisions = $event"
       />
-      <Board :room-state="roomState" :spectator-roles="rolesShown ? spectatorRoles : {}">
+      <Board
+        :room-state="roomState"
+        :spectator-roles="rolesShown ? spectatorRoles : {}"
+        :spectator-decisions="rolesShown ? spectatorDecisions : []"
+      >
         <template v-if="roomState.vote" v-slot:content>
           <RoomVote v-if="roomState.vote" :roomUuid="roomState.roomID" :vote="roomState.vote" />
         </template>
@@ -63,7 +68,7 @@ import { i18n } from '@/plugins/i18n';
 import { useRouter } from 'vue-router';
 import { defineComponent, ref, computed, watch, provide } from 'vue';
 import Board from '@/components/view/board/Board.vue';
-import type { TVisibleRole, TRoles, ISocketError } from '@avalon/types';
+import type { TVisibleRole, AiSpectatorDecision, TRoles, ISocketError } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { GameStateManager } from '@/helpers/game-state-manager';
@@ -123,6 +128,7 @@ export default defineComponent({
       () => hideStickers.value,
     );
     const game = stateManager.game;
+    const spectatorDecisions = ref<AiSpectatorDecision[]>([]);
     const spectatorRoles = ref<Record<string, TRoles>>({});
     const canRevealRoles = computed(() =>
       Boolean(
@@ -234,6 +240,7 @@ export default defineComponent({
 
     return {
       spectatorRoles,
+      spectatorDecisions,
       canRevealRoles,
       rolesShown,
       hideStickers,

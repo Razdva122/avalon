@@ -1,4 +1,5 @@
 export default {
+  resumeTechnical: 'Tentar novamente · mesmo orçamento',
   controls: 'Controles da partida',
   budgetDetails: 'Detalhes do orçamento',
   selectModel: 'Modelo para a nova partida',
@@ -12,6 +13,10 @@ export default {
   gameBudget: 'Por partida: {limit} ₽',
   budgetReserved: 'Inclui reservas de solicitações em curso. A data final não está incluída.',
 
+  privateDecisions: 'Explicações privadas',
+  privateDecisionsHint:
+    'Passe o cursor sobre um bot ou toque nele para ver sua última explicação privada. O modelo pode errar.',
+  decisionSeat: '{seat} · Missão {mission}',
   revealRoles: 'Revelar papéis',
   hideRoles: 'Ocultar papéis',
   rolesHint: 'Só você vê os papéis. O conhecimento dos bots não muda.',

@@ -1,4 +1,5 @@
 export default {
+  resumeTechnical: '重试 · 预算不变',
   controls: '对局控制',
   budgetDetails: '预算详情',
   selectModel: '新对局的模型',
@@ -12,6 +13,9 @@ export default {
   gameBudget: '每局：{limit} ₽',
   budgetReserved: '包含进行中请求的预留费用。不包含结束日期。',
 
+  privateDecisions: '私密解释',
+  privateDecisionsHint: '悬停或点击机器人，查看其最近的私密解释。模型可能出错。',
+  decisionSeat: '{seat} · 第{mission}次任务',
   revealRoles: '显示角色',
   hideRoles: '隐藏角色',
   rolesHint: '仅你可见角色，机器人掌握的信息不会改变。',
