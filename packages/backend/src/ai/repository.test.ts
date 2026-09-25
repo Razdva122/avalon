@@ -218,3 +218,17 @@ test('room lease covers a ten-minute request and is renewed for the next request
   await repo.release('slow');
   await expect(repo.claim('other')).resolves.toBeUndefined();
 });
+
+test('production match starts at 200 and admin extension reaches 400 without resetting cost', async () => {
+  const db = client.db('production-200');
+  const repo = new AiRepository(db, 3000, 200, { periodDays: 30, ledgerID: 'production' });
+  await repo.claim('match');
+  expect(await repo.roomLimit('match')).toBe(200);
+  await repo.reserve('match', 1990000);
+  await expect(repo.reserve('match', 20000)).rejects.toThrow('Лимит партии 200');
+  expect(await repo.doubleMatchLimit('match', 20000)).toBe(400);
+  await repo.reserve('match', 20000);
+  expect(await repo.roomCost('match')).toBe(201);
+  expect(await repo.budget()).toMatchObject({ limitRub: 3000, matchLimitRub: 200, usedRub: 201 });
+  await expect(repo.reserve('match', 2000000)).rejects.toThrow('Лимит партии 400');
+});

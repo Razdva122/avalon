@@ -203,8 +203,9 @@ test('retries a token-limited decision once with identical facts and preserves r
     privateReason: 'Private reason.',
   });
   expect(generate).toHaveBeenCalledTimes(3);
+  expect(generate.mock.calls[0][1]).toMatchObject({ maxOutput: 8192, reasoning: 'default' });
   expect(generate.mock.calls[1][1]).toMatchObject({
-    maxOutput: 4096,
+    maxOutput: 8192,
     reasoning: 'default',
     phase: 'decision-retry',
   });

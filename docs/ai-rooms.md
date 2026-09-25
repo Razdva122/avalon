@@ -390,7 +390,7 @@ Success позволяет считать эти дедукции доказат
 
 Production settings and rollout: [deploy/ai-production.md](../deploy/ai-production.md).
 Production has a separate persistent 30-day ledger (Moscow calendar), 3,000 RUB per
-period and 150 RUB per game; development retains the 700/100 experiment ledger.
+period and 200 RUB per game; development retains the 700/100 experiment ledger.
 `getAiBudget` is DB-admin-only and returns limits, used/reserved funds, remaining amount
 and period dates. No budget figures enter public broadcasts, including pause messages.
 
@@ -430,7 +430,7 @@ Use `--case=<exact fixture name>` for a single production-regression fixture (5 
 
 ### Продолжение после лимита партии
 
-Администратор (`isAdmin === true`, проверяется в БД при каждом запросе) может нажать «Продолжить · увеличить лимит … (×2)» для живой партии, приостановленной из-за индивидуального бюджета. `controlAiRoom(..., 'resumeBudget')` удваивает текущий лимит только этой комнаты (150 → 300 → 600 ₽). Индивидуальный лимит хранится в `ai_experiment_budget.roomLimits`; расходы не сбрасываются. Общий бюджет, включая производственные 3000 ₽ за 30 дней, продолжает ограничивать каждый запрос. Если следующему запросу не хватает общего бюджета, лимит партии не меняется.
+Администратор (`isAdmin === true`, проверяется в БД при каждом запросе) может нажать «Продолжить · увеличить лимит … (×2)» для живой партии, приостановленной из-за индивидуального бюджета. `controlAiRoom(..., 'resumeBudget')` удваивает текущий лимит только этой комнаты (200 → 400 → 800 ₽). Индивидуальный лимит хранится в `ai_experiment_budget.roomLimits`; расходы не сбрасываются. Общий бюджет, включая производственные 3000 ₽ за 30 дней, продолжает ограничивать каждый запрос. Если следующему запросу не хватает общего бюджета, лимит партии не меняется.
 
 Продолжение сохраняет движок, состав команды, уже высказанные голоса, совет тёмных и выполненные итоговые обзоры. При паузе перед публичной репликой сохраняется уже оплаченное приватное решение. Одновременные команды запуска/продолжения блокируются до завершения предыдущего игрового цикла и освобождения его резерва управления. Администратор видит индивидуальный лимит через закрытый `getAiRoomCosts`; публичное состояние его не содержит.
 
@@ -470,3 +470,9 @@ npx ts-node -r tsconfig-paths/register src/ai/evaluate.ts --production-regressio
 ### Ожидание модели
 
 Каждый HTTP-запрос к модели (решение, публичная реплика, повторная попытка и итоговый обзор) может выполняться до **10 минут**. Это общий дедлайн получения ответа и его тела; администратор может прервать его раньше кнопкой остановки. Только AI-запросы используют сетевой dispatcher с соответствующими таймаутами. Блокировка партии удерживается 12 минут от последнего резервирования запроса и освобождается при завершении игрового цикла. Таймаут не увеличивает лимиты расходов; неподтверждённая стоимость сохраняется резервом. Дополнительных параметров env не требуется.
+
+### Reasoning output limit
+
+Game decisions with reasoning enabled start with 8192 output tokens. The one automatic focused retry also stays at 8192; it does not double to 16384. Public speech and post-game reviews retain their smaller limits. Every attempt reserves and charges usage against the existing room and shared budgets.
+
+Production defaults to 200 RUB per game; the first explicit administrator budget continuation raises that room to 400 RUB without resetting spending. The shared 3000 RUB / 30-day limit is unchanged. If production explicitly sets `AI_MATCH_BUDGET_RUB=150`, update that setting to `200` on deployment; environment overrides the default. Previously persisted per-room extensions are retained. Development remains 100 RUB per game.

@@ -240,7 +240,7 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
             phase: finalReview ? 'review' : 'decision',
             reasoning: finalReview ? 'none' : reasoning,
             decisionDetails: !finalReview,
-            maxOutput: finalReview ? 768 : reasoning === 'default' ? 4096 : 640,
+            maxOutput: finalReview ? 768 : reasoning === 'default' ? 8192 : 640,
             instructions: finalReview
               ? systemFor(request) +
                 ' Write 3-4 short sentences about ONE consequential choice. Use a decisionExamples ID when available, otherwise a yourActions ID. Explain: my actual choice; the belief recorded in my reason; evidence available THEN that supported or contradicted it; a feasible alternative and how it might have helped my actual side. Cite mission/proposal and seats. Do not lead with the victory rule or merely name the last event. decisionExamples are a bounded sample, not the whole game; their reasons are fallible historical beliefs, not facts. Compare them with missions, teamVotes and knowledge at that time. Revealed roles explain the outcome, not what you knew then. Never claim a certain win from a speculative alternative. If the choice was sound, explain why and identify the remaining uncertainty rather than inventing a mistake. A forced fifth proposal cannot be rejected; examine the preceding voluntary choice. Success does not prove alignment; each participant plays one card. Winning Evil must not recommend helping Good. In assassination compare actual council evidence with a plausible alternative; leadership alone is weak evidence. Do not recommend doing what you already did, invent inspections, or confuse proposals with completed missions.'

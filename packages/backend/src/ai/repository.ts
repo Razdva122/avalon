@@ -60,7 +60,7 @@ export class AiRepository {
     if (
       ![totalRub, matchRub].every((n) => Number.isFinite(n) && n > 0) ||
       totalRub > (options.periodDays ? 3000 : 700) ||
-      matchRub > (options.periodDays ? 150 : 100)
+      matchRub > (options.periodDays ? 200 : 100)
     )
       throw Error('Invalid AI budget limits');
   }

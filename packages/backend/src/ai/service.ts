@@ -18,7 +18,7 @@ export class AiService {
       this.repository = new AiRepository(
         db,
         Number(process.env.AI_TOTAL_BUDGET_RUB || (process.env.NODE_ENV === 'production' ? 3000 : 700)),
-        Number(process.env.AI_MATCH_BUDGET_RUB || (process.env.NODE_ENV === 'production' ? 150 : 100)),
+        Number(process.env.AI_MATCH_BUDGET_RUB || (process.env.NODE_ENV === 'production' ? 200 : 100)),
         process.env.NODE_ENV === 'production' ? { periodDays: 30, ledgerID: 'avalon-ai-production-v1' } : {},
       );
   }

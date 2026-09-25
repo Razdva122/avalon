@@ -892,6 +892,11 @@ export default defineComponent({
 
 <style scoped>
 .ai-private-decision {
+  background: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-on-surface));
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px #0005;
   padding: 16px;
   max-width: min(350px, calc(100vw - 48px));
   overflow-wrap: anywhere;
