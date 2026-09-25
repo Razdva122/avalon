@@ -121,6 +121,23 @@
       </section>
       <SocialChannels class="social-mobile" />
     </div>
+    <section class="lobby-guide" aria-labelledby="lobby-guide-title">
+      <h2 id="lobby-guide-title">{{ $t('mainPage.guideTitle') }}</h2>
+      <ol>
+        <li>{{ $t('mainPage.guideCreate') }}</li>
+        <li>{{ $t('mainPage.guideInvite') }}</li>
+        <li>{{ $t('mainPage.guideStart') }}</li>
+      </ol>
+      <div v-for="topic in ['cost', 'devices', 'conversation', 'features']" :key="topic" class="guide-answer">
+        <h3>{{ $t(`mainPage.guide.${topic}Title`) }}</h3>
+        <p>{{ $t(`mainPage.guide.${topic}Text`) }}</p>
+      </div>
+      <nav class="lobby-links" :aria-label="$t('menu.wiki')">
+        <LocaleLink :to="{ name: 'rules' }">{{ $t('wiki.rules') }}</LocaleLink>
+        <LocaleLink :to="{ name: 'roles' }">{{ $t('wiki.roles') }}</LocaleLink>
+        <LocaleLink :to="{ name: 'expansions' }">{{ $t('breadCrumbs.expansions') }}</LocaleLink>
+      </nav>
+    </section>
     <nav class="lobby-footer" :aria-label="$t('menu.menu')">
       <LocaleLink :to="{ name: 'wiki' }">{{ $t('menu.wiki') }}</LocaleLink>
       <LocaleLink :to="{ name: 'stats' }">{{ $t('menu.stats') }}</LocaleLink>
@@ -272,6 +289,33 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.lobby-guide {
+  max-width: 72ch;
+  margin: 40px auto 0;
+  padding-top: 28px;
+  border-top: 1px solid rgba(var(--v-theme-text-primary), 0.15);
+  font-size: 16px;
+  line-height: 1.65;
+  color: rgb(var(--v-theme-text-primary));
+  h2 {
+    font-size: 24px;
+    line-height: 1.3;
+  }
+  ol {
+    padding-left: 24px;
+    margin: 16px 0 24px;
+  }
+  li + li {
+    margin-top: 8px;
+  }
+  h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .guide-answer {
+    margin-bottom: 20px;
+  }
+}
 .social-mobile {
   display: none;
 }

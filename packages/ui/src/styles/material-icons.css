@@ -111,6 +111,9 @@
 .material-icons.cached::before {
   content: '\e86a';
 }
+.material-icons.call::before {
+  content: '\e0b0';
+}
 .material-icons.campaign::before {
   content: '\ef49';
 }
@@ -174,6 +177,9 @@
 .material-icons.compare::before {
   content: '\e3b9';
 }
+.material-icons.computer::before {
+  content: '\e30a';
+}
 .material-icons.create::before {
   content: '\e150';
 }
@@ -200,6 +206,9 @@
 }
 .material-icons.details::before {
   content: '\e3c8';
+}
+.material-icons.devices::before {
+  content: '\e1b1';
 }
 .material-icons.discord::before {
   content: '\ea6c';
@@ -501,6 +510,9 @@
 .material-icons.person_add::before {
   content: '\e7fe';
 }
+.material-icons.phone::before {
+  content: '\e0cd';
+}
 .material-icons.photo_camera::before {
   content: '\e412';
 }
@@ -660,6 +672,9 @@
 .material-icons.tab::before {
   content: '\e8d8';
 }
+.material-icons.tablet::before {
+  content: '\e32f';
+}
 .material-icons.tag::before {
   content: '\e9ef';
 }
@@ -677,6 +692,9 @@
 }
 .material-icons.token::before {
   content: '\ea25';
+}
+.material-icons.topic::before {
+  content: '\f1c8';
 }
 .material-icons.transform::before {
   content: '\e428';

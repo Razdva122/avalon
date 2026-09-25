@@ -9,6 +9,26 @@ export default {
     restartGame: 'Reiniciar juego',
   },
   mainPage: {
+    guideTitle: 'Cómo empezar una partida con amigos',
+    guideCreate: 'Reúne a 5–10 jugadores. Inicia sesión y crea una sala.',
+    guideInvite:
+      'Comparte el enlace de la sala. Cada amigo inicia sesión y se une a la partida desde su propio dispositivo.',
+    guideStart:
+      'Elige los roles y las expansiones en los ajustes de la sala. Cuando todos se hayan unido, el anfitrión bloquea la entrada de jugadores e inicia la partida.',
+    guide: {
+      costTitle: '¿Es gratis?',
+      costText:
+        'Jugar a Avalon con amigos es gratis. Necesitas una cuenta para crear una sala o participar como jugador. Las funciones prémium opcionales y las partidas con IA tienen condiciones propias; consulta sus páginas.',
+      devicesTitle: '¿Qué dispositivos necesitamos?',
+      devicesText:
+        'Abre avalon-game.com en el navegador de un teléfono, una tableta o un ordenador. No necesitas instalar una aplicación. Cada jugador usa su propia pantalla para mantener su rol en secreto.',
+      conversationTitle: '¿Cómo hablamos durante la partida?',
+      conversationText:
+        'Usa el chat de texto de la sala o una llamada de voz externa, por ejemplo en Discord. Si jugáis en persona, hablad en voz alta y activa la opción de ocultar spoilers para proteger la información privada de tu pantalla.',
+      featuresTitle: '¿Qué roles y expansiones hay?',
+      featuresText:
+        'Elige roles clásicos como Merlín, Percival, Morgana, Mordred y Oberón, o prueba roles adicionales como los Amantes y la Bruja. La Dama del Lago y Excalibur añaden más opciones. El historial permite revisar acciones anteriores, salvo que la sala lo oculte.',
+    },
     socialTitle: 'Avalon está en las redes',
     socialDescription: 'Memes, traiciones y momentos de la Mesa Redonda.',
     socialInvitation: 'Síguenos y dale me gusta a tus vídeos favoritos para que más jugadores descubran Avalon.',

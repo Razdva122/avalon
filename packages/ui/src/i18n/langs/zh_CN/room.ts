@@ -9,6 +9,24 @@ export default {
     restartGame: '重开游戏',
   },
   mainPage: {
+    guideTitle: '如何与朋友开始游戏',
+    guideCreate: '召集 5–10 名玩家。登录账号并创建房间。',
+    guideInvite: '分享房间链接。每位朋友需要登录账号，并使用自己的设备加入游戏。',
+    guideStart: '在房间设置中选择角色和扩展。所有人加入后，房主锁定玩家名单并开始游戏。',
+    guide: {
+      costTitle: '游戏免费吗？',
+      costText:
+        '与朋友游玩阿瓦隆是免费的。创建房间或以玩家身份参加游戏需要账号。可选的高级功能和 AI 游戏有各自的使用条件，请查看相应页面。',
+      devicesTitle: '需要什么设备？',
+      devicesText:
+        '在手机、平板电脑或电脑的浏览器中打开 avalon-game.com，无需安装应用。每位玩家使用自己的屏幕，以免泄露身份。',
+      conversationTitle: '游戏中如何交流？',
+      conversationText:
+        '可以使用房间文字聊天，或另行发起语音通话，例如使用 Discord。如果大家在同一个地方，可以直接交谈，并开启隐藏剧透功能来遮住屏幕上的私人信息。',
+      featuresTitle: '有哪些角色和扩展？',
+      featuresText:
+        '可以选择梅林、派西维尔、莫甘娜、莫德雷德和奥伯伦等经典角色，也可以尝试恋人、女巫等额外角色。湖中仙女和王者之剑提供更多玩法。除非房间开启隐藏历史记录，否则可以查看之前的游戏行动。',
+    },
     socialTitle: 'Avalon 入驻社交平台了',
     socialDescription: '圆桌旁的趣味梗、背叛与精彩瞬间。',
     socialInvitation: '关注我们的账号，为喜欢的视频点赞，让更多玩家发现 Avalon。',

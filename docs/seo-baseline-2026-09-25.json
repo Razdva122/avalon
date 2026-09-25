@@ -1,0 +1,545 @@
+{
+  "queries": {
+    "ok": true,
+    "data": {
+      "site_url": "https://avalon-game.com/",
+      "days": 28,
+      "start_date": "2026-08-28",
+      "end_date": "2026-09-25",
+      "dimension": "query",
+      "row_count": 30,
+      "rows": [
+        {
+          "keys": ["阿瓦隆線上"],
+          "clicks": 345,
+          "impressions": 688,
+          "ctr": 0.501453488372093,
+          "position": 1.747093023255814
+        },
+        {
+          "keys": ["avalon online"],
+          "clicks": 177,
+          "impressions": 1752,
+          "ctr": 0.10102739726027397,
+          "position": 4.823630136986301
+        },
+        {
+          "keys": ["阿瓦隆角色"],
+          "clicks": 149,
+          "impressions": 547,
+          "ctr": 0.27239488117001825,
+          "position": 1.319926873857404
+        },
+        {
+          "keys": ["線上阿瓦隆"],
+          "clicks": 144,
+          "impressions": 282,
+          "ctr": 0.5106382978723404,
+          "position": 1.6631205673758864
+        },
+        {
+          "keys": ["阿瓦隆"],
+          "clicks": 112,
+          "impressions": 6097,
+          "ctr": 0.018369690011481057,
+          "position": 6.957684106937839
+        },
+        {
+          "keys": ["avalon game"],
+          "clicks": 109,
+          "impressions": 7419,
+          "ctr": 0.014692007009030866,
+          "position": 9.155950936783933
+        },
+        {
+          "keys": ["avalon rules"],
+          "clicks": 97,
+          "impressions": 588,
+          "ctr": 0.1649659863945578,
+          "position": 3.4200680272108843
+        },
+        {
+          "keys": ["avalon roles"],
+          "clicks": 78,
+          "impressions": 190,
+          "ctr": 0.4105263157894737,
+          "position": 1.5894736842105264
+        },
+        {
+          "keys": ["avalon game rules"],
+          "clicks": 72,
+          "impressions": 499,
+          "ctr": 0.14428857715430862,
+          "position": 3.847695390781563
+        },
+        {
+          "keys": ["avalon board game"],
+          "clicks": 46,
+          "impressions": 5280,
+          "ctr": 0.008712121212121213,
+          "position": 9.520833333333334
+        },
+        {
+          "keys": ["阿瓦隆 線上"],
+          "clicks": 42,
+          "impressions": 78,
+          "ctr": 0.5384615384615384,
+          "position": 1.7051282051282053
+        },
+        {
+          "keys": ["阿瓦隆 角色"],
+          "clicks": 37,
+          "impressions": 127,
+          "ctr": 0.29133858267716534,
+          "position": 1.2677165354330708
+        },
+        {
+          "keys": ["avalon game online"],
+          "clicks": 35,
+          "impressions": 221,
+          "ctr": 0.1583710407239819,
+          "position": 7.8054298642533935
+        },
+        {
+          "keys": ["avalon juego de mesa"],
+          "clicks": 30,
+          "impressions": 2070,
+          "ctr": 0.014492753623188406,
+          "position": 6.206763285024155
+        },
+        {
+          "keys": ["avalon characters"],
+          "clicks": 27,
+          "impressions": 330,
+          "ctr": 0.08181818181818182,
+          "position": 3.0272727272727273
+        },
+        {
+          "keys": ["avalon board game rules"],
+          "clicks": 25,
+          "impressions": 229,
+          "ctr": 0.1091703056768559,
+          "position": 8.847161572052402
+        },
+        {
+          "keys": ["avalon board game online"],
+          "clicks": 24,
+          "impressions": 84,
+          "ctr": 0.2857142857142857,
+          "position": 2.8452380952380953
+        },
+        {
+          "keys": ["avalon online game"],
+          "clicks": 24,
+          "impressions": 179,
+          "ctr": 0.1340782122905028,
+          "position": 3.642458100558659
+        },
+        {
+          "keys": ["avalon game characters"],
+          "clicks": 21,
+          "impressions": 111,
+          "ctr": 0.1891891891891892,
+          "position": 1.7387387387387387
+        },
+        {
+          "keys": ["avalon"],
+          "clicks": 20,
+          "impressions": 2251,
+          "ctr": 0.00888494002665482,
+          "position": 12.418480675255442
+        },
+        {
+          "keys": ["avalon reglas"],
+          "clicks": 19,
+          "impressions": 28,
+          "ctr": 0.6785714285714286,
+          "position": 1.0357142857142858
+        },
+        {
+          "keys": ["阿瓦隆线上"],
+          "clicks": 18,
+          "impressions": 26,
+          "ctr": 0.6923076923076923,
+          "position": 1.6153846153846154
+        },
+        {
+          "keys": ["avalon board game characters"],
+          "clicks": 14,
+          "impressions": 88,
+          "ctr": 0.1590909090909091,
+          "position": 1.8522727272727273
+        },
+        {
+          "keys": ["авалон настольная игра правила"],
+          "clicks": 14,
+          "impressions": 34,
+          "ctr": 0.4117647058823529,
+          "position": 1.088235294117647
+        },
+        {
+          "keys": ["阿瓦隆線上玩"],
+          "clicks": 13,
+          "impressions": 30,
+          "ctr": 0.43333333333333335,
+          "position": 1.6
+        },
+        {
+          "keys": ["play avalon online"],
+          "clicks": 12,
+          "impressions": 249,
+          "ctr": 0.04819277108433735,
+          "position": 5.883534136546185
+        },
+        {
+          "keys": ["線上阿瓦隆app"],
+          "clicks": 12,
+          "impressions": 47,
+          "ctr": 0.2553191489361702,
+          "position": 1.851063829787234
+        },
+        {
+          "keys": ["阿瓦隆在线"],
+          "clicks": 12,
+          "impressions": 15,
+          "ctr": 0.8,
+          "position": 1.4
+        },
+        {
+          "keys": ["online avalon"],
+          "clicks": 11,
+          "impressions": 69,
+          "ctr": 0.15942028985507245,
+          "position": 4.217391304347826
+        },
+        {
+          "keys": ["авалон правила игры"],
+          "clicks": 11,
+          "impressions": 25,
+          "ctr": 0.44,
+          "position": 1.12
+        }
+      ]
+    },
+    "error": null
+  },
+  "pages": {
+    "ok": true,
+    "data": {
+      "site_url": "https://avalon-game.com/",
+      "days": 28,
+      "start_date": "2026-08-28",
+      "end_date": "2026-09-25",
+      "dimension": "page",
+      "row_count": 15,
+      "rows": [
+        {
+          "keys": ["https://avalon-game.com/zh-tw/"],
+          "clicks": 932,
+          "impressions": 8121,
+          "ctr": 0.11476419160201945,
+          "position": 5.968353651028199
+        },
+        {
+          "keys": ["https://avalon-game.com/"],
+          "clicks": 619,
+          "impressions": 14856,
+          "ctr": 0.041666666666666664,
+          "position": 9.365778136779753
+        },
+        {
+          "keys": ["https://avalon-game.com/wiki/rules/"],
+          "clicks": 561,
+          "impressions": 27208,
+          "ctr": 0.02061893560717436,
+          "position": 7.74033372537489
+        },
+        {
+          "keys": ["https://avalon-game.com/wiki/roles/"],
+          "clicks": 355,
+          "impressions": 4448,
+          "ctr": 0.0798111510791367,
+          "position": 10.134892086330936
+        },
+        {
+          "keys": ["https://avalon-game.com/zh-tw/wiki/roles/"],
+          "clicks": 260,
+          "impressions": 3489,
+          "ctr": 0.07451991974777873,
+          "position": 6.153052450558899
+        },
+        {
+          "keys": ["https://avalon-game.com/es/wiki/rules/"],
+          "clicks": 170,
+          "impressions": 4618,
+          "ctr": 0.036812472932005194,
+          "position": 6.767215244694673
+        },
+        {
+          "keys": ["https://avalon-game.com/zh-cn/"],
+          "clicks": 127,
+          "impressions": 798,
+          "ctr": 0.15914786967418545,
+          "position": 6.50250626566416
+        },
+        {
+          "keys": ["https://avalon-game.com/ru/wiki/rules/"],
+          "clicks": 90,
+          "impressions": 1263,
+          "ctr": 0.07125890736342043,
+          "position": 7.225653206650831
+        },
+        {
+          "keys": ["https://avalon-game.com/wiki/expansions/"],
+          "clicks": 47,
+          "impressions": 869,
+          "ctr": 0.05408515535097814,
+          "position": 25.04602991944764
+        },
+        {
+          "keys": ["https://avalon-game.com/es/"],
+          "clicks": 44,
+          "impressions": 1414,
+          "ctr": 0.031117397454031116,
+          "position": 11.423620933521924
+        },
+        {
+          "keys": ["https://avalon-game.com/ru/"],
+          "clicks": 44,
+          "impressions": 1064,
+          "ctr": 0.041353383458646614,
+          "position": 12.840225563909774
+        },
+        {
+          "keys": ["https://avalon-game.com/wiki/roles/morgana/"],
+          "clicks": 41,
+          "impressions": 879,
+          "ctr": 0.04664391353811149,
+          "position": 4.657565415244596
+        },
+        {
+          "keys": ["https://avalon-game.com/zh-tw/wiki/rules/"],
+          "clicks": 36,
+          "impressions": 3497,
+          "ctr": 0.010294538175579068,
+          "position": 8.002001715756363
+        },
+        {
+          "keys": ["https://avalon-game.com/pt/"],
+          "clicks": 35,
+          "impressions": 1551,
+          "ctr": 0.02256608639587363,
+          "position": 13.515151515151516
+        },
+        {
+          "keys": ["https://avalon-game.com/pt/wiki/rules/"],
+          "clicks": 32,
+          "impressions": 799,
+          "ctr": 0.04005006257822278,
+          "position": 11.02628285356696
+        }
+      ]
+    },
+    "error": null
+  },
+  "inspection": {
+    "ok": true,
+    "data": {
+      "url": "https://avalon-game.com/",
+      "verdict": "PASS",
+      "coverage_state": "Submitted and indexed",
+      "crawled_as": "MOBILE",
+      "last_crawl_time": "2026-09-25T12:54:06Z",
+      "indexing_state": "INDEXING_ALLOWED",
+      "page_fetch_state": "SUCCESSFUL",
+      "robots_txt_state": "ALLOWED",
+      "google_canonical": "https://avalon-game.com/",
+      "user_canonical": "https://avalon-game.com/",
+      "mobile_usability_verdict": "VERDICT_UNSPECIFIED"
+    },
+    "error": null
+  },
+  "sitemaps": {
+    "ok": true,
+    "data": {
+      "site_url": "https://avalon-game.com/",
+      "count": 1,
+      "sitemaps": [
+        {
+          "path": "https://avalon-game.com/sitemap.xml",
+          "last_submitted": "2026-09-20T17:09:01.563Z",
+          "last_downloaded": "2026-09-23T08:42:02.312Z",
+          "is_pending": false,
+          "is_sitemaps_index": false,
+          "contents": [
+            {
+              "type": "web",
+              "submitted": "186",
+              "indexed": "0"
+            }
+          ],
+          "errors": "0",
+          "warnings": "0"
+        }
+      ]
+    },
+    "error": null
+  },
+  "rules": {
+    "ok": true,
+    "data": {
+      "url": "https://avalon-game.com/wiki/rules/",
+      "verdict": "PASS",
+      "coverage_state": "Submitted and indexed",
+      "crawled_as": "MOBILE",
+      "last_crawl_time": "2026-09-25T03:30:27Z",
+      "indexing_state": "INDEXING_ALLOWED",
+      "page_fetch_state": "SUCCESSFUL",
+      "robots_txt_state": "ALLOWED",
+      "google_canonical": "https://avalon-game.com/wiki/rules/",
+      "user_canonical": "https://avalon-game.com/wiki/rules/",
+      "mobile_usability_verdict": "VERDICT_UNSPECIFIED",
+      "rich_results_verdict": "PASS"
+    },
+    "error": null
+  },
+  "about": {
+    "ok": true,
+    "data": {
+      "url": "https://avalon-game.com/about/",
+      "verdict": "PASS",
+      "coverage_state": "Submitted and indexed",
+      "crawled_as": "MOBILE",
+      "last_crawl_time": "2026-09-22T16:34:36Z",
+      "indexing_state": "INDEXING_ALLOWED",
+      "page_fetch_state": "SUCCESSFUL",
+      "robots_txt_state": "ALLOWED",
+      "google_canonical": "https://avalon-game.com/about/",
+      "user_canonical": "https://avalon-game.com/about/",
+      "mobile_usability_verdict": "VERDICT_UNSPECIFIED"
+    },
+    "error": null
+  },
+  "meta": {
+    "ok": true,
+    "data": {
+      "url": "https://avalon-game.com/",
+      "final_url": "https://avalon-game.com/",
+      "status": 200,
+      "title": "Play Avalon Online Free with Friends | The Resistance",
+      "title_length": 53,
+      "meta_description": "Play The Resistance: Avalon online for free with 5–10 players. Learn the roles and rules, create a room, and invite your friends with a link.",
+      "meta_description_length": 141,
+      "meta_robots": "index, follow",
+      "canonical": "https://avalon-game.com/",
+      "h1_count": 1,
+      "open_graph": {
+        "og:type": "website",
+        "og:logo": "https://storage.yandexcloud.net/avalon-game/assets/img/blue_team_no_background.af268c52436c022e.webp",
+        "og:title": "Play Avalon Online Free with Friends | The Resistance",
+        "og:url": "https://avalon-game.com/",
+        "og:image": "https://storage.yandexcloud.net/avalon-game/assets/img/merlin.cb9066db94d4652c.webp",
+        "og:description": "Play The Resistance: Avalon online for free with 5–10 players. Learn the roles and rules, create a room, and invite your friends with a link."
+      },
+      "twitter": {},
+      "hreflang": [
+        {
+          "hreflang": "pt",
+          "href": "https://avalon-game.com/pt/"
+        },
+        {
+          "hreflang": "en",
+          "href": "https://avalon-game.com/"
+        },
+        {
+          "hreflang": "ru",
+          "href": "https://avalon-game.com/ru/"
+        },
+        {
+          "hreflang": "zh-TW",
+          "href": "https://avalon-game.com/zh-tw/"
+        },
+        {
+          "hreflang": "zh-CN",
+          "href": "https://avalon-game.com/zh-cn/"
+        },
+        {
+          "hreflang": "es",
+          "href": "https://avalon-game.com/es/"
+        },
+        {
+          "hreflang": "x-default",
+          "href": "https://avalon-game.com/"
+        }
+      ]
+    },
+    "error": null
+  },
+  "robots": {
+    "ok": true,
+    "data": {
+      "robots_url": "https://avalon-game.com/robots.txt",
+      "status": 200,
+      "groups": [
+        {
+          "user_agents": ["*"],
+          "rules": [
+            {
+              "type": "allow",
+              "path": "/"
+            }
+          ],
+          "crawl_delay": null
+        },
+        {
+          "user_agents": ["Yandex"],
+          "rules": [
+            {
+              "type": "allow",
+              "path": "/"
+            }
+          ],
+          "crawl_delay": null
+        }
+      ],
+      "sitemaps": ["https://avalon-game.com/sitemap.xml"],
+      "content_signals": {},
+      "edge_cache": {
+        "normal": {
+          "cf_cache_status": null,
+          "age": null,
+          "last_modified": "Fri, 25 Sep 2026 13:43:31 GMT"
+        },
+        "cache_busted": {
+          "cf_cache_status": null,
+          "age": null,
+          "last_modified": "Fri, 25 Sep 2026 13:43:31 GMT"
+        },
+        "stale_edge_cache": false
+      },
+      "probes": [
+        {
+          "user_agent": "Googlebot",
+          "url": "https://avalon-game.com/",
+          "allowed": true,
+          "matched_rule": {
+            "type": "allow",
+            "path": "/"
+          }
+        },
+        {
+          "user_agent": "OAI-SearchBot",
+          "url": "https://avalon-game.com/",
+          "allowed": true,
+          "matched_rule": {
+            "type": "allow",
+            "path": "/"
+          }
+        }
+      ],
+      "findings": [],
+      "advisories": []
+    },
+    "error": null
+  }
+}
