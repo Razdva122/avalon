@@ -1,4 +1,5 @@
 import '@/init';
+import { startVoiceGateway } from '@/voice/runtime';
 import express from 'express';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
@@ -60,7 +61,8 @@ connectDB().then(async (mongoose) => {
     createRecoveryRouter(recovery, (id) => revokeUserSockets(io, id)),
   );
   const dbManager = new DBManager(mongoose);
-  new Manager(io, dbManager);
+  const manager = new Manager(io, dbManager);
+  startVoiceGateway(manager.voice);
 
   // Start the rating scheduler (will initialize ratings if needed)
   await ratingScheduler.start();

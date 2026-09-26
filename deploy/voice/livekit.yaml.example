@@ -1,0 +1,17 @@
+# Copy to livekit.yaml on the media VM and replace every placeholder.
+# Keep this file and tls/ outside images; restrict access to the operator.
+port: 7880
+log_level: info
+rtc:
+  tcp_port: 7881
+  port_range_start: 50000
+  port_range_end: 60000
+  use_external_ip: true
+keys:
+  REPLACE_WITH_RANDOM_API_KEY: REPLACE_WITH_A_DIFFERENT_RANDOM_SECRET_AT_LEAST_32_CHARS
+turn:
+  enabled: true
+  domain: turn.example.com
+  tls_port: 443
+  cert_file: /etc/livekit/tls/fullchain.pem
+  key_file: /etc/livekit/tls/privkey.pem

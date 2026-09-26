@@ -31,6 +31,7 @@ import { revealer } from '@/i18n/langs/pages/roles/revealer';
 import { stats } from '@/i18n/langs/pages/stats';
 import { userStats } from '@/i18n/langs/pages/userStats';
 import { leaderboard } from '@/i18n/langs/pages/leaderboard';
+import { voice } from '@/i18n/langs/pages/voice';
 import { userAchievements } from '@/i18n/langs/pages/userAchievements';
 import { globalAchievements } from '@/i18n/langs/pages/globalAchievements';
 
@@ -74,6 +75,7 @@ Object.entries({
   stats,
   userStats,
   leaderboard,
+  voice,
   userAchievements,
   globalAchievements,
 }).forEach(([key, value]) => {

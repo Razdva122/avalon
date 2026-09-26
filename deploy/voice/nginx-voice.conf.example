@@ -1,0 +1,28 @@
+# Add these locations inside the TLS server for voice.example.com on the
+# backend host. The nginx container and backend must share a private network.
+# Set VOICE_GATEWAY_HOST=0.0.0.0 in that backend container. Bind host TCP 7882
+# only to the backend VM's private VPC IP so the media watchdog can probe it;
+# security group and host firewall allow only the media VM source IP.
+# If both processes run directly on one host, use the host's private IP for the
+# gateway and replace backend:7882 with that IP below.
+# In the nginx http context, add once:
+# limit_req_zone $binary_remote_addr zone=voice_admission:10m rate=2r/s;
+
+location ~ ^/rtc(?:/validate|/v1(?:/validate)?)?$ {
+    access_log off;
+    # nginx can include $request_uri (and its access_token) in upstream errors.
+    error_log /dev/null crit;
+    limit_req zone=voice_admission burst=20 nodelay;
+    limit_req_status 429;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 75s;
+    proxy_send_timeout 75s;
+    proxy_pass http://backend:7882;
+}
+
+# The dedicated voice.example.com server must reject every other location.
+location / { return 404; }

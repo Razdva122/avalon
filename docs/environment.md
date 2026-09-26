@@ -28,6 +28,8 @@ Dev Compose использует те же параметры MongoDB через
 
 **Прокси.** `TRUSTED_PROXY_CIDRS` перечисляет доверенные IP/CIDR reverse proxy. При прямом доступе не нужен. Существующее значение на сервере следует сохранить.
 
+**Голосовой чат.** `VOICE_ENABLED=false` выключает beta-функцию по умолчанию. Для включения нужны `LIVEKIT_API_KEY` и `LIVEKIT_API_SECRET` из закрытой конфигурации LiveKit, `LIVEKIT_INTERNAL_URL` для приватного API (`http://127.0.0.1:7880` при размещении на одной машине или VPC-адрес media VM) и `LIVEKIT_PUBLIC_URL` вида `wss://voice.example.com/` для клиента. `VOICE_GATEWAY_PORT=7882` и `VOICE_GATEWAY_HOST=127.0.0.1` задают отдельный listener signaling-шлюза. Для backend в Docker задайте `VOICE_GATEWAY_HOST=0.0.0.0` внутри контейнера, предоставьте nginx доступ через Docker-сеть и опубликуйте TCP `7882` **только** на приватном VPC IP backend VM для health watchdog на media VM. Security group и host firewall должны пропускать к этому порту лишь media VM. Внешний TLS-прокси направляет к шлюзу только четыре RTC пути. Полная схема, firewall и проверки приведены в [инструкции голоса](voice-chat.md).
+
 **Донаты.** Дополнительные параметры не нужны. Четыре адреса кошельков и публичные API встроены в код. Возможные переопределения `SUPPORT_*` и необязательный ключ TronGrid описаны в [настройке донатов](payments/direct-crypto.md).
 
 Удалённые `NOWPAYMENTS_*`, `OXAPAY_*`, `SUPPORT_FRONTEND_URL`, `DIRECT_SUPPORT_ENABLED` и `PREMIUM_COSMETICS_ENABLED` больше не используются. Указывать их в окружении контейнера не требуется.

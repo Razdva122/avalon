@@ -1,3 +1,5 @@
+import { createRoomVoice, registerVoiceEndpoints } from '@/voice/runtime';
+import type { VoiceService } from '@/voice/service';
 import { publicRoomState } from '@/ai/public-state';
 import { AiService } from '@/ai/service';
 import { BOT_PROFILES } from '@/ai/room';
@@ -29,6 +31,7 @@ import { AchievementManager } from '@/achievements';
 import { AvatarsManager } from '@/user/avatars';
 
 export class Manager {
+  voice: VoiceService;
   aiService: AiService;
   stickersManager = new StickersManager();
   rooms: Dictionary<Room> = {};
@@ -138,6 +141,7 @@ export class Manager {
       if (room.data.manager.game.stage === 'end') {
         const newUUID = crypto.randomUUID();
         room.nextRoomID = newUUID;
+        this.voice.destroyRoom(uuid);
         this.createRoom(newUUID, room.leaderID, room.players, room.options);
 
         this.io.to(room.roomID).emit('restartGame', newUUID);
@@ -151,6 +155,7 @@ export class Manager {
 
   destroyRoom(uuid: string) {
     if (this.rooms[uuid]?.ai) return;
+    this.voice.destroyRoom(uuid);
     this.updateRoomsList(uuid, true);
     this.io.to(uuid).emit('destroyRoom', uuid);
     delete this.rooms[uuid];
@@ -167,6 +172,7 @@ export class Manager {
   constructor(io: Server, dbManager: DBManager) {
     this.io = io;
     this.dbManager = dbManager;
+    this.voice = createRoomVoice(this);
     this.aiService = new AiService(this);
     this.avatarsManager = new AvatarsManager(dbManager);
     this.achievementManager = new AchievementManager(io);
@@ -182,6 +188,9 @@ export class Manager {
 
     eventBus.on('roomUpdated', (room) => {
       this.updateRoomsList(room);
+      const roomID = typeof room === 'string' ? room : room.roomID;
+      this.io.to(roomID).emit('voiceStateChanged', roomID);
+      void this.voice.reconcile(roomID);
     });
 
     eventBus.on('gameEnded', async (roomID) => {
@@ -247,6 +256,7 @@ export class Manager {
       }
 
       this.aiService.register(socket, userState.userID);
+      registerVoiceEndpoints(this.voice, socket, userState.userID);
 
       socket.on('joinRoom', async (uuid, cb) => {
         const room = this.rooms[uuid];
@@ -272,6 +282,7 @@ export class Manager {
       });
 
       socket.on('leaveRoom', (uuid) => {
+        this.voice.revokeSocket(socket.id, uuid);
         socket.leave(uuid);
         this.updateOnlineCounter(uuid, -1);
       });

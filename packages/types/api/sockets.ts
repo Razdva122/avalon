@@ -1,3 +1,4 @@
+import type { VoiceState, VoiceJoin, VoiceError } from '../voice';
 import type { PlayerGameSummary } from '../stats/player-games';
 import type { StickerResponse, StickerMessage, StickerError } from '../user/stickers';
 import type { TRoomState } from '../room';
@@ -46,6 +47,8 @@ export type {
 export type { ArgumentOfCallback } from './helpers';
 
 export interface ServerToClientEvents {
+  voiceStateChanged: (roomID: string) => void;
+  voiceRevoked: (sessionID: string) => void;
   stickerSent: (message: StickerMessage) => void;
   stickersUpdated: () => void;
   roomsListUpdated: (list: TRoomsList) => void;
@@ -64,6 +67,10 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerUserEvents {
+  getVoiceState: (roomID: string, cb: (result: VoiceState | VoiceError) => void) => void;
+  setVoiceEnabled: (roomID: string, enabled: boolean, cb: (result: VoiceState | VoiceError) => void) => void;
+  joinVoice: (roomID: string, cb: (result: VoiceJoin | VoiceError) => void) => void;
+  leaveVoice: (sessionID: string, cb: (result: true | VoiceError) => void) => void;
   getMyStickers: (cb: (result: StickerResponse) => void) => void;
   updateStickerPreferences: (favorites: string[], hideOnBoard: boolean, cb: (result: StickerResponse) => void) => void;
   markStickersSeen: (ids: string[], cb: (result: true | StickerError) => void) => void;

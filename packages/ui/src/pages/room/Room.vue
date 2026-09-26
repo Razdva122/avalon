@@ -58,6 +58,7 @@
           <StickerPicker :roomID="roomState.roomID" @hide-on-board="hideStickers = $event" />
         </template>
       </Chat>
+      <VoicePanel v-if="userID" :roomUuid="uuid" :seatIds="roomState.players.map((player) => player.id).join(',')" />
     </template>
   </div>
 </template>
@@ -82,6 +83,7 @@ import { roomChatKey } from '@/helpers/room-chat-context';
 import { useRoomStickers } from '@/helpers/composables/useRoomStickers';
 import Chat from '@/components/feedback/Chat.vue';
 import RatingChangesPanel from '@/components/stats/RatingChangesPanel.vue';
+import VoicePanel from '@/components/voice/VoicePanel.vue';
 import eventBus from '@/helpers/event-bus';
 
 export default defineComponent({
@@ -96,6 +98,7 @@ export default defineComponent({
     Chat,
     StickerPicker,
     RatingChangesPanel,
+    VoicePanel,
   },
   props: {
     uuid: {
@@ -253,6 +256,7 @@ export default defineComponent({
       alert,
       game,
       online,
+      userID,
       restartGame,
     };
   },

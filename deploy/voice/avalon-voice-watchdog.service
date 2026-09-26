@@ -1,0 +1,17 @@
+[Unit]
+Description=Stop LiveKit if Avalon voice control is unavailable
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/avalon-voice-watchdog.env
+ExecStart=/usr/bin/python3 /opt/avalon/deploy/voice/watchdog.py
+Restart=always
+RestartSec=2
+StateDirectory=avalon-voice-watchdog
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+# Run only on the dedicated media VM, after creating livekit.yaml and tls/.
+# Host networking lets LiveKit advertise and receive the same ICE ports.
+services:
+  livekit:
+    image: livekit/livekit-server:v1.13.7
+    command: --config /etc/livekit/livekit.yaml
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - ./livekit.yaml:/etc/livekit/livekit.yaml:ro
+      - ./tls:/etc/livekit/tls:ro
+    security_opt:
+      - no-new-privileges:true

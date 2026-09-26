@@ -14,3 +14,5 @@ export * from './consts';
 export * from './stats';
 export * from './user';
 export * from './stats/player-games';
+
+export * from './voice';
