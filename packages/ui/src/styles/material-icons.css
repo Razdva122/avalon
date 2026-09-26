@@ -60,6 +60,9 @@
 .material-icons.approval::before {
   content: '\e982';
 }
+.material-icons.apps::before {
+  content: '\e5c3';
+}
 .material-icons.arrow_back::before {
   content: '\e5c4';
 }
@@ -213,6 +216,9 @@
 .material-icons.discord::before {
   content: '\ea6c';
 }
+.material-icons.dock::before {
+  content: '\e30e';
+}
 .material-icons.domain::before {
   content: '\e7ee';
 }
@@ -305,6 +311,9 @@
 }
 .material-icons.groups::before {
   content: '\f233';
+}
+.material-icons.headphones::before {
+  content: '\f01f';
 }
 .material-icons.height::before {
   content: '\ea16';
@@ -438,6 +447,9 @@
 .material-icons.messenger::before {
   content: '\e0ca';
 }
+.material-icons.mic::before {
+  content: '\e029';
+}
 .material-icons.mode::before {
   content: '\f097';
 }
@@ -479,6 +491,9 @@
 }
 .material-icons.outbox::before {
   content: '\ef5f';
+}
+.material-icons.output::before {
+  content: '\ebbe';
 }
 .material-icons.padding::before {
   content: '\e9c8';

@@ -86,6 +86,16 @@
                 {{ player.name }}
               </span>
             </span>
+            <VoiceStatus
+              v-if="voiceStatus"
+              class="player-voice-status"
+              :class="{ 'is-left': voiceSide === 'left' }"
+              table
+              :status="voiceStatus"
+              :name="player.name"
+              :own="isOwnVoice"
+              interactive
+            />
           </span>
         </div>
       </template>
@@ -134,6 +144,8 @@
 <script lang="ts">
 import { useFloating, autoUpdate, offset, flip, shift, arrow } from '@floating-ui/vue';
 import { roomChatKey } from '@/helpers/room-chat-context';
+import VoiceStatus from '@/components/voice/VoiceStatus.vue';
+import { roomVoiceKey } from '@/helpers/room-voice-context';
 import StickerImage from '@/components/stickers/StickerImage.vue';
 import { stickerReactionsKey } from '@/helpers/composables/useRoomStickers';
 import cloneDeep from 'lodash/cloneDeep';
@@ -164,12 +176,14 @@ import snakeCase from 'lodash/snakeCase';
 export default defineComponent({
   components: {
     StickerImage,
+    VoiceStatus,
     PlayerIcon,
     Avatar,
     PlotCard,
     UserHoverCard,
   },
   props: {
+    voiceSide: { type: String as PropType<'left' | 'right'>, default: 'right' },
     playerState: {
       type: Object as PropType<IFrontendPlayer | RoomPlayer>,
       required: true,
@@ -192,6 +206,20 @@ export default defineComponent({
   setup(props) {
     const gameState = inject(gameStateKey)!;
     const store = useStore();
+    const voiceContext = inject(roomVoiceKey, undefined);
+    const isOwnVoice = computed(() => props.playerState.id === store.state.profile?.id);
+    const voiceStatus = computed(() => {
+      const voice = voiceContext?.value;
+      if (
+        voice?.status.value !== 'connected' ||
+        !voice.state.value.available ||
+        !voice.state.value.enabled ||
+        !voice.state.value.canJoin ||
+        !props.playerState.id
+      )
+        return undefined;
+      return voice.userStatus(props.playerState.id, store.state.profile?.id ?? '');
+    });
     const roomChat = inject(roomChatKey, undefined);
     const reactions = inject(stickerReactionsKey, {});
     const stickerReaction = computed(() => reactions[props.playerState.id]);
@@ -433,6 +461,8 @@ export default defineComponent({
     });
 
     return {
+      voiceStatus,
+      isOwnVoice,
       userState,
       displayUserAvatar,
       player,
@@ -910,5 +940,22 @@ export default defineComponent({
 .player-content[role='button']:focus-visible {
   outline: 2px solid rgb(var(--v-theme-primary));
   outline-offset: 4px;
+}
+</style>
+
+<style scoped>
+.player-name {
+  position: relative;
+}
+.player-voice-status {
+  position: absolute;
+  top: 50%;
+  left: calc(100% - 3px);
+  transform: translateY(-50%);
+  z-index: 5;
+}
+.player-voice-status.is-left {
+  left: auto;
+  right: calc(100% - 3px);
 }
 </style>

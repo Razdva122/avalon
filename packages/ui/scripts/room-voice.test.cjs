@@ -222,3 +222,171 @@ test('LiveKit adapter routes per-person gain through Web Audio and detaches on e
     global.document = oldDocument;
   }
 });
+
+for (const [name, expected] of [
+  ['NotAllowedError', 'permission'],
+  ['NotFoundError', 'missing'],
+  ['NotReadableError', 'busy'],
+  ['Error', 'failed'],
+]) {
+  test(`microphone ${name} keeps listening available and recovers on retry`, async () => {
+    const f = fixture();
+    await f.voice.refresh();
+    const joining = f.voice.join();
+    await tick();
+    f.connect();
+    await joining;
+    f.client.setMicrophoneEnabled = async () => {
+      throw Object.assign(new Error('browser message'), { name });
+    };
+    await f.voice.setMicrophoneEnabled(true);
+    assert.equal(f.voice.microphoneError.value, expected);
+    assert.equal(f.voice.error.value, undefined);
+    assert.equal(f.voice.status.value, 'connected');
+    assert.equal(f.voice.microphoneEnabled.value, false);
+    assert.equal(f.voice.microphonePending.value, false);
+    f.client.setMicrophoneEnabled = async () => {};
+    await f.voice.setMicrophoneEnabled(true);
+    assert.equal(f.voice.microphoneError.value, undefined);
+    assert.equal(f.voice.microphoneEnabled.value, true);
+    await f.voice.leave();
+  });
+}
+
+test('late microphone rejection after leaving cannot restore an error', async () => {
+  const f = fixture();
+  await f.voice.refresh();
+  const joining = f.voice.join();
+  await tick();
+  f.connect();
+  await joining;
+  let reject;
+  f.client.setMicrophoneEnabled = (enabled) =>
+    enabled
+      ? new Promise((_, fail) => {
+          reject = fail;
+        })
+      : Promise.resolve();
+  const enabling = f.voice.setMicrophoneEnabled(true);
+  await f.voice.leave();
+  reject(Object.assign(new Error('denied'), { name: 'NotAllowedError' }));
+  await enabling;
+  assert.equal(f.voice.microphoneError.value, undefined);
+  assert.equal(f.voice.microphonePending.value, false);
+});
+
+test('voice indicators distinguish local mute, sender mute and live speech without leaking stale room state', async () => {
+  const f = fixture();
+  await f.voice.refresh();
+  const joining = f.voice.join();
+  await tick();
+  f.connect();
+  await joining;
+  f.listeners.onParticipant({ sessionID: 's2', userID: 'alice', microphoneEnabled: false, speaking: false });
+  assert.equal(f.voice.userStatus('alice', 'me'), 'selfMuted');
+  f.listeners.onParticipantAudio('s2', { microphoneEnabled: true, speaking: true });
+  assert.equal(f.voice.userStatus('alice', 'me'), 'speaking');
+  f.voice.setUserMuted('alice', true);
+  assert.equal(f.voice.userStatus('alice', 'me'), 'localMuted');
+  f.listeners.onParticipantAudio('s2', { microphoneEnabled: false, speaking: false });
+  f.voice.setUserMuted('alice', false);
+  assert.equal(f.voice.userStatus('alice', 'me'), 'selfMuted');
+  f.listeners.onLocalAudio({ microphoneEnabled: true, speaking: true });
+  assert.equal(f.voice.userStatus('me', 'me'), 'speaking');
+  f.listeners.onReconnecting(true);
+  assert.equal(f.voice.userStatus('alice', 'me'), 'unknown');
+  f.listeners.onReconnecting(false);
+  assert.equal(f.voice.userStatus('missing', 'me'), 'offline');
+  await f.voice.leave();
+  f.listeners.onParticipantAudio('s2', { microphoneEnabled: true, speaking: true });
+  f.listeners.onLocalAudio({ microphoneEnabled: true, speaking: true });
+  assert.equal(f.voice.userStatus('alice', 'me'), 'unknown');
+  assert.equal(f.voice.microphoneEnabled.value, false);
+  assert.equal(f.voice.speaking.value, false);
+});
+
+test('multiple sessions for one player show speech if any unmuted microphone is speaking', async () => {
+  const f = fixture();
+  await f.voice.refresh();
+  const joining = f.voice.join();
+  await tick();
+  f.connect();
+  await joining;
+  f.listeners.onParticipant({ sessionID: 's2', userID: 'alice', microphoneEnabled: false, speaking: false });
+  f.listeners.onParticipant({ sessionID: 's3', userID: 'alice', microphoneEnabled: true, speaking: true });
+  assert.equal(f.voice.userStatus('alice', 'me'), 'speaking');
+  f.listeners.onParticipantLeft('s3');
+  assert.equal(f.voice.userStatus('alice', 'me'), 'selfMuted');
+  await f.voice.leave();
+});
+
+test('SDK forwards microphone and speaker changes for local and remote participants', async () => {
+  let instance;
+  const remote = { identity: 's2', metadata: '{"userID":"alice"}', isMicrophoneEnabled: false, isSpeaking: false };
+  class FakeRoom {
+    constructor() {
+      instance = this;
+      this.events = {};
+      this.remoteParticipants = new Map([['s2', remote]]);
+      this.localParticipant = {
+        identity: 'self',
+        isMicrophoneEnabled: false,
+        isSpeaking: false,
+        setMicrophoneEnabled: async () => {},
+      };
+    }
+    on(name, fn) {
+      this.events[name] = fn;
+    }
+    async connect() {}
+    async disconnect() {}
+  }
+  const names = [
+    'ParticipantConnected',
+    'ParticipantMetadataChanged',
+    'ParticipantDisconnected',
+    'TrackSubscribed',
+    'TrackUnsubscribed',
+    'AudioPlaybackStatusChanged',
+    'Disconnected',
+    'TrackMuted',
+    'TrackUnmuted',
+    'TrackPublished',
+    'TrackUnpublished',
+    'LocalTrackPublished',
+    'LocalTrackUnpublished',
+    'ActiveSpeakersChanged',
+    'Reconnecting',
+    'Reconnected',
+  ];
+  const changes = [];
+  const local = [];
+  const client = createLiveKitVoiceClient({
+    Room: FakeRoom,
+    RoomEvent: Object.fromEntries(names.map((n) => [n, n])),
+    Track: { Kind: { Audio: 'audio' }, Source: { Microphone: 'microphone' } },
+  });
+  await client.connect('wss://voice', 'test', {
+    onParticipant() {},
+    onParticipantLeft() {},
+    onDisconnected() {},
+    onPlaybackBlocked() {},
+    onParticipantAudio: (id, s) => changes.push([id, s]),
+    onLocalAudio: (s) => local.push(s),
+    onReconnecting() {},
+  });
+  remote.isMicrophoneEnabled = true;
+  remote.isSpeaking = true;
+  instance.localParticipant.isMicrophoneEnabled = true;
+  instance.localParticipant.isSpeaking = true;
+  instance.events.ActiveSpeakersChanged([remote, instance.localParticipant]);
+  assert.deepEqual(changes.at(-1), ['s2', { microphoneEnabled: true, speaking: true }]);
+  assert.deepEqual(local.at(-1), { microphoneEnabled: true, speaking: true });
+  remote.isMicrophoneEnabled = false;
+  instance.events.TrackMuted({}, remote);
+  assert.deepEqual(changes.at(-1), ['s2', { microphoneEnabled: false, speaking: false }]);
+  client.disconnect();
+  const count = changes.length;
+  instance.events.ActiveSpeakersChanged([]);
+  assert.equal(changes.length, count);
+});

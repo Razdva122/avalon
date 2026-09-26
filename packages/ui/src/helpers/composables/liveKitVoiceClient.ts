@@ -33,13 +33,41 @@ export function createLiveKitVoiceClient({ Room, RoomEvent, Track }: typeof impo
   };
   return {
     async connect(url: string, token: string, events: VoiceClientEvents) {
+      const audioState = (participant: { isMicrophoneEnabled?: boolean; isSpeaking?: boolean }) => ({
+        microphoneEnabled: participant.isMicrophoneEnabled === true,
+        speaking: participant.isMicrophoneEnabled === true && participant.isSpeaking === true,
+      });
+      const reportAudio = (participant: { identity: string; isMicrophoneEnabled?: boolean; isSpeaking?: boolean }) => {
+        if (closed) return;
+        if (participant === room.localParticipant) events.onLocalAudio?.(audioState(participant));
+        else events.onParticipantAudio?.(participant.identity, audioState(participant));
+      };
+      const reportAllAudio = () => {
+        reportAudio(room.localParticipant);
+        room.remoteParticipants.forEach(reportAudio);
+      };
+      room.on(RoomEvent.ActiveSpeakersChanged, reportAllAudio);
+      room.on(RoomEvent.TrackMuted, (_publication, participant) => reportAudio(participant));
+      room.on(RoomEvent.TrackUnmuted, (_publication, participant) => reportAudio(participant));
+      room.on(RoomEvent.TrackPublished, (_publication, participant) => reportAudio(participant));
+      room.on(RoomEvent.TrackUnpublished, (_publication, participant) => reportAudio(participant));
+      room.on(RoomEvent.LocalTrackPublished, () => reportAudio(room.localParticipant));
+      room.on(RoomEvent.LocalTrackUnpublished, () => reportAudio(room.localParticipant));
+      room.on(RoomEvent.Reconnecting, () => {
+        if (!closed) events.onReconnecting?.(true);
+      });
+      room.on(RoomEvent.Reconnected, () => {
+        if (closed) return;
+        reportAllAudio();
+        events.onReconnecting?.(false);
+      });
       room.on(RoomEvent.ParticipantConnected, (participant) => {
         const info = participantInfo(participant);
-        if (!closed && info) events.onParticipant(info);
+        if (!closed && info) events.onParticipant({ ...info, ...audioState(participant) });
       });
       room.on(RoomEvent.ParticipantMetadataChanged, (_metadata, participant) => {
         const info = participantInfo(participant);
-        if (!closed && info) events.onParticipant(info);
+        if (!closed && info) events.onParticipant({ ...info, ...audioState(participant) });
       });
       room.on(RoomEvent.ParticipantDisconnected, (participant) => {
         removeAudio(participant.identity);
@@ -49,7 +77,7 @@ export function createLiveKitVoiceClient({ Room, RoomEvent, Track }: typeof impo
         const info = participantInfo(participant);
         if (closed || track.kind !== Track.Kind.Audio || !info) return;
         // Install persisted local gain/mute before the element can play.
-        events.onParticipant(info);
+        events.onParticipant({ ...info, ...audioState(participant) });
         const element = track.attach();
         element.autoplay = true;
         element.style.display = 'none';
@@ -78,8 +106,9 @@ export function createLiveKitVoiceClient({ Room, RoomEvent, Track }: typeof impo
       if (closed) return;
       for (const participant of room.remoteParticipants.values()) {
         const info = participantInfo(participant);
-        if (info) events.onParticipant(info);
+        if (info) events.onParticipant({ ...info, ...audioState(participant) });
       }
+      reportAudio(room.localParticipant);
     },
     disconnect() {
       closed = true;

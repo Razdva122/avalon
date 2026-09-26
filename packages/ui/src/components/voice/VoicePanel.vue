@@ -1,95 +1,293 @@
 <template>
   <aside class="room-voice" :aria-label="$t('voice.title')">
-    <button class="voice-launcher" type="button" :aria-expanded="open" @click="open = !open">
-      <span class="voice-symbol" aria-hidden="true">◖))</span>
-      <span>{{ $t('voice.title') }}</span>
-      <span v-if="voice.status.value === 'connected'" class="voice-live" aria-hidden="true" />
-    </button>
-    <div v-if="open" class="voice-panel">
-      <header class="voice-heading">
-        <strong>{{ $t('voice.title') }}</strong>
-        <button type="button" :aria-label="$t('voice.close')" @click="open = false">×</button>
-      </header>
-      <div class="voice-body">
-        <label v-if="voice.state.value.canManage" class="voice-setting">
-          <span>{{ $t('voice.roomSetting') }}</span>
-          <input
-            type="checkbox"
-            :checked="voice.state.value.enabled"
-            :disabled="!voice.state.value.available"
-            @change="toggleRoom"
-          />
-        </label>
-        <p v-if="!voice.state.value.available" class="voice-note">{{ $t('voice.unavailable') }}</p>
-        <p v-else-if="!voice.state.value.enabled" class="voice-note">{{ $t('voice.disabled') }}</p>
-        <p v-else-if="!voice.state.value.canJoin" class="voice-note">{{ $t('voice.spectator') }}</p>
-        <template v-else>
-          <p v-if="voice.error.value" class="voice-error" role="alert">{{ errorText }}</p>
-          <div class="voice-actions">
-            <button
-              v-if="voice.status.value === 'idle' || voice.status.value === 'error'"
-              type="button"
-              @click="voice.join"
-            >
-              {{ voice.status.value === 'error' ? $t('voice.retry') : $t('voice.join') }}
-            </button>
-            <span v-if="voice.status.value === 'connecting'" role="status">{{ $t('voice.connecting') }}</span>
-            <template v-if="voice.status.value === 'connected'">
-              <button
-                type="button"
-                :disabled="voice.microphonePending.value"
-                @click="voice.setMicrophoneEnabled(!voice.microphoneEnabled.value)"
-              >
-                {{ voice.microphoneEnabled.value ? $t('voice.micOn') : $t('voice.micOff') }}
-              </button>
-              <button type="button" class="voice-secondary" @click="voice.leave">{{ $t('voice.leave') }}</button>
-            </template>
+    <div class="voice-dock" :class="{ 'is-connected': isConnected }">
+      <button
+        ref="launcher"
+        class="voice-launcher"
+        type="button"
+        :aria-expanded="open"
+        :aria-controls="panelID"
+        @click="open = !open"
+      >
+        <VoiceIcon name="headphones" />
+        <span class="voice-dock-label">{{ $t('voice.shortTitle') }} <small>beta</small></span>
+        <span
+          v-if="isConnected"
+          class="voice-count"
+          :aria-label="`${$t('voice.participants')}: ${voice.participants.value.length + 1}`"
+        >
+          <i class="voice-dot" />{{ voice.participants.value.length + 1 }}
+        </span>
+        <VoiceIcon :name="open ? 'chevronDown' : 'chevronUp'" class="voice-chevron" />
+      </button>
+      <button
+        v-if="isConnected"
+        type="button"
+        class="voice-quick-mic"
+        :class="{ 'is-muted': !voice.microphoneEnabled.value }"
+        :title="micLabel"
+        :aria-label="micLabel"
+        :aria-pressed="voice.microphoneEnabled.value"
+        :disabled="voice.microphonePending.value"
+        @click="toggleMic"
+      >
+        <VoiceIcon :name="voice.microphoneEnabled.value ? 'mic' : 'micOff'" />
+      </button>
+    </div>
+    <Transition name="voice-reveal">
+      <section
+        v-if="open"
+        :id="panelID"
+        ref="panel"
+        class="voice-panel"
+        tabindex="-1"
+        :aria-label="$t('voice.title')"
+        @keydown.esc.stop.prevent="closePanel"
+      >
+        <header class="voice-heading">
+          <div class="voice-heading-copy">
+            <div class="voice-title">
+              <h2>{{ $t('voice.panelTitle') }}</h2>
+              <span class="voice-beta">beta</span>
+            </div>
+            <p class="voice-status" role="status"><i v-if="isConnected" class="voice-dot" />{{ connectionLabel }}</p>
           </div>
-          <button v-if="voice.playbackBlocked.value" type="button" class="voice-secondary" @click="voice.startAudio">
-            {{ $t('voice.resumeAudio') }}
+          <button
+            v-if="voice.state.value.canManage"
+            type="button"
+            class="voice-icon-button"
+            :class="{ 'is-selected': settingsOpen }"
+            :aria-label="$t('voice.roomSettings')"
+            :title="$t('voice.roomSettings')"
+            :aria-expanded="settingsOpen"
+            :aria-controls="`${panelID}-settings`"
+            @click="settingsOpen = !settingsOpen"
+          >
+            <VoiceIcon name="settings" />
           </button>
-          <template v-if="voice.status.value === 'connected'">
-            <label class="voice-volume">
-              <span>{{ $t('voice.masterVolume') }}</span
-              ><span>{{ voice.masterVolume.value }}%</span>
-              <input type="range" min="0" max="100" :value="voice.masterVolume.value" @input="setMasterVolume" />
-            </label>
-            <p class="voice-roster-title">{{ $t('voice.participants') }}</p>
-            <p class="voice-self">
-              {{ $t('voice.you') }} · {{ voice.microphoneEnabled.value ? $t('voice.micOn') : $t('voice.micOff') }}
-            </p>
-            <p v-if="!voice.participants.value.length" class="voice-note">{{ $t('voice.noOthers') }}</p>
-            <div v-for="participant in voice.participants.value" :key="participant.sessionID" class="voice-person">
-              <strong>{{ displayName(participant.userID) }}</strong>
-              <label class="voice-volume">
-                <span>{{ $t('voice.personVolume', { name: displayName(participant.userID) }) }}</span>
-                <span>{{ participant.volume }}%</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  :value="participant.volume"
-                  @input="setUserVolume(participant.userID, $event)"
-                />
-              </label>
+          <button
+            type="button"
+            class="voice-icon-button"
+            :aria-label="$t('voice.close')"
+            :title="$t('voice.close')"
+            @click="closePanel"
+          >
+            <VoiceIcon name="close" />
+          </button>
+        </header>
+        <div v-if="settingsOpen && voice.state.value.canManage" :id="`${panelID}-settings`" class="voice-room-settings">
+          <label class="voice-setting">
+            <span>{{ $t('voice.roomSetting') }}</span>
+            <span class="voice-switch"
+              ><input
+                type="checkbox"
+                role="switch"
+                :checked="voice.state.value.enabled"
+                :disabled="!voice.state.value.available"
+                @change="toggleRoom" /><span aria-hidden="true"
+            /></span>
+          </label>
+          <p class="voice-hint">{{ $t('voice.privacy') }}</p>
+        </div>
+        <div class="voice-body">
+          <p v-if="voice.error.value" class="voice-error" role="alert"><VoiceIcon name="info" />{{ errorText }}</p>
+          <template v-if="voice.state.value.available && voice.state.value.enabled && voice.state.value.canJoin">
+            <template v-if="isConnected">
               <button
                 type="button"
-                class="voice-secondary"
-                :aria-pressed="participant.muted"
-                @click="voice.setUserMuted(participant.userID, !participant.muted)"
+                class="voice-microphone"
+                :class="{ 'is-muted': !voice.microphoneEnabled.value }"
+                :aria-label="micLabel"
+                :aria-pressed="voice.microphoneEnabled.value"
+                :disabled="voice.microphonePending.value"
+                @click="toggleMic"
               >
-                {{ participant.muted ? $t('voice.unmutePerson') : $t('voice.mutePerson') }}
+                <span class="voice-microphone-icon"
+                  ><VoiceIcon :name="voice.microphoneEnabled.value ? 'mic' : 'micOff'"
+                /></span>
+                <span class="voice-microphone-copy"
+                  ><strong>{{ $t('voice.microphone') }}</strong
+                  ><span>{{ $t(voice.microphoneEnabled.value ? 'voice.micOn' : 'voice.micOff') }}</span></span
+                >
+                <span class="voice-microphone-action">{{
+                  $t(voice.microphoneEnabled.value ? 'voice.turnOff' : 'voice.turnOn')
+                }}</span>
               </button>
+              <div
+                v-if="micHelpOpen || voice.microphoneError.value || voice.microphonePending.value"
+                class="voice-mic-help"
+                aria-live="polite"
+                :aria-busy="voice.microphonePending.value"
+              >
+                <strong>{{
+                  $t(
+                    voice.microphonePending.value
+                      ? 'voice.micWaiting'
+                      : voice.microphoneError.value
+                        ? 'voice.micNeedsAttention'
+                        : 'voice.micPermissionTitle',
+                  )
+                }}</strong>
+                <p>{{ micHelpText }}</p>
+                <p v-if="voice.microphoneError.value === 'permission'" class="voice-hint">
+                  {{ $t('voice.micSystemHelp') }}
+                </p>
+                <div class="voice-mic-help-actions">
+                  <button
+                    type="button"
+                    class="voice-primary"
+                    :disabled="voice.microphonePending.value"
+                    @click="requestMicrophone"
+                  >
+                    {{
+                      $t(
+                        voice.microphonePending.value
+                          ? 'voice.micWaiting'
+                          : voice.microphoneError.value
+                            ? 'voice.micRetry'
+                            : 'voice.micRequest',
+                      )
+                    }}
+                  </button>
+                  <button
+                    v-if="!voice.microphonePending.value && !voice.microphoneError.value"
+                    type="button"
+                    class="voice-icon-button voice-listen-only"
+                    @click="micHelpOpen = false"
+                  >
+                    {{ $t('voice.micListenOnly') }}
+                  </button>
+                </div>
+              </div>
+              <div class="voice-roster-heading">
+                <h3>{{ $t('voice.participants') }}</h3>
+                <span>{{ voice.participants.value.length + 1 }}</span>
+              </div>
+              <ul class="voice-roster">
+                <li class="voice-person voice-self">
+                  <VoiceStatus :status="userStatus(ownUserID)" :name="$t('voice.you')" own />
+                  <div class="voice-person-controls">
+                    <strong>{{ $t('voice.you') }}</strong>
+                    <span class="voice-person-state">{{
+                      $t(
+                        userStatus(ownUserID) === 'selfMuted'
+                          ? 'voice.statusSelfMutedOwn'
+                          : `voice.status_${userStatus(ownUserID)}`,
+                      )
+                    }}</span>
+                  </div>
+                </li>
+                <li
+                  v-for="participant in voice.participants.value"
+                  :key="participant.sessionID"
+                  class="voice-person"
+                  :class="{ 'is-muted': participant.muted }"
+                >
+                  <VoiceStatus :status="userStatus(participant.userID)" :name="displayName(participant.userID)" />
+                  <div class="voice-person-controls">
+                    <div class="voice-person-label">
+                      <strong :title="displayName(participant.userID)">{{ displayName(participant.userID) }}</strong
+                      ><span>{{ participant.volume }}%</span>
+                    </div>
+                    <span class="voice-person-state">{{ $t(`voice.status_${userStatus(participant.userID)}`) }}</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      :value="participant.volume"
+                      :disabled="participant.muted"
+                      :aria-label="$t('voice.personVolume', { name: displayName(participant.userID) })"
+                      @input="setUserVolume(participant.userID, $event)"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    class="voice-icon-button"
+                    :aria-label="`${$t(participant.muted ? 'voice.unmutePerson' : 'voice.mutePerson')}: ${displayName(participant.userID)}`"
+                    :title="$t(participant.muted ? 'voice.unmutePerson' : 'voice.mutePerson')"
+                    :aria-pressed="participant.muted"
+                    @click="voice.setUserMuted(participant.userID, !participant.muted)"
+                  >
+                    <VoiceIcon :name="participant.muted ? 'volumeOff' : 'volume'" />
+                  </button>
+                </li>
+              </ul>
+              <p class="voice-hint">{{ $t(voice.participants.value.length ? 'voice.localOnly' : 'voice.noOthers') }}</p>
+            </template>
+            <div v-else class="voice-welcome">
+              <span class="voice-welcome-icon"><VoiceIcon name="headphones" /></span>
+              <p>{{ $t('voice.privacy') }}</p>
+              <button
+                type="button"
+                class="voice-primary"
+                :disabled="voice.status.value === 'connecting'"
+                @click="voice.join"
+              >
+                <VoiceIcon name="headphones" />{{
+                  $t(
+                    voice.status.value === 'connecting'
+                      ? 'voice.connecting'
+                      : voice.status.value === 'error'
+                        ? 'voice.retry'
+                        : 'voice.join',
+                  )
+                }}
+              </button>
+              <p class="voice-hint">{{ $t('voice.listenHint') }}</p>
             </div>
           </template>
-        </template>
-      </div>
-    </div>
+          <div v-else class="voice-empty">
+            <VoiceIcon name="headphones" />
+            <p>
+              {{
+                $t(
+                  !voice.state.value.available
+                    ? 'voice.unavailable'
+                    : !voice.state.value.enabled
+                      ? 'voice.disabled'
+                      : 'voice.spectator',
+                )
+              }}
+            </p>
+            <button
+              v-if="voice.state.value.available && !voice.state.value.enabled && voice.state.value.canManage"
+              type="button"
+              class="voice-primary"
+              @click="voice.setEnabled(true)"
+            >
+              {{ $t('voice.enableRoom') }}
+            </button>
+          </div>
+          <button v-if="voice.playbackBlocked.value" type="button" class="voice-primary" @click="voice.startAudio">
+            <VoiceIcon name="volume" />{{ $t('voice.resumeAudio') }}
+          </button>
+        </div>
+        <footer v-if="isConnected" class="voice-footer">
+          <label class="voice-master"
+            ><span><VoiceIcon name="volume" />{{ $t('voice.masterVolume') }}</span
+            ><output>{{ voice.masterVolume.value }}%</output
+            ><input
+              type="range"
+              min="0"
+              max="100"
+              :value="voice.masterVolume.value"
+              :aria-label="$t('voice.masterVolume')"
+              @input="setMasterVolume"
+          /></label>
+          <button type="button" class="voice-leave" @click="voice.leave">
+            <VoiceIcon name="leave" />{{ $t('voice.leave') }}
+          </button>
+        </footer>
+      </section>
+    </Transition>
   </aside>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import VoiceIcon from './VoiceIcon.vue';
+import VoiceStatus from './VoiceStatus.vue';
+import { roomVoiceKey } from '@/helpers/room-voice-context';
 import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
@@ -100,6 +298,17 @@ const props = defineProps<{ roomUuid: string; seatIds: string }>();
 const store = useStore();
 const { t } = useI18n();
 const open = ref(false);
+const settingsOpen = ref(false);
+const launcher = ref<HTMLButtonElement>();
+const panel = ref<HTMLElement>();
+const panelID = computed(() => `voice-panel-${props.roomUuid}`);
+const closePanel = () => {
+  open.value = false;
+  void nextTick(() => launcher.value?.focus());
+};
+watch(open, (value) => {
+  if (value) void nextTick(() => panel.value?.focus());
+});
 const preferenceStore = (() => {
   try {
     return typeof window === 'undefined' ? undefined : window.localStorage;
@@ -118,6 +327,64 @@ const voice = createRoomVoice(
   loadLiveKitVoiceClient,
   preferenceStore,
 );
+const voiceContext = inject(roomVoiceKey, undefined);
+if (voiceContext) voiceContext.value = voice;
+onUnmounted(() => {
+  if (voiceContext?.value === voice) voiceContext.value = undefined;
+});
+const ownUserID = computed(() => store.state.profile?.id ?? '');
+const userStatus = (id: string) => voice.userStatus(id, ownUserID.value);
+const isConnected = computed(() => voice.status.value === 'connected');
+const micLabel = computed(() => t(voice.microphoneEnabled.value ? 'voice.disableMic' : 'voice.enableMic'));
+const micHelpOpen = ref(false);
+const microphoneWasEnabled = ref(false);
+const micHelpText = computed(() => {
+  const failure = voice.microphoneError.value;
+  return t(
+    failure === 'permission'
+      ? 'voice.micPermissionHelp'
+      : failure === 'missing'
+        ? 'voice.micMissingHelp'
+        : failure === 'busy'
+          ? 'voice.micBusyHelp'
+          : failure
+            ? 'voice.micFailedHelp'
+            : 'voice.micPermissionIntro',
+  );
+});
+const requestMicrophone = async () => {
+  await voice.setMicrophoneEnabled(true);
+  if (voice.microphoneEnabled.value) {
+    microphoneWasEnabled.value = true;
+    micHelpOpen.value = false;
+  }
+};
+const toggleMic = () => {
+  if (voice.microphoneEnabled.value) {
+    void voice.setMicrophoneEnabled(false);
+  } else if (!microphoneWasEnabled.value || voice.microphoneError.value) {
+    open.value = true;
+    micHelpOpen.value = true;
+  } else {
+    void requestMicrophone();
+  }
+};
+watch(voice.microphoneError, (failure) => {
+  if (failure) {
+    open.value = true;
+    micHelpOpen.value = true;
+  }
+});
+watch(isConnected, (connected) => {
+  if (!connected) micHelpOpen.value = false;
+});
+const connectionLabel = computed(() => {
+  if (!voice.state.value.available) return t('voice.unavailable');
+  if (!voice.state.value.enabled) return t('voice.disabled');
+  if (isConnected.value) return t('voice.connected');
+  if (voice.status.value === 'connecting') return t('voice.connecting');
+  return t('voice.notConnected');
+});
 const errorText = computed(() => {
   const code = voice.error.value;
   if (code === 'disconnected') return t('voice.disconnected');
@@ -192,150 +459,487 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
+.voice-mic-help {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid rgba(var(--v-theme-primary), 0.3);
+  border-radius: 12px;
+  background: rgba(var(--v-theme-primary), 0.06);
+  font-size: 13px;
+  line-height: 1.5;
+  p {
+    margin: 8px 0 12px;
+  }
+}
+.voice-mic-help-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.voice-listen-only {
+  width: auto !important;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
 .room-voice {
   position: fixed;
-  left: 12px;
-  bottom: 16px;
+  left: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
   z-index: 15;
   color: rgb(var(--v-theme-text-primary));
   text-align: left;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.room-voice button {
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    box-shadow 140ms ease;
+}
+.room-voice svg {
+  flex-shrink: 0;
+}
+.voice-dock {
+  display: flex;
+  align-items: center;
+  background: rgb(var(--v-theme-inset));
+  border: 1px solid rgba(var(--v-theme-text-primary), 0.14);
+  border-radius: 16px;
+  box-shadow: 0 4px 18px #0002;
+  padding: 4px;
 }
 .voice-launcher {
-  min-height: 48px;
   display: flex;
-  gap: 8px;
   align-items: center;
-  padding: 0 14px;
-  border-radius: 14px;
-  background: rgb(var(--v-theme-inset));
-  box-shadow: 0 2px 12px #0003;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 10px;
+  border-radius: 12px;
+}
+.voice-dock-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 650;
 }
-.voice-symbol {
-  font-size: 17px;
-  letter-spacing: -2px;
+.voice-dock-label small,
+.voice-beta {
+  font-size: 11px;
+  line-height: 20px;
+  padding: 0 6px;
+  border: 1px solid rgba(var(--v-theme-text-primary), 0.2);
+  border-radius: 5px;
+  font-weight: 500;
 }
-.voice-live {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.voice-count {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.voice-dot {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
   background: rgb(var(--v-theme-success));
+  border-radius: 50%;
+}
+.voice-chevron {
+  width: 16px;
+  height: 16px;
+}
+.voice-quick-mic {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(var(--v-theme-success), 0.12);
+}
+.voice-quick-mic.is-muted {
+  background: rgba(var(--v-theme-text-primary), 0.09);
 }
 .voice-panel {
   position: absolute;
-  bottom: 56px;
+  bottom: 64px;
   left: 0;
-  width: min(340px, calc(100vw - 24px));
-  max-height: min(68dvh, 570px);
+  width: min(384px, calc(100vw - 32px));
+  max-height: min(76dvh, 680px);
   display: flex;
   flex-direction: column;
-  background: rgb(var(--v-theme-surface));
-  border: 1px solid rgba(var(--v-theme-text-primary), 0.18);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px #0004;
+  background: rgb(var(--v-theme-inset));
+  border: 1px solid rgba(var(--v-theme-text-primary), 0.16);
+  border-radius: 20px;
+  box-shadow: 0 16px 56px #0003;
   overflow: hidden;
+  outline: none;
 }
 .voice-heading {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
-  border-bottom: 1px solid rgba(var(--v-theme-text-primary), 0.13);
+  gap: 4px;
+  padding: 16px 12px 14px 20px;
 }
-.voice-heading button {
-  width: 44px;
-  height: 44px;
-  font-size: 25px;
+.voice-heading-copy {
+  flex: 1;
+  min-width: 0;
 }
-.voice-body {
-  overflow-y: auto;
-  padding: 14px;
-  display: grid;
-  gap: 14px;
-}
-.voice-setting {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-weight: 600;
-}
-.voice-setting input {
-  width: 22px;
-  height: 22px;
-  accent-color: rgb(var(--v-theme-primary));
-}
-.voice-note {
-  margin: 0;
-  opacity: 0.8;
-  line-height: 1.45;
-}
-.voice-error {
-  margin: 0;
-  color: rgb(var(--v-theme-error));
-  line-height: 1.45;
-}
-.voice-actions {
+.voice-title {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
 }
-.voice-actions button {
-  min-height: 44px;
-  padding: 0 12px;
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
-  border-radius: 9px;
-}
-.voice-actions .voice-secondary,
-.voice-secondary {
-  min-height: 40px;
-  padding: 0 8px;
-  background: rgb(var(--v-theme-inset));
-  color: rgb(var(--v-theme-text-primary));
-  border-radius: 8px;
-}
-.voice-volume {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 5px;
-  font-size: 13px;
-}
-.voice-volume input {
-  grid-column: 1 / -1;
-  width: 100%;
-  min-height: 28px;
-  accent-color: rgb(var(--v-theme-primary));
-}
-.voice-roster-title {
-  margin: 4px 0 0;
-  font-weight: 650;
-}
-.voice-self {
+.voice-title h2 {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
   margin: 0;
+}
+.voice-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  margin: 5px 0 0;
+}
+.voice-icon-button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+.voice-icon-button:hover,
+.voice-icon-button.is-selected,
+.voice-launcher:hover,
+.voice-leave:hover {
+  background: rgba(var(--v-theme-text-primary), 0.08);
+}
+.voice-room-settings {
+  padding: 14px 20px;
+  border-block: 1px solid rgba(var(--v-theme-text-primary), 0.12);
+}
+.voice-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-weight: 600;
+  min-height: 44px;
+  cursor: pointer;
+}
+.voice-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  align-items: center;
+}
+.voice-switch input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: 1;
+  cursor: pointer;
+}
+.voice-switch > span {
+  height: 24px;
+  border-radius: 20px;
+  background: rgba(var(--v-theme-text-primary), 0.32);
+  padding: 3px;
+}
+.voice-switch > span::after {
+  content: '';
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 160ms ease;
+}
+.voice-switch input:checked + span {
+  background: rgb(var(--v-theme-primary));
+}
+.voice-switch input:checked + span::after {
+  transform: translateX(20px);
+}
+.voice-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+  padding: 0 20px 16px;
+}
+.voice-microphone {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding: 12px;
+  min-height: 76px;
+  border: 1px solid rgba(var(--v-theme-success), 0.55);
+  border-radius: 14px;
+  background: rgba(var(--v-theme-success), 0.09);
+  text-align: left;
+}
+.voice-microphone.is-muted {
+  background: rgba(var(--v-theme-text-primary), 0.045);
+  border-color: rgba(var(--v-theme-text-primary), 0.18);
+}
+.voice-microphone:hover {
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+.voice-microphone-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: rgb(var(--v-theme-inset));
+}
+.voice-microphone-copy {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.voice-microphone-copy strong {
   font-size: 14px;
 }
+.voice-microphone-copy > span {
+  font-size: 12px;
+}
+.voice-microphone-action {
+  font-size: 12px;
+  font-weight: 650;
+}
+.voice-roster-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+  margin-bottom: 8px;
+}
+.voice-roster-heading h3 {
+  font-size: 12px;
+  font-weight: 650;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.065em;
+}
+.voice-roster-heading > span {
+  font-size: 12px;
+  padding: 1px 7px;
+  background: rgba(var(--v-theme-text-primary), 0.07);
+  border-radius: 6px;
+}
+.voice-roster {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 .voice-person {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 72px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(var(--v-theme-text-primary), 0.1);
+}
+.voice-person:first-child {
+  border: 0;
+}
+.voice-self {
+  min-height: 44px;
+}
+.voice-self > svg {
+  margin: 0 12px;
+  width: 18px;
+}
+.voice-avatar {
   display: grid;
-  gap: 6px;
-  border-top: 1px solid rgba(var(--v-theme-text-primary), 0.13);
-  padding-top: 12px;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(var(--v-theme-text-primary), 0.08);
+  font-size: 13px;
+  font-weight: 700;
 }
-.voice-person strong {
-  overflow-wrap: anywhere;
+.voice-avatar svg {
+  width: 18px;
 }
-.voice-person button {
-  justify-self: start;
+.voice-person-name {
+  flex: 1;
+  font-weight: 600;
 }
-button:focus-visible,
-input:focus-visible {
-  outline: 2px solid rgb(var(--v-theme-primary));
-  outline-offset: 2px;
+.voice-person-controls {
+  flex: 1;
+  min-width: 0;
 }
-button:disabled {
-  cursor: wait;
-  opacity: 0.65;
+.voice-person-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.voice-person-label strong {
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.voice-person-label > span {
+  font-size: 12px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.voice-person.is-muted .voice-avatar {
+  opacity: 0.55;
+}
+.voice-person.is-muted .voice-icon-button {
+  background: rgba(var(--v-theme-text-primary), 0.1);
+}
+.room-voice input[type='range'] {
+  width: 100%;
+  display: block;
+  min-width: 0;
+  height: 32px;
+  accent-color: rgb(var(--v-theme-primary));
+  cursor: pointer;
+}
+.voice-hint {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 10px 0 0;
+}
+.voice-footer {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(var(--v-theme-text-primary), 0.12);
+  padding: 16px 20px 8px;
+}
+.voice-master {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 12px;
+  align-items: center;
+  font-size: 13px;
+}
+.voice-master > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+.voice-master svg {
+  width: 18px;
+}
+.voice-master output {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.voice-master input {
+  grid-column: 1 / -1;
+}
+.voice-leave {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-top: 6px;
+}
+.voice-leave svg {
+  width: 18px;
+}
+.voice-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 10px 16px;
+  width: 100%;
+  border-radius: 12px;
+  background: rgb(var(--v-theme-primary));
+  color: white;
+  font-size: 14px;
+  font-weight: 650;
+}
+.voice-primary:hover {
+  filter: brightness(0.93);
+}
+.voice-welcome,
+.voice-empty {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  padding: 20px 0 8px;
+  text-align: center;
+}
+.voice-welcome p,
+.voice-empty p {
+  margin: 0;
+}
+.voice-welcome-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  background: rgba(var(--v-theme-primary), 0.09);
+  border-radius: 20px;
+}
+.voice-welcome-icon svg {
+  width: 30px;
+  height: 30px;
+}
+.voice-empty > svg {
+  width: 32px;
+  height: 32px;
+}
+.voice-error {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid rgba(var(--v-theme-error), 0.5);
+  border-radius: 10px;
+  margin: 0 0 12px;
+}
+.room-voice button:focus-visible,
+.room-voice input:focus-visible,
+.voice-switch input:focus-visible + span {
+  outline: 3px solid rgb(var(--v-theme-primary));
+  outline-offset: 3px;
+}
+.room-voice button:disabled,
+.room-voice input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.voice-reveal-enter-active,
+.voice-reveal-leave-active {
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+.voice-reveal-enter-from,
+.voice-reveal-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
 }
 @media (max-width: 600px) {
   .room-voice {
@@ -343,7 +947,50 @@ button:disabled {
     bottom: calc(8px + env(safe-area-inset-bottom));
   }
   .voice-panel {
-    width: min(340px, calc(100vw - 16px));
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    width: auto;
+    max-height: calc(100dvh - 148px - env(safe-area-inset-bottom));
+    border-radius: 20px;
   }
+  .voice-heading {
+    padding-left: 16px;
+  }
+  .voice-body,
+  .voice-footer,
+  .voice-room-settings {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+@media (max-height: 500px) {
+  .voice-panel {
+    max-height: calc(100dvh - 88px - env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+  .voice-body {
+    overflow: visible;
+    flex-shrink: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .room-voice *,
+  .voice-reveal-enter-active,
+  .voice-reveal-leave-active {
+    transition: none !important;
+  }
+}
+</style>
+
+<style scoped>
+.voice-person-state {
+  display: block;
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 2px;
+  color: rgb(var(--v-theme-text-primary));
+  opacity: 0.8;
 }
 </style>

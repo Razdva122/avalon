@@ -59,6 +59,7 @@
       >
         <Player
           :player-state="player"
+          :voice-side="Math.sin((2 * Math.PI * i) / players.length + Math.PI) > 0.75 ? 'left' : 'right'"
           :private-decision="
             roomState.ai && !playerInGame && spectatorRoles[player.id]
               ? spectatorDecisions.find((d) => d.playerID === player.id)
@@ -374,7 +375,8 @@ export default defineComponent({
 
     @media screen and (max-width: $value) and (min-width: $newValue) {
       .board-container {
-        transform: scale(calc(($newValue + 40px) / $size));
+        --board-scale: #{calc(($newValue + 40px) / $size)};
+        transform: scale(var(--board-scale));
       }
 
       .wrapper {
@@ -385,7 +387,8 @@ export default defineComponent({
 
     @media screen and (max-height: $value) and (min-height: $newValue) {
       .board-container {
-        transform: scale(calc(($newValue - 50px) / $size));
+        --board-scale: #{calc(($newValue - 50px) / $size)};
+        transform: scale(var(--board-scale));
       }
 
       .wrapper {
@@ -407,7 +410,8 @@ export default defineComponent({
   margin: 120px 100px;
   color: white;
   overflow: visible;
-  transform: scale(1);
+  --board-scale: 1;
+  transform: scale(var(--board-scale));
 }
 
 @include scaleFromSize(840px);

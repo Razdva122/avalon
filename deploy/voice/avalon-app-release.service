@@ -1,0 +1,17 @@
+[Unit]
+Description=Avalon application release with private voice gateway
+Requires=docker.service
+After=network-online.target docker.service
+Wants=network-online.target
+PartOf=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/avalon/voice-release
+ExecStartPre=/opt/avalon/voice-release/gateway-firewall.sh
+ExecStart=/usr/bin/docker compose -p coi -f /opt/avalon/voice-release/compose.yaml up -d --no-deps backend ui
+TimeoutStartSec=180
+
+[Install]
+WantedBy=multi-user.target

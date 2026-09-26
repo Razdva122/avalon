@@ -3,12 +3,17 @@ import { ref } from 'vue';
 export type VoiceState = { available: boolean; enabled: boolean; canJoin: boolean; canManage: boolean };
 export type VoiceResult<T> = T | { error: string };
 export type VoiceAdmission = { url: string; token: string; sessionID: string };
-export type VoiceParticipant = { sessionID: string; userID: string; volume: number; muted: boolean };
+export type VoiceAudioState = { microphoneEnabled: boolean; speaking: boolean };
+export type VoiceUserStatus = 'speaking' | 'ready' | 'selfMuted' | 'localMuted' | 'offline' | 'unknown';
+export type VoiceParticipant = VoiceAudioState & { sessionID: string; userID: string; volume: number; muted: boolean };
 export type VoiceClientEvents = {
-  onParticipant: (participant: { sessionID: string; userID: string }) => void;
+  onParticipant: (participant: { sessionID: string; userID: string } & Partial<VoiceAudioState>) => void;
   onParticipantLeft: (sessionID: string) => void;
   onDisconnected: () => void;
   onPlaybackBlocked: () => void;
+  onParticipantAudio?: (sessionID: string, state: VoiceAudioState) => void;
+  onLocalAudio?: (state: VoiceAudioState) => void;
+  onReconnecting?: (reconnecting: boolean) => void;
 };
 export type VoiceClient = {
   connect: (url: string, token: string, events: VoiceClientEvents) => Promise<void>;
@@ -66,13 +71,16 @@ export function createRoomVoice(
   let generation = 0;
   let client: VoiceClient | undefined;
   let sessionID: string | undefined;
-  let preferences = loadPreferences(persistence);
+  const preferences = loadPreferences(persistence);
   const state = ref<VoiceState>({ ...emptyState });
   const status = ref<'idle' | 'connecting' | 'connected' | 'error'>('idle');
   const error = ref<string>();
   const playbackBlocked = ref(false);
   const microphoneEnabled = ref(false);
+  const speaking = ref(false);
+  const reconnecting = ref(false);
   const microphonePending = ref(false);
+  const microphoneError = ref<'permission' | 'missing' | 'busy' | 'failed'>();
   const participants = ref<VoiceParticipant[]>([]);
   const masterVolume = ref(preferences.masterVolume);
   const persist = () => {
@@ -123,7 +131,10 @@ export function createRoomVoice(
     client = undefined;
     sessionID = undefined;
     microphoneEnabled.value = false;
+    speaking.value = false;
+    reconnecting.value = false;
     microphonePending.value = false;
+    microphoneError.value = undefined;
     playbackBlocked.value = false;
     participants.value = [];
     status.value = 'idle';
@@ -198,12 +209,40 @@ export function createRoomVoice(
       client = pendingClient;
       sessionID = admission.sessionID;
       const events: VoiceClientEvents = {
-        onParticipant: ({ sessionID: id, userID }) => {
+        onParticipant: ({ sessionID: id, userID, microphoneEnabled: mic, speaking: active }) => {
           if (current !== generation || !userID) return;
           const saved = preferences.users[userID] ?? { volume: 100, muted: false };
-          const participant = { sessionID: id, userID, volume: saved.volume, muted: saved.muted };
+          const previous = participants.value.find((entry) => entry.sessionID === id);
+          const participant = {
+            sessionID: id,
+            userID,
+            volume: saved.volume,
+            muted: saved.muted,
+            microphoneEnabled: mic ?? previous?.microphoneEnabled ?? false,
+            speaking: active ?? previous?.speaking ?? false,
+          };
           participants.value = [...participants.value.filter((entry) => entry.sessionID !== id), participant];
           updateGain(participant);
+        },
+        onParticipantAudio: (id, audio) => {
+          if (current !== generation) return;
+          const participant = participants.value.find((entry) => entry.sessionID === id);
+          if (participant) Object.assign(participant, audio, { speaking: audio.microphoneEnabled && audio.speaking });
+        },
+        onLocalAudio: (audio) => {
+          if (current !== generation) return;
+          microphoneEnabled.value = audio.microphoneEnabled;
+          speaking.value = audio.microphoneEnabled && audio.speaking;
+        },
+        onReconnecting: (value) => {
+          if (current !== generation) return;
+          reconnecting.value = value;
+          if (value) {
+            speaking.value = false;
+            participants.value.forEach((participant) => {
+              participant.speaking = false;
+            });
+          }
         },
         onParticipantLeft: (id) => {
           if (current === generation) participants.value = participants.value.filter((entry) => entry.sessionID !== id);
@@ -243,14 +282,26 @@ export function createRoomVoice(
     const target = client;
     const current = generation;
     microphonePending.value = true;
+    microphoneError.value = undefined;
     try {
       await target.setMicrophoneEnabled(enabled);
       if (current === generation) {
         microphoneEnabled.value = enabled;
-        error.value = undefined;
+        if (!enabled) speaking.value = false;
+        microphoneError.value = undefined;
       } else if (enabled) void target.setMicrophoneEnabled(false).catch(() => undefined);
     } catch (cause) {
-      if (current === generation) error.value = message(cause);
+      if (current === generation) {
+        const name = cause && typeof cause === 'object' && 'name' in cause ? cause.name : '';
+        microphoneError.value =
+          name === 'NotAllowedError' || name === 'PermissionDeniedError' || name === 'SecurityError'
+            ? 'permission'
+            : name === 'NotFoundError' || name === 'DevicesNotFoundError'
+              ? 'missing'
+              : name === 'NotReadableError' || name === 'TrackStartError' || name === 'AbortError'
+                ? 'busy'
+                : 'failed';
+      }
     } finally {
       if (current === generation) microphonePending.value = false;
     }
@@ -281,6 +332,15 @@ export function createRoomVoice(
     error.value = undefined;
     await refresh();
   };
+  const userStatus = (userID: string, ownUserID: string): VoiceUserStatus => {
+    if (status.value !== 'connected' || reconnecting.value) return 'unknown';
+    if (userID === ownUserID) return !microphoneEnabled.value ? 'selfMuted' : speaking.value ? 'speaking' : 'ready';
+    const sessions = participants.value.filter((participant) => participant.userID === userID);
+    if (!sessions.length) return 'offline';
+    if (sessions.some((participant) => participant.muted)) return 'localMuted';
+    if (!sessions.some((participant) => participant.microphoneEnabled)) return 'selfMuted';
+    return sessions.some((participant) => participant.microphoneEnabled && participant.speaking) ? 'speaking' : 'ready';
+  };
   const dispose = () => stop();
   return {
     state,
@@ -288,7 +348,11 @@ export function createRoomVoice(
     error,
     playbackBlocked,
     microphoneEnabled,
+    speaking,
+    reconnecting,
+    userStatus,
     microphonePending,
+    microphoneError,
     participants,
     masterVolume,
     refresh,

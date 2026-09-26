@@ -67,7 +67,7 @@
 import { localizedPath } from '@/router/paths';
 import { i18n } from '@/plugins/i18n';
 import { useRouter } from 'vue-router';
-import { defineComponent, ref, computed, watch, provide } from 'vue';
+import { defineComponent, ref, computed, watch, provide, shallowRef } from 'vue';
 import Board from '@/components/view/board/Board.vue';
 import type { TVisibleRole, AiSpectatorDecision, TRoles, ISocketError } from '@avalon/types';
 import { socket } from '@/api/socket';
@@ -83,6 +83,8 @@ import { roomChatKey } from '@/helpers/room-chat-context';
 import { useRoomStickers } from '@/helpers/composables/useRoomStickers';
 import Chat from '@/components/feedback/Chat.vue';
 import RatingChangesPanel from '@/components/stats/RatingChangesPanel.vue';
+import { roomVoiceKey } from '@/helpers/room-voice-context';
+import type { createRoomVoice } from '@/helpers/composables/useRoomVoice';
 import VoicePanel from '@/components/voice/VoicePanel.vue';
 import eventBus from '@/helpers/event-bus';
 
@@ -107,6 +109,8 @@ export default defineComponent({
     },
   },
   async setup(props) {
+    const voiceContext = shallowRef<ReturnType<typeof createRoomVoice>>();
+    provide(roomVoiceKey, voiceContext);
     const stateManager = new GameStateManager();
     const alert = ref<boolean>(true);
     const errorMessage = ref<ISocketError>();
