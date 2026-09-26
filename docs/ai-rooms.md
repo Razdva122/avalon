@@ -289,7 +289,8 @@ Reasoning включён по умолчанию для решений; публ
 ### Автоматический повтор при исчерпании ответа
 
 Если Chat Completions возвращает `finish_reason: length`, приватное решение
-повторяется один раз с теми же фактами и лимитом 8192 вместо 4096 токенов.
+повторяется один раз с теми же фактами. Для решений с рассуждением первая попытка
+и повтор имеют одинаковый потолок 20 000 выходных токенов.
 Публичная речь аналогично допускает один повтор с 512 вместо 256 токенов,
 без повторного выбора действия. В диагностике повтор имеет mode `decision-retry`,
 `review-retry` или `speech-retry`. Каждая попытка отдельно резервирует бюджет и
@@ -473,6 +474,14 @@ npx ts-node -r tsconfig-paths/register src/ai/evaluate.ts --production-regressio
 
 ### Reasoning output limit
 
-Game decisions with reasoning enabled start with 8192 output tokens. The one automatic focused retry also stays at 8192; it does not double to 16384. Public speech and post-game reviews retain their smaller limits. Every attempt reserves and charges usage against the existing room and shared budgets.
+Game decisions with reasoning enabled start with 20,000 output tokens. The one automatic focused retry and a roster-consistency repair also use 20,000; retries do not increase this ceiling. Public speech retains its smaller limit. Post-game reviews now use one reasoned call with a 20,000-token ceiling when reasoning is enabled; there is no separate draft-check call. Every attempt reserves and charges usage against the existing room and shared budgets.
 
 Production defaults to 200 RUB per game; the first explicit administrator budget continuation raises that room to 400 RUB without resetting spending. The shared 3000 RUB / 30-day limit is unchanged. If production explicitly sets `AI_MATCH_BUDGET_RUB=150`, update that setting to `200` on deployment; environment overrides the default. Previously persisted per-room extensions are retained. Development remains 100 RUB per game.
+
+### Public Percival claims and explicit positions
+
+Merlin, Percival and Evil bots may use `claimMorgana` on a public decision to intentionally claim Percival and accuse a seat of being Morgana. The server appends a canonical English statement after public-speech sanitization. Other bots receive these declarations as public testimony, never as verified roles or private knowledge. On their next scheduled public decision each must return `claimStances` with an explicit `trust` or `distrust` for every other claimant. Missing, duplicate or invalid positions stop publication; there are no additional paid discussion rounds. Instructions require explaining the stance, making teams/votes consistent with it, and explaining any change. Deterministic Good Lady-result announcements remain truthful and do not introduce an extra decision call. Claims remain available from the archived public chat even when the ordinary recent-chat window has moved on.
+
+Evil card instructions compare the immediate benefit of Fail with the concrete future value of a cover Success, account for the score and required Fail count, and describe a shared seat-order sabotage convention to avoid unnecessary double Fails. These are model instructions, not a server strategy solver. Good opening instructions distinguish self-preference from a blanket veto and explicitly consider the forced fifth leader. Merlin safety and assassination instructions distinguish privileged early knowledge from deductions everyone can make after public evidence.
+
+A narrow consistency check detects explicitly selected bracketed rosters in a private explanation that contradict the action. One billed `decision-repair` can correct the action or explanation using the same facts and legal choices; a repeated mismatch pauses before applying the action. This is not a general natural-language verifier. Reviews now ask for one reasoned first-person causal analysis anchored to the actual outcome and recorded decision examples, rather than a second model critique of a draft.

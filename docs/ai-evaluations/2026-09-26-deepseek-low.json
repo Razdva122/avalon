@@ -1,0 +1,95 @@
+{
+  "date": "2026-09-26",
+  "model": "deepseek-v4-flash",
+  "sourceRoom": "f5b8a1a4-1082-4c6c-8c96-0b12cc274d20",
+  "sourceTrace": "97a58dea-62e9-47f7-b86a-97c5cf719793",
+  "ledgerID": "stuck-eval-2026-09-25-extra-50",
+  "testCostRub": 17.68,
+  "totalBudgetRub": 50,
+  "totalUsedRub": 45.6408,
+  "remainingRub": 4.3592,
+  "method": "Identical saved original proposal prompt and limited knowledge for servant 6, mission 2 proposal 3. max_tokens=8192, temperature=0.7, same JSON schema. Sequential order low/omitted/omitted/low. Evaluation-only payload adapter injects low before the shared client logs and sends the request. Production code and games unchanged. Existing billing reservations enforce the same 50 RUB cumulative ledger.",
+  "conclusion": "Both modes produced zero final replies in two attempts each. All requests HTTP 200, finish_reason length, output_tokens 8192. This does not establish whether the provider ignores low or applies it without enough effect. No answer quality comparison possible. First low request cost more due to no cached input.",
+  "results": [
+    {
+      "attempt": 1,
+      "effort": "low",
+      "seconds": 129.717,
+      "rub": 4.8088,
+      "error": "Модель исчерпала лимит ответа (8192 токенов), не завершив решение. Партия приостановлена.",
+      "metrics": {
+        "mode": "low-test-1-low",
+        "status": "error",
+        "rub": 4.8088,
+        "inputTokens": 2376,
+        "outputTokens": 8192,
+        "cachedTokens": 0,
+        "httpStatus": 200,
+        "sentEffort": "low",
+        "finishReason": "length",
+        "reasoningChars": 23810,
+        "finalChars": 0
+      }
+    },
+    {
+      "attempt": 2,
+      "effort": "default",
+      "seconds": 137.734,
+      "rub": 4.2904,
+      "error": "Модель исчерпала лимит ответа (8192 токенов), не завершив решение. Партия приостановлена.",
+      "metrics": {
+        "mode": "low-test-2-default",
+        "status": "error",
+        "rub": 4.2904,
+        "inputTokens": 2376,
+        "outputTokens": 8192,
+        "cachedTokens": 2304,
+        "httpStatus": 200,
+        "sentEffort": "omitted",
+        "finishReason": "length",
+        "reasoningChars": 24762,
+        "finalChars": 0
+      }
+    },
+    {
+      "attempt": 3,
+      "effort": "default",
+      "seconds": 128.61,
+      "rub": 4.2904,
+      "error": "Модель исчерпала лимит ответа (8192 токенов), не завершив решение. Партия приостановлена.",
+      "metrics": {
+        "mode": "low-test-3-default",
+        "status": "error",
+        "rub": 4.2904,
+        "inputTokens": 2376,
+        "outputTokens": 8192,
+        "cachedTokens": 2304,
+        "httpStatus": 200,
+        "sentEffort": "omitted",
+        "finishReason": "length",
+        "reasoningChars": 25101,
+        "finalChars": 0
+      }
+    },
+    {
+      "attempt": 4,
+      "effort": "low",
+      "seconds": 131.499,
+      "rub": 4.2904,
+      "error": "Модель исчерпала лимит ответа (8192 токенов), не завершив решение. Партия приостановлена.",
+      "metrics": {
+        "mode": "low-test-4-low",
+        "status": "error",
+        "rub": 4.2904,
+        "inputTokens": 2376,
+        "outputTokens": 8192,
+        "cachedTokens": 2304,
+        "httpStatus": 200,
+        "sentEffort": "low",
+        "finishReason": "length",
+        "reasoningChars": 25103,
+        "finalChars": 0
+      }
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { claimContext, claimSpeech } from './claims';
 import { Agent } from 'undici';
 import { AI_REQUEST_TIMEOUT_MS } from './timing';
 import { aiModel } from './models';
@@ -37,6 +38,8 @@ export type BotReply = {
   choice: number;
   speech: string;
   privateReason?: string;
+  claimMorgana?: number | null;
+  claimStances?: { seat: number; stance: 'trust' | 'distrust' }[];
   publicReason?: string;
   evidence?: DecisionEvidence[];
 };
@@ -70,12 +73,12 @@ export function systemFor(request: BotRequest): string {
     'Mission deduction examples (illustrations, NOT events from this game): (1) Team [you, 1], yourCard=Success, fails=1: 1 played Fail and is Evil. (2) Team [you, 1, 2], yourCard=Success, fails=2: BOTH 1 and 2 played Fail and are Evil. (3) The same three-person team with only one Fail proves at least one of 1 and 2 is Evil, not which one or both. (4) A successful mission does not prove its members Good: Evil may play Success. (5) When two Fails are required, a team with exactly one Evil cannot fail; one known Evil does not establish how many unknown teammates are Evil. Use only your own visible card and recorded fails during play, never hidden cards. A Good voter should not treat rejection of a failed team as evidence of Evil. Keep proven deductions across turns; do not replace them with unsupported trust. Choose for YOUR side: Good normally avoids proven saboteurs; Evil may exploit them while hiding its motive.';
   switch (request.state.stage) {
     case 'onMission':
-      return `${format} ${rules} Choose a secret card for YOUR side. Good must play Success. Evil can use Success for cover or Fail for sabotage. Use missionRule: one Fail cannot defeat a mission needing two. Your card does not cancel another card. Compare Success and Fail against the current score: at two Good successes, another success immediately triggers assassination. If two Evil are on a mission requiring two Fails, both need Fail to defeat it. Do not rely on one ally alone. Choose Success for cover only with a concrete benefit that justifies the risk to your side.`;
+      return `${format} ${rules} Choose a secret card for YOUR side. Good must play Success. Evil must compare Success for cover against Fail for sabotage on EVERY mission. Name the concrete benefit of gaining trust (future invitations, hiding an ally or access to later decisive missions), the exposure caused by a Fail, and the score risk. A cover Success is a deliberate investment, not evidence that you or your allies became Good. Use missionRule: one Fail cannot defeat a mission needing two. Your card does not cancel another card. Compare Success and Fail against the current score: at two Good successes, another success immediately triggers assassination. If two Evil are on a mission requiring two Fails, both need Fail to defeat it. Do not rely on one ally alone. Shared sabotage convention: if sabotage is strategically needed, the lowest-numbered known Evil participants, up to failsRequired, play Fail; additional Evil play Success to avoid redundant revealing cards. This is a coordination convention, not knowledge of future cards. With exactly two Evil and a two-Fail threshold both must Fail. With two Good successes prioritize preventing the third success over hypothetical future trust; with two Evil failures prioritize winning now when enough Evil are present. Never sacrifice a decisive sabotage merely to gain trust for a round that may never happen. If too few Evil are present to reach failsRequired, a Fail cannot change the mission result and only exposes information. With a safe score margin, a cover Success can be preferable; identify its concrete benefit and the next opportunity. A successful mission does not prove anyone Good.`;
     case 'checkLoyalty':
     case 'announceLoyalty':
       return `${format} ${rules} ${ladyTrust} Lady checks alignment and passes to the inspected player; past holders cannot be checked. Good announces privateKnowledge.inspectionResult truthfully by default: Lady explains the knowledge without revealing Merlin. A lie requires a concrete protective tactic. Evil may lie for its side. inspectionTarget is NOT a mission team.`;
     case 'assassinate':
-      return `${format} ${rules} Find Merlin, not merely an active Good leader. Compare direct role claims with behavior, possible bluffs and privileged knowledge of Evil excluding Mordred. All Evil share this objective. When privateDiscussion=true your speech is PRIVATE: recommend the SAME target as choice, cite evidence, compare an alternative and respond to previous advice. A Lady Good result does NOT exclude Merlin: Merlin is Good, and Lady reveals alignment, not role. Leading the last successful mission is weak evidence: leaders cannot control others' cards. In council, give one piece of evidence for your candidate and one reason an alternative could be Merlin; challenge unsupported earlier advice instead of merely agreeing. The designated assassin chooses after comparing alternatives, not by council popularity. Public testimony is evidence, not proof.`;
+      return `${format} ${rules} Find Merlin, not merely an active Good leader. Compare direct role claims with behavior, possible bluffs and privileged knowledge of Evil excluding Mordred. All Evil share this objective. When privateDiscussion=true your speech is PRIVATE: recommend the SAME target as choice, cite evidence, compare an alternative and respond to previous advice. A Lady Good result does NOT exclude Merlin: Merlin is Good, and Lady reveals alignment, not role. Leadership, taking a Lady check and mission success are weak signals available to any Good player. Seek correct alignment knowledge expressed BEFORE it became public; match each clue to its time and possible source. A deduction following public Fail cards or a Lady announcement is not unique Merlin knowledge. Merlin cannot see Mordred: naming Mordred after a public check is not evidence of secret sight. Compare early statements against later statements, and actively challenge the first council suggestion. A Good Lady result never rules out Merlin. In council, give one piece of evidence for your candidate and one reason an alternative could be Merlin; challenge unsupported earlier advice instead of merely agreeing. The designated assassin chooses after comparing alternatives, not by council popularity. Public testimony is evidence, not proof.`;
     default:
       return `${format} ${rules} ${deductionExamples} ${ladyTrust} Normally include yourself in proposals: Good reduces unknowns, Evil gains trust or sabotage opportunities. Omit yourself only for a concrete tactical reason. Prefer coherent teams over equally safe teams with players opposing each other; conflict is not proof. Majority approves. Reject cancels ONLY the proposal, rotates the leader and leaves the mission number and score unchanged. Fail is a secret mission card, NOT a vote. Example only: score 0-0, team [1,4] rejected means still 0-0 with NO completed mission. Approving an Evil team allows sabotage; rejecting it prevents that attempt. Proposal 5 is automatic, not an Evil win. If the fifth leader is suspicious, seek an acceptable earlier team without blindly accepting a losing roster. Follow missionRule, not intuition about Fail counts. Never claim to join a team without your seat. Normally support your own unchanged proposal. Public voting speech gives only the factual reason; the server announces your current vote. You may describe earlier votes accurately, but do not repeat your current vote. Proposal speech explains the selected roster without repeating it.`;
   }
@@ -83,9 +86,9 @@ export function systemFor(request: BotRequest): string {
 
 const roleAdvice: Record<string, string> = {
   merlin:
-    'Your survival is part of winning, not an optional final step. Never publicly name your role or quote your secret Evil list. Guide Good with public evidence and cautious suspicions. Evaluate the whole roster against failsRequired. With two Fails required, exactly one Evil is SAFE for the mission even if that player always plays Fail; approving it can secure the third success. Reject if a second Evil could be present and a safer roster is available. You see only two Evil in this seven-player setup: Mordred is hidden. Unknown is NOT confirmed Good. Locate the remaining Evil using completed missions; never clear everyone outside your visible Evil list. If a failed mission contained neither visible Evil, hidden Mordred was among its participants. Do not call those suspects likely Good just because you cannot see them. Prefer a roster excluding that suspect group when enough other seats remain, especially alongside one known Evil on a two-Fail mission.',
+    'Your survival is part of winning, not an optional final step. Never publicly name your role or quote your secret Evil list. Guide Good with public evidence and cautious suspicions. Never call someone confirmed Evil publicly just because you can see their role. Track whether other players repeatedly cite you as the sole source: that exposes you. Do not reveal the other wizard when making an intentional Percival cover claim. Evaluate the whole roster against failsRequired. With two Fails required, exactly one Evil is SAFE for the mission even if that player always plays Fail; approving it can secure the third success. Reject if a second Evil could be present and a safer roster is available. You see only two Evil in this seven-player setup: Mordred is hidden. Unknown is NOT confirmed Good. Locate the remaining Evil using completed missions; never clear everyone outside your visible Evil list. If a failed mission contained neither visible Evil, hidden Mordred was among its participants. Do not call those suspects likely Good just because you cannot see them. Prefer a roster excluding that suspect group when enough other seats remain, especially alongside one known Evil on a two-Fail mission.',
   percival:
-    'Your wizard pair contains Merlin and Morgana; you do NOT know which is which. Treat them as candidates, never label either Morgana as fact without evidence. Track the actual author of Lady claims. Protect likely Merlin without exposing the pair or your certainty. You do not know other alignments.',
+    'Your wizard pair contains Merlin and Morgana; you do NOT know which is which. Treat them as candidates, never label either Morgana as fact without evidence. Track the actual author of Lady claims. Protect likely Merlin without exposing the pair or your certainty. Compare the wizard candidates’ early votes and support for later-exposed Evil; a good mission alone does not resolve the pair. You may make an intentional Percival claim via claimMorgana without naming the other wizard. You do not know other alignments.',
   servant:
     'You are ALWAYS Good. Deliberate mission failure or helping Evil NEVER benefits you. Infer from mission rosters and public behavior, not invented private knowledge.',
   mordred:
@@ -98,6 +101,7 @@ const roleAdvice: Record<string, string> = {
 
 export function compactRequest(request: BotRequest) {
   const { state } = request;
+  const claims = claimContext(request);
   const players = state.players || [];
   const seat = (id?: string) => players.find((p) => p.id === id)?.index;
   const own = players.find((p) => p.id === request.playerID);
@@ -235,6 +239,10 @@ export function compactRequest(request: BotRequest) {
       teamStage && failsRequired !== undefined
         ? { successWithFails: Array.from({ length: failsRequired }, (_, i) => i), failureAtLeast: failsRequired }
         : undefined,
+    publicRoleClaims: claims.claims,
+    previousClaimStances: claims.previousStances,
+    claimTargets: claims.targets,
+    requiredClaimStances: claims.claimants,
     inspectionTarget: inspection ? seat(players.find((p) => p.features.isSelected)?.id) : undefined,
     // The first two lists are authoritative event classes, never interchangeable.
     missions,
@@ -284,7 +292,7 @@ export function parseReply(text: string, choices: number | string[], maxSpeech =
   return { choice: value.choice, speech: value.speech.trim() };
 }
 
-export function parseDecisionReply(text: string, choices: string[]): BotReply {
+export function parseDecisionReply(text: string, choices: string[], request?: BotRequest): BotReply {
   const reply = parseReply(text, choices);
   const data = JSON.parse(text.replace(/^```(?:json)?\s*|\s*```$/g, ''));
   const bounded = (value: unknown, max: number) =>
@@ -315,7 +323,17 @@ export function parseDecisionReply(text: string, choices: string[]): BotReply {
           ? ('claim' as const)
           : item.certainty,
   }));
-  return { ...reply, publicReason: data.publicReason.trim(), evidence };
+  const result = {
+    ...reply,
+    publicReason: data.publicReason.trim(),
+    evidence,
+    ...(data.claimMorgana != null ? { claimMorgana: data.claimMorgana } : {}),
+    ...(data.claimStances ? { claimStances: data.claimStances } : {}),
+  };
+  if (request) claimSpeech(request, result);
+  else if (data.claimMorgana != null || data.claimStances?.length)
+    throw new AiTechnicalPause('Unexpected public claim');
+  return result;
 }
 
 export type GenerationOptions = {
@@ -381,6 +399,32 @@ export function yandexDecide(
       const previous = reset ? undefined : saved;
       audit.contextReset = reset;
       audit.retainedBytes = previous?.bytes || 0;
+      const claim = claimContext(request);
+      const claimSchema = options.decisionDetails
+        ? {
+            ...(claim.targets.length
+              ? { claimMorgana: { type: ['integer', 'null'], enum: [null, ...claim.targets] } }
+              : {}),
+            ...(claim.claimants.length
+              ? {
+                  claimStances: {
+                    type: 'array',
+                    minItems: claim.claimants.length,
+                    maxItems: claim.claimants.length,
+                    items: {
+                      type: 'object',
+                      additionalProperties: false,
+                      required: ['seat', 'stance'],
+                      properties: {
+                        seat: { type: 'integer', enum: claim.claimants },
+                        stance: { type: 'string', enum: ['trust', 'distrust'] },
+                      },
+                    },
+                  },
+                }
+              : {}),
+          }
+        : {};
       const maxOutput = options.maxOutput ?? (sessionMode ? (request.speak ? 384 : 256) : request.speak ? 192 : 32);
       const seen = new Set(saved?.seen);
       const context = compactRequest(request);
@@ -469,9 +513,10 @@ export function yandexDecide(
                 required: sessionMode
                   ? ['choice', 'speech', 'memory']
                   : options.decisionDetails
-                    ? ['evidence', 'speech', 'choice', 'publicReason']
+                    ? ['evidence', 'speech', 'choice', 'publicReason', ...Object.keys(claimSchema)]
                     : ['choice', 'speech'],
                 properties: {
+                  ...claimSchema,
                   ...(options.decisionDetails
                     ? {
                         publicReason: { type: 'string', maxLength: 240 },
@@ -627,13 +672,15 @@ export function yandexDecide(
       if (data.choices?.[0]?.finish_reason !== 'stop')
         throw new AiTechnicalPause('Модель не вернула завершённый ответ. Партия приостановлена.');
       const reply = options.decisionDetails
-        ? parseDecisionReply(data.choices[0].message.content, request.choices)
+        ? parseDecisionReply(data.choices[0].message.content, request.choices, request)
         : parseReply(data.choices[0].message.content, request.choices, request.state.stage === 'end' ? 800 : 500);
       Object.assign(trace!, {
         choice: request.choices[reply.choice],
         speech: reply.speech,
         publicReason: reply.publicReason,
         evidence: reply.evidence,
+        claimMorgana: reply.claimMorgana,
+        claimStances: reply.claimStances,
       });
       await writeTrace();
       audit.status = 'completed';
