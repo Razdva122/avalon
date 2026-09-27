@@ -9,6 +9,7 @@ import cors from 'cors';
 import { backendPort, frontendOrigin } from '@/const';
 
 import { connectDB, DBManager } from '@/db';
+import { MigrationError, ensureAchievementCatalog } from '@/db/migrations';
 
 import { Manager } from '@/main';
 import { supportRouter } from '@/support/routes';
@@ -16,6 +17,8 @@ import { directSupport } from '@/support/direct/service';
 import { startSupportWorker } from '@/support/direct/worker';
 import { supportOrderModel } from '@/support/repository';
 import { ratingScheduler } from '@/scripts/scheduler';
+import { ensureRoleRatingIndexes } from '@/scripts/roleRatingStorage';
+import { ensureTrueSkillSnapshotIndexes } from '@/scripts/trueSkillSnapshotStorage';
 import { userProfileModel } from '@/db/models';
 import { mailConfig } from '@/recovery/config';
 import { MongoRecoveryRepository } from '@/recovery/repository';
@@ -45,12 +48,16 @@ const io = new Server(server, { ...corsOpts, maxHttpBufferSize: 64 * 1024 });
 app.use(CookieParser());
 app.use(cors(corsOpts.cors));
 
-connectDB().then(async (mongoose) => {
+async function start() {
+  const mongoose = await connectDB();
+  await ensureAchievementCatalog(mongoose.connection.db!);
   await supportOrderModel.init();
+  await ensureRoleRatingIndexes();
+  await ensureTrueSkillSnapshotIndexes();
   startSupportWorker(directSupport);
   app.use('/api/support', supportRouter);
   let recovery: RecoveryService | null = null;
-  if (mailSettings && mongoose?.connection.db) {
+  if (mailSettings && mongoose.connection.db) {
     const repository = new MongoRecoveryRepository(mongoose.connection.db, userProfileModel.collection.name);
     await repository.init();
     recovery = new RecoveryService(repository, mailSettings, smtpSender(mailSettings));
@@ -67,8 +74,17 @@ connectDB().then(async (mongoose) => {
   // Start the rating scheduler (will initialize ratings if needed)
   await ratingScheduler.start();
   console.log('Rating system initialized and scheduler started');
-});
+  server.listen(backendPort, () => {
+    console.log(`server running at http://localhost:${backendPort}`);
+  });
+}
 
-server.listen(backendPort, () => {
-  console.log(`server running at http://localhost:${backendPort}`);
+void start().catch((error: unknown) => {
+  // Do not serialize driver errors: connection strings can contain credentials.
+  console.error(
+    error instanceof MigrationError
+      ? error.message
+      : 'Backend startup failed. Check database availability and migration diagnostics.',
+  );
+  process.exit(1);
 });

@@ -1,93 +1,67 @@
 import { DBManager } from './index';
 import { roomModel } from './models';
-import type { StartedRoomState } from '@avalon/types';
+import { Encoder, PacketType } from 'socket.io-parser';
+import { validPacket } from '@/security/validation';
 
 afterEach(() => jest.restoreAllMocks());
 
+test('the initial history cursor survives the actual Socket.IO wire encoding', () => {
+  const wire = new Encoder().encode({
+    type: PacketType.EVENT,
+    nsp: '/',
+    data: ['getPlayerGameSummariesPage', 'user', undefined],
+  })[0] as string;
+  const [event, userID, cursor] = JSON.parse(wire.slice(1));
+  expect(cursor).toBe(null);
+  expect(validPacket(event, [userID, cursor, () => {}])).toBe(true);
+});
 test.each([['room', 'victim'], { $ne: null }, '', 'bad.id', 'x'.repeat(81)])(
   'rejects unsafe IDs before querying: %p',
   async (id) => {
     const findOne = jest.spyOn(roomModel, 'findOne').mockResolvedValue(null);
     const find = jest.spyOn(roomModel, 'find').mockResolvedValue([]);
     const db = new DBManager(undefined);
-    for (const method of ['getRoomFromDB', 'getPlayerGames', 'getPlayerGameSummaries'] as const)
+    for (const method of [
+      'getRoomFromDB',
+      'getPlayerGames',
+      'getPlayerGameSummaries',
+      'getPlayerGameSummariesPage',
+    ] as const)
       await expect(db[method](id as string)).rejects.toThrow('Invalid ID');
     expect(findOne).not.toHaveBeenCalled();
     expect(find).not.toHaveBeenCalled();
   },
 );
 
-test('statistics share work, expire, and invalidate only after a successful save', async () => {
-  const now = jest.spyOn(Date, 'now').mockReturnValue(1000);
-  let count = 1;
-  const aggregate = jest.spyOn(roomModel, 'aggregate').mockImplementation(() => {
-    const result = Promise.resolve([{ gamesCount: count, goodWins: count, evilWins: 0 }]);
-    return Object.assign(result, { option: () => result }) as never;
+test('statistics share a pending calculation and permit retry after its failure', async () => {
+  let reject!: (error: Error) => void;
+  const failed = new Promise<never>((_, no) => {
+    reject = no;
   });
-  const save = jest
-    .spyOn(roomModel.prototype as unknown as { save(): Promise<void> }, 'save')
-    .mockResolvedValue(undefined);
+  const aggregate = jest.spyOn(roomModel, 'aggregate').mockImplementation(() => ({ option: () => failed }) as never);
   const db = new DBManager(undefined);
-  const stats = await Promise.all(Array.from({ length: 12 }, () => db.getFullStats()));
-  expect(stats[0].total.gamesCount).toBe(1);
-  expect(aggregate).toHaveBeenCalledTimes(3);
-  count = 2;
-  expect((await db.getFullStats()).total.gamesCount).toBe(1);
-  await db.saveRoomToDB({} as StartedRoomState);
-  expect((await db.getFullStats()).total.gamesCount).toBe(2);
-  count = 3;
-  save.mockRejectedValueOnce(Error('write failed'));
-  await expect(db.saveRoomToDB({} as StartedRoomState)).rejects.toThrow('write failed');
-  expect((await db.getFullStats()).total.gamesCount).toBe(2);
-  now.mockReturnValue(62000);
-  expect((await db.getFullStats()).total.gamesCount).toBe(3);
+  const pending = Promise.allSettled([db.getFullStats(), db.getFullStats()]);
+  reject(Error('temporarily unavailable'));
+  expect((await pending).map((r) => r.status)).toEqual(['rejected', 'rejected']);
+  expect(aggregate).toHaveBeenCalledTimes(1);
+  aggregate.mockImplementation(
+    () =>
+      ({
+        option: async () => [{ byPlayers: [{ gamesCount: 2, goodWins: 1, evilWins: 1 }], roles: [], addons: [] }],
+      }) as never,
+  );
+  expect((await db.getFullStats()).total).toMatchObject({
+    gamesCount: 2,
+    goodWinPercentage: 50,
+    evilWinPercentage: 50,
+  });
 });
 
-test('statistics failures can retry and a concurrent save cannot poison the cache', async () => {
-  let resolve!: (value: { gamesCount: number; goodWins: number; evilWins: number }[]) => void;
-  const delayed = new Promise<{ gamesCount: number; goodWins: number; evilWins: number }[]>((done) => {
-    resolve = done;
-  });
-  const aggregate = jest
-    .spyOn(roomModel, 'aggregate')
-    .mockImplementation(() => Object.assign(delayed, { option: () => delayed }) as never);
-  jest.spyOn(roomModel.prototype as unknown as { save(): Promise<void> }, 'save').mockResolvedValue(undefined);
-  const db = new DBManager(undefined);
-  const first = db.getFullStats();
-  await db.saveRoomToDB({} as StartedRoomState);
-  resolve([{ gamesCount: 1, goodWins: 1, evilWins: 0 }]);
-  await first;
-  aggregate.mockImplementation(() => {
-    const result = Promise.resolve([{ gamesCount: 2, goodWins: 2, evilWins: 0 }]);
-    return Object.assign(result, { option: () => result }) as never;
-  });
-  expect((await db.getFullStats()).total.gamesCount).toBe(2);
-  const other = new DBManager(undefined);
-  aggregate.mockImplementationOnce(() => {
-    throw Error('query failed');
-  });
-  await expect(other.getFullStats()).rejects.toThrow('query failed');
-  expect((await other.getFullStats()).total.gamesCount).toBe(2);
-});
-
-test('only legacy full replays are capped; player summaries retain every game', async () => {
-  const rows = Array.from({ length: 120 }, (_, i) => ({ game: { uuid: String(i) } }));
-  const find = jest.spyOn(roomModel, 'find').mockImplementation(() => {
-    let limit = rows.length;
-    const cursor = {
-      sort: () => cursor,
-      limit: (value: number) => {
-        limit = value;
-        return cursor;
-      },
-      maxTimeMS: () => cursor,
-      lean: async () => rows.slice(0, limit),
-      then: (resolve: (value: unknown) => void) => Promise.resolve(rows.slice(0, limit)).then(resolve),
-    };
-    return cursor as never;
-  });
-  const db = new DBManager(undefined);
-  expect(await db.getPlayerGames('player')).toHaveLength(100);
-  expect(await db.getPlayerGameSummaries('player')).toHaveLength(120);
-  expect(find).toHaveBeenCalledTimes(2);
-});
+test.each(['x', 'a'.repeat(24), { $gt: '' }, 'a'.repeat(24) + ':' + 'z'.repeat(24)])(
+  'rejects malformed history cursor %p',
+  async (cursor) => {
+    await expect(new DBManager(undefined).getPlayerGameSummariesPage('user', cursor as string)).rejects.toThrow(
+      'Invalid history cursor',
+    );
+  },
+);

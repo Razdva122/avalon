@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { AI_LEASE_MS } from './timing';
 import type { Db } from 'mongodb';
 import type { AiBudgetSnapshot, StartedRoomState, TRoomState, TRoomInfo } from '@avalon/types';
@@ -40,6 +41,9 @@ export type AiDecisionTrace = {
   output?: unknown;
 };
 
+type Reservation = { roomID: string; units: number; period?: string; dispatched?: boolean; actual?: number };
+type RoomBudget = { _id: string; units: number; limit?: number };
+
 type Ledger = {
   _id: string;
   used: number;
@@ -49,6 +53,9 @@ type Ledger = {
   leaseUntil?: Date;
   anchor?: number;
   periods?: Record<string, number>;
+  requests?: Record<string, Reservation>;
+  maintenance?: string;
+  retiring?: string[];
 };
 function validateID(id: unknown): asserts id is string {
   if (typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id)) throw new Error('Invalid ID');
@@ -64,6 +71,7 @@ export class AiRepository {
   private listPending?: Promise<TRoomInfo[]>;
   private listVersion = 0;
   private indexes?: Promise<unknown>;
+  private retentionIndexes?: Promise<unknown>;
 
   constructor(
     private db: Db,
@@ -78,16 +86,48 @@ export class AiRepository {
     )
       throw Error('Invalid AI budget limits');
   }
+  private retentionDate(start: Date, variable: string, fallback: number) {
+    const days = Number(process.env[variable] ?? fallback);
+    if (!Number.isSafeInteger(days) || days < 1 || days > 36500) throw new Error(`Invalid ${variable}`);
+    return new Date(start.getTime() + days * 86400000);
+  }
+  private async ensureRetentionIndexes() {
+    if (!this.retentionIndexes)
+      this.retentionIndexes = Promise.all([
+        this.db.collection('ai_request_costs').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+        this.db.collection('ai_decision_traces').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+      ]).catch((error) => {
+        this.retentionIndexes = undefined;
+        throw error;
+      });
+    await this.retentionIndexes;
+  }
   async recordRequest(entry: AiRequestLog) {
+    const expiresAt =
+      entry.actualUnits !== undefined || entry.status === 'completed'
+        ? this.retentionDate(entry.startedAt, 'AI_REQUEST_RETENTION_DAYS', 365)
+        : undefined;
+    await this.ensureRetentionIndexes();
     await this.db
       .collection<AiRequestLog>('ai_request_costs')
-      .updateOne({ _id: entry._id }, { $set: entry }, { upsert: true });
+      .updateOne({ _id: entry._id }, { $set: { ...entry, ...(expiresAt ? { expiresAt } : {}) } }, { upsert: true });
   }
   // Server-only diagnostics: never included in public room states or replays.
   async recordDecision(entry: AiDecisionTrace) {
+    const expiresAt = this.retentionDate(entry.createdAt, 'AI_TRACE_RETENTION_DAYS', 30);
+    await this.ensureRetentionIndexes();
     await this.db
       .collection<AiDecisionTrace>('ai_decision_traces')
-      .updateOne({ _id: entry._id }, { $set: entry }, { upsert: true });
+      .updateOne({ _id: entry._id }, { $set: { ...entry, expiresAt } }, { upsert: true });
+  }
+  private get ledgerID() {
+    return this.options.ledgerID || 'avalon-ai-v1';
+  }
+  private get archivedRooms() {
+    return this.db.collection<RoomBudget>('ai_room_budgets');
+  }
+  private archiveID(roomID: string) {
+    return `${this.ledgerID}:${roomID}`;
   }
   private get ledger() {
     return this.db.collection<Ledger>('ai_experiment_budget');
@@ -125,14 +165,101 @@ export class AiRepository {
   async claim(roomID: string) {
     validateID(roomID);
     await this.initialize();
-    const result = await this.ledger.updateOne(
+    const token = randomUUID();
+    const previous = await this.ledger.findOneAndUpdate(
       {
-        _id: this.options.ledgerID || 'avalon-ai-v1',
-        $or: [{ owner: { $exists: false } }, { leaseUntil: { $lt: new Date() } }, { owner: roomID }],
+        _id: this.ledgerID,
+        retiring: { $ne: roomID },
+        $and: [
+          { $or: [{ maintenance: { $exists: false } }, { leaseUntil: { $lt: new Date() } }] },
+          { $or: [{ owner: { $exists: false } }, { leaseUntil: { $lt: new Date() } }, { owner: roomID }] },
+        ],
       },
-      { $set: { owner: roomID, leaseUntil: new Date(Date.now() + AI_LEASE_MS) } },
+      { $set: { owner: roomID, maintenance: token, leaseUntil: new Date(Date.now() + AI_LEASE_MS) } },
+      { returnDocument: 'before' },
     );
-    if (!result.matchedCount) throw new AiPause('Другая AI-партия уже запущена.');
+    if (!previous) throw new AiPause('Другая AI-партия уже запущена.');
+    try {
+      if (await this.archivedRooms.findOne({ _id: this.archiveID(roomID) }))
+        throw new AiPause('Архивная партия не может расходовать бюджет.');
+      // An abandoned pre-dispatch reservation cannot have incurred a provider charge.
+      // Apply refunds and remove their receipts in the same document write.
+      const recover = previous.owner !== roomID || (previous.leaseUntil?.getTime() || 0) < Date.now();
+      if (recover) {
+        const refunds: Record<string, number> = {};
+        const receipts: Record<string, ''> = {};
+        for (const [id, request] of Object.entries(previous.requests || {})) {
+          if (request.dispatched || request.actual !== undefined) continue;
+          for (const key of [
+            'used',
+            `rooms.${request.roomID}`,
+            ...(request.period ? [`periods.${request.period}`] : []),
+          ])
+            refunds[key] = (refunds[key] || 0) - request.units;
+          receipts[`requests.${id}`] = '';
+        }
+        if (Object.keys(receipts).length)
+          await this.ledger.updateOne({ _id: this.ledgerID, maintenance: token }, { $inc: refunds, $unset: receipts });
+      }
+      const current = await this.ledger.findOne({ _id: this.ledgerID, maintenance: token });
+      if (!current) throw new AiPause('Потеряно управление AI-партией.');
+      const retired = Object.entries(current.rooms).filter(([id]) => id !== roomID);
+      if (retired.length) {
+        // This durable barrier outlives the maintenance lease. A delayed archive writer
+        // cannot publish stale totals while another claimant reopens a retiring room.
+        const barrier = await this.ledger.updateOne(
+          { _id: this.ledgerID, maintenance: token },
+          { $set: { retiring: retired.map(([id]) => id) } },
+        );
+        if (!barrier.matchedCount) throw new AiPause('Потеряно управление AI-партией.');
+        // Persist immutable historical totals before removing counters. A restart can repeat both steps.
+        await this.archivedRooms.bulkWrite(
+          retired.map(([id, units]) => ({
+            updateOne: {
+              filter: { _id: this.archiveID(id) },
+              update: { $setOnInsert: { units, limit: current.roomLimits?.[id] ?? this.matchRub } },
+              upsert: true,
+            },
+          })),
+        );
+      }
+      const periods = Object.entries(current.periods || {}).sort(([a], [b]) => Number(b) - Number(a));
+      const retainedPeriods = new Set(periods.slice(0, 24).map(([period]) => period));
+      const activePeriod = this.period(current);
+      if (activePeriod !== undefined) retainedPeriods.add(String(activePeriod));
+      for (const request of Object.values(current.requests || {}))
+        if (request.roomID === roomID && request.actual === undefined && request.period)
+          retainedPeriods.add(request.period);
+      const retiredPeriods = periods.filter(([period]) => !retainedPeriods.has(period));
+      if (retiredPeriods.length)
+        await this.db.collection<{ _id: string; units: number }>('ai_budget_periods').bulkWrite(
+          retiredPeriods.map(([period, units]) => ({
+            updateOne: {
+              filter: { _id: `${this.ledgerID}:${period}` },
+              update: { $setOnInsert: { units } },
+              upsert: true,
+            },
+          })),
+        );
+      const remove: Record<string, ''> = { retiring: '' };
+      for (const [period] of retiredPeriods) remove[`periods.${period}`] = '';
+      for (const [id] of retired) {
+        remove[`rooms.${id}`] = '';
+        remove[`roomLimits.${id}`] = '';
+      }
+      for (const [id, request] of Object.entries(current.requests || {}))
+        if (request.roomID !== roomID) remove[`requests.${id}`] = '';
+      if (Object.keys(remove).length)
+        await this.ledger.updateOne({ _id: this.ledgerID, maintenance: token }, { $unset: remove });
+    } catch (error) {
+      await this.ledger.updateOne(
+        { _id: this.ledgerID, maintenance: token },
+        { $unset: { owner: '', leaseUntil: '' } },
+      );
+      throw error;
+    } finally {
+      await this.ledger.updateOne({ _id: this.ledgerID, maintenance: token }, { $unset: { maintenance: '' } });
+    }
   }
   async release(roomID: string) {
     validateID(roomID);
@@ -141,13 +268,16 @@ export class AiRepository {
       { $unset: { owner: '', leaseUntil: '' } },
     );
   }
-  async reserve(roomID: string, units: number) {
+  async reserve(roomID: string, units: number, requestID?: string) {
+    if (requestID !== undefined) validateID(requestID);
     validateID(roomID);
     if (!Number.isSafeInteger(units) || units <= 0 || !/^[a-zA-Z0-9-]+$/.test(roomID))
       throw new AiPause('Ошибка учёта расхода.');
     const roomKey = `rooms.${roomID}`;
     const ledger = await this.ledger.findOne({ _id: this.options.ledgerID || 'avalon-ai-v1' });
     if (!ledger || ledger.owner !== roomID) throw new AiPause('Потеряно управление AI-партией.');
+    if (requestID && ledger.requests?.[requestID]) throw new AiPause('Запрос уже зарезервирован.');
+    if (Object.keys(ledger.requests || {}).length >= 2048) throw new AiPause('Достигнут предел запросов партии.');
     const matchRub = ledger.roomLimits?.[roomID] ?? this.matchRub;
     const period = this.period(ledger);
     const totalKey = period === undefined ? 'used' : `periods.${period}`;
@@ -155,8 +285,11 @@ export class AiRepository {
       {
         _id: ledger._id,
         owner: roomID,
+        maintenance: { $exists: false },
+        ...(requestID ? { [`requests.${requestID}`]: { $exists: false } } : {}),
         $expr: {
           $and: [
+            { $lt: [{ $size: { $objectToArray: { $ifNull: ['$requests', {}] } } }, 2048] },
             { $lte: [{ $ifNull: [`$${totalKey}`, 0] }, Math.floor(this.totalRub * 10000) - units] },
             { $lte: [{ $ifNull: [`$${roomKey}`, 0] }, Math.floor(matchRub * 10000) - units] },
           ],
@@ -164,7 +297,18 @@ export class AiRepository {
       },
       {
         $inc: { used: units, [roomKey]: units, ...(period === undefined ? {} : { [totalKey]: units }) },
-        $set: { leaseUntil: new Date(Date.now() + AI_LEASE_MS) },
+        $set: {
+          leaseUntil: new Date(Date.now() + AI_LEASE_MS),
+          ...(requestID
+            ? {
+                [`requests.${requestID}`]: {
+                  roomID,
+                  units,
+                  ...(period === undefined ? {} : { period: String(period) }),
+                },
+              }
+            : {}),
+        },
       },
     );
     if (!result.matchedCount) {
@@ -186,7 +330,9 @@ export class AiRepository {
   async roomLimit(roomID: string) {
     validateID(roomID);
     const ledger = await this.ledger.findOne({ _id: this.options.ledgerID || 'avalon-ai-v1' });
-    return ledger?.roomLimits?.[roomID] ?? this.matchRub;
+    if (ledger?.rooms[roomID] !== undefined || ledger?.roomLimits?.[roomID] !== undefined)
+      return ledger.roomLimits?.[roomID] ?? this.matchRub;
+    return (await this.archivedRooms.findOne({ _id: this.archiveID(roomID) }))?.limit ?? this.matchRub;
   }
   async doubleMatchLimit(roomID: string, reserveUnits: number) {
     validateID(roomID);
@@ -207,6 +353,7 @@ export class AiRepository {
       {
         _id: ledger._id,
         owner: roomID,
+        maintenance: { $exists: false },
         [`roomLimits.${roomID}`]: previous ?? { $exists: false },
         $expr: { $lte: [{ $ifNull: [`$${totalKey}`, 0] }, Math.floor(this.totalRub * 10000) - reserveUnits] },
       },
@@ -215,7 +362,23 @@ export class AiRepository {
     if (!result.matchedCount) throw new AiPause('Лимит бюджета исчерпан или состояние партии изменилось.');
     return next;
   }
-  async settle(roomID: string, reserved: number, actual: number, period?: string) {
+  async markDispatched(roomID: string, requestID: string) {
+    validateID(roomID);
+    validateID(requestID);
+    const result = await this.ledger.updateOne(
+      {
+        _id: this.ledgerID,
+        owner: roomID,
+        maintenance: { $exists: false },
+        [`requests.${requestID}.roomID`]: roomID,
+        [`requests.${requestID}.actual`]: { $exists: false },
+      },
+      { $set: { [`requests.${requestID}.dispatched`]: true } },
+    );
+    if (!result.matchedCount) throw new AiPause('Потерян резерв запроса.');
+  }
+  async settle(roomID: string, reserved: number, actual: number, period?: string, requestID?: string) {
+    if (requestID !== undefined) validateID(requestID);
     validateID(roomID);
     if (
       !Number.isSafeInteger(actual) ||
@@ -227,9 +390,22 @@ export class AiRepository {
     )
       throw new AiPause('Некорректный расход API.');
     if (this.options.periodDays && period === undefined) throw new AiPause('Не указан период резерва.');
-    await this.ledger.updateOne(
-      { _id: this.options.ledgerID || 'avalon-ai-v1' },
+    const result = await this.ledger.updateOne(
       {
+        _id: this.ledgerID,
+        owner: roomID,
+        maintenance: { $exists: false },
+        ...(requestID
+          ? {
+              [`requests.${requestID}.roomID`]: roomID,
+              [`requests.${requestID}.units`]: reserved,
+              [`requests.${requestID}.period`]: period ?? { $exists: false },
+              [`requests.${requestID}.actual`]: { $exists: false },
+            }
+          : {}),
+      },
+      {
+        ...(requestID ? { $set: { [`requests.${requestID}.actual`]: actual } } : {}),
         $inc: {
           used: actual - reserved,
           [`rooms.${roomID}`]: actual - reserved,
@@ -237,12 +413,26 @@ export class AiRepository {
         },
       },
     );
+    if (!result.matchedCount) {
+      const ledger = await this.ledger.findOne({ _id: this.ledgerID });
+      const receipt = requestID ? ledger?.requests?.[requestID] : undefined;
+      if (
+        !receipt ||
+        receipt.roomID !== roomID ||
+        receipt.units !== reserved ||
+        receipt.period !== period ||
+        receipt.actual !== actual
+      )
+        throw new AiPause('Расчёт запроса уже закрыт или резерв изменился.');
+    }
     if (actual > reserved) throw new AiPause('Расход превысил резерв. Требуется проверка тарифа.');
   }
   async roomCost(roomID: string) {
     validateID(roomID);
     const ledger = await this.ledger.findOne({ _id: this.options.ledgerID || 'avalon-ai-v1' });
-    return (ledger?.rooms[roomID] || 0) / 10000;
+    const units =
+      ledger?.rooms[roomID] ?? (await this.archivedRooms.findOne({ _id: this.archiveID(roomID) }))?.units ?? 0;
+    return units / 10000;
   }
   async save(state: TRoomState) {
     // Separate collection keeps AI replays out of all existing ranked statistics queries.

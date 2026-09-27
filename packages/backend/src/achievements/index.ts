@@ -1,3 +1,5 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
+export const achievementGameContext = new AsyncLocalStorage<number>();
 import { userChannel } from '@/helpers/channels';
 import { Achievement, UserAchievement, AchievementStats } from '@avalon/types';
 import { Server } from 'socket.io';
@@ -41,6 +43,7 @@ export class AchievementService {
     userID: string,
     achievementID: string,
     newStateKey?: string | number,
+    gameSequence = achievementGameContext.getStore(),
   ): Promise<UserAchievement> {
     // Получаем информацию о достижении
     const achievement = await achievementModel.findOne({ id: achievementID }).lean();
@@ -48,62 +51,82 @@ export class AchievementService {
       throw new Error(`Achievement ${achievementID} not found`);
     }
 
-    // Получаем текущий прогресс пользователя
-    const userAchievement = await userAchievementModel
-      .findOne({
-        userID,
-        achievementID,
-      })
-      .lean();
-
-    // Если достижение уже завершено и не требуется принудительное обновление, возвращаем текущее состояние
-    if (userAchievement?.completed) {
-      return userAchievement;
-    }
-
-    if (newStateKey && userAchievement?.state?.[newStateKey] === true) {
-      return userAchievement;
-    }
-
-    // Определяем текущий прогресс
-    const currentProgress = userAchievement?.currentProgress ?? 0;
-
-    // Обновляем прогресс
-    const newProgress = currentProgress + 1;
-
-    // Проверяем, достигнуто ли требуемое значение
-    const wasCompleted = userAchievement?.completed ?? false;
-    const completed = newProgress >= achievement.requirement;
-
-    // Обновляем запись в базе данных
-    const updatedAchievement = await userAchievementModel
-      .findOneAndUpdate(
-        { userID, achievementID },
-        {
-          $set: {
-            currentProgress: newProgress,
-            completed,
-            completedAt: completed && !wasCompleted ? new Date() : userAchievement?.completedAt,
-            state: newStateKey ? { ...userAchievement?.state, [newStateKey]: true } : undefined,
-            updatedAt: new Date(),
+    const key = newStateKey === undefined ? undefined : String(newStateKey);
+    const allowed = {
+      $and: [
+        { $ne: [{ $ifNull: ['$completed', false] }, true] },
+        ...(key === undefined
+          ? []
+          : [{ $ne: [{ $getField: { field: key, input: { $ifNull: ['$state', {}] } } }, true] }]),
+        ...(gameSequence === undefined ? [] : [{ $lt: [{ $ifNull: ['$lastGameSequence', 0] }, gameSequence] }]),
+      ],
+    };
+    const pipeline = [
+      { $set: { _advance: allowed, userID: { $literal: userID }, achievementID: { $literal: achievementID } } },
+      {
+        $set: {
+          currentProgress: { $add: [{ $ifNull: ['$currentProgress', 0] }, { $cond: ['$_advance', 1, 0] }] },
+          state:
+            key === undefined
+              ? { $ifNull: ['$state', {}] }
+              : {
+                  $cond: [
+                    '$_advance',
+                    { $mergeObjects: [{ $ifNull: ['$state', {}] }, { $literal: { [key]: true } }] },
+                    { $ifNull: ['$state', {}] },
+                  ],
+                },
+          ...(gameSequence === undefined
+            ? {}
+            : { lastGameSequence: { $max: [{ $ifNull: ['$lastGameSequence', 0] }, gameSequence] } }),
+          updatedAt: '$$NOW',
+        },
+      },
+      {
+        $set: {
+          completed: { $gte: ['$currentProgress', achievement.requirement] },
+          completedAt: {
+            $cond: [
+              { $and: ['$_advance', { $gte: ['$currentProgress', achievement.requirement] }] },
+              '$$NOW',
+              '$completedAt',
+            ],
           },
         },
-        { new: true, upsert: true },
-      )
-      .lean();
-
-    // Если достижение было завершено, обновляем статистику и отправляем уведомление
-    if (completed && !wasCompleted) {
-      // Отправляем уведомление о новом достижении через Socket.io
-      this.notifyAchievementUnlocked(userID, achievementID);
-
-      await this.updateAchievementStats(achievementID);
-    } else if (!completed && newProgress > currentProgress) {
-      // Отправляем уведомление о прогрессе в достижении
-      this.notifyAchievementProgress(userID, achievementID, newProgress, achievement.requirement);
+      },
+      { $unset: '_advance' },
+    ];
+    // Unique natural key prevents duplicate first writes. Retry an upsert race against its winner.
+    const apply = () =>
+      userAchievementModel
+        .findOneAndUpdate({ userID, achievementID }, pipeline, {
+          upsert: true,
+          returnDocument: 'before',
+          updatePipeline: true,
+        })
+        .lean();
+    let previous;
+    try {
+      previous = await apply();
+    } catch (error) {
+      if ((error as { code?: number }).code !== 11000) throw error;
+      previous = await apply();
     }
-
-    return updatedAchievement;
+    const updated = await userAchievementModel.findOne({ userID, achievementID }).lean();
+    if (!updated) throw new Error('Achievement update disappeared');
+    const advanced =
+      !previous?.completed &&
+      (key === undefined || previous?.state?.[key] !== true) &&
+      (gameSequence === undefined || (previous?.lastGameSequence ?? 0) < gameSequence);
+    if (updated.completed) {
+      // Recompute even on a replay: a previous attempt may have failed after progress was committed.
+      await this.updateAchievementStats(achievementID);
+      if (advanced && (previous?.currentProgress ?? 0) + 1 >= achievement.requirement)
+        this.notifyAchievementUnlocked(userID, achievementID);
+    } else if (advanced) {
+      this.notifyAchievementProgress(userID, achievementID, updated.currentProgress, achievement.requirement);
+    }
+    return updated;
   }
 
   /**
@@ -120,19 +143,37 @@ export class AchievementService {
       completed: true,
     });
 
-    const completionPercentage = totalUsers > 0 ? (completedUsers / totalUsers) * 100 : 0;
-
-    await achievementStatsModel.findOneAndUpdate(
-      { achievementID },
-      {
-        $set: {
-          totalUsers,
-          completedUsers,
-          completionPercentage,
-        },
-      },
-      { new: true, upsert: true },
-    );
+    const apply = () =>
+      achievementStatsModel.findOneAndUpdate(
+        { achievementID },
+        [
+          {
+            $set: {
+              achievementID: { $literal: achievementID },
+              totalUsers: { $max: [{ $ifNull: ['$totalUsers', 0] }, totalUsers] },
+              completedUsers: { $max: [{ $ifNull: ['$completedUsers', 0] }, completedUsers] },
+            },
+          },
+          {
+            $set: {
+              completionPercentage: {
+                $cond: [
+                  { $gt: ['$totalUsers', 0] },
+                  { $multiply: [{ $divide: ['$completedUsers', '$totalUsers'] }, 100] },
+                  0,
+                ],
+              },
+            },
+          },
+        ],
+        { upsert: true, updatePipeline: true },
+      );
+    try {
+      await apply();
+    } catch (error) {
+      if ((error as { code?: number }).code !== 11000) throw error;
+      await apply();
+    }
   }
 
   /**

@@ -74,6 +74,7 @@
 </template>
 
 <script lang="ts">
+import { loadPlayerGames } from '@/helpers/stats/load-games';
 import { defineComponent, ref, computed, watch, onUnmounted, toRef } from 'vue';
 import { useUserProfile } from '@/helpers/composables';
 import { socket } from '@/api/socket';
@@ -150,7 +151,10 @@ export default defineComponent({
           });
       else ratingsLoading.value = false;
       try {
-        const games = await socket.timeout(20000).emitWithAck('getPlayerGameSummaries', userID);
+        const games = await loadPlayerGames(
+          (cursor) => socket.timeout(20000).emitWithAck('getPlayerGameSummariesPage', userID, cursor ?? null),
+          () => currentRequest === requestId,
+        );
         if (currentRequest !== requestId) return;
         if (!Array.isArray(games)) throw new Error('Player statistics unavailable');
         const stats = prepareUserStats(games, userID).teams.total;

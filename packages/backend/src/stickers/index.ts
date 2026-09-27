@@ -15,21 +15,64 @@ export class StickersManager {
   private sending = new Set<string>();
   private lastSent = new Map<string, number>();
 
+  private gameCounts = new Map<string, { expires: number; pending: Promise<number> }>();
+
+  invalidateGameCounts(userIDs: string[]): void {
+    for (const userID of userIDs) this.gameCounts.delete(userID);
+  }
+
+  private gameCount(userID: string): Promise<number> {
+    const cached = this.gameCounts.get(userID);
+    if (cached && cached.expires > Date.now()) return cached.pending;
+    const pending = this.countGames(userID);
+    const entry = { expires: Date.now() + 60000, pending };
+    this.gameCounts.set(userID, entry);
+    if (this.gameCounts.size > 5000) this.gameCounts.delete(this.gameCounts.keys().next().value!);
+    void pending.catch(() => {
+      if (this.gameCounts.get(userID) === entry) this.gameCounts.delete(userID);
+    });
+    return pending;
+  }
+
+  private async countGames(userID: string): Promise<number> {
+    const required = Math.max(0, ...STICKERS.map((sticker) => sticker.games || 0));
+    if (!required) return 0;
+    // Stop as soon as every game-count unlock is satisfied. The set stays bounded by that threshold.
+    const rooms = roomModel
+      .find(
+        {
+          'players.id': userID,
+          'game.stage': 'end',
+          'game.result.winner': { $in: ['good', 'evil'] },
+          'game.result.reason': { $ne: 'manualy' },
+        },
+        { roomID: 1, _id: 0 },
+      )
+      .maxTimeMS(10000)
+      .lean()
+      .cursor({ batchSize: 32 });
+    const ids = new Set<string>();
+    try {
+      for await (const room of rooms) {
+        ids.add(room.roomID);
+        if (ids.size >= required) break;
+      }
+    } finally {
+      await rooms.close();
+    }
+    return ids.size;
+  }
+
   async collection(userID: string): Promise<StickerCollection> {
     const [games, achievements, features, total] = await Promise.all([
-      roomModel.distinct('roomID', {
-        'game.players.id': userID,
-        'game.stage': 'end',
-        'game.result.winner': { $in: ['good', 'evil'] },
-        'game.result.reason': { $ne: 'manualy' },
-      }),
+      this.gameCount(userID),
       userAchievementModel.find({ userID }).lean(),
       userFeaturesModel.findOne({ userID }).lean(),
       supportTotalCents(userID),
     ]);
     const completed = achievements.filter((a) => a.completed).map((a) => a.achievementID);
     const stickers = STICKERS.map((sticker) => {
-      const available = isStickerAvailable(sticker, games.length, completed, hasPremium(total, features));
+      const available = isStickerAvailable(sticker, games, completed, hasPremium(total, features));
       const achievement = achievements.find((a) => a.achievementID === sticker.achievement);
       const requirement = sticker.games || achievementsData.find((a) => a.id === sticker.achievement)?.requirement || 1;
       const secret = sticker.hidden && !available;
@@ -46,7 +89,7 @@ export class StickersManager {
                 : sticker.achievement
                   ? achievement?.currentProgress || 0
                   : sticker.games
-                    ? games.length
+                    ? games
                     : 1,
             ),
         isNew:

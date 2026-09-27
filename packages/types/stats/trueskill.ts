@@ -15,6 +15,9 @@ import { DEFAULT_MU, DEFAULT_SIGMA, calculateConservativeRating } from './truesk
   },
 })
 export class PlayerTrueSkillRating {
+  @prop({ default: 0 })
+  ratingSequence!: number;
+
   @prop({ required: true, unique: true })
   userID!: string;
 
@@ -106,7 +109,7 @@ export class TrueSkillRatingSnapshot {
   },
 })
 export class GameTrueSkillResult {
-  @prop({ required: true })
+  @prop({ required: true, unique: true })
   gameID!: string;
 
   @prop({ required: true, type: Date })

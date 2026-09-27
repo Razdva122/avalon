@@ -42,7 +42,15 @@ export function installSocketAdmission(io: Server) {
       }
       if (['updateUserPassword', 'updateUserEmail', 'updateUserLogin'].includes(event))
         allowed = allowed && limits.take(`credentials:${user || ip}`, 10, 900000);
-      if (['getTotalStats', 'getPlayerGames', 'getPlayerGameSummaries', 'getAiRoomsList'].includes(event))
+      if (
+        [
+          'getTotalStats',
+          'getPlayerGames',
+          'getPlayerGameSummaries',
+          'getPlayerGameSummariesPage',
+          'getAiRoomsList',
+        ].includes(event)
+      )
         allowed = allowed && limits.take(`expensive:${ip}`, 60, 60000);
       if (['createRoom', 'restartGame'].includes(event))
         allowed = allowed && limits.take(`create:${user || ip}`, 10, 60000);

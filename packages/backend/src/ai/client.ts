@@ -368,6 +368,8 @@ export function yandexDecide(
       status: 'preparing',
     };
     let trace: AiDecisionTrace | undefined;
+    let reservation: { units: number; period?: string } | undefined;
+    let dispatched = false;
     const writeTrace = async () => {
       try {
         if (trace && repository.recordDecision) await repository.recordDecision(trace);
@@ -484,11 +486,13 @@ export function yandexDecide(
       const reserve = (inputBytes + 4096) * tariff.input + maxOutput * tariff.output;
       audit.reserveUnits = reserve;
       audit.status = 'reserving';
-      const budgetPeriod = await repository.reserve(roomID, reserve);
+      const budgetPeriod = await repository.reserve(roomID, reserve, audit._id);
+      reservation = { units: reserve, period: budgetPeriod };
       audit.status = 'reserved';
       await writeAudit();
       if (signal?.aborted) {
-        await repository.settle(roomID, reserve, 0, budgetPeriod);
+        await repository.settle(roomID, reserve, 0, budgetPeriod, audit._id);
+        reservation = undefined;
         audit.status = 'cancelled-before-send';
         audit.actualUnits = 0;
         onCost(await repository.roomCost(roomID));
@@ -574,6 +578,10 @@ export function yandexDecide(
         await writeTrace();
         audit.status = 'sent';
         await writeAudit();
+        signal?.throwIfAborted();
+        if (repository.markDispatched) await repository.markDispatched(roomID, audit._id);
+        signal?.throwIfAborted();
+        dispatched = true;
         const response = await fetch(
           `https://ai.api.cloud.yandex.net/v1/${sessionMode ? 'responses' : 'chat/completions'}`,
           {
@@ -635,7 +643,8 @@ export function yandexDecide(
       audit.cachedTokens = cached;
       audit.outputTokens = usage.completion_tokens;
       audit.actualUnits = actual;
-      await repository.settle(roomID, reserve, actual, budgetPeriod);
+      await repository.settle(roomID, reserve, actual, budgetPeriod, audit._id);
+      reservation = undefined;
       onCost(await repository.roomCost(roomID));
       if (sessionMode) {
         if (data.status !== 'completed' || typeof data.id !== 'string')
@@ -686,6 +695,12 @@ export function yandexDecide(
       audit.status = 'completed';
       return reply;
     } catch (error) {
+      if (reservation && !dispatched) {
+        await repository.settle(roomID, reservation.units, 0, reservation.period, audit._id);
+        reservation = undefined;
+        audit.actualUnits = 0;
+        onCost(await repository.roomCost(roomID));
+      }
       audit.status =
         audit.status === 'reserving'
           ? 'reservation-rejected'

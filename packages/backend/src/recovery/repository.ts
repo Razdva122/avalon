@@ -52,6 +52,9 @@ export class MongoRecoveryRepository {
       this.counters.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
       this.users.createIndex({ 'recoveryTokens.hash': 1 }, { sparse: true }),
       this.users.createIndex({ 'mailQueue.availableAt': 1 }, { sparse: true }),
+      this.users.createIndex({ 'mailQueue.expiresAt': 1 }, { sparse: true }),
+      this.users.createIndex({ 'mailQueue.leaseUntil': 1 }, { sparse: true }),
+      this.users.createIndex({ 'recoveryTokens.expiresAt': 1 }, { sparse: true }),
     ]);
   }
   async take(key: string, limits: { count: number; ms: number }[], now: Date): Promise<boolean> {
@@ -137,7 +140,10 @@ export class MongoRecoveryRepository {
     if (retryAt) {
       await this.users.updateOne(
         { id: userID, mailQueue: { $elemMatch: { id: job.id, lease: job.lease } } },
-        { $set: { 'mailQueue.$.state': 'pending', 'mailQueue.$.availableAt': retryAt } },
+        {
+          $set: { 'mailQueue.$.state': 'pending', 'mailQueue.$.availableAt': retryAt },
+          $unset: { 'mailQueue.$.lease': '', 'mailQueue.$.leaseUntil': '' },
+        },
       );
     } else {
       await this.users.updateOne({ id: userID }, { $pull: { mailQueue: { id: job.id, lease: job.lease } } });
@@ -146,7 +152,12 @@ export class MongoRecoveryRepository {
   async cleanup(now: Date) {
     // A worker that died during SMTP has an ambiguous delivery result: do not resend.
     await this.users.updateMany(
-      { 'mailQueue.0': { $exists: true } },
+      {
+        $or: [
+          { 'mailQueue.expiresAt': { $lte: now } },
+          { mailQueue: { $elemMatch: { state: 'sending', leaseUntil: { $lte: now } } } },
+        ],
+      },
       {
         $pull: {
           mailQueue: {
@@ -156,7 +167,7 @@ export class MongoRecoveryRepository {
       },
     );
     await this.users.updateMany(
-      { 'recoveryTokens.0': { $exists: true } },
+      { 'recoveryTokens.expiresAt': { $lte: now } },
       { $pull: { recoveryTokens: { expiresAt: { $lte: now } } } },
     );
   }

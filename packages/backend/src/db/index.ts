@@ -13,7 +13,6 @@ function validateID(id: unknown): asserts id is string {
 export class DBManager extends UserLayer {
   private statsCache?: { value: TTotalWinrateStats; expires: number };
   private statsPending?: Promise<TTotalWinrateStats>;
-  private statsVersion = 0;
   dbInstance: mongoose.Mongoose | undefined;
 
   constructor(dbInstance: mongoose.Mongoose | undefined) {
@@ -22,10 +21,16 @@ export class DBManager extends UserLayer {
   }
 
   async saveRoomToDB(roomState: StartedRoomState): Promise<void> {
-    const room = new roomModel(roomState);
-    await room.save();
-    this.statsVersion++;
-    this.statsCache = undefined;
+    await roomModel.updateOne(
+      { roomID: roomState.roomID },
+      {
+        $setOnInsert: {
+          ...roomState,
+          completionPending: Boolean(roomState.game?.result?.winner && roomState.game.result.reason !== 'manualy'),
+        },
+      },
+      { upsert: true, runValidators: true },
+    );
   }
 
   async getRoomFromDB(roomID: string): Promise<StartedRoomState | null> {
@@ -50,16 +55,50 @@ export class DBManager extends UserLayer {
   }
 
   async getPlayerGameSummaries(playerID: string): Promise<PlayerGameSummary[]> {
+    const page = await this.getPlayerGameSummariesPage(playerID);
+    if (page.nextCursor) throw Error('paginationRequired');
+    return page.games;
+  }
+
+  async getPlayerGameSummariesPage(
+    playerID: string,
+    cursor?: string | null,
+  ): Promise<{ games: PlayerGameSummary[]; nextCursor?: string }> {
     validateID(playerID);
+    if (cursor != null && (typeof cursor !== 'string' || !/^[a-f0-9]{24}:[a-f0-9]{24}$/.test(cursor)))
+      throw Error('Invalid history cursor');
+    const [after, upper] = cursor?.split(':') ?? [];
+    const newest = upper
+      ? undefined
+      : await roomModel
+          .findOne(
+            { 'players.id': playerID, 'game.stage': 'end', 'game.result.reason': { $ne: 'manualy' } },
+            { _id: 1 },
+          )
+          .sort({ _id: -1 })
+          .maxTimeMS(10000)
+          .lean();
+    if (!upper && !newest) return { games: [] };
+    const ceiling = upper ? new mongoose.Types.ObjectId(upper) : newest!._id;
     const rooms = await roomModel
       .find(
-        { 'players.id': playerID, 'game.stage': 'end', 'game.result.reason': { $ne: 'manualy' } },
-        { _id: 0, 'game.uuid': 1, 'game.players.id': 1, 'game.players.role': 1, 'game.result.winner': 1 },
+        {
+          'players.id': playerID,
+          'game.stage': 'end',
+          'game.result.reason': { $ne: 'manualy' },
+          _id: { $lte: ceiling, ...(after ? { $gt: new mongoose.Types.ObjectId(after) } : {}) },
+        },
+        { _id: 1, 'game.uuid': 1, 'game.players.id': 1, 'game.players.role': 1, 'game.result.winner': 1 },
       )
       .sort({ _id: 1 })
+      .limit(201)
       .maxTimeMS(10000)
       .lean();
-    return rooms.map((room) => room.game);
+    const visible = rooms.slice(0, 200);
+    return {
+      games: visible.map((room) => room.game),
+      ...(rooms.length > 200 ? { nextCursor: `${visible[199]._id}:${ceiling}` } : {}),
+    };
   }
 
   async getLastRooms(amount: number): Promise<StartedRoomState[]> {
@@ -71,9 +110,8 @@ export class DBManager extends UserLayer {
   async getFullStats(): Promise<TTotalWinrateStats> {
     if (this.statsCache && this.statsCache.expires > Date.now()) return this.statsCache.value;
     if (this.statsPending) return this.statsPending;
-    const version = this.statsVersion;
     const pending = this.calculateFullStats().then((value) => {
-      if (version === this.statsVersion) this.statsCache = { value, expires: Date.now() + 60000 };
+      this.statsCache = { value, expires: Date.now() + 60000 };
       return value;
     });
     this.statsPending = pending;
@@ -85,13 +123,23 @@ export class DBManager extends UserLayer {
   }
 
   private async calculateFullStats(): Promise<TTotalWinrateStats> {
-    const results = await Promise.all([
-      roomModel.aggregate(query.statsByPlayers).option({ maxTimeMS: 10000 }),
-      roomModel.aggregate(query.rolesStats).option({ maxTimeMS: 10000 }),
-      roomModel.aggregate(query.addonsStats).option({ maxTimeMS: 10000 }),
-    ]);
+    const [facets] = await roomModel
+      .aggregate([
+        query.statsByPlayers[0],
+        {
+          $facet: {
+            byPlayers: query.statsByPlayers.slice(1),
+            roles: query.rolesStats.slice(1),
+            addons: query.addonsStats.slice(1),
+          },
+        },
+      ])
+      .option({ maxTimeMS: 10000 });
+    const results = [facets.byPlayers, facets.roles, facets.addons];
 
-    const totalGamesResult = results[0].reduce<Omit<TWinrateStats, 'goodWinPercentage' | 'evilWinPercentage'>>(
+    const totalGamesResult = (results[0] as TWinrateStats[]).reduce<
+      Omit<TWinrateStats, 'goodWinPercentage' | 'evilWinPercentage'>
+    >(
       (acc, el) => {
         acc.gamesCount += el.gamesCount;
         acc.evilWins += el.evilWins;

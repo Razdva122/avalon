@@ -98,6 +98,11 @@ export interface ClientToServerUserEvents {
 export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkillSocketEvents {
   getTotalStats: (callback: (stats: TTotalWinrateStats | ISocketError) => void) => void;
   getPlayerGameSummaries: (uuid: string, callback: (games: PlayerGameSummary[] | null | ISocketError) => void) => void;
+  getPlayerGameSummariesPage: (
+    uuid: string,
+    cursor: string | null,
+    callback: (page: import('../stats/player-games').PlayerGameSummaryPage | ISocketError) => void,
+  ) => void;
   getPlayerGames: (uuid: string, callback: (games: VisualGameState[] | ISocketError) => void) => void;
   getAiRoomsList: (callback: (result: { rooms: TRoomsList } | { error: string }) => void) => void;
   getRoomsList: (callback: (list: TRoomsList | ISocketError) => void) => void;

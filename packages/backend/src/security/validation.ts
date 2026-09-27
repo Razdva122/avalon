@@ -68,6 +68,7 @@ const acknowledgements: Record<string, number> = {
   getOnlineCounter: 1,
   getPlayerGames: 1,
   getPlayerGameSummaries: 1,
+  getPlayerGameSummariesPage: 2,
   getUserProfile: 1,
   registerUser: 1,
   getRoleLeaderboard: 1,
@@ -127,6 +128,11 @@ export function validPacket(event: string, args: unknown[]): boolean {
   const values = ack !== undefined ? args.slice(0, ack) : args;
   if (values.length > 4) return false;
   if (!nonIDs.has(event) && values.length && !validID(values[0])) return false;
+  if (event === 'getPlayerGameSummariesPage')
+    return (
+      values.length === 2 &&
+      (values[1] == null || (typeof values[1] === 'string' && /^[a-f0-9]{24}:[a-f0-9]{24}$/.test(values[1])))
+    );
   if (event === 'voteForMission' || event === 'preVote')
     return (
       values.length === (event === 'preVote' ? 3 : 2) &&

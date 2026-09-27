@@ -80,9 +80,12 @@ export class LockedRoomState extends BaseRoomState {
   declare stage: 'locked';
 }
 
-@index({ roomID: 1 })
+@index({ roomID: 1 }, { unique: true })
 @index({ 'players.id': 1, 'game.stage': 1, _id: 1 })
+@index({ completionPending: 1, _id: 1 })
 export class StartedRoomState extends BaseRoomState {
+  @prop()
+  public completionPending?: boolean;
   declare stage: 'started';
 
   @prop({ required: true })

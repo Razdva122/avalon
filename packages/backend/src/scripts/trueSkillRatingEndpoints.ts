@@ -4,7 +4,7 @@ import { supportTotalCents } from '@/support/repository';
 import { ServerSocket } from '@avalon/types';
 import { trueSkillCalculator } from './trueSkillCalculator';
 import { TrueSkillLeaderboardEntry } from '@avalon/types/api/trueskill-sockets';
-import { DEFAULT_MU, DEFAULT_SIGMA, calculateConservativeRating } from '@avalon/types/stats/trueskill-constants';
+import { nextResetDate, resetRating } from './rating-operations';
 
 async function resetCooldownMonths(userID: string): Promise<1 | 3> {
   const [total, features] = await Promise.all([
@@ -12,17 +12,6 @@ async function resetCooldownMonths(userID: string): Promise<1 | 3> {
     userFeaturesModel.findOne({ userID }).lean(),
   ]);
   return hasPremium(total, features) ? 1 : 3;
-}
-
-function nextResetDate(lastResetAt: Date | undefined, months: number): Date | undefined {
-  if (!lastResetAt) return undefined;
-  const next = new Date(lastResetAt);
-  const day = next.getUTCDate();
-  next.setUTCDate(1);
-  next.setUTCMonth(next.getUTCMonth() + months);
-  const lastDay = new Date(Date.UTC(next.getUTCFullYear(), next.getUTCMonth() + 1, 0)).getUTCDate();
-  next.setUTCDate(Math.min(day, lastDay));
-  return next;
 }
 
 /**
@@ -148,34 +137,8 @@ export function registerTrueSkillRatingEndpoints(socket: ServerSocket, authentic
           return;
         }
 
-        // Сбрасываем рейтинг на стандартные значения
-        const updated = await playerTrueSkillRatingModel.updateOne(
-          // Compare the reset we read so concurrent requests cannot both reset.
-          { userID, lastResetAt: rating.lastResetAt ?? null },
-          {
-            $set: {
-              mu: DEFAULT_MU,
-              sigma: DEFAULT_SIGMA,
-              conservativeRating: calculateConservativeRating(DEFAULT_MU, DEFAULT_SIGMA),
-              lastResetAt: now,
-            },
-          },
-        );
-
-        if (!updated.matchedCount) {
-          const current = await playerTrueSkillRatingModel.findOne({ userID }).lean();
-          callback({
-            success: false,
-            error: 'Rating reset cooldown is active',
-            nextResetAvailableAt: nextResetDate(current?.lastResetAt, months),
-          });
-          return;
-        }
-        callback({
-          success: true,
-          nextResetAvailableAt: nextResetDate(now, months),
-          message: 'Rating has been reset successfully',
-        });
+        const result = await resetRating(userID, months);
+        callback({ ...result, ...(result.success ? { message: 'Rating has been reset successfully' } : {}) });
       } catch (error) {
         console.error('Error resetting TrueSkill rating:', error);
         callback({

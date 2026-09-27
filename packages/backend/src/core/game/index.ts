@@ -477,8 +477,8 @@ export class Game extends GameHooks {
           this.result = { winner, reason: winner === 'evil' ? 'evilTeamMissions' : 'goodTeamMissions' };
         }
 
-        this.stage = 'end';
         this.timer.clearTimer();
+        this.stage = 'end';
 
         this.openAllRoles();
 
@@ -509,8 +509,8 @@ export class Game extends GameHooks {
       };
     }
 
-    this.stage = 'end';
     this.timer.clearTimer();
+    this.stage = 'end';
     this.openAllRoles();
     this.stateObserver.gameStateChanged();
   }

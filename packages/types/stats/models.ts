@@ -1,4 +1,4 @@
-import { prop, modelOptions, Severity } from '@typegoose/typegoose';
+import { index, prop, modelOptions, Severity } from '@typegoose/typegoose';
 import type { TRoles } from '../game/roles';
 
 /**
@@ -12,6 +12,8 @@ import type { TRoles } from '../game/roles';
     allowMixed: Severity.ALLOW,
   },
 })
+@index({ role: 1, rank: 1 })
+@index({ userID: 1 })
 export class RoleRating {
   @prop({ required: true })
   userID!: string;
@@ -49,6 +51,7 @@ export class RoleRating {
     allowMixed: Severity.ALLOW,
   },
 })
+@index({ date: 1 })
 export class RoleRankings {
   @prop({ required: true, type: Date })
   date!: Date;

@@ -1,8 +1,8 @@
-import { roleRatingModel, roleRankingsModel, roomModel } from '../db/models';
-import { TRoles, VisualGameState } from '@avalon/types';
+import { roomModel } from '../db/models';
+import { publishRoleRatings, beginRoleRatingPublication, cleanupRoleRatingGenerations } from './roleRatingStorage';
+import { TRoles } from '@avalon/types';
 import { goodRolesImportance } from '@avalon/types/consts';
 import { RoleRating } from '@avalon/types/stats';
-import { Player } from '@avalon/types/game/player';
 import { eventBus } from '@/helpers';
 
 // Constants for rating calculation
@@ -11,12 +11,6 @@ const GAMES_COUNT_WEIGHT = 0.3;
 const MAX_LOG_BASE = 100; // Adjust based on expected max games count
 const MAX_DECAY = 0.3; // 20% maximum decay
 const MAX_DECAY_DAYS = 90; // Days after which maximum decay is applied
-
-// Extended game state with additional properties for rating calculation
-interface ExtendedGameState extends VisualGameState {
-  currentPlayer?: Player;
-  startAt?: Date;
-}
 
 interface PlayerStats {
   userID: string;
@@ -40,19 +34,15 @@ export async function updateRatings(): Promise<void> {
   console.log('Starting ratings update...');
 
   // Get all completed games
-  const games = await getAllCompletedGames();
-
-  // Group games by role
-  const gamesByRole = groupGamesByRole(games);
+  await cleanupRoleRatingGenerations();
+  const staging = await beginRoleRatingPublication();
+  const statsByRole = await collectPlayerStats();
 
   // Store all calculated ratings for history
   const allRatings: RatingData[] = [];
 
   // For each role, calculate ratings
-  for (const [role, gamesForRole] of Object.entries(gamesByRole)) {
-    // Calculate player stats for this role
-    const playerStats = calculatePlayerStats(gamesForRole);
-
+  for (const playerStats of Object.values(statsByRole)) {
     // Calculate ratings with logarithmic scale
     const ratings = playerStats.map((player) => {
       // Calculate logarithmic factor for games count
@@ -92,15 +82,12 @@ export async function updateRatings(): Promise<void> {
       rating.rank = index + 1;
     });
 
-    // Store in database
-    await storeRatings(role as TRoles, ratings);
-
     // Add to all ratings for history
     allRatings.push(...ratings);
   }
 
   // Store a snapshot of all ratings for this date
-  await storeRankingsSnapshot(new Date(), allRatings);
+  await publishRoleRatings(allRatings, new Date(), staging);
 
   await updateTop1Info(allRatings);
 
@@ -131,115 +118,45 @@ function getDaysSince(date: Date): number {
 /**
  * Retrieves all completed games from the database
  */
-async function getAllCompletedGames(): Promise<ExtendedGameState[]> {
-  // Query the database for all completed games
-  const rooms = await roomModel
-    .find({
-      'game.result': { $exists: true },
-      'game.result.reason': { $ne: 'manualy' },
-    })
-    .lean();
-
-  return rooms.map((room) => ({
-    ...room.game,
-    startAt: room.startAt ? new Date(room.startAt) : new Date(), // Convert string to Date
-  }));
-}
-
-/**
- * Groups games by role
- */
-function groupGamesByRole(games: ExtendedGameState[]): Record<string, ExtendedGameState[]> {
-  const roleGames: Record<string, ExtendedGameState[]> = {};
-
-  games.forEach((game) => {
-    game.players.forEach((player) => {
-      const role = player.role as TRoles;
-      if (!roleGames[role]) {
-        roleGames[role] = [];
+async function collectPlayerStats(): Promise<Record<string, PlayerStats[]>> {
+  const stats = new Map<string, Map<string, PlayerStats>>();
+  const cursor = roomModel
+    .find(
+      { 'game.result': { $exists: true }, 'game.result.reason': { $ne: 'manualy' } },
+      { roomID: 1, startAt: 1, 'game.players.id': 1, 'game.players.role': 1, 'game.result.winner': 1 },
+    )
+    .sort({ roomID: 1 })
+    .lean()
+    .cursor({ batchSize: 250 });
+  let previousRoom: string | undefined;
+  try {
+    for await (const room of cursor) {
+      if (room.roomID === previousRoom) continue;
+      previousRoom = room.roomID;
+      for (const player of room.game.players) {
+        const role = player.role as TRoles;
+        const byPlayer = stats.get(role) || new Map<string, PlayerStats>();
+        stats.set(role, byPlayer);
+        const date = new Date(room.startAt);
+        const value = byPlayer.get(player.id) || {
+          userID: player.id,
+          role,
+          gamesCount: 0,
+          wins: 0,
+          winrate: 0,
+          lastPlayedAt: date,
+        };
+        value.gamesCount++;
+        if (room.game.result?.winner === (isGoodRole(role) ? 'good' : 'evil')) value.wins++;
+        if (date > value.lastPlayedAt) value.lastPlayedAt = date;
+        value.winrate = (value.wins / value.gamesCount) * 100;
+        byPlayer.set(player.id, value);
       }
-
-      // Add this game to the list for this role
-      roleGames[role].push({
-        ...game,
-        currentPlayer: player, // Add the current player to the game for easier processing
-      });
-    });
-  });
-
-  return roleGames;
-}
-
-/**
- * Calculates player statistics for a set of games
- */
-function calculatePlayerStats(games: ExtendedGameState[]): PlayerStats[] {
-  const playerStats: Record<string, PlayerStats> = {};
-
-  games.forEach((game) => {
-    const player = game.currentPlayer;
-
-    // Skip if player is undefined
-    if (!player) {
-      return;
     }
-
-    const role = player.role as TRoles;
-    const team = isGoodRole(role) ? 'good' : 'evil';
-    const isWin = game.result?.winner === team;
-    const gameDate = game.startAt || new Date();
-
-    if (!playerStats[player.id]) {
-      playerStats[player.id] = {
-        userID: player.id,
-        role,
-        gamesCount: 0,
-        wins: 0,
-        winrate: 0,
-        lastPlayedAt: gameDate,
-      };
-    }
-
-    playerStats[player.id].gamesCount++;
-    if (isWin) {
-      playerStats[player.id].wins++;
-    }
-
-    // Update last played date if this game is more recent
-    if (gameDate > playerStats[player.id].lastPlayedAt) {
-      playerStats[player.id].lastPlayedAt = gameDate;
-    }
-  });
-
-  // Calculate winrates
-  Object.values(playerStats).forEach((stats) => {
-    stats.winrate = (stats.wins / stats.gamesCount) * 100;
-  });
-
-  return Object.values(playerStats);
-}
-
-/**
- * Stores ratings for a specific role in the database
- */
-async function storeRatings(role: TRoles, ratings: RatingData[]): Promise<void> {
-  // Delete existing ratings for this role
-  await roleRatingModel.deleteMany({ role });
-
-  // Insert new ratings
-  if (ratings.length > 0) {
-    await roleRatingModel.insertMany(ratings);
+  } finally {
+    await cursor.close();
   }
-}
-
-/**
- * Stores a snapshot of all ratings for historical tracking
- */
-async function storeRankingsSnapshot(date: Date, ratings: RatingData[]): Promise<void> {
-  await roleRankingsModel.create({
-    date,
-    ratings,
-  });
+  return Object.fromEntries([...stats].map(([role, players]) => [role, [...players.values()]]));
 }
 
 /**

@@ -6,7 +6,7 @@ import {
   CheckLoyalty,
   HistoryMission,
 } from '@avalon/types';
-import { AchievementService } from './index';
+import { AchievementService, achievementGameContext } from './index';
 import {
   ACHIEVEMENT_LIGHT_WINS,
   ACHIEVEMENT_DARK_WINS,
@@ -45,7 +45,12 @@ export class AchievementHandlers {
   /**
    * Обработчик завершения игры
    */
-  async handleGameEnd(game: VisualGameState): Promise<void> {
+  async handleGameEnd(game: VisualGameState, sequence?: number): Promise<void> {
+    if (sequence !== undefined) return achievementGameContext.run(sequence, () => this.processGameEnd(game));
+    return this.processGameEnd(game);
+  }
+
+  private async processGameEnd(game: VisualGameState): Promise<void> {
     try {
       const players = game.players;
 
@@ -72,10 +77,12 @@ export class AchievementHandlers {
           await this.processComplexAchievements(player.id, game, isWinner);
         } catch (error) {
           console.error(`Error processing achievements for player ${player.id}:`, error);
+          throw error;
         }
       }
     } catch (error) {
       console.error(`Error processing achievements for game ${game.uuid}:`, error);
+      throw error;
     }
   }
 

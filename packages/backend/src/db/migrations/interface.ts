@@ -1,5 +1,8 @@
+import type { mongo } from 'mongoose';
+
+/** Migrations must be idempotent: a process can die after up and before the completion marker. */
 export interface Migration {
   name: string;
-  up: () => Promise<void>;
-  down?: () => Promise<void>;
+  up: (db: mongo.Db) => Promise<void>;
+  down?: (db: mongo.Db) => Promise<void>;
 }

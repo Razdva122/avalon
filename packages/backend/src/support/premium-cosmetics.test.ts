@@ -8,7 +8,20 @@ let features: Record<string, unknown> = {};
 let savedAvatar = 'servant';
 jest.mock('@/support/repository', () => ({ supportTotalCents: async () => total }));
 jest.mock('@/db/models', () => ({
-  roomModel: { distinct: async () => [] },
+  roomModel: {
+    find: () => ({
+      maxTimeMS: () => ({
+        lean: () => ({
+          cursor: () => ({
+            [Symbol.asyncIterator]: async function* () {
+              yield* [];
+            },
+            close: async () => {},
+          }),
+        }),
+      }),
+    }),
+  },
   userAchievementModel: { find: () => ({ lean: async () => [] }) },
   userFeaturesModel: {
     findOne: () => ({ lean: async () => features }),

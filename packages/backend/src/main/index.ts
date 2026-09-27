@@ -27,7 +27,7 @@ import { handleSocketErrors, eventBus } from '@/helpers';
 import { registerRatingEndpoints } from '@/scripts/ratingEndpoints';
 import { registerTrueSkillRatingEndpoints } from '@/scripts/trueSkillRatingEndpoints';
 import { registerAchievementEndpoints } from '@/scripts/achievementEndpoints';
-import { updateTrueSkillForGame } from '@/scripts/updateTrueSkillRatings';
+import { GameResultWorker } from '@/scripts/game-results';
 import { DBManager } from '@/db';
 import { installSessionChecks, revokeUserSockets } from '@/user/sessions';
 import { AchievementManager } from '@/achievements';
@@ -225,31 +225,26 @@ export class Manager {
       void this.voice.reconcile(roomID);
     });
 
-    eventBus.on('gameEnded', async (roomID) => {
-      const room = this.rooms[roomID];
-
-      if (room && !room.ai) {
-        // Save room to DB
-        await this.saveRoomToDB(room);
-
-        // Calculate and store rating changes for this game only
-        // (Daily snapshots are handled by the scheduler)
-        const gameState = room.calculateRoomState();
-        if (gameState.stage === 'started' && gameState.game.result && gameState.game.result.reason !== 'manualy') {
-          const gameDate = new Date(gameState.startAt);
-          const playerIds = gameState.players.map((player) => player.id);
-          await this.dbManager.updateLastGameDate(playerIds, gameDate);
-
-          // Update TrueSkill ratings
-          await updateTrueSkillForGame(gameState.game);
-          console.log(`TrueSkill ratings updated for game ${gameState.game.uuid}`);
-
-          await this.achievementManager.achievementHandlers.handleGameEnd(gameState.game);
-          gameState.game.players.forEach((player) => this.io.to(userChannel(player.id)).emit('stickersUpdated'));
-          console.log(`Achievements processed directly for game: ${gameState.game.uuid}`);
-        }
-      }
-    });
+    if (dbManager.dbInstance) {
+      const results = new GameResultWorker(dbManager, async (game, sequence) => {
+        await this.achievementManager.achievementHandlers.handleGameEnd(game, sequence);
+        this.stickersManager.invalidateGameCounts(game.players.map((player) => player.id));
+        game.players.forEach((player) => this.io.to(userChannel(player.id)).emit('stickersUpdated'));
+      });
+      const retry = () => {
+        void results.flush().catch(() => console.error('Game result processing failed; will retry'));
+      };
+      const timer = setInterval(retry, 5000);
+      timer.unref();
+      retry();
+      eventBus.on('gameEnded', (roomID) => {
+        const room = this.rooms[roomID];
+        if (!room || room.ai) return;
+        const state = room.calculateRoomState();
+        if (state.stage === 'started')
+          void results.submit(state).catch(() => console.error('Game result save failed; will retry'));
+      });
+    }
 
     eventBus.on('restartRoom', (room) => {
       this.restartRoom(room.roomID);
@@ -342,6 +337,10 @@ export class Manager {
         const stats = await dbManager.getFullStats();
 
         cb(stats);
+      });
+
+      socket.on('getPlayerGameSummariesPage', async (uuid, cursor, cb) => {
+        cb(await dbManager.getPlayerGameSummariesPage(uuid, cursor));
       });
 
       socket.on('getPlayerGameSummaries', async (uuid, cb) => {

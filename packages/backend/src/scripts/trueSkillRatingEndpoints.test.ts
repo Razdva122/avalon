@@ -1,50 +1,66 @@
 import { registerTrueSkillRatingEndpoints } from './trueSkillRatingEndpoints';
 import type { ServerSocket } from '@avalon/types';
 
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { playerTrueSkillRatingModel, userFeaturesModel } from '@/db/models';
+let mongo: MongoMemoryServer;
 let total = 0;
 let features: Record<string, unknown> = {};
-let rating: Record<string, any> | null;
-const updateOne = jest.fn(async (query, update) => {
-  if (
-    !rating ||
-    query.userID !== rating.userID ||
-    ('lastResetAt' in query && Number(query.lastResetAt) !== Number(rating.lastResetAt ?? null))
-  ) {
-    return { matchedCount: 0 };
-  }
-  Object.assign(rating, update.$set);
-  return { matchedCount: 1 };
-});
+let rating: Record<string, unknown>;
 jest.mock('@/support/repository', () => ({ supportTotalCents: async () => total }));
-jest.mock('../db/models', () => ({
-  playerTrueSkillRatingModel: {
-    findOne: () => ({ lean: async () => rating && { ...rating } }),
-    updateOne: (...args: [unknown, unknown]) => updateOne(...args),
-  },
-  gameTrueSkillResultModel: {},
-  userFeaturesModel: { findOne: () => ({ lean: async () => features }) },
-}));
+beforeAll(async () => {
+  mongo = await MongoMemoryServer.create();
+  await mongoose.connect(mongo.getUri());
+  await playerTrueSkillRatingModel.init();
+});
+afterAll(async () => {
+  await mongoose.disconnect();
+  await mongo?.stop();
+});
 
 function endpoints(userID: string | undefined = 'player') {
-  const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
+  const handlers: Record<
+    string,
+    (userID: string, callback: (result: Record<string, unknown>) => void) => Promise<void>
+  > = {};
   registerTrueSkillRatingEndpoints(
     {
-      on: (name: string, handler: any) => {
+      on: (
+        name: string,
+        handler: (userID: string, callback: (result: Record<string, unknown>) => void) => Promise<void>,
+      ) => {
         handlers[name] = handler;
       },
     } as ServerSocket,
     userID,
   );
   return async (name: string, target = 'player') => {
-    let result: any;
-    await handlers[name](target, (value: unknown) => {
+    let result: Record<string, unknown> = {};
+    await handlers[name](target, (value: Record<string, unknown>) => {
       result = value;
     });
     return result;
   };
 }
-beforeEach(() => {
-  jest.useFakeTimers().setSystemTime(new Date('2026-09-17T12:00:00Z'));
+beforeEach(async () => {
+  for (const collection of await mongoose.connection.db!.collections()) await collection.deleteMany({});
+  jest
+    .useFakeTimers({
+      doNotFake: [
+        'nextTick',
+        'setImmediate',
+        'clearImmediate',
+        'setTimeout',
+        'clearTimeout',
+        'setInterval',
+        'clearInterval',
+        'hrtime',
+        'performance',
+        'queueMicrotask',
+      ],
+    })
+    .setSystemTime(new Date('2026-09-17T12:00:00Z'));
   total = 0;
   features = {};
   rating = {
@@ -57,9 +73,13 @@ beforeEach(() => {
     losses: 15,
     lastResetAt: new Date('2026-08-17T12:00:00Z'),
   };
-  updateOne.mockClear();
+  await playerTrueSkillRatingModel.create(rating);
+  jest.spyOn(userFeaturesModel, 'findOne').mockImplementation(() => ({ lean: async () => features }) as never);
 });
-afterEach(() => jest.useRealTimers());
+afterEach(() => {
+  jest.useRealTimers();
+  jest.restoreAllMocks();
+});
 
 test.each(['paid', 'granted'])('%s Premium can reset at one month even with its badge hidden', async (mode) => {
   total = mode === 'paid' ? 1000 : 0;
@@ -70,7 +90,7 @@ test.each(['paid', 'granted'])('%s Premium can reset at one month even with its 
     nextResetAvailableAt: new Date('2026-09-17T12:00:00Z'),
   });
   expect(await call('resetTrueSkillRating')).toMatchObject({ success: true });
-  expect(rating).toMatchObject({
+  expect(await playerTrueSkillRatingModel.findOne({ userID: 'player' }).lean()).toMatchObject({
     mu: 6000,
     sigma: 1500,
     conservativeRating: 1500,
@@ -95,7 +115,7 @@ test('standard accounts keep the three-month cooldown and receive the actual nex
     success: false,
     nextResetAvailableAt: new Date('2026-11-17T12:00:00Z'),
   });
-  expect(rating?.mu).toBe(7000);
+  expect((await playerTrueSkillRatingModel.findOne({ userID: 'player' }).lean())?.mu).toBe(7000);
   jest.setSystemTime(new Date('2026-11-17T12:00:00Z'));
   expect(await call('resetTrueSkillRating')).toMatchObject({ success: true });
 });
@@ -107,21 +127,21 @@ test('Premium cannot reset before a full month has elapsed', async () => {
     success: false,
     nextResetAvailableAt: new Date('2026-09-17T12:00:00Z'),
   });
-  expect(rating?.mu).toBe(7000);
+  expect((await playerTrueSkillRatingModel.findOne({ userID: 'player' }).lean())?.mu).toBe(7000);
 });
 
 test('a first reset is available and simultaneous requests cannot both succeed', async () => {
-  delete rating!.lastResetAt;
+  await playerTrueSkillRatingModel.updateOne({ userID: 'player' }, { $unset: { lastResetAt: '' } });
   const call = endpoints();
   const results = await Promise.all([call('resetTrueSkillRating'), call('resetTrueSkillRating')]);
   expect(results.filter((result) => result.success)).toHaveLength(1);
 });
 
 test('reset only applies to the authenticated account', async () => {
-  delete rating!.lastResetAt;
+  await playerTrueSkillRatingModel.updateOne({ userID: 'player' }, { $unset: { lastResetAt: '' } });
   expect(await endpoints('other')('resetTrueSkillRating')).toMatchObject({ success: false });
   expect(await endpoints('')('resetTrueSkillRating')).toMatchObject({ success: false });
-  expect(updateOne).not.toHaveBeenCalled();
+  expect(await mongoose.connection.db!.collection('rating_operations').countDocuments()).toBe(0);
 });
 
 test.each([
@@ -130,7 +150,7 @@ test.each([
   [0, '2026-11-30T12:00:00Z', '2027-02-28T12:00:00Z'],
 ])('calendar cooldown clamps to the last day of a shorter month', async (amount, last, next) => {
   total = amount;
-  rating!.lastResetAt = new Date(last);
+  await playerTrueSkillRatingModel.updateOne({ userID: 'player' }, { $set: { lastResetAt: new Date(last) } });
   jest.setSystemTime(new Date(new Date(next).getTime() - 1));
   const call = endpoints();
   expect(await call('resetTrueSkillRating')).toMatchObject({ success: false, nextResetAvailableAt: new Date(next) });

@@ -23,6 +23,7 @@ function setupPage() {
     if (id === 'vue-router') return { useRouter: () => ({ push() {} }) };
     if (id === '@/helpers/composables') return { useResponsive: () => ({ isMobile: vue.ref(false) }) };
     if (id === '@/api/socket') return { socket };
+    if (id === '@/helpers/stats/load-games') return require('../src/helpers/stats/load-games.ts');
     if (id === '@/helpers/stats')
       return {
         prepareUserStats: (games) => ({ ...emptyStats, marker: games[0]?.uuid }),
@@ -44,7 +45,7 @@ test('page displays loading immediately and statistics do not wait for rating re
   const { page, pending, stop } = setupPage();
   assert.equal(typeof page.then, 'undefined', 'setup must not block rendering');
   assert.equal(page.loading.value, true);
-  pending[0].resolve([{ uuid: 'game' }]);
+  pending[0].resolve({ games: [{ uuid: 'game' }] });
   await flush();
   assert.equal(page.loading.value, false);
   assert.equal(page.lastGames.value[0].gameID, 'game');
@@ -59,9 +60,9 @@ test('late response cannot replace the next user and a failed load can be retrie
   assert.equal(typeof page.then, 'undefined');
   props.uuid = 'second';
   await vue.nextTick();
-  pending[1].resolve([]);
+  pending[1].resolve({ games: [] });
   await flush();
-  pending[0].resolve([{ uuid: 'stale' }]);
+  pending[0].resolve({ games: [{ uuid: 'stale' }] });
   await flush();
   assert.deepEqual(page.lastGames.value, []);
   props.uuid = 'third';
@@ -72,7 +73,7 @@ test('late response cannot replace the next user and a failed load can be retrie
   assert.equal(page.loadError.value, true);
   page.retry();
   assert.equal(page.loading.value, true);
-  pending[3].resolve([]);
+  pending[3].resolve({ games: [] });
   await flush();
   assert.equal(page.loadError.value, false);
   stop();
@@ -116,4 +117,33 @@ test('compact game records preserve totals, recent games and teammate statistics
   ]);
   assert.deepEqual(prepareGamesForView(games, 'user', 0), []);
   assert.equal(prepareUserStats([], 'user').teams.total.winrate, '0.00');
+});
+
+const { loadPlayerGames } = require('../src/helpers/stats/load-games.ts');
+test('paged history retains all games and stops fetching when the user changes', async () => {
+  const cursors = [];
+  const games = await loadPlayerGames(
+    async (cursor) => {
+      cursors.push(cursor);
+      return cursor ? { games: [{ uuid: 'second' }] } : { games: [{ uuid: 'first' }], nextCursor: 'page2' };
+    },
+    () => true,
+  );
+  assert.deepEqual(
+    games.map((g) => g.uuid),
+    ['first', 'second'],
+  );
+  assert.deepEqual(cursors, [undefined, 'page2']);
+  let calls = 0;
+  assert.deepEqual(
+    await loadPlayerGames(
+      async () => {
+        calls++;
+        return { games: [{ uuid: 'stale' }], nextCursor: 'never' };
+      },
+      () => false,
+    ),
+    [],
+  );
+  assert.equal(calls, 1);
 });

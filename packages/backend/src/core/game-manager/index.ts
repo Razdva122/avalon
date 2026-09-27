@@ -30,6 +30,7 @@ export * from '@/core/game-manager/interface';
 
 export class GameManager {
   game: Game;
+  private ended = false;
   roomState!: TRoomState;
   io: Server;
   roomID: string;
@@ -92,7 +93,8 @@ export class GameManager {
       eventBus.emit('roomUpdated', this.roomID);
     }
 
-    if (this.game.stage === 'end') {
+    if (this.game.stage === 'end' && !this.ended) {
+      this.ended = true;
       eventBus.emit('gameEnded', this.roomID);
     }
 

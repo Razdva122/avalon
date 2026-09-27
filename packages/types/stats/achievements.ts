@@ -1,4 +1,4 @@
-import { prop, modelOptions, Severity } from '@typegoose/typegoose';
+import { index, prop, modelOptions, Severity } from '@typegoose/typegoose';
 
 import { AchievementType } from './achievement-type';
 export { AchievementType } from './achievement-type';
@@ -39,7 +39,11 @@ export class Achievement {
     allowMixed: Severity.ALLOW,
   },
 })
+@index({ userID: 1, achievementID: 1 }, { unique: true })
+@index({ achievementID: 1, completed: 1 })
 export class UserAchievement {
+  @prop({ default: 0 })
+  lastGameSequence?: number;
   @prop({ required: true })
   userID!: string; // ID пользователя
 
@@ -73,6 +77,7 @@ export class UserAchievement {
     allowMixed: Severity.ALLOW,
   },
 })
+@index({ achievementID: 1 }, { unique: true })
 export class AchievementStats {
   @prop({ required: true })
   achievementID!: string; // ID достижения

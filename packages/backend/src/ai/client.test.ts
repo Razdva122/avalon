@@ -666,3 +666,37 @@ test('review parser allows 800 characters only with the explicit review limit', 
   expect(parseReply(text, 1, 800).speech).toHaveLength(800);
   expect(() => parseReply(JSON.stringify({ choice: 0, speech: 'x'.repeat(801) }), 1, 800)).toThrow();
 });
+
+test.each(['recordRequest', 'recordDecision'] as const)(
+  'refunds unsent budget when %s persistence fails',
+  async (method) => {
+    const { repo, cost } = setup();
+    repo[method] = async () => {
+      throw Error('database unavailable');
+    };
+    let sent = false;
+    global.fetch = (async () => {
+      sent = true;
+      throw Error('must not send');
+    }) as typeof fetch;
+    await expect(yandexDecide('room', repo, () => {})(request)).rejects.toThrow();
+    expect(sent).toBe(false);
+    expect(cost()).toBe(0);
+  },
+);
+
+test('stop while storing the trace refunds before dispatch', async () => {
+  const { repo, cost } = setup();
+  const controller = new AbortController();
+  repo.recordDecision = async () => {
+    controller.abort();
+  };
+  let sent = false;
+  global.fetch = (async () => {
+    sent = true;
+    throw Error('aborted');
+  }) as typeof fetch;
+  await expect(yandexDecide('room', repo, () => {})(request, controller.signal)).rejects.toThrow();
+  expect(sent).toBe(false);
+  expect(cost()).toBe(0);
+});

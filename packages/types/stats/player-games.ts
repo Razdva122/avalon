@@ -6,3 +6,5 @@ export type PlayerGameSummary = {
   players: Pick<VisualGameState['players'][number], 'id' | 'role'>[];
   result?: Pick<NonNullable<VisualGameState['result']>, 'winner'>;
 };
+
+export type PlayerGameSummaryPage = { games: PlayerGameSummary[]; nextCursor?: string };
