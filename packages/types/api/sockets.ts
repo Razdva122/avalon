@@ -13,6 +13,7 @@ import type { TLoyalty, TRoles } from '../game/roles';
 import type { TrueSkillSocketEvents } from './trueskill-sockets';
 
 import type {
+  ISocketError,
   IRoomUnavailableError,
   ILoginError,
   IRegisterError,
@@ -79,7 +80,7 @@ export interface ClientToServerUserEvents {
     user: Omit<UserProfile, 'avatar' | 'registrationDate'>,
     callback: (user: UserWithToken | IRegisterError) => void,
   ) => void;
-  updateUserName: (name: string) => void;
+  updateUserName: (name: string, callback?: (result: true | ISocketError) => void) => void;
   updateUserEmail: (password: string, email: string, callback: (result: true | IUpdateEmailError) => void) => void;
   updateUserLogin: (password: string, login: string, callback: (result: true | IUpdateLoginError) => void) => void;
   updateUserPassword: (
@@ -89,19 +90,19 @@ export interface ClientToServerUserEvents {
   ) => void;
   updateUserAvatar: (avatarID: string, callback: (result: true | IUpdateAvatarError) => void) => void;
   login: (loginOrEmail: string, password: string, callback: (user: UserWithToken | ILoginError) => void) => void;
-  getUserAvatars: (callback: (avatars: IAvatarInfo[]) => void) => void;
-  getMyProfile: (callback: (user: UserForUI) => void) => void;
+  getUserAvatars: (callback: (avatars: IAvatarInfo[] | ISocketError) => void) => void;
+  getMyProfile: (callback: (user: UserForUI | ISocketError) => void) => void;
   revealEasterEgg: () => void;
 }
 
 export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkillSocketEvents {
-  getTotalStats: (callback: (stats: TTotalWinrateStats) => void) => void;
-  getPlayerGameSummaries: (uuid: string, callback: (games: PlayerGameSummary[] | null) => void) => void;
-  getPlayerGames: (uuid: string, callback: (games: VisualGameState[]) => void) => void;
+  getTotalStats: (callback: (stats: TTotalWinrateStats | ISocketError) => void) => void;
+  getPlayerGameSummaries: (uuid: string, callback: (games: PlayerGameSummary[] | null | ISocketError) => void) => void;
+  getPlayerGames: (uuid: string, callback: (games: VisualGameState[] | ISocketError) => void) => void;
   getAiRoomsList: (callback: (result: { rooms: TRoomsList } | { error: string }) => void) => void;
-  getRoomsList: (callback: (list: TRoomsList) => void) => void;
-  getOnlineCounter: (id: string, callback: (counter: number) => void) => void;
-  getUserProfile: (id: string, callback: (user: PublicUserProfile) => void) => void;
+  getRoomsList: (callback: (list: TRoomsList | ISocketError) => void) => void;
+  getOnlineCounter: (id: string, callback: (counter: number | ISocketError) => void) => void;
+  getUserProfile: (id: string, callback: (user: PublicUserProfile | ISocketError) => void) => void;
 
   // Rating system endpoints
   getRolesWithRatings: (callback: (roles: TRoles[] | { error: string }) => void) => void;
@@ -151,7 +152,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
     action: 'start' | 'stop' | 'resumeBudget' | 'resumeTechnical',
     callback: (result: { ok: true } | { error: string }) => void,
   ) => void;
-  createRoom: (callback: (uuid: string) => void) => void;
+  createRoom: (callback: (result: string | ISocketError) => void) => void;
   updateOptions: (uuid: string, options: GameOptions) => void;
   joinRoom: (uuid: string, callback: (state: TRoomState | IRoomUnavailableError) => void) => void;
   sendMessage: (uuid: string, message: string, requestID: string, callback: (result: ChatSendResult) => void) => void;

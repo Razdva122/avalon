@@ -7,7 +7,7 @@ function setup(joined = true) {
   const chat = new Chat();
   const addMessage = jest.fn((user: string, text: string, request?: string) => chat.addMessage(text, user, request));
   const socket = {
-    rooms: new Set(joined ? ['room'] : []),
+    rooms: new Set(joined ? ['room:room'] : []),
     on: (_event: string, handler: typeof send) => (send = handler),
   };
   registerChatEndpoints(socket as unknown as ServerSocket, 'alice', (id) =>

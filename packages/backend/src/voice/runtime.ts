@@ -1,3 +1,4 @@
+import { roomChannel } from '@/helpers/channels';
 import { VoiceStartup } from './startup';
 import { RoomServiceClient } from 'livekit-server-sdk';
 import type { Manager } from '@/main';
@@ -24,7 +25,7 @@ export function createRoomVoice(manager: Manager) {
       const room = manager.rooms[roomID];
       return {
         present: Boolean(
-          user.id === userID && socket.connected && socket.rooms.has(roomID) && room && !room.nextRoomID,
+          user.id === userID && socket.connected && socket.rooms.has(roomChannel(roomID)) && room && !room.nextRoomID,
         ),
         seated: Boolean(room?.players.includes(userID)),
         admin: profile.isAdmin === true,
@@ -45,7 +46,7 @@ export function createRoomVoice(manager: Manager) {
         if ((error as { code?: string }).code !== 'not_found') throw error;
       }
     },
-    stateChanged: (id) => manager.io.to(id).emit('voiceStateChanged', id),
+    stateChanged: (id) => manager.io.to(roomChannel(id)).emit('voiceStateChanged', id),
     revoked: (socketID, id) => manager.io.to(socketID).emit('voiceRevoked', id),
   });
   if (config) {
@@ -53,7 +54,7 @@ export function createRoomVoice(manager: Manager) {
       const wasReady = startup?.ready;
       await startup?.reconcile();
       if (!wasReady && startup?.ready) {
-        for (const id of Object.keys(manager.rooms)) manager.io.to(id).emit('voiceStateChanged', id);
+        for (const id of Object.keys(manager.rooms)) manager.io.to(roomChannel(id)).emit('voiceStateChanged', id);
       }
     };
     void refreshStartup();

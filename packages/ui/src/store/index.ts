@@ -12,11 +12,19 @@ import { alertsInStorage, userProfileInStorage, userSettingsInStorage } from '@/
 export * from '@/store/interface';
 
 import { socket } from '@/api/socket';
+import { isSocketError } from '@/helpers/socket-errors';
+import { validators } from '@/helpers/validators';
+import eventBus from '@/helpers/event-bus';
+import { i18n } from '@/plugins/i18n';
 import { hydratePage } from '@/helpers/prerender';
 
 import type { ArgumentOfCallback, UserWithToken } from '@avalon/types';
 
 export const key: InjectionKey<Store<IState>> = Symbol();
+
+// Keep failed lookups retryable without changing the reactive loading placeholder:
+// changing it would retrigger useUserProfile watchEffect and immediately retry.
+const failedProfileLookups = new Set<string>();
 
 export const store = createStore<IState>({
   state: {
@@ -118,11 +126,14 @@ export const store = createStore<IState>({
       const result = socket.emitWithAck('updateUserPassword', password, newPassword);
       return result;
     },
-    updateUserName({ commit, state }, { name }): void {
-      if (state.profile) {
-        socket.emit('updateUserName', name);
+    async updateUserName({ commit, state }, { name }): Promise<true | { error: string }> {
+      if (!state.profile) return { error: 'forbidden' };
+      if (validators.name(name) !== true) return { error: 'invalidRequest' };
+      const result = await socket.timeout(10000).emitWithAck('updateUserName', name);
+      if (result === true && state.profile) {
         commit('updateUserProfile', { ...state.profile, name });
       }
+      return result;
     },
     async updateUserEmail({ commit, state }, { email, password }): Promise<ArgumentOfCallback<'updateUserEmail'>> {
       const result = await socket.emitWithAck('updateUserEmail', password, email);
@@ -136,7 +147,16 @@ export const store = createStore<IState>({
       return result;
     },
     async refreshProfile({ commit, state }): Promise<ArgumentOfCallback<'getMyProfile'>> {
-      const result = await socket.emitWithAck('getMyProfile');
+      let result: ArgumentOfCallback<'getMyProfile'>;
+      try {
+        result = await socket.timeout(10000).emitWithAck('getMyProfile');
+      } catch {
+        result = { error: 'requestFailed' };
+      }
+      if (isSocketError(result)) {
+        eventBus.emit('infoMessage', i18n.global.t('errors.' + result.error));
+        return result;
+      }
 
       if (state.profile) {
         commit('updateUserProfile', { ...state.profile, ...result });
@@ -167,12 +187,25 @@ export const store = createStore<IState>({
       return result;
     },
     async getUserPublicProfile({ state, commit }, { uuid }): Promise<TUserState> {
-      if (!state.users[uuid]) {
+      if (!state.users[uuid] || failedProfileLookups.has(uuid)) {
+        failedProfileLookups.delete(uuid);
         commit('updateUsersState', { uuid, user: { status: 'loading' } });
 
-        socket.emitWithAck('getUserProfile', uuid).then((profile) => {
-          commit('updateUsersState', { uuid, user: { status: 'ready', profile } });
-        });
+        socket
+          .timeout(10000)
+          .emitWithAck('getUserProfile', uuid)
+          .then((profile) => {
+            if (isSocketError(profile)) {
+              failedProfileLookups.add(uuid);
+              eventBus.emit('infoMessage', i18n.global.t('errors.' + profile.error));
+              return;
+            }
+            commit('updateUsersState', { uuid, user: { status: 'ready', profile } });
+          })
+          .catch(() => {
+            failedProfileLookups.add(uuid);
+            eventBus.emit('infoMessage', i18n.global.t('errors.requestFailed'));
+          });
       }
 
       return state.users[uuid];

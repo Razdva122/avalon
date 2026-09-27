@@ -55,6 +55,7 @@
               <v-text-field
                 hide-details="auto"
                 v-model="username"
+                :rules="[validators.name]"
                 :label="$t('profile.username')"
                 class="name-field"
                 autocomplete="nickname"
@@ -239,6 +240,7 @@ import StickerCollection from '@/components/stickers/StickerCollection.vue';
 import Avatar from '@/components/user/Avatar.vue';
 import AvatarModal from '@/components/user/AvatarModal.vue';
 import { socket } from '@/api/socket';
+import { validators } from '@/helpers/validators';
 import UserTrueSkillRating from '@/components/stats/UserTrueSkillRating.vue';
 import type { PlayerTrueSkillRating } from '@avalon/types';
 
@@ -255,6 +257,8 @@ export default defineComponent({
 
     return {
       username: profile?.name || '',
+      validators,
+      updatingName: false,
       availableLocales: this.$i18n.availableLocales.map((el) => ({
         value: el,
         title: LanguageMap[<TLanguage>el],
@@ -320,7 +324,11 @@ export default defineComponent({
       },
     },
     updateAvailable() {
-      return this.username.trim() !== '' && this.$store.state.profile?.name !== this.username.trim();
+      return (
+        !this.updatingName &&
+        validators.name(this.username.trim()) === true &&
+        this.$store.state.profile?.name !== this.username.trim()
+      );
     },
     availableThemes() {
       return [
@@ -383,10 +391,18 @@ export default defineComponent({
     goToAchievements() {
       this.$router.push({ name: 'user_achievements', params: { uuid: this.$store.state.profile!.id } });
     },
-    update() {
+    async update() {
       if (!this.updateAvailable) return;
       this.username = this.username.trim();
-      this.$store.dispatch('updateUserName', { name: this.username });
+      this.updatingName = true;
+      try {
+        const result = await this.$store.dispatch('updateUserName', { name: this.username });
+        if (result !== true) eventBus.emit('infoMessage', this.$t('errors.' + result.error));
+      } catch {
+        eventBus.emit('infoMessage', this.$t('errors.requestFailed'));
+      } finally {
+        this.updatingName = false;
+      }
     },
 
     // Добавляем новые методы для функционала сброса рейтинга

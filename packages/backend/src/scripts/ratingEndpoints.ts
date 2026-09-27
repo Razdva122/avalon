@@ -11,7 +11,7 @@ export function registerRatingEndpoints(socket: ServerSocket): void {
   socket.on('getRolesWithRatings', (callback) => {
     console.log('Getting roles with ratings');
     try {
-      roleRatingModel
+      return roleRatingModel
         .aggregate([
           { $match: { rating: { $gt: 0 } } },
           { $group: { _id: '$role' } },
@@ -35,7 +35,7 @@ export function registerRatingEndpoints(socket: ServerSocket): void {
   socket.on('getRoleLeaderboard', (role: TRoles, callback) => {
     console.log(`Getting leaderboard for role: ${role}, limit: 20`);
     try {
-      roleRatingModel
+      return roleRatingModel
         .find({ role })
         .sort({ rank: 1 })
         .limit(20)
@@ -57,7 +57,7 @@ export function registerRatingEndpoints(socket: ServerSocket): void {
   socket.on('getUserRatings', (userID: string, callback) => {
     console.log(`Getting ratings for user: ${userID}`);
     try {
-      roleRatingModel
+      return roleRatingModel
         .find({ userID })
         .sort({ rating: -1, gamesCount: -1 })
         .lean()
@@ -79,7 +79,7 @@ export function registerRatingEndpoints(socket: ServerSocket): void {
     console.log(`Getting popular roles with at least ${minPlayers} players`);
     try {
       // Aggregate to count players per role with rating > 0
-      roleRatingModel
+      return roleRatingModel
         .aggregate([
           { $match: { rating: { $gt: 0 } } },
           { $group: { _id: '$role', playerCount: { $sum: 1 } } },
@@ -107,7 +107,7 @@ export function registerRatingEndpoints(socket: ServerSocket): void {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - 30);
 
-      roleRankingsModel
+      return roleRankingsModel
         .find({
           date: { $gte: startDate },
         })

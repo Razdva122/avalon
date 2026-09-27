@@ -140,9 +140,9 @@ export default defineComponent({
     const canRevealRoles = computed(() =>
       Boolean(
         roomState.value?.ai &&
-          roomState.value.stage === 'started' &&
-          game.value.stage !== 'end' &&
-          !game.value.players.some((p) => p.id === userID.value),
+        roomState.value.stage === 'started' &&
+        game.value.stage !== 'end' &&
+        !game.value.players.some((p) => p.id === userID.value),
       ),
     );
     const rolesShown = computed(() => canRevealRoles.value && Object.keys(spectatorRoles.value).length > 0);
@@ -163,9 +163,13 @@ export default defineComponent({
 
     await initState(props.uuid);
 
-    socket.emitWithAck('getOnlineCounter', props.uuid).then((counter) => {
-      online.value = counter;
-    });
+    socket
+      .timeout(10000)
+      .emitWithAck('getOnlineCounter', props.uuid)
+      .then((counter) => {
+        if (typeof counter === 'number') online.value = counter;
+      })
+      .catch(() => {});
 
     socket.on('roomUpdated', (state) => {
       if (state.roomID === props.uuid) {

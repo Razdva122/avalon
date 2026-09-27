@@ -1,3 +1,5 @@
+import { validID, validName, validEmail, validLogin, validPassword, text } from '@/security/validation';
+import { passwordWork } from '@/security/limits';
 import { hasPremium } from '@/support/premium';
 import { supportTotalCents } from '@/support/repository';
 import bcrypt from 'bcrypt';
@@ -7,13 +9,24 @@ import { generateJWT } from '@/user';
 import { AchievementType } from '@avalon/types/stats/achievements';
 import { achievementsData } from '@/achievements/data';
 
+const dummyPasswordHash = '$2b$12$Sg4UudVZO9Sw82oSWkF3l.W8908VIMCRonYDqabHoUmfp3RYDkIc6';
+
 export class UserLayer {
   hashRounds = 12;
 
   async registerUser(
     user: Omit<UserProfile, 'avatar' | 'registrationDate'>,
   ): Promise<ArgumentOfCallback<'registerUser'>> {
-    const passHash = await bcrypt.hash(user.password, this.hashRounds);
+    if (
+      !user ||
+      !validID(user.id) ||
+      !validName(user.name) ||
+      !validEmail(user.email) ||
+      !validLogin(user.login) ||
+      !validPassword(user.password)
+    )
+      throw Error('invalidRequest');
+    const passHash = await passwordWork.run(() => bcrypt.hash(user.password, this.hashRounds));
 
     const userModel = new userProfileModel({
       id: user.id,
@@ -51,6 +64,7 @@ export class UserLayer {
   }
 
   async getUserByID(id: string): Promise<UserProfile> {
+    if (!validID(id)) throw Error('invalidRequest');
     const user = await userProfileModel.findOne({ id });
 
     if (!user) {
@@ -61,6 +75,7 @@ export class UserLayer {
   }
 
   async getUserFeatures(id: string): Promise<UserFeatures | null> {
+    if (!validID(id)) throw Error('invalidRequest');
     const features = await userFeaturesModel.findOne({ userID: id });
     return features;
   }
@@ -109,7 +124,8 @@ export class UserLayer {
   }
 
   async updateUserName(id: string, name: string): Promise<void> {
-    await userProfileModel.findOneAndUpdate({ id }, { $set: { name } });
+    if (!validID(id) || !validName(name)) throw Error('invalidRequest');
+    await userProfileModel.findOneAndUpdate({ id }, { $set: { name: name.trim() } }, { runValidators: true });
   }
 
   async updateUserAvatar(userID: string, avatarID: string): Promise<void> {
@@ -122,6 +138,11 @@ export class UserLayer {
     type: 'email' | 'password' | 'login',
     value: string,
   ): Promise<ArgumentOfCallback<'updateUserEmail' | 'updateUserPassword'>> {
+    if (
+      !text(password, 1024) ||
+      !(type === 'email' ? validEmail(value) : type === 'login' ? validLogin(value) : validPassword(value))
+    )
+      throw Error('invalidRequest');
     const user = await this.getUserByID(id);
     const isPassValid = await this.validateUserPassword(user, password);
 
@@ -144,7 +165,7 @@ export class UserLayer {
           throw err;
         }
       } else {
-        const passHash = await bcrypt.hash(value, this.hashRounds);
+        const passHash = await passwordWork.run(() => bcrypt.hash(value, this.hashRounds));
         const updated = await userProfileModel.findOneAndUpdate(
           { id: user.id, password: user.password },
           { $set: { password: passHash }, $inc: { authVersion: 1 }, $unset: { recoveryTokens: 1 } },
@@ -160,6 +181,7 @@ export class UserLayer {
   }
 
   async login(loginOrEmail: string, password: string): Promise<ArgumentOfCallback<'login'>> {
+    if (!text(loginOrEmail, 254) || !text(password, 1024)) throw Error('invalidRequest');
     const type = loginOrEmail.match(/^[a-zA-Z0-9_.-]+$/) ? 'login' : 'email';
     let user;
 
@@ -170,7 +192,8 @@ export class UserLayer {
     }
 
     if (!user) {
-      return { error: type === 'email' ? 'emailNotExist' : 'loginNotExist' };
+      await passwordWork.run(() => bcrypt.compare(password, dummyPasswordHash));
+      return { error: 'wrongPassword' };
     }
 
     const isPassValid = await this.validateUserPassword(user, password);
@@ -216,7 +239,8 @@ export class UserLayer {
   }
 
   async validateUserPassword(user: UserProfile, password: string): Promise<boolean> {
-    const isPassValid = await bcrypt.compare(password, user.password);
+    if (!text(password, 1024)) throw Error('invalidRequest');
+    const isPassValid = await passwordWork.run(() => bcrypt.compare(password, user.password));
     return isPassValid;
   }
 }

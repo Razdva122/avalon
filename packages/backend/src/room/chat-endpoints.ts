@@ -1,3 +1,4 @@
+import { roomChannel } from '@/helpers/channels';
 import type { ServerSocket } from '@avalon/types';
 import type { Room } from './index';
 
@@ -5,7 +6,7 @@ export function registerChatEndpoints(socket: ServerSocket, userID: string, getR
   socket.on('sendMessage', (uuid, message, requestID, callback) => {
     const room = getRoom(uuid);
     const reply = typeof callback === 'function' ? callback : undefined;
-    if (!room || !socket.rooms.has(uuid)) {
+    if (!room || !socket.rooms.has(roomChannel(uuid))) {
       reply?.({ error: 'notInRoom' });
       return;
     }

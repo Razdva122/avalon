@@ -56,13 +56,13 @@ export default {
     reject: 'Rejeitar:',
   },
   checkLoyalty: {
-    checkInfo: '<b>{ladyOwner}</b> verificou a lealdade de <b>{ladyTarget}</b>',
+    checkInfo: '{ladyOwner} verificou a lealdade de {ladyTarget}',
   },
   revealLoyalty: {
-    revealInfo: '<b>{revealer}</b> revelou sua lealdade para <b>{target}</b>',
+    revealInfo: '{revealer} revelou sua lealdade para {target}',
   },
   announceLoyalty: {
-    announceInfo: '<b>{announcer}</b> anunciou a lealdade de <b>{target}</b>',
+    announceInfo: '{announcer} anunciou a lealdade de {target}',
     declareInfo: 'E declarou sua lealdade como',
     actualInfo: 'na verdade',
   },
@@ -76,7 +76,7 @@ export default {
   },
   switch: {
     skip: 'decidiu não usar excalibur',
-    switchInfo: '<b>{switcher}</b> usou excalibur para mudar a ação de <b>{target}</b> para',
+    switchInfo: '{switcher} usou excalibur para mudar a ação de {target} para',
   },
   assassinate: {
     lovers: 'Amantes',
@@ -86,28 +86,28 @@ export default {
     shotResultMiss: '{killedName} não é {roleName}',
   },
   giveCard: {
-    toPlayer: '<b>{leaderName}</b> deu a carta «{cardName}» para <b>{cardOwner}</b>',
-    toSelf: '<b>{leaderName}</b> recebeu a carta «{cardName}» para si mesmo',
+    toPlayer: '{leaderName} deu a carta «{cardName}» para {cardOwner}',
+    toSelf: '{leaderName} recebeu a carta «{cardName}» para si mesmo',
   },
   restoreHonor: {
-    transfer: '<b>{newOwnerName}</b> pegou a carta «{cardName}» de <b>{prevOwnerName}</b>',
+    transfer: '{newOwnerName} pegou a carta «{cardName}» de {prevOwnerName}',
   },
   ambush: {
-    history: '<b>{ownerName}</b> usou a carta Emboscada em <b>{targetName}</b> e viu sua ação: {result}',
+    history: '{ownerName} usou a carta Emboscada em {targetName} e viu sua ação: {result}',
     resultHidden: 'oculto',
   },
   leadToVictory: {
-    history: '<b>{cardOwner}</b> usou a carta «{cardName}» e assumiu a liderança de <b>{prevLeaderName}</b>',
+    history: '{cardOwner} usou a carta «{cardName}» e assumiu a liderança de {prevLeaderName}',
   },
   kingReturns: {
-    history: '<b>{cardOwner}</b> usou a carta «{cardName}» para cancelar a última votação e mudar a liderança',
+    history: '{cardOwner} usou a carta «{cardName}» para cancelar a última votação e mudar a liderança',
   },
   weFoundYou: {
     history:
-      '<b>{cardOwner}</b> usou a carta «{cardName}» em <b>{selectedPlayer}</b>, forçando-o a jogar sua carta de missão abertamente',
+      '{cardOwner} usou a carta «{cardName}» em {selectedPlayer}, forçando-o a jogar sua carta de missão abertamente',
   },
   playCard: {
-    history: '<b>{cardOwner}</b> jogou a carta «{cardName}»',
+    history: '{cardOwner} jogou a carta «{cardName}»',
   },
   preVote: {
     title: 'Votação preliminar',

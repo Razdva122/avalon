@@ -1,3 +1,4 @@
+import { roomChannel, userChannel } from '@/helpers/channels';
 import { Game } from '@/core/game';
 import type { TRoomState, TGameMethodsParams, TGetLoyaltyData } from '@/core/game-manager/interface';
 import { eventBus } from '@/helpers';
@@ -140,12 +141,12 @@ export class GameManager {
    */
   sendNewStateToUsers(): void {
     this.game.players.forEach((player) => {
-      this.io.to(player.userID).emit('gameUpdated', this.prepareStateForUser(player.userID));
+      this.io.to(userChannel(player.userID)).emit('gameUpdated', this.prepareStateForUser(player.userID));
     });
 
     this.io
-      .except(this.game.players.map((player) => player.userID))
-      .to(this.roomID)
+      .except(this.game.players.map((player) => userChannel(player.userID)))
+      .to(roomChannel(this.roomID))
       .emit('gameUpdated', this.prepareStateForUser());
   }
 

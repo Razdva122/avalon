@@ -39,14 +39,10 @@ export class AiService {
     socket.on('getAiRoomsList', async (cb) => {
       if (typeof cb !== 'function') return;
       try {
-        const archived = (await this.repository?.recent(20)) || [];
+        const archived = (await this.repository?.recentSummaries()) || [];
         const live = Object.values(this.manager.rooms)
           .filter((room) => room.ai)
-          .map((room) => room.calculateRoomState());
-        const rooms = [...new Map([...archived, ...live].map((room) => [room.roomID, room])).values()]
-          .filter((room) => room.ai)
-          .sort((a, b) => Date.parse(b.createAt) - Date.parse(a.createAt))
-          .slice(0, 20)
+          .map((room) => room.calculateRoomState())
           .map<TRoomInfo>((room) => ({
             uuid: room.roomID,
             ai: true,
@@ -60,6 +56,9 @@ export class AiService {
             startAt: room.stage === 'started' ? room.startAt : undefined,
             result: room.stage === 'started' ? room.game.result : undefined,
           }));
+        const rooms = [...new Map([...archived, ...live].map((room) => [room.uuid, room])).values()]
+          .sort((a, b) => Date.parse(b.createAt) - Date.parse(a.createAt))
+          .slice(0, 20);
         cb({ rooms });
       } catch {
         cb({ error: 'Could not load AI rooms' });

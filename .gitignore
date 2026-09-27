@@ -41,3 +41,4 @@ pnpm-debug.log*
 # Local creative materials, renders, announcements, and their backups.
 /artifacts/
 /announcements/
+/output/

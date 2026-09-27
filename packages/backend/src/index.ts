@@ -40,7 +40,7 @@ const corsOpts = {
     credentials: true,
   },
 };
-const io = new Server(server, corsOpts);
+const io = new Server(server, { ...corsOpts, maxHttpBufferSize: 64 * 1024 });
 
 app.use(CookieParser());
 app.use(cors(corsOpts.cors));

@@ -1,3 +1,4 @@
+import { passwordWork } from '@/security/limits';
 import { randomBytes, randomUUID } from 'crypto';
 import bcrypt from 'bcrypt';
 import { MailConfig, normalizeEmail } from './config';
@@ -83,7 +84,7 @@ export class RecoveryService {
       recoveryTokens: { $elemMatch: { hash, expiresAt: { $gt: now } } },
     });
     if (!user) throw new Error('invalid_token');
-    const passwordHash = await bcrypt.hash(password, 12);
+    const passwordHash = await passwordWork.run(() => bcrypt.hash(password, 12));
     const language = mailLanguage(user.recoveryTokens?.find((token) => token.hash === hash)?.language);
     const job = this.job('changed', { to: user.email, language }, now);
     const changed = await this.repository.consume(hash, passwordHash, job, this.clock());

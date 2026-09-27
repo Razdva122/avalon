@@ -1,3 +1,6 @@
+import { roomChannel, userChannel } from '@/helpers/channels';
+import { validID } from '@/security/validation';
+import { installSocketAdmission } from '@/security/socket-admission';
 import { createRoomVoice, registerVoiceEndpoints } from '@/voice/runtime';
 import type { VoiceService } from '@/voice/service';
 import { publicRoomState } from '@/ai/public-state';
@@ -34,27 +37,49 @@ export class Manager {
   voice: VoiceService;
   aiService: AiService;
   stickersManager = new StickersManager();
-  rooms: Dictionary<Room> = {};
+  rooms: Dictionary<Room> = Object.create(null);
   roomsList: TRoomsList = [];
+  private roomTimers = new Map<string, NodeJS.Timeout>();
   io: Server;
   dbManager: DBManager;
   avatarsManager: AvatarsManager;
   achievementManager: AchievementManager;
-  onlineCounter: Dictionary<number> = {};
+  onlineCounter: Dictionary<number> = Object.create(null);
 
   get roomListCutted() {
     return this.roomsList.slice(0, 20);
   }
 
   createRoom(uuid: string, leaderID: string, players: string[], options?: GameOptions) {
+    const retained = Object.values(this.rooms);
+    if (
+      retained.length >= 500 ||
+      retained.filter(
+        (room) =>
+          room.leaderID === leaderID &&
+          !room.nextRoomID &&
+          (room.data.stage !== 'started' || room.data.manager.game.stage !== 'end'),
+      ).length >= 3
+    )
+      throw Error('roomLimit');
     this.rooms[uuid] = new Room(uuid, leaderID, players, this.io, options);
 
     this.updateRoomsList(this.rooms[uuid]);
 
-    // Delete room after 10 day timeout
-    setTimeout(() => {
-      this.destroyRoom(uuid);
-    }, 86400000 * 10);
+    const expire = () => {
+      const room = this.rooms[uuid];
+      if (!room) return;
+      if (room.data.stage === 'started' && room.data.manager.game.stage !== 'end') {
+        const timer = setTimeout(expire, 5 * 60000);
+        timer.unref();
+        this.roomTimers.set(uuid, timer);
+      } else {
+        this.destroyRoom(uuid);
+      }
+    };
+    const timer = setTimeout(expire, 30 * 60000);
+    timer.unref();
+    this.roomTimers.set(uuid, timer);
   }
 
   updateRoomsList(roomOrID: Room | string, removeRoom: boolean = false) {
@@ -140,11 +165,11 @@ export class Manager {
 
       if (room.data.manager.game.stage === 'end') {
         const newUUID = crypto.randomUUID();
+        this.createRoom(newUUID, room.leaderID, room.players, room.options);
         room.nextRoomID = newUUID;
         this.voice.destroyRoom(uuid);
-        this.createRoom(newUUID, room.leaderID, room.players, room.options);
 
-        this.io.to(room.roomID).emit('restartGame', newUUID);
+        this.io.to(roomChannel(room.roomID)).emit('restartGame', newUUID);
       } else {
         throw new Error(`Cant restart game with uuid ${uuid}, room stage ${room.data.manager.game.stage}`);
       }
@@ -155,9 +180,16 @@ export class Manager {
 
   destroyRoom(uuid: string) {
     if (this.rooms[uuid]?.ai) return;
+    clearTimeout(this.roomTimers.get(uuid));
+    this.roomTimers.delete(uuid);
+    const room = this.rooms[uuid];
+    if (room?.data.stage === 'started') {
+      room.data.manager.game.stateObserver.gameStateChanged = () => {};
+      room.data.manager.game.timer.cleanup();
+    }
     this.voice.destroyRoom(uuid);
     this.updateRoomsList(uuid, true);
-    this.io.to(uuid).emit('destroyRoom', uuid);
+    this.io.to(roomChannel(uuid)).emit('destroyRoom', uuid);
     delete this.rooms[uuid];
   }
 
@@ -189,7 +221,7 @@ export class Manager {
     eventBus.on('roomUpdated', (room) => {
       this.updateRoomsList(room);
       const roomID = typeof room === 'string' ? room : room.roomID;
-      this.io.to(roomID).emit('voiceStateChanged', roomID);
+      this.io.to(roomChannel(roomID)).emit('voiceStateChanged', roomID);
       void this.voice.reconcile(roomID);
     });
 
@@ -213,7 +245,7 @@ export class Manager {
           console.log(`TrueSkill ratings updated for game ${gameState.game.uuid}`);
 
           await this.achievementManager.achievementHandlers.handleGameEnd(gameState.game);
-          gameState.game.players.forEach((player) => this.io.to(player.id).emit('stickersUpdated'));
+          gameState.game.players.forEach((player) => this.io.to(userChannel(player.id)).emit('stickersUpdated'));
           console.log(`Achievements processed directly for game: ${gameState.game.uuid}`);
         }
       }
@@ -227,12 +259,13 @@ export class Manager {
       this.destroyRoom(room.roomID);
     });
 
+    installSocketAdmission(io);
     installSessionChecks(io);
     io.on('connection', (socket) => {
       // Register endpoints
+      handleSocketErrors(socket);
       registerRatingEndpoints(socket);
       registerAchievementEndpoints(socket);
-      handleSocketErrors(socket);
       this.updateOnlineCounter('lobby', 1);
 
       const userState: {
@@ -244,29 +277,36 @@ export class Manager {
       if (socket.data.authUser) {
         const tokenValue = socket.data.authUser;
         userState.userID = tokenValue.id;
-        this.dbManager.getUserCompletedAchievements(tokenValue.id, 'hidden').then((achievements) => {
-          socket.emit('hiddenAchievementsList', achievements);
-        });
+        this.dbManager
+          .getUserCompletedAchievements(tokenValue.id, 'hidden')
+          .then((achievements) => {
+            socket.emit('hiddenAchievementsList', achievements);
+          })
+          .catch(() => socket.emit('serverError', 'requestFailed'));
       }
 
       registerTrueSkillRatingEndpoints(socket, userState.userID);
 
       if (userState.userID) {
-        socket.join(userState.userID);
+        socket.join(userChannel(userState.userID));
       }
 
       this.aiService.register(socket, userState.userID);
       registerVoiceEndpoints(this.voice, socket, userState.userID);
 
       socket.on('joinRoom', async (uuid, cb) => {
+        if (!validID(uuid)) throw Error('invalidRequest');
         const room = this.rooms[uuid];
         const gameFromDB = room
           ? null
           : (await this.dbManager.getRoomFromDB(uuid)) || (await this.aiService.repository?.load(uuid));
 
         if (room || gameFromDB) {
-          socket.join(uuid);
-          this.updateOnlineCounter(uuid, 1);
+          if (!socket.rooms.has(roomChannel(uuid))) {
+            if ([...socket.rooms].filter((id) => id.startsWith('room:')).length >= 20) throw Error('roomLimit');
+            await socket.join(roomChannel(uuid));
+            this.updateOnlineCounter(uuid, 1);
+          }
         }
 
         if (gameFromDB) {
@@ -283,8 +323,10 @@ export class Manager {
 
       socket.on('leaveRoom', (uuid) => {
         this.voice.revokeSocket(socket.id, uuid);
-        socket.leave(uuid);
-        this.updateOnlineCounter(uuid, -1);
+        if (socket.rooms.has(roomChannel(uuid))) {
+          socket.leave(roomChannel(uuid));
+          this.updateOnlineCounter(uuid, -1);
+        }
       });
 
       socket.on('getRoomsList', (cb) => {
@@ -293,7 +335,7 @@ export class Manager {
       });
 
       socket.on('getOnlineCounter', (id, cb) => {
-        cb(this.onlineCounter[id]);
+        cb(this.onlineCounter[id] || 0);
       });
 
       socket.on('getTotalStats', async (cb) => {
@@ -317,7 +359,7 @@ export class Manager {
       });
 
       socket.on('registerUser', async (user, cb) => {
-        const userForUI = await dbManager.registerUser(user);
+        const userForUI = await dbManager.registerUser({ ...user, id: crypto.randomUUID() });
 
         cb(userForUI);
       });
@@ -341,12 +383,10 @@ export class Manager {
 
       socket.on('disconnecting', () => {
         Array.from(socket.rooms).forEach((room) => {
-          this.updateOnlineCounter(room, -1);
+          if (room.startsWith('room:')) this.updateOnlineCounter(room.slice(5), -1);
         });
 
-        if (!socket.rooms.has('lobby')) {
-          this.updateOnlineCounter('lobby', -1);
-        }
+        this.updateOnlineCounter('lobby', -1);
       });
     });
 
@@ -408,8 +448,9 @@ export class Manager {
       cb(result);
     });
 
-    socket.on('updateUserName', (name) => {
-      this.dbManager.updateUserName(userID, name);
+    socket.on('updateUserName', async (name, cb) => {
+      await this.dbManager.updateUserName(userID, name);
+      cb?.(true);
     });
 
     socket.on('createRoom', (cb) => {
@@ -419,6 +460,7 @@ export class Manager {
     });
 
     socket.on('restartGame', (uuid) => {
+      if (this.rooms[uuid]?.leaderID !== userID) throw Error('forbidden');
       this.restartRoom(uuid);
     });
 
@@ -449,7 +491,7 @@ export class Manager {
 
     socket.on('lockRoom', (uuid) => {
       const room = this.rooms[uuid];
-      if (!room.ai && room.leaderID === userID) {
+      if (room && !room.ai && room.leaderID === userID) {
         room.toggleLockedState();
         eventBus.emit('roomUpdated', room);
       }
@@ -457,7 +499,7 @@ export class Manager {
 
     socket.on('updateOptions', (uuid, options) => {
       const room = this.rooms[uuid];
-      if (!room.ai && room.leaderID === userID) {
+      if (room && !room.ai && room.leaderID === userID) {
         room.updateOptions(options);
         eventBus.emit('roomUpdated', room);
       }
@@ -465,21 +507,21 @@ export class Manager {
 
     socket.on('endGame', (uuid) => {
       const room = this.rooms[uuid];
-      if (!room.ai && room.leaderID === userID) {
+      if (room && !room.ai && room.leaderID === userID) {
         room.startVoteFor('endGame');
       }
     });
 
     socket.on('endAndRestartGame', (uuid) => {
       const room = this.rooms[uuid];
-      if (!room.ai && room.leaderID === userID) {
+      if (room && !room.ai && room.leaderID === userID) {
         room.startVoteFor('endAndRestartGame');
       }
     });
 
     socket.on('shuffle', (uuid) => {
       const room = this.rooms[uuid];
-      if (!room.ai && room.leaderID === userID) {
+      if (room && !room.ai && room.leaderID === userID) {
         room.shuffle();
       }
     });
@@ -493,7 +535,7 @@ export class Manager {
 
     socket.on('startGame', (uuid) => {
       const room = this.rooms[uuid];
-      if (!room.ai && room.leaderID === userID) {
+      if (room && !room.ai && room.leaderID === userID) {
         room.startGame();
         eventBus.emit('roomUpdated', room);
       }
@@ -501,7 +543,7 @@ export class Manager {
 
     socket.on('kickPlayer', (uuid, kickUserID) => {
       const room = this.rooms[uuid];
-      if (!room.ai && room.leaderID === userID) {
+      if (room && !room.ai && room.leaderID === userID) {
         room.leaveGame(kickUserID);
 
         if (this.rooms[uuid]) {
@@ -513,21 +555,21 @@ export class Manager {
     // Custom timer events
     socket.on('startCustomTimer', (uuid: string, durationSeconds: number) => {
       const room = this.rooms[uuid];
-      if (!room.ai && room.leaderID === userID && room.data.stage === 'started') {
+      if (room && !room.ai && room.leaderID === userID && room.data.stage === 'started') {
         room.data.manager.callGameMethods(userID, { method: 'startCustomTimer', durationSeconds });
       }
     });
 
     socket.on('addCustomTimerTime', (uuid: string, additionalSeconds: number) => {
       const room = this.rooms[uuid];
-      if (!room.ai && room.leaderID === userID && room.data.stage === 'started') {
+      if (room && !room.ai && room.leaderID === userID && room.data.stage === 'started') {
         room.data.manager.callGameMethods(userID, { method: 'addCustomTimerTime', additionalSeconds });
       }
     });
 
     socket.on('stopCustomTimer', (uuid: string) => {
       const room = this.rooms[uuid];
-      if (!room.ai && room.leaderID === userID && room.data.stage === 'started') {
+      if (room && !room.ai && room.leaderID === userID && room.data.stage === 'started') {
         room.data.manager.callGameMethods(userID, { method: 'stopCustomTimer' });
       }
     });
@@ -537,11 +579,11 @@ export class Manager {
     const getRoomManager = (uuid: string) => {
       const room = this.rooms[uuid];
       if (room?.ai) throw new Error('AI players are controlled by the server');
-      if (room.data.stage === 'started') {
+      if (room?.data.stage === 'started' && room.players.includes(userID)) {
         return room.data.manager;
       }
 
-      throw new Error(`Room with uuid ${uuid} have wrong stage ${this.rooms[uuid].data.stage}`);
+      throw new Error(`Room with uuid ${uuid} have wrong stage ${this.rooms[uuid]?.data.stage}`);
     };
 
     socket.on('selectPlayer', (uuid, selectedUserID) => {
@@ -646,7 +688,8 @@ export class Manager {
 
     this.onlineCounter[id] = this.onlineCounter[id] || 0;
     this.onlineCounter[id] += diff;
+    if (this.onlineCounter[id] === 0) delete this.onlineCounter[id];
     const emitName = id === 'lobby' ? 'onlineCounterUpdated' : 'roomOnlineUpdated';
-    this.io.to(id).emit(emitName, this.onlineCounter[id]);
+    this.io.to(id === 'lobby' ? 'lobby' : roomChannel(id)).emit(emitName, this.onlineCounter[id] || 0);
   }
 }

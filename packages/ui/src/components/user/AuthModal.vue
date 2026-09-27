@@ -57,7 +57,7 @@
       />
       <PasswordField
         v-model="password"
-        :rules="[validators.required, validators.min8, validators.spacesForbidden]"
+        :rules="[validators.required, validators.min8, validators.maxPasswordBytes, validators.spacesForbidden]"
         :label="$t('modal.password')"
         :hint="$t('validators.minCharacters', { count: 8 })"
         counter
@@ -66,7 +66,7 @@
       <TextField
         v-model="username"
         autocomplete="nickname"
-        :rules="[validators.required]"
+        :rules="[validators.required, validators.name]"
         :label="$t('modal.username')"
       />
       <v-btn

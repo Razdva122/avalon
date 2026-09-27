@@ -1,15 +1,14 @@
 <template>
   <div>
-    <span
-      v-html="
-        $t('restoreHonor.transfer', {
-          cardName: $t('cardsInfo.' + data.cardName),
-          prevOwnerName: playerNames[data.prevOwnerID],
-          newOwnerName: playerNames[data.newOwnerID],
-        })
-      "
-    >
-    </span>
+    <i18n-t keypath="restoreHonor.transfer" tag="span" scope="global">
+      <template #cardName>{{ $t('cardsInfo.' + data.cardName) }}</template>
+      <template #prevOwnerName
+        ><b>{{ playerNames[data.prevOwnerID] }}</b></template
+      >
+      <template #newOwnerName
+        ><b>{{ playerNames[data.newOwnerID] }}</b></template
+      >
+    </i18n-t>
   </div>
 </template>
 

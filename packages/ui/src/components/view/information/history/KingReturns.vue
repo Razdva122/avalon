@@ -1,14 +1,11 @@
 <template>
   <div>
-    <span
-      v-html="
-        $t('kingReturns.history', {
-          cardName: $t('cardsInfo.kingReturns'),
-          cardOwner: playerNames[data.ownerID],
-        })
-      "
-    >
-    </span>
+    <i18n-t keypath="kingReturns.history" tag="span" scope="global">
+      <template #cardName>{{ $t('cardsInfo.kingReturns') }}</template>
+      <template #cardOwner
+        ><b>{{ playerNames[data.ownerID] }}</b></template
+      >
+    </i18n-t>
   </div>
 </template>
 

@@ -93,7 +93,11 @@
             <span v-if="item === 'ai-games' ? aiRooms !== undefined : roomsList">{{ filterCount(item) }}</span>
           </button>
         </div>
-        <div v-if="filter === 'ai-games' && aiError" class="rooms-message" role="alert">
+        <div v-if="filter !== 'ai-games' && roomsError" class="rooms-message" role="alert">
+          <p>{{ $t('errors.' + roomsError) }}</p>
+          <button class="reset-filter" @click="initState">{{ $t('mainPage.retryAi') }}</button>
+        </div>
+        <div v-else-if="filter === 'ai-games' && aiError" class="rooms-message" role="alert">
           <p>{{ $t('aiArena.connectionError') }}</p>
           <button class="reset-filter" @click="loadAiRooms">{{ $t('mainPage.retryAi') }}</button>
         </div>
@@ -153,6 +157,7 @@ import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
 import type { TRoomsList } from '@avalon/types';
 import { socket } from '@/api/socket';
+import { isSocketError } from '@/helpers/socket-errors';
 import eventBus from '@/helpers/event-bus';
 import LobbyRoom from './LobbyRoom.vue';
 import SocialChannels from './SocialChannels.vue';
@@ -173,6 +178,7 @@ export default defineComponent({
     const store = useStore();
 
     const roomsList = ref<TRoomsList>();
+    const roomsError = ref('');
     const aiRooms = ref<TRoomsList>();
     const aiLoading = ref(false);
     const aiError = ref(false);
@@ -199,14 +205,26 @@ export default defineComponent({
     );
     const online = ref<number>();
 
-    socket.emitWithAck('getOnlineCounter', 'lobby').then((counter) => {
-      online.value = counter;
-    });
+    socket
+      .timeout(10000)
+      .emitWithAck('getOnlineCounter', 'lobby')
+      .then((counter) => {
+        if (typeof counter === 'number') online.value = counter;
+      })
+      .catch(() => {});
 
     const initState = async () => {
-      const data = await socket.emitWithAck('getRoomsList');
-
-      roomsList.value = data;
+      roomsError.value = '';
+      try {
+        const data = await socket.timeout(10000).emitWithAck('getRoomsList');
+        if (isSocketError(data)) {
+          roomsError.value = data.error;
+          return;
+        }
+        roomsList.value = data;
+      } catch {
+        roomsError.value = 'requestFailed';
+      }
     };
 
     void initState();
@@ -218,8 +236,16 @@ export default defineComponent({
         return;
       }
 
-      const uuid = await socket.emitWithAck('createRoom');
-      router.push({ name: 'room', params: { uuid } });
+      try {
+        const result = await socket.timeout(10000).emitWithAck('createRoom');
+        if (typeof result !== 'string') {
+          eventBus.emit('infoMessage', t('errors.' + result.error));
+          return;
+        }
+        await router.push({ name: 'room', params: { uuid: result } });
+      } catch {
+        eventBus.emit('infoMessage', t('errors.requestFailed'));
+      }
     };
 
     const updateRooms = (list: TRoomsList) => {
@@ -283,6 +309,8 @@ export default defineComponent({
       filterCount,
       online,
       roomsList,
+      roomsError,
+      initState,
     };
   },
 });

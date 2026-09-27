@@ -4,7 +4,13 @@
  */
 export default {
   errors: {
-    wrongPassword: 'Wrong password',
+    rateLimited: 'Too many requests. Please wait and try again.',
+    invalidRequest: 'Please check the information you entered.',
+    requestFailed: 'The request failed. Please try again.',
+    roomLimit: 'The room limit has been reached. Please try again later.',
+    forbidden: 'You do not have permission to perform this action.',
+
+    wrongPassword: 'Incorrect login, email or password.',
     emailNotExist: 'User with this email not found',
     loginNotExist: 'User with this login not found',
     emailAlreadyExist: 'A user with this email is already registered',
@@ -13,6 +19,8 @@ export default {
     avatarNotAvailable: 'This avatar is not available for you',
   },
   validators: {
+    maxCharacters: 'Maximum {count} characters',
+    invalidName: 'Enter a name without control characters.',
     requiredField: 'Required field',
     minCharacters: 'Min {count} characters',
     spacesForbidden: 'Spaces are not allowed',

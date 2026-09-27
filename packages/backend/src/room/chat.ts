@@ -5,6 +5,15 @@ export class Chat {
   history: ChatMessage[] = [];
   private requests = new Map<string, ChatMessage>();
 
+  append(entry: ChatMessage): void {
+    this.history.push(entry);
+    if (entry.requestID) this.requests.set(JSON.stringify([entry.userID, entry.requestID]), entry);
+    while (this.history.length > 1000) {
+      const removed = this.history.shift()!;
+      if (removed.requestID) this.requests.delete(JSON.stringify([removed.userID, removed.requestID]));
+    }
+  }
+
   addMessage(message: string, userID: string, requestID?: string): ChatMessage {
     if (typeof message !== 'string' || !message.trim() || message.length > 2000) {
       throw new Error('invalidMessage');
@@ -19,8 +28,7 @@ export class Chat {
       userID,
       timestamp: Date.now(),
     };
-    this.history.push(entry);
-    if (key) this.requests.set(key, entry);
+    this.append(entry);
     return entry;
   }
 }

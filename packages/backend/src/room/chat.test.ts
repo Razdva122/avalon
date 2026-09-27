@@ -16,3 +16,13 @@ test('rejects empty and oversized messages without changing history', () => {
   expect(() => chat.addMessage('a'.repeat(2001), 'alice', '2')).toThrow();
   expect(chat.history).toHaveLength(0);
 });
+
+test('retains only recent messages and releases their old deduplication entries', () => {
+  const chat = new Chat();
+  const first = chat.addMessage('first', 'alice', '0');
+  for (let i = 1; i <= 1000; i++) chat.addMessage(`message ${i}`, 'alice', String(i));
+  expect(chat.history).toHaveLength(1000);
+  expect(chat.history[0].message).toBe('message 1');
+  expect(chat.addMessage('first', 'alice', '0').id).not.toBe(first.id);
+  expect(chat.history).toHaveLength(1000);
+});

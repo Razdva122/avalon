@@ -1,15 +1,14 @@
 <template>
   <div>
-    <span
-      v-html="
-        $t('ambush.history', {
-          ownerName: playerNames[data.ownerID],
-          targetName: playerNames[data.targetID],
-          result: data.result ? $t('inGame.' + data.result) : $t('ambush.resultHidden'),
-        })
-      "
-    >
-    </span>
+    <i18n-t keypath="ambush.history" tag="span" scope="global">
+      <template #ownerName
+        ><b>{{ playerNames[data.ownerID] }}</b></template
+      >
+      <template #targetName
+        ><b>{{ playerNames[data.targetID] }}</b></template
+      >
+      <template #result>{{ data.result ? $t('inGame.' + data.result) : $t('ambush.resultHidden') }}</template>
+    </i18n-t>
   </div>
 </template>
 

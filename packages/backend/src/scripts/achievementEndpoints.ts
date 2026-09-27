@@ -10,7 +10,7 @@ export function registerAchievementEndpoints(socket: ServerSocket): void {
   socket.on('getAllAchievements', (callback) => {
     console.log('Getting all achievements');
     try {
-      achievementModel
+      return achievementModel
         .find()
         .lean()
         .then((achievements) => {
@@ -39,7 +39,7 @@ export function registerAchievementEndpoints(socket: ServerSocket): void {
   socket.on('getUserAchievements', (userID: string, callback) => {
     console.log(`Getting achievements for user: ${userID}`);
     try {
-      userAchievementModel
+      return userAchievementModel
         .find({ userID })
         .lean()
         .then((userAchievements) => {
@@ -68,7 +68,7 @@ export function registerAchievementEndpoints(socket: ServerSocket): void {
   socket.on('getAchievementStats', (callback) => {
     console.log('Getting achievement stats');
     try {
-      achievementStatsModel
+      return achievementStatsModel
         .find()
         .lean()
         .then((stats) => {

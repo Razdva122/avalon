@@ -56,13 +56,13 @@ export default {
     reject: '拒绝：',
   },
   checkLoyalty: {
-    checkInfo: '<b>{ladyOwner}</b> 检查了 <b>{ladyTarget}</b> 的忠诚',
+    checkInfo: '{ladyOwner} 检查了 {ladyTarget} 的忠诚',
   },
   revealLoyalty: {
-    revealInfo: '<b>{revealer}</b> 向 <b>{target}</b> 揭示了自己的忠诚',
+    revealInfo: '{revealer} 向 {target} 揭示了自己的忠诚',
   },
   announceLoyalty: {
-    announceInfo: '<b>{announcer}</b> 宣布了 <b>{target}</b> 的忠诚',
+    announceInfo: '{announcer} 宣布了 {target} 的忠诚',
     declareInfo: '并宣布他的忠诚为',
     actualInfo: '实际上',
   },
@@ -76,7 +76,7 @@ export default {
   },
   switch: {
     skip: '决定不使用 神剑',
-    switchInfo: '<b>{switcher}</b> 使用 神剑 将 <b>{target}</b> 的行动更改为',
+    switchInfo: '{switcher} 使用 神剑 将 {target} 的行动更改为',
   },
   assassinate: {
     lovers: '恋人',
@@ -86,27 +86,27 @@ export default {
     shotResultMiss: '{killedName} 不是 {roleName}',
   },
   giveCard: {
-    toPlayer: '<b>{leaderName}</b> 将卡牌 «{cardName}» 给了 <b>{cardOwner}</b>',
-    toSelf: '<b>{leaderName}</b> 自己收到了卡牌 «{cardName}»',
+    toPlayer: '{leaderName} 将卡牌 «{cardName}» 给了 {cardOwner}',
+    toSelf: '{leaderName} 自己收到了卡牌 «{cardName}»',
   },
   restoreHonor: {
-    transfer: '<b>{newOwnerName}</b> 从 <b>{prevOwnerName}</b> 那里拿走了卡牌 «{cardName}»',
+    transfer: '{newOwnerName} 从 {prevOwnerName} 那里拿走了卡牌 «{cardName}»',
   },
   ambush: {
-    history: '<b>{ownerName}</b> 对 <b>{targetName}</b> 使用了伏击卡并看到了他们的行动: {result}',
+    history: '{ownerName} 对 {targetName} 使用了伏击卡并看到了他们的行动: {result}',
     resultHidden: '隐藏',
   },
   leadToVictory: {
-    history: '<b>{cardOwner}</b> 使用了卡牌 «{cardName}» 并从 <b>{prevLeaderName}</b> 接过了领导权',
+    history: '{cardOwner} 使用了卡牌 «{cardName}» 并从 {prevLeaderName} 接过了领导权',
   },
   kingReturns: {
-    history: '<b>{cardOwner}</b> 使用了卡牌 «{cardName}» 取消了最后一次投票并更换了领导权',
+    history: '{cardOwner} 使用了卡牌 «{cardName}» 取消了最后一次投票并更换了领导权',
   },
   weFoundYou: {
-    history: '<b>{cardOwner}</b> 对 <b>{selectedPlayer}</b> 使用了卡牌 «{cardName}»，迫使他公开打出任务卡',
+    history: '{cardOwner} 对 {selectedPlayer} 使用了卡牌 «{cardName}»，迫使他公开打出任务卡',
   },
   playCard: {
-    history: '<b>{cardOwner}</b> 使用了卡牌 «{cardName}»',
+    history: '{cardOwner} 使用了卡牌 «{cardName}»',
   },
   preVote: {
     title: '初步投票',

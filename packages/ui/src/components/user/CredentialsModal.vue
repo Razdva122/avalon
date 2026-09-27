@@ -59,7 +59,7 @@
     >
       <PasswordField
         v-model="password"
-        :rules="[validators.required, validators.min8, validators.spacesForbidden]"
+        :rules="[validators.required, validators.spacesForbidden]"
         :label="$t('modal.password')"
         :hint="$t('validators.minCharacters', { count: 8 })"
         counter
@@ -67,7 +67,7 @@
       <PasswordField
         v-model="newPassword"
         autocomplete="new-password"
-        :rules="[validators.required, validators.min8, validators.spacesForbidden]"
+        :rules="[validators.required, validators.min8, validators.maxPasswordBytes, validators.spacesForbidden]"
         :label="$t('modal.newPassword')"
         :hint="$t('validators.minCharacters', { count: 8 })"
         counter

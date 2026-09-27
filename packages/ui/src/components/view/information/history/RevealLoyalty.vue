@@ -1,13 +1,13 @@
 <template>
   <div>
-    <span
-      v-html="
-        $t('revealLoyalty.revealInfo', {
-          revealer: playerNames[data.revealerID],
-          target: playerNames[data.targetID],
-        })
-      "
-    ></span>
+    <i18n-t keypath="revealLoyalty.revealInfo" tag="span" scope="global">
+      <template #revealer
+        ><b>{{ playerNames[data.revealerID] }}</b></template
+      >
+      <template #target
+        ><b>{{ playerNames[data.targetID] }}</b></template
+      >
+    </i18n-t>
   </div>
 </template>
 

@@ -1,3 +1,4 @@
+import { roomChannel, userChannel } from '@/helpers/channels';
 import { publicRoomState } from '@/ai/public-state';
 import type { TRoomState, Server, GameOptions, TVoteTarget, VoteInRoom } from '@avalon/types';
 import type { TRoomData } from '@/room/interface';
@@ -66,10 +67,10 @@ export class Room {
   }
 
   addMessage(userID: string, message: string, requestID?: string) {
-    const count = this.chat.history.length;
+    const previous = this.chat.history[this.chat.history.length - 1];
     const entry = this.chat.addMessage(message, userID, requestID);
-    if (this.chat.history.length !== count) {
-      this.io.to(this.roomID).emit('newMessage', {
+    if (entry !== previous && entry === this.chat.history[this.chat.history.length - 1]) {
+      this.io.to(roomChannel(this.roomID)).emit('newMessage', {
         id: entry.id,
         roomID: this.roomID,
         text: entry.message,
@@ -93,12 +94,15 @@ export class Room {
   updateRoomState(direct: boolean = false) {
     if (direct) {
       this.players.forEach((playerID) => {
-        this.io.to(playerID).emit('roomUpdated', publicRoomState(this.calculateRoomState(playerID)));
+        this.io.to(userChannel(playerID)).emit('roomUpdated', publicRoomState(this.calculateRoomState(playerID)));
       });
 
-      this.io.except(this.players).to(this.roomID).emit('roomUpdated', publicRoomState(this.calculateRoomState()));
+      this.io
+        .except(this.players.map(userChannel))
+        .to(roomChannel(this.roomID))
+        .emit('roomUpdated', publicRoomState(this.calculateRoomState()));
     } else {
-      this.io.to(this.roomID).emit('roomUpdated', publicRoomState(this.calculateRoomState()));
+      this.io.to(roomChannel(this.roomID)).emit('roomUpdated', publicRoomState(this.calculateRoomState()));
     }
   }
 

@@ -1,3 +1,4 @@
+import { userChannel } from '@/helpers/channels';
 import { validateJWT } from '@/user';
 import { userProfileModel } from '@/db/models';
 import type { Server, ServerSocket } from '@avalon/types';
@@ -36,8 +37,16 @@ export function installSessionChecks(io: Server) {
   io.on('connection', (socket) => {
     if (socket.data.invalidSession) socket.emit('renewJWT');
     if (!socket.data.authUser) return;
+    let pending: ReturnType<typeof authenticatedUser> | undefined;
+    const check = () => {
+      if (!pending)
+        pending = authenticatedUser(socket.handshake.auth.token).finally(() => {
+          pending = undefined;
+        });
+      return pending;
+    };
     socket.use((_packet, next) => {
-      void authenticatedUser(socket.handshake.auth.token).then(
+      void check().then(
         () => next(),
         () => {
           revoke(socket);
@@ -46,7 +55,7 @@ export function installSessionChecks(io: Server) {
       );
     });
     const timer = setInterval(() => {
-      void authenticatedUser(socket.handshake.auth.token).catch(() => revoke(socket));
+      void check().catch(() => revoke(socket));
     }, 60000);
     timer.unref();
     socket.on('disconnect', () => clearInterval(timer));
@@ -54,6 +63,6 @@ export function installSessionChecks(io: Server) {
 }
 
 export function revokeUserSockets(io: Server, userID: string) {
-  io.to(userID).emit('renewJWT');
-  io.in(userID).disconnectSockets(true);
+  io.to(userChannel(userID)).emit('renewJWT');
+  io.in(userChannel(userID)).disconnectSockets(true);
 }

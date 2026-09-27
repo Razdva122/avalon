@@ -121,7 +121,7 @@ import {
 } from '@/helpers/stats';
 
 import { socket } from '@/api/socket';
-import type { PlayerGameSummary, GameTrueSkillResult } from '@avalon/types';
+import type { GameTrueSkillResult } from '@avalon/types';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import TeammateProfile from '@/components/stats/TeammateProfile.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
@@ -169,11 +169,9 @@ export default defineComponent({
       teammates.value = [];
       enemies.value = [];
       try {
-        const games: PlayerGameSummary[] | null = await socket
-          .timeout(20000)
-          .emitWithAck('getPlayerGameSummaries', uuid);
+        const games = await socket.timeout(20000).emitWithAck('getPlayerGameSummaries', uuid);
         if (currentRequest !== requestId) return;
-        if (!games) throw new Error('Player statistics unavailable');
+        if (!Array.isArray(games)) throw new Error('Player statistics unavailable');
         state.value = prepareUserStats(games, uuid);
         lastGames.value = prepareGamesForView(games, uuid, 5);
         teammates.value = preparePlayerStats(games, uuid, 'teammate');

@@ -1,5 +1,5 @@
 export const backendPort = 3000;
-export const frontendURL = process.env.NODE_ENV === 'production' ? 'avalon-game.com' : 'http://localhost:8080';
+export const frontendURL = process.env.NODE_ENV === 'production' ? 'https://avalon-game.com' : 'http://localhost:8080';
 
 // Dev servers can use another port when 8080 is already occupied.
 export const frontendOrigin =

@@ -1,6 +1,6 @@
 import { AI_LEASE_MS } from './timing';
 import type { Db } from 'mongodb';
-import type { AiBudgetSnapshot, StartedRoomState, TRoomState } from '@avalon/types';
+import type { AiBudgetSnapshot, StartedRoomState, TRoomState, TRoomInfo } from '@avalon/types';
 import { AiPause, AiMatchBudgetPause } from './client';
 
 export type AiRequestLog = {
@@ -50,7 +50,21 @@ type Ledger = {
   anchor?: number;
   periods?: Record<string, number>;
 };
+function validateID(id: unknown): asserts id is string {
+  if (typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id)) throw new Error('Invalid ID');
+}
+
+type ArchiveSummary = Pick<
+  StartedRoomState,
+  'roomID' | 'ai' | 'stage' | 'leaderID' | 'players' | 'options' | 'createAt' | 'startAt'
+> & { game: Pick<StartedRoomState['game'], 'result'> };
+
 export class AiRepository {
+  private listCache?: { value: TRoomInfo[]; expires: number };
+  private listPending?: Promise<TRoomInfo[]>;
+  private listVersion = 0;
+  private indexes?: Promise<unknown>;
+
   constructor(
     private db: Db,
     private totalRub = 700,
@@ -109,6 +123,7 @@ export class AiRepository {
     };
   }
   async claim(roomID: string) {
+    validateID(roomID);
     await this.initialize();
     const result = await this.ledger.updateOne(
       {
@@ -120,12 +135,14 @@ export class AiRepository {
     if (!result.matchedCount) throw new AiPause('Другая AI-партия уже запущена.');
   }
   async release(roomID: string) {
+    validateID(roomID);
     await this.ledger.updateOne(
       { _id: this.options.ledgerID || 'avalon-ai-v1', owner: roomID },
       { $unset: { owner: '', leaseUntil: '' } },
     );
   }
   async reserve(roomID: string, units: number) {
+    validateID(roomID);
     if (!Number.isSafeInteger(units) || units <= 0 || !/^[a-zA-Z0-9-]+$/.test(roomID))
       throw new AiPause('Ошибка учёта расхода.');
     const roomKey = `rooms.${roomID}`;
@@ -167,10 +184,12 @@ export class AiRepository {
     return period === undefined ? undefined : String(period);
   }
   async roomLimit(roomID: string) {
+    validateID(roomID);
     const ledger = await this.ledger.findOne({ _id: this.options.ledgerID || 'avalon-ai-v1' });
     return ledger?.roomLimits?.[roomID] ?? this.matchRub;
   }
   async doubleMatchLimit(roomID: string, reserveUnits: number) {
+    validateID(roomID);
     if (!/^[a-zA-Z0-9-]{1,80}$/.test(roomID) || !Number.isSafeInteger(reserveUnits) || reserveUnits <= 0)
       throw new AiPause('Invalid resume request');
     const ledger = await this.ledger.findOne({ _id: this.options.ledgerID || 'avalon-ai-v1' });
@@ -197,6 +216,7 @@ export class AiRepository {
     return next;
   }
   async settle(roomID: string, reserved: number, actual: number, period?: string) {
+    validateID(roomID);
     if (
       !Number.isSafeInteger(actual) ||
       actual < 0 ||
@@ -220,15 +240,84 @@ export class AiRepository {
     if (actual > reserved) throw new AiPause('Расход превысил резерв. Требуется проверка тарифа.');
   }
   async roomCost(roomID: string) {
+    validateID(roomID);
     const ledger = await this.ledger.findOne({ _id: this.options.ledgerID || 'avalon-ai-v1' });
     return (ledger?.rooms[roomID] || 0) / 10000;
   }
   async save(state: TRoomState) {
     // Separate collection keeps AI replays out of all existing ranked statistics queries.
     if (state.stage !== 'started') return;
+    validateID(state.roomID);
     await this.db
       .collection<{ _id: string; state: StartedRoomState }>('ai_room_replays')
       .updateOne({ _id: state.roomID }, { $set: { state: structuredClone(state) } }, { upsert: true });
+    this.listVersion++;
+    this.listCache = undefined;
+  }
+  async recentSummaries(): Promise<TRoomInfo[]> {
+    if (this.listCache && this.listCache.expires > Date.now()) return this.listCache.value;
+    if (this.listPending) return this.listPending;
+    const version = this.listVersion;
+    const pending = this.readSummaries().then((value) => {
+      if (version === this.listVersion) this.listCache = { value, expires: Date.now() + 15000 };
+      return value;
+    });
+    this.listPending = pending;
+    try {
+      return await pending;
+    } finally {
+      if (this.listPending === pending) this.listPending = undefined;
+    }
+  }
+  private async readSummaries(): Promise<TRoomInfo[]> {
+    if (!this.indexes)
+      this.indexes = Promise.all([
+        this.db.collection('ai_room_replays').createIndex({ 'state.createAt': -1 }),
+        this.db.collection('ai_decision_traces').createIndex({ roomID: 1 }),
+      ]).catch((error) => {
+        this.indexes = undefined;
+        throw error;
+      });
+    await this.indexes;
+    const docs = await this.db
+      .collection<{ state: ArchiveSummary }>('ai_room_replays')
+      .find(
+        {},
+        {
+          projection: {
+            _id: 0,
+            'state.roomID': 1,
+            'state.ai': 1,
+            'state.stage': 1,
+            'state.leaderID': 1,
+            'state.players.id': 1,
+            'state.options': 1,
+            'state.createAt': 1,
+            'state.startAt': 1,
+            'state.game.result': 1,
+          },
+          maxTimeMS: 10000,
+        },
+      )
+      .sort({ 'state.createAt': -1 })
+      .limit(20)
+      .toArray();
+    const states = await this.restoreModels(docs.map(({ state }) => this.archiveState(state)));
+    return states
+      .filter((state) => state.ai)
+      .map((state) => ({
+        uuid: state.roomID,
+        ai: true,
+        aiStatus: state.ai?.status,
+        aiModel: state.ai?.model,
+        hostID: state.leaderID,
+        state: state.stage,
+        players: state.players.length,
+        options: state.options,
+        createAt: state.createAt,
+        startAt: state.startAt,
+        result: state.game?.result,
+      }));
   }
   async recent(limit: number): Promise<StartedRoomState[]> {
     const docs = await this.db
@@ -239,7 +328,7 @@ export class AiRepository {
       .toArray();
     return this.restoreModels(docs.map(({ state }) => this.archiveState(state)));
   }
-  private async restoreModels(states: StartedRoomState[]): Promise<StartedRoomState[]> {
+  private async restoreModels<T extends Pick<StartedRoomState, 'roomID' | 'ai'>>(states: T[]): Promise<T[]> {
     const ids = states.filter((state) => state.ai && !state.ai.model).map((state) => state.roomID);
     if (!ids.length) return states;
     const records = await this.db
@@ -260,7 +349,7 @@ export class AiRepository {
     }
     return states;
   }
-  private archiveState(state: StartedRoomState) {
+  private archiveState<T extends Pick<StartedRoomState, 'ai'>>(state: T) {
     if (state.ai) {
       state.ai.canResumeBudget = false;
       state.ai.canResumeTechnical = false;
@@ -272,6 +361,7 @@ export class AiRepository {
     return state;
   }
   async load(id: string) {
+    validateID(id);
     const doc = await this.db
       .collection<{ _id: string; state: StartedRoomState }>('ai_room_replays')
       .findOne({ _id: id });

@@ -1,3 +1,4 @@
+import { userChannel } from '@/helpers/channels';
 import { Achievement, UserAchievement, AchievementStats } from '@avalon/types';
 import { Server } from 'socket.io';
 import { achievementModel, userAchievementModel, achievementStatsModel, userFeaturesModel } from '../db/models';
@@ -140,7 +141,7 @@ export class AchievementService {
   private notifyAchievementUnlocked(userID: string, achievementID: string): void {
     try {
       if (this.io) {
-        this.io.to(userID).emit('achievementUnlocked', achievementID);
+        this.io.to(userChannel(userID)).emit('achievementUnlocked', achievementID);
       }
     } catch (error) {
       console.error('Error sending achievement unlocked notification:', error);
@@ -158,7 +159,7 @@ export class AchievementService {
   ): void {
     try {
       if (this.io) {
-        this.io.to(userID).emit('achievementProgress', {
+        this.io.to(userChannel(userID)).emit('achievementProgress', {
           achievementID,
           currentProgress,
           requirement,

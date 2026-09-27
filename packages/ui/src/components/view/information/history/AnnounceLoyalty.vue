@@ -1,13 +1,13 @@
 <template>
   <div>
-    <span
-      v-html="
-        $t('announceLoyalty.announceInfo', {
-          announcer: playerNames[data.announcerID],
-          target: playerNames[data.targetID],
-        })
-      "
-    ></span>
+    <i18n-t keypath="announceLoyalty.announceInfo" tag="span" scope="global">
+      <template #announcer
+        ><b>{{ playerNames[data.announcerID] }}</b></template
+      >
+      <template #target
+        ><b>{{ playerNames[data.targetID] }}</b></template
+      >
+    </i18n-t>
   </div>
   <div>
     {{ $t('announceLoyalty.declareInfo') }}

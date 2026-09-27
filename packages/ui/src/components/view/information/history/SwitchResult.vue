@@ -1,13 +1,13 @@
 <template>
   <div v-if="data.targetID">
-    <span
-      v-html="
-        $t('switch.switchInfo', {
-          switcher: playerNames[data.switcherID],
-          target: playerNames[data.targetID],
-        })
-      "
-    ></span>
+    <i18n-t keypath="switch.switchInfo" tag="span" scope="global">
+      <template #switcher
+        ><b>{{ playerNames[data.switcherID] }}</b></template
+      >
+      <template #target
+        ><b>{{ playerNames[data.targetID] }}</b></template
+      >
+    </i18n-t>
     <span>&nbsp;</span>
     <template v-if="data.result">
       <span :class="data.result === 'fail' ? 'text-error' : 'text-success'"> {{ $t('inGame.' + data.result) }} </span>

@@ -152,7 +152,7 @@ export default defineComponent({
       try {
         const games = await socket.timeout(20000).emitWithAck('getPlayerGameSummaries', userID);
         if (currentRequest !== requestId) return;
-        if (!games) throw new Error('Player statistics unavailable');
+        if (!Array.isArray(games)) throw new Error('Player statistics unavailable');
         const stats = prepareUserStats(games, userID).teams.total;
         totalGames.value = stats.total;
         overallWinrate.value = Number(stats.winrate);

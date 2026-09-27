@@ -1,26 +1,20 @@
 <template>
   <div>
-    <span
-      v-if="data.target === 'player'"
-      v-html="
-        $t('giveCard.toPlayer', {
-          cardName: $t('cardsInfo.' + data.cardName),
-          leaderName: playerNames[data.leaderID],
-          cardOwner: playerNames[data.ownerID],
-        })
-      "
-    >
-    </span>
-    <span
-      v-else
-      v-html="
-        $t('giveCard.toSelf', {
-          cardName: $t('cardsInfo.' + data.cardName),
-          leaderName: playerNames[data.leaderID],
-        })
-      "
-    >
-    </span>
+    <i18n-t v-if="data.target === 'player'" keypath="giveCard.toPlayer" tag="span" scope="global">
+      <template #cardName>{{ $t('cardsInfo.' + data.cardName) }}</template>
+      <template #leaderName
+        ><b>{{ playerNames[data.leaderID] }}</b></template
+      >
+      <template #cardOwner
+        ><b>{{ playerNames[data.ownerID] }}</b></template
+      >
+    </i18n-t>
+    <i18n-t v-else keypath="giveCard.toSelf" tag="span" scope="global">
+      <template #cardName>{{ $t('cardsInfo.' + data.cardName) }}</template>
+      <template #leaderName
+        ><b>{{ playerNames[data.leaderID] }}</b></template
+      >
+    </i18n-t>
   </div>
 </template>
 

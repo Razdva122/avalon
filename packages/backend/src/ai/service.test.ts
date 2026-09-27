@@ -291,8 +291,21 @@ test('public AI list returns latest 20 unique rooms with live state and no priva
     },
   } as unknown as Manager;
   const service = new AiService(host);
-  const recent = jest.fn(async () => archived);
-  service.repository = { recent } as unknown as AiRepository;
+  const recent = jest.fn(async () =>
+    archived.map((room) => ({
+      uuid: room.roomID,
+      ai: true,
+      aiStatus: room.ai.status,
+      aiModel: room.ai.model,
+      hostID: room.leaderID,
+      state: room.stage,
+      options: room.options,
+      players: room.players.length,
+      createAt: room.createAt,
+      result: room.game.result,
+    })),
+  );
+  service.repository = { recentSummaries: recent } as unknown as AiRepository;
   const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
   service.register({
     on: (name: string, handler: any) => {
@@ -301,7 +314,7 @@ test('public AI list returns latest 20 unique rooms with live state and no priva
   } as unknown as ServerSocket);
   const response = jest.fn();
   await handlers.getAiRoomsList(response);
-  expect(recent).toHaveBeenCalledWith(20);
+  expect(recent).toHaveBeenCalledWith();
   const { rooms } = response.mock.calls[0][0];
   expect(rooms).toHaveLength(20);
   expect(rooms.map((room: any) => room.uuid)).toEqual(

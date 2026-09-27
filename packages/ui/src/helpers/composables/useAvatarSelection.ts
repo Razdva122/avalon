@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import type { IAvatarInfo } from '@avalon/types';
 
 interface AvatarSelectionOptions {
-  load: () => Promise<IAvatarInfo[]>;
+  load: () => Promise<IAvatarInfo[] | { error: string }>;
   save: (id: string) => Promise<true | { error: string }>;
   current: () => string | undefined;
 }
@@ -28,6 +28,7 @@ export function useAvatarSelection({ load, save, current }: AvatarSelectionOptio
     loading.value = true;
     try {
       const result = await load();
+      if (!Array.isArray(result)) throw new Error(result.error);
       if (requestSession === session) {
         avatars.value = [...result].sort((a, b) => Number(b.available) - Number(a.available));
       }

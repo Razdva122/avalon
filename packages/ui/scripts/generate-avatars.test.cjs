@@ -40,7 +40,7 @@ test('image generation preserves avatar animation and creates 512px avatars plus
   const script = path.join(root, 'scripts/generate-avatars.cjs');
   await fs.copyFile(path.join(__dirname, 'generate-avatars.cjs'), script);
   execFileSync(process.execPath, [script], {
-    env: { ...process.env, NODE_PATH: path.resolve(__dirname, '../../../node_modules') },
+    env: { ...process.env, NODE_PATH: require.resolve.paths('sharp').join(path.delimiter) },
   });
   const generated = await fs.readFile(path.join(root, 'src/assets/avatars/premium/animated.webp'));
   assert.deepEqual(generated, animation, 'animation frames, timing and compression must be preserved');

@@ -56,13 +56,13 @@ export default {
     reject: 'Rechazar:',
   },
   checkLoyalty: {
-    checkInfo: '<b>{ladyOwner}</b> verificó la lealtad de <b>{ladyTarget}</b>',
+    checkInfo: '{ladyOwner} verificó la lealtad de {ladyTarget}',
   },
   revealLoyalty: {
-    revealInfo: '<b>{revealer}</b> reveló su lealtad a <b>{target}</b>',
+    revealInfo: '{revealer} reveló su lealtad a {target}',
   },
   announceLoyalty: {
-    announceInfo: '<b>{announcer}</b> anunció la lealtad de <b>{target}</b>',
+    announceInfo: '{announcer} anunció la lealtad de {target}',
     declareInfo: 'Y declaró su lealtad como',
     actualInfo: 'en realidad',
   },
@@ -76,7 +76,7 @@ export default {
   },
   switch: {
     skip: 'decidió no usar excalibur',
-    switchInfo: '<b>{switcher}</b> usó excalibur para cambiar la acción de <b>{target}</b> a',
+    switchInfo: '{switcher} usó excalibur para cambiar la acción de {target} a',
   },
   assassinate: {
     lovers: 'Amantes',
@@ -86,24 +86,24 @@ export default {
     shotResultMiss: '{killedName} no es {roleName}',
   },
   giveCard: {
-    toPlayer: '<b>{leaderName}</b> dio la carta «{cardName}» a <b>{cardOwner}</b>',
-    toSelf: '<b>{leaderName}</b> se dio la carta «{cardName}» a sí mismo',
+    toPlayer: '{leaderName} dio la carta «{cardName}» a {cardOwner}',
+    toSelf: '{leaderName} se dio la carta «{cardName}» a sí mismo',
   },
   restoreHonor: {
-    transfer: '<b>{newOwnerName}</b> tomó la carta «{cardName}» de <b>{prevOwnerName}</b>',
+    transfer: '{newOwnerName} tomó la carta «{cardName}» de {prevOwnerName}',
   },
   ambush: {
-    history: '<b>{ownerName}</b> usó la carta Emboscada en <b>{targetName}</b> y vio su acción: {result}',
+    history: '{ownerName} usó la carta Emboscada en {targetName} y vio su acción: {result}',
     resultHidden: 'oculto',
   },
   leadToVictory: {
-    history: '<b>{cardOwner}</b> usó la carta «{cardName}» y tomó el liderazgo de <b>{prevLeaderName}</b>',
+    history: '{cardOwner} usó la carta «{cardName}» y tomó el liderazgo de {prevLeaderName}',
   },
   kingReturns: {
-    history: '<b>{cardOwner}</b> usó la carta «{cardName}» para cancelar la última votación y cambiar el liderazgo',
+    history: '{cardOwner} usó la carta «{cardName}» para cancelar la última votación y cambiar el liderazgo',
   },
   playCard: {
-    history: '<b>{cardOwner}</b> jugó la carta «{cardName}»',
+    history: '{cardOwner} jugó la carta «{cardName}»',
   },
   preVote: {
     title: 'Votación preliminar',

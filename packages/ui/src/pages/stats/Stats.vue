@@ -1,7 +1,9 @@
 <template>
   <div class="info-page-content stats-page">
     <h1>{{ $t('stats.title') }}</h1>
-    <p v-if="!state">{{ $t('mainPage.loading') }}</p>
+    <p v-if="error" role="alert">{{ $t('errors.' + error) }}</p>
+    <v-btn v-if="error" @click="initState">{{ $t('mainPage.retryAi') }}</v-btn>
+    <p v-if="!state && !error">{{ $t('mainPage.loading') }}</p>
     <template v-if="state">
       <div class="total-stats">
         <h2>{{ $t('stats.generalStatsTitle') }}</h2>
@@ -47,6 +49,7 @@ import { useI18n } from 'vue-i18n';
 import type { TTotalWinrateStats, TRoleStats } from '@avalon/types';
 import { goodRolesImportance } from '@avalon/types/consts';
 import { socket } from '@/api/socket';
+import { isSocketError } from '@/helpers/socket-errors';
 import { prettifyPercent } from '@/helpers/stats';
 import PlayerCountsStats from '@/components/stats/PlayerCountsStats.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
@@ -61,12 +64,22 @@ export default defineComponent({
   },
   setup() {
     const state = ref<TTotalWinrateStats>();
+    const error = ref('');
 
     const { t } = useI18n();
 
     const initState = async () => {
-      const stateFromBackend = await socket.emitWithAck('getTotalStats');
-      state.value = stateFromBackend;
+      error.value = '';
+      try {
+        const result = await socket.timeout(10000).emitWithAck('getTotalStats');
+        if (isSocketError(result)) {
+          error.value = result.error;
+          return;
+        }
+        state.value = result;
+      } catch {
+        error.value = 'requestFailed';
+      }
     };
 
     void initState();
@@ -176,6 +189,8 @@ export default defineComponent({
 
     return {
       state,
+      error,
+      initState,
       rolesTables,
       byPlayersTable,
       generalTable,

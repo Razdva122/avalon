@@ -59,7 +59,7 @@ app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, '../dist/index.
     await page.click('.recovery-card button[type=submit]');
     await page.waitForSelector('.recovery-card .v-input--error');
     assert.equal(resetBody, undefined);
-    await inputs[1].click({ clickCount: 3 });
+    await inputs[1].click({ count: 3 });
     await inputs[1].press('Backspace');
     await inputs[1].type('new-password');
     await page.click('.recovery-card button[type=submit]');

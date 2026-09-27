@@ -1,13 +1,13 @@
 <template>
   <div>
-    <span
-      v-html="
-        $t('checkLoyalty.checkInfo', {
-          ladyOwner: playerNames[data.validatorID],
-          ladyTarget: playerNames[data.inspectedID],
-        })
-      "
-    ></span>
+    <i18n-t keypath="checkLoyalty.checkInfo" tag="span" scope="global">
+      <template #ladyOwner
+        ><b>{{ playerNames[data.validatorID] }}</b></template
+      >
+      <template #ladyTarget
+        ><b>{{ playerNames[data.inspectedID] }}</b></template
+      >
+    </i18n-t>
   </div>
 </template>
 

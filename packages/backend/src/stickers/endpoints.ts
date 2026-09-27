@@ -1,3 +1,4 @@
+import { roomChannel } from '@/helpers/channels';
 import crypto from 'crypto';
 import type { Server, ServerSocket } from '@avalon/types';
 import type { Room } from '@/room';
@@ -38,14 +39,14 @@ export function registerStickerEndpoints(
   });
   socket.on('sendSticker', async (uuid, stickerID, cb) => {
     const room = getRoom(uuid);
-    if (!room || !socket.rooms.has(uuid)) {
+    if (!room || !socket.rooms.has(roomChannel(uuid))) {
       cb({ error: 'notInRoom' });
       return;
     }
     try {
       cb(
         await manager.authorizeSend(userID, stickerID, () => {
-          if (getRoom(uuid) !== room || !socket.rooms.has(uuid)) throw new Error('Room left');
+          if (getRoom(uuid) !== room || !socket.rooms.has(roomChannel(uuid))) throw new Error('Room left');
           const message = {
             id: crypto.randomUUID(),
             roomID: uuid,
@@ -57,7 +58,7 @@ export function registerStickerEndpoints(
                 ? room.data.manager.game.players.some((p) => p.userID === userID)
                 : room.players.includes(userID),
           };
-          room.chat.history.push({
+          room.chat.append({
             id: message.id,
             kind: 'sticker',
             stickerID,
@@ -65,7 +66,7 @@ export function registerStickerEndpoints(
             timestamp: message.timestamp,
             message: stickerID,
           });
-          io.to(uuid).emit('stickerSent', message);
+          io.to(roomChannel(uuid)).emit('stickerSent', message);
         }),
       );
     } catch {

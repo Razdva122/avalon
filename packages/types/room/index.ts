@@ -80,6 +80,7 @@ export class LockedRoomState extends BaseRoomState {
   declare stage: 'locked';
 }
 
+@index({ roomID: 1 })
 @index({ 'players.id': 1, 'game.stage': 1, _id: 1 })
 export class StartedRoomState extends BaseRoomState {
   declare stage: 'started';

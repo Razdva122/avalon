@@ -1,4 +1,4 @@
-FROM --platform=${BUILDPLATFORM} ghcr.io/puppeteer/puppeteer:22.5.0 AS build-stage
+FROM --platform=${BUILDPLATFORM} ghcr.io/puppeteer/puppeteer:25.12.0@sha256:60ad89b1d8ca14877120250b9c96694dd19a4eda5890fdbad64f4740c6a27361 AS build-stage
 
 ARG APP_DIR=/home/pptruser/app
 RUN mkdir -p ${APP_DIR}

@@ -56,13 +56,13 @@ export default {
     reject: 'Против:',
   },
   checkLoyalty: {
-    checkInfo: '<b>{ladyOwner}</b> проверил лояльность <b>{ladyTarget}</b>',
+    checkInfo: '{ladyOwner} проверил лояльность {ladyTarget}',
   },
   revealLoyalty: {
-    revealInfo: '<b>{revealer}</b> показал свою лояльность <b>{target}</b>',
+    revealInfo: '{revealer} показал свою лояльность {target}',
   },
   announceLoyalty: {
-    announceInfo: '<b>{announcer}</b> объявил лояльность <b>{target}</b>',
+    announceInfo: '{announcer} объявил лояльность {target}',
     declareInfo: 'и сказал что его лояльность -',
     actualInfo: 'на самом деле',
   },
@@ -76,7 +76,7 @@ export default {
   },
   switch: {
     skip: 'решил не использовать Экскалибур',
-    switchInfo: '<b>{switcher}</b> использовал Экскалибур и изменил решение <b>{target}</b> на',
+    switchInfo: '{switcher} использовал Экскалибур и изменил решение {target} на',
   },
   assassinate: {
     lovers: 'Любовники',
@@ -86,28 +86,28 @@ export default {
     shotResultMiss: '{killedName} не был {roleName}',
   },
   giveCard: {
-    toPlayer: '<b>{leaderName}</b> передал карту «{cardName}» игроку <b>{cardOwner}</b>',
-    toSelf: '<b>{leaderName}</b> получил карту «{cardName}» себе',
+    toPlayer: '{leaderName} передал карту «{cardName}» игроку {cardOwner}',
+    toSelf: '{leaderName} получил карту «{cardName}» себе',
   },
   restoreHonor: {
-    transfer: '<b>{newOwnerName}</b> забрал карту «{cardName}» у <b>{prevOwnerName}</b>',
+    transfer: '{newOwnerName} забрал карту «{cardName}» у {prevOwnerName}',
   },
   ambush: {
-    history: '<b>{ownerName}</b> использовал карту Засада на <b>{targetName}</b> и увидел его действие: {result}',
+    history: '{ownerName} использовал карту Засада на {targetName} и увидел его действие: {result}',
     resultHidden: 'скрыто',
   },
   leadToVictory: {
-    history: '<b>{cardOwner}</b> использовал карту «{cardName}» и забрал лидерство у <b>{prevLeaderName}</b>',
+    history: '{cardOwner} использовал карту «{cardName}» и забрал лидерство у {prevLeaderName}',
   },
   kingReturns: {
-    history: '<b>{cardOwner}</b> использовал карту «{cardName}» для отмены последнего голосования и смены лидерства',
+    history: '{cardOwner} использовал карту «{cardName}» для отмены последнего голосования и смены лидерства',
   },
   weFoundYou: {
     history:
-      '<b>{cardOwner}</b> использовал карту «{cardName}» на <b>{selectedPlayer}</b>, заставив его сыграть карту похода открыто',
+      '{cardOwner} использовал карту «{cardName}» на {selectedPlayer}, заставив его сыграть карту похода открыто',
   },
   playCard: {
-    history: '<b>{cardOwner}</b> сыграл карту «{cardName}»',
+    history: '{cardOwner} сыграл карту «{cardName}»',
   },
   preVote: {
     title: 'Предварительное голосование',
