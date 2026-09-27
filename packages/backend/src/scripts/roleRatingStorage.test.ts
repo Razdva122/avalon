@@ -83,3 +83,39 @@ test('orphan cleanup preserves current entries and gives superseded readers a gr
   expect(await entries.countDocuments({ generation: 'orphan' })).toBe(0);
   expect((await readRoleRatings({ userID: 'p' }, { rating: -1 }))[0].rating).toBe(99);
 });
+
+test('backfill is repeatable, preserves the leaderboard and bypasses migrated legacy arrays', async () => {
+  const storage = await import('./roleRatingStorage');
+  const { roleRankingsModel } = await import('@/db/models');
+  const backfill = (storage as unknown as { backfillRoleHistory(start: Date): Promise<void> }).backfillRoleHistory;
+  expect(typeof backfill).toBe('function');
+  const date = new Date('2026-09-24T01:00:00Z');
+  const inserted = await roleRankingsModel.collection.insertOne({
+    date,
+    ratings: [row(0), row(999), { ...row(5), userID: 'other' }],
+  });
+  await backfill(new Date('2026-09-01'));
+  await backfill(new Date('2026-09-01'));
+  expect((await readRoleRatings({ userID: 'p' }, { rating: -1 }))[0].rating).toBe(99);
+  // A migrated snapshot must not even evaluate its old array on subsequent reads.
+  await roleRankingsModel.collection.updateOne({ _id: inserted.insertedId }, { $set: { ratings: 'unreadable' } });
+  const history = await readRoleHistory('p', 'merlin', new Date('2026-09-01'));
+  expect(history.filter((point) => point.date.getTime() === date.getTime())).toEqual([{ date, rating: 0, rank: 1 }]);
+  const missing = await readRoleHistory('missing', 'merlin', new Date('2026-09-01'));
+  expect(missing.find((point) => point.date.getTime() === date.getTime())).toEqual({ date, rating: null, rank: null });
+});
+
+test('interrupted backfill leaves legacy history readable and retry publishes the complete day', async () => {
+  const { backfillRoleHistory } = await import('./roleRatingStorage');
+  const { roleRankingsModel } = await import('@/db/models');
+  const date = new Date('2026-10-01T01:00:00Z');
+  await roleRankingsModel.collection.insertOne({ date, ratings: [row(45)] });
+  const write = jest
+    .spyOn(mongoose.mongo.Collection.prototype, 'insertMany')
+    .mockRejectedValueOnce(new Error('interrupted'));
+  await expect(backfillRoleHistory(date)).rejects.toThrow('interrupted');
+  write.mockRestore();
+  expect(await readRoleHistory('p', 'merlin', date)).toEqual([{ date, rating: 45, rank: 1 }]);
+  await backfillRoleHistory(date);
+  expect(await readRoleHistory('p', 'merlin', date)).toEqual([{ date, rating: 45, rank: 1 }]);
+});

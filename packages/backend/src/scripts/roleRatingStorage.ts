@@ -23,12 +23,68 @@ function collections() {
 }
 export async function ensureRoleRatingIndexes(): Promise<void> {
   const { entries } = collections();
+  await roleRankingsModel.collection.createIndex({ date: 1 });
   await entries.createIndexes([
     { key: { generation: 1, userID: 1, role: 1 }, unique: true },
     { key: { generation: 1, role: 1, rank: 1 } },
     { key: { userID: 1, role: 1, date: 1 } },
     { key: { createdAt: 1, retiredAt: 1 } },
   ]);
+}
+
+/** Import recent immutable snapshots without switching the current leaderboard. */
+export async function backfillRoleHistory(startDate: Date): Promise<void> {
+  await ensureRoleRatingIndexes();
+  const { entries, publication } = collections();
+  const snapshots = roleRankingsModel
+    .find({ date: { $gte: startDate } }, { date: 1 })
+    .sort({ date: -1, _id: -1 })
+    .lean()
+    .cursor({ batchSize: 32 });
+  try {
+    for await (const snapshot of snapshots) {
+      const day = snapshot.date.toISOString().slice(0, 10);
+      const current = await publication.findOne({ _id: 'current' });
+      if (current?.days?.some((entry) => entry.date.toISOString().slice(0, 10) === day)) continue;
+      const staging = await beginRoleRatingPublication();
+      if (staging.previous?.days?.some((entry) => entry.date.toISOString().slice(0, 10) === day)) {
+        await publication.updateOne(
+          { _id: 'current', staging: staging.generation },
+          { $unset: { staging: '', stagedAt: '' } },
+        );
+        continue;
+      }
+      const source = await roleRankingsModel.findById(snapshot._id, { ratings: 1 }).lean();
+      if (!source) throw new Error('Role history snapshot disappeared during migration');
+      // Preserve Array.find semantics if a legacy snapshot repeats a player/role.
+      const unique = new Map<string, RoleRating>();
+      for (const rating of source.ratings) {
+        const key = JSON.stringify([rating.userID, rating.role]);
+        if (!unique.has(key)) unique.set(key, rating);
+      }
+      const rows = [...unique.values()];
+      for (let offset = 0; offset < rows.length; offset += 500) {
+        await entries.insertMany(
+          rows.slice(offset, offset + 500).map((row) => ({
+            ...row,
+            generation: staging.generation,
+            date: snapshot.date,
+            createdAt: staging.createdAt,
+          })),
+        );
+      }
+      const result = await publication.updateOne(
+        { _id: 'current', staging: staging.generation, generation: staging.previous?.generation ?? { $exists: false } },
+        {
+          $set: { days: [...(staging.previous?.days || []), { generation: staging.generation, date: snapshot.date }] },
+          $unset: { staging: '', stagedAt: '' },
+        },
+      );
+      if (!result.matchedCount) throw new Error('Role history publication changed during migration; retry');
+    }
+  } finally {
+    await snapshots.close();
+  }
 }
 
 /** Acquire the publication token before scanning the archive, fencing slower computations. */
@@ -123,10 +179,14 @@ export async function readRoleHistory(userID: string, role: string, startDate: D
     const row = rows.find((value) => value.generation === entry.generation);
     return { date: entry.date, rating: row?.rating ?? null, rank: row?.rank ?? null };
   });
-  // Project only the requested entry from old array snapshots during the transition.
+  // Exclude complete UTC days before touching old arrays, including their different timestamps.
+  const covered = days.map((entry) => {
+    const start = new Date(`${entry.date.toISOString().slice(0, 10)}T00:00:00.000Z`);
+    return { date: { $gte: start, $lt: new Date(start.getTime() + 86400000) } };
+  });
   const legacy = await roleRankingsModel
     .aggregate([
-      { $match: { date: { $gte: startDate } } },
+      { $match: { date: { $gte: startDate }, ...(covered.length ? { $nor: covered } : {}) } },
       {
         $project: {
           date: 1,
