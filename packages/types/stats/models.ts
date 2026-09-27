@@ -39,23 +39,3 @@ export class RoleRating {
   @prop({ type: Date, default: Date.now })
   updatedAt!: Date;
 }
-
-/**
- * Mongoose model for RoleRankings
- */
-@modelOptions({
-  schemaOptions: {
-    timestamps: true,
-  },
-  options: {
-    allowMixed: Severity.ALLOW,
-  },
-})
-@index({ date: 1 })
-export class RoleRankings {
-  @prop({ required: true, type: Date })
-  date!: Date;
-
-  @prop({ type: () => [RoleRating], _id: false })
-  ratings!: RoleRating[];
-}

@@ -121,13 +121,6 @@ export const migrations: Migration[] = [
     },
   },
   { name: '2026-09-27-achievement-catalog-v1', up: ensureAchievementCatalog },
-  {
-    name: '2026-09-27-role-history-backfill-v1',
-    async up() {
-      const { backfillRoleHistory } = await import('@/scripts/roleRatingStorage');
-      await backfillRoleHistory(new Date(Date.now() - 31 * 86400000));
-    },
-  },
 ];
 
 interface MigrationState {
