@@ -5,7 +5,8 @@
       <Avatar class="user-preview__avatar" :avatarID="userState.profile.avatar" />
       <div class="user-preview__name ml-2">
         {{ userState.profile.name }}
-        <PremiumBadge v-if="userState.profile.premium" />
+        <AdminBadge v-if="userState.profile.isAdmin === true" />
+        <PremiumBadge v-else-if="userState.profile.premium" />
       </div>
     </template>
   </div>
@@ -14,11 +15,12 @@
 <script lang="ts">
 import { defineComponent, computed } from 'vue';
 import PremiumBadge from '@/components/user/PremiumBadge.vue';
+import AdminBadge from '@/components/user/AdminBadge.vue';
 import Avatar from '@/components/user/Avatar.vue';
 import { useUserProfile } from '@/helpers/composables';
 
 export default defineComponent({
-  components: { PremiumBadge, Avatar },
+  components: { AdminBadge, PremiumBadge, Avatar },
   props: {
     userID: {
       type: String,

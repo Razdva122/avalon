@@ -1,24 +1,35 @@
 <template>
   <div class="custom-timer-controls" v-if="isRoomLeader">
-    <div class="timer-buttons">
-      <v-btn color="primary" size="medium" @click="addMinutes(1)">+1</v-btn>
-      <v-btn color="primary" size="medium" @click="addMinutes(2)">+2</v-btn>
-      <v-btn color="primary" size="medium" @click="addMinutes(5)">+5</v-btn>
-    </div>
-    <div class="timer-controls">
-      <v-btn
-        :color="isTimerActive ? 'error' : 'success'"
-        size="medium"
-        @click="isTimerActive ? stopTimer() : startTimer()"
-      >
-        {{ isTimerActive ? $t('game.stop') : $t('game.start') }}
-      </v-btn>
-    </div>
+    <v-menu location="top" :close-on-content-click="true">
+      <template #activator="{ props }">
+        <v-btn v-bind="props" class="timer-add" variant="text" color="primary" min-height="44">{{
+          $t('timerUi.addTime')
+        }}</v-btn>
+      </template>
+      <v-list class="timer-presets" :aria-label="$t('timerUi.addTime')">
+        <v-list-item
+          v-for="minutes in [1, 2, 5]"
+          :key="minutes"
+          :title="$t('timerUi.addMinutes', { count: minutes })"
+          @click="addMinutes(minutes)"
+        />
+      </v-list>
+    </v-menu>
+    <v-btn
+      class="timer-toggle"
+      :icon="isTimerActive ? 'stop' : 'play_arrow'"
+      :aria-label="$t(isTimerActive ? 'game.stop' : 'game.start')"
+      :title="$t(isTimerActive ? 'game.stop' : 'game.start')"
+      :color="isTimerActive ? 'error' : 'success'"
+      variant="text"
+      min-height="44"
+      @click="isTimerActive ? stopTimer() : startTimer()"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, inject } from 'vue';
+import { defineComponent, computed, inject } from 'vue';
 import { useStore } from '@/store';
 import { socket } from '@/api/socket';
 import { gameStateKey } from '@/helpers/game-state-manager';
@@ -48,6 +59,7 @@ export default defineComponent({
     });
 
     const addMinutes = (minutes: number) => {
+      if (!isRoomLeader.value) return;
       if (isTimerActive.value) {
         // Добавить минуты к существующему таймеру
         socket.emit('addCustomTimerTime', props.roomID, minutes * 60);
@@ -58,11 +70,11 @@ export default defineComponent({
     };
 
     const startTimer = () => {
-      socket.emit('startCustomTimer', props.roomID, 1 * 60);
+      if (isRoomLeader.value) socket.emit('startCustomTimer', props.roomID, 1 * 60);
     };
 
     const stopTimer = () => {
-      socket.emit('stopCustomTimer', props.roomID);
+      if (isRoomLeader.value) socket.emit('stopCustomTimer', props.roomID);
     };
 
     return {
@@ -79,18 +91,24 @@ export default defineComponent({
 <style scoped lang="scss">
 .custom-timer-controls {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
+  align-items: center;
+  gap: 0;
 }
-
-.timer-buttons {
-  display: flex;
-  gap: 10px;
+.custom-timer-controls :deep(.v-btn) {
+  min-width: 0;
+  padding-inline: 8px;
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
 }
-
-.timer-controls {
-  display: flex;
-  justify-content: center;
+.timer-toggle {
+  width: 44px;
+  height: 44px;
+}
+.timer-presets {
+  min-width: 140px;
+}
+.timer-presets :deep(.v-list-item) {
+  min-height: 44px;
 }
 </style>

@@ -178,3 +178,35 @@ test('startup cleanup readiness blocks admissions and health until old media roo
   await service.setEnabled('alice', 's', 'room', true);
   expect((await service.join('alice', 's', 'room')).sessionID).toBeTruthy();
 });
+test('recovery cancels an in-flight join even if media becomes ready before policy completes', async () => {
+  let ready = true;
+  let release!: () => void;
+  let delay = false;
+  const waiting = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const service = new VoiceService(config, {
+    ready: () => ready,
+    prepareRecovery: () => {
+      ready = false;
+    },
+    exists: () => true,
+    policy: async () => {
+      if (delay) await waiting;
+      return { present: true, seated: true, admin: false, leader: true };
+    },
+    remove: async () => {},
+    deleteRoom: async () => {},
+    stateChanged: () => {},
+    revoked: () => {},
+  });
+  await service.setEnabled('alice', 's', 'room', true);
+  delay = true;
+  const pending = service.join('alice', 's', 'room');
+  service.prepareRecovery();
+  ready = true;
+  release();
+  await expect(pending).rejects.toThrow('forbidden');
+  const joined = await service.join('alice', 's', 'room');
+  expect(await service.admit(joined.token)).toBe(joined.sessionID);
+});

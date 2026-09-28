@@ -3,6 +3,7 @@ import WebSocket, { WebSocketServer } from 'ws';
 
 interface Admission {
   healthy?(): boolean;
+  prepareRecovery?(): void;
   admit(token: string): Promise<string>;
   attach(id: string, close: () => void): () => void;
   limit(key: string, max?: number): void;
@@ -29,6 +30,17 @@ export function createVoiceGateway(internalUrl: string, admission: Admission) {
     // Private media-VM watchdog endpoint; never expose through public TLS proxy.
     if (req.method === 'GET' && req.url === '/health/voice') {
       res.writeHead(admission.healthy?.() ? 204 : 503).end();
+      return;
+    }
+    // Like health, this route is VPC-only and must never be proxied publicly.
+    if (req.method === 'POST' && req.url === '/recovery/voice') {
+      try {
+        if (!admission.prepareRecovery) throw Error('unavailable');
+        admission.prepareRecovery();
+        res.writeHead(204).end();
+      } catch {
+        res.writeHead(503).end();
+      }
       return;
     }
     try {

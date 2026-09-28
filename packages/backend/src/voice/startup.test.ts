@@ -35,3 +35,24 @@ test('failed startup cleanup stays closed and retries without deleting new live 
   await startup.reconcile();
   expect(attempts).toBe(2);
 });
+test('recovery invalidates an in-flight cleanup and requires a fresh media sweep', async () => {
+  let finish!: () => void;
+  let calls = 0;
+  const startup = new VoiceStartup({
+    listRooms: async () => {
+      if (++calls === 1) await new Promise<void>((resolve) => (finish = resolve));
+      return [];
+    },
+    deleteRoom: async () => {},
+  });
+  const old = startup.reconcile();
+  startup.reset();
+  finish();
+  await old;
+  expect(startup.ready).toBe(false);
+  await startup.reconcile();
+  expect(startup.ready).toBe(true);
+  expect(calls).toBe(2);
+  startup.reset();
+  expect(startup.ready).toBe(false);
+});

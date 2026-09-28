@@ -147,3 +147,23 @@ test('addon and feature edits publish immediately, preserving mutual exclusion',
   assert.equal(emitted[2].value.features.displayIndex, true);
   assert.equal(instance.overlay, true);
 });
+
+test('opening a dedicated section uses the latest complete settings', () => {
+  const { instance, emitted } = panel();
+  instance.section = 'addons';
+  instance.features = { displayIndex: true, useCustomTimer: true };
+  instance.openOptions();
+  assert.equal(instance.type, 'addons');
+  instance.changeAddon('excalibur', true);
+  assert.deepEqual(emitted.at(-1).value.features, { displayIndex: true, useCustomTimer: true });
+  assert.deepEqual(emitted.at(-1).value.roles, instance.roles);
+  instance.section = 'features';
+  instance.addons = { plotCards: true };
+  instance.openOptions();
+  assert.equal(instance.type, 'features');
+  instance.changeFeature('anonymousVoting', true);
+  assert.deepEqual(emitted.at(-1).value.addons, { plotCards: true });
+  instance.section = 'roles';
+  instance.openOptions();
+  assert.equal(instance.type, 'roles');
+});

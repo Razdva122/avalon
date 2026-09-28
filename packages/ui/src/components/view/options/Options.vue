@@ -1,12 +1,14 @@
 <template>
   <v-btn color="info" @click="openOptions">
-    <template #prepend><span class="material-icons" aria-hidden="true">settings</span></template>
+    <template #prepend
+      ><span class="material-icons" aria-hidden="true">{{ sectionIcon }}</span></template
+    >
     {{ buttonText }}
   </v-btn>
-  <v-dialog v-model="overlay" max-width="620" :aria-label="$t('options.title')">
+  <v-dialog v-model="overlay" max-width="620" :aria-label="$t(section ? `options.${section}` : 'options.title')">
     <v-card class="options">
       <header class="options-header">
-        <h2>{{ $t('options.title') }}</h2>
+        <h2>{{ $t(section ? `options.${section}` : 'options.title') }}</h2>
         <v-btn
           icon="close"
           variant="text"
@@ -16,7 +18,7 @@
         />
       </header>
       <v-tabs
-        v-if="settings.addons || settings.features"
+        v-if="!section && (settings.addons || settings.features)"
         v-model="type"
         class="options-tabs"
         color="text-primary"
@@ -147,6 +149,9 @@
             class="option-row feature-row"
             :class="{ selected: settings.features[feature.name] }"
           >
+            <OptionHelp :label="feature.label" :content="feature.hint">
+              <span class="material-icons feature-icon" aria-hidden="true">{{ feature.icon }}</span>
+            </OptionHelp>
             <v-checkbox
               :model-value="settings.features[feature.name]"
               @update:model-value="changeFeature(feature.name, Boolean($event))"
@@ -155,12 +160,12 @@
               color="info"
               density="compact"
             />
-            <OptionHelp :label="feature.label" :content="feature.hint" />
           </div>
         </template>
       </div>
       <footer class="options-footer">
         <span
+          v-if="type === 'roles'"
           class="selection-count"
           role="status"
           :aria-label="`${$t('options.selectedRoles')}: ${selectedCount}`"
@@ -193,6 +198,7 @@ export default defineComponent({
     features: { type: Object as PropType<GameOptionsFeatures> },
     playerCount: { type: Number },
     buttonText: { required: true, type: String },
+    section: { type: String as PropType<'roles' | 'addons' | 'features'> },
   },
   data() {
     return {
@@ -212,6 +218,9 @@ export default defineComponent({
     };
   },
   computed: {
+    sectionIcon(): string {
+      return this.section ? { roles: 'groups', addons: 'layers', features: 'tune' }[this.section] : 'settings';
+    },
     currentOptions(): OptionsDraft {
       return { roles: this.roles, addons: this.addons, features: this.features };
     },
@@ -330,26 +339,31 @@ export default defineComponent({
       return [
         {
           name: 'displayIndex',
+          icon: 'format_list_numbered',
           label: this.$t('options.displayIndex'),
           hint: this.$t('options.displayIndexHint'),
         },
         {
           name: 'anonymousVoting',
+          icon: 'how_to_vote',
           label: this.$t('options.anonymousVoting'),
           hint: this.$t('options.anonymousVotingHint'),
         },
         {
           name: 'hiddenHistory',
+          icon: 'visibility_off',
           label: this.$t('options.hiddenHistory'),
           hint: this.$t('options.hiddenHistoryHint'),
         },
         {
           name: 'lookingForPlayers',
+          icon: 'group_add',
           label: this.$t('mainPage.lookingForPlayers'),
           hint: this.$t('options.lookingForPlayersHint'),
         },
         {
           name: 'wtfMode',
+          icon: 'content_copy',
           label: this.$t('options.wtfMode'),
           hint: this.$t('options.wtfModeHint'),
         },
@@ -374,6 +388,7 @@ export default defineComponent({
   },
   methods: {
     openOptions() {
+      this.type = this.section || 'roles';
       this.settings = copyOptions(this.currentOptions);
       this.previousRoles = null;
       this.autoChanged = [];
@@ -507,6 +522,13 @@ export default defineComponent({
 .option-row :deep(.v-selection-control) {
   min-height: 44px;
 }
+.feature-icon {
+  font-size: 24px;
+  color: rgb(var(--v-theme-text-primary));
+}
+.feature-row.selected .feature-icon {
+  color: rgb(var(--v-theme-info));
+}
 .role-portrait,
 .addon-icon {
   display: block;
@@ -572,6 +594,7 @@ export default defineComponent({
   white-space: nowrap;
 }
 .footer-actions {
+  margin-left: auto;
   display: flex;
   gap: 4px;
 }

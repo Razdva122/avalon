@@ -11,6 +11,7 @@ export interface VoicePolicy {
 }
 interface Dependencies {
   ready?(): boolean;
+  prepareRecovery?(): void;
   policy(userID: string, socketID: string, roomID: string): Promise<VoicePolicy>;
   exists(roomID: string): boolean;
   remove(roomName: string, identity: string): Promise<unknown>;
@@ -42,6 +43,17 @@ export class VoiceService {
     readonly config: VoiceConfig | undefined,
     private deps: Dependencies,
   ) {}
+  // Called only by the private watchdog after it has confirmed LiveKit stopped.
+  prepareRecovery() {
+    if (!this.config || !this.deps.prepareRecovery) throw Error('unavailable');
+    this.deps.prepareRecovery();
+    for (const join of this.pending) join.cancelled = true;
+    for (const session of this.sessions.values()) this.revoke(session, false);
+    for (const [id, room] of this.rooms) {
+      this.rooms.set(id, { name: randomUUID(), enabled: room.enabled, blocked: false });
+      this.deps.stateChanged(id);
+    }
+  }
   private async policy(userID: string, socketID: string, roomID: string) {
     if (!userID || !this.deps.exists(roomID)) throw Error('forbidden');
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -174,7 +186,7 @@ export class VoiceService {
     this.rooms.delete(roomID);
     this.deps.stateChanged(roomID);
   }
-  private revoke(session: Session) {
+  private revoke(session: Session, removeMedia = true) {
     if (!this.sessions.delete(session.id)) return;
     this.closers.get(session.id)?.forEach((close) => close());
     this.closers.delete(session.id);
@@ -186,7 +198,10 @@ export class VoiceService {
         durationSeconds: Math.round((Date.now() - session.started) / 1000),
       }),
     );
-    void this.deps.remove(session.roomName, session.id).catch(() => this.quarantine(session.roomID, session.roomName));
+    if (removeMedia)
+      void this.deps
+        .remove(session.roomName, session.id)
+        .catch(() => this.quarantine(session.roomID, session.roomName));
   }
   private quarantine(roomID: string, roomName: string) {
     this.retries.add(roomName);

@@ -72,3 +72,24 @@ test('a rejected registration replies to ack and never reaches the next handler'
   expect(packet('registerUser', {}, reply)).toBe('rateLimited');
   expect(reply).toHaveBeenCalledWith({ error: 'rateLimited' });
 });
+
+test.each(['development', 'production', 'test', undefined])(
+  'registration budget supports local test accounts without weakening %s limits',
+  (environment) => {
+    const previous = process.env.NODE_ENV;
+    if (environment === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = environment;
+    try {
+      const connection = setup();
+      for (let i = 0; i < 5; i++) expect(connection('198.51.100.1')('registerUser', {}, () => {})).toBeUndefined();
+      const packet = connection('198.51.100.1');
+      if (environment === 'development') {
+        for (let i = 5; i < 100; i++) expect(packet('registerUser', {}, () => {})).toBeUndefined();
+      }
+      expect(packet('registerUser', {}, () => {})).toBe('rateLimited');
+    } finally {
+      if (previous === undefined) delete process.env.NODE_ENV;
+      else process.env.NODE_ENV = previous;
+    }
+  },
+);

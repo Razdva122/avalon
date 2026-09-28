@@ -143,7 +143,7 @@ export class DirectService {
           $or: [{ 'direct.leaseUntil': { $exists: false } }, { 'direct.leaseUntil': { $lte: now } }],
         },
         { $set: { 'direct.leaseToken': token, 'direct.leaseUntil': new Date(now.getTime() + 120000) } },
-        { new: true, sort: { 'direct.nextCheckAt': 1 } },
+        { returnDocument: 'after', sort: { 'direct.nextCheckAt': 1 } },
       )
       .lean();
     if (!order?.direct) return false;

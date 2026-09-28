@@ -35,11 +35,18 @@
         </template>
       </Board>
       <div class="info-container">
-        <RolesInfo
-          v-if="roomState.stage === 'started'"
-          :game-roles="game.settings.roles"
-          :visible-roles="visibleRoles"
-        />
+        <div class="room-side-tools">
+          <RolesInfo
+            v-if="roomState.stage === 'started'"
+            :game-roles="game.settings.roles"
+            :visible-roles="visibleRoles"
+          />
+          <HostPanel
+            v-if="displayHostPanel && roomState.stage === 'started'"
+            :roomState="roomState"
+            :gameEnded="game.stage === 'end'"
+          />
+        </div>
         <CardsInfo
           v-if="roomState.stage === 'started' && game.addonsData.plotCards"
           :data="game.addonsData.plotCards.cardsState"
@@ -51,7 +58,6 @@
           :gameID="roomState.roomID"
           :gameState="game"
         />
-        <HostPanel v-if="displayHostPanel" :roomUuid="roomState.roomID" :roomStage="roomState.stage" />
       </div>
       <Chat v-model:open="chatOpen" :messages="roomState.chat" :roomUuid="roomState.roomID">
         <template #stickers>
@@ -336,7 +342,7 @@ export default defineComponent({
   margin-right: 10px;
 }
 
-.info-container > * {
+.info-container > :not(.room-side-tools) {
   transform-origin: left center;
   transform: rotate(90deg) translateX(-50%);
   margin-left: 10px;
@@ -349,8 +355,35 @@ export default defineComponent({
 
 .room {
   width: 100vw;
-  height: 100%;
-  overflow-y: hidden;
-  overflow-x: hidden;
+  height: 100dvh;
+  padding-top: 50px;
+  box-sizing: border-box;
+  overflow: clip;
+}
+</style>
+
+<style lang="scss">
+.room-side-tools {
+  margin-left: -8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.room-side-tools .roles {
+  writing-mode: vertical-rl;
+  min-width: 44px;
+  width: 44px;
+  height: 88px;
+  padding: 8px 0;
+  border-radius: 0 6px 0 0;
+}
+.room-side-tools .host-trigger--game {
+  border-radius: 0 0 6px 0;
+  background: rgb(var(--v-theme-info));
+  color: white !important;
+}
+.room:has(.game-timer) .online {
+  top: 110px;
 }
 </style>

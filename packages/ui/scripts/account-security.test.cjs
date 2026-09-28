@@ -139,14 +139,16 @@ test('statistics reject socket errors instead of exposing an invalid stats objec
   assert.equal(state.error.value, 'rateLimited');
 });
 
-function accountStore(reply) {
+function accountStore(reply, onTimeout = () => {}) {
   return load('../src/store/index.ts', {
     vuex: { createStore: (options) => options },
+    uuid: require('uuid'),
     '@/api/socket': {
       socket: {
         on() {},
         emit() {},
-        timeout() {
+        timeout(ms) {
+          onTimeout(ms);
           return this;
         },
         emitWithAck: async () => (typeof reply === 'function' ? reply() : reply),
@@ -330,3 +332,41 @@ for (const failure of [{ error: 'rateLimited' }, new Error('timeout')]) {
     }
   });
 }
+
+test('registration has a bounded wait and commits only accepted accounts', async () => {
+  for (const reply of [{ error: 'rateLimited' }, { id: 'new-user' }]) {
+    const timeouts = [],
+      commits = [];
+    const store = accountStore(reply, (ms) => timeouts.push(ms));
+    const result = await store.actions.registerUser(
+      { commit: (...args) => commits.push(args) },
+      {
+        login: 'testuser',
+        email: 'test@example.com',
+        name: 'Test',
+        password: 'password123',
+      },
+    );
+    assert.deepEqual(timeouts, [10000]);
+    assert.deepEqual(result, reply);
+    assert.equal(commits.length, 'error' in reply ? 0 : 1);
+  }
+});
+
+test('registration transport errors return an error to both normal and developer forms', async () => {
+  const store = accountStore(() => {
+    throw new Error('timeout');
+  });
+  const commits = [];
+  const result = await store.actions.registerUser(
+    { commit: (...args) => commits.push(args) },
+    {
+      login: 'testuser',
+      email: 'test@example.com',
+      name: 'Test',
+      password: 'password123',
+    },
+  );
+  assert.deepEqual(result, { error: 'requestFailed' });
+  assert.deepEqual(commits, []);
+});

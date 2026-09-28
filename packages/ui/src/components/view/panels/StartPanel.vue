@@ -21,25 +21,22 @@
     >
       {{ $t('startPanel.joinGame') }}
     </v-btn>
-    <template v-if="isUserLeader">
-      <v-btn class="mt-2" color="info" @click="onLockClick">
-        {{ roomState.stage === 'created' ? $t('startPanel.lockGame') : $t('startPanel.unlockGame') }}
+    <div v-if="isUserLeader" class="lobby-host-actions">
+      <v-btn color="info" class="lobby-lock" @click="onLockClick">
+        <template #prepend
+          ><span class="material-icons" aria-hidden="true">{{
+            roomState.stage === 'locked' ? 'lock_open' : 'lock'
+          }}</span></template
+        >
+        {{ $t(roomState.stage === 'locked' ? 'startPanel.unlockGame' : 'startPanel.lockGame') }}
       </v-btn>
-      <v-btn class="mt-2 mb-4" color="success" :disabled="isStartGameDisabled" @click="onStartClick">
+      <v-btn class="lobby-start" color="success" :disabled="isStartGameDisabled" @click="onStartClick">
+        <template #prepend><span class="material-icons" aria-hidden="true">play_arrow</span></template>
         {{ $t('startPanel.startGame') }}
       </v-btn>
-      <div class="d-flex flex-column gap-2">
-        <Options
-          :roles="options.roles"
-          :addons="options.addons"
-          :features="options.features"
-          :playerCount="roomState.players.length"
-          :buttonText="$t('startPanel.options')"
-          @apply="applyOptions"
-        />
-        <TimerButton :features="options.features" @update:features="updateFeatures" />
-      </div>
-    </template>
+      <p class="lobby-start-hint" role="status">{{ $t(startHint) }}</p>
+      <HostPanel :roomState="roomState" />
+    </div>
   </template>
 </template>
 
@@ -51,17 +48,11 @@ import { useStore } from '@/store';
 import { TPageRoomState } from '@/helpers/game-state-manager';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
-import Options from '@/components/view/options/Options.vue';
-import TimerButton from '@/components/view/options/TimerButton.vue';
-import { useRoomOptions } from '@/components/view/options/room-options';
-import type { GameOptionsFeatures } from '@avalon/types';
+import HostPanel from './HostPanel.vue';
 
 export default defineComponent({
   name: 'StartPanel',
-  components: {
-    Options,
-    TimerButton,
-  },
+  components: { HostPanel },
   props: {
     roomState: {
       type: Object as PropType<TPageRoomState>,
@@ -73,11 +64,6 @@ export default defineComponent({
     const communityPath = computed(() => localizedPath('/community/', locale.value));
     const { roomState } = toRefs(props);
     const store = useStore();
-
-    const { options, applyOptions } = useRoomOptions(
-      () => roomState.value.options,
-      (next) => socket.emit('updateOptions', roomState.value.roomID, next),
-    );
 
     const isUserInGame = computed(() => {
       return roomState.value.players.some((player) => player.id === store.state.profile?.id);
@@ -103,11 +89,18 @@ export default defineComponent({
       socket.emit(isUserInGame.value ? 'leaveGame' : 'joinGame', roomState.value.roomID);
     };
 
+    const startHint = computed(() =>
+      roomState.value.players.length < 5 || roomState.value.players.length > 10
+        ? 'hostMenu.needPlayers'
+        : roomState.value.stage !== 'locked'
+          ? 'hostMenu.lockBeforeStart'
+          : 'hostMenu.ready',
+    );
     const onLockClick = () => {
-      socket.emit('lockRoom', roomState.value.roomID);
+      if (isUserLeader.value && roomState.value.stage !== 'started') socket.emit('lockRoom', roomState.value.roomID);
     };
-
     const onStartClick = () => {
+      if (!isUserLeader.value || isStartGameDisabled.value) return;
       socket.emit('startGame', roomState.value.roomID);
     };
 
@@ -116,28 +109,37 @@ export default defineComponent({
       eventBus.emit('infoMessage', t('infoMessage.linkCopied'));
     };
 
-    const updateFeatures = (newFeatures: GameOptionsFeatures) => {
-      applyOptions({ ...options.value, features: newFeatures });
-    };
-
     return {
       communityPath,
       roomState,
-      options,
 
       isUserInGame,
       isUserLeader,
       isStartGameDisabled,
 
       onJoinClick,
-      onLockClick,
       onStartClick,
+      onLockClick,
+      startHint,
       onCopyClick,
-      updateFeatures,
-      applyOptions,
     };
   },
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.lobby-host-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.lobby-start-hint {
+  max-width: 240px;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+  margin: 0;
+}
+</style>

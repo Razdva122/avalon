@@ -6,9 +6,12 @@
       <v-card class="dev-card">
         <v-btn @click="togglePanel" class="close" icon="close" color="text-primary" variant="text" density="compact" />
         <v-card-title>Developer Tools</v-card-title>
+        <v-alert v-if="error" type="error" class="mb-4">{{ $t(`errors.${error}`) }}</v-alert>
         <v-card-actions>
           <v-btn color="error" @click="resetStore"> Reset Store </v-btn>
-          <v-btn color="success" @click="createFakeAccount"> Create Test Account </v-btn>
+          <v-btn color="success" :loading="isCreating" :disabled="isCreating" @click="createFakeAccount">
+            Create Test Account
+          </v-btn>
           <v-btn color="on-surface" @click="togglePanel"> Close </v-btn>
         </v-card-actions>
       </v-card>
@@ -19,12 +22,15 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
 import { useStore } from '@/store';
+import { v4 as uuidv4 } from 'uuid';
 
 export default defineComponent({
   name: 'DevPanel',
   setup() {
     const store = useStore();
     const isPanelOpen = ref(false);
+    const isCreating = ref(false);
+    const error = ref('');
     const isDev = computed(() => process.env.NODE_ENV === 'development');
 
     const togglePanel = () => {
@@ -36,21 +42,34 @@ export default defineComponent({
     };
 
     const createFakeAccount = async () => {
-      const randomString = () => Math.random().toString(36).substring(2, 10);
-      const fakeUser = {
-        login: `testuser_${randomString()}`,
-        email: `test_${randomString()}@example.com`,
-        password: randomString(),
-        name: randomString(),
-      };
-
-      store.dispatch('registerUser', fakeUser);
-      isPanelOpen.value = false;
+      if (isCreating.value) return;
+      isCreating.value = true;
+      error.value = '';
+      try {
+        const id = uuidv4();
+        const user = await store.dispatch('registerUser', {
+          login: `testuser_${id}`,
+          email: `test_${id}@example.com`,
+          password: uuidv4(),
+          name: `test_${id.slice(0, 8)}`,
+        });
+        if ('error' in user) {
+          error.value = user.error;
+        } else {
+          isPanelOpen.value = false;
+        }
+      } catch {
+        error.value = 'requestFailed';
+      } finally {
+        isCreating.value = false;
+      }
     };
 
     return {
       isDev,
       isPanelOpen,
+      isCreating,
+      error,
       togglePanel,
       resetStore,
       createFakeAccount,

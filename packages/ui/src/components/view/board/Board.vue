@@ -1,78 +1,86 @@
 <template>
-  <div class="wrapper">
-    <div class="board-container" :class="'view-mode-' + stateManager.viewMode.value">
-      <div class="game-board" alt="board" :class="'game-end-' + gameResult"></div>
-      <slot name="content">
-        <div class="timer" v-if="timerDuration > 0">
-          <Timer @timerEnd="clearHistoryElement" :duration="timerDuration" />
-        </div>
-        <div class="actions-container d-flex flex-column justify-center">
-          <template v-if="roomState.stage !== 'started'">
-            <div class="options-panel mb-4">
-              <div class="options-title">{{ $t('game.rolesAndAddons') }}</div>
-              <OptionsPreview
-                :roles="roomState.options.roles"
-                :addons="roomState.options.addons"
-                :max-view="10"
-                class="options-preview"
-              />
-            </div>
-            <div class="button-panel d-flex flex-column align-center">
-              <StartPanel :room-state="roomState" />
-            </div>
-          </template>
-          <template v-else>
-            <template v-if="shouldShowAnnounceLoyalty">
-              <AnnounceLoyalty />
+  <div class="board-and-timer">
+    <div class="wrapper">
+      <div class="board-container" :class="'view-mode-' + stateManager.viewMode.value">
+        <div class="game-board" alt="board" :class="'game-end-' + gameResult"></div>
+        <slot name="content">
+          <div class="timer" v-if="timerDuration > 0">
+            <Timer @timerEnd="clearHistoryElement" :duration="timerDuration" />
+          </div>
+          <div class="actions-container d-flex flex-column justify-center">
+            <template v-if="roomState.stage !== 'started'">
+              <div class="options-panel mb-4">
+                <div class="options-title">{{ $t('game.rolesAndAddons') }}</div>
+                <OptionsPreview
+                  :roles="roomState.options.roles"
+                  :addons="roomState.options.addons"
+                  :max-view="10"
+                  class="options-preview"
+                />
+              </div>
+              <div class="button-panel d-flex flex-column align-center">
+                <StartPanel :room-state="roomState" />
+              </div>
             </template>
-            <Game v-else :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory">
-              <template v-slot:restart>
-                <slot name="restart"></slot>
+            <template v-else>
+              <template v-if="shouldShowAnnounceLoyalty">
+                <AnnounceLoyalty />
               </template>
-            </Game>
-            <div
-              v-if="gameTimer && (gameTimer.active || gameTimer.isCustom) && stateManager.viewMode.value === 'live'"
-              class="game-timer"
-            >
-              <GameTimer
-                @timerEnd="onGameTimerEnd"
-                :endTime="gameTimer.endTime || Date.now()"
-                :isCustom="gameTimer.isCustom"
-              >
-                <template v-slot:timer-controls>
-                  <CustomTimerControls
-                    v-if="userIsLeader && gameTimer.isCustom"
-                    :roomID="roomState.roomID"
-                    :leaderID="roomState.leaderID"
-                  />
+              <Game v-else :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory">
+                <template v-slot:restart>
+                  <slot name="restart"></slot>
                 </template>
-              </GameTimer>
-            </div>
-          </template>
+              </Game>
+            </template>
+          </div>
+        </slot>
+        <div
+          class="player-container"
+          v-for="(player, i) in players"
+          :style="{ transform: calculateRotate(i) }"
+          :key="player.id"
+        >
+          <Player
+            :player-state="player"
+            :voice-side="Math.sin((2 * Math.PI * i) / players.length + Math.PI) > 0.75 ? 'left' : 'right'"
+            :private-decision="
+              roomState.ai && !playerInGame && spectatorRoles[player.id]
+                ? spectatorDecisions.find((d) => d.playerID === player.id)
+                : undefined
+            "
+            :spectator-role="roomState.ai && !playerInGame ? spectatorRoles[player.id] : undefined"
+            :display-kick="userIsLeader"
+            :display-index="roomState.stage === 'started' ? gameState.features.displayIndex : false"
+            :visible-history="visibleHistory"
+            :current-stage="roomState.stage === 'started' ? gameState.stage : undefined"
+            :style="{ transform: calculateRotate(i, true), translate: '0 -50%' }"
+            @player-click="onPlayerClick"
+          />
         </div>
-      </slot>
+      </div>
+    </div>
+
+    <div class="room-toolbar">
       <div
-        class="player-container"
-        v-for="(player, i) in players"
-        :style="{ transform: calculateRotate(i) }"
-        :key="player.id"
+        v-if="gameTimer && (gameTimer.active || gameTimer.isCustom) && stateManager.viewMode.value === 'live'"
+        class="game-timer"
       >
-        <Player
-          :player-state="player"
-          :voice-side="Math.sin((2 * Math.PI * i) / players.length + Math.PI) > 0.75 ? 'left' : 'right'"
-          :private-decision="
-            roomState.ai && !playerInGame && spectatorRoles[player.id]
-              ? spectatorDecisions.find((d) => d.playerID === player.id)
-              : undefined
-          "
-          :spectator-role="roomState.ai && !playerInGame ? spectatorRoles[player.id] : undefined"
-          :display-kick="userIsLeader"
-          :display-index="roomState.stage === 'started' ? gameState.features.displayIndex : false"
-          :visible-history="visibleHistory"
-          :current-stage="roomState.stage === 'started' ? gameState.stage : undefined"
-          :style="{ transform: calculateRotate(i, true), translate: '0 -50%' }"
-          @player-click="onPlayerClick"
-        />
+        <GameTimer
+          @timerEnd="onGameTimerEnd"
+          @addMinute="addTimerMinute"
+          :canAdjust="userIsLeader && gameTimer.isCustom"
+          :endTime="gameTimer.endTime || Date.now()"
+          :isCustom="gameTimer.isCustom"
+          :active="gameTimer.active"
+        >
+          <template v-slot:timer-controls>
+            <CustomTimerControls
+              v-if="userIsLeader && gameTimer.isCustom"
+              :roomID="roomState.roomID"
+              :leaderID="roomState.leaderID"
+            />
+          </template>
+        </GameTimer>
       </div>
     </div>
   </div>
@@ -166,6 +174,11 @@ export default defineComponent({
       }
       return null;
     });
+
+    const addTimerMinute = () => {
+      if (!userIsLeader.value || !gameTimer.value?.isCustom || stateManager.viewMode.value !== 'live') return;
+      socket.emit(gameTimer.value.active ? 'addCustomTimerTime' : 'startCustomTimer', roomState.value.roomID, 60);
+    };
 
     const onGameTimerEnd = () => {
       // Timer ended, backend will handle the timeout
@@ -352,6 +365,7 @@ export default defineComponent({
       onPlayerClick,
       gameTimer,
       onGameTimerEnd,
+      addTimerMinute,
     };
   },
 });
@@ -498,22 +512,28 @@ export default defineComponent({
   min-width: 60px;
 }
 
-.game-timer {
-  position: fixed;
-  bottom: -50px;
-  left: -100px;
-  background-color: rgb(var(--v-theme-surface-light));
-  color: white;
-  padding: 15px 25px;
-  border-radius: 30px;
-  font-size: 24px;
-  font-weight: bold;
+.board-and-timer {
+  max-width: 100%;
+  overflow-x: clip;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.room-toolbar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  min-width: 120px;
   justify-content: center;
+  gap: 4px;
+  min-height: 44px;
+  max-width: calc(100vw - 16px);
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  margin-top: 0;
+}
+.game-timer {
+  min-width: 0;
 }
 </style>

@@ -16,6 +16,7 @@ export function createRoomVoice(manager: Manager) {
   const startup = client ? new VoiceStartup(client) : undefined;
   const service = new VoiceService(config, {
     ready: () => startup?.ready ?? false,
+    prepareRecovery: () => startup?.reset(),
     exists: (id) => Boolean(manager.rooms[id] && !manager.rooms[id].nextRoomID),
     policy: async (userID, socketID, roomID) => {
       const socket = manager.io.sockets.sockets.get(socketID);

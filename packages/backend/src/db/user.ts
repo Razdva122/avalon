@@ -120,6 +120,7 @@ export class UserLayer {
       avatar: user.avatar,
       name: user.name,
       premium: features?.showPremiumBadge !== false && hasPremium(await supportTotalCents(id), features),
+      isAdmin: user.isAdmin === true,
     };
   }
 

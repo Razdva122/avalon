@@ -17,6 +17,8 @@ export function clientAddress(request: IncomingMessage, trusted = process.env.TR
 
 export function installSocketAdmission(io: Server) {
   const limits = new WindowLimiter();
+  // Local multiplayer testing needs more than five accounts from the same IP.
+  const registrationsPerHour = process.env.NODE_ENV === 'development' ? 100 : 5;
   io.use((socket, next) => {
     const ip = clientAddress(socket.request);
     socket.data.clientIP = ip;
@@ -34,7 +36,7 @@ export function installSocketAdmission(io: Server) {
         limits.take(`packets:${ip}`, 1200, 60000) &&
         limits.take('global-packets', 5000, 10000);
       if (user) allowed = allowed && limits.take(`user:${user}`, 600, 60000);
-      if (event === 'registerUser') allowed = allowed && limits.take(`register:${ip}`, 5, 3600000);
+      if (event === 'registerUser') allowed = allowed && limits.take(`register:${ip}`, registrationsPerHour, 3600000);
       if (event === 'login') {
         allowed = allowed && limits.take(`login-ip:${ip}`, 30, 900000);
         if (typeof first === 'string' && first.length <= 254)

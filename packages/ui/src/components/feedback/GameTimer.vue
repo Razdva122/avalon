@@ -1,165 +1,202 @@
 <template>
-  <div class="game-timer-container" v-if="remainingTime > 0 || isCustomTimer">
-    <span
-      class="time"
-      :class="{
-        'low-time': Number(timeInString) < 10,
-        'critical-time': Number(timeInString) < 5,
-        'timer-end': Number(timeInString) === 0,
-      }"
+  <section class="game-timer-container" :aria-label="$t('options.timer')">
+    <div
+      class="timer-reading"
+      :class="{ 'timer-adjustable': canAdjust && isCustom }"
+      :title="canAdjust && isCustom ? $t('timerUi.doubleClickMinute') : undefined"
+      @dblclick.prevent="onDoubleClick"
+      @pointerdown="onPointerDown"
+      @pointermove="onPointerMove"
+      @pointerup="onPointerUp"
+      @pointercancel="onPointerCancel"
     >
-      {{ '⏱️ ' }}{{ timeInString }}
-    </span>
-
-    <!-- Слот для элементов управления таймером -->
+      <span class="material-icons" aria-hidden="true">timer</span>
+      <div>
+        <p class="timer-caption sr-only">{{ $t(isCustom ? 'timerUi.manual' : 'timerUi.stage') }}</p>
+        <span
+          class="time"
+          role="timer"
+          aria-live="off"
+          :class="{
+            'low-time': active && seconds > 0 && seconds <= 10,
+            'critical-time': active && seconds > 0 && seconds <= 5,
+          }"
+          >{{ timeInString }}</span
+        >
+      </div>
+      <span class="timer-status sr-only" role="status">{{
+        $t(!active ? 'timerUi.stopped' : seconds === 0 ? 'timerUi.finished' : 'timerUi.running')
+      }}</span>
+    </div>
     <slot name="timer-controls"></slot>
-  </div>
+  </section>
 </template>
-
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted, computed, watch } from 'vue';
-
 export default defineComponent({
   props: {
-    endTime: {
-      required: true,
-      type: Number,
-    },
-    isCustom: {
-      type: Boolean,
-      default: false,
-    },
+    endTime: { required: true, type: Number },
+    isCustom: { type: Boolean, default: false },
+    active: { type: Boolean, default: true },
+    canAdjust: { type: Boolean, default: false },
   },
-  emits: ['timerEnd'],
+  emits: ['timerEnd', 'addMinute'],
   setup(props, { emit }) {
-    const displaySeconds = ref(Math.floor((props.endTime - Date.now()) / 1000));
-    let intervalId: number | undefined;
-
-    const remainingTime = computed(() => {
-      const remaining = props.endTime - Date.now();
-      return Math.max(0, remaining);
-    });
-
-    const timeInString = computed(() => {
-      const totalSeconds = Math.max(0, displaySeconds.value);
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-
-      if (minutes > 0) {
-        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      }
-      return seconds.toString();
-    });
-
-    onMounted(() => {
-      // Initial check
-      if (remainingTime.value <= 0) {
-        emit('timerEnd');
-        return;
-      }
-
-      intervalId = window.setInterval(() => {
-        const newSeconds = Math.floor((props.endTime - Date.now()) / 1000);
-
-        // Only update if seconds changed
-        if (newSeconds !== displaySeconds.value) {
-          displaySeconds.value = newSeconds;
-        }
-
-        if (newSeconds < 0 && intervalId) {
-          window.clearInterval(intervalId);
-          intervalId = undefined;
+    const seconds = ref(0);
+    let interval: number | undefined;
+    let finished = false;
+    const clear = () => {
+      if (interval !== undefined) window.clearInterval(interval);
+      interval = undefined;
+    };
+    function tick() {
+      seconds.value = props.active ? Math.max(0, Math.ceil((props.endTime - Date.now()) / 1000)) : 0;
+      if (!props.active || seconds.value === 0) {
+        clear();
+        if (props.active && !finished) {
+          finished = true;
           emit('timerEnd');
         }
-      }, 500); // Check every 500ms but only update when seconds change
-    });
-
-    onUnmounted(() => {
-      if (intervalId) {
-        window.clearInterval(intervalId);
       }
-    });
-
-    // Watch for endTime changes to reset timer
-    watch(
-      () => props.endTime,
-      (newEndTime, oldEndTime) => {
-        if (newEndTime !== oldEndTime) {
-          // Clear existing interval
-          if (intervalId) {
-            window.clearInterval(intervalId);
-          }
-
-          // Reset display seconds
-          displaySeconds.value = Math.floor((newEndTime - Date.now()) / 1000);
-
-          // Start new interval if there's time remaining
-          if (displaySeconds.value >= 0) {
-            intervalId = window.setInterval(() => {
-              const newSeconds = Math.floor((props.endTime - Date.now()) / 1000);
-
-              // Only update if seconds changed
-              if (newSeconds !== displaySeconds.value) {
-                displaySeconds.value = newSeconds;
-              }
-
-              if (newSeconds < 0 && intervalId) {
-                window.clearInterval(intervalId);
-                intervalId = undefined;
-                emit('timerEnd');
-              }
-            }, 500);
-          }
-        }
-      },
+    }
+    function restart() {
+      clear();
+      finished = false;
+      tick();
+      if (props.active && seconds.value > 0) interval = window.setInterval(tick, 250);
+    }
+    onMounted(restart);
+    watch(() => [props.endTime, props.active], restart);
+    onUnmounted(clear);
+    const timeInString = computed(
+      () => `${String(Math.floor(seconds.value / 60)).padStart(2, '0')}:${String(seconds.value % 60).padStart(2, '0')}`,
     );
-
-    const isCustomTimer = computed(() => {
-      return props.isCustom;
-    });
-
+    function addMinute() {
+      if (props.canAdjust && props.isCustom) emit('addMinute');
+    }
+    const tapWindow = 350;
+    const tapDistance = 24;
+    let touchStart: { id: number; x: number; y: number; at: number } | undefined;
+    let previousTap: { x: number; y: number; at: number } | undefined;
+    let ignoreDoubleClickUntil = 0;
+    function onPointerCancel() {
+      touchStart = undefined;
+      previousTap = undefined;
+    }
+    function onPointerDown(event: PointerEvent) {
+      if (event.pointerType !== 'touch') return;
+      ignoreDoubleClickUntil = Date.now() + 800;
+      if (!event.isPrimary || !props.canAdjust || !props.isCustom) {
+        onPointerCancel();
+        return;
+      }
+      touchStart = { id: event.pointerId, x: event.clientX, y: event.clientY, at: Date.now() };
+    }
+    function onPointerMove(event: PointerEvent) {
+      if (
+        touchStart?.id === event.pointerId &&
+        Math.hypot(event.clientX - touchStart.x, event.clientY - touchStart.y) > tapDistance
+      )
+        onPointerCancel();
+    }
+    function onPointerUp(event: PointerEvent) {
+      if (event.pointerType !== 'touch') return;
+      // Some mobile browsers also dispatch dblclick after the touch sequence.
+      ignoreDoubleClickUntil = Date.now() + 800;
+      const start = touchStart;
+      touchStart = undefined;
+      if (
+        !start ||
+        start.id !== event.pointerId ||
+        !event.isPrimary ||
+        Date.now() - start.at > tapWindow ||
+        Math.hypot(event.clientX - start.x, event.clientY - start.y) > tapDistance ||
+        !props.canAdjust ||
+        !props.isCustom
+      ) {
+        previousTap = undefined;
+        return;
+      }
+      const now = Date.now();
+      if (
+        previousTap &&
+        now - previousTap.at <= tapWindow &&
+        Math.hypot(event.clientX - previousTap.x, event.clientY - previousTap.y) <= tapDistance
+      ) {
+        previousTap = undefined;
+        addMinute();
+      } else {
+        previousTap = { x: event.clientX, y: event.clientY, at: now };
+      }
+    }
+    function onDoubleClick() {
+      if (Date.now() >= ignoreDoubleClickUntil) addMinute();
+    }
+    watch(() => [props.canAdjust, props.isCustom], onPointerCancel);
     return {
-      remainingTime,
+      seconds,
       timeInString,
-      isCustomTimer,
+      addMinute,
+      onPointerDown,
+      onPointerMove,
+      onPointerUp,
+      onPointerCancel,
+      onDoubleClick,
     };
   },
 });
 </script>
-
 <style scoped lang="scss">
-.game-timer-container {
+.game-timer-container,
+.timer-reading {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  gap: 6px;
 }
-
-.time {
+.game-timer-container {
   color: rgb(var(--v-theme-text-primary));
+  background: rgb(var(--v-theme-inset));
+  border-radius: 8px;
+  padding: 0 4px 0 10px;
+  box-shadow: 0 1px 4px #0002;
 }
-
+.game-timer-container:has(> .timer-reading:last-child) {
+  padding-right: 10px;
+}
+.timer-reading {
+  flex-shrink: 0;
+  min-height: 44px;
+  user-select: none;
+}
+.timer-reading > .material-icons {
+  font-size: 20px;
+  color: rgb(var(--v-theme-primary));
+}
+.timer-adjustable {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.time {
+  display: block;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
 .low-time {
   color: rgb(var(--v-theme-warning));
 }
-
 .critical-time {
   color: rgb(var(--v-theme-error));
-  animation: pulse 1s infinite;
 }
-
-.timer-end {
-  animation: none;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-  100% {
-    opacity: 1;
-  }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 </style>

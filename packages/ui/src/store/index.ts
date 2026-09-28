@@ -108,13 +108,16 @@ export const store = createStore<IState>({
     async registerUser({ commit }, { password, name, email, login }): Promise<ArgumentOfCallback<'registerUser'>> {
       const id = uuidv4();
 
-      const user = await socket.emitWithAck('registerUser', {
-        password,
-        id,
-        name,
-        email,
-        login,
-      });
+      const user = await socket
+        .timeout(10000)
+        .emitWithAck('registerUser', {
+          password,
+          id,
+          name,
+          email,
+          login,
+        })
+        .catch(() => ({ error: 'requestFailed' as const }));
 
       if (!('error' in user)) {
         commit('updateUserProfile', user);

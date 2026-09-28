@@ -4,6 +4,7 @@ export * from './avatars';
 
 export class PublicUserProfile {
   public premium?: boolean;
+  public isAdmin?: boolean;
 
   @prop({ required: true, unique: true })
   public id!: string;
@@ -57,7 +58,7 @@ export interface UserWithToken extends UserForUI {
 })
 export class UserProfile extends UserForUI {
   @prop({ default: false })
-  public isAdmin?: boolean;
+  declare public isAdmin?: boolean;
 
   @prop({ default: 0 })
   public authVersion?: number;
