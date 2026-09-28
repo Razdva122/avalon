@@ -30,6 +30,10 @@ export class PlayerTrueSkillRating {
   @prop({ required: true, default: 0 })
   gamesCount!: number;
 
+  // Lifetime gamesCount is preserved on reset; this counter starts again from zero.
+  @prop()
+  gamesSinceReset?: number;
+
   @prop({ required: true, default: 0 })
   wins!: number;
 
@@ -123,6 +127,10 @@ export class GameTrueSkillResult {
  * Record of TrueSkill change for a player in a game
  */
 export class PlayerTrueSkillChange {
+  // Immutable qualification count at the end of this match, including this match.
+  @prop()
+  gamesSinceReset?: number;
+
   @prop({ required: true })
   userID!: string;
 

@@ -1,5 +1,6 @@
 export default {
   stickers: {
+    'cleric-best': 'Best of the Best',
     'mordred-puppet': "@:{'premiumCosmetics.mordred-puppet'}",
     'morgana-violin': "@:{'premiumCosmetics.morgana-violin'}",
     reward: 'Sticker reward',

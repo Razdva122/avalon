@@ -29,6 +29,8 @@ import {
   STANDARD_ROLES,
 } from '@avalon/types';
 import { eventBus } from '@/helpers';
+import { gameTrueSkillResultModel } from '@/db/models';
+import { ACHIEVEMENT_BEST_OF_THE_BEST, BEST_OF_THE_BEST_MIN_GAMES, BEST_OF_THE_BEST_RATING } from '@avalon/types';
 
 /**
  * Класс для обработки игровых событий и обновления достижений
@@ -59,6 +61,18 @@ export class AchievementHandlers {
 
       if (!winnerTeam) {
         return;
+      }
+
+      // Use the immutable result: a retry may run after another game or a rating reset.
+      const ratingResult = await gameTrueSkillResultModel.findOne({ gameID: game.uuid }).lean();
+      for (const change of ratingResult?.playerChanges ?? []) {
+        if (
+          (change.gamesSinceReset ?? 0) >= BEST_OF_THE_BEST_MIN_GAMES &&
+          Number.isFinite(change.newMu) &&
+          change.newMu >= BEST_OF_THE_BEST_RATING
+        ) {
+          await this.achievementService.updateAchievementProgress(change.userID, ACHIEVEMENT_BEST_OF_THE_BEST);
+        }
       }
 
       // Обрабатываем достижения для каждого игрока

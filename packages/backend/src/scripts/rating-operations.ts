@@ -12,6 +12,7 @@ type Values = {
   sigma: number;
   conservativeRating: number;
   gamesCount: number;
+  gamesSinceReset: number;
   wins: number;
   losses: number;
   lastPlayedAt?: Date;
@@ -87,7 +88,10 @@ async function applyOperation(job: Operation, sequence: number) {
     const ratings = new Map(rows.map((r) => [r.userID, r]));
     let plan: NonNullable<Operation['plan']>;
     if (job.kind === 'game') {
-      const changes = trueSkillCalculator.calculateTrueSkillChangesForGame(job.game!, ratings);
+      const changes = trueSkillCalculator.calculateTrueSkillChangesForGame(job.game!, ratings).map((change) => ({
+        ...change,
+        gamesSinceReset: (ratings.get(change.userID)?.gamesSinceReset ?? 0) + 1,
+      }));
       plan = {
         changes,
         players: changes.map((change) => {
@@ -98,6 +102,7 @@ async function applyOperation(job: Operation, sequence: number) {
             sigma: change.newSigma,
             conservativeRating: calculateConservativeRating(change.newMu, change.newSigma),
             gamesCount: (before?.gamesCount ?? 0) + 1,
+            gamesSinceReset: change.gamesSinceReset,
             wins: (before?.wins ?? 0) + Number(change.won),
             losses: (before?.losses ?? 0) + Number(!change.won),
             lastPlayedAt: job.createdAt,
@@ -121,6 +126,7 @@ async function applyOperation(job: Operation, sequence: number) {
                   sigma: DEFAULT_SIGMA,
                   conservativeRating: calculateConservativeRating(DEFAULT_MU, DEFAULT_SIGMA),
                   gamesCount: before.gamesCount,
+                  gamesSinceReset: 0,
                   wins: before.wins,
                   losses: before.losses,
                   lastResetAt: job.createdAt,

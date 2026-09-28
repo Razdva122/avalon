@@ -3,6 +3,9 @@
  */
 export default {
   achievements: {
+    best_of_the_best: 'Лучший из лучших',
+    best_of_the_best_description:
+      'Достичь рейтинга TrueSkill 6800 или выше, сыграв минимум 10 рейтинговых игр с начала игры или последнего сброса рейтинга.',
     rewards: 'Награды',
     avatarType: 'Аватар',
     stickerType: 'Стикер',

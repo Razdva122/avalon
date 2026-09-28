@@ -3,6 +3,9 @@
  */
 export default {
   achievements: {
+    best_of_the_best: '強中之強',
+    best_of_the_best_description:
+      '從開始遊戲或最近一次重設評分後，完成至少10場計分對局，並達到6800或更高的TrueSkill評分。',
     rewards: '獎勵',
     avatarType: '頭像',
     stickerType: '貼圖',

@@ -62,6 +62,28 @@ test('concurrent processing of one game applies one result to each player', asyn
   expect(await gameTrueSkillResultModel.countDocuments({ gameID: game.uuid })).toBe(1);
 });
 
+test('rating reset restarts qualification games without erasing lifetime games; replays count once', async () => {
+  const game = endedRoom('qualification-first').game;
+  await updateTrueSkillForGame(game);
+  expect(await resetRating('a', 1)).toMatchObject({ success: true });
+  expect(await playerTrueSkillRatingModel.findOne({ userID: 'a' }).lean()).toMatchObject({
+    gamesCount: 1,
+    gamesSinceReset: 0,
+  });
+  const next = { ...game, uuid: 'qualification-next' };
+  await Promise.all([updateTrueSkillForGame(next), updateTrueSkillForGame(next)]);
+  expect(await playerTrueSkillRatingModel.findOne({ userID: 'a' }).lean()).toMatchObject({
+    gamesCount: 2,
+    gamesSinceReset: 1,
+  });
+  expect(await playerTrueSkillRatingModel.findOne({ userID: 'b' }).lean()).toMatchObject({
+    gamesCount: 2,
+    gamesSinceReset: 2,
+  });
+  const result = await gameTrueSkillResultModel.findOne({ gameID: next.uuid }).lean();
+  expect(result?.playerChanges.find((p) => p.userID === 'a')).toMatchObject({ gamesSinceReset: 1 });
+});
+
 test('retry resumes after a failed player write without skipping or double-counting players', async () => {
   const game = endedRoom().game;
   const original = playerTrueSkillRatingModel.updateOne.bind(playerTrueSkillRatingModel);

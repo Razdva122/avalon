@@ -16,6 +16,7 @@ import {
   ACHIEVEMENT_BODYGUARD,
   ACHIEVEMENT_SEER,
   ACHIEVEMENT_SECRET_HUNTER,
+  ACHIEVEMENT_BEST_OF_THE_BEST,
   SUPPORTED_PLAYER_COUNTS,
   ASSASSIN_TARGETS,
   STANDARD_ROLES,
@@ -25,6 +26,7 @@ import {
  * Данные для инициализации достижений
  */
 export const achievementsData: Achievement[] = [
+  { id: ACHIEVEMENT_BEST_OF_THE_BEST, type: AchievementType.OPEN, requirement: 1 },
   // Открытые достижения
   {
     id: ACHIEVEMENT_LIGHT_WINS,

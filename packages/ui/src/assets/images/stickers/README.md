@@ -1,5 +1,11 @@
 # Sticker artwork
 
+## cleric-best — «Лучший из лучших» (2026-09-28)
+
+Generated with the built-in image_gen tool. References: `../roles/cleric.webp` (character), user-provided Matthew McConaughey cigarette meme (expression and pose), `merlin-think.webp` (sticker rendering). Runtime asset: 320×320 WebP, transparent alpha retained. Unlock: `best_of_the_best` achievement.
+
+Prompt: Use case: stylized-concept. Asset type: ONE transparent Avalon game reaction sticker for achievement 'Best of the Best'. Input 1 is our Cleric character: preserve recognizable short salt-and-pepper hair and beard, black medieval clerical cloak and large ornate silver cross. Input 2 is the requested Matthew McConaughey meme: use his wide-eyed intense yet self-assured expression and hand holding a cigarette to the lips, and recognizable McConaughey facial cues, reimagined AS our Cleric. Input 3 is the existing sticker style reference: match painterly dark medieval fantasy rendering, warm ivory thin die-cut outline, detailed fabric, readable exaggerated expression. Create a single chest-up character portrait, head looking directly at viewer, one hand at lips with cigarette as in meme, small subtle wisp of smoke. Keep the cleric's beard, costume and prominent silver cross. Square centered composition, full silhouette and hand inside generous padding. Real transparent alpha background. No scenery, no checkerboard, no text, no 18+ overlay, no watermark, no collage. Expression and gesture must be legible at 96 pixels.
+
 ## Emotion replacements (2026-09-15)
 
 `oberon-smirk` is now **Furious! / В ярости!** and `servant-wave` is now **Sobbing… / До слёз…**. Stable IDs are retained to preserve saved favorites, unlocks and chat references. Replaced with the built-in image_gen tool, resized to 320px with alpha preserved.

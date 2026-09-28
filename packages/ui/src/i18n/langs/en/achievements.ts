@@ -3,6 +3,9 @@
  */
 export default {
   achievements: {
+    best_of_the_best: 'Best of the Best',
+    best_of_the_best_description:
+      'Reach a TrueSkill rating of 6800 or higher after completing at least 10 rated games from the start or since your last rating reset.',
     rewards: 'Rewards',
     avatarType: 'Avatar',
     stickerType: 'Sticker',
