@@ -191,7 +191,9 @@ export class Manager {
       room.data.manager.game.timer.cleanup();
     }
     this.voice.destroyRoom(uuid);
-    this.updateRoomsList(uuid, true);
+    // Releasing a completed room must not remove its saved game from the lobby.
+    const completed = room?.data.stage === 'started' && room.data.manager.game.stage === 'end';
+    if (!completed) this.updateRoomsList(uuid, true);
     this.io.to(roomChannel(uuid)).emit('destroyRoom', uuid);
     delete this.rooms[uuid];
   }

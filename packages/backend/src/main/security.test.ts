@@ -105,7 +105,35 @@ test('waiting rooms are actually released after idle TTL, not just hidden from l
   manager.createRoom('waiting', 'alice', ['alice']);
   jest.advanceTimersByTime(30 * 60000);
   expect(manager.rooms.waiting).toBeUndefined();
+  expect(manager.roomListCutted).not.toEqual(expect.arrayContaining([expect.objectContaining({ uuid: 'waiting' })]));
 });
+
+test.each(['manualy', 'rejectedVote'] as const)(
+  'expired completed games remain in the lobby after ending with %s',
+  async (reason) => {
+    const { manager, handlers, broadcasts } = fixture();
+    manager.createRoom('completed', 'alice', ['alice', 'bob', 'carol', 'dave', 'eve']);
+    const room = manager.rooms.completed;
+    room.startGame();
+    if (room.data.stage !== 'started') throw Error('game did not start');
+    room.data.manager.game.endGame(reason);
+    jest.advanceTimersByTime(30 * 60000);
+
+    expect(manager.rooms.completed).toBeUndefined();
+    const list = jest.fn();
+    await handlers.getRoomsList(list);
+    expect(list).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ uuid: 'completed', result: expect.objectContaining({ reason }) }),
+      ]),
+    );
+    expect(broadcasts.filter(({ event }) => event === 'roomsListUpdated').pop()?.value).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ uuid: 'completed', result: expect.objectContaining({ reason }) }),
+      ]),
+    );
+  },
+);
 
 test('new chat messages still broadcast when bounded history is full; retries do not', () => {
   const { manager, broadcasts } = fixture();
