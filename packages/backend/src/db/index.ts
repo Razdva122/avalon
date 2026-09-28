@@ -36,7 +36,7 @@ export class DBManager extends UserLayer {
   async getRoomFromDB(roomID: string): Promise<StartedRoomState | null> {
     validateID(roomID);
     const room = await roomModel.findOne({ roomID });
-    return room;
+    return room?.toObject() ?? null;
   }
 
   async getPlayerGames(playerID: string): Promise<VisualGameState[]> {

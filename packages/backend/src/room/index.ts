@@ -119,6 +119,7 @@ export class Room {
   calculateRoomState(userID?: string): TRoomState {
     const roomState = {
       ai: this.ai,
+      archived: Boolean(this.nextRoomID),
       roomID: this.roomID,
       leaderID: this.leaderID,
       vote: this.vote,

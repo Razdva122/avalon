@@ -69,7 +69,6 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerUserEvents {
   getVoiceState: (roomID: string, cb: (result: VoiceState | VoiceError) => void) => void;
-  setVoiceEnabled: (roomID: string, enabled: boolean, cb: (result: VoiceState | VoiceError) => void) => void;
   joinVoice: (roomID: string, cb: (result: VoiceJoin | VoiceError) => void) => void;
   leaveVoice: (sessionID: string, cb: (result: true | VoiceError) => void) => void;
   getMyStickers: (cb: (result: StickerResponse) => void) => void;

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Real-server contract test. Requires a running backend, a real LiveKit server,
-// two seated test accounts in the same voice-enabled room, and local Chromium.
+// two seated test accounts in the same room with voice infrastructure configured, and local Chromium.
 const assert = require('node:assert/strict');
 const http = require('node:http');
 const fs = require('node:fs');

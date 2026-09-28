@@ -246,6 +246,16 @@ export class Manager {
       });
     }
 
+    eventBus.on('gameEnded', (roomID) => {
+      const room = this.rooms[roomID];
+      if (!room || room.ai) return;
+      // Give players a full conversation window after the game, regardless of its duration.
+      clearTimeout(this.roomTimers.get(roomID));
+      const timer = setTimeout(() => this.destroyRoom(roomID), 30 * 60000);
+      timer.unref();
+      this.roomTimers.set(roomID, timer);
+    });
+
     eventBus.on('restartRoom', (room) => {
       this.restartRoom(room.roomID);
     });
@@ -305,7 +315,7 @@ export class Manager {
         }
 
         if (gameFromDB) {
-          cb(publicRoomState(gameFromDB));
+          cb(publicRoomState({ ...gameFromDB, archived: true }));
           return;
         }
 

@@ -53,19 +53,6 @@
             <p class="voice-status" role="status"><i v-if="isConnected" class="voice-dot" />{{ connectionLabel }}</p>
           </div>
           <button
-            v-if="voice.state.value.canManage"
-            type="button"
-            class="voice-icon-button"
-            :class="{ 'is-selected': settingsOpen }"
-            :aria-label="$t('voice.roomSettings')"
-            :title="$t('voice.roomSettings')"
-            :aria-expanded="settingsOpen"
-            :aria-controls="`${panelID}-settings`"
-            @click="settingsOpen = !settingsOpen"
-          >
-            <VoiceIcon name="settings" />
-          </button>
-          <button
             type="button"
             class="voice-icon-button"
             :aria-label="$t('voice.close')"
@@ -75,23 +62,9 @@
             <VoiceIcon name="close" />
           </button>
         </header>
-        <div v-if="settingsOpen && voice.state.value.canManage" :id="`${panelID}-settings`" class="voice-room-settings">
-          <label class="voice-setting">
-            <span>{{ $t('voice.roomSetting') }}</span>
-            <span class="voice-switch"
-              ><input
-                type="checkbox"
-                role="switch"
-                :checked="voice.state.value.enabled"
-                :disabled="!voice.state.value.available"
-                @change="toggleRoom" /><span aria-hidden="true"
-            /></span>
-          </label>
-          <p class="voice-hint">{{ $t('voice.privacy') }}</p>
-        </div>
         <div class="voice-body">
           <p v-if="voice.error.value" class="voice-error" role="alert"><VoiceIcon name="info" />{{ errorText }}</p>
-          <template v-if="voice.state.value.available && voice.state.value.enabled && voice.state.value.canJoin">
+          <template v-if="voice.state.value.available && voice.state.value.canJoin">
             <template v-if="isConnected">
               <button
                 type="button"
@@ -239,24 +212,8 @@
           <div v-else class="voice-empty">
             <VoiceIcon name="headphones" />
             <p>
-              {{
-                $t(
-                  !voice.state.value.available
-                    ? 'voice.unavailable'
-                    : !voice.state.value.enabled
-                      ? 'voice.disabled'
-                      : 'voice.spectator',
-                )
-              }}
+              {{ $t(!voice.state.value.available ? 'voice.unavailable' : 'voice.spectator') }}
             </p>
-            <button
-              v-if="voice.state.value.available && !voice.state.value.enabled && voice.state.value.canManage"
-              type="button"
-              class="voice-primary"
-              @click="voice.setEnabled(true)"
-            >
-              {{ $t('voice.enableRoom') }}
-            </button>
           </div>
           <button v-if="voice.playbackBlocked.value" type="button" class="voice-primary" @click="voice.startAudio">
             <VoiceIcon name="volume" />{{ $t('voice.resumeAudio') }}
@@ -298,7 +255,6 @@ const props = defineProps<{ roomUuid: string; seatIds: string }>();
 const store = useStore();
 const { t } = useI18n();
 const open = ref(false);
-const settingsOpen = ref(false);
 const launcher = ref<HTMLButtonElement>();
 const panel = ref<HTMLElement>();
 const panelID = computed(() => `voice-panel-${props.roomUuid}`);
@@ -320,7 +276,6 @@ const voice = createRoomVoice(
   props.roomUuid,
   {
     getVoiceState: (roomID) => socket.timeout(10000).emitWithAck('getVoiceState', roomID),
-    setVoiceEnabled: (roomID, enabled) => socket.timeout(10000).emitWithAck('setVoiceEnabled', roomID, enabled),
     joinVoice: (roomID) => socket.timeout(10000).emitWithAck('joinVoice', roomID),
     leaveVoice: (sessionID) => socket.timeout(10000).emitWithAck('leaveVoice', sessionID),
   },
@@ -380,7 +335,6 @@ watch(isConnected, (connected) => {
 });
 const connectionLabel = computed(() => {
   if (!voice.state.value.available) return t('voice.unavailable');
-  if (!voice.state.value.enabled) return t('voice.disabled');
   if (isConnected.value) return t('voice.connected');
   if (voice.status.value === 'connecting') return t('voice.connecting');
   return t('voice.notConnected');
@@ -397,7 +351,6 @@ const displayName = (userID: string) => {
   const user = store.state.users[userID];
   return user?.status === 'ready' ? user.profile.name : userID.slice(0, 8);
 };
-const toggleRoom = (event: Event) => void voice.setEnabled((event.target as HTMLInputElement).checked);
 const setMasterVolume = (event: Event) => voice.setMasterVolume(Number((event.target as HTMLInputElement).value));
 const setUserVolume = (userID: string, event: Event) =>
   voice.setUserVolume(userID, Number((event.target as HTMLInputElement).value));
@@ -616,61 +569,9 @@ onUnmounted(() => {
   border-radius: 12px;
 }
 .voice-icon-button:hover,
-.voice-icon-button.is-selected,
 .voice-launcher:hover,
 .voice-leave:hover {
   background: rgba(var(--v-theme-text-primary), 0.08);
-}
-.voice-room-settings {
-  padding: 14px 20px;
-  border-block: 1px solid rgba(var(--v-theme-text-primary), 0.12);
-}
-.voice-setting {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  font-weight: 600;
-  min-height: 44px;
-  cursor: pointer;
-}
-.voice-switch {
-  position: relative;
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  display: grid;
-  align-items: center;
-}
-.voice-switch input {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  z-index: 1;
-  cursor: pointer;
-}
-.voice-switch > span {
-  height: 24px;
-  border-radius: 20px;
-  background: rgba(var(--v-theme-text-primary), 0.32);
-  padding: 3px;
-}
-.voice-switch > span::after {
-  content: '';
-  display: block;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: white;
-  transition: transform 160ms ease;
-}
-.voice-switch input:checked + span {
-  background: rgb(var(--v-theme-primary));
-}
-.voice-switch input:checked + span::after {
-  transform: translateX(20px);
 }
 .voice-body {
   overflow-y: auto;
@@ -920,8 +821,7 @@ onUnmounted(() => {
   margin: 0 0 12px;
 }
 .room-voice button:focus-visible,
-.room-voice input:focus-visible,
-.voice-switch input:focus-visible + span {
+.room-voice input:focus-visible {
   outline: 3px solid rgb(var(--v-theme-primary));
   outline-offset: 3px;
 }
@@ -959,8 +859,7 @@ onUnmounted(() => {
     padding-left: 16px;
   }
   .voice-body,
-  .voice-footer,
-  .voice-room-settings {
+  .voice-footer {
     padding-left: 16px;
     padding-right: 16px;
   }

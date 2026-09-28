@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 
-export type VoiceState = { available: boolean; enabled: boolean; canJoin: boolean; canManage: boolean };
+export type VoiceState = { available: boolean; canJoin: boolean };
 export type VoiceResult<T> = T | { error: string };
 export type VoiceAdmission = { url: string; token: string; sessionID: string };
 export type VoiceAudioState = { microphoneEnabled: boolean; speaking: boolean };
@@ -24,7 +24,6 @@ export type VoiceClient = {
 };
 export type VoiceTransport = {
   getVoiceState: (roomID: string) => Promise<VoiceResult<VoiceState>>;
-  setVoiceEnabled: (roomID: string, enabled: boolean) => Promise<VoiceResult<VoiceState>>;
   joinVoice: (roomID: string) => Promise<VoiceResult<VoiceAdmission>>;
   leaveVoice: (sessionID: string) => Promise<VoiceResult<true>>;
 };
@@ -35,7 +34,7 @@ export type VoicePreferenceStore = {
 
 type Preferences = { masterVolume: number; users: Record<string, { volume: number; muted: boolean }> };
 const preferenceKey = 'avalon.voice.preferences.v1';
-const emptyState: VoiceState = { available: false, enabled: false, canJoin: false, canManage: false };
+const emptyState: VoiceState = { available: false, canJoin: false };
 const clamp = (value: number) => (Number.isFinite(value) ? Math.min(100, Math.max(0, Math.round(value))) : 100);
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
@@ -162,36 +161,13 @@ export function createRoomVoice(
         return;
       }
       state.value = result;
-      if ((!result.enabled || !result.available || !result.canJoin) && sessionID) stop();
+      if ((!result.available || !result.canJoin) && sessionID) stop();
     } catch (cause) {
       if (current === generation) error.value = message(cause);
     }
   };
-  const setEnabled = async (enabled: boolean) => {
-    if (!state.value.canManage) return;
-    const currentRoom = roomID;
-    try {
-      const result = await transport.setVoiceEnabled(currentRoom, enabled);
-      if (currentRoom !== roomID) return;
-      if ('error' in result) {
-        error.value = result.error;
-        return;
-      }
-      state.value = result;
-      error.value = undefined;
-      if (!result.enabled) stop();
-    } catch (cause) {
-      error.value = message(cause);
-    }
-  };
   const join = async () => {
-    if (
-      status.value === 'connecting' ||
-      status.value === 'connected' ||
-      !state.value.canJoin ||
-      !state.value.enabled ||
-      !state.value.available
-    )
+    if (status.value === 'connecting' || status.value === 'connected' || !state.value.canJoin || !state.value.available)
       return;
     const current = ++generation;
     const currentRoom = roomID;
@@ -356,7 +332,6 @@ export function createRoomVoice(
     participants,
     masterVolume,
     refresh,
-    setEnabled,
     join,
     leave,
     revoke,

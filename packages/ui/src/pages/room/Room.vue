@@ -64,7 +64,11 @@
           <StickerPicker :roomID="roomState.roomID" @hide-on-board="hideStickers = $event" />
         </template>
       </Chat>
-      <VoicePanel v-if="userID" :roomUuid="uuid" :seatIds="roomState.players.map((player) => player.id).join(',')" />
+      <VoicePanel
+        v-if="userID && !roomState.archived"
+        :roomUuid="uuid"
+        :seatIds="roomState.players.map((player) => player.id).join(',')"
+      />
     </template>
   </div>
 </template>

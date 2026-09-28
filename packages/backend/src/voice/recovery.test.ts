@@ -42,7 +42,6 @@ test('private recovery closes admissions and old connections until media cleanup
   await once(gateway, 'listening');
   const origin = `http://127.0.0.1:${(gateway.address() as AddressInfo).port}`;
   try {
-    await service.setEnabled('alice', 's', 'room', true);
     const old = await service.join('alice', 's', 'room');
     let closed = false;
     service.attach(old.sessionID, () => {

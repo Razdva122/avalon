@@ -65,3 +65,12 @@ test.each(['x', 'a'.repeat(24), { $gt: '' }, 'a'.repeat(24) + ':' + 'z'.repeat(2
     );
   },
 );
+
+test('saved rooms can be extended with response metadata without losing game fields', async () => {
+  const saved = new roomModel({ roomID: 'archive', stage: 'started', leaderID: 'alice' });
+  jest.spyOn(roomModel, 'findOne').mockResolvedValue(saved);
+  const room = await new DBManager(undefined).getRoomFromDB('archive');
+  const response = JSON.parse(JSON.stringify({ ...room, archived: true }));
+  expect(response).toMatchObject({ roomID: 'archive', stage: 'started', leaderID: 'alice', archived: true });
+  expect(response).not.toHaveProperty('_doc');
+});

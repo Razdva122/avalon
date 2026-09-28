@@ -213,7 +213,6 @@ export default defineComponent({
       if (
         voice?.status.value !== 'connected' ||
         !voice.state.value.available ||
-        !voice.state.value.enabled ||
         !voice.state.value.canJoin ||
         !props.playerState.id
       )

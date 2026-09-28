@@ -93,10 +93,6 @@ export function registerVoiceEndpoints(service: VoiceService, socket: ServerSock
     }
   };
   socket.on('getVoiceState', (id, cb) => void execute(id, cb, () => service.state(userID!, socket.id, id)));
-  socket.on(
-    'setVoiceEnabled',
-    (id, enabled, cb) => void execute(id, cb, () => service.setEnabled(userID!, socket.id, id, enabled)),
-  );
   socket.on('joinVoice', (id, cb) => void execute(id, cb, () => service.join(userID!, socket.id, id)));
   socket.on('leaveVoice', (id, cb) => void execute(id, cb, () => service.leave(userID!, socket.id, id)));
   socket.on('disconnecting', () => service.revokeSocket(socket.id));

@@ -4,7 +4,7 @@ require('ts-node').register({ transpileOnly: true, compilerOptions: { module: 'C
 const { createRoomVoice } = require('../src/helpers/composables/useRoomVoice.ts');
 const { createLiveKitVoiceClient } = require('../src/helpers/composables/liveKitVoiceClient.ts');
 
-const state = { available: true, enabled: true, canJoin: true, canManage: false };
+const state = { available: true, canJoin: true };
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 function fixture() {
   const calls = [];
@@ -23,7 +23,6 @@ function fixture() {
   };
   const transport = {
     getVoiceState: async () => state,
-    setVoiceEnabled: async () => state,
     joinVoice: async () => ({ url: 'wss://voice', token: 'secret', sessionID: 'session-1' }),
     leaveVoice: async (id) => {
       calls.push(['leave', id]);

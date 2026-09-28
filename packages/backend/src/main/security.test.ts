@@ -119,3 +119,35 @@ test('new chat messages still broadcast when bounded history is full; retries do
     expect.objectContaining({ channel: 'room:chat-room', value: expect.objectContaining({ text: 'newest' }) }),
   ]);
 });
+
+test('room responses distinguish saved archives and rooms replaced by the next game', async () => {
+  const { manager, handlers } = fixture();
+  const archive = jest.fn();
+  await handlers.joinRoom('archive', archive);
+  expect(archive).toHaveBeenCalledWith(expect.objectContaining({ archived: true }));
+  manager.createRoom('live', 'alice', ['alice']);
+  const live = jest.fn();
+  await handlers.joinRoom('live', live);
+  expect(live).toHaveBeenCalledWith(expect.objectContaining({ archived: false }));
+  manager.rooms.live.nextRoomID = 'next';
+  const replaced = jest.fn();
+  await handlers.joinRoom('live', replaced);
+  expect(replaced).toHaveBeenCalledWith(expect.objectContaining({ archived: true }));
+});
+
+test.each([29, 64])('a game ending %i minutes after creation keeps its room for 30 more minutes', async (minutes) => {
+  const { manager, handlers } = fixture();
+  manager.createRoom('postgame', 'alice', ['alice', 'bob', 'carol', 'dave', 'eve']);
+  const room = manager.rooms.postgame;
+  room.startGame();
+  jest.advanceTimersByTime(minutes * 60000);
+  if (room.data.stage !== 'started') throw Error('game did not start');
+  room.data.manager.game.endGame('manualy');
+  jest.advanceTimersByTime(30 * 60000 - 1);
+  expect(manager.rooms.postgame).toBe(room);
+  const state = jest.fn();
+  await handlers.joinRoom('postgame', state);
+  expect(state).toHaveBeenCalledWith(expect.objectContaining({ archived: false }));
+  jest.advanceTimersByTime(1);
+  expect(manager.rooms.postgame).toBeUndefined();
+});

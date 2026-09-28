@@ -46,6 +46,8 @@ export type AiRoomState = {
 
 export class BaseRoomState {
   public ai?: AiRoomState;
+  // Response-only: archived games have no live room or voice conversation.
+  public archived?: boolean;
 
   @prop({ required: true })
   public stage!: 'created' | 'locked' | 'started';

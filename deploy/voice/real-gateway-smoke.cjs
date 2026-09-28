@@ -106,7 +106,6 @@ async function main() {
     const gatewayHTTP = await listen(gateway);
     config.publicUrl = gatewayHTTP.replace(/^http/, 'ws') + '/';
     const pageURL = await listen(staticServer);
-    await service.setEnabled('alice', 'socket-a', roomID, true);
     await assert.rejects(service.join('spectator', 'socket-s', roomID), /forbidden/);
     const a = await service.join('alice', 'socket-a', roomID);
     const b = await service.join('bob', 'socket-b', roomID);

@@ -28,7 +28,7 @@ interface Session {
   started: number;
 }
 export class VoiceService {
-  private rooms = new Map<string, { name: string; enabled: boolean; blocked: boolean }>();
+  private rooms = new Map<string, { name: string; blocked: boolean }>();
   private sessions = new Map<string, Session>();
   private closers = new Map<string, Set<() => void>>();
   private retries = new Set<string>();
@@ -49,8 +49,8 @@ export class VoiceService {
     this.deps.prepareRecovery();
     for (const join of this.pending) join.cancelled = true;
     for (const session of this.sessions.values()) this.revoke(session, false);
-    for (const [id, room] of this.rooms) {
-      this.rooms.set(id, { name: randomUUID(), enabled: room.enabled, blocked: false });
+    for (const id of this.rooms.keys()) {
+      this.rooms.set(id, { name: randomUUID(), blocked: false });
       this.deps.stateChanged(id);
     }
   }
@@ -72,9 +72,7 @@ export class VoiceService {
     const available = Boolean(this.config && (this.deps.ready?.() ?? true) && !room?.blocked);
     return {
       available,
-      enabled: available && Boolean(room?.enabled),
       canJoin: available && (p.seated || p.admin),
-      canManage: available && (p.leader || p.admin),
     };
   }
   limit(key: string, max = 12) {
@@ -85,20 +83,6 @@ export class VoiceService {
     this.limits.set(key, entry);
     if (++entry.count > max) throw Error('rateLimited');
   }
-  async setEnabled(userID: string, socketID: string, roomID: string, enabled: boolean) {
-    if (typeof enabled !== 'boolean') throw Error('invalidRequest');
-    const p = await this.policy(userID, socketID, roomID);
-    if (!p.leader && !p.admin) throw Error('forbidden');
-    if (!this.config || !(this.deps.ready?.() ?? true)) throw Error('unavailable');
-    const room = this.rooms.get(roomID) || { name: randomUUID(), enabled: false, blocked: false };
-    if (room.blocked) throw Error('unavailable');
-    for (const join of this.pending) if (join.roomID === roomID) join.cancelled = true;
-    room.enabled = enabled;
-    this.rooms.set(roomID, room);
-    if (!enabled) this.revokeRoom(roomID);
-    this.deps.stateChanged(roomID);
-    return this.state(userID, socketID, roomID);
-  }
   async join(userID: string, socketID: string, roomID: string): Promise<VoiceJoin> {
     this.limit(`join:${userID}`);
     for (const join of this.pending) if (join.userID === userID) join.cancelled = true;
@@ -106,9 +90,10 @@ export class VoiceService {
     this.pending.add(pending);
     try {
       const state = await this.state(userID, socketID, roomID);
-      if (!state.enabled || !this.config) throw Error('unavailable');
+      if (!state.available || !this.config) throw Error('unavailable');
       if (!state.canJoin) throw Error('forbidden');
-      const room = this.rooms.get(roomID)!;
+      const room = this.rooms.get(roomID) ?? { name: randomUUID(), blocked: false };
+      this.rooms.set(roomID, room);
       const session: Session = { id: randomUUID(), userID, socketID, roomID, roomName: room.name, started: Date.now() };
       const token = new AccessToken(this.config.apiKey, this.config.apiSecret, {
         identity: session.id,
@@ -126,13 +111,7 @@ export class VoiceService {
       });
       const jwt = await token.toJwt();
       const latest = await this.policy(userID, socketID, roomID);
-      if (
-        pending.cancelled ||
-        this.rooms.get(roomID) !== room ||
-        !(latest.seated || latest.admin) ||
-        !room.enabled ||
-        room.blocked
-      )
+      if (pending.cancelled || this.rooms.get(roomID) !== room || !(latest.seated || latest.admin) || room.blocked)
         throw Error('forbidden');
       for (const previous of this.sessions.values()) if (previous.userID === userID) this.revoke(previous);
       this.sessions.set(session.id, session);
@@ -148,7 +127,7 @@ export class VoiceService {
     if (!session || claims.video?.room !== session.roomName || claims.video?.roomJoin !== true)
       throw Error('forbidden');
     const state = await this.state(session.userID, session.socketID, session.roomID);
-    if (!state.enabled || !state.canJoin || this.sessions.get(session.id) !== session) throw Error('forbidden');
+    if (!state.available || !state.canJoin || this.sessions.get(session.id) !== session) throw Error('forbidden');
     return session.id;
   }
   attach(id: string, close: () => void): () => void {
@@ -208,7 +187,6 @@ export class VoiceService {
     const room = this.rooms.get(roomID);
     if (room?.name === roomName && !room.blocked) {
       room.blocked = true;
-      room.enabled = false;
       this.revokeRoom(roomID);
       this.deps.stateChanged(roomID);
     }
@@ -221,7 +199,7 @@ export class VoiceService {
         if (roomID && session.roomID !== roomID) continue;
         try {
           const state = await this.state(session.userID, session.socketID, session.roomID);
-          if (!state.enabled || !state.canJoin) this.revoke(session);
+          if (!state.available || !state.canJoin) this.revoke(session);
         } catch {
           this.revoke(session);
         }
@@ -232,7 +210,7 @@ export class VoiceService {
           this.retries.delete(name);
           for (const [id, room] of this.rooms)
             if (room.name === name) {
-              this.rooms.set(id, { name: randomUUID(), enabled: false, blocked: false });
+              this.rooms.set(id, { name: randomUUID(), blocked: false });
               this.deps.stateChanged(id);
             }
         } catch {
