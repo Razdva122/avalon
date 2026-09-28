@@ -202,3 +202,48 @@ test('recovery cancels an in-flight join even if media becomes ready before poli
   const joined = await service.join('alice', 's', 'room');
   expect(await service.admit(joined.token)).toBe(joined.sessionID);
 });
+
+test('room members can see an empty conversation before joining', async () => {
+  const { service } = setup();
+  expect(await service.state('viewer', 'view-socket', 'room')).toMatchObject({ participantCount: 0 });
+  await service.join('alice', 'a', 'room');
+  expect(await service.state('viewer', 'view-socket', 'room')).toMatchObject({ participantCount: 0 });
+});
+
+test('participant counts track connected people, not validation requests or duplicate connections', async () => {
+  const { service } = setup();
+  const alice = await service.join('alice', 'a', 'room');
+  const bob = await service.join('bob', 'b', 'room');
+  const validation = service.attach(alice.sessionID, () => {});
+  expect((await service.state('viewer', 'v', 'room')).participantCount).toBe(0);
+  const first = service.attach(alice.sessionID, () => {}, true);
+  const reconnect = service.attach(alice.sessionID, () => {}, true);
+  const second = service.attach(bob.sessionID, () => {}, true);
+  expect((await service.state('viewer', 'v', 'room')).participantCount).toBe(2);
+  first();
+  first();
+  validation();
+  expect((await service.state('viewer', 'v', 'room')).participantCount).toBe(2);
+  reconnect();
+  expect((await service.state('viewer', 'v', 'room')).participantCount).toBe(1);
+  service.leave('bob', 'b', bob.sessionID);
+  second();
+  expect((await service.state('viewer', 'v', 'room')).participantCount).toBe(0);
+});
+
+test('replacement, seat loss, and room destruction remove connected participants from the count', async () => {
+  const { service, policies } = setup();
+  const first = await service.join('alice', 'a', 'room');
+  const detachOld = service.attach(first.sessionID, () => {}, true);
+  const replacement = await service.join('alice', 'new', 'room');
+  service.attach(replacement.sessionID, () => {}, true);
+  detachOld();
+  expect((await service.state('viewer', 'v', 'room')).participantCount).toBe(1);
+  policies.set('alice', { present: true, seated: false, admin: false, leader: true });
+  await service.reconcile();
+  expect((await service.state('viewer', 'v', 'room')).participantCount).toBe(0);
+  const bob = await service.join('bob', 'b', 'room');
+  service.attach(bob.sessionID, () => {}, true);
+  service.destroyRoom('room');
+  expect((await service.state('viewer', 'v', 'room')).participantCount).toBe(0);
+});

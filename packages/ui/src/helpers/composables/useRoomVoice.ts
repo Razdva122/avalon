@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 
-export type VoiceState = { available: boolean; canJoin: boolean };
+export type VoiceState = { available: boolean; canJoin: boolean; participantCount: number };
 export type VoiceResult<T> = T | { error: string };
 export type VoiceAdmission = { url: string; token: string; sessionID: string };
 export type VoiceAudioState = { microphoneEnabled: boolean; speaking: boolean };
@@ -34,7 +34,7 @@ export type VoicePreferenceStore = {
 
 type Preferences = { masterVolume: number; users: Record<string, { volume: number; muted: boolean }> };
 const preferenceKey = 'avalon.voice.preferences.v1';
-const emptyState: VoiceState = { available: false, canJoin: false };
+const emptyState: VoiceState = { available: false, canJoin: false, participantCount: 0 };
 const clamp = (value: number) => (Number.isFinite(value) ? Math.min(100, Math.max(0, Math.round(value))) : 100);
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
 

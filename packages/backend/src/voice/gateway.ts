@@ -5,7 +5,7 @@ interface Admission {
   healthy?(): boolean;
   prepareRecovery?(): void;
   admit(token: string): Promise<string>;
-  attach(id: string, close: () => void): () => void;
+  attach(id: string, close: () => void, participant?: boolean): () => void;
   limit(key: string, max?: number): void;
 }
 const routes = new Set(['/rtc', '/rtc/validate', '/rtc/v1', '/rtc/v1/validate']);
@@ -105,6 +105,9 @@ export function createVoiceGateway(internalUrl: string, admission: Admission) {
           }
           sockets.handleUpgrade(req, socket, head, (client) => {
             local = client;
+            // Validation requests and failed handshakes are not conversation participants.
+            detach();
+            detach = admission.attach(id, close, true);
             client.on('error', close);
             client.on('close', close);
             client.on('message', (data, binary) => {

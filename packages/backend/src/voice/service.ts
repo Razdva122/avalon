@@ -26,6 +26,7 @@ interface Session {
   roomID: string;
   roomName: string;
   started: number;
+  connections: number;
 }
 export class VoiceService {
   private rooms = new Map<string, { name: string; blocked: boolean }>();
@@ -73,6 +74,9 @@ export class VoiceService {
     return {
       available,
       canJoin: available && (p.seated || p.admin),
+      participantCount: available
+        ? [...this.sessions.values()].filter((session) => session.roomID === roomID && session.connections > 0).length
+        : 0,
     };
   }
   limit(key: string, max = 12) {
@@ -94,7 +98,15 @@ export class VoiceService {
       if (!state.canJoin) throw Error('forbidden');
       const room = this.rooms.get(roomID) ?? { name: randomUUID(), blocked: false };
       this.rooms.set(roomID, room);
-      const session: Session = { id: randomUUID(), userID, socketID, roomID, roomName: room.name, started: Date.now() };
+      const session: Session = {
+        id: randomUUID(),
+        userID,
+        socketID,
+        roomID,
+        roomName: room.name,
+        started: Date.now(),
+        connections: 0,
+      };
       const token = new AccessToken(this.config.apiKey, this.config.apiSecret, {
         identity: session.id,
         ttl: 60,
@@ -130,17 +142,24 @@ export class VoiceService {
     if (!state.available || !state.canJoin || this.sessions.get(session.id) !== session) throw Error('forbidden');
     return session.id;
   }
-  attach(id: string, close: () => void): () => void {
-    if (!this.sessions.has(id)) {
+  attach(id: string, close: () => void, participant = false): () => void {
+    const session = this.sessions.get(id);
+    if (!session) {
       close();
       throw Error('forbidden');
     }
     const connections = this.closers.get(id) || new Set();
     connections.add(close);
     this.closers.set(id, connections);
+    if (participant && ++session.connections === 1) this.deps.stateChanged(session.roomID);
+    let detached = false;
     return () => {
+      if (detached) return;
+      detached = true;
       connections.delete(close);
       if (!connections.size) this.closers.delete(id);
+      if (participant && --session.connections === 0 && this.sessions.get(id) === session)
+        this.deps.stateChanged(session.roomID);
     };
   }
   leave(userID: string, socketID: string, id: string) {
@@ -167,9 +186,11 @@ export class VoiceService {
   }
   private revoke(session: Session, removeMedia = true) {
     if (!this.sessions.delete(session.id)) return;
+    const wasConnected = session.connections > 0;
     this.closers.get(session.id)?.forEach((close) => close());
     this.closers.delete(session.id);
     this.deps.revoked(session.socketID, session.id);
+    if (wasConnected) this.deps.stateChanged(session.roomID);
     // Structured operational record: no tokens, identities or audio.
     console.info(
       JSON.stringify({

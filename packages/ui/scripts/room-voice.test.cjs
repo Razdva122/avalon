@@ -4,7 +4,7 @@ require('ts-node').register({ transpileOnly: true, compilerOptions: { module: 'C
 const { createRoomVoice } = require('../src/helpers/composables/useRoomVoice.ts');
 const { createLiveKitVoiceClient } = require('../src/helpers/composables/liveKitVoiceClient.ts');
 
-const state = { available: true, canJoin: true };
+const state = { available: true, canJoin: true, participantCount: 0 };
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 function fixture() {
   const calls = [];

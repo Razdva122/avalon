@@ -1,8 +1,9 @@
 import { createServer } from 'node:http';
-import { once } from 'node:events';
+import { once, EventEmitter } from 'node:events';
 import { AddressInfo } from 'node:net';
 import WebSocket, { WebSocketServer } from 'ws';
 import { createVoiceGateway } from './gateway';
+import { VoiceService } from './service';
 
 test('gateway denies unknown paths and stale admissions, forwards valid WebSocket and closes on revocation', async () => {
   const upstream = createServer((_req, res) => res.end('success'));
@@ -75,6 +76,61 @@ test('initial upstream messages arrive even when sent immediately at handshake',
     const closed = once(client, 'close');
     revoke();
     await closed;
+    wss.clients.forEach((socket) => socket.terminate());
+    await new Promise<void>((resolve) => gateway.close(() => resolve()));
+    await new Promise<void>((resolve) => wss.close(() => resolve()));
+    await new Promise<void>((resolve) => upstream.close(() => resolve()));
+  }
+});
+
+test('participant count broadcasts only established conversations and updates when the socket closes', async () => {
+  const upstream = createServer((_req, res) => res.end('success'));
+  const wss = new WebSocketServer({ server: upstream });
+  upstream.listen(0, '127.0.0.1');
+  await once(upstream, 'listening');
+  const internalUrl = `http://127.0.0.1:${(upstream.address() as AddressInfo).port}`;
+  const changes = new EventEmitter();
+  const service = new VoiceService(
+    {
+      apiKey: 'test',
+      apiSecret: 'a'.repeat(40),
+      internalUrl,
+      publicUrl: 'wss://voice.example',
+      gatewayHost: '127.0.0.1',
+      gatewayPort: 7882,
+    },
+    {
+      exists: () => true,
+      policy: async () => ({ present: true, seated: true, admin: false, leader: false }),
+      remove: async () => {},
+      deleteRoom: async () => {},
+      stateChanged: (roomID) => changes.emit('changed', roomID),
+      revoked: () => {},
+    },
+  );
+  const admission = await service.join('alice', 'a', 'room');
+  const gateway = createVoiceGateway(internalUrl, service);
+  gateway.listen(0, '127.0.0.1');
+  await once(gateway, 'listening');
+  const origin = `http://127.0.0.1:${(gateway.address() as AddressInfo).port}`;
+  let client: WebSocket | undefined;
+  try {
+    expect((await fetch(`${origin}/rtc/validate?access_token=${admission.token}`)).status).toBe(200);
+    expect((await service.state('bob', 'b', 'room')).participantCount).toBe(0);
+    const entered = once(changes, 'changed');
+    client = new WebSocket(`${origin.replace('http:', 'ws:')}/rtc?access_token=${admission.token}`);
+    await once(client, 'open');
+    expect(await entered).toEqual(['room']);
+    expect((await service.state('bob', 'b', 'room')).participantCount).toBe(1);
+    expect((await service.state('bob', 'b', 'another-room')).participantCount).toBe(0);
+    const left = once(changes, 'changed');
+    const closed = once(client, 'close');
+    client.close();
+    await closed;
+    expect(await left).toEqual(['room']);
+    expect((await service.state('bob', 'b', 'room')).participantCount).toBe(0);
+  } finally {
+    client?.terminate();
     wss.clients.forEach((socket) => socket.terminate());
     await new Promise<void>((resolve) => gateway.close(() => resolve()));
     await new Promise<void>((resolve) => wss.close(() => resolve()));

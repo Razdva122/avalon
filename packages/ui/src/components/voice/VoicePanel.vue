@@ -12,11 +12,14 @@
         <VoiceIcon name="headphones" />
         <span class="voice-dock-label">{{ $t('voice.shortTitle') }} <small>beta</small></span>
         <span
-          v-if="isConnected"
+          v-if="voice.state.value.available"
           class="voice-count"
-          :aria-label="`${$t('voice.participants')}: ${voice.participants.value.length + 1}`"
+          :class="{ 'is-empty': participantCount === 0 }"
+          :aria-label="`${$t('voice.participants')}: ${participantCount}`"
+          aria-live="polite"
+          aria-atomic="true"
         >
-          <i class="voice-dot" />{{ voice.participants.value.length + 1 }}
+          <i class="voice-dot" aria-hidden="true" />{{ participantCount }}
         </span>
         <VoiceIcon :name="open ? 'chevronDown' : 'chevronUp'" class="voice-chevron" />
       </button>
@@ -138,7 +141,11 @@
               </div>
               <ul class="voice-roster">
                 <li class="voice-person voice-self">
-                  <VoiceStatus :status="userStatus(ownUserID)" :name="$t('voice.you')" own />
+                  <span class="voice-avatar">
+                    <Avatar v-if="avatarID(ownUserID)" :avatarID="avatarID(ownUserID)!" alt="" />
+                    <VoiceIcon v-else name="person" />
+                    <VoiceStatus :status="userStatus(ownUserID)" :name="$t('voice.you')" own />
+                  </span>
                   <div class="voice-person-controls">
                     <strong>{{ $t('voice.you') }}</strong>
                     <span class="voice-person-state">{{
@@ -156,7 +163,11 @@
                   class="voice-person"
                   :class="{ 'is-muted': participant.muted }"
                 >
-                  <VoiceStatus :status="userStatus(participant.userID)" :name="displayName(participant.userID)" />
+                  <span class="voice-avatar">
+                    <Avatar v-if="avatarID(participant.userID)" :avatarID="avatarID(participant.userID)!" alt="" />
+                    <VoiceIcon v-else name="person" />
+                    <VoiceStatus :status="userStatus(participant.userID)" :name="displayName(participant.userID)" />
+                  </span>
                   <div class="voice-person-controls">
                     <div class="voice-person-label">
                       <strong :title="displayName(participant.userID)">{{ displayName(participant.userID) }}</strong
@@ -244,6 +255,7 @@
 import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import VoiceIcon from './VoiceIcon.vue';
 import VoiceStatus from './VoiceStatus.vue';
+import Avatar from '@/components/user/Avatar.vue';
 import { roomVoiceKey } from '@/helpers/room-voice-context';
 import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
@@ -290,6 +302,9 @@ onUnmounted(() => {
 const ownUserID = computed(() => store.state.profile?.id ?? '');
 const userStatus = (id: string) => voice.userStatus(id, ownUserID.value);
 const isConnected = computed(() => voice.status.value === 'connected');
+const participantCount = computed(() =>
+  isConnected.value ? voice.participants.value.length + 1 : (voice.state.value.participantCount ?? 0),
+);
 const micLabel = computed(() => t(voice.microphoneEnabled.value ? 'voice.disableMic' : 'voice.enableMic'));
 const micHelpOpen = ref(false);
 const microphoneWasEnabled = ref(false);
@@ -350,6 +365,11 @@ const errorText = computed(() => {
 const displayName = (userID: string) => {
   const user = store.state.users[userID];
   return user?.status === 'ready' ? user.profile.name : userID.slice(0, 8);
+};
+const avatarID = (userID: string) => {
+  if (userID === ownUserID.value) return store.state.profile?.avatar;
+  const user = store.state.users[userID];
+  return user?.status === 'ready' ? user.profile.avatar : undefined;
 };
 const setMasterVolume = (event: Event) => voice.setMasterVolume(Number((event.target as HTMLInputElement).value));
 const setUserVolume = (userID: string, event: Event) =>
@@ -492,6 +512,17 @@ onUnmounted(() => {
   gap: 5px;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
+  min-width: 32px;
+  justify-content: center;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(var(--v-theme-success), 0.12);
+}
+.voice-count.is-empty {
+  background: rgba(var(--v-theme-text-primary), 0.06);
+}
+.voice-count.is-empty .voice-dot {
+  background: rgba(var(--v-theme-text-primary), 0.4);
 }
 .voice-dot {
   display: inline-block;
@@ -662,23 +693,41 @@ onUnmounted(() => {
 .voice-self {
   min-height: 44px;
 }
-.voice-self > svg {
-  margin: 0 12px;
-  width: 18px;
-}
 .voice-avatar {
+  position: relative;
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
+  margin-right: 4px;
   flex-shrink: 0;
   border-radius: 50%;
   background: rgba(var(--v-theme-text-primary), 0.08);
   font-size: 13px;
   font-weight: 700;
 }
-.voice-avatar svg {
+.voice-avatar > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+.voice-avatar > svg {
   width: 18px;
+}
+.voice-avatar :deep(.voice-status-anchor) {
+  position: absolute;
+  right: -5px;
+  bottom: -3px;
+}
+.voice-avatar :deep(.voice-status-mark) {
+  width: 22px;
+  height: 22px;
+  flex-basis: 22px;
+}
+.voice-avatar :deep(.voice-status-mark svg) {
+  width: 14px;
+  height: 14px;
 }
 .voice-person-name {
   flex: 1;
