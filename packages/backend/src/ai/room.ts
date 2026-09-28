@@ -250,7 +250,8 @@ export class BotRoom extends Room {
   }
   private async publish(id: string, text: string) {
     if (this.cancelled) return;
-    this.addMessage(id, text);
+    if (this.persistChatMessage) await this.persistChatMessage(id, text);
+    else this.addMessage(id, text);
     await this.checkpoint(this.calculateRoomState());
     if (!this.delayMs || this.cancelled) return;
     await new Promise<void>((resolve) => {

@@ -140,7 +140,11 @@ export class StickersManager {
     );
   }
 
-  async authorizeSend(userID: string, stickerID: string, deliver: () => void): Promise<true | StickerError> {
+  async authorizeSend(
+    userID: string,
+    stickerID: string,
+    deliver: () => void | Promise<void>,
+  ): Promise<true | StickerError> {
     if (!STICKERS.some((s) => s.id === stickerID)) return { error: 'invalid' };
     const now = Date.now();
     const retryAfter = STICKER_COOLDOWN_MS - (now - (this.lastSent.get(userID) || 0));
@@ -150,7 +154,7 @@ export class StickersManager {
     try {
       const collection = await this.collection(userID);
       if (!collection.stickers.some((s) => s.id === stickerID && s.available)) return { error: 'unavailable' };
-      deliver();
+      await deliver();
       this.lastSent.set(userID, Date.now());
       for (const [id, time] of this.lastSent) if (Date.now() - time >= STICKER_COOLDOWN_MS) this.lastSent.delete(id);
       return true;

@@ -1,15 +1,14 @@
 import { roomChannel } from '@/helpers/channels';
-import crypto from 'crypto';
-import type { Server, ServerSocket } from '@avalon/types';
-import type { Room } from '@/room';
+import type { ServerSocket } from '@avalon/types';
+import type { ChatService } from '@/room/chat-service';
+import { validID } from '@/security/validation';
 import { StickersManager } from './index';
 
 export function registerStickerEndpoints(
   socket: ServerSocket,
   userID: string,
   manager: StickersManager,
-  getRoom: (id: string) => Room | undefined,
-  io: Server,
+  chat: Pick<ChatService, 'sendSticker'>,
 ): void {
   socket.on('getMyStickers', async (cb) => {
     try {
@@ -38,37 +37,13 @@ export function registerStickerEndpoints(
     }
   });
   socket.on('sendSticker', async (uuid, stickerID, cb) => {
-    const room = getRoom(uuid);
-    if (!room || !socket.rooms.has(roomChannel(uuid))) {
+    const allowed = () => socket.connected !== false && socket.rooms.has(roomChannel(uuid));
+    if (!validID(uuid) || !allowed()) {
       cb({ error: 'notInRoom' });
       return;
     }
     try {
-      cb(
-        await manager.authorizeSend(userID, stickerID, () => {
-          if (getRoom(uuid) !== room || !socket.rooms.has(roomChannel(uuid))) throw new Error('Room left');
-          const message = {
-            id: crypto.randomUUID(),
-            roomID: uuid,
-            userID,
-            timestamp: Date.now(),
-            stickerID,
-            showOnBoard:
-              room.data.stage === 'started'
-                ? room.data.manager.game.players.some((p) => p.userID === userID)
-                : room.players.includes(userID),
-          };
-          room.chat.append({
-            id: message.id,
-            kind: 'sticker',
-            stickerID,
-            userID,
-            timestamp: message.timestamp,
-            message: stickerID,
-          });
-          io.to(roomChannel(uuid)).emit('stickerSent', message);
-        }),
-      );
+      cb(await manager.authorizeSend(userID, stickerID, () => chat.sendSticker(uuid, userID, stickerID, allowed)));
     } catch {
       cb({ error: 'failed' });
     }

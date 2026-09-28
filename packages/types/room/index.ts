@@ -135,7 +135,7 @@ export class ChatMessage {
   public timestamp!: number;
 }
 
-export type ChatSendResult = { message: ChatMessage } | { error: 'invalidMessage' | 'notInRoom' };
+export type ChatSendResult = { message: ChatMessage } | { error: 'invalidMessage' | 'notInRoom' | 'failed' };
 
 export type TMessage = {
   id?: string;

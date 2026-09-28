@@ -115,3 +115,19 @@ test('premium stickers never enter a new player’s starter favorites', () => {
   expect(DEFAULT_STICKER_FAVORITES).not.toContain('mordred-puppet');
   expect(DEFAULT_STICKER_FAVORITES).not.toContain('morgana-violin');
 });
+
+test('sticker delivery failure is awaited and does not consume the send cooldown', async () => {
+  const stickers = new StickersManager();
+  await expect(
+    stickers.authorizeSend('player', 'servant-yes', async () => {
+      throw Error('database unavailable');
+    }),
+  ).rejects.toThrow('database unavailable');
+  let delivered = false;
+  expect(
+    await stickers.authorizeSend('player', 'servant-yes', async () => {
+      delivered = true;
+    }),
+  ).toBe(true);
+  expect(delivered).toBe(true);
+});

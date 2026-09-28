@@ -77,7 +77,8 @@
 import { localizedPath } from '@/router/paths';
 import { i18n } from '@/plugins/i18n';
 import { useRouter } from 'vue-router';
-import { defineComponent, ref, computed, watch, provide, shallowRef } from 'vue';
+import { defineComponent, ref, computed, watch, provide, shallowRef, onUnmounted } from 'vue';
+import { createRoomSession } from '@/helpers/room-session';
 import Board from '@/components/view/board/Board.vue';
 import type { TVisibleRole, AiSpectatorDecision, TRoles, ISocketError } from '@avalon/types';
 import { socket } from '@/api/socket';
@@ -160,16 +161,26 @@ export default defineComponent({
       spectatorRoles.value = {};
     });
 
-    const initState = async (uuid: string) => {
-      const stateFromBackend = await socket.emitWithAck('joinRoom', uuid);
-
-      if ('error' in stateFromBackend) {
-        errorMessage.value = stateFromBackend;
-      } else {
+    const session = createRoomSession(
+      socket,
+      () => props.uuid,
+      (stateFromBackend) => {
+        errorMessage.value = undefined;
         stateManager.mutateRoomState({ newRoomState: stateFromBackend, userID: userID.value });
         if (stateFromBackend.ai) chatOpen.value = true;
-      }
-    };
+      },
+      (error) => {
+        errorMessage.value = error;
+      },
+      () => {
+        router.push(localizedPath('/', i18n.global.locale.value));
+      },
+      (messages) => {
+        if (roomState.value?.roomID === props.uuid) roomState.value.chat = messages;
+      },
+    );
+    const initState = session.load;
+    onUnmounted(session.dispose);
 
     await initState(props.uuid);
 
@@ -181,12 +192,6 @@ export default defineComponent({
       })
       .catch(() => {});
 
-    socket.on('roomUpdated', (state) => {
-      if (state.roomID === props.uuid) {
-        stateManager.mutateRoomState({ newRoomState: state, userID: userID.value });
-      }
-    });
-
     socket.on('gameUpdated', (game) => {
       if (game.uuid === props.uuid && roomState.value.stage === 'started') {
         stateManager.mutateRoomState({ newGameState: game, userID: userID.value });
@@ -195,12 +200,6 @@ export default defineComponent({
 
     socket.on('restartGame', (uuid) => {
       router.push({ name: 'room', params: { uuid } });
-    });
-
-    socket.on('destroyRoom', (gameUUID) => {
-      if (gameUUID === props.uuid) {
-        router.push(localizedPath('/', i18n.global.locale.value));
-      }
     });
 
     socket.on('roomOnlineUpdated', (counter) => {
@@ -230,12 +229,13 @@ export default defineComponent({
     );
 
     const displayHostPanel = computed(() => {
-      return !roomState.value.ai && roomState.value.leaderID === userID.value;
+      return !roomState.value.ai && !roomState.value.archived && roomState.value.leaderID === userID.value;
     });
 
     const displayRestartButton = computed(() => {
       return (
         !roomState.value.ai &&
+        !roomState.value.archived &&
         roomState.value.stage === 'started' &&
         game.value.stage === 'end' &&
         roomState.value.leaderID === userID.value

@@ -167,6 +167,10 @@ export class AiService {
             process.env.NODE_ENV === 'development' ? 2000 : 10000,
           );
           room.ai!.model = model;
+          if (this.manager.chatService) {
+            room.persistChatMessage = (author, text) =>
+              this.manager.chatService.sendText(id, author, text, undefined, () => this.manager.rooms[id] === room);
+          }
           this.manager.rooms[id] = room;
           this.manager.updateRoomsList(room);
           cb({ roomID: id });

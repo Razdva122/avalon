@@ -8,6 +8,7 @@ import { Chat } from '@/room/chat';
 import * as _ from 'lodash';
 
 export class Room {
+  persistChatMessage?: (userID: string, text: string) => Promise<unknown>;
   ai?: import('@avalon/types').AiRoomState;
   roomID: string;
   nextRoomID?: string;
@@ -91,18 +92,20 @@ export class Room {
     this.updateRoomState();
   }
 
-  updateRoomState(direct: boolean = false) {
+  updateRoomState(direct: boolean = false, chatOnly = false) {
     if (direct) {
       this.players.forEach((playerID) => {
-        this.io.to(userChannel(playerID)).emit('roomUpdated', publicRoomState(this.calculateRoomState(playerID)));
+        this.io
+          .to(userChannel(playerID))
+          .emit('roomUpdated', publicRoomState(this.calculateRoomState(playerID)), chatOnly);
       });
 
       this.io
         .except(this.players.map(userChannel))
         .to(roomChannel(this.roomID))
-        .emit('roomUpdated', publicRoomState(this.calculateRoomState()));
+        .emit('roomUpdated', publicRoomState(this.calculateRoomState()), chatOnly);
     } else {
-      this.io.to(roomChannel(this.roomID)).emit('roomUpdated', publicRoomState(this.calculateRoomState()));
+      this.io.to(roomChannel(this.roomID)).emit('roomUpdated', publicRoomState(this.calculateRoomState()), chatOnly);
     }
   }
 

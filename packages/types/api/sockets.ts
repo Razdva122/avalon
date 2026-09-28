@@ -55,7 +55,7 @@ export interface ServerToClientEvents {
   roomsListUpdated: (list: TRoomsList) => void;
   onlineCounterUpdated: (counter: number) => void;
   roomOnlineUpdated: (counter: number) => void;
-  roomUpdated: (state: TRoomState) => void;
+  roomUpdated: (state: TRoomState, chatOnly?: boolean) => void;
   gameUpdated: (state: VisualGameState) => void;
   newMessage: (message: TMessage) => void;
   restartGame: (uuid: string) => void;

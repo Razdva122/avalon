@@ -1,12 +1,13 @@
 import { roomChannel } from '@/helpers/channels';
 import type { ServerSocket } from '@avalon/types';
-import type { Room } from './index';
+import { validID } from '@/security/validation';
+import type { ChatService } from './chat-service';
 
-export function registerChatEndpoints(socket: ServerSocket, userID: string, getRoom: (id: string) => Room | undefined) {
-  socket.on('sendMessage', (uuid, message, requestID, callback) => {
-    const room = getRoom(uuid);
+export function registerChatEndpoints(socket: ServerSocket, userID: string, chat: Pick<ChatService, 'sendText'>) {
+  socket.on('sendMessage', async (uuid, message, requestID, callback) => {
     const reply = typeof callback === 'function' ? callback : undefined;
-    if (!room || !socket.rooms.has(roomChannel(uuid))) {
+    const allowed = () => socket.connected !== false && socket.rooms.has(roomChannel(uuid));
+    if (!validID(uuid) || !allowed()) {
       reply?.({ error: 'notInRoom' });
       return;
     }
@@ -15,10 +16,15 @@ export function registerChatEndpoints(socket: ServerSocket, userID: string, getR
       return;
     }
     try {
-      const entry = room.addMessage(userID, message, requestID);
+      const entry = await chat.sendText(uuid, userID, message, requestID, allowed);
       reply?.({ message: entry });
-    } catch {
-      reply?.({ error: 'invalidMessage' });
+    } catch (error) {
+      const code =
+        error instanceof Error && (error.message === 'invalidMessage' || error.message === 'notInRoom')
+          ? error.message
+          : 'failed';
+      if (reply) reply({ error: code });
+      else socket.emit('serverError', code);
     }
   });
 }

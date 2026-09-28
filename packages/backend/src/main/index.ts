@@ -7,6 +7,8 @@ import { publicRoomState } from '@/ai/public-state';
 import { AiService } from '@/ai/service';
 import { BOT_PROFILES } from '@/ai/room';
 import { registerChatEndpoints } from '@/room/chat-endpoints';
+import { ChatService } from '@/room/chat-service';
+import { ChatRepository } from '@/room/chat-repository';
 import { registerStickerEndpoints } from '@/stickers/endpoints';
 import { StickersManager } from '@/stickers';
 import { Room } from '@/room';
@@ -37,6 +39,7 @@ export class Manager {
   voice: VoiceService;
   aiService: AiService;
   stickersManager = new StickersManager();
+  chatService: ChatService;
   rooms: Dictionary<Room> = Object.create(null);
   roomsList: TRoomsList = [];
   private roomTimers = new Map<string, NodeJS.Timeout>();
@@ -206,6 +209,13 @@ export class Manager {
     this.dbManager = dbManager;
     this.voice = createRoomVoice(this);
     this.aiService = new AiService(this);
+    const chatDB = dbManager.dbInstance?.connection.db;
+    this.chatService = new ChatService(
+      chatDB ? new ChatRepository(chatDB) : undefined,
+      (id) => this.rooms[id],
+      async (id) => (await this.dbManager.getRoomFromDB(id)) || (await this.aiService.repository?.load(id)),
+      io,
+    );
     this.avatarsManager = new AvatarsManager(dbManager);
     this.achievementManager = new AchievementManager(io);
 
@@ -315,12 +325,23 @@ export class Manager {
         }
 
         if (gameFromDB) {
-          cb(publicRoomState({ ...gameFromDB, archived: true }));
+          const chat = await this.chatService.history(uuid, gameFromDB.chat);
+          cb(publicRoomState({ ...gameFromDB, chat, archived: true }));
           return;
         }
 
         if (room) {
-          cb(publicRoomState(this.rooms[uuid].calculateRoomState(userState.userID)));
+          await this.chatService.history(uuid, room.chat.history);
+          const current = this.rooms[uuid];
+          if (current) cb(publicRoomState(current.calculateRoomState(userState.userID)));
+          else {
+            // A post-game room may expire while its durable history is loading.
+            const archived = await this.dbManager.getRoomFromDB(uuid);
+            if (archived) {
+              const chat = await this.chatService.history(uuid, archived.chat);
+              cb(publicRoomState({ ...archived, chat, archived: true }));
+            } else cb({ error: 'errorNotFound' });
+          }
         } else {
           cb({ error: 'errorNotFound' });
         }
@@ -473,9 +494,9 @@ export class Manager {
       this.restartRoom(uuid);
     });
 
-    registerStickerEndpoints(socket, userID, this.stickersManager, (id) => this.rooms[id], this.io);
+    registerStickerEndpoints(socket, userID, this.stickersManager, this.chatService);
 
-    registerChatEndpoints(socket, userID, (id) => this.rooms[id]);
+    registerChatEndpoints(socket, userID, this.chatService);
 
     socket.on('joinGame', (uuid) => {
       const room = this.rooms[uuid];

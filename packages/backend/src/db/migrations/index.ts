@@ -121,6 +121,12 @@ export const migrations: Migration[] = [
     },
   },
   { name: '2026-09-27-achievement-catalog-v1', up: ensureAchievementCatalog },
+  {
+    name: '2026-09-28-room-chat-v1',
+    async up(db) {
+      await reconcileIndex(db.collection('room_chat_messages'), { roomID: 1, timestamp: -1, order: -1 });
+    },
+  },
 ];
 
 interface MigrationState {
