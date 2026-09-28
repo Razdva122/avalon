@@ -127,14 +127,6 @@ export const migrations: Migration[] = [
       await reconcileIndex(db.collection('room_chat_messages'), { roomID: 1, timestamp: -1, order: -1 });
     },
   },
-  {
-    name: '2026-09-28-best-of-the-best-v1',
-    async up(db) {
-      await ensureAchievementCatalog(db);
-      const { backfillBestOfTheBest } = await import('@/achievements/best-of-the-best-backfill');
-      console.info('Best of the Best backfill:', await backfillBestOfTheBest(db, true));
-    },
-  },
 ];
 
 interface MigrationState {
