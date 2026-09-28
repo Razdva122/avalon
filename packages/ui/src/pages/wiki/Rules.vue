@@ -8,6 +8,7 @@
       <a href="#winning">{{ $t('rules.conclusionOfGameplayTitle') }}</a>
       <a href="#mission-sizes">{{ $t('rules.missionSizes') }}</a>
       <a href="#roles-setup">{{ $t('rules.recommendTitle') }}</a>
+      <a href="#faq">{{ $t('rules.faqTitle') }}</a>
     </nav>
 
     <section class="quick-start">
@@ -264,6 +265,14 @@
 
     <v-divider :thickness="5"></v-divider>
 
+    <h2 id="faq">{{ $t('rules.faqTitle') }}</h2>
+    <section v-for="topic in ['Players', 'Tie', 'Merlin']" :key="topic">
+      <h3 :id="`faq-${topic.toLowerCase()}`">{{ $t(`rules.faq${topic}Question`) }}</h3>
+      <p>{{ $t(`rules.faq${topic}Answer`) }}</p>
+    </section>
+
+    <v-divider :thickness="5"></v-divider>
+
     <h2>{{ $t('rules.offlineSetup') }}</h2>
     <p>
       <LocalizedTextWrapper keypath="rules.defaultSetup" />
@@ -412,6 +421,7 @@
     <p>
       <strong>{{ $t('rules.note') }}</strong> <LocalizedTextWrapper keypath="rules.gameSetupNote" />
     </p>
+    <WikiPlayCta :show-rules="false" />
   </div>
 </template>
 
@@ -420,12 +430,14 @@ import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import Options from '@/components/view/options/Options.vue';
+import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
     Options,
+    WikiPlayCta,
   },
   data() {
     const roles = {
@@ -467,7 +479,8 @@ export default defineComponent({
     padding: 8px 0;
   }
 }
-h2[id] {
+h2[id],
+h3[id] {
   scroll-margin-top: 80px;
 }
 @import '@/styles/info-page.scss';

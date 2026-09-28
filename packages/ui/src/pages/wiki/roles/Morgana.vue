@@ -38,10 +38,12 @@
     <p>
       <LocalizedTextWrapper keypath="morgana.thrivingAsMorgana" />
     </p>
+    <WikiPlayCta />
   </div>
 </template>
 
 <script lang="ts">
+import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 import { defineComponent } from 'vue';
 import WikiRoleGuide from '@/components/view/information/WikiRoleGuide.vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
@@ -53,6 +55,7 @@ import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
+    WikiPlayCta,
     WikiRoleGuide,
     WikiBreadCrumbs,
     PreviewLink,

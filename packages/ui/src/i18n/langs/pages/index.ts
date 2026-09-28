@@ -1,3 +1,4 @@
+import { wikiPlay } from './wikiPlay';
 import { community } from './community';
 import { support } from './support';
 import type { TLanguage } from '@/i18n/interface';
@@ -45,6 +46,7 @@ export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
 };
 
 Object.entries({
+  wikiPlay,
   community,
   support,
   wiki,

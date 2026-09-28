@@ -1,6 +1,6 @@
 module.exports.excalibur = {
   pt: {
-    title: 'Avalon: The Resistance | Excalibur',
+    title: 'Excalibur em Avalon: regras da expansão e como usar',
     description:
       "Regras para a carta 'Excalibur' no jogo de tabuleiro 'Avalon: The Resistance'. Regras para a carta 'Sargento' no jogo de tabuleiro 'The Resistance'.",
     keywords: ['Expansões', 'Complementos', 'Módulo', 'Excalibur', 'Sargento', 'Regras'],

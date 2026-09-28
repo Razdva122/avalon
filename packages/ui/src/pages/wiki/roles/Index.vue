@@ -192,10 +192,12 @@
         />
       </LocaleLink>
     </div>
+    <WikiPlayCta />
   </div>
 </template>
 
 <script lang="ts">
+import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
@@ -203,6 +205,7 @@ import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
+    WikiPlayCta,
     WikiBreadCrumbs,
     SchemaImage,
   },

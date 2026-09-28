@@ -12,7 +12,7 @@ module.exports.rules = {
     keywords: ['Wiki', 'Rules', 'How to play'],
   },
   ru: {
-    title: 'Правила Авалона: как играть, роли и составы на 5–10 человек',
+    title: 'Авалон: правила настольной игры и роли на 5–10 человек',
     description:
       'Как играть в Авалон: быстрый старт, пример миссии, роли на 5–10 игроков, голосование, таблица миссий, условия победы и покушение на Мерлина.',
     keywords: ['Вики', 'Правила', 'Как играть'],
@@ -30,7 +30,7 @@ module.exports.rules = {
     keywords: ['维基', '规则', '怎么玩'],
   },
   es: {
-    title: 'Reglas de Avalon: cómo jugar y roles para 5–10 jugadores',
+    title: 'Avalon: reglas del juego de mesa y cómo jugar (5–10)',
     description:
       'Aprende a jugar a Avalon: guía rápida, ejemplo de misión, roles para 5–10 jugadores, votaciones, tamaño de los equipos, victoria y asesinato de Merlín.',
     keywords: ['Wiki', 'Reglas', 'Cómo jugar'],

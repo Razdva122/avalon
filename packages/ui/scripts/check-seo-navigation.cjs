@@ -148,6 +148,18 @@ const server = http.createServer((req, res) => {
       if (pathname === '/ru/support/') await page.waitForSelector('.support-page');
       if (pathname === '/ru/wiki/rules/') {
         await page.waitForSelector('.rules');
+        // Exercise repeated placeholders deliberately, independent of editorial
+        // changes to the article. Restore the real copy before later checks.
+        const originalDescription = await page.evaluate(async () => {
+          const app = document.querySelector('#app').__vue_app__;
+          const i18n = app._context.provides[app.__VUE_I18N_SYMBOL__].global;
+          const original = i18n.getLocaleMessage('ru').rules.additionalObjectivesDescription;
+          i18n.mergeLocaleMessage('ru', {
+            rules: { additionalObjectivesDescription: '{merlin} и {merlin}' },
+          });
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+          return original;
+        });
         assert.equal(
           await page.$eval('.rules', (rules) =>
             Array.from(rules.querySelectorAll('p')).some((paragraph) => {
@@ -159,6 +171,12 @@ const server = http.createServer((req, res) => {
           'Repeated translated placeholders must render two independent, localized links',
         );
         assert.doesNotMatch(await page.$eval('.rules', (rules) => rules.textContent), /\u0001/);
+        await page.evaluate(async (description) => {
+          const app = document.querySelector('#app').__vue_app__;
+          const i18n = app._context.provides[app.__VUE_I18N_SYMBOL__].global;
+          i18n.mergeLocaleMessage('ru', { rules: { additionalObjectivesDescription: description } });
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+        }, originalDescription);
       }
       if (pathname === '/') {
         assert.match(await page.$eval('.support-card', (el) => new URL(el.href).pathname), /\/support\/$/);
@@ -205,6 +223,27 @@ const server = http.createServer((req, res) => {
     });
     assert.deepEqual(pageErrors, [], 'Rules anchors must not cause hydration or navigation errors');
     console.log('Rules direct fragment and table of contents scrolling OK');
+    await page.setViewport({ width: 390, height: 844 });
+    await page.goto(origin + '/zh-tw/wiki/rules/#faq', { waitUntil: 'networkidle0' });
+    await page.waitForFunction(() => {
+      const top = document.querySelector('#faq')?.getBoundingClientRect().top;
+      return top !== undefined && Math.abs(top - 80) < 3;
+    });
+    assert.equal(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      true,
+      'Mobile rules and FAQ must not overflow horizontally',
+    );
+    // Earlier navigation sets a Russian preference; dismiss its language banner
+    // before testing the Chinese page's bottom CTA on a narrow viewport.
+    if (await page.$('.language-suggestion button')) {
+      await page.click('.language-suggestion button');
+      await page.waitForSelector('.language-suggestion', { hidden: true });
+    }
+    await page.locator('.wiki-play-cta .play-link').click();
+    await page.waitForFunction(() => location.pathname === '/zh-tw/' && document.querySelector('.lobby'));
+    assert.deepEqual(pageErrors, [], 'Mobile FAQ and play CTA must navigate without errors');
+    console.log('Mobile FAQ fragment and localized play CTA OK');
   } finally {
     if (browser) await browser.close();
     server.close();

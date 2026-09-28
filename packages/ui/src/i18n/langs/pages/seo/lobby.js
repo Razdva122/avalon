@@ -12,9 +12,9 @@ module.exports.lobby = {
     keywords: ['Play'],
   },
   ru: {
-    title: 'Играть в Авалон онлайн!',
+    title: 'Авалон онлайн — играть бесплатно с друзьями на 5–10 человек',
     description:
-      "Познакомьтесь с легендарной игрой на стратегическую дедукцию 'Авалон: Сопротивление', в которую можно играть бесплатно онлайн. Изучите правила и присоединяйтесь к сообществу.",
+      'Играйте в настольную игру «Сопротивление: Авалон» онлайн в браузере. Соберите 5–10 друзей, войдите в аккаунт, создайте комнату и пригласите игроков по ссылке.',
     keywords: ['Играть'],
   },
   'zh-TW': {
@@ -29,9 +29,9 @@ module.exports.lobby = {
     keywords: ['玩'],
   },
   es: {
-    title: '¡Juega a Avalon en línea!',
+    title: 'Avalon online gratis: juega con amigos en el navegador',
     description:
-      "Explora el legendario juego de deducción estratégica con 'Avalon: La Resistencia' — gratis para jugar en línea. Aprende las reglas, únete a una comunidad llena de energía.",
+      'Juega al juego de mesa Avalon online con 5–10 amigos. Consulta las reglas y los roles, inicia sesión, crea una sala y comparte el enlace. Sin instalar una app.',
     keywords: ['Jugar'],
   },
 };

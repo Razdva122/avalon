@@ -55,7 +55,7 @@ export default {
 
     header: 'Juega a Avalon en línea',
     intro:
-      'Juega gratis a The Resistance: Avalon en línea con 5–10 jugadores. Aprende las reglas y los roles, inicia sesión para crear una sala y comparte el enlace con tus amigos.',
+      'Juega al juego de mesa The Resistance: Avalon online gratis en el navegador con 5–10 jugadores. Aprende las reglas y los roles, inicia sesión para crear una sala y comparte el enlace con tus amigos.',
     createRoom: 'Crear sala',
     watch: 'Ver',
     join: 'Unirse',

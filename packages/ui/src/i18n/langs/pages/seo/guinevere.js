@@ -1,6 +1,6 @@
 module.exports.guinevere = {
   pt: {
-    title: 'Avalon: The Resistance | Guinevere',
+    title: 'Guinevere em Avalon: habilidade, regras e dicas',
     description: "Regras e dicas para o papel de Guinevere no jogo de tabuleiro 'Avalon: The Resistance'",
     keywords: ['Guinevere', 'Papel', 'Regras', 'Dicas'],
   },

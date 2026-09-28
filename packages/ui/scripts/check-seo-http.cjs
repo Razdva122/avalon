@@ -18,7 +18,7 @@ const aliases = {
 
 async function checkCrawlerContent() {
   // User-Agent probes detect simple bot blocking, not verified crawler IP policies.
-  const agents = ['Googlebot', 'OAI-SearchBot', 'PerplexityBot'];
+  const agents = ['Googlebot', 'YandexBot', 'OAI-SearchBot', 'PerplexityBot'];
   for (const language of ['en', 'ru']) {
     for (const route of ['/', '/wiki/rules/', '/wiki/roles/merlin/', '/support/', '/community/']) {
       const pathname = localizedPath(route, language);

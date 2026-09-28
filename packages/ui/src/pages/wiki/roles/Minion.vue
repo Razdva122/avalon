@@ -59,10 +59,12 @@
     </ul>
 
     <p><LocalizedTextWrapper keypath="minion.conclusionText" /></p>
+    <WikiPlayCta />
   </div>
 </template>
 
 <script lang="ts">
+import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
@@ -73,6 +75,7 @@ import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
+    WikiPlayCta,
     WikiBreadCrumbs,
     PreviewLink,
     SchemaImage,

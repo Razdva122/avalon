@@ -34,37 +34,37 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     teamProposalDescription:
       'O jogador com o token de Líder propõe uma equipe de jogadores para a missão. O número de jogadores necessários para a equipe depende da missão atual e do número total de jogadores no jogo.',
     votingDescription:
-      'Todos os jogadores, incluindo o Líder, então votam na equipe proposta. Uma maioria simples é necessária para que a proposta seja aceita. Se a proposta for rejeitada, o token de Líder passa para o próximo jogador e uma nova proposta começa. Se quatro propostas forem rejeitadas em sequência, o quinto Líder tem o poder de escolher a equipe da missão sem votação.',
+      'Todos votam, inclusive o líder. É preciso mais da metade dos votos a favor; um empate rejeita a equipe. A liderança passa no sentido horário e outra equipe é proposta para a mesma missão. No original, cinco rejeições seguidas dão a vitória ao mal. Aqui, após quatro rejeições, a quinta equipe normalmente parte sem votação; as cartas de trama podem afetar a aprovação.',
     progressionOfPlayTitle: 'Progressão do Jogo',
     leaderTokenMove:
       'Após o resultado da missão ter sido determinado, o token de Líder move-se para o próximo jogador no sentido horário.',
     newRound:
-      'Uma nova rodada começa com uma nova proposta de equipe, e o mesmo processo se repete para um total de cinco missões.',
+      'Repita a formação de equipes e as missões até três sucessos ou três fracassos. São no máximo cinco missões; as restantes não são jogadas após atingir esse resultado.',
     playersUseSkills:
       'Os jogadores devem usar seus poderes de persuasão, dedução e blefe para influenciar a seleção da equipe, a votação e a discussão para promover a agenda do seu lado.',
     missionPhaseTitle: 'Fase da Missão',
     teamApproved:
-      'Uma vez que uma equipe tenha sido aprovada, os membros da equipe escolhem secretamente uma carta de Sucesso { goodLoyaltyIcon } ou Falha { evilLoyaltyIcon } para determinar o resultado da missão.',
+      'Somente os membros da equipe aprovada escolhem cartas em segredo. No jogo básico, o bem deve jogar Sucesso { goodLoyaltyIcon }; o mal pode jogar Sucesso ou Falha { evilLoyaltyIcon }.',
     submitCardsToLeader:
-      'Todos os jogadores submetem suas cartas escolhidas ao Líder, que as embaralha para ocultar qual jogador submeteu qual carta.',
+      'Em uma partida presencial, o líder recolhe e embaralha as cartas dos membros da equipe antes de revelá-las, para ocultar quem jogou cada carta.',
     cardsRevealed:
-      'As cartas são então reveladas. Para uma missão ter sucesso, todas as cartas devem ser cartas de Sucesso { goodLoyaltyIcon }. Se uma ou mais cartas de Falha { evilLoyaltyIcon } forem reveladas, a missão falha. Certas missões podem exigir duas cartas de Falha para falhar, dependendo do número de jogadores no jogo.',
+      'Normalmente, uma Falha { evilLoyaltyIcon } faz a missão fracassar; sem nenhuma, ela tem sucesso { goodLoyaltyIcon }. A exceção é a quarta missão com 7–10 jogadores: são necessárias pelo menos duas Falhas, então apenas uma ainda permite o sucesso.',
     conclusionOfGameplayTitle: 'Conclusão do Jogo',
     gameplayEndsCondition:
-      'O jogo continua por cinco missões, terminando quando os Servos Leais de Arthur completam com sucesso três missões ou os Servos de Mordred fazem com que três missões falhem. No caso de os Servos Leais de Arthur terem sucesso, os Servos de Mordred têm uma última oportunidade de vencer identificando corretamente {merlin}; se o fizerem, os Servos de Mordred vencem.',
+      'Três missões fracassadas dão vitória imediata ao mal. Após três sucessos, começa o assassinato: no original, o Assassino indica um jogador do bem após conversar com sua equipe. Se for {merlin}, o mal vence; caso contrário, o bem vence. Aqui, a equipe do mal realiza o assassinato; papéis personalizados podem incluir outros alvos.',
     strategicDiscussion:
       'Através de discussão estratégica, observação cuidadosa e táticas inteligentes, cada lado deve fazer o seu melhor para alcançar seus objetivos sem revelar suas verdadeiras lealdades, fazendo com que cada rodada de Avalon: The Resistance se desenrole de maneira única e cheia de suspense.',
     assassinNote:
-      'Na versão original, há um papel distinto do <b>Assassino</b>. Sugerimos delegar esta função a qualquer um dos papéis do mal, ou alternativamente, tomar a decisão coletivamente entre os jogadores do mal.',
+      'No original, o <b>Assassino</b> faz a escolha final após conversar com o mal. As configurações acima usam o assassinato pela equipe do mal desta plataforma. Para seguir as regras originais, inclua o Assassino entre os jogadores do mal.',
     objectiveArthur: 'Objetivo para os { goodLoyaltyIcon } Servos Leais de Arthur',
     objectiveMordred: 'Objetivo para os { evilLoyaltyIcon } Servos de Mordred',
     missionObjective:
       'Os Leais { servant } devem completar com sucesso três das cinco missões. Eles devem trabalhar juntos para propor equipes para cada missão e votar nas composições das equipes, sempre tentando manter os traidores fora das equipes para evitar que as missões falhem.',
     minionObjective:
-      'Os { minion } visam semear discórdia e desconfiança entre os { servant }. Seu objetivo é fazer com que três missões falhem infiltrando-se nas equipes e sabotando missões. Eles devem se comunicar secretamente e elaborar estratégias para enganar os leais e lançar dúvidas sobre as verdadeiras lealdades de outros jogadores.',
+      'Os {minion} tentam entrar nas equipes e fazer três missões fracassarem, enganando os {servant} nas discussões. Blefar é permitido, mas os jogadores não devem mostrar suas cartas de personagem durante a partida.',
     additionalObjectivesTitle: 'Objetivos Adicionais',
     additionalObjectivesDescription:
-      'O jogo se intensifica com papéis especiais, como { merlin }, que conhece as identidades dos Servos de Mordred mas deve manter sua identidade em segredo para evitar o assassinato no final do jogo. Os Servos de Mordred podem vencer identificando corretamente e assassinando { merlin } depois que três missões tiverem sido bem-sucedidas.',
+      '{merlin} vê os jogadores do mal na preparação, exceto papéis que ficam ocultos dele, como Mordred. Ele deve ajudar o bem sem revelar sua identidade: após três sucessos, o mal ainda pode vencer se o identificar.',
     twoFailsNote:
       'Em missões marcadas com um asterisco (*), duas cartas de Falha { evilLoyaltyIcon } são necessárias para que a missão falhe.',
     missionSizes: 'Tamanho da Equipe da Missão',
@@ -73,10 +73,11 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     recommendTitle: 'Configuração de Papéis Recomendada',
     generalTipsTitle: 'Dicas Gerais',
     generalTipsText:
-      'Para uma experiência de jogo enriquecedora, sugerimos um grupo de <strong>7 a 10 jogadores</strong>, onde as complexidades e a emoção do jogo realmente brilham.',
+      'Avalon comporta <strong>5–10 jogadores</strong>. As configurações abaixo são sugestões para esta plataforma, incluindo papéis personalizados; não são a configuração obrigatória do jogo original.',
     newcomersAdvice:
-      'Para iniciantes, é aconselhável começar sua jornada em Avalon com os <strong>papéis básicos</strong>. À medida que você se acostuma com o jogo, pode introduzir gradualmente papéis adicionais, aumentando a complexidade e o envolvimento <strong>passo a passo</strong>.',
-    recommendationAfterFirstGames: 'Após os primeiros jogos, recomendamos adicionar papéis na seguinte ordem:',
+      'No jogo básico original, use <strong>Merlin e o Assassino</strong> e complete o grupo com servos leais e servos de Mordred, mantendo a proporção correta entre bem e mal. Acrescente papéis opcionais quando todos entenderem as votações e missões.',
+    recommendationAfterFirstGames:
+      'Depois de aprender o básico, experimente estes papéis e variantes; Tristão e Isolda são papéis personalizados da plataforma:',
     offlineSetup: 'Configuração do jogo offline:',
     defaultSetup:
       'A configuração padrão inclui personagens como { merlin }, { percival } e { morgana }. No entanto, você tem a flexibilidade de personalizar o jogo selecionando os papéis que melhor se adequam ao seu grupo.',
@@ -98,6 +99,16 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     everyoneOpenEyes: 'Todos abram os olhos',
     percivalOpenEyes: 'abra seus olhos e veja',
     loversOpenEyes: 'abram seus olhos e olhem ao redor para conhecerem um ao outro',
+    faqTitle: 'Perguntas frequentes sobre Avalon',
+    faqPlayersQuestion: 'Quantas pessoas podem jogar Avalon?',
+    faqPlayersAnswer:
+      'De 5 a 10 pessoas. A proporção entre bem e mal é: 5 jogadores: 3/2; 6: 4/2; 7: 4/3; 8: 5/3; 9: 6/3; 10: 6/4. Os papéis especiais estão incluídos no total de cada lado.',
+    faqTieQuestion: 'O que acontece quando a votação empata?',
+    faqTieAnswer:
+      'A equipe é rejeitada. É preciso mais da metade dos votos a favor: por exemplo, quatro de seis. O próximo líder propõe outra equipe para a mesma missão; rejeitar uma equipe não conta como missão fracassada.',
+    faqMerlinQuestion: 'O bem vence assim que três missões têm sucesso?',
+    faqMerlinAnswer:
+      'Em uma partida normal com Merlin, é preciso sobreviver ao assassinato. No original, o Assassino tem uma tentativa de identificar Merlin. Se acertar, o mal vence; se errar, o bem vence. Nesta plataforma, a equipe do mal realiza essa etapa.',
   },
   en: {
     quickStartTitle: 'How to play Avalon: a quick start',
@@ -125,42 +136,43 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     title: 'Avalon Rules: How to Play The Resistance: Avalon',
     gameObjective: 'Game Objective',
     gameDescription:
-      'Avalon: The Resistance is a strategic board game where players are tasked with completing a series of missions while dealing with hidden traitors known as Minions of Mordred. The game is set in the legendary world of King Arthur and the Knights of the Round Table.',
+      'The Resistance: Avalon is a social deduction board game for 5–10 players with secret good and evil roles. Players discuss a proposed mission team, vote to approve or reject it, then the chosen team submits mission cards in secret. This guide covers setup, voting, mission sizes and winning, with the differences between the original board game and this online platform explained above.',
     gameplayRules: 'Gameplay Rules',
     teamProposalAndVoting: 'Team Proposal and Voting',
     teamProposalDescription:
       'The player with the Leader token proposes a team of players for the mission. The number of players required for the team depends on the current mission and the total number of players in the game.',
     votingDescription:
-      'All players, including the Leader, then vote on the proposed team. A simple majority is required for the proposal to be accepted. If the proposal is rejected, the Leader token passes to the next player and a new proposal begins. If four proposals are rejected in a row, the fifth Leader has the power to choose the quest team without a vote.',
+      'Everyone, including the Leader, votes. More than half of all players must approve; a tie rejects the team. After rejection, leadership passes clockwise and a new team is proposed for the same mission. In the original board game, five consecutive rejections give evil the win. On this platform, the fifth team normally goes without a vote after four rejections; Plot Cards can affect approval.',
     progressionOfPlayTitle: 'Progression of Play',
     leaderTokenMove:
       'After the outcome of the mission has been determined, the Leader token moves to the next player in clockwise order.',
-    newRound: 'A new round begins with a new team proposal, and the same process repeats for a total of five missions.',
+    newRound:
+      'Repeat team selection and missions until three missions succeed or three fail. There are at most five missions; do not play the remaining missions once either side reaches three.',
     playersUseSkills:
       "Players must use their powers of persuasion, deduction, and bluffing to influence team selection, the vote, and discussion to further their side's agenda.",
     missionPhaseTitle: 'Mission Phase',
     teamApproved:
-      'Once a team has been approved, members of the team secretly choose a Success { goodLoyaltyIcon } or Fail { evilLoyaltyIcon } card to determine the outcome of the mission.',
+      'Only the approved team submits mission cards in secret. In the base game, good players must choose Success { goodLoyaltyIcon }; evil players may choose Success or Fail { evilLoyaltyIcon }.',
     submitCardsToLeader:
-      'All players submit their chosen cards to the Leader, who shuffles them to conceal which player submitted which card.',
+      'In a physical game, the Leader collects and shuffles the selected team members’ mission cards before revealing them, so nobody can identify who played each card.',
     cardsRevealed:
-      'The cards are then revealed. For a mission to succeed, all the cards must be Success { goodLoyaltyIcon } cards. If one or more Fail { evilLoyaltyIcon } cards are revealed, the mission fails. Certain missions may require two Fail cards to fail, depending on the number of players in the game.',
+      'Normally, one Fail { evilLoyaltyIcon } makes the mission fail; otherwise it succeeds { goodLoyaltyIcon }. The exception is mission four with 7–10 players: it requires at least two Fails, so a single Fail still gives a successful mission.',
     conclusionOfGameplayTitle: 'Conclusion of Gameplay',
     gameplayEndsCondition:
-      'The gameplay continues through five missions, with the game ending once either the Loyal Servants of Arthur successfully complete three missions or the Minions of Mordred cause three missions to fail. In the case that the Loyal Servants of Arthur succeed, the Minions of Mordred have one final opportunity to win by correctly identifying {merlin}, if they do so the Minions win.',
+      'Three failed missions immediately give evil the win. After three successful missions, stop questing and resolve the assassination: in the original game, the Assassin names one good player after discussion with the evil team. If that player is {merlin}, evil wins; otherwise good wins. On this platform, the evil team handles assassination, with other targets possible in custom role setups.',
     strategicDiscussion:
       'Through strategic discussion, careful observation, and clever tactics, each side must do their best to achieve their objectives without revealing their true allegiances, making each round of Avalon: The Resistance play out uniquely and full of suspense.',
     assassinNote:
-      'In the original version, there is a distinct role of the <b>Assassin</b>. We suggest delegating this function to any of the evil roles, or alternatively, making the decision collectively among the evil players.',
+      'The original board game includes a separate <b>Assassin</b>, who makes the final Merlin guess after evil discusses it. The custom setups above use this platform’s evil-team assassination instead. For an original board-game setup, include the Assassin among the evil players.',
     objectiveArthur: 'Objective for the { goodLoyaltyIcon } Loyal Servants of Arthur',
     objectiveMordred: 'Objective for the { evilLoyaltyIcon } Minions of Mordred',
     missionObjective:
       'The Loyal { servant } must successfully complete three out of five missions. They must work together to propose teams for each mission and vote on team compositions, always trying to keep traitors off the teams to prevent missions from failing.',
     minionObjective:
-      'The { minion } aim to sow discord and mistrust among the { servant }. Their goal is to cause three missions to fail by infiltrating teams and sabotaging missions. They must communicate covertly and strategize to mislead the loyalists and cast doubt on the true allegiances of other players.',
+      'The { minion } try to get onto mission teams and cause three failures while misleading the { servant } in discussion. Bluffing is allowed, but players must not show their character cards during play.',
     additionalObjectivesTitle: 'Additional Objectives',
     additionalObjectivesDescription:
-      'The game intensifies with special roles, such as { merlin }, who knows the identities of the Minions but must keep his identity secret to avoid assassination at the end of the game. The Minions of Mordred can win by correctly identifying and assassinating { merlin } after three missions have succeeded.',
+      '{ merlin } sees evil players at setup, except for roles such as Mordred that remain hidden from him. He must help good without revealing his identity: after three successful missions, evil can still win by correctly identifying him.',
     twoFailsNote:
       'On missions marked with an asterisk (*), two Fail { evilLoyaltyIcon } cards are required for the mission to fail.',
     missionSizes: 'Mission Team Size',
@@ -169,19 +181,20 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     recommendTitle: 'Recommended Roles Setup',
     generalTipsTitle: 'General tips',
     generalTipsText:
-      'For an enriching gaming experience, we suggest a group size of <strong>7 to 10 players</strong> where the intricacies and excitement of the game truly shine.',
+      'Avalon supports <strong>5–10 players</strong>. The setups below are suggestions for this platform, including custom roles; they are not the original board game’s required setup.',
     newcomersAdvice:
-      "For newcomers, it's advisable to begin your Avalon journey with the <strong>basic roles</strong>. As you become more accustomed to the gameplay, you can incrementally introduce additional roles, enhancing complexity and engagement <strong>step by step</strong>.",
-    recommendationAfterFirstGames: 'After the first games, we recommend adding roles in the following order:',
-    offlineSetup: 'Game setup in offline:',
+      'For the original base game, use <strong>Merlin and the Assassin</strong>, then fill the remaining places with loyal servants and minions in the correct good/evil ratio. Add optional roles when everyone understands voting and missions.',
+    recommendationAfterFirstGames:
+      'Once the group knows the basics, consider these additional roles and variants; Tristan and Isolde are custom roles on this platform:',
+    offlineSetup: 'Setting up an in-person game',
     defaultSetup:
-      'The default setup includes characters such as { merlin }, { percival }, and { morgana }. However, you have the flexibility to customize the game by selecting the roles that best fit your group.',
-    closeEyesExtendHand: 'Everyone close your eyes and extend your hand info a fist in front of you.',
+      'This role-aware opening script starts with { merlin }, { percival } and { morgana } selected. Adjust the selection to match your group; it is a customizable script, not the original base-game setup.',
+    closeEyesExtendHand: 'Everyone close your eyes and hold a closed fist in front of you.',
     except: 'except',
     seeAllAgentsOfEvil: 'open your eyes and look around so that you know all agents of Evil.',
     extendYourThumb: 'extend your thumb into the air',
     extendYourThumbSo: 'extend your thumb into the air so',
-    willKnowOfYou: 'will known of you',
+    willKnowOfYou: 'can see you',
     closeEyes: 'close your eyes',
     guinevereLookAround: 'open your eyes and look around so that you know both lancelots',
     allPlayersShouldHaveEyedClosed: 'All players have their eyes closed and hands in a fist in front of them',
@@ -193,6 +206,16 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     everyoneOpenEyes: 'Everyone open your eyes',
     percivalOpenEyes: 'open your eyes and see',
     loversOpenEyes: 'open your eyes and look around to know each other',
+    faqTitle: 'Avalon rules FAQ',
+    faqPlayersQuestion: 'How many people can play Avalon?',
+    faqPlayersAnswer:
+      'Avalon plays with 5–10 people. Good/evil counts are: 5 players: 3/2; 6: 4/2; 7: 4/3; 8: 5/3; 9: 6/3; 10: 6/4. These counts include the special roles on each side.',
+    faqTieQuestion: 'What happens when the team vote is tied?',
+    faqTieAnswer:
+      'The team is rejected. Approval needs more than half of all players, so a six-player game needs four approvals. The next leader proposes another team for the same mission; rejection itself is not a failed mission.',
+    faqMerlinQuestion: 'Does good win as soon as three missions succeed?',
+    faqMerlinAnswer:
+      'In a standard game with Merlin, good must also survive the assassination. The Assassin gets one final guess at Merlin in the original board game. A correct guess gives evil the win; a wrong guess gives good the win. This platform lets the evil team handle that step.',
   },
   ru: {
     variantNote:
@@ -220,43 +243,43 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     title: 'Правила Авалона: как играть в компании от 5 до 10 человек',
     gameObjective: 'Цель игры',
     gameDescription:
-      'Авалон: Сопротивление - это стратегическая настольная игра, в которой игроки должны выполнить серию миссий, сталкиваясь с скрытыми предателями, известными как Миньоны Мордреда. Игра разворачивается в легендарном мире короля Артура и рыцарей Круглого стола.',
+      '«Сопротивление: Авалон» (The Resistance: Avalon) — настольная игра на социальную дедукцию для 5–10 человек с тайными ролями добра и зла. Лидер предлагает команду, все голосуют, а её участники тайно разыгрывают карты миссии. Ниже — правила игры в Авалон, таблица миссий и составы ролей; отличия онлайн-платформы от настольного оригинала указаны выше.',
     gameplayRules: 'Правила Игры',
     teamProposalAndVoting: 'Предложение Команды и Голосование',
     teamProposalDescription:
       'Игрок с жетоном лидера предлагает команду игроков для выполнения миссии. Количество игроков, необходимых для команды, зависит от текущей миссии и общего числа игроков в игре.',
     votingDescription:
-      'Все игроки, включая лидера, голосуют за предложенную команду. Для принятия предложения требуется простое большинство. Если предложение отклонено, жетон лидера переходит к следующему игроку, и начинается новое предложение. Если четыре предложения подряд отклонены, пятый лидер может выбрать команду для миссии без голосования.',
+      'Голосуют все, включая лидера. Нужно больше половины голосов за; ничья отклоняет команду. После отказа лидерство переходит по часовой стрелке, и новая команда собирается на ту же миссию. В настольном оригинале пять отказов подряд приносят победу злу. На платформе после четырёх отказов пятая команда обычно идёт без голосования; карты интриг могут влиять на её принятие.',
     progressionOfPlayTitle: 'Ход игры',
     leaderTokenMove:
       'После определения результата миссии жетон лидера передается следующему игроку по часовой стрелке.',
     newRound:
-      'Начинается новый раунд с новым предложением команды, и тот же процесс повторяется всего для пяти миссий.',
+      'Повторяйте сбор команды и миссии до трёх успехов или трёх провалов. Всего возможно не более пяти миссий; оставшиеся после третьего результата не играются.',
     playersUseSkills:
       'Игроки должны использовать свои навыки убеждения, дедукции и блефа, чтобы повлиять на выбор команды, голосование и обсуждение в пользу своей стороны.',
     missionPhaseTitle: 'Фаза миссии',
     teamApproved:
-      'После утверждения команды её участники тайно выбирают карту Успеха { goodLoyaltyIcon } или карту Провала { evilLoyaltyIcon }, чтобы определить результат миссии.',
+      'Только участники принятой команды тайно выбирают карты миссии. В базовой игре добро обязано играть Успех { goodLoyaltyIcon }, а зло может выбрать Успех или Провал { evilLoyaltyIcon }.',
     submitCardsToLeader:
-      'Все игроки передают выбранные карты Лидеру, который тасует их, чтобы скрыть, кто какую карту сдал.',
+      'В настольной игре лидер собирает и перемешивает карты участников миссии перед раскрытием, чтобы нельзя было определить, кто какую карту сыграл.',
     cardsRevealed:
-      'Затем карты раскрываются. Для успешного выполнения миссии все карты должны быть картами Успеха { goodLoyaltyIcon }. Если раскрыта одна или более карт Провала { evilLoyaltyIcon }, миссия проваливается. В некоторых миссиях может потребоваться две карты Провала для провала, в зависимости от количества игроков.',
+      'Обычно одна карта Провала { evilLoyaltyIcon } проваливает миссию; без неё миссия успешна { goodLoyaltyIcon }. Исключение — четвёртая миссия при 7–10 игроках: нужны хотя бы два провала, поэтому с одной картой Провала миссия всё ещё успешна.',
     conclusionOfGameplayTitle: 'Завершение игры',
     gameplayEndsCondition:
-      'Игра продолжается пять миссий, и заканчивается, как только либо слуги Артура успешно завершают три миссии, либо Приспешники Мордреда проваливают три миссии. В случае, если слуги Артура преуспевают, Приспешники Мордреда имеют последнюю возможность победить, правильно идентифицировав {merlin}, если они это делают, побеждают Приспешники.',
+      'Три проваленные миссии сразу приносят победу злу. После трёх успешных миссий начинается убийство: в оригинале Убийца после обсуждения со злом называет одного доброго игрока. Если это {merlin}, побеждает зло; иначе — добро. На платформе убийство выполняет команда зла; пользовательские наборы ролей могут добавлять другие цели.',
     strategicDiscussion:
       'Посредством стратегических обсуждений, внимательных наблюдений и хитроумных тактик каждая сторона должна делать всё возможное, чтобы достичь своих целей, не раскрывая свою истинную принадлежность, делая каждый раунд игры Avalon: The Resistance уникальным и полным напряжения.',
     assassinNote:
-      'В оригинальной версии существует отдельная роль <b>Убийцы</b>. Мы предлагаем отдать эту возможность любому из злых персонажей или принимать решение коллективно всей команды Мордреда.',
+      'В настольном оригинале отдельный <b>Убийца</b> делает последний выбор после обсуждения с командой зла. Составы выше используют убийство командой зла по правилам платформы. Для игры по оригинальным правилам включите Убийцу в число злых игроков.',
     objectiveArthur: 'Цель для {goodLoyaltyIcon} Cлуг Артура',
     objectiveMordred: 'Цель для {evilLoyaltyIcon} Миньонов Мордреда',
     missionObjective:
       'Верные { servant } должны успешно завершить три из пяти миссий. Они должны работать вместе, чтобы предлагать команды для каждой миссии и голосовать за их состав, всегда стараясь исключить предателей из команд, чтобы предотвратить провал миссий.',
     minionObjective:
-      '{ minion } стремятся сеять раздор и недоверие среди { servant }. Их цель — провалить три миссии, внедряясь в команды и саботируя их. Они должны тайно общаться и разрабатывать стратегии, чтобы вводить в заблуждение слуг Артура и вызывать сомнения в истинных намерениях других игроков.',
+      '{ minion } стараются попадать в команды и провалить три миссии, вводя { servant } в заблуждение во время обсуждения. Блеф разрешён, но показывать карты ролей во время игры нельзя.',
     additionalObjectivesTitle: 'Дополнительные Задачи',
     additionalObjectivesDescription:
-      'Игра усложняется с особыми ролями, такими как { merlin }, который знает личности Миньонов, но должен сохранить свою личность в тайне, чтобы избежать убийства в конце игры. Миньоны Мордреда могут победить, правильно идентифицировав и убив { merlin } если силы света успешно закончили три миссии.',
+      '{ merlin } в начале видит злых игроков, кроме скрытых от него ролей, например Мордреда. Ему нужно помогать добру, не раскрывая себя: после трёх успешных миссий зло ещё может победить, правильно определив Мерлина.',
     twoFailsNote: 'Для провала миссии, отмеченной звездочкой (*), требуются две карты Провал { evilLoyaltyIcon }.',
     missionSizes: 'Размер команды на миссии',
     excaliburHint:
@@ -264,10 +287,11 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     recommendTitle: 'Рекомендуемая Настройка Ролей',
     generalTipsTitle: 'Общие советы',
     generalTipsText:
-      'Для насыщенного игрового опыта мы предлагаем размер группы от <strong>7 до 10 игроков</strong>, где сложные моменты и волнение от игры проявляются в полной мере.',
+      'Авалон рассчитан на <strong>5–10 игроков</strong>. Ниже приведены рекомендации для платформы, в том числе с авторскими ролями, а не обязательные составы настольного оригинала.',
     newcomersAdvice:
-      'Новичкам рекомендуется начинать свое путешествие в Avalon с <strong>основных ролей</strong>. По мере того, как вы привыкаете к процессу игры, вы можете постепенно вводить дополнительные роли, повышая сложность и вовлеченность <strong>шаг за шагом</strong>.',
-    recommendationAfterFirstGames: 'После первых игр мы рекомендуем добавлять роли в следующем порядке:',
+      'Для базовой настольной игры возьмите <strong>Мерлина и Убийцу</strong>, а остальные места заполните слугами Артура и приспешниками Мордреда с нужным соотношением добра и зла. Дополнительные роли вводите после освоения голосований и миссий.',
+    recommendationAfterFirstGames:
+      'Освоив основы, можно попробовать следующие роли и варианты; Тристан и Изольда — авторские роли платформы:',
     offlineSetup: 'Настройка игры в оффлайне:',
     defaultSetup:
       'Настройка по умолчанию включает персонажей, таких как { merlin }, { percival } и { morgana }. Однако у вас есть возможность настроить игру, выбрав роли, которые наилучшим образом подходят вашей группе.',
@@ -287,6 +311,16 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     everyoneOpenEyes: 'Все откройте глаза',
     percivalOpenEyes: 'откройте глаза и узнайте кто является',
     loversOpenEyes: 'откройте глаза и оглянитесь, чтобы узнать друг друга',
+    faqTitle: 'Частые вопросы о правилах Авалона',
+    faqPlayersQuestion: 'Сколько человек нужно для Авалона?',
+    faqPlayersAnswer:
+      'От 5 до 10. Соотношение добра и зла: 5 игроков — 3/2; 6 — 4/2; 7 — 4/3; 8 — 5/3; 9 — 6/3; 10 — 6/4. Особые роли входят в число игроков своей стороны.',
+    faqTieQuestion: 'Что происходит при ничьей в голосовании?',
+    faqTieAnswer:
+      'Команда отклоняется. За неё должны проголосовать больше половины игроков: например, четверо из шести. Следующий лидер собирает команду на ту же миссию; отказ сам по себе не считается её провалом.',
+    faqMerlinQuestion: 'Добро побеждает сразу после трёх успешных миссий?',
+    faqMerlinAnswer:
+      'В обычной игре с Мерлином нужно ещё пережить убийство. В настольном оригинале Убийца делает одну попытку угадать Мерлина: верный выбор приносит победу злу, ошибочный — добру. На платформе этот этап выполняет команда зла.',
   },
   'zh-CN': {
     variantNote:
@@ -317,43 +351,43 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     teamProposalDescription:
       '拥有领袖标记的玩家提议一个玩家团队来执行任务。团队所需的玩家数量取决于当前任务和游戏中的玩家总数。',
     votingDescription:
-      '所有玩家，包括领袖，然后对提议的团队进行投票。提案获得多数票即可被接受。如果提案被拒绝，领导标记传给下一个玩家并开始新提案。如果连续四个提案被拒绝，第五个领导者有权在无需投票的情况下选择任务团队。',
+      '所有玩家（包括队长）都要投票。超过半数同意才通过，平票视为否决。队长标记顺时针传给下一位玩家，重新为同一次任务组队。原版连续五次否决会让坏人获胜；本站通常在四次否决后直接派出第五支队伍，阴谋卡可能影响队伍是否通过。',
     progressionOfPlayTitle: '游戏进程',
     leaderTokenMove: '在确定任务结果后，领导者标记顺时针移动到下一位玩家。',
-    newRound: '新一轮开始时，将提出新的队伍建议，相同的过程总共重复五次任务。',
+    newRound: '重复组队与执行任务，直到累计三次成功或三次失败。最多进行五次任务，达到上述条件后不再执行剩余任务。',
     playersUseSkills: '玩家必须运用他们的说服力、推理能力和虚张声势来影响团队选择、投票和讨论，以推进他们一方的目标。',
     missionPhaseTitle: '任务阶段',
     teamApproved:
-      '当一个团队被批准后，团队成员秘密选择成功 { goodLoyaltyIcon } 或失败 { evilLoyaltyIcon } 卡来确定任务的结果。',
-    submitCardsToLeader: '所有玩家将他们选择的卡提交给领导者，领导者会洗牌以隐藏哪个玩家提交了哪个卡。',
+      '只有通过组队投票的队员秘密出任务牌。基本规则中，好人只能出成功 { goodLoyaltyIcon }；坏人可以出成功或失败 { evilLoyaltyIcon }。',
+    submitCardsToLeader: '实体桌游中，队长收齐任务队员出的牌，洗匀后再翻开，避免大家知道每张牌是谁出的。',
     cardsRevealed:
-      '然后揭示卡片。任务要成功，所有卡片必须是成功 { goodLoyaltyIcon } 卡。如果揭示出一张或者多张失败 { evilLoyaltyIcon } 卡，任务即失败。某些任务可能需要两张失败卡才能失败，具体取决于游戏中的玩家数量。',
+      '通常只要一张失败 { evilLoyaltyIcon } 牌，任务就失败；没有失败牌则成功 { goodLoyaltyIcon }。例外是 7–10 人局的第四次任务：至少两张失败牌才会失败，因此只有一张失败牌仍算成功。',
     conclusionOfGameplayTitle: '游戏结束',
     gameplayEndsCondition:
-      '游戏通过五个任务继续进行，当亚瑟的忠诚仆人成功完成三个任务或莫德雷德的爪牙让三个任务失败时游戏结束。如果亚瑟的忠诚仆人成功，莫德雷德的爪牙有最后一次机会通过正确识别{merlin}来获胜，如果他们这样做，爪牙获胜。',
+      '累计三次任务失败，坏人立即获胜。累计三次成功后停止任务，进入刺杀：原版由刺客与坏人讨论后，指认一名好人。如果对方是{merlin}，坏人获胜；猜错则好人获胜。本站由邪恶阵营处理刺杀，自定义角色配置也可能加入其他刺杀目标。',
     strategicDiscussion:
       '通过战略讨论、仔细观察和聪明的战术，每一方都必须尽力实现他们的目标，而不暴露他们的真实效忠，使每一轮《阿瓦隆：反抗组织》的游戏过程独特而充满悬念。',
     assassinNote:
-      '在原版中，有一个单独的角色是<b>刺客</b>。我们建议将此功能委派给任何一个邪恶角色，或者由邪恶玩家共同决定。',
+      '原版由独立角色<b>刺客</b>与坏人讨论后做最后指认。上方配置采用本站由邪恶阵营处理刺杀的玩法；若按原版桌游规则游玩，请在坏人名额中安排刺客。',
     objectiveArthur: '{goodLoyaltyIcon} 亚瑟忠诚仆人的目标',
     objectiveMordred: '{evilLoyaltyIcon} 莫德雷德爪牙的目标',
     missionObjective:
       '忠诚的{ servant }必须成功完成五个任务中的三个。他们必须共同合作，为每个任务提议小组，并对小组构成进行投票，始终努力将叛徒排除在团队之外，以防止任务失败。',
     minionObjective:
-      '{ minion }旨在制造{ servant }之间的不和与不信任。他们的目标是通过潜入团队和破坏任务，使三个任务失败。他们必须秘密沟通并制定战略，误导忠诚者并对其他玩家的真正忠诚度产生怀疑。',
+      '{ minion }要设法加入任务队伍，让三次任务失败，并在讨论中误导{ servant }。可以说谎或假装其他角色，但游戏中不能展示角色牌。',
     additionalObjectivesTitle: '附加目标',
     additionalObjectivesDescription:
-      '游戏因特殊角色而变得更加激烈，例如{ merlin }，他知道爪牙的身份，但必须保持自己的身份秘密，以避免在游戏结束时被暗杀。莫德雷德的爪牙可以通过正确识别并暗杀{ merlin }在三个任务成功后获得胜利。',
+      '{ merlin }在开局时能看见坏人，但看不见莫德雷德等对他隐藏身份的角色。他必须帮助好人又不暴露自己，因为三次任务成功后，坏人仍可通过刺杀梅林获胜。',
     twoFailsNote: '在标有星号 (*) 的任务中，需要两张失败 { evilLoyaltyIcon } 卡才能导致任务失败。',
     missionSizes: '任务小组人数',
     excaliburHint: '我们建议将{excalibur}加入任意玩家数量的游戏中，但仅限于有经验玩家的陪伴下使用。',
     recommendTitle: '推荐角色设置',
     generalTipsTitle: '一般提示',
     generalTipsText:
-      '为了丰富的游戏体验，我们建议 <strong>7 到 10 名玩家</strong> 的小组规模，在这里游戏的复杂性和兴奋性真正展现。',
+      '阿瓦隆适合 <strong>5–10 人</strong>游玩。以下是本站的推荐配置，包含自定义角色，并非原版桌游的必要配置。',
     newcomersAdvice:
-      '对于新手，建议从 <strong>基本角色</strong> 开始您的 Avalon 之旅。随着您越来越习惯于游戏玩法，可以逐渐引入额外角色，逐步提高复杂性和参与度 <strong>一步一步</strong>。',
-    recommendationAfterFirstGames: '在第一次游戏之后，我们建议按以下顺序添加角色：',
+      '原版基本游戏使用<strong>梅林和刺客</strong>，其余名额按好坏人比例补入忠臣与爪牙。熟悉组队、投票和任务流程后，再逐步加入可选角色。',
+    recommendationAfterFirstGames: '熟悉基本规则后，可以尝试以下角色与变体；特里斯坦和伊索尔德属于本站自定义角色：',
     offlineSetup: '离线游戏设置：',
     defaultSetup:
       '默认设置包括角色：{ merlin }、{ percival } 和 { morgana }。不过，您可以灵活定制游戏，选择最适合您团队的角色。',
@@ -373,6 +407,16 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     everyoneOpenEyes: '所有人睁开眼睛',
     percivalOpenEyes: '睁开眼睛和看',
     loversOpenEyes: '睁开眼睛，环顾四周以认识彼此',
+    faqTitle: '阿瓦隆规则常见问题',
+    faqPlayersQuestion: '阿瓦隆几个人可以玩？好坏人怎么分？',
+    faqPlayersAnswer:
+      '适合 5–10 人。好人／坏人人数依次为：5 人局 3／2、6 人局 4／2、7 人局 4／3、8 人局 5／3、9 人局 6／3、10 人局 6／4。特殊角色也计入所属阵营的人数。',
+    faqTieQuestion: '组队投票平票怎么办？',
+    faqTieAnswer:
+      '平票视为否决，必须超过半数同意才通过，例如六人局需要四票同意。下一位队长重新为同一次任务组队；否决队伍本身不算任务失败。',
+    faqMerlinQuestion: '三次任务成功，好人就赢了吗？',
+    faqMerlinAnswer:
+      '一般有梅林的游戏还要进入刺杀阶段。原版由刺客最后猜一次谁是梅林：猜中则坏人获胜，猜错则好人获胜。本站由邪恶阵营处理这个阶段。',
   },
   'zh-TW': {
     quickStartTitle: '阿瓦隆怎麼玩？新手快速入門',
@@ -389,7 +433,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       '原版桌遊中，同一任務連續五次組隊遭否決，壞人立即獲勝。本站通常在四次否決後，讓第五位隊長直接派隊，不再投票；陰謀卡可能影響隊伍是否通過。原版由刺客做最後指認，本站則由邪惡陣營處理刺殺。線下遊玩前，請先確認採用的規則及角色。',
     numberOfPlayers: '玩家人數',
     missionNumber: '任務 {number}',
-    countPlayers: '{count} 玩家',
+    countPlayers: '{count} 人局',
     servantTeam: '忠誠的亞瑟隨從:',
     mordredTeam: '莫德雷德的爪牙:',
     expansions: '擴展:',
@@ -399,66 +443,76 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     gameDescription:
       '阿瓦隆（The Resistance: Avalon）是一款適合 5–10 人的隱藏身分推理遊戲。每輪由隊長提名任務隊伍，全體玩家投票，再由獲准出任務的玩家秘密決定任務成敗。好人需要完成三次任務並保護梅林；壞人可讓三次任務失敗，或在好人完成三次任務後刺殺梅林獲勝。下方可直接查閱各人數的任務表與角色配置。',
     gameplayRules: '遊戲規則',
-    teamProposalAndVoting: '團隊提案和投票',
+    teamProposalAndVoting: '組隊與投票',
     teamProposalDescription:
-      '擁有領袖標記的玩家提議一個玩家團隊來執行任務。團隊所需的玩家數量取決於當前任務和遊戲中的玩家總數。',
+      '持有隊長標記的玩家提出任務隊伍，可以選自己，也可以不選。所需隊員人數由玩家總數和目前任務決定，請查閱下方任務表。',
     votingDescription:
-      '所有玩家，包括領袖，然後對提議的團隊進行投票。提案獲得多數票即可被接受。如果提案被拒絕，領導標記傳給下一個玩家並開始新提案。如果連續四個提案被拒絕，第五個領導者有權在無需投票的情況下選擇任務團隊。',
+      '所有玩家（包括隊長）都要投票。超過半數同意才通過，平票視為否決。遭否決後，隊長標記順時針傳給下一位玩家，重新為同一次任務組隊。原版連續五次否決會讓壞人獲勝；本站通常在四次否決後直接派出第五支隊伍，陰謀卡則可能影響隊伍是否通過。',
     progressionOfPlayTitle: '遊戲進程',
-    leaderTokenMove: '在確定任務結果後，領導者標記順時針移動到下一位玩家。',
-    newRound: '新一輪開始時，將提出新的團隊建議，相同的過程總共重複五次任務。',
-    playersUseSkills: '玩家必須運用他們的說服力、推理能力和虛張聲勢來影響團隊選擇、投票和討論，以推進他們一方的目標。',
+    leaderTokenMove: '任務結果公布後，隊長標記順時針傳給下一位玩家。',
+    newRound: '重複組隊與執行任務，直到累計三次成功或三次失敗。最多進行五次任務，達成上述條件後就不再執行剩餘任務。',
+    playersUseSkills: '觀察投票和任務結果，透過討論、推理與虛張聲勢判斷彼此的立場，幫助自己的陣營獲勝。',
     missionPhaseTitle: '任務階段',
     teamApproved:
-      '當一個團隊被批准後，團隊成員秘密選擇成功 { goodLoyaltyIcon } 或失敗 { evilLoyaltyIcon } 卡來確定任務的結果。',
-    submitCardsToLeader: '所有玩家將他們選擇的卡提交給領導者，領導者會洗牌以隱藏哪位玩家提交了哪張卡。',
+      '只有通過組隊投票的隊員秘密出任務牌。基本規則中，好人只能出成功 { goodLoyaltyIcon }；壞人可以出成功或失敗 { evilLoyaltyIcon }。',
+    submitCardsToLeader: '實體桌遊中，隊長收齊任務隊員出的牌，洗勻後再翻開，避免大家知道每張牌是誰出的。',
     cardsRevealed:
-      '然後揭示卡片。任務要成功，所有卡片必須是成功 { goodLoyaltyIcon } 卡。如果揭示出一張或者多張失敗 { evilLoyaltyIcon } 卡，任務即失敗。某些任務可能需要兩張失敗卡才能失敗，具體取決於遊戲中的玩家數量。',
+      '通常只要一張失敗 { evilLoyaltyIcon } 牌，任務就失敗；沒有失敗牌則成功 { goodLoyaltyIcon }。唯一的人數例外是 7–10 人局的第四次任務：至少兩張失敗牌才會失敗，因此只有一張失敗牌仍算成功。',
     conclusionOfGameplayTitle: '遊戲結束',
     gameplayEndsCondition:
-      '遊戲通過五個任務繼續進行，當亞瑟的忠誠僕人成功完成三個任務或莫德雷德的爪牙讓三個任務失敗時遊戲結束。如果亞瑟的忠誠僕人成功，莫德雷德的爪牙有最後一次機會通過正確識別{merlin}來獲勝，如果他們這樣做，爪牙獲勝。',
+      '累計三次任務失敗，壞人立即獲勝。累計三次成功後停止任務，進入刺殺：原版由刺客與壞人討論後，指認一名好人。如果對方是{merlin}，壞人獲勝；猜錯則好人獲勝。本站由邪惡陣營處理刺殺，自訂角色配置也可能加入其他刺殺目標。',
     strategicDiscussion:
-      '通過戰略討論、仔細觀察和聰明的策略，每一方都必須盡力實現他們的目標，而不暴露他們的真實效忠，讓每一輪《阿瓦隆：反抗勢力》的遊戲過程獨特而充滿懸念。',
+      '任務成功不代表隊員全是好人。把組隊名單、投票紀錄與任務結果一起比較，並留意誰的說法前後不一致。',
     assassinNote:
-      '在原版中，有一個單獨的角色是<b>刺客</b>。我們建議將此功能委派給任何一個邪惡角色，或由邪惡玩家共同決定。',
+      '原版由獨立角色<b>刺客</b>與壞人討論後做最後指認。上方配置採用本站由邪惡陣營處理刺殺的玩法；若要依照原版桌遊遊玩，請在壞人名額中安排刺客。',
     objectiveArthur: '{goodLoyaltyIcon} 亞瑟忠誠僕人的目標',
     objectiveMordred: '{evilLoyaltyIcon} 莫德雷德爪牙的目標',
     missionObjective:
-      '忠誠的{ servant }必須成功完成五個任務中的三個。他們必須共同合作，為每個任務提出小組建議，並對小組組成進行投票，始終努力將叛徒排除在團隊之外，以防止任務失敗。',
+      '{ servant }要讓三次任務成功，並保護梅林免於刺殺。討論和投票時，盡量選出可信任的隊伍，避免讓壞人混入任務。',
     minionObjective:
-      '{ minion }旨在製造{ servant }之間的不和與不信任。他們的目標是通過潛入團隊和破壞任務，使三個任務失敗。他們必須秘密溝通並制定戰略，誤導忠誠者並對其他玩家的真正忠誠度產生懷疑。',
+      '{ minion }要設法加入任務隊伍，讓三次任務失敗，並在討論中誤導{ servant }。可以說謊或假裝其他角色，但遊戲中不能展示角色牌。',
     additionalObjectivesTitle: '附加目標',
     additionalObjectivesDescription:
-      '遊戲因特殊角色而變得更加激烈，例如{ merlin }，他知道爪牙的身份，但必須保持自己的身份秘密，以避免在遊戲結束時被暗殺。莫德雷德的爪牙可以通過正確識別並暗殺{ merlin }在三個任務成功後獲得勝利。',
+      '{ merlin }在開局時能看見壞人，但看不見莫德雷德等對他隱藏身分的角色。他必須幫助好人又不暴露自己，因為三次任務成功後，壞人仍可透過刺殺梅林獲勝。',
     twoFailsNote: '在標有星號 (*) 的任務中，需要兩張失敗 { evilLoyaltyIcon } 卡才能導致任務失敗。',
-    missionSizes: '任務小組人數',
+    missionSizes: '各人數的任務隊員表',
     excaliburHint: '我們建議將{excalibur}加入任意玩家數量的遊戲中，但僅限於有經驗玩家的陪伴下使用。',
-    recommendTitle: '推薦角色設置',
-    generalTipsTitle: '一般提示',
+    recommendTitle: '推薦角色配置',
+    generalTipsTitle: '新手如何選擇角色',
     generalTipsText:
-      '為了豐富的遊戲體驗，我們建議 <strong>7 到 10 名玩家</strong> 的小組規模，在這裡遊戲的複雜性和興奮性真正展現。',
+      '阿瓦隆適合 <strong>5–10 人</strong>遊玩。以下是本站的推薦配置，包含自訂角色，並非原版桌遊的必要配置。',
     newcomersAdvice:
-      '對於新手，建議從 <strong>基本角色</strong> 開始您的 Avalon 之旅。隨著您越來越習慣於遊戲玩法，可以逐漸引入額外角色，逐步提高複雜性和參與度 <strong>一步一步</strong>。',
-    recommendationAfterFirstGames: '在第一次遊戲之後，我們建議按以下順序添加角色：',
-    offlineSetup: '離線遊戲設置：',
+      '原版基本遊戲使用<strong>梅林和刺客</strong>，其餘名額依好壞人比例補入忠臣與爪牙。熟悉組隊、投票及任務流程後，再逐步加入選用角色。',
+    recommendationAfterFirstGames: '熟悉基本規則後，可以嘗試以下角色與變體；崔斯坦和伊索德屬於本站自訂角色：',
+    offlineSetup: '實體桌遊的開局流程',
     defaultSetup:
-      '默認設置包括角色：{ merlin }、{ percival } 和 { morgana }。不過，您可以靈活定制遊戲，選擇最適合您團隊的角色。',
+      '下方開局口令預先勾選{ merlin }、{ percival }和{ morgana }。請依實際使用的角色調整；這是可自訂的口令，不代表原版的基本配置。',
     closeEyesExtendHand: '所有人閉上眼睛，並將手伸出形成拳頭放在前面。',
     except: '除了',
-    seeAllAgentsOfEvil: '睜開眼睛，環顧四周，以便認識所有的邪惡代理。',
+    seeAllAgentsOfEvil: '睜開眼睛，確認其他壞人。',
     extendYourThumb: '將你的拇指翹起',
     extendYourThumbSo: '將你的拇指翹起以便',
-    willKnowOfYou: '會知道你',
+    willKnowOfYou: '看見你',
     closeEyes: '閉上眼睛',
     guinevereLookAround: '睜開眼睛，環顧四周，以便認識兩個蘭斯洛特。',
     allPlayersShouldHaveEyedClosed: '所有玩家都應該閉上眼睛，手握成拳頭放在前面',
     putYourThumbDown: '放下拇指，重新將手握成拳頭',
-    merlinOpenEyes: '睜開眼睛，看到邪惡代理',
-    gameSetupNote: '為了遊戲設置，{minion}一詞指的是所有的邪惡代理，除非另有說明',
+    merlinOpenEyes: '睜開眼睛，查看壞人',
+    gameSetupNote: '除非另有說明，開局口令中的「{minion}」泛指所有邪惡陣營玩家。',
     ordinaryMinion: '普通（沒有額外角色）',
     everyoneOpenEyes: '所有人睜開眼睛',
     percivalOpenEyes: '睜開眼睛和看',
     loversOpenEyes: '睜開眼睛，環顧四周以認識彼此',
+    faqTitle: '阿瓦隆規則常見問題',
+    faqPlayersQuestion: '阿瓦隆幾個人可以玩？好壞人怎麼分？',
+    faqPlayersAnswer:
+      '適合 5–10 人。好人／壞人人數依序為：5 人局 3／2、6 人局 4／2、7 人局 4／3、8 人局 5／3、9 人局 6／3、10 人局 6／4。特殊角色也計入所屬陣營的人數。',
+    faqTieQuestion: '組隊投票平票怎麼辦？',
+    faqTieAnswer:
+      '平票視為否決，必須超過半數同意才通過，例如六人局需要四票同意。下一位隊長重新為同一次任務組隊；否決隊伍本身不算任務失敗。',
+    faqMerlinQuestion: '三次任務成功，好人就贏了嗎？',
+    faqMerlinAnswer:
+      '一般有梅林的遊戲還要進入刺殺階段。原版由刺客最後猜一次誰是梅林：猜中則壞人獲勝，猜錯則好人獲勝。本站由邪惡陣營處理這個階段。',
   },
   es: {
     variantNote:
@@ -486,43 +540,43 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     title: 'Reglas de Avalon: cómo jugar con 5–10 jugadores',
     gameObjective: 'Objetivo del Juego',
     gameDescription:
-      'Avalon: La Resistencia es un juego de mesa estratégico donde los jugadores tienen la tarea de completar una serie de misiones mientras lidian con traidores ocultos conocidos como los Secuaces de Mordred. El juego está ambientado en el legendario mundo del Rey Arturo y los Caballeros de la Mesa Redonda.',
+      'La Resistencia: Avalon (The Resistance: Avalon) es un juego de mesa de deducción social para 5–10 personas con roles secretos del bien y del mal. El líder propone un equipo, todos votan y sus integrantes juegan cartas de misión en secreto. Esta guía explica cómo jugar, las votaciones, la tabla de misiones y las condiciones de victoria; las diferencias con esta plataforma aparecen arriba.',
     gameplayRules: 'Reglas del Juego',
     teamProposalAndVoting: 'Propuesta de Equipo y Votación',
     teamProposalDescription:
       'El jugador con el token de Líder propone un equipo de jugadores para la misión. El número de jugadores requeridos para el equipo depende de la misión actual y del número total de jugadores en el juego.',
     votingDescription:
-      'Todos los jugadores, incluido el Líder, votan por el equipo propuesto. Se requiere una mayoría simple para que la propuesta sea aceptada. Si la propuesta es rechazada, el token de Líder pasa al siguiente jugador y comienza una nueva proposición. Si se rechazan cuatro propuestas seguidas, el quinto Líder tiene el poder de elegir el equipo de la misión sin votación.',
+      'Votan todos, incluido el líder. Hace falta más de la mitad de los votos a favor; un empate rechaza el equipo. El liderazgo pasa en sentido horario y se propone otro equipo para la misma misión. En el original, cinco rechazos consecutivos dan la victoria al mal. Aquí, tras cuatro rechazos, el quinto equipo normalmente sale sin votación; las cartas de trama pueden afectar a su aprobación.',
     progressionOfPlayTitle: 'Progresión del Juego',
     leaderTokenMove:
       'Después de determinar el resultado de la misión, el token de Líder se mueve al siguiente jugador en orden de las agujas del reloj.',
     newRound:
-      'Una nueva ronda comienza con una nueva propuesta de equipo, y el mismo proceso se repite para un total de cinco misiones.',
+      'Repite la formación de equipos y las misiones hasta alcanzar tres éxitos o tres fracasos. Se juegan como máximo cinco misiones; las restantes no se juegan cuando se alcanza ese resultado.',
     playersUseSkills:
       'Los jugadores deben usar sus poderes de persuasión, deducción y engaño para influir en la selección del equipo, la votación y la discusión para promover la agenda de su lado.',
     missionPhaseTitle: 'Fase de Misión',
     teamApproved:
-      'Una vez que se ha aprobado un equipo, los miembros del equipo eligen en secreto una carta de Éxito {goodLoyaltyIcon} o Fracaso {evilLoyaltyIcon} para determinar el resultado de la misión.',
+      'Solo los miembros del equipo aprobado eligen cartas en secreto. En el juego básico, el bien debe jugar Éxito { goodLoyaltyIcon }; el mal puede jugar Éxito o Fracaso { evilLoyaltyIcon }.',
     submitCardsToLeader:
-      'Todos los jugadores entregan sus cartas elegidas al Líder, quien las mezcla para ocultar qué jugador entregó qué carta.',
+      'En una partida presencial, el líder recoge y mezcla las cartas de los miembros del equipo antes de revelarlas, para ocultar quién jugó cada carta.',
     cardsRevealed:
-      'Luego se revelan las cartas. Para que una misión tenga éxito, todas las cartas deben ser de Éxito {goodLoyaltyIcon}. Si se revela una o más cartas de Fracaso {evilLoyaltyIcon}, la misión fracasa. Ciertas misiones pueden requerir dos cartas de Fracaso para fallar, dependiendo del número de jugadores en el juego.',
+      'Normalmente, un Fracaso { evilLoyaltyIcon } hace fallar la misión; sin ninguno, tiene éxito { goodLoyaltyIcon }. La excepción es la cuarta misión con 7–10 jugadores: hacen falta al menos dos Fracasos, así que uno solo no impide el éxito.',
     conclusionOfGameplayTitle: 'Conclusión del Juego',
     gameplayEndsCondition:
-      'El juego continúa a través de cinco misiones, finalizando una vez que los Leales Sirvientes de Arturo completan con éxito tres misiones o los Secuaces de Mordred logran que tres misiones fracasen. En caso de que los Leales Sirvientes de Arturo tengan éxito, los Secuaces de Mordred tienen una última oportunidad de ganar identificando correctamente a {merlin}. Si lo logran, ganan los Secuaces.',
+      'Tres misiones fallidas dan la victoria inmediata al mal. Tras tres éxitos, se pasa al asesinato: en el original, el Asesino nombra a un jugador del bien después de debatir con su equipo. Si es {merlin}, gana el mal; si no, gana el bien. Aquí lo gestiona el equipo del mal; los roles personalizados pueden añadir otros objetivos.',
     strategicDiscussion:
       'A través de discusiones estratégicas, observaciones cuidadosas y tácticas inteligentes, cada bando debe hacer lo mejor para lograr sus objetivos sin revelar sus verdaderas lealtades, haciendo que cada ronda de Avalon: La Resistencia sea única y llena de suspense.',
     assassinNote:
-      'En la versión original, hay un rol distintivo del <b>Asesino</b>. Recomendamos delegar esta función a cualquiera de los roles malvados, o alternativamente, tomar la decisión colectivamente entre los jugadores malvados.',
+      'En el juego original, el <b>Asesino</b> hace la elección final tras debatir con el mal. Las configuraciones anteriores usan el asesinato por el equipo del mal de esta plataforma. Para jugar según el original, incluye al Asesino entre los jugadores del mal.',
     objectiveArthur: 'Objetivo para los Leales Sirvientes de Arturo {goodLoyaltyIcon}',
     objectiveMordred: 'Objetivo para los Secuaces de Mordred {evilLoyaltyIcon}',
     missionObjective:
       'Los Leales {servant} deben completar con éxito tres de las cinco misiones. Deben trabajar juntos para proponer equipos para cada misión y votar sobre las composiciones de los equipos, siempre tratando de mantener a los traidores fuera de los equipos para evitar que las misiones fracasen.',
     minionObjective:
-      'Los {minion} buscan sembrar discordia y desconfianza entre los {servant}. Su objetivo es hacer que tres misiones fracasen infiltrándose en los equipos y saboteando las misiones. Deben comunicarse de manera encubierta y planear estrategias para engañar a los lealistas y sembrar dudas sobre las verdaderas lealtades de otros jugadores.',
+      'Los {minion} intentan entrar en los equipos y hacer fallar tres misiones, mientras engañan a los {servant} durante el debate. Se permite mentir, pero no mostrar las cartas de personaje durante la partida.',
     additionalObjectivesTitle: 'Objetivos Adicionales',
     additionalObjectivesDescription:
-      'El juego se intensifica con roles especiales, como {merlin}, quien conoce las identidades de los Secuaces pero debe mantener su identidad en secreto para evitar el asesinato al final del juego. Los Secuaces de Mordred pueden ganar identificando y asesinando correctamente a {merlin} después de que tres misiones hayan tenido éxito.',
+      '{merlin} ve a los jugadores del mal al preparar la partida, salvo roles que se ocultan de él, como Mordred. Debe ayudar al bien sin revelar su identidad: después de tres misiones exitosas, el mal aún puede ganar si lo identifica.',
     twoFailsNote:
       'En las misiones marcadas con un asterisco (*), se requieren dos cartas de Fracaso {evilLoyaltyIcon} para que la misión fracase.',
     missionSizes: 'Tamaño del Equipo de Misión',
@@ -531,10 +585,11 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     recommendTitle: 'Configuración Recomendada de Roles',
     generalTipsTitle: 'Consejos Generales',
     generalTipsText:
-      'Para una experiencia de juego enriquecedora, sugerimos un grupo de <strong>7 a 10 jugadores</strong>, donde las complejidades y la emoción del juego realmente brillan.',
+      'Avalon admite <strong>5–10 jugadores</strong>. Las configuraciones siguientes son sugerencias para esta plataforma, con algunos roles personalizados; no son la configuración obligatoria del juego original.',
     newcomersAdvice:
-      'Para los recién llegados, es recomendable comenzar tu viaje en Avalon con los <strong>roles básicos</strong>. A medida que te acostumbres más al juego, puedes introducir gradualmente roles adicionales, aumentando la complejidad y el compromiso <strong>paso a paso</strong>.',
-    recommendationAfterFirstGames: 'Después de los primeros juegos, recomendamos añadir roles en el siguiente orden:',
+      'En el juego básico original, usa <strong>Merlín y el Asesino</strong> y completa el grupo con sirvientes leales y secuaces, respetando la proporción del bien y del mal. Añade roles opcionales cuando todos dominen las votaciones y las misiones.',
+    recommendationAfterFirstGames:
+      'Una vez dominadas las reglas básicas, prueba estos roles y variantes; Tristán e Isolda son roles personalizados de la plataforma:',
     offlineSetup: 'Configuración del juego sin conexión:',
     defaultSetup:
       'La configuración predeterminada incluye personajes como {merlin}, {percival} y {morgana}. Sin embargo, tienes la flexibilidad de personalizar el juego seleccionando los roles que mejor se adapten a tu grupo.',
@@ -556,5 +611,15 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     everyoneOpenEyes: 'Todos abran sus ojos',
     percivalOpenEyes: 'abre tus ojos y ve',
     loversOpenEyes: 'abre tus ojos y mira alrededor para conocerse mutuamente',
+    faqTitle: 'Preguntas frecuentes sobre Avalon',
+    faqPlayersQuestion: '¿Cuántas personas pueden jugar a Avalon?',
+    faqPlayersAnswer:
+      'De 5 a 10 personas. La proporción del bien y del mal es: 5 jugadores: 3/2; 6: 4/2; 7: 4/3; 8: 5/3; 9: 6/3; 10: 6/4. Los roles especiales se incluyen en el total de su bando.',
+    faqTieQuestion: '¿Qué pasa si hay empate en la votación?',
+    faqTieAnswer:
+      'El equipo se rechaza. Se necesita más de la mitad de los votos a favor: por ejemplo, cuatro de seis. El siguiente líder propone otro equipo para la misma misión; rechazar un equipo no equivale a fallar una misión.',
+    faqMerlinQuestion: '¿El bien gana al completar tres misiones?',
+    faqMerlinAnswer:
+      'En una partida normal con Merlín, aún debe sobrevivir al asesinato. En el original, el Asesino tiene un intento para identificar a Merlín. Si acierta, gana el mal; si falla, gana el bien. En esta plataforma, el equipo del mal gestiona ese paso.',
   },
 };
