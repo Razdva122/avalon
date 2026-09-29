@@ -1,32 +1,36 @@
 module.exports.troublemaker = {
   pt: {
-    title: 'Avalon: The Resistance | Encrenqueiro',
-    description: "Regras e dicas para o papel de Encrenqueiro no jogo de tabuleiro 'Avalon: The Resistance'",
+    title: 'Encrenqueiro em Avalon: bom com verificação de mal',
+    description:
+      'Por que o Encrenqueiro parece mau em Avalon? Verificações enganosas, direito de falar a verdade, Sucesso obrigatório e diferença para o Trapaceiro.',
     keywords: ['Encrenqueiro', 'Papel', 'Regras', 'Dicas'],
   },
   en: {
-    title: 'Avalon: The Resistance | Troublemaker',
-    description: "Rules and Tips for Troublemaker role in the board game 'Avalon: The Resistance'",
+    title: 'Troublemaker in Avalon: Good Role, Evil Check',
+    description:
+      'Why does the Troublemaker look evil in Avalon? Learn which loyalty checks are misleading, whether lying is compulsory and which mission card is allowed.',
     keywords: ['Troublemaker', 'Role', 'Rules', 'Tips'],
   },
   ru: {
-    title: 'Авалон: Сопротивление | Траблмейкер',
-    description: "Правила и советы для роли Траблмейкер в настольной игре 'Авалон: Сопротивление'",
+    title: 'Траблмейкер в Авалоне: добро с проверкой «зло»',
+    description:
+      'Почему Траблмейкер выглядит злым в Авалоне? Ложные проверки, право говорить правду, обязательный успех и отличие от Трикстера.',
     keywords: ['Траблмейкер', 'Роль', 'Правила', 'Советы'],
   },
   'zh-TW': {
-    title: '阿瓦隆：反抗勢力 | 麻煩友',
-    description: '「阿瓦隆：反抗勢力」桌遊中麻煩友的角色規則和攻略建議',
+    title: '阿瓦隆麻煩友：好人為何被查成壞人',
+    description: '阿瓦隆麻煩友為什麼顯示邪惡？了解誤導陣營查驗、是否必須說謊、任務只能成功的規則，以及與騙子的區別。',
     keywords: ['麻煩友', '角色', '規則', '建議'],
   },
   'zh-CN': {
-    title: '阿瓦隆：反抗组织 | 麻烦友',
-    description: '桌游《阿瓦隆：反抗组织》中麻烦友角色的规则和建议',
+    title: '阿瓦隆麻烦友：好人为何被查成坏人',
+    description: '阿瓦隆麻烦友为什么显示邪恶？了解误导阵营查验、是否必须说谎、任务只能成功的规则，以及与骗子的区别。',
     keywords: ['麻烦友', '角色', '规则', '建议'],
   },
   es: {
-    title: 'Avalon: La Resistencia | Problematizador',
-    description: "Reglas y consejos para el rol de Problematizador en el juego de mesa 'Avalon: La Resistencia'",
+    title: 'Problematizador en Avalon: rol bueno, comprobación mala',
+    description:
+      '¿Por qué el Problematizador parece malo en Avalon? Comprobaciones engañosas, derecho a decir la verdad, Éxito obligatorio y diferencia con el Tramposo.',
     keywords: ['Problematizador', 'Rol', 'Reglas', 'Consejos'],
   },
 };

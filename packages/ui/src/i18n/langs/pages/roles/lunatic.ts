@@ -3,9 +3,16 @@ import { Dictionary } from '@avalon/types';
 
 export const lunatic: { [key in TLanguage]: Dictionary<string> } = {
   en: {
-    generalInformation: 'General Information:',
-    roleDescription:
-      'The role of {lunatic} in the tabletop game Avalon adds a twist to the standard gameplay for Minions of Evil. Unlike other minions, a {lunatic} must vote "Fail" on every mission they are part of, simulating uncompromising sabotage. This compulsory action increases the challenge for the forces of evil, as it can reveal the {lunatic}\'s identity if not handled wisely.',
+    seoHeading: 'Lunatic in Avalon: Must-Fail Rule & Strategy',
+    seoTeam: 'Evil. You win with the evil team.',
+    seoAbility:
+      '{lunatic} must submit Fail on every mission they join. Unlike an ordinary {minion}, they cannot choose Success to gain trust.',
+    seoLimit:
+      'Does one Lunatic always fail the mission? Not if that mission requires two Fail cards. The forced card is not a guarantee of the final result; {excalibur}, when enabled, can also change a card.',
+    seoScenario1:
+      'On a mission needing only one Fail, your required card will fail it unless another enabled mechanic changes that card.',
+    seoScenario2:
+      'On the fourth mission with 7–10 players, two Fail cards are needed. If you are the only evil participant, your one Fail is not enough.',
     generalTipsHeader: 'General Tips:',
     strategicFailure: 'Incorporate mandatory failure strategically:',
     strategicFailureDetails:
@@ -16,20 +23,18 @@ export const lunatic: { [key in TLanguage]: Dictionary<string> } = {
     covertSupportAllies: 'Align with other minions subtly:',
     subtleAlignment:
       'Although your role requires overt sabotage, look for opportunities to support other minions in more covert ways.',
-    strategicAdviceHeader: 'Strategic Tips:',
-    monitorGameFlow: 'Monitor the flow:',
-    disruptiveTiming:
-      'Pay close attention to how the game is developing. Your forced failures should ideally come at moments that cause maximum confusion and disruption.',
-    avoidBehaviorPatterns: 'Avoid patterns:',
-    confuseThroughInconsistency:
-      'Although you must always fail missions, vary your behavior in discussions and non-mission related decisions to confuse others about your true role.',
-    roleConclusion:
-      'Embrace the role of {lunatic} with cunning and subtlety. Your challenge is not only to disrupt the missions but also to sew discord while maintaining your disguise enemies.',
   },
   ru: {
-    generalInformation: 'Общая информация:',
-    roleDescription:
-      'Роль {lunatic} в настольной игре Avalon вносит изюминку в стандартный игровой процесс миньонов Зла. В отличие от других миньонов, {lunatic} должен голосовать за «Неудачу» на каждой миссии, в которой участвует, имитируя безоговорочный саботаж. Это обязательное действие увеличивает сложность для сил зла, так как может раскрыть личность {lunatic}, если не действовать мудро.',
+    seoHeading: 'Лунатик в Авалоне: обязательный провал и стратегия',
+    seoTeam: 'Зло. Вы побеждаете вместе с командой зла.',
+    seoAbility:
+      '{lunatic} обязан дать провал в каждой миссии, где участвует. В отличие от обычной роли {minion}, успех ради доверия ему недоступен.',
+    seoLimit:
+      'Всегда ли Лунатик проваливает миссию? Если нужны две карты провала, одной недостаточно. Обязательная карта не гарантирует итог; включённый {excalibur} также может изменить карту.',
+    seoScenario1:
+      'В миссии с порогом в один провал ваша обязательная карта провалит поход, если другая включённая механика её не изменит.',
+    seoScenario2:
+      'В четвёртой миссии на 7–10 игроков нужны два провала. Если вы единственный злой участник, одной вашей карты недостаточно.',
     generalTipsHeader: 'Общие советы:',
     strategicFailure: 'Используйте обязательный провал стратегически:',
     strategicFailureDetails:
@@ -40,20 +45,15 @@ export const lunatic: { [key in TLanguage]: Dictionary<string> } = {
     covertSupportAllies: 'Ненавязчиво скоординируйтесь с другими миньонами:',
     subtleAlignment:
       'Хотя ваша роль требует открытого саботажа, ищите возможности поддержать других миньонов более скрытно.',
-    strategicAdviceHeader: 'Стратегические советы:',
-    monitorGameFlow: 'Следите за ходом игры:',
-    disruptiveTiming:
-      'Внимательно следите за развитием игры. Ваши принудительные провалы должны происходить в те моменты, когда они вызовут максимальное замешательство и хаос.',
-    avoidBehaviorPatterns: 'Избегайте шаблонов:',
-    confuseThroughInconsistency:
-      'Хотя вам всегда нужно проваливать миссии, меняйте своё поведение в обсуждениях и решениях, не связанных с миссиями, чтобы ввести других в заблуждение относительно вашей истинной роли.',
-    roleConclusion:
-      'Примите роль {lunatic} с хитростью и тонкостью. Ваша задача — не только нарушать миссии, но и сеять раздор, сохраняя свою маскировку среди врагов.',
   },
   'zh-CN': {
-    generalInformation: '一般信息：',
-    roleDescription:
-      '在桌游《阿瓦隆》中,{lunatic}这一角色为邪恶爪牙的标准玩法增添了一丝新意。与其他爪牙不同,{lunatic}在参与的每个任务中都必须投票"失败",以模拟毫不妥协的破坏行为。这一强制行动增加了邪恶势力面临的挑战,因为如果处理不当,可能会暴露{lunatic}的身份。',
+    seoHeading: '阿瓦隆疯子：强制失败与任务策略',
+    seoTeam: '坏人。你随邪恶阵营获胜。',
+    seoAbility: '{lunatic}参加的每次任务都必须出失败。与普通{minion}不同，不能用成功牌换取信任。',
+    seoLimit:
+      '有疯子就一定任务失败吗？若任务需要两张失败牌，一张不够。强制出的牌不保证最终结果；启用的{excalibur}也可能改变任务牌。',
+    seoScenario1: '只需一张失败牌的任务中，你的牌会使任务失败，除非其他已启用的机制改变了这张牌。',
+    seoScenario2: '7至10人局的第4次任务需要两张失败牌。如果你是唯一的坏人，仅靠你的一张失败牌不够。',
     generalTipsHeader: '基本提示:',
     strategicFailure: '战略性地融入强制失败:',
     strategicFailureDetails: '虽然在任务中你必须始终投票"失败",但在其他方面需要采用策略以避免立即被发现。',
@@ -61,19 +61,15 @@ export const lunatic: { [key in TLanguage]: Dictionary<string> } = {
     bluffTechnique: '通过参与讨论和策略制定,假装你有选择权,从而掩盖你被迫失败的事实,并保持一种不可预测的氛围。',
     covertSupportAllies: '巧妙地与其他爪牙协调:',
     subtleAlignment: '虽然你的角色要求明面上的破坏,但也要寻找机会以更加隐秘的方式支持其他爪牙。',
-    strategicAdviceHeader: '策略提示:',
-    monitorGameFlow: '监控局势:',
-    disruptiveTiming: '密切关注游戏的发展局势。你的强制失败最好在能够引起最大混乱和动荡的时刻发生。',
-    avoidBehaviorPatterns: '避免固定模式:',
-    confuseThroughInconsistency:
-      '虽然你必须总是让任务失败,但在讨论和与任务无关的决策中要变化自己的行为,以迷惑他人关于你真实身份的判断。',
-    roleConclusion:
-      '以狡猾和细腻的方式接受 {lunatic} 的角色。你的挑战不仅仅是干扰任务,还在于制造纷争,同时保持你在敌人中的伪装。',
   },
   'zh-TW': {
-    generalInformation: '一般信息：',
-    roleDescription:
-      '在桌遊《阿瓦隆》中,{lunatic} 的角色為邪惡爪牙的標準遊戲玩法增添了一個轉折。與其他爪牙不同,{lunatic} 在參與的每個任務中都必須投票「失敗」,以模擬毫不妥協的破壞行為。這一強制性行動增加了邪惡勢力的挑戰,因為如果處理不當,可能會揭露 {lunatic} 的身份。',
+    seoHeading: '阿瓦隆瘋子：強制失敗與任務策略',
+    seoTeam: '壞人。你隨邪惡陣營獲勝。',
+    seoAbility: '{lunatic}參加的每次任務都必須出失敗。與普通{minion}不同，不能用成功牌換取信任。',
+    seoLimit:
+      '有瘋子就一定任務失敗嗎？若任務需要兩張失敗牌，一張不夠。強制出的牌不保證最終結果；啟用的{excalibur}也可能改變任務牌。',
+    seoScenario1: '只需一張失敗牌的任務中，你的牌會使任務失敗，除非其他已啟用的機制改變了這張牌。',
+    seoScenario2: '7至10人局的第4次任務需要兩張失敗牌。如果你是唯一的壞人，僅靠你的一張失敗牌不夠。',
     generalTipsHeader: '基本提示:',
     strategicFailure: '策略性地融入強制性失敗:',
     strategicFailureDetails: '儘管在任務中你必須始終投票「失敗」,但在其他方面的遊戲策略上要謹慎,以避免立即被發現。',
@@ -81,19 +77,18 @@ export const lunatic: { [key in TLanguage]: Dictionary<string> } = {
     bluffTechnique: '通過參與討論和策略制定,假裝你有選擇權,從而掩飾你被迫的失敗,同時保持不可預測的氣息。',
     covertSupportAllies: '巧妙地與其他爪牙協同:',
     subtleAlignment: '儘管你的角色要求明顯破壞,但尋找以更隱秘方式支持其他爪牙的機會。',
-    strategicAdviceHeader: '策略提示:',
-    monitorGameFlow: '監控局勢:',
-    disruptiveTiming: '密切注意遊戲發展情況。你的強制性失敗最好發生在引起最大混亂和干擾的時刻。',
-    avoidBehaviorPatterns: '避免固定模式:',
-    confuseThroughInconsistency:
-      '儘管你必須始終讓任務失敗,但在討論和與任務無關的決策中要變化行為,以混淆他人對你真實角色的判斷。',
-    roleConclusion:
-      '以狡猾與微妙的方式擁抱 {lunatic} 的角色。你的挑戰不僅在於破壞任務,更在於製造紛爭,同時保持你在敵人中的偽裝。',
   },
   es: {
-    generalInformation: 'Información General:',
-    roleDescription:
-      'El papel de {lunatic} en el juego de mesa Avalon añade un giro a la jugabilidad estándar de los Secuaces del Mal. A diferencia de otros secuaces, un {lunatic} debe votar "Fallo" en cada misión en la que participa, simulando un sabotaje intransigente. Esta acción obligatoria aumenta el reto para las fuerzas del mal, ya que puede revelar la identidad del {lunatic} si no se maneja con sabiduría.',
+    seoHeading: 'Lunático en Avalon: Fracaso obligatorio y estrategia',
+    seoTeam: 'Mal. Ganas con el equipo del mal.',
+    seoAbility:
+      '{lunatic} debe jugar Fracaso en cada misión en la que participa. A diferencia de un {minion} normal, no puede jugar Éxito para ganar confianza.',
+    seoLimit:
+      '¿Un Lunático siempre hace fallar la misión? No si se necesitan dos Fracasos. Su carta obligatoria no garantiza el resultado; {excalibur}, si está habilitado, también puede cambiar una carta.',
+    seoScenario1:
+      'En una misión que necesita un solo Fracaso, tu carta hará que falle salvo que otra mecánica habilitada la cambie.',
+    seoScenario2:
+      'En la cuarta misión con 7–10 jugadores se necesitan dos Fracasos. Si eres el único malvado, tu carta no basta.',
     generalTipsHeader: 'Consejos Generales:',
     strategicFailure: 'Incorpora el fallo obligatorio de manera estratégica:',
     strategicFailureDetails:
@@ -104,20 +99,18 @@ export const lunatic: { [key in TLanguage]: Dictionary<string> } = {
     covertSupportAllies: 'Aliéntate sutilmente con otros secuaces:',
     subtleAlignment:
       'Aunque tu rol requiera sabotaje abierto, busca oportunidades para apoyar a otros secuaces de forma más encubierta.',
-    strategicAdviceHeader: 'Consejos Estratégicos:',
-    monitorGameFlow: 'Monitorea el desarrollo:',
-    disruptiveTiming:
-      'Presta mucha atención al desarrollo del juego. Tus fracasos forzados deberían ocurrir, idealmente, en momentos que generen la máxima confusión y alteración.',
-    avoidBehaviorPatterns: 'Evita patrones:',
-    confuseThroughInconsistency:
-      'Aunque siempre debes hacer fracasar las misiones, varía tu comportamiento en debates y decisiones que no se relacionen con las misiones para confundir a los demás sobre tu verdadero rol.',
-    roleConclusion:
-      'Abraza el rol de {lunatic} con astucia y sutileza. Tu desafío no es solo interrumpir las misiones, sino también sembrar el desorden mientras mantienes tu disfraz entre los enemigos.',
   },
   pt: {
-    generalInformation: 'Informações Gerais:',
-    roleDescription:
-      'O papel do {lunatic} no jogo de tabuleiro Avalon adiciona uma reviravolta à jogabilidade padrão dos Lacaios do Mal. Diferente de outros lacaios, um {lunatic} deve votar "Falha" em cada missão da qual participa, simulando uma sabotagem intransigente. Esta ação obrigatória aumenta o desafio para as forças do mal, pois pode revelar a identidade do {lunatic} se não for gerenciada com sabedoria.',
+    seoHeading: 'Lunático em Avalon: Falha obrigatória e estratégia',
+    seoTeam: 'Mal. Você vence com a equipe do mal.',
+    seoAbility:
+      '{lunatic} deve jogar Falha em toda missão de que participa. Ao contrário de um {minion} comum, não pode jogar Sucesso para ganhar confiança.',
+    seoLimit:
+      'Um Lunático sempre faz a missão falhar? Não se forem necessárias duas Falhas. Sua carta obrigatória não garante o resultado; {excalibur}, quando habilitada, também pode alterar uma carta.',
+    seoScenario1:
+      'Numa missão que exige uma Falha, sua carta fará a missão fracassar, a menos que outra mecânica habilitada a altere.',
+    seoScenario2:
+      'Na quarta missão com 7–10 jogadores são necessárias duas Falhas. Se você for o único jogador do mal, sua carta não basta.',
     generalTipsHeader: 'Dicas Gerais:',
     strategicFailure: 'Incorpore a falha obrigatória estrategicamente:',
     strategicFailureDetails:
@@ -128,14 +121,5 @@ export const lunatic: { [key in TLanguage]: Dictionary<string> } = {
     covertSupportAllies: 'Alinhe-se com outros lacaios sutilmente:',
     subtleAlignment:
       'Embora seu papel exija sabotagem aberta, procure oportunidades para apoiar outros lacaios de maneiras mais encobertas.',
-    strategicAdviceHeader: 'Dicas Estratégicas:',
-    monitorGameFlow: 'Monitore o fluxo:',
-    disruptiveTiming:
-      'Preste muita atenção a como o jogo está se desenvolvendo. Suas falhas forçadas devem idealmente ocorrer em momentos que causem máxima confusão e perturbação.',
-    avoidBehaviorPatterns: 'Evite padrões:',
-    confuseThroughInconsistency:
-      'Embora você deva sempre falhar nas missões, varie seu comportamento em discussões e decisões não relacionadas às missões para confundir os outros sobre seu verdadeiro papel.',
-    roleConclusion:
-      'Abrace o papel de {lunatic} com astúcia e sutileza. Seu desafio não é apenas perturbar as missões, mas também semear discórdia enquanto mantém seu disfarce entre os inimigos.',
   },
 };

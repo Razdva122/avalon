@@ -3,11 +3,16 @@ import { Dictionary } from '@avalon/types';
 
 export const trickster: { [key in TLanguage]: Dictionary<string> } = {
   pt: {
-    generalInformation: 'Informações Gerais: ',
-    intro: `
-			Como um {trickster}, você mente quando sua lealdade é verificada com {ladyOfLake} ou {cleric},
-			posicionando-se perfeitamente como um membro confiável do lado do bem.
-		`,
+    seoHeading: 'Trapaceiro em Avalon: falsa lealdade e Merlin',
+    seoTeam: 'Mal. Uma verificação que indica bem não muda seu lado real.',
+    seoAbility:
+      'Aqui, {trickster} parece bom nas verificações de lealdade de {ladyOfLake}, {cleric} e na verificação concedida por {witch}.',
+    seoLimit:
+      'Ele se esconde de Merlin? Não: {merlin} o vê como mau. {troublemaker} tem o efeito contrário: é bom, mas sua lealdade verificada aparece como má.',
+    seoScenario1:
+      'Uma verificação boa pode apoiar seu blefe, mas não prova que uma missão fracassada não tinha jogadores do mal.',
+    seoScenario2:
+      'Se os argumentos de Merlin contradisserem uma verificação boa, não reaja expondo conhecimento privado: os outros não sabem se o Trapaceiro explica a contradição.',
     generalTipsTitle: 'Dicas Gerais:',
     generalTipsCultivateTrustTitle: 'Cultive uma persona confiável:',
     generalTipsCultivateTrust: `
@@ -23,34 +28,18 @@ export const trickster: { [key in TLanguage]: Dictionary<string> } = {
     generalTipsMonitorInfluence: `
 			Acompanhe como os outros o percebem e ajuste sua estratégia para manter seu disfarce.
 		`,
-    strategicTipsTitle: 'Dicas Estratégicas:',
-    strategicTipsManipulateVotingTitle: 'Manipule padrões de votação:',
-    strategicTipsManipulateVoting: `
-			Seus votos em propostas podem enviar sinais para jogadores observadores. Pense cuidadosamente sobre quando apoiar
-			ou se opor a missões.
-		`,
-    strategicTipsControlInformationFlowTitle: 'Controle o fluxo de informações:',
-    strategicTipsControlInformationFlow: `
-			À medida que ganha confiança, outros jogadores provavelmente compartilharão insights com você. Use essas informações para beneficiar
-			sua equipe sem revelar sua fonte.
-		`,
-    strategicTipsPrepareDefenseTitle: 'Prepare uma defesa credível:',
-    strategicTipsPrepareDefense: `
-			Se a suspeita recair sobre você, esteja pronto com explicações plausíveis para suas ações que se encaixem com sua
-			persona construída como um jogador do bem.
-		`,
-    conclusion: `
-			Jogar como {trickster} permite que você teça uma teia de enganos. Abrace as complexidades do seu papel e
-			você pode mudar o equilíbrio a favor do mal, manipulando resultados-chave e deixando as forças do bem confusas
-			e paranóicas. Encontre um equilíbrio entre ações evidentes e manipulações sutis para dominar a arte do engano.
-		`,
   },
   en: {
-    generalInformation: 'General Information: ',
-    intro: `
-			As a {trickster}, you lie when your loyalty is checked with {ladyOfLake} or {cleric},
-			positioning yourself perfectly as a trusted member of the good side.
-		`,
+    seoHeading: 'Trickster in Avalon: False Loyalty & Merlin',
+    seoTeam: 'Evil. A good result from a loyalty check does not change your actual team.',
+    seoAbility:
+      'On this platform, {trickster} appears good to loyalty checks, including {ladyOfLake}, {cleric} and the check granted by {witch}.',
+    seoLimit:
+      'Is the Trickster hidden from Merlin? No. {merlin} still sees this role as evil. {troublemaker} has the opposite effect: a good player whose checked loyalty appears evil.',
+    seoScenario1:
+      'A good check result can support your bluff, but it is not proof that no evil player was on a failed mission.',
+    seoScenario2:
+      'If Merlin’s public reasoning contradicts a good check result, avoid reacting with private certainty: other players do not know whether Trickster is the explanation.',
     generalTipsTitle: 'General Tips:',
     generalTipsCultivateTrustTitle: 'Cultivate a trustworthy persona:',
     generalTipsCultivateTrust: `
@@ -66,34 +55,17 @@ export const trickster: { [key in TLanguage]: Dictionary<string> } = {
     generalTipsMonitorInfluence: `
 			Keep track of how others perceive you and adjust your strategy to maintain your disguise.
 		`,
-    strategicTipsTitle: 'Strategic Tips:',
-    strategicTipsManipulateVotingTitle: 'Manipulate voting patterns:',
-    strategicTipsManipulateVoting: `
-			Your votes on proposals can send signals to observant players. Think carefully about when to support 
-			or oppose missions.
-		`,
-    strategicTipsControlInformationFlowTitle: 'Control information flow:',
-    strategicTipsControlInformationFlow: `
-			As you gain trust, other players will likely share insights with you. Use this information to benefit 
-			your team without revealing your source.
-		`,
-    strategicTipsPrepareDefenseTitle: 'Prepare a credible defense:',
-    strategicTipsPrepareDefense: `
-			If suspicion falls on you, be ready with plausible explanations for your actions that fit with your 
-			constructed persona as a good player.
-		`,
-    conclusion: `
-			Playing as the {trickster} allows you to weave a web of deceit. Embrace the complexities of your role and 
-			you can shift the balance in favor of evil, manipulating key outcomes and leaving the forces of good puzzled 
-			and paranoid. Strike a balance between overt actions and subtle manipulations to master the art of deception.
-		`,
   },
   ru: {
-    generalInformation: 'Общая информация: ',
-    intro: `
-		 Как {trickster} вы лжете, когда вашу верность проверяют с помощью {ladyOfLake} или {cleric},
-		 что позволяет вам идеально занять позицию доверенного члена светлой стороны.
-		`,
+    seoHeading: 'Трикстер в Авалоне: ложная лояльность и Мерлин',
+    seoTeam: 'Зло. Добрый результат проверки не меняет вашу настоящую сторону.',
+    seoAbility:
+      'На платформе {trickster} выглядит добрым при проверках лояльности: {ladyOfLake}, {cleric} и проверке, которую даёт {witch}.',
+    seoLimit:
+      'Скрыт ли Трикстер от Мерлина? Нет, {merlin} видит его злым. {troublemaker} работает наоборот: добрый игрок с результатом проверки «зло».',
+    seoScenario1: 'Добрая проверка может поддержать ваш блеф, но не доказывает отсутствие злых в проваленной миссии.',
+    seoScenario2:
+      'Если рассуждения Мерлина противоречат доброй проверке, не выдавайте реакцией тайные знания: остальные не знают, объясняется ли это Трикстером.',
     generalTipsTitle: 'Общие советы:',
     generalTipsCultivateTrustTitle: 'Создайте доверительный образ:',
     generalTipsCultivateTrust: `
@@ -108,34 +80,14 @@ export const trickster: { [key in TLanguage]: Dictionary<string> } = {
     generalTipsMonitorInfluence: `
 		 Наблюдайте, как вас воспринимают другие, и корректируйте свою стратегию, чтобы поддерживать свой маскарад.
 		`,
-    strategicTipsTitle: 'Стратегические советы:',
-    strategicTipsManipulateVotingTitle: 'Манипулируйте голосованиями:',
-    strategicTipsManipulateVoting: `
-		 Ваши голоса по предложениям могут подавать сигналы наблюдательным игрокам. Тщательно обдумывайте, когда поддерживать 
-		 или противостоять миссиям.
-		`,
-    strategicTipsControlInformationFlowTitle: 'Контролируйте поток информации:',
-    strategicTipsControlInformationFlow: `
-		 По мере укрепления доверия к вам другие игроки могут делиться с вами идеями. Используйте эту информацию, чтобы получить
-		 преимущество без раскрытия источника.
-		`,
-    strategicTipsPrepareDefenseTitle: 'Готовьте правдоподобную защиту:',
-    strategicTipsPrepareDefense: `
-		 Если на вас падает подозрение, будьте готовы дать правдоподобные объяснения вашим действиям, которые укладываются в
-		 созданный вами образ как добросовестного игрока.
-		`,
-    conclusion: `
-		 Играя как {trickster}, вы можете плести сеть обмана. Примите сложности своей роли, и вы можете изменить баланс в пользу зла,
-		 влияя на ключевые исходы и оставляя силы добра в растерянности и параноидальными. Найдите баланс между явными действиями и 
-		 тонкими манипуляциями, чтобы овладеть искусством обмана.
-		`,
   },
   'zh-CN': {
-    generalInformation: '一般信息：',
-    intro: `
-		 作为{trickster}，当你被{ladyOfLake}或{cleric}检查忠诚时，撒谎，
-		 完美地将自己定位为被信任的正义方成员。
-		`,
+    seoHeading: '阿瓦隆骗子：假阵营查验与梅林视野',
+    seoTeam: '坏人。查验显示好人不会改变你的真实阵营。',
+    seoAbility: '本站{trickster}在阵营查验中显示为好人，包括{ladyOfLake}、{cleric}及{witch}提供的查验。',
+    seoLimit: '骗子能躲过梅林吗？不能，{merlin}仍看到他是坏人。{troublemaker}正好相反：本身是好人，查验却显示坏人。',
+    seoScenario1: '好人查验结果可以支持你的伪装，但不证明失败任务中没有坏人。',
+    seoScenario2: '如果梅林的公开推理与好人查验结果冲突，不要用反应暴露私有信息：其他人不知道是否由骗子造成。',
     generalTipsTitle: '一般提示:',
     generalTipsCultivateTrustTitle: '培养可信的人设:',
     generalTipsCultivateTrust: `
@@ -149,30 +101,14 @@ export const trickster: { [key in TLanguage]: Dictionary<string> } = {
     generalTipsMonitorInfluence: `
 		 跟踪其他人对你的看法，并调整策略以维持你的掩饰。
 		`,
-    strategicTipsTitle: '战略提示:',
-    strategicTipsManipulateVotingTitle: '操控投票模式:',
-    strategicTipsManipulateVoting: `
-		 你在提案上的投票可能会向其他警觉的玩家发送信号。仔细考虑何时支持或反对任务。
-		`,
-    strategicTipsControlInformationFlowTitle: '控制信息流:',
-    strategicTipsControlInformationFlow: `
-		 随着对你的信任增加，其他玩家可能会与您共享见解。使用这些信息来提升团队的利益，同时不暴露来源。
-		`,
-    strategicTipsPrepareDefenseTitle: '准备一个可信的辩解:',
-    strategicTipsPrepareDefense: `
-		 如果怀疑针对你，准备好合理的解释来使你的行为看似符合你构建的角色。
-		`,
-    conclusion: `
-		 作为{trickster}，你可以编织一个欺骗的网络。接受角色的复杂性，你可以转变局势，使之有利于邪恶，
-		 操控关键结果，令正义方摸不着头脑，疑神疑鬼。在显性行动和微妙操作间找到平衡，掌控欺骗的艺术。
-		`,
   },
   'zh-TW': {
-    generalInformation: '一般信息：',
-    intro: `
-		 身為{trickster}，當你的忠誠受到{ladyOfLake}或{cleric}檢查時，你要撒謊，
-		 使自己完美地成為被信任的正義方成員。
-		`,
+    seoHeading: '阿瓦隆騙子：假陣營查驗與梅林視野',
+    seoTeam: '壞人。查驗顯示好人不會改變你的真實陣營。',
+    seoAbility: '本站{trickster}在陣營查驗中顯示為好人，包括{ladyOfLake}、{cleric}及{witch}提供的查驗。',
+    seoLimit: '騙子能躲過梅林嗎？不能，{merlin}仍看到他是壞人。{troublemaker}正好相反：本身是好人，查驗卻顯示壞人。',
+    seoScenario1: '好人查驗結果可以支持你的偽裝，但不證明失敗任務中沒有壞人。',
+    seoScenario2: '如果梅林的公開推理與好人查驗結果衝突，不要用反應暴露私有資訊：其他人不知道是否由騙子造成。',
     generalTipsTitle: '一般提示:',
     generalTipsCultivateTrustTitle: '建立可信形象:',
     generalTipsCultivateTrust: `
@@ -186,30 +122,18 @@ export const trickster: { [key in TLanguage]: Dictionary<string> } = {
     generalTipsMonitorInfluence: `
 		 跟踪他人對你的看法，並調整策略以維持你的掩飾。
 		`,
-    strategicTipsTitle: '戰略提示:',
-    strategicTipsManipulateVotingTitle: '操控投票模式:',
-    strategicTipsManipulateVoting: `
-		 你的投票行為能給予觀察敏銳的玩家以信號。仔細考慮何時支持或反對任務。
-		`,
-    strategicTipsControlInformationFlowTitle: '控制信息流:',
-    strategicTipsControlInformationFlow: `
-		 當你贏得信任時，其他玩家可能會與你分享見解。利用這些信息讓你的團隊受益，同時不透露來源。
-		`,
-    strategicTipsPrepareDefenseTitle: '準備可信的辯護:',
-    strategicTipsPrepareDefense: `
-		 如果你受到了懷疑，準備一些合理的解釋來為你的行為辯護，並將其鑲嵌於你作為好角色的假面之下。
-		`,
-    conclusion: `
-		 作為{trickster}，你可以編織欺騙的網絡。接受角色的複雜性，你可以轉變局勢，以邪惡為營，操縱關鍵結果，
-		 讓正義方感到混亂和困惑。在顯性的操作和細微的操作中找到平衡，以掌握欺騙的藝術。
-		`,
   },
   es: {
-    generalInformation: 'Información General: ',
-    intro: `
-		 Como {trickster}, mientes cuando tu lealtad es verificada por {ladyOfLake} o {cleric},
-		 posicionándote perfectamente como un miembro confiable del lado bueno.
-		`,
+    seoHeading: 'Tramposo en Avalon: falsa lealtad y Merlín',
+    seoTeam: 'Mal. Una comprobación que indique bien no cambia tu bando real.',
+    seoAbility:
+      'Aquí, {trickster} aparece como bueno ante comprobaciones de lealtad: {ladyOfLake}, {cleric} y la comprobación otorgada por {witch}.',
+    seoLimit:
+      '¿Se oculta de Merlín? No: {merlin} lo ve como malvado. {troublemaker} funciona al revés: es bueno pero su lealtad comprobada aparece como mala.',
+    seoScenario1:
+      'Un resultado bueno puede apoyar tu engaño, pero no demuestra que una misión fallida careciera de jugadores malvados.',
+    seoScenario2:
+      'Si los argumentos de Merlín contradicen una comprobación buena, no reacciones revelando información privada: los demás no saben si el Tramposo explica la contradicción.',
     generalTipsTitle: 'Consejos Generales:',
     generalTipsCultivateTrustTitle: 'Cultiva una personalidad confiable:',
     generalTipsCultivateTrust: `
@@ -224,27 +148,6 @@ export const trickster: { [key in TLanguage]: Dictionary<string> } = {
     generalTipsMonitorInfluenceTitle: 'Monitorea tu influencia:',
     generalTipsMonitorInfluence: `
 		 Observa cómo los demás te perciben y ajusta tu estrategia para mantener tu disfraz.
-		`,
-    strategicTipsTitle: 'Consejos Estratégicos:',
-    strategicTipsManipulateVotingTitle: 'Manipula los patrones de votación:',
-    strategicTipsManipulateVoting: `
-		 Tus votos sobre propuestas pueden enviar señales a jugadores observadores. Piensa cuidadosamente cuándo apoyar 
-		 u oponer misiones.
-		`,
-    strategicTipsControlInformationFlowTitle: 'Controla el flujo de información:',
-    strategicTipsControlInformationFlow: `
-		 A medida que ganas confianza, es probable que otros jugadores compartan información contigo. Usa esta información 
-		 para beneficiar a tu equipo sin revelar tu fuente.
-		`,
-    strategicTipsPrepareDefenseTitle: 'Prepara una defensa creíble:',
-    strategicTipsPrepareDefense: `
-		 Si la sospecha recae sobre ti, prepárate con explicaciones plausibles para tus acciones que encajen con tu 
-		 personaje construido como un buen jugador.
-		`,
-    conclusion: `
-		 Jugar como {trickster} te permite tejer una red de engaño. Abraza las complejidades de tu rol y puedes cambiar 
-		 el equilibrio a favor del mal, manipulando resultados clave y dejando a las fuerzas del bien perplejas y paranoicas. 
-		 Encuentra el equilibrio entre acciones evidentes y manipulaciones sutiles para dominar el arte del engaño.
 		`,
   },
 };

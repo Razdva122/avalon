@@ -1,123 +1,111 @@
 import type { TLanguage } from '@/i18n/interface';
-import { Dictionary } from '@avalon/types';
+import type { Dictionary } from '@avalon/types';
 
 export const excalibur: { [key in TLanguage]: Dictionary<string> } = {
-  pt: {
-    intro:
-      '{excalibur} introduz uma camada adicional de estratégia e interação entre os jogadores. Ele complementa as regras básicas do jogo e oferece novas possibilidades durante toda a jogabilidade.',
-    title: 'Regras para usar "Excalibur" (Sargento em \'The Resistance\'):',
-    assign: 'Atribuindo "Excalibur":',
-    leaderInstructions:
-      ' Antes do início da missão, o líder da missão seleciona um participante dentre aqueles designados para a missão para receber {excalibur}. O líder deve passar {excalibur} para outra pessoa na missão além de si mesmo.',
-    voting: 'Votação para a Missão:',
-    votingInstructions:
-      ' Todos os jogadores à mesa sabem a quem {excalibur} foi dado, e eles prosseguem para votar a favor ou contra a missão.',
-    usage: 'Usando Excalibur:',
-    usageInstructions:
-      ' Depois que todos os participantes da missão fizeram sua escolha (sucesso ou falha), é a vez do portador de {excalibur}, que tem a oportunidade de mudar o voto submetido de qualquer um dos participantes.',
-    transparency: 'Transparência de Excalibur:',
-    transparencyInstructions:
-      ' Todos à mesa podem ver se {excalibur} foi usado. Se {excalibur} foi utilizado, todos os jogadores sabem sobre quem foi usado, mas apenas o portador de {excalibur} e o indivíduo alvo sabem qual era o voto original. O resto dos jogadores só pode especular com base no resultado da missão.',
-    strategicValue: 'Valor Estratégico:',
-    strategicInstructions:
-      ' Possuir {excalibur} adiciona profundidade estratégica ao jogo, permitindo que um jogador potencialmente altere o curso do jogo influenciando as ações de personagens bons e maus. {excalibur} pode ser um fator crucial nos resultados das votações de missão, especialmente durante momentos críticos no jogo.',
-  },
   en: {
-    intro:
-      '{excalibur} introduces an additional layer of strategy and interaction among players. It complements the base rules of the game and offers new possibilities throughout the gameplay.',
-    title: 'Rules for using "Excalibur" (Sergeant in \'The Resistance\'):',
-    assign: 'Assigning "Excalibur":',
-    leaderInstructions:
-      ' Before the mission starts, the mission leader selects a participant from those assigned to the mission to receive {excalibur}. The leader must pass {excalibur} to someone else on the mission besides themselves.',
-    voting: 'Voting for the Mission:',
-    votingInstructions:
-      ' All players at the table are aware of to whom {excalibur} has been given, and they proceed to vote for or against the mission.',
-    usage: 'Using Excalibur:',
-    usageInstructions:
-      ' After all mission participants have made their choice (success or failure), it is the turn of the {excalibur} holder, who has the opportunity to change the submitted vote of any one participant.',
-    transparency: 'Excalibur Transparency:',
-    transparencyInstructions:
-      ' Everyone at the table can see whether {excalibur} was used. If {excalibur} was deployed, all players know on whom it was used, but only the {excalibur} holder and the targeted individual know what the original vote was. The rest of the players can only speculate based on the mission outcome.',
-    strategicValue: 'Strategic Value:',
-    strategicInstructions:
-      ' Possessing {excalibur} adds strategic depth to the game by allowing one player to potentially alter the course of the game by influencing the actions of both good and evil characters. {excalibur} can be a pivotal factor in the outcomes of mission votes, especially during critical moments in the game.',
+    seoIntro:
+      "{excalibur} changes one submitted mission card: Success becomes Fail, or Fail becomes Success. It does not change a player's role or their vote to approve the team.",
+    seoRule1:
+      'After selecting a team and before the approval vote, the leader gives the sword to a team member other than themselves. Everyone can see who holds it.',
+    seoRule2:
+      "After mission cards have been submitted, the holder can flip another team member's card or skip using the sword. The interface does not allow the holder to target themselves or anyone outside the mission.",
+    seoRule3:
+      "A new holder is chosen for each proposed team. The final mission result uses the cards after the flip and the mission's required number of Fails.",
+    seoLimit1:
+      "Who sees the flipped card? The use and target are public. During the game, the holder and target know the affected card's result; other players do not receive that private value.",
+    seoLimit2:
+      "Does Excalibur guarantee success? No: you pick a player before learning their card. A good player's Success can become Fail, and removing one Fail may leave enough Fails to lose the mission.",
+    seoScenario1:
+      "On a mission needing one Fail, there is exactly one Fail. Flipping that card to Success saves the mission; flipping a different player's Success adds a second Fail.",
+    seoScenario2:
+      'The fourth mission with 7–10 players needs two Fails. If two were submitted and one is flipped to Success, only one remains and the mission succeeds.',
+    seoHeading: 'Excalibur in Avalon: rules, card flips and examples',
   },
   ru: {
-    intro:
-      '{excalibur} вводит дополнительный уровень стратегии и взаимодействия среди игроков. Это дополнение к базовым правилам игры, которое предлагает новые возможности в процессе игры.',
-    title: 'Правила использования "Экскалибура" (Сержант в \'Сопротивлении\'):',
-    assign: 'Назначение "Экскалибура":',
-    leaderInstructions:
-      ' Перед началом миссии лидер выбирает участника из тех, кто назначен на миссию, чтобы передать ему {excalibur}. Лидер обязан передать {excalibur} кому-то еще на миссии, кроме себя.',
-    voting: 'Голосование за миссию:',
-    votingInstructions:
-      ' Все игроки за столом знают, кому передан {excalibur}, и переходят к голосованию за или против миссии.',
-    usage: 'Использование Экскалибура:',
-    usageInstructions:
-      ' После того как все участники миссии сделали свой выбор (успех или провал), наступает очередь держателя {excalibur}, который получает возможность изменить отправленный голос любого из участников.',
-    transparency: 'Прозрачность Экскалибура:',
-    transparencyInstructions:
-      ' Все за столом могут увидеть, был ли использован {excalibur}. Если {excalibur} был применен, все игроки знают, на кого он был использован, но только держатель {excalibur} и целевой человек знают, каким был оригинальный голос. Остальные игроки могут лишь строить догадки на основе исхода миссии.',
-    strategicValue: 'Стратегическая ценность:',
-    strategicInstructions:
-      ' Обладание {excalibur} добавляет стратегическую глубину в игру, позволяя одному игроку потенциально изменить ход игры, влияя на действия как добрых, так и злых персонажей. {excalibur} может быть ключевым фактором в исходах голосований миссий, особенно в критические моменты игры.',
-  },
-  'zh-CN': {
-    intro:
-      '{excalibur} 为玩家之间引入了一个额外的战略和互动层面。它补充了游戏的基本规则，并在游戏过程中提供了新的可能性。',
-    title: '使用“神剑”（反抗组织中的“军士”）的规则：',
-    assign: '分配“神剑”：',
-    leaderInstructions:
-      '任务开始前，任务领导者从被指派执行任务的参与者中选择一位接受 {excalibur}。领导者必须将 {excalibur} 传给任务中的其他人，而不是自己。',
-    voting: '任务投票：',
-    votingInstructions: '桌上所有玩家都知道 {excalibur} 被给予了谁，接着投票决定支持或反对任务。',
-    usage: '使用 神剑：',
-    usageInstructions:
-      '所有任务参与者做出选择（成功还是失败）后，轮到 {excalibur} 持有者，他有机会更改任何一名参与者的提交投票。',
-    transparency: '神剑 的透明度：',
-    transparencyInstructions:
-      '桌上所有人都可以看到 {excalibur} 是否被使用。如果 {excalibur} 被使用，所有玩家知道影响了谁，但只有持有 {excalibur} 的人和被目标的个人知道原始的投票是什么。其他玩家只能根据任务结果来推测。',
-    strategicValue: '战略价值：',
-    strategicInstructions:
-      '拥有 {excalibur} 为游戏增加了战略深度，使一个玩家可以通过影响好和坏角色的行为，潜在地改变游戏进程。{excalibur} 可以成为影响任务投票结果的关键因素，特别是在游戏的重要时刻。',
-  },
-  'zh-TW': {
-    intro:
-      '{excalibur} 為玩家之間引入了一個額外的戰略和互動層面。它補充了遊戲的基本規則，並在遊戲過程中提供了新的可能性。',
-    title: '使用“神劍”（反抗勢力中的“軍士”）的規則：',
-    assign: '分配“神劍”：',
-    leaderInstructions:
-      '任務開始前，任務領導者從被指派執行任務的參與者中選擇一位接受 {excalibur}。領導者必須將 {excalibur} 傳給任務中的其他人，而不是自己。',
-    voting: '任務投票：',
-    votingInstructions: '桌上所有玩家都知道 {excalibur} 被給予了誰，接著投票決定支持或反對任務。',
-    usage: '使用 神劍：',
-    usageInstructions:
-      '所有任務參與者做出選擇（成功還是失敗）後，輪到 {excalibur} 持有者，他有機會更改任何一名參與者的提交投票。',
-    transparency: '神劍 的透明度：',
-    transparencyInstructions:
-      '桌上所有人都可以看到 {excalibur} 是否被使用。如果 {excalibur} 被使用，所有玩家知道影響了誰，但只有持有 {excalibur} 的人和被目標的個人知道原始的投票是什麼。其他玩家只能根據任務結果來推測。',
-    strategicValue: '戰略價值：',
-    strategicInstructions:
-      '擁有 {excalibur} 為遊戲增加了戰略深度，使一個玩家可以通過影響好和壞角色的行為，潛在地改變遊戲進程。{excalibur} 可以成為影響任務投票結果的關鍵因素，特別是在遊戲的重要時刻。',
+    seoIntro:
+      '{excalibur} меняет одну сыгранную карту миссии: успех на провал или провал на успех. Он не меняет роль игрока и голос за одобрение команды.',
+    seoRule1:
+      'После сбора команды, до голосования за неё, лидер передаёт меч участнику миссии, кроме себя. Все видят, кто получил Экскалибур.',
+    seoRule2:
+      'После сдачи карт миссии владелец может изменить карту другого участника команды или пропустить применение. Интерфейс не разрешает выбрать себя или игрока вне миссии.',
+    seoRule3:
+      'Для каждой предложенной команды меч назначается заново. Итог миссии определяется по картам после изменения с учётом требуемого числа провалов.',
+    seoLimit1:
+      'Кто видит изменённую карту? Применение меча и цель публичны. Во время игры владелец и цель знают результат затронутой карты; остальные не получают это тайное значение.',
+    seoLimit2:
+      'Гарантирует ли Экскалибур успех? Нет: цель выбирают до просмотра её карты. Успех доброго игрока может стать провалом, а после удаления одного провала других может хватить для поражения.',
+    seoScenario1:
+      'В миссии, где достаточно одного провала, сыгран ровно один провал. Его замена на успех спасает миссию; замена успеха другого игрока добавляет второй провал.',
+    seoScenario2:
+      'Для четвёртой миссии при 7–10 игроках нужны два провала. Если сыграны два и один заменён успехом, остаётся один провал и миссия проходит.',
+    seoHeading: 'Экскалибур в Авалоне: правила и смена карты миссии',
   },
   es: {
-    intro:
-      '{excalibur} introduce una capa adicional de estrategia e interacción entre los jugadores. Complementa las reglas básicas del juego y ofrece nuevas posibilidades a lo largo de la partida.',
-    title: 'Reglas para usar "Excalibur" (Sargento en \'La Resistencia\'):',
-    assign: 'Asignación de "Excalibur":',
-    leaderInstructions:
-      ' Antes de que comience la misión, el líder de la misión selecciona a un participante de los asignados a la misión para recibir {excalibur}. El líder debe pasar {excalibur} a alguien más en la misión además de ellos mismos.',
-    voting: 'Votación para la Misión:',
-    votingInstructions:
-      ' Todos los jugadores en la mesa saben a quién se le ha dado {excalibur} y proceden a votar a favor o en contra de la misión.',
-    usage: 'Uso de Excalibur:',
-    usageInstructions:
-      ' Después de que todos los participantes de la misión hayan hecho su elección (éxito o fracaso), es el turno del poseedor de {excalibur}, quien tiene la oportunidad de cambiar el voto presentado de cualquier participante.',
-    transparency: 'Transparencia de Excalibur:',
-    transparencyInstructions:
-      ' Todos en la mesa pueden ver si {excalibur} fue utilizado. Si {excalibur} fue desplegado, todos los jugadores saben sobre quién se utilizó, pero solo el poseedor de {excalibur} y la persona objetivo saben cuál fue el voto original. El resto de los jugadores solo puede especular basándose en el resultado de la misión.',
-    strategicValue: 'Valor Estratégico:',
-    strategicInstructions:
-      ' Poseer {excalibur} agrega profundidad estratégica al juego al permitir que un jugador potencialmente altere el curso del juego al influir en las acciones de personajes tanto buenos como malos. {excalibur} puede ser un factor decisivo en los resultados de las votaciones de misiones, especialmente durante momentos críticos en el juego.',
+    seoIntro:
+      '{excalibur} invierte una carta de misión jugada: Éxito pasa a Fracaso y viceversa. No cambia el personaje ni el voto para aprobar el equipo.',
+    seoRule1:
+      'Tras elegir el equipo y antes de votarlo, el líder entrega la espada a otro miembro de la misión. Todos ven quién la recibe.',
+    seoRule2:
+      'Después de entregar las cartas de misión, el portador puede cambiar la de otro miembro del equipo o no usar la espada. La interfaz impide elegirse a sí mismo o elegir a alguien fuera de la misión.',
+    seoRule3:
+      'Se elige un portador para cada equipo propuesto. El resultado final usa las cartas tras el cambio y el número de Fracasos necesario para esa misión.',
+    seoLimit1:
+      '¿Quién ve la carta cambiada? El uso y el objetivo son públicos. Durante la partida, el portador y el objetivo conocen el resultado de la carta afectada; los demás no reciben ese valor privado.',
+    seoLimit2:
+      '¿Excalibur garantiza el éxito? No: eliges a un jugador antes de conocer su carta. El Éxito de un jugador bueno puede convertirse en Fracaso, y quitar un Fracaso puede no ser suficiente.',
+    seoScenario1:
+      'Una misión que necesita un Fracaso contiene exactamente uno. Cambiarlo a Éxito salva la misión; cambiar el Éxito de otra persona añade un segundo Fracaso.',
+    seoScenario2:
+      'La cuarta misión con 7–10 jugadores necesita dos Fracasos. Si se jugaron dos y uno pasa a Éxito, queda uno y la misión tiene éxito.',
+    seoHeading: 'Excalibur en Avalon: reglas y cambio de carta de misión',
+  },
+  pt: {
+    seoIntro:
+      '{excalibur} inverte uma carta de missão jogada: Sucesso vira Fracasso e vice-versa. Não altera o personagem nem o voto de aprovação da equipe.',
+    seoRule1:
+      'Após escolher a equipe e antes da votação, o líder entrega a espada a outro participante da missão. Todos veem quem a recebeu.',
+    seoRule2:
+      'Depois que as cartas de missão são entregues, o portador pode inverter a carta de outro participante ou não usar a espada. A interface não permite escolher a si mesmo nem alguém fora da missão.',
+    seoRule3:
+      'Um portador é escolhido para cada equipe proposta. O resultado final considera as cartas após a troca e o número de Fracassos necessário para a missão.',
+    seoLimit1:
+      'Quem vê a carta alterada? O uso e o alvo são públicos. Durante a partida, o portador e o alvo conhecem o resultado da carta afetada; os demais não recebem esse valor privado.',
+    seoLimit2:
+      'Excalibur garante sucesso? Não: o alvo é escolhido antes de conhecer sua carta. O Sucesso de alguém do bem pode virar Fracasso, e remover um Fracasso pode não bastar.',
+    seoScenario1:
+      'Uma missão que exige um Fracasso tem exatamente um. Inverter essa carta para Sucesso salva a missão; inverter o Sucesso de outra pessoa acrescenta um segundo Fracasso.',
+    seoScenario2:
+      'A quarta missão com 7–10 jogadores exige dois Fracassos. Se dois foram jogados e um vira Sucesso, resta apenas um e a missão é bem-sucedida.',
+    seoHeading: 'Excalibur em Avalon: regras e troca da carta de missão',
+  },
+  'zh-CN': {
+    seoIntro:
+      '{excalibur}会翻转一张已提交的任务牌：成功变失败，失败变成功。它不会改变角色，也不会改变赞成或反对队伍的投票。',
+    seoRule1: '队伍选定后、表决前，队长把剑交给队内另一位玩家，不能给自己。所有人都知道谁持有剑。',
+    seoRule2: '任务牌全部提交后，持有者可翻转队内另一人的牌，也可放弃使用。界面不允许选择自己或不在本次任务中的玩家。',
+    seoRule3: '每次提出队伍都要重新指定持有者。最终任务结果根据翻转后的牌，以及该任务所需的失败牌数量计算。',
+    seoLimit1:
+      '谁能看到被翻转的牌？是否用剑及目标是公开的。游戏中持有者与目标知道该牌的结果，其他玩家不会获得这个私下信息。',
+    seoLimit2:
+      '神剑一定能救任务吗？不能：先选目标，再得知其牌。好人的成功可能变成失败；即使减少一张失败牌，剩余失败牌也可能足以让任务失败。',
+    seoScenario1:
+      '某任务只需一张失败牌就会失败，实际恰有一张。把它翻成成功可救任务；若翻了另一个人的成功牌，反而会增加第二张失败牌。',
+    seoScenario2: '7–10人局的第4次任务需要两张失败牌。若原本有两张，其中一张变为成功后只剩一张，任务成功。',
+    seoHeading: '阿瓦隆王者之剑 Excalibur：翻转任务牌规则',
+  },
+  'zh-TW': {
+    seoIntro:
+      '{excalibur}會翻轉一張已提交的任務牌：成功變失敗，失敗變成功。它不會改變角色，也不會改變贊成或反對隊伍的投票。',
+    seoRule1: '隊伍選定後、表決前，隊長把劍交給隊內另一位玩家，不能給自己。所有人都知道誰持有劍。',
+    seoRule2: '任務牌全部提交後，持有者可翻轉隊內另一人的牌，也可放棄使用。介面不允許選擇自己或不在本次任務中的玩家。',
+    seoRule3: '每次提出隊伍都要重新指定持有者。最終任務結果根據翻轉後的牌，以及該任務所需的失敗牌數量計算。',
+    seoLimit1:
+      '誰能看到被翻轉的牌？是否用劍及目標是公開的。遊戲中持有者與目標知道該牌的結果，其他玩家不會獲得這個私下資訊。',
+    seoLimit2:
+      '神劍一定能救任務嗎？不能：先選目標，再得知其牌。好人的成功可能變成失敗；即使減少一張失敗牌，剩餘失敗牌也可能足以讓任務失敗。',
+    seoScenario1:
+      '某任務只需一張失敗牌就會失敗，實際恰有一張。把它翻成成功可救任務；若翻了另一個人的成功牌，反而會增加第二張失敗牌。',
+    seoScenario2: '7–10人局的第4次任務需要兩張失敗牌。若原本有兩張，其中一張變為成功後只剩一張，任務成功。',
+    seoHeading: '阿瓦隆王者之劍 Excalibur：翻轉任務牌規則',
   },
 };

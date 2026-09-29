@@ -3,16 +3,17 @@ import { Dictionary } from '@avalon/types';
 
 export const servant: { [key in TLanguage]: Dictionary<string> } = {
   en: {
-    generalTipsTitle: 'General Tips:',
-    tipRoleTitle: 'Role:',
-    tipRoleText:
-      "You belong to the 'Good' team and your task is to assist in successfully completing three out of five missions.",
-    tipKnowledgeTitle: 'Knowledge:',
-    tipKnowledgeText:
-      "At the game's start, you have no information about which players are on your side and which are against you.",
-    tipObjectiveTitle: 'Objective:',
-    tipObjectiveText:
-      "Your ultimate goal is to ensure the victory of 'Good' by helping to choose trustworthy participants for missions and preventing the 'Evil' from successfully completing missions.",
+    seoHeading: 'Loyal Servant of Arthur in Avalon: Rules & Strategy',
+    seoTeam:
+      'Good. The {servant}, or Loyal Servant of Arthur, helps good complete three successful missions and survive any enabled assassination.',
+    seoAbility:
+      'A Servant has no secret information about other roles at setup. Use team proposals, votes and mission results to identify trustworthy players.',
+    seoLimit:
+      'Can a Loyal Servant play Fail? No. Good players must play Success. A successful mission still does not prove everyone was good: most evil roles may also choose Success.',
+    seoScenario1:
+      'When a mission fails, compare its members with earlier teams. Avoid claiming certainty about which player failed without enough evidence.',
+    seoScenario2:
+      'If someone seems unusually well informed, consider whether publicly calling them {merlin} would help evil. Discuss the team choice instead.',
     strategicTipsTitle: 'Strategic Tips:',
     tipActiveObservationTitle: 'Active Observation:',
     tipActiveObservationText:
@@ -23,27 +24,19 @@ export const servant: { [key in TLanguage]: Dictionary<string> } = {
     tipVotingStrategyTitle: 'Voting Strategy:',
     tipVotingStrategyText:
       "Use your vote as a tool to express trust or distrust towards a team's composition. Voting against a team proposal can stimulate further discussion and help reveal suspicious patterns.",
-    tipBalancedActivityTitle: 'Balanced Activity:',
-    tipBalancedActivityText:
-      "Find a balance between participating actively in discussions and observing. Being too active can make you a target for 'Evil', whereas being too passive can allow 'Evil' to dictate the game's flow.",
-    tipFormAlliancesTitle: 'Form Alliances:',
-    tipFormAlliancesText:
-      'Gradually form alliances with players you are confident are allies. Mutual support and information exchange are key to identifying and opposing evil characters.',
-    tipUseExclusionsTitle: 'Use Exclusions:',
-    tipUseExclusionsText:
-      'Try to build your reasoning on excluding unreliable players from missions, progressively narrowing down the circle of suspects.',
-    conclusionText:
-      "Playing as a {servant}, remember the importance of teamwork and collective strategy. Your job is not just to help pick the right teams for missions but also to protect the reputation of 'Good' players, easing the path towards victory.",
   },
   ru: {
-    generalTipsTitle: 'Общие советы:',
-    tipRoleTitle: 'Роль:',
-    tipRoleText: 'Вы принадлежите к команде «Добрых», и ваша задача — помогать успешно выполнить три из пяти миссий.',
-    tipKnowledgeTitle: 'Знания:',
-    tipKnowledgeText: 'В начале игры у вас нет информации о том, кто ваш союзник, а кто против.',
-    tipObjectiveTitle: 'Цель:',
-    tipObjectiveText:
-      'Ваша конечная цель — обеспечить победу «Добрых», помогая выбирать надежных участников миссий и препятствуя успешному выполнению миссий командой «Злодеев».',
+    seoHeading: 'Сервант в Авалоне: верный слуга Артура и его правила',
+    seoTeam:
+      'Добро. {servant}, или верный слуга Артура, помогает выполнить три миссии и пережить включённое в состав финальное убийство.',
+    seoAbility:
+      'Сервант не получает тайной информации о чужих ролях на старте. Ищите надёжных игроков по составам команд, голосованиям и результатам миссий.',
+    seoLimit:
+      'Может ли верный слуга Артура дать провал? Нет, добрые обязаны дать успех. Но успешная миссия не доказывает доброту всей команды: большинство злых тоже могут дать успех.',
+    seoScenario1:
+      'После провала сравните участников с предыдущими составами. Не выдавайте догадку о виновнике за достоверное знание.',
+    seoScenario2:
+      'Если кто-то необычно хорошо осведомлён, подумайте, поможет ли злу публичное предположение, что это {merlin}. Обсуждайте предложенную команду.',
     strategicTipsTitle: 'Стратегические советы:',
     tipActiveObservationTitle: 'Активное наблюдение:',
     tipActiveObservationText:
@@ -54,26 +47,14 @@ export const servant: { [key in TLanguage]: Dictionary<string> } = {
     tipVotingStrategyTitle: 'Голосовая стратегия:',
     tipVotingStrategyText:
       'Используйте свой голос как инструмент для выражения доверия или недоверия к составу команды. Голосование против предложения по команде может стимулировать дальнейшее обсуждение и помочь выявить подозрительные схемы.',
-    tipBalancedActivityTitle: 'Сбалансированная активность:',
-    tipBalancedActivityText:
-      'Найдите баланс между активным участием в обсуждениях и наблюдением. Чрезмерная активность может сделать вас мишенью для «Злодеев», тогда как чрезмерная пассивность позволит «Злодеям» диктовать ход игры.',
-    tipFormAlliancesTitle: 'Формирование альянсов:',
-    tipFormAlliancesText:
-      'Постепенно формируйте альянсы с игроками, в отношении которых вы уверены, что они ваши союзники. Взаимная поддержка и обмен информацией — ключ к выявлению и противодействию злодейским персонажам.',
-    tipUseExclusionsTitle: 'Использование исключений:',
-    tipUseExclusionsText:
-      'Старайтесь строить свои рассуждения на исключении ненадёжных игроков из участия в миссиях, постепенно сужая круг подозреваемых.',
-    conclusionText:
-      'Играя за {servant}, помните о важности командной работы и коллективной стратегии. Ваша работа — не только помогать выбирать правильные команды для миссий, но и защищать репутацию игроков «Добрых», облегчая путь к победе.',
   },
   'zh-CN': {
-    generalTipsTitle: '基本提示:',
-    tipRoleTitle: '角色:',
-    tipRoleText: '你属于"善良"阵营,你的任务是协助成功完成五次任务中的三次。',
-    tipKnowledgeTitle: '信息:',
-    tipKnowledgeText: '在游戏开始时,你不清楚哪些玩家是你的盟友,哪些玩家处于对立面。',
-    tipObjectiveTitle: '目标:',
-    tipObjectiveText: '你的最终目标是通过协助挑选可信赖的任务参与者并阻止"邪恶"阵营成功完成任务,从而确保"善良"的胜利。',
+    seoHeading: '阿瓦隆仆人：亚瑟王忠臣的规则与策略',
+    seoTeam: '好人。{servant}是亚瑟王的忠实仆人，帮助完成三次成功任务，并让好人躲过本局启用的刺杀。',
+    seoAbility: '仆人开局不获得其他角色的秘密信息。根据队伍提案、投票和任务结果寻找可信玩家。',
+    seoLimit: '忠臣能出失败吗？不能，好人必须出成功。但任务成功不证明全员好人，因为大多数坏人也能选择成功。',
+    seoScenario1: '任务失败后，将队员与之前的队伍进行比较。证据不足时，不要声称已确定是谁出的失败。',
+    seoScenario2: '如果某人显得特别知情，公开说他是{merlin}可能帮助坏人。讨论队伍选择本身，而不是揭露身份。',
     strategicTipsTitle: '策略提示:',
     tipActiveObservationTitle: '积极观察:',
     tipActiveObservationText: '密切关注其他玩家的行为和举止。观察他们如何投票或对团队提议发表评论,可以提供重要线索。',
@@ -83,24 +64,14 @@ export const servant: { [key in TLanguage]: Dictionary<string> } = {
     tipVotingStrategyTitle: '投票策略:',
     tipVotingStrategyText:
       '利用你的投票来表达对团队组成的信任或不信任。反对团队提议的投票可能会引发更多讨论,并帮助揭露可疑迹象。',
-    tipBalancedActivityTitle: '平衡参与:',
-    tipBalancedActivityText:
-      '在积极参与讨论和保持观察之间找到平衡。过于活跃可能让你成为"邪恶"的目标,而过于被动则可能让"邪恶"主导游戏进程。',
-    tipFormAlliancesTitle: '结盟:',
-    tipFormAlliancesText: '逐步与那些你确信是盟友的玩家结成联盟。互相支持和信息交流是识别并对抗邪恶角色的关键。',
-    tipUseExclusionsTitle: '利用排除法:',
-    tipUseExclusionsText: '尝试通过排除不可靠的玩家来构建你的推理,逐步缩小嫌疑人的范围。',
-    conclusionText:
-      '作为{servant},请记住团队合作和集体策略的重要性。你的任务不仅仅是协助挑选适当的任务团队,还要维护"善良"玩家的声誉,为胜利铺平道路。',
   },
   'zh-TW': {
-    generalTipsTitle: '基本提示:',
-    tipRoleTitle: '角色:',
-    tipRoleText: '你屬於"善良"陣營,你的任務是協助成功完成五次任務中的三次。',
-    tipKnowledgeTitle: '資訊:',
-    tipKnowledgeText: '在遊戲開始時,你並不清楚哪些玩家站在你這邊,哪些玩家是對立的。',
-    tipObjectiveTitle: '目標:',
-    tipObjectiveText: '你的最終目標是通過協助挑選可信賴的任務成員並阻止"邪惡"陣營成功完成任務,以確保"善良"的勝利。',
+    seoHeading: '阿瓦隆僕人：亞瑟王忠臣的規則與策略',
+    seoTeam: '好人。{servant}是亞瑟王的忠實僕人，幫助完成三次成功任務，並讓好人躲過本局啟用的刺殺。',
+    seoAbility: '僕人開局不獲得其他角色的秘密資訊。根據隊伍提案、投票和任務結果尋找可信玩家。',
+    seoLimit: '忠臣能出失敗嗎？不能，好人必須出成功。但任務成功不證明全員好人，因為大多數壞人也能選擇成功。',
+    seoScenario1: '任務失敗後，將隊員與之前的隊伍進行比較。證據不足時，不要聲稱已確定是誰出的失敗。',
+    seoScenario2: '如果某人顯得特別知情，公開說他是{merlin}可能幫助壞人。討論隊伍選擇本身，而不是揭露身分。',
     strategicTipsTitle: '策略提示:',
     tipActiveObservationTitle: '積極觀察:',
     tipActiveObservationText: '密切關注其他玩家的行動與舉止。玩家如何投票或對隊伍建議發表評論可能會透露關鍵線索。',
@@ -110,27 +81,19 @@ export const servant: { [key in TLanguage]: Dictionary<string> } = {
     tipVotingStrategyTitle: '投票策略:',
     tipVotingStrategyText:
       '利用你的投票來表達對隊伍組成的信任或不信任。對隊伍建議投反對票能激發更多討論,並幫助揭示可疑情況。',
-    tipBalancedActivityTitle: '平衡參與:',
-    tipBalancedActivityText:
-      '在積極發言與靜觀其變之間取得平衡。過於活躍可能使你成為"邪惡"的目標,而過度被動則可能讓"邪惡"主導遊戲進程。',
-    tipFormAlliancesTitle: '結盟:',
-    tipFormAlliancesText: '逐步與你確信是盟友的玩家結成聯盟。互相支持及資訊共享是識別並對抗邪惡角色的關鍵。',
-    tipUseExclusionsTitle: '利用排除法:',
-    tipUseExclusionsText: '試著透過排除不可靠的玩家來構建你的推理,逐步縮小嫌疑人的範圍。',
-    conclusionText:
-      '作為{servant},請記住團隊合作和集體策略的重要性。你的任務不僅在於協助挑選適合的任務隊伍,還要保護"善良"玩家的聲譽,為勝利鋪平道路。',
   },
   es: {
-    generalTipsTitle: 'Consejos Generales:',
-    tipRoleTitle: 'Rol:',
-    tipRoleText:
-      "Perteneces al equipo de los 'Buenos', y tu tarea es ayudar a completar con éxito tres de las cinco misiones.",
-    tipKnowledgeTitle: 'Conocimiento:',
-    tipKnowledgeText:
-      'Al inicio del juego, no tienes información sobre qué jugadores están de tu lado y cuáles están en contra.',
-    tipObjectiveTitle: 'Objetivo:',
-    tipObjectiveText:
-      "Tu objetivo final es asegurar la victoria de los 'Buenos' ayudando a elegir participantes confiables para las misiones y evitando que los 'Malvados' completen sus misiones con éxito.",
+    seoHeading: 'Siervo Leal de Arturo en Avalon: reglas y estrategia',
+    seoTeam:
+      'Bien. El {servant}, o Siervo Leal de Arturo, ayuda a completar tres misiones y superar cualquier asesinato habilitado.',
+    seoAbility:
+      'No recibe información secreta sobre otros roles al inicio. Usa propuestas de equipos, votos y resultados para encontrar jugadores fiables.',
+    seoLimit:
+      '¿Puede jugar Fracaso? No: los buenos deben jugar Éxito. Una misión exitosa no prueba que todos sean buenos, porque la mayoría de los malvados también pueden jugar Éxito.',
+    seoScenario1:
+      'Después de un Fracaso, compara el equipo con los anteriores. No presentes como certeza una acusación sin pruebas suficientes.',
+    seoScenario2:
+      'Si alguien parece tener mucha información, piensa si llamarlo {merlin} públicamente ayudaría al mal. Habla del equipo propuesto.',
     strategicTipsTitle: 'Consejos Estratégicos:',
     tipActiveObservationTitle: 'Observación Activa:',
     tipActiveObservationText:
@@ -141,29 +104,19 @@ export const servant: { [key in TLanguage]: Dictionary<string> } = {
     tipVotingStrategyTitle: 'Estrategia de Votación:',
     tipVotingStrategyText:
       'Utiliza tu voto como herramienta para expresar confianza o desconfianza en la composición del equipo. Votar en contra de una propuesta puede estimular más discusión y ayudar a revelar comportamientos sospechosos.',
-    tipBalancedActivityTitle: 'Actividad Equilibrada:',
-    tipBalancedActivityText:
-      "Encuentra un equilibrio entre participar activamente en las discusiones y observar. Ser demasiado activo puede convertirte en blanco de los 'Malvados', mientras que ser pasivo podría permitir que ellos dicten el curso del juego.",
-    tipFormAlliancesTitle: 'Forma Alianzas:',
-    tipFormAlliancesText:
-      'Gradualmente, forma alianzas con jugadores en los que confíes y consideres aliados. El apoyo mutuo y el intercambio de información son clave para identificar y oponerse a los personajes malvados.',
-    tipUseExclusionsTitle: 'Usa Exclusiones:',
-    tipUseExclusionsText:
-      'Intenta construir tu razonamiento excluyendo a los jugadores poco confiables de las misiones, reduciendo progresivamente el círculo de sospechosos.',
-    conclusionText:
-      "Como {servant}, recuerda la importancia del trabajo en equipo y de una estrategia colectiva. Tu tarea no es solo ayudar a elegir los equipos adecuados para las misiones, sino también proteger la reputación de los 'Buenos' y allanar el camino hacia la victoria.",
   },
   pt: {
-    generalTipsTitle: 'Dicas Gerais:',
-    tipRoleTitle: 'Função:',
-    tipRoleText:
-      "Você pertence à equipe do 'Bem' e sua tarefa é ajudar a completar com sucesso três das cinco missões.",
-    tipKnowledgeTitle: 'Conhecimento:',
-    tipKnowledgeText:
-      'No início do jogo, você não tem informações sobre quais jogadores estão do seu lado e quais estão contra você.',
-    tipObjectiveTitle: 'Objetivo:',
-    tipObjectiveText:
-      "Seu objetivo final é garantir a vitória da equipe do 'Bem', ajudando a escolher participantes confiáveis para as missões e impedindo que a equipe do 'Mal' complete as missões com sucesso.",
+    seoHeading: 'Servo Leal de Arthur em Avalon: regras e estratégia',
+    seoTeam:
+      'Bem. O {servant}, ou Servo Leal de Arthur, ajuda a completar três missões e sobreviver a qualquer assassinato habilitado.',
+    seoAbility:
+      'O Servo não recebe informações secretas sobre outros papéis no início. Use propostas de equipes, votos e resultados para encontrar jogadores confiáveis.',
+    seoLimit:
+      'Pode jogar Falha? Não: os bons devem jogar Sucesso. Uma missão bem-sucedida não prova que todos sejam bons, pois a maioria dos maus também pode jogar Sucesso.',
+    seoScenario1:
+      'Após uma Falha, compare a equipe com as anteriores. Não apresente como certeza uma acusação sem evidência suficiente.',
+    seoScenario2:
+      'Se alguém parecer muito bem informado, pense se chamá-lo de {merlin} em público ajudaria o mal. Discuta a equipe proposta.',
     strategicTipsTitle: 'Dicas Estratégicas:',
     tipActiveObservationTitle: 'Observação Ativa:',
     tipActiveObservationText:
@@ -174,16 +127,5 @@ export const servant: { [key in TLanguage]: Dictionary<string> } = {
     tipVotingStrategyTitle: 'Estratégia de Votação:',
     tipVotingStrategyText:
       'Use seu voto como uma ferramenta para expressar confiança ou desconfiança em relação à composição de uma equipe. Votar contra uma proposta de equipe pode estimular mais discussão e ajudar a revelar padrões suspeitos.',
-    tipBalancedActivityTitle: 'Atividade Equilibrada:',
-    tipBalancedActivityText:
-      "Encontre um equilíbrio entre participar ativamente das discussões e observar. Ser muito ativo pode torná-lo um alvo para o 'Mal', enquanto ser muito passivo pode permitir que o 'Mal' dite o fluxo do jogo.",
-    tipFormAlliancesTitle: 'Forme Alianças:',
-    tipFormAlliancesText:
-      'Forme gradualmente alianças com jogadores que você tem certeza que são aliados. O apoio mútuo e a troca de informações são fundamentais para identificar e se opor aos personagens do mal.',
-    tipUseExclusionsTitle: 'Use Exclusões:',
-    tipUseExclusionsText:
-      'Tente construir seu raciocínio excluindo jogadores não confiáveis das missões, reduzindo progressivamente o círculo de suspeitos.',
-    conclusionText:
-      "Jogando como {servant}, lembre-se da importância do trabalho em equipe e da estratégia coletiva. Seu trabalho não é apenas ajudar a escolher as equipes certas para as missões, mas também proteger a reputação dos jogadores do 'Bem', facilitando o caminho para a vitória.",
   },
 };

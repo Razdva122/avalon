@@ -1,19 +1,11 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
     <h1>
       <div class="evil-loyalty-icon"></div>
-      {{ $t('roles.witch') }} {{ $t('roles.role') }}
+      {{ $t('witch.seoHeading') }}
     </h1>
-    <SchemaImage
-      class="preview-image"
-      :src="calculateRoleUrl('witch')"
-      :alt="$t('roles.witch')"
-      :description="$t('roles.witch')"
-    />
-
-    <h2>{{ $t('witch.generalInformation') }}</h2>
-    <p><LocalizedTextWrapper keypath="witch.intro" /></p>
+    <WikiRoleGuide role="witch" />
 
     <TopRolePlayer role="witch" class="my-4" />
 
@@ -31,29 +23,7 @@
         <strong>{{ $t('witch.utilizePowerTitle') }}</strong>
         {{ $t('witch.utilizePowerText') }}
       </li>
-      <li>
-        <strong>{{ $t('witch.maintainDisguiseTitle') }}</strong>
-        {{ $t('witch.maintainDisguiseText') }}
-      </li>
     </ul>
-
-    <h2>{{ $t('witch.strategicTipsTitle') }}</h2>
-    <ul>
-      <li>
-        <strong>{{ $t('witch.createUncertaintyTitle') }}</strong>
-        {{ $t('witch.createUncertaintyText') }}
-      </li>
-      <li>
-        <strong>{{ $t('witch.influenceGameplayTitle') }}</strong>
-        {{ $t('witch.influenceGameplayText') }}
-      </li>
-      <li>
-        <strong>{{ $t('witch.hideEarlyMissionsTitle') }}</strong>
-        {{ $t('witch.hideEarlyMissionsText') }}
-      </li>
-    </ul>
-
-    <p><LocalizedTextWrapper keypath="witch.conclusion" /></p>
     <WikiPlayCta />
   </div>
 </template>
@@ -62,29 +32,22 @@
 import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import PreviewLink from '@/components/view/information/PreviewLink.vue';
-import SchemaImage from '@/components/view/SchemaImage.vue';
-import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
+import WikiRoleGuide from '@/components/view/information/WikiRoleGuide.vue';
 import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
-import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiPlayCta,
     WikiBreadCrumbs,
-    PreviewLink,
-    SchemaImage,
-    LocalizedTextWrapper,
+    WikiRoleGuide,
     TopRolePlayer,
-  },
-  methods: {
-    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 h2 {
   margin-top: 20px;

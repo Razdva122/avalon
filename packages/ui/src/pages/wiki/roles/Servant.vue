@@ -1,33 +1,12 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
     <h1>
       <div class="good-loyalty-icon"></div>
-      {{ $t('roles.servant') }} {{ $t('roles.role') }}
+      {{ $t('servant.seoHeading') }}
     </h1>
 
-    <SchemaImage
-      class="preview-image"
-      :src="calculateRoleUrl('servant')"
-      :alt="$t('roles.servant')"
-      :description="$t('roles.servant')"
-    />
-
-    <h2>{{ $t('servant.generalTipsTitle') }}</h2>
-    <ul>
-      <li>
-        <strong>{{ $t('servant.tipRoleTitle') }}</strong>
-        {{ $t('servant.tipRoleText') }}
-      </li>
-      <li>
-        <strong>{{ $t('servant.tipKnowledgeTitle') }}</strong>
-        {{ $t('servant.tipKnowledgeText') }}
-      </li>
-      <li>
-        <strong>{{ $t('servant.tipObjectiveTitle') }}</strong>
-        {{ $t('servant.tipObjectiveText') }}
-      </li>
-    </ul>
+    <WikiRoleGuide role="servant" />
 
     <TopRolePlayer role="servant" class="my-4" />
 
@@ -45,21 +24,7 @@
         <strong>{{ $t('servant.tipVotingStrategyTitle') }}</strong>
         {{ $t('servant.tipVotingStrategyText') }}
       </li>
-      <li>
-        <strong>{{ $t('servant.tipBalancedActivityTitle') }}</strong>
-        {{ $t('servant.tipBalancedActivityText') }}
-      </li>
-      <li>
-        <strong>{{ $t('servant.tipFormAlliancesTitle') }}</strong>
-        {{ $t('servant.tipFormAlliancesText') }}
-      </li>
-      <li>
-        <strong>{{ $t('servant.tipUseExclusionsTitle') }}</strong>
-        {{ $t('servant.tipUseExclusionsText') }}
-      </li>
     </ul>
-
-    <p><LocalizedTextWrapper keypath="servant.conclusionText" /></p>
     <WikiPlayCta />
   </div>
 </template>
@@ -68,29 +33,22 @@
 import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import PreviewLink from '@/components/view/information/PreviewLink.vue';
-import SchemaImage from '@/components/view/SchemaImage.vue';
-import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
+import WikiRoleGuide from '@/components/view/information/WikiRoleGuide.vue';
 import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
-import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiPlayCta,
     WikiBreadCrumbs,
-    PreviewLink,
-    SchemaImage,
-    LocalizedTextWrapper,
+    WikiRoleGuide,
     TopRolePlayer,
-  },
-  methods: {
-    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 h2 {
   margin-top: 20px;

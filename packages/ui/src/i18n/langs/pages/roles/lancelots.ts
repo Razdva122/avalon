@@ -3,22 +3,16 @@ import { Dictionary } from '@avalon/types';
 
 export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
   en: {
-    generalInformationTitle: 'General Information:',
-    introduction:
-      'Lancelots presents a dynamic challenge in the realm of Avalon. As two players starting on opposite sides, the {goodLancelot} aligns with the forces of good, while the {evilLancelot} conspires with the minions of Mordred.',
-    loyaltyTides:
-      "However, the tides of loyalty may turn as the game progresses. {merlin} can see the {evilLancelot} among the ranks of Mordred's followers, and the minions of Mordred recognize the presence of an {evilLancelot}.",
-    goodAndEvilRecognition: 'On the other hand, the {evilLancelot} does not know his allies.',
-    guinevereKnowledge:
-      'If {guinevere} is present in the game, she knows both Lancelots but does not know their loyalty.',
-    gameplayKeyConcept:
-      "Key to the Lancelots' gameplay is the deck of loyalty change. After the second mission, a card is drawn.",
-    loyaltyChangeMechanism:
-      "If a <span class='material-icons icon-swap'>swap_horiz</span><b>loyalty change</b> card is revealed, the Lancelots switch allegiances along with all corresponding changes (such as the ability to fail a mission, or being subject to the Lady of Lake card).",
-    deckComposition:
-      "Whereas, if the card drawn is <span class='material-icons icon-swap'>close</span><b>blank</b>, no change occurs. The deck contains <b>five cards</b>, of which two prompt <span class='material-icons icon-swap'>swap_horiz</span><b>loyalty change</b>, and three are <span class='material-icons icon-swap'>close</span><b>blank</b>.",
-    possibleResults:
-      'Every Lancelot has a restriction on which outcome they can choose during the mission: {evilLancelot} may only fail, while {goodLancelot} may only success.',
+    seoHeading: 'Lancelot in Avalon: Switching Sides & Mission Rules',
+    seoTeam: 'One starts good and one evil. Each wins with their current side; a switch changes both allegiances.',
+    seoAbility:
+      'Here, a card is drawn before missions 3, 4 and 5 if play reaches them. The shuffled deck has two Switch cards and three blanks. Switch changes both sides; blank changes neither.',
+    seoLimit:
+      'Can Evil Lancelot play Success? On this platform, no: the currently evil Lancelot must play Fail and the currently good one must play Success. Neither learns the other’s identity or evil teammates at setup. Board-game Lancelot variants differ.',
+    seoScenario1:
+      'A Switch before mission 3 makes the previously good Lancelot evil, so that player must now play Fail. Earlier Success cards do not confirm current loyalty.',
+    seoScenario2:
+      '{guinevere} knows both Lancelots without their sides. {merlin} sees the starting evil Lancelot only as evil; that marker does not update after a switch. Players shown the specific Lancelot role, including {merlinPure} and the other evil players who see it, receive updated allegiance information.',
     generalTipsTitle: 'General Tips:',
     embraceUnpredictabilityTitle: 'Embrace unpredictability:',
     embraceUnpredictabilityDescription:
@@ -29,39 +23,19 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
     observeAndAdaptTitle: 'Observe and adapt:',
     observeAndAdaptDescription:
       "Both Lancelots must closely monitor the game's narrative to effectively realign their strategies following any change in loyalty.",
-    subtlePlaysTitle: 'Subtle plays:',
-    subtlePlaysDescription:
-      'Whether undermining a quest subtly as evil or bolstering one as good, the art of disguise is crucial. Go unnoticed in your actions to preserve your new allegiance.',
-    strategicTipsTitle: 'Strategic Tips:',
-    merlinsPerceptionTitle: "Merlin's perception:",
-    merlinsPerceptionDescription:
-      'If you are the {evilLancelot} and become good, remember that {merlin} still perceives you as part of evil. Use this to your advantage.',
-    balanceTheScalesTitle: 'Balance the scales:',
-    balanceTheScalesDescription:
-      'Play an active role in votes and quest propositions to exert influence subtly, tipping the scales in favor of your current side.',
-    maintainYourCoverTitle: 'Maintain your cover:',
-    maintainYourCoverDescription:
-      'If you switch to the evil side, be mindful not to abruptly change your behavior. Gradual shifts are less conspicuous.',
-    servingAsLancelotDescription:
-      'Serving as a Lancelot, you hold a powerful dual identity that can dramatically shift the course of the game in Avalon. With the potential for changing loyalties, your role invites a strategic depth unlike any other. Tread cautiously, for the balance of good and evil rests upon your armored shoulders.',
   },
   ru: {
-    generalInformationTitle: 'Общая информация:',
-    introduction:
-      'Ланселоты представляют собой динамичную роль в мире Авалона. Будучи двумя игроками, начинающими на противоположных сторонах, {goodLancelot} присоединяется к силам света, в то время как {evilLancelot} к силам тьмы.',
-    loyaltyTides:
-      'Однако лояльность может измениться по мере развития игры. {merlin} может видеть {evilLancelot} среди последователей Мордреда, и слуги Мордреда знают кто среди них является {evilLancelot}.',
-    goodAndEvilRecognition: 'С другой стороны, {evilLancelot} не знает своих союзников.',
-    guinevereKnowledge:
-      'Если {guinevere} присутствует в игре, она знает обоих Ланселотов, но не знает, кому они преданы.',
-    gameplayKeyConcept:
-      'Ключевым элементом игры Ланселотов является колода смены лояльности. После второй миссии вытягивается карта.',
-    loyaltyChangeMechanism:
-      "Если открывается карта <span class='material-icons icon-swap'>swap_horiz</span><b>смена лояльности</b>, Ланселоты меняют стороны со всеми соответствующими изменениями (например, возможность провалить миссию или быть подверженным влиянию карты Леди Озера).",
-    deckComposition:
-      "Если вытянута <span class='material-icons icon-swap'>close</span><b>пустая</b> карта, изменения не происходит. Колода содержит <b>пять карт</b>, из которых две вызывают <span class='material-icons icon-swap'>swap_horiz</span><b>смену лояльности</b>, а три — <span class='material-icons icon-swap'>close</span><b>пустые</b>.",
-    possibleResults:
-      'Каждый Ланселот имеет ограничение на то, какой результат он может выбрать во время миссии: {evilLancelot} может выбрать только провал, а {goodLancelot} — только успех.',
+    seoHeading: 'Ланселоты в Авалоне: смена сторон и правила миссий',
+    seoTeam:
+      'Один начинает за добро, другой — за зло. Каждый побеждает со своей текущей стороной; при смене лояльности стороны меняются у обоих.',
+    seoAbility:
+      'На платформе карту тянут перед миссиями 3, 4 и 5, если игра до них доходит. В перемешанной колоде две карты смены и три пустые. Смена переворачивает обе стороны, пустая карта ничего не меняет.',
+    seoLimit:
+      'Может ли тёмный Ланселот дать успех? На платформе — нет: текущий тёмный обязан дать провал, светлый — успех. На старте Ланселоты не знают друг друга и злых союзников. В настольных вариантах правила могут отличаться.',
+    seoScenario1:
+      'Смена перед третьей миссией делает бывшего светлого Ланселота тёмным: теперь он обязан дать провал. Прежние успехи не подтверждают текущую лояльность.',
+    seoScenario2:
+      '{guinevere} знает обоих Ланселотов без их сторон. {merlin} видит стартового тёмного Ланселота только как злого; эта отметка после смены не обновляется. Те, кому показана конкретная роль Ланселота, включая роль {merlinPure} и видящих его злых союзников, получают обновлённую сторону.',
     generalTipsTitle: 'Общие советы:',
     embraceUnpredictabilityTitle: 'Примите непредсказуемость:',
     embraceUnpredictabilityDescription:
@@ -72,37 +46,17 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
     observeAndAdaptTitle: 'Наблюдайте и адаптируйтесь:',
     observeAndAdaptDescription:
       'Оба Ланселота должны внимательно следить за ходом игры, чтобы эффективно корректировать свою стратегию после любой смены лояльности.',
-    subtlePlaysTitle: 'Тонкие игры:',
-    subtlePlaysDescription:
-      'Искусство маскировки крайне важно, как при провале похода в роли зла, так и при его поддержке в роли добра. Оставайтесь незамеченными в своих действиях, чтобы сохранить новую приверженность.',
-    strategicTipsTitle: 'Стратегические советы:',
-    merlinsPerceptionTitle: 'Восприятие Мерлина:',
-    merlinsPerceptionDescription:
-      'Если вы {evilLancelot} и становитесь добрым, помните, что {merlin} все еще считает вас частью зла. Используйте это в своих интересах.',
-    balanceTheScalesTitle: 'Балансирование весов:',
-    balanceTheScalesDescription:
-      'Активно участвуйте в голосованиях и предложениях квестов, чтобы незаметно влиять на ситуацию, склоняя весы в пользу вашей нынешней стороны.',
-    maintainYourCoverTitle: 'Сохраните прикрытие:',
-    maintainYourCoverDescription:
-      'Если вы переходите на сторону зла, следите за тем, чтобы не резко менять свое поведение. Постепенные изменения менее заметны.',
-    servingAsLancelotDescription:
-      'Будучи Ланселотом, вы обладаете мощной способностью сменить лояльность, которая может кардинально изменить ход игры в Авалоне. С возможностью смены лояльности, ваша роль предполагает стратегическую глубину, не похожую на другие. Будьте осторожны, ведь баланс добра и зла лежит на ваших бронированных плечах.',
   },
   'zh-CN': {
-    generalInformationTitle: '一般信息：',
-    introduction:
-      '兰斯洛特在阿瓦隆的领域中提出了一个动态的挑战。作为两个从对立面开始的玩家，{goodLancelot} 与善的一方结盟，而 {evilLancelot} 与莫德雷德的爪牙密谋。',
-    loyaltyTides:
-      '然而，随着游戏的进行，忠诚可能会改变。{merlin} 可以看到莫德雷德追随者中的 {evilLancelot}，而莫德雷德的爪牙认出 {evilLancelot} 的存在。',
-    goodAndEvilRecognition: '另一方面，{evilLancelot} 不知道他的盟友。',
-    guinevereKnowledge: '如果游戏中有 {guinevere}，她知道两个兰斯洛特，但不知道他们的忠诚度。',
-    gameplayKeyConcept: '兰斯洛特游戏的关键是忠诚度变化的牌堆。在第二次任务后抽取一张卡。',
-    loyaltyChangeMechanism:
-      "如果显示 <span class='material-icons icon-swap'>swap_horiz</span><b>忠诚变化</b> 卡片，兰斯洛特将切换阵营，并随之进行所有相应的变化（例如完成或失败任务，或被 湖中仙女 卡影响）。",
-    deckComposition:
-      "而如果抽出的卡是 <span class='material-icons icon-swap'>close</span><b>空白</b>，则不发生变化。牌堆包含 <b>五张卡片</b>，其中两张促使 <span class='material-icons icon-swap'>swap_horiz</span><b>忠诚变化</b>，三张为空白。",
-    possibleResults:
-      '每个兰斯洛特在任务中都有选择结果的限制:{evilLancelot} 只能选择失败,而 {goodLancelot} 只能选择成功.',
+    seoHeading: '阿瓦隆兰斯洛特：换边规则与任务玩法',
+    seoTeam: '一名初始为好人，一名初始为坏人。各自随当前阵营获胜；转换时两人的阵营同时交换。',
+    seoAbility:
+      '本站在第3、4、5次任务开始前各抽一张牌，前提是游戏进行到该阶段。洗混的五张牌含两张转换和三张空白。转换牌交换两人阵营，空白牌不改变阵营。',
+    seoLimit:
+      '邪恶兰斯洛特能出成功吗？本站不能：当前坏人必须出失败，当前好人必须出成功。两人开局不知道对方或坏人队友是谁。实体桌游的不同变体规则可能不同。',
+    seoScenario1: '第3次任务前抽到转换，原本的好兰斯洛特变成坏人，必须出失败。以前出过成功不能证明现在是好人。',
+    seoScenario2:
+      '{guinevere}知道两名兰斯洛特但不知道阵营。{merlin}只看到初始邪恶兰斯洛特是坏人，转换后该标记不会更新。能看到具体兰斯洛特角色的玩家，包括{merlinPure}及能认出他的其他坏人，会收到更新后的阵营信息。',
     generalTipsTitle: '一般提示：',
     embraceUnpredictabilityTitle: '接受不可预测性：',
     embraceUnpredictabilityDescription: '作为兰斯洛特，不可预测性是你的元素。利用可能的换边来为自己谋利。',
@@ -111,35 +65,17 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
       '记住你的初始角色，但如果抽到了忠诚变化的卡片，请迅速适应。你的新角色需要扮演得逼真，以避免怀疑。',
     observeAndAdaptTitle: '观察和适应：',
     observeAndAdaptDescription: '两位兰斯洛特都必须密切关注游戏的叙述，以在忠诚度改变后有效调整他们的策略。',
-    subtlePlaysTitle: '微妙的玩法：',
-    subtlePlaysDescription:
-      '无论是以邪恶的方式隐秘干扰任务，还是以善良的方式支持任务，伪装艺术是至关重要的。使你的行动不被察觉，以保留你的新忠诚。',
-    strategicTipsTitle: '战略提示：',
-    merlinsPerceptionTitle: '梅林的感知：',
-    merlinsPerceptionDescription:
-      '如果你是 {evilLancelot} 并且成为好的一方，请记住 {merlin} 仍然认为你是邪恶的一部分。利用这一点来获取优势。',
-    balanceTheScalesTitle: '平衡天平：',
-    balanceTheScalesDescription: '在投票和任务提议中扮演积极角色，施加微妙的影响，使天平倾向于您当前的一方。',
-    maintainYourCoverTitle: '保持你的伪装：',
-    maintainYourCoverDescription: '如果你转到邪恶一方，注意不要突然改变你的行为。逐渐的转变不那么显眼。',
-    servingAsLancelotDescription:
-      '作为兰斯洛特，你拥有强大的双重身份，可以显著改变阿瓦隆中的游戏进程。随着忠诚的潜在变化，你的角色提供了独特的战略深度。谨慎行事，因为善与恶的平衡掌握在你的装甲肩膀上。',
   },
   'zh-TW': {
-    generalInformationTitle: '一般信息：',
-    introduction:
-      '蘭斯洛特在阿瓦隆的領域中提出了一個動態的挑戰。作為兩個從對立面開始的玩家，{goodLancelot} 與善的一方結盟，而 {evilLancelot} 與莫德雷德的爪牙密謀。',
-    loyaltyTides:
-      '然而，隨著遊戲的進行，忠誠可能會改變。{merlin} 可以看到莫德雷德追隨者中的 {evilLancelot}，而莫德雷德的爪牙認出 {evilLancelot} 的存在。',
-    goodAndEvilRecognition: '另一方面，{evilLancelot} 不知道他的盟友。',
-    guinevereKnowledge: '如果遊戲中有 {guinevere}，她知道兩個蘭斯洛特，但不知道他們的忠誠度。',
-    gameplayKeyConcept: '蘭斯洛特遊戲的關鍵是忠誠度變化的牌堆。在第二次任務後抽取一張卡。',
-    loyaltyChangeMechanism:
-      "如果顯示 <span class='material-icons icon-swap'>swap_horiz</span><b>忠誠變化</b> 卡片，蘭斯洛特將切換陣營，並隨之進行所有相應的變化（例如完成或失敗任務，或被 湖中仙女 卡影響）。",
-    deckComposition:
-      "而如果抽出的卡是 <span class='material-icons icon-swap'>close</span><b>空白</b>，則不發生變化。牌堆包含 <b>五張卡片</b>，其中兩張促使 <span class='material-icons icon-swap'>swap_horiz</span><b>忠誠變化</b>，三張為空白。",
-    possibleResults:
-      '每個蘭斯洛特在任務中都有選擇結果的限制:{evilLancelot} 只能選擇失敗,而 {goodLancelot} 只能選擇成功.',
+    seoHeading: '阿瓦隆蘭斯洛特：換邊規則與任務玩法',
+    seoTeam: '一名初始為好人，一名初始為壞人。各自隨目前陣營獲勝；轉換時兩人的陣營同時交換。',
+    seoAbility:
+      '本站在第3、4、5次任務開始前各抽一張牌，前提是遊戲進行到該階段。洗混的五張牌含兩張轉換和三張空白。轉換牌交換兩人陣營，空白牌不改變陣營。',
+    seoLimit:
+      '邪惡蘭斯洛特能出成功嗎？本站不能：目前的壞人必須出失敗，好人必須出成功。兩人開局不知道對方或壞人隊友是誰。實體桌遊的不同變體規則可能不同。',
+    seoScenario1: '第3次任務前抽到轉換，原本的好蘭斯洛特變成壞人，必須出失敗。以前出過成功不能證明現在是好人。',
+    seoScenario2:
+      '{guinevere}知道兩名蘭斯洛特但不知道陣營。{merlin}只看到初始邪惡蘭斯洛特是壞人，轉換後該標記不會更新。能看到具體蘭斯洛特角色的玩家，包括{merlinPure}及能認出他的其他壞人，會收到更新後的陣營資訊。',
     generalTipsTitle: '一般提示：',
     embraceUnpredictabilityTitle: '接受不可預測性：',
     embraceUnpredictabilityDescription: '作為蘭斯洛特，不可預測性是你的元素。利用可能的換邊來為自己謀利。',
@@ -148,37 +84,19 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
       '記住你的初始角色，但如果抽到了忠誠變化的卡片，請迅速適應。你的新角色需要扮演得逼真，以避免懷疑。',
     observeAndAdaptTitle: '觀察和適應：',
     observeAndAdaptDescription: '兩位蘭斯洛特都必須密切關注遊戲的敘述，以在忠誠度改變後有效調整他們的策略。',
-    subtlePlaysTitle: '微妙的玩法：',
-    subtlePlaysDescription:
-      '無論是以邪惡的方式隱秘干擾任務，還是以善良的方式支持任務，偽裝藝術是至關重要的。使你的行動不被察覺，以保留你的新忠誠。',
-    strategicTipsTitle: '戰略提示：',
-    merlinsPerceptionTitle: '梅林的感知：',
-    merlinsPerceptionDescription:
-      '如果你是 {evilLancelot} 並且成為好的一方，請記住 {merlin} 仍然認為你是邪惡的一部分。利用這一點來獲取優勢。',
-    balanceTheScalesTitle: '平衡天平：',
-    balanceTheScalesDescription: '在投票和任務提議中扮演積極角色，施加微妙的影響，使天平傾向於您當前的一方。',
-    maintainYourCoverTitle: '保持你的偽裝：',
-    maintainYourCoverDescription: '如果你轉到邪惡一方，注意不要突然改變你的行為。逐漸的轉變不那麼顯眼。',
-    servingAsLancelotDescription:
-      '作為蘭斯洛特，你擁有強大的雙重身份，可以顯著改變阿瓦隆中的遊戲進程。隨著忠誠的潛在變化，你的角色提供了獨特的戰略深度。謹慎行事，因為善與惡的平衡掌握在你的裝甲肩膀上。',
   },
   es: {
-    generalInformationTitle: 'Información General:',
-    introduction:
-      'Los Lancelots presentan un desafío dinámico en el reino de Avalon. Siendo dos jugadores que comienzan en lados opuestos, el {goodLancelot} se alinea con las fuerzas del bien, mientras que el {evilLancelot} conspira con los secuaces de Mordred.',
-    loyaltyTides:
-      'Sin embargo, las mareas de lealtad pueden cambiar a medida que avanza el juego. {merlin} puede ver al {evilLancelot} entre las filas de los seguidores de Mordred, y los secuaces de Mordred reconocen la presencia de un {evilLancelot}.',
-    goodAndEvilRecognition: 'Por otro lado, el {evilLancelot} no conoce a sus aliados.',
-    guinevereKnowledge:
-      'Si {guinevere} está presente en el juego, ella conoce a ambos Lancelots pero no conoce su lealtad.',
-    gameplayKeyConcept:
-      'El elemento clave del juego de los Lancelots es el mazo de cambio de lealtad. Después de la segunda misión, se roba una carta.',
-    loyaltyChangeMechanism:
-      "Si se revela una carta de <span class='material-icons icon-swap'>swap_horiz</span><b>cambio de lealtad</b>, los Lancelots cambian de bando junto con todos los cambios correspondientes (como la habilidad de fallar una misión, o estar sujeto a la carta de la Dama del Lago).",
-    deckComposition:
-      "Mientras que, si la carta robada es <span class='material-icons icon-swap'>close</span><b>en blanco</b>, no ocurre ningún cambio. El mazo contiene <b>cinco cartas</b>, de las cuales dos provocan un <span class='material-icons icon-swap'>swap_horiz</span><b>cambio de lealtad</b>, y tres son <span class='material-icons icon-swap'>close</span><b>en blanco</b>.",
-    possibleResults:
-      'Cada Lancelot tiene una restricción sobre el resultado que puede elegir durante la misión: {evilLancelot} solo puede elegir el fracaso, mientras que {goodLancelot} solo puede elegir el éxito.',
+    seoHeading: 'Lancelot en Avalon: cambios de bando y misiones',
+    seoTeam:
+      'Uno empieza en el bien y otro en el mal. Cada uno gana con su bando actual; un cambio invierte ambas lealtades.',
+    seoAbility:
+      'Aquí se roba una carta antes de las misiones 3, 4 y 5, si se llega a ellas. El mazo mezclado tiene dos cambios y tres cartas en blanco. Un cambio invierte ambos bandos; una carta en blanco no los altera.',
+    seoLimit:
+      '¿Puede el Lancelot malo jugar Éxito? Aquí no: el Lancelot actualmente malo debe jugar Fracaso y el bueno, Éxito. Al inicio ninguno conoce al otro ni a los demás malvados. Las variantes del juego de mesa difieren.',
+    seoScenario1:
+      'Un cambio antes de la misión 3 convierte al anterior Lancelot bueno en malo: ahora debe jugar Fracaso. Los éxitos anteriores no confirman su lealtad actual.',
+    seoScenario2:
+      '{guinevere} conoce a ambos Lancelots sin sus bandos. {merlin} solo ve al Lancelot inicialmente malo como malvado; esa marca no se actualiza al cambiar. Quienes ven el rol específico de Lancelot, incluidos {merlinPure} y los demás malvados que lo reconocen, reciben la lealtad actualizada.',
     generalTipsTitle: 'Consejos Generales:',
     embraceUnpredictabilityTitle: 'Abraza la imprevisibilidad:',
     embraceUnpredictabilityDescription:
@@ -189,39 +107,18 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
     observeAndAdaptTitle: 'Observa y adapta:',
     observeAndAdaptDescription:
       'Ambos Lancelots deben monitorear de cerca la narrativa del juego para realinear efectivamente sus estrategias tras cualquier cambio de lealtad.',
-    subtlePlaysTitle: 'Jugadas sutiles:',
-    subtlePlaysDescription:
-      'Ya sea socavando una misión sutilmente como malvado o reforzándola como bueno, el arte del disfraz es crucial. Pasa desapercibido en tus acciones para preservar tu nueva lealtad.',
-    strategicTipsTitle: 'Consejos Estratégicos:',
-    merlinsPerceptionTitle: 'Percepción de Merlin:',
-    merlinsPerceptionDescription:
-      'Si eres el {evilLancelot} y te vuelves bueno, recuerda que {merlin} todavía te percibe como parte del mal. Usa esto a tu favor.',
-    balanceTheScalesTitle: 'Equilibra las balanzas:',
-    balanceTheScalesDescription:
-      'Juega un papel activo en las votaciones y propuestas de misiones para ejercer influencia sutilmente, inclinando las balanzas a favor de tu lado actual.',
-    maintainYourCoverTitle: 'Mantén tu cobertura:',
-    maintainYourCoverDescription:
-      'Si cambias al lado del mal, ten cuidado de no cambiar abruptamente tu comportamiento. Los cambios graduales son menos visibles.',
-    servingAsLancelotDescription:
-      'Sirviendo como un Lancelot, mantienes una poderosa doble identidad que puede cambiar dramáticamente el curso del juego en Avalon. Con el potencial de cambiar de lealtades, tu rol invita a una profundidad estratégica como ninguna otra. Avanza con precaución, pues el equilibrio del bien y del mal recae sobre tus hombros acorazados.',
   },
   pt: {
-    generalInformationTitle: 'Informações Gerais:',
-    introduction:
-      'Os Lancelots apresentam um desafio dinâmico no reino de Avalon. Como dois jogadores começando em lados opostos, o {goodLancelot} se alinha com as forças do bem, enquanto o {evilLancelot} conspira com os lacaios de Mordred.',
-    loyaltyTides:
-      'No entanto, as marés de lealdade podem mudar conforme o jogo avança. {merlin} pode ver o {evilLancelot} entre as fileiras dos seguidores de Mordred, e os lacaios de Mordred reconhecem a presença de um {evilLancelot}.',
-    goodAndEvilRecognition: 'Por outro lado, o {evilLancelot} não conhece seus aliados.',
-    guinevereKnowledge:
-      'Se {guinevere} estiver presente no jogo, ela conhece ambos os Lancelots, mas não sabe a lealdade deles.',
-    gameplayKeyConcept:
-      'A chave para a jogabilidade dos Lancelots é o baralho de mudança de lealdade. Após a segunda missão, uma carta é sacada.',
-    loyaltyChangeMechanism:
-      "Se uma carta de <span class='material-icons icon-swap'>swap_horiz</span><b>mudança de lealdade</b> for revelada, os Lancelots trocam de lealdade junto com todas as mudanças correspondentes (como a capacidade de falhar uma missão, ou estar sujeito à carta da Dama do Lago).",
-    deckComposition:
-      "Enquanto que, se a carta sacada for <span class='material-icons icon-swap'>close</span><b>em branco</b>, nenhuma mudança ocorre. O baralho contém <b>cinco cartas</b>, das quais duas provocam <span class='material-icons icon-swap'>swap_horiz</span><b>mudança de lealdade</b>, e três são <span class='material-icons icon-swap'>close</span><b>em branco</b>.",
-    possibleResults:
-      'Cada Lancelot tem uma restrição sobre qual resultado pode escolher durante a missão: {evilLancelot} só pode falhar, enquanto {goodLancelot} só pode ter sucesso.',
+    seoHeading: 'Lancelot em Avalon: troca de lado e regras das missões',
+    seoTeam: 'Um começa no bem e outro no mal. Cada um vence com seu lado atual; uma troca inverte as duas lealdades.',
+    seoAbility:
+      'Aqui, uma carta é comprada antes das missões 3, 4 e 5, se a partida chegar a elas. O baralho embaralhado tem duas trocas e três cartas em branco. A troca inverte ambos os lados; a carta em branco não muda nada.',
+    seoLimit:
+      'O Lancelot mau pode jogar Sucesso? Aqui não: quem está mau deve jogar Falha, e quem está bom, Sucesso. No início, nenhum conhece o outro ou os demais jogadores do mal. As variantes de mesa diferem.',
+    seoScenario1:
+      'Uma troca antes da missão 3 torna mau o Lancelot que era bom: agora ele deve jogar Falha. Sucessos anteriores não confirmam a lealdade atual.',
+    seoScenario2:
+      '{guinevere} conhece os dois Lancelots sem seus lados. {merlin} vê o Lancelot inicialmente mau apenas como mau; essa marca não muda após uma troca. Quem vê o papel específico de Lancelot, incluindo {merlinPure} e os demais maus que o reconhecem, recebe a lealdade atualizada.',
     generalTipsTitle: 'Dicas Gerais:',
     embraceUnpredictabilityTitle: 'Abrace a imprevisibilidade:',
     embraceUnpredictabilityDescription:
@@ -232,20 +129,5 @@ export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
     observeAndAdaptTitle: 'Observe e adapte-se:',
     observeAndAdaptDescription:
       'Ambos os Lancelots devem monitorar de perto a narrativa do jogo para realinhar efetivamente suas estratégias após qualquer mudança de lealdade.',
-    subtlePlaysTitle: 'Jogadas sutis:',
-    subtlePlaysDescription:
-      'Seja minando sutilmente uma missão como mal ou reforçando-a como bem, a arte do disfarce é crucial. Passe despercebido em suas ações para preservar sua nova lealdade.',
-    strategicTipsTitle: 'Dicas Estratégicas:',
-    merlinsPerceptionTitle: 'Percepção de Merlin:',
-    merlinsPerceptionDescription:
-      'Se você é o {evilLancelot} e se torna bom, lembre-se que {merlin} ainda o percebe como parte do mal. Use isso a seu favor.',
-    balanceTheScalesTitle: 'Equilibre as balanças:',
-    balanceTheScalesDescription:
-      'Desempenhe um papel ativo em votações e propostas de missão para exercer influência sutilmente, inclinando a balança a favor do seu lado atual.',
-    maintainYourCoverTitle: 'Mantenha sua cobertura:',
-    maintainYourCoverDescription:
-      'Se você mudar para o lado do mal, cuidado para não mudar abruptamente seu comportamento. Mudanças graduais são menos conspícuas.',
-    servingAsLancelotDescription:
-      'Servindo como um Lancelot, você possui uma poderosa identidade dupla que pode mudar dramaticamente o curso do jogo em Avalon. Com o potencial de mudar lealdades, seu papel convida a uma profundidade estratégica como nenhum outro. Caminhe com cautela, pois o equilíbrio do bem e do mal repousa sobre seus ombros blindados.',
   },
 };

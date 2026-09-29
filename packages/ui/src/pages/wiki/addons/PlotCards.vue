@@ -1,21 +1,37 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
-    <h1>{{ $t('addons.plotCards') }}</h1>
-    <SchemaImage
-      class="preview-image"
-      :src="getImagePathByID('features', 'plot_cards')"
-      :alt="$t('addons.plotCards')"
-      :description="$t('addons.plotCards')"
-    />
-    <p>
-      <strong>{{ $t('addons.plotCards') }}</strong>
-      <LocalizedTextWrapper keypath="plotCards.intro" />
-    </p>
-
-    <h2>{{ $t('plotCards.howItWorks') }}</h2>
-    <p><LocalizedTextWrapper keypath="plotCards.mechanics" /></p>
-
+    <h1>{{ $t('plotCards.seoHeading') }}</h1>
+    <div class="addon-overview">
+      <SchemaImage
+        class="addon-image"
+        :src="getImagePathByID('features', 'plot_cards')"
+        :alt="$t('addons.plotCards')"
+        :description="$t('addons.plotCards')"
+      />
+      <p><LocalizedTextWrapper keypath="plotCards.seoIntro" /></p>
+    </div>
+    <section class="addon-rules">
+      <h2>{{ $t('wiki.rules') }}</h2>
+      <ol>
+        <li v-for="number in 3" :key="number"><LocalizedTextWrapper :keypath="`plotCards.seoRule${number}`" /></li>
+      </ol>
+    </section>
+    <section class="wiki-panel addon-limits">
+      <h2>{{ $t('wiki.roleLimit') }}</h2>
+      <p><LocalizedTextWrapper keypath="plotCards.seoLimit1" /></p>
+      <p><LocalizedTextWrapper keypath="plotCards.seoLimit2" /></p>
+    </section>
+    <section class="addon-scenarios">
+      <h2>{{ $t('wiki.roleScenarios') }}</h2>
+      <ul>
+        <li v-for="number in 2" :key="number"><LocalizedTextWrapper :keypath="`plotCards.seoScenario${number}`" /></li>
+      </ul>
+    </section>
+    <nav class="wiki-nav" :aria-label="$t('wiki.title')">
+      <LocaleLink :to="{ name: 'expansions' }">{{ $t('wiki.addonsTitle') }}</LocaleLink>
+      <LocaleLink :to="{ name: 'roles' }">{{ $t('wiki.rolesTitle') }}</LocaleLink>
+    </nav>
     <h2>{{ $t('plotCards.cardsInGame') }}</h2>
     <div class="cards-in-game">
       <div class="player-count">
@@ -66,10 +82,8 @@
     </div>
 
     <h2>{{ $t('plotCards.cardTypes') }}</h2>
-    <p><LocalizedTextWrapper keypath="plotCards.typesIntro" /></p>
 
     <h3>{{ $t('plotCards.usableCards') }}</h3>
-    <p><LocalizedTextWrapper keypath="plotCards.usableIntro" /></p>
     <ul class="card-list">
       <li class="card-item">
         <div class="card-header">
@@ -102,7 +116,6 @@
     </ul>
 
     <h3>{{ $t('plotCards.instantCards') }}</h3>
-    <p><LocalizedTextWrapper keypath="plotCards.instantIntro" /></p>
     <ul class="card-list">
       <li class="card-item">
         <div class="card-header">
@@ -135,7 +148,6 @@
     </ul>
 
     <h3>{{ $t('plotCards.effectsCards') }}</h3>
-    <p><LocalizedTextWrapper keypath="plotCards.effectsIntro" /></p>
     <ul class="card-list">
       <li class="card-item">
         <div class="card-header">
@@ -146,87 +158,23 @@
       </li>
     </ul>
 
-    <h2>{{ $t('plotCards.gameplayTips') }}</h2>
-    <ol>
-      <li>
-        <strong>{{ $t('plotCards.strategicUse') }}</strong>
-        <LocalizedTextWrapper keypath="plotCards.strategicTips" />
-      </li>
-      <li>
-        <strong>{{ $t('plotCards.timing') }}</strong>
-        <LocalizedTextWrapper keypath="plotCards.timingTips" />
-      </li>
-      <li>
-        <strong>{{ $t('plotCards.information') }}</strong>
-        <LocalizedTextWrapper keypath="plotCards.informationTips" />
-      </li>
-      <li>
-        <strong>{{ $t('plotCards.deception') }}</strong>
-        <LocalizedTextWrapper keypath="plotCards.deceptionTips" />
-      </li>
-    </ol>
-
-    <h2>{{ $t('plotCards.faq') }}</h2>
-    <div class="faq-section">
-      <div class="faq-item">
-        <h4>{{ $t('plotCards.canCombine') }}</h4>
-        <p><LocalizedTextWrapper keypath="plotCards.canCombineAnswer" /></p>
-      </div>
-      <div class="faq-item">
-        <h4>{{ $t('plotCards.whenDistributed') }}</h4>
-        <p><LocalizedTextWrapper keypath="plotCards.whenDistributedAnswer" /></p>
-      </div>
-      <div class="faq-item">
-        <h4>{{ $t('plotCards.seeOthers') }}</h4>
-        <p><LocalizedTextWrapper keypath="plotCards.seeOthersAnswer" /></p>
-      </div>
-      <div class="faq-item">
-        <h4>{{ $t('plotCards.mustUse') }}</h4>
-        <p><LocalizedTextWrapper keypath="plotCards.mustUseAnswer" /></p>
-      </div>
-    </div>
+    <WikiPlayCta />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
+import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 import PlotCard from '@/components/view/information/PlotCard.vue';
 import { getImagePathByID } from '@/helpers/images';
-
-export default defineComponent({
-  components: {
-    WikiBreadCrumbs,
-    PreviewLink,
-    SchemaImage,
-    LocalizedTextWrapper,
-    PlotCard,
-  },
-  data() {
-    return {
-      getImagePathByID,
-    };
-  },
-});
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
-
-h2 {
-  margin-top: 24px;
-  margin-bottom: 16px;
-}
-
-h3 {
-  margin-top: 20px;
-  margin-bottom: 12px;
-  color: var(--v-primary-base);
-}
-
+@import '@/styles/wiki-page.scss';
+@import '@/styles/wiki-addon.scss';
 .card-list {
   list-style-type: none;
   padding-left: 0;
@@ -287,18 +235,5 @@ h3 {
 .card-icon-small {
   width: 100%;
   height: 100%;
-}
-
-.faq-section {
-  margin-top: 16px;
-
-  .faq-item {
-    margin-bottom: 20px;
-
-    h4 {
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-  }
 }
 </style>

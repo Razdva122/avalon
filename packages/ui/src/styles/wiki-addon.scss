@@ -1,0 +1,22 @@
+.addon-overview {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+  margin: 24px 0;
+  .addon-image {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+}
+@media (max-width: 700px) {
+  .addon-overview {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .addon-overview .addon-image {
+    width: 160px;
+    justify-self: center;
+  }
+}

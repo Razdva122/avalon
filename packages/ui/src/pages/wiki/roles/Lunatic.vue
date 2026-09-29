@@ -1,21 +1,11 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
     <h1>
       <div class="evil-loyalty-icon"></div>
-      {{ $t('roles.lunatic') }} {{ $t('roles.role') }}
+      {{ $t('lunatic.seoHeading') }}
     </h1>
-    <SchemaImage
-      class="preview-image"
-      :src="calculateRoleUrl('lunatic')"
-      :alt="$t('roles.lunatic')"
-      :description="$t('roles.lunatic')"
-    />
-
-    <h2>{{ $t('lunatic.generalInformation') }}</h2>
-    <p>
-      <LocalizedTextWrapper keypath="lunatic.roleDescription" />
-    </p>
+    <WikiRoleGuide role="lunatic" />
 
     <TopRolePlayer role="lunatic" class="my-4" />
 
@@ -34,22 +24,6 @@
         {{ $t('lunatic.subtleAlignment') }}
       </li>
     </ul>
-
-    <h2>{{ $t('lunatic.strategicAdviceHeader') }}</h2>
-    <ul>
-      <li>
-        <strong>{{ $t('lunatic.monitorGameFlow') }}</strong>
-        {{ $t('lunatic.disruptiveTiming') }}
-      </li>
-      <li>
-        <strong>{{ $t('lunatic.avoidBehaviorPatterns') }}</strong>
-        {{ $t('lunatic.confuseThroughInconsistency') }}
-      </li>
-    </ul>
-
-    <p>
-      <LocalizedTextWrapper keypath="lunatic.roleConclusion" />
-    </p>
     <WikiPlayCta />
   </div>
 </template>
@@ -58,29 +32,22 @@
 import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import PreviewLink from '@/components/view/information/PreviewLink.vue';
-import SchemaImage from '@/components/view/SchemaImage.vue';
-import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
-import { calculateRoleUrl } from '@/helpers/styles';
+import WikiRoleGuide from '@/components/view/information/WikiRoleGuide.vue';
 import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
 
 export default defineComponent({
   components: {
     WikiPlayCta,
     WikiBreadCrumbs,
-    PreviewLink,
-    SchemaImage,
-    LocalizedTextWrapper,
+    WikiRoleGuide,
     TopRolePlayer,
-  },
-  methods: {
-    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 h2 {
   margin-top: 20px;

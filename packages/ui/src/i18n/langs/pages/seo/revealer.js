@@ -1,32 +1,36 @@
 module.exports.revealer = {
   pt: {
-    title: 'Avalon: The Resistance | Revelador',
-    description: "Regras e dicas para o papel de Revelador no jogo de tabuleiro 'Avalon: The Resistance'",
+    title: 'Revelador em Avalon: quando o papel é revelado',
+    description:
+      'Quando o Revelador aparece em Avalon? Duas missões fracassadas ativam a revelação pública. Entenda o que o jogador do mal ainda pode fazer.',
     keywords: ['Revelador', 'Papel', 'Regras', 'Dicas'],
   },
   en: {
-    title: 'Avalon: The Resistance | Revealer',
-    description: "Rules and Tips for Revealer role in the board game 'Avalon: The Resistance'",
+    title: 'Revealer in Avalon: When the Role Is Revealed',
+    description:
+      'When does the Revealer reveal in Avalon? Learn the two-failed-missions trigger, who sees the role and what the evil player can still do afterwards.',
     keywords: ['Revealer', 'Role', 'Rules', 'Tips'],
   },
   ru: {
-    title: 'Авалон: Сопротивление | Разоблаченная',
-    description: "Правила и советы для роли Разоблаченная в настольной игре 'Авалон: Сопротивление'",
+    title: 'Разоблаченная в Авалоне: когда раскрывается роль',
+    description:
+      'Когда раскрывается Разоблаченная в Авалоне? Две проваленные миссии, видимость роли для всех и возможности злого игрока после раскрытия.',
     keywords: ['Разоблаченная', 'Роль', 'Правила', 'Советы'],
   },
   'zh-TW': {
-    title: '阿瓦隆：反抗勢力 | 被揭示者',
-    description: '「阿瓦隆：反抗勢力」桌遊中被揭示者的角色規則和攻略建議',
+    title: '阿瓦隆被揭示者：何時公開身分與後續玩法',
+    description: '阿瓦隆被揭示者什麼時候現身？了解兩次任務失敗後的公開觸發條件，以及壞人被揭示後仍可採取的行動。',
     keywords: ['被揭示者', '角色', '規則', '建議'],
   },
   'zh-CN': {
-    title: '阿瓦隆：反抗组织 | 被揭示者',
-    description: '桌游《阿瓦隆：反抗组织》中被揭示者角色的规则和建议',
+    title: '阿瓦隆被揭示者：何时公开身份与后续玩法',
+    description: '阿瓦隆被揭示者什么时候现身？了解两次任务失败后的公开触发条件，以及坏人被揭示后仍可采取的行动。',
     keywords: ['被揭示者', '角色', '规则', '建议'],
   },
   es: {
-    title: 'Avalon: La Resistencia | Revelada',
-    description: "Reglas y consejos para el rol de Revelada en el juego de mesa 'Avalon: La Resistencia'",
+    title: 'Revelador en Avalon: cuándo se revela el rol',
+    description:
+      '¿Cuándo se revela el Revelador en Avalon? Dos misiones fallidas activan la revelación pública. Descubre qué puede hacer después el jugador malvado.',
     keywords: ['Revelada', 'Rol', 'Reglas', 'Consejos'],
   },
 };

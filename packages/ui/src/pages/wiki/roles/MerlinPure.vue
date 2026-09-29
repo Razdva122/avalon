@@ -1,19 +1,11 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
     <h1>
       <div class="good-loyalty-icon"></div>
-      {{ $t('roles.merlinPure') }} {{ $t('roles.role') }}
+      {{ $t('merlinPure.seoHeading') }}
     </h1>
-    <SchemaImage
-      class="preview-image"
-      :src="calculateRoleUrl('merlinPure')"
-      :alt="$t('roles.merlinpure')"
-      :description="$t('roles.merlinpure')"
-    />
-
-    <h2>{{ $t('merlinPure.generalInformationTitle') }}</h2>
-    <p><LocalizedTextWrapper keypath="merlinPure.generalInformationText" /></p>
+    <WikiRoleGuide role="merlinPure" />
 
     <TopRolePlayer role="merlinPure" class="my-4" />
 
@@ -31,41 +23,7 @@
         <strong>{{ $t('merlinPure.tipAvoidAccusationsTitle') }}</strong>
         <LocalizedTextWrapper keypath="merlinPure.tipAvoidAccusationsText" />
       </li>
-      <li>
-        <strong>{{ $t('merlinPure.tipBalanceIntelTitle') }}</strong>
-        {{ $t('merlinPure.tipBalanceIntelText') }}
-      </li>
-      <li>
-        <strong>{{ $t('merlinPure.tipWatchAssassinTitle') }}</strong>
-        {{ $t('merlinPure.tipWatchAssassinText') }}
-      </li>
     </ul>
-
-    <h2>{{ $t('merlinPure.strategicTipsTitle') }}</h2>
-    <ul>
-      <li>
-        <strong>{{ $t('merlinPure.tipAmbiguityTitle') }}</strong>
-        {{ $t('merlinPure.tipAmbiguityText') }}
-      </li>
-      <li>
-        <strong>{{ $t('merlinPure.tipGradualRevealTitle') }}</strong>
-        {{ $t('merlinPure.tipGradualRevealText') }}
-      </li>
-      <li>
-        <strong>{{ $t('merlinPure.tipHintNotDeclareTitle') }}</strong>
-        {{ $t('merlinPure.tipHintNotDeclareText') }}
-      </li>
-      <li>
-        <strong>{{ $t('merlinPure.tipAddressWithoutConfirmTitle') }}</strong>
-        {{ $t('merlinPure.tipAddressWithoutConfirmText') }}
-      </li>
-      <li>
-        <strong>{{ $t('merlinPure.tipSupportDiscoveryTitle') }}</strong>
-        {{ $t('merlinPure.tipSupportDiscoveryText') }}
-      </li>
-    </ul>
-
-    <p><LocalizedTextWrapper keypath="merlinPure.conclusionText" /></p>
     <WikiPlayCta />
   </div>
 </template>
@@ -74,29 +32,24 @@
 import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import PreviewLink from '@/components/view/information/PreviewLink.vue';
-import SchemaImage from '@/components/view/SchemaImage.vue';
+import WikiRoleGuide from '@/components/view/information/WikiRoleGuide.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
 import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
-import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiPlayCta,
     WikiBreadCrumbs,
-    PreviewLink,
-    SchemaImage,
+    WikiRoleGuide,
     LocalizedTextWrapper,
     TopRolePlayer,
-  },
-  methods: {
-    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 h2 {
   margin-top: 20px;

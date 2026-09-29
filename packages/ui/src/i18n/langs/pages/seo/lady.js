@@ -1,36 +1,38 @@
 module.exports.lady = {
   pt: {
-    title: 'Avalon: The Resistance | Dama do Lago',
+    title: 'Dama do Lago em Avalon: regras e lealdade',
     description:
-      "Regras para a carta 'Dama do Lago' no jogo de tabuleiro 'Avalon: The Resistance'. Regras para a carta 'Ficha de Inquisidor' no jogo de tabuleiro 'The Resistance'.",
-    keywords: ['Expansões', 'Complementos', 'Módulo', 'Dama do Lago', 'Ficha de Inquisidor', 'Regras'],
+      'Quando usar a Dama do Lago, para quem passar a ficha, se é possível mentir e como Mordred, Trickster e Troublemaker aparecem na verificação.',
+    keywords: ['Dama do Lago em Avalon: regras e lealdade'],
   },
   en: {
-    title: 'Avalon: The Resistance | Lady of the Lake',
+    title: 'Lady of the Lake in Avalon: rules and loyalty checks',
     description:
-      "Rules for the 'Lady of the Lake' card in the board game 'Avalon: The Resistance'. Rules for the 'Inquisitor Token' card in the board game 'The Resistance'.",
-    keywords: ['Expansions', 'Addons', 'Module', 'Lady of the Lake', 'Inquisitor Token', 'Rules'],
+      'When to use the Lady of the Lake in Avalon, who receives it, whether you can lie, and how Mordred, Trickster and Troublemaker appear in checks.',
+    keywords: ['Lady of the Lake in Avalon: rules and loyalty checks'],
   },
   ru: {
-    title: 'Авалон: Сопротивление | Леди Озера',
+    title: 'Леди Озера в Авалоне: правила и проверка лояльности',
     description:
-      "Правила для карты 'Леди Озера' в настольной игре 'Авалон: Сопротивление'. Правила для карты 'Инквизиторский Токен' в настольной игре 'Сопротивление'.",
-    keywords: ['Дополнения', 'Аддоны', 'Модуль', 'Леди Озера', 'Инквизиторский Токен', 'Правила'],
+      'Когда использовать Леди Озера, кому передавать жетон, можно ли лгать о проверке и как видны Мордред, Трикстер и Траблмейкер в Авалоне.',
+    keywords: ['Леди Озера в Авалоне: правила и проверка лояльности'],
   },
   'zh-TW': {
-    title: '阿瓦隆：反抗勢力 | 湖中仙女',
-    description: '桌遊「阿瓦隆：反抗勢力」中的「湖中仙女」卡牌規則。桌遊「反抗組織」中的「審問標記」卡牌規則。',
-    keywords: ['擴充', '附加組件', '模組', '湖中仙女', '審問標記', '規則'],
+    title: '阿瓦隆湖中仙女（湖中女神）：查驗規則與傳遞順序',
+    description:
+      '阿瓦隆湖中仙女何時查驗、交給誰、能否說謊？了解湖中女神的傳遞規則，以及莫德雷德、詭術師和搗蛋鬼的查驗結果。',
+    keywords: ['阿瓦隆湖中仙女（湖中女神）：查驗規則與傳遞順序'],
   },
   'zh-CN': {
-    title: '阿瓦隆：反抗组织 | 湖中仙女',
-    description: '桌游《阿瓦隆：反抗组织》中「湖中仙女」卡牌的规则。桌游《反抗势力》中的「审问标记」卡牌规则。',
-    keywords: ['扩展', '附加组件', '模块', '湖中仙女', '审问标记', '规则'],
+    title: '阿瓦隆湖中仙女（湖中女神）：查验规则与传递顺序',
+    description:
+      '阿瓦隆湖中仙女何时查验、交给谁、能否说谎？了解湖中女神的传递规则，以及莫德雷德、诡术师和捣蛋鬼的查验结果。',
+    keywords: ['阿瓦隆湖中仙女（湖中女神）：查验规则与传递顺序'],
   },
   es: {
-    title: 'Avalon: La Resistencia | Dama del Lago',
+    title: 'Dama del Lago en Avalon: reglas y lealtad',
     description:
-      "Reglas para la carta 'Dama del Lago' en el juego de mesa 'Avalon: La Resistencia'. Reglas para la carta 'Ficha de Inquisidor' en el juego de mesa 'La Resistencia'",
-    keywords: ['Expansiones', 'Complementos', 'Módulo', 'Dama del Lago', 'Ficha de Inquisidor', 'Reglas'],
+      'Cuándo usar la Dama del Lago, a quién pasarla, si puedes mentir y cómo aparecen Mordred, Trickster y Troublemaker al comprobar la lealtad.',
+    keywords: ['Dama del Lago en Avalon: reglas y lealtad'],
   },
 };

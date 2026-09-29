@@ -1,3 +1,4 @@
+import { expansions } from './expansions';
 import { wikiPlay } from './wikiPlay';
 import { community } from './community';
 import { support } from './support';
@@ -46,6 +47,7 @@ export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
 };
 
 Object.entries({
+  expansions,
   wikiPlay,
   community,
   support,

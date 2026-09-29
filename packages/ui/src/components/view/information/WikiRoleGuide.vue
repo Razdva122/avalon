@@ -1,12 +1,19 @@
 <template>
   <div class="role-guide">
     <div class="role-overview">
-      <SchemaImage
-        class="role-portrait"
-        :src="calculateRoleUrl(role)"
-        :alt="$t(`roles.${role}`)"
-        :description="$t(`roles.${role}`)"
-      />
+      <div class="role-portraits">
+        <SchemaImage
+          v-for="portrait in portraits"
+          :key="portrait"
+          class="role-portrait"
+          :src="calculateRoleUrl(portrait)"
+          :alt="$t(`roles.${portrait}`)"
+          :description="$t(`roles.${portrait}`)"
+        />
+        <small v-if="role === 'lovers' || role === 'guinevere'" class="role-credits">
+          {{ $t(`${role}.credits`) }}
+        </small>
+      </div>
       <section class="wiki-panel">
         <h2>{{ $t('wiki.roleFacts') }}</h2>
         <dl>
@@ -32,10 +39,21 @@
 
 <script setup lang="ts">
 import type { PropType } from 'vue';
+import { computed } from 'vue';
+import type { TRoles } from '@avalon/types';
 import SchemaImage from '@/components/view/SchemaImage.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
 import { calculateRoleUrl } from '@/helpers/styles';
-defineProps({ role: { type: String as PropType<'percival' | 'mordred' | 'morgana' | 'oberon'>, required: true } });
+type GuideRole =
+  | Exclude<TRoles, 'merlin' | 'tristan' | 'isolde' | 'goodLancelot' | 'evilLancelot' | 'wraith'>
+  | 'lancelots'
+  | 'lovers';
+const props = defineProps({ role: { type: String as PropType<GuideRole>, required: true } });
+const portraits = computed<TRoles[]>(() => {
+  if (props.role === 'lancelots') return ['goodLancelot', 'evilLancelot'];
+  if (props.role === 'lovers') return ['tristan', 'isolde'];
+  return [props.role];
+});
 const facts = [
   { label: 'roleTeam', key: 'seoTeam' },
   { label: 'roleAbility', key: 'seoAbility' },
@@ -50,6 +68,14 @@ const facts = [
   gap: 28px;
   align-items: start;
   margin: 28px 0 36px;
+}
+.role-portraits {
+  display: grid;
+  gap: 12px;
+}
+.role-credits {
+  text-align: center;
+  color: rgb(var(--v-theme-on-surface));
 }
 .role-portrait {
   width: 100%;
@@ -116,9 +142,15 @@ a:focus-visible {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  .role-portrait {
-    width: 140px;
+  .role-portraits {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 140px));
+    justify-content: center;
+    width: 100%;
+    max-width: 292px;
     justify-self: center;
+  }
+  .role-credits {
+    grid-column: 1 / -1;
   }
   .wiki-panel {
     padding: 18px;

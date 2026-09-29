@@ -1,36 +1,36 @@
 module.exports.plotCards = {
   pt: {
-    title: 'Avalon: The Resistance | Cartas de Enredo',
+    title: 'Cartas de Enredo em Avalon: regras, lista e distribuição',
     description:
-      "Regras para a expansão 'Cartas de Enredo' no jogo de tabuleiro 'Avalon: The Resistance'. Expansão 'O Enredo se Complica' para o jogo de tabuleiro 'The Resistance'.",
-    keywords: ['Expansões', 'Complementos', 'Módulo', 'Cartas de Enredo', 'O Enredo se Complica', 'Regras'],
+      'Guia das Cartas de Enredo de Avalon: baralhos de 7 ou 15 cartas, distribuição para 5–10 jogadores, lealdade, rejeição de equipes e exemplos.',
+    keywords: ['Cartas de Enredo em Avalon: regras, lista e distribuição'],
   },
   en: {
-    title: 'Avalon: The Resistance | Plot Cards',
+    title: 'Avalon Plot Cards: rules, card list and distribution',
     description:
-      "Rules for the 'Plot Cards' expansion in the board game 'Avalon: The Resistance'. 'The Plot Thickens' expansion for the board game 'The Resistance'.",
-    keywords: ['Expansions', 'Addons', 'Module', 'Plot Cards', 'The Plot Thickens', 'Rules'],
+      'Avalon Plot Cards guide: 7 or 15 cards, distribution for 5–10 players, card timing, team rejection, loyalty checks and examples.',
+    keywords: ['Avalon Plot Cards: rules, card list and distribution'],
   },
   ru: {
-    title: 'Авалон: Сопротивление | Сюжетные Карты',
+    title: 'Карты сюжета в Авалоне: правила, состав и раздача',
     description:
-      'Правила для дополнения «Сюжетные Карты» в настольной игре «Авалон: Сопротивление». Расширение «Сюжет Усложняется» для настольной игры «Сопротивление».',
-    keywords: ['Расширения', 'Дополнения', 'Модуль', 'Сюжетные Карты', 'Сюжет Усложняется', 'Правила'],
+      'Как работают карты сюжета Авалона: колода из 7 или 15 карт, раздача при 5–10 игроках, проверки, отмена команды и примеры применения.',
+    keywords: ['Карты сюжета в Авалоне: правила, состав и раздача'],
   },
   es: {
-    title: 'Avalon: La Resistencia | Cartas de Trama',
+    title: 'Cartas de Trama en Avalon: reglas, lista y reparto',
     description:
-      "Reglas para la expansión 'Cartas de Trama' en el juego de mesa 'Avalon: La Resistencia'. Expansión 'La Trama se Complica' para el juego de mesa 'La Resistencia'.",
-    keywords: ['Expansiones', 'Complementos', 'Módulo', 'Cartas de Trama', 'La Trama se Complica', 'Reglas'],
+      'Guía de Cartas de Trama de Avalon: mazos de 7 o 15 cartas, reparto para 5–10 jugadores, lealtad, rechazo de equipos y ejemplos.',
+    keywords: ['Cartas de Trama en Avalon: reglas, lista y reparto'],
   },
   'zh-TW': {
-    title: '阿瓦隆：反抗勢力 | 情節卡',
-    description: '桌遊「阿瓦隆：反抗勢力」中「情節卡」擴充的規則。桌遊「反抗勢力」的「情節加劇」擴充規則。',
-    keywords: ['擴充', '附加組件', '模組', '情節卡', '情節加劇', '規則'],
+    title: '阿瓦隆劇情卡：完整列表、發牌與使用規則',
+    description: '了解阿瓦隆劇情卡擴充：7張與15張牌組、5–10人發牌數量、即時效果、陣營查驗、否決隊伍及實例。',
+    keywords: ['阿瓦隆劇情卡：完整列表、發牌與使用規則'],
   },
   'zh-CN': {
-    title: '阿瓦隆：反抗组织 | 情节卡',
-    description: '桌游《阿瓦隆：反抗组织》中「情节卡」扩展的规则。桌游《反抗势力》的「情节加剧」扩展规则。',
-    keywords: ['扩展', '附加组件', '模块', '情节卡', '情节加剧', '规则'],
+    title: '阿瓦隆剧情卡：完整列表、发牌与使用规则',
+    description: '了解阿瓦隆剧情卡扩展：7张与15张牌组、5–10人发牌数量、即时效果、阵营查验、否决队伍及实例。',
+    keywords: ['阿瓦隆剧情卡：完整列表、发牌与使用规则'],
   },
 };

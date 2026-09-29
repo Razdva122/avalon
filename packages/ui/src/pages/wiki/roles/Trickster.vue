@@ -1,21 +1,11 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
     <h1>
       <div class="evil-loyalty-icon"></div>
-      {{ $t('roles.trickster') }} {{ $t('roles.role') }}
+      {{ $t('trickster.seoHeading') }}
     </h1>
-    <SchemaImage
-      class="preview-image"
-      :src="calculateRoleUrl('trickster')"
-      :alt="$t('roles.trickster')"
-      :description="$t('roles.trickster')"
-    />
-
-    <h2>{{ $t('trickster.generalInformation') }}</h2>
-    <p>
-      <LocalizedTextWrapper keypath="trickster.intro" />
-    </p>
+    <WikiRoleGuide role="trickster" />
 
     <TopRolePlayer role="trickster" class="my-4" />
 
@@ -34,26 +24,6 @@
         {{ $t('trickster.generalTipsMonitorInfluence') }}
       </li>
     </ul>
-
-    <h2>{{ $t('trickster.strategicTipsTitle') }}</h2>
-    <ul>
-      <li>
-        <strong>{{ $t('trickster.strategicTipsManipulateVotingTitle') }}</strong>
-        {{ $t('trickster.strategicTipsManipulateVoting') }}
-      </li>
-      <li>
-        <strong>{{ $t('trickster.strategicTipsControlInformationFlowTitle') }}</strong>
-        {{ $t('trickster.strategicTipsControlInformationFlow') }}
-      </li>
-      <li>
-        <strong>{{ $t('trickster.strategicTipsPrepareDefenseTitle') }}</strong>
-        {{ $t('trickster.strategicTipsPrepareDefense') }}
-      </li>
-    </ul>
-
-    <p>
-      <LocalizedTextWrapper keypath="trickster.conclusion" />
-    </p>
     <WikiPlayCta />
   </div>
 </template>
@@ -62,29 +32,22 @@
 import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import PreviewLink from '@/components/view/information/PreviewLink.vue';
-import SchemaImage from '@/components/view/SchemaImage.vue';
-import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
+import WikiRoleGuide from '@/components/view/information/WikiRoleGuide.vue';
 import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
-import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiPlayCta,
     WikiBreadCrumbs,
-    PreviewLink,
-    SchemaImage,
-    LocalizedTextWrapper,
+    WikiRoleGuide,
     TopRolePlayer,
-  },
-  methods: {
-    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 h2 {
   margin-top: 20px;

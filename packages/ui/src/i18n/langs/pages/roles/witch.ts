@@ -3,210 +3,117 @@ import { Dictionary } from '@avalon/types';
 
 export const witch: { [key in TLanguage]: Dictionary<string> } = {
   pt: {
-    generalInformation: 'Informações Gerais: ',
-    intro: `Como {witch}, você possui um poder único entre os servos do mal: ocultar o resultado de uma missão enquanto ativa uma verificação de lealdade em um jogador aleatório não-{witch}. Embora isso forneça informações às forças do bem, seu objetivo é transformá-las em arma — semear caos, virar aliados uns contra os outros e inclinar o jogo a favor do mal, tudo enquanto mantém seu disfarce.`,
+    seoHeading: 'Bruxa em Avalon: missão oculta e verificação',
+    seoTeam: 'Mal. {witch} pode usar sua habilidade especial uma vez por partida nesta plataforma.',
+    seoAbility:
+      'A Bruxa pode ocultar o resultado de uma missão. Um jogador aleatório que não seja a Bruxa recebe o direito de verificar a lealdade exibida de um jogador.',
+    seoLimit:
+      'Ela transforma Falha em Sucesso? Não: oculta a informação sem mudar o resultado real. O sorteado é quem verifica, não o alvo da verificação.',
+    seoScenario1:
+      'Oculte uma missão quando perder essa informação pública favorecer o mal, mas considere o que a nova verificação pode revelar.',
+    seoScenario2:
+      'Uma verificação boa pode ser de {trickster}; uma má, de {troublemaker}. Interprete o resultado junto com os papéis habilitados e o histórico das missões.',
     generalTipsTitle: `Dicas Gerais:`,
-
     sowSeedsTitle: `Semeie confusão:`,
     sowSeedsText: `Utilize sua habilidade para manter os jogadores incertos sobre os resultados das missões, causando dúvida e indecisão nas fileiras do bem.`,
-
     collaborateTitle: `Colabore com outros malfeitores:`,
     collaborateText: `Considere cuidadosamente as consequências de ocultar uma missão, e só o faça quando beneficiar você e seus aliados.`,
-
     utilizePowerTitle: `Utilize seu poder estrategicamente:`,
     utilizePowerText: `O momento é crucial, pois você só pode usar seu poder uma vez. Ao ocultar o resultado de uma missão, um jogador aleatório não-bruxa recebe uma verificação de lealdade. Escolha o momento que maximize a confusão enquanto protege seus aliados.`,
-
-    maintainDisguiseTitle: `Mantenha seu disfarce:`,
-    maintainDisguiseText: `Evite dar qualquer pista que possa revelar sua verdadeira lealdade ou despertar suspeitas sobre suas intenções.`,
-
-    strategicTipsTitle: `Dicas Estratégicas:`,
-
-    createUncertaintyTitle: `Crie incerteza:`,
-    createUncertaintyText: `Sua capacidade de obscurecer resultados de missões deixa os jogadores do bem no escuro, dificultando que eles elaborem estratégias eficazes.`,
-
-    influenceGameplayTitle: `Influencie o jogo:`,
-    influenceGameplayText: `Incentive a dúvida e a discórdia entre os jogadores do bem, direcionando discussões e decisões em uma direção favorável ao mal.`,
-
-    hideEarlyMissionsTitle: `Oculte missões iniciais:`,
-    hideEarlyMissionsText: `Considere ocultar missões iniciais para criar confusão, mas lembre-se que isso ativa uma verificação de lealdade. Coordene com aliados para garantir que a verificação não os exponha, enquanto lança suspeitas sobre oponentes-chave.`,
-
-    conclusion: `Como {witch}, você tece incerteza através de missões ocultas e verificações de lealdade forçadas. Seu único movimento poderoso pode expor outros enquanto protege a si mesmo. Use-o para criar paradoxos que fraturem a confiança da equipe do bem!`,
   },
   en: {
-    generalInformation: 'General Information: ',
-    intro: `As {witch}, you wield a unique power among evil's minions: hiding one mission's outcome while triggering a loyalty check on a random non-{witch} player. Though this gives good forces intel, your goal is to weaponize it — breed chaos, turn allies against each other, and sway the game to evil's favor, all while maintaining your cover.`,
+    seoHeading: 'Witch in Avalon: Hidden Mission & Loyalty Check',
+    seoTeam: 'Evil. {witch} can use the special ability once per game on this platform.',
+    seoAbility:
+      'The Witch may hide one mission’s outcome. A random player other than the Witch then receives the ability to check a player’s displayed loyalty.',
+    seoLimit:
+      'Does the Witch change a Fail into Success? No: hiding changes the information shown, not the actual outcome. The random player is the checker, not a randomly chosen target.',
+    seoScenario1:
+      'Hide a mission when losing public information is useful to evil, but weigh the information that the new loyalty check could give the table.',
+    seoScenario2:
+      'A check showing good can still be {trickster}; one showing evil can be {troublemaker}. Interpret the report alongside the roles enabled and the mission history.',
     generalTipsTitle: `General Tips:`,
-
     sowSeedsTitle: `Sow seeds of confusion:`,
     sowSeedsText: `Utilize your skill to keep players uncertain about mission outcomes, causing doubt and indecision within the ranks of good.`,
-
     collaborateTitle: `Collaborate with fellow evildoers:`,
     collaborateText: `Carefully consider the consequences of hiding a mission, and only do so when it benefits you and your allies.`,
-
     utilizePowerTitle: `Utilize your power strategically:`,
     utilizePowerText: `Timing is crucial as you can only use your power once. When hiding a mission's result, a random non-witch player gets a loyalty check. Choose the moment that maximizes confusion while protecting your allies.`,
-
-    maintainDisguiseTitle: `Maintain your disguise:`,
-    maintainDisguiseText: `Avoid giving away any hints that could reveal your true allegiance or arouse suspicion about your intentions.`,
-
-    strategicTipsTitle: `Strategic Tips:`,
-
-    createUncertaintyTitle: `Create uncertainty:`,
-    createUncertaintyText: `Your ability to obscure mission results leaves good players in the dark, making it difficult for them to strategize effectively.`,
-
-    influenceGameplayTitle: `Influence gameplay:`,
-    influenceGameplayText: `Encourage doubt and discord among good players, steering discussions and decisions in a direction favorable to evil.`,
-
-    hideEarlyMissionsTitle: `Hide early missions:`,
-    hideEarlyMissionsText: `Consider hiding early missions to create confusion, but remember this triggers a loyalty check. Coordinate with allies to ensure the check doesn't expose them, while casting suspicion on key opponents.`,
-
-    conclusion: `As {witch}, you weave uncertainty through hidden missions and forced loyalty checks. Your single powerful move can expose others while protecting yourself. Use it to create paradoxes that fracture the good team's trust!`,
   },
   ru: {
-    generalInformation: 'Общая информация: ',
-    intro:
-      'Играя за {witch}, вы получаете уникальную способность среди приспешников зла: скрыть результат одной миссии, активируя проверку лояльности у случайного игрока (не {witch}). Это даёт силам добра информацию, но ваша цель — обратить её против них: посеять хаос, заставить сомневаться в союзниках и склонить игру в пользу зла, сохраняя свою скрытность.',
+    seoHeading: 'Ведьма в Авалоне: скрытая миссия и проверка',
+    seoTeam: 'Зло. На платформе {witch} может применить особую способность один раз за игру.',
+    seoAbility:
+      'Ведьма может скрыть исход одной миссии. Случайный игрок, кроме самой Ведьмы, получает право проверить отображаемую лояльность выбранного игрока.',
+    seoLimit:
+      'Превращает ли Ведьма провал в успех? Нет: скрывается информация, а не меняется реальный исход. Случайно выбирают обладателя проверки, а не её цель.',
+    seoScenario1:
+      'Скрывайте миссию, когда отсутствие публичной информации полезно злу. Учитывайте, какие сведения столу может дать новая проверка.',
+    seoScenario2:
+      'Добрым по проверке может оказаться {trickster}, злым — {troublemaker}. Сопоставляйте объявленный результат с включёнными ролями и историей миссий.',
     generalTipsTitle: 'Общие советы:',
-
     sowSeedsTitle: 'Посейте семена сомнений:',
     sowSeedsText:
       'Используйте свои способности, чтобы оставлять игроков в неведении относительно результатов миссий, вызывая сомнения и нерешительность среди добрых сил.',
-
     collaborateTitle: 'Сотрудничайте с другими злодеями:',
     collaborateText:
       'Продумывайте последствия скрытия похода и делайте это только тогда, когда это выгодно вам и вашим союзникам.',
-
     utilizePowerTitle: 'Используйте свою силу стратегически:',
     utilizePowerText:
       'Время решает всё — вы можете использовать способность лишь раз. Скрывая результат миссии, вы провоцируете проверку лояльности у другого игрока. Выбирайте момент, который максимизирует хаос, защищая своих соратников.',
-
-    maintainDisguiseTitle: 'Сохраняйте маскировку:',
-    maintainDisguiseText:
-      'Избегайте любых намеков, которые могут выдать вашу истинную принадлежность или вызвать подозрения в ваших намерениях.',
-
-    strategicTipsTitle: 'Стратегические советы:',
-
-    createUncertaintyTitle: 'Создайте неопределенность:',
-    createUncertaintyText:
-      'Ваше умение скрывать результаты миссий оставляет добрых игроков в темноте, затрудняя им эффективное планирование.',
-
-    influenceGameplayTitle: 'Влияйте на ход игры:',
-    influenceGameplayText:
-      'Посеять сомнение и раздор среди добрых игроков, направляя обсуждения и решения в сторону, выгодную злу.',
-
-    hideEarlyMissionsTitle: 'Скрывайте результаты ранних миссий:',
-    hideEarlyMissionsText:
-      'Сокрытие ранних миссий создаёт неразбериху, но запускает проверку. Координируйтесь с союзниками, чтобы проверка не раскрыла их, одновременно бросая тень подозрения на ключевых противников.',
-
-    conclusion:
-      'Как {witch}, вы сеете хаос через скрытые миссии и вынужденные проверки. Ваш единственный ход может раскрыть других, защищая вас. Используйте его, чтобы создать неразрешимые противоречия в стане добрых!',
   },
   'zh-CN': {
-    generalInformation: '一般信息：',
-    intro:
-      '身为{witch}，你掌握邪恶阵营独有的能力：隐藏一次任务结果并触发随机玩家（非{witch}）的忠诚检验。尽管这会让正义方获得情报，但你的真正目的是将其化为武器——制造混乱、挑拨盟友互疑，在隐藏身份的同时将游戏导向邪恶的胜利。',
+    seoHeading: '阿瓦隆巫婆：隐藏任务结果与阵营查验',
+    seoTeam: '坏人。本站{witch}每局只能使用一次特殊能力。',
+    seoAbility: '巫婆可以隐藏一次任务的结果。随后，巫婆以外的一名随机玩家获得查验某位玩家显示阵营的权利。',
+    seoLimit: '巫婆能把失败变成成功吗？不能，只隐藏信息，不改变实际结果。随机选中的是查验者，不是被查验的目标。',
+    seoScenario1: '当缺少公开任务信息有利于坏人时，可以考虑隐藏，但要权衡新查验可能给全桌带来的信息。',
+    seoScenario2: '查验为好人可能是{trickster}，为坏人可能是{troublemaker}。结合本局启用的角色和任务历史判断。',
     generalTipsTitle: '一般提示：',
-
     sowSeedsTitle: '播下困惑的种子：',
     sowSeedsText: '利用你的技能让玩家对任务结果产生不确定性，在善良力量的行列中引起怀疑和犹豫。',
-
     collaborateTitle: '与其他邪恶势力合作：',
     collaborateText: '隐藏任务前务必权衡后果，仅在对己方有利时使用此能力。',
-
     utilizePowerTitle: '战略性地使用你的能力：',
     utilizePowerText:
       '时机决定一切——你只能使用一次能力。隐藏任务结果时，会触发其他玩家的忠诚检验。选择最能制造混乱并保护盟友的时机。',
-
-    maintainDisguiseTitle: '保持你的伪装：',
-    maintainDisguiseText: '避免透露可能揭露你真实意图的任何线索，或者引起怀疑。',
-
-    strategicTipsTitle: '战略提示：',
-
-    createUncertaintyTitle: '制造不确定性：',
-    createUncertaintyText: '你隐藏任务结果的能力让善良玩家一无所知，使他们难以有效地计划。',
-
-    influenceGameplayTitle: '影响游戏：',
-    influenceGameplayText: '鼓励善良玩家之间的疑虑和不和谐，引导讨论和决策朝着有利于邪恶的方向发展。',
-
-    hideEarlyMissionsTitle: '隐藏早期任务：',
-    hideEarlyMissionsText:
-      '隐藏早期任务可制造混乱，但会触发检验。与盟友协调，确保检验不会暴露他们，同时将嫌疑引向关键对手。',
-
-    conclusion:
-      '作为{witch}，你通过隐藏任务和强制检验散播混乱。你唯一的能力既可揭露他人，又能保护自己。用它创造正义阵营无法破解的矛盾！',
   },
   'zh-TW': {
-    generalInformation: '一般信息：',
-    intro:
-      '身為{witch}，你掌握邪惡陣營獨有的能力：隱藏一次任務結果並觸發隨機玩家（非{witch}）的忠誠檢驗。儘管這會讓正義方獲得情報，但你的真正目的是將其化為武器——製造混亂、挑撥盟友互疑，在隱藏身份的同時將遊戲導向邪惡的勝利。',
+    seoHeading: '阿瓦隆巫婆：隱藏任務結果與陣營查驗',
+    seoTeam: '壞人。本站{witch}每局只能使用一次特殊能力。',
+    seoAbility: '巫婆可以隱藏一次任務的結果。隨後，巫婆以外的一名隨機玩家獲得查驗某位玩家顯示陣營的權利。',
+    seoLimit: '巫婆能把失敗變成成功嗎？不能，只隱藏資訊，不改變實際結果。隨機選中的是查驗者，不是被查驗的目標。',
+    seoScenario1: '當缺少公開任務資訊有利於壞人時，可以考慮隱藏，但要權衡新查驗可能給全桌帶來的資訊。',
+    seoScenario2: '查驗為好人可能是{trickster}，為壞人可能是{troublemaker}。結合本局啟用的角色和任務歷史判斷。',
     generalTipsTitle: '一般提示：',
-
     sowSeedsTitle: '播下混亂的種子：',
     sowSeedsText: '利用你的技能使玩家對任務結果感到不確定，在善良力量的行列中造成懷疑和猶豫。',
-
     collaborateTitle: '與其他邪惡的人合作：',
     collaborateText: '隱藏任務前務必權衡後果，僅在對己方有利時使用此能力。',
-
     utilizePowerTitle: '戰略性地運用你的力量：',
     utilizePowerText:
       '時機決定一切——你只能使用一次能力。隱藏任務結果時，會觸發其他玩家的忠誠檢驗。選擇最能製造混亂並保護盟友的時機。',
-
-    maintainDisguiseTitle: '保持你的偽裝：',
-    maintainDisguiseText: '避免透露可能揭示你真正意圖的任何提示或引起懷疑。',
-
-    strategicTipsTitle: '戰略提示：',
-
-    createUncertaintyTitle: '製造不確定性：',
-    createUncertaintyText: '你對任務結果的遮掩能力使善良玩家一片黑暗，讓他們難以有效策劃。',
-
-    influenceGameplayTitle: '影響遊戲：',
-    influenceGameplayText: '鼓勵善良玩家之間的懷疑和不和，將討論和決策引向對邪惡有利的方向。',
-
-    hideEarlyMissionsTitle: '隱藏早期任務：',
-    hideEarlyMissionsText:
-      '隱藏早期任務可製造混亂，但會觸發檢驗。與盟友協調，確保檢驗不會暴露他們，同時將嫌疑引向關鍵對手。',
-
-    conclusion:
-      '作為{witch}，你通過隱藏任務和強制檢驗散播混亂。你唯一的能力既可揭露他人，又能保護自己。用它創造正義陣營無法破解的矛盾！',
   },
   es: {
-    generalInformation: 'Información General: ',
-    intro:
-      'Como {witch}, posees un poder único entre los siervos del mal: ocultar el resultado de una misión mientras activas una verificación de lealtad en un jugador aleatorio (no {witch}). Aunque esto da información al bando bueno, tu objetivo es usarla como arma: sembrar caos, poner aliados en contra y llevar el juego hacia el mal, manteniendo tu tapadera.',
+    seoHeading: 'Bruja en Avalon: misión oculta y comprobación',
+    seoTeam: 'Mal. {witch} puede usar su habilidad especial una vez por partida en esta plataforma.',
+    seoAbility:
+      'La Bruja puede ocultar el resultado de una misión. Un jugador aleatorio distinto de la Bruja recibe el derecho a comprobar la lealtad mostrada de un jugador.',
+    seoLimit:
+      '¿Convierte Fracaso en Éxito? No: oculta información sin cambiar el resultado real. Se elige al azar a quien comprueba, no al objetivo de la comprobación.',
+    seoScenario1:
+      'Oculta una misión si perder esa información pública beneficia al mal, pero considera lo que la nueva comprobación puede revelar.',
+    seoScenario2:
+      'Una comprobación buena puede corresponder a {trickster}; una mala, a {troublemaker}. Interpreta el resultado junto con los roles habilitados y las misiones.',
     generalTipsTitle: 'Consejos Generales:',
-
     sowSeedsTitle: 'Siembra semillas de confusión:',
     sowSeedsText:
       'Utiliza tu habilidad para mantener a los jugadores inciertos sobre los resultados de las misiones, causando dudas e indecisión dentro de las filas del bien.',
-
     collaborateTitle: 'Colabora con otros malvados:',
     collaborateText:
       'Evalúa cuidadosamente las consecuencias de ocultar una misión, y hazlo solo cuando beneficie a ti y a tus aliados.',
-
     utilizePowerTitle: 'Utiliza tu poder estratégicamente:',
     utilizePowerText:
       'El momento lo es todo — solo puedes usar tu habilidad una vez. Al ocultar un resultado, provocas una verificación en otro jugador. Elige el momento que maximice el caos protegiendo a tus aliados.',
-
-    maintainDisguiseTitle: 'Mantén tu disfraz:',
-    maintainDisguiseText:
-      'Evita dar pistas que puedan revelar tu verdadera lealtad o despertar sospechas sobre tus intenciones.',
-
-    strategicTipsTitle: 'Consejos Estratégicos:',
-
-    createUncertaintyTitle: 'Crea incertidumbre:',
-    createUncertaintyText:
-      'Tu habilidad para obscurecer los resultados de las misiones deja a los jugadores del bien en la oscuridad, dificultándoles planificar de manera efectiva.',
-
-    influenceGameplayTitle: 'Influye en el juego:',
-
-    influenceGameplayText:
-      'Fomenta la duda y la discordia entre los jugadores del bien, orientando las discusiones y decisiones hacia una dirección favorable para el mal.',
-
-    hideEarlyMissionsTitle: 'Oculta las primeras misiones:',
-    hideEarlyMissionsText:
-      'Ocultar misiones tempranas genera confusión, pero activa una verificación. Coordina con aliados para que la verificación no los exponga, mientras señalas a oponentes clave.',
-
-    conclusion:
-      '¡Como {witch}, siembras caos mediante misiones ocultas y verificaciones forzadas. Tu único movimiento puede exponer a otros mientras te proteges. Úsalo para crear paradojas que fracturen la confianza del equipo bueno!',
   },
 };

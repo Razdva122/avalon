@@ -1,32 +1,36 @@
 module.exports.witch = {
   pt: {
-    title: 'Avalon: The Resistance | Bruxa',
-    description: "Regras e dicas para o papel de Bruxa no jogo de tabuleiro 'Avalon: The Resistance'",
+    title: 'Bruxa em Avalon: missão oculta e verificação',
+    description:
+      'O que faz a Bruxa em Avalon? Ocultar uma missão uma vez, conceder uma verificação de lealdade e os limites da habilidade nesta plataforma.',
     keywords: ['Bruxa', 'Papel', 'Regras', 'Dicas'],
   },
   en: {
-    title: 'Avalon: The Resistance | Witch',
-    description: "Rules and Tips for Witch role in the board game 'Avalon: The Resistance'",
+    title: 'Witch in Avalon: Hidden Mission & Loyalty Check',
+    description:
+      'What does the Witch do in Avalon? Learn the one-use hidden mission ability, who receives a loyalty check and why hiding does not change the result.',
     keywords: ['Witch', 'Role', 'Rules', 'Tips'],
   },
   ru: {
-    title: 'Авалон: Сопротивление | Ведьма',
-    description: "Правила и советы для роли Ведьмы в настольной игре 'Авалон: Сопротивление'",
+    title: 'Ведьма в Авалоне: скрытая миссия и проверка',
+    description:
+      'Что делает Ведьма в Авалоне? Одноразовое сокрытие результата миссии, случайный обладатель проверки лояльности и ограничения способности.',
     keywords: ['Ведьма', 'Роль', 'Правила', 'Советы'],
   },
   'zh-TW': {
-    title: '阿瓦隆：反抗勢力 | 巫婆',
-    description: '「阿瓦隆：反抗勢力」桌遊中巫婆的角色規則和攻略建議',
+    title: '阿瓦隆巫婆：隱藏任務結果與陣營查驗',
+    description: '阿瓦隆巫婆做什麼？了解一次性隱藏任務結果、隨機玩家獲得查驗權，以及隱藏不會改變真實任務結果的限制。',
     keywords: ['巫婆', '角色', '規則', '建議'],
   },
   'zh-CN': {
-    title: '阿瓦隆：反抗组织 | 巫婆',
-    description: '桌游《阿瓦隆：反抗组织》中巫婆角色的规则和建议',
+    title: '阿瓦隆巫婆：隐藏任务结果与阵营查验',
+    description: '阿瓦隆巫婆做什么？了解一次性隐藏任务结果、随机玩家获得查验权，以及隐藏不会改变真实任务结果的限制。',
     keywords: ['巫婆', '角色', '规则', '建议'],
   },
   es: {
-    title: 'Avalon: La Resistencia | Bruja',
-    description: "Reglas y consejos para el rol de Bruja en el juego de mesa 'Avalon: La Resistencia'",
+    title: 'Bruja en Avalon: misión oculta y comprobación',
+    description:
+      '¿Qué hace la Bruja en Avalon? Ocultar una misión una sola vez, otorgar una comprobación de lealtad y los límites de la habilidad en esta plataforma.',
     keywords: ['Bruja', 'Rol', 'Reglas', 'Consejos'],
   },
 };

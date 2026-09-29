@@ -1,140 +1,111 @@
 import type { TLanguage } from '@/i18n/interface';
-import { Dictionary } from '@avalon/types';
+import type { Dictionary } from '@avalon/types';
 
 export const lady: { [key in TLanguage]: Dictionary<string> } = {
-  pt: {
-    intro:
-      ' é uma expansão que introduz um novo elemento estratégico e proporciona a capacidade de obter informações adicionais sobre as lealdades de outros jogadores. É usada em <strong>jogos com 7 ou mais</strong> participantes e adiciona mais profundidade à jogabilidade.',
-    title: 'Regras para usar a "Dama do Lago" (Token do Inquisidor em \'The Resistance\'):',
-    whenToUseIt: 'Quando Usar:',
-    comesIntoPlay:
-      ' A {ladyOfLake} entra em jogo após a conclusão da segunda missão. Isso significa que ela se torna disponível a partir da terceira rodada do jogo.',
-    selectingTheHolder: 'Selecionando o Portador:',
-    initiallyGetsPlayer:
-      ' Inicialmente, a {ladyOfLake} vai para o jogador à direita do primeiro líder. O jogador que recebe o título {ladyOfLake} usa seu poder no final de cada rodada (após a segunda), passando-o para outro jogador que ainda não recebeu a {ladyOfLake}.',
-    applyingTheAbility: 'Aplicando a Habilidade:',
-    choosesPlayer:
-      ' O proprietário da {ladyOfLake} escolhe outro jogador e secretamente descobre seu papel — se esse jogador é um Servo de Arthur (bom) ou um Servo de Mordred (mau).',
-    passingTheLady: 'Passando a "Dama do Lago":',
-    passesToChecked:
-      ' Após usar sua habilidade, o proprietário da {ladyOfLake} a passa para o jogador cuja lealdade acabou de ser verificada. Este jogador então usará a {ladyOfLake} na próxima rodada.',
-    restrictionRecurrent: 'Restrição sobre Verificações Recorrentes:',
-    cannotCheckAgain:
-      ' Um jogador que já recebeu a {ladyOfLake} não pode ser verificado novamente. Esta regra ajuda a garantir que a cada rodada, novas informações sejam reveladas sobre um jogador diferente.',
-    strategicUse: 'Uso Estratégico:',
-    strategicPossibilities:
-      ' O uso da {ladyOfLake} adiciona possibilidades estratégicas ao jogo. Os jogadores podem usar as informações obtidas para planejar suas ações, tentando identificar traidores entre os participantes.',
-  },
   en: {
-    intro:
-      ' is an expansion that introduces a new strategic element and provides the ability to gain additional information about the loyalties of other players. It is used in <strong>games with 7 or more</strong> participants and adds more depth to the gameplay.',
-    title: 'Rules for using "Lady of lake" (Inquisitor Token in \'The Resistance\'):',
-    whenToUseIt: 'When to Use It:',
-    comesIntoPlay:
-      ' The {ladyOfLake} comes into play after the second quest is completed. That means it becomes available starting from the third round of the game.',
-    selectingTheHolder: 'Selecting the Holder:',
-    initiallyGetsPlayer:
-      ' Initially, the {ladyOfLake} gets the player to the right of the first leader. The player who receives the title {ladyOfLake} uses her power at the end of each round (after the second), passing it to another player who has not yet received the {ladyOfLake}.',
-    applyingTheAbility: 'Applying the Ability:',
-    choosesPlayer:
-      ' The owner of the {ladyOfLake} chooses another player and secretly learns their role — whether that player is a Servant of Arthur (good) or a Minion of Mordred (evil).',
-    passingTheLady: 'Passing the "Lady of the Lake":',
-    passesToChecked:
-      ' After using her ability, the {ladyOfLake} owner passes it to the player whose loyalty was just checked. This player will then use {ladyOfLake} in the next round.',
-    restrictionRecurrent: 'Restriction on Recurrent Checks:',
-    cannotCheckAgain:
-      ' A player who has already been passed the {ladyOfLake} cannot be checked again. This rule helps ensure that each round, new information is revealed about a different player.',
-    strategicUse: 'Strategic Use:',
-    strategicPossibilities:
-      ' The use of the {ladyOfLake} adds strategic possibilities to the game. Players can use the information gained to plan their actions, trying to identify traitors among the participants.',
+    seoIntro:
+      "The {ladyOfLake} is an optional Avalon expansion for privately checking a player's displayed loyalty. It is a token passed between players, not a character role. These rules describe play on this site.",
+    seoRule1:
+      'The first holder is the player to the right of the first leader. Checks take place before team selection for missions 3, 4 and 5, if the game reaches them; rejected teams do not create extra checks.',
+    seoRule2:
+      'Choose another player who has never held this Lady. Only the holder receives the check result: good or evil, not the exact character. Announce a result to the table, then pass the token to the checked player.',
+    seoRule3:
+      'You cannot check yourself or any previous holder, including the starting holder. The checked player becomes the next holder; this does not mean they must be trusted.',
+    seoLimit1:
+      "Can you lie about the Lady's result? Yes. The private result and the holder's public claim are different things. Compare the claim with votes and mission results.",
+    seoLimit2:
+      'Does the Lady reveal Mordred? {mordred} appears evil despite being hidden from Merlin. {trickster} appears good and {troublemaker} appears evil. Unlike {ladyOfSea}, this Lady does not name an evil role.',
+    seoScenario1:
+      'After mission 2, Alice checks Bob and passes him the token. Before mission 4, Bob must choose someone who has not held it; he cannot check Alice back.',
+    seoScenario2:
+      'A good result does not prove someone is {merlin}: many good roles have that result, and {trickster} also appears good.',
+    seoHeading: 'Lady of the Lake in Avalon: rules and loyalty checks',
   },
   ru: {
-    intro:
-      ' — это дополнение, которое вводит новый стратегический элемент и предоставляет возможность получить дополнительную информацию о лояльности других игроков. Оно используется в <strong>играх с 7 или более</strong> участниками и добавляет глубину игровому процессу.',
-    title: 'Правила использования "Леди Озера" (инквизиторский токен в \'Сопротивление\'):',
-    whenToUseIt: 'Когда использовать:',
-    comesIntoPlay:
-      ' {ladyOfLake} вступает в игру после завершения второго похода. Это означает, что она становится доступна, начиная с третьего раунда игры.',
-    selectingTheHolder: 'Выбор держателя:',
-    initiallyGetsPlayer:
-      ' Изначально {ladyOfLake} передаётся игроку справа от первого лидера. Игрок, получивший титул {ladyOfLake}, использует её силу в конце каждого раунда (после второго), передавая её другому игроку, который ещё не получал {ladyOfLake}.',
-    applyingTheAbility: 'Использование способности:',
-    choosesPlayer:
-      ' Владелец {ladyOfLake} выбирает другого игрока и тайно узнаёт его роль — является ли этот игрок слугой Артура (свет) или приспешником Мордреда (тьма).',
-    passingTheLady: 'Передача "Леди Озера":',
-    passesToChecked:
-      ' После использования способности владелец {ladyOfLake} передаёт её игроку, чья лояльность только что была проверена. Этот игрок затем использует {ladyOfLake} в следующем раунде.',
-    restrictionRecurrent: 'Ограничение на повторные проверки:',
-    cannotCheckAgain:
-      ' Игрок, который уже получил {ladyOfLake}, не может быть проверен снова. Это правило помогает гарантировать, что в каждом раунде раскрывается новая информация о другом игроке.',
-    strategicUse: 'Стратегическое использование:',
-    strategicPossibilities:
-      ' Использование {ladyOfLake} добавляет стратегические возможности в игру. Игроки могут использовать полученную информацию для планирования своих действий, пытаясь выявить предателей среди участников.',
-  },
-  'zh-CN': {
-    intro:
-      ' 是一个扩展，介绍了一种新的战略元素，并提供获得其他玩家忠诚度的附加信息的能力。它用于<strong>7个或以上</strong>参与者的游戏，增加了更多游戏深度。',
-    title: '使用 "湖中仙女"（反抗者中的审问标志）的规则：',
-    whenToUseIt: '使用时机：',
-    comesIntoPlay: ' {ladyOfLake}在第二个任务完成后加入游戏。这意味着从游戏的第三轮开始可用。',
-    selectingTheHolder: '选择持有者：',
-    initiallyGetsPlayer:
-      ' 最初，{ladyOfLake}传给第一个领导者右边的玩家。获得{ladyOfLake}头衔的玩家在每轮结束（第二轮之后）使用她的能力，并将其传给另一个尚未获得{ladyOfLake}的玩家。',
-    applyingTheAbility: '应用能力：',
-    choosesPlayer:
-      ' {ladyOfLake}的拥有者选择另一位玩家，秘密了解他们的角色——该玩家是亚瑟的仆人（善）还是莫德雷德的手下（恶）。',
-    passingTheLady: '传递"湖上女士"：',
-    passesToChecked:
-      ' 使用能力后，{ladyOfLake}的拥有者将其传递给刚刚忠诚被检查的玩家。这个玩家将在下一轮使用{ladyOfLake}。',
-    restrictionRecurrent: '重复检查的限制：',
-    cannotCheckAgain:
-      ' 已经传递过{ladyOfLake}的玩家不能再被检查。该规则有助于确保每一个轮次都有新的信息被揭露关于不同的玩家。',
-    strategicUse: '战略性使用：',
-    strategicPossibilities:
-      ' 使用{ladyOfLake}为游戏增添了战略性的可能性。玩家可以使用获得的信息制定行动计划，试图识别参与者中的叛徒。',
-  },
-  'zh-TW': {
-    intro:
-      ' 是一個擴展，介紹了一種新的戰略元素，並提供獲取其他玩家忠誠度的附加信息的能力。它用於<strong>7位或更多</strong>參加者的遊戲中，增加了更多遊戲深度。',
-    title: '使用 "湖中仙女"（反抗者中的審問標記）的規則：',
-    whenToUseIt: '使用時機：',
-    comesIntoPlay: ' {ladyOfLake}在第二個任務完成後加入遊戲。這表示從遊戲的第三輪開始可用。',
-    selectingTheHolder: '選擇持有者：',
-    initiallyGetsPlayer:
-      ' 最初，{ladyOfLake}傳給第一個領導者右邊的玩家。獲得{ladyOfLake}頭銜的玩家在每輪結束（第二輪之後）使用她的能力，並將其傳給另一個尚未獲得{ladyOfLake}的玩家。',
-    applyingTheAbility: '應用能力：',
-    choosesPlayer:
-      ' {ladyOfLake}的擁有者選擇另一位玩家，秘密了解他們的角色——該玩家是亞瑟的僕人（善）還是莫德雷德的手下（惡）。',
-    passingTheLady: '傳遞"湖上女士"：',
-    passesToChecked:
-      ' 使用能力後，{ladyOfLake}的擁有者將其傳遞給剛剛忠誠被檢查的玩家。這個玩家將在下一輪使用{ladyOfLake}。',
-    restrictionRecurrent: '重複檢查的限制：',
-    cannotCheckAgain: ' 已經傳遞過{ladyOfLake}的玩家不能再被檢查。此規則有助于確保每輪都揭露新的信息關於不同的玩家。',
-    strategicUse: '戰略性使用：',
-    strategicPossibilities:
-      ' 使用{ladyOfLake}為游戏增添了戰略性的可能性。玩家可以使用獲得的信息制定行動計劃，試圖識別參加者中的叛徒。',
+    seoIntro:
+      '{ladyOfLake} — дополнение Авалона для тайной проверки отображаемой лояльности игрока. Это передаваемый жетон, а не отдельная роль. Ниже описаны правила игры на этом сайте.',
+    seoRule1:
+      'Первый владелец — игрок справа от первого лидера. Проверки проходят перед сбором команды на миссии 3, 4 и 5, если игра до них дошла. Отклонённая команда не даёт дополнительной проверки.',
+    seoRule2:
+      'Выберите другого игрока, который ещё не владел этой Леди. Только владелец узнаёт результат: добро или зло, без точной роли. Затем он объявляет результат столу и передаёт жетон проверенному игроку.',
+    seoRule3:
+      'Нельзя проверять себя и любого прежнего владельца, включая первого. Проверенный игрок получает право следующей проверки, но это само по себе не делает его надёжным союзником.',
+    seoLimit1:
+      'Можно ли лгать о результате Леди? Да. Тайный результат и публичное заявление владельца — разные вещи. Сопоставляйте слова с голосованиями и исходами миссий.',
+    seoLimit2:
+      'Видит ли Леди Мордреда? {mordred} определяется как зло, хотя скрыт от Мерлина. {trickster} выглядит добрым, а {troublemaker} — злым. Точную злую роль может показать {ladyOfSea}; Леди Озера её не называет.',
+    seoScenario1:
+      'После миссии 2 Анна проверяет Бориса и передаёт ему жетон. Перед миссией 4 Борис должен выбрать того, кто ещё не владел Леди: проверить Анну в ответ нельзя.',
+    seoScenario2:
+      'Результат «добро» не доказывает, что игрок — {merlin}: так выглядят многие добрые роли, а также {trickster}.',
+    seoHeading: 'Леди Озера в Авалоне: правила и проверка лояльности',
   },
   es: {
-    intro:
-      ' es una expansión que introduce un nuevo elemento estratégico y proporciona la capacidad de obtener información adicional sobre las lealtades de otros jugadores. Se utiliza en <strong>juegos con 7 o más</strong> participantes y añade más profundidad al juego.',
-    title: 'Reglas para usar "Dama del Lago" (Ficha de Inquisidor en \'La Resistencia\'):',
-    whenToUseIt: 'Cuándo Usarla:',
-    comesIntoPlay:
-      ' La {ladyOfLake} entra en juego después de que se completa la segunda misión. Esto significa que está disponible a partir de la tercera ronda del juego.',
-    selectingTheHolder: 'Seleccionando al Portador:',
-    initiallyGetsPlayer:
-      ' Inicialmente, la {ladyOfLake} es otorgada al jugador a la derecha del primer líder. El jugador que recibe el título de {ladyOfLake} utiliza su poder al final de cada ronda (después de la segunda), pasándola a otro jugador que aún no haya recibido la {ladyOfLake}.',
-    applyingTheAbility: 'Aplicación de la Habilidad:',
-    choosesPlayer:
-      ' El dueño de la {ladyOfLake} elige a otro jugador y aprende secretamente su rol — si ese jugador es un Servidor de Arturo (bueno) o un Esbirros de Mordred (malo).',
-    passingTheLady: 'Pasando la "Dama del Lago":',
-    passesToChecked:
-      ' Después de usar su habilidad, el dueño de {ladyOfLake} la pasa al jugador cuya lealtad acaba de ser comprobada. Este jugador usará entonces {ladyOfLake} en la siguiente ronda.',
-    restrictionRecurrent: 'Restricción sobre Comprobaciones Recurrentes:',
-    cannotCheckAgain:
-      ' Un jugador que ya ha recibido la {ladyOfLake} no puede ser comprobado de nuevo. Esta regla ayuda a asegurar que en cada ronda se revele nueva información sobre un jugador diferente.',
-    strategicUse: 'Uso Estratégico:',
-    strategicPossibilities:
-      ' El uso de la {ladyOfLake} añade posibilidades estratégicas al juego. Los jugadores pueden usar la información obtenida para planificar sus acciones, tratando de identificar a los traidores entre los participantes.',
+    seoIntro:
+      'La {ladyOfLake} es una expansión opcional de Avalon para consultar en privado la lealtad mostrada de un jugador. Es una ficha que cambia de manos, no un personaje. Estas reglas describen la versión del sitio.',
+    seoRule1:
+      'La recibe primero quien está a la derecha del primer líder. Se usa antes de formar los equipos de las misiones 3, 4 y 5, si la partida llega a ellas. Rechazar un equipo no genera otra consulta.',
+    seoRule2:
+      'Elige a otro jugador que nunca haya tenido esta Dama. Solo el portador ve el resultado: bien o mal, sin el personaje exacto. Anuncia un resultado y entrega la ficha al jugador consultado.',
+    seoRule3:
+      'No puedes consultarte a ti mismo ni a ningún portador anterior, incluido el inicial. El jugador consultado será el siguiente portador; eso no demuestra que sea de confianza.',
+    seoLimit1:
+      '¿Se puede mentir sobre el resultado? Sí. La información privada y lo que anuncia el portador son cosas distintas. Contrasta sus palabras con votos y resultados de misiones.',
+    seoLimit2:
+      '¿La Dama detecta a Mordred? {mordred} aparece como mal aunque Merlín no lo vea. {trickster} aparece como bien y {troublemaker} como mal. A diferencia de la {ladyOfSea}, no identifica el personaje malvado.',
+    seoScenario1:
+      'Tras la misión 2, Ana consulta a Bruno y le entrega la ficha. Antes de la misión 4, Bruno debe elegir a alguien que no la haya tenido: no puede consultar a Ana.',
+    seoScenario2:
+      'Un resultado de bien no identifica a {merlin}: muchas funciones buenas muestran ese resultado, y también {trickster}.',
+    seoHeading: 'Dama del Lago en Avalon: reglas y lealtad',
+  },
+  pt: {
+    seoIntro:
+      'A {ladyOfLake} é uma expansão opcional de Avalon para verificar em segredo a lealdade exibida de um jogador. É uma ficha que muda de mãos, não um personagem. Estas regras descrevem a versão do site.',
+    seoRule1:
+      'O primeiro portador é quem está à direita do primeiro líder. As verificações ocorrem antes de formar as equipes das missões 3, 4 e 5, se a partida chegar até elas. Equipes rejeitadas não geram verificações extras.',
+    seoRule2:
+      'Escolha outro jogador que nunca tenha recebido esta Dama. Só o portador vê o resultado: bem ou mal, sem o personagem exato. Anuncie um resultado e passe a ficha ao jogador verificado.',
+    seoRule3:
+      'Não é permitido verificar a si mesmo nem qualquer portador anterior, incluindo o inicial. Quem foi verificado recebe a próxima verificação; isso não prova que seja confiável.',
+    seoLimit1:
+      'É possível mentir sobre o resultado? Sim. O resultado privado e o anúncio do portador são coisas diferentes. Compare o anúncio com votos e resultados das missões.',
+    seoLimit2:
+      'A Dama detecta Mordred? {mordred} aparece como mal, embora Merlin não o veja. {trickster} aparece como bem e {troublemaker} como mal. Ao contrário da {ladyOfSea}, esta Dama não identifica o personagem do mal.',
+    seoScenario1:
+      'Após a missão 2, Ana verifica Bruno e passa a ficha a ele. Antes da missão 4, Bruno deve escolher alguém que nunca a recebeu: não pode verificar Ana de volta.',
+    seoScenario2:
+      'Um resultado de bem não identifica {merlin}: vários personagens do bem têm esse resultado, assim como {trickster}.',
+    seoHeading: 'Dama do Lago em Avalon: regras e lealdade',
+  },
+  'zh-CN': {
+    seoIntro:
+      '{ladyOfLake}也常被称为湖中女神，是阿瓦隆中用于私下查验玩家显示阵营的扩展。它是会传递的标记，不是独立角色。以下介绍本站的玩法。',
+    seoRule1:
+      '首任队长右侧的玩家首先持有标记。若游戏仍在进行，分别在第3、4、5次任务组队前查验。队伍被否决不会增加查验次数。',
+    seoRule2:
+      '选择另一位从未持有过这枚标记的玩家。只有持有者看到查验结果：好人或坏人，不是具体角色。随后公开宣布一个结果，并把标记交给被查验者。',
+    seoRule3: '不能查验自己或任何之前的持有者，包括最初持有者。被查验者获得下次查验权，但这并不证明其值得信任。',
+    seoLimit1: '可以谎报湖中仙女的结果吗？可以。私下看到的结果与公开说法是两回事，应结合投票和任务结果判断。',
+    seoLimit2:
+      '湖中仙女能查到莫德雷德吗？{mordred}虽然不被梅林看见，查验仍显示坏人。{trickster}显示好人，{troublemaker}显示坏人。与{ladyOfSea}不同，它不显示具体的坏人角色。',
+    seoScenario1: '任务2结束后，甲查验乙并交出标记。任务4组队前，乙必须选择从未持有过标记的人，不能回查甲。',
+    seoScenario2: '查验显示好人不代表对方就是{merlin}：许多好人角色都显示好人，{trickster}也一样。',
+    seoHeading: '阿瓦隆湖中仙女（湖中女神）：查验规则与传递顺序',
+  },
+  'zh-TW': {
+    seoIntro:
+      '{ladyOfLake}也常被稱為湖中女神，是阿瓦隆中用於私下查驗玩家顯示陣營的擴充。它是會傳遞的標記，不是獨立角色。以下介紹本站的玩法。',
+    seoRule1:
+      '首任隊長右側的玩家首先持有標記。若遊戲仍在進行，分別在第3、4、5次任務組隊前查驗。隊伍被否決不會增加查驗次數。',
+    seoRule2:
+      '選擇另一位從未持有過這枚標記的玩家。只有持有者看到查驗結果：好人或壞人，不是具體角色。隨後公開宣布一個結果，並把標記交給被查驗者。',
+    seoRule3: '不能查驗自己或任何之前的持有者，包括最初持有者。被查驗者獲得下次查驗權，但這並不證明其值得信任。',
+    seoLimit1: '可以謊報湖中仙女的結果嗎？可以。私下看到的結果與公開說法是兩回事，應結合投票和任務結果判斷。',
+    seoLimit2:
+      '湖中仙女能查到莫德雷德嗎？{mordred}雖然不被梅林看見，查驗仍顯示壞人。{trickster}顯示好人，{troublemaker}顯示壞人。與{ladyOfSea}不同，它不顯示具體的壞人角色。',
+    seoScenario1: '任務2結束後，甲查驗乙並交出標記。任務4組隊前，乙必須選擇從未持有過標記的人，不能回查甲。',
+    seoScenario2: '查驗顯示好人不代表對方就是{merlin}：許多好人角色都顯示好人，{trickster}也一樣。',
+    seoHeading: '阿瓦隆湖中仙女（湖中女神）：查驗規則與傳遞順序',
   },
 };

@@ -1,67 +1,52 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
-    <h1>{{ $t('addons.ladyOfSea') }}</h1>
-    <SchemaImage
-      class="preview-image"
-      :src="getImagePathByID('features', 'lady_of_sea')"
-      :alt="$t('addons.ladyOfSea')"
-      :description="$t('addons.ladyOfSea')"
-    />
-    <p>
-      <LocalizedTextWrapper keypath="ladySea.intro" />
-    </p>
+    <h1>{{ $t('ladySea.seoHeading') }}</h1>
+    <div class="addon-overview">
+      <SchemaImage
+        class="addon-image"
+        :src="getImagePathByID('features', 'lady_of_sea')"
+        :alt="$t('addons.ladyOfSea')"
+        :description="$t('addons.ladyOfSea')"
+      />
+      <p><LocalizedTextWrapper keypath="ladySea.seoIntro" /></p>
+    </div>
+    <section class="addon-rules">
+      <h2>{{ $t('wiki.rules') }}</h2>
+      <ol>
+        <li v-for="number in 3" :key="number"><LocalizedTextWrapper :keypath="`ladySea.seoRule${number}`" /></li>
+      </ol>
+    </section>
+    <section class="wiki-panel addon-limits">
+      <h2>{{ $t('wiki.roleLimit') }}</h2>
+      <p><LocalizedTextWrapper keypath="ladySea.seoLimit1" /></p>
+      <p><LocalizedTextWrapper keypath="ladySea.seoLimit2" /></p>
+    </section>
+    <section class="addon-scenarios">
+      <h2>{{ $t('wiki.roleScenarios') }}</h2>
+      <ul>
+        <li v-for="number in 2" :key="number"><LocalizedTextWrapper :keypath="`ladySea.seoScenario${number}`" /></li>
+      </ul>
+    </section>
+    <nav class="wiki-nav" :aria-label="$t('wiki.title')">
+      <LocaleLink :to="{ name: 'expansions' }">{{ $t('wiki.addonsTitle') }}</LocaleLink>
+      <LocaleLink :to="{ name: 'roles' }">{{ $t('wiki.rolesTitle') }}</LocaleLink>
+    </nav>
 
-    <h2>{{ $t('ladySea.title') }}</h2>
-
-    <ol>
-      <li>
-        <strong>{{ $t('ladySea.howToUseTitle') }}</strong>
-        <LocalizedTextWrapper keypath="ladySea.howToUseContent" />
-      </li>
-      <li>
-        <strong>{{ $t('ladySea.complicationTitle') }}</strong>
-        <LocalizedTextWrapper keypath="ladySea.complicationContent" />
-      </li>
-      <li>
-        <strong>{{ $t('ladySea.additionalInformationTitle') }}</strong>
-        <LocalizedTextWrapper keypath="ladySea.additionalInformationContent" />
-      </li>
-      <li>
-        <strong>{{ $t('ladySea.rolesTitle') }}</strong>
-        <LocalizedTextWrapper keypath="ladySea.rolesContent" />
-      </li>
-    </ol>
+    <WikiPlayCta />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
+import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 import { getImagePathByID } from '@/helpers/images';
-
-export default defineComponent({
-  components: {
-    WikiBreadCrumbs,
-    PreviewLink,
-    SchemaImage,
-    LocalizedTextWrapper,
-  },
-  data() {
-    return {
-      getImagePathByID,
-    };
-  },
-});
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
-
-h2 {
-  margin-top: 20px;
-}
+@import '@/styles/wiki-page.scss';
+@import '@/styles/wiki-addon.scss';
 </style>

@@ -1,21 +1,11 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content wiki-page">
     <WikiBreadCrumbs />
     <h1>
       <div class="evil-loyalty-icon"></div>
-      {{ $t('roles.brute') }} {{ $t('roles.role') }}
+      {{ $t('brute.seoHeading') }}
     </h1>
-    <SchemaImage
-      class="preview-image"
-      :src="calculateRoleUrl('brute')"
-      :alt="$t('roles.brute')"
-      :description="$t('roles.brute')"
-    />
-
-    <h2>{{ $t('brute.generalInformation') }}</h2>
-    <p>
-      <LocalizedTextWrapper keypath="brute.roleDescription" />
-    </p>
+    <WikiRoleGuide role="brute" />
 
     <TopRolePlayer role="brute" class="my-4" />
 
@@ -34,22 +24,6 @@
         <LocalizedTextWrapper keypath="brute.strategicSuccessLaterDescription" />
       </li>
     </ul>
-
-    <h2>{{ $t('brute.strategicTips') }}</h2>
-    <ul>
-      <li>
-        <strong>{{ $t('brute.earlyMissionAmbiguities') }}</strong>
-        {{ $t('brute.earlyMissionAmbiguitiesDescription') }}
-      </li>
-      <li>
-        <strong>{{ $t('brute.buildTrustEndgame') }}</strong>
-        {{ $t('brute.buildTrustEndgameDescription') }}
-      </li>
-    </ul>
-
-    <p>
-      <LocalizedTextWrapper keypath="brute.embraceCapabilities" />
-    </p>
     <WikiPlayCta />
   </div>
 </template>
@@ -58,29 +32,24 @@
 import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 import { defineComponent } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
-import PreviewLink from '@/components/view/information/PreviewLink.vue';
-import SchemaImage from '@/components/view/SchemaImage.vue';
+import WikiRoleGuide from '@/components/view/information/WikiRoleGuide.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
 import TopRolePlayer from '@/components/stats/TopRolePlayer.vue';
-import { calculateRoleUrl } from '@/helpers/styles';
 
 export default defineComponent({
   components: {
     WikiPlayCta,
     WikiBreadCrumbs,
-    PreviewLink,
-    SchemaImage,
+    WikiRoleGuide,
     LocalizedTextWrapper,
     TopRolePlayer,
-  },
-  methods: {
-    calculateRoleUrl: calculateRoleUrl,
   },
 });
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+@import '@/styles/wiki-page.scss';
 
 h2 {
   margin-top: 20px;
