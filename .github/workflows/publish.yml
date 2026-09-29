@@ -40,6 +40,16 @@ jobs:
           ref: refs/tags/${{ env.RELEASE_TAG }}
           persist-credentials: false
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install nginx for routing checks
+        run: sudo apt-get update && sudo apt-get install -y nginx
+
+      - name: Check mounted nginx configuration upgrade
+        run: node --test deploy/nginx/*.test.cjs
+
       - name: Resolve immutable release commit
         id: release
         shell: bash
