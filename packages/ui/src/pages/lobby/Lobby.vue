@@ -575,14 +575,14 @@ h1 {
   top: 12px;
   right: 15px;
   transform: rotate(14deg);
-  background-image: getImagePathByID('roles', 'morgana');
+  background-image: getAvatarPathByID('roles', 'morgana');
   background-position: center;
 }
 .character-card--merlin {
   top: 0;
   left: 18px;
   transform: rotate(-12deg);
-  background-image: getImagePathByID('roles', 'merlin');
+  background-image: getAvatarPathByID('roles', 'merlin');
   background-position: center;
 }
 .art-caption {

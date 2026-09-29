@@ -1,0 +1,198 @@
+[
+  {
+    "id": "2dTJjX0h8JpiH8JQs00021Dwk",
+    "createdAt": "2026-09-29T10:14:42.355Z",
+    "target": "avalon-game.com",
+    "method": "HTTPS GET /",
+    "results": [
+      {
+        "country": "TW",
+        "city": "Taipei",
+        "network": "Data Communication Business Group",
+        "status": 200,
+        "timingsMs": {
+          "total": 1464,
+          "dns": 344,
+          "tcp": 279,
+          "tls": 282,
+          "firstByte": 558,
+          "download": 1
+        },
+        "firstByteIncludingConnectionMs": 1463
+      },
+      {
+        "country": "DE",
+        "city": "Falkenstein",
+        "network": "Hetzner Online",
+        "status": 200,
+        "timingsMs": {
+          "total": 270,
+          "dns": 66,
+          "tcp": 50,
+          "tls": 54,
+          "firstByte": 100,
+          "download": 0
+        },
+        "firstByteIncludingConnectionMs": 270
+      },
+      {
+        "country": "US",
+        "city": "Buffalo",
+        "network": "HostPapa",
+        "status": 200,
+        "timingsMs": {
+          "total": 710,
+          "dns": 181,
+          "tcp": 124,
+          "tls": 144,
+          "firstByte": 242,
+          "download": 19
+        },
+        "firstByteIncludingConnectionMs": 691
+      }
+    ]
+  },
+  {
+    "id": "2EW3lDoqAVHdi3g3o00021Dwl",
+    "createdAt": "2026-09-29T10:15:40.146Z",
+    "target": "avalon-game.com",
+    "method": "HTTPS GET /",
+    "results": [
+      {
+        "country": "TW",
+        "city": "Taipei",
+        "network": "Data Communication Business Group",
+        "status": 200,
+        "timingsMs": {
+          "total": 1218,
+          "dns": 18,
+          "tcp": 286,
+          "tls": 332,
+          "firstByte": 573,
+          "download": 9
+        },
+        "firstByteIncludingConnectionMs": 1209
+      },
+      {
+        "country": "TW",
+        "city": "Taichung",
+        "network": "Data Communication Business Group",
+        "status": 200,
+        "timingsMs": {
+          "total": 1484,
+          "dns": 332,
+          "tcp": 285,
+          "tls": 295,
+          "firstByte": 571,
+          "download": 1
+        },
+        "firstByteIncludingConnectionMs": 1483
+      },
+      {
+        "country": "TW",
+        "city": "Taipei",
+        "network": "Digital United",
+        "status": 200,
+        "timingsMs": {
+          "total": 1069,
+          "dns": 472,
+          "tcp": 148,
+          "tls": 153,
+          "firstByte": 295,
+          "download": 1
+        },
+        "firstByteIncludingConnectionMs": 1068
+      },
+      {
+        "country": "DE",
+        "city": "Falkenstein",
+        "network": "Hetzner Online",
+        "status": 200,
+        "timingsMs": {
+          "total": 312,
+          "dns": 109,
+          "tcp": 44,
+          "tls": 69,
+          "firstByte": 88,
+          "download": 2
+        },
+        "firstByteIncludingConnectionMs": 310
+      },
+      {
+        "country": "DE",
+        "city": "Nuremberg",
+        "network": "netcup",
+        "status": 200,
+        "timingsMs": {
+          "total": 275,
+          "dns": 63,
+          "tcp": 50,
+          "tls": 65,
+          "firstByte": 92,
+          "download": 5
+        },
+        "firstByteIncludingConnectionMs": 270
+      },
+      {
+        "country": "DE",
+        "city": "Nuremberg",
+        "network": "Hetzner Online",
+        "status": 200,
+        "timingsMs": {
+          "total": 336,
+          "dns": 152,
+          "tcp": 43,
+          "tls": 54,
+          "firstByte": 85,
+          "download": 2
+        },
+        "firstByteIncludingConnectionMs": 334
+      },
+      {
+        "country": "US",
+        "city": "Los Angeles",
+        "network": "HostPapa",
+        "status": 200,
+        "timingsMs": {
+          "total": 1062,
+          "dns": 360,
+          "tcp": 172,
+          "tls": 184,
+          "firstByte": 344,
+          "download": 2
+        },
+        "firstByteIncludingConnectionMs": 1060
+      },
+      {
+        "country": "US",
+        "city": "Buffalo",
+        "network": "HostPapa",
+        "status": 200,
+        "timingsMs": {
+          "total": 564,
+          "dns": 71,
+          "tcp": 119,
+          "tls": 131,
+          "firstByte": 238,
+          "download": 5
+        },
+        "firstByteIncludingConnectionMs": 559
+      },
+      {
+        "country": "US",
+        "city": "Houston",
+        "network": "Snaju Development",
+        "status": 200,
+        "timingsMs": {
+          "total": 971,
+          "dns": 311,
+          "tcp": 162,
+          "tls": 172,
+          "firstByte": 325,
+          "download": 1
+        },
+        "firstByteIncludingConnectionMs": 970
+      }
+    ]
+  }
+]

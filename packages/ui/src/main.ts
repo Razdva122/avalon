@@ -17,6 +17,9 @@ import { socket } from '@/api/socket';
 import { prerender, ssrPage, hydratePage } from '@/helpers/prerender';
 import { userSettingsInStorage } from '@/store/init';
 import { fullStylesReady } from '@/helpers/critical-css';
+import { startWebVitals } from '@/helpers/web-vitals';
+
+startWebVitals();
 
 const root = document.querySelector<HTMLElement>('#app')!;
 const app = (hydratePage || (prerender && ssrPage) ? createSSRApp : createApp)(App)

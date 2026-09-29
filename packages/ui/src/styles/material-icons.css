@@ -90,6 +90,9 @@
 .material-icons.attachment::before {
   content: '\e2bc';
 }
+.material-icons.attribution::before {
+  content: '\efdb';
+}
 .material-icons.auto_awesome::before {
   content: '\e65f';
 }
@@ -113,9 +116,6 @@
 }
 .material-icons.cached::before {
   content: '\e86a';
-}
-.material-icons.call::before {
-  content: '\e0b0';
 }
 .material-icons.campaign::before {
   content: '\ef49';
@@ -299,6 +299,9 @@
 }
 .material-icons.forum::before {
   content: '\e0bf';
+}
+.material-icons.forward::before {
+  content: '\e154';
 }
 .material-icons.fullscreen::before {
   content: '\e5d0';

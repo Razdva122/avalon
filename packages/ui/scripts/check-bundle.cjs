@@ -19,6 +19,12 @@ for (const file of maps) {
   }
 }
 const initial = files.filter((file) => /^(app|chunk-vendors)\..*\.js$/.test(file));
+// Diagnostics are fetched independently, but still count their cost explicitly.
+const vitals = files.filter((file) => /^web-vitals\..*\.js$/.test(file));
+assert.equal(vitals.length, 1, 'Expected one independently loaded Web Vitals chunk');
+const vitalsBytes = zlib.gzipSync(fs.readFileSync(path.join(dist, 'js', vitals[0]))).length;
+assert(vitalsBytes < 15 * 1024, `Web Vitals diagnostics exceed 15 KiB gzip: ${vitalsBytes}`);
+console.log(`Optional Web Vitals diagnostics: ${(vitalsBytes / 1024).toFixed(1)} KiB gzip.`);
 const gzipBytes = initial.reduce(
   (sum, file) => sum + zlib.gzipSync(fs.readFileSync(path.join(dist, 'js', file))).length,
   0,

@@ -19,3 +19,7 @@
 @function getThumbnailPathByID($type, $id) {
   @return url('~@/assets/thumbnails/#{$type}/#{$id}.webp');
 }
+
+@function getAvatarPathByID($type, $id) {
+  @return url('~@/assets/avatars/#{$type}/#{$id}.webp');
+}
