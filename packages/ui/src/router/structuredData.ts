@@ -31,6 +31,7 @@ export function updateStructuredData(
 
   const url = origin + path;
   const home = basePath(path) === '/';
+  const community = basePath(path).startsWith('/community/');
   const wiki = basePath(path).startsWith('/wiki/');
   const graph = [
     {
@@ -48,7 +49,8 @@ export function updateStructuredData(
       inLanguage: meta.lang,
       isPartOf: { '@id': origin + '/#website' },
       ...(home ? { mainEntity: { '@id': origin + '/#game' } } : {}),
-      ...(wiki ? { about: { '@id': origin + '/#game' } } : {}),
+      ...(community ? { additionalType: 'https://schema.org/CollectionPage' } : {}),
+      ...(wiki || community ? { about: { '@id': origin + '/#game' } } : {}),
       ...(breadcrumbs.length ? { breadcrumb: { '@id': url + '#breadcrumbs' } } : {}),
     },
     ...(home

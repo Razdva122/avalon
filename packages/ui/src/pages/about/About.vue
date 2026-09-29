@@ -1,12 +1,12 @@
 <template>
-  <div class="info-page-content">
+  <div class="info-page-content about-page">
     <h1 class="title">{{ $t('about.title') }}</h1>
     <div v-html="$t('about.content')"></div>
 
     <div v-html="$t('about.description')"></div>
 
     <div class="image">
-      <img class="preview" alt="preview" :src="getImagePathByID('other', 'preview')" />
+      <img class="preview" :alt="$t('about.title')" :src="getImagePathByID('other', 'preview')" />
     </div>
 
     <div>
@@ -50,6 +50,10 @@
       v-if="$store.state.profile && !$store.state.profile?.knownAchievements?.includes('secret_hunter')"
       @click="redeemAvatar"
       class="socials secret-avatar"
+      role="button"
+      tabindex="0"
+      @keydown.enter="redeemAvatar"
+      @keydown.space.prevent="redeemAvatar"
     >
       {{ $t('about.secretAvatar') }}
     </div>
@@ -109,7 +113,8 @@ export default defineComponent({
 }
 
 .supporters h2 {
-  font-size: 24px;
+  font-size: 16px;
+  line-height: 1.8;
   margin-bottom: 12px;
 }
 
@@ -137,7 +142,8 @@ export default defineComponent({
 }
 
 .socials {
-  font-size: 24px;
+  font-size: 16px;
+  line-height: 1.8;
 }
 
 .preview {
@@ -149,11 +155,16 @@ export default defineComponent({
   cursor: pointer;
 }
 
+.about-page {
+  max-width: 960px;
+}
+
 .image {
   text-align: center;
 }
 
 .disclaimer {
-  font-size: 12px;
+  font-size: 14px;
+  color: rgb(var(--v-theme-text-secondary));
 }
 </style>

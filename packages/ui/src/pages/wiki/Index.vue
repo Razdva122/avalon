@@ -83,7 +83,7 @@
     border-radius: 16px;
     text-decoration: none;
     color: inherit;
-    background: rgba(var(--v-theme-on-surface), 0.025);
+    background: rgb(var(--v-theme-surface));
     &:hover {
       border-color: rgb(var(--v-theme-primary));
       background: rgba(var(--v-theme-primary), 0.08);

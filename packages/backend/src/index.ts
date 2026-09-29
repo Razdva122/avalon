@@ -13,6 +13,8 @@ import { MigrationError, ensureAchievementCatalog } from '@/db/migrations';
 
 import { Manager } from '@/main';
 import { supportRouter } from '@/support/routes';
+import { playerBoardsRouter } from '@/player-boards/routes';
+import { ensurePlayerBoardIndexes } from '@/player-boards/repository';
 import { directSupport } from '@/support/direct/service';
 import { startSupportWorker } from '@/support/direct/worker';
 import { supportOrderModel } from '@/support/repository';
@@ -52,10 +54,12 @@ async function start() {
   const mongoose = await connectDB();
   await ensureAchievementCatalog(mongoose.connection.db!);
   await supportOrderModel.init();
+  await ensurePlayerBoardIndexes();
   await ensureRoleRatingIndexes();
   await ensureTrueSkillSnapshotIndexes();
   startSupportWorker(directSupport);
   app.use('/api/support', supportRouter);
+  app.use('/api/player-boards', playerBoardsRouter);
   let recovery: RecoveryService | null = null;
   if (mailSettings && mongoose.connection.db) {
     const repository = new MongoRecoveryRepository(mongoose.connection.db, userProfileModel.collection.name);

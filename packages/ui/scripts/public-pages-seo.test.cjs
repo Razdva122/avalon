@@ -4,7 +4,7 @@ const { routesSeo } = require('../src/router/seo');
 const { isNeutralPath, localizedPath } = require('../src/router/paths');
 
 test('support and community are public, indexable, prerendered pages in all six languages', () => {
-  for (const name of ['support', 'community']) {
+  for (const name of ['support', 'community', 'community_solo', 'community_group']) {
     const route = routesSeo[name];
     assert.equal(route.meta.prerender, true, name);
     assert.equal(Boolean(route.meta.skipSiteMap), false, name);

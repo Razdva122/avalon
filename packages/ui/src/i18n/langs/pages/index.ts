@@ -1,6 +1,7 @@
 import { expansions } from './expansions';
 import { wikiPlay } from './wikiPlay';
 import { community } from './community';
+import { playerBoards } from './playerBoards';
 import { support } from './support';
 import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
@@ -50,6 +51,7 @@ Object.entries({
   expansions,
   wikiPlay,
   community,
+  playerBoards,
   support,
   wiki,
   lancelots,

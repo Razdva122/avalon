@@ -4,6 +4,19 @@
  */
 export default {
   menu: {
+    back: 'Volver',
+    darkTheme: 'Tema oscuro',
+
+    rulesRoles: 'Reglas y roles',
+    signIn: 'Entrar',
+    signInRegister: 'Entrar / Registrarse',
+    myProfile: 'Mi perfil',
+    account: 'Mi cuenta',
+    playersResults: 'Jugadores y resultados',
+    aboutAvalon: 'Acerca de Avalon',
+    settings: 'Ajustes',
+    close: 'Cerrar menú',
+
     menu: 'Menú',
     home: 'Inicio',
     profile: 'Perfil',

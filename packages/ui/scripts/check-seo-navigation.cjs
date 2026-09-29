@@ -160,6 +160,8 @@ const server = http.createServer((req, res) => {
       '/ru/wiki/roles/merlin/',
       '/ru/about/',
       '/ru/community/',
+      '/ru/community/players/',
+      '/ru/community/groups/',
       '/ru/support/',
       '/leaderboard/',
       '/',
@@ -221,7 +223,9 @@ const server = http.createServer((req, res) => {
           const node = JSON.parse(raw)['@graph'].find((n) => n['@type'] === 'WebPage');
           return (
             node.url === 'https://avalon-game.com' + route &&
-            (route.includes('/wiki/') ? JSON.parse(crumbs)['@id'] === node.breadcrumb['@id'] : crumbs === '')
+            (route.includes('/wiki/') || route.includes('/community/')
+              ? JSON.parse(crumbs)['@id'] === node.breadcrumb['@id']
+              : crumbs === '')
           );
         },
         {},

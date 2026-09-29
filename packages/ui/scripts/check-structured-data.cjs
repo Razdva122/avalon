@@ -68,3 +68,24 @@ test('support and community deliver localized public content and structured data
     }
   }
 });
+
+test('both board landing pages deliver crawlable localized HTML, distinct metadata and breadcrumbs', () => {
+  const { routesSeo } = require('../src/router/seo');
+  const { localizedPath } = require('../src/router/paths');
+  const sitemap = fs.readFileSync(path.join(dist, 'sitemap.xml'), 'utf8');
+  for (const name of ['community_solo', 'community_group']) {
+    const entry = routesSeo[name];
+    for (const [language, meta] of Object.entries(entry.meta.multiLanguage)) {
+      const route = localizedPath(entry.path, language);
+      const html = fs.readFileSync(path.join(dist, route, 'index.html'), 'utf8');
+      assert(html.includes(`<title>${meta.title}</title>`));
+      assert.equal((html.match(/<h1[ >]/g) || []).length, 1);
+      assert(html.includes('discovery-guide'));
+      assert(html.includes(`href="${localizedPath('/community/players/', language)}"`));
+      assert(html.includes(`href="${localizedPath('/community/groups/', language)}"`));
+      assert(sitemap.includes('https://avalon-game.com' + route));
+      assert.equal(graphAt(route).find((item) => item['@type'] === 'BreadcrumbList').itemListElement.length, 3);
+      assert.doesNotMatch(html, /demo_avalon_|demo-board-|class="board-form"/);
+    }
+  }
+});

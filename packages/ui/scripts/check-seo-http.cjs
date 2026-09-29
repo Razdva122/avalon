@@ -20,7 +20,15 @@ async function checkCrawlerContent() {
   // User-Agent probes detect simple bot blocking, not verified crawler IP policies.
   const agents = ['Googlebot', 'YandexBot', 'OAI-SearchBot', 'PerplexityBot'];
   for (const language of ['en', 'ru']) {
-    for (const route of ['/', '/wiki/rules/', '/wiki/roles/merlin/', '/support/', '/community/']) {
+    for (const route of [
+      '/',
+      '/wiki/rules/',
+      '/wiki/roles/merlin/',
+      '/support/',
+      '/community/',
+      '/community/players/',
+      '/community/groups/',
+    ]) {
       const pathname = localizedPath(route, language);
       for (const agent of agents) {
         const response = await fetch(origin + pathname, { headers: { 'User-Agent': agent }, redirect: 'manual' });
@@ -54,7 +62,7 @@ async function main() {
   for (const language of languages) {
     await check(localizedPath('/', language), 200);
     await check(localizedPath('/wiki/rules/', language), 200);
-    for (const route of ['/support/', '/community/']) {
+    for (const route of ['/support/', '/community/', '/community/players/', '/community/groups/']) {
       const pathname = localizedPath(route, language);
       await check(pathname, 200);
       await check(pathname.slice(0, -1), 301, pathname);

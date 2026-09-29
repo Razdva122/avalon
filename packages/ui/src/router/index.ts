@@ -14,6 +14,8 @@ import { wikiBreadcrumbs } from './breadcrumbs';
 import { scrollBehavior } from './scroll';
 
 const routeComponentMap = {
+  community_solo: () => import('@/pages/community/Community.vue'),
+  community_group: () => import('@/pages/community/Community.vue'),
   community: () => import('@/pages/community/Community.vue'),
   support: () => import('@/pages/support/Support.vue'),
   lobby: () => import(/* webpackChunkName: 'lobby' */ '@/pages/lobby/Lobby.vue'),
@@ -207,7 +209,26 @@ function updateMetadata(to: RouteLocationNormalized) {
       lang: i18n.global.locale.value,
       skipSiteMap: Boolean(meta.skipSiteMap),
     },
-    wikiArticle ? wikiBreadcrumbs(to.path, i18n.global.locale.value, (key) => i18n.global.t(key)) : [],
+    wikiArticle
+      ? wikiBreadcrumbs(to.path, i18n.global.locale.value, (key) => i18n.global.t(key))
+      : basePath(to.path).startsWith('/community/')
+        ? [
+            { to: localizedPath('/', i18n.global.locale.value), title: i18n.global.t('menu.home') },
+            { to: localizedPath('/community/', i18n.global.locale.value), title: i18n.global.t('community.title') },
+            ...(basePath(to.path) === '/community/'
+              ? []
+              : [
+                  {
+                    to: to.path,
+                    title: i18n.global.t(
+                      basePath(to.path).includes('/players/')
+                        ? 'playerBoards.seoSoloTitle'
+                        : 'playerBoards.seoGroupTitle',
+                    ),
+                  },
+                ]),
+          ]
+        : [],
   );
 
   let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');

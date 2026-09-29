@@ -111,9 +111,6 @@
 .material-icons.block::before {
   content: '\e14b';
 }
-.material-icons.build::before {
-  content: '\e869';
-}
 .material-icons.cached::before {
   content: '\e86a';
 }
@@ -183,6 +180,9 @@
 .material-icons.computer::before {
   content: '\e30a';
 }
+.material-icons.contacts::before {
+  content: '\e0ba';
+}
 .material-icons.content_copy::before {
   content: '\e14d';
 }
@@ -230,9 +230,6 @@
 }
 .material-icons.draw::before {
   content: '\e746';
-}
-.material-icons.duo::before {
-  content: '\e9a5';
 }
 .material-icons.edit::before {
   content: '\e3c9';
@@ -477,9 +474,6 @@
 .material-icons.more::before {
   content: '\e619';
 }
-.material-icons.moving::before {
-  content: '\e501';
-}
 .material-icons.nature::before {
   content: '\e406';
 }
@@ -636,6 +630,9 @@
 .material-icons.scale::before {
   content: '\eb5f';
 }
+.material-icons.schedule::before {
+  content: '\e8b5';
+}
 .material-icons.schema::before {
   content: '\e4fd';
 }
@@ -693,9 +690,6 @@
 .material-icons.style::before {
   content: '\e41d';
 }
-.material-icons.subject::before {
-  content: '\e8d2';
-}
 .material-icons.support::before {
   content: '\ef73';
 }
@@ -716,6 +710,9 @@
 }
 .material-icons.task::before {
   content: '\f075';
+}
+.material-icons.telegram::before {
+  content: '\ea6b';
 }
 .material-icons.timelapse::before {
   content: '\e422';
@@ -773,6 +770,9 @@
 }
 .material-icons.web::before {
   content: '\e051';
+}
+.material-icons.wechat::before {
+  content: '\ea81';
 }
 .material-icons.window::before {
   content: '\f088';

@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-row align-center justify-center">
+  <div class="d-flex flex-row align-center justify-center" role="status" :aria-label="state.text" :title="state.text">
     <div :class="state.class" class="rounded-circle circle"></div>
     <div class="ml-2 connection-state">{{ state.text }}</div>
   </div>
@@ -47,8 +47,8 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .circle {
-  width: 14px;
-  height: 14px;
+  width: 8px;
+  height: 8px;
 }
 
 @media only screen and (max-width: 600px) {

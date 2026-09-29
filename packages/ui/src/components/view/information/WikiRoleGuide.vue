@@ -87,10 +87,10 @@ const facts = [
   padding: 24px;
   border: 1px solid rgba(var(--v-theme-on-surface), 0.14);
   border-radius: 16px;
-  background: rgba(var(--v-theme-on-surface), 0.025);
+  background: rgb(var(--v-theme-surface));
 }
 h2 {
-  font-size: 27px;
+  font-size: clamp(22px, 2.4vw, 27px);
   line-height: 1.35;
   margin: 0 0 16px;
 }

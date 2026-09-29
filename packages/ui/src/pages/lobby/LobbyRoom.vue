@@ -206,7 +206,7 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
 }
 .room-link--join {
   background: rgb(var(--v-theme-primary));
-  color: white;
+  color: rgb(var(--v-theme-on-primary));
 }
 .game:focus-visible {
   outline: 2px solid rgb(var(--v-theme-text-primary));

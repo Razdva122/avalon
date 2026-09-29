@@ -2,14 +2,14 @@
   max-width: 1120px;
   width: 100%;
   margin-inline: auto;
-  padding: 64px 28px 48px;
-  font-size: 17px;
+  padding: 74px 28px 56px;
+  font-size: 16px;
   line-height: 1.7;
   overflow-wrap: anywhere;
   h1 {
     font-size: clamp(28px, 3.2vw, 40px);
     line-height: 1.25;
-    margin: 16px 0 24px;
+    margin: 12px 0 28px;
     text-wrap: balance;
   }
   h2 {
@@ -43,7 +43,7 @@
     padding: 24px;
     border: 1px solid rgba(var(--v-theme-on-surface), 0.14);
     border-radius: 16px;
-    background: rgba(var(--v-theme-on-surface), 0.025);
+    background: rgb(var(--v-theme-surface));
     > h2:first-child,
     > h3:first-child {
       margin-top: 0;
@@ -78,7 +78,7 @@
     }
   }
   @media (max-width: 700px) {
-    padding: 60px 16px 32px;
+    padding: 66px 16px 40px;
     font-size: 16px;
     .wiki-panel {
       padding: 18px;
@@ -86,5 +86,17 @@
     h1 {
       margin-top: 12px;
     }
+  }
+}
+
+.info-page-content.wiki-page {
+  li {
+    list-style-position: outside;
+  }
+  ul:not([class]) > li {
+    list-style-type: disc;
+  }
+  :deep(.wiki-panel) {
+    background: rgb(var(--v-theme-surface));
   }
 }

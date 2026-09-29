@@ -1,11 +1,18 @@
 .info-page-content {
-  padding: 50px 20px 20px 20px;
-  font-size: 18px;
+  max-width: 1180px;
+  width: 100%;
+  margin-inline: auto;
+  padding: 82px 28px 64px;
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
 
   h1 {
-    text-align: center;
-    margin-bottom: 16px;
-    margin-top: 5px;
+    text-align: left;
+    font-size: clamp(28px, 3.2vw, 40px);
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    margin: 0 0 28px;
   }
 
   div,
@@ -37,5 +44,25 @@
     border-radius: 20px;
     overflow: hidden;
     margin-bottom: 0px;
+  }
+}
+
+.info-page-content {
+  h2 {
+    line-height: 1.35;
+    margin-top: 28px;
+    margin-bottom: 14px;
+    font-size: clamp(21px, 2.3vw, 27px);
+  }
+  h3 {
+    line-height: 1.4;
+  }
+  > p,
+  > div:not([class]) {
+    margin-bottom: 18px;
+  }
+  @media (max-width: 700px) {
+    padding: 72px 16px 40px;
+    font-size: 16px;
   }
 }

@@ -2,12 +2,20 @@
   <v-overlay v-model="overlay" :persistent="persistent" class="align-center justify-center modal-overlay">
     <div class="modal-wrapper" :style="maxWidth ? { maxWidth: maxWidth + 'px' } : {}">
       <v-card class="modal-card" :style="maxWidth ? { maxWidth: maxWidth + 'px' } : {}" elevation="8">
-        <v-btn @click="closeModal" class="close-btn" icon="close" color="text-primary" variant="text" size="small" />
+        <v-btn
+          @click="closeModal"
+          :aria-label="$t('infoMessage.close')"
+          class="close-btn"
+          icon="close"
+          color="text-primary"
+          variant="text"
+          size="small"
+        />
         <div class="modal-header-bar">
           <slot name="header"></slot>
         </div>
         <v-sheet :style="$props.width ? { width: $props.width + 'px', maxWidth: '100%' } : {}" class="modal-content">
-          <div v-if="error" class="error-message mb-3">
+          <div v-if="error" class="error-message mb-3" role="alert">
             <span class="material-icons error-icon">error</span>
             <div>
               {{ $t('errors.' + error) }}

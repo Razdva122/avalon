@@ -1,3 +1,4 @@
+const { communitySolo, communityGroup } = require('../i18n/langs/pages/seo/playerBoards');
 const {
   lobby,
   wiki,
@@ -40,6 +41,18 @@ const {
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
+  community_solo: {
+    path: '/community/players/',
+    name: 'community_solo',
+    priority: 0.7,
+    meta: { prerender: true, multiLanguage: communitySolo },
+  },
+  community_group: {
+    path: '/community/groups/',
+    name: 'community_group',
+    priority: 0.7,
+    meta: { prerender: true, multiLanguage: communityGroup },
+  },
   community: {
     path: '/community/',
     name: 'community',

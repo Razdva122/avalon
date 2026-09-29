@@ -3,8 +3,10 @@
     <h1>{{ $t('leaderboard.title') }}</h1>
 
     <div class="custom-tabs-container">
-      <div class="custom-tabs">
-        <div
+      <div class="custom-tabs" role="group" :aria-label="$t('leaderboard.title')">
+        <button
+          type="button"
+          :aria-pressed="activeTab === tab.value"
           v-for="tab in tabs"
           :key="tab.value"
           class="custom-tab"
@@ -13,7 +15,7 @@
         >
           <span class="material-icons"> {{ tab.icon }} </span>
           <span>{{ tab.title }}</span>
-        </div>
+        </button>
       </div>
     </div>
 
@@ -75,7 +77,7 @@ export default defineComponent({
 .custom-tabs-container {
   margin: 20px 0;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .custom-tabs {
@@ -87,16 +89,18 @@ export default defineComponent({
 }
 
 .custom-tab {
-  padding: 12px 24px;
+  padding: 12px clamp(12px, 3vw, 24px);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: background-color 0.15s ease;
   position: relative;
-  min-width: 160px;
+  min-width: 0;
+  min-height: 48px;
+  flex: 1;
   margin-bottom: 0px !important;
 
   &:hover:not(.active) {

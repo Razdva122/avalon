@@ -3,10 +3,12 @@
     <v-btn
       class="mr-1"
       href="https://discord.gg/DR9cEDDNdN"
+      aria-label="Discord"
+      rel="noopener noreferrer"
       target="_blank"
       density="comfortable"
       variant="plain"
-      color="invert"
+      color="text-primary"
       size="large"
       icon
     >
@@ -15,9 +17,11 @@
     <v-btn
       density="comfortable"
       href="https://github.com/Razdva122/avalon"
+      aria-label="GitHub"
+      rel="noopener noreferrer"
       target="_blank"
       variant="plain"
-      color="invert"
+      color="text-primary"
       size="large"
       icon
     >
@@ -34,6 +38,6 @@ export default defineComponent({});
 
 <style scoped lang="scss">
 .social-icon {
-  width: 36px;
+  width: 23px;
 }
 </style>

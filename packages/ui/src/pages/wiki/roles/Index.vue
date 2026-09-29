@@ -220,33 +220,42 @@ export default defineComponent({
 @import '@/styles/wiki-page.scss';
 
 .roles-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-  flex-wrap: wrap;
-
-  h2 {
-    text-align: center;
-    @include text-overflow(1);
-  }
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin: 24px 0 40px;
 }
-
-.role {
-  cursor: pointer;
+.roles-container .role {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 170px;
-  max-width: 20%;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px 12px;
+  border: 1px solid rgb(var(--v-theme-surface-border));
+  border-radius: 14px;
+  background: rgb(var(--v-theme-surface));
+  color: inherit;
+  h2 {
+    font-size: 16px;
+    text-align: center;
+    margin: 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    overflow-wrap: anywhere;
+  }
+  &:hover {
+    border-color: rgb(var(--v-theme-support-accent));
+    background: rgba(var(--v-theme-support-accent), 0.05);
+  }
 }
-
 .role-image {
-  width: 67%;
+  width: min(100%, 132px);
   border: 2px solid rgb(var(--v-theme-info));
+  border-radius: 12px;
   aspect-ratio: 1;
   overflow: hidden;
-
   :deep(.image-content) {
     width: 100%;
     height: 100%;
@@ -254,8 +263,26 @@ export default defineComponent({
     object-position: top center;
   }
 }
-
 .evil-role {
-  border: 2px solid rgb(var(--v-theme-error));
+  border-color: rgb(var(--v-theme-error));
+}
+@media (max-width: 900px) {
+  .roles-container {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 650px) {
+  .roles-container {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .roles-container .role {
+    padding: 14px 8px;
+  }
+}
+@media (max-width: 430px) {
+  .roles-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 </style>

@@ -1,7 +1,7 @@
 .achievements-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 60px 24px 40px;
+  padding: 82px 24px 48px;
   .v-btn {
     text-transform: none;
     letter-spacing: 0;
@@ -109,7 +109,7 @@
 }
 @media (max-width: 600px) {
   .achievements-page {
-    padding: 50px 12px 24px;
+    padding: 72px 16px 32px;
   }
   .page-header {
     flex-direction: column;

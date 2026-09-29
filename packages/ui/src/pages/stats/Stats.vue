@@ -1,9 +1,9 @@
 <template>
   <div class="info-page-content stats-page">
     <h1>{{ $t('stats.title') }}</h1>
-    <p v-if="error" role="alert">{{ $t('errors.' + error) }}</p>
+    <p v-if="error" role="alert" class="stats-state">{{ $t('errors.' + error) }}</p>
     <v-btn v-if="error" @click="initState">{{ $t('mainPage.retryAi') }}</v-btn>
-    <p v-if="!state && !error">{{ $t('mainPage.loading') }}</p>
+    <p v-if="!state && !error" role="status" class="stats-state">{{ $t('mainPage.loading') }}</p>
     <template v-if="state">
       <div class="total-stats">
         <h2>{{ $t('stats.generalStatsTitle') }}</h2>
@@ -206,8 +206,16 @@ export default defineComponent({
 @import '@/styles/info-page.scss';
 
 .chart {
+  width: 100%;
   max-width: 700px;
   height: 400px;
+}
+
+.stats-state {
+  padding: 28px;
+  border-radius: 12px;
+  border: 1px solid rgb(var(--v-theme-surface-border));
+  background: rgb(var(--v-theme-surface));
 }
 
 .stats-page {

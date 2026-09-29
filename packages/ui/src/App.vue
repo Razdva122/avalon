@@ -1,19 +1,34 @@
 <template>
   <header class="header">
-    <div class="header-left-container d-flex align-center mr-4 ml-4">
-      <v-btn class="mr-1" density="comfortable" variant="plain" color="invert" size="large" :to="homePath" icon>
-        <v-icon class="home-icon" size="large" icon="fa:fa-solid fa-house" />
-      </v-btn>
-      <Socials class="mr-4" />
-      <ConnectStatus class="connect-status" />
+    <div class="header-left-container d-flex align-center">
+      <RouterLink class="home-link" :to="homePath" :aria-label="$t('menu.home')">
+        <v-icon class="home-icon" size="20" icon="fa:fa-solid fa-house" aria-hidden="true" />
+      </RouterLink>
+      <ConnectStatus v-if="currentRoute === 'room'" class="connect-status" />
     </div>
-    <div class="header-right-container d-flex align-center mr-2">
-      <DevPanel />
+    <nav class="header-navigation" :aria-label="$t('menu.menu')">
+      <LocaleLink :to="{ name: 'community' }" :class="{ active: inSection('/community/') }">{{
+        $t('community.title')
+      }}</LocaleLink>
+      <LocaleLink class="desktop-navigation" :to="{ name: 'wiki' }" :class="{ active: inSection('/wiki/') }">{{
+        $t('menu.rulesRoles')
+      }}</LocaleLink>
+    </nav>
+    <div class="header-right-container d-flex align-center">
       <SpoilerEye v-if="currentRoute === 'room'" />
-      <ThemeToggle />
+      <button
+        type="button"
+        class="header-account desktop-navigation"
+        :aria-label="$t($store.state.profile ? 'menu.myProfile' : 'menu.signIn')"
+        @click="profileClick"
+      >
+        <Avatar v-if="$store.state.profile" :avatarID="$store.state.profile.avatar" alt="" />
+        <span v-else>{{ $t('menu.signIn') }}</span>
+      </button>
       <Menu @profileClick="profileClick" />
     </div>
   </header>
+  <p v-if="$store.state.connect === false" class="connection-warning" role="status">{{ $t('onlineStatus.error') }}</p>
   <RouterView v-slot="{ Component }">
     <template v-if="Component">
       <Suspense>
@@ -39,10 +54,9 @@ import Menu from '@/components/header/Menu.vue';
 import ConnectStatus from '@/components/feedback/ConnectStatus.vue';
 import InfoSnackbar from '@/components/feedback/InfoSnackbar.vue';
 import Version from '@/components/feedback/Version.vue';
-import Socials from '@/components/feedback/Socials.vue';
 import SpoilerEye from '@/components/feedback/SpoilerEye.vue';
-import ThemeToggle from '@/components/feedback/ThemeToggle.vue';
-import DevPanel from '@/components/dev/DevPanel.vue';
+import Avatar from '@/components/user/Avatar.vue';
+import { inNavigationSection } from '@/components/header/navigation';
 import AchievementPopupsContainer from '@/components/achievements/AchievementPopupsContainer.vue';
 import { isHolidays } from '@/helpers/utility';
 import eventBus from '@/helpers/event-bus';
@@ -56,14 +70,12 @@ export default defineComponent({
     ConnectStatus,
     InfoSnackbar,
     Version,
-    Socials,
     Menu,
     SpoilerEye,
-    ThemeToggle,
+    Avatar,
     CredentialsModal: defineAsyncComponent(
       () => import(/* webpackChunkName: 'credentials-dialog' */ '@/components/user/CredentialsModal.vue'),
     ),
-    DevPanel,
     AchievementPopupsContainer,
   },
   data() {
@@ -85,6 +97,9 @@ export default defineComponent({
     },
   },
   methods: {
+    inSection(path: string) {
+      return inNavigationSection(this.$route.path, path);
+    },
     openAuthModal() {
       this.authRequested = true;
       this.authOpen = true;
@@ -123,15 +138,32 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.v-theme--lightTheme {
+  --v-theme-text-secondary: 93, 105, 120;
+  --v-theme-surface-border: 217, 224, 232;
+}
+.v-theme--darkTheme {
+  --v-theme-text-secondary: 175, 189, 207;
+  --v-theme-surface-border: 53, 66, 85;
+}
+
 body {
   color: rgb(var(--v-theme-text-primary));
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family:
+    Avenir,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Noto Sans',
+    Helvetica,
+    Arial,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 ul > li {
@@ -151,15 +183,17 @@ a {
   height: 50px;
   width: 100%;
   background-color: rgb(var(--v-theme-bg-header));
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
+  border-bottom: 1px solid rgb(var(--v-theme-surface-border));
+  padding-inline: clamp(10px, 2vw, 28px);
+  align-items: center;
+  gap: 12px;
   display: flex;
   justify-content: space-between;
   position: fixed;
   top: 0px;
   left: 0px;
   z-index: 100;
-  box-shadow: 0 2px 4px rgba(var(--v-theme-text-primary), 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.025);
 }
 
 .page {
@@ -167,7 +201,7 @@ a {
 }
 
 .connect-status {
-  font-size: large;
+  font-size: 13px;
 }
 
 .header-right-container {
@@ -175,8 +209,9 @@ a {
 }
 
 .version {
-  opacity: 30%;
-  font-size: large;
+  opacity: 0.55;
+  pointer-events: none;
+  font-size: 11px;
   position: fixed;
   bottom: 5px;
   right: 10px;
@@ -204,7 +239,7 @@ body {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   background-image: getImagePathByID('core', 'holidays-background');
   background-attachment: fixed;
   background-size: cover;
@@ -230,7 +265,7 @@ body {
 }
 
 .home-icon {
-  width: 32px;
+  width: 20px;
 }
 
 .header-left-container {
@@ -240,5 +275,146 @@ body {
 /* Override for skeleton loaders to have transparent background */
 .v-skeleton-loader {
   background-color: transparent !important;
+}
+</style>
+
+<style lang="scss">
+.header-left-container {
+  gap: 14px;
+  min-width: 0;
+}
+.header-right-container {
+  flex-shrink: 0;
+}
+.header .home-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 0 8px;
+  min-height: 44px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.header-navigation {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+.header-navigation a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+}
+.header-navigation a:hover {
+  background: rgb(var(--v-theme-inset-hover));
+}
+.header-navigation .active {
+  color: rgb(var(--v-theme-support-accent));
+  background: rgb(var(--v-theme-support-button));
+}
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 3px;
+}
+:where(button, select, summary) {
+  cursor: pointer;
+}
+:where(button, input, select, textarea):disabled {
+  cursor: not-allowed;
+}
+.page :where(h1, h2, h3, h4) {
+  text-wrap: pretty;
+}
+.page :where(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  font-size: 16px;
+}
+.stats-page .v-data-table,
+.leaderboard-page .v-data-table {
+  background: rgb(var(--v-theme-surface)) !important;
+  border: 1px solid rgb(var(--v-theme-surface-border));
+  border-radius: 14px;
+  font-size: 15px !important;
+  overflow: hidden;
+}
+.stats-page .v-data-table th,
+.leaderboard-page .v-data-table th {
+  color: rgb(var(--v-theme-text-secondary));
+  font-weight: 600 !important;
+  background: rgba(var(--v-theme-primary), 0.04);
+}
+.stats-page .v-table__wrapper,
+.leaderboard-page .v-table__wrapper {
+  scrollbar-width: thin;
+}
+@media (max-width: 760px) {
+  .header .desktop-navigation {
+    display: none;
+  }
+  .header-navigation {
+    margin-left: 0;
+    min-width: 0;
+    flex: 1;
+  }
+  .header-navigation a {
+    padding: 8px;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+  .header-left-container .connect-status {
+    display: none;
+  }
+  .header-left-container {
+    gap: 10px;
+  }
+  .header {
+    gap: 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+
+<style lang="scss">
+.header-account {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.header-account:hover {
+  background: rgb(var(--v-theme-inset-hover));
+}
+.header-account img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+.connection-warning {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 110;
+  max-width: calc(100vw - 32px);
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: rgb(var(--v-theme-error));
+  color: rgb(var(--v-theme-on-error));
+  font-size: 14px;
 }
 </style>

@@ -476,7 +476,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .profile-page-wrapper {
-  padding: 60px 20px 20px 20px;
+  padding: 82px 24px 48px;
   min-height: 100vh;
 }
 
@@ -647,7 +647,7 @@ export default defineComponent({
 // Адаптивность
 @media (max-width: 600px) {
   .profile-page-wrapper {
-    padding: 50px 12px 24px;
+    padding: 72px 16px 32px;
   }
 
   .profile-card {

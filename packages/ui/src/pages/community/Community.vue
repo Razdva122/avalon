@@ -1,12 +1,63 @@
 <template>
   <main class="community-page">
     <header class="community-hero">
+      <nav class="community-breadcrumbs" :aria-label="t('community.title')">
+        <LocaleLink :to="{ name: 'lobby' }">{{ t('menu.home') }}</LocaleLink
+        ><span aria-hidden="true">/</span
+        ><LocaleLink :to="{ name: 'community' }" :aria-current="activeTab === 'servers' ? 'page' : undefined">{{
+          t('community.title')
+        }}</LocaleLink
+        ><template v-if="activeTab !== 'servers'"
+          ><span aria-hidden="true">/</span
+          ><span aria-current="page">{{
+            t(`playerBoards.${activeTab === 'solo' ? 'seoSoloTitle' : 'seoGroupTitle'}`)
+          }}</span></template
+        >
+      </nav>
       <p class="eyebrow">AVALON · {{ t('community.eyebrow') }}</p>
-      <h1>{{ t('community.title') }}</h1>
-      <p class="intro">{{ t('community.intro') }}</p>
+      <h1>
+        {{
+          t(
+            activeTab === 'servers'
+              ? 'community.title'
+              : `playerBoards.${activeTab === 'solo' ? 'seoSoloTitle' : 'seoGroupTitle'}`,
+          )
+        }}
+      </h1>
+      <p class="intro">
+        {{
+          t(
+            activeTab === 'servers'
+              ? 'community.intro'
+              : `playerBoards.${activeTab === 'solo' ? 'seoSoloIntro' : 'seoGroupIntro'}`,
+          )
+        }}
+      </p>
     </header>
 
-    <section aria-labelledby="servers-title">
+    <div class="community-tabs" role="tablist" :aria-label="t('community.title')">
+      <LocaleLink
+        v-for="tab in tabs"
+        :id="`community-tab-${tab.value}`"
+        :key="tab.value"
+        :to="{ name: tab.route }"
+        role="tab"
+        :aria-selected="activeTab === tab.value"
+        :aria-controls="`community-panel-${tab.value}`"
+        :tabindex="activeTab === tab.value ? 0 : -1"
+        @keydown="onTabKey($event, tab.value)"
+      >
+        {{ t(tab.label) }}
+      </LocaleLink>
+    </div>
+
+    <section
+      v-show="activeTab === 'servers'"
+      id="community-panel-servers"
+      role="tabpanel"
+      aria-labelledby="community-tab-servers"
+      tabindex="0"
+    >
       <div class="section-heading">
         <h2 id="servers-title">{{ t('community.servers') }}</h2>
         <span class="server-count">{{ communityServers.length }}</span>
@@ -26,7 +77,7 @@
               <p class="description">{{ t(server.descriptionKey) }}</p>
               <ul class="language-tags" :aria-label="t('community.languages')">
                 <li v-for="language in server.languages" :key="language.code" :lang="language.code">
-                  {{ language.label }}
+                  <span aria-hidden="true">{{ languageFlags[language.code] }}</span> {{ language.label }}
                 </li>
               </ul>
             </div>
@@ -63,14 +114,73 @@
         </li>
       </ul>
     </section>
+    <section
+      v-for="board in boardKinds"
+      v-show="activeTab === board"
+      :id="`community-panel-${board}`"
+      :key="board"
+      role="tabpanel"
+      :aria-labelledby="`community-tab-${board}`"
+      tabindex="0"
+    >
+      <PlayerBoards v-if="activeTab === board" :kind="board" />
+    </section>
+    <section class="discovery-guide" aria-labelledby="discovery-title">
+      <h2 id="discovery-title">{{ t('playerBoards.discoveryTitle') }}</h2>
+      <p>{{ t('playerBoards.discoveryHow') }}</p>
+      <p>{{ t(activeTab === 'group' ? 'playerBoards.discoveryGroup' : 'playerBoards.discoverySolo') }}</p>
+      <p>{{ t('playerBoards.discoveryLifetime') }}</p>
+      <nav class="discovery-links" :aria-label="t('community.title')">
+        <LocaleLink :to="{ name: 'community_solo' }">{{ t('playerBoards.seoSoloTitle') }}</LocaleLink
+        ><LocaleLink :to="{ name: 'community_group' }">{{ t('playerBoards.seoGroupTitle') }}</LocaleLink>
+      </nav>
+      <h3>{{ t('playerBoards.discoveryNew') }}</h3>
+      <p>{{ t('playerBoards.discoveryLearn') }}</p>
+      <nav class="discovery-links" :aria-label="t('menu.wiki')">
+        <LocaleLink :to="{ name: 'rules' }">{{ t('wiki.rules') }}</LocaleLink
+        ><LocaleLink :to="{ name: 'roles' }">{{ t('wiki.roles') }}</LocaleLink
+        ><LocaleLink :to="{ name: 'lobby' }">{{ t('menu.home') }}</LocaleLink>
+      </nav>
+    </section>
   </main>
 </template>
 
 <script setup lang="ts">
+import { languageFlags } from './board-display';
+import { computed, nextTick } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { localizedPath } from '@/router/paths';
 import { useI18n } from 'vue-i18n';
 import { communityServers } from './servers';
+import PlayerBoards from './PlayerBoards.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const route = useRoute();
+const router = useRouter();
+const boardKinds = ['solo', 'group'] as const;
+const tabs = [
+  { value: 'servers', label: 'community.servers', route: 'community' },
+  { value: 'solo', label: 'playerBoards.solo', route: 'community_solo' },
+  { value: 'group', label: 'playerBoards.group', route: 'community_group' },
+] as const;
+type CommunityTab = (typeof tabs)[number]['value'];
+const activeTab = computed<CommunityTab>(() =>
+  route.path.includes('/community/players') ? 'solo' : route.path.includes('/community/groups') ? 'group' : 'servers',
+);
+async function onTabKey(event: KeyboardEvent, current: CommunityTab) {
+  const index = tabs.findIndex((tab) => tab.value === current);
+  let next: number;
+  if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+  else if (event.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
+  else if (event.key === 'Home') next = 0;
+  else if (event.key === 'End') next = tabs.length - 1;
+  else return;
+  event.preventDefault();
+  const container = (event.currentTarget as HTMLElement).parentElement;
+  await router.push(localizedPath(router.resolve({ name: tabs[next].route }).path, locale.value));
+  await nextTick();
+  container?.querySelectorAll<HTMLElement>('[role="tab"]')[next]?.focus();
+}
 // Keep the placement offer below official servers and above community listings.
 const directoryEntries = [
   ...communityServers.filter((server) => server.official).map((server) => ({ server })),
@@ -85,6 +195,43 @@ const directoryEntries = [
   margin: 0 auto;
   padding: 84px 24px 64px;
   color: rgb(var(--v-theme-text-primary));
+}
+.community-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(var(--v-theme-text-primary), 0.2);
+  a {
+    flex: 1;
+    min-width: 0;
+    min-height: 48px;
+    padding: 12px 16px;
+    border: 1px solid rgba(var(--v-theme-text-primary), 0.25);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    &[aria-selected='true'] {
+      background: rgb(var(--v-theme-support-button));
+      border-color: rgb(var(--v-theme-support-accent));
+      color: rgb(var(--v-theme-support-accent));
+    }
+  }
+}
+.community-tabs a:focus-visible,
+[role='tabpanel']:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-support-accent));
+  outline-offset: 3px;
+}
+@media (max-width: 480px) {
+  .community-tabs {
+    gap: 6px;
+    a {
+      padding: 10px 6px;
+      font-size: 13px;
+    }
+  }
 }
 .community-hero {
   max-width: 730px;
@@ -216,7 +363,8 @@ h3 {
   padding: 28px;
   border: 1px solid rgb(var(--v-theme-support-border));
   border-radius: 18px;
-  background: linear-gradient(120deg, rgba(var(--v-theme-support-accent), 0.09), transparent 75%),
+  background:
+    linear-gradient(120deg, rgba(var(--v-theme-support-accent), 0.09), transparent 75%),
     rgb(var(--v-theme-support-surface));
   color: rgb(var(--v-theme-support-text));
   h3 {
@@ -321,12 +469,64 @@ h3 {
   .community-page {
     padding: 64px 16px 40px;
   }
+  .community-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(var(--v-theme-text-primary), 0.2);
+    a {
+      flex: 1;
+      min-width: 0;
+      min-height: 48px;
+      padding: 12px 16px;
+      border: 1px solid rgba(var(--v-theme-text-primary), 0.25);
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+      &[aria-selected='true'] {
+        background: rgb(var(--v-theme-support-button));
+        border-color: rgb(var(--v-theme-support-accent));
+        color: rgb(var(--v-theme-support-accent));
+      }
+    }
+  }
+  .community-tabs a:focus-visible,
+  [role='tabpanel']:focus-visible {
+    outline: 2px solid rgb(var(--v-theme-support-accent));
+    outline-offset: 3px;
+  }
+  @media (max-width: 480px) {
+    .community-tabs {
+      gap: 6px;
+      a {
+        padding: 10px 6px;
+        font-size: 13px;
+      }
+    }
+  }
   .community-hero {
     margin-bottom: 32px;
   }
   .server-card {
-    padding: 20px;
-    grid-template-columns: 1fr;
+    padding: 16px;
+    gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .server-logo {
+    width: 56px;
+    height: 56px;
+  }
+  .server-heading {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .server-details {
+    min-width: 0;
+  }
+  .server-heading h3 {
+    overflow-wrap: anywhere;
   }
   .join-link {
     grid-column: 1;
@@ -337,5 +537,52 @@ h3 {
   .join-link {
     transition: none;
   }
+}
+</style>
+
+<style scoped>
+.discovery-guide {
+  border-top: 1px solid rgb(var(--v-theme-surface-border));
+  margin: 40px 0;
+  padding-top: 28px;
+  line-height: 1.8;
+}
+.discovery-guide h2 {
+  font-size: 24px;
+}
+.discovery-guide h3 {
+  margin-top: 24px;
+}
+.discovery-guide p {
+  margin: 12px 0;
+  max-width: 78ch;
+}
+.discovery-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+.discovery-links a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 8px 0;
+}
+</style>
+
+<style scoped>
+.community-breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  font-size: 13px;
+  margin-bottom: 20px;
+  color: rgb(var(--v-theme-text-secondary));
+}
+.community-breadcrumbs a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.community-tabs a {
+  text-align: center;
 }
 </style>
