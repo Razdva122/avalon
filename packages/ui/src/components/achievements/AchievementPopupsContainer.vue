@@ -128,12 +128,17 @@ export default defineComponent({
 <style scoped lang="scss">
 .achievement-popups-container {
   position: fixed;
-  top: 70px;
-  right: 20px;
+  top: calc(70px + env(safe-area-inset-top, 0px));
+  right: max(20px, env(safe-area-inset-right, 0px));
+  width: min(390px, calc(100vw - 40px));
+  max-height: calc(100dvh - 90px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: stretch;
+  gap: 12px;
   pointer-events: none;
 
   > * {
@@ -143,7 +148,9 @@ export default defineComponent({
 
 .popup-list-enter-active,
 .popup-list-leave-active {
-  transition: all 0.3s ease;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
 }
 
 .popup-list-enter-from {
@@ -154,5 +161,25 @@ export default defineComponent({
 .popup-list-leave-to {
   opacity: 0;
   transform: translateX(30px);
+}
+@media (max-width: 480px) {
+  .achievement-popups-container {
+    right: max(12px, env(safe-area-inset-right, 0px));
+    left: max(12px, env(safe-area-inset-left, 0px));
+    width: auto;
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popup-list-enter-active,
+  .popup-list-leave-active {
+    transition: none;
+  }
+
+  .popup-list-enter-from,
+  .popup-list-leave-to {
+    transform: none;
+  }
 }
 </style>

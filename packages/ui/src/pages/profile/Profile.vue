@@ -39,6 +39,16 @@
               </template>
               {{ $t('menu.achievements') }}
             </v-btn>
+            <v-btn
+              class="action-btn"
+              size="large"
+              color="primary"
+              variant="outlined"
+              @click="logout"
+              prepend-icon="logout"
+            >
+              {{ $t('profile.logout') }}
+            </v-btn>
           </div>
         </v-card-text>
       </v-card>
@@ -154,17 +164,6 @@
       </div>
       <v-card class="profile-card collection-card" elevation="0"><StickerCollection /></v-card>
 
-      <v-card class="profile-card session-card" elevation="0">
-        <v-card-text class="danger-item">
-          <div class="danger-info">
-            <h2 class="danger-title">{{ $t('profile.logoutTitle') }}</h2>
-            <div class="danger-description">{{ $t('profile.logoutHint') }}</div>
-          </div>
-          <v-btn color="primary" variant="outlined" @click="logout" prepend-icon="logout">{{
-            $t('profile.logout')
-          }}</v-btn>
-        </v-card-text>
-      </v-card>
       <!-- Опасная зона -->
       <v-card v-if="!ratingLoading && trueSkillRating" class="profile-card danger-zone" elevation="0">
         <v-card-title tag="h2" class="card-header danger-header">

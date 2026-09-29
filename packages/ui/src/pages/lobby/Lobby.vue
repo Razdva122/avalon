@@ -910,6 +910,9 @@ a:focus-visible {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
   }
+  .discord-card {
+    grid-column: 1 / -1;
+  }
 }
 @media (max-width: 600px) {
   .lobby {

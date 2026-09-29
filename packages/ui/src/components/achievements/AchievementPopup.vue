@@ -1,53 +1,73 @@
 <template>
-  <div
+  <article
     class="achievement-popup"
     :class="{ 'achievement-popup--progress': type === 'progress' }"
-    @click="navigateToUserAchievements"
+    role="status"
+    aria-atomic="true"
   >
-    <div class="achievement-popup__content">
-      <div class="achievement-popup__icon">
-        <v-icon v-if="!achievement.icon" size="large" icon="fa:fa-solid fa-trophy" />
-        <img v-else :src="achievement.icon" alt="Achievement icon" />
+    <div
+      class="achievement-popup__body"
+      :class="{ 'achievement-popup__body--link': canNavigate }"
+      :role="canNavigate ? 'link' : undefined"
+      :tabindex="canNavigate ? 0 : undefined"
+      @click="navigateToUserAchievements"
+      @keydown.enter.prevent="navigateToUserAchievements"
+    >
+      <div class="achievement-popup__header">
+        <div class="achievement-popup__icon" aria-hidden="true">
+          <v-icon size="20" :icon="type === 'unlocked' ? 'fa:fa-solid fa-trophy' : 'fa:fa-solid fa-chart-line'" />
+        </div>
+        <div class="achievement-popup__heading">
+          <div class="achievement-popup__title">
+            {{ type === 'unlocked' ? $t('achievementsPopup.unlocked') : $t('achievementsPopup.progress') }}
+          </div>
+          <h3 class="achievement-popup__name">{{ achievement.name }}</h3>
+        </div>
       </div>
-      <div class="achievement-popup__info">
-        <div class="achievement-popup__title">
-          {{ type === 'unlocked' ? $t('achievementsPopup.unlocked') : $t('achievementsPopup.progress') }}
-        </div>
-        <div class="achievement-popup__name">{{ achievement.name }}</div>
-        <div class="achievement-popup__description">{{ achievement.description }}</div>
-        <div v-if="type === 'progress'" class="achievement-popup__progress">
-          <v-progress-linear
-            :model-value="(progress.currentValue / progress.maxValue) * 100"
-            color="primary"
-            height="10"
-          />
-          <div class="achievement-popup__progress-text">{{ progress.currentValue }} / {{ progress.maxValue }}</div>
-        </div>
-        <div v-if="stickerReward" class="achievement-popup__reward">
-          <div class="achievement-popup__reward-text">{{ $t('stickers.title') }}</div>
-          <div style="width: 64px; height: 64px"><StickerImage :id="stickerReward.id" /></div>
-        </div>
-        <div
-          v-if="avatarReward"
-          class="achievement-popup__reward"
-          :class="{ 'achievement-popup__reward--unlocked': type === 'unlocked' }"
-        >
-          <div class="achievement-popup__reward-text">{{ $t('achievements.avatarReward') }}</div>
-          <div class="achievement-popup__reward-icon">
-            <Avatar :avatarID="avatarReward" size="medium" />
+      <p class="achievement-popup__description">{{ achievement.description }}</p>
+      <div v-if="type === 'progress'" class="achievement-popup__progress">
+        <v-progress-linear
+          :model-value="
+            progress.maxValue > 0 ? Math.min(100, Math.max(0, (progress.currentValue / progress.maxValue) * 100)) : 0
+          "
+          :aria-label="achievement.name"
+          color="primary"
+          height="6"
+          rounded
+        />
+        <span class="achievement-popup__progress-text">{{ progress.currentValue }} / {{ progress.maxValue }}</span>
+      </div>
+      <section
+        v-if="avatarReward || stickerReward"
+        class="achievement-popup__rewards"
+        :class="{ 'achievement-popup__rewards--unlocked': type === 'unlocked' }"
+      >
+        <div class="achievement-popup__rewards-title">{{ $t('achievements.rewards') }}</div>
+        <div class="achievement-popup__reward-list">
+          <div v-if="avatarReward" class="achievement-popup__reward">
+            <div class="achievement-popup__reward-image achievement-popup__reward-image--avatar">
+              <Avatar :avatarID="avatarReward" />
+            </div>
+            <span>{{ $t('achievements.avatarType') }}</span>
+          </div>
+          <div v-if="stickerReward" class="achievement-popup__reward">
+            <div class="achievement-popup__reward-image">
+              <StickerImage :id="stickerReward.id" />
+            </div>
+            <span>{{ $t('achievements.stickerType') }}</span>
           </div>
         </div>
-      </div>
+      </section>
     </div>
-    <v-btn
-      @click.stop="$emit('close')"
+    <button
+      type="button"
       class="achievement-popup__close"
-      icon="close"
-      color="text-primary"
-      variant="text"
-      density="compact"
-    />
-  </div>
+      :aria-label="$t('infoMessage.close')"
+      @click.stop="$emit('close')"
+    >
+      <v-icon icon="close" size="20" aria-hidden="true" />
+    </button>
+  </article>
 </template>
 
 <script lang="ts">
@@ -97,7 +117,6 @@ export default defineComponent({
       return {
         name: t(`achievements.${props.achievementID}`),
         description: getAchievementsText(props.achievementID, t(`achievements.${props.achievementID}_description`)),
-        icon: undefined,
       };
     });
 
@@ -118,7 +137,10 @@ export default defineComponent({
       // Если пользователь не авторизован, ничего не делаем
     };
 
+    const canNavigate = computed(() => Boolean(store.state.profile?.id));
+
     return {
+      canNavigate,
       achievement,
       navigateToUserAchievements,
       avatarReward,
@@ -131,130 +153,191 @@ export default defineComponent({
 <style scoped lang="scss">
 .achievement-popup {
   position: relative;
-  width: 350px;
-  padding: 16px;
-  background-color: rgb(var(--v-theme-bg-header));
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  margin-bottom: 16px;
-  animation: slide-in 0.3s ease-out;
-  cursor: pointer;
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  color: rgb(var(--v-theme-text-primary));
+  background: rgb(var(--v-theme-bg-header));
+  border: 1px solid rgba(var(--v-theme-primary), 0.24);
+  border-top: 3px solid rgb(var(--v-theme-primary));
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
 
-  &__content {
+  &__body {
+    padding: 16px;
+    overflow-wrap: anywhere;
+
+    &--link {
+      cursor: pointer;
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgb(var(--v-theme-primary));
+      outline-offset: -4px;
+      border-radius: 13px;
+    }
+  }
+
+  &__header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    gap: 12px;
+    padding-right: 32px;
   }
 
   &__icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 16px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 36px;
+    height: 36px;
+    border-radius: 50%;
     color: rgb(var(--v-theme-primary));
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+    background: rgba(var(--v-theme-primary), 0.1);
   }
 
-  &__info {
-    flex: 1;
+  &__heading {
+    min-width: 0;
   }
 
   &__title {
-    font-size: 14px;
-    font-weight: bold;
-    color: rgb(var(--v-theme-primary));
     margin-bottom: 4px;
+    color: rgb(var(--v-theme-primary));
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
   }
 
   &__name {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 4px;
-    color: rgb(var(--v-theme-text-primary));
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-wrap: balance;
   }
 
   &__description {
+    margin: 12px 0 0;
+    color: rgba(var(--v-theme-text-primary), 0.8);
     font-size: 14px;
-    color: rgb(var(--v-theme-text-secondary));
-    margin-bottom: 8px;
+    line-height: 1.5;
   }
 
   &__progress {
-    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
 
-    &-text {
-      font-size: 12px;
-      text-align: right;
-      margin-top: 4px;
-      color: rgb(var(--v-theme-text-secondary));
+    .v-progress-linear {
+      flex: 1;
     }
   }
 
-  &__close {
-    position: absolute;
-    top: 8px;
-    right: 8px;
+  &__progress-text {
+    flex: 0 0 auto;
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 
-  &--progress {
-    background-color: rgb(var(--v-theme-bg-header));
+  &__rewards {
+    margin-top: 14px;
+    padding: 12px;
+    background: rgba(var(--v-theme-primary), 0.06);
+    border-radius: 10px;
+
+    &--unlocked {
+      background: rgba(var(--v-theme-success), 0.15);
+      box-shadow: inset 0 0 0 1px rgba(var(--v-theme-success), 0.3);
+    }
+  }
+
+  &__rewards-title {
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  &__reward-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
   }
 
   &__reward {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
-    margin-top: 12px;
-    background-color: rgba(var(--v-theme-primary), 0.1);
-    border-radius: 4px;
-    font-size: 14px;
-    transition: all 0.3s ease;
-
-    &--unlocked {
-      background-color: rgba(var(--v-theme-success), 0.15);
-      border: 1px solid rgba(var(--v-theme-success), 0.3);
-    }
+    gap: 8px;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.4;
   }
 
-  &__reward-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  &__reward-image {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
 
     :deep(img) {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      transition: transform 0.3s ease;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
-    &:hover :deep(img) {
-      transform: scale(1.1);
+    &--avatar :deep(img) {
+      border-radius: 50%;
     }
   }
 
-  &__reward-text {
-    font-weight: 500;
+  &__close {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
     color: rgb(var(--v-theme-text-primary));
+    border-radius: 50%;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(var(--v-theme-primary), 0.08);
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgb(var(--v-theme-primary));
+      outline-offset: -4px;
+    }
+  }
+
+  &--progress {
+    border-top-color: rgba(var(--v-theme-primary), 0.4);
   }
 }
 
-@keyframes slide-in {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
+@media (max-width: 480px) {
+  .achievement-popup {
+    border-radius: 12px;
+
+    &__body {
+      padding: 12px;
+    }
+
+    &__header {
+      gap: 10px;
+    }
+
+    &__name {
+      font-size: 16px;
+    }
+
+    &__reward-list {
+      gap: 8px 16px;
+    }
   }
 }
 </style>
