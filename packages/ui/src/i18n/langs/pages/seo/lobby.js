@@ -8,7 +8,7 @@ module.exports.lobby = {
   en: {
     title: 'Play Avalon Online Free with Friends | The Resistance',
     description:
-      'Play The Resistance: Avalon online for free with 5–10 players. Learn the roles and rules, create a room, and invite your friends with a link.',
+      'Play The Resistance: Avalon board game online for free with 5–10 friends. Sign in, create a room, and share a link. No app installation needed.',
     keywords: ['Play'],
   },
   ru: {

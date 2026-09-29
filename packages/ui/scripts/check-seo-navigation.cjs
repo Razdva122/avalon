@@ -86,6 +86,36 @@ const server = http.createServer((req, res) => {
       assert.equal(hero.retained, true, `${pathname}: startup replaced the painted LCP text`);
       assert.deepEqual(pageErrors, [], `Uncaught errors while hydrating ${pathname}`);
       console.log('Lobby LCP nodes retained:', pathname);
+      const guide = await page.evaluate(() => {
+        const panel = document.querySelector('.lobby-guide');
+        const answers = [...panel.querySelectorAll('details')];
+        const social = document.querySelector('.social-card');
+        return {
+          answers: answers.length,
+          readable: answers.every((answer) => answer.querySelector('p')?.textContent.trim().length > 40),
+          closed: answers.every((answer) => !answer.open),
+          socialCount: document.querySelectorAll('.social-card').length,
+          socialAfter: Boolean(panel.compareDocumentPosition(social) & Node.DOCUMENT_POSITION_FOLLOWING),
+        };
+      });
+      assert.deepEqual(guide, { answers: 4, readable: true, closed: true, socialCount: 1, socialAfter: true });
+      const summary = await page.$('.lobby-guide summary');
+      await summary.focus();
+      await page.keyboard.press('Enter');
+      assert.equal(await page.$eval('.lobby-guide details', (node) => node.open), true, 'FAQ opens from keyboard');
+      await page.keyboard.press('Enter');
+      assert.equal(await page.$eval('.lobby-guide details', (node) => node.open), false, 'FAQ closes from keyboard');
+      if (pathname === '/') {
+        await page.setViewport({ width: 390, height: 844 });
+        assert.equal(
+          await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+          true,
+          'Mobile lobby must not overflow horizontally',
+        );
+        await page.click('.guide-start button');
+        await page.waitForSelector('.v-overlay--active input[type="password"]', { visible: true });
+        await page.setViewport({ width: 1280, height: 900 });
+      }
     }
     // Returning visitors hydrate the anonymous HTML first, then restore their
     // preferences without replacing the hero or switching its URL language.

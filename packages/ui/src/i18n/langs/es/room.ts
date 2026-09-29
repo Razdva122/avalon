@@ -9,6 +9,9 @@ export default {
     restartGame: 'Reiniciar juego',
   },
   mainPage: {
+    newPlayerTitle: '¿Primera vez en Avalon?',
+    gameplaySummary:
+      'Avalon es un juego de mesa de deducción social con roles secretos. Debatid en quién confiar, votad los equipos de las misiones y ocultad vuestra identidad. El Bien intenta completar tres misiones; el Mal intenta sabotearlas o descubrir a Merlín.',
     guideTitle: 'Cómo empezar una partida con amigos',
     guideCreate: 'Reúne a 5–10 jugadores. Inicia sesión y crea una sala.',
     guideInvite:
@@ -24,7 +27,7 @@ export default {
         'Abre avalon-game.com en el navegador de un teléfono, una tableta o un ordenador. No necesitas instalar una aplicación. Cada jugador usa su propia pantalla para mantener su rol en secreto.',
       conversationTitle: '¿Cómo hablamos durante la partida?',
       conversationText:
-        'Usa el chat de texto de la sala o una llamada de voz externa, por ejemplo en Discord. Si jugáis en persona, hablad en voz alta y activa la opción de ocultar spoilers para proteger la información privada de tu pantalla.',
+        'Usa el chat de voz integrado o el chat de texto de la sala. Si lo prefieres, puedes usar una plataforma externa como Discord. Si jugáis en persona, hablad en voz alta y activa la opción de ocultar spoilers para proteger la información privada de tu pantalla.',
       featuresTitle: '¿Qué roles y expansiones hay?',
       featuresText:
         'Elige roles clásicos como Merlín, Percival, Morgana, Mordred y Oberón, o prueba roles adicionales como los Amantes y la Bruja. La Dama del Lago y Excalibur añaden más opciones. El historial permite revisar acciones anteriores, salvo que la sala lo oculte.',

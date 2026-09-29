@@ -66,7 +66,6 @@
             >{{ $t('support.showBenefits') }} <span class="material-icons" aria-hidden="true">arrow_forward</span></span
           >
         </LocaleLink>
-        <SocialChannels class="social-desktop" />
         <div class="leaderboard-panel">
           <RotatingTopPlayer />
           <LocaleLink class="leaderboard-link" :to="{ name: 'leaderboard' }"
@@ -123,25 +122,42 @@
           </button>
         </div>
       </section>
-      <SocialChannels class="social-mobile" />
     </div>
     <section class="lobby-guide" aria-labelledby="lobby-guide-title">
-      <h2 id="lobby-guide-title">{{ $t('mainPage.guideTitle') }}</h2>
-      <ol>
-        <li>{{ $t('mainPage.guideCreate') }}</li>
-        <li>{{ $t('mainPage.guideInvite') }}</li>
-        <li>{{ $t('mainPage.guideStart') }}</li>
-      </ol>
-      <div v-for="topic in ['cost', 'devices', 'conversation', 'features']" :key="topic" class="guide-answer">
-        <h3>{{ $t(`mainPage.guide.${topic}Title`) }}</h3>
-        <p>{{ $t(`mainPage.guide.${topic}Text`) }}</p>
+      <div class="guide-overview">
+        <div class="guide-introduction">
+          <h2 id="lobby-guide-title">{{ $t('mainPage.newPlayerTitle') }}</h2>
+          <p>{{ $t('mainPage.gameplaySummary') }}</p>
+          <nav class="lobby-links" :aria-label="$t('menu.wiki')">
+            <LocaleLink :to="{ name: 'rules' }">{{ $t('wiki.rules') }}</LocaleLink>
+            <LocaleLink :to="{ name: 'roles' }">{{ $t('wiki.roles') }}</LocaleLink>
+          </nav>
+        </div>
+        <div class="guide-start">
+          <h3>{{ $t('mainPage.guideTitle') }}</h3>
+          <ol>
+            <li>{{ $t('mainPage.guideCreate') }}</li>
+            <li>{{ $t('mainPage.guideInvite') }}</li>
+            <li>{{ $t('mainPage.guideStart') }}</li>
+          </ol>
+          <v-btn color="primary" size="large" elevation="0" @click="createRoom">
+            {{ $t('mainPage.createRoom') }}
+          </v-btn>
+        </div>
       </div>
-      <nav class="lobby-links" :aria-label="$t('menu.wiki')">
-        <LocaleLink :to="{ name: 'rules' }">{{ $t('wiki.rules') }}</LocaleLink>
-        <LocaleLink :to="{ name: 'roles' }">{{ $t('wiki.roles') }}</LocaleLink>
-        <LocaleLink :to="{ name: 'expansions' }">{{ $t('breadCrumbs.expansions') }}</LocaleLink>
-      </nav>
+      <div class="guide-questions">
+        <details v-for="topic in ['cost', 'devices', 'conversation', 'features']" :key="topic" class="guide-question">
+          <summary>{{ $t(`mainPage.guide.${topic}Title`) }}</summary>
+          <div class="guide-answer">
+            <p>{{ $t(`mainPage.guide.${topic}Text`) }}</p>
+            <LocaleLink v-if="topic === 'features'" :to="{ name: 'expansions' }">{{
+              $t('breadCrumbs.expansions')
+            }}</LocaleLink>
+          </div>
+        </details>
+      </div>
     </section>
+    <SocialChannels class="lobby-social" />
     <nav class="lobby-footer" :aria-label="$t('menu.menu')">
       <LocaleLink :to="{ name: 'wiki' }">{{ $t('menu.wiki') }}</LocaleLink>
       <LocaleLink :to="{ name: 'stats' }">{{ $t('menu.stats') }}</LocaleLink>
@@ -318,34 +334,109 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .lobby-guide {
-  max-width: 72ch;
-  margin: 40px auto 0;
-  padding-top: 28px;
-  border-top: 1px solid rgba(var(--v-theme-text-primary), 0.15);
+  margin-top: 32px;
+  border: 1px solid rgba(var(--v-theme-text-primary), 0.1);
+  border-radius: 20px;
+  background: rgb(var(--v-theme-inset));
   font-size: 16px;
   line-height: 1.65;
   color: rgb(var(--v-theme-text-primary));
   h2 {
-    font-size: 24px;
-    line-height: 1.3;
-  }
-  ol {
-    padding-left: 24px;
-    margin: 16px 0 24px;
-  }
-  li + li {
-    margin-top: 8px;
+    margin-bottom: 16px;
+    font-size: 28px;
+    line-height: 1.25;
+    text-wrap: balance;
   }
   h3 {
     font-size: 18px;
-    margin-bottom: 6px;
+    line-height: 1.4;
   }
-  .guide-answer {
-    margin-bottom: 20px;
+  a {
+    color: inherit;
+    text-underline-offset: 4px;
   }
 }
-.social-mobile {
-  display: none;
+.guide-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 40px;
+  padding: 32px;
+}
+.guide-introduction .lobby-links {
+  margin-top: 20px;
+}
+.guide-start {
+  padding-left: 32px;
+  border-left: 1px solid rgba(var(--v-theme-text-primary), 0.12);
+  ol {
+    padding-left: 22px;
+    margin: 16px 0 24px;
+  }
+  li {
+    padding-left: 4px;
+  }
+  li + li {
+    margin-top: 12px;
+  }
+  li::marker {
+    font-weight: 700;
+    color: rgb(var(--v-theme-primary));
+  }
+}
+.guide-questions {
+  padding: 0 32px 12px;
+}
+.guide-question {
+  border-top: 1px solid rgba(var(--v-theme-text-primary), 0.12);
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 56px;
+    padding: 16px 0;
+    font-weight: 600;
+    line-height: 1.4;
+    list-style: none;
+    cursor: pointer;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary::after {
+    content: '+';
+    flex-shrink: 0;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1;
+  }
+  &[open] summary::after {
+    content: '−';
+  }
+  summary:hover {
+    color: rgb(var(--v-theme-primary));
+  }
+  summary:focus-visible {
+    outline: 2px solid rgb(var(--v-theme-primary));
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+}
+.guide-answer {
+  max-width: 72ch;
+  padding: 0 0 20px;
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 8px;
+  }
+}
+.lobby-social {
+  margin-top: 24px;
+  :deep(nav) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 .lobby-footer {
   display: flex;
@@ -791,16 +882,27 @@ a:focus-visible {
   }
 }
 @media (max-width: 760px) {
-  .social-desktop {
-    display: none;
+  .guide-overview {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 24px;
   }
-  .social-mobile {
-    display: block;
-    grid-area: social;
+  .guide-start {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .guide-questions {
+    padding: 0 24px 8px;
+  }
+  .lobby-guide h2 {
+    font-size: 24px;
+  }
+  .lobby-social :deep(nav) {
+    grid-template-columns: minmax(0, 1fr);
   }
   .lobby-content {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: 'community' 'rooms' 'social';
+    grid-template-areas: 'community' 'rooms';
   }
   .lobby-sidebar {
     position: static;

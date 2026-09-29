@@ -306,12 +306,18 @@ export default defineComponent({
   }
 }
 
-.online {
+.room > .online {
   opacity: 30%;
   font-size: large;
   position: fixed;
   top: 60px;
   right: 10px;
+}
+
+@media (max-width: 600px) {
+  .room > .online {
+    top: 110px;
+  }
 }
 
 .game-stage {
@@ -386,8 +392,5 @@ export default defineComponent({
   border-radius: 0 0 6px 0;
   background: rgb(var(--v-theme-info));
   color: white !important;
-}
-.room:has(.game-timer) .online {
-  top: 110px;
 }
 </style>

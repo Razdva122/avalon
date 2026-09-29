@@ -9,6 +9,9 @@ export default {
     restartGame: 'Restart game',
   },
   mainPage: {
+    newPlayerTitle: 'New to Avalon?',
+    gameplaySummary:
+      'Avalon is a social deduction board game with secret roles. Discuss whom to trust, vote on quest teams, and keep your identity hidden. Good tries to complete three quests; Evil tries to sabotage them or identify Merlin.',
     guideTitle: 'How to start a game with friends',
     guideCreate: 'Gather 5–10 players. Sign in and choose Create room.',
     guideInvite: 'Share the room link. Each friend signs in and joins the game from their own device.',
@@ -23,7 +26,7 @@ export default {
         'Open avalon-game.com in a browser on a phone, tablet or computer. No app installation is needed. Each player uses their own screen to keep their role secret.',
       conversationTitle: 'How do we talk during the game?',
       conversationText:
-        'Use the room text chat or arrange a separate voice call, for example on Discord. If you are together in person, discuss the game aloud and use Hide spoilers to conceal private information on your screen.',
+        'Use the built-in voice chat or text chat in the room. If you prefer, you can use an external platform such as Discord. If you are together in person, discuss the game aloud and use Hide spoilers to conceal private information on your screen.',
       featuresTitle: 'Which roles and expansions are available?',
       featuresText:
         'Choose classic roles such as Merlin, Percival, Morgana, Mordred and Oberon, or try additional roles such as the Lovers and Witch. Lady of the Lake and Excalibur add more options. The game history lets you review past actions unless the room uses hidden history.',
@@ -54,7 +57,7 @@ export default {
 
     header: 'Play Avalon Online',
     intro:
-      'Play The Resistance: Avalon online for free with 5–10 players. Learn the rules and roles, sign in to create a room, and share its link with your friends.',
+      'Play The Resistance: Avalon board game online for free with 5–10 friends. Sign in, create a room, and share the link. Play in your browser on mobile or desktop. No app installation needed.',
     createRoom: 'Create room',
     watch: 'Watch',
     join: 'Join',
