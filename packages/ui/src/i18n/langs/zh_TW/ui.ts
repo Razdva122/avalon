@@ -75,6 +75,7 @@ export default {
     account: '帳戶',
     dangerZone: '危險區域',
     logoutTitle: '登出',
+    logoutConfirmText: '確定要登出嗎？',
     logoutHint: '您將被重定向到主頁',
     gameSettings: '遊戲設定',
   },

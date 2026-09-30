@@ -40,13 +40,17 @@
               :key="entry.key"
               :data-message-key="entry.key"
               class="message-entry"
-              :class="{ 'message-highlight': highlighted === entry.key }"
+              :class="{
+                'message-highlight': highlighted === entry.key,
+                'message-entry-sticker': entry.message.kind === 'sticker' && entry.message.stickerID,
+              }"
             >
               <div v-if="entry.message.kind === 'sticker' && entry.message.stickerID" class="chat-sticker">
                 <StickerImage :id="entry.message.stickerID" @load="onMediaLoad" />
               </div>
               <div v-else class="message-text">{{ entry.message.message }}</div>
               <time
+                class="message-meta"
                 :datetime="new Date(entry.message.timestamp).toISOString()"
                 :title="new Date(entry.message.timestamp).toLocaleString()"
                 >{{ formatTime(entry.message.timestamp) }}</time
@@ -55,20 +59,26 @@
           </section>
         </template>
         <section v-for="message in outbox" :key="message.requestID" class="message-group message-own outgoing-message">
-          <div class="message-text">{{ message.message }}</div>
-          <span v-if="message.status === 'sending'" class="delivery-state" role="status">{{ $t('chat.sending') }}</span>
-          <span v-else-if="message.status === 'failed'" class="delivery-state" role="alert"
-            >{{ $t('chat.failed') }}
-            <v-btn
-              variant="text"
-              color="text-primary"
-              size="small"
-              :disabled="!connected"
-              @click="retry(message.requestID)"
-              >{{ $t('chat.retry') }}</v-btn
-            >
-          </span>
-          <time v-else>{{ formatTime(message.timestamp) }}</time>
+          <div class="message-entry" :class="{ 'message-entry-failed': message.status === 'failed' }">
+            <div class="message-text">{{ message.message }}</div>
+            <span v-if="message.status === 'sending'" class="message-meta delivery-state" role="status">
+              {{ $t('chat.sending') }}
+            </span>
+            <span v-else-if="message.status === 'failed'" class="message-meta delivery-state" role="alert">
+              {{ $t('chat.failed') }}
+              <v-btn
+                variant="text"
+                color="text-primary"
+                size="small"
+                :disabled="!connected"
+                @click="retry(message.requestID)"
+                >{{ $t('chat.retry') }}</v-btn
+              >
+            </span>
+            <time v-else class="message-meta" :datetime="new Date(message.timestamp).toISOString()">
+              {{ formatTime(message.timestamp) }}
+            </time>
+          </div>
         </section>
       </div>
       <div v-if="nearBottom && unread.length" class="jump-container">
@@ -407,15 +417,17 @@ onUnmounted(() => {
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 12px;
+  padding: 16px;
   overflow-anchor: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--v-theme-text-primary), 0.25) transparent;
 }
 .message-group {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 3px;
 }
 .message-own {
   align-items: flex-end;
@@ -425,6 +437,8 @@ onUnmounted(() => {
   min-height: 32px;
   text-align: left;
   border-radius: 6px;
+  margin-bottom: 3px;
+  padding: 0 2px;
 }
 .message-author :deep(.user-preview) {
   margin: 0;
@@ -432,36 +446,62 @@ onUnmounted(() => {
 .message-author :deep(.user-preview__name) {
   max-width: 245px;
   color: rgb(var(--v-theme-text-primary));
+  font-size: 12px;
+  font-weight: 600;
 }
 .message-entry {
-  max-width: 88%;
+  max-width: 90%;
   min-width: 0;
-  border-radius: 12px;
+  padding: 8px 11px 5px;
+  border: 1px solid rgba(var(--v-theme-text-primary), 0.08);
+  border-radius: 5px 14px 14px 5px;
+  background: rgba(var(--v-theme-text-primary), 0.055);
+}
+.message-entry:nth-child(2) {
+  border-top-left-radius: 14px;
+}
+.message-entry:last-child {
+  border-bottom-left-radius: 14px;
+}
+.message-own .message-entry {
+  background: rgba(var(--v-theme-primary), 0.13);
+  border-color: rgba(var(--v-theme-primary), 0.14);
+  border-radius: 14px 5px 5px 14px;
+}
+.message-own .message-entry:nth-child(2) {
+  border-top-right-radius: 14px;
+}
+.message-own .message-entry:last-child {
+  border-bottom-right-radius: 14px;
 }
 .message-text {
-  padding: 9px 12px;
-  border-radius: 12px;
-  background: rgb(var(--v-theme-inset));
   color: rgb(var(--v-theme-text-primary));
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.55;
   text-align: left;
 }
-.message-own .message-text {
-  background: rgba(var(--v-theme-primary), 0.14);
-}
-.message-entry time,
-.outgoing-message time {
-  display: block;
+.message-meta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
   font-size: 11px;
-  margin: 3px 4px;
+  line-height: 1.4;
+  margin-top: 3px;
   color: rgb(var(--v-theme-text-primary));
-  opacity: 0.75;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
 }
-.message-own time {
-  text-align: right;
+.message-entry.message-entry-sticker {
+  padding: 2px;
+  background: transparent;
+  border-color: transparent;
+}
+.message-entry-sticker .message-meta {
+  justify-content: center;
 }
 .message-highlight {
   outline: 2px solid rgb(var(--v-theme-primary));
@@ -473,14 +513,30 @@ onUnmounted(() => {
 }
 .date-divider,
 .unread-divider {
-  margin: 8px 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0 18px;
   text-align: center;
   font-size: 12px;
+  line-height: 1.5;
+}
+.date-divider::before,
+.date-divider::after,
+.unread-divider::before,
+.unread-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(var(--v-theme-text-primary), 0.12);
 }
 .unread-divider {
-  border-block: 1px solid rgba(var(--v-theme-primary), 0.4);
-  padding: 6px;
+  color: rgb(var(--v-theme-primary));
   font-weight: 600;
+}
+.unread-divider::before,
+.unread-divider::after {
+  background: rgba(var(--v-theme-primary), 0.35);
 }
 .empty-chat {
   padding: 28px 12px;
@@ -507,7 +563,12 @@ onUnmounted(() => {
   gap: 8px;
 }
 .chat-input {
+  flex: 1 1 0;
   min-width: 0;
+}
+.chat-input :deep(textarea) {
+  font-size: 16px;
+  line-height: 1.5;
 }
 .chat-composer :deep(.sticker-control),
 .send-button {
@@ -542,9 +603,16 @@ onUnmounted(() => {
 }
 .delivery-state {
   font-size: 12px;
+  opacity: 1;
 }
-.outgoing-message > .message-text {
-  max-width: 88%;
+.message-own .message-entry-failed {
+  border-color: rgba(var(--v-theme-error), 0.6);
+}
+.delivery-state .v-btn {
+  min-height: 44px;
+}
+.outgoing-message .message-entry {
+  border-radius: 14px;
 }
 .sr-only {
   position: absolute;
@@ -587,6 +655,9 @@ onUnmounted(() => {
   }
   .message-author :deep(.user-preview__name) {
     max-width: calc(100vw - 104px);
+  }
+  .messages-container {
+    padding: 12px;
   }
 }
 </style>

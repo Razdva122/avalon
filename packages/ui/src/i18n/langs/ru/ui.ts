@@ -77,6 +77,7 @@ export default {
     account: 'Аккаунт',
     dangerZone: 'Опасная зона',
     logoutTitle: 'Выход из аккаунта',
+    logoutConfirmText: 'Вы уверены, что хотите выйти из аккаунта?',
     logoutHint: 'Вы будете перенаправлены на главную страницу',
     gameSettings: 'Игровые настройки',
   },

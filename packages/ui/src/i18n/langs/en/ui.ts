@@ -76,6 +76,7 @@ export default {
     account: 'Account',
     dangerZone: 'Danger Zone',
     logoutTitle: 'Logout',
+    logoutConfirmText: 'Are you sure you want to log out?',
     logoutHint: 'You will be redirected to the main page',
     gameSettings: 'Game Settings',
   },

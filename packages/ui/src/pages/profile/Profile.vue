@@ -201,6 +201,28 @@
 
     <AvatarModal ref="avatarModal" />
 
+    <v-dialog
+      v-model="logoutDialog"
+      max-width="420px"
+      aria-labelledby="logout-dialog-title"
+      aria-describedby="logout-dialog-description"
+    >
+      <v-card class="logout-dialog">
+        <v-card-title id="logout-dialog-title" class="dialog-title">{{ $t('profile.logoutTitle') }}</v-card-title>
+        <v-card-text id="logout-dialog-description" class="dialog-text">
+          {{ $t('profile.logoutConfirmText') }}
+        </v-card-text>
+        <v-card-actions class="dialog-actions">
+          <v-btn color="primary" variant="tonal" class="dialog-btn" autofocus @click="logoutDialog = false">
+            {{ $t('modal.cancel') }}
+          </v-btn>
+          <v-btn color="primary" variant="flat" class="dialog-btn" @click="confirmLogout">
+            {{ $t('profile.logout') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!-- Модальное окно подтверждения сброса рейтинга -->
     <v-dialog v-model="resetRatingDialog" max-width="420px">
       <v-card class="reset-rating-dialog">
@@ -258,6 +280,7 @@ export default defineComponent({
       username: profile?.name || '',
       validators,
       updatingName: false,
+      logoutDialog: false,
       availableLocales: this.$i18n.availableLocales.map((el) => ({
         value: el,
         title: LanguageMap[<TLanguage>el],
@@ -372,6 +395,11 @@ export default defineComponent({
       (this.$refs.avatarModal as typeof AvatarModal).displayModal();
     },
     logout() {
+      this.logoutDialog = true;
+    },
+    confirmLogout() {
+      if (!this.logoutDialog) return;
+      this.logoutDialog = false;
       this.$router.push(localizedPath('/', i18n.global.locale.value));
       this.$store.commit('clearUserProfile');
     },
@@ -707,8 +735,9 @@ export default defineComponent({
   }
 }
 
-// Диалог сброса рейтинга
-.reset-rating-dialog {
+// Диалоги подтверждения
+.reset-rating-dialog,
+.logout-dialog {
   border-radius: 16px !important;
   background-color: rgb(var(--v-theme-inset)) !important;
   overflow: hidden;
@@ -720,6 +749,7 @@ export default defineComponent({
     padding: 20px 24px 12px;
     font-size: 18px;
     font-weight: 600;
+    white-space: normal;
 
     .warning-icon {
       color: rgb(var(--v-theme-warning));

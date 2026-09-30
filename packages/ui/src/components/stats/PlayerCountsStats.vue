@@ -1,5 +1,10 @@
 <template>
-  <Bar id="my-chart-id" :options="settings.chartOptions" :data="settings.chartData" />
+  <div class="player-counts-chart">
+    <p class="chart-title">{{ $t('chartStats.winrateByTeamSize') }}</p>
+    <div class="chart-canvas">
+      <Bar :options="settings.chartOptions" :data="settings.chartData" />
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -51,7 +56,7 @@ export default defineComponent({
       () =>
         <{ chartData: ChartProps<'bar'>['data']; chartOptions: ChartProps<'bar'>['options'] }>{
           chartData: {
-            labels: props.statsByPlayer.map((el) => t('chartStats.countPlayer', { playerCount: el.playerCount })),
+            labels: props.statsByPlayer.map((el) => el.playerCount.toString()),
             datasets: [
               {
                 type: 'bar',
@@ -70,8 +75,14 @@ export default defineComponent({
           chartOptions: {
             plugins: {
               title: {
-                display: true,
-                text: t('chartStats.winrateByTeamSize'),
+                display: false,
+              },
+              legend: {
+                labels: {
+                  boxWidth: 12,
+                  boxHeight: 12,
+                  padding: 12,
+                },
               },
               annotation: {
                 annotations: {
@@ -95,6 +106,13 @@ export default defineComponent({
             scales: {
               x: {
                 stacked: true,
+                title: {
+                  display: true,
+                  text: t('stats.playerCount'),
+                },
+                ticks: {
+                  maxRotation: 0,
+                },
               },
               y: {
                 stacked: true,
@@ -114,3 +132,28 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.player-counts-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.chart-title {
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.chart-canvas {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.chart-canvas > div {
+  height: 100%;
+}
+</style>

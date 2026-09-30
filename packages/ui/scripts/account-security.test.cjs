@@ -123,6 +123,7 @@ test('room creation timeouts are handled and successful creation still navigates
 
 test('statistics reject socket errors instead of exposing an invalid stats object', async () => {
   const page = load('../src/pages/stats/Stats.vue', {
+    '@/helpers/composables/useResponsive': { useResponsive: () => ({ isMobile: Vue.ref(false) }) },
     '@/api/socket': {
       socket: {
         timeout() {
@@ -277,6 +278,7 @@ test('statistics retain the last successful result when a refresh is rejected', 
   const stats = { roleStats: [], byPlayers: [], addonsStats: [], total: { gamesCount: 0 } };
   const replies = [stats, { error: 'requestFailed' }];
   const page = load('../src/pages/stats/Stats.vue', {
+    '@/helpers/composables/useResponsive': { useResponsive: () => ({ isMobile: Vue.ref(false) }) },
     '@/api/socket': {
       socket: {
         timeout() {

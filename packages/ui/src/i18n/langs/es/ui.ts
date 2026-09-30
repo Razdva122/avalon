@@ -77,6 +77,7 @@ export default {
     account: 'Cuenta',
     dangerZone: 'Zona de Peligro',
     logoutTitle: 'Cerrar sesión',
+    logoutConfirmText: '¿Seguro que quieres cerrar sesión?',
     logoutHint: 'Serás redirigido a la página principal',
     gameSettings: 'Configuración del Juego',
   },

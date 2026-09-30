@@ -75,6 +75,7 @@ export default {
     account: '账户',
     dangerZone: '危险区域',
     logoutTitle: '退出登录',
+    logoutConfirmText: '确定要退出登录吗？',
     logoutHint: '您将被重定向到主页',
     gameSettings: '游戏设置',
   },

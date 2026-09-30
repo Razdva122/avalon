@@ -8,9 +8,10 @@
       item-title="label"
       item-value="value"
       :label="$t('stats.selectRole')"
-      outlined
-      dense
-      class="mb-4"
+      variant="outlined"
+      density="comfortable"
+      hide-details
+      class="role-select mb-4"
     ></v-select>
 
     <div class="table-container">
@@ -20,24 +21,30 @@
         :loading="loading"
         class="leaderboard-table"
         disable-sort
+        :mobile="false"
+        :hide-default-header="isMobile"
         hide-default-footer
         item-value="userID"
       >
         <template v-slot:item="{ item }">
-          <tr class="hoverable-row" @click="navigateToPlayerStats(item)">
-            <td class="text-center">
+          <tr class="hoverable-row leaderboard-row" @click="navigateToPlayerStats(item)">
+            <td class="leaderboard-rank">
               <div class="rank-cell">{{ item.rank }}</div>
             </td>
 
-            <td :class="{ 'teammate-profile-cell': isMobile }">
-              <TeammateProfile :teammateID="item.userID" />
+            <td class="leaderboard-player">
+              <router-link :to="{ name: 'user_stats', params: { uuid: item.userID } }" @click.stop>
+                <TeammateProfile :teammateID="item.userID" />
+              </router-link>
             </td>
 
-            <td class="text-center">
+            <td class="leaderboard-rating">
+              <span v-if="isMobile" class="mobile-metric-label">{{ $t('stats.rating') }}</span>
               <div class="rating-cell">{{ item.rating }}</div>
             </td>
 
-            <td class="text-center">
+            <td class="leaderboard-winrate">
+              <span v-if="isMobile" class="mobile-metric-label">{{ $t('stats.winrate') }}</span>
               <div class="winrate-cell">
                 <WinrateDisplay :winrate="item.winrate.toFixed(2)" />
               </div>
@@ -75,7 +82,7 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const { t } = useI18n();
-    const { isMobile } = useResponsive();
+    const { isMobile } = useResponsive(960);
 
     const leaderboard = ref<RoleRating[]>([]);
     const loading = ref(true);
@@ -99,7 +106,6 @@ export default defineComponent({
       const userIDHeader = {
         title: t('stats.player'),
         value: 'userID',
-        ...(isMobile.value && { width: '130px' }),
       };
 
       const ratingHeader = {
@@ -239,7 +245,7 @@ export default defineComponent({
 
 .rating-cell {
   font-weight: bold;
-  color: var(--v-primary-base);
+  color: rgb(var(--v-theme-primary));
 }
 
 .leaderboard-table {
@@ -262,15 +268,5 @@ export default defineComponent({
 .games-count-cell {
   white-space: nowrap;
   text-align: center;
-}
-
-@media (max-width: 700px) {
-  .teammate-profile-cell {
-    width: 130px;
-    max-width: 130px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
 }
 </style>
