@@ -1,3 +1,4 @@
+import aiAgents from './aiAgents';
 import aiArena from './aiArena';
 import { passwordRecovery } from '../passwordRecovery';
 import { premiumCosmetics } from '../premiumCosmetics';
@@ -20,6 +21,7 @@ import pages from '@/i18n/langs/pages';
 
 export const en = {
   aiArena,
+  aiAgents,
   passwordRecovery: passwordRecovery['en'],
   premiumCosmetics: premiumCosmetics.en,
   ...menu,

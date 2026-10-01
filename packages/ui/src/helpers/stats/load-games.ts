@@ -17,5 +17,7 @@ export async function loadPlayerGames(
     if (cursor && visited.has(cursor)) throw Error('Repeated history cursor');
     if (cursor) visited.add(cursor);
   } while (cursor);
+  if (games.every((game) => typeof game.startAt === 'string' && Number.isFinite(Date.parse(game.startAt))))
+    games.sort((a, b) => Date.parse(a.startAt!) - Date.parse(b.startAt!) || a.uuid.localeCompare(b.uuid));
   return games;
 }

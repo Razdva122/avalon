@@ -1,3 +1,4 @@
+import { aiPlayedModel } from '@avalon/types';
 import { MongoMemoryServer } from 'mongodb-memory-server-core';
 import { MongoClient } from 'mongodb';
 import { AiRepository } from './repository';
@@ -451,4 +452,130 @@ test('expired maintenance cannot resurrect a room while its retirement archive i
     route.mockRestore();
   }
   expect(await repo.roomCost('old')).toBe(0.01);
+});
+
+test('subscription lease renewal preserves RUB totals and fails after ownership is released', async () => {
+  const repo = new AiRepository(client.db('codex-lease'), 1, 1);
+  await repo.claim('codex-match');
+  const before = await repo.budget();
+  await repo.renewLease('codex-match');
+  expect((await repo.budget()).usedRub).toBe(before.usedRub);
+  await expect(repo.renewLease('other-match')).rejects.toThrow();
+  await repo.release('codex-match');
+  await expect(repo.renewLease('codex-match')).rejects.toThrow();
+});
+
+test('AI profile history counts completed games only, paginates chronologically and exposes summaries only', async () => {
+  const db = client.db('profile-history');
+  const repo = new AiRepository(db);
+  const docs = Array.from({ length: 202 }, (_, i) => ({
+    _id: `game-${String(i).padStart(3, '0')}`,
+    state: {
+      createAt: String(new Date(Date.UTC(2026, 8, 1, 0, i))),
+      stage: 'started',
+      ai: { status: 'finished' },
+      players: [{ id: 'avalon-agent-3' }],
+      game: {
+        uuid: `game-${i}`,
+        stage: 'end',
+        players: [{ id: 'avalon-agent-3', role: i % 2 ? 'merlin' : 'morgana', secret: 'private' }],
+        result: { winner: 'good', reason: 'missions' },
+        history: ['private'],
+      },
+    },
+  }));
+  await db.collection<{ _id: string; state: Record<string, unknown> }>('ai_room_replays').insertMany([
+    ...docs,
+    { ...docs[0], _id: 'paused', state: { ...docs[0].state, game: { ...docs[0].state.game, stage: 'selectTeam' } } },
+    {
+      ...docs[0],
+      _id: 'manual',
+      state: { ...docs[0].state, game: { ...docs[0].state.game, result: { winner: 'good', reason: 'manualy' } } },
+    },
+  ]);
+  const first = await repo.getPlayerGameSummariesPage('avalon-agent-3');
+  expect(first.games).toHaveLength(200);
+  expect(first.games[0]).toEqual({
+    uuid: 'game-0',
+    startAt: docs[0].state.createAt,
+    players: [{ id: 'avalon-agent-3', role: 'morgana' }],
+    result: { winner: 'good' },
+  });
+  expect(first.nextCursor).toBeDefined();
+  const next = await new AiRepository(db).getPlayerGameSummariesPage('avalon-agent-3', first.nextCursor);
+  expect(next.games.map((game) => game.uuid)).toEqual(['game-200', 'game-201']);
+  expect(next.nextCursor).toBeUndefined();
+  expect(await repo.getPlayerGameSummariesPage('avalon-agent-9')).toEqual({ games: [] });
+  await expect(repo.getPlayerGameSummariesPage('avalon-agent-3', 'bad')).rejects.toThrow();
+  expect(await db.collection('rooms').countDocuments()).toBe(0);
+});
+
+test('AI profile TrueSkill counts completed games from the current season, stays isolated and refreshes after save', async () => {
+  const db = client.db('ai-ratings');
+  const repo = new AiRepository(db);
+  const state = {
+    roomID: 'rating-game',
+    stage: 'started',
+    createAt: String(new Date('2026-10-01T00:00:00Z')),
+    ai: { status: 'finished', profileRatingSeason: 1 },
+    players: [{ id: 'avalon-agent-1' }],
+    game: {
+      uuid: 'rating-game',
+      stage: 'end',
+      players: [
+        { id: 'avalon-agent-1', role: 'merlin' },
+        { id: 'avalon-agent-2', role: 'servant' },
+        { id: 'avalon-agent-3', role: 'morgana' },
+      ],
+      result: { winner: 'good', reason: 'missions' },
+    },
+  };
+  expect(await repo.getProfileRating('avalon-agent-1')).toMatchObject({ mu: 6000, gamesCount: 0 });
+  await repo.save(state as unknown as import('@avalon/types').StartedRoomState);
+  const rating = await repo.getProfileRating('avalon-agent-1');
+  expect(rating).toMatchObject({ gamesCount: 1, wins: 1, losses: 0 });
+  expect(rating!.mu).toBeGreaterThan(6000);
+  expect(await new AiRepository(db).getProfileRating('avalon-agent-1')).toEqual(rating);
+  await repo.save(state as unknown as import('@avalon/types').StartedRoomState);
+  expect(await repo.getProfileRating('avalon-agent-1')).toEqual(rating);
+  expect(await db.listCollections().toArray()).toHaveLength(1);
+});
+
+test('old Codex archives infer the played model from traces and preserve the provider', async () => {
+  const db = client.db('legacy-codex-model');
+  await db.collection<{ _id: string; state: Record<string, unknown> }>('ai_room_replays').insertOne({
+    _id: 'old-codex',
+    state: { roomID: 'old-codex', createAt: '2026-10-01', ai: { status: 'finished', model: 'codex-chatgpt' } },
+  });
+  await db.collection('ai_decision_traces').insertOne({ roomID: 'old-codex', payload: { model: 'gpt-6.1-sol' } });
+  const state = await new AiRepository(db).load('old-codex');
+  expect(state?.ai?.model).toBe('codex-chatgpt');
+  expect(aiPlayedModel(state?.ai)).toBe('gpt-6.1-sol');
+});
+
+test('pre-release games remain in statistics but do not affect the new 6000 rating baseline', async () => {
+  const db = client.db('rating-release-boundary');
+  await db.collection<{ _id: string; state: Record<string, unknown> }>('ai_room_replays').insertOne({
+    _id: 'before-release',
+    state: {
+      createAt: String(new Date()),
+      stage: 'started',
+      ai: { status: 'finished' },
+      players: [{ id: 'avalon-agent-1' }],
+      game: {
+        uuid: 'before-release',
+        stage: 'end',
+        players: [
+          { id: 'avalon-agent-1', role: 'merlin' },
+          { id: 'avalon-agent-2', role: 'servant' },
+          { id: 'avalon-agent-3', role: 'morgana' },
+        ],
+        result: { winner: 'good', reason: 'missions' },
+      },
+    },
+  });
+  const repo = new AiRepository(db);
+  expect(await repo.getProfileRating('avalon-agent-1')).toMatchObject({ mu: 6000, gamesCount: 0 });
+  expect(await repo.getProfileRating('avalon-ai-1')).toBeUndefined();
+  expect((await repo.getPlayerGameSummariesPage('avalon-agent-1')).games).toHaveLength(1);
 });

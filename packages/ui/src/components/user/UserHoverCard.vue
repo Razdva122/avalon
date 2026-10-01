@@ -17,9 +17,23 @@
               {{ userState.profile.name }}
             </div>
             <v-skeleton-loader v-else type="text" width="120" />
+            <div v-if="userState.status === 'ready' && userState.profile.aiPersona" class="text-body-2 mt-1">
+              <strong>{{
+                userState.profile.aiPersona.key
+                  ? $t(`aiAgents.${userState.profile.aiPersona.key}.title`)
+                  : userState.profile.aiPersona.title
+              }}</strong>
+              <p class="mt-1">
+                {{
+                  userState.profile.aiPersona.key
+                    ? $t(`aiAgents.${userState.profile.aiPersona.key}.description`)
+                    : userState.profile.aiPersona.description
+                }}
+              </p>
+            </div>
           </div>
         </div>
-        <div v-if="!compact" class="trueskill-rating">
+        <div v-if="!compact && !/^avalon-ai-[1-7]$/.test(userID)" class="trueskill-rating">
           <UserTrueSkillRating :userID="userID" />
         </div>
         <slot name="actions" />
@@ -41,14 +55,14 @@
         <div class="d-flex justify-space-between">
           <div class="stat-label">{{ $t('stats.winrate') }}:</div>
           <div class="stat-value" v-if="!loading">
-            <span v-if="compact && totalGames === 0">—</span>
+            <span v-if="totalGames === 0">—</span>
             <WinrateDisplay v-else :winrate="overallWinrate.toString()" />
           </div>
           <v-skeleton-loader v-else type="text" width="60" />
         </div>
       </div>
 
-      <template v-if="!compact">
+      <template v-if="!compact && !isAiProfile">
         <v-divider class="my-2"></v-divider>
         <div class="top-roles-title mt-2">{{ $t('stats.topRoles') }}</div>
         <div v-if="!ratingsLoading && topRoles.length > 0" class="top-roles-list">
@@ -69,6 +83,9 @@
         </div>
         <v-skeleton-loader v-else type="list-item-three-line" />
       </template>
+      <v-btn class="mt-3" block variant="tonal" color="primary" min-height="44" :to="`/stats/user/${userID}/`">
+        {{ $t('userStats.profile') }}
+      </v-btn>
     </div>
   </v-card>
 </template>
@@ -106,6 +123,7 @@ export default defineComponent({
   },
   setup(props) {
     const { userState } = useUserProfile(toRef(props, 'userID'));
+    const isAiProfile = computed(() => /^avalon-(?:agent-(?:[1-9]|10)|ai-[1-7])$/.test(props.userID));
     const userRatings = ref<RoleRating[]>([]);
     const loading = ref(true);
     const totalGames = ref(0);
@@ -138,7 +156,7 @@ export default defineComponent({
       loadError.value = false;
       userRatings.value = [];
       // Role rankings are optional and must not determine overall game statistics.
-      if (!props.compact)
+      if (!props.compact && !isAiProfile.value)
         void socket
           .timeout(10000)
           .emitWithAck('getUserRatings', userID)
@@ -194,6 +212,7 @@ export default defineComponent({
     };
 
     return {
+      isAiProfile,
       userState,
       userRatings,
       loading,

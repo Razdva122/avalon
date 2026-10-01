@@ -117,6 +117,7 @@
 </template>
 
 <script lang="ts">
+import { gameStageLabel } from '@/helpers/game-stage-label';
 import last from 'lodash/last';
 import { useI18n } from 'vue-i18n';
 import type { THistoryResults } from '@avalon/types';
@@ -186,31 +187,7 @@ export default defineComponent({
     });
 
     const stageText = computed(() => {
-      return {
-        votingForTeam: 'voting',
-        useExcalibur: 'excalibur',
-        selectTeam: 'team building',
-        onMission: 'mission',
-        initialization: 'initialization',
-        giveExcalibur: 'excalibur',
-        checkLoyalty: 'check loyalty',
-        announceLoyalty: 'announce loyalty',
-        revealLoyalty: 'reveal loyalty',
-        witchLoyalty: 'witch loyalty',
-        end: 'end',
-        switchLancelots: 'lancelots',
-        assassinate: 'assassinate',
-        hidden: 'hidden',
-        witchAbility: 'witch',
-        giveCard: 'give card',
-        preVote: 'voting',
-        leadToVictory: 'lead to victory',
-        restoreHonor: 'restore honor',
-        ambush: 'ambush',
-        kingReturns: 'king returns',
-        playCard: 'play card',
-        weFoundYou: 'we found you',
-      }[gameState.value.stage];
+      return gameStageLabel(gameState.value.stage);
     });
 
     return {

@@ -7,6 +7,7 @@ import {
   AiPause,
   AiTechnicalPause,
   compactRequest,
+  ladyTransferPreference,
   systemFor,
   yandexDecide,
 } from './client';
@@ -18,6 +19,7 @@ export function publicContext(request: BotRequest, choice: string) {
   const c = compactRequest(request);
   return {
     seat: c.you?.seat,
+    personality: request.style,
     publicRoleClaims: c.publicRoleClaims,
     stage: c.stage,
     choice,
@@ -115,6 +117,7 @@ export function reviewContext(request: BotRequest) {
     evilCouncil: request.evilCouncil,
     automaticProposals: votes.filter((v) => v.forced).map(({ mission, attempt, team }) => ({ mission, attempt, team })),
     you: c.you,
+    personality: request.style,
     score: c.score,
     result: c.result,
     revealedRoles: c.revealedRoles,
@@ -154,6 +157,7 @@ export function decisionInstructions(request: BotRequest) {
           : 'Propose or vote on the exact roster. Include yourself by default. Good compares the FULL roster with known Evil and safer alternatives; needing a success does not make a team safe. Use proposal/rejectionsUntilForced and the fifth leader: rejectedProposals never changed the score or played cards. Proposal 5 is automatic. Normally support your unchanged team unless new evidence explains a change. Evil knows its allies: a roster with no Evil cannot sabotage. An all-Evil proposal may lack the fourth approval needed: consider a mixed roster and a plausible public reason. Avoid exposing the entire Evil bloc through identical approvals and rejections; cover votes are useful only when they do not throw away a necessary win. Count ALL Evil slots before inventing another suspect.';
   return (
     rules +
+    (action === 'checkLoyalty' ? ` ${ladyTransferPreference}` : '') +
     opening +
     (['selectTeam', 'votingForTeam'].includes(action)
       ? ' Decision check: (1) Separate known alignment, mission deductions and unverified claims; cite their sources. (2) Trust flows from a trusted Lady checker to the checked target, NEVER backwards: someone truthfully calling YOU Good does not make THEM Good; Evil can tell the truth. (3) Compare the full roster with one plausible safer alternative and the next/fifth leader. A fresh roster or absence from failed missions does not clear anyone. (4) Compare individual votes in rejectedProposals and approvedProposals by mission/attempt: repeated off-team support, joint blocks and later failures can connect suspects. Consider contrary votes and innocent explanations; correlation is not proof. Forced proposals cast no votes. (5) At two failures, another failure ends the game: choose for success, never to test someone or learn afterward. State only the decisive evidence and consequence; update at most three changed hypotheses. Evil uses this analysis to win and conceal allies without changing private knowledge.'

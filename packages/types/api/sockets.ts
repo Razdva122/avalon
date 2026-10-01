@@ -150,6 +150,14 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
       defaultModel?: string;
     }) => void,
   ) => void;
+  getAiCodexModels: (
+    callback: (result: { models: import('../room').CodexModelOption[] } | { error: string }) => void,
+  ) => void;
+  configureAiCodex: (
+    roomID: string,
+    settings: import('../room').CodexSettings,
+    callback: (result: { ok: true } | { error: string }) => void,
+  ) => void;
   createAiRoom: (model: string, callback: (result: { roomID: string } | { error: string }) => void) => void;
   controlAiRoom: (
     roomID: string,

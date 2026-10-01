@@ -1,0 +1,27 @@
+const labels: Record<string, string> = {
+  votingForTeam: 'voting',
+  useExcalibur: 'excalibur',
+  selectTeam: 'team building',
+  onMission: 'mission',
+  initialization: 'initialization',
+  giveExcalibur: 'excalibur',
+  checkLoyalty: 'check loyalty',
+  announceLoyalty: 'announce loyalty',
+  revealLoyalty: 'reveal loyalty',
+  witchLoyalty: 'witch loyalty',
+  end: 'end',
+  switchLancelots: 'lancelots',
+  assassinate: 'assassinate',
+  hidden: 'hidden',
+  witchAbility: 'witch',
+  giveCard: 'give card',
+  preVote: 'voting',
+  leadToVictory: 'lead to victory',
+  restoreHonor: 'restore honor',
+  ambush: 'ambush',
+  kingReturns: 'king returns',
+  playCard: 'play card',
+  weFoundYou: 'we found you',
+};
+
+export const gameStageLabel = (stage: string): string => labels[stage] || 'stage';

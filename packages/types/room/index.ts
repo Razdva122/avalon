@@ -34,7 +34,15 @@ export class VoteInRoom {
   public result!: VoteRoomResult;
 }
 
+export type CodexSettings = { model: string; reasoning: string };
+export type CodexModelOption = { id: string; label: string; efforts: string[] };
+
 export type AiRoomState = {
+  /** Only rooms created after the AI rating release participate in this season. */
+  profileRatingSeason?: number;
+  codex?: CodexSettings;
+  /** Restored inference label for archives that predate saved Codex settings. */
+  playedModel?: string;
   status: 'ready' | 'running' | 'paused' | 'finished' | 'stopped';
   canResumeBudget?: boolean;
   canResumeTechnical?: boolean;
@@ -43,6 +51,8 @@ export type AiRoomState = {
   fallbacks: number;
   message: string;
 };
+
+export { aiPlayedModel } from './ai-model';
 
 export class BaseRoomState {
   public ai?: AiRoomState;

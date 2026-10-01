@@ -1,3 +1,4 @@
+import { aiPlayedModel } from '@avalon/types';
 import { roomChannel, userChannel } from '@/helpers/channels';
 import { validID } from '@/security/validation';
 import { installSocketAdmission } from '@/security/socket-admission';
@@ -5,7 +6,7 @@ import { createRoomVoice, registerVoiceEndpoints } from '@/voice/runtime';
 import type { VoiceService } from '@/voice/service';
 import { publicRoomState } from '@/ai/public-state';
 import { AiService } from '@/ai/service';
-import { BOT_PROFILES } from '@/ai/room';
+import { getBotProfile } from '@/ai/agents';
 import { registerChatEndpoints } from '@/room/chat-endpoints';
 import { ChatService } from '@/room/chat-service';
 import { ChatRepository } from '@/room/chat-repository';
@@ -98,7 +99,7 @@ export class Manager {
       const roomData: TRoomInfo = {
         ai: Boolean(room.ai),
         aiStatus: room.ai?.status,
-        aiModel: room.ai?.model,
+        aiModel: aiPlayedModel(room.ai),
         hostID: room.leaderID,
         state: room.data.stage,
         options: room.options,
@@ -133,7 +134,7 @@ export class Manager {
       return {
         ai: Boolean(room.ai),
         aiStatus: room.ai?.status,
-        aiModel: room.ai?.model,
+        aiModel: aiPlayedModel(room.ai),
         hostID: room.leaderID,
         state: 'started',
         options: room.options,
@@ -215,7 +216,7 @@ export class Manager {
     this.chatService = new ChatService(
       chatDB ? new ChatRepository(chatDB) : undefined,
       (id) => this.rooms[id],
-      async (id) => (await this.dbManager.getRoomFromDB(id)) || (await this.aiService.repository?.load(id)),
+      async (id) => (await this.dbManager.getRoomFromDB(id)) || (await this.aiService.archiveRepository?.load(id)),
       io,
     );
     this.avatarsManager = new AvatarsManager(dbManager);
@@ -223,7 +224,7 @@ export class Manager {
 
     void Promise.allSettled([
       this.dbManager.getLastRooms(20),
-      this.aiService.repository?.recent(20) || Promise.resolve([]),
+      this.aiService.archiveRepository?.recent(20) || Promise.resolve([]),
     ]).then((results) => {
       this.generateRoomsListFromDB(results.flatMap((result) => (result.status === 'fulfilled' ? result.value : [])));
       if (results.some((result) => result.status === 'rejected'))
@@ -302,7 +303,9 @@ export class Manager {
           .catch(() => socket.emit('serverError', 'requestFailed'));
       }
 
-      registerTrueSkillRatingEndpoints(socket, userState.userID);
+      registerTrueSkillRatingEndpoints(socket, userState.userID, async (id) =>
+        this.aiService.archiveRepository?.getProfileRating(id),
+      );
 
       if (userState.userID) {
         socket.join(userChannel(userState.userID));
@@ -316,7 +319,7 @@ export class Manager {
         const room = this.rooms[uuid];
         const gameFromDB = room
           ? null
-          : (await this.dbManager.getRoomFromDB(uuid)) || (await this.aiService.repository?.load(uuid));
+          : (await this.dbManager.getRoomFromDB(uuid)) || (await this.aiService.archiveRepository?.load(uuid));
 
         if (room || gameFromDB) {
           if (!socket.rooms.has(roomChannel(uuid))) {
@@ -373,12 +376,20 @@ export class Manager {
       });
 
       socket.on('getPlayerGameSummariesPage', async (uuid, cursor, cb) => {
-        cb(await dbManager.getPlayerGameSummariesPage(uuid, cursor));
+        cb(
+          getBotProfile(uuid)
+            ? await this.aiService.archiveRepository!.getPlayerGameSummariesPage(uuid, cursor)
+            : await dbManager.getPlayerGameSummariesPage(uuid, cursor),
+        );
       });
 
       socket.on('getPlayerGameSummaries', async (uuid, cb) => {
         try {
-          cb(await dbManager.getPlayerGameSummaries(uuid));
+          if (getBotProfile(uuid)) {
+            const page = await this.aiService.archiveRepository!.getPlayerGameSummariesPage(uuid);
+            if (page.nextCursor) throw Error('paginationRequired');
+            cb(page.games);
+          } else cb(await dbManager.getPlayerGameSummaries(uuid));
         } catch (error) {
           console.error('Failed to load player game summaries', error);
           cb(null);
@@ -403,7 +414,7 @@ export class Manager {
       });
 
       socket.on('getUserProfile', async (id, cb) => {
-        const publicUser = BOT_PROFILES.find((p) => p.id === id) || (await dbManager.getPublicUserProfile(id));
+        const publicUser = getBotProfile(id) || (await dbManager.getPublicUserProfile(id));
 
         cb(publicUser);
       });

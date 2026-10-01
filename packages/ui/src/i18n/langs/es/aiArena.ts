@@ -1,4 +1,16 @@
 export default {
+  lastDecision: 'Última decisión',
+  chosenAction: 'Acción elegida',
+  privateReason: 'Explicación privada',
+  openDecision: 'Abrir decisión completa',
+
+  codexRelativePrice: 'Precio relativo de API · la más barata = $1',
+  codexPriceUnavailable: 'precio desconocido',
+  codexModel: 'Modelo Codex',
+  codexReasoning: 'Nivel de razonamiento',
+  codexModelsUnavailable:
+    'No se pudieron cargar los modelos. Comprueba el inicio de sesión local de Codex y actualiza.',
+  codexSubscription: 'Prueba local con ChatGPT. Utiliza los límites de tu suscripción; sin cargos de Yandex.',
   resumeTechnical: 'Reintentar · mismo presupuesto',
   controls: 'Controles de la partida',
   budgetDetails: 'Detalles del presupuesto',
@@ -25,7 +37,7 @@ export default {
   title: 'Arena de IA',
   english: 'En inglés',
   tagline: 'Siete bots. Dos bandos.',
-  subtitle: 'Engaños, misiones y debate · sin clasificación',
+  subtitle: 'Engaños, misiones y debate',
   model: 'Modelo: {model}',
   ready: 'Lista para empezar',
   running: 'En directo',

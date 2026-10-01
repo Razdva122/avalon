@@ -1,5 +1,5 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
-import type { AiBudgetSnapshot } from '@avalon/types';
+import type { AiBudgetSnapshot, CodexModelOption } from '@avalon/types';
 import type { Ref } from 'vue';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
@@ -12,12 +12,17 @@ export function useAiAccess(roomIDs: Ref<string[]> = computed(() => [])) {
   const limits = ref<Record<string, number>>({});
   const models = ref<{ id: string; label: string }[]>([]);
   const defaultModel = ref('');
+  const codexModels = ref<CodexModelOption[]>([]);
   const activeRoomID = ref<string>();
   let version = 0;
+  let catalogVersion = 0;
+  let catalogLoading = false;
   const clear = () => {
     version++;
+    catalogVersion++;
     canManage.value = false;
     models.value = [];
+    codexModels.value = [];
     defaultModel.value = '';
     activeRoomID.value = undefined;
     costs.value = {};
@@ -38,10 +43,30 @@ export function useAiAccess(roomIDs: Ref<string[]> = computed(() => [])) {
       defaultModel.value = access.canManage ? access.defaultModel || '' : '';
       activeRoomID.value = access.canManage ? access.roomID : undefined;
       if (!access.canManage) {
+        codexModels.value = [];
+        catalogVersion++;
         budget.value = undefined;
         costs.value = {};
         limits.value = {};
         return;
+      }
+      if (models.value.some((model) => model.id === 'codex-chatgpt') && !catalogLoading) {
+        const generation = catalogVersion;
+        catalogLoading = true;
+        void (async () => {
+          try {
+            const result = await socket.timeout(30000).emitWithAck('getAiCodexModels');
+            if (generation === catalogVersion)
+              codexModels.value =
+                'error' in result
+                  ? []
+                  : result.models.filter((model: CodexModelOption) => !/^gpt-5(?:[.-]|$)/i.test(model.id));
+          } catch {
+            if (generation === catalogVersion) codexModels.value = [];
+          } finally {
+            catalogLoading = false;
+          }
+        })();
       }
       const summary = await socket.timeout(5000).emitWithAck('getAiBudget');
       if (current !== version) return;
@@ -85,5 +110,5 @@ export function useAiAccess(roomIDs: Ref<string[]> = computed(() => [])) {
     socket.off('connect', refresh);
     socket.off('disconnect', clear);
   });
-  return { canManage, costs, limits, budget, models, defaultModel, activeRoomID, refresh };
+  return { canManage, costs, limits, budget, models, codexModels, defaultModel, activeRoomID, refresh };
 }

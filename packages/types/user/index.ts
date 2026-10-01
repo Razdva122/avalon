@@ -3,6 +3,7 @@ import { prop, modelOptions } from '@typegoose/typegoose';
 export * from './avatars';
 
 export class PublicUserProfile {
+  public aiPersona?: { key?: string; title: string; description: string };
   public premium?: boolean;
   public isAdmin?: boolean;
 

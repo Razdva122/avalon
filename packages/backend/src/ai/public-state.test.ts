@@ -1,6 +1,6 @@
 import { publicRoomState } from './public-state';
 import { BotRoom } from './room';
-import type { Server } from '@avalon/types';
+import { aiPlayedModel, type Server } from '@avalon/types';
 
 test('AI broadcasts and replay serialization hide cost without mutating persistence state', () => {
   const emit = jest.fn();
@@ -20,4 +20,12 @@ test('AI broadcasts and replay serialization hide cost without mutating persiste
     expect(event).toBe('roomUpdated');
     expect(state.ai).not.toHaveProperty('costRub');
   }
+});
+
+test('public AI model label uses the actual selected Codex model without changing provider routing', () => {
+  expect(aiPlayedModel({ model: 'codex-chatgpt', codex: { model: 'gpt-6.1-sol', reasoning: 'low' } })).toBe(
+    'gpt-6.1-sol',
+  );
+  expect(aiPlayedModel({ model: 'codex-chatgpt' })).toBeUndefined();
+  expect(aiPlayedModel({ model: 'qwen3.6-35b-a3b' })).toBe('qwen3.6-35b-a3b');
 });

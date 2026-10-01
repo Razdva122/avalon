@@ -1,20 +1,11 @@
 import { Room } from '@/room';
-import type { GameOptions, Server, TRoomState, PublicUserProfile, AiSpectatorDecision } from '@avalon/types';
+import { AI_PROFILE_RATING_SEASON } from './rating-season';
+import type { GameOptions, Server, TRoomState, AiSpectatorDecision } from '@avalon/types';
 import type { TGameMethodsParams } from '@/core/game-manager';
 import { AiPause, AiTechnicalPause, AiMatchBudgetPause, type Decide, type BotRequest, type BotReply } from './client';
 
-export const BOT_PROFILES: PublicUserProfile[] = ['Alice', 'Ben', 'Clara', 'Daniel', 'Emma', 'Felix', 'Grace'].map(
-  (name, i) => ({ id: `avalon-ai-${i + 1}`, name: `${name} · AI`, avatar: 'servant' }),
-);
-const styles = [
-  'cautiously check facts',
-  'speak directly',
-  'ask precise questions',
-  'look for contradictions',
-  'defend your position calmly',
-  'suggest alternatives',
-  'speak briefly',
-];
+import { BOT_AGENTS, selectBotAgents } from './agents';
+export { BOT_PROFILES } from './agents';
 export const botOptions: GameOptions = {
   roles: { merlin: 1, percival: 1, mordred: 1, morgana: 1 },
   addons: { ladyOfLake: true },
@@ -49,10 +40,11 @@ export class BotRoom extends Room {
     private checkpoint: (state: TRoomState) => Promise<void> = async () => {},
     private delayMs = 0,
   ) {
+    const agents = selectBotAgents();
     super(
       id,
       owner,
-      BOT_PROFILES.map((p) => p.id),
+      agents.map((p) => p.id),
       io,
       structuredClone(botOptions),
     );
@@ -60,9 +52,10 @@ export class BotRoom extends Room {
     this.data = { stage: 'locked' };
     this.ai = {
       status: 'ready',
+      profileRatingSeason: AI_PROFILE_RATING_SEASON,
       costRub: 0,
       fallbacks: 0,
-      message: 'Seven AI players · English discussion · unranked',
+      message: 'Seven AI players · English discussion',
     };
   }
   override joinGame(userID: string): void {
@@ -140,12 +133,13 @@ export class BotRoom extends Room {
     if (this.cancelled) return null;
     if (!speak && choices.length === 1) return { choice: 0, speech: '' };
     if (++this.calls > 350) throw new AiPause('The request limit for this match has been reached.');
-    const index = BOT_PROFILES.findIndex((p) => p.id === id);
+    const agent = BOT_AGENTS.find((p) => p.id === id);
+    if (!agent) throw new AiTechnicalPause('Unknown AI agent profile.');
     const state = this.stateFor(id);
     const request: BotRequest = {
       playerID: id,
       name: this.label(id),
-      style: styles[index],
+      style: agent.style,
       task,
       speak,
       state,
@@ -158,15 +152,13 @@ export class BotRoom extends Room {
       evilEvidence:
         state.stage === 'assassinate'
           ? this.chat.history
-              .filter(
-                (m) => BOT_PROFILES.some((p) => p.id === m.userID) && !/^I vote (approve|reject)\.$/.test(m.message),
-              )
+              .filter((m) => this.players.includes(m.userID) && !/^I vote (approve|reject)\.$/.test(m.message))
               .slice(0, 350)
               .map((m) => ({ id: m.id, name: this.label(m.userID), text: m.message }))
           : undefined,
       evilCouncil: ['assassinate', 'end'].includes(state.stage) ? structuredClone(this.evilCouncil) : undefined,
       chat: this.chat.history
-        .filter((m) => BOT_PROFILES.some((p) => p.id === m.userID))
+        .filter((m) => this.players.includes(m.userID))
         .filter((m) => !m.message.startsWith('Post-game:') && !m.message.startsWith('Evil council (revealed):'))
         .slice(0)
         .map((m) => ({ id: m.id, name: this.label(m.userID), text: m.message })),
@@ -177,7 +169,7 @@ export class BotRoom extends Room {
         state.players.map((p) => [p.index, p.role]),
       );
     }
-    this.ai!.message = `${BOT_PROFILES[index].name}: ${task}`;
+    this.ai!.message = `${agent.name}: ${task}`;
     this.updateRoomState(true);
     let answer: BotReply;
     try {

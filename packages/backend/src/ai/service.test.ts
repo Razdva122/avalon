@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as codexModels from './codex-models';
 import { AiService } from './service';
 import { BotRoom } from './room';
 import type { Manager } from '@/main';
@@ -387,4 +388,174 @@ test('technical resume requires a current admin, never doubles budgets and rejec
   host.rooms.technical = budgetRoom;
   expect(await control()).toHaveProperty('error');
   expect(claim).toHaveBeenCalledTimes(1);
+});
+
+test('development advertises and creates Codex without Yandex credentials; production rejects it', async () => {
+  const previous = { ...process.env };
+  const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
+  const host = {
+    rooms: {},
+    io,
+    updateRoomsList: jest.fn(),
+    dbManager: { dbInstance: { connection: { db: {} } }, getUserByID: async () => ({ isAdmin: true }) },
+  } as unknown as Manager;
+  try {
+    process.env.NODE_ENV = 'development';
+    process.env.AI_ROOMS_ENABLED = 'true';
+    process.env.AI_CODEX_ENABLED = 'true';
+    delete process.env.YANDEX_API_KEY;
+    delete process.env.YANDEX_FOLDER_ID;
+    const service = new AiService(host);
+    expect(service.repository).toBeDefined();
+    const claim = jest.fn();
+    service.repository = { claim, save: jest.fn() } as unknown as AiRepository;
+    const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
+    service.register(
+      {
+        on: (name: string, h: any) => {
+          handlers[name] = h;
+        },
+      } as unknown as ServerSocket,
+      'owner',
+    );
+    const access = jest.fn();
+    await handlers.getAiRoomAccess(access);
+    expect(access.mock.calls[0][0].models).toContainEqual({ id: 'codex-chatgpt', label: 'Codex · ChatGPT' });
+    const created = jest.fn();
+    await handlers.createAiRoom('codex-chatgpt', created);
+    expect(created.mock.calls[0][0]).toHaveProperty('roomID');
+    expect(host.rooms[created.mock.calls[0][0].roomID].ai?.model).toBe('codex-chatgpt');
+    expect(claim).toHaveBeenCalledTimes(1);
+    process.env.NODE_ENV = 'production';
+    host.rooms = {};
+    const denied = jest.fn();
+    await handlers.createAiRoom('codex-chatgpt', denied);
+    expect(denied.mock.calls[0][0]).toHaveProperty('error');
+    expect(claim).toHaveBeenCalledTimes(1);
+    await handlers.getAiRoomAccess(access);
+    expect(access.mock.calls.at(-1)[0].models.some((m: { id: string }) => m.id === 'codex-chatgpt')).toBe(false);
+  } finally {
+    process.env = previous;
+  }
+});
+
+test('Codex settings require admin access and stay frozen after launch', async () => {
+  const catalog = jest
+    .spyOn(codexModels, 'getCodexModels')
+    .mockResolvedValue([{ id: 'gpt-6-luna', label: 'Luna', efforts: ['low', 'high'] }]);
+  const old = { ...process.env };
+  process.env.NODE_ENV = 'development';
+  process.env.AI_CODEX_ENABLED = 'true';
+  const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
+  const room = new BotRoom(
+    'settings-room',
+    'admin',
+    io,
+    async () => ({ choice: 0, speech: '' }),
+    async () => {},
+    0,
+  );
+  room.ai!.model = 'codex-chatgpt';
+  const host = {
+    rooms: { 'settings-room': room },
+    io,
+    updateRoomsList: jest.fn(),
+    dbManager: { getUserByID: async (id: string) => ({ isAdmin: id === 'admin' }) },
+  } as unknown as Manager;
+  const service = new AiService(host);
+  const saved: any[] = [];
+  service.repository = {
+    save: async (state: any) => {
+      saved.push(state);
+    },
+  } as unknown as AiRepository;
+  const settings = { model: 'gpt-6-luna', reasoning: 'high' };
+  function connect(id: string) {
+    const events: Record<string, any> = {};
+    service.register(
+      {
+        on: (name: string, fn: any) => {
+          events[name] = fn;
+        },
+      } as unknown as ServerSocket,
+      id,
+    );
+    return events;
+  }
+  try {
+    const denied = jest.fn();
+    await connect('visitor').configureAiCodex('settings-room', settings, denied);
+    expect(denied.mock.calls[0][0]).toEqual({ error: 'AI room access denied' });
+    const admin = connect('admin');
+    const unconfigured = jest.fn();
+    await admin.controlAiRoom('settings-room', 'start', unconfigured);
+    expect(unconfigured.mock.calls[0][0]).toEqual({ error: 'Choose a Codex model and reasoning level before launch' });
+    const response = jest.fn();
+    await admin.configureAiCodex('settings-room', settings, response);
+    expect(response.mock.calls[0][0]).toEqual({ ok: true });
+    expect(saved[0].ai.codex).toEqual(settings);
+    expect(host.updateRoomsList).toHaveBeenCalledWith(room);
+    room.ai!.status = 'running';
+    await admin.configureAiCodex('settings-room', { ...settings, reasoning: 'low' }, response);
+    expect(response.mock.calls[1][0]).toHaveProperty('error');
+    expect((room.ai as any).codex).toEqual(settings);
+  } finally {
+    catalog.mockRestore();
+    process.env = old;
+  }
+});
+
+test('administrator access stays available while the Codex catalog is still loading', async () => {
+  const old = { ...process.env };
+  process.env.NODE_ENV = 'development';
+  process.env.AI_CODEX_ENABLED = 'true';
+  const catalog = jest.spyOn(codexModels, 'getCodexModels').mockReturnValue(new Promise(() => {}));
+  const service = new AiService({
+    rooms: {},
+    dbManager: { getUserByID: async () => ({ isAdmin: true }) },
+  } as unknown as Manager);
+  service.repository = {} as AiRepository;
+  const events: Record<string, any> = {};
+  service.register(
+    {
+      on: (name: string, fn: any) => {
+        events[name] = fn;
+      },
+    } as unknown as ServerSocket,
+    'admin',
+  );
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const access = new Promise<any>((resolve) => {
+      void events.getAiRoomAccess(resolve);
+    });
+    const result = await Promise.race([
+      access,
+      new Promise((resolve) => {
+        timer = setTimeout(() => resolve('catalog blocked access'), 50);
+      }),
+    ]);
+    expect(result).toHaveProperty('canManage', true);
+  } finally {
+    clearTimeout(timer);
+    catalog.mockRestore();
+    process.env = old;
+  }
+});
+
+test('archived AI statistics remain readable when game generation is disabled', async () => {
+  const previous = process.env.AI_ROOMS_ENABLED;
+  process.env.AI_ROOMS_ENABLED = 'false';
+  try {
+    const service = new AiService({
+      dbManager: { dbInstance: { connection: { db: {} } } },
+      rooms: {},
+    } as unknown as Manager);
+    expect(service.archiveRepository).toBeDefined();
+    expect(service.repository).toBeUndefined();
+    expect(await service.canManage('owner')).toBe(false);
+  } finally {
+    if (previous === undefined) delete process.env.AI_ROOMS_ENABLED;
+    else process.env.AI_ROOMS_ENABLED = previous;
+  }
 });

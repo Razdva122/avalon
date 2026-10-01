@@ -19,7 +19,10 @@ afterAll(async () => {
   await mongo?.stop();
 });
 
-function endpoints(userID: string | undefined = 'player') {
+function endpoints(
+  userID: string | undefined = 'player',
+  aiRating?: (id: string) => Promise<import('@avalon/types').PlayerTrueSkillRating | undefined>,
+) {
   const handlers: Record<
     string,
     (userID: string, callback: (result: Record<string, unknown>) => void) => Promise<void>
@@ -34,6 +37,7 @@ function endpoints(userID: string | undefined = 'player') {
       },
     } as ServerSocket,
     userID,
+    aiRating,
   );
   return async (name: string, target = 'player') => {
     let result: Record<string, unknown> = {};
@@ -156,4 +160,15 @@ test.each([
   expect(await call('resetTrueSkillRating')).toMatchObject({ success: false, nextResetAvailableAt: new Date(next) });
   jest.setSystemTime(new Date(next));
   expect(await call('resetTrueSkillRating')).toMatchObject({ success: true });
+});
+
+test('AI profile endpoint uses isolated ratings and never falls back to human ratings', async () => {
+  const humanCount = await playerTrueSkillRatingModel.countDocuments();
+  const ai = { userID: 'avalon-agent-3', mu: 6123, gamesCount: 2 } as import('@avalon/types').PlayerTrueSkillRating;
+  expect(await endpoints(undefined, async () => ai)('getTrueSkillRating', ai.userID)).toEqual({
+    success: true,
+    rating: ai,
+  });
+  expect(await endpoints()('getTrueSkillRating', ai.userID)).toMatchObject({ success: false });
+  expect(await playerTrueSkillRatingModel.countDocuments()).toBe(humanCount);
 });

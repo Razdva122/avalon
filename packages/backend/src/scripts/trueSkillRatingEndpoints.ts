@@ -4,6 +4,8 @@ import { supportTotalCents } from '@/support/repository';
 import { ServerSocket } from '@avalon/types';
 import { trueSkillCalculator } from './trueSkillCalculator';
 import { TrueSkillLeaderboardEntry } from '@avalon/types/api/trueskill-sockets';
+import { getBotProfile } from '@/ai/agents';
+import type { PlayerTrueSkillRating } from '@avalon/types';
 import { nextResetDate, resetRating } from './rating-operations';
 
 async function resetCooldownMonths(userID: string): Promise<1 | 3> {
@@ -18,9 +20,22 @@ async function resetCooldownMonths(userID: string): Promise<1 | 3> {
  * Register TrueSkill rating endpoints
  * @param socket The socket instance
  */
-export function registerTrueSkillRatingEndpoints(socket: ServerSocket, authenticatedUserID?: string): void {
+export function registerTrueSkillRatingEndpoints(
+  socket: ServerSocket,
+  authenticatedUserID?: string,
+  aiRating?: (id: string) => Promise<PlayerTrueSkillRating | undefined>,
+): void {
   // Get player TrueSkill rating
   socket.on('getTrueSkillRating', async (userID: string, callback) => {
+    if (getBotProfile(userID)) {
+      try {
+        const rating = await aiRating?.(userID);
+        callback(rating ? { success: true, rating } : { success: false, error: 'AI profile rating unavailable' });
+      } catch {
+        callback({ success: false, error: 'AI profile rating unavailable' });
+      }
+      return;
+    }
     const rating = await playerTrueSkillRatingModel.findOne({ userID }).lean();
 
     if (!rating) {

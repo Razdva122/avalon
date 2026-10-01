@@ -63,6 +63,7 @@ const acknowledgements: Record<string, number> = {
   getMyStickers: 0,
   getAiBudget: 0,
   getAiRoomAccess: 0,
+  getAiCodexModels: 0,
   createRoom: 0,
   joinRoom: 1,
   getOnlineCounter: 1,
@@ -96,6 +97,7 @@ const acknowledgements: Record<string, number> = {
   updateStickerPreferences: 2,
   sendSticker: 2,
   controlAiRoom: 2,
+  configureAiCodex: 2,
   getLoyaltyWithCard: 2,
   setVoiceEnabled: 2,
 };
@@ -131,7 +133,11 @@ export function validPacket(event: string, args: unknown[]): boolean {
   if (event === 'getPlayerGameSummariesPage')
     return (
       values.length === 2 &&
-      (values[1] == null || (typeof values[1] === 'string' && /^[a-f0-9]{24}:[a-f0-9]{24}$/.test(values[1])))
+      (values[1] == null ||
+        (typeof values[1] === 'string' &&
+          (/^[a-f0-9]{24}:[a-f0-9]{24}$/.test(values[1]) ||
+            (/^avalon-(?:agent-(?:[1-9]|10)|ai-[1-7])$/.test(String(values[0])) &&
+              /^ai:[a-zA-Z0-9_-]{1,600}$/.test(values[1])))))
     );
   if (event === 'voteForMission' || event === 'preVote')
     return (
@@ -148,6 +154,17 @@ export function validPacket(event: string, args: unknown[]): boolean {
       values[1] > 0 &&
       values[1] <= 86400
     );
+  if (event === 'configureAiCodex') {
+    const settings = values[1];
+    return (
+      record(settings) &&
+      Object.keys(settings).length === 2 &&
+      typeof settings.model === 'string' &&
+      /^[a-zA-Z0-9._-]{1,100}$/.test(settings.model) &&
+      typeof settings.reasoning === 'string' &&
+      ['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra'].includes(settings.reasoning)
+    );
+  }
   if (event === 'registerUser') {
     const user = values[0];
     return (

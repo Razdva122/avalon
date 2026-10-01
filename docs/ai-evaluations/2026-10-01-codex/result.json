@@ -1,0 +1,918 @@
+{
+  "experiment": "throwaway-local-codex-chatgpt",
+  "startedAt": "2026-10-01T06:51:36.622Z",
+  "finishedAt": "2026-10-01T07:16:40.836Z",
+  "calls": 108,
+  "seconds": 1504.214,
+  "usage": {
+    "input_tokens": 1840697,
+    "cached_input_tokens": 370048,
+    "output_tokens": 19113
+  },
+  "ai": {
+    "status": "paused",
+    "costRub": 0,
+    "fallbacks": 0,
+    "message": "Model returned invalid decision evidence. Match paused.",
+    "canResumeBudget": false,
+    "canResumeTechnical": true
+  },
+  "gameStage": "selectTeam",
+  "history": [
+    {
+      "type": "vote",
+      "result": "approve",
+      "index": 0,
+      "forced": false,
+      "leaderID": "avalon-ai-1",
+      "team": [
+        {
+          "id": "avalon-ai-1"
+        },
+        {
+          "id": "avalon-ai-2"
+        }
+      ],
+      "anonymous": false,
+      "votes": [
+        {
+          "playerID": "avalon-ai-1",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-2",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-3",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-4",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-5",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-6",
+          "onMission": false,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-7",
+          "onMission": false,
+          "value": "approve"
+        }
+      ]
+    },
+    {
+      "type": "mission",
+      "index": 0,
+      "settings": {
+        "players": 2,
+        "failsRequired": 1
+      },
+      "leaderID": "avalon-ai-1",
+      "hidden": false,
+      "fails": 1,
+      "result": "fail",
+      "actions": [
+        {
+          "playerID": "avalon-ai-1"
+        },
+        {
+          "playerID": "avalon-ai-2"
+        }
+      ]
+    },
+    {
+      "type": "vote",
+      "result": "reject",
+      "index": 0,
+      "forced": false,
+      "leaderID": "avalon-ai-2",
+      "team": [
+        {
+          "id": "avalon-ai-2"
+        },
+        {
+          "id": "avalon-ai-3"
+        },
+        {
+          "id": "avalon-ai-4"
+        }
+      ],
+      "anonymous": false,
+      "votes": [
+        {
+          "playerID": "avalon-ai-1",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-2",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-3",
+          "onMission": true,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-4",
+          "onMission": true,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-5",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-6",
+          "onMission": false,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-7",
+          "onMission": false,
+          "value": "approve"
+        }
+      ]
+    },
+    {
+      "type": "vote",
+      "result": "reject",
+      "index": 1,
+      "forced": false,
+      "leaderID": "avalon-ai-3",
+      "team": [
+        {
+          "id": "avalon-ai-3"
+        },
+        {
+          "id": "avalon-ai-4"
+        },
+        {
+          "id": "avalon-ai-5"
+        }
+      ],
+      "anonymous": false,
+      "votes": [
+        {
+          "playerID": "avalon-ai-1",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-2",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-3",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-4",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-5",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-6",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-7",
+          "onMission": false,
+          "value": "reject"
+        }
+      ]
+    },
+    {
+      "type": "vote",
+      "result": "reject",
+      "index": 2,
+      "forced": false,
+      "leaderID": "avalon-ai-4",
+      "team": [
+        {
+          "id": "avalon-ai-3"
+        },
+        {
+          "id": "avalon-ai-4"
+        },
+        {
+          "id": "avalon-ai-5"
+        }
+      ],
+      "anonymous": false,
+      "votes": [
+        {
+          "playerID": "avalon-ai-1",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-2",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-3",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-4",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-5",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-6",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-7",
+          "onMission": false,
+          "value": "reject"
+        }
+      ]
+    },
+    {
+      "type": "vote",
+      "result": "reject",
+      "index": 3,
+      "forced": false,
+      "leaderID": "avalon-ai-5",
+      "team": [
+        {
+          "id": "avalon-ai-3"
+        },
+        {
+          "id": "avalon-ai-4"
+        },
+        {
+          "id": "avalon-ai-5"
+        }
+      ],
+      "anonymous": false,
+      "votes": [
+        {
+          "playerID": "avalon-ai-1",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-2",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-3",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-4",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-5",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-6",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-7",
+          "onMission": false,
+          "value": "reject"
+        }
+      ]
+    },
+    {
+      "type": "vote",
+      "result": "approve",
+      "index": 4,
+      "forced": true,
+      "leaderID": "avalon-ai-6",
+      "team": [
+        {
+          "id": "avalon-ai-3"
+        },
+        {
+          "id": "avalon-ai-4"
+        },
+        {
+          "id": "avalon-ai-6"
+        }
+      ],
+      "anonymous": false,
+      "votes": [
+        {
+          "playerID": "avalon-ai-1",
+          "onMission": false,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-2",
+          "onMission": false,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-3",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-4",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-5",
+          "onMission": false,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-6",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-7",
+          "onMission": false,
+          "value": "approve"
+        }
+      ]
+    },
+    {
+      "type": "mission",
+      "index": 1,
+      "settings": {
+        "players": 3,
+        "failsRequired": 1
+      },
+      "leaderID": "avalon-ai-6",
+      "hidden": false,
+      "fails": 1,
+      "result": "fail",
+      "actions": [
+        {
+          "playerID": "avalon-ai-3"
+        },
+        {
+          "playerID": "avalon-ai-4"
+        },
+        {
+          "playerID": "avalon-ai-6"
+        }
+      ]
+    },
+    {
+      "type": "checkLoyalty",
+      "validatorID": "avalon-ai-7",
+      "inspectedID": "avalon-ai-6"
+    },
+    {
+      "type": "announceLoyalty",
+      "announced": "good",
+      "announcerID": "avalon-ai-7",
+      "targetID": "avalon-ai-6"
+    },
+    {
+      "type": "vote",
+      "result": "reject",
+      "index": 0,
+      "forced": false,
+      "leaderID": "avalon-ai-7",
+      "team": [
+        {
+          "id": "avalon-ai-5"
+        },
+        {
+          "id": "avalon-ai-6"
+        },
+        {
+          "id": "avalon-ai-7"
+        }
+      ],
+      "anonymous": false,
+      "votes": [
+        {
+          "playerID": "avalon-ai-1",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-2",
+          "onMission": false,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-3",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-4",
+          "onMission": false,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-5",
+          "onMission": true,
+          "value": "reject"
+        },
+        {
+          "playerID": "avalon-ai-6",
+          "onMission": true,
+          "value": "approve"
+        },
+        {
+          "playerID": "avalon-ai-7",
+          "onMission": true,
+          "value": "approve"
+        }
+      ]
+    }
+  ],
+  "chat": [
+    {
+      "id": "31acd9cc-d496-4d9d-912f-7bee1c899b29",
+      "kind": "text",
+      "message": "I propose 1, 2. With no mission or voting evidence yet, this opening team is a starting choice toward success, not a clearance of 2.",
+      "userID": "avalon-ai-1",
+      "timestamp": 1790837514894
+    },
+    {
+      "id": "c6bde60a-1671-4a53-8809-7b5cc96c6b03",
+      "kind": "text",
+      "message": "I vote approve. With no mission evidence yet, I favor an opening team containing me, since switching to 3 offers no established safety advantage.",
+      "userID": "avalon-ai-2",
+      "timestamp": 1790837540807
+    },
+    {
+      "id": "b14a1056-36d9-44b9-958f-228e48567d5a",
+      "kind": "text",
+      "message": "I vote reject. With four rejections available, I favor 2 and 3 under 2 next, trusting my own Success while neither current member is cleared.",
+      "userID": "avalon-ai-3",
+      "timestamp": 1790837567945
+    },
+    {
+      "id": "9b93aec1-1996-4260-8d98-ce9bb03d975f",
+      "kind": "text",
+      "message": "I vote reject. I prefer 2 and 4 under the next leader because I trust my own Success, though 2 remains uncertain and neither current member is cleared.",
+      "userID": "avalon-ai-4",
+      "timestamp": 1790837596691
+    },
+    {
+      "id": "8ab6e7e9-8493-495e-8c78-8b6494f2266c",
+      "kind": "text",
+      "message": "I vote reject. I prefer 5 and 3 because I trust my own Success; neither 1 nor 2 has mission evidence, and keeping 2 next would not resolve my concern.",
+      "userID": "avalon-ai-5",
+      "timestamp": 1790837623126
+    },
+    {
+      "id": "74e73f81-c274-4b4b-8473-6b5021adb8de",
+      "kind": "text",
+      "message": "I vote approve. I support this opening choice because moving to 2, 3 under leader 2 would exchange untested players without an established safety advantage.",
+      "userID": "avalon-ai-6",
+      "timestamp": 1790837649764
+    },
+    {
+      "id": "ac0ef919-8513-4bec-ad4f-b4754558e7f0",
+      "kind": "text",
+      "message": "I vote approve. Neither 1 nor 2 is cleared, but replacing 1 with 3 under 2 offers no established safety advantage, so this opening team is reasonable.",
+      "userID": "avalon-ai-7",
+      "timestamp": 1790837668386
+    },
+    {
+      "id": "2d831332-47fb-4d5d-87ba-7a0194edaca3",
+      "kind": "text",
+      "message": "I vote approve. I support this opening team because there is no new evidence against it, and switching to 3 under 2 offers no established safety advantage.",
+      "userID": "avalon-ai-1",
+      "timestamp": 1790837691255
+    },
+    {
+      "id": "59078291-82d6-46cc-9901-c5b669cfd07b",
+      "kind": "text",
+      "message": "I propose 2, 3, 4. I combined the preferences of 3 and 4 for teams with me to build support, while the failed mission leaves 1 and 2 disputed.",
+      "userID": "avalon-ai-2",
+      "timestamp": 1790837739108
+    },
+    {
+      "id": "ff27995b-222b-47c7-a6ec-34d6bc790fc1",
+      "kind": "text",
+      "message": "I vote reject. Including 2 after the failed mission risks another failure; I favor 3,4,5 since 5 opposed that team, though alignments remain unresolved.",
+      "userID": "avalon-ai-3",
+      "timestamp": 1790837769636
+    },
+    {
+      "id": "3612325d-b2ed-4465-a07f-9c8f490fb794",
+      "kind": "text",
+      "message": "I vote reject. Keeping 2 after the failed mission risks another failure; I prefer 3,4,5, while recognizing that 3 and 5 remain unverified.",
+      "userID": "avalon-ai-4",
+      "timestamp": 1790837799921
+    },
+    {
+      "id": "37ee25fc-e085-45b1-9934-8f162152ee0d",
+      "kind": "text",
+      "message": "I vote reject. Keeping 2 after the failed mission risks another failure; I favor 3,4,5, though 3 and 4 remain unverified.",
+      "userID": "avalon-ai-5",
+      "timestamp": 1790837826767
+    },
+    {
+      "id": "63d2c4ec-6964-477c-abf6-5610bc7740d2",
+      "kind": "text",
+      "message": "I vote approve. I approve because the single Fail leaves 1 or 2 implicated without isolating either, and adding 3 and 4 offers a reasonable basis despite the risk.",
+      "userID": "avalon-ai-6",
+      "timestamp": 1790837851814
+    },
+    {
+      "id": "27ddc1f0-b72d-4853-9972-172586798652",
+      "kind": "text",
+      "message": "I vote approve. I support this attempt because the single Fail leaves 1 or 2 implicated without distinguishing them, and the alternative is not publicly cleared either.",
+      "userID": "avalon-ai-7",
+      "timestamp": 1790837877609
+    },
+    {
+      "id": "28392170-7dfa-4201-ad89-0399bde814ca",
+      "kind": "text",
+      "message": "I vote reject. I am Good. Mission 1 had 1 Fail card(s); 2 betrayed us. I reject teams with them.",
+      "userID": "avalon-ai-1",
+      "timestamp": 1790837892480
+    },
+    {
+      "id": "a31ef027-43b9-4b66-a0d0-0c3c5d0bf6be",
+      "kind": "text",
+      "message": "I vote approve. I support this attempt because I believe 1 caused the previous failure, and excluding 1 gives us a better chance of success.",
+      "userID": "avalon-ai-2",
+      "timestamp": 1790837926344
+    },
+    {
+      "id": "c231ce97-3f3e-4a7a-b4a2-666c878e77c3",
+      "kind": "text",
+      "message": "I propose 3, 4, 5. I selected this team because all three support it and it excludes both failed-mission participants; their rejection votes help but do not prove alignment.",
+      "userID": "avalon-ai-3",
+      "timestamp": 1790837947765
+    },
+    {
+      "id": "df7a5647-8eaf-43c2-9f44-e8fa8b06034f",
+      "kind": "text",
+      "message": "I vote approve. I approve because this excludes both failed-mission participants, and 3 and 5 opposed that team and the reuse of 2, though neither is cleared.",
+      "userID": "avalon-ai-4",
+      "timestamp": 1790837973356
+    },
+    {
+      "id": "013194ed-fee8-4c8d-8c99-8c2183b62b72",
+      "kind": "text",
+      "message": "I vote approve. I support this cautiously because 3 and 4 opposed the failed team and reusing 2, while replacing 4 with 1 offers no clearer safety.",
+      "userID": "avalon-ai-5",
+      "timestamp": 1790838002154
+    },
+    {
+      "id": "770f81c0-1d81-4a12-a82a-f00b53aa6b5b",
+      "kind": "text",
+      "message": "I vote reject. I reject because excluding 1 and 2 clears no one; 3, 4, 5's opposition is encouraging, but I prefer replacing 5 with myself for accountability.",
+      "userID": "avalon-ai-6",
+      "timestamp": 1790838030926
+    },
+    {
+      "id": "0f0ad741-90cc-4293-8d6b-99807ec78aa2",
+      "kind": "text",
+      "message": "I vote reject. I reject because excluding 1 and 2 clears no one, and I prefer replacing 5 with myself to take responsibility for the result.",
+      "userID": "avalon-ai-7",
+      "timestamp": 1790838060881
+    },
+    {
+      "id": "60ef5de0-3258-4361-8b65-ac68b313d556",
+      "kind": "text",
+      "message": "I vote reject. I reject because 3, 4, and 5 remain uncleared, and I prefer replacing 5 with myself to take responsibility for the mission.",
+      "userID": "avalon-ai-1",
+      "timestamp": 1790838085099
+    },
+    {
+      "id": "f4545ec6-eac0-48d2-95ea-659a96b3361a",
+      "kind": "text",
+      "message": "I vote reject. I reject because I suspect 1 caused the first failure, and I prefer including myself for accountability while these seats remain unverified.",
+      "userID": "avalon-ai-2",
+      "timestamp": 1790838117815
+    },
+    {
+      "id": "b3900a81-f330-441b-8baa-f2fbd1f35347",
+      "kind": "text",
+      "message": "I vote approve. I approve cautiously: 4 and 5 opposed the failed team; neither is cleared, but replacing 5 with 6 offers no stronger evidence of safety.",
+      "userID": "avalon-ai-3",
+      "timestamp": 1790838148179
+    },
+    {
+      "id": "1e6c9943-d8b5-42b2-99fa-6d6222a52002",
+      "kind": "text",
+      "message": "I propose 3, 4, 5. This team's voting record remains our best lead, though nobody is cleared; replacing 5 adds no stronger evidence of safety.",
+      "userID": "avalon-ai-4",
+      "timestamp": 1790838176838
+    },
+    {
+      "id": "65818fb6-90f3-45e2-bb68-43d4ef8a9af7",
+      "kind": "text",
+      "message": "I vote approve. I approve because 3 and 4 opposed the failed team and reusing 2, so I prefer this unchanged team to adding 1 or following 6's voting lead.",
+      "userID": "avalon-ai-5",
+      "timestamp": 1790838195792
+    },
+    {
+      "id": "76af766b-49c7-4eaf-a831-f653a29b074d",
+      "kind": "text",
+      "message": "I vote reject. I reject because opposing the failed team clears nobody, and I still prefer replacing 5 with myself to share responsibility for the result.",
+      "userID": "avalon-ai-6",
+      "timestamp": 1790838223628
+    },
+    {
+      "id": "750c5b80-ff70-4d20-b39e-9a7fbdb0d296",
+      "kind": "text",
+      "message": "I vote reject. Opposing earlier teams clears nobody, so my concern remains; I prefer replacing 5 with myself to take responsibility for the result.",
+      "userID": "avalon-ai-7",
+      "timestamp": 1790838250019
+    },
+    {
+      "id": "57bc2aa5-d3b0-48be-b76d-c8836f4885b3",
+      "kind": "text",
+      "message": "I vote reject. I reject because I suspect 2 after the first failure; opposing that team clears nobody, and I prefer replacing 5 with myself for a safer mission.",
+      "userID": "avalon-ai-1",
+      "timestamp": 1790838278815
+    },
+    {
+      "id": "64971625-bb65-4c99-abb1-d04336e4560e",
+      "kind": "text",
+      "message": "I vote reject. I suspect 1 after the first failure; opposing that team clears nobody, and I prefer 2,3,4 for direct accountability.",
+      "userID": "avalon-ai-2",
+      "timestamp": 1790838301614
+    },
+    {
+      "id": "92a8bf73-da7b-4f22-9e82-46de8c660472",
+      "kind": "text",
+      "message": "I vote approve. I approve: 4 and 5 remain unverified, but 6 backed the failed team and then reusing 2, so replacing 5 with 6 offers no stronger safety evidence.",
+      "userID": "avalon-ai-3",
+      "timestamp": 1790838326835
+    },
+    {
+      "id": "7f46126b-ea9a-4da2-bdf0-e559bb537856",
+      "kind": "text",
+      "message": "I vote approve. Earlier opposition clears nobody, but 6 backed the failed team and reusing 2, so I see no safety gain in replacing 5 with 6.",
+      "userID": "avalon-ai-4",
+      "timestamp": 1790838346962
+    },
+    {
+      "id": "48e1ceba-89ba-4262-bb2c-5d95b544a6b5",
+      "kind": "text",
+      "message": "I propose 3, 4, 5. I keep this team because 3 and 4 opposed the failed team and reusing 2; those votes prove no roles, but suggested swaps offer no stronger safety evidence.",
+      "userID": "avalon-ai-5",
+      "timestamp": 1790838370371
+    },
+    {
+      "id": "81e63b95-79c3-42ab-a10a-d86a6eaed5a8",
+      "kind": "text",
+      "message": "I vote reject. I prefer replacing 5 with 6 for direct accountability, since opposing the failed first mission does not clear 3, 4, or 5.",
+      "userID": "avalon-ai-6",
+      "timestamp": 1790838396494
+    },
+    {
+      "id": "4b334926-43c9-4e47-bc4a-678467482672",
+      "kind": "text",
+      "message": "I vote reject. I reject because repeated proposals and earlier opposition add no alignment evidence; I still prefer replacing 5 with myself for direct accountability.",
+      "userID": "avalon-ai-7",
+      "timestamp": 1790838417656
+    },
+    {
+      "id": "34c3dc6c-e2f1-4667-a857-8fdcd92da35f",
+      "kind": "text",
+      "message": "I vote reject. I suspect 2 after the first failure; earlier opposition clears nobody, and I prefer replacing 5 with myself for a safer mission.",
+      "userID": "avalon-ai-1",
+      "timestamp": 1790838443093
+    },
+    {
+      "id": "6ac437bc-264b-454e-af03-edc96406f377",
+      "kind": "text",
+      "message": "I vote reject. I suspect 1 after the first mission's failure and prefer 2,3,4 for direct accountability, since earlier opposition clears nobody.",
+      "userID": "avalon-ai-2",
+      "timestamp": 1790838473709
+    },
+    {
+      "id": "db744c48-40c0-47ca-9494-f2e42f1a200e",
+      "kind": "text",
+      "message": "I vote approve. I approve because 5 opposed the failed team and reusing 2 while 6 backed both; neither is cleared, so swapping 5 for 6 offers no stronger safety evidence.",
+      "userID": "avalon-ai-3",
+      "timestamp": 1790838492849
+    },
+    {
+      "id": "ecc880ac-c08f-46d6-b413-0e7fdf7fc8be",
+      "kind": "text",
+      "message": "I vote approve. I see no safety gain in replacing 5 with 6, who backed the failed team and retaining 2, though those votes clear nobody.",
+      "userID": "avalon-ai-4",
+      "timestamp": 1790838512755
+    },
+    {
+      "id": "a9e18452-14a7-4a7a-b73d-9e75c06cba45",
+      "kind": "text",
+      "message": "I vote approve. I approve: 3 and 4 opposed the failed team and retaining 2, while 6 backed both; votes clear nobody, so replacing me with 6 adds no safety evidence.",
+      "userID": "avalon-ai-5",
+      "timestamp": 1790838536703
+    },
+    {
+      "id": "a07590e4-a09f-4c02-8947-65e2ceefd1de",
+      "kind": "text",
+      "message": "I propose 3, 4, 6. I favor the replacement I previously proposed for direct accountability, while 3 and 4 opposing the failed opening team does not clear them.",
+      "userID": "avalon-ai-6",
+      "timestamp": 1790838570896
+    },
+    {
+      "id": "f7d4ec4d-94e2-4a7c-88e6-9e5171936d61",
+      "kind": "text",
+      "message": "After one Fail on mission 2, checking 6 will guide whether to exclude 6 or focus suspicion on 3 and 4, while leaving others unresolved.",
+      "userID": "avalon-ai-7",
+      "timestamp": 1790838621856
+    },
+    {
+      "id": "55c6ee2c-9d8d-4941-9531-72fdcc47f51f",
+      "kind": "text",
+      "message": "I inspected 6 and announce: Good.",
+      "userID": "avalon-ai-7",
+      "timestamp": 1790838637584
+    },
+    {
+      "id": "eaf5a4f0-01a8-4a6a-9b71-25a94ca44acc",
+      "kind": "text",
+      "message": "I am Good, so 7 reported my alignment correctly. This alone does not prove 7 is Good.",
+      "userID": "avalon-ai-6",
+      "timestamp": 1790838637585
+    },
+    {
+      "id": "dfceddc9-4ab6-49c8-b7ee-1cc9f16866bb",
+      "kind": "text",
+      "message": "I propose 5, 6, 7. I favor 5 for opposing the failed opening team and 6 based on my reported check, adding myself to avoid 1, 2 and the unresolved 3, 4 pair.",
+      "userID": "avalon-ai-7",
+      "timestamp": 1790838672908
+    },
+    {
+      "id": "aa358e15-3f03-4a8b-926e-78bd1358ffb9",
+      "kind": "text",
+      "message": "I vote reject. As I am Good, the opening Fail implicates 2; 7's claim does not clear 6, so I prefer 1,3,5 with two failures.",
+      "userID": "avalon-ai-1",
+      "timestamp": 1790838710316
+    },
+    {
+      "id": "d3257f6e-2104-4760-9f27-5e4c389c45d3",
+      "kind": "text",
+      "message": "I vote approve. As I am Good, the opening Fail implicates 1; excluding 1, including 5 who opposed that mission, and using 7's reported check supports this vote.",
+      "userID": "avalon-ai-2",
+      "timestamp": 1790838740630
+    },
+    {
+      "id": "92d23c3a-44c4-4ac7-91d1-784c8e918cec",
+      "kind": "text",
+      "message": "I vote reject. I suspect 4 or 6 after mission 2; 7's claim does not verify 6 for us, so with two failures I prefer 3,4,5.",
+      "userID": "avalon-ai-3",
+      "timestamp": 1790838772063
+    },
+    {
+      "id": "1450ad69-9c3e-4ea5-bc5e-7b3b76543b18",
+      "kind": "text",
+      "message": "I vote reject. I suspect 3 or 6 after mission 2; 6 and 7 repeatedly blocked 3,4,5, and 7's claim clears neither, so I favor 3,4,5 with two failures.",
+      "userID": "avalon-ai-4",
+      "timestamp": 1790838808514
+    },
+    {
+      "id": "7a61fce5-5df9-4ead-87b0-628efda4339d",
+      "kind": "text",
+      "message": "I vote reject. I reject because 6 and 7 repeatedly blocked 3,4,5 and 7's claim does not verify 6; with two failures, I favor 1,3,5.",
+      "userID": "avalon-ai-5",
+      "timestamp": 1790838841614
+    },
+    {
+      "id": "cd06de82-003f-4c00-8121-9a6f83414f18",
+      "kind": "text",
+      "message": "I vote approve. 5 opposed the failed opening team, and I favor avoiding the unresolved 3,4 pair, though the Lady report alone does not clear 7.",
+      "userID": "avalon-ai-6",
+      "timestamp": 1790838869541
+    },
+    {
+      "id": "e4296fc0-d19d-414b-a2a6-ac0bafe93d0d",
+      "kind": "text",
+      "message": "I vote approve. I support this proposal because 5 opposed the failed opening team, my reported Lady check supports 6, and I favor including myself.",
+      "userID": "avalon-ai-7",
+      "timestamp": 1790838896908
+    },
+    {
+      "id": "3c708a22-41b8-4dff-a0e9-2f0f635c14fd",
+      "kind": "text",
+      "message": "I propose 1, 3, 5. I selected this team to avoid 2 and the disputed 6,7 pair, retain 5, and follow the team preference that 1 and 5 previously expressed.",
+      "userID": "avalon-ai-1",
+      "timestamp": 1790838926318
+    },
+    {
+      "id": "c5f09e45-22a0-4635-bd84-33f8b63c3ee6",
+      "kind": "text",
+      "message": "I vote reject. I am Good. Mission 1 had 1 Fail card(s); 1 betrayed us. I reject teams with them.",
+      "userID": "avalon-ai-2",
+      "timestamp": 1790838942614
+    },
+    {
+      "id": "cfa57df3-2677-4758-820b-ff4187cf8360",
+      "kind": "text",
+      "message": "I vote approve. I prefer avoiding the unresolved 4,6 pair; 2 repeatedly sided with 6,7, making 1 preferable to returning 4, though neither is cleared.",
+      "userID": "avalon-ai-3",
+      "timestamp": 1790838979648
+    }
+  ],
+  "decisions": [
+    {
+      "playerID": "avalon-ai-3",
+      "id": 56,
+      "seat": "3",
+      "mission": 3,
+      "stage": "selectTeam",
+      "choice": "approve",
+      "reason": "1,3,5 avoids both 4 and 6, one of whom sabotaged mission 2. 2's repeated alignment with 6,7 makes 1 preferable to 4, though 5 remains unresolved. Fifth leader 4 offers no safer guarantee; failure ends the game."
+    },
+    {
+      "playerID": "avalon-ai-2",
+      "id": 55,
+      "seat": "2",
+      "mission": 3,
+      "stage": "selectTeam",
+      "choice": "reject",
+      "reason": "As Evil, I know 1,3,5 has no ally and would succeed. Rejecting preserves a chance for 2,3,5 to deliver our third failure; fifth leader 4 may force another all-Good roster."
+    },
+    {
+      "playerID": "avalon-ai-1",
+      "id": 54,
+      "seat": "1",
+      "mission": 3,
+      "stage": "selectTeam",
+      "choice": "1, 3, 5",
+      "reason": "I support 1,3,5, my previously preferred roster. 2 is Evil; 6 remains suspect from mission 2 and voting. 3 is unresolved, but this team has plausible support from 4. Any Fail loses mission 3."
+    },
+    {
+      "playerID": "avalon-ai-7",
+      "id": 53,
+      "seat": "7",
+      "mission": 3,
+      "stage": "selectTeam",
+      "choice": "approve",
+      "reason": "Known Evil 6 and 7 can deliver the third failure on 5,6,7. Only three approvals seem likely, but rejecting abandons this chance; alternatives 1,3,5 and fifth leader 4's favored 3,4,5 are entirely Good."
+    },
+    {
+      "playerID": "avalon-ai-6",
+      "id": 52,
+      "seat": "6",
+      "mission": 3,
+      "stage": "selectTeam",
+      "choice": "approve",
+      "reason": "5,6,7 contains Evil 6 and 7; one Fail wins our third failure. Alternative 1,3,5 is entirely Good, and fifth leader 4 may force a clean team. Support this winning opportunity despite four announced objections."
+    },
+    {
+      "playerID": "avalon-ai-5",
+      "id": 51,
+      "seat": "5",
+      "mission": 3,
+      "stage": "selectTeam",
+      "choice": "reject",
+      "reason": "7 is known Evil, so 5,6,7 risks the game-ending third failure. Mission 2 places hidden Evil among 3,4,6; prefer 1,3,5 cautiously. Fifth leader 4 offers further alternatives before forcing."
+    },
+    {
+      "playerID": "avalon-ai-4",
+      "id": 50,
+      "seat": "4",
+      "mission": 3,
+      "stage": "selectTeam",
+      "choice": "reject",
+      "reason": "Mission 2's Fail implicates 3 or 6 because I played Success. 6 and 7 repeatedly blocked 3,4,5; their check is unverified. I prefer 3,4,5, including myself, and can propose it as fifth leader. Another Fail ends the game."
+    }
+  ]
+}

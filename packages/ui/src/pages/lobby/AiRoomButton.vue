@@ -9,7 +9,8 @@
     <v-btn color="secondary" :loading="busy" :disabled="!activeRoomID && !selectedModel" @click="openRoom">
       {{ $t(activeRoomID ? 'aiArena.watch' : 'aiArena.create') }}
     </v-btn>
-    <details v-if="budget" class="ai-budget-details">
+    <p v-if="selectedModel === 'codex-chatgpt'">{{ $t('aiArena.codexSubscription') }}</p>
+    <details v-else-if="budget" class="ai-budget-details">
       <summary>{{ $t('aiArena.budgetDetails') }}</summary>
       <AiBudgetPanel :budget="budget" />
     </details>

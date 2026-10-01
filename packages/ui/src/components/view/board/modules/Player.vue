@@ -20,7 +20,7 @@
           class="player-content"
           :tabindex="privateDecision ? 0 : undefined"
           :role="privateDecision ? 'button' : undefined"
-          :aria-label="privateDecision ? $t('aiArena.privateDecisions') : undefined"
+          :aria-label="privateDecision ? `${player.name} · ${$t('aiArena.lastDecision')}` : undefined"
           @keydown.enter.prevent="privateDecision && (showUserCardDialog = true)"
           @keydown.space.prevent="privateDecision && (showUserCardDialog = true)"
         >
@@ -100,27 +100,24 @@
         </div>
       </template>
 
-      <div v-if="privateDecision" class="ai-private-decision">
-        <strong>{{ $t('aiArena.privateDecisions') }}</strong>
-        <p>
-          {{ $t('aiArena.decisionSeat', { seat: privateDecision.seat, mission: privateDecision.mission }) }} ·
-          {{ privateDecision.choice }}
-        </p>
-        <p>{{ privateDecision.reason }}</p>
-      </div>
+      <AiPrivateDecision
+        v-if="privateDecision"
+        :decision="privateDecision"
+        :name="player.name"
+        :avatar="userState.status === 'ready' ? userState.profile.avatar : undefined"
+        preview
+      />
       <UserHoverCard v-else-if="player.id" :userID="player.id" :isVisible="tooltipOpen" />
     </v-tooltip>
 
     <v-dialog v-model="showUserCardDialog" content-class="user-card-dialog" @click.stop>
-      <v-card v-if="privateDecision" class="ai-private-decision">
-        <strong>{{ $t('aiArena.privateDecisions') }}</strong>
-        <p>
-          {{ $t('aiArena.decisionSeat', { seat: privateDecision.seat, mission: privateDecision.mission }) }} ·
-          {{ privateDecision.choice }}
-        </p>
-        <p>{{ privateDecision.reason }}</p>
-        <v-btn variant="text" @click="showUserCardDialog = false">{{ $t('chat.closeProfile') }}</v-btn>
-      </v-card>
+      <AiPrivateDecision
+        v-if="privateDecision"
+        :decision="privateDecision"
+        :name="player.name"
+        :avatar="userState.status === 'ready' ? userState.profile.avatar : undefined"
+        @close="showUserCardDialog = false"
+      />
       <UserHoverCard
         v-else-if="player.id && showUserCardDialog"
         :userID="player.id"
@@ -170,6 +167,7 @@ import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import { getImagePathByID } from '@/helpers/images';
 import Avatar from '@/components/user/Avatar.vue';
 import PlotCard from '@/components/view/information/PlotCard.vue';
+import AiPrivateDecision from './AiPrivateDecision.vue';
 import UserHoverCard from '@/components/user/UserHoverCard.vue';
 import snakeCase from 'lodash/snakeCase';
 
@@ -181,6 +179,7 @@ export default defineComponent({
     Avatar,
     PlotCard,
     UserHoverCard,
+    AiPrivateDecision,
   },
   props: {
     voiceSide: { type: String as PropType<'left' | 'right'>, default: 'right' },
@@ -920,22 +919,6 @@ export default defineComponent({
 </style>
 
 <style scoped>
-.ai-private-decision {
-  background: rgb(var(--v-theme-surface));
-  color: rgb(var(--v-theme-on-surface));
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.2);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px #0005;
-  padding: 16px;
-  max-width: min(350px, calc(100vw - 48px));
-  overflow-wrap: anywhere;
-  white-space: normal;
-  font-size: 14px;
-  line-height: 1.5;
-}
-.ai-private-decision p {
-  margin-top: 8px;
-}
 .player-content[role='button']:focus-visible {
   outline: 2px solid rgb(var(--v-theme-primary));
   outline-offset: 4px;

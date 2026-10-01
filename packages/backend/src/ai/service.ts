@@ -1,3 +1,4 @@
+import { aiPlayedModel } from '@avalon/types';
 import { aiModel, AI_MODELS, DEFAULT_AI_MODEL } from './models';
 import type { ServerSocket, TRoomInfo } from '@avalon/types';
 import type { Manager } from '@/main';
@@ -6,15 +7,27 @@ import { AiRepository } from './repository';
 import { BotRoom } from './room';
 import { AiPause } from './client';
 import { separatedDecide } from './pipeline';
+import { decisionPipeline } from './pipeline';
+import { getCodexModels, validateCodexSettings } from './codex-models';
+import { CODEX_MODEL, codexEnabled, codexDecide } from './codex';
 
 export class AiService {
   repository?: AiRepository;
+  private archive?: AiRepository;
+  get archiveRepository(): AiRepository | undefined {
+    return this.repository || this.archive;
+  }
   private creating = false;
   private starting = false;
   private running = new Set<string>();
   constructor(private manager: Manager) {
     const db = manager.dbManager.dbInstance?.connection.db;
-    if (process.env.AI_ROOMS_ENABLED === 'true' && db && process.env.YANDEX_API_KEY && process.env.YANDEX_FOLDER_ID)
+    if (db) this.archive = new AiRepository(db);
+    if (
+      process.env.AI_ROOMS_ENABLED === 'true' &&
+      db &&
+      (codexEnabled() || (process.env.YANDEX_API_KEY && process.env.YANDEX_FOLDER_ID))
+    )
       this.repository = new AiRepository(
         db,
         Number(process.env.AI_TOTAL_BUDGET_RUB || (process.env.NODE_ENV === 'production' ? 3000 : 700)),
@@ -39,7 +52,7 @@ export class AiService {
     socket.on('getAiRoomsList', async (cb) => {
       if (typeof cb !== 'function') return;
       try {
-        const archived = (await this.repository?.recentSummaries()) || [];
+        const archived = (await this.archiveRepository?.recentSummaries()) || [];
         const live = Object.values(this.manager.rooms)
           .filter((room) => room.ai)
           .map((room) => room.calculateRoomState())
@@ -47,7 +60,7 @@ export class AiService {
             uuid: room.roomID,
             ai: true,
             aiStatus: room.ai?.status,
-            aiModel: room.ai?.model,
+            aiModel: aiPlayedModel(room.ai),
             hostID: room.leaderID,
             state: room.stage,
             options: room.options,
@@ -114,6 +127,15 @@ export class AiService {
         cb({ error: 'Could not load AI costs' });
       }
     });
+    socket.on('getAiCodexModels', async (cb) => {
+      if (typeof cb !== 'function') return;
+      try {
+        if (!codexEnabled() || !(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        cb({ models: await getCodexModels() });
+      } catch (error) {
+        cb({ error: error instanceof AiPause ? error.message : 'Could not load Codex models' });
+      }
+    });
     socket.on('getAiRoomAccess', async (cb) => {
       if (typeof cb !== 'function') return;
       try {
@@ -123,10 +145,18 @@ export class AiService {
             ? {
                 canManage,
                 roomID: this.active()?.roomID,
-                models: Object.entries(AI_MODELS).map(([id, model]) => ({ id, label: model.label })),
-                defaultModel: Object.prototype.hasOwnProperty.call(AI_MODELS, process.env.YANDEX_MODEL || '')
-                  ? process.env.YANDEX_MODEL
-                  : DEFAULT_AI_MODEL,
+                models: [
+                  ...(codexEnabled() && !(process.env.YANDEX_API_KEY && process.env.YANDEX_FOLDER_ID)
+                    ? []
+                    : Object.entries(AI_MODELS).map(([id, model]) => ({ id, label: model.label }))),
+                  ...(codexEnabled() ? [{ id: CODEX_MODEL, label: 'Codex · ChatGPT' }] : []),
+                ],
+                defaultModel:
+                  codexEnabled() && !(process.env.YANDEX_API_KEY && process.env.YANDEX_FOLDER_ID)
+                    ? CODEX_MODEL
+                    : Object.prototype.hasOwnProperty.call(AI_MODELS, process.env.YANDEX_MODEL || '')
+                      ? process.env.YANDEX_MODEL
+                      : DEFAULT_AI_MODEL,
               }
             : { canManage },
         );
@@ -145,24 +175,26 @@ export class AiService {
         try {
           let model: string;
           try {
-            model = aiModel(selectedModel).id;
+            model = selectedModel === CODEX_MODEL && codexEnabled() ? CODEX_MODEL : aiModel(selectedModel).id;
           } catch (error) {
             throw new AiPause((error as Error).message);
           }
           const id = randomUUID();
           await this.repository!.claim(id);
-          const room = new BotRoom(
+          const room: BotRoom = new BotRoom(
             id,
             userID!,
             this.manager.io,
-            separatedDecide(
-              id,
-              this.repository!,
-              (rub) => {
-                room.ai!.costRub = rub;
-              },
-              model,
-            ),
+            model === CODEX_MODEL
+              ? decisionPipeline(codexDecide(id, this.repository!, undefined, () => room.ai?.codex))
+              : separatedDecide(
+                  id,
+                  this.repository!,
+                  (rub) => {
+                    room.ai!.costRub = rub;
+                  },
+                  model,
+                ),
             (state) => this.repository!.save(state),
             process.env.NODE_ENV === 'development' ? 2000 : 10000,
           );
@@ -179,6 +211,35 @@ export class AiService {
         }
       } catch (error) {
         cb({ error: error instanceof AiPause ? error.message : 'Could not create AI room' });
+      }
+    });
+    socket.on('configureAiCodex', async (id, settings, cb) => {
+      if (typeof cb !== 'function') return;
+      try {
+        if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        if (typeof id !== 'string' || !codexEnabled()) return cb({ error: 'Invalid Codex room' });
+        const room = this.manager.rooms[id];
+        if (!(room instanceof BotRoom) || room.ai?.model !== CODEX_MODEL || room.ai.status !== 'ready' || this.starting)
+          return cb({ error: 'Codex settings can only be changed before launch' });
+        const validated = validateCodexSettings(settings, await getCodexModels());
+        // Catalog lookup is asynchronous: recheck before changing a possibly started room.
+        if (room.ai.status !== 'ready' || this.starting) return cb({ error: 'AI room control in progress' });
+        this.starting = true;
+        const previous = room.ai.codex;
+        room.ai.codex = validated;
+        try {
+          await this.repository!.save(room.calculateRoomState());
+        } catch (error) {
+          room.ai.codex = previous;
+          throw error;
+        } finally {
+          this.starting = false;
+        }
+        room.updateRoomState(true);
+        this.manager.updateRoomsList(room);
+        cb({ ok: true });
+      } catch (error) {
+        cb({ error: error instanceof AiPause ? error.message : 'Could not save Codex settings' });
       }
     });
     socket.on('controlAiRoom', async (id, action, cb) => {
@@ -206,6 +267,8 @@ export class AiService {
             : action !== 'start' || room.ai?.status !== 'ready')
         )
           return cb({ error: 'AI room is not ready to start or resume' });
+        if (room.ai?.model === CODEX_MODEL && !room.ai.codex)
+          return cb({ error: 'Choose a Codex model and reasoning level before launch' });
         this.starting = true;
         try {
           await this.repository!.claim(id);

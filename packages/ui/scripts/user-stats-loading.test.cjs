@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const ts = require('typescript');
 const vue = require('vue');
-function setupPage() {
+function setupPage(uuid = 'first') {
   const pending = [];
   const socket = {
     emitWithAck: (event, uuid) => new Promise((resolve, reject) => pending.push({ event, uuid, resolve, reject })),
@@ -33,7 +33,7 @@ function setupPage() {
     return {};
   };
   new Function('require', 'exports', code)(requireMock, exports);
-  const props = vue.reactive({ uuid: 'first' });
+  const props = vue.reactive({ uuid });
   const scope = vue.effectScope();
   const page = scope.run(() => exports.default.setup(props));
   return { page, props, pending, stop: () => scope.stop() };
@@ -146,4 +146,37 @@ test('paged history retains all games and stops fetching when the user changes',
     [],
   );
   assert.equal(calls, 1);
+});
+
+test('AI profiles show role results without requesting human rating history', async () => {
+  const { page, pending, stop } = setupPage('avalon-agent-3');
+  assert.equal(page.isAiProfile.value, true);
+  pending[0].resolve({ games: [{ uuid: 'ai-game' }] });
+  await flush();
+  assert.equal(page.loading.value, false);
+  assert.equal(pending.length, 1, 'AI games do not request shared TrueSkill history');
+  assert.equal(
+    page.lastGamesHeaders.value.some((header) => header.key === 'ratingChange'),
+    false,
+  );
+  stop();
+});
+
+test('AI archive pagination restores chronology across legacy and ISO dates', async () => {
+  const games = await loadPlayerGames(
+    async (cursor) =>
+      cursor
+        ? {
+            games: [{ uuid: 'old', startAt: String(new Date('2026-09-01T00:00:00Z')) }],
+          }
+        : {
+            games: [{ uuid: 'new', startAt: '2026-10-01T00:00:00.000Z' }],
+            nextCursor: 'ai:next',
+          },
+    () => true,
+  );
+  assert.deepEqual(
+    games.map((game) => game.uuid),
+    ['old', 'new'],
+  );
 });

@@ -10,12 +10,19 @@
       {{ $t('userStats.loadError') }}
       <v-btn variant="text" @click="retry">{{ $t('userStats.retry') }}</v-btn>
     </v-alert>
+    <div v-else-if="isAiProfile && state?.teams.total.total === 0" class="empty-history" role="status">
+      <span class="material-icons" aria-hidden="true">sports_esports</span>
+      <h2>{{ $t('userStats.noGames') }}</h2>
+      <p>{{ $t('userStats.noGamesHint') }}</p>
+      <p class="mt-3">{{ $t('stats.aiProfileNote') }}</p>
+    </div>
     <template v-else>
       <h2>{{ $t('stats.generalStatsTitle') }}</h2>
       <v-data-table
         class="general-table"
         :headers="generalTable.headers"
         :items="generalTable.data"
+        :no-data-text="$t('userStats.noGames')"
         hide-default-footer
         disable-sort
       >
@@ -27,17 +34,26 @@
       </v-data-table>
 
       <h2>{{ $t('userStats.lastGamesStatsTitle') }}</h2>
-      <v-data-table :headers="lastGamesHeaders" :items="lastGames" hide-default-footer disable-sort>
+      <v-data-table
+        :headers="lastGamesHeaders"
+        :items="lastGames"
+        :no-data-text="$t('userStats.noGames')"
+        hide-default-footer
+        disable-sort
+      >
         <template v-slot:item="{ item }">
           <tr class="game-row" @click="navigateToGame(item.gameID)">
             <td>
               <PreviewLink :target="item.role" />
+              <router-link class="stats-link" :to="`/room/${item.gameID}/`" @click.stop>{{
+                $t('userStats.openGame')
+              }}</router-link>
             </td>
             <td>
               <v-chip v-if="item.isWin" color="green"> {{ $t('userStats.winResult') }}</v-chip>
               <v-chip v-else color="red"> {{ $t('userStats.loseResult') }}</v-chip>
             </td>
-            <td>
+            <td v-if="!isAiProfile">
               <v-chip v-if="item.ratingChange?.change > 0" color="success" variant="flat" size="small">{{
                 item.ratingChange.string
               }}</v-chip>
@@ -53,7 +69,21 @@
         </template>
       </v-data-table>
 
-      <UserRatings :userID="uuid" />
+      <template v-if="isAiProfile">
+        <h2>{{ $t('stats.roleResultsTitle') }}</h2>
+        <p class="my-3">{{ $t('stats.aiProfileNote') }}</p>
+        <v-data-table
+          :headers="roleHeaders"
+          :items="roleResults"
+          :no-data-text="$t('userStats.noGames')"
+          hide-default-footer
+          disable-sort
+        >
+          <template v-slot:item.role="{ value }"><PreviewLink :target="value" /></template>
+          <template v-slot:item.winrate="{ value }"><WinrateDisplay :winrate="value" /></template>
+        </v-data-table>
+      </template>
+      <UserRatings v-else :userID="uuid" />
 
       <div class="stats-container d-flex flex-column flex-md-row justify-space-between">
         <div class="teammates-container">
@@ -62,13 +92,16 @@
             class="teammates-table"
             :headers="simplifiedHeaders"
             :items="teammates"
+            :no-data-text="$t('userStats.noGames')"
             hide-default-footer
             disable-sort
           >
             <template v-slot:item="{ item }">
               <tr class="teammate-row" @click="navigateToPlayerStats(item.id)">
                 <td>
-                  <TeammateProfile :teammateID="item.id" />
+                  <router-link class="stats-link" :to="`/stats/user/${item.id}/`" @click.stop
+                    ><TeammateProfile :teammateID="item.id"
+                  /></router-link>
                 </td>
                 <td>{{ item.gamesCount }}</td>
                 <td>
@@ -85,13 +118,16 @@
             class="enemies-table"
             :headers="simplifiedHeaders"
             :items="enemies"
+            :no-data-text="$t('userStats.noGames')"
             hide-default-footer
             disable-sort
           >
             <template v-slot:item="{ item }">
               <tr class="enemy-row" @click="navigateToPlayerStats(item.id)">
                 <td>
-                  <TeammateProfile :teammateID="item.id" />
+                  <router-link class="stats-link" :to="`/stats/user/${item.id}/`" @click.stop
+                    ><TeammateProfile :teammateID="item.id"
+                  /></router-link>
                 </td>
                 <td>{{ item.gamesCount }}</td>
                 <td>
@@ -147,6 +183,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const isAiProfile = computed(() => /^avalon-(?:agent-(?:[1-9]|10)|ai-[1-7])$/.test(props.uuid));
     const state = ref<TUserStats>();
     const lastGames = ref<(TGameView & { ratingChange?: { string: string; change: number } })[]>();
     const teammates = ref<TTeammateStats[]>();
@@ -181,6 +218,8 @@ export default defineComponent({
         teammates.value = preparePlayerStats(games, uuid, 'teammate');
         enemies.value = preparePlayerStats(games, uuid, 'enemy');
         loading.value = false;
+
+        if (isAiProfile.value) return;
 
         // Ratings are optional: show the statistics before these requests finish.
         void Promise.all(
@@ -236,7 +275,7 @@ export default defineComponent({
       return {
         headers: [
           { title: t('userStats.side'), key: 'side' },
-          { title: t('userStats.gamesCount'), key: 'gamesCount' },
+          { title: t('userStats.gamesShort'), key: 'gamesCount' },
           { title: t('userStats.wins'), key: 'wins' },
         ],
         data: Object.entries(stateData.teams)
@@ -245,7 +284,7 @@ export default defineComponent({
             return {
               side: name,
               gamesCount: value.total,
-              wins: `${value.wins} (${value.winrate} %)`,
+              wins: value.total ? `${value.wins} (${value.winrate} %)` : '—',
             };
           }),
       };
@@ -255,7 +294,7 @@ export default defineComponent({
       const baseHeaders = [
         { title: t('userStats.role'), key: 'role' },
         { title: t('userStats.result'), key: 'isWin' },
-        { title: t('userStats.rating'), key: 'ratingChange' },
+        ...(!isAiProfile.value ? [{ title: t('userStats.rating'), key: 'ratingChange' }] : []),
       ];
 
       if (!isMobile.value) {
@@ -265,10 +304,27 @@ export default defineComponent({
       return baseHeaders;
     });
 
+    const roleHeaders = computed(() => [
+      { title: t('userStats.role'), key: 'role' },
+      { title: t('userStats.gamesShort'), key: 'total' },
+      ...(!isMobile.value
+        ? [
+            { title: t('userStats.wins'), key: 'wins' },
+            { title: t('userStats.lose'), key: 'lose' },
+          ]
+        : []),
+      { title: t('userStats.winrate'), key: 'winrate' },
+    ]);
+    const roleResults = computed(() =>
+      [...Object.entries(state.value?.roles.good || {}), ...Object.entries(state.value?.roles.evil || {})].map(
+        ([role, value]) => ({ role, ...value }),
+      ),
+    );
+
     const teammatesHeaders = computed(() => {
       return [
         { title: t('userStats.playerName'), key: 'id' },
-        { title: t('userStats.gamesCount'), key: 'gamesCount' },
+        { title: t('userStats.gamesShort'), key: 'gamesCount' },
         { title: t('userStats.wins'), key: 'wins' },
         { title: t('userStats.lose'), key: 'lose' },
         { title: t('userStats.winrate'), key: 'winrate' },
@@ -278,12 +334,15 @@ export default defineComponent({
     const simplifiedHeaders = computed(() => {
       return [
         { title: t('userStats.playerName'), key: 'id' },
-        { title: t('userStats.gamesCount'), key: 'gamesCount' },
+        { title: t('userStats.gamesShort'), key: 'gamesCount' },
         { title: t('userStats.winrate'), key: 'winrate' },
       ];
     });
 
     return {
+      isAiProfile,
+      roleHeaders,
+      roleResults,
       state,
       loading,
       loadError,
@@ -305,6 +364,41 @@ export default defineComponent({
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
+.empty-history {
+  margin-top: 32px;
+  padding: 24px;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.15);
+  border-radius: 16px;
+  text-align: center;
+}
+.empty-history > .material-icons {
+  font-size: 36px;
+  opacity: 0.6;
+}
+.stats-link {
+  display: block;
+  padding: 10px 0;
+  color: rgb(var(--v-theme-primary));
+  text-underline-offset: 3px;
+}
+.stats-link:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
+  outline-offset: 2px;
+}
+.stats-page :deep(th),
+.general-table :deep(td) {
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .stats-page :deep(th),
+  .stats-page :deep(td) {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  .general-table :deep(td:first-child) {
+    white-space: normal;
+  }
+}
 
 .stats-page {
   .good-loyalty-icon,

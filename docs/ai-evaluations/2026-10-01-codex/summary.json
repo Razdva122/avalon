@@ -1,0 +1,39 @@
+{
+  "status": "paused-not-completed",
+  "authentication": "ChatGPT (codex login status); no API key environment variables",
+  "cliVersion": "0.159.2",
+  "model": "CLI default; model ID not recorded",
+  "reasoningEffort": "low",
+  "mainCalls": 108,
+  "acceptedMainReplies": 107,
+  "formatRepairCalls": 1,
+  "mainSeconds": 1504.214,
+  "medianReplySeconds": 13.2015,
+  "p95ReplySeconds": 23.651,
+  "maxReplySeconds": 26.221,
+  "mainUsage": {
+    "input_tokens": 1840697,
+    "cached_input_tokens": 370048,
+    "output_tokens": 19113
+  },
+  "repairUsage": {
+    "input_tokens": 18841,
+    "cached_input_tokens": 0,
+    "output_tokens": 224
+  },
+  "fallbacks": 0,
+  "completedMissions": 2,
+  "goodSuccesses": 0,
+  "evilFailures": 2,
+  "roles": {
+    "1": "servant",
+    "2": "morgana",
+    "3": "percival",
+    "4": "servant",
+    "5": "merlin",
+    "6": "mordred",
+    "7": "minion"
+  },
+  "stoppingReason": "Evidence source 169 characters exceeds parser maximum 160; schema omitted maxLength; fixed-source-limit retry passed.",
+  "tests": "48 tests passed in room.test.ts and pipeline.test.ts"
+}

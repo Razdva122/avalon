@@ -1,3 +1,4 @@
+import aiAgents from './aiAgents';
 import aiArena from './aiArena';
 import { passwordRecovery } from '../passwordRecovery';
 import { premiumCosmetics } from '../premiumCosmetics';
@@ -20,6 +21,7 @@ import achievements from './achievements';
 
 export const pt = {
   aiArena,
+  aiAgents,
   passwordRecovery: passwordRecovery['pt'],
   premiumCosmetics: premiumCosmetics.pt,
   ...menu,

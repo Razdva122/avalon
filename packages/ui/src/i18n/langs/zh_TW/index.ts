@@ -1,3 +1,4 @@
+import aiAgents from './aiAgents';
 import aiArena from './aiArena';
 import { passwordRecovery } from '../passwordRecovery';
 import { premiumCosmetics } from '../premiumCosmetics';
@@ -20,6 +21,7 @@ import achievements from './achievements';
 
 export const zh_TW = {
   aiArena,
+  aiAgents,
   passwordRecovery: passwordRecovery['zh-TW'],
   premiumCosmetics: premiumCosmetics.zh_TW,
   ...menu,

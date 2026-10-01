@@ -1,4 +1,4 @@
-import { VisualGameState, TVisibleRole, TGoodRoles, TEvilRoles } from '@avalon/types';
+import { PlayerGameSummary, TVisibleRole, TGoodRoles, TEvilRoles } from '@avalon/types';
 import { PlayerTrueSkillChange } from '@avalon/types/stats/trueskill';
 import { goodRolesImportance } from '@avalon/types/consts';
 import { TrueSkill, Rating } from 'ts-trueskill';
@@ -48,7 +48,7 @@ export class TrueSkillCalculator {
    * Calculate TrueSkill changes for all players in a game
    */
   calculateTrueSkillChangesForGame(
-    game: VisualGameState,
+    game: PlayerGameSummary,
     currentRatings: Map<string, { mu: number; sigma: number; gamesCount: number }>,
   ): PlayerTrueSkillChange[] {
     if (!game.result || !game.result.winner) {

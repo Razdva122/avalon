@@ -4,7 +4,7 @@
       <summary>
         <span class="ai-heading"
           ><strong>{{ $t('aiArena.title') }}</strong
-          ><small v-if="ai.model">{{ ai.model }}</small></span
+          ><small v-if="displayModel">{{ displayModel }}</small></span
         >
         <span class="ai-status" :class="`ai-status--${ai.status}`">{{ $t(`aiArena.${ai.status}`) }}</span>
         <span class="ai-expand" aria-hidden="true">⌄</span>
@@ -12,6 +12,28 @@
       </summary>
       <div class="ai-details">
         <p aria-live="polite">{{ ai.message }}</p>
+        <p v-if="ai.model === 'codex-chatgpt'">{{ $t('aiArena.codexSubscription') }}</p>
+        <div v-if="canManage && ai.model === 'codex-chatgpt' && ai.status === 'ready'" class="codex-settings">
+          <label>
+            <span>{{ $t('aiArena.codexModel') }}</span>
+            <select v-model="codexModel" :disabled="busy || !codexModels.length">
+              <option v-for="model in pricedCodexModels" :key="model.id" :value="model.id">{{ model.label }}</option>
+            </select>
+          </label>
+          <p v-if="codexModels.length" class="codex-price-hint">
+            <a href="https://developers.openai.com/api/docs/pricing" target="_blank" rel="noopener noreferrer">{{
+              $t('aiArena.codexRelativePrice')
+            }}</a>
+          </p>
+          <label>
+            <span>{{ $t('aiArena.codexReasoning') }}</span>
+            <select v-model="codexReasoning" :disabled="busy || !efforts.length">
+              <option v-for="effort in efforts" :key="effort" :value="effort">{{ effort }}</option>
+            </select>
+          </label>
+          <p v-if="!codexModels.length" role="status">{{ $t('aiArena.codexModelsUnavailable') }}</p>
+        </div>
+        <p v-if="ai.codex && ai.status !== 'ready'">{{ ai.codex.model }} · {{ ai.codex.reasoning }}</p>
         <v-btn v-if="canReveal" class="mt-2" :loading="revealing" :aria-pressed="rolesShown" @click="toggleRoles">
           {{ $t(rolesShown ? 'aiArena.hideRoles' : 'aiArena.revealRoles') }}
         </v-btn>
@@ -19,9 +41,14 @@
         <p v-if="rolesShown">{{ $t('aiArena.privateDecisionsHint') }}</p>
         <p v-if="rolesShown && decisionsError" role="status">{{ $t('aiArena.connectionError') }}</p>
         <div v-if="canManage" class="ai-controls">
-          <v-btn v-if="ai.status === 'ready'" color="success" :loading="busy" @click="control('start')">{{
-            $t('aiArena.start')
-          }}</v-btn>
+          <v-btn
+            v-if="ai.status === 'ready'"
+            color="success"
+            :loading="busy"
+            :disabled="ai.model === 'codex-chatgpt' && !efforts.length"
+            @click="control('start')"
+            >{{ $t('aiArena.start') }}</v-btn
+          >
           <v-btn
             v-if="ai.status === 'paused' && ai.canResumeTechnical"
             color="success"
@@ -47,7 +74,7 @@
           >
         </div>
         <AiBudgetPanel
-          v-if="canManage && budget"
+          v-if="canManage && budget && ai.model !== 'codex-chatgpt'"
           :budget="budget"
           :cost="costs[roomID]"
           :match-limit="limits[roomID]"
@@ -60,13 +87,57 @@
 <script setup lang="ts">
 import AiBudgetPanel from '@/components/view/panels/AiBudgetPanel.vue';
 import { ref, computed, watch } from 'vue';
+import { codexRelativePrice } from '@/helpers/codex-pricing';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
 import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
+import { aiPlayedModel } from '@avalon/types/room/ai-model';
 import type { AiRoomState, AiSpectatorDecision, TRoles } from '@avalon/types';
 const props = defineProps<{ ai: AiRoomState; roomID: string; canReveal?: boolean; rolesShown?: boolean }>();
 const { t } = useI18n();
-const { canManage, costs, limits, budget, refresh } = useAiAccess(computed(() => [props.roomID]));
+const { canManage, costs, limits, budget, codexModels, refresh } = useAiAccess(computed(() => [props.roomID]));
+const pricedCodexModels = computed(() => {
+  const ids = codexModels.value.map((model) => model.id);
+  return codexModels.value.map((model) => ({
+    ...model,
+    label: `${model.label} · ${codexRelativePrice(model.id, ids) || t('aiArena.codexPriceUnavailable')}`,
+  }));
+});
+const codexModel = ref(props.ai.codex?.model || '');
+const displayModel = computed(() =>
+  props.ai.model === 'codex-chatgpt' ? aiPlayedModel(props.ai) || codexModel.value : aiPlayedModel(props.ai),
+);
+const codexReasoning = ref(props.ai.codex?.reasoning || 'low');
+const efforts = computed(() => codexModels.value.find((model) => model.id === codexModel.value)?.efforts || []);
+watch(
+  [() => props.roomID, () => props.ai.codex?.model, () => props.ai.codex?.reasoning],
+  () => {
+    if (props.ai.codex) {
+      codexModel.value = props.ai.codex.model;
+      codexReasoning.value = props.ai.codex.reasoning;
+    } else {
+      codexModel.value = codexModels.value[0]?.id || '';
+      codexReasoning.value = 'low';
+    }
+  },
+  { immediate: true },
+);
+watch(
+  codexModels,
+  (models) => {
+    if (!models.length) return;
+    if (!models.some((model) => model.id === codexModel.value)) codexModel.value = models[0]?.id || '';
+  },
+  { immediate: true },
+);
+watch(
+  efforts,
+  (levels) => {
+    if (!levels.length) return;
+    if (!levels.includes(codexReasoning.value)) codexReasoning.value = levels.includes('low') ? 'low' : levels[0] || '';
+  },
+  { immediate: true },
+);
 const emit = defineEmits<{ roles: [value: Record<string, TRoles>]; decisions: [value: AiSpectatorDecision[]] }>();
 const revealing = ref(false);
 
@@ -123,6 +194,16 @@ async function control(action: 'start' | 'stop' | 'resumeBudget' | 'resumeTechni
   busy.value = true;
   error.value = '';
   try {
+    if (action === 'start' && props.ai.model === 'codex-chatgpt') {
+      const configured = await socket.timeout(30000).emitWithAck('configureAiCodex', props.roomID, {
+        model: codexModel.value,
+        reasoning: codexReasoning.value,
+      });
+      if ('error' in configured) {
+        error.value = configured.error;
+        return;
+      }
+    }
     const result = await socket.timeout(10000).emitWithAck('controlAiRoom', props.roomID, action);
     if ('error' in result) error.value = result.error;
     else await refresh();
@@ -196,6 +277,37 @@ details[open] .ai-expand {
   margin: 8px 0;
   overflow-wrap: anywhere;
   font-size: 13px;
+}
+.codex-settings {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+.codex-settings label {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+.codex-settings select {
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid #8888;
+  border-radius: 6px;
+  background: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-on-surface));
+  font: inherit;
+  width: 100%;
+  appearance: auto;
+}
+.codex-price-hint {
+  font-size: 12px;
+  margin: 0;
+}
+.codex-price-hint a {
+  color: inherit;
+}
+.codex-settings select:focus-visible {
+  outline: 2px solid rgb(var(--v-theme-primary));
 }
 .ai-controls {
   display: flex;

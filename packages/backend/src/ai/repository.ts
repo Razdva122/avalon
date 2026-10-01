@@ -1,7 +1,10 @@
+import { aiPlayedModel } from '@avalon/types';
 import { randomUUID } from 'crypto';
 import { AI_LEASE_MS } from './timing';
+import { calculateAiRatings } from './ratings';
+import { AI_PROFILE_RATING_SEASON } from './rating-season';
 import type { Db } from 'mongodb';
-import type { AiBudgetSnapshot, StartedRoomState, TRoomState, TRoomInfo } from '@avalon/types';
+import type { AiBudgetSnapshot, StartedRoomState, TRoomState, TRoomInfo, PlayerGameSummaryPage } from '@avalon/types';
 import { AiPause, AiMatchBudgetPause } from './client';
 
 export type AiRequestLog = {
@@ -67,6 +70,8 @@ type ArchiveSummary = Pick<
 > & { game: Pick<StartedRoomState['game'], 'result'> };
 
 export class AiRepository {
+  private ratingCache?: { version: number; expires: number; ratings: ReturnType<typeof calculateAiRatings> };
+  private ratingPending?: Promise<ReturnType<typeof calculateAiRatings>>;
   private listCache?: { value: TRoomInfo[]; expires: number };
   private listPending?: Promise<TRoomInfo[]>;
   private listVersion = 0;
@@ -268,6 +273,15 @@ export class AiRepository {
       { $unset: { owner: '', leaseUntil: '' } },
     );
   }
+  // Codex subscription calls keep the same exclusive room lease without reserving RUB.
+  async renewLease(roomID: string) {
+    validateID(roomID);
+    const result = await this.ledger.updateOne(
+      { _id: this.ledgerID, owner: roomID, leaseUntil: { $gt: new Date() } },
+      { $set: { leaseUntil: new Date(Date.now() + AI_LEASE_MS) } },
+    );
+    if (!result.matchedCount) throw new AiPause('Потеряно управление AI-партией.');
+  }
   async reserve(roomID: string, units: number, requestID?: string) {
     if (requestID !== undefined) validateID(requestID);
     validateID(roomID);
@@ -444,6 +458,105 @@ export class AiRepository {
     this.listVersion++;
     this.listCache = undefined;
   }
+  /** Completed AI games remain isolated from human history and rating collections. */
+  async getPlayerGameSummariesPage(playerID: string, cursor?: string | null): Promise<PlayerGameSummaryPage> {
+    validateID(playerID);
+    const collection = this.db.collection<{ _id: string; state: StartedRoomState }>('ai_room_replays');
+    const filter = {
+      'state.players.id': playerID,
+      'state.game.stage': 'end',
+      'state.game.result.winner': { $in: ['good', 'evil'] },
+      'state.game.result.reason': { $ne: 'manualy' },
+    };
+    let afterID: string | undefined;
+    let upperID: string;
+    if (cursor != null) {
+      if (typeof cursor !== 'string' || !/^ai:[a-zA-Z0-9_-]{1,600}$/.test(cursor))
+        throw Error('Invalid history cursor');
+      const parsed = JSON.parse(Buffer.from(cursor.slice(3), 'base64url').toString('utf8'));
+      if (!Array.isArray(parsed) || parsed.length !== 2) throw Error('Invalid history cursor');
+      [afterID, upperID] = parsed;
+      validateID(afterID);
+      validateID(upperID);
+    } else {
+      const newest = await collection
+        .find(filter, { projection: { _id: 1 }, maxTimeMS: 10000 })
+        .sort({ _id: -1 })
+        .limit(1)
+        .next();
+      if (!newest) return { games: [] };
+      upperID = newest._id;
+    }
+    // UUID ordering gives a stable cursor regardless of legacy date formats.
+    // The client orders the complete summary set by parsed startAt for recent games.
+    const docs = await collection
+      .find(
+        { ...filter, _id: { $lte: upperID, ...(afterID ? { $gt: afterID } : {}) } },
+        {
+          projection: {
+            _id: 1,
+            'state.startAt': 1,
+            'state.createAt': 1,
+            'state.game.uuid': 1,
+            'state.game.players.id': 1,
+            'state.game.players.role': 1,
+            'state.game.result.winner': 1,
+          },
+          maxTimeMS: 10000,
+        },
+      )
+      .sort({ _id: 1 })
+      .limit(201)
+      .toArray();
+    const visible = docs.slice(0, 200);
+    return {
+      games: visible.map(({ state }) => ({ ...state.game, startAt: state.startAt || state.createAt })),
+      ...(docs.length > 200
+        ? { nextCursor: 'ai:' + Buffer.from(JSON.stringify([visible[199]._id, upperID])).toString('base64url') }
+        : {}),
+    };
+  }
+  async getProfileRating(playerID: string) {
+    validateID(playerID);
+    if (this.ratingCache?.version === this.listVersion && this.ratingCache.expires > Date.now())
+      return this.ratingCache.ratings.get(playerID);
+    if (!this.ratingPending) {
+      const version = this.listVersion;
+      this.ratingPending = this.db
+        .collection<{ _id: string; state: StartedRoomState }>('ai_room_replays')
+        .find(
+          {
+            'state.game.stage': 'end',
+            'state.ai.profileRatingSeason': AI_PROFILE_RATING_SEASON,
+            'state.game.result.winner': { $in: ['good', 'evil'] },
+            'state.game.result.reason': { $ne: 'manualy' },
+          },
+          {
+            projection: {
+              'state.createAt': 1,
+              'state.startAt': 1,
+              'state.game.uuid': 1,
+              'state.game.players.id': 1,
+              'state.game.players.role': 1,
+              'state.game.result.winner': 1,
+            },
+            maxTimeMS: 10000,
+          },
+        )
+        .toArray()
+        .then((docs) => {
+          const ratings = calculateAiRatings(
+            docs.map(({ state }) => ({ ...state.game, startAt: state.startAt || state.createAt })),
+          );
+          if (version === this.listVersion) this.ratingCache = { version, expires: Date.now() + 15000, ratings };
+          return ratings;
+        })
+        .finally(() => {
+          this.ratingPending = undefined;
+        });
+    }
+    return (await this.ratingPending).get(playerID);
+  }
   async recentSummaries(): Promise<TRoomInfo[]> {
     if (this.listCache && this.listCache.expires > Date.now()) return this.listCache.value;
     if (this.listPending) return this.listPending;
@@ -499,7 +612,7 @@ export class AiRepository {
         uuid: state.roomID,
         ai: true,
         aiStatus: state.ai?.status,
-        aiModel: state.ai?.model,
+        aiModel: aiPlayedModel(state.ai),
         hostID: state.leaderID,
         state: state.stage,
         players: state.players.length,
@@ -519,7 +632,11 @@ export class AiRepository {
     return this.restoreModels(docs.map(({ state }) => this.archiveState(state)));
   }
   private async restoreModels<T extends Pick<StartedRoomState, 'roomID' | 'ai'>>(states: T[]): Promise<T[]> {
-    const ids = states.filter((state) => state.ai && !state.ai.model).map((state) => state.roomID);
+    const ids = states
+      .filter(
+        (state) => state.ai && (!state.ai.model || (state.ai.model === 'codex-chatgpt' && !aiPlayedModel(state.ai))),
+      )
+      .map((state) => state.roomID);
     if (!ids.length) return states;
     const records = await this.db
       .collection<AiDecisionTrace>('ai_decision_traces')
@@ -529,13 +646,17 @@ export class AiRepository {
       ])
       .toArray();
     for (const state of states) {
-      if (!state.ai || state.ai.model) continue;
+      if (!state.ai || !ids.includes(state.roomID)) continue;
       // Only the model identifier is public, never the provider project/folder path.
       const models = records
         .find((record) => record._id === state.roomID)
         ?.models.map((model) => model.split('/').pop() || '')
         .filter((model) => /^[a-zA-Z0-9._-]+$/.test(model));
-      if (models?.length) state.ai.model = [...new Set(models)].sort().join(', ');
+      if (models?.length) {
+        const label = [...new Set(models)].sort().join(', ');
+        if (state.ai.model === 'codex-chatgpt') state.ai.playedModel = label;
+        else state.ai.model = label;
+      }
     }
     return states;
   }

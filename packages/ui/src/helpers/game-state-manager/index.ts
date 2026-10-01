@@ -19,7 +19,7 @@ export class GameStateManager {
     this.state = ref() as TPageRoomStateRef;
 
     this.game = computed(() => {
-      if (this.state.value.stage === 'started') {
+      if (this.state.value?.stage === 'started') {
         return this.state.value.gameStates[this.state.value.pointer];
       }
     }) as Ref<VisualGameState>;

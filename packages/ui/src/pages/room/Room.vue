@@ -314,12 +314,6 @@ export default defineComponent({
   right: 10px;
 }
 
-@media (max-width: 600px) {
-  .room > .online {
-    top: 110px;
-  }
-}
-
 .game-stage {
   width: 500px;
   background-color: white;
