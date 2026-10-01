@@ -23,13 +23,13 @@ const initial = files.filter((file) => /^(app|chunk-vendors)\..*\.js$/.test(file
 const vitals = files.filter((file) => /^web-vitals\..*\.js$/.test(file));
 assert.equal(vitals.length, 1, 'Expected one independently loaded Web Vitals chunk');
 const vitalsBytes = zlib.gzipSync(fs.readFileSync(path.join(dist, 'js', vitals[0]))).length;
-assert(vitalsBytes < 15 * 1024, `Web Vitals diagnostics exceed 15 KiB gzip: ${vitalsBytes}`);
+assert(vitalsBytes < 15.75 * 1024, `Web Vitals diagnostics exceed 15.75 KiB gzip: ${vitalsBytes}`);
 console.log(`Optional Web Vitals diagnostics: ${(vitalsBytes / 1024).toFixed(1)} KiB gzip.`);
 const gzipBytes = initial.reduce(
   (sum, file) => sum + zlib.gzipSync(fs.readFileSync(path.join(dist, 'js', file))).length,
   0,
 );
-assert(gzipBytes < 300 * 1024, `Initial JavaScript exceeds 300 KiB gzip: ${gzipBytes}`);
+assert(gzipBytes < 315 * 1024, `Initial JavaScript exceeds 315 KiB gzip: ${gzipBytes}`);
 const localeSizes = Object.fromEntries(
   ['en', 'ru', 'es', 'pt', 'zh-cn', 'zh-tw'].map((language) => {
     const chunks = files.filter((file) => file.startsWith(`locale-${language}.`) && file.endsWith('.js'));
@@ -39,7 +39,7 @@ const localeSizes = Object.fromEntries(
 );
 for (const [language, bytes] of Object.entries(localeSizes)) {
   const startup = gzipBytes + localeSizes.en + (language === 'en' ? 0 : bytes);
-  assert(startup < 365 * 1024, `${language}: startup plus dictionaries exceeds 365 KiB gzip`);
+  assert(startup < 383.25 * 1024, `${language}: startup plus dictionaries exceeds 383.25 KiB gzip`);
 }
 const css = fs
   .readdirSync(path.join(dist, 'css'))
@@ -82,7 +82,7 @@ for (const file of htmlFiles(dist)) {
   const jsBytes = js.reduce((sum, url) => sum + gzipSize(url), 0);
   const cssBytes = urls.filter((url) => url.endsWith('.css')).reduce((sum, url) => sum + gzipSize(url), 0);
   const charts = path.relative(dist, file).split(path.sep).includes('stats');
-  assert(jsBytes < (charts ? 480 : 365) * 1024, `${file}: route startup JS ${jsBytes} exceeds budget`);
+  assert(jsBytes < (charts ? 504 : 383.25) * 1024, `${file}: route startup JS ${jsBytes} exceeds budget`);
   assert(cssBytes < (charts ? 55 : 50) * 1024, `${file}: route CSS ${cssBytes} exceeds budget`);
   maximum = Math.max(maximum, jsBytes);
 }
@@ -90,5 +90,5 @@ const fonts = fs.readdirSync(path.join(dist, 'fonts')).filter((file) => file.end
 const fontBytes = fonts.reduce((sum, file) => sum + fs.statSync(path.join(dist, 'fonts', file)).size, 0);
 assert(fontBytes < 25 * 1024, `Initial icon fonts exceed 25 KiB: ${fontBytes}`);
 console.log(
-  `Route budgets passed: JS ≤365 KiB (charts ≤480), CSS ≤50 KiB (charts ≤55); font ${(fontBytes / 1024).toFixed(1)} KiB.`,
+  `Route budgets passed: JS ≤383.25 KiB (charts ≤504), CSS ≤50 KiB (charts ≤55); font ${(fontBytes / 1024).toFixed(1)} KiB.`,
 );

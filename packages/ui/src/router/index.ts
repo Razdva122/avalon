@@ -4,7 +4,6 @@ import { pageLanguage, preferredLanguage } from '@/helpers/i18n/policy';
 import { createRouter, createWebHistory, RouteRecordRaw, RouteLocationNormalized } from 'vue-router';
 import { routesSeo } from '@/router/seo';
 import type { TMultiLangRoute, TNormalizedLangRoute } from '@/router/seo';
-import cloneDeep from 'lodash/cloneDeep';
 import { TLanguage, LanguageMap } from '@/helpers/i18n';
 import { getImagePath } from '@/helpers/images';
 import { i18n, loadLanguage, commitLanguage } from '@/plugins/i18n';
@@ -121,7 +120,8 @@ Object.values(routesSeo).forEach((route) => {
     }
     routes.push(
       ...(neutral ? ['en'] : Object.keys(multiLangRoute.meta.multiLanguage)).map((lang) => {
-        const clone = cloneDeep(multiLangRoute);
+        // Only the route and meta are changed below; localized SEO values remain read-only.
+        const clone = { ...multiLangRoute, meta: { ...multiLangRoute.meta } };
         const langNormalized = lang === 'en' ? '' : lang.toLowerCase();
 
         // @ts-ignore
