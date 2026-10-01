@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import type { CodexWeeklyLimit } from '@avalon/types';
+import { hasRemoteCodex, remoteCodex, remoteCodexCacheKey } from './codex-remote';
 
 type Window = { usedPercent?: unknown; windowDurationMins?: unknown; resetsAt?: unknown };
 type Bucket = { primary?: Window; secondary?: Window };
@@ -18,6 +19,7 @@ export function parseWeeklyLimit(value: unknown, checkedAt = Date.now()): CodexW
 
 // Only initialize and read account quotas: never start a model turn or expose credentials.
 export function readCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
+  if (hasRemoteCodex()) return remoteCodex({ operation: 'limits' }).then((value) => parseWeeklyLimit(value));
   const env: NodeJS.ProcessEnv = {};
   for (const key of [
     'PATH',
@@ -97,7 +99,9 @@ export function readCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
 let cache: { key: string; expires: number; value: CodexWeeklyLimit | null } | undefined;
 let pending: { key: string; promise: Promise<CodexWeeklyLimit | null> } | undefined;
 export async function getCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
-  const key = `${process.env.AI_CODEX_BIN || 'codex'}:${process.env.AI_CODEX_HOME || process.env.CODEX_HOME || process.env.HOME}`;
+  const key = hasRemoteCodex()
+    ? remoteCodexCacheKey()
+    : `${process.env.AI_CODEX_BIN || 'codex'}:${process.env.AI_CODEX_HOME || process.env.CODEX_HOME || process.env.HOME}`;
   if (cache?.key === key && cache.expires > Date.now()) return cache.value;
   if (pending?.key === key) return pending.promise;
   const promise = readCodexWeeklyLimit()

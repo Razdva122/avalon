@@ -1,0 +1,15 @@
+# Merge with the existing production backend service; retain its secrets and mounts.
+# Requires a release containing the Codex CLI and production opt-in support.
+services:
+  backend:
+    environment:
+      AI_ROOMS_ENABLED: 'true'
+      AI_CODEX_ENABLED: 'false' # Set true only after ChatGPT login succeeds.
+      AI_CODEX_BIN: /usr/local/bin/codex
+      AI_CODEX_HOME: /var/lib/avalon-codex
+    volumes:
+      - avalon-codex:/var/lib/avalon-codex
+volumes:
+  avalon-codex:
+    external: true
+    name: avalon-codex

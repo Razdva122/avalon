@@ -8,10 +8,11 @@ import type { BotRequest, GenerationOptions } from './client';
 import type { AiRepository, AiRequestLog, AiDecisionTrace } from './repository';
 import type { CodexSettings } from '@avalon/types';
 import { AI_REQUEST_TIMEOUT_MS } from './timing';
+import { hasRemoteCodex, remoteCodex } from './codex-remote';
 
 export const CODEX_MODEL = 'codex-chatgpt';
 export function codexEnabled() {
-  return process.env.NODE_ENV === 'development' && process.env.AI_CODEX_ENABLED === 'true';
+  return ['development', 'production'].includes(process.env.NODE_ENV || '') && process.env.AI_CODEX_ENABLED === 'true';
 }
 
 export function codexSchema(choices: string[], details: boolean, review = false) {
@@ -68,6 +69,15 @@ export type CodexRunner = (
 
 export const runCodex: CodexRunner = async (prompt, schema, signal, settings) => {
   signal?.throwIfAborted();
+  if (hasRemoteCodex()) {
+    const result = (await remoteCodex({ operation: 'decide', prompt, schema, settings }, signal)) as {
+      text?: unknown;
+      usage?: Usage;
+    } | null;
+    if (!result || typeof result.text !== 'string' || !result.usage || typeof result.usage !== 'object')
+      throw new AiTechnicalPause('Invalid Codex worker decision.');
+    return { text: result.text, usage: result.usage };
+  }
   const dir = await mkdtemp(join(tmpdir(), 'avalon-codex-'));
   try {
     const schemaPath = join(dir, 'schema.json');
@@ -229,7 +239,7 @@ export function codexDecide(
   settings?: () => CodexSettings | undefined,
 ) {
   return async (request: BotRequest, options: GenerationOptions, signal?: AbortSignal) => {
-    if (!codexEnabled()) throw new AiTechnicalPause('Codex is enabled only for local development.');
+    if (!codexEnabled()) throw new AiTechnicalPause('Codex is disabled on this server.');
     signal?.throwIfAborted();
     await repository.renewLease(roomID);
     const id = randomUUID();

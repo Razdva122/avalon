@@ -391,54 +391,57 @@ test('technical resume requires a current admin, never doubles budgets and rejec
   expect(claim).toHaveBeenCalledTimes(1);
 });
 
-test('development advertises and creates Codex without Yandex credentials; production rejects it', async () => {
-  const previous = { ...process.env };
-  const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
-  const host = {
-    rooms: {},
-    io,
-    updateRoomsList: jest.fn(),
-    dbManager: { dbInstance: { connection: { db: {} } }, getUserByID: async () => ({ isAdmin: true }) },
-  } as unknown as Manager;
-  try {
-    process.env.NODE_ENV = 'development';
-    process.env.AI_ROOMS_ENABLED = 'true';
-    process.env.AI_CODEX_ENABLED = 'true';
-    delete process.env.YANDEX_API_KEY;
-    delete process.env.YANDEX_FOLDER_ID;
-    const service = new AiService(host);
-    expect(service.repository).toBeDefined();
-    const claim = jest.fn();
-    service.repository = { claim, save: jest.fn() } as unknown as AiRepository;
-    const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
-    service.register(
-      {
-        on: (name: string, h: any) => {
-          handlers[name] = h;
-        },
-      } as unknown as ServerSocket,
-      'owner',
-    );
-    const access = jest.fn();
-    await handlers.getAiRoomAccess(access);
-    expect(access.mock.calls[0][0].models).toContainEqual({ id: 'codex-chatgpt', label: 'Codex · ChatGPT' });
-    const created = jest.fn();
-    await handlers.createAiRoom('codex-chatgpt', created);
-    expect(created.mock.calls[0][0]).toHaveProperty('roomID');
-    expect(host.rooms[created.mock.calls[0][0].roomID].ai?.model).toBe('codex-chatgpt');
-    expect(claim).toHaveBeenCalledTimes(1);
-    process.env.NODE_ENV = 'production';
-    host.rooms = {};
-    const denied = jest.fn();
-    await handlers.createAiRoom('codex-chatgpt', denied);
-    expect(denied.mock.calls[0][0]).toHaveProperty('error');
-    expect(claim).toHaveBeenCalledTimes(1);
-    await handlers.getAiRoomAccess(access);
-    expect(access.mock.calls.at(-1)[0].models.some((m: { id: string }) => m.id === 'codex-chatgpt')).toBe(false);
-  } finally {
-    process.env = previous;
-  }
-});
+test.each(['development', 'production'])(
+  '%s advertises and creates opt-in Codex without Yandex credentials',
+  async (environment) => {
+    const previous = { ...process.env };
+    const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
+    const host = {
+      rooms: {},
+      io,
+      updateRoomsList: jest.fn(),
+      dbManager: { dbInstance: { connection: { db: {} } }, getUserByID: async () => ({ isAdmin: true }) },
+    } as unknown as Manager;
+    try {
+      process.env.NODE_ENV = environment;
+      process.env.AI_ROOMS_ENABLED = 'true';
+      process.env.AI_CODEX_ENABLED = 'true';
+      delete process.env.YANDEX_API_KEY;
+      delete process.env.YANDEX_FOLDER_ID;
+      const service = new AiService(host);
+      expect(service.repository).toBeDefined();
+      const claim = jest.fn();
+      service.repository = { claim, save: jest.fn() } as unknown as AiRepository;
+      const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
+      service.register(
+        {
+          on: (name: string, h: any) => {
+            handlers[name] = h;
+          },
+        } as unknown as ServerSocket,
+        'owner',
+      );
+      const access = jest.fn();
+      await handlers.getAiRoomAccess(access);
+      expect(access.mock.calls[0][0].models).toContainEqual({ id: 'codex-chatgpt', label: 'Codex · ChatGPT' });
+      const created = jest.fn();
+      await handlers.createAiRoom('codex-chatgpt', created);
+      expect(created.mock.calls[0][0]).toHaveProperty('roomID');
+      expect(host.rooms[created.mock.calls[0][0].roomID].ai?.model).toBe('codex-chatgpt');
+      expect(claim).toHaveBeenCalledTimes(1);
+      process.env.AI_CODEX_ENABLED = 'false';
+      host.rooms = {};
+      const denied = jest.fn();
+      await handlers.createAiRoom('codex-chatgpt', denied);
+      expect(denied.mock.calls[0][0]).toHaveProperty('error');
+      expect(claim).toHaveBeenCalledTimes(1);
+      await handlers.getAiRoomAccess(access);
+      expect(access.mock.calls.at(-1)[0].models.some((m: { id: string }) => m.id === 'codex-chatgpt')).toBe(false);
+    } finally {
+      process.env = previous;
+    }
+  },
+);
 
 test('Codex settings require admin access and stay frozen after launch', async () => {
   const catalog = jest
@@ -561,7 +564,7 @@ test('archived AI statistics remain readable when game generation is disabled', 
   }
 });
 
-test('weekly Codex quota is admin-only, unavailable data stays null and production cannot query it', async () => {
+test('weekly Codex quota is admin-only in production, unavailable data stays null and disabled Codex cannot query it', async () => {
   const previous = { ...process.env };
   const quota = jest.spyOn(codexLimits, 'getCodexWeeklyLimit').mockResolvedValue(null);
   const host = {
@@ -597,8 +600,12 @@ test('weekly Codex quota is admin-only, unavailable data stays null and producti
     expect(quota).toHaveBeenCalledTimes(1);
     process.env.NODE_ENV = 'production';
     await connect('owner').getAiCodexWeeklyLimit(callback);
+    expect(callback.mock.calls.at(-1)[0]).toEqual({ weekly: null });
+    expect(quota).toHaveBeenCalledTimes(2);
+    process.env.AI_CODEX_ENABLED = 'false';
+    await connect('owner').getAiCodexWeeklyLimit(callback);
     expect(callback.mock.calls.at(-1)[0]).toHaveProperty('error');
-    expect(quota).toHaveBeenCalledTimes(1);
+    expect(quota).toHaveBeenCalledTimes(2);
   } finally {
     process.env = previous;
     quota.mockRestore();

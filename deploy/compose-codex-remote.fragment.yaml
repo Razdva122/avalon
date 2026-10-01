@@ -1,0 +1,14 @@
+# Merge into the existing production Compose; requires the new backend release.
+# This uses a remote worker instead of mounting local ChatGPT credentials.
+services:
+  backend:
+    environment:
+      AI_ROOMS_ENABLED: 'true'
+      AI_CODEX_ENABLED: 'false' # Enable during the controlled release rollout.
+      AI_CODEX_SSH_HOST: '146.103.118.73'
+      AI_CODEX_SSH_PORT: '10022'
+      AI_CODEX_SSH_USER: avalon-codex
+      AI_CODEX_SSH_KEY: /run/codex-ssh/id_ed25519
+      AI_CODEX_SSH_KNOWN_HOSTS: /run/codex-ssh/known_hosts
+    volumes:
+      - /opt/avalon/codex-ssh:/run/codex-ssh:ro

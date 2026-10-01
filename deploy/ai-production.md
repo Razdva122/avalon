@@ -6,6 +6,10 @@ Yandex folder/API key from deployment secrets. `.env.local` is ignored in produc
 Keep the existing database, application and mail configuration. Do not deploy local
 secret files or import local users/tokens.
 
+For the optional ChatGPT subscription provider, follow
+[Codex production preparation](codex-production.md). Installing the CLI on the VM
+alone does not put it inside the backend container.
+
 ## Limits and calendar
 
 - `NODE_ENV=production`: 3,000 RUB per **30 consecutive calendar days**, 150 RUB per game.

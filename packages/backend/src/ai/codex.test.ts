@@ -9,11 +9,15 @@ afterEach(() => {
   process.env = { ...oldEnv };
 });
 
-test('Codex is opt-in development only, even if production enables the flag', () => {
+test('Codex is opt-in in development and production, disabled in other environments', () => {
   process.env.AI_CODEX_ENABLED = 'true';
   process.env.NODE_ENV = 'development';
   expect(codexEnabled()).toBe(true);
   process.env.NODE_ENV = 'production';
+  expect(codexEnabled()).toBe(true);
+  process.env.NODE_ENV = 'test';
+  expect(codexEnabled()).toBe(false);
+  delete process.env.NODE_ENV;
   expect(codexEnabled()).toBe(false);
   process.env.NODE_ENV = 'development';
   delete process.env.AI_CODEX_ENABLED;
@@ -77,6 +81,7 @@ test('invalid output pauses instead of choosing a fallback and disabled Codex ca
   await expect(generate(request, { context: {}, phase: 'speech' })).rejects.toThrow();
   runner.mockClear();
   process.env.NODE_ENV = 'production';
+  process.env.AI_CODEX_ENABLED = 'false';
   await expect(generate(request, { context: {} })).rejects.toThrow();
   expect(runner).not.toHaveBeenCalled();
 });

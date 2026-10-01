@@ -15,8 +15,8 @@ export default {
   codexModel: 'Modelo Codex',
   codexReasoning: 'Nivel de razonamiento',
   codexModelsUnavailable:
-    'No se pudieron cargar los modelos. Comprueba el inicio de sesión local de Codex y actualiza.',
-  codexSubscription: 'Prueba local con ChatGPT. Utiliza los límites de tu suscripción; sin cargos de Yandex.',
+    'No se pudieron cargar los modelos. Comprueba el inicio de sesión de Codex en el servidor y actualiza.',
+  codexSubscription: 'Utiliza los límites de la suscripción de ChatGPT; sin cargos de Yandex.',
   resumeTechnical: 'Reintentar · mismo presupuesto',
   controls: 'Controles de la partida',
   budgetDetails: 'Detalles del presupuesto',

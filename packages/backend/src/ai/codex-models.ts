@@ -2,6 +2,7 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 import type { CodexSettings, CodexModelOption } from '@avalon/types';
 import { AiTechnicalPause } from './client';
+import { hasRemoteCodex, remoteCodex, remoteCodexCacheKey } from './codex-remote';
 
 export function parseCodexModels(value: unknown): CodexModelOption[] {
   const models = (value as { models?: unknown[] })?.models;
@@ -35,11 +36,17 @@ let pending: Promise<CodexModelOption[]> | undefined;
 export async function getCodexModels(): Promise<CodexModelOption[]> {
   const bin = process.env.AI_CODEX_BIN || 'codex';
   const home = process.env.AI_CODEX_HOME || process.env.CODEX_HOME;
-  const key = `${bin}:${home}`;
+  const key = hasRemoteCodex() ? remoteCodexCacheKey() : `${bin}:${home}`;
   if (cache?.key === key && cache.expires > Date.now()) return cache.models;
   if (pending) return pending;
   pending = (async () => {
     try {
+      if (hasRemoteCodex()) {
+        const models = parseCodexModels(await remoteCodex({ operation: 'models' }));
+        if (!models.length) throw new Error('empty');
+        cache = { key, models, expires: Date.now() + 300000 };
+        return models;
+      }
       const { stdout } = await promisify(execFile)(bin, ['debug', 'models'], {
         timeout: 20000,
         maxBuffer: 8 * 1024 * 1024,
@@ -50,7 +57,7 @@ export async function getCodexModels(): Promise<CodexModelOption[]> {
       cache = { key, models, expires: Date.now() + 300000 };
       return models;
     } catch {
-      throw new AiTechnicalPause('Could not load Codex models. Check your local ChatGPT login.');
+      throw new AiTechnicalPause('Could not load Codex models. Check server ChatGPT login.');
     } finally {
       pending = undefined;
     }
