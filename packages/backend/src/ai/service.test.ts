@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as codexModels from './codex-models';
+import * as codexLimits from './codex-limits';
 import { AiService } from './service';
 import { BotRoom } from './room';
 import type { Manager } from '@/main';
@@ -557,5 +558,49 @@ test('archived AI statistics remain readable when game generation is disabled', 
   } finally {
     if (previous === undefined) delete process.env.AI_ROOMS_ENABLED;
     else process.env.AI_ROOMS_ENABLED = previous;
+  }
+});
+
+test('weekly Codex quota is admin-only, unavailable data stays null and production cannot query it', async () => {
+  const previous = { ...process.env };
+  const quota = jest.spyOn(codexLimits, 'getCodexWeeklyLimit').mockResolvedValue(null);
+  const host = {
+    rooms: {},
+    dbManager: { getUserByID: async (id: string) => ({ isAdmin: id === 'owner' }) },
+  } as unknown as Manager;
+  try {
+    process.env.NODE_ENV = 'development';
+    process.env.AI_CODEX_ENABLED = 'true';
+    const service = new AiService(host);
+    service.repository = {} as AiRepository;
+    const connect = (id?: string) => {
+      const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
+      service.register(
+        {
+          on: (name: string, handler: any) => {
+            handlers[name] = handler;
+          },
+        } as unknown as ServerSocket,
+        id,
+      );
+      return handlers;
+    };
+    for (const id of [undefined, 'visitor']) {
+      const callback = jest.fn();
+      await connect(id).getAiCodexWeeklyLimit(callback);
+      expect(callback.mock.calls[0][0]).toHaveProperty('error');
+    }
+    expect(quota).not.toHaveBeenCalled();
+    const callback = jest.fn();
+    await connect('owner').getAiCodexWeeklyLimit(callback);
+    expect(callback).toHaveBeenCalledWith({ weekly: null });
+    expect(quota).toHaveBeenCalledTimes(1);
+    process.env.NODE_ENV = 'production';
+    await connect('owner').getAiCodexWeeklyLimit(callback);
+    expect(callback.mock.calls.at(-1)[0]).toHaveProperty('error');
+    expect(quota).toHaveBeenCalledTimes(1);
+  } finally {
+    process.env = previous;
+    quota.mockRestore();
   }
 });

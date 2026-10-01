@@ -1,4 +1,10 @@
 export default {
+  codexWeeklyLimit: 'Límite semanal de Codex',
+  codexWeeklyRemaining: 'Queda {percent}%',
+  codexWeeklyReset: 'El límite se restablece: {date}',
+  codexWeeklyShared: 'Límite compartido de la cuenta, incluido el uso fuera del juego.',
+  codexWeeklyUnavailable: 'Límite semanal de Codex no disponible.',
+
   lastDecision: 'Última decisión',
   chosenAction: 'Acción elegida',
   privateReason: 'Explicación privada',

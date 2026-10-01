@@ -150,6 +150,9 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
       defaultModel?: string;
     }) => void,
   ) => void;
+  getAiCodexWeeklyLimit: (
+    callback: (result: { weekly: import('../room').CodexWeeklyLimit | null } | { error: string }) => void,
+  ) => void;
   getAiCodexModels: (
     callback: (result: { models: import('../room').CodexModelOption[] } | { error: string }) => void,
   ) => void;

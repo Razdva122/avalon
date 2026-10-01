@@ -1,4 +1,10 @@
 export default {
+  codexWeeklyLimit: 'Codex 每周限额',
+  codexWeeklyRemaining: '剩余 {percent}%',
+  codexWeeklyReset: '限额重置时间：{date}',
+  codexWeeklyShared: '账户共享限额，包括游戏外的使用。',
+  codexWeeklyUnavailable: 'Codex 每周限额不可用。',
+
   lastDecision: '最近的决定',
   chosenAction: '所选行动',
   privateReason: '私人解释',

@@ -25,6 +25,8 @@ test('premium avatar IDs keep their catalog slash', () => {
 
 test('Codex catalog and configuration packets accept their required acknowledgements', () => {
   expect(validPacket('getAiCodexModels', [() => {}])).toBe(true);
+  expect(validPacket('getAiCodexWeeklyLimit', [() => {}])).toBe(true);
+  expect(validPacket('getAiCodexWeeklyLimit', [])).toBe(false);
   expect(validPacket('configureAiCodex', ['room', { model: 'gpt-6-luna', reasoning: 'high' }, () => {}])).toBe(true);
   expect(validPacket('getAiCodexModels', [])).toBe(false);
   expect(validPacket('configureAiCodex', ['room', { model: 'gpt-6-luna', reasoning: 'high' }])).toBe(false);

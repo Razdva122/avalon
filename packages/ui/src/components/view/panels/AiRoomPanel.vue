@@ -13,6 +13,7 @@
       <div class="ai-details">
         <p aria-live="polite">{{ ai.message }}</p>
         <p v-if="ai.model === 'codex-chatgpt'">{{ $t('aiArena.codexSubscription') }}</p>
+        <CodexWeeklyLimit v-if="canManage && ai.model === 'codex-chatgpt'" />
         <div v-if="canManage && ai.model === 'codex-chatgpt' && ai.status === 'ready'" class="codex-settings">
           <label>
             <span>{{ $t('aiArena.codexModel') }}</span>
@@ -85,6 +86,7 @@
   </section>
 </template>
 <script setup lang="ts">
+import CodexWeeklyLimit from '@/components/view/panels/CodexWeeklyLimit.vue';
 import AiBudgetPanel from '@/components/view/panels/AiBudgetPanel.vue';
 import { ref, computed, watch } from 'vue';
 import { codexRelativePrice } from '@/helpers/codex-pricing';

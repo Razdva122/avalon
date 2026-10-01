@@ -174,3 +174,9 @@ export type AiSpectatorDecision = {
   choice: string;
   reason: string;
 };
+
+export interface CodexWeeklyLimit {
+  remainingPercent: number;
+  resetsAt: number | null;
+  checkedAt: number;
+}

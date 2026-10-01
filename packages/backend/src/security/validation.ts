@@ -64,6 +64,7 @@ const acknowledgements: Record<string, number> = {
   getAiBudget: 0,
   getAiRoomAccess: 0,
   getAiCodexModels: 0,
+  getAiCodexWeeklyLimit: 0,
   createRoom: 0,
   joinRoom: 1,
   getOnlineCounter: 1,

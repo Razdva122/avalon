@@ -1,4 +1,10 @@
 export default {
+  codexWeeklyLimit: 'Недельный лимит Codex',
+  codexWeeklyRemaining: 'Осталось {percent}%',
+  codexWeeklyReset: 'Обновление лимита: {date}',
+  codexWeeklyShared: 'Общий лимит аккаунта, включая работу вне игры.',
+  codexWeeklyUnavailable: 'Недельный лимит Codex недоступен.',
+
   lastDecision: 'Последнее решение',
   chosenAction: 'Выбранное действие',
   privateReason: 'Приватное объяснение',

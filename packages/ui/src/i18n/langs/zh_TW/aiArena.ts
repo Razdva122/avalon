@@ -1,4 +1,10 @@
 export default {
+  codexWeeklyLimit: 'Codex 每週限額',
+  codexWeeklyRemaining: '剩餘 {percent}%',
+  codexWeeklyReset: '限額重設時間：{date}',
+  codexWeeklyShared: '帳戶共用限額，包括遊戲外的使用。',
+  codexWeeklyUnavailable: 'Codex 每週限額無法取得。',
+
   lastDecision: '最近的決定',
   chosenAction: '所選行動',
   privateReason: '私人解釋',

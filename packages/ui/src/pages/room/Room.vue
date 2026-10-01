@@ -7,7 +7,7 @@
         ><v-btn size="x-large">{{ $t('room.backToLobby') }}</v-btn></LocaleLink
       >
     </template>
-    <template v-else>
+    <template v-else-if="roomState">
       <AiRoomPanel
         v-if="roomState.ai"
         class="ai-room-status"
@@ -70,6 +70,7 @@
         :seatIds="roomState.players.map((player) => player.id).join(',')"
       />
     </template>
+    <p v-else role="status">{{ $t('mainPage.loading') }}</p>
   </div>
 </template>
 

@@ -9,6 +9,7 @@ import { AiPause } from './client';
 import { separatedDecide } from './pipeline';
 import { decisionPipeline } from './pipeline';
 import { getCodexModels, validateCodexSettings } from './codex-models';
+import { getCodexWeeklyLimit } from './codex-limits';
 import { CODEX_MODEL, codexEnabled, codexDecide } from './codex';
 
 export class AiService {
@@ -125,6 +126,15 @@ export class AiService {
         cb({ costs, limits });
       } catch {
         cb({ error: 'Could not load AI costs' });
+      }
+    });
+    socket.on('getAiCodexWeeklyLimit', async (cb) => {
+      if (typeof cb !== 'function') return;
+      try {
+        if (!codexEnabled() || !(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        cb({ weekly: await getCodexWeeklyLimit() });
+      } catch {
+        cb({ error: 'Could not load Codex limits' });
       }
     });
     socket.on('getAiCodexModels', async (cb) => {
