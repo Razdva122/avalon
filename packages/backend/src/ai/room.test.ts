@@ -11,7 +11,14 @@ test('seven bots complete a real game, including Lady of Lake and assassination,
   const room = new BotRoom('test-room', 'admin', io, async (request) => {
     stages.add(request.state.stage);
     if (request.state.stage === 'onMission') missionThinking.push(room.ai?.thinkingPlayerID);
-    return { ...reply(request), choice: request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0 };
+    let choice = request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0;
+    if (request.task === 'Propose a team and explain your choice') {
+      if (room.data.stage !== 'started') throw Error('not started');
+      // Force a real secret-card model call regardless of the random role assignment.
+      const evil = room.data.manager.game.players.find((player) => player.role.loyalty === 'evil')!;
+      choice = request.choices.findIndex((team) => team.split(', ').includes(String(evil.index)));
+    }
+    return { ...reply(request), choice };
   });
   expect(room.players).toHaveLength(7);
   expect(room.options).toEqual(botOptions);
