@@ -1,7 +1,7 @@
 <template>
   <div
     class="player-container"
-    :class="playerClasses"
+    :class="[playerClasses, { 'ai-thinking': thinking }]"
     @click="privateDecision ? (showUserCardDialog = true) : $emit('playerClick', player.id)"
     ref="playerRef"
   >
@@ -24,6 +24,15 @@
           @keydown.enter.prevent="privateDecision && (showUserCardDialog = true)"
           @keydown.space.prevent="privateDecision && (showUserCardDialog = true)"
         >
+          <span
+            v-if="thinking"
+            class="ai-thinking-status"
+            role="status"
+            :aria-label="`${player.name}: ${$t('aiArena.thinking')}`"
+          >
+            <span class="thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            {{ $t('aiArena.thinking') }}
+          </span>
           <img class="player-frame" alt="frame" :src="getImagePathByID('core', 'player-frame')" />
           <div class="player-icon"></div>
           <Avatar
@@ -182,6 +191,7 @@ export default defineComponent({
     AiPrivateDecision,
   },
   props: {
+    thinking: { type: Boolean, default: false },
     voiceSide: { type: String as PropType<'left' | 'right'>, default: 'right' },
     playerState: {
       type: Object as PropType<IFrontendPlayer | RoomPlayer>,
@@ -487,6 +497,75 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.ai-thinking .player-frame {
+  filter: drop-shadow(0 0 7px rgba(var(--v-theme-primary), 0.7));
+}
+.ai-thinking-status {
+  position: absolute;
+  z-index: 4;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  padding: 4px 9px;
+  border-radius: 12px;
+  border: 1px solid rgba(var(--v-theme-primary), 0.5);
+  background: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-primary));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+  font-weight: 700;
+}
+.thinking-dots {
+  display: flex;
+  gap: 3px;
+  i {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: thinking-pulse 1.4s ease-in-out infinite;
+  }
+  i:nth-child(2) {
+    animation-delay: 0.18s;
+  }
+  i:nth-child(3) {
+    animation-delay: 0.36s;
+  }
+}
+@media (max-width: 600px) {
+  // The existing table scales as a whole on phones; compensate for the status text.
+  .ai-thinking-status {
+    font-size: 24px;
+    padding: 6px 12px;
+    gap: 8px;
+    border-radius: 20px;
+  }
+  .thinking-dots i {
+    width: 6px;
+    height: 6px;
+  }
+}
+@keyframes thinking-pulse {
+  0%,
+  70%,
+  100% {
+    opacity: 0.35;
+  }
+  35% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thinking-dots i {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 @mixin dropShadowBorder($color, $size) {
   filter: drop-shadow($size $size 0 $color) drop-shadow(-$size $size 0 $color) drop-shadow($size (-$size) 0 $color)
     drop-shadow((-$size) (-$size) 0 $color);

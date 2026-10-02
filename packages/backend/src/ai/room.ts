@@ -7,7 +7,7 @@ import { AiPause, AiTechnicalPause, AiMatchBudgetPause, type Decide, type BotReq
 import { BOT_AGENTS, selectBotAgents } from './agents';
 export { BOT_PROFILES } from './agents';
 export const botOptions: GameOptions = {
-  roles: { merlin: 1, percival: 1, mordred: 1, morgana: 1 },
+  roles: { merlin: 1, percival: 1, mordred: 1, morgana: 1, oberon: 1 },
   addons: { ladyOfLake: true },
   features: { wtfMode: false, displayIndex: true },
 };
@@ -85,6 +85,7 @@ export class BotRoom extends Room {
 
   stop() {
     this.cancelled = true;
+    delete this.ai!.thinkingPlayerID;
     this.abort.abort();
     this.ai!.status = 'stopped';
     this.ai!.canResumeBudget = false;
@@ -169,7 +170,9 @@ export class BotRoom extends Room {
         state.players.map((p) => [p.index, p.role]),
       );
     }
-    this.ai!.message = `${agent.name}: ${task}`;
+    // Only Evil needs a model call for the secret mission card: never expose its identity.
+    if (state.stage !== 'onMission') this.ai!.thinkingPlayerID = id;
+    this.ai!.message = state.stage === 'onMission' ? 'Collecting secret mission cards.' : `${agent.name}: ${task}`;
     this.updateRoomState(true);
     let answer: BotReply;
     try {
@@ -189,6 +192,9 @@ export class BotRoom extends Room {
       if (++this.failures >= 3) throw new AiPause('Three consecutive model errors. Match paused.');
       answer = { choice: 0, speech: '' };
       this.ai!.message = 'Model error: a legal fallback action was used.';
+    } finally {
+      delete this.ai!.thinkingPlayerID;
+      this.updateRoomState(true);
     }
     if (this.cancelled || this.manager.game.stage !== state.stage) return null;
     if (answer.privateReason?.trim()) {
@@ -342,7 +348,7 @@ export class BotRoom extends Room {
           }));
         break;
       case 'announceLoyalty':
-        task = ['mordred', 'morgana', 'minion'].includes(own.role)
+        task = ['mordred', 'morgana', 'minion', 'oberon'].includes(own.role)
           ? 'Announce the Lady result; choose truth or a strategic lie for Evil'
           : 'Announce privateKnowledge.inspectionResult truthfully by default. Lady explains your knowledge without revealing your role. Do not reverse the result merely to hide Merlin.';
         privateCheck = this.manager.getGameData(id, { method: 'getLoyalty' });
@@ -356,12 +362,14 @@ export class BotRoom extends Room {
         task =
           'Choose the player you believe is Merlin after reviewing ALL teammates in evilCouncil and the early public clues in evilEvidence';
         choices = state.players
-          .filter((p) => !['evil', 'mordred', 'morgana', 'minion'].includes(p.role))
+          .filter((p) => !['evil', 'mordred', 'morgana', 'minion', 'oberon'].includes(p.role))
           .map((p) => ({
             text: this.label(p.id),
             actions: [...this.select([p.id]), { method: 'assassinate', type: 'merlin' }],
           }));
-        for (const ally of state.players.filter((p) => ['evil', 'mordred', 'morgana', 'minion'].includes(p.role))) {
+        for (const ally of state.players.filter((p) =>
+          ['evil', 'mordred', 'morgana', 'minion', 'oberon'].includes(p.role),
+        )) {
           if (this.evilCouncil.some((entry) => entry.seat === this.label(ally.id))) continue;
           const suggestion = await this.ask(
             ally.id,

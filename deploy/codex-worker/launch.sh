@@ -3,10 +3,7 @@ set -eu
 # Only this root-owned launcher is permitted by sudo. No caller arguments.
 [ "$#" -eq 0 ] || exit 1
 exec 9>/opt/avalon-codex/worker.lock
-if ! flock -n 9; then
-  printf '%s\n' '{"ok":false,"error":"busy"}'
-  exit 0
-fi
+locked=false
 container="avalon-codex-worker-$$"
 heartbeat=''
 child=''
@@ -22,14 +19,42 @@ cleanup() {
     wait "$child" 2>/dev/null || true
   fi
   # Also cover a create/start request that was in flight when SSH disconnected.
-  for attempt in 1 2 3 4 5; do
-    docker rm -f "$container" >/dev/null 2>&1 || true
-    sleep 0.2
-  done
+  if [ "$locked" = true ]; then
+    for attempt in 1 2 3 4 5; do
+      docker rm -f "$container" >/dev/null 2>&1 || true
+      sleep 0.2
+    done
+  fi
   rm -f "$output"
 }
 trap cleanup EXIT
 trap 'exit 1' HUP INT TERM
+launcher=$$
+# This pipe belongs to SSH itself, unlike the container's stdout (owned by dockerd).
+# A disconnected client must terminate the launcher and remove the whole container.
+(
+  trap 'kill -TERM "$launcher"; exit 1' PIPE
+  while true; do
+    sleep 1
+    if ! printf '\n'; then kill -TERM "$launcher"; exit 1; fi
+  done
+) &
+heartbeat=$!
+# Quota/catalog reads may briefly hold the same worker as a game turn. Wait
+# before dispatching, without replaying a decision that may already have run.
+# Polling keeps cancellation responsive; the heartbeat also covers this wait.
+deadline=$((SECONDS + 30))
+while ! flock -n 9; do
+  if [ "$SECONDS" -ge "$deadline" ]; then
+    kill "$heartbeat" >/dev/null 2>&1 || true
+    wait "$heartbeat" 2>/dev/null || true
+    heartbeat=''
+    printf '%s\n' '{"ok":false,"error":"busy"}'
+    exit 0
+  fi
+  sleep 0.2
+done
+locked=true
 # Complete creation before spawning the attach client: cleanup always has a
 # registered container to remove, even if SSH stops during slow image/storage work.
 docker create -i --name "$container" --memory=256m --memory-swap=256m \
@@ -41,17 +66,7 @@ docker create -i --name "$container" --memory=256m --memory-swap=256m \
   --entrypoint node avalon-codex:0.159.2 /worker.cjs </dev/null >/dev/null
 docker start -a -i "$container" <&0 >"$output" &
 child=$!
-launcher=$$
-# This pipe belongs to SSH itself, unlike the container's stdout (owned by dockerd).
-# A disconnected client must terminate the launcher and remove the whole container.
-(
-  trap 'kill -TERM "$launcher"; exit 1' PIPE
-  while kill -0 "$child" 2>/dev/null; do
-    sleep 1
-    if ! printf '\n'; then kill -TERM "$launcher"; exit 1; fi
-  done
-) &
-heartbeat=$!
+
 status=0
 wait "$child" || status=$?
 kill "$heartbeat" >/dev/null 2>&1 || true

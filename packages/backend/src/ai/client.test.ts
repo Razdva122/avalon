@@ -202,13 +202,13 @@ test('private Evil evidence and council never enter a Good players model context
     evilEvidence: [{ name: '1', text: 'EARLY_CLUE' }],
     evilCouncil: [{ seat: '2', target: '1', reason: 'SECRET_COUNCIL' }],
   };
-  for (const role of ['servant', 'merlin', 'percival', 'mordred', 'morgana', 'minion']) {
+  for (const role of ['servant', 'merlin', 'percival', 'mordred', 'morgana', 'minion', 'oberon']) {
     const state = {
       stage: 'assassinate',
       players: [{ id: 'bot', index: 2, role, features: {} }],
     } as unknown as VisualGameState;
     const serialized = JSON.stringify(compactRequest({ ...context, state }));
-    const evil = ['mordred', 'morgana', 'minion'].includes(role);
+    const evil = ['mordred', 'morgana', 'minion', 'oberon'].includes(role);
     expect(serialized.includes('SECRET_COUNCIL')).toBe(evil);
     expect(serialized.includes('EARLY_CLUE')).toBe(evil);
   }
@@ -699,4 +699,25 @@ test('stop while storing the trace refunds before dispatch', async () => {
   await expect(yandexDecide('room', repo, () => {})(request, controller.signal)).rejects.toThrow();
   expect(sent).toBe(false);
   expect(cost()).toBe(0);
+});
+
+test('Oberon uses Evil action facts without inventing hidden allies', () => {
+  const current = {
+    ...request,
+    state: {
+      stage: 'onMission',
+      mission: 0,
+      settings: { missions: [{ failsRequired: 1 }] },
+      players: [
+        { id: 'bot', index: 1, role: 'oberon', features: { isSent: true } },
+        { id: 'other', index: 2, role: 'unknown', features: { isSent: true } },
+      ],
+      history: [],
+    },
+  } as unknown as BotRequest;
+  const context = compactRequest(current);
+  expect(context.you?.side).toBe('evil');
+  expect(context.actionFacts?.knownEvilOnTeam).toEqual([1]);
+  expect(context.actionFacts?.unresolvedOnTeam).toEqual([2]);
+  expect(context.roleAdvice).toContain('do not know your allies');
 });

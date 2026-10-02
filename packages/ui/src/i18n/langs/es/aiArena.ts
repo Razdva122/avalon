@@ -1,4 +1,5 @@
 export default {
+  thinking: 'Pensando',
   codexWeeklyLimit: 'Límite semanal de Codex',
   codexWeeklyRemaining: 'Queda {percent}%',
   codexWeeklyReset: 'El límite se restablece: {date}',

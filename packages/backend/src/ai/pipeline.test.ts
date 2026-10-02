@@ -188,6 +188,7 @@ test('public sabotage confessions are replaced but ordinary suspicions remain', 
     safePublicSpeech('I approve because it aligns with my strategy to let the mission fail.', 'approve'),
   ).not.toContain('fail');
   expect(safePublicSpeech('I am Mordred.', 'reject')).not.toContain('Mordred');
+  expect(safePublicSpeech('I am Oberon.', 'reject')).not.toContain('Oberon');
   expect(safePublicSpeech('I suspect 2 is evil.', 'reject')).toBe('I suspect 2 is evil.');
 });
 

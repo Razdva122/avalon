@@ -26,7 +26,7 @@ export function claimContext(request: BotRequest) {
     request.speak &&
     !request.privateDiscussion &&
     ['selectTeam', 'votingForTeam', 'checkLoyalty', 'announceLoyalty'].includes(request.state.stage);
-  const eligible = own && ['merlin', 'percival', 'mordred', 'morgana', 'minion'].includes(own.role);
+  const eligible = own && ['merlin', 'percival', 'mordred', 'morgana', 'minion', 'oberon'].includes(own.role);
   return {
     claims,
     previousStances: [...previousStances].map(([seat, stance]) => ({ seat, stance })),

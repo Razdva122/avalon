@@ -7,8 +7,10 @@ const reply = (request: BotRequest) => ({ choice: 0, speech: request.speak ? 'I 
 
 test('seven bots complete a real game, including Lady of Lake and assassination, with public discussion', async () => {
   const stages = new Set<string>();
+  const missionThinking: (string | undefined)[] = [];
   const room = new BotRoom('test-room', 'admin', io, async (request) => {
     stages.add(request.state.stage);
+    if (request.state.stage === 'onMission') missionThinking.push(room.ai?.thinkingPlayerID);
     return { ...reply(request), choice: request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0 };
   });
   expect(room.players).toHaveLength(7);
@@ -19,20 +21,27 @@ test('seven bots complete a real game, including Lady of Lake and assassination,
   expect(room.data.manager.game.stage).toBe('end');
   expect(stages.has('checkLoyalty')).toBe(true);
   expect(stages.has('assassinate')).toBe(true);
+  expect(missionThinking.length).toBeGreaterThan(0);
+  expect(missionThinking.every((id) => id === undefined)).toBe(true);
   expect(room.chat.history.length).toBeGreaterThan(20);
   expect(room.ai?.status).toBe('finished');
+  expect(room.ai).not.toHaveProperty('thinkingPlayerID');
 });
 
 test('cancellation discards replies and spectators never enter prompts', async () => {
   const requests: BotRequest[] = [];
+  const thinking: (string | undefined)[] = [];
   const room = new BotRoom('privacy', 'admin', io, async (request) => {
     requests.push(request);
+    thinking.push(room.ai?.thinkingPlayerID);
     room.stop();
+    thinking.push(room.ai?.thinkingPlayerID);
     return reply(request);
   });
   room.addMessage('spectator', 'SPECTATOR_SECRET');
   await room.run();
   expect(requests).toHaveLength(1);
+  expect(thinking).toEqual([requests[0].playerID, undefined]);
   expect(JSON.stringify(requests)).not.toContain('SPECTATOR_SECRET');
   expect(room.ai?.status).toBe('stopped');
   expect(room.chat.history.filter((m) => BOT_PROFILES.some((p) => p.id === m.userID))).toHaveLength(0);
@@ -45,6 +54,7 @@ test('malformed decisions use legal fallback and repeated API failures pause spe
   await room.run();
   expect(room.ai?.status).toBe('paused');
   expect(room.ai?.fallbacks).toBe(3);
+  expect(room.ai).not.toHaveProperty('thinkingPlayerID');
 });
 
 test('ordinary lobby mutations cannot change bot configuration or add a human', () => {
@@ -80,13 +90,16 @@ test('all seven prompts enforce the initial private role visibility', async () =
   await room.run();
   expect(seen.size).toBe(7);
   const roles = new Map([...seen].map(([id, r]) => [id, r.state.players.find((p) => p.id === id)!.role]));
+  expect([...roles.values()].filter((role) => role === 'oberon')).toHaveLength(1);
+  expect([...roles.values()].filter((role) => ['mordred', 'morgana', 'oberon'].includes(role!))).toHaveLength(3);
+  expect([...roles.values()]).not.toContain('minion');
   for (const [id, request] of seen) {
     const own = roles.get(id);
     for (const player of request.state.players) {
       const actual = roles.get(player.id);
       let expected = 'unknown';
       if (player.id === id) expected = own!;
-      else if (own === 'merlin' && ['minion', 'morgana'].includes(actual!)) expected = 'evil';
+      else if (own === 'merlin' && ['minion', 'morgana', 'oberon'].includes(actual!)) expected = 'evil';
       else if (own === 'percival' && ['merlin', 'morgana'].includes(actual!)) expected = 'mysteryWizard';
       else if (['mordred', 'morgana', 'minion'].includes(own!) && ['mordred', 'morgana', 'minion'].includes(actual!))
         expected = 'evil';
@@ -282,7 +295,7 @@ test('all three evil players privately deliberate with early evidence before the
   expect(council).toHaveLength(3);
   expect(new Set(council.map((r) => r.playerID)).size).toBe(3);
   for (const r of council) {
-    expect(['mordred', 'morgana', 'minion']).toContain(r.state.players.find((p) => p.id === r.playerID)!.role);
+    expect(['mordred', 'morgana', 'oberon']).toContain(r.state.players.find((p) => p.id === r.playerID)!.role);
     expect(JSON.stringify(r)).toContain('EARLY_CLUE');
   }
   expect(JSON.stringify(final)).toContain('SECRET_COUNCIL');

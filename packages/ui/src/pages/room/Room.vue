@@ -59,7 +59,7 @@
           :gameState="game"
         />
       </div>
-      <Chat v-model:open="chatOpen" :messages="roomState.chat" :roomUuid="roomState.roomID">
+      <Chat v-model:open="chatOpen" :messages="roomState.chat" :roomUuid="roomState.roomID" :seats="chatSeats">
         <template #stickers>
           <StickerPicker :roomID="roomState.roomID" @hide-on-board="hideStickers = $event" />
         </template>
@@ -260,7 +260,13 @@ export default defineComponent({
       return [];
     });
 
+    const chatSeats = computed(() =>
+      roomState.value?.stage === 'started' && roomState.value.game.features.displayIndex
+        ? Object.fromEntries(roomState.value.game.players.map((player) => [player.id, player.index]))
+        : undefined,
+    );
     return {
+      chatSeats,
       spectatorRoles,
       spectatorDecisions,
       canRevealRoles,

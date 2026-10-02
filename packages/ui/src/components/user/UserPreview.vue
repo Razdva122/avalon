@@ -4,6 +4,7 @@
     <template v-else>
       <Avatar class="user-preview__avatar" :avatarID="userState.profile.avatar" />
       <div class="user-preview__name ml-2">
+        <span v-if="seat" class="user-seat">#{{ seat }}</span>
         {{ userState.profile.name }}
         <AdminBadge v-if="userState.profile.isAdmin === true" />
         <PremiumBadge v-else-if="userState.profile.premium" />
@@ -22,6 +23,7 @@ import { useUserProfile } from '@/helpers/composables';
 export default defineComponent({
   components: { AdminBadge, PremiumBadge, Avatar },
   props: {
+    seat: { type: Number },
     userID: {
       type: String,
       required: true,
@@ -44,6 +46,22 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.user-seat {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 22px;
+  margin-right: 6px;
+  padding: 0 5px;
+  border: 1px solid rgba(var(--v-theme-primary), 0.35);
+  border-radius: 6px;
+  color: rgb(var(--v-theme-primary));
+  background: rgba(var(--v-theme-primary), 0.1);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
 .user-preview {
   margin-bottom: 4px;
 }

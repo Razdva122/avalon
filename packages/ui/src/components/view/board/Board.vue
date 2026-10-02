@@ -42,6 +42,7 @@
         >
           <Player
             :player-state="player"
+            :thinking="roomState.ai?.status === 'running' && roomState.ai.thinkingPlayerID === player.id"
             :voice-side="Math.sin((2 * Math.PI * i) / players.length + Math.PI) > 0.75 ? 'left' : 'right'"
             :private-decision="
               roomState.ai && !playerInGame && spectatorRoles[player.id]

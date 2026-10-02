@@ -1,4 +1,5 @@
 export default {
+  thinking: '思考中',
   codexWeeklyLimit: 'Codex 每周限额',
   codexWeeklyRemaining: '剩余 {percent}%',
   codexWeeklyReset: '限额重置时间：{date}',

@@ -101,3 +101,57 @@ test('CLI failures persist a failed request and private context before pausing',
   });
   expect(repo.recordDecision.mock.calls[0][0].payload.context).toEqual({ marker: 'private' });
 });
+
+test.each([
+  { role: 'mordred', stage: 'announceLoyalty', speak: false, chat: [], targets: [null], claimants: [] },
+  { role: 'servant', stage: 'selectTeam', speak: true, chat: [], targets: [null], claimants: [] },
+  {
+    role: 'merlin',
+    stage: 'selectTeam',
+    speak: true,
+    chat: [{ name: '2', text: 'I am Percival. 3 is Morgana.' }],
+    targets: [null, 2, 3],
+    claimants: [2],
+  },
+])(
+  'runner schema admits only legal public claims for $role at $stage',
+  async ({ role, stage, speak, chat, targets, claimants }) => {
+    process.env.NODE_ENV = 'development';
+    process.env.AI_CODEX_ENABLED = 'true';
+    const current = {
+      ...request,
+      playerID: 'a',
+      speak,
+      chat,
+      state: {
+        ...request.state,
+        stage,
+        players: [
+          { id: 'a', index: 1, role },
+          { id: 'b', index: 2, role: 'unknown' },
+          { id: 'c', index: 3, role: 'unknown' },
+        ],
+      },
+    } as unknown as BotRequest;
+    const runner = async (_prompt: string, schema: ReturnType<typeof codexSchema>) => {
+      // These limits must be sent to the CLI, rather than merely checked after generation.
+      expect(schema.properties.claimMorgana).toMatchObject({ enum: targets });
+      expect(schema.properties.claimStances).toMatchObject({ minItems: claimants.length, maxItems: claimants.length });
+      if (claimants.length)
+        expect(schema.properties.claimStances!.items.properties.seat).toMatchObject({ enum: claimants });
+      return {
+        text: JSON.stringify({
+          choice: current.choices[0],
+          speech: 'I support this action.',
+          publicReason: '',
+          evidence: [],
+          claimMorgana: null,
+          claimStances: claimants.map((seat) => ({ seat, stance: 'distrust' })),
+        }),
+        usage: {},
+      };
+    };
+    const repo = { recordDecision: jest.fn(), recordRequest: jest.fn(), renewLease: jest.fn() };
+    expect((await codexDecide('match', repo, runner)(current, { decisionDetails: true })).choice).toBe(0);
+  },
+);

@@ -30,10 +30,16 @@
             <button
               class="message-author"
               type="button"
-              :aria-label="$t('chat.viewAuthor', { name: authorName(group.userID) })"
+              :aria-label="
+                $t('chat.viewAuthor', {
+                  name: seats?.[group.userID]
+                    ? `#${seats[group.userID]} ${authorName(group.userID)}`
+                    : authorName(group.userID),
+                })
+              "
               @click="selectedUser = group.userID"
             >
-              <UserPreview :userID="group.userID" size="chat" />
+              <UserPreview :userID="group.userID" size="chat" :seat="seats?.[group.userID]" />
             </button>
             <div
               v-for="entry in group.entries"
@@ -178,7 +184,12 @@ import { groupMessages, useRoomChat } from '@/helpers/composables/useRoomChat';
 import UserPreview from '@/components/user/UserPreview.vue';
 import UserHoverCard from '@/components/user/UserHoverCard.vue';
 import StickerImage from '@/components/stickers/StickerImage.vue';
-const props = defineProps<{ roomUuid: string; messages: ChatMessage[]; open: boolean }>();
+const props = defineProps<{
+  roomUuid: string;
+  messages: ChatMessage[];
+  open: boolean;
+  seats?: Record<string, number>;
+}>();
 const emit = defineEmits<{ (event: 'update:open', value: boolean): void }>();
 const store = useStore();
 const { locale, t } = useI18n();

@@ -44,6 +44,8 @@ export type AiRoomState = {
   /** Restored inference label for archives that predate saved Codex settings. */
   playedModel?: string;
   status: 'ready' | 'running' | 'paused' | 'finished' | 'stopped';
+  /** The AI seat currently awaiting generation; cleared when idle or paused. */
+  thinkingPlayerID?: string;
   canResumeBudget?: boolean;
   canResumeTechnical?: boolean;
   costRub?: number;
