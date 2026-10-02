@@ -80,3 +80,26 @@ test('worker accepts only game decision input or read-only discovery operations'
   assert.doesNotThrow(() => validateRequest({ operation: 'models' }));
   assert.doesNotThrow(() => validateRequest({ operation: 'limits' }));
 });
+
+test('worker reports exhausted subscription quota without exposing raw CLI diagnostics', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'worker-quota-test-'));
+  try {
+    await writeFile(
+      join(directory, 'codex'),
+      `#!${process.execPath}\nprocess.stdin.resume();process.stdin.on('end',()=>{console.log(JSON.stringify({type:'turn.failed',error:{message:'You’ve hit your usage limit. PRIVATE_DIAGNOSTIC'}}));setInterval(()=>{},1000)});`,
+      { mode: 0o700 },
+    );
+    const child = spawn(process.execPath, [join(__dirname, 'worker.cjs')], {
+      env: { ...process.env, PATH: `${directory}:${process.env.PATH}` },
+    });
+    let stdout = '';
+    child.stdout.on('data', (chunk) => (stdout += chunk));
+    const done = new Promise((resolve) => child.on('close', resolve));
+    child.stdin.end(JSON.stringify({ operation: 'decide', prompt: 'game', schema: { type: 'object' } }));
+    assert.equal(await done, 0);
+    assert.deepEqual(JSON.parse(stdout), { ok: false, error: 'usage_limit' });
+    assert.equal(stdout.includes('PRIVATE_DIAGNOSTIC'), false);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});

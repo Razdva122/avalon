@@ -1,4 +1,6 @@
 export default {
+  codexShortTermLimit: 'Лимит Codex на 5 часов',
+  codexLimitReached: 'Лимит Codex исчерпан. Дождитесь обновления и продолжите партию.',
   thinking: 'Думает',
   codexWeeklyLimit: 'Недельный лимит Codex',
   codexWeeklyRemaining: 'Осталось {percent}%',

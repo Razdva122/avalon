@@ -58,7 +58,8 @@ export default {
     witchInfo:
       'Pode ocultar o resultado de uma missão, mas isso dará uma verificação de lealdade a um jogador aleatório',
     revealerInfo: 'Revela-se após a segunda missão falha',
-    clericInfo: 'Conhece a lealdade do líder da primeira missão. Deve permanecer oculto',
+    clericInfo:
+      'Conhece a lealdade do líder da primeira missão. Deve permanecer oculto: para vencer assassinando o Clérigo, o mal precisa identificá-lo e depois acertar outro jogador do bem e seu papel exato.',
     unknownInfo: 'Papel desconhecido',
     mysteryWizardInfo: 'Um dos dois magos é bom (Merlin) ou mau (Morgana)',
     unknownLancelotInfo: 'Lancelot, cuja lealdade não é conhecida',

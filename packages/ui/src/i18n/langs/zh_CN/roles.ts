@@ -56,7 +56,8 @@ export default {
     bruteInfo: '可能只会失败前三个任务',
     witchInfo: '可以隐藏一次任务的结果，但这会给一个随机玩家忠诚检测',
     revealerInfo: '在第二次任务失败后揭露自己',
-    clericInfo: '知道第一次任务领导者的忠诚情况。必须保持隐藏',
+    clericInfo:
+      '知道第一次任务队长的忠诚情况。必须隐藏身份：坏人若要通过刺杀牧师获胜，须先猜中牧师，再猜中另一名好人及其具体角色。',
     unknownInfo: '未知角色',
     mysteryWizardInfo: '两个玩家之一是好人方的(梅林)还是坏人的(莫甘娜)',
     unknownLancelotInfo: '兰斯洛特,谁的忠诚无人知晓',

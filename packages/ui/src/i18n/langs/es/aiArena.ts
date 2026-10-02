@@ -1,4 +1,6 @@
 export default {
+  codexShortTermLimit: 'Límite de Codex de 5 horas',
+  codexLimitReached: 'Se agotó el límite de Codex. Espera a que se restablezca y reanuda la partida.',
   thinking: 'Pensando',
   codexWeeklyLimit: 'Límite semanal de Codex',
   codexWeeklyRemaining: 'Queda {percent}%',

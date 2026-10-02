@@ -9,7 +9,19 @@ export function parseWeeklyLimit(value: unknown, checkedAt = Date.now()): CodexW
   const bucket = response?.rateLimitsByLimitId ? response.rateLimitsByLimitId.codex : response?.rateLimits;
   const week = [bucket?.primary, bucket?.secondary].find((window) => window?.windowDurationMins === 10080);
   if (!week || typeof week.usedPercent !== 'number' || !Number.isFinite(week.usedPercent)) return null;
+  const short = [bucket?.primary, bucket?.secondary].find((window) => window?.windowDurationMins === 300);
+  const shortTerm =
+    short && typeof short.usedPercent === 'number' && Number.isFinite(short.usedPercent)
+      ? {
+          remainingPercent: Math.max(0, Math.min(100, 100 - short.usedPercent)),
+          resetsAt:
+            typeof short.resetsAt === 'number' && Number.isFinite(short.resetsAt) && short.resetsAt > 0
+              ? short.resetsAt
+              : null,
+        }
+      : undefined;
   return {
+    ...(shortTerm ? { shortTerm } : {}),
     remainingPercent: Math.max(0, Math.min(100, 100 - week.usedPercent)),
     resetsAt:
       typeof week.resetsAt === 'number' && Number.isFinite(week.resetsAt) && week.resetsAt > 0 ? week.resetsAt : null,

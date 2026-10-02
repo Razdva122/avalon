@@ -1,4 +1,6 @@
 export default {
+  codexShortTermLimit: 'Codex 5 小時限額',
+  codexLimitReached: 'Codex 使用限額已用盡。請等待重設後繼續對局。',
   thinking: '思考中',
   codexWeeklyLimit: 'Codex 每週限額',
   codexWeeklyRemaining: '剩餘 {percent}%',

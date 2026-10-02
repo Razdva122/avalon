@@ -1,12 +1,19 @@
 <template>
   <div class="codex-weekly-limit" aria-live="polite">
     <template v-if="weekly">
-      <div class="quota-heading">
-        <span>{{ $t('aiArena.codexWeeklyLimit') }}</span>
-        <strong>{{ $t('aiArena.codexWeeklyRemaining', { percent: Math.round(weekly.remainingPercent) }) }}</strong>
-      </div>
-      <progress :value="weekly.remainingPercent" max="100" :aria-label="$t('aiArena.codexWeeklyLimit')" />
-      <p v-if="weekly.resetsAt" class="quota-hint">{{ $t('aiArena.codexWeeklyReset', { date: resetDate }) }}</p>
+      <section v-for="window in windows" :key="window.label" class="quota-window">
+        <div class="quota-heading">
+          <span>{{ $t(window.label) }}</span>
+          <strong>{{ $t('aiArena.codexWeeklyRemaining', { percent: Math.round(window.remainingPercent) }) }}</strong>
+        </div>
+        <progress :value="window.remainingPercent" max="100" :aria-label="$t(window.label)" />
+        <p v-if="window.resetsAt" class="quota-hint">
+          {{ $t('aiArena.codexWeeklyReset', { date: formatReset(window.resetsAt) }) }}
+        </p>
+      </section>
+      <p v-if="windows.some((window) => window.remainingPercent === 0)" class="quota-blocked" role="status">
+        {{ $t('aiArena.codexLimitReached') }}
+      </p>
       <p class="quota-hint">{{ $t('aiArena.codexWeeklyShared') }}</p>
     </template>
     <p v-else>{{ $t(loading ? 'mainPage.loading' : 'aiArena.codexWeeklyUnavailable') }}</p>
@@ -23,16 +30,21 @@ const loading = ref(true);
 let stopped = false;
 let fetching = false;
 let timer: ReturnType<typeof setInterval> | undefined;
-const resetDate = computed(() =>
-  weekly.value?.resetsAt
-    ? new Date(weekly.value.resetsAt * 1000).toLocaleString(locale.value, {
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : '',
+const windows = computed(() =>
+  weekly.value
+    ? [
+        ...(weekly.value.shortTerm ? [{ ...weekly.value.shortTerm, label: 'aiArena.codexShortTermLimit' }] : []),
+        { ...weekly.value, label: 'aiArena.codexWeeklyLimit' },
+      ]
+    : [],
 );
+const formatReset = (timestamp: number) =>
+  new Date(timestamp * 1000).toLocaleString(locale.value, {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 async function refresh() {
   if (fetching || stopped) return;
   fetching = true;
@@ -60,6 +72,15 @@ onBeforeUnmount(() => {
   padding: 12px 16px;
   border: 1px solid rgba(var(--v-theme-on-surface), 0.16);
   border-radius: 12px;
+}
+.quota-window + .quota-window {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.16);
+}
+.quota-blocked {
+  margin: 12px 0 8px;
+  font-weight: 600;
 }
 .quota-heading {
   display: flex;

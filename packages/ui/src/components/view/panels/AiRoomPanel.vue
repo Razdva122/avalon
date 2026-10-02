@@ -11,7 +11,13 @@
         <span class="sr-only">{{ $t('aiArena.controls') }}</span>
       </summary>
       <div class="ai-details">
-        <p aria-live="polite">{{ ai.message }}</p>
+        <p aria-live="polite">
+          {{
+            ai.message?.startsWith('Codex subscription usage limit reached.')
+              ? $t('aiArena.codexLimitReached')
+              : ai.message
+          }}
+        </p>
         <p v-if="ai.model === 'codex-chatgpt'">{{ $t('aiArena.codexSubscription') }}</p>
         <CodexWeeklyLimit v-if="canManage && ai.model === 'codex-chatgpt'" />
         <div v-if="canManage && ai.model === 'codex-chatgpt' && ai.status === 'ready'" class="codex-settings">

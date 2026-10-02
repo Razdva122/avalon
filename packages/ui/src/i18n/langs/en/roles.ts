@@ -57,7 +57,8 @@ export default {
     bruteInfo: 'May fail only first three missions',
     witchInfo: 'Can hide the result of one mission, but this will give a loyalty check to a random player',
     revealerInfo: 'Reveal herself after second failed mission',
-    clericInfo: 'Knows loyalty of the leader of the first mission. Must remain hidden',
+    clericInfo:
+      'Knows the loyalty of the first mission leader. Must remain hidden: evil needs to identify the Cleric, then another good player and their exact role to win by assassinating the Cleric.',
     unknownInfo: 'Unknown role',
     mysteryWizardInfo: 'One of the two wizards is good (Merlin) or evil (Morgana)',
     unknownLancelotInfo: 'Lancelot, whose loyalty is not known',

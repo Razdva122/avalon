@@ -51,7 +51,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       'Normalmente, uma Falha { evilLoyaltyIcon } faz a missão fracassar; sem nenhuma, ela tem sucesso { goodLoyaltyIcon }. A exceção é a quarta missão com 7–10 jogadores: são necessárias pelo menos duas Falhas, então apenas uma ainda permite o sucesso.',
     conclusionOfGameplayTitle: 'Conclusão do Jogo',
     gameplayEndsCondition:
-      'Três missões fracassadas dão vitória imediata ao mal. Após três sucessos, começa o assassinato: no original, o Assassino indica um jogador do bem após conversar com sua equipe. Se for {merlin}, o mal vence; caso contrário, o bem vence. Aqui, a equipe do mal realiza o assassinato; papéis personalizados podem incluir outros alvos.',
+      'Três missões fracassadas dão vitória imediata ao mal. Após três sucessos, começa o assassinato: no original, o Assassino indica um jogador do bem após conversar com sua equipe. Se for {merlin}, o mal vence; caso contrário, o bem vence. Aqui, a equipe do mal realiza o assassinato; papéis personalizados podem incluir outros alvos. Para vencer assassinando o Clérigo após três missões bem-sucedidas, o mal deve identificar dois jogadores em sequência: primeiro o Clérigo e depois outro jogador do bem, escolhendo tanto o jogador quanto seu papel exato na lista disponível. É preciso acertar ambos; um erro em qualquer etapa dá a vitória ao bem.',
     strategicDiscussion:
       'Através de discussão estratégica, observação cuidadosa e táticas inteligentes, cada lado deve fazer o seu melhor para alcançar seus objetivos sem revelar suas verdadeiras lealdades, fazendo com que cada rodada de Avalon: The Resistance se desenrole de maneira única e cheia de suspense.',
     assassinNote:
@@ -159,7 +159,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       'Normally, one Fail { evilLoyaltyIcon } makes the mission fail; otherwise it succeeds { goodLoyaltyIcon }. The exception is mission four with 7–10 players: it requires at least two Fails, so a single Fail still gives a successful mission.',
     conclusionOfGameplayTitle: 'Conclusion of Gameplay',
     gameplayEndsCondition:
-      'Three failed missions immediately give evil the win. After three successful missions, stop questing and resolve the assassination: in the original game, the Assassin names one good player after discussion with the evil team. If that player is {merlin}, evil wins; otherwise good wins. On this platform, the evil team handles assassination, with other targets possible in custom role setups.',
+      'Three failed missions immediately give evil the win. After three successful missions, stop questing and resolve the assassination: in the original game, the Assassin names one good player after discussion with the evil team. If that player is {merlin}, evil wins; otherwise good wins. On this platform, the evil team handles assassination, with other targets possible in custom role setups. To win by assassinating the Cleric after three successful missions, evil must identify two players in order: first the Cleric, then another good player, selecting both that player and their exact role from the available list. Both guesses must be correct; a wrong guess at either stage gives good the win.',
     strategicDiscussion:
       'Through strategic discussion, careful observation, and clever tactics, each side must do their best to achieve their objectives without revealing their true allegiances, making each round of Avalon: The Resistance play out uniquely and full of suspense.',
     assassinNote:
@@ -266,7 +266,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       'Обычно одна карта Провала { evilLoyaltyIcon } проваливает миссию; без неё миссия успешна { goodLoyaltyIcon }. Исключение — четвёртая миссия при 7–10 игроках: нужны хотя бы два провала, поэтому с одной картой Провала миссия всё ещё успешна.',
     conclusionOfGameplayTitle: 'Завершение игры',
     gameplayEndsCondition:
-      'Три проваленные миссии сразу приносят победу злу. После трёх успешных миссий начинается убийство: в оригинале Убийца после обсуждения со злом называет одного доброго игрока. Если это {merlin}, побеждает зло; иначе — добро. На платформе убийство выполняет команда зла; пользовательские наборы ролей могут добавлять другие цели.',
+      'Три проваленные миссии сразу приносят победу злу. После трёх успешных миссий начинается убийство: в оригинале Убийца после обсуждения со злом называет одного доброго игрока. Если это {merlin}, побеждает зло; иначе — добро. На платформе убийство выполняет команда зла; пользовательские наборы ролей могут добавлять другие цели. Чтобы победить через убийство Клирика после трёх успешных миссий, зло должно последовательно угадать двух игроков: сначала Клирика, затем ещё одного мирного, выбрав и игрока, и его конкретную роль из доступного списка. Оба попадания обязательны; ошибка на любом этапе приносит победу добру.',
     strategicDiscussion:
       'Посредством стратегических обсуждений, внимательных наблюдений и хитроумных тактик каждая сторона должна делать всё возможное, чтобы достичь своих целей, не раскрывая свою истинную принадлежность, делая каждый раунд игры Avalon: The Resistance уникальным и полным напряжения.',
     assassinNote:
@@ -364,7 +364,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       '通常只要一张失败 { evilLoyaltyIcon } 牌，任务就失败；没有失败牌则成功 { goodLoyaltyIcon }。例外是 7–10 人局的第四次任务：至少两张失败牌才会失败，因此只有一张失败牌仍算成功。',
     conclusionOfGameplayTitle: '游戏结束',
     gameplayEndsCondition:
-      '累计三次任务失败，坏人立即获胜。累计三次成功后停止任务，进入刺杀：原版由刺客与坏人讨论后，指认一名好人。如果对方是{merlin}，坏人获胜；猜错则好人获胜。本站由邪恶阵营处理刺杀，自定义角色配置也可能加入其他刺杀目标。',
+      '累计三次任务失败，坏人立即获胜。累计三次成功后停止任务，进入刺杀：原版由刺客与坏人讨论后，指认一名好人。如果对方是{merlin}，坏人获胜；猜错则好人获胜。本站由邪恶阵营处理刺杀，自定义角色配置也可能加入其他刺杀目标。 三次任务成功后，若坏人选择刺杀牧师，必须依次猜中两名玩家：先找出牧师，再从可选列表中选择另一名好人的具体角色，并指出持有该角色的玩家。两次都猜对，坏人才获胜；任一阶段猜错，好人获胜。',
     strategicDiscussion:
       '通过战略讨论、仔细观察和聪明的战术，每一方都必须尽力实现他们的目标，而不暴露他们的真实效忠，使每一轮《阿瓦隆：反抗组织》的游戏过程独特而充满悬念。',
     assassinNote:
@@ -460,7 +460,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       '通常只要一張失敗 { evilLoyaltyIcon } 牌，任務就失敗；沒有失敗牌則成功 { goodLoyaltyIcon }。唯一的人數例外是 7–10 人局的第四次任務：至少兩張失敗牌才會失敗，因此只有一張失敗牌仍算成功。',
     conclusionOfGameplayTitle: '遊戲結束',
     gameplayEndsCondition:
-      '累計三次任務失敗，壞人立即獲勝。累計三次成功後停止任務，進入刺殺：原版由刺客與壞人討論後，指認一名好人。如果對方是{merlin}，壞人獲勝；猜錯則好人獲勝。本站由邪惡陣營處理刺殺，自訂角色配置也可能加入其他刺殺目標。',
+      '累計三次任務失敗，壞人立即獲勝。累計三次成功後停止任務，進入刺殺：原版由刺客與壞人討論後，指認一名好人。如果對方是{merlin}，壞人獲勝；猜錯則好人獲勝。本站由邪惡陣營處理刺殺，自訂角色配置也可能加入其他刺殺目標。 三次任務成功後，若壞人選擇刺殺牧師，必須依序猜中兩名玩家：先找出牧師，再從可選清單中選擇另一名好人的具體角色，並指出持有該角色的玩家。兩次都猜對，壞人才獲勝；任一階段猜錯，好人獲勝。',
     strategicDiscussion:
       '任務成功不代表隊員全是好人。把組隊名單、投票紀錄與任務結果一起比較，並留意誰的說法前後不一致。',
     assassinNote:
@@ -563,7 +563,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       'Normalmente, un Fracaso { evilLoyaltyIcon } hace fallar la misión; sin ninguno, tiene éxito { goodLoyaltyIcon }. La excepción es la cuarta misión con 7–10 jugadores: hacen falta al menos dos Fracasos, así que uno solo no impide el éxito.',
     conclusionOfGameplayTitle: 'Conclusión del Juego',
     gameplayEndsCondition:
-      'Tres misiones fallidas dan la victoria inmediata al mal. Tras tres éxitos, se pasa al asesinato: en el original, el Asesino nombra a un jugador del bien después de debatir con su equipo. Si es {merlin}, gana el mal; si no, gana el bien. Aquí lo gestiona el equipo del mal; los roles personalizados pueden añadir otros objetivos.',
+      'Tres misiones fallidas dan la victoria inmediata al mal. Tras tres éxitos, se pasa al asesinato: en el original, el Asesino nombra a un jugador del bien después de debatir con su equipo. Si es {merlin}, gana el mal; si no, gana el bien. Aquí lo gestiona el equipo del mal; los roles personalizados pueden añadir otros objetivos. Para ganar asesinando al Clérigo tras tres misiones exitosas, el mal debe identificar a dos jugadores en orden: primero al Clérigo y después a otro jugador del bien, eligiendo tanto al jugador como su rol exacto de la lista disponible. Debe acertar ambos; un error en cualquiera de las dos etapas da la victoria al bien.',
     strategicDiscussion:
       'A través de discusiones estratégicas, observaciones cuidadosas y tácticas inteligentes, cada bando debe hacer lo mejor para lograr sus objetivos sin revelar sus verdaderas lealtades, haciendo que cada ronda de Avalon: La Resistencia sea única y llena de suspense.',
     assassinNote:

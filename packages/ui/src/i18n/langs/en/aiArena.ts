@@ -1,4 +1,6 @@
 export default {
+  codexShortTermLimit: 'Codex 5-hour limit',
+  codexLimitReached: 'Codex usage limit reached. Wait for it to reset, then resume the match.',
   thinking: 'Thinking',
   codexWeeklyLimit: 'Codex weekly limit',
   codexWeeklyRemaining: '{percent}% remaining',

@@ -178,6 +178,7 @@ export type AiSpectatorDecision = {
 };
 
 export interface CodexWeeklyLimit {
+  shortTerm?: { remainingPercent: number; resetsAt: number | null };
   remainingPercent: number;
   resetsAt: number | null;
   checkedAt: number;

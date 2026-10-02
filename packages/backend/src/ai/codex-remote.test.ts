@@ -89,3 +89,10 @@ test('game decisions, model catalog and weekly quota use the remote worker when 
   expect(await getCodexModels()).toEqual([{ id: 'gpt-6.1-sol', label: 'Sol', efforts: ['low'] }]);
   expect(await readCodexWeeklyLimit()).toMatchObject({ remainingPercent: 75, resetsAt: 2000000000 });
 });
+
+test('exhausted subscription quota gives an actionable pause reason', async () => {
+  await executable(
+    `process.stdin.resume();process.stdin.on('end',()=>console.log('{"ok":false,"error":"usage_limit"}'));`,
+  );
+  await expect(remoteCodex({ operation: 'decide' })).rejects.toThrow('subscription usage limit');
+});

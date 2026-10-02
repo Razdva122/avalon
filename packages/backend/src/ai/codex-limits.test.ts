@@ -78,3 +78,22 @@ test('read-only account request initializes before querying, uses selected profi
     jest.resetAllMocks();
   }
 });
+
+test('returns the exhausted five-hour window alongside remaining weekly quota', () => {
+  expect(
+    parseWeeklyLimit(
+      {
+        rateLimits: {
+          primary: { usedPercent: 100, windowDurationMins: 300, resetsAt: 1790953112 },
+          secondary: { usedPercent: 41, windowDurationMins: 10080, resetsAt: 1791484250 },
+        },
+      },
+      100,
+    ),
+  ).toEqual({
+    remainingPercent: 59,
+    resetsAt: 1791484250,
+    checkedAt: 100,
+    shortTerm: { remainingPercent: 0, resetsAt: 1790953112 },
+  });
+});

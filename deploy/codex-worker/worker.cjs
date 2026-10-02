@@ -135,7 +135,8 @@ async function decide(request) {
       let buffer = '',
         bytes = 0,
         tokens = {},
-        failure = false;
+        failure = false,
+        failureReason = 'failed';
       const timer = setTimeout(() => {
         failure = true;
         child.kill('SIGKILL');
@@ -160,6 +161,14 @@ async function decide(request) {
           try {
             const event = JSON.parse(line);
             if (event.type === 'turn.completed') tokens = event.usage || {};
+            // Return only a safe category, never raw CLI messages or account details.
+            if (
+              ['error', 'turn.failed'].includes(event.type) &&
+              /(?:hit|reached|exceeded) your usage limit|usage_limit_reached/i.test(
+                event.error?.message || event.message || '',
+              )
+            )
+              failureReason = 'usage_limit';
             if (
               event.type === 'turn.failed' ||
               ['command_execution', 'mcp_tool_call', 'web_search', 'file_change'].includes(event.item?.type)
@@ -174,7 +183,7 @@ async function decide(request) {
       });
       child.on('close', (code) => {
         clearTimeout(timer);
-        if (failure || code !== 0) reject(Error('failed'));
+        if (failure || code !== 0) reject(Error(failureReason));
         else resolve(tokens);
       });
       child.stdin.end(request.prompt);
@@ -206,9 +215,11 @@ async function main() {
     clearTimeout(inputTimer);
     const result = await handleRequest(JSON.parse(input));
     process.stdout.write(JSON.stringify({ ok: true, result }) + '\n');
-  } catch {
+  } catch (error) {
     clearTimeout(inputTimer);
-    process.stdout.write('{"ok":false,"error":"failed"}\n');
+    process.stdout.write(
+      JSON.stringify({ ok: false, error: error.message === 'usage_limit' ? 'usage_limit' : 'failed' }) + '\n',
+    );
   }
 }
 module.exports = { validateRequest, handleRequest };
