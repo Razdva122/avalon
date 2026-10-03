@@ -21,10 +21,14 @@ export default defineComponent({
 
     return {
       time,
+      intervalID: undefined as ReturnType<typeof setInterval> | undefined,
     };
   },
   created() {
     this.initTimer();
+  },
+  beforeUnmount() {
+    this.clearTimer();
   },
   watch: {
     duration() {
@@ -33,16 +37,21 @@ export default defineComponent({
     },
   },
   methods: {
+    clearTimer() {
+      if (this.intervalID !== undefined) clearInterval(this.intervalID);
+      this.intervalID = undefined;
+    },
     initTimer() {
+      this.clearTimer();
       if (this.time <= 0) {
         return;
       }
 
-      const id = setInterval(() => {
-        this.time -= 1000;
-        if (this.time < 0) {
+      this.intervalID = setInterval(() => {
+        this.time = Math.max(0, this.time - 1000);
+        if (this.time === 0) {
+          this.clearTimer();
           this.$emit('timerEnd');
-          clearInterval(id);
         }
       }, 1000);
     },

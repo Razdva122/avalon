@@ -1,13 +1,16 @@
 <template>
   <div class="board-and-timer">
     <div class="wrapper">
-      <div class="board-container" :class="'view-mode-' + stateManager.viewMode.value">
-        <div class="game-board" alt="board" :class="'game-end-' + gameResult"></div>
+      <div ref="boardRef" class="board-container" :class="'view-mode-' + stateManager.viewMode.value">
+        <div class="game-board" alt="board" :class="'game-end-' + (assassinationActive ? '' : gameResult)"></div>
         <slot name="content">
           <div class="timer" v-if="timerDuration > 0">
             <Timer @timerEnd="clearHistoryElement" :duration="timerDuration" />
           </div>
-          <div class="actions-container d-flex flex-column justify-center">
+          <div
+            class="actions-container d-flex flex-column justify-center"
+            :class="{ 'during-assassination': assassinationActive }"
+          >
             <template v-if="roomState.stage !== 'started'">
               <div class="options-panel mb-4">
                 <div class="options-title">{{ $t('game.rolesAndAddons') }}</div>
@@ -41,7 +44,10 @@
           :key="player.id"
         >
           <Player
+            :data-player-id="player.id"
             :player-state="player"
+            :loyalty-badge="loyaltyBadges[player.id]"
+            :badge-hidden="activeLoyaltyTarget === player.id"
             :thinking="roomState.ai?.status === 'running' && roomState.ai.thinkingPlayerID === player.id"
             :voice-side="Math.sin((2 * Math.PI * i) / players.length + Math.PI) > 0.75 ? 'left' : 'right'"
             :private-decision="
@@ -58,6 +64,8 @@
             @player-click="onPlayerClick"
           />
         </div>
+        <div ref="loyaltyEffectRef" class="board-event-effects" aria-hidden="true"></div>
+        <div ref="cardEffectRef" class="board-card-effect" aria-hidden="true"></div>
       </div>
     </div>
 
@@ -88,7 +96,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, inject, watch, ref, PropType, toRefs, nextTick } from 'vue';
+import { defineComponent, computed, inject, watch, ref, PropType, toRefs, nextTick, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import Player from '@/components/view/board/modules/Player.vue';
@@ -100,15 +108,30 @@ import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
 import CustomTimerControls from '@/components/view/board/modules/CustomTimerControls.vue';
 import eventBus from '@/helpers/event-bus';
-import { THistoryResults, AiSpectatorDecision, TRoles } from '@avalon/types';
+import { THistoryResults, AiSpectatorDecision, TRoles, VisualGameState } from '@avalon/types';
 import { hasActiveCard, useHaveActiveLoyaltyCard, isAdjacentPlayer, isPlayerOnMission } from '@/helpers/plot-cards';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 import { gameStateKey, stateManagerKey, TPageRoomState } from '@/helpers/game-state-manager';
-import { calculateVisualElement } from '@/components/view/board/helpers';
+import {
+  calculateVisualElement,
+  createLiveEventTracker,
+  assassinationReveal,
+  loyaltyBadge,
+} from '@/components/view/board/helpers';
+import { getThumbnailPathByID } from '@/helpers/images';
+import { calculateRoleUrl } from '@/helpers/styles';
+import {
+  renderAssassination,
+  renderLoyalty,
+  ASSASSINATION_REVEAL_DURATION,
+  LOYALTY_REVEAL_DURATION,
+} from './animations/render';
+import './animations/style.scss';
 
 export default defineComponent({
   name: 'Board',
+  emits: ['assassination-active'],
   components: {
     Player,
     Game,
@@ -127,7 +150,7 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const { t } = useI18n();
     const router = useRouter();
     const { roomState } = toRefs(props);
@@ -135,7 +158,179 @@ export default defineComponent({
     const stateManager = inject(stateManagerKey)!;
     const store = useStore();
     const visibleHistory = ref<THistoryResults>();
+    const visibleHistoryIndex = ref(-1);
     const timerDuration = ref(0);
+    const boardRef = ref<HTMLElement>();
+    const cardEffectRef = ref<HTMLElement>();
+    const loyaltyEffectRef = ref<HTMLElement>();
+    const assassinationActive = ref(false);
+    watch(assassinationActive, (active) => emit('assassination-active', active), { immediate: true });
+    const activeReveal = ref<ReturnType<typeof assassinationReveal>>();
+    const activeLoyaltyTarget = ref<string>();
+    const maskedPlayers = ref<VisualGameState['players']>();
+    let beforeAttack: VisualGameState['players'] | undefined;
+    let cleanupAnimation: (() => void) | undefined;
+    let effectTimer: ReturnType<typeof setTimeout> | undefined;
+    let effectGeneration = 0;
+    const liveGame = computed(() => (roomState.value.stage === 'started' ? roomState.value.game : undefined));
+    const eventTracker = createLiveEventTracker(liveGame.value);
+    const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clearEffect = () => {
+      effectGeneration++;
+      if (effectTimer) clearTimeout(effectTimer);
+      effectTimer = undefined;
+      cleanupAnimation?.();
+      cleanupAnimation = undefined;
+      assassinationActive.value = false;
+      activeReveal.value = undefined;
+      activeLoyaltyTarget.value = undefined;
+      maskedPlayers.value = undefined;
+    };
+    onUnmounted(clearEffect);
+
+    const playerName = (id: string) => {
+      const user = store.state.users[id];
+      return user?.status === 'ready' ? user.profile.name : '…';
+    };
+    // Public profiles can arrive after the animation starts, especially for AI players.
+    watch(
+      () =>
+        activeReveal.value
+          ? {
+              selected: playerName(activeReveal.value.selectedID),
+              survivor: playerName(activeReveal.value.targetID),
+            }
+          : undefined,
+      (names) => {
+        if (!names) return;
+        cardEffectRef.value?.querySelectorAll<HTMLElement>('[data-card-owner]').forEach((label) => {
+          const name = label.dataset.cardOwner === 'selected' ? names.selected : names.survivor;
+          label.textContent = name;
+          label.title = name;
+        });
+      },
+      { flush: 'post' },
+    );
+
+    const loyaltyBadges = computed(() => {
+      const badges: Record<string, { team: 'good' | 'evil'; sourceName: string }> = {};
+      const badge = loyaltyBadge(visibleHistory.value);
+      if (badge) {
+        const source = store.state.users[badge.sourceID];
+        badges[badge.targetID] = {
+          team: badge.team,
+          sourceName: source?.status === 'ready' ? source.profile.name : '…',
+        };
+      }
+      return badges;
+    });
+
+    const playerGeometry = (id: string) => {
+      const board = boardRef.value;
+      const seat = Array.from(board?.querySelectorAll<HTMLElement>('[data-player-id]') ?? []).find(
+        (node) => node.dataset.playerId === id,
+      );
+      const frame = seat?.querySelector('.player-frame');
+      if (!board || !frame) return;
+      const area = board.getBoundingClientRect();
+      const portrait = frame.getBoundingClientRect();
+      const scale = area.width / board.offsetWidth;
+      return {
+        x: (portrait.x + portrait.width / 2 - area.x) / scale,
+        y: (portrait.y + portrait.height / 2 - area.y) / scale,
+        radius: portrait.width / (2 * scale),
+      };
+    };
+
+    const playVisibleEvent = async () => {
+      if (stateManager.viewMode.value !== 'live' || !liveGame.value) return;
+      const game = liveGame.value;
+      const reveal = gameState.value?.stage === 'end' ? assassinationReveal(game) : undefined;
+      const event = reveal ? game.history[game.history.length - 1] : visibleHistory.value;
+      const badge = loyaltyBadge(event);
+      if (!reveal && !badge) return;
+      const index = reveal ? game.history.length - 1 : visibleHistoryIndex.value;
+      if (!eventTracker.take(index)) return;
+      clearEffect();
+      const generation = effectGeneration;
+      if (reveal) {
+        assassinationActive.value = true;
+        activeReveal.value = reveal;
+        maskedPlayers.value = beforeAttack;
+      } else if (badge && !reducedMotion()) activeLoyaltyTarget.value = badge.targetID;
+      await nextTick();
+      if (generation !== effectGeneration || stateManager.viewMode.value !== 'live') return;
+      if (reveal && cardEffectRef.value) {
+        cleanupAnimation = renderAssassination(cardEffectRef.value, {
+          roleImage: calculateRoleUrl(reveal.role),
+          playerName: playerName(reveal.selectedID),
+          survivorImage: calculateRoleUrl(reveal.targetRole),
+          survivorName: playerName(reveal.targetID),
+          hit: reveal.hit,
+          reducedMotion: reducedMotion(),
+        });
+        effectTimer = setTimeout(clearEffect, ASSASSINATION_REVEAL_DURATION);
+      } else if (badge && loyaltyEffectRef.value && boardRef.value) {
+        const source = playerGeometry(badge.sourceID);
+        const target = playerGeometry(badge.targetID);
+        if (!source || !target) {
+          clearEffect();
+          return;
+        }
+        cleanupAnimation = renderLoyalty(loyaltyEffectRef.value, {
+          teamImage: getThumbnailPathByID(
+            'core',
+            badge.team === 'good' ? 'blue_team_no_background' : 'red_team_no_background',
+          ),
+          ladyImage: getThumbnailPathByID('features', 'lady_of_lake'),
+          source,
+          target,
+          width: boardRef.value.offsetWidth,
+          height: boardRef.value.offsetHeight,
+          reducedMotion: reducedMotion(),
+        });
+        effectTimer = setTimeout(clearEffect, reducedMotion() ? 0 : LOYALTY_REVEAL_DURATION);
+      } else clearEffect();
+    };
+
+    // Replay generation can mutate oldGame.history; cache its length as a primitive watch source.
+    watch(
+      [liveGame, () => liveGame.value?.history.length, stateManager.snapshotRevision, stateManager.viewMode],
+      ([game, length, revision, mode], [oldGame, oldLength, oldRevision, oldMode]) => {
+        const reset = revision !== oldRevision || mode !== oldMode;
+        if (reset || game?.uuid !== oldGame?.uuid) clearEffect();
+        if (
+          !reset &&
+          mode === 'live' &&
+          game &&
+          oldGame &&
+          game.uuid === oldGame.uuid &&
+          length === (oldLength ?? 0) + 1
+        ) {
+          const event = game.history[game.history.length - 1];
+          if (
+            event.type === 'assassinate' &&
+            (event.assassinateType === 'merlin' || event.assassinateType === 'guinevere') &&
+            event.killedIDs.length === 1
+          ) {
+            clearEffect();
+            beforeAttack = oldGame.players.map((player) => ({ ...player, features: { ...player.features } }));
+            assassinationActive.value = true;
+            maskedPlayers.value = beforeAttack;
+          }
+        }
+        eventTracker.observe(game, mode, reset);
+        if (game?.stage === 'end' && assassinationActive.value && !assassinationReveal(game)) clearEffect();
+        void playVisibleEvent();
+      },
+    );
+    watch(
+      [visibleHistory, () => gameState.value?.stage],
+      () => {
+        void playVisibleEvent();
+      },
+      { flush: 'post' },
+    );
 
     const playerInGame = computed(() => {
       if (roomState.value.stage !== 'started') return undefined;
@@ -144,7 +339,7 @@ export default defineComponent({
 
     const players = computed(() => {
       if (roomState.value.stage === 'started') {
-        return gameState.value.players;
+        return maskedPlayers.value ?? gameState.value.players;
       }
 
       return roomState.value.players;
@@ -160,6 +355,7 @@ export default defineComponent({
 
     const clearHistoryElement = () => {
       visibleHistory.value = undefined;
+      visibleHistoryIndex.value = -1;
       timerDuration.value = 0;
       stateManager.moveToNextStage();
     };
@@ -259,9 +455,13 @@ export default defineComponent({
       }
 
       if (lastVisibleElement.value.element && lastVisibleElement.value.timeout > 0) {
+        const element = lastVisibleElement.value.element;
+        const index = gameState.value.history.length - 1;
+        const timeout = lastVisibleElement.value.timeout;
         nextTick(() => {
-          visibleHistory.value = lastVisibleElement.value.element;
-          timerDuration.value = lastVisibleElement.value.timeout;
+          visibleHistory.value = element;
+          visibleHistoryIndex.value = index;
+          timerDuration.value = timeout;
         });
       } else {
         stateManager.moveToNextStage();
@@ -296,13 +496,16 @@ export default defineComponent({
 
       if (lastVisibleElement.value.element) {
         visibleHistory.value = lastVisibleElement.value.element;
+        visibleHistoryIndex.value = gameState.value.history.length - 1;
       } else {
         visibleHistory.value = undefined;
+        visibleHistoryIndex.value = -1;
       }
 
       if (stateManager.state.value.stage === 'started') {
         if (pointer === stateManager.state.value.gameStates.length - 1) {
           visibleHistory.value = undefined;
+          visibleHistoryIndex.value = -1;
         }
       }
     });
@@ -312,6 +515,7 @@ export default defineComponent({
         nextTick(() => {
           timerDuration.value = 0;
           visibleHistory.value = undefined;
+          visibleHistoryIndex.value = -1;
         });
       }
     });
@@ -349,6 +553,12 @@ export default defineComponent({
     });
 
     return {
+      boardRef,
+      cardEffectRef,
+      loyaltyEffectRef,
+      assassinationActive,
+      activeLoyaltyTarget,
+      loyaltyBadges,
       roomState,
       gameState,
       players,
@@ -373,6 +583,24 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.board-event-effects {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+.board-card-effect {
+  position: absolute;
+  width: 380px;
+  height: 290px;
+  top: 155px;
+  left: 110px;
+  z-index: 4;
+  pointer-events: none;
+}
+.during-assassination {
+  visibility: hidden;
+}
 @mixin gameEndShadow($color) {
   box-shadow:
     rgba($color, 0.4) 8px 8px,

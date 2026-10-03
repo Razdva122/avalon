@@ -7,6 +7,7 @@ function setup() {
   const handlers = {};
   const pending = [];
   const states = [];
+  const sources = [];
   const errors = [];
   const chats = [];
   let redirects = 0;
@@ -26,7 +27,10 @@ function setup() {
   const session = createRoomSession(
     socket,
     () => id,
-    (state) => states.push(state),
+    (state, source) => {
+      states.push(state);
+      sources.push(source);
+    },
     (error) => errors.push(error),
     () => redirects++,
     (chat) => chats.push(chat),
@@ -35,6 +39,7 @@ function setup() {
     handlers,
     pending,
     states,
+    sources,
     errors,
     chats,
     session,
@@ -97,4 +102,64 @@ test('chat-only broadcasts update messages without rebuilding the game replay', 
   f.handlers.roomUpdated({ roomID: 'room', chat: [{ id: 'new', message: 'hello' }] }, true);
   assert.deepEqual(f.states, []);
   assert.deepEqual(f.chats, [[{ id: 'new', message: 'hello' }]]);
+});
+
+test('room snapshots distinguish initial join and reconnect from live room broadcasts', async () => {
+  const f = setup();
+  const initial = f.session.load('room');
+  f.pending[0].resolve({ roomID: 'room', stage: 'started', chat: [] });
+  await initial;
+  f.handlers.roomUpdated({ roomID: 'room', stage: 'started', chat: [] });
+
+  const reconnect = f.handlers.connect();
+  f.handlers.roomUpdated({ roomID: 'room', chat: [{ id: 'new', message: 'while joining' }] });
+  f.pending[1].resolve({ roomID: 'room', stage: 'started', chat: [] });
+  await reconnect;
+
+  assert.deepEqual(f.sources, ['snapshot', 'update', 'snapshot']);
+  assert.equal(f.states[2].chat[0].id, 'new');
+});
+
+test('pending joins remain loading until the acknowledgement or disposal', async () => {
+  const f = setup();
+  assert.equal(f.session.isLoading?.(), false);
+  const initial = f.session.load('room');
+  assert.equal(f.session.isLoading(), true);
+  f.handlers.roomUpdated({ roomID: 'room', chat: [] });
+  assert.equal(f.session.isLoading(), true);
+  f.pending[0].resolve({ roomID: 'room', chat: [] });
+  await initial;
+  assert.equal(f.session.isLoading(), false);
+
+  const reconnect = f.handlers.connect();
+  assert.equal(f.session.isLoading(), true);
+  f.session.dispose();
+  assert.equal(f.session.isLoading(), false);
+  f.pending[1].resolve({ roomID: 'room', chat: [] });
+  await reconnect;
+  assert.equal(f.states.length, 1);
+});
+
+test('game state snapshot revision changes only for loaded room snapshots', () => {
+  const fs = require('node:fs');
+  const ts = require('typescript');
+  const vue = require('vue');
+  const source = fs.readFileSync(require.resolve('../src/helpers/game-state-manager/index.ts'), 'utf8');
+  const code = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, esModuleInterop: true },
+  }).outputText;
+  const exports = {};
+  const load = (id) => (id === 'vue' ? { ...vue, provide() {} } : id.startsWith('@/') ? {} : require(id));
+  new Function('require', 'exports', code)(load, exports);
+  const manager = new exports.GameStateManager();
+  const game = { stage: 'selectTeam', history: [], players: [] };
+  const room = { stage: 'started', game };
+
+  manager.mutateRoomState({ newRoomState: room });
+  assert.equal(manager.snapshotRevision?.value, 1);
+  manager.mutateRoomState({ newRoomState: room, isLiveUpdate: true });
+  manager.mutateRoomState({ newGameState: game });
+  assert.equal(manager.snapshotRevision.value, 1);
+  manager.mutateRoomState({ newRoomState: room });
+  assert.equal(manager.snapshotRevision.value, 2);
 });

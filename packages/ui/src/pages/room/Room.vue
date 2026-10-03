@@ -22,6 +22,7 @@
         :room-state="roomState"
         :spectator-roles="rolesShown ? spectatorRoles : {}"
         :spectator-decisions="rolesShown ? spectatorDecisions : []"
+        @assassination-active="assassinationActive = $event"
       >
         <template v-if="roomState.vote" v-slot:content>
           <RoomVote v-if="roomState.vote" :roomUuid="roomState.roomID" :vote="roomState.vote" />
@@ -54,7 +55,7 @@
       </div>
       <div class="right-info-container">
         <RatingChangesPanel
-          v-if="!roomState.ai && roomState.stage === 'started' && game.stage === 'end'"
+          v-if="!roomState.ai && !assassinationActive && roomState.stage === 'started' && game.stage === 'end'"
           :gameID="roomState.roomID"
           :gameState="game"
         />
@@ -99,6 +100,8 @@ import { roomVoiceKey } from '@/helpers/room-voice-context';
 import type { createRoomVoice } from '@/helpers/composables/useRoomVoice';
 import VoicePanel from '@/components/voice/VoicePanel.vue';
 import eventBus from '@/helpers/event-bus';
+import { ASSASSINATION_REVEAL_DURATION } from '@/components/view/board/animations/render';
+import { assassinationReveal } from '@/components/view/board/helpers';
 
 export default defineComponent({
   name: 'Room',
@@ -147,6 +150,7 @@ export default defineComponent({
       () => hideStickers.value,
     );
     const game = stateManager.game;
+    const assassinationActive = ref(false);
     const spectatorDecisions = ref<AiSpectatorDecision[]>([]);
     const spectatorRoles = ref<Record<string, TRoles>>({});
     const canRevealRoles = computed(() =>
@@ -165,9 +169,13 @@ export default defineComponent({
     const session = createRoomSession(
       socket,
       () => props.uuid,
-      (stateFromBackend) => {
+      (stateFromBackend, source) => {
         errorMessage.value = undefined;
-        stateManager.mutateRoomState({ newRoomState: stateFromBackend, userID: userID.value });
+        stateManager.mutateRoomState({
+          newRoomState: stateFromBackend,
+          userID: userID.value,
+          isLiveUpdate: source === 'update',
+        });
         if (stateFromBackend.ai) chatOpen.value = true;
       },
       (error) => {
@@ -194,7 +202,7 @@ export default defineComponent({
       .catch(() => {});
 
     socket.on('gameUpdated', (game) => {
-      if (game.uuid === props.uuid && roomState.value.stage === 'started') {
+      if (!session.isLoading() && game.uuid === props.uuid && roomState.value?.stage === 'started') {
         stateManager.mutateRoomState({ newGameState: game, userID: userID.value });
       }
     });
@@ -218,16 +226,47 @@ export default defineComponent({
       initState(props.uuid);
     });
 
+    let freshFinalGame: string | undefined;
+    let ratingTimeout: ReturnType<typeof setTimeout> | undefined;
+    const clearRatingTimer = () => {
+      if (ratingTimeout) clearTimeout(ratingTimeout);
+      ratingTimeout = undefined;
+      freshFinalGame = undefined;
+    };
+    onUnmounted(clearRatingTimer);
+    const showRatingAfterReveal = () => {
+      if (!freshFinalGame || game.value?.stage !== 'end' || stateManager.viewMode.value !== 'live') return;
+      const uuid = freshFinalGame;
+      freshFinalGame = undefined;
+      const delay = assassinationReveal(game.value) ? ASSASSINATION_REVEAL_DURATION + 200 : 1500;
+      ratingTimeout = setTimeout(() => {
+        ratingTimeout = undefined;
+        if (game.value?.uuid === uuid && stateManager.viewMode.value === 'live') eventBus.emit('showRatingPanel');
+      }, delay);
+    };
     watch(
-      () => game.value?.result?.winner,
-      (newWinner, oldWinner) => {
-        if (newWinner && !oldWinner && !roomState.value.ai) {
-          setTimeout(() => {
-            eventBus.emit('showRatingPanel');
-          }, 1500);
+      [() => (roomState.value?.stage === 'started' ? roomState.value.game : undefined), stateManager.snapshotRevision],
+      ([current, revision], [previous, oldRevision]) => {
+        if (revision !== oldRevision || current?.uuid !== previous?.uuid) {
+          clearRatingTimer();
+          return;
+        }
+        if (
+          current?.stage === 'end' &&
+          previous?.stage !== 'end' &&
+          current.result?.winner &&
+          !roomState.value.ai &&
+          stateManager.viewMode.value === 'live'
+        ) {
+          freshFinalGame = current.uuid;
+          showRatingAfterReveal();
         }
       },
     );
+    watch([game, stateManager.viewMode], () => {
+      if (stateManager.viewMode.value !== 'live') clearRatingTimer();
+      else showRatingAfterReveal();
+    });
 
     const displayHostPanel = computed(() => {
       return !roomState.value.ai && !roomState.value.archived && roomState.value.leaderID === userID.value;
@@ -280,6 +319,7 @@ export default defineComponent({
       visibleRoles,
       alert,
       game,
+      assassinationActive,
       online,
       userID,
       restartGame,

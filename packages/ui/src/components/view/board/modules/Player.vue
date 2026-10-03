@@ -41,6 +41,22 @@
             :avatarID="userState.profile.avatar"
           />
           <PlayerIcon v-if="'role' in player" class="role-container" :icon="player.role" />
+          <span
+            v-if="loyaltyBadge && !badgeHidden"
+            class="player-loyalty-badge"
+            :class="'team-' + loyaltyBadge.team"
+            role="img"
+            :aria-label="`${$t('announceLoyalty.announceInfo', { announcer: loyaltyBadge.sourceName, target: player.name })}: ${$t('game.' + loyaltyBadge.team)}`"
+            :title="`${$t('announceLoyalty.announceInfo', { announcer: loyaltyBadge.sourceName, target: player.name })}: ${$t('game.' + loyaltyBadge.team)}`"
+            ><img
+              :src="
+                getThumbnailPathByID(
+                  'core',
+                  loyaltyBadge.team === 'good' ? 'blue_team_no_background' : 'red_team_no_background',
+                )
+              "
+              alt=""
+          /></span>
           <div
             v-if="stickerReaction"
             class="player-sticker"
@@ -173,7 +189,7 @@ import { getPlayerCards, isAdjacentPlayer, hasActiveCard } from '@/helpers/plot-
 import type { IFrontendPlayer } from '@/components/view/board/interface';
 import { gameStateKey } from '@/helpers/game-state-manager';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
-import { getImagePathByID } from '@/helpers/images';
+import { getImagePathByID, getThumbnailPathByID } from '@/helpers/images';
 import Avatar from '@/components/user/Avatar.vue';
 import PlotCard from '@/components/view/information/PlotCard.vue';
 import AiPrivateDecision from './AiPrivateDecision.vue';
@@ -191,6 +207,8 @@ export default defineComponent({
     AiPrivateDecision,
   },
   props: {
+    loyaltyBadge: { type: Object as PropType<{ team: 'good' | 'evil'; sourceName: string }> },
+    badgeHidden: Boolean,
     thinking: { type: Boolean, default: false },
     voiceSide: { type: String as PropType<'left' | 'right'>, default: 'right' },
     playerState: {
@@ -354,7 +372,11 @@ export default defineComponent({
           clone.features.isSent = false;
         }
 
-        if (visibleHistory.value?.type === 'announceLoyalty' && visibleHistory.value.announced) {
+        if (
+          visibleHistory.value?.type === 'announceLoyalty' &&
+          visibleHistory.value.announced &&
+          !['good', 'evil'].includes(visibleHistory.value.announced)
+        ) {
           if (clone.id === visibleHistory.value.targetID) {
             clone.role = visibleHistory.value.announced;
           }
@@ -469,6 +491,7 @@ export default defineComponent({
     });
 
     return {
+      getThumbnailPathByID,
       voiceStatus,
       isOwnVoice,
       userState,
@@ -589,6 +612,28 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.player-loyalty-badge {
+  position: absolute;
+  top: 76px;
+  left: 83px;
+  width: 32px;
+  height: 32px;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: 50%;
+  padding: 3px;
+  border: 1px solid #d3bb83;
+  background: radial-gradient(circle at 35% 25%, #555147, #171b21 70%);
+  box-shadow:
+    0 2px 5px #0008,
+    inset 0 0 0 2px #94836870;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 }
 
 :deep(.user-hover-tooltip) {

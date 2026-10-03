@@ -14,6 +14,7 @@ export class GameStateManager {
   state: TPageRoomStateRef;
   game: Ref<VisualGameState>;
   viewMode: Ref<'live' | 'history'> = ref('live');
+  readonly snapshotRevision = ref(0);
 
   constructor() {
     this.state = ref() as TPageRoomStateRef;
@@ -52,10 +53,12 @@ export class GameStateManager {
     newRoomState,
     newGameState,
     userID,
+    isLiveUpdate = false,
   }: {
     newRoomState?: TRoomState;
     newGameState?: VisualGameState;
     userID?: string;
+    isLiveUpdate?: boolean;
   }): void {
     if (userID) {
       if (newRoomState) {
@@ -72,6 +75,7 @@ export class GameStateManager {
     }
 
     if (newRoomState) {
+      if (!isLiveUpdate) this.snapshotRevision.value += 1;
       if (newRoomState.stage === 'started') {
         const game = newRoomState.game;
 

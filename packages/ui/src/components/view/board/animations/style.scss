@@ -1,0 +1,390 @@
+.avalon-assassination {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 380px;
+  height: 290px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 20;
+}
+
+.avalon-cards-scene {
+  position: absolute;
+  inset: 0;
+  width: 380px;
+  height: 290px;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #302419;
+  perspective: 800px;
+  transform: rotateX(12deg);
+  transform-style: preserve-3d;
+  isolation: isolate;
+}
+
+.avalon-cards-target,
+.avalon-cards-halves {
+  position: absolute;
+  left: 126px;
+  top: 43px;
+  width: 128px;
+  height: 186px;
+  transform-style: preserve-3d;
+  transform: rotate(-5deg);
+  z-index: 3;
+}
+
+.avalon-cards-card {
+  width: 128px;
+  height: 186px;
+  position: relative;
+  border-radius: 8px;
+  transform-style: preserve-3d;
+  box-shadow:
+    0 2px 0 #665541,
+    0 4px 0 #b09970,
+    0 7px 5px #09060366,
+    5px 13px 16px #0009;
+}
+
+.avalon-cards-turn {
+  transform-origin: center;
+  backface-visibility: visible;
+}
+
+.avalon-cards-back,
+.avalon-cards-front,
+.avalon-cards-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.avalon-cards-back,
+.avalon-cards-front {
+  backface-visibility: hidden;
+}
+.avalon-cards-front {
+  transform: rotateY(180deg);
+}
+
+.avalon-cards-face {
+  background: radial-gradient(ellipse at 30% 5%, #f6e7be, #d0b789);
+  border: 1px solid #dac495;
+  box-shadow:
+    inset 0 0 0 4px #695437,
+    inset 0 0 0 5px #d6bb80,
+    inset 0 0 22px #6a421b35;
+}
+
+.avalon-cards-face::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, #58371706 0px, #58371706 1px, transparent 1px, transparent 3px),
+    radial-gradient(ellipse at top left, #fff4 0%, transparent 65%);
+  mix-blend-mode: multiply;
+}
+
+.avalon-cards-art {
+  position: absolute;
+  inset: 9px 9px 40px;
+  overflow: hidden;
+  border: 1px solid #654b2c;
+  border-radius: 3px 3px 1px 1px;
+  background: #202014;
+  box-shadow: inset 0 0 14px #0008;
+}
+
+.avalon-cards-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.12) saturate(0.72);
+}
+.avalon-cards-title {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 10px;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-shadow: 0 1px #fff8;
+}
+
+.avalon-cards-back {
+  background:
+    repeating-linear-gradient(45deg, transparent 0 9px, #a68a4920 10px 11px, transparent 12px 20px),
+    repeating-linear-gradient(-45deg, transparent 0 9px, #a68a4920 10px 11px, transparent 12px 20px),
+    radial-gradient(ellipse, #302e25, #101c1b);
+  border: 1px solid #c4a775;
+  box-shadow:
+    inset 0 0 0 4px #152321,
+    inset 0 0 0 5px #a6925a80,
+    inset 0 0 24px #0009;
+  color: #ccb77f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.avalon-cards-back span {
+  font-size: 24px;
+  font-style: italic;
+  text-shadow: 0 1px #000;
+  z-index: 1;
+}
+.avalon-cards-back-ornament {
+  position: absolute;
+  width: 76px;
+  height: 104px;
+  border: 1px solid #9b8645;
+  border-radius: 44%;
+  box-shadow:
+    0 0 0 5px #bc9f3e15,
+    inset 0 0 0 5px #bc9f3e15;
+  transform: rotate(45deg);
+}
+.avalon-cards-table-shadow {
+  position: absolute;
+  left: 122px;
+  top: 215px;
+  width: 147px;
+  height: 24px;
+  border-radius: 50%;
+  background: #0009;
+  filter: blur(11px);
+  z-index: 0;
+}
+.avalon-cards-halves {
+  z-index: 4;
+  opacity: 0;
+}
+.avalon-cards-half {
+  position: absolute;
+  inset: 0;
+  filter: drop-shadow(3px 6px 3px #0008);
+  transform-origin: 50% 87%;
+  height: 186px;
+}
+.avalon-cards-half-left {
+  clip-path: polygon(
+    0 0,
+    52% 0,
+    49% 9%,
+    54% 16%,
+    49% 27%,
+    53% 36%,
+    48% 44%,
+    53% 56%,
+    47% 64%,
+    51% 78%,
+    48% 91%,
+    52% 100%,
+    0 100%
+  );
+}
+.avalon-cards-half-right {
+  clip-path: polygon(
+    52% 0,
+    100% 0,
+    100% 100%,
+    52% 100%,
+    48% 91%,
+    51% 78%,
+    47% 64%,
+    53% 56%,
+    48% 44%,
+    53% 36%,
+    49% 27%,
+    54% 16%,
+    49% 9%
+  );
+}
+.avalon-cards-half .avalon-cards-face {
+  filter: saturate(0.45) brightness(0.9);
+}
+
+.avalon-cards-side {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  backface-visibility: hidden;
+  // Flatten each clipped side as one surface to keep its opposite face hidden.
+  transform-style: flat;
+  overflow: visible;
+}
+
+.avalon-cards-body,
+.avalon-cards-flap,
+.avalon-cards-gap,
+.avalon-cards-fragment,
+.avalon-cards-fibers {
+  position: absolute;
+  inset: 0;
+}
+.avalon-cards-body {
+  clip-path: var(--avalon-cards-body-clip);
+  z-index: 2;
+}
+.avalon-cards-fragment {
+  clip-path: var(--avalon-cards-flap-clip);
+  z-index: 2;
+}
+.avalon-cards-gap {
+  z-index: 1;
+  width: 128px;
+  height: 186px;
+  filter: blur(0.25px) drop-shadow(0.6px 0.8px 0.7px #160e075c);
+  overflow: visible;
+}
+.avalon-cards-flap {
+  z-index: 3;
+  transform-origin: var(--avalon-cards-origin);
+  transform-style: preserve-3d;
+}
+.avalon-cards-fibers {
+  width: 128px;
+  height: 186px;
+  z-index: 4;
+  pointer-events: none;
+  overflow: visible;
+  opacity: 0.85;
+}
+.avalon-cards-survivor {
+  position: absolute;
+  left: 220px;
+  top: 43px;
+  z-index: 5;
+  opacity: 0;
+  transform: translateX(190px) rotate(11deg);
+}
+
+.avalon-assassination-reduced .avalon-cards-target {
+  display: none;
+}
+.avalon-assassination-reduced .avalon-cards-halves {
+  opacity: 1;
+}
+.avalon-assassination-reduced .avalon-cards-half-left {
+  transform: translate(-12px, 4px) rotate(-9deg);
+}
+.avalon-assassination-reduced .avalon-cards-half-right {
+  transform: translate(13px, 10px) rotate(10deg);
+}
+.avalon-assassination-reduced .avalon-cards-survivor {
+  opacity: 1;
+  transform: rotate(3deg);
+}
+.avalon-assassination-reduced.avalon-assassination-miss .avalon-cards-halves {
+  transform: translateX(-84px) rotate(-5deg);
+}
+.avalon-assassination-reduced.avalon-assassination-miss .avalon-cards-table-shadow {
+  transform: translateX(-84px);
+}
+
+.avalon-loyalty-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+  isolation: isolate;
+}
+.avalon-loyalty-emblem {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 35% 18%, #d2b782, #857152 65%, #4a4439);
+  border: 1px solid #cbb582;
+  box-shadow:
+    0 1px 0 #c9ae75,
+    0 3px 0 #625746,
+    0 4px 0 #2b2922,
+    3px 7px 9px #0008;
+  transform-origin: center;
+  transform-style: preserve-3d;
+  opacity: 0;
+  z-index: 4;
+  overflow: hidden;
+}
+.avalon-loyalty-emblem > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  filter: saturate(0.95);
+  border-radius: 50%;
+}
+.avalon-loyalty-emblem::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid #fff2;
+  box-shadow:
+    inset 0 1px 2px #fff4,
+    inset 0 -2px 2px #0007;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.avalon-loyalty-sheen {
+  position: absolute;
+  inset: -15%;
+  width: 100%;
+  height: 130%;
+  background: linear-gradient(100deg, transparent 34%, #fff3db 48%, transparent 63%);
+  opacity: 0;
+  pointer-events: none;
+}
+.avalon-loyalty-source-rim,
+.avalon-loyalty-target-rim {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px solid #c7ad72;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px #0005;
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.avalon-loyalty-target-rim {
+  border-color: #d0bc8b;
+  border-width: 2px;
+}
+.avalon-loyalty-source-mark {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 50%;
+  padding: 1px;
+  overflow: hidden;
+  background: #b6a074;
+  border: 1px solid #d1ba83;
+  box-shadow: 1px 2px 3px #0009;
+  z-index: 3;
+  opacity: 0;
+}
+.avalon-loyalty-source-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 54% 31%;
+  filter: saturate(0.7);
+}

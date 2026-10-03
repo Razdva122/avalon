@@ -4,7 +4,7 @@ import type { ChatMessage, ISocketError, Socket, TRoomState } from '@avalon/type
 export function createRoomSession(
   socket: Pick<Socket, 'on' | 'off' | 'emitWithAck'>,
   roomID: () => string,
-  receive: (state: TRoomState) => void,
+  receive: (state: TRoomState, source: 'snapshot' | 'update') => void,
   onError: (error: ISocketError) => void,
   onExpiredMissing: () => void,
   receiveChat: (messages: ChatMessage[]) => void,
@@ -35,7 +35,7 @@ export function createRoomSession(
               .sort((a, b) => a.timestamp - b.timestamp)
               .slice(-1000)
           : state.chat;
-        receive({ ...state, chat });
+        receive({ ...state, chat }, 'snapshot');
       }
     } catch {
       if (!disposed && current === generation && id === roomID()) onError({ error: 'requestFailed' });
@@ -50,7 +50,7 @@ export function createRoomSession(
     if (state.roomID !== roomID()) return;
     if (loading) buffered = state;
     else if (chatOnly) receiveChat(state.chat);
-    else receive(state);
+    else receive(state, 'update');
   };
   const reconnect = () => load(roomID());
   const expired = (id: string) => (id === roomID() ? load(id, true) : Promise.resolve());
@@ -59,8 +59,10 @@ export function createRoomSession(
   socket.on('destroyRoom', expired);
   return {
     load,
+    isLoading: () => loading,
     dispose() {
       disposed = true;
+      loading = false;
       generation++;
       socket.off('roomUpdated', updated);
       socket.off('connect', reconnect);
