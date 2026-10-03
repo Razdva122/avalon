@@ -7,8 +7,10 @@ const reply = (request: BotRequest) => ({ choice: 0, speech: request.speak ? 'I 
 
 test('seven bots complete a real game, including Lady of Lake and assassination, with public discussion', async () => {
   const stages = new Set<string>();
+  const languages: (string | undefined)[] = [];
   const missionThinking: (string | undefined)[] = [];
   const room = new BotRoom('test-room', 'admin', io, async (request) => {
+    languages.push(request.language);
     stages.add(request.state.stage);
     if (request.state.stage === 'onMission') missionThinking.push(room.ai?.thinkingPlayerID);
     let choice = request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0;
@@ -23,6 +25,7 @@ test('seven bots complete a real game, including Lady of Lake and assassination,
   expect(room.players).toHaveLength(7);
   expect(room.options).toEqual(botOptions);
   await room.run();
+  expect(languages.every((language) => language === 'en')).toBe(true);
   expect(room.data.stage).toBe('started');
   if (room.data.stage !== 'started') throw Error('not started');
   expect(room.data.manager.game.stage).toBe('end');
@@ -34,6 +37,41 @@ test('seven bots complete a real game, including Lady of Lake and assassination,
   expect(room.ai?.status).toBe('finished');
   expect(room.ai).not.toHaveProperty('thinkingPlayerID');
 });
+
+test.each(['ru', 'zh-tw'] as const)(
+  '%s room uses its saved language for every stage and public announcement',
+  async (language) => {
+    const requests: BotRequest[] = [];
+    const room = new BotRoom(
+      `language-${language}`,
+      'admin',
+      io,
+      async (request) => {
+        requests.push(request);
+        let choice = request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0;
+        if (request.task === 'Propose a team and explain your choice') {
+          if (room.data.stage !== 'started') throw Error('not started');
+          const evil = room.data.manager.game.players.find((player) => player.role.loyalty === 'evil')!;
+          choice = request.choices.findIndex((team) => team.split(', ').includes(String(evil.index)));
+        }
+        return { choice, speech: language === 'ru' ? 'Проверим эту команду.' : '我們來驗證這支隊伍。' };
+      },
+      async () => {},
+      0,
+      language,
+    );
+    expect(room.ai?.message).toMatch(language === 'ru' ? /рус/iu : /繁體中文/u);
+    await room.run();
+    expect(room.ai?.status).toBe('finished');
+    expect(room.calculateRoomState().ai).toMatchObject({ language });
+    expect(requests.every((request) => request.language === language)).toBe(true);
+    for (const stage of ['selectTeam', 'onMission', 'checkLoyalty', 'announceLoyalty', 'assassinate', 'end'])
+      expect(requests.some((request) => request.state.stage === stage)).toBe(true);
+    expect(room.chat.history.map((message) => message.message).join('\n')).not.toMatch(
+      /I propose|I vote|I inspected|I am Good|Post-game:|Evil council \(revealed\)/,
+    );
+  },
+);
 
 test('cancellation discards replies and spectators never enter prompts', async () => {
   const requests: BotRequest[] = [];
@@ -346,6 +384,75 @@ test('vote publication retains historical evidence and removes only a conflictin
   expect(
     votes.every((m) => m.message === 'I vote approve. 4 rejected the previous safe roster. This team excludes 4.'),
   ).toBe(true);
+});
+
+test.each([
+  [
+    'ru',
+    'Я голосую против. 4 отверг предыдущую команду. В этой команде нет 4.',
+    'Я голосую за. 4 отверг предыдущую команду. В этой команде нет 4.',
+  ],
+  [
+    'zh-tw',
+    '我反對這支隊伍。4 之前反對安全的隊伍。這支隊伍沒有 4。',
+    '我投贊成票。 4 之前反對安全的隊伍。這支隊伍沒有 4。',
+  ],
+] as const)(
+  '%s vote publication removes conflicting declarations and retains past evidence',
+  async (language, speech, expected) => {
+    const room = new BotRoom(
+      `vote-${language}`,
+      'admin',
+      io,
+      async () => ({ choice: 0, speech }),
+      async (state) => {
+        if (state.stage === 'started' && state.game.stage === 'onMission') room.stop();
+      },
+      0,
+      language,
+    );
+    await room.run();
+    expect(room.chat.history.slice(1)).toHaveLength(7);
+    expect(room.chat.history.slice(1).every((message) => message.message === expected)).toBe(true);
+    if (room.data.stage !== 'started') throw Error('not started');
+    const vote = room.data.manager.prepareStateForUser().history.find((event) => event.type === 'vote');
+    expect(vote?.type === 'vote' && vote.result).toBe('approve');
+  },
+);
+
+test('all localized after-game messages stay out of prompts and vote-only messages stay out of assassination evidence', async () => {
+  const requests: BotRequest[] = [];
+  const room = new BotRoom('localized-history', 'admin', io, async (request) => {
+    requests.push(request);
+    return { ...reply(request), choice: request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0 };
+  });
+  const votes = ['I vote reject.', 'Я голосую против.', '我投反對票。'];
+  for (const text of [
+    'Post-game: OLD_REVIEW_EN',
+    'Evil council (revealed): OLD_COUNCIL_EN',
+    'После игры: OLD_REVIEW_RU',
+    'Совет злых (раскрыт): OLD_COUNCIL_RU',
+    '賽後回顧：OLD_REVIEW_ZH',
+    '邪惡陣營密談（公開）：OLD_COUNCIL_ZH',
+    ...votes,
+    'PUBLIC_EARLY_CLUE',
+  ])
+    room.addMessage(room.players[0], text);
+  await room.run();
+  expect(room.ai?.status).toBe('finished');
+  expect(
+    requests.every((request) => request.chat.every((message) => !/OLD_REVIEW|OLD_COUNCIL/.test(message.text))),
+  ).toBe(true);
+  const evidence = requests
+    .filter((request) => request.state.stage === 'assassinate')
+    .map((request) => request.evilEvidence!);
+  expect(evidence.length).toBeGreaterThan(0);
+  for (const messages of evidence) {
+    expect(
+      messages.every((message) => !votes.includes(message.text) && !/OLD_REVIEW|OLD_COUNCIL/.test(message.text)),
+    ).toBe(true);
+    expect(messages.some((message) => message.text === 'PUBLIC_EARLY_CLUE')).toBe(true);
+  }
 });
 
 test('budget resume retains the proposed team and completed discussion votes', async () => {

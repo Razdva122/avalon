@@ -23,6 +23,8 @@ export default {
   controls: '对局控制',
   budgetDetails: '预算详情',
   selectModel: '新对局的模型',
+  selectLanguage: '讨论语言',
+  language: '讨论语言：{language}',
   resumeBudget: '继续 · 将限额提高至 {limit} ₽（×2）',
   budgetResetIn: '额度重置倒计时：{days}天{hours}小时{minutes}分钟',
   budgetResetPending: '周期已结束，正在更新预算…',

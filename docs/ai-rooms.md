@@ -1,7 +1,7 @@
 # AI-комната Avalon
 
 Первый эксперимент: семь ботов Alice, Ben, Clara, Daniel, Emma, Felix и Grace
-обсуждают игру на английском, обращаясь друг к другу по номерам 1–7. Номера совпадают с индексами на доске (порядок мест может меняться). Роли: Мерлин, Персиваль, два слуги, Мордред,
+обсуждают игру на выбранном языке (английский, русский или традиционный китайский Тайваня), обращаясь друг к другу по номерам 1–7. Номера совпадают с индексами на доске (порядок мест может меняться). Роли: Мерлин, Персиваль, два слуги, Мордред,
 Моргана и приспешник; включена Леди Озера. Имена не связаны с ролями.
 Зрители видят обычную доску и чат. Сообщения зрителей пока не передаются ботам.
 Человеческие места — следующий этап. AI-партии не начисляют рейтинг и достижения.
@@ -480,7 +480,7 @@ Production defaults to 200 RUB per game; the first explicit administrator budget
 
 ### Public Percival claims and explicit positions
 
-Merlin, Percival and Evil bots may use `claimMorgana` on a public decision to intentionally claim Percival and accuse a seat of being Morgana. The server appends a canonical English statement after public-speech sanitization. Other bots receive these declarations as public testimony, never as verified roles or private knowledge. On their next scheduled public decision each must return `claimStances` with an explicit `trust` or `distrust` for every other claimant. Missing, duplicate or invalid positions stop publication; there are no additional paid discussion rounds. Instructions require explaining the stance, making teams/votes consistent with it, and explaining any change. Deterministic Good Lady-result announcements remain truthful and do not introduce an extra decision call. Claims remain available from the archived public chat even when the ordinary recent-chat window has moved on.
+Merlin, Percival and Evil bots may use `claimMorgana` on a public decision to intentionally claim Percival and accuse a seat of being Morgana. The server appends a canonical statement in the room’s discussion language after public-speech sanitization. Other bots receive these declarations as public testimony, never as verified roles or private knowledge. On their next scheduled public decision each must return `claimStances` with an explicit `trust` or `distrust` for every other claimant. Missing, duplicate or invalid positions stop publication; there are no additional paid discussion rounds. Instructions require explaining the stance, making teams/votes consistent with it, and explaining any change. Deterministic Good Lady-result announcements remain truthful and do not introduce an extra decision call. Claims remain available from the archived public chat even when the ordinary recent-chat window has moved on.
 
 Evil card instructions compare the immediate benefit of Fail with the concrete future value of a cover Success, account for the score and required Fail count, and describe a shared seat-order sabotage convention to avoid unnecessary double Fails. These are model instructions, not a server strategy solver. Good opening instructions distinguish self-preference from a blanket veto and explicitly consider the forced fifth leader. Merlin safety and assassination instructions distinguish privileged early knowledge from deductions everyone can make after public evidence.
 
@@ -546,3 +546,40 @@ Ray предпочитает ранние эксперименты с новым
 ### Остаток недельного лимита Codex
 
 В панели Codex-партии администратор видит остаток недельного лимита аккаунта и время его обновления. Backend читает `account/rateLimits/read` через `codex app-server` с теми же `AI_CODEX_BIN` и `AI_CODEX_HOME`, которые используются для решений ботов. Запрос не запускает модель; в браузер передаются только процент остатка, время сброса и время чтения. Недельное окно определяется по длительности 10080 минут в общем bucket `codex`, независимо от расположения в primary/secondary; отсутствие окна или ошибка отображаются как недоступность, не как нулевой остаток. Успешное чтение кешируется на минуту, неудачное — на 10 секунд; UI обновляет значение раз в минуту. Это общий лимит аккаунта, включая работу вне игры, а не оценка оставшегося количества партий. Данные доступны только администратору при включённом локальном Codex; public room state не содержит квоту.
+
+## Язык и живое обсуждение AI-партии
+
+Перед созданием AI-комнаты рядом с моделью выбирается язык общения: `en`, `ru`
+или `zh-tw` (традиционный китайский, Тайвань). Он сохраняется в `ai.language`,
+виден в лобби и комнате и передаётся во все запросы ботов: решения, публичную
+речь, закрытый совет злых и итоговый разбор. Серверные объявления голосований,
+составов, проверок Леди, заявлений о Персивале и итоговых сообщений используют
+тот же язык. Старые комнаты и старый вызов `createAiRoom(model, callback)`
+сохраняют английский по умолчанию. Новый клиент передаёт
+`createAiRoom({ model, language }, callback)`; неподдерживаемый язык отклоняется
+до резервирования бюджета комнаты. JSON-ключи и допустимые значения игровых
+действий остаются прежними.
+
+Обычная реплика допускает до двух коротких предложений и 240 символов:
+конкретный довод и уместный адресный вопрос или ответ. В свой следующий ход бот
+сначала отвечает на вопрос или возражение к нему из доступного недавнего чата.
+Если такого вопроса нет, он может предложить компромисс или задать один полезный
+вопрос; спрашивать на каждом ходу не требуется. Характер влияет на манеру речи:
+дипломат предлагает компромисс, провокатор задаёт точный вопрос, лоялист защищает
+обоснованное доверие, аналитик выбирает решающий факт, азартный игрок называет
+конкретный риск. Манера речи не отменяет цель стороны, факты, легальность
+действия и секретность. Объявления сервера и обязательные заявления о роли
+могут добавлять текст поверх этого лимита. Нового круга обсуждения или
+голосования нет.
+
+Мерлин получает короткую проверку авторства: при сопоставимой безопасности и
+возможности собрать большинство предпочесть поддержку уже публично
+обоснованного состава постоянному выдвижению своих новых чистых команд. Это
+критерий выбора между сопоставимыми вариантами; при угрозе миссии или
+достижимому большинству следует предложить нужный состав самому.
+
+Перед убийством злые кратко рассматривают каждого допустимого кандидата,
+включая тихих последователей, затем сравнивают двух сильнейших. Проверяют,
+можно ли объяснить раннюю точность публичными фактами, включением себя или
+знаниями Персиваля. Общий для кандидатов довод их не различает; чистый состав,
+его позднейший успех и повторы совета не считаются независимыми уликами.

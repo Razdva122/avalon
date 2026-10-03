@@ -44,6 +44,29 @@ test('recent AI replays survive a repository restart and are returned newest fir
   expect(rooms[0].ai?.status).toBe('stopped');
 });
 
+test('AI room summaries preserve selected language and default older archives to English', async () => {
+  const db = client.db('summary-languages');
+  await db.collection<{ _id: string; state: Record<string, unknown> }>('ai_room_replays').insertMany(
+    [undefined, 'ru', 'zh-tw'].map((language, index) => ({
+      _id: `language-${index}`,
+      state: {
+        roomID: `language-${index}`,
+        createAt: `2026-09-${20 + index}T12:00:00.000Z`,
+        stage: 'locked',
+        leaderID: 'owner',
+        players: [],
+        options: { roles: {}, addons: {}, features: {} },
+        ai: { status: 'finished', model: 'saved-model', ...(language ? { language } : {}) },
+      },
+    })),
+  );
+  expect(await new AiRepository(db).recentSummaries()).toMatchObject([
+    { uuid: 'language-2', aiLanguage: 'zh-tw' },
+    { uuid: 'language-1', aiLanguage: 'ru' },
+    { uuid: 'language-0', aiLanguage: 'en' },
+  ]);
+});
+
 test('request log updates one entry and keeps actual billing separate from the reservation', async () => {
   const db = client.db('request-costs');
   const repo = new AiRepository(db);

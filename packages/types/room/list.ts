@@ -6,6 +6,7 @@ export type TRoomInfo = {
   ai?: boolean;
   aiStatus?: import('./index').AiRoomState['status'];
   aiModel?: string;
+  aiLanguage?: import('./index').AiLanguage;
   hostID: string;
   players: number;
   state: 'created' | 'started' | 'locked';

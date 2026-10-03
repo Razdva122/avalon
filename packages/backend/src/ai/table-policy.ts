@@ -1,5 +1,6 @@
 import { AiPause, compactRequest } from './client';
 import type { BotRequest } from './client';
+import { aiText } from './language';
 
 // Explicit table conventions requested by the owner, not alignment deduction.
 // Applies identically to Good and Evil, including an Evil player's deliberate bluff.
@@ -17,7 +18,11 @@ export function tablePolicy(request: BotRequest) {
       if (blocked.length) {
         choices = choices.filter((choice) => choice === 'reject');
         const mission = positions.find((m) => m.team.some((seat) => seat !== undefined && blocked.includes(seat)))!;
-        publicReason = `I am Good. Mission ${mission.n} had ${mission.fails} Fail card(s); ${mission.team.filter((seat) => seat !== c.you?.seat).join(' and ')} betrayed us. I reject teams with them.`;
+        publicReason = aiText(request.language).failedMission(
+          mission.n,
+          mission.fails!,
+          mission.team.filter((seat) => seat !== c.you?.seat),
+        );
       }
     } else if (choices.every((choice) => /^\d+(, \d+)*$/.test(choice))) {
       choices = choices.filter((choice) =>

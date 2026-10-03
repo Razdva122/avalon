@@ -5,7 +5,7 @@
     :to="{ name: 'room', params: { uuid: game.uuid } }"
     :aria-label="
       game.ai
-        ? `${$t('aiArena.title')}. ${aiStatusLabel}. ${aiAction}`
+        ? `${$t('aiArena.title')}. ${$t('aiArena.language', { language: aiLanguageLabel })}. ${aiStatusLabel}. ${aiAction}`
         : `${$t(`mainPage.${action}`)} — ${userName}. ${$t(`mainPage.${status}`)}`
     "
   >
@@ -20,7 +20,7 @@
         ></span>
         <div class="ai-heading">
           <div class="ai-eyebrow">
-            {{ $t('aiArena.title') }} <span>{{ $t('aiArena.english') }}</span>
+            {{ $t('aiArena.title') }} <span>{{ aiLanguageLabel }}</span>
           </div>
           <span class="ai-title">{{ $t('aiArena.tagline') }}</span>
           <span class="ai-subtitle">{{ $t('aiArena.subtitle') }}</span>
@@ -75,6 +75,9 @@ const hostID = computed(() => props.game.hostID);
 const { userName } = useUserProfile(hostID);
 const game = toRef(props, 'game');
 const { locale, t } = useI18n();
+const aiLanguageLabel = computed(
+  () => ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）' })[game.value.aiLanguage || 'en'],
+);
 const aiDate = computed(() =>
   new Date(game.value.startAt || game.value.createAt).toLocaleString(locale.value, {
     day: 'numeric',
@@ -263,6 +266,7 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
 }
 .ai-eyebrow {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 9px;
   font-size: 10px;

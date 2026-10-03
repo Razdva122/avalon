@@ -24,6 +24,8 @@ export default {
   controls: 'Controles de la partida',
   budgetDetails: 'Detalles del presupuesto',
   selectModel: 'Modelo para la nueva partida',
+  selectLanguage: 'Idioma de la discusión',
+  language: 'Idioma de la discusión: {language}',
   resumeBudget: 'Continuar · aumentar límite a {limit} ₽ (×2)',
   budgetResetIn: 'El límite se renueva en: {days} d {hours} h {minutes} min',
   budgetResetPending: 'Periodo finalizado. Actualizando presupuesto…',

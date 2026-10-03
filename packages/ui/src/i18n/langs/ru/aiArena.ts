@@ -23,6 +23,8 @@ export default {
   controls: 'Управление партией',
   budgetDetails: 'Расходы и лимиты',
   selectModel: 'Модель для новой партии',
+  selectLanguage: 'Язык обсуждения',
+  language: 'Язык обсуждения: {language}',
   resumeBudget: 'Продолжить · увеличить лимит до {limit} ₽ (×2)',
   budgetResetIn: 'До обновления лимита: {days} дн. {hours} ч. {minutes} мин.',
   budgetResetPending: 'Период завершён. Обновляем бюджет…',

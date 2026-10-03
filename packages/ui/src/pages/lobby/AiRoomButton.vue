@@ -1,11 +1,21 @@
 <template>
   <div v-if="canManage" class="ai-lobby-controls">
-    <label v-if="!activeRoomID" class="ai-model-select">
-      <span>{{ $t('aiArena.selectModel') }}</span>
-      <select v-model="selectedModel" :disabled="busy">
-        <option v-for="model in models" :key="model.id" :value="model.id">{{ model.label }}</option>
-      </select>
-    </label>
+    <div v-if="!activeRoomID" class="ai-room-selects">
+      <label>
+        <span>{{ $t('aiArena.selectModel') }}</span>
+        <select v-model="selectedModel" :disabled="busy">
+          <option v-for="model in models" :key="model.id" :value="model.id">{{ model.label }}</option>
+        </select>
+      </label>
+      <label>
+        <span>{{ $t('aiArena.selectLanguage') }}</span>
+        <select v-model="selectedLanguage" :disabled="busy">
+          <option value="en">English</option>
+          <option value="ru">Русский</option>
+          <option value="zh-tw">繁體中文（台灣）</option>
+        </select>
+      </label>
+    </div>
     <v-btn color="secondary" :loading="busy" :disabled="!activeRoomID && !selectedModel" @click="openRoom">
       {{ $t(activeRoomID ? 'aiArena.watch' : 'aiArena.create') }}
     </v-btn>
@@ -24,10 +34,12 @@ import { useRouter } from 'vue-router';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
 import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
+import type { AiLanguage } from '@avalon/types';
 const { t } = useI18n();
 const router = useRouter();
 const { canManage, budget, models, defaultModel, activeRoomID } = useAiAccess();
 const selectedModel = ref('');
+const selectedLanguage = ref<AiLanguage>('en');
 watch([models, defaultModel], () => {
   if (!models.value.some((model) => model.id === selectedModel.value)) {
     selectedModel.value = models.value.some((model) => model.id === defaultModel.value)
@@ -45,7 +57,10 @@ async function openRoom() {
       await router.push({ name: 'room', params: { uuid: activeRoomID.value } });
       return;
     }
-    const result = await socket.timeout(10000).emitWithAck('createAiRoom', selectedModel.value);
+    const result = await socket.timeout(10000).emitWithAck('createAiRoom', {
+      model: selectedModel.value,
+      language: selectedLanguage.value,
+    });
     if ('error' in result) error.value = result.error;
     else await router.push({ name: 'room', params: { uuid: result.roomID } });
   } catch {
@@ -77,12 +92,21 @@ async function openRoom() {
 .ai-budget-details summary:focus-visible {
   outline: 2px solid rgb(var(--v-theme-primary));
 }
-.ai-model-select {
+.ai-room-selects {
   display: grid;
-  gap: 4px;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: 8px;
   margin-bottom: 8px;
 }
+.ai-room-selects label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
 select {
+  min-height: 44px;
+  width: 100%;
+  min-width: 0;
   padding: 8px 12px;
   border: 1px solid currentColor;
   border-radius: 4px;

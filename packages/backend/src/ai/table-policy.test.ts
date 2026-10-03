@@ -11,6 +11,28 @@ test('both factions must reject teams with their accused partners regardless of 
     expect(rule.publicReason).toContain(fixture.name.endsWith('-3') ? '2 and 3' : '2');
   }
 });
+
+test.each([
+  {
+    language: 'en',
+    reason: 'I am Good. Mission 1 had 2 Fail card(s); 2 and 3 betrayed us. I reject teams with them.',
+  },
+  {
+    language: 'ru',
+    reason: 'Я мирный. На миссии 1 было 2 карт провала; 2 и 3 предали нас. Я против команд с ними.',
+  },
+  {
+    language: 'zh-tw',
+    reason: '我是正義方。第 1 次任務有 2 張失敗卡；2 和 3 背叛了我們。我反對包含他們的隊伍。',
+  },
+] as const)('mandatory failure testimony follows $language while choices stay legal', ({ language, reason }) => {
+  const request = fixtures.find((f) => f.name === 'postulate-morgana-3')!.request;
+  const rule = tablePolicy({ ...request, language } as unknown as BotRequest);
+  expect(rule.choices).toEqual(['reject']);
+  expect(rule.publicReason).toBe(reason);
+  if (language === 'en') expect(tablePolicy(request as unknown as BotRequest).publicReason).toBe(reason);
+});
+
 test('proposals include oneself by default and keep original legal rosters', () => {
   const fixture = fixtures.find((f) => f.name === 'self-inclusion-proposal')!;
   const r = fixture.request as unknown as BotRequest;

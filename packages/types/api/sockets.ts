@@ -1,7 +1,7 @@
 import type { VoiceState, VoiceJoin, VoiceError } from '../voice';
 import type { PlayerGameSummary } from '../stats/player-games';
 import type { StickerResponse, StickerMessage, StickerError } from '../user/stickers';
-import type { TRoomState } from '../room';
+import type { AiLanguage, TRoomState } from '../room';
 import type { VisualGameState } from '../game/state';
 import type { GameOptions } from '../game/options';
 
@@ -161,7 +161,10 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
     settings: import('../room').CodexSettings,
     callback: (result: { ok: true } | { error: string }) => void,
   ) => void;
-  createAiRoom: (model: string, callback: (result: { roomID: string } | { error: string }) => void) => void;
+  createAiRoom: (
+    options: string | { model: string; language: AiLanguage },
+    callback: (result: { roomID: string } | { error: string }) => void,
+  ) => void;
   controlAiRoom: (
     roomID: string,
     action: 'start' | 'stop' | 'resumeBudget' | 'resumeTechnical',

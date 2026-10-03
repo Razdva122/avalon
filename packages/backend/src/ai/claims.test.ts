@@ -47,3 +47,63 @@ test('past public positions survive recent-chat truncation, and private turns re
     }),
   ).toThrow();
 });
+
+const localizedClaims = [
+  {
+    language: 'en',
+    claim: 'I am Percival. 3 is Morgana. Include me in missions and exclude 3.',
+    trust: "I trust 2's Percival claim.",
+    distrust: "I distrust 2's Percival claim.",
+  },
+  {
+    language: 'ru',
+    claim: 'Я Персиваль. 3 — Моргана. Включайте меня в миссии и исключайте 3.',
+    trust: 'Я доверяю заявлению 2 о роли Персиваля.',
+    distrust: 'Я не доверяю заявлению 2 о роли Персиваля.',
+  },
+  {
+    language: 'zh-tw',
+    claim: '我是派西維爾。3 是莫甘娜。請讓我參加任務，排除 3。',
+    trust: '我相信 2 的派西維爾聲明。',
+    distrust: '我不相信 2 的派西維爾聲明。',
+  },
+] as const;
+
+test.each(localizedClaims)(
+  'server claim and stance speech follows $language',
+  ({ language, claim, trust, distrust }) => {
+    const r = { ...request(), language } as BotRequest;
+    for (const [stance, text] of [
+      ['trust', trust],
+      ['distrust', distrust],
+    ] as const) {
+      expect(claimSpeech(r, { choice: 0, speech: '', claimMorgana: 3, claimStances: [{ seat: 2, stance }] })).toBe(
+        `${text} ${claim}`,
+      );
+    }
+  },
+);
+
+test.each(localizedClaims)(
+  '$language claims and revised stances remain public testimony in any room language',
+  ({ claim, trust, distrust }) => {
+    for (const language of ['en', 'ru', 'zh-tw']) {
+      const r = {
+        ...request(),
+        language,
+        chat: [
+          { name: '2', text: `A public reason. ${claim}` },
+          { name: '1', text: trust },
+          { name: '1', text: distrust },
+          { name: '3', text: trust },
+        ],
+      } as BotRequest;
+      const context = claimContext(r);
+      expect(context.claims).toEqual([{ by: 2, target: 3, status: 'claim' }]);
+      expect(context.claimants).toEqual([2]);
+      expect(context.previousStances).toEqual([{ seat: 2, stance: 'distrust' }]);
+      r.chat.push({ name: '1', text: trust });
+      expect(claimContext(r).previousStances).toEqual([{ seat: 2, stance: 'trust' }]);
+    }
+  },
+);

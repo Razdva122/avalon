@@ -149,7 +149,7 @@ test('compact context strips internal IDs and bounds repeated chat and vote hist
     chat: Array.from({ length: 30 }, () => ({ name: '6', text: 'a'.repeat(500) })),
   });
   expect(compact.votes).toHaveLength(25);
-  expect(compact.chat).toHaveLength(7);
+  expect(compact.chat).toHaveLength(14);
   expect(compact.chat!.every((m) => m.text.length <= 240)).toBe(true);
   const serialized = JSON.stringify(compact);
   expect(serialized).not.toContain('internal-id');

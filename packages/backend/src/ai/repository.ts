@@ -613,6 +613,7 @@ export class AiRepository {
         ai: true,
         aiStatus: state.ai?.status,
         aiModel: aiPlayedModel(state.ai),
+        aiLanguage: state.ai?.language ?? 'en',
         hostID: state.leaderID,
         state: state.stage,
         players: state.players.length,

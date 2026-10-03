@@ -257,6 +257,7 @@ test('creation validates selected model before claiming a lease and pins DeepSee
     await handlers.createAiRoom('deepseek-v4-flash', created);
     const room = host.rooms[created.mock.calls[0][0].roomID];
     expect(room.ai?.model).toBe('deepseek-v4-flash');
+    expect(room.calculateRoomState().ai).toMatchObject({ language: 'en' });
     const reopened = jest.fn();
     await handlers.createAiRoom('qwen3.6-35b-a3b', reopened);
     expect(reopened).toHaveBeenCalledWith({ roomID: room.roomID });
@@ -266,6 +267,63 @@ test('creation validates selected model before claiming a lease and pins DeepSee
     if (previous === undefined) delete process.env.YANDEX_MODEL;
     else process.env.YANDEX_MODEL = previous;
   }
+});
+
+test.each(['en', 'ru', 'zh-tw'])('creation saves the selected %s discussion language', async (language) => {
+  const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
+  const host = {
+    rooms: {},
+    io,
+    updateRoomsList: jest.fn(),
+    dbManager: { getUserByID: async () => ({ isAdmin: true }) },
+  } as unknown as Manager;
+  const service = new AiService(host);
+  service.repository = { claim: async () => {} } as unknown as AiRepository;
+  const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
+  service.register(
+    {
+      on: (name: string, handler: any) => {
+        handlers[name] = handler;
+      },
+    } as unknown as ServerSocket,
+    'owner',
+  );
+  const created = jest.fn();
+  await handlers.createAiRoom({ model: 'deepseek-v4-flash', language }, created);
+  expect(created.mock.calls[0][0]).toHaveProperty('roomID');
+  const room = host.rooms[created.mock.calls[0][0].roomID];
+  expect(room.calculateRoomState().ai).toMatchObject({ model: 'deepseek-v4-flash', language });
+});
+
+test('creation rejects unsupported or malformed language options before claiming a lease', async () => {
+  const host = {
+    rooms: {},
+    dbManager: { getUserByID: async () => ({ isAdmin: true }) },
+  } as unknown as Manager;
+  const service = new AiService(host);
+  const claim = jest.fn(async () => {});
+  service.repository = { claim } as unknown as AiRepository;
+  const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
+  service.register(
+    {
+      on: (name: string, handler: any) => {
+        handlers[name] = handler;
+      },
+    } as unknown as ServerSocket,
+    'owner',
+  );
+  for (const language of ['EN', 'ru-RU', 'zh', 'zh-cn', '', undefined, null, {}, ['en']]) {
+    const response = jest.fn();
+    await handlers.createAiRoom({ model: 'deepseek-v4-flash', language }, response);
+    expect(response.mock.calls[0][0]).toEqual({ error: 'Invalid AI language' });
+  }
+  for (const value of [null, [], {}, { language: 'ru' }, { model: 7, language: 'ru' }]) {
+    const response = jest.fn();
+    await handlers.createAiRoom(value, response);
+    expect(response.mock.calls[0][0]).toHaveProperty('error');
+  }
+  expect(claim).not.toHaveBeenCalled();
+  expect(Object.keys(host.rooms)).toHaveLength(0);
 });
 
 test('public AI list returns latest 20 unique rooms with live state and no private game data', async () => {
@@ -326,6 +384,7 @@ test('public AI list returns latest 20 unique rooms with live state and no priva
       .map((room) => room.roomID),
   );
   expect(rooms[0].aiStatus).toBe('running');
+  expect(rooms[0].aiLanguage).toBe('en');
   expect(rooms.every((room: any) => room.ai)).toBe(true);
   expect(rooms[0]).not.toHaveProperty('game');
   expect(rooms[0]).not.toHaveProperty('chat');

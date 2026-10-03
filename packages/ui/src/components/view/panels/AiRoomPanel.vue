@@ -11,6 +11,7 @@
         <span class="sr-only">{{ $t('aiArena.controls') }}</span>
       </summary>
       <div class="ai-details">
+        <p>{{ $t('aiArena.language', { language: displayLanguage }) }}</p>
         <p aria-live="polite">
           {{
             ai.message?.startsWith('Codex subscription usage limit reached.')
@@ -104,6 +105,9 @@ import type { AiRoomState, AiSpectatorDecision, TRoles } from '@avalon/types';
 const props = defineProps<{ ai: AiRoomState; roomID: string; canReveal?: boolean; rolesShown?: boolean }>();
 const { t } = useI18n();
 const { canManage, costs, limits, budget, codexModels, refresh } = useAiAccess(computed(() => [props.roomID]));
+const displayLanguage = computed(
+  () => ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）' })[props.ai.language || 'en'],
+);
 const pricedCodexModels = computed(() => {
   const ids = codexModels.value.map((model) => model.id);
   return codexModels.value.map((model) => ({

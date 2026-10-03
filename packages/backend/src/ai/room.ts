@@ -1,8 +1,9 @@
 import { Room } from '@/room';
 import { AI_PROFILE_RATING_SEASON } from './rating-season';
-import type { GameOptions, Server, TRoomState, AiSpectatorDecision } from '@avalon/types';
+import type { AiLanguage, GameOptions, Server, TRoomState, AiSpectatorDecision } from '@avalon/types';
 import type { TGameMethodsParams } from '@/core/game-manager';
 import { AiPause, AiTechnicalPause, AiMatchBudgetPause, type Decide, type BotRequest, type BotReply } from './client';
+import { aiText, isAfterGameSpeech, isVoteOnly } from './language';
 
 import { BOT_AGENTS, selectBotAgents } from './agents';
 export { BOT_PROFILES } from './agents';
@@ -39,6 +40,7 @@ export class BotRoom extends Room {
     private decide: Decide,
     private checkpoint: (state: TRoomState) => Promise<void> = async () => {},
     private delayMs = 0,
+    private readonly language: AiLanguage = 'en',
   ) {
     const agents = selectBotAgents();
     super(
@@ -51,11 +53,12 @@ export class BotRoom extends Room {
     this.maxCapacity = 7;
     this.data = { stage: 'locked' };
     this.ai = {
+      language,
       status: 'ready',
       profileRatingSeason: AI_PROFILE_RATING_SEASON,
       costRub: 0,
       fallbacks: 0,
-      message: 'Seven AI players · English discussion',
+      message: aiText(language).ready,
     };
   }
   override joinGame(userID: string): void {
@@ -138,6 +141,7 @@ export class BotRoom extends Room {
     if (!agent) throw new AiTechnicalPause('Unknown AI agent profile.');
     const state = this.stateFor(id);
     const request: BotRequest = {
+      language: this.language,
       playerID: id,
       name: this.label(id),
       style: agent.style,
@@ -153,14 +157,14 @@ export class BotRoom extends Room {
       evilEvidence:
         state.stage === 'assassinate'
           ? this.chat.history
-              .filter((m) => this.players.includes(m.userID) && !/^I vote (approve|reject)\.$/.test(m.message))
+              .filter((m) => this.players.includes(m.userID) && !isVoteOnly(m.message) && !isAfterGameSpeech(m.message))
               .slice(0, 350)
               .map((m) => ({ id: m.id, name: this.label(m.userID), text: m.message }))
           : undefined,
       evilCouncil: ['assassinate', 'end'].includes(state.stage) ? structuredClone(this.evilCouncil) : undefined,
       chat: this.chat.history
         .filter((m) => this.players.includes(m.userID))
-        .filter((m) => !m.message.startsWith('Post-game:') && !m.message.startsWith('Evil council (revealed):'))
+        .filter((m) => !isAfterGameSpeech(m.message))
         .slice(0)
         .map((m) => ({ id: m.id, name: this.label(m.userID), text: m.message })),
     };
@@ -224,23 +228,35 @@ export class BotRoom extends Room {
         // Preserve evidence about earlier votes; discard conflicting current declarations sentence by sentence.
         const selectedVote = choices[answer.choice].text;
         speech = speech
-          .split(/(?<=[.!?])\s+/)
+          .split(/(?<=[.!?])\s+|(?<=[。！？])\s*/u)
           .filter((sentence) => {
-            const declaration = sentence.match(
+            const english = sentence.match(
               /\b(?:I|we)\s+(?:(?:will|would|must|should)\s+)?(?:vote\s+)?(approve|reject)\b/i,
             );
-            return !declaration || declaration[1].toLowerCase() === selectedVote;
+            const russian = sentence.match(
+              /(?:^|\s)(?:я|мы)\s+(?:(?:голосую|голосуем)\s+)?(за|против|поддерживаю|поддерживаем|одобряю|одобряем|отклоняю|отклоняем)(?=[\s.!?]|$)/iu,
+            );
+            const chinese = sentence.match(/(?:我|我們)\s*(?:投票?)?\s*(贊成|支持|同意|反對|拒絕)/u);
+            const declaration = english?.[1].toLowerCase() || russian?.[1].toLowerCase() || chinese?.[1];
+            const vote = /^(approve|за|поддерживаю|поддерживаем|одобряю|одобряем|贊成|支持|同意)$/u.test(
+              declaration || '',
+            )
+              ? 'approve'
+              : 'reject';
+            return !declaration || vote === selectedVote;
           })
           .map((sentence) =>
-            sentence.replace(/^I\s+(?:vote\s+)?(?:approve|reject)(?:\s+this team)?[.!]\s*$/i, '').trim(),
+            isVoteOnly(sentence)
+              ? ''
+              : sentence.replace(/^I\s+(?:vote\s+)?(?:approve|reject)(?:\s+this team)?[.!]\s*$/i, '').trim(),
           )
           .filter(Boolean)
-          .join(' ');
-        speech = `I vote ${choices[answer.choice].text}. ${speech}`.trim();
+          .join(this.language === 'zh-tw' ? '' : ' ');
+        speech = `${aiText(this.language).vote(choices[answer.choice].text)} ${speech}`.trim();
       } else if (task === 'Propose a team and explain your choice') {
-        speech = `I propose ${choices[answer.choice].text}. ${speech}`;
+        speech = `${aiText(this.language).proposal(choices[answer.choice].text)} ${speech}`;
       }
-      await this.publish(id, `${state.stage === 'end' ? 'Post-game: ' : ''}${speech}`);
+      await this.publish(id, `${state.stage === 'end' ? aiText(this.language).postGamePrefix : ''}${speech}`);
     } else {
       await this.checkpoint(this.calculateRoomState());
     }
@@ -391,17 +407,9 @@ export class BotRoom extends Room {
       const inspected = state.players.find((p) => p.features.isSelected);
       this.apply(id, choices[result.choice]);
       if (state.stage === 'announceLoyalty' && inspected) {
-        await this.publish(
-          id,
-          `I inspected ${this.label(inspected.id)} and announce: ${result.choice === 0 ? 'Good' : 'Evil'}.`,
-        );
+        await this.publish(id, aiText(this.language).inspection(this.label(inspected.id), result.choice === 0));
         // Public Good-persona stance for either side; never changes private alignment knowledge.
-        await this.publish(
-          inspected.id,
-          result.choice === 0
-            ? `I am Good, so ${this.label(id)} reported my alignment correctly. This alone does not prove ${this.label(id)} is Good.`
-            : `I am Good. ${this.label(id)} is lying about my inspection; I accuse ${this.label(id)} of being Evil.`,
-        );
+        await this.publish(inspected.id, aiText(this.language).inspectionResponse(this.label(id), result.choice === 0));
       }
     }
   }
@@ -429,7 +437,7 @@ export class BotRoom extends Room {
         for (; this.revealedCouncil < this.evilCouncil.length; this.revealedCouncil++) {
           const entry = this.evilCouncil[this.revealedCouncil];
           const player = this.manager.game.players.find((p) => `${p.index}` === entry.seat)!;
-          await this.publish(player.userID, `Evil council (revealed): Target ${entry.target}. ${entry.reason}`);
+          await this.publish(player.userID, aiText(this.language).council(entry.target, entry.reason));
         }
         for (const id of this.players) {
           if (this.cancelled) break;

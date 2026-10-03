@@ -37,7 +37,11 @@ export class VoteInRoom {
 export type CodexSettings = { model: string; reasoning: string };
 export type CodexModelOption = { id: string; label: string; efforts: string[] };
 
+export type AiLanguage = 'en' | 'ru' | 'zh-tw';
+
 export type AiRoomState = {
+  /** Missing in older archives; discussion defaults to English. */
+  language?: AiLanguage;
   /** Only rooms created after the AI rating release participate in this season. */
   profileRatingSeason?: number;
   codex?: CodexSettings;

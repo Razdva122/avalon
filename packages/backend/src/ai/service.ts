@@ -1,6 +1,6 @@
 import { aiPlayedModel } from '@avalon/types';
 import { aiModel, AI_MODELS, DEFAULT_AI_MODEL } from './models';
-import type { ServerSocket, TRoomInfo } from '@avalon/types';
+import type { AiLanguage, ServerSocket, TRoomInfo } from '@avalon/types';
 import type { Manager } from '@/main';
 import { randomUUID } from 'crypto';
 import { AiRepository } from './repository';
@@ -62,6 +62,7 @@ export class AiService {
             ai: true,
             aiStatus: room.ai?.status,
             aiModel: aiPlayedModel(room.ai),
+            aiLanguage: room.ai?.language ?? 'en',
             hostID: room.leaderID,
             state: room.stage,
             options: room.options,
@@ -174,11 +175,20 @@ export class AiService {
         cb({ canManage: false });
       }
     });
-    socket.on('createAiRoom', async (selectedModel, cb) => {
+    socket.on('createAiRoom', async (options, cb) => {
       if (typeof cb !== 'function') return;
       try {
         if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
-        if (typeof selectedModel !== 'string') return cb({ error: 'Invalid AI model' });
+        let selectedModel: string;
+        let language: AiLanguage = 'en';
+        if (typeof options === 'string') selectedModel = options;
+        else {
+          if (!options || typeof options !== 'object' || Array.isArray(options) || typeof options.model !== 'string')
+            return cb({ error: 'Invalid AI model' });
+          if (!['en', 'ru', 'zh-tw'].includes(options.language)) return cb({ error: 'Invalid AI language' });
+          selectedModel = options.model;
+          language = options.language;
+        }
         if (this.active()) return cb({ roomID: this.active()!.roomID });
         if (this.creating || this.starting || this.running.size) return cb({ error: 'AI room is being created' });
         this.creating = true;
@@ -207,6 +217,7 @@ export class AiService {
                 ),
             (state) => this.repository!.save(state),
             process.env.NODE_ENV === 'development' ? 2000 : 10000,
+            language,
           );
           room.ai!.model = model;
           if (this.manager.chatService) {
