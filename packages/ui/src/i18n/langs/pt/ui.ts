@@ -60,6 +60,12 @@ export default {
     styleDefault: 'Padrão',
     styleLegacy: 'Clássico',
     styleAnime: 'Anime',
+    imageStyleHint: 'Escolha as ilustrações dos papéis e dos ícones do jogo. Veja Merlin em cada estilo abaixo.',
+    imageStyleNote: 'O estilo muda apenas para você. Não altera as regras.',
+    imageStylePreview: '{role} no estilo {style}',
+    styleDefaultDescription: 'Retratos de fantasia detalhados',
+    styleLegacyDescription: 'Ilustrações do jogo original',
+    styleAnimeDescription: 'Personagens desenhados no estilo anime',
     resetRating: 'Redefinir Classificação',
     resetRatingHint: 'Redefinir sua classificação para valores padrão',
     resetRatingConfirmTextPremium:

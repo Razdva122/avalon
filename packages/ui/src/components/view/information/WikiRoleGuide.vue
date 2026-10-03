@@ -6,6 +6,7 @@
           v-for="portrait in portraits"
           :key="portrait"
           class="role-portrait"
+          :role="portrait"
           :src="calculateRoleUrl(portrait)"
           :alt="$t(`roles.${portrait}`)"
           :description="$t(`roles.${portrait}`)"

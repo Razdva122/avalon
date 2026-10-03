@@ -5,6 +5,7 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const ts = require('typescript');
 const { createStore } = require('vuex');
+const { computed } = require('vue');
 
 const src = path.resolve(__dirname, '../src');
 
@@ -31,11 +32,15 @@ webpackRequire.context = (request, _recursive, pattern) => {
 };
 const images = load('helpers/images/index.ts', webpackRequire);
 const store = createStore({ state: { settings: null } });
-const { calculateRoleUrl } = load('helpers/styles/index.ts', (id) => {
-  if (id === '@/helpers/images') return images;
-  if (id === '@/store') return { store };
-  return require(id);
-});
+const { calculateRoleUrl, calculateRolePortraitStyle, calculateRoleIconStyle } = load(
+  'helpers/styles/index.ts',
+  (id) => {
+    if (id === '@/helpers/images') return images;
+    if (id === '@/store') return { store };
+    if (id === './role-framing') return load('helpers/styles/role-framing.ts', require);
+    return require(id);
+  },
+);
 const artwork = (file) => pathToFileURL(path.join(src, 'assets/images', file)).href;
 
 test('role cards use default artwork when no preference or default style is selected', () => {
@@ -90,4 +95,44 @@ test('anime cards use the chosen artwork, including Pure Merlin and Guinevere', 
     ['goodLancelot', 'roles/anime/good_lancelot.webp'],
   ])
     assert.equal(calculateRoleUrl(role), artwork(file), role);
+});
+
+test('every role asset, including mystery and reveal variants, resolves in all three styles', () => {
+  const camelCase = require('lodash/camelCase');
+  const files = fs.readdirSync(path.join(src, 'assets/images/roles')).filter((file) => file.endsWith('.webp'));
+  for (const style of ['default', 'legacy', 'anime']) {
+    store.state.settings = { style };
+    const folder = style === 'default' ? 'roles' : `roles/${style}`;
+    for (const file of files) {
+      const id = file.slice(0, -5);
+      const role = id === 'mystery' ? 'mysteryWizard' : id.startsWith('revealer_') ? id : camelCase(id);
+      assert.equal(calculateRoleUrl(role), artwork(`${folder}/${file}`));
+      const portrait = calculateRolePortraitStyle(role);
+      assert.ok(Number(portrait['--role-image-scale']) >= 1, `${style}/${role} must fill its frame`);
+      const icon = calculateRoleIconStyle(role, false);
+      const thumbnail = calculateRoleIconStyle(role, true);
+      assert.equal(icon.backgroundImage, `url("${artwork(`${folder}/${file}`)}")`);
+      assert.equal(
+        thumbnail.backgroundImage,
+        `url("${pathToFileURL(path.join(src, 'assets/thumbnails', folder, file)).href}")`,
+      );
+      assert.equal(icon.backgroundPosition, thumbnail.backgroundPosition);
+      assert.equal(icon.backgroundSize, thumbnail.backgroundSize);
+    }
+  }
+});
+
+test('portrait and game crops react to preference changes and leave non-role icons alone', () => {
+  store.state.settings = null;
+  const portrait = computed(() => calculateRolePortraitStyle('merlin'));
+  const icon = computed(() => calculateRoleIconStyle('merlin', true));
+  const initialPortrait = portrait.value;
+  const initialIcon = icon.value;
+  store.state.settings = { style: 'legacy' };
+  assert.notDeepEqual(portrait.value, initialPortrait);
+  assert.notDeepEqual(icon.value, initialIcon);
+  for (const role of ['good', 'evil', 'unknown', 'excalibur']) {
+    assert.deepEqual(calculateRoleIconStyle(role, false), {});
+    assert.deepEqual(calculateRolePortraitStyle(role), {});
+  }
 });

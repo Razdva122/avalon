@@ -39,10 +39,8 @@ export function registerTrueSkillRatingEndpoints(
     const rating = await playerTrueSkillRatingModel.findOne({ userID }).lean();
 
     if (!rating) {
-      callback({
-        success: false,
-        error: `Player rating ${userID} does not exist`,
-      });
+      // Accounts have no rating until their first rated game.
+      callback({ success: true });
       return;
     }
 

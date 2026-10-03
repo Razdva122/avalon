@@ -1,49 +1,39 @@
 import snakeCase from 'lodash/snakeCase';
-import { getImagePathByID } from '@/helpers/images';
+import { getImagePathByID, getThumbnailPathByID } from '@/helpers/images';
+import { roleFraming } from './role-framing';
 
 import { store } from '@/store';
 import { TVisibleRole } from '@avalon/types';
 
-// Список ролей, для которых есть legacy изображения
-const LEGACY_ROLES = [
-  'merlin',
-  'minion',
-  'mordred',
-  'morgana',
-  'oberon',
-  'percival',
-  'servant',
-  'merlin_pure',
-  'tristan',
-  'isolde',
-  'good_lancelot',
-  'evil_lancelot',
-  'unknown_lancelot',
-  'guinevere',
-  'troublemaker',
-  'cleric',
-  'trickster',
-  'lunatic',
-  'brute',
-  'witch',
-  'revealer',
-  'wraith',
-];
+type RoleArtwork = TVisibleRole | 'revealer_hidden' | 'revealer_progress';
 
-export function calculateRoleUrl(role: TVisibleRole): string {
-  const style = store.state.settings?.style;
-  const roleSnake = snakeCase(role);
+function roleArt(role: string) {
+  const preference = store.state.settings?.style;
+  const style = preference === 'anime' || preference === 'legacy' ? preference : 'default';
+  const id = role === 'mysteryWizard' ? 'mystery' : snakeCase(role);
+  const framing = roleFraming[style][id];
+  const folder = style === 'default' ? ('roles' as const) : (`roles/${style}` as const);
+  return { id, framing, folder };
+}
 
-  if (style === 'anime') {
-    return getImagePathByID('roles/anime', roleSnake);
-  }
+export function calculateRoleUrl(role: RoleArtwork): string {
+  const { id, folder } = roleArt(role);
+  return getImagePathByID(folder, id);
+}
 
-  // Для legacy проверяем, есть ли изображение для этой роли
-  if (style === 'legacy' && LEGACY_ROLES.includes(roleSnake)) {
-    return getImagePathByID('roles/legacy', roleSnake);
-  }
+export function calculateRolePortraitStyle(role: string): Record<string, string | number> {
+  const { framing } = roleArt(role);
+  if (!framing) return {};
+  const [scale, x, y] = framing;
+  return { '--role-image-scale': scale, '--role-image-position': `${x}% ${y}%` };
+}
 
-  return getImagePathByID('roles', roleSnake);
+export function calculateRoleIconStyle(role: string, thumbnail: boolean): Record<string, string> {
+  const { id, folder, framing } = roleArt(role);
+  if (!framing) return {};
+  const [, , , size, x, y] = framing;
+  const url = thumbnail ? getThumbnailPathByID(folder, id) : getImagePathByID(folder, id);
+  return { backgroundImage: `url("${url}")`, backgroundSize: `${size}%`, backgroundPosition: `${x}% ${y}%` };
 }
 
 export function computedStyles(): string[] {

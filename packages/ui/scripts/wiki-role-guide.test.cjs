@@ -21,7 +21,8 @@ function component(file) {
       if (id.endsWith('SchemaImage.vue')) return { default: component('components/view/SchemaImage.vue') };
       // Text interpolation is verified by the production SEO build checks.
       if (id.endsWith('LocalizedTextWrapper.vue')) return { default: { render: () => null } };
-      if (id === '@/helpers/styles') return { calculateRoleUrl: (role) => `/roles/${role}.webp` };
+      if (id === '@/helpers/styles')
+        return { calculateRoleUrl: (role) => `/roles/${role}.webp`, calculateRolePortraitStyle: () => ({}) };
       return require(id);
     },
     module,

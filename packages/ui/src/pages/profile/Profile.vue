@@ -130,15 +130,37 @@
               variant="outlined"
               density="comfortable"
             ></v-select>
-            <v-select
-              :label="$t('profile.imageStyle')"
-              :items="availableStyles"
-              class="w-100 mb-4"
-              v-model="imageStyle"
-              hide-details="auto"
-              variant="outlined"
-              density="comfortable"
-            ></v-select>
+            <fieldset class="image-style-fieldset" aria-describedby="image-style-hint image-style-note">
+              <legend>{{ $t('profile.imageStyle') }}</legend>
+              <p id="image-style-hint" class="image-style-hint">{{ $t('profile.imageStyleHint') }}</p>
+              <div class="image-style-options">
+                <button
+                  v-for="style in availableStyles"
+                  :key="style.value"
+                  type="button"
+                  class="image-style-option"
+                  :aria-pressed="imageStyle === style.value"
+                  @click="imageStyle = style.value"
+                >
+                  <img
+                    :src="style.image"
+                    :alt="$t('profile.imageStylePreview', { role: $t('roles.merlin'), style: style.title })"
+                    width="160"
+                    height="200"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span v-if="imageStyle === style.value" class="image-style-check material-icons" aria-hidden="true">
+                    check
+                  </span>
+                  <span class="image-style-copy">
+                    <span class="image-style-title">{{ style.title }}</span>
+                    <span class="image-style-description">{{ style.description }}</span>
+                  </span>
+                </button>
+              </div>
+              <p id="image-style-note" class="image-style-note">{{ $t('profile.imageStyleNote') }}</p>
+            </fieldset>
 
             <div class="settings-divider"></div>
             <div class="settings-subtitle">{{ $t('profile.gameSettings') }}</div>
@@ -252,8 +274,9 @@
 import { localizedPath } from '@/router/paths';
 import { i18n } from '@/plugins/i18n';
 import { chooseLanguage } from '@/helpers/i18n/preference';
+import { getImagePathByID } from '@/helpers/images';
 import { defineComponent } from 'vue';
-import { LanguageMap, TLanguage } from '@/helpers/i18n';
+import { LanguageMap } from '@/helpers/i18n';
 import { store } from '@/store';
 import eventBus from '@/helpers/event-bus';
 import { RouteLocationNormalized, NavigationGuardNext } from 'vue-router';
@@ -281,9 +304,9 @@ export default defineComponent({
       validators,
       updatingName: false,
       logoutDialog: false,
-      availableLocales: this.$i18n.availableLocales.map((el) => ({
-        value: el,
-        title: LanguageMap[<TLanguage>el],
+      availableLocales: Object.entries(LanguageMap).map(([value, title]) => ({
+        value,
+        title,
       })),
       // Добавляем новые поля для функционала сброса рейтинга
       resetRatingDialog: false,
@@ -367,16 +390,22 @@ export default defineComponent({
     availableStyles() {
       return [
         {
-          value: 'default',
+          value: 'default' as const,
           title: this.$t('profile.styleDefault'),
+          description: this.$t('profile.styleDefaultDescription'),
+          image: getImagePathByID('roles', 'merlin'),
         },
         {
-          value: 'legacy',
+          value: 'legacy' as const,
           title: this.$t('profile.styleLegacy'),
+          description: this.$t('profile.styleLegacyDescription'),
+          image: getImagePathByID('roles/legacy', 'merlin'),
         },
         {
-          value: 'anime',
+          value: 'anime' as const,
           title: this.$t('profile.styleAnime'),
+          description: this.$t('profile.styleAnimeDescription'),
+          image: getImagePathByID('roles/anime', 'merlin'),
         },
       ];
     },
@@ -616,6 +645,131 @@ export default defineComponent({
 }
 
 // Настройки
+.image-style-fieldset {
+  container-type: inline-size;
+  border: 0;
+  padding: 0;
+  margin: 20px 0 0;
+  min-width: 0;
+
+  legend {
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+.image-style-hint,
+.image-style-note,
+.image-style-description {
+  color: rgba(var(--v-theme-on-surface), 0.8);
+  line-height: 1.6;
+}
+
+.image-style-hint {
+  font-size: 13px;
+  margin: 8px 0 16px;
+}
+
+.image-style-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.image-style-option {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-width: 0;
+  border: 2px solid rgba(var(--v-theme-on-surface), 0.16);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgb(var(--v-theme-inset));
+  color: rgb(var(--v-theme-on-surface));
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(var(--v-theme-inset-hover));
+  }
+
+  &[aria-pressed='true'] {
+    border-color: rgb(var(--v-theme-primary));
+    background: rgba(var(--v-theme-primary), 0.08);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgb(var(--v-theme-primary));
+    outline-offset: 3px;
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: center 20%;
+  }
+}
+
+.image-style-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 8px;
+  overflow-wrap: anywhere;
+}
+
+.image-style-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.image-style-description,
+.image-style-note {
+  font-size: 12px;
+}
+
+.image-style-note {
+  margin: 12px 0 0;
+}
+
+.image-style-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  font-size: 18px;
+}
+
+@container (max-width: 360px) {
+  .image-style-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .image-style-option {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .image-style-copy {
+    padding: 12px 16px;
+  }
+
+  .image-style-check {
+    left: 8px;
+    right: auto;
+  }
+}
+
 .settings-divider {
   height: 1px;
   background: rgba(var(--v-theme-on-surface), 0.1);

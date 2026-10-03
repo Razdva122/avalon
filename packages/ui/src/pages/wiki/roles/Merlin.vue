@@ -9,6 +9,7 @@
     <div class="merlin-overview">
       <SchemaImage
         class="merlin-portrait"
+        role="merlin"
         :src="calculateRoleUrl('merlin')"
         :alt="$t('roles.merlin')"
         :description="$t('roles.merlin')"

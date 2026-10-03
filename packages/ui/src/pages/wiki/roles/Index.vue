@@ -15,6 +15,7 @@
         <h2>{{ $t('roles.merlin') }}</h2>
         <SchemaImage
           class="role-image"
+          role="merlin"
           :src="calculateRoleUrl('merlin')"
           :alt="$t('roles.merlin')"
           :description="$t('roles.merlin')"
@@ -24,6 +25,7 @@
         <h2>{{ $t('roles.merlinPure') }}</h2>
         <SchemaImage
           class="role-image"
+          role="merlinPure"
           :src="calculateRoleUrl('merlinPure')"
           :alt="$t('roles.merlinPure')"
           :description="$t('roles.merlinPure')"
@@ -33,6 +35,7 @@
         <h2>{{ $t('roles.guinevere') }}</h2>
         <SchemaImage
           class="role-image"
+          role="guinevere"
           :src="calculateRoleUrl('guinevere')"
           :alt="$t('roles.guinevere')"
           :description="$t('roles.guinevere')"
@@ -42,6 +45,7 @@
         <h2>{{ $t('roles.percival') }}</h2>
         <SchemaImage
           class="role-image"
+          role="percival"
           :src="calculateRoleUrl('percival')"
           :alt="$t('roles.percival')"
           :description="$t('roles.percival')"
@@ -51,6 +55,7 @@
         <h2>{{ $t('roles.tristan') }}</h2>
         <SchemaImage
           class="role-image"
+          role="tristan"
           :src="calculateRoleUrl('tristan')"
           :alt="$t('roles.tristan')"
           :description="$t('roles.tristan')"
@@ -60,6 +65,7 @@
         <h2>{{ $t('roles.isolde') }}</h2>
         <SchemaImage
           class="role-image"
+          role="isolde"
           :src="calculateRoleUrl('isolde')"
           :alt="$t('roles.isolde')"
           :description="$t('roles.isolde')"
@@ -69,6 +75,7 @@
         <h2>{{ $t('roles.cleric') }}</h2>
         <SchemaImage
           class="role-image"
+          role="cleric"
           :src="calculateRoleUrl('cleric')"
           :alt="$t('roles.cleric')"
           :description="$t('roles.cleric')"
@@ -78,6 +85,7 @@
         <h2>{{ $t('roles.troublemaker') }}</h2>
         <SchemaImage
           class="role-image"
+          role="troublemaker"
           :src="calculateRoleUrl('troublemaker')"
           :alt="$t('roles.troublemaker')"
           :description="$t('roles.troublemaker')"
@@ -87,6 +95,7 @@
         <h2>{{ $t('roles.servant') }}</h2>
         <SchemaImage
           class="role-image"
+          role="servant"
           :src="calculateRoleUrl('servant')"
           :alt="$t('roles.servant')"
           :description="$t('roles.servant')"
@@ -96,6 +105,7 @@
         <h2>{{ $t('roles.goodLancelot') }}</h2>
         <SchemaImage
           class="role-image"
+          role="goodLancelot"
           :src="calculateRoleUrl('goodLancelot')"
           :alt="$t('roles.goodLancelot')"
           :description="$t('roles.goodLancelot')"
@@ -105,6 +115,7 @@
         <h2>{{ $t('roles.evilLancelot') }}</h2>
         <SchemaImage
           class="role-image evil-role"
+          role="evilLancelot"
           :src="calculateRoleUrl('evilLancelot')"
           :alt="$t('roles.evilLancelot')"
           :description="$t('roles.evilLancelot')"
@@ -114,6 +125,7 @@
         <h2>{{ $t('roles.mordred') }}</h2>
         <SchemaImage
           class="role-image evil-role"
+          role="mordred"
           :src="calculateRoleUrl('mordred')"
           :alt="$t('roles.mordred')"
           :description="$t('roles.mordred')"
@@ -123,6 +135,7 @@
         <h2>{{ $t('roles.morgana') }}</h2>
         <SchemaImage
           class="role-image evil-role"
+          role="morgana"
           :src="calculateRoleUrl('morgana')"
           :alt="$t('roles.morgana')"
           :description="$t('roles.morgana')"
@@ -132,6 +145,7 @@
         <h2>{{ $t('roles.oberon') }}</h2>
         <SchemaImage
           class="role-image evil-role"
+          role="oberon"
           :src="calculateRoleUrl('oberon')"
           :alt="$t('roles.oberon')"
           :description="$t('roles.oberon')"
@@ -141,6 +155,7 @@
         <h2>{{ $t('roles.trickster') }}</h2>
         <SchemaImage
           class="role-image evil-role"
+          role="trickster"
           :src="calculateRoleUrl('trickster')"
           :alt="$t('roles.trickster')"
           :description="$t('roles.trickster')"
@@ -150,6 +165,7 @@
         <h2>{{ $t('roles.witch') }}</h2>
         <SchemaImage
           class="role-image evil-role"
+          role="witch"
           :src="calculateRoleUrl('witch')"
           :alt="$t('roles.witch')"
           :description="$t('roles.witch')"
@@ -159,6 +175,7 @@
         <h2>{{ $t('roles.revealer') }}</h2>
         <SchemaImage
           class="role-image evil-role"
+          role="revealer"
           :src="calculateRoleUrl('revealer')"
           :alt="$t('roles.revealer')"
           :description="$t('roles.revealer')"
@@ -168,6 +185,7 @@
         <h2>{{ $t('roles.lunatic') }}</h2>
         <SchemaImage
           class="role-image evil-role"
+          role="lunatic"
           :src="calculateRoleUrl('lunatic')"
           :alt="$t('roles.lunatic')"
           :description="$t('roles.lunatic')"
@@ -177,6 +195,7 @@
         <h2>{{ $t('roles.brute') }}</h2>
         <SchemaImage
           class="role-image evil-role"
+          role="brute"
           :src="calculateRoleUrl('brute')"
           :alt="$t('roles.brute')"
           :description="$t('roles.brute')"
@@ -186,6 +205,7 @@
         <h2>{{ $t('roles.minion') }}</h2>
         <SchemaImage
           class="role-image evil-role"
+          role="minion"
           :src="calculateRoleUrl('minion')"
           :alt="$t('roles.minion')"
           :description="$t('roles.minion')"
@@ -256,12 +276,6 @@ export default defineComponent({
   border-radius: 12px;
   aspect-ratio: 1;
   overflow: hidden;
-  :deep(.image-content) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top center;
-  }
 }
 .evil-role {
   border-color: rgb(var(--v-theme-error));

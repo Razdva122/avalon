@@ -61,6 +61,13 @@ export default {
     styleDefault: 'Estándar',
     styleLegacy: 'Clásico',
     styleAnime: 'Anime',
+    imageStyleHint:
+      'Elige las ilustraciones de los roles y los iconos del juego. Aquí puedes ver a Merlín en cada estilo.',
+    imageStyleNote: 'El estilo cambia solo para ti. No afecta a las reglas.',
+    imageStylePreview: '{role} en estilo {style}',
+    styleDefaultDescription: 'Retratos de fantasía detallados',
+    styleLegacyDescription: 'Ilustraciones del juego original',
+    styleAnimeDescription: 'Personajes dibujados al estilo anime',
     resetRating: 'Restablecer Clasificación',
     resetRatingHint: 'Restablecer tu clasificación a valores predeterminados',
     resetRatingConfirmTextPremium:

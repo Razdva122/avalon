@@ -19,6 +19,7 @@
     <ul>
       <SchemaImage
         class="archetype-image evil-role"
+        role="wraith"
         :src="calculateRoleUrl('wraith')"
         :alt="$t('roles.wraith')"
         :description="$t('roles.wraith')"

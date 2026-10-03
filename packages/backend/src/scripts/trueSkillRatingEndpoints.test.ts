@@ -85,6 +85,13 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
+test('an account without rated games returns an empty rating without an error or database writes', async () => {
+  await playerTrueSkillRatingModel.deleteMany({});
+  expect(await endpoints()('getTrueSkillRating')).toEqual({ success: true });
+  expect(await endpoints('other')('getTrueSkillRating')).toEqual({ success: true });
+  expect(await playerTrueSkillRatingModel.countDocuments()).toBe(0);
+});
+
 test.each(['paid', 'granted'])('%s Premium can reset at one month even with its badge hidden', async (mode) => {
   total = mode === 'paid' ? 1000 : 0;
   features = { showPremiumBadge: false, ...(mode === 'granted' ? { premiumGrantedAt: new Date() } : {}) };

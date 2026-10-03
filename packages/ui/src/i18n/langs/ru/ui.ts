@@ -61,6 +61,12 @@ export default {
     styleDefault: 'Стандартный',
     styleLegacy: 'Классический',
     styleAnime: 'Аниме',
+    imageStyleHint: 'Выберите оформление ролей и значков в игре. Ниже — Мерлин в каждом стиле.',
+    imageStyleNote: 'Стиль меняется только у вас. На правила игры не влияет.',
+    imageStylePreview: '{role} — {style}',
+    styleDefaultDescription: 'Детальные фэнтези-портреты',
+    styleLegacyDescription: 'Иллюстрации из оригинальной игры',
+    styleAnimeDescription: 'Рисованные персонажи в стиле аниме',
     resetRating: 'Сбросить рейтинг',
     resetRatingHint: 'Сбросить ваш рейтинг до стандартных значений',
     resetRatingConfirmTextPremium:

@@ -3,6 +3,15 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const ts = require('typescript');
 
+const languageExports = {};
+new Function(
+  'require',
+  'exports',
+  ts.transpileModule(fs.readFileSync(require.resolve('../src/helpers/i18n/index.ts'), 'utf8'), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS },
+  }).outputText,
+)(() => ({}), languageExports);
+
 function profile() {
   const pending = [];
   const socket = { emit: (event, id, callback) => pending.push({ event, id, callback }) };
@@ -15,6 +24,7 @@ function profile() {
     (id) => {
       if (id === 'vue') return require('vue');
       if (id === '@/api/socket') return { socket };
+      if (id === '@/helpers/i18n') return languageExports;
       if (id === '@/helpers/event-bus') return { default: { emit() {} } };
       return {};
     },
@@ -34,6 +44,20 @@ function profile() {
   };
   return { page, state, pending };
 }
+
+test('profile offers every supported language even when only English and Russian messages are loaded', () => {
+  const { page, state } = profile();
+  state.$i18n = { availableLocales: ['en', 'ru'] };
+  const data = page.data.call(state);
+  assert.deepEqual(data.availableLocales, [
+    { value: 'en', title: 'English' },
+    { value: 'ru', title: 'Русский' },
+    { value: 'zh-TW', title: '繁體中文' },
+    { value: 'zh-CN', title: '简体中文' },
+    { value: 'es', title: 'Español' },
+    { value: 'pt', title: 'Português' },
+  ]);
+});
 
 test('profile uses the server reset date and interval, including clearing a previous date', () => {
   const { page, state, pending } = profile();
