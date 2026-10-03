@@ -1,4 +1,33 @@
 import { validPacket } from './validation';
+
+test.each(['en', 'ru', 'zh-tw'])('accepts AI creation options with %s and an acknowledgement', (language) => {
+  expect(validPacket('createAiRoom', [{ model: 'codex-chatgpt', language }, () => {}])).toBe(true);
+});
+
+test('AI creation keeps the legacy model-only packet and requires the acknowledgement', () => {
+  expect(validPacket('createAiRoom', ['codex-chatgpt', () => {}])).toBe(true);
+  expect(validPacket('createAiRoom', [{ model: 'codex-chatgpt', language: 'ru' }])).toBe(false);
+  expect(validPacket('createAiRoom', [{ model: 'codex-chatgpt', language: 'ru' }, 'not-a-callback'])).toBe(false);
+});
+
+test.each([
+  null,
+  [],
+  {},
+  { model: 'codex-chatgpt' },
+  { language: 'ru' },
+  { model: 7, language: 'ru' },
+  { model: '', language: 'ru' },
+  { model: 'a'.repeat(255), language: 'ru' },
+  { model: { $ne: null }, language: 'ru' },
+  { model: 'codex-chatgpt', language: 'zh-cn' },
+  { model: 'codex-chatgpt', language: ['ru'] },
+  { model: 'codex-chatgpt', language: 'ru', extra: true },
+  Object.assign(Object.create({ language: 'ru' }), { model: 'codex-chatgpt' }),
+])('rejects malformed AI creation options %#', (options) => {
+  expect(validPacket('createAiRoom', [options, () => {}])).toBe(false);
+});
+
 test.each([
   ['voteForMission', ['room', 'bogus']],
   ['voteForMission', ['room', undefined]],

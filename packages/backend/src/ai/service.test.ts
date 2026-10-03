@@ -3,6 +3,7 @@ import * as codexModels from './codex-models';
 import * as codexLimits from './codex-limits';
 import { AiService } from './service';
 import { BotRoom } from './room';
+import { handleSocketErrors } from '@/helpers/socket';
 import type { Manager } from '@/main';
 import type { Server, ServerSocket } from '@avalon/types';
 import type { AiRepository } from './repository';
@@ -280,14 +281,14 @@ test.each(['en', 'ru', 'zh-tw'])('creation saves the selected %s discussion lang
   const service = new AiService(host);
   service.repository = { claim: async () => {} } as unknown as AiRepository;
   const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
-  service.register(
-    {
-      on: (name: string, handler: any) => {
-        handlers[name] = handler;
-      },
-    } as unknown as ServerSocket,
-    'owner',
-  );
+  const socket = {
+    on: (name: string, handler: any) => {
+      handlers[name] = handler;
+      return socket;
+    },
+  } as unknown as ServerSocket;
+  handleSocketErrors(socket);
+  service.register(socket, 'owner');
   const created = jest.fn();
   await handlers.createAiRoom({ model: 'deepseek-v4-flash', language }, created);
   expect(created.mock.calls[0][0]).toHaveProperty('roomID');

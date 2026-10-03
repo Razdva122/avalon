@@ -155,6 +155,17 @@ export function validPacket(event: string, args: unknown[]): boolean {
       values[1] > 0 &&
       values[1] <= 86400
     );
+  if (event === 'createAiRoom') {
+    const options = values[0];
+    if (typeof options === 'string') return text(options, 254);
+    return (
+      record(options) &&
+      Object.keys(options).length === 2 &&
+      text(options.model, 254) &&
+      typeof options.language === 'string' &&
+      ['en', 'ru', 'zh-tw'].includes(options.language)
+    );
+  }
   if (event === 'configureAiCodex') {
     const settings = values[1];
     return (
