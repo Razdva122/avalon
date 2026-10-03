@@ -5,7 +5,30 @@ import { store } from '@/store';
 import { TVisibleRole } from '@avalon/types';
 
 // Список ролей, для которых есть legacy изображения
-const LEGACY_ROLES = ['merlin', 'minion', 'mordred', 'morgana', 'oberon', 'percival', 'servant'];
+const LEGACY_ROLES = [
+  'merlin',
+  'minion',
+  'mordred',
+  'morgana',
+  'oberon',
+  'percival',
+  'servant',
+  'merlin_pure',
+  'tristan',
+  'isolde',
+  'good_lancelot',
+  'evil_lancelot',
+  'unknown_lancelot',
+  'guinevere',
+  'troublemaker',
+  'cleric',
+  'trickster',
+  'lunatic',
+  'brute',
+  'witch',
+  'revealer',
+  'wraith',
+];
 
 export function calculateRoleUrl(role: TVisibleRole): string {
   const style = store.state.settings?.style;

@@ -212,6 +212,36 @@ export default defineComponent({
 }
 
 .style-legacy {
+  @each $role,
+    $image
+      in (
+        merlinPure: 'merlin_pure',
+        tristan: 'tristan',
+        isolde: 'isolde',
+        goodLancelot: 'good_lancelot',
+        evilLancelot: 'evil_lancelot',
+        unknownLancelot: 'unknown_lancelot',
+        guinevere: 'guinevere',
+        troublemaker: 'troublemaker',
+        cleric: 'cleric',
+        trickster: 'trickster',
+        lunatic: 'lunatic',
+        brute: 'brute',
+        witch: 'witch',
+        revealer: 'revealer',
+        revealer_hidden: 'revealer_hidden',
+        revealer_progress: 'revealer_progress',
+        wraith: 'wraith',
+        mysteryWizard: 'mystery'
+      )
+  {
+    &.icon-#{$role} {
+      @include player-image('roles/legacy', $image);
+      background-size: 100%;
+      background-position: 50% 30%;
+    }
+  }
+
   &.icon-merlin {
     @include player-image('roles/legacy', 'merlin');
     background-size: 100%;

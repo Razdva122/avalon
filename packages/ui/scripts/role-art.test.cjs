@@ -51,7 +51,7 @@ test('role cards use default artwork when no preference or default style is sele
   }
 });
 
-test('classic cards use available skins and preserve default Pure Merlin and Guinevere artwork', () => {
+test('classic cards use classic artwork for every playable role', () => {
   store.state.settings = { style: 'legacy' };
   for (const [role, file] of [
     ['merlin', 'roles/legacy/merlin.webp'],
@@ -61,8 +61,21 @@ test('classic cards use available skins and preserve default Pure Merlin and Gui
     ['mordred', 'roles/legacy/mordred.webp'],
     ['morgana', 'roles/legacy/morgana.webp'],
     ['oberon', 'roles/legacy/oberon.webp'],
-    ['merlinPure', 'roles/merlin_pure.webp'],
-    ['guinevere', 'roles/guinevere.webp'],
+    ['merlinPure', 'roles/legacy/merlin_pure.webp'],
+    ['guinevere', 'roles/legacy/guinevere.webp'],
+    ['tristan', 'roles/legacy/tristan.webp'],
+    ['isolde', 'roles/legacy/isolde.webp'],
+    ['goodLancelot', 'roles/legacy/good_lancelot.webp'],
+    ['evilLancelot', 'roles/legacy/evil_lancelot.webp'],
+    ['troublemaker', 'roles/legacy/troublemaker.webp'],
+    ['cleric', 'roles/legacy/cleric.webp'],
+    ['trickster', 'roles/legacy/trickster.webp'],
+    ['lunatic', 'roles/legacy/lunatic.webp'],
+    ['brute', 'roles/legacy/brute.webp'],
+    ['witch', 'roles/legacy/witch.webp'],
+    ['revealer', 'roles/legacy/revealer.webp'],
+    ['wraith', 'roles/legacy/wraith.webp'],
+    ['unknownLancelot', 'roles/legacy/unknown_lancelot.webp'],
   ])
     assert.equal(calculateRoleUrl(role), artwork(file), role);
 });
