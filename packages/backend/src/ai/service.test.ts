@@ -12,9 +12,11 @@ test('only database-admin authenticated account can create or control a room, du
   const old = process.env.AI_ROOM_ADMIN_LOGINS;
   process.env.AI_ROOM_ADMIN_LOGINS = 'razdva';
   const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
+  const sendText = jest.fn(async () => {});
   const host = {
     rooms: {},
     io,
+    chatService: { sendText },
     updateRoomsList: () => {},
     dbManager: {
       getUserByID: async (id: string) => ({ login: 'razdva', isAdmin: id === 'owner' }),
@@ -51,6 +53,14 @@ test('only database-admin authenticated account can create or control a room, du
     await admin.createAiRoom('qwen3.6-35b-a3b', created);
     const id = created.mock.calls[0][0].roomID;
     expect(host.rooms[id]).toBeInstanceOf(BotRoom);
+    await host.rooms[id].persistChatMessage?.('bot-author', 'Exact speech.', 'stable-publication-id');
+    expect(sendText).toHaveBeenCalledWith(
+      id,
+      'bot-author',
+      'Exact speech.',
+      'stable-publication-id',
+      expect.any(Function),
+    );
     await admin.createAiRoom('qwen3.6-35b-a3b', created);
     expect(created.mock.calls[1][0]).toEqual({ roomID: id });
     expect(Object.keys(host.rooms)).toHaveLength(1);
@@ -270,30 +280,81 @@ test('creation validates selected model before claiming a lease and pins DeepSee
   }
 });
 
-test.each(['en', 'ru', 'zh-tw'])('creation saves the selected %s discussion language', async (language) => {
-  const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
-  const host = {
-    rooms: {},
-    io,
-    updateRoomsList: jest.fn(),
-    dbManager: { getUserByID: async () => ({ isAdmin: true }) },
-  } as unknown as Manager;
+test.each([
+  ['en', undefined],
+  ['ru', undefined],
+  ['zh-tw', undefined],
+  ['en', 5],
+  ['ru', 5],
+  ['zh-tw', 5],
+  ['en', 6],
+  ['ru', 6],
+  ['zh-tw', 6],
+  ['en', 7],
+  ['ru', 7],
+  ['zh-tw', 7],
+  ['en', 8],
+  ['ru', 8],
+  ['zh-tw', 8],
+])(
+  'creation saves language %s and AI player count %s through the actual socket boundary',
+  async (language, playerCount) => {
+    const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
+    const host = {
+      rooms: {},
+      io,
+      updateRoomsList: jest.fn(),
+      dbManager: { getUserByID: async () => ({ isAdmin: true }) },
+    } as unknown as Manager;
+    const service = new AiService(host);
+    service.repository = { claim: async () => {} } as unknown as AiRepository;
+    const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
+    const socket = {
+      on: (name: string, handler: any) => {
+        handlers[name] = handler;
+        return socket;
+      },
+    } as unknown as ServerSocket;
+    handleSocketErrors(socket);
+    service.register(socket, 'owner');
+    const created = jest.fn();
+    await handlers.createAiRoom(
+      { model: 'deepseek-v4-flash', language, ...(playerCount === undefined ? {} : { playerCount }) },
+      created,
+    );
+    expect(created.mock.calls[0][0]).toHaveProperty('roomID');
+    const room = host.rooms[created.mock.calls[0][0].roomID];
+    expect(room.calculateRoomState().ai).toMatchObject({
+      model: 'deepseek-v4-flash',
+      language,
+      playerCount: playerCount ?? 7,
+    });
+    expect(room.players).toHaveLength(playerCount ?? 7);
+    expect(room.maxCapacity).toBe(playerCount ?? 7);
+  },
+);
+
+test('invalid AI player counts are rejected before reserving a room', async () => {
+  const host = { rooms: {}, dbManager: { getUserByID: async () => ({ isAdmin: true }) } } as unknown as Manager;
   const service = new AiService(host);
-  service.repository = { claim: async () => {} } as unknown as AiRepository;
+  const claim = jest.fn(async () => {});
+  service.repository = { claim } as unknown as AiRepository;
   const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
-  const socket = {
-    on: (name: string, handler: any) => {
-      handlers[name] = handler;
-      return socket;
-    },
-  } as unknown as ServerSocket;
-  handleSocketErrors(socket);
-  service.register(socket, 'owner');
-  const created = jest.fn();
-  await handlers.createAiRoom({ model: 'deepseek-v4-flash', language }, created);
-  expect(created.mock.calls[0][0]).toHaveProperty('roomID');
-  const room = host.rooms[created.mock.calls[0][0].roomID];
-  expect(room.calculateRoomState().ai).toMatchObject({ model: 'deepseek-v4-flash', language });
+  service.register(
+    {
+      on: (name: string, handler: any) => {
+        handlers[name] = handler;
+      },
+    } as unknown as ServerSocket,
+    'owner',
+  );
+  for (const playerCount of [0, 4, 9, 10, 5.5, '5', null, undefined, {}, [], NaN, Infinity]) {
+    const response = jest.fn();
+    await handlers.createAiRoom({ model: 'deepseek-v4-flash', language: 'ru', playerCount }, response);
+    expect(response).toHaveBeenCalledWith({ error: 'Invalid AI player count' });
+  }
+  expect(claim).not.toHaveBeenCalled();
+  expect(Object.keys(host.rooms)).toHaveLength(0);
 });
 
 test('creation rejects unsupported or malformed language options before claiming a lease', async () => {

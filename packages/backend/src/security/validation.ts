@@ -160,10 +160,12 @@ export function validPacket(event: string, args: unknown[]): boolean {
     if (typeof options === 'string') return text(options, 254);
     return (
       record(options) &&
-      Object.keys(options).length === 2 &&
+      Object.keys(options).every((key) => ['model', 'language', 'playerCount'].includes(key)) &&
       text(options.model, 254) &&
       typeof options.language === 'string' &&
-      ['en', 'ru', 'zh-tw'].includes(options.language)
+      ['en', 'ru', 'zh-tw'].includes(options.language) &&
+      (!Object.prototype.hasOwnProperty.call(options, 'playerCount') ||
+        (typeof options.playerCount === 'number' && [5, 6, 7, 8].includes(options.playerCount)))
     );
   }
   if (event === 'configureAiCodex') {

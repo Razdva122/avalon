@@ -1,6 +1,6 @@
 import { aiPlayedModel } from '@avalon/types';
 import { aiModel, AI_MODELS, DEFAULT_AI_MODEL } from './models';
-import type { AiLanguage, ServerSocket, TRoomInfo } from '@avalon/types';
+import type { AiLanguage, AiPlayerCount, ServerSocket, TRoomInfo } from '@avalon/types';
 import type { Manager } from '@/main';
 import { randomUUID } from 'crypto';
 import { AiRepository } from './repository';
@@ -181,11 +181,17 @@ export class AiService {
         if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
         let selectedModel: string;
         let language: AiLanguage = 'en';
+        let playerCount: AiPlayerCount = 7;
         if (typeof options === 'string') selectedModel = options;
         else {
           if (!options || typeof options !== 'object' || Array.isArray(options) || typeof options.model !== 'string')
             return cb({ error: 'Invalid AI model' });
           if (!['en', 'ru', 'zh-tw'].includes(options.language)) return cb({ error: 'Invalid AI language' });
+          if (Object.prototype.hasOwnProperty.call(options, 'playerCount')) {
+            if (typeof options.playerCount !== 'number' || ![5, 6, 7, 8].includes(options.playerCount))
+              return cb({ error: 'Invalid AI player count' });
+            playerCount = options.playerCount;
+          }
           selectedModel = options.model;
           language = options.language;
         }
@@ -218,11 +224,12 @@ export class AiService {
             (state) => this.repository!.save(state),
             process.env.NODE_ENV === 'development' ? 2000 : 10000,
             language,
+            playerCount,
           );
           room.ai!.model = model;
           if (this.manager.chatService) {
-            room.persistChatMessage = (author, text) =>
-              this.manager.chatService.sendText(id, author, text, undefined, () => this.manager.rooms[id] === room);
+            room.persistChatMessage = (author, text, requestID) =>
+              this.manager.chatService.sendText(id, author, text, requestID, () => this.manager.rooms[id] === room);
           }
           this.manager.rooms[id] = room;
           this.manager.updateRoomsList(room);

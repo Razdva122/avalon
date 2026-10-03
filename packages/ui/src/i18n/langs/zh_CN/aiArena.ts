@@ -10,6 +10,8 @@ export default {
 
   lastDecision: '最近的决定',
   chosenAction: '所选行动',
+  teamDiscussion: '组队讨论',
+  preferredTeam: '偏好的队伍',
   privateReason: '私人解释',
   openDecision: '查看完整决定',
 
@@ -24,6 +26,8 @@ export default {
   budgetDetails: '预算详情',
   selectModel: '新对局的模型',
   selectLanguage: '讨论语言',
+  selectPlayerCount: '机器人数量',
+  playerCount: '{count}个机器人',
   language: '讨论语言：{language}',
   resumeBudget: '继续 · 将限额提高至 {limit} ₽（×2）',
   budgetResetIn: '额度重置倒计时：{days}天{hours}小时{minutes}分钟',
@@ -45,7 +49,7 @@ export default {
 
   title: 'AI竞技场',
   english: '英语对话',
-  tagline: '七个机器人，两个阵营。',
+  tagline: '{count}个机器人，两个阵营。',
   subtitle: '伪装、任务与讨论',
   model: '模型：{model}',
   ready: '准备开始',
@@ -57,7 +61,7 @@ export default {
   evilWon: '邪恶方获胜',
   watch: '观看对局',
   discussion: '查看讨论',
-  create: 'AI对局 · 7个机器人',
+  create: 'AI对局 · {count}个机器人',
   start: '开始AI对局',
   stop: '停止',
   connectionError: '无法连接服务器，请检查网络后重试。',

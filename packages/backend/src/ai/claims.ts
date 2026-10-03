@@ -10,7 +10,7 @@ export function claimContext(request: BotRequest) {
   for (const message of request.chat) {
     if (Number(message.name) === own?.index) {
       for (const match of message.text.matchAll(
-        /\bI (trust|distrust) ([1-7])'s Percival claim\.|Я (не )?доверяю заявлению ([1-7]) о роли Персиваля\.|我(不)?相信 ([1-7]) 的派西維爾聲明。/g,
+        /\bI (trust|distrust) ([1-8])'s Percival claim\.|Я (не )?доверяю заявлению ([1-8]) о роли Персиваля\.|我(不)?相信 ([1-8]) 的派西維爾聲明。/g,
       ))
         previousStances.set(
           Number(match[2] || match[4] || match[6]),
@@ -18,7 +18,7 @@ export function claimContext(request: BotRequest) {
         );
     }
     const match = message.text.match(
-      /\bI am Percival\. ([1-7]) is Morgana\.|Я Персиваль\. ([1-7]) — Моргана\.|我是派西維爾。([1-7]) 是莫甘娜。/,
+      /\bI am Percival\. ([1-8]) is Morgana\.|Я Персиваль\. ([1-8]) — Моргана\.|我是派西維爾。([1-8]) 是莫甘娜。/,
     );
     const target = match?.[1] || match?.[2] || match?.[3];
     const by = Number(message.name);
@@ -34,6 +34,7 @@ export function claimContext(request: BotRequest) {
   const publicTurn =
     request.speak &&
     !request.privateDiscussion &&
+    !request.optionalSpeech &&
     ['selectTeam', 'votingForTeam', 'checkLoyalty', 'announceLoyalty'].includes(request.state.stage);
   const eligible = own && ['merlin', 'percival', 'mordred', 'morgana', 'minion', 'oberon'].includes(own.role);
   return {

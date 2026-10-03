@@ -69,6 +69,45 @@ const localizedClaims = [
   },
 ] as const;
 
+test.each(localizedClaims)('$language claims and stances support the eighth seat', ({ language, claim, distrust }) => {
+  const r = {
+    ...request(),
+    language,
+    state: {
+      ...request().state,
+      players: Array.from({ length: 8 }, (_, i) => ({
+        id: i === 0 ? 'a' : `seat-${i + 1}`,
+        index: i + 1,
+        role: i === 0 ? 'merlin' : 'unknown',
+      })),
+    },
+    chat: [
+      { name: '2', text: claim.replace(/\b3\b/g, '8') },
+      { name: '8', text: claim },
+      { name: '1', text: distrust.replace(/\b2\b/g, '8') },
+    ],
+  } as BotRequest;
+  expect(claimContext(r)).toMatchObject({
+    claims: [
+      { by: 2, target: 8, status: 'claim' },
+      { by: 8, target: 3, status: 'claim' },
+    ],
+    claimants: [2, 8],
+    previousStances: [{ seat: 8, stance: 'distrust' }],
+  });
+  const speech = claimSpeech(r, {
+    choice: 0,
+    speech: '',
+    claimMorgana: 8,
+    claimStances: [
+      { seat: 2, stance: 'distrust' },
+      { seat: 8, stance: 'distrust' },
+    ],
+  });
+  expect(speech).toContain(claim.replace(/\b3\b/g, '8'));
+  expect(speech).toContain(distrust.replace(/\b2\b/g, '8'));
+});
+
 test.each(localizedClaims)(
   'server claim and stance speech follows $language',
   ({ language, claim, trust, distrust }) => {

@@ -35,6 +35,17 @@ test('a fresh roster draws seven unique agents without changing the persistent p
   expect(BOT_AGENTS.map((a) => a.id)).toEqual(before);
 });
 
+test.each([5, 6, 8] as const)('a %i-player roster draws unique agents from the same persistent pool', (count) => {
+  const before = BOT_AGENTS.map((agent) => agent.id);
+  const first = selectBotAgents(() => 0, count);
+  const second = selectBotAgents((bound) => bound - 1, count);
+  expect(first).toHaveLength(count);
+  expect(new Set(first.map((agent) => agent.id)).size).toBe(count);
+  expect(first.every((agent) => BOT_AGENTS.includes(agent))).toBe(true);
+  expect(first.map((agent) => agent.id)).not.toEqual(second.map((agent) => agent.id));
+  expect(BOT_AGENTS.map((agent) => agent.id)).toEqual(before);
+});
+
 test('the selected agent personality reaches actual decision context and the roster stays fixed', async () => {
   const seen: BotRequest[] = [];
   const room = new BotRoom('agent-room', 'admin', io, async (request) => {

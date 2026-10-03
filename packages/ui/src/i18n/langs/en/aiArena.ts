@@ -10,6 +10,8 @@ export default {
 
   lastDecision: 'Last decision',
   chosenAction: 'Chosen action',
+  teamDiscussion: 'Team discussion',
+  preferredTeam: 'Preferred team',
   privateReason: 'Private explanation',
   openDecision: 'Open full decision',
 
@@ -24,6 +26,8 @@ export default {
   budgetDetails: 'Budget details',
   selectModel: 'Model for the new match',
   selectLanguage: 'Discussion language',
+  selectPlayerCount: 'Number of bots',
+  playerCount: '{count} bots',
   language: 'Discussion language: {language}',
   resumeBudget: 'Continue · raise limit to {limit} ₽ (×2)',
   budgetResetIn: 'Budget resets in: {days}d {hours}h {minutes}m',
@@ -46,7 +50,7 @@ export default {
 
   title: 'AI Arena',
   english: 'English',
-  tagline: 'Seven bots. Two sides.',
+  tagline: '{count} bots. Two sides.',
   subtitle: 'Bluffs, missions & debate',
   model: 'Model: {model}',
   ready: 'Ready to start',
@@ -58,7 +62,7 @@ export default {
   evilWon: 'Evil won',
   watch: 'Watch match',
   discussion: 'Read discussion',
-  create: 'AI match · 7 bots',
+  create: 'AI match · {count} bots',
   start: 'Start AI match',
   stop: 'Stop',
   connectionError: 'Could not reach the server. Check your connection and try again.',

@@ -4,6 +4,7 @@
       <summary>
         <span class="ai-heading"
           ><strong>{{ $t('aiArena.title') }}</strong
+          ><small>{{ $t('aiArena.playerCount', { count: displayPlayerCount }) }}</small
           ><small v-if="displayModel">{{ displayModel }}</small></span
         >
         <span class="ai-status" :class="`ai-status--${ai.status}`">{{ $t(`aiArena.${ai.status}`) }}</span>
@@ -102,9 +103,16 @@ import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
 import { aiPlayedModel } from '@avalon/types/room/ai-model';
 import type { AiRoomState, AiSpectatorDecision, TRoles } from '@avalon/types';
-const props = defineProps<{ ai: AiRoomState; roomID: string; canReveal?: boolean; rolesShown?: boolean }>();
+const props = defineProps<{
+  ai: AiRoomState;
+  roomID: string;
+  playerCount?: number;
+  canReveal?: boolean;
+  rolesShown?: boolean;
+}>();
 const { t } = useI18n();
 const { canManage, costs, limits, budget, codexModels, refresh } = useAiAccess(computed(() => [props.roomID]));
+const displayPlayerCount = computed(() => props.ai.playerCount ?? props.playerCount ?? 7);
 const displayLanguage = computed(
   () => ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）' })[props.ai.language || 'en'],
 );

@@ -10,6 +10,8 @@ export default {
 
   lastDecision: 'Последнее решение',
   chosenAction: 'Выбранное действие',
+  teamDiscussion: 'Обсуждение команды',
+  preferredTeam: 'Желаемый состав',
   privateReason: 'Приватное объяснение',
   openDecision: 'Открыть решение полностью',
 
@@ -24,6 +26,8 @@ export default {
   budgetDetails: 'Расходы и лимиты',
   selectModel: 'Модель для новой партии',
   selectLanguage: 'Язык обсуждения',
+  selectPlayerCount: 'Количество ботов',
+  playerCount: 'Ботов: {count}',
   language: 'Язык обсуждения: {language}',
   resumeBudget: 'Продолжить · увеличить лимит до {limit} ₽ (×2)',
   budgetResetIn: 'До обновления лимита: {days} дн. {hours} ч. {minutes} мин.',
@@ -46,7 +50,7 @@ export default {
 
   title: 'Арена ИИ',
   english: 'На английском',
-  tagline: 'Семь ботов. Две стороны.',
+  tagline: 'Ботов: {count}. Две стороны.',
   subtitle: 'Блеф, миссии и обсуждение',
   model: 'Модель: {model}',
   ready: 'Готова к запуску',
@@ -58,7 +62,7 @@ export default {
   evilWon: 'Победа зла',
   watch: 'Смотреть игру',
   discussion: 'Открыть обсуждение',
-  create: 'AI-партия · 7 ботов',
+  create: 'AI-партия · {count} ботов',
   start: 'Запустить AI-партию',
   stop: 'Остановить',
   connectionError: 'Нет связи с сервером. Проверьте соединение и попробуйте снова.',

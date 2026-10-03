@@ -10,6 +10,8 @@ export default {
 
   lastDecision: 'Última decisión',
   chosenAction: 'Acción elegida',
+  teamDiscussion: 'Debate del equipo',
+  preferredTeam: 'Equipo preferido',
   privateReason: 'Explicación privada',
   openDecision: 'Abrir decisión completa',
 
@@ -25,6 +27,8 @@ export default {
   budgetDetails: 'Detalles del presupuesto',
   selectModel: 'Modelo para la nueva partida',
   selectLanguage: 'Idioma de la discusión',
+  selectPlayerCount: 'Número de bots',
+  playerCount: '{count} bots',
   language: 'Idioma de la discusión: {language}',
   resumeBudget: 'Continuar · aumentar límite a {limit} ₽ (×2)',
   budgetResetIn: 'El límite se renueva en: {days} d {hours} h {minutes} min',
@@ -47,7 +51,7 @@ export default {
 
   title: 'Arena de IA',
   english: 'En inglés',
-  tagline: 'Siete bots. Dos bandos.',
+  tagline: '{count} bots. Dos bandos.',
   subtitle: 'Engaños, misiones y debate',
   model: 'Modelo: {model}',
   ready: 'Lista para empezar',
@@ -59,7 +63,7 @@ export default {
   evilWon: 'Ganó el Mal',
   watch: 'Ver partida',
   discussion: 'Leer debate',
-  create: 'Partida de IA · 7 bots',
+  create: 'Partida de IA · {count} bots',
   start: 'Iniciar partida de IA',
   stop: 'Detener',
   connectionError: 'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.',

@@ -10,6 +10,8 @@ export default {
 
   lastDecision: '最近的決定',
   chosenAction: '所選行動',
+  teamDiscussion: '組隊討論',
+  preferredTeam: '偏好的隊伍',
   privateReason: '私人解釋',
   openDecision: '查看完整決定',
 
@@ -24,6 +26,8 @@ export default {
   budgetDetails: '預算詳情',
   selectModel: '新對局的模型',
   selectLanguage: '討論語言',
+  selectPlayerCount: '機器人數量',
+  playerCount: '{count}個機器人',
   language: '討論語言：{language}',
   resumeBudget: '繼續 · 將限額提高至 {limit} ₽（×2）',
   budgetResetIn: '額度重設倒數：{days}天{hours}小時{minutes}分鐘',
@@ -45,7 +49,7 @@ export default {
 
   title: 'AI競技場',
   english: '英語對話',
-  tagline: '七個機器人，兩個陣營。',
+  tagline: '{count}個機器人，兩個陣營。',
   subtitle: '偽裝、任務與討論',
   model: '模型：{model}',
   ready: '準備開始',
@@ -57,7 +61,7 @@ export default {
   evilWon: '邪惡方獲勝',
   watch: '觀看對局',
   discussion: '查看討論',
-  create: 'AI對局 · 7個機器人',
+  create: 'AI對局 · {count}個機器人',
   start: '開始AI對局',
   stop: '停止',
   connectionError: '無法連線至伺服器，請檢查網路後重試。',

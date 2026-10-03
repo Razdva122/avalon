@@ -10,6 +10,8 @@ export default {
 
   lastDecision: 'Última decisão',
   chosenAction: 'Ação escolhida',
+  teamDiscussion: 'Discussão da equipe',
+  preferredTeam: 'Equipe preferida',
   privateReason: 'Explicação privada',
   openDecision: 'Abrir decisão completa',
 
@@ -24,6 +26,8 @@ export default {
   budgetDetails: 'Detalhes do orçamento',
   selectModel: 'Modelo para a nova partida',
   selectLanguage: 'Idioma da discussão',
+  selectPlayerCount: 'Número de bots',
+  playerCount: '{count} bots',
   language: 'Idioma da discussão: {language}',
   resumeBudget: 'Continuar · aumentar limite para {limit} ₽ (×2)',
   budgetResetIn: 'O limite renova em: {days} d {hours} h {minutes} min',
@@ -46,7 +50,7 @@ export default {
 
   title: 'Arena de IA',
   english: 'Em inglês',
-  tagline: 'Sete bots. Dois lados.',
+  tagline: '{count} bots. Dois lados.',
   subtitle: 'Blefes, missões e debate',
   model: 'Modelo: {model}',
   ready: 'Pronta para começar',
@@ -58,7 +62,7 @@ export default {
   evilWon: 'O Mal venceu',
   watch: 'Assistir à partida',
   discussion: 'Ler discussão',
-  create: 'Partida de IA · 7 bots',
+  create: 'Partida de IA · {count} bots',
   start: 'Iniciar partida de IA',
   stop: 'Parar',
   connectionError: 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.',

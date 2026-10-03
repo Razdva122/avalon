@@ -33,6 +33,29 @@ test('structured output applies parser limits to evidence, including the failed 
   expect(schema.properties.choice.enum).toEqual(request.choices);
 });
 
+test('structured output permits a stance on an eighth-seat Percival claim', () => {
+  const r = {
+    ...request,
+    playerID: 'seat-1',
+    speak: true,
+    state: {
+      ...request.state,
+      stage: 'selectTeam',
+      players: Array.from({ length: 8 }, (_, i) => ({
+        id: `seat-${i + 1}`,
+        index: i + 1,
+        role: i === 0 ? 'merlin' : 'unknown',
+      })),
+    },
+    chat: [{ name: '8', text: 'I am Percival. 2 is Morgana.' }],
+  } as unknown as BotRequest;
+  const schema = codexSchema(r.choices, true, false, r);
+  expect(schema.properties.claimMorgana!.enum).toContain(8);
+  const seat = schema.properties.claimStances!.items.properties.seat;
+  expect(seat.enum).toEqual([8]);
+  expect(seat.maximum).toBeGreaterThanOrEqual(8);
+});
+
 test('Codex uses existing private/public pipeline and records subscription usage without RUB charges', async () => {
   process.env.NODE_ENV = 'development';
   process.env.AI_CODEX_ENABLED = 'true';

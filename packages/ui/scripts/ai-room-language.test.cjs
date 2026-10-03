@@ -26,7 +26,10 @@ const messages = Object.fromEntries(
   ]),
 );
 
-async function fixture(file, { props = {}, locale = 'en', activeRoomID } = {}) {
+async function fixture(
+  file,
+  { props = {}, locale = 'en', activeRoomID, acknowledge = async () => ({ roomID: 'created-room' }) } = {},
+) {
   const sent = [];
   const navigation = [];
   const access = {
@@ -56,7 +59,7 @@ async function fixture(file, { props = {}, locale = 'en', activeRoomID } = {}) {
           timeout: () => ({
             emitWithAck: async (...args) => {
               sent.push(args);
-              return { roomID: 'created-room' };
+              return acknowledge(...args);
             },
           }),
         },
@@ -84,25 +87,28 @@ async function fixture(file, { props = {}, locale = 'en', activeRoomID } = {}) {
   ];
   await vue.nextTick();
   let tree;
-  const app = vue.createSSRApp(
-    {
-      props: component.props,
-      setup: () => state,
-      render(...args) {
-        tree = render.apply(this, args);
-        return tree;
+  const renderHtml = () => {
+    const app = vue.createSSRApp(
+      {
+        props: component.props,
+        setup: () => state,
+        render(...args) {
+          tree = render.apply(this, args);
+          return tree;
+        },
       },
-    },
-    props,
-  );
-  app.config.globalProperties.$t = i18n.global.t;
-  app.component('RouterLink', {
-    setup:
-      (_, { slots }) =>
-      () =>
-        vue.h('a', slots.default?.()),
-  });
-  const html = await renderToString(app);
+      props,
+    );
+    app.config.globalProperties.$t = i18n.global.t;
+    app.component('RouterLink', {
+      setup:
+        (_, { slots }) =>
+        () =>
+          vue.h('a', slots.default?.()),
+    });
+    return renderToString(app);
+  };
+  const html = await renderHtml();
   function nodes(type, node = tree) {
     if (!node || typeof node !== 'object') return [];
     return [
@@ -110,14 +116,14 @@ async function fixture(file, { props = {}, locale = 'en', activeRoomID } = {}) {
       ...(Array.isArray(node.children) ? node.children.flatMap((child) => nodes(type, child)) : []),
     ];
   }
-  return { html, nodes, sent, navigation, stop: () => scope.stop() };
+  return { html, nodes, sent, navigation, access, render: renderHtml, stop: () => scope.stop() };
 }
 
 test('native language selection sends the chosen language when creating an AI room', async (t) => {
   const room = await fixture('pages/lobby/AiRoomButton.vue');
   t.after(room.stop);
   const selects = room.nodes('select');
-  assert.equal(selects.length, 2, 'new-room controls need separate model and discussion language selects');
+  assert.equal(selects.length, 3, 'new-room controls need model, discussion language and player count selects');
   const language = selects[1];
   assert.deepEqual(
     room.nodes('option', language).map((option) => [option.props.value, option.children]),
@@ -131,7 +137,7 @@ test('native language selection sends the chosen language when creating an AI ro
   selects[0].props['onUpdate:modelValue']('yandex');
   language.props['onUpdate:modelValue']('zh-tw');
   await room.nodes('v-btn')[0].props.onClick();
-  assert.deepEqual(room.sent, [['createAiRoom', { model: 'yandex', language: 'zh-tw' }]]);
+  assert.deepEqual(room.sent, [['createAiRoom', { model: 'yandex', language: 'zh-tw', playerCount: 7 }]]);
   assert.deepEqual(room.navigation, [{ name: 'room', params: { uuid: 'created-room' } }]);
 });
 
@@ -139,7 +145,43 @@ test('new AI rooms keep English as the default discussion language', async (t) =
   const room = await fixture('pages/lobby/AiRoomButton.vue', { locale: 'ru' });
   t.after(room.stop);
   await room.nodes('v-btn')[0].props.onClick();
-  assert.deepEqual(room.sent, [['createAiRoom', { model: 'codex-chatgpt', language: 'en' }]]);
+  assert.deepEqual(room.sent, [['createAiRoom', { model: 'codex-chatgpt', language: 'en', playerCount: 7 }]]);
+});
+
+for (const playerCount of [5, 6, 7, 8]) {
+  test(`native player count selection creates a ${playerCount}-bot room`, async (t) => {
+    const room = await fixture('pages/lobby/AiRoomButton.vue');
+    t.after(room.stop);
+    const count = room.nodes('select')[2];
+    assert.ok(count, 'missing player count control');
+    assert.deepEqual(
+      room.nodes('option', count).map((option) => option.props.value),
+      [5, 6, 7, 8],
+    );
+    assert.match(room.html, /<label[^>]*><span>Number of bots<\/span>\s*<select/);
+    assert.equal(count.dirs[0].value, 7, 'seven bots should be selected by default');
+    count.props['onUpdate:modelValue'](playerCount);
+    const html = await room.render();
+    assert.ok(html.includes(`AI match · ${playerCount} bots`));
+    await room.nodes('v-btn')[0].props.onClick();
+    assert.deepEqual(room.sent, [['createAiRoom', { model: 'codex-chatgpt', language: 'en', playerCount }]]);
+  });
+}
+
+test('new-room selects stay disabled while creation awaits acknowledgement', async (t) => {
+  let finish;
+  const room = await fixture('pages/lobby/AiRoomButton.vue', {
+    acknowledge: () => new Promise((resolve) => (finish = resolve)),
+  });
+  t.after(room.stop);
+  const opening = room.nodes('v-btn')[0].props.onClick();
+  await room.render();
+  assert.equal(room.nodes('select').length, 3);
+  assert.ok(room.nodes('select').every((select) => select.props.disabled));
+  finish({ roomID: 'created-room' });
+  await opening;
+  await room.render();
+  assert.ok(room.nodes('select').every((select) => !select.props.disabled));
 });
 
 test('opening an active AI room navigates without creating or changing its language', async (t) => {
@@ -149,6 +191,39 @@ test('opening an active AI room navigates without creating or changing its langu
   await room.nodes('v-btn')[0].props.onClick();
   assert.deepEqual(room.sent, []);
   assert.deepEqual(room.navigation, [{ name: 'room', params: { uuid: 'active-room' } }]);
+});
+
+test('opening a newly active room ignores the draft bot count', async (t) => {
+  const room = await fixture('pages/lobby/AiRoomButton.vue');
+  t.after(room.stop);
+  const count = room.nodes('select')[2];
+  assert.ok(count, 'missing player count control');
+  count.props['onUpdate:modelValue'](5);
+  room.access.activeRoomID.value = 'active-room';
+  await room.render();
+  assert.equal(room.nodes('select').length, 0);
+  await room.nodes('v-btn')[0].props.onClick();
+  assert.deepEqual(room.sent, []);
+  assert.deepEqual(room.navigation, [{ name: 'room', params: { uuid: 'active-room' } }]);
+});
+
+test('room panel summary uses the saved count, the legacy seat count, then seven', async (t) => {
+  for (const [saved, seats, expected] of [
+    [5, 7, 5],
+    [6, undefined, 6],
+    [7, 5, 7],
+    [8, 7, 8],
+    [undefined, 5, 5],
+    [undefined, 6, 6],
+    [undefined, 8, 8],
+    [undefined, undefined, 7],
+  ]) {
+    const room = await fixture('components/view/panels/AiRoomPanel.vue', {
+      props: { roomID: 'room', playerCount: seats, ai: { model: 'yandex', status: 'ready', playerCount: saved } },
+    });
+    t.after(room.stop);
+    assert.match(room.html, new RegExp(`<summary>[\\s\\S]*?<small>${expected} bots<\\/small>[\\s\\S]*?<\\/summary>`));
+  }
 });
 
 test('room panel displays saved discussion languages and defaults legacy rooms to English', async (t) => {
@@ -175,12 +250,35 @@ test('all interface locales provide language control and saved-language labels',
     });
     t.after(room.stop);
     t.after(panel.stop);
-    assert.equal(room.nodes('select').length, 2);
+    assert.equal(room.nodes('select').length, 3);
     assert.ok(!room.html.includes('aiArena.selectLanguage'), `${locale} is missing the select label`);
+    assert.ok(!room.html.includes('aiArena.selectPlayerCount'), `${locale} is missing the bot count label`);
+    assert.ok(!panel.html.includes('aiArena.playerCount'), `${locale} is missing the saved count label`);
     assert.ok(!panel.html.includes('aiArena.language'), `${locale} is missing the saved-language label`);
     assert.ok(panel.html.includes('Русский'), `${locale} does not display the saved language`);
   }
 });
+
+for (const playerCount of [5, 6, 7, 8]) {
+  test(`lobby tagline displays the actual ${playerCount}-bot room size`, async (t) => {
+    const room = await fixture('pages/lobby/LobbyRoom.vue', {
+      props: {
+        game: {
+          uuid: 'room',
+          hostID: 'host',
+          ai: true,
+          aiStatus: 'ready',
+          players: playerCount,
+          state: 'created',
+          options: { roles: {}, addons: {} },
+          createAt: '2026-10-03T00:00:00Z',
+        },
+      },
+    });
+    t.after(room.stop);
+    assert.ok(room.html.includes(`<span class="ai-title">${playerCount} bots. Two sides.</span>`));
+  });
+}
 
 test('lobby badges identify each saved AI room language and default legacy rooms to English', async (t) => {
   for (const [language, label] of [

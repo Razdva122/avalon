@@ -4,6 +4,20 @@ test.each(['en', 'ru', 'zh-tw'])('accepts AI creation options with %s and an ack
   expect(validPacket('createAiRoom', [{ model: 'codex-chatgpt', language }, () => {}])).toBe(true);
 });
 
+test.each([5, 6, 7, 8])('accepts %i AI players in every discussion language', (playerCount) => {
+  for (const language of ['en', 'ru', 'zh-tw'])
+    expect(validPacket('createAiRoom', [{ model: 'codex-chatgpt', language, playerCount }, () => {}])).toBe(true);
+});
+
+test.each([0, 4, 9, 10, 5.5, '5', null, undefined, {}, [], NaN, Infinity])(
+  'rejects unsupported or malformed AI player counts %#',
+  (playerCount) => {
+    expect(validPacket('createAiRoom', [{ model: 'codex-chatgpt', language: 'ru', playerCount }, () => {}])).toBe(
+      false,
+    );
+  },
+);
+
 test('AI creation keeps the legacy model-only packet and requires the acknowledgement', () => {
   expect(validPacket('createAiRoom', ['codex-chatgpt', () => {}])).toBe(true);
   expect(validPacket('createAiRoom', [{ model: 'codex-chatgpt', language: 'ru' }])).toBe(false);

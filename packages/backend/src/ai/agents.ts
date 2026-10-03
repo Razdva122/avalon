@@ -1,5 +1,5 @@
 import { randomInt } from 'crypto';
-import type { PublicUserProfile } from '@avalon/types';
+import type { AiPlayerCount, PublicUserProfile } from '@avalon/types';
 
 type BotAgent = PublicUserProfile & { style: string };
 const character = (
@@ -128,11 +128,11 @@ export function getBotProfile(id: string): PublicUserProfile | undefined {
   return BOT_PROFILES.find((profile) => profile.id === id) || legacyProfiles.find((profile) => profile.id === id);
 }
 
-export function selectBotAgents(draw: (bound: number) => number = randomInt): BotAgent[] {
+export function selectBotAgents(draw: (bound: number) => number = randomInt, count: AiPlayerCount = 7): BotAgent[] {
   const shuffled = [...BOT_AGENTS];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = draw(i + 1);
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-  return shuffled.slice(0, 7);
+  return shuffled.slice(0, count);
 }

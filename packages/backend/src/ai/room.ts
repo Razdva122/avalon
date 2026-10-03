@@ -1,6 +1,7 @@
+import { randomUUID } from 'crypto';
 import { Room } from '@/room';
 import { AI_PROFILE_RATING_SEASON } from './rating-season';
-import type { AiLanguage, GameOptions, Server, TRoomState, AiSpectatorDecision } from '@avalon/types';
+import type { AiLanguage, AiPlayerCount, GameOptions, Server, TRoomState, AiSpectatorDecision } from '@avalon/types';
 import type { TGameMethodsParams } from '@/core/game-manager';
 import { AiPause, AiTechnicalPause, AiMatchBudgetPause, type Decide, type BotRequest, type BotReply } from './client';
 import { aiText, isAfterGameSpeech, isVoteOnly } from './language';
@@ -25,7 +26,12 @@ export class BotRoom extends Room {
   private cancelled = false;
   private executing = false;
   budgetResumeUnits = 0;
-  private discussion?: { votes: Map<string, 'approve' | 'reject'> };
+  private discussion?: {
+    spoken: Set<string>;
+    finalTeam?: Choice;
+    votes: Map<string, 'approve' | 'reject'>;
+    pendingPublication?: { id: string; text: string; requestID: string };
+  };
   private revealedCouncil = 0;
   private reviewedPlayers = new Set<string>();
   private abort = new AbortController();
@@ -41,19 +47,27 @@ export class BotRoom extends Room {
     private checkpoint: (state: TRoomState) => Promise<void> = async () => {},
     private delayMs = 0,
     private readonly language: AiLanguage = 'en',
+    playerCount: AiPlayerCount = 7,
   ) {
-    const agents = selectBotAgents();
+    if (![5, 6, 7, 8].includes(playerCount)) throw Error('Invalid AI player count');
+    const agents = selectBotAgents(undefined, playerCount);
+    const options = structuredClone(botOptions);
+    if (playerCount !== 7) {
+      delete options.roles.oberon;
+    }
+    if (playerCount < 7) delete options.addons.ladyOfLake;
     super(
       id,
       owner,
       agents.map((p) => p.id),
       io,
-      structuredClone(botOptions),
+      options,
     );
-    this.maxCapacity = 7;
+    this.maxCapacity = playerCount;
     this.data = { stage: 'locked' };
     this.ai = {
       language,
+      playerCount,
       status: 'ready',
       profileRatingSeason: AI_PROFILE_RATING_SEASON,
       costRub: 0,
@@ -133,10 +147,14 @@ export class BotRoom extends Room {
     speak: boolean,
     privateCheck?: string,
     privateDiscussion = false,
+    publicDiscussion = false,
+    optionalSpeech = false,
   ): Promise<BotReply | null> {
     if (this.cancelled) return null;
     if (!speak && choices.length === 1) return { choice: 0, speech: '' };
-    if (++this.calls > 350) throw new AiPause('The request limit for this match has been reached.');
+    // Eight seats can need 418 calls for five fully discussed forced missions and their debrief.
+    const requestLimit = this.players.length === 8 ? 450 : 400;
+    if (++this.calls > requestLimit) throw new AiPause('The request limit for this match has been reached.');
     const agent = BOT_AGENTS.find((p) => p.id === id);
     if (!agent) throw new AiTechnicalPause('Unknown AI agent profile.');
     const state = this.stateFor(id);
@@ -151,6 +169,8 @@ export class BotRoom extends Room {
       choices: choices.map((c) => c.text),
       privateCheck,
       privateDiscussion,
+      publicDiscussion,
+      optionalSpeech,
       rolesKnownBeforeReveal: state.stage === 'end' ? this.rolesKnownBeforeReveal.get(id) : undefined,
       // The room archives every public clue; all Evil revisit it before assassination.
       // Bound transcript size under the existing request and spending limits.
@@ -201,6 +221,14 @@ export class BotRoom extends Room {
       this.updateRoomState(true);
     }
     if (this.cancelled || this.manager.game.stage !== state.stage) return null;
+    // Retain completed decisions before publication/checkpoints can pause the match.
+    if (this.discussion) {
+      if (publicDiscussion) this.discussion.spoken.add(id);
+      if (optionalSpeech) this.discussion.finalTeam = choices[answer.choice];
+      if (state.stage === 'votingForTeam') {
+        this.discussion.votes.set(id, answer.choice === 0 ? 'approve' : 'reject');
+      }
+    }
     if (answer.privateReason?.trim()) {
       const previous = this.spectatorDecisions.findIndex((decision) => decision.playerID === id);
       if (previous >= 0) this.spectatorDecisions.splice(previous, 1);
@@ -209,7 +237,7 @@ export class BotRoom extends Room {
         id: ++this.decisionSequence,
         seat: this.label(id),
         mission: (state.mission ?? 0) + 1,
-        stage: state.stage,
+        stage: publicDiscussion ? 'discussion' : state.stage,
         choice: choices[answer.choice].text,
         reason: answer.privateReason.trim().slice(0, 240),
       });
@@ -222,38 +250,9 @@ export class BotRoom extends Room {
       });
       return answer;
     }
-    if (speak && (answer.speech.trim() || choices.map((c) => c.text).join(',') === 'approve,reject')) {
-      let speech = answer.speech.trim().replace(/\bplayers?\s*#?([1-7])\b/gi, '$1');
-      if (choices.map((c) => c.text).join(',') === 'approve,reject') {
-        // Preserve evidence about earlier votes; discard conflicting current declarations sentence by sentence.
-        const selectedVote = choices[answer.choice].text;
-        speech = speech
-          .split(/(?<=[.!?])\s+|(?<=[。！？])\s*/u)
-          .filter((sentence) => {
-            const english = sentence.match(
-              /\b(?:I|we)\s+(?:(?:will|would|must|should)\s+)?(?:vote\s+)?(approve|reject)\b/i,
-            );
-            const russian = sentence.match(
-              /(?:^|\s)(?:я|мы)\s+(?:(?:голосую|голосуем)\s+)?(за|против|поддерживаю|поддерживаем|одобряю|одобряем|отклоняю|отклоняем)(?=[\s.!?]|$)/iu,
-            );
-            const chinese = sentence.match(/(?:我|我們)\s*(?:投票?)?\s*(贊成|支持|同意|反對|拒絕)/u);
-            const declaration = english?.[1].toLowerCase() || russian?.[1].toLowerCase() || chinese?.[1];
-            const vote = /^(approve|за|поддерживаю|поддерживаем|одобряю|одобряем|贊成|支持|同意)$/u.test(
-              declaration || '',
-            )
-              ? 'approve'
-              : 'reject';
-            return !declaration || vote === selectedVote;
-          })
-          .map((sentence) =>
-            isVoteOnly(sentence)
-              ? ''
-              : sentence.replace(/^I\s+(?:vote\s+)?(?:approve|reject)(?:\s+this team)?[.!]\s*$/i, '').trim(),
-          )
-          .filter(Boolean)
-          .join(this.language === 'zh-tw' ? '' : ' ');
-        speech = `${aiText(this.language).vote(choices[answer.choice].text)} ${speech}`.trim();
-      } else if (task === 'Propose a team and explain your choice') {
+    if (speak && answer.speech.trim()) {
+      let speech = answer.speech.trim().replace(/\bplayers?\s*#?([1-8])\b/gi, '$1');
+      if (task.startsWith('Choose the final team')) {
         speech = `${aiText(this.language).proposal(choices[answer.choice].text)} ${speech}`;
       }
       await this.publish(id, `${state.stage === 'end' ? aiText(this.language).postGamePrefix : ''}${speech}`);
@@ -262,10 +261,14 @@ export class BotRoom extends Room {
     }
     return this.cancelled ? null : answer;
   }
-  private async publish(id: string, text: string) {
+  private async publish(id: string, text: string, requestID: string = randomUUID()) {
     if (this.cancelled) return;
-    if (this.persistChatMessage) await this.persistChatMessage(id, text);
-    else this.addMessage(id, text);
+    const discussion = this.discussion;
+    if (discussion) discussion.pendingPublication = { id, text, requestID };
+    if (this.persistChatMessage) await this.persistChatMessage(id, text, requestID);
+    else this.addMessage(id, text, requestID);
+    // Insertion succeeded; a later checkpoint pause must not duplicate this message.
+    if (discussion) delete discussion.pendingPublication;
     await this.checkpoint(this.calculateRoomState());
     if (!this.delayMs || this.cancelled) return;
     await new Promise<void>((resolve) => {
@@ -283,51 +286,77 @@ export class BotRoom extends Room {
     for (const action of choice.actions) this.manager.callGameMethods(id, action);
   }
 
+  private clockwiseSeats() {
+    const seats = [...this.manager.game.players].sort((a, b) => a.index - b.index).map((player) => player.userID);
+    const offset = seats.indexOf(this.manager.game.leader.userID);
+    return [...seats.slice(offset), ...seats.slice(0, offset)];
+  }
+
   private async discussTeam() {
     const id = this.manager.game.leader.userID;
-    const choices = this.teams(id);
-    if (!this.discussion) {
-      const proposal = await this.ask(id, 'Propose a team and explain your choice', choices, true);
-      if (!proposal) return;
-      this.apply(id, choices[proposal.choice]);
-      this.discussion = { votes: new Map() };
+    this.discussion ??= { spoken: new Set(), votes: new Map() };
+    const pending = this.discussion.pendingPublication;
+    if (pending) {
+      await this.publish(pending.id, pending.text, pending.requestID);
+      if (this.cancelled) return;
     }
-    const seats = this.players;
-    const offset = seats.indexOf(id);
-    const order = [...seats.slice(offset + 1), ...seats.slice(0, offset)];
-    if (this.manager.game.turn === 4) {
-      this.manager.callGameMethods(id, { method: 'sentSelectedPlayers' });
-      this.discussion = undefined;
-      return;
-    }
-    // One request per voter returns both public argument and the binding vote.
-    // Earlier speakers do not revise their vote in this economical single-circle format.
-    const votes = this.discussion.votes;
-    const choicesForVote = ['approve', 'reject'].map((text) => ({ text, actions: [] }));
-    for (const player of [...order, id]) {
-      if (votes.has(player)) continue;
+    for (const player of this.clockwiseSeats()) {
+      if (this.discussion.spoken.has(player)) continue;
       const answer = await this.ask(
         player,
-        player === id
-          ? 'Give your final vote on your unchanged proposal after the discussion; explain it briefly'
-          : 'Discuss this exact proposed team and cast your binding vote in the SAME answer; choose approve or reject. Give a brief reason without repeating vote words.',
-        choicesForVote,
+        'Discuss the next team before the leader chooses: recommend a legal roster, assess trust and known history, or ask a question. This is advice; do not cast or announce a binding vote.',
+        this.teams(player),
+        true,
+        undefined,
+        false,
         true,
       );
       if (!answer) return;
-      votes.set(player, answer.choice === 0 ? 'approve' : 'reject');
     }
-    this.discussion = undefined;
+    if (!this.discussion.finalTeam) {
+      const proposal = await this.ask(
+        id,
+        'Choose the final team after hearing the full public circle. You may briefly announce your final roster or remain silent.',
+        this.teams(id),
+        true,
+        undefined,
+        false,
+        false,
+        true,
+      );
+      if (!proposal) return;
+    }
+    this.apply(id, this.discussion.finalTeam!);
     this.manager.callGameMethods(id, { method: 'sentSelectedPlayers' });
+    if (this.manager.game.stage !== 'votingForTeam') this.discussion = undefined;
+  }
+
+  private async voteForTeam() {
+    this.discussion ??= { spoken: new Set(), votes: new Map() };
+    const votes = this.discussion.votes;
+    const choices = ['approve', 'reject'].map((text) => ({ text, actions: [] }));
+    for (const player of this.clockwiseSeats()) {
+      if (votes.has(player)) continue;
+      const answer = await this.ask(
+        player,
+        'Vote on the proposed team silently; choose approve or reject.',
+        choices,
+        false,
+      );
+      if (!answer) return;
+    }
+    // Keep every decision private until all bots have seen the same voting state.
     for (const [player, option] of votes) {
-      if (this.cancelled || this.manager.game.stage !== 'votingForTeam') break;
+      if (this.cancelled || this.manager.game.stage !== 'votingForTeam') return;
       this.manager.callGameMethods(player, { method: 'voteForMission', option });
     }
+    this.discussion = undefined;
   }
 
   private async act() {
     const game = this.manager.game;
     if (game.stage === 'selectTeam') return this.discussTeam();
+    if (game.stage === 'votingForTeam') return this.voteForTeam();
     const actor = game.players.find((p) => p.features.waitForAction);
     if (!actor) throw new AiPause('No player is available for the next action.');
     const id = actor.userID;
@@ -338,13 +367,6 @@ export class BotRoom extends Room {
     let privateCheck: string | undefined;
     let speak = false;
     switch (state.stage) {
-      case 'votingForTeam':
-        task = 'Vote on the proposed team';
-        choices = ['approve', 'reject'].map((option) => ({
-          text: option,
-          actions: [{ method: 'voteForMission', option: option as 'approve' | 'reject' }],
-        }));
-        break;
       case 'onMission':
         task = 'Secretly choose your mission action';
         choices = (own.validMissionsResult || []).map((result) => ({

@@ -15,9 +15,18 @@
           <option value="zh-tw">繁體中文（台灣）</option>
         </select>
       </label>
+      <label>
+        <span>{{ $t('aiArena.selectPlayerCount') }}</span>
+        <select v-model="selectedPlayerCount" :disabled="busy">
+          <option :value="5">5</option>
+          <option :value="6">6</option>
+          <option :value="7">7</option>
+          <option :value="8">8</option>
+        </select>
+      </label>
     </div>
     <v-btn color="secondary" :loading="busy" :disabled="!activeRoomID && !selectedModel" @click="openRoom">
-      {{ $t(activeRoomID ? 'aiArena.watch' : 'aiArena.create') }}
+      {{ $t(activeRoomID ? 'aiArena.watch' : 'aiArena.create', { count: selectedPlayerCount }) }}
     </v-btn>
     <p v-if="selectedModel === 'codex-chatgpt'">{{ $t('aiArena.codexSubscription') }}</p>
     <details v-else-if="budget" class="ai-budget-details">
@@ -34,12 +43,13 @@ import { useRouter } from 'vue-router';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
 import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
-import type { AiLanguage } from '@avalon/types';
+import type { AiLanguage, AiPlayerCount } from '@avalon/types';
 const { t } = useI18n();
 const router = useRouter();
 const { canManage, budget, models, defaultModel, activeRoomID } = useAiAccess();
 const selectedModel = ref('');
 const selectedLanguage = ref<AiLanguage>('en');
+const selectedPlayerCount = ref<AiPlayerCount>(7);
 watch([models, defaultModel], () => {
   if (!models.value.some((model) => model.id === selectedModel.value)) {
     selectedModel.value = models.value.some((model) => model.id === defaultModel.value)
@@ -60,6 +70,7 @@ async function openRoom() {
     const result = await socket.timeout(10000).emitWithAck('createAiRoom', {
       model: selectedModel.value,
       language: selectedLanguage.value,
+      playerCount: selectedPlayerCount.value,
     });
     if ('error' in result) error.value = result.error;
     else await router.push({ name: 'room', params: { uuid: result.roomID } });

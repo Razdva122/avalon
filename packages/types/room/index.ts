@@ -38,10 +38,13 @@ export type CodexSettings = { model: string; reasoning: string };
 export type CodexModelOption = { id: string; label: string; efforts: string[] };
 
 export type AiLanguage = 'en' | 'ru' | 'zh-tw';
+export type AiPlayerCount = 5 | 6 | 7 | 8;
 
 export type AiRoomState = {
   /** Missing in older archives; discussion defaults to English. */
   language?: AiLanguage;
+  /** Missing in older archives; the saved player list still identifies the size. */
+  playerCount?: AiPlayerCount;
   /** Only rooms created after the AI rating release participate in this season. */
   profileRatingSeason?: number;
   codex?: CodexSettings;

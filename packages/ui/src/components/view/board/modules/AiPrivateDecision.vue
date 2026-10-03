@@ -16,10 +16,15 @@
     </header>
     <div class="decision-meta">
       {{ $t('aiArena.decisionSeat', { seat: decision.seat, mission: decision.mission }) }}
-      <span> · {{ $t(`game.${gameStageLabel(decision.stage)}`) }}</span>
+      <span>
+        ·
+        {{ $t(decision.stage === 'discussion' ? 'aiArena.teamDiscussion' : `game.${gameStageLabel(decision.stage)}`) }}
+      </span>
     </div>
     <div class="decision-action">
-      <div class="decision-caption">{{ $t('aiArena.chosenAction') }}</div>
+      <div class="decision-caption">
+        {{ $t(decision.stage === 'discussion' ? 'aiArena.preferredTeam' : 'aiArena.chosenAction') }}
+      </div>
       <p>{{ decision.choice }}</p>
     </div>
     <template v-if="!preview">

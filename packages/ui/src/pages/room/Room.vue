@@ -13,6 +13,7 @@
         class="ai-room-status"
         :ai="roomState.ai"
         :roomID="roomState.roomID"
+        :player-count="roomState.players.length"
         :canReveal="canRevealRoles"
         :rolesShown="rolesShown"
         @roles="spectatorRoles = $event"

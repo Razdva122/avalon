@@ -12,7 +12,7 @@ export function languageInstruction(language: AiLanguage = 'en'): string {
 
 const texts = {
   en: {
-    ready: 'Seven AI players · English discussion',
+    ready: 'AI players ready · English discussion',
     postGamePrefix: 'Post-game: ',
     councilPrefix: 'Evil council (revealed): ',
     vote: (choice: string) => `I vote ${choice}.`,
@@ -33,7 +33,7 @@ const texts = {
     neutralProposal: 'This is the team I want to test.',
   },
   ru: {
-    ready: 'Семь AI-игроков · Обсуждение на русском',
+    ready: 'AI-игроки готовы · Обсуждение на русском',
     postGamePrefix: 'После игры: ',
     councilPrefix: 'Совет злых (раскрыт): ',
     vote: (choice: string) => `Я голосую ${choice === 'approve' ? 'за' : 'против'}.`,
@@ -55,7 +55,7 @@ const texts = {
     neutralProposal: 'Эту команду я хочу проверить на миссии.',
   },
   'zh-tw': {
-    ready: '七位 AI 玩家 · 繁體中文討論',
+    ready: 'AI 玩家已就緒 · 繁體中文討論',
     postGamePrefix: '賽後回顧：',
     councilPrefix: '邪惡陣營密談（公開）：',
     vote: (choice: string) => `我投${choice === 'approve' ? '贊成' : '反對'}票。`,

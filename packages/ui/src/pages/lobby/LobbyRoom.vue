@@ -22,7 +22,7 @@
           <div class="ai-eyebrow">
             {{ $t('aiArena.title') }} <span>{{ aiLanguageLabel }}</span>
           </div>
-          <span class="ai-title">{{ $t('aiArena.tagline') }}</span>
+          <span class="ai-title">{{ $t('aiArena.tagline', { count: game.players }) }}</span>
           <span class="ai-subtitle">{{ $t('aiArena.subtitle') }}</span>
           <span v-if="game.aiModel" class="ai-subtitle">{{ $t('aiArena.model', { model: game.aiModel }) }}</span>
         </div>

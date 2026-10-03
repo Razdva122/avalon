@@ -53,7 +53,7 @@ export function codexSchema(choices: string[], details: boolean, review = false,
                 seat: {
                   type: 'integer',
                   minimum: 1,
-                  maximum: 7,
+                  maximum: 8,
                   ...(claims.claimants.length ? { enum: claims.claimants } : {}),
                 },
                 stance: { type: 'string', enum: ['trust', 'distrust'] },
