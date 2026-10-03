@@ -5,6 +5,7 @@
         v-for="popup in popups"
         :key="popup.id"
         :achievementID="popup.achievementID"
+        :stickerIDs="popup.stickerIDs"
         :type="popup.type"
         :progress="popup.progress"
         @close="closePopup(popup.id)"
@@ -14,15 +15,19 @@
 </template>
 
 <script lang="ts">
-import { defineAsyncComponent, defineComponent, onMounted, onUnmounted, ref } from 'vue';
+import { defineAsyncComponent, defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
 import type { AchievementProgress } from './AchievementPopup.vue';
 import { socket } from '@/api/socket';
+import { store } from '@/store';
+import { useStickers } from '@/helpers/composables/useStickers';
+import { STICKERS } from '@avalon/types/user/stickers';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface AchievementData {
   id: string;
   type: 'unlocked' | 'progress';
-  achievementID: string;
+  achievementID?: string;
+  stickerIDs?: string[];
   progress?: AchievementProgress;
 }
 
@@ -33,94 +38,66 @@ export default defineComponent({
   },
   setup() {
     const popups = ref<AchievementData[]>([]);
-
-    /**
-     * Закрывает попап по его ID
-     * @param id ID попапа
-     */
+    const { collection } = useStickers();
+    // Dismissal only hides this session's notice. New badges persist on the server.
+    const announced = new Set<string>();
     const closePopup = (id: string) => {
-      const index = popups.value.findIndex((popup) => popup.id === id);
-      if (index !== -1) {
-        popups.value.splice(index, 1);
+      popups.value = popups.value.filter((popup) => popup.id !== id);
+    };
+    watch(
+      () => store.state.profile?.id,
+      () => {
+        popups.value = [];
+        announced.clear();
+      },
+    );
+    watch(
+      collection,
+      (value) => {
+        if (!value) return;
+        const stickerIDs = value.stickers
+          .filter((s) => s.available && s.isNew && !announced.has(s.id))
+          .map((s) => s.id);
+        if (!stickerIDs.length) return;
+        stickerIDs.forEach((id) => announced.add(id));
+        const existing = popups.value.find((p) => p.stickerIDs);
+        if (existing) existing.stickerIDs!.push(...stickerIDs);
+        else popups.value.push({ id: uuidv4(), type: 'unlocked', stickerIDs });
+      },
+      { immediate: true },
+    );
+    const handleAchievementUnlocked = (achievementID: string) => {
+      // An achievement's own card already contains its sticker reward.
+      const stickerIDs = STICKERS.filter((s) => s.achievement === achievementID).map((s) => s.id);
+      stickerIDs.forEach((id) => announced.add(id));
+      for (const popup of popups.value) {
+        if (popup.stickerIDs) popup.stickerIDs = popup.stickerIDs.filter((id) => !stickerIDs.includes(id));
       }
+      popups.value = popups.value.filter((p) =>
+        p.stickerIDs ? p.stickerIDs.length : p.achievementID !== achievementID,
+      );
+      popups.value.push({ id: uuidv4(), achievementID, type: 'unlocked' });
     };
-
-    /**
-     * Создает новый попап для разблокированного достижения
-     * @param achievementId ID достижения
-     */
-    const createUnlockedPopup = (achievementId: string) => {
-      const popup: AchievementData = {
-        id: uuidv4(),
-        achievementID: achievementId,
-        type: 'unlocked',
-      };
-
-      popups.value.push(popup);
-
-      // Автоматически закрываем попап через 10 секунд
-      setTimeout(() => {
-        closePopup(popup.id);
-      }, 10000);
-    };
-
-    /**
-     * Создает новый попап для прогресса достижения
-     * @param data Данные о прогрессе достижения
-     */
-    const createProgressPopup = (data: { achievementID: string; currentProgress: number; requirement: number }) => {
-      const popup: AchievementData = {
-        id: uuidv4(),
-        achievementID: data.achievementID,
-        type: 'progress',
-        progress: {
-          currentValue: data.currentProgress,
-          maxValue: data.requirement,
-        },
-      };
-
-      popups.value.push(popup);
-
-      // Автоматически закрываем попап через 10 секунд
-      setTimeout(() => {
-        closePopup(popup.id);
-      }, 10000);
-    };
-
-    /**
-     * Обработчик события разблокировки достижения
-     */
-    const handleAchievementUnlocked = (achievementId: string) => {
-      createUnlockedPopup(achievementId);
-    };
-
-    /**
-     * Обработчик события прогресса достижения
-     */
     const handleAchievementProgress = (data: {
       achievementID: string;
       currentProgress: number;
       requirement: number;
     }) => {
-      createProgressPopup(data);
+      if (popups.value.some((p) => p.achievementID === data.achievementID && p.type === 'unlocked')) return;
+      const progress = { currentValue: data.currentProgress, maxValue: data.requirement };
+      const existing = popups.value.find((p) => p.achievementID === data.achievementID);
+      if (existing) existing.progress = progress;
+      else popups.value.push({ id: uuidv4(), achievementID: data.achievementID, type: 'progress', progress });
     };
-
     onMounted(() => {
-      // Подписываемся на события сокетов
       socket.on('achievementUnlocked', handleAchievementUnlocked);
       socket.on('achievementProgress', handleAchievementProgress);
     });
-
     onUnmounted(() => {
-      // Отписываемся от событий сокетов при размонтировании компонента
       socket.off('achievementUnlocked', handleAchievementUnlocked);
       socket.off('achievementProgress', handleAchievementProgress);
     });
-
-    return {
-      popups,
-      closePopup,
-    };
+    return { popups, closePopup };
   },
 });
 </script>

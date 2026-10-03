@@ -188,7 +188,7 @@ export default {
     animeVariant: '{name} (аниме)',
     modalHeader: 'Выбор аватара',
     servantHint: 'Стандартный аватар',
-    lady_of_lakeHint: 'Вручается пользователям, зарегистрированным в 2025 году',
+    lady_of_lakeHint: 'Вручается пользователям, зарегистрированным до 2026 года',
     excaliburHint: "Выдается за достижение: @:{'achievements.still_worthy'}",
     evilHint: "Выдается за достижение: @:{'achievements.mistakes_happen'}",
     goodHint: "Выдается за достижение: @:{'achievements.seer'}",

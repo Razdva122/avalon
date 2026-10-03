@@ -168,9 +168,11 @@ export const store = createStore<IState>({
       return result;
     },
     async updateUserAvatar({ commit, state }, { avatarID }): Promise<ArgumentOfCallback<'updateUserAvatar'>> {
+      const owner = state.profile?.id;
+      if (!owner) return { error: 'avatarNotAvailable' };
       const result = await socket.timeout(10000).emitWithAck('updateUserAvatar', avatarID);
 
-      if (state.profile) {
+      if (state.profile?.id === owner) {
         if (result === true) {
           commit('updateUserProfile', { ...state.profile, avatar: avatarID });
         }

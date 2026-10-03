@@ -8,7 +8,7 @@
           icon
           :class="{ 'sticker-trigger-open': open }"
           variant="text"
-          :aria-label="$t('stickers.title')"
+          :aria-label="newCount ? $t('cosmeticRewards.openWithNew', { count: newCount }) : $t('stickers.title')"
           :title="$t('stickers.title')"
           color="text-primary"
         >
@@ -30,6 +30,7 @@
             <circle cx="15.5" cy="9" r="1" fill="currentColor" stroke="none" />
             <path d="M8 13a4 4 0 0 0 5 2" />
           </svg>
+          <span v-if="newCount" class="new-count" aria-hidden="true">{{ newCount }}</span>
         </v-btn>
       </template>
       <v-card class="picker" rounded="lg">
@@ -93,25 +94,6 @@
         ></v-card
       >
     </v-dialog>
-    <v-snackbar v-model="showReward" :timeout="12000" location="top" class="sticker-reward">
-      <div class="reward-content">
-        <div class="reward-art"><StickerImage v-if="rewardID" :id="rewardID" /></div>
-        <div>
-          <strong>{{ $t('stickers.unlocked') }}</strong>
-          <p>{{ $t(`stickers.${rewardID}`) }}</p>
-        </div>
-      </div>
-      <template #actions
-        ><v-btn :disabled="busy" @click="favoriteReward">{{ $t('stickers.add') }}</v-btn
-        ><v-btn
-          @click="
-            showReward = false;
-            showCollection = true;
-          "
-          >{{ $t('stickers.collection') }}</v-btn
-        ></template
-      >
-    </v-snackbar>
   </div>
 </template>
 <script setup lang="ts">
@@ -123,49 +105,20 @@ import StickerImage from './StickerImage.vue';
 import StickerCollection from './StickerCollection.vue';
 const props = defineProps<{ roomID: string }>();
 const emit = defineEmits<{ (event: 'hideOnBoard', value: boolean): void }>();
-const { collection, load, loading, error, busy, save, markSeen } = useStickers();
+const { collection, load, loading, error, newCount, markSeen } = useStickers();
 const open = ref(false),
   showCollection = ref(false),
   sending = ref(false),
   sendError = ref('');
-const remaining = ref(0),
-  showReward = ref(false),
-  rewardID = ref('');
+const remaining = ref(0);
 let cooldown: ReturnType<typeof setInterval> | undefined;
-let rewardTimer: ReturnType<typeof setTimeout> | undefined;
-const rewardQueue: string[] = [];
-const nextReward = () => {
-  const id = rewardQueue.shift();
-  if (id) {
-    rewardID.value = id;
-    showReward.value = true;
-  }
-};
-watch(collection, (value, previous) => {
-  if (!value) {
-    rewardQueue.length = 0;
-    clearTimeout(rewardTimer);
-    showReward.value = false;
-    return;
-  }
-  emit('hideOnBoard', value.hideOnBoard);
-  if (!value || !previous) return;
-  const unlocked = value.stickers.filter(
-    (s) => s.available && !previous.stickers.find((p) => p.id === s.id)?.available,
-  );
-  for (const sticker of unlocked) if (!rewardQueue.includes(sticker.id)) rewardQueue.push(sticker.id);
-  if (unlocked.length && !showReward.value) {
-    clearTimeout(rewardTimer);
-    rewardTimer = setTimeout(nextReward, 12000);
-  }
-});
-watch(showReward, (visible, wasVisible) => {
-  if (!visible && wasVisible) {
-    if (collection.value) void markSeen([rewardID.value]);
-    clearTimeout(rewardTimer);
-    rewardTimer = setTimeout(nextReward, 1000);
-  }
-});
+watch(
+  collection,
+  (value) => {
+    if (value) emit('hideOnBoard', value.hideOnBoard);
+  },
+  { immediate: true },
+);
 watch(open, (value) => {
   if (value) {
     sendError.value = '';
@@ -199,6 +152,7 @@ const send = async (id: string) => {
     if (result === true) {
       open.value = false;
       startCooldown(STICKER_COOLDOWN_MS);
+      void markSeen([id]);
     } else {
       sendError.value = result.error;
       if (result.retryAfter) startCooldown(result.retryAfter);
@@ -214,22 +168,8 @@ const sendFromCollection = async (id: string) => {
   open.value = true;
   await send(id);
 };
-const favoriteReward = async () => {
-  if (!collection.value) return;
-  const favorites = collection.value.favorites;
-  if (!favorites.includes(rewardID.value)) {
-    if (favorites.length >= 6) {
-      showReward.value = false;
-      showCollection.value = true;
-      return;
-    }
-    await save([...favorites, rewardID.value]);
-  }
-  if (!error.value) showReward.value = false;
-};
 onUnmounted(() => {
   clearInterval(cooldown);
-  clearTimeout(rewardTimer);
 });
 </script>
 <style scoped>
@@ -298,14 +238,18 @@ onUnmounted(() => {
   text-align: center;
   padding: 8px;
 }
-.reward-content {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-.reward-art {
-  width: 64px;
-  height: 64px;
-  flex-shrink: 0;
+.new-count {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  font-size: 11px;
+  line-height: 18px;
+  font-weight: 700;
 }
 </style>

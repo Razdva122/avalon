@@ -187,7 +187,7 @@ export default {
     animeVariant: '{name} (anime)',
     modalHeader: 'Avatar selection',
     servantHint: 'Standard avatar',
-    lady_of_lakeHint: 'Awarded to users registered in 2025',
+    lady_of_lakeHint: 'Awarded to users registered before 2026',
     excaliburHint: "Awarded for achievement: @:{'achievements.still_worthy'}",
     evilHint: "Awarded for achievement: @:{'achievements.mistakes_happen'}",
     goodHint: "Awarded for achievement: @:{'achievements.seer'}",

@@ -49,6 +49,8 @@
         <achievement-card
           v-for="achievement in openAchievements"
           :key="achievement.id"
+          :id="`achievement-${achievement.id}`"
+          :canUseRewards="uuid === $store.state.profile?.id"
           :achievementID="achievement.id"
           :isUnlocked="achievement.completed"
           :isOpen="true"
@@ -67,6 +69,8 @@
         <achievement-card
           v-for="achievement in hiddenAchievements"
           :key="achievement.id"
+          :id="`achievement-${achievement.id}`"
+          :canUseRewards="uuid === $store.state.profile?.id"
           :achievementID="achievement.id"
           :isUnlocked="achievement.completed"
           :isOpen="false"
@@ -82,7 +86,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, watch } from 'vue';
+import { defineComponent, ref, computed, onMounted, watch, nextTick } from 'vue';
+import { useRoute } from 'vue-router';
 import type { AchievementResponse } from '@avalon/types';
 import { socket } from '@/api/socket';
 import AchievementCard from '@/components/achievements/AchievementCard.vue';
@@ -122,7 +127,13 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const route = useRoute();
     const loading = ref(true);
+    watch([loading, () => route.hash], async () => {
+      if (loading.value || !route.hash.startsWith('#achievement-')) return;
+      await nextTick();
+      document.getElementById(route.hash.slice(1))?.scrollIntoView({ block: 'start' });
+    });
     const error = ref(false);
     let requestId = 0;
     const achievements = ref<UserAchievementData[]>([]);

@@ -4,27 +4,32 @@
     :class="{ 'achievement-popup--progress': type === 'progress' }"
     role="status"
     aria-atomic="true"
+    @mouseenter="hovered = true"
+    @mouseleave="hovered = false"
+    @focusin="focused = true"
+    @focusout="leaveFocus"
   >
-    <div
-      class="achievement-popup__body"
-      :class="{ 'achievement-popup__body--link': canNavigate }"
-      :role="canNavigate ? 'link' : undefined"
-      :tabindex="canNavigate ? 0 : undefined"
-      @click="navigateToUserAchievements"
-      @keydown.enter.prevent="navigateToUserAchievements"
-    >
+    <div class="achievement-popup__body">
       <div class="achievement-popup__header">
         <div class="achievement-popup__icon" aria-hidden="true">
-          <v-icon size="20" :icon="type === 'unlocked' ? 'fa:fa-solid fa-trophy' : 'fa:fa-solid fa-chart-line'" />
+          <v-icon size="20" :icon="type === 'progress' ? 'fa:fa-solid fa-chart-line' : 'fa:fa-solid fa-trophy'" />
         </div>
         <div class="achievement-popup__heading">
           <div class="achievement-popup__title">
-            {{ type === 'unlocked' ? $t('achievementsPopup.unlocked') : $t('achievementsPopup.progress') }}
+            {{
+              achievementID
+                ? $t(type === 'unlocked' ? 'achievementsPopup.unlocked' : 'achievementsPopup.progress')
+                : $t('stickers.unlocked')
+            }}
           </div>
-          <h3 class="achievement-popup__name">{{ achievement.name }}</h3>
+          <h3 class="achievement-popup__name">
+            {{ achievementID ? achievement.name : $t('cosmeticRewards.newStickers', { count: stickerIDs.length }) }}
+          </h3>
         </div>
       </div>
-      <p class="achievement-popup__description">{{ achievement.description }}</p>
+      <p class="achievement-popup__description">
+        {{ achievementID ? achievement.description : $t('cosmeticRewards.unlockedHint') }}
+      </p>
       <div v-if="type === 'progress'" class="achievement-popup__progress">
         <v-progress-linear
           :model-value="
@@ -38,32 +43,57 @@
         <span class="achievement-popup__progress-text">{{ progress.currentValue }} / {{ progress.maxValue }}</span>
       </div>
       <section
-        v-if="avatarReward || stickerReward"
+        v-if="avatarReward || stickerRewards.length"
         class="achievement-popup__rewards"
         :class="{ 'achievement-popup__rewards--unlocked': type === 'unlocked' }"
       >
-        <div class="achievement-popup__rewards-title">{{ $t('achievements.rewards') }}</div>
+        <div class="achievement-popup__rewards-title">
+          {{ $t(type === 'unlocked' ? 'cosmeticRewards.received' : 'cosmeticRewards.futureRewards') }}
+        </div>
         <div class="achievement-popup__reward-list">
           <div v-if="avatarReward" class="achievement-popup__reward">
             <div class="achievement-popup__reward-image achievement-popup__reward-image--avatar">
               <Avatar :avatarID="avatarReward" />
             </div>
-            <span>{{ $t('achievements.avatarType') }}</span>
-          </div>
-          <div v-if="stickerReward" class="achievement-popup__reward">
-            <div class="achievement-popup__reward-image">
-              <StickerImage :id="stickerReward.id" />
+            <div class="achievement-popup__reward-copy">
+              <span class="achievement-popup__reward-label">{{ $t('achievements.avatarType') }}</span>
+              <strong>{{ avatarName(avatarReward) }}</strong>
             </div>
-            <span>{{ $t('achievements.stickerType') }}</span>
+          </div>
+          <div v-for="sticker in stickerRewards" :key="sticker.id" class="achievement-popup__reward">
+            <div class="achievement-popup__reward-image"><StickerImage :id="sticker.id" /></div>
+            <div class="achievement-popup__reward-copy">
+              <span class="achievement-popup__reward-label">{{ $t('achievements.stickerType') }}</span>
+              <strong>{{ $t(`stickers.${sticker.id}`) }}</strong>
+            </div>
           </div>
         </div>
       </section>
+      <RewardActions
+        v-if="type === 'unlocked' && $store.state.profile && (avatarReward || stickerRewards.length)"
+        class="achievement-popup__actions"
+        :avatarID="avatarReward"
+        :stickerIDs="stickerRewards.length === 1 ? [stickerRewards[0].id] : []"
+        @busy="busy = $event"
+      />
+      <router-link
+        v-if="!achievementID && stickerRewards.length !== 1"
+        class="achievement-popup__details-link"
+        :to="{ name: 'profile', hash: '#stickers' }"
+        >{{ $t('stickers.collection') }}</router-link
+      >
+      <router-link
+        v-if="achievementID && $store.state.profile"
+        class="achievement-popup__details-link"
+        :to="achievementPath"
+        >{{ $t('cosmeticRewards.viewAchievement') }}</router-link
+      >
     </div>
     <button
       type="button"
       class="achievement-popup__close"
       :aria-label="$t('infoMessage.close')"
-      @click.stop="$emit('close')"
+      @click="$emit('close')"
     >
       <v-icon icon="close" size="20" aria-hidden="true" />
     </button>
@@ -72,14 +102,17 @@
 
 <script lang="ts">
 import { getAchievementsText } from '@/helpers/achievements';
-import { defineComponent, computed, PropType } from 'vue';
+import { avatarName } from '@/helpers/avatars';
+import { localizedPath } from '@/router/paths';
+import { defineComponent, computed, ref, watch, onMounted, onUnmounted, PropType } from 'vue';
+import { useDocumentVisibility } from '@vueuse/core';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
 import { store } from '@/store';
 import StickerImage from '@/components/stickers/StickerImage.vue';
 import { STICKERS } from '@avalon/types/user/stickers';
 import { ACHIEVEMENT_TO_AVATAR_MAP } from '@avalon/types/stats/achievement-avatars';
 import Avatar from '@/components/user/Avatar.vue';
+import RewardActions from './RewardActions.vue';
 
 export interface AchievementProgress {
   currentValue: number;
@@ -88,63 +121,60 @@ export interface AchievementProgress {
 
 export default defineComponent({
   name: 'AchievementPopup',
-  components: {
-    Avatar,
-    StickerImage,
-  },
+  components: { Avatar, StickerImage, RewardActions },
   props: {
-    achievementID: {
-      type: String,
-      required: true,
-    },
-    type: {
-      type: String as PropType<'unlocked' | 'progress'>,
-      required: true,
-      validator: (value: string) => ['unlocked', 'progress'].includes(value),
-    },
-    progress: {
-      type: Object as PropType<AchievementProgress>,
-      required: false,
-      default: () => ({ currentValue: 0, maxValue: 0 }),
-    },
+    achievementID: { type: String, default: '' },
+    stickerIDs: { type: Array as PropType<string[]>, default: () => [] },
+    type: { type: String as PropType<'unlocked' | 'progress'>, required: true },
+    progress: { type: Object as PropType<AchievementProgress>, default: () => ({ currentValue: 0, maxValue: 0 }) },
   },
   emits: ['close'],
-  setup(props) {
-    const { t } = useI18n();
-    const router = useRouter();
-
-    const achievement = computed(() => {
-      return {
-        name: t(`achievements.${props.achievementID}`),
-        description: getAchievementsText(props.achievementID, t(`achievements.${props.achievementID}_description`)),
-      };
-    });
-
-    // Определяем ID аватарки, которая выдается за достижение
-    const stickerReward = computed(() =>
-      STICKERS.find((s) => s.achievement === props.achievementID && (!s.hidden || props.type === 'unlocked')),
-    );
-    const avatarReward = computed(() => {
-      return ACHIEVEMENT_TO_AVATAR_MAP[props.achievementID];
-    });
-
-    // Функция для перехода на страницу личных достижений
-    const navigateToUserAchievements = () => {
-      const userID = store.state.profile?.id;
-      if (userID) {
-        router.push(`/achievements/user/${userID}/`);
-      }
-      // Если пользователь не авторизован, ничего не делаем
+  setup(props, { emit }) {
+    const { t, locale } = useI18n();
+    const hovered = ref(false),
+      focused = ref(false),
+      busy = ref(false);
+    const visibility = useDocumentVisibility();
+    const paused = computed(() => hovered.value || focused.value || busy.value || visibility.value === 'hidden');
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const schedule = () => {
+      clearTimeout(timer);
+      if (!paused.value) timer = setTimeout(() => emit('close'), 12000);
     };
-
-    const canNavigate = computed(() => Boolean(store.state.profile?.id));
-
+    watch([paused, () => props.progress, () => props.stickerIDs.length, () => props.type], schedule);
+    onMounted(schedule);
+    onUnmounted(() => clearTimeout(timer));
+    const leaveFocus = (event: FocusEvent) => {
+      focused.value =
+        event.relatedTarget instanceof Node && (event.currentTarget as HTMLElement).contains(event.relatedTarget);
+    };
+    const achievement = computed(() => ({
+      name: t(`achievements.${props.achievementID}`),
+      description: getAchievementsText(props.achievementID, t(`achievements.${props.achievementID}_description`)),
+    }));
+    const stickerRewards = computed(() =>
+      STICKERS.filter(
+        (s) =>
+          props.stickerIDs.includes(s.id) ||
+          (s.achievement === props.achievementID && (!s.hidden || props.type === 'unlocked')),
+      ),
+    );
+    const avatarReward = computed(() => ACHIEVEMENT_TO_AVATAR_MAP[props.achievementID]);
+    const achievementPath = computed(
+      () =>
+        localizedPath(`/achievements/user/${store.state.profile?.id}/`, locale.value) +
+        `#achievement-${props.achievementID}`,
+    );
     return {
-      canNavigate,
+      hovered,
+      focused,
+      busy,
+      leaveFocus,
       achievement,
-      navigateToUserAchievements,
+      stickerRewards,
       avatarReward,
-      stickerReward,
+      achievementPath,
+      avatarName: (id: string) => avatarName(id, t),
     };
   },
 });
@@ -167,18 +197,26 @@ export default defineComponent({
   &__body {
     padding: 16px;
     overflow-wrap: anywhere;
-
-    &--link {
-      cursor: pointer;
-    }
-
-    &:focus-visible {
-      outline: 2px solid rgb(var(--v-theme-primary));
-      outline-offset: -4px;
-      border-radius: 13px;
-    }
   }
-
+  &__actions {
+    margin-top: 14px;
+  }
+  &__details-link {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 0;
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  &__reward-copy {
+    min-width: 0;
+  }
+  &__reward-label {
+    display: block;
+    color: rgb(var(--v-theme-text-secondary));
+    font-size: 12px;
+  }
   &__header {
     display: flex;
     align-items: flex-start;

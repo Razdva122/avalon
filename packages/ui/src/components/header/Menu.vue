@@ -9,6 +9,11 @@
   >
     <template #activator="{ props }">
       <button type="button" class="menu-trigger" v-bind="props">
+        <span
+          v-if="newCount"
+          class="new-stickers-dot"
+          :aria-label="$t('cosmeticRewards.openWithNew', { count: newCount })"
+        />
         {{ $t('menu.menu') }}<span class="material-icons" aria-hidden="true">menu</span>
       </button>
     </template>
@@ -42,6 +47,16 @@
             <span class="material-icons" aria-hidden="true">menu_book</span>{{ $t('menu.rulesRoles') }}
           </LocaleLink>
         </section>
+        <LocaleLink
+          v-if="$store.state.profile"
+          :to="{ name: 'profile', hash: '#stickers' }"
+          class="menu-item"
+          @click="open = false"
+        >
+          <span class="material-icons" aria-hidden="true">collections_bookmark</span
+          >{{ $t('cosmeticRewards.collectionNav') }}
+          <span v-if="newCount" class="new-stickers-count">{{ newCount }}</span>
+        </LocaleLink>
         <section class="menu-section">
           <h3>{{ $t('menu.playersResults') }}</h3>
           <LocaleLink
@@ -123,6 +138,7 @@ import { rememberLanguage, chooseLanguage } from '@/helpers/i18n/preference';
 import { inNavigationSection } from './navigation';
 import Avatar from '@/components/user/Avatar.vue';
 import DevPanel from '@/components/dev/DevPanel.vue';
+import { useStickers } from '@/helpers/composables/useStickers';
 
 export default defineComponent({
   components: {
@@ -131,6 +147,7 @@ export default defineComponent({
     Avatar,
     DevPanel,
   },
+  setup: () => ({ newCount: useStickers().newCount }),
   emits: ['profileClick'],
   data: () => ({
     open: false,
@@ -195,6 +212,20 @@ export default defineComponent({
 });
 </script>
 <style scoped lang="scss">
+.new-stickers-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgb(var(--v-theme-primary));
+}
+.new-stickers-count {
+  margin-left: auto;
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: 12px;
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+}
 .menu-trigger,
 .close-menu {
   display: inline-flex;

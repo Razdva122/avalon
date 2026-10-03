@@ -167,6 +167,7 @@
 import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
+import { useStickers } from '@/helpers/composables/useStickers';
 import Avatar from '@/components/user/Avatar.vue';
 import SupportBenefits from './SupportBenefits.vue';
 import NetworkIcon from './NetworkIcon.vue';
@@ -178,6 +179,13 @@ const { t } = useI18n();
 const store = useStore();
 const info = ref<SupportInfo | null>(null);
 const account = ref<SupportAccount | null>(null);
+const { load: loadStickers } = useStickers();
+watch(
+  () => account.value?.premium,
+  (active, previous) => {
+    if (active && active !== previous) void loadStickers();
+  },
+);
 const network = ref('');
 const txid = ref('');
 const copied = ref(false);

@@ -112,7 +112,10 @@
         <div class="achievement-card__reward-list">
           <div v-if="avatarReward" class="achievement-card__reward-item">
             <Avatar :avatarID="avatarReward" class="achievement-card__reward-image" />
-            <span>{{ $t('achievements.avatarType') }}</span>
+            <div>
+              <span>{{ $t('achievements.avatarType') }}</span>
+              <div class="achievement-card__reward-name">{{ avatarName(avatarReward) }}</div>
+            </div>
           </div>
           <div v-for="sticker in stickerRewards" :key="sticker.id" class="achievement-card__reward-item">
             <StickerImage :id="sticker.id" class="achievement-card__reward-image" />
@@ -122,6 +125,12 @@
             </div>
           </div>
         </div>
+        <RewardActions
+          v-if="canUseRewards && isUnlocked && !showGlobalStats"
+          class="mt-3"
+          :avatarID="avatarReward"
+          :stickerIDs="stickerRewards.map((s) => s.id)"
+        />
       </section>
     </div>
   </v-card>
@@ -136,6 +145,8 @@ import { ACHIEVEMENT_TO_AVATAR_MAP } from '@avalon/types/stats/achievement-avata
 import { STICKERS } from '@avalon/types/user/stickers';
 import StickerImage from '@/components/stickers/StickerImage.vue';
 import Avatar from '@/components/user/Avatar.vue';
+import RewardActions from './RewardActions.vue';
+import { avatarName } from '@/helpers/avatars';
 
 export interface AchievementProgress {
   currentValue: number;
@@ -147,8 +158,10 @@ export default defineComponent({
   components: {
     Avatar,
     StickerImage,
+    RewardActions,
   },
   props: {
+    canUseRewards: Boolean,
     achievementID: {
       type: String,
       required: true,
@@ -223,6 +236,7 @@ export default defineComponent({
     });
 
     return {
+      avatarName: (id: string) => avatarName(id, t),
       achievement,
       isInProgress,
       shouldShowProgressBar,
@@ -235,6 +249,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .achievement-card {
+  scroll-margin-top: 80px;
   width: 100%;
   height: 100%;
   min-width: 0;

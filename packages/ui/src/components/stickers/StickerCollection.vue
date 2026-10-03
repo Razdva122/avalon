@@ -1,9 +1,9 @@
 <template>
-  <section class="sticker-collection">
+  <section id="stickers" class="sticker-collection" aria-labelledby="sticker-collection-title">
     <header>
       <div>
-        <h2>{{ $t('stickers.title') }}</h2>
-        <p>{{ $t('stickers.subtitle') }}</p>
+        <h2 id="sticker-collection-title">{{ $t('stickers.title') }}</h2>
+        <p>{{ $t('cosmeticRewards.collectionHint') }}</p>
       </div>
       <span v-if="collection" class="collection-count"
         >{{ collection.stickers.filter((s) => s.available).length }} / {{ STICKERS.length }}</span
@@ -17,7 +17,10 @@
       <h3>
         {{ $t('stickers.favorites') }} <small>{{ collection.favorites.length }} / 6</small>
       </h3>
-      <p class="hint">{{ $t('stickers.favoriteHint') }}</p>
+      <p class="hint">{{ $t('cosmeticRewards.favoriteHint') }}</p>
+      <p v-if="collection.favorites.length >= STICKER_FAVORITES_LIMIT" class="limit-hint" role="status">
+        {{ $t('cosmeticRewards.favoriteLimit') }}
+      </p>
       <div class="favorite-row">
         <div v-for="(id, index) in collection.favorites" :key="id" class="favorite-item">
           <StickerImage :id="id" />
@@ -36,7 +39,7 @@
               variant="text"
               color="text-primary"
               icon="close"
-              :aria-label="$t('stickers.remove')"
+              :aria-label="$t('cosmeticRewards.removeFavorite')"
               :disabled="busy"
               @click="toggle(id)"
             />
@@ -61,6 +64,7 @@
         hide-details
         @update:model-value="save(collection.favorites, !!$event)"
       />
+      <p class="hint board-hint">{{ $t('cosmeticRewards.boardHint') }}</p>
       <div class="sticker-grid">
         <article
           v-for="sticker in sortedStickers"
@@ -91,11 +95,14 @@
             color="primary"
             size="small"
             variant="tonal"
-            :disabled="busy || (!collection.favorites.includes(sticker.id) && collection.favorites.length >= 6)"
+            :disabled="
+              busy ||
+              (!collection.favorites.includes(sticker.id) && collection.favorites.length >= STICKER_FAVORITES_LIMIT)
+            "
             :prepend-icon="collection.favorites.includes(sticker.id) ? 'star' : 'star_border'"
             @click="toggle(sticker.id)"
           >
-            {{ $t(collection.favorites.includes(sticker.id) ? 'stickers.remove' : 'stickers.add') }}
+            {{ $t(collection.favorites.includes(sticker.id) ? 'cosmeticRewards.removeFavorite' : 'stickers.add') }}
           </v-btn>
           <v-btn
             v-if="sticker.available && selectable"
@@ -114,6 +121,15 @@
           <span v-else-if="!sticker.available" class="locked-label"
             ><span class="material-icons">lock</span>{{ $t('stickers.locked') }}</span
           >
+          <v-btn
+            v-if="sticker.isNew"
+            variant="text"
+            size="small"
+            color="primary"
+            class="seen-button"
+            @click="viewStickers([sticker.id])"
+            >{{ $t('cosmeticRewards.markOneSeen') }}</v-btn
+          >
         </article>
       </div>
       <v-btn
@@ -121,15 +137,16 @@
         variant="text"
         color="text-primary"
         class="mt-3"
-        @click="markSeen(collection.stickers.filter((s) => s.isNew).map((s) => s.id))"
+        @click="viewStickers(collection.stickers.filter((s) => s.isNew).map((s) => s.id))"
         >{{ $t('stickers.markSeen') }}</v-btn
       >
+      <p v-if="seenError" class="hint text-error" role="alert">{{ $t('stickers.failed') }}</p>
     </template>
   </section>
 </template>
 <script setup lang="ts">
-import { computed } from 'vue';
-import { STICKERS } from '@avalon/types/user/stickers';
+import { computed, ref, onMounted } from 'vue';
+import { STICKERS, STICKER_FAVORITES_LIMIT } from '@avalon/types/user/stickers';
 import { useI18n } from 'vue-i18n';
 import { useStickers } from '@/helpers/composables/useStickers';
 import StickerImage from './StickerImage.vue';
@@ -137,10 +154,20 @@ defineProps<{ selectable?: boolean }>();
 defineEmits<{ (event: 'send', id: string): void }>();
 const { t } = useI18n();
 const { collection, loading, error, busy, load, save, markSeen } = useStickers();
+const seenError = ref(false);
+onMounted(load);
+const viewStickers = async (ids: string[]) => {
+  seenError.value = !(await markSeen(ids));
+};
 const secret = (id: string, available: boolean) => !available && STICKERS.find((s) => s.id === id)?.hidden;
 const isPremium = (id: string) => STICKERS.find((s) => s.id === id)?.premium;
 const sortedStickers = computed(() =>
-  [...(collection.value?.stickers ?? [])].sort((a, b) => Number(!!isPremium(b.id)) - Number(!!isPremium(a.id))),
+  [...(collection.value?.stickers ?? [])].sort(
+    (a, b) =>
+      Number(b.available && b.isNew) - Number(a.available && a.isNew) ||
+      Number(b.available) - Number(a.available) ||
+      Number(!!isPremium(a.id)) - Number(!!isPremium(b.id)),
+  ),
 );
 const requirement = (id: string, available: boolean) => {
   const def = STICKERS.find((s) => s.id === id)!;
@@ -153,7 +180,10 @@ const requirement = (id: string, available: boolean) => {
 const toggle = async (id: string) => {
   if (!collection.value) return;
   const favorites = collection.value.favorites;
-  await save(favorites.includes(id) ? favorites.filter((s) => s !== id) : [...favorites, id]);
+  const adding = !favorites.includes(id);
+  if (await save(adding ? [...favorites, id] : favorites.filter((s) => s !== id))) {
+    if (adding) await viewStickers([id]);
+  }
 };
 const move = (index: number, direction: number) => {
   if (!collection.value) return;
@@ -190,6 +220,17 @@ h3 small {
   opacity: 0.6;
   font-weight: normal;
 }
+.limit-hint {
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 10px 12px;
+  margin-top: 8px;
+  border-radius: 8px;
+  background: rgba(var(--v-theme-primary), 0.08);
+}
+.board-hint {
+  margin-top: 6px;
+}
 .favorite-row {
   display: flex;
   gap: 8px;
@@ -197,10 +238,15 @@ h3 small {
   padding: 12px 0;
 }
 .favorite-item {
-  flex: 0 0 80px;
+  flex: 0 0 96px;
 }
 .favorite-item > img {
   height: 78px;
+}
+.reorder :deep(.v-btn) {
+  min-width: 32px;
+  width: 32px;
+  height: 36px;
 }
 .reorder {
   display: flex;
@@ -231,6 +277,19 @@ h3 small {
 .requirement {
   min-height: 38px;
   margin: 8px 0;
+}
+.favorite-button,
+.seen-button {
+  height: auto;
+  min-height: 40px;
+  max-width: 100%;
+  padding: 8px 6px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.favorite-button :deep(.v-btn__content),
+.seen-button :deep(.v-btn__content) {
+  white-space: normal;
 }
 .favorite-button,
 .locked-label {

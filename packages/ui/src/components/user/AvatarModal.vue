@@ -63,12 +63,19 @@
           <p>
             {{
               inspected.premium
-                ? $t('premiumCosmetics.unlockHint')
+                ? $t(inspected.available ? 'premiumCosmetics.included' : 'premiumCosmetics.unlockHint')
                 : inspected.available && inspected.info
                   ? inspected.info
                   : $t('avatars.' + inspected.id + 'Hint')
             }}
           </p>
+          <p v-if="inspectedAchievement && !inspected.available" class="unlock-condition">{{ unlockCondition }}</p>
+          <router-link
+            v-if="inspectedAchievement && knownAchievement && !inspected.available"
+            :to="achievementPath"
+            @click="overlay = false"
+            >{{ $t('cosmeticRewards.viewAchievement') }}</router-link
+          >
           <router-link
             v-if="inspected.premium && !inspected.available"
             :to="{ name: 'support' }"
@@ -85,6 +92,11 @@
 import { defineComponent, ref, computed, watch, onBeforeUnmount, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
+import { avatarName } from '@/helpers/avatars';
+import { getAchievementsText } from '@/helpers/achievements';
+import { ACHIEVEMENT_TO_AVATAR_MAP } from '@avalon/types/stats/achievement-avatars';
+import { OPEN_ACHIEVEMENT_IDS } from '@avalon/types/stats/achievements-constants';
+import { localizedPath } from '@/router/paths';
 import type { IAvatarInfo } from '@avalon/types';
 import AvatarPreview from '@/components/user/AvatarPreview.vue';
 import { useStore } from '@/store';
@@ -95,7 +107,7 @@ export default defineComponent({
   setup() {
     const overlay = ref(false);
     const store = useStore();
-    const { t } = useI18n();
+    const { t, locale } = useI18n();
     const selectedAvatar = computed(() => store.state.profile?.avatar);
     const picker = useAvatarSelection({
       load: () => socket.timeout(10000).emitWithAck('getUserAvatars'),
@@ -122,22 +134,38 @@ export default defineComponent({
         }
       });
     };
-    const avatarName = (id: string) => {
-      if (id.startsWith('premium/')) return t('premiumCosmetics.' + id.slice(8));
-      const role = id.replace('anime/', '');
-      const special: Record<string, string> = {
-        merlin_pure: 'roles.merlinPure',
-        lady_of_lake: 'addons.ladyOfLake',
-        lady_of_sea: 'addons.ladyOfSea',
-        excalibur: 'addons.excalibur',
-        good: 'avatars.goodName',
-        evil: 'avatars.evilName',
-        mystery: 'roles.mysteryWizard',
-      };
-      const name = t(special[role] || 'roles.' + role);
-      return id.startsWith('anime/') ? t('avatars.animeVariant', { name }) : name;
+    const inspectedAchievement = computed(
+      () => Object.entries(ACHIEVEMENT_TO_AVATAR_MAP).find(([, id]) => id === picker.inspected.value?.id)?.[0],
+    );
+    const knownAchievement = computed(
+      () =>
+        !!inspectedAchievement.value &&
+        (OPEN_ACHIEVEMENT_IDS.includes(inspectedAchievement.value) ||
+          store.state.profile?.knownAchievements?.includes(inspectedAchievement.value)),
+    );
+    const unlockCondition = computed(() =>
+      knownAchievement.value
+        ? getAchievementsText(inspectedAchievement.value!, t(`achievements.${inspectedAchievement.value}_description`))
+        : t('cosmeticRewards.secretCondition'),
+    );
+    const achievementPath = computed(
+      () =>
+        localizedPath(`/achievements/user/${store.state.profile?.id}/`, locale.value) +
+        `#achievement-${inspectedAchievement.value}`,
+    );
+    return {
+      ...picker,
+      overlay,
+      selectedAvatar,
+      displayModal,
+      restoreFocus,
+      avatarName: (id: string) => avatarName(id, t),
+      selectAvatar,
+      inspectedAchievement,
+      knownAchievement,
+      unlockCondition,
+      achievementPath,
     };
-    return { ...picker, overlay, selectedAvatar, displayModal, restoreFocus, avatarName, selectAvatar };
   },
 });
 </script>

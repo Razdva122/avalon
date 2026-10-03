@@ -161,6 +161,25 @@ function accountStore(reply, onTimeout = () => {}) {
   }).store;
 }
 
+test('a late avatar acknowledgement cannot change a different account', async () => {
+  let acknowledge;
+  const reply = new Promise((resolve) => {
+    acknowledge = resolve;
+  });
+  const account = accountStore(() => reply);
+  const state = { profile: { id: 'first', avatar: 'servant' } };
+  const commits = [];
+  const saving = account.actions.updateUserAvatar(
+    { state, commit: (...args) => commits.push(args) },
+    { avatarID: 'merlin' },
+  );
+  state.profile = { id: 'second', avatar: 'oberon' };
+  acknowledge(true);
+  await saving;
+  assert.deepEqual(commits, []);
+  assert.equal(state.profile.avatar, 'oberon');
+});
+
 test('profile name changes commit only after the server accepts them', async () => {
   for (const response of [{ error: 'rateLimited' }, { error: 'invalidRequest' }, true]) {
     const store = accountStore(response);
