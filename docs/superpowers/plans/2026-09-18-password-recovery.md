@@ -1,5 +1,7 @@
 # Password Recovery Implementation Plan
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 **Goal:** Add opt-in Postbox password recovery without email verification.
 **Architecture:** Atomic per-user Mongo outbox, shared sliding limits, SMTP worker, versioned sessions, Vue form.
 **Tech Stack:** TypeScript, MongoDB, Express, Socket.IO, Vue/Vuetify, Nodemailer.

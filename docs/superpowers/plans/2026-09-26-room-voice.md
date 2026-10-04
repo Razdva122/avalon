@@ -1,5 +1,7 @@
 # Room voice beta implementation plan
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 **Goal:** Ship an optional LiveKit voice room for seated players and site administrators, with local audio controls and a Yandex Cloud deployment runbook.
 **Spec:** ../specs/2026-09-26-room-voice-design.md
 **Architecture:** An authenticated Socket.IO service owns voice admissions. A dedicated signaling gateway validates every LiveKit connection against current admissions; private LiveKit handles media. Vue lazily loads the audio client.

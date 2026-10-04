@@ -1,5 +1,7 @@
 # Database reliability implementation plan
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 **Goal:** Correct all findings in `docs/database-audit-2026-09-27.md` without requiring a replica set or changing rating formulas.
 
 **Architecture:** MongoDB standalone remains supported. A durable globally ordered operation queue stores an immutable rating plan before applying it. Each player update uses a revision compare-and-set; duplicate/stale workers cannot apply the same plan twice. A controller never advances until player updates and game achievements finish. Achievement sequence guards make retries safe. Role leaderboards publish immutable generations through an atomic pointer. Startup awaits migrations and indexes before listening.

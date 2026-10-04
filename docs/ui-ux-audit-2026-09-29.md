@@ -1,5 +1,7 @@
 # UI/UX audit — 2026-09-29
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](README.md).
+
 Applied frontend-design and ui-ux-pro-max guidance, retaining Avalon's existing character artwork and restrained gold accents.
 
 ## Changes

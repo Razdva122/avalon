@@ -1,5 +1,7 @@
 # Community Player Boards Implementation Plan
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 > Execute with subagent-driven-development, then verify integration in the same worktree.
 
 **Goal:** Deliver both player boards on Community.

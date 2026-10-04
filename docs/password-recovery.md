@@ -1,5 +1,7 @@
 # Password recovery with Yandex Cloud Postbox
 
+[Documentation index](README.md)
+
 The code is opt-in. No email verification, signup emails, or bulk announcements are sent. Existing accounts recover using their saved email. A typo in that address means its actual owner can receive the recovery link; users should check the address in profile settings.
 
 ## Configure sending

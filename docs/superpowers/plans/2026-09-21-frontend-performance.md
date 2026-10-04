@@ -1,5 +1,7 @@
 # Frontend performance implementation
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 Approved scope: the six recommendations in `artifacts/performance-audit-2026-09-21/audit.md` and the user's request to implement all of them. Work in `codex/frontend-performance`; no deployment or infrastructure changes.
 
 - [x] Generate small role/team/addon thumbnails with existing Sharp pipeline; keep large portraits and skins intact. Verify actual generated dimensions and file sizes.

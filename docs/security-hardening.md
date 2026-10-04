@@ -1,6 +1,9 @@
 # Security hardening — 27 September 2026
 
-The September audit findings were addressed in application code and dependencies. Deployment is separate: these changes have not been applied to the running service.
+[Documentation index](README.md)
+
+The September audit findings were addressed in application code and dependencies. Deployment is separate. This audit records repository changes at that date; verify
+the currently running image and deployment settings independently.
 
 ## Application changes
 

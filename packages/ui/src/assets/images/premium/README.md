@@ -1,5 +1,7 @@
 # Premium: Mind games
 
+[Documentation index](../../../../../../docs/README.md)
+
 ## Availability
 
 Premium cosmetics, the community page and support links are released in every environment. The release flag has been removed. Premium avatars and stickers still require paid or manually granted Premium; backend authorization is covered by tests.

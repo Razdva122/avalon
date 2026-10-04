@@ -1,5 +1,7 @@
 # SEO страниц дополнений — 29 сентября 2026
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](README.md).
+
 ## Объём
 
 По запросу владельца применён подход предыдущей доработки ролей: четыре статьи дополнений и обзор раздела на EN, RU, ES, PT, zh-CN и zh-TW — 30 локализованных страниц. Адреса, canonical, языковая маршрутизация и правила самой игры не менялись.

@@ -1,5 +1,7 @@
 # Исправления аудита базы данных
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](README.md).
+
 Реализация закрывает причины из `database-audit-2026-09-27.md` в коде и скриптах развёртывания. Production не подключался, миграции и исправления исторических данных на нём не выполнялись.
 
 | Пункт аудита                      | Изменение                                                                                                                                                                                                                                                                                                 |

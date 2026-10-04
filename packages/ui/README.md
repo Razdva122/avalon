@@ -1,6 +1,8 @@
 # @avalon/ui
 
-This repository contains the user interface codebase for our application, built with Vue 3, Vuetify, and Vuex.
+This workspace contains the Avalon browser UI, built with Vue 3, Vue Router, Vuetify, Vuex and vue-i18n. Install dependencies and run the commands below from the monorepo root.
+
+[Documentation index](../../docs/README.md) · [Development guide](../../docs/development.md) · [Release guide](../../deploy/README.md).
 
 ## Project Structure
 
@@ -23,19 +25,19 @@ This repository contains the user interface codebase for our application, built 
 **Install dependencies:**
 
 ```
-npm install
+npm ci
 ```
 
 **Compiles and hot-reloads for development:**
 
 ```
-npm run serve
+npm run serve --workspace=packages/ui
 ```
 
 **Compiles and minifies for production:**
 
 ```
-npm run build
+npm run build:ui
 ```
 
 ## Tests
@@ -64,7 +66,7 @@ structured data, and metadata updates during navigation in Chromium.
 To check a running Nginx deployment, run:
 
 ```sh
-SEO_BASE_URL=https://avalon-game.com npm run check:seo:http
+SEO_BASE_URL=https://avalon-game.com npm run check:seo:http --workspace=packages/ui
 ```
 
 This also probes public HTML with Googlebot, OAI-SearchBot and PerplexityBot
@@ -204,7 +206,7 @@ icons can magnify artwork by up to 230%. The preview supports user avatars up to
 
 `npm run generate:avatars --workspace=packages/ui` regenerates previews from
 `src/assets/images` using pinned Sharp, quality 85 and lossless alpha. It runs
-before image tests (and therefore production builds), and before the dev server.
+before serve and production builds. Run it before directly invoking image tests on a clean checkout.
 After replacing artwork during a dev session, rerun it or restart the dev server.
 `src/assets/avatars` is generated and ignored by Git; do not edit it manually.
 
@@ -239,3 +241,12 @@ Image preparation also generates 128px thumbnails. Small inline role icons,
 addon icons and team badges use them; full portraits and card artwork retain
 originals. The Material Icons subset is checked in; normal builds need no Python.
 See `src/assets/fonts/README.md` when adding icon names or updating Vuetify.
+
+## Feature guides
+
+- [AI Arena](../../docs/ai-rooms.md), [voice beta](../../docs/voice-chat.md) and [persistent room chat](../../docs/room-chat.md)
+- [Community boards](../../docs/player-boards.md), [recovery](../../docs/password-recovery.md) and [support payments](../../docs/payments/direct-crypto.md)
+- [Localization](src/i18n/README.md), [SEO/URL policy](SEO.md) and [icon font maintenance](src/assets/fonts/README.md)
+
+Performance measurements in dated reports describe the tested build/environment.
+Recheck live metrics after deploying; a passing build does not measure production LCP.

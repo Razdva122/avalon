@@ -1,5 +1,7 @@
 # Эксперимент: семь AI-игроков в Avalon
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 Статус: реализован локальный прототип. Пользователь подтвердил приоритет обсуждений,
 семь участников с рекомендованными ролями и бюджет эксперимента до $10.
 Подтверждён Yandex AI Studio, Qwen3.6-35b-a3b; выполняются ограниченные живые проверки.

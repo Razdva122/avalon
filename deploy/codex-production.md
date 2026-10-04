@@ -1,12 +1,26 @@
 # Codex on the production backend
 
-The backend image installs `@openai/codex@0.159.2`. Deploy a release containing
-this change: the earlier release blocks Codex in production and has no CLI.
+[Documentation index](../docs/README.md)
+
+The backend image installs `@openai/codex@0.159.2`. Select an image built from the current repository; older images may lack
+production opt-in or remote transport.
 Codex stays disabled until `AI_CODEX_ENABLED=true`; all existing administrator
 access checks, pacing and subscription usage accounting remain in place.
 The AI Arena also requires `AI_ROOMS_ENABLED=true`, included in the fragment.
 
-## Prepare the VM
+## Choose the transport
+
+Use local mode when the backend container can authenticate with ChatGPT directly.
+Use the [remote Compose fragment](compose-codex-remote.fragment.yaml) when the
+CLI and credentials are hosted on a separate worker. Remote mode is selected by
+`AI_CODEX_SSH_HOST` and requires user, key and pinned known_hosts paths; the default
+SSH port is 10022. Do not merge both authentication layouts by accident.
+The worker scripts and tests are under `deploy/codex-worker`.
+
+The VM preparation sections below are dated operational records. Their successful
+checks do not establish the currently running release or current authentication state.
+
+## Prepare the VM (local mode)
 
 Merge [compose-codex.fragment.yaml](compose-codex.fragment.yaml) into the existing
 production Compose. Keep its application secrets, database volumes and network
@@ -116,7 +130,7 @@ catalog and weekly quota. An arbitrary `id` command was denied. A live SSH
 disconnect removed the worker container and freed the lock. Isolated Linux tests
 also cover cancellation while container creation completes late.
 
-### Enable in the next backend release
+### Enable remote mode during rollout
 
 Merge [compose-codex-remote.fragment.yaml](compose-codex-remote.fragment.yaml)
 into the Yandex Cloud production Compose and use the new backend image containing
@@ -125,8 +139,9 @@ networks, UI and MongoDB configuration. The remote-worker configuration supersed
 the local Codex-auth volume fragment: ChatGPT credentials stay on the worker VM.
 Keep `AI_CODEX_ENABLED=false` until the controlled rollout; then set it true.
 
-The currently running `v69.0.1` backend does not implement this SSH transport.
-No production backend restart or Compose change was performed by preparation.
+At the recorded 2026-10-01 preparation, the `v69.0.1` backend did not implement
+this SSH transport and was not restarted. This is historical evidence; check the
+actual deployed image and configuration before rollout.
 During rollout, check that no human or AI game is active before recreating backend.
 Verify model selection and quota in the administrator UI, then start one supervised
 game. A complete game and real model decisions remain rollout checks.

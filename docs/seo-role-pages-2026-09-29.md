@@ -1,5 +1,7 @@
 # SEO страниц ролей — 29 сентября 2026
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](README.md).
+
 ## Основание
 
 Владелец подтвердил доработку оставшихся 13 статей на всех шести языках. В исходном коде краткие SEO-блоки уже имели Merlin, Percival, Morgana, Mordred и Oberon. Доработаны Brute, Cleric, Guinevere, Lancelots, Lovers, Lunatic, Merlin Pure, Minion, Revealer, Servant, Trickster, Troublemaker и Witch. Парные роли сохраняют общие страницы.

@@ -1,5 +1,7 @@
 # Локальный эксперимент: боты Avalon через Codex / ChatGPT
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 1 октября 2026. Исследовательский запуск, не интеграция в production.
 
 **Подключение подтверждено; партия не завершена.** Семь существующих ботов играли через локальный Codex CLI 0.159.2 с текущей авторизацией ChatGPT. `codex login status` показал ChatGPT; переменные `CODEX_API_KEY` и `OPENAI_API_KEY` отсутствовали. API Яндекса, MongoDB и работающий сервер не использовались.

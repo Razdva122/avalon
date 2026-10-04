@@ -19,7 +19,7 @@ Plot Cards are special game-changing cards that can be used during different sta
 - **Charge (Opinion Maker)** - 1x
   - Player must vote publicly
 
-### 7+ Player Cards
+### Additional cards at 7–10 players
 
 - **The King Returns (No Confidence)** - 2x
   - Null a previous approve and change leadership
@@ -39,3 +39,19 @@ Plot Cards are special game-changing cards that can be used during different sta
 - **Instant**: Cards that have an immediate, one-time effect
 - **Usable**: Cards that can be played at specific game stages
 - **Effect**: Cards stay in the game until the end
+
+## Deck and distribution
+
+The seven base cards above form the complete deck for 5–6 players. At 7–10 players
+the eight additional cards are added to that deck (15 total); their counts are
+additional, so The King Returns has three copies and Charge has two.
+The shuffled deck distributes one card per round at 5–6 players, two at 7–8,
+and three at 9–10. Card distribution starts at the first team-selection attempt
+of a mission. The leader assigns each card to a player.
+
+Implementation: `index.ts` defines the deck and stage hooks, `cards` implements
+effects, `history` records actions, and `interface.ts` defines runtime card state.
+Shared names/history contracts are in `packages/types/game`.
+
+[Documentation index](../../../../../../../docs/README.md) ·
+Public addon rules are available in the in-game wiki.

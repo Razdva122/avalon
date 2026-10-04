@@ -1,5 +1,7 @@
 # Community player boards
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 Approved in chat: implement the first version on the existing Community page, above existing server listings. Two boards: solo (looking for company) and group (looking for players). Signed-in users may publish solo; group requires participation in at least one completed non-manual game, checked server-side. One persistent listing per user per board. No free-form descriptions or comments.
 
 Listings contain languages (en,ru,es,pt,cmn,yue), days (1 Monday through 7 Sunday), local start/end hour 0..23, IANA timezone, voice/text/either, beginner/experienced experience, beginnerFriendly boolean, canTeach boolean, groupSize and seeking count for group (total <=10), and one or two contacts: wechat,qq,line,discord,telegram. Contacts use account IDs only for MVP; qqGroup optional contact type for group only. Publicly displayed contacts with copy buttons; no arbitrary URLs or HTML. UI explains contacts are public. Nick/avatar come from current profile.

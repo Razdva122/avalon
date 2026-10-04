@@ -1,5 +1,7 @@
 # Материалы для обзоров Avalon
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](README.md).
+
 Черновики от 25 сентября 2026. Ничего не опубликовано и не отправлено.
 
 ## Очерёдность размещений

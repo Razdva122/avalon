@@ -1,5 +1,7 @@
 # Замеры production MongoDB — 27 сентября 2026
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](README.md).
+
 Проверена работающая БД `avalon-prod`, MongoDB 6.0.20, backend v65.0.0. Только чтение: статистика коллекций/индексов, ограниченные explain executionStats и агрегации. Данные, индексы, настройки profiling и работающие сервисы не изменялись. Пользовательские идентификаторы и содержимое документов не сохранялись.
 
 ## Объём

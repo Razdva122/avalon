@@ -1,5 +1,7 @@
 # SEO and performance follow-up — 16 September 2026
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../docs/README.md).
+
 ## Yandex Webmaster findings
 
 The authenticated property is https://avalon-game.com. The inspected reports still predominantly describe crawls before release 60.0.1; their warnings are not proof of a current regression.

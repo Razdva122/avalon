@@ -1,5 +1,7 @@
 # Direct Crypto Support Implementation Plan
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 > **For agentic workers:** Use superpowers:executing-plans to implement this plan task-by-task in this session.
 
 **Goal:** Accept arbitrary BTC and USDT transfers, verify txids and credit support exactly once.

@@ -1,5 +1,7 @@
 # Community player boards
 
+[Documentation index](README.md)
+
 The Community page has three tabs: community servers (selected by default), looking for a group, and looking for players. Each player board loads when its tab is selected:
 
 - `solo`: a signed-in player looks for a group.
@@ -44,13 +46,13 @@ Backend integration tests run against a real temporary MongoDB and HTTP server w
 
 UI tests cover draft projection, cooldown/status helpers, filtering query construction, localized transport errors, production proxy coverage, stale account/filter responses and failed-save recovery. Browser verification additionally exercises Traditional Chinese, LINE defaults, publish/edit, the recruiting gate, and 375px layouts. No live accounts or public listings were created during verification.
 
-Verified 2026-09-29: 61 backend suites / 477 tests; 209 UI unit tests; production build and its SEO, navigation, bundle, images, recovery, support, startup and Web Vitals checks passed. Production prerender used the locally installed Chrome via `PUPPETEER_EXECUTABLE_PATH`. Temporary Mongo tests used an existing cached binary via `MONGOMS_SYSTEM_BINARY`. Review findings were fixed and re-reviewed. Changes are local only.
+Verified 2026-09-29: 61 backend suites / 477 tests; 209 UI unit tests; production build and its SEO, navigation, bundle, images, recovery, support, startup and Web Vitals checks passed. Production prerender used the locally installed Chrome via `PUPPETEER_EXECUTABLE_PATH`. Temporary Mongo tests used an existing cached binary via `MONGOMS_SYSTEM_BINARY`. Review findings were fixed and re-reviewed. These results describe the 2026-09-29 local verification; check deployment independently.
 
 ## Local demo listings
 
 From `packages/backend`, run `NODE_ENV=development ../../node_modules/.bin/ts-node src/scripts/seedPlayerBoards.ts` to seed eight clearly labelled DEMO profiles (four solo, four groups). It only accepts loopback MongoDB in development, uses fixed fixture IDs, and never inserts fake games or changes existing real accounts. Contacts are illustrative only. Rerunning refreshes those fixtures rather than duplicating them. Add `--remove` to remove only the demo profiles/listings and their reports.
 
-Latest board revision: 48 backend board tests, 209 UI tests and the production build passed. Browser checks confirmed group names without avatars, colored contact icons, experience/communication icons, group-only beginner badges and mobile layout.
+Additional verification recorded during the board revision: 48 backend board tests, 209 UI tests and the production build passed. Browser checks confirmed group names without avatars, colored contact icons, experience/communication icons, group-only beginner badges and mobile layout.
 
 Invitation guidance: [Discord](https://support.discord.com/hc/en-us/articles/208866998-Invites-101), [Telegram](https://www.telegram.org/faq), [LINE](https://help.line.me/line/desktop/?contentId=20008159). Link validation checks format, not whether an invitation has expired. Language flags are decorative and always accompanied by language names.
 

@@ -1,5 +1,7 @@
 # Screenshots for the Reddit announcement
 
+[Documentation index](../README.md)
+
 Captured from the public production site on 2026-09-25 with a fresh, signed-out Chrome profile. No fabricated UI or edited gameplay data. The language suggestion was dismissed using its normal button; neutral pages use the site's English guest preference.
 
 Suggested order and English captions:

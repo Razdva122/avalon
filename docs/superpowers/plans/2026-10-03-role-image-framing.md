@@ -1,5 +1,7 @@
 # Role image framing implementation plan
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 **Goal:** Audit all 25 role images in each of the three styles and choose framing for the wiki gallery, role pages, and game icons.
 
 **Architecture:** Keep the original assets. Share square portrait framing through the existing image/style helpers and SchemaImage; retain separate circle framing in PlayerIcon. Use the compiled Vue components for visual verification.

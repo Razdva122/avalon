@@ -1,5 +1,7 @@
 # Новые публикации о развитии Avalon
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](README.md).
+
 Статус: черновики, не опубликованы. Дата: 25 сентября 2026. Аккаунт, указанный владельцем: https://www.reddit.com/user/Razdva12/ . Авторизованное подключение ещё не установлено.
 
 ## Проверка площадок

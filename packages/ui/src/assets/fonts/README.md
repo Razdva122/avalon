@@ -1,5 +1,7 @@
 # Material Icons subset
 
+[Documentation index](../../../../../docs/README.md)
+
 `material-icons.woff2` is a subset of the installed
 `material-design-icons-iconfont` font, licensed under the adjacent Apache license.
 The generated `../../styles/material-icons.css` preserves ligatures and icon-name

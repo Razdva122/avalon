@@ -1,5 +1,7 @@
 # NOWPayments Implementation Plan
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 **Goal:** Connect hosted USDT checkout to Avalon accounts and Premium.
 **Architecture:** REST support router alongside Socket.IO, Mongo order ledger, signed IPN updates, derived Premium, localized support UI.
 **Tech Stack:** TypeScript, Express, Mongoose, Vue 3, existing JWT.

@@ -1,5 +1,7 @@
 # SEO improvements — 28 September 2026
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](README.md).
+
 ## Basis and scope
 
 The owner approved implementation following a live review of Google Search Console and Yandex Webmaster. This is a bounded update to existing pages, translations and navigation; canonical URLs and game mechanics remain unchanged.

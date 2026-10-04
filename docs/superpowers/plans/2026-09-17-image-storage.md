@@ -1,5 +1,7 @@
 # Image Storage Implementation Plan
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 > **For agentic workers:** Use executing-plans to implement these tasks in order.
 
 **Goal:** Serve production game images from Yandex Storage and upload them automatically before UI publication.

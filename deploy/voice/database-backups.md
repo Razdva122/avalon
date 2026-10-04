@@ -1,5 +1,7 @@
 # Consistent standalone MongoDB backups
 
+[Documentation index](../../docs/README.md)
+
 Copy `backup-mongodb.sh` beside `activate-app.sh` in `/opt/avalon/voice-release` when deploying the updated release tooling. The activation script calls the helper before replacing the application.
 
 The helper takes MongoDB's `fsyncLock`, dumps all databases into a private temporary file, validates gzip integrity, unlocks, then publishes the archive. MongoDB reads continue; all writers, including background workers, wait during the dump. Schedule the operation during a maintenance window: long dumps can exceed application write timeouts. Root credentials remain inside the container environment and are never printed by the scripts. Do not run with shell tracing.

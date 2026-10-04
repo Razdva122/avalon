@@ -1,5 +1,7 @@
 # LCP: исследование и доработки 29 сентября 2026
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](README.md).
+
 ## Завершение отчётности — 30 сентября 2026
 
 В GA4 `430786828` подтверждён приём `web_vital`: 29 сентября — 524 события от 85 пользователей; 30 сентября на момент проверки — 223 события от 47 пользователей (неполный день). Эти числа включают все пять метрик и их обновления, это не количество LCP. На сайте проверена версия `68.0.2`. Search Console обновлён только по 28 сентября, до релиза.

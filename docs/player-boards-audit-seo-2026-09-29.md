@@ -1,5 +1,7 @@
 # Аудит объявлений и SEO — 29 сентября 2026
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](README.md).
+
 Область: две доски объявлений, страница сообщества и их навигация. Все изменения локальные; публикация на production не выполнялась.
 
 ## Найденные и исправленные проблемы

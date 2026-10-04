@@ -1,5 +1,7 @@
 # Persistent room chat implementation plan
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 **Goal:** Keep text and sticker conversations available after room archival and server restarts.
 
 **Approved scope:** The chat portion of the design discussed on 2026-09-28. Game snapshots and game recovery are deferred.

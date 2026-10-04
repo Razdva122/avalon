@@ -1,5 +1,7 @@
 # AI dialogue and discussion languages implementation plan
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 > **For agentic workers:** Use subagent-driven-development and dispatching-parallel-agents for the independent room, interface, and prompt tasks. Track verified steps below.
 
 **Goal:** Make AI conversations more interactive and expressive, add the two agreed reasoning checks, and allow English, Russian, or Traditional Chinese (Taiwan) discussion.

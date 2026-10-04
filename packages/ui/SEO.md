@@ -1,5 +1,7 @@
 # SEO changes and verification
 
+[Documentation index](../../docs/README.md)
+
 ## URL policy
 
 - English public pages use unprefixed URLs. `/en/...` redirects permanently to the matching English URL.

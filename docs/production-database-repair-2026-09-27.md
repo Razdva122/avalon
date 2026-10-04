@@ -1,5 +1,7 @@
 # Восстановление production после миграции
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](README.md).
+
 27 сентября 2026, база `avalon-prod`, backend/UI `v66.1.2`.
 
 После явного подтверждения пользователя удалены 122 лишних документа игр из 119 групп roomID и 3 дубликата достижений. Все 241 исходный документ игр и 6 документов достижений сохранены без изменений в `repair_20260927_startedroomstates` и `repair_20260927_userachievements`; перед удалением проверено равенство копий и оригиналов. Независимый архив mongodump на сервере: `/var/backups/avalon/before-dedup-20260927.archive.gz`, 287572352 байта. Проверена gzip-целостность; полное тестовое восстановление архива не выполнялось.

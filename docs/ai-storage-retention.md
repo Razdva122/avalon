@@ -1,5 +1,7 @@
 # AI accounting and diagnostic retention
 
+[Documentation index](README.md)
+
 AI spending is still enforced in one MongoDB document, so a standalone MongoDB is supported. A reservation and its request-ID receipt are written atomically. Settlement checks that receipt and records actual usage in the same update as the refund; repeating the same settlement cannot subtract money twice. A request with the same ID cannot reserve twice.
 
 The client refunds failures and cancellations known to occur before HTTP dispatch. Before sending, it durably marks the receipt as potentially dispatched. If the process dies or MongoDB becomes unavailable before refunding an unsent request, the next successful claim after release/lease expiry refunds that unsent receipt. A crash after the dispatch marker is conservative: the complete reservation remains charged because the provider might have processed the request. Reconciling those ambiguous charges requires provider billing evidence; they are never automatically refunded.

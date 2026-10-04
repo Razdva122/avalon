@@ -1,5 +1,7 @@
 # Восстановление пароля и служебная почта
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 Согласовано: восстановление на текущий сохранённый email, включая старые аккаунты. Подтверждения email и массовых рассылок нет. Смена email по текущему паролю остаётся доступной.
 
 ## Поведение

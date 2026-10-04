@@ -1,5 +1,7 @@
 # AI decision reliability implementation plan
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 Goal: address observed production errors while leaving strategy with Qwen and keeping existing budgets.
 Design approved in conversation: prefer self on uninformed opening votes; distinguish authoritative game facts from model hypotheses; check current roster/threshold/identity; ground reviews in actual actions; evaluate reasoning modes on saved errors before changing the default.
 

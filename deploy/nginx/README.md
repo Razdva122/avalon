@@ -1,5 +1,7 @@
 # Mounted nginx configuration compatibility
 
+[Documentation index](../../docs/README.md)
+
 The production Compose file mounts `/opt/avalon/voice-release/nginx.voice.conf`
 read-only over `/etc/nginx/nginx.conf`. Updating the UI image therefore does not
 update that configuration. Older voice configurations route board API requests

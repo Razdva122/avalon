@@ -1,5 +1,7 @@
 # Unified image storage
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 The approved direction is Yandex Object Storage with automatic uploads during releases.
 Tracked `packages/ui/src/assets/images` and `icons` remain the source of truth.
 Production builds emit content-hashed image files and reference them at

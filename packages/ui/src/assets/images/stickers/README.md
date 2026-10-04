@@ -1,5 +1,7 @@
 # Sticker artwork
 
+[Documentation index](../../../../../../docs/README.md)
+
 ## cleric-best — «Лучший из лучших» (2026-09-28)
 
 Generated with the built-in image_gen tool. References: `../roles/cleric.webp` (character), user-provided Matthew McConaughey cigarette meme (expression and pose), `merlin-think.webp` (sticker rendering). Runtime asset: 320×320 WebP, transparent alpha retained. Unlock: `best_of_the_best` achievement.

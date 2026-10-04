@@ -1,5 +1,7 @@
 # Голосовой чат комнаты · beta
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../../README.md).
+
 Дата: 2026-09-26. Статус: требования согласованы в обсуждении; техническая спецификация подготовлена для ревью перед реализацией.
 
 ## Согласованный результат

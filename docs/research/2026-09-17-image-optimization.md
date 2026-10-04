@@ -1,5 +1,7 @@
 # Аудит изображений Avalon — 17 сентября 2026
 
+> Historical record: findings, measurements and plans describe their recorded date. For current setup and operations, use the [documentation index](../README.md).
+
 Проверены исходники master (v61.3.0), реальные публичные страницы production и сжатие копий всех 99 файлов. Код приложения, исходные изображения и бакет не изменены. Основной приоритет: варианты разрешения, затем PNG → WebP и отложенная загрузка; AVIF — дополнительный этап.
 
 ## Что загружается сейчас
