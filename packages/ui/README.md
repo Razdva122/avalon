@@ -116,8 +116,8 @@ its URL. A normal rebuild preserves URLs for unchanged images.
    - `YC_STORAGE_SECRET_ACCESS_KEY`: secret access key.
 4. Commit the workflow and source changes. The existing release trigger remains
    a pushed `v*.*.*` tag; no new Docker Hub variables or secrets are required.
-   The workflow also supports **Run workflow** to build, upload and verify images
-   without publishing either Docker container.
+   The workflow also supports **Run workflow** to publish an existing version tag,
+   including both Docker containers and the verified game images.
 
 References: [Yandex static keys](https://yandex.cloud/ru/docs/iam/operations/authentication/manage-access-keys),
 [bucket IAM roles](https://yandex.cloud/en/docs/storage/security/),
@@ -147,6 +147,32 @@ from deleting `assets/img/` while an old UI version can still reference it. A fa
 or cancelled run may leave extra hashed files, which is harmless. Retry a failed
 run after correcting access, credentials or connectivity; it will upload missing
 files and recheck all URLs before publication.
+
+### CI build caches and cleanup
+
+Both Docker builds use Docker Hub registry caches with `mode=max`:
+`<DOCKER_HUB_USERNAME>/backend-avalon:buildcache` for the backend and
+`<DOCKER_HUB_USERNAME>/nginx-avalon:buildcache` for the audited UI build. These
+separate, mutable tags reuse the existing Docker Hub credentials and repositories;
+they are build caches, never deployment image tags. The first build after migration
+starts without a registry cache. UI authentication runs before the audited export;
+publication still packages that exact export after routing and public image checks.
+
+The workflow no longer exports UI BuildKit caches to GitHub Actions storage.
+After **both** container publications succeed, a separate cleanup job lists all
+GitHub cache pages, then deletes only legacy `index-ui-build-<version>-*` and
+`buildkit-blob-<version>-sha256:*` keys on `refs/tags/v*` or historical
+`refs/heads/refs/tags/v*` refs. Branch, pull request and non-version-tag caches,
+and unrelated cache keys, are retained. Only this job has `actions: write`.
+Failed, skipped or cancelled publications do not trigger cleanup. An already
+removed cache (HTTP 404) is logged and skipped; other API errors fail cleanup and
+appear in the run logs. A cleanup failure does not undo published images.
+
+Publication remains serialized without cancelling active releases. The resolver
+has a 15-minute timeout, each publisher 30 minutes, and cleanup 10 minutes.
+Run `node --test .github/tests/*.test.cjs` to check release validation, publication
+ordering, cache selection and cleanup failure behavior without contacting GitHub
+or Docker Hub.
 
 ### Local verification and manual recovery
 
