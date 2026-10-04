@@ -32,14 +32,4 @@ Use case: stylized-concept. Create ONE transparent game reaction sticker for Ava
 
 ## morgana-violin
 
-Artwork: `../stickers/morgana-violin.webp`. The file and sticker ID are both `morgana-violin`. Generated with the built-in image_gen tool and resized to 320px with alpha preserved.
-
-Latest prompt (references: Morgana role portrait and previous violin sticker):
-
-Use case: stylized-concept. Edit the second reference sticker: replace the male Oberon character with MORGANA from the first reference portrait. Preserve the sticker's concept: sarcastic fake sympathy, exaggerated pitying pout, one eyebrow raised with amused condescending eyes, playing a comically tiny violin and tiny bow near chest. Morgana is a recognizable beautiful adult woman with long black hair, gold crown, black hooded robes, delicate gold jewelry, pale blue eyes from portrait. Feminine face and hands. Keep the same painterly dark medieval fantasy rendering, warm ivory die-cut outline, waist-up square composition, complete hands and silhouette within padding. The violin must read clearly at 96px. GENUINE transparent alpha background, no scenery, no checkerboard, no text, no watermark. This is the premium 'So very sorry…' game reaction sticker.
-
-Original generation:
-
-Reference: ../stickers/oberon-laugh.webp
-
-Use case: stylized-concept. Create ONE new transparent Avalon reaction sticker. Reference is Oberon sticker, preserve recognizable hooded dark-haired young man, black cloak and red accents, ivory die-cut outline and painterly rendering. Sarcastic fake sympathy: exaggerated pitying pout, one eyebrow raised and amused eyes, playing an absurdly tiny violin with a tiny bow near his chest, hands very clearly visible and violin readable. Message conveyed: oh, so sad, let me play the world's smallest violin for your excuses. Upper body square composition, full silhouette including hands inside padding. Dark medieval fantasy premium game sticker, readable at 96 pixels. GENUINE TRANSPARENT ALPHA background, no checkerboard, no scenery, no words, no watermark.
+Artwork: `../stickers/morgana-violin.webp`. Current source: user-selected `../stickers/morgana-sigh-closeup.png`, replacing the previous artwork and crop. Converted directly to 320×320 WebP (quality 90, alpha quality 100), preserving composition and transparency. The existing `morgana-violin` sticker ID is retained for favorites, Premium authorization and shared previews/gameplay.
