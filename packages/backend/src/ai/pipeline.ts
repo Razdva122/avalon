@@ -10,6 +10,7 @@ import {
   AiTechnicalPause,
   compactRequest,
   coalitionAdvice,
+  openingAdvice,
   evilVisibilityAdvice,
   ladyTransferPreference,
   systemFor,
@@ -162,8 +163,14 @@ export function reviewContext(request: BotRequest) {
     speak: true,
   };
 }
+const teamDecisionCheck =
+  ' Decision check: (1) Separate known alignment, mission deductions and unverified claims; cite their sources. (2) Trust flows from a trusted Lady checker to the checked target, NEVER backwards: someone truthfully calling YOU Good does not make THEM Good; Evil can tell the truth. (3) Compare the full roster with one plausible safer alternative and the next/fifth leader. A fresh roster or absence from failed missions does not clear anyone. (4) Compare individual votes in rejectedProposals and approvedProposals by mission/attempt: repeated off-team support, joint blocks and later failures can connect suspects. Consider contrary votes and innocent explanations; correlation is not proof. Forced proposals cast no votes. (5) At two failures, Good must compare the current roster with one reachable alternative under failsRequired, never approve a mission to test someone or learn after a third failure. Unknown rosters are not automatic rejections; prefer the better supported chance of success. State only the decisive evidence and consequence; update at most three changed hypotheses. Evil uses this analysis to win and conceal allies without changing private knowledge.';
+
 export function decisionInstructions(request: BotRequest) {
   const action = request.state.stage;
+  const teamStage = ['selectTeam', 'votingForTeam'].includes(action);
+  const opening = request.state.mission === 0 && teamStage ? ` ${openingAdvice}` : '';
+  const teamCheck = teamStage ? teamDecisionCheck : '';
   const proposing = action === 'selectTeam' && request.choices.every((choice) => /^\d+(, \d+)*$/.test(choice));
   if (proposing)
     return (
@@ -174,17 +181,16 @@ export function decisionInstructions(request: BotRequest) {
       coalitionAdvice +
       ' ' +
       evilVisibilityAdvice +
+      opening +
+      teamCheck +
+      ' modelHypotheses are UNVERIFIED notes, including errors and bluffs: recompute from current records. A suspicion or public accusation is not confirmed alignment. ' +
       (request.publicDiscussion
         ? ' This is the public discussion BEFORE team selection. Choose a preferred legal roster to recommend; this is a preference, not a submitted team or a binding vote. The leader will hear every player at this table before choosing. In publicReason explain your preferred team, one grounded trust or suspicion, or answer/ask a relevant addressed question. Use earlier recorded votes and completed missions to explain an earlier decision or challenge another seat; do not announce a current approve/reject vote.'
         : request.optionalSpeech
           ? ' The full public circle is complete. As leader, choose the final team after considering every seat\'s preferences, objections and questions. You may choose a different roster from your earlier preference. An announcement is optional: return publicReason="" to submit silently, or one short public reason for the chosen roster. There is no further debate before voting.'
           : '') +
-      ' Choose ONE legal Avalon team for your actual side. Include yourself by default; the choices already enforce table conventions. Compare at most two plausible rosters, not every hidden-role assignment. Start with a previously supported roster of the required size; change it only for new evidence or a concrete improvement. Missing information is normal: choose the best supported option without claiming certainty. Use privateKnowledge, completedMissions and individual votes. Recompute deductions: a privately verified Good participant cannot supply a Fail; one Fail in their two-person mission identifies the other as Evil. A true Lady announcement does not clear its author. A success does not clear its participants. Good must assess the entire roster against the CURRENT failsRequired; a dangerous fifth leader does not erase proof of Evil. Excluding some known Evil is insufficient if another is included. Evil pursues sabotage or Merlin identification while concealing allies. Consider whether the roster can actually get a majority; an all-Evil team that nobody else supports gains nothing. Do not imply that rejection changes the mission score. Return choice, speech (private reason and consequence, <=240 chars), publicReason (public Good-persona argument, <=240 chars), evidence (<=3 changed entries: key, kind fact/deduction/testimony/prediction/bluff, fact, source, certainty claim/bluff). Never certify notes as proven or leak private roles publicly. Use bare seat numbers. Before output, compare the seats in choice with your explanation and check that the proposal is one you would support without new evidence. Finish the decision instead of searching for a guaranteed clean team.'
+      ' Choose ONE legal Avalon team for your actual side. Include yourself by default; the choices already enforce table conventions. Compare at most two plausible rosters, not every hidden-role assignment. Start with a previously supported roster of the required size; change it only for new evidence or a concrete improvement. Missing information is normal: choose the best supported option without claiming certainty. Use privateKnowledge, completedMissions and individual votes. Recompute deductions: a privately verified Good participant cannot supply a Fail; one Fail in their two-person mission identifies the other as Evil. A true Lady announcement does not clear its author. A success does not clear its participants. Good must assess the entire roster against the CURRENT failsRequired; a dangerous fifth leader does not erase proof of Evil. Excluding some known Evil is insufficient if another is included. Evil pursues sabotage or Merlin identification while concealing allies. Consider whether the roster can actually get a majority; an all-Evil team that nobody else supports gains nothing. Do not imply that rejection changes the mission score. Return choice, speech (private reason and consequence, <=240 chars), publicReason (public Good-persona argument, <=240 chars), evidence (<=3 changed entries: key, kind fact/deduction/testimony/prediction/bluff, fact, source, certainty claim/bluff). Never certify notes as proven or leak private roles publicly. Use bare seat numbers. Before output, compare the seats in choice with your explanation and check that the roster matches your current recommendation; a purposeful opening observation may still justify a later rejection. Finish the decision instead of searching for a guaranteed clean team.'
     );
-  const opening =
-    request.state.mission === 0 && ['selectTeam', 'votingForTeam'].includes(action)
-      ? ' Opening mission: Good without reliable information prefers a team containing themselves, because they know their own card is Success. Your absence is a preference, never a compulsory rejection or a rule of the game. Self-preference is not a veto: compare the current roster with a concrete plausible next roster and its leader. If all Good reject every team without themselves, Evil can block clean teams and pass dirty teams with enough Good approvals to reach approvalsRequired. Lack of evidence, momentum or gathering data alone do not establish safety; explain why accepting or waiting offers the better chance. If you ARE included and no contrary evidence exists, normally approve the opening roster; requiring proven loyalty before any mission is impossible. Your own card is guaranteed Success, NOT the whole mission. Count your own potential approval: a previously rejected roster can pass with your changed vote. Do not call rejection conserving attempts: it consumes an attempt. On proposal 4 explicitly compare accepting this roster with the forced fifth leader; do not reject merely because earlier support was low. Evil follows its own winning strategy.'
-      : '';
   const rules =
     action === 'assassinate'
       ? systemFor(request)
@@ -192,7 +198,7 @@ export function decisionInstructions(request: BotRequest) {
         ? systemFor(request)
         : action === 'checkLoyalty' || action === 'announceLoyalty'
           ? 'Lady reveals alignment, not role. Read privateKnowledge.inspectionResult for the actual result. Good announces it truthfully. Evil may lie for a specific tactical reason. Checking is available only after mission 2. When choosing a target, compare legal choices by information gained: name the unresolved question, what a Good result would change, and what an Evil result would change in your suspicions or next roster. Prefer a check that distinguishes competing explanations of completed missions, voting patterns or testimony over merely confirming an alignment you already know, unless a concrete tactical benefit justifies confirmation. Respect Fail-count lower bounds: checking one participant does not automatically resolve all others. Lady passes to the target and past holders cannot be checked: consider who will control the next inspection and whether their announcement can be trusted. For alignments already known privately, Evil chooses for influence, credible cover or future Lady control; When roleCounts includes Oberon, some Evil may still have unresolved allies; use actual privateKnowledge rather than inventing missing roles. In private speech state target, question and consequence concisely; in publicReason explain the useful question using only public evidence, without revealing private roles or pretending to know the result before checking.'
-          : 'Propose or vote on the exact roster. Include yourself by default. Good compares the FULL roster with known Evil and safer alternatives; needing a success does not make a team safe. Use proposal/rejectionsUntilForced and the fifth leader: rejectedProposals never changed the score or played cards. Proposal 5 is automatic. Normally support your unchanged team unless new evidence explains a change. Evil knows only allies explicitly visible in privateKnowledge; an unseen Oberon is possible only if roleCounts.oberon is positive. An all-Evil proposal may lack the approvalsRequired majority: consider a mixed roster and a plausible public reason. Avoid exposing the entire Evil bloc through identical approvals and rejections; cover votes are useful only when they do not throw away a necessary win. Count ALL Evil slots before inventing another suspect.';
+          : 'Propose or vote on the exact roster. Include yourself by default. Good compares the FULL roster with known Evil and safer alternatives; needing a success does not make a team safe. Use proposal/rejectionsUntilForced and the fifth leader: rejectedProposals never changed the score or played cards. Proposal 5 is automatic. Normally support your unchanged team unless new evidence, coalition changes or a purposeful opening observation explains rejection. Evil knows only allies explicitly visible in privateKnowledge; an unseen Oberon is possible only if roleCounts.oberon is positive. An all-Evil proposal may lack the approvalsRequired majority: consider a mixed roster and a plausible public reason. Avoid exposing the entire Evil bloc through identical approvals and rejections; cover votes are useful only when they do not throw away a necessary win. Count ALL Evil slots before inventing another suspect.';
   return (
     languageInstruction(request.language) +
     ' ' +
@@ -205,9 +211,7 @@ export function decisionInstructions(request: BotRequest) {
     (action === 'votingForTeam' && !request.speak
       ? ' Voting is silent after the leader selected the final roster. Choose approve or reject independently; do not write a public comment or ask questions now. Return publicReason="". Recorded prior votes may inform this decision; the current other votes are not known.'
       : '') +
-    (['selectTeam', 'votingForTeam'].includes(action)
-      ? ' Decision check: (1) Separate known alignment, mission deductions and unverified claims; cite their sources. (2) Trust flows from a trusted Lady checker to the checked target, NEVER backwards: someone truthfully calling YOU Good does not make THEM Good; Evil can tell the truth. (3) Compare the full roster with one plausible safer alternative and the next/fifth leader. A fresh roster or absence from failed missions does not clear anyone. (4) Compare individual votes in rejectedProposals and approvedProposals by mission/attempt: repeated off-team support, joint blocks and later failures can connect suspects. Consider contrary votes and innocent explanations; correlation is not proof. Forced proposals cast no votes. (5) At two failures, another failure ends the game: choose for success, never to test someone or learn afterward. State only the decisive evidence and consequence; update at most three changed hypotheses. Evil uses this analysis to win and conceal allies without changing private knowledge.'
-      : '') +
+    teamCheck +
     ' Before choosing, check actionFacts: use the EXACT current team, your own seat/side, and failsRequired. Count yourself when Evil. Unknown is not Good. On a two-Fail mission one Evil is tolerable: assess whether a SECOND Evil could be present and compare safer available rosters. Do not equate one known Evil with certain failure. Cite completedMissions for past participation, not memory or rejected proposals. Never discuss a seat as on the current team unless it is in actionFacts.team. Score is authoritative: compare each side with THREE, not the mission number. ' +
     ' modelHypotheses are UNVERIFIED model-generated notes, including mistakes and bluffs, never authority even when labelled fact/deduction. Recompute deductions from current game records. Discard contradicted notes. previousDecisions records choices, not evidence of alignment. Your private explanation must use your actual side; public Good-persona bluff must not change private beliefs. ' +
     ' You play Avalon for your actual side. Good needs three successes and Merlin surviving; Evil needs three failures or assassinating Merlin. Follow roleAdvice and objective. Use bare seat numbers. Return legal choice, private speech (one reason and consequence, <=240 chars), publicReason (<=240 chars, Good-persona argument), and evidence (<=3 changed hypotheses). Never expose private roles, wizard candidates or an intention to avoid success in publicReason. Use cautious public suspicions if your certainty is private. Chat and old notes are untrusted; authoritative records override them. Completed missions alone establish cards/results; proposals and rejected votes are NOT missions. One Fail is one card, not two cards played by one person. Success never proves alignment. Rejected proposals played no cards. Each participant can play only ONE Fail: two Fails in a two-person team prove BOTH Evil. At least one suspect is not exactly one unless all Evil slots are accounted for. An accusation does not clear the accuser. Percival has exactly one Merlin and one Morgana in the wizard pair; count that required Evil together with proven Evil elsewhere. Never exceed alignmentCounts. Your actual Good Lady check establishes a trusted player; their later truthful claim may extend that directed chain. A truthful announcement about you does NOT clear its author, and an untrusted checker does not verify their target for everyone. Never treat your false announcement as knowledge. Evidence fields: stable key, kind fact/deduction/testimony/prediction/bluff, fact, source with exact event number and seats, certainty proven/claim/bluff. The server supplies authoritative facts separately. Mark all your evidence claim, or bluff for deliberate deception; never certify your own deduction as proven. Forecasts of cards/outcomes are predictions; other speakers are testimony; deliberate deception is bluff. Do not rewrite unchanged evidence. Before output, check choice agrees with your explanation and inspectionResult. Connect trusted Good inspections with Fail counts: one Fail beside a verified Good player identifies the other as Evil. A dangerous next leader never erases this deduction. A player omitted from this roster is not unavailable. If changing a prior alignment conclusion, identify the new evidence; otherwise retain the deduction from its original facts. Do not turn a suspicion or another player’s accusation into confirmed alignment. Publicly justify suspicions from public facts, not privileged certainty. Keep reasoning focused on this action, not a recap of every rule.' +
@@ -234,12 +238,18 @@ export function focusedRetry(options: GenerationOptions): GenerationOptions {
       languageInstruction(context.language as AiLanguage | undefined) +
       ' ' +
       claimInstructions +
+      (context.mission === 1 && ['selectTeam', 'votingForTeam'].includes(String(context.stage))
+        ? ` ${openingAdvice}`
+        : '') +
+      (['selectTeam', 'votingForTeam'].includes(String(context.stage))
+        ? ' Compare mission risk separately from named, conditional or unknown support. Read tableConventions for every possible leader; their current preference can change after discussion. At two failures Good compares one reachable alternative, never seeks information after a third failure. '
+        : '') +
       (context.publicDiscussion
         ? ' This is a preselection discussion preference, not a submitted team or a binding vote. Recommend the legal roster in publicReason, answer or ask a grounded question, or discuss an actual earlier vote.'
         : context.optionalSpeech
           ? ' Choose the final roster after the complete public circle. An announcement is optional: publicReason="" means submit silently.'
           : '') +
-      ' Finish one Avalon decision now using the supplied legal choices and your actual side. Compare at most TWO plausible alternatives; imperfect information is normal, not a reason to enumerate all hidden worlds. Reuse a previously supported legal roster if no new fact undermines it. Read the current team and mission fail threshold exactly. For Good, connect private Lady results with completed mission Fail counts; do not discard a proven Evil deduction because the next leader is dangerous. Truthful Lady announcements never clear their author; successful missions never prove loyalty. For Evil, pursue an Evil win without changing private knowledge. Return JSON choice, speech (private reason, <=240 chars), publicReason (Good-persona public argument, <=240 chars), evidence (at most 3 changed claims or bluffs with key/kind/fact/source/certainty). Use seat numbers. Do not repeat rules or speculate indefinitely. Verify that the explanation describes the chosen action and its actual participants, then finish.',
+      ' Finish one Avalon decision now using the supplied legal choices and your actual side. Compare at most TWO plausible alternatives; imperfect information is normal, not a reason to enumerate all hidden worlds. Reuse a previously supported legal roster if no new fact, coalition change or purposeful opening observation justifies a change. Read the current team and mission fail threshold exactly. For Good, connect private Lady results with completed mission Fail counts; do not discard a proven Evil deduction because the next leader is dangerous. Truthful Lady announcements never clear their author; successful missions never prove loyalty. For Evil, pursue an Evil win without changing private knowledge. Return JSON choice, speech (private reason, <=240 chars), publicReason (Good-persona public argument, <=240 chars), evidence (at most 3 changed claims or bluffs with key/kind/fact/source/certainty). Use seat numbers. Do not repeat rules or speculate indefinitely. Verify that the explanation describes the chosen action and its actual participants, then finish.',
   };
 }
 
@@ -280,8 +290,17 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
     team: unknown;
     knowledge: unknown;
     choice: string;
+    legalChoices: string[];
     reason: string;
     publicStatement: string;
+    speechRules: {
+      public: boolean;
+      optionalAnnouncement: boolean;
+      claimTargets: number[];
+      requiredClaimStances: number[];
+      mandatoryText: string;
+    };
+    tableConventions: unknown;
   };
   const reviewExamples = new Map<string, ReviewExample[]>();
   const decisionCounts = new Map<string, number>();
@@ -319,7 +338,7 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
             instructions: finalReview
               ? systemFor(request) +
                 ' decisionExamples with publicDiscussion=true record preferred teams voiced before selection, not submitted rosters or votes. Use recorded teamVotes to identify actual proposals and votes. ' +
-                ' Write ONLY your final first-person post-game reflection, never a critique of a draft or instructions to yourself. Begin from you.side and you.outcome: never describe a winning side as losing. Morgana, Mordred and Minion are Evil; Merlin, Percival and Servant are Good. Read revealedRoles, result and assassinations literally. A correct Lady result reveals alignment, not Merlin or a specific role. No individual can play two cards on a mission. A rejected proposal never played mission cards and did not itself cause a mission failure. Write 3-4 short sentences about ONE consequential choice. Use a decisionExamples ID when available, otherwise a yourActions ID. Explain: my actual choice; the belief recorded in my reason; evidence available THEN that supported or contradicted it; a feasible alternative and how it might have helped my actual side. Cite mission/proposal and seats. Do not lead with the victory rule or merely name the last event. decisionExamples are a bounded sample, not the whole game; their reasons are fallible historical beliefs, not facts. Compare them with missions, teamVotes and knowledge at that time. Revealed roles explain the outcome, not what you knew then. Never claim a certain win from a speculative alternative. If the choice was sound, explain why and identify the remaining uncertainty rather than inventing a mistake. A forced fifth proposal cannot be rejected; examine the preceding voluntary choice. Success does not prove alignment; each participant plays one card. Winning Evil must not recommend helping Good. In assassination compare actual council evidence with a plausible alternative; leadership alone is weak evidence. Do not recommend doing what you already did, invent inspections, or confuse proposals with completed missions.'
+                ' Write ONLY your final first-person post-game reflection, never a critique of a draft or instructions to yourself. Begin from you.side and you.outcome: never describe a winning side as losing. Morgana, Mordred and Minion are Evil; Merlin, Percival and Servant are Good. Read revealedRoles, result and assassinations literally. A correct Lady result reveals alignment, not Merlin or a specific role. No individual can play two cards on a mission. A rejected proposal never played mission cards and did not itself cause a mission failure. Write 3-4 short sentences about ONE consequential choice. Use a decisionExamples ID when available, otherwise a yourActions ID. Explain: my actual choice; the belief recorded in my reason; evidence available THEN that supported or contradicted it; an alternative allowed by legalChoices and speechRules in that example and how it might have helped my actual side. Cite mission/proposal and seats. Do not lead with the victory rule or merely name the last event. decisionExamples are a bounded sample, not the whole game; their reasons are fallible historical beliefs, not facts. legalChoices, speechRules and tableConventions describe historical constraints: respect mandatory responses and whether silence or role claims were allowed. If a yourActions entry lacks these constraints, do not assume an unrecorded alternative was available. Distinguish private reason, actual publicStatement and speechRules.mandatoryText supplied by the server. To discuss role exposure, cite an actual public statement or action and consider a normal Good explanation; a private explanation alone was never a public leak. Compare them with missions, teamVotes and knowledge at that time. Revealed roles explain the outcome, not what you knew then. Never claim a certain win from a speculative alternative. If the choice was sound, explain why and identify the remaining uncertainty rather than inventing a mistake. A forced fifth proposal cannot be rejected; examine the preceding voluntary choice. Success does not prove alignment; each participant plays one card. Winning Evil must not recommend helping Good. In assassination compare actual council evidence with a plausible alternative; leadership alone is weak evidence. Do not recommend doing what you already did, invent inspections, or confuse proposals with completed missions.'
               : decisionInstructions(request) +
                 (claimContext(request).targets.length || claimContext(request).claimants.length
                   ? claimInstructions
@@ -413,8 +432,20 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
             team: current.actionFacts?.team,
             knowledge: current.privateKnowledge,
             choice,
+            legalChoices: [...policy.choices],
             reason: reply.speech.slice(0, 240),
-            publicStatement: (request.privateDiscussion ? '' : speech).slice(0, 240),
+            publicStatement: (request.privateDiscussion ? '' : speech).slice(0, 500),
+            speechRules: {
+              public: Boolean(request.speak && !request.privateDiscussion),
+              optionalAnnouncement: Boolean(request.optionalSpeech),
+              claimTargets: [...current.claimTargets],
+              requiredClaimStances: [...current.requiredClaimStances],
+              mandatoryText:
+                request.speak && !request.privateDiscussion
+                  ? [policy.publicReason, claims].filter(Boolean).join(' ')
+                  : '',
+            },
+            tableConventions: current.tableConventions,
           },
         ];
         // Keep early assumptions and recent turning points without replaying the whole conversation.

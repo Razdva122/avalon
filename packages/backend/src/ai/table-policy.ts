@@ -1,4 +1,4 @@
-import { AiPause, compactRequest } from './client';
+import { AiPause, compactRequest, excludesMissionPartners } from './client';
 import type { BotRequest } from './client';
 import { aiText } from './language';
 
@@ -6,9 +6,7 @@ import { aiText } from './language';
 // Applies identically to Good and Evil, including an Evil player's deliberate bluff.
 export function tablePolicy(request: BotRequest) {
   const c = compactRequest(request);
-  const positions = c.missions.filter(
-    (m) => m.participated && ((m.team.length === 2 && m.fails === 1) || (m.team.length === 3 && m.fails === 2)),
-  );
+  const positions = c.missions.filter((m) => m.participated && excludesMissionPartners(m));
   const targets = new Set(positions.flatMap((m) => m.team.filter((seat) => seat !== c.you?.seat)));
   let choices = request.choices;
   let publicReason: string | undefined;

@@ -430,6 +430,109 @@ test('review receives bounded own decision explanations and knowledge, never ano
   expect(earlierContext.decisionExamples).toBeUndefined();
 });
 
+test('review retains enforced historical choices, mandatory claim speech and the complete public statement', async () => {
+  const publicArgument = 'A'.repeat(240);
+  const generate = jest
+    .fn()
+    .mockResolvedValueOnce({
+      choice: 0,
+      speech: 'My actual role remains Mordred.',
+      publicReason: publicArgument,
+      claimStances: [{ seat: 4, stance: 'distrust' }],
+    })
+    .mockResolvedValueOnce({ choice: 0, speech: publicArgument })
+    .mockResolvedValueOnce({ choice: 1, speech: 'My silent vote.' })
+    .mockResolvedValueOnce({ choice: 0, speech: 'My reflection.' });
+  const r = {
+    ...request,
+    playerID: '1',
+    publicDiscussion: true,
+    choices: ['2, 3', '1, 2', '1, 3', '1, 4', '1, 5'],
+    chat: [{ name: '4', text: 'I am Percival. 5 is Morgana.' }],
+    state: {
+      stage: 'selectTeam',
+      mission: 1,
+      vote: 0,
+      players: [1, 2, 3, 4, 5].map((index) => ({
+        id: String(index),
+        index,
+        role: index === 1 ? 'mordred' : 'unknown',
+        features: { isLeader: index === 1, isSent: index === 1 || index === 3 },
+      })),
+      history: [
+        {
+          type: 'mission',
+          index: 0,
+          result: 'fail',
+          fails: 1,
+          actions: [
+            { playerID: '1', value: 'fail' },
+            { playerID: '2', value: 'success' },
+          ],
+        },
+      ],
+    },
+  } as unknown as BotRequest;
+  const decide = decisionPipeline(generate);
+  await decide(r);
+  await decide({
+    ...r,
+    publicDiscussion: false,
+    speak: false,
+    choices: ['approve', 'reject'],
+    state: { ...r.state, stage: 'votingForTeam' },
+  });
+  await decide({ ...r, choices: ['Write your conclusion'], state: { ...r.state, stage: 'end' } });
+  const examples = generate.mock.calls[3][1].context.decisionExamples;
+  expect(examples[0]).toMatchObject({
+    legalChoices: ['1, 3', '1, 4', '1, 5'],
+    reason: 'My actual role remains Mordred.',
+    publicStatement: `${publicArgument} I distrust 4's Percival claim.`,
+    speechRules: {
+      public: true,
+      optionalAnnouncement: false,
+      claimTargets: [2, 3, 4, 5],
+      requiredClaimStances: [4],
+      mandatoryText: "I distrust 4's Percival claim.",
+    },
+  });
+  expect(examples[1]).toMatchObject({
+    legalChoices: ['approve', 'reject'],
+    publicStatement: '',
+    speechRules: {
+      public: false,
+      optionalAnnouncement: false,
+      claimTargets: [],
+      requiredClaimStances: [],
+      mandatoryText: '',
+    },
+  });
+});
+
+test('review records when a leader could submit a team silently', async () => {
+  const generate = jest.fn().mockResolvedValue({ choice: 0, speech: 'Private reason.', publicReason: '' });
+  const decide = decisionPipeline(generate);
+  const r = {
+    ...request,
+    optionalSpeech: true,
+    choices: ['7'],
+    state: { ...request.state, stage: 'selectTeam' },
+  } as BotRequest;
+  await decide(r);
+  await decide({ ...r, choices: ['Write your conclusion'], state: { ...r.state, stage: 'end' } });
+  expect(generate.mock.calls[1][1].context.decisionExamples[0]).toMatchObject({
+    legalChoices: ['7'],
+    publicStatement: '',
+    speechRules: {
+      public: true,
+      optionalAnnouncement: true,
+      claimTargets: [],
+      requiredClaimStances: [],
+      mandatoryText: '',
+    },
+  });
+});
+
 test('review can resume after a budget pause without a separate draft checker', async () => {
   const { AiMatchBudgetPause } = await import('./client');
   const generate = jest

@@ -534,6 +534,39 @@ test('truncated paid replies are settled and the retry separately reserves budge
   );
 });
 
+test('silent Yandex pipeline votes retain a private reason without publishing speech', async () => {
+  const { repo } = setup();
+  const reason = "I reject this opening roster to compare the next leader's alternative and recorded votes.";
+  const speechLimits: number[] = [];
+  global.fetch = (async (_url, options) => {
+    const payload = JSON.parse(options!.body as string);
+    const maxLength = payload.response_format.json_schema.schema.properties.speech.maxLength;
+    speechLimits.push(maxLength);
+    return new Response(
+      JSON.stringify({
+        usage: { prompt_tokens: 100, completion_tokens: 30 },
+        choices: [
+          {
+            finish_reason: 'stop',
+            message: {
+              content: JSON.stringify({
+                choice: 'reject',
+                speech: reason.slice(0, maxLength),
+                publicReason: '',
+                evidence: [],
+              }),
+            },
+          },
+        ],
+      }),
+    );
+  }) as typeof fetch;
+  const decide = decisionPipeline((r, options, signal) => yandexDecide('room', repo, () => {}, options)(r, signal));
+  const result = await decide({ ...openingRequest('servant', true), speak: false });
+  expect(result).toEqual({ choice: 1, speech: '', privateReason: reason });
+  expect(speechLimits).toEqual([240]);
+});
+
 test('decision evidence requires bounded sourced facts and explicit certainty', () => {
   const valid = {
     choice: 'reject',
@@ -587,6 +620,80 @@ const openingRequest = (role: string, selected: boolean, vote = 0): BotRequest =
       { id: '3', index: 3, role: 'unknown', features: { isSelected: true } },
     ],
   } as unknown as VisualGameState,
+});
+
+test.each([
+  { observer: 1, role: 'servant', card: 'success' },
+  { observer: 1, role: 'morgana', card: 'fail' },
+  { observer: 5, role: 'servant', card: 'success' },
+])('public table conventions describe every affected seat for $role observer $observer', ({ observer, role, card }) => {
+  const players = [4, 2, 7, 5, 1, 6, 3].map((index) => ({
+    id: `private-id-${index}`,
+    index,
+    role: index === observer ? role : 'unknown',
+    features: {},
+  }));
+  const mission = (index: number, team: number[], fails: number, result: string | null = 'fail') => ({
+    type: 'mission',
+    index,
+    result,
+    fails,
+    settings: { players: team.length, failsRequired: 1 },
+    actions: team.map((seat) => ({ playerID: `private-id-${seat}`, value: seat === observer ? card : undefined })),
+  });
+  const state = {
+    stage: 'selectTeam',
+    mission: 2,
+    vote: 0,
+    players,
+    history: [
+      mission(0, [1, 2], 1),
+      { type: 'vote', result: 'reject', team: [{ id: 'private-id-5' }, { id: 'private-id-6' }], votes: [] },
+      mission(1, [2, 3, 4], 2),
+      mission(2, [5, 6, 7], 2, null),
+    ],
+  } as unknown as VisualGameState;
+  expect(compactRequest({ ...request, playerID: `private-id-${observer}`, state }).tableConventions).toEqual({
+    includeSelfInProposals: true,
+    excludedPartners: [
+      { seat: 1, seats: [2] },
+      { seat: 2, seats: [1, 3, 4] },
+      { seat: 3, seats: [2, 4] },
+      { seat: 4, seats: [2, 3] },
+    ],
+  });
+});
+
+test.each([
+  { team: [1, 2], fails: 0, result: 'success' },
+  { team: [1, 2], fails: 2, result: 'fail' },
+  { team: [1, 2, 3], fails: 1, result: 'fail' },
+  { team: [1, 2, 3], fails: 3, result: 'fail' },
+  { team: [1, 2, 3, 4], fails: 2, result: 'fail' },
+])('other mission shapes do not impose partner exclusions: $team / $fails Fail', ({ team, fails, result }) => {
+  const state = {
+    ...openingRequest('servant', true).state,
+    players: [1, 2, 3, 4, 5, 6, 7].map((index) => ({
+      id: String(index),
+      index,
+      role: index === 1 ? 'servant' : 'unknown',
+      features: {},
+    })),
+    history: [
+      {
+        type: 'mission',
+        index: 0,
+        result,
+        fails,
+        settings: { players: team.length, failsRequired: 1 },
+        actions: team.map((index) => ({ playerID: String(index) })),
+      },
+    ],
+  } as unknown as VisualGameState;
+  expect(compactRequest({ ...request, playerID: '1', state }).tableConventions).toEqual({
+    includeSelfInProposals: true,
+    excludedPartners: [],
+  });
 });
 test('opening self preference applies to uninvolved Good without forcing a late rejection or Evil strategy', () => {
   expect(compactRequest(openingRequest('servant', false))).toMatchObject({

@@ -3,6 +3,25 @@ import { tablePolicy } from './table-policy';
 import fixtures from './fixtures/postulates.json';
 import type { BotRequest } from './client';
 
+test.each([true, false])('opening Good votes stay independent of self inclusion: selected=%s', (selected) => {
+  const request = {
+    playerID: 'own',
+    choices: ['approve', 'reject'],
+    state: {
+      stage: 'votingForTeam',
+      mission: 0,
+      vote: 0,
+      history: [],
+      players: [
+        { id: 'own', index: 1, role: 'servant', features: { isSelected: selected } },
+        { id: 'other', index: 2, role: 'unknown', features: { isSelected: true } },
+      ],
+    },
+    chat: [],
+  } as unknown as BotRequest;
+  expect(tablePolicy(request).choices).toEqual(['approve', 'reject']);
+});
+
 test('both factions must reject teams with their accused partners regardless of own card', () => {
   for (const fixture of fixtures.filter((f) => f.name.startsWith('postulate-'))) {
     const rule = tablePolicy(fixture.request as unknown as BotRequest);

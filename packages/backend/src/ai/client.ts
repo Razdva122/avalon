@@ -69,7 +69,10 @@ export const ladyTransferPreference =
   'When legal inspection targets offer comparable information and tactical value, Good should prefer passing the Lady to a player supported as Good by reliable evidence. The inspected player becomes the next holder: keeping the Lady with Good helps build a directed trust chain through subsequent truthful checks. If the Lady reaches Evil, later announcements from that holder are untrusted testimony and cannot extend that chain without independent reliable support. This does not invalidate earlier reliable checks. This is a tie-breaker, not a reason to ignore a more decisive inspection or proven facts. Unknown is not confirmed Good; an untrusted public Good claim alone is not reliable evidence. Evil should choose for its own side, including taking control of the Lady or disrupting Good trust, rather than preserving a Good trust chain.';
 
 export const coalitionAdvice =
-  'Good coalition decision: knowing your own alignment favors self-inclusion but never makes absence from a team an automatic veto. Compare approving the current roster with the realistic outcome of rejection: next leader, remaining attempts, fifth leader, their stated preferred rosters and likely votes. Your preferred alternative is useful only if a reachable leader can propose it AND it can reach approvalsRequired; count your own changed vote. If a roster repeatedly falls one vote short of the required majority, do not repeat it without a concrete way to gain that extra approval. When no meaningful safety improvement is supported, accept a plausible compromise rather than insist on replacing an unresolved player with yourself. Even before proposal 4, account for whether disagreement leads to a worse forced team. On proposal 4 compare the current roster directly with the fifth leader and their likely selection. Do not require certainty that any legal roster is clean: choose the better supported chance of winning for your side. Never override reliable proof that the roster must fail under failsRequired; an uncertain roster and a proven losing roster are different. You may revise a preference when coalition feasibility or the remaining attempts change, even without new alignment evidence. Evil may exploit disagreement while pursuing its own side, not help Good form a clean majority.';
+  "Good coalition decision: assess mission risk and vote support separately. For the current roster and one concrete feasible alternative, name likely supporters, conditional supporters and unknown votes using actual recorded votes or public statements; count your own changed vote. Unknown votes are not confirmed Rejects, and a majority is not evidence of safety. An alternative needs a reachable leader, a legal roster and a credible path to approvalsRequired. A next leader's stated preference can change; it is not an inevitable selection. Use public tableConventions to check each leader's self-inclusion and excluded partners; an omitted seat has no excluded partners. These constraints do not classify anyone as confirmed Evil. If a roster repeatedly falls one vote short, identify a specific changed voter or roster before repeating it. Knowing your own alignment favors self-inclusion but absence is not an automatic veto. At two mission failures, compare approval with one feasible alternative; do not automatically reject every roster with unresolved players. On proposal 4 compare current mission risk with the forced fifth leader's feasible selection, separately from likely votes. Never approve a roster reliably proven to lose under failsRequired. Revise a preference when evidence, coalition feasibility or remaining attempts change. Evil may exploit disagreement for its own objective.";
+
+export const openingAdvice =
+  "Opening information tradeoff: on mission 1, an early Reject can be useful even when you are on the roster or proposed it. Name what the next proposed roster or recorded votes could teach, such as whose preferred seats change or who supports a compromise, and how this would change your later roster or trust. Rejection costs one proposal, may reveal no alignment and does not guarantee enough Good approvals to reach approvalsRequired. On proposal 4, Reject sends the fifth leader's feasible roster automatically on mission with NO further vote: you can observe that roster but gain no new votes before it runs. Compare that limited information with the forced roster's mission risk under tableConventions. Never approve a proven losing roster for information. Evil must judge approval and rejection by its own objective.";
 
 export const evilVisibilityAdvice =
   'Evil knowledge is limited to privateKnowledge and the public roleCounts. Oberon is possible only if roleCounts.oberon is positive; then Oberon does not know allies and is not shown to other Evil during missions, so a roster with no KNOWN Evil may still contain Oberon. Never invent an absent role or an extra Evil slot beyond alignmentCounts. The sabotage convention covers known participants only; any unresolved allies may act independently. Reveal-stage knowledge may be used only after the game state actually reveals it.';
@@ -96,7 +99,7 @@ export function systemFor(request: BotRequest): string {
     return `${format} Review the finished game honestly. Explain the cause behind one consequential decision for your side, not just the rule that ended the game. Winning does not make every decision correct. Use assassinations and mission cards, not other players' conclusions. Automatic proposals are not voluntary votes. Revealed roles were not necessarily known during play. Admit public role leaks shown in yourStatements. No need to bluff now.`;
   const rules =
     evilVisibilityAdvice +
-    ' Good needs 3 mission successes AND Merlin surviving assassination. Evil needs 3 failures OR killing Merlin after 3 successes. Success never proves alignment. Private knowledge is not public evidence: never reveal Merlin, Percival candidates or Evil allies in public speech. Lady announcements are claims, not verified public alignment. Unknown means unknown. Current privateKnowledge and score override old memory and public claims. A player marked evil in your private knowledge remains Evil regardless of helpful behavior. Percival must use the mysteryWizard pair: exactly one is Merlin and one Morgana, not two unknown ordinary players.';
+    " Good needs 3 mission successes AND Merlin surviving assassination. Evil needs 3 failures OR killing Merlin after 3 successes. Success never proves alignment. Private knowledge is not public evidence: never reveal Merlin's identity, Percival's wizard pair or Evil allies as actual allies in public speech. Intentional Percival claims allowed by claimTargets do not disclose the other wizard or change private knowledge. Lady announcements are claims, not verified public alignment. Unknown means unknown. Current privateKnowledge and score override old memory and public claims. A player marked evil in your private knowledge remains Evil regardless of helpful behavior. Percival must use the mysteryWizard pair: exactly one is Merlin and one Morgana, not two unknown ordinary players.";
   const ladyTrust =
     'Lady trust for Good: your own actual Good inspection proves that target Good with certainty. If you announced Good truthfully, seek to include that player in EVERY proposed mission alongside yourself, ahead of untested seats, and strongly prefer such rosters when voting. If this trusted player later announces another target Good, extend your trusted core along that directed check chain and favor both in future teams. Preserve the chain and its sources in private memory. Example only: you checked 2 Good; 2 checked 4 and announced Good; favor yourself, 2 and 4 when team size permits. Your direct result is proven; the later link relies on the trusted checker telling the truth. Public Good announcements from untrusted players do not establish this chain. Never treat your own false Good announcement as real knowledge. Fit the legal team size, prioritize directly verified Good when space is limited, and do not approve a dangerous full roster merely because it includes a trusted player. Evil can imitate this public trust but must still act for Evil.';
   const deductionExamples =
@@ -110,7 +113,7 @@ export function systemFor(request: BotRequest): string {
     case 'assassinate':
       return `${format} ${rules} Find Merlin, not merely an active Good leader. Compare direct role claims with behavior, possible bluffs and privileged knowledge of Evil excluding Mordred. All Evil share this objective. When privateDiscussion=true your speech is PRIVATE: recommend the SAME target as choice, cite evidence, compare an alternative and respond to previous advice. A Lady Good result does NOT exclude Merlin: Merlin is Good, and Lady reveals alignment, not role. Leadership, taking a Lady check and mission success are weak signals available to any Good player. Seek correct alignment knowledge expressed BEFORE it became public; match each clue to its time and possible source. A deduction following public Fail cards or a Lady announcement is not unique Merlin knowledge. Merlin cannot see Mordred: naming Mordred after a public check is not evidence of secret sight. Compare early statements against later statements, and actively challenge the first council suggestion. A Good Lady result never rules out Merlin. In council, give one piece of evidence for your candidate and one reason an alternative could be Merlin; challenge unsupported earlier advice instead of merely agreeing. The designated assassin chooses after comparing alternatives, not by council popularity. Public testimony is evidence, not proof. ${assassinationCheck}`;
     default:
-      return `${format} ${rules} ${deductionExamples} ${ladyTrust} ${coalitionAdvice} Normally include yourself in proposals: Good reduces unknowns, Evil gains trust or sabotage opportunities. Omit yourself only for a concrete tactical reason. Prefer coherent teams over equally safe teams with players opposing each other; conflict is not proof. Majority approves. Reject cancels ONLY the proposal, rotates the leader and leaves the mission number and score unchanged. Fail is a secret mission card, NOT a vote. Example only: score 0-0, team [1,4] rejected means still 0-0 with NO completed mission. Approving an Evil team allows sabotage; rejecting it prevents that attempt. Proposal 5 is automatic, not an Evil win. If the fifth leader is suspicious, seek an acceptable earlier team without blindly accepting a losing roster. Follow missionRule, not intuition about Fail counts. Never claim to join a team without your seat. Normally support your own unchanged proposal. Discuss preferences before selection; voting after the final selection is silent. You may explain earlier recorded votes in the next discussion. An optional final proposal speech explains the selected roster without repeating it.`;
+      return `${format} ${rules} ${deductionExamples} ${ladyTrust} ${coalitionAdvice} ${request.state.mission === 0 ? openingAdvice : ''} Use the legal choices and public tableConventions, including self-inclusion in your own proposals. Good reduces unknowns; Evil gains trust or sabotage opportunities. Prefer coherent teams over equally safe teams with players opposing each other; conflict is not proof. Majority approves. Reject cancels ONLY the proposal, rotates the leader and leaves the mission number and score unchanged. Fail is a secret mission card, NOT a vote. Example only: score 0-0, team [1,4] rejected means still 0-0 with NO completed mission. Approving an Evil team allows sabotage; rejecting it prevents that attempt. Proposal 5 is automatic, not an Evil win. If the fifth leader is suspicious, seek an acceptable earlier team without blindly accepting a losing roster. Follow missionRule, not intuition about Fail counts. Never claim to join a team without your seat. Reassess even your own unchanged proposal using mission risk, coalition support and the opening information tradeoff. Discuss preferences before selection; voting after the final selection is silent. You may explain earlier recorded votes in the next discussion. An optional final proposal speech explains the selected roster without repeating it.`;
   }
 }
 
@@ -120,7 +123,7 @@ const roleAdvice: Record<string, string> = {
     ' ' +
     merlinAuthorshipCheck,
   percival:
-    'Your wizard pair contains Merlin and Morgana; you do NOT know which is which. Treat them as candidates, never label either Morgana as fact without evidence. Track the actual author of Lady claims. Protect likely Merlin without exposing the pair or your certainty. Once you privately resolve the pair, do not publicly certify the remaining wizard as Good or repeatedly single them out as the uniquely reliable guide. Build support from public mission and vote evidence, and take responsibility for the public argument yourself when justified; never fabricate evidence or reveal the pair. Compare the wizard candidates’ early votes and support for later-exposed Evil; a good mission alone does not resolve the pair. You may make an intentional Percival claim via claimMorgana without naming the other wizard. You do not know other alignments.',
+    'Your wizard pair contains Merlin and Morgana; you do NOT initially know which is which. Treat them as candidates, never label either Morgana as fact without evidence. Track the actual author of Lady claims. Protect likely Merlin without exposing the pair or your certainty. Once you privately resolve the pair, do not publicly certify the remaining wizard as Good or repeatedly single them out as the uniquely reliable guide. Build support from public mission and vote evidence, and take responsibility for the public argument yourself when justified; never fabricate evidence or reveal the pair. Compare the wizard candidates’ early votes and support for later-exposed Evil; a good mission alone does not resolve the pair. You may make an intentional Percival claim via claimMorgana without naming the other wizard. Your initial private knowledge does not reveal other alignments; use actual mission and check deductions.',
   servant:
     'You are ALWAYS Good. Deliberate mission failure or helping Evil NEVER benefits you. Infer from mission rosters and public behavior, not invented private knowledge.',
   mordred:
@@ -132,6 +135,11 @@ const roleAdvice: Record<string, string> = {
   minion:
     'Help Evil through votes and mission cards while posing as Good. Look for Merlin among players consistently avoiding you and Morgana. Do not admit sabotage.',
 };
+
+// Public table convention, independent of the observer's role and private card.
+export function excludesMissionPartners(mission: { team: readonly unknown[]; fails?: number }) {
+  return (mission.team.length === 2 && mission.fails === 1) || (mission.team.length === 3 && mission.fails === 2);
+}
 
 export function compactRequest(request: BotRequest) {
   const { state } = request;
@@ -204,6 +212,14 @@ export function compactRequest(request: BotRequest) {
         yourCard: action && 'value' in action ? action.value : undefined,
       };
     });
+  const excludedPartners = seats.flatMap(({ index }) => {
+    const partners = [
+      ...new Set(missions.filter((m) => excludesMissionPartners(m) && m.team.includes(index)).flatMap((m) => m.team)),
+    ]
+      .filter((seat): seat is number => seat !== undefined && seat !== index)
+      .sort((a, b) => a - b);
+    return partners.length ? [{ seat: index, seats: partners }] : [];
+  });
   let missionNumber = 1;
   let attempt = 0;
   const votes = history.flatMap((e) => {
@@ -246,6 +262,7 @@ export function compactRequest(request: BotRequest) {
     language: request.language ?? 'en',
     playerCount,
     approvalsRequired: Math.floor(playerCount / 2) + 1,
+    tableConventions: { includeSelfInProposals: true, excludedPartners },
     alignmentCounts,
     roleCounts,
     roleAdvice: end ? undefined : ownRoleAdvice,
@@ -617,7 +634,8 @@ export function yandexDecide(
                   choice: { type: 'string', enum: request.choices },
                   speech: {
                     type: 'string',
-                    maxLength: request.speak ? (request.state.stage === 'end' ? 800 : 240) : 0,
+                    maxLength:
+                      request.speak || options.decisionDetails ? (request.state.stage === 'end' ? 800 : 240) : 0,
                   },
                 },
               },
