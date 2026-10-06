@@ -15,6 +15,7 @@ export type BoardKind = (typeof BOARD_KINDS)[number];
 export type BoardContactType = (typeof BOARD_CONTACT_TYPES)[number];
 export type BoardReportReason = (typeof BOARD_REPORT_REASONS)[number];
 export interface BoardDraft {
+  memberIDs?: string[];
   kind: BoardKind;
   groupName: string;
   languages: string[];
@@ -33,6 +34,7 @@ export interface BoardDraft {
   contacts: { type: BoardContactType; value: string }[];
 }
 export interface BoardListing extends BoardDraft {
+  members?: BoardMember[];
   id: string;
   userID: string;
   name: string;
@@ -42,6 +44,11 @@ export interface BoardListing extends BoardDraft {
   expiresAt: string;
   active: boolean;
   moderated: boolean;
+}
+export interface BoardMember {
+  userID: string;
+  name: string;
+  avatar: string;
 }
 export interface BoardReport {
   id: string;

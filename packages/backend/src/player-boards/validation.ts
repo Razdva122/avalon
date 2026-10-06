@@ -38,7 +38,10 @@ function integer(value: unknown, min: number, max: number): value is number {
 export function validateBoardDraft(value: unknown, kind: BoardKind): BoardDraft {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw Error('invalid_draft');
   const draft = value as Record<string, unknown>;
-  if (Object.keys(draft).some((key) => !fields.includes(key)) || fields.some((key) => !(key in draft)))
+  if (
+    Object.keys(draft).some((key) => !fields.includes(key) && key !== 'memberIDs') ||
+    fields.some((key) => !(key in draft))
+  )
     throw Error('invalid_draft');
   if (
     typeof draft.groupName !== 'string' ||
@@ -92,6 +95,15 @@ export function validateBoardDraft(value: unknown, kind: BoardKind): BoardDraft 
     throw Error('invalid_experience');
   if (typeof draft.beginnerFriendly !== 'boolean' || typeof draft.canTeach !== 'boolean') throw Error('invalid_draft');
   if (!integer(draft.groupSize, 1, 10)) throw Error('invalid_group_size');
+  const memberIDs = draft.memberIDs === undefined ? [] : draft.memberIDs;
+  if (
+    !Array.isArray(memberIDs) ||
+    memberIDs.length > Math.min(10, draft.groupSize) ||
+    (kind === 'solo' && memberIDs.length > 0) ||
+    new Set(memberIDs).size !== memberIDs.length ||
+    memberIDs.some((id) => typeof id !== 'string' || !/^[A-Za-z0-9-]{1,80}$/.test(id))
+  )
+    throw Error('invalid_members');
   if (!Array.isArray(draft.contacts) || draft.contacts.length < 1 || draft.contacts.length > 2)
     throw Error('invalid_contacts');
   const contactTypes = new Set<string>();
@@ -130,6 +142,7 @@ export function validateBoardDraft(value: unknown, kind: BoardKind): BoardDraft 
     beginnerFriendly: kind === 'group' && draft.beginnerFriendly,
     canTeach: draft.canTeach,
     groupSize: draft.groupSize,
+    memberIDs: [...memberIDs],
 
     contacts: draft.contacts.map(({ type, value: account }) => ({ type, value: account })),
   };

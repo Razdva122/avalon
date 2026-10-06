@@ -31,6 +31,7 @@ API:
 
 - `GET /?kind=solo|group&language=cmn&page=1`: public page (20 listings, `hasMore`). Omit `language` for all languages.
 - `GET /me`: private listings, recruiting eligibility, publication ban and admin status.
+- `GET /members?query=...`: authenticated case-insensitive public-name prefix search, 2–80 characters, at most ten `{userID,name,avatar}` results.
 - `PUT /me/:kind`: create or edit only whitelisted `BoardDraft` fields.
 - `POST /me/:kind/bump|hide|reactivate`: owner lifecycle actions.
 - `POST /:id/report` with `{reason: 'spam'|'abuse'|'contact'}`.
@@ -39,6 +40,10 @@ API:
 - `POST /moderation/users/:userID/ban` with `{banned: boolean}`.
 
 DTOs are defined in `packages/types/player-board.ts`. All rules are enforced on the server, including atomic cooldown predicates, blocked publication and unique listing ownership.
+
+Recruiting drafts optionally list `memberIDs`: up to ten distinct registered accounts and at most `groupSize`. Solo drafts cannot contain members. Older drafts normalize omitted IDs to `[]`; public listing `members` includes current names and avatars only. Members can be added, removed or edited without changing listing rank or expiry. Unknown accounts return `invalid_members`.
+
+Active listings can enter the [weekly lifetime Premium giveaway](payments/weekly-giveaway.md): one ticket per listing, Sunday 20:00 Asia/Yekaterinburg, one solo recipient and one distinct recruiting recipient. Existing Premium and banned accounts cannot receive prizes. A recruiting listing without explicit members uses its author; a listing whose explicit members are all ineligible has no ticket for that draw.
 
 ## Verification
 

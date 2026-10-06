@@ -1,4 +1,25 @@
 import { validateBoardDraft } from './validation';
+test('old drafts normalize missing members to an empty list', () => {
+  expect(validateBoardDraft({ ...draft, groupName: 'Avalon' }, 'group')).toHaveProperty('memberIDs', []);
+});
+test('registered member IDs are accepted for group drafts', () => {
+  expect(
+    validateBoardDraft({ ...draft, groupName: 'Avalon', groupSize: 2, memberIDs: ['alice', 'bob'] }, 'group'),
+  ).toHaveProperty('memberIDs', ['alice', 'bob']);
+});
+test.each([['alice', 'alice'], ['a', 'b', 'c'], ['bad/id'], [3], 'alice'])(
+  'rejects invalid members %p',
+  (memberIDs) => {
+    expect(() => validateBoardDraft({ ...draft, groupName: 'Avalon', groupSize: 2, memberIDs }, 'group')).toThrow(
+      'invalid_members',
+    );
+  },
+);
+test('solo cannot list members', () => {
+  expect(() => validateBoardDraft({ ...draft, kind: 'solo', groupName: '', memberIDs: ['alice'] }, 'solo')).toThrow(
+    'invalid_members',
+  );
+});
 const draft = {
   kind: 'group',
   otherLanguage: '',

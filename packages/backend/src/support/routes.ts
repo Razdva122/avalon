@@ -6,6 +6,7 @@ import { supportOrderModel, supportTotalCents } from './repository';
 import { publicDonation, SupportOrder } from './service';
 import { DirectService, directSupport } from './direct/service';
 import { formatAtomic } from './direct/protocol';
+import { publicGiveaway } from './giveaway/service';
 
 const asyncRoute =
   (fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>) =>
@@ -33,6 +34,12 @@ export function createSupportRouter(service: DirectService) {
     next();
   });
   router.use(express.json({ limit: '8kb' }));
+  router.get(
+    '/giveaway',
+    asyncRoute(async (_req, res) => {
+      res.json(await publicGiveaway());
+    }),
+  );
   router.get(
     '/',
     asyncRoute(async (_req, res) => {

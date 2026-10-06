@@ -423,3 +423,38 @@ test.each(['solo', 'group'])(
 test('JSON endpoints are not search landing pages', async () => {
   expect((await request()).headers.get('x-robots-tag')).toBe('noindex');
 });
+test('member search requires authentication, bounds and escapes names, and exposes public profiles', async () => {
+  expect((await request('/members?query=Al')).status).toBe(401);
+  for (const query of ['A', 'x'.repeat(81)])
+    expect((await request('/members?query=' + query, 'GET', 'alice')).status).toBe(400);
+  await userProfileModel.collection.insertMany(
+    Array.from({ length: 12 }, (_, i) => ({ id: 'search' + i, name: 'Al' + i })),
+  );
+  const response = await request('/members?query=al', 'GET', 'alice');
+  expect(response.status).toBe(200);
+  const body = await response.json();
+  expect(body.members).toHaveLength(10);
+  expect((await (await request('/members?query=ali', 'GET', 'alice')).json()).members).toEqual([
+    { userID: 'alice', name: 'Alice', avatar: 'merlin' },
+  ]);
+  expect(JSON.stringify(body)).not.toMatch(/email|password|login|authVersion/);
+  expect(await (await request('/members?query=Al.*', 'GET', 'alice')).json()).toEqual({ members: [] });
+});
+test('party members are editable public profiles and unknown accounts are rejected', async () => {
+  await roomModel.collection.insertOne({
+    roomID: 'eligible',
+    players: [{ id: 'alice' }],
+    game: { stage: 'end', result: { winner: 'good', reason: 'tasks' } },
+  });
+  const group = { ...draft, kind: 'group', groupName: 'Avalon', groupSize: 2, memberIDs: ['alice', 'bob'] };
+  const response = await publish('alice', group, 'group');
+  expect(response.status).toBe(200);
+  expect((await response.json()).listing.members).toEqual([
+    { userID: 'alice', name: 'Alice', avatar: 'merlin' },
+    { userID: 'bob', name: 'Bob', avatar: 'servant' },
+  ]);
+  expect((await publish('alice', { ...group, memberIDs: ['missing'] }, 'group')).status).toBe(400);
+  expect((await (await publish('alice', { ...group, memberIDs: [] }, 'group')).json()).listing.members).toEqual([]);
+  const solo = await listing();
+  expect(solo.memberIDs).toEqual([]);
+});

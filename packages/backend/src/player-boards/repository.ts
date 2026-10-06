@@ -31,6 +31,7 @@ const schema = new Schema<StoredBoard>({
   canTeach: Boolean,
   groupName: { type: String, maxlength: 60, default: '' },
   groupSize: Number,
+  memberIDs: { type: [String], default: [] },
 
   contacts: [{ _id: false, type: { type: String }, value: String }],
   createdAt: Date,
@@ -119,6 +120,10 @@ export async function setBoardBan(userID: string, banned: boolean) {
   if (!banned) await boardListingModel.updateMany({ userID }, { $set: { publishingBlocked: false } });
 }
 export async function publishBoard(userID: string, draft: BoardDraft, now: Date): Promise<StoredBoard> {
+  const memberIDs = draft.memberIDs ?? [];
+  if ((await userProfileModel.countDocuments({ id: { $in: memberIDs } })) !== memberIDs.length)
+    throw Error('invalid_members');
+  draft = { ...draft, memberIDs };
   await requirePublishing(userID, draft.kind);
   await ensureSlot(userID, draft.kind);
   let listing = await boardListingModel
@@ -193,7 +198,7 @@ export async function boardAction(userID: string, kind: BoardKind, action: strin
 }
 export async function boardDTOs(items: StoredBoard[]): Promise<BoardListing[]> {
   const profiles = await userProfileModel
-    .find({ id: { $in: items.map((i) => i.userID) } }, { id: 1, name: 1, avatar: 1 })
+    .find({ id: { $in: items.flatMap((i) => [i.userID, ...(i.memberIDs ?? [])]) } }, { id: 1, name: 1, avatar: 1 })
     .lean();
   return items.map((item) => {
     const profile = profiles.find((p) => p.id === item.userID);
@@ -216,6 +221,11 @@ export async function boardDTOs(items: StoredBoard[]): Promise<BoardListing[]> {
       canTeach: item.canTeach,
       groupName: item.groupName,
       groupSize: item.groupSize,
+      memberIDs: [...(item.memberIDs ?? [])],
+      members: (item.memberIDs ?? []).flatMap((id) => {
+        const member = profiles.find((p) => p.id === id);
+        return member ? [{ userID: member.id, name: member.name, avatar: member.avatar ?? 'servant' }] : [];
+      }),
 
       contacts: item.contacts.map(({ type, value }) => ({ type, value })),
       createdAt: item.createdAt!.toISOString(),
@@ -225,6 +235,18 @@ export async function boardDTOs(items: StoredBoard[]): Promise<BoardListing[]> {
       moderated: item.moderated,
     };
   });
+}
+export async function searchBoardMembers(value: unknown) {
+  if (typeof value !== 'string' || value.length > 80 || value.trim().length < 2 || /[\x00-\x1f\x7f]/.test(value))
+    throw Error('invalid_members');
+  const prefix = value.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const profiles = await userProfileModel
+    .find({ name: new RegExp('^' + prefix, 'i') }, { id: 1, name: 1, avatar: 1 })
+    .sort({ name: 1, id: 1 })
+    .limit(10)
+    .maxTimeMS(2000)
+    .lean();
+  return { members: profiles.map((p) => ({ userID: p.id, name: p.name, avatar: p.avatar ?? 'servant' })) };
 }
 export async function publicBoards(kind: BoardKind, language: string | undefined, page: number, now: Date) {
   const items = await boardListingModel

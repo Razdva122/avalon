@@ -15,6 +15,7 @@ import {
   publishBoard,
   reportBoard,
   setBoardBan,
+  searchBoardMembers,
 } from './repository';
 
 const asyncRoute =
@@ -53,6 +54,12 @@ export function createPlayerBoardsRouter(now = () => new Date()) {
     '/me',
     asyncRoute(async (_req, res) => {
       res.json(await ownerBoards(res.locals.userID));
+    }),
+  );
+  router.get(
+    '/members',
+    asyncRoute(async (req, res) => {
+      res.json(await searchBoardMembers(req.query.query));
     }),
   );
   router.put(
@@ -150,6 +157,7 @@ export function createPlayerBoardsRouter(now = () => new Date()) {
       'invalid_communication',
       'invalid_experience',
       'invalid_group_size',
+      'invalid_members',
       'invalid_group_name',
       'invalid_contacts',
       'invalid_page',
