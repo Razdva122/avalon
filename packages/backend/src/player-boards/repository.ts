@@ -237,6 +237,7 @@ export async function boardDTOs(items: StoredBoard[]): Promise<BoardListing[]> {
   });
 }
 export async function searchBoardMembers(value: unknown) {
+  // eslint-disable-next-line no-control-regex -- Reject control characters in untrusted public-name queries.
   if (typeof value !== 'string' || value.length > 80 || value.trim().length < 2 || /[\x00-\x1f\x7f]/.test(value))
     throw Error('invalid_members');
   const prefix = value.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
