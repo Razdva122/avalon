@@ -1,6 +1,6 @@
 {
   "name": "@avalon/backend",
-  "version": "69.7.4",
+  "version": "69.8.0",
   "description": "",
   "main": "index.js",
   "scripts": {
