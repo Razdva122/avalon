@@ -34,6 +34,7 @@
       </div>
     </section>
 
+    <GiveawayBanner />
     <div class="lobby-content">
       <aside class="lobby-sidebar">
         <LocaleLink class="discord-card" :to="{ name: 'community' }">
@@ -180,9 +181,11 @@ import SocialChannels from './SocialChannels.vue';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
 import AiRoomButton from './AiRoomButton.vue';
 import RotatingTopPlayer from '@/components/stats/RotatingTopPlayer.vue';
+import GiveawayBanner from '@/pages/support/GiveawayBanner.vue';
 
 export default defineComponent({
   components: {
+    GiveawayBanner,
     AiRoomButton,
     LobbyRoom,
     SocialChannels,

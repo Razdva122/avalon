@@ -102,6 +102,15 @@
             >{{ t('playerBoards.groupSize')
             }}<input v-model.number="draft.groupSize" type="number" min="1" max="10" required
           /></label>
+          <MemberPicker
+            class="wide"
+            v-model="draft.memberIDs"
+            :members="initial && 'members' in initial ? (initial as BoardListing).members : []"
+            :limit="Math.min(10, draft.groupSize || 0)"
+          />
+          <p v-if="invalid && (draft.memberIDs?.length || 0) > draft.groupSize" class="form-error wide" role="alert">
+            {{ t('giveaway.membersLimit') }}
+          </p>
         </template>
       </div>
       <h4>{{ t('playerBoards.contacts') }}</h4>
@@ -156,9 +165,10 @@
 import { validBoardContact } from '@avalon/types/board-contact';
 import { reactive, ref } from 'vue';
 import ContactIcon from './ContactIcon.vue';
+import MemberPicker from './MemberPicker.vue';
 import { useI18n } from 'vue-i18n';
 import { BOARD_LANGUAGES, BOARD_CONTACT_TYPES } from '@avalon/types/player-board';
-import type { BoardDraft, BoardKind, BoardContactType } from '@avalon/types/player-board';
+import type { BoardDraft, BoardListing, BoardKind, BoardContactType } from '@avalon/types/player-board';
 import { contactLabel, editableDraft } from './board-helpers';
 import { dayKeys, formatHour, languageFlags } from './board-display';
 const props = defineProps<{ kind: BoardKind; initial?: BoardDraft; busy: boolean }>();
@@ -192,6 +202,7 @@ const draft = reactive<BoardDraft>(
       }
     : {
         kind: props.kind,
+        memberIDs: [],
         groupName: '',
         languages: [],
         otherLanguage: '',
@@ -228,8 +239,17 @@ function submit() {
     (draft.languages.includes('other') && !/^[\p{L}][\p{L}\p{M} '’(),-]{0,59}$/u.test(draft.otherLanguage.trim())) ||
     draft.contacts.some((contact) => !validBoardContact(contact.type, contact.value, props.kind === 'group')) ||
     (props.kind === 'group' && !draft.groupName?.trim()) ||
+    (props.kind === 'group' &&
+      (!Number.isInteger(draft.groupSize) ||
+        draft.groupSize < 1 ||
+        draft.groupSize > 10 ||
+        (draft.memberIDs?.length || 0) > draft.groupSize ||
+        new Set(draft.memberIDs).size !== (draft.memberIDs?.length || 0))) ||
     new Set(draft.contacts.map((contact) => contact.type)).size !== draft.contacts.length;
-  if (props.kind === 'solo') draft.beginnerFriendly = false;
+  if (props.kind === 'solo') {
+    draft.beginnerFriendly = false;
+    draft.memberIDs = [];
+  }
   if (!invalid.value) emit('save', JSON.parse(JSON.stringify(draft)));
 }
 </script>

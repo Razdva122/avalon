@@ -6,6 +6,7 @@
       <p class="intro">{{ t('support.intro') }}</p>
     </header>
     <SupportBenefits :active="account?.premium === true" />
+    <Giveaway />
     <p v-if="error" class="error" role="alert">
       {{ t(`support.${error}`) }}
       <button type="button" @click="load()">{{ t('support.retry') }}</button>
@@ -170,6 +171,7 @@ import { useStore } from '@/store';
 import { useStickers } from '@/helpers/composables/useStickers';
 import Avatar from '@/components/user/Avatar.vue';
 import SupportBenefits from './SupportBenefits.vue';
+import Giveaway from './Giveaway.vue';
 import NetworkIcon from './NetworkIcon.vue';
 import WalletQR from './WalletQR.vue';
 import { isSupportTxid } from './checkout';

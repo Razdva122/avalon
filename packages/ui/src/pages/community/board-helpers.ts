@@ -60,6 +60,7 @@ export function editableDraft(listing: BoardDraft): BoardDraft {
   } = listing;
   return {
     kind,
+    memberIDs: [...(listing.memberIDs ?? [])],
     groupName: listing.groupName,
     otherLanguage: listing.otherLanguage ?? '',
     scheduleEnabled: listing.scheduleEnabled ?? false,

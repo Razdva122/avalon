@@ -29,6 +29,15 @@
     <p v-if="listing.kind === 'group'" class="group-size">
       {{ t('playerBoards.groupMembers', { size: listing.groupSize }) }}
     </p>
+    <ul
+      v-if="listing.kind === 'group' && listing.members?.length"
+      class="member-roster"
+      :aria-label="t('giveaway.members')"
+    >
+      <li v-for="member in listing.members" :key="member.userID">
+        <LocaleLink :to="{ name: 'user_stats', params: { uuid: member.userID } }">{{ member.name }}</LocaleLink>
+      </li>
+    </ul>
     <ul class="tags" :aria-label="t('playerBoards.languages')">
       <li v-for="language in listing.languages" :key="language">
         <span aria-hidden="true">{{ languageFlags[language] }}</span>
@@ -100,6 +109,7 @@
   </article>
 </template>
 <script setup lang="ts">
+import LocaleLink from '@/components/feedback/LocaleLink.vue';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ContactIcon from './ContactIcon.vue';
@@ -140,6 +150,19 @@ async function copy(value: string, index: number) {
 }
 </script>
 <style scoped lang="scss">
+.member-roster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 0;
+  margin-top: 10px;
+  list-style: none;
+  font-size: 14px;
+}
+.member-roster a {
+  color: rgb(var(--v-theme-primary));
+  text-decoration: underline;
+}
 .activate-button {
   background: rgb(var(--v-theme-primary));
   color: rgb(var(--v-theme-on-primary));

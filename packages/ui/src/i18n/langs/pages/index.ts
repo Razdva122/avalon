@@ -4,6 +4,7 @@ import { wikiPlay } from './wikiPlay';
 import { community } from './community';
 import { playerBoards } from './playerBoards';
 import { support } from './support';
+import { giveaway } from './giveaway';
 import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
@@ -55,6 +56,7 @@ Object.entries({
   community,
   playerBoards,
   support,
+  giveaway,
   wiki,
   lancelots,
   lady,

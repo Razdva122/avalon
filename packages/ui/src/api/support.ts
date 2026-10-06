@@ -1,5 +1,15 @@
 import { store } from '@/store';
 import { supportError } from '@/pages/support/checkout';
+import type { GiveawayState } from '@avalon/types/giveaway';
+export async function giveawayRequest(): Promise<GiveawayState> {
+  const base = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3000';
+  const response = await fetch(`${base}/api/support/giveaway`, {
+    signal: AbortSignal.timeout(8000),
+    cache: 'no-store',
+  });
+  if (!response.ok) throw new Error('giveaway_unavailable');
+  return response.json();
+}
 export interface SupportNetwork {
   id: 'btc' | 'tron' | 'eth' | 'bsc';
   label: string;

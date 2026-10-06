@@ -112,6 +112,8 @@ const server = http.createServer((req, res) => {
           true,
           'Mobile lobby must not overflow horizontally',
         );
+        // Keep the target clear of the visitor-language suggestion at the viewport bottom.
+        await page.$eval('.guide-start button', (button) => button.scrollIntoView({ block: 'center' }));
         await page.click('.guide-start button');
         await page.waitForSelector('.v-overlay--active input[type="password"]', { visible: true });
         await page.setViewport({ width: 1280, height: 900 });

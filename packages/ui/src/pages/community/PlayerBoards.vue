@@ -7,6 +7,11 @@
       </div>
     </header>
     <p class="rules">{{ t('playerBoards.rules') }}</p>
+    <aside class="giveaway-note">
+      <strong>{{ t('giveaway.title') }}</strong>
+      <p>{{ t('giveaway.boardNotice') }}</p>
+      <LocaleLink :to="{ name: 'support', hash: '#giveaway' }">{{ t('giveaway.rulesTitle') }} →</LocaleLink>
+    </aside>
     <div class="toolbar">
       <fieldset class="language-filter">
         <legend>{{ t('playerBoards.languages') }}</legend>
@@ -159,6 +164,7 @@ import ReportIcon from './ReportIcon.vue';
 import BoardCard from './BoardCard.vue';
 import BoardForm from './BoardForm.vue';
 import BoardModeration from './BoardModeration.vue';
+import LocaleLink from '@/components/feedback/LocaleLink.vue';
 const { t } = useI18n();
 const store = useStore();
 const profile = computed(() => store.state.profile);
@@ -325,6 +331,24 @@ onBeforeUnmount(() => {
 });
 </script>
 <style scoped lang="scss">
+.giveaway-note {
+  margin: 16px 0;
+  padding: 14px 16px;
+  border-left: 3px solid rgb(var(--v-theme-support-accent));
+  background: rgba(var(--v-theme-support-accent), 0.06);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.giveaway-note p {
+  margin: 6px 0;
+}
+.giveaway-note a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: rgb(var(--v-theme-primary));
+  text-decoration: underline;
+}
 .player-boards {
   margin: 0 0 56px;
   scroll-margin-top: 80px;
