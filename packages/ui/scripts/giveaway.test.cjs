@@ -35,6 +35,7 @@ function component(relative, inline = false, dependencies = {}) {
     if (id.startsWith('@avalon/types/')) return require(`../../types/${id.split('/').at(-1)}.ts`);
     if (id === './board-helpers' || id === './board-display')
       return require(`../src/pages/community/${id.slice(2)}.ts`);
+    if (id === './giveaway-time') return require('../src/pages/support/giveaway-time.ts');
     return { default: { render: () => null } };
   };
   new Function('require', 'module', 'exports', code)(load, module, module.exports);

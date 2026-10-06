@@ -3,9 +3,13 @@ import type { TLanguage } from '@/i18n/interface';
 export const giveaway: Record<TLanguage, Record<string, string>> = {
   en: {
     title: 'Weekly Premium giveaway',
-    bannerTitle: 'Win lifetime Premium — two prizes every week',
+    bannerTitle: 'Free Premium every week',
+    soloShortCTA: 'I’m a player',
+    groupShortCTA: 'We’re a group',
     intro: 'One player listing and one group listing win lifetime Premium each week, with one recipient per prize.',
-    timing: 'Every Sunday at 20:00 UTC+5 (15:00 UTC)',
+    timing: 'Weekly: {time} (your local time)',
+    timingShort: '{time} (your time)',
+    timingFallback: 'Weekly giveaway — time shown in your time zone',
     soloCTA: 'Join with a player listing',
     groupCTA: 'Join with a group listing',
     rulesTitle: 'Premium giveaway rules',
@@ -19,7 +23,7 @@ export const giveaway: Record<TLanguage, Record<string, string>> = {
     liveRule:
       'Eligibility uses the cutoff dates and the live publication state when the draw is processed. If processing is delayed, earlier publication states are not reconstructed.',
     boardNotice:
-      'Active listings enter automatically: one ticket per listing, two lifetime Premium prizes every Sunday at 20:00 UTC+5. Existing Premium holders and banned players are excluded. A group uses its registered roster, or its author if empty; the two recipients are different. You do not need to republish each week.',
+      'Active listings enter automatically: one ticket per listing, two lifetime Premium prizes each week. Existing Premium holders and banned players are excluded. A group uses its registered roster, or its author if empty; the two recipients are different. You do not need to republish each week.',
     loading: 'Loading giveaway results…',
     error: 'Could not load the results. You can still publish your listing.',
     retry: 'Try again',
@@ -46,10 +50,14 @@ export const giveaway: Record<TLanguage, Record<string, string>> = {
   },
   ru: {
     title: 'Еженедельный розыгрыш Premium',
-    bannerTitle: 'Выиграй Premium навсегда — два приза каждую неделю',
+    bannerTitle: 'Бесплатный Premium каждую неделю',
+    soloShortCTA: 'Я игрок',
+    groupShortCTA: 'Мы пати',
     intro:
       'Каждую неделю выбираем анкету игрока и анкету компании. По одному получателю пожизненного Premium в каждой категории.',
-    timing: 'Каждое воскресенье в 20:00 по Екатеринбургу (UTC+5)',
+    timing: 'Каждую неделю: {time} (ваше время)',
+    timingShort: '{time} (ваше время)',
+    timingFallback: 'Еженедельный розыгрыш — время в вашем часовом поясе',
     soloCTA: 'Участвовать с анкетой игрока',
     groupCTA: 'Участвовать с анкетой компании',
     rulesTitle: 'Правила розыгрыша Premium',
@@ -63,7 +71,7 @@ export const giveaway: Record<TLanguage, Record<string, string>> = {
     liveRule:
       'Учитываются даты на момент розыгрыша и текущее состояние публикации при его обработке. Если обработка задержалась, прошлое состояние анкеты не восстанавливается.',
     boardNotice:
-      'Активные анкеты участвуют автоматически: один билет на анкету, два пожизненных Premium каждое воскресенье в 20:00 UTC+5. Игроки с Premium и заблокированные не участвуют. Кандидаты компании — её зарегистрированный состав, а если он пуст — автор; получатели двух призов разные. Еженедельно публиковать заново не нужно.',
+      'Активные анкеты участвуют автоматически: один билет на анкету, два пожизненных Premium каждую неделю. Игроки с Premium и заблокированные не участвуют. Кандидаты компании — её зарегистрированный состав, а если он пуст — автор; получатели двух призов разные. Еженедельно публиковать заново не нужно.',
     loading: 'Загружаем результаты розыгрыша…',
     error: 'Не удалось загрузить результаты. Анкету всё равно можно опубликовать.',
     retry: 'Повторить',
@@ -90,10 +98,14 @@ export const giveaway: Record<TLanguage, Record<string, string>> = {
   },
   es: {
     title: 'Sorteo semanal de Premium',
-    bannerTitle: 'Gana Premium de por vida: dos premios cada semana',
+    bannerTitle: 'Premium gratis cada semana',
+    soloShortCTA: 'Soy jugador',
+    groupShortCTA: 'Somos un grupo',
     intro:
       'Cada semana se eligen un anuncio de jugador y uno de grupo, con un destinatario de Premium de por vida por premio.',
-    timing: 'Cada domingo a las 20:00 UTC+5 (15:00 UTC)',
+    timing: 'Cada semana: {time} (tu hora local)',
+    timingShort: '{time} (hora local)',
+    timingFallback: 'Sorteo semanal — horario en tu zona horaria',
     soloCTA: 'Participar con un anuncio de jugador',
     groupCTA: 'Participar con un anuncio de grupo',
     rulesTitle: 'Reglas del sorteo de Premium',
@@ -107,7 +119,7 @@ export const giveaway: Record<TLanguage, Record<string, string>> = {
     liveRule:
       'Se usan las fechas del cierre y el estado actual de publicación al procesar el sorteo. Si se retrasa, no se reconstruye el estado anterior.',
     boardNotice:
-      'Los anuncios activos participan automáticamente: una participación por anuncio y dos Premium de por vida cada domingo a las 20:00 UTC+5. Se excluyen quienes ya tienen Premium y los bloqueados. El grupo usa sus miembros registrados o, si no hay, el autor; los destinatarios son distintos. No hace falta volver a publicar cada semana.',
+      'Los anuncios activos participan automáticamente: una participación por anuncio y dos Premium de por vida cada semana. Se excluyen quienes ya tienen Premium y los bloqueados. El grupo usa sus miembros registrados o, si no hay, el autor; los destinatarios son distintos. No hace falta volver a publicar cada semana.',
     loading: 'Cargando resultados…',
     error: 'No se pudieron cargar los resultados. Puedes publicar tu anuncio igualmente.',
     retry: 'Reintentar',
@@ -134,10 +146,14 @@ export const giveaway: Record<TLanguage, Record<string, string>> = {
   },
   pt: {
     title: 'Sorteio semanal de Premium',
-    bannerTitle: 'Ganhe Premium vitalício: dois prêmios por semana',
+    bannerTitle: 'Premium grátis toda semana',
+    soloShortCTA: 'Sou jogador',
+    groupShortCTA: 'Somos um grupo',
     intro:
       'Toda semana são escolhidos um anúncio de jogador e um de grupo, com um ganhador de Premium vitalício por prêmio.',
-    timing: 'Todo domingo às 20:00 UTC+5 (15:00 UTC)',
+    timing: 'Toda semana: {time} (seu horário local)',
+    timingShort: '{time} (hora local)',
+    timingFallback: 'Sorteio semanal — horário no seu fuso',
     soloCTA: 'Participar com anúncio de jogador',
     groupCTA: 'Participar com anúncio de grupo',
     rulesTitle: 'Regras do sorteio de Premium',
@@ -151,7 +167,7 @@ export const giveaway: Record<TLanguage, Record<string, string>> = {
     liveRule:
       'São usadas as datas de corte e o estado atual da publicação no processamento. Em caso de atraso, o estado anterior não é reconstruído.',
     boardNotice:
-      'Anúncios ativos participam automaticamente: uma participação por anúncio e dois Premium vitalícios todo domingo às 20:00 UTC+5. Quem já tem Premium ou está bloqueado é excluído. O grupo usa seus membros registrados ou o autor se a lista estiver vazia; os ganhadores são diferentes. Não precisa republicar toda semana.',
+      'Anúncios ativos participam automaticamente: uma participação por anúncio e dois Premium vitalícios por semana. Quem já tem Premium ou está bloqueado é excluído. O grupo usa seus membros registrados ou o autor se a lista estiver vazia; os ganhadores são diferentes. Não precisa republicar toda semana.',
     loading: 'Carregando resultados…',
     error: 'Não foi possível carregar os resultados. Você ainda pode publicar seu anúncio.',
     retry: 'Tentar novamente',
@@ -178,9 +194,13 @@ export const giveaway: Record<TLanguage, Record<string, string>> = {
   },
   'zh-CN': {
     title: '每周 Premium 抽奖',
-    bannerTitle: '赢取终身 Premium：每周两个名额',
+    bannerTitle: '每周免费 Premium',
+    soloShortCTA: '我是玩家',
+    groupShortCTA: '我们是群组',
     intro: '每周抽取一份玩家资料和一份群组资料，每个奖项各有一位获奖者获得终身 Premium。',
-    timing: '每周日 UTC+5 时间 20:00（UTC 15:00）',
+    timing: '每周抽奖：{time}（您的当地时间）',
+    timingShort: '{time}（当地时间）',
+    timingFallback: '每周抽奖，时间按您的时区显示',
     soloCTA: '发布玩家资料参与',
     groupCTA: '发布群组资料参与',
     rulesTitle: 'Premium 抽奖规则',
@@ -193,7 +213,7 @@ export const giveaway: Record<TLanguage, Record<string, string>> = {
       '玩家和群组资料分别抽奖，因此可以拥有两次机会。两个奖项必须由不同的人获得；玩家奖项的获奖者不再参与群组奖项。',
     liveRule: '资格按截止日期和处理抽奖时的实时发布状态判断。如处理延迟，不会重建历史发布状态。',
     boardNotice:
-      '有效资料自动参与：每份资料一次机会，每周日 UTC+5 时间20:00抽取两位终身 Premium 获奖者。已有 Premium 或被封禁的玩家不参与。群组候选人为注册成员；名单为空则为作者。两个奖项由不同的人获得，无需每周重新发布。',
+      '有效资料自动参与：每份资料一次机会，每周抽取两位终身 Premium 获奖者。已有 Premium 或被封禁的玩家不参与。群组候选人为注册成员；名单为空则为作者。两个奖项由不同的人获得，无需每周重新发布。',
     loading: '正在加载抽奖结果…',
     error: '无法加载结果，仍可发布资料参与。',
     retry: '重试',
@@ -220,9 +240,13 @@ export const giveaway: Record<TLanguage, Record<string, string>> = {
   },
   'zh-TW': {
     title: '每週 Premium 抽獎',
-    bannerTitle: '贏取終身 Premium：每週兩個名額',
+    bannerTitle: '每週免費 Premium',
+    soloShortCTA: '我是玩家',
+    groupShortCTA: '我們是群組',
     intro: '每週抽出一份玩家資料和一份群組資料，每個獎項各有一位得獎者獲得終身 Premium。',
-    timing: '每週日 UTC+5 時間 20:00（UTC 15:00）',
+    timing: '每週抽獎：{time}（您的當地時間）',
+    timingShort: '{time}（當地時間）',
+    timingFallback: '每週抽獎，時間依您的時區顯示',
     soloCTA: '發布玩家資料參加',
     groupCTA: '發布群組資料參加',
     rulesTitle: 'Premium 抽獎規則',
@@ -234,7 +258,7 @@ export const giveaway: Record<TLanguage, Record<string, string>> = {
     chancesRule: '玩家與群組資料分別抽獎，因此可有兩次機會。兩個獎項須由不同的人獲得；玩家獎項得獎者不再參加群組獎項。',
     liveRule: '資格依截止日期和處理抽獎時的即時發布狀態判斷。若處理延遲，不會重建歷史發布狀態。',
     boardNotice:
-      '有效資料自動參加：每份資料一次機會，每週日 UTC+5 時間20:00抽出兩位終身 Premium 得獎者。已有 Premium 或被封鎖的玩家不參加。群組候選人為註冊成員；名單空白則為作者。兩個獎項由不同的人獲得，不必每週重新發布。',
+      '有效資料自動參加：每份資料一次機會，每週抽出兩位終身 Premium 得獎者。已有 Premium 或被封鎖的玩家不參加。群組候選人為註冊成員；名單空白則為作者。兩個獎項由不同的人獲得，不必每週重新發布。',
     loading: '正在載入抽獎結果…',
     error: '無法載入結果，仍可發布資料參加。',
     retry: '重試',

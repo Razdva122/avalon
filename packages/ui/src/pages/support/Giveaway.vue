@@ -1,11 +1,25 @@
 <template>
   <section id="giveaway" class="giveaway" aria-labelledby="giveaway-title">
-    <h2 id="giveaway-title">{{ t('giveaway.title') }}</h2>
-    <p>{{ t('giveaway.intro') }}</p>
-    <p class="timing">{{ t('giveaway.timing') }}</p>
+    <header class="giveaway-heading">
+      <div>
+        <span class="prize-badge"
+          ><span class="material-icons" aria-hidden="true">all_inclusive</span>{{ t('support.lifetimePremium') }}</span
+        >
+        <h2 id="giveaway-title">{{ t('giveaway.title') }}</h2>
+        <p>{{ t('giveaway.intro') }}</p>
+        <p class="timing">
+          <span class="material-icons" aria-hidden="true">schedule</span><GiveawayTime :at="data?.nextDrawAt" />
+        </p>
+      </div>
+      <GiveawayEmblem class="prize-emblem" />
+    </header>
     <div class="giveaway-links">
-      <LocaleLink :to="{ name: 'community_solo' }">{{ t('giveaway.soloCTA') }} →</LocaleLink>
-      <LocaleLink :to="{ name: 'community_group' }">{{ t('giveaway.groupCTA') }} →</LocaleLink>
+      <LocaleLink :to="{ name: 'community_solo' }"
+        ><span class="material-icons" aria-hidden="true">person</span>{{ t('giveaway.soloCTA') }}</LocaleLink
+      >
+      <LocaleLink :to="{ name: 'community_group' }"
+        ><span class="material-icons" aria-hidden="true">groups</span>{{ t('giveaway.groupCTA') }}</LocaleLink
+      >
     </div>
     <details class="giveaway-rules">
       <summary>{{ t('giveaway.rulesTitle') }}</summary>
@@ -20,23 +34,47 @@
         <button type="button" @click="load">{{ t('giveaway.retry') }}</button>
       </div>
       <template v-else-if="data">
-        <p>{{ t('giveaway.nextDraw', { date: date(data.nextDrawAt) }) }}</p>
+        <p class="next-draw">
+          <span class="material-icons" aria-hidden="true">event</span
+          >{{ t('giveaway.nextDraw', { date: date(data.nextDrawAt) }) }}
+        </p>
         <template v-if="data.latestDraw">
           <h3>{{ t('giveaway.latestDraw', { date: date(data.latestDraw.drawAt) }) }}</h3>
           <ul class="winner-list">
             <li v-for="category in ['solo', 'group'] as const" :key="category">
-              <strong>{{ t(`giveaway.${category}Prize`) }}</strong>
+              <strong class="winner-category"
+                ><span class="material-icons" aria-hidden="true">{{ category === 'solo' ? 'person' : 'groups' }}</span
+                >{{ t(`giveaway.${category}Prize`) }}</strong
+              >
               <template v-if="data.latestDraw[category]">
-                <LocaleLink :to="{ name: 'user_stats', params: { uuid: data.latestDraw[category]!.userID } }">{{
-                  data.latestDraw[category]!.name
-                }}</LocaleLink>
-                <span v-if="category === 'group'">{{ data.latestDraw.group!.groupName }}</span>
+                <div class="winner-profile">
+                  <Avatar
+                    :avatarID="data.latestDraw[category]!.avatar"
+                    class="winner-avatar"
+                    alt=""
+                    loading="lazy"
+                    width="64"
+                    height="64"
+                  />
+                  <div>
+                    <LocaleLink :to="{ name: 'user_stats', params: { uuid: data.latestDraw[category]!.userID } }">{{
+                      data.latestDraw[category]!.name
+                    }}</LocaleLink>
+                    <span v-if="category === 'group'" class="winner-group">{{ data.latestDraw.group!.groupName }}</span>
+                  </div>
+                </div>
+                <span class="winner-reward"
+                  ><span class="material-icons" aria-hidden="true">workspace_premium</span
+                  >{{ t('support.lifetimePremium') }}</span
+                >
               </template>
               <span v-else>{{ t('giveaway.noWinner') }}</span>
             </li>
           </ul>
         </template>
-        <p v-else>{{ t('giveaway.noDraw') }}</p>
+        <p v-else class="first-draw">
+          <span class="material-icons" aria-hidden="true">emoji_events</span>{{ t('giveaway.noDraw') }}
+        </p>
       </template>
     </div>
   </section>
@@ -47,6 +85,10 @@ import { useI18n } from 'vue-i18n';
 import type { GiveawayState } from '@avalon/types/giveaway';
 import { giveawayRequest } from '@/api/support';
 import LocaleLink from '@/components/feedback/LocaleLink.vue';
+import Avatar from '@/components/user/Avatar.vue';
+import GiveawayEmblem from './GiveawayEmblem.vue';
+import GiveawayTime from './GiveawayTime.vue';
+import { formatGiveawayTime } from './giveaway-time';
 const { t, locale } = useI18n();
 const data = ref<GiveawayState | null>(null);
 const loading = ref(true);
@@ -66,13 +108,7 @@ async function load() {
   }
 }
 function date(value: string) {
-  return (
-    new Intl.DateTimeFormat(locale.value, {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-      timeZone: 'Asia/Yekaterinburg',
-    }).format(new Date(value)) + ' (UTC+5)'
-  );
+  return formatGiveawayTime(value, locale.value, undefined, true);
 }
 onMounted(load);
 onBeforeUnmount(() => {
@@ -82,14 +118,41 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 .giveaway {
   margin: 24px 0;
-  padding: 24px;
-  border: 1px solid rgb(var(--v-theme-support-border));
-  border-radius: 12px;
-  background: rgb(var(--v-theme-surface));
+  padding: 28px;
+  border: 1px solid rgba(var(--v-theme-support-accent), 0.45);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(var(--v-theme-support-accent), 0.1), transparent 55%), rgb(var(--v-theme-surface));
   scroll-margin-top: 90px;
 }
+.giveaway-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  gap: 24px;
+  align-items: center;
+}
+.prize-badge,
+.winner-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgb(var(--v-theme-support-accent));
+  font-size: 13px;
+  font-weight: 650;
+}
+.prize-badge {
+  padding: 5px 10px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(var(--v-theme-support-accent), 0.35);
+  border-radius: 6px;
+}
+.material-icons {
+  font-size: 21px;
+}
 h2 {
-  font-size: 22px;
+  font-size: clamp(24px, 3vw, 30px);
+  line-height: 1.2;
+  text-wrap: balance;
 }
 p {
   margin: 10px 0;
@@ -98,11 +161,26 @@ p {
 .timing {
   font-weight: 600;
 }
+.timing,
+.next-draw,
+.first-draw,
+.winner-category {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.timing .material-icons,
+.next-draw .material-icons,
+.first-draw .material-icons,
+.winner-category .material-icons {
+  flex-shrink: 0;
+  color: rgb(var(--v-theme-support-accent));
+}
 .giveaway-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 20px;
-  margin: 12px 0;
+  gap: 10px;
+  margin: 20px 0 10px;
 }
 a {
   color: rgb(var(--v-theme-primary));
@@ -114,6 +192,20 @@ summary {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+}
+.giveaway-links a {
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid #b38637;
+  border-radius: 8px;
+  background: #e7c675;
+  color: #382a0c;
+  font-weight: 650;
+  text-decoration: none;
+}
+.giveaway-links a:hover {
+  background: #f0d791;
 }
 summary {
   display: list-item;
@@ -140,8 +232,41 @@ h3 {
 .winner-list li {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid rgb(var(--v-theme-support-border));
+  border-radius: 12px;
+  background: rgba(var(--v-theme-support-accent), 0.05);
   overflow-wrap: anywhere;
+}
+.winner-profile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.winner-profile > div {
+  min-width: 0;
+}
+.winner-profile a {
+  font-size: 18px;
+  font-weight: 650;
+}
+.winner-avatar {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(var(--v-theme-support-accent), 0.5);
+  background: rgb(var(--v-theme-surface));
+}
+.winner-group {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+}
+.first-draw {
+  padding: 14px 0 0;
 }
 button {
   min-height: 44px;
@@ -156,6 +281,18 @@ button {
 @media (max-width: 560px) {
   .giveaway {
     padding: 16px;
+  }
+  .giveaway-heading {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .prize-emblem {
+    grid-row: 1;
+    width: 126px;
+    margin: 0 auto;
+  }
+  .giveaway-links a {
+    width: 100%;
   }
   .winner-list {
     grid-template-columns: 1fr;

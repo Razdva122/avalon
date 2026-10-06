@@ -8,9 +8,13 @@
     </header>
     <p class="rules">{{ t('playerBoards.rules') }}</p>
     <aside class="giveaway-note">
-      <strong>{{ t('giveaway.title') }}</strong>
-      <p>{{ t('giveaway.boardNotice') }}</p>
-      <LocaleLink :to="{ name: 'support', hash: '#giveaway' }">{{ t('giveaway.rulesTitle') }} →</LocaleLink>
+      <GiveawayEmblem class="board-prize-emblem" />
+      <div>
+        <strong>{{ t('giveaway.title') }}</strong>
+        <p><GiveawayTime /></p>
+        <p>{{ t('giveaway.boardNotice') }}</p>
+        <LocaleLink :to="{ name: 'support', hash: '#giveaway' }">{{ t('giveaway.rulesTitle') }} →</LocaleLink>
+      </div>
     </aside>
     <div class="toolbar">
       <fieldset class="language-filter">
@@ -142,6 +146,8 @@
   </section>
 </template>
 <script setup lang="ts">
+import GiveawayEmblem from '../support/GiveawayEmblem.vue';
+import GiveawayTime from '../support/GiveawayTime.vue';
 import { computed, nextTick, onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
@@ -332,12 +338,28 @@ onBeforeUnmount(() => {
 </script>
 <style scoped lang="scss">
 .giveaway-note {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
   margin: 16px 0;
   padding: 14px 16px;
   border-left: 3px solid rgb(var(--v-theme-support-accent));
   background: rgba(var(--v-theme-support-accent), 0.06);
   font-size: 14px;
   line-height: 1.6;
+}
+.giveaway-note strong {
+  font-size: 17px;
+}
+@media (max-width: 560px) {
+  .giveaway-note {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .board-prize-emblem {
+    width: 88px;
+  }
 }
 .giveaway-note p {
   margin: 6px 0;
