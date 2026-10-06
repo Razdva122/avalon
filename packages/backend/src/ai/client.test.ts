@@ -695,16 +695,16 @@ test.each([
     excludedPartners: [],
   });
 });
-test('opening self preference applies to uninvolved Good without forcing a late rejection or Evil strategy', () => {
-  expect(compactRequest(openingRequest('servant', false))).toMatchObject({
-    actionFacts: { openingSelfPreference: true, team: [2, 3], youAreOnTeam: false },
-  });
+test('opening action facts report participation without prescribing a self preference', () => {
   for (const r of [
+    openingRequest('servant', false),
     openingRequest('servant', true),
     openingRequest('mordred', false),
     openingRequest('servant', false, 3),
   ]) {
-    expect(compactRequest(r)).toMatchObject({ actionFacts: { openingSelfPreference: false } });
+    const facts = compactRequest(r).actionFacts!;
+    expect(facts.youAreOnTeam).toBe(facts.team.includes(facts.yourSeat));
+    expect(facts).not.toHaveProperty('openingSelfPreference');
   }
 });
 test('action facts count an Evil player themselves and preserve the two-Fail threshold', () => {
@@ -719,7 +719,6 @@ test('action facts count an Evil player themselves and preserve the two-Fail thr
       knownEvilOnTeam: [1],
       failsRequired: 2,
       toleratesFails: 1,
-      openingSelfPreference: false,
     },
   });
 });

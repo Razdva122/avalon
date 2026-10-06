@@ -60,6 +60,41 @@ test('proposals include oneself by default and keep original legal rosters', () 
   expect(rule.choices.every((choice) => choice.split(', ').includes('3') && r.choices.includes(choice))).toBe(true);
 });
 
+test.each(['servant', 'morgana'])('%s may discuss rosters without self while final proposals keep self', (role) => {
+  const request = {
+    playerID: '1',
+    choices: ['1, 2, 3', '2, 3, 4', '1, 3, 4', '3, 4, 5'],
+    publicDiscussion: true,
+    chat: [],
+    state: {
+      stage: 'selectTeam',
+      mission: 1,
+      vote: 0,
+      players: Array.from({ length: 8 }, (_, i) => ({
+        id: String(i + 1),
+        index: i + 1,
+        role: i === 0 ? role : 'unknown',
+        features: { isLeader: i === 0 },
+      })),
+      history: [
+        {
+          type: 'mission',
+          index: 0,
+          leaderID: '1',
+          result: 'fail',
+          fails: 1,
+          actions: [
+            { playerID: '1', value: 'success' },
+            { playerID: '2', value: 'fail' },
+          ],
+        },
+      ],
+    },
+  } as unknown as BotRequest;
+  expect(tablePolicy(request).choices).toEqual(['1, 3, 4', '3, 4, 5']);
+  expect(tablePolicy({ ...request, publicDiscussion: false }).choices).toEqual(['1, 3, 4']);
+});
+
 test('guarded decisions map back to original action indices and keep the mandatory public stance', async () => {
   const r = fixtures.find((f) => f.name === 'postulate-morgana-3')!.request as unknown as BotRequest;
   const generate = jest.fn().mockResolvedValue({

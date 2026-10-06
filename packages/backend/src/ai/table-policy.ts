@@ -35,7 +35,7 @@ export function tablePolicy(request: BotRequest) {
           .map(Number)
           .includes(c.you?.seat as number),
       );
-      if (withSelf.length) choices = withSelf;
+      if (!request.publicDiscussion && withSelf.length) choices = withSelf;
     }
     if (!choices.length)
       throw new AiPause('Нет команды, совместимой с заданными постулатами игрока. Партия приостановлена.');
