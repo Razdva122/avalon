@@ -157,7 +157,6 @@ export default defineComponent({
     const spectatorRoles = ref<Record<string, TRoles>>({});
     const canJoinAi = computed(() =>
       Boolean(
-        store.state.profile?.isAdmin &&
         roomState.value?.leaderID === userID.value &&
         roomState.value?.ai?.status === 'ready' &&
         !roomState.value.ai.humanPlayerID,

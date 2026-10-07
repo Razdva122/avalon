@@ -336,3 +336,36 @@ test('mixed game summary counts the bots separately from the single human', asyn
   t.after(panel.stop);
   assert.ok(panel.html.includes('1 человек + 6 ботов'));
 });
+
+test('room owner can reach the join control with an authenticated profile that omits the admin flag', async (t) => {
+  const filename = path.join(__dirname, '../src/pages/room/Room.vue');
+  const { descriptor } = parse(fs.readFileSync(filename, 'utf8'));
+  const source = ts.createSourceFile(filename, descriptor.script.content, ts.ScriptTarget.Latest, true);
+  let initializer;
+  const visit = (node) => {
+    if (ts.isVariableDeclaration(node) && node.name.getText(source) === 'canJoinAi')
+      initializer = node.initializer.getText(source);
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  assert.ok(initializer);
+  const store = { state: { profile: { id: 'owner' } } };
+  const roomState = vue.ref({ leaderID: 'owner', ai: { status: 'ready' } });
+  const userID = vue.computed(() => store.state.profile.id);
+  const canJoin = new Function('computed', 'store', 'roomState', 'userID', `return (${initializer});`)(
+    vue.computed,
+    store,
+    roomState,
+    userID,
+  );
+  assert.equal(canJoin.value, true);
+  const panel = await fixture('components/view/panels/AiRoomPanel.vue', {
+    props: { roomID: 'room', ai: roomState.value.ai, canJoin: canJoin.value },
+  });
+  t.after(panel.stop);
+  assert.ok(panel.html.includes('Play with bots'));
+  panel.access.canManage.value = false;
+  assert.ok(!(await panel.render()).includes('Play with bots'), 'server permission is still required');
+  roomState.value.leaderID = 'another-owner';
+  assert.equal(canJoin.value, false);
+});
