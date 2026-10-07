@@ -249,7 +249,14 @@ export async function searchBoardMembers(value: unknown) {
     .lean();
   return { members: profiles.map((p) => ({ userID: p.id, name: p.name, avatar: p.avatar ?? 'servant' })) };
 }
-export async function publicBoards(kind: BoardKind, language: string | undefined, page: number, now: Date) {
+export async function publicBoards(
+  kind: BoardKind,
+  language: string | undefined,
+  page: number,
+  now: Date,
+  communication?: 'voice' | 'text',
+  beginnerFriendly = false,
+) {
   const items = await boardListingModel
     .aggregate<StoredBoard>([
       {
@@ -260,6 +267,8 @@ export async function publicBoards(kind: BoardKind, language: string | undefined
           publishingBlocked: false,
           expiresAt: { $gt: now },
           ...(language ? { languages: language } : {}),
+          ...(communication ? { communication: { $in: [communication, 'either'] } } : {}),
+          ...(kind === 'group' && beginnerFriendly ? { beginnerFriendly: true } : {}),
         },
       },
       { $sort: { bumpedAt: -1, _id: -1 } },

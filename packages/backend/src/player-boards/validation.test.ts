@@ -1,4 +1,4 @@
-import { validateBoardDraft } from './validation';
+import { boardQuery, validateBoardDraft } from './validation';
 test('old drafts normalize missing members to an empty list', () => {
   expect(validateBoardDraft({ ...draft, groupName: 'Avalon' }, 'group')).toHaveProperty('memberIDs', []);
 });
@@ -114,4 +114,13 @@ test.each([
   expect(() =>
     validateBoardDraft({ ...draft, groupName: 'Avalon', contacts: [{ type: 'discord', value }] }, 'group'),
   ).toThrow('invalid_contacts');
+});
+
+test('public filters validate communication and beginner flags', () => {
+  expect(boardQuery({ kind: 'group', communication: 'voice', beginnerFriendly: '1' })).toMatchObject({
+    communication: 'voice',
+    beginnerFriendly: true,
+  });
+  expect(() => boardQuery({ communication: ['voice'] })).toThrow('invalid_communication');
+  expect(() => boardQuery({ beginnerFriendly: 'yes' })).toThrow('invalid_request');
 });

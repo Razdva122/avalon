@@ -1,6 +1,6 @@
 <template>
   <main class="community-page">
-    <header class="community-hero">
+    <header class="community-hero" :class="{ 'community-hero--compact': activeTab !== 'servers' }">
       <nav class="community-breadcrumbs" :aria-label="t('community.title')">
         <LocaleLink :to="{ name: 'lobby' }">{{ t('menu.home') }}</LocaleLink
         ><span aria-hidden="true">/</span
@@ -14,14 +14,10 @@
           }}</span></template
         >
       </nav>
-      <p class="eyebrow">AVALON · {{ t('community.eyebrow') }}</p>
+      <p v-if="activeTab === 'servers'" class="eyebrow">AVALON · {{ t('community.eyebrow') }}</p>
       <h1>
         {{
-          t(
-            activeTab === 'servers'
-              ? 'community.title'
-              : `playerBoards.${activeTab === 'solo' ? 'seoSoloTitle' : 'seoGroupTitle'}`,
-          )
+          t(activeTab === 'servers' ? 'community.title' : `playerBoards.${activeTab === 'solo' ? 'players' : 'teams'}`)
         }}
       </h1>
       <p class="intro">
@@ -29,7 +25,7 @@
           t(
             activeTab === 'servers'
               ? 'community.intro'
-              : `playerBoards.${activeTab === 'solo' ? 'seoSoloIntro' : 'seoGroupIntro'}`,
+              : `playerBoards.${activeTab === 'solo' ? 'browsePlayersIntro' : 'browseTeamsIntro'}`,
           )
         }}
       </p>
@@ -159,9 +155,9 @@ const route = useRoute();
 const router = useRouter();
 const boardKinds = ['solo', 'group'] as const;
 const tabs = [
-  { value: 'servers', label: 'community.servers', route: 'community' },
-  { value: 'solo', label: 'playerBoards.solo', route: 'community_solo' },
-  { value: 'group', label: 'playerBoards.group', route: 'community_group' },
+  { value: 'servers', label: 'playerBoards.communities', route: 'community' },
+  { value: 'solo', label: 'playerBoards.players', route: 'community_solo' },
+  { value: 'group', label: 'playerBoards.teams', route: 'community_group' },
 ] as const;
 type CommunityTab = (typeof tabs)[number]['value'];
 const activeTab = computed<CommunityTab>(() =>
@@ -236,6 +232,20 @@ const directoryEntries = [
 .community-hero {
   max-width: 730px;
   margin-bottom: 48px;
+}
+.community-hero--compact {
+  margin-bottom: 24px;
+  .community-breadcrumbs {
+    margin-bottom: 12px;
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-size: clamp(26px, 4vw, 34px);
+  }
+  .intro {
+    font-size: 16px;
+    line-height: 1.5;
+  }
 }
 .eyebrow {
   font-size: 12px;
@@ -506,7 +516,7 @@ h3 {
       }
     }
   }
-  .community-hero {
+  .community-hero:not(.community-hero--compact) {
     margin-bottom: 32px;
   }
   .server-card {

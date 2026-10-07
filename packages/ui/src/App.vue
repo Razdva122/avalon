@@ -7,8 +7,8 @@
       <ConnectStatus v-if="currentRoute === 'room'" class="connect-status" />
     </div>
     <nav class="header-navigation" :aria-label="$t('menu.menu')">
-      <LocaleLink :to="{ name: 'community' }" :class="{ active: inSection('/community/') }">{{
-        $t('community.title')
+      <LocaleLink :to="{ name: 'community_group' }" :class="{ active: inSection('/community/') }">{{
+        $t('playerBoards.findCompany')
       }}</LocaleLink>
       <LocaleLink class="desktop-navigation" :to="{ name: 'wiki' }" :class="{ active: inSection('/wiki/') }">{{
         $t('menu.rulesRoles')

@@ -154,7 +154,17 @@ export function boardQuery(query: Record<string, unknown>) {
     throw Error('invalid_languages');
   const pageValue = query.page ?? '1';
   if (typeof pageValue !== 'string' || !/^[1-9]\d{0,4}$/.test(pageValue)) throw Error('invalid_page');
-  return { kind, language: language as string | undefined, page: Number(pageValue) };
+  const communication = query.communication;
+  if (communication !== undefined && communication !== 'voice' && communication !== 'text')
+    throw Error('invalid_communication');
+  if (query.beginnerFriendly !== undefined && query.beginnerFriendly !== '1') throw Error('invalid_request');
+  return {
+    kind,
+    language: language as string | undefined,
+    page: Number(pageValue),
+    communication: communication as 'voice' | 'text' | undefined,
+    beginnerFriendly: kind === 'group' && query.beginnerFriendly === '1',
+  };
 }
 export function reportReason(value: unknown): BoardReportReason {
   if (!(BOARD_REPORT_REASONS as readonly unknown[]).includes(value)) throw Error('invalid_report');

@@ -77,3 +77,29 @@ test('network and timeout failures always have localized recovery copy', () => {
   assert.equal(boardClientError(new Error('cooldownError')), 'cooldownError');
   assert.equal(boardClientError(new Error('SecretDatabaseName')), 'error');
 });
+
+test('communication and beginner filters are sent with pagination instead of filtering one page locally', () => {
+  assert.equal(
+    publicQuery('group', 'ru', 2, 'voice', true),
+    '?kind=group&page=2&language=ru&communication=voice&beginnerFriendly=1',
+  );
+  assert.equal(publicQuery('solo', '', 1, 'text', true), '?kind=solo&page=1&communication=text');
+});
+
+test('contact hints compile in every locale and keep the Telegram username example', () => {
+  const { createI18n } = require('vue-i18n');
+  const { baseCompile } = require('@intlify/message-compiler');
+  const { playerBoards } = require('../src/i18n/langs/pages/playerBoards.ts');
+  for (const [locale, messages] of Object.entries(playerBoards)) {
+    const i18n = createI18n({ legacy: false, locale, messages: { [locale]: messages } });
+    for (const key of Object.keys(messages).filter((key) => /^(accountHelp_|inviteHelp_)/.test(key))) {
+      baseCompile(messages[key], {
+        onError(error) {
+          throw error;
+        },
+      });
+      assert.ok(i18n.global.t(key).length > 0);
+    }
+    assert.match(i18n.global.t('accountHelp_telegram'), /@avalon_player/);
+  }
+});

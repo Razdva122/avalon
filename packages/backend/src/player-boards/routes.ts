@@ -34,8 +34,8 @@ export function createPlayerBoardsRouter(now = () => new Date()) {
   router.get(
     '/',
     asyncRoute(async (req, res) => {
-      const { kind, language, page } = boardQuery(req.query);
-      res.json(await publicBoards(kind, language, page, now()));
+      const { kind, language, page, communication, beginnerFriendly } = boardQuery(req.query);
+      res.json(await publicBoards(kind, language, page, now(), communication, beginnerFriendly));
     }),
   );
   router.use(

@@ -37,14 +37,22 @@
     <GiveawayBanner />
     <div class="lobby-content">
       <aside class="lobby-sidebar">
-        <LocaleLink class="discord-card" :to="{ name: 'community' }">
-          <span class="discord-icon material-icons" aria-hidden="true">groups</span>
-          <div>
-            <h2>{{ $t('mainPage.findPlayers') }}</h2>
-            <p>{{ $t('community.bannerText') }}</p>
-          </div>
-          <span class="discord-arrow" aria-hidden="true">→</span>
-        </LocaleLink>
+        <section class="play-with-card" aria-labelledby="play-with-title">
+          <h2 id="play-with-title">
+            <span class="material-icons" aria-hidden="true">groups</span>{{ $t('playerBoards.playWith') }}
+          </h2>
+          <nav :aria-label="$t('playerBoards.playWith')">
+            <LocaleLink :to="{ name: 'community_group' }">
+              {{ $t('playerBoards.findTeam') }}<span aria-hidden="true">→</span>
+            </LocaleLink>
+            <LocaleLink :to="{ name: 'community_solo' }">
+              {{ $t('playerBoards.findPlayers') }}<span aria-hidden="true">→</span>
+            </LocaleLink>
+            <LocaleLink class="communities-link" :to="{ name: 'community' }">
+              {{ $t('playerBoards.communities') }}<span aria-hidden="true">→</span>
+            </LocaleLink>
+          </nav>
+        </section>
         <LocaleLink class="support-card" :to="{ name: 'support' }">
           <div class="support-card__heading">
             <span class="support-card__icon" aria-hidden="true">
@@ -718,14 +726,47 @@ h1 {
   display: grid;
   gap: 20px;
 }
-.discord-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.play-with-card {
   padding: 18px 16px;
   border: 1px solid rgba(var(--v-theme-text-primary), 0.08);
   border-radius: 14px;
   background: rgba(var(--v-theme-inset), 0.65);
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  nav {
+    display: grid;
+    gap: 8px;
+  }
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgb(var(--v-theme-support-button));
+    color: rgb(var(--v-theme-support-accent));
+    font-size: 14px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    &:hover {
+      background: rgb(var(--v-theme-inset-hover));
+    }
+  }
+  .communities-link {
+    border-top: 1px solid rgb(var(--v-theme-surface-border));
+    border-radius: 0;
+    background: transparent;
+    color: rgb(var(--v-theme-text-secondary));
+    font-weight: 400;
+  }
 }
 .support-card {
   display: flex;
@@ -809,35 +850,6 @@ h1 {
     transition: none;
   }
 }
-.discord-icon {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background: #5865f2;
-  color: white;
-  font-size: 20px;
-}
-.discord-card h2 {
-  font-size: 15px;
-  line-height: 1.4;
-  font-weight: 600;
-}
-.discord-card p {
-  margin-top: 4px;
-  font-size: 12px;
-  line-height: 1.5;
-  color: rgba(var(--v-theme-text-primary), 0.65);
-}
-.discord-arrow {
-  margin-left: auto;
-  opacity: 0.6;
-}
-.discord-card:hover {
-  background: rgb(var(--v-theme-inset));
-}
 .leaderboard-panel {
   padding: 16px;
   border: 1px solid rgba(var(--v-theme-text-primary), 0.08);
@@ -913,7 +925,7 @@ a:focus-visible {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
   }
-  .discord-card {
+  .play-with-card {
     grid-column: 1 / -1;
   }
 }
@@ -954,7 +966,7 @@ a:focus-visible {
   .lobby-sidebar {
     grid-template-columns: minmax(0, 1fr);
   }
-  .discord-card {
+  .play-with-card {
     padding: 12px 16px;
   }
   .leaderboard-panel {

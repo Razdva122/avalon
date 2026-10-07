@@ -1,7 +1,11 @@
 <template>
   <form class="board-form" @submit.prevent="submit">
     <fieldset :disabled="busy">
-      <legend>{{ t(`playerBoards.${initial ? 'edit' : 'publish'}`) }}</legend>
+      <legend>{{ t(`playerBoards.${initial ? 'edit' : kind === 'group' ? 'publishTeam' : 'publishPlayer'}`) }}</legend>
+      <p v-if="draftSaved" class="draft-note" role="status">
+        {{ t('playerBoards.draftSaved') }}
+        <button type="button" @click="discardDraft">{{ t('playerBoards.discardDraft') }}</button>
+      </p>
       <div class="form-grid">
         <label v-if="kind === 'group'" class="wide"
           >{{ t('playerBoards.groupName')
@@ -116,26 +120,40 @@
       <h4>{{ t('playerBoards.contacts') }}</h4>
       <p class="hint">{{ t(`playerBoards.${kind === 'group' ? 'groupContactHint' : 'contactHint'}`) }}</p>
       <div v-for="(contact, index) in draft.contacts" :key="index" class="contact-row">
-        <label
-          ><span><ContactIcon :type="contact.type" /> {{ t('playerBoards.contactType') }}</span
-          ><select v-model="contact.type">
-            <option v-for="type in contactTypes" :key="type" :value="type">
+        <div class="contact-platform-picker wide">
+          <p :id="`contact-platform-${index}`">{{ t('playerBoards.contactType') }}</p>
+          <div class="contact-platforms" role="group" :aria-labelledby="`contact-platform-${index}`">
+            <button
+              v-for="type in contactTypes"
+              :key="type"
+              type="button"
+              :class="{ selected: contact.type === type }"
+              :aria-pressed="contact.type === type"
+              :disabled="draft.contacts.some((other, otherIndex) => otherIndex !== index && other.type === type)"
+              @click="contact.type = type"
+            >
+              <ContactIcon :type="type" />
               {{ type === 'qqGroup' ? t('playerBoards.qqGroup') : contactLabel(type) }}
-            </option>
-          </select></label
-        >
+              <span v-if="contact.type === type" aria-hidden="true">✓</span>
+            </button>
+          </div>
+        </div>
         <label
           >{{ t(`playerBoards.${kind === 'group' ? 'contactIDOrLink' : 'contactID'}`)
           }}<input
             v-model.trim="contact.value"
-            :aria-describedby="kind === 'group' ? `contact-help-${index}` : undefined"
+            :aria-describedby="`contact-help-${index}`"
             required
             :maxlength="kind === 'group' ? 512 : 80"
             autocomplete="off"
             spellcheck="false"
         /></label>
-        <p v-if="kind === 'group'" :id="`contact-help-${index}`" class="hint contact-help">
-          {{ t(`playerBoards.inviteHelp_${contact.type}`) }}
+        <button type="button" @click="draft.contacts.splice(index, 1)">
+          {{ t('playerBoards.removeContact') }}
+        </button>
+        <p :id="`contact-help-${index}`" class="hint contact-help">
+          <span v-if="contact.type !== 'qqGroup'">{{ t(`playerBoards.accountHelp_${contact.type}`) }}</span>
+          <span v-if="kind === 'group'"> {{ t(`playerBoards.inviteHelp_${contact.type}`) }}</span>
         </p>
         <p
           v-if="invalid && !validBoardContact(contact.type, contact.value, kind === 'group')"
@@ -144,17 +162,33 @@
         >
           {{ t('playerBoards.invalidContact') }}
         </p>
-        <button v-if="draft.contacts.length > 1" type="button" @click="draft.contacts.splice(index, 1)">
-          {{ t('playerBoards.removeContact') }}
+      </div>
+      <div v-if="draft.contacts.length < 2 && (!draft.contacts.length || choosingContact)" class="new-contact-picker">
+        <p id="new-contact-platform">{{ t('playerBoards.chooseContactPlatform') }}</p>
+        <div class="contact-platforms" role="group" aria-labelledby="new-contact-platform">
+          <button
+            v-for="type in contactTypes"
+            :key="type"
+            type="button"
+            :disabled="draft.contacts.some((contact) => contact.type === type)"
+            @click="addContact(type)"
+          >
+            <ContactIcon :type="type" />
+            {{ type === 'qqGroup' ? t('playerBoards.qqGroup') : contactLabel(type) }}
+          </button>
+        </div>
+        <button v-if="draft.contacts.length" type="button" @click="choosingContact = false">
+          {{ t('playerBoards.cancel') }}
         </button>
       </div>
-      <button v-if="draft.contacts.length < 2" type="button" @click="addContact">
+      <button v-else-if="draft.contacts.length < 2" type="button" @click="choosingContact = true">
         {{ t('playerBoards.addContact') }}
       </button>
       <p class="privacy-note">{{ t('playerBoards.publicContacts') }}</p>
       <p v-if="invalid" class="form-error" role="alert">{{ t('playerBoards.required') }}</p>
       <div class="form-actions">
-        <button class="primary" type="submit">{{ t(`playerBoards.${initial ? 'save' : 'publish'}`) }}</button
+        <button class="primary" type="submit">
+          {{ t(`playerBoards.${initial ? 'save' : kind === 'group' ? 'publishTeam' : 'publishPlayer'}`) }}</button
         ><button type="button" @click="$emit('cancel')">{{ t('playerBoards.cancel') }}</button>
       </div>
     </fieldset>
@@ -163,7 +197,8 @@
 
 <script setup lang="ts">
 import { validBoardContact } from '@avalon/types/board-contact';
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
+import { readBoardDraft, writeBoardDraft, clearBoardDraft } from './board-form-session';
 import ContactIcon from './ContactIcon.vue';
 import MemberPicker from './MemberPicker.vue';
 import { useI18n } from 'vue-i18n';
@@ -171,12 +206,10 @@ import { BOARD_LANGUAGES, BOARD_CONTACT_TYPES } from '@avalon/types/player-board
 import type { BoardDraft, BoardListing, BoardKind, BoardContactType } from '@avalon/types/player-board';
 import { contactLabel, editableDraft } from './board-helpers';
 import { dayKeys, formatHour, languageFlags } from './board-display';
-const props = defineProps<{ kind: BoardKind; initial?: BoardDraft; busy: boolean }>();
+const props = defineProps<{ kind: BoardKind; initial?: BoardDraft; busy: boolean; draftKey?: string }>();
 const emit = defineEmits<{ (e: 'save', draft: BoardDraft): void; (e: 'cancel'): void }>();
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const contactTypes = BOARD_CONTACT_TYPES.filter((type) => props.kind === 'group' || type !== 'qqGroup');
-const defaultContact: BoardContactType =
-  locale.value === 'zh-TW' ? 'line' : locale.value === 'zh-CN' ? 'wechat' : 'discord';
 const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 const timeZones = Array.from(
   new Set([
@@ -194,37 +227,62 @@ const timeZones = Array.from(
     'America/Sao_Paulo',
   ]),
 );
-const draft = reactive<BoardDraft>(
-  props.initial
-    ? {
-        ...editableDraft(props.initial),
-        ...(!props.initial.scheduleEnabled ? { startHour: 19, endHour: 22, timeZone } : {}),
-      }
-    : {
-        kind: props.kind,
-        memberIDs: [],
-        groupName: '',
-        languages: [],
-        otherLanguage: '',
-        scheduleEnabled: false,
-        days: [],
-        startHour: 19,
-        endHour: 22,
-        timeZone,
-        communication: 'either',
-        experience: 'beginner',
-        beginnerFriendly: props.kind === 'group',
-        canTeach: false,
-        groupSize: props.kind === 'group' ? 4 : 1,
+const defaultDraft: BoardDraft = props.initial
+  ? {
+      ...editableDraft(props.initial),
+      ...(!props.initial.scheduleEnabled ? { startHour: 19, endHour: 22, timeZone } : {}),
+    }
+  : {
+      kind: props.kind,
+      memberIDs: [],
+      groupName: '',
+      languages: [],
+      otherLanguage: '',
+      scheduleEnabled: false,
+      days: [],
+      startHour: 19,
+      endHour: 22,
+      timeZone,
+      communication: 'either',
+      experience: 'beginner',
+      beginnerFriendly: props.kind === 'group',
+      canTeach: false,
+      groupSize: props.kind === 'group' ? 4 : 1,
 
-        contacts: [{ type: defaultContact, value: '' }],
-      },
+      contacts: [],
+    };
+const restoredDraft = props.draftKey ? readBoardDraft(props.draftKey, defaultDraft) : null;
+const draft = reactive<BoardDraft>(restoredDraft ?? JSON.parse(JSON.stringify(defaultDraft)));
+const draftSaved = ref(Boolean(restoredDraft));
+const choosingContact = ref(false);
+let discardingDraft = false;
+watch(
+  draft,
+  () => {
+    if (props.draftKey && !discardingDraft) draftSaved.value = writeBoardDraft(props.draftKey, draft);
+  },
+  { deep: true, flush: 'sync' },
 );
+function discardDraft() {
+  discardingDraft = true;
+  Object.assign(draft, JSON.parse(JSON.stringify(defaultDraft)));
+  if (props.draftKey) clearBoardDraft(props.draftKey);
+  draftSaved.value = false;
+  invalid.value = false;
+  choosingContact.value = false;
+  discardingDraft = false;
+}
 const hours = Array.from({ length: 24 }, (_, i) => i);
 const invalid = ref(false);
-function addContact() {
-  const type = contactTypes.find((value) => !draft.contacts.some((contact) => contact.type === value));
-  if (type) draft.contacts.push({ type, value: '' });
+function addContact(type: BoardContactType) {
+  if (
+    draft.contacts.length >= 2 ||
+    !contactTypes.includes(type) ||
+    draft.contacts.some((contact) => contact.type === type)
+  )
+    return;
+  draft.contacts.push({ type, value: '' });
+  choosingContact.value = false;
 }
 function submit() {
   let validZone = true;
@@ -237,6 +295,7 @@ function submit() {
     (draft.scheduleEnabled && (!validZone || !draft.days.length || draft.startHour === draft.endHour)) ||
     !draft.languages.length ||
     (draft.languages.includes('other') && !/^[\p{L}][\p{L}\p{M} '’(),-]{0,59}$/u.test(draft.otherLanguage.trim())) ||
+    !draft.contacts.length ||
     draft.contacts.some((contact) => !validBoardContact(contact.type, contact.value, props.kind === 'group')) ||
     (props.kind === 'group' && !draft.groupName?.trim()) ||
     (props.kind === 'group' &&
@@ -325,16 +384,57 @@ input[type='checkbox'] {
 }
 .contact-row {
   display: grid;
-  grid-template-columns: minmax(100px, 1fr) minmax(100px, 2fr) auto;
+  grid-template-columns: minmax(100px, 1fr) auto;
   gap: 12px;
   align-items: end;
-  margin: 14px 0;
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid rgb(var(--v-theme-support-border));
+  border-radius: 8px;
+}
+.contact-platform-picker,
+.new-contact-picker {
+  font-size: 14px;
+}
+.new-contact-picker {
+  margin: 16px 0;
+}
+.contact-platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+.contact-platforms button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgb(var(--v-theme-background));
+  cursor: pointer;
+}
+.contact-platforms button.selected {
+  border-color: rgb(var(--v-theme-primary));
+  background: rgba(var(--v-theme-primary), 0.1);
+  box-shadow: inset 0 0 0 1px rgb(var(--v-theme-primary));
+  font-weight: 600;
+}
+.contact-platforms button:disabled {
+  cursor: not-allowed;
 }
 h4 {
   font-size: 18px;
   margin: 24px 0 8px;
 }
 .hint {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.draft-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 20px;
   font-size: 13px;
   line-height: 1.6;
 }

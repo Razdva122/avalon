@@ -46,11 +46,30 @@
       <li v-if="listing.kind === 'group' && listing.beginnerFriendly">{{ t('playerBoards.beginnerFriendly') }}</li>
       <li v-if="listing.canTeach">{{ t('playerBoards.canTeach') }}</li>
     </ul>
-    <p v-if="listing.scheduleEnabled" class="schedule">
-      {{ listing.days.map((day) => t(`playerBoards.${dayKeys[day - 1]}`)).join(', ') }}<br />
-      <strong>{{ formatHour(listing.startHour) }}–{{ formatHour(listing.endHour) }}</strong> · {{ listing.timeZone }}
-      <span v-if="listing.endHour < listing.startHour"> · {{ t('playerBoards.overnight') }}</span>
-    </p>
+    <div v-if="localSchedule" class="schedule">
+      <p class="schedule-label">{{ t('playerBoards.yourTime', { zone: visitorZone }) }}</p>
+      <ul class="schedule-slots">
+        <li v-for="(slot, index) in localSchedule.slots" :key="index">
+          {{ t(`playerBoards.${dayKeys[slot.startDay - 1]}`) }}
+          <strong
+            >{{ slot.startTime }}–<template v-if="slot.startDay !== slot.endDay"
+              >{{ t(`playerBoards.${dayKeys[slot.endDay - 1]}`) }} </template
+            >{{ slot.endTime }}</strong
+          >
+        </li>
+      </ul>
+      <p class="hint">{{ t('playerBoards.scheduleReference', { date: scheduleReference }) }}</p>
+      <details class="original-schedule">
+        <summary>{{ t('playerBoards.originalSchedule') }}</summary>
+        <p>
+          {{ listing.days.map((day) => t(`playerBoards.${dayKeys[day - 1]}`)).join(', ') }}<br />
+          <strong>{{ formatHour(listing.startHour) }}–{{ formatHour(listing.endHour) }}</strong> ·
+          {{ listing.timeZone }}
+          <span v-if="listing.endHour < listing.startHour"> · {{ t('playerBoards.overnight') }}</span>
+        </p>
+      </details>
+    </div>
+    <p v-else class="schedule">{{ t('playerBoards.timeByAgreement') }}</p>
     <div class="board-contacts">
       <div v-for="(contact, index) in listing.contacts" :key="contact.type" class="contact">
         <span class="contact-platform"
@@ -63,21 +82,18 @@
           :href="boardInviteUrl(contact.type, contact.value)!"
           target="_blank"
           rel="noopener noreferrer nofollow ugc"
-          >{{ t('playerBoards.openInvite') }} ↗</a
+          >{{ t('playerBoards.joinTeam') }} ↗</a
         ><code v-else>{{ contact.value }}</code>
         <button
           type="button"
-          :aria-label="`${t(boardInviteUrl(contact.type, contact.value) ? 'playerBoards.copyLink' : 'playerBoards.copy')}: ${contactLabel(contact.type)}`"
+          :aria-label="`${t(contactCopyKey(contact))}: ${contactLabel(contact.type)}`"
           @click="copy(contact.value, index)"
         >
-          {{
-            t(
-              `playerBoards.${copied === index ? 'copied' : boardInviteUrl(contact.type, contact.value) ? 'copyLink' : 'copy'}`,
-            )
-          }}
+          {{ t(copied === index ? 'playerBoards.copied' : contactCopyKey(contact)) }}
         </button>
       </div>
     </div>
+    <p v-if="copyNextStep" role="status" class="hint">{{ copyNextStep }}</p>
     <p v-if="copyFailed" role="status" class="hint">{{ t('playerBoards.copyError') }}</p>
     <footer>
       <span>{{ t('playerBoards.bumped', { date: date(listing.bumpedAt) }) }}</span>
@@ -120,6 +136,7 @@ import CategoryIcon from './CategoryIcon.vue';
 import Avatar from '@/components/user/Avatar.vue';
 import { contactLabel, listingState, nextBumpAt } from './board-helpers';
 import { dayKeys, formatHour, languageFlags } from './board-display';
+import { localWeeklySchedule } from './board-schedule';
 const props = defineProps<{
   listing: BoardListing;
   owner?: boolean;
@@ -131,8 +148,31 @@ const props = defineProps<{
 defineEmits<{ (e: 'edit'): void; (e: 'action', action: BoardAction): void; (e: 'report'): void }>();
 const { t, locale } = useI18n();
 const state = computed(() => listingState(props.listing, props.now));
+const visitorZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const localSchedule = computed(() =>
+  props.listing.scheduleEnabled ? localWeeklySchedule(props.listing, visitorZone, props.now) : null,
+);
+const scheduleReference = computed(() =>
+  localSchedule.value
+    ? new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium', timeZone: 'UTC' }).format(
+        new Date(`${localSchedule.value.referenceDate}T00:00:00Z`),
+      )
+    : '',
+);
 const copied = ref(-1);
 const copyFailed = ref(false);
+function contactCopyKey(contact: BoardListing['contacts'][number]) {
+  if (boardInviteUrl(contact.type, contact.value)) return 'playerBoards.copyLink';
+  if (['discord', 'telegram'].includes(contact.type) && !/^\d+$/.test(contact.value.trim()))
+    return 'playerBoards.copyUsername';
+  return 'playerBoards.copy';
+}
+const copyNextStep = computed(() => {
+  const contact = props.listing.contacts[copied.value];
+  return contact && contactCopyKey(contact) === 'playerBoards.copyUsername'
+    ? t(`playerBoards.copyNext_${contact.type}`)
+    : '';
+});
 function date(value: string, time = false) {
   return new Intl.DateTimeFormat(locale.value, {
     dateStyle: 'medium',
@@ -140,6 +180,7 @@ function date(value: string, time = false) {
   }).format(new Date(value));
 }
 async function copy(value: string, index: number) {
+  copied.value = -1;
   copyFailed.value = false;
   try {
     await navigator.clipboard.writeText(value);
@@ -256,6 +297,27 @@ header {
 .schedule {
   line-height: 1.8;
   font-size: 14px;
+}
+.schedule-label {
+  font-weight: 600;
+}
+.schedule-slots {
+  list-style: none;
+  padding: 0;
+}
+.original-schedule {
+  margin-top: 8px;
+  summary {
+    width: fit-content;
+    cursor: pointer;
+    min-height: 44px;
+    padding: 8px 0;
+    color: rgb(var(--v-theme-primary));
+  }
+  summary:focus-visible {
+    outline: 2px solid rgb(var(--v-theme-support-accent));
+    outline-offset: 3px;
+  }
 }
 .board-contacts {
   display: flex;

@@ -1,21 +1,6 @@
 <template>
   <section id="player-boards" class="player-boards" aria-labelledby="board-title">
-    <header class="board-heading">
-      <div>
-        <h2 id="board-title">{{ t(`playerBoards.${kind}`) }}</h2>
-        <p>{{ t('playerBoards.intro') }}</p>
-      </div>
-    </header>
-    <p class="rules">{{ t('playerBoards.rules') }}</p>
-    <aside class="giveaway-note">
-      <GiveawayEmblem class="board-prize-emblem" />
-      <div>
-        <strong>{{ t('giveaway.title') }}</strong>
-        <p><GiveawayTime /></p>
-        <p>{{ t('giveaway.boardNotice') }}</p>
-        <LocaleLink :to="{ name: 'support', hash: '#giveaway' }">{{ t('giveaway.rulesTitle') }} →</LocaleLink>
-      </div>
-    </aside>
+    <h2 id="board-title" class="sr-only">{{ t(`playerBoards.${kind === 'group' ? 'teams' : 'players'}`) }}</h2>
     <div class="toolbar">
       <fieldset class="language-filter">
         <legend>{{ t('playerBoards.languages') }}</legend>
@@ -44,17 +29,40 @@
           </button>
         </div>
       </fieldset>
-      <button v-if="!profile" type="button" class="primary" @click="login">{{ t('playerBoards.login') }}</button>
+      <div class="quick-filters">
+        <label
+          >{{ t('playerBoards.communication') }}
+          <select v-model="communication">
+            <option value="">{{ t('playerBoards.anyCommunication') }}</option>
+            <option value="voice">{{ t('playerBoards.voice') }}</option>
+            <option value="text">{{ t('playerBoards.text') }}</option>
+          </select>
+        </label>
+        <label v-if="kind === 'group'" class="check-filter">
+          <input v-model="beginnerFriendly" type="checkbox" />{{ t('playerBoards.beginnerFriendly') }}
+        </label>
+        <button v-if="hasFilters" type="button" class="reset-filters" @click="resetFilters">
+          {{ t('playerBoards.resetFilters') }}
+        </button>
+      </div>
+      <button v-if="!profile" type="button" class="primary" @click="startPublish">
+        {{ t(`playerBoards.${kind === 'group' ? 'publishTeam' : 'publishPlayer'}`) }}
+      </button>
       <button
         v-else-if="account && !own && !account.banned"
         type="button"
         class="primary"
         :disabled="busy || (kind === 'group' && !account.canRecruit)"
-        @click="editing = true"
+        @click="startPublish"
       >
-        {{ t('playerBoards.publish') }}
+        {{ t(`playerBoards.${kind === 'group' ? 'publishTeam' : 'publishPlayer'}`) }}
       </button>
     </div>
+    <details class="board-how">
+      <summary>{{ t('playerBoards.howItWorks') }}</summary>
+      <p>{{ t('playerBoards.intro') }}</p>
+      <p>{{ t('playerBoards.rules') }}</p>
+    </details>
     <p v-if="account?.banned" class="notice">{{ t('playerBoards.banned') }}</p>
     <p v-else-if="profile && kind === 'group' && account && !account.canRecruit" class="notice">
       {{ t('playerBoards.eligibility') }}
@@ -67,15 +75,18 @@
       {{ t(`playerBoards.${error}`) }}
     </p>
     <p v-if="success" role="status" class="notice">{{ t(`playerBoards.${success}`) }}</p>
-    <BoardForm
-      v-if="editing && profile && account && !account.banned"
-      :key="`${kind}:${own?.id || 'new'}`"
-      :kind="kind"
-      :initial="own"
-      :busy="busy"
-      @save="save"
-      @cancel="editing = false"
-    />
+    <div v-if="editing" ref="formElement" tabindex="-1" class="board-editor">
+      <BoardForm
+        v-if="editing && profile && account && !account.banned"
+        :key="draftStorageKey"
+        :draft-key="draftStorageKey"
+        :kind="kind"
+        :initial="own"
+        :busy="busy"
+        @save="save"
+        @cancel="editing = false"
+      />
+    </div>
     <div v-if="own && !editing" ref="ownListingElement" tabindex="-1" class="own-listing">
       <BoardCard
         :listing="own"
@@ -92,7 +103,12 @@
       {{ t(`playerBoards.${loadError}`) }} <button @click="loadPublic">{{ t('playerBoards.retry') }}</button>
     </div>
     <template v-else>
-      <p v-if="!visibleListings.length" class="empty">{{ t(own ? 'playerBoards.noMatches' : 'playerBoards.empty') }}</p>
+      <div v-if="!visibleListings.length" class="empty">
+        <p>
+          {{ t(hasFilters ? 'playerBoards.noFilterMatches' : own ? 'playerBoards.noMatches' : 'playerBoards.empty') }}
+        </p>
+        <button v-if="hasFilters" type="button" @click="resetFilters">{{ t('playerBoards.resetFilters') }}</button>
+      </div>
       <BoardCard
         v-for="listing in visibleListings"
         :key="listing.id"
@@ -107,6 +123,11 @@
         ><button :disabled="!hasMore" @click="page++">{{ t('playerBoards.next') }}</button>
       </div>
     </template>
+    <aside class="giveaway-note">
+      <strong>{{ t('giveaway.title') }}</strong>
+      <span><GiveawayTime /></span>
+      <LocaleLink :to="{ name: 'support', hash: '#giveaway' }">{{ t('giveaway.rulesTitle') }} →</LocaleLink>
+    </aside>
     <v-dialog
       :model-value="Boolean(reportTarget)"
       max-width="460"
@@ -146,11 +167,12 @@
   </section>
 </template>
 <script setup lang="ts">
-import GiveawayEmblem from '../support/GiveawayEmblem.vue';
 import GiveawayTime from '../support/GiveawayTime.vue';
 import { computed, nextTick, onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
+import { useRoute, useRouter } from 'vue-router';
+import { clearBoardDraft } from './board-form-session';
 import { BOARD_LANGUAGES, BOARD_REPORT_REASONS } from '@avalon/types/player-board';
 import type {
   BoardKind,
@@ -176,17 +198,46 @@ const store = useStore();
 const profile = computed(() => store.state.profile);
 const props = defineProps<{ kind?: BoardKind }>();
 const kind = computed(() => props.kind ?? 'solo');
-const language = ref('');
-const page = ref(1);
+const route = useRoute();
+const router = useRouter();
+function updateQuery(changes: Record<string, string | undefined>) {
+  const query = { ...route.query, ...changes };
+  for (const key of Object.keys(query)) if (query[key] === undefined || query[key] === '') delete query[key];
+  void router.push({ query });
+}
+const language = computed({
+  get: () => (BOARD_LANGUAGES.some((item) => item.value === route.query.language) ? String(route.query.language) : ''),
+  set: (value: string) => updateQuery({ language: value || undefined, page: undefined }),
+});
+const communication = computed({
+  get: () =>
+    route.query.communication === 'voice' || route.query.communication === 'text' ? route.query.communication : '',
+  set: (value: string) => updateQuery({ communication: value || undefined, page: undefined }),
+});
+const beginnerFriendly = computed({
+  get: () => kind.value === 'group' && route.query.beginnerFriendly === '1',
+  set: (value: boolean) => updateQuery({ beginnerFriendly: value ? '1' : undefined, page: undefined }),
+});
+const page = computed({
+  get: () =>
+    typeof route.query.page === 'string' && /^[1-9]\d{0,4}$/.test(route.query.page) ? Number(route.query.page) : 1,
+  set: (value: number) => updateQuery({ page: value > 1 ? String(value) : undefined }),
+});
+const hasFilters = computed(() => Boolean(language.value || communication.value || beginnerFriendly.value));
+const resetFilters = () =>
+  updateQuery({ language: undefined, communication: undefined, beginnerFriendly: undefined, page: undefined });
 const hasMore = ref(false);
 const listings = ref<BoardListing[]>([]);
 const account = ref<BoardOwnerState | null>(null);
 const own = computed(() => account.value?.listings.find((item) => item.kind === kind.value));
+const draftStorageKey = computed(() => `${profile.value?.id}:${kind.value}:${own.value?.id || 'new'}`);
 const now = ref(Date.now());
 const visibleListings = computed(() =>
   listings.value.filter((item) => item.id !== own.value?.id && listingState(item, now.value) === 'active'),
 );
 const editing = ref(false);
+const publishAfterLogin = ref(false);
+const formElement = ref<HTMLElement | null>(null);
 const ownListingElement = ref<HTMLElement | null>(null);
 const mutationNotice = ref<HTMLElement | null>(null);
 async function reveal(element: typeof ownListingElement) {
@@ -194,7 +245,7 @@ async function reveal(element: typeof ownListingElement) {
   element.value?.focus({ preventScroll: true });
   element.value?.scrollIntoView({ block: 'start' });
 }
-const loading = ref(!prerender);
+const loading = ref(true);
 const accountLoading = ref(false);
 const busy = ref(false);
 const error = ref('');
@@ -212,14 +263,25 @@ let publicGeneration = 0;
 let accountGeneration = 0;
 let mounted = false;
 let timer: ReturnType<typeof setInterval> | undefined;
-const login = () => eventBus.emit('openAuthModal');
+function startPublish() {
+  if (!profile.value) {
+    publishAfterLogin.value = true;
+    eventBus.emit('openAuthModal');
+    return;
+  }
+  if (!account.value || account.value.banned || (kind.value === 'group' && !account.value.canRecruit)) return;
+  editing.value = true;
+  void reveal(formElement);
+}
 async function loadPublic() {
   if (!mounted) return;
   const generation = ++publicGeneration;
   loading.value = true;
   loadError.value = '';
   try {
-    const result = await boardRequest<BoardPage>(publicQuery(kind.value, language.value, page.value));
+    const result = await boardRequest<BoardPage>(
+      publicQuery(kind.value, language.value, page.value, communication.value, beginnerFriendly.value),
+    );
     if (generation !== publicGeneration) return;
     listings.value = result.listings;
     hasMore.value = result.hasMore;
@@ -240,7 +302,13 @@ async function loadAccount() {
   accountLoading.value = true;
   try {
     const result = await boardRequest<BoardOwnerState>('/me');
-    if (generation === accountGeneration) account.value = result;
+    if (generation === accountGeneration) {
+      account.value = result;
+      if (publishAfterLogin.value) {
+        publishAfterLogin.value = false;
+        startPublish();
+      }
+    }
   } catch (e) {
     if (generation === accountGeneration) accountError.value = boardClientError(e);
   } finally {
@@ -253,12 +321,14 @@ async function refresh() {
 async function mutate(path: string, method: string, body: unknown, message: string) {
   if (busy.value) return;
   const token = profile.value?.token;
+  const savedDraftKey = draftStorageKey.value;
   busy.value = true;
   error.value = '';
   success.value = '';
   try {
     await boardRequest(path, method, body);
     if (token !== profile.value?.token) return;
+    if (method === 'PUT') clearBoardDraft(savedDraftKey);
     editing.value = false;
     success.value = message;
     await refresh();
@@ -298,17 +368,17 @@ async function sendReport() {
 }
 watch(kind, () => {
   editing.value = false;
+  publishAfterLogin.value = false;
 });
-watch([kind, language], () => {
+watch([kind, language, communication, beginnerFriendly, page], () => {
   error.value = '';
   success.value = '';
-  if (page.value !== 1) page.value = 1;
-  else void loadPublic();
+  void loadPublic();
 });
-watch(page, () => void loadPublic());
 watch(
   () => profile.value?.token,
-  () => {
+  (_token, previousToken) => {
+    if (previousToken) publishAfterLogin.value = false;
     editing.value = false;
     account.value = null;
     reportTarget.value = '';
@@ -338,10 +408,10 @@ onBeforeUnmount(() => {
 </script>
 <style scoped lang="scss">
 .giveaway-note {
-  display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
+  gap: 4px 16px;
   margin: 16px 0;
   padding: 14px 16px;
   border-left: 3px solid rgb(var(--v-theme-support-accent));
@@ -350,19 +420,7 @@ onBeforeUnmount(() => {
   line-height: 1.6;
 }
 .giveaway-note strong {
-  font-size: 17px;
-}
-@media (max-width: 560px) {
-  .giveaway-note {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
-  }
-  .board-prize-emblem {
-    width: 88px;
-  }
-}
-.giveaway-note p {
-  margin: 6px 0;
+  font-size: 14px;
 }
 .giveaway-note a {
   display: inline-flex;
@@ -374,20 +432,6 @@ onBeforeUnmount(() => {
 .player-boards {
   margin: 0 0 56px;
   scroll-margin-top: 80px;
-}
-.board-heading h2 {
-  font-size: clamp(24px, 4vw, 32px);
-  line-height: 1.2;
-  margin-bottom: 12px;
-}
-.board-heading p {
-  max-width: 680px;
-  line-height: 1.65;
-}
-.rules {
-  font-size: 13px;
-  line-height: 1.6;
-  margin: 12px 0 24px;
 }
 
 button {
@@ -414,6 +458,47 @@ button:hover:not(:disabled) {
   gap: 16px;
   flex-wrap: wrap;
   margin: 20px 0;
+}
+.quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px 16px;
+}
+.check-filter {
+  flex-direction: row;
+  align-items: center;
+  min-height: 44px;
+  input {
+    width: 18px;
+    height: 18px;
+    accent-color: rgb(var(--v-theme-primary));
+  }
+}
+.board-how {
+  font-size: 13px;
+  line-height: 1.6;
+  summary {
+    cursor: pointer;
+    width: fit-content;
+    padding: 12px 0;
+    min-height: 44px;
+  }
+  p {
+    margin: 8px 0;
+  }
+}
+.board-editor {
+  scroll-margin-top: 80px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 label {
   display: flex;

@@ -214,7 +214,11 @@ const server = http.createServer((req, res) => {
       }
       if (pathname === '/') {
         assert.match(await page.$eval('.support-card', (el) => new URL(el.href).pathname), /\/support\/$/);
-        assert.match(await page.$eval('.discord-card', (el) => new URL(el.href).pathname), /\/community\/$/);
+        assert.deepEqual(
+          await page.$$eval('.play-with-card a', (links) => links.map((link) => new URL(link.href).pathname)),
+          ['/community/groups/', '/community/players/', '/community/'],
+          'Lobby search links must open the relevant listings directly and keep the community directory available',
+        );
       }
       assert.deepEqual(pageErrors, [], `Uncaught errors while navigating to ${pathname}`);
       await page.waitForFunction(

@@ -458,3 +458,28 @@ test('party members are editable public profiles and unknown accounts are reject
   const solo = await listing();
   expect(solo.memberIDs).toEqual([]);
 });
+
+test('communication and beginner filters apply before pagination and include flexible communication', async () => {
+  const seed = Array.from({ length: 24 }, (_, index) => ({
+    ...draft,
+    kind: 'group',
+    groupName: `Group ${index}`,
+    userID: 'alice',
+    active: true,
+    moderated: false,
+    publishingBlocked: false,
+    createdAt: new Date(time),
+    bumpedAt: new Date(time + index),
+    expiresAt: new Date(time + 30 * DAY),
+    communication: index === 0 ? 'either' : index < 3 ? 'voice' : 'text',
+    beginnerFriendly: index !== 2,
+  }));
+  // Insert through the collection with distinct authors to respect the owner/kind index.
+  await userProfileModel.collection.insertMany(seed.map((_, i) => ({ id: `filter${i}`, name: `Filter ${i}` })));
+  await boardListingModel.collection.insertMany(seed.map((item, i) => ({ ...item, userID: `filter${i}` })));
+  const page = await (await request('?kind=group&communication=voice&beginnerFriendly=1')).json();
+  expect(page.listings.map((item: { userID: string }) => item.userID)).toEqual(['filter1', 'filter0']);
+  expect(page.hasMore).toBe(false);
+  expect((await request('?kind=group&communication=invalid')).status).toBe(400);
+  expect((await request('?kind=group&beginnerFriendly=yes')).status).toBe(400);
+});

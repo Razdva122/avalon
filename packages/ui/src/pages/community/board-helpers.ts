@@ -77,9 +77,17 @@ export function editableDraft(listing: BoardDraft): BoardDraft {
     contacts: contacts.map(({ type, value }) => ({ type, value })),
   };
 }
-export function publicQuery(kind: BoardKind, language: string, page: number) {
+export function publicQuery(
+  kind: BoardKind,
+  language: string,
+  page: number,
+  communication = '',
+  beginnerFriendly = false,
+) {
   const query = new URLSearchParams({ kind, page: String(page) });
   if (language) query.set('language', language);
+  if (communication === 'voice' || communication === 'text') query.set('communication', communication);
+  if (kind === 'group' && beginnerFriendly) query.set('beginnerFriendly', '1');
   return `?${query}`;
 }
 
