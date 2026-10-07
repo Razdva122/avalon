@@ -35,7 +35,7 @@ test('past public positions survive recent-chat truncation, and private turns re
   r.chat.push({ name: '1', text: "I trust 2's Percival claim." });
   expect(claimContext(r).previousStances).toEqual([{ seat: 2, stance: 'trust' }]);
   expect(claimSpeech({ ...r, speak: false }, { choice: 0, speech: '' })).toBe('');
-  expect(claimSpeech({ ...r, privateDiscussion: true }, { choice: 0, speech: '' })).toBe('');
+  expect(claimSpeech({ ...r, councilDiscussion: true }, { choice: 0, speech: '' })).toBe('');
   expect(() =>
     claimSpeech(r, {
       choice: 0,

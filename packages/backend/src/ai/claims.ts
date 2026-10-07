@@ -33,7 +33,7 @@ export function claimContext(request: BotRequest) {
   const claims = [...claimsBySeat.values()];
   const publicTurn =
     request.speak &&
-    !request.privateDiscussion &&
+    !request.councilDiscussion &&
     !request.optionalSpeech &&
     ['selectTeam', 'votingForTeam', 'checkLoyalty', 'announceLoyalty'].includes(request.state.stage);
   const eligible = own && ['merlin', 'percival', 'mordred', 'morgana', 'minion', 'oberon'].includes(own.role);

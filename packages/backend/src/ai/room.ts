@@ -27,6 +27,7 @@ export class BotRoom extends Room {
   private cancelled = false;
   private executing = false;
   private wakeHuman?: () => void;
+  private discussionMessages?: { since: number; existing: Set<string | undefined> };
   private missionChoices = new Map<string, Choice>();
   budgetResumeUnits = 0;
   private discussion?: {
@@ -35,7 +36,8 @@ export class BotRoom extends Room {
     votes: Map<string, 'approve' | 'reject'>;
     pendingPublication?: { id: string; text: string; requestID: string };
   };
-  private revealedCouncil = 0;
+  private councilSpoken = new Set<string>();
+  private councilPending?: { id: string; text: string; requestID: string };
   private reviewedPlayers = new Set<string>();
   private abort = new AbortController();
   private failures = 0;
@@ -66,6 +68,21 @@ export class BotRoom extends Room {
       io,
       options,
     );
+    this.onChatMessage = (entry) => {
+      if (
+        entry.kind !== 'sticker' &&
+        entry.userID === this.ai?.humanPlayerID &&
+        this.ai.status === 'running' &&
+        this.ai.waitingForDiscussion &&
+        !(this.manager.game.stage === 'assassinate'
+          ? this.councilSpoken.has(entry.userID)
+          : this.discussion?.spoken.has(entry.userID)) &&
+        this.discussionMessages &&
+        entry.timestamp >= this.discussionMessages.since &&
+        !this.discussionMessages.existing.has(entry.id)
+      )
+        this.finishDiscussion(entry.userID);
+    };
     this.maxCapacity = playerCount;
     this.data = { stage: 'locked' };
     this.ai = {
@@ -94,19 +111,64 @@ export class BotRoom extends Room {
     delete this.ai!.profileRatingSeason;
   }
 
+  private councilComplete(): boolean {
+    return (
+      !this.councilPending &&
+      this.manager.game.players.filter((p) => p.role.loyalty === 'evil').every((p) => this.councilSpoken.has(p.userID))
+    );
+  }
+
+  override updateRoomState(direct = false, chatOnly = false) {
+    if (
+      this.ai &&
+      this.data.stage === 'started' &&
+      this.data.manager.game.stage === 'assassinate' &&
+      !this.councilComplete()
+    )
+      this.ai.discussionPending = true;
+    super.updateRoomState(direct, chatOnly);
+  }
+
   humanAction(userID: string, params: TGameMethodsParams): void {
     if (userID !== this.ai!.humanPlayerID || this.ai!.status !== 'running')
       throw Error('AI players are controlled by the server');
+    if (
+      (params.method === 'sentSelectedPlayers' && this.ai!.discussionPending) ||
+      (params.method === 'assassinate' && !this.councilComplete())
+    )
+      throw Error('Wait until the public discussion finishes');
     this.manager.callGameMethods(userID, params);
     if (params.method === 'sentSelectedPlayers' && this.manager.game.stage !== 'selectTeam')
       this.discussion = undefined;
     this.wakeHuman?.();
   }
 
-  private async waitForHuman(pending: () => boolean) {
+  finishDiscussion(userID: string): void {
+    if (userID !== this.ai!.humanPlayerID || this.ai!.status !== 'running' || !this.ai!.waitingForDiscussion)
+      throw Error('Not your discussion turn');
+    if (this.manager.game.stage === 'assassinate') {
+      if (
+        this.councilSpoken.has(userID) ||
+        this.manager.game.players.find((p) => p.userID === userID)?.role.loyalty !== 'evil'
+      )
+        throw Error('Not your discussion turn');
+      this.councilSpoken.add(userID);
+    } else {
+      if (this.manager.game.stage !== 'selectTeam' || !this.discussion || this.discussion.spoken.has(userID))
+        throw Error('Not your discussion turn');
+      this.discussion.spoken.add(userID);
+    }
+    this.wakeHuman?.();
+  }
+
+  private async waitForHuman(pending: () => boolean, discussion = false) {
     if (this.cancelled || !pending()) return;
     this.ai!.waitingForHuman = true;
-    this.ai!.message = aiText(this.language).waitingForHuman;
+    if (discussion) {
+      this.discussionMessages = { since: Date.now(), existing: new Set(this.chat.history.map((entry) => entry.id)) };
+      this.ai!.waitingForDiscussion = true;
+    }
+    this.ai!.message = discussion ? aiText(this.language).waitingForDiscussion : aiText(this.language).waitingForHuman;
     this.updateRoomState(true);
     let leaseTimer: ReturnType<typeof setTimeout> | undefined;
     let waiting = true;
@@ -136,6 +198,8 @@ export class BotRoom extends Room {
       clearTimeout(leaseTimer);
       this.wakeHuman = undefined;
       delete this.ai!.waitingForHuman;
+      delete this.ai!.waitingForDiscussion;
+      this.discussionMessages = undefined;
       this.updateRoomState(true);
     }
   }
@@ -207,7 +271,7 @@ export class BotRoom extends Room {
     choices: Choice[],
     speak: boolean,
     privateCheck?: string,
-    privateDiscussion = false,
+    councilDiscussion = false,
     publicDiscussion = false,
     optionalSpeech = false,
   ): Promise<BotReply | null> {
@@ -229,7 +293,7 @@ export class BotRoom extends Room {
       state,
       choices: choices.map((c) => c.text),
       privateCheck,
-      privateDiscussion,
+      councilDiscussion,
       publicDiscussion,
       optionalSpeech,
       rolesKnownBeforeReveal: state.stage === 'end' ? this.rolesKnownBeforeReveal.get(id) : undefined,
@@ -257,7 +321,7 @@ export class BotRoom extends Room {
     }
     // Only Evil needs a model call for the secret mission card: never expose its identity.
     const secretMission = state.stage === 'onMission' && Boolean(this.ai!.humanPlayerID);
-    if (state.stage !== 'onMission' && !(this.ai!.humanPlayerID && privateDiscussion)) this.ai!.thinkingPlayerID = id;
+    if (state.stage !== 'onMission') this.ai!.thinkingPlayerID = id;
     this.ai!.message = this.ai!.humanPlayerID
       ? aiText(this.language).thinking
       : state.stage === 'onMission'
@@ -308,12 +372,19 @@ export class BotRoom extends Room {
         reason: answer.privateReason.trim().slice(0, 240),
       });
     }
-    if (privateDiscussion) {
+    if (councilDiscussion) {
       this.evilCouncil.push({
         seat: this.label(id),
         target: choices[answer.choice].text,
         reason: answer.speech.trim(),
       });
+      this.councilSpoken.add(id);
+      this.councilPending = {
+        id,
+        text: aiText(this.language).council(choices[answer.choice].text, answer.speech.trim()),
+        requestID: randomUUID(),
+      };
+      await this.publishCouncil();
       return answer;
     }
     if (speak && answer.speech.trim()) {
@@ -361,15 +432,23 @@ export class BotRoom extends Room {
   private async discussTeam() {
     const id = this.manager.game.leader.userID;
     this.discussion ??= { spoken: new Set(), votes: new Map() };
+    if (this.ai!.humanPlayerID) {
+      this.ai!.discussionPending = true;
+      this.updateRoomState(true);
+    }
     const pending = this.discussion.pendingPublication;
     if (pending) {
       await this.publish(pending.id, pending.text, pending.requestID);
       if (this.cancelled) return;
     }
     for (const player of this.clockwiseSeats()) {
-      if (player === this.ai!.humanPlayerID) continue;
-      if (this.manager.game.stage !== 'selectTeam') return;
+      if (this.cancelled || this.manager.game.stage !== 'selectTeam') return;
       if (this.discussion.spoken.has(player)) continue;
+      if (player === this.ai!.humanPlayerID) {
+        await this.waitForHuman(() => !this.discussion?.spoken.has(player), true);
+        if (this.cancelled) return;
+        continue;
+      }
       const answer = await this.ask(
         player,
         'Discuss the next team before the leader chooses: recommend a legal roster, assess trust and known history, or ask a question. This is advice; do not cast or announce a binding vote.',
@@ -381,6 +460,8 @@ export class BotRoom extends Room {
       );
       if (!answer) return;
     }
+    delete this.ai!.discussionPending;
+    this.updateRoomState(true);
     if (id === this.ai!.humanPlayerID) {
       await this.waitForHuman(() => this.manager.game.stage === 'selectTeam');
       this.discussion = undefined;
@@ -430,10 +511,51 @@ export class BotRoom extends Room {
     await this.waitForHuman(() => this.manager.game.stage === 'votingForTeam');
   }
 
+  private async publishCouncil() {
+    const pending = this.councilPending;
+    if (!pending || this.cancelled) return;
+    await this.publish(pending.id, pending.text, pending.requestID);
+    if (!this.cancelled) this.councilPending = undefined;
+  }
+
+  private async discussAssassination() {
+    const game = this.manager.game;
+    this.ai!.discussionPending = true;
+    this.updateRoomState(true);
+    await this.publishCouncil();
+    for (const ally of game.players.filter((p) => p.role.loyalty === 'evil')) {
+      if (this.cancelled || game.stage !== 'assassinate') return;
+      if (this.councilSpoken.has(ally.userID)) continue;
+      if (ally.userID === this.ai!.humanPlayerID) {
+        await this.waitForHuman(() => game.stage === 'assassinate' && !this.councilSpoken.has(ally.userID), true);
+        continue;
+      }
+      const state = this.stateFor(ally.userID);
+      const choices = state.players
+        .filter((p) => !['evil', 'mordred', 'morgana', 'minion', 'oberon'].includes(p.role))
+        .map((p) => ({ text: this.label(p.id), actions: [] }));
+      const suggestion = await this.ask(
+        ally.userID,
+        'Evil council: discuss whom to assassinate in the public room chat, cite the strongest clue and compare an alternative. Respond to earlier teammates, including the human. This is advice, not the final shot.',
+        choices,
+        true,
+        undefined,
+        true,
+      );
+      if (!suggestion) return;
+    }
+    delete this.ai!.discussionPending;
+    this.updateRoomState(true);
+  }
+
   private async act() {
     const game = this.manager.game;
     if (game.stage === 'selectTeam') return this.discussTeam();
     if (game.stage === 'votingForTeam') return this.voteForTeam();
+    if (game.stage === 'assassinate') {
+      await this.discussAssassination();
+      if (this.cancelled || game.stage !== 'assassinate') return;
+    }
     const batchMission = game.stage === 'onMission' && Boolean(this.ai!.humanPlayerID);
     const actor = game.players.find(
       (p) =>
@@ -499,21 +621,6 @@ export class BotRoom extends Room {
             text: this.label(p.id),
             actions: [...this.select([p.id]), { method: 'assassinate', type: 'merlin' }],
           }));
-        for (const ally of state.players.filter((p) =>
-          ['evil', 'mordred', 'morgana', 'minion', 'oberon'].includes(p.role),
-        )) {
-          if (ally.id === this.ai!.humanPlayerID) continue;
-          if (this.evilCouncil.some((entry) => entry.seat === this.label(ally.id))) continue;
-          const suggestion = await this.ask(
-            ally.id,
-            'Private Evil council: suggest whom to assassinate, cite the strongest clue and compare an alternative. Respond to earlier teammates. This is advice, not the final shot.',
-            choices.map((c) => ({ text: c.text, actions: [] })),
-            true,
-            undefined,
-            true,
-          );
-          if (!suggestion) return;
-        }
         break;
       default:
         throw new AiPause('Unsupported game stage.');
@@ -559,11 +666,6 @@ export class BotRoom extends Room {
         await this.checkpoint(this.calculateRoomState());
       }
       if (!this.cancelled) {
-        for (; this.revealedCouncil < this.evilCouncil.length; this.revealedCouncil++) {
-          const entry = this.evilCouncil[this.revealedCouncil];
-          const player = this.manager.game.players.find((p) => `${p.index}` === entry.seat)!;
-          await this.publish(player.userID, aiText(this.language).council(entry.target, entry.reason));
-        }
         for (const id of this.players) {
           if (id === this.ai!.humanPlayerID) continue;
           if (this.cancelled) break;

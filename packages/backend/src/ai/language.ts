@@ -7,13 +7,14 @@ export function languageInstruction(language: AiLanguage = 'en'): string {
     'zh-tw':
       'Speak TRADITIONAL CHINESE ONLY (zh-TW), with Taiwan vocabulary and Traditional characters, never Simplified Chinese.',
   }[language];
-  return `${instruction} Use this language for all written explanations, publicReason, speech, memory and evidence text, including private council and post-game reflections. Keep JSON keys and exact legal choice values unchanged. Use bare seat numbers, never names or Player prefixes.`;
+  return `${instruction} Use this language for all written explanations, publicReason, speech, memory and evidence text, including public Evil council and post-game reflections. Keep JSON keys and exact legal choice values unchanged. Use bare seat numbers, never names or Player prefixes.`;
 }
 
 const texts = {
   en: {
     thinking: 'Bots are considering their next action.',
     waitingForHuman: 'Waiting for the human player’s action. Use the board controls and chat.',
+    waitingForDiscussion: 'Your turn to speak. Send a chat message or pass.',
     ready: 'AI players ready · English discussion',
     postGamePrefix: 'Post-game: ',
     councilPrefix: 'Evil council (revealed): ',
@@ -24,7 +25,7 @@ const texts = {
       good
         ? `I am Good, so ${inspector} reported my alignment correctly. This alone does not prove ${inspector} is Good.`
         : `I am Good. ${inspector} is lying about my inspection; I accuse ${inspector} of being Evil.`,
-    council: (target: string, reason: string) => `Evil council (revealed): Target ${target}. ${reason}`,
+    council: (target: string, reason: string) => `Evil council: Target ${target}. ${reason}`,
     percivalClaim: (target: number) =>
       `I am Percival. ${target} is Morgana. Include me in missions and exclude ${target}.`,
     percivalStance: (target: number, stance: 'trust' | 'distrust') => `I ${stance} ${target}'s Percival claim.`,
@@ -37,6 +38,7 @@ const texts = {
   ru: {
     thinking: 'Боты обдумывают ход.',
     waitingForHuman: 'Ждём ход человека. Используй кнопки на поле и чат.',
+    waitingForDiscussion: 'Твоё слово. Отправь сообщение в чат или передай слово.',
     ready: 'AI-игроки готовы · Обсуждение на русском',
     postGamePrefix: 'После игры: ',
     councilPrefix: 'Совет злых (раскрыт): ',
@@ -47,7 +49,7 @@ const texts = {
       good
         ? `Я мирный, поэтому ${inspector} верно объявил мою сторону. Само по себе это не доказывает, что ${inspector} мирный.`
         : `Я мирный. ${inspector} лжёт о моей проверке; я обвиняю ${inspector} в игре за злых.`,
-    council: (target: string, reason: string) => `Совет злых (раскрыт): Цель ${target}. ${reason}`,
+    council: (target: string, reason: string) => `Совет злых: Цель ${target}. ${reason}`,
     percivalClaim: (target: number) =>
       `Я Персиваль. ${target} — Моргана. Включайте меня в миссии и исключайте ${target}.`,
     percivalStance: (target: number, stance: 'trust' | 'distrust') =>
@@ -61,6 +63,7 @@ const texts = {
   'zh-tw': {
     thinking: '機器人正在思考下一步行動。',
     waitingForHuman: '等待真人玩家行動。請使用遊戲面板與聊天室。',
+    waitingForDiscussion: '輪到你發言。請在聊天室發言，然後交棒。',
     ready: 'AI 玩家已就緒 · 繁體中文討論',
     postGamePrefix: '賽後回顧：',
     councilPrefix: '邪惡陣營密談（公開）：',
@@ -71,7 +74,7 @@ const texts = {
       good
         ? `我是正義方，所以 ${inspector} 正確公布了我的陣營。這本身並不能證明 ${inspector} 是正義方。`
         : `我是正義方。${inspector} 對我的查驗結果說謊；我指控 ${inspector} 是邪惡方。`,
-    council: (target: string, reason: string) => `邪惡陣營密談（公開）：目標 ${target}。${reason}`,
+    council: (target: string, reason: string) => `邪惡陣營會議：目標 ${target}。${reason}`,
     percivalClaim: (target: number) => `我是派西維爾。${target} 是莫甘娜。請讓我參加任務，排除 ${target}。`,
     percivalStance: (target: number, stance: 'trust' | 'distrust') =>
       `我${stance === 'trust' ? '' : '不'}相信 ${target} 的派西維爾聲明。`,

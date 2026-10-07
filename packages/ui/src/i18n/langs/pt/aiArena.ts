@@ -1,4 +1,9 @@
 export default {
+  yourDiscussionTurn: 'Sua vez de falar',
+  discussionHint: 'Envie uma mensagem no chat para continuar a discussão, ou clique em «Passar a vez» para pular.',
+  passTurn: 'Passar a vez',
+  discussionError: 'Não foi possível passar a vez. Tente novamente.',
+
   playWithBots: 'Jogar com bots',
   mixedPlayerCount: '1 pessoa + {count} bots',
   joinError: 'Não foi possível entrar. Apenas o administrador que criou a sala pode entrar antes do início.',

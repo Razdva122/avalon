@@ -369,3 +369,26 @@ test('room owner can reach the join control with an authenticated profile that o
   roomState.value.leaderID = 'another-owner';
   assert.equal(canJoin.value, false);
 });
+
+for (const isHumanPlayer of [true, false]) {
+  test(`discussion prompt is visible outside collapsed controls only for human: ${isHumanPlayer}`, async (t) => {
+    const panel = await fixture('components/view/panels/AiRoomPanel.vue', {
+      locale: 'ru',
+      props: {
+        roomID: 'mixed-room',
+        isHumanPlayer,
+        ai: { status: 'running', humanPlayerID: 'admin', waitingForDiscussion: true },
+      },
+      acknowledge: async () => ({ ok: true }),
+    });
+    t.after(panel.stop);
+    if (isHumanPlayer) {
+      assert.match(panel.html, /Твоё слово/);
+      assert.ok(panel.html.indexOf('Твоё слово') < panel.html.indexOf('<details'));
+      await panel.nodes('v-btn')[0].props.onClick();
+      assert.deepEqual(panel.sent, [['finishAiDiscussion', 'mixed-room']]);
+    } else {
+      assert.doesNotMatch(panel.html, /Твоё слово|Передать слово/);
+    }
+  });
+}

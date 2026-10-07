@@ -1,4 +1,9 @@
 export default {
+  yourDiscussionTurn: 'Your turn to speak',
+  discussionHint: 'Send a chat message to continue the discussion. Or press “Pass turn” to skip.',
+  passTurn: 'Pass turn',
+  discussionError: 'Could not pass the turn. Please try again.',
+
   playWithBots: 'Play with bots',
   mixedPlayerCount: '1 human + {count} bots',
   joinError: 'Could not join. Only the administrator who created this room can join before the game starts.',

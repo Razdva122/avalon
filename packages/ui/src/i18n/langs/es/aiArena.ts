@@ -1,4 +1,10 @@
 export default {
+  yourDiscussionTurn: 'Tu turno de hablar',
+  discussionHint:
+    'Envía un mensaje al chat para continuar la discusión, o pulsa «Pasar turno» para omitir tu intervención.',
+  passTurn: 'Pasar turno',
+  discussionError: 'No se pudo pasar el turno. Inténtalo de nuevo.',
+
   playWithBots: 'Jugar con bots',
   mixedPlayerCount: '1 persona + {count} bots',
   joinError: 'No se pudo entrar. Solo el administrador que creó la sala puede entrar antes del inicio.',

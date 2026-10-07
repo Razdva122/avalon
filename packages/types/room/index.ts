@@ -44,6 +44,8 @@ export type AiRoomState = {
   /** Single administrator seat; absent in spectator-only bot matches. */
   humanPlayerID?: string;
   waitingForHuman?: boolean;
+  waitingForDiscussion?: boolean;
+  discussionPending?: boolean;
   /** Missing in older archives; discussion defaults to English. */
   language?: AiLanguage;
   /** Missing in older archives; the saved player list still identifies the size. */

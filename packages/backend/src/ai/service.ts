@@ -243,6 +243,22 @@ export class AiService {
         cb({ error: error instanceof AiPause ? error.message : 'Could not create AI room' });
       }
     });
+    socket.on('finishAiDiscussion', async (id, cb) => {
+      if (typeof cb !== 'function') return;
+      try {
+        if (typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id)) return cb({ error: 'Invalid room ID' });
+        const room = this.manager.rooms[id];
+        if (!(room instanceof BotRoom) || !userID || room.ai?.humanPlayerID !== userID)
+          return cb({ error: 'Not your discussion turn' });
+        // Drain preceding chat writes before waking the next bot.
+        await this.manager.chatService?.history(id, room.chat.history);
+        if (this.manager.rooms[id] !== room) return cb({ error: 'Room changed' });
+        room.finishDiscussion(userID);
+        cb({ ok: true });
+      } catch {
+        cb({ error: 'Could not finish discussion turn' });
+      }
+    });
     socket.on('joinAiRoom', async (id, cb) => {
       if (typeof cb !== 'function') return;
       try {

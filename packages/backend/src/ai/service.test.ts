@@ -777,3 +777,48 @@ test('only the database-admin owner can take the single human seat; mixed games 
   expect(cb.mock.calls[1][0]).toHaveProperty('error');
   room.stop();
 });
+
+test('passing the human discussion waits for preceding chat writes and rejects spectators', async () => {
+  const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
+  const room = new BotRoom('discussion-room', 'owner', io, async () => ({ choice: 0, speech: '' }));
+  room.joinAsHuman('owner');
+  let release!: () => void;
+  const history = jest.fn(
+    () =>
+      new Promise<void>((resolve) => {
+        release = resolve;
+      }),
+  );
+  const host = {
+    rooms: { 'discussion-room': room },
+    io,
+    dbManager: {},
+    chatService: { history },
+  } as unknown as Manager;
+  const service = new AiService(host);
+  const finish = jest.spyOn(room, 'finishDiscussion').mockImplementation(() => {});
+  function connect(id: string) {
+    const events: Record<string, (...args: any[]) => any> = {};
+    service.register(
+      {
+        on: (name: string, handler: (...args: any[]) => any) => {
+          events[name] = handler;
+        },
+      } as unknown as ServerSocket,
+      id,
+    );
+    return events;
+  }
+  const denied = jest.fn();
+  await connect('spectator').finishAiDiscussion('discussion-room', denied);
+  expect(denied.mock.calls[0][0]).toHaveProperty('error');
+  expect(history).not.toHaveBeenCalled();
+  const ack = jest.fn();
+  const passing = connect('owner').finishAiDiscussion('discussion-room', ack);
+  expect(history).toHaveBeenCalledWith('discussion-room', room.chat.history);
+  expect(finish).not.toHaveBeenCalled();
+  release();
+  await passing;
+  expect(finish).toHaveBeenCalledWith('owner');
+  expect(ack).toHaveBeenCalledWith({ ok: true });
+});

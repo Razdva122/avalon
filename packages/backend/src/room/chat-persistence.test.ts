@@ -185,3 +185,33 @@ test('a committed message can be retried after history read failure without dupl
   expect(events.filter(({ event }) => event === 'newMessage')).toHaveLength(0);
   expect(events.filter(({ event }) => event === 'roomUpdated')).toHaveLength(2);
 });
+
+test('only a newly persisted human text message finishes the AI discussion turn', async () => {
+  const { BotRoom } = await import('@/ai/room');
+  const { rooms, service, io, repo } = fixture();
+  const room = new BotRoom('human-chat-turn', 'admin', io, async () => ({ choice: 0, speech: 'Test team' }));
+  rooms[room.roomID] = room;
+  room.joinAsHuman('admin');
+  const run = room.run();
+  try {
+    for (let i = 0; i < 100; i++) await new Promise<void>((resolve) => setImmediate(resolve));
+    expect(room.ai?.waitingForDiscussion).toBe(true);
+    await service.sendText(room.roomID, 'spectator', 'spectator text', 'spectator', () => true);
+    expect(room.ai?.waitingForDiscussion).toBe(true);
+    await service.sendSticker(room.roomID, 'admin', 'merlin', () => true);
+    expect(room.ai?.waitingForDiscussion).toBe(true);
+    const finish = jest.spyOn(room, 'finishDiscussion');
+    jest.spyOn(repo, 'history').mockRejectedValueOnce(Error('temporary history read failure'));
+    await expect(service.sendText(room.roomID, 'admin', 'My team suggestion', 'human', () => true)).rejects.toThrow();
+    expect(finish).not.toHaveBeenCalled();
+    await service.history(room.roomID);
+    await service.sendText(room.roomID, 'admin', 'My team suggestion', 'human', () => true);
+    expect(finish).toHaveBeenCalledTimes(1);
+    expect(room.chat.history.some((entry) => entry.message === 'My team suggestion')).toBe(true);
+    await service.sendText(room.roomID, 'admin', 'My team suggestion', 'human', () => true);
+    expect(finish).toHaveBeenCalledTimes(1);
+  } finally {
+    room.stop();
+    await run;
+  }
+});

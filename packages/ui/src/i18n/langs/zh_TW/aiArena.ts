@@ -1,4 +1,9 @@
 export default {
+  yourDiscussionTurn: '輪到你發言',
+  discussionHint: '傳送聊天訊息後，討論將繼續。也可以點擊「交棒」跳過發言。',
+  passTurn: '交棒',
+  discussionError: '無法交棒，請重試。',
+
   playWithBots: '與機器人對戰',
   mixedPlayerCount: '1 位真人 + {count} 個機器人',
   joinError: '無法加入。只有建立房間的管理員可以在開始前加入。',

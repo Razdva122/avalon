@@ -131,7 +131,19 @@ async function decide(request) {
       '-',
     ];
     const usage = await new Promise((resolve, reject) => {
-      const child = spawn('codex', args);
+      const startedAt = Date.now();
+      let lastEvent = 'none',
+        transport = 'none',
+        diagnosticBuffer = '';
+      const child = spawn('codex', args, { detached: process.platform !== 'win32' });
+      const kill = () => {
+        try {
+          if (process.platform !== 'win32' && child.pid) process.kill(-child.pid, 'SIGKILL');
+          else child.kill('SIGKILL');
+        } catch {
+          /* process already exited */
+        }
+      };
       let buffer = '',
         bytes = 0,
         tokens = {},
@@ -139,9 +151,16 @@ async function decide(request) {
         failureReason = 'failed';
       const timer = setTimeout(() => {
         failure = true;
-        child.kill('SIGKILL');
+        failureReason = 'timeout';
+        kill();
       }, TIMEOUT);
-      child.stderr.resume();
+      const noteDiagnostic = (chunk) => {
+        diagnosticBuffer = (diagnosticBuffer + chunk.toString()).slice(-4096);
+        if (/stream disconnected|reconnecting|connection.*(?:failed|reset)|timed? out/i.test(diagnosticBuffer))
+          transport = 'connection';
+        else if (/unauthorized|authentication|401|403/i.test(diagnosticBuffer)) transport = 'authentication';
+      };
+      child.stderr.on('data', noteDiagnostic);
       child.stdin.on('error', () => {});
       child.on('error', () => {
         failure = true;
@@ -150,7 +169,7 @@ async function decide(request) {
         bytes += chunk.length;
         if (bytes > LIMIT) {
           failure = true;
-          child.kill('SIGKILL');
+          kill();
           return;
         }
         buffer += chunk.toString();
@@ -160,7 +179,21 @@ async function decide(request) {
           buffer = buffer.slice(newline + 1);
           try {
             const event = JSON.parse(line);
+            if (
+              [
+                'thread.started',
+                'turn.started',
+                'turn.completed',
+                'turn.failed',
+                'error',
+                'item.started',
+                'item.completed',
+              ].includes(event.type)
+            )
+              lastEvent = event.type;
             if (event.type === 'turn.completed') tokens = event.usage || {};
+            if (['error', 'turn.failed'].includes(event.type))
+              noteDiagnostic(event.error?.message || event.message || '');
             // Return only a safe category, never raw CLI messages or account details.
             if (
               ['error', 'turn.failed'].includes(event.type) &&
@@ -174,15 +207,32 @@ async function decide(request) {
               ['command_execution', 'mcp_tool_call', 'web_search', 'file_change'].includes(event.item?.type)
             ) {
               failure = true;
-              child.kill('SIGKILL');
+              kill();
             }
           } catch {
             /* ignore CLI diagnostics */
           }
         }
       });
-      child.on('close', (code) => {
+      child.on('close', async (code) => {
         clearTimeout(timer);
+        if ((failure || code !== 0) && process.env.CODEX_HOME) {
+          try {
+            await writeFile(
+              join(process.env.CODEX_HOME, 'avalon-last-failure.json'),
+              JSON.stringify({
+                at: new Date().toISOString(),
+                elapsedMs: Date.now() - startedAt,
+                reason: failureReason,
+                lastEvent,
+                transport,
+              }),
+              { mode: 0o600 },
+            );
+          } catch {
+            /* diagnostic storage must not prevent request cleanup */
+          }
+        }
         if (failure || code !== 0) reject(Error(failureReason));
         else resolve(tokens);
       });
@@ -218,7 +268,10 @@ async function main() {
   } catch (error) {
     clearTimeout(inputTimer);
     process.stdout.write(
-      JSON.stringify({ ok: false, error: error.message === 'usage_limit' ? 'usage_limit' : 'failed' }) + '\n',
+      JSON.stringify({
+        ok: false,
+        error: ['usage_limit', 'timeout'].includes(error.message) ? error.message : 'failed',
+      }) + '\n',
     );
   }
 }

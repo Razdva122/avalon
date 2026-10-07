@@ -40,7 +40,7 @@ test.each([
     expect(JSON.stringify(publicOptions.context)).not.toMatch(/merlin|PRIVATE ROLE KNOWLEDGE/);
     expect(focusedRetry(generate.mock.calls[0][1]).instructions).toContain(instruction);
     expect(
-      systemFor({ ...request, privateDiscussion: true, state: { ...request.state, stage: 'assassinate' } }),
+      systemFor({ ...request, councilDiscussion: true, state: { ...request.state, stage: 'assassinate' } }),
     ).toContain(instruction);
     const review = jest.fn().mockResolvedValue({ choice: 0, speech });
     await decisionPipeline(review)({ ...request, state: { ...request.state, stage: 'end' } });

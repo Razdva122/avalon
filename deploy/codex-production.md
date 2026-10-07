@@ -150,3 +150,28 @@ To disable the connection, set `AI_CODEX_ENABLED=false` and apply the normal
 backend rollout. To revoke worker access immediately, remove only the dedicated
 production key from `/home/avalon-codex/.ssh/authorized_keys`; existing root/admin
 keys and VPN services remain independent. Preserve `state` for later login.
+
+## Decision timeout recovery (2026-10-07)
+
+A mixed five-seat production match paused at assassination after its SSH request
+hit the 615-second transport deadline. The CLI wrapper had been killed at its
+600-second deadline, but the native Codex descendant survived, holding stdout
+open. The Node worker and launcher therefore remained alive and retained the
+worker lock; later catalog reads returned `busy` without any newer game request.
+
+The decision runner now starts the CLI in a separate POSIX process group and
+kills that whole group on timeout, forbidden tool use, or excessive output. A
+mock wrapper with a surviving descendant reproduced the hang before the fix;
+regressions passed on macOS and in a network-isolated Linux container afterward.
+The worker source was updated with a backup, the identified orphan container was
+removed, and a production-backend catalog read succeeded. Game data and auth
+state were preserved. The match stays technically paused until its administrator
+uses the existing retry control; recovery did not generate a model decision.
+
+A subsequent administrator retry also reached the decision timeout. This time
+the worker container exited and released its lock, confirming process cleanup;
+the reason Codex returned no decision remains unresolved. The worker now records
+only the latest failure in `state/avalon-last-failure.json` (mode 600): timestamp,
+elapsed time, a bounded reason, the last whitelisted event type, and a connection
+or authentication classification. It never stores prompts, replies, or raw CLI
+diagnostics. Network-isolated Linux regressions passed before this worker update.

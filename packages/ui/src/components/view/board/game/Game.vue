@@ -79,7 +79,11 @@
     <div class="vote-stage mb-4">{{ $t('game.voteStage') }}: {{ gameState.vote + 1 }} / 5</div>
     <div class="button-panel actions-or-info mb-4 d-flex flex-column align-center">
       <PlotCardsPanel v-if="!visibleHistory" :data="gameState.addonsData.plotCards?.activeCards" :game="gameState" />
-      <InGamePanel v-if="inGamePanel && !visibleHistory && stateManager.viewMode.value === 'live'" :game="gameState" />
+      <InGamePanel
+        v-if="inGamePanel && !visibleHistory && stateManager.viewMode.value === 'live'"
+        :game="gameState"
+        :team-discussion-pending="roomState.ai?.discussionPending"
+      />
       <div
         class="d-flex flex-row align-center justify-center"
         v-if="visibleHistory?.type === 'mission' && !missionAnimationActive"

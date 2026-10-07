@@ -48,7 +48,7 @@
   <div>
     <v-btn
       color="error"
-      :disabled="progressData ? isCustomAssassinateDisabled : isAssassinateDisabled"
+      :disabled="disabled || (progressData ? isCustomAssassinateDisabled : isAssassinateDisabled)"
       @click="onAssassinateClick"
       >{{ $t('assassinate.assassinate') }}</v-btn
     >
@@ -64,6 +64,7 @@ import { socket } from '@/api/socket';
 export default defineComponent({
   name: 'AssassinateControl',
   props: {
+    disabled: Boolean,
     game: {
       required: true,
       type: Object as PropType<VisualGameState>,

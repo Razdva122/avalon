@@ -203,7 +203,7 @@ export function decisionInstructions(request: BotRequest) {
   return (
     languageInstruction(request.language) +
     ' ' +
-    (request.speak && !request.privateDiscussion ? tableConversationAdvice + ' ' : '') +
+    (request.speak && !request.councilDiscussion ? tableConversationAdvice + ' ' : '') +
     rules +
     (['onMission', 'assassinate'].includes(action) ? '' : ' ' + evilVisibilityAdvice) +
     (['selectTeam', 'votingForTeam'].includes(action) ? ' ' + coalitionAdvice : '') +
@@ -394,9 +394,9 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
       const claims = finalReview ? '' : claimSpeech(request, reply);
       pending = { key, reply };
       let speech =
-        finalReview || request.privateDiscussion ? reply.speech : request.speak ? policy.publicReason || '' : '';
+        finalReview || request.councilDiscussion ? reply.speech : request.speak ? policy.publicReason || '' : '';
       const silentAnnouncement = request.optionalSpeech && !reply.publicReason?.trim();
-      if (request.speak && !finalReview && !request.privateDiscussion && !policy.publicReason && !silentAnnouncement) {
+      if (request.speak && !finalReview && !request.councilDiscussion && !policy.publicReason && !silentAnnouncement) {
         const publicReply = await complete(
           { ...request, choices: [choice] },
           {
@@ -437,14 +437,14 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
             choice,
             legalChoices: [...policy.choices],
             reason: reply.speech.slice(0, 240),
-            publicStatement: (request.privateDiscussion ? '' : speech).slice(0, 500),
+            publicStatement: speech.slice(0, 500),
             speechRules: {
-              public: Boolean(request.speak && !request.privateDiscussion),
+              public: Boolean(request.speak),
               optionalAnnouncement: Boolean(request.optionalSpeech),
               claimTargets: [...current.claimTargets],
               requiredClaimStances: [...current.requiredClaimStances],
               mandatoryText:
-                request.speak && !request.privateDiscussion
+                request.speak && !request.councilDiscussion
                   ? [policy.publicReason, claims].filter(Boolean).join(' ')
                   : '',
             },

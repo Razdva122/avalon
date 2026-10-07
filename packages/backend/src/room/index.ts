@@ -8,6 +8,7 @@ import { Chat } from '@/room/chat';
 import * as _ from 'lodash';
 
 export class Room {
+  onChatMessage?: (entry: import('@avalon/types').ChatMessage) => void;
   persistChatMessage?: (userID: string, text: string, requestID?: string) => Promise<unknown>;
   ai?: import('@avalon/types').AiRoomState;
   roomID: string;

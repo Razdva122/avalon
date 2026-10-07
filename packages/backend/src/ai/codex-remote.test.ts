@@ -96,3 +96,8 @@ test('exhausted subscription quota gives an actionable pause reason', async () =
   );
   await expect(remoteCodex({ operation: 'decide' })).rejects.toThrow('subscription usage limit');
 });
+
+test('worker timeouts show the stalled response reason rather than a generic SSH failure', async () => {
+  await executable(`process.stdin.resume();process.stdin.on('end',()=>console.log('{"ok":false,"error":"timeout"}'));`);
+  await expect(remoteCodex({ operation: 'decide' })).rejects.toThrow('timed out');
+});

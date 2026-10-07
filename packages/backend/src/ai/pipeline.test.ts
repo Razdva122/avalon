@@ -138,9 +138,9 @@ test.each(['servant', 'mordred'])(
     expect(reply.choice).toBe(1);
   },
 );
-test('private council stays private and failures pause without a fallback action', async () => {
+test('council speech uses the decision response and failures pause without a fallback action', async () => {
   const generate = jest.fn().mockResolvedValue({ choice: 0, speech: '1 could be Merlin.' });
-  await decisionPipeline(generate)({ ...request, privateDiscussion: true });
+  await decisionPipeline(generate)({ ...request, councilDiscussion: true });
   expect(generate).toHaveBeenCalledTimes(1);
   const broken = jest
     .fn()

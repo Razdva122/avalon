@@ -170,6 +170,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
     action: 'start' | 'stop' | 'resumeBudget' | 'resumeTechnical',
     callback: (result: { ok: true } | { error: string }) => void,
   ) => void;
+  finishAiDiscussion: (roomID: string, callback: (result: { ok: true } | { error: string }) => void) => void;
   joinAiRoom: (roomID: string, callback: (result: { ok: true } | { error: string }) => void) => void;
   createRoom: (callback: (result: string | ISocketError) => void) => void;
   updateOptions: (uuid: string, options: GameOptions) => void;

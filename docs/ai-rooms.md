@@ -6,7 +6,7 @@ AI rooms are spectator games with 5, 6, 7 or 8 bots (default: seven). An
 administrator creates and controls a match; spectators see the board, public
 chat and optional AI role/decision reveal. Before launch, the database-admin owner can take one seat using “Play with bots”,
 replacing one bot while preserving the selected table size. Other humans cannot
-join. Mixed games wait for the human’s ordinary board actions and include their
+join. Mixed games pause at the human seat in each public discussion circle. The “Your turn to speak” prompt waits for a new human text message without opening chat automatically; a persisted message continues the circle, or “Pass turn” skips the speech. Team submission stays disabled until the circle finishes. Mixed games also wait for the human’s ordinary board actions and include their
 public chat in bot context. Role/decision reveal is disabled for everyone in a
 mixed room. Mixed games award neither human nor AI profile ratings.
 Spectator messages are not passed to the bots. AI games use their own profile
@@ -147,3 +147,10 @@ Yandex calls when invoked and is not part of the ordinary test suite.
 Historical experiments, intermediate budgets and measured games are preserved in
 [the September–October experiment notes](history/ai-experiment-2026-09-21-to-2026-10-03.md).
 They are evidence for those dates, not current operational defaults.
+
+Before assassination, Evil council advice is published to the room chat immediately,
+with no post-game duplicate. An Evil human gets a speaking turn even when a bot
+is the assassin. The human message becomes part of subsequent bot input. A human
+assassin can shoot only after all council participants have spoken or passed;
+this guard also applies during asynchronous state persistence. Good humans can
+read the council in the common chat but do not get an Evil council turn.

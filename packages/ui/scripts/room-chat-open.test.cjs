@@ -37,3 +37,21 @@ test('AI room snapshots and updates preserve the user-selected chat visibility',
   callback({ ai: {} }, 'snapshot');
   assert.equal(chatOpen.value, false, 'reconnecting does not reopen dismissed chat');
 });
+
+test('human discussion snapshots preserve manually selected chat visibility', () => {
+  const filename = require.resolve('../src/pages/room/Room.vue');
+  const { descriptor } = parse(fs.readFileSync(filename, 'utf8'));
+  const source = ts.createSourceFile(filename, descriptor.script.content, ts.ScriptTarget.Latest, true);
+  let opensChatOnTurn = false;
+  const visit = (node) => {
+    if (
+      ts.isCallExpression(node) &&
+      node.expression.getText(source) === 'watch' &&
+      node.arguments[0].getText(source).includes('waitingForDiscussion')
+    )
+      opensChatOnTurn = true;
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  assert.equal(opensChatOnTurn, false, 'speaking turn must not force chat open');
+});

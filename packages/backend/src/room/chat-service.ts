@@ -98,6 +98,7 @@ export class ChatService {
             .emit('roomUpdated', publicRoomState({ ...saved, chat: history, archived: true }), true);
       }
       // Refresh history on retries, but do not replay board reactions for an old message.
+      live?.onChatMessage?.(stored);
       if (stored.id !== entry.id) return stored;
       if (stored.kind === 'sticker') {
         this.io.to(roomChannel(id)).emit('stickerSent', {

@@ -1,5 +1,12 @@
 <template>
   <section v-if="ai" class="ai-panel" :aria-label="$t('aiArena.title')">
+    <div v-if="isHumanPlayer && ai.status === 'running' && ai.waitingForDiscussion" class="ai-human-turn" role="status">
+      <strong>{{ $t('aiArena.yourDiscussionTurn') }}</strong>
+      <p>{{ $t('aiArena.discussionHint') }}</p>
+      <v-btn color="primary" :loading="busy" :disabled="busy" @click="finishDiscussion">
+        {{ $t('aiArena.passTurn') }}
+      </v-btn>
+    </div>
     <details class="ai-disclosure">
       <summary>
         <span class="ai-heading"
@@ -121,6 +128,7 @@ const props = defineProps<{
   playerCount?: number;
   canReveal?: boolean;
   canJoin?: boolean;
+  isHumanPlayer?: boolean;
   rolesShown?: boolean;
 }>();
 const { t } = useI18n();
@@ -223,6 +231,18 @@ async function toggleRoles() {
 }
 const busy = ref(false);
 const error = ref('');
+async function finishDiscussion() {
+  busy.value = true;
+  error.value = '';
+  try {
+    const result = await socket.timeout(10000).emitWithAck('finishAiDiscussion', props.roomID);
+    if ('error' in result) error.value = t('aiArena.discussionError');
+  } catch {
+    error.value = t('aiArena.connectionError');
+  } finally {
+    busy.value = false;
+  }
+}
 async function join() {
   busy.value = true;
   error.value = '';
@@ -260,6 +280,12 @@ async function control(action: 'start' | 'stop' | 'resumeBudget' | 'resumeTechni
 }
 </script>
 <style scoped>
+.ai-human-turn {
+  padding: 12px;
+}
+.ai-human-turn p {
+  margin: 8px 0 12px;
+}
 .ai-panel {
   width: min(360px, calc(100vw - 16px));
   border: 1px solid rgba(var(--v-theme-primary), 0.3);

@@ -28,7 +28,7 @@
     </Spoiler>
   </template>
   <template v-if="game.stage === 'assassinate' && isUserAssassin">
-    <AssassinateControl :game="game" />
+    <AssassinateControl :game="game" :disabled="teamDiscussionPending" />
   </template>
   <template v-if="game.stage === 'checkLoyalty' && isUserCheckOwner">
     <v-btn color="warning" :disabled="!isCheckAvailable" @click="emitClick('checkLoyalty')">{{
@@ -79,6 +79,7 @@ export default defineComponent({
     AssassinateControl,
   },
   props: {
+    teamDiscussionPending: Boolean,
     game: {
       required: true,
       type: Object as PropType<VisualGameState>,
@@ -124,6 +125,7 @@ export default defineComponent({
     });
 
     const isSendTeamDisabled = computed(() => {
+      if (props.teamDiscussionPending) return true;
       const needPlayers = game.value.settings.missions[game.value.mission].players;
       return game.value.players.filter((player) => player.features.isSelected).length !== needPlayers;
     });

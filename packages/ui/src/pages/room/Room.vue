@@ -14,6 +14,7 @@
         :ai="roomState.ai"
         :roomID="roomState.roomID"
         :player-count="roomState.players.length"
+        :is-human-player="roomState.ai?.humanPlayerID === userID"
         :canReveal="canRevealRoles"
         :canJoin="canJoinAi"
         :rolesShown="rolesShown"

@@ -103,3 +103,58 @@ test('worker reports exhausted subscription quota without exposing raw CLI diagn
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test('decision timeout terminates the CLI wrapper and its descendants', { timeout: 5000 }, async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'worker-descendants-'));
+  let worker;
+  let descendant;
+  try {
+    const source = (await require('node:fs/promises').readFile(join(__dirname, 'worker.cjs'), 'utf8')).replace(
+      'const TIMEOUT = 10 * 60 * 1000;',
+      'const TIMEOUT = 500;',
+    );
+    await writeFile(join(directory, 'worker.cjs'), source);
+    const pidFile = join(directory, 'descendant');
+    await writeFile(
+      join(directory, 'codex'),
+      `#!${process.execPath}\nconst {spawn}=require('node:child_process');const fs=require('node:fs');const c=spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:'inherit'});fs.writeFileSync(${JSON.stringify(pidFile)},String(c.pid));process.stderr.write('stream disconnected before completion PRIVATE_TOKEN\\n');console.log(JSON.stringify({type:'thread.started'}));setInterval(()=>{},1000);`,
+      { mode: 0o700 },
+    );
+    worker = spawn(process.execPath, [join(directory, 'worker.cjs')], {
+      env: { ...process.env, CODEX_HOME: directory, PATH: `${directory}:${process.env.PATH}` },
+    });
+    let stdout = '';
+    worker.stdout.on('data', (chunk) => (stdout += chunk));
+    const done = new Promise((resolve) => worker.on('close', resolve));
+    worker.stdin.end(JSON.stringify({ operation: 'decide', prompt: 'game', schema: {} }));
+    const result = await Promise.race([done, new Promise((resolve) => setTimeout(() => resolve('hung'), 1800))]);
+    descendant = Number(await require('node:fs/promises').readFile(pidFile, 'utf8'));
+    assert.equal(result, 0, 'grandchild pipes must not keep the worker or its lock alive after timeout');
+    assert.equal(JSON.parse(stdout).error, 'timeout');
+    const diagnostic = JSON.parse(
+      await require('node:fs/promises').readFile(join(directory, 'avalon-last-failure.json'), 'utf8'),
+    );
+    assert.equal(diagnostic.reason, 'timeout');
+    assert.equal(diagnostic.transport, 'connection');
+    assert.equal(diagnostic.lastEvent, 'thread.started');
+    assert.doesNotMatch(JSON.stringify(diagnostic), /PRIVATE_TOKEN|game input/);
+    if (process.platform === 'linux') {
+      // A container's PID 1 may not reap an orphan immediately; zombies hold no pipes or locks.
+      let state;
+      try {
+        state = await require('node:fs/promises').readFile(`/proc/${descendant}/stat`, 'utf8');
+      } catch (error) {
+        assert.equal(error.code, 'ENOENT');
+      }
+      if (state) assert.equal(state.slice(state.lastIndexOf(')') + 2, state.lastIndexOf(')') + 3), 'Z');
+    } else assert.throws(() => process.kill(descendant, 0), { code: 'ESRCH' });
+  } finally {
+    worker?.kill('SIGKILL');
+    if (descendant) {
+      try {
+        process.kill(descendant, 'SIGKILL');
+      } catch {}
+    }
+    await rm(directory, { recursive: true, force: true });
+  }
+});
