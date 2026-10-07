@@ -313,11 +313,19 @@ export class Game extends GameHooks {
    */
   finishCurrentRound(): void {
     this.clearSendPlayers();
-    // Witch finishes its declaration and mission in one update. The UI displays
-    // both history events for ten seconds each before showing the stage timer.
+    // Witch and Excalibur can finish alongside the mission in one update.
+    // Reserve time for every scene before starting the next stage timer.
     const previous = _.last(this.history);
     this.history.push(this.currentMission);
-    this.timer.setHistoryDelay(previous?.type === 'announceLoyalty' ? 20000 : 10000);
+    const extraDelay =
+      previous?.type === 'announceLoyalty'
+        ? 10000
+        : previous?.type === 'switchResult'
+          ? (previous as HistoryElement<'switchResult'>).data.target
+            ? 3000
+            : 2000
+          : 0;
+    this.timer.setHistoryDelay(10000 + extraDelay);
   }
 
   /**

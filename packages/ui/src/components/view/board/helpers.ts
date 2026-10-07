@@ -19,10 +19,10 @@ export function calculateVisualElement(history: THistoryResults[]): { element?: 
     };
   }
 
-  if (lastElement?.type === 'switchResult' && lastElement.targetID) {
+  if (lastElement?.type === 'switchResult') {
     return {
       element: lastElement,
-      timeout: 0,
+      timeout: lastElement.targetID ? 3000 : 2000,
     };
   }
 
@@ -161,4 +161,9 @@ export function missionReveal(event?: THistoryResults) {
   if (event.fails === undefined || !event.result) return;
   if (!Number.isInteger(event.fails) || event.fails < 0 || event.fails > players) return;
   return { index: event.index, players, fails: event.fails, result: event.result };
+}
+
+export function excaliburReveal(event?: THistoryResults) {
+  if (event?.type !== 'switchResult' || !event.switcherID) return;
+  return { sourceID: event.switcherID, targetID: event.targetID };
 }

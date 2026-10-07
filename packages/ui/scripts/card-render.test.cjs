@@ -15,6 +15,7 @@ function scene(t, options, motions = []) {
     createElement: () => {
       const node = (selector) => ({
         style: { left: '103px' },
+        setAttribute() {},
         classList: { contains: (name) => selector.includes(name) },
         querySelector: (child) => node(`${selector} ${child}`),
         animate: (frames, timing) => {
@@ -37,11 +38,13 @@ function scene(t, options, motions = []) {
     else global.document = originalDocument;
   });
   const cleanup = (
-    options.mission
-      ? renderer.renderMission
-      : options.variant
-        ? renderer.renderPairAssassination
-        : renderer.renderAssassination
+    options.excalibur
+      ? renderer.renderExcalibur
+      : options.mission
+        ? renderer.renderMission
+        : options.variant
+          ? renderer.renderPairAssassination
+          : renderer.renderAssassination
   )(
     {
       appendChild: (node) => {
@@ -240,5 +243,29 @@ test('witch scene never creates decision faces or flip animations, including red
       motions.some((m) => m.selector.endsWith(' .back')),
       false,
     );
+  }
+});
+
+test('Excalibur arc uses public player positions; skip has no target flash or arc', (t) => {
+  for (const target of [{ x: 120, y: 450, radius: 57.5 }, undefined]) {
+    for (const reducedMotion of [false, true]) {
+      const motions = [];
+      const html = scene(
+        t,
+        { excalibur: true, source: { x: 300, y: 610, radius: 57.5 }, target, width: 600, height: 600, reducedMotion },
+        motions,
+      );
+      assert.ok(html.includes('ex-owner-badge'));
+      assert.equal(html.includes('class="ex-arc"'), Boolean(target));
+      assert.equal(html.includes('class="ex-change"'), Boolean(target));
+      assert.equal(html.includes('avalon-mission-card'), false);
+      assert.equal(html.includes('/selected.webp'), false);
+      if (!target)
+        assert.equal(
+          motions.some((m) => m.selector === '.ex-target-ring'),
+          false,
+        );
+      if (reducedMotion) assert.equal(motions.length, 0);
+    }
   }
 });

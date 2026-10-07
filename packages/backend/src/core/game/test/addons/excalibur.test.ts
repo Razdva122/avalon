@@ -99,3 +99,28 @@ describe('Excalibur logic', () => {
     expect(game.missions[4].data.fails).toBe(1);
   });
 });
+
+test.each([true, false])('Excalibur use=%s gives its scene and mission time before next stage timer', (use) => {
+  jest.useFakeTimers();
+  const next = generateNewGame({ excalibur: true });
+  try {
+    next.game.features.timerDurations = { firstSelectTeam: { enabled: true, duration: 60 } };
+    next.gameHelper
+      .selectPlayersOnMission()
+      .sentSelectedPlayers()
+      .giveExcalibur()
+      .makeVotes()
+      .makeActions()
+      .useExcalibur(use);
+    expect(next.game.stage).toBe('selectTeam');
+    const delay = 10000 + (use ? 3000 : 2000);
+    jest.advanceTimersByTime(delay - 1);
+    expect(next.game.timer.getTimerState().active).toBe(false);
+    jest.advanceTimersByTime(1);
+    expect(next.game.timer.getTimerState()).toMatchObject({ active: true, stage: 'firstSelectTeam' });
+    expect(next.game.timer.getRemainingTime()).toBe(60000);
+  } finally {
+    next.game.timer.cleanup();
+    jest.useRealTimers();
+  }
+});

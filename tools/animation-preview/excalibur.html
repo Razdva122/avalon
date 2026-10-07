@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Avalon — Экскалибур</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="mission.css?v=witch-1" />
+    <link rel="stylesheet" href="mission-table.css" />
+    <link rel="stylesheet" href="excalibur.css?v=sword-3" />
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="mission.html">Avalon<span>Экскалибур на столе</span></a
+      ><span class="draft">Предпросмотр</span>
+    </header>
+    <main>
+      <div class="intro">
+        <h1>Использование Экскалибура</h1>
+        <p>Два сценария на игроках: золотая дуга при использовании и угасание знака при пропуске.</p>
+      </div>
+      <div class="workspace native-workspace">
+        <section class="theatre" aria-label="Предпросмотр на игровом столе">
+          <div class="scene-header"><span id="scene-type">Результат миссии</span><span id="duration"></span></div>
+          <div class="native-viewport">
+            <div class="board native-board">
+              <div class="table"></div>
+              <div id="native-players"></div>
+              <div class="native-history" aria-hidden="true">◂ &nbsp; История партии &nbsp; ▸</div>
+              <div id="mission-track" class="mission-track" aria-label="Результаты пяти миссий"></div>
+              <div class="native-vote">Стадия голосования: 1 / 5</div>
+              <div id="stage" aria-label="Анонимные карты миссии"></div>
+              <div class="native-meta"><span>Стадия: Экскалибур</span><span id="native-balance"></span></div>
+            </div>
+          </div>
+          <div class="playback">
+            <button id="play" class="primary">▶ Запустить сцену</button><button id="reset">Сбросить</button
+            ><label><input id="slow" type="checkbox" /> Медленно</label>
+          </div>
+        </section>
+        <aside>
+          <div class="settings">
+            <h2>Сценарий</h2>
+            <label for="outcome">Действие</label
+            ><select id="outcome">
+              <option value="use">Использовать</option>
+              <option value="skip">Пропустить</option>
+            </select>
+            <p id="outcome-note"></p>
+          </div>
+          <div class="selected">
+            <h2 id="selected-title"></h2>
+            <p id="selected-description"></p>
+            <div class="sequence" id="sequence"></div>
+          </div>
+          <p class="hint">
+            Действие видно на игроках. Решения похода не раскрываются.<br /><a href="mission.html"
+              >← Анимации результатов похода</a
+            >
+          </p>
+        </aside>
+      </div>
+
+      <footer>Предпросмотр Экскалибура. Оба сценария также подключены к событиям игры.</footer>
+    </main>
+    <script type="module" src="excalibur.js?v=sword-3"></script>
+  </body>
+</html>

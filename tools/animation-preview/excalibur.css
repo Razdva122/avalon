@@ -1,0 +1,94 @@
+.ex-effects {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+.ex-arc {
+  position: absolute;
+  inset: 0;
+  width: 840px;
+  height: 840px;
+  overflow: visible;
+}
+.ex-arc path {
+  fill: none;
+  stroke: #f0d798;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.ex-trail {
+  stroke-width: 2;
+}
+.ex-trail-glow {
+  stroke-width: 9;
+  opacity: 0.4;
+  filter: blur(5px);
+}
+.ex-spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff3ce;
+  box-shadow:
+    0 0 6px 3px #eccc87,
+    0 0 22px 7px #eccc8766;
+  opacity: 0;
+  offset-anchor: center;
+}
+.ex-owner-badge,
+.ex-change {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #d2b579;
+  border-radius: 50%;
+  background: #27362c;
+  box-shadow: 0 2px 5px #0009;
+}
+.ex-owner-badge svg {
+  width: 30px;
+  height: 30px;
+  margin: 1px;
+}
+.ex-change {
+  opacity: 0;
+  color: #f2db9c;
+  font: 28px/31px Georgia;
+  text-align: center;
+}
+.ex-target-ring {
+  position: absolute;
+  width: 108px;
+  height: 108px;
+  border: 2px solid #eed28f;
+  border-radius: 50%;
+  box-shadow:
+    0 0 13px 4px #e6c57888,
+    inset 0 0 12px #e6c57866;
+  opacity: 0;
+}
+.sequence {
+  white-space: pre-line;
+}
+
+.ex-owner-badge {
+  width: 44px;
+  height: 52px;
+  border-radius: 12px;
+  background: radial-gradient(ellipse at top, #344a43, #182920);
+  border-color: #bda372;
+  box-shadow:
+    0 0 0 2px #182820,
+    0 3px 7px #0009;
+}
+.ex-owner-badge svg {
+  width: 36px;
+  height: 48px;
+  margin: 1px 3px;
+  filter: drop-shadow(0 1px 1px #0009);
+}

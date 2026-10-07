@@ -531,3 +531,106 @@ export function renderMission(container: HTMLElement, options: MissionOptions): 
     cleanup();
   };
 }
+
+const excaliburSword = `<svg viewBox="0 0 48 64" aria-hidden="true">
+  <defs><linearGradient id="ex-blade" x1="0" x2="1"><stop stop-color="#819ba2"/><stop offset=".46" stop-color="#f5faf3"/><stop offset=".52" stop-color="#c7d7d8"/><stop offset="1" stop-color="#78939b"/></linearGradient><linearGradient id="ex-gold" x1="0" x2="1"><stop stop-color="#977038"/><stop offset=".45" stop-color="#f1d898"/><stop offset="1" stop-color="#a67e40"/></linearGradient></defs>
+  <path d="M24 3l5 9-1.3 28h-7.4L19 12z" fill="url(#ex-blade)" stroke="#526d77" stroke-width=".8"/>
+  <path d="M24 8v30" stroke="#f4faf5" stroke-width=".8" opacity=".7"/>
+  <path d="M22 43h4v12h-4z" fill="#293f4b" stroke="#b59a60" stroke-width=".8"/>
+  <path d="M22 46h4m-4 3h4m-4 3h4" stroke="#a58e61" stroke-width=".7"/>
+  <path d="M11 43l1-5 9 2h6l9-2 1 5-11-1h-4z" fill="url(#ex-gold)" stroke="#967443" stroke-width=".8"/>
+  <path d="M24 38l3 4-3 4-3-4z" fill="#79b8cf" stroke="#eed397" stroke-width="1"/>
+  <path d="M24 54l4 4-4 4-4-4z" fill="url(#ex-gold)" stroke="#9d7e47" stroke-width=".7"/>
+  <path d="M24 56l1.5 2-1.5 2-1.5-2z" fill="#568da4"/>
+</svg>`;
+
+type ExcaliburOptions = { source: Position; target?: Position; width: number; height: number; reducedMotion: boolean };
+
+export function renderExcalibur(container: HTMLElement, options: ExcaliburOptions): () => void {
+  const { root, motion, cleanup } = createScene(container, 'avalon-excalibur-scene');
+  const { source, target, width, height } = options;
+  // A short arc along the seats, keeping the central game controls clear.
+  const center = { x: width / 2, y: height / 2 };
+  const radius = Math.max(
+    Math.hypot(source.x - center.x, source.y - center.y),
+    target ? Math.hypot(target.x - center.x, target.y - center.y) : 0,
+  );
+  const sourceAngle = Math.atan2(source.y - center.y, source.x - center.x);
+  const targetAngle = target ? Math.atan2(target.y - center.y, target.x - center.x) : sourceAngle;
+  const delta = Math.atan2(Math.sin(targetAngle - sourceAngle), Math.cos(targetAngle - sourceAngle));
+  const path = target
+    ? `M ${source.x} ${source.y} A ${radius} ${radius} 0 0 ${delta >= 0 ? 1 : 0} ${target.x} ${target.y}`
+    : '';
+  root.innerHTML =
+    `<div class="ex-owner-badge" style="left:${source.x + 32}px;top:${source.y - 46}px">${excaliburSword}</div>` +
+    (target
+      ? `<svg class="ex-arc" viewBox="0 0 ${width} ${height}"><path class="ex-trail-glow" d="${path}" pathLength="1"/><path class="ex-trail" d="${path}" pathLength="1"/></svg><div class="ex-spark" style="offset-path:path('${path}')"></div><div class="ex-target-ring" style="left:${target.x - target.radius}px;top:${target.y - target.radius}px;width:${target.radius * 2}px;height:${target.radius * 2}px"></div><div class="ex-change" style="left:${target.x + 29}px;top:${target.y - 43}px">↻</div>`
+      : '');
+  const badge = root.querySelector('.ex-owner-badge')!;
+  if (options.reducedMotion) {
+    badge.setAttribute('style', `left:${source.x + 32}px;top:${source.y - 46}px;opacity:0`);
+    if (target) root.classList.add('reduced-use');
+    return cleanup;
+  }
+  if (!target) {
+    motion(
+      badge,
+      [
+        { opacity: 1, transform: 'scale(1)' },
+        { opacity: 0, transform: 'scale(.88)' },
+      ],
+      900,
+      250,
+    );
+    return cleanup;
+  }
+  motion(
+    badge,
+    [
+      { transform: 'scale(1)', boxShadow: '0 0 0 0 #dcc18500' },
+      { offset: 0.5, transform: 'scale(1.15)', boxShadow: '0 0 0 9px #dcc18533' },
+      { transform: 'scale(1)', boxShadow: '0 0 0 0 #dcc18500' },
+    ],
+    550,
+  );
+  root
+    .querySelectorAll('.ex-arc path')
+    .forEach((line) =>
+      motion(line, [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], 950, 350, 'cubic-bezier(.3,.05,.4,1)'),
+    );
+  motion(
+    root.querySelector('.ex-spark')!,
+    [
+      { offsetDistance: '0%', opacity: 0 },
+      { offset: 0.08, opacity: 1 },
+      { offset: 0.94, opacity: 1 },
+      { offsetDistance: '100%', opacity: 0 },
+    ],
+    950,
+    350,
+    'cubic-bezier(.3,.05,.4,1)',
+  );
+  motion(
+    root.querySelector('.ex-target-ring')!,
+    [
+      { opacity: 0, transform: 'scale(.95)' },
+      { offset: 0.28, opacity: 1, transform: 'scale(1.04)' },
+      { offset: 0.65, opacity: 0.75, transform: 'scale(1)' },
+      { opacity: 0, transform: 'scale(1.12)' },
+    ],
+    1300,
+    1150,
+  );
+  motion(
+    root.querySelector('.ex-change')!,
+    [
+      { opacity: 0, transform: 'scale(.6) rotate(-70deg)' },
+      { opacity: 1, transform: 'scale(1) rotate(0deg)' },
+    ],
+    400,
+    1300,
+  );
+  motion(root.querySelector('.ex-arc')!, [{ opacity: 1 }, { opacity: 0 }], 650, 1550);
+  motion(badge, [{ opacity: 1 }, { opacity: 0 }], 500, 650);
+  return cleanup;
+}

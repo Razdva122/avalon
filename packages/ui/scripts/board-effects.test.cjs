@@ -208,3 +208,13 @@ test('mission reveal uses only public counts and the published result', () => {
   assert.equal(helpers.missionReveal({ ...mission, fails: 5 }), undefined);
   assert.equal(helpers.missionReveal({ ...mission, result: undefined }), undefined);
 });
+
+test('Excalibur use and skip have a display window and never carry private decisions', () => {
+  for (const event of [
+    { type: 'switchResult', switcherID: 'p1', targetID: 'p2', result: 'fail' },
+    { type: 'switchResult', switcherID: 'p1' },
+  ]) {
+    assert.deepEqual(helpers.excaliburReveal(event), { sourceID: 'p1', targetID: event.targetID });
+    assert.equal(helpers.calculateVisualElement([event]).timeout, event.targetID ? 3000 : 2000);
+  }
+});

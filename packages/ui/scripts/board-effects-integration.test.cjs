@@ -103,6 +103,7 @@ function fixture(t, initial = game(), reducedMotion = false) {
         ...animationRender,
         renderLoyalty: render('lady'),
         renderMission: render('mission'),
+        renderExcalibur: render('excalibur'),
         renderAssassination: render('assassination'),
         renderPairAssassination: render('pair'),
       };
@@ -551,4 +552,54 @@ test('Witch declaration and hidden mission arriving in one live update both anim
   await f.flush();
   assert.equal(f.api.visibleHistory.value, undefined);
   assert.equal(f.api.gameTimer.value.active, true, 'next stage timer appears once both history events finish');
+});
+
+test('Excalibur use or skip runs before its bundled mission, then restores the stage timer', async (t) => {
+  const f = fixture(t, game([declaration], { stage: 'useExcalibur' }));
+  const action = { type: 'switchResult', switcherID: 'p1', targetID: 'p2', result: 'fail' };
+  const mission = {
+    type: 'mission',
+    index: 0,
+    settings: { players: 2, failsRequired: 1 },
+    fails: 1,
+    result: 'fail',
+    actions: [],
+  };
+  f.manager.mutateRoomState({
+    newGameState: game([declaration, action, mission], {
+      stage: 'selectTeam',
+      timer: { active: true, endTime: 100000, isCustom: false },
+    }),
+  });
+  await f.flush();
+  assert.deepEqual(
+    f.draws.map((d) => d.kind),
+    ['excalibur'],
+  );
+  assert.equal(f.api.timerDuration.value, 3000);
+  assert.equal(f.draws[0].options.result, undefined);
+  f.api.clearHistoryElement();
+  await f.flush();
+  assert.deepEqual(
+    f.draws.map((d) => d.kind),
+    ['excalibur', 'mission'],
+  );
+  assert.equal(f.draws[0].cleaned, true);
+  f.api.clearHistoryElement();
+  await f.flush();
+  assert.equal(f.api.gameTimer.value.active, true);
+});
+
+test('Excalibur skip animates without a target and cancels on history navigation', async (t) => {
+  const f = fixture(t, game([declaration], { stage: 'useExcalibur' }));
+  f.manager.mutateRoomState({
+    newGameState: game([declaration, { type: 'switchResult', switcherID: 'p1' }], { stage: 'selectTeam' }),
+  });
+  await f.flush();
+  assert.equal(f.draws[0]?.kind, 'excalibur');
+  assert.equal(f.draws[0].options.target, undefined);
+  assert.equal(f.api.timerDuration.value, 2000);
+  f.manager.toggleViewMode();
+  await f.flush();
+  assert.equal(f.draws[0].cleaned, true);
 });

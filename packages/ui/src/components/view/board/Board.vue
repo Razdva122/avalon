@@ -126,6 +126,7 @@ import {
   assassinationReveal,
   loyaltyBadge,
   missionReveal,
+  excaliburReveal,
 } from '@/components/view/board/helpers';
 import { getThumbnailPathByID } from '@/helpers/images';
 import { calculateRoleUrl } from '@/helpers/styles';
@@ -134,6 +135,7 @@ import {
   renderPairAssassination,
   renderLoyalty,
   renderMission,
+  renderExcalibur,
   ASSASSINATION_REVEAL_DURATION,
   LOYALTY_REVEAL_DURATION,
 } from './animations/render';
@@ -268,7 +270,8 @@ export default defineComponent({
       const event = reveal ? game.history[game.history.length - 1] : visibleHistory.value;
       const badge = loyaltyBadge(event);
       const mission = missionReveal(event);
-      if (!reveal && !badge && !mission) return;
+      const excalibur = excaliburReveal(event);
+      if (!reveal && !badge && !mission && !excalibur) return;
       const index = reveal ? game.history.length - 1 : visibleHistoryIndex.value;
       if (!eventTracker.take(index)) return;
       clearEffect();
@@ -308,6 +311,21 @@ export default defineComponent({
                 reducedMotion: reducedMotion(),
               });
         effectTimer = setTimeout(clearEffect, reveal.pending ? 2000 : ASSASSINATION_REVEAL_DURATION);
+      } else if (excalibur && loyaltyEffectRef.value && boardRef.value) {
+        const source = playerGeometry(excalibur.sourceID);
+        const target = excalibur.targetID ? playerGeometry(excalibur.targetID) : undefined;
+        if (!source || (excalibur.targetID && !target)) {
+          clearEffect();
+          return;
+        }
+        cleanupAnimation = renderExcalibur(loyaltyEffectRef.value, {
+          source,
+          target,
+          width: boardRef.value.offsetWidth,
+          height: boardRef.value.offsetHeight,
+          reducedMotion: reducedMotion(),
+        });
+        effectTimer = setTimeout(clearEffect, excalibur.targetID ? 3000 : 2000);
       } else if (mission && missionEffectRef.value && boardRef.value) {
         const board = boardRef.value;
         const token = board.querySelector<HTMLElement>(`[data-mission-index="${mission.index}"]`);
@@ -420,7 +438,7 @@ export default defineComponent({
     };
 
     const clearHistoryElement = () => {
-      if (missionAnimationActive.value) clearEffect();
+      if (missionAnimationActive.value || visibleHistory.value?.type === 'switchResult') clearEffect();
       visibleHistory.value = undefined;
       visibleHistoryIndex.value = -1;
       timerDuration.value = 0;
