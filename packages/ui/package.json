@@ -1,6 +1,6 @@
 {
   "name": "@avalon/ui",
-  "version": "69.10.0",
+  "version": "69.11.0",
   "private": true,
   "scripts": {
     "preserve": "npm run generate:avatars && node scripts/generate-locales.cjs",
