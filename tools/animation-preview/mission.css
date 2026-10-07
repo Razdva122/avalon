@@ -1,0 +1,187 @@
+.size-label {
+  margin-top: 16px;
+}
+.mission-track {
+  position: absolute;
+  bottom: 73px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+}
+.mission-token {
+  position: relative;
+  width: 33px;
+  height: 33px;
+  border-radius: 50%;
+  border: 1px solid #b69d6e;
+  color: #c7baa0;
+  background: #19251c;
+  display: grid;
+  place-content: center;
+  font:
+    16px Georgia,
+    serif;
+  box-shadow: 0 2px 5px #0007;
+}
+.mission-token img {
+  position: absolute;
+  inset: 3px;
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+}
+.mission-token.active {
+  box-shadow: 0 0 0 3px #c7ae6233;
+}
+.mission-card {
+  position: absolute;
+  width: 74px;
+  height: 112px;
+  top: 66px;
+  transform: rotate(var(--angle, 0deg));
+}
+.mission-card .turn {
+  box-shadow: 4px 8px 10px #0007;
+  border-radius: 6px;
+}
+.mission-card .back {
+  font-size: 18px;
+  border-radius: 6px;
+}
+.mission-card .back:before {
+  width: 44px;
+  height: 60px;
+  left: 14px;
+  top: 25px;
+}
+.mission-card .face {
+  border-radius: 6px;
+  background: radial-gradient(ellipse at top, #f1e2bb, #c4ae84);
+}
+.mission-card .face img {
+  inset: 11px 11px 31px;
+  width: 50px;
+  height: 64px;
+  object-fit: contain;
+  border: 0;
+  filter: none;
+}
+.mission-card .face strong {
+  font-size: 11px;
+  bottom: 11px;
+}
+.mission-card.bad .face {
+  background: radial-gradient(ellipse at top, #dfc8ac, #b29677);
+}
+.mission-badge {
+  position: absolute;
+  left: 140px;
+  top: 50px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid #d5bb7e;
+  background: radial-gradient(ellipse at top, #b69e68, #302e1e);
+  box-shadow:
+    0 0 0 7px #c7ae6222,
+    0 10px 15px #0007;
+  opacity: 0;
+  z-index: 12;
+}
+.mission-badge img {
+  width: 58px;
+  height: 58px;
+  position: absolute;
+  inset: 9px;
+}
+.mission-seal {
+  position: absolute;
+  top: 94px;
+  left: 114px;
+  width: 132px;
+  padding: 10px 4px;
+  text-align: center;
+  color: #dbebcc;
+  background: #294334eb;
+  border: 1px solid #a4bd8a;
+  font:
+    21px Georgia,
+    serif;
+  transform: rotate(-11deg);
+  opacity: 0;
+  z-index: 10;
+}
+.mission-seal.bad {
+  color: #efd5bd;
+  background: #63372deb;
+  border-color: #c19872;
+}
+.mission-rim {
+  position: absolute;
+  inset: -4px;
+  border: 2px solid #c39a71;
+  border-radius: 9px;
+  opacity: 0;
+}
+.mission-card.bad .mission-rim {
+  border-color: #d19082;
+}
+.mission-glint {
+  position: absolute;
+  top: 128px;
+  height: 2px;
+  left: 0;
+  right: 0;
+  background: #d3b97b;
+  box-shadow: 0 0 8px #ceb275;
+  opacity: 0;
+}
+.mission-summary {
+  font-size: 14px;
+  margin-top: 14px;
+  color: #d3c39d;
+}
+.hint a {
+  color: var(--gold);
+}
+@media (max-width: 760px) {
+  .mission-track {
+    bottom: 66px;
+    gap: 10px;
+  }
+  .mission-token {
+    width: 29px;
+    height: 29px;
+  }
+  .mission-token img {
+    width: 21px;
+    height: 21px;
+  }
+}
+
+/* Witch leaves every decision face absent, including in the preview DOM. */
+.witch-hidden .mission-rim {
+  border-color: #b799ce;
+  box-shadow:
+    0 0 14px #b799ce66,
+    inset 0 0 12px #b799ce33;
+}
+.witch-hidden .mission-badge {
+  border-color: #b8a1c6;
+  background: radial-gradient(ellipse at top, #6a5875, #2e2339);
+  box-shadow:
+    0 0 0 7px #b799ce22,
+    0 10px 15px #0007;
+}
+.witch-hidden .mission-badge img {
+  inset: 0;
+  width: 76px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 50%;
+  filter: saturate(0.65);
+}
+.witch-hidden .mission-seal {
+  display: none;
+}

@@ -39,6 +39,8 @@ export default {
     announceLoyalty: 'Объявить',
   },
   mission: {
+    cardSuccess: 'Успех',
+    cardFail: 'Провал',
     players: 'Игроков',
     fails: 'Провалов',
     indexMission: '{index} поход',
@@ -79,6 +81,8 @@ export default {
     switchInfo: '{switcher} использовал Экскалибур и изменил решение {target} на',
   },
   assassinate: {
+    verdictHit: 'Убит',
+    verdictMiss: 'Промах',
     lovers: 'Любовники',
     assassinate: 'Убить',
     shot: '{killerName} убил {killedName}',

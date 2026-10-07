@@ -66,7 +66,7 @@
   backface-visibility: hidden;
 }
 .avalon-cards-front {
-  transform: rotateY(180deg);
+  opacity: 0;
 }
 
 .avalon-cards-face {
@@ -387,4 +387,228 @@
   object-fit: cover;
   object-position: 54% 31%;
   filter: saturate(0.7);
+}
+
+.avalon-pair-slot {
+  position: absolute;
+  top: 43px;
+  left: 36px;
+  width: 128px;
+  height: 186px;
+  transform: rotate(-5deg);
+}
+.avalon-pair-slot-1 {
+  left: 210px;
+  transform: rotate(5deg);
+}
+.avalon-pair-single .avalon-pair-slot {
+  left: 126px;
+}
+.avalon-pair-turn {
+  position: absolute;
+  inset: 0;
+}
+.avalon-pair-back,
+.avalon-pair-front,
+.avalon-pair-halves,
+.avalon-pair-half-left,
+.avalon-pair-half-right {
+  position: absolute;
+  inset: 0;
+}
+.avalon-pair-front,
+.avalon-pair-halves {
+  opacity: 0;
+}
+.avalon-pair-half-left,
+.avalon-pair-half-right {
+  filter: drop-shadow(3px 6px 3px #0008);
+}
+.avalon-pair-stamp {
+  position: absolute;
+  left: 15px;
+  top: 56px;
+  width: 98px;
+  text-align: center;
+  padding: 8px 4px;
+  background: #572e28eb;
+  color: #f0c5b0;
+  border: 1px solid #bd8763;
+  font:
+    17px Georgia,
+    'Times New Roman',
+    serif;
+  transform: rotate(-12deg);
+  opacity: 0;
+  z-index: 8;
+}
+.avalon-pair-miss {
+  background: #274334eb;
+  color: #c5e8b8;
+}
+.avalon-pair-protected {
+  position: absolute;
+  inset: -5px;
+  border: 2px solid #b8d4a5;
+  border-radius: 11px;
+  box-shadow: 0 0 17px #93b98355;
+  opacity: 0;
+}
+.avalon-pair-slash {
+  position: absolute;
+  top: 130px;
+  left: 22px;
+  width: 330px;
+  height: 2px;
+  background: #ffe2ac;
+  box-shadow: 0 0 12px #efaa63;
+  transform: rotate(-14deg);
+  opacity: 0;
+  z-index: 6;
+}
+.avalon-pair-reduced {
+  .avalon-pair-back {
+    opacity: 0;
+  }
+  .avalon-pair-front,
+  .avalon-pair-stamp,
+  .avalon-pair-protected {
+    opacity: 1;
+  }
+  .avalon-pair-cut .avalon-pair-turn {
+    opacity: 0;
+  }
+  .avalon-pair-halves {
+    opacity: 1;
+  }
+  .avalon-pair-half-left {
+    transform: translate(-13px, 5px) rotate(-9deg);
+  }
+  .avalon-pair-half-right {
+    transform: translate(13px, 12px) rotate(9deg);
+  }
+}
+
+.avalon-mission-scene {
+  position: absolute;
+  width: 360px;
+  height: 240px;
+  left: 120px;
+  top: 250px;
+  .avalon-mission-card {
+    position: absolute;
+    top: 66px;
+    width: 74px;
+    height: 112px;
+  }
+  .turn,
+  .back,
+  .face {
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+  }
+  .turn {
+    box-shadow: 4px 8px 10px #0007;
+  }
+  .back {
+    display: grid;
+    place-items: center;
+    color: #d3b87e;
+    font:
+      18px Georgia,
+      serif;
+    background: #24382c;
+    border: 2px double #b69d6e;
+  }
+  .face {
+    opacity: 0;
+    background: radial-gradient(ellipse at top, #f1e2bb, #c4ae84);
+    border: 1px solid #b69d6e;
+  }
+  .face img {
+    position: absolute;
+    top: 11px;
+    left: 11px;
+    width: 50px;
+    height: 64px;
+    object-fit: contain;
+  }
+  .face strong {
+    position: absolute;
+    bottom: 11px;
+    width: 100%;
+    text-align: center;
+    color: #352a1a;
+    font:
+      bold 11px Georgia,
+      serif;
+  }
+  .bad .face {
+    background: radial-gradient(ellipse at top, #dfc8ac, #b29677);
+  }
+  .avalon-mission-badge {
+    position: absolute;
+    left: 140px;
+    top: 50px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid #d5bb7e;
+    background: radial-gradient(ellipse at top, #b69e68, #302e1e);
+    box-shadow:
+      0 0 0 7px #c7ae6222,
+      0 10px 15px #0007;
+    opacity: 0;
+  }
+  .avalon-mission-badge img {
+    position: absolute;
+    inset: 9px;
+    width: 58px;
+    height: 58px;
+  }
+  &.reduced {
+    .back {
+      opacity: 0;
+    }
+    .face {
+      opacity: 1;
+    }
+  }
+}
+
+.avalon-mission-scene.witch-hidden {
+  .mission-rim {
+    position: absolute;
+    inset: -4px;
+    border: 2px solid #b799ce;
+    border-radius: 9px;
+    opacity: 0;
+    box-shadow:
+      0 0 14px #b799ce66,
+      inset 0 0 12px #b799ce33;
+  }
+  .avalon-mission-badge {
+    border-color: #b8a1c6;
+    background: radial-gradient(ellipse at top, #6a5875, #2e2339);
+    box-shadow:
+      0 0 0 7px #b799ce22,
+      0 10px 15px #0007;
+  }
+  .avalon-mission-badge img {
+    inset: 0;
+    width: 76px;
+    height: 76px;
+    object-fit: cover;
+    border-radius: 50%;
+    filter: saturate(0.65);
+  }
+  &.reduced {
+    .back {
+      opacity: 1;
+    }
+    .mission-rim {
+      opacity: 0.25;
+    }
+  }
 }

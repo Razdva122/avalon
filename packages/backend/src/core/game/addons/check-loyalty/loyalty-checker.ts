@@ -113,8 +113,10 @@ export class LoyaltyChecker {
     this.game.history.push(loyaltyAnnounce);
 
     this.updateVisibleRoles(executor, selectedPlayer);
-    this.postAnnounceAction(executor, selectedPlayer);
+    // Witch can synchronously finish the mission and start the next stage here.
+    // Clear the announcement timer before that transition, preserving its new timer.
     this.game.timer.clearTimer();
+    this.postAnnounceAction(executor, selectedPlayer);
     this.loyaltySubject.next(true);
   }
 

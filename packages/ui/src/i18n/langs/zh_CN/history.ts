@@ -39,6 +39,8 @@ export default {
     announceLoyalty: '宣布',
   },
   mission: {
+    cardSuccess: '成功',
+    cardFail: '失败',
     players: '玩家',
     fails: '失败',
     indexMission: '{index} 任务',
@@ -79,6 +81,8 @@ export default {
     switchInfo: '{switcher} 使用 神剑 将 {target} 的行动更改为',
   },
   assassinate: {
+    verdictHit: '击杀',
+    verdictMiss: '未中',
     lovers: '恋人',
     assassinate: '暗杀',
     shot: '{killerName} 暗杀 {killedName}',

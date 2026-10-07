@@ -39,6 +39,8 @@ export default {
     hidden: 'Hidden',
   },
   mission: {
+    cardSuccess: 'Success',
+    cardFail: 'Fail',
     players: 'Players',
     fails: 'Fails',
     indexMission: '{index} mission',
@@ -79,6 +81,8 @@ export default {
     switchInfo: "{switcher} used Excalibur and changed {target}'s decision to",
   },
   assassinate: {
+    verdictHit: 'Killed',
+    verdictMiss: 'Miss',
     lovers: 'Lovers',
     assassinate: 'Assassinate',
     shot: '{killerName} killed {killedName}',

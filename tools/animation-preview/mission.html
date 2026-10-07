@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Avalon — результаты миссии</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="mission.css" />
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="index.html">Avalon<span>Мастерская анимаций</span></a
+      ><a class="draft" href="mission-table.html" style="color: var(--gold)">Веер на столе Avalon →</a>
+    </header>
+    <main>
+      <div class="intro">
+        <h1>Судьба похода</h1>
+        <p>Три варианта раскрытия результатов миссии. Анонимные карты, понятный итог, тот же игровой стол.</p>
+      </div>
+      <div class="workspace">
+        <section class="theatre" aria-label="Предпросмотр анимации">
+          <div class="scene-header">
+            <span id="scene-type">Результат миссии</span><span id="duration">≈ 3 секунды</span>
+          </div>
+          <div class="board">
+            <div class="table"></div>
+            <div class="seat north">
+              <img src="/packages/ui/src/assets/images/roles/mordred.webp" alt="" /><span>Мордред</span>
+            </div>
+            <div class="seat west">
+              <img src="/packages/ui/src/assets/images/roles/percival.webp" alt="" /><span>Персиваль</span>
+            </div>
+            <div class="seat east">
+              <img src="/packages/ui/src/assets/images/roles/morgana.webp" alt="" /><span>Моргана</span>
+            </div>
+            <div class="seat south">
+              <img src="/packages/ui/src/assets/images/roles/merlin.webp" alt="" /><span>Мерлин</span>
+            </div>
+            <div id="stage" aria-label="Анонимные карты миссии"></div>
+            <div id="mission-track" class="mission-track" aria-label="Результаты пяти миссий"></div>
+          </div>
+          <div class="playback">
+            <button id="play" class="primary">▶ Запустить сцену</button><button id="reset">Сбросить</button
+            ><label><input id="slow" type="checkbox" /> Медленно</label>
+          </div>
+        </section>
+        <aside>
+          <div class="settings">
+            <h2>Результат миссии</h2>
+            <label for="outcome">Проверьте разные результаты</label
+            ><select id="outcome"></select
+            ><label for="team-size" class="size-label">Размер команды</label
+            ><select id="team-size">
+              <option value="2">2 участника</option>
+              <option value="3" selected>3 участника</option>
+              <option value="4">4 участника</option>
+              <option value="5">5 участников</option>
+            </select>
+            <p id="outcome-note"></p>
+          </div>
+          <div class="selected">
+            <span class="small">Выбранный вариант</span>
+            <h2 id="selected-title"></h2>
+            <p id="selected-description"></p>
+            <div class="sequence" id="sequence"></div>
+          </div>
+          <p class="hint">
+            Кнопка запуска также повторяет анимацию. Результат остаётся на столе, чтобы его можно было рассмотреть.
+          </p>
+        </aside>
+      </div>
+      <section class="collection" aria-label="Варианты анимации миссии">
+        <div class="group-heading">
+          <h2>Три варианта</h2>
+          <p>Выберите, как раскрывать карты миссии</p>
+        </div>
+        <div id="mission-options" class="options"></div>
+      </section>
+      <footer>
+        Использованы оригинальные иллюстрации Avalon. Результаты не раскрывают, кто сыграл каждую карту. Эти три
+        концепта пока не подключены к партии.
+      </footer>
+    </main>
+    <script type="module" src="mission.js"></script>
+  </body>
+</html>

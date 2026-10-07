@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Avalon — веер на игровом столе</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="mission.css?v=witch-1" />
+    <link rel="stylesheet" href="mission-table.css" />
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="mission.html">Avalon<span>Веер на игровом столе</span></a
+      ><span class="draft">Предпросмотр</span>
+    </header>
+    <main>
+      <div class="intro">
+        <h1>Веер решений на столе Avalon</h1>
+        <p>Оригинальный стол, рамки игроков и расположение шкалы миссий. Можно менять состав и исход похода.</p>
+      </div>
+      <div class="workspace native-workspace">
+        <section class="theatre" aria-label="Предпросмотр на игровом столе">
+          <div class="scene-header"><span id="scene-type">Результат миссии</span><span id="duration"></span></div>
+          <div class="native-viewport">
+            <div class="board native-board">
+              <div class="table"></div>
+              <div id="native-players"></div>
+              <div class="native-history" aria-hidden="true">◂ &nbsp; История партии &nbsp; ▸</div>
+              <div id="mission-track" class="mission-track" aria-label="Результаты пяти миссий"></div>
+              <div class="native-vote">Стадия голосования: 1 / 5</div>
+              <div id="stage" aria-label="Анонимные карты миссии"></div>
+              <div class="native-meta"><span>Стадия: результаты миссии</span><span id="native-balance"></span></div>
+            </div>
+          </div>
+          <div class="playback">
+            <button id="play" class="primary">▶ Запустить сцену</button><button id="reset">Сбросить</button
+            ><label><input id="slow" type="checkbox" /> Медленно</label>
+          </div>
+        </section>
+        <aside>
+          <div class="settings">
+            <h2>Сценарий</h2>
+            <label for="outcome">Результат миссии</label
+            ><select id="outcome"></select
+            ><label for="team-size" class="size-label">Участники похода</label
+            ><select id="team-size">
+              <option value="2">2 участника</option>
+              <option value="3" selected>3 участника</option>
+              <option value="4">4 участника</option>
+              <option value="5">5 участников</option></select
+            ><label for="seat-count" class="size-label">Игроки за столом</label
+            ><select id="seat-count">
+              <option value="5">5 игроков</option>
+              <option value="6">6 игроков</option>
+              <option value="7" selected>7 игроков</option>
+              <option value="8">8 игроков</option>
+              <option value="9">9 игроков</option>
+              <option value="10">10 игроков</option>
+            </select>
+            <p id="outcome-note"></p>
+          </div>
+          <div class="selected">
+            <h2 id="selected-title"></h2>
+            <p id="selected-description"></p>
+            <div class="sequence" id="sequence"></div>
+          </div>
+          <p class="hint">
+            Портреты здесь служат аватарами. Карты миссии анонимны.<br /><a href="mission.html">← Все три варианта</a>
+          </p>
+        </aside>
+      </div>
+      <div id="mission-options" class="options" hidden></div>
+      <footer>
+        Предпросмотр использует изображения и геометрию игрового стола. «Веер решений» также подключён к результатам
+        миссии в игре.
+      </footer>
+    </main>
+    <script type="module" src="mission-table.js?v=witch-1"></script>
+  </body>
+</html>

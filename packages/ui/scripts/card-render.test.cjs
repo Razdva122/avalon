@@ -8,17 +8,41 @@ const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKi
 const renderer = {};
 new Function('require', 'exports', code)(require, renderer);
 
-function scene(t, options) {
+function scene(t, options, motions = []) {
   const originalDocument = global.document;
   let root;
   global.document = {
-    createElement: () => ({ innerHTML: '', setAttribute() {}, remove() {} }),
+    createElement: () => {
+      const node = (selector) => ({
+        style: { left: '103px' },
+        classList: { contains: (name) => selector.includes(name) },
+        querySelector: (child) => node(`${selector} ${child}`),
+        animate: (frames, timing) => {
+          motions.push({ selector, frames, ...timing });
+          return { cancel() {} };
+        },
+      });
+      return {
+        innerHTML: '',
+        classList: { add() {} },
+        setAttribute() {},
+        remove() {},
+        querySelector: node,
+        querySelectorAll: () => [node('.avalon-cards-reverse'), node('.avalon-cards-front')],
+      };
+    },
   };
   t.after(() => {
     if (originalDocument === undefined) delete global.document;
     else global.document = originalDocument;
   });
-  const cleanup = renderer.renderAssassination(
+  const cleanup = (
+    options.mission
+      ? renderer.renderMission
+      : options.variant
+        ? renderer.renderPairAssassination
+        : renderer.renderAssassination
+  )(
     {
       appendChild: (node) => {
         root = node;
@@ -31,11 +55,13 @@ function scene(t, options) {
       survivorName: 'Боб',
       hit: false,
       reducedMotion: true,
+      hitLabel: 'Убит',
+      missLabel: 'Промах',
       ...options,
     },
   );
   t.after(cleanup);
-  return root.innerHTML;
+  return `<div class="${root.className}">${root.innerHTML}</div>`;
 }
 
 function labels(html, owner) {
@@ -81,4 +107,138 @@ test('a miss shows both player names and safely escapes nickname text and title 
   assert.ok(html.includes('/survivor.webp'));
   assert.equal(html.includes('<img src=x'), false);
   assert.equal(html.includes('<svg onload='), false);
+});
+
+test('the card swaps surfaces only at its edge and never rotates back past its face', (t) => {
+  const motions = [];
+  scene(t, { hit: true, reducedMotion: false }, motions);
+  const flip = motions.find((motion) => motion.selector === '.avalon-cards-turn');
+  const widths = flip.frames.map((frame) => {
+    const match = /^scaleX\(([\d.]+)\)$/.exec(frame.transform);
+    assert.ok(match, 'the reveal must not rotate or expose nested 3D backfaces');
+    return Number(match[1]);
+  });
+  assert.equal(widths[0], 1);
+  assert.ok(widths[1] > 0 && widths[1] <= 0.05, 'surfaces swap while the card is edge-on');
+  assert.equal(widths.at(-1), 1);
+  assert.equal(flip.frames[1].offset, 0.5);
+  assert.equal(flip.easing, 'linear', 'the surface switch must align with the geometric midpoint');
+  const back = motions.find((motion) => motion.selector === '.avalon-cards-reverse');
+  const front = motions.find((motion) => motion.selector === '.avalon-cards-front');
+  assert.deepEqual(
+    back.frames.map((frame) => frame.opacity),
+    [1, 0],
+  );
+  assert.deepEqual(
+    front.frames.map((frame) => frame.opacity),
+    [0, 1],
+  );
+  assert.equal(back.delay, flip.delay + flip.duration / 2);
+  assert.equal(front.delay, back.delay);
+  assert.equal(back.duration, 1);
+  assert.equal(front.duration, 1);
+});
+
+test('pair cards show escaped player names and static reduced-motion outcomes', (t) => {
+  const cards = [
+    { id: 'p1', roleImage: '/cleric.webp', playerName: 'Алексей <&>', hit: true },
+    { id: 'p2', roleImage: '/servant.webp', playerName: 'Мария', hit: false },
+  ];
+  const html = scene(t, { variant: 'verdict', cards });
+  assert.ok(labels(html, 'p1').length > 0);
+  assert.ok(labels(html, 'p2').length > 0);
+  assert.ok(labels(html, 'p1').every((label) => label.text === 'Алексей &lt;&amp;&gt;'));
+  assert.ok(labels(html, 'p2').every((label) => label.text === 'Мария'));
+  assert.ok(html.includes('Убит'));
+  assert.ok(html.includes('Промах'));
+  assert.ok(!html.includes('Покушение'));
+  assert.ok(html.includes('avalon-pair-reduced'));
+});
+
+test('shared cut affects both Lovers cards only when the pair was guessed', (t) => {
+  for (const hit of [true, false]) {
+    const motions = [];
+    scene(
+      t,
+      {
+        variant: 'cut',
+        reducedMotion: false,
+        cards: [
+          { id: 'p1', roleImage: '/tristan.webp', playerName: 'Алексей', hit },
+          { id: 'p2', roleImage: '/isolde.webp', playerName: 'Мария', hit },
+        ],
+      },
+      motions,
+    );
+    const cuts = motions.filter((motion) => motion.selector.endsWith('.avalon-pair-half-left'));
+    assert.equal(cuts.length, hit ? 2 : 0);
+    if (hit) assert.equal(cuts[0].delay, cuts[1].delay);
+  }
+});
+
+test('mission cards stay anonymous, flip at their edge and cleanup cancels landing', (t) => {
+  const motions = [];
+  let landed = false;
+  const html = scene(
+    t,
+    {
+      mission: true,
+      players: 2,
+      fails: 1,
+      result: 'fail',
+      successImage: '/good.webp',
+      failImage: '/evil.webp',
+      successLabel: 'Success',
+      failLabel: 'Fail',
+      target: { x: 90, y: 242, size: 65 },
+      reducedMotion: false,
+      onReveal: () => {
+        landed = true;
+      },
+    },
+    motions,
+  );
+  assert.equal(html.includes('data-card-owner'), false);
+  assert.equal(html.includes('Алиса'), false);
+  assert.ok(html.includes('Success') && html.includes('Fail'));
+  const flips = motions.filter((m) => m.selector.endsWith(' .turn'));
+  assert.equal(flips.length, 2);
+  assert.equal(flips[1].delay - flips[0].delay, 260);
+  assert.equal(flips[0].frames[1].transform, 'scaleX(.04)');
+  assert.equal(landed, false);
+});
+
+test('witch scene never creates decision faces or flip animations, including reduced motion', (t) => {
+  for (const reducedMotion of [false, true]) {
+    const motions = [];
+    const html = scene(
+      t,
+      {
+        mission: true,
+        players: 3,
+        hidden: true,
+        witchImage: '/witch.webp',
+        successImage: '/good.webp',
+        failImage: '/evil.webp',
+        successLabel: 'Success',
+        failLabel: 'Fail',
+        target: { x: 90, y: 242, size: 65 },
+        reducedMotion,
+        onReveal() {},
+      },
+      motions,
+    );
+    assert.ok(html.includes('/witch.webp'));
+    assert.equal(html.includes('class="face"'), false);
+    assert.equal(html.includes('/good.webp'), false);
+    assert.equal(html.includes('/evil.webp'), false);
+    assert.equal(
+      motions.some((m) => m.selector.endsWith(' .turn')),
+      false,
+    );
+    assert.equal(
+      motions.some((m) => m.selector.endsWith(' .back')),
+      false,
+    );
+  }
 });

@@ -68,13 +68,22 @@
       </div>
     </div>
     <div class="d-flex flex-row mb-4">
-      <Mission v-for="mission in gameState.missionState" :mission="mission" />
+      <Mission
+        v-for="(mission, index) in displayMissions"
+        :key="index"
+        :mission="mission"
+        :index="index"
+        :conceal-result="pendingMission === index"
+      />
     </div>
     <div class="mb-4">{{ $t('game.voteStage') }}: {{ gameState.vote + 1 }} / 5</div>
     <div class="button-panel actions-or-info mb-4 d-flex flex-column align-center">
       <PlotCardsPanel v-if="!visibleHistory" :data="gameState.addonsData.plotCards?.activeCards" :game="gameState" />
       <InGamePanel v-if="inGamePanel && !visibleHistory && stateManager.viewMode.value === 'live'" :game="gameState" />
-      <div class="d-flex flex-row align-center justify-center" v-if="visibleHistory?.type === 'mission'">
+      <div
+        class="d-flex flex-row align-center justify-center"
+        v-if="visibleHistory?.type === 'mission' && !missionAnimationActive"
+      >
         <template v-for="i in visibleHistory.settings.players">
           <div
             v-if="visibleHistory.fails !== undefined"
@@ -142,6 +151,8 @@ export default defineComponent({
     PlotCardsPanel,
   },
   props: {
+    missionAnimationActive: Boolean,
+    pendingMission: Number,
     inGamePanel: {
       required: true,
       type: Boolean,
@@ -150,11 +161,30 @@ export default defineComponent({
       type: Object as PropType<THistoryResults>,
     },
   },
-  setup() {
+  setup(props) {
     const { t } = useI18n();
     const gameState = inject(gameStateKey)!;
     const stateManager = inject(stateManagerKey)!;
     const roomState = stateManager.startedRoomState;
+
+    // The replay snapshot advances after the history timer, so land the public
+    // result on its token without advancing any other part of the game.
+    const displayMissions = computed(() =>
+      gameState.value.missionState.map((mission, index) => {
+        const event = props.visibleHistory;
+        return props.missionAnimationActive &&
+          props.pendingMission === undefined &&
+          event?.type === 'mission' &&
+          event.index === index
+          ? {
+              ...mission,
+              hidden: event.hidden,
+              result: event.hidden ? undefined : event.result,
+              fails: event.hidden ? undefined : event.fails,
+            }
+          : mission;
+      }),
+    );
 
     const endReason = computed(() => {
       if (gameState.value.result) {
@@ -192,6 +222,7 @@ export default defineComponent({
 
     return {
       gameState,
+      displayMissions,
       stateManager,
       endReason,
       stageText,

@@ -62,8 +62,8 @@ function createScene(container: HTMLElement, className: string) {
   return { root, motion, cleanup };
 }
 
-const face = (art: string, name: string, owner: 'selected' | 'survivor'): string =>
-  `<div class="avalon-cards-face"><div class="avalon-cards-art"><img src="${escapeHTML(art)}" alt=""></div><div class="avalon-cards-title" data-card-owner="${owner}" title="${escapeHTML(name)}">${escapeHTML(name)}</div></div>`;
+const face = (art: string, name: string, owner: string): string =>
+  `<div class="avalon-cards-face"><div class="avalon-cards-art"><img src="${escapeHTML(art)}" alt=""></div><div class="avalon-cards-title" data-card-owner="${escapeHTML(owner)}" title="${escapeHTML(name)}">${escapeHTML(name)}</div></div>`;
 
 const back = '<div class="avalon-cards-back"><div class="avalon-cards-back-ornament"></div><span>Avalon</span></div>';
 
@@ -136,17 +136,24 @@ export function renderAssassination(container: HTMLElement, options: Assassinati
     motion(side.querySelector('.avalon-cards-edge')!, [{ strokeDashoffset: '70' }, { strokeDashoffset: '0' }], 280, 40);
     motion(side.querySelector('.avalon-cards-threads')!, [{ opacity: 0 }, { opacity: 0.85 }], 160, 160);
   });
+  // Swap flattened surfaces at the edge instead of relying on nested 3D
+  // backface culling, which can expose the card back while the face unfolds.
+  const flipDuration = 520;
+  const flipDelay = 180;
+  const edgeAt = flipDelay + flipDuration / 2;
   motion(
     find('.avalon-cards-turn'),
     [
-      { transform: 'rotateY(0deg) translateZ(0)' },
-      { offset: 0.45, transform: 'rotateY(-87deg) translateZ(15px)' },
-      { offset: 0.86, transform: 'rotateY(-187deg) translateZ(2px)' },
-      { transform: 'rotateY(-180deg) translateZ(0)' },
+      { transform: 'scaleX(1)', easing: 'ease-in' },
+      { offset: 0.5, transform: 'scaleX(0.04)', easing: 'ease-out' },
+      { transform: 'scaleX(1)' },
     ],
-    900,
-    450,
+    flipDuration,
+    flipDelay,
+    'linear',
   );
+  motion(find('.avalon-cards-reverse'), [{ opacity: 1 }, { opacity: 0 }], 1, edgeAt);
+  motion(find('.avalon-cards-front'), [{ opacity: 0 }, { opacity: 1 }], 1, edgeAt);
   motion(
     find('.avalon-cards-table-shadow'),
     [
@@ -154,8 +161,8 @@ export function renderAssassination(container: HTMLElement, options: Assassinati
       { offset: 0.4, opacity: 0.4, transform: 'scale(1.12)' },
       { opacity: 0.7, transform: 'scale(1)' },
     ],
-    900,
-    450,
+    flipDuration,
+    flipDelay,
   );
   motion(find('.avalon-cards-target'), [{ opacity: 1 }, { opacity: 0 }], 1, 1600);
   motion(find('.avalon-cards-halves'), [{ opacity: 0 }, { opacity: 1 }], 1, 1600);
@@ -211,6 +218,103 @@ export function renderAssassination(container: HTMLElement, options: Assassinati
       2250,
     );
   }
+  return cleanup;
+}
+
+type PairAssassinationOptions = {
+  variant: 'cut' | 'verdict';
+  hitLabel: string;
+  missLabel: string;
+  cards: { id: string; roleImage: string; playerName: string; hit: boolean }[];
+  reducedMotion: boolean;
+};
+
+/** Shared cut for Lovers, or one verdict per public Cleric assassination stage. */
+export function renderPairAssassination(container: HTMLElement, options: PairAssassinationOptions): () => void {
+  const { root, motion, cleanup } = createScene(
+    container,
+    `avalon-assassination avalon-pair${options.cards.length === 1 ? ' avalon-pair-single' : ''}${options.reducedMotion ? ' avalon-pair-reduced' : ''}`,
+  );
+  root.innerHTML = `<div class="avalon-cards-scene">${options.cards
+    .map((card, index) => {
+      const front = face(card.roleImage, card.playerName, card.id);
+      const cut = options.variant === 'cut' && card.hit;
+      return `<div class="avalon-pair-slot avalon-pair-slot-${index}${cut ? ' avalon-pair-cut' : ''}">
+      <div class="avalon-pair-turn avalon-cards-card"><div class="avalon-pair-back">${back}</div><div class="avalon-pair-front">${front}</div></div>
+      ${cut ? `<div class="avalon-pair-halves"><div class="avalon-pair-half-left avalon-cards-half-left">${front}</div><div class="avalon-pair-half-right avalon-cards-half-right">${front}</div></div>` : ''}
+      ${options.variant === 'verdict' ? `<div class="avalon-pair-stamp${card.hit ? '' : ' avalon-pair-miss'}">${escapeHTML(card.hit ? options.hitLabel : options.missLabel)}</div>` : ''}
+      ${!card.hit ? '<div class="avalon-pair-protected"></div>' : ''}
+    </div>`;
+    })
+    .join('')}${options.variant === 'cut' ? '<div class="avalon-pair-slash"></div>' : ''}</div>`;
+  if (options.reducedMotion) return cleanup;
+  const find = (selector: string) => root.querySelector(selector)!;
+  options.cards.forEach((card, index) => {
+    const selector = `.avalon-pair-slot-${index}`;
+    const at = (child: string) => find(`${selector} ${child}`);
+    const delay = options.variant === 'verdict' ? (index ? 1550 : 350) : 350;
+    motion(
+      at('.avalon-pair-turn'),
+      [
+        { transform: 'scaleX(1)', easing: 'ease-in' },
+        { offset: 0.5, transform: 'scaleX(0.04)', easing: 'ease-out' },
+        { transform: 'scaleX(1)' },
+      ],
+      520,
+      delay,
+      'linear',
+    );
+    motion(at('.avalon-pair-back'), [{ opacity: 1 }, { opacity: 0 }], 1, delay + 260);
+    motion(at('.avalon-pair-front'), [{ opacity: 0 }, { opacity: 1 }], 1, delay + 260);
+    if (options.variant === 'cut' && card.hit) {
+      motion(at('.avalon-pair-turn'), [{ opacity: 1 }, { opacity: 0 }], 1, 1570);
+      motion(at('.avalon-pair-halves'), [{ opacity: 0 }, { opacity: 1 }], 1, 1570);
+      for (const [side, sign] of [
+        ['left', -1],
+        ['right', 1],
+      ] as const) {
+        motion(
+          at(`.avalon-pair-half-${side}`),
+          [
+            { transform: 'translate(0,0) rotate(0deg)' },
+            { transform: `translate(${sign * 13}px,${sign < 0 ? 5 : 12}px) rotate(${sign * 9}deg)` },
+          ],
+          620,
+          1570,
+        );
+      }
+    }
+    if (options.variant === 'verdict') {
+      motion(
+        at('.avalon-pair-stamp'),
+        [
+          { opacity: 0, transform: 'scale(1.8) rotate(-12deg)' },
+          { offset: 0.75, opacity: 1, transform: 'scale(0.95) rotate(-12deg)' },
+          { opacity: 1, transform: 'scale(1) rotate(-12deg)' },
+        ],
+        380,
+        index ? 2400 : 1200,
+      );
+    }
+    if (!card.hit)
+      motion(
+        at('.avalon-pair-protected'),
+        [{ opacity: 0 }, { opacity: 1 }],
+        400,
+        options.variant === 'verdict' ? (index ? 2550 : 1350) : 1570,
+      );
+  });
+  if (options.variant === 'cut')
+    motion(
+      find('.avalon-pair-slash'),
+      [
+        { opacity: 0, transform: 'rotate(-14deg) scaleX(0)' },
+        { offset: 0.4, opacity: 0.9, transform: 'rotate(-14deg) scaleX(1)' },
+        { opacity: 0, transform: 'rotate(-14deg) scaleX(1)' },
+      ],
+      350,
+      1420,
+    );
   return cleanup;
 }
 
@@ -322,4 +426,108 @@ export function renderLoyalty(container: HTMLElement, options: LoyaltyOptions): 
     1050,
   );
   return cleanup;
+}
+
+type MissionOptions = {
+  players: number;
+  fails?: number;
+  result?: 'success' | 'fail';
+  hidden?: boolean;
+  witchImage: string;
+  successImage: string;
+  failImage: string;
+  successLabel: string;
+  failLabel: string;
+  target: { x: number; y: number; size: number };
+  reducedMotion: boolean;
+  onReveal: () => void;
+};
+
+export function renderMission(container: HTMLElement, options: MissionOptions): () => void {
+  const { root, motion, cleanup } = createScene(
+    container,
+    `avalon-mission-scene${options.hidden ? ' witch-hidden' : ''}`,
+  );
+  const image = (bad: boolean) => escapeHTML(bad ? options.failImage : options.successImage);
+  root.innerHTML =
+    Array.from({ length: options.players }, (_, i) => {
+      const bad = !options.hidden && i >= options.players - (options.fails ?? 0);
+      const x = (360 - options.players * 74 - (options.players - 1) * 6) / 2 + i * 80;
+      if (options.hidden)
+        return `<div class="avalon-mission-card" style="left:${x}px"><div class="turn"><div class="back">Avalon</div></div><div class="mission-rim"></div></div>`;
+      return `<div class="avalon-mission-card${bad ? ' bad' : ''}" style="left:${x}px"><div class="turn"><div class="back">Avalon</div><div class="face"><img src="${image(bad)}" alt=""><strong>${escapeHTML(bad ? options.failLabel : options.successLabel)}</strong></div></div></div>`;
+    }).join('') +
+    `<div class="avalon-mission-badge"><img src="${options.hidden ? escapeHTML(options.witchImage) : image(options.result === 'fail')}" alt=""></div>`;
+  const cards = Array.from(root.querySelectorAll<HTMLElement>('.avalon-mission-card'));
+  if (options.reducedMotion) {
+    root.classList.add('reduced');
+    options.onReveal();
+    return cleanup;
+  }
+  cards.forEach((card, i) => {
+    const x = parseFloat(card.style.left);
+    motion(
+      card,
+      [
+        { transform: `translate(${143 - x}px,14px) rotate(${(i - 1) * 2}deg)` },
+        { transform: `rotate(${(i - (options.players - 1) / 2) * 3}deg)` },
+      ],
+      500,
+      i * 70,
+    );
+    if (options.hidden) {
+      motion(
+        card.querySelector('.mission-rim')!,
+        [{ opacity: 0 }, { offset: 0.45, opacity: 1 }, { opacity: 0.25 }],
+        650,
+        760 + i * 110,
+      );
+      return;
+    }
+    const delay = 620 + i * 260;
+    motion(
+      card.querySelector('.turn')!,
+      [
+        { transform: 'scaleX(1)', easing: 'ease-in' },
+        { offset: 0.5, transform: 'scaleX(.04)', easing: 'ease-out' },
+        { transform: 'scaleX(1)' },
+      ],
+      480,
+      delay,
+      'linear',
+    );
+    motion(card.querySelector('.back')!, [{ opacity: 1 }, { opacity: 0 }], 1, delay + 240);
+    motion(card.querySelector('.face')!, [{ opacity: 0 }, { opacity: 1 }], 1, delay + 240);
+  });
+  const resultAt = options.hidden ? 1550 : 1240 + (options.players - 1) * 260;
+  cards.forEach((card) => motion(card, [{ opacity: 1 }, { opacity: 0.7 }], 350, resultAt));
+  const badge = root.querySelector('.avalon-mission-badge')!;
+  motion(
+    badge,
+    [
+      { opacity: 0, transform: 'scale(.6)' },
+      { opacity: 1, transform: 'scale(1)' },
+    ],
+    340,
+    resultAt,
+  );
+  motion(
+    badge,
+    [
+      { transform: 'translate(0,0) scale(1)' },
+      {
+        transform: `translate(${options.target.x - 180}px,${options.target.y - 340}px) scale(${options.target.size / 80})`,
+      },
+    ],
+    650,
+    resultAt + 440,
+    undefined,
+    'forwards',
+  );
+  motion(badge, [{ opacity: 1 }, { opacity: 0 }], 160, resultAt + 1090, undefined, 'forwards');
+  const landing = setTimeout(options.onReveal, resultAt + 1090);
+  return () => {
+    clearTimeout(landing);
+    cleanup();
+  };
 }

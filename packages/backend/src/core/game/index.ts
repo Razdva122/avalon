@@ -313,9 +313,11 @@ export class Game extends GameHooks {
    */
   finishCurrentRound(): void {
     this.clearSendPlayers();
+    // Witch finishes its declaration and mission in one update. The UI displays
+    // both history events for ten seconds each before showing the stage timer.
+    const previous = _.last(this.history);
     this.history.push(this.currentMission);
-    // Mark that we need a delay for the next timer (mission results display)
-    this.timer.setHistoryDelay();
+    this.timer.setHistoryDelay(previous?.type === 'announceLoyalty' ? 20000 : 10000);
   }
 
   /**

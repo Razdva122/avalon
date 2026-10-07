@@ -39,6 +39,8 @@ export default {
     hidden: 'Oculto',
   },
   mission: {
+    cardSuccess: 'Sucesso',
+    cardFail: 'Falha',
     players: 'Jogadores',
     fails: 'Falhas',
     indexMission: 'missão {index}',
@@ -79,6 +81,8 @@ export default {
     switchInfo: '{switcher} usou excalibur para mudar a ação de {target} para',
   },
   assassinate: {
+    verdictHit: 'Morto',
+    verdictMiss: 'Falhou',
     lovers: 'Amantes',
     assassinate: 'Assassinar',
     shot: '{killerName} assassina {killedName}',

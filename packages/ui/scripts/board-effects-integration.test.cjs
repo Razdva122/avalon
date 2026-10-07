@@ -33,7 +33,7 @@ const game = (history = [], extra = {}) => ({
   history,
   players,
   features: {},
-  missionState: [],
+  missionState: [{ players: 2, failsRequired: 1 }],
   addonsData: {},
   ...extra,
 });
@@ -102,7 +102,9 @@ function fixture(t, initial = game(), reducedMotion = false) {
       return {
         ...animationRender,
         renderLoyalty: render('lady'),
+        renderMission: render('mission'),
         renderAssassination: render('assassination'),
+        renderPairAssassination: render('pair'),
       };
     if (id.startsWith('@/') || id.startsWith('./')) return {};
     return require(id);
@@ -123,7 +125,9 @@ function fixture(t, initial = game(), reducedMotion = false) {
   // Board and replay watchers use the real Vue scheduler; rendering and geometry are stubbed.
   api.cardEffectRef.value = { querySelectorAll: () => labels };
   api.loyaltyEffectRef.value = {};
+  api.missionEffectRef.value = {};
   api.boardRef.value = {
+    querySelector: () => ({ getBoundingClientRect: () => ({ x: 200, y: 210, width: 65, height: 65 }) }),
     offsetWidth: 600,
     offsetHeight: 600,
     getBoundingClientRect: () => ({ x: 0, y: 0, width: 600, height: 600 }),
@@ -147,6 +151,20 @@ function fixture(t, initial = game(), reducedMotion = false) {
     users,
     labels,
     emitted,
+    displayedMissions: () => {
+      const Game = compile('../src/components/view/board/game/Game.vue', (id) => {
+        if (id === 'vue') return { ...vue, inject: (key) => (key === keys.gameStateKey ? manager.game : manager) };
+        if (id === 'vue-i18n') return { useI18n: () => ({ t: (key) => key }) };
+        if (id === '@/helpers/game-state-manager') return keys;
+        if (id.startsWith('@/')) return {};
+        return require(id);
+      }).default;
+      return Game.setup({
+        visibleHistory: api.visibleHistory.value,
+        missionAnimationActive: api.missionAnimationActive.value,
+        pendingMission: api.pendingMission.value,
+      }).displayMissions.value;
+    },
     flush: async () => {
       for (let i = 0; i < 5; i++) await vue.nextTick();
     },
@@ -258,7 +276,7 @@ test('card nicknames update when public profiles arrive after the reveal starts'
   assert.equal(f.draws.length, 1, 'profile loading does not restart the animation');
 });
 
-test('Cleric attacks never conceal the end result or start a card scene', async (t) => {
+test('a Cleric event with an unrelated end reason does not start a card scene', async (t) => {
   const f = fixture(t);
   const event = { ...attack, assassinateType: 'cleric' };
   f.manager.mutateRoomState({ newRoomState: room(game([event], { stage: 'end', result })), isLiveUpdate: true });
@@ -362,3 +380,175 @@ for (const hit of [false, true]) {
     );
   });
 }
+
+test('live Lovers pair runs once, keeps public player names, and masks end roles', async (t) => {
+  const hiddenPlayers = players.map((player) => ({ ...player, role: 'unknown' }));
+  const f = fixture(t, game([], { players: hiddenPlayers }));
+  const event = { ...attack, assassinateType: 'lovers', result: 'hit', killedIDs: ['p1', 'p2'] };
+  const ended = game([event], {
+    stage: 'end',
+    result: { winner: 'evil', reason: 'killLovers' },
+    players: players.map((p, i) => ({ ...p, role: ['tristan', 'isolde', 'minion'][i] })),
+  });
+  f.manager.mutateRoomState({ newRoomState: room(ended), isLiveUpdate: true });
+  await f.flush();
+  assert.equal(f.draws.length, 1);
+  assert.equal(f.draws[0].kind, 'pair');
+  assert.equal(f.draws[0].options.variant, 'cut');
+  assert.deepEqual(
+    f.draws[0].options.cards.map((card) => card.playerName),
+    ['Алиса', 'Борис'],
+  );
+  assert.equal(f.api.players.value[0].role, 'unknown');
+  f.manager.mutateRoomState({ newRoomState: room(ended), isLiveUpdate: true });
+  await f.flush();
+  assert.equal(f.draws.length, 1);
+});
+
+test('Cleric first-stage verdict is replaced by the final pair and cancels its old timer', async (t) => {
+  const f = fixture(t);
+  const first = { ...attack, assassinateType: 'cleric', result: 'hit', killedIDs: ['p1'] };
+  const clericPlayers = players.map((p, i) => (i === 0 ? { ...p, role: 'cleric' } : p));
+  const pending = game([first], {
+    players: clericPlayers,
+    addonsData: { assassin: { progressData: { type: 'cleric', stage: 1 } } },
+  });
+  f.manager.mutateRoomState({ newRoomState: room(pending), isLiveUpdate: true });
+  await f.flush();
+  assert.equal(f.draws.length, 1);
+  assert.equal(f.draws[0].options.cards.length, 1);
+  assert.equal([...f.timers.values()][0].delay, 2000);
+  assert.equal(f.api.players.value[0].role, 'cleric');
+  const second = { ...first, result: 'miss', killedIDs: ['p2'] };
+  f.manager.mutateRoomState({
+    newRoomState: room(
+      game([first, second], { players: clericPlayers, stage: 'end', result: { winner: 'good', reason: 'missCleric' } }),
+    ),
+    isLiveUpdate: true,
+  });
+  await f.flush();
+  assert.equal(f.draws.length, 2);
+  assert.equal(f.draws[0].cleaned, true);
+  assert.equal(f.draws[1].options.variant, 'verdict');
+  assert.deepEqual(
+    f.draws[1].options.cards.map((card) => card.hit),
+    [true, false],
+  );
+  assert.equal(f.timers.size, 1);
+  assert.equal([...f.timers.values()][0].delay, 10000);
+});
+
+test('pair nicknames update without restarting the scene when public profiles arrive late', async (t) => {
+  const f = fixture(t);
+  f.labels[0].dataset.cardOwner = 'p1';
+  f.labels[1].dataset.cardOwner = 'p1';
+  f.labels[2].dataset.cardOwner = 'p2';
+  f.users.p1 = { status: 'loading' };
+  f.users.p2 = { status: 'loading' };
+  const event = { ...attack, assassinateType: 'lovers', result: 'hit', killedIDs: ['p1', 'p2'] };
+  f.manager.mutateRoomState({
+    newRoomState: room(game([event], { stage: 'end', result: { reason: 'killLovers' } })),
+    isLiveUpdate: true,
+  });
+  await f.flush();
+  f.users.p1 = { status: 'ready', profile: { name: 'Первый игрок' } };
+  f.users.p2 = { status: 'ready', profile: { name: 'Второй игрок' } };
+  await f.flush();
+  assert.deepEqual(
+    f.labels.map((label) => label.textContent),
+    ['Первый игрок', 'Первый игрок', 'Второй игрок'],
+  );
+  assert.equal(f.draws.length, 1);
+});
+
+test('new live mission starts fan once, conceals token until landing and cancels in history', async (t) => {
+  const f = fixture(t, game([declaration], { stage: 'selectTeam' }));
+  const event = {
+    type: 'mission',
+    index: 0,
+    settings: { players: 2, failsRequired: 1 },
+    fails: 1,
+    result: 'fail',
+    actions: [],
+  };
+  f.manager.mutateRoomState({ newGameState: game([declaration, event], { stage: 'selectTeam' }) });
+  await f.flush();
+  assert.deepEqual(
+    f.draws.map((d) => d.kind),
+    ['mission'],
+  );
+  assert.equal(f.api.missionAnimationActive.value, true);
+  assert.equal(f.api.pendingMission.value, 0);
+  assert.equal(f.draws[0].options.result, 'fail');
+  assert.equal(f.displayedMissions()[0].result, undefined);
+  f.draws[0].options.onReveal();
+  assert.equal(f.api.pendingMission.value, undefined);
+  assert.equal(f.manager.game.value.missionState[0].result, undefined, 'the replay snapshot is still behind');
+  assert.equal(f.displayedMissions()[0].result, 'fail', 'landing immediately reveals the public result');
+  f.manager.mutateRoomState({ newGameState: game([declaration, event], { stage: 'selectTeam' }) });
+  await f.flush();
+  assert.equal(f.draws.length, 1);
+  f.manager.toggleViewMode();
+  await f.flush();
+  assert.equal(f.api.missionAnimationActive.value, false);
+  assert.equal(f.draws[0].cleaned, true);
+});
+
+test('hidden missions show only witch marker while reconnect snapshots never replay', async (t) => {
+  const event = {
+    type: 'mission',
+    index: 0,
+    settings: { players: 2, failsRequired: 1 },
+    fails: 0,
+    result: 'success',
+    actions: [],
+  };
+  const f = fixture(t, game([declaration, event], { stage: 'selectTeam' }));
+  await f.flush();
+  assert.equal(f.draws.length, 0);
+  f.manager.mutateRoomState({
+    newGameState: game([declaration, event, { ...event, hidden: true }], { stage: 'selectTeam' }),
+  });
+  await f.flush();
+  assert.equal(f.draws.length, 1);
+  const options = f.draws[0].options;
+  assert.equal(options.hidden, true);
+  assert.equal(options.fails, undefined);
+  assert.equal(options.result, undefined);
+  assert.equal(options.witchImage, 'roles/witch.webp');
+  options.onReveal();
+  assert.equal(f.displayedMissions()[0].hidden, true);
+  assert.equal(f.displayedMissions()[0].result, undefined);
+  assert.equal(f.displayedMissions()[0].fails, undefined);
+});
+
+test('Witch declaration and hidden mission arriving in one live update both animate in order', async (t) => {
+  const f = fixture(t, game([declaration], { stage: 'announceLoyalty' }));
+  const mission = { type: 'mission', index: 0, settings: { players: 2, failsRequired: 1 }, hidden: true, actions: [] };
+  f.manager.mutateRoomState({
+    newGameState: game([declaration, declaration, mission], {
+      stage: 'selectTeam',
+      timer: { active: true, endTime: 100000, isCustom: false },
+    }),
+  });
+  await f.flush();
+  assert.deepEqual(
+    f.draws.map((d) => d.kind),
+    ['lady'],
+  );
+  f.api.clearHistoryElement();
+  await f.flush();
+  assert.deepEqual(
+    f.draws.map((d) => d.kind),
+    ['lady', 'mission'],
+  );
+  assert.equal(f.draws[1].options.hidden, true);
+  assert.equal(f.api.missionAnimationActive.value, true);
+  f.draws[1].options.onReveal();
+  assert.equal(f.displayedMissions()[0].hidden, true);
+  assert.equal(f.api.gameTimer.value, null, 'stage timer stays hidden during the mission scene');
+  f.api.clearHistoryElement();
+  await f.flush();
+  assert.equal(f.api.visibleHistory.value, undefined);
+  assert.equal(f.api.gameTimer.value.active, true, 'next stage timer appears once both history events finish');
+});

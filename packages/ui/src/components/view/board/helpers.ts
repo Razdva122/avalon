@@ -37,12 +37,19 @@ export function createLiveEventTracker(initial?: VisualGameState) {
   let length = initial?.history.length ?? 0;
   const pending = new Map<number, THistoryResults>();
   return {
-    observe(game: VisualGameState | undefined, mode: 'live' | 'history', reset = false) {
+    observe(game: VisualGameState | undefined, mode: 'live' | 'history', reset = false, allowLiveBatch = false) {
       const nextLength = game?.history.length ?? 0;
-      if (reset || mode !== 'live' || game?.uuid !== uuid || nextLength < length || nextLength > length + 1) {
+      if (
+        reset ||
+        mode !== 'live' ||
+        game?.uuid !== uuid ||
+        nextLength < length ||
+        (nextLength > length + 1 && !allowLiveBatch)
+      ) {
         pending.clear();
-      } else if (game && nextLength === length + 1) {
-        pending.set(length, game.history[length]);
+      } else if (game && nextLength > length) {
+        // Witch can append its declaration and mission in the same live update.
+        for (let index = length; index < nextLength; index++) pending.set(index, game.history[index]);
       }
       uuid = game?.uuid;
       length = nextLength;
@@ -55,6 +62,8 @@ export function createLiveEventTracker(initial?: VisualGameState) {
   };
 }
 
+export type AssassinationCard = { id: string; role: TRoles; hit: boolean };
+
 export function assassinationReveal(game: VisualGameState):
   | {
       role: TRoles;
@@ -62,9 +71,54 @@ export function assassinationReveal(game: VisualGameState):
       selectedID: string;
       targetID: string;
       hit: boolean;
+      variant?: 'cut' | 'verdict';
+      cards?: AssassinationCard[];
+      pending?: boolean;
     }
   | undefined {
   const event = last(game.history);
+  if (event?.type === 'assassinate' && (event.assassinateType === 'lovers' || event.assassinateType === 'cleric')) {
+    const cleric = event.assassinateType === 'cleric';
+    const pending =
+      cleric &&
+      game.stage === 'assassinate' &&
+      event.result === 'hit' &&
+      game.addonsData?.assassin?.progressData?.type === 'cleric' &&
+      game.addonsData.assassin.progressData.stage === 1;
+    const reasons = cleric ? ['killCleric', 'missCleric'] : ['killLovers', 'missLovers'];
+    if (!pending && (game.stage !== 'end' || !reasons.includes(game.result?.reason ?? ''))) return;
+    if (event.killedIDs.length !== (cleric ? 1 : 2) || new Set(event.killedIDs).size !== event.killedIDs.length) return;
+    const previous = game.history[game.history.length - 2];
+    const events =
+      !pending &&
+      cleric &&
+      previous?.type === 'assassinate' &&
+      previous.assassinateType === 'cleric' &&
+      previous.result === 'hit' &&
+      previous.assassinID === event.assassinID &&
+      previous.killedIDs.length === 1
+        ? [previous, event]
+        : [event];
+    const cards: AssassinationCard[] = [];
+    for (const attack of events) {
+      for (const id of attack.killedIDs) {
+        const player = game.players.find((player) => player.id === id);
+        // Never use private roles: the live first Cleric card must already be public.
+        if (!player || player.role === 'unknown' || (pending && player.role !== 'cleric')) return;
+        cards.push({ id, role: player.role as TRoles, hit: attack.result === 'hit' });
+      }
+    }
+    return {
+      role: cards[0].role,
+      targetRole: cards[0].role,
+      selectedID: cards[0].id,
+      targetID: cards[0].id,
+      hit: event.result === 'hit',
+      variant: cleric ? 'verdict' : 'cut',
+      cards,
+      pending: Boolean(pending),
+    };
+  }
   if (
     game.stage !== 'end' ||
     event?.type !== 'assassinate' ||
@@ -96,4 +150,15 @@ export function loyaltyBadge(
 ): { team: TLoyalty; sourceID: string; targetID: string } | undefined {
   if (event?.type !== 'announceLoyalty' || (event.announced !== 'good' && event.announced !== 'evil')) return;
   return { team: event.announced, sourceID: event.announcerID, targetID: event.targetID };
+}
+
+/** Anonymous public totals only; individual mission votes never enter the scene. */
+export function missionReveal(event?: THistoryResults) {
+  if (!event || event.type !== 'mission') return;
+  const players = event.settings.players;
+  if (!Number.isInteger(players) || players < 1 || players > 5) return;
+  if (event.hidden) return { index: event.index, players, hidden: true as const };
+  if (event.fails === undefined || !event.result) return;
+  if (!Number.isInteger(event.fails) || event.fails < 0 || event.fails > players) return;
+  return { index: event.index, players, fails: event.fails, result: event.result };
 }

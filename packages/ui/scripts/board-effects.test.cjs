@@ -120,3 +120,91 @@ test('a still-visible old declaration cannot consume a newer assassination', () 
   tracker.observe(game([declaration, attack], { stage: 'end' }), 'live');
   assert.deepEqual(tracker.take(1), attack);
 });
+
+test('Lovers reveals two selected cards only after end roles are public', () => {
+  const event = { ...attack, assassinateType: 'lovers', result: 'hit', killedIDs: ['p1', 'p2'] };
+  const ended = game([event], {
+    stage: 'end',
+    result: { reason: 'killLovers' },
+    players: [
+      { id: 'p1', role: 'tristan' },
+      { id: 'p2', role: 'isolde' },
+    ],
+  });
+  const reveal = helpers.assassinationReveal(ended);
+  assert.equal(reveal.variant, 'cut');
+  assert.deepEqual(reveal.cards, [
+    { id: 'p1', role: 'tristan', hit: true },
+    { id: 'p2', role: 'isolde', hit: true },
+  ]);
+  assert.equal(helpers.assassinationReveal({ ...ended, stage: 'assassinate' }), undefined);
+  assert.equal(
+    helpers.assassinationReveal({
+      ...ended,
+      players: [
+        { id: 'p1', role: 'unknown' },
+        { id: 'p2', role: 'isolde' },
+      ],
+    }),
+    undefined,
+  );
+  const miss = helpers.assassinationReveal({
+    ...ended,
+    history: [{ ...event, result: 'miss' }],
+    result: { reason: 'missLovers' },
+  });
+  assert.ok(miss.cards.every((card) => !card.hit));
+});
+
+test('Cleric verdict follows public first-stage reveal and final second-stage outcome', () => {
+  const first = { ...attack, assassinateType: 'cleric', result: 'hit', killedIDs: ['p1'] };
+  const players = [
+    { id: 'p1', role: 'cleric' },
+    { id: 'p2', role: 'percival' },
+  ];
+  const pending = game([first], { players, addonsData: { assassin: { progressData: { type: 'cleric', stage: 1 } } } });
+  const reveal = helpers.assassinationReveal(pending);
+  assert.equal(reveal.pending, true);
+  assert.deepEqual(reveal.cards, [{ id: 'p1', role: 'cleric', hit: true }]);
+  const second = { ...first, result: 'miss', killedIDs: ['p2'] };
+  const ended = game([first, second], { players, stage: 'end', result: { reason: 'missCleric' } });
+  assert.deepEqual(helpers.assassinationReveal(ended).cards, [
+    { id: 'p1', role: 'cleric', hit: true },
+    { id: 'p2', role: 'percival', hit: false },
+  ]);
+  assert.deepEqual(helpers.assassinationReveal({ ...ended, history: [second] }).cards, [
+    { id: 'p2', role: 'percival', hit: false },
+  ]);
+  assert.equal(helpers.assassinationReveal({ ...pending, players: [{ id: 'p1', role: 'unknown' }] }), undefined);
+  assert.equal(helpers.assassinationReveal({ ...pending, addonsData: {} }), undefined);
+});
+
+test('a second Cleric guess on the same player preserves both stage verdicts', () => {
+  const first = { ...attack, assassinateType: 'cleric', result: 'hit', killedIDs: ['p1'] };
+  const second = { ...first, result: 'miss' };
+  const ended = game([first, second], {
+    stage: 'end',
+    result: { reason: 'missCleric' },
+    players: [{ id: 'p1', role: 'cleric' }],
+  });
+  assert.deepEqual(helpers.assassinationReveal(ended).cards, [
+    { id: 'p1', role: 'cleric', hit: true },
+    { id: 'p1', role: 'cleric', hit: false },
+  ]);
+});
+
+test('mission reveal uses only public counts and the published result', () => {
+  const mission = {
+    type: 'mission',
+    index: 3,
+    settings: { players: 4, failsRequired: 2 },
+    fails: 1,
+    result: 'success',
+    actions: [{ playerID: 'secret', result: 'fail' }],
+  };
+  assert.deepEqual(helpers.missionReveal(mission), { index: 3, players: 4, fails: 1, result: 'success' });
+  assert.deepEqual(helpers.missionReveal({ ...mission, hidden: true }), { index: 3, players: 4, hidden: true });
+  assert.equal(helpers.missionReveal({ ...mission, fails: undefined }), undefined);
+  assert.equal(helpers.missionReveal({ ...mission, fails: 5 }), undefined);
+  assert.equal(helpers.missionReveal({ ...mission, result: undefined }), undefined);
+});

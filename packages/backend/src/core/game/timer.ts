@@ -16,7 +16,7 @@ export class GameTimer {
   private timers: Map<string, NodeJS.Timeout> = new Map();
   private currentTimer?: TimerState;
   private game: Game;
-  private pendingHistoryDelay: boolean = false;
+  private pendingHistoryDelay: number = 0;
   private isCustomTimer: boolean;
 
   constructor(game: Game, isCustomTimer?: boolean) {
@@ -27,8 +27,8 @@ export class GameTimer {
   /**
    * Mark that we need a history delay for the next timer
    */
-  setHistoryDelay(): void {
-    this.pendingHistoryDelay = true;
+  setHistoryDelay(duration = 10000): void {
+    this.pendingHistoryDelay = duration;
   }
 
   /**
@@ -81,8 +81,8 @@ export class GameTimer {
     console.log(`[GameTimer] Starting timer for stage: ${stage}, duration: ${duration}s`);
 
     // Check if we need to add a history display delay
-    const delay = this.pendingHistoryDelay ? 10000 : 0; // 10 seconds for history display
-    this.pendingHistoryDelay = false;
+    const delay = this.pendingHistoryDelay;
+    this.pendingHistoryDelay = 0;
 
     // If there's a delay, set the timer to start in the future
     const now = Date.now();
@@ -246,7 +246,7 @@ export class GameTimer {
   cleanup(): void {
     this.clearTimer();
     this.currentTimer = undefined;
-    this.pendingHistoryDelay = false;
+    this.pendingHistoryDelay = 0;
   }
 
   /**

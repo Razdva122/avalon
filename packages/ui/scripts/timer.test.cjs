@@ -44,6 +44,7 @@ function mountTimer(context, initialDuration) {
     now = end;
   };
   const duration = ref(initialDuration);
+  const eventIndex = ref(0);
   const events = [];
   let timer;
   const renderer = createRenderer({
@@ -62,6 +63,7 @@ function mountTimer(context, initialDuration) {
     render: () =>
       h(Timer, {
         duration: duration.value,
+        key: eventIndex.value,
         ref: (instance) => {
           timer = instance;
         },
@@ -72,6 +74,7 @@ function mountTimer(context, initialDuration) {
   context.after(() => app.unmount());
   return {
     duration,
+    eventIndex,
     events,
     app,
     tick,
@@ -120,4 +123,22 @@ test('unmounting cancels countdown instead of firing into a later event', (conte
   mounted.tick(15000);
   assert.equal(timer.time, 8000);
   assert.deepEqual(mounted.events, []);
+});
+
+test('consecutive history events each count down even when both last ten seconds', async (context) => {
+  const board = fs.readFileSync(require.resolve('../src/components/view/board/Board.vue'), 'utf8');
+  assert.match(board, /<Timer[^>]*:key="visibleHistoryIndex"/);
+  const mounted = mountTimer(context, 10000);
+  mounted.tick(10000);
+  await nextTick();
+  assert.deepEqual(mounted.events, ['timerEnd']);
+  // Board clears one history event and schedules the next in the same Vue flush.
+  mounted.duration.value = 0;
+  mounted.duration.value = 10000;
+  mounted.eventIndex.value++;
+  await nextTick();
+  assert.equal(mounted.timer.time, 10000);
+  mounted.tick(10000);
+  await nextTick();
+  assert.deepEqual(mounted.events, ['timerEnd', 'timerEnd']);
 });

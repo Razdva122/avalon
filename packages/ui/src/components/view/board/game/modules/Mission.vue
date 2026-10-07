@@ -1,9 +1,19 @@
 <template>
   <div class="mission-container">
-    <v-tooltip :disabled="!mission.result && !mission.hidden" location="top center" origin="auto" no-click-animation>
+    <v-tooltip
+      :disabled="concealResult || (!mission.result && !mission.hidden)"
+      location="top center"
+      origin="auto"
+      no-click-animation
+    >
       <template v-slot:activator="{ props: tooltip }">
-        <div v-bind="tooltip" class="mission mr-2 d-flex flex-column justify-center" :class="missionClasses">
-          <div v-if="!mission.result">
+        <div
+          v-bind="tooltip"
+          :data-mission-index="index"
+          class="mission mr-2 d-flex flex-column justify-center"
+          :class="missionClasses"
+        >
+          <div v-if="concealResult || !mission.result">
             {{ mission.players }}
           </div>
         </div>
@@ -23,6 +33,8 @@ import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   props: {
+    index: Number,
+    concealResult: Boolean,
     mission: {
       required: true,
       type: Object as PropType<MissionWithResult>,
@@ -32,7 +44,9 @@ export default defineComponent({
     missionClasses() {
       const classes = [];
 
-      if (this.mission.result === 'fail') {
+      if (this.concealResult) {
+        classes.push('mission-empty');
+      } else if (this.mission.result === 'fail') {
         classes.push('mission-fail');
       } else if (this.mission.result === 'success') {
         classes.push('mission-success');

@@ -5,7 +5,7 @@
         <div class="game-board" alt="board" :class="'game-end-' + (assassinationActive ? '' : gameResult)"></div>
         <slot name="content">
           <div class="timer" v-if="timerDuration > 0">
-            <Timer @timerEnd="clearHistoryElement" :duration="timerDuration" />
+            <Timer :key="visibleHistoryIndex" @timerEnd="clearHistoryElement" :duration="timerDuration" />
           </div>
           <div
             class="actions-container d-flex flex-column justify-center"
@@ -29,7 +29,13 @@
               <template v-if="shouldShowAnnounceLoyalty">
                 <AnnounceLoyalty />
               </template>
-              <Game v-else :inGamePanel="Boolean(playerInGame)" :visible-history="visibleHistory">
+              <Game
+                v-else
+                :inGamePanel="Boolean(playerInGame)"
+                :visible-history="visibleHistory"
+                :mission-animation-active="missionAnimationActive"
+                :pending-mission="pendingMission"
+              >
                 <template v-slot:restart>
                   <slot name="restart"></slot>
                 </template>
@@ -65,6 +71,7 @@
           />
         </div>
         <div ref="loyaltyEffectRef" class="board-event-effects" aria-hidden="true"></div>
+        <div ref="missionEffectRef" class="board-event-effects" aria-hidden="true"></div>
         <div ref="cardEffectRef" class="board-card-effect" aria-hidden="true"></div>
       </div>
     </div>
@@ -118,12 +125,15 @@ import {
   createLiveEventTracker,
   assassinationReveal,
   loyaltyBadge,
+  missionReveal,
 } from '@/components/view/board/helpers';
 import { getThumbnailPathByID } from '@/helpers/images';
 import { calculateRoleUrl } from '@/helpers/styles';
 import {
   renderAssassination,
+  renderPairAssassination,
   renderLoyalty,
+  renderMission,
   ASSASSINATION_REVEAL_DURATION,
   LOYALTY_REVEAL_DURATION,
 } from './animations/render';
@@ -161,6 +171,9 @@ export default defineComponent({
     const visibleHistoryIndex = ref(-1);
     const timerDuration = ref(0);
     const boardRef = ref<HTMLElement>();
+    const missionEffectRef = ref<HTMLElement>();
+    const missionAnimationActive = ref(false);
+    const pendingMission = ref<number>();
     const cardEffectRef = ref<HTMLElement>();
     const loyaltyEffectRef = ref<HTMLElement>();
     const assassinationActive = ref(false);
@@ -181,6 +194,8 @@ export default defineComponent({
       effectTimer = undefined;
       cleanupAnimation?.();
       cleanupAnimation = undefined;
+      missionAnimationActive.value = false;
+      pendingMission.value = undefined;
       assassinationActive.value = false;
       activeReveal.value = undefined;
       activeLoyaltyTarget.value = undefined;
@@ -199,12 +214,13 @@ export default defineComponent({
           ? {
               selected: playerName(activeReveal.value.selectedID),
               survivor: playerName(activeReveal.value.targetID),
+              ...Object.fromEntries((activeReveal.value.cards ?? []).map((card) => [card.id, playerName(card.id)])),
             }
           : undefined,
       (names) => {
         if (!names) return;
         cardEffectRef.value?.querySelectorAll<HTMLElement>('[data-card-owner]').forEach((label) => {
-          const name = label.dataset.cardOwner === 'selected' ? names.selected : names.survivor;
+          const name = (names as Record<string, string>)[label.dataset.cardOwner ?? ''] ?? '…';
           label.textContent = name;
           label.title = name;
         });
@@ -245,31 +261,81 @@ export default defineComponent({
     const playVisibleEvent = async () => {
       if (stateManager.viewMode.value !== 'live' || !liveGame.value) return;
       const game = liveGame.value;
-      const reveal = gameState.value?.stage === 'end' ? assassinationReveal(game) : undefined;
+      const reveal =
+        gameState.value?.stage === 'end' || (game.stage === 'assassinate' && gameState.value?.stage === 'assassinate')
+          ? assassinationReveal(game)
+          : undefined;
       const event = reveal ? game.history[game.history.length - 1] : visibleHistory.value;
       const badge = loyaltyBadge(event);
-      if (!reveal && !badge) return;
+      const mission = missionReveal(event);
+      if (!reveal && !badge && !mission) return;
       const index = reveal ? game.history.length - 1 : visibleHistoryIndex.value;
       if (!eventTracker.take(index)) return;
       clearEffect();
       const generation = effectGeneration;
+      if (mission) {
+        missionAnimationActive.value = true;
+        pendingMission.value = mission.index;
+      }
       if (reveal) {
         assassinationActive.value = true;
         activeReveal.value = reveal;
-        maskedPlayers.value = beforeAttack;
+        maskedPlayers.value = reveal.pending ? undefined : beforeAttack;
       } else if (badge && !reducedMotion()) activeLoyaltyTarget.value = badge.targetID;
       await nextTick();
       if (generation !== effectGeneration || stateManager.viewMode.value !== 'live') return;
       if (reveal && cardEffectRef.value) {
-        cleanupAnimation = renderAssassination(cardEffectRef.value, {
-          roleImage: calculateRoleUrl(reveal.role),
-          playerName: playerName(reveal.selectedID),
-          survivorImage: calculateRoleUrl(reveal.targetRole),
-          survivorName: playerName(reveal.targetID),
-          hit: reveal.hit,
+        cleanupAnimation =
+          reveal.cards && reveal.variant
+            ? renderPairAssassination(cardEffectRef.value, {
+                variant: reveal.variant,
+                hitLabel: t('assassinate.verdictHit'),
+                missLabel: t('assassinate.verdictMiss'),
+                cards: reveal.cards.map((card) => ({
+                  id: card.id,
+                  roleImage: calculateRoleUrl(card.role),
+                  playerName: playerName(card.id),
+                  hit: card.hit,
+                })),
+                reducedMotion: reducedMotion(),
+              })
+            : renderAssassination(cardEffectRef.value, {
+                roleImage: calculateRoleUrl(reveal.role),
+                playerName: playerName(reveal.selectedID),
+                survivorImage: calculateRoleUrl(reveal.targetRole),
+                survivorName: playerName(reveal.targetID),
+                hit: reveal.hit,
+                reducedMotion: reducedMotion(),
+              });
+        effectTimer = setTimeout(clearEffect, reveal.pending ? 2000 : ASSASSINATION_REVEAL_DURATION);
+      } else if (mission && missionEffectRef.value && boardRef.value) {
+        const board = boardRef.value;
+        const token = board.querySelector<HTMLElement>(`[data-mission-index="${mission.index}"]`);
+        if (!token) {
+          clearEffect();
+          return;
+        }
+        const rect = board.getBoundingClientRect();
+        const target = token.getBoundingClientRect();
+        const scale = rect.width / board.offsetWidth;
+        cleanupAnimation = renderMission(missionEffectRef.value, {
+          ...mission,
+          witchImage: calculateRoleUrl('witch'),
+          successImage: getThumbnailPathByID('core', 'blue_team_no_background'),
+          failImage: getThumbnailPathByID('core', 'red_team_no_background'),
+          successLabel: t('mission.cardSuccess'),
+          failLabel: t('mission.cardFail'),
+          target: {
+            x: (target.x + target.width / 2 - rect.x) / scale - 120,
+            y: (target.y + target.height / 2 - rect.y) / scale,
+            size: target.width / scale,
+          },
           reducedMotion: reducedMotion(),
+          onReveal: () => {
+            if (generation === effectGeneration) pendingMission.value = undefined;
+          },
         });
-        effectTimer = setTimeout(clearEffect, ASSASSINATION_REVEAL_DURATION);
+        effectTimer = setTimeout(clearEffect, 10000);
       } else if (badge && loyaltyEffectRef.value && boardRef.value) {
         const source = playerGeometry(badge.sourceID);
         const target = playerGeometry(badge.targetID);
@@ -310,8 +376,8 @@ export default defineComponent({
           const event = game.history[game.history.length - 1];
           if (
             event.type === 'assassinate' &&
-            (event.assassinateType === 'merlin' || event.assassinateType === 'guinevere') &&
-            event.killedIDs.length === 1
+            ((['merlin', 'guinevere', 'cleric'].includes(event.assassinateType) && event.killedIDs.length === 1) ||
+              (event.assassinateType === 'lovers' && event.killedIDs.length === 2))
           ) {
             clearEffect();
             beforeAttack = oldGame.players.map((player) => ({ ...player, features: { ...player.features } }));
@@ -319,7 +385,7 @@ export default defineComponent({
             maskedPlayers.value = beforeAttack;
           }
         }
-        eventTracker.observe(game, mode, reset);
+        eventTracker.observe(game, mode, reset, true);
         if (game?.stage === 'end' && assassinationActive.value && !assassinationReveal(game)) clearEffect();
         void playVisibleEvent();
       },
@@ -354,6 +420,7 @@ export default defineComponent({
     };
 
     const clearHistoryElement = () => {
+      if (missionAnimationActive.value) clearEffect();
       visibleHistory.value = undefined;
       visibleHistoryIndex.value = -1;
       timerDuration.value = 0;
@@ -554,6 +621,9 @@ export default defineComponent({
 
     return {
       boardRef,
+      missionEffectRef,
+      missionAnimationActive,
+      pendingMission,
       cardEffectRef,
       loyaltyEffectRef,
       assassinationActive,
@@ -570,6 +640,7 @@ export default defineComponent({
       shouldShowAnnounceLoyalty,
 
       timerDuration,
+      visibleHistoryIndex,
       clearHistoryElement,
 
       calculateRotate,

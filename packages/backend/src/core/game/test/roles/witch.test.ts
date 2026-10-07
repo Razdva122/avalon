@@ -61,3 +61,26 @@ describe('Witch', () => {
     expect(game.stage).toBe('witchAbility');
   });
 });
+
+test('Witch hidden mission keeps the next stage timer after its history delay', () => {
+  jest.useFakeTimers();
+  const next = generateNewGame({}, { witch: 1 });
+  try {
+    next.game.features.timerDurations = {
+      firstSelectTeam: { enabled: true, duration: 60 },
+      announceLoyalty: { enabled: true, duration: 60 },
+    };
+    next.gameHelper.selectPlayersOnMission().sentSelectedPlayers().makeVotes().makeActions();
+    next.gameHelper.useWitchAbility().useWitchCheck().announceWitchLoyalty();
+    expect(next.game.stage).toBe('selectTeam');
+    expect(next.game.timer.getTimerState().active).toBe(false);
+    jest.advanceTimersByTime(10000);
+    expect(next.game.timer.getTimerState().active).toBe(false);
+    jest.advanceTimersByTime(10000);
+    expect(next.game.timer.getTimerState()).toMatchObject({ active: true, stage: 'firstSelectTeam' });
+    expect(next.game.timer.getRemainingTime()).toBe(60000);
+  } finally {
+    next.game.timer.cleanup();
+    jest.useRealTimers();
+  }
+});
