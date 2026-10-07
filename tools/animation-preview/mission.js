@@ -56,6 +56,18 @@ function setup() {
   for (const option of team.options) option.disabled = config.required === 2 && Number(option.value) < 4;
   if (config.required === 2 && Number(team.value) < 4) team.value = '4';
   const count = Number(team.value);
+  const native = document.querySelector('.native-board');
+  if (native) {
+    const board = native.getBoundingClientRect();
+    const unit = board.width / 840;
+    const voteBottom = (native.querySelector('.native-vote').getBoundingClientRect().bottom - board.y) / unit;
+    const footerTop = (native.querySelector('.native-meta').getBoundingClientRect().top - board.y) / unit;
+    const scale = Math.min(1, Math.max(1, footerTop - voteBottom - 24) / 138);
+    stage.style.left = `${(840 - 360 * scale) / 2}px`;
+    stage.style.top = `${voteBottom + 12 - 60 * scale}px`;
+    stage.style.transform = `scale(${scale})`;
+    stage.style.transformOrigin = 'top left';
+  }
   const mission = config.required === 2 ? 3 : 1;
   stage.classList.toggle('witch-hidden', Boolean(config.hidden));
   document.querySelector('#scene-type').textContent = config.hidden ? 'Поход скрыт ведьмой' : 'Результат миссии';

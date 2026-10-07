@@ -1,4 +1,4 @@
-import './mission.js?v=witch-1';
+import './mission.js?v=mobile-layout-2';
 const world = document.querySelector('.native-board');
 const viewport = document.querySelector('.native-viewport');
 const seats = document.querySelector('#seat-count');

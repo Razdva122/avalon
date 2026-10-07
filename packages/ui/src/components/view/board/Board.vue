@@ -126,6 +126,7 @@ import {
   assassinationReveal,
   loyaltyBadge,
   missionReveal,
+  missionSceneLayout,
   excaliburReveal,
 } from '@/components/view/board/helpers';
 import { getThumbnailPathByID } from '@/helpers/images';
@@ -336,15 +337,22 @@ export default defineComponent({
         const rect = board.getBoundingClientRect();
         const target = token.getBoundingClientRect();
         const scale = rect.width / board.offsetWidth;
+        const vote = board.querySelector<HTMLElement>('.vote-stage')?.getBoundingClientRect();
+        const footer = board.querySelector<HTMLElement>('.meta-info')?.getBoundingClientRect();
+        const scene =
+          vote && footer
+            ? missionSceneLayout(board.offsetWidth, (vote.bottom - rect.y) / scale, (footer.top - rect.y) / scale)
+            : { left: 120, top: 250, scale: 1 };
         cleanupAnimation = renderMission(missionEffectRef.value, {
           ...mission,
+          scene,
           witchImage: calculateRoleUrl('witch'),
           successImage: getThumbnailPathByID('core', 'blue_team_no_background'),
           failImage: getThumbnailPathByID('core', 'red_team_no_background'),
           successLabel: t('mission.cardSuccess'),
           failLabel: t('mission.cardFail'),
           target: {
-            x: (target.x + target.width / 2 - rect.x) / scale - 120,
+            x: (target.x + target.width / 2 - rect.x) / scale,
             y: (target.y + target.height / 2 - rect.y) / scale,
             size: target.width / scale,
           },

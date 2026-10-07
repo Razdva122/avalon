@@ -429,6 +429,7 @@ export function renderLoyalty(container: HTMLElement, options: LoyaltyOptions): 
 }
 
 type MissionOptions = {
+  scene?: { left: number; top: number; scale: number };
   players: number;
   fails?: number;
   result?: 'success' | 'fail';
@@ -447,6 +448,11 @@ export function renderMission(container: HTMLElement, options: MissionOptions): 
   const { root, motion, cleanup } = createScene(
     container,
     `avalon-mission-scene${options.hidden ? ' witch-hidden' : ''}`,
+  );
+  const scene = options.scene ?? { left: 120, top: 250, scale: 1 };
+  root.setAttribute(
+    'style',
+    `left:${scene.left}px;top:${scene.top}px;transform:scale(${scene.scale});transform-origin:top left`,
   );
   const image = (bad: boolean) => escapeHTML(bad ? options.failImage : options.successImage);
   root.innerHTML =
@@ -516,7 +522,7 @@ export function renderMission(container: HTMLElement, options: MissionOptions): 
     [
       { transform: 'translate(0,0) scale(1)' },
       {
-        transform: `translate(${options.target.x - 180}px,${options.target.y - 340}px) scale(${options.target.size / 80})`,
+        transform: `translate(${(options.target.x - scene.left) / scene.scale - 180}px,${(options.target.y - scene.top) / scene.scale - 90}px) scale(${options.target.size / scene.scale / 80})`,
       },
     ],
     650,

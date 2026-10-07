@@ -177,7 +177,6 @@ export default defineComponent({
           userID: userID.value,
           isLiveUpdate: source === 'update',
         });
-        if (stateFromBackend.ai) chatOpen.value = true;
       },
       (error) => {
         errorMessage.value = error;

@@ -128,7 +128,14 @@ function fixture(t, initial = game(), reducedMotion = false) {
   api.loyaltyEffectRef.value = {};
   api.missionEffectRef.value = {};
   api.boardRef.value = {
-    querySelector: () => ({ getBoundingClientRect: () => ({ x: 200, y: 210, width: 65, height: 65 }) }),
+    querySelector: (selector) => ({
+      getBoundingClientRect: () =>
+        selector === '.vote-stage'
+          ? { bottom: 330 }
+          : selector === '.meta-info'
+            ? { top: 445 }
+            : { x: 200, y: 210, width: 65, height: 65 },
+    }),
     offsetWidth: 600,
     offsetHeight: 600,
     getBoundingClientRect: () => ({ x: 0, y: 0, width: 600, height: 600 }),
@@ -602,4 +609,20 @@ test('Excalibur skip animates without a target and cancels on history navigation
   f.manager.toggleViewMode();
   await f.flush();
   assert.equal(f.draws[0].cleaned, true);
+});
+
+test('mission scene uses measured voting label and footer rather than fixed desktop coordinates', async (t) => {
+  const f = fixture(t, game([declaration], { stage: 'selectTeam' }));
+  const event = {
+    type: 'mission',
+    index: 0,
+    settings: { players: 2, failsRequired: 1 },
+    fails: 0,
+    result: 'success',
+    actions: [],
+  };
+  f.manager.mutateRoomState({ newGameState: game([declaration, event], { stage: 'selectTeam' }) });
+  await f.flush();
+  assert.deepEqual(f.draws[0].options.scene, helpers.missionSceneLayout(600, 330, 445));
+  assert.equal(f.draws[0].options.target.x, 232.5);
 });

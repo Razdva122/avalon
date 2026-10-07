@@ -269,3 +269,35 @@ test('Excalibur arc uses public player positions; skip has no target flash or ar
     }
   }
 });
+
+test('mission emblem still lands on its token when the mobile fan is scaled and moved', (t) => {
+  const motions = [];
+  const layout = { left: 192, top: 302, scale: 0.6 };
+  const target = { x: 232.5, y: 242.5, size: 65 };
+  scene(
+    t,
+    {
+      mission: true,
+      players: 2,
+      fails: 0,
+      result: 'success',
+      successImage: '/good.webp',
+      failImage: '/evil.webp',
+      successLabel: 'Success',
+      failLabel: 'Fail',
+      scene: layout,
+      target,
+      reducedMotion: false,
+      onReveal() {},
+    },
+    motions,
+  );
+  const flight = motions.find(
+    (m) => m.selector === '.avalon-mission-badge' && m.frames.at(-1).transform?.includes('translate('),
+  );
+  const match = flight.frames.at(-1).transform.match(/translate\(([-\d.]+)px,([-\d.]+)px\) scale\(([-\d.]+)\)/);
+  assert.ok(match);
+  assert.ok(Math.abs(layout.left + layout.scale * (180 + Number(match[1])) - target.x) < 0.001);
+  assert.ok(Math.abs(layout.top + layout.scale * (90 + Number(match[2])) - target.y) < 0.001);
+  assert.ok(Math.abs(layout.scale * 80 * Number(match[3]) - target.size) < 0.001);
+});
