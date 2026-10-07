@@ -67,7 +67,14 @@ function fixture(t, initial = game(), reducedMotion = false) {
   let timerID = 0;
   global.window = { matchMedia: () => ({ matches: reducedMotion }) };
   global.setTimeout = (callback, delay) => {
-    timers.set(++timerID, { callback, delay });
+    const id = ++timerID;
+    timers.set(id, {
+      callback: () => {
+        timers.delete(id);
+        return callback();
+      },
+      delay,
+    });
     return timerID;
   };
   global.clearTimeout = (id) => timers.delete(id);
@@ -240,7 +247,7 @@ test('AI room end updates render Guinevere once and preserve the cards through b
   await f.flush();
   assert.equal(f.draws.length, 1);
   assert.equal(f.draws[0].cleaned, false);
-  assert.equal([...f.timers.values()][0].delay, 10000);
+  assert.equal([...f.timers.values()][0].delay, 7000);
 });
 
 for (const earlyWinner of [false, true]) {
@@ -335,7 +342,7 @@ test('reduced motion renders a static final reveal and its cleanup restores the 
   assert.equal(f.api.assassinationActive.value, true);
   assert.equal(f.timers.size, 1);
   const timer = [...f.timers.values()][0];
-  assert.equal(timer.delay, 10000, 'static cards get the same reading time');
+  assert.equal(timer.delay, 7000, 'static cards get the same reading time');
   timer.callback();
   await f.flush();
   assert.equal(f.draws[0].cleaned, true);
@@ -359,7 +366,7 @@ test('the Lady badge disappears when the ten-second event display ends', async (
 });
 
 for (const hit of [false, true]) {
-  test(`${hit ? 'hit' : 'miss'} cards remain on the board for at least ten seconds before restoring the result`, async (t) => {
+  test(`${hit ? 'hit' : 'miss'} cards remain available for seven seconds and cleanup restores the Board`, async (t) => {
     const f = fixture(t);
     const event = hit ? { ...attack, result: 'hit', killedIDs: ['p1'] } : attack;
     const finalResult = hit ? { winner: 'evil', reason: 'killMerlin' } : result;
@@ -369,7 +376,7 @@ for (const hit of [false, true]) {
     });
     await f.flush();
     const timer = [...f.timers.values()][0];
-    assert.equal(timer.delay, 10000);
+    assert.equal(timer.delay, 7000);
     assert.equal(f.api.assassinationActive.value, true);
     assert.deepEqual(
       f.emitted.at(-1),
@@ -443,7 +450,7 @@ test('Cleric first-stage verdict is replaced by the final pair and cancels its o
     [true, false],
   );
   assert.equal(f.timers.size, 1);
-  assert.equal([...f.timers.values()][0].delay, 10000);
+  assert.equal([...f.timers.values()][0].delay, 7000);
 });
 
 test('pair nicknames update without restarting the scene when public profiles arrive late', async (t) => {
@@ -626,3 +633,25 @@ test('mission scene uses measured voting label and footer rather than fixed desk
   assert.deepEqual(f.draws[0].options.scene, helpers.missionSceneLayout(600, 330, 445));
   assert.equal(f.draws[0].options.target.x, 232.5);
 });
+
+for (const reduced of [false, true]) {
+  test(`assassination remains centered until the seven-second reading window ends (reduced=${reduced})`, async (t) => {
+    const f = fixture(t, game(), reduced);
+    f.manager.mutateRoomState({ newRoomState: room(game([attack], { stage: 'end', result })), isLiveUpdate: true });
+    await f.flush();
+    assert.equal(f.timers.size, 1, 'no early reveal or docking timer');
+    const completion = [...f.timers.values()][0];
+    assert.equal(completion.delay, 7000);
+    assert.equal(f.api.assassinationActive.value, true);
+    assert.equal(f.draws[0].cleaned, false);
+    f.users.p2 = { status: 'ready', profile: { name: 'Updated during reading' } };
+    await f.flush();
+    assert.equal(f.labels[0].textContent, 'Updated during reading');
+    completion.callback();
+    await f.flush();
+    assert.equal(f.draws[0].cleaned, true);
+    assert.equal(f.api.assassinationActive.value, false);
+    assert.equal(f.api.players.value[0].role, 'merlin');
+    assert.equal(f.timers.size, 0);
+  });
+}

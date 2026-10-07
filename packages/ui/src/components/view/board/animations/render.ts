@@ -1,5 +1,5 @@
 // Choreography finishes within three seconds; keep the revealed cards for reading.
-export const ASSASSINATION_REVEAL_DURATION = 10000;
+export const ASSASSINATION_REVEAL_DURATION = 7000;
 export const LOYALTY_REVEAL_DURATION = 1800;
 
 type Position = { x: number; y: number; radius: number };
@@ -62,80 +62,24 @@ function createScene(container: HTMLElement, className: string) {
   return { root, motion, cleanup };
 }
 
-const face = (art: string, name: string, owner: string): string =>
-  `<div class="avalon-cards-face"><div class="avalon-cards-art"><img src="${escapeHTML(art)}" alt=""></div><div class="avalon-cards-title" data-card-owner="${escapeHTML(owner)}" title="${escapeHTML(name)}">${escapeHTML(name)}</div></div>`;
+const face = (art: string): string =>
+  `<div class="avalon-cards-face"><div class="avalon-cards-art"><img src="${escapeHTML(art)}" alt=""></div></div>`;
+
+const caption = (name: string, owner: string, extraClass = ''): string =>
+  `<div class="avalon-cards-title avalon-cards-caption ${extraClass}" data-card-owner="${escapeHTML(owner)}" title="${escapeHTML(name)}">${escapeHTML(name)}</div>`;
 
 const back = '<div class="avalon-cards-back"><div class="avalon-cards-back-ornament"></div><span>Avalon</span></div>';
-
-// A narrow, uneven paper cut shared by the front and its mirrored back.
-const tear: [number, number][] = [
-  [66, 0],
-  [65.4, 4.2],
-  [67, 7],
-  [65.8, 10.5],
-  [66.5, 13.8],
-  [64.6, 17.8],
-  [66, 21],
-  [65.2, 24.9],
-  [66.2, 29],
-  [64.8, 32.4],
-  [66.3, 35.7],
-  [65.4, 39.6],
-  [66, 43.1],
-  [64.6, 47],
-  [66.3, 51.2],
-  [65.2, 55.1],
-  [66, 58],
-  [65.7, 63],
-];
-
-function damagedSide(content: string, reverse = false): string {
-  const mirror = ([x, y]: [number, number]): [number, number] => [reverse ? 128 - x : x, y];
-  const points = tear.map(mirror);
-  const path = points.map(([x, y], index) => `${index ? 'L' : 'M'}${x} ${y}`).join(' ');
-  const polygon = (vertices: [number, number][]) =>
-    `polygon(${vertices
-      .map(mirror)
-      .map(([x, y]) => `${x}px ${y}px`)
-      .join(',')})`;
-  const body = polygon([[0, 0], ...tear, [128, 63], [128, 186], [0, 186]]);
-  const flap = polygon([tear[0], [128, 0], [128, 63], ...tear.slice(1).reverse()]);
-  const fibers = [3, 5, 7, 9, 11, 13, 15, 16]
-    .map(
-      (index, i) =>
-        `M${points[index][0]} ${points[index][1]}l${(reverse ? 1 : -1) * (1.2 + (i % 3) * 0.5)} ${i % 2 ? '-.5' : '1.2'}`,
-    )
-    .join(' ');
-
-  return `<div class="avalon-cards-side ${reverse ? 'avalon-cards-reverse' : 'avalon-cards-front'}" style="--avalon-cards-body-clip:${body};--avalon-cards-flap-clip:${flap};--avalon-cards-origin:${reverse ? 31 : 97}px 63px"><svg class="avalon-cards-gap" viewBox="0 0 128 186"><path class="avalon-cards-cut" d="${path}" fill="none" stroke="#25190e" stroke-width="2.1" stroke-dasharray="70" stroke-dashoffset="70"/></svg><div class="avalon-cards-body">${content}</div><div class="avalon-cards-flap"><div class="avalon-cards-fragment">${content}</div><svg class="avalon-cards-fibers" viewBox="0 0 128 186"><path class="avalon-cards-edge" d="${path}" fill="none" stroke="#efe0bb" stroke-width="1.15" stroke-dasharray="70" stroke-dashoffset="70"/><path class="avalon-cards-threads" d="${fibers}" fill="none" stroke="#e9d7af" stroke-width=".65" stroke-linecap="round" opacity="0"/></svg></div></div>`;
-}
 
 export function renderAssassination(container: HTMLElement, options: AssassinationOptions): () => void {
   const { root, motion, cleanup } = createScene(
     container,
     `avalon-assassination${options.hit ? '' : ' avalon-assassination-miss'}${options.reducedMotion ? ' avalon-assassination-reduced' : ''}`,
   );
-  const front = face(options.roleImage, options.playerName, 'selected');
-  root.innerHTML = `<div class="avalon-cards-scene"><div class="avalon-cards-table-shadow"></div><div class="avalon-cards-target"><div class="avalon-cards-turn avalon-cards-card">${damagedSide(back, true)}${damagedSide(front)}</div></div><div class="avalon-cards-halves"><div class="avalon-cards-half avalon-cards-half-left">${front}</div><div class="avalon-cards-half avalon-cards-half-right">${front}</div></div>${options.hit ? '' : `<div class="avalon-cards-survivor avalon-cards-card">${face(options.survivorImage, options.survivorName, 'survivor')}</div>`}</div>`;
+  const front = face(options.roleImage);
+  root.innerHTML = `<div class="avalon-cards-scene"><div class="avalon-cards-table-shadow"></div><div class="avalon-cards-target"><div class="avalon-cards-turn avalon-cards-card"><div class="avalon-cards-side avalon-cards-reverse">${back}</div><div class="avalon-cards-side avalon-cards-front">${front}</div></div></div><div class="avalon-cards-halves"><div class="avalon-cards-half avalon-cards-half-left">${front}</div><div class="avalon-cards-half avalon-cards-half-right">${front}</div></div>${caption(options.playerName, 'selected', 'avalon-cards-selected-caption')}${options.hit ? '' : `<div class="avalon-cards-survivor avalon-cards-card">${face(options.survivorImage)}</div>${caption(options.survivorName, 'survivor', 'avalon-cards-survivor-caption')}`}</div>`;
 
   if (options.reducedMotion) return cleanup;
   const find = (selector: string): Element => root.querySelector(selector)!;
-  root.querySelectorAll('.avalon-cards-side').forEach((side) => {
-    const sign = side.classList.contains('avalon-cards-reverse') ? -1 : 1;
-    motion(
-      side.querySelector('.avalon-cards-flap')!,
-      [
-        { transform: 'translateX(0) rotateX(0deg)' },
-        { offset: 0.75, transform: `translateX(${sign * 0.8}px) rotateX(${sign * -15}deg)` },
-        { transform: `translateX(${sign * 0.6}px) rotateX(${sign * -12}deg)` },
-      ],
-      320,
-      40,
-    );
-    motion(side.querySelector('.avalon-cards-cut')!, [{ strokeDashoffset: '70' }, { strokeDashoffset: '0' }], 280, 40);
-    motion(side.querySelector('.avalon-cards-edge')!, [{ strokeDashoffset: '70' }, { strokeDashoffset: '0' }], 280, 40);
-    motion(side.querySelector('.avalon-cards-threads')!, [{ opacity: 0 }, { opacity: 0.85 }], 160, 160);
-  });
   // Swap flattened surfaces at the edge instead of relying on nested 3D
   // backface culling, which can expose the card back while the face unfolds.
   const flipDuration = 520;
@@ -154,6 +98,7 @@ export function renderAssassination(container: HTMLElement, options: Assassinati
   );
   motion(find('.avalon-cards-reverse'), [{ opacity: 1 }, { opacity: 0 }], 1, edgeAt);
   motion(find('.avalon-cards-front'), [{ opacity: 0 }, { opacity: 1 }], 1, edgeAt);
+  motion(find('.avalon-cards-selected-caption'), [{ opacity: 0 }, { opacity: 1 }], 160, edgeAt);
   motion(
     find('.avalon-cards-table-shadow'),
     [
@@ -187,6 +132,13 @@ export function renderAssassination(container: HTMLElement, options: Assassinati
     1600,
   );
   if (!options.hit) {
+    motion(
+      find('.avalon-cards-selected-caption'),
+      [{ transform: 'translateX(0)' }, { transform: 'translateX(-84px)' }],
+      560,
+      2100,
+    );
+    motion(find('.avalon-cards-survivor-caption'), [{ opacity: 0 }, { opacity: 1 }], 160, 2250);
     motion(
       find('.avalon-cards-halves'),
       [
@@ -237,13 +189,14 @@ export function renderPairAssassination(container: HTMLElement, options: PairAss
   );
   root.innerHTML = `<div class="avalon-cards-scene">${options.cards
     .map((card, index) => {
-      const front = face(card.roleImage, card.playerName, card.id);
+      const front = face(card.roleImage);
       const cut = options.variant === 'cut' && card.hit;
       return `<div class="avalon-pair-slot avalon-pair-slot-${index}${cut ? ' avalon-pair-cut' : ''}">
       <div class="avalon-pair-turn avalon-cards-card"><div class="avalon-pair-back">${back}</div><div class="avalon-pair-front">${front}</div></div>
       ${cut ? `<div class="avalon-pair-halves"><div class="avalon-pair-half-left avalon-cards-half-left">${front}</div><div class="avalon-pair-half-right avalon-cards-half-right">${front}</div></div>` : ''}
       ${options.variant === 'verdict' ? `<div class="avalon-pair-stamp${card.hit ? '' : ' avalon-pair-miss'}">${escapeHTML(card.hit ? options.hitLabel : options.missLabel)}</div>` : ''}
       ${!card.hit ? '<div class="avalon-pair-protected"></div>' : ''}
+      ${caption(card.playerName, card.id)}
     </div>`;
     })
     .join('')}${options.variant === 'cut' ? '<div class="avalon-pair-slash"></div>' : ''}</div>`;
@@ -266,6 +219,7 @@ export function renderPairAssassination(container: HTMLElement, options: PairAss
     );
     motion(at('.avalon-pair-back'), [{ opacity: 1 }, { opacity: 0 }], 1, delay + 260);
     motion(at('.avalon-pair-front'), [{ opacity: 0 }, { opacity: 1 }], 1, delay + 260);
+    motion(at('.avalon-cards-caption'), [{ opacity: 0 }, { opacity: 1 }], 160, delay + 260);
     if (options.variant === 'cut' && card.hit) {
       motion(at('.avalon-pair-turn'), [{ opacity: 1 }, { opacity: 0 }], 1, 1570);
       motion(at('.avalon-pair-halves'), [{ opacity: 0 }, { opacity: 1 }], 1, 1570);
@@ -505,16 +459,15 @@ export function renderMission(container: HTMLElement, options: MissionOptions): 
     motion(card.querySelector('.back')!, [{ opacity: 1 }, { opacity: 0 }], 1, delay + 240);
     motion(card.querySelector('.face')!, [{ opacity: 0 }, { opacity: 1 }], 1, delay + 240);
   });
-  const resultAt = options.hidden ? 1550 : 1240 + (options.players - 1) * 260;
-  cards.forEach((card) => motion(card, [{ opacity: 1 }, { opacity: 0.7 }], 350, resultAt));
+  const resultAt = options.hidden ? 1550 : 1600 + (options.players - 1) * 260;
   const badge = root.querySelector('.avalon-mission-badge')!;
   motion(
     badge,
     [
-      { opacity: 0, transform: 'scale(.6)' },
-      { opacity: 1, transform: 'scale(1)' },
+      { opacity: 0, transform: 'translateY(18px)' },
+      { opacity: 1, transform: 'translateY(0)' },
     ],
-    340,
+    200,
     resultAt,
   );
   motion(
@@ -522,16 +475,16 @@ export function renderMission(container: HTMLElement, options: MissionOptions): 
     [
       { transform: 'translate(0,0) scale(1)' },
       {
-        transform: `translate(${(options.target.x - scene.left) / scene.scale - 180}px,${(options.target.y - scene.top) / scene.scale - 90}px) scale(${options.target.size / scene.scale / 80})`,
+        transform: `translate(${(options.target.x - scene.left) / scene.scale - 180}px,${(options.target.y - scene.top) / scene.scale - 224}px) scale(${options.target.size / scene.scale / 48})`,
       },
     ],
-    650,
-    resultAt + 440,
+    500,
+    resultAt + 560,
     undefined,
     'forwards',
   );
-  motion(badge, [{ opacity: 1 }, { opacity: 0 }], 160, resultAt + 1090, undefined, 'forwards');
-  const landing = setTimeout(options.onReveal, resultAt + 1090);
+  motion(badge, [{ opacity: 1 }, { opacity: 0 }], 160, resultAt + 1060, undefined, 'forwards');
+  const landing = setTimeout(options.onReveal, resultAt + 1060);
   return () => {
     clearTimeout(landing);
     cleanup();

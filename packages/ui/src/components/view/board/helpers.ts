@@ -170,6 +170,6 @@ export function excaliburReveal(event?: THistoryResults) {
 
 /** Fit the whole fan, including its initial stack motion, between live labels. */
 export function missionSceneLayout(width: number, voteBottom: number, footerTop: number) {
-  const scale = Math.min(1, Math.max(1, footerTop - voteBottom - 24) / 138);
+  const scale = Math.min(1, Math.max(1, footerTop - voteBottom - 24) / 198);
   return { left: (width - 360 * scale) / 2, top: voteBottom + 12 - 60 * scale, scale };
 }

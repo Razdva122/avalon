@@ -85,7 +85,7 @@ test('closed cards carry Avalon as their only back label', (t) => {
 test('a successful attack labels the selected player and does not add a survivor card', (t) => {
   const html = scene(t, { hit: true, playerName: 'Алиса' });
   const selected = labels(html, 'selected');
-  assert.ok(selected.length > 0, 'the selected card identifies its owner');
+  assert.equal(selected.length, 1, 'one intact caption identifies the owner outside the torn artwork');
   assert.ok(selected.every((label) => label.text === 'Алиса'));
   assert.equal(labels(html, 'survivor').length, 0);
   assert.equal(html.includes('/survivor.webp'), false);
@@ -298,6 +298,54 @@ test('mission emblem still lands on its token when the mobile fan is scaled and 
   const match = flight.frames.at(-1).transform.match(/translate\(([-\d.]+)px,([-\d.]+)px\) scale\(([-\d.]+)\)/);
   assert.ok(match);
   assert.ok(Math.abs(layout.left + layout.scale * (180 + Number(match[1])) - target.x) < 0.001);
-  assert.ok(Math.abs(layout.top + layout.scale * (90 + Number(match[2])) - target.y) < 0.001);
-  assert.ok(Math.abs(layout.scale * 80 * Number(match[3]) - target.size) < 0.001);
+  assert.ok(Math.abs(layout.top + layout.scale * (224 + Number(match[2])) - target.y) < 0.001);
+  assert.ok(Math.abs(layout.scale * 48 * Number(match[3]) - target.size) < 0.001);
+});
+
+test('mission keeps full-size cards while the separate result enters from below', (t) => {
+  const motions = [];
+  scene(
+    t,
+    {
+      mission: true,
+      players: 5,
+      fails: 2,
+      result: 'fail',
+      successImage: '/good.webp',
+      failImage: '/evil.webp',
+      successLabel: 'Success',
+      failLabel: 'Fail',
+      target: { x: 90, y: 242, size: 65 },
+      reducedMotion: false,
+      onReveal() {},
+    },
+    motions,
+  );
+  const flips = motions.filter((m) => m.selector.endsWith(' .turn'));
+  const lastFlip = flips.at(-1);
+  assert.equal(
+    motions.some(
+      (m) =>
+        m.selector.startsWith('.avalon-mission-card') &&
+        m.frames.some((frame) => frame.transform?.includes('scale(.7)')),
+    ),
+    false,
+    'cards never shrink for the result',
+  );
+  const badge = motions.find((m) => m.selector === '.avalon-mission-badge' && m.frames[0].opacity === 0);
+  assert.ok(badge.delay >= lastFlip.delay + lastFlip.duration + 500, 'cards remain readable before the result');
+  assert.equal(badge.frames[0].transform, 'translateY(18px)');
+  assert.equal(badge.frames.at(-1).transform, 'translateY(0)');
+});
+
+test('torn pair cards have one intact caption per player', (t) => {
+  const html = scene(t, {
+    variant: 'cut',
+    cards: [
+      { id: 'p1', roleImage: '/tristan.webp', playerName: 'Очень длинное имя', hit: true },
+      { id: 'p2', roleImage: '/isolde.webp', playerName: 'Мария', hit: true },
+    ],
+  });
+  assert.equal(labels(html, 'p1').length, 1);
+  assert.equal(labels(html, 'p2').length, 1);
 });

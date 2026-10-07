@@ -91,7 +91,7 @@
 
 .avalon-cards-art {
   position: absolute;
-  inset: 9px 9px 40px;
+  inset: 9px;
   overflow: hidden;
   border: 1px solid #654b2c;
   border-radius: 3px 3px 1px 1px;
@@ -107,19 +107,33 @@
 }
 .avalon-cards-title {
   position: absolute;
-  left: 6px;
-  right: 6px;
-  bottom: 10px;
   font-weight: bold;
-  font-size: 12px;
-  line-height: 1.2;
+  font-size: 13px;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
   overflow-wrap: anywhere;
   text-align: center;
-  text-shadow: 0 1px #fff8;
+  color: #f3e4c0;
+  text-shadow: 0 1px 3px #000;
+}
+.avalon-cards-caption {
+  top: 216px;
+  left: -20px;
+  width: 168px;
+  opacity: 0;
+}
+.avalon-cards-selected-caption,
+.avalon-cards-survivor-caption {
+  top: 258px;
+}
+.avalon-cards-selected-caption {
+  left: 106px;
+}
+.avalon-cards-survivor-caption {
+  left: 200px;
 }
 
 .avalon-cards-back {
@@ -226,42 +240,6 @@
   overflow: visible;
 }
 
-.avalon-cards-body,
-.avalon-cards-flap,
-.avalon-cards-gap,
-.avalon-cards-fragment,
-.avalon-cards-fibers {
-  position: absolute;
-  inset: 0;
-}
-.avalon-cards-body {
-  clip-path: var(--avalon-cards-body-clip);
-  z-index: 2;
-}
-.avalon-cards-fragment {
-  clip-path: var(--avalon-cards-flap-clip);
-  z-index: 2;
-}
-.avalon-cards-gap {
-  z-index: 1;
-  width: 128px;
-  height: 186px;
-  filter: blur(0.25px) drop-shadow(0.6px 0.8px 0.7px #160e075c);
-  overflow: visible;
-}
-.avalon-cards-flap {
-  z-index: 3;
-  transform-origin: var(--avalon-cards-origin);
-  transform-style: preserve-3d;
-}
-.avalon-cards-fibers {
-  width: 128px;
-  height: 186px;
-  z-index: 4;
-  pointer-events: none;
-  overflow: visible;
-  opacity: 0.85;
-}
 .avalon-cards-survivor {
   position: absolute;
   left: 220px;
@@ -271,6 +249,12 @@
   transform: translateX(190px) rotate(11deg);
 }
 
+.avalon-assassination-reduced .avalon-cards-caption {
+  opacity: 1;
+}
+.avalon-assassination-reduced.avalon-assassination-miss .avalon-cards-selected-caption {
+  transform: translateX(-84px);
+}
 .avalon-assassination-reduced .avalon-cards-target {
   display: none;
 }
@@ -470,6 +454,7 @@
   .avalon-pair-back {
     opacity: 0;
   }
+  .avalon-cards-caption,
   .avalon-pair-front,
   .avalon-pair-stamp,
   .avalon-pair-protected {
@@ -500,6 +485,7 @@
     top: 66px;
     width: 74px;
     height: 112px;
+    transform-origin: top center;
   }
   .turn,
   .back,
@@ -549,10 +535,10 @@
   }
   .avalon-mission-badge {
     position: absolute;
-    left: 140px;
-    top: 50px;
-    width: 80px;
-    height: 80px;
+    left: 156px;
+    top: 200px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     border: 2px solid #d5bb7e;
     background: radial-gradient(ellipse at top, #b69e68, #302e1e);
@@ -563,9 +549,9 @@
   }
   .avalon-mission-badge img {
     position: absolute;
-    inset: 9px;
-    width: 58px;
-    height: 58px;
+    inset: 5px;
+    width: 34px;
+    height: 34px;
   }
   &.reduced {
     .back {
@@ -597,8 +583,8 @@
   }
   .avalon-mission-badge img {
     inset: 0;
-    width: 76px;
-    height: 76px;
+    width: 44px;
+    height: 44px;
     object-fit: cover;
     border-radius: 50%;
     filter: saturate(0.65);
