@@ -6,6 +6,7 @@ import { createRoomVoice, registerVoiceEndpoints } from '@/voice/runtime';
 import type { VoiceService } from '@/voice/service';
 import { publicRoomState } from '@/ai/public-state';
 import { AiService } from '@/ai/service';
+import { BotRoom } from '@/ai/room';
 import { getBotProfile } from '@/ai/agents';
 import { registerChatEndpoints } from '@/room/chat-endpoints';
 import { ChatService } from '@/room/chat-service';
@@ -623,7 +624,16 @@ export class Manager {
   createMethodsForGame(socket: ServerSocket, userID: string): void {
     const getRoomManager = (uuid: string) => {
       const room = this.rooms[uuid];
-      if (room?.ai) throw new Error('AI players are controlled by the server');
+      if (room?.ai) {
+        if (!(room instanceof BotRoom) || room.ai.humanPlayerID !== userID || room.data.stage !== 'started')
+          throw new Error('AI players are controlled by the server');
+        const manager = room.data.manager;
+        return {
+          callGameMethods: (id: string, params: Parameters<typeof manager.callGameMethods>[1]) =>
+            room.humanAction(id, params),
+          getGameData: manager.getGameData.bind(manager),
+        };
+      }
       if (room?.data.stage === 'started' && room.players.includes(userID)) {
         return room.data.manager;
       }

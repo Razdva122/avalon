@@ -1,4 +1,7 @@
 export default {
+  playWithBots: 'Jogar com bots',
+  mixedPlayerCount: '1 pessoa + {count} bots',
+  joinError: 'Não foi possível entrar. Apenas o administrador que criou a sala pode entrar antes do início.',
   codexShortTermLimit: 'Limite de 5 horas do Codex',
   codexLimitReached: 'Limite do Codex atingido. Aguarde a renovação e retome a partida.',
   thinking: 'Pensando',

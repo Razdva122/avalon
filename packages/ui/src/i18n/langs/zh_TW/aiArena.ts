@@ -1,4 +1,7 @@
 export default {
+  playWithBots: '與機器人對戰',
+  mixedPlayerCount: '1 位真人 + {count} 個機器人',
+  joinError: '無法加入。只有建立房間的管理員可以在開始前加入。',
   codexShortTermLimit: 'Codex 5 小時限額',
   codexLimitReached: 'Codex 使用限額已用盡。請等待重設後繼續對局。',
   thinking: '思考中',

@@ -179,3 +179,27 @@ test.each([29, 64])('a game ending %i minutes after creation keeps its room for 
   jest.advanceTimersByTime(1);
   expect(manager.rooms.postgame).toBeUndefined();
 });
+
+test('ordinary game sockets admit only the mixed-room human, never bot identities or spectators', async () => {
+  const { BotRoom } = await import('@/ai/room');
+  const { Room } = await import('@/room');
+  const { manager, handlers } = fixture(true);
+  const room = new BotRoom('mixed', 'alice', manager.io, async () => ({ choice: 0, speech: '' }));
+  room.joinAsHuman('alice');
+  manager.rooms.mixed = room;
+  Room.prototype.startGame.call(room);
+  room.ai!.status = 'running';
+  if (room.data.stage !== 'started') throw Error('not started');
+  const game = room.data.manager.game;
+  game.leader = game.players.find((p) => p.userID === 'alice')!;
+  handlers.selectPlayer('mixed', game.players[0].userID);
+  expect(game.players[0].features.isSelected).toBe(true);
+  room.ai!.status = 'paused';
+  handlers.selectPlayer('mixed', game.players[0].userID);
+  expect(game.players[0].features.isSelected).toBe(true);
+  room.ai!.status = 'running';
+  room.ai!.humanPlayerID = 'someone-else';
+  handlers.selectPlayer('mixed', game.players[0].userID);
+  expect(game.players[0].features.isSelected).toBe(true);
+  room.stop();
+});

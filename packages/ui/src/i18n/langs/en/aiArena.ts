@@ -1,4 +1,7 @@
 export default {
+  playWithBots: 'Play with bots',
+  mixedPlayerCount: '1 human + {count} bots',
+  joinError: 'Could not join. Only the administrator who created this room can join before the game starts.',
   codexShortTermLimit: 'Codex 5-hour limit',
   codexLimitReached: 'Codex usage limit reached. Wait for it to reset, then resume the match.',
   thinking: 'Thinking',

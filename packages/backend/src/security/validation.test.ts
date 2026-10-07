@@ -80,3 +80,10 @@ test('AI profile history cursor is bounded and allowed only for AI profiles', ()
   expect(validPacket('getPlayerGameSummariesPage', ['human', 'ai:YWJj', () => {}])).toBe(false);
   expect(validPacket('getPlayerGameSummariesPage', ['avalon-agent-3', 'ai:' + 'a'.repeat(601), () => {}])).toBe(false);
 });
+
+test('joining an AI human seat requires exactly a room ID and acknowledgement', () => {
+  expect(validPacket('joinAiRoom', ['mixed-room', () => {}])).toBe(true);
+  expect(validPacket('joinAiRoom', ['mixed-room'])).toBe(false);
+  expect(validPacket('joinAiRoom', ['mixed-room', 'forged-user', () => {}])).toBe(false);
+  expect(validPacket('joinAiRoom', [['mixed-room'], () => {}])).toBe(false);
+});

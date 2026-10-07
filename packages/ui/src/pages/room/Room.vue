@@ -15,6 +15,7 @@
         :roomID="roomState.roomID"
         :player-count="roomState.players.length"
         :canReveal="canRevealRoles"
+        :canJoin="canJoinAi"
         :rolesShown="rolesShown"
         @roles="spectatorRoles = $event"
         @decisions="spectatorDecisions = $event"
@@ -154,9 +155,18 @@ export default defineComponent({
     const assassinationActive = ref(false);
     const spectatorDecisions = ref<AiSpectatorDecision[]>([]);
     const spectatorRoles = ref<Record<string, TRoles>>({});
+    const canJoinAi = computed(() =>
+      Boolean(
+        store.state.profile?.isAdmin &&
+        roomState.value?.leaderID === userID.value &&
+        roomState.value?.ai?.status === 'ready' &&
+        !roomState.value.ai.humanPlayerID,
+      ),
+    );
     const canRevealRoles = computed(() =>
       Boolean(
         roomState.value?.ai &&
+        !roomState.value.ai.humanPlayerID &&
         roomState.value.stage === 'started' &&
         game.value.stage !== 'end' &&
         !game.value.players.some((p) => p.id === userID.value),
@@ -309,6 +319,7 @@ export default defineComponent({
       spectatorRoles,
       spectatorDecisions,
       canRevealRoles,
+      canJoinAi,
       rolesShown,
       hideStickers,
       chatOpen,

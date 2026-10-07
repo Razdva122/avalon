@@ -87,6 +87,7 @@ export class AiService {
       if (
         !(room instanceof BotRoom) ||
         !room.ai ||
+        room.ai.humanPlayerID !== undefined ||
         room.data.stage !== 'started' ||
         (userID !== undefined && room.players.includes(userID))
       )
@@ -227,6 +228,7 @@ export class AiService {
             playerCount,
           );
           room.ai!.model = model;
+          room.renewLease = () => this.repository!.renewLease(id);
           if (this.manager.chatService) {
             room.persistChatMessage = (author, text, requestID) =>
               this.manager.chatService.sendText(id, author, text, requestID, () => this.manager.rooms[id] === room);
@@ -239,6 +241,22 @@ export class AiService {
         }
       } catch (error) {
         cb({ error: error instanceof AiPause ? error.message : 'Could not create AI room' });
+      }
+    });
+    socket.on('joinAiRoom', async (id, cb) => {
+      if (typeof cb !== 'function') return;
+      try {
+        if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        if (typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id)) return cb({ error: 'Invalid room ID' });
+        const room = this.manager.rooms[id];
+        if (!(room instanceof BotRoom) || room.leaderID !== userID) return cb({ error: 'AI room access denied' });
+        if (this.starting || this.running.has(id)) return cb({ error: 'AI room control in progress' });
+        room.joinAsHuman(userID!);
+        room.updateRoomState(true);
+        this.manager.updateRoomsList(room);
+        cb({ ok: true });
+      } catch {
+        cb({ error: 'Only the administrator owner can join before launch' });
       }
     });
     socket.on('configureAiCodex', async (id, settings, cb) => {

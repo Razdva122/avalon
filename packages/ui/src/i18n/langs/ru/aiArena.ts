@@ -1,4 +1,7 @@
 export default {
+  playWithBots: 'Играть с ботами',
+  mixedPlayerCount: '1 человек + {count} ботов',
+  joinError: 'Не удалось войти. До старта войти может только администратор, создавший комнату.',
   codexShortTermLimit: 'Лимит Codex на 5 часов',
   codexLimitReached: 'Лимит Codex исчерпан. Дождитесь обновления и продолжите партию.',
   thinking: 'Думает',

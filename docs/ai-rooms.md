@@ -4,7 +4,11 @@
 
 AI rooms are spectator games with 5, 6, 7 or 8 bots (default: seven). An
 administrator creates and controls a match; spectators see the board, public
-chat and optional AI role/decision reveal. Human seats are not implemented.
+chat and optional AI role/decision reveal. Before launch, the database-admin owner can take one seat using “Play with bots”,
+replacing one bot while preserving the selected table size. Other humans cannot
+join. Mixed games wait for the human’s ordinary board actions and include their
+public chat in bot context. Role/decision reveal is disabled for everyone in a
+mixed room. Mixed games award neither human nor AI profile ratings.
 Spectator messages are not passed to the bots. AI games use their own profile
 statistics/rating pool and do not award human ratings or achievements.
 

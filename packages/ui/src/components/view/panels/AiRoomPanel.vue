@@ -4,7 +4,11 @@
       <summary>
         <span class="ai-heading"
           ><strong>{{ $t('aiArena.title') }}</strong
-          ><small>{{ $t('aiArena.playerCount', { count: displayPlayerCount }) }}</small
+          ><small>{{
+            $t(ai.humanPlayerID ? 'aiArena.mixedPlayerCount' : 'aiArena.playerCount', {
+              count: displayPlayerCount - (ai.humanPlayerID ? 1 : 0),
+            })
+          }}</small
           ><small v-if="displayModel">{{ displayModel }}</small></span
         >
         <span class="ai-status" :class="`ai-status--${ai.status}`">{{ $t(`aiArena.${ai.status}`) }}</span>
@@ -50,6 +54,14 @@
         <p v-if="rolesShown">{{ $t('aiArena.privateDecisionsHint') }}</p>
         <p v-if="rolesShown && decisionsError" role="status">{{ $t('aiArena.connectionError') }}</p>
         <div v-if="canManage" class="ai-controls">
+          <v-btn
+            v-if="canJoin && ai.status === 'ready' && !ai.humanPlayerID"
+            color="primary"
+            :loading="busy"
+            :disabled="busy"
+            @click="join"
+            >{{ $t('aiArena.playWithBots') }}</v-btn
+          >
           <v-btn
             v-if="ai.status === 'ready'"
             color="success"
@@ -108,6 +120,7 @@ const props = defineProps<{
   roomID: string;
   playerCount?: number;
   canReveal?: boolean;
+  canJoin?: boolean;
   rolesShown?: boolean;
 }>();
 const { t } = useI18n();
@@ -210,6 +223,18 @@ async function toggleRoles() {
 }
 const busy = ref(false);
 const error = ref('');
+async function join() {
+  busy.value = true;
+  error.value = '';
+  try {
+    const result = await socket.timeout(10000).emitWithAck('joinAiRoom', props.roomID);
+    if ('error' in result) error.value = t('aiArena.joinError');
+  } catch {
+    error.value = t('aiArena.connectionError');
+  } finally {
+    busy.value = false;
+  }
+}
 async function control(action: 'start' | 'stop' | 'resumeBudget' | 'resumeTechnical') {
   busy.value = true;
   error.value = '';

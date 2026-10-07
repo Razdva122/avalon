@@ -732,3 +732,48 @@ test('weekly Codex quota is admin-only in production, unavailable data stays nul
     quota.mockRestore();
   }
 });
+
+test('only the database-admin owner can take the single human seat; mixed games never reveal roles to spectators', async () => {
+  const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
+  const room = new BotRoom('mixed-room', 'owner', io, async () => ({ choice: 0, speech: '' }));
+  const host = {
+    rooms: { 'mixed-room': room },
+    io,
+    updateRoomsList() {},
+    dbManager: { getUserByID: async (id: string) => ({ isAdmin: ['owner', 'other-admin'].includes(id) }) },
+  } as unknown as Manager;
+  const service = new AiService(host);
+  service.repository = { save: async () => {} } as unknown as AiRepository;
+  function connect(id?: string) {
+    const events: Record<string, (...args: any[]) => any> = {};
+    service.register(
+      {
+        on: (name: string, handler: (...args: any[]) => any) => {
+          events[name] = handler;
+        },
+      } as unknown as ServerSocket,
+      id,
+    );
+    return events;
+  }
+  for (const id of [undefined, 'visitor', 'other-admin']) {
+    const cb = jest.fn();
+    await connect(id).joinAiRoom('mixed-room', cb);
+    expect(cb.mock.calls[0][0]).toHaveProperty('error');
+    expect(room.players).not.toContain('owner');
+  }
+  const cb = jest.fn();
+  await connect('owner').joinAiRoom('mixed-room', cb);
+  expect(cb.mock.calls[0][0]).toEqual({ ok: true });
+  expect(room.players).toContain('owner');
+  // Start the underlying real engine without running bots, to exercise the reveal boundary.
+  const { Room } = await import('@/room');
+  Room.prototype.startGame.call(room);
+  room.ai!.status = 'running';
+  const reveal = jest.fn();
+  connect().getAiSpectatorRoles('mixed-room', reveal);
+  expect(reveal.mock.calls[0][0]).toHaveProperty('error');
+  await connect('owner').joinAiRoom('mixed-room', cb);
+  expect(cb.mock.calls[1][0]).toHaveProperty('error');
+  room.stop();
+});

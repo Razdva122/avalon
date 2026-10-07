@@ -67,6 +67,7 @@ const acknowledgements: Record<string, number> = {
   getAiCodexWeeklyLimit: 0,
   createRoom: 0,
   joinRoom: 1,
+  joinAiRoom: 1,
   getOnlineCounter: 1,
   getPlayerGames: 1,
   getPlayerGameSummaries: 1,

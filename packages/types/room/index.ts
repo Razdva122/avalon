@@ -41,6 +41,9 @@ export type AiLanguage = 'en' | 'ru' | 'zh-tw';
 export type AiPlayerCount = 5 | 6 | 7 | 8;
 
 export type AiRoomState = {
+  /** Single administrator seat; absent in spectator-only bot matches. */
+  humanPlayerID?: string;
+  waitingForHuman?: boolean;
   /** Missing in older archives; discussion defaults to English. */
   language?: AiLanguage;
   /** Missing in older archives; the saved player list still identifies the size. */

@@ -21,10 +21,13 @@ function combinations(ids: string[], count: number): string[][] {
 }
 
 export class BotRoom extends Room {
+  renewLease?: () => Promise<void>;
   readonly spectatorDecisions: AiSpectatorDecision[] = [];
   private decisionSequence = 0;
   private cancelled = false;
   private executing = false;
+  private wakeHuman?: () => void;
+  private missionChoices = new Map<string, Choice>();
   budgetResumeUnits = 0;
   private discussion?: {
     spoken: Set<string>;
@@ -79,6 +82,63 @@ export class BotRoom extends Room {
     void userID;
     throw Error('AI room has fixed seats');
   }
+  joinAsHuman(userID: string): void {
+    if (this.ai!.status !== 'ready' || this.data.stage !== 'locked' || userID !== this.leaderID)
+      throw Error('Only the administrator owner can join before launch');
+    if (this.ai!.humanPlayerID) {
+      if (this.ai!.humanPlayerID === userID) return;
+      throw Error('The human seat is occupied');
+    }
+    this.players[this.players.length - 1] = userID;
+    this.ai!.humanPlayerID = userID;
+    delete this.ai!.profileRatingSeason;
+  }
+
+  humanAction(userID: string, params: TGameMethodsParams): void {
+    if (userID !== this.ai!.humanPlayerID || this.ai!.status !== 'running')
+      throw Error('AI players are controlled by the server');
+    this.manager.callGameMethods(userID, params);
+    if (params.method === 'sentSelectedPlayers' && this.manager.game.stage !== 'selectTeam')
+      this.discussion = undefined;
+    this.wakeHuman?.();
+  }
+
+  private async waitForHuman(pending: () => boolean) {
+    if (this.cancelled || !pending()) return;
+    this.ai!.waitingForHuman = true;
+    this.ai!.message = aiText(this.language).waitingForHuman;
+    this.updateRoomState(true);
+    let leaseTimer: ReturnType<typeof setTimeout> | undefined;
+    let waiting = true;
+    try {
+      await this.checkpoint(this.calculateRoomState());
+      await new Promise<void>((resolve, reject) => {
+        this.wakeHuman = () => {
+          if (this.cancelled || !pending()) {
+            waiting = false;
+            resolve();
+          }
+        };
+        const renew = async () => {
+          try {
+            if (!waiting) return;
+            await this.renewLease!();
+            if (waiting) leaseTimer = setTimeout(renew, 60000);
+          } catch {
+            if (waiting) reject(new AiTechnicalPause('Could not retain AI room ownership. Retry to continue.'));
+          }
+        };
+        if (this.renewLease) leaseTimer = setTimeout(renew, 60000);
+        this.wakeHuman();
+      });
+    } finally {
+      waiting = false;
+      clearTimeout(leaseTimer);
+      this.wakeHuman = undefined;
+      delete this.ai!.waitingForHuman;
+      this.updateRoomState(true);
+    }
+  }
   override leaveGame(userID: string): void {
     void userID;
     throw Error('AI room has fixed seats');
@@ -102,6 +162,7 @@ export class BotRoom extends Room {
 
   stop() {
     this.cancelled = true;
+    this.wakeHuman?.();
     delete this.ai!.thinkingPlayerID;
     this.abort.abort();
     this.ai!.status = 'stopped';
@@ -195,9 +256,14 @@ export class BotRoom extends Room {
       );
     }
     // Only Evil needs a model call for the secret mission card: never expose its identity.
-    if (state.stage !== 'onMission') this.ai!.thinkingPlayerID = id;
-    this.ai!.message = state.stage === 'onMission' ? 'Collecting secret mission cards.' : `${agent.name}: ${task}`;
-    this.updateRoomState(true);
+    const secretMission = state.stage === 'onMission' && Boolean(this.ai!.humanPlayerID);
+    if (state.stage !== 'onMission' && !(this.ai!.humanPlayerID && privateDiscussion)) this.ai!.thinkingPlayerID = id;
+    this.ai!.message = this.ai!.humanPlayerID
+      ? aiText(this.language).thinking
+      : state.stage === 'onMission'
+        ? 'Collecting secret mission cards.'
+        : `${agent.name}: ${task}`;
+    if (!secretMission) this.updateRoomState(true);
     let answer: BotReply;
     try {
       answer = await this.decide(request, this.abort.signal);
@@ -218,7 +284,7 @@ export class BotRoom extends Room {
       this.ai!.message = 'Model error: a legal fallback action was used.';
     } finally {
       delete this.ai!.thinkingPlayerID;
-      this.updateRoomState(true);
+      if (!secretMission) this.updateRoomState(true);
     }
     if (this.cancelled || this.manager.game.stage !== state.stage) return null;
     // Retain completed decisions before publication/checkpoints can pause the match.
@@ -301,6 +367,8 @@ export class BotRoom extends Room {
       if (this.cancelled) return;
     }
     for (const player of this.clockwiseSeats()) {
+      if (player === this.ai!.humanPlayerID) continue;
+      if (this.manager.game.stage !== 'selectTeam') return;
       if (this.discussion.spoken.has(player)) continue;
       const answer = await this.ask(
         player,
@@ -312,6 +380,11 @@ export class BotRoom extends Room {
         true,
       );
       if (!answer) return;
+    }
+    if (id === this.ai!.humanPlayerID) {
+      await this.waitForHuman(() => this.manager.game.stage === 'selectTeam');
+      this.discussion = undefined;
+      return;
     }
     if (!this.discussion.finalTeam) {
       const proposal = await this.ask(
@@ -336,6 +409,8 @@ export class BotRoom extends Room {
     const votes = this.discussion.votes;
     const choices = ['approve', 'reject'].map((text) => ({ text, actions: [] }));
     for (const player of this.clockwiseSeats()) {
+      if (player === this.ai!.humanPlayerID) continue;
+      if (!this.manager.game.players.find((p) => p.userID === player)!.features.waitForAction) continue;
       if (votes.has(player)) continue;
       const answer = await this.ask(
         player,
@@ -348,16 +423,35 @@ export class BotRoom extends Room {
     // Keep every decision private until all bots have seen the same voting state.
     for (const [player, option] of votes) {
       if (this.cancelled || this.manager.game.stage !== 'votingForTeam') return;
+      if (!this.manager.game.players.find((p) => p.userID === player)!.features.waitForAction) continue;
       this.manager.callGameMethods(player, { method: 'voteForMission', option });
     }
     this.discussion = undefined;
+    await this.waitForHuman(() => this.manager.game.stage === 'votingForTeam');
   }
 
   private async act() {
     const game = this.manager.game;
     if (game.stage === 'selectTeam') return this.discussTeam();
     if (game.stage === 'votingForTeam') return this.voteForTeam();
-    const actor = game.players.find((p) => p.features.waitForAction);
+    const batchMission = game.stage === 'onMission' && Boolean(this.ai!.humanPlayerID);
+    const actor = game.players.find(
+      (p) =>
+        p.features.waitForAction &&
+        p.userID !== this.ai!.humanPlayerID &&
+        !(batchMission && this.missionChoices.has(p.userID)),
+    );
+    if (!actor && batchMission && this.missionChoices.size) {
+      // Submit together so immediate Good cards and generated Evil cards have no visible timing difference.
+      const choices = this.missionChoices;
+      this.missionChoices = new Map();
+      for (const [id, choice] of choices) this.apply(id, choice);
+      return;
+    }
+    if (!actor && this.ai!.humanPlayerID) {
+      const stage = game.stage;
+      return this.waitForHuman(() => game.stage === stage && game.players.some((p) => p.features.waitForAction));
+    }
     if (!actor) throw new AiPause('No player is available for the next action.');
     const id = actor.userID;
     const state = this.stateFor(id);
@@ -408,6 +502,7 @@ export class BotRoom extends Room {
         for (const ally of state.players.filter((p) =>
           ['evil', 'mordred', 'morgana', 'minion', 'oberon'].includes(p.role),
         )) {
+          if (ally.id === this.ai!.humanPlayerID) continue;
           if (this.evilCouncil.some((entry) => entry.seat === this.label(ally.id))) continue;
           const suggestion = await this.ask(
             ally.id,
@@ -426,12 +521,20 @@ export class BotRoom extends Room {
     if (!choices.length) throw new AiPause('No legal actions available.');
     const result = await this.ask(id, task, choices, speak, privateCheck);
     if (result) {
+      if (batchMission) {
+        this.missionChoices.set(id, choices[result.choice]);
+        return;
+      }
       const inspected = state.players.find((p) => p.features.isSelected);
       this.apply(id, choices[result.choice]);
       if (state.stage === 'announceLoyalty' && inspected) {
         await this.publish(id, aiText(this.language).inspection(this.label(inspected.id), result.choice === 0));
         // Public Good-persona stance for either side; never changes private alignment knowledge.
-        await this.publish(inspected.id, aiText(this.language).inspectionResponse(this.label(id), result.choice === 0));
+        if (inspected.id !== this.ai!.humanPlayerID)
+          await this.publish(
+            inspected.id,
+            aiText(this.language).inspectionResponse(this.label(id), result.choice === 0),
+          );
       }
     }
   }
@@ -462,6 +565,7 @@ export class BotRoom extends Room {
           await this.publish(player.userID, aiText(this.language).council(entry.target, entry.reason));
         }
         for (const id of this.players) {
+          if (id === this.ai!.humanPlayerID) continue;
           if (this.cancelled) break;
           if (this.reviewedPlayers.has(id)) continue;
           await this.ask(

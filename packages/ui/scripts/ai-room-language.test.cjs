@@ -305,3 +305,34 @@ test('lobby badges identify each saved AI room language and default legacy rooms
     assert.ok(room.html.includes(`<span>${label}</span>`), `wrong lobby badge for ${language}`);
   }
 });
+
+test('administrator owner joins from the ready panel; visitors and launched games have no join control', async (t) => {
+  const props = { roomID: 'mixed', canJoin: true, ai: { model: 'yandex', status: 'ready', playerCount: 7 } };
+  const room = await fixture('components/view/panels/AiRoomPanel.vue', {
+    props,
+    acknowledge: async () => ({ ok: true }),
+  });
+  t.after(room.stop);
+  const join = room.nodes('v-btn').find((node) => String(node.children).includes('Play with bots'));
+  assert.ok(join, 'owner needs a join control');
+  await join.props.onClick();
+  assert.deepEqual(room.sent, [['joinAiRoom', 'mixed']]);
+  for (const variant of [
+    { ...props, canJoin: false },
+    { ...props, ai: { ...props.ai, status: 'running' } },
+    { ...props, ai: { ...props.ai, humanPlayerID: 'owner' } },
+  ]) {
+    const panel = await fixture('components/view/panels/AiRoomPanel.vue', { props: variant });
+    t.after(panel.stop);
+    assert.ok(!panel.html.includes('Play with bots'));
+  }
+});
+
+test('mixed game summary counts the bots separately from the single human', async (t) => {
+  const panel = await fixture('components/view/panels/AiRoomPanel.vue', {
+    locale: 'ru',
+    props: { roomID: 'mixed', ai: { status: 'running', playerCount: 7, humanPlayerID: 'owner' } },
+  });
+  t.after(panel.stop);
+  assert.ok(panel.html.includes('1 человек + 6 ботов'));
+});

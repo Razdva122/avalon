@@ -995,3 +995,220 @@ test('spectators get only each bot latest short reason without leaking it to cha
   expect(JSON.stringify(room.chat.history)).not.toContain('PRIVATE-');
   expect(JSON.stringify(requests)).not.toContain('PRIVATE-');
 });
+
+test('one owner replaces a bot only before launch', () => {
+  const room = new BotRoom('human-seat', 'admin', io, async (r) => reply(r));
+  expect(() => room.joinAsHuman('visitor')).toThrow();
+  room.joinAsHuman('admin');
+  room.joinAsHuman('admin');
+  expect(room.players).toHaveLength(7);
+  expect(room.players.filter((id) => id === 'admin')).toHaveLength(1);
+  expect(room.ai?.humanPlayerID).toBe('admin');
+  expect(room.ai?.profileRatingSeason).toBeUndefined();
+  room.ai!.status = 'running';
+  expect(() => room.joinAsHuman('admin')).toThrow();
+});
+
+test('human seat completes a real game through ordinary actions without any model impersonation', async () => {
+  const requests: BotRequest[] = [];
+  const publicStatus: { task: string; message: string; privateDiscussion?: boolean; thinkingPlayerID?: string }[] = [];
+  const room = new BotRoom('human-game', 'admin', io, async (request) => {
+    requests.push(request);
+    const ai = room.calculateRoomState('admin').ai!;
+    publicStatus.push({
+      task: request.task,
+      message: ai.message,
+      privateDiscussion: request.privateDiscussion,
+      thinkingPlayerID: ai.thinkingPlayerID,
+    });
+    return { ...reply(request), choice: request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0 };
+  });
+  room.joinAsHuman('admin');
+  room.addMessage('admin', 'Consider my proposed team.');
+  const run = room.run();
+  try {
+    for (let step = 0; step < 1000 && room.ai?.status === 'running'; step++) {
+      // Let the real bot loop reach its next human boundary, without a provider or network.
+      await new Promise<void>((resolve) => setImmediate(resolve));
+      if (room.data.stage !== 'started') continue;
+      const game = room.data.manager.game;
+      const human = game.players.find((p) => p.userID === 'admin')!;
+      if (!human.features.waitForAction) continue;
+      const act = (params: Parameters<typeof room.humanAction>[1]) => room.humanAction('admin', params);
+      switch (game.stage) {
+        case 'selectTeam':
+          for (const p of game.players.slice(0, game.settings.missions[game.round].players))
+            act({ method: 'selectPlayer', playerID: p.userID });
+          act({ method: 'sentSelectedPlayers' });
+          break;
+        case 'votingForTeam':
+          act({ method: 'voteForMission', option: 'approve' });
+          break;
+        case 'onMission':
+          act({ method: 'actionOnMission', result: 'success' });
+          break;
+        case 'checkLoyalty':
+          act({
+            method: 'selectPlayer',
+            playerID: game.players.find((p) => !p.features.ladyOfLake && p !== human)!.userID,
+          });
+          act({ method: 'checkLoyalty' });
+          break;
+        case 'announceLoyalty':
+          act({ method: 'announceLoyalty', loyalty: 'good' });
+          break;
+        case 'assassinate':
+          act({ method: 'selectPlayer', playerID: game.players.find((p) => p.role.role === 'merlin')!.userID });
+          act({ method: 'assassinate', type: 'merlin' });
+          break;
+      }
+    }
+    expect(room.ai?.status).toBe('finished');
+    expect(requests.length).toBeGreaterThan(0);
+    expect(requests.some((r) => r.chat.some((m) => m.text === 'Consider my proposed team.'))).toBe(true);
+    expect(requests.every((r) => r.playerID !== 'admin')).toBe(true);
+    expect(room.chat.history.filter((m) => m.userID === 'admin').map((m) => m.message)).toEqual([
+      'Consider my proposed team.',
+    ]);
+    expect(room.ai?.fallbacks).toBe(0);
+    expect(publicStatus.every((s) => !s.message.includes(s.task))).toBe(true);
+    expect(publicStatus.filter((s) => s.privateDiscussion).every((s) => s.thinkingPlayerID === undefined)).toBe(true);
+  } finally {
+    if (room.ai?.status === 'running') room.stop();
+    await run;
+  }
+});
+
+test('long human waits preserve the lease without model calls and stop cancels the wait', async () => {
+  const { AI_LEASE_MS } = await import('./timing');
+  jest.useFakeTimers();
+  let expires = Date.now() + AI_LEASE_MS;
+  let calls = 0;
+  const room = new BotRoom('long-human-wait', 'admin', io, async (request) => {
+    calls++;
+    return reply(request);
+  });
+  room.renewLease = async () => {
+    if (expires <= Date.now()) throw Error('Expired lease');
+    expires = Date.now() + AI_LEASE_MS;
+  };
+  room.joinAsHuman('admin');
+  const run = room.run();
+  try {
+    await jest.advanceTimersByTimeAsync(0);
+    expect(room.ai?.waitingForHuman).toBe(true);
+    const before = calls;
+    await jest.advanceTimersByTimeAsync(AI_LEASE_MS + 60000);
+    expect(expires).toBeGreaterThan(Date.now());
+    expect(calls).toBe(before);
+    expect(room.ai?.status).toBe('running');
+    room.stop();
+    await run;
+    expect(room.ai?.waitingForHuman).toBeUndefined();
+    expect(jest.getTimerCount()).toBe(0);
+  } finally {
+    room.stop();
+    await run;
+    jest.useRealTimers();
+  }
+});
+
+test('renewal failure during human team vote resumes without making bots vote twice', async () => {
+  jest.useFakeTimers();
+  let calls = 0;
+  const room = new BotRoom('resume-human-vote', 'admin', io, async (request) => {
+    calls++;
+    return reply(request);
+  });
+  room.renewLease = async () => {
+    throw Error('Temporary lease renewal failure');
+  };
+  room.joinAsHuman('admin');
+  let run = room.run();
+  try {
+    await jest.advanceTimersByTimeAsync(0);
+    if (room.data.stage !== 'started') throw Error('not started');
+    const game = room.data.manager.game;
+    if (game.stage === 'selectTeam') {
+      for (const p of game.players.slice(0, game.settings.missions[0].players))
+        room.humanAction('admin', { method: 'selectPlayer', playerID: p.userID });
+      room.humanAction('admin', { method: 'sentSelectedPlayers' });
+      await jest.advanceTimersByTimeAsync(0);
+    }
+    expect(game.stage).toBe('votingForTeam');
+    expect(room.ai?.waitingForHuman).toBe(true);
+    const before = calls;
+    await jest.advanceTimersByTimeAsync(60000);
+    await run;
+    expect(room.ai?.canResumeTechnical).toBe(true);
+    room.renewLease = async () => {};
+    run = room.run(false, true);
+    await jest.advanceTimersByTimeAsync(0);
+    expect(room.ai?.status).toBe('running');
+    expect(calls).toBe(before);
+    room.humanAction('admin', { method: 'voteForMission', option: 'approve' });
+    expect(game.stage).not.toBe('votingForTeam');
+  } finally {
+    room.stop();
+    await run;
+    jest.useRealTimers();
+  }
+});
+
+test('mixed missions keep every bot card pending until all secret decisions are collected', async () => {
+  const { Room } = await import('@/room');
+  let waiting: boolean[] = [];
+  let missionBroadcasts = 0;
+  const secretIo = {
+    to: () => secretIo,
+    except: () => secretIo,
+    emit: (event: string, state: import('@avalon/types').TRoomState) => {
+      if (
+        event === 'roomUpdated' &&
+        state.stage === 'started' &&
+        state.game.stage === 'onMission' &&
+        state.ai?.status === 'running'
+      )
+        missionBroadcasts++;
+      return true;
+    },
+  } as unknown as Server;
+  const room = new BotRoom(
+    'secret-card-timing',
+    'admin',
+    secretIo,
+    async (request) => {
+      if (request.state.stage === 'onMission') {
+        waiting = request.state.players
+          .filter((p) => p.id !== 'admin' && p.features.isSent)
+          .map((p) => !!p.features.waitForAction);
+        room.stop();
+      }
+      return reply(request);
+    },
+    undefined,
+    0,
+    'en',
+    5,
+  );
+  room.joinAsHuman('admin');
+  Room.prototype.startGame.call(room);
+  if (room.data.stage !== 'started') throw Error('not started');
+  const game = room.data.manager.game;
+  const good = game.players.find((p) => p.userID !== 'admin' && p.role.loyalty === 'good')!;
+  const evil = game.players.find((p) => p.userID !== 'admin' && p.role.loyalty === 'evil')!;
+  // Force the immediately-decided Good bot to be encountered before the model-driven Evil bot.
+  game.players.sort((a, b) => Number(a.role.loyalty === 'evil') - Number(b.role.loyalty === 'evil'));
+  game.leader = good;
+  const manager = room.data.manager;
+  manager.callGameMethods(good.userID, { method: 'selectPlayer', playerID: good.userID });
+  manager.callGameMethods(good.userID, { method: 'selectPlayer', playerID: evil.userID });
+  manager.callGameMethods(good.userID, { method: 'sentSelectedPlayers' });
+  for (const player of game.players)
+    manager.callGameMethods(player.userID, { method: 'voteForMission', option: 'approve' });
+  room.ai!.status = 'paused';
+  room.ai!.canResumeTechnical = true;
+  await room.run(false, true);
+  expect(waiting).toEqual([true, true]);
+  expect(missionBroadcasts).toBe(0);
+});

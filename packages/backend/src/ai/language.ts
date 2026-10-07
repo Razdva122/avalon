@@ -12,6 +12,8 @@ export function languageInstruction(language: AiLanguage = 'en'): string {
 
 const texts = {
   en: {
+    thinking: 'Bots are considering their next action.',
+    waitingForHuman: 'Waiting for the human player’s action. Use the board controls and chat.',
     ready: 'AI players ready · English discussion',
     postGamePrefix: 'Post-game: ',
     councilPrefix: 'Evil council (revealed): ',
@@ -33,6 +35,8 @@ const texts = {
     neutralProposal: 'This is the team I want to test.',
   },
   ru: {
+    thinking: 'Боты обдумывают ход.',
+    waitingForHuman: 'Ждём ход человека. Используй кнопки на поле и чат.',
     ready: 'AI-игроки готовы · Обсуждение на русском',
     postGamePrefix: 'После игры: ',
     councilPrefix: 'Совет злых (раскрыт): ',
@@ -55,6 +59,8 @@ const texts = {
     neutralProposal: 'Эту команду я хочу проверить на миссии.',
   },
   'zh-tw': {
+    thinking: '機器人正在思考下一步行動。',
+    waitingForHuman: '等待真人玩家行動。請使用遊戲面板與聊天室。',
     ready: 'AI 玩家已就緒 · 繁體中文討論',
     postGamePrefix: '賽後回顧：',
     councilPrefix: '邪惡陣營密談（公開）：',
