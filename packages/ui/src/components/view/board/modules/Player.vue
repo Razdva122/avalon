@@ -1,7 +1,7 @@
 <template>
   <div
     class="player-container"
-    :class="[playerClasses, { 'ai-thinking': thinking }]"
+    :class="[playerClasses, { 'ai-thinking': thinking, 'player-premium-assassin': showPremiumAssassin }]"
     @click="privateDecision ? (showUserCardDialog = true) : $emit('playerClick', player.id)"
     ref="playerRef"
   >
@@ -38,6 +38,11 @@
             class="player-pulse-aura"
             aria-hidden="true"
           ></span>
+          <span v-if="showPremiumAssassin" class="player-assassin-fire" aria-hidden="true">
+            <span class="player-assassin-spark"></span>
+            <span class="player-assassin-spark"></span>
+            <span class="player-assassin-spark"></span>
+          </span>
           <img class="player-frame" alt="frame" :src="getImagePathByID('core', 'player-frame')" />
           <div class="player-icon"></div>
           <Avatar
@@ -501,6 +506,13 @@ export default defineComponent({
       return classes;
     });
 
+    const showPremiumAssassin = computed(
+      () =>
+        userState.value.status === 'ready' &&
+        Boolean(userState.value.profile.premium) &&
+        Boolean(playerClasses.value['player-feature-isAssassin']),
+    );
+
     const displayUserAvatar = computed(() => {
       return !gameState.value;
     });
@@ -528,6 +540,7 @@ export default defineComponent({
       displayUserAvatar,
       player,
       playerClasses,
+      showPremiumAssassin,
       chatMessage,
       roomChat,
       messageElement,
@@ -910,7 +923,95 @@ export default defineComponent({
   color: #f2a4a0;
 }
 
+// One rotating parent keeps the sparks attached to the bright tip during state updates.
+.player-assassin-fire {
+  position: absolute;
+  top: -2px;
+  left: 3px;
+  width: 119px;
+  height: 119px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+  animation: player-assassin-orbit 6s linear infinite;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: conic-gradient(
+      transparent 0deg 295deg,
+      #ed4861 320deg,
+      #ffad78 345deg,
+      #fff0cc 353deg,
+      #fff0cc 359deg,
+      transparent 360deg
+    );
+    mask: radial-gradient(closest-side, transparent 88%, #000 92%);
+    filter: drop-shadow(0 0 3px #ff554f);
+  }
+}
+
+.player-assassin-spark {
+  position: absolute;
+  top: 0;
+  left: calc(50% - 2px);
+  width: 3px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffe5bb;
+  box-shadow: 0 0 4px 1px #f36e5f;
+  opacity: 0;
+  animation: player-assassin-spark 1.8s ease-out infinite;
+
+  &:nth-child(2) {
+    animation-delay: -0.6s;
+  }
+  &:nth-child(3) {
+    animation-delay: -1.2s;
+  }
+}
+
+.player-premium-assassin .player-assassin-badge {
+  background: linear-gradient(#572633, #28151c);
+  border-color: #ffc3b0;
+}
+
+@keyframes player-assassin-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes player-assassin-spark {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(-30deg) scale(0.6);
+  }
+  8% {
+    opacity: 1;
+    transform: translate(-2px, -3px) rotate(-30deg) scale(1);
+  }
+  48% {
+    opacity: 0.8;
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: translate(-22px, -30px) rotate(-45deg) scale(0.3);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .player-assassin-fire {
+    animation: none;
+    opacity: 0.7;
+  }
+  .player-assassin-spark {
+    display: none;
+    animation: none;
+  }
   .player-pulse-aura,
   .player-feature-waitForAction .player-name::before,
   .player-feature-isAssassin .player-name::before {
