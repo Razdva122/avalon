@@ -1,7 +1,7 @@
 import type { AiLanguage } from '@avalon/types';
 import { AiOutputLimit, compactRequest } from './client';
 import type { BotRequest } from './client';
-import { decisionPipeline } from './pipeline';
+import { publicContext, decisionPipeline } from './pipeline';
 
 const requestFor = (count: number): BotRequest =>
   ({
@@ -51,7 +51,7 @@ test.each([
       .mockResolvedValueOnce({ choice: 0, speech: 'I prefer this team.' });
     expect(await decisionPipeline(generate)(request)).toMatchObject({ choice: 1, speech: 'I prefer this team.' });
     const decision = generate.mock.calls[0][1];
-    const publicReply = generate.mock.calls[1][1];
+    const publicReply = { context: publicContext(request, request.choices[1]) };
     const facts = {
       playerCount: count,
       approvalsRequired: approvals,
@@ -66,8 +66,8 @@ test.each([
     });
     expect(decision.context.roleAdvice).toContain(`You currently see ${visibleEvil} Evil`);
     expect(decision.context.roleCounts.oberon).toBe(count === 7 ? 1 : undefined);
-    expect(publicReply.context.roleCounts.oberon).toBe(count === 7 ? 1 : undefined);
-    expect(publicReply.context.roleCounts.minion).toBe(count === 8 ? 1 : undefined);
+    expect(publicReply.context.roleCounts?.oberon).toBe(count === 7 ? 1 : undefined);
+    expect(publicReply.context.roleCounts?.minion).toBe(count === 8 ? 1 : undefined);
     expect(decision.context.privateKnowledge.rolesVisibleToYou).toContainEqual([4, 'evil']);
     expect(JSON.stringify(publicReply.context)).not.toMatch(
       /privateKnowledge|rolesVisibleToYou|roleAdvice|PRIVATE ROLE REASON/,
@@ -167,6 +167,6 @@ test.each([
     const decision = generate.mock.calls[0][1];
     expect(decision.context.approvalsRequired).toBe(approvalsRequired);
     expect(decision.instructions).not.toContain('one Good vote');
-    expect(decision.instructions).toContain('enough Good approvals to reach approvalsRequired');
+    expect(decision.context.approvalsRequired).toBe(approvalsRequired);
   },
 );

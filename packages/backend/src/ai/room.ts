@@ -286,6 +286,7 @@ export class BotRoom extends Room {
     const request: BotRequest = {
       language: this.language,
       playerID: id,
+      humanPlayerID: this.ai!.humanPlayerID,
       name: this.label(id),
       style: agent.style,
       task,

@@ -142,3 +142,91 @@ test('anonymous votes cannot be attributed to seats for questioning', () => {
   } as unknown as BotRequest;
   expect(compactRequest(anonymous)).toMatchObject({ offTeamApprovals: [] });
 });
+
+test('summarizes repeated sole off-team support without treating votes as proof or rejected teams as missions', () => {
+  const current = {
+    ...request,
+    state: {
+      ...request.state,
+      history: [
+        {
+          type: 'vote',
+          leaderID: '2',
+          team: [{ id: '2' }, { id: '5' }],
+          result: 'reject',
+          forced: false,
+          votes: [
+            { playerID: '1', value: 'reject' },
+            { playerID: '2', value: 'approve' },
+            { playerID: '3', value: 'reject' },
+            { playerID: '4', value: 'approve' },
+            { playerID: '5', value: 'approve' },
+          ],
+        },
+        {
+          type: 'vote',
+          leaderID: '5',
+          team: [{ id: '3' }, { id: '5' }, { id: '1' }],
+          result: 'approve',
+          forced: false,
+          votes: [
+            { playerID: '1', value: 'approve' },
+            { playerID: '2', value: 'reject' },
+            { playerID: '3', value: 'approve' },
+            { playerID: '4', value: 'approve' },
+            { playerID: '5', value: 'approve' },
+          ],
+        },
+        {
+          type: 'mission',
+          index: 0,
+          leaderID: '5',
+          result: 'fail',
+          fails: 2,
+          actions: [
+            { playerID: '3', value: 'fail' },
+            { playerID: '5', value: 'fail' },
+            { playerID: '1', value: 'success' },
+          ],
+        },
+      ],
+    },
+  } as unknown as BotRequest;
+  const expected = [
+    {
+      seat: 4,
+      approvals: 2,
+      soleApprovals: 2,
+      failedMissionApprovals: 1,
+      supportedSeats: [
+        { seat: 1, approvals: 1 },
+        { seat: 2, approvals: 1 },
+        { seat: 3, approvals: 1 },
+        { seat: 5, approvals: 2 },
+      ],
+    },
+  ];
+  expect(compactRequest(current)).toMatchObject({ offTeamVotingPatterns: expected });
+  expect(publicContext(current, '1, 3, 5')).toMatchObject({ offTeamVotingPatterns: expected });
+  expect(
+    focusedRetry({ context: compactRequest(current), decisionDetails: true, phase: 'decision', maxOutput: 1000 })
+      .context,
+  ).toMatchObject({ offTeamVotingPatterns: expected });
+});
+
+test('does not summarize forced or anonymous votes as individual support', () => {
+  for (const votes of ['forced', 'anonymous']) {
+    const current = {
+      ...request,
+      state: {
+        ...request.state,
+        history: request.state.history.map((e) =>
+          e.type === 'vote'
+            ? { ...e, ...(votes === 'forced' ? { forced: true } : { votes: { approve: 4, reject: 1 } }) }
+            : e,
+        ),
+      },
+    } as unknown as BotRequest;
+    expect(compactRequest(current)).toMatchObject({ offTeamVotingPatterns: [] });
+  }
+});

@@ -33,7 +33,7 @@ test('structured output applies parser limits to evidence, including the failed 
   expect(schema.properties.choice.enum).toEqual(request.choices);
 });
 
-test('structured output permits a stance on an eighth-seat Percival claim', () => {
+test('structured output lets the model identify a free-form eighth-seat claim', () => {
   const r = {
     ...request,
     playerID: 'seat-1',
@@ -47,16 +47,17 @@ test('structured output permits a stance on an eighth-seat Percival claim', () =
         role: i === 0 ? 'merlin' : 'unknown',
       })),
     },
-    chat: [{ name: '8', text: 'I am Percival. 2 is Morgana.' }],
+    chat: [{ name: '8', text: 'My role is Percival; I believe the second wizard is Morgana.' }],
   } as unknown as BotRequest;
   const schema = codexSchema(r.choices, true, false, r);
   expect(schema.properties.claimMorgana!.enum).toContain(8);
   const seat = schema.properties.claimStances!.items.properties.seat;
-  expect(seat.enum).toEqual([8]);
+  expect(seat.enum).toEqual([2, 3, 4, 5, 6, 7, 8]);
+  expect(schema.properties.claimStances).toMatchObject({ minItems: 0, maxItems: 7 });
   expect(seat.maximum).toBeGreaterThanOrEqual(8);
 });
 
-test('Codex uses existing private/public pipeline and records subscription usage without RUB charges', async () => {
+test('Codex uses one decision with separate public words and records subscription usage without RUB charges', async () => {
   process.env.NODE_ENV = 'development';
   process.env.AI_CODEX_ENABLED = 'true';
   const recordDecision = jest.fn().mockResolvedValue(undefined);
@@ -75,11 +76,7 @@ test('Codex uses existing private/public pipeline and records subscription usage
   const decide = decisionPipeline(codexDecide('local-match', { recordDecision, recordRequest, renewLease }, runner));
   const reply = await decide({ ...request, speak: true });
   expect(reply.choice).toBeGreaterThanOrEqual(0);
-  expect(runner).toHaveBeenCalledTimes(2);
-  const publicPrompt = JSON.parse(runner.mock.calls[1][0].split('\nGAME INPUT:\n')[1]);
-  expect(publicPrompt.you).toBeUndefined();
-  expect(publicPrompt.privateKnowledge).toBeUndefined();
-  expect(publicPrompt.modelHypotheses).toBeUndefined();
+  expect(runner).toHaveBeenCalledTimes(1);
   expect(recordRequest).toHaveBeenCalledWith(
     expect.objectContaining({
       mode: 'codex-chatgpt',
@@ -92,7 +89,7 @@ test('Codex uses existing private/public pipeline and records subscription usage
   expect(recordRequest.mock.calls.every(([r]) => r.actualUnits === undefined && r.reserveUnits === undefined)).toBe(
     true,
   );
-  expect(renewLease).toHaveBeenCalledTimes(2);
+  expect(renewLease).toHaveBeenCalledTimes(1);
 });
 
 test('invalid output pauses instead of choosing a fallback and disabled Codex cannot invoke the runner', async () => {
@@ -159,9 +156,10 @@ test.each([
     const runner = async (_prompt: string, schema: ReturnType<typeof codexSchema>) => {
       // These limits must be sent to the CLI, rather than merely checked after generation.
       expect(schema.properties.claimMorgana).toMatchObject({ enum: targets });
-      expect(schema.properties.claimStances).toMatchObject({ minItems: claimants.length, maxItems: claimants.length });
-      if (claimants.length)
-        expect(schema.properties.claimStances!.items.properties.seat).toMatchObject({ enum: claimants });
+      const allowedStances = speak && stage === 'selectTeam' ? [2, 3] : [];
+      expect(schema.properties.claimStances).toMatchObject({ minItems: 0, maxItems: allowedStances.length });
+      if (allowedStances.length)
+        expect(schema.properties.claimStances!.items.properties.seat).toMatchObject({ enum: allowedStances });
       return {
         text: JSON.stringify({
           choice: current.choices[0],

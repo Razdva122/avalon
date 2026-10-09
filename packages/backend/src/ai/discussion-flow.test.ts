@@ -73,7 +73,7 @@ test.each<AiLanguage>(['en', 'ru', 'zh-tw'])(
     expect(result.choice).toBe(1);
     expect(compactRequest(input)).toMatchObject({ publicDiscussion: true, proposedTeam: [] });
     expect(generate.mock.calls[0][1].instructions).toContain('preference');
-    const options = generate.mock.calls[1][1];
+    const options = { context: publicContext(input, '1, 3, 5'), instructions: generate.mock.calls[0][1].instructions };
     expect(options.context).toMatchObject({ actionType: 'discuss', choice: '1, 3, 5', language, proposedTeam: [] });
     expect(options.context.votes).toContainEqual(
       expect.objectContaining({
@@ -90,7 +90,7 @@ test.each<AiLanguage>(['en', 'ru', 'zh-tw'])(
     expect(JSON.stringify(options.context)).not.toMatch(
       /mordred|PRIVATE ALLY|privateKnowledge|yourCard|roleAdvice|modelHypotheses/,
     );
-    expect(options.instructions).toContain('not a submitted team');
+    expect(options.instructions).toContain('not a submitted roster');
     expect(focusedRetry(generate.mock.calls[0][1]).instructions).toContain('preference');
     expect(focusedRetry(generate.mock.calls[0][1]).context).toMatchObject({ chat: options.context.chat });
   },
@@ -135,7 +135,7 @@ test('an optional leader announcement uses the final selected roster and all cir
     .mockResolvedValueOnce({ choice: 1, speech: 'Private choice.', publicReason: 'A compromise with 3 and 5.' })
     .mockResolvedValueOnce({ choice: 0, speech: 'A compromise with 3 and 5.' });
   expect(await decisionPipeline(generate)(input)).toMatchObject({ choice: 1, speech: 'A compromise with 3 and 5.' });
-  expect(generate.mock.calls[1][1].context).toMatchObject({
+  expect(publicContext(input, '1, 3, 5')).toMatchObject({
     actionType: 'propose',
     choice: '1, 3, 5',
     chat: [{ by: '2', text: discussion.chat[0].text }],
@@ -175,7 +175,7 @@ test.each<AiLanguage>(['en', 'ru', 'zh-tw'])(
       .fn()
       .mockResolvedValue({ choice: 0, speech: 'Reject the prior teammate.', publicReason: '2 is Evil.' });
     expect(await decisionPipeline(generate)(input)).toEqual({
-      choice: 1,
+      choice: 0,
       speech: '',
       privateReason: 'Reject the prior teammate.',
     });
@@ -191,11 +191,11 @@ test('private memory and final review distinguish public preferences from submit
   const decide = decisionPipeline(generate);
   await decide(discussion);
   await decide({ ...discussion, publicDiscussion: false, optionalSpeech: true } as BotRequest);
-  expect(generate.mock.calls[2][1].context.previousDecisions).toContainEqual(
+  expect(generate.mock.calls[1][1].context.previousDecisions).toContainEqual(
     expect.objectContaining({ publicDiscussion: true, choice: '1, 3, 4' }),
   );
   await decide({ ...discussion, state: { ...discussion.state, stage: 'end' } });
-  expect(generate.mock.calls[4][1].context.decisionExamples).toEqual([
+  expect(generate.mock.calls[2][1].context.decisionExamples).toEqual([
     expect.objectContaining({ publicDiscussion: true, choice: '1, 3, 4' }),
     expect.objectContaining({ publicDiscussion: false, choice: '1, 3, 4' }),
   ]);
@@ -239,7 +239,7 @@ test('real room and decision pipeline complete a circle, silent final choice and
       request.state.players.every((player: { features: { waitForAction: boolean } }) => player.features.waitForAction),
     ).toBe(true);
   }
-  expect(generate.mock.calls.filter(([, options]) => options.phase === 'speech')).toHaveLength(7);
+  expect(generate.mock.calls.filter(([, options]) => options.phase === 'speech')).toHaveLength(0);
   expect(room.chat.history.filter((message) => room.players.includes(message.userID))).toHaveLength(7);
   if (room.data.stage !== 'started') throw new Error('Expected started game.');
   expect(room.data.manager.game.stage).toBe('onMission');

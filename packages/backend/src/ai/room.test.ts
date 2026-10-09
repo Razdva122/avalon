@@ -1,4 +1,5 @@
 import { BotRoom, BOT_PROFILES, botOptions } from './room';
+import { compactRequest } from './client';
 import type { BotRequest } from './client';
 import type { Server } from '@avalon/types';
 
@@ -1073,6 +1074,10 @@ test('human seat completes a real game through ordinary actions without any mode
     expect(requests.length).toBeGreaterThan(0);
     expect(requests.some((r) => r.chat.some((m) => m.text === 'Consider my proposed team.'))).toBe(true);
     expect(requests.every((r) => r.playerID !== 'admin')).toBe(true);
+    const lastPublicTurn = requests.filter((r) => r.state.stage === 'selectTeam').pop()!;
+    expect(compactRequest(lastPublicTurn).humanStatements).toEqual([
+      expect.objectContaining({ text: 'Consider my proposed team.', status: 'claim' }),
+    ]);
     expect(room.chat.history.filter((m) => m.userID === 'admin').map((m) => m.message)).toEqual([
       'Consider my proposed team.',
     ]);

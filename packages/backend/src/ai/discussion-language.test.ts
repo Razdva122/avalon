@@ -1,5 +1,6 @@
+import type { AiLanguage } from '@avalon/types';
 import { compactRequest, systemFor } from './client';
-import { decisionPipeline, focusedRetry } from './pipeline';
+import { publicContext, decisionPipeline, focusedRetry } from './pipeline';
 import type { BotRequest } from './client';
 
 const base = {
@@ -34,7 +35,9 @@ test.each([
       expect(options.instructions).not.toContain('ENGLISH ONLY');
       expect(options.context.language).toBe(language);
     }
-    const publicOptions = generate.mock.calls[1][1];
+    const publicOptions = {
+      context: { ...publicContext({ ...base, language: language as AiLanguage }, 'reject'), publicReason: speech },
+    };
     expect(publicOptions.context).toMatchObject({ personality: base.style, publicReason: speech });
     expect(publicOptions.context.chat).toEqual([{ by: '2', text: base.chat[0].text }]);
     expect(JSON.stringify(publicOptions.context)).not.toMatch(/merlin|PRIVATE ROLE KNOWLEDGE/);
@@ -54,14 +57,13 @@ test.each([
   ['ru', 'Я хочу саботировать эту миссию.', 'Нужны более веские основания для поддержки этой команды.'],
   ['zh-tw', '我是梅林。', '我需要更充分的理由才會支持這支隊伍。'],
   ['zh-tw', '我要破壞這次任務。', '我需要更充分的理由才會支持這支隊伍。'],
-])('replaces unsafe public %s speech with a localized neutral statement', async (language, unsafe, neutral) => {
+])('blocks explicit private disclosure in %s without inventing speech', async (language, unsafe) => {
   const generate = jest
     .fn()
     .mockResolvedValueOnce({ choice: 1, speech: 'Private.', publicReason: unsafe })
     .mockResolvedValueOnce({ choice: 0, speech: unsafe });
-  const result = await decisionPipeline(generate)({ ...base, language } as BotRequest);
-  expect(result.speech).toBe(neutral);
-  expect(generate.mock.calls[1][1].context.publicReason).toBe(neutral);
+  await expect(decisionPipeline(generate)({ ...base, language } as BotRequest)).rejects.toThrow('exposes private');
+  expect(generate).toHaveBeenCalledTimes(1);
 });
 
 test('legacy requests keep English and selected language does not change legal choices', () => {

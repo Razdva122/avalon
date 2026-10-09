@@ -626,7 +626,7 @@ test.each([
   { observer: 1, role: 'servant', card: 'success' },
   { observer: 1, role: 'morgana', card: 'fail' },
   { observer: 5, role: 'servant', card: 'success' },
-])('public table conventions describe every affected seat for $role observer $observer', ({ observer, role, card }) => {
+])('mission facts do not impose partner exclusions for $role observer $observer', ({ observer, role, card }) => {
   const players = [4, 2, 7, 5, 1, 6, 3].map((index) => ({
     id: `private-id-${index}`,
     index,
@@ -654,13 +654,8 @@ test.each([
     ],
   } as unknown as VisualGameState;
   expect(compactRequest({ ...request, playerID: `private-id-${observer}`, state }).tableConventions).toEqual({
-    includeSelfInProposals: true,
-    excludedPartners: [
-      { seat: 1, seats: [2] },
-      { seat: 2, seats: [1, 3, 4] },
-      { seat: 3, seats: [2, 4] },
-      { seat: 4, seats: [2, 3] },
-    ],
+    includeSelfInProposals: false,
+    excludedPartners: [],
   });
 });
 
@@ -691,7 +686,7 @@ test.each([
     ],
   } as unknown as VisualGameState;
   expect(compactRequest({ ...request, playerID: '1', state }).tableConventions).toEqual({
-    includeSelfInProposals: true,
+    includeSelfInProposals: false,
     excludedPartners: [],
   });
 });
