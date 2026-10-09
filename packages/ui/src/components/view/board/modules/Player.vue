@@ -33,6 +33,11 @@
             <span class="thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span>
             {{ $t('aiArena.thinking') }}
           </span>
+          <span
+            v-if="playerClasses['player-feature-waitForAction'] || playerClasses['player-feature-isAssassin']"
+            class="player-pulse-aura"
+            aria-hidden="true"
+          ></span>
           <img class="player-frame" alt="frame" :src="getImagePathByID('core', 'player-frame')" />
           <div class="player-icon"></div>
           <Avatar
@@ -65,6 +70,31 @@
           >
             <StickerImage :id="stickerReaction.stickerID" aria-hidden="true" />
           </div>
+          <span v-if="playerClasses['player-feature-isSent']" class="player-mission-arc" aria-hidden="true"></span>
+          <span
+            v-if="playerClasses['player-feature-isSent']"
+            class="player-state-badge player-mission-flag"
+            role="img"
+            :aria-label="$t('game.mission')"
+            :title="$t('game.mission')"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V3m0 1c4-3 8 3 14 0v10c-6 3-10-3-14 0" /></svg>
+          </span>
+          <span
+            v-if="playerClasses['player-feature-isSelected']"
+            class="player-state-badge player-selection-check"
+            aria-hidden="true"
+          >
+            <svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" /></svg>
+          </span>
+          <span
+            v-if="playerClasses['player-feature-isAssassin']"
+            class="player-state-badge player-assassin-badge"
+            role="img"
+            :aria-label="$t('game.assassinate')"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 17 11-13 3-1-1 4-11 12M4 15l7 7M7 18l-4 4" /></svg>
+          </span>
           <div class="player-crown" alt="crown"></div>
           <div class="player-actions-features" v-if="'features' in player">
             <img
@@ -645,6 +675,7 @@ export default defineComponent({
 }
 
 .player-actions-features {
+  z-index: 5;
   display: flex;
   position: absolute;
   height: 40px;
@@ -681,6 +712,7 @@ export default defineComponent({
 }
 
 .action-icon {
+  z-index: 6;
   position: absolute;
   font-size: 90px;
   top: 12px;
@@ -699,6 +731,7 @@ export default defineComponent({
   background-image: getImagePathByID('core', 'name-frame');
   background-size: 95% 75%;
   background-position: center;
+  background-repeat: no-repeat;
   @include dropShadowBorder(rgba(0, 0, 0, 0.5), 1px);
 }
 
@@ -737,55 +770,153 @@ export default defineComponent({
   border-radius: 50%;
 }
 
-@keyframes pulse-blue {
-  0% {
-    @include dropShadowBorder(rgba(65, 105, 225, 0.4), 2px);
-  }
-  25% {
-    @include dropShadowBorder(rgba(65, 105, 225, 0.8), 2px);
-  }
-  75% {
-    @include dropShadowBorder(rgba(65, 105, 225, 0.8), 2px);
-  }
-  100% {
-    @include dropShadowBorder(rgba(65, 105, 225, 0.4), 2px);
-  }
+// State indication: pulse only the opacity of pre-painted glows.
+.player-feature-waitForAction {
+  --player-pulse-color: #709eff;
+  --player-name-glow: #709effb3;
 }
 
-@keyframes pulse-red {
-  0% {
-    @include dropShadowBorder(rgba(220, 20, 60, 0.3), 2px);
-  }
-  25% {
-    @include dropShadowBorder(rgba(220, 20, 60, 0.6), 2px);
-  }
-  75% {
-    @include dropShadowBorder(rgba(220, 20, 60, 0.6), 2px);
-  }
-  100% {
-    @include dropShadowBorder(rgba(220, 20, 60, 0.3), 2px);
-  }
+.player-feature-isAssassin {
+  --player-pulse-color: #ef6274;
+  --player-name-glow: #ef6274;
 }
 
-.player-feature-waitForAction .player-name {
-  animation: pulse-blue 3s infinite ease-in-out;
+.player-pulse-aura {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  width: 115px;
+  height: 115px;
+  border-radius: 50%;
+  box-shadow: 0 0 12px 3px var(--player-pulse-color);
+  pointer-events: none;
 }
 
+.player-feature-isSelected .player-pulse-aura {
+  top: -2px;
+  left: 3px;
+  width: 119px;
+  height: 119px;
+  box-shadow:
+    0 0 6px 3px var(--player-pulse-color),
+    0 0 18px 6px var(--player-pulse-color);
+}
+
+.player-feature-waitForAction .player-name,
 .player-feature-isAssassin .player-name {
-  animation: pulse-red 3s infinite ease-in-out;
+  isolation: isolate;
+  filter: none;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: getImagePathByID('core', 'name-frame');
+    background-size: 95% 75%;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: drop-shadow(2px 2px 0 var(--player-name-glow)) drop-shadow(-2px 2px 0 var(--player-name-glow))
+      drop-shadow(2px -2px 0 var(--player-name-glow)) drop-shadow(-2px -2px 0 var(--player-name-glow))
+      drop-shadow(0 0 5px var(--player-name-glow));
+    pointer-events: none;
+  }
+}
+
+.player-pulse-aura,
+.player-feature-waitForAction .player-name::before,
+.player-feature-isAssassin .player-name::before {
+  animation: player-state-glow 3s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+}
+
+@keyframes player-state-glow {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.9;
+  }
 }
 
 .player-feature-isSelected .player-icon {
-  border-color: rgba(255, 245, 50, 0.642);
+  top: -2px;
+  left: 3px;
+  width: 119px;
+  height: 119px;
+  border: 3px solid #efd477;
+  z-index: 3;
 }
 
-.player-feature-isSent .player-icon {
-  border-color: rgba(255, 255, 255, 0.8);
+.player-mission-arc {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  width: 115px;
+  height: 115px;
+  box-sizing: border-box;
+  border: 8px solid #49c9bb;
+  border-top-color: #76e3d5;
+  border-radius: 50%;
+  clip-path: inset(0 0 50% 0);
+  box-shadow: inset 0 1px 1px #d6fff680;
+  z-index: 2;
+  pointer-events: none;
 }
 
-.player-feature-isSent.player-feature-isSelected .player-icon {
-  outline: 3px solid rgba(255, 245, 50, 0.642);
-  border-width: 3px;
+.player-state-badge {
+  position: absolute;
+  width: 29px;
+  height: 29px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #222b28;
+  border: 1px solid currentColor;
+  z-index: 7;
+  pointer-events: none;
+
+  svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.player-mission-flag {
+  top: 1px;
+  left: 82.5px;
+  color: #d9fff8;
+  background: linear-gradient(#24675e, #133b38);
+  border-color: #76e3d5;
+  box-shadow: 0 2px 4px #0007;
+}
+
+.player-selection-check {
+  top: 88px;
+  right: 3px;
+  color: #efd477;
+}
+
+.player-assassin-badge {
+  top: 2px;
+  left: 3px;
+  color: #f2a4a0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-pulse-aura,
+  .player-feature-waitForAction .player-name::before,
+  .player-feature-isAssassin .player-name::before {
+    animation: none;
+    opacity: 0.55;
+  }
 }
 
 .player-feature-isLeader .player-crown {
@@ -793,6 +924,7 @@ export default defineComponent({
 }
 
 .player-crown {
+  z-index: 4;
   display: none;
   background-image: getImagePathByID('core', 'crown');
   background-size: contain;
@@ -937,6 +1069,7 @@ export default defineComponent({
 .player-feature-switch-toFail {
   .switch-image {
     display: flex;
+    z-index: 6;
     position: absolute;
     justify-content: space-between;
     align-items: center;
