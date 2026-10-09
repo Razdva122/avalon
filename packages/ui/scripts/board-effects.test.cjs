@@ -223,9 +223,10 @@ test('mission layout fits between voting text and footer across mobile text size
   for (const voteBottom of [310, 326, 348]) {
     const footerTop = 445;
     const layout = helpers.missionSceneLayout(600, voteBottom, footerTop);
-    // Include the full-size fan and the separate result emblem below it.
+    // Only the cards use this space; the result emerges below the fan.
     assert.ok(layout.top + 60 * layout.scale >= voteBottom + 6);
-    assert.ok(layout.top + 248 * layout.scale <= footerTop - 6);
+    assert.ok(layout.top + 198 * layout.scale <= footerTop - 6);
+    assert.ok(layout.top + 198 * layout.scale >= footerTop - 12);
     assert.equal(layout.left + 180 * layout.scale, 300);
     assert.ok(layout.scale > 0 && layout.scale <= 1);
   }

@@ -464,11 +464,12 @@ export function renderMission(container: HTMLElement, options: MissionOptions): 
   motion(
     badge,
     [
-      { opacity: 0, transform: 'translateY(18px)' },
+      { opacity: 0, transform: 'translateY(-72px)' },
       { opacity: 1, transform: 'translateY(0)' },
     ],
     200,
     resultAt,
+    'cubic-bezier(0.23, 1, 0.32, 1)',
   );
   motion(
     badge,

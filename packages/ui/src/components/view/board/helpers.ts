@@ -168,8 +168,8 @@ export function excaliburReveal(event?: THistoryResults) {
   return { sourceID: event.switcherID, targetID: event.targetID };
 }
 
-/** Fit the whole fan, including its initial stack motion, between live labels. */
+/** Fit only the card fan between live labels; the result emerges below it. */
 export function missionSceneLayout(width: number, voteBottom: number, footerTop: number) {
-  const scale = Math.min(1, Math.max(1, footerTop - voteBottom - 24) / 198);
+  const scale = Math.min(1, Math.max(1, footerTop - voteBottom - 24) / 138);
   return { left: (width - 360 * scale) / 2, top: voteBottom + 12 - 60 * scale, scale };
 }

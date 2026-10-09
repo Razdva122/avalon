@@ -509,6 +509,29 @@ test('new live mission starts fan once, conceals token until landing and cancels
   assert.equal(f.draws[0].cleaned, true);
 });
 
+test('mission cleanup shares the history timer so the legacy result cannot flash', async (t) => {
+  const f = fixture(t, game([declaration], { stage: 'selectTeam' }));
+  const event = {
+    type: 'mission',
+    index: 0,
+    settings: { players: 2, failsRequired: 1 },
+    fails: 1,
+    result: 'fail',
+    actions: [],
+  };
+  f.manager.mutateRoomState({ newGameState: game([declaration, event], { stage: 'selectTeam' }) });
+  await f.flush();
+  f.draws[0].options.onReveal();
+  assert.equal(f.api.visibleHistory.value.type, 'mission');
+  assert.equal(f.api.timerDuration.value, 10000);
+  assert.equal(f.timers.size, 0, 'no independent cleanup can expose the legacy result before history ends');
+  f.api.clearHistoryElement();
+  await f.flush();
+  assert.equal(f.api.missionAnimationActive.value, false);
+  assert.notEqual(f.api.visibleHistory.value?.type, 'mission');
+  assert.equal(f.draws[0].cleaned, true);
+});
+
 test('hidden missions show only witch marker while reconnect snapshots never replay', async (t) => {
   const event = {
     type: 'mission',

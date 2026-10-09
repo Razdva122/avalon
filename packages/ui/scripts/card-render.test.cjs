@@ -334,7 +334,7 @@ test('mission keeps full-size cards while the separate result enters from below'
   );
   const badge = motions.find((m) => m.selector === '.avalon-mission-badge' && m.frames[0].opacity === 0);
   assert.ok(badge.delay >= lastFlip.delay + lastFlip.duration + 500, 'cards remain readable before the result');
-  assert.equal(badge.frames[0].transform, 'translateY(18px)');
+  assert.equal(badge.frames[0].transform, 'translateY(-72px)');
   assert.equal(badge.frames.at(-1).transform, 'translateY(0)');
 });
 

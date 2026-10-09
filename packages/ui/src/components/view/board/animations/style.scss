@@ -482,6 +482,7 @@
   top: 250px;
   .avalon-mission-card {
     position: absolute;
+    z-index: 2;
     top: 66px;
     width: 74px;
     height: 112px;
@@ -535,6 +536,7 @@
   }
   .avalon-mission-badge {
     position: absolute;
+    z-index: 1;
     left: 156px;
     top: 200px;
     width: 48px;

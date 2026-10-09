@@ -361,7 +361,7 @@ export default defineComponent({
             if (generation === effectGeneration) pendingMission.value = undefined;
           },
         });
-        effectTimer = setTimeout(clearEffect, 10000);
+        // The history timer clears both the scene and its legacy result together.
       } else if (badge && loyaltyEffectRef.value && boardRef.value) {
         const source = playerGeometry(badge.sourceID);
         const target = playerGeometry(badge.targetID);

@@ -1,0 +1,934 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Avalon — состояния на игровом поле</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #141b18;
+        color: #f1eadc;
+        font:
+          15px/1.5 system-ui,
+          sans-serif;
+      }
+      header {
+        padding: 18px 24px;
+        border-bottom: 1px solid #35423b;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+      .brand {
+        font:
+          24px Georgia,
+          serif;
+        letter-spacing: 0.16em;
+        color: #dfc389;
+      }
+      .draft {
+        font-size: 12px;
+        color: #b5beaf;
+      }
+      main {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 285px;
+        gap: 24px;
+      }
+      .viewport {
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+      }
+      .board {
+        position: absolute;
+        width: 840px;
+        height: 840px;
+        transform-origin: top left;
+      }
+      .table {
+        position: absolute;
+        left: 120px;
+        top: 120px;
+        width: 600px;
+        height: 600px;
+        background: url('/packages/ui/src/assets/images/core/board.webp') center/137%;
+        border-radius: 50%;
+      }
+      .seat {
+        position: absolute;
+        width: 125px;
+        height: 174px;
+        transform: translate(-50%, -50%);
+        text-align: center;
+      }
+      .player {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        position: relative;
+        border: 0;
+        background: none;
+        color: #fff;
+        padding: 0;
+        width: 125px;
+        font: 16px/24px system-ui;
+        cursor: pointer;
+      }
+      .portrait {
+        width: 115px;
+        height: 115px;
+        position: relative;
+        display: block;
+      }
+      .frame {
+        position: absolute;
+        inset: 0;
+        width: 115px;
+        height: 115px;
+      }
+      .role {
+        position: absolute;
+        top: 13px;
+        left: 12.5px;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: url('/packages/ui/src/assets/images/core/player-frame.webp') center/135%;
+      }
+      .ring {
+        position: absolute;
+        top: 8px;
+        left: 7.5px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 6px solid transparent;
+        transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
+        z-index: 2;
+        pointer-events: none;
+      }
+      .name {
+        margin-top: 10px;
+        width: 115px;
+        background: url('/packages/ui/src/assets/images/core/name-frame.webp') center/95% 75% no-repeat;
+        text-shadow: 0 1px 3px #000;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+      }
+      .name-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .status {
+        font-size: 16px;
+        line-height: 23px;
+        min-height: 26px;
+        padding-top: 5px;
+        color: #d8d4c8;
+      }
+      .badge {
+        position: absolute;
+        width: 29px;
+        height: 29px;
+        border-radius: 50%;
+        background: #222b28;
+        border: 1px solid currentColor;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 3;
+      }
+      .badge svg,
+      .status svg {
+        width: 16px;
+        height: 16px;
+      }
+      .team-badge {
+        top: 2px;
+        right: -2px;
+        color: #99d7ef;
+      }
+      .killer-badge {
+        top: 2px;
+        left: -2px;
+        color: #f2a4a0;
+      }
+      .check-badge {
+        right: -2px;
+        top: 36px;
+        color: #efd477;
+        opacity: 0;
+        transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
+      }
+      .new .selected .ring {
+        border: 3px solid #efd477;
+        inset: -2px;
+        width: 119px;
+        height: 119px;
+      }
+      .new .selected .check-badge {
+        opacity: 1;
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #92d3ed;
+        position: relative;
+        flex: none;
+      }
+      .dot:after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: #92d3ed;
+        animation: breathe 2.8s infinite ease-in-out;
+      }
+      .action {
+        color: #a8dcf2;
+        font-size: 14px;
+        white-space: nowrap;
+      }
+      .danger {
+        color: #f2a4a0;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border: 1px solid #647169;
+        background: #222b28;
+        border-radius: 5px;
+        padding: 0 7px;
+      }
+      .labels .team-badge,
+      .labels .killer-badge {
+        display: none;
+      }
+      .crown {
+        position: absolute;
+        top: -45px;
+        left: 5px;
+        width: 80px;
+        height: 80px;
+        transform: rotate(-15deg);
+        z-index: 4;
+      }
+      .old .selected .ring {
+        border-color: rgba(255, 245, 50, 0.642);
+      }
+      .old .sent .ring {
+        border-color: rgba(255, 255, 255, 0.8);
+      }
+      .old .sent.selected .ring {
+        outline: 3px solid rgba(255, 245, 50, 0.642);
+        border-width: 3px;
+      }
+      .old .wait .name {
+        animation: oldblue 3s infinite ease-in-out;
+      }
+      .old .killer .name {
+        animation: oldred 3s infinite ease-in-out;
+      }
+      .old .badge,
+      .old .status,
+      .old .dot {
+        display: none;
+      }
+      .old .ring {
+        transition: none;
+      }
+      .paused * {
+        animation-play-state: paused !important;
+      }
+      @keyframes breathe {
+        0%,
+        100% {
+          opacity: 0.12;
+        }
+        50% {
+          opacity: 0.48;
+        }
+      }
+      @keyframes oldblue {
+        0%,
+        100% {
+          filter: drop-shadow(2px 2px 0 #4169e166) drop-shadow(-2px 2px 0 #4169e166) drop-shadow(2px -2px 0 #4169e166)
+            drop-shadow(-2px -2px 0 #4169e166);
+        }
+        25%,
+        75% {
+          filter: drop-shadow(2px 2px 0 #4169e1cc) drop-shadow(-2px 2px 0 #4169e1cc) drop-shadow(2px -2px 0 #4169e1cc)
+            drop-shadow(-2px -2px 0 #4169e1cc);
+        }
+      }
+      @keyframes oldred {
+        0%,
+        100% {
+          filter: drop-shadow(2px 2px 0 #dc143c4d) drop-shadow(-2px 2px 0 #dc143c4d) drop-shadow(2px -2px 0 #dc143c4d)
+            drop-shadow(-2px -2px 0 #dc143c4d);
+        }
+        25%,
+        75% {
+          filter: drop-shadow(2px 2px 0 #dc143c99) drop-shadow(-2px 2px 0 #dc143c99) drop-shadow(2px -2px 0 #dc143c99)
+            drop-shadow(-2px -2px 0 #dc143c99);
+        }
+      }
+      .center {
+        position: absolute;
+        left: 235px;
+        top: 250px;
+        width: 370px;
+        text-align: center;
+        color: #fff;
+      }
+      .history {
+        color: #cbc6b7;
+        font-size: 18px;
+        margin-bottom: 24px;
+      }
+      .mission-track {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .mission {
+        display: grid;
+        place-items: center;
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        background: #f2d8a9;
+        color: #141b18;
+        border: 2px solid #f2d8a9;
+        font-size: 24px;
+      }
+      .mission.done {
+        background: #6b94ad;
+        color: #fff;
+      }
+      .mission.active {
+        box-shadow: 0 0 0 3px #dfc38980;
+      }
+      .phase {
+        font-size: 18px;
+        margin-top: 16px;
+      }
+      .instruction {
+        font-size: 20px;
+        line-height: 1.4;
+        margin-top: 27px;
+      }
+      .primary-action {
+        margin-top: 18px;
+        background: #284235;
+        border-color: #61876c;
+      }
+      .bottom {
+        position: absolute;
+        top: 612px;
+        left: 250px;
+        width: 340px;
+        display: flex;
+        justify-content: space-between;
+        color: #fff;
+        font-size: 16px;
+      }
+      aside {
+        padding-top: 8px;
+      }
+      h1 {
+        font:
+          22px/1.3 Georgia,
+          serif;
+        margin: 0 0 22px;
+      }
+      h2 {
+        font-size: 13px;
+        font-weight: 500;
+        color: #c3c9bd;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin: 24px 0 10px;
+      }
+      button,
+      select {
+        font: inherit;
+        color: #eee7d8;
+        border: 1px solid #43554a;
+        background: #223129;
+        border-radius: 7px;
+        padding: 9px 12px;
+        min-height: 44px;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:focus-visible,
+      select:focus-visible {
+        outline: 2px solid #dfc389;
+        outline-offset: 3px;
+      }
+      .choices {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .choices button {
+        text-align: left;
+      }
+      .choices button[aria-pressed='true'] {
+        background: #3b4933;
+        border-color: #dfc389;
+        color: #ffe1a0;
+      }
+      .note {
+        color: #b5beaf;
+        font-size: 13px;
+      }
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .legend {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        color: #d6dbcf;
+        font-size: 13px;
+      }
+      .legend span {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .legend svg {
+        width: 17px;
+        height: 17px;
+      }
+      .gold {
+        color: #efd477;
+      }
+      .blue {
+        color: #99d7ef;
+      }
+      .red {
+        color: #f2a4a0;
+      }
+      #feedback {
+        min-height: 42px;
+        color: #dfc389;
+        font-size: 13px;
+        margin-top: 18px;
+      }
+      @media (max-width: 800px) {
+        main {
+          grid-template-columns: 1fr;
+          padding: 12px;
+          gap: 10px;
+        }
+        aside {
+          padding: 12px;
+        }
+        .choices {
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+        h1 {
+          margin-bottom: 12px;
+        }
+        h2 {
+          margin-top: 16px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .dot:after,
+        .old .wait .name,
+        .old .killer .name {
+          animation: none;
+        }
+        .old .wait .name {
+          outline: 1px solid #92d3ed;
+        }
+        .old .killer .name {
+          outline-color: #f2a4a0;
+        }
+      }
+
+      .equipment-tray {
+        position: absolute;
+        left: 8px;
+        top: 75px;
+        display: flex;
+        gap: 2px;
+        padding: 5px;
+        z-index: 5;
+        height: 40px;
+      }
+      .equipment {
+        width: 30px;
+        height: 30px;
+        min-height: 0;
+        padding: 0;
+        border: 3px solid #888;
+        border-radius: 50%;
+        background: #222b28;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+        flex: none;
+      }
+      .equipment img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .equipment.active {
+        border-color: #729ae9;
+      }
+      .equipment.used img {
+        filter: grayscale(1);
+      }
+      .equipment.more {
+        width: 24px;
+        border-width: 1px;
+        border-radius: 6px;
+        font: 13px/1 system-ui;
+        color: #efdcab;
+      }
+      .loyalty {
+        position: absolute;
+        top: 76px;
+        left: 83px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        padding: 3px;
+        border: 1px solid #d3bb83;
+        background: radial-gradient(circle at 35% 25%, #555147, #171b21 70%);
+        box-shadow: 0 2px 5px #0008;
+        z-index: 6;
+      }
+      .loyalty img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .voice {
+        position: absolute;
+        top: 124px;
+        left: 116px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: #14734e;
+        border: 1px solid #62dca4;
+        color: #fff;
+        z-index: 6;
+      }
+      .voice svg {
+        width: 15px;
+        height: 15px;
+      }
+      .voice.left {
+        left: auto;
+        right: 116px;
+      }
+      .vote-mark {
+        position: absolute;
+        top: 12px;
+        left: 16px;
+        font-size: 90px;
+        line-height: 1;
+        color: #8bdf9d;
+        z-index: 7;
+        text-shadow: 0 1px 3px #0007;
+        pointer-events: none;
+      }
+      .vote-mark.reject {
+        color: #f68f94;
+      }
+      #detail {
+        font-size: 13px;
+        padding: 12px 0;
+        border-top: 1px solid #35423b;
+        margin-top: 16px;
+      }
+      #detail:empty {
+        display: none;
+      }
+      .detail-title {
+        color: #dfc389;
+        margin-bottom: 8px;
+      }
+      .detail-items {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .detail-item img {
+        width: 30px;
+        height: 30px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 1px solid #68796a;
+      }
+      .detail-meta {
+        color: #b5beaf;
+        margin-top: 10px;
+      }
+      .extra-controls {
+        display: grid;
+        gap: 9px;
+        margin-top: 12px;
+      }
+      .extra-controls label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .extra-controls select {
+        max-width: 185px;
+        font-size: 13px;
+      }
+      .bottom {
+        top: 580px;
+      }
+
+      .pulse-toolbar {
+        max-width: 1280px;
+        margin: auto;
+        padding: 12px 20px 0;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .pulse-toolbar label {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 13px;
+      }
+      .pulse-toolbar select {
+        max-width: 230px;
+        font-size: 13px;
+      }
+      .pulse-toolbar + main {
+        padding-top: 12px;
+      }
+      .mission-flag {
+        top: 0;
+        right: -3px;
+        width: 30px;
+        height: 30px;
+        color: #e4dcc1;
+        background: #27382e;
+        border: 1px solid #bfb290;
+        z-index: 7;
+        box-shadow: 0 2px 4px #0007;
+      }
+      .mission-flag svg {
+        width: 18px;
+        height: 18px;
+      }
+      .mission-legend {
+        color: #e4dcc1;
+      }
+      .mission-arc {
+        position: absolute;
+        inset: 0;
+        border: 8px solid #49c9bb;
+        border-top-color: #76e3d5;
+        border-left-color: #49c9bb;
+        border-right-color: #49c9bb;
+        border-radius: 50%;
+        clip-path: inset(0 0 50% 0);
+        z-index: 2;
+        pointer-events: none;
+        box-shadow: inset 0 1px 1px #d6fff680;
+      }
+      .mission-flag {
+        top: 1px;
+        left: 80%;
+        right: auto;
+        transform: translateX(-50%);
+        width: 29px;
+        height: 29px;
+        color: #d9fff8;
+        background: linear-gradient(#24675e, #133b38);
+        border: 1px solid #76e3d5;
+        z-index: 7;
+        box-shadow: 0 2px 4px #0007;
+      }
+      .mission-flag svg {
+        width: 17px;
+        height: 17px;
+      }
+      .mission-legend {
+        color: #76e3d5;
+      }
+      /* Motion study: preserve selection and original equipment; vary only action pulse. */
+      .refined .team-badge,
+      .refined .dot,
+      .refined .mission-ring,
+      .refined .status {
+        display: none;
+      }
+      .refined .check-badge {
+        top: auto;
+        bottom: -2px;
+        right: -2px;
+        z-index: 7;
+      }
+      .refined .ring {
+        z-index: 3;
+      }
+      .refined .equipment-tray {
+        z-index: 5;
+      }
+      .refined .wait {
+        --pulse-color: #709eff;
+      }
+      .refined .killer {
+        --pulse-color: #ef6274;
+      }
+      .refined .name {
+        position: relative;
+        isolation: isolate;
+      }
+      .refined .name::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        z-index: -1;
+        border: 2px solid var(--pulse-color);
+        border-radius: 8px;
+        box-shadow: 0 0 10px 2px var(--pulse-color);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .pulse-aura {
+        display: none;
+        position: absolute;
+        inset: -5px;
+        border: 2px solid var(--pulse-color);
+        border-radius: 50%;
+        box-shadow: 0 0 16px 4px var(--pulse-color);
+        z-index: 0;
+        pointer-events: none;
+      }
+      .refined .wait .name,
+      .refined .killer .name {
+        animation: none;
+      }
+      .refined[data-pulse='classic'] .wait .name {
+        animation: oldblue var(--pulse-duration, 3s) infinite ease-in-out;
+      }
+      .refined[data-pulse='classic'] .killer .name {
+        animation: oldred var(--pulse-duration, 3s) infinite ease-in-out;
+      }
+      .refined[data-pulse='name'] .wait .name::before,
+      .refined[data-pulse='name'] .killer .name::before {
+        animation: av-soft-glow var(--pulse-duration, 3s) cubic-bezier(0.77, 0, 0.175, 1) infinite;
+      }
+      .refined:is([data-pulse='portrait'], [data-pulse='combo']) .wait .pulse-aura,
+      .refined:is([data-pulse='portrait'], [data-pulse='combo']) .killer .pulse-aura {
+        display: block;
+        inset: 0;
+        border: 0;
+        box-shadow: 0 0 12px 3px var(--pulse-color);
+        animation: av-soft-glow var(--pulse-duration, 3s) cubic-bezier(0.77, 0, 0.175, 1) infinite;
+      }
+      .refined[data-pulse='wave'] .wait .pulse-aura,
+      .refined[data-pulse='wave'] .killer .pulse-aura {
+        display: block;
+        inset: -2px;
+        box-shadow: 0 0 8px 1px var(--pulse-color);
+        animation: av-outward-wave var(--pulse-duration, 3s) linear infinite;
+      }
+      .refined:is([data-pulse='portrait'], [data-pulse='combo']) .selected .pulse-aura {
+        inset: -2px;
+        box-shadow:
+          0 0 6px 3px var(--pulse-color),
+          0 0 18px 6px var(--pulse-color);
+      }
+      /* Glow follows the original nameplate silhouette. */
+      .refined[data-pulse='combo'] .wait .name,
+      .refined[data-pulse='combo'] .killer .name {
+        --name-glow: color-mix(in srgb, var(--pulse-color) 70%, transparent);
+      }
+      .refined[data-pulse='combo'] .killer .name {
+        --name-glow: var(--pulse-color);
+      }
+      .refined[data-pulse='combo'] .wait .name::before,
+      .refined[data-pulse='combo'] .killer .name::before {
+        inset: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: url('/packages/ui/src/assets/images/core/name-frame.webp') center/95% 75% no-repeat;
+        filter: drop-shadow(2px 2px 0 var(--name-glow)) drop-shadow(-2px 2px 0 var(--name-glow))
+          drop-shadow(2px -2px 0 var(--name-glow)) drop-shadow(-2px -2px 0 var(--name-glow))
+          drop-shadow(0 0 5px var(--name-glow));
+        animation: av-soft-glow var(--pulse-duration, 3s) cubic-bezier(0.77, 0, 0.175, 1) infinite;
+      }
+      @keyframes av-soft-glow {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 0.9;
+        }
+      }
+      @keyframes av-outward-wave {
+        0% {
+          opacity: 0;
+          transform: scale(1);
+        }
+        12% {
+          opacity: 0.7;
+          transform: scale(1);
+        }
+        65% {
+          opacity: 0;
+          transform: scale(1.12);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.12);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .refined .wait .name,
+        .refined .killer .name {
+          animation: none !important;
+        }
+        .refined[data-pulse='classic'] .wait .name,
+        .refined[data-pulse='classic'] .killer .name {
+          outline: 1px solid var(--pulse-color);
+        }
+        .refined .wait .name::after,
+        .refined .killer .name::after,
+        .refined .wait .name::before,
+        .refined .killer .name::before,
+        .refined .wait .pulse-aura,
+        .refined .killer .pulse-aura {
+          animation: none !important;
+          transform: none;
+          opacity: 0.45;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <span class="brand">AVALON</span
+      ><span class="draft">Превью состояний · оригинальный стол и размеры элементов</span>
+    </header>
+    <div class="pulse-toolbar">
+      <label for="pulse-style"
+        >Пульсация<select id="pulse-style" aria-label="Пульсация">
+          <option value="classic">Свечение имени · текущее</option>
+          <option value="name">Мягкий контур имени</option>
+          <option value="portrait">Ореол портрета</option>
+          <option value="combo" selected>Ореол + свечение плашки</option>
+          <option value="wave">Волна от портрета</option>
+        </select></label
+      ><label for="pulse-speed"
+        >Темп<select id="pulse-speed" aria-label="Темп">
+          <option value="2">Быстрее · 2 с</option>
+          <option value="3" selected>Обычный · 3 с</option>
+          <option value="6">Медленно · 6 с</option>
+        </select></label
+      >
+    </div>
+    <main>
+      <section class="viewport" aria-label="Игровое поле">
+        <div class="board new labels" id="board">
+          <div class="table"></div>
+          <div class="center">
+            <div class="history">‹ &nbsp; История партии &nbsp; ›</div>
+            <div class="mission-track">
+              <span class="mission done">✓</span><span class="mission done">✓</span><span class="mission active">3</span
+              ><span class="mission">4</span><span class="mission">5</span>
+            </div>
+            <div>Голосование за команду: 1 / 5</div>
+            <div id="phase" class="phase"></div>
+            <div id="instruction" class="instruction"></div>
+            <button class="primary-action" id="game-action" type="button"></button>
+          </div>
+          <div id="players"></div>
+          <div class="bottom">
+            <span id="count-label">10 игроков</span
+            ><span style="color: #a0cced" id="balance-label"
+              >6 <span style="color: #fff">vs</span> <span style="color: #efaaa5">4</span></span
+            >
+          </div>
+        </div>
+      </section>
+      <aside>
+        <h1>Состояния на игровом поле</h1>
+        <div class="extra-controls">
+          <label for="seat-count"
+            >Игроков<select id="seat-count" aria-label="Игроков">
+              <option value="7">7</option>
+              <option value="10" selected>10</option>
+            </select></label
+          ><label for="extras"
+            >Дополнения<select id="extras" aria-label="Дополнения">
+              <option value="none">Без дополнений</option>
+              <option value="normal" selected>Карты и предметы</option>
+              <option value="dense">Много карточек</option>
+            </select></label
+          >
+        </div>
+        <h2>Игровая ситуация</h2>
+        <div class="choices" id="scenarios">
+          <button type="button" data-scene="select" aria-pressed="true">Выбор команды</button
+          ><button type="button" data-scene="vote" aria-pressed="false">Команда и ожидание голосов</button
+          ><button type="button" data-scene="mission" aria-pressed="false">Игроки на миссии</button
+          ><button type="button" data-scene="combined" aria-pressed="false">На миссии и выбран</button
+          ><button type="button" data-scene="loyalty" aria-pressed="false">Проверка Леди озера</button
+          ><button type="button" data-scene="votes" aria-pressed="false">Результат голосования</button
+          ><button type="button" data-scene="assassin" aria-pressed="false">Убийца выбирает цель</button>
+        </div>
+        <h2>Обозначения</h2>
+        <div class="legend" id="legend"></div>
+        <h2>Просмотр</h2>
+        <button id="pause" type="button" aria-pressed="false">Остановить пульсацию</button>
+        <p class="note">
+          Нажми на игрока для выбора. Карты и предметы показаны в исходном расположении. Дополнения демонстрационные.
+        </p>
+        <div id="feedback" aria-live="polite"></div>
+      </aside>
+    </main>
+    <script src="player-states.js"></script>
+  </body>
+</html>
