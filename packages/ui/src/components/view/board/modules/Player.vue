@@ -659,8 +659,8 @@ export default defineComponent({
 
 .player-loyalty-badge {
   position: absolute;
-  top: 76px;
-  left: 83px;
+  top: 41.5px;
+  left: 99px;
   width: 32px;
   height: 32px;
   z-index: 3;

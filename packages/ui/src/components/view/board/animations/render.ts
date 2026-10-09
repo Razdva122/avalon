@@ -293,23 +293,25 @@ export function renderLoyalty(container: HTMLElement, options: LoyaltyOptions): 
   };
   const badgeAt = {
     // Seats can extend beyond the felt: land on the portrait, not the table boundary.
-    x: target.x + target.radius * 0.64,
-    y: target.y + target.radius * 0.6,
+    // Keep the lower-right selection check and upper-right mission flag clear.
+    x: target.x + target.radius * (52.5 / 57.5),
+    y: target.y,
   };
   const origin = {
     x: source.x + (inward.x / inwardLength) * (source.radius + 7 * unit),
     y: source.y + (inward.y / inwardLength) * (source.radius + 7 * unit),
   };
-  const delta = { x: badgeAt.x - showAt.x, y: badgeAt.y - showAt.y };
+  const approachAt = { x: badgeAt.x + badgeSize * 0.45, y: badgeAt.y - badgeSize * 0.8 };
+  const delta = { x: approachAt.x - showAt.x, y: approachAt.y - showAt.y };
   const length = Math.hypot(delta.x, delta.y) || 1;
   const normal = { x: -delta.y / length, y: delta.x / length };
-  const middle = { x: (showAt.x + badgeAt.x) * 0.5, y: (showAt.y + badgeAt.y) * 0.5 };
+  const middle = { x: (showAt.x + approachAt.x) * 0.5, y: (showAt.y + approachAt.y) * 0.5 };
   const side = (center.x - middle.x) * normal.x + (center.y - middle.y) * normal.y >= 0 ? 1 : -1;
   const bend = Math.min(width * 0.095, length * 0.24);
   const control = { x: middle.x + normal.x * bend * side, y: middle.y + normal.y * bend * side };
   const curve = (progress: number) => ({
-    x: (1 - progress) ** 2 * showAt.x + 2 * (1 - progress) * progress * control.x + progress ** 2 * badgeAt.x,
-    y: (1 - progress) ** 2 * showAt.y + 2 * (1 - progress) * progress * control.y + progress ** 2 * badgeAt.y,
+    x: (1 - progress) ** 2 * showAt.x + 2 * (1 - progress) * progress * control.x + progress ** 2 * approachAt.x,
+    y: (1 - progress) ** 2 * showAt.y + 2 * (1 - progress) * progress * control.y + progress ** 2 * approachAt.y,
   });
   const at = (position: { x: number; y: number }, scale: number, rotation = 0, tilt = 0) =>
     `translate(${position.x - heroSize * 0.5}px,${position.y - heroSize * 0.5}px) rotate(${rotation}deg) rotateY(${tilt}deg) scale(${scale})`;
@@ -327,7 +329,7 @@ export function renderLoyalty(container: HTMLElement, options: LoyaltyOptions): 
       { offset: 0.47, opacity: 1, transform: at(curve(0.17), 0.94, 0, 3) },
       { offset: 0.59, opacity: 1, transform: at(curve(0.43), 0.81, 5, 6) },
       { offset: 0.72, opacity: 1, transform: at(curve(0.74), 0.61, 2, 2) },
-      { offset: 0.83, opacity: 1, transform: at(badgeAt, finalScale * 1.05), easing: 'cubic-bezier(.22,.65,.3,1)' },
+      { offset: 0.83, opacity: 1, transform: at(approachAt, finalScale * 1.05), easing: 'cubic-bezier(.22,.65,.3,1)' },
       {
         offset: 0.91,
         opacity: 1,
