@@ -40,6 +40,51 @@ const game = (history = [], extra = {}) => ({
 const result = { winner: 'good', reason: 'missMerlin' };
 const room = (gameState) => ({ stage: 'started', roomID: 'game-a', players, game: gameState });
 
+test('a real lobby start masks roles until the personal card closes, without replaying on reconnect', async (t) => {
+  const { api, manager } = fixture(t, game([], { stage: 'selectTeam' }));
+  assert.equal(api.roleDeal.value, undefined);
+  manager.state.value = { stage: 'locked', roomID: 'game-a', players };
+  await vue.nextTick();
+  manager.mutateRoomState({ newRoomState: room(game([], { stage: 'selectTeam' })), isLiveUpdate: true });
+  await vue.nextTick();
+  assert.equal(api.roleDeal.value.role, 'minion');
+  assert.ok(api.players.value.every((player) => player.role === 'unknown'));
+  api.finishRoleDeal();
+  assert.equal(api.roleDeal.value, undefined);
+  assert.deepEqual(
+    api.players.value.map((player) => player.role),
+    ['merlin', 'percival', 'minion'],
+  );
+  manager.mutateRoomState({ newRoomState: room(game([], { stage: 'selectTeam' })) });
+  await vue.nextTick();
+  assert.equal(api.roleDeal.value, undefined);
+});
+
+test('a party with plot cards also deals roles, then releases controls when its stage advances', async (t) => {
+  const { api, manager } = fixture(t, game([], { stage: 'selectTeam' }));
+  manager.state.value = { stage: 'locked', roomID: 'game-a', players };
+  await vue.nextTick();
+  manager.mutateRoomState({ newRoomState: room(game([], { stage: 'giveCard' })), isLiveUpdate: true });
+  await vue.nextTick();
+  assert.equal(api.roleDeal.value?.role, 'minion');
+  manager.mutateRoomState({ newGameState: game([], { stage: 'selectTeam' }) });
+  await vue.nextTick();
+  assert.equal(api.roleDeal.value, undefined);
+});
+
+test('reconnecting from a retained lobby to a started snapshot does not replay role dealing', async (t) => {
+  const { api, manager } = fixture(t, game([], { stage: 'selectTeam' }));
+  manager.state.value = { stage: 'locked', roomID: 'game-a', players };
+  await vue.nextTick();
+  manager.mutateRoomState({ newRoomState: room(game([], { stage: 'selectTeam' })), isLiveUpdate: false });
+  await vue.nextTick();
+  assert.equal(api.roleDeal.value, undefined);
+  assert.deepEqual(
+    api.players.value.map((player) => player.role),
+    ['merlin', 'percival', 'minion'],
+  );
+});
+
 function fixture(t, initial = game(), reducedMotion = false) {
   const manager = new GameStateManager();
   manager.mutateRoomState({ newRoomState: room(initial) });

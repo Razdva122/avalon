@@ -1,6 +1,19 @@
-import type { THistoryResults, VisualGameState, TRoles, TLoyalty } from '@avalon/types';
+import type { THistoryResults, VisualGameState, TRoles, TLoyalty, TVisibleRole } from '@avalon/types';
 
 import last from 'lodash/last';
+
+/** Only a live lobby-to-game transition is a deal, never an initial room snapshot. */
+export function shouldDealRoles(
+  room: { stage: string; game?: { stage: string; players: { id: string; role: TVisibleRole }[] } },
+  previousStage: string | undefined,
+  viewerID: string | undefined,
+  mode: 'live' | 'history',
+): boolean {
+  if (!['created', 'locked'].includes(previousStage ?? '') || room.stage !== 'started' || mode !== 'live') return false;
+  if (!viewerID || !room.game || room.game.stage === 'end') return false;
+  const player = room.game.players.find((seat) => seat.id === viewerID);
+  return Boolean(player && !['unknown', 'good', 'evil'].includes(player.role));
+}
 
 export function calculateVisualElement(history: THistoryResults[]): { element?: THistoryResults; timeout: number } {
   const lastElement = last(history);

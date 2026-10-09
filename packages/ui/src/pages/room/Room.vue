@@ -22,6 +22,7 @@
         @decisions="spectatorDecisions = $event"
       />
       <Board
+        :key="uuid"
         :room-state="roomState"
         :spectator-roles="rolesShown ? spectatorRoles : {}"
         :spectator-decisions="rolesShown ? spectatorDecisions : []"

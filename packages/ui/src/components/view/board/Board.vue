@@ -1,7 +1,14 @@
 <template>
   <div class="board-and-timer">
     <div class="wrapper">
-      <div ref="boardRef" class="board-container" :class="'view-mode-' + stateManager.viewMode.value">
+      <div
+        ref="boardRef"
+        class="board-container"
+        :class="[
+          'view-mode-' + stateManager.viewMode.value,
+          { 'role-deal-active': roleDeal, 'role-deal-finished': roleDealFinished },
+        ]"
+      >
         <div class="game-board" alt="board" :class="'game-end-' + (assassinationActive ? '' : gameResult)"></div>
         <slot name="content">
           <div class="timer" v-if="timerDuration > 0">
@@ -46,6 +53,7 @@
         <div
           class="player-container"
           v-for="(player, i) in players"
+          :inert="roleDeal ? true : undefined"
           :style="{ transform: calculateRotate(i) }"
           :key="player.id"
         >
@@ -73,6 +81,16 @@
         <div ref="loyaltyEffectRef" class="board-event-effects" aria-hidden="true"></div>
         <div ref="missionEffectRef" class="board-event-effects" aria-hidden="true"></div>
         <div ref="cardEffectRef" class="board-card-effect" aria-hidden="true"></div>
+        <RoleDeal
+          v-if="roleDeal && boardRef"
+          :key="roleDeal.uuid"
+          :board="boardRef"
+          :player-id="roleDeal.playerID"
+          :role="roleDeal.role"
+          :player-ids="roomState.players.map((player) => player.id)"
+          :deck-roles="[...gameState.settings.roles.good, ...gameState.settings.roles.evil]"
+          @complete="finishRoleDeal"
+        />
       </div>
     </div>
 
@@ -115,7 +133,8 @@ import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
 import CustomTimerControls from '@/components/view/board/modules/CustomTimerControls.vue';
 import eventBus from '@/helpers/event-bus';
-import { THistoryResults, AiSpectatorDecision, TRoles, VisualGameState } from '@avalon/types';
+import { THistoryResults, AiSpectatorDecision, TRoles, TVisibleRole, VisualGameState } from '@avalon/types';
+import RoleDeal from './animations/RoleDeal.vue';
 import { hasActiveCard, useHaveActiveLoyaltyCard, isAdjacentPlayer, isPlayerOnMission } from '@/helpers/plot-cards';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
@@ -128,6 +147,7 @@ import {
   missionReveal,
   missionSceneLayout,
   excaliburReveal,
+  shouldDealRoles,
 } from '@/components/view/board/helpers';
 import { getThumbnailPathByID } from '@/helpers/images';
 import { calculateRoleUrl } from '@/helpers/styles';
@@ -154,6 +174,7 @@ export default defineComponent({
     AnnounceLoyalty,
     OptionsPreview,
     CustomTimerControls,
+    RoleDeal,
   },
   props: {
     spectatorDecisions: { type: Array as PropType<AiSpectatorDecision[]>, default: () => [] },
@@ -180,6 +201,51 @@ export default defineComponent({
     const cardEffectRef = ref<HTMLElement>();
     const loyaltyEffectRef = ref<HTMLElement>();
     const assassinationActive = ref(false);
+    const roleDeal = ref<{ uuid: string; playerID: string; role: TVisibleRole; stage: VisualGameState['stage'] }>();
+    const roleDealFinished = ref(false);
+    const finishRoleDeal = () => {
+      roleDeal.value = undefined;
+      roleDealFinished.value = true;
+    };
+    watch(
+      [() => roomState.value.stage, stateManager.snapshotRevision],
+      ([stage, revision], [previousStage, previousRevision]) => {
+        roleDeal.value = undefined;
+        roleDealFinished.value = false;
+        if (
+          revision !== previousRevision ||
+          store.state.hideSpoilers ||
+          !shouldDealRoles(roomState.value, previousStage, store.state.profile?.id, stateManager.viewMode.value)
+        )
+          return;
+        if (roomState.value.stage !== 'started') return;
+        const player = roomState.value.game.players.find((seat) => seat.id === store.state.profile?.id)!;
+        roleDeal.value = {
+          uuid: roomState.value.game.uuid,
+          playerID: player.id,
+          role: player.role,
+          stage: roomState.value.game.stage,
+        };
+      },
+    );
+    watch(
+      [
+        () => gameState.value?.stage,
+        () => gameState.value?.uuid,
+        stateManager.viewMode,
+        () => store.state.hideSpoilers,
+      ],
+      ([stage, uuid, mode, hidden]) => {
+        if (
+          roleDeal.value &&
+          (uuid !== roleDeal.value.uuid ||
+            mode !== 'live' ||
+            hidden ||
+            (stage !== roleDeal.value.stage && !(roleDeal.value.stage === 'initialization' && stage === 'selectTeam')))
+        )
+          finishRoleDeal();
+      },
+    );
     watch(assassinationActive, (active) => emit('assassination-active', active), { immediate: true });
     const activeReveal = ref<ReturnType<typeof assassinationReveal>>();
     const activeLoyaltyTarget = ref<string>();
@@ -431,6 +497,7 @@ export default defineComponent({
 
     const players = computed(() => {
       if (roomState.value.stage === 'started') {
+        if (roleDeal.value) return gameState.value.players.map((player) => ({ ...player, role: 'unknown' as const }));
         return maskedPlayers.value ?? gameState.value.players;
       }
 
@@ -647,6 +714,9 @@ export default defineComponent({
 
     return {
       boardRef,
+      roleDeal,
+      roleDealFinished,
+      finishRoleDeal,
       missionEffectRef,
       missionAnimationActive,
       pendingMission,
@@ -680,6 +750,20 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.role-deal-active .actions-container {
+  visibility: hidden;
+}
+.role-deal-finished .role-container:not(.icon-unknown) {
+  animation: role-deal-known 200ms ease-out;
+}
+@keyframes role-deal-known {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 .board-event-effects {
   position: absolute;
   inset: 0;
