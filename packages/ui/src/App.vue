@@ -245,7 +245,7 @@ body {
   background-size: cover;
   pointer-events: none;
   z-index: -1;
-  opacity: 0.1;
+  opacity: var(--v-holiday-background-opacity);
 }
 
 .v-data-table {

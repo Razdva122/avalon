@@ -47,6 +47,7 @@ const lightTheme = {
   },
   variables: {
     'icon-invert': 0,
+    'holiday-background-opacity': 0.06,
   },
 };
 
@@ -80,6 +81,7 @@ const darkTheme = {
   },
   variables: {
     'icon-invert': 1,
+    'holiday-background-opacity': 0.1,
   },
 };
 
