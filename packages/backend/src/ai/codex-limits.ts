@@ -119,7 +119,7 @@ export async function getCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
   const promise = readCodexWeeklyLimit()
     .catch(() => null)
     .then((value) => {
-      cache = { key, expires: Date.now() + (value ? 60000 : 10000), value };
+      cache = { key, expires: Date.now() + 60000, value };
       return value;
     });
   pending = { key, promise };

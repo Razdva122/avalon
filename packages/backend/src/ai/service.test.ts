@@ -12,8 +12,11 @@ const initialEnvironment = { ...process.env };
 beforeEach(() => {
   process.env.NODE_ENV = 'development';
   process.env.AI_CODEX_ENABLED = 'true';
+  jest.spyOn(codexLimits, 'getCodexWeeklyLimit').mockResolvedValue(null);
+  jest.spyOn(codexModels, 'getCodexModels').mockResolvedValue([]);
 });
 afterEach(() => {
+  jest.restoreAllMocks();
   process.env = { ...initialEnvironment };
 });
 
@@ -464,11 +467,11 @@ test('Codex settings require admin access and stay frozen after launch', async (
   }
 });
 
-test('administrator access stays available while the Codex catalog is still loading', async () => {
+test('administrator access stays available when the Codex catalog fails and public modes fail closed', async () => {
   const old = { ...process.env };
   process.env.NODE_ENV = 'development';
   process.env.AI_CODEX_ENABLED = 'true';
-  const catalog = jest.spyOn(codexModels, 'getCodexModels').mockReturnValue(new Promise(() => {}));
+  const catalog = jest.spyOn(codexModels, 'getCodexModels').mockRejectedValue(Error('Catalog unavailable'));
   const service = new AiService({
     rooms: {},
     dbManager: { getUserByID: async () => ({ isAdmin: true }) },
@@ -483,20 +486,15 @@ test('administrator access stays available while the Codex catalog is still load
     } as unknown as ServerSocket,
     'admin',
   );
-  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    const access = new Promise<any>((resolve) => {
-      void events.getAiRoomAccess(resolve);
+    const response = jest.fn();
+    await events.getAiRoomAccess(response);
+    expect(response.mock.calls[0][0]).toMatchObject({
+      canManage: true,
+      canPlay: true,
+      botModes: { smart: false, regular: false },
     });
-    const result = await Promise.race([
-      access,
-      new Promise((resolve) => {
-        timer = setTimeout(() => resolve('catalog blocked access'), 50);
-      }),
-    ]);
-    expect(result).toHaveProperty('canManage', true);
   } finally {
-    clearTimeout(timer);
     catalog.mockRestore();
     process.env = old;
   }

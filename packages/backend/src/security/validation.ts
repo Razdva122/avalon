@@ -86,6 +86,8 @@ const acknowledgements: Record<string, number> = {
   markStickersSeen: 1,
   getAiSpectatorRoles: 1,
   createAiRoom: 1,
+  createHumanAiRoom: 0,
+  startHumanAiRoom: 2,
   getLoyalty: 1,
   getVoiceState: 1,
   joinVoice: 1,
@@ -113,6 +115,7 @@ const nonIDs = new Set([
   'updateStickerPreferences',
   'markStickersSeen',
   'createAiRoom',
+  'createHumanAiRoom',
   'getPopularRoles',
   'getTopPlayersForPopularRoles',
 ]);
@@ -154,6 +157,17 @@ export function validPacket(event: string, args: unknown[]): boolean {
       values[1] > 0 &&
       values[1] <= 86400
     );
+  if (event === 'startHumanAiRoom') {
+    const options = values[1];
+    return (
+      record(options) &&
+      Object.keys(options).length === 2 &&
+      typeof options.difficulty === 'string' &&
+      ['smart', 'regular'].includes(options.difficulty) &&
+      typeof options.language === 'string' &&
+      ['en', 'ru', 'zh-tw'].includes(options.language)
+    );
+  }
   if (event === 'createAiRoom') {
     const options = values[0];
     if (typeof options === 'string') return text(options, 254);

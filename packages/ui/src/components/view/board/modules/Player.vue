@@ -5,6 +5,23 @@
     @click="privateDecision ? (showUserCardDialog = true) : $emit('playerClick', player.id)"
     ref="playerRef"
   >
+    <Teleport to="body">
+      <span
+        v-if="thinking || isOwnDiscussionTurn"
+        ref="statusElement"
+        class="ai-player-status"
+        :class="statusThemeClasses"
+        :style="statusStyles"
+        role="status"
+        aria-atomic="true"
+        :aria-label="`${player.name}: ${$t(statusKey)}`"
+      >
+        <span v-if="thinking && !isOwnDiscussionTurn" class="thinking-dots" aria-hidden="true"
+          ><i></i><i></i><i></i
+        ></span>
+        {{ $t(statusKey) }}
+      </span>
+    </Teleport>
     <v-tooltip
       :open-delay="privateDecision ? 300 : 2500"
       :close-delay="0"
@@ -24,15 +41,6 @@
           @keydown.enter.prevent="privateDecision && (showUserCardDialog = true)"
           @keydown.space.prevent="privateDecision && (showUserCardDialog = true)"
         >
-          <span
-            v-if="thinking"
-            class="ai-thinking-status"
-            role="status"
-            :aria-label="`${player.name}: ${$t('aiArena.thinking')}`"
-          >
-            <span class="thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-            {{ $t('aiArena.thinking') }}
-          </span>
           <span
             v-if="playerClasses['player-feature-waitForAction'] || playerClasses['player-feature-isAssassin']"
             class="player-pulse-aura"
@@ -210,6 +218,7 @@ import { defineComponent, PropType, inject, computed, toRefs, ref, onMounted, on
 import { onLongPress } from '@vueuse/core';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
+import { useTheme } from 'vuetify';
 import { useUserProfile } from '@/helpers/composables';
 import type {
   RoomPlayer,
@@ -245,6 +254,7 @@ export default defineComponent({
     loyaltyBadge: { type: Object as PropType<{ team: 'good' | 'evil'; sourceName: string }> },
     badgeHidden: Boolean,
     thinking: { type: Boolean, default: false },
+    discussionTurn: { type: Boolean, default: false },
     voiceSide: { type: String as PropType<'left' | 'right'>, default: 'right' },
     playerState: {
       type: Object as PropType<IFrontendPlayer | RoomPlayer>,
@@ -268,8 +278,11 @@ export default defineComponent({
   setup(props) {
     const gameState = inject(gameStateKey)!;
     const store = useStore();
+    const theme = useTheme();
     const voiceContext = inject(roomVoiceKey, undefined);
     const isOwnVoice = computed(() => props.playerState.id === store.state.profile?.id);
+    const isOwnDiscussionTurn = computed(() => props.discussionTurn && isOwnVoice.value && !props.visibleHistory);
+    const statusKey = computed(() => (isOwnDiscussionTurn.value ? 'aiArena.yourDiscussionTurn' : 'aiArena.thinking'));
     const voiceStatus = computed(() => {
       const voice = voiceContext?.value;
       if (
@@ -288,6 +301,14 @@ export default defineComponent({
     const { userState, userName } = useUserProfile(playerState.value.id);
     const chatMessage = ref<{ message?: string; timeoutId?: number }>();
     const playerRef = ref<HTMLElement | null>(null);
+    const statusElement = ref<HTMLElement | null>(null);
+    const { floatingStyles: statusStyles } = useFloating(playerRef, statusElement, {
+      strategy: 'fixed',
+      placement: 'top',
+      middleware: [offset(6), shift({ padding: 8 })],
+      whileElementsMounted: (reference, floating, update) =>
+        autoUpdate(reference, floating, update, { animationFrame: true }),
+    });
     const messageElement = ref<HTMLElement | null>(null);
     const messageArrow = ref<HTMLElement | null>(null);
     const {
@@ -536,6 +557,11 @@ export default defineComponent({
       getThumbnailPathByID,
       voiceStatus,
       isOwnVoice,
+      isOwnDiscussionTurn,
+      statusKey,
+      statusElement,
+      statusStyles,
+      statusThemeClasses: theme.themeClasses,
       userState,
       displayUserAvatar,
       player,
@@ -566,12 +592,10 @@ export default defineComponent({
 .ai-thinking .player-frame {
   filter: drop-shadow(0 0 7px rgba(var(--v-theme-primary), 0.7));
 }
-.ai-thinking-status {
-  position: absolute;
-  z-index: 4;
-  top: -18px;
-  left: 50%;
-  transform: translateX(-50%);
+.ai-player-status {
+  position: fixed;
+  z-index: 30;
+  pointer-events: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -600,19 +624,6 @@ export default defineComponent({
   }
   i:nth-child(3) {
     animation-delay: 0.36s;
-  }
-}
-@media (max-width: 600px) {
-  // The existing table scales as a whole on phones; compensate for the status text.
-  .ai-thinking-status {
-    font-size: 24px;
-    padding: 6px 12px;
-    gap: 8px;
-    border-radius: 20px;
-  }
-  .thinking-dots i {
-    width: 6px;
-    height: 6px;
   }
 }
 @keyframes thinking-pulse {

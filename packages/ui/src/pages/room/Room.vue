@@ -9,7 +9,7 @@
     </template>
     <template v-else-if="roomState">
       <AiRoomPanel
-        v-if="roomState.ai"
+        v-if="roomState.ai && !(roomState.ai.publicBotGame && roomState.ai.status === 'ready')"
         class="ai-room-status"
         :ai="roomState.ai"
         :roomID="roomState.roomID"

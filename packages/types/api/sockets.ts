@@ -1,7 +1,7 @@
 import type { VoiceState, VoiceJoin, VoiceError } from '../voice';
 import type { PlayerGameSummary } from '../stats/player-games';
 import type { StickerResponse, StickerMessage, StickerError } from '../user/stickers';
-import type { AiLanguage, AiPlayerCount, TRoomState } from '../room';
+import type { AiBotDifficulty, AiLanguage, AiPlayerCount, TRoomState } from '../room';
 import type { VisualGameState } from '../game/state';
 import type { GameOptions } from '../game/options';
 
@@ -140,6 +140,9 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
   getAiRoomAccess: (
     callback: (result: {
       canManage: boolean;
+      canPlay?: boolean;
+      botModes?: Record<AiBotDifficulty, boolean>;
+      ownRoomID?: string;
       roomID?: string;
       models?: { id: string; label: string }[];
       defaultModel?: string;
@@ -159,6 +162,12 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
   createAiRoom: (
     options: string | { model: string; language: AiLanguage; playerCount?: AiPlayerCount },
     callback: (result: { roomID: string } | { error: string }) => void,
+  ) => void;
+  createHumanAiRoom: (callback: (result: { roomID: string } | { error: string }) => void) => void;
+  startHumanAiRoom: (
+    roomID: string,
+    options: { difficulty: AiBotDifficulty; language: AiLanguage },
+    callback: (result: { ok: true } | { error: string }) => void,
   ) => void;
   controlAiRoom: (
     roomID: string,

@@ -40,6 +40,24 @@ const game = (history = [], extra = {}) => ({
 const result = { winner: 'good', reason: 'missMerlin' };
 const room = (gameState) => ({ stage: 'started', roomID: 'game-a', players, game: gameState });
 
+test('the discussion prompt follows the live human turn and disappears on replay or game end', async (t) => {
+  const { api, manager } = fixture(t, game([], { stage: 'selectTeam' }));
+  assert.equal(api.discussionPlayerID.value, undefined);
+  manager.state.value.ai = { status: 'running', humanPlayerID: 'p3', waitingForDiscussion: false };
+  assert.equal(api.discussionPlayerID.value, undefined);
+  manager.state.value.ai.waitingForDiscussion = true;
+  assert.equal(api.discussionPlayerID.value, 'p3');
+  manager.toggleViewMode();
+  assert.equal(api.discussionPlayerID.value, undefined, 'a live reply prompt must not address someone in replay');
+  manager.toggleViewMode();
+  assert.equal(api.discussionPlayerID.value, 'p3');
+  manager.state.value.ai.status = 'paused';
+  assert.equal(api.discussionPlayerID.value, undefined);
+  manager.state.value.ai.status = 'running';
+  manager.state.value.game.stage = 'end';
+  assert.equal(api.discussionPlayerID.value, undefined, 'stale AI flags must not request a reply after game end');
+});
+
 test('a real lobby start masks roles until the personal card closes, without replaying on reconnect', async (t) => {
   const { api, manager } = fixture(t, game([], { stage: 'selectTeam' }));
   assert.equal(api.roleDeal.value, undefined);

@@ -1,8 +1,62 @@
-import { parseWeeklyLimit, readCodexWeeklyLimit } from './codex-limits';
+import { getCodexWeeklyLimit, parseWeeklyLimit, readCodexWeeklyLimit } from './codex-limits';
 import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import { PassThrough } from 'stream';
 jest.mock('child_process', () => ({ spawn: jest.fn() }));
+
+test.each([true, false])(
+  'concurrent quota reads share one request and cache success=%s for a minute',
+  async (success) => {
+    const old = { ...process.env };
+    process.env.AI_CODEX_HOME = `/test-cache-${success}`;
+    delete process.env.AI_CODEX_SSH_HOST;
+    const now = jest.spyOn(Date, 'now').mockReturnValue(1000);
+    const spawnMock = spawn as jest.Mock;
+    spawnMock.mockReset();
+    spawnMock.mockImplementation(() => {
+      const child = Object.assign(new EventEmitter(), {
+        stdout: new PassThrough(),
+        stderr: new PassThrough(),
+        stdin: new PassThrough(),
+        kill: jest.fn(() => {
+          queueMicrotask(() => child.emit('close'));
+        }),
+      });
+      if (!success) queueMicrotask(() => child.emit('error', Error('read unavailable')));
+      else
+        child.stdin.on('data', (data: Buffer) => {
+          const message = JSON.parse(data.toString());
+          if (!message.id) return;
+          queueMicrotask(() =>
+            child.stdout.write(
+              JSON.stringify({
+                id: message.id,
+                result:
+                  message.id === 1 ? {} : { rateLimits: { primary: { usedPercent: 20, windowDurationMins: 10080 } } },
+              }) + '\n',
+            ),
+          );
+        });
+      return child;
+    });
+    try {
+      const responses = await Promise.all(Array.from({ length: 12 }, () => getCodexWeeklyLimit()));
+      expect(spawnMock).toHaveBeenCalledTimes(1);
+      if (success) expect(responses[0]?.remainingPercent).toBe(80);
+      else expect(responses[0]).toBeNull();
+      now.mockReturnValue(60000);
+      await getCodexWeeklyLimit();
+      expect(spawnMock).toHaveBeenCalledTimes(1);
+      now.mockReturnValue(61000);
+      await getCodexWeeklyLimit();
+      expect(spawnMock).toHaveBeenCalledTimes(2);
+    } finally {
+      now.mockRestore();
+      process.env = old;
+      jest.resetAllMocks();
+    }
+  },
+);
 test.each(['primary', 'secondary'])(
   'finds weekly window in %s, uses the Codex bucket and only returns display fields',
   (slot) => {

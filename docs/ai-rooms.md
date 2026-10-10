@@ -2,11 +2,26 @@
 
 [Documentation index](README.md) · [Production configuration](../deploy/ai-production.md)
 
-AI rooms are spectator games with 5, 6, 7 or 8 bots (default: seven). An
-administrator creates and controls a match; spectators see the board, public
-chat and optional AI role/decision reveal. Before launch, the database-admin owner can take one seat using “Play with bots”,
+AI rooms support public matches with one human and four bots, and spectator
+games with 5, 6, 7 or 8 bots (default: seven). A signed-in player sees “Play with
+bots” next to “Create room” when at least one mode is available. It opens a
+prepared room named `Username vs 4 Bots`, with the owner already seated. On the
+table, the owner chooses the discussion language and starts with “Smart bots”
+or “Regular bots”; regular bots are described as useful for understanding the
+principles of the game. The language defaults to the user's interface language
+when supported, otherwise English. Preparing a room makes no inference request.
+An owner can return to their existing room without creating another.
+Only one AI room can reserve the shared slot at a time, including preparation,
+active play and technical pauses. Other players cannot create or start another
+AI match while that slot is occupied.
+
+Administrators retain the separate arena controls for creating and managing
+spectator games. Before launch, the database-admin owner can take one seat,
 replacing one bot while preserving the selected table size. Other humans cannot
-join. Mixed games pause at the human seat in each public discussion circle. The “Your turn to speak” prompt waits for a new human text message without opening chat automatically; a persisted message continues the circle, or “Pass turn” skips the speech. Team submission stays disabled until the circle finishes. Mixed games also wait for the human’s ordinary board actions and include their
+join an existing room. Spectators see the board, public chat and optional AI
+role/decision reveal in games containing only bots.
+
+Mixed games pause at the human seat in each public discussion circle. The “Your turn to speak” prompt waits for a new human text message without opening chat automatically; a persisted message continues the circle, or “Pass turn” skips the speech. Team submission stays disabled until the circle finishes. Mixed games also wait for the human’s ordinary board actions and include their
 public chat in bot context. Role/decision reveal is disabled for everyone in a
 mixed room. Mixed games award neither human nor AI profile ratings.
 Spectator messages are not passed to the bots. AI games use their own profile
@@ -47,17 +62,30 @@ The backend discovers available models and reasoning levels from that account.
 There is no paid API fallback. For a separate worker, follow the remote SSH setup
 in [Codex production](../deploy/codex-production.md).
 
-Restart backend after environment changes. Management requires `isAdmin: true`
-on the verified account in the selected MongoDB database. A username or client
-flag does not grant access. The public AI list/archive remains viewable without
-management rights, including when new AI games are disabled.
+Restart backend after environment changes. Arena administration requires
+`isAdmin: true` on the verified account in the selected MongoDB database. A
+username or client flag does not grant access. Public bot play requires a
+verified signed-in account; it does not grant arena administration, arbitrary
+model selection or access to private decisions and account quotas. The public
+AI list/archive remains viewable without management rights, including when new
+AI games are disabled.
 
 ## Discussion and decisions
 
-Creation accepts `createAiRoom({ model, language, playerCount }, callback)`.
+Administrator creation accepts
+`createAiRoom({ model, language, playerCount }, callback)`.
 Discussion language is `en`, `ru` or `zh-tw`, with English as the legacy default.
 The UI itself supports six languages. Unsupported model, language and table size
-are rejected before room reservation.
+are rejected before room reservation. Public bot play accepts
+`createHumanAiRoom(callback)`; the callback returns a `roomID` or an `error`.
+`startHumanAiRoom(roomID, { difficulty: 'smart' | 'regular', language }, callback)`
+starts the same prepared room and returns `ok: true` or an `error`. The server
+chooses the model, reasoning effort and five-seat table; clients cannot override
+these settings or start another owner's room.
+Access responses include `canPlay`, `botModes` availability and `ownRoomID` for
+returning to the owner's active match. Room state records the selected mode as
+`botDifficulty` after launch; `publicBotGame` identifies the public room before
+and after launch. The server supplies its title and visible countdown deadlines.
 
 Bots discuss the proposal before the leader finalizes a team, then vote quietly.
 The chosen language applies to public speech, private notes, Evil council,
@@ -96,11 +124,44 @@ omits private model traces and subscription quotas.
 
 Messages are paced at two seconds in development and ten seconds in production.
 Codex records subscription token usage; there is no RUB budget or per-game paid
-API charge. Model selection and reasoning use the authenticated Codex catalog.
-The weekly Codex quota is account-wide, read through the same local/remote provider,
-cached one minute on success and ten seconds on failure. Missing data means
-unavailable, not zero remaining quota. Model price comparisons are estimates from
-the checked-in pricing table, not a bill or prediction of subscription consumption.
+API charge. Administrator model selection and reasoning use the authenticated
+Codex catalog. Public play uses these fixed server presets:
+
+| Mode         | Model         | Reasoning effort | Required five-hour remainder | Required weekly remainder |
+| ------------ | ------------- | ---------------- | ---------------------------- | ------------------------- |
+| Smart bots   | `gpt-6.1-sol` | `medium`         | Greater than 80%             | Greater than 5%           |
+| Regular bots | `gpt-6-luna`  | `low`            | Greater than 20%             | Greater than 2%           |
+
+Both thresholds are strict: equality does not allow a new match. The selected
+preset must also be supported by the authenticated model catalog. Missing or
+invalid quota data, including an absent five-hour window, disables public
+starts. Availability and start admission share the same backend quota snapshot;
+the server checks eligibility again when a player starts a match. Public clients
+receive mode availability without the underlying percentages or account limits.
+
+The Codex quota is account-wide and read through the same local/remote provider.
+The backend shares a 60-second cache across users and coalesces simultaneous
+refresh requests into one provider read. The cache refreshes on demand when its
+snapshot expires; it does not poll the provider while the site is idle. Failed
+reads are also cached for one minute, and an unavailable snapshot denies new
+public starts. Model price comparisons are estimates from the checked-in pricing
+table, not a bill or prediction of subscription consumption.
+
+These checks limit admission; they do not reserve provider quota or guarantee
+completion. Usage elsewhere on the same account can consume the shared quota
+after admission. A match keeps its selected model and reasoning effort; lower
+remaining quota prevents new starts rather than changing that preset mid-game.
+Technical continuation of an already started match does not reapply these
+admission thresholds; provider exhaustion can still pause the match.
+
+Public rooms allow 90 seconds to choose the language and launch after preparation.
+Every actual human discussion or board-action turn also has a 90-second deadline.
+The backend publishes `launchExpiresAt` and `humanActionExpiresAt` so the table
+can show the remaining time. Unrelated messages, partial team selections and
+polling do not extend a turn. At expiry the match stops, clears its pending
+human turn and releases the shared slot. A late start or action is rejected.
+These human-turn deadlines do not apply to administrator-created mixed games.
+Prepared rooms are temporary and are not archived before gameplay starts.
 
 Model requests have a ten-minute timeout and a twelve-minute ownership lease.
 The technical limit is 400 calls for 5–7 bots and 450 for eight. Provider

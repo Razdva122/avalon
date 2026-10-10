@@ -1,5 +1,24 @@
 import { validPacket } from './validation';
 
+test('human preparation accepts only its acknowledgement', () => {
+  expect(validPacket('createHumanAiRoom', [() => {}])).toBe(true);
+  expect(validPacket('createHumanAiRoom', [{ difficulty: 'regular', language: 'ru' }, () => {}])).toBe(false);
+});
+
+test.each(['smart', 'regular'])('accepts the fixed human start mode %s', (difficulty) => {
+  expect(validPacket('startHumanAiRoom', ['room', { difficulty, language: 'ru' }, () => {}])).toBe(true);
+});
+
+test.each([
+  { difficulty: 'custom', language: 'ru' },
+  { difficulty: 'smart', language: 'ru', model: 'gpt-6.1-sol' },
+  { difficulty: 'smart', language: 'ru', playerCount: 7 },
+  { difficulty: 'regular', language: 'zh-cn' },
+  null,
+])('rejects malformed or customized public bot creation %#', (options) => {
+  expect(validPacket('startHumanAiRoom', ['room', options, () => {}])).toBe(false);
+});
+
 test.each(['en', 'ru', 'zh-tw'])('accepts AI creation options with %s and an acknowledgement', (language) => {
   expect(validPacket('createAiRoom', [{ model: 'codex-chatgpt', language }, () => {}])).toBe(true);
 });

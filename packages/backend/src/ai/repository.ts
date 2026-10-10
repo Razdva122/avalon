@@ -289,6 +289,7 @@ export class AiRepository {
         ai: true,
         aiStatus: state.ai?.status,
         aiModel: aiPlayedModel(state.ai),
+        aiTitle: state.ai?.title,
         aiLanguage: state.ai?.language ?? 'en',
         hostID: state.leaderID,
         state: state.stage,

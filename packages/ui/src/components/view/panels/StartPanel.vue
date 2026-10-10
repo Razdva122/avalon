@@ -1,5 +1,17 @@
 <template>
-  <template v-if="!roomState.ai">
+  <div v-if="roomState.ai?.publicBotGame && roomState.ai.status === 'ready'" class="bot-start-panel">
+    <BotGameChoices
+      v-if="isUserLeader"
+      :roomID="roomState.roomID"
+      :title="roomState.ai.title"
+      :expires-at="roomState.ai.launchExpiresAt"
+    />
+    <template v-else>
+      <h2>{{ roomState.ai.title }}</h2>
+      <p>{{ $t('aiArena.ready') }}</p>
+    </template>
+  </div>
+  <template v-else-if="!roomState.ai">
     <v-btn color="info" class="mb-4" @click="onCopyClick">
       <template v-slot:prepend>
         <span class="material-icons"> share </span>
@@ -49,10 +61,11 @@ import { TPageRoomState } from '@/helpers/game-state-manager';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import HostPanel from './HostPanel.vue';
+import BotGameChoices from '@/components/view/board/modules/BotGameChoices.vue';
 
 export default defineComponent({
   name: 'StartPanel',
-  components: { HostPanel },
+  components: { HostPanel, BotGameChoices },
   props: {
     roomState: {
       type: Object as PropType<TPageRoomState>,
@@ -128,6 +141,12 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+.bot-start-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
 .lobby-host-actions {
   display: flex;
   flex-direction: column;

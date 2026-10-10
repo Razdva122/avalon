@@ -14,6 +14,7 @@
             <span class="material-icons" aria-hidden="true">add</span>
             {{ $t('mainPage.createRoom') }}
           </v-btn>
+          <BotRoomButton />
           <nav class="lobby-links" :aria-label="$t('menu.wiki')">
             <LocaleLink :to="{ name: 'rules' }"
               ><span class="link-label">{{ $t('wiki.rules') }}</span
@@ -182,6 +183,7 @@ import eventBus from '@/helpers/event-bus';
 import LobbyRoom from './LobbyRoom.vue';
 import SocialChannels from './SocialChannels.vue';
 import AiRoomButton from './AiRoomButton.vue';
+import BotRoomButton from './BotRoomButton.vue';
 import RotatingTopPlayer from '@/components/stats/RotatingTopPlayer.vue';
 import GiveawayBanner from '@/pages/support/GiveawayBanner.vue';
 
@@ -189,6 +191,7 @@ export default defineComponent({
   components: {
     GiveawayBanner,
     AiRoomButton,
+    BotRoomButton,
     LobbyRoom,
     SocialChannels,
     RotatingTopPlayer,

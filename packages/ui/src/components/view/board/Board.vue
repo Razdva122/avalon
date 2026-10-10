@@ -7,6 +7,7 @@
         :class="[
           'view-mode-' + stateManager.viewMode.value,
           { 'role-deal-active': roleDeal, 'role-deal-finished': roleDealFinished },
+          { 'bot-preparation-table': roomState.ai?.publicBotGame && roomState.ai.status === 'ready' },
         ]"
       >
         <div class="game-board" alt="board" :class="'game-end-' + (assassinationActive ? '' : gameResult)"></div>
@@ -18,8 +19,14 @@
             class="actions-container d-flex flex-column justify-center"
             :class="{ 'during-assassination': assassinationActive }"
           >
+            <BotGameTimer
+              v-if="roomState.ai?.publicBotGame && roomState.ai.humanActionExpiresAt"
+              class="bot-action-timer"
+              :expires-at="roomState.ai.humanActionExpiresAt"
+              phase="action"
+            />
             <template v-if="roomState.stage !== 'started'">
-              <div class="options-panel mb-4">
+              <div v-if="!roomState.ai?.publicBotGame" class="options-panel mb-4">
                 <div class="options-title">{{ $t('game.rolesAndAddons') }}</div>
                 <OptionsPreview
                   :roles="roomState.options.roles"
@@ -62,7 +69,12 @@
             :player-state="player"
             :loyalty-badge="loyaltyBadges[player.id]"
             :badge-hidden="activeLoyaltyTarget === player.id"
-            :thinking="roomState.ai?.status === 'running' && roomState.ai.thinkingPlayerID === player.id"
+            :thinking="
+              stateManager.viewMode.value === 'live' &&
+              roomState.ai?.status === 'running' &&
+              roomState.ai.thinkingPlayerID === player.id
+            "
+            :discussion-turn="discussionPlayerID === player.id"
             :voice-side="Math.sin((2 * Math.PI * i) / players.length + Math.PI) > 0.75 ? 'left' : 'right'"
             :private-decision="
               roomState.ai && !playerInGame && spectatorRoles[player.id]
@@ -129,6 +141,7 @@ import Timer from '@/components/feedback/Timer.vue';
 import GameTimer from '@/components/feedback/GameTimer.vue';
 import Game from '@/components/view/board/game/Game.vue';
 import StartPanel from '@/components/view/panels/StartPanel.vue';
+import BotGameTimer from '@/components/view/board/modules/BotGameTimer.vue';
 import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
 import CustomTimerControls from '@/components/view/board/modules/CustomTimerControls.vue';
@@ -169,6 +182,7 @@ export default defineComponent({
     Player,
     Game,
     StartPanel,
+    BotGameTimer,
     Timer,
     GameTimer,
     AnnounceLoyalty,
@@ -508,6 +522,12 @@ export default defineComponent({
       return !roomState.value.ai && store.state.profile?.id === roomState.value.leaderID;
     });
 
+    const discussionPlayerID = computed(() => {
+      const room = roomState.value;
+      if (stateManager.viewMode.value !== 'live' || room.stage !== 'started' || room.game.stage === 'end') return;
+      if (room.ai?.status === 'running' && room.ai.waitingForDiscussion) return room.ai.humanPlayerID;
+    });
+
     const calculateRotate = (i: number, negative: boolean = false) => {
       return `rotate(${negative ? '-' : ''}${(360 / players.value.length) * i + 180}deg)`;
     };
@@ -729,6 +749,7 @@ export default defineComponent({
       gameState,
       players,
       playerInGame,
+      discussionPlayerID,
       visibleHistory,
       stateManager,
       gameResult,
@@ -851,6 +872,15 @@ export default defineComponent({
   height: 340px;
   z-index: 1;
   position: absolute;
+}
+.bot-preparation-table .actions-container {
+  top: 0;
+  height: 600px;
+}
+@media (max-width: 600px), (max-height: 600px) {
+  .bot-action-timer {
+    zoom: calc(1 / var(--board-scale, 1));
+  }
 }
 
 .game-board {

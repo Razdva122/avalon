@@ -39,10 +39,18 @@ export type CodexModelOption = { id: string; label: string; efforts: string[] };
 
 export type AiLanguage = 'en' | 'ru' | 'zh-tw';
 export type AiPlayerCount = 5 | 6 | 7 | 8;
+export type AiBotDifficulty = 'smart' | 'regular';
 
 export type AiRoomState = {
-  /** Single administrator seat; absent in spectator-only bot matches. */
+  /** Single human seat; absent in spectator-only bot matches. */
   humanPlayerID?: string;
+  /** Public one-human/four-bot room, including its ready preparation stage. */
+  publicBotGame?: boolean;
+  title?: string;
+  launchExpiresAt?: number;
+  humanActionExpiresAt?: number;
+  /** Public human match with server-frozen model and reasoning settings. */
+  botDifficulty?: AiBotDifficulty;
   waitingForHuman?: boolean;
   waitingForDiscussion?: boolean;
   discussionPending?: boolean;

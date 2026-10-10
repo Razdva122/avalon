@@ -15,6 +15,11 @@ export const botOptions: GameOptions = {
 };
 
 type Choice = { text: string; actions: TGameMethodsParams[] };
+const humanTimeoutMessage: Record<AiLanguage, string> = {
+  en: 'Match stopped: the human player did not act within 90 seconds.',
+  ru: 'Партия завершена: человек не сделал ход за 90 секунд.',
+  'zh-tw': '對局已結束：真人玩家未在 90 秒內行動。',
+};
 function combinations(ids: string[], count: number): string[][] {
   if (count === 0) return [[]];
   return ids.flatMap((id, i) => combinations(ids.slice(i + 1), count - 1).map((tail) => [id, ...tail]));
@@ -27,6 +32,7 @@ export class BotRoom extends Room {
   private cancelled = false;
   private executing = false;
   private wakeHuman?: () => void;
+  private humanActionTimer?: ReturnType<typeof setTimeout>;
   private discussionMessages?: { since: number; existing: Set<string | undefined> };
   private missionChoices = new Map<string, Choice>();
   private discussion?: {
@@ -50,7 +56,7 @@ export class BotRoom extends Room {
     private decide: Decide,
     private checkpoint: (state: TRoomState) => Promise<void> = async () => {},
     private delayMs = 0,
-    private readonly language: AiLanguage = 'en',
+    private language: AiLanguage = 'en',
     playerCount: AiPlayerCount = 7,
   ) {
     if (![5, 6, 7, 8].includes(playerCount)) throw Error('Invalid AI player count');
@@ -109,6 +115,21 @@ export class BotRoom extends Room {
     delete this.ai!.profileRatingSeason;
   }
 
+  setLanguage(language: AiLanguage): void {
+    if (this.ai!.status !== 'ready' || this.data.stage !== 'locked' || !['en', 'ru', 'zh-tw'].includes(language))
+      throw Error('Discussion language can only be changed before launch');
+    this.language = language;
+    this.ai!.language = language;
+    this.ai!.message = aiText(language).ready;
+  }
+
+  private checkHumanDeadline(): void {
+    if (this.ai!.humanActionExpiresAt !== undefined && this.ai!.humanActionExpiresAt <= Date.now()) {
+      this.stop(humanTimeoutMessage[this.language]);
+      throw Error('Human action timed out');
+    }
+  }
+
   private councilComplete(): boolean {
     return (
       !this.councilPending &&
@@ -130,6 +151,7 @@ export class BotRoom extends Room {
   humanAction(userID: string, params: TGameMethodsParams): void {
     if (userID !== this.ai!.humanPlayerID || this.ai!.status !== 'running')
       throw Error('AI players are controlled by the server');
+    this.checkHumanDeadline();
     if (
       (params.method === 'sentSelectedPlayers' && this.ai!.discussionPending) ||
       (params.method === 'assassinate' && !this.councilComplete())
@@ -144,6 +166,7 @@ export class BotRoom extends Room {
   finishDiscussion(userID: string): void {
     if (userID !== this.ai!.humanPlayerID || this.ai!.status !== 'running' || !this.ai!.waitingForDiscussion)
       throw Error('Not your discussion turn');
+    this.checkHumanDeadline();
     if (this.manager.game.stage === 'assassinate') {
       if (
         this.councilSpoken.has(userID) ||
@@ -166,6 +189,12 @@ export class BotRoom extends Room {
       this.discussionMessages = { since: Date.now(), existing: new Set(this.chat.history.map((entry) => entry.id)) };
       this.ai!.waitingForDiscussion = true;
     }
+    if (this.ai!.publicBotGame) {
+      this.ai!.humanActionExpiresAt = Date.now() + 90000;
+      this.humanActionTimer = setTimeout(() => {
+        if (!this.cancelled && pending()) this.stop(humanTimeoutMessage[this.language]);
+      }, 90000);
+    }
     this.ai!.message = discussion ? aiText(this.language).waitingForDiscussion : aiText(this.language).waitingForHuman;
     this.updateRoomState(true);
     let leaseTimer: ReturnType<typeof setTimeout> | undefined;
@@ -176,6 +205,9 @@ export class BotRoom extends Room {
         this.wakeHuman = () => {
           if (this.cancelled || !pending()) {
             waiting = false;
+            clearTimeout(this.humanActionTimer);
+            this.humanActionTimer = undefined;
+            delete this.ai!.humanActionExpiresAt;
             resolve();
           }
         };
@@ -194,7 +226,10 @@ export class BotRoom extends Room {
     } finally {
       waiting = false;
       clearTimeout(leaseTimer);
+      clearTimeout(this.humanActionTimer);
+      this.humanActionTimer = undefined;
       this.wakeHuman = undefined;
+      delete this.ai!.humanActionExpiresAt;
       delete this.ai!.waitingForHuman;
       delete this.ai!.waitingForDiscussion;
       this.discussionMessages = undefined;
@@ -222,14 +257,20 @@ export class BotRoom extends Room {
     throw Error('Use AI room controls');
   }
 
-  stop() {
+  stop(message = 'Match stopped.') {
     this.cancelled = true;
     this.wakeHuman?.();
+    clearTimeout(this.humanActionTimer);
+    this.humanActionTimer = undefined;
+    delete this.ai!.humanActionExpiresAt;
+    delete this.ai!.waitingForHuman;
+    delete this.ai!.waitingForDiscussion;
+    delete this.ai!.discussionPending;
     delete this.ai!.thinkingPlayerID;
     this.abort.abort();
     this.ai!.status = 'stopped';
     this.ai!.canResumeTechnical = false;
-    this.ai!.message = 'Stopped by the administrator.';
+    this.ai!.message = message;
     if (this.data.stage === 'started' && this.data.manager.game.stage !== 'end')
       this.data.manager.game.endGame('manualy');
     this.updateRoomState(true);

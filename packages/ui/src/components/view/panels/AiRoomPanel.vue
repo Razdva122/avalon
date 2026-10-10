@@ -10,7 +10,7 @@
     <details class="ai-disclosure">
       <summary>
         <span class="ai-heading"
-          ><strong>{{ $t('aiArena.title') }}</strong
+          ><strong>{{ ai.title || $t('aiArena.title') }}</strong
           ><small>{{
             $t(ai.humanPlayerID ? 'aiArena.mixedPlayerCount' : 'aiArena.playerCount', {
               count: displayPlayerCount - (ai.humanPlayerID ? 1 : 0),
@@ -31,9 +31,16 @@
               : ai.message
           }}
         </p>
-        <p v-if="ai.model === 'codex-chatgpt'">{{ $t('aiArena.codexSubscription') }}</p>
+        <p v-if="!ai.publicBotGame && !ai.botDifficulty && ai.model === 'codex-chatgpt'">
+          {{ $t('aiArena.codexSubscription') }}
+        </p>
         <CodexWeeklyLimit v-if="canManage && ai.model === 'codex-chatgpt'" />
-        <div v-if="canManage && ai.model === 'codex-chatgpt' && ai.status === 'ready'" class="codex-settings">
+        <div
+          v-if="
+            canManage && !ai.publicBotGame && !ai.botDifficulty && ai.model === 'codex-chatgpt' && ai.status === 'ready'
+          "
+          class="codex-settings"
+        >
           <label>
             <span>{{ $t('aiArena.codexModel') }}</span>
             <select v-model="codexModel" :disabled="busy || !codexModels.length">
@@ -53,14 +60,16 @@
           </label>
           <p v-if="!codexModels.length" role="status">{{ $t('aiArena.codexModelsUnavailable') }}</p>
         </div>
-        <p v-if="ai.codex && ai.status !== 'ready'">{{ ai.codex.model }} · {{ ai.codex.reasoning }}</p>
+        <p v-if="!ai.publicBotGame && !ai.botDifficulty && ai.codex && ai.status !== 'ready'">
+          {{ ai.codex.model }} · {{ ai.codex.reasoning }}
+        </p>
         <v-btn v-if="canReveal" class="mt-2" :loading="revealing" :aria-pressed="rolesShown" @click="toggleRoles">
           {{ $t(rolesShown ? 'aiArena.hideRoles' : 'aiArena.revealRoles') }}
         </v-btn>
         <p v-if="rolesShown">{{ $t('aiArena.rolesHint') }}</p>
         <p v-if="rolesShown">{{ $t('aiArena.privateDecisionsHint') }}</p>
         <p v-if="rolesShown && decisionsError" role="status">{{ $t('aiArena.connectionError') }}</p>
-        <div v-if="canManage" class="ai-controls">
+        <div v-if="canControl" class="ai-controls">
           <v-btn
             v-if="canJoin && ai.status === 'ready' && !ai.humanPlayerID"
             color="primary"
@@ -70,10 +79,10 @@
             >{{ $t('aiArena.playWithBots') }}</v-btn
           >
           <v-btn
-            v-if="ai.status === 'ready'"
+            v-if="ai.status === 'ready' && !ai.publicBotGame"
             color="success"
             :loading="busy"
-            :disabled="ai.model === 'codex-chatgpt' && !efforts.length"
+            :disabled="busy || (!ai.botDifficulty && ai.model === 'codex-chatgpt' && !efforts.length)"
             @click="control('start')"
             >{{ $t('aiArena.start') }}</v-btn
           >
@@ -118,6 +127,9 @@ const props = defineProps<{
 }>();
 const { t } = useI18n();
 const { canManage, codexModels, refresh } = useAiAccess();
+const canControl = computed(
+  () => canManage.value || (Boolean(props.ai.publicBotGame || props.ai.botDifficulty) && props.isHumanPlayer === true),
+);
 const displayPlayerCount = computed(() => props.ai.playerCount ?? props.playerCount ?? 7);
 const displayLanguage = computed(
   () => ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）' })[props.ai.language || 'en'],
@@ -244,7 +256,7 @@ async function control(action: 'start' | 'stop' | 'resumeTechnical') {
   busy.value = true;
   error.value = '';
   try {
-    if (action === 'start' && props.ai.model === 'codex-chatgpt') {
+    if (action === 'start' && !props.ai.botDifficulty && props.ai.model === 'codex-chatgpt') {
       const configured = await socket.timeout(30000).emitWithAck('configureAiCodex', props.roomID, {
         model: codexModel.value,
         reasoning: codexReasoning.value,

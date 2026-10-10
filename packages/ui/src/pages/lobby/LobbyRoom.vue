@@ -5,7 +5,7 @@
     :to="{ name: 'room', params: { uuid: game.uuid } }"
     :aria-label="
       game.ai
-        ? `${$t('aiArena.title')}. ${$t('aiArena.language', { language: aiLanguageLabel })}. ${aiStatusLabel}. ${aiAction}`
+        ? `${game.aiTitle || $t('aiArena.title')}. ${$t('aiArena.language', { language: aiLanguageLabel })}. ${aiStatusLabel}. ${aiAction}`
         : `${$t(`mainPage.${action}`)} — ${userName}. ${$t(`mainPage.${status}`)}`
     "
   >
@@ -22,9 +22,11 @@
           <div class="ai-eyebrow">
             {{ $t('aiArena.title') }} <span>{{ aiLanguageLabel }}</span>
           </div>
-          <span class="ai-title">{{ $t('aiArena.tagline', { count: game.players }) }}</span>
-          <span class="ai-subtitle">{{ $t('aiArena.subtitle') }}</span>
-          <span v-if="game.aiModel" class="ai-subtitle">{{ $t('aiArena.model', { model: game.aiModel }) }}</span>
+          <span class="ai-title">{{ game.aiTitle || $t('aiArena.tagline', { count: game.players }) }}</span>
+          <span class="ai-subtitle">{{ $t(game.aiTitle ? 'aiArena.botTable' : 'aiArena.subtitle') }}</span>
+          <span v-if="game.aiModel && !game.aiTitle" class="ai-subtitle">{{
+            $t('aiArena.model', { model: game.aiModel })
+          }}</span>
         </div>
       </div>
       <div v-if="!game.ai" class="game-name">
