@@ -36,28 +36,16 @@ Add to `packages/backend/.env.local` (ignored by Git):
 
 ```dotenv
 AI_ROOMS_ENABLED=true
-YANDEX_API_KEY=your-key
-YANDEX_FOLDER_ID=your-folder
-YANDEX_MODEL=qwen3.6-35b-a3b
-AI_TOTAL_BUDGET_RUB=700
-AI_MATCH_BUDGET_RUB=100
-```
-
-For Codex instead of, or alongside, Yandex:
-
-```dotenv
-AI_ROOMS_ENABLED=true
 AI_CODEX_ENABLED=true
-# Optional paths to an installed/authenticated CLI and its profile:
+# Optional local CLI/profile paths:
 # AI_CODEX_BIN=/absolute/path/to/codex
 # AI_CODEX_HOME=/absolute/path/to/profile
 ```
 
-Codex must be authenticated with ChatGPT. The backend discovers available models
-and reasoning levels from that account; API-key billing is not used by this
-runner. Yandex credentials are unnecessary when only Codex is configured.
-The model catalogue shown for Yandex contains Qwen3.6 35B and DeepSeek V4 Flash;
-`YANDEX_MODEL` selects the default, while each room retains its chosen model.
+Codex is the only supported provider and must be authenticated with ChatGPT.
+The backend discovers available models and reasoning levels from that account.
+There is no paid API fallback. For a separate worker, follow the remote SSH setup
+in [Codex production](../deploy/codex-production.md).
 
 Restart backend after environment changes. Management requires `isAdmin: true`
 on the verified account in the selected MongoDB database. A username or client
@@ -87,29 +75,18 @@ Only permitted private knowledge is supplied to each bot. Spectator role reveal
 is AI-only; it must never expose hidden roles in human games. Public room state
 omits private model traces and subscription quotas.
 
-## Budgets, pacing and pauses
+## Subscription, pacing and pauses
 
-| Mode        | Yandex shared budget                | Initial per-game cap | Message pacing |
-| ----------- | ----------------------------------- | -------------------- | -------------- |
-| Development | 700 RUB lifetime experiment         | 100 RUB              | 2 seconds      |
-| Production  | 3000 RUB per 30 calendar days (MSK) | 200 RUB              | 10 seconds     |
-
-Environment overrides may lower the initial caps. Production periods are anchored
-at first budget access/creation and renew automatically; they are neither calendar
-months nor rolling windows. Spending and reservations survive restarts.
-The administrator can explicitly continue a game with a doubled room cap
-(first default production continuation: 200 → 400 RUB). This preserves previous
-spending and does not increase the shared cap. Never reset ledgers to resume a game.
-
-Yandex reserves before dispatch and settles confirmed token usage. Codex records
-subscription/token usage separately; the UI does not show it as a RUB charge.
+Messages are paced at two seconds in development and ten seconds in production.
+Codex records subscription token usage; there is no RUB budget or per-game paid
+API charge. Model selection and reasoning use the authenticated Codex catalog.
 The weekly Codex quota is account-wide, read through the same local/remote provider,
 cached one minute on success and ten seconds on failure. Missing data means
 unavailable, not zero remaining quota. Model price comparisons are estimates from
 the checked-in pricing table, not a bill or prediction of subscription consumption.
 
 Model requests have a ten-minute timeout and a twelve-minute ownership lease.
-The technical limit is 400 calls for 5–7 bots and 450 for eight. Budget/provider
+The technical limit is 400 calls for 5–7 bots and 450 for eight. Provider
 failures pause the game instead of inventing a move. Completed discussion,
 final selection and votes are retained for continuation; persisted message IDs
 prevent duplicate publication. A backend restart is not a live-game resume protocol.
@@ -117,16 +94,15 @@ prevent duplicate publication. A backend restart is not a live-game resume proto
 ## Persistence and retention
 
 MongoDB stores replay state, public messages, model requests, private traces,
-aggregate costs and archived room budgets. AI profile statistics use their own
+subscription usage and private decision traces. AI profile statistics use their own
 rating season/pool. Completed human games and human rating models remain separate.
-See [accounting and diagnostic retention](ai-storage-retention.md) before changing
-TTL settings or interpreting a charge after a crash. Public chat uses the shared
+See [diagnostic retention](ai-storage-retention.md) before changing TTL settings. Public chat uses the shared
 [persistent room chat](room-chat.md) service.
 
 ## Production and verification
 
-Follow [Yandex production configuration](../deploy/ai-production.md) or
-[Codex production setup](../deploy/codex-production.md). Current code allows Codex
+Follow [production configuration](../deploy/ai-production.md) and
+[Codex setup](../deploy/codex-production.md). Current code allows Codex
 in both development and production when explicitly enabled. The production image
 contains the pinned CLI and OpenSSH client; remote mode keeps ChatGPT credentials
 on the worker VM.
@@ -141,8 +117,7 @@ npm run build:ui
 ```
 
 Tests use mocked model responses; provider authentication and complete gameplay
-need a separately supervised live check. `src/ai/evaluate.ts` performs real paid
-Yandex calls when invoked and is not part of the ordinary test suite.
+need a separately supervised live check. Tests never start paid inference requests.
 
 Historical experiments, intermediate budgets and measured games are preserved in
 [the September–October experiment notes](history/ai-experiment-2026-09-21-to-2026-10-03.md).

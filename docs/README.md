@@ -35,7 +35,7 @@ defaults. NOWPayments is retired; support uses direct BTC/USDT transfers.
 ## Operations and maintenance
 
 - [Миграции базы данных](database-migrations.ru.md)
-- [AI accounting and diagnostic retention](ai-storage-retention.md)
+- [AI ownership and diagnostic retention](ai-storage-retention.md)
 - [Security hardening — 27 September 2026](security-hardening.md)
 - [Восстановление пароля: Yandex Cloud и выкладка через Docker Compose](production-password-recovery.ru.md)
 - [AI games: production configuration](../deploy/ai-production.md)

@@ -69,10 +69,7 @@ test('AI persistence rejects object and array IDs before touching the database',
     },
   } as unknown as Db);
   for (const id of [['room'], { $ne: null }, '', 'bad.id', 'x'.repeat(81)]) {
-    for (const method of ['load', 'claim', 'release', 'roomCost', 'roomLimit'] as const)
+    for (const method of ['load', 'claim', 'release', 'renewLease'] as const)
       await expect(repo[method](id as string)).rejects.toThrow('Invalid ID');
-    await expect(repo.reserve(id as string, 1)).rejects.toThrow('Invalid ID');
-    await expect(repo.settle(id as string, 1, 1)).rejects.toThrow('Invalid ID');
-    await expect(repo.doubleMatchLimit(id as string, 1)).rejects.toThrow('Invalid ID');
   }
 });

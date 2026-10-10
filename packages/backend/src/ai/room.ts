@@ -3,7 +3,7 @@ import { Room } from '@/room';
 import { AI_PROFILE_RATING_SEASON } from './rating-season';
 import type { AiLanguage, AiPlayerCount, GameOptions, Server, TRoomState, AiSpectatorDecision } from '@avalon/types';
 import type { TGameMethodsParams } from '@/core/game-manager';
-import { AiPause, AiTechnicalPause, AiMatchBudgetPause, type Decide, type BotRequest, type BotReply } from './client';
+import { AiPause, AiTechnicalPause, type Decide, type BotRequest, type BotReply } from './client';
 import { aiText, isAfterGameSpeech, isVoteOnly } from './language';
 
 import { BOT_AGENTS, selectBotAgents } from './agents';
@@ -29,7 +29,6 @@ export class BotRoom extends Room {
   private wakeHuman?: () => void;
   private discussionMessages?: { since: number; existing: Set<string | undefined> };
   private missionChoices = new Map<string, Choice>();
-  budgetResumeUnits = 0;
   private discussion?: {
     spoken: Set<string>;
     finalTeam?: Choice;
@@ -90,7 +89,6 @@ export class BotRoom extends Room {
       playerCount,
       status: 'ready',
       profileRatingSeason: AI_PROFILE_RATING_SEASON,
-      costRub: 0,
       fallbacks: 0,
       message: aiText(language).ready,
     };
@@ -230,7 +228,6 @@ export class BotRoom extends Room {
     delete this.ai!.thinkingPlayerID;
     this.abort.abort();
     this.ai!.status = 'stopped';
-    this.ai!.canResumeBudget = false;
     this.ai!.canResumeTechnical = false;
     this.ai!.message = 'Stopped by the administrator.';
     if (this.data.stage === 'started' && this.data.manager.game.stage !== 'end')
@@ -647,21 +644,17 @@ export class BotRoom extends Room {
     }
   }
 
-  async run(resumeBudget = false, resumeTechnical = false) {
+  async run(resumeTechnical = false) {
     if (
       this.executing ||
-      (resumeBudget || resumeTechnical
-        ? this.ai!.status !== 'paused' || !(resumeBudget ? this.ai!.canResumeBudget : this.ai!.canResumeTechnical)
-        : this.ai!.status !== 'ready')
+      (resumeTechnical ? this.ai!.status !== 'paused' || !this.ai!.canResumeTechnical : this.ai!.status !== 'ready')
     )
       return;
     this.executing = true;
-    this.ai!.canResumeBudget = false;
     this.ai!.canResumeTechnical = false;
-    this.budgetResumeUnits = 0;
     this.ai!.status = 'running';
     try {
-      if (!resumeBudget && !resumeTechnical) super.startGame();
+      if (!resumeTechnical) super.startGame();
       while (!this.cancelled && this.manager.game.stage !== 'end') {
         await this.act();
         await this.checkpoint(this.calculateRoomState());
@@ -686,9 +679,7 @@ export class BotRoom extends Room {
       }
     } catch (error) {
       if (this.cancelled) return;
-      this.ai!.canResumeBudget = error instanceof AiMatchBudgetPause;
       this.ai!.canResumeTechnical = error instanceof AiTechnicalPause;
-      this.budgetResumeUnits = error instanceof AiMatchBudgetPause ? error.reserveUnits : 0;
       this.ai!.status = 'paused';
       this.ai!.message =
         error instanceof AiPause ? error.message : 'Match paused due to an error. No further requests will be made.';

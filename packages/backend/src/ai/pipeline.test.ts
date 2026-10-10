@@ -1,5 +1,5 @@
 import { decisionPipeline, publicContext, safePublicSpeech } from './pipeline';
-import { AiOutputLimit, AiPause } from './client';
+import { AiPause } from './client';
 import type { BotRequest } from './client';
 import type { VisualGameState } from '@avalon/types';
 const request: BotRequest = {
@@ -16,6 +16,7 @@ const request: BotRequest = {
   choices: ['approve', 'reject'],
   privateCheck: 'evil',
 };
+
 test('technical resume requests a fresh decision after an invalid choice', async () => {
   const generate = jest
     .fn()
@@ -27,6 +28,7 @@ test('technical resume requests a fresh decision after an invalid choice', async
   await expect(decide(input)).resolves.toMatchObject({ choice: 1 });
   expect(generate).toHaveBeenCalledTimes(2);
 });
+
 test('voting analysis receives off-team votes and mission links without treating forced approval as support', async () => {
   const players = Array.from({ length: 7 }, (_, i) => ({
     id: String(i + 1),
@@ -83,6 +85,7 @@ test('voting analysis receives off-team votes and mission links without treating
   expect(c.privateKnowledge.rolesVisibleToYou).toEqual(players.map((p) => [p.index, p.role]));
   expect(generate.mock.calls[0][0].choices).toEqual(['approve', 'reject']);
 });
+
 test('secret cards need one call and never publish the justification', async () => {
   const generate = jest.fn().mockResolvedValue({ choice: 0, speech: 'Sabotage now.' });
   expect(
@@ -90,6 +93,7 @@ test('secret cards need one call and never publish the justification', async () 
   ).toEqual({ choice: 0, speech: '', privateReason: 'Sabotage now.' });
   expect(generate).toHaveBeenCalledTimes(1);
 });
+
 test.each(['servant', 'mordred'])(
   'Lady counteraccusation keeps %s private alignment separate from public testimony',
   async (role) => {
@@ -121,6 +125,7 @@ test.each(['servant', 'mordred'])(
     expect(reply.choice).toBe(1);
   },
 );
+
 test('council speech uses the decision response and failures pause without a fallback action', async () => {
   const generate = jest.fn().mockResolvedValue({ choice: 0, speech: '1 could be Merlin.' });
   await decisionPipeline(generate)({ ...request, councilDiscussion: true });
@@ -128,6 +133,7 @@ test('council speech uses the decision response and failures pause without a fal
   const broken = jest.fn().mockRejectedValueOnce(Error('HTTP'));
   await expect(decisionPipeline(broken)(request)).rejects.toThrow('Match paused');
 });
+
 test('decision notes remain isolated between players and bounded to four entries', async () => {
   const generate = jest.fn().mockResolvedValue({ choice: 0, speech: 'Private clue.' });
   const decide = decisionPipeline(generate);
@@ -136,6 +142,7 @@ test('decision notes remain isolated between players and bounded to four entries
   await decide({ ...request, playerID: 'other', speak: false });
   expect(generate.mock.calls[6][1].context.previousDecisions).toEqual([]);
 });
+
 test('public mission data strips own card and hidden individual cards', () => {
   const r = {
     ...request,
@@ -172,57 +179,14 @@ test('public sabotage confessions are replaced but ordinary suspicions remain', 
   expect(safePublicSpeech('I suspect 2 is evil.', 'reject')).toBe('I suspect 2 is evil.');
 });
 
-test('retries a token-limited decision once with identical facts and preserves reasoning on the bounded retry', async () => {
-  const generate = jest
-    .fn()
-    .mockRejectedValueOnce(new AiOutputLimit(4096))
-    .mockResolvedValueOnce({ choice: 1, speech: 'Private reason.', publicReason: 'I need stronger evidence.' });
-  expect(await decisionPipeline(generate)(request)).toEqual({
-    choice: 1,
-    speech: 'I need stronger evidence.',
-    privateReason: 'Private reason.',
-  });
-  expect(generate).toHaveBeenCalledTimes(2);
-  expect(generate.mock.calls[0][1]).toMatchObject({ maxOutput: 20000, reasoning: 'default' });
-  expect(generate.mock.calls[1][1]).toMatchObject({
-    maxOutput: 20000,
-    reasoning: 'default',
-    phase: 'decision-retry',
-  });
-  expect(generate.mock.calls[1][1].instructions.length).toBeLessThan(generate.mock.calls[0][1].instructions.length);
-  expect(generate.mock.calls[1][1].context.modelHypotheses).toBeUndefined();
-  expect(generate.mock.calls[1][1].context.completedMissions).toEqual(
-    generate.mock.calls[0][1].context.completedMissions,
-  );
-  expect(generate.mock.calls[1][0]).toEqual(generate.mock.calls[0][0]);
-});
-
-test('a second token limit pauses with an explicit reason instead of a third attempt', async () => {
-  const generate = jest
-    .fn()
-    .mockRejectedValueOnce(new AiOutputLimit(4096))
-    .mockRejectedValueOnce(new AiOutputLimit(20000));
-  await expect(decisionPipeline(generate)(request)).rejects.toThrow('20000');
-  expect(generate).toHaveBeenCalledTimes(2);
-});
-
-test('an explicitly selected non-reasoning mode remains unchanged on retry', async () => {
-  const generate = jest
-    .fn()
-    .mockRejectedValueOnce(new AiOutputLimit(640))
-    .mockResolvedValueOnce({ choice: 1, speech: 'Private reason.' });
-  await decisionPipeline(generate, 'none')({ ...request, speak: false });
-  expect(generate.mock.calls[1][1]).toMatchObject({ reasoning: 'none', maxOutput: 640, phase: 'decision-retry' });
-});
-
-test('budget errors and cancellation prevent additional requests', async () => {
-  const blocked = jest.fn().mockRejectedValue(new AiPause('budget'));
-  await expect(decisionPipeline(blocked)(request)).rejects.toThrow('budget');
+test('provider errors and cancellation prevent additional requests', async () => {
+  const blocked = jest.fn().mockRejectedValue(new AiPause('provider unavailable'));
+  await expect(decisionPipeline(blocked)(request)).rejects.toThrow('provider unavailable');
   expect(blocked).toHaveBeenCalledTimes(1);
   const controller = new AbortController();
   const cancelled = jest.fn().mockImplementation(async () => {
     controller.abort();
-    throw new AiOutputLimit(4096);
+    throw new AiPause('cancelled');
   });
   await expect(decisionPipeline(cancelled)(request, controller.signal)).rejects.toThrow();
   expect(cancelled).toHaveBeenCalledTimes(1);
@@ -257,11 +221,9 @@ test('evidence outlives four turns and public speech receives only the intended 
   expect((await decide(request)).speech).toBe('Mission 2 exposed 2, 5 and 6.');
 });
 
-test('post-game review has a bounded output and excludes live decision memory', async () => {
+test('post-game review excludes live decision memory', async () => {
   const generate = jest.fn().mockResolvedValue({ choice: 0, speech: 'We lost.' });
   await decisionPipeline(generate)({ ...request, state: { ...request.state, stage: 'end' } });
-  expect(generate.mock.calls[0][1].reasoning).toBe('default');
-  expect(generate.mock.calls[0][1].maxOutput).toBe(20000);
   expect(generate.mock.calls[0][1].context).not.toHaveProperty('previousDecisions');
 });
 
@@ -478,11 +440,11 @@ test('review records when a leader could submit a team silently', async () => {
   });
 });
 
-test('review can resume after a budget pause without a separate draft checker', async () => {
-  const { AiMatchBudgetPause } = await import('./client');
+test('review can resume after a provider pause without a separate draft checker', async () => {
+  const { AiPause } = await import('./client');
   const generate = jest
     .fn()
-    .mockRejectedValueOnce(new AiMatchBudgetPause('Budget', 1000))
+    .mockRejectedValueOnce(new AiPause('Interrupted decision'))
     .mockResolvedValueOnce({ choice: 0, speech: 'Corrected factual review.' });
   const decide = decisionPipeline(generate);
   const r = {
@@ -503,7 +465,7 @@ test('review can resume after a budget pause without a separate draft checker', 
       ],
     },
   } as unknown as BotRequest;
-  await expect(decide(r)).rejects.toBeInstanceOf(AiMatchBudgetPause);
+  await expect(decide(r)).rejects.toBeInstanceOf(AiPause);
   expect((await decide(r)).speech).toBe('Corrected factual review.');
   expect(generate.mock.calls.map(([, options]) => options.phase)).toEqual(['review', 'review']);
   expect(generate.mock.calls[1][1].context.missions[0]).toMatchObject({ n: 5, failsRequired: 1, fails: 1 });

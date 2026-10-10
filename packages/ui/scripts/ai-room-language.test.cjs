@@ -34,12 +34,9 @@ async function fixture(
   const navigation = [];
   const access = {
     canManage: vue.ref(true),
-    budget: vue.ref(undefined),
     models: vue.ref([]),
     defaultModel: vue.ref('codex-chatgpt'),
     activeRoomID: vue.ref(activeRoomID),
-    costs: vue.ref({}),
-    limits: vue.ref({}),
     codexModels: vue.ref([]),
     refresh: async () => {},
   };
@@ -81,10 +78,7 @@ async function fixture(
   const render = evaluate(template.code).render;
   const scope = vue.effectScope();
   const state = scope.run(() => component.setup(vue.reactive(props), { expose() {}, emit() {} }));
-  access.models.value = [
-    { id: 'codex-chatgpt', label: 'Codex' },
-    { id: 'yandex', label: 'Yandex' },
-  ];
+  access.models.value = [{ id: 'codex-chatgpt', label: 'Codex' }];
   await vue.nextTick();
   let tree;
   const renderHtml = () => {
@@ -123,8 +117,8 @@ test('native language selection sends the chosen language when creating an AI ro
   const room = await fixture('pages/lobby/AiRoomButton.vue');
   t.after(room.stop);
   const selects = room.nodes('select');
-  assert.equal(selects.length, 3, 'new-room controls need model, discussion language and player count selects');
-  const language = selects[1];
+  assert.equal(selects.length, 2, 'new-room controls need discussion language and player count selects');
+  const language = selects[0];
   assert.deepEqual(
     room.nodes('option', language).map((option) => [option.props.value, option.children]),
     [
@@ -134,10 +128,9 @@ test('native language selection sends the chosen language when creating an AI ro
     ],
   );
   assert.match(room.html, /<label[^>]*><span>Discussion language<\/span>\s*<select/);
-  selects[0].props['onUpdate:modelValue']('yandex');
   language.props['onUpdate:modelValue']('zh-tw');
   await room.nodes('v-btn')[0].props.onClick();
-  assert.deepEqual(room.sent, [['createAiRoom', { model: 'yandex', language: 'zh-tw', playerCount: 7 }]]);
+  assert.deepEqual(room.sent, [['createAiRoom', { model: 'codex-chatgpt', language: 'zh-tw', playerCount: 7 }]]);
   assert.deepEqual(room.navigation, [{ name: 'room', params: { uuid: 'created-room' } }]);
 });
 
@@ -152,7 +145,7 @@ for (const playerCount of [5, 6, 7, 8]) {
   test(`native player count selection creates a ${playerCount}-bot room`, async (t) => {
     const room = await fixture('pages/lobby/AiRoomButton.vue');
     t.after(room.stop);
-    const count = room.nodes('select')[2];
+    const count = room.nodes('select')[1];
     assert.ok(count, 'missing player count control');
     assert.deepEqual(
       room.nodes('option', count).map((option) => option.props.value),
@@ -176,7 +169,7 @@ test('new-room selects stay disabled while creation awaits acknowledgement', asy
   t.after(room.stop);
   const opening = room.nodes('v-btn')[0].props.onClick();
   await room.render();
-  assert.equal(room.nodes('select').length, 3);
+  assert.equal(room.nodes('select').length, 2);
   assert.ok(room.nodes('select').every((select) => select.props.disabled));
   finish({ roomID: 'created-room' });
   await opening;
@@ -196,7 +189,7 @@ test('opening an active AI room navigates without creating or changing its langu
 test('opening a newly active room ignores the draft bot count', async (t) => {
   const room = await fixture('pages/lobby/AiRoomButton.vue');
   t.after(room.stop);
-  const count = room.nodes('select')[2];
+  const count = room.nodes('select')[1];
   assert.ok(count, 'missing player count control');
   count.props['onUpdate:modelValue'](5);
   room.access.activeRoomID.value = 'active-room';
@@ -219,7 +212,11 @@ test('room panel summary uses the saved count, the legacy seat count, then seven
     [undefined, undefined, 7],
   ]) {
     const room = await fixture('components/view/panels/AiRoomPanel.vue', {
-      props: { roomID: 'room', playerCount: seats, ai: { model: 'yandex', status: 'ready', playerCount: saved } },
+      props: {
+        roomID: 'room',
+        playerCount: seats,
+        ai: { model: 'codex-chatgpt', status: 'ready', playerCount: saved },
+      },
     });
     t.after(room.stop);
     assert.match(room.html, new RegExp(`<summary>[\\s\\S]*?<small>${expected} bots<\\/small>[\\s\\S]*?<\\/summary>`));
@@ -234,7 +231,7 @@ test('room panel displays saved discussion languages and defaults legacy rooms t
     ['zh-tw', '繁體中文（台灣）'],
   ]) {
     const room = await fixture('components/view/panels/AiRoomPanel.vue', {
-      props: { roomID: 'room', ai: { model: 'yandex', status: 'ready', language } },
+      props: { roomID: 'room', ai: { model: 'codex-chatgpt', status: 'ready', language } },
     });
     t.after(room.stop);
     assert.ok(room.html.includes(`Discussion language: ${label}`), `missing saved-language display for ${language}`);
@@ -246,11 +243,11 @@ test('all interface locales provide language control and saved-language labels',
     const room = await fixture('pages/lobby/AiRoomButton.vue', { locale });
     const panel = await fixture('components/view/panels/AiRoomPanel.vue', {
       locale,
-      props: { roomID: 'room', ai: { model: 'yandex', status: 'ready', language: 'ru' } },
+      props: { roomID: 'room', ai: { model: 'codex-chatgpt', status: 'ready', language: 'ru' } },
     });
     t.after(room.stop);
     t.after(panel.stop);
-    assert.equal(room.nodes('select').length, 3);
+    assert.equal(room.nodes('select').length, 2);
     assert.ok(!room.html.includes('aiArena.selectLanguage'), `${locale} is missing the select label`);
     assert.ok(!room.html.includes('aiArena.selectPlayerCount'), `${locale} is missing the bot count label`);
     assert.ok(!panel.html.includes('aiArena.playerCount'), `${locale} is missing the saved count label`);
@@ -307,7 +304,7 @@ test('lobby badges identify each saved AI room language and default legacy rooms
 });
 
 test('administrator owner joins from the ready panel; visitors and launched games have no join control', async (t) => {
-  const props = { roomID: 'mixed', canJoin: true, ai: { model: 'yandex', status: 'ready', playerCount: 7 } };
+  const props = { roomID: 'mixed', canJoin: true, ai: { model: 'codex-chatgpt', status: 'ready', playerCount: 7 } };
   const room = await fixture('components/view/panels/AiRoomPanel.vue', {
     props,
     acknowledge: async () => ({ ok: true }),

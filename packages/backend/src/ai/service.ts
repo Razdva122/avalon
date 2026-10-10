@@ -1,12 +1,10 @@
 import { aiPlayedModel } from '@avalon/types';
-import { aiModel, AI_MODELS, DEFAULT_AI_MODEL } from './models';
 import type { AiLanguage, AiPlayerCount, ServerSocket, TRoomInfo } from '@avalon/types';
 import type { Manager } from '@/main';
 import { randomUUID } from 'crypto';
 import { AiRepository } from './repository';
 import { BotRoom } from './room';
 import { AiPause } from './client';
-import { separatedDecide } from './pipeline';
 import { decisionPipeline } from './pipeline';
 import { getCodexModels, validateCodexSettings } from './codex-models';
 import { getCodexWeeklyLimit } from './codex-limits';
@@ -24,23 +22,13 @@ export class AiService {
   constructor(private manager: Manager) {
     const db = manager.dbManager.dbInstance?.connection.db;
     if (db) this.archive = new AiRepository(db);
-    if (
-      process.env.AI_ROOMS_ENABLED === 'true' &&
-      db &&
-      (codexEnabled() || (process.env.YANDEX_API_KEY && process.env.YANDEX_FOLDER_ID))
-    )
-      this.repository = new AiRepository(
-        db,
-        Number(process.env.AI_TOTAL_BUDGET_RUB || (process.env.NODE_ENV === 'production' ? 3000 : 700)),
-        Number(process.env.AI_MATCH_BUDGET_RUB || (process.env.NODE_ENV === 'production' ? 200 : 100)),
-        process.env.NODE_ENV === 'production' ? { periodDays: 30, ledgerID: 'avalon-ai-production-v1' } : {},
-      );
+    if (process.env.AI_ROOMS_ENABLED === 'true' && db && codexEnabled()) this.repository = new AiRepository(db);
   }
   private active() {
     return Object.values(this.manager.rooms).find((r) => r.ai && ['ready', 'running', 'paused'].includes(r.ai.status));
   }
   async canManage(userID?: string): Promise<boolean> {
-    if (!this.repository || !userID) return false;
+    if (!this.repository || !userID || !codexEnabled()) return false;
     try {
       const profile = await this.manager.dbManager.getUserByID(userID);
       return profile.isAdmin === true;
@@ -97,39 +85,6 @@ export class AiService {
         decisions: room.spectatorDecisions,
       });
     });
-    socket.on('getAiBudget', async (cb) => {
-      if (typeof cb !== 'function') return;
-      try {
-        if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
-        cb({ budget: await this.repository!.budget() });
-      } catch {
-        cb({ error: 'Could not load AI budget' });
-      }
-    });
-    socket.on('getAiRoomCosts', async (ids, cb) => {
-      if (typeof cb !== 'function') return;
-      try {
-        if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
-        if (
-          !Array.isArray(ids) ||
-          ids.length > 50 ||
-          ids.some((id) => typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id))
-        )
-          return cb({ error: 'Invalid room IDs' });
-        const costs: Record<string, number> = {};
-        const limits: Record<string, number> = {};
-        for (const id of new Set(ids)) {
-          const state = this.manager.rooms[id] || (await this.repository!.load(id));
-          if (state?.ai && typeof state.ai.costRub === 'number') {
-            costs[id] = state.ai.costRub;
-            limits[id] = await this.repository!.roomLimit(id);
-          }
-        }
-        cb({ costs, limits });
-      } catch {
-        cb({ error: 'Could not load AI costs' });
-      }
-    });
     socket.on('getAiCodexWeeklyLimit', async (cb) => {
       if (typeof cb !== 'function') return;
       try {
@@ -157,18 +112,8 @@ export class AiService {
             ? {
                 canManage,
                 roomID: this.active()?.roomID,
-                models: [
-                  ...(codexEnabled() && !(process.env.YANDEX_API_KEY && process.env.YANDEX_FOLDER_ID)
-                    ? []
-                    : Object.entries(AI_MODELS).map(([id, model]) => ({ id, label: model.label }))),
-                  ...(codexEnabled() ? [{ id: CODEX_MODEL, label: 'Codex · ChatGPT' }] : []),
-                ],
-                defaultModel:
-                  codexEnabled() && !(process.env.YANDEX_API_KEY && process.env.YANDEX_FOLDER_ID)
-                    ? CODEX_MODEL
-                    : Object.prototype.hasOwnProperty.call(AI_MODELS, process.env.YANDEX_MODEL || '')
-                      ? process.env.YANDEX_MODEL
-                      : DEFAULT_AI_MODEL,
+                models: [{ id: CODEX_MODEL, label: 'Codex · ChatGPT' }],
+                defaultModel: CODEX_MODEL,
               }
             : { canManage },
         );
@@ -196,38 +141,24 @@ export class AiService {
           selectedModel = options.model;
           language = options.language;
         }
+        if (selectedModel !== CODEX_MODEL) return cb({ error: 'Only Codex is supported' });
         if (this.active()) return cb({ roomID: this.active()!.roomID });
         if (this.creating || this.starting || this.running.size) return cb({ error: 'AI room is being created' });
         this.creating = true;
         try {
-          let model: string;
-          try {
-            model = selectedModel === CODEX_MODEL && codexEnabled() ? CODEX_MODEL : aiModel(selectedModel).id;
-          } catch (error) {
-            throw new AiPause((error as Error).message);
-          }
           const id = randomUUID();
           await this.repository!.claim(id);
           const room: BotRoom = new BotRoom(
             id,
             userID!,
             this.manager.io,
-            model === CODEX_MODEL
-              ? decisionPipeline(codexDecide(id, this.repository!, undefined, () => room.ai?.codex))
-              : separatedDecide(
-                  id,
-                  this.repository!,
-                  (rub) => {
-                    room.ai!.costRub = rub;
-                  },
-                  model,
-                ),
+            decisionPipeline(codexDecide(id, this.repository!, undefined, () => room.ai?.codex)),
             (state) => this.repository!.save(state),
             process.env.NODE_ENV === 'development' ? 2000 : 10000,
             language,
             playerCount,
           );
-          room.ai!.model = model;
+          room.ai!.model = CODEX_MODEL;
           room.renewLease = () => this.repository!.renewLease(id);
           if (this.manager.chatService) {
             room.persistChatMessage = (author, text, requestID) =>
@@ -319,13 +250,12 @@ export class AiService {
           this.manager.updateRoomsList(room);
           return cb({ ok: true });
         }
-        const resume = action === 'resumeBudget';
         const technical = action === 'resumeTechnical';
         if (
           this.running.size ||
           this.creating ||
-          (resume || technical
-            ? room.ai?.status !== 'paused' || !(resume ? room.ai.canResumeBudget : room.ai.canResumeTechnical)
+          (technical
+            ? room.ai?.status !== 'paused' || !room.ai.canResumeTechnical
             : action !== 'start' || room.ai?.status !== 'ready')
         )
           return cb({ error: 'AI room is not ready to start or resume' });
@@ -334,18 +264,10 @@ export class AiService {
         this.starting = true;
         try {
           await this.repository!.claim(id);
-          if (resume) {
-            try {
-              await this.repository!.doubleMatchLimit(id, room.budgetResumeUnits);
-            } catch (error) {
-              await this.repository!.release(id);
-              throw error;
-            }
-          }
           this.running.add(id);
           // run changes status synchronously before the first await: duplicate starts cannot spend twice.
           void room
-            .run(resume, technical)
+            .run(technical)
             .catch(() => {
               /* room.run already exposes a sanitized paused status */
             })

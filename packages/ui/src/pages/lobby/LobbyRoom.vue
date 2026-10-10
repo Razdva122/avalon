@@ -49,7 +49,6 @@
           ><i aria-hidden="true"></i>{{ aiStatusLabel }}</span
         >
         <small class="ai-date">{{ aiDate }}</small>
-        <small v-if="cost !== undefined" class="ai-cost">{{ cost.toFixed(2) }} ₽</small>
       </template>
       <span v-else>{{ $t(`mainPage.${status}`) }}</span>
     </span>
@@ -70,7 +69,7 @@ import type { TRoomInfo } from '@avalon/types';
 import { useUserProfile } from '@/helpers/composables';
 import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 
-const props = defineProps<{ game: TRoomInfo; cost?: number }>();
+const props = defineProps<{ game: TRoomInfo }>();
 const hostID = computed(() => props.game.hostID);
 const { userName } = useUserProfile(hostID);
 const game = toRef(props, 'game');
@@ -311,13 +310,6 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
   display: block;
   margin-top: 4px;
   font-size: 10px;
-}
-.ai-cost {
-  font-size: 11px;
-  display: block;
-  margin-top: 5px;
-  opacity: 0.7;
-  font-variant-numeric: tabular-nums;
 }
 .game--ai .room-link {
   background: rgba(137, 101, 224, 0.15);

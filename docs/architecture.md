@@ -41,7 +41,7 @@ socket routing and every worker's concurrency semantics.
 | Public listings/moderation    | `player-boards`           | [Boards](player-boards.md)                                     |
 | Progress and unlocks          | `achievements`            | [Achievements](../packages/backend/src/achievements/README.md) |
 
-Optional providers are enabled through environment configuration. AI management
+Codex is the only AI provider and is enabled through environment configuration. AI management
 and board moderation check the account's database `isAdmin` flag. ChatGPT auth,
 SMTP credentials, LiveKit secrets and blockchain RPC keys remain server-side.
 

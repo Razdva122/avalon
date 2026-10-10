@@ -1,5 +1,5 @@
 import type { AiLanguage } from '@avalon/types';
-import { AiOutputLimit, compactRequest } from './client';
+import { compactRequest } from './client';
 import type { BotRequest } from './client';
 import { publicContext, decisionPipeline } from './pipeline';
 
@@ -112,16 +112,15 @@ test.each<[number, AiLanguage, number, { good: number; evil: number }]>([
   [8, 'ru', 5, { good: 5, evil: 3 }],
   [8, 'zh-tw', 5, { good: 5, evil: 3 }],
 ])(
-  'a %i-player %s final-selection retry retains the full circle, facts and optional silence',
+  'a %i-player %s final selection retains the full circle, facts and optional silence',
   async (count, language, approvalsRequired, alignmentCounts) => {
     const request = { ...requestFor(count), language, publicDiscussion: false, optionalSpeech: true };
     const generate = jest
       .fn()
-      .mockRejectedValueOnce(new AiOutputLimit(20000))
       .mockResolvedValueOnce({ choice: 1, speech: 'Choose after hearing everyone.', publicReason: '' });
     expect(await decisionPipeline(generate)(request)).toMatchObject({ choice: 1, speech: '' });
-    const retry = generate.mock.calls[1][1];
-    expect(retry.context).toMatchObject({
+    const options = generate.mock.calls[0][1];
+    expect(options.context).toMatchObject({
       language,
       playerCount: count,
       approvalsRequired,
@@ -129,8 +128,8 @@ test.each<[number, AiLanguage, number, { good: number; evil: number }]>([
       optionalSpeech: true,
       publicDiscussion: false,
     });
-    expect(retry.context.chat).toHaveLength(count);
-    expect(retry.instructions).toContain('optional');
+    expect(options.context.chat).toHaveLength(count);
+    expect(options.instructions).toContain('publicReason may be empty');
   },
 );
 

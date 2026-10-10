@@ -1,6 +1,6 @@
 import { compactRequest } from './client';
 import type { BotRequest } from './client';
-import { focusedRetry, publicContext } from './pipeline';
+import { publicContext } from './pipeline';
 
 const human = { name: '2', text: 'Я персиваль 5 это моргана. 4 поддерживает походы с 5, не берите их.' };
 const request = {
@@ -27,7 +27,7 @@ const request = {
   chat: [human, ...Array.from({ length: 30 }, () => ({ name: '3', text: 'Предпочитаю 3, 4.' }))],
 } as unknown as BotRequest;
 
-test('human warnings and free-form role testimony survive bot chatter and retries without text classification', () => {
+test('human warnings and free-form role testimony survive bot chatter without text classification', () => {
   const expected = {
     humanStatements: [{ by: 2, text: human.text, status: 'claim' }],
     publicRoleClaims: [],
@@ -37,8 +37,6 @@ test('human warnings and free-form role testimony survive bot chatter and retrie
   expect(context.chat).toHaveLength(14);
   expect(context.chat).not.toContainEqual({ by: '2', text: human.text });
   expect(publicContext(request, '1, 2')).toMatchObject(expected);
-  const retry = focusedRetry({ context, decisionDetails: true, phase: 'decision', maxOutput: 1000 });
-  expect(retry.context).toMatchObject(expected);
   expect(JSON.stringify(publicContext(request, '1, 2'))).not.toMatch(
     /humanPlayerID|privateKnowledge|servant|"bot"|"human"/,
   );

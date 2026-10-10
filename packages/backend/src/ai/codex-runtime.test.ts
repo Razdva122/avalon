@@ -28,7 +28,7 @@ function fakeChild(onInput: (child: EventEmitter, args: string[]) => void) {
 }
 
 test('runner forces ChatGPT, removes backend secrets, disables tools, parses usage and removes temporary files', async () => {
-  process.env.YANDEX_API_KEY = 'must-not-be-passed';
+  process.env.UNRELATED_SERVICE_SECRET = 'must-not-be-passed';
   process.env.SECRET_KEY = 'must-not-be-passed';
   process.env.CODEX_API_KEY = 'must-not-be-passed';
   let output = '';
@@ -48,7 +48,7 @@ test('runner forces ChatGPT, removes backend secrets, disables tools, parses usa
   expect(args).toContain('features.shell_tool=false');
   expect(args).toContain('features.unified_exec=false');
   expect(args).toContain('web_search="disabled"');
-  expect(options.env.YANDEX_API_KEY).toBeUndefined();
+  expect(options.env.UNRELATED_SERVICE_SECRET).toBeUndefined();
   expect(options.env.SECRET_KEY).toBeUndefined();
   expect(options.env.CODEX_API_KEY).toBeUndefined();
   await expect(access(output)).rejects.toThrow();

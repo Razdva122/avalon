@@ -1,6 +1,6 @@
-import { AiOutputLimit, AiTechnicalPause, compactRequest } from './client';
+import { AiTechnicalPause, compactRequest } from './client';
 import { claimContext } from './claims';
-import { decisionPipeline, focusedRetry, publicContext } from './pipeline';
+import { decisionPipeline, publicContext } from './pipeline';
 import { BotRoom } from './room';
 import type { BotRequest } from './client';
 import type { AiLanguage, Server } from '@avalon/types';
@@ -91,12 +91,10 @@ test.each<AiLanguage>(['en', 'ru', 'zh-tw'])(
       /mordred|PRIVATE ALLY|privateKnowledge|yourCard|roleAdvice|modelHypotheses/,
     );
     expect(options.instructions).toContain('not a submitted roster');
-    expect(focusedRetry(generate.mock.calls[0][1]).instructions).toContain('preference');
-    expect(focusedRetry(generate.mock.calls[0][1]).context).toMatchObject({ chat: options.context.chat });
   },
 );
 
-test('a bounded retry of the final selection preserves the full public circle and optional silence', async () => {
+test('the final selection preserves the full public circle and optional silence', async () => {
   const input = {
     ...discussion,
     publicDiscussion: false,
@@ -105,12 +103,10 @@ test('a bounded retry of the final selection preserves the full public circle an
   };
   const generate = jest
     .fn()
-    .mockRejectedValueOnce(new AiOutputLimit(20000))
     .mockResolvedValueOnce({ choice: 1, speech: 'The circle supports this compromise.', publicReason: '' });
   expect(await decisionPipeline(generate)(input)).toMatchObject({ choice: 1, speech: '' });
-  expect(generate).toHaveBeenCalledTimes(2);
-  expect(generate.mock.calls[1][1].context.chat).toEqual(generate.mock.calls[0][1].context.chat);
-  expect(generate.mock.calls[1][1].context.chat).toHaveLength(7);
+  expect(generate).toHaveBeenCalledTimes(1);
+  expect(generate.mock.calls[0][1].context.chat).toHaveLength(7);
 });
 
 test('leader can submit silently after a public role claim without mandatory extra speech', async () => {

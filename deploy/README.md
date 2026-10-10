@@ -63,7 +63,7 @@ an old backend; some migrations/authorization changes cannot simply be reversed.
 - [Database backup/restore](voice/database-backups.md)
 - [Mounted nginx configuration compatibility](nginx/README.md)
 - [Voice beta topology and rollout](../docs/voice-chat.md)
-- [Yandex AI budgets and rollout](ai-production.md)
+- [Codex-only AI configuration and rollout](ai-production.md)
 - [Codex local container / remote SSH worker](codex-production.md)
 - [Password recovery](../docs/password-recovery.md) and [Russian production runbook](../docs/production-password-recovery.ru.md)
 - [Direct crypto support](../docs/payments/direct-crypto.md)

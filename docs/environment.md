@@ -38,30 +38,26 @@ Dev Compose использует те же параметры MongoDB через
 
 Изменения файлов окружения требуют перезапуска backend. Изменения `environment`/`env_file` в Compose требуют пересоздания контейнера.
 
-**AI-комнаты.** По умолчанию выключены. Параметры Yandex/Codex, проверка `isAdmin` в базе
-и лимиты расходов описаны в [инструкции AI-комнат](ai-rooms.md).
+**AI-комнаты.** По умолчанию выключены. Параметры Codex, проверка `isAdmin` в базе
+и лимиты подписки описаны в [инструкции AI-комнат](ai-rooms.md).
 
 ## AI, Codex и хранение диагностики
 
-| Параметр                                       | Назначение / значение по умолчанию                                           |
-| ---------------------------------------------- | ---------------------------------------------------------------------------- |
-| `AI_ROOMS_ENABLED`                             | `true` включает создание AI-комнат при настроенном провайдере                |
-| `YANDEX_API_KEY`, `YANDEX_FOLDER_ID`           | Секрет и folder ID провайдера Yandex                                         |
-| `YANDEX_MODEL`                                 | Начальный выбор: `qwen3.6-35b-a3b`; также поддерживается `deepseek-v4-flash` |
-| `AI_TOTAL_BUDGET_RUB`                          | 700 ₽ lifetime в development; 3000 ₽ на 30 дней в production                 |
-| `AI_MATCH_BUDGET_RUB`                          | 100 ₽ в development; 200 ₽ в production; начальный потолок можно уменьшить   |
-| `AI_CODEX_ENABLED`                             | Явное `true` включает Codex в development или production                     |
-| `AI_CODEX_BIN`, `AI_CODEX_HOME`                | Путь локального CLI и профиля авторизации                                    |
-| `AI_CODEX_SSH_HOST`                            | Выбирает удалённый worker вместо локального CLI                              |
-| `AI_CODEX_SSH_PORT`, `AI_CODEX_SSH_USER`       | Порт SSH (по умолчанию 10022) и выделенный пользователь                      |
-| `AI_CODEX_SSH_KEY`, `AI_CODEX_SSH_KNOWN_HOSTS` | Пути ключа и проверенного known_hosts; оба обязательны для remote mode       |
-| `AI_CODEX_SSH_BIN`                             | Необязательный путь SSH-клиента; по умолчанию `ssh`                          |
-| `AI_TRACE_RETENTION_DAYS`                      | 30 дней для новых приватных traces                                           |
-| `AI_REQUEST_RETENTION_DAYS`                    | 365 дней для подтверждённых request logs                                     |
+| Параметр                                       | Назначение / значение по умолчанию                                     |
+| ---------------------------------------------- | ---------------------------------------------------------------------- |
+| `AI_ROOMS_ENABLED`                             | `true` включает создание AI-комнат при настроенном Codex               |
+| `AI_CODEX_ENABLED`                             | Явное `true` включает Codex в development или production               |
+| `AI_CODEX_BIN`, `AI_CODEX_HOME`                | Путь локального CLI и профиля авторизации                              |
+| `AI_CODEX_SSH_HOST`                            | Выбирает удалённый worker вместо локального CLI                        |
+| `AI_CODEX_SSH_PORT`, `AI_CODEX_SSH_USER`       | Порт SSH (по умолчанию 10022) и выделенный пользователь                |
+| `AI_CODEX_SSH_KEY`, `AI_CODEX_SSH_KNOWN_HOSTS` | Пути ключа и проверенного known_hosts; оба обязательны для remote mode |
+| `AI_CODEX_SSH_BIN`                             | Необязательный путь SSH-клиента; по умолчанию `ssh`                    |
+| `AI_TRACE_RETENTION_DAYS`                      | 30 дней для новых приватных traces                                     |
+| `AI_REQUEST_RETENTION_DAYS`                    | 365 дней для подтверждённых request logs                               |
 
-Настройки контекста и reasoning сверяйте с `packages/backend/src/ai/client.ts`;
-операторские значения не заменяют проверку бюджета и допустимых моделей.
-TTL диагностики не удаляет replay, историю начислений или агрегаты расходов.
+AI Arena поддерживает только Codex с авторизацией ChatGPT. Модель и reasoning
+выбираются из каталога worker. Платного API fallback нет.
+TTL диагностики не удаляет replay и исторические данные.
 Подробнее: [AI Arena](ai-rooms.md), [Codex production](../deploy/codex-production.md),
 [учёт и retention](ai-storage-retention.md).
 

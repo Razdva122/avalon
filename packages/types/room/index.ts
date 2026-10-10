@@ -58,8 +58,8 @@ export type AiRoomState = {
   status: 'ready' | 'running' | 'paused' | 'finished' | 'stopped';
   /** The AI seat currently awaiting generation; cleared when idle or paused. */
   thinkingPlayerID?: string;
-  canResumeBudget?: boolean;
   canResumeTechnical?: boolean;
+  /** Read-only compatibility with historical archives; no current paid provider. */
   costRub?: number;
   model?: string;
   fallbacks: number;
@@ -166,16 +166,6 @@ export type TMessage = {
   roomID?: string;
   text: string;
   author: string;
-};
-
-export type AiBudgetSnapshot = {
-  limitRub: number;
-  usedRub: number;
-  remainingRub: number;
-  matchLimitRub: number;
-  periodDays?: number;
-  periodStart?: string;
-  periodEnd?: string;
 };
 
 /** Short model-written explanation; only returned through the AI spectator endpoint. */

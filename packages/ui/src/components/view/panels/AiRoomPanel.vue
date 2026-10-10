@@ -86,14 +86,6 @@
             {{ $t('aiArena.resumeTechnical') }}
           </v-btn>
           <v-btn
-            v-if="ai.status === 'paused' && ai.canResumeBudget && limits[roomID] !== undefined"
-            color="success"
-            :loading="busy"
-            @click="control('resumeBudget')"
-          >
-            {{ $t('aiArena.resumeBudget', { limit: limits[roomID] * 2 }) }}
-          </v-btn>
-          <v-btn
             v-if="['ready', 'running', 'paused'].includes(ai.status)"
             color="warning"
             :disabled="busy"
@@ -101,12 +93,6 @@
             >{{ $t('aiArena.stop') }}</v-btn
           >
         </div>
-        <AiBudgetPanel
-          v-if="canManage && budget && ai.model !== 'codex-chatgpt'"
-          :budget="budget"
-          :cost="costs[roomID]"
-          :match-limit="limits[roomID]"
-        />
       </div>
     </details>
     <p v-if="error" class="ai-error" role="alert">{{ error }}</p>
@@ -114,7 +100,6 @@
 </template>
 <script setup lang="ts">
 import CodexWeeklyLimit from '@/components/view/panels/CodexWeeklyLimit.vue';
-import AiBudgetPanel from '@/components/view/panels/AiBudgetPanel.vue';
 import { ref, computed, watch } from 'vue';
 import { codexRelativePrice } from '@/helpers/codex-pricing';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
@@ -132,7 +117,7 @@ const props = defineProps<{
   rolesShown?: boolean;
 }>();
 const { t } = useI18n();
-const { canManage, costs, limits, budget, codexModels, refresh } = useAiAccess(computed(() => [props.roomID]));
+const { canManage, codexModels, refresh } = useAiAccess();
 const displayPlayerCount = computed(() => props.ai.playerCount ?? props.playerCount ?? 7);
 const displayLanguage = computed(
   () => ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）' })[props.ai.language || 'en'],
@@ -255,7 +240,7 @@ async function join() {
     busy.value = false;
   }
 }
-async function control(action: 'start' | 'stop' | 'resumeBudget' | 'resumeTechnical') {
+async function control(action: 'start' | 'stop' | 'resumeTechnical') {
   busy.value = true;
   error.value = '';
   try {

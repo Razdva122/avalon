@@ -120,12 +120,7 @@
           </button>
         </div>
         <div v-else class="games-list">
-          <LobbyRoom
-            v-for="game in visibleRooms.slice(0, visibleLimit)"
-            :key="game.uuid"
-            :game="game"
-            :cost="aiCosts[game.uuid]"
-          />
+          <LobbyRoom v-for="game in visibleRooms.slice(0, visibleLimit)" :key="game.uuid" :game="game" />
           <button v-if="visibleRooms.length > visibleLimit" class="show-more" @click="visibleLimit += 8">
             {{ $t('mainPage.showMore') }} <span aria-hidden="true">↓</span>
           </button>
@@ -186,7 +181,6 @@ import { isSocketError } from '@/helpers/socket-errors';
 import eventBus from '@/helpers/event-bus';
 import LobbyRoom from './LobbyRoom.vue';
 import SocialChannels from './SocialChannels.vue';
-import { useAiAccess } from '@/helpers/composables/useAiAccess';
 import AiRoomButton from './AiRoomButton.vue';
 import RotatingTopPlayer from '@/components/stats/RotatingTopPlayer.vue';
 import GiveawayBanner from '@/pages/support/GiveawayBanner.vue';
@@ -223,13 +217,6 @@ export default defineComponent({
         aiLoading.value = false;
       }
     };
-    const { costs: aiCosts } = useAiAccess(
-      computed(() => [
-        ...new Set(
-          [...(roomsList.value || []), ...(aiRooms.value || [])].filter((room) => room.ai).map((room) => room.uuid),
-        ),
-      ]),
-    );
     const online = ref<number>();
 
     socket
@@ -328,7 +315,6 @@ export default defineComponent({
       aiLoading,
       aiError,
       loadAiRooms,
-      aiCosts,
       filter,
       visibleLimit,
       filters,

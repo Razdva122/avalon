@@ -1,6 +1,6 @@
 import { compactRequest } from './client';
 import type { BotRequest } from './client';
-import { focusedRetry, publicContext } from './pipeline';
+import { publicContext } from './pipeline';
 
 const request = {
   playerID: '1',
@@ -93,15 +93,6 @@ test('questions can distinguish off-team approvals of a rejected proposal from t
     ],
   });
   expect(JSON.stringify(context)).not.toMatch(/merlin|yourCard|"cards"|privateKnowledge/);
-  const retry = focusedRetry({
-    context: compactRequest(request),
-    decisionDetails: true,
-    phase: 'decision',
-    maxOutput: 10000,
-  });
-  expect(retry.context).toMatchObject({
-    offTeamApprovals: [expect.anything(), expect.objectContaining({ seats: [1, 5], missionResult: 'fail' })],
-  });
 });
 
 test('an automatic proposal never invents off-team votes even if legacy history contains vote entries', () => {
@@ -208,10 +199,6 @@ test('summarizes repeated sole off-team support without treating votes as proof 
   ];
   expect(compactRequest(current)).toMatchObject({ offTeamVotingPatterns: expected });
   expect(publicContext(current, '1, 3, 5')).toMatchObject({ offTeamVotingPatterns: expected });
-  expect(
-    focusedRetry({ context: compactRequest(current), decisionDetails: true, phase: 'decision', maxOutput: 1000 })
-      .context,
-  ).toMatchObject({ offTeamVotingPatterns: expected });
 });
 
 test('does not summarize forced or anonymous votes as individual support', () => {

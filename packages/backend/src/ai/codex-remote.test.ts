@@ -25,9 +25,9 @@ async function executable(source: string) {
   await writeFile(process.env.AI_CODEX_SSH_BIN!, `#!${process.execPath}\n${source}`, { mode: 0o700 });
 }
 test('SSH transport pins host identity and passes JSON input without backend credentials', async () => {
-  process.env.YANDEX_API_KEY = 'secret';
+  process.env.UNRELATED_SERVICE_SECRET = 'secret';
   await executable(
-    `let input='';process.stdin.on('data',d=>input+=d);process.stdin.on('end',()=>console.log(JSON.stringify({ok:true,result:{request:JSON.parse(input),args:process.argv.slice(2),secret:process.env.YANDEX_API_KEY||null}})));`,
+    `let input='';process.stdin.on('data',d=>input+=d);process.stdin.on('end',()=>console.log(JSON.stringify({ok:true,result:{request:JSON.parse(input),args:process.argv.slice(2),secret:process.env.UNRELATED_SERVICE_SECRET||null}})));`,
   );
   const result = (await remoteCodex({ operation: 'models' })) as {
     request: object;

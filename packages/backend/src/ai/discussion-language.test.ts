@@ -1,6 +1,6 @@
 import type { AiLanguage } from '@avalon/types';
 import { compactRequest, systemFor } from './client';
-import { publicContext, decisionPipeline, focusedRetry } from './pipeline';
+import { publicContext, decisionPipeline } from './pipeline';
 import type { BotRequest } from './client';
 
 const base = {
@@ -41,7 +41,6 @@ test.each([
     expect(publicOptions.context).toMatchObject({ personality: base.style, publicReason: speech });
     expect(publicOptions.context.chat).toEqual([{ by: '2', text: base.chat[0].text }]);
     expect(JSON.stringify(publicOptions.context)).not.toMatch(/merlin|PRIVATE ROLE KNOWLEDGE/);
-    expect(focusedRetry(generate.mock.calls[0][1]).instructions).toContain(instruction);
     expect(
       systemFor({ ...request, councilDiscussion: true, state: { ...request.state, stage: 'assassinate' } }),
     ).toContain(instruction);

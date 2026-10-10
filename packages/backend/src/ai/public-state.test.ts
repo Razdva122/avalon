@@ -7,11 +7,11 @@ test('AI broadcasts and replay serialization hide cost without mutating persiste
   const io = { to: () => io, except: () => io, emit } as unknown as Server;
   const room = new BotRoom('room', 'owner', io, async () => ({ choice: 0, speech: '' }));
   room.ai!.costRub = 18.4;
-  room.ai!.model = 'qwen-test';
+  room.ai!.model = 'legacy-model';
   room.ai!.message = 'Лимит партии 150 ₽: использовано 148.12 ₽, резерв запроса 5.10 ₽.';
   const persisted = room.calculateRoomState();
   expect(publicRoomState(persisted).ai).not.toHaveProperty('costRub');
-  expect(publicRoomState(persisted).ai?.model).toBe('qwen-test');
+  expect(publicRoomState(persisted).ai?.model).toBe('legacy-model');
   expect(persisted.ai?.costRub).toBe(18.4);
   expect(publicRoomState(persisted).ai?.message).not.toContain('148.12');
   room.updateRoomState();
@@ -27,5 +27,5 @@ test('public AI model label uses the actual selected Codex model without changin
     'gpt-6.1-sol',
   );
   expect(aiPlayedModel({ model: 'codex-chatgpt' })).toBeUndefined();
-  expect(aiPlayedModel({ model: 'qwen3.6-35b-a3b' })).toBe('qwen3.6-35b-a3b');
+  expect(aiPlayedModel({ model: 'legacy-model' })).toBe('legacy-model');
 });

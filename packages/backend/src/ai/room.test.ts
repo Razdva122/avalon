@@ -620,17 +620,17 @@ test('all localized after-game messages stay out of prompts and vote-only messag
   }
 });
 
-test.each(['budget', 'technical'] as const)(
+test.each(['technical'] as const)(
   '%s resume preserves a partial public circle without duplicate speeches',
   async (kind) => {
-    const { AiMatchBudgetPause, AiTechnicalPause } = await import('./client');
+    const { AiTechnicalPause } = await import('./client');
     const requests: BotRequest[] = [];
     let paused = false;
     const room = new BotRoom('resume-circle', 'admin', io, async (request) => {
       requests.push(request);
       if (!paused && requests.length === 4) {
         paused = true;
-        throw kind === 'budget' ? new AiMatchBudgetPause('Match budget', 2000) : new AiTechnicalPause('Output limit');
+        throw new AiTechnicalPause('Output limit');
       }
       return {
         ...reply(request),
@@ -641,7 +641,7 @@ test.each(['budget', 'technical'] as const)(
     expect(room.ai?.status).toBe('paused');
     expect(room.chat.history).toHaveLength(3);
     const manager = room.data.stage === 'started' && room.data.manager;
-    await room.run(kind === 'budget', kind === 'technical');
+    await room.run(true);
     expect(room.data.stage === 'started' && room.data.manager).toBe(manager);
     expect(room.ai?.status).toBe('finished');
     const circle = requests.filter((request) => request.publicDiscussion && request.state.mission === 0);
@@ -650,30 +650,30 @@ test.each(['budget', 'technical'] as const)(
   },
 );
 
-test('budget resume does not repeat Evil council advice or completed post-game reviews', async () => {
-  const { AiMatchBudgetPause } = await import('./client');
+test('technical resume does not repeat Evil council advice or completed post-game reviews', async () => {
+  const { AiTechnicalPause } = await import('./client');
   const pauses = new Set<string>();
   const room = new BotRoom('resume-end', 'admin', io, async (request) => {
     if (request.councilDiscussion || request.state.stage === 'end') {
       const key = `${request.state.stage}:${request.playerID}`;
       if (!pauses.has(key)) {
         pauses.add(key);
-        throw new AiMatchBudgetPause('Match budget', 1000);
+        throw new AiTechnicalPause('Interrupted decision');
       }
     }
     return { ...reply(request), choice: request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0 };
   });
   await room.run();
-  for (let attempt = 0; attempt < 12 && room.ai?.canResumeBudget; attempt++) await room.run(true);
+  for (let attempt = 0; attempt < 12 && room.ai?.canResumeTechnical; attempt++) await room.run(true);
   expect(room.ai?.status).toBe('finished');
   expect(room.chat.history.filter((m) => m.message.startsWith('Evil council:'))).toHaveLength(3);
   expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(7);
 });
 
-test.each(['budget', 'technical'] as const)(
+test.each(['technical'] as const)(
   '%s resume retries final selection without repeating the public circle',
   async (kind) => {
-    const { AiMatchBudgetPause, AiTechnicalPause } = await import('./client');
+    const { AiTechnicalPause } = await import('./client');
     const requests: BotRequest[] = [];
     let paused = false;
     const room = new BotRoom(
@@ -684,7 +684,7 @@ test.each(['budget', 'technical'] as const)(
         requests.push(request);
         if (!paused && request.task.startsWith('Choose the final team')) {
           paused = true;
-          throw kind === 'budget' ? new AiMatchBudgetPause('Match budget', 1000) : new AiTechnicalPause('Output limit');
+          throw new AiTechnicalPause('Output limit');
         }
         return reply(request);
       },
@@ -697,7 +697,7 @@ test.each(['budget', 'technical'] as const)(
     expect(room.chat.history).toHaveLength(7);
     if (room.data.stage !== 'started') throw Error('not started');
     expect(room.data.manager.game.players.every((player) => !player.features.isSelected)).toBe(true);
-    await room.run(kind === 'budget', kind === 'technical');
+    await room.run(true);
     expect(requests.filter((request) => request.publicDiscussion)).toHaveLength(7);
     expect(requests.filter((request) => request.task.startsWith('Choose the final team'))).toHaveLength(2);
     expect(room.chat.history.filter((message) => message.message.startsWith('I propose'))).toHaveLength(1);
@@ -706,16 +706,13 @@ test.each(['budget', 'technical'] as const)(
 );
 
 test.each([
-  ['budget', 7],
   ['technical', 7],
-  ['budget', 5],
   ['technical', 6],
-  ['budget', 8],
   ['technical', 8],
 ] as const)(
   '%s resume in a %i-player room retains collected silent votes without exposing or repeating them',
   async (kind, count) => {
-    const { AiMatchBudgetPause, AiTechnicalPause } = await import('./client');
+    const { AiTechnicalPause } = await import('./client');
     const requests: BotRequest[] = [];
     let paused = false;
     let voteRequests = 0;
@@ -727,7 +724,7 @@ test.each([
         requests.push(request);
         if (request.state.stage === 'votingForTeam' && !paused && ++voteRequests === 4) {
           paused = true;
-          throw kind === 'budget' ? new AiMatchBudgetPause('Match budget', 1000) : new AiTechnicalPause('Output limit');
+          throw new AiTechnicalPause('Output limit');
         }
         return { choice: 0, speech: request.state.stage === 'votingForTeam' ? 'PRIVATE_VOTE' : 'Discuss the roster.' };
       },
@@ -748,7 +745,7 @@ test.each([
       .filter((request) => request.state.stage === 'votingForTeam')
       .slice(0, 3)
       .map((request) => request.playerID);
-    await room.run(kind === 'budget', kind === 'technical');
+    await room.run(true);
     const voters = requests.filter((request) => request.state.stage === 'votingForTeam');
     expect(voters).toHaveLength(count + 1);
     for (const id of votersBefore) expect(voters.filter((request) => request.playerID === id)).toHaveLength(1);
@@ -793,7 +790,7 @@ test.each(['discussion', 'selection', 'votes'] as const)(
     );
     await room.run();
     expect(room.ai?.canResumeTechnical).toBe(true);
-    await room.run(false, true);
+    await room.run(true);
     expect(requests.filter((request) => request.publicDiscussion)).toHaveLength(7);
     expect(requests.filter((request) => request.task.startsWith('Choose the final team'))).toHaveLength(1);
     expect(requests.filter((request) => request.state.stage === 'votingForTeam')).toHaveLength(7);
@@ -836,7 +833,7 @@ test.each(['discussion', 'selection'] as const)(
     expect(room.ai?.canResumeTechnical).toBe(true);
     expect(room.chat.history).toHaveLength(phase === 'discussion' ? 0 : 7);
     const before = requests.length;
-    await room.run(false, true);
+    await room.run(true);
     expect(requests.filter((request) => request.publicDiscussion)).toHaveLength(7);
     expect(requests.filter((request) => request.optionalSpeech)).toHaveLength(1);
     expect(requests.filter((request) => request.state.stage === 'votingForTeam')).toHaveLength(7);
@@ -879,7 +876,7 @@ test.each(['discussion', 'selection'] as const)(
     await room.run();
     expect(room.ai?.canResumeTechnical).toBe(true);
     expect(room.chat.history).toHaveLength(phase === 'discussion' ? 1 : 8);
-    await room.run(false, true);
+    await room.run(true);
     expect(room.chat.history).toHaveLength(8);
     expect(room.chat.history.filter((message) => message.message === failedText)).toHaveLength(1);
     const retried = publications.filter((publication) => publication.text === failedText);
@@ -1155,7 +1152,7 @@ test('renewal failure during human team vote resumes without making bots vote tw
     await run;
     expect(room.ai?.canResumeTechnical).toBe(true);
     room.renewLease = async () => {};
-    run = room.run(false, true);
+    run = room.run(true);
     await jest.advanceTimersByTimeAsync(0);
     expect(room.ai?.status).toBe('running');
     expect(calls).toBe(before);
@@ -1221,7 +1218,7 @@ test('mixed missions keep every bot card pending until all secret decisions are 
     manager.callGameMethods(player.userID, { method: 'voteForMission', option: 'approve' });
   room.ai!.status = 'paused';
   room.ai!.canResumeTechnical = true;
-  await room.run(false, true);
+  await room.run(true);
   expect(waiting).toEqual([true, true]);
   expect(missionBroadcasts).toBe(0);
 });
@@ -1312,7 +1309,7 @@ test.each([false, true])(
       expect(() => room.humanAction('admin', { method: 'assassinate', type: 'merlin' })).toThrow('discussion');
     room.ai!.status = 'paused';
     room.ai!.canResumeTechnical = true;
-    const run = room.run(false, true);
+    const run = room.run(true);
     try {
       for (let i = 0; i < 100; i++) await new Promise<void>((resolve) => setImmediate(resolve));
       expect(room.ai?.waitingForDiscussion).toBe(true);

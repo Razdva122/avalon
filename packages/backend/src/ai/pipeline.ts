@@ -1,18 +1,8 @@
 import { claimContext, validateClaims, claimInstructions } from './claims';
-import { aiModel } from './models';
 import { languageInstruction } from './language';
 import type { AiLanguage } from '@avalon/types';
-import {
-  AiOutputLimit,
-  AiPause,
-  AiTechnicalPause,
-  compactRequest,
-  systemFor,
-  tableConversationAdvice,
-  yandexDecide,
-} from './client';
+import { AiPause, AiTechnicalPause, compactRequest, systemFor, tableConversationAdvice } from './client';
 import type { BotReply, BotRequest, Decide, GenerationOptions, DecisionEvidence } from './client';
-import type { AiRepository } from './repository';
 
 // Explicit allowlist: public role totals are safe; private assignments, cards, checks and notes stay private.
 export function publicContext(request: BotRequest, choice: string) {
@@ -175,50 +165,8 @@ export function decisionInstructions(request: BotRequest) {
   );
 }
 
-// A bounded second attempt keeps authoritative facts, not the failed attempt's speculation.
-export function focusedRetry(options: GenerationOptions): GenerationOptions {
-  if (!options.decisionDetails)
-    return { ...options, maxOutput: Math.min(20000, options.maxOutput! * 2), phase: `${options.phase}-retry` };
-  const context = { ...(options.context as Record<string, unknown>) };
-  if (!context.publicDiscussion && !context.optionalSpeech) delete context.chat;
-  delete context.modelHypotheses;
-  return {
-    ...options,
-    context,
-    phase: `${options.phase}-retry`,
-    instructions:
-      languageInstruction(context.language as AiLanguage | undefined) +
-      ' ' +
-      claimInstructions +
-      ' Finish the current Avalon action now. Use the supplied legal choices, actual side, roleAdvice, privateKnowledge, score and completedMissions. Do not enumerate hidden worlds. Retain exact Fail thresholds; rejected proposals played no cards and success does not clear alignment. Follow publicDiscussion/optionalSpeech/speak: discussion is a preference, votes are silent. Return choice, private speech, publicReason (your own public words, <=240 chars), and at most 3 changed evidence notes. Never expose Merlin, private allies, wizard candidates or sabotage plans in publicReason. A deliberate Percival claim must be written by you and recorded with claimMorgana. Keep public and private reasons separate.',
-  };
-}
-
 type Generate = (request: BotRequest, options: GenerationOptions, signal?: AbortSignal) => ReturnType<Decide>;
-export function decisionPipeline(generate: Generate, reasoning: 'none' | 'default' = 'default'): Decide {
-  let resumeWithFocusedPrompt = false;
-  const complete: Generate = async (request, options, signal) => {
-    if (resumeWithFocusedPrompt && options.decisionDetails) {
-      options = { ...focusedRetry(options), phase: options.phase };
-      resumeWithFocusedPrompt = false;
-    }
-    try {
-      return await generate(request, options, signal);
-    } catch (error) {
-      if (!(error instanceof AiOutputLimit)) throw error;
-      signal?.throwIfAborted();
-      // Each attempt uses the normal reservation and billing path. No game action has been applied yet.
-      try {
-        return await generate(request, focusedRetry(options), signal);
-      } catch (retryError) {
-        if (retryError instanceof AiOutputLimit) {
-          resumeWithFocusedPrompt = Boolean(options.decisionDetails);
-          throw new AiTechnicalPause(`Повторная попытка также не завершилась. ${retryError.message}`);
-        }
-        throw retryError;
-      }
-    }
-  };
+export function decisionPipeline(generate: Generate): Decide {
   const evidence = new Map<string, DecisionEvidence[]>();
   type ReviewExample = {
     id: string;
@@ -270,14 +218,11 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
       const finalReview = request.state.stage === 'end';
       const decisionRequest = request;
       const { missions, votes, ...current } = compactRequest(decisionRequest);
-      let reply = await complete(
+      let reply = await generate(
         decisionRequest,
         {
-          snapshot: true,
           phase: finalReview ? 'review' : 'decision',
-          reasoning,
           decisionDetails: !finalReview,
-          maxOutput: reasoning === 'default' ? 20000 : finalReview ? 768 : 640,
           instructions: finalReview
             ? systemFor(request) +
               ' decisionExamples with publicDiscussion=true record preferred teams voiced before selection, not submitted rosters or votes. Use recorded teamVotes to identify actual proposals and votes. ' +
@@ -305,11 +250,8 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
         reply = await generate(
           decisionRequest,
           {
-            snapshot: true,
             phase: 'decision-repair',
-            reasoning,
             decisionDetails: true,
-            maxOutput: reasoning === 'default' ? 20000 : 640,
             instructions:
               decisionInstructions(request) +
               claimInstructions +
@@ -413,15 +355,4 @@ export function decisionPipeline(generate: Generate, reasoning: 'none' | 'defaul
       throw pause;
     }
   };
-}
-export function separatedDecide(
-  roomID: string,
-  repository: AiRepository,
-  onCost: (rub: number) => void,
-  model = aiModel().id,
-): Decide {
-  return decisionPipeline(
-    (request, options, signal) => yandexDecide(roomID, repository, onCost, { ...options, model })(request, signal),
-    process.env.AI_REASONING === 'none' ? 'none' : 'default',
-  );
 }

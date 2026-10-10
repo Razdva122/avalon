@@ -6,6 +6,7 @@ The backend image installs `@openai/codex@0.159.2`. Select an image built from t
 production opt-in or remote transport.
 Codex stays disabled until `AI_CODEX_ENABLED=true`; all existing administrator
 access checks, pacing and subscription usage accounting remain in place.
+Codex is the only supported AI provider; there is no paid inference fallback.
 The AI Arena also requires `AI_ROOMS_ENABLED=true`, included in the fragment.
 
 ## Choose the transport

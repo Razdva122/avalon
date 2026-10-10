@@ -37,7 +37,7 @@ test('missing weekly data is unavailable, zero usage is valid, percentages are c
 test('read-only account request initializes before querying, uses selected profile and excludes backend secrets', async () => {
   const old = { ...process.env };
   process.env.AI_CODEX_HOME = '/private/test-profile';
-  process.env.YANDEX_API_KEY = 'secret';
+  process.env.UNRELATED_SERVICE_SECRET = 'secret';
   const sent: { method: string; id?: number }[] = [];
   const child = Object.assign(new EventEmitter(), {
     stdout: new PassThrough(),
@@ -71,7 +71,7 @@ test('read-only account request initializes before querying, uses selected profi
     expect(sent.map((m) => m.method)).toEqual(['initialize', 'initialized', 'account/rateLimits/read']);
     const options = (spawn as jest.Mock).mock.calls[0][2];
     expect(options.env.CODEX_HOME).toBe('/private/test-profile');
-    expect(options.env.YANDEX_API_KEY).toBeUndefined();
+    expect(options.env.UNRELATED_SERVICE_SECRET).toBeUndefined();
     expect(child.kill).toHaveBeenCalled();
   } finally {
     process.env = old;

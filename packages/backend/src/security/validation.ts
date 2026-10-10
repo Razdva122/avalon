@@ -61,7 +61,6 @@ const acknowledgements: Record<string, number> = {
   getUserAvatars: 0,
   getMyProfile: 0,
   getMyStickers: 0,
-  getAiBudget: 0,
   getAiRoomAccess: 0,
   getAiCodexModels: 0,
   getAiCodexWeeklyLimit: 0,
@@ -86,7 +85,6 @@ const acknowledgements: Record<string, number> = {
   updateUserAvatar: 1,
   markStickersSeen: 1,
   getAiSpectatorRoles: 1,
-  getAiRoomCosts: 1,
   createAiRoom: 1,
   getLoyalty: 1,
   getVoiceState: 1,
@@ -114,7 +112,6 @@ const nonIDs = new Set([
   'updateUserAvatar',
   'updateStickerPreferences',
   'markStickersSeen',
-  'getAiRoomCosts',
   'createAiRoom',
   'getPopularRoles',
   'getTopPlayersForPopularRoles',
@@ -204,10 +201,10 @@ export function validPacket(event: string, args: unknown[]): boolean {
       safeOptions(options)
     );
   }
-  if (event === 'getAiRoomCosts' || event === 'markStickersSeen' || event === 'updateStickerPreferences') {
+  if (event === 'markStickersSeen' || event === 'updateStickerPreferences') {
     return (
       Array.isArray(values[0]) &&
-      values[0].length <= (event === 'getAiRoomCosts' ? 50 : 12) &&
+      values[0].length <= 12 &&
       values[0].every(validID) &&
       (event !== 'updateStickerPreferences' || typeof values[1] === 'boolean')
     );

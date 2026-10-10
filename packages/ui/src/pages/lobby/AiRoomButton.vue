@@ -2,12 +2,6 @@
   <div v-if="canManage" class="ai-lobby-controls">
     <div v-if="!activeRoomID" class="ai-room-selects">
       <label>
-        <span>{{ $t('aiArena.selectModel') }}</span>
-        <select v-model="selectedModel" :disabled="busy">
-          <option v-for="model in models" :key="model.id" :value="model.id">{{ model.label }}</option>
-        </select>
-      </label>
-      <label>
         <span>{{ $t('aiArena.selectLanguage') }}</span>
         <select v-model="selectedLanguage" :disabled="busy">
           <option value="en">English</option>
@@ -29,15 +23,10 @@
       {{ $t(activeRoomID ? 'aiArena.watch' : 'aiArena.create', { count: selectedPlayerCount }) }}
     </v-btn>
     <p v-if="selectedModel === 'codex-chatgpt'">{{ $t('aiArena.codexSubscription') }}</p>
-    <details v-else-if="budget" class="ai-budget-details">
-      <summary>{{ $t('aiArena.budgetDetails') }}</summary>
-      <AiBudgetPanel :budget="budget" />
-    </details>
     <p v-if="error" role="alert">{{ error }}</p>
   </div>
 </template>
 <script setup lang="ts">
-import AiBudgetPanel from '@/components/view/panels/AiBudgetPanel.vue';
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
@@ -46,7 +35,7 @@ import { socket } from '@/api/socket';
 import type { AiLanguage, AiPlayerCount } from '@avalon/types';
 const { t } = useI18n();
 const router = useRouter();
-const { canManage, budget, models, defaultModel, activeRoomID } = useAiAccess();
+const { canManage, models, defaultModel, activeRoomID } = useAiAccess();
 const selectedModel = ref('');
 const selectedLanguage = ref<AiLanguage>('en');
 const selectedPlayerCount = ref<AiPlayerCount>(7);
@@ -93,15 +82,6 @@ async function openRoom() {
 .ai-lobby-controls > :deep(.v-btn) {
   min-height: 44px;
   max-width: 100%;
-}
-.ai-budget-details summary {
-  cursor: pointer;
-  padding: 12px 0;
-  min-height: 44px;
-  font-size: 13px;
-}
-.ai-budget-details summary:focus-visible {
-  outline: 2px solid rgb(var(--v-theme-primary));
 }
 .ai-room-selects {
   display: grid;
