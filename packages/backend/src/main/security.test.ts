@@ -1,6 +1,6 @@
 import { Manager } from './index';
 import { eventBus } from '@/helpers';
-import type { Server, ServerSocket } from '@avalon/types';
+import type { Server, ServerSocket, StartedRoomState } from '@avalon/types';
 import type { DBManager } from '@/db';
 
 jest.mock('@/voice/runtime', () => ({
@@ -134,6 +134,60 @@ test.each(['manualy', 'rejectedVote'] as const)(
     );
   },
 );
+
+test('stopping a ready AI room removes it from lobby responses and broadcasts but keeps its direct link', async () => {
+  const { BotRoom } = await import('@/ai/room');
+  const { manager, handlers, broadcasts } = fixture(true);
+  const room = new BotRoom('bot-ready', 'alice', manager.io, async () => ({ choice: 0, speech: '' }));
+  room.joinAsHuman('alice');
+  manager.rooms[room.roomID] = room;
+  manager.updateRoomsList(room);
+  expect(manager.roomListCutted).toContainEqual(expect.objectContaining({ uuid: room.roomID, aiStatus: 'ready' }));
+
+  room.stop();
+  manager.updateRoomsList(room);
+  const list = jest.fn();
+  handlers.getRoomsList(list);
+  expect(list).toHaveBeenCalledWith([]);
+  expect(broadcasts.filter(({ event }) => event === 'roomsListUpdated').pop()?.value).toEqual([]);
+  expect(manager.rooms[room.roomID]).toBe(room);
+  const direct = jest.fn();
+  await handlers.joinRoom(room.roomID, direct);
+  expect(direct).toHaveBeenCalledWith(
+    expect.objectContaining({ roomID: room.roomID, ai: expect.objectContaining({ status: 'stopped' }) }),
+  );
+});
+
+test('startup lobby loading hides stopped archives and cannot restore a stopped live room from a stale snapshot', async () => {
+  const { BotRoom } = await import('@/ai/room');
+  const { manager, handlers } = fixture();
+  manager.createRoom('human-ended', 'alice', ['alice', 'bob', 'carol', 'dave', 'eve']);
+  const human = manager.rooms['human-ended'];
+  human.startGame();
+  if (human.data.stage !== 'started') throw Error('game did not start');
+  human.data.manager.game.endGame('manualy');
+  const saved = human.calculateRoomState() as StartedRoomState;
+  const stopped = new BotRoom('live-stopped', 'alice', manager.io, async () => ({ choice: 0, speech: '' }));
+  stopped.stop();
+  manager.rooms[stopped.roomID] = stopped;
+  manager.generateRoomsListFromDB([
+    ...Array.from({ length: 55 }, (_, index) => ({
+      ...saved,
+      roomID: `stopped-${index}`,
+      createAt: '2026-10-11T12:00:00.000Z',
+      ai: { ...stopped.ai!, status: 'stopped' as const },
+    })),
+    { ...saved, roomID: stopped.roomID, ai: { ...stopped.ai!, status: 'running' } },
+    { ...saved, roomID: 'ai-finished', ai: { ...stopped.ai!, status: 'finished' } },
+    saved,
+  ]);
+  const list = jest.fn();
+  handlers.getRoomsList(list);
+  expect(list.mock.calls[0][0].map(({ uuid }: { uuid: string }) => uuid).sort()).toEqual([
+    'ai-finished',
+    'human-ended',
+  ]);
+});
 
 test('new chat messages still broadcast when bounded history is full; retries do not', () => {
   const { manager, broadcasts } = fixture();

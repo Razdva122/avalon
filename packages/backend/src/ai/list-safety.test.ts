@@ -51,7 +51,7 @@ test('lobby summaries use a projection, share concurrent reads, expire, and inva
     expect(indexes).toContainEqual({ 'state.createAt': -1 });
     status = 'paused';
     await repo.save({ stage: 'started', roomID: 'room' } as StartedRoomState);
-    expect((await repo.recentSummaries())[0].aiStatus).toBe('stopped');
+    expect(await repo.recentSummaries()).toEqual([]);
     expect(reads).toBe(2);
     now.mockReturnValue(17000);
     await repo.recentSummaries();

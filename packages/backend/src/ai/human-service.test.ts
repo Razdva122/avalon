@@ -40,8 +40,8 @@ afterEach(() => {
 
 function fixture(adminID = 'admin') {
   const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
-  const claim = jest.fn(async () => {});
-  const release = jest.fn(async () => {});
+  const claim = jest.fn<Promise<void>, [string]>(async () => {});
+  const release = jest.fn<Promise<void>, [string]>(async () => {});
   const save = jest.fn(async () => {});
   const host = {
     rooms: {},
@@ -91,6 +91,43 @@ test('create prepares a named four-bot table, reserves its slot, and makes no mo
   expect(room.data.stage).toBe('locked');
   expect(run).not.toHaveBeenCalled();
   expect(claim).toHaveBeenCalledWith(room.roomID);
+});
+
+test('only the ready-room owner can stop preparation, cancel expiry, and release the slot for another player', async () => {
+  jest.useFakeTimers();
+  const { draft, connect, claim, release, host } = fixture();
+  let lease: string | undefined;
+  claim.mockImplementation(async (id: string) => {
+    if (lease && lease !== id) throw Error('Slot busy');
+    lease = id;
+  });
+  release.mockImplementation(async (id: string) => {
+    if (lease === id) lease = undefined;
+  });
+  const room = await draft();
+  expect(lease).toBe(room.roomID);
+  expect(jest.getTimerCount()).toBe(1);
+  for (const spectator of [undefined, 'other']) {
+    const denied = jest.fn();
+    await connect(spectator).controlAiRoom(room.roomID, 'stop', denied);
+    expect(denied).toHaveBeenCalledWith({ error: 'AI room access denied' });
+    expect(room.ai?.status).toBe('ready');
+    expect(lease).toBe(room.roomID);
+  }
+  const stopped = jest.fn();
+  await connect('owner').controlAiRoom(room.roomID, 'stop', stopped);
+  expect(stopped).toHaveBeenCalledWith({ ok: true });
+  expect(room.ai?.status).toBe('stopped');
+  expect(room.ai).not.toHaveProperty('launchExpiresAt');
+  expect(jest.getTimerCount()).toBe(0);
+  expect(lease).toBeUndefined();
+  expect(host.rooms[room.roomID]).toBe(room);
+  const next = await draft('other');
+  expect(next.roomID).not.toBe(room.roomID);
+  expect(lease).toBe(next.roomID);
+  expect(next.ai?.status).toBe('ready');
+  expect(run).not.toHaveBeenCalled();
+  jest.clearAllTimers();
 });
 
 test.each([

@@ -2,14 +2,29 @@
   <section class="bot-game-choices" :aria-label="$t('aiArena.playWithBots')">
     <h2 class="bot-table" :title="title">{{ title || $t('aiArena.botTable') }}</h2>
     <BotGameTimer v-if="expiresAt" :expires-at="expiresAt" phase="preparation" />
-    <label class="bot-language">
-      <span>{{ $t('aiArena.selectLanguage') }}</span>
-      <select v-model="selectedLanguage" :disabled="busy">
-        <option value="en">English</option>
-        <option value="ru">Русский</option>
-        <option value="zh-tw">繁體中文（台灣）</option>
-      </select>
-    </label>
+    <div class="bot-preparation-actions">
+      <label class="bot-language">
+        <span>{{ $t('aiArena.selectLanguage') }}</span>
+        <select v-model="selectedLanguage" :disabled="busy">
+          <option value="en">English</option>
+          <option value="ru">Русский</option>
+          <option value="zh-tw">繁體中文（台灣）</option>
+        </select>
+      </label>
+      <v-btn
+        class="bot-leave-button"
+        variant="text"
+        color="warning"
+        :aria-label="$t('startPanel.leaveGame')"
+        :title="$t('startPanel.leaveGame')"
+        :loading="busy && !pendingDifficulty"
+        :disabled="busy || !canPlay"
+        @click="leave"
+      >
+        <span class="material-icons bot-leave-icon" aria-hidden="true">logout</span>
+        <span class="bot-leave-label">{{ $t('startPanel.leaveGame') }}</span>
+      </v-btn>
+    </div>
     <div class="bot-modes">
       <div
         v-for="difficulty in botDifficulties"
@@ -51,11 +66,14 @@
 import { ref } from 'vue';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { localizedPath } from '@/router/paths';
 import { socket } from '@/api/socket';
 import type { AiBotDifficulty, AiLanguage } from '@avalon/types';
 import BotGameTimer from './BotGameTimer.vue';
 const props = defineProps<{ roomID: string; title?: string; expiresAt?: number }>();
 const { t, locale } = useI18n();
+const router = useRouter();
 const { canPlay, botModes, refresh } = useAiAccess();
 const botDifficulties: AiBotDifficulty[] = ['smart', 'regular'];
 const selectedLanguage = ref<AiLanguage>(
@@ -64,6 +82,23 @@ const selectedLanguage = ref<AiLanguage>(
 const pendingDifficulty = ref<AiBotDifficulty>();
 const busy = ref(false);
 const error = ref('');
+async function leave() {
+  if (busy.value || !canPlay.value) return;
+  busy.value = true;
+  error.value = '';
+  try {
+    const result = await socket.timeout(10000).emitWithAck('controlAiRoom', props.roomID, 'stop');
+    if ('error' in result) {
+      error.value = t('aiArena.botLeaveError');
+      return;
+    }
+    await router.push(localizedPath('/', locale.value));
+  } catch {
+    error.value = t('aiArena.connectionError');
+  } finally {
+    busy.value = false;
+  }
+}
 async function play(difficulty: AiBotDifficulty) {
   if (busy.value || !canPlay.value || !botModes.value[difficulty]) return;
   if (props.expiresAt && Date.now() >= props.expiresAt) {
@@ -107,11 +142,28 @@ async function play(difficulty: AiBotDifficulty) {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.bot-preparation-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
 .bot-language {
+  flex: 1;
+  min-width: 0;
   display: grid;
   gap: 4px;
-  margin: 8px 0 12px;
   font-size: 14px;
+}
+.bot-preparation-actions .bot-leave-button {
+  width: auto;
+  min-height: 44px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.bot-leave-icon {
+  font-size: 20px;
+  margin-right: 6px;
 }
 .bot-language select {
   min-height: 44px;
@@ -175,10 +227,24 @@ async function play(difficulty: AiBotDifficulty) {
     line-height: 18px;
     margin-bottom: 2px;
   }
+  .bot-preparation-actions {
+    margin: 4px 0 6px;
+  }
   .bot-language {
     gap: 2px;
-    margin: 4px 0 6px;
     font-size: 12px;
+  }
+  .bot-preparation-actions .bot-leave-button {
+    min-width: 44px;
+    width: 44px;
+    min-height: 45px;
+    padding: 0;
+  }
+  .bot-leave-icon {
+    margin-right: 0;
+  }
+  .bot-leave-label {
+    display: none;
   }
   .bot-language > span {
     position: absolute;
@@ -244,7 +310,7 @@ async function play(difficulty: AiBotDifficulty) {
     line-height: 13px;
     margin: 0;
   }
-  .bot-language {
+  .bot-preparation-actions {
     margin: 2px 0 4px;
   }
   .bot-mode {

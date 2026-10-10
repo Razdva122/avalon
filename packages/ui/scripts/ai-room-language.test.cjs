@@ -246,7 +246,70 @@ test('unavailable bot modes stay visible and cannot initiate a match', async (t)
   assert.deepEqual(room.sent, []);
   room.access.botModes.value = { smart: false, regular: false };
   await room.render();
+  assert.ok(
+    room
+      .nodes('v-btn')
+      .filter((node) => node.props['data-bot-mode'])
+      .every((node) => node.props.disabled),
+  );
+});
+
+test('leaving preparation waits for cancellation before returning to the lobby, even without available bots', async (t) => {
+  let finish;
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    props: { roomID: 'bot-room', expiresAt: Date.now() + 90000 },
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: false, regular: false }) },
+    acknowledge: () => new Promise((resolve) => (finish = resolve)),
+  });
+  t.after(room.stop);
+  const leave = room.nodes('v-btn').find((node) => node.props.class === 'bot-leave-button');
+  assert.ok(leave, 'prepared table has a leave button');
+  assert.equal(leave.props.disabled, false);
+  const leaving = leave.props.onClick();
+  await leave.props.onClick();
+  await room.render();
+  assert.deepEqual(room.sent, [['controlAiRoom', 'bot-room', 'stop']]);
+  assert.deepEqual(room.navigation, [], 'stay until the server releases the slot');
+  assert.ok(room.nodes('select')[0].props.disabled);
   assert.ok(room.nodes('v-btn').every((node) => node.props.disabled));
+  finish({ ok: true });
+  await leaving;
+  assert.deepEqual(room.navigation, ['/']);
+});
+
+test('failed preparation cancellation stays in the room and allows retry without exposing server errors', async (t) => {
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    props: { roomID: 'bot-room' },
+    locale: 'ru',
+    accessOverrides: { canPlay: vue.ref(true) },
+    acknowledge: async () => ({ error: 'AI room control in progress' }),
+  });
+  t.after(room.stop);
+  const leave = room.nodes('v-btn').find((node) => node.props.class === 'bot-leave-button');
+  assert.ok(leave);
+  await leave.props.onClick();
+  const html = await room.render();
+  assert.deepEqual(room.navigation, []);
+  assert.ok(html.includes('Не удалось покинуть игру. Попробуйте ещё раз.'));
+  assert.ok(!html.includes('AI room control in progress'));
+  assert.equal(room.nodes('v-btn').find((node) => node.props.class === 'bot-leave-button').props.disabled, false);
+});
+
+test('a network failure cancelling preparation keeps the player in the room', async (t) => {
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    props: { roomID: 'bot-room' },
+    accessOverrides: { canPlay: vue.ref(true) },
+    acknowledge: async () => {
+      throw Error('ACK timeout');
+    },
+  });
+  t.after(room.stop);
+  const leave = room.nodes('v-btn').find((node) => node.props.class === 'bot-leave-button');
+  assert.ok(leave);
+  await leave.props.onClick();
+  const html = await room.render();
+  assert.deepEqual(room.navigation, []);
+  assert.ok(html.includes(messages.en.aiArena.connectionError));
 });
 
 test('bot table locks language and prevents duplicate starts while the server acknowledges', async (t) => {
@@ -260,6 +323,10 @@ test('bot table locks language and prevents duplicate starts while the server ac
   const button = room.nodes('v-btn').find((node) => node.props['data-bot-mode'] === 'smart');
   const starting = button.props.onClick();
   await button.props.onClick();
+  await room
+    .nodes('v-btn')
+    .find((node) => node.props.class === 'bot-leave-button')
+    .props.onClick();
   await room.render();
   assert.deepEqual(room.sent, [['startHumanAiRoom', 'bot-room', { difficulty: 'smart', language: 'en' }]]);
   assert.ok(room.nodes('select')[0].props.disabled);

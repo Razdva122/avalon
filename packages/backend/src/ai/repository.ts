@@ -261,7 +261,7 @@ export class AiRepository {
     const docs = await this.db
       .collection<{ state: ArchiveSummary }>('ai_room_replays')
       .find(
-        {},
+        { 'state.ai.status': { $nin: ['stopped', 'running', 'paused'] } },
         {
           projection: {
             _id: 0,
@@ -283,7 +283,7 @@ export class AiRepository {
       .toArray();
     const states = await this.restoreModels(docs.map(({ state }) => this.archiveState(state)));
     return states
-      .filter((state) => state.ai)
+      .filter((state) => state.ai && state.ai.status !== 'stopped')
       .map((state) => ({
         uuid: state.roomID,
         ai: true,

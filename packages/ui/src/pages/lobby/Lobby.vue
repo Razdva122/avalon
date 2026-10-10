@@ -206,8 +206,12 @@ export default defineComponent({
     const aiRooms = ref<TRoomsList>();
     const aiLoading = ref(false);
     const aiError = ref(false);
+    let aiRefreshPending = false;
     const loadAiRooms = async () => {
-      if (aiLoading.value) return;
+      if (aiLoading.value) {
+        aiRefreshPending = true;
+        return;
+      }
       aiLoading.value = true;
       aiError.value = false;
       try {
@@ -218,6 +222,10 @@ export default defineComponent({
         aiError.value = true;
       } finally {
         aiLoading.value = false;
+        if (aiRefreshPending) {
+          aiRefreshPending = false;
+          if (filter.value === 'ai-games') void loadAiRooms();
+        }
       }
     };
     const online = ref<number>();
@@ -267,6 +275,7 @@ export default defineComponent({
 
     const updateRooms = (list: TRoomsList) => {
       roomsList.value = list;
+      if (filter.value === 'ai-games') void loadAiRooms();
     };
     socket.on('roomsListUpdated', updateRooms);
 
@@ -308,6 +317,7 @@ export default defineComponent({
     };
     socket.on('onlineCounterUpdated', updateOnline);
     onBeforeUnmount(() => {
+      aiRefreshPending = false;
       socket.off('roomsListUpdated', updateRooms);
       socket.off('onlineCounterUpdated', updateOnline);
     });

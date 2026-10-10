@@ -94,7 +94,7 @@ export class Manager {
       return;
     }
 
-    if (removeRoom) {
+    if (removeRoom || room.ai?.status === 'stopped') {
       this.roomsList = this.roomsList.filter((el) => el.uuid !== room.roomID);
     } else {
       const roomData: TRoomInfo = {
@@ -153,6 +153,7 @@ export class Manager {
 
     // Existing live entries take precedence if a room was created during startup loading.
     this.roomsList = [...new Map([...roomsInfo, ...this.roomsList].map((room) => [room.uuid, room])).values()]
+      .filter((room) => room.aiStatus !== 'stopped' && this.rooms[room.uuid]?.ai?.status !== 'stopped')
       .sort((a, b) => Date.parse(b.createAt) - Date.parse(a.createAt))
       .slice(0, 50);
     this.io.to('lobby').emit('roomsListUpdated', this.roomListCutted);

@@ -86,6 +86,32 @@ test('AI room summaries preserve selected language and default older archives to
   ]);
 });
 
+test('lobby summaries skip stopped archives before limiting without deleting their replays', async () => {
+  const db = client.db('summary-stopped');
+  const collection = db.collection<{ _id: string; state: Record<string, unknown> }>('ai_room_replays');
+  const statuses = [...Array.from({ length: 21 }, () => 'stopped'), 'running', 'paused', 'finished', 'finished'];
+  await collection.insertMany(
+    statuses.map((status, index) => ({
+      _id: `room-${index}`,
+      state: {
+        roomID: `room-${index}`,
+        createAt: new Date(Date.UTC(2026, 9, 30 - index)).toISOString(),
+        stage: 'started',
+        leaderID: 'owner',
+        players: [],
+        options: { roles: {}, addons: {}, features: {} },
+        ai: { status, model: 'saved-model' },
+      },
+    })),
+  );
+  const repo = new AiRepository(db);
+  expect((await repo.recentSummaries()).map(({ uuid }) => uuid)).toEqual(['room-23', 'room-24']);
+  expect((await repo.load('room-0'))?.ai?.status).toBe('stopped');
+  expect((await repo.load('room-21'))?.ai?.status).toBe('stopped');
+  expect(await repo.recent(30)).toHaveLength(25);
+  expect(await collection.countDocuments()).toBe(25);
+});
+
 test('Codex request log records finalized subscription token usage once', async () => {
   const db = client.db('request-costs');
   const repo = new AiRepository(db);

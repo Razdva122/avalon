@@ -298,6 +298,46 @@ test('public AI list returns latest 20 unique rooms with live state and no priva
   expect(response).toHaveBeenLastCalledWith({ error: 'Could not load AI rooms' });
 });
 
+test('public AI list hides stopped rooms after merging live state over stale archives', async () => {
+  const states = ['ready', 'running', 'paused', 'finished', 'stopped'] as const;
+  const archived = Array.from({ length: 25 }, (_, index) => ({
+    uuid: `archived-stopped-${index}`,
+    ai: true,
+    aiStatus: 'stopped',
+    createAt: '2026-10-11T12:00:00.000Z',
+  }));
+  archived.push({ uuid: 'stopped', ai: true, aiStatus: 'finished', createAt: '2026-10-11T12:00:00.000Z' });
+  const host = {
+    dbManager: {},
+    rooms: Object.fromEntries(
+      states.map((status) => {
+        const state = {
+          roomID: status,
+          ai: { status, model: 'test' },
+          stage: 'locked',
+          leaderID: 'host',
+          players: [],
+          options: {},
+          createAt: '2026-10-10T12:00:00.000Z',
+        };
+        return [status, { ai: state.ai, calculateRoomState: () => state }];
+      }),
+    ),
+  } as unknown as Manager;
+  const service = new AiService(host);
+  service.repository = { recentSummaries: async () => archived } as unknown as AiRepository;
+  const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
+  service.register({ on: (name: string, handler: any) => (handlers[name] = handler) } as unknown as ServerSocket);
+  const response = jest.fn();
+  await handlers.getAiRoomsList(response);
+  expect(response.mock.calls[0][0].rooms.map(({ uuid }: { uuid: string }) => uuid).sort()).toEqual([
+    'finished',
+    'paused',
+    'ready',
+    'running',
+  ]);
+});
+
 test('technical resume requires a current admin and rejects non-recoverable or stopped rooms', async () => {
   const { AiTechnicalPause, AiPause } = await import('./client');
   const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;

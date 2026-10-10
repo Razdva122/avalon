@@ -65,22 +65,30 @@ test('profile refuses invalid names before optimistic profile update', () => {
   }
 });
 
-async function lobby(createResult, roomsResult = []) {
+async function lobby(createResult, roomsResult = [], aiResult = { rooms: [] }) {
   const routes = [],
-    notifications = [];
+    notifications = [],
+    requests = [];
+  const listeners = new Map();
   const socket = {
     timeout() {
       return this;
     },
     async emitWithAck(event) {
+      requests.push(event);
       if (event === 'createRoom') {
         if (createResult instanceof Error) throw createResult;
         return createResult;
       }
+      if (event === 'getAiRoomsList') return typeof aiResult === 'function' ? aiResult() : aiResult;
       return event === 'getOnlineCounter' ? 1 : typeof roomsResult === 'function' ? roomsResult() : roomsResult;
     },
-    on() {},
-    off() {},
+    on(event, listener) {
+      listeners.set(event, listener);
+    },
+    off(event, listener) {
+      if (listeners.get(event) === listener) listeners.delete(event);
+    },
   };
   const page = load('../src/pages/lobby/Lobby.vue', {
     '@/api/socket': { socket },
@@ -91,16 +99,90 @@ async function lobby(createResult, roomsResult = []) {
     '@/helpers/composables/useAiAccess': { useAiAccess: () => ({ costs: Vue.ref({}) }) },
   }).default;
   let state;
-  await renderToString(
-    Vue.createSSRApp({
-      setup() {
-        state = page.setup();
-        return () => null;
-      },
-    }),
-  );
-  return { state, routes, notifications };
+  const renderer = Vue.createRenderer({
+    createComment: () => ({}),
+    insert() {},
+    remove() {},
+  });
+  const app = renderer.createApp({
+    setup() {
+      state = page.setup();
+      return () => null;
+    },
+  });
+  app.mount({});
+  await new Promise((resolve) => setImmediate(resolve));
+  return {
+    state,
+    routes,
+    notifications,
+    requests,
+    broadcast: (event, ...args) => listeners.get(event)?.(...args),
+    dispose: () => app.unmount(),
+  };
 }
+
+test('the open AI filter removes a cached room after the server broadcasts its stop', async (t) => {
+  const ready = { uuid: 'ai-ready', players: 5, state: 'locked', aiStatus: 'ready', options: {} };
+  const replies = [{ rooms: [ready] }, { rooms: [] }];
+  const fixture = await lobby('room-123', [ready], () => replies.shift());
+  t.after(fixture.dispose);
+  fixture.state.filter.value = 'ai-games';
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(fixture.state.visibleRooms.value, [ready]);
+
+  fixture.broadcast('roomsListUpdated', []);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(fixture.state.filter.value, 'ai-games');
+  assert.deepEqual(fixture.state.visibleRooms.value, []);
+  assert.equal(fixture.requests.filter((event) => event === 'getAiRoomsList').length, 2);
+});
+
+test('AI room broadcasts during a pending list request coalesce into one fresh trailing request', async (t) => {
+  const ready = { uuid: 'ai-ready', players: 5, state: 'locked', aiStatus: 'ready', options: {} };
+  let resolveFirst, resolveSecond;
+  const first = new Promise((resolve) => (resolveFirst = resolve));
+  const second = new Promise((resolve) => (resolveSecond = resolve));
+  const replies = [first, second];
+  const fixture = await lobby('room-123', [ready], () => replies.shift());
+  t.after(fixture.dispose);
+  fixture.state.filter.value = 'ai-games';
+  await Vue.nextTick();
+  fixture.broadcast('roomsListUpdated', []);
+  fixture.broadcast('roomsListUpdated', []);
+  assert.equal(fixture.requests.filter((event) => event === 'getAiRoomsList').length, 1);
+
+  resolveFirst({ rooms: [ready] });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(fixture.requests.filter((event) => event === 'getAiRoomsList').length, 2);
+  assert.equal(fixture.state.aiLoading.value, true);
+  resolveSecond({ rooms: [] });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(fixture.state.visibleRooms.value, []);
+  assert.equal(fixture.state.aiLoading.value, false);
+  assert.equal(fixture.requests.filter((event) => event === 'getAiRoomsList').length, 2);
+});
+
+test('room broadcasts do not request AI lists outside the AI filter, including a queued refresh', async (t) => {
+  let resolveList;
+  const pending = new Promise((resolve) => (resolveList = resolve));
+  const fixture = await lobby('room-123', [], () => pending);
+  t.after(fixture.dispose);
+  fixture.broadcast('roomsListUpdated', []);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(fixture.requests.includes('getAiRoomsList'), false);
+
+  fixture.state.filter.value = 'ai-games';
+  await Vue.nextTick();
+  fixture.broadcast('roomsListUpdated', []);
+  fixture.state.filter.value = 'playing';
+  await Vue.nextTick();
+  resolveList({ rooms: [] });
+  await new Promise((resolve) => setImmediate(resolve));
+  fixture.broadcast('roomsListUpdated', []);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(fixture.requests.filter((event) => event === 'getAiRoomsList').length, 1);
+});
 
 test('rejected room creation shows an error and never navigates to the error object', async () => {
   for (const error of ['roomLimit', 'rateLimited', 'invalidRequest', 'requestFailed', 'forbidden']) {
