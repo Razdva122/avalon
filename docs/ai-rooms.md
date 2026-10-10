@@ -62,14 +62,31 @@ are rejected before room reservation.
 Bots discuss the proposal before the leader finalizes a team, then vote quietly.
 The chosen language applies to public speech, private notes, Evil council,
 server announcements and post-game reflections. JSON keys and legal choice
-values stay fixed. Ordinary speech allows two short sentences and 240 characters;
-server announcements and mandatory role claims can add text.
+values stay fixed. Ordinary public speech allows 240 characters;
+server announcements can add text.
 
 Private decisions and public speech are separated. Authoritative facts, legal
 actions, side objectives and secrecy override personality. Public Percival claims
-are testimony, not verified knowledge; other bots must express trust/distrust
-when required. Table conventions restrict some team selections/votes after
-failed missions. Good Lady-result announcements are deterministic and truthful.
+are testimony, not verified knowledge; claims and reactions use the model's own
+words. Strategic advice covers coalition support, the consequences of rejection,
+combined mission constraints, consistent wizard-candidate risk and Merlin's
+history of public words and votes. Off-team Good players account for the reduced
+number of Good available inside a roster; Evil bluffing as Good check the same
+arithmetic when explaining support. Unavoidable Evil presence is distinct from
+actual Fail cards and the mission's Fail threshold. Good treat unqualified
+voluntary support from an off-team player as a strong Evil read when that
+player's claimed Good perspective forces enough Evil inside to sabotage. They
+act on that read through trust, roster preferences and public persuasion, without
+first requiring an explanation. The sourced read remains a revisable hypothesis;
+reliable Good knowledge, supported two-Fail safety and explicit risk tradeoffs
+still matter. Bots choose among all legal actions without mandatory self-inclusion
+or failed-mission partner exclusions. Evil card
+coordination is optional advice; future cards and unseen allies remain unknown.
+Good Lady-result announcements are deterministic and truthful.
+
+During ordinary play and the public Evil council, only `publicReason` is
+published. `speech` remains the private decision reason used by diagnostics and
+post-game review examples; the final post-game reflection uses `speech` publicly.
 
 Only permitted private knowledge is supplied to each bot. Spectator role reveal
 is AI-only; it must never expose hidden roles in human games. Public room state

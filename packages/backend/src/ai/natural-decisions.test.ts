@@ -1,5 +1,7 @@
 import { decisionPipeline } from './pipeline';
-import type { BotRequest } from './client';
+import { BotRoom } from './room';
+import type { BotRequest, GenerationOptions } from './client';
+import type { Server } from '@avalon/types';
 import fixtures from './fixtures/postulates.json';
 
 const request = fixtures.find((f) => f.name === 'postulate-morgana-3')!.request as unknown as BotRequest;
@@ -16,6 +18,64 @@ test('publishes the original public argument in one call even after a failed mis
   expect(inputs[0].choices).toEqual(request.choices);
   expect(result).toEqual({ choice: 0, speech: publicReason, privateReason: 'Private sabotage opportunity.' });
 });
+
+test('publishes council public arguments while keeping private review reasons separate', async () => {
+  const privateReason = 'PRIVATE_COUNCIL_REASON: using hidden role knowledge.';
+  const publicReason = 'Compare the early roster advice with the later failed team; another candidate may fit too.';
+  const reviews: GenerationOptions['context'][] = [];
+  const councilRequests: BotRequest[] = [];
+  const decide = decisionPipeline(async (r, options) => {
+    if (options.phase === 'review') {
+      reviews.push(options.context);
+      return { choice: 0, speech: 'I should have compared the earlier advice more carefully.' };
+    }
+    if (r.councilDiscussion) councilRequests.push(r);
+    return {
+      choice: r.state.stage === 'onMission' ? r.choices.indexOf('success') : 0,
+      speech: r.councilDiscussion ? privateReason : 'Private decision.',
+      publicReason: r.speak ? (r.councilDiscussion ? publicReason : 'Compare the mission results.') : '',
+    };
+  });
+  const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
+  const room = new BotRoom('council-public-reason', 'admin', io, decide, undefined, 0, 'en', 5);
+  await room.run();
+
+  expect(room.ai?.status).toBe('finished');
+  const councilMessages = room.chat.history.filter((message) => message.message.startsWith('Evil council:'));
+  expect(councilMessages).toHaveLength(2);
+  for (const message of councilMessages) expect(message.message).toContain(publicReason);
+  expect(JSON.stringify(room.chat.history)).not.toContain(privateReason);
+  expect(JSON.stringify(councilRequests)).not.toContain(privateReason);
+  expect(councilRequests[1].evilCouncil).toEqual([
+    { seat: councilRequests[0].name, target: councilRequests[0].choices[0], reason: publicReason },
+  ]);
+  const councilExamples = reviews.flatMap((context) =>
+    (
+      context as { decisionExamples: { stage: string; reason: string; publicStatement: string }[] }
+    ).decisionExamples.filter((example) => example.stage === 'assassinate'),
+  );
+  expect(councilExamples.filter((example) => example.publicStatement)).toEqual([
+    expect.objectContaining({ reason: privateReason, publicStatement: publicReason }),
+    expect.objectContaining({ reason: privateReason, publicStatement: publicReason }),
+  ]);
+});
+
+test.each([undefined, ''])(
+  'council never falls back to private speech when publicReason is %s',
+  async (publicReason) => {
+    const result = await decisionPipeline(async () => ({
+      choice: 0,
+      speech: 'PRIVATE_COUNCIL_REASON',
+      publicReason,
+    }))({
+      ...request,
+      councilDiscussion: true,
+      choices: ['1', '2'],
+      state: { ...request.state, stage: 'assassinate' },
+    });
+    expect(result).toEqual({ choice: 0, speech: '', privateReason: 'PRIVATE_COUNCIL_REASON' });
+  },
+);
 
 test('model may choose not to repeat a stance on an old bot declaration', async () => {
   const r = { ...request, publicRoleClaims: [{ by: 2, target: 3, status: 'claim' as const }] };

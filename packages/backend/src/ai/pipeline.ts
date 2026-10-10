@@ -1,7 +1,15 @@
 import { claimContext, validateClaims, claimInstructions } from './claims';
 import { languageInstruction } from './language';
 import type { AiLanguage } from '@avalon/types';
-import { AiPause, AiTechnicalPause, compactRequest, systemFor, tableConversationAdvice } from './client';
+import {
+  AiPause,
+  AiTechnicalPause,
+  compactRequest,
+  systemFor,
+  tableConversationAdvice,
+  coalitionAdvice,
+  assassinationCheck,
+} from './client';
 import type { BotReply, BotRequest, Decide, GenerationOptions, DecisionEvidence } from './client';
 
 // Explicit allowlist: public role totals are safe; private assignments, cards, checks and notes stay private.
@@ -149,8 +157,15 @@ export function decisionInstructions(request: BotRequest) {
     : request.optionalSpeech
       ? 'As leader, select the final roster after hearing the full circle. publicReason may be empty.'
       : request.councilDiscussion
-        ? 'The Evil council is public. In speech discuss your assassination candidate from public evidence, without announcing private allies.'
+        ? 'The Evil council is public. In publicReason discuss your assassination candidate from public evidence, compare an alternative and respond to earlier advice without announcing private allies. speech remains your private reason, including during council.'
         : 'Choose the action for the current stage. When speak=false, publicReason must be empty.';
+  const strategy = ['selectTeam', 'votingForTeam'].includes(request.state.stage)
+    ? coalitionAdvice
+    : request.state.stage === 'onMission'
+      ? "Evil card advice: compare sabotage with a concrete future benefit of cover using score and failsRequired. Optional coordination when sabotage is worthwhile: the lowest-numbered known Evil participants up to failsRequired may play Fail, others Success to limit redundant exposure. Allies' future cards remain unknown; unresolved teammates may also be Evil and act independently. Oberon cannot coordinate with unseen allies. Weigh early exposure against cover, and prioritize a decisive sabotage over trust for a round that may never occur. Too few Evil cannot meet a two-Fail threshold."
+      : request.state.stage === 'assassinate'
+        ? assassinationCheck
+        : '';
   return (
     languageInstruction(request.language) +
     ' ' +
@@ -158,8 +173,11 @@ export function decisionInstructions(request: BotRequest) {
     ' ' +
     'Play Avalon for your actual side and objective, using roleAdvice and privateKnowledge. Choose exactly one supplied legal choice. You decide strategy: self-inclusion, accusation, bluffing, trust and risk are not server mandates. Known facts constrain beliefs; they do not dictate a fixed speech or a single bluff. ' +
     'Completed missions establish results and Fail counts; rejected proposals played no cards and did not change the score. Each participant plays one card. Success alone does not prove alignment. Read failsRequired, approvalsRequired and score literally. Proposals 1–4 require a majority; proposal 5 runs automatically. Good needs three successes and Merlin surviving; Evil needs three failures or killing Merlin. Oberon knows no allies; use only visible privateKnowledge. ' +
+    'Combine ALL completed missions with alignmentCounts and reliable private facts before disputing a deduction. Fails give a lower bound on Evil in a team; remaining Evil slots can also give an upper bound. Example only: with three Evil total, disjoint teams showing two and one Fails contain exactly two and one Evil, even if Evil sometimes play Success. Do not add bounds across overlapping teams as if their participants were different. Use only publicly available bounds in public arguments, and update old hypotheses when new facts narrow them. ' +
     'Public claims and modelHypotheses are fallible testimony or notes, not verified roles. Retain useful earlier deductions and reconsider them with new evidence. A truthful Lady result reveals alignment, not role, and does not clear its author. Do not invent votes, inspections, dialogue or future cards. ' +
     'Keep private knowledge private: never confess being Evil or Merlin, expose the wizard pair or allies, or announce sabotage. A deliberate Percival claim is allowed through claimMorgana and must be written in publicReason. Your public argument can bluff for your side; your private reason must still use your actual side and knowledge. Merlin must protect both missions and their identity: use the public-viewpoint check in roleAdvice before publishing, including equal treatment of competing unverified claims. Keep private certainty in speech and evidence, not in unsupported public conclusions. ' +
+    strategy +
+    ' ' +
     turn +
     ' Return JSON choice, speech (private reason, <=240 characters), publicReason (your actual public words, <=240 characters), evidence (at most 3 changed notes with key/kind/fact/source/certainty). Use claim certainty for hypotheses and testimony, bluff for deliberate deception. No unchanged evidence dump. Public words are published directly, without a rewrite or added sentences. Silence is allowed during discussion; respond when you have something to contribute.'
   );
@@ -274,9 +292,10 @@ export function decisionPipeline(generate: Generate): Decide {
       const choice = request.choices[reply.choice];
       if (choice === undefined) throw new AiTechnicalPause('Invalid private decision.');
       if (!finalReview) validateClaims(request, reply);
-      const speech =
-        finalReview || request.councilDiscussion
-          ? reply.speech
+      const speech = finalReview
+        ? reply.speech
+        : request.councilDiscussion
+          ? reply.publicReason || ''
           : request.speak
             ? safePublicSpeech(reply.publicReason || '', choice, request.language, reply.claimMorgana != null)
             : '';
