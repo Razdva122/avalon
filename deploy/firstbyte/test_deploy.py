@@ -30,11 +30,11 @@ NEW = {
 
 class DeployTests(unittest.TestCase):
     def test_ssh_boundary_rejects_commands_and_shell_payloads(self):
-        for value in ['deploy v71.0.0', 'check v72.0.0-rc.1']:
+        for value in ['deploy v71.0.0', 'check v72.0.0-rc.1', 'deploy-skip-rooms v71.0.0']:
             self.assertEqual(deploy.parse_command(value), tuple(value.split(' ')))
         for value in ['', 'bash', '--run v71.0.0', 'deploy master', 'deploy v1.0.0;id',
                       'deploy v1.0.0\nid', 'deploy v1.0.0\n', 'deploy $(id)',
-                      'deploy v1.0.0 ' , 'deploy v1.0.0-' + 'a' * 128]:
+                      'deploy v1.0.0 ', 'deploy-skip-rooms v1.0.0;id', 'deploy v1.0.0 --skip-room-check', 'deploy v1.0.0-' + 'a' * 128]:
             with self.subTest(value=value), self.assertRaises(ValueError):
                 deploy.parse_command(value)
 
@@ -47,7 +47,7 @@ class DeployTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             deploy.replace_images(OLD + OLD, NEW)
 
-    def scenario(self, failure=None, check=False, same=False):
+    def scenario(self, failure=None, check=False, same=False, skip=False):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             compose = root / 'compose.production.yaml'
@@ -83,11 +83,11 @@ class DeployTests(unittest.TestCase):
             with patch.object(deploy, 'ROOT', root), patch.object(deploy, 'run', side_effect=command), \
                  patch.object(deploy, 'health', side_effect=health), \
                  patch.object(deploy.shutil, 'disk_usage', return_value=namedtuple('usage', 'total used free')(40, 10, (1 if failure == 'disk' else 30) * 1024**3)):
-                if failure:
+                if failure and not (failure == 'busy' and skip):
                     with self.assertRaises((RuntimeError, subprocess.CalledProcessError)):
-                        deploy.deploy('v72.0.0', check_only=check)
+                        deploy.deploy('v72.0.0', check_only=check, skip_room_check=skip)
                 else:
-                    deploy.deploy('v72.0.0', check_only=check)
+                    deploy.deploy('v72.0.0', check_only=check, skip_room_check=skip)
             return compose.read_text(), starts, steps
 
     def test_success_backs_up_before_replacing_only_app_services(self):
@@ -99,6 +99,7 @@ class DeployTests(unittest.TestCase):
         self.assertLess(backup, up)
         self.assertEqual(steps[up][-2:], ['backend', 'ui'])
         self.assertIn('--no-deps', steps[up])
+        self.assertEqual(sum(step[:2] == ['docker', 'exec'] for step in steps), 2)
 
     def test_failures_before_activation_do_not_change_compose_or_restart(self):
         for failure in ['pull', 'backup', 'busy', 'pending', 'disk']:
@@ -114,6 +115,35 @@ class DeployTests(unittest.TestCase):
                 self.assertEqual(final, OLD)
                 self.assertEqual(len(starts), 2)
                 self.assertEqual(starts[-1], OLD)
+
+    def test_skip_rooms_allows_abandoned_games_but_still_backs_up(self):
+        final, starts, steps = self.scenario(failure='busy', skip=True)
+        self.assertIn(NEW['backend'], final)
+        self.assertEqual(len(starts), 1)
+        self.assertIn(['systemctl', 'start', 'avalon-backup.service'], steps)
+        self.assertFalse(any(step[:2] == ['docker', 'exec'] for step in steps))
+
+    def test_skip_rooms_does_not_bypass_backup_failure_or_health_rollback(self):
+        for failure in ['backup', 'health']:
+            with self.subTest(failure=failure):
+                final, starts, _ = self.scenario(failure=failure, skip=True)
+                self.assertEqual(final, OLD)
+                self.assertEqual(len(starts), 0 if failure == 'backup' else 2)
+
+    def test_skip_flag_survives_systemd_dispatch(self):
+        commands = []
+        def process(args):
+            commands.append(args)
+            return subprocess.CompletedProcess(args, 0)
+        with patch.object(deploy.sys, 'argv', ['deploy.py', 'deploy-skip-rooms v71.0.0']), \
+             patch.object(deploy.subprocess, 'run', side_effect=process):
+            deploy.main()
+        child = commands[0]
+        child_args = child[child.index('/usr/local/sbin/avalon-deploy'):]
+        with patch.object(deploy.sys, 'argv', child_args), \
+             patch.dict(deploy.os.environ, {}, clear=True), patch.object(deploy, 'deploy') as operation:
+            deploy.main()
+        operation.assert_called_once_with('v71.0.0', check_only=False, skip_room_check=True)
 
     def test_check_and_same_digest_do_not_restart_or_make_backup(self):
         for options in [{'check': True}, {'same': True}]:
