@@ -25,9 +25,9 @@ socket.on('connect', () => socket.emit('getRolesWithRatings', roles => {
 
 
 def parse_command(value):
-    match = re.fullmatch(r'(deploy|check) (' + TAG + ')', value)
+    match = re.fullmatch(r'(deploy|deploy-skip-rooms|check) (' + TAG + ')', value)
     if not match or len(match[2]) > 128:
-        raise ValueError('Expected deploy vX.Y.Z or check vX.Y.Z')
+        raise ValueError('Expected deploy, deploy-skip-rooms or check followed by vX.Y.Z')
     return match[1], match[2]
 
 
@@ -97,7 +97,7 @@ def activate():
     health()
 
 
-def deploy(tag, check_only=False):
+def deploy(tag, check_only=False, skip_room_check=False):
     parse_command('deploy ' + tag)
     target = ROOT / 'compose.production.yaml'
     pending = ROOT / 'deploy-pending.json'
@@ -120,19 +120,23 @@ def deploy(tag, check_only=False):
             health()
             print('Preflight OK; ' + ('no changes requested' if check_only else 'release already installed'), flush=True)
             return
-        print('Checking rooms and creating a verified off-host backup', flush=True)
-        idle()
+        if skip_room_check:
+            print('WARNING: room checks explicitly skipped; unfinished games may lose their state', flush=True)
+        else:
+            idle()
+        print('Creating a verified off-host backup', flush=True)
         run(['systemctl', 'start', 'avalon-backup.service'], timeout=2800)
-        idle()
+        if not skip_room_check:
+            idle()
         # The backup script verifies off-host readback before reporting success.
         (ROOT / 'compose.previous.yaml').write_text(previous)
-        pending.write_text(json.dumps({'tag': tag, 'images': images, 'startedAt': time.time()}))
+        pending.write_text(json.dumps({'tag': tag, 'images': images, 'skipRoomCheck': skip_room_check, 'startedAt': time.time()}))
         try:
             write_compose(candidate)
             compose('config', '--quiet')
             print('Activating backend and UI', flush=True)
             activate()
-            (ROOT / 'last-deploy.json').write_text(json.dumps({'tag': tag, 'images': images, 'completedAt': time.time()}))
+            (ROOT / 'last-deploy.json').write_text(json.dumps({'tag': tag, 'images': images, 'skipRoomCheck': skip_room_check, 'completedAt': time.time()}))
         except Exception:
             print('Deployment failed; restoring previous application images', flush=True)
             write_compose(previous)
@@ -148,7 +152,8 @@ def main():
     os.umask(0o077)
     # Internal mode is invoked only by the root-owned systemd service command.
     if len(sys.argv) == 3 and sys.argv[1] == '--run' and not os.environ.get('SUDO_USER'):
-        return deploy(sys.argv[2])
+        mode, tag = parse_command(sys.argv[2])
+        return deploy(tag, check_only=mode == 'check', skip_room_check=mode == 'deploy-skip-rooms')
     if len(sys.argv) != 2:
         raise ValueError('One SSH command argument required')
     mode, tag = parse_command(sys.argv[1])
@@ -160,7 +165,7 @@ def main():
     result = subprocess.run([
         'systemd-run', '--unit=avalon-deploy', '--collect', '--wait', '--quiet',
         '--property=UMask=0077',
-        '/usr/local/sbin/avalon-deploy', '--run', tag,
+        '/usr/local/sbin/avalon-deploy', '--run', f'{mode} {tag}',
     ])
     subprocess.run(['journalctl', '-u', 'avalon-deploy', '--since=@' + started, '--no-pager', '-o', 'cat'])
     if result.returncode:

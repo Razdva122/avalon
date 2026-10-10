@@ -10,6 +10,10 @@ Compose project `avalon-production`. The runner does not build images or copy se
 2. Open [Actions → Deploy to server](https://github.com/Razdva122/avalon/actions/workflows/deploy.yml).
 3. Select **Run workflow**, branch **master**, and the published tag, e.g. `v71.0.0`.
 4. Leave **check_only** disabled to deploy. Enable it to pull/check without changing containers.
+5. For an abandoned unfinished game, enable **skip_room_check** («Пропустить проверку комнат»).
+   It defaults to **false** and skips only the two room checks. Backup, health checks and rollback
+   remain mandatory. Unfinished games may lose their state, so use it only when that is acceptable.
+   **check_only** takes precedence: with both boxes checked, no containers are changed.
 
 The manual job is named **deploy to server**. A tag push only publishes images; it does not deploy.
 The server pulls both images, records their immutable digests, checks room inventory, runs the
@@ -24,7 +28,8 @@ with incompatible database migrations require a separate migration plan. Watchdo
 and may briefly stop/recover voice during the backend restart.
 
 Selecting the already installed image digests checks health and exits without a restart or backup.
-A failed backup, missing image, nonempty/incomplete room inventory, less than 5 GiB free disk or an
+A failed backup, missing image, nonempty/incomplete room inventory (unless explicitly skipped),
+less than 5 GiB free disk or an
 unresolved interrupted deployment blocks activation. Images are not automatically pruned: keep the
 previous version available for rollback and inspect disk usage when deployment reports low space.
 
@@ -45,7 +50,7 @@ previous version available for rollback and inspect disk usage when deployment r
 - Prerequisites: the existing FirstByte production compose, backup service, watchdog, Python 3,
   Docker Compose, curl, sudo and systemd. Deployment does not bootstrap a blank server.
 
-Only exactly `deploy vX.Y.Z` or `check vX.Y.Z` (optional prerelease suffix) is accepted; no shell,
+Only exactly `deploy vX.Y.Z`, `deploy-skip-rooms vX.Y.Z` or `check vX.Y.Z` (optional prerelease suffix) is accepted; no shell,
 forwarding or arbitrary commands. GitHub cannot upload/replace the server entry point. Script
 updates require the administrator SSH key. The private CI key lives only in GitHub Secrets after
 setup; rotate it by replacing this dedicated authorized key and environment secret.

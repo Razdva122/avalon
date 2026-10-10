@@ -14,6 +14,12 @@ on:
         type: boolean
         default: false
 
+      skip_room_check:
+        description: 'Пропустить проверку комнат (незавершённые игры могут потерять состояние)'
+        required: true
+        type: boolean
+        default: false
+
 permissions:
   contents: read
 
@@ -33,6 +39,7 @@ jobs:
     env:
       RELEASE_TAG: ${{ inputs.tag }}
       CHECK_ONLY: ${{ inputs.check_only }}
+      SKIP_ROOM_CHECK: ${{ inputs.skip_room_check }}
     steps:
       - name: Validate release tag
         shell: bash
@@ -66,6 +73,7 @@ jobs:
           trap 'rm -f "$key_file"' EXIT
           printf '%s\n' "$DEPLOY_SSH_KEY" > "$key_file"
           operation=deploy
+          if [[ "$SKIP_ROOM_CHECK" == true ]]; then operation=deploy-skip-rooms; fi
           if [[ "$CHECK_ONLY" == true ]]; then operation=check; fi
           ssh -T -i "$key_file" \
             -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
