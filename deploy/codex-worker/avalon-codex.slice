@@ -1,0 +1,11 @@
+[Unit]
+Description=Avalon Codex shared resource budget
+
+[Slice]
+CPUAccounting=yes
+MemoryAccounting=yes
+TasksAccounting=yes
+CPUQuota=50%
+MemoryMax=256M
+MemorySwapMax=0
+TasksMax=128

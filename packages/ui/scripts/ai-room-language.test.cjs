@@ -930,16 +930,26 @@ test('human action countdown separates normal turn time from the live shared res
   assert.ok(html.includes('Общий запас: 270 с'), html);
 });
 
-test('discussion countdown explains automatic passing instead of ending the match', async (t) => {
-  t.mock.method(Date, 'now', () => 1000000);
-  t.mock.method(globalThis, 'setInterval', () => 1);
+test('discussion countdown shows the shared reserve as it is spent', async (t) => {
+  let now = 1000000;
+  let tick;
+  t.mock.method(Date, 'now', () => now);
+  t.mock.method(globalThis, 'setInterval', (callback) => {
+    tick = callback;
+    return 1;
+  });
   t.mock.method(globalThis, 'clearInterval', () => {});
   const room = await fixture('components/view/board/modules/BotGameTimer.vue', {
     locale: 'ru',
-    props: { expiresAt: 1090000, phase: 'action', discussion: true, timeBankMs: 300000 },
+    props: { expiresAt: 1390000, baseExpiresAt: 1090000, phase: 'action', discussion: true, timeBankMs: 300000 },
   });
   t.after(room.stop);
   assert.ok(room.html.includes('Ваше слово: 90 с'), room.html);
   assert.ok(room.html.includes('слово передаётся автоматически'), room.html);
-  assert.ok(!room.html.includes('Общий запас'), room.html);
+  assert.ok(room.html.includes('Общий запас: 300 с'), room.html);
+  now = 1120000;
+  tick();
+  const html = await room.render();
+  assert.ok(html.includes('Расходуется запас: 270 с'), html);
+  assert.ok(html.includes('Общий запас: 270 с'), html);
 });

@@ -6,21 +6,32 @@
     ref="playerRef"
   >
     <Teleport to="body">
-      <span
-        v-if="thinking || isOwnDiscussionTurn"
+      <div
+        v-if="thinking || isOwnDiscussionTurn || activeActionTimer"
         ref="statusElement"
         class="ai-player-status"
-        :class="statusThemeClasses"
+        :class="[statusThemeClasses, { 'human-action-status': activeActionTimer }]"
         :style="statusStyles"
-        role="status"
+        :role="activeActionTimer ? undefined : 'status'"
         aria-atomic="true"
-        :aria-label="`${player.name}: ${$t(statusKey)}`"
+        :aria-label="activeActionTimer ? undefined : `${player.name}: ${$t(statusKey)}`"
       >
-        <span v-if="thinking && !isOwnDiscussionTurn" class="thinking-dots" aria-hidden="true"
-          ><i></i><i></i><i></i
-        ></span>
-        {{ $t(statusKey) }}
-      </span>
+        <BotGameTimer
+          v-if="activeActionTimer"
+          :expires-at="activeActionTimer.humanActionExpiresAt!"
+          :base-expires-at="activeActionTimer.humanActionBaseExpiresAt"
+          :time-bank-ms="activeActionTimer.humanTimeBankMs"
+          :discussion="activeActionTimer.waitingForDiscussion"
+          phase="action"
+          compact
+        />
+        <template v-else>
+          <span v-if="thinking && !isOwnDiscussionTurn" class="thinking-dots" aria-hidden="true"
+            ><i></i><i></i><i></i
+          ></span>
+          {{ $t(statusKey) }}
+        </template>
+      </div>
     </Teleport>
     <v-tooltip
       :open-delay="privateDecision ? 300 : 2500"
@@ -222,6 +233,7 @@ import { useTheme } from 'vuetify';
 import { useUserProfile } from '@/helpers/composables';
 import type {
   RoomPlayer,
+  AiRoomState,
   THistoryResults,
   Dictionary,
   TGameStage,
@@ -237,6 +249,7 @@ import { getImagePathByID, getThumbnailPathByID } from '@/helpers/images';
 import Avatar from '@/components/user/Avatar.vue';
 import PlotCard from '@/components/view/information/PlotCard.vue';
 import AiPrivateDecision from './AiPrivateDecision.vue';
+import BotGameTimer from './BotGameTimer.vue';
 import UserHoverCard from '@/components/user/UserHoverCard.vue';
 import snakeCase from 'lodash/snakeCase';
 
@@ -249,12 +262,14 @@ export default defineComponent({
     PlotCard,
     UserHoverCard,
     AiPrivateDecision,
+    BotGameTimer,
   },
   props: {
     loyaltyBadge: { type: Object as PropType<{ team: 'good' | 'evil'; sourceName: string }> },
     badgeHidden: Boolean,
     thinking: { type: Boolean, default: false },
     discussionTurn: { type: Boolean, default: false },
+    actionTimer: { type: Object as PropType<AiRoomState> },
     voiceSide: { type: String as PropType<'left' | 'right'>, default: 'right' },
     playerState: {
       type: Object as PropType<IFrontendPlayer | RoomPlayer>,
@@ -282,6 +297,9 @@ export default defineComponent({
     const voiceContext = inject(roomVoiceKey, undefined);
     const isOwnVoice = computed(() => props.playerState.id === store.state.profile?.id);
     const isOwnDiscussionTurn = computed(() => props.discussionTurn && isOwnVoice.value && !props.visibleHistory);
+    const activeActionTimer = computed(() =>
+      !props.visibleHistory && props.actionTimer?.humanActionExpiresAt ? props.actionTimer : undefined,
+    );
     const statusKey = computed(() => (isOwnDiscussionTurn.value ? 'aiArena.yourDiscussionTurn' : 'aiArena.thinking'));
     const voiceStatus = computed(() => {
       const voice = voiceContext?.value;
@@ -305,7 +323,13 @@ export default defineComponent({
     const { floatingStyles: statusStyles } = useFloating(playerRef, statusElement, {
       strategy: 'fixed',
       placement: 'top',
-      middleware: [offset(6), shift({ padding: 8 })],
+      middleware: [
+        offset(({ rects }) => {
+          const crown = playerRef.value?.querySelector('.player-crown')?.getBoundingClientRect();
+          return crown?.height ? Math.max(6, rects.reference.y - crown.top + 6) : 6;
+        }),
+        shift({ padding: 8 }),
+      ],
       whileElementsMounted: (reference, floating, update) =>
         autoUpdate(reference, floating, update, { animationFrame: true }),
     });
@@ -558,6 +582,7 @@ export default defineComponent({
       voiceStatus,
       isOwnVoice,
       isOwnDiscussionTurn,
+      activeActionTimer,
       statusKey,
       statusElement,
       statusStyles,
@@ -625,6 +650,13 @@ export default defineComponent({
   i:nth-child(3) {
     animation-delay: 0.36s;
   }
+}
+.human-action-status {
+  border-color: #a78b52;
+  background: #202b34;
+  color: #f0d698;
+  font-weight: 600;
+  border-radius: 9px;
 }
 @keyframes thinking-pulse {
   0%,

@@ -128,9 +128,11 @@ export class AiRepository {
     // Separate collection keeps AI replays out of all existing ranked statistics queries.
     if (state.stage !== 'started') return;
     validateID(state.roomID);
+    const saved = structuredClone(state);
+    saved.createAt = new Date(saved.createAt).toISOString();
     await this.db
       .collection<{ _id: string; state: StartedRoomState }>('ai_room_replays')
-      .updateOne({ _id: state.roomID }, { $set: { state: structuredClone(state) } }, { upsert: true });
+      .updateOne({ _id: state.roomID }, { $set: { state: saved } }, { upsert: true });
     this.listVersion++;
     this.listCache = undefined;
   }

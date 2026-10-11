@@ -24,7 +24,8 @@ VM metadata, Compose environment/env_file and local environment files.
 6. Confirm Codex model discovery and account quota reads work before a supervised game.
 7. Verify the persistent configuration source contains no paid inference credentials, so reboot cannot re-enable them.
 
-Production messages retain ten-second pacing; development uses two seconds.
+Messages have no artificial delay. Private votes, mission cards and post-game
+reviews run with at most two concurrent requests; public discussion stays sequential.
 The subscription quota is account-wide. A technical interruption pauses the game;
 the existing retry resumes its current state without repeating completed speech.
 There is no pay-per-token fallback when Codex fails or reaches its quota.

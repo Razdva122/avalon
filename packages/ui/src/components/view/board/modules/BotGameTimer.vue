@@ -1,23 +1,29 @@
 <template>
-  <div class="bot-game-timer">
-    <p class="bot-countdown" role="timer">
-      {{
-        $t(
-          phase === 'preparation'
-            ? 'aiArena.botLaunchTime'
-            : discussion
-              ? 'aiArena.botDiscussionTime'
-              : usingReserve
-                ? 'aiArena.botReserveTime'
-                : 'aiArena.botActionTime',
-          { seconds },
-        )
-      }}
+  <div class="bot-game-timer" :class="{ 'bot-timer-compact': compact }">
+    <details v-if="compact" class="bot-timer-details">
+      <summary>
+        <span role="timer">{{
+          $t(discussion ? 'aiArena.botDiscussionTime' : 'aiArena.botActionTime', { seconds })
+        }}</span>
+        <span class="bot-timer-info" aria-hidden="true">ⓘ</span>
+      </summary>
+      <div class="bot-timer-explanation">
+        <p v-if="usingReserve" class="bot-reserve">{{ $t('aiArena.botReserveTime', { seconds }) }}</p>
+        <p v-if="timeBankMs !== undefined" class="bot-reserve">
+          {{ $t('aiArena.botTimeBankRemaining', { seconds: reserveSeconds }) }}
+        </p>
+        <p class="bot-action-hint">
+          {{ $t(discussion ? 'aiArena.botDiscussionDeadlineHint' : 'aiArena.botActionDeadlineHint') }}
+        </p>
+      </div>
+    </details>
+    <p v-else class="bot-countdown" role="timer">
+      {{ $t(countdownKey, { seconds }) }}
     </p>
-    <p v-if="phase === 'action' && !discussion && timeBankMs !== undefined" class="bot-reserve">
+    <p v-if="phase === 'action' && timeBankMs !== undefined && !compact" class="bot-reserve">
       {{ $t('aiArena.botTimeBankRemaining', { seconds: reserveSeconds }) }}
     </p>
-    <p v-if="phase === 'action'" class="bot-action-hint">
+    <p v-if="phase === 'action' && !compact" class="bot-action-hint">
       {{ $t(discussion ? 'aiArena.botDiscussionDeadlineHint' : 'aiArena.botActionDeadlineHint') }}
     </p>
   </div>
@@ -31,14 +37,20 @@ const props = defineProps<{
   timeBankMs?: number;
   discussion?: boolean;
   phase: 'preparation' | 'action';
+  compact?: boolean;
 }>();
 const now = ref(Date.now());
 const usingReserve = computed(
-  () =>
-    props.phase === 'action' &&
-    !props.discussion &&
-    props.baseExpiresAt !== undefined &&
-    now.value >= props.baseExpiresAt,
+  () => props.phase === 'action' && props.baseExpiresAt !== undefined && now.value >= props.baseExpiresAt,
+);
+const countdownKey = computed(() =>
+  props.phase === 'preparation'
+    ? 'aiArena.botLaunchTime'
+    : usingReserve.value
+      ? 'aiArena.botReserveTime'
+      : props.discussion
+        ? 'aiArena.botDiscussionTime'
+        : 'aiArena.botActionTime',
 );
 const seconds = computed(() =>
   Math.max(
@@ -78,5 +90,52 @@ onBeforeUnmount(() => clearInterval(timer));
   max-width: 280px;
   font-size: 12px;
   line-height: 1.3;
+}
+.bot-timer-compact {
+  margin: 0;
+  font-size: 12px;
+}
+.bot-timer-details {
+  position: relative;
+  pointer-events: auto;
+}
+.bot-timer-details summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 20px;
+  cursor: pointer;
+  list-style: none;
+}
+.bot-timer-details summary::after {
+  content: '';
+  position: absolute;
+  inset: -12px -9px;
+}
+.bot-timer-details summary:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+.bot-timer-info {
+  opacity: 0.7;
+}
+.bot-timer-details summary::-webkit-details-marker {
+  display: none;
+}
+.bot-timer-explanation {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: -9px;
+  right: -9px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid #a78b52;
+  border-radius: 10px;
+  background: #202b34;
+  color: #e6e3da;
+  white-space: normal;
+  font-weight: 400;
 }
 </style>

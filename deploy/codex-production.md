@@ -5,7 +5,7 @@
 The backend image installs `@openai/codex@0.159.2`. Select an image built from the current repository; older images may lack
 production opt-in or remote transport.
 Codex stays disabled until `AI_CODEX_ENABLED=true`; all existing administrator
-access checks, pacing and subscription usage accounting remain in place.
+access checks and subscription usage accounting remain in place.
 Codex is the only supported AI provider; there is no paid inference fallback.
 The AI Arena also requires `AI_ROOMS_ENABLED=true`, included in the fragment.
 
@@ -118,8 +118,8 @@ The production private key was generated **on production** under
 is root-owned and mode 700. No root password is used by the application.
 
 The worker accepts bounded JSON on stdin for `decide`, `models`, or `limits`.
-It sends JSON on stdout. The launcher uses a nonblocking flock for one request,
-buffers the Docker result in a temporary root-only file, and sends whitespace
+It sends JSON on stdout. The launcher uses two bounded flock slots for concurrent requests,
+buffers each Docker result in a temporary root-only file, and sends whitespace
 heartbeats directly over SSH while running. An SSH disconnect stops the launcher
 and removes the container. Container creation completes synchronously before
 the background attach client is started, so cancellation cannot leave a late
@@ -176,3 +176,35 @@ only the latest failure in `state/avalon-last-failure.json` (mode 600): timestam
 elapsed time, a bounded reason, the last whitelisted event type, and a connection
 or authentication classification. It never stores prompts, replies, or raw CLI
 diagnostics. Network-isolated Linux regressions passed before this worker update.
+
+## Two-slot worker (2026-10-11)
+
+The launcher retains a shared `worker.lock` plus exclusive `worker-slot-1.lock`
+and `worker-slot-2.lock`. Older launchers hold the legacy lock exclusively, so
+an atomic replacement waits for their request to finish before starting new slots.
+A third request waits up to 30 seconds with SSH heartbeats; it does not dispatch
+or repeat a model turn while waiting. Cancellation removes only its own container.
+
+Docker must use the systemd cgroup driver and cgroup v2. Install
+`deploy/codex-worker/avalon-codex.slice` root-owned as
+`/etc/systemd/system/avalon-codex.slice`, run `systemctl daemon-reload`, and
+`systemctl start avalon-codex.slice` **before** installing the new launcher.
+Verify `systemctl show avalon-codex.slice` reports `MemoryMax=268435456`,
+`CPUQuotaPerSecUSec=500ms`, `TasksMax=128` and `MemorySwapMax=0`.
+Both containers use `--cgroup-parent=avalon-codex.slice`; their combined ceiling
+is 256 MiB RAM, half of one CPU and 128 tasks, rather than two independent budgets.
+Per-container limits remain 256 MiB/0.5 CPU and rise to 128 tasks.
+
+Back up `/opt/avalon-codex/worker-launch` before an atomic root-owned replacement;
+preserve the state/auth directory, forced-command SSH key and existing lock files.
+Rollback restores that launcher: its exclusive legacy lock prevents overlap with
+new requests still finishing. The slice may remain installed while old containers
+finish outside it. Backend/UI activation must preserve the current production
+configuration and wait for live games to finish.
+
+The backend pairs only private team votes, mission cards and post-game reviews.
+Discussion and Evil council remain sequential. Completed choices survive technical
+pause; a failed pair cancels its pending peer before another pair starts. Reviews
+publish in seat order with stable message IDs. Public thinking state supports two
+seats, with a legacy single-seat fallback; secret mission generation never identifies
+model-driven seats. Artificial message pacing is disabled.

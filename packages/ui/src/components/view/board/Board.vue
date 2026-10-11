@@ -19,15 +19,6 @@
             class="actions-container d-flex flex-column justify-center"
             :class="{ 'during-assassination': assassinationActive }"
           >
-            <BotGameTimer
-              v-if="roomState.ai?.publicBotGame && roomState.ai.humanActionExpiresAt"
-              class="bot-action-timer"
-              :expires-at="roomState.ai.humanActionExpiresAt"
-              :base-expires-at="roomState.ai.humanActionBaseExpiresAt"
-              :time-bank-ms="roomState.ai.humanTimeBankMs"
-              :discussion="roomState.ai.waitingForDiscussion"
-              phase="action"
-            />
             <template v-if="roomState.stage !== 'started'">
               <div v-if="!roomState.ai?.publicBotGame" class="options-panel mb-4">
                 <div class="options-title">{{ $t('game.rolesAndAddons') }}</div>
@@ -72,12 +63,9 @@
             :player-state="player"
             :loyalty-badge="loyaltyBadges[player.id]"
             :badge-hidden="activeLoyaltyTarget === player.id"
-            :thinking="
-              stateManager.viewMode.value === 'live' &&
-              roomState.ai?.status === 'running' &&
-              roomState.ai.thinkingPlayerID === player.id
-            "
+            :thinking="thinkingPlayerIDs.includes(player.id)"
             :discussion-turn="discussionPlayerID === player.id"
+            :action-timer="actionTimerPlayerID === player.id ? roomState.ai : undefined"
             :voice-side="Math.sin((2 * Math.PI * i) / players.length + Math.PI) > 0.75 ? 'left' : 'right'"
             :private-decision="
               roomState.ai && !playerInGame && spectatorRoles[player.id]
@@ -144,7 +132,6 @@ import Timer from '@/components/feedback/Timer.vue';
 import GameTimer from '@/components/feedback/GameTimer.vue';
 import Game from '@/components/view/board/game/Game.vue';
 import StartPanel from '@/components/view/panels/StartPanel.vue';
-import BotGameTimer from '@/components/view/board/modules/BotGameTimer.vue';
 import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
 import CustomTimerControls from '@/components/view/board/modules/CustomTimerControls.vue';
@@ -185,7 +172,6 @@ export default defineComponent({
     Player,
     Game,
     StartPanel,
-    BotGameTimer,
     Timer,
     GameTimer,
     AnnounceLoyalty,
@@ -525,10 +511,29 @@ export default defineComponent({
       return !roomState.value.ai && store.state.profile?.id === roomState.value.leaderID;
     });
 
+    const thinkingPlayerIDs = computed(() => {
+      const room = roomState.value;
+      const ai = room.ai;
+      if (
+        stateManager.viewMode.value !== 'live' ||
+        room.stage !== 'started' ||
+        ai?.status !== 'running' ||
+        room.game.stage === 'onMission'
+      )
+        return [];
+      return ai.thinkingPlayerIDs ?? (ai.thinkingPlayerID ? [ai.thinkingPlayerID] : []);
+    });
     const discussionPlayerID = computed(() => {
       const room = roomState.value;
       if (stateManager.viewMode.value !== 'live' || room.stage !== 'started' || room.game.stage === 'end') return;
       if (room.ai?.status === 'running' && room.ai.waitingForDiscussion) return room.ai.humanPlayerID;
+    });
+
+    const actionTimerPlayerID = computed(() => {
+      const room = roomState.value;
+      if (stateManager.viewMode.value !== 'live' || room.stage !== 'started' || room.game.stage === 'end') return;
+      if (room.ai?.publicBotGame && room.ai.status === 'running' && room.ai.humanActionExpiresAt)
+        return room.ai.humanPlayerID;
     });
 
     const calculateRotate = (i: number, negative: boolean = false) => {
@@ -753,6 +758,8 @@ export default defineComponent({
       players,
       playerInGame,
       discussionPlayerID,
+      thinkingPlayerIDs,
+      actionTimerPlayerID,
       visibleHistory,
       stateManager,
       gameResult,
@@ -879,11 +886,6 @@ export default defineComponent({
 .bot-preparation-table .actions-container {
   top: 0;
   height: 600px;
-}
-@media (max-width: 600px), (max-height: 600px) {
-  .bot-action-timer {
-    zoom: calc(1 / var(--board-scale, 1));
-  }
 }
 
 .game-board {

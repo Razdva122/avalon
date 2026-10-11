@@ -16,7 +16,8 @@ export default {
   botTimeBankRemaining: 'Общий запас: {seconds} с',
   botReserveTime: 'Расходуется запас: {seconds} с',
   botDiscussionTime: 'Ваше слово: {seconds} с',
-  botDiscussionDeadlineHint: 'Через 90 секунд слово передаётся автоматически.',
+  botDiscussionDeadlineHint:
+    '90 секунд на реплику + 5 минут общего запаса. Когда время и запас истекут, слово передаётся автоматически.',
   botTimeout: 'Время истекло. Партия завершена.',
   botTable: 'Игрок и 4 бота',
   botSmart: 'Умные боты',

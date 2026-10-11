@@ -122,7 +122,12 @@ omits private model traces and subscription quotas.
 
 ## Subscription, pacing and pauses
 
-Messages are paced at two seconds in development and ten seconds in production.
+Public discussions and the Evil council remain sequential, without an artificial
+message delay. Private team votes, secret mission-card decisions and post-game
+reflections generate at most two replies concurrently. Private actions are applied
+only after the entire phase has completed; post-game replies publish in seat order.
+Both thinking seats animate during votes and reviews. Mission generators are not
+identified publicly, so immediate Good cards cannot reveal which seats needed a model.
 Codex records subscription token usage; there is no RUB budget or per-game paid
 API charge. Administrator model selection and reasoning use the authenticated
 Codex catalog. Public play uses these fixed server presets:
@@ -155,11 +160,15 @@ Technical continuation of an already started match does not reapply these
 admission thresholds; provider exhaustion can still pause the match.
 
 Public rooms allow 90 seconds to choose the language and launch after preparation.
-Every actual human discussion or board-action turn also has a 90-second deadline.
-The backend publishes `launchExpiresAt` and `humanActionExpiresAt` so the table
-can show the remaining time. Unrelated messages, partial team selections and
-polling do not extend a turn. At expiry the match stops, clears its pending
-human turn and releases the shared slot. A late start or action is rejected.
+Every actual human discussion or board-action turn has 90 seconds plus the
+remaining shared five-minute reserve. Overtime on either kind of turn spends
+that reserve; it does not refill between turns. Once both run out, discussion
+passes automatically, while a required board action stops the match, clears its
+pending human turn and releases the shared slot.
+The backend publishes `launchExpiresAt`, `humanActionBaseExpiresAt` and
+`humanActionExpiresAt` so the table can show the turn time and remaining reserve.
+Unrelated messages, partial team selections and polling do not extend a turn.
+A late start or action is rejected.
 These human-turn deadlines do not apply to administrator-created mixed games.
 Prepared rooms are temporary and are not archived before gameplay starts.
 

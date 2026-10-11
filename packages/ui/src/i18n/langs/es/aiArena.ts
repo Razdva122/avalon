@@ -17,7 +17,8 @@ export default {
   botTimeBankRemaining: 'Reserva compartida: {seconds} s',
   botReserveTime: 'Usando la reserva: {seconds} s',
   botDiscussionTime: 'Tu turno de hablar: {seconds} s',
-  botDiscussionDeadlineHint: 'Después de 90 segundos, el turno pasa automáticamente.',
+  botDiscussionDeadlineHint:
+    '90 segundos para hablar + la reserva compartida de 5 minutos. Cuando ambos se agotan, el turno pasa automáticamente.',
   botTimeout: 'Se agotó el tiempo. La partida ha terminado.',
   botTable: '1 jugador y 4 bots',
   botSmart: 'Bots inteligentes',

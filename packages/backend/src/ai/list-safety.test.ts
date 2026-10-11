@@ -50,7 +50,7 @@ test('lobby summaries use a projection, share concurrent reads, expire, and inva
     expect(projections[0]).not.toHaveProperty('state.game');
     expect(indexes).toContainEqual({ 'state.createAt': -1 });
     status = 'paused';
-    await repo.save({ stage: 'started', roomID: 'room' } as StartedRoomState);
+    await repo.save({ stage: 'started', roomID: 'room', createAt: '2026-09-27T00:00:00.000Z' } as StartedRoomState);
     expect(await repo.recentSummaries()).toEqual([]);
     expect(reads).toBe(2);
     now.mockReturnValue(17000);

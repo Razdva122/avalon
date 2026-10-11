@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const ts = require('typescript');
 const vue = require('vue');
-const { parse, compileTemplate } = require('@vue/compiler-sfc');
+const { parse, compileScript, compileTemplate } = require('@vue/compiler-sfc');
 const { renderToString } = require('@vue/server-renderer');
 
 function fixture(overrides = {}) {
@@ -45,6 +45,24 @@ function fixture(overrides = {}) {
           arrow() {},
         };
       if (id === '@avalon/types/consts') return { availablePlotCards: {} };
+      if (id === './BotGameTimer.vue') {
+        const filename = require.resolve('../src/components/view/board/modules/BotGameTimer.vue');
+        const { descriptor } = parse(fs.readFileSync(filename, 'utf8'));
+        const script = compileScript(descriptor, { id: 'timer' });
+        const template = compileTemplate({
+          source: descriptor.template.content,
+          filename,
+          id: 'timer',
+          compilerOptions: { bindingMetadata: script.bindings },
+        });
+        const timer = {};
+        const code = ts.transpileModule(script.content + '\n' + template.code, {
+          compilerOptions: { module: ts.ModuleKind.CommonJS },
+        }).outputText;
+        new Function('require', 'exports', code)(() => ({ ...vue, onMounted() {}, onBeforeUnmount() {} }), timer);
+        timer.default.render = timer.render;
+        return { __esModule: true, default: timer.default };
+      }
       if (id.endsWith('.vue')) return { __esModule: true, default: { render: () => null } };
       if (id.startsWith('@/') || id.startsWith('./')) return {};
       return require(id);
@@ -76,10 +94,14 @@ function fixture(overrides = {}) {
   async function render() {
     const context = {};
     const app = vue.createSSRApp({ ...exports.default, setup: () => api, render: renderer.render }, props);
-    app.config.globalProperties.$t = (key) =>
+    app.config.globalProperties.$t = (key, params = {}) =>
       ({
         'aiArena.yourDiscussionTurn': 'Ваше слово',
         'aiArena.thinking': 'Думает',
+        'aiArena.botActionTime': `Ваш ход: ${params.seconds} с`,
+        'aiArena.botDiscussionTime': `Ваше слово: ${params.seconds} с`,
+        'aiArena.botReserveTime': `Расходуется запас: ${params.seconds} с`,
+        'aiArena.botTimeBankRemaining': `Общий запас: ${params.seconds} с`,
       })[key] || key;
     app.component('v-tooltip', {
       inheritAttrs: false,
@@ -150,4 +172,26 @@ test('bot thinking retains its dots in the same floating status pill and follows
   assert.ok(rendered.badge.includes('v-theme--darkTheme'), 'the pill follows a theme toggle');
   player.props.thinking = false;
   assert.ok(!(await player.render()).badge.includes('Думает'), 'completed inference removes the status');
+});
+
+test('human deadline renders in the floating player pill, keeps the reserve and clears with the action', async (t) => {
+  t.mock.method(Date, 'now', () => 1000000);
+  const player = fixture({
+    actionTimer: { humanActionExpiresAt: 1390000, humanActionBaseExpiresAt: 1090000, humanTimeBankMs: 300000 },
+  });
+  t.after(player.stop);
+  let rendered = await player.render();
+  assert.ok(rendered.badge.includes('Ваш ход: 90 с'), rendered.badge);
+  assert.ok(rendered.badge.includes('Общий запас: 300 с'), rendered.badge);
+  assert.ok(!rendered.html.includes('Ваш ход'), 'the clock stays outside the scaled table');
+  assert.ok(rendered.badge.includes('<summary'), 'touch and keyboard users can disclose the deadline explanation');
+  player.props.actionTimer.waitingForDiscussion = true;
+  rendered = await player.render();
+  assert.ok(rendered.badge.includes('Ваше слово: 90 с'), rendered.badge);
+  assert.ok(rendered.badge.includes('Общий запас: 300 с'), 'discussion shares the action reserve');
+  player.props.visibleHistory = { type: 'preVote', votes: [] };
+  assert.ok(!(await player.render()).badge.includes('Ваше слово'), 'history suppresses the live deadline');
+  player.props.visibleHistory = undefined;
+  player.props.actionTimer = undefined;
+  assert.ok(!(await player.render()).badge.includes('Ваш ход'), 'completed action removes the clock');
 });

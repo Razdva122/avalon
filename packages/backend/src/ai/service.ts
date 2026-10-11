@@ -157,7 +157,7 @@ export class AiService {
       this.manager.io,
       decisionPipeline(codexDecide(id, this.repository!, undefined, () => room.ai?.codex)),
       (state) => this.repository!.save(state),
-      process.env.NODE_ENV === 'development' ? 2000 : 10000,
+      0,
       language,
       playerCount,
     );

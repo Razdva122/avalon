@@ -127,6 +127,28 @@ export const migrations: Migration[] = [
       await reconcileIndex(db.collection('room_chat_messages'), { roomID: 1, timestamp: -1, order: -1 });
     },
   },
+  {
+    name: '2026-10-11-ai-room-dates-v1',
+    async up(db) {
+      const rooms = db.collection<{ _id: string; state: { createAt: string } }>('ai_room_replays');
+      const cursor = rooms.find({ 'state.createAt': { $type: 'string' } }, { projection: { 'state.createAt': 1 } });
+      try {
+        for await (const room of cursor) {
+          const timestamp = Date.parse(room.state.createAt);
+          if (!Number.isFinite(timestamp)) continue;
+          const createAt = new Date(timestamp).toISOString();
+          if (createAt !== room.state.createAt) {
+            await rooms.updateOne(
+              { _id: room._id, 'state.createAt': room.state.createAt },
+              { $set: { 'state.createAt': createAt } },
+            );
+          }
+        }
+      } finally {
+        await cursor.close();
+      }
+    },
+  },
 ];
 
 interface MigrationState {

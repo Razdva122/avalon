@@ -99,7 +99,7 @@ test('passing before expiry cancels that deadline and starts a new deadline only
   const run = room.run(true);
   try {
     await jest.advanceTimersByTimeAsync(0);
-    expect(ai.humanActionExpiresAt).toBe(1090000);
+    expect(ai.humanActionExpiresAt).toBe(1390000);
     await jest.advanceTimersByTimeAsync(89999);
     room.finishDiscussion('owner');
     expect(ai.humanActionExpiresAt).toBeUndefined();
@@ -237,18 +237,21 @@ test('prestart language changes apply to both the ready message and actual bot r
 });
 
 test.each(['en', 'ru', 'zh-tw'] as const)(
-  'a missed discussion automatically passes after 90 seconds without spending reserve (%s)',
+  'a missed discussion spends the shared reserve before automatically passing (%s)',
   async (language) => {
     const { room, ai, game } = fixture('discussion', language);
     const run = room.run(true);
     try {
-      await jest.advanceTimersByTimeAsync(90000);
+      await jest.advanceTimersByTimeAsync(389999);
+      expect(ai.status).toBe('running');
+      expect(ai.waitingForDiscussion).toBe(true);
+      await jest.advanceTimersByTimeAsync(1);
       expect(ai.status).toBe('running');
       expect(ai.waitingForDiscussion).toBeUndefined();
       expect(game.stage).toBe('selectTeam');
       expect(ai).toMatchObject({
-        humanTimeBankMs: 300000,
-        humanActionBaseExpiresAt: 1180000,
+        humanTimeBankMs: 0,
+        humanActionBaseExpiresAt: 1480000,
         humanActionExpiresAt: 1480000,
       });
     } finally {
@@ -319,5 +322,25 @@ test('a technical pause spends elapsed overtime and resume retains the remaining
     room.stop();
     await run;
     await resumed;
+  }
+});
+
+test('discussion overtime reduces the reserve available for the following board action', async () => {
+  const { room, ai } = fixture('discussion');
+  const run = room.run(true);
+  try {
+    await jest.advanceTimersByTimeAsync(120000);
+    expect(ai.waitingForDiscussion).toBe(true);
+    room.finishDiscussion('owner');
+    await jest.advanceTimersByTimeAsync(0);
+    expect(ai.waitingForDiscussion).toBeUndefined();
+    expect(ai).toMatchObject({
+      humanTimeBankMs: 270000,
+      humanActionBaseExpiresAt: 1210000,
+      humanActionExpiresAt: 1480000,
+    });
+  } finally {
+    room.stop();
+    await run;
   }
 });

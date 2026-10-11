@@ -40,6 +40,25 @@ const game = (history = [], extra = {}) => ({
 const result = { winner: 'good', reason: 'missMerlin' };
 const room = (gameState) => ({ stage: 'started', roomID: 'game-a', players, game: gameState });
 
+test('both thinking seats animate in live play, with legacy fallback and no mission-role disclosure', (t) => {
+  const { api, manager } = fixture(t, game([], { stage: 'votingForTeam' }));
+  manager.state.value.ai = { status: 'running', thinkingPlayerIDs: ['p1', 'p2'], thinkingPlayerID: 'p1' };
+  assert.deepEqual(api.thinkingPlayerIDs.value, ['p1', 'p2']);
+  manager.state.value.ai.thinkingPlayerIDs = ['p2'];
+  assert.deepEqual(api.thinkingPlayerIDs.value, ['p2']);
+  manager.toggleViewMode();
+  assert.deepEqual(api.thinkingPlayerIDs.value, []);
+  manager.toggleViewMode();
+  manager.state.value.game.stage = 'onMission';
+  assert.deepEqual(api.thinkingPlayerIDs.value, []);
+  manager.state.value.game.stage = 'end';
+  assert.deepEqual(api.thinkingPlayerIDs.value, ['p2']);
+  manager.state.value.ai.status = 'paused';
+  assert.deepEqual(api.thinkingPlayerIDs.value, []);
+  manager.state.value.ai = { status: 'running', thinkingPlayerID: 'p3' };
+  assert.deepEqual(api.thinkingPlayerIDs.value, ['p3']);
+});
+
 test('the discussion prompt follows the live human turn and disappears on replay or game end', async (t) => {
   const { api, manager } = fixture(t, game([], { stage: 'selectTeam' }));
   assert.equal(api.discussionPlayerID.value, undefined);
@@ -56,6 +75,27 @@ test('the discussion prompt follows the live human turn and disappears on replay
   manager.state.value.ai.status = 'running';
   manager.state.value.game.stage = 'end';
   assert.equal(api.discussionPlayerID.value, undefined, 'stale AI flags must not request a reply after game end');
+});
+
+test('the action deadline belongs to the human seat only during a running live public bot game', (t) => {
+  const { api, manager } = fixture(t, game([], { stage: 'selectTeam' }));
+  assert.equal(api.actionTimerPlayerID.value, undefined);
+  manager.state.value.ai = {
+    publicBotGame: true,
+    status: 'running',
+    humanPlayerID: 'p3',
+    humanActionExpiresAt: Date.now() + 90000,
+  };
+  assert.equal(api.actionTimerPlayerID.value, 'p3');
+  manager.toggleViewMode();
+  assert.equal(api.actionTimerPlayerID.value, undefined);
+  manager.toggleViewMode();
+  assert.equal(api.actionTimerPlayerID.value, 'p3');
+  manager.state.value.ai.status = 'paused';
+  assert.equal(api.actionTimerPlayerID.value, undefined);
+  manager.state.value.ai.status = 'running';
+  manager.state.value.game.stage = 'end';
+  assert.equal(api.actionTimerPlayerID.value, undefined);
 });
 
 test('a real lobby start masks roles until the personal card closes, without replaying on reconnect', async (t) => {

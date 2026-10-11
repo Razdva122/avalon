@@ -2,6 +2,7 @@ import { aiPlayedModel } from '@avalon/types';
 import { MongoMemoryServer } from 'mongodb-memory-server-core';
 import { MongoClient } from 'mongodb';
 import { AiRepository } from './repository';
+import { MigrationManager, migrations } from '@/db/migrations';
 let server: MongoMemoryServer;
 let client: MongoClient;
 beforeAll(async () => {
@@ -61,6 +62,43 @@ test('recent AI replays survive a repository restart and are returned newest fir
   const rooms = await new AiRepository(db).recent(1);
   expect(rooms.map((r) => r.roomID)).toEqual(['new']);
   expect(rooms[0].ai?.status).toBe('stopped');
+});
+
+test.each(['saved', 'migrated'])('%s AI dates select the newest games before applying the list limit', async (mode) => {
+  const db = client.db(`chronological-${mode}`);
+  const repo = new AiRepository(db);
+  const states = Array.from({ length: 22 }, (_, index) => ({
+    roomID: `older-${index}`,
+    createAt: 'Wed Sep 23 2026 17:34:09 GMT+0000 (Coordinated Universal Time)',
+    stage: 'started',
+    leaderID: 'owner',
+    players: [],
+    options: { roles: {}, addons: {}, features: {} },
+    ai: { status: 'finished', model: 'saved-model' },
+    game: { stage: 'end', result: { winner: 'evil', reason: 'killMerlin' } },
+  }));
+  states.push({
+    ...states[0],
+    roomID: 'dddiazzz',
+    createAt: 'Sat Oct 10 2026 20:02:48 GMT+0000 (Coordinated Universal Time)',
+  });
+  states.push({ ...states[0], roomID: 'iso-date', createAt: '2026-10-09T20:02:48.000Z' });
+  if (mode === 'saved') {
+    for (const state of states) await repo.save(state as unknown as import('@avalon/types').StartedRoomState);
+    expect(states[22].createAt).toBe('Sat Oct 10 2026 20:02:48 GMT+0000 (Coordinated Universal Time)');
+  } else {
+    await db
+      .collection<{ _id: string; state: (typeof states)[number] }>('ai_room_replays')
+      .insertMany(states.map((state) => ({ _id: state.roomID, state })));
+    const dateMigration = migrations.filter((migration) => migration.name === '2026-10-11-ai-room-dates-v1');
+    await MigrationManager.runMigrations(db, dateMigration);
+    await MigrationManager.runMigrations(db, dateMigration);
+  }
+  const restarted = new AiRepository(db);
+  expect((await restarted.recent(20)).slice(0, 2).map((state) => state.roomID)).toEqual(['dddiazzz', 'iso-date']);
+  expect((await restarted.recentSummaries()).slice(0, 2).map((room) => room.uuid)).toEqual(['dddiazzz', 'iso-date']);
+  expect(await db.collection('ai_room_replays').countDocuments()).toBe(24);
+  expect((await restarted.load('dddiazzz'))?.game.result).toEqual({ winner: 'evil', reason: 'killMerlin' });
 });
 
 test('AI room summaries preserve selected language and default older archives to English', async () => {

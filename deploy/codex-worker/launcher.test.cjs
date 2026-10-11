@@ -7,6 +7,74 @@ const { spawn } = require('node:child_process');
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 test(
+  'two slots run together, a third waits, and all containers share the resource slice',
+  { skip: process.platform !== 'linux', timeout: 15000 },
+  async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'worker-two-slots-'));
+    const children = [];
+    try {
+      const script = (await readFile(join(__dirname, 'launch.sh'), 'utf8')).replaceAll('/opt/avalon-codex', directory);
+      await writeFile(join(directory, 'launch'), script, { mode: 0o700 });
+      await writeFile(
+        join(directory, 'docker'),
+        `#!${process.execPath}
+const fs=require('node:fs'); const root=${JSON.stringify(directory)}; const args=process.argv.slice(2);
+if(args[0]==='create')fs.appendFileSync(root+'/created',JSON.stringify(args)+'\\n');
+if(args[0]==='start'){
+ const name=args[args.length-1]; process.stdin.resume();
+ const timer=setInterval(()=>{if(fs.existsSync(root+'/release-'+name)){clearInterval(timer);console.log('{"ok":true}');process.exit(0)}},20);
+}`,
+        { mode: 0o700 },
+      );
+      const start = () => {
+        const child = spawn('bash', [join(directory, 'launch')], {
+          env: { ...process.env, PATH: `${directory}:${process.env.PATH}` },
+        });
+        child.stdin.end('{}');
+        child.stdout.resume();
+        child.stderr.resume();
+        children.push(child);
+        return child;
+      };
+      const records = async () => {
+        try {
+          return (await readFile(join(directory, 'created'), 'utf8')).trim().split('\n').map(JSON.parse);
+        } catch {
+          return [];
+        }
+      };
+      const waitFor = async (count) => {
+        for (let n = 0; n < 100; n++) {
+          if ((await records()).length === count) return;
+          await delay(30);
+        }
+        assert.equal((await records()).length, count);
+      };
+      start();
+      start();
+      await waitFor(2);
+      start();
+      await delay(400);
+      assert.equal((await records()).length, 2);
+      for (const args of await records()) {
+        assert.ok(args.includes('--cgroup-parent=avalon-codex.slice'));
+        assert.ok(args.includes('--pids-limit=128'));
+      }
+      const first = (await records())[0];
+      await writeFile(join(directory, 'release-' + first[first.indexOf('--name') + 1]), '1');
+      await waitFor(3);
+    } finally {
+      const exits = children.map((child) =>
+        child.exitCode !== null ? Promise.resolve() : new Promise((resolve) => child.once('close', resolve)),
+      );
+      children.forEach((child) => child.kill('SIGTERM'));
+      await Promise.all(exits);
+      await rm(directory, { recursive: true, force: true });
+    }
+  },
+);
+
+test(
   'cancel during Docker startup cleans up a late container and releases the lock',
   { skip: process.platform !== 'linux' },
   async () => {

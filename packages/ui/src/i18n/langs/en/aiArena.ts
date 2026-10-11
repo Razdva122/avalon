@@ -15,7 +15,8 @@ export default {
   botTimeBankRemaining: 'Shared reserve: {seconds} s',
   botReserveTime: 'Using reserve: {seconds} s',
   botDiscussionTime: 'Your turn to speak: {seconds} s',
-  botDiscussionDeadlineHint: 'After 90 seconds, the turn passes automatically.',
+  botDiscussionDeadlineHint:
+    '90 seconds to speak + the shared 5-minute reserve. When both run out, the turn passes automatically.',
   botTimeout: 'Time is up. The match has ended.',
   botTable: '1 player and 4 bots',
   botSmart: 'Smart bots',

@@ -15,7 +15,7 @@ export default {
   botTimeBankRemaining: '共用備用時間：{seconds}秒',
   botReserveTime: '正在使用備用時間：{seconds}秒',
   botDiscussionTime: '輪到你發言：{seconds}秒',
-  botDiscussionDeadlineHint: '90秒後自動跳過發言。',
+  botDiscussionDeadlineHint: '發言時間為90秒，另有共用的5分鐘備用時間。兩者用盡後自動跳過發言。',
   botTimeout: '時間已到，對局已結束。',
   botTable: '1 位玩家和 4 個機器人',
   botSmart: '智慧機器人',

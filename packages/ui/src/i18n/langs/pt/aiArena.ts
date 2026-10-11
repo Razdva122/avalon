@@ -16,7 +16,8 @@ export default {
   botTimeBankRemaining: 'Reserva compartilhada: {seconds} s',
   botReserveTime: 'Usando a reserva: {seconds} s',
   botDiscussionTime: 'Sua vez de falar: {seconds} s',
-  botDiscussionDeadlineHint: 'Após 90 segundos, a vez passa automaticamente.',
+  botDiscussionDeadlineHint:
+    '90 segundos para falar + a reserva compartilhada de 5 minutos. Quando ambos acabam, a vez passa automaticamente.',
   botTimeout: 'O tempo acabou. A partida foi encerrada.',
   botTable: '1 jogador e 4 bots',
   botSmart: 'Bots inteligentes',

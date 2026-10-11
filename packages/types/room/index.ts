@@ -69,6 +69,8 @@ export type AiRoomState = {
   status: 'ready' | 'running' | 'paused' | 'finished' | 'stopped';
   /** The AI seat currently awaiting generation; cleared when idle or paused. */
   thinkingPlayerID?: string;
+  /** Up to two public seats generating replies; omitted during secret mission cards. */
+  thinkingPlayerIDs?: string[];
   canResumeTechnical?: boolean;
   /** Read-only compatibility with historical archives; no current paid provider. */
   costRub?: number;
