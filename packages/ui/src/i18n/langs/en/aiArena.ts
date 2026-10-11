@@ -1,4 +1,7 @@
 export default {
+  botBeginnerStart: 'Start',
+  botBeginnerHint: '5 players: you and 4 regular bots. Bots use simple language and explain their choices.',
+  botPremiumSeats: '7 and 8 players require Premium.',
   yourDiscussionTurn: 'Your turn to speak',
   discussionHint: 'Send a chat message to continue the discussion. Or press “Pass turn” to skip.',
   passTurn: 'Pass turn',

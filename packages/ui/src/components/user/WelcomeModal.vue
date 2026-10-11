@@ -34,6 +34,7 @@
               <p>{{ $t('welcome.aiDescription') }}</p>
             </div>
             <BotRoomButton
+              beginner
               color="primary"
               hide-icon
               inline-errors

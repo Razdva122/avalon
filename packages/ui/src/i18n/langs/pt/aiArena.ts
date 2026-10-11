@@ -1,4 +1,7 @@
 export default {
+  botBeginnerStart: 'Começar',
+  botBeginnerHint: '5 jogadores: você e 4 bots comuns. Os bots usam linguagem simples e explicam suas escolhas.',
+  botPremiumSeats: 'Partidas com 7 e 8 jogadores exigem Premium.',
   yourDiscussionTurn: 'Sua vez de falar',
   discussionHint: 'Envie uma mensagem no chat para continuar a discussão, ou clique em «Passar a vez» para pular.',
   passTurn: 'Passar a vez',

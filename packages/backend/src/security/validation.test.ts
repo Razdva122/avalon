@@ -12,7 +12,7 @@ test.each(['smart', 'regular'])('accepts the fixed human start mode %s', (diffic
 test.each([
   { difficulty: 'custom', language: 'ru' },
   { difficulty: 'smart', language: 'ru', model: 'gpt-6.1-sol' },
-  { difficulty: 'smart', language: 'ru', playerCount: 7 },
+  { difficulty: 'smart', language: 'ru', playerCount: 9 },
   { difficulty: 'regular', language: 'zh-cn' },
   null,
 ])('rejects malformed or customized public bot creation %#', (options) => {
@@ -105,4 +105,12 @@ test('joining an AI human seat requires exactly a room ID and acknowledgement', 
   expect(validPacket('joinAiRoom', ['mixed-room'])).toBe(false);
   expect(validPacket('joinAiRoom', ['mixed-room', 'forged-user', () => {}])).toBe(false);
   expect(validPacket('joinAiRoom', [['mixed-room'], () => {}])).toBe(false);
+});
+
+test('accepts beginner preparation and supported public table sizes', () => {
+  expect(validPacket('createHumanAiRoom', [{ beginner: true }, () => {}])).toBe(true);
+  for (const playerCount of [5, 6, 7, 8])
+    expect(
+      validPacket('startHumanAiRoom', ['room', { difficulty: 'regular', language: 'ru', playerCount }, () => {}]),
+    ).toBe(true);
 });

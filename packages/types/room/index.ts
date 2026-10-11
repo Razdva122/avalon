@@ -46,6 +46,8 @@ export type AiRoomState = {
   humanPlayerID?: string;
   /** Public one-human/four-bot room, including its ready preparation stage. */
   publicBotGame?: boolean;
+  /** Beginner-only five-seat match with simpler bot communication. */
+  beginner?: boolean;
   title?: string;
   launchExpiresAt?: number;
   humanActionExpiresAt?: number;

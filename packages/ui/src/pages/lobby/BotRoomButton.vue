@@ -29,6 +29,7 @@ import { openRoomRoute } from '@/helpers/open-room-route';
 
 const { t, locale } = useI18n();
 const props = defineProps<{
+  beginner?: boolean;
   unavailableText?: string;
   busyText?: string;
   loadingText?: string;
@@ -46,7 +47,11 @@ const emit = defineEmits<{
 }>();
 const router = useRouter();
 const { canPlay, botsBusy, accessStatus, botModes, botWaitHours, ownRoomID, refresh } = useAiAccess();
-const available = computed(() => canPlay.value && (ownRoomID.value || botModes.value.smart || botModes.value.regular));
+const available = computed(
+  () =>
+    canPlay.value &&
+    (ownRoomID.value || (props.beginner ? botModes.value.regular : botModes.value.smart || botModes.value.regular)),
+);
 const busy = ref(false);
 let active = true;
 onBeforeUnmount(() => {
@@ -55,6 +60,11 @@ onBeforeUnmount(() => {
 const availability = computed(() =>
   available.value ? 'available' : accessStatus.value === 'ready' ? 'unavailable' : accessStatus.value,
 );
+const recoveryHours = computed(() =>
+  (props.beginner ? [botWaitHours.value.regular] : Object.values(botWaitHours.value)).filter(
+    (hours): hours is number => hours !== undefined,
+  ),
+);
 const statusText = computed(() =>
   availability.value === 'loading'
     ? props.loadingText || t('aiArena.botChecking')
@@ -62,11 +72,9 @@ const statusText = computed(() =>
       ? props.errorText || t('aiArena.connectionError')
       : botsBusy.value
         ? props.busyText || t('aiArena.botBusy')
-        : Object.keys(botWaitHours.value).length
+        : recoveryHours.value.length
           ? t('aiArena.botAvailableIn', {
-              hours: new Intl.NumberFormat(locale.value.replace('_', '-')).format(
-                Math.min(...Object.values(botWaitHours.value).filter((hours): hours is number => hours !== undefined)),
-              ),
+              hours: new Intl.NumberFormat(locale.value.replace('_', '-')).format(Math.min(...recoveryHours.value)),
             })
           : props.unavailableText || t('aiArena.botUnavailable'),
 );
@@ -89,7 +97,9 @@ async function openRoom() {
       if (opened) emit('opened');
       return;
     }
-    const result = await socket.timeout(30000).emitWithAck('createHumanAiRoom');
+    const result = props.beginner
+      ? await socket.timeout(30000).emitWithAck('createHumanAiRoom', { beginner: true })
+      : await socket.timeout(30000).emitWithAck('createHumanAiRoom');
     if (!active) return;
     if ('error' in result) {
       reportError('aiArena.botPlayError');

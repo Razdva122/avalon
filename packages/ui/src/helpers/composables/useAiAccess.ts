@@ -10,6 +10,7 @@ export function useAiAccess() {
   const store = useStore();
   const canManage = ref(false);
   const canPlay = ref(false);
+  const canPlayLargeTables = ref(false);
   const botsBusy = ref(false);
   const accessStatus = ref<'loading' | 'ready' | 'error'>('loading');
   const botModes = ref({ smart: false, regular: false });
@@ -41,6 +42,7 @@ export function useAiAccess() {
     catalogVersion++;
     canManage.value = false;
     canPlay.value = false;
+    canPlayLargeTables.value = false;
     botsBusy.value = false;
     botModes.value = { smart: false, regular: false };
     botModeAvailableAt.value = {};
@@ -53,6 +55,7 @@ export function useAiAccess() {
   function applyAccess(access: AiAccess) {
     canManage.value = access.canManage;
     canPlay.value = access.canPlay === true;
+    canPlayLargeTables.value = access.canPlay === true && access.canPlayLargeTables === true;
     botsBusy.value = access.canPlay === true && access.botsBusy === true;
     accessStatus.value = 'ready';
     botModes.value = access.canPlay
@@ -141,6 +144,7 @@ export function useAiAccess() {
   return {
     canManage,
     canPlay,
+    canPlayLargeTables,
     botsBusy,
     accessStatus,
     botModes,

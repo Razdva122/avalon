@@ -2,14 +2,23 @@
 
 [Documentation index](README.md) · [Production configuration](../deploy/ai-production.md)
 
-AI rooms support public matches with one human and four bots, and spectator
+AI rooms support public matches with one human and 4–7 bots, and spectator
 games with 5, 6, 7 or 8 bots (default: seven). A signed-in player sees “Play with
 bots” next to “Create room” when at least one mode is available. It opens a
 prepared room named `Username vs 4 Bots`, with the owner already seated. On the
 table, the owner chooses the discussion language and starts with “Smart bots”
 or “Regular bots”; regular bots are described as useful for understanding the
 principles of the game. The language defaults to the user's interface language
-when supported, otherwise English. Preparing a room makes no inference request.
+when supported, otherwise English. The standard table offers 5, 6, 7 or 8 total players beside the bot modes before launch.
+Five and six seats are available to all eligible players; seven and eight require
+Premium. The server checks the donation/manual-grant entitlement at launch,
+independently of the visible Premium badge. A prepared room initially has five
+seats; starting applies the selected size, roles and Lady of the Lake settings.
+The first welcome in-app entry instead creates a beginner table: one human,
+four regular bots, automatic discussion language and a single Start button.
+Beginner prompts use plain language, one idea at a time and concrete public
+reasons, with fewer elaborate bluffs; secrecy and each side's winning objective
+still apply. Preparing a room makes no inference request.
 An owner can return to their existing room without creating another.
 Only one AI room can reserve the shared slot at a time, including preparation,
 active play and technical pauses. Other players cannot create or start another
@@ -77,10 +86,12 @@ Administrator creation accepts
 Discussion language is `en`, `ru` or `zh-tw`, with English as the legacy default.
 The UI itself supports six languages. Unsupported model, language and table size
 are rejected before room reservation. Public bot play accepts
-`createHumanAiRoom(callback)`; the callback returns a `roomID` or an `error`.
-`startHumanAiRoom(roomID, { difficulty: 'smart' | 'regular', language }, callback)`
+`createHumanAiRoom(callback)` (standard) or
+`createHumanAiRoom({ beginner: true }, callback)` (beginner); the callback returns a `roomID` or an `error`.
+`startHumanAiRoom(roomID, { difficulty: 'smart' | 'regular', language, playerCount?: 5 | 6 | 7 | 8 }, callback)`
 starts the same prepared room and returns `ok: true` or an `error`. The server
-chooses the model, reasoning effort and five-seat table; clients cannot override
+chooses the model and reasoning effort, validates table size and Premium, and
+forces regular bots with five seats for beginner rooms; clients cannot override
 these settings or start another owner's room.
 Access responses include `canPlay`, `botModes` availability and `ownRoomID` for
 returning to the owner's active match. Room state records the selected mode as

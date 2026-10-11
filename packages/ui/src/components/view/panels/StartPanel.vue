@@ -5,6 +5,7 @@
       :roomID="roomState.roomID"
       :title="roomState.ai.title"
       :expires-at="roomState.ai.launchExpiresAt"
+      :beginner="roomState.ai.beginner"
     />
     <template v-else>
       <h2>{{ roomState.ai.title }}</h2>

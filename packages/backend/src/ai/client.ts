@@ -5,6 +5,7 @@ import type { AiLanguage, VisualGameState } from '@avalon/types';
 export type BotRequest = {
   playerID: string;
   humanPlayerID?: string;
+  beginner?: boolean;
   // Public declarations and this bot's prior positions come from structured model actions, never text parsing.
   publicRoleClaims?: { by: number; target: number; status: 'claim' }[];
   previousClaimStances?: { seat: number; stance: 'trust' | 'distrust' }[];
@@ -70,6 +71,9 @@ export const assassinationCheck =
 export function systemFor(request: BotRequest): string {
   const format =
     languageInstruction(request.language) +
+    (request.beginner
+      ? ' This is a beginner match. Use plain language, one idea per message and at most two short sentences. Explain preferences using one concrete public vote or mission result; briefly explain unfamiliar game terms. Avoid elaborate bluffs, stacked hypothetical cases and repeated pressure on the human. Let the human make their own choices. Preserve hidden roles and pursue your actual side honestly. Do not deliberately lose or fabricate evidence.'
+      : '') +
     ' Return only {"choice":"exact entry from choices","speech":"..."}. Copy a legal choice exactly. When speak=false speech=""; otherwise write complete short sentences, at most 240 characters (800 at end). Facts override testimony; do not invent actions.' +
     (request.publicDiscussion
       ? ' This is a preselection discussion preference, not a submitted team or a binding vote. Recommend a roster, discuss trust and answer or ask about actual earlier votes; the leader selects after the full circle. Do not announce a current approve/reject vote.'

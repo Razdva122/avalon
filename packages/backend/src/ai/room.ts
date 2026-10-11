@@ -117,6 +117,20 @@ export class BotRoom extends Room {
     delete this.ai!.profileRatingSeason;
   }
 
+  setPlayerCount(playerCount: AiPlayerCount): void {
+    if (this.ai!.status !== 'ready' || this.data.stage !== 'locked' || ![5, 6, 7, 8].includes(playerCount))
+      throw Error('Table size can only be changed before launch');
+    if (this.ai!.beginner && playerCount !== 5) throw Error('Beginner tables require five players');
+    if (this.players.length === playerCount) return;
+    this.players = selectBotAgents(undefined, playerCount).map((agent) => agent.id);
+    if (this.ai!.humanPlayerID) this.players[this.players.length - 1] = this.ai!.humanPlayerID;
+    this.options = structuredClone(botOptions);
+    if (playerCount !== 7) delete this.options.roles.oberon;
+    if (playerCount < 7) delete this.options.addons.ladyOfLake;
+    this.maxCapacity = playerCount;
+    this.ai!.playerCount = playerCount;
+  }
+
   setLanguage(language: AiLanguage): void {
     if (this.ai!.status !== 'ready' || this.data.stage !== 'locked' || !['en', 'ru', 'zh-tw'].includes(language))
       throw Error('Discussion language can only be changed before launch');
@@ -346,6 +360,7 @@ export class BotRoom extends Room {
       language: this.language,
       playerID: id,
       humanPlayerID: this.ai!.humanPlayerID,
+      beginner: this.ai!.beginner,
       name: this.label(id),
       style: agent.style,
       task,

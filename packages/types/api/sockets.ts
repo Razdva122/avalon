@@ -143,6 +143,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
       canPlay?: boolean;
       botsBusy?: boolean;
       botModes?: Record<AiBotDifficulty, boolean>;
+      canPlayLargeTables?: boolean;
       /** Estimated quota recovery, in Unix milliseconds; omitted when unknown or occupied. */
       botModeAvailableAt?: Partial<Record<AiBotDifficulty, number>>;
       ownRoomID?: string;
@@ -166,10 +167,13 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
     options: string | { model: string; language: AiLanguage; playerCount?: AiPlayerCount },
     callback: (result: { roomID: string } | { error: string }) => void,
   ) => void;
-  createHumanAiRoom: (callback: (result: { roomID: string } | { error: string }) => void) => void;
+  createHumanAiRoom: {
+    (callback: (result: { roomID: string } | { error: string }) => void): void;
+    (options: { beginner: boolean }, callback: (result: { roomID: string } | { error: string }) => void): void;
+  };
   startHumanAiRoom: (
     roomID: string,
-    options: { difficulty: AiBotDifficulty; language: AiLanguage },
+    options: { difficulty: AiBotDifficulty; language: AiLanguage; playerCount?: AiPlayerCount },
     callback: (result: { ok: true } | { error: string }) => void,
   ) => void;
   controlAiRoom: (

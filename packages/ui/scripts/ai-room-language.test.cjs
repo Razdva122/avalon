@@ -297,7 +297,7 @@ test('players start a prepared bot room with either mode and the language select
     });
     t.after(room.stop);
     assert.ok(room.html.includes('Host vs4Bots'));
-    assert.equal(room.nodes('select').length, 1);
+    assert.equal(room.nodes('select').length, 2);
     room.nodes('select')[0].props['onUpdate:modelValue']('ru');
     const play = room.nodes('v-btn').find((node) => node.props['data-bot-mode'] === difficulty);
     assert.ok(play, `missing ${difficulty} choice`);
@@ -952,4 +952,78 @@ test('discussion countdown shows the shared reserve as it is spent', async (t) =
   const html = await room.render();
   assert.ok(html.includes('Расходуется запас: 270 с'), html);
   assert.ok(html.includes('Общий запас: 270 с'), html);
+});
+
+test('beginner entry prepares a beginner room and needs regular bots', async (t) => {
+  const room = await fixture('pages/lobby/BotRoomButton.vue', {
+    props: { beginner: true },
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
+  });
+  t.after(room.stop);
+  await room.nodes('v-btn')[0].props.onClick();
+  assert.deepEqual(room.sent, [['createHumanAiRoom', { beginner: true }]]);
+  room.access.botModes.value = { smart: true, regular: false };
+  await room.render();
+  assert.ok(room.nodes('v-btn')[0].props.disabled);
+});
+
+test('beginner table hides settings and starts only regular five-seat play', async (t) => {
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    props: { roomID: 'beginner-room', beginner: true },
+    locale: 'ru',
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
+  });
+  t.after(room.stop);
+  assert.equal(room.nodes('select').length, 0);
+  assert.equal(room.nodes('v-btn').filter((node) => node.props['data-bot-mode']).length, 1);
+  await room
+    .nodes('v-btn')
+    .find((node) => node.props['data-bot-mode'] === 'regular')
+    .props.onClick();
+  assert.deepEqual(room.sent, [['startHumanAiRoom', 'beginner-room', { difficulty: 'regular', language: 'ru' }]]);
+});
+
+test('standard table offers four sizes and locks premium seats', async (t) => {
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    props: { roomID: 'standard-room' },
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      canPlayLargeTables: vue.ref(false),
+      botModes: vue.ref({ smart: true, regular: true }),
+    },
+  });
+  t.after(room.stop);
+  assert.equal(room.nodes('select').length, 2);
+  const count = room.nodes('select')[1];
+  assert.deepEqual(
+    count.children.filter((n) => n.type === 'option').map((n) => [n.props.value, !!n.props.disabled]),
+    [
+      [5, false],
+      [6, false],
+      [7, true],
+      [8, true],
+    ],
+  );
+  count.props['onUpdate:modelValue'](6);
+  await room
+    .nodes('v-btn')
+    .find((node) => node.props['data-bot-mode'] === 'regular')
+    .props.onClick();
+  assert.deepEqual(room.sent, [
+    ['startHumanAiRoom', 'standard-room', { difficulty: 'regular', language: 'en', playerCount: 6 }],
+  ]);
+});
+
+test('beginner unavailability ignores smart-only recovery estimates', async (t) => {
+  const room = await fixture('pages/lobby/BotRoomButton.vue', {
+    props: { beginner: true, unavailableText: 'Beginner unavailable' },
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      botModes: vue.ref({ smart: false, regular: false }),
+      botWaitHours: vue.ref({ smart: 1 }),
+    },
+  });
+  t.after(room.stop);
+  assert.ok(room.html.includes('Beginner unavailable'));
+  assert.ok(!room.html.includes('1 hour'));
 });

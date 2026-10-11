@@ -1,4 +1,7 @@
 export default {
+  botBeginnerStart: '開始',
+  botBeginnerHint: '5名玩家：你和4個普通機器人。機器人用簡單語言解釋自己的選擇。',
+  botPremiumSeats: '7人和8人遊戲需要Premium。',
   yourDiscussionTurn: '輪到你發言',
   discussionHint: '傳送聊天訊息後，討論將繼續。也可以點擊「交棒」跳過發言。',
   passTurn: '交棒',

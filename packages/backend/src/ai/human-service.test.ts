@@ -7,6 +7,7 @@ import { BotRoom } from './room';
 import type { AiRepository } from './repository';
 import * as limits from './codex-limits';
 import * as catalog from './codex-models';
+import * as support from '@/support/repository';
 
 const initialEnvironment = { ...process.env };
 const models = [
@@ -25,6 +26,7 @@ beforeEach(() => {
     checkedAt: Date.now(),
     shortTerm: { remainingPercent: 90, resetsAt: null },
   });
+  jest.spyOn(support, 'supportTotalCents').mockResolvedValue(0);
   modelCatalog = jest.spyOn(catalog, 'getCodexModels').mockResolvedValue(models);
   // Exercise the real start engine without issuing model turns.
   run = jest.spyOn(BotRoom.prototype, 'run').mockImplementation(async function (this: BotRoom) {
@@ -48,6 +50,10 @@ function fixture(adminID = 'admin') {
     io,
     updateRoomsList() {},
     dbManager: {
+      getUserFeatures: async (id: string) => ({
+        showPremiumBadge: false,
+        ...(id === 'premium' ? { premiumGrantedAt: new Date() } : {}),
+      }),
       getUserByID: async (id: string) => {
         if (id === 'missing') throw Error('No user');
         return { id, name: id === 'owner' ? 'Alice' : id, isAdmin: id === adminID };
@@ -203,6 +209,7 @@ test('a ready room is reused by its owner and prevents another party reserving t
   expect(access.mock.calls[0][0]).toEqual({
     canManage: false,
     canPlay: true,
+    canPlayLargeTables: false,
     ownRoomID: first.roomID,
     botModes: { smart: true, regular: true },
   });
@@ -210,6 +217,7 @@ test('a ready room is reused by its owner and prevents another party reserving t
   expect(access.mock.calls[1][0]).toEqual({
     canManage: false,
     canPlay: true,
+    canPlayLargeTables: false,
     botsBusy: true,
     botModes: { smart: false, regular: false },
   });
@@ -422,4 +430,77 @@ test('missing models and occupied slots do not promise availability at a quota r
   await connect('other').getAiRoomAccess(access);
   expect(access.mock.calls[1][0]).toMatchObject({ botsBusy: true });
   expect(access.mock.calls[1][0].botModeAvailableAt?.smart).toBeUndefined();
+});
+
+test.each([5, 6, 7, 8])('public table supports %i seats with server premium admission', async (playerCount) => {
+  const { draft, connect } = fixture();
+  const owner = playerCount >= 7 ? 'premium' : 'owner';
+  const room = await draft(owner);
+  const response = jest.fn();
+  await connect(owner).startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'ru', playerCount }, response);
+  expect(response).toHaveBeenCalledWith({ ok: true });
+  expect(room.players).toHaveLength(playerCount);
+  expect(room.players.filter((id) => id === owner)).toHaveLength(1);
+  expect(new Set(room.players).size).toBe(playerCount);
+  expect(room.ai?.playerCount).toBe(playerCount);
+  expect(room.options.addons.ladyOfLake).toBe(playerCount >= 7 ? true : undefined);
+});
+
+test.each([7, 8])('non-premium cannot start a %i-player table', async (playerCount) => {
+  const { draft, connect } = fixture();
+  const room = await draft();
+  const response = jest.fn();
+  await connect('owner').startHumanAiRoom(
+    room.roomID,
+    { difficulty: 'regular', language: 'ru', playerCount },
+    response,
+  );
+  expect(response.mock.calls[0][0]).toHaveProperty('error');
+  expect(room.ai?.status).toBe('ready');
+  expect(room.players).toHaveLength(5);
+});
+
+test('beginner preparation pins regular bots and five seats', async () => {
+  const { host, connect } = fixture();
+  const created = jest.fn();
+  await connect('owner').createHumanAiRoom({ beginner: true }, created);
+  const room = host.rooms[created.mock.calls[0][0].roomID] as BotRoom;
+  expect(room.ai?.beginner).toBe(true);
+  for (const options of [
+    { difficulty: 'smart', language: 'ru' },
+    { difficulty: 'regular', language: 'ru', playerCount: 6 },
+  ]) {
+    const rejected = jest.fn();
+    await connect('owner').startHumanAiRoom(room.roomID, options, rejected);
+    expect(rejected.mock.calls[0][0]).toHaveProperty('error');
+  }
+  const started = jest.fn();
+  await connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'ru' }, started);
+  expect(started).toHaveBeenCalledWith({ ok: true });
+  expect(room.players).toHaveLength(5);
+});
+
+test('large-table access uses the entitlement even with a hidden premium badge', async () => {
+  const { connect } = fixture();
+  const response = jest.fn();
+  await connect('premium').getAiRoomAccess(response);
+  expect(response.mock.calls[0][0].canPlayLargeTables).toBe(true);
+});
+
+test.each([
+  [999, false],
+  [1000, true],
+])('paid premium admission at %i cents is %s', async (total, allowed) => {
+  jest.mocked(support.supportTotalCents).mockResolvedValue(total as number);
+  const { draft, connect } = fixture();
+  const room = await draft();
+  const result = jest.fn();
+  await connect('owner').startHumanAiRoom(
+    room.roomID,
+    { difficulty: 'regular', language: 'ru', playerCount: 8 },
+    result,
+  );
+  expect(result.mock.calls[0][0]).toEqual(
+    allowed ? { ok: true } : { error: 'Premium is required for seven or eight players' },
+  );
 });

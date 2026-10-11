@@ -128,7 +128,7 @@ const booleanSecond = new Set([
   'setVoiceEnabled',
 ]);
 export function validPacket(event: string, args: unknown[]): boolean {
-  const ack = acknowledgements[event];
+  const ack = event === 'createHumanAiRoom' && args.length === 2 ? 1 : acknowledgements[event];
   if (ack !== undefined && (args.length !== ack + 1 || typeof args[ack] !== 'function')) return false;
   const values = ack !== undefined ? args.slice(0, ack) : args;
   if (values.length > 4) return false;
@@ -157,11 +157,17 @@ export function validPacket(event: string, args: unknown[]): boolean {
       values[1] > 0 &&
       values[1] <= 86400
     );
+  if (event === 'createHumanAiRoom')
+    return (
+      values.length === 0 ||
+      (record(values[0]) && Object.keys(values[0]).length === 1 && typeof values[0].beginner === 'boolean')
+    );
   if (event === 'startHumanAiRoom') {
     const options = values[1];
     return (
       record(options) &&
-      Object.keys(options).length === 2 &&
+      Object.keys(options).every((key) => ['difficulty', 'language', 'playerCount'].includes(key)) &&
+      (options.playerCount === undefined || [5, 6, 7, 8].includes(options.playerCount as number)) &&
       typeof options.difficulty === 'string' &&
       ['smart', 'regular'].includes(options.difficulty) &&
       typeof options.language === 'string' &&

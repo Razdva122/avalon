@@ -3,12 +3,21 @@
     <h2 class="bot-table" :title="title">{{ title || $t('aiArena.botTable') }}</h2>
     <BotGameTimer v-if="expiresAt" :expires-at="expiresAt" phase="preparation" />
     <div class="bot-preparation-actions">
-      <label class="bot-language">
+      <label v-if="!beginner" class="bot-language">
         <span>{{ $t('aiArena.selectLanguage') }}</span>
         <select v-model="selectedLanguage" :disabled="busy">
           <option value="en">English</option>
           <option value="ru">Русский</option>
           <option value="zh-tw">繁體中文（台灣）</option>
+        </select>
+      </label>
+      <label v-if="!beginner" class="bot-language">
+        <span>{{ $t('aiArena.selectPlayerCount') }}</span>
+        <select v-model="selectedPlayerCount" :disabled="busy">
+          <option :value="5">5</option>
+          <option :value="6">6</option>
+          <option :value="7" :disabled="!canPlayLargeTables">7 · Premium</option>
+          <option :value="8" :disabled="!canPlayLargeTables">8 · Premium</option>
         </select>
       </label>
       <v-btn
@@ -25,7 +34,9 @@
         <span class="bot-leave-label">{{ $t('startPanel.leaveGame') }}</span>
       </v-btn>
     </div>
-    <div class="bot-modes">
+    <p v-if="!beginner && !canPlayLargeTables" class="bot-action-hint">{{ $t('aiArena.botPremiumSeats') }}</p>
+    <p v-if="beginner" id="bot-beginner-hint" class="bot-action-hint">{{ $t('aiArena.botBeginnerHint') }}</p>
+    <div class="bot-modes" :class="{ 'bot-modes--beginner': beginner }">
       <div
         v-for="difficulty in botDifficulties"
         :key="difficulty"
@@ -37,7 +48,7 @@
           :color="difficulty === 'smart' ? 'primary' : 'secondary'"
           :loading="busy && pendingDifficulty === difficulty"
           :disabled="busy || !canPlay || !botModes[difficulty]"
-          :aria-describedby="`bot-${difficulty}-hint bot-${difficulty}-availability`"
+          :aria-describedby="`${beginner ? 'bot-beginner-hint' : `bot-${difficulty}-hint`} bot-${difficulty}-availability`"
           @click="play(difficulty)"
         >
           <span class="bot-mode-label">
@@ -46,10 +57,18 @@
               :icon="difficulty === 'smart' ? 'fa:fa-solid fa-brain' : 'fa:fa-solid fa-graduation-cap'"
               aria-hidden="true"
             />
-            <span>{{ $t(difficulty === 'smart' ? 'aiArena.botSmart' : 'aiArena.botRegular') }}</span>
+            <span>{{
+              $t(
+                beginner
+                  ? 'aiArena.botBeginnerStart'
+                  : difficulty === 'smart'
+                    ? 'aiArena.botSmart'
+                    : 'aiArena.botRegular',
+              )
+            }}</span>
           </span>
         </v-btn>
-        <p :id="`bot-${difficulty}-hint`">
+        <p v-if="!beginner" :id="`bot-${difficulty}-hint`">
           {{ $t(difficulty === 'smart' ? 'aiArena.botSmartHint' : 'aiArena.botRegularHint') }}
         </p>
         <p :id="`bot-${difficulty}-availability`" role="status">
@@ -69,20 +88,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { localizedPath } from '@/router/paths';
 import { socket } from '@/api/socket';
-import type { AiBotDifficulty, AiLanguage } from '@avalon/types';
+import type { AiBotDifficulty, AiLanguage, AiPlayerCount } from '@avalon/types';
 import BotGameTimer from './BotGameTimer.vue';
-const props = defineProps<{ roomID: string; title?: string; expiresAt?: number }>();
+const props = defineProps<{ roomID: string; title?: string; expiresAt?: number; beginner?: boolean }>();
 const { t, locale } = useI18n();
 const router = useRouter();
-const { canPlay, botModes, botsBusy, botWaitHours, accessStatus, refresh } = useAiAccess();
+const { canPlay, canPlayLargeTables, botModes, botsBusy, botWaitHours, accessStatus, refresh } = useAiAccess();
 const formatHours = (hours: number) => new Intl.NumberFormat(locale.value.replace('_', '-')).format(hours);
-const botDifficulties: AiBotDifficulty[] = ['smart', 'regular'];
+const botDifficulties = computed<AiBotDifficulty[]>(() => (props.beginner ? ['regular'] : ['smart', 'regular']));
+const selectedPlayerCount = ref<AiPlayerCount>(5);
 const selectedLanguage = ref<AiLanguage>(
   locale.value === 'ru' ? 'ru' : /^zh[-_]tw$/i.test(locale.value) ? 'zh-tw' : 'en',
 );
@@ -108,6 +128,7 @@ async function leave() {
 }
 async function play(difficulty: AiBotDifficulty) {
   if (busy.value || !canPlay.value || !botModes.value[difficulty] || accessStatus.value !== 'ready') return;
+  if (!props.beginner && selectedPlayerCount.value >= 7 && !canPlayLargeTables.value) return;
   if (props.expiresAt && Date.now() >= props.expiresAt) {
     error.value = t('aiArena.botTimeout');
     return;
@@ -119,6 +140,7 @@ async function play(difficulty: AiBotDifficulty) {
     const result = await socket.timeout(30000).emitWithAck('startHumanAiRoom', props.roomID, {
       difficulty,
       language: selectedLanguage.value,
+      ...(!props.beginner && selectedPlayerCount.value !== 5 ? { playerCount: selectedPlayerCount.value } : {}),
     });
     if ('error' in result) {
       error.value = t('aiArena.botPlayError');
@@ -191,6 +213,9 @@ async function play(difficulty: AiBotDifficulty) {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+}
+.bot-modes--beginner {
+  grid-template-columns: 1fr;
 }
 .bot-mode {
   min-width: 0;
@@ -331,6 +356,9 @@ async function play(difficulty: AiBotDifficulty) {
   }
   .bot-mode:last-child :deep(.v-btn) {
     grid-column: 2;
+  }
+  .bot-modes--beginner .bot-mode:last-child :deep(.v-btn) {
+    grid-column: 1 / -1;
   }
   .bot-mode p {
     grid-column: 1 / -1;

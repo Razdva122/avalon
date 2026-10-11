@@ -1,4 +1,7 @@
 export default {
+  botBeginnerStart: 'Начать',
+  botBeginnerHint: '5 игроков: вы и 4 простых бота. Боты говорят проще и объясняют свои решения.',
+  botPremiumSeats: '7 и 8 игроков доступны с Premium.',
   yourDiscussionTurn: 'Ваше слово',
   discussionHint:
     'Отправь сообщение в чат — боты продолжат обсуждение. Можно пропустить реплику кнопкой «Передать слово».',
