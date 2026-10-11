@@ -20,6 +20,7 @@ export const STICKERS: readonly StickerDefinition[] = [
   { id: 'servant-victory', achievement: 'light_wins' },
   { id: 'oberon-smirk', achievement: 'dark_wins' },
   { id: 'cleric-best', achievement: 'best_of_the_best' },
+  { id: 'morgana-panic', achievement: 'ai_win' },
   { id: 'mordred-puppet', premium: true },
   { id: 'morgana-violin', premium: true },
 ];

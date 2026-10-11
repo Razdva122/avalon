@@ -49,6 +49,7 @@ type ArchiveSummary = Pick<
 > & { game: Pick<StartedRoomState['game'], 'result'> };
 
 export class AiRepository {
+  private achievementProcessing?: Promise<void>;
   private ratingCache?: { version: number; expires: number; ratings: ReturnType<typeof calculateAiRatings> };
   private ratingPending?: Promise<ReturnType<typeof calculateAiRatings>>;
   private listCache?: { value: TRoomInfo[]; expires: number };
@@ -130,12 +131,42 @@ export class AiRepository {
     validateID(state.roomID);
     const saved = structuredClone(state);
     saved.createAt = new Date(saved.createAt).toISOString();
-    await this.db
-      .collection<{ _id: string; state: StartedRoomState }>('ai_room_replays')
-      .updateOne({ _id: state.roomID }, { $set: { state: saved } }, { upsert: true });
+    await this.db.collection<{ _id: string; state: StartedRoomState }>('ai_room_replays').updateOne(
+      { _id: state.roomID },
+      {
+        $set: {
+          state: saved,
+          ...(saved.ai?.humanPlayerID &&
+          saved.game.stage === 'end' &&
+          saved.game.result?.winner &&
+          saved.game.result.reason !== 'manualy'
+            ? { aiAchievementPending: true }
+            : {}),
+        },
+      },
+      { upsert: true },
+    );
     this.listVersion++;
     this.listCache = undefined;
   }
+  /** Retry durably saved award work, including after a server restart. */
+  processPendingAchievements(handler: (state: StartedRoomState) => Promise<void>): Promise<void> {
+    if (this.achievementProcessing) return this.achievementProcessing;
+    this.achievementProcessing = (async () => {
+      const collection = this.db.collection<{ _id: string; state: StartedRoomState; aiAchievementPending?: boolean }>(
+        'ai_room_replays',
+      );
+      const pending = await collection.find({ aiAchievementPending: true }).limit(20).maxTimeMS(10000).toArray();
+      for (const entry of pending) {
+        await handler(entry.state);
+        await collection.updateOne({ _id: entry._id }, { $unset: { aiAchievementPending: '' } });
+      }
+    })().finally(() => {
+      this.achievementProcessing = undefined;
+    });
+    return this.achievementProcessing;
+  }
+
   /** Completed AI games remain isolated from human history and rating collections. */
   async getPlayerGameSummariesPage(playerID: string, cursor?: string | null): Promise<PlayerGameSummaryPage> {
     validateID(playerID);

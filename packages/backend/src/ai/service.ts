@@ -156,7 +156,14 @@ export class AiService {
       owner,
       this.manager.io,
       decisionPipeline(codexDecide(id, this.repository!, undefined, () => room.ai?.codex)),
-      (state) => this.repository!.save(state),
+      async (state) => {
+        await this.repository!.save(state);
+        if (state.stage === 'started' && state.game.stage === 'end' && state.ai?.humanPlayerID) {
+          await this.repository!.processPendingAchievements((saved) =>
+            this.manager.achievementManager.achievementHandlers.handleAiGameEnd(saved),
+          ).catch(() => console.error('AI achievement processing failed; will retry'));
+        }
+      },
       0,
       language,
       playerCount,

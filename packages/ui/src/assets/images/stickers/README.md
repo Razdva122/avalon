@@ -75,3 +75,7 @@ Use case: stylized-concept. Asset type: one transparent game reaction sticker. R
 For `minion-oops` and `oberon-smirk`, the first outputs baked in a checkerboard. Final assets were regenerated with the original role portraits as references and this prompt, substituting the role and pose:
 
 Generate one new game sticker based on this reference character [minion: facepalming his helmet in embarrassment / oberon: smirking knowingly with fingertips together]. Painterly dark medieval fantasy, gold ivory cutout outline, entire waist-up silhouette inside the square. IMPORTANT actual transparent alpha channel background, background pixels must be transparent. Do not draw a checkerboard or any background. No text. No blood. Match existing character costume.
+
+## morgana-panic — «Только не меня!» (2026-10-11)
+
+Achievement reward: open `ai_win`, one human victory against regular or smart AI bots. Selected from built-in image_gen previews; character reference `../roles/morgana.webp`, style reference `morgana-wow.webp`. Morgana recoils with frightened pleading eyes and both palms facing the viewer. Preserve crown, black hair and robes, painterly medieval fantasy, thin ivory-gold outline, no text. Runtime asset: 320×320 WebP with transparent alpha preserved.

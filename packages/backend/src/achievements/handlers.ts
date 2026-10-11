@@ -1,5 +1,7 @@
 import {
   VisualGameState,
+  StartedRoomState,
+  ACHIEVEMENT_AI_WIN,
   TLoyalty,
   HistoryAssassinate,
   HistoryVote,
@@ -50,6 +52,19 @@ export class AchievementHandlers {
   async handleGameEnd(game: VisualGameState, sequence?: number): Promise<void> {
     if (sequence !== undefined) return achievementGameContext.run(sequence, () => this.processGameEnd(game));
     return this.processGameEnd(game);
+  }
+
+  /** AI matches award only this dedicated human achievement. */
+  async handleAiGameEnd(state: StartedRoomState): Promise<void> {
+    const humanID = state.ai?.humanPlayerID;
+    const game = state.game;
+    if (!humanID || game.stage !== 'end' || !game.result?.winner || game.result.reason === 'manualy') return;
+    const player = game.players.find((player) => player.id === humanID);
+    if (!player) return;
+    const loyalty = Object.keys(evilRolesImportance).includes(player.role) ? 'evil' : 'good';
+    if (loyalty === game.result.winner) {
+      await this.achievementService.updateAchievementProgress(humanID, ACHIEVEMENT_AI_WIN);
+    }
   }
 
   private async processGameEnd(game: VisualGameState): Promise<void> {

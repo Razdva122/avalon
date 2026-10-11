@@ -3,6 +3,8 @@
  */
 export default {
   achievements: {
+    ai_win: 'Human Factor',
+    ai_win_description: 'Win one game against AI with regular or smart bots.',
     best_of_the_best: 'Best of the Best',
     best_of_the_best_description:
       'Reach a TrueSkill rating of 6800 or higher after completing at least 10 rated games from the start or since your last rating reset.',

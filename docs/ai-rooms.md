@@ -25,7 +25,7 @@ Mixed games pause at the human seat in each public discussion circle. The “You
 public chat in bot context. Role/decision reveal is disabled for everyone in a
 mixed room. Mixed games award neither human nor AI profile ratings.
 Spectator messages are not passed to the bots. AI games use their own profile
-statistics/rating pool and do not award human ratings or achievements.
+statistics/rating pool and do not award human ratings or ordinary achievements. A human victory in a completed AI match unlocks the dedicated open `ai_win` achievement and the Morgana “Not me, please!” sticker; both regular and smart bots qualify.
 
 ## Table and characters
 

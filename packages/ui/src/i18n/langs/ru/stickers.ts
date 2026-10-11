@@ -1,5 +1,6 @@
 export default {
   stickers: {
+    'morgana-panic': 'Только не меня!',
     'cleric-best': 'Лучший из лучших',
     'mordred-puppet': "@:{'premiumCosmetics.mordred-puppet'}",
     'morgana-violin': "@:{'premiumCosmetics.morgana-violin'}",

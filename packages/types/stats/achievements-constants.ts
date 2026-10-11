@@ -10,6 +10,7 @@ export const ACHIEVEMENT_DIFFERENT_PLAYER_COUNT = 'different_player_count';
 export const ACHIEVEMENT_ASSASSIN_KILLS = 'assassin_kills';
 export const ACHIEVEMENT_TOP_PLAYER = 'top_player';
 export const ACHIEVEMENT_SECRET_HUNTER = 'secret_hunter';
+export const ACHIEVEMENT_AI_WIN = 'ai_win';
 export const ACHIEVEMENT_BEST_OF_THE_BEST = 'best_of_the_best';
 export const BEST_OF_THE_BEST_RATING = 6800;
 export const BEST_OF_THE_BEST_MIN_GAMES = 10;
@@ -23,6 +24,7 @@ export const OPEN_ACHIEVEMENT_IDS = [
   ACHIEVEMENT_TOP_PLAYER,
   ACHIEVEMENT_SECRET_HUNTER,
   ACHIEVEMENT_BEST_OF_THE_BEST,
+  ACHIEVEMENT_AI_WIN,
 ];
 
 // Скрытые достижения

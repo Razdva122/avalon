@@ -3,6 +3,8 @@
  */
 export default {
   achievements: {
+    ai_win: 'Fator humano',
+    ai_win_description: 'Vença uma partida contra a IA com bots comuns ou inteligentes.',
     best_of_the_best: 'O melhor dos melhores',
     best_of_the_best_description:
       'Alcance uma classificação TrueSkill de 6800 ou mais após completar pelo menos 10 partidas ranqueadas desde o início ou desde a última redefinição da classificação.',

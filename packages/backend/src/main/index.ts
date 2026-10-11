@@ -252,6 +252,9 @@ export class Manager {
       });
       const retry = () => {
         void results.flush().catch(() => console.error('Game result processing failed; will retry'));
+        void this.aiService.archiveRepository
+          ?.processPendingAchievements((state) => this.achievementManager.achievementHandlers.handleAiGameEnd(state))
+          .catch(() => console.error('AI achievement processing failed; will retry'));
       };
       const timer = setInterval(retry, 5000);
       timer.unref();

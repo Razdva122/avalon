@@ -408,3 +408,29 @@ test('pre-release games remain in statistics but do not affect the new 6000 rati
   expect(await repo.getProfileRating('avalon-ai-1')).toBeUndefined();
   expect((await repo.getPlayerGameSummariesPage('avalon-agent-1')).games).toHaveLength(1);
 });
+
+test('saved AI award work survives a failed award and repository restart', async () => {
+  const db = client.db('award-retry');
+  const state = {
+    roomID: 'award-retry',
+    stage: 'started',
+    createAt: new Date().toISOString(),
+    ai: { humanPlayerID: 'human', status: 'running' },
+    game: { stage: 'end', result: { winner: 'good', reason: 'missions' }, players: [{ id: 'human', role: 'servant' }] },
+  } as unknown as import('@avalon/types').StartedRoomState;
+  await new AiRepository(db).save(state);
+  const failed = async () => {
+    throw new Error('temporary achievement failure');
+  };
+  const process = (repo: AiRepository, handler: (state: import('@avalon/types').StartedRoomState) => Promise<void>) =>
+    repo.processPendingAchievements(handler);
+  await expect(process(new AiRepository(db), failed)).rejects.toThrow('temporary achievement failure');
+  const awarded: string[] = [];
+  await process(new AiRepository(db), async (saved) => {
+    awarded.push(saved.ai!.humanPlayerID!);
+  });
+  await process(new AiRepository(db), async (saved) => {
+    awarded.push(saved.ai!.humanPlayerID!);
+  });
+  expect(awarded).toEqual(['human']);
+});
