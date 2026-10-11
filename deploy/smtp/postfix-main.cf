@@ -3,3 +3,7 @@ milter_default_action = tempfail
 smtpd_tls_protocols = >=TLSv1.2
 smtpd_tls_mandatory_protocols = >=TLSv1.2
 inet_protocols = ipv4
+# Accept known domain recipients, then discard replies and delivery reports.
+# Authentication on private port 465 remains independent of local delivery.
+virtual_transport = discard:inbound-not-monitored
+local_transport = discard:inbound-not-monitored

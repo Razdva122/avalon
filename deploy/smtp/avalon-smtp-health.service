@@ -1,9 +1,9 @@
 [Unit]
-Description=Check Avalon private SMTP and queued mail
+Description=Check Avalon SMTP, inbound discard and queued mail
 After=docker.service
 
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/python3 /opt/avalon/smtp/health.py
-TimeoutStartSec=55
+TimeoutStartSec=180
 UMask=0077

@@ -9,3 +9,22 @@ Publish avalon-prod.avalon-game.com A 157.228.134.198 (matching existing PTR), a
 Keep the current Avalon 71.3.0 production image and all mail encryption/event secrets and limits (20/hour, 100/day). Rebase generic SMTP support onto current source. Test against the new SMTP before changing application environment. Queue acceptance, recipient-server delivery, and user inbox receipt are distinct checks. Send one authorized test only after TLS, authentication, DNS and relay checks pass; inspect actual DKIM signing and the remote SMTP response. Await receipt confirmation before activating the provider in production.
 
 Back up all changed configuration. The SMTP service starts independently; production compose and backend remain unchanged during preparation. Preserve rollback to previous sender. Add a monitor and backup integration for the mail state so failures are visible; avoid automated outgoing email notifications.
+
+## Approved amendment: technical incoming mail
+
+After confirming the outgoing test in the inbox and activating own SMTP, the
+user asked to stop paying for FirstByte mail hosting and explicitly approved
+accepting then deleting replies/bounces on the VPS. This supersedes the initial
+private-only listener and retained FirstByte MX constraints. Publish IPv4 port25
+without authentication, with known-recipient validation and no relay. Use native
+Postfix discard transports for both virtual-domain and hostname-local delivery;
+retain the account solely for sender authentication and recipient validation.
+Port465 remains private. No readable inbox exists; queued mail is discarded,
+while delivery metadata remains in logs. Point MX at avalon-prod and remove
+obsolete FirstByte hosting A/SPF/DKIM records. Keep separate free DNS hosting.
+
+Verify public TLS, explicit relay denial, rejected unknown recipients, local
+discard with a null-envelope test and no mailbox growth, then private outgoing
+authentication without sending another external message. Monitor inbound
+configuration and public restrictions; include the amended configuration in
+the existing encrypted off-host backup. No backend restart is required.

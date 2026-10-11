@@ -13,7 +13,8 @@
 ## Global constraints
 
 - Exactly one authorized test email to lexur-02@yandex.ru.
-- No public SMTP/IMAP/POP3 listeners, unauthenticated relay or spoofing.
+- No public authenticated submission/IMAP/POP3 listeners, unauthenticated relay
+  or spoofing. The later approved technical-incoming amendment permits port25.
 - Dedicated 2048-bit DKIM selector vps20261011; TLS 1.2 or higher with certificate verification.
 - Preserve production image/version, existing secrets and limits 20/hour and 100/day.
 - No application SMTP switch before confirmed delivery; retain Postbox and current MX for rollback.
@@ -35,3 +36,34 @@ Own SMTP is active in Avalon 71.3.0. The one test was DKIM signed, Yandex accept
 Retained Yandex zone could not be synchronized because its console RPC reported Channel closed before call started. Current delegation and exact A/SPF/DKIM were verified on all six FirstByte NS plus Google/Cloudflare. This inactive old zone was not deleted.
 
 Normal deploy.py invokes the idle checker via stdin, which does not execute its require.main guard. This migration ran the checker as a file, then obtained explicit user approval because the20-room inventory was truncated and contained three waiting rooms. Repairing the normal deployment guard remains a separate follow-up; never rely on its silent stdin success.
+
+## Technical incoming mail after FirstByte cancellation
+
+The user approved accepting and immediately discarding mail on the existing VPS,
+without a readable inbox. FirstByte service 4739178 auto-renewal is disabled.
+
+1. Verify missing public port/discard behavior before changing configuration.
+2. Publish only IPv4 port 25 and set native Postfix virtual_transport to discard;
+   keep authenticated outgoing port 465 private and retain recipient validation.
+3. Verify public TLS, disabled authentication, denied relay/unknown recipients,
+   one controlled null-envelope message discarded without mailbox delivery,
+   and unchanged private outgoing authentication. Do not send external tests.
+4. Move MX to avalon-prod, remove FirstByte hosting SPF/A/DKIM records, verify
+   all authoritative servers and public resolvers before removing paid hosting.
+5. Keep separate DNS hosting, take a verified backup, review and merge the
+   infrastructure files into master so later restores preserve discard behavior.
+
+Runtime verification passed: public STARTTLS and no AUTH, explicit relay554,
+unknown-recipient rejection, local null-envelope message74A79E006B discarded
+and removed with no mailbox growth; unchanged private outgoing authentication.
+An external non-sending SMTP probe also passed. Avalon backend was not restarted.
+Initial deployment automatically rolled back because the VPS hosts file maps
+the hostname to loopback; the probe now connects to the published IPv4 address
+and validates the certificate using the DNS hostname. All six authoritative
+servers and Google/Cloudflare confirm amended MX/SPF/DKIM and removed legacy
+hosting records. Backup avalon-20261011T144953Z.tar.age includes amended SMTP;
+remote ciphertext checksum readback verified.
+
+FirstByte refused deleting paid mail service4739178 before the minimum one-month
+term ends on2026-11-11. Auto-renewal remains disabled; the service is unused.
+Separate DNS service4738725 (DNS-100-free,0RUB/month) remains active.

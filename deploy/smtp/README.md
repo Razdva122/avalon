@@ -1,17 +1,23 @@
-# Avalon private outgoing SMTP
+# Avalon outgoing SMTP and technical incoming mail
 
 Docker Mailserver 16.0.1 runs independently under `/opt/avalon/smtp`. It joins
 `avalon-production_production` at `172.30.90.20`, with the internal alias
-`avalon-prod.avalon-game.com`. Only the loopback diagnostic port 1465 is published.
-MX and incoming mail remain at FirstByte hosting; this service sends application mail.
+`avalon-prod.avalon-game.com`. Port 465 stays private, with a loopback diagnostic
+port 1465. Public IPv4 port 25 accepts mail for known domain recipients without
+authentication. Postfix's native discard transport removes replies and delivery
+reports after acceptance; no readable inbox exists. Mail briefly enters the
+delivery queue, and delivery metadata remains in logs. This does not affect
+authenticated application mail to external recipients.
 
 ## Reconstructing the service
 
 Create root-private directories `config`, `data`, `state`, `logs`, `tls` under
-`/opt/avalon/smtp`. Copy `compose.yaml`, `check.py`, `health.py`, and
+`/opt/avalon/smtp`. Copy `compose.yaml`, `check.py`, `check-inbound.py`, `health.py`, and
 `renew-certificate.sh` there. **Install `postfix-main.cf` into
 `/opt/avalon/smtp/config/postfix-main.cf`**, not beside compose: this makes DKIM
-failure temporary instead of silently sending unsigned mail.
+failure temporary instead of silently sending unsigned mail, and routes local
+domain and local hostname mail to `discard:inbound-not-monitored`. Keep the account database for
+sender authentication and recipient validation; no Dovecot mailbox delivery is used.
 
 Restore the encrypted runtime backup's account database, DKIM keys, private
 `backend-smtp.env`, mail data, and state. Do not regenerate DKIM or passwords
@@ -23,6 +29,8 @@ Publish A `avalon-prod.avalon-game.com` → `157.228.134.198`; existing PTR alre
 matches. Add `ip4:157.228.134.198` to the single existing SPF record. Publish the
 2048-bit DKIM TXT under selector `vps20261011`. Preserve old senders/selectors
 until rollback is no longer needed. Public DNS is delegated to FirstByte.
+MX is `10 avalon-prod.avalon-game.com.`; remove the old FirstByte hosting IP
+from SPF and its unused `dkim._domainkey` record when switching incoming mail.
 
 Issue a dedicated Let's Encrypt webroot certificate for the SMTP hostname under
 `/opt/avalon/production/acme`. Add that hostname to the HTTP ACME server in
@@ -39,7 +47,8 @@ verify the certificate actually served on loopback, not just hook exit status.
 
 Install the health service/timer under `/etc/systemd/system`, reload systemd,
 and enable the timer. It checks processes, trusted TLS, certificate expiry,
-and queue size/age every five minutes. Failures are recorded in `health.json`
+queue size/age, inbound discard configuration and public SMTP restrictions
+every five minutes. Failures are recorded in `health.json`
 and the systemd journal; no email notifications are sent.
 
 The existing encrypted Avalon backup includes `/opt/avalon/smtp` and
@@ -50,6 +59,8 @@ Protect decrypted backups: they contain SMTP credentials and signing keys.
 
 ```sh
 python3 /opt/avalon/smtp/check.py  # auth/relay security; sends zero messages
+python3 /opt/avalon/smtp/check-inbound.py  # public SMTP security; sends zero messages
+python3 /opt/avalon/smtp/check-inbound.py --discard-test  # local null-sender test to security@ only
 python3 /opt/avalon/smtp/health.py
 docker compose -f /opt/avalon/smtp/compose.yaml ps
 docker compose -f /opt/avalon/smtp/compose.yaml logs --tail 100 smtp
@@ -80,8 +91,13 @@ old 71.2.0 artifacts over the current release.
 For Postbox rollback remove all four generic SMTP fields together and retain
 the old Postbox credentials. Postbox connectivity was unavailable during this
 incident; its configuration alone does not establish a functioning fallback.
-Keep paid FirstByte inbox and Yandex services until their separate dependencies
-and bounce handling have been reviewed.
+The user explicitly chose to discard replies and bounces on the VPS. FirstByte
+paid mail hosting auto-renewal is disabled; its DNS hosting is a separate service.
+FirstByte refused immediate deletion because the minimum first term is one
+month, through 2026-11-11. Paid hosting remains unused for that term; do not
+re-enable renewal or remove the separate DNS-100-free service4738725.
+Keep unrelated Yandex services, including object storage, until their own
+dependencies have been reviewed.
 
 ## Current activation
 

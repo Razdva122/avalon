@@ -19,6 +19,13 @@ def main():
         status['check'] = 'mail_processes'
         subprocess.run(COMPOSE + ['exec', '-T', 'smtp', 'dms-healthcheck'],
                        check=True, timeout=15, capture_output=True)
+        status['check'] = 'inbound_discard_configuration'
+        result = subprocess.run(COMPOSE + ['exec', '-T', 'smtp', 'postconf', '-h', 'virtual_transport', 'local_transport'],
+                                check=True, timeout=15, capture_output=True, text=True)
+        assert result.stdout.splitlines() == ['discard:inbound-not-monitored'] * 2, 'Inbound discard disabled'
+        status['check'] = 'public_inbound_smtp'
+        subprocess.run(['python3', str(ROOT / 'check-inbound.py')],
+                       check=True, timeout=60, capture_output=True)
         status['check'] = 'tls_connection'
         with client() as connection:
             status['check'] = 'certificate_expiry'
