@@ -1,4 +1,6 @@
 export interface MailConfig {
+  host: string;
+  port: number;
   user: string;
   password: string;
   from: string;
@@ -19,15 +21,15 @@ export function normalizeEmail(value: unknown): string | null {
 
 export function mailConfig(env: NodeJS.ProcessEnv = process.env): MailConfig | null {
   if (env.MAIL_ENABLED !== 'true') return null;
-  const required = [
-    'POSTBOX_SMTP_USER',
-    'POSTBOX_SMTP_PASSWORD',
-    'MAIL_FROM',
-    'MAIL_FRONTEND_URL',
-    'MAIL_ENCRYPTION_KEY',
-    'MAIL_EVENT_SECRET',
-  ];
-  if (required.some((key) => !env[key])) throw new Error('Incomplete mail configuration');
+  const host = env.SMTP_HOST || 'postbox.cloud.yandex.net';
+  const port = Number(env.SMTP_PORT || 465);
+  if (!/^[a-zA-Z0-9.-]+$/.test(host) || !Number.isSafeInteger(port) || port < 1 || port > 65535)
+    throw new Error('Invalid SMTP configuration');
+  const genericCredentials = !!(env.SMTP_HOST || env.SMTP_USER || env.SMTP_PASSWORD);
+  const user = genericCredentials ? env.SMTP_USER : env.POSTBOX_SMTP_USER;
+  const password = genericCredentials ? env.SMTP_PASSWORD : env.POSTBOX_SMTP_PASSWORD;
+  const required = ['MAIL_FROM', 'MAIL_FRONTEND_URL', 'MAIL_ENCRYPTION_KEY', 'MAIL_EVENT_SECRET'];
+  if (!user || !password || required.some((key) => !env[key])) throw new Error('Incomplete mail configuration');
   const origin = new URL(env.MAIL_FRONTEND_URL!);
   const production = env.NODE_ENV === 'production';
   if (
@@ -46,8 +48,10 @@ export function mailConfig(env: NodeJS.ProcessEnv = process.env): MailConfig | n
   if (![hourlyLimit, dailyLimit].every((n) => Number.isSafeInteger(n) && n > 0 && n <= 100000))
     throw new Error('Invalid mail limits');
   return {
-    user: env.POSTBOX_SMTP_USER!,
-    password: env.POSTBOX_SMTP_PASSWORD!,
+    host,
+    port,
+    user,
+    password,
     from,
     origin: origin.origin,
     key: Buffer.from(env.MAIL_ENCRYPTION_KEY!, 'hex'),

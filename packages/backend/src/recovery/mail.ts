@@ -8,9 +8,10 @@ export interface Mail {
 }
 export function smtpSender(config: MailConfig): (mail: Mail) => Promise<void> {
   const transport = nodemailer.createTransport({
-    host: 'postbox.cloud.yandex.net',
-    port: 465,
-    secure: true,
+    host: config.host,
+    port: config.port,
+    secure: config.port === 465,
+    requireTLS: config.port !== 465,
     auth: { user: config.user, pass: config.password },
     tls: { minVersion: 'TLSv1.2', rejectUnauthorized: true },
     connectionTimeout: 10000,

@@ -21,6 +21,11 @@ services:
       MAIL_ENABLED: 'false'
       POSTBOX_SMTP_USER: REPLACE_WITH_API_KEY_ID
       POSTBOX_SMTP_PASSWORD: REPLACE_WITH_API_KEY_SECRET
+      # Для другого SMTP вместо POSTBOX_SMTP_* задайте все четыре поля:
+      # SMTP_HOST: mail.example.com
+      # SMTP_PORT: '465'
+      # SMTP_USER: security@avalon-game.com
+      # SMTP_PASSWORD: REPLACE_WITH_MAILBOX_PASSWORD
       MAIL_FROM: security@avalon-game.com
       MAIL_FRONTEND_URL: https://avalon-game.com
       MAIL_ENCRYPTION_KEY: REPLACE_WITH_64_HEX_CHARACTERS

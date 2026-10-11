@@ -16,6 +16,8 @@ let service: RecoveryService;
 let now: number;
 let sent: { to: string; subject: string; text: string }[];
 const config: MailConfig = {
+  host: 'postbox.cloud.yandex.net',
+  port: 465,
   user: 'test-key',
   password: 'test-secret',
   from: 'security@example.com',
