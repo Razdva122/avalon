@@ -3,6 +3,27 @@
  * This file contains translations for modal dialogs and info messages
  */
 export default {
+  welcome: {
+    accountCreated: '帳號已建立',
+    title: '你想和誰一起玩？',
+    aiTitle: '與 AI 對戰',
+    aiDescription: '與四個機器人一起學習遊戲。',
+    aiAction: '與 AI 對戰',
+    aiChecking: '正在檢查…',
+    aiUnavailable: '機器人暫無法使用',
+    aiBusy: '所有機器人目前都在忙',
+    aiAccessError: '無法連線 AI',
+    aiOpening: '正在準備機器人房間。你可以關閉此視窗。',
+    boardTitle: '尋找隊友',
+    boardDescription: '在公告板上尋找遊戲團隊。',
+    boardAction: '尋找隊友',
+    friendsTitle: '與好友一起玩',
+    friendsDescription: '建立房間，將連結傳送給好友。',
+    friendsPlayerCount: '5–10 位玩家',
+    friendsAction: '建立房間',
+    roomOpening: '正在建立房間。你可以關閉此視窗。',
+    later: '稍後再說',
+  },
   modal: {
     username: '使用者名稱',
     usernameHint: '選擇您的遊戲名稱',

@@ -3,6 +3,27 @@
  * This file contains translations for modal dialogs and info messages
  */
 export default {
+  welcome: {
+    accountCreated: 'Account created',
+    title: 'Who would you like to play with?',
+    aiTitle: 'With AI',
+    aiDescription: 'Learn the game at a table with four bots.',
+    aiAction: 'Play with AI',
+    aiChecking: 'Checking access…',
+    aiUnavailable: 'Bots unavailable',
+    aiBusy: 'All bots are busy right now',
+    aiAccessError: 'Cannot reach AI',
+    aiOpening: 'Preparing your bot table. You can close this window.',
+    boardTitle: 'Find a group',
+    boardDescription: 'Find a group on the community board.',
+    boardAction: 'Find a group',
+    friendsTitle: 'With friends',
+    friendsDescription: 'Create a room and share the link with friends.',
+    friendsPlayerCount: '5–10 players',
+    friendsAction: 'Create a room',
+    roomOpening: 'Creating your room. You can close this window.',
+    later: 'Later',
+  },
   modal: {
     username: 'Username',
     usernameHint: 'Select your username for game',

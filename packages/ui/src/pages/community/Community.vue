@@ -10,14 +10,18 @@
         ><template v-if="activeTab !== 'servers'"
           ><span aria-hidden="true">/</span
           ><span aria-current="page">{{
-            t(`playerBoards.${activeTab === 'solo' ? 'seoSoloTitle' : 'seoGroupTitle'}`)
+            t(`playerBoards.${activeTab === 'solo' ? 'players' : 'teams'}`)
           }}</span></template
         >
       </nav>
       <p v-if="activeTab === 'servers'" class="eyebrow">AVALON · {{ t('community.eyebrow') }}</p>
       <h1>
         {{
-          t(activeTab === 'servers' ? 'community.title' : `playerBoards.${activeTab === 'solo' ? 'players' : 'teams'}`)
+          t(
+            activeTab === 'servers'
+              ? 'community.title'
+              : `playerBoards.${activeTab === 'solo' ? 'findPlayers' : 'findCompany'}`,
+          )
         }}
       </h1>
       <p class="intro">
@@ -223,6 +227,7 @@ const directoryEntries = [
 @media (max-width: 480px) {
   .community-tabs {
     gap: 6px;
+    margin-bottom: 20px;
     a {
       padding: 10px 6px;
       font-size: 13px;
@@ -510,6 +515,7 @@ h3 {
   @media (max-width: 480px) {
     .community-tabs {
       gap: 6px;
+      margin-bottom: 20px;
       a {
         padding: 10px 6px;
         font-size: 13px;

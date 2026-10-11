@@ -141,7 +141,10 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
     callback: (result: {
       canManage: boolean;
       canPlay?: boolean;
+      botsBusy?: boolean;
       botModes?: Record<AiBotDifficulty, boolean>;
+      /** Estimated quota recovery, in Unix milliseconds; omitted when unknown or occupied. */
+      botModeAvailableAt?: Partial<Record<AiBotDifficulty, number>>;
       ownRoomID?: string;
       roomID?: string;
       models?: { id: string; label: string }[];

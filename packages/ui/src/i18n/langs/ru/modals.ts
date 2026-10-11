@@ -3,6 +3,27 @@
  * This file contains translations for modal dialogs and info messages
  */
 export default {
+  welcome: {
+    accountCreated: 'Аккаунт создан',
+    title: 'С кем хотите сыграть?',
+    aiTitle: 'С AI',
+    aiDescription: 'Разберитесь в игре за столом с четырьмя ботами.',
+    aiAction: 'Играть с AI',
+    aiChecking: 'Проверяем доступ…',
+    aiUnavailable: 'Боты пока недоступны',
+    aiBusy: 'Все боты сейчас заняты',
+    aiAccessError: 'Нет связи с AI',
+    aiOpening: 'Готовим стол с ботами. Можно закрыть это окно.',
+    boardTitle: 'Найти компанию',
+    boardDescription: 'Найдите группу на доске объявлений.',
+    boardAction: 'Найти компанию',
+    friendsTitle: 'С друзьями',
+    friendsDescription: 'Создайте комнату и отправьте друзьям ссылку.',
+    friendsPlayerCount: '5–10 игроков',
+    friendsAction: 'Создать комнату',
+    roomOpening: 'Создаём комнату. Можно закрыть это окно.',
+    later: 'Позже',
+  },
   modal: {
     username: 'Имя пользователя',
     usernameHint: 'Выберите игровое имя',

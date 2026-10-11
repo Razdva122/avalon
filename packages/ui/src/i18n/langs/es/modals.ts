@@ -3,6 +3,27 @@
  * This file contains translations for modal dialogs and info messages
  */
 export default {
+  welcome: {
+    accountCreated: 'Cuenta creada',
+    title: '¿Con quién quieres jugar?',
+    aiTitle: 'Con IA',
+    aiDescription: 'Aprende a jugar en una mesa con cuatro bots.',
+    aiAction: 'Jugar con IA',
+    aiChecking: 'Comprobando acceso…',
+    aiUnavailable: 'Bots no disponibles',
+    aiBusy: 'Todos los bots están ocupados',
+    aiAccessError: 'Sin conexión con IA',
+    aiOpening: 'Preparando la mesa con bots. Puedes cerrar esta ventana.',
+    boardTitle: 'Encontrar un grupo',
+    boardDescription: 'Encuentra un grupo en el tablón de anuncios.',
+    boardAction: 'Encontrar grupo',
+    friendsTitle: 'Con amigos',
+    friendsDescription: 'Crea una sala y comparte el enlace con tus amigos.',
+    friendsPlayerCount: '5–10 jugadores',
+    friendsAction: 'Crear sala',
+    roomOpening: 'Creando la sala. Puedes cerrar esta ventana.',
+    later: 'Más tarde',
+  },
   modal: {
     username: 'Nombre de usuario',
     usernameHint: 'Elige tu nombre para el juego',

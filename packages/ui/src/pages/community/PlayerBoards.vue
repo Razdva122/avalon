@@ -1,6 +1,35 @@
 <template>
   <section id="player-boards" class="player-boards" aria-labelledby="board-title">
     <h2 id="board-title" class="sr-only">{{ t(`playerBoards.${kind === 'group' ? 'teams' : 'players'}`) }}</h2>
+    <aside v-if="showInvitation" class="board-invitation" aria-labelledby="invitation-title">
+      <div class="invitation-copy">
+        <p class="invitation-context">{{ t(`playerBoards.${kind === 'group' ? 'noTeamsYet' : 'noPlayersYet'}`) }}</p>
+        <h3 id="invitation-title">{{ t('playerBoards.invitationTitle') }}</h3>
+        <p class="invitation-description">{{ t('playerBoards.invitationBody') }}</p>
+        <div class="invitation-actions">
+          <LocaleLink
+            v-if="kind === 'group'"
+            class="primary invitation-action"
+            :to="{ name: 'community_solo', query: { publish: '1' } }"
+          >
+            <v-icon icon="person_add" size="20" aria-hidden="true" />{{ t('playerBoards.invitationAction') }}
+          </LocaleLink>
+          <button v-else type="button" class="primary invitation-action" :disabled="busy" @click="startPublish">
+            <v-icon icon="person_add" size="20" aria-hidden="true" />{{ t('playerBoards.invitationAction') }}
+          </button>
+          <LocaleLink class="invitation-community" :to="{ name: 'community' }">{{
+            t('playerBoards.communitiesAction')
+          }}</LocaleLink>
+        </div>
+        <p class="invitation-note">{{ t('playerBoards.invitationNote') }}</p>
+      </div>
+      <div class="party-table" aria-hidden="true">
+        <div class="party-table-top"><v-icon icon="groups" size="40" /></div>
+        <div v-for="seat in 5" :key="seat" class="party-seat" :class="`party-seat--${seat}`">
+          <v-icon v-if="seat !== 1" icon="person" size="22" />
+        </div>
+      </div>
+    </aside>
     <div class="toolbar">
       <fieldset class="language-filter">
         <legend>{{ t('playerBoards.languages') }}</legend>
@@ -45,28 +74,47 @@
           {{ t('playerBoards.resetFilters') }}
         </button>
       </div>
-      <button v-if="!profile" type="button" class="primary" @click="startPublish">
-        {{ t(`playerBoards.${kind === 'group' ? 'publishTeam' : 'publishPlayer'}`) }}
-      </button>
       <button
-        v-else-if="account && !own && !account.banned"
+        v-if="kind === 'group' && account?.canRecruit && !account.banned && !own && !editing"
         type="button"
-        class="primary"
-        :disabled="busy || (kind === 'group' && !account.canRecruit)"
+        :disabled="busy"
         @click="startPublish"
       >
-        {{ t(`playerBoards.${kind === 'group' ? 'publishTeam' : 'publishPlayer'}`) }}
+        {{ t('playerBoards.publishTeam') }}
       </button>
     </div>
+    <aside v-if="showCompactInvitation" class="board-profile-prompt" aria-labelledby="profile-prompt-title">
+      <div class="profile-prompt-copy">
+        <h3 id="profile-prompt-title">
+          {{
+            t(
+              playerListing
+                ? 'playerBoards.myPlayerProfile'
+                : kind === 'group'
+                  ? 'playerBoards.compactInvitationTitle'
+                  : 'playerBoards.invitationTitle',
+            )
+          }}
+        </h3>
+        <p>{{ t(playerListing ? 'playerBoards.managePlayerProfile' : 'playerBoards.compactInvitationBody') }}</p>
+      </div>
+      <LocaleLink v-if="kind === 'group'" class="primary invitation-action" :to="playerProfileTarget">
+        <v-icon :icon="playerListing ? 'person' : 'person_add'" size="20" aria-hidden="true" />
+        {{ t(playerListing ? 'playerBoards.myProfileAction' : 'playerBoards.invitationAction') }}
+      </LocaleLink>
+      <button v-else type="button" class="primary invitation-action" :disabled="busy" @click="startPublish">
+        <v-icon icon="person_add" size="20" aria-hidden="true" />{{ t('playerBoards.invitationAction') }}
+      </button>
+    </aside>
     <details class="board-how">
       <summary>{{ t('playerBoards.howItWorks') }}</summary>
       <p>{{ t('playerBoards.intro') }}</p>
       <p>{{ t('playerBoards.rules') }}</p>
+      <p v-if="profile && kind === 'group' && account && !account.canRecruit && !account.banned">
+        {{ t('playerBoards.eligibility') }}
+      </p>
     </details>
     <p v-if="account?.banned" class="notice">{{ t('playerBoards.banned') }}</p>
-    <p v-else-if="profile && kind === 'group' && account && !account.canRecruit" class="notice">
-      {{ t('playerBoards.eligibility') }}
-    </p>
     <p v-if="accountLoading" role="status">{{ t('playerBoards.loading') }}</p>
     <p v-if="accountError" role="alert">
       {{ t(`playerBoards.${accountError}`) }} <button @click="loadAccount">{{ t('playerBoards.retry') }}</button>
@@ -103,9 +151,17 @@
       {{ t(`playerBoards.${loadError}`) }} <button @click="loadPublic">{{ t('playerBoards.retry') }}</button>
     </div>
     <template v-else>
-      <div v-if="!visibleListings.length" class="empty">
+      <div v-if="!visibleListings.length && !showInvitation && !editing" class="empty">
         <p>
-          {{ t(hasFilters ? 'playerBoards.noFilterMatches' : own ? 'playerBoards.noMatches' : 'playerBoards.empty') }}
+          {{
+            t(
+              hasFilters
+                ? 'playerBoards.noFilterMatches'
+                : own || playerListing
+                  ? 'playerBoards.noMatches'
+                  : 'playerBoards.empty',
+            )
+          }}
         </p>
         <button v-if="hasFilters" type="button" @click="resetFilters">{{ t('playerBoards.resetFilters') }}</button>
       </div>
@@ -229,6 +285,10 @@ const resetFilters = () =>
 const hasMore = ref(false);
 const listings = ref<BoardListing[]>([]);
 const account = ref<BoardOwnerState | null>(null);
+const playerListing = computed(() => account.value?.listings.find((item) => item.kind === 'solo'));
+const playerProfileTarget = computed(() =>
+  playerListing.value ? { name: 'community_solo' } : { name: 'community_solo', query: { publish: '1' } },
+);
 const own = computed(() => account.value?.listings.find((item) => item.kind === kind.value));
 const draftStorageKey = computed(() => `${profile.value?.id}:${kind.value}:${own.value?.id || 'new'}`);
 const now = ref(Date.now());
@@ -252,6 +312,30 @@ const error = ref('');
 const loadError = ref('');
 const accountError = ref('');
 const success = ref('');
+const showInvitation = computed(
+  () =>
+    !loading.value &&
+    !loadError.value &&
+    !accountLoading.value &&
+    !accountError.value &&
+    !visibleListings.value.length &&
+    !hasFilters.value &&
+    page.value === 1 &&
+    !own.value &&
+    !playerListing.value &&
+    !editing.value &&
+    !account.value?.banned,
+);
+const showCompactInvitation = computed(
+  () =>
+    !loading.value &&
+    !accountLoading.value &&
+    !accountError.value &&
+    !showInvitation.value &&
+    !editing.value &&
+    (kind.value === 'group' || !own.value) &&
+    (!profile.value || (account.value && (!account.value.banned || Boolean(playerListing.value)))),
+);
 const reportTarget = ref('');
 const reportListingName = computed(() => {
   const listing = listings.value.find((item) => item.id === reportTarget.value);
@@ -272,6 +356,14 @@ function startPublish() {
   if (!account.value || account.value.banned || (kind.value === 'group' && !account.value.canRecruit)) return;
   editing.value = true;
   void reveal(formElement);
+}
+function consumePublishIntent() {
+  if (!mounted || kind.value !== 'solo' || route.query.publish !== '1') return;
+  if (profile.value && !account.value) return;
+  const query = { ...route.query };
+  delete query.publish;
+  void router.replace({ query });
+  startPublish();
 }
 async function loadPublic() {
   if (!mounted) return;
@@ -308,6 +400,7 @@ async function loadAccount() {
         publishAfterLogin.value = false;
         startPublish();
       }
+      consumePublishIntent();
     }
   } catch (e) {
     if (generation === accountGeneration) accountError.value = boardClientError(e);
@@ -391,9 +484,11 @@ watch(reportTarget, () => {
   reportError.value = '';
   reportReason.value = 'spam';
 });
+watch(() => route.query.publish, consumePublishIntent);
 onMounted(() => {
   if (prerender) return;
   mounted = true;
+  consumePublishIntent();
   void refresh();
   timer = setInterval(() => {
     now.value = Date.now();
@@ -407,6 +502,184 @@ onBeforeUnmount(() => {
 });
 </script>
 <style scoped lang="scss">
+.board-profile-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  margin: 20px 0 12px;
+  padding: 16px 20px;
+  border: 1px solid rgba(var(--v-theme-primary), 0.25);
+  border-left: 3px solid rgb(var(--v-theme-primary));
+  border-radius: 8px;
+  background: rgb(var(--v-theme-inset));
+  .invitation-action {
+    flex: 0 0 auto;
+  }
+}
+.profile-prompt-copy {
+  min-width: 0;
+  h3 {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  p {
+    margin-top: 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgb(var(--v-theme-text-secondary));
+  }
+}
+@media (max-width: 600px) {
+  .board-profile-prompt {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+    .invitation-action {
+      width: 100%;
+    }
+  }
+  .profile-prompt-copy p {
+    display: none;
+  }
+}
+.board-invitation {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 28px;
+  padding: 32px;
+  border: 1px solid rgba(var(--v-theme-primary), 0.45);
+  border-radius: 16px;
+  background: rgb(var(--v-theme-inset));
+}
+.invitation-context {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: rgb(var(--v-theme-text-secondary));
+}
+.invitation-copy h3 {
+  font-size: clamp(26px, 3vw, 32px);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.invitation-description {
+  max-width: 54ch;
+  margin-top: 12px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.invitation-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+}
+.invitation-action {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+}
+.invitation-community {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: rgb(var(--v-theme-primary));
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.invitation-note {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgb(var(--v-theme-text-secondary));
+}
+.party-table {
+  position: relative;
+  width: 200px;
+  height: 190px;
+}
+.party-table-top {
+  position: absolute;
+  top: 42px;
+  left: 48px;
+  display: grid;
+  place-items: center;
+  width: 104px;
+  height: 104px;
+  border: 1px solid rgba(var(--v-theme-primary), 0.3);
+  border-radius: 50%;
+  background: rgba(var(--v-theme-primary), 0.07);
+  color: rgb(var(--v-theme-primary));
+}
+.party-seat {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 48px;
+  border: 1px dashed rgba(var(--v-theme-primary), 0.45);
+  border-radius: 10px;
+  color: rgba(var(--v-theme-primary), 0.65);
+}
+.party-seat--1 {
+  top: -8px;
+  left: 80px;
+  border-style: solid;
+  background-image: getAvatarPathByID('roles', 'merlin');
+  background-size: cover;
+  background-position: center 20%;
+}
+.party-seat--2 {
+  top: 48px;
+  right: 0;
+}
+.party-seat--3 {
+  top: 140px;
+  right: 28px;
+}
+.party-seat--4 {
+  top: 140px;
+  left: 28px;
+}
+.party-seat--5 {
+  top: 48px;
+  left: 0;
+}
+@media (max-width: 700px) {
+  .board-invitation {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 20px 16px;
+  }
+  .party-table {
+    display: none;
+  }
+}
+@media (max-width: 480px) {
+  .invitation-actions {
+    margin-top: 16px;
+    gap: 4px;
+  }
+  .invitation-action,
+  .invitation-community {
+    width: 100%;
+    justify-content: center;
+  }
+}
 .giveaway-note {
   display: flex;
   flex-wrap: wrap;

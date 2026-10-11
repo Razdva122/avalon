@@ -98,7 +98,7 @@ export default defineComponent({
   props: {
     modelValue: Boolean,
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'registered'],
   computed: {
     overlay: {
       get(): boolean {
@@ -175,7 +175,8 @@ export default defineComponent({
         this.error = userOrError.error;
       } else {
         this.closeAuthModal();
-        this.$router.push('/profile');
+        await this.$router.push('/profile');
+        this.$emit('registered');
       }
     },
     closeAuthModal() {

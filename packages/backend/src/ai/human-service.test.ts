@@ -210,8 +210,18 @@ test('a ready room is reused by its owner and prevents another party reserving t
   expect(access.mock.calls[1][0]).toEqual({
     canManage: false,
     canPlay: true,
+    botsBusy: true,
     botModes: { smart: false, regular: false },
   });
+});
+
+test('unavailable quota does not report bots as occupied', async () => {
+  quota.mockResolvedValue(null);
+  const { connect } = fixture();
+  const access = jest.fn();
+  await connect('owner').getAiRoomAccess(access);
+  expect(access.mock.calls[0][0].botModes).toEqual({ smart: false, regular: false });
+  expect(access.mock.calls[0][0].botsBusy).not.toBe(true);
 });
 
 test.each([undefined, 'missing', 'avalon-agent-1', 'avalon-ai-1'])(
@@ -370,4 +380,46 @@ test('preparation respects the manager room cap', async () => {
   expect(response).toHaveBeenCalled();
   expect(response.mock.calls[0][0]).toHaveProperty('error');
   expect(Object.keys(host.rooms)).toHaveLength(500);
+});
+
+test.each([
+  [10, 70, 1100000, 1010800, { smart: 1010800000 }],
+  [5, 90, 1100000, 1010800, { smart: 1100000000 }],
+  [2, 10, 1100000, 1010800, { smart: 1100000000, regular: 1100000000 }],
+  [10, 90, 1100000, 1010800, {}],
+  [2, 10, null, 1010800, {}],
+  [10, 70, 1100000, 999999, {}],
+])(
+  'public access predicts reset only for blocked quota windows (%s / %s)',
+  async (weekly, short, weekReset, shortReset, expected) => {
+    jest.useFakeTimers();
+    jest.setSystemTime(1000000000);
+    quota.mockResolvedValue({
+      remainingPercent: weekly,
+      resetsAt: weekReset,
+      shortTerm: { remainingPercent: short, resetsAt: shortReset },
+    });
+    const { connect } = fixture();
+    const access = jest.fn();
+    await connect('owner').getAiRoomAccess(access);
+    expect(access.mock.calls[0][0].botModeAvailableAt || {}).toEqual(expected);
+  },
+);
+
+test('missing models and occupied slots do not promise availability at a quota reset', async () => {
+  quota.mockResolvedValue({
+    remainingPercent: 10,
+    resetsAt: null,
+    shortTerm: { remainingPercent: 70, resetsAt: Date.now() / 1000 + 3600 },
+  });
+  const { connect, draft } = fixture();
+  const access = jest.fn();
+  modelCatalog.mockResolvedValue(models.slice(1));
+  await connect('owner').getAiRoomAccess(access);
+  expect(access.mock.calls[0][0].botModeAvailableAt?.smart).toBeUndefined();
+  modelCatalog.mockResolvedValue(models);
+  await draft();
+  await connect('other').getAiRoomAccess(access);
+  expect(access.mock.calls[1][0]).toMatchObject({ botsBusy: true });
+  expect(access.mock.calls[1][0].botModeAvailableAt?.smart).toBeUndefined();
 });

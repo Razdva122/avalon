@@ -23,6 +23,9 @@
               v-if="roomState.ai?.publicBotGame && roomState.ai.humanActionExpiresAt"
               class="bot-action-timer"
               :expires-at="roomState.ai.humanActionExpiresAt"
+              :base-expires-at="roomState.ai.humanActionBaseExpiresAt"
+              :time-bank-ms="roomState.ai.humanTimeBankMs"
+              :discussion="roomState.ai.waitingForDiscussion"
               phase="action"
             />
             <template v-if="roomState.stage !== 'started'">

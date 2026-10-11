@@ -53,7 +53,13 @@
           {{ $t(difficulty === 'smart' ? 'aiArena.botSmartHint' : 'aiArena.botRegularHint') }}
         </p>
         <p :id="`bot-${difficulty}-availability`" role="status">
-          <template v-if="!botModes[difficulty]">{{ $t('aiArena.botUnavailable') }}</template>
+          <template v-if="!botModes[difficulty]">
+            {{
+              !botsBusy && botWaitHours[difficulty] !== undefined
+                ? $t('aiArena.botAvailableIn', { hours: formatHours(botWaitHours[difficulty]!) })
+                : $t(botsBusy ? 'aiArena.botBusy' : 'aiArena.botUnavailable')
+            }}
+          </template>
         </p>
       </div>
     </div>
@@ -74,7 +80,8 @@ import BotGameTimer from './BotGameTimer.vue';
 const props = defineProps<{ roomID: string; title?: string; expiresAt?: number }>();
 const { t, locale } = useI18n();
 const router = useRouter();
-const { canPlay, botModes, refresh } = useAiAccess();
+const { canPlay, botModes, botsBusy, botWaitHours, accessStatus, refresh } = useAiAccess();
+const formatHours = (hours: number) => new Intl.NumberFormat(locale.value.replace('_', '-')).format(hours);
 const botDifficulties: AiBotDifficulty[] = ['smart', 'regular'];
 const selectedLanguage = ref<AiLanguage>(
   locale.value === 'ru' ? 'ru' : /^zh[-_]tw$/i.test(locale.value) ? 'zh-tw' : 'en',
@@ -100,7 +107,7 @@ async function leave() {
   }
 }
 async function play(difficulty: AiBotDifficulty) {
-  if (busy.value || !canPlay.value || !botModes.value[difficulty]) return;
+  if (busy.value || !canPlay.value || !botModes.value[difficulty] || accessStatus.value !== 'ready') return;
   if (props.expiresAt && Date.now() >= props.expiresAt) {
     error.value = t('aiArena.botTimeout');
     return;
@@ -333,8 +340,7 @@ async function play(difficulty: AiBotDifficulty) {
   .bot-mode:first-child p {
     grid-row: 2;
   }
-  #bot-smart-hint,
-  #bot-smart-availability {
+  #bot-smart-hint {
     display: none;
   }
   .bot-mode:last-child p {

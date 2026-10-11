@@ -16,9 +16,9 @@ export const botOptions: GameOptions = {
 
 type Choice = { text: string; actions: TGameMethodsParams[] };
 const humanTimeoutMessage: Record<AiLanguage, string> = {
-  en: 'Match stopped: the human player did not act within 90 seconds.',
-  ru: 'Партия завершена: человек не сделал ход за 90 секунд.',
-  'zh-tw': '對局已結束：真人玩家未在 90 秒內行動。',
+  en: 'Match stopped: the turn time and shared time reserve have run out.',
+  ru: 'Партия завершена: время на ход и общий запас исчерпаны.',
+  'zh-tw': '對局已結束：行動時間與共用備用時間已用盡。',
 };
 function combinations(ids: string[], count: number): string[][] {
   if (count === 0) return [[]];
@@ -125,9 +125,20 @@ export class BotRoom extends Room {
 
   private checkHumanDeadline(): void {
     if (this.ai!.humanActionExpiresAt !== undefined && this.ai!.humanActionExpiresAt <= Date.now()) {
-      this.stop(humanTimeoutMessage[this.language]);
+      if (this.ai!.waitingForDiscussion) this.completeDiscussion(this.ai!.humanPlayerID!);
+      else this.stop(humanTimeoutMessage[this.language]);
       throw Error('Human action timed out');
     }
+  }
+
+  private clearHumanActionTimer(): void {
+    clearTimeout(this.humanActionTimer);
+    this.humanActionTimer = undefined;
+    const base = this.ai!.humanActionBaseExpiresAt;
+    if (base !== undefined)
+      this.ai!.humanTimeBankMs = Math.max(0, (this.ai!.humanTimeBankMs || 0) - Math.max(0, Date.now() - base));
+    delete this.ai!.humanActionBaseExpiresAt;
+    delete this.ai!.humanActionExpiresAt;
   }
 
   private councilComplete(): boolean {
@@ -167,6 +178,10 @@ export class BotRoom extends Room {
     if (userID !== this.ai!.humanPlayerID || this.ai!.status !== 'running' || !this.ai!.waitingForDiscussion)
       throw Error('Not your discussion turn');
     this.checkHumanDeadline();
+    this.completeDiscussion(userID);
+  }
+
+  private completeDiscussion(userID: string): void {
     if (this.manager.game.stage === 'assassinate') {
       if (
         this.councilSpoken.has(userID) ||
@@ -190,10 +205,16 @@ export class BotRoom extends Room {
       this.ai!.waitingForDiscussion = true;
     }
     if (this.ai!.publicBotGame) {
-      this.ai!.humanActionExpiresAt = Date.now() + 90000;
+      const base = Date.now() + 90000;
+      if (!discussion) this.ai!.humanActionBaseExpiresAt = base;
+      const duration = 90000 + (discussion ? 0 : this.ai!.humanTimeBankMs || 0);
+      this.ai!.humanActionExpiresAt = Date.now() + duration;
       this.humanActionTimer = setTimeout(() => {
-        if (!this.cancelled && pending()) this.stop(humanTimeoutMessage[this.language]);
-      }, 90000);
+        if (!this.cancelled && pending()) {
+          if (discussion) this.completeDiscussion(this.ai!.humanPlayerID!);
+          else this.stop(humanTimeoutMessage[this.language]);
+        }
+      }, duration);
     }
     this.ai!.message = discussion ? aiText(this.language).waitingForDiscussion : aiText(this.language).waitingForHuman;
     this.updateRoomState(true);
@@ -205,9 +226,7 @@ export class BotRoom extends Room {
         this.wakeHuman = () => {
           if (this.cancelled || !pending()) {
             waiting = false;
-            clearTimeout(this.humanActionTimer);
-            this.humanActionTimer = undefined;
-            delete this.ai!.humanActionExpiresAt;
+            this.clearHumanActionTimer();
             resolve();
           }
         };
@@ -226,10 +245,8 @@ export class BotRoom extends Room {
     } finally {
       waiting = false;
       clearTimeout(leaseTimer);
-      clearTimeout(this.humanActionTimer);
-      this.humanActionTimer = undefined;
+      this.clearHumanActionTimer();
       this.wakeHuman = undefined;
-      delete this.ai!.humanActionExpiresAt;
       delete this.ai!.waitingForHuman;
       delete this.ai!.waitingForDiscussion;
       this.discussionMessages = undefined;
@@ -260,9 +277,7 @@ export class BotRoom extends Room {
   stop(message = 'Match stopped.') {
     this.cancelled = true;
     this.wakeHuman?.();
-    clearTimeout(this.humanActionTimer);
-    this.humanActionTimer = undefined;
-    delete this.ai!.humanActionExpiresAt;
+    this.clearHumanActionTimer();
     delete this.ai!.waitingForHuman;
     delete this.ai!.waitingForDiscussion;
     delete this.ai!.discussionPending;
@@ -692,6 +707,7 @@ export class BotRoom extends Room {
     )
       return;
     this.executing = true;
+    if (this.ai!.publicBotGame && this.ai!.humanTimeBankMs === undefined) this.ai!.humanTimeBankMs = 300000;
     this.ai!.canResumeTechnical = false;
     this.ai!.status = 'running';
     try {

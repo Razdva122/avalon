@@ -51,40 +51,48 @@ beforeEach(() => {
 afterEach(() => jest.useRealTimers());
 
 test.each([
-  ['vote', 'en', 'Match stopped: the human player did not act within 90 seconds.'],
-  ['discussion', 'ru', 'Партия завершена: человек не сделал ход за 90 секунд.'],
-  ['discussion', 'zh-tw', '對局已結束：真人玩家未在 90 秒內行動。'],
-] as const)('%s stops the public match after 90 seconds (%s)', async (kind, language, message) => {
-  const { room, ai, game, saved, requests } = fixture(kind, language);
-  const run = room.run(true);
-  try {
-    await jest.advanceTimersByTimeAsync(0);
-    expect(ai).toMatchObject({ waitingForHuman: true, humanActionExpiresAt: 1090000 });
-    expect(ai.waitingForDiscussion).toBe(kind === 'discussion' ? true : undefined);
-    await jest.advanceTimersByTimeAsync(89999);
-    expect(ai.status).toBe('running');
-    room.updateRoomState(true);
-    room.addMessage('spectator', 'An unrelated message.');
-    expect(() => room.humanAction('spectator', { method: 'voteForMission', option: 'approve' })).toThrow();
-    expect(ai.humanActionExpiresAt).toBe(1090000);
-    await jest.advanceTimersByTimeAsync(1);
-    await run;
-    expect(ai).toMatchObject({ status: 'stopped', canResumeTechnical: false, message });
-    expect(ai.waitingForHuman).toBeUndefined();
-    expect(ai.waitingForDiscussion).toBeUndefined();
-    expect(ai.humanActionExpiresAt).toBeUndefined();
-    expect(ai.discussionPending).toBeUndefined();
-    expect(game.stage).toBe('end');
-    expect(game.result?.reason).toBe('manualy');
-    expect(saved[saved.length - 1].ai).toMatchObject({ status: 'stopped', message });
-    expect(saved[saved.length - 1].ai).not.toHaveProperty('humanActionExpiresAt');
-    expect(requests).toHaveLength(0);
-    expect(jest.getTimerCount()).toBe(0);
-  } finally {
-    room.stop();
-    await run;
-  }
-});
+  ['vote', 'en', 'Match stopped: the turn time and shared time reserve have run out.'],
+  ['vote', 'ru', 'Партия завершена: время на ход и общий запас исчерпаны.'],
+  ['vote', 'zh-tw', '對局已結束：行動時間與共用備用時間已用盡。'],
+] as const)(
+  '%s stops the public match only after the turn time and five-minute reserve (%s)',
+  async (kind, language, message) => {
+    const { room, ai, game, saved, requests } = fixture(kind, language);
+    const run = room.run(true);
+    try {
+      await jest.advanceTimersByTimeAsync(0);
+      expect(ai).toMatchObject({
+        waitingForHuman: true,
+        humanActionExpiresAt: 1390000,
+        humanActionBaseExpiresAt: 1090000,
+        humanTimeBankMs: 300000,
+      });
+      expect(ai.waitingForDiscussion).toBeUndefined();
+      await jest.advanceTimersByTimeAsync(389999);
+      expect(ai.status).toBe('running');
+      room.updateRoomState(true);
+      room.addMessage('spectator', 'An unrelated message.');
+      expect(() => room.humanAction('spectator', { method: 'voteForMission', option: 'approve' })).toThrow();
+      expect(ai.humanActionExpiresAt).toBe(1390000);
+      await jest.advanceTimersByTimeAsync(1);
+      await run;
+      expect(ai).toMatchObject({ status: 'stopped', canResumeTechnical: false, message });
+      expect(ai.waitingForHuman).toBeUndefined();
+      expect(ai.waitingForDiscussion).toBeUndefined();
+      expect(ai.humanActionExpiresAt).toBeUndefined();
+      expect(ai.discussionPending).toBeUndefined();
+      expect(game.stage).toBe('end');
+      expect(game.result?.reason).toBe('manualy');
+      expect(saved[saved.length - 1].ai).toMatchObject({ status: 'stopped', message });
+      expect(saved[saved.length - 1].ai).not.toHaveProperty('humanActionExpiresAt');
+      expect(requests).toHaveLength(0);
+      expect(jest.getTimerCount()).toBe(0);
+    } finally {
+      room.stop();
+      await run;
+    }
+  },
+);
 
 test('passing before expiry cancels that deadline and starts a new deadline only for the next action', async () => {
   const { room, ai, game } = fixture('discussion');
@@ -98,18 +106,18 @@ test('passing before expiry cancels that deadline and starts a new deadline only
     await jest.advanceTimersByTimeAsync(0);
     expect(ai.waitingForDiscussion).toBeUndefined();
     expect(ai.waitingForHuman).toBe(true);
-    expect(ai.humanActionExpiresAt).toBe(1179999);
+    expect(ai.humanActionExpiresAt).toBe(1479999);
     await jest.advanceTimersByTimeAsync(1);
     expect(ai.status).toBe('running');
     room.humanAction('owner', { method: 'selectPlayer', playerID: game.players[0].userID });
     room.addMessage('owner', 'This is not a discussion turn.');
-    expect(ai.humanActionExpiresAt).toBe(1179999);
+    expect(ai.humanActionExpiresAt).toBe(1479999);
     await jest.advanceTimersByTimeAsync(89998);
     room.humanAction('owner', { method: 'selectPlayer', playerID: game.players[1].userID });
     room.humanAction('owner', { method: 'sentSelectedPlayers' });
     await jest.advanceTimersByTimeAsync(0);
     expect(game.stage).toBe('votingForTeam');
-    expect(ai.humanActionExpiresAt).toBe(1269998);
+    expect(ai.humanActionExpiresAt).toBe(1569998);
     await jest.advanceTimersByTimeAsync(1);
     expect(ai.status).toBe('running');
   } finally {
@@ -159,7 +167,7 @@ test('an action received after its published deadline cannot beat the timer call
   const run = room.run(true);
   try {
     await jest.advanceTimersByTimeAsync(0);
-    jest.setSystemTime(1090000);
+    jest.setSystemTime(1390000);
     expect(() => room.humanAction('owner', { method: 'voteForMission', option: 'approve' })).toThrow();
     await run;
     expect(ai.status).toBe('stopped');
@@ -201,7 +209,7 @@ test('the service releases the shared room lease after a human action timeout', 
     const response = jest.fn();
     await control(room.roomID, 'resumeTechnical', response);
     expect(response).toHaveBeenCalledWith({ ok: true });
-    await jest.advanceTimersByTimeAsync(89999);
+    await jest.advanceTimersByTimeAsync(389999);
     expect(released).toEqual([]);
     await jest.advanceTimersByTimeAsync(1);
     expect(ai.status).toBe('stopped');
@@ -226,4 +234,90 @@ test('prestart language changes apply to both the ready message and actual bot r
   expect(languages).toEqual(['ru']);
   expect(() => room.setLanguage('en')).toThrow();
   expect(room.ai?.language).toBe('ru');
+});
+
+test.each(['en', 'ru', 'zh-tw'] as const)(
+  'a missed discussion automatically passes after 90 seconds without spending reserve (%s)',
+  async (language) => {
+    const { room, ai, game } = fixture('discussion', language);
+    const run = room.run(true);
+    try {
+      await jest.advanceTimersByTimeAsync(90000);
+      expect(ai.status).toBe('running');
+      expect(ai.waitingForDiscussion).toBeUndefined();
+      expect(game.stage).toBe('selectTeam');
+      expect(ai).toMatchObject({
+        humanTimeBankMs: 300000,
+        humanActionBaseExpiresAt: 1180000,
+        humanActionExpiresAt: 1480000,
+      });
+    } finally {
+      room.stop();
+      await run;
+    }
+  },
+);
+
+test('slow mandatory actions spend a shared reserve instead of refilling it on the next turn', async () => {
+  const { room, ai, game } = fixture('discussion');
+  const run = room.run(true);
+  try {
+    await jest.advanceTimersByTimeAsync(0);
+    room.finishDiscussion('owner');
+    await jest.advanceTimersByTimeAsync(210000);
+    expect(ai.status).toBe('running');
+    room.humanAction('owner', { method: 'selectPlayer', playerID: game.players[0].userID });
+    room.addMessage('owner', 'Still thinking.');
+    expect(ai.humanActionExpiresAt).toBe(1390000);
+    room.humanAction('owner', { method: 'selectPlayer', playerID: game.players[1].userID });
+    room.humanAction('owner', { method: 'sentSelectedPlayers' });
+    await jest.advanceTimersByTimeAsync(0);
+    expect(game.stage).toBe('votingForTeam');
+    expect(ai).toMatchObject({
+      humanTimeBankMs: 180000,
+      humanActionBaseExpiresAt: 1300000,
+      humanActionExpiresAt: 1480000,
+    });
+    await jest.advanceTimersByTimeAsync(269999);
+    expect(ai.status).toBe('running');
+    await jest.advanceTimersByTimeAsync(1);
+    await run;
+    expect(ai).toMatchObject({ status: 'stopped', humanTimeBankMs: 0 });
+  } finally {
+    room.stop();
+    await run;
+  }
+});
+
+test('a technical pause spends elapsed overtime and resume retains the remaining shared reserve', async () => {
+  const { room, ai } = fixture('vote');
+  room.renewLease = async () => {
+    if (Date.now() >= 1120000) throw Error('Temporary lease failure');
+  };
+  const run = room.run(true);
+  let resumed: Promise<void> | undefined;
+  try {
+    await jest.advanceTimersByTimeAsync(120000);
+    await run;
+    expect(ai).toMatchObject({ status: 'paused', canResumeTechnical: true, humanTimeBankMs: 270000 });
+    expect(ai.humanActionExpiresAt).toBeUndefined();
+    room.renewLease = undefined;
+    resumed = room.run(true);
+    await jest.advanceTimersByTimeAsync(0);
+    expect(ai).toMatchObject({
+      status: 'running',
+      humanTimeBankMs: 270000,
+      humanActionBaseExpiresAt: 1210000,
+      humanActionExpiresAt: 1480000,
+    });
+    await jest.advanceTimersByTimeAsync(359999);
+    expect(ai.status).toBe('running');
+    await jest.advanceTimersByTimeAsync(1);
+    await resumed;
+    expect(ai).toMatchObject({ status: 'stopped', humanTimeBankMs: 0 });
+  } finally {
+    room.stop();
+    await run;
+    await resumed;
+  }
 });

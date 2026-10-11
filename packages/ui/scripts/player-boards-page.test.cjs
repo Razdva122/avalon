@@ -19,6 +19,10 @@ function pageHarness(query = {}, profile = { id: 'alice', token: 'alice-token' }
       navigations.push(to);
       route.query = to.query;
     },
+    replace: async (to) => {
+      navigations.push(to);
+      route.query = to.query;
+    },
   };
   const file = path.resolve(__dirname, '../src/pages/community/PlayerBoards.vue');
   const { descriptor } = parse(fs.readFileSync(file, 'utf8'), { filename: file });
@@ -63,6 +67,117 @@ const flush = async () => {
   for (let i = 0; i < 6; i++) await Promise.resolve();
 };
 const account = (name) => ({ listings: [{ id: name, kind: 'solo' }], canRecruit: true, banned: false, isAdmin: false });
+test('active teams replace the large invitation with a compact player-profile action for a new account', async () => {
+  const h = pageHarness({}, { id: 'alice', token: 'alice-token' }, false, 'group');
+  try {
+    h.pending.find((p) => p.url === '/me').resolve({ listings: [], banned: false, canRecruit: false });
+    h.pending
+      .find((p) => p.url.startsWith('?'))
+      .resolve({
+        listings: [
+          { id: 'team', active: true, moderated: false, expiresAt: new Date(Date.now() + 86400000).toISOString() },
+        ],
+        hasMore: false,
+      });
+    await flush();
+    assert.equal(h.page.showInvitation.value, false);
+    assert.equal(h.page.showCompactInvitation.value, true);
+    assert.deepEqual(h.page.playerProfileTarget.value, { name: 'community_solo', query: { publish: '1' } });
+    h.route.query = { language: 'ru' };
+    await vue.nextTick();
+    h.pending.at(-1).resolve({ listings: [], hasMore: false });
+    await flush();
+    assert.equal(h.page.showCompactInvitation.value, true, 'filtering must not remove the player-profile action');
+  } finally {
+    h.stop();
+  }
+});
+
+test('an existing player profile leads to its management rather than a duplicate creation prompt', async () => {
+  const h = pageHarness({}, { id: 'alice', token: 'alice-token' }, false, 'group');
+  try {
+    h.pending.find((p) => p.url === '/me').resolve(account('existing-player'));
+    h.pending.find((p) => p.url.startsWith('?')).resolve({ listings: [], hasMore: false });
+    await flush();
+    assert.equal(h.page.showInvitation.value, false);
+    assert.equal(h.page.showCompactInvitation.value, true);
+    assert.equal(h.page.playerListing.value.id, 'existing-player');
+    assert.deepEqual(h.page.playerProfileTarget.value, { name: 'community_solo' });
+    h.page.editing.value = true;
+    assert.equal(h.page.showCompactInvitation.value, false, 'the team editor should not compete with another CTA');
+  } finally {
+    h.stop();
+  }
+});
+
+test('compact invitations wait for account access and cannot invite a banned account to publish', async () => {
+  const h = pageHarness({}, { id: 'alice', token: 'alice-token' }, false, 'group');
+  try {
+    h.pending.find((p) => p.url.startsWith('?')).resolve({ listings: [], hasMore: false });
+    await flush();
+    assert.equal(h.page.showCompactInvitation.value, false);
+    h.pending.find((p) => p.url === '/me').resolve({ listings: [], banned: true, canRecruit: false });
+    await flush();
+    assert.equal(h.page.showCompactInvitation.value, false);
+  } finally {
+    h.stop();
+  }
+});
+test('a player profile link opens the form once eligibility arrives and preserves search filters', async () => {
+  const h = pageHarness({ publish: '1', language: 'ru' });
+  try {
+    assert.equal(h.page.editing.value, false);
+    h.pending.find((p) => p.url === '/me').resolve({ listings: [], banned: false, canRecruit: false });
+    await flush();
+    assert.equal(h.page.editing.value, true);
+    assert.deepEqual(h.route.query, { language: 'ru' });
+    h.page.editing.value = false;
+    h.page.loadAccount();
+    h.pending
+      .filter((p) => p.url === '/me')
+      .at(-1)
+      .resolve({ listings: [], banned: false, canRecruit: false });
+    await flush();
+    assert.equal(h.page.editing.value, false, 'refresh must not reopen a dismissed form');
+  } finally {
+    h.stop();
+  }
+});
+
+test('a guest profile link continues into the form after signing in', async () => {
+  const h = pageHarness({ publish: '1' }, null);
+  try {
+    assert.equal(h.page.publishAfterLogin.value, true);
+    h.store.state.profile = { id: 'alice', token: 'alice-token' };
+    await vue.nextTick();
+    h.pending.find((p) => p.url === '/me').resolve({ listings: [], banned: false, canRecruit: false });
+    await flush();
+    assert.equal(h.page.editing.value, true);
+  } finally {
+    h.stop();
+  }
+});
+
+test('a failed search or active filters cannot show the first-listing invitation', async () => {
+  const h = pageHarness({}, null);
+  try {
+    assert.equal(h.page.showInvitation.value, false, 'loading is not an empty board');
+    h.pending[0].reject(Error('offline'));
+    await flush();
+    assert.equal(h.page.showInvitation.value, false, 'failure is not an empty board');
+    h.page.loadPublic();
+    h.pending.at(-1).resolve({ listings: [], hasMore: false });
+    await flush();
+    assert.equal(h.page.showInvitation.value, true);
+    h.route.query = { language: 'ru' };
+    await vue.nextTick();
+    h.pending.at(-1).resolve({ listings: [], hasMore: false });
+    await flush();
+    assert.equal(h.page.showInvitation.value, false, 'filters retain their reset action');
+  } finally {
+    h.stop();
+  }
+});
 test('switching accounts cannot restore a previous user listing from a late response', async () => {
   const h = pageHarness();
   try {

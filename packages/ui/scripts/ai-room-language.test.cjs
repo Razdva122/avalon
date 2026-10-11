@@ -47,10 +47,17 @@ async function fixture(
   const sent = [];
   const navigation = [];
   const notifications = [];
+  const emitted = [];
+  const cleanup = [];
+  const mounted = [];
   const access = {
+    accessStatus: vue.ref('ready'),
     canManage: vue.ref(true),
     canPlay: vue.ref(false),
     botModes: vue.ref({ smart: false, regular: false }),
+    botModeAvailableAt: vue.ref({}),
+    botWaitHours: vue.ref({}),
+    botsBusy: vue.ref(false),
     ownRoomID: vue.ref(),
     models: vue.ref([]),
     defaultModel: vue.ref('codex-chatgpt'),
@@ -64,9 +71,24 @@ async function fixture(
   const { descriptor } = parse(fs.readFileSync(filename, 'utf8'), { filename });
   const script = compileScript(descriptor, { id: filename });
   const component = evaluate(script.content, (id) => {
-    if (id === 'vue') return vue;
+    if (id === 'vue')
+      return {
+        ...vue,
+        onBeforeUnmount: (callback) => cleanup.push(callback),
+        onMounted: (callback) => mounted.push(callback),
+      };
     if (id === 'vue-i18n') return { useI18n: () => i18n.global };
-    if (id === 'vue-router') return { useRouter: () => ({ push: async (route) => navigation.push(route) }) };
+    if (id === 'vue-router')
+      return {
+        useRouter: () => ({
+          beforeResolve: () => () => {},
+          push: async (route) => {
+            navigation.push(route);
+          },
+        }),
+      };
+    if (id === '@/helpers/open-room-route')
+      return evaluate(fs.readFileSync(path.join(__dirname, '../src/helpers/open-room-route.ts'), 'utf8'));
     if (id === '@/store') return { useStore: () => ({ state: { profile: { id: 'owner' } } }) };
     if (id === '@/router/paths') return { localizedPath: (url) => url, neutralRoomUrl: (url) => url };
     if (id === '@/helpers/event-bus') return { default: { emit: (...args) => notifications.push(args) } };
@@ -102,7 +124,9 @@ async function fixture(
   assert.deepEqual(template.errors, []);
   const render = evaluate(template.code).render;
   const scope = vue.effectScope();
-  const state = scope.run(() => component.setup(vue.reactive(props), { expose() {}, emit() {} }));
+  const state = scope.run(() =>
+    component.setup(vue.reactive(props), { expose() {}, emit: (...args) => emitted.push(args) }),
+  );
   access.models.value = [{ id: 'codex-chatgpt', label: 'Codex' }];
   await vue.nextTick();
   let tree;
@@ -137,6 +161,7 @@ async function fixture(
     return renderToString(app);
   };
   const html = await renderHtml();
+  mounted.forEach((callback) => callback());
   function nodes(type, node = tree) {
     if (!node || typeof node !== 'object') return [];
     return [
@@ -144,8 +169,87 @@ async function fixture(
       ...(Array.isArray(node.children) ? node.children.flatMap((child) => nodes(type, child)) : []),
     ];
   }
-  return { html, nodes, sent, navigation, notifications, access, render: renderHtml, stop: () => scope.stop() };
+  return {
+    html,
+    nodes,
+    sent,
+    navigation,
+    notifications,
+    emitted,
+    access,
+    render: renderHtml,
+    stop: () => {
+      cleanup.forEach((callback) => callback());
+      scope.stop();
+    },
+  };
 }
+
+test('a bot button disabled by its parent cannot create a competing room', async (t) => {
+  const room = await fixture('pages/lobby/BotRoomButton.vue', {
+    props: { disabled: true },
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
+  });
+  t.after(room.stop);
+  await room.nodes('v-btn')[0].props.onClick();
+  assert.deepEqual(room.sent, []);
+  assert.deepEqual(room.navigation, []);
+});
+
+test('bot creation reports its pending state to block competing welcome actions', async (t) => {
+  let finish;
+  const room = await fixture('pages/lobby/BotRoomButton.vue', {
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
+    acknowledge: () => new Promise((resolve) => (finish = resolve)),
+  });
+  t.after(room.stop);
+  const opening = room.nodes('v-btn')[0].props.onClick();
+  assert.deepEqual(
+    room.emitted.filter(([event]) => event === 'busy'),
+    [['busy', true]],
+  );
+  finish({ error: 'unavailable' });
+  await opening;
+  assert.deepEqual(
+    room.emitted.filter(([event]) => event === 'busy'),
+    [
+      ['busy', true],
+      ['busy', false],
+    ],
+  );
+});
+
+test('closing the welcome while bot creation is pending suppresses late navigation', async (t) => {
+  let finish;
+  const room = await fixture('pages/lobby/BotRoomButton.vue', {
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
+    acknowledge: () => new Promise((resolve) => (finish = resolve)),
+  });
+  const opening = room.nodes('v-btn')[0].props.onClick();
+  room.stop();
+  finish({ roomID: 'late-room' });
+  await opening;
+  assert.deepEqual(room.navigation, []);
+  assert.deepEqual(room.notifications, []);
+});
+
+test('the welcome shows checking before AI availability is known and reports a checked unavailable state', async (t) => {
+  const room = await fixture('pages/lobby/BotRoomButton.vue', {
+    props: { unavailableText: 'Unavailable', loadingText: 'Checking', errorText: 'Connection failed' },
+    accessOverrides: { accessStatus: vue.ref('loading') },
+  });
+  t.after(room.stop);
+  assert.ok(room.html.includes('Checking'));
+  assert.ok(!room.html.includes('Unavailable'));
+  room.access.accessStatus.value = 'ready';
+  await vue.nextTick();
+  const html = await room.render();
+  assert.ok(html.includes('Unavailable'));
+  assert.deepEqual(
+    room.emitted.filter(([event]) => event === 'availability').map(([, state]) => state),
+    ['loading', 'unavailable'],
+  );
+});
 
 test('only ready public bot room owners choose bots on the table; ordinary rooms keep human controls', async (t) => {
   for (const [owner, count, ai, visible] of [
@@ -369,10 +473,10 @@ test('a reconnect preserves the prepared bot table and deadline while permission
   assert.deepEqual(room.sent, []);
 });
 
-test('lobby bot button is visible only to eligible players with an available mode or their own room', async (t) => {
+test('lobby bot button stays visible for eligible players even when both modes are unavailable', async (t) => {
   for (const [canPlay, smart, regular, ownRoomID, visible] of [
     [false, true, true, undefined, false],
-    [true, false, false, undefined, false],
+    [true, false, false, undefined, true],
     [true, true, false, undefined, true],
     [true, false, true, undefined, true],
     [true, false, false, 'existing-room', true],
@@ -387,7 +491,12 @@ test('lobby bot button is visible only to eligible players with an available mod
     });
     t.after(room.stop);
     assert.equal(room.nodes('v-btn').length, visible ? 1 : 0);
-    if (visible) assert.ok(room.html.includes(ownRoomID ? 'Продолжить мою партию' : 'Сыграть с AI'));
+    if (visible)
+      assert.ok(
+        room.html.includes(
+          ownRoomID ? 'Продолжить мою партию' : smart || regular ? 'Сыграть с AI' : 'Сейчас недоступно.',
+        ),
+      );
   }
 });
 
@@ -396,6 +505,9 @@ test('lobby players return to their reserved room even while new bot games are u
     accessOverrides: {
       canPlay: vue.ref(true),
       botModes: vue.ref({ smart: false, regular: false }),
+      botModeAvailableAt: vue.ref({}),
+      botWaitHours: vue.ref({}),
+      botsBusy: vue.ref(false),
       ownRoomID: vue.ref('own-room'),
     },
   });
@@ -757,3 +869,77 @@ for (const isHumanPlayer of [true, false]) {
     }
   });
 }
+
+test('slow initial AI availability keeps the same button on the page until the answer arrives', async (t) => {
+  const room = await fixture('pages/lobby/BotRoomButton.vue', {
+    accessOverrides: { accessStatus: vue.ref('loading') },
+  });
+  t.after(room.stop);
+  const loading = room.nodes('v-btn')[0];
+  assert.ok(loading, 'reserve button space before availability is known');
+  assert.equal(loading.props.disabled, true);
+  await loading.props.onClick();
+  assert.deepEqual(room.sent, []);
+  room.access.canPlay.value = true;
+  room.access.botModes.value = { smart: false, regular: true };
+  room.access.accessStatus.value = 'ready';
+  await room.render();
+  const ready = room.nodes('v-btn')[0];
+  assert.equal(ready.key, loading.key, 'availability updates must not replace the button');
+  assert.equal(ready.props.disabled, false);
+  room.access.botModes.value = { smart: false, regular: false };
+  await room.render();
+  assert.equal(room.nodes('v-btn')[0].key, ready.key);
+  assert.equal(room.nodes('v-btn')[0].props.disabled, true);
+});
+
+test('smart bot availability shows fractional hours to the quota reset and no estimate for occupied bots', async (t) => {
+  t.mock.method(Date, 'now', () => 1000000000);
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    locale: 'ru',
+    props: { roomID: 'quota-wait' },
+    accessOverrides: { canPlay: vue.ref(true), botWaitHours: vue.ref({ smart: 2.4 }) },
+  });
+  t.after(room.stop);
+  assert.ok(room.html.includes('2,4'), room.html);
+  assert.ok(room.html.includes('ч'), room.html);
+  room.access.botsBusy.value = true;
+  assert.ok(!(await room.render()).includes('2,4'), 'occupied slots have no promised release time');
+});
+
+test('human action countdown separates normal turn time from the live shared reserve', async (t) => {
+  let now = 1000000;
+  let tick;
+  t.mock.method(Date, 'now', () => now);
+  t.mock.method(globalThis, 'setInterval', (callback) => {
+    tick = callback;
+    return 1;
+  });
+  t.mock.method(globalThis, 'clearInterval', () => {});
+  const room = await fixture('components/view/board/modules/BotGameTimer.vue', {
+    locale: 'ru',
+    props: { expiresAt: 1390000, baseExpiresAt: 1090000, timeBankMs: 300000, phase: 'action' },
+  });
+  t.after(room.stop);
+  assert.ok(room.html.includes('Ваш ход: 90 с'), room.html);
+  assert.ok(room.html.includes('Общий запас: 300 с'), room.html);
+  now = 1120000;
+  tick();
+  const html = await room.render();
+  assert.ok(html.includes('Расходуется запас: 270 с'), html);
+  assert.ok(html.includes('Общий запас: 270 с'), html);
+});
+
+test('discussion countdown explains automatic passing instead of ending the match', async (t) => {
+  t.mock.method(Date, 'now', () => 1000000);
+  t.mock.method(globalThis, 'setInterval', () => 1);
+  t.mock.method(globalThis, 'clearInterval', () => {});
+  const room = await fixture('components/view/board/modules/BotGameTimer.vue', {
+    locale: 'ru',
+    props: { expiresAt: 1090000, phase: 'action', discussion: true, timeBankMs: 300000 },
+  });
+  t.after(room.stop);
+  assert.ok(room.html.includes('Ваше слово: 90 с'), room.html);
+  assert.ok(room.html.includes('слово передаётся автоматически'), room.html);
+  assert.ok(!room.html.includes('Общий запас'), room.html);
+});

@@ -39,7 +39,8 @@
     </template>
   </RouterView>
   <LanguageSuggestion />
-  <AuthModal v-if="authRequested" v-model="authOpen" />
+  <AuthModal v-if="authRequested" v-model="authOpen" @registered="welcomeOpen = true" />
+  <WelcomeModal v-if="welcomeOpen && $store.state.profile" v-model="welcomeOpen" />
   <CredentialsModal v-if="credentialsRequested" v-model="credentialsOpen" :mode="credentialsMode" />
   <InfoSnackbar />
   <AchievementPopupsContainer />
@@ -63,6 +64,9 @@ import eventBus from '@/helpers/event-bus';
 
 export default defineComponent({
   components: {
+    WelcomeModal: defineAsyncComponent(
+      () => import(/* webpackChunkName: 'welcome-dialog' */ '@/components/user/WelcomeModal.vue'),
+    ),
     AuthModal: defineAsyncComponent(
       () => import(/* webpackChunkName: 'auth-dialog' */ '@/components/user/AuthModal.vue'),
     ),
@@ -83,6 +87,7 @@ export default defineComponent({
       currentLocale: this.$i18n.locale,
       authRequested: false,
       authOpen: false,
+      welcomeOpen: false,
       credentialsRequested: false,
       credentialsOpen: false,
       credentialsMode: 'email' as 'email' | 'login' | 'password',

@@ -40,6 +40,23 @@ function humanModeAvailable(difficulty: AiBotDifficulty, quota: CodexWeeklyLimit
   );
 }
 
+function humanModeAvailableAt(difficulty: AiBotDifficulty, quota: CodexWeeklyLimit | null, models: CodexModelOption[]) {
+  const settings = humanSettings[difficulty];
+  if (!models.some((model) => model.id === settings.model && model.efforts.includes(settings.reasoning))) return;
+  const resets: number[] = [];
+  for (const [window, threshold] of [
+    [quota, difficulty === 'smart' ? 5 : 2],
+    [quota?.shortTerm, difficulty === 'smart' ? 80 : 20],
+  ] as const) {
+    if (!window || !Number.isFinite(window.remainingPercent)) return;
+    if (window.remainingPercent <= threshold) {
+      if (!window.resetsAt || !Number.isFinite(window.resetsAt) || window.resetsAt * 1000 <= Date.now()) return;
+      resets.push(window.resetsAt * 1000);
+    }
+  }
+  return resets.length ? Math.max(...resets) : undefined;
+}
+
 export class AiService {
   repository?: AiRepository;
   private archive?: AiRepository;
@@ -79,13 +96,23 @@ export class AiService {
   }
 
   private async humanModes() {
+    return (await this.humanAvailability()).botModes;
+  }
+
+  private async humanAvailability() {
     const [quota, models] = await Promise.allSettled([getCodexWeeklyLimit(), getCodexModels()]);
     const limit = quota.status === 'fulfilled' ? quota.value : null;
     const catalog = models.status === 'fulfilled' ? models.value : [];
-    return {
+    const botModes = {
       smart: humanModeAvailable('smart', limit, catalog),
       regular: humanModeAvailable('regular', limit, catalog),
     };
+    const botModeAvailableAt: Partial<Record<AiBotDifficulty, number>> = {};
+    for (const difficulty of ['smart', 'regular'] as const) {
+      const availableAt = humanModeAvailableAt(difficulty, limit, catalog);
+      if (!botModes[difficulty] && availableAt !== undefined) botModeAvailableAt[difficulty] = availableAt;
+    }
+    return { botModes, botModeAvailableAt };
   }
 
   private publicRoom(room: BotRoom) {
@@ -242,19 +269,30 @@ export class AiService {
               this.launchReady(active))
           );
         };
-        let botModes =
+        const availability =
           canPlay && eligibleSlot() && !this.creating && !this.starting && !this.running.size
-            ? await this.humanModes()
-            : { smart: false, regular: false };
+            ? await this.humanAvailability()
+            : { botModes: { smart: false, regular: false }, botModeAvailableAt: {} };
+        let { botModes } = availability;
         // A room may claim the shared slot while read-only quota/catalog lookups are in flight.
         const active = this.active();
-        if (!eligibleSlot() || this.creating || this.starting || this.running.size)
-          botModes = { smart: false, regular: false };
+        const botsBusy = !eligibleSlot() || this.creating || this.starting || this.running.size > 0;
+        if (botsBusy) botModes = { smart: false, regular: false };
         const ownRoomID =
           active instanceof BotRoom && this.publicRoom(active) && active.ai?.humanPlayerID === userID
             ? active.roomID
             : undefined;
-        const publicAccess = canPlay ? { canPlay, botModes, ...(ownRoomID ? { ownRoomID } : {}) } : {};
+        const publicAccess = canPlay
+          ? {
+              canPlay,
+              botModes,
+              ...(!botsBusy && Object.keys(availability.botModeAvailableAt).length
+                ? { botModeAvailableAt: availability.botModeAvailableAt }
+                : {}),
+              ...(botsBusy ? { botsBusy: true } : {}),
+              ...(ownRoomID ? { ownRoomID } : {}),
+            }
+          : {};
         cb(
           canManage
             ? {

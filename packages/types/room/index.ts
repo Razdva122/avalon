@@ -49,6 +49,9 @@ export type AiRoomState = {
   title?: string;
   launchExpiresAt?: number;
   humanActionExpiresAt?: number;
+  humanActionBaseExpiresAt?: number;
+  /** Shared reserve for mandatory human actions; discussion does not spend it. */
+  humanTimeBankMs?: number;
   /** Public human match with server-frozen model and reasoning settings. */
   botDifficulty?: AiBotDifficulty;
   waitingForHuman?: boolean;
