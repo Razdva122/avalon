@@ -40,6 +40,12 @@ test('a custom SMTP host cannot reuse Postbox credentials accidentally', () => {
   ).toThrow('Incomplete mail configuration');
 });
 
+test('generic credentials require an explicit SMTP host', () => {
+  expect(() => mailConfig({ ...base, SMTP_USER: 'new-user', SMTP_PASSWORD: 'new-secret' })).toThrow(
+    'Incomplete mail configuration',
+  );
+});
+
 test.each(['0', '65536', 'NaN', '465.5'])('invalid SMTP port %s fails before mail starts', (port) => {
   expect(() =>
     mailConfig({ ...base, SMTP_PORT: port, POSTBOX_SMTP_USER: 'old-user', POSTBOX_SMTP_PASSWORD: 'old-secret' }),

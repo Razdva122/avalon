@@ -26,6 +26,7 @@ export function mailConfig(env: NodeJS.ProcessEnv = process.env): MailConfig | n
   if (!/^[a-zA-Z0-9.-]+$/.test(host) || !Number.isSafeInteger(port) || port < 1 || port > 65535)
     throw new Error('Invalid SMTP configuration');
   const genericCredentials = !!(env.SMTP_HOST || env.SMTP_USER || env.SMTP_PASSWORD);
+  if (genericCredentials && !env.SMTP_HOST) throw new Error('Incomplete mail configuration');
   const user = genericCredentials ? env.SMTP_USER : env.POSTBOX_SMTP_USER;
   const password = genericCredentials ? env.SMTP_PASSWORD : env.POSTBOX_SMTP_PASSWORD;
   const required = ['MAIL_FROM', 'MAIL_FRONTEND_URL', 'MAIL_ENCRYPTION_KEY', 'MAIL_EVENT_SECRET'];

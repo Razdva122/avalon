@@ -1,0 +1,53 @@
+name: avalon-smtp
+services:
+  smtp:
+    image: ghcr.io/docker-mailserver/docker-mailserver@sha256:d0fe7668defe157aad57ea31b1707ad1e2fb57d7a91bdf17cbdf876549946c86
+    hostname: avalon-prod.avalon-game.com
+    restart: unless-stopped
+    stop_grace_period: 1m
+    ports:
+      - '127.0.0.1:1465:465'
+    environment:
+      SSL_TYPE: manual
+      SSL_CERT_PATH: /tls/fullchain.pem
+      SSL_KEY_PATH: /tls/privkey.pem
+      TLS_LEVEL: modern
+      ENABLE_IMAP: '0'
+      ENABLE_POP3: '0'
+      ENABLE_AMAVIS: '0'
+      ENABLE_CLAMAV: '0'
+      ENABLE_SPAMASSASSIN: '0'
+      ENABLE_RSPAMD: '0'
+      ENABLE_OPENDKIM: '1'
+      ENABLE_OPENDMARC: '0'
+      ENABLE_POLICYD_SPF: '0'
+      ENABLE_FAIL2BAN: '0'
+      ENABLE_POSTGREY: '0'
+      ENABLE_UPDATE_CHECK: '0'
+      PFLOGSUMM_TRIGGER: none
+      LOGWATCH_INTERVAL: none
+      SPOOF_PROTECTION: '1'
+      PERMIT_DOCKER: none
+      POSTFIX_INET_PROTOCOLS: ipv4
+      DOVECOT_INET_PROTOCOLS: ipv4
+      TZ: Europe/Moscow
+    volumes:
+      - ./config:/tmp/docker-mailserver
+      - ./data:/var/mail
+      - ./state:/var/mail-state
+      - ./logs:/var/log/mail
+      - ./tls:/tls:ro
+    networks:
+      production:
+        ipv4_address: 172.30.90.20
+        aliases:
+          - avalon-prod.avalon-game.com
+    healthcheck:
+      test: ['CMD', 'dms-healthcheck']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+networks:
+  production:
+    external: true
+    name: avalon-production_production
