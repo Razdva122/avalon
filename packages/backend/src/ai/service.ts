@@ -218,6 +218,8 @@ export class AiService {
             aiStatus: room.ai?.status,
             aiModel: aiPlayedModel(room.ai),
             aiTitle: room.ai?.title,
+            aiBeginner: room.ai?.beginner,
+            aiBotDifficulty: room.ai?.botDifficulty,
             aiLanguage: room.ai?.language ?? 'en',
             hostID: room.leaderID,
             state: room.stage,

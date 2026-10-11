@@ -140,9 +140,13 @@ test('stopping a ready AI room removes it from lobby responses and broadcasts bu
   const { manager, handlers, broadcasts } = fixture(true);
   const room = new BotRoom('bot-ready', 'alice', manager.io, async () => ({ choice: 0, speech: '' }));
   room.joinAsHuman('alice');
+  room.ai!.beginner = true;
+  room.ai!.botDifficulty = 'regular';
   manager.rooms[room.roomID] = room;
   manager.updateRoomsList(room);
-  expect(manager.roomListCutted).toContainEqual(expect.objectContaining({ uuid: room.roomID, aiStatus: 'ready' }));
+  expect(manager.roomListCutted).toContainEqual(
+    expect.objectContaining({ uuid: room.roomID, aiStatus: 'ready', aiBeginner: true, aiBotDifficulty: 'regular' }),
+  );
 
   room.stop();
   manager.updateRoomsList(room);
@@ -178,7 +182,11 @@ test('startup lobby loading hides stopped archives and cannot restore a stopped 
       ai: { ...stopped.ai!, status: 'stopped' as const },
     })),
     { ...saved, roomID: stopped.roomID, ai: { ...stopped.ai!, status: 'running' } },
-    { ...saved, roomID: 'ai-finished', ai: { ...stopped.ai!, status: 'finished' } },
+    {
+      ...saved,
+      roomID: 'ai-finished',
+      ai: { ...stopped.ai!, status: 'finished', beginner: true, botDifficulty: 'regular' },
+    },
     saved,
   ]);
   const list = jest.fn();
@@ -187,6 +195,9 @@ test('startup lobby loading hides stopped archives and cannot restore a stopped 
     'ai-finished',
     'human-ended',
   ]);
+  expect(list.mock.calls[0][0]).toContainEqual(
+    expect.objectContaining({ uuid: 'ai-finished', aiBeginner: true, aiBotDifficulty: 'regular' }),
+  );
 });
 
 test('new chat messages still broadcast when bounded history is full; retries do not', () => {

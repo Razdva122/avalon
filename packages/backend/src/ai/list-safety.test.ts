@@ -22,7 +22,7 @@ test('lobby summaries use a projection, share concurrent reads, expire, and inva
               {
                 state: {
                   roomID: 'room',
-                  ai: { status, model: 'model' },
+                  ai: { status, model: 'model', beginner: true, botDifficulty: 'regular' },
                   stage: 'started',
                   leaderID: 'host',
                   players: [{ id: 'bot' }],
@@ -44,7 +44,13 @@ test('lobby summaries use a projection, share concurrent reads, expire, and inva
     };
     const results = await Promise.all(Array.from({ length: 12 }, () => repo.recentSummaries()));
     expect(reads).toBe(1);
-    expect(results[0][0]).toMatchObject({ uuid: 'room', aiStatus: 'finished', players: 1 });
+    expect(results[0][0]).toMatchObject({
+      uuid: 'room',
+      aiStatus: 'finished',
+      players: 1,
+      aiBeginner: true,
+      aiBotDifficulty: 'regular',
+    });
     expect(results[0][0]).not.toHaveProperty('game');
     expect(projections[0]).toMatchObject({ 'state.game.result': 1 });
     expect(projections[0]).not.toHaveProperty('state.game');

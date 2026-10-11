@@ -779,7 +779,7 @@ test('lobby badges identify each saved AI room language and default legacy rooms
       },
     });
     t.after(room.stop);
-    assert.ok(room.html.includes(`<span>${label}</span>`), `wrong lobby badge for ${language}`);
+    assert.ok(room.html.includes(`<span class="ai-language">${label}</span>`), `wrong lobby badge for ${language}`);
   }
 });
 
@@ -1026,4 +1026,56 @@ test('beginner unavailability ignores smart-only recovery estimates', async (t) 
   t.after(room.stop);
   assert.ok(room.html.includes('Beginner unavailable'));
   assert.ok(!room.html.includes('1 hour'));
+});
+
+test('AI lobby cards show the actual mixed table size and saved beginner mode', async (t) => {
+  const room = await fixture('pages/lobby/LobbyRoom.vue', {
+    locale: 'ru',
+    props: {
+      game: {
+        uuid: 'beginner',
+        hostID: 'host',
+        ai: true,
+        aiTitle: 'Alice vs 5 Bots',
+        aiBeginner: true,
+        aiStatus: 'finished',
+        players: 6,
+        state: 'started',
+        options: { roles: {}, addons: {} },
+        createAt: '2026-10-11T12:00:00Z',
+        result: { winner: 'evil' },
+      },
+    },
+  });
+  t.after(room.stop);
+  assert.ok(room.html.includes('1 человек + 5 ботов'));
+  assert.ok(room.html.includes('Для новичков'));
+  assert.ok(room.html.includes('Победа зла'));
+  assert.ok(room.html.includes('Обсуждение'));
+  assert.ok(!room.html.includes('<i aria-hidden="true">'), 'finished cards have no live dot');
+});
+
+test('AI lobby shows saved smart difficulty and a live-only indicator', async (t) => {
+  const room = await fixture('pages/lobby/LobbyRoom.vue', {
+    locale: 'ru',
+    props: {
+      game: {
+        uuid: 'smart',
+        hostID: 'host',
+        ai: true,
+        aiTitle: 'Alice vs 7 Bots',
+        aiBotDifficulty: 'smart',
+        aiStatus: 'running',
+        players: 8,
+        state: 'started',
+        options: { roles: {}, addons: {} },
+        createAt: '2026-10-11T12:00:00Z',
+      },
+    },
+  });
+  t.after(room.stop);
+  assert.ok(room.html.includes('Умные боты'));
+  assert.ok(room.html.includes('1 человек + 7 ботов'));
+  assert.ok(room.html.includes('<i aria-hidden="true">'));
+  assert.ok(room.html.includes('Смотреть'));
 });

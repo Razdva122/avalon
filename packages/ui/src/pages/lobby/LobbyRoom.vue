@@ -12,21 +12,23 @@
     <div class="game-info">
       <div v-if="game.ai" class="ai-identity">
         <span class="ai-emblem" aria-hidden="true"
-          ><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7">
+          ><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7">
             <rect x="4" y="6" width="16" height="15" rx="5" />
             <path d="M12 6V3M1 12v4m22-4v4M9 17h6" />
             <circle cx="9" cy="12" r="1" fill="currentColor" />
             <circle cx="15" cy="12" r="1" fill="currentColor" /></svg
         ></span>
         <div class="ai-heading">
-          <div class="ai-eyebrow">
-            {{ $t('aiArena.title') }} <span>{{ aiLanguageLabel }}</span>
+          <span class="ai-title">{{ aiTitle }}</span>
+          <div class="ai-meta">
+            <span>{{
+              $t(game.aiTitle ? 'aiArena.mixedPlayerCount' : 'aiArena.playerCount', {
+                count: game.players - (game.aiTitle ? 1 : 0),
+              })
+            }}</span>
+            <span class="ai-language">{{ aiLanguageLabel }}</span>
+            <span v-if="aiModeLabel" class="ai-mode">{{ aiModeLabel }}</span>
           </div>
-          <span class="ai-title">{{ game.aiTitle || $t('aiArena.tagline', { count: game.players }) }}</span>
-          <span class="ai-subtitle">{{ $t(game.aiTitle ? 'aiArena.botTable' : 'aiArena.subtitle') }}</span>
-          <span v-if="game.aiModel && !game.aiTitle" class="ai-subtitle">{{
-            $t('aiArena.model', { model: game.aiModel })
-          }}</span>
         </div>
       </div>
       <div v-if="!game.ai" class="game-name">
@@ -48,7 +50,9 @@
       <span v-if="isRecruiting" class="material-icons recruitment-icon" aria-hidden="true">person_add</span>
       <template v-if="game.ai">
         <span class="ai-status" :class="{ 'ai-status--live': game.aiStatus === 'running' }"
-          ><i aria-hidden="true"></i>{{ aiStatusLabel }}</span
+          ><i v-if="game.aiStatus === 'running'" aria-hidden="true"></i>
+          <span v-else-if="game.result?.winner" :class="`${game.result.winner}-loyalty-icon`" aria-hidden="true"></span>
+          {{ aiStatusLabel }}</span
         >
         <small class="ai-date">{{ aiDate }}</small>
       </template>
@@ -92,7 +96,17 @@ const aiStatusLabel = computed(() => {
     return t(`aiArena.${game.value.result.winner === 'good' ? 'goodWon' : 'evilWon'}`);
   return t(`aiArena.${game.value.aiStatus || (game.value.result ? 'finished' : 'ready')}`);
 });
-const aiAction = computed(() => t(`aiArena.${game.value.aiStatus === 'running' ? 'watch' : 'discussion'}`));
+const aiTitle = computed(
+  () => game.value.aiTitle?.replace(/ vs \d+ Bots$/, '') || t('aiArena.tagline', { count: game.value.players }),
+);
+const aiModeLabel = computed(() =>
+  game.value.aiBeginner
+    ? t('aiArena.cardBeginner')
+    : game.value.aiBotDifficulty
+      ? t(game.value.aiBotDifficulty === 'smart' ? 'aiArena.botSmart' : 'aiArena.botRegular')
+      : '',
+);
+const aiAction = computed(() => t(`aiArena.${game.value.aiStatus === 'running' ? 'cardWatch' : 'cardDiscussion'}`));
 const canJoin = computed(
   () => !game.value.ai && !game.value.result && game.value.state === 'created' && game.value.players < 10,
 );
@@ -228,117 +242,105 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
   flex-shrink: 0;
 }
 .game--ai {
-  min-height: 112px;
-  border-color: rgba(137, 101, 224, 0.42);
-  background: linear-gradient(110deg, rgba(137, 101, 224, 0.13), transparent 70%), rgb(var(--v-theme-inset));
-  box-shadow: inset 3px 0 0 #9670e8;
+  min-height: 84px;
+  grid-template-columns: minmax(0, 1fr) 148px 48px 116px;
+  padding: 12px 16px;
+  border-color: rgba(var(--v-theme-text-primary), 0.12);
 }
 .game--ai:hover {
-  border-color: #9670e8;
-  background: linear-gradient(110deg, rgba(137, 101, 224, 0.2), transparent), rgb(var(--v-theme-inset-hover));
+  border-color: rgba(var(--v-theme-primary), 0.4);
 }
 .game--ai .game-info {
-  flex-wrap: wrap;
-  gap: 10px 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
 }
 .ai-identity {
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
+  gap: 10px;
   min-width: 0;
 }
 .ai-emblem {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
-  flex: 0 0 46px;
-  border-radius: 14px;
-  background: #7050b5;
-  color: #fff;
-  font-size: 26px;
-  box-shadow: 0 3px 12px #7050b529;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: 8px;
+  background: rgba(var(--v-theme-primary), 0.08);
+  color: rgb(var(--v-theme-primary));
 }
 .ai-heading {
   display: grid;
-  gap: 4px;
+  gap: 5px;
   min-width: 0;
-}
-.ai-eyebrow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 9px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-}
-.ai-eyebrow span {
-  font-size: 8px;
-  letter-spacing: 0.6px;
-  padding: 2px 5px;
-  border-radius: 4px;
-  border: 1px solid rgba(var(--v-theme-text-primary), 0.25);
 }
 .ai-title {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.ai-subtitle {
-  font-size: 10px;
-  opacity: 0.7;
+.ai-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  font-size: 12px;
   line-height: 1.4;
+  color: rgba(var(--v-theme-text-primary), 0.7);
+}
+.ai-language,
+.ai-mode {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 16px;
+}
+.ai-language {
+  border: 1px solid rgba(var(--v-theme-text-primary), 0.18);
+  color: rgb(var(--v-theme-text-primary));
+}
+.ai-mode {
+  background: rgba(var(--v-theme-primary), 0.1);
+  color: rgb(var(--v-theme-primary));
 }
 .ai-status {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 12px;
   font-weight: 600;
   color: rgb(var(--v-theme-text-primary));
 }
 .ai-status i {
   width: 6px;
   height: 6px;
-  background: #999;
+  flex-shrink: 0;
+  background: rgb(var(--v-theme-success));
   border-radius: 50%;
-}
-.ai-status--live i {
-  background: #45bd87;
-  box-shadow: 0 0 0 3px #45bd8725;
 }
 .ai-date {
   display: block;
-  margin-top: 4px;
-  font-size: 10px;
+  margin-top: 5px;
+  font-size: 11px;
 }
 .game--ai .room-link {
-  background: rgba(137, 101, 224, 0.15);
-  border: 1px solid rgba(137, 101, 224, 0.22);
+  min-height: 44px;
+  white-space: nowrap;
+  color: rgb(var(--v-theme-primary));
+  background: rgba(var(--v-theme-primary), 0.06);
 }
 .game--ai :deep(.game-options) {
-  flex: 0 1 auto;
-  margin-left: 58px;
-}
-@media (max-width: 600px) {
-  .game--ai {
-    padding: 14px;
-    gap: 12px;
-  }
-  .game--ai .game-info {
-    padding-right: 0;
-  }
-  .game--ai .players-amount {
-    top: 14px;
-    font-size: 11px;
-  }
-  .game--ai .ai-eyebrow {
-    padding-right: 42px;
-  }
-  .game--ai .ai-title {
-    font-size: 14px;
-  }
+  flex: none;
+  overflow: hidden;
+  gap: 0;
 }
 @import '@/styles/loyalty-icons.scss';
 .evil-loyalty-icon,
@@ -380,6 +382,34 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
     grid-row: 2;
     min-width: 104px;
     min-height: 36px;
+  }
+}
+@media (max-width: 1100px) {
+  .game--ai .game-info {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .game--ai :deep(.game-options) {
+    margin-left: 42px;
+  }
+}
+@media (max-width: 600px) {
+  .game--ai {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 12px;
+    padding: 12px;
+  }
+  .game--ai .game-info {
+    padding-right: 32px;
+  }
+  .ai-meta > span:first-child {
+    flex-basis: 100%;
+  }
+  .game--ai .players-amount {
+    top: 14px;
+  }
+  .game--ai .room-link {
+    min-width: 104px;
   }
 }
 </style>

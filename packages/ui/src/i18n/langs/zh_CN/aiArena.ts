@@ -1,4 +1,7 @@
 export default {
+  cardBeginner: '新手',
+  cardWatch: '观看',
+  cardDiscussion: '讨论',
   botBeginnerStart: '开始',
   botBeginnerHint: '5名玩家：你和4个普通机器人。机器人用简单语言解释自己的选择。',
   botPremiumSeats: '7人和8人游戏需要Premium。',

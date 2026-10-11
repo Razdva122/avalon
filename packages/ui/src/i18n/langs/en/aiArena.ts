@@ -1,4 +1,7 @@
 export default {
+  cardBeginner: 'Beginner',
+  cardWatch: 'Watch',
+  cardDiscussion: 'Discussion',
   botBeginnerStart: 'Start',
   botBeginnerHint: '5 players: you and 4 regular bots. Bots use simple language and explain their choices.',
   botPremiumSeats: '7 and 8 players require Premium.',
