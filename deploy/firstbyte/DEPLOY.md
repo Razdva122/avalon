@@ -11,13 +11,13 @@ Compose project `avalon-production`. The runner does not build images or copy se
 3. Select **Run workflow**, branch **master**, and the published tag, e.g. `v71.0.0`.
 4. Leave **check_only** disabled to deploy. Enable it to pull/check without changing containers.
 5. For an abandoned unfinished game, enable **skip_room_check** («Пропустить проверку комнат»).
-   It defaults to **false** and skips only the two room checks. Backup, health checks and rollback
+   It defaults to **false** and skips only the room check. Health checks and rollback
    remain mandatory. Unfinished games may lose their state, so use it only when that is acceptable.
    **check_only** takes precedence: with both boxes checked, no containers are changed.
 
 The manual job is named **deploy to server**. A tag push only publishes images; it does not deploy.
-The server pulls both images, records their immutable digests, checks room inventory, runs the
-existing verified off-host backup, checks rooms again, then updates only `backend` and `ui` with
+The server pulls both images, records their immutable digests, checks room inventory immediately
+before activation, then updates only `backend` and `ui` with
 `--no-deps`. MongoDB, volumes, LiveKit/HAProxy configuration, TLS and environment files stay in place.
 There is a short application interruption. Deploy during a quiet period: room checks are a safety
 check, not a maintenance lock preventing new rooms from being created immediately afterward.
@@ -28,10 +28,15 @@ with incompatible database migrations require a separate migration plan. Watchdo
 and may briefly stop/recover voice during the backend restart.
 
 Selecting the already installed image digests checks health and exits without a restart or backup.
-A failed backup, missing image, nonempty/incomplete room inventory (unless explicitly skipped),
+A missing image, nonempty/incomplete room inventory (unless explicitly skipped),
 less than 5 GiB free disk or an
 unresolved interrupted deployment blocks activation. Images are not automatically pruned: keep the
 previous version available for rollback and inspect disk usage when deployment reports low space.
+
+Backups run independently through the existing `avalon-backup.timer`; deployment does not start
+or wait for a backup. Before a release requiring a database migration, arrange a fresh verified
+backup separately. Data recovery uses the latest successful scheduled copy, while application
+rollback still restores the previous images automatically.
 
 ## Access and server installation
 
@@ -59,7 +64,7 @@ setup; rotate it by replacing this dedicated authorized key and environment secr
 
 The server runs deployments in a transient `avalon-deploy.service`. Closing SSH or cancelling the
 GitHub job does not stop the server transaction. External operations have individual timeouts;
-there is no overall systemd kill deadline that could interrupt rollback after a slow backup/pull. GitHub concurrency and a server-side file lock
+there is no overall systemd kill deadline that could interrupt rollback after a slow pull. GitHub concurrency and a server-side file lock
 prevent simultaneous deployments. Check:
 
 ```sh
@@ -68,7 +73,9 @@ journalctl -u avalon-deploy.service --since today
 cat /opt/avalon/production/last-deploy.json
 ```
 
-A completed transient unit is collected; its journal remains. A failed job remains failed even when
+A completed transient unit is collected; its journal remains. The SSH entry point requires a fresh
+`deploy-result-<invocation-id>.json` success receipt for the requested tag, so an operator-stopped service cannot
+report a successful deployment. A failed job remains failed even when
 the previous application was restored. An external HTTPS check from the runner also runs afterward;
 a failure at that final step needs investigation and does not itself trigger a second rollback.
 
@@ -76,7 +83,7 @@ a failure at that final step needs investigation and does not itself trigger a s
 `deploy-pending.json` remains if rollback failed or the machine/process was forcibly interrupted.
 Inspect the running containers and journal before an administrator clears that marker; do not
 blindly retry or restore MongoDB. To return to an earlier compatible release, manually deploy its
-published tag (with the same backup/room checks).
+published tag (with the same room and health checks).
 
 After a server restore, reinstall the dedicated SSH user/sudo entry and `/usr/local/sbin` symlink;
 the recovery bundle contains production files but not the account's `/var/lib` directory or sudoers.

@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import time
+import uuid
 
 ROOT = Path('/opt/avalon/production')
 REPOS = {'backend': 'razdva12/backend-avalon', 'ui': 'razdva12/nginx-avalon'}
@@ -124,11 +125,7 @@ def deploy(tag, check_only=False, skip_room_check=False):
             print('WARNING: room checks explicitly skipped; unfinished games may lose their state', flush=True)
         else:
             idle()
-        print('Creating a verified off-host backup', flush=True)
-        run(['systemctl', 'start', 'avalon-backup.service'], timeout=2800)
-        if not skip_room_check:
-            idle()
-        # The backup script verifies off-host readback before reporting success.
+        # Backups run independently on their timer; check rooms immediately before activation.
         (ROOT / 'compose.previous.yaml').write_text(previous)
         pending.write_text(json.dumps({'tag': tag, 'images': images, 'skipRoomCheck': skip_room_check, 'startedAt': time.time()}))
         try:
@@ -151,9 +148,16 @@ def deploy(tag, check_only=False, skip_room_check=False):
 def main():
     os.umask(0o077)
     # Internal mode is invoked only by the root-owned systemd service command.
-    if len(sys.argv) == 3 and sys.argv[1] == '--run' and not os.environ.get('SUDO_USER'):
+    if len(sys.argv) == 4 and sys.argv[1] == '--run' and not os.environ.get('SUDO_USER'):
         mode, tag = parse_command(sys.argv[2])
-        return deploy(tag, check_only=mode == 'check', skip_room_check=mode == 'deploy-skip-rooms')
+        if not re.fullmatch(r'[0-9a-f]{32}', sys.argv[3]):
+            raise ValueError('Invalid deployment invocation ID')
+        deploy(tag, check_only=mode == 'check', skip_room_check=mode == 'deploy-skip-rooms')
+        receipt = ROOT / ('deploy-result-' + sys.argv[3] + '.json')
+        temporary = receipt.with_suffix('.tmp')
+        temporary.write_text(json.dumps({'tag': tag, 'completedAt': time.time()}))
+        temporary.replace(receipt)
+        return
     if len(sys.argv) != 2:
         raise ValueError('One SSH command argument required')
     mode, tag = parse_command(sys.argv[1])
@@ -161,15 +165,24 @@ def main():
         return deploy(tag, check_only=True)
     # A disconnected/cancelled runner must not kill rollback. Each external operation
     # has its own timeout; do not impose a service deadline that could kill rollback.
-    started = str(int(time.time()))
-    result = subprocess.run([
-        'systemd-run', '--unit=avalon-deploy', '--collect', '--wait', '--quiet',
-        '--property=UMask=0077',
-        '/usr/local/sbin/avalon-deploy', '--run', f'{mode} {tag}',
-    ])
-    subprocess.run(['journalctl', '-u', 'avalon-deploy', '--since=@' + started, '--no-pager', '-o', 'cat'])
-    if result.returncode:
-        raise RuntimeError('Deployment failed; inspect avalon-deploy journal')
+    started = time.time()
+    invocation = uuid.uuid4().hex
+    receipt = ROOT / ('deploy-result-' + invocation + '.json')
+    try:
+        result = subprocess.run([
+            'systemd-run', '--unit=avalon-deploy', '--collect', '--wait', '--quiet',
+            '--property=UMask=0077',
+            '/usr/local/sbin/avalon-deploy', '--run', f'{mode} {tag}', invocation,
+        ])
+        subprocess.run(['journalctl', '-u', 'avalon-deploy', '--since=@' + str(int(started)), '--no-pager', '-o', 'cat'])
+        if result.returncode:
+            raise RuntimeError('Deployment failed; inspect avalon-deploy journal')
+        # systemd-run can return zero for an operator-stopped service too.
+        completed = json.loads(receipt.read_text()) if receipt.exists() else {}
+        if completed.get('tag') != tag or completed.get('completedAt', 0) < started:
+            raise RuntimeError('Deployment did not complete; inspect avalon-deploy journal')
+    finally:
+        receipt.unlink(missing_ok=True)
 
 
 if __name__ == '__main__':
