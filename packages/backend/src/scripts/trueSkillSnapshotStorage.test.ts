@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import { playerTrueSkillRatingModel, trueSkillRatingHistoryModel } from '@/db/models';
 import { createTrueSkillRatingSnapshot } from './updateTrueSkillRatings';
 let mongo: MongoMemoryServer;
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
+  mongo = await createTestMongo();
   await mongoose.connect(mongo.getUri());
 });
 afterAll(async () => {

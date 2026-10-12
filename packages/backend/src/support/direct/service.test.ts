@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import { configuredNetworks } from './config';
 import { DirectService } from './service';
 import { supportOrderModel, supportTotalCents } from '../repository';
@@ -29,7 +30,7 @@ function makeService() {
   });
 }
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
+  mongo = await createTestMongo();
   await mongoose.connect(mongo.getUri());
   await supportOrderModel.init();
 });

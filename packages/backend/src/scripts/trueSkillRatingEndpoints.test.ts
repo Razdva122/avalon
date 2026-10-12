@@ -2,7 +2,8 @@ import { registerTrueSkillRatingEndpoints } from './trueSkillRatingEndpoints';
 import type { ServerSocket } from '@avalon/types';
 
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import { playerTrueSkillRatingModel, userFeaturesModel } from '@/db/models';
 let mongo: MongoMemoryServer;
 let total = 0;
@@ -10,7 +11,7 @@ let features: Record<string, unknown> = {};
 let rating: Record<string, unknown>;
 jest.mock('@/support/repository', () => ({ supportTotalCents: async () => total }));
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
+  mongo = await createTestMongo();
   await mongoose.connect(mongo.getUri());
   await playerTrueSkillRatingModel.init();
 });

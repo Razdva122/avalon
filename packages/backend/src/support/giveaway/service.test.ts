@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 import express from 'express';
 import { Server } from 'http';
 import { AddressInfo } from 'net';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import { userFeaturesModel, userProfileModel } from '@/db/models';
 import { boardAuthorModel, boardListingModel, ensurePlayerBoardIndexes } from '@/player-boards/repository';
 import { supportOrderModel, supportTotalCents } from '../repository';
@@ -19,7 +20,7 @@ const zero = () => 0;
 const service = (random: (max: number) => number = zero, grant?: (id: string, at: Date) => Promise<void>) =>
   new GiveawayService({ now: () => now, random, ...(grant ? { grant } : {}) });
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
+  mongo = await createTestMongo();
   await mongoose.connect(mongo.getUri(), { autoIndex: false });
   await ensurePlayerBoardIndexes();
   await ensureGiveawayIndexes();

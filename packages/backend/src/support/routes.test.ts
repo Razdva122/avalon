@@ -2,7 +2,8 @@ import express from 'express';
 import { Server } from 'http';
 import { AddressInfo } from 'net';
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import { createSupportRouter } from './routes';
 import { DirectService } from './direct/service';
 import { configuredNetworks } from './direct/config';
@@ -25,7 +26,7 @@ const networks = configuredNetworks({
   SUPPORT_ETH_RPC_URL: 'https://private-rpc.example/secret',
 }).filter((n) => n.id === 'eth');
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
+  mongo = await createTestMongo();
   await mongoose.connect(mongo.getUri());
   await supportOrderModel.init();
   const service = new DirectService({

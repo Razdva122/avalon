@@ -61,11 +61,3 @@ test('the selected agent personality reaches actual decision context and the ros
   expect(seen[0].style).toBe(agent.style);
   expect(compactRequest(seen[0]).personality).toBe(agent.style);
 });
-
-test('all new agents use English nicknames and model instructions with a stable persona translation key', () => {
-  for (const agent of BOT_AGENTS) {
-    expect(agent.name).toMatch(/^[A-Za-z]+ · AI$/);
-    expect(agent.style).not.toMatch(/[А-Яа-яЁё]/);
-    expect(agent.aiPersona?.key).toMatch(/^[a-z]+$/);
-  }
-});

@@ -1,4 +1,5 @@
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import { MongoClient, Db } from 'mongodb';
 import type { ChatMessage, Server, TRoomState } from '@avalon/types';
 import { ChatRepository } from './chat-repository';
@@ -11,7 +12,7 @@ let server: MongoMemoryServer;
 let client: MongoClient;
 let db: Db;
 beforeAll(async () => {
-  server = await MongoMemoryServer.create();
+  server = await createTestMongo();
   client = await MongoClient.connect(server.getUri());
   db = client.db('chat');
 });

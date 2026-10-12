@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import type { Server } from 'socket.io';
 import { StartedRoomState, isStickerAvailable, STICKERS } from '@avalon/types';
 import { AchievementService } from './index';
@@ -11,7 +12,7 @@ import { eventBus } from '@/helpers';
 let mongo: MongoMemoryServer;
 const service = new AchievementService({ to: () => ({ emit: () => {} }) } as unknown as Server);
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
+  mongo = await createTestMongo();
   await mongoose.connect(mongo.getUri());
   await userAchievementModel.init();
 });

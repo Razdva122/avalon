@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import { Room } from '@/room';
 import { eventBus } from '@/helpers';
 import { DBManager } from '@/db';
@@ -28,7 +29,7 @@ function endedRoom(id = 'integrity-game') {
   return room.calculateRoomState() as StartedRoomState;
 }
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
+  mongo = await createTestMongo();
   await mongoose.connect(mongo.getUri());
   await Promise.all([roomModel.init(), playerTrueSkillRatingModel.init(), gameTrueSkillResultModel.init()]);
 });

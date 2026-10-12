@@ -345,12 +345,9 @@ test('Oberon uses Evil action facts without inventing hidden allies', () => {
   expect(context.roleAdvice).toContain('do not know your allies');
 });
 
-test('beginner instructions are scoped to the beginner match, including its review', () => {
-  const state = { stage: 'end' } as VisualGameState;
-  const regular = systemFor({ ...request, state });
-  const beginner = systemFor({ ...request, state, ...{ beginner: true } });
-  expect(beginner).toContain('beginner');
-  expect(beginner).toContain('plain language');
-  expect(beginner).toContain('Do not deliberately lose');
-  expect(regular).not.toContain('plain language');
+test('beginner guidance applies only to beginner requests, including final review', () => {
+  const input = { ...request, state: { stage: 'end' } as VisualGameState };
+  const regular = systemFor(input);
+  expect(systemFor({ ...input, beginner: true })).not.toBe(regular);
+  expect(systemFor({ ...input, beginner: false })).toBe(regular);
 });

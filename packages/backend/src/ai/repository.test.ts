@@ -1,12 +1,13 @@
 import { aiPlayedModel } from '@avalon/types';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import { MongoClient } from 'mongodb';
 import { AiRepository } from './repository';
 import { MigrationManager, migrations } from '@/db/migrations';
 let server: MongoMemoryServer;
 let client: MongoClient;
 beforeAll(async () => {
-  server = await MongoMemoryServer.create();
+  server = await createTestMongo();
   client = await MongoClient.connect(server.getUri());
 });
 afterAll(async () => {

@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import * as migrationModule from './index';
 let server: MongoMemoryServer;
 beforeAll(async () => {
-  server = await MongoMemoryServer.create();
+  server = await createTestMongo();
   await mongoose.connect(server.getUri(), { autoIndex: false });
 });
 afterAll(async () => {

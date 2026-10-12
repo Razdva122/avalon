@@ -166,6 +166,5 @@ test.each([
     const decision = generate.mock.calls[0][1];
     expect(decision.context.approvalsRequired).toBe(approvalsRequired);
     expect(decision.instructions).not.toContain('one Good vote');
-    expect(decision.context.approvalsRequired).toBe(approvalsRequired);
   },
 );

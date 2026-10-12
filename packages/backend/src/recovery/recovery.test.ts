@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import { MongoRecoveryRepository } from './repository';
 import { RecoveryService } from './service';
 import { MailConfig, mailConfig } from './config';
@@ -31,7 +32,7 @@ const config: MailConfig = {
 };
 
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
+  mongo = await createTestMongo();
   await mongoose.connect(mongo.getUri());
   repository = new MongoRecoveryRepository(mongoose.connection.db!, 'users');
   await repository.init();

@@ -4,7 +4,8 @@ import { Server } from 'http';
 import { AddressInfo } from 'net';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import { config } from '@/config';
 import { userProfileModel, roomModel } from '@/db/models';
 import { createPlayerBoardsRouter } from './routes';
@@ -54,7 +55,7 @@ async function listing() {
   return (await response.json()).listing;
 }
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
+  mongo = await createTestMongo();
   await mongoose.connect(mongo.getUri(), { autoIndex: false });
   await ensurePlayerBoardIndexes();
   const app = express();

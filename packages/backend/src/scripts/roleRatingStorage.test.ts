@@ -1,12 +1,13 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import { publishRoleRatings, readRoleRatings, readRoleHistory, ensureRoleRatingIndexes } from './roleRatingStorage';
 import type { RoleRating } from '@avalon/types';
 let mongo: MongoMemoryServer;
 const row = (rating: number) =>
   ({ userID: 'p', role: 'merlin', gamesCount: 20, rating, rank: 1, winrate: 50 }) as RoleRating;
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
+  mongo = await createTestMongo();
   await mongoose.connect(mongo.getUri());
   await ensureRoleRatingIndexes();
 });

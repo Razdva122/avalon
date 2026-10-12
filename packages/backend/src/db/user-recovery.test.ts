@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server-core';
+import type { MongoMemoryServer } from 'mongodb-memory-server-core';
+import { createTestMongo } from '@/test-utils/mongo';
 import { UserLayer } from './user';
 import { userProfileModel } from './models';
 import { config } from '@/config';
@@ -11,7 +12,7 @@ let token: string;
 jest.setTimeout(120000);
 beforeAll(async () => {
   config.SECRET_KEY = 'recovery-credential-tests';
-  mongo = await MongoMemoryServer.create();
+  mongo = await createTestMongo();
   await mongoose.connect(mongo.getUri());
   await userProfileModel.init();
 });
