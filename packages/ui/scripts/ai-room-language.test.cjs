@@ -145,6 +145,14 @@ async function fixture(
     );
     app.config.globalProperties.$t = i18n.global.t;
     app.component('v-icon', { render: () => null });
+    app.component('v-dialog', {
+      name: 'v-dialog',
+      props: ['modelValue'],
+      setup:
+        (props, { slots }) =>
+        () =>
+          props.modelValue ? vue.h('section', slots.default?.()) : null,
+    });
     app.component('v-btn', {
       name: 'v-btn',
       setup:
@@ -167,6 +175,9 @@ async function fixture(
     return [
       ...(node.type === type || node.type?.name === type ? [node] : []),
       ...(Array.isArray(node.children) ? node.children.flatMap((child) => nodes(type, child)) : []),
+      ...((node.type === 'v-dialog' || node.type?.name === 'v-dialog') && node.children?.default
+        ? node.children.default().flatMap((child) => nodes(type, child))
+        : []),
     ];
   }
   return {
@@ -1078,4 +1089,66 @@ test('AI lobby shows saved smart difficulty and a live-only indicator', async (t
   assert.ok(room.html.includes('1 человек + 7 ботов'));
   assert.ok(room.html.includes('<i aria-hidden="true">'));
   assert.ok(room.html.includes('Смотреть'));
+});
+
+test('prepared table keeps settings out of the main view and retains them for launch after closing', async (t) => {
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    props: { roomID: 'compact-room' },
+    locale: 'ru',
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      canPlayLargeTables: vue.ref(true),
+      botModes: vue.ref({ smart: true, regular: true }),
+    },
+    acknowledge: async () => ({ ok: true }),
+  });
+  t.after(room.stop);
+  assert.ok(!room.html.includes('<select'), 'settings do not clutter the table');
+  const settings = room.nodes('button').find((node) => node.props['data-bot-settings'] !== undefined);
+  assert.ok(settings, 'table offers an explicit settings action');
+  settings.props.onClick();
+  const openHtml = await room.render();
+  assert.ok(openHtml.includes('<select'), 'settings open with editable values');
+  room.nodes('select')[0].props['onUpdate:modelValue']('en');
+  room.nodes('select')[1].props['onUpdate:modelValue'](6);
+  room
+    .nodes('button')
+    .find((node) => node.props['data-bot-settings-done'] !== undefined)
+    .props.onClick();
+  const closedHtml = await room.render();
+  assert.ok(!closedHtml.includes('<select'));
+  assert.ok(closedHtml.includes('English'));
+  assert.ok(closedHtml.includes('6 игроков'));
+  await room
+    .nodes('v-btn')
+    .find((node) => node.props['data-bot-mode'] === 'regular')
+    .props.onClick();
+  assert.deepEqual(room.sent, [
+    ['startHumanAiRoom', 'compact-room', { difficulty: 'regular', language: 'en', playerCount: 6 }],
+  ]);
+});
+
+test('compact preparation countdown shows remaining launch time and reaches zero without an action prompt', async (t) => {
+  let now = 1000000;
+  let tick;
+  t.mock.method(Date, 'now', () => now);
+  t.mock.method(globalThis, 'setInterval', (callback) => {
+    tick = callback;
+    return 1;
+  });
+  t.mock.method(globalThis, 'clearInterval', () => {});
+  const room = await fixture('components/view/board/modules/BotGameTimer.vue', {
+    locale: 'ru',
+    props: { expiresAt: 1070000, phase: 'preparation', compact: true },
+  });
+  t.after(room.stop);
+  assert.ok(room.html.includes('На запуск 1:10'));
+  assert.ok(!room.html.includes('<details'));
+  assert.ok(!room.html.includes('Ваш ход'));
+  now = 1061000;
+  tick();
+  assert.ok((await room.render()).includes('На запуск 0:09'));
+  now = 1080000;
+  tick();
+  assert.ok((await room.render()).includes('На запуск 0:00'));
 });

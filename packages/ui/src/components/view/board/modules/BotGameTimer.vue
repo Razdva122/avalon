@@ -1,6 +1,6 @@
 <template>
   <div class="bot-game-timer" :class="{ 'bot-timer-compact': compact }">
-    <details v-if="compact" class="bot-timer-details">
+    <details v-if="compact && phase === 'action'" class="bot-timer-details">
       <summary>
         <span role="timer">{{
           $t(discussion ? 'aiArena.botDiscussionTime' : 'aiArena.botActionTime', { seconds })
@@ -18,7 +18,12 @@
       </div>
     </details>
     <p v-else class="bot-countdown" role="timer">
-      {{ $t(countdownKey, { seconds }) }}
+      {{
+        $t(compact && phase === 'preparation' ? 'aiArena.botLaunchTimeShort' : countdownKey, {
+          seconds,
+          time: preparationTime,
+        })
+      }}
     </p>
     <p v-if="phase === 'action' && timeBankMs !== undefined && !compact" class="bot-reserve">
       {{ $t('aiArena.botTimeBankRemaining', { seconds: reserveSeconds }) }}
@@ -57,6 +62,9 @@ const seconds = computed(() =>
     0,
     Math.ceil(((usingReserve.value ? props.expiresAt : props.baseExpiresAt || props.expiresAt) - now.value) / 1000),
   ),
+);
+const preparationTime = computed(
+  () => `${Math.floor(seconds.value / 60)}:${String(seconds.value % 60).padStart(2, '0')}`,
 );
 const reserveSeconds = computed(() =>
   Math.max(

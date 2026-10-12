@@ -895,6 +895,17 @@ onUnmounted(() => {
     left: 8px;
     bottom: calc(8px + env(safe-area-inset-bottom));
   }
+  .voice-launcher {
+    gap: 6px;
+    padding: 0 8px;
+  }
+  .voice-dock-label {
+    font-size: 13px;
+  }
+  .voice-dock-label small,
+  .voice-chevron {
+    display: none;
+  }
   .voice-panel {
     position: fixed;
     left: 8px;

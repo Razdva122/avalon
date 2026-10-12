@@ -1,89 +1,176 @@
 <template>
   <section class="bot-game-choices" :aria-label="$t('aiArena.playWithBots')">
-    <h2 class="bot-table" :title="title">{{ title || $t('aiArena.botTable') }}</h2>
-    <BotGameTimer v-if="expiresAt" :expires-at="expiresAt" phase="preparation" />
-    <div class="bot-preparation-actions">
-      <label v-if="!beginner" class="bot-language">
-        <span>{{ $t('aiArena.selectLanguage') }}</span>
-        <select v-model="selectedLanguage" :disabled="busy">
-          <option value="en">English</option>
-          <option value="ru">Русский</option>
-          <option value="zh-tw">繁體中文（台灣）</option>
-        </select>
-      </label>
-      <label v-if="!beginner" class="bot-language">
-        <span>{{ $t('aiArena.selectPlayerCount') }}</span>
-        <select v-model="selectedPlayerCount" :disabled="busy">
-          <option :value="5">5</option>
-          <option :value="6">6</option>
-          <option :value="7" :disabled="!canPlayLargeTables">7 · Premium</option>
-          <option :value="8" :disabled="!canPlayLargeTables">8 · Premium</option>
-        </select>
-      </label>
-      <v-btn
-        class="bot-leave-button"
-        variant="text"
-        color="warning"
-        :aria-label="$t('startPanel.leaveGame')"
-        :title="$t('startPanel.leaveGame')"
-        :loading="busy && !pendingDifficulty"
-        :disabled="busy || !canPlay"
-        @click="leave"
-      >
-        <span class="material-icons bot-leave-icon" aria-hidden="true">logout</span>
-        <span class="bot-leave-label">{{ $t('startPanel.leaveGame') }}</span>
-      </v-btn>
-    </div>
-    <p v-if="!beginner && !canPlayLargeTables" class="bot-action-hint">{{ $t('aiArena.botPremiumSeats') }}</p>
-    <p v-if="beginner" id="bot-beginner-hint" class="bot-action-hint">{{ $t('aiArena.botBeginnerHint') }}</p>
+    <h2 class="bot-table" :title="title">
+      {{
+        selectedPlayerCount === 5
+          ? $t('aiArena.botSoloRoster')
+          : $t('aiArena.mixedPlayerCount', { count: selectedPlayerCount - 1 })
+      }}
+    </h2>
+    <button
+      ref="settingsTrigger"
+      v-if="!beginner"
+      type="button"
+      class="bot-configuration"
+      data-bot-settings
+      :aria-label="$t('aiArena.botSettings')"
+      aria-haspopup="dialog"
+      :disabled="busy"
+      @click="settingsOpen = true"
+    >
+      <span>{{ $t('aiArena.botPreparationSummary', { language: languageName, count: selectedPlayerCount }) }}</span>
+      <v-icon icon="settings" class="bot-settings-icon" aria-hidden="true" />
+    </button>
     <div class="bot-modes" :class="{ 'bot-modes--beginner': beginner }">
-      <div
-        v-for="difficulty in botDifficulties"
-        :key="difficulty"
-        class="bot-mode"
-        :class="{ 'bot-mode--unavailable': !botModes[difficulty] }"
-      >
+      <div v-for="difficulty in botDifficulties" :key="difficulty" class="bot-mode">
         <v-btn
           :data-bot-mode="difficulty"
-          :color="difficulty === 'smart' ? 'primary' : 'secondary'"
+          :class="`bot-mode-button bot-mode-button--${difficulty}`"
           :loading="busy && pendingDifficulty === difficulty"
           :disabled="busy || !canPlay || !botModes[difficulty]"
-          :aria-describedby="`${beginner ? 'bot-beginner-hint' : `bot-${difficulty}-hint`} bot-${difficulty}-availability`"
+          :aria-describedby="`bot-${difficulty}-availability`"
           @click="play(difficulty)"
         >
-          <span class="bot-mode-label">
-            <v-icon
-              class="bot-mode-icon"
-              :icon="difficulty === 'smart' ? 'fa:fa-solid fa-brain' : 'fa:fa-solid fa-graduation-cap'"
-              aria-hidden="true"
-            />
-            <span>{{
-              $t(
-                beginner
-                  ? 'aiArena.botBeginnerStart'
-                  : difficulty === 'smart'
-                    ? 'aiArena.botSmart'
-                    : 'aiArena.botRegular',
-              )
-            }}</span>
-          </span>
+          {{
+            $t(
+              beginner
+                ? 'aiArena.botBeginnerStart'
+                : difficulty === 'smart'
+                  ? 'aiArena.botSmart'
+                  : 'aiArena.botRegular',
+            )
+          }}
         </v-btn>
-        <p v-if="!beginner" :id="`bot-${difficulty}-hint`">
-          {{ $t(difficulty === 'smart' ? 'aiArena.botSmartHint' : 'aiArena.botRegularHint') }}
-        </p>
-        <p :id="`bot-${difficulty}-availability`" role="status">
+        <p
+          :id="`bot-${difficulty}-availability`"
+          class="bot-availability"
+          role="status"
+          :aria-label="!botModes[difficulty] && botsBusy ? $t('aiArena.botBusy') : undefined"
+        >
           <template v-if="!botModes[difficulty]">
             {{
               !botsBusy && botWaitHours[difficulty] !== undefined
-                ? $t('aiArena.botAvailableIn', { hours: formatHours(botWaitHours[difficulty]!) })
-                : $t(botsBusy ? 'aiArena.botBusy' : 'aiArena.botUnavailable')
+                ? $t('aiArena.botAvailabilityShort', { hours: formatHours(botWaitHours[difficulty]!) })
+                : $t(botsBusy ? 'aiArena.botBusyShort' : 'aiArena.botUnavailable')
             }}
           </template>
         </p>
       </div>
     </div>
-    <p class="bot-action-hint">{{ $t('aiArena.botActionDeadlineHint') }}</p>
-    <p v-if="error" role="alert">{{ error }}</p>
+    <div class="bot-time-row">
+      <BotGameTimer v-if="expiresAt" :expires-at="expiresAt" phase="preparation" compact />
+      <button
+        ref="timeHelpTrigger"
+        type="button"
+        class="bot-time-help"
+        :aria-label="$t('aiArena.botTimeHelp')"
+        aria-haspopup="dialog"
+        :disabled="busy"
+        @click="timeHelpOpen = true"
+      >
+        ?
+      </button>
+    </div>
+    <v-btn
+      class="bot-leave-button"
+      variant="text"
+      :loading="busy && !pendingDifficulty"
+      :disabled="busy || !canPlay"
+      @click="leave"
+      >{{ $t('aiArena.botLeaveShort') }}</v-btn
+    >
+    <p v-if="error" class="bot-error" role="alert">{{ error }}</p>
+
+    <v-dialog
+      v-model="settingsOpen"
+      class="bot-preparation-dialog"
+      max-width="420"
+      :aria-label="$t('aiArena.botSettings')"
+      @after-leave="settingsTrigger?.focus()"
+    >
+      <section class="bot-preparation-sheet">
+        <header class="bot-sheet-header">
+          <h2>{{ $t('aiArena.botSettings') }}</h2>
+          <button
+            type="button"
+            class="bot-sheet-close"
+            :aria-label="$t('aiArena.botSettingsDone')"
+            :disabled="busy"
+            @click="settingsOpen = false"
+          >
+            <v-icon icon="close" aria-hidden="true" />
+          </button>
+        </header>
+        <div class="bot-setting-fields">
+          <label v-if="!beginner" class="bot-language">
+            <span>{{ $t('aiArena.selectLanguage') }}</span>
+            <select v-model="selectedLanguage" :disabled="busy">
+              <option value="en">English</option>
+              <option value="ru">Русский</option>
+              <option value="zh-tw">繁體中文（台灣）</option>
+            </select>
+          </label>
+          <label v-if="!beginner" class="bot-language">
+            <span>{{ $t('aiArena.botTotalPlayers') }}</span>
+            <select v-model="selectedPlayerCount" :disabled="busy">
+              <option :value="5">5</option>
+              <option :value="6">6</option>
+              <option :value="7" :disabled="!canPlayLargeTables">7 · Premium</option>
+              <option :value="8" :disabled="!canPlayLargeTables">8 · Premium</option>
+            </select>
+          </label>
+        </div>
+        <p class="bot-sheet-note">{{ $t('aiArena.mixedPlayerCount', { count: selectedPlayerCount - 1 }) }}</p>
+        <p v-if="!beginner && !canPlayLargeTables" class="bot-sheet-note">{{ $t('aiArena.botPremiumSeats') }}</p>
+        <div class="bot-sheet-explanations">
+          <p v-if="beginner">{{ $t('aiArena.botBeginnerHint') }}</p>
+          <template v-else>
+            <p>
+              <strong>{{ $t('aiArena.botRegular') }}.</strong> {{ $t('aiArena.botRegularHint') }}
+            </p>
+            <p>
+              <strong>{{ $t('aiArena.botSmart') }}.</strong> {{ $t('aiArena.botSmartHint') }}
+            </p>
+          </template>
+        </div>
+        <button
+          type="button"
+          class="bot-sheet-done"
+          data-bot-settings-done
+          :disabled="busy"
+          @click="settingsOpen = false"
+        >
+          {{ $t('aiArena.botSettingsDone') }}
+        </button>
+      </section>
+    </v-dialog>
+    <v-dialog
+      v-model="timeHelpOpen"
+      class="bot-preparation-dialog"
+      max-width="420"
+      :aria-label="$t('aiArena.botTimeHelp')"
+      @after-leave="timeHelpTrigger?.focus()"
+    >
+      <section class="bot-preparation-sheet">
+        <header class="bot-sheet-header">
+          <h2>{{ $t('aiArena.botTimeHelp') }}</h2>
+          <button
+            type="button"
+            class="bot-sheet-close"
+            :aria-label="$t('aiArena.botSettingsDone')"
+            :disabled="busy"
+            @click="timeHelpOpen = false"
+          >
+            <v-icon icon="close" aria-hidden="true" />
+          </button>
+        </header>
+        <p class="bot-time-explanation">{{ $t('aiArena.botActionDeadlineHint') }}</p>
+        <p v-if="beginner" class="bot-time-explanation">{{ $t('aiArena.botBeginnerHint') }}</p>
+        <button type="button" class="bot-sheet-done" :disabled="busy" @click="timeHelpOpen = false">
+          {{ $t('aiArena.botSettingsDone') }}
+        </button>
+      </section>
+    </v-dialog>
   </section>
 </template>
 
@@ -101,10 +188,17 @@ const { t, locale } = useI18n();
 const router = useRouter();
 const { canPlay, canPlayLargeTables, botModes, botsBusy, botWaitHours, accessStatus, refresh } = useAiAccess();
 const formatHours = (hours: number) => new Intl.NumberFormat(locale.value.replace('_', '-')).format(hours);
-const botDifficulties = computed<AiBotDifficulty[]>(() => (props.beginner ? ['regular'] : ['smart', 'regular']));
+const botDifficulties = computed<AiBotDifficulty[]>(() => (props.beginner ? ['regular'] : ['regular', 'smart']));
 const selectedPlayerCount = ref<AiPlayerCount>(5);
 const selectedLanguage = ref<AiLanguage>(
   locale.value === 'ru' ? 'ru' : /^zh[-_]tw$/i.test(locale.value) ? 'zh-tw' : 'en',
+);
+const settingsOpen = ref(false);
+const timeHelpOpen = ref(false);
+const settingsTrigger = ref<HTMLButtonElement>();
+const timeHelpTrigger = ref<HTMLButtonElement>();
+const languageName = computed(
+  () => ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）' })[selectedLanguage.value],
 );
 const pendingDifficulty = ref<AiBotDifficulty>();
 const busy = ref(false);
@@ -160,59 +254,39 @@ async function play(difficulty: AiBotDifficulty) {
 .bot-game-choices {
   width: 390px;
   max-width: 100%;
-  margin: 8px 0 12px;
   text-align: center;
+  color: #f4efdf;
 }
 .bot-table {
-  margin: 0 0 8px;
-  font-size: 16px;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 600;
 }
-.bot-preparation-actions {
-  display: flex;
-  align-items: flex-end;
+.bot-configuration {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  margin: 8px 0 12px;
-}
-.bot-language {
-  flex: 1;
-  min-width: 0;
-  display: grid;
-  gap: 4px;
-  font-size: 14px;
-}
-.bot-preparation-actions .bot-leave-button {
   width: auto;
-  min-height: 44px;
-  text-transform: none;
-  letter-spacing: 0;
+  max-width: 100%;
+  min-height: 40px;
+  padding: 4px;
+  color: #ded9c9;
+  font-size: 14px;
+  cursor: pointer;
 }
-.bot-leave-icon {
-  font-size: 20px;
-  margin-right: 6px;
-}
-.bot-language select {
-  min-height: 44px;
-  width: 100%;
-  padding: 6px 10px;
-  border: 1px solid currentColor;
-  border-radius: 4px;
-  color: rgb(var(--v-theme-on-surface));
-  background: rgb(var(--v-theme-surface));
-  font: inherit;
-  appearance: auto;
-}
-.bot-language select:focus-visible {
-  outline: 2px solid rgb(var(--v-theme-primary));
-  outline-offset: 2px;
+.bot-settings-icon {
+  flex-shrink: 0;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }
 .bot-modes {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+  margin-top: 8px;
 }
 .bot-modes--beginner {
   grid-template-columns: 1fr;
@@ -220,166 +294,253 @@ async function play(difficulty: AiBotDifficulty) {
 .bot-mode {
   min-width: 0;
 }
-.bot-mode :deep(.v-btn) {
+.bot-mode :deep(.bot-mode-button) {
   width: 100%;
-  min-height: 44px;
+  min-height: 48px;
+  height: auto;
+  padding: 10px;
+  border-radius: 8px;
   text-transform: none;
   letter-spacing: 0;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 600;
 }
-.bot-mode-label {
+.bot-mode :deep(.v-btn__content) {
+  white-space: normal;
+}
+.bot-mode :deep(.bot-mode-button--regular) {
+  background: #f1eadb;
+  color: #263438;
+}
+.bot-mode :deep(.bot-mode-button--smart) {
+  background: #295f8f;
+  color: #fff;
+  border: 1px solid #75a3c6;
+}
+.bot-mode :deep(.v-btn--disabled) {
+  opacity: 1;
+  background: #354142;
+  color: #b7c1be;
+  border: 1px solid #657172;
+  box-shadow: none;
+}
+.bot-mode :deep(.v-btn--disabled .v-btn__overlay) {
+  opacity: 0;
+}
+.bot-availability {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.25;
+  color: #d4c9ac;
+}
+.bot-availability:empty {
+  display: none;
+}
+.bot-time-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
+  margin-top: 8px;
+  color: #d4d5c9;
 }
-.bot-mode-icon {
-  width: 18px;
-  height: 18px;
-  font-size: 18px;
+.bot-time-row :deep(.bot-game-timer) {
+  margin: 0;
+  font-size: 14px;
 }
-.bot-mode p {
-  margin: 6px 0 0;
+.bot-time-help {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #87918a;
+  border-radius: 50%;
+  font-size: 14px;
+  color: #e3dfd0;
+  cursor: pointer;
+}
+.bot-game-choices :deep(.bot-leave-button) {
+  width: auto;
+  min-height: 36px;
+  padding: 4px 12px;
+  color: #bfc8c2;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.bot-error {
+  margin-top: 8px;
+  max-height: 100px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.bot-configuration:disabled,
+.bot-time-help:disabled,
+.bot-preparation-sheet button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.bot-configuration:focus-visible,
+.bot-time-help:focus-visible,
+.bot-preparation-sheet button:focus-visible,
+.bot-language select:focus-visible {
+  outline: 3px solid #98c8ed;
+  outline-offset: 3px;
+}
+.bot-preparation-sheet {
+  padding: 20px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 16px;
+  background: #202d30;
+  color: #f4efdf;
+  text-align: left;
+}
+.bot-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.bot-sheet-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.bot-sheet-close {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+}
+.bot-setting-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.bot-language {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  font-size: 14px;
+  color: #c4c9bf;
+}
+.bot-language select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid #657172;
+  border-radius: 8px;
+  background: #28373a;
+  color: #f4efdf;
+  font: inherit;
+  font-size: 16px;
+  appearance: auto;
+}
+.bot-sheet-note {
+  margin: 10px 0 0;
+  color: #bfc8c2;
   font-size: 13px;
   line-height: 1.4;
 }
-.bot-action-hint {
-  margin: 8px 0 0;
-  font-size: 12px;
-  line-height: 1.3;
+.bot-sheet-explanations {
+  display: grid;
+  gap: 12px;
+  border-top: 1px solid #52615d;
+  margin-top: 20px;
+  padding-top: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.bot-time-explanation {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.bot-sheet-done {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px;
+  margin-top: 20px;
+  border-radius: 8px;
+  background: #d8c39d;
+  color: #263438;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
 }
 @media (max-width: 600px), (max-height: 600px) {
   .bot-game-choices {
-    zoom: calc(1 / var(--board-scale, 1));
-    width: 190px;
+    width: 440px;
     max-width: none;
-    margin: 0;
+    transform: translateY(6px);
   }
   .bot-table {
-    font-size: 14px;
-    line-height: 18px;
-    margin-bottom: 2px;
+    font-size: 28px;
   }
-  .bot-preparation-actions {
-    margin: 4px 0 6px;
+  .bot-configuration {
+    min-height: 64px;
+    gap: 12px;
+    font-size: 26px;
   }
-  .bot-language {
-    gap: 2px;
-    font-size: 12px;
-  }
-  .bot-preparation-actions .bot-leave-button {
-    min-width: 44px;
-    width: 44px;
-    min-height: 45px;
-    padding: 0;
-  }
-  .bot-leave-icon {
-    margin-right: 0;
-  }
-  .bot-leave-label {
-    display: none;
-  }
-  .bot-language > span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-  .bot-language select {
-    min-height: 45px;
+  .bot-settings-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
   }
   .bot-modes {
-    gap: 8px;
-  }
-  .bot-mode :deep(.v-btn) {
-    min-height: 45px;
-    font-size: 13px;
-    letter-spacing: 0;
-    padding: 0 6px;
-  }
-  .bot-mode :deep(.v-btn__content) {
-    white-space: normal;
-  }
-  .bot-mode-label {
-    flex-direction: column;
-    gap: 2px;
-    line-height: 13px;
-  }
-  .bot-mode-icon {
-    width: 14px;
-    height: 14px;
-    font-size: 14px;
-  }
-  .bot-mode p {
-    font-size: 11px;
-    line-height: 1.2;
+    gap: 22px;
     margin-top: 4px;
   }
-  .bot-action-hint {
-    font-size: 11px;
-    line-height: 1.2;
-    margin-top: 6px;
+  .bot-mode :deep(.bot-mode-button) {
+    min-height: 96px;
+    padding: 12px;
+    font-size: 30px;
   }
-  .bot-mode p[role='status']:empty,
-  .bot-mode--unavailable p:first-of-type {
-    display: none;
+  .bot-availability {
+    font-size: 24px;
+    margin-top: 2px;
+  }
+  .bot-time-row {
+    margin-top: 4px;
+    gap: 22px;
+  }
+  .bot-time-row :deep(.bot-game-timer) {
+    font-size: 26px;
+  }
+  .bot-time-help {
+    width: 64px;
+    height: 64px;
+    font-size: 28px;
+  }
+  .bot-game-choices :deep(.bot-leave-button) {
+    min-height: 64px;
+    font-size: 26px;
+    padding: 6px 16px;
+  }
+  .bot-error {
+    font-size: 24px;
   }
 }
-@media (max-height: 600px) {
-  .bot-game-choices {
-    width: 170px;
-  }
-  .bot-table {
-    font-size: 12px;
-    line-height: 14px;
-    margin-bottom: 0;
-  }
-  :deep(.bot-game-timer) {
-    font-size: 11px;
-    line-height: 13px;
+@media (max-width: 600px) {
+  .bot-preparation-dialog :deep(.v-overlay__content) {
+    bottom: 0;
     margin: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - 24px);
   }
-  .bot-preparation-actions {
-    margin: 2px 0 4px;
-  }
-  .bot-mode {
-    display: contents;
-  }
-  .bot-mode :deep(.v-btn) {
-    grid-row: 1;
-  }
-  .bot-mode:first-child :deep(.v-btn) {
-    grid-column: 1;
-  }
-  .bot-mode:last-child :deep(.v-btn) {
-    grid-column: 2;
-  }
-  .bot-modes--beginner .bot-mode:last-child :deep(.v-btn) {
-    grid-column: 1 / -1;
-  }
-  .bot-mode p {
-    grid-column: 1 / -1;
-    margin-top: 0;
-    line-height: 1.15;
-  }
-  .bot-mode:first-child p {
-    grid-row: 2;
-  }
-  #bot-smart-hint {
-    display: none;
-  }
-  .bot-mode:last-child p {
-    grid-row: 3;
-  }
-  .bot-modes {
-    row-gap: 2px;
-  }
-  .bot-action-hint {
-    max-width: 150px;
-    margin: 4px auto 0;
+  .bot-preparation-sheet {
+    max-height: calc(100dvh - 24px);
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    border-radius: 20px 20px 0 0;
   }
 }
 </style>
