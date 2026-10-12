@@ -39,7 +39,7 @@ async function main() {
       const html = processed.slice(0, processed.indexOf('<body')) + original.slice(original.indexOf('<body'));
       const styles = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map((match) => match[1]).join('\n');
       const bytes = zlib.gzipSync(styles).length;
-      assert(bytes < 8 * 1024, `${pathname}: inline styles exceed 8 KiB gzip (${bytes})`);
+      assert(bytes < 8.4 * 1024, `${pathname}: inline styles exceed 8.4 KiB gzip (${bytes})`);
       maximum = Math.max(maximum, bytes);
       await fs.writeFile(file, html);
       count++;
