@@ -63,7 +63,7 @@ test('worker refuses a CLI tool execution instead of returning a decision', asyn
     const done = new Promise((resolve) => child.on('close', resolve));
     child.stdin.end(JSON.stringify({ operation: 'decide', prompt: 'game input', schema: { type: 'object' } }));
     assert.equal(await done, 0);
-    assert.equal(JSON.parse(stdout).ok, false);
+    assert.deepEqual(JSON.parse(stdout), { ok: false, error: 'forbidden_tool' });
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
@@ -158,3 +158,66 @@ test('decision timeout terminates the CLI wrapper and its descendants', { timeou
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+for (const [message, category, httpStatus] of [
+  ['Invalid schema for response_format. HTTP 400 PRIVATE_TOKEN', 'invalid_schema', 400],
+  ['Rate limit reached. HTTP 429 PRIVATE_TOKEN', 'rate_limit', 429],
+  ['Unexpected status code: 503 PRIVATE_TOKEN', 'server_error', 503],
+]) {
+  test(`worker stores safe ${category} diagnostics for a failed turn`, async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'worker-error-test-'));
+    try {
+      await writeFile(
+        join(directory, 'codex'),
+        `#!${process.execPath}\nprocess.stdin.resume();process.stdin.on('end',()=>{console.log(JSON.stringify({type:'turn.failed',error:{message:${JSON.stringify(message)}}}));setInterval(()=>{},1000)});`,
+        { mode: 0o700 },
+      );
+      const child = spawn(process.execPath, [join(__dirname, 'worker.cjs')], {
+        env: { ...process.env, PATH: `${directory}:${process.env.PATH}`, CODEX_HOME: directory },
+      });
+      let stdout = '';
+      child.stdout.on('data', (chunk) => (stdout += chunk));
+      const done = new Promise((resolve) => child.on('close', resolve));
+      child.stdin.end(
+        JSON.stringify({ operation: 'decide', prompt: 'PRIVATE_GAME_INPUT', schema: { type: 'object' } }),
+      );
+      assert.equal(await done, 0);
+      assert.deepEqual(JSON.parse(stdout), { ok: false, error: 'failed' });
+      const diagnostic = JSON.parse(
+        await require('node:fs/promises').readFile(join(directory, 'avalon-last-failure.json'), 'utf8'),
+      );
+      assert.equal(diagnostic.errorCategory, category);
+      assert.equal(diagnostic.httpStatus, httpStatus);
+      assert.doesNotMatch(JSON.stringify(diagnostic), /PRIVATE_TOKEN|PRIVATE_GAME_INPUT/);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+}
+
+for (const [source, error] of [
+  ["console.log(JSON.stringify({type:'turn.completed'}))", 'invalid_response'],
+  ["process.stdout.write('x'.repeat(5*1024*1024));setInterval(()=>{},1000)", 'output_limit'],
+]) {
+  test(`worker reports ${error} without classifying it as a retryable request failure`, async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'worker-reply-test-'));
+    try {
+      await writeFile(
+        join(directory, 'codex'),
+        `#!${process.execPath}\nprocess.stdin.resume();process.stdin.on('end',()=>{${source}});`,
+        { mode: 0o700 },
+      );
+      const child = spawn(process.execPath, [join(__dirname, 'worker.cjs')], {
+        env: { ...process.env, PATH: `${directory}:${process.env.PATH}` },
+      });
+      let stdout = '';
+      child.stdout.on('data', (chunk) => (stdout += chunk));
+      const done = new Promise((resolve) => child.on('close', resolve));
+      child.stdin.end(JSON.stringify({ operation: 'decide', prompt: 'game', schema: { type: 'object' } }));
+      assert.equal(await done, 0);
+      assert.deepEqual(JSON.parse(stdout), { ok: false, error });
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+}

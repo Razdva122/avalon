@@ -134,7 +134,9 @@ async function decide(request) {
       const startedAt = Date.now();
       let lastEvent = 'none',
         transport = 'none',
-        diagnosticBuffer = '';
+        diagnosticBuffer = '',
+        errorCategory = 'unknown',
+        httpStatus;
       const child = spawn('codex', args, { detached: process.platform !== 'win32' });
       const kill = () => {
         try {
@@ -159,15 +161,34 @@ async function decide(request) {
         if (/stream disconnected|reconnecting|connection.*(?:failed|reset)|timed? out/i.test(diagnosticBuffer))
           transport = 'connection';
         else if (/unauthorized|authentication|401|403/i.test(diagnosticBuffer)) transport = 'authentication';
+        const status = diagnosticBuffer.match(
+          /(?:HTTP(?:\/\d(?:\.\d)?)?\s+|status(?:\s+code)?\s*[:=]?\s*)([45]\d{2})\b/i,
+        );
+        if (status) httpStatus = Number(status[1]);
+        if (/invalid.*schema|schema.*(?:invalid|unsupported)|response_format/i.test(diagnosticBuffer))
+          errorCategory = 'invalid_schema';
+        else if (/(?:hit|reached|exceeded) your usage limit|usage_limit_reached/i.test(diagnosticBuffer))
+          errorCategory = 'usage_limit';
+        else if (/rate.?limit|too many requests/i.test(diagnosticBuffer) || httpStatus === 429)
+          errorCategory = 'rate_limit';
+        else if (/context.*(?:limit|exceeded|window)|too many tokens/i.test(diagnosticBuffer))
+          errorCategory = 'context_limit';
+        else if (/model.*(?:not found|not available|not supported|does not exist)/i.test(diagnosticBuffer))
+          errorCategory = 'model_unavailable';
+        else if (transport !== 'none') errorCategory = transport;
+        else if (httpStatus >= 500) errorCategory = 'server_error';
+        else if (httpStatus >= 400) errorCategory = 'invalid_request';
       };
       child.stderr.on('data', noteDiagnostic);
       child.stdin.on('error', () => {});
       child.on('error', () => {
+        failureReason = 'cli_unavailable';
         failure = true;
       });
       child.stdout.on('data', (chunk) => {
         bytes += chunk.length;
         if (bytes > LIMIT) {
+          failureReason = 'output_limit';
           failure = true;
           kill();
           return;
@@ -202,10 +223,11 @@ async function decide(request) {
               )
             )
               failureReason = 'usage_limit';
-            if (
-              event.type === 'turn.failed' ||
-              ['command_execution', 'mcp_tool_call', 'web_search', 'file_change'].includes(event.item?.type)
-            ) {
+            if (['command_execution', 'mcp_tool_call', 'web_search', 'file_change'].includes(event.item?.type)) {
+              failureReason = 'forbidden_tool';
+              failure = true;
+              kill();
+            } else if (event.type === 'turn.failed') {
               failure = true;
               kill();
             }
@@ -226,6 +248,10 @@ async function decide(request) {
                 reason: failureReason,
                 lastEvent,
                 transport,
+                errorCategory,
+                httpStatus,
+                exitCode: code,
+                model: request.settings?.model,
               }),
               { mode: 0o600 },
             );
@@ -239,7 +265,7 @@ async function decide(request) {
       child.stdin.end(request.prompt);
     });
     const text = await readFile(output, 'utf8');
-    if (Buffer.byteLength(text) > LIMIT) throw Error('large');
+    if (Buffer.byteLength(text) > LIMIT) throw Error('output_limit');
     return { text, usage };
   } finally {
     await rm(directory, { recursive: true, force: true });
@@ -270,7 +296,13 @@ async function main() {
     process.stdout.write(
       JSON.stringify({
         ok: false,
-        error: ['usage_limit', 'timeout'].includes(error.message) ? error.message : 'failed',
+        error: ['usage_limit', 'timeout', 'forbidden_tool', 'output_limit', 'cli_unavailable'].includes(error.message)
+          ? error.message
+          : ['invalid', 'large'].includes(error.message)
+            ? 'invalid_request'
+            : error.code === 'ENOENT'
+              ? 'invalid_response'
+              : 'failed',
       }) + '\n',
     );
   }

@@ -124,7 +124,11 @@ heartbeats directly over SSH while running. An SSH disconnect stops the launcher
 and removes the container. Container creation completes synchronously before
 the background attach client is started, so cancellation cannot leave a late
 unregistered container behind. Cleanup also stops the Docker client. Metadata reads
-can retry a busy worker; game decisions are never automatically repeated.
+can retry a busy worker. The backend retries a failed Codex decision request once
+(local CLI failure, SSH failure, or worker `failed`). A second failure pauses the
+match for manual retry. Busy workers, usage limits, timeouts, invalid replies, and
+cancellation do not trigger an automatic decision retry. Update the worker before
+enabling backend retry so its distinct nonretryable error codes are available.
 
 The production VM successfully used its restricted key to retrieve the model
 catalog and weekly quota. An arbitrary `id` command was denied. A live SSH
@@ -174,7 +178,8 @@ the worker container exited and released its lock, confirming process cleanup;
 the reason Codex returned no decision remains unresolved. The worker now records
 only the latest failure in `state/avalon-last-failure.json` (mode 600): timestamp,
 elapsed time, a bounded reason, the last whitelisted event type, and a connection
-or authentication classification. It never stores prompts, replies, or raw CLI
+or authentication classification. Diagnostics also include a whitelisted error category,
+HTTP status (when detected), CLI exit code and selected model. It never stores prompts, replies, or raw CLI
 diagnostics. Network-isolated Linux regressions passed before this worker update.
 
 ## Two-slot worker (2026-10-11)

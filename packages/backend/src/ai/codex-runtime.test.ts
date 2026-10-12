@@ -76,3 +76,70 @@ test('runner uses the model and reasoning selected for this party', async () => 
   expect(args[args.indexOf('--model') + 1]).toBe('gpt-6-luna');
   expect(args).toContain('model_reasoning_effort="high"');
 });
+
+test.each([false, true])('local failed turn retries only once (alwaysFails=%s)', async (alwaysFails) => {
+  delete process.env.AI_CODEX_SSH_HOST;
+  let attempts = 0;
+  fakeChild((child, args) => {
+    attempts++;
+    const current = mockedSpawn.mock.results[attempts - 1].value;
+    if (attempts === 1 || alwaysFails) {
+      current.stdout.write(JSON.stringify({ type: 'turn.failed' }) + '\n');
+      child.emit('close', 1);
+    } else {
+      void writeFile(args[args.indexOf('-o') + 1], '{"choice":"approve","speech":"recovered"}').then(() =>
+        child.emit('close', 0),
+      );
+    }
+  });
+  const result = runCodex('game', codexSchema(['approve'], false));
+  if (alwaysFails) await expect(result).rejects.toThrow('could not complete');
+  else expect(JSON.parse((await result).text).speech).toBe('recovered');
+  expect(attempts).toBe(2);
+});
+
+test.each(['error', 'turn.failed'])('local usage limit in %s pauses without retry', async (eventType) => {
+  delete process.env.AI_CODEX_SSH_HOST;
+  let attempts = 0;
+  fakeChild((child) => {
+    attempts++;
+    mockedSpawn.mock.results[attempts - 1].value.stdout.write(
+      JSON.stringify({ type: eventType, error: { message: 'You have hit your usage limit' } }) + '\n',
+    );
+    if (eventType === 'error')
+      mockedSpawn.mock.results[attempts - 1].value.stdout.write(JSON.stringify({ type: 'turn.failed' }) + '\n');
+    child.emit('close', 1);
+  });
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toThrow('usage limit');
+  expect(attempts).toBe(1);
+});
+
+test('stop after a failed turn prevents the automatic retry', async () => {
+  delete process.env.AI_CODEX_SSH_HOST;
+  const controller = new AbortController();
+  let attempts = 0;
+  jest.spyOn(process, 'kill').mockImplementation(() => true);
+  fakeChild((child) => {
+    attempts++;
+    mockedSpawn.mock.results[attempts - 1].value.stdout.write(JSON.stringify({ type: 'turn.failed' }) + '\n');
+    controller.abort();
+    child.emit('close', 1);
+  });
+  await expect(runCodex('game', codexSchema(['approve'], false), controller.signal)).rejects.toThrow('cancelled');
+  expect(attempts).toBe(1);
+});
+
+test('a forbidden tool error cannot become retryable through a later failed-turn event', async () => {
+  delete process.env.AI_CODEX_SSH_HOST;
+  let attempts = 0;
+  jest.spyOn(process, 'kill').mockImplementation(() => true);
+  fakeChild((child) => {
+    attempts++;
+    const current = mockedSpawn.mock.results[attempts - 1].value;
+    current.stdout.write(JSON.stringify({ type: 'item.completed', item: { type: 'command_execution' } }) + '\n');
+    current.stdout.write(JSON.stringify({ type: 'turn.failed' }) + '\n');
+    child.emit('close', 1);
+  });
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toThrow('tool');
+  expect(attempts).toBe(1);
+});

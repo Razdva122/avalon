@@ -1,6 +1,6 @@
 import { execFile } from 'child_process';
 import { isAbsolute } from 'path';
-import { AiTechnicalPause } from './client';
+import { AiTechnicalPause, CodexRequestFailed } from './client';
 import { AI_REQUEST_TIMEOUT_MS } from './timing';
 
 export function hasRemoteCodex() {
@@ -80,13 +80,16 @@ export function remoteCodex(request: object, signal?: AbortSignal, attempt = 0):
       (error, stdout) => {
         if (error)
           return reject(
-            new AiTechnicalPause(signal?.aborted ? 'Codex request cancelled.' : 'Codex SSH request failed.'),
+            signal?.aborted
+              ? new AiTechnicalPause('Codex request cancelled.')
+              : error.killed
+                ? new AiTechnicalPause('Codex SSH request failed.')
+                : new CodexRequestFailed('Codex SSH request failed.'),
           );
         try {
           const response = JSON.parse(stdout);
           if (response.ok !== true) {
-            // Catalog and quota previews can arrive together. Retry only reads;
-            // game decisions must never be duplicated automatically.
+            // Retry busy metadata reads here; failed decisions get one retry in runCodex.
             if (
               response.error === 'busy' &&
               attempt < 3 &&
@@ -108,7 +111,7 @@ export function remoteCodex(request: object, signal?: AbortSignal, attempt = 0):
                   : response.error === 'timeout'
                     ? 'Codex response timed out. No action was applied; retry the match.'
                     : 'Codex worker request failed.';
-            return reject(new AiTechnicalPause(reason));
+            return reject(response.error === 'failed' ? new CodexRequestFailed(reason) : new AiTechnicalPause(reason));
           }
           resolve(response.result);
         } catch {

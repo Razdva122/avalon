@@ -101,3 +101,44 @@ test('worker timeouts show the stalled response reason rather than a generic SSH
   await executable(`process.stdin.resume();process.stdin.on('end',()=>console.log('{"ok":false,"error":"timeout"}'));`);
   await expect(remoteCodex({ operation: 'decide' })).rejects.toThrow('timed out');
 });
+
+test.each([false, true])('decision request failure retries exactly once (alwaysFails=%s)', async (alwaysFails) => {
+  const counter = join(directory, 'decision-attempts');
+  await writeFile(counter, '0');
+  await executable(
+    `const fs=require('node:fs');const path=${JSON.stringify(counter)};let input='';process.stdin.on('data',d=>input+=d);process.stdin.on('end',()=>{const n=Number(fs.readFileSync(path))+1;fs.writeFileSync(path,String(n));console.log(JSON.stringify(n===1||${alwaysFails}?{ok:false,error:'failed'}:{ok:true,result:{text:'{"choice":"approve","speech":"recovered"}',usage:{input_tokens:7}}}))});`,
+  );
+  const result = runCodex('game', codexSchema(['approve'], false));
+  if (alwaysFails) await expect(result).rejects.toThrow('request failed');
+  else expect(JSON.parse((await result).text).speech).toBe('recovered');
+  expect(await readFile(counter, 'utf8')).toBe('2');
+});
+
+test.each([
+  'busy',
+  'usage_limit',
+  'timeout',
+  'forbidden_tool',
+  'output_limit',
+  'cli_unavailable',
+  'invalid_request',
+  'invalid_response',
+])('decision %s does not trigger automatic retry', async (error) => {
+  const counter = join(directory, 'decision-attempts');
+  await writeFile(counter, '0');
+  await executable(
+    `const fs=require('node:fs');const path=${JSON.stringify(counter)};process.stdin.resume();process.stdin.on('end',()=>{fs.writeFileSync(path,String(Number(fs.readFileSync(path))+1));console.log(JSON.stringify({ok:false,error:${JSON.stringify(error)}}))});`,
+  );
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toThrow();
+  expect(await readFile(counter, 'utf8')).toBe('1');
+});
+
+test('SSH request failure also gets exactly one retry', async () => {
+  const counter = join(directory, 'decision-attempts');
+  await writeFile(counter, '0');
+  await executable(
+    `const fs=require('node:fs');const path=${JSON.stringify(counter)};process.stdin.resume();process.stdin.on('end',()=>{const n=Number(fs.readFileSync(path))+1;fs.writeFileSync(path,String(n));if(n===1)process.exit(1);console.log(JSON.stringify({ok:true,result:{text:'{"choice":"approve","speech":"recovered"}',usage:{}}}))});`,
+  );
+  expect(JSON.parse((await runCodex('game', codexSchema(['approve'], false))).text).speech).toBe('recovered');
+  expect(await readFile(counter, 'utf8')).toBe('2');
+});

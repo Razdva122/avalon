@@ -3,7 +3,7 @@ import { mkdtemp, writeFile, readFile, rm } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
-import { AiTechnicalPause, parseReply, parseDecisionReply } from './client';
+import { AiTechnicalPause, CodexRequestFailed, parseReply, parseDecisionReply } from './client';
 import type { BotRequest, GenerationOptions } from './client';
 import type { AiRepository, AiRequestLog, AiDecisionTrace } from './repository';
 import type { CodexSettings } from '@avalon/types';
@@ -76,6 +76,15 @@ export type CodexRunner = (
 ) => Promise<{ text: string; usage: Usage }>;
 
 export const runCodex: CodexRunner = async (prompt, schema, signal, settings) => {
+  try {
+    return await runCodexOnce(prompt, schema, signal, settings);
+  } catch (error) {
+    if (!(error instanceof CodexRequestFailed) || signal?.aborted) throw error;
+    return runCodexOnce(prompt, schema, signal, settings);
+  }
+};
+
+const runCodexOnce: CodexRunner = async (prompt, schema, signal, settings) => {
   signal?.throwIfAborted();
   if (hasRemoteCodex()) {
     const result = (await remoteCodex({ operation: 'decide', prompt, schema, settings }, signal)) as {
@@ -167,7 +176,7 @@ export const runCodex: CodexRunner = async (prompt, schema, signal, settings) =>
         ],
         { env, detached: process.platform !== 'win32', stdio: ['pipe', 'pipe', 'pipe'] },
       );
-      let failure: string | undefined;
+      let failure: AiTechnicalPause | undefined;
       let pending = '';
       let bytes = 0;
       let tokens: Usage = {};
@@ -180,18 +189,18 @@ export const runCodex: CodexRunner = async (prompt, schema, signal, settings) =>
         }
       };
       const abort = () => {
-        failure = 'Codex request cancelled.';
+        failure = new AiTechnicalPause('Codex request cancelled.');
         kill();
       };
       signal?.addEventListener('abort', abort, { once: true });
       const timer = setTimeout(() => {
-        failure = 'Codex response timed out. Retry the match.';
+        failure = new AiTechnicalPause('Codex response timed out. Retry the match.');
         kill();
       }, AI_REQUEST_TIMEOUT_MS);
       child.stdout.on('data', (data: Buffer) => {
         bytes += data.length;
         if (bytes > 4 * 1024 * 1024) {
-          failure = 'Codex output limit exceeded.';
+          failure = new AiTechnicalPause('Codex output limit exceeded.');
           kill();
           return;
         }
@@ -206,13 +215,24 @@ export const runCodex: CodexRunner = async (prompt, schema, signal, settings) =>
             continue;
           }
           if (event.type === 'turn.completed') tokens = event.usage || {};
-          if (event.type === 'turn.failed')
-            failure = 'Codex could not complete the request. Check ChatGPT login and usage limits, then retry.';
+          if (
+            ['error', 'turn.failed'].includes(event.type) &&
+            /(?:hit|reached|exceeded) your usage limit|usage_limit_reached/i.test(
+              event.error?.message || event.message || '',
+            )
+          )
+            failure = new AiTechnicalPause(
+              'Codex subscription usage limit reached. Wait for the limit to reset, then retry the match.',
+            );
+          else if (event.type === 'turn.failed' && !failure)
+            failure = new CodexRequestFailed(
+              'Codex could not complete the request. Check ChatGPT login and usage limits, then retry.',
+            );
           if (
             event.item &&
             ['command_execution', 'mcp_tool_call', 'web_search', 'file_change'].includes(event.item.type)
           ) {
-            failure = 'Codex attempted to use a tool instead of returning a game decision.';
+            failure = new AiTechnicalPause('Codex attempted to use a tool instead of returning a game decision.');
             kill();
           }
         }
@@ -222,13 +242,13 @@ export const runCodex: CodexRunner = async (prompt, schema, signal, settings) =>
       child.stdin.on('error', () => {});
       child.stdin.end(prompt);
       child.on('error', () => {
-        failure = 'Codex CLI unavailable. Check AI_CODEX_BIN and sign in with ChatGPT.';
+        failure = new AiTechnicalPause('Codex CLI unavailable. Check AI_CODEX_BIN and sign in with ChatGPT.');
       });
       child.on('close', (code) => {
         clearTimeout(timer);
         signal?.removeEventListener('abort', abort);
         if (failure || code !== 0)
-          reject(new AiTechnicalPause(failure || 'Codex failed. Check ChatGPT login and usage limits, then retry.'));
+          reject(failure || new CodexRequestFailed('Codex failed. Check ChatGPT login and usage limits, then retry.'));
         else resolve(tokens);
       });
       if (signal?.aborted) abort();

@@ -46,6 +46,7 @@ export type BotReply = {
 export type Decide = (request: BotRequest, signal?: AbortSignal) => Promise<BotReply>;
 export class AiPause extends Error {}
 export class AiTechnicalPause extends AiPause {}
+export class CodexRequestFailed extends AiTechnicalPause {}
 
 export const ladyTransferPreference =
   'When legal inspection targets offer comparable information and tactical value, Good should prefer passing the Lady to a player supported as Good by reliable evidence. The inspected player becomes the next holder: keeping the Lady with Good helps build a directed trust chain through subsequent truthful checks. If the Lady reaches Evil, later announcements from that holder are untrusted testimony and cannot extend that chain without independent reliable support. This does not invalidate earlier reliable checks. This is a tie-breaker, not a reason to ignore a more decisive inspection or proven facts. Unknown is not confirmed Good; an untrusted public Good claim alone is not reliable evidence. Evil should choose for its own side, including taking control of the Lady or disrupting Good trust, rather than preserving a Good trust chain.';
