@@ -682,6 +682,7 @@ h1 {
   opacity: 1;
 }
 .games-list {
+  container: lobby-games / inline-size;
   display: grid;
   gap: 8px;
 }

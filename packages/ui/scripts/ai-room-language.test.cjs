@@ -894,9 +894,10 @@ test('AI lobby cards show the actual mixed table size and saved beginner mode', 
   });
   t.after(room.stop);
   assert.ok(room.html.includes('1 человек + 5 ботов'));
-  assert.ok(room.html.includes('Для новичков'));
+  assert.ok(room.html.includes('С подсказками'));
+  assert.ok(!room.html.includes('players-amount'), 'roster replaces the redundant AI player count');
   assert.ok(room.html.includes('Победа зла'));
-  assert.ok(room.html.includes('Обсуждение'));
+  assert.ok(room.html.includes('Открыть'));
   assert.ok(!room.html.includes('<i aria-hidden="true">'), 'finished cards have no live dot');
 });
 
@@ -919,7 +920,7 @@ test('AI lobby shows saved smart difficulty and a live-only indicator', async (t
     },
   });
   t.after(room.stop);
-  assert.ok(room.html.includes('Умные боты'));
+  assert.ok(room.html.includes('Умные'));
   assert.ok(room.html.includes('1 человек + 7 ботов'));
   assert.ok(room.html.includes('<i aria-hidden="true">'));
   assert.ok(room.html.includes('Смотреть'));

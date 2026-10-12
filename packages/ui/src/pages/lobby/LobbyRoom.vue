@@ -20,12 +20,6 @@
         ></span>
         <div class="ai-heading">
           <span class="ai-title">{{ aiTitle }}</span>
-          <div class="ai-meta">
-            <span>{{ aiRosterLabel }}</span>
-            <span v-if="game.aiOpenSeats" class="ai-open-seat">{{ $t('aiArena.cardFriendSeatOpen') }}</span>
-            <span class="ai-language">{{ aiLanguageLabel }}</span>
-            <span v-if="aiModeLabel" class="ai-mode">{{ aiModeLabel }}</span>
-          </div>
         </div>
       </div>
       <div v-if="!game.ai" class="game-name">
@@ -35,13 +29,19 @@
         }}</span>
         <span class="host-name">{{ userName }}</span>
       </div>
-      <OptionsPreview
-        v-if="hasOptions"
-        :linked="false"
-        :max-view="5"
-        :roles="game.options.roles"
-        :addons="game.options.addons"
-      />
+    </div>
+    <OptionsPreview
+      v-if="hasOptions"
+      :linked="false"
+      :max-view="5"
+      :roles="game.options.roles"
+      :addons="game.options.addons"
+    />
+    <div v-if="game.ai" class="ai-meta">
+      <span>{{ aiRosterLabel }}</span>
+      <span v-if="game.aiOpenSeats" class="ai-open-seat">{{ $t('aiArena.cardFriendSeatOpen') }}</span>
+      <span class="ai-language">{{ aiLanguageLabel }}</span>
+      <span v-if="aiModeLabel" class="ai-mode">{{ aiModeLabel }}</span>
     </div>
     <span class="game-status" :class="{ 'game-status--recruiting': isRecruiting }">
       <span v-if="isRecruiting" class="material-icons recruitment-icon" aria-hidden="true">person_add</span>
@@ -55,7 +55,7 @@
       </template>
       <span v-else>{{ $t(`mainPage.${status}`) }}</span>
     </span>
-    <span class="players-amount" :aria-label="`${game.players} ${$t('mainPage.players')}`">
+    <span v-if="!game.ai" class="players-amount" :aria-label="`${game.players} ${$t('mainPage.players')}`">
       <span class="material-icons" aria-hidden="true">group</span>
       {{ game.state === 'created' && !game.result ? `${game.players}/10` : game.players }}
     </span>
@@ -106,10 +106,10 @@ const aiModeLabel = computed(() =>
   game.value.aiBeginner
     ? t('aiArena.cardBeginner')
     : game.value.aiBotDifficulty
-      ? t(game.value.aiBotDifficulty === 'smart' ? 'aiArena.botSmart' : 'aiArena.botRegular')
+      ? t(game.value.aiBotDifficulty === 'smart' ? 'aiArena.cardSmart' : 'aiArena.cardRegular')
       : '',
 );
-const aiAction = computed(() => t(`aiArena.${game.value.aiStatus === 'running' ? 'cardWatch' : 'cardDiscussion'}`));
+const aiAction = computed(() => t(game.value.aiStatus === 'running' ? 'aiArena.cardWatch' : 'mainPage.viewGame'));
 const canJoin = computed(
   () => !game.value.ai && !game.value.result && game.value.state === 'created' && game.value.players < 10,
 );
@@ -131,9 +131,9 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
 .game {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 132px 58px 140px;
+  grid-template-columns: minmax(0, 1fr) 140px 132px 58px 100px;
   align-items: center;
-  gap: 12px;
+  gap: 4px 12px;
   min-height: 58px;
   padding: 8px 14px;
   border: 1px solid rgba(var(--v-theme-text-primary), 0.06);
@@ -148,37 +148,37 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
   background: rgb(var(--v-theme-inset-hover));
 }
 .game-info {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+.game-name,
+.ai-identity {
   min-width: 0;
   display: flex;
   align-items: center;
-  flex-wrap: nowrap;
   gap: 8px;
 }
-.game-name {
+.host-name,
+.ai-title {
   min-width: 0;
-  flex: 0 1 auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.game-info:has(.game-options) .game-name {
-  max-width: 45%;
-}
-.host-name {
   font-size: 14px;
   font-weight: 600;
-  @include text-overflow(1);
+  line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   display: block;
 }
 .room-icon {
-  flex-shrink: 0;
+  flex: 0 0 24px;
   font-size: 20px;
+  text-align: center;
   opacity: 0.5;
 }
 .game-status {
+  grid-column: 3;
+  grid-row: 1;
   min-width: 0;
   font-size: 11px;
   color: rgba(var(--v-theme-text-primary), 0.65);
@@ -203,6 +203,8 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
   color: rgb(var(--v-theme-success));
 }
 .players-amount {
+  grid-column: 4;
+  grid-row: 1;
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -215,11 +217,13 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
   opacity: 0.5;
 }
 .room-link {
+  grid-column: 5;
+  grid-row: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 38px;
+  min-height: 44px;
   padding: 8px;
   border-radius: 8px;
   font-size: 12px;
@@ -234,7 +238,8 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
   outline-offset: 3px;
 }
 .game :deep(.game-options) {
-  flex: 1 1 0;
+  grid-column: 2;
+  grid-row: 1;
   min-width: 0;
   flex-wrap: nowrap;
   overflow-x: auto;
@@ -245,54 +250,35 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
   flex-shrink: 0;
 }
 .game--ai {
-  min-height: 84px;
-  grid-template-columns: minmax(0, 1fr) 148px 48px 116px;
-  padding: 12px 16px;
-  border-color: rgba(var(--v-theme-text-primary), 0.12);
+  min-height: 72px;
 }
-.game--ai:hover {
-  border-color: rgba(var(--v-theme-primary), 0.4);
-}
-.game--ai .game-info {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-}
-.ai-identity {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
+.game--ai .game-status,
+.game--ai .room-link {
+  grid-row: 1 / 3;
 }
 .ai-emblem {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  flex: 0 0 32px;
-  border-radius: 8px;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border-radius: 6px;
   background: rgba(var(--v-theme-primary), 0.08);
   color: rgb(var(--v-theme-primary));
 }
 .ai-heading {
-  display: grid;
-  gap: 5px;
   min-width: 0;
 }
-.ai-title {
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 .ai-meta {
+  grid-column: 1 / 3;
+  grid-row: 2;
+  min-width: 0;
+  padding-left: 32px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 8px;
-  font-size: 12px;
+  gap: 4px 8px;
+  font-size: 11px;
   line-height: 1.4;
   color: rgba(var(--v-theme-text-primary), 0.7);
 }
@@ -300,8 +286,8 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
 .ai-mode {
   display: inline-flex;
   align-items: center;
-  min-height: 22px;
-  padding: 2px 6px;
+  min-height: 20px;
+  padding: 1px 5px;
   border-radius: 4px;
   font-size: 11px;
   line-height: 16px;
@@ -312,6 +298,9 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
 }
 .ai-mode {
   background: rgba(var(--v-theme-primary), 0.1);
+  color: rgb(var(--v-theme-primary));
+}
+.ai-open-seat {
   color: rgb(var(--v-theme-primary));
 }
 .ai-status {
@@ -331,88 +320,61 @@ const action = computed(() => (game.value.result ? 'viewGame' : canJoin.value ? 
 }
 .ai-date {
   display: block;
-  margin-top: 5px;
+  margin-top: 4px;
   font-size: 11px;
-}
-.game--ai .room-link {
-  min-height: 44px;
-  white-space: nowrap;
-  color: rgb(var(--v-theme-primary));
-  background: rgba(var(--v-theme-primary), 0.06);
-}
-.game--ai :deep(.game-options) {
-  flex: none;
-  overflow: hidden;
-  gap: 0;
 }
 @import '@/styles/loyalty-icons.scss';
 .evil-loyalty-icon,
 .good-loyalty-icon {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
 }
-@media (max-width: 1100px) {
+@container lobby-games (max-width: 720px) {
   .game {
-    grid-template-columns: minmax(0, 1fr) 112px 48px 140px;
-    gap: 8px;
-    padding-right: 12px;
-  }
-}
-@media (max-width: 600px) {
-  .game {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 2px 12px;
+    grid-template-columns: minmax(0, 1fr) 112px 104px 40px 80px;
+    column-gap: 8px;
     padding: 8px 12px;
   }
+  .game--recruiting {
+    padding-left: 10px;
+  }
+}
+@container lobby-games (max-width: 580px) {
+  .game {
+    grid-template-columns: minmax(0, 1fr) 112px;
+    gap: 6px 12px;
+  }
   .game-info {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    padding-right: 44px;
     min-height: 28px;
   }
+  .game :deep(.game-options) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .ai-meta {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
   .players-amount {
-    position: absolute;
-    right: 12px;
-    top: 14px;
+    grid-column: 1;
+    grid-row: 3;
+    margin-left: 32px;
   }
   .game-status {
     grid-column: 1;
     grid-row: 2;
+    margin-left: 32px;
   }
   .room-link {
     grid-column: 2;
-    grid-row: 2;
-    min-width: 104px;
-    min-height: 36px;
+    grid-row: 2 / 4;
+    justify-self: end;
+    min-width: 80px;
   }
-}
-@media (max-width: 1100px) {
-  .game--ai .game-info {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 6px;
-  }
-  .game--ai :deep(.game-options) {
-    margin-left: 42px;
-  }
-}
-@media (max-width: 600px) {
-  .game--ai {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 10px 12px;
-    padding: 12px;
-  }
-  .game--ai .game-info {
-    padding-right: 32px;
-  }
-  .ai-meta > span:first-child {
-    flex-basis: 100%;
-  }
-  .game--ai .players-amount {
-    top: 14px;
-  }
+  .game--ai .game-status,
   .game--ai .room-link {
-    min-width: 104px;
+    grid-row: 3;
   }
 }
 </style>
