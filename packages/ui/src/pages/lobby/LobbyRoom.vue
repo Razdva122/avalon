@@ -21,11 +21,8 @@
         <div class="ai-heading">
           <span class="ai-title">{{ aiTitle }}</span>
           <div class="ai-meta">
-            <span>{{
-              $t(game.aiTitle ? 'aiArena.mixedPlayerCount' : 'aiArena.playerCount', {
-                count: game.players - (game.aiTitle ? 1 : 0),
-              })
-            }}</span>
+            <span>{{ aiRosterLabel }}</span>
+            <span v-if="game.aiOpenSeats" class="ai-open-seat">{{ $t('aiArena.cardFriendSeatOpen') }}</span>
             <span class="ai-language">{{ aiLanguageLabel }}</span>
             <span v-if="aiModeLabel" class="ai-mode">{{ aiModeLabel }}</span>
           </div>
@@ -99,6 +96,12 @@ const aiStatusLabel = computed(() => {
 const aiTitle = computed(
   () => game.value.aiTitle?.replace(/ vs \d+ Bots$/, '') || t('aiArena.tagline', { count: game.value.players }),
 );
+const aiRosterLabel = computed(() => {
+  const humans = game.value.aiHumanCount ?? (game.value.aiTitle ? 1 : 0);
+  const bots = game.value.aiBotCount ?? game.value.players - humans;
+  if (humans > 1) return t('aiArena.cardHumanRoster', { humans, bots });
+  return t(humans === 1 ? 'aiArena.mixedPlayerCount' : 'aiArena.playerCount', { count: bots });
+});
 const aiModeLabel = computed(() =>
   game.value.aiBeginner
     ? t('aiArena.cardBeginner')

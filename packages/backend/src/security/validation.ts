@@ -161,10 +161,20 @@ export function validPacket(event: string, args: unknown[]): boolean {
     return (
       values.length === 0 ||
       (record(values[0]) &&
-        Object.keys(values[0]).every((key) => ['beginner', 'withFriend'].includes(key)) &&
+        Object.keys(values[0]).every((key) =>
+          ['beginner', 'withFriend', 'difficulty', 'language', 'playerCount'].includes(key),
+        ) &&
         typeof values[0].beginner === 'boolean' &&
         (values[0].withFriend === undefined || typeof values[0].withFriend === 'boolean') &&
-        !(values[0].beginner && values[0].withFriend))
+        (values[0].difficulty === undefined || ['regular', 'smart'].includes(values[0].difficulty as string)) &&
+        (values[0].language === undefined || ['en', 'ru', 'zh-tw'].includes(values[0].language as string)) &&
+        (values[0].playerCount === undefined || [5, 6, 7, 8].includes(values[0].playerCount as number)) &&
+        !(values[0].beginner && values[0].withFriend) &&
+        !(
+          values[0].beginner &&
+          ((values[0].difficulty !== undefined && values[0].difficulty !== 'regular') ||
+            (values[0].playerCount !== undefined && values[0].playerCount !== 5))
+        ))
     );
   if (event === 'startHumanAiRoom') {
     const options = values[1];

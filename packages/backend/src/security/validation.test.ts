@@ -120,3 +120,39 @@ test('friend room creation accepts a boolean mode and rejects malformed and begi
   expect(validPacket('createHumanAiRoom', [{ beginner: false, withFriend: 'yes' }, () => {}])).toBe(false);
   expect(validPacket('createHumanAiRoom', [{ beginner: true, withFriend: true }, () => {}])).toBe(false);
 });
+
+test('unified bot setup passes packet validation for all supported modes and sizes', () => {
+  for (const difficulty of ['regular', 'smart'])
+    for (const withFriend of [false, true])
+      for (const playerCount of [5, 6, 7, 8])
+        for (const language of ['en', 'ru', 'zh-tw'])
+          expect(
+            validPacket('createHumanAiRoom', [
+              { beginner: false, withFriend, difficulty, language, playerCount },
+              () => {},
+            ]),
+          ).toBe(true);
+  expect(
+    validPacket('createHumanAiRoom', [
+      { beginner: true, withFriend: false, difficulty: 'regular', language: 'en', playerCount: 5 },
+      () => {},
+    ]),
+  ).toBe(true);
+});
+
+test.each([
+  { difficulty: 'unknown' },
+  { language: 'xx' },
+  { playerCount: '7' },
+  { playerCount: 9 },
+  { unknown: true },
+  { beginner: true, difficulty: 'smart' },
+  { beginner: true, playerCount: 6 },
+])('unified bot setup rejects malformed options %j', (invalid) => {
+  expect(
+    validPacket('createHumanAiRoom', [
+      { beginner: false, withFriend: false, difficulty: 'regular', language: 'en', playerCount: 5, ...invalid },
+      () => {},
+    ]),
+  ).toBe(false);
+});

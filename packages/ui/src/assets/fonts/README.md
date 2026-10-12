@@ -19,4 +19,4 @@ instead of constructing them from fragments.
 
 `node --test packages/ui/scripts/material-icons.test.cjs` checks coverage against
 current source and Vuetify without Python dependencies. The original font was
-125,116 bytes; this subset is 13,128 bytes (89.5% smaller).
+125,116 bytes; this subset is 14,124 bytes (88.7% smaller).

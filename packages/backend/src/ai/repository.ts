@@ -1,4 +1,4 @@
-import { aiPlayedModel } from '@avalon/types';
+import { aiPlayedModel, aiRosterInfo } from '@avalon/types';
 import { AI_LEASE_MS } from './timing';
 import { calculateAiRatings } from './ratings';
 import { AI_PROFILE_RATING_SEASON } from './rating-season';
@@ -323,6 +323,7 @@ export class AiRepository {
         aiStatus: state.ai?.status,
         aiModel: aiPlayedModel(state.ai),
         aiTitle: state.ai?.title,
+        ...aiRosterInfo(state.ai, state.players.length),
         aiBeginner: state.ai?.beginner,
         aiBotDifficulty: state.ai?.botDifficulty,
         aiLanguage: state.ai?.language ?? 'en',

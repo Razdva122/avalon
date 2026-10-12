@@ -195,9 +195,6 @@
 .material-icons.dangerous::before {
   content: '\e99a';
 }
-.material-icons.dark_mode::before {
-  content: '\e51c';
-}
 .material-icons.dataset::before {
   content: '\f8ee';
 }
@@ -404,9 +401,6 @@
 }
 .material-icons.light::before {
   content: '\f02a';
-}
-.material-icons.light_mode::before {
-  content: '\e518';
 }
 .material-icons.link::before {
   content: '\e157';
@@ -653,6 +647,9 @@
 }
 .material-icons.shuffle::before {
   content: '\e043';
+}
+.material-icons.smart_toy::before {
+  content: '\f06c';
 }
 .material-icons.sort::before {
   content: '\e164';

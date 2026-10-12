@@ -55,6 +55,8 @@ export type AiRoomState = {
   publicBotGame?: boolean;
   /** Beginner-only five-seat match with simpler bot communication. */
   beginner?: boolean;
+  /** Settings chosen before creating the prepared public room. */
+  preparedDifficulty?: AiBotDifficulty;
   title?: string;
   launchExpiresAt?: number;
   humanActionExpiresAt?: number;
@@ -89,6 +91,7 @@ export type AiRoomState = {
 };
 
 export { aiPlayedModel } from './ai-model';
+export { aiRosterInfo } from './ai-roster';
 
 export class BaseRoomState {
   public ai?: AiRoomState;
@@ -202,7 +205,8 @@ export type AiSpectatorDecision = {
 };
 
 export interface CodexWeeklyLimit {
-  shortTerm?: { remainingPercent: number; resetsAt: number | null };
+  // null: provider explicitly reports no short window; undefined: data unavailable.
+  shortTerm?: { remainingPercent: number; resetsAt: number | null } | null;
   remainingPercent: number;
   resetsAt: number | null;
   checkedAt: number;

@@ -1,4 +1,4 @@
-import { aiPlayedModel } from '@avalon/types';
+import { aiPlayedModel, aiRosterInfo } from '@avalon/types';
 import type {
   AiBotDifficulty,
   AiLanguage,
@@ -33,11 +33,10 @@ function humanModeAvailable(difficulty: AiBotDifficulty, quota: CodexWeeklyLimit
   const settings = humanSettings[difficulty];
   return (
     typeof weekly === 'number' &&
-    typeof short === 'number' &&
     Number.isFinite(weekly) &&
-    Number.isFinite(short) &&
     weekly > (difficulty === 'smart' ? 5 : 2) &&
-    short > (difficulty === 'smart' ? 80 : 20) &&
+    (quota?.shortTerm === null ||
+      (typeof short === 'number' && Number.isFinite(short) && short > (difficulty === 'smart' ? 80 : 20))) &&
     models.some((model) => model.id === settings.model && model.efforts.includes(settings.reasoning))
   );
 }
@@ -50,6 +49,7 @@ function humanModeAvailableAt(difficulty: AiBotDifficulty, quota: CodexWeeklyLim
     [quota, difficulty === 'smart' ? 5 : 2],
     [quota?.shortTerm, difficulty === 'smart' ? 80 : 20],
   ] as const) {
+    if (window === null && quota?.shortTerm === null) continue;
     if (!window || !Number.isFinite(window.remainingPercent)) return;
     if (window.remainingPercent <= threshold) {
       if (!window.resetsAt || !Number.isFinite(window.resetsAt) || window.resetsAt * 1000 <= Date.now()) return;
@@ -178,6 +178,7 @@ export class AiService {
       0,
       language,
       playerCount,
+      10000,
     );
     room.ai!.model = CODEX_MODEL;
     room.renewLease = () => this.repository!.renewLease(id);
@@ -218,6 +219,7 @@ export class AiService {
             aiStatus: room.ai?.status,
             aiModel: aiPlayedModel(room.ai),
             aiTitle: room.ai?.title,
+            ...aiRosterInfo(room.ai, room.players.length),
             aiBeginner: room.ai?.beginner,
             aiBotDifficulty: room.ai?.botDifficulty,
             aiLanguage: room.ai?.language ?? 'en',
@@ -333,15 +335,31 @@ export class AiService {
       const cb = args[args.length - 1] as (result: { roomID: string } | { error: string }) => void;
       if (typeof cb !== 'function') return;
       const options =
-        args.length === 1 ? { beginner: false } : (args[0] as { beginner: boolean; withFriend?: boolean });
+        args.length === 1
+          ? { beginner: false }
+          : (args[0] as {
+              beginner: boolean;
+              withFriend?: boolean;
+              difficulty?: AiBotDifficulty;
+              language?: AiLanguage;
+              playerCount?: AiPlayerCount;
+            });
       if (
         !options ||
         typeof options !== 'object' ||
         Array.isArray(options) ||
-        Object.keys(options).some((key) => !['beginner', 'withFriend'].includes(key)) ||
+        Object.keys(options).some(
+          (key) => !['beginner', 'withFriend', 'difficulty', 'language', 'playerCount'].includes(key),
+        ) ||
         typeof options.beginner !== 'boolean' ||
         (options.withFriend !== undefined && typeof options.withFriend !== 'boolean') ||
-        (options.beginner && options.withFriend === true)
+        (options.beginner && options.withFriend === true) ||
+        (options.difficulty !== undefined && !['regular', 'smart'].includes(options.difficulty)) ||
+        (options.language !== undefined && !['en', 'ru', 'zh-tw'].includes(options.language)) ||
+        (options.playerCount !== undefined && ![5, 6, 7, 8].includes(options.playerCount)) ||
+        (options.beginner &&
+          ((options.difficulty !== undefined && options.difficulty !== 'regular') ||
+            (options.playerCount !== undefined && options.playerCount !== 5)))
       )
         return cb({ error: 'Invalid bot room options' });
       let claimedID: string | undefined;
@@ -349,6 +367,8 @@ export class AiService {
       let locked = false;
       try {
         if (!(await this.canPlay(userID))) return cb({ error: 'AI room access denied' });
+        if ((options.playerCount ?? 5) >= 7 && !(await this.canPlayLargeTables(userID!)))
+          return cb({ error: 'Premium is required for seven or eight players' });
         const active = this.active();
         if (active)
           return cb(
@@ -360,22 +380,30 @@ export class AiService {
         if (Object.keys(this.manager.rooms).length >= 500) return cb({ error: 'Room limit reached' });
         this.creating = locked = true;
         const modes = await this.humanModes();
-        if (options.beginner ? !modes.regular : !modes.smart && !modes.regular)
+        if (
+          options.difficulty
+            ? !modes[options.difficulty]
+            : options.beginner
+              ? !modes.regular
+              : !modes.smart && !modes.regular
+        )
           return cb({ error: 'Bot games are currently unavailable' });
         const profile = await this.manager.dbManager.getUserByID(userID!);
         if (Object.keys(this.manager.rooms).length >= 500) return cb({ error: 'Room limit reached' });
         const id = randomUUID();
         await this.repository!.claim(id);
         claimedID = id;
-        const room = (createdRoom = this.createRoom(id, userID!, 'en', 5));
+        const room = (createdRoom = this.createRoom(id, userID!, options.language ?? 'en', options.playerCount ?? 5));
         room.ai!.publicBotGame = true;
         room.ai!.beginner = options.beginner;
+        room.ai!.preparedDifficulty = options.difficulty;
         if (options.withFriend) room.ai!.withFriend = true;
-        room.ai!.title = `${typeof profile.name === 'string' && profile.name.trim() ? profile.name : userID} vs 4 Bots`;
-        room.ai!.launchExpiresAt = Date.now() + 90000;
+        room.ai!.title = `${typeof profile.name === 'string' && profile.name.trim() ? profile.name : userID} vs ${(options.playerCount ?? 5) - (options.withFriend ? 2 : 1)} Bots`;
+        const preparationMs = options.withFriend ? 120000 : 60000;
+        room.ai!.launchExpiresAt = Date.now() + preparationMs;
         room.joinAsHuman(userID!);
         this.manager.rooms[id] = room;
-        const timer = setTimeout(() => void this.expireLaunch(room).catch(() => {}), 90000);
+        const timer = setTimeout(() => void this.expireLaunch(room).catch(() => {}), preparationMs);
         timer.unref();
         this.launchTimers.set(id, timer);
         this.manager.updateRoomsList(room);
@@ -414,6 +442,13 @@ export class AiService {
           return cb({ error: 'Invalid bot mode or language' });
         if (room.ai!.withFriend && room.humanIDs.length !== 2)
           return cb({ error: 'Wait for your friend to join before launch' });
+        if (
+          room.ai!.preparedDifficulty &&
+          (options.difficulty !== room.ai!.preparedDifficulty ||
+            options.language !== room.ai!.language ||
+            (options.playerCount ?? 5) !== room.ai!.playerCount)
+        )
+          return cb({ error: 'The prepared bot settings cannot be changed at launch' });
         const playerCount = options.playerCount ?? 5;
         if (room.ai!.beginner && (options.difficulty !== 'regular' || playerCount !== 5))
           return cb({ error: 'Beginner games require regular bots and five players' });

@@ -2,39 +2,43 @@
 
 [Documentation index](README.md) · [Production configuration](../deploy/ai-production.md)
 
-AI rooms support public matches with one human and 4–7 bots, and spectator
-games with 5, 6, 7 or 8 bots (default: seven). A signed-in player sees “Play with
-bots” next to “Create room” when at least one mode is available. It opens a
-prepared room named `Username vs 4 Bots`, with the owner already seated. On the
-table, the owner chooses the discussion language and starts with “Smart bots”
-or “Regular bots”; regular bots are described as useful for understanding the
-principles of the game. The language defaults to the user's interface language
-when supported, otherwise English. The standard table offers 5, 6, 7 or 8 total players beside the bot modes before launch.
-Five and six seats are available to all eligible players; seven and eight require
-Premium. The server checks the donation/manual-grant entitlement at launch,
-independently of the visible Premium badge. A prepared room initially has five
-seats; starting applies the selected size, roles and Lady of the Lake settings.
-The first welcome in-app entry instead creates a beginner table: one human,
-four regular bots, automatic discussion language and a single Start button.
-Beginner prompts use plain language, one idea at a time and concrete public
-reasons, with fewer elaborate bluffs; secrecy and each side's winning objective
-still apply. Preparing a room makes no inference request.
-An owner can return to their existing room without creating another.
-Only one AI room can reserve the shared slot at a time, including preparation,
-active play and technical pauses. Other players cannot create or start another
-AI match while that slot is occupied.
+AI rooms support public matches with one or two humans and the remaining
+seats filled by bots, and administrator spectator games with 5–8 bots.
+“Play with AI” stays visible and clickable in the lobby, including for guests,
+while checking access, and when every bot mode is unavailable. It opens a setup
+dialog before reserving a room. Owners of an existing match return to that room.
 
-Administrators retain the separate arena controls for creating and managing
-spectator games. Before launch, the database-admin owner can take one seat,
-replacing one bot while preserving the selected table size. Other humans cannot
-join an existing room. Spectators see the board, public chat and optional AI
-role/decision reveal in games containing only bots.
+Setup offers Solo / With a friend, regular bots, stronger opponents, and a compact
+solo-only First game option. The discussion language defaults to the supported
+interface language or English. Total seats are 5, 6, 7 or 8; 7/8 display Premium
+and require the server-checked entitlement. Unavailable modes remain visible as
+locked choices; one notification explains mode availability, known recovery hours,
+or that the shared slot is occupied. Guests can reach authentication from setup.
 
-Mixed games pause at the human seat in each public discussion circle. The “Your turn to speak” prompt waits for a new human text message without opening chat automatically; a persisted message continues the circle, or “Pass turn” skips the speech. Team submission stays disabled until the circle finishes. Mixed games also wait for the human’s ordinary board actions and include their
-public chat in bot context. Role/decision reveal is disabled for everyone in a
-mixed room. Mixed games award neither human nor AI profile ratings.
-Spectator messages are not passed to the bots. AI games use their own profile
-statistics/rating pool and do not award human ratings or ordinary achievements. A human victory in a completed AI match unlocks the dedicated open `ai_win` achievement and the Morgana “Not me, please!” sticker; both regular and smart bots qualify.
+Create game saves the selected language, size and `preparedDifficulty` in the
+ready room without making an inference request. The owner is already seated.
+Solo preparation expires after 60 seconds; friend preparation after 120 seconds.
+Before launch, the owner can remove the guest using the Remove player button or
+the guest avatar. This frees the reserved seat for another player without resetting
+the preparation deadline. Bots and the owner cannot be removed from AI tables.
+Lobby and archive cards count human players, bots and reserved empty seats separately;
+joining or removing the guest updates the live roster immediately.
+The friend’s reserved seat appears empty until a second authenticated human joins
+through the room link. The owner starts with one Start match button using the saved
+settings. Launch rechecks quota and Premium; prepared settings cannot be altered
+by a different launch payload. Legacy preparation without saved settings retains
+its original table controls. Only one AI room reserves the shared slot at a time,
+including preparation, active play and technical pauses.
+
+Administrators retain their separate spectator arena controls. Before launch,
+the administrator owner can replace one bot with a human seat. Role/decision
+reveal is available only in games containing bots exclusively, never in mixed games.
+
+Mixed games wait for human discussion and board actions. A persisted public text
+message continues discussion, or Pass turn skips it. Spectator messages are not
+passed to bots. AI games use their own statistics pool; mixed games do not change
+ordinary human ratings. A completed human victory against either bot difficulty
+unlocks the dedicated `ai_win` achievement and Morgana sticker.
 
 ## Table and characters
 
@@ -87,7 +91,9 @@ Discussion language is `en`, `ru` or `zh-tw`, with English as the legacy default
 The UI itself supports six languages. Unsupported model, language and table size
 are rejected before room reservation. Public bot play accepts
 `createHumanAiRoom(callback)` (standard) or
-`createHumanAiRoom({ beginner: true }, callback)` (beginner); the callback returns a `roomID` or an `error`.
+`createHumanAiRoom({ beginner: true }, callback)` (legacy beginner); the callback returns a `roomID` or an `error`.
+The setup dialog passes `{ beginner, withFriend, difficulty, language, playerCount }`
+to `createHumanAiRoom` to save the prepared settings.
 `startHumanAiRoom(roomID, { difficulty: 'smart' | 'regular', language, playerCount?: 5 | 6 | 7 | 8 }, callback)`
 starts the same prepared room and returns `ok: true` or an `error`. The server
 chooses the model and reasoning effort, validates table size and Premium, and
@@ -150,8 +156,9 @@ Codex catalog. Public play uses these fixed server presets:
 
 Both thresholds are strict: equality does not allow a new match. The selected
 preset must also be supported by the authenticated model catalog. Missing or
-invalid quota data, including an absent five-hour window, disables public
-starts. Availability and start admission share the same backend quota snapshot;
+invalid quota data disables public starts. If Codex explicitly reports a
+weekly-only account (the other window is null), only the weekly threshold applies;
+an omitted or malformed window still prevents admission. Availability and start admission share the same backend quota snapshot;
 the server checks eligibility again when a player starts a match. Public clients
 receive mode availability without the underlying percentages or account limits.
 
@@ -170,7 +177,7 @@ remaining quota prevents new starts rather than changing that preset mid-game.
 Technical continuation of an already started match does not reapply these
 admission thresholds; provider exhaustion can still pause the match.
 
-Public rooms allow 90 seconds to choose the language and launch after preparation.
+Public solo rooms allow 60 seconds to launch after creation; friend rooms allow 120 seconds to join and launch. Settings are chosen before creation.
 Every actual human discussion or board-action turn has 90 seconds plus the
 remaining shared five-minute reserve. Overtime on either kind of turn spends
 that reserve; it does not refill between turns. Once both run out, discussion

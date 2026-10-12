@@ -1,4 +1,4 @@
-import { aiPlayedModel } from '@avalon/types';
+import { aiPlayedModel, aiRosterInfo } from '@avalon/types';
 import { roomChannel, userChannel } from '@/helpers/channels';
 import { validID } from '@/security/validation';
 import { installSocketAdmission } from '@/security/socket-admission';
@@ -102,6 +102,7 @@ export class Manager {
         aiStatus: room.ai?.status,
         aiModel: aiPlayedModel(room.ai),
         aiTitle: room.ai?.title,
+        ...aiRosterInfo(room.ai, room.players.length),
         aiBeginner: room.ai?.beginner,
         aiBotDifficulty: room.ai?.botDifficulty,
         aiLanguage: room.ai ? (room.ai.language ?? 'en') : undefined,
@@ -141,6 +142,7 @@ export class Manager {
         aiStatus: room.ai?.status,
         aiModel: aiPlayedModel(room.ai),
         aiTitle: room.ai?.title,
+        ...aiRosterInfo(room.ai, room.players.length),
         aiBeginner: room.ai?.beginner,
         aiBotDifficulty: room.ai?.botDifficulty,
         aiLanguage: room.ai ? (room.ai.language ?? 'en') : undefined,
@@ -599,7 +601,15 @@ export class Manager {
 
     socket.on('kickPlayer', (uuid, kickUserID) => {
       const room = this.rooms[uuid];
-      if (room && !room.ai && room.leaderID === userID) {
+      const canKickGuest =
+        room instanceof BotRoom &&
+        room.ai?.publicBotGame &&
+        room.ai.withFriend &&
+        room.ai.status === 'ready' &&
+        room.data.stage === 'locked' &&
+        kickUserID !== room.leaderID &&
+        room.isHuman(kickUserID);
+      if (room && (!room.ai || canKickGuest) && room.leaderID === userID) {
         room.leaveGame(kickUserID);
 
         if (this.rooms[uuid]) {

@@ -9,13 +9,11 @@
         <h1 id="lobby-title">{{ $t('mainPage.header') }}</h1>
         <p class="lobby-intro">{{ $t('mainPage.intro') }}</p>
         <div class="lobby-actions">
-          <AiRoomButton />
           <v-btn class="create-room" color="primary" size="large" elevation="0" @click="createRoom">
             <span class="material-icons" aria-hidden="true">add</span>
             {{ $t('mainPage.createRoom') }}
           </v-btn>
           <BotRoomButton />
-          <BotRoomButton with-friend>{{ $t('aiArena.botPlayWithFriend') }}</BotRoomButton>
           <nav class="lobby-links" :aria-label="$t('menu.wiki')">
             <LocaleLink :to="{ name: 'rules' }"
               ><span class="link-label">{{ $t('wiki.rules') }}</span
@@ -183,7 +181,6 @@ import { isSocketError } from '@/helpers/socket-errors';
 import eventBus from '@/helpers/event-bus';
 import LobbyRoom from './LobbyRoom.vue';
 import SocialChannels from './SocialChannels.vue';
-import AiRoomButton from './AiRoomButton.vue';
 import BotRoomButton from './BotRoomButton.vue';
 import RotatingTopPlayer from '@/components/stats/RotatingTopPlayer.vue';
 import GiveawayBanner from '@/pages/support/GiveawayBanner.vue';
@@ -191,7 +188,6 @@ import GiveawayBanner from '@/pages/support/GiveawayBanner.vue';
 export default defineComponent({
   components: {
     GiveawayBanner,
-    AiRoomButton,
     BotRoomButton,
     LobbyRoom,
     SocialChannels,

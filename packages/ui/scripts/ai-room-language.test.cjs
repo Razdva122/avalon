@@ -14,6 +14,18 @@ function evaluate(source, load = require) {
   new Function('require', 'module', 'exports', code)(load, module, module.exports);
   return module.exports;
 }
+test('Premium crown renders an SVG from the registered icon set', () => {
+  const { fa } = evaluate(fs.readFileSync(path.join(__dirname, '../src/plugins/vuetify/icons.ts'), 'utf8'));
+  const icon = fa.component({ tag: 'i', icon: 'fa-solid fa-crown' });
+  assert.equal(icon.children[0]?.type, 'svg');
+  assert.ok(icon.children[0]?.children[0]?.props.d);
+});
+
+test('lobby uses the unified AI setup instead of the old arena creation panel', () => {
+  const lobby = fs.readFileSync(path.join(__dirname, '../src/pages/lobby/Lobby.vue'), 'utf8');
+  assert.doesNotMatch(lobby, /AiRoomButton/);
+  assert.match(lobby, /<BotRoomButton\s*\/>/);
+});
 const locales = ['en', 'ru', 'es', 'pt', 'zh_CN', 'zh_TW'];
 const community = evaluate(
   fs.readFileSync(path.join(__dirname, '../src/i18n/langs/pages/community.ts'), 'utf8'),
@@ -25,6 +37,7 @@ const messages = Object.fromEntries(
     {
       aiArena: evaluate(fs.readFileSync(path.join(__dirname, `../src/i18n/langs/${locale}/aiArena.ts`), 'utf8'))
         .default,
+      ...evaluate(fs.readFileSync(path.join(__dirname, `../src/i18n/langs/${locale}/modals.ts`), 'utf8')).default,
       ...evaluate(fs.readFileSync(path.join(__dirname, `../src/i18n/langs/${locale}/room.ts`), 'utf8')).default,
       ...evaluate(fs.readFileSync(path.join(__dirname, `../src/i18n/langs/${locale}/ui.ts`), 'utf8'), (id) =>
         id === '../../suggestions' ? suggestions : require(id),
@@ -40,6 +53,7 @@ async function fixture(
     props = {},
     locale = 'en',
     activeRoomID,
+    profile = { id: 'owner' },
     accessOverrides = {},
     acknowledge = async () => ({ roomID: 'created-room' }),
   } = {},
@@ -54,6 +68,7 @@ async function fixture(
     accessStatus: vue.ref('ready'),
     canManage: vue.ref(true),
     canPlay: vue.ref(false),
+    canPlayLargeTables: vue.ref(false),
     botModes: vue.ref({ smart: false, regular: false }),
     botModeAvailableAt: vue.ref({}),
     botWaitHours: vue.ref({}),
@@ -89,7 +104,7 @@ async function fixture(
       };
     if (id === '@/helpers/open-room-route')
       return evaluate(fs.readFileSync(path.join(__dirname, '../src/helpers/open-room-route.ts'), 'utf8'));
-    if (id === '@/store') return { useStore: () => ({ state: { profile: { id: 'owner' } } }) };
+    if (id === '@/store') return { useStore: () => ({ state: { profile } }) };
     if (id === '@/router/paths') return { localizedPath: (url) => url, neutralRoomUrl: (url) => url };
     if (id === '@/helpers/event-bus') return { default: { emit: (...args) => notifications.push(args) } };
     if (id === '@/helpers/composables/useAiAccess') return { useAiAccess: () => access };
@@ -97,6 +112,7 @@ async function fixture(
     if (id === '@/api/socket')
       return {
         socket: {
+          emit: (...args) => sent.push(args),
           timeout: () => ({
             emitWithAck: async (...args) => {
               sent.push(args);
@@ -109,7 +125,8 @@ async function fixture(
       return evaluate(fs.readFileSync(path.join(__dirname, '../../types/room/ai-model.ts'), 'utf8'));
     if (id === '@/helpers/codex-pricing')
       return evaluate(fs.readFileSync(path.join(__dirname, '../src/helpers/codex-pricing.ts'), 'utf8'));
-    if (id.endsWith('.vue')) return { default: { name: path.basename(id, '.vue'), render: () => null } };
+    if (id.endsWith('.vue'))
+      return { __esModule: true, default: { name: path.basename(id, '.vue'), render: () => null } };
     throw Error(`Unexpected import: ${id}`);
   }).default;
   const template = compileTemplate({
@@ -173,7 +190,7 @@ async function fixture(
   function nodes(type, node = tree) {
     if (!node || typeof node !== 'object') return [];
     return [
-      ...(node.type === type || node.type?.name === type ? [node] : []),
+      ...(node.type === type || node.type?.name === type || node.type?.__asyncResolved?.name === type ? [node] : []),
       ...(Array.isArray(node.children) ? node.children.flatMap((child) => nodes(type, child)) : []),
       ...((node.type === 'v-dialog' || node.type?.name === 'v-dialog') && node.children?.default
         ? node.children.default().flatMap((child) => nodes(type, child))
@@ -205,61 +222,6 @@ test('a bot button disabled by its parent cannot create a competing room', async
   await room.nodes('v-btn')[0].props.onClick();
   assert.deepEqual(room.sent, []);
   assert.deepEqual(room.navigation, []);
-});
-
-test('bot creation reports its pending state to block competing welcome actions', async (t) => {
-  let finish;
-  const room = await fixture('pages/lobby/BotRoomButton.vue', {
-    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
-    acknowledge: () => new Promise((resolve) => (finish = resolve)),
-  });
-  t.after(room.stop);
-  const opening = room.nodes('v-btn')[0].props.onClick();
-  assert.deepEqual(
-    room.emitted.filter(([event]) => event === 'busy'),
-    [['busy', true]],
-  );
-  finish({ error: 'unavailable' });
-  await opening;
-  assert.deepEqual(
-    room.emitted.filter(([event]) => event === 'busy'),
-    [
-      ['busy', true],
-      ['busy', false],
-    ],
-  );
-});
-
-test('closing the welcome while bot creation is pending suppresses late navigation', async (t) => {
-  let finish;
-  const room = await fixture('pages/lobby/BotRoomButton.vue', {
-    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
-    acknowledge: () => new Promise((resolve) => (finish = resolve)),
-  });
-  const opening = room.nodes('v-btn')[0].props.onClick();
-  room.stop();
-  finish({ roomID: 'late-room' });
-  await opening;
-  assert.deepEqual(room.navigation, []);
-  assert.deepEqual(room.notifications, []);
-});
-
-test('the welcome shows checking before AI availability is known and reports a checked unavailable state', async (t) => {
-  const room = await fixture('pages/lobby/BotRoomButton.vue', {
-    props: { unavailableText: 'Unavailable', loadingText: 'Checking', errorText: 'Connection failed' },
-    accessOverrides: { accessStatus: vue.ref('loading') },
-  });
-  t.after(room.stop);
-  assert.ok(room.html.includes('Checking'));
-  assert.ok(!room.html.includes('Unavailable'));
-  room.access.accessStatus.value = 'ready';
-  await vue.nextTick();
-  const html = await room.render();
-  assert.ok(html.includes('Unavailable'));
-  assert.deepEqual(
-    room.emitted.filter(([event]) => event === 'availability').map(([, state]) => state),
-    ['loading', 'unavailable'],
-  );
 });
 
 test('only ready public bot room owners choose bots on the table; ordinary rooms keep human controls', async (t) => {
@@ -484,33 +446,6 @@ test('a reconnect preserves the prepared bot table and deadline while permission
   assert.deepEqual(room.sent, []);
 });
 
-test('lobby bot button stays visible for eligible players even when both modes are unavailable', async (t) => {
-  for (const [canPlay, smart, regular, ownRoomID, visible] of [
-    [false, true, true, undefined, false],
-    [true, false, false, undefined, true],
-    [true, true, false, undefined, true],
-    [true, false, true, undefined, true],
-    [true, false, false, 'existing-room', true],
-  ]) {
-    const room = await fixture('pages/lobby/BotRoomButton.vue', {
-      locale: 'ru',
-      accessOverrides: {
-        canPlay: vue.ref(canPlay),
-        botModes: vue.ref({ smart, regular }),
-        ownRoomID: vue.ref(ownRoomID),
-      },
-    });
-    t.after(room.stop);
-    assert.equal(room.nodes('v-btn').length, visible ? 1 : 0);
-    if (visible)
-      assert.ok(
-        room.html.includes(
-          ownRoomID ? 'Продолжить мою партию' : smart || regular ? 'Сыграть с AI' : 'Сейчас недоступно.',
-        ),
-      );
-  }
-});
-
 test('lobby players return to their reserved room even while new bot games are unavailable', async (t) => {
   const room = await fixture('pages/lobby/BotRoomButton.vue', {
     accessOverrides: {
@@ -527,57 +462,6 @@ test('lobby players return to their reserved room even while new bot games are u
   await room.nodes('v-btn')[0].props.onClick();
   assert.deepEqual(room.sent, []);
   assert.deepEqual(room.navigation, [{ name: 'room', params: { uuid: 'own-room' } }]);
-});
-
-test('lobby bot button creates only a waiting room without choosing a model or starting inference', async (t) => {
-  const room = await fixture('pages/lobby/BotRoomButton.vue', {
-    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: false, regular: true }) },
-  });
-  t.after(room.stop);
-  await room.nodes('v-btn')[0].props.onClick();
-  assert.deepEqual(room.sent, [['createHumanAiRoom']]);
-  assert.deepEqual(room.navigation, [{ name: 'room', params: { uuid: 'created-room' } }]);
-});
-
-test('lobby bot button prevents duplicate creation while awaiting the server', async (t) => {
-  let finish;
-  const room = await fixture('pages/lobby/BotRoomButton.vue', {
-    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
-    acknowledge: () => new Promise((resolve) => (finish = resolve)),
-  });
-  t.after(room.stop);
-  const button = room.nodes('v-btn')[0];
-  const opening = button.props.onClick();
-  await button.props.onClick();
-  await room.render();
-  assert.deepEqual(room.sent, [['createHumanAiRoom']]);
-  assert.ok(room.nodes('v-btn')[0].props.disabled);
-  finish({ roomID: 'created-room' });
-  await opening;
-});
-
-test('lobby bot creation errors use localized notifications instead of exposing server messages', async (t) => {
-  for (const acknowledge of [
-    async () => ({ error: 'internal quota trace' }),
-    async () => {
-      throw Error('offline');
-    },
-  ]) {
-    const room = await fixture('pages/lobby/BotRoomButton.vue', {
-      locale: 'ru',
-      accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
-      acknowledge,
-    });
-    t.after(room.stop);
-    await room.nodes('v-btn')[0].props.onClick();
-    assert.deepEqual(room.navigation, []);
-    assert.equal(room.notifications.length, 1);
-    assert.equal(room.notifications[0][0], 'infoMessage');
-    assert.ok(room.notifications[0][1] && !room.notifications[0][1].includes('internal quota trace'));
-    assert.ok(!room.notifications[0][1].startsWith('aiArena.'), 'notification must be translated');
-    await room.render();
-    assert.equal(room.nodes('v-btn')[0].props.disabled, false);
-  }
 });
 
 test('prepared public bot games keep mode launch on the table without editable Codex controls', async (t) => {
@@ -881,29 +765,6 @@ for (const isHumanPlayer of [true, false]) {
   });
 }
 
-test('slow initial AI availability keeps the same button on the page until the answer arrives', async (t) => {
-  const room = await fixture('pages/lobby/BotRoomButton.vue', {
-    accessOverrides: { accessStatus: vue.ref('loading') },
-  });
-  t.after(room.stop);
-  const loading = room.nodes('v-btn')[0];
-  assert.ok(loading, 'reserve button space before availability is known');
-  assert.equal(loading.props.disabled, true);
-  await loading.props.onClick();
-  assert.deepEqual(room.sent, []);
-  room.access.canPlay.value = true;
-  room.access.botModes.value = { smart: false, regular: true };
-  room.access.accessStatus.value = 'ready';
-  await room.render();
-  const ready = room.nodes('v-btn')[0];
-  assert.equal(ready.key, loading.key, 'availability updates must not replace the button');
-  assert.equal(ready.props.disabled, false);
-  room.access.botModes.value = { smart: false, regular: false };
-  await room.render();
-  assert.equal(room.nodes('v-btn')[0].key, ready.key);
-  assert.equal(room.nodes('v-btn')[0].props.disabled, true);
-});
-
 test('smart bot availability shows fractional hours to the quota reset and no estimate for occupied bots', async (t) => {
   t.mock.method(Date, 'now', () => 1000000000);
   const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
@@ -965,19 +826,6 @@ test('discussion countdown shows the shared reserve as it is spent', async (t) =
   assert.ok(html.includes('Общий запас: 270 с'), html);
 });
 
-test('beginner entry prepares a beginner room and needs regular bots', async (t) => {
-  const room = await fixture('pages/lobby/BotRoomButton.vue', {
-    props: { beginner: true },
-    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
-  });
-  t.after(room.stop);
-  await room.nodes('v-btn')[0].props.onClick();
-  assert.deepEqual(room.sent, [['createHumanAiRoom', { beginner: true }]]);
-  room.access.botModes.value = { smart: true, regular: false };
-  await room.render();
-  assert.ok(room.nodes('v-btn')[0].props.disabled);
-});
-
 test('beginner table hides settings and starts only regular five-seat play', async (t) => {
   const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
     props: { roomID: 'beginner-room', beginner: true },
@@ -1023,20 +871,6 @@ test('standard table offers four sizes and locks premium seats', async (t) => {
   assert.deepEqual(room.sent, [
     ['startHumanAiRoom', 'standard-room', { difficulty: 'regular', language: 'en', playerCount: 6 }],
   ]);
-});
-
-test('beginner unavailability ignores smart-only recovery estimates', async (t) => {
-  const room = await fixture('pages/lobby/BotRoomButton.vue', {
-    props: { beginner: true, unavailableText: 'Beginner unavailable' },
-    accessOverrides: {
-      canPlay: vue.ref(true),
-      botModes: vue.ref({ smart: false, regular: false }),
-      botWaitHours: vue.ref({ smart: 1 }),
-    },
-  });
-  t.after(room.stop);
-  assert.ok(room.html.includes('Beginner unavailable'));
-  assert.ok(!room.html.includes('1 hour'));
 });
 
 test('AI lobby cards show the actual mixed table size and saved beginner mode', async (t) => {
@@ -1153,16 +987,6 @@ test('compact preparation countdown shows remaining launch time and reaches zero
   assert.ok((await room.render()).includes('На запуск 0:00'));
 });
 
-test('friend entry creates a two-human room', async (t) => {
-  const room = await fixture('pages/lobby/BotRoomButton.vue', {
-    props: { withFriend: true },
-    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
-  });
-  t.after(room.stop);
-  await room.nodes('v-btn')[0].props.onClick();
-  assert.deepEqual(room.sent, [['createHumanAiRoom', { beginner: false, withFriend: true }]]);
-});
-
 test('friend preparation blocks launch until the second human joins', async (t) => {
   const props = { roomID: 'friends', withFriend: true, humanCount: 1 };
   const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
@@ -1198,4 +1022,292 @@ test('only the current human speaker gets the pass button in a friend game', asy
   });
   t.after(room.stop);
   assert.doesNotMatch(room.html, /Ваше слово|Передать слово/);
+});
+
+test('Play with AI remains visible and opens setup when every bot is unavailable', async (t) => {
+  const room = await fixture('pages/lobby/BotRoomButton.vue', {
+    accessOverrides: { canPlay: vue.ref(false), botModes: vue.ref({ regular: false, smart: false }) },
+  });
+  t.after(room.stop);
+  assert.equal(room.nodes('v-btn').length, 1);
+  assert.equal(!!room.nodes('v-btn')[0].props.disabled, false);
+  await room.nodes('v-btn')[0].props.onClick();
+  await room.render();
+  const setup = room.nodes('BotGameSetup')[0];
+  assert.ok(setup);
+  assert.equal(setup.props.modelValue, true);
+  assert.deepEqual(room.sent, [], 'opening settings must not reserve or create a room');
+});
+
+test('setup creates the chosen friend table without launching inference', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true, withFriend: true },
+    locale: 'ru',
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      canPlayLargeTables: vue.ref(true),
+      botModes: vue.ref({ regular: true, smart: true }),
+    },
+  });
+  t.after(room.stop);
+  room
+    .nodes('input')
+    .find((node) => node.props.value === 'smart')
+    .props['onUpdate:modelValue']('smart');
+  room
+    .nodes('button')
+    .find((node) => node.props['data-player-count'] === 8)
+    .props.onClick();
+  await room.render();
+  await room
+    .nodes('v-btn')
+    .find((node) => node.props['data-create-bot-game'] !== undefined)
+    .props.onClick();
+  assert.deepEqual(room.sent, [
+    ['createHumanAiRoom', { beginner: false, withFriend: true, difficulty: 'smart', language: 'ru', playerCount: 8 }],
+  ]);
+  assert.deepEqual(room.navigation, [{ name: 'room', params: { uuid: 'created-room' } }]);
+});
+
+test('setup omits availability-checking text while access loads', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    accessOverrides: { accessStatus: vue.ref('loading') },
+  });
+  t.after(room.stop);
+  assert.doesNotMatch(room.html, /Проверяем доступность|сейчас недоступны/);
+  assert.equal(room.nodes('v-btn').find((node) => 'data-create-bot-game' in node.props).props.disabled, true);
+});
+
+test('setup locks Premium seats and unavailable bots while keeping settings visible', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      botModes: vue.ref({ regular: true, smart: false }),
+      botWaitHours: vue.ref({ smart: 2 }),
+    },
+  });
+  t.after(room.stop);
+  assert.ok(room.html.includes('Сильные боты сейчас недоступны'));
+  assert.ok(room.html.includes('Будут доступны через 2 ч.'));
+  assert.ok(!room.html.includes('Проверить снова'));
+  assert.equal(room.nodes('input').find((node) => node.props.value === 'smart').props.disabled, true);
+  const seats = room.nodes('button').filter((node) => node.props['data-player-count']);
+  assert.deepEqual(
+    seats.map((node) => [node.props['data-player-count'], !!node.props.disabled]),
+    [
+      [5, false],
+      [6, false],
+      [7, true],
+      [8, true],
+    ],
+  );
+  assert.equal(room.nodes('select').length, 1);
+});
+
+test('setup explains the occupied slot without a recovery promise and cannot create', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      botsBusy: vue.ref(true),
+      botWaitHours: vue.ref({ regular: 2, smart: 2 }),
+    },
+  });
+  t.after(room.stop);
+  assert.ok(room.html.includes('Они уже играют другую партию'));
+  assert.ok(!room.html.includes('Будут доступны'));
+  const create = room.nodes('v-btn').find((node) => node.props['data-create-bot-game'] !== undefined);
+  assert.equal(create.props.disabled, true);
+  await create.props.onClick();
+  assert.deepEqual(room.sent, []);
+});
+
+test('guest can open setup and reaches authentication without creating a room', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    profile: null,
+  });
+  t.after(room.stop);
+  const create = room.nodes('v-btn').find((node) => node.props['data-create-bot-game'] !== undefined);
+  assert.equal(!!create.props.disabled, false);
+  await create.props.onClick();
+  assert.deepEqual(room.sent, []);
+  assert.deepEqual(room.notifications, [['openAuthModal']]);
+});
+
+test('setup blocks duplicate creation and ignores navigation after unmount', async () => {
+  let finish;
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true, smart: true }) },
+    acknowledge: () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  });
+  const create = room.nodes('v-btn').find((node) => node.props['data-create-bot-game'] !== undefined);
+  const pending = create.props.onClick();
+  await create.props.onClick();
+  assert.equal(room.sent.length, 1);
+  room.stop();
+  finish({ roomID: 'late-room' });
+  await pending;
+  assert.deepEqual(room.navigation, []);
+});
+
+test('created room uses the saved setup after reload and waits for the friend', async (t) => {
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    props: {
+      roomID: 'saved-room',
+      difficulty: 'smart',
+      language: 'ru',
+      playerCount: 8,
+      withFriend: true,
+      humanCount: 1,
+    },
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      canPlayLargeTables: vue.ref(true),
+      botModes: vue.ref({ regular: true, smart: true }),
+    },
+  });
+  t.after(room.stop);
+  assert.equal(room.nodes('select').length, 0);
+  assert.equal(
+    room.nodes('v-btn').find((node) => node.props['data-prepared-start'] !== undefined).props.disabled,
+    true,
+  );
+  await room
+    .nodes('v-btn')
+    .find((node) => node.props['data-prepared-start'] !== undefined)
+    .props.onClick();
+  assert.deepEqual(room.sent, []);
+});
+
+test('saved solo setup starts with the persisted language, size and difficulty', async (t) => {
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    props: { roomID: 'saved-room', difficulty: 'smart', language: 'ru', playerCount: 8 },
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      canPlayLargeTables: vue.ref(true),
+      botModes: vue.ref({ regular: true, smart: true }),
+    },
+  });
+  t.after(room.stop);
+  await room
+    .nodes('v-btn')
+    .find((node) => node.props['data-prepared-start'] !== undefined)
+    .props.onClick();
+  assert.deepEqual(room.sent, [
+    ['startHumanAiRoom', 'saved-room', { difficulty: 'smart', language: 'ru', playerCount: 8 }],
+  ]);
+});
+
+test('setup can resume a room discovered after opening even when new games are unavailable', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    accessOverrides: { canPlay: vue.ref(true), ownRoomID: vue.ref('running-room') },
+  });
+  t.after(room.stop);
+  const create = room.nodes('v-btn').find((node) => node.props['data-create-bot-game'] !== undefined);
+  assert.equal(create.props.disabled, false);
+  await create.props.onClick();
+  assert.deepEqual(room.sent, []);
+  assert.deepEqual(room.navigation, [{ name: 'room', params: { uuid: 'running-room' } }]);
+});
+
+test('setup describes the human and bot roster in player-facing language', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true, smart: true }) },
+  });
+  t.after(room.stop);
+  assert.ok(room.html.includes('Вы и 4 бота'));
+  room
+    .nodes('button')
+    .find((node) => node.props['data-player-count'] === 6)
+    .props.onClick();
+  const html = await room.render();
+  assert.ok(html.includes('Вы и 5 ботов'));
+});
+
+test('expired preparation offers a return to the lobby instead of an empty action panel', async (t) => {
+  const room = await fixture('components/view/panels/StartPanel.vue', {
+    locale: 'ru',
+    props: {
+      roomState: {
+        roomID: 'expired-room',
+        leaderID: 'owner',
+        stage: 'locked',
+        players: [{ id: 'owner' }],
+        ai: { publicBotGame: true, status: 'stopped' },
+      },
+    },
+  });
+  t.after(room.stop);
+  assert.ok(room.html.includes('Время подготовки истекло'));
+  assert.ok(room.nodes('v-btn').some((node) => node.props.to === '/ru/' || node.props.to === '/'));
+});
+
+test('only the owner gets a remove-player action for the occupied friend seat', async (t) => {
+  const state = {
+    roomID: 'friend-room',
+    leaderID: 'owner',
+    stage: 'locked',
+    players: [{ id: 'owner' }, { id: 'friend' }],
+    ai: { publicBotGame: true, withFriend: true, status: 'ready', humanPlayerIDs: ['owner', 'friend'] },
+  };
+  const owner = await fixture('components/view/panels/StartPanel.vue', { locale: 'ru', props: { roomState: state } });
+  t.after(owner.stop);
+  const remove = owner.nodes('v-btn').find((node) => 'data-kick-friend' in node.props);
+  assert.ok(remove);
+  assert.ok(owner.html.includes('Удалить игрока'));
+  remove.props.onClick();
+  assert.deepEqual(owner.sent, [['kickPlayer', 'friend-room', 'friend']]);
+  const guest = await fixture('components/view/panels/StartPanel.vue', {
+    profile: { id: 'friend' },
+    props: { roomState: state },
+  });
+  t.after(guest.stop);
+  assert.ok(!guest.nodes('v-btn').some((node) => 'data-kick-friend' in node.props));
+  const empty = await fixture('components/view/panels/StartPanel.vue', {
+    props: { roomState: { ...state, ai: { ...state.ai, humanPlayerIDs: ['owner'] } } },
+  });
+  t.after(empty.stop);
+  assert.ok(!empty.nodes('v-btn').some((node) => 'data-kick-friend' in node.props));
+});
+
+test('lobby shows the actual friend-game roster and its empty seat', async (t) => {
+  const game = {
+    uuid: 'friend-room',
+    hostID: 'host',
+    ai: true,
+    aiTitle: 'Owner vs 5 Bots',
+    aiStatus: 'ready',
+    players: 7,
+    state: 'locked',
+    options: { roles: {}, addons: {} },
+    createAt: '2026-10-12T00:00:00Z',
+    aiBotCount: 5,
+  };
+  const waiting = await fixture('pages/lobby/LobbyRoom.vue', {
+    props: { game: { ...game, aiHumanCount: 1, aiOpenSeats: 1 } },
+  });
+  t.after(waiting.stop);
+  assert.ok(waiting.html.includes('1 human + 5 bots'));
+  assert.ok(waiting.html.includes('Friend’s seat open'));
+  assert.ok(!waiting.html.includes('6 bots'));
+  const joined = await fixture('pages/lobby/LobbyRoom.vue', {
+    props: { game: { ...game, aiHumanCount: 2, aiOpenSeats: 0 } },
+  });
+  t.after(joined.stop);
+  assert.ok(joined.html.includes('2 humans + 5 bots'));
+  assert.ok(!joined.html.includes('Friend’s seat open'));
 });

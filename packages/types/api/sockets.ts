@@ -170,7 +170,13 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
   createHumanAiRoom: {
     (callback: (result: { roomID: string } | { error: string }) => void): void;
     (
-      options: { beginner: boolean; withFriend?: boolean },
+      options: {
+        beginner: boolean;
+        withFriend?: boolean;
+        difficulty?: AiBotDifficulty;
+        language?: AiLanguage;
+        playerCount?: AiPlayerCount;
+      },
       callback: (result: { roomID: string } | { error: string }) => void,
     ): void;
   };

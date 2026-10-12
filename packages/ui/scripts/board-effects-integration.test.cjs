@@ -40,6 +40,21 @@ const game = (history = [], extra = {}) => ({
 const result = { winner: 'good', reason: 'missMerlin' };
 const room = (gameState) => ({ stage: 'started', roomID: 'game-a', players, game: gameState });
 
+test('owner can kick the friend through the avatar during AI preparation', (t) => {
+  const { api, manager, emitted } = fixture(t);
+  manager.state.value.stage = 'locked';
+  manager.state.value.leaderID = 'p3';
+  manager.state.value.ai = { publicBotGame: true, withFriend: true, status: 'ready', humanPlayerIDs: ['p3', 'p1'] };
+  api.onPlayerClick('p1');
+  assert.deepEqual(emitted.filter(Array.isArray), [['kickPlayer', 'game-a', 'p1']]);
+  api.onPlayerClick('p2');
+  api.onPlayerClick('p3');
+  assert.equal(emitted.filter(Array.isArray).length, 1, 'bots and owner are not kick targets');
+  manager.state.value.ai.status = 'running';
+  api.onPlayerClick('p1');
+  assert.equal(emitted.filter(Array.isArray).length, 1);
+});
+
 test('both thinking seats animate in live play, with legacy fallback and no mission-role disclosure', (t) => {
   const { api, manager } = fixture(t, game([], { stage: 'votingForTeam' }));
   manager.state.value.ai = { status: 'running', thinkingPlayerIDs: ['p1', 'p2'], thinkingPlayerID: 'p1' };
@@ -197,6 +212,7 @@ function fixture(t, initial = game(), reducedMotion = false) {
         onUnmounted: (callback) => unmount.push(callback),
       };
     if (id === 'vue-router') return { useRouter: () => ({ push() {} }) };
+    if (id === '@/api/socket') return { socket: { emit: (...args) => emitted.push(args) } };
     if (id === 'vue-i18n') return { useI18n: () => ({ t: (key) => key }) };
     if (id === '@/helpers/game-state-manager') return keys;
     if (id === '@/store') return { useStore: () => ({ state: { users, profile: { id: 'p3' } } }) };

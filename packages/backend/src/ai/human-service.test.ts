@@ -8,6 +8,7 @@ import type { AiRepository } from './repository';
 import * as limits from './codex-limits';
 import * as catalog from './codex-models';
 import * as support from '@/support/repository';
+import { errorHandler } from '@/helpers/socket';
 
 const initialEnvironment = { ...process.env };
 const models = [
@@ -40,7 +41,7 @@ afterEach(() => {
   process.env = { ...initialEnvironment };
 });
 
-function fixture(adminID = 'admin') {
+function fixture(adminID = 'admin', validatePackets = false) {
   const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
   const claim = jest.fn<Promise<void>, [string]>(async () => {});
   const release = jest.fn<Promise<void>, [string]>(async () => {});
@@ -65,7 +66,12 @@ function fixture(adminID = 'admin') {
   function connect(id?: string) {
     const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
     service.register(
-      { on: (event: string, handler: any) => (handlers[event] = handler) } as unknown as ServerSocket,
+      {
+        on: (event: string, handler: any) =>
+          (handlers[event] = validatePackets
+            ? errorHandler(handler, { emit: jest.fn() } as unknown as ServerSocket, event)
+            : handler),
+      } as unknown as ServerSocket,
       id,
     );
     return handlers;
@@ -79,6 +85,28 @@ function fixture(adminID = 'admin') {
   }
   return { host, service, connect, claim, release, save, draft };
 }
+
+test.each([false, true])(
+  'unified setup reaches room creation through socket validation, withFriend=%s',
+  async (withFriend) => {
+    const { connect, host } = fixture('admin', true);
+    const response = jest.fn();
+    await connect('premium').createHumanAiRoom(
+      {
+        beginner: false,
+        withFriend,
+        difficulty: 'regular',
+        language: 'en',
+        playerCount: 7,
+      },
+      response,
+    );
+    const id = response.mock.calls[0][0].roomID;
+    expect(id).toBeDefined();
+    expect(host.rooms[id].ai).toMatchObject({ preparedDifficulty: 'regular', language: 'en', playerCount: 7 });
+    expect(run).not.toHaveBeenCalled();
+  },
+);
 
 test('create prepares a named four-bot table, reserves its slot, and makes no model turn', async () => {
   const { draft, claim } = fixture();
@@ -195,6 +223,33 @@ test.each([null, { remainingPercent: 10, resetsAt: null, checkedAt: 0 }])(
   },
 );
 
+test.each(['regular', 'smart'] as const)('weekly-only accounts can prepare and start %s bots', async (difficulty) => {
+  quota.mockResolvedValue({ remainingPercent: 93, resetsAt: null, checkedAt: Date.now(), shortTerm: null });
+  const { connect, host } = fixture();
+  const handlers = connect('owner');
+  const access = jest.fn();
+  await handlers.getAiRoomAccess(access);
+  expect(access.mock.calls[0][0].botModes).toEqual({ regular: true, smart: true });
+  const response = jest.fn();
+  await handlers.createHumanAiRoom({ beginner: false, difficulty, language: 'en', playerCount: 5 }, response);
+  const id = response.mock.calls[0][0].roomID;
+  expect(id).toBeDefined();
+  const started = jest.fn();
+  await handlers.startHumanAiRoom(id, { difficulty, language: 'en', playerCount: 5 }, started);
+  expect(started.mock.calls[0][0]).not.toHaveProperty('error');
+  expect(host.rooms[id].ai?.status).toBe('running');
+});
+
+test('weekly-only accounts still honor weekly quota thresholds and reset time', async () => {
+  const reset = Date.now() / 1000 + 3600;
+  quota.mockResolvedValue({ remainingPercent: 2, resetsAt: reset, checkedAt: Date.now(), shortTerm: null });
+  const { connect } = fixture();
+  const access = jest.fn();
+  await connect('owner').getAiRoomAccess(access);
+  expect(access.mock.calls[0][0].botModes).toEqual({ regular: false, smart: false });
+  expect(access.mock.calls[0][0].botModeAvailableAt).toEqual({ regular: reset * 1000, smart: reset * 1000 });
+});
+
 test('a ready room is reused by its owner and prevents another party reserving the slot', async () => {
   const { draft, connect, host, claim } = fixture();
   const first = await draft();
@@ -307,11 +362,11 @@ test('concurrent starts claim the execution slot once', async () => {
   expect(claim).toHaveBeenCalledTimes(1);
 });
 
-test('the ready reservation expires after ninety seconds and releases its slot', async () => {
+test('the ready reservation expires after one minute and releases its slot', async () => {
   jest.useFakeTimers();
   const { draft, release, connect } = fixture();
   const room = await draft();
-  await jest.advanceTimersByTimeAsync(89999);
+  await jest.advanceTimersByTimeAsync(59999);
   expect(room.ai?.status).toBe('ready');
   await jest.advanceTimersByTimeAsync(1);
   expect(room.ai?.status).toBe('stopped');
@@ -333,7 +388,7 @@ test('quota lookup finishing after the launch deadline cannot start the expired 
   quota.mockImplementation(() => new Promise((resolve) => (releaseQuota = resolve)));
   const response = jest.fn();
   const pending = connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'en' }, response);
-  await jest.advanceTimersByTimeAsync(90000);
+  await jest.advanceTimersByTimeAsync(60000);
   releaseQuota({ remainingPercent: 10, shortTerm: { remainingPercent: 90 } });
   await pending;
   expect(response.mock.calls[0][0]).toHaveProperty('error');
@@ -353,7 +408,7 @@ test('an expired launch releases its slot and a late response cannot clear the n
     { difficulty: 'regular', language: 'en' },
     expiredResponse,
   );
-  await jest.advanceTimersByTimeAsync(90000);
+  await jest.advanceTimersByTimeAsync(60000);
   const prepared = jest.fn();
   await connect('other').createHumanAiRoom(prepared);
   expect(prepared.mock.calls[0][0]).toHaveProperty('roomID');
@@ -526,5 +581,80 @@ test('friend mode requires two humans before launch and lets either human find t
   const access = jest.fn();
   await connect('friend').getAiRoomAccess(access);
   expect(access.mock.calls[0][0].ownRoomID).toBe(room.roomID);
+  room.stop();
+});
+
+test('creation saves the chosen mode, language and size before launch without inference', async () => {
+  jest.useFakeTimers();
+  const { connect, host } = fixture();
+  const response = jest.fn();
+  await connect('premium').createHumanAiRoom(
+    { beginner: false, withFriend: true, difficulty: 'smart', language: 'ru', playerCount: 8 },
+    response,
+  );
+  expect(response.mock.calls[0][0]).toHaveProperty('roomID');
+  const room = host.rooms[response.mock.calls[0][0].roomID] as BotRoom;
+  expect(room.players).toHaveLength(8);
+  expect(room.ai).toMatchObject({ preparedDifficulty: 'smart', language: 'ru', playerCount: 8, withFriend: true });
+  expect(room.ai!.launchExpiresAt).toBe(Date.now() + 120000);
+  expect(run).not.toHaveBeenCalled();
+  await jest.advanceTimersByTimeAsync(119999);
+  expect(room.ai!.status).toBe('ready');
+  await jest.advanceTimersByTimeAsync(1);
+  expect(room.ai!.status).toBe('stopped');
+});
+
+test('single-player preparation lasts one minute', async () => {
+  jest.useFakeTimers();
+  const { draft, release } = fixture();
+  const room = await draft();
+  expect(room.ai!.launchExpiresAt).toBe(Date.now() + 60000);
+  await jest.advanceTimersByTimeAsync(59999);
+  expect(room.ai!.status).toBe('ready');
+  await jest.advanceTimersByTimeAsync(1);
+  expect(room.ai!.status).toBe('stopped');
+  expect(release).toHaveBeenCalledWith(room.roomID);
+});
+
+test.each([
+  { beginner: false, difficulty: 'unknown', language: 'ru', playerCount: 5 },
+  { beginner: false, difficulty: 'regular', language: 'unknown', playerCount: 5 },
+  { beginner: false, difficulty: 'regular', language: 'ru', playerCount: 7 },
+  { beginner: true, difficulty: 'smart', language: 'ru', playerCount: 5 },
+  { beginner: true, difficulty: 'regular', language: 'ru', playerCount: 6 },
+])('invalid or unentitled setup never reserves the shared slot: %j', async (options) => {
+  const { connect, claim } = fixture();
+  const response = jest.fn();
+  await connect('owner').createHumanAiRoom(options, response);
+  expect(response.mock.calls[0][0]).toHaveProperty('error');
+  expect(claim).not.toHaveBeenCalled();
+});
+
+test('a prepared setup cannot be changed by a different launch payload', async () => {
+  const { connect, host } = fixture();
+  const created = jest.fn();
+  await connect('owner').createHumanAiRoom(
+    { beginner: false, difficulty: 'regular', language: 'ru', playerCount: 6 },
+    created,
+  );
+  const room = host.rooms[created.mock.calls[0][0].roomID] as BotRoom;
+  for (const options of [
+    { difficulty: 'smart', language: 'ru', playerCount: 6 },
+    { difficulty: 'regular', language: 'en', playerCount: 6 },
+    { difficulty: 'regular', language: 'ru', playerCount: 5 },
+  ]) {
+    const result = jest.fn();
+    await connect('owner').startHumanAiRoom(room.roomID, options, result);
+    expect(result.mock.calls[0][0]).toHaveProperty('error');
+    expect(room.ai!.status).toBe('ready');
+  }
+  expect(run).not.toHaveBeenCalled();
+  const started = jest.fn();
+  await connect('owner').startHumanAiRoom(
+    room.roomID,
+    { difficulty: 'regular', language: 'ru', playerCount: 6 },
+    started,
+  );
+  expect(started).toHaveBeenCalledWith({ ok: true });
   room.stop();
 });

@@ -1,187 +1,219 @@
 <template>
   <section class="bot-game-choices" :aria-label="$t('aiArena.playWithBots')">
-    <h2 class="bot-table" :title="title">
-      {{
-        withFriend
-          ? $t('aiArena.botFriendRoster', { count: selectedPlayerCount - 2 })
-          : selectedPlayerCount === 5
-            ? $t('aiArena.botSoloRoster')
-            : $t('aiArena.mixedPlayerCount', { count: selectedPlayerCount - 1 })
-      }}
-    </h2>
-    <button
-      ref="settingsTrigger"
-      v-if="!beginner"
-      type="button"
-      class="bot-configuration"
-      data-bot-settings
-      :aria-label="$t('aiArena.botSettings')"
-      aria-haspopup="dialog"
-      :disabled="busy"
-      @click="settingsOpen = true"
-    >
-      <span>{{ $t('aiArena.botPreparationSummary', { language: languageName, count: selectedPlayerCount }) }}</span>
-      <v-icon icon="settings" class="bot-settings-icon" aria-hidden="true" />
-    </button>
-    <p v-if="withFriend && humanCount !== 2" role="status">{{ $t('aiArena.botWaitingForFriend') }}</p>
-    <div class="bot-modes" :class="{ 'bot-modes--beginner': beginner }">
-      <div v-for="difficulty in botDifficulties" :key="difficulty" class="bot-mode">
-        <v-btn
-          :data-bot-mode="difficulty"
-          :class="`bot-mode-button bot-mode-button--${difficulty}`"
-          :loading="busy && pendingDifficulty === difficulty"
-          :disabled="busy || !canPlay || !botModes[difficulty] || (withFriend && humanCount !== 2)"
-          :aria-describedby="`bot-${difficulty}-availability`"
-          @click="play(difficulty)"
-        >
-          {{
-            $t(
-              beginner
-                ? 'aiArena.botBeginnerStart'
-                : difficulty === 'smart'
-                  ? 'aiArena.botSmart'
-                  : 'aiArena.botRegular',
-            )
-          }}
-        </v-btn>
-        <p
-          :id="`bot-${difficulty}-availability`"
-          class="bot-availability"
-          role="status"
-          :aria-label="!botModes[difficulty] && botsBusy ? $t('aiArena.botBusy') : undefined"
-        >
-          <template v-if="!botModes[difficulty]">
-            {{
-              !botsBusy && botWaitHours[difficulty] !== undefined
-                ? $t('aiArena.botAvailabilityShort', { hours: formatHours(botWaitHours[difficulty]!) })
-                : $t(botsBusy ? 'aiArena.botBusyShort' : 'aiArena.botUnavailable')
-            }}
-          </template>
-        </p>
-      </div>
-    </div>
-    <div class="bot-time-row">
+    <div v-if="difficulty" class="prepared-bot-game">
+      <h2 class="bot-table">
+        {{
+          $t(withFriend ? 'aiArena.botFriendRoster' : 'aiArena.mixedPlayerCount', {
+            count: selectedPlayerCount - (withFriend ? 2 : 1),
+          })
+        }}
+      </h2>
+      <p>{{ $t(withFriend && humanCount !== 2 ? 'aiArena.botWaitingForFriend' : 'aiArena.ready') }}</p>
       <BotGameTimer v-if="expiresAt" :expires-at="expiresAt" phase="preparation" compact />
+      <v-btn
+        class="prepared-start"
+        variant="flat"
+        prepend-icon="play_arrow"
+        :loading="busy && !!pendingDifficulty"
+        :disabled="busy || !canPlay || !botModes[difficulty] || (withFriend && humanCount !== 2)"
+        data-prepared-start
+        @click="play(difficulty)"
+        >{{ $t('aiArena.setupStart') }}</v-btn
+      >
+      <v-btn
+        class="prepared-cancel"
+        variant="outlined"
+        :disabled="busy"
+        :loading="busy && !pendingDifficulty"
+        @click="leave"
+        >{{ $t('aiArena.setupCancel') }}</v-btn
+      >
+      <p v-if="error" class="bot-error" role="alert">{{ error }}</p>
+    </div>
+    <template v-else>
+      <h2 class="bot-table" :title="title">
+        {{
+          withFriend
+            ? $t('aiArena.botFriendRoster', { count: selectedPlayerCount - 2 })
+            : selectedPlayerCount === 5
+              ? $t('aiArena.botSoloRoster')
+              : $t('aiArena.mixedPlayerCount', { count: selectedPlayerCount - 1 })
+        }}
+      </h2>
       <button
-        ref="timeHelpTrigger"
+        ref="settingsTrigger"
+        v-if="!beginner"
         type="button"
-        class="bot-time-help"
-        :aria-label="$t('aiArena.botTimeHelp')"
+        class="bot-configuration"
+        data-bot-settings
+        :aria-label="$t('aiArena.botSettings')"
         aria-haspopup="dialog"
         :disabled="busy"
-        @click="timeHelpOpen = true"
+        @click="settingsOpen = true"
       >
-        ?
+        <span>{{ $t('aiArena.botPreparationSummary', { language: languageName, count: selectedPlayerCount }) }}</span>
+        <v-icon icon="settings" class="bot-settings-icon" aria-hidden="true" />
       </button>
-    </div>
-    <v-btn
-      class="bot-leave-button"
-      variant="text"
-      :loading="busy && !pendingDifficulty"
-      :disabled="busy || !canPlay"
-      @click="leave"
-      >{{ $t('aiArena.botLeaveShort') }}</v-btn
-    >
-    <p v-if="error" class="bot-error" role="alert">{{ error }}</p>
+      <p v-if="withFriend && humanCount !== 2" role="status">{{ $t('aiArena.botWaitingForFriend') }}</p>
+      <div class="bot-modes" :class="{ 'bot-modes--beginner': beginner }">
+        <div v-for="difficulty in botDifficulties" :key="difficulty" class="bot-mode">
+          <v-btn
+            :data-bot-mode="difficulty"
+            :class="`bot-mode-button bot-mode-button--${difficulty}`"
+            :loading="busy && pendingDifficulty === difficulty"
+            :disabled="busy || !canPlay || !botModes[difficulty] || (withFriend && humanCount !== 2)"
+            :aria-describedby="`bot-${difficulty}-availability`"
+            @click="play(difficulty)"
+          >
+            {{
+              $t(
+                beginner
+                  ? 'aiArena.botBeginnerStart'
+                  : difficulty === 'smart'
+                    ? 'aiArena.botSmart'
+                    : 'aiArena.botRegular',
+              )
+            }}
+          </v-btn>
+          <p
+            :id="`bot-${difficulty}-availability`"
+            class="bot-availability"
+            role="status"
+            :aria-label="!botModes[difficulty] && botsBusy ? $t('aiArena.botBusy') : undefined"
+          >
+            <template v-if="!botModes[difficulty]">
+              {{
+                !botsBusy && botWaitHours[difficulty] !== undefined
+                  ? $t('aiArena.botAvailabilityShort', { hours: formatHours(botWaitHours[difficulty]!) })
+                  : $t(botsBusy ? 'aiArena.botBusyShort' : 'aiArena.botUnavailable')
+              }}
+            </template>
+          </p>
+        </div>
+      </div>
+      <div class="bot-time-row">
+        <BotGameTimer v-if="expiresAt" :expires-at="expiresAt" phase="preparation" compact />
+        <button
+          ref="timeHelpTrigger"
+          type="button"
+          class="bot-time-help"
+          :aria-label="$t('aiArena.botTimeHelp')"
+          aria-haspopup="dialog"
+          :disabled="busy"
+          @click="timeHelpOpen = true"
+        >
+          ?
+        </button>
+      </div>
+      <v-btn
+        class="bot-leave-button"
+        variant="text"
+        :loading="busy && !pendingDifficulty"
+        :disabled="busy || !canPlay"
+        @click="leave"
+        >{{ $t('aiArena.botLeaveShort') }}</v-btn
+      >
+      <p v-if="error" class="bot-error" role="alert">{{ error }}</p>
 
-    <v-dialog
-      v-model="settingsOpen"
-      class="bot-preparation-dialog"
-      max-width="420"
-      :aria-label="$t('aiArena.botSettings')"
-      @after-leave="settingsTrigger?.focus()"
-    >
-      <section class="bot-preparation-sheet">
-        <header class="bot-sheet-header">
-          <h2>{{ $t('aiArena.botSettings') }}</h2>
+      <v-dialog
+        v-model="settingsOpen"
+        class="bot-preparation-dialog"
+        max-width="420"
+        :aria-label="$t('aiArena.botSettings')"
+        @after-leave="settingsTrigger?.focus()"
+      >
+        <section class="bot-preparation-sheet">
+          <header class="bot-sheet-header">
+            <h2>{{ $t('aiArena.botSettings') }}</h2>
+            <button
+              type="button"
+              class="bot-sheet-close"
+              :aria-label="$t('aiArena.botSettingsDone')"
+              :disabled="busy"
+              @click="settingsOpen = false"
+            >
+              <v-icon icon="close" aria-hidden="true" />
+            </button>
+          </header>
+          <div class="bot-setting-fields">
+            <label v-if="!beginner" class="bot-language">
+              <span>{{ $t('aiArena.selectLanguage') }}</span>
+              <select v-model="selectedLanguage" :disabled="busy">
+                <option value="en">English</option>
+                <option value="ru">Русский</option>
+                <option value="zh-tw">繁體中文（台灣）</option>
+              </select>
+            </label>
+            <label v-if="!beginner" class="bot-language">
+              <span>{{ $t('aiArena.botTotalPlayers') }}</span>
+              <select v-model="selectedPlayerCount" :disabled="busy">
+                <option :value="5">5</option>
+                <option :value="6">6</option>
+                <option :value="7" :disabled="!canPlayLargeTables">7 · Premium</option>
+                <option :value="8" :disabled="!canPlayLargeTables">8 · Premium</option>
+              </select>
+            </label>
+          </div>
+          <p class="bot-sheet-note">
+            {{
+              $t(withFriend ? 'aiArena.botFriendRoster' : 'aiArena.mixedPlayerCount', {
+                count: selectedPlayerCount - (withFriend ? 2 : 1),
+              })
+            }}
+          </p>
+          <p v-if="!beginner && !canPlayLargeTables" class="bot-sheet-note">{{ $t('aiArena.botPremiumSeats') }}</p>
+          <div class="bot-sheet-explanations">
+            <p v-if="beginner">{{ $t('aiArena.botBeginnerHint') }}</p>
+            <template v-else>
+              <p>
+                <strong>{{ $t('aiArena.botRegular') }}.</strong> {{ $t('aiArena.botRegularHint') }}
+              </p>
+              <p>
+                <strong>{{ $t('aiArena.botSmart') }}.</strong> {{ $t('aiArena.botSmartHint') }}
+              </p>
+            </template>
+          </div>
           <button
             type="button"
-            class="bot-sheet-close"
-            :aria-label="$t('aiArena.botSettingsDone')"
+            class="bot-sheet-done"
+            data-bot-settings-done
             :disabled="busy"
             @click="settingsOpen = false"
           >
-            <v-icon icon="close" aria-hidden="true" />
+            {{ $t('aiArena.botSettingsDone') }}
           </button>
-        </header>
-        <div class="bot-setting-fields">
-          <label v-if="!beginner" class="bot-language">
-            <span>{{ $t('aiArena.selectLanguage') }}</span>
-            <select v-model="selectedLanguage" :disabled="busy">
-              <option value="en">English</option>
-              <option value="ru">Русский</option>
-              <option value="zh-tw">繁體中文（台灣）</option>
-            </select>
-          </label>
-          <label v-if="!beginner" class="bot-language">
-            <span>{{ $t('aiArena.botTotalPlayers') }}</span>
-            <select v-model="selectedPlayerCount" :disabled="busy">
-              <option :value="5">5</option>
-              <option :value="6">6</option>
-              <option :value="7" :disabled="!canPlayLargeTables">7 · Premium</option>
-              <option :value="8" :disabled="!canPlayLargeTables">8 · Premium</option>
-            </select>
-          </label>
-        </div>
-        <p class="bot-sheet-note">
-          {{
-            $t(withFriend ? 'aiArena.botFriendRoster' : 'aiArena.mixedPlayerCount', {
-              count: selectedPlayerCount - (withFriend ? 2 : 1),
-            })
-          }}
-        </p>
-        <p v-if="!beginner && !canPlayLargeTables" class="bot-sheet-note">{{ $t('aiArena.botPremiumSeats') }}</p>
-        <div class="bot-sheet-explanations">
-          <p v-if="beginner">{{ $t('aiArena.botBeginnerHint') }}</p>
-          <template v-else>
-            <p>
-              <strong>{{ $t('aiArena.botRegular') }}.</strong> {{ $t('aiArena.botRegularHint') }}
-            </p>
-            <p>
-              <strong>{{ $t('aiArena.botSmart') }}.</strong> {{ $t('aiArena.botSmartHint') }}
-            </p>
-          </template>
-        </div>
-        <button
-          type="button"
-          class="bot-sheet-done"
-          data-bot-settings-done
-          :disabled="busy"
-          @click="settingsOpen = false"
-        >
-          {{ $t('aiArena.botSettingsDone') }}
-        </button>
-      </section>
-    </v-dialog>
-    <v-dialog
-      v-model="timeHelpOpen"
-      class="bot-preparation-dialog"
-      max-width="420"
-      :aria-label="$t('aiArena.botTimeHelp')"
-      @after-leave="timeHelpTrigger?.focus()"
-    >
-      <section class="bot-preparation-sheet">
-        <header class="bot-sheet-header">
-          <h2>{{ $t('aiArena.botTimeHelp') }}</h2>
-          <button
-            type="button"
-            class="bot-sheet-close"
-            :aria-label="$t('aiArena.botSettingsDone')"
-            :disabled="busy"
-            @click="timeHelpOpen = false"
-          >
-            <v-icon icon="close" aria-hidden="true" />
+        </section>
+      </v-dialog>
+      <v-dialog
+        v-model="timeHelpOpen"
+        class="bot-preparation-dialog"
+        max-width="420"
+        :aria-label="$t('aiArena.botTimeHelp')"
+        @after-leave="timeHelpTrigger?.focus()"
+      >
+        <section class="bot-preparation-sheet">
+          <header class="bot-sheet-header">
+            <h2>{{ $t('aiArena.botTimeHelp') }}</h2>
+            <button
+              type="button"
+              class="bot-sheet-close"
+              :aria-label="$t('aiArena.botSettingsDone')"
+              :disabled="busy"
+              @click="timeHelpOpen = false"
+            >
+              <v-icon icon="close" aria-hidden="true" />
+            </button>
+          </header>
+          <p class="bot-time-explanation">
+            {{ $t(withFriend ? 'aiArena.botFriendDeadlineHint' : 'aiArena.botActionDeadlineHint') }}
+          </p>
+          <p v-if="beginner" class="bot-time-explanation">{{ $t('aiArena.botBeginnerHint') }}</p>
+          <button type="button" class="bot-sheet-done" :disabled="busy" @click="timeHelpOpen = false">
+            {{ $t('aiArena.botSettingsDone') }}
           </button>
-        </header>
-        <p class="bot-time-explanation">
-          {{ $t(withFriend ? 'aiArena.botFriendDeadlineHint' : 'aiArena.botActionDeadlineHint') }}
-        </p>
-        <p v-if="beginner" class="bot-time-explanation">{{ $t('aiArena.botBeginnerHint') }}</p>
-        <button type="button" class="bot-sheet-done" :disabled="busy" @click="timeHelpOpen = false">
-          {{ $t('aiArena.botSettingsDone') }}
-        </button>
-      </section>
-    </v-dialog>
+        </section>
+      </v-dialog>
+    </template>
   </section>
 </template>
 
@@ -201,15 +233,18 @@ const props = defineProps<{
   beginner?: boolean;
   withFriend?: boolean;
   humanCount?: number;
+  difficulty?: AiBotDifficulty;
+  language?: AiLanguage;
+  playerCount?: AiPlayerCount;
 }>();
 const { t, locale } = useI18n();
 const router = useRouter();
 const { canPlay, canPlayLargeTables, botModes, botsBusy, botWaitHours, accessStatus, refresh } = useAiAccess();
 const formatHours = (hours: number) => new Intl.NumberFormat(locale.value.replace('_', '-')).format(hours);
 const botDifficulties = computed<AiBotDifficulty[]>(() => (props.beginner ? ['regular'] : ['regular', 'smart']));
-const selectedPlayerCount = ref<AiPlayerCount>(5);
+const selectedPlayerCount = ref<AiPlayerCount>(props.playerCount ?? 5);
 const selectedLanguage = ref<AiLanguage>(
-  locale.value === 'ru' ? 'ru' : /^zh[-_]tw$/i.test(locale.value) ? 'zh-tw' : 'en',
+  props.language ?? (locale.value === 'ru' ? 'ru' : /^zh[-_]tw$/i.test(locale.value) ? 'zh-tw' : 'en'),
 );
 const settingsOpen = ref(false);
 const timeHelpOpen = ref(false);
@@ -270,6 +305,43 @@ async function play(difficulty: AiBotDifficulty) {
 </script>
 
 <style scoped>
+.prepared-bot-game {
+  display: grid;
+  gap: 12px;
+}
+.prepared-bot-game p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+.prepared-bot-game :deep(.v-btn) {
+  width: 100%;
+  min-height: 44px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.prepared-bot-game :deep(.prepared-start) {
+  min-height: 48px;
+  background: #295f8f;
+  color: #fff;
+  border: 1px solid #75a3c6;
+  font-size: 18px;
+  font-weight: 600;
+}
+.prepared-bot-game :deep(.prepared-start.v-btn--disabled) {
+  opacity: 1;
+  background: #354142;
+  color: #b7c1be;
+  border-color: #657172;
+  box-shadow: none;
+}
+.prepared-bot-game :deep(.prepared-start.v-btn--disabled .v-btn__overlay) {
+  opacity: 0;
+}
+.prepared-bot-game :deep(.prepared-cancel) {
+  border-color: rgba(244, 239, 223, 0.55);
+  background: rgba(0, 0, 0, 0.16);
+  color: #f4efdf;
+}
 .bot-game-choices {
   width: 390px;
   max-width: 100%;

@@ -61,6 +61,7 @@ export class BotRoom extends Room {
     private delayMs = 0,
     private language: AiLanguage = 'en',
     playerCount: AiPlayerCount = 7,
+    private reviewDelayMs = delayMs,
   ) {
     if (![5, 6, 7, 8].includes(playerCount)) throw Error('Invalid AI player count');
     const agents = selectBotAgents(undefined, playerCount);
@@ -569,7 +570,13 @@ export class BotRoom extends Room {
     }
     return this.cancelled ? null : answer;
   }
-  private async publish(id: string, text: string, requestID: string = randomUUID(), onPublished?: () => void) {
+  private async publish(
+    id: string,
+    text: string,
+    requestID: string = randomUUID(),
+    onPublished?: () => void,
+    delayMs = this.delayMs,
+  ) {
     if (this.cancelled) return;
     const discussion = this.discussion;
     if (discussion) discussion.pendingPublication = { id, text, requestID };
@@ -579,14 +586,14 @@ export class BotRoom extends Room {
     if (discussion) delete discussion.pendingPublication;
     onPublished?.();
     await this.checkpoint(this.calculateRoomState());
-    if (!this.delayMs || this.cancelled) return;
+    if (!delayMs || this.cancelled) return;
     await new Promise<void>((resolve) => {
       const done = () => {
         clearTimeout(timer);
         this.abort.signal.removeEventListener('abort', done);
         resolve();
       };
-      const timer = setTimeout(done, this.delayMs);
+      const timer = setTimeout(done, delayMs);
       this.abort.signal.addEventListener('abort', done, { once: true });
     });
   }
@@ -917,7 +924,7 @@ export class BotRoom extends Room {
             review.published = true;
             this.reviewedPlayers.add(id);
           };
-          if (review.text) await this.publish(id, review.text, review.requestID, markPublished);
+          if (review.text) await this.publish(id, review.text, review.requestID, markPublished, this.reviewDelayMs);
           else markPublished();
         }
       }

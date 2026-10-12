@@ -3,13 +3,16 @@ import type { CodexWeeklyLimit } from '@avalon/types';
 import { hasRemoteCodex, remoteCodex, remoteCodexCacheKey } from './codex-remote';
 
 type Window = { usedPercent?: unknown; windowDurationMins?: unknown; resetsAt?: unknown };
-type Bucket = { primary?: Window; secondary?: Window };
+type Bucket = { primary?: Window | null; secondary?: Window | null };
 export function parseWeeklyLimit(value: unknown, checkedAt = Date.now()): CodexWeeklyLimit | null {
   const response = value as { rateLimits?: Bucket; rateLimitsByLimitId?: Record<string, Bucket> } | null;
   const bucket = response?.rateLimitsByLimitId ? response.rateLimitsByLimitId.codex : response?.rateLimits;
   const week = [bucket?.primary, bucket?.secondary].find((window) => window?.windowDurationMins === 10080);
   if (!week || typeof week.usedPercent !== 'number' || !Number.isFinite(week.usedPercent)) return null;
   const short = [bucket?.primary, bucket?.secondary].find((window) => window?.windowDurationMins === 300);
+  const noShortWindow =
+    (bucket?.primary === week && bucket?.secondary === null) ||
+    (bucket?.secondary === week && bucket?.primary === null);
   const shortTerm =
     short && typeof short.usedPercent === 'number' && Number.isFinite(short.usedPercent)
       ? {
@@ -21,7 +24,7 @@ export function parseWeeklyLimit(value: unknown, checkedAt = Date.now()): CodexW
         }
       : undefined;
   return {
-    ...(shortTerm ? { shortTerm } : {}),
+    ...(shortTerm ? { shortTerm } : noShortWindow ? { shortTerm: null } : {}),
     remainingPercent: Math.max(0, Math.min(100, 100 - week.usedPercent)),
     resetsAt:
       typeof week.resetsAt === 'number' && Number.isFinite(week.resetsAt) && week.resetsAt > 0 ? week.resetsAt : null,

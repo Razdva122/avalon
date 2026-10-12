@@ -481,6 +481,48 @@ test('the ten-second interval also covers Lady announcements and all seven concl
   }
 });
 
+test('post-game publication is paced even when live speech has no delay', async () => {
+  jest.useFakeTimers();
+  try {
+    const times: number[] = [];
+    const room = new BotRoom(
+      'paced-reviews',
+      'admin',
+      io,
+      async (r) => ({
+        choice: r.state.stage === 'onMission' ? r.choices.indexOf('success') : 0,
+        speech: r.speak ? 'My reflection.' : '',
+      }),
+      async () => {
+        const reviews = room.chat.history.filter((m) => m.message.startsWith('Post-game:'));
+        while (times.length < reviews.length) times.push(Date.now());
+      },
+      0,
+      'en',
+      5,
+      10000,
+    );
+    const running = room.run();
+    await jest.advanceTimersByTimeAsync(0);
+    expect(times).toHaveLength(1);
+    await jest.advanceTimersByTimeAsync(9999);
+    expect(times).toHaveLength(1);
+    await jest.advanceTimersByTimeAsync(1);
+    expect(times).toHaveLength(2);
+    await jest.advanceTimersByTimeAsync(40000);
+    await running;
+    expect(room.ai?.status).toBe('finished');
+    expect(times).toHaveLength(5);
+    expect(times.slice(1).every((time, index) => time - times[index] >= 10000)).toBe(true);
+    expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:')).map((m) => m.userID)).toEqual(
+      room.players,
+    );
+    expect(jest.getTimerCount()).toBe(0);
+  } finally {
+    jest.useRealTimers();
+  }
+});
+
 test('the leader can submit the final roster without a public announcement', async () => {
   const requests: BotRequest[] = [];
   const room = new BotRoom(

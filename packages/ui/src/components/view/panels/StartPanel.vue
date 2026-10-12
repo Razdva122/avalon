@@ -1,7 +1,24 @@
 <template>
-  <div v-if="roomState.ai?.publicBotGame && roomState.ai.status === 'ready'" class="bot-start-panel">
+  <div
+    v-if="roomState.ai?.publicBotGame && roomState.ai.status === 'stopped' && roomState.stage !== 'started'"
+    class="bot-start-panel"
+  >
+    <p role="status">{{ $t('aiArena.setupExpired') }}</p>
+    <v-btn :to="lobbyPath" color="primary">{{ $t('room.backToLobby') }}</v-btn>
+  </div>
+  <div v-else-if="roomState.ai?.publicBotGame && roomState.ai.status === 'ready'" class="bot-start-panel">
     <v-btn v-if="roomState.ai.withFriend && isUserLeader" color="info" class="mb-2" @click="onCopyClick">
       {{ $t('startPanel.copyLink') }}
+    </v-btn>
+    <v-btn
+      v-if="isUserLeader && friendID"
+      class="mb-2"
+      variant="outlined"
+      prepend-icon="close"
+      data-kick-friend
+      @click="onKickFriend"
+    >
+      {{ $t('aiArena.setupRemovePlayer') }}
     </v-btn>
     <BotGameChoices
       v-if="isUserLeader"
@@ -11,6 +28,9 @@
       :beginner="roomState.ai.beginner"
       :with-friend="roomState.ai.withFriend"
       :human-count="roomState.ai.humanPlayerIDs?.length ?? 1"
+      :difficulty="roomState.ai.preparedDifficulty"
+      :language="roomState.ai.language"
+      :player-count="roomState.ai.playerCount"
     />
     <template v-else>
       <h2>{{ roomState.ai.title }}</h2>
@@ -87,6 +107,7 @@ export default defineComponent({
   setup(props) {
     const { t, locale } = useI18n();
     const communityPath = computed(() => localizedPath('/community/', locale.value));
+    const lobbyPath = computed(() => localizedPath('/', locale.value));
     const { roomState } = toRefs(props);
     const store = useStore();
 
@@ -97,6 +118,15 @@ export default defineComponent({
     const isUserLeader = computed(() => {
       return roomState.value.leaderID === store.state.profile?.id;
     });
+    const friendID = computed(() =>
+      roomState.value.ai?.withFriend
+        ? roomState.value.ai.humanPlayerIDs?.find((id) => id !== roomState.value.leaderID)
+        : undefined,
+    );
+    const onKickFriend = () => {
+      if (isUserLeader.value && roomState.value.ai?.status === 'ready' && friendID.value)
+        socket.emit('kickPlayer', roomState.value.roomID, friendID.value);
+    };
 
     const isStartGameDisabled = computed(() => {
       return (
@@ -136,10 +166,13 @@ export default defineComponent({
 
     return {
       communityPath,
+      lobbyPath,
       roomState,
 
       isUserInGame,
       isUserLeader,
+      friendID,
+      onKickFriend,
       isStartGameDisabled,
 
       onJoinClick,

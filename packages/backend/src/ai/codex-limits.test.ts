@@ -4,6 +4,14 @@ import { EventEmitter } from 'events';
 import { PassThrough } from 'stream';
 jest.mock('child_process', () => ({ spawn: jest.fn() }));
 
+test('explicitly absent short window differs from missing or malformed quota data', () => {
+  const weekly = { usedPercent: 7, windowDurationMins: 10080 };
+  expect(parseWeeklyLimit({ rateLimits: { primary: weekly, secondary: null } })?.shortTerm).toBeNull();
+  expect(parseWeeklyLimit({ rateLimits: { primary: null, secondary: weekly } })?.shortTerm).toBeNull();
+  expect(parseWeeklyLimit({ rateLimits: { primary: weekly } })?.shortTerm).toBeUndefined();
+  expect(parseWeeklyLimit({ rateLimits: { primary: weekly, secondary: {} } })?.shortTerm).toBeUndefined();
+});
+
 test.each([true, false])(
   'concurrent quota reads share one request and cache success=%s for a minute',
   async (success) => {

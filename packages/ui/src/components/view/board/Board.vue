@@ -58,7 +58,23 @@
           :style="{ transform: calculateRotate(i) }"
           :key="player.id"
         >
+          <div
+            v-if="
+              roomState.ai?.publicBotGame &&
+              roomState.ai.withFriend &&
+              roomState.ai.status === 'ready' &&
+              (roomState.ai.humanPlayerIDs?.length ?? 1) === 1 &&
+              i === players.length - 2
+            "
+            class="friend-seat"
+            :style="{ transform: calculateRotate(i, true), translate: '0 -50%' }"
+            role="status"
+          >
+            <span class="friend-seat-avatar" aria-hidden="true"></span>
+            <span class="friend-seat-label">{{ $t('aiArena.setupEmptySeat') }}</span>
+          </div>
           <Player
+            v-else
             :data-player-id="player.id"
             :player-state="player"
             :loyalty-badge="loyaltyBadges[player.id]"
@@ -73,7 +89,7 @@
                 : undefined
             "
             :spectator-role="roomState.ai && !playerInGame ? spectatorRoles[player.id] : undefined"
-            :display-kick="userIsLeader"
+            :display-kick="canKickPlayer(player.id)"
             :display-index="roomState.stage === 'started' ? gameState.features.displayIndex : false"
             :visible-history="visibleHistory"
             :current-stage="roomState.stage === 'started' ? gameState.stage : undefined"
@@ -593,6 +609,18 @@ export default defineComponent({
     const kickPlayer = (uuid: string) => {
       socket.emit('kickPlayer', roomState.value.roomID, uuid);
     };
+    const canKickPlayer = (targetID: string) => {
+      const room = roomState.value;
+      if (store.state.profile?.id !== room.leaderID || room.stage === 'started') return false;
+      if (!room.ai) return true;
+      return Boolean(
+        room.ai.publicBotGame &&
+        room.ai.withFriend &&
+        room.ai.status === 'ready' &&
+        room.ai.humanPlayerIDs?.includes(targetID) &&
+        targetID !== room.leaderID,
+      );
+    };
 
     const canUserSelectPlayer = (targetPlayerID: string) => {
       if (!playerInGame.value) return false;
@@ -635,7 +663,7 @@ export default defineComponent({
       }
 
       if (roomState.value.stage !== 'started') {
-        userIsLeader.value ? kickPlayer(uuid) : navigateToUserStats(uuid);
+        canKickPlayer(uuid) ? kickPlayer(uuid) : navigateToUserStats(uuid);
         return;
       }
 
@@ -790,6 +818,7 @@ export default defineComponent({
 
       calculateRotate,
       onPlayerClick,
+      canKickPlayer,
       gameTimer,
       onGameTimerEnd,
       addTimerMinute,
@@ -904,6 +933,38 @@ export default defineComponent({
 .bot-preparation-table .actions-container {
   top: 0;
   height: 600px;
+}
+.friend-seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 125px;
+  height: 150px;
+  text-align: center;
+}
+.friend-seat-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 115px;
+  width: 115px;
+  height: 115px;
+  background-image: getImagePathByID('core', 'player-frame');
+  background-size: contain;
+}
+.friend-seat-label {
+  width: 115px;
+  border-radius: 8px;
+  background-image: getImagePathByID('core', 'name-frame');
+  background-size: 95% 75%;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.5)) drop-shadow(-1px 1px 0 rgba(0, 0, 0, 0.5))
+    drop-shadow(1px -1px 0 rgba(0, 0, 0, 0.5)) drop-shadow(-1px -1px 0 rgba(0, 0, 0, 0.5));
 }
 
 .game-board {

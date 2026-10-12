@@ -7,6 +7,9 @@ export type TRoomInfo = {
   aiStatus?: import('./index').AiRoomState['status'];
   aiModel?: string;
   aiTitle?: string;
+  aiHumanCount?: number;
+  aiBotCount?: number;
+  aiOpenSeats?: number;
   aiBeginner?: boolean;
   aiBotDifficulty?: import('./index').AiBotDifficulty;
   aiLanguage?: import('./index').AiLanguage;

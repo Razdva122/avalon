@@ -2,6 +2,7 @@ import { Manager } from './index';
 import { eventBus } from '@/helpers';
 import type { Server, ServerSocket, StartedRoomState } from '@avalon/types';
 import type { DBManager } from '@/db';
+import { BotRoom } from '@/ai/room';
 
 jest.mock('@/voice/runtime', () => ({
   createRoomVoice: () => ({ destroyRoom() {}, reconcile() {}, revokeSocket() {} }),
@@ -13,6 +14,64 @@ jest.mock('@/ai/service', () => ({
   },
 }));
 jest.mock('@/achievements', () => ({ AchievementManager: class {} }));
+
+test('owner can remove only the guest from a ready friend bot room', () => {
+  const { manager, handlers } = fixture(true);
+  const room = new BotRoom(
+    'friend-room',
+    'alice',
+    manager.io,
+    async () => ({ choice: 0, speech: '' }),
+    async () => {},
+    0,
+    'en',
+    5,
+  );
+  room.ai!.publicBotGame = true;
+  room.ai!.withFriend = true;
+  room.ai!.launchExpiresAt = Date.now() + 120000;
+  room.joinAsHuman('alice');
+  room.joinGame('guest');
+  manager.rooms[room.roomID] = room;
+  const deadline = room.ai!.launchExpiresAt;
+  manager.updateRoomsList(room);
+  expect(manager.roomListCutted[0]).toMatchObject({ aiHumanCount: 2, aiBotCount: 3, aiOpenSeats: 0 });
+  handlers.kickPlayer(room.roomID, 'alice');
+  handlers.kickPlayer(room.roomID, room.players[0]);
+  expect(room.humanIDs).toEqual(['alice', 'guest']);
+  handlers.kickPlayer(room.roomID, 'guest');
+  expect(room.humanIDs).toEqual(['alice']);
+  expect(room.players).not.toContain('guest');
+  expect(room.players).toHaveLength(5);
+  expect(room.ai!.launchExpiresAt).toBe(deadline);
+  manager.updateRoomsList(room);
+  expect(manager.roomListCutted[0]).toMatchObject({ aiHumanCount: 1, aiBotCount: 3, aiOpenSeats: 1 });
+  room.joinGame('friend');
+  room.ai!.status = 'running';
+  handlers.kickPlayer(room.roomID, 'friend');
+  expect(room.humanIDs).toEqual(['alice', 'friend']);
+});
+
+test('another player cannot kick the guest from a bot room', () => {
+  const { manager, handlers } = fixture(true);
+  const room = new BotRoom(
+    'friend-room',
+    'owner',
+    manager.io,
+    async () => ({ choice: 0, speech: '' }),
+    async () => {},
+    0,
+    'en',
+    5,
+  );
+  room.ai!.publicBotGame = true;
+  room.ai!.withFriend = true;
+  room.joinAsHuman('owner');
+  room.joinGame('guest');
+  manager.rooms[room.roomID] = room;
+  handlers.kickPlayer(room.roomID, 'guest');
+  expect(room.humanIDs).toEqual(['owner', 'guest']);
+});
 
 function fixture(auth = false) {
   const connections: ((socket: unknown) => void)[] = [];
