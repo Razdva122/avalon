@@ -1,4 +1,9 @@
 export default {
+  botPlayWithFriend: 'Com um amigo contra bots',
+  botFriendRoster: 'Você e um amigo + {count} bots',
+  botWaitingForFriend: 'Compartilhe o link da sala e espere seu amigo entrar.',
+  botFriendDeadlineHint:
+    'Cada jogador tem 90 segundos por turno e uma reserva pessoal de 5 minutos para a partida. Se qualquer jogador ficar sem tempo, inclusive durante a discussão, a partida termina.',
   botBusyShort: 'Ocupados',
   botSoloRoster: 'Você + 4 bots',
   botPreparationSummary: '{language}, {count} jogadores',

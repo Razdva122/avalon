@@ -1,15 +1,26 @@
 <template>
   <div v-if="roomState.ai?.publicBotGame && roomState.ai.status === 'ready'" class="bot-start-panel">
+    <v-btn v-if="roomState.ai.withFriend && isUserLeader" color="info" class="mb-2" @click="onCopyClick">
+      {{ $t('startPanel.copyLink') }}
+    </v-btn>
     <BotGameChoices
       v-if="isUserLeader"
       :roomID="roomState.roomID"
       :title="roomState.ai.title"
       :expires-at="roomState.ai.launchExpiresAt"
       :beginner="roomState.ai.beginner"
+      :with-friend="roomState.ai.withFriend"
+      :human-count="roomState.ai.humanPlayerIDs?.length ?? 1"
     />
     <template v-else>
       <h2>{{ roomState.ai.title }}</h2>
       <p>{{ $t('aiArena.ready') }}</p>
+      <v-btn
+        v-if="roomState.ai.withFriend && (isUserInGame || (roomState.ai.humanPlayerIDs?.length ?? 1) < 2)"
+        color="info"
+        @click="onJoinClick"
+        >{{ $t(isUserInGame ? 'startPanel.leaveGame' : 'startPanel.joinGame') }}</v-btn
+      >
     </template>
   </div>
   <template v-else-if="!roomState.ai">

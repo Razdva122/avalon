@@ -114,3 +114,9 @@ test('accepts beginner preparation and supported public table sizes', () => {
       validPacket('startHumanAiRoom', ['room', { difficulty: 'regular', language: 'ru', playerCount }, () => {}]),
     ).toBe(true);
 });
+
+test('friend room creation accepts a boolean mode and rejects malformed and beginner combinations', () => {
+  expect(validPacket('createHumanAiRoom', [{ beginner: false, withFriend: true }, () => {}])).toBe(true);
+  expect(validPacket('createHumanAiRoom', [{ beginner: false, withFriend: 'yes' }, () => {}])).toBe(false);
+  expect(validPacket('createHumanAiRoom', [{ beginner: true, withFriend: true }, () => {}])).toBe(false);
+});

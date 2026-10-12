@@ -781,3 +781,29 @@ for (const reduced of [false, true]) {
     assert.equal(f.timers.size, 0);
   });
 }
+
+test('friend timers belong to their seats and disappear in replay and after game end', (t) => {
+  const { api, manager } = fixture(t, game([], { stage: 'selectTeam' }));
+  manager.state.value.ai = {
+    publicBotGame: true,
+    withFriend: true,
+    status: 'running',
+    humanPlayerID: 'p3',
+    humanPlayerIDs: ['p3', 'p4'],
+    discussionPlayerID: 'p4',
+    waitingForDiscussion: true,
+    humanTimers: {
+      p3: { humanTimeBankMs: 270000 },
+      p4: { humanTimeBankMs: 300000, humanActionBaseExpiresAt: 1090000, humanActionExpiresAt: 1390000 },
+    },
+  };
+  assert.equal(api.discussionPlayerID.value, 'p4');
+  assert.equal(api.playerActionTimer('p3'), undefined);
+  assert.equal(api.playerActionTimer('p4').humanActionExpiresAt, 1390000);
+  assert.equal(api.playerActionTimer('p4').waitingForDiscussion, true);
+  manager.toggleViewMode();
+  assert.equal(api.playerActionTimer('p4'), undefined);
+  manager.toggleViewMode();
+  manager.state.value.game.stage = 'end';
+  assert.equal(api.playerActionTimer('p4'), undefined);
+});

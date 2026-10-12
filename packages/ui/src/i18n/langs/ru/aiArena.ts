@@ -1,4 +1,10 @@
 export default {
+  botPlayWithFriend: 'С другом против ботов',
+  botFriendRoster: 'Вы с другом + {count} бота',
+  botWaitingForFriend: 'Пригласите друга по ссылке и дождитесь его присоединения.',
+  botFriendDeadlineHint:
+    'У каждого игрока 90 секунд на ход и 5 минут запаса на всю партию. Если у любого игрока время истечёт, партия завершится, в том числе при обсуждении.',
+
   botBusyShort: 'Заняты',
   botSoloRoster: 'Вы + 4 бота',
   botPreparationSummary: '{language}, {count} игроков',

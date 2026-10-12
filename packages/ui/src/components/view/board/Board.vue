@@ -65,7 +65,7 @@
             :badge-hidden="activeLoyaltyTarget === player.id"
             :thinking="thinkingPlayerIDs.includes(player.id)"
             :discussion-turn="discussionPlayerID === player.id"
-            :action-timer="actionTimerPlayerID === player.id ? roomState.ai : undefined"
+            :action-timer="playerActionTimer(player.id)"
             :voice-side="Math.sin((2 * Math.PI * i) / players.length + Math.PI) > 0.75 ? 'left' : 'right'"
             :private-decision="
               roomState.ai && !playerInGame && spectatorRoles[player.id]
@@ -526,7 +526,8 @@ export default defineComponent({
     const discussionPlayerID = computed(() => {
       const room = roomState.value;
       if (stateManager.viewMode.value !== 'live' || room.stage !== 'started' || room.game.stage === 'end') return;
-      if (room.ai?.status === 'running' && room.ai.waitingForDiscussion) return room.ai.humanPlayerID;
+      if (room.ai?.status === 'running' && room.ai.waitingForDiscussion)
+        return room.ai.discussionPlayerID ?? room.ai.humanPlayerID;
     });
 
     const actionTimerPlayerID = computed(() => {
@@ -535,6 +536,22 @@ export default defineComponent({
       if (room.ai?.publicBotGame && room.ai.status === 'running' && room.ai.humanActionExpiresAt)
         return room.ai.humanPlayerID;
     });
+
+    const playerActionTimer = (id: string) => {
+      const room = roomState.value;
+      if (
+        stateManager.viewMode.value !== 'live' ||
+        room.stage !== 'started' ||
+        room.game.stage === 'end' ||
+        !room.ai?.publicBotGame ||
+        room.ai.status !== 'running'
+      )
+        return;
+      const timer = room.ai.humanTimers?.[id];
+      if (timer?.humanActionExpiresAt)
+        return { ...room.ai, ...timer, waitingForDiscussion: room.ai.discussionPlayerID === id };
+      if (!room.ai.withFriend && actionTimerPlayerID.value === id) return room.ai;
+    };
 
     const calculateRotate = (i: number, negative: boolean = false) => {
       return `rotate(${negative ? '-' : ''}${(360 / players.value.length) * i + 180}deg)`;
@@ -760,6 +777,7 @@ export default defineComponent({
       discussionPlayerID,
       thinkingPlayerIDs,
       actionTimerPlayerID,
+      playerActionTimer,
       visibleHistory,
       stateManager,
       gameResult,

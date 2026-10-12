@@ -42,8 +42,15 @@ export type AiPlayerCount = 5 | 6 | 7 | 8;
 export type AiBotDifficulty = 'smart' | 'regular';
 
 export type AiRoomState = {
-  /** Single human seat; absent in spectator-only bot matches. */
+  /** Owner human seat; absent in spectator-only bot matches. */
   humanPlayerID?: string;
+  withFriend?: boolean;
+  humanPlayerIDs?: string[];
+  discussionPlayerID?: string;
+  humanTimers?: Record<
+    string,
+    { humanActionExpiresAt?: number; humanActionBaseExpiresAt?: number; humanTimeBankMs: number }
+  >;
   /** Public one-human/four-bot room, including its ready preparation stage. */
   publicBotGame?: boolean;
   /** Beginner-only five-seat match with simpler bot communication. */
@@ -52,7 +59,7 @@ export type AiRoomState = {
   launchExpiresAt?: number;
   humanActionExpiresAt?: number;
   humanActionBaseExpiresAt?: number;
-  /** Shared reserve for mandatory human actions; discussion does not spend it. */
+  /** Owner reserve shared across turns and discussion. */
   humanTimeBankMs?: number;
   /** Public human match with server-frozen model and reasoning settings. */
   botDifficulty?: AiBotDifficulty;

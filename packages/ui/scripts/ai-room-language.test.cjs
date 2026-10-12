@@ -1152,3 +1152,50 @@ test('compact preparation countdown shows remaining launch time and reaches zero
   tick();
   assert.ok((await room.render()).includes('На запуск 0:00'));
 });
+
+test('friend entry creates a two-human room', async (t) => {
+  const room = await fixture('pages/lobby/BotRoomButton.vue', {
+    props: { withFriend: true },
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
+  });
+  t.after(room.stop);
+  await room.nodes('v-btn')[0].props.onClick();
+  assert.deepEqual(room.sent, [['createHumanAiRoom', { beginner: false, withFriend: true }]]);
+});
+
+test('friend preparation blocks launch until the second human joins', async (t) => {
+  const props = { roomID: 'friends', withFriend: true, humanCount: 1 };
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    locale: 'ru',
+    props,
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
+  });
+  t.after(room.stop);
+  assert.match(room.html, /Вы с другом/);
+  assert.match(room.html, /дождитесь его присоединения/);
+  const button = room.nodes('v-btn').find((node) => node.props?.['data-bot-mode'] === 'regular');
+  assert.equal(button.props.disabled, true);
+  await button.props.onClick();
+  assert.deepEqual(room.sent, []);
+  props.humanCount = 2;
+  await room.render();
+  await room
+    .nodes('v-btn')
+    .find((node) => node.props?.['data-bot-mode'] === 'regular')
+    .props.onClick();
+  assert.equal(room.sent[0][0], 'startHumanAiRoom');
+});
+
+test('only the current human speaker gets the pass button in a friend game', async (t) => {
+  const room = await fixture('components/view/panels/AiRoomPanel.vue', {
+    locale: 'ru',
+    props: {
+      roomID: 'friends',
+      isHumanPlayer: true,
+      isDiscussionPlayer: false,
+      ai: { status: 'running', withFriend: true, humanPlayerIDs: ['owner', 'friend'], waitingForDiscussion: true },
+    },
+  });
+  t.after(room.stop);
+  assert.doesNotMatch(room.html, /Ваше слово|Передать слово/);
+});

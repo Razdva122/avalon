@@ -285,7 +285,7 @@ export class AiService {
             !active ||
             (active instanceof BotRoom &&
               this.publicRoom(active) &&
-              active.ai?.humanPlayerID === userID &&
+              Boolean(userID && active.isHuman(userID)) &&
               this.launchReady(active))
           );
         };
@@ -299,7 +299,7 @@ export class AiService {
         const botsBusy = !eligibleSlot() || this.creating || this.starting || this.running.size > 0;
         if (botsBusy) botModes = { smart: false, regular: false };
         const ownRoomID =
-          active instanceof BotRoom && this.publicRoom(active) && active.ai?.humanPlayerID === userID
+          active instanceof BotRoom && this.publicRoom(active) && Boolean(userID && active.isHuman(userID))
             ? active.roomID
             : undefined;
         const publicAccess = canPlay
@@ -332,13 +332,16 @@ export class AiService {
     socket.on('createHumanAiRoom', async (...args: unknown[]) => {
       const cb = args[args.length - 1] as (result: { roomID: string } | { error: string }) => void;
       if (typeof cb !== 'function') return;
-      const options = args.length === 1 ? { beginner: false } : (args[0] as { beginner: boolean });
+      const options =
+        args.length === 1 ? { beginner: false } : (args[0] as { beginner: boolean; withFriend?: boolean });
       if (
         !options ||
         typeof options !== 'object' ||
         Array.isArray(options) ||
-        Object.keys(options).length !== 1 ||
-        typeof options.beginner !== 'boolean'
+        Object.keys(options).some((key) => !['beginner', 'withFriend'].includes(key)) ||
+        typeof options.beginner !== 'boolean' ||
+        (options.withFriend !== undefined && typeof options.withFriend !== 'boolean') ||
+        (options.beginner && options.withFriend === true)
       )
         return cb({ error: 'Invalid bot room options' });
       let claimedID: string | undefined;
@@ -349,7 +352,7 @@ export class AiService {
         const active = this.active();
         if (active)
           return cb(
-            active instanceof BotRoom && this.publicRoom(active) && active.ai?.humanPlayerID === userID
+            active instanceof BotRoom && this.publicRoom(active) && Boolean(userID && active.isHuman(userID))
               ? { roomID: active.roomID }
               : { error: 'Another AI match is already active' },
           );
@@ -367,6 +370,7 @@ export class AiService {
         const room = (createdRoom = this.createRoom(id, userID!, 'en', 5));
         room.ai!.publicBotGame = true;
         room.ai!.beginner = options.beginner;
+        if (options.withFriend) room.ai!.withFriend = true;
         room.ai!.title = `${typeof profile.name === 'string' && profile.name.trim() ? profile.name : userID} vs 4 Bots`;
         room.ai!.launchExpiresAt = Date.now() + 90000;
         room.joinAsHuman(userID!);
@@ -408,6 +412,8 @@ export class AiService {
           !['en', 'ru', 'zh-tw'].includes(options.language)
         )
           return cb({ error: 'Invalid bot mode or language' });
+        if (room.ai!.withFriend && room.humanIDs.length !== 2)
+          return cb({ error: 'Wait for your friend to join before launch' });
         const playerCount = options.playerCount ?? 5;
         if (room.ai!.beginner && (options.difficulty !== 'regular' || playerCount !== 5))
           return cb({ error: 'Beginner games require regular bots and five players' });
@@ -433,8 +439,21 @@ export class AiService {
           await this.expireLaunch(room);
           return cb({ error: 'The bot game preparation time has expired' });
         }
+        let friendName: string | undefined;
+        if (room.ai!.withFriend) {
+          const friendID = room.humanIDs[1];
+          if (!friendID) return cb({ error: 'Wait for your friend to join before launch' });
+          const friend = await this.manager.dbManager.getUserByID(friendID);
+          if (!this.launchReady(room)) {
+            await this.expireLaunch(room);
+            return cb({ error: 'The bot game preparation time has expired' });
+          }
+          if (room.humanIDs[1] !== friendID) return cb({ error: 'Bot room preparation changed' });
+          friendName = friend.name || friendID;
+        }
         room.setPlayerCount(playerCount);
-        room.ai!.title = room.ai!.title?.replace(/vs \d+ Bots$/, `vs ${playerCount - 1} Bots`);
+        room.ai!.title = room.ai!.title?.replace(/vs \d+ Bots$/, `vs ${playerCount - room.humanIDs.length} Bots`);
+        if (friendName) room.ai!.title = room.ai!.title?.replace(' vs ', ` + ${friendName} vs `);
         room.setLanguage(options.language);
         room.ai!.botDifficulty = options.difficulty;
         room.ai!.codex = { ...humanSettings[options.difficulty] };
@@ -496,7 +515,7 @@ export class AiService {
       try {
         if (typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id)) return cb({ error: 'Invalid room ID' });
         const room = this.manager.rooms[id];
-        if (!(room instanceof BotRoom) || !userID || room.ai?.humanPlayerID !== userID)
+        if (!(room instanceof BotRoom) || !userID || !room.isHuman(userID))
           return cb({ error: 'Not your discussion turn' });
         // Drain preceding chat writes before waking the next bot.
         await this.manager.chatService?.history(id, room.chat.history);
@@ -564,7 +583,7 @@ export class AiService {
         if (typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id)) return cb({ error: 'Invalid room ID' });
         const room = this.manager.rooms[id];
         if (!(room instanceof BotRoom)) return cb({ error: 'AI room not found' });
-        const ownHumanRoom = Boolean(this.publicRoom(room) && userID && room.ai?.humanPlayerID === userID);
+        const ownHumanRoom = Boolean(this.publicRoom(room) && userID && room.isHuman(userID));
         if (!(await this.canManage(userID)) && !(ownHumanRoom && (await this.canPlay(userID))))
           return cb({ error: 'AI room access denied' });
         if (this.starting) return cb({ error: 'AI room control in progress' });

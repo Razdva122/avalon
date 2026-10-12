@@ -635,7 +635,7 @@ export class Manager {
     const getRoomManager = (uuid: string) => {
       const room = this.rooms[uuid];
       if (room?.ai) {
-        if (!(room instanceof BotRoom) || room.ai.humanPlayerID !== userID || room.data.stage !== 'started')
+        if (!(room instanceof BotRoom) || !room.isHuman(userID) || room.data.stage !== 'started')
           throw new Error('AI players are controlled by the server');
         const manager = room.data.manager;
         return {

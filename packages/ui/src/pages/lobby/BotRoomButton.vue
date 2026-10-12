@@ -30,6 +30,7 @@ import { openRoomRoute } from '@/helpers/open-room-route';
 const { t, locale } = useI18n();
 const props = defineProps<{
   beginner?: boolean;
+  withFriend?: boolean;
   unavailableText?: string;
   busyText?: string;
   loadingText?: string;
@@ -97,9 +98,11 @@ async function openRoom() {
       if (opened) emit('opened');
       return;
     }
-    const result = props.beginner
-      ? await socket.timeout(30000).emitWithAck('createHumanAiRoom', { beginner: true })
-      : await socket.timeout(30000).emitWithAck('createHumanAiRoom');
+    const result = props.withFriend
+      ? await socket.timeout(30000).emitWithAck('createHumanAiRoom', { beginner: false, withFriend: true })
+      : props.beginner
+        ? await socket.timeout(30000).emitWithAck('createHumanAiRoom', { beginner: true })
+        : await socket.timeout(30000).emitWithAck('createHumanAiRoom');
     if (!active) return;
     if ('error' in result) {
       reportError('aiArena.botPlayError');

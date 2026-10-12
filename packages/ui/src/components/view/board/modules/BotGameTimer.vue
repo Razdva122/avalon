@@ -13,7 +13,15 @@
           {{ $t('aiArena.botTimeBankRemaining', { seconds: reserveSeconds }) }}
         </p>
         <p class="bot-action-hint">
-          {{ $t(discussion ? 'aiArena.botDiscussionDeadlineHint' : 'aiArena.botActionDeadlineHint') }}
+          {{
+            $t(
+              withFriend
+                ? 'aiArena.botFriendDeadlineHint'
+                : discussion
+                  ? 'aiArena.botDiscussionDeadlineHint'
+                  : 'aiArena.botActionDeadlineHint',
+            )
+          }}
         </p>
       </div>
     </details>
@@ -29,7 +37,15 @@
       {{ $t('aiArena.botTimeBankRemaining', { seconds: reserveSeconds }) }}
     </p>
     <p v-if="phase === 'action' && !compact" class="bot-action-hint">
-      {{ $t(discussion ? 'aiArena.botDiscussionDeadlineHint' : 'aiArena.botActionDeadlineHint') }}
+      {{
+        $t(
+          withFriend
+            ? 'aiArena.botFriendDeadlineHint'
+            : discussion
+              ? 'aiArena.botDiscussionDeadlineHint'
+              : 'aiArena.botActionDeadlineHint',
+        )
+      }}
     </p>
   </div>
 </template>
@@ -41,6 +57,7 @@ const props = defineProps<{
   baseExpiresAt?: number;
   timeBankMs?: number;
   discussion?: boolean;
+  withFriend?: boolean;
   phase: 'preparation' | 'action';
   compact?: boolean;
 }>();

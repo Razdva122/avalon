@@ -7,7 +7,7 @@ import type { AiLanguage, Server, ServerSocket, TRoomState } from '@avalon/types
 
 const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
 
-function fixture(kind: 'discussion' | 'vote', language: AiLanguage = 'en') {
+function fixture(kind: 'discussion' | 'vote', language: AiLanguage = 'en', withFriend = false) {
   const saved: TRoomState[] = [];
   const requests: string[] = [];
   const room = new BotRoom(
@@ -25,7 +25,12 @@ function fixture(kind: 'discussion' | 'vote', language: AiLanguage = 'en') {
     language,
     5,
   );
+  if (withFriend) {
+    room.ai!.publicBotGame = true;
+    room.ai!.withFriend = true;
+  }
   room.joinAsHuman('owner');
+  if (withFriend) room.joinGame('friend');
   const ai = room.ai!;
   ai.publicBotGame = true;
   Room.prototype.startGame.call(room);
@@ -36,7 +41,7 @@ function fixture(kind: 'discussion' | 'vote', language: AiLanguage = 'en') {
     for (const player of game.players.slice(0, 2))
       room.data.manager.callGameMethods('owner', { method: 'selectPlayer', playerID: player.userID });
     room.data.manager.callGameMethods('owner', { method: 'sentSelectedPlayers' });
-    for (const player of game.players.filter((player) => player.userID !== 'owner'))
+    for (const player of game.players.filter((player) => !room.isHuman(player.userID)))
       room.data.manager.callGameMethods(player.userID, { method: 'voteForMission', option: 'reject' });
   }
   ai.status = 'paused';
@@ -339,6 +344,124 @@ test('discussion overtime reduces the reserve available for the following board 
       humanActionBaseExpiresAt: 1210000,
       humanActionExpiresAt: 1480000,
     });
+  } finally {
+    room.stop();
+    await run;
+  }
+});
+
+test('a friend replaces a bot only in a ready friend table and survives resizing', () => {
+  const { room, ai } = fixture('vote');
+  const draft = new BotRoom('friends', 'owner', io, async () => ({ choice: 0, speech: '' }), undefined, 0, 'en', 5);
+  draft.joinAsHuman('owner');
+  draft.ai!.publicBotGame = true;
+  Object.assign(draft.ai!, { withFriend: true });
+  draft.joinGame('friend');
+  expect(draft.players).toContain('friend');
+  expect(draft.players.filter((id) => !id.startsWith('ai-'))).toContain('owner');
+  expect(() => draft.joinGame('third')).toThrow();
+  draft.setPlayerCount(6);
+  expect(draft.players).toContain('friend');
+  expect(draft.players).toContain('owner');
+  expect(() => room.joinGame('friend')).toThrow();
+  expect(ai.status).toBe('paused');
+});
+
+test('both humans vote themselves and the remaining player keeps an independent deadline', async () => {
+  const { room, ai, game, requests } = fixture('vote', 'en', true);
+  const run = room.run(true);
+  try {
+    await jest.advanceTimersByTimeAsync(120000);
+    room.humanAction('owner', { method: 'voteForMission', option: 'reject' });
+    await jest.advanceTimersByTimeAsync(0);
+    expect(game.stage).toBe('votingForTeam');
+    expect(ai.status).toBe('running');
+    expect(() => room.humanAction('stranger', { method: 'voteForMission', option: 'reject' })).toThrow();
+    await jest.advanceTimersByTimeAsync(269999);
+    expect(ai.status).toBe('running');
+    await jest.advanceTimersByTimeAsync(1);
+    await run;
+    expect(ai.status).toBe('stopped');
+    expect(game.stage).toBe('end');
+    expect(requests).not.toContain('friend');
+    expect(jest.getTimerCount()).toBe(0);
+  } finally {
+    room.stop();
+    await run;
+  }
+});
+
+test('friend table stops instead of passing a discussion when time runs out', async () => {
+  const { room, ai, game } = fixture('discussion', 'en', true);
+  const run = room.run(true);
+  try {
+    await jest.advanceTimersByTimeAsync(390000);
+    expect(ai.status).toBe('stopped');
+    expect(game.stage).toBe('end');
+  } finally {
+    room.stop();
+    await run;
+  }
+});
+
+test('discussion overtime spends only the current speaker reserve', async () => {
+  const { room, ai } = fixture('discussion', 'en', true);
+  const run = room.run(true);
+  try {
+    await jest.advanceTimersByTimeAsync(120000);
+    expect(ai.discussionPlayerID).toBe('owner');
+    expect(() => room.finishDiscussion('friend')).toThrow();
+    room.finishDiscussion('owner');
+    await jest.advanceTimersByTimeAsync(0);
+    expect(ai.discussionPlayerID).toBe('friend');
+    expect(ai.humanTimers!.owner).toEqual({ humanTimeBankMs: 270000 });
+    expect(ai.humanTimers!.friend).toMatchObject({ humanTimeBankMs: 300000, humanActionExpiresAt: 1510000 });
+    room.onChatMessage!(room.addMessage('owner', 'Not my turn now.'));
+    expect(ai.discussionPlayerID).toBe('friend');
+    room.onChatMessage!(room.addMessage('friend', 'My recommendation.'));
+    await jest.advanceTimersByTimeAsync(0);
+    expect(ai.waitingForDiscussion).toBeUndefined();
+    expect(ai.humanTimers!.friend).toEqual({ humanTimeBankMs: 300000 });
+    expect(ai.humanTimers!.owner).toMatchObject({ humanTimeBankMs: 270000, humanActionExpiresAt: 1480000 });
+  } finally {
+    room.stop();
+    await run;
+  }
+});
+
+test('a friend action received at the deadline ends the game before accepting the action', async () => {
+  const { room, ai, game } = fixture('vote', 'en', true);
+  const run = room.run(true);
+  try {
+    await jest.advanceTimersByTimeAsync(0);
+    jest.setSystemTime(1390000);
+    expect(() => room.humanAction('friend', { method: 'voteForMission', option: 'approve' })).toThrow('timed out');
+    await run;
+    expect(ai.status).toBe('stopped');
+    expect(game.stage).toBe('end');
+  } finally {
+    room.stop();
+    await run;
+  }
+});
+
+test('selecting team members does not cancel the friend-mode leader deadline', async () => {
+  const { room, ai, game } = fixture('discussion', 'en', true);
+  const run = room.run(true);
+  try {
+    await jest.advanceTimersByTimeAsync(0);
+    room.finishDiscussion('owner');
+    await jest.advanceTimersByTimeAsync(0);
+    room.finishDiscussion('friend');
+    await jest.advanceTimersByTimeAsync(0);
+    expect(ai.waitingForDiscussion).toBeUndefined();
+    expect(ai.humanTimers!.owner.humanActionExpiresAt).toBe(1390000);
+    room.humanAction('owner', { method: 'selectPlayer', playerID: game.players[0].userID });
+    expect(ai.humanTimers!.owner.humanActionExpiresAt).toBe(1390000);
+    await jest.advanceTimersByTimeAsync(390000);
+    await run;
+    expect(ai.status).toBe('stopped');
+    expect(game.stage).toBe('end');
   } finally {
     room.stop();
     await run;

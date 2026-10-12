@@ -22,6 +22,7 @@
           :base-expires-at="activeActionTimer.humanActionBaseExpiresAt"
           :time-bank-ms="activeActionTimer.humanTimeBankMs"
           :discussion="activeActionTimer.waitingForDiscussion"
+          :with-friend="activeActionTimer.withFriend"
           phase="action"
           compact
         />

@@ -56,14 +56,16 @@ export class AchievementHandlers {
 
   /** AI matches award only this dedicated human achievement. */
   async handleAiGameEnd(state: StartedRoomState): Promise<void> {
-    const humanID = state.ai?.humanPlayerID;
+    const humanIDs = state.ai?.humanPlayerIDs ?? (state.ai?.humanPlayerID ? [state.ai.humanPlayerID] : []);
     const game = state.game;
-    if (!humanID || game.stage !== 'end' || !game.result?.winner || game.result.reason === 'manualy') return;
-    const player = game.players.find((player) => player.id === humanID);
-    if (!player) return;
-    const loyalty = Object.keys(evilRolesImportance).includes(player.role) ? 'evil' : 'good';
-    if (loyalty === game.result.winner) {
-      await this.achievementService.updateAchievementProgress(humanID, ACHIEVEMENT_AI_WIN);
+    if (game.stage !== 'end' || !game.result?.winner || game.result.reason === 'manualy') return;
+    for (const humanID of new Set(humanIDs)) {
+      const player = game.players.find((player) => player.id === humanID);
+      if (!player) continue;
+      const loyalty = Object.keys(evilRolesImportance).includes(player.role) ? 'evil' : 'good';
+      if (loyalty === game.result.winner) {
+        await this.achievementService.updateAchievementProgress(humanID, ACHIEVEMENT_AI_WIN);
+      }
     }
   }
 

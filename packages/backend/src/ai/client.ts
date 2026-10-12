@@ -5,6 +5,7 @@ import type { AiLanguage, VisualGameState } from '@avalon/types';
 export type BotRequest = {
   playerID: string;
   humanPlayerID?: string;
+  humanPlayerIDs?: string[];
   beginner?: boolean;
   // Public declarations and this bot's prior positions come from structured model actions, never text parsing.
   publicRoleClaims?: { by: number; target: number; status: 'claim' }[];
@@ -264,13 +265,15 @@ export function compactRequest(request: BotRequest) {
       },
     ];
   });
-  const humanSeat = seat(request.humanPlayerID);
-  const humanMessages = humanSeat === undefined ? [] : request.chat.filter((m) => m.name === String(humanSeat));
+  const humanSeats = (request.humanPlayerIDs ?? (request.humanPlayerID ? [request.humanPlayerID] : []))
+    .map((id) => seat(id))
+    .filter((index) => index !== undefined);
+  const humanMessages = request.chat.filter((m) => humanSeats.includes(Number(m.name)));
   // Keep opening evidence and recent revisions even when bot dialogue displaces the recent chat.
   // ponytail: bounded to 24 human statements; larger histories need a sourced testimony summary.
   const humanStatements = humanMessages
     .filter((_, i) => i < 8 || i >= humanMessages.length - 16)
-    .map((m) => ({ by: humanSeat!, text: m.text.slice(0, 600), status: 'claim' as const }));
+    .map((m) => ({ by: Number(m.name), text: m.text.slice(0, 600), status: 'claim' as const }));
   const failsRequired = state.settings?.missions[state.mission]?.failsRequired;
   return {
     you: own && {

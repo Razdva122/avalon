@@ -1,6 +1,12 @@
 <template>
   <section v-if="ai" class="ai-panel" :aria-label="$t('aiArena.title')">
-    <div v-if="isHumanPlayer && ai.status === 'running' && ai.waitingForDiscussion" class="ai-human-turn" role="status">
+    <div
+      v-if="
+        isHumanPlayer && (!ai.withFriend || isDiscussionPlayer) && ai.status === 'running' && ai.waitingForDiscussion
+      "
+      class="ai-human-turn"
+      role="status"
+    >
       <strong>{{ $t('aiArena.yourDiscussionTurn') }}</strong>
       <p>{{ $t('aiArena.discussionHint') }}</p>
       <v-btn color="primary" :loading="busy" :disabled="busy" @click="finishDiscussion">
@@ -12,9 +18,16 @@
         <span class="ai-heading"
           ><strong>{{ ai.title || $t('aiArena.title') }}</strong
           ><small>{{
-            $t(ai.humanPlayerID ? 'aiArena.mixedPlayerCount' : 'aiArena.playerCount', {
-              count: displayPlayerCount - (ai.humanPlayerID ? 1 : 0),
-            })
+            $t(
+              ai.withFriend
+                ? 'aiArena.botFriendRoster'
+                : ai.humanPlayerID
+                  ? 'aiArena.mixedPlayerCount'
+                  : 'aiArena.playerCount',
+              {
+                count: displayPlayerCount - (ai.humanPlayerIDs?.length ?? (ai.humanPlayerID ? 1 : 0)),
+              },
+            )
           }}</small
           ><small v-if="displayModel">{{ displayModel }}</small></span
         >
@@ -123,6 +136,7 @@ const props = defineProps<{
   canReveal?: boolean;
   canJoin?: boolean;
   isHumanPlayer?: boolean;
+  isDiscussionPlayer?: boolean;
   rolesShown?: boolean;
 }>();
 const { t } = useI18n();

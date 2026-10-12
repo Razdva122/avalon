@@ -1,4 +1,9 @@
 export default {
+  botPlayWithFriend: '與好友一起對戰機器人',
+  botFriendRoster: '你和好友 + {count} 個機器人',
+  botWaitingForFriend: '分享房間連結，等待好友加入。',
+  botFriendDeadlineHint:
+    '每位玩家每回合有90秒，整局另有個人5分鐘備用時間。任一玩家時間耗盡（包括討論期間），對局立即結束。',
   botBusyShort: '忙碌中',
   botSoloRoster: '你 + 4 個機器人',
   botPreparationSummary: '{language}，{count} 位玩家',

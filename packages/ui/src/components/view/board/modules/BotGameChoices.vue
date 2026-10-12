@@ -2,9 +2,11 @@
   <section class="bot-game-choices" :aria-label="$t('aiArena.playWithBots')">
     <h2 class="bot-table" :title="title">
       {{
-        selectedPlayerCount === 5
-          ? $t('aiArena.botSoloRoster')
-          : $t('aiArena.mixedPlayerCount', { count: selectedPlayerCount - 1 })
+        withFriend
+          ? $t('aiArena.botFriendRoster', { count: selectedPlayerCount - 2 })
+          : selectedPlayerCount === 5
+            ? $t('aiArena.botSoloRoster')
+            : $t('aiArena.mixedPlayerCount', { count: selectedPlayerCount - 1 })
       }}
     </h2>
     <button
@@ -21,13 +23,14 @@
       <span>{{ $t('aiArena.botPreparationSummary', { language: languageName, count: selectedPlayerCount }) }}</span>
       <v-icon icon="settings" class="bot-settings-icon" aria-hidden="true" />
     </button>
+    <p v-if="withFriend && humanCount !== 2" role="status">{{ $t('aiArena.botWaitingForFriend') }}</p>
     <div class="bot-modes" :class="{ 'bot-modes--beginner': beginner }">
       <div v-for="difficulty in botDifficulties" :key="difficulty" class="bot-mode">
         <v-btn
           :data-bot-mode="difficulty"
           :class="`bot-mode-button bot-mode-button--${difficulty}`"
           :loading="busy && pendingDifficulty === difficulty"
-          :disabled="busy || !canPlay || !botModes[difficulty]"
+          :disabled="busy || !canPlay || !botModes[difficulty] || (withFriend && humanCount !== 2)"
           :aria-describedby="`bot-${difficulty}-availability`"
           @click="play(difficulty)"
         >
@@ -120,7 +123,13 @@
             </select>
           </label>
         </div>
-        <p class="bot-sheet-note">{{ $t('aiArena.mixedPlayerCount', { count: selectedPlayerCount - 1 }) }}</p>
+        <p class="bot-sheet-note">
+          {{
+            $t(withFriend ? 'aiArena.botFriendRoster' : 'aiArena.mixedPlayerCount', {
+              count: selectedPlayerCount - (withFriend ? 2 : 1),
+            })
+          }}
+        </p>
         <p v-if="!beginner && !canPlayLargeTables" class="bot-sheet-note">{{ $t('aiArena.botPremiumSeats') }}</p>
         <div class="bot-sheet-explanations">
           <p v-if="beginner">{{ $t('aiArena.botBeginnerHint') }}</p>
@@ -164,7 +173,9 @@
             <v-icon icon="close" aria-hidden="true" />
           </button>
         </header>
-        <p class="bot-time-explanation">{{ $t('aiArena.botActionDeadlineHint') }}</p>
+        <p class="bot-time-explanation">
+          {{ $t(withFriend ? 'aiArena.botFriendDeadlineHint' : 'aiArena.botActionDeadlineHint') }}
+        </p>
         <p v-if="beginner" class="bot-time-explanation">{{ $t('aiArena.botBeginnerHint') }}</p>
         <button type="button" class="bot-sheet-done" :disabled="busy" @click="timeHelpOpen = false">
           {{ $t('aiArena.botSettingsDone') }}
@@ -183,7 +194,14 @@ import { localizedPath } from '@/router/paths';
 import { socket } from '@/api/socket';
 import type { AiBotDifficulty, AiLanguage, AiPlayerCount } from '@avalon/types';
 import BotGameTimer from './BotGameTimer.vue';
-const props = defineProps<{ roomID: string; title?: string; expiresAt?: number; beginner?: boolean }>();
+const props = defineProps<{
+  roomID: string;
+  title?: string;
+  expiresAt?: number;
+  beginner?: boolean;
+  withFriend?: boolean;
+  humanCount?: number;
+}>();
 const { t, locale } = useI18n();
 const router = useRouter();
 const { canPlay, canPlayLargeTables, botModes, botsBusy, botWaitHours, accessStatus, refresh } = useAiAccess();
@@ -221,6 +239,7 @@ async function leave() {
   }
 }
 async function play(difficulty: AiBotDifficulty) {
+  if (props.withFriend && props.humanCount !== 2) return;
   if (busy.value || !canPlay.value || !botModes.value[difficulty] || accessStatus.value !== 'ready') return;
   if (!props.beginner && selectedPlayerCount.value >= 7 && !canPlayLargeTables.value) return;
   if (props.expiresAt && Date.now() >= props.expiresAt) {

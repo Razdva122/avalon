@@ -504,3 +504,27 @@ test.each([
     allowed ? { ok: true } : { error: 'Premium is required for seven or eight players' },
   );
 });
+
+test('friend mode requires two humans before launch and lets either human find their room', async () => {
+  const { host, connect } = fixture();
+  const created = jest.fn();
+  await connect('owner').createHumanAiRoom({ beginner: false, withFriend: true }, created);
+  const result = created.mock.calls[0][0];
+  expect(result).toHaveProperty('roomID');
+  const room = host.rooms[result.roomID] as BotRoom;
+  const rejected = jest.fn();
+  await connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'ru' }, rejected);
+  expect(rejected.mock.calls[0][0]).toHaveProperty('error');
+  room.joinGame('friend');
+  const started = jest.fn();
+  await connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'ru' }, started);
+  expect(started.mock.calls[0][0]).toEqual({ ok: true });
+  expect(room.players).toContain('friend');
+  expect(room.players).toHaveLength(5);
+  expect(room.ai!.humanPlayerIDs).toEqual(['owner', 'friend']);
+  expect(room.ai!.title).toBe('Alice + friend vs 3 Bots');
+  const access = jest.fn();
+  await connect('friend').getAiRoomAccess(access);
+  expect(access.mock.calls[0][0].ownRoomID).toBe(room.roomID);
+  room.stop();
+});

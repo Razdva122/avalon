@@ -15,6 +15,7 @@
             {{ $t('mainPage.createRoom') }}
           </v-btn>
           <BotRoomButton />
+          <BotRoomButton with-friend>{{ $t('aiArena.botPlayWithFriend') }}</BotRoomButton>
           <nav class="lobby-links" :aria-label="$t('menu.wiki')">
             <LocaleLink :to="{ name: 'rules' }"
               ><span class="link-label">{{ $t('wiki.rules') }}</span

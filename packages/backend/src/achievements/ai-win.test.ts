@@ -67,3 +67,13 @@ test.each(['loss', 'unfinished', 'cancelled', 'spectator', 'ordinary'])('%s does
   await handle(room);
   expect(await userAchievementModel.countDocuments()).toBe(0);
 });
+
+test('friend games award each winning human and exclude the losing human', async () => {
+  const room = state('morgana', 'good');
+  room.ai!.humanPlayerIDs = ['human', 'friend'];
+  room.game.players.push({ id: 'friend', role: 'servant' } as (typeof room.game.players)[number]);
+  await handle(room);
+  const awards = await userAchievementModel.find().lean();
+  expect(awards).toHaveLength(1);
+  expect(awards[0]).toMatchObject({ userID: 'friend', achievementID: 'ai_win', completed: true });
+});

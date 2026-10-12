@@ -160,7 +160,11 @@ export function validPacket(event: string, args: unknown[]): boolean {
   if (event === 'createHumanAiRoom')
     return (
       values.length === 0 ||
-      (record(values[0]) && Object.keys(values[0]).length === 1 && typeof values[0].beginner === 'boolean')
+      (record(values[0]) &&
+        Object.keys(values[0]).every((key) => ['beginner', 'withFriend'].includes(key)) &&
+        typeof values[0].beginner === 'boolean' &&
+        (values[0].withFriend === undefined || typeof values[0].withFriend === 'boolean') &&
+        !(values[0].beginner && values[0].withFriend))
     );
   if (event === 'startHumanAiRoom') {
     const options = values[1];

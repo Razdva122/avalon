@@ -1008,84 +1008,99 @@ test('one owner replaces a bot only before launch', () => {
   expect(() => room.joinAsHuman('admin')).toThrow();
 });
 
-test('human seat completes a real game through ordinary actions without any model impersonation', async () => {
-  const requests: BotRequest[] = [];
-  const publicStatus: { task: string; message: string; councilDiscussion?: boolean; thinkingPlayerID?: string }[] = [];
-  const room = new BotRoom('human-game', 'admin', io, async (request) => {
-    requests.push(request);
-    const ai = room.calculateRoomState('admin').ai!;
-    publicStatus.push({
-      task: request.task,
-      message: ai.message,
-      councilDiscussion: request.councilDiscussion,
-      thinkingPlayerID: ai.thinkingPlayerID,
+test.each([false, true])(
+  'human seats complete a real game without model impersonation (withFriend=%s)',
+  async (withFriend) => {
+    const requests: BotRequest[] = [];
+    const publicStatus: { task: string; message: string; councilDiscussion?: boolean; thinkingPlayerID?: string }[] =
+      [];
+    const room = new BotRoom('human-game', 'admin', io, async (request) => {
+      requests.push(request);
+      const ai = room.calculateRoomState('admin').ai!;
+      publicStatus.push({
+        task: request.task,
+        message: ai.message,
+        councilDiscussion: request.councilDiscussion,
+        thinkingPlayerID: ai.thinkingPlayerID,
+      });
+      return {
+        ...reply(request),
+        choice: request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0,
+      };
     });
-    return { ...reply(request), choice: request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0 };
-  });
-  room.joinAsHuman('admin');
-  room.addMessage('admin', 'Consider my proposed team.');
-  const run = room.run();
-  try {
-    for (let step = 0; step < 1000 && room.ai?.status === 'running'; step++) {
-      // Let the real bot loop reach its next human boundary, without a provider or network.
-      await new Promise<void>((resolve) => setImmediate(resolve));
-      if (room.data.stage !== 'started') continue;
-      const game = room.data.manager.game;
-      if (room.ai?.waitingForDiscussion) {
-        room.finishDiscussion('admin');
-        continue;
-      }
-      if (room.ai?.discussionPending) continue;
-      const human = game.players.find((p) => p.userID === 'admin')!;
-      if (!human.features.waitForAction) continue;
-      const act = (params: Parameters<typeof room.humanAction>[1]) => room.humanAction('admin', params);
-      switch (game.stage) {
-        case 'selectTeam':
-          for (const p of game.players.slice(0, game.settings.missions[game.round].players))
-            act({ method: 'selectPlayer', playerID: p.userID });
-          act({ method: 'sentSelectedPlayers' });
-          break;
-        case 'votingForTeam':
-          act({ method: 'voteForMission', option: 'approve' });
-          break;
-        case 'onMission':
-          act({ method: 'actionOnMission', result: 'success' });
-          break;
-        case 'checkLoyalty':
-          act({
-            method: 'selectPlayer',
-            playerID: game.players.find((p) => !p.features.ladyOfLake && p !== human)!.userID,
-          });
-          act({ method: 'checkLoyalty' });
-          break;
-        case 'announceLoyalty':
-          act({ method: 'announceLoyalty', loyalty: 'good' });
-          break;
-        case 'assassinate':
-          act({ method: 'selectPlayer', playerID: game.players.find((p) => p.role.role === 'merlin')!.userID });
-          act({ method: 'assassinate', type: 'merlin' });
-          break;
-      }
+    if (withFriend) {
+      room.ai!.publicBotGame = true;
+      room.ai!.withFriend = true;
     }
-    expect(room.ai?.status).toBe('finished');
-    expect(requests.length).toBeGreaterThan(0);
-    expect(requests.some((r) => r.chat.some((m) => m.text === 'Consider my proposed team.'))).toBe(true);
-    expect(requests.every((r) => r.playerID !== 'admin')).toBe(true);
-    const lastPublicTurn = requests.filter((r) => r.state.stage === 'selectTeam').pop()!;
-    expect(compactRequest(lastPublicTurn).humanStatements).toEqual([
-      expect.objectContaining({ text: 'Consider my proposed team.', status: 'claim' }),
-    ]);
-    expect(room.chat.history.filter((m) => m.userID === 'admin').map((m) => m.message)).toEqual([
-      'Consider my proposed team.',
-    ]);
-    expect(room.ai?.fallbacks).toBe(0);
-    expect(publicStatus.every((s) => !s.message.includes(s.task))).toBe(true);
-    expect(publicStatus.filter((s) => s.councilDiscussion).every((s) => s.thinkingPlayerID !== undefined)).toBe(true);
-  } finally {
-    if (room.ai?.status === 'running') room.stop();
-    await run;
-  }
-});
+    room.joinAsHuman('admin');
+    if (withFriend) room.joinGame('friend');
+    room.addMessage('admin', 'Consider my proposed team.');
+    if (withFriend) room.addMessage('friend', 'Consider my friend proposal.');
+    const run = room.run();
+    try {
+      for (let step = 0; step < 1000 && room.ai?.status === 'running'; step++) {
+        // Let the real bot loop reach its next human boundary, without a provider or network.
+        await new Promise<void>((resolve) => setImmediate(resolve));
+        if (room.data.stage !== 'started') continue;
+        const game = room.data.manager.game;
+        if (room.ai?.waitingForDiscussion) {
+          room.finishDiscussion(room.ai!.discussionPlayerID ?? 'admin');
+          continue;
+        }
+        if (room.ai?.discussionPending) continue;
+        for (const human of game.players.filter((p) => room.isHuman(p.userID))) {
+          if (!human.features.waitForAction) continue;
+          const act = (params: Parameters<typeof room.humanAction>[1]) => room.humanAction(human.userID, params);
+          switch (game.stage) {
+            case 'selectTeam':
+              for (const p of game.players.slice(0, game.settings.missions[game.round].players))
+                act({ method: 'selectPlayer', playerID: p.userID });
+              act({ method: 'sentSelectedPlayers' });
+              break;
+            case 'votingForTeam':
+              act({ method: 'voteForMission', option: 'approve' });
+              break;
+            case 'onMission':
+              act({ method: 'actionOnMission', result: 'success' });
+              break;
+            case 'checkLoyalty':
+              act({
+                method: 'selectPlayer',
+                playerID: game.players.find((p) => !p.features.ladyOfLake && p !== human)!.userID,
+              });
+              act({ method: 'checkLoyalty' });
+              break;
+            case 'announceLoyalty':
+              act({ method: 'announceLoyalty', loyalty: 'good' });
+              break;
+            case 'assassinate':
+              act({ method: 'selectPlayer', playerID: game.players.find((p) => p.role.role === 'merlin')!.userID });
+              act({ method: 'assassinate', type: 'merlin' });
+              break;
+          }
+        }
+      }
+      expect(room.ai?.status).toBe('finished');
+      expect(requests.length).toBeGreaterThan(0);
+      expect(requests.some((r) => r.chat.some((m) => m.text === 'Consider my proposed team.'))).toBe(true);
+      expect(requests.every((r) => !room.isHuman(r.playerID))).toBe(true);
+      const lastPublicTurn = requests.filter((r) => r.state.stage === 'selectTeam').pop()!;
+      expect(compactRequest(lastPublicTurn).humanStatements).toEqual([
+        expect.objectContaining({ text: 'Consider my proposed team.', status: 'claim' }),
+        ...(withFriend ? [expect.objectContaining({ text: 'Consider my friend proposal.', status: 'claim' })] : []),
+      ]);
+      expect(room.chat.history.filter((m) => m.userID === 'admin').map((m) => m.message)).toEqual([
+        'Consider my proposed team.',
+      ]);
+      expect(room.ai?.fallbacks).toBe(0);
+      expect(publicStatus.every((s) => !s.message.includes(s.task))).toBe(true);
+      expect(publicStatus.filter((s) => s.councilDiscussion).every((s) => s.thinkingPlayerID !== undefined)).toBe(true);
+    } finally {
+      if (room.ai?.status === 'running') room.stop();
+      await run;
+    }
+  },
+);
 
 test('long human waits preserve the lease without model calls and stop cancels the wait', async () => {
   const { AI_LEASE_MS } = await import('./timing');

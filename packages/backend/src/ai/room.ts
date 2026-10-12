@@ -32,6 +32,7 @@ export class BotRoom extends Room {
   private cancelled = false;
   private executing = false;
   private wakeHuman?: () => void;
+  private friendActionTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private humanActionTimer?: ReturnType<typeof setTimeout>;
   private discussionMessages?: { since: number; existing: Set<string | undefined> };
   private missionChoices = new Map<string, Choice>();
@@ -78,9 +79,10 @@ export class BotRoom extends Room {
     this.onChatMessage = (entry) => {
       if (
         entry.kind !== 'sticker' &&
-        entry.userID === this.ai?.humanPlayerID &&
-        this.ai.status === 'running' &&
-        this.ai.waitingForDiscussion &&
+        this.isHuman(entry.userID) &&
+        this.ai!.status === 'running' &&
+        this.ai!.waitingForDiscussion &&
+        entry.userID === (this.ai!.discussionPlayerID ?? this.ai!.humanPlayerID) &&
         !(this.manager.game.stage === 'assassinate'
           ? this.councilSpoken.has(entry.userID)
           : this.discussion?.spoken.has(entry.userID)) &&
@@ -102,9 +104,29 @@ export class BotRoom extends Room {
     };
   }
   override joinGame(userID: string): void {
-    void userID;
-    throw Error('AI room has fixed seats');
+    if (
+      !this.ai?.publicBotGame ||
+      !this.ai.withFriend ||
+      this.ai.status !== 'ready' ||
+      this.data.stage !== 'locked' ||
+      (this.ai.launchExpiresAt !== undefined && Date.now() >= this.ai.launchExpiresAt)
+    )
+      throw Error('AI room has fixed seats');
+    if (this.isHuman(userID)) return;
+    if (this.humanIDs.length >= 2) throw Error('The friend seat is occupied');
+    this.players[this.players.length - 2] = userID;
+    this.ai.humanPlayerIDs = [...this.humanIDs, userID];
+    this.updateRoomState(true);
   }
+
+  get humanIDs(): string[] {
+    return this.ai?.humanPlayerIDs ?? (this.ai?.humanPlayerID ? [this.ai.humanPlayerID] : []);
+  }
+
+  isHuman(userID: string): boolean {
+    return this.humanIDs.includes(userID);
+  }
+
   joinAsHuman(userID: string): void {
     if (this.ai!.status !== 'ready' || this.data.stage !== 'locked' || userID !== this.leaderID)
       throw Error('Only the administrator owner can join before launch');
@@ -114,6 +136,7 @@ export class BotRoom extends Room {
     }
     this.players[this.players.length - 1] = userID;
     this.ai!.humanPlayerID = userID;
+    if (this.ai!.withFriend) this.ai!.humanPlayerIDs = [userID];
     delete this.ai!.profileRatingSeason;
   }
 
@@ -123,7 +146,9 @@ export class BotRoom extends Room {
     if (this.ai!.beginner && playerCount !== 5) throw Error('Beginner tables require five players');
     if (this.players.length === playerCount) return;
     this.players = selectBotAgents(undefined, playerCount).map((agent) => agent.id);
-    if (this.ai!.humanPlayerID) this.players[this.players.length - 1] = this.ai!.humanPlayerID;
+    this.humanIDs.forEach((id, index) => {
+      this.players[this.players.length - 1 - index] = id;
+    });
     this.options = structuredClone(botOptions);
     if (playerCount !== 7) delete this.options.roles.oberon;
     if (playerCount < 7) delete this.options.addons.ladyOfLake;
@@ -139,7 +164,13 @@ export class BotRoom extends Room {
     this.ai!.message = aiText(language).ready;
   }
 
-  private checkHumanDeadline(): void {
+  private checkHumanDeadline(userID: string): void {
+    const timer = this.ai!.humanTimers?.[userID];
+    if (timer?.humanActionExpiresAt !== undefined && timer.humanActionExpiresAt <= Date.now()) {
+      this.stop(humanTimeoutMessage[this.language]);
+      throw Error('Human action timed out');
+    }
+    if (this.ai!.withFriend) return;
     if (this.ai!.humanActionExpiresAt !== undefined && this.ai!.humanActionExpiresAt <= Date.now()) {
       if (this.ai!.waitingForDiscussion) this.completeDiscussion(this.ai!.humanPlayerID!);
       else this.stop(humanTimeoutMessage[this.language]);
@@ -147,7 +178,22 @@ export class BotRoom extends Room {
     }
   }
 
+  private clearFriendActionTimer(userID: string): void {
+    clearTimeout(this.friendActionTimers.get(userID));
+    this.friendActionTimers.delete(userID);
+    const timer = this.ai!.humanTimers?.[userID];
+    if (!timer) return;
+    if (timer.humanActionBaseExpiresAt !== undefined)
+      timer.humanTimeBankMs = Math.max(
+        0,
+        timer.humanTimeBankMs - Math.max(0, Date.now() - timer.humanActionBaseExpiresAt),
+      );
+    delete timer.humanActionBaseExpiresAt;
+    delete timer.humanActionExpiresAt;
+  }
+
   private clearHumanActionTimer(): void {
+    for (const id of this.friendActionTimers.keys()) this.clearFriendActionTimer(id);
     clearTimeout(this.humanActionTimer);
     this.humanActionTimer = undefined;
     const base = this.ai!.humanActionBaseExpiresAt;
@@ -176,9 +222,8 @@ export class BotRoom extends Room {
   }
 
   humanAction(userID: string, params: TGameMethodsParams): void {
-    if (userID !== this.ai!.humanPlayerID || this.ai!.status !== 'running')
-      throw Error('AI players are controlled by the server');
-    this.checkHumanDeadline();
+    if (!this.isHuman(userID) || this.ai!.status !== 'running') throw Error('AI players are controlled by the server');
+    this.checkHumanDeadline(userID);
     if (
       (params.method === 'sentSelectedPlayers' && this.ai!.discussionPending) ||
       (params.method === 'assassinate' && !this.councilComplete())
@@ -187,13 +232,20 @@ export class BotRoom extends Room {
     this.manager.callGameMethods(userID, params);
     if (params.method === 'sentSelectedPlayers' && this.manager.game.stage !== 'selectTeam')
       this.discussion = undefined;
+    if (this.ai!.withFriend && !this.humanActionPending(userID)) this.clearFriendActionTimer(userID);
     this.wakeHuman?.();
+    this.updateRoomState(true);
   }
 
   finishDiscussion(userID: string): void {
-    if (userID !== this.ai!.humanPlayerID || this.ai!.status !== 'running' || !this.ai!.waitingForDiscussion)
+    if (
+      !this.isHuman(userID) ||
+      this.ai!.status !== 'running' ||
+      !this.ai!.waitingForDiscussion ||
+      userID !== (this.ai!.discussionPlayerID ?? this.ai!.humanPlayerID)
+    )
       throw Error('Not your discussion turn');
-    this.checkHumanDeadline();
+    this.checkHumanDeadline(userID);
     this.completeDiscussion(userID);
   }
 
@@ -213,14 +265,36 @@ export class BotRoom extends Room {
     this.wakeHuman?.();
   }
 
-  private async waitForHuman(pending: () => boolean, discussion = false) {
+  private humanActionPending(userID: string): boolean {
+    const game = this.manager.game;
+    return game.stage === 'selectTeam'
+      ? game.leader.userID === userID
+      : game.stage !== 'end' && Boolean(game.players.find((p) => p.userID === userID)?.features.waitForAction);
+  }
+
+  private async waitForHuman(pending: () => boolean, discussion = false, discussionPlayerID?: string) {
     if (this.cancelled || !pending()) return;
     this.ai!.waitingForHuman = true;
     if (discussion) {
       this.discussionMessages = { since: Date.now(), existing: new Set(this.chat.history.map((entry) => entry.id)) };
       this.ai!.waitingForDiscussion = true;
+      if (this.ai!.withFriend) this.ai!.discussionPlayerID = discussionPlayerID;
     }
-    if (this.ai!.publicBotGame) {
+    if (this.ai!.publicBotGame && this.ai!.withFriend) {
+      const ids = discussion ? [discussionPlayerID!] : this.humanIDs.filter((id) => this.humanActionPending(id));
+      for (const id of ids) {
+        const timer = this.ai!.humanTimers![id];
+        const duration = 90000 + timer.humanTimeBankMs;
+        timer.humanActionBaseExpiresAt = Date.now() + 90000;
+        timer.humanActionExpiresAt = Date.now() + duration;
+        this.friendActionTimers.set(
+          id,
+          setTimeout(() => {
+            if (!this.cancelled && pending()) this.stop(humanTimeoutMessage[this.language]);
+          }, duration),
+        );
+      }
+    } else if (this.ai!.publicBotGame) {
       const base = Date.now() + 90000;
       this.ai!.humanActionBaseExpiresAt = base;
       const duration = 90000 + (this.ai!.humanTimeBankMs || 0);
@@ -265,13 +339,18 @@ export class BotRoom extends Room {
       this.wakeHuman = undefined;
       delete this.ai!.waitingForHuman;
       delete this.ai!.waitingForDiscussion;
+      delete this.ai!.discussionPlayerID;
       this.discussionMessages = undefined;
       this.updateRoomState(true);
     }
   }
   override leaveGame(userID: string): void {
-    void userID;
-    throw Error('AI room has fixed seats');
+    if (!this.ai?.withFriend || !this.isHuman(userID) || userID === this.leaderID || this.ai.status !== 'ready')
+      throw Error('AI room has fixed seats');
+    this.ai.humanPlayerIDs = this.humanIDs.filter((id) => id !== userID);
+    this.players = selectBotAgents(undefined, this.ai.playerCount!).map((agent) => agent.id);
+    this.players[this.players.length - 1] = this.ai.humanPlayerID!;
+    this.updateRoomState(true);
   }
   override updateOptions(options: GameOptions): void {
     void options;
@@ -296,6 +375,7 @@ export class BotRoom extends Room {
     this.clearHumanActionTimer();
     delete this.ai!.waitingForHuman;
     delete this.ai!.waitingForDiscussion;
+    delete this.ai!.discussionPlayerID;
     delete this.ai!.discussionPending;
     this.thinkingPlayers.clear();
     delete this.ai!.thinkingPlayerID;
@@ -360,6 +440,7 @@ export class BotRoom extends Room {
       language: this.language,
       playerID: id,
       humanPlayerID: this.ai!.humanPlayerID,
+      humanPlayerIDs: this.ai!.humanPlayerIDs,
       beginner: this.ai!.beginner,
       name: this.label(id),
       style: agent.style,
@@ -570,8 +651,8 @@ export class BotRoom extends Room {
     for (const player of this.clockwiseSeats()) {
       if (this.cancelled || this.manager.game.stage !== 'selectTeam') return;
       if (this.discussion.spoken.has(player)) continue;
-      if (player === this.ai!.humanPlayerID) {
-        await this.waitForHuman(() => !this.discussion?.spoken.has(player), true);
+      if (this.isHuman(player)) {
+        await this.waitForHuman(() => !this.discussion?.spoken.has(player), true, player);
         if (this.cancelled) return;
         continue;
       }
@@ -588,7 +669,7 @@ export class BotRoom extends Room {
     }
     delete this.ai!.discussionPending;
     this.updateRoomState(true);
-    if (id === this.ai!.humanPlayerID) {
+    if (this.isHuman(id)) {
       await this.waitForHuman(() => this.manager.game.stage === 'selectTeam');
       this.discussion = undefined;
       return;
@@ -617,7 +698,7 @@ export class BotRoom extends Room {
     const choices = ['approve', 'reject'].map((text) => ({ text, actions: [] }));
     const pending = this.clockwiseSeats().filter(
       (player) =>
-        player !== this.ai!.humanPlayerID &&
+        !this.isHuman(player) &&
         this.manager.game.players.find((p) => p.userID === player)!.features.waitForAction &&
         !votes.has(player),
     );
@@ -659,8 +740,12 @@ export class BotRoom extends Room {
     for (const ally of game.players.filter((p) => p.role.loyalty === 'evil')) {
       if (this.cancelled || game.stage !== 'assassinate') return;
       if (this.councilSpoken.has(ally.userID)) continue;
-      if (ally.userID === this.ai!.humanPlayerID) {
-        await this.waitForHuman(() => game.stage === 'assassinate' && !this.councilSpoken.has(ally.userID), true);
+      if (this.isHuman(ally.userID)) {
+        await this.waitForHuman(
+          () => game.stage === 'assassinate' && !this.councilSpoken.has(ally.userID),
+          true,
+          ally.userID,
+        );
         continue;
       }
       const state = this.stateFor(ally.userID);
@@ -684,7 +769,7 @@ export class BotRoom extends Room {
   private async collectMissionCards() {
     const game = this.manager.game;
     const pending = game.players.filter(
-      (p) => p.features.waitForAction && p.userID !== this.ai!.humanPlayerID && !this.missionChoices.has(p.userID),
+      (p) => p.features.waitForAction && !this.isHuman(p.userID) && !this.missionChoices.has(p.userID),
     );
     const generated = new Map<string, Choice[]>();
     for (const player of pending) {
@@ -720,7 +805,7 @@ export class BotRoom extends Room {
       await this.discussAssassination();
       if (this.cancelled || game.stage !== 'assassinate') return;
     }
-    const actor = game.players.find((p) => p.features.waitForAction && p.userID !== this.ai!.humanPlayerID);
+    const actor = game.players.find((p) => p.features.waitForAction && !this.isHuman(p.userID));
     if (!actor && this.ai!.humanPlayerID) {
       const stage = game.stage;
       return this.waitForHuman(() => game.stage === stage && game.players.some((p) => p.features.waitForAction));
@@ -777,7 +862,7 @@ export class BotRoom extends Room {
       if (state.stage === 'announceLoyalty' && inspected) {
         await this.publish(id, aiText(this.language).inspection(this.label(inspected.id), result.choice === 0));
         // Public Good-persona stance for either side; never changes private alignment knowledge.
-        if (inspected.id !== this.ai!.humanPlayerID)
+        if (!this.isHuman(inspected.id))
           await this.publish(
             inspected.id,
             aiText(this.language).inspectionResponse(this.label(id), result.choice === 0),
@@ -793,7 +878,12 @@ export class BotRoom extends Room {
     )
       return;
     this.executing = true;
-    if (this.ai!.publicBotGame && this.ai!.humanTimeBankMs === undefined) this.ai!.humanTimeBankMs = 300000;
+    if (this.ai!.publicBotGame && !this.ai!.withFriend && this.ai!.humanTimeBankMs === undefined)
+      this.ai!.humanTimeBankMs = 300000;
+    if (this.ai!.withFriend) {
+      this.ai!.humanTimers ??= {};
+      for (const id of this.humanIDs) this.ai!.humanTimers[id] ??= { humanTimeBankMs: 300000 };
+    }
     this.ai!.canResumeTechnical = false;
     this.ai!.status = 'running';
     try {
@@ -804,7 +894,7 @@ export class BotRoom extends Room {
       }
       if (!this.cancelled) {
         const pending = this.players.filter(
-          (id) => id !== this.ai!.humanPlayerID && !this.reviewedPlayers.has(id) && !this.reviewReplies.has(id),
+          (id) => !this.isHuman(id) && !this.reviewedPlayers.has(id) && !this.reviewReplies.has(id),
         );
         await this.inPairs(pending, (id, signal) =>
           this.ask(
