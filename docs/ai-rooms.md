@@ -113,7 +113,19 @@ server announcements can add text.
 Private decisions and public speech are separated. Authoritative facts, legal
 actions, side objectives and secrecy override personality. Public Percival claims
 are testimony, not verified knowledge; claims and reactions use the model's own
-words. Strategic advice covers coalition support, the consequences of rejection,
+words. The room's saved `botDifficulty` selects prompt advice independently of the
+model: regular bots receive shorter team-selection/voting instructions and compact
+role advice; smart bots retain deeper strategy and coalition negotiation. Matches
+without a saved difficulty, including administrator games, use smart advice.
+Rules, legal choices, private knowledge, language and output format remain shared.
+Regular team decisions explicitly check the current roster, known and possible Evil,
+the Fail threshold and a reachable alternative before acting. Both profiles treat
+old model notes as fallible, correct contradicted notes under the same key and cite
+the relevant mission/proposal in their sources. These instructions do not impose
+server-selected teams or votes. Prompt-routing tests do not establish stronger
+model play; improvements need model evaluation on recorded situations.
+
+Strategic advice covers coalition support, the consequences of rejection,
 combined mission constraints, consistent wizard-candidate risk and Merlin's
 history of public words and votes. Off-team Good players account for the reduced
 number of Good available inside a roster; Evil bluffing as Good check the same

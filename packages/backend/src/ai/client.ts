@@ -1,12 +1,13 @@
 import { claimContext, validateClaims } from './claims';
 import { languageInstruction } from './language';
-import type { AiLanguage, VisualGameState } from '@avalon/types';
+import type { AiBotDifficulty, AiLanguage, VisualGameState } from '@avalon/types';
 
 export type BotRequest = {
   playerID: string;
   humanPlayerID?: string;
   humanPlayerIDs?: string[];
   beginner?: boolean;
+  botDifficulty?: AiBotDifficulty;
   // Public declarations and this bot's prior positions come from structured model actions, never text parsing.
   publicRoleClaims?: { by: number; target: number; status: 'claim' }[];
   previousClaimStances?: { seat: number; stance: 'trust' | 'distrust' }[];
@@ -123,6 +124,23 @@ const roleAdvice: Record<string, string> = {
     'Help Evil through votes and mission cards while posing as Good. Look for Merlin among players consistently avoiding you and Morgana. Do not admit sabotage.',
 };
 
+const regularRoleAdvice: Record<string, string> = {
+  merlin:
+    'You are Good. Use visible Evil and mission deductions when choosing; helpful speech or a Success never erases known Evil. Compare the entire roster with failsRequired, including possible hidden Evil. Protect your identity: explain from public evidence, not your secret list. Review your recent words and votes for uniquely accurate avoidance of Evil. Among similarly safe options, support a public case or let others lead; never risk a decisive failure merely for cover.',
+  percival:
+    'You are Good. Your mysteryWizard pair contains exactly one Merlin and one Morgana. A team containing both contains Evil; compare that with failsRequired. A Fail on a team with both does not by itself accuse another teammate or resolve the pair. Distinguish candidates through actual proposals, votes and missions. Defend sound public arguments in your own voice without naming the pair or advertising whom you protect.',
+  servant:
+    'You are Good. Use your own Success card and recorded Fail counts to deduce what is possible. Make your own public case and help gather support rather than copying the loudest player. Success does not clear teammates. Keeping Merlin alive is part of winning; sound independent arguments provide cover. Never deliberately help Evil.',
+  mordred:
+    'You are Evil and hidden from Merlin. Use only visible allies. Privately seek sabotage opportunities or useful cover; publicly argue as a Good player seeking successful missions. Never identify yourself or allies as Evil, or describe another mission failure as your victory.',
+  morgana:
+    'You are Evil. Merlin sees you as Evil; Percival sees you and Merlin as unresolved candidates. Offer credible public guidance to influence that uncertainty. Privately pursue Evil victory; publicly argue for successful missions. Never expose yourself or allies, or call another mission failure your victory.',
+  oberon:
+    'You are Evil; Merlin sees you, but you do not know allies and they do not recognize you during missions. Do not invent ally identities or coordinated cards. Privately choose sabotage or cover for Evil using score and failsRequired; publicly pose as Good. Use newly revealed roles only after revelation.',
+  minion:
+    'You are Evil. Use known allies to seek sabotage opportunities while publicly posing as Good. Never announce sabotage or identify allies. Privately compare Fail with a concrete future benefit of cover. Look for Merlin through early accurate avoidance of visible Evil, not leadership alone.',
+};
+
 // Public table convention, independent of the observer's role and private card.
 export function excludesMissionPartners(mission: { team: readonly unknown[]; fails?: number }) {
   return (mission.team.length === 2 && mission.fails === 1) || (mission.team.length === 3 && mission.fails === 2);
@@ -153,7 +171,7 @@ export function compactRequest(request: BotRequest) {
     : undefined;
   const seat = (id?: string) => players.find((p) => p.id === id)?.index;
   const own = players.find((p) => p.id === request.playerID);
-  let ownRoleAdvice = own && roleAdvice[own.role];
+  let ownRoleAdvice = own && (request.botDifficulty === 'regular' ? regularRoleAdvice : roleAdvice)[own.role];
   if (own?.role === 'merlin') {
     const visibleEvil = players.filter((p) => ['evil', 'mordred', 'morgana', 'minion', 'oberon'].includes(p.role));
     ownRoleAdvice += ` You currently see ${visibleEvil.length} Evil seat(s) in privateKnowledge.rolesVisibleToYou.`;
