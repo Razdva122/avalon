@@ -104,7 +104,13 @@ returning to the owner's active match. Room state records the selected mode as
 `botDifficulty` after launch; `publicBotGame` identifies the public room before
 and after launch. The server supplies its title and visible countdown deadlines.
 
-Bots discuss the proposal before the leader finalizes a team, then vote quietly.
+On the first proposal of each mission, every player gets a public speaking turn
+before the leader finalizes a team. After a rejection, only the new leader speaks:
+a bot selects the final roster in that same turn, addresses another seat and
+explains why it chose this team using earlier discussion and recorded votes.
+A human leader gets a discussion turn followed by team selection; other humans
+and bots do not get scheduled reply turns on repeat proposals. Voting stays quiet,
+and the full public circle returns at the start of the next mission.
 The chosen language applies to public speech, private notes, Evil council,
 server announcements and post-game reflections. JSON keys and legal choice
 values stay fixed. Ordinary public speech allows 240 characters;

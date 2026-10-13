@@ -517,7 +517,7 @@ export class BotRoom extends Room {
     // Retain completed decisions before publication/checkpoints can pause the match.
     if (this.discussion) {
       if (publicDiscussion) this.discussion.spoken.add(id);
-      if (optionalSpeech) this.discussion.finalTeam = choices[answer.choice];
+      if (state.stage === 'selectTeam' && !publicDiscussion) this.discussion.finalTeam = choices[answer.choice];
       if (state.stage === 'votingForTeam') {
         this.discussion.votes.set(id, answer.choice === 0 ? 'approve' : 'reject');
       }
@@ -646,6 +646,7 @@ export class BotRoom extends Room {
 
   private async discussTeam() {
     const id = this.manager.game.leader.userID;
+    const firstProposal = this.manager.game.turn === 0;
     this.discussion ??= { spoken: new Set(), votes: new Map() };
     if (this.ai!.humanPlayerID) {
       this.ai!.discussionPending = true;
@@ -656,7 +657,8 @@ export class BotRoom extends Room {
       await this.publish(pending.id, pending.text, pending.requestID);
       if (this.cancelled) return;
     }
-    for (const player of this.clockwiseSeats()) {
+    const speakers = firstProposal ? this.clockwiseSeats() : this.isHuman(id) ? [id] : [];
+    for (const player of speakers) {
       if (this.cancelled || this.manager.game.stage !== 'selectTeam') return;
       if (this.discussion.spoken.has(player)) continue;
       if (this.isHuman(player)) {
@@ -685,13 +687,15 @@ export class BotRoom extends Room {
     if (!this.discussion.finalTeam) {
       const proposal = await this.ask(
         id,
-        'Choose the final team after hearing the full public circle. You may briefly announce your final roster or remain silent.',
+        firstProposal
+          ? 'Choose the final team after hearing the full public circle. You may briefly announce your final roster or remain silent.'
+          : 'Choose the final team as the only speaker on this repeat proposal. Address another seat directly and explain why you selected this exact roster, using the earlier discussion and recorded votes. Publish this explanation now; no other player has a reply turn before selection.',
         this.teams(id),
         true,
         undefined,
         false,
         false,
-        true,
+        firstProposal,
       );
       if (!proposal) return;
     }

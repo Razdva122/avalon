@@ -109,6 +109,43 @@ test('the final selection preserves the full public circle and optional silence'
   expect(generate.mock.calls[0][1].context.chat).toHaveLength(7);
 });
 
+test('a repeat leader repairs an empty explanation before submitting the roster', async () => {
+  const input = {
+    ...discussion,
+    publicDiscussion: false,
+    optionalSpeech: false,
+    state: { ...discussion.state, vote: 1 },
+  } as BotRequest;
+  const generate = jest
+    .fn()
+    .mockResolvedValueOnce({ choice: 1, speech: 'Private choice.', publicReason: '' })
+    .mockResolvedValueOnce({
+      choice: 1,
+      speech: 'Private choice.',
+      publicReason: '2, I chose 1, 3, 5 to retain your preferred pair.',
+    });
+  expect(await decisionPipeline(generate)(input)).toMatchObject({
+    choice: 1,
+    speech: '2, I chose 1, 3, 5 to retain your preferred pair.',
+  });
+  expect(generate).toHaveBeenCalledTimes(2);
+  expect(generate.mock.calls[1][1].phase).toBe('decision-repair');
+});
+
+test.each(['', 'I am Merlin.'])(
+  'a repeat leader cannot submit without a publishable explanation (%s)',
+  async (publicReason) => {
+    const input = {
+      ...discussion,
+      publicDiscussion: false,
+      optionalSpeech: false,
+      state: { ...discussion.state, vote: 1 },
+    } as BotRequest;
+    const generate = jest.fn().mockResolvedValue({ choice: 1, speech: 'Private choice.', publicReason });
+    await expect(decisionPipeline(generate)(input)).rejects.toBeInstanceOf(AiTechnicalPause);
+  },
+);
+
 test('leader can submit silently after a public role claim without mandatory extra speech', async () => {
   const input = {
     ...discussion,

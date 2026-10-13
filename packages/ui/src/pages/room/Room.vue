@@ -1,5 +1,12 @@
 <template>
-  <div class="room d-flex align-center justify-space-around">
+  <div
+    class="room d-flex align-center justify-space-around"
+    :style="{ '--beginner-board-scale': tipsBoardScale }"
+    :class="{
+      'room-with-beginner-tips':
+        roomState && tipsSession.available && tipsSession.enabled && stateManager.viewMode.value === 'live',
+    }"
+  >
     <span class="online">{{ $t('mainPage.online', { count: online }) }}</span>
     <template v-if="errorMessage">
       <h1 class="mb-4">{{ $t('room.' + errorMessage.error) }}</h1>
@@ -8,6 +15,14 @@
       >
     </template>
     <template v-else-if="roomState">
+      <BeginnerTips
+        v-if="tipsSession.available && roomState.stage === 'started'"
+        :game="roomState.game"
+        :ai="roomState.ai"
+        :userID="userID"
+        :live="stateManager.viewMode.value === 'live' && !chatOpen"
+        :spoilers-hidden="$store.state.hideSpoilers"
+      />
       <AiRoomPanel
         v-if="roomState.ai && !(roomState.ai.publicBotGame && roomState.ai.status === 'ready')"
         class="ai-room-status"
@@ -107,10 +122,15 @@ import VoicePanel from '@/components/voice/VoicePanel.vue';
 import eventBus from '@/helpers/event-bus';
 import { ASSASSINATION_REVEAL_DURATION } from '@/components/view/board/animations/render';
 import { assassinationReveal } from '@/components/view/board/helpers';
+import { useWindowSize } from '@vueuse/core';
+import { beginnerBoardScale } from '@/helpers/beginner-tips';
+import BeginnerTips from '@/components/view/information/BeginnerTips.vue';
+import { beginnerTipsSession as tipsSession, startBeginnerTips } from '@/helpers/beginner-tips-session';
 
 export default defineComponent({
   name: 'Room',
   components: {
+    BeginnerTips,
     Board,
     AiRoomPanel,
     RolesInfo,
@@ -132,6 +152,8 @@ export default defineComponent({
     const voiceContext = shallowRef<ReturnType<typeof createRoomVoice>>();
     provide(roomVoiceKey, voiceContext);
     const stateManager = new GameStateManager();
+    const { width, height } = useWindowSize();
+    const tipsBoardScale = computed(() => beginnerBoardScale(width.value, height.value));
     const alert = ref<boolean>(true);
     const errorMessage = ref<ISocketError>();
     const store = useStore();
@@ -140,6 +162,21 @@ export default defineComponent({
     const userID = computed(() => store.state.profile?.id);
 
     const roomState = stateManager.state;
+    watch(
+      () =>
+        [
+          roomState.value?.roomID,
+          userID.value,
+          roomState.value?.stage === 'started' &&
+            roomState.value.ai?.beginner &&
+            roomState.value.game.players.some((p) => p.id === userID.value),
+        ] as const,
+      ([roomID, id, available]) => startBeginnerTips(roomID || '', id || '', Boolean(available)),
+      { immediate: true },
+    );
+    onUnmounted(() => {
+      tipsSession.available = false;
+    });
     const hideStickers = ref(false);
     const chatOpen = ref(false);
     provide(roomChatKey, { open: chatOpen, roomID: () => props.uuid });
@@ -317,6 +354,9 @@ export default defineComponent({
         : undefined,
     );
     return {
+      stateManager,
+      tipsSession,
+      tipsBoardScale,
       chatSeats,
       spectatorRoles,
       spectatorDecisions,
@@ -423,6 +463,33 @@ export default defineComponent({
   padding-top: 50px;
   box-sizing: border-box;
   overflow: clip;
+}
+@media (max-width: 1279px) and (min-height: 601px), (max-width: 649px) and (max-height: 600px) {
+  .room-with-beginner-tips .wrapper {
+    height: calc(840px * var(--beginner-board-scale));
+  }
+  .room-with-beginner-tips .board-container {
+    --board-scale: var(--beginner-board-scale);
+  }
+}
+@media (max-width: 1279px) {
+  .room.room-with-beginner-tips {
+    height: calc(100dvh - 230px);
+  }
+}
+@media (max-width: 1279px) and (max-height: 600px) {
+  .room.room-with-beginner-tips {
+    height: calc(100dvh - 130px);
+  }
+}
+@media (min-width: 650px) and (max-width: 1279px) and (max-height: 600px) {
+  .room.room-with-beginner-tips {
+    height: 100dvh;
+  }
+  .room-with-beginner-tips .ai-room-status {
+    max-width: 200px;
+    font-size: 12px;
+  }
 }
 </style>
 

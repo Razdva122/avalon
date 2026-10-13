@@ -60,6 +60,8 @@ export default {
   botPlay: 'Jugar con IA',
   botLaunchTime: 'Inicia la partida: {seconds} s',
   botActionTime: 'Tu turno: {seconds} s',
+  playerActionTime: 'Turno de {name}: {seconds} s',
+  playerDiscussionTime: 'Habla {name}: {seconds} s',
   botActionDeadlineHint:
     '90 segundos por turno + una reserva compartida de 5 minutos. La partida termina cuando ambos se agotan.',
   botAvailableIn: 'La disponibilidad se actualiza en {hours} h.',

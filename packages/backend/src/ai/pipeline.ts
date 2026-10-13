@@ -156,11 +156,13 @@ export function decisionInstructions(request: BotRequest) {
     request.botDifficulty === 'regular' && ['selectTeam', 'votingForTeam'].includes(request.state.stage);
   const turn = request.publicDiscussion
     ? 'This is discussion before team selection: choice is a preference, not a submitted roster or vote.'
-    : request.optionalSpeech
-      ? 'As leader, select the final roster after hearing the full circle. publicReason may be empty.'
-      : request.councilDiscussion
-        ? 'The Evil council is public. In publicReason discuss your assassination candidate from public evidence, compare an alternative and respond to earlier advice without announcing private allies. speech remains your private reason, including during council.'
-        : 'Choose the action for the current stage. When speak=false, publicReason must be empty.';
+    : request.state.stage === 'selectTeam' && request.state.vote > 0
+      ? 'Only the leader speaks on this repeat proposal. Select the final roster now. In publicReason, directly address another seat and explain why you selected this exact team using public evidence, earlier discussion or recorded votes. State your rationale rather than waiting for an answer: other players have no reply turn before selection. Do not repeat a generic opening argument; explain why you retain or change the previous proposal. Your public explanation is required; do not submit silently.'
+      : request.optionalSpeech
+        ? 'As leader, select the final roster after hearing the full circle. publicReason may be empty.'
+        : request.councilDiscussion
+          ? 'The Evil council is public. In publicReason discuss your assassination candidate from public evidence, compare an alternative and respond to earlier advice without announcing private allies. speech remains your private reason, including during council.'
+          : 'Choose the action for the current stage. When speak=false, publicReason must be empty.';
   const strategy = ['selectTeam', 'votingForTeam'].includes(request.state.stage)
     ? regularTeam
       ? 'Privately check in order: (1) For voting, evaluate ONLY actionFacts.team, the current proposedTeam; for selection, evaluate the exact legal roster you choose. Never substitute an earlier preferred team. (2) Use your own side, privateKnowledge and completed mission deductions; success or testimony cannot erase known Evil. (3) Count known and possible Evil against missionRule.failureAtLeast: enough Evil CAN sabotage, not necessarily WILL; one Evil cannot fail a two-Fail mission, but unknown teammates may supply another. (4) Choose for your actual side. Good normally avoids established sabotage risk when a safer reachable roster exists; Evil seeks sabotage access or concrete cover. (5) Before Reject, compare one reachable alternative and proposal.fifthLeader; only rejecting proposal 4 immediately forces proposal 5. Your own inclusion does not clear others. If off-team as Good, at most alignmentCounts.good - 1 Good can be inside. Before an information bet, name which possible result would distinguish your hypotheses; a known saboteur can explain another Fail without accusing new teammates. At two failures prioritize survival. If repeating a rejected roster, give a new public reason that could persuade a missing voter. Never publish these private checks.'
@@ -189,7 +191,7 @@ export function decisionInstructions(request: BotRequest) {
     strategy +
     ' ' +
     turn +
-    ' Return JSON choice, speech (private reason, <=240 characters), publicReason (your actual public words, <=240 characters), evidence (at most 3 changed notes with key/kind/fact/source/certainty). Use claim certainty for hypotheses and testimony, bluff for deliberate deception. No unchanged evidence dump. Public words are published directly, without a rewrite or added sentences. Silence is allowed during discussion; respond when you have something to contribute.'
+    ' Return JSON choice, speech (private reason, <=240 characters), publicReason (your actual public words, <=240 characters), evidence (at most 3 changed notes with key/kind/fact/source/certainty). Use claim certainty for hypotheses and testimony, bluff for deliberate deception. No unchanged evidence dump. Public words are published directly, without a rewrite or added sentences. Silence is allowed during the full public circle; the sole leader on a repeat proposal must explain their roster.'
   );
 }
 
@@ -245,6 +247,8 @@ export function decisionPipeline(generate: Generate): Decide {
       }
       const finalReview = request.state.stage === 'end';
       const decisionRequest = request;
+      const requiresExplanation =
+        request.speak && request.state.stage === 'selectTeam' && request.state.vote > 0 && !request.publicDiscussion;
       const { missions, votes, ...current } = compactRequest(decisionRequest);
       let reply = await generate(
         decisionRequest,
@@ -274,7 +278,8 @@ export function decisionPipeline(generate: Generate): Decide {
         signal,
       );
       signal?.throwIfAborted();
-      if (contradictsRoster(decisionRequest, reply)) {
+      const missingExplanation = requiresExplanation && !reply.publicReason?.trim();
+      if (missingExplanation || contradictsRoster(decisionRequest, reply)) {
         reply = await generate(
           decisionRequest,
           {
@@ -283,7 +288,9 @@ export function decisionPipeline(generate: Generate): Decide {
             instructions:
               decisionInstructions(request) +
               claimInstructions +
-              ' Your previous choice and explicitly selected roster in speech disagree. Reconsider using the same facts; return one legal choice with a matching explanation. You may correct either the choice or explanation. Finish now.',
+              (missingExplanation
+                ? ' Your public explanation was empty. Return one legal choice and a nonempty publicReason addressing another seat and explaining that exact roster from public evidence. Finish now.'
+                : ' Your previous choice and explicitly selected roster in speech disagree. Reconsider using the same facts; return one legal choice with a matching explanation. You may correct either the choice or explanation. Finish now.'),
             context: {
               ...current,
               completedMissions: missions,
@@ -309,6 +316,8 @@ export function decisionPipeline(generate: Generate): Decide {
           : request.speak
             ? safePublicSpeech(reply.publicReason || '', choice, request.language, reply.claimMorgana != null)
             : '';
+      if (requiresExplanation && !speech.trim())
+        throw new AiTechnicalPause('Repeat proposal requires a public leader explanation.');
       // Record only metadata accompanying published model speech, never generate speech from metadata.
       if (speech.trim() && own && !finalReview && !request.councilDiscussion) {
         if (reply.claimMorgana != null)

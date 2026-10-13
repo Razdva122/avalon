@@ -60,6 +60,8 @@ export default {
   botPlay: 'Play with AI',
   botLaunchTime: 'Start the match: {seconds} s',
   botActionTime: 'Your turn: {seconds} s',
+  playerActionTime: '{name}’s turn: {seconds} s',
+  playerDiscussionTime: '{name} is speaking: {seconds} s',
   botActionDeadlineHint: '90 seconds per turn + a shared 5-minute reserve. The match ends when both run out.',
   botAvailableIn: 'Availability updates in {hours} h.',
   botBusy: 'Bots are playing another match.',

@@ -1,3 +1,4 @@
+import { beginnerTips } from '../beginnerTips';
 import aiAgents from './aiAgents';
 import aiArena from './aiArena';
 import { passwordRecovery } from '../passwordRecovery';
@@ -21,6 +22,7 @@ import achievements from './achievements';
 
 export const zh_TW = {
   aiArena,
+  beginnerTips: beginnerTips['zh-TW'],
   aiAgents,
   passwordRecovery: passwordRecovery['zh-TW'],
   premiumCosmetics: premiumCosmetics.zh_TW,

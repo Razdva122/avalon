@@ -27,7 +27,9 @@ function fixture(overrides = {}) {
         };
       if (id === '@/helpers/game-state-manager') return { gameStateKey: 'game' };
       if (id === '@/helpers/composables')
-        return { useUserProfile: () => ({ userState: profile, userName: vue.ref('Owner') }) };
+        return {
+          useUserProfile: () => ({ userState: profile, userName: vue.ref(overrides.playerState?.name || 'Owner') }),
+        };
       if (id === '@/store') return { useStore: () => store };
       if (id === 'vuetify') return { useTheme: () => ({ themeClasses }) };
       if (id === '@/api/socket') return { socket: { on() {}, off() {} } };
@@ -98,7 +100,9 @@ function fixture(overrides = {}) {
       ({
         'aiArena.yourDiscussionTurn': 'Ваше слово',
         'aiArena.thinking': 'Думает',
-        'aiArena.botActionTime': `Ваш ход: ${params.seconds} с`,
+        'aiArena.botActionTime': `Твой ход: ${params.seconds} с`,
+        'aiArena.playerActionTime': `Ход: ${params.name} · ${params.seconds} с`,
+        'aiArena.playerDiscussionTime': `Слово: ${params.name} · ${params.seconds} с`,
         'aiArena.botDiscussionTime': `Ваше слово: ${params.seconds} с`,
         'aiArena.botReserveTime': `Расходуется запас: ${params.seconds} с`,
         'aiArena.botTimeBankRemaining': `Общий запас: ${params.seconds} с`,
@@ -180,10 +184,11 @@ test('human deadline renders in the floating player pill, keeps the reserve and 
     actionTimer: { humanActionExpiresAt: 1390000, humanActionBaseExpiresAt: 1090000, humanTimeBankMs: 300000 },
   });
   t.after(player.stop);
+  player.store.state.profile.id = 'owner';
   let rendered = await player.render();
-  assert.ok(rendered.badge.includes('Ваш ход: 90 с'), rendered.badge);
+  assert.ok(rendered.badge.includes('Твой ход: 90 с'), rendered.badge);
   assert.ok(rendered.badge.includes('Общий запас: 300 с'), rendered.badge);
-  assert.ok(!rendered.html.includes('Ваш ход'), 'the clock stays outside the scaled table');
+  assert.ok(!rendered.html.includes('Твой ход'), 'the clock stays outside the scaled table');
   assert.ok(rendered.badge.includes('<summary'), 'touch and keyboard users can disclose the deadline explanation');
   player.props.actionTimer.waitingForDiscussion = true;
   rendered = await player.render();
@@ -193,5 +198,25 @@ test('human deadline renders in the floating player pill, keeps the reserve and 
   assert.ok(!(await player.render()).badge.includes('Ваше слово'), 'history suppresses the live deadline');
   player.props.visibleHistory = undefined;
   player.props.actionTimer = undefined;
-  assert.ok(!(await player.render()).badge.includes('Ваш ход'), 'completed action removes the clock');
+  assert.ok(!(await player.render()).badge.includes('Твой ход'), 'completed action removes the clock');
+});
+
+test('friend and spectator deadlines name the acting player instead of prompting the viewer', async (t) => {
+  t.mock.method(Date, 'now', () => 1000000);
+  const player = fixture({
+    playerState: { id: 'owner', name: 'Аня', features: {} },
+    actionTimer: { humanActionExpiresAt: 1090000, withFriend: true },
+  });
+  t.after(player.stop);
+  let rendered = await player.render();
+  assert.ok(rendered.badge.includes('Ход: Аня · 90 с'), rendered.badge);
+  assert.ok(!rendered.badge.includes('Твой ход'), 'a friend’s action is not the viewer’s turn');
+  player.props.actionTimer.waitingForDiscussion = true;
+  rendered = await player.render();
+  assert.ok(rendered.badge.includes('Слово: Аня · 90 с'), rendered.badge);
+  assert.ok(!rendered.badge.includes('Ваше слово'), 'a friend’s discussion is not the viewer’s reply');
+  player.store.state.profile.id = 'owner';
+  assert.ok((await player.render()).badge.includes('Ваше слово: 90 с'));
+  player.store.state.profile = undefined;
+  assert.ok((await player.render()).badge.includes('Слово: Аня · 90 с'), 'spectators see the player name');
 });

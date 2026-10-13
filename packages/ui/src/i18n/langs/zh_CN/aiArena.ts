@@ -59,6 +59,8 @@ export default {
   botPlay: '与 AI 对战',
   botLaunchTime: '请开始对局：{seconds} 秒',
   botActionTime: '轮到你行动：{seconds} 秒',
+  playerActionTime: '{name} 的回合：{seconds} 秒',
+  playerDiscussionTime: '{name} 发言：{seconds} 秒',
   botActionDeadlineHint: '每次行动90秒，另有整局共用的5分钟备用时间。两者用尽后对局结束。',
   botAvailableIn: '距离可用状态更新：{hours}小时。',
   botBusy: '机器人正在进行另一场对局。',

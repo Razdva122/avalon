@@ -23,6 +23,7 @@
           :time-bank-ms="activeActionTimer.humanTimeBankMs"
           :discussion="activeActionTimer.waitingForDiscussion"
           :with-friend="activeActionTimer.withFriend"
+          :player-name="isOwnVoice ? undefined : player.name"
           phase="action"
           compact
         />
@@ -620,7 +621,7 @@ export default defineComponent({
 }
 .ai-player-status {
   position: fixed;
-  z-index: 30;
+  z-index: 13;
   pointer-events: none;
   display: inline-flex;
   align-items: center;

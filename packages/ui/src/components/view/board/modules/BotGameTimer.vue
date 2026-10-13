@@ -2,9 +2,7 @@
   <div class="bot-game-timer" :class="{ 'bot-timer-compact': compact }">
     <details v-if="compact && phase === 'action'" class="bot-timer-details">
       <summary>
-        <span role="timer">{{
-          $t(discussion ? 'aiArena.botDiscussionTime' : 'aiArena.botActionTime', { seconds })
-        }}</span>
+        <span role="timer">{{ $t(actionKey, { seconds, name: playerName }) }}</span>
         <span class="bot-timer-info" aria-hidden="true">ⓘ</span>
       </summary>
       <div class="bot-timer-explanation">
@@ -30,6 +28,7 @@
         $t(compact && phase === 'preparation' ? 'aiArena.botLaunchTimeShort' : countdownKey, {
           seconds,
           time: preparationTime,
+          name: playerName,
         })
       }}
     </p>
@@ -58,6 +57,7 @@ const props = defineProps<{
   timeBankMs?: number;
   discussion?: boolean;
   withFriend?: boolean;
+  playerName?: string;
   phase: 'preparation' | 'action';
   compact?: boolean;
 }>();
@@ -65,14 +65,21 @@ const now = ref(Date.now());
 const usingReserve = computed(
   () => props.phase === 'action' && props.baseExpiresAt !== undefined && now.value >= props.baseExpiresAt,
 );
+const actionKey = computed(() =>
+  props.playerName !== undefined
+    ? props.discussion
+      ? 'aiArena.playerDiscussionTime'
+      : 'aiArena.playerActionTime'
+    : props.discussion
+      ? 'aiArena.botDiscussionTime'
+      : 'aiArena.botActionTime',
+);
 const countdownKey = computed(() =>
   props.phase === 'preparation'
     ? 'aiArena.botLaunchTime'
     : usingReserve.value
       ? 'aiArena.botReserveTime'
-      : props.discussion
-        ? 'aiArena.botDiscussionTime'
-        : 'aiArena.botActionTime',
+      : actionKey.value,
 );
 const seconds = computed(() =>
   Math.max(

@@ -793,7 +793,7 @@ test('human action countdown separates normal turn time from the live shared res
     props: { expiresAt: 1390000, baseExpiresAt: 1090000, timeBankMs: 300000, phase: 'action' },
   });
   t.after(room.stop);
-  assert.ok(room.html.includes('Ваш ход: 90 с'), room.html);
+  assert.ok(room.html.includes('Твой ход: 90 с'), room.html);
   assert.ok(room.html.includes('Общий запас: 300 с'), room.html);
   now = 1120000;
   tick();
@@ -979,7 +979,7 @@ test('compact preparation countdown shows remaining launch time and reaches zero
   t.after(room.stop);
   assert.ok(room.html.includes('На запуск 1:10'));
   assert.ok(!room.html.includes('<details'));
-  assert.ok(!room.html.includes('Ваш ход'));
+  assert.ok(!room.html.includes('Твой ход'));
   now = 1061000;
   tick();
   assert.ok((await room.render()).includes('На запуск 0:09'));

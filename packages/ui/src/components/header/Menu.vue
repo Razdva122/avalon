@@ -98,6 +98,11 @@
             >
           </div>
         </section>
+        <section v-if="tipsSession.available && !tipsSession.enabled" class="menu-section">
+          <button type="button" class="menu-item" @click="enableTips">
+            <span class="material-icons" aria-hidden="true">info_outline</span>{{ $t('beginnerTips.enable') }}
+          </button>
+        </section>
         <section class="menu-section compact-settings" :aria-label="$t('menu.settings')">
           <button ref="languageTrigger" type="button" class="language-trigger" @click="showLanguages(true)">
             <svg
@@ -139,6 +144,7 @@ import { inNavigationSection } from './navigation';
 import Avatar from '@/components/user/Avatar.vue';
 import DevPanel from '@/components/dev/DevPanel.vue';
 import { useStickers } from '@/helpers/composables/useStickers';
+import { beginnerTipsSession as tipsSession, setBeginnerTipsEnabled } from '@/helpers/beginner-tips-session';
 
 export default defineComponent({
   components: {
@@ -147,7 +153,7 @@ export default defineComponent({
     Avatar,
     DevPanel,
   },
-  setup: () => ({ newCount: useStickers().newCount }),
+  setup: () => ({ newCount: useStickers().newCount, tipsSession }),
   emits: ['profileClick'],
   data: () => ({
     open: false,
@@ -167,6 +173,10 @@ export default defineComponent({
     },
   },
   methods: {
+    enableTips() {
+      setBeginnerTipsEnabled(true);
+      this.open = false;
+    },
     async showLanguages(value: boolean) {
       this.languageView = value;
       await nextTick();

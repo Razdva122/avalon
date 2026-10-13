@@ -103,7 +103,7 @@ test.each([
       expect(requests.some((request) => request.state.stage === stage)).toBe(count === 8);
     expect(Boolean(room.options.addons.ladyOfLake)).toBe(count === 8);
     const circles = requests.filter((request) => request.publicDiscussion);
-    expect(circles).toHaveLength(count * 6);
+    expect(circles).toHaveLength(count * 3);
     for (let start = 0; start < circles.length; start += count) {
       const circle = circles.slice(start, start + count);
       const leader = circle[0].state.players.find((player) => player.features.isLeader)!;
@@ -343,7 +343,7 @@ test.each([0, 1])(
   },
 );
 
-test('each proposal gets a leader-first public circle, final selection, then buffered silent votes', async () => {
+test('only the first proposal gets a public circle; later leaders select once before buffered silent votes', async () => {
   const requests: BotRequest[] = [];
   const votesBeforeDecisions: string[][] = [];
   const room = new BotRoom(
@@ -355,10 +355,10 @@ test('each proposal gets a leader-first public circle, final selection, then buf
       if (room.data.stage !== 'started') throw Error('not started');
       if (request.state.stage === 'votingForTeam') {
         votesBeforeDecisions.push(room.data.manager.game.vote!.data.votes.map((vote) => vote.value));
-        return { choice: request.state.vote === 0 ? 1 : 0, speech: 'SECRET_VOTE_REPLY' };
+        return { choice: request.state.vote < 3 ? 1 : 0, speech: 'SECRET_VOTE_REPLY' };
       }
       if (request.task.startsWith('Choose the final team')) {
-        expect(request.chat).toHaveLength(request.state.vote === 0 ? 7 : 15);
+        expect(request.chat).toHaveLength(7 + request.state.vote);
         return { choice: request.choices.length - 1, speech: 'This final roster uses the discussion.' };
       }
       expect(request.state.players.every((player) => !player.features.isSelected)).toBe(true);
@@ -370,42 +370,27 @@ test('each proposal gets a leader-first public circle, final selection, then buf
   );
   await room.run();
   const circles = requests.filter((request) => request.publicDiscussion);
-  expect(circles.map((request) => request.name)).toEqual([
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '1',
-  ]);
+  expect(circles.map((request) => request.name)).toEqual(['1', '2', '3', '4', '5', '6', '7']);
   expect(circles.every((request) => request.speak && request.state.stage === 'selectTeam')).toBe(true);
   expect(circles.every((request) => request.choices.every((team) => /^\d, \d$/.test(team)))).toBe(true);
   const selections = requests.filter((request) => request.task.startsWith('Choose the final team'));
-  expect(selections).toHaveLength(2);
-  expect(selections.every((request) => request.speak && request.optionalSpeech)).toBe(true);
+  expect(selections.map((request) => request.name)).toEqual(['1', '2', '3', '4']);
+  expect(selections.every((request) => request.speak && !request.publicDiscussion)).toBe(true);
+  expect(selections.map((request) => request.optionalSpeech)).toEqual([true, false, false, false]);
   const voters = requests.filter((request) => request.state.stage === 'votingForTeam');
-  expect(voters).toHaveLength(14);
+  expect(voters).toHaveLength(28);
   expect(voters.every((request) => !request.speak && request.choices.join(',') === 'approve,reject')).toBe(true);
-  expect(votesBeforeDecisions).toEqual(Array.from({ length: 14 }, () => Array(7).fill('unvoted')));
+  expect(votesBeforeDecisions).toEqual(Array.from({ length: 28 }, () => Array(7).fill('unvoted')));
   expect(JSON.stringify(requests)).not.toContain('SECRET_VOTE_REPLY');
   expect(JSON.stringify(room.chat.history)).not.toContain('SECRET_VOTE_REPLY');
-  const secondCircle = circles.slice(7);
   expect(
-    secondCircle.every((request) =>
-      request.state.history.some((event) => event.type === 'vote' && event.result === 'reject'),
-    ),
+    selections
+      .slice(1)
+      .every((request) => request.state.history.some((event) => event.type === 'vote' && event.result === 'reject')),
   ).toBe(true);
   if (room.data.stage !== 'started') throw Error('not started');
   const votes = room.data.manager.prepareStateForUser().history.filter((event) => event.type === 'vote');
-  expect(votes).toHaveLength(2);
+  expect(votes).toHaveLength(4);
   const finalTeam = selections[0].choices[selections[0].choices.length - 1].split(', ');
   for (const vote of votes) {
     if (vote.type !== 'vote') throw Error('not a vote');
@@ -416,6 +401,31 @@ test('each proposal gets a leader-first public circle, final selection, then buf
     );
     expect(seatLabels).toEqual(finalTeam);
   }
+});
+
+test('a new mission restores the full public circle after a leader-only repeat proposal', async () => {
+  const requests: BotRequest[] = [];
+  const room = new BotRoom(
+    'new-mission-circle',
+    'admin',
+    io,
+    async (request) => {
+      requests.push(request);
+      if (request.state.stage === 'votingForTeam')
+        return { choice: request.state.mission === 0 && request.state.vote === 0 ? 1 : 0, speech: '' };
+      if (request.state.stage === 'onMission') return { choice: request.choices.indexOf('success'), speech: '' };
+      return { choice: 0, speech: request.speak ? '2, this roster keeps our preferred pair.' : '' };
+    },
+    async (state) => {
+      if (state.stage === 'started' && state.game.mission === 1 && state.game.stage === 'votingForTeam') room.stop();
+    },
+  );
+  await room.run();
+  expect(requests.filter((r) => r.publicDiscussion && r.state.mission === 0)).toHaveLength(7);
+  expect(
+    requests.filter((r) => r.state.stage === 'selectTeam' && r.state.mission === 0 && r.state.vote === 1),
+  ).toHaveLength(1);
+  expect(requests.filter((r) => r.publicDiscussion && r.state.mission === 1)).toHaveLength(7);
 });
 
 test('messages are paced ten seconds apart and Stop cancels the pending pause immediately', async () => {
@@ -956,7 +966,7 @@ test.each(['discussion', 'selection', 'votes'] as const)(
 );
 
 test.each([5, 6, 7, 8] as const)(
-  '%i bots complete five missions with four rejected circles before each forced fifth roster',
+  '%i bots complete five missions with four rejections and leader-only repeats before each forced fifth roster',
   async (count) => {
     const requests: BotRequest[] = [];
     const room = new BotRoom(
@@ -988,10 +998,12 @@ test.each([5, 6, 7, 8] as const)(
     );
     await room.run();
     expect(room.ai?.status).toBe('finished');
-    if (count === 7) expect(requests.length).toBeGreaterThan(350);
     expect(requests.length).toBeLessThanOrEqual(count === 8 ? 450 : 400);
-    if (count === 8) expect(requests).toHaveLength(418);
-    expect(requests.filter((request) => request.publicDiscussion)).toHaveLength(count * 25);
+    if (count === 8) expect(requests).toHaveLength(258);
+    expect(requests.filter((request) => request.publicDiscussion)).toHaveLength(count * 5);
+    expect(requests.filter((request) => request.publicDiscussion).every((request) => request.state.vote === 0)).toBe(
+      true,
+    );
     expect(requests.filter((request) => request.task.startsWith('Choose the final team'))).toHaveLength(25);
     const voters = requests.filter((request) => request.state.stage === 'votingForTeam');
     expect(voters).toHaveLength(count * 20);

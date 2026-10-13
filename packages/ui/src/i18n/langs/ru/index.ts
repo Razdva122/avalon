@@ -1,3 +1,4 @@
+import { beginnerTips } from '../beginnerTips';
 import aiAgents from './aiAgents';
 import aiArena from './aiArena';
 import { passwordRecovery } from '../passwordRecovery';
@@ -21,6 +22,7 @@ import achievements from './achievements';
 
 export const ru = {
   aiArena,
+  beginnerTips: beginnerTips['ru'],
   aiAgents,
   passwordRecovery: passwordRecovery['ru'],
   premiumCosmetics: premiumCosmetics.ru,

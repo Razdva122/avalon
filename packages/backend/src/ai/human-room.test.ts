@@ -55,6 +55,38 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
+test.each([false, true])('repeat proposals give a discussion turn only to a human leader (%s)', async (humanLeader) => {
+  const { room, ai, game, requests } = fixture('vote');
+  if (room.data.stage !== 'started') throw Error('not started');
+  room.data.manager.callGameMethods('owner', { method: 'voteForMission', option: 'reject' });
+  expect(game.stage).toBe('selectTeam');
+  game.leader = game.players.find((player) => (humanLeader ? player.userID === 'owner' : player.userID !== 'owner'))!;
+  const run = room.run(true);
+  try {
+    await jest.advanceTimersByTimeAsync(0);
+    if (humanLeader) {
+      expect(ai.waitingForDiscussion).toBe(true);
+      expect(requests).toHaveLength(0);
+      room.finishDiscussion('owner');
+      await jest.advanceTimersByTimeAsync(0);
+      expect(ai.waitingForDiscussion).toBeUndefined();
+      expect(ai.waitingForHuman).toBe(true);
+      expect(game.stage).toBe('selectTeam');
+      expect(requests).toHaveLength(0);
+    } else {
+      expect(ai.waitingForDiscussion).toBeUndefined();
+      expect(ai.waitingForHuman).toBe(true);
+      expect(game.stage).toBe('votingForTeam');
+      expect(room.chat.history).toHaveLength(1);
+      expect(room.chat.history[0].userID).toBe(game.leader.userID);
+      expect(requests).toHaveLength(5);
+    }
+  } finally {
+    room.stop();
+    await run;
+  }
+});
+
 test.each([
   ['vote', 'en', 'Match stopped: the turn time and shared time reserve have run out.'],
   ['vote', 'ru', 'Партия завершена: время на ход и общий запас исчерпаны.'],

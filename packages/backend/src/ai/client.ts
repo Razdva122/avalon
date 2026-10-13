@@ -80,9 +80,11 @@ export function systemFor(request: BotRequest): string {
     ' Return only {"choice":"exact entry from choices","speech":"..."}. Copy a legal choice exactly. When speak=false speech=""; otherwise write complete short sentences, at most 240 characters (800 at end). Facts override testimony; do not invent actions.' +
     (request.publicDiscussion
       ? ' This is a preselection discussion preference, not a submitted team or a binding vote. Recommend a roster, discuss trust and answer or ask about actual earlier votes; the leader selects after the full circle. Do not announce a current approve/reject vote.'
-      : request.optionalSpeech
-        ? ' Choose the final team after the full circle. Your announcement is optional: speech="" submits silently.'
-        : '');
+      : request.state.stage === 'selectTeam' && request.state.vote > 0
+        ? ' Only the leader speaks on this repeat proposal. Select the final team, address another seat directly and explain this exact roster from public evidence, earlier discussion or recorded votes. An explanation is required; no other player has a reply turn before selection.'
+        : request.optionalSpeech
+          ? ' Choose the final team after the full circle. Your announcement is optional: speech="" submits silently.'
+          : '');
   if (request.state.stage === 'end')
     return `${format} Review the finished game honestly. Explain the cause behind one consequential decision for your side, not just the rule that ended the game. Winning does not make every decision correct. Use assassinations and mission cards, not other players' conclusions. Automatic proposals are not voluntary votes. Revealed roles were not necessarily known during play. Admit public role leaks shown in yourStatements. No need to bluff now.`;
   const rules =
