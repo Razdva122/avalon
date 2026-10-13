@@ -105,7 +105,7 @@ test('logout clears public bot access and rejects the late response from the pre
   await Promise.resolve();
   assert.equal(room.access.canPlay.value, false);
   assert.equal(room.access.ownRoomID.value, undefined);
-  assert.deepEqual(room.access.botModes.value, { smart: false, regular: false });
+  assert.deepEqual(room.access.botModes.value, { smart: false, regular: false, beginner: false });
 });
 
 test('occupied bot access clears its reason after the slot opens or connection fails', async (t) => {

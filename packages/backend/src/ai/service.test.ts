@@ -532,7 +532,7 @@ test('administrator access stays available when the Codex catalog fails and publ
     expect(response.mock.calls[0][0]).toMatchObject({
       canManage: true,
       canPlay: true,
-      botModes: { smart: false, regular: false },
+      botModes: { smart: false, regular: false, beginner: false },
     });
   } finally {
     catalog.mockRestore();

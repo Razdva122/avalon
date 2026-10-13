@@ -1,6 +1,7 @@
 import { aiPlayedModel, aiRosterInfo } from '@avalon/types';
 import type {
   AiBotDifficulty,
+  AiBotMode,
   AiLanguage,
   AiPlayerCount,
   CodexModelOption,
@@ -22,32 +23,35 @@ import { getBotProfile } from './agents';
 import { hasPremium } from '@/support/premium';
 import { supportTotalCents } from '@/support/repository';
 
-const humanSettings: Record<AiBotDifficulty, CodexSettings> = {
+const humanSettings: Record<AiBotMode, CodexSettings> = {
   smart: { model: 'gpt-6.1-sol', reasoning: 'medium' },
-  regular: { model: 'gpt-6-luna', reasoning: 'low' },
+  regular: { model: 'gpt-6-luna', reasoning: 'medium' },
+  beginner: { model: 'gpt-6-luna', reasoning: 'low' },
 };
 
-function humanModeAvailable(difficulty: AiBotDifficulty, quota: CodexWeeklyLimit | null, models: CodexModelOption[]) {
+function humanModeAvailable(difficulty: AiBotMode, quota: CodexWeeklyLimit | null, models: CodexModelOption[]) {
   const weekly = quota?.remainingPercent;
   const short = quota?.shortTerm?.remainingPercent;
   const settings = humanSettings[difficulty];
   return (
     typeof weekly === 'number' &&
     Number.isFinite(weekly) &&
-    weekly > (difficulty === 'smart' ? 5 : 2) &&
+    weekly > (difficulty === 'smart' ? 5 : difficulty === 'regular' ? 3 : 1) &&
     (quota?.shortTerm === null ||
-      (typeof short === 'number' && Number.isFinite(short) && short > (difficulty === 'smart' ? 80 : 20))) &&
+      (typeof short === 'number' &&
+        Number.isFinite(short) &&
+        short > (difficulty === 'smart' ? 60 : difficulty === 'regular' ? 30 : 20))) &&
     models.some((model) => model.id === settings.model && model.efforts.includes(settings.reasoning))
   );
 }
 
-function humanModeAvailableAt(difficulty: AiBotDifficulty, quota: CodexWeeklyLimit | null, models: CodexModelOption[]) {
+function humanModeAvailableAt(difficulty: AiBotMode, quota: CodexWeeklyLimit | null, models: CodexModelOption[]) {
   const settings = humanSettings[difficulty];
   if (!models.some((model) => model.id === settings.model && model.efforts.includes(settings.reasoning))) return;
   const resets: number[] = [];
   for (const [window, threshold] of [
-    [quota, difficulty === 'smart' ? 5 : 2],
-    [quota?.shortTerm, difficulty === 'smart' ? 80 : 20],
+    [quota, difficulty === 'smart' ? 5 : difficulty === 'regular' ? 3 : 1],
+    [quota?.shortTerm, difficulty === 'smart' ? 60 : difficulty === 'regular' ? 30 : 20],
   ] as const) {
     if (window === null && quota?.shortTerm === null) continue;
     if (!window || !Number.isFinite(window.remainingPercent)) return;
@@ -117,9 +121,10 @@ export class AiService {
     const botModes = {
       smart: humanModeAvailable('smart', limit, catalog),
       regular: humanModeAvailable('regular', limit, catalog),
+      beginner: humanModeAvailable('beginner', limit, catalog),
     };
-    const botModeAvailableAt: Partial<Record<AiBotDifficulty, number>> = {};
-    for (const difficulty of ['smart', 'regular'] as const) {
+    const botModeAvailableAt: Partial<Record<AiBotMode, number>> = {};
+    for (const difficulty of ['smart', 'regular', 'beginner'] as const) {
       const availableAt = humanModeAvailableAt(difficulty, limit, catalog);
       if (!botModes[difficulty] && availableAt !== undefined) botModeAvailableAt[difficulty] = availableAt;
     }
@@ -294,12 +299,12 @@ export class AiService {
         const availability =
           canPlay && eligibleSlot() && !this.creating && !this.starting && !this.running.size
             ? await this.humanAvailability()
-            : { botModes: { smart: false, regular: false }, botModeAvailableAt: {} };
+            : { botModes: { smart: false, regular: false, beginner: false }, botModeAvailableAt: {} };
         let { botModes } = availability;
         // A room may claim the shared slot while read-only quota/catalog lookups are in flight.
         const active = this.active();
         const botsBusy = !eligibleSlot() || this.creating || this.starting || this.running.size > 0;
-        if (botsBusy) botModes = { smart: false, regular: false };
+        if (botsBusy) botModes = { smart: false, regular: false, beginner: false };
         const ownRoomID =
           active instanceof BotRoom && this.publicRoom(active) && Boolean(userID && active.isHuman(userID))
             ? active.roomID
@@ -381,10 +386,10 @@ export class AiService {
         this.creating = locked = true;
         const modes = await this.humanModes();
         if (
-          options.difficulty
-            ? !modes[options.difficulty]
-            : options.beginner
-              ? !modes.regular
+          options.beginner
+            ? !modes.beginner
+            : options.difficulty
+              ? !modes[options.difficulty]
               : !modes.smart && !modes.regular
         )
           return cb({ error: 'Bot games are currently unavailable' });
@@ -467,7 +472,8 @@ export class AiService {
           await this.expireLaunch(room);
           return cb({ error: 'The bot game preparation time has expired' });
         }
-        if (!modes[options.difficulty]) return cb({ error: 'This bot mode is currently unavailable' });
+        const mode = room.ai!.beginner ? 'beginner' : options.difficulty;
+        if (!modes[mode]) return cb({ error: 'This bot mode is currently unavailable' });
         await this.repository!.claim(id);
         claimed = true;
         if (!this.launchReady(room)) {
@@ -491,7 +497,7 @@ export class AiService {
         if (friendName) room.ai!.title = room.ai!.title?.replace(' vs ', ` + ${friendName} vs `);
         room.setLanguage(options.language);
         room.ai!.botDifficulty = options.difficulty;
-        room.ai!.codex = { ...humanSettings[options.difficulty] };
+        room.ai!.codex = { ...humanSettings[mode] };
         delete room.ai!.launchExpiresAt;
         this.clearLaunchTimer(id);
         this.runRoom(room);

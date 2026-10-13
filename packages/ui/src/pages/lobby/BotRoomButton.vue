@@ -55,7 +55,10 @@ onBeforeUnmount(() => {
 });
 const availability = computed(() =>
   canPlay.value &&
-  (ownRoomID.value || (props.beginner ? botModes.value.regular : botModes.value.smart || botModes.value.regular))
+  (ownRoomID.value ||
+    (props.beginner
+      ? botModes.value.beginner
+      : botModes.value.smart || botModes.value.regular || botModes.value.beginner))
     ? 'available'
     : accessStatus.value === 'ready'
       ? 'unavailable'

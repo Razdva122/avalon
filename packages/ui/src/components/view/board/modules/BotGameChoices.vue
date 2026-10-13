@@ -15,7 +15,9 @@
         variant="flat"
         prepend-icon="play_arrow"
         :loading="busy && !!pendingDifficulty"
-        :disabled="busy || !canPlay || !botModes[difficulty] || (withFriend && humanCount !== 2)"
+        :disabled="
+          busy || !canPlay || !botModes[beginner ? 'beginner' : difficulty] || (withFriend && humanCount !== 2)
+        "
         data-prepared-start
         @click="play(difficulty)"
         >{{ $t('aiArena.setupStart') }}</v-btn
@@ -61,7 +63,9 @@
             :data-bot-mode="difficulty"
             :class="`bot-mode-button bot-mode-button--${difficulty}`"
             :loading="busy && pendingDifficulty === difficulty"
-            :disabled="busy || !canPlay || !botModes[difficulty] || (withFriend && humanCount !== 2)"
+            :disabled="
+              busy || !canPlay || !botModes[beginner ? 'beginner' : difficulty] || (withFriend && humanCount !== 2)
+            "
             :aria-describedby="`bot-${difficulty}-availability`"
             @click="play(difficulty)"
           >
@@ -79,12 +83,14 @@
             :id="`bot-${difficulty}-availability`"
             class="bot-availability"
             role="status"
-            :aria-label="!botModes[difficulty] && botsBusy ? $t('aiArena.botBusy') : undefined"
+            :aria-label="!botModes[beginner ? 'beginner' : difficulty] && botsBusy ? $t('aiArena.botBusy') : undefined"
           >
-            <template v-if="!botModes[difficulty]">
+            <template v-if="!botModes[beginner ? 'beginner' : difficulty]">
               {{
-                !botsBusy && botWaitHours[difficulty] !== undefined
-                  ? $t('aiArena.botAvailabilityShort', { hours: formatHours(botWaitHours[difficulty]!) })
+                !botsBusy && botWaitHours[beginner ? 'beginner' : difficulty] !== undefined
+                  ? $t('aiArena.botAvailabilityShort', {
+                      hours: formatHours(botWaitHours[beginner ? 'beginner' : difficulty]!),
+                    })
                   : $t(botsBusy ? 'aiArena.botBusyShort' : 'aiArena.botUnavailable')
               }}
             </template>
@@ -275,7 +281,13 @@ async function leave() {
 }
 async function play(difficulty: AiBotDifficulty) {
   if (props.withFriend && props.humanCount !== 2) return;
-  if (busy.value || !canPlay.value || !botModes.value[difficulty] || accessStatus.value !== 'ready') return;
+  if (
+    busy.value ||
+    !canPlay.value ||
+    !botModes.value[props.beginner ? 'beginner' : difficulty] ||
+    accessStatus.value !== 'ready'
+  )
+    return;
   if (!props.beginner && selectedPlayerCount.value >= 7 && !canPlayLargeTables.value) return;
   if (props.expiresAt && Date.now() >= props.expiresAt) {
     error.value = t('aiArena.botTimeout');

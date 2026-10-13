@@ -180,7 +180,7 @@ function modeAvailable(mode: 'regular' | 'smart' | 'beginner') {
   return (
     accessStatus.value === 'ready' &&
     canPlay.value &&
-    botModes.value[mode === 'smart' ? 'smart' : 'regular'] &&
+    botModes.value[mode] &&
     !(mode === 'beginner' && withFriend.value)
   );
 }
@@ -204,16 +204,21 @@ const notice = computed(() => {
   if (accessStatus.value === 'loading') return '';
   if (accessStatus.value === 'error') return t('aiArena.connectionError');
   if (botsBusy.value) return t('aiArena.setupBusy');
-  if (!canPlay.value || (!botModes.value.smart && !botModes.value.regular)) return t('aiArena.setupAllUnavailable');
+  if (!canPlay.value || (!botModes.value.smart && !botModes.value.regular && !modeAvailable('beginner')))
+    return t('aiArena.setupAllUnavailable');
   if (!botModes.value.smart) return t('aiArena.setupSmartUnavailable');
   if (!botModes.value.regular) return t('aiArena.setupRegularUnavailable');
   return '';
 });
 const waitHours = computed(() => {
   if (botsBusy.value || accessStatus.value !== 'ready' || !signedIn.value) return undefined;
-  if (botModes.value.regular) return botWaitHours.value.smart;
-  if (botModes.value.smart) return botWaitHours.value.regular;
-  const waits = Object.values(botWaitHours.value).filter((hours): hours is number => hours !== undefined);
+  if (modeAvailable('smart') || modeAvailable('regular') || modeAvailable('beginner')) {
+    if (!botModes.value.smart) return botWaitHours.value.smart;
+    if (!botModes.value.regular) return botWaitHours.value.regular;
+    return undefined;
+  }
+  const modes = withFriend.value ? (['smart', 'regular'] as const) : (['smart', 'regular', 'beginner'] as const);
+  const waits = modes.map((mode) => botWaitHours.value[mode]).filter((hours): hours is number => hours !== undefined);
   return waits.length ? Math.min(...waits) : undefined;
 });
 const formatHours = (hours: number) => new Intl.NumberFormat(locale.value.replace('_', '-')).format(hours);

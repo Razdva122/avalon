@@ -1,7 +1,7 @@
 import type { VoiceState, VoiceJoin, VoiceError } from '../voice';
 import type { PlayerGameSummary } from '../stats/player-games';
 import type { StickerResponse, StickerMessage, StickerError } from '../user/stickers';
-import type { AiBotDifficulty, AiLanguage, AiPlayerCount, TRoomState } from '../room';
+import type { AiBotDifficulty, AiBotMode, AiLanguage, AiPlayerCount, TRoomState } from '../room';
 import type { VisualGameState } from '../game/state';
 import type { GameOptions } from '../game/options';
 
@@ -142,10 +142,10 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
       canManage: boolean;
       canPlay?: boolean;
       botsBusy?: boolean;
-      botModes?: Record<AiBotDifficulty, boolean>;
+      botModes?: Record<AiBotMode, boolean>;
       canPlayLargeTables?: boolean;
       /** Estimated quota recovery, in Unix milliseconds; omitted when unknown or occupied. */
-      botModeAvailableAt?: Partial<Record<AiBotDifficulty, number>>;
+      botModeAvailableAt?: Partial<Record<AiBotMode, number>>;
       ownRoomID?: string;
       roomID?: string;
       models?: { id: string; label: string }[];

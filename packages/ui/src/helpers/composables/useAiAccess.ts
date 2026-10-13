@@ -1,5 +1,5 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
-import type { AiBotDifficulty, ClientToServerEvents, CodexModelOption } from '@avalon/types';
+import type { AiBotMode, ClientToServerEvents, CodexModelOption } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 
@@ -13,13 +13,13 @@ export function useAiAccess() {
   const canPlayLargeTables = ref(false);
   const botsBusy = ref(false);
   const accessStatus = ref<'loading' | 'ready' | 'error'>('loading');
-  const botModes = ref({ smart: false, regular: false });
-  const botModeAvailableAt = ref<Partial<Record<AiBotDifficulty, number>>>({});
+  const botModes = ref({ smart: false, regular: false, beginner: false });
+  const botModeAvailableAt = ref<Partial<Record<AiBotMode, number>>>({});
   const now = ref(Date.now());
   const botWaitHours = computed(() => {
-    const hours: Partial<Record<AiBotDifficulty, number>> = {};
+    const hours: Partial<Record<AiBotMode, number>> = {};
     if (botsBusy.value) return hours;
-    for (const difficulty of ['smart', 'regular'] as const) {
+    for (const difficulty of ['smart', 'regular', 'beginner'] as const) {
       const reset = botModeAvailableAt.value[difficulty];
       if (!botModes.value[difficulty] && reset && reset > now.value)
         hours[difficulty] = Math.ceil((reset - now.value) / 360000) / 10;
@@ -44,7 +44,7 @@ export function useAiAccess() {
     canPlay.value = false;
     canPlayLargeTables.value = false;
     botsBusy.value = false;
-    botModes.value = { smart: false, regular: false };
+    botModes.value = { smart: false, regular: false, beginner: false };
     botModeAvailableAt.value = {};
     ownRoomID.value = undefined;
     models.value = [];
@@ -59,8 +59,8 @@ export function useAiAccess() {
     botsBusy.value = access.canPlay === true && access.botsBusy === true;
     accessStatus.value = 'ready';
     botModes.value = access.canPlay
-      ? access.botModes || { smart: false, regular: false }
-      : { smart: false, regular: false };
+      ? access.botModes || { smart: false, regular: false, beginner: false }
+      : { smart: false, regular: false, beginner: false };
     botModeAvailableAt.value = access.canPlay ? access.botModeAvailableAt || {} : {};
     ownRoomID.value = access.canPlay ? access.ownRoomID : undefined;
     models.value = access.canManage ? access.models || [] : [];

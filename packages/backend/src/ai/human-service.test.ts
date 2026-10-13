@@ -13,7 +13,7 @@ import { errorHandler } from '@/helpers/socket';
 const initialEnvironment = { ...process.env };
 const models = [
   { id: 'gpt-6.1-sol', label: 'Sol', efforts: ['medium'] },
-  { id: 'gpt-6-luna', label: 'Luna', efforts: ['low'] },
+  { id: 'gpt-6-luna', label: 'Luna', efforts: ['low', 'medium'] },
 ];
 let quota: jest.SpyInstance;
 let modelCatalog: jest.SpyInstance;
@@ -166,7 +166,7 @@ test('only the ready-room owner can stop preparation, cancel expiry, and release
 
 test.each([
   ['smart', 'gpt-6.1-sol', 'medium'],
-  ['regular', 'gpt-6-luna', 'low'],
+  ['regular', 'gpt-6-luna', 'medium'],
 ])('start applies %s settings and language to the same ready room', async (difficulty, model, reasoning) => {
   const { draft, connect, claim, host } = fixture();
   const room = await draft();
@@ -189,10 +189,10 @@ test.each([
 });
 
 test.each([
-  ['smart', 80, 6],
-  ['smart', 81, 5],
-  ['regular', 20, 3],
-  ['regular', 21, 2],
+  ['smart', 60, 6],
+  ['smart', 61, 5],
+  ['regular', 30, 4],
+  ['regular', 31, 3],
   ['regular', Number.NaN, 10],
   ['regular', 90, Number.POSITIVE_INFINITY],
 ])(
@@ -229,7 +229,7 @@ test.each(['regular', 'smart'] as const)('weekly-only accounts can prepare and s
   const handlers = connect('owner');
   const access = jest.fn();
   await handlers.getAiRoomAccess(access);
-  expect(access.mock.calls[0][0].botModes).toEqual({ regular: true, smart: true });
+  expect(access.mock.calls[0][0].botModes).toEqual({ regular: true, smart: true, beginner: true });
   const response = jest.fn();
   await handlers.createHumanAiRoom({ beginner: false, difficulty, language: 'en', playerCount: 5 }, response);
   const id = response.mock.calls[0][0].roomID;
@@ -246,7 +246,7 @@ test('weekly-only accounts still honor weekly quota thresholds and reset time', 
   const { connect } = fixture();
   const access = jest.fn();
   await connect('owner').getAiRoomAccess(access);
-  expect(access.mock.calls[0][0].botModes).toEqual({ regular: false, smart: false });
+  expect(access.mock.calls[0][0].botModes).toEqual({ regular: false, smart: false, beginner: true });
   expect(access.mock.calls[0][0].botModeAvailableAt).toEqual({ regular: reset * 1000, smart: reset * 1000 });
 });
 
@@ -266,7 +266,7 @@ test('a ready room is reused by its owner and prevents another party reserving t
     canPlay: true,
     canPlayLargeTables: false,
     ownRoomID: first.roomID,
-    botModes: { smart: true, regular: true },
+    botModes: { smart: true, regular: true, beginner: true },
   });
   await connect('other').getAiRoomAccess(access);
   expect(access.mock.calls[1][0]).toEqual({
@@ -274,7 +274,7 @@ test('a ready room is reused by its owner and prevents another party reserving t
     canPlay: true,
     canPlayLargeTables: false,
     botsBusy: true,
-    botModes: { smart: false, regular: false },
+    botModes: { smart: false, regular: false, beginner: false },
   });
 });
 
@@ -283,7 +283,7 @@ test('unavailable quota does not report bots as occupied', async () => {
   const { connect } = fixture();
   const access = jest.fn();
   await connect('owner').getAiRoomAccess(access);
-  expect(access.mock.calls[0][0].botModes).toEqual({ smart: false, regular: false });
+  expect(access.mock.calls[0][0].botModes).toEqual({ smart: false, regular: false, beginner: false });
   expect(access.mock.calls[0][0].botsBusy).not.toBe(true);
 });
 
@@ -331,7 +331,7 @@ test('technical resume retains selected model without applying a new-match quota
   await connect('owner').controlAiRoom(room.roomID, 'resumeTechnical', response);
   expect(response).toHaveBeenCalledWith({ ok: true });
   expect(quota).not.toHaveBeenCalled();
-  expect(room.ai?.codex).toEqual({ model: 'gpt-6-luna', reasoning: 'low' });
+  expect(room.ai?.codex).toEqual({ model: 'gpt-6-luna', reasoning: 'medium' });
 });
 
 test('model catalog support is checked again before starting', async () => {
@@ -446,11 +446,11 @@ test('preparation respects the manager room cap', async () => {
 });
 
 test.each([
-  [10, 70, 1100000, 1010800, { smart: 1010800000 }],
+  [10, 60, 1100000, 1010800, { smart: 1010800000 }],
   [5, 90, 1100000, 1010800, { smart: 1100000000 }],
-  [2, 10, 1100000, 1010800, { smart: 1100000000, regular: 1100000000 }],
+  [2, 10, 1100000, 1010800, { smart: 1100000000, regular: 1100000000, beginner: 1010800000 }],
   [10, 90, 1100000, 1010800, {}],
-  [2, 10, null, 1010800, {}],
+  [2, 10, null, 1010800, { beginner: 1010800000 }],
   [10, 70, 1100000, 999999, {}],
 ])(
   'public access predicts reset only for blocked quota windows (%s / %s)',
@@ -657,4 +657,65 @@ test('a prepared setup cannot be changed by a different launch payload', async (
   );
   expect(started).toHaveBeenCalledWith({ ok: true });
   room.stop();
+});
+
+test.each([
+  [21, 2, true],
+  [20, 2, false],
+  [21, 1, false],
+])('first game has independent strict thresholds: %s / %s', async (shortTerm, weekly, allowed) => {
+  quota.mockResolvedValue({ remainingPercent: weekly, shortTerm: { remainingPercent: shortTerm } });
+  const { connect, host } = fixture();
+  const handlers = connect('owner');
+  const access = jest.fn();
+  await handlers.getAiRoomAccess(access);
+  expect(access.mock.calls[0][0].botModes).toEqual({ smart: false, regular: false, beginner: allowed });
+  const created = jest.fn();
+  await handlers.createHumanAiRoom({ beginner: true, difficulty: 'regular', language: 'en', playerCount: 5 }, created);
+  if (!allowed) {
+    expect(created.mock.calls[0][0]).toHaveProperty('error');
+    return;
+  }
+  const id = created.mock.calls[0][0].roomID;
+  expect(id).toBeDefined();
+  const started = jest.fn();
+  await handlers.startHumanAiRoom(id, { difficulty: 'regular', language: 'en', playerCount: 5 }, started);
+  expect(started).toHaveBeenCalledWith({ ok: true });
+  expect(host.rooms[id].ai?.codex).toEqual({ model: 'gpt-6-luna', reasoning: 'low' });
+});
+
+test('first game rechecks its own quota at launch', async () => {
+  const { connect, host } = fixture();
+  const handlers = connect('owner');
+  const created = jest.fn();
+  await handlers.createHumanAiRoom({ beginner: true }, created);
+  const id = created.mock.calls[0][0].roomID;
+  quota.mockResolvedValue({ remainingPercent: 1, shortTerm: { remainingPercent: 21 } });
+  const started = jest.fn();
+  await handlers.startHumanAiRoom(id, { difficulty: 'regular', language: 'en' }, started);
+  expect(started.mock.calls[0][0]).toHaveProperty('error');
+  expect(host.rooms[id].ai?.status).toBe('ready');
+});
+
+test('smart bots can prepare and start above 60 percent without waiting for a quota reset', async () => {
+  quota.mockResolvedValue({
+    remainingPercent: 6,
+    resetsAt: Date.now() / 1000 + 86400,
+    checkedAt: Date.now(),
+    shortTerm: { remainingPercent: 61, resetsAt: Date.now() / 1000 + 3600 },
+  });
+  const { connect, host } = fixture();
+  const handlers = connect('owner');
+  const access = jest.fn();
+  await handlers.getAiRoomAccess(access);
+  expect(access.mock.calls[0][0].botModes.smart).toBe(true);
+  expect(access.mock.calls[0][0].botModeAvailableAt?.smart).toBeUndefined();
+  const created = jest.fn();
+  await handlers.createHumanAiRoom({ beginner: false, difficulty: 'smart', language: 'en', playerCount: 5 }, created);
+  const id = created.mock.calls[0][0].roomID;
+  expect(id).toBeDefined();
+  const started = jest.fn();
+  await handlers.startHumanAiRoom(id, { difficulty: 'smart', language: 'en' }, started);
+  expect(started).toHaveBeenCalledWith({ ok: true });
+  expect(host.rooms[id].ai?.codex).toEqual({ model: 'gpt-6.1-sol', reasoning: 'medium' });
 });

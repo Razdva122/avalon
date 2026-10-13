@@ -830,7 +830,7 @@ test('beginner table hides settings and starts only regular five-seat play', asy
   const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
     props: { roomID: 'beginner-room', beginner: true },
     locale: 'ru',
-    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true, beginner: true }) },
   });
   t.after(room.stop);
   assert.equal(room.nodes('select').length, 0);
@@ -1311,4 +1311,61 @@ test('lobby shows the actual friend-game roster and its empty seat', async (t) =
   t.after(joined.stop);
   assert.ok(joined.html.includes('2 humans + 5 bots'));
   assert.ok(!joined.html.includes('Friend’s seat open'));
+});
+
+test('first game can be prepared and launched while regular bots are unavailable', async (t) => {
+  const accessOverrides = {
+    canPlay: vue.ref(true),
+    botModes: vue.ref({ regular: false, smart: false, beginner: true }),
+  };
+  const setup = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true, beginner: true },
+    locale: 'ru',
+    accessOverrides,
+  });
+  t.after(setup.stop);
+  assert.equal(setup.nodes('input').find((node) => node.props.value === 'beginner').props.disabled, false);
+  const create = setup.nodes('v-btn').find((node) => 'data-create-bot-game' in node.props);
+  assert.equal(create.props.disabled, false);
+  assert.ok(!setup.html.includes('Все боты сейчас недоступны'));
+  await create.props.onClick();
+  assert.deepEqual(setup.sent, [
+    ['createHumanAiRoom', { beginner: true, withFriend: false, difficulty: 'regular', language: 'ru', playerCount: 5 }],
+  ]);
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    props: { roomID: 'first', beginner: true, difficulty: 'regular', language: 'ru', playerCount: 5 },
+    accessOverrides,
+    acknowledge: async () => ({ ok: true }),
+  });
+  t.after(room.stop);
+  const start = room.nodes('v-btn').find((node) => 'data-prepared-start' in node.props);
+  assert.equal(start.props.disabled, false);
+  await start.props.onClick();
+  assert.deepEqual(room.sent, [['startHumanAiRoom', 'first', { difficulty: 'regular', language: 'ru' }]]);
+});
+
+test('setup recovery belongs to the displayed unavailable mode and excludes beginner in friend play', async (t) => {
+  const solo = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      botModes: vue.ref({ smart: false, regular: false, beginner: true }),
+      botWaitHours: vue.ref({ smart: 144, regular: 4 }),
+    },
+  });
+  t.after(solo.stop);
+  assert.ok(solo.html.includes('Сильные боты сейчас недоступны'));
+  assert.ok(solo.html.includes('Будут доступны через 144 ч.'));
+  const friend = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true, withFriend: true },
+    locale: 'ru',
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      botModes: vue.ref({ smart: false, regular: false, beginner: false }),
+      botWaitHours: vue.ref({ smart: 144, regular: 4, beginner: 1 }),
+    },
+  });
+  t.after(friend.stop);
+  assert.ok(friend.html.includes('Будут доступны через 4 ч.'));
 });

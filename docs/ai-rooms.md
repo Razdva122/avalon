@@ -97,7 +97,7 @@ to `createHumanAiRoom` to save the prepared settings.
 `startHumanAiRoom(roomID, { difficulty: 'smart' | 'regular', language, playerCount?: 5 | 6 | 7 | 8 }, callback)`
 starts the same prepared room and returns `ok: true` or an `error`. The server
 chooses the model and reasoning effort, validates table size and Premium, and
-forces regular bots with five seats for beginner rooms; clients cannot override
+forces Luna low bots with five seats for beginner rooms; clients cannot override
 these settings or start another owner's room.
 Access responses include `canPlay`, `botModes` availability and `ownRoomID` for
 returning to the owner's active match. Room state records the selected mode as
@@ -169,8 +169,9 @@ Codex catalog. Public play uses these fixed server presets:
 
 | Mode         | Model         | Reasoning effort | Required five-hour remainder | Required weekly remainder |
 | ------------ | ------------- | ---------------- | ---------------------------- | ------------------------- |
-| Smart bots   | `gpt-6.1-sol` | `medium`         | Greater than 80%             | Greater than 5%           |
-| Regular bots | `gpt-6-luna`  | `low`            | Greater than 20%             | Greater than 2%           |
+| Smart bots   | `gpt-6.1-sol` | `medium`         | Greater than 60%             | Greater than 5%           |
+| Regular bots | `gpt-6-luna`  | `medium`         | Greater than 30%             | Greater than 3%           |
+| First game   | `gpt-6-luna`  | `low`            | Greater than 20%             | Greater than 1%           |
 
 Both thresholds are strict: equality does not allow a new match. The selected
 preset must also be supported by the authenticated model catalog. Missing or

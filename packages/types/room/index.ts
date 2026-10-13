@@ -40,6 +40,7 @@ export type CodexModelOption = { id: string; label: string; efforts: string[] };
 export type AiLanguage = 'en' | 'ru' | 'zh-tw';
 export type AiPlayerCount = 5 | 6 | 7 | 8;
 export type AiBotDifficulty = 'smart' | 'regular';
+export type AiBotMode = AiBotDifficulty | 'beginner';
 
 export type AiRoomState = {
   /** Owner human seat; absent in spectator-only bot matches. */
