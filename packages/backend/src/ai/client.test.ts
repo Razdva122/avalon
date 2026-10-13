@@ -18,8 +18,9 @@ test('rejects invented choices and oversized speech', () => {
   expect(parseReply('{"choice":1,"speech":"I disagree."}', 2)).toEqual({ choice: 1, speech: 'I disagree.' });
 });
 
-test('compact context strips internal IDs and bounds repeated chat and vote history', () => {
+test.each(['selectTeam', 'onMission'])('compact %s context strips internal IDs and bounds public behavior', (stage) => {
   const state = {
+    stage,
     mission: 0,
     players: [{ id: 'internal-id', index: 6, role: 'servant', features: {} }],
     history: Array.from({ length: 30 }, () => ({
@@ -38,8 +39,8 @@ test('compact context strips internal IDs and bounds repeated chat and vote hist
     state,
     chat: Array.from({ length: 30 }, () => ({ name: '6', text: 'a'.repeat(500) })),
   });
-  expect(compact.votes).toHaveLength(25);
-  expect(compact.chat).toHaveLength(14);
+  expect(compact.votes?.length).toBe(25);
+  expect(compact.chat?.length).toBe(14);
   expect(compact.chat!.every((m) => m.text.length <= 240)).toBe(true);
   const serialized = JSON.stringify(compact);
   expect(serialized).not.toContain('internal-id');

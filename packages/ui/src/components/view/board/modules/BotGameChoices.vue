@@ -1,23 +1,15 @@
 <template>
   <section class="bot-game-choices" :aria-label="$t('aiArena.playWithBots')">
     <div v-if="difficulty" class="prepared-bot-game">
-      <h2 class="bot-table">
-        {{
-          $t(withFriend ? 'aiArena.botFriendRoster' : 'aiArena.mixedPlayerCount', {
-            count: selectedPlayerCount - (withFriend ? 2 : 1),
-          })
-        }}
-      </h2>
-      <p>{{ $t(withFriend && humanCount !== 2 ? 'aiArena.botWaitingForFriend' : 'aiArena.ready') }}</p>
+      <h2 class="bot-table">{{ rosterText }}</h2>
+      <p>{{ waitingForPlayers ? waitingText : $t('aiArena.ready') }}</p>
       <BotGameTimer v-if="expiresAt" :expires-at="expiresAt" phase="preparation" compact />
       <v-btn
         class="prepared-start"
         variant="flat"
         prepend-icon="play_arrow"
         :loading="busy && !!pendingDifficulty"
-        :disabled="
-          busy || !canPlay || !botModes[beginner ? 'beginner' : difficulty] || (withFriend && humanCount !== 2)
-        "
+        :disabled="busy || !canPlay || !botModes[beginner ? 'beginner' : difficulty] || waitingForPlayers"
         data-prepared-start
         @click="play(difficulty)"
         >{{ $t('aiArena.setupStart') }}</v-btn
@@ -33,15 +25,7 @@
       <p v-if="error" class="bot-error" role="alert">{{ error }}</p>
     </div>
     <template v-else>
-      <h2 class="bot-table" :title="title">
-        {{
-          withFriend
-            ? $t('aiArena.botFriendRoster', { count: selectedPlayerCount - 2 })
-            : selectedPlayerCount === 5
-              ? $t('aiArena.botSoloRoster')
-              : $t('aiArena.mixedPlayerCount', { count: selectedPlayerCount - 1 })
-        }}
-      </h2>
+      <h2 class="bot-table" :title="title">{{ rosterText }}</h2>
       <button
         ref="settingsTrigger"
         v-if="!beginner"
@@ -56,16 +40,14 @@
         <span>{{ $t('aiArena.botPreparationSummary', { language: languageName, count: selectedPlayerCount }) }}</span>
         <v-icon icon="settings" class="bot-settings-icon" aria-hidden="true" />
       </button>
-      <p v-if="withFriend && humanCount !== 2" role="status">{{ $t('aiArena.botWaitingForFriend') }}</p>
+      <p v-if="waitingForPlayers" role="status">{{ waitingText }}</p>
       <div class="bot-modes" :class="{ 'bot-modes--beginner': beginner }">
         <div v-for="difficulty in botDifficulties" :key="difficulty" class="bot-mode">
           <v-btn
             :data-bot-mode="difficulty"
             :class="`bot-mode-button bot-mode-button--${difficulty}`"
             :loading="busy && pendingDifficulty === difficulty"
-            :disabled="
-              busy || !canPlay || !botModes[beginner ? 'beginner' : difficulty] || (withFriend && humanCount !== 2)
-            "
+            :disabled="busy || !canPlay || !botModes[beginner ? 'beginner' : difficulty] || waitingForPlayers"
             :aria-describedby="`bot-${difficulty}-availability`"
             @click="play(difficulty)"
           >
@@ -160,13 +142,7 @@
               </select>
             </label>
           </div>
-          <p class="bot-sheet-note">
-            {{
-              $t(withFriend ? 'aiArena.botFriendRoster' : 'aiArena.mixedPlayerCount', {
-                count: selectedPlayerCount - (withFriend ? 2 : 1),
-              })
-            }}
-          </p>
+          <p class="bot-sheet-note">{{ rosterText }}</p>
           <p v-if="!beginner && !canPlayLargeTables" class="bot-sheet-note">{{ $t('aiArena.botPremiumSeats') }}</p>
           <div class="bot-sheet-explanations">
             <p v-if="beginner">{{ $t('aiArena.botBeginnerHint') }}</p>
@@ -239,6 +215,7 @@ const props = defineProps<{
   beginner?: boolean;
   withFriend?: boolean;
   humanCount?: number;
+  humanSeats?: 2 | 3;
   difficulty?: AiBotDifficulty;
   language?: AiLanguage;
   playerCount?: AiPlayerCount;
@@ -249,6 +226,17 @@ const { canPlay, canPlayLargeTables, botModes, botsBusy, botWaitHours, accessSta
 const formatHours = (hours: number) => new Intl.NumberFormat(locale.value.replace('_', '-')).format(hours);
 const botDifficulties = computed<AiBotDifficulty[]>(() => (props.beginner ? ['regular'] : ['regular', 'smart']));
 const selectedPlayerCount = ref<AiPlayerCount>(props.playerCount ?? 5);
+const expectedHumanCount = computed(() => (props.withFriend ? (props.humanSeats ?? 2) : 1));
+const openHumanSeats = computed(() => Math.max(0, expectedHumanCount.value - (props.humanCount ?? 1)));
+const waitingForPlayers = computed(() => openHumanSeats.value > 0);
+const waitingText = computed(() => t('aiArena.botWaitingForFriends', { count: openHumanSeats.value }));
+const rosterText = computed(() =>
+  t('aiArena.cardHumanRoster', {
+    humans: expectedHumanCount.value,
+    bots: selectedPlayerCount.value - expectedHumanCount.value,
+  }),
+);
+
 const selectedLanguage = ref<AiLanguage>(
   props.language ?? (locale.value === 'ru' ? 'ru' : /^zh[-_]tw$/i.test(locale.value) ? 'zh-tw' : 'en'),
 );
@@ -280,7 +268,7 @@ async function leave() {
   }
 }
 async function play(difficulty: AiBotDifficulty) {
-  if (props.withFriend && props.humanCount !== 2) return;
+  if (waitingForPlayers.value) return;
   if (
     busy.value ||
     !canPlay.value ||

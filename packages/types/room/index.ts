@@ -46,6 +46,8 @@ export type AiRoomState = {
   /** Owner human seat; absent in spectator-only bot matches. */
   humanPlayerID?: string;
   withFriend?: boolean;
+  /** Reserved human seats; older friend rooms default to two. */
+  humanSeats?: 2 | 3;
   humanPlayerIDs?: string[];
   discussionPlayerID?: string;
   humanTimers?: Record<

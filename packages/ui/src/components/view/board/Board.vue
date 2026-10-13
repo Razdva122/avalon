@@ -63,8 +63,8 @@
               roomState.ai?.publicBotGame &&
               roomState.ai.withFriend &&
               roomState.ai.status === 'ready' &&
-              (roomState.ai.humanPlayerIDs?.length ?? 1) === 1 &&
-              i === players.length - 2
+              i >= players.length - (roomState.ai.humanSeats ?? 2) &&
+              i < players.length - (roomState.ai.humanPlayerIDs?.length ?? 1)
             "
             class="friend-seat"
             :style="{ transform: calculateRotate(i, true), translate: '0 -50%' }"

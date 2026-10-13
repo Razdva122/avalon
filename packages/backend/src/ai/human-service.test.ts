@@ -560,29 +560,43 @@ test.each([
   );
 });
 
-test('friend mode requires two humans before launch and lets either human find their room', async () => {
-  const { host, connect } = fixture();
-  const created = jest.fn();
-  await connect('owner').createHumanAiRoom({ beginner: false, withFriend: true }, created);
-  const result = created.mock.calls[0][0];
-  expect(result).toHaveProperty('roomID');
-  const room = host.rooms[result.roomID] as BotRoom;
-  const rejected = jest.fn();
-  await connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'ru' }, rejected);
-  expect(rejected.mock.calls[0][0]).toHaveProperty('error');
-  room.joinGame('friend');
-  const started = jest.fn();
-  await connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'ru' }, started);
-  expect(started.mock.calls[0][0]).toEqual({ ok: true });
-  expect(room.players).toContain('friend');
-  expect(room.players).toHaveLength(5);
-  expect(room.ai!.humanPlayerIDs).toEqual(['owner', 'friend']);
-  expect(room.ai!.title).toBe('Alice + friend vs 3 Bots');
-  const access = jest.fn();
-  await connect('friend').getAiRoomAccess(access);
-  expect(access.mock.calls[0][0].ownRoomID).toBe(room.roomID);
-  room.stop();
-});
+test.each([2, 3])(
+  'friend mode requires %i humans before launch and lets each human find their room',
+  async (humanSeats) => {
+    const { host, connect } = fixture('admin', true);
+    const created = jest.fn();
+    await connect('owner').createHumanAiRoom({ beginner: false, withFriend: true, humanSeats }, created);
+    const result = created.mock.calls[0][0];
+    expect(result).toHaveProperty('roomID');
+    const room = host.rooms[result.roomID] as BotRoom;
+    const rejected = jest.fn();
+    await connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'ru' }, rejected);
+    expect(rejected.mock.calls[0][0]).toHaveProperty('error');
+    room.joinGame('friend');
+    if (humanSeats === 3) {
+      await connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'ru' }, rejected);
+      expect(rejected.mock.calls[1][0]).toHaveProperty('error');
+      room.joinGame('friend2');
+    }
+    expect(() => room.joinGame('extra')).toThrow();
+    room.leaveGame('friend');
+    expect(room.players).toContain('owner');
+    if (humanSeats === 3) expect(room.players).toContain('friend2');
+    room.joinGame('friend');
+    expect(new Set(room.players).size).toBe(5);
+    const started = jest.fn();
+    await connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'ru' }, started);
+    expect(started.mock.calls[0][0]).toEqual({ ok: true });
+    expect(room.players).toContain('friend');
+    expect(room.players).toHaveLength(5);
+    expect(room.ai!.humanPlayerIDs).toEqual(humanSeats === 3 ? ['owner', 'friend2', 'friend'] : ['owner', 'friend']);
+    expect(room.ai!.title).toBe(humanSeats === 3 ? 'Alice + friend2 + friend vs 2 Bots' : 'Alice + friend vs 3 Bots');
+    const access = jest.fn();
+    await connect('friend').getAiRoomAccess(access);
+    expect(access.mock.calls[0][0].ownRoomID).toBe(room.roomID);
+    room.stop();
+  },
+);
 
 test('creation saves the chosen mode, language and size before launch without inference', async () => {
   jest.useFakeTimers();

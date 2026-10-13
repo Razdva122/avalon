@@ -17,18 +17,7 @@
       <summary>
         <span class="ai-heading"
           ><strong>{{ ai.title || $t('aiArena.title') }}</strong
-          ><small>{{
-            $t(
-              ai.withFriend
-                ? 'aiArena.botFriendRoster'
-                : ai.humanPlayerID
-                  ? 'aiArena.mixedPlayerCount'
-                  : 'aiArena.playerCount',
-              {
-                count: displayPlayerCount - (ai.humanPlayerIDs?.length ?? (ai.humanPlayerID ? 1 : 0)),
-              },
-            )
-          }}</small
+          ><small>{{ rosterText }}</small
           ><small v-if="displayModel">{{ displayModel }}</small></span
         >
         <span class="ai-status" :class="`ai-status--${ai.status}`">{{ $t(`aiArena.${ai.status}`) }}</span>
@@ -144,6 +133,11 @@ const { canManage, codexModels, refresh } = useAiAccess();
 const canControl = computed(
   () => canManage.value || (Boolean(props.ai.publicBotGame || props.ai.botDifficulty) && props.isHumanPlayer === true),
 );
+const rosterText = computed(() => {
+  const humans = props.ai.humanPlayerIDs?.length ?? (props.ai.humanPlayerID ? 1 : 0);
+  const bots = displayPlayerCount.value - humans;
+  return humans ? t('aiArena.cardHumanRoster', { humans, bots }) : t('aiArena.playerCount', { count: bots });
+});
 const displayPlayerCount = computed(() => props.ai.playerCount ?? props.playerCount ?? 7);
 const displayLanguage = computed(
   () => ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）' })[props.ai.language || 'en'],

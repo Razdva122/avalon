@@ -162,10 +162,12 @@ export function validPacket(event: string, args: unknown[]): boolean {
       values.length === 0 ||
       (record(values[0]) &&
         Object.keys(values[0]).every((key) =>
-          ['beginner', 'withFriend', 'difficulty', 'language', 'playerCount'].includes(key),
+          ['beginner', 'withFriend', 'humanSeats', 'difficulty', 'language', 'playerCount'].includes(key),
         ) &&
         typeof values[0].beginner === 'boolean' &&
         (values[0].withFriend === undefined || typeof values[0].withFriend === 'boolean') &&
+        (values[0].humanSeats === undefined ||
+          (values[0].withFriend === true && [2, 3].includes(values[0].humanSeats as number))) &&
         (values[0].difficulty === undefined || ['regular', 'smart'].includes(values[0].difficulty as string)) &&
         (values[0].language === undefined || ['en', 'ru', 'zh-tw'].includes(values[0].language as string)) &&
         (values[0].playerCount === undefined || [5, 6, 7, 8].includes(values[0].playerCount as number)) &&

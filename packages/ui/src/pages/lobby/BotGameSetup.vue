@@ -29,6 +29,13 @@
             <v-icon icon="people" />{{ $t('aiArena.setupFriend') }}
           </button>
         </div>
+        <label v-if="withFriend" class="language-field human-seats-field">
+          <span>{{ $t('aiArena.setupHumanPlayers') }}</span>
+          <select v-model="humanSeats" :disabled="busy" data-human-seats>
+            <option :value="2">2</option>
+            <option :value="3">3</option>
+          </select>
+        </label>
         <p v-if="withFriend" class="friend-hint">{{ $t('aiArena.setupFriendHint') }}</p>
         <div v-if="notice" class="availability-notice" role="status">
           <v-icon icon="schedule" />
@@ -157,18 +164,12 @@ const open = computed({ get: () => props.modelValue, set: (value) => emit('updat
 const signedIn = computed(() => Boolean(store.state.profile?.id));
 const selectedMode = ref<'regular' | 'smart' | 'beginner'>(props.beginner ? 'beginner' : 'regular');
 const withFriend = ref(Boolean(props.withFriend));
+const humanSeats = ref<2 | 3>(2);
 const language = ref<AiLanguage>(locale.value === 'ru' ? 'ru' : /^zh[-_]tw$/i.test(locale.value) ? 'zh-tw' : 'en');
 const playerCount = ref<AiPlayerCount>(5);
 const rosterText = computed(() => {
-  const count = playerCount.value - (withFriend.value ? 2 : 1);
-  const key = withFriend.value
-    ? count <= 4
-      ? 'setupFriendRosterSmall'
-      : 'setupFriendRosterLarge'
-    : count <= 4
-      ? 'setupSoloRosterSmall'
-      : 'setupSoloRosterLarge';
-  return t(`aiArena.${key}`, { count });
+  const humans = withFriend.value ? humanSeats.value : 1;
+  return t('aiArena.cardHumanRoster', { humans, bots: playerCount.value - humans });
 });
 const busy = ref(false);
 const error = ref('');
@@ -238,6 +239,7 @@ async function create() {
       : await socket.timeout(30000).emitWithAck('createHumanAiRoom', {
           beginner: selectedMode.value === 'beginner',
           withFriend: withFriend.value,
+          ...(withFriend.value && humanSeats.value === 3 ? { humanSeats: humanSeats.value } : {}),
           difficulty: selectedMode.value === 'smart' ? 'smart' : 'regular',
           language: language.value,
           playerCount: playerCount.value,
@@ -325,6 +327,9 @@ async function create() {
   font-size: 13px;
   line-height: 1.5;
   color: rgb(var(--v-theme-text-secondary));
+}
+.human-seats-field {
+  margin-bottom: 12px;
 }
 .friend-hint {
   margin: -4px 0 16px;

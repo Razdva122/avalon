@@ -173,6 +173,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
       options: {
         beginner: boolean;
         withFriend?: boolean;
+        humanSeats?: 2 | 3;
         difficulty?: AiBotDifficulty;
         language?: AiLanguage;
         playerCount?: AiPlayerCount;

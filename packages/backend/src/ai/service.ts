@@ -345,6 +345,7 @@ export class AiService {
           : (args[0] as {
               beginner: boolean;
               withFriend?: boolean;
+              humanSeats?: 2 | 3;
               difficulty?: AiBotDifficulty;
               language?: AiLanguage;
               playerCount?: AiPlayerCount;
@@ -354,10 +355,11 @@ export class AiService {
         typeof options !== 'object' ||
         Array.isArray(options) ||
         Object.keys(options).some(
-          (key) => !['beginner', 'withFriend', 'difficulty', 'language', 'playerCount'].includes(key),
+          (key) => !['beginner', 'withFriend', 'humanSeats', 'difficulty', 'language', 'playerCount'].includes(key),
         ) ||
         typeof options.beginner !== 'boolean' ||
         (options.withFriend !== undefined && typeof options.withFriend !== 'boolean') ||
+        (options.humanSeats !== undefined && (!options.withFriend || ![2, 3].includes(options.humanSeats))) ||
         (options.beginner && options.withFriend === true) ||
         (options.difficulty !== undefined && !['regular', 'smart'].includes(options.difficulty)) ||
         (options.language !== undefined && !['en', 'ru', 'zh-tw'].includes(options.language)) ||
@@ -402,8 +404,11 @@ export class AiService {
         room.ai!.publicBotGame = true;
         room.ai!.beginner = options.beginner;
         room.ai!.preparedDifficulty = options.difficulty;
-        if (options.withFriend) room.ai!.withFriend = true;
-        room.ai!.title = `${typeof profile.name === 'string' && profile.name.trim() ? profile.name : userID} vs ${(options.playerCount ?? 5) - (options.withFriend ? 2 : 1)} Bots`;
+        if (options.withFriend) {
+          room.ai!.withFriend = true;
+          room.ai!.humanSeats = options.humanSeats ?? 2;
+        }
+        room.ai!.title = `${typeof profile.name === 'string' && profile.name.trim() ? profile.name : userID} vs ${(options.playerCount ?? 5) - (options.withFriend ? (options.humanSeats ?? 2) : 1)} Bots`;
         const preparationMs = options.withFriend ? 120000 : 60000;
         room.ai!.launchExpiresAt = Date.now() + preparationMs;
         room.joinAsHuman(userID!);
@@ -445,7 +450,7 @@ export class AiService {
           !['en', 'ru', 'zh-tw'].includes(options.language)
         )
           return cb({ error: 'Invalid bot mode or language' });
-        if (room.ai!.withFriend && room.humanIDs.length !== 2)
+        if (room.ai!.withFriend && room.humanIDs.length !== (room.ai!.humanSeats ?? 2))
           return cb({ error: 'Wait for your friend to join before launch' });
         if (
           room.ai!.preparedDifficulty &&
@@ -480,21 +485,25 @@ export class AiService {
           await this.expireLaunch(room);
           return cb({ error: 'The bot game preparation time has expired' });
         }
-        let friendName: string | undefined;
+        const friendNames: string[] = [];
         if (room.ai!.withFriend) {
-          const friendID = room.humanIDs[1];
-          if (!friendID) return cb({ error: 'Wait for your friend to join before launch' });
-          const friend = await this.manager.dbManager.getUserByID(friendID);
+          const humanIDs = [...room.humanIDs];
+          if (humanIDs.length !== (room.ai!.humanSeats ?? 2))
+            return cb({ error: 'Wait for your friends to join before launch' });
+          for (const friendID of humanIDs.slice(1)) {
+            const friend = await this.manager.dbManager.getUserByID(friendID);
+            friendNames.push(friend.name || friendID);
+          }
           if (!this.launchReady(room)) {
             await this.expireLaunch(room);
             return cb({ error: 'The bot game preparation time has expired' });
           }
-          if (room.humanIDs[1] !== friendID) return cb({ error: 'Bot room preparation changed' });
-          friendName = friend.name || friendID;
+          if (humanIDs.some((id, index) => room.humanIDs[index] !== id) || room.humanIDs.length !== humanIDs.length)
+            return cb({ error: 'Bot room preparation changed' });
         }
         room.setPlayerCount(playerCount);
         room.ai!.title = room.ai!.title?.replace(/vs \d+ Bots$/, `vs ${playerCount - room.humanIDs.length} Bots`);
-        if (friendName) room.ai!.title = room.ai!.title?.replace(' vs ', ` + ${friendName} vs `);
+        if (friendNames.length) room.ai!.title = room.ai!.title?.replace(' vs ', ` + ${friendNames.join(' + ')} vs `);
         room.setLanguage(options.language);
         room.ai!.botDifficulty = options.difficulty;
         room.ai!.codex = { ...humanSettings[mode] };

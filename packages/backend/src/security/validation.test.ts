@@ -156,3 +156,16 @@ test.each([
     ]),
   ).toBe(false);
 });
+
+test.each([2, 3])('friends setup accepts %i human seats', (humanSeats) => {
+  expect(validPacket('createHumanAiRoom', [{ beginner: false, withFriend: true, humanSeats }, () => {}])).toBe(true);
+});
+
+test.each([0, 1, 4, '3', null])('friends setup rejects invalid human seats %j', (humanSeats) => {
+  expect(validPacket('createHumanAiRoom', [{ beginner: false, withFriend: true, humanSeats }, () => {}])).toBe(false);
+});
+
+test('solo and beginner setup cannot reserve friends', () => {
+  expect(validPacket('createHumanAiRoom', [{ beginner: false, humanSeats: 3 }, () => {}])).toBe(false);
+  expect(validPacket('createHumanAiRoom', [{ beginner: true, withFriend: true, humanSeats: 3 }, () => {}])).toBe(false);
+});

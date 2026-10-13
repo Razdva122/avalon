@@ -706,7 +706,7 @@ test('mixed game summary counts the bots separately from the single human', asyn
     props: { roomID: 'mixed', ai: { status: 'running', playerCount: 7, humanPlayerID: 'owner' } },
   });
   t.after(panel.stop);
-  assert.ok(panel.html.includes('1 человек + 6 ботов'));
+  assert.ok(panel.html.includes('Игроков: 1 · Ботов: 6'));
 });
 
 test('room owner can reach the join control with an authenticated profile that omits the admin flag', async (t) => {
@@ -989,15 +989,15 @@ test('compact preparation countdown shows remaining launch time and reaches zero
 });
 
 test('friend preparation blocks launch until the second human joins', async (t) => {
-  const props = { roomID: 'friends', withFriend: true, humanCount: 1 };
+  const props = vue.reactive({ roomID: 'friends', withFriend: true, humanCount: 1 });
   const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
     locale: 'ru',
     props,
     accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ smart: true, regular: true }) },
   });
   t.after(room.stop);
-  assert.match(room.html, /Вы с другом/);
-  assert.match(room.html, /дождитесь его присоединения/);
+  assert.match(room.html, /Игроков: 2 · Ботов: 3/);
+  assert.match(room.html, /Свободных мест: 1/);
   const button = room.nodes('v-btn').find((node) => node.props?.['data-bot-mode'] === 'regular');
   assert.equal(button.props.disabled, true);
   await button.props.onClick();
@@ -1230,13 +1230,13 @@ test('setup describes the human and bot roster in player-facing language', async
     accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true, smart: true }) },
   });
   t.after(room.stop);
-  assert.ok(room.html.includes('Вы и 4 бота'));
+  assert.ok(room.html.includes('Игроков: 1 · Ботов: 4'));
   room
     .nodes('button')
     .find((node) => node.props['data-player-count'] === 6)
     .props.onClick();
   const html = await room.render();
-  assert.ok(html.includes('Вы и 5 ботов'));
+  assert.ok(html.includes('Игроков: 1 · Ботов: 5'));
 });
 
 test('expired preparation offers a return to the lobby instead of an empty action panel', async (t) => {
@@ -1368,4 +1368,90 @@ test('setup recovery belongs to the displayed unavailable mode and excludes begi
   });
   t.after(friend.stop);
   assert.ok(friend.html.includes('Будут доступны через 4 ч.'));
+});
+
+test('three-human setup reserves two friends and sends the chosen format', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true, smart: true }) },
+  });
+  t.after(room.stop);
+  room
+    .nodes('button')
+    .find((node) => node.props['aria-pressed'] === false)
+    .props.onClick();
+  await room.render();
+  const seats = room.nodes('select').find((node) => 'data-human-seats' in node.props);
+  assert.ok(seats, 'friends format offers a human player count');
+  seats.props['onUpdate:modelValue'](3);
+  const html = await room.render();
+  assert.match(html, /Игроков: 3 · Ботов: 2/);
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-create-bot-game' in node.props)
+    .props.onClick();
+  assert.deepEqual(room.sent, [
+    [
+      'createHumanAiRoom',
+      {
+        beginner: false,
+        withFriend: true,
+        humanSeats: 3,
+        difficulty: 'regular',
+        language: 'ru',
+        playerCount: 5,
+      },
+    ],
+  ]);
+});
+
+test('three-human preparation waits for both friends', async (t) => {
+  const props = vue.reactive({
+    roomID: 'three',
+    difficulty: 'regular',
+    withFriend: true,
+    humanSeats: 3,
+    humanCount: 2,
+  });
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    props,
+    locale: 'ru',
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true, smart: true }) },
+  });
+  t.after(room.stop);
+  let start = room.nodes('v-btn').find((node) => 'data-prepared-start' in node.props);
+  assert.equal(start.props.disabled, true);
+  await start.props.onClick();
+  assert.deepEqual(room.sent, []);
+  props.humanCount = 3;
+  await room.render();
+  assert.match(room.html, /Игроков: 3 · Ботов: 2/);
+  start = room.nodes('v-btn').find((node) => 'data-prepared-start' in node.props);
+  assert.equal(start.props.disabled, false);
+  await start.props.onClick();
+  assert.equal(room.sent[0][0], 'startHumanAiRoom');
+});
+
+test('friends waiting message counts missing humans as players join', async (t) => {
+  const props = vue.reactive({
+    roomID: 'friends',
+    difficulty: 'regular',
+    withFriend: true,
+    humanSeats: 3,
+    humanCount: 1,
+  });
+  const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+    props,
+    locale: 'ru',
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true, smart: true }) },
+  });
+  t.after(room.stop);
+  assert.match(room.html, /Свободных мест: 2/);
+  props.humanCount = 2;
+  assert.match(await room.render(), /Свободных мест: 1/);
+  props.humanCount = 3;
+  const html = await room.render();
+  assert.doesNotMatch(html, /Свободных мест:/);
+  assert.equal(room.nodes('v-btn').find((node) => 'data-prepared-start' in node.props).props.disabled, false);
 });

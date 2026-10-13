@@ -2,13 +2,14 @@
 
 [Documentation index](README.md) · [Production configuration](../deploy/ai-production.md)
 
-AI rooms support public matches with one or two humans and the remaining
+AI rooms support public matches with one, two or three humans and the remaining
 seats filled by bots, and administrator spectator games with 5–8 bots.
 “Play with AI” stays visible and clickable in the lobby, including for guests,
 while checking access, and when every bot mode is unavailable. It opens a setup
 dialog before reserving a room. Owners of an existing match return to that room.
 
-Setup offers Solo / With a friend, regular bots, stronger opponents, and a compact
+Setup offers Solo / With friends, with a choice of 2 or 3 human players including
+the owner, regular bots, stronger opponents, and a compact
 solo-only First game option. The discussion language defaults to the supported
 interface language or English. Total seats are 5, 6, 7 or 8; 7/8 display Premium
 and require the server-checked entitlement. Unavailable modes remain visible as
@@ -18,13 +19,14 @@ or that the shared slot is occupied. Guests can reach authentication from setup.
 Create game saves the selected language, size and `preparedDifficulty` in the
 ready room without making an inference request. The owner is already seated.
 Solo preparation expires after 60 seconds; friend preparation after 120 seconds.
-Before launch, the owner can remove the guest using the Remove player button or
+Before launch, the owner can remove a guest using the Remove player button or
 the guest avatar. This frees the reserved seat for another player without resetting
 the preparation deadline. Bots and the owner cannot be removed from AI tables.
 Lobby and archive cards count human players, bots and reserved empty seats separately;
-joining or removing the guest updates the live roster immediately.
-The friend’s reserved seat appears empty until a second authenticated human joins
-through the room link. The owner starts with one Start match button using the saved
+joining or removing a guest updates the live roster immediately.
+Reserved friend seats appear empty until authenticated humans join through the
+room link. Launch waits for the selected number of humans; removing one guest
+keeps the other guest seated. Older friend rooms retain their two-human default. The owner starts with one Start match button using the saved
 settings. Launch rechecks quota and Premium; prepared settings cannot be altered
 by a different launch payload. Legacy preparation without saved settings retains
 its original table controls. Only one AI room reserves the shared slot at a time,
@@ -143,8 +145,17 @@ act on that read through trust, roster preferences and public persuasion, withou
 first requiring an explanation. The sourced read remains a revisable hypothesis;
 reliable Good knowledge, supported two-Fail safety and explicit risk tradeoffs
 still matter. Bots choose among all legal actions without mandatory self-inclusion
-or failed-mission partner exclusions. Evil card
-coordination is optional advice; future cards and unseen allies remain unknown.
+or failed-mission partner exclusions. Evil team advice assesses how the sequence
+of actual proposals and votes exposes links to known allies, using public facts
+to evaluate the credibility of support. It weighs immediate sabotage access
+against cover and future influence; when the score permits, another roster or an
+early Good success can serve a concrete later benefit. Decisive sabotage and
+immediate Evil victory take priority. This advice sets no fixed voting pattern
+or mandatory rejection of allies. Evil bots predict teammates' cards from
+public discussion, recorded votes, completed missions and current incentives,
+with no prearranged sabotage order or designated saboteur. Secret card decisions
+retain the bounded public chat and vote history; future cards and unseen allies
+remain unknown.
 Good Lady-result announcements are deterministic and truthful.
 
 During ordinary play and the public Evil council, only `publicReason` is

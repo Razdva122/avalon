@@ -1,3 +1,4 @@
+import { aiRosterInfo } from '@avalon/types';
 import { AiRepository } from './repository';
 import type { Db } from 'mongodb';
 import type { StartedRoomState, TRoomInfo } from '@avalon/types';
@@ -78,4 +79,20 @@ test('AI persistence rejects object and array IDs before touching the database',
     for (const method of ['load', 'claim', 'release', 'renewLease'] as const)
       await expect(repo[method](id as string)).rejects.toThrow('Invalid ID');
   }
+});
+
+test('three-human roster reserves two empty seats and releases them as friends join', () => {
+  const ai = {
+    status: 'ready' as const,
+    fallbacks: 0,
+    message: '',
+    withFriend: true,
+    humanSeats: 3 as const,
+    humanPlayerIDs: ['owner'],
+  };
+  expect(aiRosterInfo(ai, 5)).toEqual({ aiHumanCount: 1, aiOpenSeats: 2, aiBotCount: 2 });
+  ai.humanPlayerIDs.push('friend');
+  expect(aiRosterInfo(ai, 5)).toEqual({ aiHumanCount: 2, aiOpenSeats: 1, aiBotCount: 2 });
+  ai.humanPlayerIDs.push('friend2');
+  expect(aiRosterInfo(ai, 5)).toEqual({ aiHumanCount: 3, aiOpenSeats: 0, aiBotCount: 2 });
 });

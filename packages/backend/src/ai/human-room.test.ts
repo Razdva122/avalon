@@ -7,7 +7,7 @@ import type { AiLanguage, Server, ServerSocket, TRoomState } from '@avalon/types
 
 const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
 
-function fixture(kind: 'discussion' | 'vote', language: AiLanguage = 'en', withFriend = false) {
+function fixture(kind: 'discussion' | 'vote', language: AiLanguage = 'en', withFriend: boolean | 3 = false) {
   const saved: TRoomState[] = [];
   const requests: string[] = [];
   const room = new BotRoom(
@@ -28,9 +28,11 @@ function fixture(kind: 'discussion' | 'vote', language: AiLanguage = 'en', withF
   if (withFriend) {
     room.ai!.publicBotGame = true;
     room.ai!.withFriend = true;
+    if (withFriend === 3) room.ai!.humanSeats = 3;
   }
   room.joinAsHuman('owner');
   if (withFriend) room.joinGame('friend');
+  if (withFriend === 3) room.joinGame('friend2');
   const ai = room.ai!;
   ai.publicBotGame = true;
   Room.prototype.startGame.call(room);
@@ -494,6 +496,26 @@ test('selecting team members does not cancel the friend-mode leader deadline', a
     await run;
     expect(ai.status).toBe('stopped');
     expect(game.stage).toBe('end');
+  } finally {
+    room.stop();
+    await run;
+  }
+});
+
+test('three humans vote independently without bot requests for their seats', async () => {
+  const { room, ai, game, requests } = fixture('vote', 'en', 3);
+  const run = room.run(true);
+  try {
+    await jest.advanceTimersByTimeAsync(0);
+    expect(Object.keys(ai.humanTimers!)).toEqual(expect.arrayContaining(['owner', 'friend', 'friend2']));
+    room.humanAction('owner', { method: 'voteForMission', option: 'approve' });
+    room.humanAction('friend', { method: 'voteForMission', option: 'approve' });
+    expect(game.stage).toBe('votingForTeam');
+    expect(ai.humanTimers!.friend2.humanActionExpiresAt).toBeDefined();
+    room.humanAction('friend2', { method: 'voteForMission', option: 'approve' });
+    expect(game.stage).toBe('onMission');
+    await jest.advanceTimersByTimeAsync(0);
+    expect(requests.filter((id) => ['owner', 'friend', 'friend2'].includes(id))).toEqual([]);
   } finally {
     room.stop();
     await run;

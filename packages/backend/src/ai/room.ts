@@ -114,8 +114,8 @@ export class BotRoom extends Room {
     )
       throw Error('AI room has fixed seats');
     if (this.isHuman(userID)) return;
-    if (this.humanIDs.length >= 2) throw Error('The friend seat is occupied');
-    this.players[this.players.length - 2] = userID;
+    if (this.humanIDs.length >= (this.ai.humanSeats ?? 2)) throw Error('The friend seat is occupied');
+    this.players[this.players.length - 1 - this.humanIDs.length] = userID;
     this.ai.humanPlayerIDs = [...this.humanIDs, userID];
     this.updateRoomState(true);
   }
@@ -350,7 +350,9 @@ export class BotRoom extends Room {
       throw Error('AI room has fixed seats');
     this.ai.humanPlayerIDs = this.humanIDs.filter((id) => id !== userID);
     this.players = selectBotAgents(undefined, this.ai.playerCount!).map((agent) => agent.id);
-    this.players[this.players.length - 1] = this.ai.humanPlayerID!;
+    this.humanIDs.forEach((id, index) => {
+      this.players[this.players.length - 1 - index] = id;
+    });
     this.updateRoomState(true);
   }
   override updateOptions(options: GameOptions): void {

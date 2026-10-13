@@ -28,6 +28,7 @@
       :beginner="roomState.ai.beginner"
       :with-friend="roomState.ai.withFriend"
       :human-count="roomState.ai.humanPlayerIDs?.length ?? 1"
+      :human-seats="roomState.ai.humanSeats"
       :difficulty="roomState.ai.preparedDifficulty"
       :language="roomState.ai.language"
       :player-count="roomState.ai.playerCount"
@@ -36,7 +37,10 @@
       <h2>{{ roomState.ai.title }}</h2>
       <p>{{ $t('aiArena.ready') }}</p>
       <v-btn
-        v-if="roomState.ai.withFriend && (isUserInGame || (roomState.ai.humanPlayerIDs?.length ?? 1) < 2)"
+        v-if="
+          roomState.ai.withFriend &&
+          (isUserInGame || (roomState.ai.humanPlayerIDs?.length ?? 1) < (roomState.ai.humanSeats ?? 2))
+        "
         color="info"
         @click="onJoinClick"
         >{{ $t(isUserInGame ? 'startPanel.leaveGame' : 'startPanel.joinGame') }}</v-btn
