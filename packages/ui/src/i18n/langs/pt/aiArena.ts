@@ -1,4 +1,6 @@
 export default {
+  endMatch: 'Encerrar partida',
+  endMatchConfirm: 'Encerrar esta partida? Os bots deixarão de jogar.',
   setupHumanPlayers: 'Jogadores humanos (incluindo você)',
   botWaitingForFriends: 'Compartilhe o link da sala e espere os outros jogadores. Lugares livres: {count}.',
   setupExpired: 'O tempo de preparação terminou. Crie outra partida.',

@@ -1,4 +1,6 @@
 export default {
+  endMatch: 'End match',
+  endMatchConfirm: 'End this match? The bots will stop playing.',
   setupHumanPlayers: 'Human players (including you)',
   botWaitingForFriends: 'Share the room link and wait for the other players. Open seats: {count}.',
   setupExpired: 'Preparation time expired. Create a new game.',

@@ -24,7 +24,7 @@ test('Premium crown renders an SVG from the registered icon set', () => {
 test('lobby uses the unified AI setup instead of the old arena creation panel', () => {
   const lobby = fs.readFileSync(path.join(__dirname, '../src/pages/lobby/Lobby.vue'), 'utf8');
   assert.doesNotMatch(lobby, /AiRoomButton/);
-  assert.match(lobby, /<BotRoomButton\s*\/>/);
+  assert.match(lobby, /<BotRoomButton\b/);
 });
 const locales = ['en', 'ru', 'es', 'pt', 'zh_CN', 'zh_TW'];
 const community = evaluate(
@@ -55,6 +55,7 @@ async function fixture(
     activeRoomID,
     profile = { id: 'owner' },
     accessOverrides = {},
+    mobile = false,
     acknowledge = async () => ({ roomID: 'created-room' }),
   } = {},
 ) {
@@ -86,6 +87,18 @@ async function fixture(
   const { descriptor } = parse(fs.readFileSync(filename, 'utf8'), { filename });
   const script = compileScript(descriptor, { id: filename });
   const component = evaluate(script.content, (id) => {
+    if (id === '@vueuse/core') return { useMediaQuery: () => vue.ref(mobile) };
+    if (id === 'vuetify/components')
+      return {
+        VDialog: {
+          name: 'v-dialog',
+          props: ['modelValue'],
+          setup:
+            (props, { slots }) =>
+            () =>
+              props.modelValue ? vue.h('section', slots.default?.()) : null,
+        },
+      };
     if (id === 'vue')
       return {
         ...vue,
@@ -222,6 +235,34 @@ test('a bot button disabled by its parent cannot create a competing room', async
   await room.nodes('v-btn')[0].props.onClick();
   assert.deepEqual(room.sent, []);
   assert.deepEqual(room.navigation, []);
+});
+
+test('mobile AI controls require confirmation before stopping and closing cancels it', async (t) => {
+  const panel = await fixture('components/view/panels/AiRoomPanel.vue', {
+    mobile: true,
+    props: { roomID: 'mobile-room', isHumanPlayer: true, ai: { status: 'running', publicBotGame: true } },
+    acknowledge: async () => ({ ok: true }),
+  });
+  t.after(panel.stop);
+  panel.nodes('summary')[0].props.onClick({ preventDefault() {} });
+  await panel.render();
+  const stopButton = () => panel.nodes('v-btn').find((node) => node.props?.['data-ai-stop'] !== undefined);
+  stopButton().props.onClick();
+  await panel.render();
+  assert.deepEqual(panel.sent, [], 'opening confirmation must not stop the game');
+  const dialog = () => panel.nodes('v-dialog')[0];
+  dialog().props['onUpdate:modelValue'](false);
+  await vue.nextTick();
+  panel.nodes('summary')[0].props.onClick({ preventDefault() {} });
+  await panel.render();
+  assert.ok(!panel.nodes('v-btn').some((node) => node.props?.['data-ai-confirm-stop'] !== undefined));
+  stopButton().props.onClick();
+  await panel.render();
+  await panel
+    .nodes('v-btn')
+    .find((node) => node.props?.['data-ai-confirm-stop'] !== undefined)
+    .props.onClick();
+  assert.deepEqual(panel.sent, [['controlAiRoom', 'mobile-room', 'stop']]);
 });
 
 test('only ready public bot room owners choose bots on the table; ordinary rooms keep human controls', async (t) => {

@@ -2,7 +2,7 @@
   <v-btn
     class="bot-room-button"
     :color="color || 'secondary'"
-    variant="flat"
+    :variant="variant || 'flat'"
     size="large"
     :elevation="0"
     :disabled="busy || !!disabled"
@@ -36,6 +36,7 @@ const props = defineProps<{
   errorText?: string;
   disabled?: boolean;
   color?: string;
+  variant?: 'flat' | 'outlined';
   hideIcon?: boolean;
   inlineErrors?: boolean;
 }>();

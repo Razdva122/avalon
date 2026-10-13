@@ -13,7 +13,7 @@
             <span class="material-icons" aria-hidden="true">add</span>
             {{ $t('mainPage.createRoom') }}
           </v-btn>
-          <BotRoomButton />
+          <BotRoomButton color="primary" variant="outlined" hide-icon>{{ $t('aiArena.playWithBots') }}</BotRoomButton>
           <nav class="lobby-links" :aria-label="$t('menu.wiki')">
             <LocaleLink :to="{ name: 'rules' }"
               ><span class="link-label">{{ $t('wiki.rules') }}</span
@@ -529,6 +529,9 @@ h1 {
   margin-right: 6px;
   font-size: 20px;
 }
+.lobby-actions :deep(.bot-room-button) {
+  background: rgb(var(--v-theme-inset));
+}
 .lobby-links a {
   display: inline-flex;
   align-items: center;
@@ -942,7 +945,8 @@ a:focus-visible {
     gap: 8px 20px;
     margin-top: 16px;
   }
-  .lobby-actions > .v-btn {
+  .lobby-actions > .v-btn,
+  .lobby-actions :deep(.bot-room-button) {
     width: 100%;
   }
   .lobby-links {

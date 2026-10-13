@@ -1,4 +1,6 @@
 export default {
+  endMatch: '結束對局',
+  endMatchConfirm: '結束本局遊戲？機器人將停止遊戲。',
   setupHumanPlayers: '真人玩家（包括你）',
   botWaitingForFriends: '分享房間連結並等待其他玩家加入。空位：{count}。',
   setupExpired: '準備時間已結束。請建立新遊戲。',
