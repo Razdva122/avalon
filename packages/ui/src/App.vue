@@ -66,6 +66,7 @@ import { inNavigationSection } from '@/components/header/navigation';
 import AchievementPopupsContainer from '@/components/achievements/AchievementPopupsContainer.vue';
 import { isHolidays } from '@/helpers/utility';
 import eventBus from '@/helpers/event-bus';
+import type { AuthAction } from '@/helpers/acquisition';
 
 export default defineComponent({
   components: {
@@ -92,7 +93,7 @@ export default defineComponent({
       currentLocale: this.$i18n.locale,
       authRequested: false,
       authOpen: false,
-      authContinuation: null as { route: string; resume: () => void | Promise<void> } | null,
+      authContinuation: null as { route: string; resume: () => void | Promise<void>; action: AuthAction } | null,
       welcomeOpen: false,
       credentialsRequested: false,
       credentialsOpen: false,
@@ -119,8 +120,8 @@ export default defineComponent({
     inSection(path: string) {
       return inNavigationSection(this.$route.path, path);
     },
-    openAuthModal(resume?: () => void | Promise<void>) {
-      this.authContinuation = resume ? { route: this.$route.fullPath, resume } : null;
+    openAuthModal(resume?: () => void | Promise<void>, action: AuthAction = 'account') {
+      this.authContinuation = resume ? { route: this.$route.fullPath, resume, action } : null;
       this.authRequested = true;
       this.authOpen = true;
     },

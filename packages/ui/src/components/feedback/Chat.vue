@@ -336,7 +336,7 @@ const close = () => {
 };
 const send = async () => {
   if (!userID.value) {
-    eventBus.emit('openAuthModal', send);
+    eventBus.emit('openAuthModal', send, 'chat');
     eventBus.emit('infoMessage', t('infoMessage.loginToMessage'));
     return;
   }

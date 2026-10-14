@@ -1,11 +1,16 @@
 <template>
-  <v-btn color="info" @click="openOptions">
+  <v-btn ref="trigger" color="info" @click="openOptions">
     <template #prepend
       ><span class="material-icons" aria-hidden="true">{{ sectionIcon }}</span></template
     >
     {{ buttonText }}
   </v-btn>
-  <v-dialog v-model="overlay" max-width="620" :aria-label="$t(section ? `options.${section}` : 'options.title')">
+  <v-dialog
+    v-model="overlay"
+    max-width="620"
+    :aria-label="$t(section ? `options.${section}` : 'options.title')"
+    @after-leave="restoreTriggerFocus"
+  >
     <v-card class="options">
       <header class="options-header">
         <h2>{{ $t(section ? `options.${section}` : 'options.title') }}</h2>
@@ -387,6 +392,9 @@ export default defineComponent({
     },
   },
   methods: {
+    restoreTriggerFocus() {
+      (this.$refs.trigger as { $el: HTMLElement } | undefined)?.$el.focus();
+    },
     openOptions() {
       this.type = this.section || 'roles';
       this.settings = copyOptions(this.currentOptions);

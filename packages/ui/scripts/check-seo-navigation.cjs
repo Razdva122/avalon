@@ -390,6 +390,24 @@ const server = http.createServer((req, res) => {
     await page.waitForFunction(() => location.pathname === '/zh-tw/' && document.querySelector('.lobby'));
     assert.deepEqual(pageErrors, [], 'Mobile FAQ and play CTA must navigate without errors');
     console.log('Mobile FAQ fragment and localized play CTA OK');
+
+    const editorRequests = [];
+    page.on('request', (request) => {
+      if (/options-dialog\.[^/]+\.js$/.test(new URL(request.url()).pathname)) editorRequests.push(request.url());
+    });
+    await page.goto(origin + '/ru/wiki/rules/', { waitUntil: 'networkidle0' });
+    assert.equal(editorRequests.length, 0, 'Rules must not download the editor before it is opened');
+    await page.locator('[data-load-role-options]').click();
+    await page.waitForSelector('.v-overlay--active .options', { visible: true });
+    assert.equal(editorRequests.length, 1, 'First click loads and opens the role editor');
+    await page.locator('.v-overlay--active .options-header button').click();
+    await page.waitForSelector('.v-overlay--active .options', { hidden: true });
+    await page.waitForFunction(() => document.querySelector('.rules-role-options button') === document.activeElement);
+    await page.locator('.rules-role-options button').click();
+    await page.waitForSelector('.v-overlay--active .options', { visible: true });
+    assert.equal(editorRequests.length, 1, 'Reopening reuses the loaded editor');
+    assert.deepEqual(pageErrors, [], 'Lazy role editor must open without navigation or hydration errors');
+    console.log('Rules role editor loads on demand and opens from the first click');
   } finally {
     if (browser) await browser.close();
     server.close();

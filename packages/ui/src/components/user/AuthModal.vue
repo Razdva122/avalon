@@ -28,7 +28,13 @@
       <v-btn :disabled="!formValid.loginForm" type="submit" color="primary" variant="elevated" class="submit-btn">{{
         $t('modal.loginButton')
       }}</v-btn>
-      <v-btn variant="text" color="text-primary" class="mt-2" to="/password-recovery/" @click="closeAuthModal">
+      <v-btn
+        variant="text"
+        color="text-primary"
+        class="mt-2"
+        to="/password-recovery/"
+        @click="closeAuthModal('password_recovery')"
+      >
         {{ $t('passwordRecovery.forgot') }}
       </v-btn>
     </v-form>
@@ -88,7 +94,7 @@ import type { VForm } from 'vuetify/components';
 import BaseModal from '@/components/user/BaseModal.vue';
 import PasswordField from '@/components/modals/PasswordField.vue';
 import TextField from '@/components/modals/TextField.vue';
-import { consumePlayIntent, trackSignup } from '@/helpers/acquisition';
+import { consumePlayIntent, trackSignup, trackOnboarding, type AuthAction } from '@/helpers/acquisition';
 import { localizedPath } from '@/router/paths';
 
 export default defineComponent({
@@ -99,7 +105,7 @@ export default defineComponent({
   },
   props: {
     modelValue: Boolean,
-    continuation: Object as PropType<{ route: string; resume: () => void | Promise<void> } | null>,
+    continuation: Object as PropType<{ route: string; resume: () => void | Promise<void>; action?: AuthAction } | null>,
   },
   emits: ['update:modelValue', 'registered'],
   computed: {
@@ -131,17 +137,29 @@ export default defineComponent({
     };
   },
   watch: {
-    modelValue(open: boolean) {
-      if (!open) this.authRequest++;
+    modelValue: {
+      immediate: true,
+      handler(open: boolean) {
+        if (open) trackOnboarding('auth_open', this.analyticsContext());
+        else this.authRequest++;
+      },
     },
     mode() {
       this.error = '';
+      if (this.modelValue) trackOnboarding('auth_tab', this.analyticsContext());
     },
     loginType() {
       this.error = '';
     },
   },
   methods: {
+    analyticsContext() {
+      return {
+        page: this.$route.meta.id || this.$route.name,
+        action: this.continuation?.action || 'account',
+        mode: this.mode,
+      };
+    },
     async updateFormValidity(type: 'loginForm' | 'registrationForm') {
       this.error = '';
 
@@ -165,7 +183,13 @@ export default defineComponent({
       const request = ++this.authRequest;
       const continuation = this.continuation;
       const route = this.$route.fullPath;
+      const context = { ...this.analyticsContext(), mode: 'auth' };
+      trackOnboarding('login_attempt', context);
       const userOrError = await this.$store.dispatch('login', { loginOrEmail: this.login, password: this.password });
+      trackOnboarding('error' in userOrError ? 'login_error' : 'login', {
+        ...context,
+        ...('error' in userOrError ? { error: userOrError.error } : {}),
+      });
       if (request !== this.authRequest || continuation !== this.continuation || route !== this.$route.fullPath) return;
 
       if ('error' in userOrError) {
@@ -178,34 +202,50 @@ export default defineComponent({
       const request = ++this.authRequest;
       const continuation = this.continuation;
       const route = this.$route.fullPath;
+      const context = { ...this.analyticsContext(), mode: 'registration' };
+      trackOnboarding('sign_up_attempt', context);
       const userOrError = await this.$store.dispatch('registerUser', {
         email: this.email,
         password: this.password,
         name: this.username,
         login: this.login,
       });
+      if ('error' in userOrError) trackOnboarding('sign_up_error', { ...context, error: userOrError.error });
+      else {
+        trackSignup();
+        trackOnboarding('auth_result', { ...context, result: 'success' });
+      }
       if (request !== this.authRequest || continuation !== this.continuation || route !== this.$route.fullPath) return;
 
       if ('error' in userOrError) {
         this.error = userOrError.error;
       } else {
-        trackSignup();
-        if (await this.continueAfterAuth()) return;
+        if (await this.continueAfterAuth(true)) return;
         await this.$router.push(localizedPath('/', unref(this.$i18n.locale)));
         this.$emit('registered');
       }
     },
-    async continueAfterAuth(): Promise<boolean> {
+    async continueAfterAuth(signup = false): Promise<boolean> {
       const resume = this.continuation?.route === this.$route.fullPath ? this.continuation?.resume : undefined;
-      this.closeAuthModal();
+      const context = this.analyticsContext();
+      this.closeAuthModal('success');
       const hasPlayIntent = consumePlayIntent(this.$route.meta.id || this.$route.name);
+      trackOnboarding('auth_continue', {
+        ...context,
+        result: resume || hasPlayIntent ? 'continued' : signup ? 'welcome' : 'stay',
+      });
       if (resume) {
         await resume();
         return true;
       }
       return hasPlayIntent;
     },
-    closeAuthModal() {
+    closeAuthModal(reason: 'dismiss' | 'success' | 'password_recovery' = 'dismiss') {
+      if (reason !== 'success' && this.overlay)
+        trackOnboarding('auth_dismiss', {
+          ...this.analyticsContext(),
+          reason: reason === 'password_recovery' ? reason : 'close',
+        });
       this.authRequest++;
       this.overlay = false;
     },

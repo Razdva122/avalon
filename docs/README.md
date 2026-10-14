@@ -22,6 +22,7 @@ defaults. NOWPayments is retired; support uses direct BTC/USDT transfers.
 
 ## Features
 
+- [Аналитика регистрации и начала игры](analytics.md)
 - [AI Arena](ai-rooms.md)
 - [Persistent room chat](room-chat.md)
 - [Голосовой чат комнаты · beta](voice-chat.md)

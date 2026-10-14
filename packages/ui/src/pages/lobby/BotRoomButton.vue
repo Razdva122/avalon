@@ -18,6 +18,7 @@
     :beginner="beginner"
     :with-friend="withFriend"
     @busy="setBusy"
+    @error="emit('error', $event)"
     @opened="$emit('opened')"
   />
 </template>
@@ -42,6 +43,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
   (event: 'opened'): void;
+  (event: 'selected'): void;
   (event: 'busy', value: boolean): void;
   (event: 'availability', value: 'available' | 'loading' | 'unavailable' | 'error'): void;
   (event: 'error', message: string): void;
@@ -72,6 +74,7 @@ function setBusy(value: boolean) {
 }
 async function openRoom() {
   if (!active || busy.value || props.disabled) return;
+  emit('selected');
   if (!ownRoomID.value) {
     setupOpen.value = true;
     return;

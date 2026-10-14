@@ -56,6 +56,7 @@ function auth(helper, routeID, reply = { id: 'private-user', email: 'private@exa
     overlay: true,
     authRequest: 0,
     error: '',
+    mode: 'auth',
     $route: { name: routeID + 'ru', meta: { id: routeID }, fullPath: '/ru/' + routeID + '/' },
     $i18n: { locale: 'ru' },
     $store: { dispatch: async () => reply },
@@ -138,14 +139,17 @@ test('an AI guide CTA retains lobby signup and emits the safe AI category, then 
   await signup.state.registerUser();
   assert.equal(signup.state.overlay, false);
   assert.deepEqual(signup.actions, []);
-  assert.deepEqual(events, [
+  assert.deepEqual(
+    events.filter((event) => ['guide_cta', 'sign_up'].includes(event[1])),
     [
-      'event',
-      'guide_cta',
-      payload(first, { destination: 'ai', page_location: `https://avalon-game.com/guides/${first}/` }),
+      [
+        'event',
+        'guide_cta',
+        payload(first, { destination: 'ai', page_location: `https://avalon-game.com/guides/${first}/` }),
+      ],
+      ['event', 'sign_up', payload()],
     ],
-    ['event', 'sign_up', payload()],
-  ]);
+  );
   const later = auth(helper, 'lobby');
   await later.state.registerUser();
   assert.deepEqual(later.actions, [
@@ -398,4 +402,97 @@ test('localized guide events use only allowlisted canonical locale paths', () =>
     ],
   );
   assert.equal(events[1][2].destination, 'ai');
+});
+
+test('onboarding events accept only categorical fields and never leak input or URLs', () => {
+  const { helper, events } = fixture();
+  helper.trackOnboarding('auth_open', {
+    page: 'lobby',
+    action: 'create_room',
+    mode: 'registration',
+    email: 'private@example.com',
+  });
+  assert.deepEqual(events[0], [
+    'event',
+    'auth_open',
+    {
+      page: 'lobby',
+      action: 'create_room',
+      mode: 'registration',
+      page_location: 'https://avalon-game.com/',
+      page_referrer: '',
+    },
+  ]);
+  helper.trackOnboarding('sign_up_error', {
+    page: '/room/private/?email=secret',
+    error: 'secret backend response',
+    action: 'private@example.com',
+  });
+  assert.deepEqual(events[1][2], {
+    page: 'other',
+    error: 'other',
+    action: 'other',
+    page_location: 'https://avalon-game.com/',
+    page_referrer: '',
+  });
+  helper.trackOnboarding('private@example.com', { action: 'create_room' });
+  assert.equal(events.length, 2);
+});
+
+test('onboarding telemetry is harmless without analytics, during prerender and when analytics throws', () => {
+  for (const options of [{ analytics: false }, { prerender: true }, { browser: false }]) {
+    const { helper, events } = fixture(options);
+    assert.doesNotThrow(() => helper.trackOnboarding('welcome_view', { reason: 'signup' }));
+    assert.deepEqual(events, []);
+  }
+  const { helper, window } = fixture();
+  window.gtag = () => {
+    throw Error('blocked');
+  };
+  assert.doesNotThrow(() => helper.trackOnboarding('welcome_choice', { choice: 'ai' }));
+});
+
+test('AI participation and completed live games are measured separately from human games', () => {
+  const { helper, events } = fixture();
+  const ai = { publicBotGame: true, status: 'running' };
+  helper.trackRoomAcquisition(room({ stage: 'started', ai }), 'private-user', true);
+  helper.trackRoomAcquisition(room({ stage: 'started', gameStage: 'end', ai }), 'private-user', true);
+  helper.trackRoomAcquisition(room({ stage: 'started', gameStage: 'end', ai }), 'private-user', true);
+  assert.deepEqual(
+    events.map((event) => event[1]),
+    ['ai_room_participation', 'ai_game_complete'],
+  );
+});
+
+test('registration records attempt, categorical failure, retry success and continuation', async () => {
+  const { helper, events } = fixture();
+  const { state } = auth(helper, 'lobby', { error: 'emailAlreadyExist' });
+  state.mode = 'registration';
+  state.continuation = { route: '/ru/lobby/', action: 'create_room', resume: () => {} };
+  await state.registerUser();
+  state.$store.dispatch = async () => ({ id: 'new-user' });
+  await state.registerUser();
+  assert.deepEqual(
+    events.map((event) => event[1]),
+    ['sign_up_attempt', 'sign_up_error', 'sign_up_attempt', 'sign_up', 'auth_result', 'auth_continue'],
+  );
+  assert.equal(events[1][2].error, 'emailAlreadyExist');
+  assert.equal(events.at(-1)[2].action, 'create_room');
+  assert.equal(events.at(-1)[2].result, 'continued');
+});
+
+test('welcome records one choice and one dismissal, and ignores repeated close', () => {
+  const { helper, events } = fixture();
+  const options = script('../src/components/user/WelcomeModal.vue', { '@/helpers/acquisition': helper }).default;
+  const state = { dismissed: false, busy: false, aiAvailability: 'available', $emit() {} };
+  for (const [name, method] of Object.entries(options.methods)) state[name] = method.bind(state);
+  options.watch.modelValue.handler.call(state, true);
+  state.chooseCommunity();
+  state.close('later');
+  assert.deepEqual(
+    events.map((event) => event[1]),
+    ['welcome_view', 'welcome_choice', 'welcome_dismiss'],
+  );
+  assert.equal(events[1][2].choice, 'community');
+  assert.equal(events[2][2].reason, 'navigation');
 });

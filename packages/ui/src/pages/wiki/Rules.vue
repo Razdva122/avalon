@@ -277,7 +277,20 @@
     <p>
       <LocalizedTextWrapper keypath="rules.defaultSetup" />
     </p>
-    <Options :roles="roles" :buttonText="$t('options.roles')" @apply="Object.assign(roles, $event.roles)" />
+    <div ref="roleOptionsLauncher" class="rules-role-options">
+      <component
+        :is="roleOptionsComponent"
+        v-if="roleOptionsComponent"
+        ref="roleOptions"
+        :roles="roles"
+        :buttonText="$t('options.roles')"
+        @apply="Object.assign(roles, $event.roles)"
+      />
+      <v-btn v-else color="info" :loading="roleOptionsLoading" data-load-role-options @click="openRoleOptions">
+        <template #prepend><span class="material-icons" aria-hidden="true">settings</span></template>
+        {{ $t('options.roles') }}
+      </v-btn>
+    </div>
     <ol class="mt-2">
       <li>{{ $t('rules.closeEyesExtendHand') }}</li>
       <li>
@@ -426,17 +439,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, markRaw, type Component } from 'vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import PreviewLink from '@/components/view/information/PreviewLink.vue';
-import Options from '@/components/view/options/Options.vue';
 import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
 
 export default defineComponent({
   components: {
     WikiBreadCrumbs,
     PreviewLink,
-    Options,
     WikiPlayCta,
   },
   data() {
@@ -463,7 +474,31 @@ export default defineComponent({
 
     return {
       roles,
+      roleOptionsComponent: null as Component | null,
+      roleOptionsLoading: false,
     };
+  },
+  methods: {
+    async openRoleOptions() {
+      if (this.roleOptionsLoading) return;
+      this.roleOptionsLoading = true;
+      try {
+        const { default: Options } = await import(
+          /* webpackChunkName: 'options-dialog' */ '@/components/view/options/Options.vue'
+        );
+        if (!this.$refs.roleOptionsLauncher) return;
+        this.roleOptionsComponent = markRaw(Options);
+        await this.$nextTick();
+        // The dialog returns focus to its replacement trigger when closed.
+        const launcher = this.$refs.roleOptionsLauncher as HTMLElement | undefined;
+        const editor = this.$refs.roleOptions as { openOptions: () => void } | undefined;
+        if (!launcher || !editor) return;
+        launcher.querySelector('button')?.focus();
+        editor.openOptions();
+      } finally {
+        this.roleOptionsLoading = false;
+      }
+    },
   },
 });
 </script>

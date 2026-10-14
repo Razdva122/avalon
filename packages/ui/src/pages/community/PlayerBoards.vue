@@ -349,14 +349,18 @@ let mounted = false;
 let timer: ReturnType<typeof setInterval> | undefined;
 function startPublish() {
   if (!profile.value) {
-    eventBus.emit('openAuthModal', () => {
-      if (!mounted) return;
-      if (account.value) startPublish();
-      else {
-        publishAfterLogin.value = true;
-        if (!accountLoading.value) void loadAccount();
-      }
-    });
+    eventBus.emit(
+      'openAuthModal',
+      () => {
+        if (!mounted) return;
+        if (account.value) startPublish();
+        else {
+          publishAfterLogin.value = true;
+          if (!accountLoading.value) void loadAccount();
+        }
+      },
+      'publish_listing',
+    );
     return;
   }
   if (!account.value || account.value.banned || (kind.value === 'group' && !account.value.canRecruit)) return;

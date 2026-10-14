@@ -1,6 +1,83 @@
 import type { TRoomState, VisualGameState } from '@avalon/types';
 
 type Destination = 'lobby' | 'community' | 'ai';
+export type AuthAction = 'account' | 'create_room' | 'join_room' | 'ai_game' | 'publish_listing' | 'chat';
+type OnboardingEvent =
+  | 'auth_open'
+  | 'auth_tab'
+  | 'auth_dismiss'
+  | 'auth_continue'
+  | 'auth_result'
+  | 'sign_up_attempt'
+  | 'sign_up_error'
+  | 'login_attempt'
+  | 'login_error'
+  | 'login'
+  | 'welcome_view'
+  | 'welcome_choice'
+  | 'welcome_dismiss'
+  | 'welcome_result'
+  | 'welcome_ai_status';
+const onboardingEvents = new Set<OnboardingEvent>([
+  'auth_open',
+  'auth_tab',
+  'auth_dismiss',
+  'auth_continue',
+  'auth_result',
+  'sign_up_attempt',
+  'sign_up_error',
+  'login_attempt',
+  'login_error',
+  'login',
+  'welcome_view',
+  'welcome_choice',
+  'welcome_dismiss',
+  'welcome_result',
+  'welcome_ai_status',
+]);
+const onboardingFields = {
+  page: [
+    'lobby',
+    'room',
+    'profile',
+    'rules',
+    'roles',
+    'wiki',
+    'community',
+    'community_solo',
+    'community_group',
+    'guide',
+    'passwordRecovery',
+  ],
+  action: ['account', 'create_room', 'join_room', 'ai_game', 'publish_listing', 'chat'],
+  mode: ['auth', 'registration'],
+  error: [
+    'emailAlreadyExist',
+    'loginAlreadyExist',
+    'invalidRequest',
+    'requestFailed',
+    'forbidden',
+    'wrongPassword',
+    'userNotFound',
+    'wrongLoginOrPassword',
+  ],
+  choice: ['ai', 'community', 'friends'],
+  reason: ['signup', 'close', 'later', 'outside', 'navigation', 'password_recovery'],
+  result: ['success', 'error', 'continued', 'welcome', 'cancelled', 'stay'],
+  availability: ['loading', 'available', 'unavailable', 'error'],
+};
+
+/** Only allowlisted categorical values cross the analytics boundary. */
+export function trackOnboarding(event: OnboardingEvent, fields: Record<string, unknown> = {}): void {
+  if (!onboardingEvents.has(event)) return;
+  const safe: Record<string, string> = {};
+  for (const [key, allowed] of Object.entries(onboardingFields)) {
+    if (!(key in fields)) continue;
+    const value = fields[key];
+    safe[key] = typeof value === 'string' && allowed.includes(value) ? value : 'other';
+  }
+  send(event, safe);
+}
 type AcquisitionRoom = Pick<TRoomState, 'roomID' | 'stage' | 'players' | 'ai' | 'archived'> & {
   game?: Pick<VisualGameState, 'uuid' | 'stage' | 'players' | 'result'>;
 };
@@ -93,13 +170,13 @@ export function trackSignup(): void {
 
 /** Feed backend states, never the history pointer or a successful spectator subscription. */
 export function trackRoomAcquisition(state: AcquisitionRoom, userID?: string, liveUpdate = false): void {
-  if (!activeBrowser() || !userID || state.ai || state.archived) return;
+  if (!activeBrowser() || !userID || (state.ai && !state.ai.publicBotGame) || state.archived) return;
   const game = state.stage === 'started' ? state.game : undefined;
   const players = game?.players || state.players;
   if (!players.some((player) => player.id === userID)) return;
   if (game?.stage !== 'end' && !participated.has(state.roomID)) {
     participated.add(state.roomID);
-    send('room_participation');
+    send(state.ai ? 'ai_room_participation' : 'room_participation');
   }
   if (!game) return;
   if (game.stage !== 'end') {
@@ -116,6 +193,6 @@ export function trackRoomAcquisition(state: AcquisitionRoom, userID?: string, li
     !completed.has(game.uuid)
   ) {
     completed.add(game.uuid);
-    send('human_game_complete');
+    send(state.ai ? 'ai_game_complete' : 'human_game_complete');
   }
 }

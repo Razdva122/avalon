@@ -256,7 +256,7 @@ export default defineComponent({
 
     const createRoom = async () => {
       if (!store.state.profile) {
-        eventBus.emit('openAuthModal', createRoom);
+        eventBus.emit('openAuthModal', createRoom, 'create_room');
         eventBus.emit('infoMessage', t('infoMessage.loginToCreate'));
         return;
       }

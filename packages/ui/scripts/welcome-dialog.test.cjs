@@ -78,6 +78,7 @@ function welcome(request) {
   }).outputText;
   new Function('exports', helperCode)(helper);
   const options = component('../src/components/user/WelcomeModal.vue', {
+    '@/helpers/acquisition': require('../src/helpers/acquisition.ts'),
     '@/api/socket': { socket: { timeout: () => ({ emitWithAck: request }) } },
     '@/helpers/open-room-route': helper,
   });

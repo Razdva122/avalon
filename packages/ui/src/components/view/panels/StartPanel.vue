@@ -140,9 +140,13 @@ export default defineComponent({
 
     const onJoinClick = () => {
       if (!store.state.profile) {
-        eventBus.emit('openAuthModal', () => {
-          if (!isUserInGame.value) onJoinClick();
-        });
+        eventBus.emit(
+          'openAuthModal',
+          () => {
+            if (!isUserInGame.value) onJoinClick();
+          },
+          'join_room',
+        );
         eventBus.emit('infoMessage', t('infoMessage.loginToJoin'));
         return;
       }

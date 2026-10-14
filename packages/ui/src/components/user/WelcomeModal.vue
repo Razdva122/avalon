@@ -12,7 +12,7 @@
           variant="text"
           color="text-primary"
           :aria-label="$t('infoMessage.close')"
-          @click="close"
+          @click="close('close')"
         />
       </div>
 
@@ -45,8 +45,9 @@
               :disabled="busy"
               @availability="aiAvailability = $event"
               @busy="setAiBusy"
-              @error="aiError = $event"
-              @opened="close"
+              @error="setAiError"
+              @selected="chooseAi"
+              @opened="finishAi"
             >
               {{ $t('welcome.aiAction') }}
             </BotRoomButton>
@@ -67,7 +68,7 @@
               :disabled="busy"
               color="primary"
               :variant="recommendCompany ? 'flat' : 'outlined'"
-              @click="close"
+              @click="chooseCommunity"
             >
               {{ $t('welcome.boardAction') }}
             </v-btn>
@@ -93,7 +94,7 @@
       </div>
 
       <footer class="welcome-footer">
-        <v-btn variant="text" color="text-primary" @click="close">{{ $t('welcome.later') }}</v-btn>
+        <v-btn variant="text" color="text-primary" @click="close('later')">{{ $t('welcome.later') }}</v-btn>
       </footer>
     </v-card>
   </v-dialog>
@@ -104,6 +105,7 @@ import { defineComponent, unref } from 'vue';
 import { socket } from '@/api/socket';
 import { localizedPath } from '@/router/paths';
 import { openRoomRoute } from '@/helpers/open-room-route';
+import { trackOnboarding } from '@/helpers/acquisition';
 import BotRoomButton from '@/pages/lobby/BotRoomButton.vue';
 
 export default defineComponent({
@@ -139,10 +141,38 @@ export default defineComponent({
       return localizedPath(this.$router.resolve({ name: 'community_group' }).path, unref(this.$i18n.locale));
     },
   },
+  watch: {
+    modelValue: {
+      immediate: true,
+      handler(open: boolean) {
+        if (open) trackOnboarding('welcome_view', { reason: 'signup', availability: this.aiAvailability });
+      },
+    },
+    aiAvailability(value: string) {
+      if (!this.dismissed) trackOnboarding('welcome_ai_status', { availability: value });
+    },
+  },
   beforeUnmount() {
     this.dismissed = true;
   },
   methods: {
+    chooseAi() {
+      if (!this.dismissed) trackOnboarding('welcome_choice', { choice: 'ai', availability: this.aiAvailability });
+    },
+    finishAi() {
+      if (this.dismissed) return;
+      trackOnboarding('welcome_result', { choice: 'ai', result: 'success' });
+      this.close('navigation');
+    },
+    setAiError(message: string) {
+      this.aiError = message;
+      if (message && !this.dismissed) trackOnboarding('welcome_result', { choice: 'ai', result: 'error' });
+    },
+    chooseCommunity() {
+      if (this.dismissed || this.busy) return;
+      trackOnboarding('welcome_choice', { choice: 'community' });
+      this.close('navigation');
+    },
     setAiBusy(value: boolean) {
       this.aiBusy = value;
       if (value) {
@@ -150,13 +180,15 @@ export default defineComponent({
         this.error = '';
       }
     },
-    close() {
+    close(reason: 'close' | 'later' | 'outside' | 'navigation' = 'outside') {
       if (this.dismissed) return;
+      trackOnboarding('welcome_dismiss', { reason });
       this.dismissed = true;
       this.$emit('update:modelValue', false);
     },
     async createRoom() {
       if (this.dismissed || this.busy) return;
+      trackOnboarding('welcome_choice', { choice: 'friends' });
       this.creating = true;
       this.error = '';
       this.aiError = '';
@@ -164,13 +196,20 @@ export default defineComponent({
         const result = await socket.timeout(10000).emitWithAck('createRoom');
         if (this.dismissed) return;
         if (typeof result !== 'string') {
+          trackOnboarding('welcome_result', { choice: 'friends', result: 'error', error: result.error });
           this.error = result.error;
           return;
         }
         const opened = await openRoomRoute(this.$router, result, () => !this.dismissed);
-        if (opened) this.close();
+        if (opened) {
+          trackOnboarding('welcome_result', { choice: 'friends', result: 'success' });
+          this.close('navigation');
+        }
       } catch {
-        if (!this.dismissed) this.error = 'requestFailed';
+        if (!this.dismissed) {
+          trackOnboarding('welcome_result', { choice: 'friends', result: 'error', error: 'requestFailed' });
+          this.error = 'requestFailed';
+        }
       } finally {
         this.creating = false;
       }

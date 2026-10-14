@@ -217,6 +217,7 @@ const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void;
   (event: 'opened'): void;
   (event: 'busy', value: boolean): void;
+  (event: 'error', message: string): void;
 }>();
 const { t, locale } = useI18n();
 const router = useRouter();
@@ -311,9 +312,13 @@ const formatHours = (hours: number) => new Intl.NumberFormat(locale.value.replac
 async function create() {
   if (!active || busy.value) return;
   if (!signedIn.value) {
-    eventBus.emit('openAuthModal', () => {
-      if (active && open.value) resumeAfterAuth.value = true;
-    });
+    eventBus.emit(
+      'openAuthModal',
+      () => {
+        if (active && open.value) resumeAfterAuth.value = true;
+      },
+      'ai_game',
+    );
     return;
   }
   if (!canCreate.value) return;
@@ -335,6 +340,7 @@ async function create() {
     if (!active) return;
     if ('error' in result) {
       error.value = t('aiArena.botPlayError');
+      emit('error', error.value);
       void refresh();
     } else if (await openRoomRoute(router, result.roomID, () => active)) {
       open.value = false;
@@ -343,6 +349,7 @@ async function create() {
   } catch {
     if (active) {
       error.value = t('aiArena.connectionError');
+      emit('error', error.value);
       void refresh();
     }
   } finally {

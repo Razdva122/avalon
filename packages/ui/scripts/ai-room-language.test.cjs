@@ -1742,3 +1742,30 @@ test('closing and reopening AI setup does not revive pending creation', async (t
   assert.deepEqual(room.sent, []);
   assert.deepEqual(room.navigation, []);
 });
+
+test('AI setup reports creation failures to the welcome funnel', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true }) },
+    acknowledge: async () => ({ error: 'requestFailed' }),
+  });
+  t.after(room.stop);
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-create-bot-game' in node.props)
+    .props.onClick();
+  assert.ok(
+    room.emitted.some(([event, message]) => event === 'error' && typeof message === 'string' && message.length),
+  );
+});
+
+test('AI button forwards setup failures through its existing error event', async (t) => {
+  const room = await fixture('pages/lobby/BotRoomButton.vue');
+  t.after(room.stop);
+  await room.nodes('v-btn')[0].props.onClick();
+  await room.render();
+  const setup = room.nodes('BotGameSetup')[0];
+  assert.equal(typeof setup.props.onError, 'function');
+  setup.props.onError('localized failure');
+  assert.ok(room.emitted.some(([event, message]) => event === 'error' && message === 'localized failure'));
+});
