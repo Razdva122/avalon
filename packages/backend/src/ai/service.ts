@@ -1,4 +1,4 @@
-import { aiPlayedModel, aiRosterInfo } from '@avalon/types';
+import { aiHumanRoles, aiPlayedModel, aiRosterInfo } from '@avalon/types';
 import type {
   AiBotDifficulty,
   AiBotMode,
@@ -386,6 +386,7 @@ export class AiService {
           ? { beginner: false }
           : (args[0] as {
               beginner: boolean;
+              role?: import('@avalon/types').AiHumanRole;
               withFriend?: boolean;
               humanSeats?: 2 | 3;
               difficulty?: AiBotDifficulty;
@@ -397,9 +398,12 @@ export class AiService {
         typeof options !== 'object' ||
         Array.isArray(options) ||
         Object.keys(options).some(
-          (key) => !['beginner', 'withFriend', 'humanSeats', 'difficulty', 'language', 'playerCount'].includes(key),
+          (key) =>
+            !['beginner', 'role', 'withFriend', 'humanSeats', 'difficulty', 'language', 'playerCount'].includes(key),
         ) ||
         typeof options.beginner !== 'boolean' ||
+        (options.role !== undefined &&
+          (options.withFriend === true || !aiHumanRoles(options.playerCount ?? 5).includes(options.role))) ||
         (options.withFriend !== undefined && typeof options.withFriend !== 'boolean') ||
         (options.humanSeats !== undefined && (!options.withFriend || ![2, 3].includes(options.humanSeats))) ||
         (options.beginner && options.withFriend === true) ||
@@ -454,6 +458,7 @@ export class AiService {
         const preparationMs = options.withFriend ? 120000 : 60000;
         room.ai!.launchExpiresAt = Date.now() + preparationMs;
         room.joinAsHuman(userID!);
+        if (options.role !== undefined) room.setHumanRole(options.role);
         this.manager.rooms[id] = room;
         const timer = setTimeout(() => void this.expireLaunch(room).catch(() => {}), preparationMs);
         timer.unref();

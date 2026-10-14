@@ -733,3 +733,29 @@ test('smart bots can prepare and start above 60 percent without waiting for a qu
   expect(started).toHaveBeenCalledWith({ ok: true });
   expect(host.rooms[id].ai?.codex).toEqual({ model: 'gpt-6.1-sol', reasoning: 'medium' });
 });
+
+test.each([false, true])(
+  'solo creation passes the role to the prepared room (socket validation=%s)',
+  async (validatePackets) => {
+    const { connect, host } = fixture('admin', validatePackets);
+    const selected = jest.spyOn(BotRoom.prototype, 'setHumanRole');
+    const created = jest.fn();
+    await connect('premium').createHumanAiRoom({ beginner: false, role: 'oberon', playerCount: 7 }, created);
+    const room = host.rooms[created.mock.calls[0][0].roomID] as BotRoom;
+    expect(selected).toHaveBeenCalledWith('oberon');
+    expect(() => room.setPlayerCount(8)).toThrow('Selected solo role is unavailable');
+    expect(room.players).toHaveLength(7);
+    expect(room.ai).not.toHaveProperty('role');
+  },
+);
+
+test.each([{ role: 'oberon' }, { role: 'minion' }, { role: 'unknown' }, { role: 'merlin', withFriend: true }])(
+  'solo creation rejects unavailable roles before claiming a room %#',
+  async (options) => {
+    const { connect, claim } = fixture();
+    const rejected = jest.fn();
+    await connect('owner').createHumanAiRoom({ beginner: false, ...options }, rejected);
+    expect(rejected).toHaveBeenCalledWith({ error: 'Invalid bot room options' });
+    expect(claim).not.toHaveBeenCalled();
+  },
+);

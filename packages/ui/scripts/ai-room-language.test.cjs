@@ -42,6 +42,10 @@ const messages = Object.fromEntries(
       ...evaluate(fs.readFileSync(path.join(__dirname, `../src/i18n/langs/${locale}/ui.ts`), 'utf8'), (id) =>
         id === '../../suggestions' ? suggestions : require(id),
       ).default,
+      ...evaluate(fs.readFileSync(path.join(__dirname, `../src/i18n/langs/${locale}/roles.ts`), 'utf8')).default,
+      wikiPlay: evaluate(fs.readFileSync(path.join(__dirname, '../src/i18n/langs/pages/wikiPlay.ts'), 'utf8')).wikiPlay[
+        locale.replace('_', '-')
+      ],
       community: community[locale],
     },
   ]),
@@ -59,6 +63,7 @@ async function fixture(
     acknowledge = async () => ({ roomID: 'created-room' }),
   } = {},
 ) {
+  const storeState = vue.reactive({ profile });
   const sent = [];
   const navigation = [];
   const notifications = [];
@@ -117,7 +122,7 @@ async function fixture(
       };
     if (id === '@/helpers/open-room-route')
       return evaluate(fs.readFileSync(path.join(__dirname, '../src/helpers/open-room-route.ts'), 'utf8'));
-    if (id === '@/store') return { useStore: () => ({ state: { profile } }) };
+    if (id === '@/store') return { useStore: () => ({ state: storeState }) };
     if (id === '@/router/paths') return { localizedPath: (url) => url, neutralRoomUrl: (url) => url };
     if (id === '@/helpers/event-bus') return { default: { emit: (...args) => notifications.push(args) } };
     if (id === '@/helpers/composables/useAiAccess') return { useAiAccess: () => access };
@@ -134,10 +139,26 @@ async function fixture(
           }),
         },
       };
+    if (id === '@/components/view/information/const')
+      return evaluate(
+        fs.readFileSync(path.join(__dirname, '../src/components/view/information/const.ts'), 'utf8'),
+        (dependency) => (dependency === '@/plugins/i18n' ? { i18n } : require(dependency)),
+      );
+    if (id === '@avalon/types/room/ai-roles')
+      return evaluate(fs.readFileSync(path.join(__dirname, '../../types/room/ai-roles.ts'), 'utf8'));
     if (id === '@avalon/types/room/ai-model')
       return evaluate(fs.readFileSync(path.join(__dirname, '../../types/room/ai-model.ts'), 'utf8'));
     if (id === '@/helpers/codex-pricing')
       return evaluate(fs.readFileSync(path.join(__dirname, '../src/helpers/codex-pricing.ts'), 'utf8'));
+    if (id.endsWith('/PlayerIcon.vue'))
+      return {
+        __esModule: true,
+        default: {
+          name: 'PlayerIcon',
+          props: ['icon', 'thumbnail'],
+          setup: (props) => () => vue.h('span', { 'data-role-icon': props.icon }),
+        },
+      };
     if (id.endsWith('.vue'))
       return { __esModule: true, default: { name: path.basename(id, '.vue'), render: () => null } };
     throw Error(`Unexpected import: ${id}`);
@@ -154,9 +175,8 @@ async function fixture(
   assert.deepEqual(template.errors, []);
   const render = evaluate(template.code).render;
   const scope = vue.effectScope();
-  const state = scope.run(() =>
-    component.setup(vue.reactive(props), { expose() {}, emit: (...args) => emitted.push(args) }),
-  );
+  const setupProps = vue.reactive(props);
+  const state = scope.run(() => component.setup(setupProps, { expose() {}, emit: (...args) => emitted.push(args) }));
   access.models.value = [{ id: 'codex-chatgpt', label: 'Codex' }];
   await vue.nextTick();
   let tree;
@@ -175,6 +195,27 @@ async function fixture(
     );
     app.config.globalProperties.$t = i18n.global.t;
     app.component('v-icon', { render: () => null });
+    app.component('v-select', {
+      name: 'v-select',
+      props: ['modelValue', 'items', 'disabled'],
+      setup:
+        (props, { slots, attrs }) =>
+        () => {
+          const item = (raw) => ({ raw, title: raw.title, value: raw.value });
+          const selected = props.items.find((raw) => raw.value === props.modelValue);
+          return vue.h('div', attrs, [
+            ...(selected ? slots.selection?.({ item: item(selected) }) || [] : []),
+            ...props.items.flatMap((raw) => slots.item?.({ item: item(raw), props: { title: raw.title } }) || []),
+          ]);
+        },
+    });
+    app.component('v-list-item', {
+      props: ['title'],
+      setup:
+        (props, { slots }) =>
+        () =>
+          vue.h('div', [slots.prepend?.(), props.title]),
+    });
     app.component('v-dialog', {
       name: 'v-dialog',
       props: ['modelValue'],
@@ -216,6 +257,8 @@ async function fixture(
     sent,
     navigation,
     notifications,
+    storeState,
+    setupProps,
     emitted,
     access,
     render: renderHtml,
@@ -1147,7 +1190,7 @@ test('setup locks Premium seats and unavailable bots while keeping settings visi
       [8, true],
     ],
   );
-  assert.equal(room.nodes('select').length, 1);
+  assert.equal(room.nodes('v-select').length, 2);
 });
 
 test('setup explains the occupied slot without a recovery promise and cannot create', async (t) => {
@@ -1180,7 +1223,9 @@ test('guest can open setup and reaches authentication without creating a room', 
   assert.equal(!!create.props.disabled, false);
   await create.props.onClick();
   assert.deepEqual(room.sent, []);
-  assert.deepEqual(room.notifications, [['openAuthModal']]);
+  assert.equal(room.notifications.length, 1);
+  assert.equal(room.notifications[0][0], 'openAuthModal');
+  assert.equal(typeof room.notifications[0][1], 'function');
 });
 
 test('setup blocks duplicate creation and ignores navigation after unmount', async () => {
@@ -1495,4 +1540,205 @@ test('friends waiting message counts missing humans as players join', async (t) 
   const html = await room.render();
   assert.doesNotMatch(html, /Свободных мест:/);
   assert.equal(room.nodes('v-btn').find((node) => 'data-prepared-start' in node.props).props.disabled, false);
+});
+
+test('solo setup sends the selected role and resets roles absent from a new table size', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      canPlayLargeTables: vue.ref(true),
+      botModes: vue.ref({ regular: true, smart: true }),
+    },
+  });
+  t.after(room.stop);
+  const select = () => room.nodes('v-select').find((node) => 'data-solo-role' in node.props);
+  assert.ok(select());
+  assert.match(room.html, /Случайная роль/);
+  room
+    .nodes('button')
+    .find((node) => node.props['data-player-count'] === 7)
+    .props.onClick();
+  await room.render();
+  select().props['onUpdate:modelValue']('oberon');
+  room
+    .nodes('button')
+    .find((node) => node.props['data-player-count'] === 8)
+    .props.onClick();
+  await room.render();
+  assert.equal(select().props.modelValue, '');
+  assert.equal(
+    select().props.items.some((item) => item.value === 'oberon'),
+    false,
+  );
+  select().props['onUpdate:modelValue']('minion');
+  await room.render();
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-create-bot-game' in node.props)
+    .props.onClick();
+  assert.equal(room.sent[0][1].role, 'minion');
+  assert.equal(room.sent[0][1].playerCount, 8);
+});
+
+test('friend setup hides the solo role selector and omits the previously selected role', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true, smart: true }) },
+  });
+  t.after(room.stop);
+  room
+    .nodes('v-select')
+    .find((node) => 'data-solo-role' in node.props)
+    .props['onUpdate:modelValue']('merlin');
+  room
+    .nodes('button')
+    .find((node) => node.props['aria-pressed'] === false)
+    .props.onClick();
+  await room.render();
+  assert.equal(
+    room.nodes('v-select').some((node) => 'data-solo-role' in node.props),
+    false,
+  );
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-create-bot-game' in node.props)
+    .props.onClick();
+  assert.equal(room.sent[0][1].withFriend, true);
+  assert.equal('role' in room.sent[0][1], false);
+});
+
+test('setup role and language choices include artwork in options and selected values', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true, smart: true }) },
+  });
+  t.after(room.stop);
+  const role = room.nodes('v-select').find((node) => 'data-solo-role' in node.props);
+  const language = room.nodes('v-select').find((node) => 'data-bot-language' in node.props);
+  assert.ok(role, 'role uses a select that supports images');
+  assert.ok(language, 'language uses a select that supports flags');
+  assert.deepEqual(
+    language.props.items.map((item) => item.value),
+    ['en', 'ru', 'zh-tw'],
+  );
+  assert.ok(language.props.items.every((item) => item.flag.endsWith('.svg')));
+  assert.match(room.html, /data-role-icon="unknown"/);
+  assert.match(room.html, /data-role-icon="merlin"/);
+  assert.match(room.html, /src="\/flags\/en.svg"/);
+  role.props['onUpdate:modelValue']('merlin');
+  language.props['onUpdate:modelValue']('ru');
+  const html = await room.render();
+  assert.match(html, /data-role-icon="merlin"/);
+  assert.match(html, /src="\/flags\/ru.svg"/);
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-create-bot-game' in node.props)
+    .props.onClick();
+  assert.equal(room.sent[0][1].role, 'merlin');
+  assert.equal(room.sent[0][1].language, 'ru');
+});
+
+test('wiki play block exposes the same direct AI setup button as the lobby', async (t) => {
+  const room = await fixture('components/view/information/WikiPlayCta.vue', { locale: 'ru' });
+  t.after(room.stop);
+  const button = room.nodes('BotRoomButton')[0];
+  assert.ok(button, 'wiki reuses the bot setup and active-room navigation flow');
+  assert.equal(button.props.variant, 'outlined');
+});
+
+test('guest AI creation resumes once access loads and retains the chosen settings', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    profile: null,
+    props: { modelValue: true },
+    locale: 'ru',
+    accessOverrides: {
+      canPlay: vue.ref(false),
+      botModes: vue.ref({ regular: false, smart: false }),
+    },
+  });
+  t.after(room.stop);
+  room
+    .nodes('button')
+    .find((node) => node.props['data-player-count'] === 6)
+    .props.onClick();
+  await room.render();
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-create-bot-game' in node.props)
+    .props.onClick();
+  assert.deepEqual(room.sent, []);
+  const resume = room.notifications.find(([event]) => event === 'openAuthModal')[1];
+  assert.equal(typeof resume, 'function');
+  room.storeState.profile = { id: 'new-user' };
+  room.access.accessStatus.value = 'loading';
+  await resume();
+  await vue.nextTick();
+  assert.deepEqual(room.sent, []);
+  room.access.canPlay.value = true;
+  room.access.botModes.value = { regular: true, smart: false };
+  room.access.accessStatus.value = 'ready';
+  await room.render();
+  assert.deepEqual(room.sent, [
+    [
+      'createHumanAiRoom',
+      {
+        beginner: false,
+        withFriend: false,
+        difficulty: 'regular',
+        language: 'ru',
+        playerCount: 6,
+      },
+    ],
+  ]);
+  assert.deepEqual(room.navigation, [{ name: 'room', params: { uuid: 'created-room' } }]);
+});
+
+test('unmounting AI setup while access loads cancels pending creation', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', { profile: null, props: { modelValue: true } });
+  t.after(room.stop);
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-create-bot-game' in node.props)
+    .props.onClick();
+  const resume = room.notifications.find(([event]) => event === 'openAuthModal')[1];
+  assert.equal(typeof resume, 'function');
+  room.storeState.profile = { id: 'new-user' };
+  room.access.accessStatus.value = 'loading';
+  await resume();
+  await vue.nextTick();
+  room.stop();
+  room.access.canPlay.value = true;
+  room.access.botModes.value = { regular: true, smart: true };
+  room.access.accessStatus.value = 'ready';
+  await vue.nextTick();
+  assert.deepEqual(room.sent, []);
+  assert.deepEqual(room.navigation, []);
+});
+
+test('closing and reopening AI setup does not revive pending creation', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', { profile: null, props: { modelValue: true } });
+  t.after(room.stop);
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-create-bot-game' in node.props)
+    .props.onClick();
+  const resume = room.notifications.find(([event]) => event === 'openAuthModal')[1];
+  room.storeState.profile = { id: 'new-user' };
+  room.access.accessStatus.value = 'loading';
+  await resume();
+  await vue.nextTick();
+  room.setupProps.modelValue = false;
+  await vue.nextTick();
+  room.setupProps.modelValue = true;
+  await vue.nextTick();
+  room.access.canPlay.value = true;
+  room.access.botModes.value = { regular: true, smart: true };
+  room.access.accessStatus.value = 'ready';
+  await vue.nextTick();
+  assert.deepEqual(room.sent, []);
+  assert.deepEqual(room.navigation, []);
 });

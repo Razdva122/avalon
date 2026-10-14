@@ -91,14 +91,74 @@
             /><v-icon v-if="!modeAvailable('beginner')" icon="lock" :aria-label="$t('aiArena.botUnavailable')" />
           </label>
         </fieldset>
-        <label class="language-field"
-          ><span>{{ $t('aiArena.selectLanguage') }}</span
-          ><select v-model="language" :disabled="busy">
-            <option value="en">English</option>
-            <option value="ru">Русский</option>
-            <option value="zh-tw">繁體中文（台灣）</option>
-          </select></label
-        >
+        <div class="language-field">
+          <span id="bot-language-label">{{ $t('aiArena.selectLanguage') }}</span>
+          <v-select
+            v-model="language"
+            :items="languageChoices"
+            :disabled="busy"
+            aria-labelledby="bot-language-label"
+            variant="outlined"
+            density="comfortable"
+            hide-details
+            class="artwork-select"
+            data-bot-language
+          >
+            <template #selection="{ item }">
+              <span class="select-choice">
+                <img :src="item.raw.flag" alt="" class="language-flag" width="24" height="16" />
+                <span>{{ item.title }}</span>
+              </span>
+            </template>
+            <template #item="{ props: itemProps, item }">
+              <v-list-item v-bind="itemProps" class="artwork-option">
+                <template #prepend>
+                  <img :src="item.raw.flag" alt="" class="language-flag" width="24" height="16" />
+                </template>
+              </v-list-item>
+            </template>
+          </v-select>
+        </div>
+        <div v-if="!withFriend" class="language-field role-field">
+          <span id="bot-role-label">{{ $t('aiArena.selectRole') }}</span>
+          <v-select
+            v-model="selectedRole"
+            :items="roleChoices"
+            :disabled="busy"
+            aria-labelledby="bot-role-label"
+            variant="outlined"
+            density="comfortable"
+            hide-details
+            class="artwork-select"
+            data-solo-role
+          >
+            <template #selection="{ item }">
+              <span class="select-choice">
+                <PlayerIcon
+                  :icon="item.raw.icon"
+                  thumbnail
+                  aria-hidden="true"
+                  class="choice-role-icon"
+                  :class="rolesShortInfo[item.raw.icon].loyalty"
+                />
+                <span>{{ item.title }}</span>
+              </span>
+            </template>
+            <template #item="{ props: itemProps, item }">
+              <v-list-item v-bind="itemProps" class="artwork-option">
+                <template #prepend>
+                  <PlayerIcon
+                    :icon="item.raw.icon"
+                    thumbnail
+                    aria-hidden="true"
+                    class="choice-role-icon"
+                    :class="rolesShortInfo[item.raw.icon].loyalty"
+                  />
+                </template>
+              </v-list-item>
+            </template>
+          </v-select>
+        </div>
         <fieldset class="seat-options">
           <legend>{{ $t('aiArena.botTotalPlayers') }}</legend>
           <div class="seat-row">
@@ -146,9 +206,12 @@ import { useRouter } from 'vue-router';
 import { useStore } from '@/store';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
+import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
+import { rolesShortInfo } from '@/components/view/information/const';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
 import { openRoomRoute } from '@/helpers/open-room-route';
 import type { AiLanguage, AiPlayerCount } from '@avalon/types';
+import { aiHumanRoles, type AiHumanRole } from '@avalon/types/room/ai-roles';
 const props = defineProps<{ modelValue: boolean; beginner?: boolean; withFriend?: boolean }>();
 const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void;
@@ -167,12 +230,28 @@ const withFriend = ref(Boolean(props.withFriend));
 const humanSeats = ref<2 | 3>(2);
 const language = ref<AiLanguage>(locale.value === 'ru' ? 'ru' : /^zh[-_]tw$/i.test(locale.value) ? 'zh-tw' : 'en');
 const playerCount = ref<AiPlayerCount>(5);
+const selectedRole = ref<AiHumanRole | ''>('');
+const availableRoles = computed(() => aiHumanRoles(playerCount.value));
+const roleChoices = computed(() => [
+  { value: '', title: t('aiArena.randomRole'), icon: 'unknown' as const },
+  ...availableRoles.value.map((role) => ({ value: role, title: t(`roles.${role}`), icon: role })),
+]);
+const languageChoices = [
+  { value: 'en', title: 'English', flag: '/flags/en.svg' },
+  { value: 'ru', title: 'Русский', flag: '/flags/ru.svg' },
+  { value: 'zh-tw', title: '繁體中文（台灣）', flag: '/flags/zh-tw.svg' },
+];
+watch([playerCount, withFriend], () => {
+  if (withFriend.value || (selectedRole.value && !availableRoles.value.includes(selectedRole.value)))
+    selectedRole.value = '';
+});
 const rosterText = computed(() => {
   const humans = withFriend.value ? humanSeats.value : 1;
   return t('aiArena.cardHumanRoster', { humans, bots: playerCount.value - humans });
 });
 const busy = ref(false);
 const error = ref('');
+const resumeAfterAuth = ref(false);
 let active = true;
 onBeforeUnmount(() => {
   active = false;
@@ -190,10 +269,16 @@ const canCreate = computed(
     Boolean(ownRoomID.value) ||
     (modeAvailable(selectedMode.value) && (playerCount.value < 7 || canPlayLargeTables.value)),
 );
+watch([resumeAfterAuth, accessStatus], () => {
+  if (!resumeAfterAuth.value || accessStatus.value === 'loading') return;
+  resumeAfterAuth.value = false;
+  if (active && open.value && accessStatus.value === 'ready') void create();
+});
 watch([selectedMode, canPlayLargeTables], () => {
   if (selectedMode.value === 'beginner' || (!canPlayLargeTables.value && playerCount.value >= 7)) playerCount.value = 5;
 });
 watch(open, (value) => {
+  if (!value) resumeAfterAuth.value = false;
   if (value) {
     error.value = '';
     void refresh();
@@ -226,7 +311,9 @@ const formatHours = (hours: number) => new Intl.NumberFormat(locale.value.replac
 async function create() {
   if (!active || busy.value) return;
   if (!signedIn.value) {
-    eventBus.emit('openAuthModal');
+    eventBus.emit('openAuthModal', () => {
+      if (active && open.value) resumeAfterAuth.value = true;
+    });
     return;
   }
   if (!canCreate.value) return;
@@ -238,6 +325,7 @@ async function create() {
       ? { roomID: ownRoomID.value }
       : await socket.timeout(30000).emitWithAck('createHumanAiRoom', {
           beginner: selectedMode.value === 'beginner',
+          ...(!withFriend.value && selectedRole.value ? { role: selectedRole.value } : {}),
           withFriend: withFriend.value,
           ...(withFriend.value && humanSeats.value === 3 ? { humanSeats: humanSeats.value } : {}),
           difficulty: selectedMode.value === 'smart' ? 'smart' : 'regular',
@@ -424,6 +512,45 @@ fieldset {
   background: rgb(var(--v-theme-inset));
   color: inherit;
   appearance: auto;
+}
+.select-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.choice-role-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: 2px solid rgb(var(--v-theme-surface-border));
+}
+.choice-role-icon.good {
+  border-color: rgb(var(--v-theme-info));
+}
+.choice-role-icon.evil {
+  border-color: rgb(var(--v-theme-error));
+}
+.language-flag {
+  display: block;
+  width: 24px;
+  height: 16px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.artwork-select :deep(.v-field__input) {
+  padding-block: 8px;
+  min-height: 48px;
+}
+.artwork-select :deep(.v-select__selection) {
+  margin-block: 0;
+}
+.artwork-option :deep(.v-list-item__prepend) {
+  margin-right: 10px;
+}
+.role-field {
+  margin-top: 16px;
 }
 .seat-options {
   margin-top: 16px;

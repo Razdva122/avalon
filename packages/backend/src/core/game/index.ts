@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import type { IPlayerInGame, IGameAddons, IStateObserver, TSelectAvailable } from '@/core/game/interface';
 
 import type {
+  TRoles,
   TMissionResult,
   TLoyalty,
   TVoteOption,
@@ -125,7 +126,13 @@ export class Game extends GameHooks {
 
   stage: TGameStage = 'initialization';
 
-  constructor(userIDs: string[], options: GameOptions, stateObserver: IStateObserver, preInit?: (game: Game) => void) {
+  constructor(
+    userIDs: string[],
+    options: GameOptions,
+    stateObserver: IStateObserver,
+    preInit?: (game: Game) => void,
+    selectedRole?: { userID: string; role: TRoles },
+  ) {
     super();
 
     if (userIDs.length < 5 || userIDs.length > 10) {
@@ -146,6 +153,19 @@ export class Game extends GameHooks {
 
     this.features = options.features;
     this.timer = new GameTimer(this, this.features.useCustomTimer);
+
+    // Assign before building role visibility and initializing private knowledge.
+    if (selectedRole) {
+      const playerIndex = userIDs.indexOf(selectedRole.userID);
+      const roleIndex = _.sample(
+        rolesInfo.characters.flatMap((character, index) => (character.role === selectedRole.role ? [index] : [])),
+      );
+      if (playerIndex < 0 || roleIndex === undefined) throw new Error('Selected role or player is unavailable');
+      [rolesInfo.characters[playerIndex], rolesInfo.characters[roleIndex]] = [
+        rolesInfo.characters[roleIndex],
+        rolesInfo.characters[playerIndex],
+      ];
+    }
 
     const players = userIDs.map((userID, index) => ({
       userID,

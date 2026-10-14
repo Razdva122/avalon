@@ -110,12 +110,12 @@ export class Room {
     }
   }
 
-  startGame() {
+  startGame(selectedRole?: { userID: string; role: import('@avalon/types').TRoles }) {
     this.startAt = String(new Date());
     this.data = {
       stage: 'started',
       startAt: this.startAt,
-      manager: new GameManager(this.players, this.options, this.io, this.roomID),
+      manager: new GameManager(this.players, this.options, this.io, this.roomID, selectedRole),
     };
     this.updateRoomState(true);
   }

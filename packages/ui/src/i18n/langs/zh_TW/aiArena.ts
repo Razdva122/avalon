@@ -1,4 +1,6 @@
 export default {
+  selectRole: '你的角色',
+  randomRole: '隨機角色',
   endMatch: '結束對局',
   endMatchConfirm: '結束本局遊戲？機器人將停止遊戲。',
   setupHumanPlayers: '真人玩家（包括你）',

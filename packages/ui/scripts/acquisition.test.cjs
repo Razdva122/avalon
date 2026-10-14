@@ -44,12 +44,20 @@ function auth(helper, routeID, reply = { id: 'private-user', email: 'private@exa
   }).outputText;
   const exports = {};
   new Function('exports', 'require', code)(exports, (id) =>
-    id === 'vue' ? require('vue') : id === '@/helpers/acquisition' ? helper : {},
+    id === 'vue'
+      ? require('vue')
+      : id === '@/helpers/acquisition'
+        ? helper
+        : id === '@/router/paths'
+          ? require('../src/router/paths.js')
+          : {},
   );
   const state = {
     overlay: true,
+    authRequest: 0,
     error: '',
-    $route: { name: routeID + 'ru', meta: { id: routeID } },
+    $route: { name: routeID + 'ru', meta: { id: routeID }, fullPath: '/ru/' + routeID + '/' },
+    $i18n: { locale: 'ru' },
     $store: { dispatch: async () => reply },
     $router: { push: async (route) => actions.push(['navigate', route]) },
     $emit: (event) => actions.push(['emit', event]),
@@ -114,7 +122,7 @@ test('guide-origin signup stays in the selected play destination, then consumes 
     const next = auth(helper, 'lobby');
     await next.state.registerUser();
     assert.deepEqual(next.actions, [
-      ['navigate', '/profile'],
+      ['navigate', '/ru/'],
       ['emit', 'registered'],
     ]);
   }
@@ -141,7 +149,7 @@ test('an AI guide CTA retains lobby signup and emits the safe AI category, then 
   const later = auth(helper, 'lobby');
   await later.state.registerUser();
   assert.deepEqual(later.actions, [
-    ['navigate', '/profile'],
+    ['navigate', '/ru/'],
     ['emit', 'registered'],
   ]);
 });
@@ -159,37 +167,37 @@ test('an AI guide CTA cannot override registration in community and its mismatch
   const mismatch = auth(helper, 'community_solo');
   await mismatch.state.registerUser();
   assert.deepEqual(mismatch.actions, [
-    ['navigate', '/profile'],
+    ['navigate', '/ru/'],
     ['emit', 'registered'],
   ]);
   const later = auth(helper, 'lobby');
   await later.state.registerUser();
   assert.deepEqual(later.actions, [
-    ['navigate', '/profile'],
+    ['navigate', '/ru/'],
     ['emit', 'registered'],
   ]);
 });
 
-test('visits alone and mismatched destinations retain normal profile/welcome registration', async () => {
+test('visits alone and mismatched destinations retain normal lobby/welcome registration', async () => {
   const { helper } = fixture();
   helper.trackGuideVisit(first);
   const visitOnly = auth(helper, 'lobby');
   await visitOnly.state.registerUser();
   assert.deepEqual(visitOnly.actions, [
-    ['navigate', '/profile'],
+    ['navigate', '/ru/'],
     ['emit', 'registered'],
   ]);
   helper.trackGuideCta(first, 'community');
   const mismatch = auth(helper, 'lobby');
   await mismatch.state.registerUser();
   assert.deepEqual(mismatch.actions, [
-    ['navigate', '/profile'],
+    ['navigate', '/ru/'],
     ['emit', 'registered'],
   ]);
   const later = auth(helper, 'community_solo');
   await later.state.registerUser();
   assert.deepEqual(later.actions, [
-    ['navigate', '/profile'],
+    ['navigate', '/ru/'],
     ['emit', 'registered'],
   ]);
 });
@@ -212,7 +220,7 @@ test('failed signup keeps play intent for retry, while successful login consumes
   const later = auth(helper, 'lobby');
   await later.state.registerUser();
   assert.deepEqual(later.actions, [
-    ['navigate', '/profile'],
+    ['navigate', '/ru/'],
     ['emit', 'registered'],
   ]);
   assert.equal(events.filter((event) => event[1] === 'sign_up').length, 2);

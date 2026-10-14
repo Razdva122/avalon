@@ -14,6 +14,7 @@ function pageHarness(query = {}, profile = { id: 'alice', token: 'alice-token' }
   const store = { state: vue.reactive({ profile }) };
   const route = vue.reactive({ query, path: '/ru/community/players/' });
   const navigations = [];
+  const notifications = [];
   const router = {
     push: async (to) => {
       navigations.push(to);
@@ -44,7 +45,7 @@ function pageHarness(query = {}, profile = { id: 'alice', token: 'alice-token' }
     if (id === '@avalon/types/player-board') return types;
     if (id === './board-helpers') return require('../src/pages/community/board-helpers.ts');
     if (id === '@/helpers/prerender') return { prerender };
-    if (id === '@/helpers/event-bus') return { default: { emit() {} } };
+    if (id === '@/helpers/event-bus') return { default: { emit: (...args) => notifications.push(args) } };
     return {};
   };
   new Function('require', 'module', 'exports', code)(customRequire, module, module.exports);
@@ -56,6 +57,7 @@ function pageHarness(query = {}, profile = { id: 'alice', token: 'alice-token' }
     store,
     route,
     navigations,
+    notifications,
     pending,
     stop() {
       unmounted.forEach((cb) => cb());
@@ -147,10 +149,16 @@ test('a player profile link opens the form once eligibility arrives and preserve
 test('a guest profile link continues into the form after signing in', async () => {
   const h = pageHarness({ publish: '1' }, null);
   try {
-    assert.equal(h.page.publishAfterLogin.value, true);
+    await flush();
+    const resume = h.notifications.find(([event]) => event === 'openAuthModal')[1];
+    assert.equal(typeof resume, 'function');
     h.store.state.profile = { id: 'alice', token: 'alice-token' };
     await vue.nextTick();
-    h.pending.find((p) => p.url === '/me').resolve({ listings: [], banned: false, canRecruit: false });
+    await resume();
+    h.pending
+      .filter((p) => p.url === '/me')
+      .at(-1)
+      .resolve({ listings: [], banned: false, canRecruit: false });
     await flush();
     assert.equal(h.page.editing.value, true);
   } finally {
@@ -273,9 +281,11 @@ test('publishing intent survives sign-in and opens after account eligibility arr
   const h = pageHarness({}, null);
   try {
     h.page.startPublish();
+    const resume = h.notifications.find(([event]) => event === 'openAuthModal')[1];
     assert.equal(h.page.editing.value, false);
     h.store.state.profile = { id: 'alice', token: 'alice-token' };
     await vue.nextTick();
+    await resume();
     h.pending.find((p) => p.url === '/me').resolve({ listings: [], banned: false, canRecruit: true });
     await flush();
     assert.equal(h.page.editing.value, true);
@@ -360,3 +370,17 @@ for (const permissions of [
     }
   });
 }
+
+test('cancelled guest publication cannot open the form after an unrelated login', async () => {
+  const h = pageHarness({}, null);
+  try {
+    h.page.startPublish();
+    h.store.state.profile = { id: 'alice', token: 'alice-token' };
+    await vue.nextTick();
+    h.pending.find((p) => p.url === '/me').resolve({ listings: [], banned: false, canRecruit: false });
+    await flush();
+    assert.equal(h.page.editing.value, false);
+  } finally {
+    h.stop();
+  }
+});

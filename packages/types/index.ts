@@ -9,6 +9,7 @@ export * from './game/state';
 export * from './game/settings';
 export * from './api/sockets';
 export * from './room';
+export * from './room/ai-roles';
 export * from './utils';
 export * from './consts';
 export * from './stats';

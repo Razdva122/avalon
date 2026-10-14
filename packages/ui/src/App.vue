@@ -39,7 +39,12 @@
     </template>
   </RouterView>
   <LanguageSuggestion />
-  <AuthModal v-if="authRequested" v-model="authOpen" @registered="welcomeOpen = true" />
+  <AuthModal
+    v-if="authRequested"
+    v-model="authOpen"
+    :continuation="authContinuation"
+    @registered="welcomeOpen = true"
+  />
   <WelcomeModal v-if="welcomeOpen && $store.state.profile" v-model="welcomeOpen" />
   <CredentialsModal v-if="credentialsRequested" v-model="credentialsOpen" :mode="credentialsMode" />
   <InfoSnackbar />
@@ -87,6 +92,7 @@ export default defineComponent({
       currentLocale: this.$i18n.locale,
       authRequested: false,
       authOpen: false,
+      authContinuation: null as { route: string; resume: () => void | Promise<void> } | null,
       welcomeOpen: false,
       credentialsRequested: false,
       credentialsOpen: false,
@@ -101,11 +107,20 @@ export default defineComponent({
       return this.$route.name;
     },
   },
+  watch: {
+    authOpen(open: boolean) {
+      if (!open) this.authContinuation = null;
+    },
+    '$route.fullPath'() {
+      this.authContinuation = null;
+    },
+  },
   methods: {
     inSection(path: string) {
       return inNavigationSection(this.$route.path, path);
     },
-    openAuthModal() {
+    openAuthModal(resume?: () => void | Promise<void>) {
+      this.authContinuation = resume ? { route: this.$route.fullPath, resume } : null;
       this.authRequested = true;
       this.authOpen = true;
     },

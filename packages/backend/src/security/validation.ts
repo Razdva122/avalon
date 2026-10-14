@@ -1,3 +1,5 @@
+import { aiHumanRoles, type AiPlayerCount, type AiHumanRole } from '@avalon/types';
+
 export function validID(value: unknown): value is string {
   return (
     typeof value === 'string' &&
@@ -162,9 +164,12 @@ export function validPacket(event: string, args: unknown[]): boolean {
       values.length === 0 ||
       (record(values[0]) &&
         Object.keys(values[0]).every((key) =>
-          ['beginner', 'withFriend', 'humanSeats', 'difficulty', 'language', 'playerCount'].includes(key),
+          ['beginner', 'role', 'withFriend', 'humanSeats', 'difficulty', 'language', 'playerCount'].includes(key),
         ) &&
         typeof values[0].beginner === 'boolean' &&
+        (values[0].role === undefined ||
+          (values[0].withFriend !== true &&
+            aiHumanRoles((values[0].playerCount ?? 5) as AiPlayerCount).includes(values[0].role as AiHumanRole))) &&
         (values[0].withFriend === undefined || typeof values[0].withFriend === 'boolean') &&
         (values[0].humanSeats === undefined ||
           (values[0].withFriend === true && [2, 3].includes(values[0].humanSeats as number))) &&

@@ -172,6 +172,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
     (
       options: {
         beginner: boolean;
+        role?: import('../room/ai-roles').AiHumanRole;
         withFriend?: boolean;
         humanSeats?: 2 | 3;
         difficulty?: AiBotDifficulty;

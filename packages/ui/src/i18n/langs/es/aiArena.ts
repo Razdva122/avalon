@@ -1,4 +1,6 @@
 export default {
+  selectRole: 'Tu rol',
+  randomRole: 'Rol aleatorio',
   endMatch: 'Finalizar partida',
   endMatchConfirm: '¿Finalizar esta partida? Los bots dejarán de jugar.',
   setupHumanPlayers: 'Jugadores humanos (incluyéndote)',

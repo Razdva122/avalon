@@ -35,10 +35,22 @@ export class GameManager {
   io: Server;
   roomID: string;
 
-  constructor(userIDs: string[], options: GameOptions, io: Server, roomID: string) {
+  constructor(
+    userIDs: string[],
+    options: GameOptions,
+    io: Server,
+    roomID: string,
+    selectedRole?: { userID: string; role: TRoles },
+  ) {
     this.roomID = roomID;
     this.io = io;
-    this.game = new Game(userIDs, options, { gameStateChanged: () => this.gameStateChanged() });
+    this.game = new Game(
+      userIDs,
+      options,
+      { gameStateChanged: () => this.gameStateChanged() },
+      undefined,
+      selectedRole,
+    );
     this.initRoomState();
   }
 

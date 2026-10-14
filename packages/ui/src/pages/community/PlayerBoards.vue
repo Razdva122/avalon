@@ -349,21 +349,27 @@ let mounted = false;
 let timer: ReturnType<typeof setInterval> | undefined;
 function startPublish() {
   if (!profile.value) {
-    publishAfterLogin.value = true;
-    eventBus.emit('openAuthModal');
+    eventBus.emit('openAuthModal', () => {
+      if (!mounted) return;
+      if (account.value) startPublish();
+      else {
+        publishAfterLogin.value = true;
+        if (!accountLoading.value) void loadAccount();
+      }
+    });
     return;
   }
   if (!account.value || account.value.banned || (kind.value === 'group' && !account.value.canRecruit)) return;
   editing.value = true;
   void reveal(formElement);
 }
-function consumePublishIntent() {
+async function consumePublishIntent() {
   if (!mounted || kind.value !== 'solo' || route.query.publish !== '1') return;
   if (profile.value && !account.value) return;
   const query = { ...route.query };
   delete query.publish;
-  void router.replace({ query });
-  startPublish();
+  await router.replace({ query });
+  if (mounted) startPublish();
 }
 async function loadPublic() {
   if (!mounted) return;

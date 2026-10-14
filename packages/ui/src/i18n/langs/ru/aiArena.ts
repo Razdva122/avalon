@@ -1,4 +1,6 @@
 export default {
+  selectRole: 'Ваша роль',
+  randomRole: 'Случайная роль',
   endMatch: 'Завершить партию',
   endMatchConfirm: 'Завершить партию? Боты прекратят игру.',
   setupHumanPlayers: 'Реальных игроков (включая вас)',

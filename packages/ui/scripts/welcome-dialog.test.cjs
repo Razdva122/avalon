@@ -22,11 +22,14 @@ function auth(reply, routeID = 'profile') {
   const actions = [];
   const options = component('../src/components/user/AuthModal.vue', {
     '@/helpers/acquisition': require('../src/helpers/acquisition.ts'),
+    '@/router/paths': require('../src/router/paths.js'),
   });
   const state = {
     overlay: true,
+    authRequest: 0,
     error: '',
-    $route: { name: routeID, meta: { id: routeID } },
+    $route: { name: routeID, meta: { id: routeID }, fullPath: '/' + routeID + '/' },
+    $i18n: { locale: 'en' },
     $store: { dispatch: async () => reply },
     $router: { push: async (path) => actions.push(['navigate', path]) },
     $emit: (event) => actions.push(['emit', event]),
@@ -42,12 +45,12 @@ test('registering from a room link keeps the room and does not open welcome over
   assert.deepEqual(actions, []);
 });
 
-test('successful registration opens the welcome dialog after reaching the profile', async () => {
+test('successful registration opens the welcome dialog after reaching the lobby', async () => {
   const { state, actions } = auth({ id: 'new-user' });
   await state.registerUser();
   assert.equal(state.overlay, false);
   assert.deepEqual(actions, [
-    ['navigate', '/profile'],
+    ['navigate', '/'],
     ['emit', 'registered'],
   ]);
 });
@@ -178,3 +181,79 @@ test('finishing an AI request preserves its error until the next attempt', () =>
   state.setAiBusy(true);
   assert.equal(state.aiError, '');
 });
+
+for (const method of ['registerUser', 'loginInAccount']) {
+  test(`${method} resumes the requested action without navigation or welcome`, async () => {
+    const { state, actions } = auth({ id: 'new-user' }, 'lobby');
+    state.continuation = { route: '/lobby/', resume: async () => actions.push(['created-room']) };
+    await state[method]();
+    assert.equal(state.overlay, false);
+    assert.deepEqual(actions, [['created-room']]);
+  });
+}
+
+test('a request from a previous page cannot resume after navigation', async () => {
+  const { state, actions } = auth({ id: 'new-user' }, 'wiki');
+  state.continuation = { route: '/lobby/', resume: () => actions.push(['created-room']) };
+  await state.registerUser();
+  assert.deepEqual(actions, [
+    ['navigate', '/'],
+    ['emit', 'registered'],
+  ]);
+});
+
+test('failed registration keeps its action available for a successful retry', async () => {
+  const { state, actions } = auth({ error: 'emailAlreadyExist' }, 'lobby');
+  state.continuation = { route: '/lobby/', resume: () => actions.push(['created-room']) };
+  await state.registerUser();
+  assert.deepEqual(actions, []);
+  state.$store.dispatch = async () => ({ id: 'new-user' });
+  await state.registerUser();
+  assert.deepEqual(actions, [['created-room']]);
+});
+
+test('joining after authentication seats the user instead of leaving an already joined room', async () => {
+  const vue = require('vue');
+  const store = { state: vue.reactive({ profile: null }) };
+  const requests = [];
+  const sent = [];
+  const options = component('../src/components/view/panels/StartPanel.vue', {
+    'vue-i18n': { useI18n: () => ({ t: (key) => key, locale: vue.ref('en') }) },
+    '@/router/paths': require('../src/router/paths.js'),
+    '@/store': { useStore: () => store },
+    '@/api/socket': { socket: { emit: (...args) => sent.push(args) } },
+    '@/helpers/event-bus': { default: { emit: (...args) => requests.push(args) } },
+  });
+  const roomState = vue.reactive({ roomID: 'invited-room', players: [], stage: 'created' });
+  const state = options.setup({ roomState });
+  state.onJoinClick();
+  assert.deepEqual(sent, []);
+  const resume = requests.find(([event]) => event === 'openAuthModal')[1];
+  assert.equal(typeof resume, 'function');
+  store.state.profile = { id: 'new-user' };
+  await resume();
+  assert.deepEqual(sent, [['joinGame', 'invited-room']]);
+  roomState.players.push({ id: 'new-user' });
+  await resume();
+  assert.deepEqual(sent, [['joinGame', 'invited-room']]);
+});
+
+for (const method of ['registerUser', 'loginInAccount']) {
+  test(`${method} ignores a cancelled reply after auth reopens for another action`, async () => {
+    const { state, actions } = auth({ id: 'new-user' }, 'lobby');
+    let finish;
+    state.$store.dispatch = () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      });
+    state.continuation = { route: '/lobby/', resume: () => actions.push(['old-action']) };
+    const pending = state[method]();
+    state.closeAuthModal();
+    state.overlay = true;
+    state.continuation = { route: '/lobby/', resume: () => actions.push(['new-action']) };
+    finish({ id: 'new-user' });
+    await pending;
+    assert.deepEqual(actions, []);
+    assert.equal(state.overlay, true);
+  });
+}

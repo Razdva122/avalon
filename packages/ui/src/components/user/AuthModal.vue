@@ -82,13 +82,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, unref, type PropType } from 'vue';
 import { validators } from '@/helpers/validators';
 import type { VForm } from 'vuetify/components';
 import BaseModal from '@/components/user/BaseModal.vue';
 import PasswordField from '@/components/modals/PasswordField.vue';
 import TextField from '@/components/modals/TextField.vue';
 import { consumePlayIntent, trackSignup } from '@/helpers/acquisition';
+import { localizedPath } from '@/router/paths';
 
 export default defineComponent({
   components: {
@@ -98,6 +99,7 @@ export default defineComponent({
   },
   props: {
     modelValue: Boolean,
+    continuation: Object as PropType<{ route: string; resume: () => void | Promise<void> } | null>,
   },
   emits: ['update:modelValue', 'registered'],
   computed: {
@@ -115,6 +117,7 @@ export default defineComponent({
 
     return {
       mode: 'auth',
+      authRequest: 0,
       username: profile?.name || '',
       password: '',
       email: '',
@@ -128,6 +131,9 @@ export default defineComponent({
     };
   },
   watch: {
+    modelValue(open: boolean) {
+      if (!open) this.authRequest++;
+    },
     mode() {
       this.error = '';
     },
@@ -156,34 +162,51 @@ export default defineComponent({
       this.formValid[type] = valid;
     },
     async loginInAccount() {
+      const request = ++this.authRequest;
+      const continuation = this.continuation;
+      const route = this.$route.fullPath;
       const userOrError = await this.$store.dispatch('login', { loginOrEmail: this.login, password: this.password });
+      if (request !== this.authRequest || continuation !== this.continuation || route !== this.$route.fullPath) return;
 
       if ('error' in userOrError) {
         this.error = userOrError.error;
       } else {
-        this.closeAuthModal();
-        consumePlayIntent(this.$route.meta.id || this.$route.name);
+        await this.continueAfterAuth();
       }
     },
     async registerUser() {
+      const request = ++this.authRequest;
+      const continuation = this.continuation;
+      const route = this.$route.fullPath;
       const userOrError = await this.$store.dispatch('registerUser', {
         email: this.email,
         password: this.password,
         name: this.username,
         login: this.login,
       });
+      if (request !== this.authRequest || continuation !== this.continuation || route !== this.$route.fullPath) return;
 
       if ('error' in userOrError) {
         this.error = userOrError.error;
       } else {
-        this.closeAuthModal();
         trackSignup();
-        if (consumePlayIntent(this.$route.meta.id || this.$route.name)) return;
-        await this.$router.push('/profile');
+        if (await this.continueAfterAuth()) return;
+        await this.$router.push(localizedPath('/', unref(this.$i18n.locale)));
         this.$emit('registered');
       }
     },
+    async continueAfterAuth(): Promise<boolean> {
+      const resume = this.continuation?.route === this.$route.fullPath ? this.continuation?.resume : undefined;
+      this.closeAuthModal();
+      const hasPlayIntent = consumePlayIntent(this.$route.meta.id || this.$route.name);
+      if (resume) {
+        await resume();
+        return true;
+      }
+      return hasPlayIntent;
+    },
     closeAuthModal() {
+      this.authRequest++;
       this.overlay = false;
     },
     displayAuthModal() {

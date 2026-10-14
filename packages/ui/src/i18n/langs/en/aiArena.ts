@@ -1,4 +1,6 @@
 export default {
+  selectRole: 'Your role',
+  randomRole: 'Random role',
   endMatch: 'End match',
   endMatchConfirm: 'End this match? The bots will stop playing.',
   setupHumanPlayers: 'Human players (including you)',

@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { aiHumanRoles, type AiHumanRole } from '@avalon/types';
 import { Room } from '@/room';
 import { AI_PROFILE_RATING_SEASON } from './rating-season';
 import type { AiLanguage, AiPlayerCount, GameOptions, Server, TRoomState, AiSpectatorDecision } from '@avalon/types';
@@ -28,6 +29,7 @@ function combinations(ids: string[], count: number): string[][] {
 export class BotRoom extends Room {
   renewLease?: () => Promise<void>;
   readonly spectatorDecisions: AiSpectatorDecision[] = [];
+  private selectedHumanRole?: AiHumanRole;
   private decisionSequence = 0;
   private cancelled = false;
   private executing = false;
@@ -141,10 +143,23 @@ export class BotRoom extends Room {
     delete this.ai!.profileRatingSeason;
   }
 
+  setHumanRole(role: AiHumanRole): void {
+    if (
+      this.ai!.status !== 'ready' ||
+      !this.ai!.humanPlayerID ||
+      this.ai!.withFriend ||
+      !aiHumanRoles(this.players.length as AiPlayerCount).includes(role)
+    )
+      throw Error('Selected solo role is unavailable');
+    this.selectedHumanRole = role;
+  }
+
   setPlayerCount(playerCount: AiPlayerCount): void {
     if (this.ai!.status !== 'ready' || this.data.stage !== 'locked' || ![5, 6, 7, 8].includes(playerCount))
       throw Error('Table size can only be changed before launch');
     if (this.ai!.beginner && playerCount !== 5) throw Error('Beginner tables require five players');
+    if (this.selectedHumanRole && !aiHumanRoles(playerCount).includes(this.selectedHumanRole))
+      throw Error('Selected solo role is unavailable at this table size');
     if (this.players.length === playerCount) return;
     this.players = selectBotAgents(undefined, playerCount).map((agent) => agent.id);
     this.humanIDs.forEach((id, index) => {
@@ -901,7 +916,10 @@ export class BotRoom extends Room {
     this.ai!.canResumeTechnical = false;
     this.ai!.status = 'running';
     try {
-      if (!resumeTechnical) super.startGame();
+      if (!resumeTechnical)
+        super.startGame(
+          this.selectedHumanRole ? { userID: this.ai!.humanPlayerID!, role: this.selectedHumanRole } : undefined,
+        );
       while (!this.cancelled && this.manager.game.stage !== 'end') {
         await this.act();
         await this.checkpoint(this.calculateRoomState());

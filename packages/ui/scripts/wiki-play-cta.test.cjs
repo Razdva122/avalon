@@ -2,9 +2,9 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { parse, compileScript } = require('@vue/compiler-sfc');
+const { parse, compileScript, compileTemplate } = require('@vue/compiler-sfc');
 const ts = require('typescript');
-const { createSSRApp, compile } = require('vue');
+const { createSSRApp, ref, h } = require('vue');
 const { renderToString } = require('@vue/server-renderer');
 const { createRouter, createMemoryHistory } = require('vue-router');
 const { createI18n } = require('vue-i18n');
@@ -34,22 +34,51 @@ function component(relative) {
   const module = { exports: {} };
   const localRequire = (id) => {
     if (id.endsWith('.vue')) {
-      return { default: /WikiPlayCta|LocaleLink/.test(id) ? component(id.slice(2)) : leaf };
+      return { default: /WikiPlayCta|LocaleLink|BotRoomButton/.test(id) ? component(id.slice(2)) : leaf };
     }
+    if (id === '@/helpers/composables/useAiAccess')
+      return {
+        useAiAccess: () => ({
+          canPlay: ref(false),
+          accessStatus: ref('ready'),
+          botModes: ref({}),
+          ownRoomID: ref(),
+        }),
+      };
+    if (id === '@/helpers/open-room-route') return { openRoomRoute: async () => true };
+    if (id === '@/helpers/images') return { getImagePathByID: (folder, id) => `/${folder}/${id}.webp` };
     if (id === '@/helpers/styles') return { calculateRoleUrl: () => '/role.webp' };
     if (id === '@/router/paths') return require('../src/router/paths');
     return require(id);
   };
   new Function('require', 'module', 'exports', code)(localRequire, module, module.exports);
   const result = module.exports.default;
-  if (!descriptor.scriptSetup) result.render = compile(descriptor.template.content);
+  if (!descriptor.scriptSetup) {
+    const template = compileTemplate({
+      source: descriptor.template.content,
+      filename,
+      id: filename,
+      compilerOptions: { isTS: true },
+    });
+    assert.deepEqual(template.errors, []);
+    const templateModule = { exports: {} };
+    const renderCode = ts.transpileModule(template.code, {
+      compilerOptions: { module: ts.ModuleKind.CommonJS },
+    }).outputText;
+    new Function('require', 'exports', renderCode)(localRequire, templateModule.exports);
+    result.render = templateModule.exports.render;
+  }
   return result;
 }
 
 async function renderPage(file, locale, prefix, props = {}) {
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: Object.entries(routesSeo).map(([name, route]) => ({ name, path: route.path, component: leaf })),
+    routes: Object.entries(routesSeo).map(([name, route]) => ({
+      name: route.name || name,
+      path: route.path,
+      component: leaf,
+    })),
   });
   // Localized routes are needed for RouterLink's real resolution.
   if (prefix) {
@@ -59,11 +88,20 @@ async function renderPage(file, locale, prefix, props = {}) {
   const app = createSSRApp(component(file), props);
   app.use(router);
   app.use(createI18n({ legacy: false, locale, missingWarn: false, fallbackWarn: false, messages }));
+  app.component('v-btn', {
+    setup:
+      (_, { slots, attrs }) =>
+      () =>
+        h('button', attrs, slots.default?.()),
+  });
+  app.component('v-icon', { render: () => null });
+  app.component('v-divider', leaf);
+  app.component('LocalizedTextWrapper', leaf);
   app.component('LocaleLink', component('components/feedback/LocaleLink.vue'));
   return renderToString(app);
 }
 
-test('every role article and the roles index render one bottom CTA with locale-preserving lobby and rules links', async () => {
+test('every wiki page renders direct AI play and locale-preserving navigation', async () => {
   for (const [locale, prefix] of [
     ['en', ''],
     ['ru', '/ru'],
@@ -72,16 +110,30 @@ test('every role article and the roles index render one bottom CTA with locale-p
     ['zh-CN', '/zh-cn'],
     ['zh-TW', '/zh-tw'],
   ]) {
-    for (const file of fs.readdirSync(path.join(root, 'pages/wiki/roles')).filter((file) => file.endsWith('.vue'))) {
-      const html = await renderPage(`pages/wiki/roles/${file}`, locale, prefix);
+    const files = [
+      'Index.vue',
+      'Rules.vue',
+      ...['roles', 'addons'].flatMap((folder) =>
+        fs
+          .readdirSync(path.join(root, 'pages/wiki', folder))
+          .filter((file) => file.endsWith('.vue'))
+          .map((file) => `${folder}/${file}`),
+      ),
+    ];
+    for (const file of files) {
+      const html = await renderPage(`pages/wiki/${file}`, locale, prefix);
       assert.equal((html.match(/class="wiki-play-cta"/g) || []).length, 1, `${locale}/${file}`);
       const cta = html.slice(html.indexOf('class="wiki-play-cta"'));
       assert.match(cta, new RegExp(`href="${prefix}/"`));
-      assert.match(cta, new RegExp(`href="${prefix}/wiki/rules/"`));
+      if (file !== 'Rules.vue') assert.match(cta, new RegExp(`href="${prefix}/wiki/rules/"`));
       assert.doesNotMatch(
         cta.slice(cta.indexOf('</aside>') + 8),
         /<(?:h[1-6]|p|section|nav)\b/,
         'article content must precede the CTA',
+      );
+      assert.ok(
+        cta.includes(translationsModule.exports.wikiPlay[locale].playAi),
+        `${locale}/${file}: direct AI play action`,
       );
       assert.doesNotMatch(cta, /wikiPlay\./, 'CTA copy must resolve in every language');
     }

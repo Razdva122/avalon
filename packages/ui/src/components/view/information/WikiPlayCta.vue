@@ -6,6 +6,7 @@
     </div>
     <nav :aria-label="$t('wikiPlay.title')">
       <LocaleLink class="play-link" :to="{ name: 'lobby' }">{{ $t('wikiPlay.play') }}</LocaleLink>
+      <BotRoomButton variant="outlined" color="primary">{{ $t('wikiPlay.playAi') }}</BotRoomButton>
       <LocaleLink v-if="showRules" :to="{ name: 'rules' }">{{ $t('wikiPlay.rules') }}</LocaleLink>
     </nav>
   </aside>
@@ -13,6 +14,7 @@
 
 <script setup lang="ts">
 import LocaleLink from '@/components/feedback/LocaleLink.vue';
+import BotRoomButton from '@/pages/lobby/BotRoomButton.vue';
 withDefaults(defineProps<{ showRules?: boolean }>(), { showRules: true });
 </script>
 
@@ -50,6 +52,14 @@ withDefaults(defineProps<{ showRules?: boolean }>(), { showRules: true });
     border-radius: 10px;
     color: inherit;
     text-decoration: none;
+  }
+
+  :deep(.bot-room-button) {
+    height: auto;
+    min-height: 44px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: inherit;
   }
 
   .play-link {

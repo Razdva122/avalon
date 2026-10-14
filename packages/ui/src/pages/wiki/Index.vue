@@ -54,8 +54,13 @@
     <ul>
       <li v-html="$t('wiki.determineWinner')"></li>
     </ul>
+    <WikiPlayCta />
   </div>
 </template>
+
+<script setup lang="ts">
+import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
+</script>
 
 <style scoped lang="scss">
 @import '@/styles/info-page.scss';
