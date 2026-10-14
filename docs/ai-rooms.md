@@ -133,6 +133,23 @@ the relevant mission/proposal in their sources. These instructions do not impose
 server-selected teams or votes. Prompt-routing tests do not establish stronger
 model play; improvements need model evaluation on recorded situations.
 
+Team decisions receive the score before each completed mission, the actual
+approvers of its accepted proposal, the next leader after a rejection, and
+sourced contrasts between a voter's support with and without a candidate.
+Forced proposals and anonymous votes supply no individual supporters. These
+summaries contain public behavior, not inferred roles. Both difficulty profiles
+compare decisive successes, selective support from suspected Evil, and a
+reachable alternative before choosing. A Success when Evil already has two
+failures is stronger behavioral evidence than an opening Success; the mission's
+Fail threshold still matters and this does not prove alignment. Unanswered
+questions and personality preferences must be weighed against these signals.
+Previous approvers identify a coalition to negotiate with, not guaranteed votes.
+Explicit current roster declarations in private or public speech are checked
+against the selected action, including ordinary lists without brackets. A
+contradiction receives one fresh model decision; an unresolved contradiction
+pauses before publication or applying the roster. Historical, conditional and
+ambiguous lists do not select a different team.
+
 Strategic advice covers coalition support, the consequences of rejection,
 combined mission constraints, consistent wizard-candidate risk and Merlin's
 history of public words and votes. Off-team Good players account for the reduced

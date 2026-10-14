@@ -1,4 +1,5 @@
 export default {
+  filterWithBots: '機器人對局',
   setupGuestTitle: '登入後開始遊戲',
   setupGuestHint: '可以先選擇設定。登入後即可檢查機器人是否可用並建立遊戲。',
   setupNoAddons: '無擴充',

@@ -98,8 +98,8 @@
             :class="{ selected: filter === item, 'ai-filter': item === 'ai-games' }"
             @click="filter = item"
           >
-            <span v-if="item === 'ai-games'" class="ai-filter-icon" aria-hidden="true">AI</span>
-            {{ item === 'ai-games' ? 'ai-games' : $t(`mainPage.filter${item}`) }}
+            <v-icon v-if="item === 'ai-games'" icon="fa:fa-solid fa-robot" size="18" aria-hidden="true" />
+            {{ item === 'ai-games' ? $t('aiArena.filterWithBots') : $t(`mainPage.filter${item}`) }}
             <span v-if="item === 'ai-games' ? aiRooms !== undefined : roomsList">{{ filterCount(item) }}</span>
           </button>
         </div>
@@ -682,14 +682,7 @@ h1 {
   background: rgba(var(--v-theme-primary), 0.18);
   box-shadow: inset 0 0 0 1px rgb(var(--v-theme-primary));
 }
-.room-filters button .ai-filter-icon {
-  padding: 2px 4px;
-  border-radius: 4px;
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
-  font-size: 10px;
-  opacity: 1;
-}
+
 .games-list {
   container: lobby-games / inline-size;
   display: grid;

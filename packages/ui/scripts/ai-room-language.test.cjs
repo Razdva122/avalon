@@ -1939,3 +1939,27 @@ test('first game hides larger tables and restores them when changing difficulty'
   await room.render();
   assert.deepEqual(counts(), [5, 6, 7, 8]);
 });
+
+test('AI rows show dates only after completion', async (t) => {
+  for (const finished of [false, true]) {
+    const room = await fixture('pages/lobby/LobbyRoom.vue', {
+      locale: 'ru',
+      props: {
+        game: {
+          uuid: 'date',
+          hostID: 'host',
+          ai: true,
+          aiTitle: 'Alice vs 4 Bots',
+          aiStatus: finished ? 'finished' : 'running',
+          players: 5,
+          state: 'started',
+          options: { roles: {}, addons: {} },
+          createAt: '2026-10-14T18:00:00Z',
+          ...(finished ? { result: { winner: 'good' } } : {}),
+        },
+      },
+    });
+    t.after(room.stop);
+    assert.equal(room.html.includes('ai-date'), finished);
+  }
+});

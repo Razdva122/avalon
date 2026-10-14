@@ -1,4 +1,5 @@
 export default {
+  filterWithBots: 'С ботами',
   setupGuestTitle: 'Войдите, чтобы начать игру',
   setupGuestHint: 'Настройки можно выбрать заранее. После входа проверим доступность ботов и создадим игру.',
   setupNoAddons: 'Без дополнений',

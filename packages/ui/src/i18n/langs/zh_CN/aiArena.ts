@@ -1,4 +1,5 @@
 export default {
+  filterWithBots: '机器人对局',
   setupGuestTitle: '登录后开始游戏',
   setupGuestHint: '可以先选择设置。登录后即可检查机器人是否可用并创建游戏。',
   setupNoAddons: '无扩展',

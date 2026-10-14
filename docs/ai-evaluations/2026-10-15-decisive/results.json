@@ -1,0 +1,625 @@
+{
+  "date": "2026-10-15",
+  "model": {
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium"
+  },
+  "scope": "Saved positions only; original persona and hypotheses retained; no game or production mutation.",
+  "phases": [
+    {
+      "name": "original",
+      "logicalCalls": 6,
+      "scored": 5,
+      "passed": 0,
+      "results": [
+        {
+          "id": "m2-accuser-select",
+          "seat": 4,
+          "mission": 2,
+          "stage": "selectTeam",
+          "publicDiscussion": false,
+          "strict": false,
+          "expectedChoice": "4, 5, 6",
+          "choice": "3, 4, 5",
+          "passed": false,
+          "privateReason": "我選3、4、5，保留隔離原隊的方向，排除機率論點錯誤且未解釋反對理由的6。1、3曾支持隔離隊伍，加上我仍需第四票；爭取5重新衡量，比直接採信2的成功牌自述更合理。",
+          "publicReason": "5，你信6，但他說避開原隊風險更高，與任務紀錄不符：1、2至少一名邪惡，其餘四人最多一名。我選3、4、5，保留隔離原隊的方向，把先前的6換成3；6尚未解釋反對3、5、6的理由。第三席會影響風險，2的成功牌也仍是自述。",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 16311,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 763,
+              "reasoning_output_tokens": 420
+            }
+          ],
+          "elapsedMs": 35009
+        },
+        {
+          "id": "m2-gambler-vote",
+          "seat": 2,
+          "mission": 2,
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "strict": true,
+          "expectedChoice": "reject",
+          "choice": "approve",
+          "passed": false,
+          "privateReason": "1已由我的成功牌與首輪結果確定為邪惡，3、4、5、6之間僅剩一名邪惡。6反對包含自己的3、5、6卻未解釋，加上機率論述站不住腳，我願意改押排除6的3、4、5；目前沒有足夠理由認為下一案更安全。",
+          "publicReason": "",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 15824,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 315,
+              "reasoning_output_tokens": 82
+            }
+          ],
+          "elapsedMs": 12895
+        },
+        {
+          "id": "m5-accuser-discuss",
+          "seat": 4,
+          "mission": 5,
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "strict": true,
+          "expectedChoice": "2, 4, 5, 6",
+          "choice": "2, 3, 4, 6",
+          "passed": false,
+          "privateReason": "我確定6是好人；邪惡分別在1、2及3、5之間。第四輪成功不足以洗清2，但目前保留2較有合作基礎。3與5尚未分清，5持續未回答具體疑點，我傾向補3，爭取1、2、3支持。",
+          "publicReason": "3，我同意補3，提2、3、4、6。第四輪成功支持保留原隊，但沒有洗清2；你自述出成功也還不能洗清你。5，我已追問兩次：第二輪失敗隊明明有你，你說2、4、5、6「不會出錯」的依據到底是什麼？你後續發言仍沒回答，我目前選擇換下你。",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 17997,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 554,
+              "reasoning_output_tokens": 133
+            }
+          ],
+          "elapsedMs": 23560
+        },
+        {
+          "id": "m5-gambler-discuss",
+          "seat": 2,
+          "mission": 5,
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "strict": true,
+          "expectedChoice": "2, 4, 5, 6",
+          "choice": "2, 3, 4, 6",
+          "passed": false,
+          "privateReason": "我接受2、3、4、6作為目前折衷。已知1邪惡，另一名在3、4、5；5持續迴避疑點，暫選排除5，但1支持此隊也讓我警惕。真正需要爭取的是6，不能把1的支持當成安全保證。",
+          "publicReason": "1，這個折衷我能接受，暫提2、3、4、6。5一直沒回答第二輪疑點，3至少提出了自己的出牌證詞；兩者都還不能定案。6，第三輪成功不能洗清5，票型也不足以判死3。我們需要你的支持，請重新比較3與5，別把尚未證實的判斷當成定論。",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 18212,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 449,
+              "reasoning_output_tokens": 109
+            }
+          ],
+          "elapsedMs": 22469
+        },
+        {
+          "id": "m5-accuser-vote",
+          "seat": 4,
+          "mission": 5,
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "strict": true,
+          "expectedChoice": "reject",
+          "choice": "approve",
+          "passed": false,
+          "privateReason": "1、2恰有一名邪惡，3、5恰有一名邪惡，6已能排除。這隊仍承擔2與3的風險，但5持續未回答疑點；換回5沒有更強依據。1、2、3已表態支持，加上我可達四票，接受目前有具體共識的折衷。",
+          "publicReason": "",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 17526,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 276,
+              "reasoning_output_tokens": 48
+            }
+          ],
+          "elapsedMs": 15112
+        },
+        {
+          "id": "m5-gambler-vote",
+          "seat": 2,
+          "mission": 5,
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "strict": true,
+          "expectedChoice": "reject",
+          "choice": "approve",
+          "passed": false,
+          "privateReason": "同意。1確定邪惡，6確定好人，3、4、5恰有一名邪惡；這隊要成功就得排對5。5仍未回應第二輪疑點，目前沒有更可靠的替代隊伍，而1、3、4與我已表態支持，能湊足四票。我接受這個決勝取捨。",
+          "publicReason": "",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 17783,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 331,
+              "reasoning_output_tokens": 110
+            }
+          ],
+          "elapsedMs": 16376
+        }
+      ]
+    },
+    {
+      "name": "facts-and-decisive-comparison",
+      "logicalCalls": 6,
+      "scored": 5,
+      "passed": 4,
+      "results": [
+        {
+          "id": "m2-accuser-select",
+          "seat": 4,
+          "mission": 2,
+          "stage": "selectTeam",
+          "publicDiscussion": false,
+          "strict": false,
+          "expectedChoice": "4, 5, 6",
+          "choice": "3, 4, 5",
+          "passed": false,
+          "privateReason": "選3、4、5：原隊至少一名邪惡，外圍最多一名。6支持含2的隊伍、反對隔離原隊，且機率論點錯誤，使我降低信任。比起維持4、5、6，加入支持隔離的3較合理，也有機會爭取上一案的1、2、3加我通過；5仍未被證實清白。",
+          "publicReason": "5，你相信6，但他的機率說法不成立：1、2至少一名邪惡，外圍四席最多一名。我改選3、4、5；6支持2、5、6，卻反對3、5、6，這讓我降低信任。3持續主張隔離原隊，也投票支持；保留你則參考首輪反對票，並非認定清白。第三席有差，這次我用3替換6。",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 16654,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 551,
+              "reasoning_output_tokens": 170
+            }
+          ],
+          "elapsedMs": 25249
+        },
+        {
+          "id": "m2-gambler-vote",
+          "seat": 2,
+          "mission": 2,
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "strict": true,
+          "expectedChoice": "reject",
+          "choice": "approve",
+          "passed": false,
+          "privateReason": "1由首輪出牌可確定為邪惡，3、4、5最多含另一名邪惡，仍有失敗風險。6的反對不足以證明他是邪惡，但這組值得試。下一位5偏好2、5、6，那組先前只有三票，尚無新增支持；目前僅一敗，我支持新組合取得結果。",
+          "publicReason": "",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 16176,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 582,
+              "reasoning_output_tokens": 355
+            }
+          ],
+          "elapsedMs": 31634
+        },
+        {
+          "id": "m5-accuser-discuss",
+          "seat": 4,
+          "mission": 5,
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "strict": true,
+          "expectedChoice": "2, 4, 5, 6",
+          "choice": "2, 4, 5, 6",
+          "passed": true,
+          "privateReason": "兩敗後，2、4、5、6曾在一張失敗就能讓邪惡獲勝時成功，2、4、6又再次成功。這比5沒回答更有分量。相較補入3，我保留5；1反覆支持含3隊伍，也增加換入3的疑慮。下一位領隊是我，仍可爭取2與6支持這個比較。",
+          "publicReason": "3，補回5的理由是：第三輪已兩敗，2、4、5、6仍零失敗，邪惡若在隊內就放棄了立即獲勝；第四輪2、4、6又成功。我先前太看重5沒回答，現在修正，建議2、4、5、6。3，1三次支持含你的隊伍，卻反對兩次救命成功隊；你怎麼看這個差異？",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 19104,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 605,
+              "reasoning_output_tokens": 134
+            }
+          ],
+          "elapsedMs": 25763
+        },
+        {
+          "id": "m5-gambler-discuss",
+          "seat": 2,
+          "mission": 5,
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "strict": true,
+          "expectedChoice": "2, 4, 5, 6",
+          "choice": "2, 4, 5, 6",
+          "passed": true,
+          "privateReason": "1已由我的首輪成功牌確定為邪惡；他持續支持3，現在又推3取代5，是對3的不利線索。決勝輪不再試人：2、4、5、6在兩敗時成功，邪惡若在隊上便放棄直接獲勝，比5未回答問題更有分量。此隊也有先前四票基礎，優於加入3。",
+          "publicReason": "1，這個折衷我不接受，我改推2、4、5、6。先前我太看重5沒回答問題，低估第三輪已經兩敗：那時這四人仍交出成功，隊中若有邪惡，就是放過直接獲勝。第四輪2、4、6又成功；決勝席我選有這份紀錄的5。你持續支持3，也讓我更不願現在換入3。",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 19319,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 541,
+              "reasoning_output_tokens": 49
+            }
+          ],
+          "elapsedMs": 15100
+        },
+        {
+          "id": "m5-accuser-vote",
+          "seat": 4,
+          "mission": 5,
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "strict": true,
+          "expectedChoice": "reject",
+          "choice": "reject",
+          "passed": true,
+          "privateReason": "我撤回暫選3的偏好。2、4、5、6在兩敗時成功，邪惡若在隊內就放棄立即獲勝；這比5未回答更有分量。現隊加入3，且疑似邪惡的1持續支持3。下一案由我領隊，可提2、4、5、6，爭取先前四名支持者；第五案由1領隊，仍須避免拖到強制出隊。",
+          "publicReason": "",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 18633,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 500,
+              "reasoning_output_tokens": 138
+            }
+          ],
+          "elapsedMs": 22680
+        },
+        {
+          "id": "m5-gambler-vote",
+          "seat": 2,
+          "mission": 5,
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "strict": true,
+          "expectedChoice": "reject",
+          "choice": "reject",
+          "passed": true,
+          "privateReason": "我要修正剛才的折衷：1確定邪惡，卻持續支持3；相較之下，4、5在第三輪放過立即獲勝的破壞機會，4又在第四輪成功。這比5沒回答問題更有分量。現在兩敗，不再試3；下一位4帶隊時應爭取2、4、5、6，優先拉回原成功隊伍的四票，避免拖到1強制派隊。",
+          "publicReason": "",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 18890,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 349,
+              "reasoning_output_tokens": 81
+            }
+          ],
+          "elapsedMs": 14294
+        }
+      ]
+    },
+    {
+      "name": "early-exposure-comparison",
+      "logicalCalls": 6,
+      "scored": 5,
+      "passed": 4,
+      "results": [
+        {
+          "id": "m2-accuser-select",
+          "seat": 4,
+          "mission": 2,
+          "stage": "selectTeam",
+          "publicDiscussion": false,
+          "strict": false,
+          "expectedChoice": "4, 5, 6",
+          "choice": "3, 4, 6",
+          "passed": false,
+          "privateReason": "相較原先4、5、6，改用持續主張隔離原隊的3，排除先說第三席不重要、後又指定2的5。這只是行為上的取捨；6仍未釐清錯誤機率說法。爭取上案支持隔離原隊的1、2、3，加上我形成四票，比直接接受含2的隊伍合理。",
+          "publicReason": "5，你先說第三席不重要，卻否決3、5、6並指定2，我對你的選人標準有疑慮。我改選3、4、6：先隔離已有失敗的1、2，保留一直支持這個方向的3。6首輪反對只能作次要參考，先前的機率說法我也不接受。1、2、3，你們上案都支持避開原隊，請支持這次調整。",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 16743,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 692,
+              "reasoning_output_tokens": 347
+            }
+          ],
+          "elapsedMs": 23567
+        },
+        {
+          "id": "m2-gambler-vote",
+          "seat": 2,
+          "mission": 2,
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "strict": true,
+          "expectedChoice": "reject",
+          "choice": "reject",
+          "passed": true,
+          "privateReason": "我確知1出失敗。3、4、5比2、5、6多放一個未知席；6的錯誤機率說法與反對票，還不足以支持這項交換。下一位5已表態想帶2、6，較有機會回到2、5、6；我選擇爭取第四張同意票。",
+          "publicReason": "",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 16265,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 388,
+              "reasoning_output_tokens": 162
+            }
+          ],
+          "elapsedMs": 21973
+        },
+        {
+          "id": "m5-accuser-discuss",
+          "seat": 4,
+          "mission": 5,
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "strict": true,
+          "expectedChoice": "2, 4, 5, 6",
+          "choice": "1, 2, 4, 6",
+          "passed": false,
+          "privateReason": "我改選2、4、5、6的理由很強：2與5在兩敗時放棄立即致勝的失敗牌，勝過3的自述。但合法選項須選一隊；1、2、4、6包含首輪已確定的一名邪惡，不能支持。",
+          "publicReason": "3，你指出補回5需要理由，這點成立。第三輪已經兩敗，2、4、5、6仍成功；若5是邪惡，當時出失敗就能贏。這比未回答問題更有分量，我撤回把5當首要嫌疑的判斷，主張保留第三輪成功陣容。",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 19195,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 470,
+              "reasoning_output_tokens": 150
+            }
+          ],
+          "elapsedMs": 21736
+        },
+        {
+          "id": "m5-gambler-discuss",
+          "seat": 2,
+          "mission": 5,
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "strict": true,
+          "expectedChoice": "2, 4, 5, 6",
+          "choice": "2, 4, 5, 6",
+          "passed": true,
+          "privateReason": "1確定邪惡，且持續支持3、反對兩支關鍵成功隊，這使3更可疑。第三輪已兩敗，4、5若邪惡可直接獲勝卻未破壞；第四輪又加強4的可信度。相較補入3，我選2、4、5、6，爭取原成功隊的四票。",
+          "publicReason": "1，這個折衷我不接受。我先前低估第三輪成功的分量：當時已兩敗，4、5若是邪惡，一張失敗就能結束遊戲，卻成功了；第四輪2、4、6又成功。5沒回答仍是疑點，但不足以讓我換進3。你持續支持3、反對這兩支成功隊，也讓這個替換更可疑。我提2、4、5、6，請4重新衡量這個差別。",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 19406,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 617,
+              "reasoning_output_tokens": 107
+            }
+          ],
+          "elapsedMs": 29375
+        },
+        {
+          "id": "m5-accuser-vote",
+          "seat": 4,
+          "mission": 5,
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "strict": true,
+          "expectedChoice": "reject",
+          "choice": "reject",
+          "passed": true,
+          "privateReason": "我撤回優先排5的判斷。2、4、5、6在兩敗時成功，5放棄立即獲勝的破壞機會，且反對兩支失敗隊；3則支持兩支失敗隊、反對兩支成功隊。未回答問題不足以壓過這些紀錄。下一案由我帶隊，可改提2、4、5、6，爭取上一輪四名支持者；現在補3風險較高。",
+          "publicReason": "",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 18722,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 541,
+              "reasoning_output_tokens": 197
+            }
+          ],
+          "elapsedMs": 24164
+        },
+        {
+          "id": "m5-gambler-vote",
+          "seat": 2,
+          "mission": 5,
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "strict": true,
+          "expectedChoice": "reject",
+          "choice": "reject",
+          "passed": true,
+          "privateReason": "我改投反對。1確定邪惡，且持續支持3；相較之下，2、4、5、6在兩敗時成功，4又在第四輪放過立即獲勝的機會。這比5未回答問題更有分量。下一位4可改提2、4、5、6，原成功隊四票有爭取空間；第五位1風險高，但目前仍有時間協商。",
+          "publicReason": "",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 18981,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 448,
+              "reasoning_output_tokens": 73
+            }
+          ],
+          "elapsedMs": 18208
+        }
+      ]
+    },
+    {
+      "name": "roster-consistency",
+      "logicalCalls": 6,
+      "scored": 5,
+      "passed": 5,
+      "results": [
+        {
+          "id": "m2-accuser-select",
+          "seat": 4,
+          "mission": 2,
+          "stage": "selectTeam",
+          "publicDiscussion": false,
+          "strict": false,
+          "expectedChoice": "4, 5, 6",
+          "choice": "3, 4, 5",
+          "passed": false,
+          "privateReason": "我選3、4、5，保留自己並隔離失敗原隊。相較4、5、6，3持續支持隔離，6卻以錯誤機率論支持帶回2；這是較弱的行為疑點，並非定罪。後續5、6可能再提2、5、6，現在仍有空間爭取隔離原隊的共識。",
+          "publicReason": "6，你說避開原隊風險更高，但1、2至少一名邪惡，外面四人最多一名。我把先前的4、5、6改為3、4、5：3持續主張隔離原隊，你則支持帶回尚未釐清的2。5，你想跟2走我聽到了，但他的成功牌仍是自述；我選你不代表認同第三席不重要。",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 16741,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 732,
+              "reasoning_output_tokens": 368
+            }
+          ],
+          "elapsedMs": 34869
+        },
+        {
+          "id": "m2-gambler-vote",
+          "seat": 2,
+          "mission": 2,
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "strict": true,
+          "expectedChoice": "reject",
+          "choice": "reject",
+          "passed": true,
+          "privateReason": "我知道1是邪惡；他支持3、5、6，讓3、5更值得警戒。4因6的錯誤論點與反對票換人，尚不足以支持整組3、4、5。下一任5明確想帶2且信任6，2、5、6已有三票支持紀錄，值得再爭取第四票。",
+          "publicReason": "",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 16263,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 331,
+              "reasoning_output_tokens": 113
+            }
+          ],
+          "elapsedMs": 14029
+        },
+        {
+          "id": "m5-accuser-discuss",
+          "seat": 4,
+          "mission": 5,
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "strict": true,
+          "expectedChoice": "2, 4, 5, 6",
+          "choice": "2, 4, 5, 6",
+          "passed": true,
+          "privateReason": "我選2、4、5、6。兩敗後，這四人曾放過立即獲勝的破壞機會，2、4、6又成功一次。相較補入3，保留5有更強的任務依據；我降低對5未回答的權重。1與3連續反對這兩支成功隊，也讓換入3更可疑。",
+          "publicReason": "3，補回5的理由是第三輪當時已有兩敗，2、4、5、6仍成功；若5是邪惡，他放過了直接獲勝的機會。這比未回答問題更有分量，我降低對5的懷疑，提2、4、5、6。你與1連續反對第三、四輪成功隊，現在換入你，有什麼比這些任務結果更強的安全依據？",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 19193,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 668,
+              "reasoning_output_tokens": 182
+            }
+          ],
+          "elapsedMs": 33082
+        },
+        {
+          "id": "m5-gambler-discuss",
+          "seat": 2,
+          "mission": 5,
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "strict": true,
+          "expectedChoice": "2, 4, 5, 6",
+          "choice": "2, 4, 5, 6",
+          "passed": true,
+          "privateReason": "1由首輪我的成功牌確定為邪惡；他持續支持3、反對兩支成功隊，更增加3的嫌疑。第三輪2、4、5、6在兩敗時成功，第四輪2、4、6再次成功。相較補入3，保留5有更強的整隊證據，也可爭取原本四名支持者；此刻應拚成功，停止試隊。",
+          "publicReason": "1，這個折衷我不接受。我先前因5沒回答就換人，現在要修正：2、4、5、6在兩敗時成功，2、4、6又成功，這比補入3更有力。你持續支持含3的隊伍，卻反對這兩支成功隊，也讓補3更危險。我建議2、4、5、6，保留曾放過立即獲勝機會的完整陣容。",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 19406,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 692,
+              "reasoning_output_tokens": 196
+            }
+          ],
+          "elapsedMs": 30954
+        },
+        {
+          "id": "m5-accuser-vote",
+          "seat": 4,
+          "mission": 5,
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "strict": true,
+          "expectedChoice": "reject",
+          "choice": "reject",
+          "passed": true,
+          "privateReason": "我先前把5未回答看得太重。第三輪在兩敗時，2、4、5、6仍成功；第四輪2、4、6又成功，保留5比新增3更有依據。疑似邪惡的1持續支持3，也增加風險。下一案由我帶隊，可改提2、4、5、6，爭取原先四名贊成者；第五案雖由偏好3的1帶隊，目前仍有協商空間。",
+          "publicReason": "",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 18724,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 566,
+              "reasoning_output_tokens": 182
+            }
+          ],
+          "elapsedMs": 22712
+        },
+        {
+          "id": "m5-gambler-vote",
+          "seat": 2,
+          "mission": 5,
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "strict": true,
+          "expectedChoice": "reject",
+          "choice": "reject",
+          "passed": true,
+          "privateReason": "我改判：兩敗後，4、5仍讓第三輪成功，4又讓第四輪成功，這比5沒回答更有分量。已知邪惡的1持續支持3、反對兩支成功隊，補3風險更高。下一位4雖偏好現隊，仍可爭取改成2、4、5、6；這隊曾獲四票，5、6也仍支持。第五位1可能保留3，但現在還有協商空間。",
+          "publicReason": "",
+          "generationCalls": 1,
+          "usages": [
+            {
+              "input_tokens": 18981,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 620,
+              "reasoning_output_tokens": 221
+            }
+          ],
+          "elapsedMs": 24797
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "One sample per position per revision; revisions were sequential diagnostics, not a blinded benchmark.",
+    "The early accuser team selection is exploratory because its unknown roles do not uniquely justify one roster.",
+    "Expected rosters and model notes are never sent as verified alignment facts; no server-selected team or vote.",
+    "The roster consistency guard checks narrow explicit declarations, not arbitrary natural-language semantics.",
+    "These results do not guarantee future choices, full-game win rate or Merlin survival."
+  ]
+}

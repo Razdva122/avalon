@@ -61,6 +61,13 @@ export const coalitionAdvice =
 export const openingAdvice =
   "Opening information tradeoff: one early Reject on mission 1 can be useful even on your own roster, but name a concrete reachable alternative, what its roster or recorded votes could teach, and how that would change your next decision. Do not spend proposals merely to include yourself or rotate unknown seats. Rejection costs one proposal, may reveal no alignment and does not guarantee enough Good approvals to reach approvalsRequired. Before repeating a rejected roster, ask a named missing voter what evidence would change their vote. On proposal 4, Reject sends the fifth leader's feasible roster automatically with NO further vote; it produces no extra voting evidence before running. Compare its mission risk under tableConventions with the current roster. Never approve a proven losing roster for information. Evil judges approval and rejection by its own objective.";
 
+export const decisiveTeamAdvice =
+  'Good team risk comparison: before choosing, weigh the strongest evidence FOR and AGAINST the exact roster against one reachable alternative. Replacing a reliably Good seat, including yourself, with another unresolved seat needs distinguishing evidence for the whole roster; a mistaken argument alone does not justify that extra exposure. Self-inclusion still does not clear teammates. An information bet must name which remaining hypotheses its outcomes would distinguish and why that benefit outweighs the risk of another failure: getting another result is not itself a benefit. After a failure, a personality preference for experimentation cannot replace this comparison. ' +
+  "Read completedMissions.scoreBefore: a Success after two failures is much stronger behavioral evidence than an early Success, because passing up an immediate winning Fail is costly to Evil. It is not proof of alignment and never overrides reliable Evil knowledge. Apply that mission's failsRequired: one Evil cannot fail a two-Fail mission, so its success cannot clear every participant. Compare the risk of adding an untested suspect with retaining players from these decisive successes. " +
+  'Read votingPatterns together with the actual votes: repeated support when a candidate is present and rejection when absent is a sourced behavioral pattern, not a role revelation. If you know or strongly infer that a supporter is Evil, selective support is evidence AGAINST that candidate, especially when sabotage wins immediately; do not dismiss it merely because it is not proof. Keep privately deduced alignments separate from public testimony. ' +
+  'Unanswered questions and mistaken arguments are weak behavioral clues, not stronger than decisive mission incentives and consistent opposing votes. Reassess your leading accusation before excluding someone; personality and repeating an unanswered question do not improve its evidence. At two failures, state the decisive comparison in your private reason. ' +
+  "Check proposal.nextLeader and proposal.fifthLeader, not just the immediate next proposal. Successful missions' previous approvers are a starting coalition to negotiate with, not promised future votes; include your own changed vote when comparing support. More total supporters does not mean safer, especially if the extra support comes from suspected Evil. On early proposals, use the remaining turns to persuade a missing voter for the better-supported roster rather than accept a weaker roster merely because opponents already support it. No fixed roster or vote is required.";
+
 export const evilTeamAdvice =
   "Evil alliance secrecy: before recommending a team, selecting the final roster or voting, privately review what your actual proposals and votes reveal about links to known allies. Secret knowledge of an ally's side is not public evidence for trusting them. Compare the observed public facts distinguishing that seat from other candidates; if none exists, weigh how an unexplained preference or repeated selective support could expose both of you. Account for your earlier public position and the full sequence of choices, not just careful wording this turn. Do not invent events to justify the move or publish this private assessment. " +
   "Evil team tradeoff: an ally on the roster provides sabotage access, not an automatic reason to approve. Compare immediate Evil gain with the cost to your and your allies' cover, coalition credibility and future invitations. When the score permits and the immediate tactical benefit is small, consider another feasible roster or allowing an early Good success for a concrete later benefit. Support or oppose allies as the actual position warrants, without fixed voting patterns or forced ally rejection. A decisive sabotage or immediate Evil victory takes priority over cover and hypothetical future trust.";
@@ -198,6 +205,7 @@ export function compactRequest(request: BotRequest) {
     leaderPosition >= 0 && Number.isInteger(state.vote) && state.vote >= 0 && state.vote <= 4
       ? {
           number: state.vote + 1,
+          nextLeader: state.vote < 4 ? seats[(leaderPosition + 1) % seats.length].index : undefined,
           fifthLeader: seats[(leaderPosition + 4 - state.vote) % seats.length].index,
           rejectionsUntilForced: 4 - state.vote,
           forced: state.vote === 4,
@@ -257,6 +265,64 @@ export function compactRequest(request: BotRequest) {
             : undefined,
       },
     ];
+  });
+  const missionFacts = missions.map((mission, index) => {
+    const proposal = votes.find(
+      (vote) =>
+        vote.mission === mission.n &&
+        vote.result === 'approve' &&
+        vote.team.length === mission.team.length &&
+        vote.team.every((member) => mission.team.includes(member)),
+    );
+    return {
+      ...mission,
+      scoreBefore: {
+        successes: missions.slice(0, index).filter((previous) => previous.result === 'success').length,
+        failures: missions.slice(0, index).filter((previous) => previous.result === 'fail').length,
+      },
+      approvers:
+        proposal && !proposal.forced && Array.isArray(proposal.votes)
+          ? proposal.votes.flatMap(([voter, value]) =>
+              typeof voter === 'number' && value === 'approve' ? [voter] : [],
+            )
+          : undefined,
+    };
+  });
+  // Public behavior only: keep both denominators and contrary votes, never assign an alignment.
+  const votingPatterns = seats.flatMap(({ index: voter }) => {
+    const castVotes = votes.slice(-25).flatMap((vote) => {
+      if (vote.forced || !Array.isArray(vote.votes)) return [];
+      const value = vote.votes.find(([seat]) => seat === voter)?.[1];
+      return value === 'approve' || value === 'reject' ? [{ ...vote, value }] : [];
+    });
+    return seats.flatMap(({ index: candidate }) => {
+      if (candidate === voter) return [];
+      const counts = (included: boolean) => {
+        const group = castVotes.filter((vote) => vote.team.includes(candidate) === included);
+        return {
+          approve: group.filter((vote) => vote.value === 'approve').length,
+          reject: group.filter((vote) => vote.value === 'reject').length,
+        };
+      };
+      const withCandidate = counts(true),
+        withoutCandidate = counts(false);
+      if (
+        withCandidate.approve < 2 ||
+        withoutCandidate.reject < 2 ||
+        withCandidate.approve * (withoutCandidate.approve + withoutCandidate.reject) <=
+          withoutCandidate.approve * (withCandidate.approve + withCandidate.reject)
+      )
+        return [];
+      return [
+        {
+          voter,
+          candidate,
+          withCandidate,
+          withoutCandidate,
+          sources: castVotes.map(({ mission, attempt }) => ({ mission, attempt })),
+        },
+      ];
+    });
   });
   const checks = history.filter((e) => e.type === 'announceLoyalty');
   // Public voting facts only; a rejected proposal never inherits a later mission's result.
@@ -383,10 +449,11 @@ export function compactRequest(request: BotRequest) {
     claimStanceTargets: claims.stanceTargets,
     inspectionTarget: inspection ? seat(players.find((p) => p.features.isSelected)?.id) : undefined,
     // The first two lists are authoritative event classes, never interchangeable.
-    missions,
+    missions: missionFacts,
     votes: votes.slice(-25),
     offTeamApprovals: state.stage === 'onMission' ? undefined : offTeamApprovals,
     offTeamVotingPatterns: state.stage === 'onMission' ? undefined : offTeamVotingPatterns,
+    votingPatterns: voting ? votingPatterns : undefined,
     humanStatements: state.stage === 'onMission' ? undefined : humanStatements,
     checks: checks.map((e) => ({
       by: seat(e.announcerID),

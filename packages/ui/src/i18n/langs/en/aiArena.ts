@@ -1,4 +1,5 @@
 export default {
+  filterWithBots: 'With bots',
   setupGuestTitle: 'Sign in to start a game',
   setupGuestHint: 'Choose your settings now. Sign in to create a game and check bot availability.',
   setupNoAddons: 'No expansions',

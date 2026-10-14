@@ -1,4 +1,5 @@
 export default {
+  filterWithBots: 'Com bots',
   setupGuestTitle: 'Entre para começar a jogar',
   setupGuestHint:
     'Escolha as configurações agora. Entre para criar uma partida e verificar a disponibilidade dos bots.',

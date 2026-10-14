@@ -91,9 +91,15 @@ test('fifth proposal forecast follows seat order across wraparound, not array or
   }));
   const state = { mission: 0, vote: 2, stage: 'selectTeam', players } as unknown as VisualGameState;
   const turn = compactRequest({ ...request, playerID: 'id-1', state });
-  expect(turn.proposal).toEqual({ number: 3, fifthLeader: 1, rejectionsUntilForced: 2, forced: false });
+  expect(turn.proposal).toEqual({ number: 3, nextLeader: 7, fifthLeader: 1, rejectionsUntilForced: 2, forced: false });
   const fifth = compactRequest({ ...request, state: { ...state, vote: 4 } });
-  expect(fifth.proposal).toEqual({ number: 5, fifthLeader: 6, rejectionsUntilForced: 0, forced: true });
+  expect(fifth.proposal).toEqual({
+    number: 5,
+    nextLeader: undefined,
+    fifthLeader: 6,
+    rejectionsUntilForced: 0,
+    forced: true,
+  });
 });
 
 test('private Evil evidence and council never enter a Good players model context', () => {

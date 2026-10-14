@@ -8,6 +8,7 @@ import {
   systemFor,
   tableConversationAdvice,
   coalitionAdvice,
+  decisiveTeamAdvice,
   evilTeamAdvice,
   ladyAnnouncementAdvice,
   assassinationCheck,
@@ -43,10 +44,19 @@ export function publicContext(request: BotRequest, choice: string) {
     teamSize: c.teamSize,
     proposedTeam: c.proposedTeam,
     missionRule: c.missionRule,
-    missions: c.missions.map(({ n, leader, team, result, fails }) => ({ n, leader, team, result, fails })),
+    missions: c.missions.map(({ n, leader, team, result, fails, scoreBefore, approvers }) => ({
+      n,
+      leader,
+      team,
+      result,
+      fails,
+      scoreBefore,
+      approvers,
+    })),
     votes: c.votes,
     offTeamApprovals: c.offTeamApprovals,
     offTeamVotingPatterns: c.offTeamVotingPatterns,
+    votingPatterns: c.votingPatterns,
     checks: c.checks.map(({ by, target, announced }) => ({ by, target, announced })),
     chat: c.chat,
   };
@@ -72,17 +82,28 @@ export function safePublicSpeech(
 // Detect only an explicit selected roster, not historical teams or hypothetical alternatives.
 function contradictsRoster(request: BotRequest, reply: BotReply): boolean {
   const choice = request.choices[reply.choice];
-  if (request.state.stage !== 'selectTeam' || !choice || !/^\d+(, \d+)*$/.test(choice)) return false;
-  const stated = reply.speech.match(
-    /(?:\b(?:choosing|I choose|I propose|my (?:chosen|selected) team is)|Я (?:выбираю|предлагаю)(?: команду)?|моя (?:выбранная )?команда|我(?:選擇|提議)(?:隊伍)?)\s*[:：]?\s*\[([1-8](?:\s*[,，、]\s*[1-8])+)\]/i,
-  )?.[1];
+  if (request.state.stage !== 'selectTeam' || !choice || !/^[1-8](\s*,\s*[1-8])*$/.test(choice)) return false;
   const seats = (value: string) =>
     value
       .split(/[,，、]/)
       .map(Number)
       .sort()
       .join(',');
-  return Boolean(stated && seats(stated) !== seats(choice));
+  return [reply.speech, reply.publicReason || ''].some((text) =>
+    [
+      ...text.matchAll(
+        /(?:^|\n|[.!?。！？])\s*(?:[1-8][,，、]\s*)?(?:(?:choosing|I(?: am)? choosing|I choose|I propose|my (?:chosen|selected) team is)|Я (?:выбираю|предлагаю)(?: команду)?|моя (?:выбранная )?команда|我(?:選擇|提議|改選|建議|選)(?:隊伍)?)\s*[:：]?\s*(?:\[\s*)?([1-8](?:\s*[,，、]\s*[1-8])+)(?:\s*\])?/gi,
+      ),
+    ].some((stated) => {
+      const suffix = text.slice((stated.index || 0) + stated[0].length);
+      if (/^\s*(?:if\b|unless\b|если(?=\s|$)|的話|如果|若|除非)/i.test(suffix)) return false;
+      const declared = seats(stated[1]);
+      // A partial conjunction or trailing address is ambiguous unless the list is bracketed.
+      if (!stated[0].trimEnd().endsWith(']') && declared.split(',').length !== seats(choice).split(',').length)
+        return false;
+      return declared !== seats(choice);
+    }),
+  );
 }
 
 export function reviewContext(request: BotRequest) {
@@ -197,6 +218,7 @@ export function decisionInstructions(request: BotRequest) {
     ' ' +
     strategy +
     ' ' +
+    (['selectTeam', 'votingForTeam'].includes(request.state.stage) ? decisiveTeamAdvice + ' ' : '') +
     turn +
     ' Return JSON choice, speech (private reason, <=240 characters), publicReason (your actual public words, <=240 characters), evidence (at most 3 changed notes with key/kind/fact/source/certainty). Use claim certainty for hypotheses and testimony, bluff for deliberate deception. No unchanged evidence dump. Public words are published directly, without a rewrite or added sentences. Silence is allowed during the full public circle; the sole leader on a repeat proposal must explain their roster.'
   );
@@ -297,7 +319,7 @@ export function decisionPipeline(generate: Generate): Decide {
               claimInstructions +
               (missingExplanation
                 ? ' Your public explanation was empty. Return one legal choice and a nonempty publicReason addressing another seat and explaining that exact roster from public evidence. Finish now.'
-                : ' Your previous choice and explicitly selected roster in speech disagree. Reconsider using the same facts; return one legal choice with a matching explanation. You may correct either the choice or explanation. Finish now.'),
+                : ' Your previous choice and explicitly selected roster in speech or publicReason disagree. Reconsider using the same facts; return one legal choice with matching private and public explanations. You may correct either the choice or explanations. Finish now.'),
             context: {
               ...current,
               completedMissions: missions,
