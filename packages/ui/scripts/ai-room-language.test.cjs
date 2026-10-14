@@ -43,6 +43,7 @@ const messages = Object.fromEntries(
         id === '../../suggestions' ? suggestions : require(id),
       ).default,
       ...evaluate(fs.readFileSync(path.join(__dirname, `../src/i18n/langs/${locale}/roles.ts`), 'utf8')).default,
+      ...evaluate(fs.readFileSync(path.join(__dirname, `../src/i18n/langs/${locale}/addons.ts`), 'utf8')).default,
       wikiPlay: evaluate(fs.readFileSync(path.join(__dirname, '../src/i18n/langs/pages/wikiPlay.ts'), 'utf8')).wikiPlay[
         locale.replace('_', '-')
       ],
@@ -1768,4 +1769,173 @@ test('AI button forwards setup failures through its existing error event', async
   assert.equal(typeof setup.props.onError, 'function');
   setup.props.onError('localized failure');
   assert.ok(room.emitted.some(([event, message]) => event === 'error' && message === 'localized failure'));
+});
+
+test('friends can reserve every seat except one and shrink to a valid roster', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true, withFriend: true },
+    locale: 'ru',
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      canPlayLargeTables: vue.ref(true),
+      botModes: vue.ref({ regular: true, smart: true }),
+    },
+  });
+  t.after(room.stop);
+  room
+    .nodes('button')
+    .find((node) => node.props['data-player-count'] === 8)
+    .props.onClick();
+  await room.render();
+  const select = () => room.nodes('select').find((node) => 'data-human-seats' in node.props);
+  assert.deepEqual(
+    room.nodes('option').map((node) => node.props.value),
+    [2, 3, 4, 5, 6, 7],
+  );
+  select().props['onUpdate:modelValue'](7);
+  assert.match(await room.render(), /Игроков: 7 · Ботов: 1/);
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-create-bot-game' in node.props)
+    .props.onClick();
+  assert.equal(room.sent[0][1].humanSeats, 7);
+  room
+    .nodes('button')
+    .find((node) => node.props['data-player-count'] === 5)
+    .props.onClick();
+  await room.render();
+  assert.deepEqual(
+    room.nodes('option').map((node) => node.props.value),
+    [2, 3, 4],
+  );
+  assert.match(await room.render(), /Игроков: 4 · Ботов: 1/);
+});
+
+test('table preview shows exact role counts and updates with table size', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    accessOverrides: { canPlayLargeTables: vue.ref(true) },
+  });
+  t.after(room.stop);
+  const roles = () =>
+    room
+      .nodes('span')
+      .filter((node) => node.props && 'data-table-role' in node.props)
+      .map((node) => [node.props['data-table-role'], node.props['data-role-count']]);
+  assert.deepEqual(roles(), [
+    ['merlin', 1],
+    ['percival', 1],
+    ['servant', 1],
+    ['mordred', 1],
+    ['morgana', 1],
+  ]);
+  room
+    .nodes('button')
+    .find((node) => node.props['data-player-count'] === 8)
+    .props.onClick();
+  await room.render();
+  assert.deepEqual(roles(), [
+    ['merlin', 1],
+    ['percival', 1],
+    ['servant', 3],
+    ['mordred', 1],
+    ['morgana', 1],
+    ['minion', 1],
+  ]);
+});
+
+test('switching first game to friends selects a playable standard mode', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true, beginner: true },
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true, smart: true, beginner: true }) },
+  });
+  t.after(room.stop);
+  room
+    .nodes('button')
+    .find((node) => node.props['aria-pressed'] === false)
+    .props.onClick();
+  await room.render();
+  const create = room.nodes('v-btn').find((node) => 'data-create-bot-game' in node.props);
+  assert.equal(create.props.disabled, false);
+  await create.props.onClick();
+  assert.equal(room.sent[0][1].beginner, false);
+});
+
+test('setup preview shows Lady of the Lake only for seven and eight seats', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    accessOverrides: { canPlayLargeTables: vue.ref(true) },
+  });
+  t.after(room.stop);
+  for (const count of [5, 6, 7, 8, 5]) {
+    room
+      .nodes('button')
+      .find((node) => node.props['data-player-count'] === count)
+      .props.onClick();
+    const html = await room.render();
+    assert.match(html, /Дополнения/);
+    if (count >= 7) {
+      assert.match(html, /Леди озера/);
+      assert.doesNotMatch(html, /Без дополнений/);
+    } else {
+      assert.match(html, /Без дополнений/);
+      assert.doesNotMatch(html, /Леди озера/);
+    }
+  }
+});
+
+test('guest setup explains authentication and lets visitors choose difficulty before signing in', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    locale: 'ru',
+    profile: null,
+  });
+  t.after(room.stop);
+  assert.match(room.html, /Настройки можно выбрать заранее/);
+  for (const mode of ['regular', 'smart', 'beginner']) {
+    assert.equal(room.nodes('input').find((node) => node.props.value === mode).props.disabled, false);
+  }
+  room
+    .nodes('input')
+    .find((node) => node.props.value === 'smart')
+    .props['onUpdate:modelValue']('smart');
+  await room.render();
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-create-bot-game' in node.props)
+    .props.onClick();
+  assert.deepEqual(room.sent, []);
+  assert.equal(room.notifications[0][0], 'openAuthModal');
+});
+
+test('first game hides larger tables and restores them when changing difficulty', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    profile: null,
+  });
+  t.after(room.stop);
+  const counts = () =>
+    room
+      .nodes('button')
+      .filter((node) => node.props?.['data-player-count'])
+      .map((node) => node.props['data-player-count']);
+  room
+    .nodes('button')
+    .find((node) => node.props['data-player-count'] === 6)
+    .props.onClick();
+  room
+    .nodes('input')
+    .find((node) => node.props.value === 'beginner')
+    .props['onUpdate:modelValue']('beginner');
+  await room.render();
+  assert.deepEqual(counts(), [5]);
+  assert.equal(room.nodes('button').find((node) => node.props['data-player-count'] === 5).props['aria-pressed'], true);
+  room
+    .nodes('input')
+    .find((node) => node.props.value === 'regular')
+    .props['onUpdate:modelValue']('regular');
+  await room.render();
+  assert.deepEqual(counts(), [5, 6, 7, 8]);
 });

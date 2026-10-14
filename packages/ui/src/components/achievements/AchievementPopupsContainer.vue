@@ -4,10 +4,8 @@
       <achievement-popup
         v-for="popup in popups"
         :key="popup.id"
-        :achievementID="popup.achievementID"
+        :achievementIDs="popup.achievementIDs"
         :stickerIDs="popup.stickerIDs"
-        :type="popup.type"
-        :progress="popup.progress"
         @close="closePopup(popup.id)"
       />
     </transition-group>
@@ -16,7 +14,6 @@
 
 <script lang="ts">
 import { defineAsyncComponent, defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
-import type { AchievementProgress } from './AchievementPopup.vue';
 import { socket } from '@/api/socket';
 import { store } from '@/store';
 import { useStickers } from '@/helpers/composables/useStickers';
@@ -25,10 +22,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 export interface AchievementData {
   id: string;
-  type: 'unlocked' | 'progress';
-  achievementID?: string;
-  stickerIDs?: string[];
-  progress?: AchievementProgress;
+  achievementIDs: string[];
+  stickerIDs: string[];
 }
 
 export default defineComponent({
@@ -38,9 +33,9 @@ export default defineComponent({
   },
   setup() {
     const popups = ref<AchievementData[]>([]);
-    const { collection } = useStickers();
-    // Dismissal only hides this session's notice. New badges persist on the server.
-    const announced = new Set<string>();
+    const { unlocked } = useStickers();
+    const announcedStickers = new Set<string>();
+    const announcedAchievements = new Set<string>();
     const closePopup = (id: string) => {
       popups.value = popups.value.filter((popup) => popup.id !== id);
     };
@@ -48,54 +43,34 @@ export default defineComponent({
       () => store.state.profile?.id,
       () => {
         popups.value = [];
-        announced.clear();
+        announcedStickers.clear();
+        announcedAchievements.clear();
       },
+      { flush: 'sync' },
     );
-    watch(
-      collection,
-      (value) => {
-        if (!value) return;
-        const stickerIDs = value.stickers
-          .filter((s) => s.available && s.isNew && !announced.has(s.id))
-          .map((s) => s.id);
-        if (!stickerIDs.length) return;
-        stickerIDs.forEach((id) => announced.add(id));
-        const existing = popups.value.find((p) => p.stickerIDs);
-        if (existing) existing.stickerIDs!.push(...stickerIDs);
-        else popups.value.push({ id: uuidv4(), type: 'unlocked', stickerIDs });
-      },
-      { immediate: true },
-    );
-    const handleAchievementUnlocked = (achievementID: string) => {
-      // An achievement's own card already contains its sticker reward.
-      const stickerIDs = STICKERS.filter((s) => s.achievement === achievementID).map((s) => s.id);
-      stickerIDs.forEach((id) => announced.add(id));
-      for (const popup of popups.value) {
-        if (popup.stickerIDs) popup.stickerIDs = popup.stickerIDs.filter((id) => !stickerIDs.includes(id));
-      }
-      popups.value = popups.value.filter((p) =>
-        p.stickerIDs ? p.stickerIDs.length : p.achievementID !== achievementID,
-      );
-      popups.value.push({ id: uuidv4(), achievementID, type: 'unlocked' });
+    const addRewards = (achievementIDs: string[], stickerIDs: string[]) => {
+      if (!store.state.profile?.id) return;
+      const achievements = achievementIDs.filter((id) => !announcedAchievements.has(id));
+      const stickers = stickerIDs.filter((id) => !announcedStickers.has(id));
+      if (!achievements.length && !stickers.length) return;
+      achievements.forEach((id) => announcedAchievements.add(id));
+      stickers.forEach((id) => announcedStickers.add(id));
+      const existing = popups.value[0];
+      if (existing) {
+        existing.achievementIDs.push(...achievements);
+        existing.stickerIDs.push(...stickers);
+      } else popups.value.push({ id: uuidv4(), achievementIDs: achievements, stickerIDs: stickers });
     };
-    const handleAchievementProgress = (data: {
-      achievementID: string;
-      currentProgress: number;
-      requirement: number;
-    }) => {
-      if (popups.value.some((p) => p.achievementID === data.achievementID && p.type === 'unlocked')) return;
-      const progress = { currentValue: data.currentProgress, maxValue: data.requirement };
-      const existing = popups.value.find((p) => p.achievementID === data.achievementID);
-      if (existing) existing.progress = progress;
-      else popups.value.push({ id: uuidv4(), achievementID: data.achievementID, type: 'progress', progress });
+    watch(unlocked, (ids) => addRewards([], ids));
+    const handleAchievementUnlocked = (achievementID: string) => {
+      const stickerIDs = STICKERS.filter((s) => s.achievement === achievementID).map((s) => s.id);
+      addRewards([achievementID], stickerIDs);
     };
     onMounted(() => {
       socket.on('achievementUnlocked', handleAchievementUnlocked);
-      socket.on('achievementProgress', handleAchievementProgress);
     });
     onUnmounted(() => {
       socket.off('achievementUnlocked', handleAchievementUnlocked);
-      socket.off('achievementProgress', handleAchievementProgress);
     });
     return { popups, closePopup };
   },

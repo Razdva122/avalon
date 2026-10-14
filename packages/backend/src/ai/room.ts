@@ -157,6 +157,8 @@ export class BotRoom extends Room {
   setPlayerCount(playerCount: AiPlayerCount): void {
     if (this.ai!.status !== 'ready' || this.data.stage !== 'locked' || ![5, 6, 7, 8].includes(playerCount))
       throw Error('Table size can only be changed before launch');
+    if (this.ai!.withFriend && (this.ai!.humanSeats ?? 2) >= playerCount)
+      throw Error('At least one bot seat is required');
     if (this.ai!.beginner && playerCount !== 5) throw Error('Beginner tables require five players');
     if (this.selectedHumanRole && !aiHumanRoles(playerCount).includes(this.selectedHumanRole))
       throw Error('Selected solo role is unavailable at this table size');

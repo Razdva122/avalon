@@ -1,4 +1,12 @@
 export default {
+  setupGuestTitle: 'Inicia sesión para empezar',
+  setupGuestHint:
+    'Elige los ajustes ahora. Inicia sesión para crear una partida y comprobar la disponibilidad de los bots.',
+  setupNoAddons: 'Sin expansiones',
+  setupTableRoles: 'Roles de la mesa',
+  setupGood: 'Bien',
+  setupEvil: 'Mal',
+  setupDetails: 'Acerca de estos ajustes',
   selectRole: 'Tu rol',
   randomRole: 'Rol aleatorio',
   endMatch: 'Finalizar partida',

@@ -8,7 +8,7 @@
           icon
           :class="{ 'sticker-trigger-open': open }"
           variant="text"
-          :aria-label="newCount ? $t('cosmeticRewards.openWithNew', { count: newCount }) : $t('stickers.title')"
+          :aria-label="$t('stickers.title')"
           :title="$t('stickers.title')"
           color="text-primary"
         >
@@ -30,7 +30,6 @@
             <circle cx="15.5" cy="9" r="1" fill="currentColor" stroke="none" />
             <path d="M8 13a4 4 0 0 0 5 2" />
           </svg>
-          <span v-if="newCount" class="new-count" aria-hidden="true">{{ newCount }}</span>
         </v-btn>
       </template>
       <v-card class="picker" rounded="lg">
@@ -105,7 +104,7 @@ import StickerImage from './StickerImage.vue';
 import StickerCollection from './StickerCollection.vue';
 const props = defineProps<{ roomID: string }>();
 const emit = defineEmits<{ (event: 'hideOnBoard', value: boolean): void }>();
-const { collection, load, loading, error, newCount, markSeen } = useStickers();
+const { collection, load, loading, error } = useStickers();
 const open = ref(false),
   showCollection = ref(false),
   sending = ref(false),
@@ -152,7 +151,6 @@ const send = async (id: string) => {
     if (result === true) {
       open.value = false;
       startCooldown(STICKER_COOLDOWN_MS);
-      void markSeen([id]);
     } else {
       sendError.value = result.error;
       if (result.retryAfter) startCooldown(result.retryAfter);
@@ -237,19 +235,5 @@ onUnmounted(() => {
   font-size: 12px;
   text-align: center;
   padding: 8px;
-}
-.new-count {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 4px;
-  border-radius: 9px;
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
-  font-size: 11px;
-  line-height: 18px;
-  font-weight: 700;
 }
 </style>

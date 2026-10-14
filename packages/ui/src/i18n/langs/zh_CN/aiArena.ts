@@ -1,4 +1,11 @@
 export default {
+  setupGuestTitle: '登录后开始游戏',
+  setupGuestHint: '可以先选择设置。登录后即可检查机器人是否可用并创建游戏。',
+  setupNoAddons: '无扩展',
+  setupTableRoles: '本局角色',
+  setupGood: '正义',
+  setupEvil: '邪恶',
+  setupDetails: '设置说明',
   selectRole: '你的角色',
   randomRole: '随机角色',
   endMatch: '结束对局',

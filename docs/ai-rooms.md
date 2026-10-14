@@ -2,13 +2,13 @@
 
 [Documentation index](README.md) · [Production configuration](../deploy/ai-production.md)
 
-AI rooms support public matches with one, two or three humans and the remaining
+AI rooms support public matches with one to seven humans and the remaining
 seats filled by bots, and administrator spectator games with 5–8 bots.
 “Play with AI” stays visible and clickable in the lobby, including for guests,
 while checking access, and when every bot mode is unavailable. It opens a setup
 dialog before reserving a room. Owners of an existing match return to that room.
 
-Setup offers Solo / With friends, with a choice of 2 or 3 human players including
+Setup offers Solo / With friends, with a choice of 2 to one fewer than the total seats, including
 the owner, regular bots, stronger opponents, and a compact
 solo-only First game option. The discussion language defaults to the supported
 interface language or English. Total seats are 5, 6, 7 or 8; 7/8 display Premium

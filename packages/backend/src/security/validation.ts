@@ -85,7 +85,6 @@ const acknowledgements: Record<string, number> = {
   getMatchTrueSkillChanges: 1,
   resetTrueSkillRating: 1,
   updateUserAvatar: 1,
-  markStickersSeen: 1,
   getAiSpectatorRoles: 1,
   createAiRoom: 1,
   createHumanAiRoom: 0,
@@ -115,7 +114,6 @@ const nonIDs = new Set([
   'updateUserName',
   'updateUserAvatar',
   'updateStickerPreferences',
-  'markStickersSeen',
   'createAiRoom',
   'createHumanAiRoom',
   'getPopularRoles',
@@ -172,7 +170,11 @@ export function validPacket(event: string, args: unknown[]): boolean {
             aiHumanRoles((values[0].playerCount ?? 5) as AiPlayerCount).includes(values[0].role as AiHumanRole))) &&
         (values[0].withFriend === undefined || typeof values[0].withFriend === 'boolean') &&
         (values[0].humanSeats === undefined ||
-          (values[0].withFriend === true && [2, 3].includes(values[0].humanSeats as number))) &&
+          (values[0].withFriend === true &&
+            typeof values[0].humanSeats === 'number' &&
+            Number.isInteger(values[0].humanSeats) &&
+            values[0].humanSeats >= 2 &&
+            values[0].humanSeats < ((values[0].playerCount ?? 5) as number))) &&
         (values[0].difficulty === undefined || ['regular', 'smart'].includes(values[0].difficulty as string)) &&
         (values[0].language === undefined || ['en', 'ru', 'zh-tw'].includes(values[0].language as string)) &&
         (values[0].playerCount === undefined || [5, 6, 7, 8].includes(values[0].playerCount as number)) &&
@@ -242,12 +244,9 @@ export function validPacket(event: string, args: unknown[]): boolean {
       safeOptions(options)
     );
   }
-  if (event === 'markStickersSeen' || event === 'updateStickerPreferences') {
+  if (event === 'updateStickerPreferences') {
     return (
-      Array.isArray(values[0]) &&
-      values[0].length <= 12 &&
-      values[0].every(validID) &&
-      (event !== 'updateStickerPreferences' || typeof values[1] === 'boolean')
+      Array.isArray(values[0]) && values[0].length <= 12 && values[0].every(validID) && typeof values[1] === 'boolean'
     );
   }
   if (event === 'sendMessage')

@@ -73,7 +73,6 @@ export interface ClientToServerUserEvents {
   leaveVoice: (sessionID: string, cb: (result: true | VoiceError) => void) => void;
   getMyStickers: (cb: (result: StickerResponse) => void) => void;
   updateStickerPreferences: (favorites: string[], hideOnBoard: boolean, cb: (result: StickerResponse) => void) => void;
-  markStickersSeen: (ids: string[], cb: (result: true | StickerError) => void) => void;
   sendSticker: (roomID: string, stickerID: string, cb: (result: true | StickerError) => void) => void;
   registerUser: (
     user: Omit<UserProfile, 'avatar' | 'registrationDate'>,
@@ -174,7 +173,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
         beginner: boolean;
         role?: import('../room/ai-roles').AiHumanRole;
         withFriend?: boolean;
-        humanSeats?: 2 | 3;
+        humanSeats?: number;
         difficulty?: AiBotDifficulty;
         language?: AiLanguage;
         playerCount?: AiPlayerCount;

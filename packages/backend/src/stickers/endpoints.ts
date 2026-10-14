@@ -24,18 +24,6 @@ export function registerStickerEndpoints(
       cb({ error: 'failed' });
     }
   });
-  socket.on('markStickersSeen', async (ids, cb) => {
-    try {
-      if (!Array.isArray(ids) || ids.length > 12 || ids.some((id) => typeof id !== 'string')) {
-        cb({ error: 'invalid' });
-        return;
-      }
-      await manager.seen(userID, ids);
-      cb(true);
-    } catch {
-      cb({ error: 'failed' });
-    }
-  });
   socket.on('sendSticker', async (uuid, stickerID, cb) => {
     const allowed = () => socket.connected !== false && socket.rooms.has(roomChannel(uuid));
     if (!validID(uuid) || !allowed()) {

@@ -18,7 +18,7 @@
           </div>
           <nav class="lobby-links" :aria-label="$t('menu.wiki')">
             <LocaleLink :to="{ name: 'rules' }"
-              ><span class="link-label">{{ $t('wiki.rules') }}</span
+              ><span class="link-label">{{ $t('mainPage.rulesLink') }}</span
               ><span aria-hidden="true">↗</span></LocaleLink
             >
             <LocaleLink :to="{ name: 'roles' }"
@@ -135,7 +135,7 @@
           <h2 id="lobby-guide-title">{{ $t('mainPage.newPlayerTitle') }}</h2>
           <p>{{ $t('mainPage.gameplaySummary') }}</p>
           <nav class="lobby-links" :aria-label="$t('menu.wiki')">
-            <LocaleLink :to="{ name: 'rules' }">{{ $t('wiki.rules') }}</LocaleLink>
+            <LocaleLink :to="{ name: 'rules' }">{{ $t('mainPage.rulesLink') }}</LocaleLink>
             <LocaleLink :to="{ name: 'roles' }">{{ $t('wiki.roles') }}</LocaleLink>
           </nav>
         </div>

@@ -1,4 +1,11 @@
 export default {
+  setupGuestTitle: '登入後開始遊戲',
+  setupGuestHint: '可以先選擇設定。登入後即可檢查機器人是否可用並建立遊戲。',
+  setupNoAddons: '無擴充',
+  setupTableRoles: '本局角色',
+  setupGood: '正義',
+  setupEvil: '邪惡',
+  setupDetails: '設定說明',
   selectRole: '你的角色',
   randomRole: '隨機角色',
   endMatch: '結束對局',

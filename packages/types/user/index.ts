@@ -90,9 +90,6 @@ export class UserFeatures {
   @prop({ type: () => [String], default: undefined })
   public favoriteStickers?: string[];
 
-  @prop({ type: () => [String], default: [] })
-  public seenStickers?: string[];
-
   @prop({ default: false })
   public hideStickersOnBoard?: boolean;
 

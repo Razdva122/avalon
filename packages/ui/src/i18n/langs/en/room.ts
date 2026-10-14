@@ -9,7 +9,8 @@ export default {
     restartGame: 'Restart game',
   },
   mainPage: {
-    newPlayerTitle: 'New to Avalon?',
+    newPlayerTitle: 'What is The Resistance: Avalon?',
+    rulesLink: 'How to play Avalon',
     gameplaySummary:
       'Avalon is a social deduction board game with secret roles. Discuss whom to trust, vote on quest teams, and keep your identity hidden. Good tries to complete three quests; Evil tries to sabotage them or identify Merlin.',
     guideTitle: 'How to start a game with friends',
@@ -57,7 +58,7 @@ export default {
 
     header: 'Play Avalon Online',
     intro:
-      'Play The Resistance: Avalon board game online for free with 5–10 friends. Sign in, create a room, and share the link. Play in your browser on mobile or desktop. No app installation needed.',
+      'Play The Resistance: Avalon board game in your browser. Games with 5–10 human players are free. Play with bots on your own or with friends; access depends on the selected mode.',
     createRoom: 'Create room',
     watch: 'Watch',
     join: 'Join',

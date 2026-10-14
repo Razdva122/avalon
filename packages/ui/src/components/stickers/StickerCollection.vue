@@ -72,7 +72,6 @@
           class="sticker-card"
           :class="{ locked: !sticker.available }"
         >
-          <span v-if="sticker.isNew" class="new-badge">{{ $t('stickers.new') }}</span>
           <span v-if="isPremium(sticker.id)" class="premium-label">Premium</span>
           <div class="art">
             <span v-if="secret(sticker.id, sticker.available)" class="secret-art">?</span
@@ -121,31 +120,13 @@
           <span v-else-if="!sticker.available" class="locked-label"
             ><span class="material-icons">lock</span>{{ $t('stickers.locked') }}</span
           >
-          <v-btn
-            v-if="sticker.isNew"
-            variant="text"
-            size="small"
-            color="primary"
-            class="seen-button"
-            @click="viewStickers([sticker.id])"
-            >{{ $t('cosmeticRewards.markOneSeen') }}</v-btn
-          >
         </article>
       </div>
-      <v-btn
-        v-if="collection.stickers.some((s) => s.isNew)"
-        variant="text"
-        color="text-primary"
-        class="mt-3"
-        @click="viewStickers(collection.stickers.filter((s) => s.isNew).map((s) => s.id))"
-        >{{ $t('stickers.markSeen') }}</v-btn
-      >
-      <p v-if="seenError" class="hint text-error" role="alert">{{ $t('stickers.failed') }}</p>
     </template>
   </section>
 </template>
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { STICKERS, STICKER_FAVORITES_LIMIT } from '@avalon/types/user/stickers';
 import { useI18n } from 'vue-i18n';
 import { useStickers } from '@/helpers/composables/useStickers';
@@ -153,20 +134,13 @@ import StickerImage from './StickerImage.vue';
 defineProps<{ selectable?: boolean }>();
 defineEmits<{ (event: 'send', id: string): void }>();
 const { t } = useI18n();
-const { collection, loading, error, busy, load, save, markSeen } = useStickers();
-const seenError = ref(false);
+const { collection, loading, error, busy, load, save } = useStickers();
 onMounted(load);
-const viewStickers = async (ids: string[]) => {
-  seenError.value = !(await markSeen(ids));
-};
 const secret = (id: string, available: boolean) => !available && STICKERS.find((s) => s.id === id)?.hidden;
 const isPremium = (id: string) => STICKERS.find((s) => s.id === id)?.premium;
 const sortedStickers = computed(() =>
   [...(collection.value?.stickers ?? [])].sort(
-    (a, b) =>
-      Number(b.available && b.isNew) - Number(a.available && a.isNew) ||
-      Number(b.available) - Number(a.available) ||
-      Number(!!isPremium(a.id)) - Number(!!isPremium(b.id)),
+    (a, b) => Number(b.available) - Number(a.available) || Number(!!isPremium(a.id)) - Number(!!isPremium(b.id)),
   ),
 );
 const requirement = (id: string, available: boolean) => {
@@ -181,9 +155,7 @@ const toggle = async (id: string) => {
   if (!collection.value) return;
   const favorites = collection.value.favorites;
   const adding = !favorites.includes(id);
-  if (await save(adding ? [...favorites, id] : favorites.filter((s) => s !== id))) {
-    if (adding) await viewStickers([id]);
-  }
+  await save(adding ? [...favorites, id] : favorites.filter((s) => s !== id));
 };
 const move = (index: number, direction: number) => {
   if (!collection.value) return;
@@ -278,8 +250,7 @@ h3 small {
   min-height: 38px;
   margin: 8px 0;
 }
-.favorite-button,
-.seen-button {
+.favorite-button {
   height: auto;
   min-height: 40px;
   max-width: 100%;
@@ -287,8 +258,7 @@ h3 small {
   text-transform: none;
   letter-spacing: normal;
 }
-.favorite-button :deep(.v-btn__content),
-.seen-button :deep(.v-btn__content) {
+.favorite-button :deep(.v-btn__content) {
   white-space: normal;
 }
 .favorite-button,
@@ -314,13 +284,6 @@ h3 small {
   font-size: 70px;
   color: rgb(var(--v-theme-primary));
   opacity: 0.35;
-}
-.new-badge {
-  position: absolute;
-  right: 8px;
-  top: 8px;
-  font-size: 10px;
-  color: rgb(var(--v-theme-primary));
 }
 .premium-label {
   align-self: flex-start;

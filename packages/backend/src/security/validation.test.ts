@@ -157,11 +157,11 @@ test.each([
   ).toBe(false);
 });
 
-test.each([2, 3])('friends setup accepts %i human seats', (humanSeats) => {
+test.each([2, 3, 4])('friends setup accepts %i human seats', (humanSeats) => {
   expect(validPacket('createHumanAiRoom', [{ beginner: false, withFriend: true, humanSeats }, () => {}])).toBe(true);
 });
 
-test.each([0, 1, 4, '3', null])('friends setup rejects invalid human seats %j', (humanSeats) => {
+test.each([0, 1, 5, 2.5, '3', null])('friends setup rejects invalid human seats %j', (humanSeats) => {
   expect(validPacket('createHumanAiRoom', [{ beginner: false, withFriend: true, humanSeats }, () => {}])).toBe(false);
 });
 

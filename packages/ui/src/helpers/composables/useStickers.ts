@@ -3,6 +3,7 @@ import { createSharedComposable } from '@vueuse/core';
 import { store } from '@/store';
 import { socket } from '@/api/socket';
 import type { StickerCollection } from '@avalon/types';
+import { STICKERS } from '@avalon/types/user/stickers';
 
 export const useStickers = createSharedComposable(() => {
   const collection = ref<StickerCollection>();
@@ -12,11 +13,21 @@ export const useStickers = createSharedComposable(() => {
   let request = 0;
   let account = 0;
   let disposed = false;
-  const seen = new Set<string>();
+  const unlocked = ref<string[]>([]);
+  let knownAvailable: Set<string> | undefined;
+  let pendingRewards = false;
   const applyCollection = (result: StickerCollection) => {
-    result.stickers.forEach((s) => {
-      if (seen.has(s.id)) s.isNew = false;
-    });
+    const available = result.stickers.filter((s) => s.available).map((s) => s.id);
+    if (pendingRewards && knownAvailable) {
+      const previous = knownAvailable;
+      const gained = available.filter((id) => {
+        const sticker = STICKERS.find((s) => s.id === id);
+        return !previous.has(id) && !!(sticker?.games || sticker?.achievement);
+      });
+      if (gained.length) unlocked.value = gained;
+    }
+    pendingRewards = false;
+    knownAvailable = new Set(available);
     collection.value = result;
   };
   const userID = computed(() => store.state.profile?.id);
@@ -46,17 +57,23 @@ export const useStickers = createSharedComposable(() => {
   const save = async (favorites: string[], hideOnBoard = collection.value?.hideOnBoard || false) => {
     if (busy.value || !userID.value) return;
     const owner = account;
-    request++;
+    const version = ++request;
     loading.value = false;
     busy.value = true;
     try {
       const result = await socket.timeout(10000).emitWithAck('updateStickerPreferences', favorites, hideOnBoard);
       if (disposed || account !== owner) return false;
-      request++;
-      loading.value = false;
+      const refreshed = version !== request;
       if ('error' in result) error.value = result.error;
       else {
-        applyCollection(result);
+        request++;
+        loading.value = false;
+        if (refreshed) {
+          // A save response can predate a game update. Preserve the reward baseline.
+          if (collection.value)
+            collection.value = { ...collection.value, favorites: result.favorites, hideOnBoard: result.hideOnBoard };
+          void load();
+        } else applyCollection(result);
         error.value = '';
         return true;
       }
@@ -67,32 +84,13 @@ export const useStickers = createSharedComposable(() => {
     }
     return false;
   };
-  const markSeen = async (ids: string[]) => {
-    const owner = account;
-    if (!userID.value) return false;
-    try {
-      // The endpoint accepts up to twelve IDs per request.
-      for (let offset = 0; offset < ids.length; offset += 12) {
-        const batch = ids.slice(offset, offset + 12);
-        const result = await socket.timeout(10000).emitWithAck('markStickersSeen', batch);
-        if (disposed || owner !== account || result !== true) return false;
-        batch.forEach((id) => seen.add(id));
-        if (collection.value)
-          collection.value.stickers.forEach((s) => {
-            if (batch.includes(s.id)) s.isNew = false;
-          });
-      }
-      return true;
-    } catch {
-      /* New badges remain available on retry. */
-      return false;
-    }
-  };
   watch(
     userID,
     () => {
       account++;
-      seen.clear();
+      knownAvailable = undefined;
+      pendingRewards = false;
+      unlocked.value = [];
       collection.value = undefined;
       error.value = '';
       busy.value = false;
@@ -100,16 +98,25 @@ export const useStickers = createSharedComposable(() => {
     },
     { immediate: true, flush: 'sync' },
   );
-  socket.on('stickersUpdated', load);
-  socket.on('achievementUnlocked', load);
-  socket.on('connect', load);
+  const refreshRewards = () => {
+    pendingRewards = !!knownAvailable;
+    void load();
+  };
+  const reconnect = () => {
+    knownAvailable = undefined;
+    pendingRewards = false;
+    unlocked.value = [];
+    void load();
+  };
+  socket.on('stickersUpdated', refreshRewards);
+  socket.on('achievementUnlocked', refreshRewards);
+  socket.on('connect', reconnect);
   onScopeDispose(() => {
     disposed = true;
     request++;
-    socket.off('stickersUpdated', load);
-    socket.off('achievementUnlocked', load);
-    socket.off('connect', load);
+    socket.off('stickersUpdated', refreshRewards);
+    socket.off('achievementUnlocked', refreshRewards);
+    socket.off('connect', reconnect);
   });
-  const newCount = computed(() => collection.value?.stickers.filter((s) => s.available && s.isNew).length || 0);
-  return { collection, loading, error, busy, newCount, load, save, markSeen };
+  return { collection, loading, error, busy, unlocked, load, save };
 });

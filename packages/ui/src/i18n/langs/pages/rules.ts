@@ -28,7 +28,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     title: 'Regras de Avalon: como jogar com 5–10 jogadores',
     gameObjective: 'Objetivo do Jogo',
     gameDescription:
-      'Avalon: The Resistance é um jogo de tabuleiro estratégico onde os jogadores são encarregados de completar uma série de missões enquanto lidam com traidores ocultos conhecidos como Servos de Mordred. O jogo é ambientado no mundo lendário do Rei Arthur e os Cavaleiros da Távola Redonda.',
+      'The Resistance: Avalon é um jogo de tabuleiro de dedução social para 5–10 pessoas. Aprenda a jogar em quatro passos e consulte os papéis, as votações, a tabela de missões e o assassinato de Merlin. As diferenças entre o jogo original e esta plataforma são explicadas separadamente.',
     gameplayRules: 'Regras de Jogo',
     teamProposalAndVoting: 'Proposta de Equipe e Votação',
     teamProposalDescription:
@@ -133,10 +133,10 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     mordredTeam: 'Minions of Mordred:',
     expansions: 'Expansions:',
     note: 'Note: ',
-    title: 'Avalon Rules: How to Play The Resistance: Avalon',
+    title: 'Avalon Board Game Rules: How to Play',
     gameObjective: 'Game Objective',
     gameDescription:
-      'The Resistance: Avalon is a social deduction board game for 5–10 players with secret good and evil roles. Players discuss a proposed mission team, vote to approve or reject it, then the chosen team submits mission cards in secret. This guide covers setup, voting, mission sizes and winning, with the differences between the original board game and this online platform explained above.',
+      'The Resistance: Avalon is a social deduction board game for 5–10 players. Learn how to play in four steps, then check role setup, team voting, the mission-size table and Merlin assassination. Differences between the original board game and this platform are explained separately.',
     gameplayRules: 'Gameplay Rules',
     teamProposalAndVoting: 'Team Proposal and Voting',
     teamProposalDescription:
@@ -243,7 +243,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     title: 'Правила Авалона: как играть в компании от 5 до 10 человек',
     gameObjective: 'Цель игры',
     gameDescription:
-      '«Сопротивление: Авалон» (The Resistance: Avalon) — настольная игра на социальную дедукцию для 5–10 человек с тайными ролями добра и зла. Лидер предлагает команду, все голосуют, а её участники тайно разыгрывают карты миссии. Ниже — правила игры в Авалон, таблица миссий и составы ролей; отличия онлайн-платформы от настольного оригинала указаны выше.',
+      '«Сопротивление: Авалон» (The Resistance: Avalon) — настольная игра на социальную дедукцию для 5–10 человек. Изучите четыре шага игры, затем сверьтесь с составами ролей, голосованием, таблицей походов и правилами покушения на Мерлина. Отличия платформы от настольного оригинала разобраны отдельно.',
     gameplayRules: 'Правила Игры',
     teamProposalAndVoting: 'Предложение Команды и Голосование',
     teamProposalDescription:
@@ -345,7 +345,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     title: '阿瓦隆规则与玩法：5–10 人新手指南',
     gameObjective: '游戏目标',
     gameDescription:
-      '阿瓦隆: 抵抗 是一款战略桌游，玩家需要在与隐藏的叛徒——莫德雷德的爪牙作斗争的同时完成一系列的任务。游戏设定在亚瑟王和圆桌骑士的传奇世界中。',
+      '阿瓦隆（The Resistance: Avalon）是一款适合 5–10 人的隐藏身份推理桌游。先用四个步骤了解怎么玩，再查看角色配置、组队投票、任务人数表与刺杀梅林的胜负规则。原版桌游与本站玩法的区别会单独说明。',
     gameplayRules: '游戏规则',
     teamProposalAndVoting: '团队提案和投票',
     teamProposalDescription:
@@ -441,7 +441,7 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     title: '阿瓦隆規則與玩法：5–10 人新手指南',
     gameObjective: '遊戲目標',
     gameDescription:
-      '阿瓦隆（The Resistance: Avalon）是一款適合 5–10 人的隱藏身分推理遊戲。每輪由隊長提名任務隊伍，全體玩家投票，再由獲准出任務的玩家秘密決定任務成敗。好人需要完成三次任務並保護梅林；壞人可讓三次任務失敗，或在好人完成三次任務後刺殺梅林獲勝。下方可直接查閱各人數的任務表與角色配置。',
+      '阿瓦隆（The Resistance: Avalon）是一款適合 5–10 人的隱藏身分推理桌遊。先用四個步驟了解怎麼玩，再查閱角色配置、組隊投票、任務人數表與刺殺梅林的勝負規則。原版桌遊與本站玩法的差異會另行說明。',
     gameplayRules: '遊戲規則',
     teamProposalAndVoting: '組隊與投票',
     teamProposalDescription:
@@ -537,10 +537,10 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     mordredTeam: 'Secuaces de Mordred:',
     expansions: 'Expansiones:',
     note: 'Nota: ',
-    title: 'Reglas de Avalon: cómo jugar con 5–10 jugadores',
+    title: 'Avalon: reglas del juego de mesa y cómo jugar',
     gameObjective: 'Objetivo del Juego',
     gameDescription:
-      'La Resistencia: Avalon (The Resistance: Avalon) es un juego de mesa de deducción social para 5–10 personas con roles secretos del bien y del mal. El líder propone un equipo, todos votan y sus integrantes juegan cartas de misión en secreto. Esta guía explica cómo jugar, las votaciones, la tabla de misiones y las condiciones de victoria; las diferencias con esta plataforma aparecen arriba.',
+      'The Resistance: Avalon es un juego de mesa de deducción social para 5–10 personas. Aprende a jugar en cuatro pasos y consulta los roles, las votaciones, la tabla de misiones y el asesinato de Merlín. Las diferencias entre el juego original y esta plataforma se explican por separado.',
     gameplayRules: 'Reglas del Juego',
     teamProposalAndVoting: 'Propuesta de Equipo y Votación',
     teamProposalDescription:

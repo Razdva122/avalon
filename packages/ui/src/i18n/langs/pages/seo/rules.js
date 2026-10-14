@@ -1,38 +1,38 @@
 module.exports.rules = {
   pt: {
-    title: 'Regras de Avalon: como jogar e papéis para 5–10 jogadores',
+    title: 'Regras de Avalon: como jogar, papéis e tabela de missões',
     description:
-      'Aprenda a jogar Avalon: guia rápido, exemplo de missão, papéis para 5–10 jogadores, votações, tamanho das equipes, vitória e assassinato de Merlin.',
+      'Como jogar The Resistance: Avalon com 5–10 pessoas: papéis, votos e tabela de missões. Entenda os três sucessos, o assassinato de Merlin e as variantes online.',
     keywords: ['Wiki', 'Regras', 'Como jogar'],
   },
   en: {
-    title: 'Avalon Rules: Setup, Roles & How to Play (5–10 Players)',
+    title: 'Avalon Board Game Rules: How to Play, Setup & Roles',
     description:
-      'Learn how to play The Resistance: Avalon: setup for 5–10 players, role abilities, team voting, mission sizes, and how each side wins.',
+      'How to play The Resistance: Avalon with 5–10 players: role setup, team voting and a mission-size table. Learn the win conditions and Merlin assassination.',
     keywords: ['Wiki', 'Rules', 'How to play'],
   },
   ru: {
     title: 'Авалон: правила настольной игры и роли на 5–10 человек',
     description:
-      'Как играть в Авалон: быстрый старт, пример миссии, роли на 5–10 игроков, голосование, таблица миссий, условия победы и покушение на Мерлина.',
+      'Как играть в настольный Авалон на 5–10 человек: роли, голосование и таблица походов. Три успешные миссии, покушение на Мерлина и отличия онлайн-правил.',
     keywords: ['Вики', 'Правила', 'Как играть'],
   },
   'zh-TW': {
-    title: '阿瓦隆規則與玩法｜5–10 人配置、任務人數與角色能力',
+    title: '阿瓦隆規則：怎麼玩、5–10 人配置與任務人數表',
     description:
-      '阿瓦隆怎麼玩？查看 5–10 人角色配置、每輪任務人數表、組隊投票、任務成功與失敗條件，以及梅林被刺殺的勝負規則。適合新手查閱與線上開局前快速複習。',
+      '阿瓦隆怎麼玩？從組隊投票到任務與刺殺梅林，四步學會基本玩法。查看 5–10 人角色配置、任務人數表、兩張失敗牌的例外，以及原版桌遊與線上規則的差異。',
     keywords: ['維基', '規則', '玩法'],
   },
   'zh-CN': {
-    title: '阿瓦隆规则与玩法｜5–10 人配置、任务人数与角色能力',
+    title: '阿瓦隆规则：怎么玩、5–10 人配置与任务人数表',
     description:
-      '阿瓦隆怎么玩？查看新手入门、任务示例、5–10 人角色配置、任务人数表、组队投票、胜负条件与梅林刺杀规则。',
+      '阿瓦隆怎么玩？从组队投票到任务与刺杀梅林，四步学会基本玩法。查看 5–10 人角色配置、任务人数表、两张失败牌的例外，以及原版桌游与在线规则的区别。',
     keywords: ['维基', '规则', '怎么玩'],
   },
   es: {
-    title: 'Avalon: reglas del juego de mesa y cómo jugar (5–10)',
+    title: 'Avalon: reglas del juego de mesa, roles y cómo jugar',
     description:
-      'Aprende a jugar a Avalon: guía rápida, ejemplo de misión, roles para 5–10 jugadores, votaciones, tamaño de los equipos, victoria y asesinato de Merlín.',
+      'Cómo jugar a The Resistance: Avalon con 5–10 personas: roles, votos y tabla de misiones. Consulta cómo ganar, el asesinato de Merlín y las variantes online.',
     keywords: ['Wiki', 'Reglas', 'Cómo jugar'],
   },
 };

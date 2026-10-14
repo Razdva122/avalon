@@ -40,7 +40,7 @@ import { STICKER_FAVORITES_LIMIT } from '@avalon/types/user/stickers';
 const props = withDefaults(defineProps<{ avatarID?: string; stickerIDs?: string[] }>(), { stickerIDs: () => [] });
 const emit = defineEmits<{ (event: 'busy', value: boolean): void }>();
 const router = useRouter();
-const { collection, busy, save, markSeen } = useStickers();
+const { collection, busy, save } = useStickers();
 const savingAvatar = ref(false),
   saveFailed = ref(false),
   saved = ref(false),
@@ -78,8 +78,7 @@ const favorite = async (id: string) => {
   stickerError.value = false;
   emit('busy', true);
   try {
-    if (await save([...collection.value.favorites, id])) await markSeen([id]);
-    else stickerError.value = true;
+    stickerError.value = !(await save([...collection.value.favorites, id]));
   } finally {
     savingSticker.value = '';
     emit('busy', false);

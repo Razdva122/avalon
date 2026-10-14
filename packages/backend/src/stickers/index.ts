@@ -92,10 +92,6 @@ export class StickersManager {
                     ? games
                     : 1,
             ),
-        isNew:
-          available &&
-          !!(sticker.games || sticker.achievement || sticker.premium) &&
-          !(features?.seenStickers || []).includes(sticker.id),
       };
     });
     return {
@@ -128,16 +124,6 @@ export class StickersManager {
       { upsert: true },
     );
     return { ...collection, favorites, hideOnBoard };
-  }
-
-  async seen(userID: string, ids: string[]): Promise<void> {
-    const collection = await this.collection(userID);
-    const available = collection.stickers.filter((s) => s.available && ids.includes(s.id)).map((s) => s.id);
-    await userFeaturesModel.updateOne(
-      { userID },
-      { $addToSet: { seenStickers: { $each: available } } },
-      { upsert: true },
-    );
   }
 
   async authorizeSend(

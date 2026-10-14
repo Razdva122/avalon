@@ -58,7 +58,7 @@ test('non-premium players can preview exclusives but cannot equip or send them',
   const stickers = new StickersManager();
   expect((await stickers.collection('player')).stickers).toEqual(
     expect.arrayContaining([
-      expect.objectContaining({ id: 'mordred-puppet', available: false, progress: 0, isNew: false }),
+      expect.objectContaining({ id: 'mordred-puppet', available: false, progress: 0 }),
       expect.objectContaining({ id: 'morgana-violin', available: false }),
     ]),
   );
@@ -83,8 +83,8 @@ test.each(['paid', 'manual'])('%s Premium unlocks cosmetics even with the badge 
   const stickers = new StickersManager();
   expect((await stickers.collection('player')).stickers).toEqual(
     expect.arrayContaining([
-      expect.objectContaining({ id: 'mordred-puppet', available: true, isNew: true }),
-      expect.objectContaining({ id: 'morgana-violin', available: true, isNew: true }),
+      expect.objectContaining({ id: 'mordred-puppet', available: true }),
+      expect.objectContaining({ id: 'morgana-violin', available: true }),
     ]),
   );
   expect(await stickers.preferences('player', ['morgana-violin'], false)).toMatchObject({

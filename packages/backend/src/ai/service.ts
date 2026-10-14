@@ -388,7 +388,7 @@ export class AiService {
               beginner: boolean;
               role?: import('@avalon/types').AiHumanRole;
               withFriend?: boolean;
-              humanSeats?: 2 | 3;
+              humanSeats?: number;
               difficulty?: AiBotDifficulty;
               language?: AiLanguage;
               playerCount?: AiPlayerCount;
@@ -405,7 +405,11 @@ export class AiService {
         (options.role !== undefined &&
           (options.withFriend === true || !aiHumanRoles(options.playerCount ?? 5).includes(options.role))) ||
         (options.withFriend !== undefined && typeof options.withFriend !== 'boolean') ||
-        (options.humanSeats !== undefined && (!options.withFriend || ![2, 3].includes(options.humanSeats))) ||
+        (options.humanSeats !== undefined &&
+          (!options.withFriend ||
+            !Number.isInteger(options.humanSeats) ||
+            options.humanSeats < 2 ||
+            options.humanSeats >= (options.playerCount ?? 5))) ||
         (options.beginner && options.withFriend === true) ||
         (options.difficulty !== undefined && !['regular', 'smart'].includes(options.difficulty)) ||
         (options.language !== undefined && !['en', 'ru', 'zh-tw'].includes(options.language)) ||
@@ -507,6 +511,8 @@ export class AiService {
         )
           return cb({ error: 'The prepared bot settings cannot be changed at launch' });
         const playerCount = options.playerCount ?? 5;
+        if (room.ai!.withFriend && (room.ai!.humanSeats ?? 2) >= playerCount)
+          return cb({ error: 'At least one bot seat is required' });
         if (room.ai!.beginner && (options.difficulty !== 'regular' || playerCount !== 5))
           return cb({ error: 'Beginner games require regular bots and five players' });
         if (playerCount >= 7 && !(await this.canPlayLargeTables(userID!)))

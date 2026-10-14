@@ -2,6 +2,7 @@
   <div class="info-page-content wiki-page rules">
     <WikiBreadCrumbs />
     <h1 class="title">{{ $t('rules.title') }}</h1>
+    <p>{{ $t('rules.gameDescription') }}</p>
 
     <nav class="rules-contents wiki-nav" :aria-label="$t('wiki.rules')">
       <a href="#gameplay">{{ $t('rules.gameplayRules') }}</a>
@@ -32,10 +33,6 @@
     </section>
 
     <h2>{{ $t('rules.gameObjective') }}</h2>
-
-    <p>
-      {{ $t('rules.gameDescription') }}
-    </p>
 
     <i18n-t keypath="rules.objectiveArthur" tag="h3">
       <template v-slot:goodLoyaltyIcon>

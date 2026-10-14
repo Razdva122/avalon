@@ -9,7 +9,8 @@ export default {
     restartGame: '重開遊戲',
   },
   mainPage: {
-    newPlayerTitle: '第一次玩阿瓦隆？',
+    newPlayerTitle: '阿瓦隆是什麼桌遊？',
+    rulesLink: '阿瓦隆怎麼玩',
     gameplaySummary:
       '阿瓦隆是一款擁有秘密身分的社交推理桌遊。討論誰值得信任，為任務隊伍投票，並隱藏自己的身分。好人陣營爭取成功完成三次任務，壞人陣營則試圖破壞任務或找出梅林。',
     guideTitle: '如何與朋友開始遊戲',
@@ -55,7 +56,8 @@ export default {
     viewGame: '查看',
 
     header: '阿瓦隆線上遊戲',
-    intro: '免費線上玩阿瓦隆，適合 5–10 人一起遊玩。了解規則與角色，登入後建立房間，再將房間連結分享給朋友。',
+    intro:
+      '在瀏覽器玩阿瓦隆（The Resistance: Avalon），一款隱藏身分的推理桌遊。5–10 人的真人局免費。也可以獨自或與朋友對戰機器人；使用條件依所選模式而異。',
     createRoom: '創建房間',
     watch: '觀戰',
     join: '加入',

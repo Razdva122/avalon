@@ -264,6 +264,9 @@
 .material-icons.explore::before {
   content: '\e87a';
 }
+.material-icons.extension::before {
+  content: '\e87b';
+}
 .material-icons.face::before {
   content: '\e87c';
 }

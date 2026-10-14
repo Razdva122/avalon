@@ -35,7 +35,6 @@ export interface StickerInfo {
   available: boolean;
   progress: number;
   requirement: number;
-  isNew: boolean;
 }
 export interface StickerCollection {
   stickers: StickerInfo[];

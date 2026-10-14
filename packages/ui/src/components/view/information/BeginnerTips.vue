@@ -31,16 +31,23 @@
     </template>
   </aside>
   <v-dialog v-model="confirmOpen" max-width="440" aria-labelledby="disable-beginner-tips-title">
-    <v-card>
-      <v-card-title id="disable-beginner-tips-title" class="text-wrap">{{
-        t('beginnerTips.confirmTitle')
-      }}</v-card-title>
-      <v-card-text>{{ t('beginnerTips.confirmText') }}</v-card-text>
-      <v-card-actions class="tip-confirm-actions">
-        <v-btn variant="text" @click="confirmOpen = false">{{ t('beginnerTips.keep') }}</v-btn>
+    <section class="tip-confirm" aria-describedby="disable-beginner-tips-description">
+      <header class="tip-confirm-header">
+        <h2 id="disable-beginner-tips-title">{{ t('beginnerTips.confirmTitle') }}</h2>
+        <v-btn
+          icon="close"
+          color="text-primary"
+          variant="text"
+          :aria-label="t('modal.cancel')"
+          @click="confirmOpen = false"
+        />
+      </header>
+      <p id="disable-beginner-tips-description">{{ t('beginnerTips.confirmText') }}</p>
+      <footer class="tip-confirm-actions">
+        <v-btn color="text-primary" variant="outlined" @click="confirmOpen = false">{{ t('modal.cancel') }}</v-btn>
         <v-btn color="primary" variant="flat" @click="disable">{{ t('beginnerTips.confirmDisable') }}</v-btn>
-      </v-card-actions>
-    </v-card>
+      </footer>
+    </section>
   </v-dialog>
 </template>
 <script setup lang="ts">
@@ -152,10 +159,44 @@ summary {
   margin-top: 4px;
   min-height: 36px;
 }
+.tip-confirm {
+  padding: 20px;
+  border: 1px solid rgb(var(--v-theme-surface-border));
+  border-radius: 16px;
+  background: rgb(var(--v-theme-inset));
+  color: rgb(var(--v-theme-text-primary));
+}
+.tip-confirm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -8px -8px 8px 0;
+}
+.tip-confirm-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.tip-confirm > p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgb(var(--v-theme-text-secondary));
+}
 .tip-confirm-actions {
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 24px;
+}
+.tip-confirm-actions :deep(.v-btn) {
+  min-height: 44px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.tip-confirm-actions :deep(.v-btn--variant-outlined) {
+  color: rgb(var(--v-theme-text-primary));
 }
 .room:has(.voice-panel) .beginner-live-tip {
   visibility: hidden;

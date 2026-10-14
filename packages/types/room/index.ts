@@ -47,7 +47,7 @@ export type AiRoomState = {
   humanPlayerID?: string;
   withFriend?: boolean;
   /** Reserved human seats; older friend rooms default to two. */
-  humanSeats?: 2 | 3;
+  humanSeats?: number;
   humanPlayerIDs?: string[];
   discussionPlayerID?: string;
   humanTimers?: Record<

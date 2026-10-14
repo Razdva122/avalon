@@ -1,4 +1,11 @@
 export default {
+  setupGuestTitle: 'Sign in to start a game',
+  setupGuestHint: 'Choose your settings now. Sign in to create a game and check bot availability.',
+  setupNoAddons: 'No expansions',
+  setupTableRoles: 'Table roles',
+  setupGood: 'Good',
+  setupEvil: 'Evil',
+  setupDetails: 'About these settings',
   selectRole: 'Your role',
   randomRole: 'Random role',
   endMatch: 'End match',

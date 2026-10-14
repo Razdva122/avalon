@@ -215,7 +215,7 @@ const props = defineProps<{
   beginner?: boolean;
   withFriend?: boolean;
   humanCount?: number;
-  humanSeats?: 2 | 3;
+  humanSeats?: number;
   difficulty?: AiBotDifficulty;
   language?: AiLanguage;
   playerCount?: AiPlayerCount;

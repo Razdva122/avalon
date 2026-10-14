@@ -1,4 +1,11 @@
 export default {
+  setupGuestTitle: 'Войдите, чтобы начать игру',
+  setupGuestHint: 'Настройки можно выбрать заранее. После входа проверим доступность ботов и создадим игру.',
+  setupNoAddons: 'Без дополнений',
+  setupTableRoles: 'Роли за столом',
+  setupGood: 'Добро',
+  setupEvil: 'Зло',
+  setupDetails: 'Подробнее о настройках',
   selectRole: 'Ваша роль',
   randomRole: 'Случайная роль',
   endMatch: 'Завершить партию',

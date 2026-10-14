@@ -759,3 +759,70 @@ test.each([{ role: 'oberon' }, { role: 'minion' }, { role: 'unknown' }, { role: 
     expect(claim).not.toHaveBeenCalled();
   },
 );
+
+test.each([5, 6, 7, 8] as const)('friends fill a %i-seat table leaving one bot', async (playerCount) => {
+  const { host, connect } = fixture('admin', true);
+  const created = jest.fn();
+  await connect('premium').createHumanAiRoom(
+    {
+      beginner: false,
+      withFriend: true,
+      humanSeats: playerCount - 1,
+      playerCount,
+      difficulty: 'regular',
+      language: 'ru',
+    },
+    created,
+  );
+  expect(created.mock.calls[0][0]).toHaveProperty('roomID');
+  const room = host.rooms[created.mock.calls[0][0].roomID] as BotRoom;
+  try {
+    for (let i = 1; i < playerCount - 2; i++) room.joinGame('friend' + i);
+    const waiting = jest.fn();
+    await connect('premium').startHumanAiRoom(
+      room.roomID,
+      { difficulty: 'regular', language: 'ru', playerCount },
+      waiting,
+    );
+    expect(waiting.mock.calls[0][0]).toHaveProperty('error');
+    room.joinGame('last-friend');
+    expect(() => room.joinGame('extra')).toThrow();
+    const started = jest.fn();
+    await connect('premium').startHumanAiRoom(
+      room.roomID,
+      { difficulty: 'regular', language: 'ru', playerCount },
+      started,
+    );
+    expect(started.mock.calls[0][0]).toEqual({ ok: true });
+    expect(room.players).toHaveLength(playerCount);
+    expect(new Set(room.players).size).toBe(playerCount);
+    expect(room.players.filter((id) => !room.isHuman(id))).toHaveLength(1);
+  } finally {
+    room.stop();
+  }
+});
+
+test.each([1, 5, 6, 2.5, '4', null])('rejects invalid human seats %s for a five-seat table', async (humanSeats) => {
+  const { connect, host } = fixture('admin', true);
+  const result = jest.fn();
+  await connect('owner').createHumanAiRoom({ beginner: false, withFriend: true, humanSeats, playerCount: 5 }, result);
+  expect(result.mock.calls[0][0]).toHaveProperty('error');
+  expect(Object.keys(host.rooms)).toHaveLength(0);
+});
+
+test('legacy friend room cannot shrink to remove its last bot', async () => {
+  const { host, connect } = fixture();
+  const created = jest.fn();
+  await connect('premium').createHumanAiRoom(
+    { beginner: false, withFriend: true, humanSeats: 5, playerCount: 6 },
+    created,
+  );
+  const room = host.rooms[created.mock.calls[0][0].roomID] as BotRoom;
+  try {
+    for (let i = 1; i < 5; i++) room.joinGame('friend' + i);
+    expect(() => room.setPlayerCount(5)).toThrow();
+    expect(room.players).toHaveLength(6);
+  } finally {
+    room.stop();
+  }
+});

@@ -9,7 +9,8 @@ export default {
     restartGame: 'Reiniciar juego',
   },
   mainPage: {
-    newPlayerTitle: '¿Primera vez en Avalon?',
+    newPlayerTitle: '¿Qué es el juego de mesa Avalon?',
+    rulesLink: 'Cómo jugar a Avalon',
     gameplaySummary:
       'Avalon es un juego de mesa de deducción social con roles secretos. Debatid en quién confiar, votad los equipos de las misiones y ocultad vuestra identidad. El Bien intenta completar tres misiones; el Mal intenta sabotearlas o descubrir a Merlín.',
     guideTitle: 'Cómo empezar una partida con amigos',
@@ -58,7 +59,7 @@ export default {
 
     header: 'Juega a Avalon en línea',
     intro:
-      'Juega al juego de mesa The Resistance: Avalon online gratis en el navegador con 5–10 jugadores. Aprende las reglas y los roles, inicia sesión para crear una sala y comparte el enlace con tus amigos.',
+      'Juega a The Resistance: Avalon, el juego de mesa de deducción social, en el navegador. Las partidas con 5–10 personas son gratis. También puedes jugar con bots, solo o con amigos; el acceso depende del modo.',
     createRoom: 'Crear sala',
     watch: 'Ver',
     join: 'Unirse',
