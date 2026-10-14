@@ -21,10 +21,7 @@ for (const file of sources) assert(emitted.has(digest(file)), `Image missing fro
 let references = 0;
 for (const file of built.filter((file) => /\.(html|css|js)$/.test(file))) {
   const text = fs.readFileSync(file, 'utf8');
-  assert(
-    !/storage\.yandexcloud\.net\/avalon-game\/(?:images|icons)\//.test(text),
-    `Unversioned cloud image in ${file}`,
-  );
+  assert(!/storage\.yandexcloud\.net/.test(text), `Yandex Storage reference in ${file}`);
   if (file.endsWith('.js')) continue;
   const urls = file.endsWith('.css')
     ? [...text.matchAll(/url\(["']?([^\s)"']+)["']?\)/g)].map((match) => match[1])

@@ -17,7 +17,7 @@ RUN npm ci
 COPY --chown=pptruser:pptruser . .
 RUN AVALON_BUILD_CONTAINER=1 npm run build:ui
 
-# Export the exact audited build for upload and packaging in CI.
+# Export the exact audited build with images for packaging in CI.
 FROM scratch AS release-artifact
 COPY --from=build-stage /home/pptruser/app/packages/ui/dist /
 

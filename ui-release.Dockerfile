@@ -1,4 +1,4 @@
-# The release was already built, audited and uploaded by publish.yml.
+# The release was already built and audited, including images by publish.yml.
 # Do not rebuild here: the container must contain the exact exported artifact.
 FROM nginx
 COPY ui-release/ /app/

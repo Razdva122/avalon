@@ -1,6 +1,6 @@
 {
   "name": "@avalon/ui",
-  "version": "72.3.1",
+  "version": "72.3.2",
   "private": true,
   "scripts": {
     "preserve": "npm run generate:avatars && node scripts/generate-locales.cjs",
@@ -11,7 +11,6 @@
     "check:build": "node scripts/check-seo.cjs && node --test scripts/check-structured-data.cjs && node scripts/check-seo-navigation.cjs && node scripts/check-bundle.cjs && node scripts/check-images.cjs && node scripts/check-password-recovery.cjs && node scripts/check-support.cjs && node scripts/check-startup.cjs && node scripts/check-web-vitals.cjs",
     "check:seo:nginx": "node scripts/check-seo-nginx.cjs",
     "check:seo:http": "node scripts/check-seo-http.cjs",
-    "upload:images": "node scripts/upload-images.cjs",
     "generate:avatars": "node scripts/generate-avatars.cjs"
   },
   "dependencies": {
