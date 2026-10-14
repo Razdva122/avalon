@@ -14,17 +14,15 @@ Publication is serialized without cancelling an active release.
 
 Required repository configuration:
 
-| Kind     | Name                           | Purpose                                          |
-| -------- | ------------------------------ | ------------------------------------------------ |
-| Variable | `DOCKER_HUB_USERNAME`          | Container repositories and registry build caches |
-| Secret   | `DOCKER_HUB_ACCESS_TOKEN`      | Docker Hub login                                 |
-| Secret   | `YC_STORAGE_ACCESS_KEY_ID`     | Static storage key ID                            |
-| Secret   | `YC_STORAGE_SECRET_ACCESS_KEY` | Static storage secret                            |
+| Kind     | Name                      | Purpose                                          |
+| -------- | ------------------------- | ------------------------------------------------ |
+| Variable | `DOCKER_HUB_USERNAME`     | Container repositories and registry build caches |
+| Secret   | `DOCKER_HUB_ACCESS_TOKEN` | Docker Hub login                                 |
 
 The workflow checks mounted nginx compatibility, then builds the backend and UI.
 The UI is exported from the `release-artifact` target, validated using production
-nginx routing, and its hashed images are uploaded/verified in Yandex Storage.
-Only then is the same UI artifact packaged into the nginx image. Image names:
+nginx routing, and all hashed images are included in the same UI artifact
+packaged into the nginx image. No Yandex Storage credentials are needed. Image names:
 
 - `<DOCKER_HUB_USERNAME>/backend-avalon:<version-tag>`
 - `<DOCKER_HUB_USERNAME>/nginx-avalon:<version-tag>`
@@ -32,8 +30,8 @@ Only then is the same UI artifact packaged into the nginx image. Image names:
 Both builds reuse separate Docker Hub `buildcache` tags. After both publications
 succeed, a cleanup job removes only obsolete version-tag BuildKit caches from
 GitHub Actions. Details and manual recovery:
-[UI release guide](../packages/ui/README.md#images-and-yandex-storage-releases).
-A failed UI upload must be corrected and retried before deploying that UI.
+[UI release guide](../packages/ui/README.md#images-served-by-the-application-server).
+A failed UI image audit must be corrected before deploying that UI.
 
 The root `npm version` lifecycle runs tests, updates workspace versions, stages
 files, pushes commits and pushes its version tag. Inspect the worktree and
