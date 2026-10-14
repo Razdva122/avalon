@@ -13,7 +13,9 @@
             <span class="material-icons" aria-hidden="true">add</span>
             {{ $t('mainPage.createRoom') }}
           </v-btn>
-          <BotRoomButton color="primary" variant="outlined" hide-icon>{{ $t('aiArena.playWithBots') }}</BotRoomButton>
+          <div id="play-with-ai" class="ai-launch">
+            <BotRoomButton color="primary" variant="outlined" hide-icon>{{ $t('aiArena.playWithBots') }}</BotRoomButton>
+          </div>
           <nav class="lobby-links" :aria-label="$t('menu.wiki')">
             <LocaleLink :to="{ name: 'rules' }"
               ><span class="link-label">{{ $t('wiki.rules') }}</span
@@ -163,6 +165,7 @@
     </section>
     <SocialChannels class="lobby-social" />
     <nav class="lobby-footer" :aria-label="$t('menu.menu')">
+      <LocaleLink :to="{ name: 'social_deduction_games_online' }">{{ $t('wiki.gameGuides') }}</LocaleLink>
       <LocaleLink :to="{ name: 'wiki' }">{{ $t('menu.wiki') }}</LocaleLink>
       <LocaleLink :to="{ name: 'stats' }">{{ $t('menu.stats') }}</LocaleLink>
       <LocaleLink :to="{ name: 'about' }">{{ $t('menu.about') }}</LocaleLink>
@@ -519,6 +522,9 @@ h1 {
 }
 .lobby-actions {
   margin-top: 20px;
+}
+.ai-launch {
+  display: inline-flex;
 }
 .create-room {
   text-transform: none;
@@ -946,6 +952,7 @@ a:focus-visible {
     margin-top: 16px;
   }
   .lobby-actions > .v-btn,
+  .lobby-actions > .ai-launch,
   .lobby-actions :deep(.bot-room-button) {
     width: 100%;
   }

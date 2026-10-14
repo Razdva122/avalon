@@ -36,7 +36,7 @@ for (const route of Object.values(routesSeo).filter((route) => route.meta.preren
       `${pathname}: personalized suggestion baked into HTML`,
     );
     assert.match(html, /<h1(?:\s|>)/, `${pathname}: missing prerendered heading`);
-    if (basePath(pathname) === '/' || /^\/(wiki(?:\/|$)|about(?:\/|$))/.test(basePath(pathname))) {
+    if (basePath(pathname) === '/' || /^\/(wiki|about|support|community|guides)(?:\/|$)/.test(basePath(pathname))) {
       assert(html.includes(`data-ssr-path="${pathname}"`), `${pathname}: missing hydration marker`);
       assert(html.includes('<!--[-->'), `${pathname}: missing Vue SSR fragment markers`);
     }
@@ -81,6 +81,14 @@ for (const route of Object.values(routesSeo).filter((route) => route.meta.preren
       `${pathname}: wrong robots policy`,
     );
     if (!route.meta.skipSiteMap) {
+      assert.deepEqual(
+        links
+          .filter((link) => link.rel === 'alternate')
+          .map((link) => link.hreflang)
+          .sort(),
+        [...Object.keys(route.meta.multiLanguage), 'x-default'].sort(),
+        `${pathname}: alternate links must describe only available translations`,
+      );
       for (const alternate of Object.keys(route.meta.multiLanguage)) {
         assert.equal(
           links.find((link) => link.hreflang === alternate)?.href,
@@ -92,12 +100,52 @@ for (const route of Object.values(routesSeo).filter((route) => route.meta.preren
     }
     if (route.name === 'lobby') {
       assert.match(html, /class="lobby-intro"/, `${pathname}: lobby is still waiting for the backend`);
+      const aiLaunch = html.match(/<div\b[^>]*id="play-with-ai"[^>]*>([\s\S]*?)<\/div>/)?.[1];
+      assert(aiLaunch?.includes('bot-room-button'), `${pathname}: AI fragment must target the existing launch control`);
       const main = html.match(/<main\b[\s\S]*?<\/main>/)?.[0] || '';
       for (const target of ['/about/', '/stats/', '/wiki/']) {
         assert(
           main.includes(`href="${localizedPath(target, language)}"`),
           `${pathname}: missing visible ${target} link`,
         );
+      }
+      assert(
+        main.includes(`href="${localizedPath('/guides/social-deduction-games-online/', language)}"`),
+        `${pathname}: missing guide entry`,
+      );
+    }
+    if (route.path === '/wiki/') {
+      assert(
+        html.includes(`href="${localizedPath('/guides/social-deduction-games-online/', language)}"`),
+        `${pathname}: missing guide entry`,
+      );
+    }
+    if (route.path.startsWith('/guides/')) {
+      assert(
+        html.includes(`href="${localizedPath('/', language)}#play-with-ai"`),
+        `${pathname}: missing real AI learning CTA`,
+      );
+      const crumbs = JSON.parse(
+        html.match(/<script id="breadcrumb-structured-data" type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] ||
+          'null',
+      );
+      assert(crumbs, `${pathname}: missing guide breadcrumbs`);
+      assert.deepEqual(
+        crumbs.itemListElement.map((item) => ({ to: new URL(item.item).pathname, title: item.name })),
+        route.meta.multiLanguage[language].breadcrumbs,
+        `${pathname}: guide breadcrumbs must match public metadata`,
+      );
+      assert.equal((html.match(/<h1[ >]/g) || []).length, 1, `${pathname}: expected one article heading`);
+      assert.match(html, new RegExp(`<article[^>]*lang="${language}"`), `${pathname}: article language`);
+      for (const href of [...html.matchAll(/<a\b[^>]*href="([^"]+)"/g)].map((m) => m[1])) {
+        if (href.startsWith('/') && !href.startsWith('//')) {
+          const url = new URL(href, origin);
+          assert.equal(
+            url.pathname,
+            localizedPath(url.pathname, language),
+            `${pathname}: link switches locale: ${href}`,
+          );
+        }
       }
     }
     if (route.path.startsWith('/wiki/')) {

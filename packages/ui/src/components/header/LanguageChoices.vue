@@ -12,7 +12,7 @@
       </button>
       <router-link
         v-else
-        :to="{ path: language.path, query: $route.query, hash: $route.hash }"
+        :to="{ path: language.path, query: $route.query, hash: language.hash }"
         :hreflang="language.code"
         :lang="language.code"
         :class="{ selected: currentLanguage === language.code }"
@@ -27,10 +27,14 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { LanguageMap } from '@/helpers/i18n';
-import { localizedPath } from '@/router/paths';
+import { languageSwitchTarget } from '@/router/paths';
 const route = useRoute();
 const languages = computed(() =>
-  Object.entries(LanguageMap).map(([code, title]) => ({ code, title, path: localizedPath(route.path, code) })),
+  Object.entries(LanguageMap).map(([code, title]) => ({
+    code,
+    title,
+    ...languageSwitchTarget(route.path, code, route.meta.availableLocales as string[] | undefined, route.hash),
+  })),
 );
 defineProps<{
   currentLanguage: string;

@@ -3,6 +3,11 @@ const { localizedPath } = require('../src/router/paths');
 
 const origin = process.env.SEO_BASE_URL || 'http://127.0.0.1:18080';
 const languages = ['en', 'ru', 'zh-tw', 'zh-cn', 'es', 'pt'];
+const guidePaths = [
+  '/guides/social-deduction-games-online/',
+  '/guides/games-like-secret-hitler/',
+  '/guides/avalon-vs-werewolf/',
+];
 const aliases = {
   '/wiki/addons/lady/': '/wiki/expansions/lady/',
   '/wiki/addons/lady_sea/': '/wiki/expansions/lady_sea/',
@@ -28,6 +33,7 @@ async function checkCrawlerContent() {
       '/community/',
       '/community/players/',
       '/community/groups/',
+      ...guidePaths,
     ]) {
       const pathname = localizedPath(route, language);
       for (const agent of agents) {
@@ -59,6 +65,20 @@ async function check(path, status, redirect, noindex = false) {
 }
 
 async function main() {
+  for (const pathname of guidePaths) {
+    await check(pathname, 200);
+    await check(pathname.slice(0, -1), 301, pathname);
+    await check('/en' + pathname + '?ref=seo-check', 301, pathname + '?ref=seo-check');
+    for (const language of languages.filter((lang) => lang !== 'en')) {
+      const localized = '/' + language + pathname;
+      await check(localized, 200);
+      await check(localized.slice(0, -1), 301, localized);
+      const html = await (await fetch(origin + localized)).text();
+      assert(html.includes(`href="https://avalon-game.com${localized}"`), `${localized}: canonical`);
+      assert.match(html, /<article[^>]*class="[^"]*guide-page/);
+      assert.doesNotMatch(html, /name="robots" content="noindex/);
+    }
+  }
   for (const language of languages) {
     await check(localizedPath('/', language), 200);
     await check(localizedPath('/wiki/rules/', language), 200);

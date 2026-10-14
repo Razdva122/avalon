@@ -182,6 +182,40 @@ or authentication classification. Diagnostics also include a whitelisted error c
 HTTP status (when detected), CLI exit code and selected model. It never stores prompts, replies, or raw CLI
 diagnostics. Network-isolated Linux regressions passed before this worker update.
 
+## Rate-limit diagnostics
+
+The worker returns `rate_limit` for a failed CLI turn classified as HTTP 429 or
+an explicit rate-limit error. The backend pauses the match with a wait/manual-retry
+message instead of immediately starting another decision request. This changes
+the application's retry behavior; the CLI may perform its own transport retries.
+Install the updated worker before deploying the backend message change. The
+previous backend already treats this new worker code as a nonretryable pause.
+
+The same private `state/avalon-last-failure.json` now includes `rateLimit`:
+
+- `kind`: `tokens`, `requests`, `concurrency`, `account_usage`, or `unknown`,
+  derived only from explicit CLI error wording. `windowDurationSeconds`, numeric
+  `limit`/`used`/`requested`, and `retryAfterSeconds` are included when recognized.
+  Unsupported number formats or units are omitted rather than guessed.
+- `quota`: a fresh read of `account/rateLimits/read`, with `checkedAt`,
+  `status`, and up to 16 sanitized `buckets`. Each bucket contains its limit ID,
+  primary/secondary usage percentage, window duration and reset timestamp,
+  `rateLimitReachedType`, and `spendControlReached` when available. An unknown
+  reason is marked `unknown`; an explicit upstream `null` remains `null`.
+  Unavailable/invalid windows are omitted, while explicit null windows remain null.
+
+The quota read starts only after a limit failure and does not generate a model
+turn. It is bounded by the existing 15-second metadata timeout; failure to read
+quotas preserves the original pause with `quota.status=unavailable`. Its whole
+process group is stopped, including CLI descendants. Failure timestamp and elapsed
+time describe the decision, excluding the subsequent metadata read.
+
+The file remains mode 600 and stores no raw CLI message, prompt, model reply,
+credential or account identifier. Its quota snapshot is account-state evidence:
+an exhausted bucket does not establish that it caused this particular request's 429. If the upstream error provides no subtype, `kind=unknown` remains intentional.
+Only the latest failure is retained across the two worker slots; correlate its
+timestamp/model with `ai_request_costs` before attributing it to a room.
+
 ## Two-slot worker (2026-10-11)
 
 The launcher retains a shared `worker.lock` plus exclusive `worker-slot-1.lock`

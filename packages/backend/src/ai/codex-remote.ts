@@ -108,9 +108,11 @@ export function remoteCodex(request: object, signal?: AbortSignal, attempt = 0):
                 ? 'Codex worker is busy. Retry the match.'
                 : response.error === 'usage_limit'
                   ? 'Codex subscription usage limit reached. Wait for the limit to reset, then retry the match.'
-                  : response.error === 'timeout'
-                    ? 'Codex response timed out. No action was applied; retry the match.'
-                    : 'Codex worker request failed.';
+                  : response.error === 'rate_limit'
+                    ? 'Codex request was rate limited. Wait a while, then manually retry the match.'
+                    : response.error === 'timeout'
+                      ? 'Codex response timed out. No action was applied; retry the match.'
+                      : 'Codex worker request failed.';
             return reject(response.error === 'failed' ? new CodexRequestFailed(reason) : new AiTechnicalPause(reason));
           }
           resolve(response.result);

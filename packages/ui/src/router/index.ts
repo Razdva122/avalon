@@ -13,6 +13,9 @@ import { wikiBreadcrumbs } from './breadcrumbs';
 import { scrollBehavior } from './scroll';
 
 const routeComponentMap = {
+  social_deduction_games_online: () => import(/* webpackChunkName: 'guides' */ '@/pages/guides/Guide.vue'),
+  games_like_secret_hitler: () => import(/* webpackChunkName: 'guides' */ '@/pages/guides/Guide.vue'),
+  avalon_vs_werewolf: () => import(/* webpackChunkName: 'guides' */ '@/pages/guides/Guide.vue'),
   community_solo: () => import('@/pages/community/Community.vue'),
   community_group: () => import('@/pages/community/Community.vue'),
   community: () => import('@/pages/community/Community.vue'),
@@ -175,6 +178,15 @@ router.beforeEach((to, from, next) => {
 // Do not change URL/content until both the selected dictionary and fallback
 // are available. This also makes direct room links wait for the recipient locale.
 router.beforeResolve(async (to) => {
+  const language = pageLanguage(
+    to.path,
+    isNeutralPath(to.path),
+    preferredLanguage(store.state.settings, navigator.languages),
+  );
+  if (basePath(to.path).startsWith('/guides/')) {
+    const { loadGuideLocale } = await import(/* webpackChunkName: 'guide-locales' */ '@/pages/guides/locales');
+    await loadGuideLocale(language);
+  }
   await loadLanguage(
     pageLanguage(to.path, isNeutralPath(to.path), preferredLanguage(store.state.settings, navigator.languages)),
   );
@@ -209,26 +221,27 @@ function updateMetadata(to: RouteLocationNormalized) {
       lang: i18n.global.locale.value,
       skipSiteMap: Boolean(meta.skipSiteMap),
     },
-    wikiArticle
-      ? wikiBreadcrumbs(to.path, i18n.global.locale.value, (key) => i18n.global.t(key))
-      : basePath(to.path).startsWith('/community/')
-        ? [
-            { to: localizedPath('/', i18n.global.locale.value), title: i18n.global.t('menu.home') },
-            { to: localizedPath('/community/', i18n.global.locale.value), title: i18n.global.t('community.title') },
-            ...(basePath(to.path) === '/community/'
-              ? []
-              : [
-                  {
-                    to: to.path,
-                    title: i18n.global.t(
-                      basePath(to.path).includes('/players/')
-                        ? 'playerBoards.seoSoloTitle'
-                        : 'playerBoards.seoGroupTitle',
-                    ),
-                  },
-                ]),
-          ]
-        : [],
+    (meta.breadcrumbs as Array<{ to: string; title: string }> | undefined) ||
+      (wikiArticle
+        ? wikiBreadcrumbs(to.path, i18n.global.locale.value, (key) => i18n.global.t(key))
+        : basePath(to.path).startsWith('/community/')
+          ? [
+              { to: localizedPath('/', i18n.global.locale.value), title: i18n.global.t('menu.home') },
+              { to: localizedPath('/community/', i18n.global.locale.value), title: i18n.global.t('community.title') },
+              ...(basePath(to.path) === '/community/'
+                ? []
+                : [
+                    {
+                      to: to.path,
+                      title: i18n.global.t(
+                        basePath(to.path).includes('/players/')
+                          ? 'playerBoards.seoSoloTitle'
+                          : 'playerBoards.seoGroupTitle',
+                      ),
+                    },
+                  ]),
+            ]
+          : []),
   );
 
   let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');

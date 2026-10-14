@@ -1,3 +1,4 @@
+const guideSeo = require('../i18n/langs/pages/seo/guides');
 const { communitySolo, communityGroup } = require('../i18n/langs/pages/seo/playerBoards');
 const {
   lobby,
@@ -41,6 +42,50 @@ const {
 } = require('../../src/i18n/langs/pages/seo');
 
 module.exports.routesSeo = {
+  social_deduction_games_online: {
+    path: '/guides/social-deduction-games-online/',
+    name: 'social_deduction_games_online',
+    props: { guide: 'social_deduction_games_online' },
+    priority: 0.7,
+    meta: {
+      prerender: true,
+      multiLanguage: guideSeo.social_deduction_games_online,
+      breadcrumbs: [
+        { to: '/', title: 'Home' },
+        { to: '/guides/social-deduction-games-online/', title: 'Online social deduction games' },
+      ],
+    },
+  },
+  games_like_secret_hitler: {
+    path: '/guides/games-like-secret-hitler/',
+    name: 'games_like_secret_hitler',
+    props: { guide: 'games_like_secret_hitler' },
+    priority: 0.7,
+    meta: {
+      prerender: true,
+      multiLanguage: guideSeo.games_like_secret_hitler,
+      breadcrumbs: [
+        { to: '/', title: 'Home' },
+        { to: '/guides/social-deduction-games-online/', title: 'Online social deduction games' },
+        { to: '/guides/games-like-secret-hitler/', title: 'Games like Secret Hitler' },
+      ],
+    },
+  },
+  avalon_vs_werewolf: {
+    path: '/guides/avalon-vs-werewolf/',
+    name: 'avalon_vs_werewolf',
+    props: { guide: 'avalon_vs_werewolf' },
+    priority: 0.7,
+    meta: {
+      prerender: true,
+      multiLanguage: guideSeo.avalon_vs_werewolf,
+      breadcrumbs: [
+        { to: '/', title: 'Home' },
+        { to: '/guides/social-deduction-games-online/', title: 'Online social deduction games' },
+        { to: '/guides/avalon-vs-werewolf/', title: 'Avalon vs Werewolf' },
+      ],
+    },
+  },
   community_solo: {
     path: '/community/players/',
     name: 'community_solo',

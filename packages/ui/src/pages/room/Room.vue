@@ -101,6 +101,7 @@ import { i18n } from '@/plugins/i18n';
 import { useRouter } from 'vue-router';
 import { defineComponent, ref, computed, watch, provide, shallowRef, onUnmounted } from 'vue';
 import { createRoomSession } from '@/helpers/room-session';
+import { trackRoomAcquisition } from '@/helpers/acquisition';
 import Board from '@/components/view/board/Board.vue';
 import type { TVisibleRole, AiSpectatorDecision, TRoles, ISocketError } from '@avalon/types';
 import { socket } from '@/api/socket';
@@ -221,6 +222,7 @@ export default defineComponent({
       () => props.uuid,
       (stateFromBackend, source) => {
         errorMessage.value = undefined;
+        trackRoomAcquisition(stateFromBackend, userID.value, source === 'update');
         stateManager.mutateRoomState({
           newRoomState: stateFromBackend,
           userID: userID.value,
@@ -252,6 +254,7 @@ export default defineComponent({
 
     socket.on('gameUpdated', (game) => {
       if (!session.isLoading() && game.uuid === props.uuid && roomState.value?.stage === 'started') {
+        trackRoomAcquisition({ ...roomState.value, game }, userID.value, true);
         stateManager.mutateRoomState({ newGameState: game, userID: userID.value });
       }
     });

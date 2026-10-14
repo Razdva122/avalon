@@ -1,7 +1,7 @@
 import { basePath } from '@/router/paths';
 
 export const prerender = '__AVALON_PRERENDER__' in window;
-export const article = /^\/(wiki(?:\/|$)|about(?:\/|$)|support(?:\/|$)|community(?:\/|$))/.test(
+export const article = /^\/(wiki(?:\/|$)|about(?:\/|$)|support(?:\/|$)|community(?:\/|$)|guides(?:\/|$))/.test(
   basePath(window.location.pathname),
 );
 // The lobby hero is prerendered too: remounting it replaces the already-painted

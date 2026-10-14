@@ -224,11 +224,18 @@ A late start or action is rejected.
 These human-turn deadlines do not apply to administrator-created mixed games.
 Prepared rooms are temporary and are not archived before gameplay starts.
 
-Model requests have a ten-minute timeout and a twelve-minute ownership lease.
+Model requests have a ten-minute timeout and a twenty-two-minute ownership lease.
 The technical limit is 400 calls for 5–7 bots and 450 for eight. Provider
 failures pause the game instead of inventing a move. Completed discussion,
 final selection and votes are retained for continuation; persisted message IDs
 prevent duplicate publication. A backend restart is not a live-game resume protocol.
+
+A paused AI match stops automatically after 15 minutes without continuation and
+releases the shared slot. This applies to both recoverable technical pauses and
+other paused errors, in public and administrator games. The stopped replay keeps
+the reason for expiry; an unfinished game is ended manually without awarding a
+winner. Resuming or stopping clears the old deadline. A later pause starts a new
+15-minute period. Leaving the page or polling the room does not extend it.
 
 ## Persistence and retention
 

@@ -86,7 +86,7 @@ test('worker reports exhausted subscription quota without exposing raw CLI diagn
   try {
     await writeFile(
       join(directory, 'codex'),
-      `#!${process.execPath}\nprocess.stdin.resume();process.stdin.on('end',()=>{console.log(JSON.stringify({type:'turn.failed',error:{message:'You’ve hit your usage limit. PRIVATE_DIAGNOSTIC'}}));setInterval(()=>{},1000)});`,
+      `#!${process.execPath}\nif(process.argv[2]==='app-server')process.exit(1);process.stdin.resume();process.stdin.on('end',()=>{console.log(JSON.stringify({type:'turn.failed',error:{message:'You’ve hit your usage limit. PRIVATE_DIAGNOSTIC'}}));setInterval(()=>{},1000)});`,
       { mode: 0o700 },
     );
     const child = spawn(process.execPath, [join(__dirname, 'worker.cjs')], {
@@ -162,6 +162,7 @@ test('decision timeout terminates the CLI wrapper and its descendants', { timeou
 for (const [message, category, httpStatus] of [
   ['Invalid schema for response_format. HTTP 400 PRIVATE_TOKEN', 'invalid_schema', 400],
   ['Rate limit reached. HTTP 429 PRIVATE_TOKEN', 'rate_limit', 429],
+  ['Invalid response_format request. HTTP 429 PRIVATE_TOKEN', 'rate_limit', 429],
   ['Unexpected status code: 503 PRIVATE_TOKEN', 'server_error', 503],
 ]) {
   test(`worker stores safe ${category} diagnostics for a failed turn`, async () => {
@@ -169,7 +170,7 @@ for (const [message, category, httpStatus] of [
     try {
       await writeFile(
         join(directory, 'codex'),
-        `#!${process.execPath}\nprocess.stdin.resume();process.stdin.on('end',()=>{console.log(JSON.stringify({type:'turn.failed',error:{message:${JSON.stringify(message)}}}));setInterval(()=>{},1000)});`,
+        `#!${process.execPath}\nif(process.argv[2]==='app-server')process.exit(1);process.stdin.resume();process.stdin.on('end',()=>{console.log(JSON.stringify({type:'turn.failed',error:{message:${JSON.stringify(message)}}}));setInterval(()=>{},1000)});`,
         { mode: 0o700 },
       );
       const child = spawn(process.execPath, [join(__dirname, 'worker.cjs')], {
@@ -182,13 +183,108 @@ for (const [message, category, httpStatus] of [
         JSON.stringify({ operation: 'decide', prompt: 'PRIVATE_GAME_INPUT', schema: { type: 'object' } }),
       );
       assert.equal(await done, 0);
-      assert.deepEqual(JSON.parse(stdout), { ok: false, error: 'failed' });
+      assert.deepEqual(JSON.parse(stdout), { ok: false, error: category === 'rate_limit' ? 'rate_limit' : 'failed' });
       const diagnostic = JSON.parse(
         await require('node:fs/promises').readFile(join(directory, 'avalon-last-failure.json'), 'utf8'),
       );
       assert.equal(diagnostic.errorCategory, category);
       assert.equal(diagnostic.httpStatus, httpStatus);
+      if (category === 'rate_limit') assert.equal(diagnostic.rateLimit.quota.status, 'unavailable');
       assert.doesNotMatch(JSON.stringify(diagnostic), /PRIVATE_TOKEN|PRIVATE_GAME_INPUT/);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+}
+
+for (const [message, kind, retryAfterSeconds, amounts, chunks] of [
+  [
+    'Rate limit reached on tokens per min (TPM): Limit 30000, Used 22999, Requested 12528. Please try again in 11.054s. PRIVATE_TOKEN',
+    'tokens',
+    11.054,
+    { limit: 30000, used: 22999, requested: 12528 },
+  ],
+  ['Too many requests per minute. HTTP 429. Retry-After: 12\nPRIVATE_TOKEN', 'requests', 12],
+  ['Too many concurrent requests. HTTP 429 PRIVATE_TOKEN', 'concurrency', undefined],
+  ['Unexpected status code: 429 PRIVATE_TOKEN', 'unknown', undefined],
+  [
+    'Rate limit on tokens per min: Limit 30,000, Used 22999.5, Requested 1e3. Retry after 1.5h. HTTP 429',
+    'tokens',
+    undefined,
+  ],
+  ['HTTP 429. Retry after 2 hours.', 'unknown', undefined],
+  [
+    'Fragmented unsupported numbers',
+    'unknown',
+    undefined,
+    undefined,
+    ['HTTP 429. Limit 30000', '.5. Retry-After: 12', ' hours\n'],
+  ],
+]) {
+  test(`worker keeps safe ${kind} limit diagnostics with an account quota snapshot`, async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'worker-rate-limit-'));
+    const quota = {
+      rateLimitsByLimitId: {
+        codex: {
+          limitId: 'codex',
+          primary: { usedPercent: 4, windowDurationMins: 300, resetsAt: 1791982189, token: 'PRIVATE_TOKEN' },
+          secondary: { usedPercent: 21, windowDurationMins: 10080, resetsAt: 1792472863 },
+          rateLimitReachedType: null,
+          spendControlReached: false,
+          account: 'PRIVATE_ACCOUNT',
+        },
+        codex_other: {
+          limitId: 'codex_other',
+          primary: { usedPercent: 100, windowDurationMins: 60, resetsAt: 1791982189 },
+          secondary: null,
+          rateLimitReachedType: kind === 'concurrency' ? 'PRIVATE_NEW_TYPE' : 'workspace_member_usage_limit_reached',
+          spendControlReached: true,
+        },
+      },
+      access_token: 'PRIVATE_TOKEN',
+    };
+    try {
+      await writeFile(
+        join(directory, 'codex'),
+        `#!${process.execPath}\nif(process.argv[2]==='app-server'){require('node:readline').createInterface({input:process.stdin}).on('line',line=>{const m=JSON.parse(line);if(m.id===1)console.log(JSON.stringify({id:1,result:{}}));if(m.id===2)console.log(JSON.stringify({id:2,result:${JSON.stringify(quota)}}));});}else{process.stdin.resume();process.stdin.on('end',()=>{const parts=${JSON.stringify(chunks)};const fail=()=>{console.log(JSON.stringify({type:'turn.failed',error:{message:parts?'':${JSON.stringify(message)}}}));setInterval(()=>{},1000)};if(parts){const next=()=>{if(!parts.length)return fail();process.stderr.write(parts.shift());setTimeout(next,20)};next()}else fail()});}`,
+        { mode: 0o700 },
+      );
+      const child = spawn(process.execPath, [join(__dirname, 'worker.cjs')], {
+        env: { ...process.env, PATH: `${directory}:${process.env.PATH}`, CODEX_HOME: directory },
+      });
+      let stdout = '';
+      child.stdout.on('data', (chunk) => (stdout += chunk));
+      const done = new Promise((resolve) => child.on('close', resolve));
+      child.stdin.end(JSON.stringify({ operation: 'decide', prompt: 'PRIVATE_GAME_INPUT', schema: {} }));
+      assert.equal(await done, 0);
+      assert.deepEqual(JSON.parse(stdout), { ok: false, error: 'rate_limit' });
+      const diagnostic = JSON.parse(
+        await require('node:fs/promises').readFile(join(directory, 'avalon-last-failure.json'), 'utf8'),
+      );
+      assert.equal(diagnostic.reason, 'rate_limit');
+      assert.equal(diagnostic.rateLimit.kind, kind);
+      assert.equal(diagnostic.rateLimit.retryAfterSeconds, retryAfterSeconds);
+      if (['tokens', 'requests'].includes(kind)) assert.equal(diagnostic.rateLimit.windowDurationSeconds, 60);
+      for (const label of ['limit', 'used', 'requested']) assert.equal(diagnostic.rateLimit[label], amounts?.[label]);
+      assert.deepEqual(diagnostic.rateLimit.quota.buckets, [
+        {
+          limitId: 'codex',
+          primary: { usedPercent: 4, windowDurationMins: 300, resetsAt: 1791982189 },
+          secondary: { usedPercent: 21, windowDurationMins: 10080, resetsAt: 1792472863 },
+          rateLimitReachedType: null,
+          spendControlReached: false,
+        },
+        {
+          limitId: 'codex_other',
+          primary: { usedPercent: 100, windowDurationMins: 60, resetsAt: 1791982189 },
+          secondary: null,
+          rateLimitReachedType: kind === 'concurrency' ? 'unknown' : 'workspace_member_usage_limit_reached',
+          spendControlReached: true,
+        },
+      ]);
+      assert.equal(diagnostic.rateLimit.quota.status, 'available');
+      assert.ok(Date.parse(diagnostic.rateLimit.quota.checkedAt));
+      assert.doesNotMatch(JSON.stringify(diagnostic), /PRIVATE_/);
     } finally {
       await rm(directory, { recursive: true, force: true });
     }
@@ -221,3 +317,58 @@ for (const [source, error] of [
     }
   });
 }
+
+test(
+  'quota diagnostic timeout preserves the rate-limit pause and stops app-server descendants',
+  { timeout: 5000 },
+  async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'worker-quota-timeout-'));
+    let worker;
+    let descendant;
+    try {
+      const source = (await require('node:fs/promises').readFile(join(__dirname, 'worker.cjs'), 'utf8')).replace(
+        "finish(Error('timeout')), 15000",
+        "finish(Error('timeout')), 300",
+      );
+      await writeFile(join(directory, 'worker.cjs'), source);
+      const pidFile = join(directory, 'descendant');
+      await writeFile(
+        join(directory, 'codex'),
+        `#!${process.execPath}\nif(process.argv[2]==='app-server'){const c=require('node:child_process').spawn(process.execPath,['-e','setInterval(()=>{},1000)'],{stdio:'inherit'});require('node:fs').writeFileSync(${JSON.stringify(pidFile)},String(c.pid));setInterval(()=>{},1000);}else{process.stdin.resume();process.stdin.on('end',()=>{console.log(JSON.stringify({type:'turn.failed',error:{message:'HTTP 429'}}));setInterval(()=>{},1000)});}`,
+        { mode: 0o700 },
+      );
+      worker = spawn(process.execPath, [join(directory, 'worker.cjs')], {
+        env: { ...process.env, CODEX_HOME: directory, PATH: `${directory}:${process.env.PATH}` },
+      });
+      let stdout = '';
+      worker.stdout.on('data', (chunk) => (stdout += chunk));
+      const done = new Promise((resolve) => worker.on('close', resolve));
+      worker.stdin.end(JSON.stringify({ operation: 'decide', prompt: 'game', schema: {} }));
+      const result = await Promise.race([done, new Promise((resolve) => setTimeout(() => resolve('hung'), 1800))]);
+      descendant = Number(await require('node:fs/promises').readFile(pidFile, 'utf8'));
+      assert.equal(result, 0, 'metadata timeout must not retain worker pipes or locks');
+      assert.deepEqual(JSON.parse(stdout), { ok: false, error: 'rate_limit' });
+      const diagnostic = JSON.parse(
+        await require('node:fs/promises').readFile(join(directory, 'avalon-last-failure.json'), 'utf8'),
+      );
+      assert.equal(diagnostic.rateLimit.quota.status, 'unavailable');
+      if (process.platform === 'linux') {
+        let state;
+        try {
+          state = await require('node:fs/promises').readFile(`/proc/${descendant}/stat`, 'utf8');
+        } catch (error) {
+          assert.equal(error.code, 'ENOENT');
+        }
+        if (state) assert.equal(state.slice(state.lastIndexOf(')') + 2, state.lastIndexOf(')') + 3), 'Z');
+      } else assert.throws(() => process.kill(descendant, 0), { code: 'ESRCH' });
+    } finally {
+      worker?.kill('SIGKILL');
+      if (descendant) {
+        try {
+          process.kill(descendant, 'SIGKILL');
+        } catch {}
+      }
+      await rm(directory, { recursive: true, force: true });
+    }
+  },
+);

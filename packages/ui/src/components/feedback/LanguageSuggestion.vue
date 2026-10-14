@@ -27,6 +27,7 @@ const visible = computed(
     ready.value &&
     route.meta.lang &&
     !route.meta.skipSiteMap &&
+    (!route.meta.availableLocales || (route.meta.availableLocales as string[]).includes(preferred.value)) &&
     route.meta.lang !== preferred.value &&
     !dismissed.value.includes(pair.value),
 );

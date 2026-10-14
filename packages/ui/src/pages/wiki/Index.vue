@@ -21,6 +21,10 @@
       </LocaleLink>
     </nav>
 
+    <p>
+      <LocaleLink :to="{ name: 'social_deduction_games_online' }">{{ $t('wiki.compareGames') }}</LocaleLink>
+    </p>
+
     <h2>{{ $t('wiki.setup') }}</h2>
     <ul>
       <li v-html="$t('wiki.playerAssignment')"></li>

@@ -97,6 +97,18 @@ test('exhausted subscription quota gives an actionable pause reason', async () =
   await expect(remoteCodex({ operation: 'decide' })).rejects.toThrow('subscription usage limit');
 });
 
+test('rate-limited decisions pause with wait and manual retry guidance after one request', async () => {
+  const counter = join(directory, 'decision-attempts');
+  await writeFile(counter, '0');
+  await executable(
+    `const fs=require('node:fs');const path=${JSON.stringify(counter)};process.stdin.resume();process.stdin.on('end',()=>{fs.writeFileSync(path,String(Number(fs.readFileSync(path))+1));console.log(JSON.stringify({ok:false,error:'rate_limit'}))});`,
+  );
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toThrow(
+    'Codex request was rate limited. Wait a while, then manually retry the match.',
+  );
+  expect(await readFile(counter, 'utf8')).toBe('1');
+});
+
 test('worker timeouts show the stalled response reason rather than a generic SSH failure', async () => {
   await executable(`process.stdin.resume();process.stdin.on('end',()=>console.log('{"ok":false,"error":"timeout"}'));`);
   await expect(remoteCodex({ operation: 'decide' })).rejects.toThrow('timed out');
@@ -117,6 +129,7 @@ test.each([false, true])('decision request failure retries exactly once (alwaysF
 test.each([
   'busy',
   'usage_limit',
+  'rate_limit',
   'timeout',
   'forbidden_tool',
   'output_limit',

@@ -19,12 +19,14 @@ test('AI room snapshots and updates preserve the user-selected chat visibility',
   visit(source);
   assert.ok(receive, 'room session state receiver exists');
   const chatOpen = ref(false);
-  const callback = new Function('chatOpen', 'errorMessage', 'stateManager', 'userID', `return (${receive});`)(
-    chatOpen,
-    ref(),
-    { mutateRoomState() {} },
-    ref('spectator'),
-  );
+  const callback = new Function(
+    'chatOpen',
+    'errorMessage',
+    'stateManager',
+    'userID',
+    'trackRoomAcquisition',
+    `return (${receive});`,
+  )(chatOpen, ref(), { mutateRoomState() {} }, ref('spectator'), () => {});
 
   callback({ ai: {} }, 'snapshot');
   assert.equal(chatOpen.value, false, 'joining an AI room keeps chat closed');

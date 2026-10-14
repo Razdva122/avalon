@@ -46,6 +46,36 @@ test('404 page does not describe itself as an indexable public page or game', ()
   assert.equal(graphAt('/404/').length, 0);
 });
 
+test('all guide locales describe their canonical page and link localized breadcrumbs to existing public pages', () => {
+  for (const { route, language, prefix } of [
+    '/guides/social-deduction-games-online/',
+    '/guides/games-like-secret-hitler/',
+    '/guides/avalon-vs-werewolf/',
+  ].flatMap((path) =>
+    [
+      ['en', ''],
+      ['ru', '/ru'],
+      ['es', '/es'],
+      ['pt', '/pt'],
+      ['zh-CN', '/zh-cn'],
+      ['zh-TW', '/zh-tw'],
+    ].map(([language, prefix]) => ({ route: prefix + path, language, prefix })),
+  )) {
+    const graph = graphAt(route);
+    const page = graph.find((node) => node['@type'] === 'WebPage');
+    assert.equal(page.url, 'https://avalon-game.com' + route);
+    assert.equal(page.inLanguage, language);
+    const crumbs = graph.find((node) => node['@type'] === 'BreadcrumbList');
+    assert.equal(page.breadcrumb['@id'], crumbs['@id']);
+    assert.equal(crumbs.itemListElement[0].item, 'https://avalon-game.com' + prefix + '/');
+    assert.equal(crumbs.itemListElement.at(-1).item, page.url);
+    assert.equal(crumbs.itemListElement.length, route.includes('social-deduction-games-online') ? 2 : 3);
+    for (const item of crumbs.itemListElement) {
+      assert(fs.existsSync(path.join(dist, new URL(item.item).pathname, 'index.html')));
+    }
+  }
+});
+
 test('support and community deliver localized public content and structured data without private account data', () => {
   const { routesSeo } = require('../src/router/seo');
   const { localizedPath } = require('../src/router/paths');

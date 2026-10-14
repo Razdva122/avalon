@@ -58,6 +58,7 @@ defaults. NOWPayments is retired; support uses direct BTC/USDT transfers.
 
 ## Historical reports and research
 
+- [International SEO acquisition: guides, keywords and editorial prospects — 14 October 2026](seo-acquisition-2026-10-14.md)
 - [Локальный эксперимент: боты Avalon через Codex / ChatGPT](ai-evaluations/2026-10-01-codex/README.md)
 - [Видимость Avalon в поиске и ответах ИИ](ai-search-2026-09-25.md)
 - [Материалы для обзоров Avalon](avalon-outreach-2026-09-25.md)
@@ -78,6 +79,7 @@ defaults. NOWPayments is retired; support uses direct BTC/USDT transfers.
 
 ## Design records
 
+- [International SEO acquisition: first release](superpowers/specs/2026-10-14-seo-acquisition-launch.md)
 - [NOWPayments support and Premium](superpowers/specs/2026-09-16-nowpayments-design.md)
 - [Unified image storage](superpowers/specs/2026-09-17-image-storage.md)
 - [Прямые криптовалютные переводы для поддержки Avalon](superpowers/specs/2026-09-18-direct-crypto-support-design.md)
@@ -88,6 +90,7 @@ defaults. NOWPayments is retired; support uses direct BTC/USDT transfers.
 
 ## Implementation plans
 
+- [International SEO acquisition launch](superpowers/plans/2026-10-14-seo-acquisition-launch.md)
 - [NOWPayments Implementation Plan](superpowers/plans/2026-09-16-nowpayments.md)
 - [Image Storage Implementation Plan](superpowers/plans/2026-09-17-image-storage.md)
 - [Direct Crypto Support Implementation Plan](superpowers/plans/2026-09-18-direct-crypto-support.md)
@@ -112,3 +115,8 @@ contracts, persisted schemas, feature flags or release behavior. Add new guides 
 this index and link them from the feature/package overview. Keep dated evidence
 intact and clearly labelled; avoid mixing past rollout status into current setup.
 Do not record secrets or invent live verification results.
+
+- [SEO аудит статей на шести языках](seo-guides-audit-2026-10-14.md).
+- [Карта языковых запросов и изменений](seo-guides-language-keywords-2026-10-14.csv).
+- [Бесплатная проверка частотности и правки статей](seo-keyword-demand-2026-10-14.md).
+- [Измеренные диапазоны запросов по странам](seo-keyword-volumes-2026-10-14.csv) и [исходные ответы инструментов](seo-keyword-volumes-2026-10-14.json).

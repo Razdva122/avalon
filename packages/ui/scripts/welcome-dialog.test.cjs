@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const ts = require('typescript');
 const { parse } = require('@vue/compiler-sfc');
+require('ts-node').register({ transpileOnly: true, compilerOptions: { module: 'CommonJS' } });
 
 function component(path, imports = {}) {
   const { descriptor } = parse(fs.readFileSync(require.resolve(path), 'utf8'));
@@ -17,12 +18,15 @@ function component(path, imports = {}) {
   return exports.default;
 }
 
-function auth(reply) {
+function auth(reply, routeID = 'profile') {
   const actions = [];
-  const options = component('../src/components/user/AuthModal.vue');
+  const options = component('../src/components/user/AuthModal.vue', {
+    '@/helpers/acquisition': require('../src/helpers/acquisition.ts'),
+  });
   const state = {
     overlay: true,
     error: '',
+    $route: { name: routeID, meta: { id: routeID } },
     $store: { dispatch: async () => reply },
     $router: { push: async (path) => actions.push(['navigate', path]) },
     $emit: (event) => actions.push(['emit', event]),
@@ -30,6 +34,13 @@ function auth(reply) {
   for (const [name, method] of Object.entries(options.methods)) state[name] = method.bind(state);
   return { state, actions };
 }
+
+test('registering from a room link keeps the room and does not open welcome over play', async () => {
+  const { state, actions } = auth({ id: 'new-user' }, 'room');
+  await state.registerUser();
+  assert.equal(state.overlay, false);
+  assert.deepEqual(actions, []);
+});
 
 test('successful registration opens the welcome dialog after reaching the profile', async () => {
   const { state, actions } = auth({ id: 'new-user' });

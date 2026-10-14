@@ -12,6 +12,18 @@
 - Rooms, profiles, leaderboards and achievements have `noindex`; nginx supplies the header even before JavaScript runs. Crawling is allowed so search engines can read it.
 - Unknown routes return HTTP 404. Only known dynamic routes receive the application shell. Keep the nginx dynamic-route allowlist in sync when adding routes.
 
+## Multilingual acquisition guides
+
+The three `/guides/` articles have complete English, Russian, Spanish, Portuguese, Simplified Chinese and Traditional Chinese content and metadata. Their English URLs are unprefixed; other versions use the existing locale prefixes. Every version is prerendered, hydrated, listed in the sitemap and has its own canonical plus six language alternates and English `x-default`. Localized lobby/wiki links expose the hub. Article actions, related links and breadcrumbs retain the current language. Language switching and translation suggestions lead to the same article, preserving query and fragment.
+
+The bot action links to the current locale’s home with `#play-with-ai`, the existing lobby launch control. Human rooms and solo/friends-with-bots setup are described separately. Public AI copy refers to the settings' available sizes rather than freezing a temporary human-seat cap into the articles.
+
+On a guide, an explicit choice of an unavailable language opens that language's home, preserving the query but clearing the old article fragment. The automatic language suggestion is hidden when the current page has no translation in the preferred language. Existing fully translated public pages still keep their same-page language links.
+
+The implementation and measurements are recorded in [the dated acquisition report](../../docs/seo-acquisition-2026-10-14.md). Its candidate keywords and editorial prospects are research inputs, not measured demand or acquired links.
+
+Article translations are independent lazy chunks in `src/pages/guides/locales`; the route loads the selected content before navigation completes. Small SEO metadata stays separate in `src/i18n/langs/pages/seo/guides` so article bodies never enter the initial bundle. Shared labels, image alternative text, source labels and descriptions are translated too. AI discussion-language availability remains a separate product constraint; translating a guide does not expand AI-supported languages.
+
 ## Language and migration behavior
 
 Public pages do not redirect based on browser language or saved preferences. This makes their content stable for indexing and preserves an explicit English choice. An unprefixed legacy public link therefore opens English. Visitors with another preferred language receive a dismissible link to the same page in that language, with query and fragment preserved. The prompt is translated into the preferred language and excluded from prerendered HTML. Dismissal lasts for the tab session and does not change the visitor's preference.
@@ -33,6 +45,8 @@ Rooms and other private routes have language-neutral URLs. Old language-prefixed
 This policy follows [Google's multilingual site guidance](https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites): separate language URLs and visible links instead of automatic language redirects. Search results may still show an older unprefixed URL while Google recrawls the site. Correct hreflang helps language targeting but does not guarantee which result Google selects.
 
 ## Rendering and performance
+
+The three acquisition guides share one responsive article template across all six locales. Short introductions and a primary bot-play link precede the comparison; detailed access conditions appear after the explanations. Native contents disclosures link to stable section fragments with clearance for the fixed header. At widths up to 700px, labelled comparison cards replace the desktop table. Both layouts use the same rows, columns and source links; CSS hides the inactive layout. Prose has a narrower reading measure, while comparison tables can use the full article width. Routes, titles, canonical URLs and language alternates are unchanged by this layout revision.
 
 The lobby and statistics heading render without waiting for a WebSocket acknowledgement. The lobby includes a localized introduction and links to rules and roles. The production prerenderer waits for rendering and hydration verification to finish, and build verification rejects missing content or incorrect metadata.
 

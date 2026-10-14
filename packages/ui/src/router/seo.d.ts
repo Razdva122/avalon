@@ -5,6 +5,7 @@ type TRouteMeta = {
   skipSiteMap?: boolean;
   lang?: string;
   id?: string;
+  breadcrumbs?: Array<{ to: string; title: string }>;
 };
 
 type TSingleLangRouteMeta = TRouteMeta & { title: string; description: string; keywords: Array<string> };
@@ -15,6 +16,7 @@ type TMultiLangRouteMeta = TRouteMeta & {
       title: string;
       description: string;
       keywords: Array<string>;
+      breadcrumbs?: Array<{ to: string; title: string }>;
     };
   };
 };
@@ -25,6 +27,7 @@ type TRoute = {
   path: string;
   name: string;
   priority: number;
+  props?: boolean | Record<string, string>;
   meta: TRouteMeta;
 };
 

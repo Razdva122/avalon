@@ -3,6 +3,8 @@ import { Dictionary } from '@avalon/types';
 
 export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   pt: {
+    gameGuides: 'Guias de jogos',
+    compareGames: 'Compare Avalon, Secret Hitler e Lobisomem para escolher o próximo jogo do seu grupo.',
     introduction:
       'Primeira partida de Avalon? Comece pelas regras e pela tabela de jogadores por missão, depois consulte os papéis da sua partida. Explore as expansões quando o grupo quiser mais opções.',
     rules: 'Regras',
@@ -43,6 +45,8 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     roleScenarios: 'Situações práticas',
   },
   en: {
+    gameGuides: 'Game guides',
+    compareGames: 'Compare Avalon, Secret Hitler and Werewolf for your next group game.',
     introduction:
       'New to Avalon? Start with the rules and player-count table, then look up the roles in your game. Use the expansions guide when your group is ready to add more options.',
     rules: 'Rules',
@@ -81,6 +85,8 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     roleScenarios: 'Practical situations',
   },
   ru: {
+    gameGuides: 'Обзоры игр',
+    compareGames: 'Сравните Авалон, Secret Hitler и «Оборотней», чтобы выбрать игру для вашей компании.',
     introduction:
       'Впервые играете в Авалон? Начните с правил и таблицы участников миссий, затем изучите роли вашей партии. Когда освоитесь, переходите к дополнениям.',
     rules: 'Правила',
@@ -119,6 +125,8 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     roleScenarios: 'Игровые ситуации',
   },
   'zh-CN': {
+    gameGuides: '游戏指南',
+    compareGames: '比较阿瓦隆、Secret Hitler 和狼人杀，为朋友聚会选择游戏。',
     introduction:
       '第一次玩阿瓦隆？先阅读规则和任务人数表，再查看本局使用的角色。熟悉基本玩法后，再选择适合你们的扩展。',
     rules: '规则',
@@ -153,6 +161,8 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     roleScenarios: '实战场景',
   },
   'zh-TW': {
+    gameGuides: '遊戲指南',
+    compareGames: '比較阿瓦隆、Secret Hitler 與狼人殺，為朋友聚會選擇遊戲。',
     introduction:
       '第一次玩阿瓦隆？先閱讀規則和任務人數表，再查看本局使用的角色。熟悉基本玩法後，再選擇適合你們的擴充。',
     rules: '規則',
@@ -187,6 +197,8 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     roleScenarios: '實戰情境',
   },
   es: {
+    gameGuides: 'Guías de juegos',
+    compareGames: 'Compara Avalon, Secret Hitler y Hombre Lobo para elegir el próximo juego de tu grupo.',
     introduction:
       '¿Es tu primera partida de Avalon? Empieza por las reglas y la tabla de jugadores por misión, y después consulta los roles de tu partida. Explora las expansiones cuando el grupo quiera añadir más opciones.',
     rules: 'Reglas',

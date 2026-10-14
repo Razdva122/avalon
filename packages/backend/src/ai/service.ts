@@ -22,6 +22,8 @@ import { CODEX_MODEL, codexEnabled, codexDecide } from './codex';
 import { getBotProfile } from './agents';
 import { hasPremium } from '@/support/premium';
 import { supportTotalCents } from '@/support/repository';
+import { AI_PAUSE_TIMEOUT_MS } from './timing';
+import { aiText } from './language';
 
 const humanSettings: Record<AiBotMode, CodexSettings> = {
   smart: { model: 'gpt-6.1-sol', reasoning: 'medium' },
@@ -72,8 +74,10 @@ export class AiService {
   private creating = false;
   private starting = false;
   private publicStartingID?: string;
+  private technicalStart?: { roomID: string };
   private running = new Set<string>();
   private launchTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private pauseTimers = new Map<string, { expiresAt: number; timer: ReturnType<typeof setTimeout> }>();
   constructor(private manager: Manager) {
     const db = manager.dbManager.dbInstance?.connection.db;
     if (db) this.archive = new AiRepository(db);
@@ -166,6 +170,39 @@ export class AiService {
     );
   }
 
+  private clearPauseTimer(id: string) {
+    clearTimeout(this.pauseTimers.get(id)?.timer);
+    this.pauseTimers.delete(id);
+  }
+
+  private async expirePause(room: BotRoom, timer: ReturnType<typeof setTimeout>) {
+    const id = room.roomID;
+    if (this.pauseTimers.get(id)?.timer !== timer) return;
+    this.clearPauseTimer(id);
+    if (this.manager.rooms[id] !== room || room.ai?.status !== 'paused') return;
+    if (this.technicalStart?.roomID === id) {
+      this.technicalStart = undefined;
+      this.starting = false;
+    }
+    try {
+      room.stop(aiText(room.ai.language).pauseExpired);
+      await this.repository!.save(room.calculateRoomState());
+    } finally {
+      await this.repository!.release(id).catch(() => {});
+      this.manager.updateRoomsList(room);
+    }
+  }
+
+  private schedulePauseExpiry(room: BotRoom) {
+    this.clearPauseTimer(room.roomID);
+    const expiresAt = Date.now() + AI_PAUSE_TIMEOUT_MS;
+    const timer = setTimeout(() => {
+      void this.expirePause(room, timer).catch(() => console.error('AI pause expiry could not be saved'));
+    }, AI_PAUSE_TIMEOUT_MS);
+    timer.unref();
+    this.pauseTimers.set(room.roomID, { expiresAt, timer });
+  }
+
   private createRoom(id: string, owner: string, language: AiLanguage, playerCount: AiPlayerCount) {
     const room: BotRoom = new BotRoom(
       id,
@@ -196,6 +233,7 @@ export class AiService {
 
   private runRoom(room: BotRoom, technical = false) {
     const id = room.roomID;
+    this.clearPauseTimer(id);
     this.running.add(id);
     // run changes status synchronously before the first await: duplicate starts cannot spend twice.
     void room
@@ -204,9 +242,13 @@ export class AiService {
         /* room.run already exposes a sanitized paused status */
       })
       .finally(async () => {
-        this.manager.updateRoomsList(room);
-        await this.repository!.release(id).catch(() => {});
-        this.running.delete(id);
+        if (this.manager.rooms[id] === room && room.ai?.status === 'paused') this.schedulePauseExpiry(room);
+        try {
+          await this.repository!.release(id).catch(() => {});
+        } finally {
+          this.running.delete(id);
+          this.manager.updateRoomsList(room);
+        }
       });
   }
 
@@ -639,6 +681,7 @@ export class AiService {
         if (this.starting) return cb({ error: 'AI room control in progress' });
         if (action === 'stop') {
           this.clearLaunchTimer(id);
+          this.clearPauseTimer(id);
           delete room.ai!.launchExpiresAt;
           room.stop();
           await this.repository!.save(room.calculateRoomState());
@@ -659,16 +702,31 @@ export class AiService {
         if (room.ai?.model === CODEX_MODEL && !room.ai.codex)
           return cb({ error: 'Choose a Codex model and reasoning level before launch' });
         this.starting = true;
+        const technicalStart = technical ? { roomID: id } : undefined;
+        if (technicalStart) this.technicalStart = technicalStart;
         try {
           if (!technical && room.ai?.botDifficulty && !(await this.humanModes())[room.ai.botDifficulty])
             return cb({ error: 'This bot mode is currently unavailable' });
           if (room.ai?.status !== (technical ? 'paused' : 'ready')) return cb({ error: 'AI room control in progress' });
           await this.repository!.claim(id);
+          const pause = this.pauseTimers.get(id);
+          if (technical && pause && pause.expiresAt <= Date.now()) await this.expirePause(room, pause.timer);
+          if (
+            this.manager.rooms[id] !== room ||
+            room.ai?.status !== (technical ? 'paused' : 'ready') ||
+            (technical && (this.technicalStart !== technicalStart || !room.ai.canResumeTechnical))
+          ) {
+            await this.repository!.release(id).catch(() => {});
+            return cb({ error: 'AI room is no longer ready to start or resume' });
+          }
           this.runRoom(room, technical);
           this.manager.updateRoomsList(room);
           cb({ ok: true });
         } finally {
-          this.starting = false;
+          if (!technicalStart || this.technicalStart === technicalStart) {
+            this.technicalStart = undefined;
+            this.starting = false;
+          }
         }
       } catch (error) {
         cb({ error: error instanceof AiPause ? error.message : 'AI room control failed' });

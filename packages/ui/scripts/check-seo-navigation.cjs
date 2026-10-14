@@ -19,7 +19,7 @@ const server = http.createServer((req, res) => {
     // Runs after HTML parsing but before the deferred app bundle. Keep the
     // actual painted nodes so a client remount cannot pass as hydration.
     const capture = `<script>
-      window.__initialHero = Array.from(document.querySelectorAll('.lobby-hero h1, .lobby-intro'))
+      window.__initialHero = Array.from(document.querySelectorAll('.lobby-hero h1, .lobby-intro, .info-page-content h1, .info-page-content p'))
         .map(node => ({ node, firstChild: node.firstChild, text: node.textContent }));
     </script>`;
     res.end(fs.readFileSync(file, 'utf8').replace('</body>', `${capture}</body>`));
@@ -153,6 +153,104 @@ const server = http.createServer((req, res) => {
     await page.waitForSelector('.v-overlay--active input[type="password"]', { visible: true });
     assert.deepEqual(pageErrors, [], 'Hydration/preferences must preserve working login controls');
     await page.evaluate(() => localStorage.clear());
+    await page.evaluate(() =>
+      localStorage.setItem('__user-settings__', JSON.stringify({ locale: { value: 'ru', isDefault: false } })),
+    );
+    for (const { pathname, language, prefix } of [
+      '/guides/social-deduction-games-online/',
+      '/guides/games-like-secret-hitler/',
+      '/guides/avalon-vs-werewolf/',
+    ].flatMap((path) =>
+      [
+        ['en', ''],
+        ['ru', '/ru'],
+        ['es', '/es'],
+        ['pt', '/pt'],
+        ['zh-CN', '/zh-cn'],
+        ['zh-TW', '/zh-tw'],
+      ].map(([language, prefix]) => ({ pathname: prefix + path, language, prefix })),
+    )) {
+      await page.goto(origin + pathname, { waitUntil: 'networkidle0' });
+      await page.waitForFunction(() => document.querySelector('#app').__vue_app__);
+      const content = await page.evaluate(() => ({
+        count: window.__initialHero.length,
+        retained: window.__initialHero.every(
+          ({ node, firstChild, text }) =>
+            document.querySelector('#app').contains(node) &&
+            node.firstChild === firstChild &&
+            node.textContent === text,
+        ),
+      }));
+      assert(content.count > 3, `${pathname}: missing prerendered guide text`);
+      assert.equal(content.retained, true, `${pathname}: hydration replaced guide text`);
+      assert.equal(await page.$eval('.guide-page', (node) => node.lang), language, pathname);
+      if (await page.$('.language-suggestion a')) {
+        assert.equal(
+          await page.$eval('.language-suggestion a', (link) => new URL(link.href).pathname),
+          '/ru' + pathname.replace(/^\/(?:ru|es|pt|zh-cn|zh-tw)(?=\/)/, ''),
+          'Suggestion keeps the same translated article',
+        );
+        await page.locator('.language-suggestion button').click();
+      }
+      await page.setViewport({ width: 390, height: 844 });
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, pathname);
+      await page.locator(`.guide-page a[href="${prefix}/#play-with-ai"]`).click();
+      await page.waitForFunction(() => {
+        const launch = document.querySelector('#play-with-ai .bot-room-button');
+        const top = document.querySelector('#play-with-ai')?.getBoundingClientRect().top;
+        return (
+          location.pathname.endsWith('/') &&
+          !location.pathname.includes('/guides/') &&
+          location.hash === '#play-with-ai' &&
+          launch &&
+          top !== undefined &&
+          Math.abs(top - 80) < 3
+        );
+      });
+      await page.waitForSelector('#play-with-ai .bot-room-button', { visible: true });
+      assert.equal(new URL(page.url()).pathname, prefix + '/', 'Bot CTA keeps article locale');
+      await page.setViewport({ width: 1280, height: 900 });
+      if (pathname === '/guides/avalon-vs-werewolf/') {
+        await page.evaluate(async (route) => {
+          await document.querySelector('#app').__vue_app__.config.globalProperties.$router.replace({
+            path: route,
+            query: { ref: 'menu-check' },
+            hash: '#comparison',
+          });
+        }, pathname);
+        await page.click('.menu-trigger');
+        await page.waitForSelector('.v-overlay--active .language-trigger', { visible: true });
+        // The dialog is visible during its enter animation, while its content
+        // still ignores pointer events. Wait for a stable button before clicking.
+        await page.locator('.v-overlay--active .language-trigger').click();
+        await page.waitForSelector('.v-overlay--active .language-links a', { visible: true });
+        const languageLinks = await page.$$eval('.v-overlay--active .language-links a', (links) =>
+          Object.fromEntries(
+            links.map((link) => [
+              link.lang,
+              new URL(link.href).pathname + new URL(link.href).search + new URL(link.href).hash,
+            ]),
+          ),
+        );
+        assert.deepEqual(languageLinks, {
+          en: '/guides/avalon-vs-werewolf/?ref=menu-check#comparison',
+          ru: '/ru/guides/avalon-vs-werewolf/?ref=menu-check#comparison',
+          'zh-TW': '/zh-tw/guides/avalon-vs-werewolf/?ref=menu-check#comparison',
+          'zh-CN': '/zh-cn/guides/avalon-vs-werewolf/?ref=menu-check#comparison',
+          es: '/es/guides/avalon-vs-werewolf/?ref=menu-check#comparison',
+          pt: '/pt/guides/avalon-vs-werewolf/?ref=menu-check#comparison',
+        });
+        await page.click('.v-overlay--active .language-links a[lang="ru"]');
+        await page.waitForFunction(
+          () =>
+            location.pathname === '/ru/guides/avalon-vs-werewolf/' &&
+            location.hash === '#comparison' &&
+            document.querySelector('.guide-page')?.lang === 'ru',
+        );
+      }
+      assert.deepEqual(pageErrors, [], `Uncaught errors while hydrating ${pathname}`);
+    }
+    await page.evaluate(() => localStorage.clear());
     await page.goto(origin, { waitUntil: 'networkidle0' });
     await page.waitForFunction(() => document.querySelector('#app').__vue_app__);
     for (const pathname of [
@@ -165,6 +263,14 @@ const server = http.createServer((req, res) => {
       '/ru/community/players/',
       '/ru/community/groups/',
       '/ru/support/',
+      '/guides/social-deduction-games-online/',
+      '/guides/games-like-secret-hitler/',
+      '/guides/avalon-vs-werewolf/',
+      '/es/guides/avalon-vs-werewolf/',
+      '/pt/guides/avalon-vs-werewolf/',
+      '/zh-cn/guides/games-like-secret-hitler/',
+      '/zh-tw/guides/games-like-secret-hitler/',
+      '/ru/guides/social-deduction-games-online/',
       '/leaderboard/',
       '/',
     ]) {
@@ -229,7 +335,7 @@ const server = http.createServer((req, res) => {
           const node = JSON.parse(raw)['@graph'].find((n) => n['@type'] === 'WebPage');
           return (
             node.url === 'https://avalon-game.com' + route &&
-            (route.includes('/wiki/') || route.includes('/community/')
+            (route.includes('/wiki/') || route.includes('/community/') || route.includes('/guides/')
               ? JSON.parse(crumbs)['@id'] === node.breadcrumb['@id']
               : crumbs === '')
           );
@@ -247,7 +353,7 @@ const server = http.createServer((req, res) => {
       else
         assert.equal(
           JSON.parse(state.graph)['@graph'].find((n) => n['@type'] === 'WebPage').inLanguage,
-          pathname.startsWith('/ru/') ? 'ru' : 'en',
+          { ru: 'ru', es: 'es', pt: 'pt', 'zh-cn': 'zh-CN', 'zh-tw': 'zh-TW' }[pathname.split('/')[1]] || 'en',
         );
       console.log('SPA structured data OK:', pathname);
     }

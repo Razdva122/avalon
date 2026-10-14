@@ -11,6 +11,12 @@ function localizedPath(path, language) {
   return prefix + basePath(path);
 }
 
+function languageSwitchTarget(path, language, availableLocales, hash = '') {
+  const available =
+    !availableLocales || availableLocales.some((locale) => locale.toLowerCase() === language.toLowerCase());
+  return { path: localizedPath(available ? path : '/', language), hash: available ? hash : '' };
+}
+
 function isNeutralPath(path) {
   return /^\/(?:password-recovery|profile|leaderboard|achievements\/global|room\/[^/]+|stats\/user\/[^/]+|achievements\/user\/[^/]+)\/$/.test(
     basePath(path),
@@ -23,4 +29,4 @@ function neutralRoomUrl(url) {
   return result.href;
 }
 
-module.exports = { basePath, localizedPath, isNeutralPath, neutralRoomUrl };
+module.exports = { basePath, localizedPath, languageSwitchTarget, isNeutralPath, neutralRoomUrl };

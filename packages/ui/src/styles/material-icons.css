@@ -111,6 +111,9 @@
 .material-icons.block::before {
   content: '\e14b';
 }
+.material-icons.build::before {
+  content: '\e869';
+}
 .material-icons.cached::before {
   content: '\e86a';
 }
@@ -213,6 +216,9 @@
 .material-icons.devices::before {
   content: '\e1b1';
 }
+.material-icons.difference::before {
+  content: '\eb7d';
+}
 .material-icons.discord::before {
   content: '\ea6c';
 }
@@ -224,6 +230,9 @@
 }
 .material-icons.done::before {
   content: '\e876';
+}
+.material-icons.download::before {
+  content: '\f090';
 }
 .material-icons.draw::before {
   content: '\e746';
@@ -393,6 +402,9 @@
 .material-icons.last_page::before {
   content: '\e5dd';
 }
+.material-icons.launch::before {
+  content: '\e895';
+}
 .material-icons.layers::before {
   content: '\e53b';
 }
@@ -422,6 +434,9 @@
 }
 .material-icons.logout::before {
   content: '\e9ba';
+}
+.material-icons.loop::before {
+  content: '\e028';
 }
 .material-icons.loyalty::before {
   content: '\e89a';
@@ -719,6 +734,9 @@
 }
 .material-icons.title::before {
   content: '\e264';
+}
+.material-icons.toc::before {
+  content: '\e8de';
 }
 .material-icons.token::before {
   content: '\ea25';

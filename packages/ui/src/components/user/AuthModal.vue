@@ -88,6 +88,7 @@ import type { VForm } from 'vuetify/components';
 import BaseModal from '@/components/user/BaseModal.vue';
 import PasswordField from '@/components/modals/PasswordField.vue';
 import TextField from '@/components/modals/TextField.vue';
+import { consumePlayIntent, trackSignup } from '@/helpers/acquisition';
 
 export default defineComponent({
   components: {
@@ -161,6 +162,7 @@ export default defineComponent({
         this.error = userOrError.error;
       } else {
         this.closeAuthModal();
+        consumePlayIntent(this.$route.meta.id || this.$route.name);
       }
     },
     async registerUser() {
@@ -175,6 +177,8 @@ export default defineComponent({
         this.error = userOrError.error;
       } else {
         this.closeAuthModal();
+        trackSignup();
+        if (consumePlayIntent(this.$route.meta.id || this.$route.name)) return;
         await this.$router.push('/profile');
         this.$emit('registered');
       }
