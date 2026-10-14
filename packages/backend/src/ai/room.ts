@@ -847,7 +847,7 @@ export class BotRoom extends Room {
       case 'announceLoyalty':
         task = ['mordred', 'morgana', 'minion', 'oberon'].includes(own.role)
           ? 'Announce the Lady result; choose truth or a strategic lie for Evil'
-          : 'Announce privateKnowledge.inspectionResult truthfully by default. Lady explains your knowledge without revealing your role. Do not reverse the result merely to hide Merlin.';
+          : 'Good bots must announce privateKnowledge.inspectionResult truthfully, without a protective exception. Lady explains your knowledge without revealing your role.';
         privateCheck = this.manager.getGameData(id, { method: 'getLoyalty' });
         // Chat is generated from this same choice after applying the announcement.
         choices = ['good', 'evil'].map((loyalty) => ({

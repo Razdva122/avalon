@@ -17,6 +17,58 @@ const request: BotRequest = {
   privateCheck: 'evil',
 };
 
+test.each(['regular', 'smart'] as const)(
+  'Percival can accuse a false bot checker without exposing the wizard pair (%s)',
+  async (botDifficulty) => {
+    const publicReason =
+      'Я дал успех, поэтому провал дал 1. Бот 7 ложно назвал его мирным: 7 тоже злой. Предлагаю 3,5,6.';
+    const generate = jest.fn().mockResolvedValue({ choice: 0, speech: '1 and 7 are Evil.', publicReason });
+    const input = {
+      ...request,
+      botDifficulty,
+      playerID: 'percival',
+      humanPlayerID: 'human',
+      publicDiscussion: true,
+      choices: ['3,5,6'],
+      state: {
+        stage: 'selectTeam',
+        mission: 2,
+        vote: 0,
+        players: [
+          { id: 'percival', index: 3, role: 'percival', features: {} },
+          { id: 'target', index: 1, role: 'mysteryWizard', features: {} },
+          { id: 'human', index: 2, role: 'mysteryWizard', features: {} },
+          { id: 'checker', index: 7, role: 'unknown', features: {} },
+        ],
+        history: [
+          {
+            type: 'mission',
+            index: 0,
+            leaderID: 'target',
+            result: 'fail',
+            fails: 1,
+            actions: [{ playerID: 'percival', value: 'success' }, { playerID: 'target' }],
+          },
+          { type: 'announceLoyalty', announcerID: 'checker', targetID: 'target', announced: 'good' },
+        ],
+      } as unknown as VisualGameState,
+    };
+    const reply = await decisionPipeline(generate)(input);
+    const { instructions, context } = generate.mock.calls[0][1];
+    expect(instructions).toContain('Good bots must announce the actual Lady result');
+    expect(instructions).toContain('false announcement by a bot proves that checker Evil');
+    expect(instructions).toContain('You may publicly state your own Success card');
+    expect(context.humanSeats).toEqual([2]);
+    expect(context.checks).toEqual([{ by: 7, target: 1, announced: 'good', actual: undefined }]);
+    expect(context.completedMissions[0]).toMatchObject({ fails: 1, yourCard: 'success', cards: undefined });
+    expect(reply.speech).toBe(publicReason);
+    const publicFacts = publicContext(input, '3,5,6');
+    expect(publicFacts).toHaveProperty('humanSeats', [2]);
+    expect(publicFacts.missions[0]).not.toHaveProperty('yourCard');
+    expect(publicFacts).not.toHaveProperty('privateKnowledge');
+  },
+);
+
 test('technical resume requests a fresh decision after an invalid choice', async () => {
   const generate = jest
     .fn()
@@ -238,15 +290,23 @@ test('forced Success and truthful Good Lady announcements do not call the model'
   expect(
     await decide({ ...good, speak: false, choices: ['success'], state: { ...good.state, stage: 'onMission' } }),
   ).toEqual({ choice: 0, speech: '' });
-  expect(
-    await decide({
-      ...good,
-      speak: false,
-      choices: ['good', 'evil'],
-      privateCheck: 'evil',
-      state: { ...good.state, stage: 'announceLoyalty' },
-    }),
-  ).toEqual({ choice: 1, speech: '' });
+  for (const role of ['servant', 'merlin', 'percival']) {
+    for (const privateCheck of ['good', 'evil']) {
+      expect(
+        await decide({
+          ...good,
+          speak: false,
+          choices: ['good', 'evil'],
+          privateCheck,
+          state: {
+            ...good.state,
+            stage: 'announceLoyalty',
+            players: [{ id: 'g', index: 7, role, features: {} }],
+          } as VisualGameState,
+        }),
+      ).toEqual({ choice: privateCheck === 'good' ? 0 : 1, speech: '' });
+    }
+  }
   expect(generate).not.toHaveBeenCalled();
 });
 

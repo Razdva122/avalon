@@ -12,6 +12,32 @@ const request: BotRequest = {
   chat: [],
   choices: ['approve', 'reject'],
 };
+test.each([{}, { humanPlayerID: 'human' }, { humanPlayerIDs: ['human', 'second-human'] }])(
+  'Lady reasoning identifies human checkers without revealing hidden roles: %j',
+  (humans) => {
+    const state = {
+      stage: 'selectTeam',
+      players: [
+        { id: 'bot', index: 3, role: 'percival', features: {} },
+        { id: 'human', index: 2, role: 'unknown', features: {} },
+        { id: 'second-human', index: 7, role: 'unknown', features: {} },
+      ],
+      history: [],
+    } as unknown as VisualGameState;
+    const input = { ...request, ...humans, state };
+    expect(compactRequest(input)).toHaveProperty(
+      'humanSeats',
+      'humanPlayerIDs' in humans ? [2, 7] : 'humanPlayerID' in humans ? [2] : [],
+    );
+    for (const stage of ['selectTeam', 'checkLoyalty', 'announceLoyalty']) {
+      const prompt = systemFor({ ...input, state: { ...state, stage } as VisualGameState });
+      expect(prompt).toContain('Good bots must announce the actual Lady result');
+      expect(prompt).toContain('false announcement by a bot proves that checker Evil');
+      expect(prompt).toContain('Humans may lie');
+      expect(prompt).not.toMatch(/truthfully by default|lie requires a concrete protective tactic/);
+    }
+  },
+);
 test('rejects invented choices and oversized speech', () => {
   expect(() => parseReply('{"choice":9,"speech":"hello"}', 2)).toThrow();
   expect(() => parseReply(JSON.stringify({ choice: 0, speech: 'a'.repeat(501) }), 2)).toThrow();

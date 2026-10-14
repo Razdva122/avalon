@@ -9,6 +9,7 @@ import {
   tableConversationAdvice,
   coalitionAdvice,
   evilTeamAdvice,
+  ladyAnnouncementAdvice,
   assassinationCheck,
 } from './client';
 import type { BotReply, BotRequest, Decide, GenerationOptions, DecisionEvidence } from './client';
@@ -21,6 +22,7 @@ export function publicContext(request: BotRequest, choice: string) {
     personality: request.style,
     language: request.language ?? 'en',
     playerCount: c.playerCount,
+    humanSeats: c.humanSeats,
     approvalsRequired: c.approvalsRequired,
     alignmentCounts: c.alignmentCounts,
     roleCounts: c.roleCounts,
@@ -191,6 +193,8 @@ export function decisionInstructions(request: BotRequest) {
     'Public claims and modelHypotheses are fallible testimony or notes, not verified roles. Retain useful earlier deductions and reconsider them with new evidence. A truthful Lady result reveals alignment, not role, and does not clear its author. Do not invent votes, inspections, dialogue or future cards. ' +
     'Current actionFacts, privateKnowledge and recorded events override old modelHypotheses. A note about a previous roster does not describe the current proposal. Correct a contradicted note using the same evidence key; include the mission/proposal or event in its source. Never reuse a known false note as a premise. ' +
     'Keep private knowledge private: never confess being Evil or Merlin, expose the wizard pair or allies, or announce sabotage. A deliberate Percival claim is allowed through claimMorgana and must be written in publicReason. Your public argument can bluff for your side; your private reason must still use your actual side and knowledge. Merlin must protect both missions and their identity: use the public-viewpoint check in roleAdvice before publishing, including equal treatment of competing unverified claims. Keep private certainty in speech and evidence, not in unsupported public conclusions. ' +
+    ladyAnnouncementAdvice +
+    ' ' +
     strategy +
     ' ' +
     turn +

@@ -157,6 +157,10 @@ with no prearranged sabotage order or designated saboteur. Secret card decisions
 retain the bounded public chat and vote history; future cards and unseen allies
 remain unknown.
 Good Lady-result announcements are deterministic and truthful.
+The model receives human seat numbers and the rule that a bot announcement proven
+false establishes the checker as Evil. Humans can choose their announcement, so
+that inference does not apply to them. A bot can state its own mission card as
+testimony to support an accusation without revealing Merlin or the wizard pair.
 
 During ordinary play and the public Evil council, only `publicReason` is
 published. `speech` remains the private decision reason used by diagnostics and
