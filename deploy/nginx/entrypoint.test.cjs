@@ -12,8 +12,10 @@ test('entrypoint retains the read-only source and launches nginx with the valida
     const runtime = path.join(dir, 'avalon-runtime.conf');
     const args = path.join(dir, 'args');
     const validation = path.join(dir, 'validation');
-    const original = 'server {\n  location /api/support {\n    proxy_pass http://backend:3000;\n  }\n}\n';
-    fs.writeFileSync(source, original, { mode: 0o444 });
+    const app = path.join(dir, 'app');
+    fs.mkdirSync(app);
+    const original = 'server {\n  root /app;\n  location /api/support {\n    proxy_pass http://backend:3000;\n  }\n}\n';
+    fs.writeFileSync(source, original.replaceAll('/app', app), { mode: 0o444 });
     fs.writeFileSync(path.join(dir, 'nginx'), '#!/bin/sh\nprintf "%s\\n" "$@" > "$VALIDATION"\n', { mode: 0o755 });
     const official = path.join(dir, 'official.sh');
     fs.writeFileSync(official, '#!/bin/sh\nprintf "%s\\n" "$@" > "$CAPTURE"\n', { mode: 0o755 });
@@ -22,15 +24,22 @@ test('entrypoint retains the read-only source and launches nginx with the valida
       .replaceAll('/etc/nginx/avalon-runtime.conf', runtime)
       .replaceAll('/etc/nginx/nginx.conf', source)
       .replaceAll('/usr/local/share/avalon/board-route.awk', path.join(__dirname, 'board-route.awk'))
-      .replaceAll('/docker-entrypoint.sh', official);
+      .replaceAll('/docker-entrypoint.sh', official)
+      .replaceAll('/app', app);
     const entrypoint = path.join(dir, 'entrypoint.sh');
     fs.writeFileSync(entrypoint, wrapper);
     const env = { ...process.env, PATH: dir + ':' + process.env.PATH, CAPTURE: args, VALIDATION: validation };
     const result = spawnSync('sh', [entrypoint, 'nginx', '-g', 'daemon off;'], { env, encoding: 'utf8' });
     assert.equal(result.status, 0, result.stderr);
-    assert.equal(fs.readFileSync(source, 'utf8'), original);
+    assert.equal(fs.readFileSync(source, 'utf8'), original.replaceAll('/app', app));
+    assert.equal(fs.readlinkSync(path.join(app, '.avalon-current')), '.');
+    assert.ok(fs.readFileSync(runtime, 'utf8').includes(`root ${app}/.avalon-current;`));
+    fs.unlinkSync(path.join(app, '.avalon-current'));
+    fs.symlinkSync('release-two', path.join(app, '.avalon-current'));
+    assert.equal(spawnSync('sh', [entrypoint, 'nginx', '-g', 'daemon off;'], { env }).status, 0);
+    assert.equal(fs.readlinkSync(path.join(app, '.avalon-current')), 'release-two');
     assert.match(fs.readFileSync(runtime, 'utf8'), /location \^~ \/api\/player-boards/);
-    assert.equal(fs.readFileSync(validation, 'utf8'), `-t\n-c\n${runtime}\n`);
+    assert.equal(fs.readFileSync(validation, 'utf8'), `-t\n-c\n${runtime}.next\n`);
     assert.equal(fs.readFileSync(args, 'utf8'), `nginx\n-c\n${runtime}\n-g\ndaemon off;\n`);
     fs.unlinkSync(validation);
     for (const command of [

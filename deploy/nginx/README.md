@@ -12,7 +12,11 @@ mounted config and writes `/etc/nginx/avalon-runtime.conf`. If the board API is
 missing, `board-route.awk` adds it immediately before the existing support API
 location, using that location's `proxy_pass`. All other configuration, including
 voice servers and certificates, is retained. The host file is never written.
-Nginx validates the generated file before starting. An existing board route is
+The wrapper also creates `/app/.avalon-current` pointing to the bundled files on
+first startup and routes `root /app` through that link in the generated config.
+FirstByte deployment can atomically switch that link while nginx keeps running.
+The selected link survives container restarts. Nginx validates the generated file
+before replacing the runtime config and starting or reloading. An existing board route is
 left unchanged. Missing or ambiguous support locations fail startup with an
 explicit diagnostic instead of guessing where to install an API route.
 

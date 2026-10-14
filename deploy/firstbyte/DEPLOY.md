@@ -17,12 +17,16 @@ Compose project `avalon-production`. The runner does not build images or copy se
 
 The manual job is named **deploy to server**. A tag push only publishes images; it does not deploy.
 The server pulls both images, records their immutable digests, checks room inventory immediately
-before activation, then updates only `backend` and `ui` with
-`--no-deps`. MongoDB, volumes, LiveKit/HAProxy configuration, TLS and environment files stay in place.
-There is a short application interruption. Deploy during a quiet period: room checks are a safety
+before activation, then exports `/app` from the UI image without starting it. The running `ui` gateway
+stages the files under `/app/.avalon-releases/<digest>` and atomically switches
+`/app/.avalon-current`. Only `backend` is recreated with `--no-deps`; nginx keeps
+its listening sockets open. Homepage, HTML and static assets remain available while
+API/Socket.IO are temporarily unavailable. MongoDB, volumes, LiveKit/HAProxy
+configuration, TLS and environment files stay in place.
+There is a short backend interruption. Deploy during a quiet period: room checks are a safety
 check, not a maintenance lock preventing new rooms from being created immediately afterward.
 
-The old images return automatically if container startup, HTTPS, nginx, voice health or the
+The previous static directory and backend image return automatically if container startup, HTTPS, nginx, voice health or the
 Socket.IO/database check fails. **Database contents are never automatically rolled back.** Releases
 with incompatible database migrations require a separate migration plan. Watchdog remains enabled
 and may briefly stop/recover voice during the backend restart.
@@ -38,6 +42,37 @@ or wait for a backup. Before a release requiring a database migration, arrange a
 backup separately. Data recovery uses the latest successful scheduled copy, while application
 rollback still restores the previous images automatically.
 
+## Static releases and gateway maintenance
+
+The UI image digest in Compose identifies the desired **static release**. The
+running gateway container keeps its original nginx image; normal deployment
+updates its static files and startup wrapper, not the nginx binary. The wrapper
+preserves host-mounted config, generates the runtime root `/app/.avalon-current`,
+and reloads nginx gracefully. Ordinary Docker restart or host reboot retains the
+selected release in the container writable layer. Explicit container recreation
+uses the desired Compose image and its bundled `/app` files as the initial release.
+Nginx base-image/security upgrades therefore need a separate planned gateway
+rollout; do not run `compose up ui` as part of normal application deployment.
+
+Old hashed JS/CSS/images/fonts are retained in both directions, including rollback,
+so open tabs can still load their assets. Missing assets use hard links within the
+container. Static release directories consume disk space and are not automatically
+pruned. Inspect their size during disk maintenance; never remove the current or
+previous rollback target. Gateway recreation resets this retained asset history.
+
+To inspect the actual frontend release and effective root:
+
+```sh
+docker compose -f /opt/avalon/production/compose.production.yaml exec -T ui readlink /app/.avalon-current
+docker compose -f /opt/avalon/production/compose.production.yaml exec -T ui nginx -T -c /etc/nginx/avalon-runtime.conf
+```
+
+`deploy-pending.json` records `previousStatic` and `uiContainer` for recovery after
+an interrupted transaction. Retain that container while investigating the marker.
+The nginx wrapper must be installed alongside the root-owned deploy script before
+using this rollout method; the first real rollout installs it into the live
+container and reloads nginx without restarting it.
+
 ## Access and server installation
 
 - GitHub environment: `production`, deployment branch policy: **master only**.
@@ -49,7 +84,8 @@ rollback still restores the previous images automatically.
   Key options are `restrict,command="sudo -n /usr/local/sbin/avalon-deploy \"$SSH_ORIGINAL_COMMAND\""`.
 - `/etc/sudoers.d/avalon-deploy` (`0440`, validated with `visudo -cf`) contains:
   `avalon-deploy ALL=(root) NOPASSWD: /usr/local/sbin/avalon-deploy`.
-- Install `deploy.py` root-owned as `/opt/avalon/production/deploy.py` (`0700`) and symlink
+- Install `deploy.py` root-owned as `/opt/avalon/production/deploy.py` (`0700`), install `deploy/nginx/entrypoint.sh`
+  as `/opt/avalon/production/nginx-entrypoint.sh` (`0755`), and symlink
   `/usr/local/sbin/avalon-deploy` to it. Install the existing `deploy/voice/check-idle.cjs` as
   `/opt/avalon/production/check-idle.cjs` (`0600`).
 - Prerequisites: the existing FirstByte production compose, backup service, watchdog, Python 3,
@@ -91,10 +127,22 @@ the recovery bundle contains production files but not the account's `/var/lib` d
 ## Checks
 
 ```sh
-python3 -m unittest discover -s deploy/firstbyte -p test_deploy.py
+python3 -m unittest discover -s deploy/firstbyte -p 'test*.py'
 node --test .github/tests/*.test.cjs
 ```
 
 Tests exercise the actual compose transaction with isolated filesystem state and substitute only
 external Docker/systemd/health operations. Real preflight, restricted SSH rejection and a no-op
 v71 deployment were also checked on FirstByte during initial setup.
+
+Optional real Docker integration check (isolated container, loopback-only HTTP;
+the release image must already be pulled):
+
+```sh
+AVALON_DOCKER_TEST_IMAGE=razdva12/nginx-avalon@sha256:<ui-digest> \
+  python3 -m unittest discover -s deploy/firstbyte -p test_static_integration.py
+```
+
+It continuously requests HTML during staging, switches and rollback, verifies
+assets in both directions while API returns 502, and checks the selected frontend
+after a container restart. It never restarts a production service.

@@ -45,8 +45,11 @@ container release.
 3. Preserve production secrets, volumes and existing network/certificate settings.
    Configure required flags and Compose fragments before switching images.
 4. Wait for human and AI games to finish. Backend recreation disconnects active games.
-5. Pull the selected images and recreate the intended services using the VM's
-   actual Compose project/service names. A restart alone does not select a new image.
+5. Pull the selected images. FirstByte's manual deploy stages and atomically
+   switches frontend files inside the running nginx gateway and recreates only
+   backend. Do not recreate `ui` during ordinary application releases; see the
+   [manual deployment guide](firstbyte/DEPLOY.md). A restart alone does not select
+   a new backend image.
 6. Check backend startup/migrations, homepage, room/socket access and relevant APIs.
    Run public SEO HTTP checks after a UI/nginx update.
 

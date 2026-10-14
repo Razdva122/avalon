@@ -82,12 +82,21 @@ class DeployTests(unittest.TestCase):
 
             with patch.object(deploy, 'ROOT', root), patch.object(deploy, 'run', side_effect=command), \
                  patch.object(deploy, 'health', side_effect=health), \
+                 patch.object(deploy, 'prepare_static', create=True, side_effect=RuntimeError('incomplete UI') if failure == 'static-prepare' else None, return_value=('ui-container', '.avalon-releases/' + '2' * 64, '.')), \
+                 patch.object(deploy, 'switch_static', create=True) as static_switch, \
                  patch.object(deploy.shutil, 'disk_usage', return_value=namedtuple('usage', 'total used free')(40, 10, (1 if failure == 'disk' else 30) * 1024**3)):
                 if failure and not (failure == 'busy' and skip):
                     with self.assertRaises((RuntimeError, subprocess.CalledProcessError)):
                         deploy.deploy('v72.0.0', check_only=check, skip_room_check=skip)
                 else:
                     deploy.deploy('v72.0.0', check_only=check, skip_room_check=skip)
+            if starts:
+                self.assertGreaterEqual(static_switch.call_count, 1, "Deployment must switch static files without recreating ui")
+                self.assertEqual(static_switch.call_args_list[0].args, ('ui-container', '.avalon-releases/' + '2' * 64))
+                if failure in ['start', 'health']:
+                    self.assertEqual(static_switch.call_args_list[-1].args, ('ui-container', '.'))
+            else:
+                static_switch.assert_not_called()
             return compose.read_text(), starts, steps
 
     def test_success_checks_rooms_after_pulls_before_replacing_only_app_services(self):
@@ -99,12 +108,13 @@ class DeployTests(unittest.TestCase):
         up = next(i for i, step in enumerate(steps) if 'up' in step)
         self.assertLess(max(pulls), idle)
         self.assertLess(idle, up)
-        self.assertEqual(steps[up][-2:], ['backend', 'ui'])
+        self.assertEqual(steps[up][-1:], ['backend'])
+        self.assertNotIn('ui', steps[up])
         self.assertIn('--no-deps', steps[up])
         self.assertEqual(sum(step[:2] == ['docker', 'exec'] for step in steps), 1)
 
     def test_failures_before_activation_do_not_change_compose_or_restart(self):
-        for failure in ['pull', 'busy', 'pending', 'disk']:
+        for failure in ['pull', 'busy', 'pending', 'disk', 'static-prepare']:
             with self.subTest(failure=failure):
                 final, starts, _ = self.scenario(failure)
                 self.assertEqual(final, OLD)

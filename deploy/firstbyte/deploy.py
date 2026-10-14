@@ -9,6 +9,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import uuid
 
@@ -70,6 +71,58 @@ def idle():
         input=(ROOT / 'check-idle.cjs').read_text(), timeout=25)
 
 
+def prepare_static(image):
+    """Export the audited UI without running its image or stopping the gateway."""
+    if not re.fullmatch(re.escape(REPOS['ui']) + r'@sha256:[0-9a-f]{64}', image):
+        raise ValueError('Unexpected UI digest')
+    ui = compose('ps', '--status', 'running', '-q', 'ui')
+    if not re.fullmatch(r'[0-9a-f]{12,64}', ui):
+        raise RuntimeError('Exactly one running UI gateway is required')
+    release = '.avalon-releases/' + image.split(':')[-1]
+    # Upgrade the startup wrapper too: a Docker/server restart must keep the
+    # selected static release. Mounted host config and TLS files are untouched.
+    run(['docker', 'cp', str(ROOT / 'nginx-entrypoint.sh'), ui + ':/usr/local/bin/avalon-nginx-entrypoint'])
+    run(['docker', 'exec', ui, 'chmod', '+x', '/usr/local/bin/avalon-nginx-entrypoint'])
+    run(['docker', 'exec', ui, '/usr/local/bin/avalon-nginx-entrypoint', 'nginx', '-s', 'reload'])
+    previous = run(['docker', 'exec', ui, 'readlink', '/app/.avalon-current'])
+    if previous != '.' and not re.fullmatch(r'\.avalon-releases/[0-9a-f]{64}', previous):
+        raise RuntimeError('Unexpected current static release')
+    if previous == release:
+        return ui, release, previous
+    exporter = run(['docker', 'create', '--network', 'none', '--entrypoint', '/bin/true', image])
+    try:
+        with tempfile.TemporaryDirectory(prefix='ui-export-', dir=ROOT) as directory:
+            artifact = Path(directory)
+            run(['docker', 'cp', exporter + ':/app/.', directory], timeout=240)
+            if not (artifact / 'index.html').is_file() or not (artifact / 'js').is_dir():
+                raise RuntimeError('UI artifact is incomplete')
+            run(['docker', 'exec', ui, 'mkdir', '-p', '/app/' + release])
+            run(['docker', 'cp', directory + '/.', ui + ':/app/' + release], timeout=240)
+    finally:
+        run(['docker', 'rm', exporter])
+    return ui, release, previous
+
+
+def switch_static(ui, release):
+    if release != '.' and not re.fullmatch(r'\.avalon-releases/[0-9a-f]{64}', release):
+        raise ValueError('Unexpected static release')
+    run(['docker', 'exec', ui, 'sh', '-eu', '-c', '''
+test -f "/app/$1/index.html"
+# Retain assets in both directions, including rollback: an open tab may
+# have fetched either version's HTML. Hard links avoid duplicating old files.
+if [ "$(readlink /app/.avalon-current)" != "$1" ]; then
+  for assets in js css img fonts; do
+    if [ -d "/app/.avalon-current/$assets" ]; then
+      mkdir -p "/app/$1/$assets"
+      cp -aln "/app/.avalon-current/$assets/." "/app/$1/$assets/"
+    fi
+  done
+fi
+ln -sfn "$1" /app/.avalon-next
+mv -Tf /app/.avalon-next /app/.avalon-current
+''', 'switch-static', release], timeout=240)
+
+
 def health():
     # Watchdog may stop/recover LiveKit while backend restarts. Give it time.
     deadline = time.monotonic() + 120
@@ -89,12 +142,12 @@ def health():
         time.sleep(3)
     run(['curl', '--fail', '--silent', '--show-error', '--max-time', '15',
          '--resolve', 'avalon-game.com:443:127.0.0.1', '--output', '/dev/null', 'https://avalon-game.com/'])
-    compose('exec', '-T', 'ui', 'nginx', '-t')
+    compose('exec', '-T', 'ui', 'nginx', '-t', '-c', '/etc/nginx/avalon-runtime.conf')
     run(['docker', 'exec', '-i', '-w', '/app', 'avalon-production-backend-1', 'node', '-'], input=SMOKE, timeout=25)
 
 
 def activate():
-    compose('up', '-d', '--no-deps', '--pull', 'never', '--wait', '--wait-timeout', '150', 'backend', 'ui')
+    compose('up', '-d', '--no-deps', '--pull', 'never', '--wait', '--wait-timeout', '150', 'backend')
     health()
 
 
@@ -121,21 +174,26 @@ def deploy(tag, check_only=False, skip_room_check=False):
             health()
             print('Preflight OK; ' + ('no changes requested' if check_only else 'release already installed'), flush=True)
             return
+        print('Preparing UI while the existing site remains available', flush=True)
+        ui, release, previous_static = prepare_static(images['ui'])
         if skip_room_check:
             print('WARNING: room checks explicitly skipped; unfinished games may lose their state', flush=True)
         else:
             idle()
         # Backups run independently on their timer; check rooms immediately before activation.
         (ROOT / 'compose.previous.yaml').write_text(previous)
-        pending.write_text(json.dumps({'tag': tag, 'images': images, 'skipRoomCheck': skip_room_check, 'startedAt': time.time()}))
+        pending.write_text(json.dumps({'tag': tag, 'images': images, 'previousStatic': previous_static,
+                                       'uiContainer': ui, 'skipRoomCheck': skip_room_check, 'startedAt': time.time()}))
         try:
             write_compose(candidate)
             compose('config', '--quiet')
-            print('Activating backend and UI', flush=True)
+            print('Switching UI files and restarting backend; nginx stays running', flush=True)
+            switch_static(ui, release)
             activate()
             (ROOT / 'last-deploy.json').write_text(json.dumps({'tag': tag, 'images': images, 'skipRoomCheck': skip_room_check, 'completedAt': time.time()}))
         except Exception:
             print('Deployment failed; restoring previous application images', flush=True)
+            switch_static(ui, previous_static)
             write_compose(previous)
             activate()
             pending.unlink()
