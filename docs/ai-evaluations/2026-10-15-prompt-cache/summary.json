@@ -1,0 +1,30 @@
+{
+  "before": {
+    "decisions": 6,
+    "requiredPassed": 5,
+    "requiredTotal": 5,
+    "exploratoryPassed": 0,
+    "generationCalls": 6,
+    "inputTokens": 114418,
+    "cachedTokens": 0,
+    "uncachedTokens": 114418,
+    "outputTokens": 3002,
+    "cacheHitCalls": 0,
+    "cachedFraction": 0.0
+  },
+  "after": {
+    "decisions": 6,
+    "requiredPassed": 5,
+    "requiredTotal": 5,
+    "exploratoryPassed": 1,
+    "generationCalls": 6,
+    "inputTokens": 113350,
+    "cachedTokens": 7680,
+    "uncachedTokens": 105670,
+    "outputTokens": 3560,
+    "cacheHitCalls": 1,
+    "cachedFraction": 0.06775474194971327
+  },
+  "uncachedInputReductionPercent": 7.645650159939866,
+  "sharedPrefixHashes": 1
+}

@@ -42,3 +42,17 @@ pnpm-debug.log*
 /artifacts/
 /announcements/
 /output/
+
+# Local raw inputs, model transcripts and intermediate runs for the October pilots.
+# Keep scripts, reports and selected measurement summaries in Git.
+/docs/ai-evaluations/2026-10-15-bot-sessions/*.json*
+!/docs/ai-evaluations/2026-10-15-bot-sessions/summary.json
+!/docs/ai-evaluations/2026-10-15-bot-sessions/usage-validation.json
+/docs/ai-evaluations/2026-10-15-prompt-cache/*.json*
+!/docs/ai-evaluations/2026-10-15-prompt-cache/summary.json
+/docs/ai-evaluations/2026-10-15-prompt-dedup/*.json*
+!/docs/ai-evaluations/2026-10-15-prompt-dedup/summary.json
+/docs/ai-evaluations/2026-10-15-session-deltas/*.json*
+!/docs/ai-evaluations/2026-10-15-session-deltas/results.json
+!/docs/ai-evaluations/2026-10-15-session-deltas/live-summary.json
+!/docs/ai-evaluations/2026-10-15-session-deltas/live-input-verification.json

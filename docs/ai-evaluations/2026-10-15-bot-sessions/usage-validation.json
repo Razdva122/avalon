@@ -1,0 +1,17 @@
+{
+  "source": "Owned experimental thread rollout, event_msg token_count; inspected during the real per-bot game",
+  "before": { "input_tokens": 48889, "cached_input_tokens": 0, "output_tokens": 721, "reasoning_output_tokens": 235 },
+  "after": {
+    "input_tokens": 69454,
+    "cached_input_tokens": 20352,
+    "output_tokens": 904,
+    "reasoning_output_tokens": 320
+  },
+  "nativeLast": {
+    "input_tokens": 20565,
+    "cached_input_tokens": 20352,
+    "output_tokens": 183,
+    "reasoning_output_tokens": 85
+  },
+  "reportCall": { "mode": "per-bot", "n": 12 }
+}

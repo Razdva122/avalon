@@ -1,0 +1,1793 @@
+[
+  {
+    "mode": "fresh",
+    "status": "finished",
+    "result": {
+      "winner": "good",
+      "reason": "missMerlin"
+    },
+    "missions": [
+      {
+        "players": 2,
+        "failsRequired": 1,
+        "hidden": false,
+        "fails": 1,
+        "result": "fail"
+      },
+      {
+        "players": 3,
+        "failsRequired": 1,
+        "hidden": false,
+        "fails": 0,
+        "result": "success"
+      },
+      {
+        "players": 2,
+        "failsRequired": 1,
+        "hidden": false,
+        "fails": 0,
+        "result": "success"
+      },
+      {
+        "players": 3,
+        "failsRequired": 1,
+        "hidden": false,
+        "fails": 0,
+        "result": "success"
+      },
+      {
+        "players": 3,
+        "failsRequired": 1
+      }
+    ],
+    "finalPublicRecord": {
+      "yourActions": [
+        {
+          "id": "proposal-4-2",
+          "type": "proposal",
+          "mission": 4,
+          "team": [5, 2, 3]
+        },
+        {
+          "id": "vote-1-1",
+          "type": "vote",
+          "mission": 1,
+          "team": [1, 2],
+          "value": "reject"
+        },
+        {
+          "id": "vote-2-1",
+          "type": "vote",
+          "mission": 2,
+          "team": [5, 2, 3],
+          "value": "approve"
+        },
+        {
+          "id": "vote-3-1",
+          "type": "vote",
+          "mission": 3,
+          "team": [5, 3],
+          "value": "approve"
+        },
+        {
+          "id": "vote-4-1",
+          "type": "vote",
+          "mission": 4,
+          "team": [5, 3, 4],
+          "value": "reject"
+        },
+        {
+          "id": "vote-4-2",
+          "type": "vote",
+          "mission": 4,
+          "team": [5, 2, 3],
+          "value": "approve"
+        },
+        {
+          "id": "card-2",
+          "type": "card",
+          "mission": 2,
+          "team": [5, 2, 3],
+          "value": "success"
+        },
+        {
+          "id": "card-3",
+          "type": "card",
+          "mission": 3,
+          "team": [5, 3],
+          "value": "success"
+        },
+        {
+          "id": "card-4",
+          "type": "card",
+          "mission": 4,
+          "team": [5, 2, 3],
+          "value": "success"
+        }
+      ],
+      "yourStatements": [
+        "4, готовность идти вместе помогает собрать голоса, но не снижает риск саботажа. Предлагаю 5, 2 как ещё один стартовый вариант. Без результатов миссий объявлять какой-либо состав надёжным рано.",
+        "4, предпочитаю 5, 3, 4. Против 2 — участие в провале, против тебя — поддержавший его голос. Первое весомее, хотя твоя безопасность не доказана. 3, предлагаю исключить обоих с провала; словам 2 пока нет подтверждения.",
+        "3, поддерживаю 5, 3. По сравнению с 5, 2 сохраняем участников успешной миссии, но исключаем участника провала. Успех не доказывает чистоту; для этой пары уже есть поддержка 3, 4 и моя.",
+        "4, я предлагал замену до успеха 5, 2, 3. Теперь у этой тройки есть общий успешный выход, а у тебя — нет. Это не гарантия, но новых доводов для замены 2 не появилось. Предпочитаю 5, 2, 3; прошу 2 и 3 сохранить состав.",
+        "Я предлагаю команду 5, 2, 3. 4, выбираю 5, 2, 3: эта тройка уже прошла миссию вместе. Участие 2 в провале настораживает, но для замены на тебя новых доводов нет. Мы втроём отвергли предыдущий состав; 2 и 3 высказались за сохранение этой тройки."
+      ],
+      "teamVotes": [
+        {
+          "mission": 1,
+          "attempt": 1,
+          "leader": 1,
+          "team": [1, 2],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [1, "approve"],
+            [2, "approve"],
+            [3, "reject"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        },
+        {
+          "mission": 2,
+          "attempt": 1,
+          "leader": 2,
+          "team": [5, 2, 3],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [1, "reject"],
+            [2, "approve"],
+            [3, "approve"],
+            [4, "reject"]
+          ],
+          "yourVote": "approve"
+        },
+        {
+          "mission": 3,
+          "attempt": 1,
+          "leader": 3,
+          "team": [5, 3],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [1, "approve"],
+            [2, "reject"],
+            [3, "approve"],
+            [4, "approve"]
+          ],
+          "yourVote": "approve"
+        },
+        {
+          "mission": 4,
+          "attempt": 1,
+          "leader": 4,
+          "team": [5, 3, 4],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [1, "approve"],
+            [2, "reject"],
+            [3, "reject"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        },
+        {
+          "mission": 4,
+          "attempt": 2,
+          "leader": 5,
+          "team": [5, 2, 3],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [1, "reject"],
+            [2, "approve"],
+            [3, "approve"],
+            [4, "reject"]
+          ],
+          "yourVote": "approve"
+        }
+      ],
+      "evilCouncil": [
+        {
+          "seat": "1",
+          "target": "3",
+          "reason": "Выбираю 3: ещё до успеха он предпочёл 2 вместо 4, тогда как 5 хотел обратную замену. Обычное объяснение — доверие словам 2 и подозрение к голосу 4. Точность 2 объясняет собственный «Успех». Поздние успехи отдельно не считаю."
+        },
+        {
+          "seat": "4",
+          "target": "3",
+          "reason": "1, согласен насчёт 3, но доверие словам 2 остаётся простым объяснением. Между 3 и 2 выбираю 3: до успеха он предпочёл 2 вместо 4, а сам 2 мог опираться на собственный «Успех». Поздние успехи отдельными уликами не считаю."
+        }
+      ],
+      "automaticProposals": [],
+      "you": {
+        "seat": 5,
+        "role": "merlin",
+        "side": "good",
+        "outcome": "won"
+      },
+      "personality": "Personality preference: Compare Fail counts and individual votes before trusting testimony. Prefer the roster with stronger evidence over social consensus. Speak tersely and precisely: compare the decisive fact or two plausible explanations, then give your conclusion. Correct a contradiction directly; skip social padding and repeated uncertainty disclaimers. When challenged, show the comparison rather than repeat the conclusion. As Evil, offer credible alternative deductions rather than emotional persuasion. These are soft preferences only: authoritative facts, legal actions, your actual side's objective and role-specific secrecy always take priority. Never invent evidence or ignore proven deductions to act in character.",
+      "language": "ru",
+      "score": {
+        "successes": 3,
+        "failures": 1
+      },
+      "result": {
+        "winner": "good",
+        "reason": "missMerlin"
+      },
+      "revealedRoles": [
+        [5, "merlin"],
+        [1, "morgana"],
+        [2, "percival"],
+        [3, "servant"],
+        [4, "mordred"]
+      ],
+      "rolesKnownBeforeReveal": [
+        [5, "merlin"],
+        [1, "evil"],
+        [2, "unknown"],
+        [3, "unknown"],
+        [4, "unknown"]
+      ],
+      "missions": [
+        {
+          "n": 1,
+          "failsRequired": 1,
+          "leader": 1,
+          "team": [1, 2],
+          "result": "fail",
+          "fails": 1,
+          "participated": false,
+          "cards": [
+            [1, "fail"],
+            [2, "success"]
+          ],
+          "scoreBefore": {
+            "successes": 0,
+            "failures": 0
+          },
+          "approvers": [1, 2, 4]
+        },
+        {
+          "n": 2,
+          "failsRequired": 1,
+          "leader": 2,
+          "team": [5, 2, 3],
+          "result": "success",
+          "fails": 0,
+          "participated": true,
+          "cards": [
+            [5, "success"],
+            [2, "success"],
+            [3, "success"]
+          ],
+          "yourCard": "success",
+          "scoreBefore": {
+            "successes": 0,
+            "failures": 1
+          },
+          "approvers": [5, 2, 3]
+        },
+        {
+          "n": 3,
+          "failsRequired": 1,
+          "leader": 3,
+          "team": [5, 3],
+          "result": "success",
+          "fails": 0,
+          "participated": true,
+          "cards": [
+            [5, "success"],
+            [3, "success"]
+          ],
+          "yourCard": "success",
+          "scoreBefore": {
+            "successes": 1,
+            "failures": 1
+          },
+          "approvers": [5, 1, 3, 4]
+        },
+        {
+          "n": 4,
+          "failsRequired": 1,
+          "leader": 5,
+          "team": [5, 2, 3],
+          "result": "success",
+          "fails": 0,
+          "participated": true,
+          "cards": [
+            [5, "success"],
+            [2, "success"],
+            [3, "success"]
+          ],
+          "yourCard": "success",
+          "scoreBefore": {
+            "successes": 2,
+            "failures": 1
+          },
+          "approvers": [5, 2, 3]
+        }
+      ],
+      "checks": [],
+      "assassinations": [
+        {
+          "assassin": 4,
+          "targets": [3],
+          "result": "miss",
+          "type": "merlin"
+        }
+      ],
+      "yourVotes": [
+        {
+          "mission": 1,
+          "attempt": 1,
+          "team": [1, 2],
+          "yourVote": "reject",
+          "forced": false
+        },
+        {
+          "mission": 2,
+          "attempt": 1,
+          "team": [5, 2, 3],
+          "yourVote": "approve",
+          "forced": false
+        },
+        {
+          "mission": 3,
+          "attempt": 1,
+          "team": [5, 3],
+          "yourVote": "approve",
+          "forced": false
+        },
+        {
+          "mission": 4,
+          "attempt": 1,
+          "team": [5, 3, 4],
+          "yourVote": "reject",
+          "forced": false
+        },
+        {
+          "mission": 4,
+          "attempt": 2,
+          "team": [5, 2, 3],
+          "yourVote": "approve",
+          "forced": false
+        }
+      ],
+      "choices": ["Write your conclusion"],
+      "speak": true,
+      "decisionExamples": [
+        {
+          "id": "decision-1",
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "mission": 1,
+          "proposal": {
+            "number": 1,
+            "nextLeader": 2,
+            "fifthLeader": 5,
+            "rejectionsUntilForced": 4,
+            "forced": false
+          },
+          "score": {
+            "successes": 0,
+            "failures": 0
+          },
+          "team": [],
+          "knowledge": {
+            "rolesVisibleToYou": [
+              [5, "merlin"],
+              [1, "evil"],
+              [2, "unknown"],
+              [3, "unknown"],
+              [4, "unknown"]
+            ],
+            "checks": []
+          },
+          "choice": "5, 2",
+          "legalChoices": ["5, 1", "5, 2", "5, 3", "5, 4", "1, 2", "1, 3", "1, 4", "2, 3", "2, 4", "3, 4"],
+          "reason": "В 1, 2 есть видимое Зло. Предпочитаю 5, 2: риск скрытого Мордреда остаётся в 2, но в альтернативе 2, 3 уже два неизвестных. Публичных оснований выделять 1 пока нет.",
+          "publicStatement": "4, готовность идти вместе помогает собрать голоса, но не снижает риск саботажа. Предлагаю 5, 2 как ещё один стартовый вариант. Без результатов миссий объявлять какой-либо состав надёжным рано.",
+          "speechRules": {
+            "public": true,
+            "optionalAnnouncement": false,
+            "claimTargets": [1, 2, 3, 4],
+            "requiredClaimStances": [],
+            "mandatoryText": ""
+          },
+          "tableConventions": {
+            "includeSelfInProposals": false,
+            "excludedPartners": []
+          }
+        },
+        {
+          "id": "decision-2",
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "mission": 1,
+          "proposal": {
+            "number": 1,
+            "nextLeader": 2,
+            "fifthLeader": 5,
+            "rejectionsUntilForced": 4,
+            "forced": false
+          },
+          "score": {
+            "successes": 0,
+            "failures": 0
+          },
+          "team": [1, 2],
+          "knowledge": {
+            "rolesVisibleToYou": [
+              [5, "merlin"],
+              [1, "evil"],
+              [2, "unknown"],
+              [3, "unknown"],
+              [4, "unknown"]
+            ],
+            "checks": []
+          },
+          "choice": "reject",
+          "legalChoices": ["approve", "reject"],
+          "reason": "В 1, 2 есть известное мне Зло при пороге в один провал. У 5, 2 риск ниже: неизвестен только 2. Следующий лидер 2 пока поддерживает 1, но впереди четыре предложения для переговоров.",
+          "publicStatement": "",
+          "speechRules": {
+            "public": false,
+            "optionalAnnouncement": false,
+            "claimTargets": [],
+            "requiredClaimStances": [],
+            "mandatoryText": ""
+          },
+          "tableConventions": {
+            "includeSelfInProposals": false,
+            "excludedPartners": []
+          }
+        },
+        {
+          "id": "decision-7",
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "mission": 4,
+          "proposal": {
+            "number": 1,
+            "nextLeader": 5,
+            "fifthLeader": 3,
+            "rejectionsUntilForced": 4,
+            "forced": false
+          },
+          "score": {
+            "successes": 2,
+            "failures": 1
+          },
+          "team": [],
+          "knowledge": {
+            "rolesVisibleToYou": [
+              [5, "merlin"],
+              [1, "evil"],
+              [2, "unknown"],
+              [3, "unknown"],
+              [4, "unknown"]
+            ],
+            "checks": []
+          },
+          "choice": "5, 2, 3",
+          "legalChoices": [
+            "5, 1, 2",
+            "5, 1, 3",
+            "5, 1, 4",
+            "5, 2, 3",
+            "5, 2, 4",
+            "5, 3, 4",
+            "1, 2, 3",
+            "1, 2, 4",
+            "1, 3, 4",
+            "2, 3, 4"
+          ],
+          "reason": "Мордред остаётся среди 2, 3, 4. Успех 5, 2, 3 и поддержка альтернативы известным злым 1 склоняют сохранить тройку. Замена 2 на 4 не обоснована; прежние голоса 2 и 3 дают основу коалиции.",
+          "publicStatement": "4, я предлагал замену до успеха 5, 2, 3. Теперь у этой тройки есть общий успешный выход, а у тебя — нет. Это не гарантия, но новых доводов для замены 2 не появилось. Предпочитаю 5, 2, 3; прошу 2 и 3 сохранить состав.",
+          "speechRules": {
+            "public": true,
+            "optionalAnnouncement": false,
+            "claimTargets": [1, 2, 3, 4],
+            "requiredClaimStances": [],
+            "mandatoryText": ""
+          },
+          "tableConventions": {
+            "includeSelfInProposals": false,
+            "excludedPartners": []
+          }
+        },
+        {
+          "id": "decision-8",
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "mission": 4,
+          "proposal": {
+            "number": 1,
+            "nextLeader": 5,
+            "fifthLeader": 3,
+            "rejectionsUntilForced": 4,
+            "forced": false
+          },
+          "score": {
+            "successes": 2,
+            "failures": 1
+          },
+          "team": [5, 3, 4],
+          "knowledge": {
+            "rolesVisibleToYou": [
+              [5, "merlin"],
+              [1, "evil"],
+              [2, "unknown"],
+              [3, "unknown"],
+              [4, "unknown"]
+            ],
+            "checks": []
+          },
+          "choice": "reject",
+          "legalChoices": ["approve", "reject"],
+          "reason": "Замена 2 на 4 не подкреплена результатами; состав поддерживает известный мне злой 1. Следующим предлагаю я: у 5, 2, 3 общий успех и заявленные три голоса, включая мой. Это достижимая альтернатива с лучшей опорой на факты.",
+          "publicStatement": "",
+          "speechRules": {
+            "public": false,
+            "optionalAnnouncement": false,
+            "claimTargets": [],
+            "requiredClaimStances": [],
+            "mandatoryText": ""
+          },
+          "tableConventions": {
+            "includeSelfInProposals": false,
+            "excludedPartners": []
+          }
+        },
+        {
+          "id": "decision-9",
+          "stage": "selectTeam",
+          "publicDiscussion": false,
+          "mission": 4,
+          "proposal": {
+            "number": 2,
+            "nextLeader": 1,
+            "fifthLeader": 3,
+            "rejectionsUntilForced": 3,
+            "forced": false
+          },
+          "score": {
+            "successes": 2,
+            "failures": 1
+          },
+          "team": [],
+          "knowledge": {
+            "rolesVisibleToYou": [
+              [5, "merlin"],
+              [1, "evil"],
+              [2, "unknown"],
+              [3, "unknown"],
+              [4, "unknown"]
+            ],
+            "checks": []
+          },
+          "choice": "5, 2, 3",
+          "legalChoices": [
+            "5, 1, 2",
+            "5, 1, 3",
+            "5, 1, 4",
+            "5, 2, 3",
+            "5, 2, 4",
+            "5, 3, 4",
+            "1, 2, 3",
+            "1, 2, 4",
+            "1, 3, 4",
+            "2, 3, 4"
+          ],
+          "reason": "Мордред остаётся среди 2, 3, 4. У 5, 2, 3 есть общий успех и достижимое большинство; замена 2 на 4 слабее обоснована и поддержана известным мне злым 1. Сохраняю состав.",
+          "publicStatement": "4, выбираю 5, 2, 3: эта тройка уже прошла миссию вместе. Участие 2 в провале настораживает, но для замены на тебя новых доводов нет. Мы втроём отвергли предыдущий состав; 2 и 3 высказались за сохранение этой тройки.",
+          "speechRules": {
+            "public": true,
+            "optionalAnnouncement": false,
+            "claimTargets": [1, 2, 3, 4],
+            "requiredClaimStances": [],
+            "mandatoryText": ""
+          },
+          "tableConventions": {
+            "includeSelfInProposals": false,
+            "excludedPartners": []
+          }
+        },
+        {
+          "id": "decision-10",
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "mission": 4,
+          "proposal": {
+            "number": 2,
+            "nextLeader": 1,
+            "fifthLeader": 3,
+            "rejectionsUntilForced": 3,
+            "forced": false
+          },
+          "score": {
+            "successes": 2,
+            "failures": 1
+          },
+          "team": [5, 2, 3],
+          "knowledge": {
+            "rolesVisibleToYou": [
+              [5, "merlin"],
+              [1, "evil"],
+              [2, "unknown"],
+              [3, "unknown"],
+              [4, "unknown"]
+            ],
+            "checks": []
+          },
+          "choice": "approve",
+          "legalChoices": ["approve", "reject"],
+          "reason": "У 5, 2, 3 есть общий успех и три заявленных голоса. Риск скрытого Мордреда остаётся, но замена 2 на 4 не подкреплена результатами; её поддерживает известный мне злой 1, следующий лидер. Сохраняю состав.",
+          "publicStatement": "",
+          "speechRules": {
+            "public": false,
+            "optionalAnnouncement": false,
+            "claimTargets": [],
+            "requiredClaimStances": [],
+            "mandatoryText": ""
+          },
+          "tableConventions": {
+            "includeSelfInProposals": false,
+            "excludedPartners": []
+          }
+        }
+      ]
+    },
+    "minutes": 13.4641,
+    "play": {
+      "attemptedCalls": 54,
+      "measuredCalls": 54,
+      "input": 810393,
+      "cached": 71936,
+      "uncached": 738457,
+      "output": 18238,
+      "inputPerCall": 15007.277777777777,
+      "uncachedPerCall": 13675.12962962963,
+      "outputPerCall": 337.74074074074076,
+      "cachedInputShare": 0.08876680820293364,
+      "cacheHitCalls": 9,
+      "failedCalls": 0
+    },
+    "reviews": {
+      "attemptedCalls": 5,
+      "measuredCalls": 5,
+      "input": 72885,
+      "cached": 0,
+      "uncached": 72885,
+      "output": 1756,
+      "inputPerCall": 14577,
+      "uncachedPerCall": 14577,
+      "outputPerCall": 351.2,
+      "cachedInputShare": 0,
+      "cacheHitCalls": 0,
+      "failedCalls": 0
+    },
+    "all": {
+      "attemptedCalls": 59,
+      "measuredCalls": 59,
+      "input": 883278,
+      "cached": 71936,
+      "uncached": 811342,
+      "output": 19994,
+      "inputPerCall": 14970.813559322034,
+      "uncachedPerCall": 13751.559322033898,
+      "outputPerCall": 338.8813559322034,
+      "cachedInputShare": 0.0814420827870727,
+      "cacheHitCalls": 9,
+      "failedCalls": 0
+    },
+    "stages": {
+      "selectTeam": {
+        "attemptedCalls": 25,
+        "measuredCalls": 25,
+        "input": 374661,
+        "cached": 0,
+        "uncached": 374661,
+        "output": 10850,
+        "inputPerCall": 14986.44,
+        "uncachedPerCall": 14986.44,
+        "outputPerCall": 434,
+        "cachedInputShare": 0,
+        "cacheHitCalls": 0,
+        "failedCalls": 0
+      },
+      "votingForTeam": {
+        "attemptedCalls": 25,
+        "measuredCalls": 25,
+        "input": 375182,
+        "cached": 71936,
+        "uncached": 303246,
+        "output": 5456,
+        "inputPerCall": 15007.28,
+        "uncachedPerCall": 12129.84,
+        "outputPerCall": 218.24,
+        "cachedInputShare": 0.19173627732673743,
+        "cacheHitCalls": 9,
+        "failedCalls": 0
+      },
+      "onMission": {
+        "attemptedCalls": 1,
+        "measuredCalls": 1,
+        "input": 12726,
+        "cached": 0,
+        "uncached": 12726,
+        "output": 216,
+        "inputPerCall": 12726,
+        "uncachedPerCall": 12726,
+        "outputPerCall": 216,
+        "cachedInputShare": 0,
+        "cacheHitCalls": 0,
+        "failedCalls": 0
+      },
+      "assassinate": {
+        "attemptedCalls": 3,
+        "measuredCalls": 3,
+        "input": 47824,
+        "cached": 0,
+        "uncached": 47824,
+        "output": 1716,
+        "inputPerCall": 15941.333333333334,
+        "uncachedPerCall": 15941.333333333334,
+        "outputPerCall": 572,
+        "cachedInputShare": 0,
+        "cacheHitCalls": 0,
+        "failedCalls": 0
+      },
+      "end": {
+        "attemptedCalls": 5,
+        "measuredCalls": 5,
+        "input": 72885,
+        "cached": 0,
+        "uncached": 72885,
+        "output": 1756,
+        "inputPerCall": 14577,
+        "uncachedPerCall": 14577,
+        "outputPerCall": 351.2,
+        "cachedInputShare": 0,
+        "cacheHitCalls": 0,
+        "failedCalls": 0
+      }
+    },
+    "players": [
+      {
+        "player": "avalon-agent-2",
+        "calls": 12,
+        "firstInput": 13585,
+        "lastInput": 15605,
+        "peakInput": 15605
+      },
+      {
+        "player": "avalon-agent-3",
+        "calls": 10,
+        "firstInput": 14075,
+        "lastInput": 15992,
+        "peakInput": 15993
+      },
+      {
+        "player": "avalon-agent-4",
+        "calls": 10,
+        "firstInput": 13829,
+        "lastInput": 15623,
+        "peakInput": 15781
+      },
+      {
+        "player": "avalon-agent-5",
+        "calls": 12,
+        "firstInput": 13782,
+        "lastInput": 16231,
+        "peakInput": 16231
+      },
+      {
+        "player": "avalon-agent-1",
+        "calls": 10,
+        "firstInput": 14484,
+        "lastInput": 16113,
+        "peakInput": 16552
+      }
+    ],
+    "pauses": [],
+    "automatedQualityChecks": {
+      "goodKnownFailVotes": 1,
+      "goodKnownFailApprovals": [],
+      "decisiveEvilCardOpportunities": 0,
+      "decisiveEvilSuccessCards": []
+    },
+    "quotaBefore": {
+      "shortTerm": null,
+      "remainingPercent": 79,
+      "resetsAt": 1792649597,
+      "checkedAt": 1792054390003
+    },
+    "quotaAfter": {
+      "shortTerm": null,
+      "remainingPercent": 78,
+      "resetsAt": 1792649597,
+      "checkedAt": 1792055197944
+    }
+  },
+  {
+    "mode": "per-bot",
+    "status": "finished",
+    "result": {
+      "winner": "evil",
+      "reason": "killMerlin"
+    },
+    "missions": [
+      {
+        "players": 2,
+        "failsRequired": 1,
+        "hidden": false,
+        "fails": 1,
+        "result": "fail"
+      },
+      {
+        "players": 3,
+        "failsRequired": 1,
+        "hidden": false,
+        "fails": 1,
+        "result": "fail"
+      },
+      {
+        "players": 2,
+        "failsRequired": 1,
+        "hidden": false,
+        "fails": 0,
+        "result": "success"
+      },
+      {
+        "players": 3,
+        "failsRequired": 1,
+        "hidden": false,
+        "fails": 0,
+        "result": "success"
+      },
+      {
+        "players": 3,
+        "failsRequired": 1,
+        "hidden": false,
+        "fails": 0,
+        "result": "success"
+      }
+    ],
+    "finalPublicRecord": {
+      "yourActions": [
+        {
+          "id": "proposal-3-2",
+          "type": "proposal",
+          "mission": 3,
+          "team": [5, 2]
+        },
+        {
+          "id": "vote-1-1",
+          "type": "vote",
+          "mission": 1,
+          "team": [1, 2],
+          "value": "reject"
+        },
+        {
+          "id": "vote-2-1",
+          "type": "vote",
+          "mission": 2,
+          "team": [5, 2, 3],
+          "value": "approve"
+        },
+        {
+          "id": "vote-2-2",
+          "type": "vote",
+          "mission": 2,
+          "team": [5, 3, 4],
+          "value": "reject"
+        },
+        {
+          "id": "vote-3-1",
+          "type": "vote",
+          "mission": 3,
+          "team": [5, 4],
+          "value": "reject"
+        },
+        {
+          "id": "vote-3-2",
+          "type": "vote",
+          "mission": 3,
+          "team": [5, 2],
+          "value": "approve"
+        },
+        {
+          "id": "vote-3-3",
+          "type": "vote",
+          "mission": 3,
+          "team": [1, 3],
+          "value": "reject"
+        },
+        {
+          "id": "vote-3-4",
+          "type": "vote",
+          "mission": 3,
+          "team": [5, 2],
+          "value": "approve"
+        },
+        {
+          "id": "vote-4-1",
+          "type": "vote",
+          "mission": 4,
+          "team": [5, 2, 3],
+          "value": "approve"
+        },
+        {
+          "id": "vote-5-1",
+          "type": "vote",
+          "mission": 5,
+          "team": [5, 2, 3],
+          "value": "approve"
+        },
+        {
+          "id": "card-2",
+          "type": "card",
+          "mission": 2,
+          "team": [5, 3, 4],
+          "value": "success"
+        },
+        {
+          "id": "card-3",
+          "type": "card",
+          "mission": 3,
+          "team": [5, 2],
+          "value": "success"
+        },
+        {
+          "id": "card-4",
+          "type": "card",
+          "mission": 4,
+          "team": [5, 2, 3],
+          "value": "success"
+        },
+        {
+          "id": "card-5",
+          "type": "card",
+          "mission": 5,
+          "team": [5, 2, 3],
+          "value": "success"
+        }
+      ],
+      "yourStatements": [
+        "Предпочитаю 5, 2: за свою карту отвечаю, а 2 уже выразил готовность участвовать. Согласие вокруг 1, 2 ещё не проверяет пару. 1, предлагаю рассмотреть замену себя на 5.",
+        "Предпочитаю 3, 4, 5: исключаем обоих участников провала. Голос 4 настораживает, но карту 2 мы не видели. Тройка не проверена. 2, готов рассмотреть её вместо 2, 3, 5? Тогда есть путь к большинству.",
+        "Я сыграл Успех: во второй миссии саботировал 3 или 4. Предпочитаю 2, 5 вместо 4, 5: 2 отверг второй провал, а 1 и 4 одобрили оба. Это довод по голосам, не проверка 2. 3, поддержишь эту пару?",
+        "Я предлагаю команду 5, 2. 3, выбираю 2, 5 вместо 4, 5. Ты уже склоняешься доверять 2; за меня — отказы от обоих провалов, тогда как 4 оба одобрил. Твоя пара 2, 3 тоже не проверена. Прошу поддержать 2, 5: вместе с нами твой голос даст большинство.",
+        "4, одобрить успешную пару — не то же, что сыграть в ней. Ты также поддержал 1, 3, а 3 эту пару отверг. Поэтому предпочитаю добавить 3 к 2, 5, сохранив участников успеха при двух провалах. Это сильнее одного удачного одобрения.",
+        "4, согласен повторить 2, 3, 5. Эта тройка сыграла Успех, когда один саботаж завершал игру. Это весомее прежних споров о голосах; замена на 2, 4, 5 добавит участника без такого результата. Сохраняю состав."
+      ],
+      "teamVotes": [
+        {
+          "mission": 1,
+          "attempt": 1,
+          "leader": 1,
+          "team": [1, 2],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [1, "approve"],
+            [2, "approve"],
+            [3, "reject"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        },
+        {
+          "mission": 2,
+          "attempt": 1,
+          "leader": 2,
+          "team": [5, 2, 3],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [1, "reject"],
+            [2, "approve"],
+            [3, "reject"],
+            [4, "reject"]
+          ],
+          "yourVote": "approve"
+        },
+        {
+          "mission": 2,
+          "attempt": 2,
+          "leader": 3,
+          "team": [5, 3, 4],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [1, "approve"],
+            [2, "reject"],
+            [3, "approve"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        },
+        {
+          "mission": 3,
+          "attempt": 1,
+          "leader": 4,
+          "team": [5, 4],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [1, "approve"],
+            [2, "reject"],
+            [3, "reject"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        },
+        {
+          "mission": 3,
+          "attempt": 2,
+          "leader": 5,
+          "team": [5, 2],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [1, "reject"],
+            [2, "approve"],
+            [3, "reject"],
+            [4, "reject"]
+          ],
+          "yourVote": "approve"
+        },
+        {
+          "mission": 3,
+          "attempt": 3,
+          "leader": 1,
+          "team": [1, 3],
+          "result": "reject",
+          "forced": false,
+          "votes": [
+            [5, "reject"],
+            [1, "approve"],
+            [2, "reject"],
+            [3, "reject"],
+            [4, "approve"]
+          ],
+          "yourVote": "reject"
+        },
+        {
+          "mission": 3,
+          "attempt": 4,
+          "leader": 2,
+          "team": [5, 2],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [1, "reject"],
+            [2, "approve"],
+            [3, "reject"],
+            [4, "approve"]
+          ],
+          "yourVote": "approve"
+        },
+        {
+          "mission": 4,
+          "attempt": 1,
+          "leader": 3,
+          "team": [5, 2, 3],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [1, "reject"],
+            [2, "approve"],
+            [3, "approve"],
+            [4, "reject"]
+          ],
+          "yourVote": "approve"
+        },
+        {
+          "mission": 5,
+          "attempt": 1,
+          "leader": 4,
+          "team": [5, 2, 3],
+          "result": "approve",
+          "forced": false,
+          "votes": [
+            [5, "approve"],
+            [1, "approve"],
+            [2, "approve"],
+            [3, "approve"],
+            [4, "approve"]
+          ],
+          "yourVote": "approve"
+        }
+      ],
+      "evilCouncil": [
+        {
+          "seat": "1",
+          "target": "5",
+          "reason": "Предпочитаю 5 перед 2: ещё до первого провала 5 предложил заменить 1 на себя. Обвинение 1 со стороны 2 уже объяснялось собственной картой. Но ранний выбор 5 мог быть обычным желанием участвовать, поэтому уверенность умеренная."
+        },
+        {
+          "seat": "4",
+          "target": "5",
+          "reason": "Согласен с 1 насчёт 5, но раннее самовключение — слабый след само по себе. Отличие от 2: 5 исключал 1 до провала, а 2 сначала согласился с ним идти. Обвинение 2 после миссии объясняется собственной картой."
+        }
+      ],
+      "automaticProposals": [],
+      "you": {
+        "seat": 5,
+        "role": "merlin",
+        "side": "good",
+        "outcome": "lost"
+      },
+      "personality": "Personality preference: Compare Fail counts and individual votes before trusting testimony. Prefer the roster with stronger evidence over social consensus. Speak tersely and precisely: compare the decisive fact or two plausible explanations, then give your conclusion. Correct a contradiction directly; skip social padding and repeated uncertainty disclaimers. When challenged, show the comparison rather than repeat the conclusion. As Evil, offer credible alternative deductions rather than emotional persuasion. These are soft preferences only: authoritative facts, legal actions, your actual side's objective and role-specific secrecy always take priority. Never invent evidence or ignore proven deductions to act in character.",
+      "language": "ru",
+      "score": {
+        "successes": 3,
+        "failures": 2
+      },
+      "result": {
+        "winner": "evil",
+        "reason": "killMerlin"
+      },
+      "revealedRoles": [
+        [5, "merlin"],
+        [1, "morgana"],
+        [2, "percival"],
+        [3, "servant"],
+        [4, "mordred"]
+      ],
+      "rolesKnownBeforeReveal": [
+        [5, "merlin"],
+        [1, "evil"],
+        [2, "unknown"],
+        [3, "unknown"],
+        [4, "unknown"]
+      ],
+      "missions": [
+        {
+          "n": 1,
+          "failsRequired": 1,
+          "leader": 1,
+          "team": [1, 2],
+          "result": "fail",
+          "fails": 1,
+          "participated": false,
+          "cards": [
+            [1, "fail"],
+            [2, "success"]
+          ],
+          "scoreBefore": {
+            "successes": 0,
+            "failures": 0
+          },
+          "approvers": [1, 2, 4]
+        },
+        {
+          "n": 2,
+          "failsRequired": 1,
+          "leader": 3,
+          "team": [5, 3, 4],
+          "result": "fail",
+          "fails": 1,
+          "participated": true,
+          "cards": [
+            [5, "success"],
+            [3, "success"],
+            [4, "fail"]
+          ],
+          "yourCard": "success",
+          "scoreBefore": {
+            "successes": 0,
+            "failures": 1
+          },
+          "approvers": [1, 3, 4]
+        },
+        {
+          "n": 3,
+          "failsRequired": 1,
+          "leader": 2,
+          "team": [5, 2],
+          "result": "success",
+          "fails": 0,
+          "participated": true,
+          "cards": [
+            [5, "success"],
+            [2, "success"]
+          ],
+          "yourCard": "success",
+          "scoreBefore": {
+            "successes": 0,
+            "failures": 2
+          },
+          "approvers": [5, 2, 4]
+        },
+        {
+          "n": 4,
+          "failsRequired": 1,
+          "leader": 3,
+          "team": [5, 2, 3],
+          "result": "success",
+          "fails": 0,
+          "participated": true,
+          "cards": [
+            [5, "success"],
+            [2, "success"],
+            [3, "success"]
+          ],
+          "yourCard": "success",
+          "scoreBefore": {
+            "successes": 1,
+            "failures": 2
+          },
+          "approvers": [5, 2, 3]
+        },
+        {
+          "n": 5,
+          "failsRequired": 1,
+          "leader": 4,
+          "team": [5, 2, 3],
+          "result": "success",
+          "fails": 0,
+          "participated": true,
+          "cards": [
+            [5, "success"],
+            [2, "success"],
+            [3, "success"]
+          ],
+          "yourCard": "success",
+          "scoreBefore": {
+            "successes": 2,
+            "failures": 2
+          },
+          "approvers": [5, 1, 2, 3, 4]
+        }
+      ],
+      "checks": [],
+      "assassinations": [
+        {
+          "assassin": 4,
+          "targets": [5],
+          "result": "hit",
+          "type": "merlin"
+        }
+      ],
+      "yourVotes": [
+        {
+          "mission": 1,
+          "attempt": 1,
+          "team": [1, 2],
+          "yourVote": "reject",
+          "forced": false
+        },
+        {
+          "mission": 2,
+          "attempt": 1,
+          "team": [5, 2, 3],
+          "yourVote": "approve",
+          "forced": false
+        },
+        {
+          "mission": 2,
+          "attempt": 2,
+          "team": [5, 3, 4],
+          "yourVote": "reject",
+          "forced": false
+        },
+        {
+          "mission": 3,
+          "attempt": 1,
+          "team": [5, 4],
+          "yourVote": "reject",
+          "forced": false
+        },
+        {
+          "mission": 3,
+          "attempt": 2,
+          "team": [5, 2],
+          "yourVote": "approve",
+          "forced": false
+        },
+        {
+          "mission": 3,
+          "attempt": 3,
+          "team": [1, 3],
+          "yourVote": "reject",
+          "forced": false
+        },
+        {
+          "mission": 3,
+          "attempt": 4,
+          "team": [5, 2],
+          "yourVote": "approve",
+          "forced": false
+        },
+        {
+          "mission": 4,
+          "attempt": 1,
+          "team": [5, 2, 3],
+          "yourVote": "approve",
+          "forced": false
+        },
+        {
+          "mission": 5,
+          "attempt": 1,
+          "team": [5, 2, 3],
+          "yourVote": "approve",
+          "forced": false
+        }
+      ],
+      "choices": ["Write your conclusion"],
+      "speak": true,
+      "decisionExamples": [
+        {
+          "id": "decision-1",
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "mission": 1,
+          "proposal": {
+            "number": 1,
+            "nextLeader": 2,
+            "fifthLeader": 5,
+            "rejectionsUntilForced": 4,
+            "forced": false
+          },
+          "score": {
+            "successes": 0,
+            "failures": 0
+          },
+          "team": [],
+          "knowledge": {
+            "rolesVisibleToYou": [
+              [5, "merlin"],
+              [1, "evil"],
+              [2, "unknown"],
+              [3, "unknown"],
+              [4, "unknown"]
+            ],
+            "checks": []
+          },
+          "choice": "5, 2",
+          "legalChoices": ["5, 1", "5, 2", "5, 3", "5, 4", "1, 2", "1, 3", "1, 4", "2, 3", "2, 4", "3, 4"],
+          "reason": "В 1, 2 есть видимое Зло. Предпочитаю 5, 2: исключаю этот риск, хотя 2 может быть скрытым Мордредом. Публично самоучастие оправдывает замену; данных для доверия 2 пока нет.",
+          "publicStatement": "Предпочитаю 5, 2: за свою карту отвечаю, а 2 уже выразил готовность участвовать. Согласие вокруг 1, 2 ещё не проверяет пару. 1, предлагаю рассмотреть замену себя на 5.",
+          "speechRules": {
+            "public": true,
+            "optionalAnnouncement": false,
+            "claimTargets": [1, 2, 3, 4],
+            "requiredClaimStances": [],
+            "mandatoryText": ""
+          },
+          "tableConventions": {
+            "includeSelfInProposals": false,
+            "excludedPartners": []
+          }
+        },
+        {
+          "id": "decision-2",
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "mission": 1,
+          "proposal": {
+            "number": 1,
+            "nextLeader": 2,
+            "fifthLeader": 5,
+            "rejectionsUntilForced": 4,
+            "forced": false
+          },
+          "score": {
+            "successes": 0,
+            "failures": 0
+          },
+          "team": [1, 2],
+          "knowledge": {
+            "rolesVisibleToYou": [
+              [5, "merlin"],
+              [1, "evil"],
+              [2, "unknown"],
+              [3, "unknown"],
+              [4, "unknown"]
+            ],
+            "checks": []
+          },
+          "choice": "reject",
+          "legalChoices": ["approve", "reject"],
+          "reason": "В 1, 2 известное мне Зло может сорвать миссию одной картой. У следующего лидера 2 можно добиваться 2, 5: риск скрытого Мордреда остаётся, но известный риск от 1 снимается. Впереди ещё четыре предложения.",
+          "publicStatement": "",
+          "speechRules": {
+            "public": false,
+            "optionalAnnouncement": false,
+            "claimTargets": [],
+            "requiredClaimStances": [],
+            "mandatoryText": ""
+          },
+          "tableConventions": {
+            "includeSelfInProposals": false,
+            "excludedPartners": []
+          }
+        },
+        {
+          "id": "decision-12",
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "mission": 4,
+          "proposal": {
+            "number": 1,
+            "nextLeader": 4,
+            "fifthLeader": 2,
+            "rejectionsUntilForced": 4,
+            "forced": false
+          },
+          "score": {
+            "successes": 1,
+            "failures": 2
+          },
+          "team": [],
+          "knowledge": {
+            "rolesVisibleToYou": [
+              [5, "merlin"],
+              [1, "evil"],
+              [2, "unknown"],
+              [3, "unknown"],
+              [4, "unknown"]
+            ],
+            "checks": []
+          },
+          "choice": "5, 2, 3",
+          "legalChoices": [
+            "5, 1, 2",
+            "5, 1, 3",
+            "5, 1, 4",
+            "5, 2, 3",
+            "5, 2, 4",
+            "5, 3, 4",
+            "1, 2, 3",
+            "1, 2, 4",
+            "1, 3, 4",
+            "2, 3, 4"
+          ],
+          "reason": "Мордред среди 3 и 4. Предпочитаю 3: он отверг 1, 3, тогда как 4 поддержал известного мне злого 1. В 2, 3, 5 остаётся риск, но 2, 4, 5 выглядит хуже. У текущего лидера есть путь к трём голосам; следующий 4 предпочитает себя.",
+          "publicStatement": "4, одобрить успешную пару — не то же, что сыграть в ней. Ты также поддержал 1, 3, а 3 эту пару отверг. Поэтому предпочитаю добавить 3 к 2, 5, сохранив участников успеха при двух провалах. Это сильнее одного удачного одобрения.",
+          "speechRules": {
+            "public": true,
+            "optionalAnnouncement": false,
+            "claimTargets": [1, 2, 3, 4],
+            "requiredClaimStances": [],
+            "mandatoryText": ""
+          },
+          "tableConventions": {
+            "includeSelfInProposals": false,
+            "excludedPartners": []
+          }
+        },
+        {
+          "id": "decision-13",
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "mission": 4,
+          "proposal": {
+            "number": 1,
+            "nextLeader": 4,
+            "fifthLeader": 2,
+            "rejectionsUntilForced": 4,
+            "forced": false
+          },
+          "score": {
+            "successes": 1,
+            "failures": 2
+          },
+          "team": [5, 2, 3],
+          "knowledge": {
+            "rolesVisibleToYou": [
+              [5, "merlin"],
+              [1, "evil"],
+              [2, "unknown"],
+              [3, "unknown"],
+              [4, "unknown"]
+            ],
+            "checks": []
+          },
+          "choice": "approve",
+          "legalChoices": ["approve", "reject"],
+          "reason": "2 и 5 добрые; риск сосредоточен в 3. Его отказ от пары с известным злым 1 и повторная поддержка 4 со стороны 1 склоняют против 4. Следующий лидер 4 выберет более подозрительные 2, 4, 5; пятый 2 предпочитает нынешнюю тройку.",
+          "publicStatement": "",
+          "speechRules": {
+            "public": false,
+            "optionalAnnouncement": false,
+            "claimTargets": [],
+            "requiredClaimStances": [],
+            "mandatoryText": ""
+          },
+          "tableConventions": {
+            "includeSelfInProposals": false,
+            "excludedPartners": []
+          }
+        },
+        {
+          "id": "decision-14",
+          "stage": "selectTeam",
+          "publicDiscussion": true,
+          "mission": 5,
+          "proposal": {
+            "number": 1,
+            "nextLeader": 5,
+            "fifthLeader": 3,
+            "rejectionsUntilForced": 4,
+            "forced": false
+          },
+          "score": {
+            "successes": 2,
+            "failures": 2
+          },
+          "team": [],
+          "knowledge": {
+            "rolesVisibleToYou": [
+              [5, "merlin"],
+              [1, "evil"],
+              [2, "unknown"],
+              [3, "unknown"],
+              [4, "unknown"]
+            ],
+            "checks": []
+          },
+          "choice": "5, 2, 3",
+          "legalChoices": [
+            "5, 1, 2",
+            "5, 1, 3",
+            "5, 1, 4",
+            "5, 2, 3",
+            "5, 2, 4",
+            "5, 3, 4",
+            "1, 2, 3",
+            "1, 2, 4",
+            "1, 3, 4",
+            "2, 3, 4"
+          ],
+          "reason": "Мордред остаётся среди 3 и 4, но 3 пропустил возможность выиграть саботажем в четвёртой миссии. Это усиливает выбор 2, 3, 5 против 2, 4, 5. Есть прежние три одобрения; следующий лидер я, пятый 3 — оба могут сохранить состав.",
+          "publicStatement": "4, согласен повторить 2, 3, 5. Эта тройка сыграла Успех, когда один саботаж завершал игру. Это весомее прежних споров о голосах; замена на 2, 4, 5 добавит участника без такого результата. Сохраняю состав.",
+          "speechRules": {
+            "public": true,
+            "optionalAnnouncement": false,
+            "claimTargets": [1, 2, 3, 4],
+            "requiredClaimStances": [],
+            "mandatoryText": ""
+          },
+          "tableConventions": {
+            "includeSelfInProposals": false,
+            "excludedPartners": []
+          }
+        },
+        {
+          "id": "decision-15",
+          "stage": "votingForTeam",
+          "publicDiscussion": false,
+          "mission": 5,
+          "proposal": {
+            "number": 1,
+            "nextLeader": 5,
+            "fifthLeader": 3,
+            "rejectionsUntilForced": 4,
+            "forced": false
+          },
+          "score": {
+            "successes": 2,
+            "failures": 2
+          },
+          "team": [5, 2, 3],
+          "knowledge": {
+            "rolesVisibleToYou": [
+              [5, "merlin"],
+              [1, "evil"],
+              [2, "unknown"],
+              [3, "unknown"],
+              [4, "unknown"]
+            ],
+            "checks": []
+          },
+          "choice": "approve",
+          "legalChoices": ["approve", "reject"],
+          "reason": "Мордред всё ещё возможен в 3, но он уже упустил немедленную победу. Это сильнее новой поддержки злого 1. Замена 3 на 4 хуже по истории; следующий лидер я и пятый 3 предпочитаем нынешний состав. Оснований откладывать нет.",
+          "publicStatement": "",
+          "speechRules": {
+            "public": false,
+            "optionalAnnouncement": false,
+            "claimTargets": [],
+            "requiredClaimStances": [],
+            "mandatoryText": ""
+          },
+          "tableConventions": {
+            "includeSelfInProposals": false,
+            "excludedPartners": []
+          }
+        }
+      ]
+    },
+    "minutes": 19.2684,
+    "play": {
+      "attemptedCalls": 84,
+      "measuredCalls": 84,
+      "input": 3931750,
+      "cached": 2456576,
+      "uncached": 1475174,
+      "output": 23174,
+      "inputPerCall": 46806.54761904762,
+      "uncachedPerCall": 17561.595238095237,
+      "outputPerCall": 275.8809523809524,
+      "cachedInputShare": 0.6248047307178737,
+      "cacheHitCalls": 62,
+      "failedCalls": 0
+    },
+    "reviews": {
+      "attemptedCalls": 5,
+      "measuredCalls": 5,
+      "input": 76819,
+      "cached": 10240,
+      "uncached": 66579,
+      "output": 1709,
+      "inputPerCall": 15363.8,
+      "uncachedPerCall": 13315.8,
+      "outputPerCall": 341.8,
+      "cachedInputShare": 0.13330035538083027,
+      "cacheHitCalls": 1,
+      "failedCalls": 0
+    },
+    "all": {
+      "attemptedCalls": 89,
+      "measuredCalls": 89,
+      "input": 4008569,
+      "cached": 2466816,
+      "uncached": 1541753,
+      "output": 24883,
+      "inputPerCall": 45040.10112359551,
+      "uncachedPerCall": 17323.067415730337,
+      "outputPerCall": 279.5842696629214,
+      "cachedInputShare": 0.6153856900055855,
+      "cacheHitCalls": 63,
+      "failedCalls": 0
+    },
+    "stages": {
+      "selectTeam": {
+        "attemptedCalls": 34,
+        "measuredCalls": 34,
+        "input": 1467211,
+        "cached": 620288,
+        "uncached": 846923,
+        "output": 14993,
+        "inputPerCall": 43153.26470588235,
+        "uncachedPerCall": 24909.5,
+        "outputPerCall": 440.97058823529414,
+        "cachedInputShare": 0.42276673225596045,
+        "cacheHitCalls": 18,
+        "failedCalls": 0
+      },
+      "votingForTeam": {
+        "attemptedCalls": 45,
+        "measuredCalls": 45,
+        "input": 2147172,
+        "cached": 1729280,
+        "uncached": 417892,
+        "output": 6571,
+        "inputPerCall": 47714.933333333334,
+        "uncachedPerCall": 9286.488888888889,
+        "outputPerCall": 146.0222222222222,
+        "cachedInputShare": 0.8053756289668457,
+        "cacheHitCalls": 42,
+        "failedCalls": 0
+      },
+      "onMission": {
+        "attemptedCalls": 2,
+        "measuredCalls": 2,
+        "input": 49702,
+        "cached": 20352,
+        "uncached": 29350,
+        "output": 358,
+        "inputPerCall": 24851,
+        "uncachedPerCall": 14675,
+        "outputPerCall": 179,
+        "cachedInputShare": 0.4094805038026639,
+        "cacheHitCalls": 1,
+        "failedCalls": 0
+      },
+      "assassinate": {
+        "attemptedCalls": 3,
+        "measuredCalls": 3,
+        "input": 267665,
+        "cached": 86656,
+        "uncached": 181009,
+        "output": 1252,
+        "inputPerCall": 89221.66666666667,
+        "uncachedPerCall": 60336.333333333336,
+        "outputPerCall": 417.3333333333333,
+        "cachedInputShare": 0.323747968542768,
+        "cacheHitCalls": 1,
+        "failedCalls": 0
+      },
+      "end": {
+        "attemptedCalls": 5,
+        "measuredCalls": 5,
+        "input": 76819,
+        "cached": 10240,
+        "uncached": 66579,
+        "output": 1709,
+        "inputPerCall": 15363.8,
+        "uncachedPerCall": 13315.8,
+        "outputPerCall": 341.8,
+        "cachedInputShare": 0.13330035538083027,
+        "cacheHitCalls": 1,
+        "failedCalls": 0
+      }
+    },
+    "players": [
+      {
+        "player": "avalon-agent-2",
+        "calls": 18,
+        "firstInput": 13585,
+        "lastInput": 87211,
+        "peakInput": 87211
+      },
+      {
+        "player": "avalon-agent-3",
+        "calls": 16,
+        "firstInput": 14081,
+        "lastInput": 87462,
+        "peakInput": 87462
+      },
+      {
+        "player": "avalon-agent-4",
+        "calls": 16,
+        "firstInput": 13835,
+        "lastInput": 83405,
+        "peakInput": 83405
+      },
+      {
+        "player": "avalon-agent-5",
+        "calls": 19,
+        "firstInput": 13792,
+        "lastInput": 93626,
+        "peakInput": 93626
+      },
+      {
+        "player": "avalon-agent-1",
+        "calls": 15,
+        "firstInput": 14488,
+        "lastInput": 84973,
+        "peakInput": 84973
+      }
+    ],
+    "pauses": [],
+    "automatedQualityChecks": {
+      "goodKnownFailVotes": 2,
+      "goodKnownFailApprovals": [],
+      "decisiveEvilCardOpportunities": 0,
+      "decisiveEvilSuccessCards": []
+    },
+    "quotaBefore": {
+      "shortTerm": null,
+      "remainingPercent": 78,
+      "resetsAt": 1792649597,
+      "checkedAt": 1792055198645
+    },
+    "quotaAfter": {
+      "shortTerm": null,
+      "remainingPercent": 76,
+      "resetsAt": 1792649597,
+      "checkedAt": 1792056354812
+    }
+  }
+]
