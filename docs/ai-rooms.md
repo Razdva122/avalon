@@ -179,6 +179,24 @@ false establishes the checker as Evil. Humans can choose their announcement, so
 that inference does not apply to them. A bot can state its own mission card as
 testimony to support an accusation without revealing Merlin or the wizard pair.
 
+Lady target decisions compare new private information, public corroboration and
+the next holder's influence. The input explicitly lists the completed mission and
+later inspection opportunities if the game continues; no later check follows
+mission four. Among comparably useful targets, Good prefer a reliably Good bot
+when another inspection can occur. Known alignments remain valid without another
+Lady result, and a check of known alignment may still serve a concrete public or
+cover purpose.
+
+Evil privately retain their actual card and knowledge while evaluating whether
+their chosen target and public explanation fit a Good participant's viewpoint.
+After a two-person mission with one Fail, a Good participant already knows the
+partner is Evil; Evil who played that Fail do not know the partner's alignment.
+Claiming personal uncertainty can therefore expose the checker. Later team
+decisions receive this advice as a sourced, revisable behavioral read, distinct
+from verified alignment. A redundant target alone does not establish Evil, and
+another player's private card is not public evidence. These are model strategy
+instructions, not server-enforced targets or alignment deductions.
+
 During ordinary play and the public Evil council, only `publicReason` is
 published. `speech` remains the private decision reason used by diagnostics and
 post-game review examples; the final post-game reflection uses `speech` publicly.
@@ -292,3 +310,12 @@ is the assassin. The human message becomes part of subsequent bot input. A human
 assassin can shoot only after all council participants have spoken or passed;
 this guard also applies during asynchronous state persistence. Good humans can
 read the council in the common chat but do not get an Evil council turn.
+
+### Session-history A/B measurement
+
+New games alternate globally between standard independent requests and isolated
+per-bot session history with exact incremental input. The private assignment is
+fixed for the match, including technical resumes; reviews stay independent in both
+arms. Quota snapshots and per-request usage are recorded in MongoDB, including
+paused/stopped games and unknown usage after failed calls. Comparable settings are
+reported separately. See [deployment and private report](../deploy/codex-production.md#balanced-bot-session-experiment-2026-10-15).

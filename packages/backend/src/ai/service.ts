@@ -12,13 +12,13 @@ import type {
 } from '@avalon/types';
 import type { Manager } from '@/main';
 import { randomUUID } from 'crypto';
-import { AiRepository } from './repository';
+import { AiRepository, SessionExperiment } from './repository';
 import { BotRoom } from './room';
 import { AiPause } from './client';
 import { decisionPipeline } from './pipeline';
 import { getCodexModels, validateCodexSettings } from './codex-models';
-import { getCodexWeeklyLimit } from './codex-limits';
-import { CODEX_MODEL, codexEnabled, codexDecide } from './codex';
+import { getCodexWeeklyLimit, readCodexExperimentQuota } from './codex-limits';
+import { CODEX_MODEL, codexEnabled, codexDecide, codexGameSessions } from './codex';
 import { getBotProfile } from './agents';
 import { hasPremium } from '@/support/premium';
 import { supportTotalCents } from '@/support/repository';
@@ -73,6 +73,7 @@ export class AiService {
   }
   private creating = false;
   private starting = false;
+  private experimentRuns = new Map<string, () => Promise<void>>();
   private publicStartingID?: string;
   private technicalStart?: { roomID: string };
   private running = new Set<string>();
@@ -188,6 +189,7 @@ export class AiService {
       room.stop(aiText(room.ai.language).pauseExpired);
       await this.repository!.save(room.calculateRoomState());
     } finally {
+      await this.finishExperiment(id);
       await this.repository!.release(id).catch(() => {});
       this.manager.updateRoomsList(room);
     }
@@ -204,11 +206,48 @@ export class AiService {
   }
 
   private createRoom(id: string, owner: string, language: AiLanguage, playerCount: AiPlayerCount) {
+    let experiment: SessionExperiment | undefined;
+    let initialization: Promise<void> | undefined;
+    const sessions = codexGameSessions();
+    const settings = () => room.ai?.codex;
+    const experimentInfo = () => ({ version: experiment!.version, mode: experiment!.mode });
+    const initialize = () =>
+      (initialization ??= (async () => {
+        const chosen = settings();
+        experiment = await this.repository!.beginSessionExperiment(id, {
+          model: chosen?.model ?? 'default',
+          reasoning: chosen?.reasoning ?? 'low',
+          difficulty: room.ai?.beginner ? 'beginner' : (room.ai?.botDifficulty ?? 'spectator'),
+          players: room.players.length,
+          humans: room.humanIDs.length,
+          language: room.ai?.language ?? 'en',
+        });
+        await this.repository!.recordExperimentQuota(id, await readCodexExperimentQuota().catch(() => null));
+      })().catch((error) => {
+        initialization = undefined;
+        throw error;
+      }));
+    const pipeline = decisionPipeline(async (request, options, signal) => {
+      await initialize();
+      signal?.throwIfAborted();
+      const runner =
+        experiment!.mode === 'session-delta' && request.state.stage !== 'end'
+          ? sessions.forPlayer(request.playerID)
+          : undefined;
+      return codexDecide(id, this.repository!, runner, settings, experimentInfo)(request, options, signal);
+    });
     const room: BotRoom = new BotRoom(
       id,
       owner,
       this.manager.io,
-      decisionPipeline(codexDecide(id, this.repository!, undefined, () => room.ai?.codex)),
+      async (request, signal) => {
+        try {
+          return await pipeline(request, signal);
+        } catch (error) {
+          sessions.invalidate(request.playerID);
+          throw error;
+        }
+      },
       async (state) => {
         await this.repository!.save(state);
         if (state.stage === 'started' && state.game.stage === 'end' && state.ai?.humanPlayerID) {
@@ -223,6 +262,25 @@ export class AiService {
       10000,
     );
     room.ai!.model = CODEX_MODEL;
+    this.experimentRuns.set(id, async () => {
+      if (initialization) await initialization.catch(() => {});
+      if (!experiment) {
+        if (room.ai?.status === 'stopped') this.experimentRuns.delete(id);
+        return;
+      }
+      try {
+        const quota = await readCodexExperimentQuota().catch(() => null);
+        await this.repository!.recordExperimentProgress(id, room.calculateRoomState(), quota);
+      } finally {
+        if (room.ai?.status === 'finished' || room.ai?.status === 'stopped') {
+          try {
+            await sessions.close();
+          } finally {
+            this.experimentRuns.delete(id);
+          }
+        }
+      }
+    });
     room.renewLease = () => this.repository!.renewLease(id);
     if (this.manager.chatService) {
       room.persistChatMessage = (author, text, requestID) =>
@@ -244,12 +302,21 @@ export class AiService {
       .finally(async () => {
         if (this.manager.rooms[id] === room && room.ai?.status === 'paused') this.schedulePauseExpiry(room);
         try {
+          await this.finishExperiment(id);
           await this.repository!.release(id).catch(() => {});
         } finally {
           this.running.delete(id);
           this.manager.updateRoomsList(room);
         }
       });
+  }
+
+  private async finishExperiment(id: string) {
+    try {
+      await this.experimentRuns.get(id)?.();
+    } catch {
+      console.error('AI experiment accounting/cleanup failed for room', id);
+    }
   }
 
   register(socket: ServerSocket, userID?: string) {
@@ -696,7 +763,10 @@ export class AiService {
           delete room.ai!.launchExpiresAt;
           room.stop();
           await this.repository!.save(room.calculateRoomState());
-          if (!this.running.has(id)) await this.repository!.release(id);
+          if (!this.running.has(id)) {
+            await this.finishExperiment(id);
+            await this.repository!.release(id);
+          }
           this.manager.updateRoomsList(room);
           return cb({ ok: true });
         }

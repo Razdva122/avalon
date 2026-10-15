@@ -435,3 +435,93 @@ test('saved AI award work survives a failed award and repository restart', async
   });
   expect(awarded).toEqual(['human']);
 });
+
+test('session experiment balances comparable games and preserves assignment on resume', async () => {
+  const db = client.db('session-ab');
+  const repo = new AiRepository(db);
+  const details = { model: 'gpt-test', reasoning: 'low', difficulty: 'smart', players: 5, humans: 1, language: 'ru' };
+  await repo.claim('one');
+  const first = await repo.beginSessionExperiment('one', details);
+  expect(first.mode).toBe('standard');
+  expect((await repo.beginSessionExperiment('one', details)).mode).toBe('standard');
+  await repo.release('one');
+  await repo.claim('two');
+  expect((await new AiRepository(db).beginSessionExperiment('two', details)).mode).toBe('session-delta');
+  await repo.release('two');
+  await repo.claim('three');
+  expect((await repo.beginSessionExperiment('three', { ...details, players: 7 })).mode).toBe('standard');
+  await repo.release('three');
+  await repo.claim('four');
+  expect((await repo.beginSessionExperiment('four', { ...details, players: 8 })).mode).toBe('session-delta');
+  await expect(repo.beginSessionExperiment('unowned', details)).rejects.toThrow();
+});
+
+test('experiment summaries retain known usage, unknown attempts and stopped games without public traces', async () => {
+  const db = client.db('session-summary');
+  const repo = new AiRepository(db);
+  await repo.claim('summary');
+  await repo.beginSessionExperiment('summary', {
+    model: 'test',
+    reasoning: 'low',
+    difficulty: 'smart',
+    players: 5,
+    humans: 1,
+    language: 'ru',
+  });
+  const quota = {
+    checkedAt: 1,
+    weekly: null,
+    buckets: [
+      { limitId: 'test', primary: { usedPercent: 10, windowDurationMins: 300, resetsAt: 2000000000 }, secondary: null },
+    ],
+  };
+  await repo.recordExperimentQuota('summary', quota);
+  await repo.recordExperimentQuota('summary', null);
+  await repo.recordRequest({
+    _id: 'known',
+    roomID: 'summary',
+    player: '3',
+    stage: 'votingForTeam',
+    mode: 'codex-chatgpt',
+    startedAt: new Date(100),
+    finishedAt: new Date(200),
+    status: 'completed',
+    inputTokens: 100,
+    cachedTokens: 60,
+    outputTokens: 5,
+    submittedInputBytes: 50,
+    sessionReset: true,
+  });
+  await repo.recordRequest({
+    _id: 'unknown',
+    roomID: 'summary',
+    player: '3',
+    stage: 'onMission',
+    mode: 'codex-chatgpt',
+    startedAt: new Date(),
+    status: 'failed',
+  });
+  await repo.recordExperimentProgress(
+    'summary',
+    {
+      stage: 'started',
+      ai: { status: 'stopped' },
+      game: { history: [{ type: 'vote', result: 'reject' }], result: { winner: 'evil', reason: 'manualy' } },
+    } as unknown as import('@avalon/types').TRoomState,
+    null,
+  );
+  expect(await db.collection('ai_session_experiments').findOne({})).toMatchObject({
+    quotaBefore: quota,
+    status: 'stopped',
+    metrics: {
+      inputTokens: 100,
+      uncachedTokens: 40,
+      outputTokens: 5,
+      unknownUsageAttempts: 1,
+      sessionResets: 1,
+      requestMs: 100,
+      rejectedTeams: 1,
+    },
+  });
+  expect(await repo.load('summary')).toBeNull();
+});

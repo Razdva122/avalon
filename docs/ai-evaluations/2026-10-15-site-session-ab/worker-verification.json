@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-15T10:43:19.827Z",
+  "purpose": "worker session rollout verification; outside game A/B samples",
+  "turns": [
+    {
+      "input_tokens": 9145,
+      "cached_input_tokens": 0,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 19,
+      "reasoning_output_tokens": 0
+    },
+    {
+      "input_tokens": 9184,
+      "cached_input_tokens": 8960,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 25,
+      "reasoning_output_tokens": 0
+    }
+  ],
+  "sameThread": true,
+  "historyVerified": true,
+  "cleaned": true
+}

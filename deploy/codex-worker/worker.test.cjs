@@ -81,6 +81,40 @@ test('worker accepts only game decision input or read-only discovery operations'
   assert.doesNotThrow(() => validateRequest({ operation: 'limits' }));
 });
 
+test('worker separates reusable instructions and rejects a prefix that would discard game input', async () => {
+  assert.throws(() =>
+    validateRequest({ operation: 'decide', prompt: 'private state', instructions: 'other', schema: {} }),
+  );
+  const directory = await mkdtemp(join(tmpdir(), 'worker-cache-test-'));
+  try {
+    await writeFile(
+      join(directory, 'codex'),
+      `#!${process.execPath}\nconst fs=require('node:fs');const args=process.argv.slice(2);let input='';process.stdin.on('data',d=>input+=d);process.stdin.on('end',()=>{if(input!=='\\nGAME INPUT:\\nPRIVATE_GAME_STATE'||args.some(a=>a.includes('PRIVATE_GAME_STATE'))||!args.includes('developer_instructions="Play Avalon."')||!args.includes('include_environment_context=false')||!args.includes('--ephemeral'))process.exit(2);fs.writeFileSync(args[args.indexOf('-o')+1],'{"choice":"approve","speech":"test"}');console.log(JSON.stringify({type:'turn.completed',usage:{input_tokens:100,cached_input_tokens:64}}));});`,
+      { mode: 0o700 },
+    );
+    const child = spawn(process.execPath, [join(__dirname, 'worker.cjs')], {
+      env: { ...process.env, PATH: `${directory}:${process.env.PATH}` },
+    });
+    let stdout = '';
+    child.stdout.on('data', (chunk) => (stdout += chunk));
+    const done = new Promise((resolve) => child.on('close', resolve));
+    child.stdin.end(
+      JSON.stringify({
+        operation: 'decide',
+        prompt: 'Play Avalon.\nGAME INPUT:\nPRIVATE_GAME_STATE',
+        instructions: 'Play Avalon.',
+        schema: { type: 'object' },
+      }),
+    );
+    assert.equal(await done, 0);
+    const response = JSON.parse(stdout);
+    assert.equal(response.ok, true);
+    assert.equal(response.result.usage.cached_input_tokens, 64);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test('worker reports exhausted subscription quota without exposing raw CLI diagnostics', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'worker-quota-test-'));
   try {
@@ -372,3 +406,58 @@ test(
     }
   },
 );
+
+test('worker validates opaque isolated sessions and cleanup operations', () => {
+  const key = '11111111-1111-4111-8111-111111111111';
+  assert.doesNotThrow(() => validateRequest({ operation: 'decide', prompt: 'game', schema: {}, session: { key } }));
+  assert.doesNotThrow(() => validateRequest({ operation: 'closeSessions', keys: [key] }));
+  for (const session of [{ key: '../auth.json' }, { key, id: '--last' }, { key, home: '/state' }])
+    assert.throws(() => validateRequest({ operation: 'decide', prompt: 'game', schema: {}, session }));
+});
+
+test('worker resumes isolated profiles across processes, keeps tools disabled, then removes only owned profiles', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'worker-session-test-'));
+  const { access, readFile } = require('node:fs/promises');
+  const key = '11111111-1111-4111-8111-111111111111';
+  const other = '22222222-2222-4222-8222-222222222222';
+  try {
+    await writeFile(join(directory, 'auth.json'), '{}', { mode: 0o600 });
+    await writeFile(
+      join(directory, 'codex'),
+      `#!${process.execPath}
+const fs=require('node:fs'),path=require('node:path');const a=process.argv.slice(2),home=process.env.CODEX_HOME;
+let input='';process.stdin.on('data',d=>input+=d);process.stdin.on('end',()=>{
+if(a.includes('--ephemeral')||!a.includes('sandbox_mode="read-only"')||!a.includes('features.shell_tool=false')||process.cwd()!==fs.realpathSync(path.join(home,'work')))process.exit(2);
+const countFile=path.join(home,'turns');const n=fs.existsSync(countFile)?Number(fs.readFileSync(countFile))+1:1;
+if(n>1&&(!a.includes('resume')||a.includes('-C')))process.exit(3);
+fs.writeFileSync(countFile,String(n));fs.writeFileSync(a[a.indexOf('-o')+1],'{"choice":"approve","speech":"test"}');
+console.log(JSON.stringify({type:'thread.started',thread_id:path.basename(home)}));
+console.log(JSON.stringify({type:'turn.completed',usage:{input_tokens:100*n}}));});`,
+      { mode: 0o700 },
+    );
+    async function invoke(request) {
+      const child = spawn(process.execPath, [join(__dirname, 'worker.cjs')], {
+        env: { ...process.env, CODEX_HOME: directory, PATH: `${directory}:${process.env.PATH}` },
+      });
+      let stdout = '';
+      child.stdout.on('data', (chunk) => (stdout += chunk));
+      const done = new Promise((resolve) => child.on('close', resolve));
+      child.stdin.end(JSON.stringify(request));
+      assert.equal(await done, 0);
+      const response = JSON.parse(stdout);
+      assert.equal(response.ok, true, stdout);
+      return response.result;
+    }
+    const request = { operation: 'decide', prompt: 'state', schema: {}, session: { key } };
+    assert.equal((await invoke(request)).threadID, key);
+    assert.equal((await invoke({ ...request, session: { key, id: key } })).usage.input_tokens, 200);
+    assert.equal((await invoke({ ...request, session: { key: other } })).usage.input_tokens, 100);
+    assert.equal(await readFile(join(directory, 'avalon-sessions', key, 'turns'), 'utf8'), '2');
+    await invoke({ operation: 'closeSessions', keys: [key] });
+    await assert.rejects(access(join(directory, 'avalon-sessions', key)));
+    await access(join(directory, 'avalon-sessions', other));
+    await access(join(directory, 'auth.json'));
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});

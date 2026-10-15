@@ -2,6 +2,8 @@ import { aiPlayedModel, aiRosterInfo } from '@avalon/types';
 import { AI_LEASE_MS } from './timing';
 import { calculateAiRatings } from './ratings';
 import { AI_PROFILE_RATING_SEASON } from './rating-season';
+import { createHash } from 'crypto';
+import type { ExperimentQuota } from './codex-limits';
 import type { Db } from 'mongodb';
 import type { StartedRoomState, TRoomState, TRoomInfo, PlayerGameSummaryPage } from '@avalon/types';
 import { AiPause } from './client';
@@ -16,9 +18,19 @@ export type AiRequestLog = {
   finishedAt?: Date;
   status: string;
   inputBytes?: number;
+  submittedInputBytes?: number;
   inputTokens?: number;
   cachedTokens?: number;
   outputTokens?: number;
+  reasoningTokens?: number;
+  model?: string;
+  reasoning?: string;
+  phase?: string;
+  experiment?: { version: string; mode: string };
+  attempts?: number;
+  unknownUsageAttempts?: number;
+  sessionReset?: boolean;
+  failureKind?: string;
 };
 
 export type AiDecisionTrace = {
@@ -36,6 +48,17 @@ export type AiDecisionTrace = {
   evidence?: import('./client').DecisionEvidence[];
   responseID?: string;
   output?: unknown;
+};
+
+export const SESSION_EXPERIMENT_VERSION = 'session-delta-v1';
+export type SessionExperiment = {
+  _id: string;
+  version: string;
+  mode: 'standard' | 'session-delta';
+  startedAt: Date;
+  stratum: string;
+  details: { model: string; reasoning: string; difficulty: string; players: number; humans: number; language: string };
+  quotaBefore?: ExperimentQuota | null;
 };
 
 type Ledger = { _id: string; owner?: string; leaseUntil?: Date };
@@ -68,12 +91,89 @@ export class AiRepository {
     if (!this.retentionIndexes)
       this.retentionIndexes = Promise.all([
         this.db.collection('ai_request_costs').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+        this.db.collection('ai_request_costs').createIndex({ roomID: 1, startedAt: 1 }),
         this.db.collection('ai_decision_traces').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
       ]).catch((error) => {
         this.retentionIndexes = undefined;
         throw error;
       });
     await this.retentionIndexes;
+  }
+  /** Called under the global game lease, before any model request. */
+  async beginSessionExperiment(roomID: string, details: SessionExperiment['details']): Promise<SessionExperiment> {
+    await this.renewLease(roomID);
+    const collection = this.db.collection<SessionExperiment>('ai_session_experiments');
+    const existing = await collection.findOne({ _id: roomID });
+    if (existing) return existing;
+    const stratum = createHash('sha256').update(JSON.stringify(details)).digest('hex').slice(0, 24);
+    await collection.createIndex({ version: 1, mode: 1 });
+    const [standard, persistent] = await Promise.all([
+      collection.countDocuments({ version: SESSION_EXPERIMENT_VERSION, mode: 'standard' }),
+      collection.countDocuments({ version: SESSION_EXPERIMENT_VERSION, mode: 'session-delta' }),
+    ]);
+    // The global lease serializes allocation. Counting durable assignments avoids
+    // losing a turn in the alternation if the server crashes before insertion.
+    await this.renewLease(roomID);
+    const assignment: SessionExperiment = {
+      _id: roomID,
+      version: SESSION_EXPERIMENT_VERSION,
+      mode: standard <= persistent ? 'standard' : 'session-delta',
+      startedAt: new Date(),
+      stratum,
+      details,
+    };
+    await collection.insertOne(assignment);
+    return assignment;
+  }
+  async recordExperimentQuota(roomID: string, quota: ExperimentQuota | null) {
+    await this.db
+      .collection<SessionExperiment>('ai_session_experiments')
+      .updateOne(
+        { _id: roomID, quotaBefore: { $exists: false } },
+        { $set: { quotaBefore: quota, quotaBeforeCheckedAt: new Date() } },
+      );
+  }
+  async recordExperimentProgress(roomID: string, state: TRoomState, quota: ExperimentQuota | null) {
+    if (state.stage !== 'started') return;
+    const requests = await this.db.collection<AiRequestLog>('ai_request_costs').find({ roomID }).toArray();
+    const total = (key: 'inputTokens' | 'cachedTokens' | 'outputTokens' | 'submittedInputBytes') =>
+      requests.reduce((sum, r) => sum + (r[key] ?? 0), 0);
+    const segment = { checkedAt: new Date(), status: state.ai?.status, quota };
+    await this.db.collection<SessionExperiment & { segments?: object[] }>('ai_session_experiments').updateOne(
+      { _id: roomID },
+      {
+        $set: {
+          updatedAt: new Date(),
+          status: state.ai?.status,
+          result: state.game.result,
+          metrics: {
+            requests: requests.length,
+            failed: requests.filter((r) => r.status === 'failed').length,
+            cancelled: requests.filter((r) => r.status === 'cancelled').length,
+            attempts: requests.reduce((sum, r) => sum + (r.attempts ?? 1), 0),
+            unknownUsageAttempts: requests.reduce(
+              (sum, r) => sum + (r.unknownUsageAttempts ?? (r.inputTokens === undefined ? 1 : 0)),
+              0,
+            ),
+            inputTokens: total('inputTokens'),
+            cachedTokens: total('cachedTokens'),
+            outputTokens: total('outputTokens'),
+            uncachedTokens: total('inputTokens') - total('cachedTokens'),
+            submittedInputBytes: total('submittedInputBytes'),
+            sessionResets: requests.filter((r) => r.sessionReset).length,
+            requestMs: requests.reduce(
+              (sum, r) => sum + (r.finishedAt ? r.finishedAt.getTime() - r.startedAt.getTime() : 0),
+              0,
+            ),
+            reviews: requests.filter((r) => r.stage === 'end').length,
+            votes: state.game.history.filter((h) => h.type === 'vote').length,
+            rejectedTeams: state.game.history.filter((h) => h.type === 'vote' && h.result === 'reject').length,
+            missions: state.game.history.filter((h) => h.type === 'mission').length,
+          },
+        },
+        $push: { segments: segment },
+      },
+    );
   }
   async recordRequest(entry: AiRequestLog) {
     const expiresAt =

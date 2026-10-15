@@ -92,6 +92,59 @@ test('Codex uses one decision with separate public words and records subscriptio
   expect(renewLease).toHaveBeenCalledTimes(1);
 });
 
+test('changing private state never enters the reusable instruction block', async () => {
+  process.env.NODE_ENV = 'development';
+  process.env.AI_CODEX_ENABLED = 'true';
+  const runner = jest.fn().mockResolvedValue({ text: '{"choice":"approve","speech":""}', usage: {} });
+  const repo = { renewLease: jest.fn(), recordRequest: jest.fn(), recordDecision: jest.fn() };
+  const generate = codexDecide('cache-room', repo, runner);
+  const input = { ...request, choices: ['approve'], speak: false };
+  for (const privateState of ['PRIVATE_FIRST_STATE', 'PRIVATE_SECOND_STATE']) {
+    await generate(input, { instructions: 'Use only legal choices.', context: { privateState } });
+  }
+  const [first, second] = runner.mock.calls;
+  expect(first[4]).toBe(second[4]);
+  expect(first[4]).toContain('Use only legal choices.');
+  expect(first[4]).not.toContain('PRIVATE_');
+  expect(first[0].slice(first[4].length)).toBe('\nGAME INPUT:\n{"privateState":"PRIVATE_FIRST_STATE"}');
+  expect(second[0].slice(second[4].length)).toBe('\nGAME INPUT:\n{"privateState":"PRIVATE_SECOND_STATE"}');
+});
+
+test('a change from voting to mission cards preserves the shared rules without dropping stage advice', async () => {
+  process.env.NODE_ENV = 'development';
+  process.env.AI_CODEX_ENABLED = 'true';
+  const runner = jest.fn().mockImplementation(async (_prompt, schema) => ({
+    text: JSON.stringify({
+      choice: schema.properties.choice.enum[0],
+      speech: 'Private reason.',
+      publicReason: '',
+      evidence: [],
+      claimMorgana: null,
+      claimStances: [],
+    }),
+    usage: {},
+  }));
+  const repo = { renewLease: jest.fn(), recordRequest: jest.fn(), recordDecision: jest.fn() };
+  const decide = decisionPipeline(codexDecide('cache-stages', repo, runner));
+  await decide({
+    ...request,
+    speak: false,
+    choices: ['approve', 'reject'],
+    state: { ...request.state, stage: 'votingForTeam' },
+  });
+  await decide({
+    ...request,
+    speak: false,
+    choices: ['success', 'fail'],
+    state: { ...request.state, stage: 'onMission' },
+  });
+  const [vote, card] = runner.mock.calls;
+  expect(vote[4]).toBe(card[4]);
+  expect(card[4]).not.toContain('Evil card advice');
+  expect(card[0].slice(card[4].length)).toContain('Evil card advice');
+  expect(vote[0].slice(vote[4].length)).toContain('Coalition advice');
+});
+
 test('invalid output pauses instead of choosing a fallback and disabled Codex cannot invoke the runner', async () => {
   process.env.NODE_ENV = 'development';
   process.env.AI_CODEX_ENABLED = 'true';

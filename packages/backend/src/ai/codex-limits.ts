@@ -33,8 +33,8 @@ export function parseWeeklyLimit(value: unknown, checkedAt = Date.now()): CodexW
 }
 
 // Only initialize and read account quotas: never start a model turn or expose credentials.
-export function readCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
-  if (hasRemoteCodex()) return remoteCodex({ operation: 'limits' }).then((value) => parseWeeklyLimit(value));
+async function readCodexLimitResponse(): Promise<unknown> {
+  if (hasRemoteCodex()) return remoteCodex({ operation: 'limits' });
   const env: NodeJS.ProcessEnv = {};
   for (const key of [
     'PATH',
@@ -63,7 +63,7 @@ export function readCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
     let done = false;
     let buffer = '';
     const timeout = setTimeout(() => finish(new Error('Codex limits unavailable')), 10000);
-    const finish = (error?: Error, value?: CodexWeeklyLimit | null) => {
+    const finish = (error?: Error, value?: unknown) => {
       if (done) return;
       done = true;
       clearTimeout(timeout);
@@ -97,7 +97,7 @@ export function readCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
           if (message.id === 1) {
             send({ method: 'initialized', params: {} });
             send({ id: 2, method: 'account/rateLimits/read' });
-          } else return finish(undefined, parseWeeklyLimit(message.result));
+          } else return finish(undefined, message.result);
         } catch {
           return finish(new Error('Codex limits unavailable'));
         }
@@ -109,6 +109,52 @@ export function readCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
       params: { clientInfo: { name: 'avalon_quota_preview', title: 'Avalon quota preview', version: '1.0.0' } },
     });
   });
+}
+
+export async function readCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
+  return parseWeeklyLimit(await readCodexLimitResponse());
+}
+
+export type ExperimentQuota = {
+  checkedAt: number;
+  weekly: CodexWeeklyLimit | null;
+  buckets: { limitId: string; primary: QuotaWindow | null; secondary: QuotaWindow | null }[];
+};
+type QuotaWindow = { usedPercent: number; windowDurationMins: number; resetsAt: number | null };
+
+export function parseExperimentQuota(value: unknown): ExperimentQuota {
+  const response = value as { rateLimits?: Bucket; rateLimitsByLimitId?: Record<string, Bucket> } | null;
+  const entries = Object.entries(response?.rateLimitsByLimitId ?? {});
+  if (!entries.length && response?.rateLimits) entries.push(['codex', response.rateLimits]);
+  const window = (w: Window | null | undefined): QuotaWindow | null => {
+    if (
+      !w ||
+      typeof w.usedPercent !== 'number' ||
+      !Number.isFinite(w.usedPercent) ||
+      w.usedPercent < 0 ||
+      w.usedPercent > 100 ||
+      typeof w.windowDurationMins !== 'number' ||
+      !Number.isSafeInteger(w.windowDurationMins) ||
+      w.windowDurationMins <= 0
+    )
+      return null;
+    return {
+      usedPercent: w.usedPercent,
+      windowDurationMins: w.windowDurationMins,
+      resetsAt: typeof w.resetsAt === 'number' && Number.isFinite(w.resetsAt) && w.resetsAt > 0 ? w.resetsAt : null,
+    };
+  };
+  return {
+    checkedAt: Date.now(),
+    weekly: parseWeeklyLimit(value),
+    buckets: entries
+      .filter(([id, b]) => /^[a-zA-Z0-9_.-]{1,80}$/.test(id) && b && typeof b === 'object')
+      .slice(0, 16)
+      .map(([limitId, b]) => ({ limitId, primary: window(b.primary), secondary: window(b.secondary) })),
+  };
+}
+export async function readCodexExperimentQuota(): Promise<ExperimentQuota> {
+  return parseExperimentQuota(await readCodexLimitResponse());
 }
 
 let cache: { key: string; expires: number; value: CodexWeeklyLimit | null } | undefined;

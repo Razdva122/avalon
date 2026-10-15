@@ -11,6 +11,9 @@ import {
   decisiveTeamAdvice,
   evilTeamAdvice,
   ladyAnnouncementAdvice,
+  ladyInspectionAdvice,
+  ladyTransferPreference,
+  ladyChoiceSignalAdvice,
   assassinationCheck,
 } from './client';
 import type { BotReply, BotRequest, Decide, GenerationOptions, DecisionEvidence } from './client';
@@ -175,9 +178,13 @@ export function reviewContext(request: BotRequest) {
     speak: true,
   };
 }
-export function decisionInstructions(request: BotRequest) {
+export function decisionInstructions(request: BotRequest, commonOnly = false) {
   const regularTeam =
     request.botDifficulty === 'regular' && ['selectTeam', 'votingForTeam'].includes(request.state.stage);
+  const assessLadyChoice =
+    request.state.stage === 'checkLoyalty' ||
+    (['selectTeam', 'votingForTeam'].includes(request.state.stage) &&
+      request.state.history?.some((event) => event.type === 'checkLoyalty'));
   const turn = request.publicDiscussion
     ? 'This is discussion before team selection: choice is a preference, not a submitted roster or vote.'
     : request.state.stage === 'selectTeam' && request.state.vote > 0
@@ -191,31 +198,37 @@ export function decisionInstructions(request: BotRequest) {
     ? (regularTeam
         ? 'Privately check in order: (1) For voting, evaluate ONLY actionFacts.team, the current proposedTeam; for selection, evaluate the exact legal roster you choose. Never substitute an earlier preferred team. (2) Use your own side, privateKnowledge and completed mission deductions; success or testimony cannot erase known Evil. (3) Count known and possible Evil against missionRule.failureAtLeast: enough Evil CAN sabotage, not necessarily WILL; one Evil cannot fail a two-Fail mission, but unknown teammates may supply another. (4) Choose for your actual side. Good normally avoids established sabotage risk when a safer reachable roster exists; Evil seeks sabotage access or concrete cover. (5) Before Reject, compare one reachable alternative and proposal.fifthLeader; only rejecting proposal 4 immediately forces proposal 5. Your own inclusion does not clear others. If off-team as Good, at most alignmentCounts.good - 1 Good can be inside. Before an information bet, name which possible result would distinguish your hypotheses; a known saboteur can explain another Fail without accusing new teammates. At two failures prioritize survival. If repeating a rejected roster, give a new public reason that could persuade a missing voter. Never publish these private checks.'
         : coalitionAdvice +
-          " When Good players disagree, distinguish an unresolved roster from one established to contain enough Evil to sabotage. Before repeating a rejection, identify a reachable alternative and the specific public evidence or compromise that could change a missing supporter's vote. Repeating the same question is not a new coalition plan.") +
+          ' Distinguish unresolved rosters from established sabotage risk. Persuade a missing voter with specific public evidence or a compromise; repeating the same question is not a new coalition plan.') +
       ' ' +
       evilTeamAdvice
     : request.state.stage === 'onMission'
       ? "Evil card advice: compare sabotage with a concrete future benefit of cover using score and failsRequired. Infer teammates' likely cards from their public words, recorded votes, completed missions and current incentives; keep these predictions uncertain. There is no prearranged sabotage convention or designated saboteur; seat numbers do not assign cards. Compare your card's effect if others play Success or Fail, including redundant exposure and the risk of too few Fails. Allies' future cards remain unknown; unresolved teammates may also be Evil and act independently. Oberon does not know allies. Weigh early exposure against cover, and prioritize a decisive sabotage over trust for a round that may never occur. Too few Evil cannot meet a two-Fail threshold."
       : request.state.stage === 'assassinate'
         ? assassinationCheck
-        : '';
-  return (
+        : request.state.stage === 'checkLoyalty'
+          ? `${ladyInspectionAdvice} ${ladyTransferPreference}`
+          : '';
+  const common =
     languageInstruction(request.language) +
     ' ' +
     (regularTeam
       ? 'Continue the conversation: answer the latest relevant question or objection, offer a concrete preference, or stay silent. Use natural language and bare seat numbers. Personality shapes tone, not facts, side or secrecy. Do not repeat a generic report or uncertainty disclaimer.'
       : tableConversationAdvice) +
     ' ' +
-    'Play Avalon for your actual side and objective, using roleAdvice and privateKnowledge. Choose exactly one supplied legal choice. You decide strategy: self-inclusion, accusation, bluffing, trust and risk are not server mandates. Known facts constrain beliefs; they do not dictate a fixed speech or a single bluff. ' +
+    'Play Avalon for your actual side and objective, using roleAdvice and privateKnowledge. Choose exactly one supplied legal choice. You choose strategy, trust, risk and public bluffing; known facts constrain private beliefs. No fixed speech, roster or vote is mandated. ' +
     'Completed missions establish results and Fail counts; rejected proposals played no cards and did not change the score. Each participant plays one card. Success alone does not prove alignment. Read failsRequired, approvalsRequired and score literally. Proposals 1–4 require a majority; proposal 5 runs automatically. Good needs three successes and Merlin surviving; Evil needs three failures or killing Merlin. Oberon knows no allies; use only visible privateKnowledge. ' +
     (regularTeam
       ? 'Combine completed missions with your own known card and alignmentCounts. Each Fail needs a different Evil participant. If you played Success in a two-seat team with one Fail, the other player is Evil. Overlapping failed teams may have the same saboteur; do not invent another. Use only public evidence in public deductions. '
       : 'Combine ALL completed missions with alignmentCounts and reliable private facts before disputing a deduction. Fails give a lower bound on Evil in a team; remaining Evil slots can also give an upper bound. Example only: with three Evil total, disjoint teams showing two and one Fails contain exactly two and one Evil, even if Evil sometimes play Success. Do not add bounds across overlapping teams as if their participants were different. Use only publicly available bounds in public arguments, and update old hypotheses when new facts narrow them. ') +
-    'Public claims and modelHypotheses are fallible testimony or notes, not verified roles. Retain useful earlier deductions and reconsider them with new evidence. A truthful Lady result reveals alignment, not role, and does not clear its author. Do not invent votes, inspections, dialogue or future cards. ' +
-    'Current actionFacts, privateKnowledge and recorded events override old modelHypotheses. A note about a previous roster does not describe the current proposal. Correct a contradicted note using the same evidence key; include the mission/proposal or event in its source. Never reuse a known false note as a premise. ' +
-    'Keep private knowledge private: never confess being Evil or Merlin, expose the wizard pair or allies, or announce sabotage. A deliberate Percival claim is allowed through claimMorgana and must be written in publicReason. Your public argument can bluff for your side; your private reason must still use your actual side and knowledge. Merlin must protect both missions and their identity: use the public-viewpoint check in roleAdvice before publishing, including equal treatment of competing unverified claims. Keep private certainty in speech and evidence, not in unsupported public conclusions. ' +
+    'Public claims and modelHypotheses are fallible, not verified roles. A truthful Lady result reveals alignment, not role, and does not clear its author. Do not invent votes, inspections, dialogue or future cards. ' +
+    'Current actionFacts, privateKnowledge and recorded events override old modelHypotheses; previous rosters are not the current proposal. Retain supported notes; correct contradicted ones with the same evidence key and mission/proposal or event source. Never reason from a known false note. ' +
+    'Never publicly confess being Evil or Merlin, expose the wizard pair or allies, or announce sabotage. A deliberate Percival claim through claimMorgana must appear in publicReason. Public arguments may bluff for your side; the private reason must use actual side and knowledge. Keep private certainty in speech and evidence. Merlin: apply the public-viewpoint check in roleAdvice, treating competing unverified claims equally; protect missions and identity without publishing secret certainty. ' +
     ladyAnnouncementAdvice +
-    ' ' +
+    ' ';
+  if (commonOnly) return common;
+  return (
+    common +
+    (assessLadyChoice ? ladyChoiceSignalAdvice + ' ' : '') +
     strategy +
     ' ' +
     (['selectTeam', 'votingForTeam'].includes(request.state.stage) ? decisiveTeamAdvice + ' ' : '') +
@@ -284,6 +297,7 @@ export function decisionPipeline(generate: Generate): Decide {
         {
           phase: finalReview ? 'review' : 'decision',
           decisionDetails: !finalReview,
+          cacheInstructions: finalReview ? undefined : decisionInstructions(request, true),
           instructions: finalReview
             ? systemFor(request) +
               ' decisionExamples with publicDiscussion=true record preferred teams voiced before selection, not submitted rosters or votes. Use recorded teamVotes to identify actual proposals and votes. ' +
@@ -314,6 +328,7 @@ export function decisionPipeline(generate: Generate): Decide {
           {
             phase: 'decision-repair',
             decisionDetails: true,
+            cacheInstructions: decisionInstructions(request, true),
             instructions:
               decisionInstructions(request) +
               claimInstructions +

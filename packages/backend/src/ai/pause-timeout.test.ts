@@ -73,6 +73,8 @@ async function pausedRoom(pause: AiPause = new AiTechnicalPause('Output limit re
   } as unknown as Manager;
   const service = new AiService(host);
   service.repository = repository as unknown as AiRepository;
+  const experimentFinalized = jest.fn(async () => {});
+  (service as any).experimentRuns.set(room.roomID, experimentFinalized);
   const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
   service.register(
     {
@@ -102,6 +104,7 @@ async function pausedRoom(pause: AiPause = new AiTechnicalPause('Output limit re
   expect(modelCalls).toBe(1);
   return {
     room,
+    experimentFinalized,
     host,
     saved,
     released,
@@ -135,6 +138,7 @@ test.each([
   await jest.advanceTimersByTimeAsync(899999);
   expect(fixture.room.ai?.status).toBe('paused');
   const releasesBeforeExpiry = fixture.released.length;
+  fixture.experimentFinalized.mockClear();
   fixture.host.updateRoomsList = jest.fn();
 
   await jest.advanceTimersByTimeAsync(1);
@@ -147,6 +151,7 @@ test.each([
     game: { stage: 'end', result: { reason: 'manualy' } },
   });
   expect(fixture.released.slice(releasesBeforeExpiry)).toContain(fixture.room.roomID);
+  expect(fixture.experimentFinalized).toHaveBeenCalledTimes(1);
   expect(fixture.host.updateRoomsList).toHaveBeenCalledWith(fixture.room);
   const replacement = await fixture.create();
   expect(replacement).toHaveProperty('roomID');
@@ -195,12 +200,14 @@ test('an expiry save failure still releases capacity, publishes the stop and rem
   jest.spyOn(console, 'error').mockImplementation(() => {});
   fixture.failStoppedSave();
   const releasesBeforeExpiry = fixture.released.length;
+  fixture.experimentFinalized.mockClear();
   fixture.host.updateRoomsList = jest.fn();
 
   await jest.advanceTimersByTimeAsync(900000);
 
   expect(fixture.room.ai?.status).toBe('stopped');
   expect(fixture.released.slice(releasesBeforeExpiry)).toContain(fixture.room.roomID);
+  expect(fixture.experimentFinalized).toHaveBeenCalledTimes(1);
   expect(fixture.host.updateRoomsList).toHaveBeenCalledWith(fixture.room);
   expect(jest.getTimerCount()).toBe(0);
   const savesAfterExpiry = fixture.saved.length;
