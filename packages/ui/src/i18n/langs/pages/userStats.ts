@@ -3,6 +3,8 @@ import { Dictionary } from '@avalon/types';
 
 export const userStats: { [key in TLanguage]: Dictionary<string> } = {
   pt: {
+    aiGames: 'Jogos com IA',
+    registrationDate: 'Data de registro',
     noGames: 'Ainda não há jogos concluídos',
     noGamesHint: 'As estatísticas aparecerão após o primeiro jogo concluído.',
     gamesShort: 'Jogos',
@@ -33,6 +35,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     rating: 'Classificação',
   },
   vi: {
+    aiGames: 'Ván chơi với AI',
+    registrationDate: 'Ngày đăng ký',
     noGames: 'Chưa có ván chơi hoàn tất',
     noGamesHint: 'Thống kê sẽ xuất hiện sau ván chơi hoàn tất đầu tiên.',
     gamesShort: 'Ván chơi',
@@ -63,6 +67,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     rating: 'Điểm xếp hạng',
   },
   en: {
+    aiGames: 'Games with AI',
+    registrationDate: 'Registration date',
     noGames: 'No completed games yet',
     noGamesHint: 'Statistics will appear after the first completed game.',
     gamesShort: 'Games',
@@ -93,6 +99,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     rating: 'Rating',
   },
   ru: {
+    aiGames: 'Игры с AI',
+    registrationDate: 'Дата регистрации',
     noGames: 'Пока нет завершённых игр',
     noGamesHint: 'Статистика появится после первой завершённой партии.',
     gamesShort: 'Игры',
@@ -123,6 +131,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     rating: 'Рейтинг',
   },
   es: {
+    aiGames: 'Partidas con IA',
+    registrationDate: 'Fecha de registro',
     noGames: 'Aún no hay partidas terminadas',
     noGamesHint: 'Las estadísticas aparecerán después de la primera partida terminada.',
     gamesShort: 'Partidas',
@@ -153,6 +163,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     rating: 'Clasificación',
   },
   'zh-TW': {
+    aiGames: '與 AI 的遊戲',
+    registrationDate: '註冊日期',
     noGames: '尚無已完成的遊戲',
     noGamesHint: '首場遊戲結束後將顯示統計資料。',
     gamesShort: '遊戲',
@@ -183,6 +195,8 @@ export const userStats: { [key in TLanguage]: Dictionary<string> } = {
     rating: '評分',
   },
   'zh-CN': {
+    aiGames: '与 AI 的游戏',
+    registrationDate: '注册日期',
     noGames: '暂无已完成的游戏',
     noGamesHint: '首场游戏结束后将显示统计数据。',
     gamesShort: '游戏',

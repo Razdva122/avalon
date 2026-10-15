@@ -3,6 +3,8 @@ import { prop, modelOptions } from '@typegoose/typegoose';
 export * from './avatars';
 
 export class PublicUserProfile {
+  public registrationDate?: string;
+  public aiGamesCount?: number;
   public aiPersona?: { key?: string; title: string; description: string };
   public premium?: boolean;
   public isAdmin?: boolean;
@@ -68,7 +70,7 @@ export class UserProfile extends UserForUI {
     required: true,
     default: () => new Date().toISOString(),
   })
-  public registrationDate!: string;
+  declare public registrationDate: string;
 
   @prop({ required: true })
   public password!: string;

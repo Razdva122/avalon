@@ -34,6 +34,7 @@
         </div>
       </div>
       <div v-if="!isAiProfile" class="info-hint">id: {{ uuid }}</div>
+      <UserProfileDetails v-if="!isAiProfile" :uuid="uuid" />
       <div v-if="userState.profile.aiPersona" class="profile-personality text-body-2 mt-2">
         <strong>{{
           userState.profile.aiPersona.key
@@ -86,6 +87,7 @@ import { defineComponent, PropType, watch, computed } from 'vue';
 import PremiumBadge from '@/components/user/PremiumBadge.vue';
 import AdminBadge from '@/components/user/AdminBadge.vue';
 import Avatar from '@/components/user/Avatar.vue';
+import UserProfileDetails from '@/components/stats/UserProfileDetails.vue';
 import UserTrueSkillRating from '@/components/stats/UserTrueSkillRating.vue';
 import WinrateDisplay from '@/components/stats/WinrateDisplay.vue';
 import { useStore } from '@/store';
@@ -93,7 +95,7 @@ import { TUserStats } from '@/helpers/stats/interface';
 
 export default defineComponent({
   name: 'UserProfileHeader',
-  components: { AdminBadge, PremiumBadge, Avatar, UserTrueSkillRating, WinrateDisplay },
+  components: { AdminBadge, PremiumBadge, Avatar, UserTrueSkillRating, WinrateDisplay, UserProfileDetails },
   props: {
     uuid: {
       type: String,

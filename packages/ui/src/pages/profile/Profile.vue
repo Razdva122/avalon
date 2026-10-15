@@ -18,6 +18,7 @@
             <div class="profile-info">
               <h2 class="profile-name">{{ $store.state.profile.name || $store.state.profile.login }}</h2>
               <div class="profile-login">{{ $store.state.profile.login }}</div>
+              <UserProfileDetails :uuid="$store.state.profile.id" />
               <button type="button" @click="openAvatarModal" class="avatar-link">
                 {{ $t('profile.changeAvatar') }}
               </button>
@@ -286,6 +287,7 @@ import AvatarModal from '@/components/user/AvatarModal.vue';
 import { socket } from '@/api/socket';
 import { validators } from '@/helpers/validators';
 import UserTrueSkillRating from '@/components/stats/UserTrueSkillRating.vue';
+import UserProfileDetails from '@/components/stats/UserProfileDetails.vue';
 import type { PlayerTrueSkillRating } from '@avalon/types';
 
 export default defineComponent({
@@ -295,6 +297,7 @@ export default defineComponent({
     Avatar,
     AvatarModal,
     UserTrueSkillRating,
+    UserProfileDetails,
   },
   data() {
     const { profile } = this.$store.state;
