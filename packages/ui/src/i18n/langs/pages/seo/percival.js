@@ -1,4 +1,10 @@
 module.exports.percival = {
+  vi: {
+    title: 'Percival trong Avalon: năng lực và chiến thuật',
+    description:
+      'Percival thấy ai trong Avalon? Tìm hiểu Merlin và Morgana xuất hiện ra sao, những điều Percival không biết và cách bảo vệ Merlin mà không làm lộ danh tính.',
+    keywords: ['Percival', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Percival em Avalon: habilidades e estratégia',
     description:

@@ -1,4 +1,10 @@
 module.exports.cleric = {
+  vi: {
+    title: 'Giáo sĩ (Cleric) trong Avalon: kiểm tra phe và Ám sát',
+    description:
+      'Giáo sĩ hoạt động thế nào trong Avalon? Tìm hiểu lúc kiểm tra Đội trưởng Nhiệm vụ đầu, vì sao kết quả phe có thể gây hiểu lầm và cách Ám sát Giáo sĩ.',
+    keywords: ['Giáo sĩ', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Clérigo em Avalon: lealdade e assassinato',
     description:

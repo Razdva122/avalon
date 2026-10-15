@@ -1,4 +1,10 @@
 module.exports.lobby = {
+  vi: {
+    title: 'Avalon online miễn phí | The Resistance: Avalon',
+    description:
+      'Chơi The Resistance: Avalon online. Ván chơi miễn phí với 5–10 người thật, kèm luật và vai trò. Thử chơi một mình hoặc cùng bạn với bot; điều kiện tùy chế độ bot.',
+    keywords: ['Chơi Avalon online'],
+  },
   pt: {
     title: 'Avalon online grátis: jogo de tabuleiro com amigos',
     description:

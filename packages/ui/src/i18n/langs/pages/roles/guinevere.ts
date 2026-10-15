@@ -2,6 +2,27 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const guinevere: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoHeading: 'Guinevere trong Avalon: hai Lancelot và Ám sát',
+    seoTeam: 'Thiện. Trên nền tảng này, {guinevere} cũng là mục tiêu Ám sát có thể được chọn.',
+    seoAbility: 'Guinevere biết hai người nào là Lancelot. Cả hai đều được hiển thị mà không nêu phe Thiện hay Ác.',
+    seoLimit:
+      'Cô ấy có biết Lancelot nào thuộc phe Thiện không? Không. Biết cặp này không tiết lộ phe hiện tại của họ, và việc đổi phe có thể thay đổi kết luận trước đó.',
+    seoScenario1:
+      'Khi một Lancelot tham gia Nhiệm vụ Thất bại, hãy so sánh toàn bộ Đội trước khi kết luận Lancelot đó thuộc phe Ác.',
+    seoScenario2:
+      'Sau khi đổi phe, hãy đánh giá lại suy luận trước đó. Tránh công khai tên cả hai Lancelot khi chưa cân nhắc nguy cơ lộ mình cho pha Ám sát.',
+    credits: "Ghi công: {'@'}Robrun",
+    generalTipsTitle: 'Mẹo chung:',
+    cautiousKnowledgeTitle: 'Thận trọng với những gì mình biết:',
+    cautiousKnowledgeText:
+      '{guinevere} phải dùng hiểu biết của mình để khéo léo dẫn đồng đội đến chiến thắng mà không làm lộ vai.',
+    useHintsTitle: 'Dùng gợi ý một cách khôn ngoan:',
+    useHintsText: 'Khả năng gợi ý tinh tế cho Đội mà không quá lộ liễu rất quan trọng với {guinevere}.',
+    balanceGameplayTitle: 'Giữ sự cân bằng trong cách chơi:',
+    balanceGameplayText:
+      'Đôi khi không nên tỏ ra biết quá nhiều. Cố ý mắc lỗi hoặc giữ im lặng có thể đánh lạc hướng phe Ác.',
+  },
   en: {
     seoHeading: 'Guinevere in Avalon: Lancelots & Assassination',
     seoTeam: 'Good. On this platform, {guinevere} is also a possible assassination target.',

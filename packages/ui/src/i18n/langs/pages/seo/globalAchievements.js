@@ -1,4 +1,10 @@
 module.exports.globalAchievements = {
+  vi: {
+    title: 'Avalon: The Resistance | Thành tích toàn cầu',
+    description:
+      'Xem thống kê thành tích toàn cầu trong Avalon. Khám phá những thành tích hiếm nhất và phổ biến nhất của người chơi.',
+    keywords: ['Thành tích', 'Thành tích toàn cầu'],
+  },
   en: {
     title: 'Avalon: The Resistance | Global Achievements',
     description:

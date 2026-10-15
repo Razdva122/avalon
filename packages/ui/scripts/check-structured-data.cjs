@@ -57,6 +57,7 @@ test('all guide locales describe their canonical page and link localized breadcr
       ['ru', '/ru'],
       ['es', '/es'],
       ['pt', '/pt'],
+      ['vi', '/vi'],
       ['zh-CN', '/zh-cn'],
       ['zh-TW', '/zh-tw'],
     ].map(([language, prefix]) => ({ route: prefix + path, language, prefix })),

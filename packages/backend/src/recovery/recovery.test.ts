@@ -336,6 +336,7 @@ test('quota deferrals do not consume the retry budget for temporary SMTP failure
 });
 
 const mailSubjects = [
+  ['vi', 'Đặt lại mật khẩu Avalon', 'Mật khẩu Avalon của bạn đã được thay đổi'],
   ['en', 'Reset your Avalon password', 'Your Avalon password was changed'],
   ['ru', 'Восстановление пароля Avalon', 'Пароль Avalon изменён'],
   ['es', 'Restablece tu contraseña de Avalon', 'Tu contraseña de Avalon ha cambiado'],

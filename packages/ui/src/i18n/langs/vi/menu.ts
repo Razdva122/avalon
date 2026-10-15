@@ -1,0 +1,23 @@
+export default {
+  menu: {
+    back: 'Quay lại',
+    darkTheme: 'Giao diện tối',
+    rulesRoles: 'Luật chơi và vai trò',
+    signIn: 'Đăng nhập',
+    signInRegister: 'Đăng nhập / Đăng ký',
+    myProfile: 'Hồ sơ của tôi',
+    account: 'Tài khoản của tôi',
+    playersResults: 'Người chơi và kết quả',
+    aboutAvalon: 'Về Avalon',
+    settings: 'Cài đặt',
+    close: 'Đóng trình đơn',
+    menu: 'Trình đơn',
+    home: 'Trang chủ',
+    profile: 'Hồ sơ',
+    wiki: 'Bách khoa',
+    about: 'Giới thiệu',
+    stats: 'Thống kê',
+    leaderboard: 'Bảng xếp hạng',
+    achievements: 'Thành tựu',
+  },
+};

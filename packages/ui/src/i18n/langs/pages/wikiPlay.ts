@@ -3,6 +3,14 @@ import type { TLanguage } from '@/i18n/interface';
 type WikiPlayMessages = { title: string; description: string; play: string; playAi: string; rules: string };
 
 export const wikiPlay: Record<TLanguage, WikiPlayMessages> = {
+  vi: {
+    title: 'Sẵn sàng chơi Avalon?',
+    description:
+      'Chơi miễn phí trong trình duyệt cùng 5–10 người bạn, hoặc thử chơi một mình với AI. Bạn cần tài khoản để chơi.',
+    play: 'Chơi Avalon trực tuyến',
+    playAi: 'Chơi với AI',
+    rules: 'Đọc luật chơi',
+  },
   en: {
     title: 'Ready to play Avalon?',
     description:

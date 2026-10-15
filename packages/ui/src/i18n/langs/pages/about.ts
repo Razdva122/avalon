@@ -26,6 +26,30 @@ export const about: { [key in TLanguage]: Dictionary<string> } = {
     disclaimerContent:
       'Este é um projeto não comercial criado por fãs por amor ao jogo. Todo o conteúdo, incluindo as regras que seguimos, é inspirado no jogo de tabuleiro original, mas todos os gráficos e ilustrações são exclusivamente nossos. Este site não é afiliado ou endossado pelos editores oficiais. Respeitamos os criadores originais e reconhecemos que todas as marcas registradas e direitos autorais relacionados pertencem aos seus respectivos proprietários.',
   },
+  vi: {
+    supportersTitle: 'Cảm ơn sự ủng hộ của bạn',
+    supportersThanks:
+      'Cảm ơn tất cả người chơi đã ủng hộ dự án, kể cả những người chọn ẩn danh. Sự giúp đỡ của bạn duy trì hoạt động và hỗ trợ phát triển trang web.',
+    recentSupporters: 'Những người chơi gần đây đã ủng hộ chúng tôi:',
+    supportProject: 'Ủng hộ dự án',
+    title: 'Giới thiệu',
+    content:
+      'Chào mừng đến với <b>avalon-game.com</b>, nơi bạn có thể chơi <b>"Avalon: The Resistance"</b> trực tuyến cùng bạn bè và những người cùng sở thích. Nền tảng mang đến trải nghiệm chơi liền mạch, cuốn hút, hoàn toàn miễn phí và không có quảng cáo làm gián đoạn.',
+    description:
+      '<b>"Avalon: The Resistance"</b> là trò chơi bàn cờ hấp dẫn về chiến thuật và lừa gạt, lấy bối cảnh thời đại huyền thoại của Vua Arthur và các Hiệp sĩ Bàn Tròn. Dành cho 5 đến 10 người chơi, trò chơi đưa bạn vào một thế giới chia rẽ: bạn có thể là người hầu trung thành của Arthur đang bảo vệ vương quốc, hoặc tay sai xảo quyệt của Mordred âm mưu hủy diệt nó. Trò chơi nổi tiếng với danh tính bí mật, những màn đánh lừa có tính toán và thử thách suy luận để phân biệt đồng minh với kẻ thù.',
+    roles:
+      'Trang web tái hiện đầy đủ các vai trong trò chơi bàn cờ truyền thống, gồm {merlin}, {percival}, {troublemaker}, {oberon}, {lunatic}, {brute}, {mordred}, {morgana}, {trickster}, {goodLancelot} và {evilLancelot}, mang lại trải nghiệm Avalon trọn vẹn. Chúng tôi còn tích hợp các bản mở rộng được yêu thích là {ladyOfLake} và {excalibur} để làm phong phú ván chơi.',
+    extraRoles:
+      'Nền tảng còn có những vai bổ sung riêng không xuất hiện trong trò chơi gốc: {merlinPure}, {guinevere}, {witch}, {cleric}, {revealer} và {tristan} + {isolde} (Cặp tình nhân), mang đến những tương tác và chiến thuật mới để bạn và Đội khám phá.',
+    features:
+      'Để hỗ trợ chiến thuật, tính năng Lịch sử cho phép người chơi xem lại các lượt trước và lên kế hoạch đối phó tốt hơn. Chế độ Chống lộ vai giúp bạn chơi cùng những người ở chung không gian mà không làm lộ vai hay ảnh hưởng đến kết quả ván chơi.',
+    code: 'Bạn có thể xem mã nguồn dự án trên ',
+    contact: 'Bạn có thể liên hệ với tôi qua ',
+    secretAvatar: 'Có gì đó không ổn, đừng nhấn vào đây.',
+    disclaimerTitle: 'Tuyên bố miễn trừ',
+    disclaimerContent:
+      'Đây là dự án phi thương mại do người hâm mộ xây dựng vì tình yêu dành cho trò chơi. Mọi nội dung, bao gồm các quy tắc được áp dụng, đều lấy cảm hứng từ trò chơi bàn cờ gốc, nhưng toàn bộ đồ họa và hình minh họa là do chúng tôi tự tạo. Trang web không liên kết với và không được các nhà phát hành chính thức bảo trợ. Chúng tôi tôn trọng tác giả gốc và ghi nhận rằng các nhãn hiệu, bản quyền liên quan thuộc về chủ sở hữu tương ứng.',
+  },
   en: {
     supportersTitle: 'Thank you for your support',
     supportersThanks:

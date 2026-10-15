@@ -1,4 +1,10 @@
 module.exports.morgana = {
+  vi: {
+    title: 'Morgana trong Avalon: năng lực và chiến thuật',
+    description:
+      'Morgana trong Avalon: vì sao Percival thấy cô như một ứng viên Merlin, vì sao Merlin vẫn thấy cô thuộc phe Ác và cách tận dụng lớp ngụy trang trong các Nhiệm vụ.',
+    keywords: ['Morgana', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Morgana em Avalon: habilidades e estratégia',
     description:

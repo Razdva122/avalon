@@ -2,6 +2,58 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const merlin: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    factsTitle: 'Merlin trong Avalon: tóm tắt khả năng',
+    teamLabel: 'Phe',
+    teamValue: 'Thiện — giúp ba Nhiệm vụ thành công và sống sót qua pha Ám sát.',
+    seesLabel: 'Merlin nhìn thấy ai',
+    seesValue:
+      'Trong bộ vai cổ điển, Merlin thấy những người phe Ác, gồm {morgana} và {oberon}, nhưng không thấy {mordred}. Merlin biết họ thuộc phe Ác, không biết tên vai cụ thể.',
+    hiddenLabel: 'Những người Merlin không thể nhận diện',
+    hiddenValue: '{mordred} bị ẩn khỏi Merlin. Vì vậy người không được tiết lộ là Ác không chắc chắn thuộc phe Thiện.',
+    percivalLabel: 'Merlin và Percival',
+    percivalValue:
+      '{percival} thấy Merlin và {morgana} là hai ứng viên mà không biết ai là ai. Merlin không được biết ai là Percival.',
+    lossLabel: 'Merlin thua như thế nào',
+    lossValue:
+      'Ba Nhiệm vụ thất bại khiến phe Ác thắng. Sau ba Nhiệm vụ thành công, Ám sát đúng Merlin cũng khiến phe Ác thắng.',
+    generalInformationTitle: 'Thông tin chung:',
+    generalInformationText:
+      'Chơi {merlin} nghĩa là giúp phe Thiện chọn Đội an toàn mà không làm lộ thông tin riêng của bạn. Giải thích phiếu bầu dựa trên thảo luận và lịch sử Nhiệm vụ. Sát thủ có thể dùng sự chắc chắn của bạn để nhận diện, nên thành tích Nhiệm vụ chỉ là một phần mục tiêu.',
+    generalTipsTitle: 'Mẹo chung:',
+    cautiousKnowledgeTitle: 'Thận trọng với những gì mình biết: ',
+    cautiousKnowledgeText:
+      'Dù {merlin} biết những người phe Ác là ai, tiết lộ trực tiếp có thể khiến bạn bị Ám sát. Mục tiêu của bạn là khéo léo giúp phe Arthur.',
+    useHintsWiselyTitle: 'Dùng gợi ý một cách khôn ngoan: ',
+    useHintsWiselyText: 'Biết đưa gợi ý tinh tế cho Đội mà không quá lộ liễu là điều cốt yếu với {merlin}.',
+    carefulAccusationsTitle: 'Thận trọng khi buộc tội: ',
+    carefulAccusationsText:
+      'Buộc tội tay sai phe Ác quá chính xác hoặc quá nhanh có thể làm lộ vai của bạn. Sự cân bằng là chìa khóa.',
+    maintainBalanceTitle: 'Giữ cân bằng trong cách chơi: ',
+    maintainBalanceText:
+      'Hãy giải thích dựa trên bằng chứng mà mọi người đều có thể thảo luận. Bạn không cần cố ý phá những quyết định có lợi cho phe Thiện để giấu vai.',
+    attentionAssassinTitle: 'Chú ý đến Sát thủ: ',
+    attentionAssassinText:
+      'Hãy nhớ Sát thủ sẽ cố nhận diện {merlin} cuối ván nếu phe Thiện thắng các Nhiệm vụ. Gợi ý quá rõ có thể khiến bạn thất bại.',
+    strategicTipsTitle: 'Chiến thuật Merlin: các tình huống thường gặp',
+    strategizeSilenceTitle: 'Một người đã biết là Ác được đề xuất:',
+    strategizeSilence:
+      'Chất vấn Đội được đề xuất bằng bằng chứng công khai, như Nhiệm vụ Thất bại hoặc lời giải thích thiếu nhất quán. Chỉ tên mọi người phe Ác ngay lập tức có thể làm lộ vai.',
+    revealEvilsTitle: 'Một Nhiệm vụ thành công có người phe Ác:',
+    revealEvils:
+      'Đừng coi Đội đó chắc chắn thuộc phe Thiện. Phe Ác có thể chọn Thành công để tạo lòng tin; hãy so sánh các Đội và phiếu bầu về sau trước khi ủng hộ lại cùng nhóm đó.',
+    utilizeAmbiguityTitle: 'Có Mordred trong ván:',
+    utilizeAmbiguity:
+      'Hãy nhớ người bạn không thấy là Ác vẫn có thể là Mordred. Dùng kết quả Nhiệm vụ để đánh giá họ thay vì mặc định họ an toàn.',
+    buildTrustTitle: 'Percival đang tìm Merlin:',
+    buildTrust:
+      'Giữ lời giải thích nhất quán với phiếu bầu. Đừng công khai nhận mình để thắng một cuộc tranh luận: điều đó cũng cung cấp thông tin cho Sát thủ.',
+    supportAlliesTitle: 'Phe Thiện sắp có lần Thành công thứ ba:',
+    supportAllies:
+      'Ủng hộ Đội an toàn mà không nhận công cho mọi quyết định đúng. Ám sát vẫn quan trọng sau khi Nhiệm vụ thành công.',
+    playingAsMerlin:
+      'Chơi {merlin} đầy thử thách nhưng cũng rất thỏa mãn. Với chiến thuật cẩn thận và giao tiếp khéo léo, bạn có thể dẫn phe Thiện đến chiến thắng mà vẫn tránh được tầm ngắm của Sát thủ. Chúc may mắn!',
+  },
   en: {
     factsTitle: 'Merlin in Avalon: abilities at a glance',
     teamLabel: 'Team',

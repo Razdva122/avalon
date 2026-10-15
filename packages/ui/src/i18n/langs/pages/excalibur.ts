@@ -2,6 +2,25 @@ import type { TLanguage } from '@/i18n/interface';
 import type { Dictionary } from '@avalon/types';
 
 export const excalibur: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoIntro:
+      '{excalibur} đảo một lá bài Nhiệm vụ đã nộp: Thành công thành Thất bại, hoặc Thất bại thành Thành công. Nó không đổi vai của người chơi hay lá phiếu Tán thành Đội của họ.',
+    seoRule1:
+      'Sau khi chọn Đội và trước khi bỏ phiếu thông qua, Đội trưởng trao kiếm cho một thành viên khác trong Đội. Mọi người đều thấy ai đang giữ kiếm.',
+    seoRule2:
+      'Sau khi các lá bài Nhiệm vụ được nộp, người giữ kiếm có thể đảo bài của một thành viên khác trong Đội hoặc bỏ qua việc dùng kiếm. Giao diện không cho phép tự chọn mình hay chọn người ngoài Nhiệm vụ.',
+    seoRule3:
+      'Mỗi Đội được đề xuất sẽ có người giữ kiếm mới. Kết quả Nhiệm vụ cuối cùng dựa trên các lá bài sau khi đảo và số lá Thất bại cần thiết của Nhiệm vụ.',
+    seoLimit1:
+      'Ai nhìn thấy lá bài bị đảo? Việc dùng kiếm và mục tiêu được công khai. Trong ván chơi, người giữ kiếm và mục tiêu biết kết quả của lá bài bị tác động; những người khác không nhận được thông tin riêng này.',
+    seoLimit2:
+      'Excalibur có bảo đảm Thành công không? Không: bạn chọn người trước khi biết bài của họ. Lá Thành công của người phe Thiện có thể thành Thất bại, và dù loại một lá Thất bại thì vẫn có thể còn đủ để Nhiệm vụ thất bại.',
+    seoScenario1:
+      'Trong Nhiệm vụ chỉ cần một lá Thất bại, có đúng một lá Thất bại. Đảo lá đó thành Thành công sẽ cứu Nhiệm vụ; đảo lá Thành công của người khác sẽ thêm lá Thất bại thứ hai.',
+    seoScenario2:
+      'Nhiệm vụ thứ tư với 7–10 người chơi cần hai lá Thất bại. Nếu có hai lá được nộp và một lá bị đảo thành Thành công, chỉ còn một lá Thất bại nên Nhiệm vụ thành công.',
+    seoHeading: 'Excalibur trong Avalon: luật chơi, đảo bài và ví dụ',
+  },
   en: {
     seoIntro:
       "{excalibur} changes one submitted mission card: Success becomes Fail, or Fail becomes Success. It does not change a player's role or their vote to approve the team.",

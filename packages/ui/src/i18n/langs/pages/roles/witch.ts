@@ -21,6 +21,27 @@ export const witch: { [key in TLanguage]: Dictionary<string> } = {
     utilizePowerTitle: `Utilize seu poder estrategicamente:`,
     utilizePowerText: `O momento é crucial, pois você só pode usar seu poder uma vez. Ao ocultar o resultado de uma missão, um jogador aleatório não-bruxa recebe uma verificação de lealdade. Escolha o momento que maximize a confusão enquanto protege seus aliados.`,
   },
+  vi: {
+    seoHeading: 'Phù thủy trong Avalon: ẩn kết quả Nhiệm vụ và kiểm tra phe',
+    seoTeam: 'Ác. {witch} có thể dùng khả năng đặc biệt một lần mỗi ván trên nền tảng này.',
+    seoAbility:
+      'Phù thủy có thể ẩn kết quả của một Nhiệm vụ. Sau đó, một người ngẫu nhiên khác Phù thủy được quyền kiểm tra phe hiển thị của một người chơi.',
+    seoLimit:
+      'Phù thủy có biến Thất bại thành Thành công không? Không: việc ẩn chỉ thay đổi thông tin được hiển thị, không đổi kết quả thực tế. Người ngẫu nhiên là người kiểm tra, không phải mục tiêu được chọn ngẫu nhiên.',
+    seoScenario1:
+      'Ẩn Nhiệm vụ khi việc thiếu thông tin công khai có lợi cho phe Ác, nhưng hãy cân nhắc thông tin mà lượt kiểm tra phe mới có thể mang lại cho mọi người.',
+    seoScenario2:
+      'Kết quả Thiện vẫn có thể là {trickster}; kết quả Ác có thể là {troublemaker}. Hãy giải thích báo cáo cùng với các vai đang bật và lịch sử Nhiệm vụ.',
+    generalTipsTitle: 'Mẹo chung:',
+    sowSeedsTitle: 'Gieo sự bối rối:',
+    sowSeedsText:
+      'Dùng khả năng để khiến người chơi không chắc về kết quả Nhiệm vụ, tạo nghi ngờ và do dự trong phe Thiện.',
+    collaborateTitle: 'Phối hợp với đồng đội phe Ác:',
+    collaborateText: 'Cân nhắc kỹ hệ quả của việc ẩn Nhiệm vụ và chỉ làm khi có lợi cho bạn cùng đồng minh.',
+    utilizePowerTitle: 'Dùng sức mạnh có tính toán:',
+    utilizePowerText:
+      'Thời điểm rất quan trọng vì bạn chỉ có thể dùng khả năng một lần. Khi ẩn kết quả Nhiệm vụ, một người ngẫu nhiên khác Phù thủy được kiểm tra phe. Hãy chọn lúc gây nhiều bối rối nhất mà vẫn bảo vệ đồng minh.',
+  },
   en: {
     seoHeading: 'Witch in Avalon: Hidden Mission & Loyalty Check',
     seoTeam: 'Evil. {witch} can use the special ability once per game on this platform.',

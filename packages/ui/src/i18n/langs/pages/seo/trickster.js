@@ -1,4 +1,10 @@
 module.exports.trickster = {
+  vi: {
+    title: 'Kẻ lừa lọc (Trickster) trong Avalon: kết quả phe giả và Merlin',
+    description:
+      'Kẻ lừa lọc thuộc phe Thiện hay Ác trong Avalon? Tìm hiểu vì sao kiểm tra cho kết quả Thiện, vì sao Merlin vẫn thấy Ác và điểm khác Kẻ gây rối.',
+    keywords: ['Kẻ lừa lọc', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Trapaceiro em Avalon: falsa lealdade e Merlin',
     description:

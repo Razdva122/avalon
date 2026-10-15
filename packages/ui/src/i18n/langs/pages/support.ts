@@ -68,6 +68,71 @@ const en = {
   bannerLink: 'Explore Premium',
   bannerText: 'Exclusive avatars, stickers and a monthly rating reset.',
 };
+const vi: typeof en = {
+  ...directSupport.vi,
+  patronNamePerk: 'Tên của bạn xuất hiện vĩnh viễn trên trang Giới thiệu.',
+  patronContactPerk: 'Liên kết đến máy chủ, trang web hoặc tài nguyên trò chơi của bạn trên trang cộng đồng.',
+  creatorRolePerk:
+    'Một nhân vật mới được phát triển theo ý tưởng và mong muốn của bạn. Chúng ta sẽ cùng thống nhất khả năng của nhân vật.',
+  creatorAchievementPerk: 'Một thành tựu độc đáo, được thiết kế và thống nhất cùng bạn.',
+  lifetimePremium: 'Premium trọn đời',
+  rewardConditions: 'Chi tiết và điều kiện phần thưởng',
+  resetPreview: 'Đặt lại TrueSkill từ hồ sơ mỗi tháng một lần. Các ván chơi và thành tựu của bạn được giữ nguyên.',
+  benefitsTitle: 'Phần thưởng ủng hộ',
+  showBenefits: 'Hiện tất cả quyền lợi',
+  hideBenefits: 'Ẩn chi tiết',
+  premiumPreview:
+    'Premium trọn đời, ảnh đại diện và nhãn dán độc quyền, huy hiệu, tùy chọn quyền riêng tư và đặt lại điểm xếp hạng hằng tháng.',
+  patronTitle: 'Để lại tên bạn trong Avalon',
+  patronPreview: 'Tên bạn xuất hiện vĩnh viễn trên trang Giới thiệu và tài nguyên của bạn trên trang cộng đồng.',
+  creatorTitle: 'Nhân vật của riêng bạn',
+  creatorPreview: 'Một nhân vật theo ý tưởng của bạn và một thành tựu độc đáo được thống nhất cùng bạn.',
+  tiersNote: 'Mức ủng hộ dựa trên tổng số tiền đã xác nhận. Mỗi mức bao gồm quyền lợi của các mức trước.',
+  resetTitle: 'Đặt lại điểm xếp hạng mỗi tháng',
+  resetDescription:
+    'Premium cho phép dùng tính năng đặt lại TrueSkill hiện có mỗi tháng một lần thay vì ba tháng một lần. Đặt lại từ hồ sơ; lịch sử ván chơi, thống kê và thành tựu được giữ nguyên.',
+  patronDescription:
+    'Khi tổng số tiền ủng hộ đạt từ $50 trở lên, tên bạn sẽ xuất hiện vĩnh viễn trên trang Giới thiệu. Bạn cũng có thể đặt liên kết đến máy chủ, trang web hoặc tài nguyên trò chơi của mình trên trang cộng đồng.',
+  communitySoon: 'Sau khi ủng hộ, liên hệ nhóm dự án để sắp xếp đăng tài nguyên của bạn.',
+  creatorDescription:
+    'Với tổng số tiền ủng hộ $1,000, bạn có thể yêu cầu một nhân vật mới phát triển theo ý tưởng và mong muốn của mình, cùng một thành tựu độc đáo được thống nhất với bạn. Chúng ta sẽ cùng bàn khả năng và cách triển khai nhân vật.',
+  rewardContact:
+    'Với phần thưởng $50 và $1,000, hãy liên hệ nhóm dự án để thống nhất tên công khai, liên kết liên hệ hoặc chi tiết nhân vật và thành tựu. Ủng hộ ẩn danh không tự động công khai tên bạn.',
+  fairDescription:
+    'Mọi vai và chế độ chơi đều có sẵn cho tất cả mọi người. Premium giữ nguyên luật chơi và cách tính điểm xếp hạng; chỉ rút ngắn thời gian chờ giữa các lần đặt lại.',
+  title: 'Giúp Avalon tiếp tục hoạt động',
+  eyebrow: 'ỦNG HỘ DỰ ÁN',
+  intro: 'Sự ủng hộ của bạn dùng để trả phí lưu trữ và gia hạn tên miền. Hãy giúp duy trì nơi cho ván chơi tiếp theo.',
+  premiumTitle: 'Món quà cảm ơn nhỏ: Premium',
+  badgeTitle: 'Huy hiệu người ủng hộ',
+  badgeDescription: 'Huy hiệu Premium cạnh tên bạn trong thẻ xem nhanh người chơi và hồ sơ thống kê công khai.',
+  privacyTitle: 'Bạn chọn cách xuất hiện',
+  privacyDescription: 'Ủng hộ ẩn danh và chọn có hiển thị huy hiệu Premium hay không.',
+  fairTitle: 'Cùng một trò chơi cho mọi người',
+  checkout: 'Ủng hộ bằng tiền mã hóa',
+  anonymous: 'Ẩn danh khoản ủng hộ này',
+  unavailable: 'Thanh toán chưa khả dụng. Vui lòng quay lại sau.',
+  login: 'Đăng nhập bằng menu tài khoản trước khi ủng hộ để chúng tôi ghi nhận khoản đóng góp của bạn.',
+  recent: '10 khoản ủng hộ mới nhất',
+  empty: 'Hãy là người đầu tiên ủng hộ Avalon.',
+  anonymousName: 'Ẩn danh',
+  account: 'Khoản ủng hộ của bạn',
+  total: 'Tổng đã ghi nhận: ${amount}',
+  active: 'Premium đang hoạt động. Cảm ơn bạn!',
+  remaining: 'Còn ${amount} để nhận Premium',
+  hideSupport: 'Ẩn tên tôi trong mọi khoản ủng hộ, kể cả trước đây',
+  showBadge: 'Hiện huy hiệu Premium của tôi',
+  save: 'Lưu cài đặt quyền riêng tư',
+  saved: 'Đã lưu cài đặt quyền riêng tư.',
+  refresh: 'Kiểm tra thanh toán',
+  refreshing: 'Đang kiểm tra…',
+  error: 'Không tải được thông tin ủng hộ. Vui lòng thử lại.',
+  retry: 'Thử lại',
+  authError: 'Vui lòng đăng nhập lại để tiếp tục.',
+  bannerTitle: 'Trở thành người bảo trợ Avalon',
+  bannerLink: 'Khám phá Premium',
+  bannerText: 'Ảnh đại diện, nhãn dán độc quyền và đặt lại điểm xếp hạng hằng tháng.',
+};
 const ru: typeof en = {
   ...directSupport.ru,
   patronNamePerk: 'Ваше имя навсегда на странице «О сайте».',
@@ -405,4 +470,4 @@ const zhTW: typeof en = {
   bannerLink: '瞭解 Premium',
   bannerText: '專屬頭像、貼紙，以及每月一次的評分重置。',
 };
-export const support = { en, ru, es, pt, 'zh-CN': zhCN, 'zh-TW': zhTW };
+export const support = { vi, en, ru, es, pt, 'zh-CN': zhCN, 'zh-TW': zhTW };

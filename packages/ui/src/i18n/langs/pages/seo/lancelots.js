@@ -1,4 +1,10 @@
 module.exports.lancelots = {
+  vi: {
+    title: 'Lancelot trong Avalon: đổi phe và luật Nhiệm vụ',
+    description:
+      'Khi nào Lancelot đổi phe trong Avalon? Tìm hiểu bộ năm thẻ của nền tảng, việc rút thẻ sau Nhiệm vụ 2, thẻ Nhiệm vụ bắt buộc và thông tin của Guinevere.',
+    keywords: ['Lancelot', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Lancelot em Avalon: troca de lado e regras das missões',
     description:

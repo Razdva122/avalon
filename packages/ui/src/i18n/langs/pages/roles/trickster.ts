@@ -29,6 +29,27 @@ export const trickster: { [key in TLanguage]: Dictionary<string> } = {
 			Acompanhe como os outros o percebem e ajuste sua estratégia para manter seu disfarce.
 		`,
   },
+  vi: {
+    seoHeading: 'Kẻ lừa lọc trong Avalon: phe giả và Merlin',
+    seoTeam: 'Ác. Kết quả Thiện khi kiểm tra phe không làm thay đổi phe thực của bạn.',
+    seoAbility:
+      'Trên nền tảng này, {trickster} hiện là Thiện khi được kiểm tra phe, gồm {ladyOfLake}, {cleric} và lượt kiểm tra do {witch} trao.',
+    seoLimit:
+      'Kẻ lừa lọc có bị ẩn khỏi Merlin không? Không. {merlin} vẫn thấy vai này là Ác. {troublemaker} có hiệu ứng ngược lại: người phe Thiện có kết quả kiểm tra là Ác.',
+    seoScenario1:
+      'Kết quả kiểm tra Thiện có thể hỗ trợ lời đánh lừa của bạn, nhưng không chứng minh Đội thực hiện Nhiệm vụ Thất bại không có người phe Ác.',
+    seoScenario2:
+      'Nếu suy luận công khai của Merlin trái với kết quả kiểm tra Thiện, tránh phản ứng bằng sự chắc chắn từ thông tin riêng: người khác không biết có phải Kẻ lừa lọc là lời giải thích hay không.',
+    generalTipsTitle: 'Mẹo chung:',
+    generalTipsCultivateTrustTitle: 'Xây dựng hình ảnh đáng tin:',
+    generalTipsCultivateTrust:
+      'Để đánh lừa người khác thành công, bạn cần tạo uy tín. Hành động nhất quán và giúp hoàn thành Nhiệm vụ để giành lòng tin.',
+    generalTipsCreateConfusionTitle: 'Gây bối rối:',
+    generalTipsCreateConfusion:
+      'Khéo léo gieo nghi ngờ về vai của người khác, chuyển sự chú ý khỏi mình sang những người thực sự thuộc phe Thiện.',
+    generalTipsMonitorInfluenceTitle: 'Theo dõi ảnh hưởng của mình:',
+    generalTipsMonitorInfluence: 'Chú ý cách người khác nhìn nhận bạn và điều chỉnh chiến thuật để giữ vỏ bọc.',
+  },
   en: {
     seoHeading: 'Trickster in Avalon: False Loyalty & Merlin',
     seoTeam: 'Evil. A good result from a loyalty check does not change your actual team.',

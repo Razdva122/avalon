@@ -5,7 +5,7 @@
 ## URL policy
 
 - English public pages use unprefixed URLs. `/en/...` redirects permanently to the matching English URL.
-- Other languages use `/ru/`, `/zh-tw/`, `/zh-cn/`, `/es/`, and `/pt/`. A public URL determines its language, including after client-side navigation.
+- Other languages use `/ru/`, `/zh-tw/`, `/zh-cn/`, `/es/`, `/pt/`, and `/vi/`. A public URL determines its language, including after client-side navigation.
 - Wiki links, breadcrumbs and their structured data retain the current language. The menu provides explicit language links for visitors without an account.
 - Sitemap and hreflang list canonical public URLs only. Build dates are not presented as content modification dates.
 - Old role aliases and `/wiki/addons/` have server and client redirects. Query parameters are preserved.
@@ -14,7 +14,7 @@
 
 ## Multilingual acquisition guides
 
-The three `/guides/` articles have complete English, Russian, Spanish, Portuguese, Simplified Chinese and Traditional Chinese content and metadata. Their English URLs are unprefixed; other versions use the existing locale prefixes. Every version is prerendered, hydrated, listed in the sitemap and has its own canonical plus six language alternates and English `x-default`. Localized lobby/wiki links expose the hub. Article actions, related links and breadcrumbs retain the current language. Language switching and translation suggestions lead to the same article, preserving query and fragment.
+The three `/guides/` articles have complete English, Russian, Spanish, Portuguese, Vietnamese, Simplified Chinese and Traditional Chinese content and metadata. Their English URLs are unprefixed; other versions use the existing locale prefixes. Every version is prerendered, hydrated, listed in the sitemap and has its own canonical plus seven language alternates and English `x-default`. Localized lobby/wiki links expose the hub. Article actions, related links and breadcrumbs retain the current language. Language switching and translation suggestions lead to the same article, preserving query and fragment.
 
 The bot action links to the current locale’s home with `#play-with-ai`, the existing lobby launch control. Human rooms and solo/friends-with-bots setup are described separately. Public AI copy refers to the settings' available sizes rather than freezing a temporary human-seat cap into the articles.
 
@@ -46,7 +46,7 @@ This policy follows [Google's multilingual site guidance](https://developers.goo
 
 ## Rendering and performance
 
-The three acquisition guides share one responsive article template across all six locales. Short introductions and a primary bot-play link precede the comparison; detailed access conditions appear after the explanations. Native contents disclosures link to stable section fragments with clearance for the fixed header. At widths up to 700px, labelled comparison cards replace the desktop table. Both layouts use the same rows, columns and source links; CSS hides the inactive layout. Prose has a narrower reading measure, while comparison tables can use the full article width. Routes, titles, canonical URLs and language alternates are unchanged by this layout revision.
+The three acquisition guides share one responsive article template across all seven locales. Short introductions and a primary bot-play link precede the comparison; detailed access conditions appear after the explanations. Native contents disclosures link to stable section fragments with clearance for the fixed header. At widths up to 700px, labelled comparison cards replace the desktop table. Both layouts use the same rows, columns and source links; CSS hides the inactive layout. Prose has a narrower reading measure, while comparison tables can use the full article width. Routes, titles, canonical URLs and language alternates are unchanged by this layout revision.
 
 The lobby and statistics heading render without waiting for a WebSocket acknowledgement. The lobby includes a localized introduction and links to rules and roles. The production prerenderer waits for rendering and hydration verification to finish, and build verification rejects missing content or incorrect metadata.
 
@@ -64,7 +64,7 @@ With nginx serving the resulting build on a local port, run:
 SEO_BASE_URL=http://127.0.0.1:18080 node packages/ui/scripts/check-seo-http.cjs
 ```
 
-This checks canonical pages, English and legacy redirects, query preservation, dynamic routes, `noindex` response headers and real 404 responses across all six languages. The production nginx configuration should also pass `nginx -t`.
+This checks canonical pages, English and legacy redirects, query preservation, dynamic routes, `noindex` response headers and real 404 responses across all seven languages. The production nginx configuration should also pass `nginx -t`.
 
 ## Deployment follow-up
 
@@ -80,6 +80,6 @@ Wiki/about pages are rendered with Vue's string renderer during the existing bui
 
 Every article is hydrated once in the build renderer, which asserts that its headings and paragraphs retain their DOM nodes. The original SSR HTML is then restored for publication. `data-ssr-path` ensures only the correct article is hydrated. Saved theme/profile settings are applied reactively after hydration, and the socket starts after mounting so listeners are ready. No socket is opened in prerendering.
 
-`npm run serve` and `npm run build` generate six independent JSON dictionaries from the existing TypeScript translations via npm lifecycle scripts. Edit `src/i18n/langs`, never `src/i18n/generated` (ignored). If running type checks or webpack directly on a clean checkout, run `node packages/ui/scripts/generate-locales.cjs` first. The selected language and English fallback load before committing navigation. Short language-suggestion strings remain available independently. Failed dictionary requests can be retried; outdated selections cannot override a newer choice.
+`npm run serve` and `npm run build` generate seven independent JSON dictionaries from the existing TypeScript translations via npm lifecycle scripts. Edit `src/i18n/langs`, never `src/i18n/generated` (ignored). If running type checks or webpack directly on a clean checkout, run `node packages/ui/scripts/generate-locales.cjs` first. The selected language and English fallback load before committing navigation. Short language-suggestion strings remain available independently. Failed dictionary requests can be retried; outdated selections cannot override a newer choice.
 
 The HTML preloads only the selected locale and English fallback. Bundle checks reject reintroducing the all-language page dictionary into runtime chunks. Current startup JS including dictionaries is 287.1 KiB gzip for English, 324.0 KiB for Russian, and 317.2 KiB for Traditional Chinese (route-specific chunks excluded, as in the previous initial-bundle comparison). This is not a measured LCP result.

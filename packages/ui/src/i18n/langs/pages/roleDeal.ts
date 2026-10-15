@@ -1,4 +1,12 @@
 export const roleDeal = {
+  vi: {
+    composition: 'Các vai trong ván này',
+    shuffling: 'Đang xáo bài…',
+    dealing: 'Đang chia vai…',
+    yourRole: 'Vai của bạn',
+    reveal: 'Xem vai',
+    ready: 'Đã hiểu',
+  },
   en: {
     composition: 'Roles in this game',
     shuffling: 'Shuffling…',

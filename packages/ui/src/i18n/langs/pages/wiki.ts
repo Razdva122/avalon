@@ -44,6 +44,45 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
     roleLimit: 'Limites importantes',
     roleScenarios: 'Situações práticas',
   },
+  vi: {
+    gameGuides: 'Hướng dẫn trò chơi',
+    compareGames: 'So sánh Avalon, Secret Hitler và Ma Sói để chọn trò tiếp theo cho nhóm bạn.',
+    introduction:
+      'Mới chơi Avalon? Hãy bắt đầu với luật chơi và bảng số người, rồi tra cứu các vai trong ván của bạn. Xem hướng dẫn bản mở rộng khi nhóm đã sẵn sàng thêm lựa chọn.',
+    rules: 'Luật chơi',
+    roles: 'Vai',
+    rolesTitle: 'Tất cả các vai trong trò chơi bàn cờ Avalon',
+    rolesInfo:
+      'Danh mục này bao gồm các vai có trên nền tảng, kể cả vai tùy chọn và vai tùy chỉnh. Mỗi ván chỉ dùng các vai được chọn trong thiết lập; bạn không cần mọi vai cho ván đầu tiên.',
+    addons: 'Bản mở rộng',
+    addonsTitle: 'Các bản mở rộng cho trò chơi bàn cờ Avalon',
+    addonsInfo:
+      'Thêm các yếu tố như {ladyOfLake}, {excalibur} và {plotCards} giúp mở rộng chiến thuật và tăng sự kịch tính của ván chơi. Dưới đây là trang hướng dẫn từng bản mở rộng.',
+    title: 'Wiki Avalon: Luật chơi, vai và bản mở rộng',
+    setup: 'Thiết lập ván chơi',
+    playerAssignment: '<b>1. Chia vai</b>: Chia ngẫu nhiên cho mỗi người một vai nhân vật để xác định phe của họ.',
+    revealPhase: '<b>2. Giai đoạn nhận thông tin</b>: Người chơi nhận thông tin theo khả năng của nhân vật.',
+    missionSelection: 'Chọn Nhiệm vụ',
+    leaderSelection: '<b>3. Chọn Đội trưởng</b>: Luân phiên vai Đội trưởng giữa các người chơi.',
+    teamProposal: '<b>4. Đề xuất Đội</b>: Đội trưởng hiện tại đề xuất Đội thực hiện Nhiệm vụ.',
+    voteTeam: '<b>5. Bỏ phiếu cho Đội</b>: Tất cả người chơi bỏ phiếu Tán thành hoặc Phản đối Đội thực hiện Nhiệm vụ.',
+    missionPhase: 'Giai đoạn Nhiệm vụ',
+    missionOutcome: '<b>6. Kết quả Nhiệm vụ</b>: Thành viên được chọn bí mật quyết định kết quả Nhiệm vụ.',
+    revealMissionResult: '<b>7. Công bố kết quả Nhiệm vụ</b>: Thông báo Nhiệm vụ Thành công hay Thất bại.',
+    specialRolesInteractions: 'Tương tác giữa các vai đặc biệt',
+    usingSpecialAbilities:
+      '<b>8. Dùng khả năng đặc biệt</b>: Nhân vật đặc biệt có thể dùng khả năng vào thời điểm được quy định.',
+    assassinationPhase:
+      '<b>9. Giai đoạn Ám sát</b>: Nếu phe Thiện hoàn thành ba Nhiệm vụ, Sát thủ có cơ hội nhận diện Merlin để phe Ác giành chiến thắng.',
+    victoryConditions: 'Điều kiện chiến thắng',
+    determineWinner:
+      '<b>10. Xác định bên thắng</b>: Ván chơi kết thúc khi một phe giành được ba Nhiệm vụ hoặc Sát thủ nhận diện đúng Merlin sau các Nhiệm vụ Thành công của phe Thiện.',
+    roleFacts: 'Tóm tắt khả năng',
+    roleTeam: 'Phe và mục tiêu',
+    roleAbility: 'Khả năng và thông tin',
+    roleLimit: 'Giới hạn quan trọng',
+    roleScenarios: 'Tình huống thực tế',
+  },
   en: {
     gameGuides: 'Game guides',
     compareGames: 'Compare Avalon, Secret Hitler and Werewolf for your next group game.',

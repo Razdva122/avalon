@@ -2,6 +2,51 @@ import type { TLanguage } from '@/i18n/interface';
 import type { Dictionary } from '@avalon/types';
 
 export const plotCards: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoIntro:
+      '{plotCards} bổ sung thông tin, thay đổi Đội trưởng và các hành động công khai cho Avalon. Trang này giải thích phiên bản trên trang web; tên và chi tiết lá bài có thể khác các phiên bản The Resistance.',
+    seoRule1:
+      'Đầu mỗi vòng Nhiệm vụ, trước lần đề xuất Đội đầu tiên, rút 1 lá với 5–6 người chơi, 2 lá với 7–8 người, hoặc 3 lá với 9–10 người. Bộ bài có 7 lá với 5–6 người và 15 lá với 7–10 người.',
+    seoRule2:
+      'Đội trưởng chia bài cho những người khác, trừ Thể hiện sức mạnh, lá bài có hiệu lực với chính Đội trưởng. Đội bị bác bỏ không bắt đầu vòng Nhiệm vụ mới hay bổ sung thẻ âm mưu.',
+    seoRule3:
+      'Bài Tức thì được xử lý ngay khi nhận. Bài Chủ động có thể giữ đến giai đoạn cho phép và được tiêu hao khi dùng. Ép phiếu là hiệu ứng kéo dài. Mọi người biết ai đang giữ những lá bài nào.',
+    seoLimit1:
+      'Có thể kết hợp các bản mở rộng không? Có: {plotCards} dùng được cùng {excalibur} và một trong hai {ladyOfLake} hoặc {ladyOfSea}. Hai Tiên nữ là lựa chọn thay thế nhau trong cài đặt phòng.',
+    seoLimit2:
+      'Kiểm tra phe có luôn đúng với phe của người chơi không? Chúng dùng phe hiển thị: {trickster} hiện là Thiện và {troublemaker} hiện là Ác. Lời công bố về kết quả kiểm tra riêng tư cũng có thể là lời nói dối.',
+    seoScenario1:
+      'Với 8 người chơi, rút hai lá trước lần đề xuất Đội đầu tiên. Nếu Đội bị bác bỏ, Đội trưởng tiếp theo đề xuất Đội khác mà không rút thêm hai lá.',
+    seoScenario2:
+      'Nhà vua trở lại bác bỏ Đội ngay cả sau khi được thông qua và tăng số lần bỏ phiếu thất bại. Vì vậy dùng nó ở lần đề xuất thứ năm có thể giúp phe Ác thắng.',
+    seoHeading: 'Thẻ âm mưu trong Avalon: luật chơi, danh sách bài và cách chia',
+    cardsInGame: 'Các lá bài dùng trong ván',
+    fiveToSixPlayers: 'Cho 5–6 người chơi (7 lá)',
+    sevenPlusPlayers: 'Cho 7+ người chơi (15 lá)',
+    additionalCards: 'Các lá bổ sung dùng khi có 7+ người chơi:',
+    cardTypes: 'Các loại thẻ âm mưu',
+    usableCards: 'Bài Chủ động',
+    leadToVictoryDesc:
+      'Người nhận có thể dùng lá này để trở thành Đội trưởng. Khi một lá "Dẫn tới chiến thắng" được dùng, không thể dùng lá "Dẫn tới chiến thắng" khác cho đến khi đã diễn ra một lần bỏ phiếu.',
+    ambushDesc:
+      'Người nhận có thể dùng lá này để xem một lá bài Nhiệm vụ đã nộp. Không cần thông báo sẽ dùng trước khi các lá bài Nhiệm vụ được nộp. Lá này không làm thay đổi bài Nhiệm vụ được xem. Có thể xem nhiều lá bài Nhiệm vụ trong một vòng, nhưng mỗi lá bài của một người trong Nhiệm vụ chỉ được tối đa một người kiểm tra.',
+    kingReturnsDesc:
+      'Dùng sau khi Đội được thông qua, trước khi nộp bài Nhiệm vụ. Bác bỏ Đội đó và chuyển quyền Đội trưởng; việc này tăng số lần bỏ phiếu thất bại và có thể khiến phe Ác thắng ở lần đề xuất thứ năm.',
+    weFoundYouDesc:
+      'Người nhận có thể dùng lá này để buộc một người chơi nộp bài Nhiệm vụ ngửa mặt. Người dùng phải thông báo việc sử dụng và mục tiêu trước khi bất kỳ thành viên nào trong Đội chọn bài Nhiệm vụ.',
+    instantCards: 'Bài Tức thì',
+    restoreHonorDesc:
+      'Lấy ngay một thẻ âm mưu đang được người khác giữ. Nếu không ai khác có bài để lấy, bỏ qua hiệu ứng này.',
+    showStrengthDesc:
+      'Đội trưởng phải đưa thẻ Phe của mình cho một người khác xem. Việc này giúp người chơi có thông tin đã được xác minh về phe của người khác.',
+    showNatureDesc:
+      'Người nhận phải đưa thẻ Phe của mình cho một người khác xem (có thể là Đội trưởng). Việc này tiết lộ phe của người giữ lá bài cho người khác.',
+    areYouTheOneDesc:
+      'Người nhận có thể kiểm tra phe của một người ngồi liền kề bằng thẻ Phe. Việc này cung cấp thông tin cụ thể về người ngồi cạnh người giữ lá bài.',
+    effectsCards: 'Bài Hiệu ứng',
+    chargeDesc:
+      'Người nhận phải chọn và công bố thẻ bỏ phiếu của mình trước khi những người khác chọn thẻ. Lá này có hiệu lực đến hết ván. Nếu có hai lá "Ép phiếu!" trong ván, hai người đó phải công bố phiếu đồng thời.',
+  },
   en: {
     seoIntro:
       "{plotCards} add information, leadership changes and public actions to Avalon. This page explains the site's version; card names and details can differ from The Resistance editions.",

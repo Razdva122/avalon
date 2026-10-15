@@ -12,14 +12,14 @@ const guidePaths = {
   avalon_vs_werewolf: '/guides/avalon-vs-werewolf/',
 };
 
-test('translated guides expose all six public locales with real breadcrumb targets', () => {
+test('translated guides expose all seven public locales with real breadcrumb targets', () => {
   for (const [name, pathname] of Object.entries(guidePaths)) {
     const route = routesSeo[name];
     assert.ok(route, `${name}: public guide must be registered`);
     assert.equal(route.path, pathname);
     assert.equal(route.meta.prerender, true);
     assert.equal(Boolean(route.meta.skipSiteMap), false);
-    assert.deepEqual(Object.keys(route.meta.multiLanguage).sort(), ['en', 'es', 'pt', 'ru', 'zh-CN', 'zh-TW']);
+    assert.deepEqual(Object.keys(route.meta.multiLanguage).sort(), ['en', 'es', 'pt', 'ru', 'vi', 'zh-CN', 'zh-TW']);
     assert.equal(paths.isNeutralPath(pathname), false);
     for (const [language, meta] of Object.entries(route.meta.multiLanguage)) {
       const prefix = language === 'en' ? '' : '/' + language.toLowerCase();
@@ -76,7 +76,7 @@ test('direct guide visits hydrate their prerendered article instead of replacing
     compilerOptions: { module: ts.ModuleKind.CommonJS },
   }).outputText;
   for (const pathname of Object.values(guidePaths).flatMap((path) =>
-    ['', '/ru', '/es', '/pt', '/zh-cn', '/zh-tw'].map((prefix) => prefix + path),
+    ['', '/ru', '/es', '/pt', '/zh-cn', '/zh-tw', '/vi'].map((prefix) => prefix + path),
   )) {
     const exports = {};
     new Function('require', 'exports', 'window', 'document', code)(

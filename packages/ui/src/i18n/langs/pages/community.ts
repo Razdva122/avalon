@@ -1,6 +1,25 @@
 import type { TLanguage } from '@/i18n/interface';
 
 export const community: Record<TLanguage, Record<string, string>> = {
+  vi: {
+    promotionLabel: 'Cộng đồng của bạn có chỗ ở đây',
+    promotionTitle: 'Đưa người chơi đến với cộng đồng của bạn',
+    promotionText:
+      'Ủng hộ Avalon tổng cộng từ $50 trở lên để đặt liên kết đến máy chủ, trang web hoặc tài nguyên trò chơi của bạn trên trang này.',
+    promotionAction: 'Ủng hộ và thêm tài nguyên của bạn',
+    promotionNote: 'Sau khi ủng hộ, hãy liên hệ với nhóm dự án để sắp xếp việc đăng liên kết.',
+    title: 'Cộng đồng',
+    eyebrow: 'Tìm những người cùng sở thích',
+    intro:
+      'Tìm người chơi Avalon và các trò suy luận xã hội khác. Tham gia cộng đồng, gặp Đội tiếp theo của bạn và cùng chơi.',
+    servers: 'Máy chủ cộng đồng',
+    avalonDescription: 'Cộng đồng của chúng tôi để tìm người chơi, thảo luận về Avalon và chơi cùng nhau.',
+    official: 'Cộng đồng chính thức',
+    languages: 'Ngôn ngữ của máy chủ',
+    join: 'Tham gia {messenger}',
+    newTab: '(mở trong thẻ mới)',
+    bannerText: 'Tìm Đội tiếp theo của bạn trong cộng đồng',
+  },
   en: {
     promotionLabel: 'Your community belongs here',
     promotionTitle: 'Bring players to your community',

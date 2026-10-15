@@ -59,6 +59,7 @@ test('profile shows three distinct selectable previews and descriptions in every
     ru: 'ru',
     es: 'es',
     pt: 'pt',
+    vi: 'vi',
     'zh-CN': 'zh_CN',
     'zh-TW': 'zh_TW',
   })) {

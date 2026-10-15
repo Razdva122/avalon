@@ -1,4 +1,10 @@
 module.exports.lovers = {
+  vi: {
+    title: 'Cặp tình nhân trong Avalon: Tristan, Isolde và Ám sát',
+    description:
+      'Tristan và Isolde hoạt động thế nào trong Avalon? Tìm hiểu Cặp tình nhân biết gì, vì sao cả hai phải ẩn danh và cách phe Ác Ám sát cặp đôi trên nền tảng này.',
+    keywords: ['Cặp tình nhân', 'Tristan', 'Isolde', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Amantes em Avalon: Tristan, Isolde e assassinato',
     description:

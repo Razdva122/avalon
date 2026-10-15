@@ -33,7 +33,7 @@ test('private-decision cards distinguish discussion preferences from chosen acti
     'exports',
     ts.transpileModule(compiled.code, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText,
   )(require, exports);
-  for (const locale of ['en', 'ru', 'zh_TW', 'zh_CN', 'es', 'pt']) {
+  for (const locale of ['en', 'ru', 'zh_TW', 'zh_CN', 'es', 'pt', 'vi']) {
     const messages = require(`../src/i18n/langs/${locale}/aiArena.ts`).default;
     assert.ok(messages.teamDiscussion && messages.preferredTeam, `missing discussion labels in ${locale}`);
     for (const stage of ['discussion', 'selectTeam']) {

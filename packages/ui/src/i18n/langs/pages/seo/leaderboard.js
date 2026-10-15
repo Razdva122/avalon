@@ -1,4 +1,9 @@
 module.exports.leaderboard = {
+  vi: {
+    title: 'Avalon: The Resistance | Bảng xếp hạng',
+    description: 'Bảng xếp hạng người chơi The Resistance: Avalon.',
+    keywords: ['Bảng xếp hạng', 'Người chơi hàng đầu', 'Xếp hạng', 'Người chơi xuất sắc'],
+  },
   pt: {
     title: 'Avalon: The Resistance | Classificação',
     description: "Tabela de classificação para jogadores de 'Avalon: The Resistance'",

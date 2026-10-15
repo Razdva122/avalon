@@ -1,4 +1,9 @@
 module.exports.userAchievements = {
+  vi: {
+    title: 'Avalon: The Resistance | Thành tích cá nhân',
+    description: 'Xem thành tích của bạn trong Avalon. Theo dõi tiến trình và mở khóa thành tích mới khi chơi.',
+    keywords: ['Thành tích', 'Thành tích cá nhân'],
+  },
   en: {
     title: 'Avalon: The Resistance | User Achievements',
     description: 'View your achievements in Avalon Game. Track your progress and unlock new achievements as you play.',

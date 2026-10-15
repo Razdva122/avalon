@@ -2,6 +2,17 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const leaderboard: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    title: 'Avalon — Bảng xếp hạng',
+    trueskill: 'TrueSkill',
+    roles: 'Vai',
+    error: 'Không tải được dữ liệu bảng xếp hạng',
+    player: 'Người chơi',
+    confidence: 'Độ tin cậy',
+    winRate: 'Tỷ lệ thắng',
+    games: 'Ván chơi',
+    rating: 'Điểm xếp hạng',
+  },
   en: {
     title: 'Avalon — Leaderboard',
     trueskill: 'TrueSkill',

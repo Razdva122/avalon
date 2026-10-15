@@ -1,4 +1,9 @@
 module.exports.support = {
+  vi: {
+    title: 'Ủng hộ Avalon · Premium',
+    description: 'Ủng hộ chi phí máy chủ và gia hạn tên miền Avalon để nhận Premium.',
+    keywords: ['Avalon', 'Premium', 'Ủng hộ', 'Quyên góp'],
+  },
   en: {
     title: 'Support Avalon · Premium',
     description: 'Support Avalon hosting and domain renewal and receive Premium.',

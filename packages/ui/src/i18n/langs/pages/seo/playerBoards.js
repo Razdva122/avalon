@@ -1,5 +1,11 @@
 module.exports = {
   communitySolo: {
+    vi: {
+      title: 'Tìm người chơi Avalon online · Avalon',
+      description:
+        'Tìm người chơi Avalon cùng ngôn ngữ. So sánh kinh nghiệm và sở thích trò chuyện bằng giọng nói hoặc văn bản, rồi liên hệ qua Discord, Telegram, LINE, QQ hoặc WeChat.',
+      keywords: ['Avalon'],
+    },
     en: {
       title: 'Find Avalon players online · Avalon',
       description:
@@ -36,6 +42,12 @@ module.exports = {
     },
   },
   communityGroup: {
+    vi: {
+      title: 'Tìm Đội chơi Avalon online · Avalon',
+      description:
+        'Tìm Đội chơi Avalon cùng ngôn ngữ. So sánh lịch chơi, chọn Đội chào đón người mới rồi liên hệ người tổ chức hoặc mở lời mời vào nhóm.',
+      keywords: ['Avalon'],
+    },
     en: {
       title: 'Find an Avalon team online · Avalon',
       description:

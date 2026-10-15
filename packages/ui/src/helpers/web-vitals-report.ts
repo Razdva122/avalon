@@ -6,7 +6,7 @@ type Payload = Record<string, string | number>;
 
 // Exact public paths only: never turn arbitrary slugs or private IDs into dimensions.
 export function publicPage(pathname: string): PublicPage | null {
-  const prefix = pathname.match(/^\/(ru|zh-tw|zh-cn|es|pt)(?=\/|$)/)?.[0] || '';
+  const prefix = pathname.match(/^\/(ru|zh-tw|zh-cn|es|pt|vi)(?=\/|$)/)?.[0] || '';
   const path = pathname.slice(prefix.length).replace(/\/$/, '') || '/';
   let route: string;
   if (path === '/') route = 'lobby';

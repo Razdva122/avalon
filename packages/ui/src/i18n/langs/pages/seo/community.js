@@ -1,4 +1,10 @@
 module.exports.community = {
+  vi: {
+    title: 'Cộng đồng · Avalon',
+    description:
+      'Tìm người chơi Avalon và các trò suy luận xã hội khác. Tham gia cộng đồng, tìm Đội tiếp theo và cùng nhau chơi.',
+    keywords: ['Avalon', 'Cộng đồng', 'Discord'],
+  },
   en: {
     title: 'Community · Avalon',
     description:

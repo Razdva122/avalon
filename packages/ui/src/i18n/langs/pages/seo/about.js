@@ -1,4 +1,10 @@
 module.exports.about = {
+  vi: {
+    title: 'Avalon: The Resistance | Giới thiệu',
+    description:
+      'Khám phá avalon-game.com, nền tảng dành cho The Resistance: Avalon. Tìm hiểu câu chuyện về trò chơi, luật chơi chính thức và cách chúng tôi kết nối người yêu Avalon trên toàn thế giới.',
+    keywords: ['Giới thiệu', 'Thông tin', 'Luật chơi'],
+  },
   pt: {
     title: 'Avalon: The Resistance | Sobre',
     description:

@@ -2,6 +2,28 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const lunatic: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoHeading: 'Kẻ điên trong Avalon: luật bắt buộc Thất bại và chiến thuật',
+    seoTeam: 'Ác. Bạn thắng cùng phe Ác.',
+    seoAbility:
+      '{lunatic} phải nộp Thất bại trong mọi Nhiệm vụ họ tham gia. Khác với {minion} thông thường, họ không thể chọn Thành công để tạo lòng tin.',
+    seoLimit:
+      'Một Kẻ điên có luôn làm Nhiệm vụ thất bại không? Không nếu Nhiệm vụ đó cần hai lá Thất bại. Lá bài bắt buộc không bảo đảm kết quả cuối cùng; {excalibur}, khi được bật, cũng có thể đảo một lá bài.',
+    seoScenario1:
+      'Trong Nhiệm vụ chỉ cần một lá Thất bại, lá bắt buộc của bạn sẽ làm nó thất bại, trừ khi cơ chế khác đang bật thay đổi lá đó.',
+    seoScenario2:
+      'Ở Nhiệm vụ thứ tư với 7–10 người chơi, cần hai lá Thất bại. Nếu bạn là người phe Ác duy nhất tham gia, một lá Thất bại là chưa đủ.',
+    generalTipsHeader: 'Mẹo chung:',
+    strategicFailure: 'Dùng lá Thất bại bắt buộc theo chiến thuật:',
+    strategicFailureDetails:
+      'Dù luôn phải chọn "Thất bại" khi tham gia Nhiệm vụ, hãy tính toán ở các mặt khác của ván chơi để tránh bị phát hiện ngay.',
+    deceiveWithBluff: 'Đánh lừa hiệu quả:',
+    bluffTechnique:
+      'Che giấu việc buộc phải chọn Thất bại bằng cách thảo luận và lên chiến thuật như thể bạn có quyền lựa chọn, giữ cho mình khó đoán.',
+    covertSupportAllies: 'Kín đáo phối hợp với các Tay sai khác:',
+    subtleAlignment:
+      'Dù vai của bạn buộc phải phá hoại rõ ràng, hãy tìm cơ hội hỗ trợ các Tay sai khác bằng những cách kín đáo hơn.',
+  },
   en: {
     seoHeading: 'Lunatic in Avalon: Must-Fail Rule & Strategy',
     seoTeam: 'Evil. You win with the evil team.',

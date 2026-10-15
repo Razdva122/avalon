@@ -1,4 +1,10 @@
 module.exports.witch = {
+  vi: {
+    title: 'Phù thủy (Witch) trong Avalon: ẩn Nhiệm vụ và kiểm tra phe',
+    description:
+      'Phù thủy làm gì trong Avalon? Tìm hiểu năng lực ẩn Nhiệm vụ dùng một lần, ai được kiểm tra phe và vì sao việc ẩn không làm thay đổi kết quả.',
+    keywords: ['Phù thủy', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Bruxa em Avalon: missão oculta e verificação',
     description:

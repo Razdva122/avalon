@@ -1,4 +1,10 @@
 module.exports.oberon = {
+  vi: {
+    title: 'Oberon trong Avalon: năng lực và chiến thuật',
+    description:
+      'Merlin có thấy Oberon trong Avalon không? Có. Tìm hiểu vì sao Oberon không biết các người chơi Ác khác, điểm khác Mordred và cách biến thể Bóng ma hoạt động.',
+    keywords: ['Oberon', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Oberon em Avalon: habilidades e estratégia',
     description:

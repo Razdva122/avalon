@@ -1,4 +1,10 @@
 module.exports.minion = {
+  vi: {
+    title: 'Tay sai của Mordred trong Avalon: luật và chiến thuật',
+    description:
+      'Tay sai của Mordred biết gì trong Avalon? Tìm hiểu họ thấy đồng minh Ác nào, khi nào được chọn Thành công hoặc Thất bại và điểm khác Mordred, Oberon.',
+    keywords: ['Tay sai của Mordred', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Lacaio de Mordred em Avalon: regras e estratégia',
     description:

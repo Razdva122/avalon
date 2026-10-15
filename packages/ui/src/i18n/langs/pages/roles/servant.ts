@@ -2,6 +2,29 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const servant: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoHeading: 'Người hầu trung thành của Arthur trong Avalon: luật chơi và chiến thuật',
+    seoTeam:
+      'Thiện. {servant}, hay Người hầu trung thành của Arthur, giúp phe Thiện hoàn thành ba Nhiệm vụ và sống sót qua mọi hình thức Ám sát đang bật.',
+    seoAbility:
+      'Người hầu không có thông tin bí mật về các vai khác lúc thiết lập. Hãy dùng các đề xuất Đội, phiếu bầu và kết quả Nhiệm vụ để tìm người đáng tin.',
+    seoLimit:
+      'Người hầu trung thành có thể chọn Thất bại không? Không. Người phe Thiện phải chọn Thành công. Nhiệm vụ thành công vẫn không chứng minh mọi người đều Thiện: đa số vai phe Ác cũng có thể chọn Thành công.',
+    seoScenario1:
+      'Khi một Nhiệm vụ thất bại, so sánh thành viên với các Đội trước. Tránh khẳng định chắc chắn ai đã phá khi chưa đủ bằng chứng.',
+    seoScenario2:
+      'Nếu ai đó có vẻ biết nhiều bất thường, hãy cân nhắc xem công khai gọi họ là {merlin} có giúp phe Ác không. Thay vào đó hãy thảo luận về lựa chọn Đội.',
+    strategicTipsTitle: 'Mẹo chiến thuật:',
+    tipActiveObservationTitle: 'Chủ động quan sát:',
+    tipActiveObservationText:
+      'Chú ý kỹ hành động và cách cư xử của người chơi khác. Cách bỏ phiếu hay bình luận về đề xuất Đội có thể mang lại manh mối quan trọng.',
+    tipCommunicationTitle: 'Giao tiếp:',
+    tipCommunicationText:
+      'Giao tiếp hiệu quả với người khác nhưng thận trọng để tránh tiết lộ thông tin giá trị cho phe Ác. Tham gia trao đổi, đặt câu hỏi và bày tỏ nghi ngờ hoặc tin tưởng đối với từng người.',
+    tipVotingStrategyTitle: 'Chiến thuật bỏ phiếu:',
+    tipVotingStrategyText:
+      'Dùng phiếu bầu để thể hiện sự tin tưởng hoặc nghi ngờ thành phần Đội. Phản đối đề xuất Đội có thể khơi thêm thảo luận và giúp làm rõ những khuôn mẫu đáng ngờ.',
+  },
   en: {
     seoHeading: 'Loyal Servant of Arthur in Avalon: Rules & Strategy',
     seoTeam:

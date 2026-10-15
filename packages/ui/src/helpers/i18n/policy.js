@@ -1,4 +1,4 @@
-const languages = ['en', 'ru', 'zh-TW', 'zh-CN', 'es', 'pt'];
+const languages = ['en', 'ru', 'zh-TW', 'zh-CN', 'es', 'pt', 'vi'];
 
 function normalizeLanguage(value) {
   return typeof value === 'string'

@@ -110,6 +110,111 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
     faqMerlinAnswer:
       'Em uma partida normal com Merlin, é preciso sobreviver ao assassinato. No original, o Assassino tem uma tentativa de identificar Merlin. Se acertar, o mal vence; se errar, o bem vence. Nesta plataforma, a equipe do mal realiza essa etapa.',
   },
+  vi: {
+    quickStartTitle: 'Cách chơi Avalon: bắt đầu nhanh',
+    quickStep1:
+      'Chuẩn bị 5–10 người, chia vai bí mật và tiết lộ thông tin theo khả năng từng vai. Phe Thiện muốn ba Nhiệm vụ thành công; phe Ác muốn ba Nhiệm vụ thất bại.',
+    quickStep2:
+      'Đội trưởng chọn Đội thực hiện Nhiệm vụ theo bảng số người bên dưới. Mọi người bỏ phiếu: phải có quá nửa Tán thành; hòa phiếu sẽ bác bỏ Đội.',
+    quickStep3:
+      'Chỉ Đội được chọn bí mật nộp bài Nhiệm vụ. Trong luật cơ bản, phe Thiện phải chọn Thành công; phe Ác có thể chọn Thành công hoặc Thất bại. Hầu hết Nhiệm vụ thất bại chỉ với một lá Thất bại; Nhiệm vụ thứ tư cần hai lá khi có ít nhất bảy người.',
+    quickStep4:
+      'Chỉ công bố kết quả Nhiệm vụ, chuyển quyền Đội trưởng và lặp lại. Sau ba Nhiệm vụ thành công, phe Ác vẫn có thể thắng bằng cách nhận diện đúng Merlin trong giai đoạn Ám sát.',
+    roundExampleTitle: 'Ví dụ: Nhiệm vụ đầu tiên với năm người',
+    roundExample:
+      'Đội trưởng chọn hai người. Nếu có ít nhất ba trong năm người Tán thành, hai người đó nộp bài Nhiệm vụ. Hai lá Thành công giúp Nhiệm vụ thành công; một lá Thất bại làm nó thất bại. Nhiệm vụ thành công không chứng minh cả hai đều thuộc phe Thiện: người phe Ác có thể chọn Thành công.',
+    variantTitle: 'Luật trò chơi bàn cờ và nền tảng này',
+    variantNote:
+      'Trong trò chơi bàn cờ gốc, năm Đội liên tiếp bị bác bỏ khiến phe Ác thắng. Trên nền tảng này, sau bốn lần bác bỏ, Đội thứ năm thường được cử đi mà không bỏ phiếu; Thẻ âm mưu có thể ảnh hưởng đến việc thông qua Đội. Trò chơi gốc giao lần đoán cuối cùng cho Sát thủ. Ở đây, phe Ác xử lý Ám sát. Hãy thống nhất luật và các vai được bật trước khi chơi trực tiếp.',
+    numberOfPlayers: 'Số người chơi',
+    missionNumber: 'Nhiệm vụ {number}',
+    countPlayers: '{count} người chơi',
+    servantTeam: 'Người hầu trung thành của Arthur:',
+    mordredTeam: 'Tay sai của Mordred:',
+    expansions: 'Bản mở rộng:',
+    note: 'Lưu ý: ',
+    title: 'Luật trò chơi bàn cờ Avalon: cách chơi',
+    gameObjective: 'Mục tiêu trò chơi',
+    gameDescription:
+      'The Resistance: Avalon là trò chơi bàn cờ suy luận xã hội cho 5–10 người. Học cách chơi qua bốn bước, rồi xem thiết lập vai, bỏ phiếu cho Đội, bảng số người đi Nhiệm vụ và Ám sát Merlin. Khác biệt giữa trò chơi bàn cờ gốc và nền tảng này được giải thích riêng.',
+    gameplayRules: 'Luật chơi',
+    teamProposalAndVoting: 'Đề xuất Đội và bỏ phiếu',
+    teamProposalDescription:
+      'Người giữ vật đánh dấu Đội trưởng đề xuất một Đội thực hiện Nhiệm vụ. Số người cần cho Đội phụ thuộc Nhiệm vụ hiện tại và tổng số người trong ván.',
+    votingDescription:
+      'Mọi người, kể cả Đội trưởng, đều bỏ phiếu. Phải có quá nửa tổng số người Tán thành; hòa phiếu sẽ bác bỏ Đội. Sau khi bị bác bỏ, quyền Đội trưởng chuyển theo chiều kim đồng hồ và một Đội mới được đề xuất cho cùng Nhiệm vụ. Trong trò chơi bàn cờ gốc, năm lần bác bỏ liên tiếp khiến phe Ác thắng. Trên nền tảng này, sau bốn lần bác bỏ, Đội thứ năm thường đi mà không bỏ phiếu; Thẻ âm mưu có thể ảnh hưởng đến việc thông qua.',
+    progressionOfPlayTitle: 'Diễn tiến ván chơi',
+    leaderTokenMove:
+      'Sau khi xác định kết quả Nhiệm vụ, vật đánh dấu Đội trưởng chuyển cho người tiếp theo theo chiều kim đồng hồ.',
+    newRound:
+      'Lặp lại chọn Đội và thực hiện Nhiệm vụ cho đến khi có ba Nhiệm vụ thành công hoặc ba Nhiệm vụ thất bại. Tối đa có năm Nhiệm vụ; không chơi tiếp các Nhiệm vụ còn lại khi một phe đã đạt ba.',
+    playersUseSkills:
+      'Người chơi phải dùng khả năng thuyết phục, suy luận và đánh lừa để tác động việc chọn Đội, bỏ phiếu và thảo luận nhằm thúc đẩy mục tiêu phe mình.',
+    missionPhaseTitle: 'Giai đoạn Nhiệm vụ',
+    teamApproved:
+      'Chỉ Đội đã được thông qua bí mật nộp bài Nhiệm vụ. Trong luật cơ bản, người phe Thiện phải chọn Thành công { goodLoyaltyIcon }; người phe Ác có thể chọn Thành công hoặc Thất bại { evilLoyaltyIcon }.',
+    submitCardsToLeader:
+      'Khi chơi trực tiếp, Đội trưởng thu và xáo các lá bài Nhiệm vụ của thành viên Đội trước khi lật, để không ai biết mỗi lá do ai nộp.',
+    cardsRevealed:
+      'Thông thường, một lá Thất bại { evilLoyaltyIcon } khiến Nhiệm vụ thất bại; nếu không thì thành công { goodLoyaltyIcon }. Ngoại lệ là Nhiệm vụ thứ tư với 7–10 người: cần ít nhất hai lá Thất bại, nên một lá Thất bại vẫn cho kết quả Nhiệm vụ thành công.',
+    conclusionOfGameplayTitle: 'Kết thúc ván chơi',
+    gameplayEndsCondition:
+      'Ba Nhiệm vụ thất bại lập tức khiến phe Ác thắng. Sau ba Nhiệm vụ thành công, dừng thực hiện Nhiệm vụ và xử lý Ám sát: trong trò chơi gốc, Sát thủ gọi tên một người phe Thiện sau khi thảo luận với phe Ác. Nếu người đó là {merlin}, phe Ác thắng; nếu không, phe Thiện thắng. Trên nền tảng này, phe Ác xử lý Ám sát, với các mục tiêu khác có thể xuất hiện trong thiết lập vai tùy chỉnh. Để thắng bằng cách Ám sát Giáo sĩ sau ba Nhiệm vụ thành công, phe Ác phải nhận diện hai người theo thứ tự: đầu tiên là Giáo sĩ, sau đó là một người phe Thiện khác, đồng thời chọn đúng cả người đó và vai cụ thể của họ từ danh sách có sẵn. Cả hai lần đoán đều phải đúng; sai ở bất kỳ bước nào thì phe Thiện thắng.',
+    strategicDiscussion:
+      'Qua thảo luận chiến thuật, quan sát cẩn thận và cách chơi khôn khéo, mỗi phe phải nỗ lực đạt mục tiêu mà không làm lộ phe thật, khiến mỗi vòng Avalon: The Resistance đều độc đáo và đầy hồi hộp.',
+    assassinNote:
+      'Trò chơi bàn cờ gốc có vai <b>Sát thủ</b> riêng, người đưa ra lần đoán Merlin cuối cùng sau khi phe Ác thảo luận. Các thiết lập tùy chỉnh bên trên dùng cơ chế Ám sát do phe Ác xử lý trên nền tảng. Để chơi theo thiết lập gốc, hãy đưa Sát thủ vào số người phe Ác.',
+    objectiveArthur: 'Mục tiêu của { goodLoyaltyIcon } Người hầu trung thành của Arthur',
+    objectiveMordred: 'Mục tiêu của { evilLoyaltyIcon } Tay sai của Mordred',
+    missionObjective:
+      'Các { servant } trung thành phải hoàn thành ba trong năm Nhiệm vụ. Họ phải phối hợp đề xuất Đội cho từng Nhiệm vụ và bỏ phiếu về thành phần Đội, luôn cố loại kẻ phản bội khỏi Đội để tránh Nhiệm vụ thất bại.',
+    minionObjective:
+      'Các { minion } cố tham gia Đội thực hiện Nhiệm vụ và gây ba lần thất bại, đồng thời đánh lạc hướng { servant } trong thảo luận. Được phép đánh lừa, nhưng người chơi không được cho xem thẻ nhân vật trong ván.',
+    additionalObjectivesTitle: 'Mục tiêu bổ sung',
+    additionalObjectivesDescription:
+      '{ merlin } thấy những người phe Ác khi thiết lập, trừ các vai như Mordred vẫn ẩn khỏi anh ấy. Merlin phải giúp phe Thiện mà không lộ danh tính: sau ba Nhiệm vụ thành công, phe Ác vẫn có thể thắng bằng cách nhận diện đúng anh ấy.',
+    twoFailsNote: 'Ở những Nhiệm vụ có dấu hoa thị (*), cần hai lá Thất bại { evilLoyaltyIcon } để Nhiệm vụ thất bại.',
+    missionSizes: 'Số người trong Đội thực hiện Nhiệm vụ',
+    excaliburHint:
+      'Chúng tôi khuyên thêm {excalibur} vào ván với bất kỳ số người nào, nhưng chỉ khi nhóm đã có kinh nghiệm.',
+    recommendTitle: 'Thiết lập vai được đề xuất',
+    generalTipsTitle: 'Mẹo chung',
+    generalTipsText:
+      'Avalon hỗ trợ <strong>5–10 người chơi</strong>. Những thiết lập bên dưới là gợi ý cho nền tảng này, gồm cả vai tùy chỉnh; chúng không phải thiết lập bắt buộc của trò chơi bàn cờ gốc.',
+    newcomersAdvice:
+      'Với trò chơi cơ bản gốc, dùng <strong>Merlin và Sát thủ</strong>, rồi lấp chỗ còn lại bằng người hầu trung thành và tay sai theo đúng tỷ lệ Thiện/Ác. Thêm vai tùy chọn khi mọi người đã hiểu bỏ phiếu và Nhiệm vụ.',
+    recommendationAfterFirstGames:
+      'Khi nhóm đã nắm luật cơ bản, cân nhắc các vai và biến thể bổ sung sau; Tristan và Isolde là vai tùy chỉnh trên nền tảng này:',
+    offlineSetup: 'Chuẩn bị ván chơi trực tiếp',
+    defaultSetup:
+      'Kịch bản mở đầu có xét các vai này bắt đầu với { merlin }, { percival } và { morgana } được chọn. Điều chỉnh lựa chọn theo nhóm của bạn; đây là kịch bản tùy chỉnh, không phải thiết lập cơ bản gốc.',
+    closeEyesExtendHand: 'Mọi người nhắm mắt và đưa một bàn tay nắm lại ra phía trước.',
+    except: 'ngoại trừ',
+    seeAllAgentsOfEvil: 'mở mắt và nhìn quanh để biết tất cả thành viên phe Ác.',
+    extendYourThumb: 'giơ ngón cái lên',
+    extendYourThumbSo: 'giơ ngón cái lên để',
+    willKnowOfYou: 'có thể thấy bạn',
+    closeEyes: 'nhắm mắt',
+    guinevereLookAround: 'mở mắt và nhìn quanh để biết cả hai Lancelot',
+    allPlayersShouldHaveEyedClosed: 'Tất cả người chơi nhắm mắt và đưa bàn tay nắm lại ra phía trước',
+    putYourThumbDown: 'hạ ngón cái xuống và nắm tay lại',
+    merlinOpenEyes: 'mở mắt để thấy thành viên phe Ác',
+    gameSetupNote: 'Trong phần thiết lập, thuật ngữ "{minion}" chỉ tất cả thành viên phe Ác trừ khi có ghi chú khác',
+    ordinaryMinion: 'Thông thường (không có vai bổ sung)',
+    everyoneOpenEyes: 'Mọi người mở mắt',
+    percivalOpenEyes: 'mở mắt và nhìn',
+    loversOpenEyes: 'mở mắt và nhìn quanh để nhận ra nhau',
+    faqTitle: 'Câu hỏi thường gặp về luật Avalon',
+    faqPlayersQuestion: 'Bao nhiêu người có thể chơi Avalon?',
+    faqPlayersAnswer:
+      'Avalon dành cho 5–10 người. Số người Thiện/Ác là: 5 người: 3/2; 6: 4/2; 7: 4/3; 8: 5/3; 9: 6/3; 10: 6/4. Các con số này bao gồm các vai đặc biệt của mỗi phe.',
+    faqTieQuestion: 'Điều gì xảy ra khi phiếu cho Đội hòa nhau?',
+    faqTieAnswer:
+      'Đội bị bác bỏ. Việc thông qua cần quá nửa tổng số người Tán thành, nên ván sáu người cần bốn phiếu Tán thành. Đội trưởng tiếp theo đề xuất Đội khác cho cùng Nhiệm vụ; việc bác bỏ tự nó không phải một Nhiệm vụ thất bại.',
+    faqMerlinQuestion: 'Phe Thiện có thắng ngay khi ba Nhiệm vụ thành công không?',
+    faqMerlinAnswer:
+      'Trong ván tiêu chuẩn có Merlin, phe Thiện còn phải sống sót qua Ám sát. Sát thủ có một lần đoán Merlin cuối cùng trong trò chơi bàn cờ gốc. Đoán đúng thì phe Ác thắng; đoán sai thì phe Thiện thắng. Nền tảng này để phe Ác xử lý bước đó.',
+  },
   en: {
     quickStartTitle: 'How to play Avalon: a quick start',
     quickStep1:

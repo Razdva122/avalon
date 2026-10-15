@@ -1,4 +1,10 @@
 module.exports.rules = {
+  vi: {
+    title: 'Luật chơi Avalon: cách chơi, thiết lập và vai trò',
+    description:
+      'Tìm hiểu cách chơi Avalon với 5–10 người: chia vai, bỏ phiếu chọn Đội và bảng số người làm Nhiệm vụ. Xem điều kiện thắng và luật Ám sát Merlin.',
+    keywords: ['Luật chơi Avalon', 'Cách chơi Avalon', 'Hướng dẫn'],
+  },
   pt: {
     title: 'Regras de Avalon: como jogar, papéis e tabela de missões',
     description:

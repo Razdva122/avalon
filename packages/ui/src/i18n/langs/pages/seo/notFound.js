@@ -1,4 +1,8 @@
 module.exports.notFound = {
+  vi: {
+    title: 'Avalon: The Resistance | 404',
+    description: 'Không tìm thấy trang =(',
+  },
   pt: {
     title: 'Avalon: The Resistance | 404',
     description: 'Página não encontrada =(',

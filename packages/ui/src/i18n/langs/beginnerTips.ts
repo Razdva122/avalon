@@ -1,4 +1,50 @@
 export const beginnerTips = {
+  vi: {
+    label: 'Gợi ý cho người mới',
+    expand: 'Mở rộng gợi ý',
+    collapse: 'Thu gọn gợi ý',
+    disable: 'Tắt gợi ý',
+    enable: 'Bật gợi ý cho người mới',
+    confirmTitle: 'Tắt gợi ý?',
+    confirmText: 'Gợi ý sẽ bị ẩn trong ván này. Bạn có thể bật lại trong trình đơn ván chơi.',
+    keep: 'Giữ gợi ý',
+    confirmDisable: 'Tắt',
+    yourRole: 'Vai trò của bạn: {role}',
+    goodGoal:
+      'Bạn thuộc phe Thiện. Mục tiêu là hoàn thành ba nhiệm vụ. Sau đó, Sát thủ sẽ tìm Merlin: nếu tìm đúng, phe Ác thắng.',
+    evilGoal: 'Bạn thuộc phe Ác. Làm thất bại ba nhiệm vụ hoặc tìm ra Merlin trong lần ám sát cuối.',
+    role_merlin:
+      'Bạn biết một số người phe Ác. Hãy giúp phe Thiện tìm đội an toàn nhưng giữ kín vai trò: Sát thủ sẽ tìm bạn ở cuối ván.',
+    role_percival: 'Bạn thấy hai ứng viên: Merlin và Morgana. Bạn chưa biết ai là ai. Hãy quan sát hành động của họ.',
+    role_morgana: 'Percival nhìn bạn như một Merlin tiềm năng. Bạn thuộc phe Ác và có thể tận dụng sự mơ hồ này.',
+    intro: 'Xem vai trò và mục tiêu của bạn. Giữ kín vai trò: một số người chơi là đối thủ của bạn.',
+    discussion:
+      'Nói trong khung chat bạn muốn cử ai làm nhiệm vụ và vì sao. Bạn có thể bỏ qua phát biểu bằng nút “Nhường lượt”.',
+    discussionWait:
+      'Người chơi đang thảo luận về đội. Bot có thể đánh lừa: hãy đối chiếu lời nói với phiếu bầu và kết quả nhiệm vụ.',
+    selectLeader: 'Chạm vào người chơi quanh bàn để chọn {count} người. Bạn có thể chọn chính mình. Sau đó cử đội đi.',
+    selectWait:
+      'Đội trưởng đang chọn đội. Hãy quan sát những người được đề xuất: tiếp theo bạn sẽ bỏ phiếu cho đội này.',
+    fifthLeader:
+      'Bốn đội đã bị phản đối. Hãy chọn kỹ {count} người: đội thứ năm này lập tức đi làm nhiệm vụ, không qua bỏ phiếu.',
+    fifthWait: 'Bốn đội đã bị phản đối. Đội thứ năm do đội trưởng chọn sẽ đi làm nhiệm vụ mà không qua bỏ phiếu.',
+    vote: 'Chọn “Tán thành” nếu bạn tin đội này. Chọn “Phản đối” nếu muốn đội khác. Đa số quyết định kết quả.',
+    voteWait: 'Phiếu của bạn đã được ghi nhận. Đợi những người còn lại bỏ phiếu.',
+    missionGood:
+      'Bạn thuộc phe Thiện và chỉ có thể chọn “Thành công”. Thẻ của bạn là bí mật: những người khác chỉ thấy kết quả chung của nhiệm vụ.',
+    missionEvil:
+      'Bạn có thể chọn “Thành công” hoặc “Thất bại”. Thất bại giúp phe Ác nhưng có thể khiến các thành viên nhiệm vụ bị nghi ngờ.',
+    missionWait: 'Đợi các thành viên nhiệm vụ chọn thẻ bí mật. Hiện bạn không cần hành động.',
+    resultSuccess:
+      'Nhiệm vụ vừa rồi thành công. Điều đó không chứng minh mọi thành viên đều thuộc phe Thiện: phe Ác cũng có thể chọn “Thành công”. Đội trưởng tiếp theo đang chọn đội.',
+    resultFail:
+      'Nhiệm vụ vừa rồi thất bại: có ít nhất một thành viên phe Ác. So sánh đội này với các nhiệm vụ trước; kết quả không chỉ ra người cụ thể.',
+    assassin:
+      'Phe Thiện đã hoàn thành ba nhiệm vụ, nhưng phe Ác còn cơ hội cuối. Chọn người bạn cho là Merlin rồi xác nhận.',
+    assassinWait:
+      'Sát thủ đang tìm Merlin. Ba nhiệm vụ thành công chưa bảo đảm phe Thiện thắng. Hãy đợi lựa chọn cuối cùng.',
+    end: 'Ván chơi đã kết thúc. Bàn chơi hiển thị kết quả và lý do. Giờ bạn có thể đối chiếu vai trò đã lộ với lời nói, phiếu bầu và nhiệm vụ của người chơi.',
+  },
   en: {
     label: 'Beginner tip',
     expand: 'Expand tip',

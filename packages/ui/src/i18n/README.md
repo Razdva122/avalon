@@ -10,6 +10,7 @@
 | `ru`           | `langs/ru`, `ru`        | `/ru/`            |
 | `es`           | `langs/es`, `es`        | `/es/`            |
 | `pt`           | `langs/pt`, `pt`        | `/pt/`            |
+| `vi`           | `langs/vi`, `vi`        | `/vi/`            |
 | `zh-CN`        | `langs/zh_CN`, `zh_CN`  | `/zh-cn/`         |
 | `zh-TW`        | `langs/zh_TW`, `zh_TW`  | `/zh-tw/`         |
 
@@ -20,7 +21,7 @@ password recovery are combined at generation time.
 
 ## Editing and generation
 
-1. Add the key to the relevant source module in all six languages.
+1. Add the key to the relevant source module in all seven languages.
 2. Keep interpolation names and the nesting of keys consistent.
 3. Regenerate dictionaries through serve/build or run from the repository root:
 
@@ -32,7 +33,7 @@ password recovery are combined at generation time.
    `npm run build:ui` to verify localized prerendering and navigation.
 
 `src/i18n/generated/*.json` is generated and ignored by Git. Do not edit it.
-The browser loads the chosen language and English fallback rather than all six
+The browser loads the chosen language and English fallback rather than all seven
 dictionaries. The locale loader prevents an old request from replacing a newer selection.
 
 ## In components

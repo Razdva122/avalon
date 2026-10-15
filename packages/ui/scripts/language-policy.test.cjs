@@ -68,6 +68,20 @@ test('browser preference order and regional language codes are respected', () =>
     assert.equal(preferredLanguage(null, browser), expected);
 });
 
+test('Vietnamese public pages keep their language and shared rooms use the recipient preference', () => {
+  for (const code of ['vi', 'vi-VN', 'vi_VN', 'VI-vn']) {
+    assert.equal(preferredLanguage(null, [code, 'en']), 'vi');
+  }
+  assert.equal(resolve('/vi/wiki/rules/', saved('en'), ['ru']), 'vi');
+  assert.equal(resolve('/vi/room/Game-ID/', saved('vi'), ['en']), 'vi');
+  assert.equal(basePath('/vi/wiki/rules/'), '/wiki/rules/');
+  assert.equal(localizedPath('/vi/wiki/rules/', 'en'), '/wiki/rules/');
+  assert.equal(
+    neutralRoomUrl('https://avalon-game.com/vi/room/Game-ID/?invite=abc#chat'),
+    'https://avalon-game.com/room/Game-ID/?invite=abc#chat',
+  );
+});
+
 test('Chinese script variants and regions choose the appropriate translation', () => {
   for (const code of ['zh-TW', 'zh-HK', 'zh-MO', 'zh-Hant', 'zh-Hant-CN']) {
     assert.equal(preferredLanguage(null, [code]), 'zh-TW');

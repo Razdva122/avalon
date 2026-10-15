@@ -1,4 +1,9 @@
 module.exports.profile = {
+  vi: {
+    title: 'Avalon: The Resistance | Hồ sơ và cài đặt',
+    description: 'Hồ sơ và cài đặt tài khoản chơi The Resistance: Avalon.',
+    keywords: ['Hồ sơ', 'Cài đặt', 'Tài khoản'],
+  },
   pt: {
     title: 'Avalon: The Resistance | Perfil e Configurações',
     description: "Perfil e configurações para o perfil do jogo em 'Avalon: The Resistance'",

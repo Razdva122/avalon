@@ -2,6 +2,25 @@ import type { TLanguage } from '@/i18n/interface';
 import type { Dictionary } from '@avalon/types';
 
 export const lady: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoIntro:
+      '{ladyOfLake} là bản mở rộng tùy chọn của Avalon để bí mật kiểm tra phe hiển thị của một người chơi. Đây là vật đánh dấu được chuyển giữa người chơi, không phải vai nhân vật. Các quy tắc này mô tả cách chơi trên trang web.',
+    seoRule1:
+      'Người giữ đầu tiên là người ngồi bên phải Đội trưởng đầu tiên. Việc kiểm tra diễn ra trước khi chọn Đội cho Nhiệm vụ 3, 4 và 5 nếu ván chơi đến đó; Đội bị bác bỏ không tạo thêm lượt kiểm tra.',
+    seoRule2:
+      'Chọn một người khác chưa từng giữ vật đánh dấu này. Chỉ người giữ nhận được kết quả kiểm tra: Thiện hoặc Ác, không phải nhân vật cụ thể. Thông báo một kết quả cho mọi người, rồi chuyển vật đánh dấu cho người bị kiểm tra.',
+    seoRule3:
+      'Bạn không thể kiểm tra chính mình hoặc bất kỳ người giữ nào trước đó, kể cả người giữ đầu tiên. Người bị kiểm tra trở thành người giữ tiếp theo; điều này không có nghĩa là họ đáng tin.',
+    seoLimit1:
+      'Có thể nói dối về kết quả kiểm tra không? Có. Kết quả riêng tư và lời tuyên bố công khai của người giữ là hai điều khác nhau. Hãy đối chiếu lời nói với phiếu bầu và kết quả Nhiệm vụ.',
+    seoLimit2:
+      'Vật đánh dấu có tiết lộ Mordred không? {mordred} hiện là Ác dù bị ẩn khỏi Merlin. {trickster} hiện là Thiện và {troublemaker} hiện là Ác. Khác với {ladyOfSea}, bản mở rộng này không nêu tên vai phe Ác.',
+    seoScenario1:
+      'Sau Nhiệm vụ 2, Alice kiểm tra Bob và chuyển vật đánh dấu cho anh ấy. Trước Nhiệm vụ 4, Bob phải chọn người chưa từng giữ nó; anh ấy không thể kiểm tra lại Alice.',
+    seoScenario2:
+      'Kết quả Thiện không chứng minh một người là {merlin}: nhiều vai phe Thiện có kết quả đó, và {trickster} cũng hiện là Thiện.',
+    seoHeading: 'Tiên nữ hồ trong Avalon: luật chơi và kiểm tra phe',
+  },
   en: {
     seoIntro:
       "The {ladyOfLake} is an optional Avalon expansion for privately checking a player's displayed loyalty. It is a token passed between players, not a character role. These rules describe play on this site.",

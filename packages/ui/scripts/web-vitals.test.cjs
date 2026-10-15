@@ -5,10 +5,13 @@ const { publicPage, targetCategory, createVitalsReporter } = require('../src/hel
 
 test('only known public pages are eligible; private paths and unknown slugs cannot become analytics dimensions', () => {
   assert.deepEqual(publicPage('/zh-tw/'), { path: '/zh-tw/', route: 'lobby', locale: 'zh-tw' });
+  assert.deepEqual(publicPage('/vi/wiki/rules/'), { path: '/vi/wiki/rules/', route: 'rules', locale: 'vi' });
   assert.deepEqual(publicPage('/wiki/roles/merlin/'), { path: '/wiki/roles/merlin/', route: 'role', locale: 'en' });
   for (const path of [
     '/room/secret/',
     '/ru/profile/',
+    '/vi/room/secret/',
+    '/vi/profile/',
     '/password-recovery/',
     '/stats/user/alice/',
     '/wiki/roles/alice@example.com/',

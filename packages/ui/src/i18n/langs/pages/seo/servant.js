@@ -1,4 +1,10 @@
 module.exports.servant = {
+  vi: {
+    title: 'Người hầu trung thành của Arthur trong Avalon: luật và chiến thuật',
+    description:
+      'Người hầu trung thành của Arthur làm gì trong Avalon? Tìm hiểu thông tin ban đầu của vai Thiện, luật chỉ được chọn Thành công và cách giúp bảo vệ Merlin.',
+    keywords: ['Người hầu', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Servo Leal de Arthur em Avalon: regras e estratégia',
     description:

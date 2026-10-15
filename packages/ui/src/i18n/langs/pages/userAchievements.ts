@@ -2,6 +2,14 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const userAchievements: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    title: 'Thành tựu người dùng',
+    description: 'Theo dõi thành tựu và tiến độ của bạn trong Avalon Game',
+    openAchievements: 'Thành tựu công khai',
+    hiddenAchievements: 'Thành tựu ẩn',
+    summary: 'Tổng quan thành tựu',
+    completed: 'Đã hoàn thành',
+  },
   en: {
     title: 'User Achievements',
     description: 'Track your achievements and progress in Avalon Game',

@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const { localizedPath } = require('../src/router/paths');
 
 const origin = process.env.SEO_BASE_URL || 'http://127.0.0.1:18080';
-const languages = ['en', 'ru', 'zh-tw', 'zh-cn', 'es', 'pt'];
+const languages = ['en', 'ru', 'zh-tw', 'zh-cn', 'es', 'pt', 'vi'];
 const guidePaths = [
   '/guides/social-deduction-games-online/',
   '/guides/games-like-secret-hitler/',
@@ -24,7 +24,7 @@ const aliases = {
 async function checkCrawlerContent() {
   // User-Agent probes detect simple bot blocking, not verified crawler IP policies.
   const agents = ['Googlebot', 'YandexBot', 'OAI-SearchBot', 'PerplexityBot'];
-  for (const language of ['en', 'ru']) {
+  for (const language of ['en', 'ru', 'vi']) {
     for (const route of [
       '/',
       '/wiki/rules/',

@@ -1,4 +1,10 @@
 module.exports.lady = {
+  vi: {
+    title: 'Tiên nữ hồ trong Avalon: luật và kiểm tra phe',
+    description:
+      'Khi nào dùng Tiên nữ hồ trong Avalon, ai nhận thẻ, có thể nói dối hay không và Mordred, Kẻ lừa lọc, Kẻ gây rối xuất hiện thế nào khi bị kiểm tra.',
+    keywords: ['Tiên nữ hồ trong Avalon', 'Luật chơi', 'Kiểm tra phe'],
+  },
   pt: {
     title: 'Dama do Lago em Avalon: regras e lealdade',
     description:

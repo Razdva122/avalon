@@ -1,6 +1,7 @@
 // SEO metadata stays small and separate from lazy-loaded article bodies.
 const locales = {
   en: require('./en'),
+  vi: require('./vi'),
   ru: require('./ru'),
   es: require('./es'),
   pt: require('./pt'),

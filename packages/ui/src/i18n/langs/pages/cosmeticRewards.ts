@@ -1,4 +1,25 @@
 export const cosmeticRewards = {
+  vi: {
+    chooseAvatar: 'Chọn ảnh đại diện',
+    inFavorites: 'Đã yêu thích',
+    favoriteLimit: 'Cả sáu vị trí đã đầy. Xóa một nhãn dán khỏi mục yêu thích để thêm nhãn khác.',
+    removeFavorite: 'Xóa khỏi mục yêu thích',
+    unlockedHint: 'Nhãn dán của bạn đã sẵn sàng. Thêm vào mục yêu thích để dùng nhanh trong phòng.',
+    received: 'Phần thưởng đã nhận',
+    earnedAchievements: 'Thành tựu: {count}',
+    earnedStickers: 'Nhãn dán: {count}',
+    earnedAvatars: 'Ảnh đại diện: {count}',
+    futureRewards: 'Phần thưởng khi hoàn thành thành tựu này',
+    viewAchievement: 'Xem thành tựu và tiến độ',
+    collectionHint:
+      'Mở khóa nhãn dán bằng cách chơi và hoàn thành thành tựu. Gửi chúng trong phòng bằng nút nhãn dán bên cạnh trò chuyện.',
+    favoriteHint:
+      'Chọn tối đa sáu nhãn dán để gửi nhanh trong phòng. Nhấn vào nhãn dán trong bảng để gửi. Dùng các mũi tên để đổi thứ tự.',
+    boardHint:
+      'Nhãn dán đã gửi được lưu trong trò chuyện và xuất hiện cạnh người chơi trên bàn trong bốn giây. Công tắc này chỉ ẩn phản ứng trên bàn đối với bạn.',
+    secretCondition: 'Đây là thành tựu bí mật. Điều kiện sẽ được tiết lộ khi bạn mở khóa nó.',
+    collectionNav: 'Nhãn dán của tôi',
+  },
   en: {
     chooseAvatar: 'Choose avatar',
     inFavorites: 'In favorites',

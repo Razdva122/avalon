@@ -2,6 +2,25 @@ import type { TLanguage } from '@/i18n/interface';
 import type { Dictionary } from '@avalon/types';
 
 export const ladySea: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoIntro:
+      '{ladyOfSea} là lựa chọn thay thế cho {ladyOfLake} trên trang web này. Nó cung cấp chi tiết hơn về người phe Ác: vai phe Ác hiển thị thay vì chỉ kết quả phe Ác.',
+    seoRule1:
+      'Người ngồi bên phải Đội trưởng đầu tiên bắt đầu giữ vật đánh dấu. Dùng nó trước khi chọn Đội cho Nhiệm vụ 3, 4 và 5 nếu ván chơi đến đó, không có lượt kiểm tra thêm sau khi một Đội bị bác bỏ.',
+    seoRule2:
+      'Chọn một người khác chưa từng giữ vật đánh dấu này. Đọc kết quả riêng tư, thông báo Thiện hoặc một vai phe Ác, rồi chuyển vật đánh dấu cho người bị kiểm tra. Không được chọn chính mình hay những người từng giữ nó.',
+    seoRule3:
+      'Người thường thuộc phe Thiện sẽ hiện là Thiện, không nêu vai cụ thể. Người thường thuộc phe Ác sẽ lộ vai. Lời tuyên bố công khai có thể sai; đó không phải kết quả riêng tư mà mọi người đều có thể xác minh.',
+    seoLimit1:
+      'Tiên nữ biển có tiết lộ mọi vai không? Không. {trickster} hiện là Thiện. {troublemaker} thuộc phe Thiện nhưng hiện thành một vai phe Ác được chọn trong ván, nên kết quả vai phe Ác không phải lúc nào cũng chính xác.',
+    seoLimit2:
+      'Có thể bật cả hai Tiên nữ không? Cài đặt phòng cho phép chọn {ladyOfSea} hoặc {ladyOfLake}. Hãy chọn một; bản Biển bổ sung thông tin về vai nhưng vẫn giữ các giới hạn kiểm tra của vật đánh dấu.',
+    seoScenario1:
+      'Kiểm tra {mordred} sẽ tiết lộ Mordred, dù Merlin không thấy vai này lúc bắt đầu. Người giữ vẫn có thể công bố kết quả khác.',
+    seoScenario2:
+      'Kiểm tra {merlin} hiện là Thiện, không phải Merlin. Đừng coi vật đánh dấu Biển là cách nhận diện mọi nhân vật phe Thiện.',
+    seoHeading: 'Tiên nữ biển trong Avalon: luật chơi và các vai được tiết lộ',
+  },
   en: {
     seoIntro:
       "The {ladyOfSea} is this site's alternative to {ladyOfLake}. It gives more detail about evil players: a visible evil role instead of only an evil loyalty result.",

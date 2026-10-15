@@ -77,8 +77,24 @@ app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, '../dist/index.
     inputs = await page.$$('.recovery-card input[type=password]');
     assert.equal(inputs.length, 2);
     assert.deepEqual(errors, []);
+
+    const vietnamese = await browser.newPage();
+    await vietnamese.setRequestInterception(true);
+    vietnamese.on('request', (req) => (req.url().startsWith(origin) ? req.continue() : req.abort()));
+    await vietnamese.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'languages', { get: () => ['vi-VN', 'vi'] });
+    });
+    await vietnamese.goto(`${origin}/password-recovery/`, { waitUntil: 'networkidle0' });
+    await vietnamese.waitForSelector('.recovery-card input[type=email]');
+    assert.equal(await vietnamese.title(), 'Khôi phục tài khoản — Avalon');
+    assert.equal(await vietnamese.$eval('html', (html) => html.lang), 'vi');
+    assert.equal(await vietnamese.$eval('.recovery-card h1', (title) => title.textContent), 'Khôi phục tài khoản');
+    await vietnamese.type('.recovery-card input[type=email]', 'player@example.com');
+    await vietnamese.click('.recovery-card button[type=submit]');
+    await vietnamese.waitForSelector('.recovery-card .v-alert[role=status]');
+    assert.equal(forgotBody.language, 'vi');
     console.log(
-      'Password recovery browser checks passed: mobile request, same-tab link, direct link, confirmation and reset.',
+      'Password recovery browser checks passed: mobile request, same-tab link, direct link, confirmation, reset and Vietnamese flow.',
     );
   } finally {
     await browser?.close();

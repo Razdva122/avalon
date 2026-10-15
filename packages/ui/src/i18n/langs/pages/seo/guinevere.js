@@ -1,4 +1,10 @@
 module.exports.guinevere = {
+  vi: {
+    title: 'Guinevere trong Avalon: Lancelot và Ám sát',
+    description:
+      'Guinevere biết gì trong Avalon? Tìm hiểu cách cô nhìn thấy hai Lancelot, vì sao phe của họ không chắc chắn và cách tránh bị Ám sát trên nền tảng này.',
+    keywords: ['Guinevere', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Guinevere em Avalon: Lancelots e assassinato',
     description:

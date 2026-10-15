@@ -2,6 +2,28 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const merlinPure: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoHeading: 'Merlin thuần khiết trong Avalon: các vai nhìn thấy và ngoại lệ',
+    seoTeam: 'Thiện. Giống {merlin}, bạn phải giúp phe Thiện thắng và sống sót qua pha Ám sát cuối cùng.',
+    seoAbility:
+      '{merlinPure} thấy vai chính xác của những người phe Ác mà mình nhìn thấy, thay vì chỉ thấy phe Ác. Đây là biến thể Merlin của nền tảng.',
+    seoLimit:
+      'Merlin thuần khiết có thấy mọi người phe Ác không? Không. {mordred} và {wraith} vẫn ẩn. Thông tin chính xác hơn không có nghĩa người không được đánh dấu chắc chắn thuộc phe Thiện.',
+    seoScenario1:
+      'Thấy vai {morgana} có thể giúp bạn hiểu cách cô ấy cố đánh lừa {percival}. Đừng công khai sự chắc chắn từ thông tin riêng này.',
+    seoScenario2:
+      'Nếu Đội tưởng an toàn lại thất bại, hãy cân nhắc các vai ẩn trước khi buộc tội người bạn đã biết thuộc phe Thiện. Giải thích suy luận bằng lịch sử Nhiệm vụ.',
+    generalTipsTitle: 'Mẹo chung:',
+    tipDiscretionTitle: 'Hết sức kín đáo:',
+    tipDiscretionText:
+      'Hiểu biết sâu rộng của bạn vừa là món quà vừa là gánh nặng. Hãy cực kỳ thận trọng khi chia sẻ thông tin để tránh lộ danh tính.',
+    tipNuancedHintsTitle: 'Dẫn dắt bằng gợi ý tinh tế:',
+    tipNuancedHintsText:
+      'Bạn phải giỏi gợi ý cho đồng đội đến gần sự thật mà không nói thẳng, vì việc bị nhận diện càng nguy hiểm với bạn.',
+    tipAvoidAccusationsTitle: 'Tránh buộc tội trực tiếp ngay lập tức:',
+    tipAvoidAccusationsText:
+      'Với hiểu biết toàn diện của mình, chỉ ra các vai phe Ác quá chính xác có thể nhanh chóng khiến bạn bị nhận ra là {merlinPure}.',
+  },
   en: {
     seoHeading: 'Merlin Pure in Avalon: Visible Roles & Exceptions',
     seoTeam: 'Good. Like {merlin}, you must help good win while surviving the final assassination.',

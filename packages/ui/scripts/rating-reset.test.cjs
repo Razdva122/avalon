@@ -56,6 +56,7 @@ test('profile offers every supported language even when only English and Russian
     { value: 'zh-CN', title: '简体中文' },
     { value: 'es', title: 'Español' },
     { value: 'pt', title: 'Português' },
+    { value: 'vi', title: 'Tiếng Việt' },
   ]);
 });
 

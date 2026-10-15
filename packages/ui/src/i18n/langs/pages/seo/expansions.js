@@ -1,4 +1,10 @@
 module.exports.expansions = {
+  vi: {
+    title: 'Bản mở rộng Avalon: Tiên nữ, Excalibur và Thẻ âm mưu',
+    description:
+      'So sánh bản mở rộng Avalon và tìm hiểu luật: Tiên nữ hồ, Tiên nữ biển, Excalibur và Thẻ âm mưu, kèm liên kết đến từng mô-đun chơi trực tuyến.',
+    keywords: ['Bản mở rộng', 'Nội dung bổ sung', 'Mô-đun', 'Luật chơi'],
+  },
   pt: {
     title: 'Expansões de Avalon: Damas, Excalibur e Cartas de Enredo',
     description:

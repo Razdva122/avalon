@@ -2,6 +2,51 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const morgana: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    generalInformation: 'Thông tin chung: ',
+    playingAsMorgana:
+      'Chơi {morgana} xoay quanh việc đánh lừa, đặc biệt là tỏ ra như {merlin} để khiến phe Thiện bối rối. Bạn nên đánh lạc hướng {percival} qua hành động và cả việc theo dõi kỹ cách {merlin} có thể đang dẫn dắt phe Thiện. Giả dạng Merlin có thể đưa {percival} đi sai hướng và mang lại lợi thế cho phe Ác.',
+    generalTips: 'Mẹo chung: ',
+    masterArtOfDeceptionTitle: 'Làm chủ nghệ thuật đánh lừa: ',
+    masterArtOfDeceptionDescription:
+      'Dùng hành động và lời nói để bắt chước vai {merlin}, dẫn người phe Thiện xa sự thật.',
+    createConfusionTitle: 'Gây bối rối trong phe Thiện: ',
+    createConfusionDescription: 'Thông tin sai lệch có tính toán có thể gieo nghi ngờ và cản trở họ quyết định.',
+    coordinateEvilPlayersTitle: 'Kín đáo phối hợp với phe Ác: ',
+    coordinateEvilPlayersDescription: 'Hợp tác với đồng đội phe Ác, nhưng cẩn thận để không khơi dậy nghi ngờ.',
+    stayComposedTitle: 'Giữ bình tĩnh: ',
+    stayComposedDescription:
+      'Dù bị nghi ngờ, thái độ điềm tĩnh có thể khiến người khác bớt tin rằng họ đã nhận diện đúng bạn.',
+    adaptStrategyTitle: 'Điều chỉnh chiến thuật: ',
+    adaptStrategyDescription: 'Theo sát diễn biến và sẵn sàng đổi chiến thuật để phe Thiện tiếp tục phải phỏng đoán.',
+    strategicTips: 'Mẹo chiến thuật: ',
+    emphasizePlausibleDeniabilityTitle: 'Giữ khả năng giải thích hợp lý: ',
+    emphasizePlausibleDeniabilityDescription:
+      'Đưa ra lập luận có lợi cho mình mà không cam kết quá mạnh với hướng đi cụ thể có thể làm lộ bạn.',
+    divertAttentionTitle: 'Khéo léo chuyển sự chú ý: ',
+    divertAttentionDescription:
+      'Nếu thấy mình đang trở thành tâm điểm, hãy khéo chuyển cuộc trò chuyện hoặc nghi ngờ sang hướng khác.',
+    imitateMerlinsConcernTitle: 'Bắt chước sự quan tâm của Merlin: ',
+    imitateMerlinsConcernDescription:
+      'Tỏ ra quan tâm đến thành công của phe Thiện trong khi kín đáo dẫn họ tới thất bại.',
+    questionOthersTitle: 'Đặt câu hỏi cho người khác: ',
+    questionOthersDescription:
+      'Đặt câu hỏi có tính toán để người khác tiết lộ thêm về vai và chiến thuật, rồi dùng thông tin đó làm lợi thế.',
+    fakeTrustworthinessTitle: 'Tạo vẻ đáng tin: ',
+    fakeTrustworthinessDescription:
+      'Xây dựng vỏ bọc đáng tin giúp những đề xuất đánh lừa của bạn có sức nặng và dễ được làm theo hơn.',
+    thrivingAsMorgana:
+      'Chơi tốt {morgana} đòi hỏi cân bằng giữa quyết đoán và tinh tế. Khả năng điều hướng câu chuyện và tác động cả người phe Ác lẫn Thiện ảnh hưởng lớn đến cơ hội thắng của Đội. Hãy đón nhận thử thách và tận hưởng việc xoay xở trong những vùng tối của Avalon.',
+    seoTeam: 'Ác. Giúp Nhiệm vụ thất bại và giữ cơ hội cuối cùng để Ám sát {merlin}.',
+    seoAbility:
+      'Với {percival}, {morgana} và {merlin} hiện là hai ứng viên không thể phân biệt. Trong thiết lập cổ điển, Morgana biết những người phe Ác có thể nhìn thấy, trừ {oberon}.',
+    seoLimit:
+      '{merlin} vẫn thấy Morgana là Ác. Morgana không biết ai là Merlin hoặc Percival và không có thông tin của Merlin chỉ vì được hiện là ứng viên.',
+    seoScenario1:
+      'Nếu cố nói như Merlin, hãy đưa ra đề xuất phù hợp với thảo luận công khai. Tuyên bố biết hoàn hảo mọi thứ hoặc công khai nhận diện đồng minh phe Ác có thể phá vỏ bọc.',
+    seoScenario2:
+      'Nếu Percival làm theo Đội bạn gợi ý, hãy cân nhắc giữa một lá Thất bại và việc giữ uy tín. Lá Thành công có thể duy trì vỏ bọc, nhưng cũng tăng số Nhiệm vụ thành công của phe Thiện.',
+  },
   en: {
     generalInformation: 'General Information: ',
     playingAsMorgana:

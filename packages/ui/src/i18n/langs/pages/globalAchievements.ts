@@ -2,6 +2,15 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const globalAchievements: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    title: 'Thành tựu toàn cầu',
+    description: 'Xem thống kê thành tựu toàn cầu trong Avalon Game',
+    openAchievements: 'Thành tựu công khai',
+    hiddenAchievements: 'Thành tựu ẩn',
+    globalSummary: 'Thống kê thành tựu toàn cầu',
+    totalUsers: 'Tổng số người chơi',
+    globalCompletion: '{percentage}% người chơi đã mở khóa thành tựu này',
+  },
   en: {
     title: 'Global Achievements',
     description: 'View global achievement statistics in Avalon Game',

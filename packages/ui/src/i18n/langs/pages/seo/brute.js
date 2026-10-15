@@ -1,4 +1,10 @@
 module.exports.brute = {
+  vi: {
+    title: 'Kẻ bạo lực (Brute) trong Avalon: luật Nhiệm vụ và chiến thuật',
+    description:
+      'Kẻ bạo lực có thể phá hỏng mọi Nhiệm vụ trong Avalon không? Tìm hiểu giới hạn ở ba Nhiệm vụ đầu, thẻ Thành công về sau và sự khác biệt với Kẻ điên.',
+    keywords: ['Kẻ bạo lực', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Bruto em Avalon: missões, regras e estratégia',
     description:

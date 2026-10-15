@@ -88,6 +88,7 @@ test('all translated guides render complete articles with locale-preserving play
     ['ru', '/ru'],
     ['es', '/es'],
     ['pt', '/pt'],
+    ['vi', '/vi'],
     ['zh-CN', '/zh-cn'],
     ['zh-TW', '/zh-tw'],
   ];

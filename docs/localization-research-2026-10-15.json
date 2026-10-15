@@ -1,0 +1,4088 @@
+{
+  "collectionDate": "2026-10-15",
+  "recommendation": {
+    "primaryLanguage": "vi",
+    "basis": "Largest observed unsupported browser-language audience in both 28 and 90 day GA4 periods. Not a claim of largest SEO market or exact number of registered players.",
+    "audienceAlternative": "ko",
+    "seoAlternative": "pl"
+  },
+  "ga4": {
+    "collectionDate": "2026-10-15",
+    "source": "Google Analytics 4 rendered demographic report, directly observed by root agent",
+    "accountId": "73364488",
+    "propertyId": "430786828",
+    "propertyName": "https://avalon-game.com/",
+    "dimension": "Language (browser language)",
+    "metricsNotes": [
+      "Active users are the GA metric, not registered accounts, native speakers or confirmed game participants.",
+      "Browser language is a proxy for localization opportunity. English browser settings can conceal other spoken languages.",
+      "Do not sum nested 28/90 day windows or language rows as unique humans; GA client identities and changing browser language can affect deduplication.",
+      "Engagement is accumulated per active user for the selected period; it is not mean session length or proof of a completed game.",
+      "A missing language row is not a measured zero for all speakers."
+    ],
+    "period28": {
+      "start": "2026-09-17",
+      "end": "2026-10-14",
+      "days": 28,
+      "sourceUrl": "https://analytics.google.com/analytics/web/#/a73364488p430786828/reports/explorer?params=_u..nav%3Dmaui%26_r.explorerCard..seldim%3D%5B%22language%22%5D%26_r.explorerCard..rowsPerPage%3D50%26_u.dateOption%3Dlast28Days&ruid=user-demographics-detail,user,demographics&collectionId=user&r=user-demographics-detail",
+      "totals": {
+        "activeUsers": 9754,
+        "newUsers": 9575,
+        "engagedSessions": 7039,
+        "eventCount": 133749
+      },
+      "rowCount": 38,
+      "rows": [
+        {
+          "language": "Vietnamese",
+          "activeUsers": 71,
+          "newUsers": 66,
+          "engagedSessions": 106,
+          "engagementRate": "62.35%",
+          "engagedSessionsPerActiveUser": "1.49",
+          "averageEngagementPerActiveUser": "36m27s",
+          "eventCount": 2044
+        },
+        {
+          "language": "Ukrainian",
+          "activeUsers": 5
+        },
+        {
+          "language": "Turkish",
+          "activeUsers": 11
+        },
+        {
+          "language": "Thai",
+          "activeUsers": 20,
+          "newUsers": 22,
+          "engagedSessions": 20,
+          "engagementRate": "71.43%",
+          "engagedSessionsPerActiveUser": "1.00",
+          "averageEngagementPerActiveUser": "1m28s",
+          "eventCount": 269
+        },
+        {
+          "language": "Swedish",
+          "activeUsers": 19
+        },
+        {
+          "language": "Spanish",
+          "activeUsers": 216
+        },
+        {
+          "language": "Slovenian",
+          "activeUsers": 3
+        },
+        {
+          "language": "Slovak",
+          "activeUsers": 4
+        },
+        {
+          "language": "Serbian",
+          "activeUsers": 3
+        },
+        {
+          "language": "Russian",
+          "activeUsers": 279
+        },
+        {
+          "language": "Romanian",
+          "activeUsers": 1
+        },
+        {
+          "language": "Portuguese",
+          "activeUsers": 67
+        },
+        {
+          "language": "Polish",
+          "activeUsers": 29,
+          "newUsers": 24,
+          "engagedSessions": 97,
+          "engagementRate": "76.38%",
+          "engagedSessionsPerActiveUser": "3.34",
+          "averageEngagementPerActiveUser": "1h02m",
+          "eventCount": 1389
+        },
+        {
+          "language": "Norwegian Bokmål",
+          "activeUsers": 6
+        },
+        {
+          "language": "Korean",
+          "activeUsers": 58,
+          "newUsers": 47,
+          "engagedSessions": 42,
+          "engagementRate": "60%",
+          "engagedSessionsPerActiveUser": "0.72",
+          "averageEngagementPerActiveUser": "4m16s",
+          "eventCount": 674
+        },
+        {
+          "language": "Japanese",
+          "activeUsers": 41,
+          "newUsers": 41,
+          "engagedSessions": 54,
+          "engagementRate": "65.06%",
+          "engagedSessionsPerActiveUser": "1.32",
+          "averageEngagementPerActiveUser": "9m11s",
+          "eventCount": 793
+        },
+        {
+          "language": "Italian",
+          "activeUsers": 29,
+          "newUsers": 28,
+          "engagedSessions": 22,
+          "engagementRate": "52.38%",
+          "engagedSessionsPerActiveUser": "0.76",
+          "averageEngagementPerActiveUser": "2m02s",
+          "eventCount": 384
+        },
+        {
+          "language": "Indonesian",
+          "activeUsers": 21,
+          "newUsers": 17,
+          "engagedSessions": 32,
+          "engagementRate": "76.19%",
+          "engagedSessionsPerActiveUser": "1.52",
+          "averageEngagementPerActiveUser": "43m48s",
+          "eventCount": 1024
+        },
+        {
+          "language": "Hungarian",
+          "activeUsers": 3
+        },
+        {
+          "language": "Hebrew",
+          "activeUsers": 11
+        },
+        {
+          "language": "Greek",
+          "activeUsers": 3
+        },
+        {
+          "language": "German",
+          "activeUsers": 25,
+          "newUsers": 25,
+          "engagedSessions": 18,
+          "engagementRate": "58.06%",
+          "engagedSessionsPerActiveUser": "0.72",
+          "averageEngagementPerActiveUser": "57s",
+          "eventCount": 257
+        },
+        {
+          "language": "Georgian",
+          "activeUsers": 1
+        },
+        {
+          "language": "French",
+          "activeUsers": 26,
+          "newUsers": 25,
+          "engagedSessions": 21,
+          "engagementRate": "63.64%",
+          "engagedSessionsPerActiveUser": "0.81",
+          "averageEngagementPerActiveUser": "1m44s",
+          "eventCount": 347
+        },
+        {
+          "language": "Finnish",
+          "activeUsers": 4
+        },
+        {
+          "language": "Esperanto",
+          "activeUsers": 1
+        },
+        {
+          "language": "English",
+          "activeUsers": 5902
+        },
+        {
+          "language": "Dutch",
+          "activeUsers": 9
+        },
+        {
+          "language": "Danish",
+          "activeUsers": 8
+        },
+        {
+          "language": "Czech",
+          "activeUsers": 1
+        },
+        {
+          "language": "Croatian",
+          "activeUsers": 4
+        },
+        {
+          "language": "Chinese",
+          "activeUsers": 2985
+        },
+        {
+          "language": "Catalan",
+          "activeUsers": 7
+        },
+        {
+          "language": "Bulgarian",
+          "activeUsers": 3
+        },
+        {
+          "language": "Basque",
+          "activeUsers": 1
+        },
+        {
+          "language": "Arabic",
+          "activeUsers": 3
+        },
+        {
+          "language": "Afrikaans",
+          "activeUsers": 1
+        },
+        {
+          "language": "(other)",
+          "activeUsers": 1
+        }
+      ]
+    },
+    "period90": {
+      "start": "2026-07-17",
+      "end": "2026-10-14",
+      "days": 90,
+      "sourceUrl": "https://analytics.google.com/analytics/web/#/a73364488p430786828/reports/explorer?params=_u..nav%3Dmaui%26_r.explorerCard..seldim%3D%5B%22language%22%5D%26_r.explorerCard..rowsPerPage%3D50%26_u.dateOption%3Dlast90Days&ruid=user-demographics-detail,user,demographics&collectionId=user&r=user-demographics-detail",
+      "totals": {
+        "activeUsers": 23451,
+        "newUsers": 22730,
+        "engagedSessions": 20601,
+        "eventCount": 386098
+      },
+      "rowCount": 46,
+      "rows": [
+        {
+          "language": "Vietnamese",
+          "activeUsers": 304,
+          "newUsers": 266,
+          "engagedSessions": 1987,
+          "engagementRate": "75.98%",
+          "engagedSessionsPerActiveUser": "6.54",
+          "averageEngagementPerActiveUser": "2h56m",
+          "eventCount": 52405
+        },
+        {
+          "language": "Ukrainian",
+          "activeUsers": 17
+        },
+        {
+          "language": "Turkish",
+          "activeUsers": 31
+        },
+        {
+          "language": "Thai",
+          "activeUsers": 130,
+          "newUsers": 126,
+          "engagedSessions": 103,
+          "engagementRate": "64.78%",
+          "engagedSessionsPerActiveUser": "0.79",
+          "averageEngagementPerActiveUser": "4m55s",
+          "eventCount": 1441
+        },
+        {
+          "language": "Swedish",
+          "activeUsers": 46
+        },
+        {
+          "language": "Spanish",
+          "activeUsers": 801
+        },
+        {
+          "language": "Slovenian",
+          "activeUsers": 7
+        },
+        {
+          "language": "Slovak",
+          "activeUsers": 7
+        },
+        {
+          "language": "Serbian",
+          "activeUsers": 12
+        },
+        {
+          "language": "Russian",
+          "activeUsers": 722
+        },
+        {
+          "language": "Romanian",
+          "activeUsers": 12
+        },
+        {
+          "language": "Portuguese",
+          "activeUsers": 217
+        },
+        {
+          "language": "Polish",
+          "activeUsers": 68,
+          "newUsers": 64,
+          "engagedSessions": 280,
+          "engagementRate": "75.27%",
+          "engagedSessionsPerActiveUser": "4.12",
+          "averageEngagementPerActiveUser": "1h28m",
+          "eventCount": 4726
+        },
+        {
+          "language": "Persian",
+          "activeUsers": 2
+        },
+        {
+          "language": "Norwegian Nynorsk",
+          "activeUsers": 1
+        },
+        {
+          "language": "Norwegian Bokmål",
+          "activeUsers": 12
+        },
+        {
+          "language": "Norwegian",
+          "activeUsers": 1
+        },
+        {
+          "language": "Latvian",
+          "activeUsers": 1
+        },
+        {
+          "language": "Lao",
+          "activeUsers": 1
+        },
+        {
+          "language": "Korean",
+          "activeUsers": 192,
+          "newUsers": 183,
+          "engagedSessions": 279,
+          "engagementRate": "71.36%",
+          "engagedSessionsPerActiveUser": "1.45",
+          "averageEngagementPerActiveUser": "49m10s",
+          "eventCount": 5478
+        },
+        {
+          "language": "Japanese",
+          "activeUsers": 90,
+          "newUsers": 90,
+          "engagedSessions": 90,
+          "engagementRate": "61.64%",
+          "engagedSessionsPerActiveUser": "1.00",
+          "averageEngagementPerActiveUser": "7m09s",
+          "eventCount": 1288
+        },
+        {
+          "language": "Italian",
+          "activeUsers": 113,
+          "newUsers": 109,
+          "engagedSessions": 93,
+          "engagementRate": "56.71%",
+          "engagedSessionsPerActiveUser": "0.82",
+          "averageEngagementPerActiveUser": "3m48s",
+          "eventCount": 1617
+        },
+        {
+          "language": "Indonesian",
+          "activeUsers": 57,
+          "newUsers": 53,
+          "engagedSessions": 56,
+          "engagementRate": "63.64%",
+          "engagedSessionsPerActiveUser": "0.98",
+          "averageEngagementPerActiveUser": "17m04s",
+          "eventCount": 1365
+        },
+        {
+          "language": "Hungarian",
+          "activeUsers": 20
+        },
+        {
+          "language": "Hebrew",
+          "activeUsers": 18
+        },
+        {
+          "language": "Greek",
+          "activeUsers": 17
+        },
+        {
+          "language": "German",
+          "activeUsers": 88,
+          "newUsers": 85,
+          "engagedSessions": 80,
+          "engagementRate": "51.28%",
+          "engagedSessionsPerActiveUser": "0.91",
+          "averageEngagementPerActiveUser": "5m06s",
+          "eventCount": 1336
+        },
+        {
+          "language": "Georgian",
+          "activeUsers": 1
+        },
+        {
+          "language": "French",
+          "activeUsers": 104,
+          "newUsers": 102,
+          "engagedSessions": 143,
+          "engagementRate": "65.9%",
+          "engagedSessionsPerActiveUser": "1.38",
+          "averageEngagementPerActiveUser": "10m23s",
+          "eventCount": 2297
+        },
+        {
+          "language": "Finnish",
+          "activeUsers": 9
+        },
+        {
+          "language": "Esperanto",
+          "activeUsers": 1
+        },
+        {
+          "language": "English",
+          "activeUsers": 13134
+        },
+        {
+          "language": "Dutch",
+          "activeUsers": 28
+        },
+        {
+          "language": "Danish",
+          "activeUsers": 26
+        },
+        {
+          "language": "Czech",
+          "activeUsers": 7
+        },
+        {
+          "language": "Croatian",
+          "activeUsers": 10
+        },
+        {
+          "language": "Chinese",
+          "activeUsers": 6997
+        },
+        {
+          "language": "Catalan",
+          "activeUsers": 18
+        },
+        {
+          "language": "Bulgarian",
+          "activeUsers": 6
+        },
+        {
+          "language": "Bengali",
+          "activeUsers": 1
+        },
+        {
+          "language": "Belarusian",
+          "activeUsers": 1
+        },
+        {
+          "language": "Basque",
+          "activeUsers": 1
+        },
+        {
+          "language": "Azerbaijani",
+          "activeUsers": 1
+        },
+        {
+          "language": "Arabic",
+          "activeUsers": 9
+        },
+        {
+          "language": "Afrikaans",
+          "activeUsers": 1
+        },
+        {
+          "language": "(other)",
+          "activeUsers": 3
+        }
+      ]
+    },
+    "humanGameComplete": {
+      "periodStart": "2026-09-17",
+      "periodEnd": "2026-10-14",
+      "filter": {
+        "dimension": "eventName",
+        "match": "exact",
+        "value": "human_game_complete"
+      },
+      "metric": "activeUsers in event-filtered report",
+      "totals": {
+        "activeUsers": 18,
+        "eventCount": 141
+      },
+      "rows": [
+        {
+          "language": "Japanese",
+          "activeUsers": 6,
+          "eventCount": 6
+        },
+        {
+          "language": "Chinese",
+          "activeUsers": 12,
+          "eventCount": 135
+        }
+      ],
+      "coverageLimitation": "Tracking was added in commit 71fb8a9b on 2026-10-14 16:14:12 +0500, with fixes 9f3e6b4d at 17:07:25. The 28-day date selection is not 28 days of game-event history; absent Vietnamese completions cannot establish absence of Vietnamese players during that period. Deployment time and exact first recorded event timestamp were not independently determined."
+    }
+  },
+  "gsc": {
+    "source": "Google Search Console UI official CSV export",
+    "property": "https://avalon-game.com/",
+    "search_type": "Web (text-based)",
+    "period_start": "2026-09-14",
+    "period_end": "2026-10-11",
+    "days": 28,
+    "data_freshness_ui": "Updated 9.5 hours ago",
+    "collected_date": "2026-10-15",
+    "total_clicks": 4496,
+    "total_impressions": 104256,
+    "countries_rows": 191,
+    "countries_clicks_sum": 4496,
+    "countries_impressions_sum": 104256,
+    "selected_countries": [
+      {
+        "Страна": "Таиланд",
+        "Kлики": "74",
+        "Показы": "1627",
+        "CTR": "4.55%",
+        "Позиция": "5.91"
+      },
+      {
+        "Страна": "Вьетнам",
+        "Kлики": "62",
+        "Показы": "910",
+        "CTR": "6.81%",
+        "Позиция": "6.43"
+      },
+      {
+        "Страна": "Индонезия",
+        "Kлики": "56",
+        "Показы": "1213",
+        "CTR": "4.62%",
+        "Позиция": "5.83"
+      },
+      {
+        "Страна": "Южная Корея",
+        "Kлики": "39",
+        "Показы": "527",
+        "CTR": "7.4%",
+        "Позиция": "5.47"
+      },
+      {
+        "Страна": "Япония",
+        "Kлики": "38",
+        "Показы": "825",
+        "CTR": "4.61%",
+        "Позиция": "5.35"
+      },
+      {
+        "Страна": "Италия",
+        "Kлики": "34",
+        "Показы": "656",
+        "CTR": "5.18%",
+        "Позиция": "6.25"
+      },
+      {
+        "Страна": "Германия",
+        "Kлики": "33",
+        "Показы": "1470",
+        "CTR": "2.24%",
+        "Позиция": "7.17"
+      },
+      {
+        "Страна": "Нидерланды",
+        "Kлики": "31",
+        "Показы": "877",
+        "CTR": "3.53%",
+        "Позиция": "8.89"
+      },
+      {
+        "Страна": "Польша",
+        "Kлики": "25",
+        "Показы": "638",
+        "CTR": "3.92%",
+        "Позиция": "8.32"
+      },
+      {
+        "Страна": "Франция",
+        "Kлики": "19",
+        "Показы": "588",
+        "CTR": "3.23%",
+        "Позиция": "9.12"
+      },
+      {
+        "Страна": "Украина",
+        "Kлики": "12",
+        "Показы": "409",
+        "CTR": "2.93%",
+        "Позиция": "5.8"
+      },
+      {
+        "Страна": "Турция",
+        "Kлики": "10",
+        "Показы": "372",
+        "CTR": "2.69%",
+        "Позиция": "6.47"
+      }
+    ],
+    "limitations": [
+      "Country is country of searcher, not language preference.",
+      "Clicks measure Google organic search exposure, not active players.",
+      "Last full available report ends 2026-10-11; does not contain 2026-10-12 to 2026-10-14."
+    ],
+    "dateValidation": {
+      "firstDailyRow": "2026-09-14",
+      "lastDailyRow": "2026-10-11",
+      "dailyRows": 28
+    },
+    "countryRows": [
+      {
+        "Страна": "Тайвань",
+        "Kлики": "1562",
+        "Показы": "21975",
+        "CTR": "7.11%",
+        "Позиция": "4.76"
+      },
+      {
+        "Страна": "США",
+        "Kлики": "445",
+        "Показы": "13548",
+        "CTR": "3.28%",
+        "Позиция": "7.03"
+      },
+      {
+        "Страна": "Малайзия",
+        "Kлики": "374",
+        "Показы": "6588",
+        "CTR": "5.68%",
+        "Позиция": "5.5"
+      },
+      {
+        "Страна": "Гонконг",
+        "Kлики": "149",
+        "Показы": "2740",
+        "CTR": "5.44%",
+        "Позиция": "5.44"
+      },
+      {
+        "Страна": "Канада",
+        "Kлики": "148",
+        "Показы": "4251",
+        "CTR": "3.48%",
+        "Позиция": "6.82"
+      },
+      {
+        "Страна": "Испания",
+        "Kлики": "148",
+        "Показы": "3158",
+        "CTR": "4.69%",
+        "Позиция": "5.99"
+      },
+      {
+        "Страна": "Филиппины",
+        "Kлики": "144",
+        "Показы": "3518",
+        "CTR": "4.09%",
+        "Позиция": "5.84"
+      },
+      {
+        "Страна": "Сингапур",
+        "Kлики": "118",
+        "Показы": "2926",
+        "CTR": "4.03%",
+        "Позиция": "6.93"
+      },
+      {
+        "Страна": "Великобритания",
+        "Kлики": "116",
+        "Показы": "3897",
+        "CTR": "2.98%",
+        "Позиция": "7.6"
+      },
+      {
+        "Страна": "Россия",
+        "Kлики": "109",
+        "Показы": "2313",
+        "CTR": "4.71%",
+        "Позиция": "7.21"
+      },
+      {
+        "Страна": "Австралия",
+        "Kлики": "94",
+        "Показы": "3102",
+        "CTR": "3.03%",
+        "Позиция": "7.27"
+      },
+      {
+        "Страна": "Таиланд",
+        "Kлики": "74",
+        "Показы": "1627",
+        "CTR": "4.55%",
+        "Позиция": "5.91"
+      },
+      {
+        "Страна": "Бразилия",
+        "Kлики": "71",
+        "Показы": "6136",
+        "CTR": "1.16%",
+        "Позиция": "4.82"
+      },
+      {
+        "Страна": "Индия",
+        "Kлики": "63",
+        "Показы": "2111",
+        "CTR": "2.98%",
+        "Позиция": "7.23"
+      },
+      {
+        "Страна": "Вьетнам",
+        "Kлики": "62",
+        "Показы": "910",
+        "CTR": "6.81%",
+        "Позиция": "6.43"
+      },
+      {
+        "Страна": "Индонезия",
+        "Kлики": "56",
+        "Показы": "1213",
+        "CTR": "4.62%",
+        "Позиция": "5.83"
+      },
+      {
+        "Страна": "Китай",
+        "Kлики": "52",
+        "Показы": "878",
+        "CTR": "5.92%",
+        "Позиция": "5.37"
+      },
+      {
+        "Страна": "Южная Корея",
+        "Kлики": "39",
+        "Показы": "527",
+        "CTR": "7.4%",
+        "Позиция": "5.47"
+      },
+      {
+        "Страна": "Япония",
+        "Kлики": "38",
+        "Показы": "825",
+        "CTR": "4.61%",
+        "Позиция": "5.35"
+      },
+      {
+        "Страна": "Италия",
+        "Kлики": "34",
+        "Показы": "656",
+        "CTR": "5.18%",
+        "Позиция": "6.25"
+      },
+      {
+        "Страна": "Германия",
+        "Kлики": "33",
+        "Показы": "1470",
+        "CTR": "2.24%",
+        "Позиция": "7.17"
+      },
+      {
+        "Страна": "Аргентина",
+        "Kлики": "33",
+        "Показы": "984",
+        "CTR": "3.35%",
+        "Позиция": "5.98"
+      },
+      {
+        "Страна": "Нидерланды",
+        "Kлики": "31",
+        "Показы": "877",
+        "CTR": "3.53%",
+        "Позиция": "8.89"
+      },
+      {
+        "Страна": "Мексика",
+        "Kлики": "28",
+        "Показы": "1592",
+        "CTR": "1.76%",
+        "Позиция": "6.76"
+      },
+      {
+        "Страна": "Швеция",
+        "Kлики": "28",
+        "Показы": "744",
+        "CTR": "3.76%",
+        "Позиция": "7.97"
+      },
+      {
+        "Страна": "Польша",
+        "Kлики": "25",
+        "Показы": "638",
+        "CTR": "3.92%",
+        "Позиция": "8.32"
+      },
+      {
+        "Страна": "Португалия",
+        "Kлики": "25",
+        "Показы": "635",
+        "CTR": "3.94%",
+        "Позиция": "5.46"
+      },
+      {
+        "Страна": "Сербия",
+        "Kлики": "20",
+        "Показы": "416",
+        "CTR": "4.81%",
+        "Позиция": "6.19"
+      },
+      {
+        "Страна": "Франция",
+        "Kлики": "19",
+        "Показы": "588",
+        "CTR": "3.23%",
+        "Позиция": "9.12"
+      },
+      {
+        "Страна": "Дания",
+        "Kлики": "19",
+        "Показы": "388",
+        "CTR": "4.9%",
+        "Позиция": "7.72"
+      },
+      {
+        "Страна": "Перу",
+        "Kлики": "17",
+        "Показы": "412",
+        "CTR": "4.13%",
+        "Позиция": "5.15"
+      },
+      {
+        "Страна": "Греция",
+        "Kлики": "16",
+        "Показы": "485",
+        "CTR": "3.3%",
+        "Позиция": "6.98"
+      },
+      {
+        "Страна": "Новая Зеландия",
+        "Kлики": "15",
+        "Показы": "560",
+        "CTR": "2.68%",
+        "Позиция": "7.07"
+      },
+      {
+        "Страна": "Швейцария",
+        "Kлики": "15",
+        "Показы": "462",
+        "CTR": "3.25%",
+        "Позиция": "10.5"
+      },
+      {
+        "Страна": "Колумбия",
+        "Kлики": "12",
+        "Показы": "464",
+        "CTR": "2.59%",
+        "Позиция": "5.98"
+      },
+      {
+        "Страна": "Украина",
+        "Kлики": "12",
+        "Показы": "409",
+        "CTR": "2.93%",
+        "Позиция": "5.8"
+      },
+      {
+        "Страна": "Израиль",
+        "Kлики": "12",
+        "Показы": "349",
+        "CTR": "3.44%",
+        "Позиция": "7.45"
+      },
+      {
+        "Страна": "Иран",
+        "Kлики": "12",
+        "Показы": "211",
+        "CTR": "5.69%",
+        "Позиция": "5.91"
+      },
+      {
+        "Страна": "Грузия",
+        "Kлики": "11",
+        "Показы": "442",
+        "CTR": "2.49%",
+        "Позиция": "6.38"
+      },
+      {
+        "Страна": "Турция",
+        "Kлики": "10",
+        "Показы": "372",
+        "CTR": "2.69%",
+        "Позиция": "6.47"
+      },
+      {
+        "Страна": "Болгария",
+        "Kлики": "10",
+        "Показы": "266",
+        "CTR": "3.76%",
+        "Позиция": "5.42"
+      },
+      {
+        "Страна": "Чили",
+        "Kлики": "9",
+        "Показы": "622",
+        "CTR": "1.45%",
+        "Позиция": "6.84"
+      },
+      {
+        "Страна": "Хорватия",
+        "Kлики": "9",
+        "Показы": "237",
+        "CTR": "3.8%",
+        "Позиция": "7.71"
+      },
+      {
+        "Страна": "Бельгия",
+        "Kлики": "8",
+        "Показы": "364",
+        "CTR": "2.2%",
+        "Позиция": "7.09"
+      },
+      {
+        "Страна": "Финляндия",
+        "Kлики": "8",
+        "Показы": "334",
+        "CTR": "2.4%",
+        "Позиция": "7.51"
+      },
+      {
+        "Страна": "Беларусь",
+        "Kлики": "8",
+        "Показы": "211",
+        "CTR": "3.79%",
+        "Позиция": "5.85"
+      },
+      {
+        "Страна": "Ирландия",
+        "Kлики": "8",
+        "Показы": "207",
+        "CTR": "3.86%",
+        "Позиция": "7.62"
+      },
+      {
+        "Страна": "Норвегия",
+        "Kлики": "7",
+        "Показы": "326",
+        "CTR": "2.15%",
+        "Позиция": "7.55"
+      },
+      {
+        "Страна": "Венгрия",
+        "Kлики": "7",
+        "Показы": "273",
+        "CTR": "2.56%",
+        "Позиция": "6.17"
+      },
+      {
+        "Страна": "Уругвай",
+        "Kлики": "7",
+        "Показы": "210",
+        "CTR": "3.33%",
+        "Позиция": "5.8"
+      },
+      {
+        "Страна": "Объединенные Арабские Эмираты",
+        "Kлики": "7",
+        "Показы": "198",
+        "CTR": "3.54%",
+        "Позиция": "6.63"
+      },
+      {
+        "Страна": "Австрия",
+        "Kлики": "7",
+        "Показы": "168",
+        "CTR": "4.17%",
+        "Позиция": "5.99"
+      },
+      {
+        "Страна": "Чехия",
+        "Kлики": "6",
+        "Показы": "298",
+        "CTR": "2.01%",
+        "Позиция": "10.29"
+      },
+      {
+        "Страна": "Коста-Рика",
+        "Kлики": "5",
+        "Показы": "297",
+        "CTR": "1.68%",
+        "Позиция": "7.46"
+      },
+      {
+        "Страна": "Бангладеш",
+        "Kлики": "5",
+        "Показы": "227",
+        "CTR": "2.2%",
+        "Позиция": "6.37"
+      },
+      {
+        "Страна": "Парагвай",
+        "Kлики": "5",
+        "Показы": "128",
+        "CTR": "3.91%",
+        "Позиция": "3.4"
+      },
+      {
+        "Страна": "Алжир",
+        "Kлики": "5",
+        "Показы": "55",
+        "CTR": "9.09%",
+        "Позиция": "5.8"
+      },
+      {
+        "Страна": "Венесуэла",
+        "Kлики": "4",
+        "Показы": "195",
+        "CTR": "2.05%",
+        "Позиция": "6.56"
+      },
+      {
+        "Страна": "Пакистан",
+        "Kлики": "4",
+        "Показы": "184",
+        "CTR": "2.17%",
+        "Позиция": "6.54"
+      },
+      {
+        "Страна": "Кипр",
+        "Kлики": "4",
+        "Показы": "98",
+        "CTR": "4.08%",
+        "Позиция": "5.52"
+      },
+      {
+        "Страна": "Шри-Ланка",
+        "Kлики": "4",
+        "Показы": "74",
+        "CTR": "5.41%",
+        "Позиция": "5.07"
+      },
+      {
+        "Страна": "Казахстан",
+        "Kлики": "3",
+        "Показы": "294",
+        "CTR": "1.02%",
+        "Позиция": "7.49"
+      },
+      {
+        "Страна": "Египет",
+        "Kлики": "3",
+        "Показы": "216",
+        "CTR": "1.39%",
+        "Позиция": "7.42"
+      },
+      {
+        "Страна": "Саудовская Аравия",
+        "Kлики": "3",
+        "Показы": "212",
+        "CTR": "1.42%",
+        "Позиция": "6.09"
+      },
+      {
+        "Страна": "Макау",
+        "Kлики": "3",
+        "Показы": "118",
+        "CTR": "2.54%",
+        "Позиция": "4.66"
+      },
+      {
+        "Страна": "Гватемала",
+        "Kлики": "3",
+        "Показы": "90",
+        "CTR": "3.33%",
+        "Позиция": "5.61"
+      },
+      {
+        "Страна": "Латвия",
+        "Kлики": "3",
+        "Показы": "85",
+        "CTR": "3.53%",
+        "Позиция": "6.09"
+      },
+      {
+        "Страна": "Эстония",
+        "Kлики": "3",
+        "Показы": "75",
+        "CTR": "4%",
+        "Позиция": "5.91"
+      },
+      {
+        "Страна": "Иордания",
+        "Kлики": "3",
+        "Показы": "52",
+        "CTR": "5.77%",
+        "Позиция": "6.13"
+      },
+      {
+        "Страна": "Бахрейн",
+        "Kлики": "3",
+        "Показы": "48",
+        "CTR": "6.25%",
+        "Позиция": "5.79"
+      },
+      {
+        "Страна": "Молдова",
+        "Kлики": "3",
+        "Показы": "33",
+        "CTR": "9.09%",
+        "Позиция": "5.27"
+      },
+      {
+        "Страна": "Тунис",
+        "Kлики": "3",
+        "Показы": "29",
+        "CTR": "10.34%",
+        "Позиция": "5.86"
+      },
+      {
+        "Страна": "Румыния",
+        "Kлики": "2",
+        "Показы": "224",
+        "CTR": "0.89%",
+        "Позиция": "7.06"
+      },
+      {
+        "Страна": "Словакия",
+        "Kлики": "2",
+        "Показы": "102",
+        "CTR": "1.96%",
+        "Позиция": "6.57"
+      },
+      {
+        "Страна": "Эквадор",
+        "Kлики": "2",
+        "Показы": "96",
+        "CTR": "2.08%",
+        "Позиция": "5.71"
+      },
+      {
+        "Страна": "Боливия",
+        "Kлики": "2",
+        "Показы": "88",
+        "CTR": "2.27%",
+        "Позиция": "6.07"
+      },
+      {
+        "Страна": "Босния и Герцеговина",
+        "Kлики": "2",
+        "Показы": "57",
+        "CTR": "3.51%",
+        "Позиция": "5.54"
+      },
+      {
+        "Страна": "Мьянма (Бирма)",
+        "Kлики": "2",
+        "Показы": "56",
+        "CTR": "3.57%",
+        "Позиция": "7.16"
+      },
+      {
+        "Страна": "Южная Африка",
+        "Kлики": "1",
+        "Показы": "157",
+        "CTR": "0.64%",
+        "Позиция": "6.71"
+      },
+      {
+        "Страна": "Литва",
+        "Kлики": "1",
+        "Показы": "132",
+        "CTR": "0.76%",
+        "Позиция": "7.28"
+      },
+      {
+        "Страна": "Марокко",
+        "Kлики": "1",
+        "Показы": "120",
+        "CTR": "0.83%",
+        "Позиция": "6.27"
+      },
+      {
+        "Страна": "Узбекистан",
+        "Kлики": "1",
+        "Показы": "79",
+        "CTR": "1.27%",
+        "Позиция": "6.68"
+      },
+      {
+        "Страна": "Кыргызстан",
+        "Kлики": "1",
+        "Показы": "59",
+        "CTR": "1.69%",
+        "Позиция": "8.22"
+      },
+      {
+        "Страна": "Панама",
+        "Kлики": "1",
+        "Показы": "58",
+        "CTR": "1.72%",
+        "Позиция": "5.79"
+      },
+      {
+        "Страна": "Доминиканская Республика",
+        "Kлики": "1",
+        "Показы": "56",
+        "CTR": "1.79%",
+        "Позиция": "4.55"
+      },
+      {
+        "Страна": "Черногория",
+        "Kлики": "1",
+        "Показы": "45",
+        "CTR": "2.22%",
+        "Позиция": "6.2"
+      },
+      {
+        "Страна": "Армения",
+        "Kлики": "1",
+        "Показы": "39",
+        "CTR": "2.56%",
+        "Позиция": "5.92"
+      },
+      {
+        "Страна": "Азербайджан",
+        "Kлики": "1",
+        "Показы": "37",
+        "CTR": "2.7%",
+        "Позиция": "6.59"
+      },
+      {
+        "Страна": "Сальвадор",
+        "Kлики": "1",
+        "Показы": "35",
+        "CTR": "2.86%",
+        "Позиция": "5.54"
+      },
+      {
+        "Страна": "Монголия",
+        "Kлики": "1",
+        "Показы": "33",
+        "CTR": "3.03%",
+        "Позиция": "5.55"
+      },
+      {
+        "Страна": "Туркменистан",
+        "Kлики": "1",
+        "Показы": "32",
+        "CTR": "3.12%",
+        "Позиция": "7.31"
+      },
+      {
+        "Страна": "Камбоджа",
+        "Kлики": "1",
+        "Показы": "31",
+        "CTR": "3.23%",
+        "Позиция": "6.87"
+      },
+      {
+        "Страна": "Мальта",
+        "Kлики": "1",
+        "Показы": "22",
+        "CTR": "4.55%",
+        "Позиция": "5.55"
+      },
+      {
+        "Страна": "Непал",
+        "Kлики": "1",
+        "Показы": "22",
+        "CTR": "4.55%",
+        "Позиция": "6.18"
+      },
+      {
+        "Страна": "Гондурас",
+        "Kлики": "1",
+        "Показы": "21",
+        "CTR": "4.76%",
+        "Позиция": "5.67"
+      },
+      {
+        "Страна": "Пуэрто-Рико",
+        "Kлики": "1",
+        "Показы": "20",
+        "CTR": "5%",
+        "Позиция": "7.35"
+      },
+      {
+        "Страна": "Лаос",
+        "Kлики": "1",
+        "Показы": "17",
+        "CTR": "5.88%",
+        "Позиция": "5.65"
+      },
+      {
+        "Страна": "Палестина",
+        "Kлики": "1",
+        "Показы": "14",
+        "CTR": "7.14%",
+        "Позиция": "5.57"
+      },
+      {
+        "Страна": "Уганда",
+        "Kлики": "1",
+        "Показы": "12",
+        "CTR": "8.33%",
+        "Позиция": "4.92"
+      },
+      {
+        "Страна": "Конго – Киншаса",
+        "Kлики": "1",
+        "Показы": "7",
+        "CTR": "14.29%",
+        "Позиция": "4.43"
+      },
+      {
+        "Страна": "Остров Мэн",
+        "Kлики": "1",
+        "Показы": "5",
+        "CTR": "20%",
+        "Позиция": "4.4"
+      },
+      {
+        "Страна": "Афганистан",
+        "Kлики": "1",
+        "Показы": "5",
+        "CTR": "20%",
+        "Позиция": "7.8"
+      },
+      {
+        "Страна": "Сейшелы",
+        "Kлики": "1",
+        "Показы": "2",
+        "CTR": "50%",
+        "Позиция": "6.5"
+      },
+      {
+        "Страна": "Словения",
+        "Kлики": "0",
+        "Показы": "91",
+        "CTR": "0%",
+        "Позиция": "12.57"
+      },
+      {
+        "Страна": "Ирак",
+        "Kлики": "0",
+        "Показы": "66",
+        "CTR": "0%",
+        "Позиция": "6.71"
+      },
+      {
+        "Страна": "Нигерия",
+        "Kлики": "0",
+        "Показы": "56",
+        "CTR": "0%",
+        "Позиция": "6.04"
+      },
+      {
+        "Страна": "Кувейт",
+        "Kлики": "0",
+        "Показы": "52",
+        "CTR": "0%",
+        "Позиция": "4.62"
+      },
+      {
+        "Страна": "Бруней",
+        "Kлики": "0",
+        "Показы": "42",
+        "CTR": "0%",
+        "Позиция": "5.74"
+      },
+      {
+        "Страна": "Никарагуа",
+        "Kлики": "0",
+        "Показы": "42",
+        "CTR": "0%",
+        "Позиция": "6.07"
+      },
+      {
+        "Страна": "Исландия",
+        "Kлики": "0",
+        "Показы": "41",
+        "CTR": "0%",
+        "Позиция": "7"
+      },
+      {
+        "Страна": "Кения",
+        "Kлики": "0",
+        "Показы": "36",
+        "CTR": "0%",
+        "Позиция": "8.72"
+      },
+      {
+        "Страна": "Македония",
+        "Kлики": "0",
+        "Показы": "30",
+        "CTR": "0%",
+        "Позиция": "5.93"
+      },
+      {
+        "Страна": "Куба",
+        "Kлики": "0",
+        "Показы": "29",
+        "CTR": "0%",
+        "Позиция": "6.48"
+      },
+      {
+        "Страна": "Гана",
+        "Kлики": "0",
+        "Показы": "26",
+        "CTR": "0%",
+        "Позиция": "4.27"
+      },
+      {
+        "Страна": "Эфиопия",
+        "Kлики": "0",
+        "Показы": "25",
+        "CTR": "0%",
+        "Позиция": "4.36"
+      },
+      {
+        "Страна": "Мальдивы",
+        "Kлики": "0",
+        "Показы": "25",
+        "CTR": "0%",
+        "Позиция": "6.24"
+      },
+      {
+        "Страна": "Катар",
+        "Kлики": "0",
+        "Показы": "24",
+        "CTR": "0%",
+        "Позиция": "6.08"
+      },
+      {
+        "Страна": "Люксембург",
+        "Kлики": "0",
+        "Показы": "24",
+        "CTR": "0%",
+        "Позиция": "7.25"
+      },
+      {
+        "Страна": "Ливан",
+        "Kлики": "0",
+        "Показы": "21",
+        "CTR": "0%",
+        "Позиция": "6.19"
+      },
+      {
+        "Страна": "Албания",
+        "Kлики": "0",
+        "Показы": "21",
+        "CTR": "0%",
+        "Позиция": "10.29"
+      },
+      {
+        "Страна": "Сирия",
+        "Kлики": "0",
+        "Показы": "19",
+        "CTR": "0%",
+        "Позиция": "6.58"
+      },
+      {
+        "Страна": "Оман",
+        "Kлики": "0",
+        "Показы": "14",
+        "CTR": "0%",
+        "Позиция": "6.36"
+      },
+      {
+        "Страна": "Ливия",
+        "Kлики": "0",
+        "Показы": "13",
+        "CTR": "0%",
+        "Позиция": "7.62"
+      },
+      {
+        "Страна": "Бенин",
+        "Kлики": "0",
+        "Показы": "12",
+        "CTR": "0%",
+        "Позиция": "6"
+      },
+      {
+        "Страна": "Ямайка",
+        "Kлики": "0",
+        "Показы": "12",
+        "CTR": "0%",
+        "Позиция": "7.42"
+      },
+      {
+        "Страна": "Ангола",
+        "Kлики": "0",
+        "Показы": "12",
+        "CTR": "0%",
+        "Позиция": "9.58"
+      },
+      {
+        "Страна": "Неизвестный регион",
+        "Kлики": "0",
+        "Показы": "10",
+        "CTR": "0%",
+        "Позиция": "6.5"
+      },
+      {
+        "Страна": "Кот д’Ивуар",
+        "Kлики": "0",
+        "Показы": "9",
+        "CTR": "0%",
+        "Позиция": "5.33"
+      },
+      {
+        "Страна": "Замбия",
+        "Kлики": "0",
+        "Показы": "9",
+        "CTR": "0%",
+        "Позиция": "5.67"
+      },
+      {
+        "Страна": "Мадагаскар",
+        "Kлики": "0",
+        "Показы": "9",
+        "CTR": "0%",
+        "Позиция": "5.89"
+      },
+      {
+        "Страна": "Маврикий",
+        "Kлики": "0",
+        "Показы": "9",
+        "CTR": "0%",
+        "Позиция": "7"
+      },
+      {
+        "Страна": "Камерун",
+        "Kлики": "0",
+        "Показы": "9",
+        "CTR": "0%",
+        "Позиция": "7.33"
+      },
+      {
+        "Страна": "Тринидад и Тобаго",
+        "Kлики": "0",
+        "Показы": "8",
+        "CTR": "0%",
+        "Позиция": "8.12"
+      },
+      {
+        "Страна": "Таджикистан",
+        "Kлики": "0",
+        "Показы": "8",
+        "CTR": "0%",
+        "Позиция": "10.88"
+      },
+      {
+        "Страна": "Сенегал",
+        "Kлики": "0",
+        "Показы": "7",
+        "CTR": "0%",
+        "Позиция": "11.71"
+      },
+      {
+        "Страна": "Танзания",
+        "Kлики": "0",
+        "Показы": "6",
+        "CTR": "0%",
+        "Позиция": "5.5"
+      },
+      {
+        "Страна": "Буркина-Фасо",
+        "Kлики": "0",
+        "Показы": "6",
+        "CTR": "0%",
+        "Позиция": "6.33"
+      },
+      {
+        "Страна": "Гвинея",
+        "Kлики": "0",
+        "Показы": "6",
+        "CTR": "0%",
+        "Позиция": "7"
+      },
+      {
+        "Страна": "Косово",
+        "Kлики": "0",
+        "Показы": "6",
+        "CTR": "0%",
+        "Позиция": "7.17"
+      },
+      {
+        "Страна": "Зимбабве",
+        "Kлики": "0",
+        "Показы": "5",
+        "CTR": "0%",
+        "Позиция": "5"
+      },
+      {
+        "Страна": "Западная Сахара",
+        "Kлики": "0",
+        "Показы": "5",
+        "CTR": "0%",
+        "Позиция": "6"
+      },
+      {
+        "Страна": "Гибралтар",
+        "Kлики": "0",
+        "Показы": "4",
+        "CTR": "0%",
+        "Позиция": "4.5"
+      },
+      {
+        "Страна": "Конго – Браззавиль",
+        "Kлики": "0",
+        "Показы": "4",
+        "CTR": "0%",
+        "Позиция": "5.5"
+      },
+      {
+        "Страна": "Мозамбик",
+        "Kлики": "0",
+        "Показы": "4",
+        "CTR": "0%",
+        "Позиция": "5.75"
+      },
+      {
+        "Страна": "Белиз",
+        "Kлики": "0",
+        "Показы": "4",
+        "CTR": "0%",
+        "Позиция": "8.25"
+      },
+      {
+        "Страна": "Барбадос",
+        "Kлики": "0",
+        "Показы": "4",
+        "CTR": "0%",
+        "Позиция": "10"
+      },
+      {
+        "Страна": "Сомали",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "3.67"
+      },
+      {
+        "Страна": "Андорра",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "4.67"
+      },
+      {
+        "Страна": "Фарерские острова",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "4.67"
+      },
+      {
+        "Страна": "Реюньон",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "6.33"
+      },
+      {
+        "Страна": "Руанда",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "6.33"
+      },
+      {
+        "Страна": "Малави",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "6.67"
+      },
+      {
+        "Страна": "Мали",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "7"
+      },
+      {
+        "Страна": "Сьерра-Леоне",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "7.67"
+      },
+      {
+        "Страна": "Каймановы острова",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "8.67"
+      },
+      {
+        "Страна": "Бермуды",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "9"
+      },
+      {
+        "Страна": "о. Гернси",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "9.33"
+      },
+      {
+        "Страна": "Папуа – Новая Гвинея",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "10.67"
+      },
+      {
+        "Страна": "Гаити",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "11.33"
+      },
+      {
+        "Страна": "Бутан",
+        "Kлики": "0",
+        "Показы": "3",
+        "CTR": "0%",
+        "Позиция": "13"
+      },
+      {
+        "Страна": "Йемен",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "2.5"
+      },
+      {
+        "Страна": "Фиджи",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "4"
+      },
+      {
+        "Страна": "Гренландия",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "5"
+      },
+      {
+        "Страна": "Свазиленд",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "6"
+      },
+      {
+        "Страна": "Намибия",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "6.5"
+      },
+      {
+        "Страна": "Сан-Марино",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "6.5"
+      },
+      {
+        "Страна": "Чад",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "6.5"
+      },
+      {
+        "Страна": "Ботсвана",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "7"
+      },
+      {
+        "Страна": "Гамбия",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "7.5"
+      },
+      {
+        "Страна": "Южный Судан",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "7.5"
+      },
+      {
+        "Страна": "Синт-Мартен",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "7.5"
+      },
+      {
+        "Страна": "Аруба",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "8.5"
+      },
+      {
+        "Страна": "Гайана",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "8.5"
+      },
+      {
+        "Страна": "Французская Полинезия",
+        "Kлики": "0",
+        "Показы": "2",
+        "CTR": "0%",
+        "Позиция": "11"
+      },
+      {
+        "Страна": "Кабо-Верде",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "2"
+      },
+      {
+        "Страна": "Габон",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "3"
+      },
+      {
+        "Страна": "Антигуа и Барбуда",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "4"
+      },
+      {
+        "Страна": "Доминика",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "4"
+      },
+      {
+        "Страна": "Гвинея-Биссау",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "4"
+      },
+      {
+        "Страна": "Сент-Люсия",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "4"
+      },
+      {
+        "Страна": "Суринам",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "5"
+      },
+      {
+        "Страна": "Американские Виргинские острова",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "5"
+      },
+      {
+        "Страна": "Монако",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "6"
+      },
+      {
+        "Страна": "Лихтенштейн",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "7"
+      },
+      {
+        "Страна": "Лесото",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "8"
+      },
+      {
+        "Страна": "Джибути",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "9"
+      },
+      {
+        "Страна": "острова Кука",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "10"
+      },
+      {
+        "Страна": "Палау",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "11"
+      },
+      {
+        "Страна": "Вануату",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "11"
+      },
+      {
+        "Страна": "Того",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "17"
+      },
+      {
+        "Страна": "Соломоновы острова",
+        "Kлики": "0",
+        "Показы": "1",
+        "CTR": "0%",
+        "Позиция": "18"
+      }
+    ],
+    "provenance": "Official CSV export collected before the rolling UI report later advanced; this fixed saved period is used throughout. Native Vietnamese query demand must not be inferred from country clicks."
+  },
+  "keywords": {
+    "rootSelectedObservations": {
+      "source": "Ahrefs Free Keyword Generator, observed live via browser",
+      "collection_date": "2026-10-15",
+      "selection": "Selected relevant observations from root-agent captures; not a complete export of all suggestions.",
+      "columns": ["query", "keyword_difficulty_display", "volume_raw", "updated_display"],
+      "limitations": [
+        "Ranges are copied literally, are not exact numbers, and must not be summed.",
+        "Market is the chosen Google country, not the whole language.",
+        "Head terms including avalon spiel, avalon online, avalon jeu and อวาลอน remain potentially ambiguous; game/rules modifiers narrow intent.",
+        "Excluded film/cafe/novel/other video games/casino/automotive suggestions.",
+        "Empty results without an explicit no-data notice are incomplete captures, not zero."
+      ],
+      "captures": [
+        {
+          "country": "de",
+          "seed": "avalon spiel",
+          "rows": [
+            ["avalon spiel", "Easy", "<100", "29 September"],
+            ["avalon spiel anleitung", "N/A", "<100", ""],
+            ["avalon spiel charaktere", "N/A", "<100", ""]
+          ],
+          "date": "2026-10-15",
+          "url": "https://ahrefs.com/keyword-generator/?country=de&input=avalon%20spiel"
+        },
+        {
+          "country": "de",
+          "seed": "avalon online",
+          "rows": [
+            ["avalon online spielen", "N/A", "<100", ""],
+            ["avalon online", "Hard", "<100", "16 September"],
+            ["play avalon online", "N/A", "<100", ""],
+            ["avalon online spiel", "", "<100", ""]
+          ],
+          "date": "2026-10-15",
+          "url": "https://ahrefs.com/keyword-generator/?country=de&input=avalon%20online"
+        },
+        {
+          "country": "de",
+          "seed": "avalon regeln",
+          "rows": [["avalon regeln", "N/A", "<100", ""]],
+          "date": "2026-10-15",
+          "url": "https://ahrefs.com/keyword-generator/?country=de&input=avalon%20regeln"
+        },
+        {
+          "country": "fr",
+          "seed": "avalon jeu",
+          "rows": [
+            ["avalon jeu", "Easy", ">100", "22 September"],
+            ["avalon jeu de société", "Easy", ">100", "1 September"],
+            ["the resistance avalon jeu", "N/A", "<100", ""],
+            ["avalon jeu en ligne", "N/A", "<100", ""],
+            ["avalon jeu de société regle", "Sign up", "<100", ""],
+            ["avalon jeu règles", "", "<100", ""]
+          ],
+          "date": "2026-10-15",
+          "url": "https://ahrefs.com/keyword-generator/?country=fr&input=avalon%20jeu"
+        },
+        {
+          "country": "fr",
+          "seed": "avalon règles",
+          "rows": [
+            ["the resistance avalon regles", "N/A", "<100", ""],
+            ["resistance avalon regles", "N/A", "<100", ""],
+            ["avalon regles", "N/A", "<100", ""],
+            ["avalon règles", "N/A", "<100", ""],
+            ["the resistance avalon règles", "N/A", "<100", ""],
+            ["avalon regles du jeu", "N/A", "<100", ""],
+            ["avalon règles du jeu", "N/A", "<100", ""]
+          ],
+          "date": "2026-10-15",
+          "url": "https://ahrefs.com/keyword-generator/?country=fr&input=avalon%20r%C3%A8gles"
+        },
+        {
+          "country": "th",
+          "seed": "อวาลอน",
+          "rows": [
+            ["อวาลอน", "Medium", ">100", "18 September"],
+            ["อวาลอน บอร์ดเกม", "N/A", "<100", ""],
+            ["บอร์ดเกม อวาลอน", "N/A", "<100", ""],
+            ["เกมอวาลอน", "N/A", "<100", ""],
+            ["อวาลอน วิธีเล่น", "Easy", "<100", "2 days"],
+            ["อวาลอน เกม", "Sign up", "<100", ""],
+            ["อวาลอน การ์ด", "", "<100", ""],
+            ["เกมอวาลอน วิธีเล่น", "", "<100", ""]
+          ],
+          "date": "2026-10-15",
+          "url": "https://ahrefs.com/keyword-generator/?country=th&input=%E0%B8%AD%E0%B8%A7%E0%B8%B2%E0%B8%A5%E0%B8%AD%E0%B8%99"
+        },
+        {
+          "country": "th",
+          "seed": "อวาลอน ออนไลน์",
+          "rows": [["อวาลอน ออนไลน์", "N/A", "<100", ""]],
+          "date": "2026-10-15",
+          "url": "https://ahrefs.com/keyword-generator/?country=th&input=%E0%B8%AD%E0%B8%A7%E0%B8%B2%E0%B8%A5%E0%B8%AD%E0%B8%99%20%E0%B8%AD%E0%B8%AD%E0%B8%99%E0%B9%84%E0%B8%A5%E0%B8%99%E0%B9%8C"
+        },
+        {
+          "country": "id",
+          "seed": "avalon board game",
+          "rows": [
+            ["avalon board game", "Hard", "<100", "30 September"],
+            ["the resistance avalon board game", "N/A", "<100", ""],
+            ["cara main avalon board game", "", "<100", ""],
+            ["jual avalon board game", "", "<100", ""]
+          ],
+          "date": "2026-10-15",
+          "url": "https://ahrefs.com/keyword-generator/?country=id&input=avalon%20board%20game"
+        },
+        {
+          "country": "vn",
+          "seed": "cách chơi avalon",
+          "date": "2026-10-15",
+          "url": "https://ahrefs.com/keyword-generator/?country=vn&input=c%C3%A1ch%20ch%C6%A1i%20avalon",
+          "rows": [["cách chơi avalon", "Easy", "<100", "28 September"]]
+        },
+        {
+          "country": "vn",
+          "seed": "luật chơi avalon",
+          "date": "2026-10-15",
+          "url": "https://ahrefs.com/keyword-generator/?country=vn&input=lu%E1%BA%ADt%20ch%C6%A1i%20avalon",
+          "rows": [
+            ["luật chơi avalon", "N/A", "<100", ""],
+            ["luật chơi avalon board game", "N/A", "<100", ""],
+            ["luat choi avalon", "N/A", "<100", ""]
+          ]
+        },
+        {
+          "country": "vn",
+          "seed": "avalon online",
+          "date": "2026-10-15",
+          "url": "https://ahrefs.com/keyword-generator/?country=vn&input=avalon%20online",
+          "rows": [
+            ["avalon online", "", "<100", ""],
+            ["play avalon online", "", "<100", ""],
+            ["avalon online game", "N/A", "<100", ""]
+          ],
+          "intent": "ambiguous_online_avalon; no precise boardgame-only intent inferred"
+        }
+      ]
+    },
+    "parallelObservations": {
+      "assembledAt": "2026-10-15T06:08:52Z",
+      "collector": "seo_secondary subagent; separate Codex IAB tab",
+      "provider": "Ahrefs Free Keyword Generator",
+      "metric": "provider estimated average monthly searches for Google country; raw free tiers only",
+      "methodologyURL": "https://help.ahrefs.com/en/articles/2138010-what-is-the-difference-between-traffic-potential-and-search-volume-in-keywords-explorer",
+      "caveats": [
+        "Collected 2026-10-15. Exact capture clock for earlier individual rows not retained; capturedAt has day precision.",
+        "Volume is a provider estimate, not Google exact searches or traffic forecast. Exact rolling 12-month window not shown.",
+        "Country does not equal language. Turkey English-title searches and Vietnam boardgame loanword queries do not measure all native formulations.",
+        "No ranking within <100; do not sum keywords or overlapping variants. No keyword-idea counts used as demand.",
+        "Updated is literal card freshness, not measurement window. Empty cells preserved as null. KD not exposed after signup prompt preserved as null.",
+        "A Cloudflare CAPTCHA appeared for Netherlands avalon spel. It was not solved or bypassed; NL metrics unavailable. Native Vietnamese luật chơi/cách chơi/online and short Japanese/Korean variants not measured before CAPTCHA.",
+        "Search results were used qualitatively to disambiguate Avalon the boardgame from myth, Tainted Grail, King of Avalon, DOS games, casino slots and unrelated products."
+      ],
+      "groups": [
+        {
+          "country": "Japan",
+          "countryCode": "jp",
+          "seed": "レジスタンス アヴァロン",
+          "rows": [
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス アヴァロン",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス アヴァロンN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンスアヴァロン 再販",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンスアヴァロン 再販N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンスアヴァロン",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンスアヴァロンN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス アヴァロン オンライン",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス アヴァロン オンラインN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス:アヴァロン 再販",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス:アヴァロン 再販N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス アヴァロン 戦略",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス アヴァロン 戦略N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス アヴァロン ランスロット",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス アヴァロン ランスロットN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス:アヴァロン 作戦",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス:アヴァロン 作戦N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス アヴァロン 人数",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス アヴァロン 人数N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンスアヴァロン 考察",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンスアヴァロン 考察N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンスアヴァロン 立ち回り",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンスアヴァロン 立ち回りSign up<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス:アヴァロン 立ち回り",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス:アヴァロン 立ち回り<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンスアヴァロン 購入",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンスアヴァロン 購入<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス アヴァロン ボードゲーム",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス アヴァロン ボードゲーム<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンスアヴァロン エクスカリバー",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンスアヴァロン エクスカリバー<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス アヴァロン アプリ",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス アヴァロン アプリ<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンスアヴァロン オンライン",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンスアヴァロン オンライン<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス：アヴァロン",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス：アヴァロン<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス：アヴァロン 「湖の騎士」拡張カード",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス：アヴァロン 「湖の騎士」拡張カード<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Japan",
+              "countryCode": "jp",
+              "seed": "レジスタンス アヴァロン",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "レジスタンス：アヴァロン online",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=jp&input=%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%20%E3%82%A2%E3%83%B4%E3%82%A1%E3%83%AD%E3%83%B3",
+              "rawRow": "レジスタンス：アヴァロン online<100",
+              "intent": "boardgame_relevant_or_related"
+            }
+          ]
+        },
+        {
+          "country": "South Korea",
+          "countryCode": "kr",
+          "seed": "레지스탕스 아발론",
+          "rows": [
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론",
+              "volumeRaw": "<100",
+              "kdRaw": "Medium",
+              "updatedRaw": "3 days",
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론Medium<1003 days",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 온라인",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 온라인N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 제작",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 제작N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 보드게임",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 보드게임N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 공략",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 공략N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 녹음",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 녹음N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 메뉴얼",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 메뉴얼N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 사이트",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 사이트N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 팁",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 팁N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 어플",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 어플N/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 전략",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 전략Sign up<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스: 아발론",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스: 아발론<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 확장",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 확장<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 한글",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 한글<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 나무위키",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 나무위키<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "보드게임 레지스탕스 아발론",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "보드게임 레지스탕스 아발론<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 룰북",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 룰북<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 호수의 여신",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 호수의 여신<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 5인",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 5인<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "South Korea",
+              "countryCode": "kr",
+              "seed": "레지스탕스 아발론",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "레지스탕스 아발론 디시",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=kr&input=%EB%A0%88%EC%A7%80%EC%8A%A4%ED%83%95%EC%8A%A4%20%EC%95%84%EB%B0%9C%EB%A1%A0",
+              "rawRow": "레지스탕스 아발론 디시<100",
+              "intent": "boardgame_relevant_or_related"
+            }
+          ]
+        },
+        {
+          "country": "Poland",
+          "countryCode": "pl",
+          "seed": "avalon gra",
+          "rows": [
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra",
+              "volumeRaw": ">100",
+              "kdRaw": "Easy",
+              "updatedRaw": "13 September",
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon graEasy>10013 September",
+              "intent": "mixed_avalon_intent_requires_boardgame_context"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra planszowa",
+              "volumeRaw": ">100",
+              "kdRaw": "Easy",
+              "updatedRaw": "17 September",
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra planszowaEasy>10017 September",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra karciana",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra karcianaN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "tainted grail the fall of avalon gra planszowa",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "tainted grail the fall of avalon gra planszowaN/A<100",
+              "intent": "excluded_other_game"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra planszowa zasady",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra planszowa zasadyN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra zasady",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra zasadyN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "tainted grail: the fall of avalon gra planszowa",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "tainted grail: the fall of avalon gra planszowaN/A<100",
+              "intent": "excluded_other_game"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "ceneo avalon gra",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "ceneo avalon graN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra empik",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra empikN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra recenzja",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra recenzjaN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra rpg",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra rpgSign up<100",
+              "intent": "excluded_or_ambiguous_other_game"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra pajak",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra pajak<100",
+              "intent": "excluded_or_ambiguous_other_game"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra kup",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra kup<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra dodatki",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra dodatki<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra opinie",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra opinie<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra postacie",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra postacie<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra strategia",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra strategia<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "tainted grail the fall of avalon gra",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "tainted grail the fall of avalon gra<100",
+              "intent": "excluded_other_game"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "tainted grail: the fall of avalon gra",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "tainted grail: the fall of avalon gra<100",
+              "intent": "excluded_other_game"
+            },
+            {
+              "country": "Poland",
+              "countryCode": "pl",
+              "seed": "avalon gra",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gra chomikuj",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=pl&input=avalon%20gra",
+              "rawRow": "avalon gra chomikuj<100",
+              "intent": "excluded_download_intent"
+            }
+          ]
+        },
+        {
+          "country": "Italy",
+          "countryCode": "it",
+          "seed": "the resistance avalon",
+          "rows": [
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon board game",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon board gameN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon",
+              "volumeRaw": "<100",
+              "kdRaw": "Easy",
+              "updatedRaw": "18 September",
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalonEasy<10018 September",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon italiano",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon italianoN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon big box",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon big boxN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon board game setup",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon board game setupN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon regolamento",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon regolamentoN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon role cards",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon role cardsN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon character cards",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon character cardsN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "raven the resistance avalon",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "raven the resistance avalonN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon game",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon gameN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon pdf",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon pdfSign up<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon rules pdf",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon rules pdf<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon uplay",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon uplay<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon prezzo",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon prezzo<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon components",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon components<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon rules",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon rules<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon istruzioni",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon istruzioni<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon board game cards roles",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon board game cards roles<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon gameplay",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon gameplay<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon review",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon review<100",
+              "intent": "boardgame_relevant_or_related"
+            }
+          ]
+        },
+        {
+          "country": "Italy",
+          "countryCode": "it",
+          "seed": "avalon gioco",
+          "rows": [
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco",
+              "volumeRaw": "<100",
+              "kdRaw": "Easy",
+              "updatedRaw": "16 September",
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon giocoEasy<10016 September",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco regole",
+              "volumeRaw": "<100",
+              "kdRaw": "Easy",
+              "updatedRaw": "2 October",
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco regoleEasy<1002 October",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco da tavolo",
+              "volumeRaw": "<100",
+              "kdRaw": "Easy",
+              "updatedRaw": "21 September",
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco da tavoloEasy<10021 September",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco da tavolo regole",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco da tavolo regoleN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco regole pdf",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco regole pdfN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco di carte",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco di carteN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "tainted grail the fall of avalon gioco da tavolo",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "tainted grail the fall of avalon gioco da tavoloN/A<100",
+              "intent": "excluded_other_game"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco online",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco onlineN/A<100",
+              "intent": "mixed_avalon_intent_requires_boardgame_context"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco prezzo",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco prezzoN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco in scatola",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco in scatolaN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco da tavola",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco da tavolaSign up<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco carte",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco carte<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "king of avalon gioco",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "king of avalon gioco<100",
+              "intent": "excluded_other_game"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco di ruolo",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco di ruolo<100",
+              "intent": "excluded_or_ambiguous_other_game"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco recensione",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco recensione<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco da tavolo italiano",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco da tavolo italiano<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon gioco da tavolo",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "the resistance avalon gioco da tavolo<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco recensioni",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco recensioni<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon gioco amazon",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "avalon gioco amazon<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Italy",
+              "countryCode": "it",
+              "seed": "avalon gioco",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon gioco",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=it&input=avalon%20gioco",
+              "rawRow": "the resistance avalon gioco<100",
+              "intent": "boardgame_relevant_or_related"
+            }
+          ]
+        },
+        {
+          "country": "Vietnam",
+          "countryCode": "vn",
+          "seed": "avalon boardgame",
+          "rows": [
+            {
+              "country": "Vietnam",
+              "countryCode": "vn",
+              "seed": "avalon boardgame",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon boardgame card",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=vn&input=avalon%20boardgame",
+              "rawRow": "avalon boardgame cardN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Vietnam",
+              "countryCode": "vn",
+              "seed": "avalon boardgame",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "avalon boardgame",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=vn&input=avalon%20boardgame",
+              "rawRow": "avalon boardgameN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            }
+          ]
+        },
+        {
+          "country": "Turkey",
+          "countryCode": "tr",
+          "seed": "the resistance avalon",
+          "rows": [
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalonN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon board game",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon board gameN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon cards",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon cardsN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon board game table",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon board game tableN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon rules",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon rulesN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon components",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon componentsN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon gameplay",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon gameplayN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon game cards",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon game cardsN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon board game cards",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon board game cardsN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon game",
+              "volumeRaw": "<100",
+              "kdRaw": "N/A",
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon gameN/A<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon gameplay table",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon gameplay tableSign up<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon online",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon online<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon big box",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon big box<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon print and play",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon print and play<100",
+              "intent": "boardgame_relevant_or_related"
+            },
+            {
+              "country": "Turkey",
+              "countryCode": "tr",
+              "seed": "the resistance avalon",
+              "capturedAt": "2026-10-15",
+              "capturedAtPrecision": "day",
+              "searchEngine": "Google",
+              "query": "the resistance avalon gameplay group",
+              "volumeRaw": "<100",
+              "kdRaw": null,
+              "updatedRaw": null,
+              "sourceURL": "https://ahrefs.com/keyword-generator/?country=tr&input=the%20resistance%20avalon",
+              "rawRow": "the resistance avalon gameplay group<100",
+              "intent": "boardgame_relevant_or_related"
+            }
+          ]
+        }
+      ],
+      "blockedMeasurements": [
+        {
+          "country": "Netherlands",
+          "countryCode": "nl",
+          "seed": "avalon spel",
+          "capturedAt": "2026-10-15",
+          "status": "blocked_captcha",
+          "sourceURL": "https://ahrefs.com/keyword-generator/?country=nl&input=avalon%20spel",
+          "volumeRaw": null
+        }
+      ],
+      "qualitativeMarkets": [
+        {
+          "language": "ja",
+          "officialName": "レジスタンス：アヴァロン",
+          "primaryPublisherURL": "https://hobbyjapan.games/resistance_avalon/",
+          "searchCandidates": [
+            "レジスタンス アヴァロン オンライン",
+            "レジスタンス アヴァロン 戦略",
+            "アヴァロン ボードゲーム"
+          ],
+          "directBrowserCompetitors": [
+            {
+              "url": "https://resistance.spiel.jp/",
+              "evidence": "Japanese interface; new registration; dispatch log UI improved 2026/04/25, custom roles 2026/04/08."
+            }
+          ],
+          "qualitativeAssessment": "Clear localized game identity and real online intent, but direct Japanese browser competitor exists."
+        },
+        {
+          "language": "ko",
+          "officialName": "레지스탕스 아발론",
+          "primaryPublisherURL": "https://www.koreaboardgames.com/product/detail?prdCd=PD2024002224O4GJ",
+          "searchCandidates": ["레지스탕스 아발론 온라인", "아발론 보드게임", "레지스탕스 아발론 룰북"],
+          "directBrowserCompetitors": [
+            {
+              "url": "https://resistance-avalon.web.app/",
+              "evidence": "Korean Avalon Online title; nickname, six-digit invite code, create/join room."
+            }
+          ],
+          "qualitativeAssessment": "Clear official boardgame name and ready local browser alternative; Google country estimates do not measure Naver demand."
+        },
+        {
+          "language": "pl",
+          "officialName": "Avalon: Rycerze Króla Artura",
+          "primaryPublisherURL": "https://sklep.portalgames.pl/gry-planszowe/6",
+          "officialRulesURL": "https://files.rebel.pl/files/instrukcje/avalon_instrukcja.pdf",
+          "searchCandidates": [
+            "avalon gra planszowa",
+            "avalon zasady",
+            "avalon online gra planszowa",
+            "avalon postacie"
+          ],
+          "directBrowserCompetitors": [],
+          "qualitativeAssessment": "Highest measured core-boardgame tier among the original six languages. Publishers and retailers are strong informational/retail competitors. No dedicated Polish boardgame browser service verified; absence not proven."
+        },
+        {
+          "language": "it",
+          "officialName": "The Resistance: Avalon",
+          "primaryPublisherURL": "https://www.devir.it/prodotto/the-resistance-avalon/",
+          "searchCandidates": [
+            "avalon gioco da tavolo",
+            "avalon gioco regole",
+            "avalon gioco online",
+            "the resistance avalon regolamento"
+          ],
+          "directBrowserCompetitors": [],
+          "qualitativeAssessment": "Official local publisher and plentiful rule/store intent, but both exact and short game queries <100. No dedicated Italian browser service verified; absence not proven."
+        },
+        {
+          "language": "vi",
+          "officialName": "Avalon (The Resistance: Avalon); publisher campaign subtitle Bậc Thầy Thuyết Phục",
+          "primaryPublisherURL": "https://avalon.boardgame.vn/",
+          "currentPublisherProductURL": "https://boardgame.vn/products/avalon-board-game-an-vai-kich-tinh-hap-dan-danh-cho-5-10-nguoi-choi-boardgamevn",
+          "searchCandidates": [
+            "avalon boardgame",
+            "luật chơi avalon",
+            "cách chơi avalon",
+            "avalon online",
+            "board game ẩn vai",
+            "avalon việt hóa"
+          ],
+          "directBrowserCompetitors": [],
+          "qualitativeAssessment": "Strong product match for Vietnamese localization: official Vietnamese edition, publisher describes hidden roles (ẩn vai), inference (suy luận xã hội), clear Ma Sói bridge. Only avalon boardgame/card measured <100; native rules/online volumes unavailable. No dedicated Vietnamese browser service verified; absence not proven."
+        },
+        {
+          "language": "tr",
+          "officialName": "The Resistance: Avalon; Turkish Avalon edition/name not verified",
+          "searchCandidates": [
+            "avalon kutu oyunu",
+            "avalon nasıl oynanır",
+            "the resistance avalon online",
+            "avalon çevrimiçi"
+          ],
+          "primaryAdjacentAppURL": "https://play.google.com/store/apps/details?hl=tr&id=studio.oube.knightsofarthur",
+          "directBrowserCompetitors": [],
+          "qualitativeAssessment": "Do not substitute Direniş alone: it names base Resistance and is not proof of Turkish Avalon localization. Native market intent looks weaker/less certain than JP/KR/PL/IT/VI in the sampled search results; many unrelated Avalon gaming meanings. Adjacent pass-and-play app is not browser multiplayer and Turkish store text does not prove Turkish app UI."
+        },
+        {
+          "language": "nl",
+          "officialName": "The Resistance: Avalon; Dutch standalone local edition not verified",
+          "searchCandidates": ["avalon spel", "avalon spelregels", "avalon online spelen"],
+          "primaryCreatorContentURL": "https://www.nox-spellenzolder.nl/video/the-resistance-avalon-lancelot/",
+          "excludedNoise": [
+            {
+              "url": "https://www.neoteo.com/nl/spellen/avalon",
+              "reason": "Avalon online spelen is a DOS game from 1998, not social deduction."
+            },
+            {
+              "url": "https://casino.toto.nl/casino/games/avalon-x",
+              "reason": "Avalon X slot, not boardgame."
+            }
+          ],
+          "qualitativeAssessment": "Dutch game/community terminology exists, but literal online phrase is contaminated by DOS/casino intent; Ahrefs blocked by CAPTCHA."
+        }
+      ]
+    },
+    "mergedScopeNote": "Root additionally measured Vietnamese cách chơi avalon, luật chơi avalon and ambiguous avalon online. Parallel-agent caveats about its unmeasured native Vietnamese queries describe only that agents subset. No CAPTCHA was solved or bypassed."
+  },
+  "productionDatabase": {
+    "measuredAt": "2026-10-15T06:12:03.131Z",
+    "accountCount": 12982,
+    "languageLocaleCountryProfileFieldsPresent": false,
+    "boardCount": 6,
+    "boardLanguages": [
+      {
+        "listings": 3,
+        "language": "ru",
+        "uniqueAuthors": 3
+      },
+      {
+        "listings": 3,
+        "language": "cmn",
+        "uniqueAuthors": 3
+      },
+      {
+        "listings": 1,
+        "language": "other",
+        "uniqueAuthors": 1
+      }
+    ],
+    "boardOtherLanguages": [
+      {
+        "listings": 1,
+        "declaredLanguage": "日本語",
+        "uniqueAuthors": 1
+      }
+    ],
+    "notes": "Profiles have no language/locale/country fields. Board language is declared willingness to communicate, not native language. Board authors and games cannot be joined to browser language."
+  },
+  "privacy": "Only aggregate counts and public SEO queries are retained. No account identities, emails, tokens, raw chats or IPs."
+}

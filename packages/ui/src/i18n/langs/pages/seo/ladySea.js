@@ -1,4 +1,10 @@
 module.exports.ladySea = {
+  vi: {
+    title: 'Tiên nữ biển trong Avalon: luật và vai trò được tiết lộ',
+    description:
+      'Tìm hiểu Tiên nữ biển khác Tiên nữ hồ thế nào: thời điểm kiểm tra, kết quả vai Ác, lời khai công khai và ngoại lệ của Kẻ lừa lọc, Kẻ gây rối.',
+    keywords: ['Tiên nữ biển trong Avalon', 'Luật chơi', 'Tiết lộ vai trò'],
+  },
   pt: {
     title: 'Dama do Mar em Avalon: regras e personagens revelados',
     description:

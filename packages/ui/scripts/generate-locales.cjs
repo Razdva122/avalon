@@ -17,10 +17,11 @@ for (const [language, moduleName] of Object.entries({
   ru: 'ru',
   es: 'es',
   pt: 'pt',
+  vi: 'vi',
   'zh-CN': 'zh_CN',
   'zh-TW': 'zh_TW',
 })) {
   const messages = require(path.join(ui, 'src/i18n/langs', moduleName))[moduleName];
   fs.writeFileSync(path.join(output, `${language}.json`), JSON.stringify(messages));
 }
-console.log('Generated six independent locale dictionaries.');
+console.log('Generated seven independent locale dictionaries.');

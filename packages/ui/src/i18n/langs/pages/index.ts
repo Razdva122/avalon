@@ -42,6 +42,7 @@ import { userAchievements } from '@/i18n/langs/pages/userAchievements';
 import { globalAchievements } from '@/i18n/langs/pages/globalAchievements';
 
 export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
+  vi: {},
   en: {},
   ru: {},
   'zh-CN': {},

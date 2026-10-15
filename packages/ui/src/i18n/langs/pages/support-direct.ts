@@ -39,6 +39,46 @@ const en = {
   rejected: 'No successful transfer of this asset to our address was found',
   duplicate: 'Transfer already credited — contact the team if this is yours',
 };
+const vi: typeof en = {
+  showQR: 'Hiện mã QR',
+  hideQR: 'Ẩn mã QR',
+  qrHint: 'Quét bằng ví của bạn. Chọn mạng hiển thị bên trên; mã QR chỉ chứa địa chỉ người nhận.',
+  qrFailed: 'Không tạo được mã QR. Hãy sao chép địa chỉ.',
+  network: 'Đồng tiền và mạng',
+  recipient: 'Địa chỉ người nhận',
+  copy: 'Sao chép',
+  copied: 'Đã sao chép',
+  copyFailed: 'Chọn và sao chép địa chỉ thủ công.',
+  tokenContract: 'Hợp đồng token được chấp nhận',
+  txid: 'Mã băm giao dịch (txid)',
+  txidHint:
+    'Sao chép mã băm giao dịch từ lịch sử ví hoặc lịch sử rút tiền của sàn. Nhập mã băm, không phải địa chỉ ví hay liên kết. Nếu không tìm thấy, hãy liên hệ nhóm dự án.',
+  pay: 'Kiểm tra giao dịch của tôi',
+  paymentHint:
+    'Gửi số tiền bất kỳ đến địa chỉ này qua mạng đã chọn, rồi nhập txid bên dưới. Chúng tôi ghi nhận số tiền thực nhận, không bao gồm phí mạng.',
+  btcConfirmation:
+    'BTC được ghi nhận sau 1 xác nhận. Giá trị USD được tính theo tỷ giá khi trang web xác minh giao dịch.',
+  tokenConfirmation:
+    'USDT được ghi nhận sau khi mạng xác nhận với giá $1 mỗi token. Dùng đúng token và mạng được hiển thị bên trên.',
+  claimSaved: 'Đã lưu yêu cầu xác minh giao dịch.',
+  premiumDescription:
+    'Nhận Premium trọn đời sau khi có $10 ủng hộ đã xác nhận. USDT được tính $1 mỗi token; BTC được định giá khi trang web xác minh giao dịch.',
+  anonymousHint: 'Danh sách hiển thị “Ẩn danh”, số tiền được ghi nhận và ngày. Giao dịch blockchain vẫn công khai.',
+  history: 'Các giao dịch gần đây của bạn',
+  noHistory: 'Bạn chưa gửi yêu cầu xác minh giao dịch nào.',
+  pendingHint:
+    'Chúng tôi tiếp tục kiểm tra sau khi bạn đóng trang. Kiểm tra tự động dừng 1 giờ sau khi gửi txid; bạn có thể kiểm tra lại thủ công. Với giao dịch có tranh chấp, hãy liên hệ nhóm dự án và cung cấp mã yêu cầu.',
+  invalidTxid: 'Nhập đầy đủ mã băm giao dịch của mạng đã chọn.',
+  alreadyClaimed: 'Giao dịch này đã được ghi nhận. Nếu đó là giao dịch của bạn, hãy liên hệ nhóm dự án để giải quyết.',
+  rateError: 'Vui lòng đợi một phút trước khi gửi hoặc kiểm tra giao dịch khác.',
+  waiting: 'Chưa tìm thấy giao dịch — đang tự động kiểm tra lại',
+  confirming: 'Đang chờ mạng xác nhận',
+  finished: 'Đã ghi nhận',
+  provider_unavailable: 'Xác minh tạm thời không khả dụng — chúng tôi sẽ thử lại',
+  check_expired: 'Đã dừng kiểm tra tự động — kiểm tra lại hoặc liên hệ nhóm dự án',
+  rejected: 'Không tìm thấy giao dịch thành công của tài sản này đến địa chỉ của chúng tôi',
+  duplicate: 'Giao dịch đã được ghi nhận — liên hệ nhóm dự án nếu đây là giao dịch của bạn',
+};
 const ru: typeof en = {
   showQR: 'Показать QR-код',
   hideQR: 'Скрыть QR-код',
@@ -237,4 +277,4 @@ const zhTW: typeof en = {
   rejected: '未找到向我們地址成功轉入此資產的紀錄',
   duplicate: '轉帳已計入，如為您的轉帳請聯絡團隊',
 };
-export const directSupport = { en, ru, es, pt, zhCN, zhTW };
+export const directSupport = { vi, en, ru, es, pt, zhCN, zhTW };

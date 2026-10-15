@@ -2,6 +2,52 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const mordred: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    generalInformation: 'Thông tin chung:',
+    playingAsMordred:
+      'Chơi {mordred} cho bạn lợi thế đặc biệt là không bị {merlin} nhận biết và dẫn dắt tay sai phe Ác. Mục tiêu là phá kế hoạch phe Thiện và bảo đảm phe Ác chiến thắng, đồng thời giữ vỏ bọc đồng minh trung thành.',
+    generalTips: 'Mẹo chung:',
+    hiddenIdentity: 'Giữ danh tính ẩn:',
+    hiddenIdentityContent:
+      'Với {mordred}, việc {merlin} không biết bạn là lợi thế lớn. Hãy giữ lợi thế bằng cách hòa nhập với người phe Thiện.',
+    distrust: 'Khéo léo gieo sự mất lòng tin:',
+    distrustContent: 'Dùng ảnh hưởng để tạo nghi ngờ về người khác mà không thu hút quá nhiều chú ý vào mình.',
+    commandTheShadows:
+      'Với {mordred}, bạn điều khiển bóng tối và tác động ván chơi từ hậu trường. Bằng sự xảo quyệt và đánh lừa, bạn có thể dẫn phe Ác đến chiến thắng, khiến phe Thiện mãi mù mờ. Hãy nhập vai và giành ưu thế!',
+    identifyMerlin: 'Nhận diện {merlin}:',
+    identifyMerlinContent: 'Cố suy ra ai là {merlin} mà không lộ mình, để Sát thủ của bạn có thể loại họ vào cuối ván.',
+    coordinateMinions: 'Phối hợp với các Tay sai:',
+    coordinateMinionsContent:
+      'Hợp tác với những người phe Ác khác để lên chiến thuật và phá kế hoạch phe Thiện. Giao tiếp và phối hợp là chìa khóa.',
+    leadShadows: 'Dẫn dắt từ bóng tối:',
+    leadShadowsContent:
+      'Là người dẫn dắt phe Ác, hãy chỉ đạo các Tay sai kín đáo và không bao giờ tiết lộ vai thật. Tác động đến kết quả mà không thu hút sự chú ý.',
+    protectIdentity: 'Bảo vệ danh tính:',
+    protectIdentityContent:
+      'Tránh cho {merlin} manh mối về vai của bạn hoặc các Tay sai đồng minh. Tính toán hành động và che giấu ý định.',
+    strategicTips: 'Mẹo chiến thuật',
+    confusePlayers: 'Gây bối rối cho người phe Thiện:',
+    confusePlayersContent:
+      'Đưa ra quyết định khiến phe Thiện mất phương hướng và Merlin khó dẫn dắt họ hơn. Làm nhiễu phán đoán của họ là điều thiết yếu.',
+    useDisinformation: 'Dùng thông tin sai lệch:',
+    useDisinformationContent:
+      'Đánh lạc hướng người phe Thiện bằng thông tin sai để đưa họ xa sự thật. Điều này có thể chuyển sự chú ý và phá chiến thuật của họ.',
+    cultivateAlliances: 'Xây dựng liên minh:',
+    cultivateAlliancesContent:
+      'Giả vờ cùng phe với người phe Thiện để giành lòng tin và điều khiển ván chơi có lợi cho phe Ác. Vỏ bọc hai mặt có thể quyết định việc xoay chuyển lựa chọn.',
+    controlNarrative: 'Dẫn dắt câu chuyện:',
+    controlNarrativeContent:
+      'Bạn có thể điều hướng thảo luận và quyết định. Hãy dùng khả năng đó khôn ngoan vì phe Ác. Bằng cách dẫn dắt trao đổi, bạn định hình hướng đi của ván chơi.',
+    seoTeam: 'Ác. Thắng bằng ba Nhiệm vụ thất bại hoặc Ám sát đúng {merlin} sau ba lần thành công.',
+    seoAbility:
+      '{merlin} không thấy Mordred lúc bắt đầu. Trong thiết lập cổ điển, Mordred biết những người phe Ác có thể nhìn thấy khác, ngoại trừ {oberon}.',
+    seoLimit:
+      'Bị ẩn khỏi {merlin} không khiến Mordred thành Thiện hay miễn bị suy luận. Kết quả Nhiệm vụ và phiếu bầu vẫn có thể làm lộ anh ta; anh ta có thể chọn Thành công hoặc Thất bại.',
+    seoScenario1:
+      'Nếu được đưa vào Đội đáng tin, hãy quyết định liệu một lá Thất bại ngay lúc này có đáng đánh đổi lòng tin đó không. Lá Thành công có thể giữ chỗ của bạn, nhưng cũng đưa phe Thiện gần ba lần thành công hơn.',
+    seoScenario2:
+      'Nếu Nhiệm vụ có bạn thất bại, giải thích lựa chọn bằng cùng bằng chứng công khai như mọi người. Đừng mặc định người từng ủng hộ bạn là Merlin: Merlin chưa từng nhận thông tin bạn thuộc phe Ác.',
+  },
   en: {
     generalInformation: 'General Information:',
     playingAsMordred:

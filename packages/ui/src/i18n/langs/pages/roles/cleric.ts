@@ -2,6 +2,28 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const cleric: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoHeading: 'Giáo sĩ trong Avalon: kiểm tra phe và Ám sát',
+    seoTeam: 'Thiện. Vai riêng của nền tảng này có điều kiện Ám sát đặc biệt.',
+    seoAbility:
+      'Sau Nhiệm vụ 1, {cleric} biết phe hiển thị của Đội trưởng Nhiệm vụ đó. Nếu Giáo sĩ là Đội trưởng, họ không nhận được thông tin mới.',
+    seoLimit:
+      'Kiểm tra có tiết lộ vai cụ thể không? Không. {trickster} hiện là Thiện và {troublemaker} hiện là Ác. Để thắng bằng cách Ám sát Giáo sĩ sau ba Nhiệm vụ Thành công, phe Ác phải nhận diện hai người theo thứ tự: đầu tiên là Giáo sĩ, sau đó là một người phe Thiện khác, đồng thời chọn đúng cả người đó và vai cụ thể của họ từ danh sách có sẵn. Cả hai lần đoán đều phải đúng; sai ở bất kỳ bước nào thì phe Thiện thắng. Mục tiêu thứ hai phải có vai phe Thiện xuất hiện trong ván, ngoại trừ Giáo sĩ và Lancelot Thiện. Merlin, Merlin thuần khiết và Guinevere chỉ được chọn nếu không có vai phe Thiện hợp lệ nào khác. Ví dụ, chọn Người hầu đòi hỏi nhận diện một người thực sự là Người hầu; chọn bất kỳ người phe Thiện nào là chưa đủ.',
+    seoScenario1:
+      'Nếu Đội trưởng đầu tiên hiện là Thiện, hãy xem ván có Kẻ lừa lọc hay không trước khi coi người đó chắc chắn thuộc phe Thiện.',
+    seoScenario2:
+      'Nếu chính bạn dẫn Nhiệm vụ 1, bạn không được chọn người khác để kiểm tra. Hãy suy luận từ phiếu bầu và kết quả Nhiệm vụ.',
+    generalTipsHeader: 'Mẹo chung:',
+    generalTipsRoleUnderstandingHeading: 'Hiểu rõ vai của mình:',
+    generalTipsRoleUnderstandingText:
+      'Hãy nhớ nhiệm vụ chính của bạn là hỗ trợ phe Thiện bằng cách thu thập thông tin về phe của đối thủ và xác nhận thiện ý của đồng đội.',
+    generalTipsLoyaltyCautionHeading: 'Thận trọng khi tiết lộ phe:',
+    generalTipsLoyaltyCautionText:
+      'Sử dụng thông tin về phe của Đội trưởng Nhiệm vụ đầu tiên, nhưng đừng vội tuyên bố hoặc buộc tội công khai vì có thể thu hút sự chú ý không mong muốn của phe Ác.',
+    generalTipsStealthHeading: 'Ẩn mình cho đến thời điểm quyết định:',
+    generalTipsStealthText:
+      'Chơi kín đáo và cẩn thận. Chỉ tiết lộ vai khi điều đó giúp tránh thất bại hoặc cứu Đội khỏi một nước đi nguy hiểm của đối thủ.',
+  },
   en: {
     seoHeading: 'Cleric in Avalon: Loyalty Check & Assassination',
     seoTeam: 'Good. This platform role has a special assassination condition.',

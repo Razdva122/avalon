@@ -71,7 +71,7 @@
                 <h3 :id="`server-${server.id}`">{{ server.name }}</h3>
                 <span v-if="server.official" class="official" :aria-label="t('community.official')">
                   <span class="material-icons" aria-hidden="true">verified</span>
-                  Official
+                  {{ t('community.official') }}
                 </span>
               </div>
               <p class="description">{{ t(server.descriptionKey) }}</p>

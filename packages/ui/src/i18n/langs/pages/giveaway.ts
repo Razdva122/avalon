@@ -1,6 +1,54 @@
 import type { TLanguage } from '@/i18n/interface';
 
 export const giveaway: Record<TLanguage, Record<string, string>> = {
+  vi: {
+    title: 'Tặng Premium hằng tuần',
+    bannerTitle: 'Premium miễn phí mỗi tuần',
+    soloShortCTA: 'Tôi là người chơi',
+    groupShortCTA: 'Chúng tôi là một nhóm',
+    intro:
+      'Mỗi tuần, một tin tìm nhóm của người chơi và một tin của nhóm thắng Premium trọn đời, mỗi giải dành cho một người.',
+    timing: 'Hằng tuần: {time} (giờ địa phương của bạn)',
+    timingShort: '{time} (giờ của bạn)',
+    timingFallback: 'Tặng thưởng hằng tuần — thời gian hiển thị theo múi giờ của bạn',
+    soloCTA: 'Tham gia bằng tin của người chơi',
+    groupCTA: 'Tham gia bằng tin của nhóm',
+    rulesTitle: 'Quy tắc tặng Premium',
+    eligibility:
+      'Mỗi tin đã đăng có một vé. Tại thời điểm chốt, tin phải đang hoạt động, chưa hết hạn và không bị hạn chế kiểm duyệt; người đăng phải còn tài khoản và không bị cấm. Tin ẩn hoặc bị kiểm duyệt không được tham gia. Không cần đăng lại mỗi tuần: tin có hiệu lực 30 ngày và có thể gia hạn bằng cách đẩy tin lên.',
+    premiumRule: 'Người đã có Premium hoặc bị cấm không thể nhận giải.',
+    partyRule:
+      'Với giải dành cho nhóm, một thành viên đã đăng ký đủ điều kiện trong danh sách được chọn sẽ nhận Premium. Nếu danh sách trống, người đăng là ứng viên. Nếu không ai đủ điều kiện, tin không tham gia.',
+    chancesRule:
+      'Tin của người chơi và của nhóm tham gia hai lượt rút thăm riêng, nên bạn có thể có hai cơ hội. Hai giải luôn thuộc về hai người khác nhau; người thắng giải cá nhân bị loại khỏi giải nhóm.',
+    liveRule:
+      'Điều kiện được xét theo mốc thời gian chốt và trạng thái đăng tin thực tế khi xử lý rút thăm. Nếu xử lý chậm, trạng thái đăng tin trước đó không được khôi phục để xét lại.',
+    boardNotice:
+      'Tin đang hoạt động tự động tham gia: mỗi tin một vé, mỗi tuần hai giải Premium trọn đời. Người đã có Premium và người bị cấm bị loại. Nhóm dùng danh sách thành viên đã đăng ký, hoặc người đăng nếu danh sách trống; hai người nhận giải phải khác nhau. Bạn không cần đăng lại mỗi tuần.',
+    loading: 'Đang tải kết quả tặng thưởng…',
+    error: 'Không tải được kết quả. Bạn vẫn có thể đăng tin.',
+    retry: 'Thử lại',
+    nextDraw: 'Lượt rút thăm tiếp theo: {date}',
+    latestDraw: 'Lượt rút thăm hoàn tất gần nhất: {date}',
+    soloPrize: 'Giải cá nhân',
+    groupPrize: 'Giải nhóm',
+    noWinner: 'Không có người thắng đủ điều kiện trong lượt này.',
+    noDraw: 'Lượt rút thăm đầu tiên chưa hoàn tất.',
+    members: 'Thành viên nhóm đã đăng ký (tùy chọn)',
+    membersHint:
+      'Chọn các tài khoản Avalon hiện có, không vượt quá quy mô nhóm và tối đa 10 người. Nếu để trống, người đăng là ứng viên giải nhóm. Tên dẫn đến hồ sơ công khai.',
+    memberSearch: 'Tìm thành viên theo tên',
+    memberSearchHint: 'Nhập ít nhất hai ký tự đầu của tên họ.',
+    memberLoading: 'Đang tìm tài khoản…',
+    memberError: 'Không thể tìm tài khoản lúc này. Đổi phần đầu của tên để thử lại, hoặc để trống danh sách.',
+    memberEmpty: 'Không có tài khoản chưa chọn nào khớp. Hãy thử phần đầu của tên khác.',
+    memberResults: 'Tài khoản phù hợp',
+    addMember: 'Thêm',
+    removeMember: 'Xóa',
+    missingMember: 'Tài khoản không còn khả dụng — xóa trước khi lưu',
+    membersFull: 'Danh sách đã đầy. Xóa một người hoặc tăng quy mô nhóm để thêm thành viên.',
+    membersLimit: 'Xóa bớt thành viên hoặc tăng quy mô nhóm trước khi lưu.',
+  },
   en: {
     title: 'Weekly Premium giveaway',
     bannerTitle: 'Free Premium every week',

@@ -1,4 +1,10 @@
 module.exports.wiki = {
+  vi: {
+    title: 'Wiki Avalon: luật chơi, vai nhân vật và bản mở rộng',
+    description:
+      'Khám phá luật chơi The Resistance: Avalon, năng lực nhân vật và bản mở rộng. Bắt đầu với hướng dẫn cách chơi Avalon, rồi tìm các vai và biến thể trong ván của bạn.',
+    keywords: ['Hướng dẫn', 'Luật chơi Avalon', 'Cách chơi Avalon'],
+  },
   pt: {
     title: 'Wiki de Avalon: regras, papéis e expansões',
     description:

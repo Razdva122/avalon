@@ -1,4 +1,10 @@
 module.exports.plotCards = {
+  vi: {
+    title: 'Thẻ âm mưu Avalon: luật, danh sách và cách chia',
+    description:
+      'Hướng dẫn Thẻ âm mưu Avalon: 7 hoặc 15 thẻ, cách chia cho 5–10 người chơi, thời điểm dùng thẻ, Phản đối Đội, kiểm tra phe và ví dụ.',
+    keywords: ['Thẻ âm mưu Avalon', 'Luật chơi', 'Danh sách thẻ', 'Cách chia thẻ'],
+  },
   pt: {
     title: 'Cartas de Enredo em Avalon: regras, lista e distribuição',
     description:

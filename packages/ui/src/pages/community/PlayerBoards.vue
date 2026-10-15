@@ -224,7 +224,7 @@
 </template>
 <script setup lang="ts">
 import GiveawayTime from '../support/GiveawayTime.vue';
-import { computed, nextTick, onMounted, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, nextTick, onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
 import { useRoute, useRouter } from 'vue-router';
@@ -246,9 +246,12 @@ import eventBus from '@/helpers/event-bus';
 import { languageFlags } from './board-display';
 import ReportIcon from './ReportIcon.vue';
 import BoardCard from './BoardCard.vue';
-import BoardForm from './BoardForm.vue';
-import BoardModeration from './BoardModeration.vue';
 import LocaleLink from '@/components/feedback/LocaleLink.vue';
+
+const BoardForm = defineAsyncComponent(() => import(/* webpackChunkName: 'board-form' */ './BoardForm.vue'));
+const BoardModeration = defineAsyncComponent(
+  () => import(/* webpackChunkName: 'board-moderation' */ './BoardModeration.vue'),
+);
 const { t } = useI18n();
 const store = useStore();
 const profile = computed(() => store.state.profile);

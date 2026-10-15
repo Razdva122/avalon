@@ -2,6 +2,45 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const percival: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    generalInformation: 'Thông tin chung: ',
+    percivalRole:
+      'Vai trò của Percival là bảo vệ và nhận diện đúng {merlin} để ngăn Tay sai của Mordred Ám sát {merlin}. Percival thấy {merlin} và {morgana} lúc bắt đầu nhưng phải phân biệt ai là ai mà không tiết lộ danh tính của họ cho người khác.',
+    generalTips: 'Mẹo chung: ',
+    understandYourRole: 'Hiểu vai của mình: ',
+    youAreProtector:
+      'Là một trong những người bảo vệ chính của {merlin}, mục tiêu quan trọng nhất của bạn là che giấu danh tính {merlin}.',
+    payAttentionToBehavior: 'Chú ý hành vi: ',
+    observeBehaviors:
+      'Quan sát hành vi và đề xuất của hai người được đánh dấu là {merlin} và {morgana}. Cố suy ra ai là {merlin} thật dựa vào cách họ dẫn dắt Đội.',
+    beSubtle: 'Giữ sự tinh tế: ',
+    beCarefulWithDefense:
+      'Khi bảo vệ hoặc làm theo người bạn tin là {merlin}, hãy khéo léo. Bảo vệ {merlin} trực tiếp có thể khiến {morgana} và các Tay sai của Mordred nhận diện, rồi Ám sát {merlin}.',
+    strategicTips: 'Mẹo chiến thuật: ',
+    createAmbiguity: 'Tạo sự mơ hồ: ',
+    actingUnsure:
+      'Đôi khi tỏ ra thiếu chắc chắn hoặc nêu nghi ngờ có thể bảo vệ danh tính {merlin}. Nếu phe Ác không chắc ai là {merlin}, họ khó thắng bằng cách Ám sát {merlin} hơn.',
+    communicateThroughVotes: 'Giao tiếp qua phiếu bầu: ',
+    votingPatterns:
+      'Cách bỏ phiếu là một phương thức giao tiếp kín đáo. Percival có thể dùng phiếu để thể hiện đồng ý hoặc không đồng ý với lựa chọn của người được cho là {merlin}, mà không thảo luận công khai.',
+    guideQuietly: 'Âm thầm dẫn dắt: ',
+    subtlyGuide:
+      'Percival không thấy phe của những người khác và không có khả năng ngăn Ám sát. Nếu không có {morgana}, ứng viên Merlin được tiết lộ là rõ ràng trong thiết lập cổ điển.',
+    protectMerlinToTheEnd: 'Bảo vệ Merlin đến cuối cùng: ',
+    takingSuspicion:
+      'Cuối ván, hãy sẵn sàng nhận nghi ngờ về mình để bảo vệ danh tính {merlin}, đặc biệt khi bạn đã được coi là người phe Thiện đáng tin.',
+    playingAsPercival:
+      'Chơi Percival trong Avalon mang đến thử thách riêng, đòi hỏi kết hợp sự tinh tế, khả năng nhận định và đánh lạc hướng có tính toán. Vai của bạn rất quan trọng trong việc bảo vệ {merlin} và bảo đảm phe Thiện thành công. Hãy cảnh giác, có chiến thuật và trên hết là bảo vệ {merlin} bằng mọi giá.',
+    seoTeam: 'Thiện. Giúp ba Nhiệm vụ thành công và bảo vệ {merlin} khỏi Ám sát.',
+    seoAbility:
+      'Khi có {morgana} trong thiết lập cổ điển, Percival thấy hai ứng viên: {merlin} và {morgana}. Danh tính của họ không được phân biệt.',
+    seoLimit:
+      'Percival không thấy phe của những người khác và không có khả năng ngăn Ám sát. Nếu không có {morgana}, ứng viên Merlin được tiết lộ là rõ ràng trong thiết lập cổ điển.',
+    seoScenario1:
+      'Nếu hai ứng viên đề xuất Đội khác nhau, hãy so sánh lập luận với kết quả Nhiệm vụ và phiếu bầu. Chỉ sự tự tin không chứng minh ai là Merlin; tránh công khai tên ứng viên bạn tin hơn.',
+    seoScenario2:
+      'Nếu Nhiệm vụ thành công, đừng coi mọi thành viên chắc chắn thuộc phe Thiện. Phe Ác có thể chọn Thành công. Tiếp tục bảo vệ Merlin sau lần thành công thứ ba, khi Ám sát vẫn có thể đổi bên thắng.',
+  },
   en: {
     generalInformation: 'General Information: ',
     percivalRole:

@@ -1,4 +1,10 @@
 module.exports.merlin = {
+  vi: {
+    title: 'Merlin trong Avalon: năng lực, ngoại lệ Mordred và chiến thuật',
+    description:
+      'Tìm hiểu Merlin thấy ai trong Avalon, vì sao Mordred vẫn ẩn mình, mối liên hệ của Percival với Morgana và cách dẫn dắt phe Thiện mà không lộ mình cho Sát thủ.',
+    keywords: ['Merlin', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Merlin em Avalon: habilidades, Mordred e estratégia',
     description:

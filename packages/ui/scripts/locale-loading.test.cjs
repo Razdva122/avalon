@@ -7,7 +7,7 @@ test('load only the selected locale and English fallback, deduplicating concurre
   const fetched = [];
   const installed = [];
   const loaders = Object.fromEntries(
-    ['en', 'ru', 'es', 'pt', 'zh-CN', 'zh-TW'].map((lang) => [
+    ['en', 'ru', 'es', 'pt', 'zh-CN', 'zh-TW', 'vi'].map((lang) => [
       lang,
       async () => {
         fetched.push(lang);

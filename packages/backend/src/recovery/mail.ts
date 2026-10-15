@@ -32,6 +32,15 @@ export function smtpSender(config: MailConfig): (mail: Mail) => Promise<void> {
 }
 
 const templates = {
+  vi: {
+    resetSubject: 'Đặt lại mật khẩu Avalon',
+    changedSubject: 'Mật khẩu Avalon của bạn đã được thay đổi',
+    intro: 'Để đặt mật khẩu Avalon mới, hãy mở liên kết này:',
+    reminder:
+      'Liên kết hết hạn sau 30 phút kể từ lúc yêu cầu. Nếu bạn không yêu cầu, hãy bỏ qua email này. Mật khẩu của bạn chưa thay đổi.',
+    changed:
+      'Mật khẩu Avalon của bạn đã được thay đổi. Các phiên đăng nhập trước đã được đăng xuất. Nếu không phải bạn thực hiện, hãy mở trang web Avalon để khôi phục tài khoản hoặc liên hệ nhóm dự án.',
+  },
   en: {
     resetSubject: 'Reset your Avalon password',
     changedSubject: 'Your Avalon password was changed',

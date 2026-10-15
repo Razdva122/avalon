@@ -5,7 +5,7 @@ const path = require('node:path');
 const ts = require('typescript');
 const { createI18n } = require('vue-i18n');
 
-const locales = ['ru', 'en', 'es', 'pt', 'zh_CN', 'zh_TW'];
+const locales = ['ru', 'en', 'es', 'pt', 'zh_CN', 'zh_TW', 'vi'];
 const keys = [
   'analyst',
   'diplomat',

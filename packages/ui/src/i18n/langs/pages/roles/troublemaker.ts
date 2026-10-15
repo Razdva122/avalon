@@ -21,6 +21,25 @@ export const troublemaker: { [key in TLanguage]: Dictionary<string> } = {
     generalTipsCounteractDesc:
       'Se um jogador do mal afirmar ser o {troublemaker}, desafie rapidamente sua declaração e esclareça a situação para evitar confusão.',
   },
+  vi: {
+    seoHeading: 'Kẻ gây rối trong Avalon: vai Thiện, kết quả kiểm tra Ác',
+    seoTeam: 'Thiện. {troublemaker} thắng cùng phe Thiện dù hiện là Ác khi được kiểm tra phe.',
+    seoAbility:
+      'Trên nền tảng này, kiểm tra của {ladyOfLake}, {cleric} và khả năng của {witch} cho thấy Kẻ gây rối là Ác.',
+    seoLimit:
+      'Người chơi có buộc phải nói dối hoặc chọn Thất bại không? Không. Kết quả gây hiểu lầm là tự động; bạn có thể nói thật và phải chọn Thành công trong Nhiệm vụ. {merlin} không thấy bạn là Ác vì khả năng này.',
+    seoScenario1:
+      'Nếu kiểm tra phe cho kết quả Ác, hãy giải thích khả năng có Kẻ gây rối khi vai này được bật. Chỉ lời nhận vai không phải bằng chứng: người phe Ác cũng có thể nói như vậy.',
+    seoScenario2:
+      'Bảo vệ mình bằng lịch sử Đội và phiếu bầu. So sánh vai này với {trickster}, người phe Ác có kết quả kiểm tra là Thiện.',
+    generalTips: 'Mẹo chung:',
+    generalTipsRevealTitle: 'Tiết lộ có tính toán',
+    generalTipsRevealDesc:
+      'Nếu kết quả phe giả của bạn bị lộ hoặc dễ bị chất vấn, hãy bình tĩnh tiết lộ vai thật {troublemaker} để duy trì lòng tin trong Đội.',
+    generalTipsCounteractTitle: 'Phản bác người phe Ác giả danh',
+    generalTipsCounteractDesc:
+      'Nếu người phe Ác nhận mình là {troublemaker}, hãy nhanh chóng chất vấn và làm rõ tình huống để tránh gây nhầm lẫn.',
+  },
   en: {
     seoHeading: 'Troublemaker in Avalon: Good Role, Evil Check',
     seoTeam: 'Good. {troublemaker} wins with good despite appearing evil in loyalty checks.',

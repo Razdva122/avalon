@@ -136,7 +136,7 @@ function send(name: string, fields: Record<string, string> = {}, page = '/') {
 }
 
 function guidePath(slug: string, language: string): string {
-  const prefix = ['ru', 'es', 'pt', 'zh-CN', 'zh-TW'].includes(language) ? `/${language.toLowerCase()}` : '';
+  const prefix = ['ru', 'es', 'pt', 'zh-CN', 'zh-TW', 'vi'].includes(language) ? `/${language.toLowerCase()}` : '';
   return `${prefix}/guides/${slug}/`;
 }
 

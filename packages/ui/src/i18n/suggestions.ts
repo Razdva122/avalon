@@ -1,4 +1,9 @@
 export const languageSuggestions = {
+  vi: {
+    message: 'Trang này cũng có phiên bản tiếng Việt.',
+    action: 'Đọc bằng tiếng Việt',
+    dismiss: 'Để sau',
+  },
   en: {
     message: 'This page is also available in English.',
     action: 'Read in English',

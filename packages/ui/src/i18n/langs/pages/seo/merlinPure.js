@@ -1,4 +1,10 @@
 module.exports.merlinPure = {
+  vi: {
+    title: 'Merlin thuần khiết (Merlin Pure) trong Avalon: vai trò nhìn thấy và ngoại lệ',
+    description:
+      'Merlin thuần khiết có thấy Mordred không? Không. Tìm hiểu các vai Ác được biến thể này của nền tảng tiết lộ, điểm khác Merlin và cách Ám sát.',
+    keywords: ['Merlin thuần khiết', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Merlin Puro em Avalon: papéis visíveis e exceções',
     description:

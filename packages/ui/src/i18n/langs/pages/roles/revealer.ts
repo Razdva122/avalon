@@ -21,6 +21,25 @@ export const revealer: { [key in TLanguage]: Dictionary<string> } = {
     commonAdviceConfuseOpponentsText:
       'Depois que seu papel for revelado, continue semeando confusão entre os oponentes, manipulando fluxos de informação para apoiar seus aliados e criar desordem entre os inimigos.',
   },
+  vi: {
+    seoHeading: 'Kẻ lộ diện trong Avalon: khi nào vai bị tiết lộ',
+    seoTeam: 'Ác. Bị lộ không khiến bạn rời ván chơi hay đổi phe.',
+    seoAbility:
+      '{revealer} bị công khai vai sau Nhiệm vụ Thất bại thứ hai. Số đếm là số Nhiệm vụ thất bại trong toàn ván, không phải số lá Thất bại của riêng bạn.',
+    seoLimit:
+      'Kẻ lộ diện có tự động lộ sau Nhiệm vụ 2 không? Không. Phải có hai Nhiệm vụ thất bại. Sau đó, Kẻ lộ diện vẫn có thể bỏ phiếu, làm Đội trưởng và chọn Thành công hoặc Thất bại khi đi Nhiệm vụ.',
+    seoScenario1:
+      'Nếu kết quả lần lượt là Thành công, Thất bại, Thất bại, việc lộ vai diễn ra sau Nhiệm vụ 3, dù bạn không tham gia các Đội thất bại đó.',
+    seoScenario2:
+      'Khi đã lộ, hãy dự đoán phe Thiện sẽ Phản đối các Đội có bạn. Phiếu bầu và đề xuất của bạn vẫn tác động đến ván chơi, vì vậy đừng làm lộ đồng minh.',
+    commonAdviceTitle: 'Lời khuyên chung:',
+    commonAdviceTakeResponsibilityHeading: 'Nhận trách nhiệm:',
+    commonAdviceTakeResponsibilityText:
+      'Biết rằng vai sẽ bị công khai sau lần thất bại thứ hai, hãy cố chủ động nhận trách nhiệm trong các Nhiệm vụ thất bại để che chở đồng minh và bảo đảm thành công chung của phe mình.',
+    commonAdviceConfuseOpponentsHeading: 'Tiếp tục gây nhiễu sau khi lộ vai:',
+    commonAdviceConfuseOpponentsText:
+      'Sau khi vai bị tiết lộ, hãy tiếp tục khiến đối thủ bối rối bằng cách điều hướng thông tin để hỗ trợ đồng minh và gây rối loạn cho phe đối lập.',
+  },
   en: {
     seoHeading: 'Revealer in Avalon: When the Role Is Revealed',
     seoTeam: 'Evil. Being revealed does not remove you from the game or change your side.',

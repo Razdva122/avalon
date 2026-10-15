@@ -2,6 +2,29 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const lancelots: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoHeading: 'Lancelot trong Avalon: đổi phe và luật Nhiệm vụ',
+    seoTeam:
+      'Một người bắt đầu ở phe Thiện, người kia ở phe Ác. Mỗi người thắng cùng phe hiện tại; đổi phe làm thay đổi phe của cả hai.',
+    seoAbility:
+      'Ở đây, một lá được rút trước Nhiệm vụ 3, 4 và 5 nếu ván chơi đến đó. Bộ bài đã xáo có hai lá Đổi phe và ba lá Trống. Đổi phe thay đổi cả hai người; Trống không đổi ai.',
+    seoLimit:
+      'Lancelot Ác có thể chọn Thành công không? Trên nền tảng này thì không: Lancelot hiện thuộc phe Ác phải chọn Thất bại, còn người hiện thuộc phe Thiện phải chọn Thành công. Khi thiết lập, cả hai không biết danh tính của nhau hay các đồng đội phe Ác. Các biến thể Lancelot trong trò chơi bàn cờ có luật khác nhau.',
+    seoScenario1:
+      'Lá Đổi phe trước Nhiệm vụ 3 khiến Lancelot trước đó thuộc phe Thiện chuyển sang Ác, nên người đó phải chọn Thất bại. Các lá Thành công trước đây không xác nhận phe hiện tại.',
+    seoScenario2:
+      '{guinevere} biết cả hai Lancelot nhưng không biết phe. {merlin} chỉ thấy Lancelot ban đầu thuộc phe Ác là Ác; dấu này không cập nhật sau khi đổi phe. Những người thấy vai Lancelot cụ thể, gồm {merlinPure} và những người phe Ác khác nhìn thấy vai đó, nhận được thông tin phe cập nhật.',
+    generalTipsTitle: 'Mẹo chung:',
+    embraceUnpredictabilityTitle: 'Đón nhận tính khó đoán:',
+    embraceUnpredictabilityDescription:
+      'Với vai Lancelot, tính khó đoán là lợi thế của bạn. Hãy tận dụng khả năng đổi phe.',
+    dualityOfRolesTitle: 'Tính hai mặt của vai:',
+    dualityOfRolesDescription:
+      'Nhớ vai ban đầu nhưng thích nghi nhanh nếu rút được lá đổi phe. Hãy thể hiện vai mới một cách thuyết phục để tránh bị nghi ngờ.',
+    observeAndAdaptTitle: 'Quan sát và thích nghi:',
+    observeAndAdaptDescription:
+      'Cả hai Lancelot phải theo sát diễn biến ván chơi để điều chỉnh chiến thuật hiệu quả sau mỗi lần đổi phe.',
+  },
   en: {
     seoHeading: 'Lancelot in Avalon: Switching Sides & Mission Rules',
     seoTeam: 'One starts good and one evil. Each wins with their current side; a switch changes both allegiances.',

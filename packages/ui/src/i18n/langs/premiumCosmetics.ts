@@ -128,4 +128,27 @@ const zhTW: typeof en = {
   collection: '開啟我的收藏',
   support: '解鎖 Premium',
 };
-export const premiumCosmetics = { en, ru, es, pt, zh_CN: zhCN, zh_TW: zhTW };
+const vi: typeof en = {
+  title: 'Ảnh đại diện và nhãn dán',
+  description: 'Hai ảnh đại diện độc quyền. Hai biểu cảm nói lên tất cả. Có trong Premium trọn đời.',
+  avatar: 'Ảnh đại diện độc quyền',
+  sticker: 'Nhãn dán độc quyền',
+  puppeteer: 'Kẻ giật dây',
+  'eclipse-queen': 'Nữ hoàng nhật thực',
+  'mordred-puppet': 'Tất cả đều theo kế hoạch',
+  'morgana-violin': 'Thở dài…',
+  puppeteerDescription: 'Nụ cười đầy ẩn ý. Bạn là người giật dây.',
+  queenDescription: 'Ánh mắt lạnh lùng dưới mặt trời bị che khuất. Làm chủ bàn chơi.',
+  puppetDescription: 'Họ đã mắc lừa. Hãy cho họ biết ai là người giật dây.',
+  violinDescription:
+    'Dành cho những lời bào chữa sau nhiệm vụ thất bại. Một cây vĩ cầm bé xíu và thật nhiều châm biếm.',
+  unlockHint: 'Có trong Premium. Chọn ảnh đại diện này trong hồ sơ sau khi Premium được kích hoạt.',
+  onlyPremium: 'Có với Premium',
+  included: 'Đã bao gồm trong Premium của bạn',
+  explore: 'Tìm hiểu Premium',
+  activation:
+    'Cả bốn vật phẩm tự động mở khóa khi Premium được kích hoạt. Chọn ảnh đại diện trong hồ sơ và thêm nhãn dán vào yêu thích. Ẩn huy hiệu không làm mất các quyền lợi này.',
+  collection: 'Mở bộ sưu tập của tôi',
+  support: 'Mở khóa Premium',
+};
+export const premiumCosmetics = { en, ru, es, pt, zh_CN: zhCN, zh_TW: zhTW, vi };

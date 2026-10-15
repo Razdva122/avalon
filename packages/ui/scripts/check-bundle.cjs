@@ -31,7 +31,7 @@ const gzipBytes = initial.reduce(
 );
 assert(gzipBytes < 315 * 1024, `Initial JavaScript exceeds 315 KiB gzip: ${gzipBytes}`);
 const localeSizes = Object.fromEntries(
-  ['en', 'ru', 'es', 'pt', 'zh-cn', 'zh-tw'].map((language) => {
+  ['en', 'ru', 'es', 'pt', 'zh-cn', 'zh-tw', 'vi'].map((language) => {
     const chunks = files.filter((file) => file.startsWith(`locale-${language}.`) && file.endsWith('.js'));
     assert.equal(chunks.length, 1, `${language}: expected one independent locale chunk`);
     return [language, zlib.gzipSync(fs.readFileSync(path.join(dist, 'js', chunks[0]))).length];

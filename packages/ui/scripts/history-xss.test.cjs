@@ -40,7 +40,7 @@ const cases = [
 const attack = '<img src=x onerror="alert(1)"> & <svg onload="alert(2)">';
 const escaped = '&lt;img src=x onerror=&quot;alert(1)&quot;&gt; &amp; &lt;svg onload=&quot;alert(2)&quot;&gt;';
 
-for (const locale of ['en', 'ru', 'es', 'pt', 'zh_CN', 'zh_TW']) {
+for (const locale of ['en', 'ru', 'es', 'pt', 'zh_CN', 'zh_TW', 'vi']) {
   for (const [name, data] of cases) {
     test(`${locale}: ${name} ${data.target || ''} renders player names as bold text, never HTML`, async () => {
       const messages = require(`../src/i18n/langs/${locale}/history.ts`).default;

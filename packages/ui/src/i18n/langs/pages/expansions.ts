@@ -2,6 +2,23 @@ import type { TLanguage } from '@/i18n/interface';
 import type { Dictionary } from '@avalon/types';
 
 export const expansions: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoHeading: 'Các bản mở rộng Avalon: luật chơi và so sánh',
+    intro:
+      'Bạn đang tìm bản mở rộng hoặc bài bổ sung cho Avalon? Hướng dẫn này so sánh bốn mô-đun tùy chọn có trên trang web. Chúng bổ sung thông tin hoặc thay đổi cách thực hiện Nhiệm vụ.',
+    chooseTitle: 'Nên chọn bản mở rộng nào?',
+    chooseText:
+      'Bắt đầu với {ladyOfLake} để bí mật kiểm tra phe. Chọn {excalibur} để đảo lá bài Nhiệm vụ, {plotCards} để có thêm nhiều hành động, hoặc {ladyOfSea} để biết chi tiết hơn về vai phe Ác. Đọc luật cơ bản trước, rồi thêm cơ chế mà nhóm bạn muốn.',
+    compatibilityTitle: 'Có thể kết hợp các bản mở rộng không?',
+    compatibilityText:
+      'Cài đặt phòng cho phép dùng {ladyOfLake} hoặc {ladyOfSea}, nhưng không dùng cả hai. Mỗi bản đều có thể kết hợp với {excalibur} và {plotCards}. Các hướng dẫn này mô tả cách triển khai trên trang web; bản in hoặc nền tảng khác có thể áp dụng luật khác.',
+    ladyText: 'Bí mật kiểm tra phe Thiện hoặc Ác, rồi chuyển vật đánh dấu. Không được kiểm tra người đã từng giữ nó.',
+    ladySeaText:
+      'Một phiên bản thay thế có thể tiết lộ vai phe Ác. Vai phe Thiện không được nêu tên, với ngoại lệ cho những vai có kết quả phe gây hiểu lầm.',
+    excaliburText:
+      'Đảo lá Thành công hoặc Thất bại của một người khác trong Nhiệm vụ sau khi nộp bài, hoặc bỏ qua việc dùng kiếm.',
+    plotCardsText: 'Bộ 7 hoặc 15 lá bài bổ sung kiểm tra phe, bác bỏ Đội, đổi Đội trưởng và bỏ phiếu công khai.',
+  },
   en: {
     seoHeading: 'Avalon expansions: rules and comparison',
     intro:

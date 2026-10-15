@@ -1,4 +1,10 @@
 module.exports.roles = {
+  vi: {
+    title: 'Vai trò Avalon: Merlin, Percival, Morgana và nhiều vai khác',
+    description:
+      'Khám phá vai trò, năng lực và phe trong Avalon. Tìm hiểu Merlin, Percival thấy ai, các vai Ác hoạt động thế nào và nên thêm nhân vật nào vào ván chơi.',
+    keywords: ['Vai trò', 'Luật chơi', 'Merlin', 'Percival', 'Morgana', 'Oberon', 'Mordred', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Avalon: The Resistance | Papéis',
     description:

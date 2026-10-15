@@ -1,4 +1,10 @@
 module.exports.lunatic = {
+  vi: {
+    title: 'Kẻ điên (Lunatic) trong Avalon: bắt buộc Thất bại và chiến thuật',
+    description:
+      'Kẻ điên có thể chọn Thành công trong Avalon không? Không. Tìm hiểu luật bắt buộc chọn Thất bại, điểm khác Kẻ bạo lực và vì sao một thẻ Thất bại chưa chắc làm hỏng Nhiệm vụ.',
+    keywords: ['Kẻ điên', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Lunático em Avalon: Falha obrigatória e estratégia',
     description:

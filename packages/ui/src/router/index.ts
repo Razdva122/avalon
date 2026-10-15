@@ -164,6 +164,7 @@ const defaultKeywords: { [key in Lowercase<TLanguage>]: string[] } = {
   'zh-cn': ['反抗组织', '阿瓦隆', '在线', '桌游'],
   es: ['La Resistencia', 'Avalon', 'En línea', 'Juego de mesa'],
   pt: ['The Resistance', 'Avalon', 'Online', 'Jogo de tabuleiro'],
+  vi: ['The Resistance', 'Avalon', 'Trực tuyến', 'Trò chơi suy luận xã hội'],
 };
 
 router.beforeEach((to, from, next) => {
@@ -210,6 +211,10 @@ function updateMetadata(to: RouteLocationNormalized) {
       ...source?.meta.multiLanguage[i18n.global.locale.value as TLanguage],
       lang: i18n.global.locale.value,
     };
+    if (to.name === 'passwordRecovery') {
+      meta.title = `${i18n.global.t('passwordRecovery.title')} — Avalon`;
+      meta.description = i18n.global.t('passwordRecovery.intro');
+    }
   }
   document.documentElement.lang = i18n.global.locale.value;
   const wikiArticle = basePath(to.path).startsWith('/wiki/') && basePath(to.path) !== '/wiki/';

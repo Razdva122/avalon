@@ -11,8 +11,8 @@ assassination and optional addons. Play at **[avalon-game.com](https://avalon-ga
 - Persistent room chat and optional LiveKit voice chat (beta).
 - Community boards for finding a group or recruiting players.
 - AI Arena with 5–8 bots, three discussion languages, Codex models and ChatGPT subscription limits.
-- Six interface languages: English, Russian, Spanish, Portuguese, Simplified Chinese
-  and Traditional Chinese. Public rules and wiki pages are prerendered.
+- Seven interface languages: English, Russian, Spanish, Portuguese, Vietnamese,
+  Simplified Chinese and Traditional Chinese. Public rules and wiki pages are prerendered.
 - Optional email password recovery and direct BTC/USDT support payments.
 
 ## Local development

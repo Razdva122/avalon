@@ -1,4 +1,10 @@
 module.exports.revealer = {
+  vi: {
+    title: 'Kẻ lộ diện (Revealer) trong Avalon: khi nào vai trò bị lộ',
+    description:
+      'Khi nào Kẻ lộ diện bị lộ trong Avalon? Tìm hiểu điều kiện hai Nhiệm vụ Thất bại, ai thấy vai trò và người chơi Ác còn có thể làm gì sau đó.',
+    keywords: ['Kẻ lộ diện', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Revelador em Avalon: quando o papel é revelado',
     description:

@@ -2,6 +2,50 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const oberon: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    generalInformation: 'Thông tin chung:',
+    playingAsOberon:
+      'Chơi {oberon} mang đến thử thách riêng: bạn là Tay sai phe Ác nhưng không biết danh tính các Tay sai khác, và họ cũng không biết bạn. Bạn phải phá kế hoạch phe Thiện trong khi chơi với thông tin hạn chế.',
+    archetypes: 'Các biến thể:',
+    archetypesDescription: '{oberon} có những biến thể cùng cơ chế cốt lõi là không bị người chơi khác nhận biết:',
+    wraithArchetype: 'Bóng ma:',
+    wraithDescription:
+      '{wraith} là biến thể của {oberon}, còn bị ẩn khỏi {merlin}, nên hoàn toàn không bị cả hai phe nhận biết.',
+    generalTips: 'Mẹo chung:',
+    playingСonclusion:
+      'Chơi {oberon} đòi hỏi sự xảo quyệt, thích nghi và khả năng đánh lừa. Tính khó đoán là tài sản có thể xoay chuyển ván chơi nếu dùng khôn ngoan. Hãy gây nhiễu, đánh lừa và mưu tính để phe Ác chiến thắng!',
+    embraceMystery: 'Tận dụng sự bí ẩn:',
+    useUnknownStatus: 'Dùng việc không ai biết bạn để tạo bối rối cho mọi người, cả phe Thiện lẫn Ác.',
+    observeClosely: 'Quan sát kỹ:',
+    payAttention: 'Chú ý hành vi và quyết định của người khác để thử suy ra danh tính các Tay sai đồng minh.',
+    actIndependently: 'Hành động độc lập:',
+    withoutCoordination:
+      'Không được phối hợp trực tiếp từ các Tay sai khác, hãy thực hiện những nước đi bạn cho rằng có lợi cho phe Ác.',
+    misleadSubtly: 'Khéo léo đánh lạc hướng:',
+    makeStatements: 'Đưa ra lời nói và hành động gieo nghi ngờ trong phe Thiện mà không tiết lộ phe thật của mình.',
+    takeRisks: 'Chấp nhận rủi ro:',
+    needToMakeBoldMoves:
+      'Bạn có thể cần nước đi táo bạo để giành lòng tin của một trong hai phe và phá kế hoạch phe Thiện.',
+    strategicTips: 'Mẹo chiến thuật:',
+    createUncertainty: 'Tạo sự thiếu chắc chắn:',
+    aimToDestabilize: 'Luôn tìm cách làm lung lay lòng tin mà những người phe Thiện dành cho nhau.',
+    beUnpredictable: 'Giữ mình khó đoán: ',
+    varyGameplay: 'Thay đổi cách chơi để tránh khuôn mẫu có thể tiết lộ vai {oberon}.',
+    listenForClues: 'Lắng nghe manh mối:',
+    useToAdvantage: 'Đồng đội phe Ác có thể vô tình làm lộ mình; hãy tận dụng điều đó để phối hợp gián tiếp.',
+    avoidDrawingAttention: 'Tránh thu hút sự chú ý:',
+    focusOnKeyPlays:
+      'Lối chơi quá năng nổ có thể gây nghi ngờ. Hãy tập trung vào các nước đi then chốt có thể xoay chuyển kết quả ván.',
+    seoTeam: 'Ác. Bạn có cùng điều kiện chiến thắng với phe Ác dù không biết đồng đội là ai.',
+    seoAbility:
+      'Trong thiết lập cổ điển, {oberon} không thấy người phe Ác khác và họ cũng không thấy anh ta. {merlin} vẫn thấy Oberon là Ác.',
+    seoLimit:
+      'Oberon không phải {mordred}: Merlin nhìn thấy anh ta. Biến thể {wraith} riêng trên nền tảng còn ẩn khỏi Merlin; đó không phải khả năng Oberon tiêu chuẩn.',
+    seoScenario1:
+      'Nếu có thể có người phe Ác khác trong Nhiệm vụ, bạn không thể dựa vào thông tin chung lúc đầu để phối hợp. Cân nhắc rằng hai lá Thất bại có thể tiết lộ có hơn một người phe Ác tham gia.',
+    seoScenario2:
+      'Nếu chọn Thành công để tạo lòng tin, hãy nhớ bạn vẫn thuộc phe Ác. Dùng phiếu bầu và kết quả Nhiệm vụ về sau để suy ra đồng minh có thể có; các suy luận đó không phải thông tin vai đã được xác nhận.',
+  },
   en: {
     generalInformation: 'General Information:',
     playingAsOberon:

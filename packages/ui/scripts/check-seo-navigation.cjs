@@ -54,7 +54,7 @@ const server = http.createServer((req, res) => {
       }
       return req.url().startsWith(origin) ? req.continue() : req.abort();
     });
-    for (const pathname of ['/', '/zh-tw/', '/ru/', '/es/', '/pt/', '/zh-cn/']) {
+    for (const pathname of ['/', '/zh-tw/', '/ru/', '/es/', '/pt/', '/zh-cn/', '/vi/']) {
       analyticsRequests = [];
       const analyticsLoaded = Promise.all([
         page.waitForRequest((request) => request.url().includes('googletagmanager.com/gtag/js')),
@@ -166,6 +166,7 @@ const server = http.createServer((req, res) => {
         ['ru', '/ru'],
         ['es', '/es'],
         ['pt', '/pt'],
+        ['vi', '/vi'],
         ['zh-CN', '/zh-cn'],
         ['zh-TW', '/zh-tw'],
       ].map(([language, prefix]) => ({ pathname: prefix + path, language, prefix })),
@@ -187,7 +188,7 @@ const server = http.createServer((req, res) => {
       if (await page.$('.language-suggestion a')) {
         assert.equal(
           await page.$eval('.language-suggestion a', (link) => new URL(link.href).pathname),
-          '/ru' + pathname.replace(/^\/(?:ru|es|pt|zh-cn|zh-tw)(?=\/)/, ''),
+          '/ru' + pathname.replace(/^\/(?:ru|es|pt|zh-cn|zh-tw|vi)(?=\/)/, ''),
           'Suggestion keeps the same translated article',
         );
         await page.locator('.language-suggestion button').click();
@@ -239,6 +240,7 @@ const server = http.createServer((req, res) => {
           'zh-CN': '/zh-cn/guides/avalon-vs-werewolf/?ref=menu-check#comparison',
           es: '/es/guides/avalon-vs-werewolf/?ref=menu-check#comparison',
           pt: '/pt/guides/avalon-vs-werewolf/?ref=menu-check#comparison',
+          vi: '/vi/guides/avalon-vs-werewolf/?ref=menu-check#comparison',
         });
         await page.click('.v-overlay--active .language-links a[lang="ru"]');
         await page.waitForFunction(
@@ -262,6 +264,10 @@ const server = http.createServer((req, res) => {
       '/ru/community/',
       '/ru/community/players/',
       '/ru/community/groups/',
+      '/vi/wiki/rules/',
+      '/vi/wiki/roles/merlin/',
+      '/vi/community/players/',
+      '/vi/guides/social-deduction-games-online/',
       '/ru/support/',
       '/guides/social-deduction-games-online/',
       '/guides/games-like-secret-hitler/',
@@ -353,7 +359,8 @@ const server = http.createServer((req, res) => {
       else
         assert.equal(
           JSON.parse(state.graph)['@graph'].find((n) => n['@type'] === 'WebPage').inLanguage,
-          { ru: 'ru', es: 'es', pt: 'pt', 'zh-cn': 'zh-CN', 'zh-tw': 'zh-TW' }[pathname.split('/')[1]] || 'en',
+          { ru: 'ru', es: 'es', pt: 'pt', vi: 'vi', 'zh-cn': 'zh-CN', 'zh-tw': 'zh-TW' }[pathname.split('/')[1]] ||
+            'en',
         );
       console.log('SPA structured data OK:', pathname);
     }
@@ -408,6 +415,54 @@ const server = http.createServer((req, res) => {
     assert.equal(editorRequests.length, 1, 'Reopening reuses the loaded editor');
     assert.deepEqual(pageErrors, [], 'Lazy role editor must open without navigation or hydration errors');
     console.log('Rules role editor loads on demand and opens from the first click');
+
+    const board = await browser.newPage();
+    const boardErrors = [];
+    const boardChunks = [];
+    board.on('pageerror', (error) => boardErrors.push(error.message));
+    await board.setRequestInterception(true);
+    board.on('request', (req) => {
+      const url = new URL(req.url());
+      if (url.origin !== origin) return req.abort();
+      if (/board-(?:form|moderation)\.[^/]+\.js$/.test(url.pathname)) boardChunks.push(url.pathname);
+      if (url.pathname.startsWith('/api/player-boards'))
+        return req.respond({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(
+            url.pathname.endsWith('/me')
+              ? { listings: [], canRecruit: true, banned: false, isAdmin: false }
+              : { listings: [], hasMore: false },
+          ),
+        });
+      return req.continue();
+    });
+    await board.evaluateOnNewDocument(() => {
+      localStorage.setItem('__user-profile__', JSON.stringify({ id: 'fixture', name: 'Fixture', token: 'test-token' }));
+    });
+    await board.goto(origin + '/vi/community/players/', { waitUntil: 'networkidle0' });
+    await board.waitForSelector('.board-invitation button');
+    assert.equal(boardChunks.length, 0, 'Browsing listings must not download editor or moderation');
+    await board.click('.board-invitation button');
+    await board.waitForSelector('.board-form', { visible: true });
+    assert.equal(boardChunks.filter((url) => /board-form\./.test(url)).length, 1, 'First click loads the editor');
+    assert.equal(await board.$eval('html', (html) => html.lang), 'vi');
+    assert.equal(
+      await board.$eval('.board-form legend', (legend) => legend.textContent.trim()),
+      'Đăng hồ sơ người chơi',
+    );
+    await board.locator('.board-form .form-actions button[type="button"]').click();
+    await board.waitForSelector('.board-form', { hidden: true });
+    await board.click('.board-invitation button');
+    await board.waitForSelector('.board-form', { visible: true });
+    assert.equal(boardChunks.filter((url) => /board-form\./.test(url)).length, 1, 'Reopening reuses the editor');
+    assert.equal(
+      boardChunks.filter((url) => /board-moderation\./.test(url)).length,
+      0,
+      'Non-admins do not load moderation',
+    );
+    assert.deepEqual(boardErrors, [], 'Vietnamese board editor opens without runtime errors');
+    console.log('Vietnamese board editor loads on first click and is reused without loading moderation');
   } finally {
     if (browser) await browser.close();
     server.close();

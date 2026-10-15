@@ -1,4 +1,10 @@
 module.exports.mordred = {
+  vi: {
+    title: 'Mordred trong Avalon: năng lực và chiến thuật',
+    description:
+      'Mordred làm gì trong Avalon? Tìm hiểu vì sao Merlin không thấy hắn, hắn biết những người chơi Ác nào và khi nào chọn Thành công hoặc Thất bại cho Nhiệm vụ.',
+    keywords: ['Mordred', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Mordred em Avalon: habilidades e estratégia',
     description:

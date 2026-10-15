@@ -2,6 +2,28 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const brute: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoHeading: 'Kẻ bạo lực trong Avalon: luật chơi, Nhiệm vụ và chiến thuật',
+    seoTeam: 'Ác. Việc nộp lá Thành công về sau không làm đổi phe của bạn.',
+    seoAbility:
+      '{brute} có thể chọn Thất bại hoặc Thành công ở Nhiệm vụ 1–3. Ở Nhiệm vụ 4 và 5, chỉ có thể chọn Thành công.',
+    seoLimit:
+      'Kẻ bạo lực có thể phá Nhiệm vụ về cuối không? Không. Giới hạn dựa trên số thứ tự Nhiệm vụ, không phải số Nhiệm vụ bạn đã tham gia. Khác với {lunatic}, bạn không bị buộc chọn Thất bại ở các Nhiệm vụ đầu.',
+    seoScenario1:
+      'Ở Nhiệm vụ 2, hãy chọn giữa một lá Thất bại ngay lập tức và một lá Thành công để xây dựng lòng tin. Cân nhắc xem Đội có người phe Ác khác hay không.',
+    seoScenario2:
+      'Ở Nhiệm vụ 4, bạn phải chọn Thành công, nhưng đồng đội phe Ác khác vẫn có thể chọn Thất bại. Nhiệm vụ thành công không chứng minh mọi thành viên đều thuộc phe Thiện.',
+    generalTips: 'Mẹo chung:',
+    earlyMissionFlexibility: 'Tận dụng sự linh hoạt ở các Nhiệm vụ đầu:',
+    earlyMissionFlexibilityDescription:
+      'Vì {brute} có thể chọn cả hai loại bài ở các Nhiệm vụ đầu, hãy dùng điều này để khiến những người hầu trung thành không chắc bạn thuộc phe nào.',
+    maintainUnpredictability: 'Giữ lối chơi khó đoán:',
+    maintainUnpredictabilityDescription:
+      'Hành động thay đổi ở các Nhiệm vụ đầu có thể che giấu danh tính, khiến người khác khó suy ra bạn là {brute}.',
+    strategicSuccessLater: 'Hướng tới những lá Thành công có lợi về sau:',
+    strategicSuccessLaterDescription:
+      'Ở các Nhiệm vụ về sau, khi {brute} chỉ được chọn "Thành công", hãy tập trung xây dựng lòng tin và tác động diễn biến ván chơi theo hướng có lợi cho phe Ác.',
+  },
   en: {
     seoHeading: 'Brute in Avalon: Rules, Missions & Strategy',
     seoTeam: 'Evil. A later Success card does not change your allegiance.',

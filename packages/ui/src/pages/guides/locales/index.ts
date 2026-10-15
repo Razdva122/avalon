@@ -4,6 +4,7 @@ import type { GuideLocale } from '../content';
 
 const loaded: Partial<Record<TLanguage, GuideLocale>> = { en: { guides, copy } };
 const loaders = {
+  vi: () => import(/* webpackChunkName: "guides-vi" */ './vi'),
   ru: () => import(/* webpackChunkName: "guides-ru" */ './ru'),
   es: () => import(/* webpackChunkName: "guides-es" */ './es'),
   pt: () => import(/* webpackChunkName: "guides-pt" */ './pt'),

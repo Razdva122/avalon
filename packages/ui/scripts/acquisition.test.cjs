@@ -36,6 +36,12 @@ function fixture({ blockedStorage = false, analytics = true, prerender = false, 
   return { helper, events, window, values };
 }
 
+test('Vietnamese guide visits keep their canonical language in analytics', () => {
+  const { helper, events } = fixture();
+  helper.trackGuideVisit(first, 'vi');
+  assert.equal(events[0][2].page_location, 'https://avalon-game.com/vi/guides/social-deduction-games-online/');
+});
+
 function auth(helper, routeID, reply = { id: 'private-user', email: 'private@example.com' }) {
   const actions = [];
   const { descriptor } = parse(fs.readFileSync(path.join(__dirname, '../src/components/user/AuthModal.vue'), 'utf8'));

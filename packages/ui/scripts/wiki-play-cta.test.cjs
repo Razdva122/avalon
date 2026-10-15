@@ -107,6 +107,7 @@ test('every wiki page renders direct AI play and locale-preserving navigation', 
     ['ru', '/ru'],
     ['es', '/es'],
     ['pt', '/pt'],
+    ['vi', '/vi'],
     ['zh-CN', '/zh-cn'],
     ['zh-TW', '/zh-tw'],
   ]) {

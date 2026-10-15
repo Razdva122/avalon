@@ -1,4 +1,9 @@
 module.exports.game = {
+  vi: {
+    title: 'Avalon: The Resistance | Ván chơi',
+    description: 'Phòng chơi The Resistance: Avalon trực tuyến.',
+    keywords: ['Ván chơi'],
+  },
   pt: {
     title: 'Avalon: The Resistance | Jogo',
     description: "Salas para jogos online em 'Avalon: The Resistance'",

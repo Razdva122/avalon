@@ -741,6 +741,9 @@
 .material-icons.toc::before {
   content: '\e8de';
 }
+.material-icons.today::before {
+  content: '\e8df';
+}
 .material-icons.token::before {
   content: '\ea25';
 }

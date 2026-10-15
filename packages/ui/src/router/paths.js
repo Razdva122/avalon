@@ -1,5 +1,5 @@
 // Shared by the client router, prerenderer and sitemap generator.
-const localePrefix = /^\/(en|ru|zh-tw|zh-cn|es|pt)(?=\/|$)/i;
+const localePrefix = /^\/(en|ru|zh-tw|zh-cn|es|pt|vi)(?=\/|$)/i;
 
 function basePath(path) {
   const withoutLocale = path.replace(localePrefix, '') || '/';

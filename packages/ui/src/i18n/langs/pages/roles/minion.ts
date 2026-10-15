@@ -2,6 +2,28 @@ import type { TLanguage } from '@/i18n/interface';
 import { Dictionary } from '@avalon/types';
 
 export const minion: { [key in TLanguage]: Dictionary<string> } = {
+  vi: {
+    seoHeading: 'Tay sai của Mordred trong Avalon: luật chơi và chiến thuật',
+    seoTeam: 'Ác. {minion} thông thường là Tay sai của Mordred, không phải vai Mordred đặc biệt.',
+    seoAbility:
+      'Khi thiết lập, Tay sai biết các đồng minh phe Ác trong ván, ngoại trừ {oberon} và {wraith}. Họ có thể chọn Thành công hoặc Thất bại khi đi Nhiệm vụ.',
+    seoLimit:
+      'Merlin có thấy Tay sai của Mordred không? Có. Là tay sai của Mordred không cho bạn khả năng ẩn khỏi {merlin} như {mordred}. Chọn Thành công không biến Tay sai thành người phe Thiện.',
+    seoScenario1:
+      'Nếu có người phe Ác khác tham gia Nhiệm vụ, hãy cân nhắc rằng hai lá Thất bại có thể làm lộ nhiều thành viên phe Ác. Tính đến những vai buộc phải chọn Thất bại.',
+    seoScenario2:
+      'Một lá Thành công có thể giúp bạn tạo lòng tin để tham gia Nhiệm vụ sau. Đó là lựa chọn chiến thuật, không phải bằng chứng về phe Thiện.',
+    strategicTipsTitle: 'Mẹo chiến thuật:',
+    tipDiscreetCollaborationTitle: 'Phối hợp kín đáo:',
+    tipDiscreetCollaborationText:
+      'Nếu có người phe Ác khác tham gia Nhiệm vụ, hãy cân nhắc rằng hai lá Thất bại có thể làm lộ nhiều thành viên phe Ác. Tính đến những vai buộc phải chọn Thất bại.',
+    tipDeceptionTitle: 'Đánh lừa:',
+    tipDeceptionText:
+      'Rèn luyện nghệ thuật đánh lừa. Hòa nhập như người phe Thiện có thể giúp bạn tác động quyết định của họ và bảo vệ danh tính.',
+    tipPublicDemeanorTitle: 'Cách thể hiện trước mọi người:',
+    tipPublicDemeanorText:
+      'Chú ý đến hành động và lời nói công khai. Tránh bị nghi ngờ bằng cách đừng quá phòng thủ hay quá hung hăng.',
+  },
   en: {
     seoHeading: 'Minion of Mordred in Avalon: Rules & Strategy',
     seoTeam: 'Evil. The ordinary {minion} is a Minion of Mordred, not the special Mordred role.',

@@ -1,4 +1,10 @@
 module.exports.excalibur = {
+  vi: {
+    title: 'Excalibur trong Avalon: luật, đổi thẻ và ví dụ',
+    description:
+      'Cách Excalibur hoạt động trong Avalon: ai nhận kiếm, khi nào đổi Thành công hoặc Thất bại, ai thấy kết quả và vì sao đổi thẻ chưa chắc cứu được Nhiệm vụ.',
+    keywords: ['Excalibur trong Avalon', 'Luật chơi', 'Đổi thẻ'],
+  },
   pt: {
     title: 'Excalibur em Avalon: regras e troca da carta de missão',
     description:

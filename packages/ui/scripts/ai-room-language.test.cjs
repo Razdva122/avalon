@@ -26,7 +26,7 @@ test('lobby uses the unified AI setup instead of the old arena creation panel', 
   assert.doesNotMatch(lobby, /AiRoomButton/);
   assert.match(lobby, /<BotRoomButton\b/);
 });
-const locales = ['en', 'ru', 'es', 'pt', 'zh_CN', 'zh_TW'];
+const locales = ['en', 'ru', 'es', 'pt', 'zh_CN', 'zh_TW', 'vi'];
 const community = evaluate(
   fs.readFileSync(path.join(__dirname, '../src/i18n/langs/pages/community.ts'), 'utf8'),
 ).community;
@@ -371,6 +371,7 @@ test('bot discussion defaults to the interface language and falls back to Englis
     ['ru', 'ru'],
     ['zh_TW', 'zh-tw'],
     ['es', 'en'],
+    ['vi', 'en'],
   ]) {
     const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
       props: { roomID: 'bot-room', title: 'Host vs4Bots' },

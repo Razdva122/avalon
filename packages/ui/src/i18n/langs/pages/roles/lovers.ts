@@ -22,6 +22,26 @@ export const lovers: { [key in TLanguage]: Dictionary<string> } = {
     disguiseYourGameplay:
       '<strong>Disfarce seu jogo:</strong> Ocasionalmente votem ou discutam um contra o outro para dissipar qualquer noção de aliança.',
   },
+  vi: {
+    seoHeading: 'Cặp tình nhân trong Avalon: Tristan, Isolde và Ám sát',
+    seoTeam: 'Thiện. {tristan} và {isolde} là hai vai riêng biệt cùng một phe.',
+    seoAbility:
+      'Cặp tình nhân biết danh tính của nhau ngay từ đầu. Mỗi người có một đồng minh phe Thiện đã biết, nhưng không nhận thông tin về những người khác.',
+    seoLimit:
+      'Phe Ác có thể thắng bằng cách đoán chỉ một người trong cặp không? Không. Trên nền tảng này, Ám sát Cặp tình nhân phải nhận diện cả Tristan và Isolde. Đây là vai biến thể, không thuộc bộ vai cơ bản cổ điển.',
+    seoScenario1:
+      'Bạn có thể tin phe của người còn lại, nhưng thêm người thứ ba chưa rõ vẫn khiến Nhiệm vụ thiếu chắc chắn. Hãy giải thích Đội bạn đề xuất bằng bằng chứng công khai.',
+    seoScenario2:
+      'Luôn bảo vệ cùng một người có thể làm lộ cả cặp. Hãy đưa ra lý do độc lập cho phiếu của bạn thay vì công khai người còn lại.',
+    credits: "Ghi công: {'@'}Vermilion0",
+    generalTips: 'Mẹo chung:',
+    maintainIndividualPersonas:
+      '<strong>Giữ phong cách riêng:</strong> Hành động độc lập để tránh tạo khuôn mẫu khiến cả hai cùng bị phát hiện.',
+    protectEachOther:
+      '<strong>Bảo vệ nhau:</strong> Theo dõi diễn biến ván chơi; khi một người bị nghi ngờ, người kia nên khéo léo chuyển hướng thay vì bảo vệ lộ liễu.',
+    disguiseYourGameplay:
+      '<strong>Che giấu lối chơi:</strong> Thỉnh thoảng bỏ phiếu hoặc tranh luận ngược nhau để xóa nghi ngờ rằng hai người có liên minh.',
+  },
   en: {
     seoHeading: 'Lovers in Avalon: Tristan, Isolde & Assassination',
     seoTeam: 'Good. {tristan} and {isolde} are two separate roles on the same team.',

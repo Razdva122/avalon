@@ -1,4 +1,9 @@
 module.exports.userStats = {
+  vi: {
+    title: 'Avalon: The Resistance | Thống kê cá nhân',
+    description: 'Thống kê cá nhân các ván The Resistance: Avalon trực tuyến.',
+    keywords: ['Thống kê', 'Số liệu', 'Tỷ lệ thắng'],
+  },
   pt: {
     title: 'Avalon: The Resistance | Estatísticas Pessoais',
     description: "Estatísticas pessoais para jogos online em 'Avalon: The Resistance'",

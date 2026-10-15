@@ -1,4 +1,10 @@
 module.exports.troublemaker = {
+  vi: {
+    title: 'Kẻ gây rối (Troublemaker) trong Avalon: vai Thiện, kiểm tra ra Ác',
+    description:
+      'Vì sao Kẻ gây rối trông như thuộc phe Ác trong Avalon? Tìm hiểu những kiểm tra phe gây hiểu lầm, có bắt buộc nói dối không và được dùng thẻ Nhiệm vụ nào.',
+    keywords: ['Kẻ gây rối', 'Vai trò', 'Luật chơi', 'Mẹo chơi'],
+  },
   pt: {
     title: 'Encrenqueiro em Avalon: bom com verificação de mal',
     description:
