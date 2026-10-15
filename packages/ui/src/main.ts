@@ -8,7 +8,7 @@ import { store, key } from '@/store';
 
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';
 
-import { vuetify } from '@/plugins/vuetify';
+import { vuetify, syncVuetifyLanguage } from '@/plugins/vuetify';
 import { i18n } from '@/plugins/i18n';
 
 import LocaleLink from '@/components/feedback/LocaleLink.vue';
@@ -32,6 +32,7 @@ const app = (hydratePage || (prerender && ssrPage) ? createSSRApp : createApp)(A
 
 async function start() {
   await Promise.all([router.isReady(), fullStylesReady()]);
+  await syncVuetifyLanguage();
   if (prerender) {
     // Capture runtime dependencies BEFORE importing the build-only SSR renderer.
     // Publishing its chunks as preloads would make visitors download the renderer.

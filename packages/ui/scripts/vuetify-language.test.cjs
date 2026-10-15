@@ -6,7 +6,7 @@ const Module = require('node:module');
 const ts = require('typescript');
 const { ref, nextTick } = require('vue');
 
-function loadPlugin(locale) {
+function loadPlugin(locale, onLoad = () => {}) {
   const filename = path.resolve(__dirname, '../src/plugins/vuetify/index.ts');
   const loaded = new Module(filename, module);
   loaded.filename = filename;
@@ -18,6 +18,7 @@ function loadPlugin(locale) {
     if (id === '@/store/init') return { userSettingsInStorage: null };
     if (id === '@/plugins/i18n') return { i18n: { global: { locale } } };
     if (id === './vi') {
+      onLoad();
       const translated = new Module(path.join(path.dirname(filename), 'vi.ts'), module);
       translated.paths = module.paths;
       translated._compile(
@@ -36,12 +37,13 @@ function loadPlugin(locale) {
     }).outputText,
     filename,
   );
-  return loaded.exports.vuetify;
+  return loaded.exports;
 }
 
 test('framework controls use Vietnamese on initial load and follow language changes', async () => {
   const locale = ref('vi');
-  const vuetify = loadPlugin(locale);
+  const { vuetify, syncVuetifyLanguage } = loadPlugin(locale);
+  await syncVuetifyLanguage();
   assert.equal(vuetify.locale.current.value, 'vi');
   assert.equal(vuetify.locale.t('$vuetify.noDataText'), 'Không có dữ liệu');
   assert.equal(vuetify.locale.t('$vuetify.input.clear', 'Tên'), 'Xóa Tên');
@@ -51,5 +53,24 @@ test('framework controls use Vietnamese on initial load and follow language chan
   assert.equal(vuetify.locale.t('$vuetify.noDataText'), 'No data available');
   locale.value = 'vi';
   await nextTick();
+  await syncVuetifyLanguage();
   assert.equal(vuetify.locale.t('$vuetify.noDataText'), 'Không có dữ liệu');
+});
+
+test('non-Vietnamese startup skips the framework dictionary and later switches reuse it', async () => {
+  let loads = 0;
+  const locale = ref('ru');
+  const { vuetify, syncVuetifyLanguage } = loadPlugin(locale, () => loads++);
+  await syncVuetifyLanguage();
+  assert.equal(loads, 0);
+  assert.equal(vuetify.locale.current.value, 'en');
+  locale.value = 'vi';
+  await syncVuetifyLanguage();
+  assert.equal(loads, 1);
+  assert.equal(vuetify.locale.t('$vuetify.input.clear', 'Tên'), 'Xóa Tên');
+  locale.value = 'ru';
+  await syncVuetifyLanguage();
+  locale.value = 'vi';
+  await syncVuetifyLanguage();
+  assert.equal(loads, 1);
 });

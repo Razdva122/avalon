@@ -3,7 +3,6 @@ import { createVuetify } from 'vuetify';
 import { watch } from 'vue';
 import { aliases, md } from 'vuetify/iconsets/md';
 import { fa } from './icons';
-import vi from './vi';
 import { i18n } from '@/plugins/i18n';
 import { hydratePage, ssrPage } from '@/helpers/prerender';
 import { userSettingsInStorage } from '@/store/init';
@@ -91,9 +90,8 @@ const darkTheme = {
 export const vuetify = createVuetify({
   ssr: ssrPage,
   locale: {
-    locale: i18n.global.locale.value === 'vi' ? 'vi' : 'en',
+    locale: 'en',
     fallback: 'en',
-    messages: { vi },
   },
   theme: {
     defaultTheme: selectTheme(),
@@ -118,6 +116,19 @@ export const vuetify = createVuetify({
   },
 });
 
-watch(i18n.global.locale, (language) => {
-  vuetify.locale.current.value = language === 'vi' ? 'vi' : 'en';
+let vietnamese: Promise<typeof import('./vi')> | undefined;
+export async function syncVuetifyLanguage() {
+  const language = i18n.global.locale.value;
+  if (language === 'vi') {
+    const messages = await (vietnamese ??= import(/* webpackChunkName: "vuetify-vi" */ './vi').catch((error) => {
+      vietnamese = undefined;
+      throw error;
+    }));
+    vuetify.locale.messages.value.vi = messages.default;
+  }
+  // A slower language download cannot replace a newer selection.
+  if (i18n.global.locale.value === language) vuetify.locale.current.value = language === 'vi' ? 'vi' : 'en';
+}
+watch(i18n.global.locale, () => {
+  void syncVuetifyLanguage().catch(() => console.error('Framework language could not be loaded'));
 });
