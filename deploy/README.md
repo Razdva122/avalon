@@ -33,6 +33,36 @@ GitHub Actions. Details and manual recovery:
 [UI release guide](../packages/ui/README.md#images-served-by-the-application-server).
 A failed UI image audit must be corrected before deploying that UI.
 
+### GitHub Actions storage quota
+
+Release images and build caches are stored in Docker Hub. The UI export stays
+on the build runner and is packaged there; no GitHub artifact transfer is needed.
+`DOCKER_BUILD_RECORD_UPLOAD=false` disables the optional `.dockerbuild`
+diagnostic uploads from Docker's build action. Normal workflow logs remain available.
+See [Docker build action environment variables](https://github.com/docker/build-push-action/tree/v6#environment-variables).
+
+If a storage alert arrives, check the latest Publish and Deploy run results before
+assuming releases are blocked. Continue the normal release process while runs
+are allowed. Merge the workflow change before pushing a new release tag; retrying
+an old run still uses its old workflow. For an existing tag, manually dispatch
+Publish from the updated `master` branch with that tag as input.
+
+Deleting old artifacts reduces current storage but does not erase storage already
+accrued during the billing cycle; usage reporting can take 6–12 hours to update.
+The quota belongs to the repository owner and may also include other repositories
+and GitHub Packages. Build caches have a separate allowance, so deleting caches
+does not free the artifact allowance. See [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
+
+If GitHub blocks runners with a billing error, this workflow change cannot unblock
+them. The account owner can allow paid Actions usage with a payment method and a
+bounded budget with **Stop usage when budget limit is reached**, or wait for the
+next billing cycle. Without paid Actions, an operator can build and audit both
+images locally using the same Dockerfiles and `linux/amd64` platform, publish new
+version tags to Docker Hub, and invoke the existing restricted SSH deployment
+entry point with an authorized key (see [deployment access](firstbyte/DEPLOY.md#access-and-server-installation)).
+Preserve the nginx/UI audits and deployment safeguards; do not build on the
+production server or overwrite an existing release tag.
+
 The root `npm version` lifecycle runs tests, updates workspace versions, stages
 files, pushes commits and pushes its version tag. Inspect the worktree and
 release contents before invoking it; documentation edits alone do not need a new

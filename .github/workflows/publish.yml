@@ -7,6 +7,10 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  # Release images and build caches live in Docker Hub; skip diagnostic artifacts.
+  DOCKER_BUILD_RECORD_UPLOAD: 'false'
+
 on:
   workflow_dispatch:
     inputs:
