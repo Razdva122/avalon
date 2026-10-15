@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-10-15T11:13:43.038Z",
+  "version": "73.2.1",
+  "experimentVersion": "session-delta-v1",
+  "allocationAvailable": true,
+  "siteRouterAvailable": true,
+  "quotaSnapshotAvailable": true,
+  "quotaWindows": [
+    {
+      "id": "codex",
+      "minutes": [300, 10080]
+    }
+  ],
+  "assignedGames": [],
+  "auditedRequests": 0
+}

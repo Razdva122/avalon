@@ -1,6 +1,6 @@
 # Website bot-session A/B rollout
 
-Release candidate: v73.2.1. The game service globally balances `standard` and
+Activated release: v73.2.1 on 2026-10-15. The game service globally balances `standard` and
 `session-delta` assignments, fixes the assignment per match, and keeps end reviews
 fresh in both arms. The separate worker was updated first on 2026-10-15.
 
@@ -22,9 +22,13 @@ The private report command and measurement limits are described in
 Initial analysis starts after at least five completed matches per mode within one
 settings stratum; check failed, stopped, paused and incomplete matches too.
 
-This file's release-candidate status is not confirmation of backend activation.
-Record the deployment receipt and post-rollout health check before claiming live
-A/B allocation is enabled.
+[Production deployment succeeded](https://github.com/Razdva122/avalon/actions/runs/38725512515)
+after both release images passed publication. The operator explicitly authorized
+resetting unfinished rooms. Server health checks and an external HTTPS request
+passed. `live-verification.json` confirms the running backend version, A/B router,
+MongoDB access and worker quota windows (300 and 10080 minutes). At that check no
+new experiment game had started; the empty ledger is the initial baseline, not a
+measurement of zero-cost games. Future game costs are recorded privately in MongoDB.
 
 ## Release verification
 
