@@ -5,7 +5,7 @@ The current website rollout and private production report are documented in
 
 The earlier pilots retain their scripts, explanations and final measurements in
 Git. Full model inputs/outputs and intermediate runs remain in their original
-local directories, excluded by narrowly scoped rules in the root `.gitignore`.
+local directories, excluded by each experiment’s local `.gitignore`.
 No raw files were deleted or moved. A fresh checkout therefore does not contain
 all inputs needed to replay these historical measurements.
 

@@ -1,0 +1,5 @@
+# Keep raw runs local; retain replay measurements and live summaries.
+/*.json*
+!/results.json
+!/live-summary.json
+!/live-input-verification.json

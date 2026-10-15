@@ -1,0 +1,3 @@
+# Keep raw runs local; retain the final measurements.
+/*.json*
+!/summary.json

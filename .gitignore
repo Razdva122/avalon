@@ -1,20 +1,27 @@
-.DS_Store
+# Dependencies and build output
 node_modules
-/dist
-**/dist
+dist
+/ui-release/
 
-# local env files
+# Generated UI assets
+/packages/ui/src/i18n/generated/
+/packages/ui/src/assets/avatars/
+/packages/ui/src/assets/thumbnails/
+
+# Local environment and operations
 .env.local
 .env.production
 .env.*.local
+/.private-ops/
 
-# Log files
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Editor directories and files
+# Editor and OS files
+.DS_Store
 .idea
 .vscode
 *.suo
@@ -23,36 +30,7 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
-# Build-time language dictionaries; edit src/i18n/langs instead.
-/packages/ui/src/i18n/generated/
-
-# Exported UI release used by the publication workflow.
-/ui-release/
-
-# Generated avatar previews; rebuilt before image tests/build and dev startup.
-/packages/ui/src/assets/avatars/
-
-# Local production operations notes; never publish.
-/.private-ops/
-
-# Generated small role and team icons.
-/packages/ui/src/assets/thumbnails/
-
-# Local creative materials, renders, announcements, and their backups.
+# Local creative output
 /artifacts/
 /announcements/
 /output/
-
-# Local raw inputs, model transcripts and intermediate runs for the October pilots.
-# Keep scripts, reports and selected measurement summaries in Git.
-/docs/ai-evaluations/2026-10-15-bot-sessions/*.json*
-!/docs/ai-evaluations/2026-10-15-bot-sessions/summary.json
-!/docs/ai-evaluations/2026-10-15-bot-sessions/usage-validation.json
-/docs/ai-evaluations/2026-10-15-prompt-cache/*.json*
-!/docs/ai-evaluations/2026-10-15-prompt-cache/summary.json
-/docs/ai-evaluations/2026-10-15-prompt-dedup/*.json*
-!/docs/ai-evaluations/2026-10-15-prompt-dedup/summary.json
-/docs/ai-evaluations/2026-10-15-session-deltas/*.json*
-!/docs/ai-evaluations/2026-10-15-session-deltas/results.json
-!/docs/ai-evaluations/2026-10-15-session-deltas/live-summary.json
-!/docs/ai-evaluations/2026-10-15-session-deltas/live-input-verification.json
