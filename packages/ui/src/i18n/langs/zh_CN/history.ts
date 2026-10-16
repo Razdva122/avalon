@@ -4,6 +4,11 @@
  */
 export default {
   history: {
+    noEvents: '暂无事件',
+    finale: '终局',
+    hiddenEvent: '事件已被游戏设置隐藏',
+    playerVotes: '玩家投票',
+    anonymousVoting: '匿名投票',
     listView: '事件记录',
     tableView: '投票表',
     noVotes: '暂无投票',
@@ -39,16 +44,24 @@ export default {
     announceLoyalty: '宣布',
   },
   mission: {
+    cards: '任务卡',
+    succeeded: '成功',
+    failed: '失败',
     cardSuccess: '成功',
     cardFail: '失败',
     players: '玩家',
     fails: '失败',
     indexMission: '{index} 任务',
-    failsCount: '失败 {count}',
+    failsCount: '失败卡：{count}',
     hidden: '由巫婆隐藏',
     team: '团队：',
   },
   vote: {
+    attempt: '第 {index} 次提案',
+    statusApproved: '获批',
+    statusRejected: '被否决',
+    approved: '队伍获批',
+    rejected: '队伍被否决',
     forcedVote: '强制投票',
     voteIndex: '{index} 票',
     teamSelected: '由选择的团队',

@@ -139,6 +139,7 @@
       <nav class="discovery-links" :aria-label="t('menu.wiki')">
         <LocaleLink :to="{ name: 'rules' }">{{ t('wiki.rules') }}</LocaleLink
         ><LocaleLink :to="{ name: 'roles' }">{{ t('wiki.roles') }}</LocaleLink
+        ><LocaleLink :to="{ name: 'social_deduction_games_online' }">{{ t('wiki.gameGuides') }}</LocaleLink
         ><LocaleLink :to="{ name: 'lobby' }">{{ t('menu.home') }}</LocaleLink>
       </nav>
     </section>

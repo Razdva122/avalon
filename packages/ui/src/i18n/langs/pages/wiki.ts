@@ -4,6 +4,9 @@ import { Dictionary } from '@avalon/types';
 export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   pt: {
     gameGuides: 'Guias de jogos',
+    guideSocialDeduction: 'Jogos de dedução social online',
+    guideSecretHitler: 'Jogos parecidos com Secret Hitler',
+    guideWerewolf: 'Avalon ou Lobisomem?',
     compareGames: 'Compare Avalon, Secret Hitler e Lobisomem para escolher o próximo jogo do seu grupo.',
     introduction:
       'Primeira partida de Avalon? Comece pelas regras e pela tabela de jogadores por missão, depois consulte os papéis da sua partida. Explore as expansões quando o grupo quiser mais opções.',
@@ -46,6 +49,9 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   },
   vi: {
     gameGuides: 'Hướng dẫn trò chơi',
+    guideSocialDeduction: 'Trò chơi suy luận xã hội trực tuyến',
+    guideSecretHitler: 'Trò chơi giống Secret Hitler',
+    guideWerewolf: 'Avalon hay Ma Sói?',
     compareGames: 'So sánh Avalon, Secret Hitler và Ma Sói để chọn trò tiếp theo cho nhóm bạn.',
     introduction:
       'Mới chơi Avalon? Hãy bắt đầu với luật chơi và bảng số người, rồi tra cứu các vai trong ván của bạn. Xem hướng dẫn bản mở rộng khi nhóm đã sẵn sàng thêm lựa chọn.',
@@ -85,6 +91,9 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   },
   en: {
     gameGuides: 'Game guides',
+    guideSocialDeduction: 'Social deduction games online',
+    guideSecretHitler: 'Games like Secret Hitler',
+    guideWerewolf: 'Avalon vs Werewolf',
     compareGames: 'Compare Avalon, Secret Hitler and Werewolf for your next group game.',
     introduction:
       'New to Avalon? Start with the rules and player-count table, then look up the roles in your game. Use the expansions guide when your group is ready to add more options.',
@@ -125,6 +134,9 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   },
   ru: {
     gameGuides: 'Обзоры игр',
+    guideSocialDeduction: 'Игры на социальную дедукцию онлайн',
+    guideSecretHitler: 'Игры, похожие на Secret Hitler',
+    guideWerewolf: 'Авалон или «Мафия»?',
     compareGames: 'Сравните Авалон, Secret Hitler и «Оборотней», чтобы выбрать игру для вашей компании.',
     introduction:
       'Впервые играете в Авалон? Начните с правил и таблицы участников миссий, затем изучите роли вашей партии. Когда освоитесь, переходите к дополнениям.',
@@ -165,6 +177,9 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   },
   'zh-CN': {
     gameGuides: '游戏指南',
+    guideSocialDeduction: '在线社交推理游戏',
+    guideSecretHitler: '类似 Secret Hitler 的游戏',
+    guideWerewolf: '阿瓦隆与狼人杀比较',
     compareGames: '比较阿瓦隆、Secret Hitler 和狼人杀，为朋友聚会选择游戏。',
     introduction:
       '第一次玩阿瓦隆？先阅读规则和任务人数表，再查看本局使用的角色。熟悉基本玩法后，再选择适合你们的扩展。',
@@ -201,6 +216,9 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   },
   'zh-TW': {
     gameGuides: '遊戲指南',
+    guideSocialDeduction: '線上社交推理遊戲',
+    guideSecretHitler: '類似 Secret Hitler 的遊戲',
+    guideWerewolf: '阿瓦隆與狼人殺比較',
     compareGames: '比較阿瓦隆、Secret Hitler 與狼人殺，為朋友聚會選擇遊戲。',
     introduction:
       '第一次玩阿瓦隆？先閱讀規則和任務人數表，再查看本局使用的角色。熟悉基本玩法後，再選擇適合你們的擴充。',
@@ -237,6 +255,9 @@ export const wiki: { [key in TLanguage]: Dictionary<string> } = {
   },
   es: {
     gameGuides: 'Guías de juegos',
+    guideSocialDeduction: 'Juegos de deducción social online',
+    guideSecretHitler: 'Juegos parecidos a Secret Hitler',
+    guideWerewolf: 'Avalon o Hombre Lobo',
     compareGames: 'Compara Avalon, Secret Hitler y Hombre Lobo para elegir el próximo juego de tu grupo.',
     introduction:
       '¿Es tu primera partida de Avalon? Empieza por las reglas y la tabla de jugadores por misión, y después consulta los roles de tu partida. Explora las expansiones cuando el grupo quiera añadir más opciones.',

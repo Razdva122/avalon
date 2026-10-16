@@ -4,6 +4,11 @@
  */
 export default {
   history: {
+    noEvents: 'Событий пока нет',
+    finale: 'Финал',
+    hiddenEvent: 'Событие скрыто настройками игры',
+    playerVotes: 'Голоса игроков',
+    anonymousVoting: 'Голоса анонимны',
     listView: 'События',
     tableView: 'Таблица голосов',
     noVotes: 'Голосований пока нет',
@@ -39,16 +44,24 @@ export default {
     announceLoyalty: 'Объявить',
   },
   mission: {
+    cards: 'Карты похода',
+    succeeded: 'Успешен',
+    failed: 'Провален',
     cardSuccess: 'Успех',
     cardFail: 'Провал',
     players: 'Игроков',
     fails: 'Провалов',
     indexMission: '{index} поход',
-    failsCount: 'провалов {count}',
+    failsCount: 'карт провала: {count}',
     hidden: 'поход скрыт Ведьмой',
     team: 'Команда:',
   },
   vote: {
+    attempt: 'Попытка {index}',
+    statusApproved: 'Одобрена',
+    statusRejected: 'Отклонена',
+    approved: 'Команда одобрена',
+    rejected: 'Команда отклонена',
     forcedVote: 'Принудительное голосование',
     voteIndex: '{index} голосование',
     teamSelected: 'команда собрана',

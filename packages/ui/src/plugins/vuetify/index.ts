@@ -37,6 +37,10 @@ const lightTheme = {
     info: '#2196F3',
     success: '#4CAF50',
     warning: '#fb8c00',
+    'history-for': '#2196F3',
+    'history-against': '#fb8c00',
+    'history-card-success': '#4CAF50',
+    'history-card-fail': '#C8000F',
     'text-primary': '#25303D',
     background: '#F4F6F9',
     surface: '#FFFFFF',
@@ -50,6 +54,11 @@ const lightTheme = {
   variables: {
     'icon-invert': 0,
     'holiday-background-opacity': 0.06,
+    'history-for-opacity': 0.07,
+    'history-against-opacity': 0.09,
+    'history-card-fail-border-opacity': 0.45,
+    'history-focus-width': '2px',
+    'history-focus-opacity': 1,
   },
 };
 
@@ -71,6 +80,10 @@ const darkTheme = {
     info: '#2196F3',
     success: '#4CAF50',
     warning: '#fb8c00',
+    'history-for': '#7F9EB7',
+    'history-against': '#B39A73',
+    'history-card-success': '#82AC90',
+    'history-card-fail': '#CD9392',
     'bg-app': '#131923',
     'bg-header': '#18202C',
     'text-primary': '#E7EDF5',
@@ -84,6 +97,11 @@ const darkTheme = {
   variables: {
     'icon-invert': 1,
     'holiday-background-opacity': 0.1,
+    'history-for-opacity': 0.045,
+    'history-against-opacity': 0.04,
+    'history-card-fail-border-opacity': 0.65,
+    'history-focus-width': '1px',
+    'history-focus-opacity': 0.65,
   },
 };
 

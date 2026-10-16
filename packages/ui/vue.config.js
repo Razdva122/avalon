@@ -6,6 +6,7 @@ const SitemapPlugin = require('sitemap-webpack-plugin').default;
 const PrerendererWebpackPlugin = require('@prerenderer/webpack-plugin');
 const PuppeteerRenderer = require('@prerenderer/renderer-puppeteer');
 const { VuetifyPlugin } = require('webpack-plugin-vuetify');
+const LocaleGenerationPlugin = require('./scripts/locale-generation-plugin.cjs');
 const { routesSeo } = require('./src/router/seo');
 const { startup, yaMetrika, gtag } = require('./const');
 const { imageGenerator } = require('./image-storage.cjs');
@@ -34,6 +35,7 @@ module.exports = defineConfig({
     },
   },
   chainWebpack: (config) => {
+    config.plugin('locale-generation').use(LocaleGenerationPlugin);
     // Keep images out of JavaScript and give every image a cacheable file URL.
     config.module.rule('images').type('asset/resource').set('generator', imageAssets);
     config.plugin('html').tap((args) => {

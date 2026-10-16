@@ -34,8 +34,7 @@ export default {
         'Elige roles clásicos como Merlín, Percival, Morgana, Mordred y Oberón, o prueba roles adicionales como los Amantes y la Bruja. La Dama del Lago y Excalibur añaden más opciones. El historial permite revisar acciones anteriores, salvo que la sala lo oculte.',
     },
     socialTitle: 'Avalon está en las redes',
-    socialDescription: 'Memes, traiciones y momentos de la Mesa Redonda.',
-    socialInvitation: 'Síguenos y dale me gusta a tus vídeos favoritos para que más jugadores descubran Avalon.',
+    socialDescription: 'Síguenos para ver memes y momentos de la Mesa Redonda.',
 
     retryAi: 'Reintentar',
     showMore: 'Ver más partidas',

@@ -4,6 +4,11 @@
  */
 export default {
   history: {
+    noEvents: 'Aún no hay eventos',
+    finale: 'Final',
+    hiddenEvent: 'Evento oculto por la configuración de la partida',
+    playerVotes: 'Votos de los jugadores',
+    anonymousVoting: 'Los votos son anónimos',
     listView: 'Eventos',
     tableView: 'Tabla de votos',
     noVotes: 'Aún no hay votos',
@@ -39,16 +44,24 @@ export default {
     announceLoyalty: 'Anunciar',
   },
   mission: {
+    cards: 'Cartas de misión',
+    succeeded: 'Completada',
+    failed: 'Fallida',
     cardSuccess: 'Éxito',
     cardFail: 'Fracaso',
     players: 'Jugadores',
     fails: 'Fallos',
     indexMission: '{index} misión',
-    failsCount: 'fallos {count}',
+    failsCount: 'Cartas de fracaso: {count}',
     hidden: 'oculto por la Bruja',
     team: 'Equipo:',
   },
   vote: {
+    attempt: 'Intento {index}',
+    statusApproved: 'Aprobado',
+    statusRejected: 'Rechazado',
+    approved: 'Equipo aprobado',
+    rejected: 'Equipo rechazado',
     forcedVote: 'Voto forzado',
     voteIndex: '{index} voto',
     teamSelected: 'equipo seleccionado por',

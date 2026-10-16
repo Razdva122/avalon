@@ -34,8 +34,7 @@ export default {
         'Escolha papéis clássicos como Merlin, Percival, Morgana, Mordred e Oberon, ou experimente papéis adicionais como os Amantes e a Bruxa. A Dama do Lago e Excalibur oferecem mais opções. O histórico permite rever ações anteriores, exceto quando a sala usa o histórico oculto.',
     },
     socialTitle: 'Avalon está nas redes sociais',
-    socialDescription: 'Memes, traições e momentos da Távola Redonda.',
-    socialInvitation: 'Siga nossos canais e curta seus vídeos favoritos para ajudar mais jogadores a descobrir Avalon.',
+    socialDescription: 'Siga-nos para ver memes e momentos da Távola Redonda.',
 
     retryAi: 'Tentar novamente',
     showMore: 'Ver mais jogos',

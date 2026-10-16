@@ -40,9 +40,9 @@ test('checked-in font stays small and icon boxes reserve space before font loadi
 
 test('external link URLs are not material icon names', () => {
   const tokens = sourceTokens(
-    '<template><a href="https://www.tiktok.com/@playavalononline">TikTok</a><span class="material-icons">home</span></template>',
+    '<template><a href="https://www.youtube.com/@playavalononline">YouTube</a><span class="material-icons">home</span></template>',
     '.vue',
   );
-  assert.ok(!tokens.includes('tiktok'));
+  assert.ok(!tokens.includes('youtube'));
   assert.ok(tokens.includes('home'));
 });

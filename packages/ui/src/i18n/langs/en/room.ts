@@ -33,8 +33,7 @@ export default {
         'Choose classic roles such as Merlin, Percival, Morgana, Mordred and Oberon, or try additional roles such as the Lovers and Witch. Lady of the Lake and Excalibur add more options. The game history lets you review past actions unless the room uses hidden history.',
     },
     socialTitle: 'Avalon is on social media',
-    socialDescription: 'Memes, betrayals, and moments from the Round Table.',
-    socialInvitation: 'Follow our channels and like your favorite videos to help more players discover Avalon.',
+    socialDescription: 'Follow us for memes and moments from the Round Table.',
 
     retryAi: 'Retry',
     showMore: 'Show more games',

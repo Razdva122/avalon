@@ -22,6 +22,8 @@ for (const [language, moduleName] of Object.entries({
   'zh-TW': 'zh_TW',
 })) {
   const messages = require(path.join(ui, 'src/i18n/langs', moduleName))[moduleName];
-  fs.writeFileSync(path.join(output, `${language}.json`), JSON.stringify(messages));
+  const target = path.join(output, `${language}.json`);
+  const content = JSON.stringify(messages);
+  if (!fs.existsSync(target) || fs.readFileSync(target, 'utf8') !== content) fs.writeFileSync(target, content);
 }
 console.log('Generated seven independent locale dictionaries.');

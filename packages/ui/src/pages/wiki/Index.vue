@@ -21,9 +21,7 @@
       </LocaleLink>
     </nav>
 
-    <p>
-      <LocaleLink :to="{ name: 'social_deduction_games_online' }">{{ $t('wiki.compareGames') }}</LocaleLink>
-    </p>
+    <GameGuideLinks />
 
     <h2>{{ $t('wiki.setup') }}</h2>
     <ul>
@@ -60,6 +58,7 @@
 
 <script setup lang="ts">
 import WikiPlayCta from '@/components/view/information/WikiPlayCta.vue';
+import GameGuideLinks from '@/components/view/information/GameGuideLinks.vue';
 </script>
 
 <style scoped lang="scss">

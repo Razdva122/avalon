@@ -36,6 +36,16 @@ for (const route of Object.values(routesSeo).filter((route) => route.meta.preren
       `${pathname}: personalized suggestion baked into HTML`,
     );
     assert.match(html, /<h1(?:\s|>)/, `${pathname}: missing prerendered heading`);
+    if (route.name === 'lobby' || route.name === 'wiki') {
+      const discovery = html.match(/<section\b[^>]*class="game-guides"[^>]*>([\s\S]*?)<\/section>/)?.[1];
+      assert(discovery, `${pathname}: missing visible game discovery section`);
+      for (const guide of Object.values(routesSeo).filter((entry) => entry.path.startsWith('/guides/'))) {
+        assert(
+          discovery.includes(`href="${localizedPath(guide.path, language)}"`),
+          `${pathname}: guide must be directly reachable without JavaScript: ${guide.path}`,
+        );
+      }
+    }
     if (basePath(pathname) === '/' || /^\/(wiki|about|support|community|guides)(?:\/|$)/.test(basePath(pathname))) {
       assert(html.includes(`data-ssr-path="${pathname}"`), `${pathname}: missing hydration marker`);
       assert(html.includes('<!--[-->'), `${pathname}: missing Vue SSR fragment markers`);

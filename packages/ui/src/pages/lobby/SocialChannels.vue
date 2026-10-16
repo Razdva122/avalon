@@ -1,7 +1,9 @@
 <template>
   <section class="social-card" :aria-label="$t('mainPage.socialTitle')">
-    <h2>{{ $t('mainPage.socialTitle') }}</h2>
-    <p>{{ $t('mainPage.socialDescription') }}</p>
+    <div class="social-card__copy">
+      <h2>{{ $t('mainPage.socialTitle') }}</h2>
+      <p>{{ $t('mainPage.socialDescription') }}</p>
+    </div>
     <nav :aria-label="$t('mainPage.socialTitle')">
       <a href="https://www.youtube.com/@playavalononline" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 576 512" aria-hidden="true" focusable="false">
@@ -21,25 +23,19 @@
         </svg>
         <span>Instagram</span>
       </a>
-      <a href="https://www.tiktok.com/@playavalononline" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 448 512" aria-hidden="true" focusable="false">
-          <path
-            fill="currentColor"
-            d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"
-          />
-        </svg>
-        <span>TikTok</span>
-      </a>
     </nav>
-    <p class="social-card__invitation">{{ $t('mainPage.socialInvitation') }}</p>
   </section>
 </template>
 
 <style scoped lang="scss">
 .social-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
   padding: 20px;
   min-width: 0;
-  border: 1px solid rgba(var(--v-theme-primary), 0.3);
+  border: 1px solid rgba(var(--v-theme-text-primary), 0.12);
   border-radius: 14px;
   background: rgb(var(--v-theme-inset));
   color: rgb(var(--v-theme-text-primary));
@@ -49,25 +45,29 @@
     text-wrap: balance;
   }
   p {
-    margin-top: 10px;
+    margin-top: 6px;
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.5;
+    color: rgba(var(--v-theme-text-primary), 0.75);
   }
   nav {
     display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
-    margin-top: 16px;
   }
   a {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    gap: 8px;
+    min-width: 140px;
     min-height: 44px;
     padding: 10px 12px;
     border: 1px solid rgba(var(--v-theme-text-primary), 0.18);
     border-radius: 8px;
     color: inherit;
     text-decoration: none;
+    font-size: 14px;
     font-weight: 600;
   }
   a:hover {
@@ -79,12 +79,20 @@
     outline-offset: 3px;
   }
   svg {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
   }
-  .social-card__invitation {
-    color: rgba(var(--v-theme-text-primary), 0.75);
+}
+@media (max-width: 760px) {
+  .social-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px;
+    a {
+      min-width: 0;
+      padding-inline: 8px;
+    }
   }
 }
 </style>

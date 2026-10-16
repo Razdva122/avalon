@@ -47,14 +47,62 @@
         :player-names="playerNames"
         :game-ended="gameEnded"
       />
-      <template v-else>
-        <div v-for="(historyEl, index) in history" :key="index">
-          <div>
-            <component :is="toKebabCase(historyEl.type)" :data="historyEl" :playerNames="playerNames" />
-          </div>
-          <v-divider :thickness="3"></v-divider>
-        </div>
-      </template>
+      <div v-else class="history-groups">
+        <p v-if="!historyGroups.length">{{ $t('history.noEvents') }}</p>
+        <details
+          v-for="(group, index) in historyGroups"
+          :key="index"
+          class="history-group"
+          :open="gameEnded ? group.kind === 'finale' : index === historyGroups.length - 1"
+        >
+          <summary class="history-group-heading">
+            <span>{{
+              group.kind === 'finale'
+                ? $t('history.finale')
+                : group.index === null
+                  ? $t('history.hidden')
+                  : $t('mission.indexMission', { index: group.index + 1 })
+            }}</span>
+            <span
+              v-if="group.mission"
+              :class="{
+                'mission-outcome--success': group.mission.result === 'success',
+                'mission-outcome--fail': group.mission.result === 'fail',
+              }"
+            >
+              {{
+                group.mission.result === undefined
+                  ? $t('mission.hidden')
+                  : $t(group.mission.result === 'success' ? 'mission.succeeded' : 'mission.failed')
+              }}
+              <span v-if="group.mission.fails !== undefined" class="mission-fails">
+                · {{ $t('mission.failsCount', { count: group.mission.fails }) }}
+              </span>
+            </span>
+          </summary>
+          <template v-for="(historyEl, eventIndex) in group.entries" :key="eventIndex">
+            <div
+              v-if="historyEl.type !== 'mission' || (!group.missionVote && historyEl.actions?.length)"
+              class="history-event"
+            >
+              <p v-if="historyEl.type === 'hidden'">{{ $t('history.hiddenEvent') }}</p>
+              <component
+                v-else
+                :is="toKebabCase(historyEl.type)"
+                :data="historyEl"
+                :playerNames="playerNames"
+                v-bind="
+                  historyEl.type === 'mission'
+                    ? { compact: true }
+                    : historyEl.type === 'vote'
+                      ? { mission: historyEl === group.missionVote ? group.mission : undefined }
+                      : {}
+                "
+              />
+            </div>
+          </template>
+        </details>
+      </div>
     </div>
   </v-overlay>
 </template>
@@ -67,6 +115,7 @@ import { defineComponent, PropType, ref, computed, toRefs, watch, onMounted } fr
 import { THistoryResults, Player } from '@avalon/types';
 import { useUserProfile } from '@/helpers/composables/useUserProfile';
 import { useStore } from '@/store';
+import { groupHistory } from '@/helpers/history-groups';
 
 import SwitchLancelots from '@/components/view/information/history/SwitchLancelots.vue';
 import SwitchResult from '@/components/view/information/history/SwitchResult.vue';
@@ -169,6 +218,7 @@ export default defineComponent({
     };
 
     return {
+      historyGroups: computed(() => groupHistory(props.history)),
       view,
       overlay,
       playerNames,
@@ -192,7 +242,7 @@ export default defineComponent({
 
 .history {
   background-color: rgb(var(--v-theme-surface));
-  width: min(400px, calc(100vw - 24px));
+  width: min(560px, calc(100vw - 24px));
   max-height: 80vh;
   overflow-y: auto;
 
@@ -208,6 +258,57 @@ export default defineComponent({
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 12px;
+}
+
+.history-groups {
+  display: grid;
+  gap: 12px;
+}
+
+.history-group {
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.15);
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+.history-group-heading {
+  min-height: 44px;
+  padding: 12px;
+  cursor: pointer;
+  font-weight: 600;
+
+  > span + span {
+    display: block;
+    margin-top: 4px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgb(var(--v-theme-primary));
+    outline-offset: -2px;
+  }
+}
+
+.history-event {
+  margin: 0 12px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.12);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.mission-fails {
+  font-weight: 400;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+.mission-outcome--success {
+  color: rgb(var(--v-theme-history-card-success));
+}
+
+.mission-outcome--fail {
+  color: rgb(var(--v-theme-history-card-fail));
 }
 
 .history-title {

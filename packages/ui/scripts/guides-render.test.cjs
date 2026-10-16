@@ -7,6 +7,8 @@ const ts = require('typescript');
 const { createSSRApp, createRenderer, h, nextTick } = require('vue');
 const { renderToString } = require('@vue/server-renderer');
 const { createRouter, createMemoryHistory, RouterView } = require('vue-router');
+const { createI18n } = require('vue-i18n');
+const { routesSeo } = require('../src/router/seo');
 const root = path.resolve(__dirname, '../src');
 
 const guideEvents = [];
@@ -35,6 +37,7 @@ function load(file) {
         return load(relative);
       }
       if (id === '@/router/paths') return require('../src/router/paths');
+      if (id === '@/components/feedback/LocaleLink.vue') return load('components/feedback/LocaleLink.vue');
       // Webpack supplies these URLs; SSR does not execute browser analytics.
       if (id === '@/helpers/images') return { getImagePathByID: () => '/assets/preview.webp' };
       if (id === '@/helpers/acquisition')
@@ -48,6 +51,32 @@ function load(file) {
 }
 
 const ids = ['social_deduction_games_online', 'games_like_secret_hitler', 'avalon_vs_werewolf'];
+
+test('game discovery links expose all three guides in the reader’s language without loading articles', async () => {
+  const GameGuideLinks = load('components/view/information/GameGuideLinks.vue').default;
+  const { wiki } = load('i18n/langs/pages/wiki.ts');
+  const { localizedPath } = require('../src/router/paths');
+  for (const locale of Object.keys(wiki)) {
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        ...ids.map((name) => ({ name, path: routesSeo[name].path, component: { render: () => null } })),
+        { path: '/:pathMatch(.*)*', component: { render: () => null } },
+      ],
+    });
+    await router.push(localizedPath('/wiki/', locale));
+    const app = createSSRApp(GameGuideLinks);
+    app.use(router);
+    app.use(createI18n({ legacy: false, locale, messages: { [locale]: { wiki: wiki[locale] } } }));
+    const html = await renderToString(app);
+    assert.ok(html.includes(wiki[locale].gameGuides), `${locale}: section heading`);
+    assert.equal((html.match(/<a\b/g) || []).length, 3, `${locale}: all guides directly reachable`);
+    for (const name of ids) {
+      assert.ok(html.includes(`href="${localizedPath(routesSeo[name].path, locale)}"`), `${locale}: ${name}`);
+    }
+    assert.ok(!html.includes('wiki.guide') && !html.includes('[object Object]'), `${locale}: readable labels`);
+  }
+});
 
 test('each public guide renders an accessible comparison and actionable English links on the server', async () => {
   const Guide = load('pages/guides/Guide.vue').default;

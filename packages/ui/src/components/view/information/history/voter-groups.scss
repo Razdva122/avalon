@@ -1,0 +1,51 @@
+.vote-details {
+  container-type: inline-size;
+
+  > summary:focus-visible {
+    outline-width: var(--v-history-focus-width);
+    outline-color: rgba(var(--v-theme-primary), var(--v-history-focus-opacity));
+  }
+}
+
+.voter-groups {
+  display: grid;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.voter-group {
+  min-width: 0;
+  padding: 10px;
+  border-inline-start: 3px solid;
+  border-radius: 6px;
+
+  &--approve {
+    border-color: rgb(var(--v-theme-history-for));
+    background: rgba(var(--v-theme-history-for), var(--v-history-for-opacity));
+  }
+
+  &--reject {
+    border-color: rgb(var(--v-theme-history-against));
+    background: rgba(var(--v-theme-history-against), var(--v-history-against-opacity));
+  }
+
+  li {
+    background: rgb(var(--v-theme-surface));
+  }
+}
+
+.voter-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@container (min-width: 440px) {
+  .voter-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}

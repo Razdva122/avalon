@@ -4,6 +4,11 @@
  */
 export default {
   history: {
+    noEvents: 'No events yet',
+    finale: 'Finale',
+    hiddenEvent: 'Event hidden by game settings',
+    playerVotes: 'Player votes',
+    anonymousVoting: 'Votes are anonymous',
     listView: 'Event log',
     tableView: 'Vote table',
     noVotes: 'No votes yet',
@@ -39,16 +44,24 @@ export default {
     hidden: 'Hidden',
   },
   mission: {
+    cards: 'Mission cards',
+    succeeded: 'Succeeded',
+    failed: 'Failed',
     cardSuccess: 'Success',
     cardFail: 'Fail',
     players: 'Players',
     fails: 'Fails',
     indexMission: '{index} mission',
-    failsCount: 'fails {count}',
+    failsCount: 'Fail cards: {count}',
     hidden: 'hidden by Witch',
     team: 'Team:',
   },
   vote: {
+    attempt: 'Attempt {index}',
+    statusApproved: 'Approved',
+    statusRejected: 'Rejected',
+    approved: 'Team approved',
+    rejected: 'Team rejected',
     forcedVote: 'Forced vote',
     voteIndex: '{index} vote',
     teamSelected: 'team selected',

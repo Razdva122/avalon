@@ -32,8 +32,7 @@ export default {
         '可以选择梅林、派西维尔、莫甘娜、莫德雷德和奥伯伦等经典角色，也可以尝试恋人、女巫等额外角色。湖中仙女和王者之剑提供更多玩法。除非房间开启隐藏历史记录，否则可以查看之前的游戏行动。',
     },
     socialTitle: 'Avalon 入驻社交平台了',
-    socialDescription: '圆桌旁的趣味梗、背叛与精彩瞬间。',
-    socialInvitation: '关注我们的账号，为喜欢的视频点赞，让更多玩家发现 Avalon。',
+    socialDescription: '关注我们，收看圆桌旁的趣味梗与精彩瞬间。',
 
     retryAi: '重试',
     showMore: '显示更多游戏',

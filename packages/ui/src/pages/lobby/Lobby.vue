@@ -151,6 +151,7 @@
           </v-btn>
         </div>
       </div>
+      <GameGuideLinks />
       <div class="guide-questions">
         <details v-for="topic in ['cost', 'devices', 'conversation', 'features']" :key="topic" class="guide-question">
           <summary>{{ $t(`mainPage.guide.${topic}Title`) }}</summary>
@@ -187,9 +188,11 @@ import SocialChannels from './SocialChannels.vue';
 import BotRoomButton from './BotRoomButton.vue';
 import RotatingTopPlayer from '@/components/stats/RotatingTopPlayer.vue';
 import GiveawayBanner from '@/pages/support/GiveawayBanner.vue';
+import GameGuideLinks from '@/components/view/information/GameGuideLinks.vue';
 
 export default defineComponent({
   components: {
+    GameGuideLinks,
     GiveawayBanner,
     BotRoomButton,
     LobbyRoom,
@@ -366,6 +369,9 @@ export default defineComponent({
     text-underline-offset: 4px;
   }
 }
+.lobby-guide .game-guides {
+  margin: 0 32px 32px;
+}
 .guide-overview {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -444,9 +450,6 @@ export default defineComponent({
 }
 .lobby-social {
   margin-top: 24px;
-  :deep(nav) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 .lobby-footer {
   display: flex;
@@ -896,6 +899,9 @@ a:focus-visible {
   }
 }
 @media (max-width: 760px) {
+  .lobby-guide .game-guides {
+    margin-inline: 24px;
+  }
   .guide-overview {
     grid-template-columns: minmax(0, 1fr);
     gap: 28px;
@@ -910,9 +916,6 @@ a:focus-visible {
   }
   .lobby-guide h2 {
     font-size: 24px;
-  }
-  .lobby-social :deep(nav) {
-    grid-template-columns: minmax(0, 1fr);
   }
   .lobby-content {
     grid-template-columns: minmax(0, 1fr);

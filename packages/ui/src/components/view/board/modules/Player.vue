@@ -325,13 +325,7 @@ export default defineComponent({
     const { floatingStyles: statusStyles } = useFloating(playerRef, statusElement, {
       strategy: 'fixed',
       placement: 'top',
-      middleware: [
-        offset(({ rects }) => {
-          const crown = playerRef.value?.querySelector('.player-crown')?.getBoundingClientRect();
-          return crown?.height ? Math.max(6, rects.reference.y - crown.top + 6) : 6;
-        }),
-        shift({ padding: 8 }),
-      ],
+      middleware: [offset(6), shift({ padding: 8 })],
       whileElementsMounted: (reference, floating, update) =>
         autoUpdate(reference, floating, update, { animationFrame: true }),
     });
