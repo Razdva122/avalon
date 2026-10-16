@@ -1,6 +1,6 @@
 import { decisionPipeline } from './pipeline';
 import { BotRoom } from './room';
-import type { BotRequest, GenerationOptions } from './client';
+import type { BotRequest } from './client';
 import type { Server } from '@avalon/types';
 import fixtures from './fixtures/postulates.json';
 
@@ -19,16 +19,11 @@ test('publishes the original public argument in one call even after a failed mis
   expect(result).toEqual({ choice: 0, speech: publicReason, privateReason: 'Private sabotage opportunity.' });
 });
 
-test('publishes council public arguments while keeping private review reasons separate', async () => {
+test('publishes council public arguments while keeping private reasons separate', async () => {
   const privateReason = 'PRIVATE_COUNCIL_REASON: using hidden role knowledge.';
   const publicReason = 'Compare the early roster advice with the later failed team; another candidate may fit too.';
-  const reviews: GenerationOptions['context'][] = [];
   const councilRequests: BotRequest[] = [];
-  const decide = decisionPipeline(async (r, options) => {
-    if (options.phase === 'review') {
-      reviews.push(options.context);
-      return { choice: 0, speech: 'I should have compared the earlier advice more carefully.' };
-    }
+  const decide = decisionPipeline(async (r) => {
     if (r.councilDiscussion) councilRequests.push(r);
     return {
       choice: r.state.stage === 'onMission' ? r.choices.indexOf('success') : 0,
@@ -48,15 +43,6 @@ test('publishes council public arguments while keeping private review reasons se
   expect(JSON.stringify(councilRequests)).not.toContain(privateReason);
   expect(councilRequests[1].evilCouncil).toEqual([
     { seat: councilRequests[0].name, target: councilRequests[0].choices[0], reason: publicReason },
-  ]);
-  const councilExamples = reviews.flatMap((context) =>
-    (
-      context as { decisionExamples: { stage: string; reason: string; publicStatement: string }[] }
-    ).decisionExamples.filter((example) => example.stage === 'assassinate'),
-  );
-  expect(councilExamples.filter((example) => example.publicStatement)).toEqual([
-    expect.objectContaining({ reason: privateReason, publicStatement: publicReason }),
-    expect.objectContaining({ reason: privateReason, publicStatement: publicReason }),
   ]);
 });
 

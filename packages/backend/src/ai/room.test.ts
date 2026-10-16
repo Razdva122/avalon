@@ -123,11 +123,8 @@ test.each([
     expect(history.filter((event) => event.type === 'mission')).toHaveLength(3);
     expect(requests.filter((request) => request.councilDiscussion)).toHaveLength(evilCount);
     expect(room.chat.history.filter((message) => message.message.startsWith('Evil council:'))).toHaveLength(evilCount);
-    const reviews = requests.filter((request) => request.state.stage === 'end');
-    expect(reviews).toHaveLength(count);
-    expect(new Set(reviews.map((request) => request.playerID)).size).toBe(count);
-    expect(reviews.every((request) => request.rolesKnownBeforeReveal?.length === count)).toBe(true);
-    expect(room.chat.history.filter((message) => message.message.startsWith('Post-game:'))).toHaveLength(count);
+    expect(requests.filter((request) => request.state.stage === 'end')).toHaveLength(0);
+    expect(room.chat.history.filter((message) => message.message.startsWith('Post-game:'))).toHaveLength(0);
   },
 );
 
@@ -184,7 +181,7 @@ test.each(['ru', 'zh-tw'] as const)(
     expect(room.ai?.status).toBe('finished');
     expect(room.calculateRoomState().ai).toMatchObject({ language });
     expect(requests.every((request) => request.language === language)).toBe(true);
-    for (const stage of ['selectTeam', 'onMission', 'checkLoyalty', 'announceLoyalty', 'assassinate', 'end'])
+    for (const stage of ['selectTeam', 'onMission', 'checkLoyalty', 'announceLoyalty', 'assassinate'])
       expect(requests.some((request) => request.state.stage === stage)).toBe(true);
     expect(room.chat.history.map((message) => message.message).join('\n')).not.toMatch(
       /I propose|I vote|I inspected|I am Good|Post-game:|Evil council \(revealed\)/,
@@ -285,7 +282,7 @@ test.each([7, 8] as const)('all %i prompts enforce the initial private role visi
 });
 
 test.each([0, 1])(
-  'Lady announcement %s gets a matching target response and complete post-game reviews',
+  'Lady announcement %s gets a matching target response without post-game reviews',
   async (announcement) => {
     const requests: BotRequest[] = [];
     const room = new BotRoom('debrief', 'admin', io, async (r) => {
@@ -309,16 +306,8 @@ test.each([0, 1])(
     expect(room.options.features.displayIndex).toBe(true);
     expect(requests.filter((r) => r.state.stage === 'checkLoyalty').every((r) => r.speak)).toBe(true);
     expect(room.ai?.fallbacks).toBe(0);
-    const conclusions = requests.filter((r) => r.state.stage === 'end');
-    expect(conclusions).toHaveLength(7);
-    expect(conclusions.every((r) => r.rolesKnownBeforeReveal?.length === 7)).toBe(true);
-    expect(
-      conclusions.every((r) =>
-        r.chat.every((m) => !m.text.startsWith('Post-game:') && !m.text.startsWith('Evil council (revealed):')),
-      ),
-    ).toBe(true);
-    expect(new Set(conclusions.map((r) => r.playerID)).size).toBe(7);
-    expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(7);
+    expect(requests.filter((r) => r.state.stage === 'end')).toHaveLength(0);
+    expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(0);
     expect(room.chat.history.some((m) => m.message.includes('they are Evil'))).toBe(false);
     expect(room.chat.history.some((m) => /I inspected \d and announce: (Good|Evil)\./.test(m.message))).toBe(true);
     if (room.data.stage !== 'started') throw Error('not started');
@@ -459,7 +448,7 @@ test('messages are paced ten seconds apart and Stop cancels the pending pause im
   }
 });
 
-test('the ten-second interval also covers Lady announcements and all seven conclusions', async () => {
+test('the ten-second interval also covers Lady announcements', async () => {
   jest.useFakeTimers();
   try {
     const times: number[] = [];
@@ -483,7 +472,7 @@ test('the ten-second interval also covers Lady announcements and all seven concl
     await running;
     expect(room.ai?.status).toBe('finished');
     expect(room.chat.history.some((m) => m.message.startsWith('I inspected'))).toBe(true);
-    expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(7);
+    expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(0);
     expect(times.length).toBeGreaterThan(20);
     expect(times.slice(1).every((time, index) => time - times[index] >= 10000)).toBe(true);
   } finally {
@@ -491,47 +480,35 @@ test('the ten-second interval also covers Lady announcements and all seven concl
   }
 });
 
-test('post-game publication is paced even when live speech has no delay', async () => {
-  jest.useFakeTimers();
-  try {
-    const times: number[] = [];
+test.each([5, 6, 7, 8] as const)(
+  'a %i-player match finishes without post-game model requests or messages',
+  async (count) => {
+    const requests: BotRequest[] = [];
     const room = new BotRoom(
-      'paced-reviews',
+      'no-reviews',
       'admin',
       io,
-      async (r) => ({
-        choice: r.state.stage === 'onMission' ? r.choices.indexOf('success') : 0,
-        speech: r.speak ? 'My reflection.' : '',
-      }),
-      async () => {
-        const reviews = room.chat.history.filter((m) => m.message.startsWith('Post-game:'));
-        while (times.length < reviews.length) times.push(Date.now());
+      async (request) => {
+        requests.push(request);
+        if (request.state.stage === 'end') throw new Error('Unexpected post-game model request');
+        return {
+          choice: request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0,
+          speech: request.speak ? 'I agree.' : '',
+        };
       },
+      undefined,
       0,
       'en',
-      5,
-      10000,
+      count,
     );
-    const running = room.run();
-    await jest.advanceTimersByTimeAsync(0);
-    expect(times).toHaveLength(1);
-    await jest.advanceTimersByTimeAsync(9999);
-    expect(times).toHaveLength(1);
-    await jest.advanceTimersByTimeAsync(1);
-    expect(times).toHaveLength(2);
-    await jest.advanceTimersByTimeAsync(40000);
-    await running;
+    await room.run();
     expect(room.ai?.status).toBe('finished');
-    expect(times).toHaveLength(5);
-    expect(times.slice(1).every((time, index) => time - times[index] >= 10000)).toBe(true);
-    expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:')).map((m) => m.userID)).toEqual(
-      room.players,
-    );
-    expect(jest.getTimerCount()).toBe(0);
-  } finally {
-    jest.useRealTimers();
-  }
-});
+    expect(room.data.stage === 'started' && room.data.manager.game.stage).toBe('end');
+    expect(requests.some((request) => request.state.stage === 'end')).toBe(false);
+    expect(room.chat.history.some((message) => message.message.startsWith('Post-game:'))).toBe(false);
+    expect(room.ai?.fallbacks).toBe(0);
+  },
+);
 
 test('the leader can submit the final roster without a public announcement', async () => {
   const requests: BotRequest[] = [];
@@ -702,11 +679,11 @@ test.each(['technical'] as const)(
   },
 );
 
-test('technical resume does not repeat Evil council advice or completed post-game reviews', async () => {
+test('technical resume does not repeat Evil council advice', async () => {
   const { AiTechnicalPause } = await import('./client');
   const pauses = new Set<string>();
   const room = new BotRoom('resume-end', 'admin', io, async (request) => {
-    if (request.councilDiscussion || request.state.stage === 'end') {
+    if (request.councilDiscussion) {
       const key = `${request.state.stage}:${request.playerID}`;
       if (!pauses.has(key)) {
         pauses.add(key);
@@ -719,7 +696,7 @@ test('technical resume does not repeat Evil council advice or completed post-gam
   for (let attempt = 0; attempt < 12 && room.ai?.canResumeTechnical; attempt++) await room.run(true);
   expect(room.ai?.status).toBe('finished');
   expect(room.chat.history.filter((m) => m.message.startsWith('Evil council:'))).toHaveLength(3);
-  expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(7);
+  expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(0);
 });
 
 test.each(['technical'] as const)(
@@ -999,7 +976,7 @@ test.each([5, 6, 7, 8] as const)(
     await room.run();
     expect(room.ai?.status).toBe('finished');
     expect(requests.length).toBeLessThanOrEqual(count === 8 ? 450 : 400);
-    if (count === 8) expect(requests).toHaveLength(258);
+    if (count === 8) expect(requests).toHaveLength(250);
     expect(requests.filter((request) => request.publicDiscussion)).toHaveLength(count * 5);
     expect(requests.filter((request) => request.publicDiscussion).every((request) => request.state.vote === 0)).toBe(
       true,

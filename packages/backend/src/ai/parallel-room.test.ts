@@ -7,11 +7,10 @@ const io = { to: () => io, except: () => io, emit: () => true } as unknown as Se
 const thinkingIDs = (room: BotRoom): string[] | undefined => Reflect.get(room.ai!, 'thinkingPlayerIDs');
 const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-test('votes, mission cards and reviews run in pairs while discussion stays sequential', async () => {
+test('votes and mission cards run in pairs while discussion stays sequential', async () => {
   const active = new Map<string, number>();
   const maximum = new Map<string, number>();
   const thinking: string[][] = [];
-  const completedReviews: string[] = [];
   const room = new BotRoom(
     'parallel-game',
     'admin',
@@ -42,7 +41,6 @@ test('votes, mission cards and reviews run in pairs while discussion stays seque
         choice = request.choices.findIndex((team) => evilSeats.every((seat) => team.split(', ').includes(seat)));
         if (choice < 0) choice = 0;
       }
-      if (request.state.stage === 'end') completedReviews.push(request.playerID);
       return { choice, speech: request.speak ? `Seat ${request.name} conclusion.` : 'PRIVATE_DECISION' };
     },
     undefined,
@@ -54,14 +52,13 @@ test('votes, mission cards and reviews run in pairs while discussion stays seque
   expect(room.ai?.status).toBe('finished');
   expect(maximum.get('votingForTeam')).toBe(2);
   expect(maximum.get('onMission')).toBe(2);
-  expect(maximum.get('end')).toBe(2);
+  expect(maximum.has('end')).toBe(false);
   expect(maximum.get('discussion')).toBe(1);
   expect(maximum.get('council')).toBe(1);
   expect(thinking.some((ids) => ids.length === 2)).toBe(true);
   expect(thinking.every((ids) => ids.length <= 2)).toBe(true);
   const published = room.chat.history.filter((m) => m.message.startsWith('Post-game:'));
-  expect(published.map((m) => m.userID)).toEqual(room.players);
-  expect(completedReviews).toHaveLength(5);
+  expect(published).toHaveLength(0);
   expect(JSON.stringify(room.chat.history)).not.toContain('PRIVATE_DECISION');
   expect(thinkingIDs(room)).toBeUndefined();
 });
@@ -158,54 +155,3 @@ test('a technical error aborts its pending peer before the next pair starts', as
   expect(room.ai?.status).toBe('paused');
   expect(thinkingIDs(room)).toBeUndefined();
 });
-
-test.each(['insert', 'checkpoint'] as const)(
-  'review %s failure resumes without regenerating completed reviews or duplicating publication',
-  async (failure) => {
-    const reviews: string[] = [];
-    const publications: { text: string; requestID?: string }[] = [];
-    let failedText: string | undefined;
-    const room = new BotRoom(
-      'parallel-review-resume',
-      'admin',
-      io,
-      async (request) => {
-        if (request.state.stage === 'end') reviews.push(request.playerID);
-        await delay(Number(request.name) % 2 ? 2 : 1);
-        return {
-          choice: request.state.stage === 'onMission' ? request.choices.indexOf('success') : 0,
-          speech: request.speak ? `Words from seat ${request.name}.` : '',
-        };
-      },
-      async () => {
-        const latest = room.chat.history[room.chat.history.length - 1];
-        if (failure === 'checkpoint' && !failedText && latest?.message.startsWith('Post-game:')) {
-          failedText = latest.message;
-          throw new AiTechnicalPause('Checkpoint unavailable');
-        }
-      },
-      0,
-      'en',
-      5,
-    );
-    room.persistChatMessage = async (id, text, requestID) => {
-      publications.push({ text, requestID });
-      room.addMessage(id, text, requestID);
-      if (failure === 'insert' && !failedText && text.startsWith('Post-game:')) {
-        failedText = text;
-        throw new AiTechnicalPause('History refresh unavailable');
-      }
-    };
-    await room.run();
-    expect(room.ai?.status).toBe('paused');
-    expect(reviews).toHaveLength(5);
-    await room.run(true);
-    expect(room.ai?.status).toBe('finished');
-    expect(reviews).toHaveLength(5);
-    const published = room.chat.history.filter((m) => m.message.startsWith('Post-game:'));
-    expect(published.map((m) => m.userID)).toEqual(room.players);
-    const retries = publications.filter((p) => p.text === failedText);
-    expect(retries).toHaveLength(failure === 'insert' ? 2 : 1);
-    expect(new Set(retries.map((p) => p.requestID)).size).toBe(1);
-  },
-);

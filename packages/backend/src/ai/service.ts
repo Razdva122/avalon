@@ -259,7 +259,6 @@ export class AiService {
       0,
       language,
       playerCount,
-      10000,
     );
     room.ai!.model = CODEX_MODEL;
     this.experimentRuns.set(id, async () => {

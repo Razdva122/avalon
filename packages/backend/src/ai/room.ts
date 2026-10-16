@@ -46,13 +46,10 @@ export class BotRoom extends Room {
   };
   private councilSpoken = new Set<string>();
   private councilPending?: { id: string; text: string; requestID: string };
-  private reviewedPlayers = new Set<string>();
-  private reviewReplies = new Map<string, { text: string; requestID: string; published: boolean }>();
   private thinkingPlayers = new Set<string>();
   private abort = new AbortController();
   private failures = 0;
   private calls = 0;
-  private rolesKnownBeforeReveal = new Map<string, [number, string][]>();
   private evilCouncil: { seat: string; target: string; reason: string }[] = [];
   constructor(
     id: string,
@@ -63,7 +60,6 @@ export class BotRoom extends Room {
     private delayMs = 0,
     private language: AiLanguage = 'en',
     playerCount: AiPlayerCount = 7,
-    private reviewDelayMs = delayMs,
   ) {
     if (![5, 6, 7, 8].includes(playerCount)) throw Error('Invalid AI player count');
     const agents = selectBotAgents(undefined, playerCount);
@@ -445,12 +441,12 @@ export class BotRoom extends Room {
     councilDiscussion = false,
     publicDiscussion = false,
     optionalSpeech = false,
-    options: { signal?: AbortSignal; deferReview?: boolean } = {},
+    options: { signal?: AbortSignal } = {},
   ): Promise<BotReply | null> {
     const signal = options.signal || this.abort.signal;
     if (this.cancelled || signal.aborted) return null;
     if (!speak && choices.length === 1) return { choice: 0, speech: '' };
-    // Eight seats can need 418 calls for five fully discussed forced missions and their debrief.
+    // Eight seats can need 410 calls for five fully discussed forced missions.
     const requestLimit = this.players.length === 8 ? 450 : 400;
     if (++this.calls > requestLimit) throw new AiPause('The request limit for this match has been reached.');
     const agent = BOT_AGENTS.find((p) => p.id === id);
@@ -473,7 +469,6 @@ export class BotRoom extends Room {
       councilDiscussion,
       publicDiscussion,
       optionalSpeech,
-      rolesKnownBeforeReveal: state.stage === 'end' ? this.rolesKnownBeforeReveal.get(id) : undefined,
       // The room archives every public clue; all Evil revisit it before assassination.
       // Bound transcript size under the existing request and spending limits.
       evilEvidence:
@@ -483,19 +478,13 @@ export class BotRoom extends Room {
               .slice(0, 350)
               .map((m) => ({ id: m.id, name: this.label(m.userID), text: m.message }))
           : undefined,
-      evilCouncil: ['assassinate', 'end'].includes(state.stage) ? structuredClone(this.evilCouncil) : undefined,
+      evilCouncil: state.stage === 'assassinate' ? structuredClone(this.evilCouncil) : undefined,
       chat: this.chat.history
         .filter((m) => this.players.includes(m.userID))
         .filter((m) => !isAfterGameSpeech(m.message))
         .slice(0)
         .map((m) => ({ id: m.id, name: this.label(m.userID), text: m.message })),
     };
-    if (state.stage !== 'end') {
-      this.rolesKnownBeforeReveal.set(
-        id,
-        state.players.map((p) => [p.index, p.role]),
-      );
-    }
     // Only Evil needs a model call for the secret mission card: never expose its identity.
     const secretMission = state.stage === 'onMission' && Boolean(this.ai!.humanPlayerID);
     if (state.stage !== 'onMission') {
@@ -516,7 +505,7 @@ export class BotRoom extends Room {
         !Number.isInteger(answer.choice) ||
         !choices[answer.choice] ||
         typeof answer.speech !== 'string' ||
-        answer.speech.length > (state.stage === 'end' ? 800 : 500)
+        answer.speech.length > 500
       )
         throw Error('Invalid decision');
       this.failures = 0;
@@ -555,15 +544,6 @@ export class BotRoom extends Room {
         reason: answer.privateReason.trim().slice(0, 240),
       });
     }
-    if (options.deferReview) {
-      this.reviewReplies.set(id, {
-        text: answer.speech.trim() ? `${aiText(this.language).postGamePrefix}${answer.speech.trim()}` : '',
-        requestID: randomUUID(),
-        published: false,
-      });
-      await this.checkpoint(this.calculateRoomState());
-      return answer;
-    }
     if (councilDiscussion) {
       this.evilCouncil.push({
         seat: this.label(id),
@@ -584,19 +564,13 @@ export class BotRoom extends Room {
       if (task.startsWith('Choose the final team')) {
         speech = `${aiText(this.language).proposal(choices[answer.choice].text)} ${speech}`;
       }
-      await this.publish(id, `${state.stage === 'end' ? aiText(this.language).postGamePrefix : ''}${speech}`);
+      await this.publish(id, speech);
     } else {
       await this.checkpoint(this.calculateRoomState());
     }
     return this.cancelled ? null : answer;
   }
-  private async publish(
-    id: string,
-    text: string,
-    requestID: string = randomUUID(),
-    onPublished?: () => void,
-    delayMs = this.delayMs,
-  ) {
+  private async publish(id: string, text: string, requestID: string = randomUUID()) {
     if (this.cancelled) return;
     const discussion = this.discussion;
     if (discussion) discussion.pendingPublication = { id, text, requestID };
@@ -604,16 +578,15 @@ export class BotRoom extends Room {
     else this.addMessage(id, text, requestID);
     // Insertion succeeded; a later checkpoint pause must not duplicate this message.
     if (discussion) delete discussion.pendingPublication;
-    onPublished?.();
     await this.checkpoint(this.calculateRoomState());
-    if (!delayMs || this.cancelled) return;
+    if (!this.delayMs || this.cancelled) return;
     await new Promise<void>((resolve) => {
       const done = () => {
         clearTimeout(timer);
         this.abort.signal.removeEventListener('abort', done);
         resolve();
       };
-      const timer = setTimeout(done, delayMs);
+      const timer = setTimeout(done, this.delayMs);
       this.abort.signal.addEventListener('abort', done, { once: true });
     });
   }
@@ -925,35 +898,6 @@ export class BotRoom extends Room {
       while (!this.cancelled && this.manager.game.stage !== 'end') {
         await this.act();
         await this.checkpoint(this.calculateRoomState());
-      }
-      if (!this.cancelled) {
-        const pending = this.players.filter(
-          (id) => !this.isHuman(id) && !this.reviewedPlayers.has(id) && !this.reviewReplies.has(id),
-        );
-        await this.inPairs(pending, (id, signal) =>
-          this.ask(
-            id,
-            'Post-game conclusion: explain why YOUR side won or lost using specific mission/vote events, your own mistake or contribution, and one lesson. All roles are now public. Do not invent events.',
-            [{ text: 'Write your conclusion', actions: [] }],
-            true,
-            undefined,
-            false,
-            false,
-            false,
-            { signal, deferReview: true },
-          ),
-        );
-        for (const id of this.players) {
-          if (this.cancelled) break;
-          const review = this.reviewReplies.get(id);
-          if (!review || review.published) continue;
-          const markPublished = () => {
-            review.published = true;
-            this.reviewedPlayers.add(id);
-          };
-          if (review.text) await this.publish(id, review.text, review.requestID, markPublished, this.reviewDelayMs);
-          else markPublished();
-        }
       }
       if (!this.cancelled) {
         this.ai!.status = 'finished';
