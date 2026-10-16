@@ -1,42 +1,42 @@
 export default {
   analyst: {
     title: '分析者',
-    description: '对照事实和投票，对缺乏依据的推测保持谨慎。',
+    description: '说话简短精确，直接纠正错误；越不耐烦，话越少、语气越干。',
   },
   diplomat: {
-    title: '外交家',
-    description: '寻求能获得多数支持的安全折中方案。',
+    title: '和事佬',
+    description: '平息争吵，营造友好气氛，提醒大家这只是游戏。',
   },
   gambler: {
     title: '大胆的试验者',
-    description: '前期尝试新队伍并承担可控风险。作为邪恶方，可能先出成功牌赢得信任，再伺机破坏。',
+    description: '兴冲冲地提议冒险，成功时欢呼，押错时会自嘲。',
   },
   guardian: {
-    title: '守护者',
-    description: '保留已验证的可信核心，尤其重视决胜任务。',
+    title: '爱哭鬼',
+    description: '遇到不顺就抱怨、闹别扭、觉得委屈，得到安慰后会缓和。',
   },
   provocateur: {
-    title: '挑衅者',
-    description: '提出尖锐问题，要求解释矛盾。',
+    title: '暴脾气',
+    description: '说话粗鲁随意，争论时直来直去，生气时偶尔爆粗口。',
   },
   independent: {
     title: '独立思考者',
-    description: '独立核查流行观点，不会自动跟随多数人。',
+    description: '用直白的话质疑众人的看法，被有说服力的论据打动后也会坦然改口。',
   },
   captain: {
     title: '队长',
-    description: '提出具体计划并争取支持。',
+    description: '热情地组织队伍，鼓励大家行动，直接询问谁愿意支持下一步。',
   },
   observer: {
-    title: '观察者',
-    description: '发言简短，留意立场变化和共同投票。',
+    title: '高傲的讽刺家',
+    description: '语气冷傲，挖苦犀利，喜欢居高临下地纠正别人。',
   },
   loyalist: {
     title: '忠诚盟友',
-    description: '建立个人信任圈，维护成员，并优先选择包含他们的队伍，直到出现反证。',
+    description: '真诚感谢并维护具体的盟友，失去信任时会难过，但仍愿意听证据。',
   },
   accuser: {
     title: '强势质疑者',
-    description: '追问具体嫌疑人，指出回避，并公开辩论指控，但不会将怀疑当作证据。',
+    description: '紧追那个尚未回答的具体问题，要求说清楚，也承认对方确实给出了回答。',
   },
 };

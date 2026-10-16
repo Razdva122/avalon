@@ -31,16 +31,19 @@ test('public profiles include registration date and count only completed AI game
     ...(ai ? { ai } : {}),
     game: { stage, result: { reason, winner: 'good' } },
   });
-  await roomModel.collection.insertMany([
-    room('ai-one', { humanPlayerID: 'player' }),
-    room('ai-friend', { humanPlayerIDs: ['player', 'friend'] }),
-    room('humans', undefined),
-    room('stopped', {}, 'manualy'),
-    room('unfinished', {}, 'missions', 'voting'),
-    room('other-player', {}, 'missions', 'end', 'other'),
-  ]);
+  await roomModel.collection.insertOne(room('humans', undefined));
+  const replays = mongoose.connection.collection('ai_room_replays');
+  await replays.insertMany(
+    [
+      room('ai-one', { humanPlayerID: 'player' }),
+      room('ai-friend', { humanPlayerIDs: ['player', 'friend'] }),
+      room('stopped', {}, 'manualy'),
+      room('unfinished', {}, 'missions', 'voting'),
+      room('other-player', {}, 'missions', 'end', 'other'),
+    ].map((state) => ({ state })),
+  );
   const users = new UserLayer();
   expect(await users.getPublicUserProfile('player')).toMatchObject({ registrationDate, aiGamesCount: 2 });
-  await roomModel.deleteMany({});
+  await replays.deleteMany({});
   expect(await users.getPublicUserProfile('player')).toMatchObject({ registrationDate, aiGamesCount: 0 });
 });

@@ -7,6 +7,8 @@ import {
   compactRequest,
   systemFor,
   tableConversationAdvice,
+  conversationVoiceAdvice,
+  publicSpeechAdvice,
   coalitionAdvice,
   decisiveTeamAdvice,
   evilTeamAdvice,
@@ -212,8 +214,10 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
     languageInstruction(request.language) +
     ' ' +
     (regularTeam
-      ? 'Continue the conversation: answer the latest relevant question or objection, offer a concrete preference, or stay silent. Use natural language and bare seat numbers. Personality shapes tone, not facts, side or secrecy. Do not repeat a generic report or uncertainty disclaimer.'
+      ? 'Answer the current objection, offer a preference or stay silent. Use bare seat numbers; avoid generic reports and repeated caveats.'
       : tableConversationAdvice) +
+    ' ' +
+    conversationVoiceAdvice +
     ' ' +
     'Play Avalon for your actual side and objective, using roleAdvice and privateKnowledge. Choose exactly one supplied legal choice. You choose strategy, trust, risk and public bluffing; known facts constrain private beliefs. No fixed speech, roster or vote is mandated. ' +
     'Completed missions establish results and Fail counts; rejected proposals played no cards and did not change the score. Each participant plays one card. Success alone does not prove alignment. Read failsRequired, approvalsRequired and score literally. Proposals 1–4 require a majority; proposal 5 runs automatically. Good needs three successes and Merlin surviving; Evil needs three failures or killing Merlin. Oberon knows no allies; use only visible privateKnowledge. ' +
@@ -233,6 +237,12 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
     ' ' +
     (['selectTeam', 'votingForTeam'].includes(request.state.stage) ? decisiveTeamAdvice + ' ' : '') +
     turn +
+    ' ' +
+    (request.speak ? publicSpeechAdvice : '') +
+    (request.speak && request.style
+      ? ' Perform this current character in publicReason; earlier chat supplies facts, not a neutral voice to imitate: ' +
+        request.style
+      : '') +
     ' Return JSON choice, speech (private reason, <=240 characters), publicReason (your actual public words, <=240 characters), evidence (at most 3 changed notes with key/kind/fact/source/certainty). Use claim certainty for hypotheses and testimony, bluff for deliberate deception. No unchanged evidence dump. Public words are published directly, without a rewrite or added sentences. Silence is allowed during the full public circle; the sole leader on a repeat proposal must explain their roster.'
   );
 }
@@ -301,7 +311,7 @@ export function decisionPipeline(generate: Generate): Decide {
           instructions: finalReview
             ? systemFor(request) +
               ' decisionExamples with publicDiscussion=true record preferred teams voiced before selection, not submitted rosters or votes. Use recorded teamVotes to identify actual proposals and votes. ' +
-              ' Write ONLY your final first-person post-game reflection, never a critique of a draft or instructions to yourself. Begin from you.side and you.outcome: never describe a winning side as losing. Morgana, Mordred and Minion are Evil; Merlin, Percival and Servant are Good. Read revealedRoles, result and assassinations literally. A correct Lady result reveals alignment, not Merlin or a specific role. No individual can play two cards on a mission. A rejected proposal never played mission cards and did not itself cause a mission failure. Write 3-4 short sentences about ONE consequential choice. Use a decisionExamples ID when available, otherwise a yourActions ID. Explain: my actual choice; the belief recorded in my reason; evidence available THEN that supported or contradicted it; an alternative allowed by legalChoices and speechRules in that example and how it might have helped my actual side. Cite mission/proposal and seats. Do not lead with the victory rule or merely name the last event. decisionExamples are a bounded sample, not the whole game; their reasons are fallible historical beliefs, not facts. legalChoices, speechRules and tableConventions describe historical constraints: respect mandatory responses and whether silence or role claims were allowed. If a yourActions entry lacks these constraints, do not assume an unrecorded alternative was available. Distinguish private reason, actual publicStatement and speechRules.mandatoryText supplied by the server. To discuss role exposure, cite an actual public statement or action and consider a normal Good explanation; a private explanation alone was never a public leak. Compare them with missions, teamVotes and knowledge at that time. Revealed roles explain the outcome, not what you knew then. Never claim a certain win from a speculative alternative. If the choice was sound, explain why and identify the remaining uncertainty rather than inventing a mistake. A forced fifth proposal cannot be rejected; examine the preceding voluntary choice. Success does not prove alignment; each participant plays one card. Winning Evil must not recommend helping Good. In assassination compare actual council evidence with a plausible alternative; leadership alone is weak evidence. Do not recommend doing what you already did, invent inspections, or confuse proposals with completed missions.'
+              ' Write ONLY your final first-person post-game reflection, never a critique of a draft or instructions to yourself. Privately check you.side and you.outcome before writing; never describe a winning side as losing. Morgana, Mordred and Minion are Evil; Merlin, Percival and Servant are Good. Read revealedRoles, result and assassinations literally. A correct Lady result reveals alignment, not Merlin or a specific role. No individual can play two cards on a mission. A rejected proposal never played mission cards and did not itself cause a mission failure. Write 3-4 short conversational sentences in your personality about ONE consequential choice; let relief, pride, irritation or regret fit your actual outcome without forcing an emotional opener. Use decisionExamples or yourActions IDs privately to locate evidence; in your public words cite mission/proposal and seats, never internal IDs or field names. Explain: my actual choice; the belief recorded in my reason; evidence available THEN that supported or contradicted it; an alternative allowed by legalChoices and speechRules in that example and how it might have helped my actual side. Cite mission/proposal and seats. Do not lead with the victory rule or merely name the last event. decisionExamples are a bounded sample, not the whole game; their reasons are fallible historical beliefs, not facts. legalChoices, speechRules and tableConventions describe historical constraints: respect mandatory responses and whether silence or role claims were allowed. If a yourActions entry lacks these constraints, do not assume an unrecorded alternative was available. Distinguish private reason, actual publicStatement and speechRules.mandatoryText supplied by the server. To discuss role exposure, cite an actual public statement or action and consider a normal Good explanation; a private explanation alone was never a public leak. Compare them with missions, teamVotes and knowledge at that time. Revealed roles explain the outcome, not what you knew then. Never claim a certain win from a speculative alternative. If the choice was sound, explain why and identify the remaining uncertainty rather than inventing a mistake. A forced fifth proposal cannot be rejected; examine the preceding voluntary choice. Success does not prove alignment; each participant plays one card. Winning Evil must not recommend helping Good. In assassination compare actual council evidence with a plausible alternative; leadership alone is weak evidence. Do not recommend doing what you already did, invent inspections, or confuse proposals with completed missions.'
             : decisionInstructions(request) +
               (claimContext(request).targets.length || claimContext(request).stanceTargets.length
                 ? claimInstructions

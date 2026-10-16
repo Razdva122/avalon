@@ -4,7 +4,7 @@
   "description": "Typings for sharing between ui and backend",
   "keywords": [],
   "author": "@Razdva122",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@typegoose/typegoose": "~13.5.0",
     "mongoose": "~9.9.5"

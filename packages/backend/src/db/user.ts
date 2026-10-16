@@ -3,8 +3,9 @@ import { passwordWork } from '@/security/limits';
 import { hasPremium } from '@/support/premium';
 import { supportTotalCents } from '@/support/repository';
 import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
 import { ArgumentOfCallback, PublicUserProfile, UserFeatures, UserForUI, UserProfile } from '@avalon/types';
-import { userFeaturesModel, userProfileModel, userAchievementModel, roomModel } from '@/db/models';
+import { userFeaturesModel, userProfileModel, userAchievementModel } from '@/db/models';
 import { generateJWT } from '@/user';
 import { AchievementType } from '@avalon/types/stats/achievements';
 import { achievementsData } from '@/achievements/data';
@@ -114,14 +115,15 @@ export class UserLayer {
   async getPublicUserProfile(id: string): Promise<PublicUserProfile> {
     const user = await this.getUserByID(id);
     const features = await this.getUserFeatures(id);
-    const aiGamesCount = await roomModel
-      .countDocuments({
-        'players.id': id,
-        'game.stage': 'end',
-        'game.result.reason': { $ne: 'manualy' },
-        ai: { $ne: null },
-      })
-      .maxTimeMS(10000);
+    const aiGamesCount = await mongoose.connection.collection('ai_room_replays').countDocuments(
+      {
+        'state.players.id': id,
+        'state.game.stage': 'end',
+        'state.game.result.winner': { $in: ['good', 'evil'] },
+        'state.game.result.reason': { $ne: 'manualy' },
+      },
+      { maxTimeMS: 10000 },
+    );
 
     return {
       id: user.id,

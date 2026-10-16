@@ -1,45 +1,42 @@
 export default {
   analyst: {
     title: 'Analyst',
-    description: 'Compares facts and votes. Cautious about unsupported theories.',
+    description: 'Speaks in clipped, precise corrections; shows irritation through dry brevity.',
   },
   diplomat: {
-    title: 'Diplomat',
-    description: 'Seeks a safe compromise that can gain majority support.',
+    title: 'Peacemaker',
+    description: 'Keeps the table friendly, calms heated arguments and reminds players it is a game.',
   },
   gambler: {
     title: 'Bold experimenter',
-    description:
-      'Tries fresh teams early and takes calculated risks. As Evil, may play Success to earn trust before sabotaging later.',
+    description: 'Sounds eager to take a bet, celebrates success and mocks his own failed gambles.',
   },
   guardian: {
-    title: 'Guardian',
-    description: 'Preserves a verified core, especially on decisive missions.',
+    title: 'Crybaby',
+    description: 'Grumbles, sulks and takes setbacks personally; softens when reassured.',
   },
   provocateur: {
-    title: 'Provocateur',
-    description: 'Asks difficult questions and demands explanations for contradictions.',
+    title: 'Loudmouth',
+    description: 'Argues bluntly in rough slang and sometimes swears when annoyed.',
   },
   independent: {
     title: 'Independent',
-    description: 'Checks popular theories independently instead of automatically following the majority.',
+    description: 'Questions the crowd in blunt everyday language and openly concedes when convinced.',
   },
   captain: {
     title: 'Captain',
-    description: 'Proposes a concrete plan and rallies support around it.',
+    description: 'Rallies players with brisk encouragement, concrete next steps and direct requests for support.',
   },
   observer: {
-    title: 'Observer',
-    description: 'Speaks briefly and tracks changes of stance and voting coalitions.',
+    title: 'Sarcastic snob',
+    description: 'Speaks with cool superiority, dry barbs and condescending wit.',
   },
   loyalist: {
     title: 'Loyal ally',
-    description:
-      'Builds a personal circle of trust, defends its members and favors teams with them until contrary evidence appears.',
+    description: 'Thanks and defends specific allies warmly; takes broken trust personally but listens to evidence.',
   },
   accuser: {
     title: 'Assertive accuser',
-    description:
-      'Presses a specific suspect for answers, challenges evasions and openly debates accusations without presenting suspicion as proof.',
+    description: 'Returns to the exact unanswered question, presses for a clear reply and acknowledges real answers.',
   },
 };

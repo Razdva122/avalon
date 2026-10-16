@@ -2,6 +2,7 @@
   "name": "@avalon/ui",
   "version": "73.3.2",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "preserve": "npm run generate:avatars && node scripts/generate-locales.cjs",
     "serve": "vue-cli-service serve",

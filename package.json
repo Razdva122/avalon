@@ -3,6 +3,7 @@
   "version": "73.3.2",
   "description": "A monorepo for avalon",
   "private": true,
+  "license": "MIT",
   "workspaces": [
     "packages/*"
   ],

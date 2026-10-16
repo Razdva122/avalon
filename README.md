@@ -91,3 +91,8 @@ Start with the **[complete documentation index](docs/README.md)**.
 Release publication builds containers and uploads images; live deployment is a
 separate operator action. Dated reports record past checks, not the currently
 running production version.
+
+## License
+
+Project code is licensed under the [MIT License](LICENSE).
+Third-party dependencies and assets remain subject to their respective licenses.
