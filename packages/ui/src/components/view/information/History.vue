@@ -241,6 +241,29 @@ export default defineComponent({
 }
 
 .history {
+  // Keep history colors local: global Vuetify tokens are inlined on every public page.
+  --v-theme-history-for: 33, 150, 243;
+  --v-theme-history-against: 251, 140, 0;
+  --v-theme-history-card-success: 76, 175, 80;
+  --v-theme-history-card-fail: 200, 0, 15;
+  --v-history-for-opacity: 0.07;
+  --v-history-against-opacity: 0.09;
+  --v-history-card-fail-border-opacity: 0.45;
+  --v-history-focus-width: 2px;
+  --v-history-focus-opacity: 1;
+
+  .v-theme--darkTheme & {
+    --v-theme-history-for: 127, 158, 183;
+    --v-theme-history-against: 179, 154, 115;
+    --v-theme-history-card-success: 130, 172, 144;
+    --v-theme-history-card-fail: 205, 147, 146;
+    --v-history-for-opacity: 0.045;
+    --v-history-against-opacity: 0.04;
+    --v-history-card-fail-border-opacity: 0.65;
+    --v-history-focus-width: 1px;
+    --v-history-focus-opacity: 0.65;
+  }
+
   background-color: rgb(var(--v-theme-surface));
   width: min(560px, calc(100vw - 24px));
   max-height: 80vh;
