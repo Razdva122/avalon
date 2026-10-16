@@ -34,8 +34,17 @@ and may briefly stop/recover voice during the backend restart.
 Selecting the already installed image digests checks health and exits without a restart or backup.
 A missing image, nonempty/incomplete room inventory (unless explicitly skipped),
 less than 5 GiB free disk or an
-unresolved interrupted deployment blocks activation. Images are not automatically pruned: keep the
-previous version available for rollback and inspect disk usage when deployment reports low space.
+unresolved interrupted deployment blocks activation. After a successful rollout, image retention
+keeps the three highest complete stable version pairs present locally (backend and UI, numeric
+`vMAJOR.MINOR.PATCH` order). Current and previous Compose images, the last-deploy receipt images,
+and images referenced by any container are always protected, even if older. Only older stable
+application images are candidates; unrelated images, prereleases, incomplete pairs and unknown
+aliases are left alone. Removal never uses force or touches volumes, backups or static files.
+The cleanup runs under the deployment lock after health checks and removal of the pending marker;
+failed, check-only and unchanged deployments do not prune. If protection cannot be resolved,
+cleanup stops. A cleanup failure emits a warning without rolling back the healthy release.
+Image removals and the free-space change are recorded in `journalctl -u avalon-deploy`.
+Cleanup happens after pulling images, so low-space failures still require operator maintenance.
 
 Backups run independently through the existing `avalon-backup.timer`; deployment does not start
 or wait for a backup. Before a release requiring a database migration, arrange a fresh verified

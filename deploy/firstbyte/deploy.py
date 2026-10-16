@@ -151,6 +151,61 @@ def activate():
     health()
 
 
+def image_prune_candidates(images, protected):
+    """Retain the three highest complete stable release pairs and safety exceptions."""
+    releases = {repo: set() for repo in REPOS.values()}
+    parsed = {}
+    for image in images:
+        tags = image.get('RepoTags') or []
+        versions = []
+        for tag in tags:
+            match = re.fullmatch(r'(.+):v([0-9]+)\.([0-9]+)\.([0-9]+)', tag)
+            if not match or match[1] not in releases:
+                break
+            version = tuple(map(int, match.groups()[1:]))
+            releases[match[1]].add(version)
+            versions.append(version)
+        else:
+            if versions:
+                parsed[image['Id']] = versions
+    complete = set.intersection(*releases.values())
+    keep = set(sorted(complete, reverse=True)[:3])
+    return [image for image in images if image['Id'] not in protected
+            and image['Id'] in parsed
+            and all(version in complete - keep for version in parsed[image['Id']])]
+
+
+def prune_images():
+    """Called under deploy.lock only; fail closed if any protection cannot be resolved."""
+    if (ROOT / 'deploy-pending.json').exists():
+        raise RuntimeError('Cannot prune during an interrupted deployment')
+    refs = set()
+    for name in ('compose.production.yaml', 'compose.previous.yaml'):
+        resolved = run(['docker', 'compose', '-f', str(ROOT / name), 'config', '--images']).splitlines()
+        if not resolved:
+            raise RuntimeError('Cannot resolve protected Compose images')
+        refs.update(resolved)
+    refs.update(json.loads((ROOT / 'last-deploy.json').read_text())['images'].values())
+    if not refs:
+        raise RuntimeError('No protected image references')
+    protected = {image['Id'] for image in json.loads(run(['docker', 'image', 'inspect', *sorted(refs)]))}
+    containers = run(['docker', 'ps', '-aq']).split()
+    if containers:
+        protected.update(item['Image'] for item in json.loads(run(['docker', 'inspect', *containers])))
+    ids = sorted(set(run(['docker', 'image', 'ls', '-aq', '--no-trunc']).split()))
+    images = json.loads(run(['docker', 'image', 'inspect', *ids])) if ids else []
+    candidates = image_prune_candidates(images, protected)
+    before = shutil.disk_usage(ROOT).free
+    print(f'Image retention: keep 3 latest complete stable releases plus protected images; '
+          f'{len(candidates)} old images to remove', flush=True)
+    for image in candidates:
+        # No force: Docker refuses removal if a container starts using this image.
+        run(['docker', 'image', 'rm', *image['RepoTags']], timeout=240)
+        print('Image retention removed: ' + ', '.join(image['RepoTags']), flush=True)
+    freed = shutil.disk_usage(ROOT).free - before
+    print(f'Image retention complete: removed {len(candidates)} images; free-space change {freed} bytes', flush=True)
+
+
 def deploy(tag, check_only=False, skip_room_check=False):
     parse_command('deploy ' + tag)
     target = ROOT / 'compose.production.yaml'
@@ -201,6 +256,11 @@ def deploy(tag, check_only=False, skip_room_check=False):
             raise
         pending.unlink()
         print('Deployment healthy: ' + tag, flush=True)
+        try:
+            prune_images()
+        except Exception as error:
+            # A cleanup failure must never roll back an already healthy release.
+            print('WARNING: image retention failed (' + type(error).__name__ + '); inspect images manually', flush=True)
 
 
 def main():

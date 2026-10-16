@@ -47,7 +47,7 @@ class DeployTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             deploy.replace_images(OLD + OLD, NEW)
 
-    def scenario(self, failure=None, check=False, same=False, skip=False):
+    def scenario(self, failure=None, check=False, same=False, skip=False, cleanup_failure=False):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             compose = root / 'compose.production.yaml'
@@ -80,7 +80,18 @@ class DeployTests(unittest.TestCase):
                 if failure == 'health' and len(starts) == 1:
                     raise RuntimeError('unhealthy')
 
+            def cleanup():
+                with (root / 'deploy.lock').open('a') as other:
+                    with self.assertRaises(BlockingIOError):
+                        deploy.fcntl.flock(other, deploy.fcntl.LOCK_EX | deploy.fcntl.LOCK_NB)
+                self.assertFalse((root / 'deploy-pending.json').exists())
+                self.assertEqual(json.loads((root / 'last-deploy.json').read_text())['tag'], 'v72.0.0')
+                steps.append(['prune-images'])
+                if cleanup_failure:
+                    raise RuntimeError('cleanup failed')
+
             with patch.object(deploy, 'ROOT', root), patch.object(deploy, 'run', side_effect=command), \
+                 patch.object(deploy, 'prune_images', create=True, side_effect=cleanup), \
                  patch.object(deploy, 'health', side_effect=health), \
                  patch.object(deploy, 'prepare_static', create=True, side_effect=RuntimeError('incomplete UI') if failure == 'static-prepare' else None, return_value=('ui-container', '.avalon-releases/' + '2' * 64, '.')), \
                  patch.object(deploy, 'switch_static', create=True) as static_switch, \
@@ -112,6 +123,7 @@ class DeployTests(unittest.TestCase):
         self.assertNotIn('ui', steps[up])
         self.assertIn('--no-deps', steps[up])
         self.assertEqual(sum(step[:2] == ['docker', 'exec'] for step in steps), 1)
+        self.assertEqual(steps[-1], ['prune-images'])
 
     def test_failures_before_activation_do_not_change_compose_or_restart(self):
         for failure in ['pull', 'busy', 'pending', 'disk', 'static-prepare']:
@@ -182,6 +194,89 @@ class DeployTests(unittest.TestCase):
             self.assertEqual(final, OLD)
             self.assertEqual(starts, [])
             self.assertNotIn(['systemctl', 'start', 'avalon-backup.service'], steps)
+            self.assertNotIn(['prune-images'], steps)
+
+    def test_cleanup_never_runs_after_failed_deployment(self):
+        for failure in ['pull', 'busy', 'pending', 'disk', 'static-prepare', 'start', 'health']:
+            with self.subTest(failure=failure):
+                _, _, steps = self.scenario(failure)
+                self.assertNotIn(['prune-images'], steps)
+
+    def test_retention_keeps_three_numeric_releases_and_protected_or_unknown_images(self):
+        images = []
+        for tag in ['v9.0.0', 'v10.0.0', 'v11.0.0', 'v12.0.0', 'v13.0.0']:
+            for service, repo in deploy.REPOS.items():
+                images.append({'Id': service + tag, 'RepoTags': [repo + ':' + tag]})
+        images += [
+            {'Id': 'incomplete', 'RepoTags': ['razdva12/backend-avalon:v14.0.0']},
+            {'Id': 'prerelease', 'RepoTags': ['razdva12/backend-avalon:v15.0.0-rc.1']},
+            {'Id': 'untagged', 'RepoTags': []},
+            {'Id': 'smtp', 'RepoTags': ['avalon-backend:smtp-old']},
+            {'Id': 'foreign', 'RepoTags': ['mongo:6']},
+            {'Id': 'alias', 'RepoTags': ['razdva12/backend-avalon:v1.0.0', 'private:keep']},
+            {'Id': 'shared', 'RepoTags': ['razdva12/backend-avalon:v9.0.0', 'razdva12/backend-avalon:v13.0.0']},
+        ]
+        candidates = deploy.image_prune_candidates(images, {'backendv9.0.0', 'uiv10.0.0'})
+        self.assertEqual({image['Id'] for image in candidates}, {'uiv9.0.0', 'backendv10.0.0'})
+
+    def test_cleanup_failure_does_not_rollback_healthy_release(self):
+        final, starts, steps = self.scenario(cleanup_failure=True)
+        self.assertIn(NEW['backend'], final)
+        self.assertEqual(len(starts), 1)
+        self.assertEqual(steps[-1], ['prune-images'])
+
+    def test_cleanup_resolves_digest_protection_and_aborts_before_deletion_on_inspect_failure(self):
+        images = [{'Id': service + str(version), 'RepoTags': [repo + f':v{version}.0.0']}
+                  for version in range(1, 6) for service, repo in deploy.REPOS.items()]
+        images[2]['RepoTags'].append('razdva12/backend-avalon:v0.0.0')
+        images.append({'Id': 'extra-ui', 'RepoTags': ['razdva12/nginx-avalon:v0.0.0']})
+        for broken in [False, 'inspect', 'compose', 'containers', 'receipt', 'pending']:
+            with self.subTest(broken=broken), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (root / 'compose.production.yaml').write_text(OLD)
+                (root / 'compose.previous.yaml').write_text(OLD)
+                (root / 'last-deploy.json').write_text(json.dumps({'images': NEW}))
+                if broken == 'receipt':
+                    (root / 'last-deploy.json').write_text('{')
+                if broken == 'pending':
+                    (root / 'deploy-pending.json').write_text('{}')
+                removed = []
+
+                def command(args, **kwargs):
+                    if args[:2] == ['docker', 'compose']:
+                        if broken == 'compose':
+                            raise subprocess.CalledProcessError(1, args)
+                        return 'current-ref' if args[3].endswith('compose.production.yaml') else 'rollback-ref'
+                    if args == ['docker', 'ps', '-aq']:
+                        if broken == 'containers':
+                            raise subprocess.CalledProcessError(1, args)
+                        return 'running-gateway'
+                    if args == ['docker', 'inspect', 'running-gateway']:
+                        return json.dumps([{'Image': 'ui1'}])
+                    if args == ['docker', 'image', 'ls', '-aq', '--no-trunc']:
+                        return '\n'.join(image['Id'] for image in images)
+                    if args[:3] == ['docker', 'image', 'inspect']:
+                        if set(args[3:]) == {image['Id'] for image in images}:
+                            return json.dumps(images)
+                        if broken == 'inspect':
+                            raise subprocess.CalledProcessError(1, args)
+                        return json.dumps([{'Id': 'backend1'}, {'Id': 'ui2'}])
+                    if args[:3] == ['docker', 'image', 'rm']:
+                        self.assertNotIn('--force', args)
+                        removed.extend(args[3:])
+                        return ''
+                    raise AssertionError(args)
+
+                with patch.object(deploy, 'ROOT', root), patch.object(deploy, 'run', side_effect=command):
+                    if broken:
+                        with self.assertRaises((subprocess.CalledProcessError, ValueError, RuntimeError)):
+                            deploy.prune_images()
+                        self.assertEqual(removed, [])
+                    else:
+                        deploy.prune_images()
+                        self.assertEqual(removed, ['razdva12/backend-avalon:v2.0.0',
+                                                   'razdva12/backend-avalon:v0.0.0',
+                                                   'razdva12/nginx-avalon:v0.0.0'])
 
 
 if __name__ == '__main__':
