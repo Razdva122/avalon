@@ -31,7 +31,9 @@ already had two failures, selective support for `3`, and the existing four-vote
 coalition against the unanswered question to `5`. The early Good voter also
 rejected `3,4,5` rather than replace a known Good seat with an extra unknown.
 
-[Recorded choices and explanations](results.json) include intermediate failures.
+The recorded diagnostic included intermediate failures. Its one-off machine
+export was removed during YAGNI cleanup on 16 October 2026; the maintained
+regression fixture and evaluator remain in backend.
 This is sequential diagnosis, with one sample per position per revision. It is
 not a blinded benchmark, a complete match, or a guarantee of future choices,
 Good win rate or Merlin survival. The consistency guard does not interpret all

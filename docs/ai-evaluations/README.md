@@ -1,25 +1,18 @@
 # AI evaluation records
 
-The current website rollout and private production report are documented in
-[the site session experiment](2026-10-15-site-session-ab/README.md).
+Completed experiments retain their findings and measurement limits in Markdown.
+One-off runners and JSON/JSONL exports were removed during YAGNI cleanup on
+16 October 2026. They are not part of the maintained test or deployment tools.
 
-The earlier pilots retain their scripts, explanations and final measurements in
-Git. Full model inputs/outputs and intermediate runs remain in their original
-local directories, excluded by each experiment’s local `.gitignore`.
-No raw files were deleted or moved. A fresh checkout therefore does not contain
-all inputs needed to replay these historical measurements.
+- [Website bot-session rollout](2026-10-15-site-session-ab/README.md): active A/B rollout and private production reporting.
+- [Alliance secrecy](2026-10-16-alliance-secrecy/README.md): six saved positions, before/after choices and winning-sabotage checks.
+- [Decisive Good-player choices](2026-10-15-decisive/README.md): retained backend regression fixture and evaluator.
+- [Prompt duplication](2026-10-15-prompt-dedup/README.md): measured text reduction.
+- [Prompt caching](2026-10-15-prompt-cache/README.md): transport comparison and cache limits.
+- [Persistent sessions](2026-10-15-bot-sessions/README.md): full-game pilot.
+- [Incremental session input](2026-10-15-session-deltas/README.md): representation checks and live comparison.
+- [Initial Codex prototype](2026-10-01-codex/README.md): historical incomplete game and format diagnosis.
 
-| Pilot                                                                        | Retained measurements                                                                                                                   |
-| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| [Prompt duplication](2026-10-15-prompt-dedup/README.md)                      | `summary.json`                                                                                                                          |
-| [Prompt caching](2026-10-15-prompt-cache/README.md)                          | `summary.json`                                                                                                                          |
-| [Persistent sessions with full snapshots](2026-10-15-bot-sessions/README.md) | `summary.json`, `usage-validation.json`                                                                                                 |
-| [Incremental session input](2026-10-15-session-deltas/README.md)             | Replay byte counts in `results.json`; live measurements in `live-summary.json`, `live-input-verification.json` and `live-comparison.md` |
-
-Historical replay/analysis scripts expect their local raw files alongside them;
-restore those files from a private archive to reproduce a saved run. Inference
-commands using `--run` consume the authenticated Codex account's quota. Scripts
-can be syntax-checked with `node --check` without running an experiment.
-
-Production request costs and game traces live privately in MongoDB, separately
-from these controlled pilot artifacts. They are not exported into this directory.
+Production request costs and game traces remain private in MongoDB. Maintained
+AI behavior checks and fixtures are in `packages/backend/src/ai`; operational
+reporting is documented in the deployment guide.

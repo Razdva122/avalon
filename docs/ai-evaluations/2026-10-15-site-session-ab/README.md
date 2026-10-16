@@ -4,7 +4,7 @@ Activated release: v73.2.1 on 2026-10-15. The game service globally balances `st
 `session-delta` assignments, fixes the assignment per match, and keeps end reviews
 fresh in both arms. The separate worker was updated first on 2026-10-15.
 
-`worker-verification.json` records two short native calls through the actual
+Worker verification used two short native calls through the actual
 resource-limited SSH worker on Codex 0.159.2 / gpt-6.1-sol low. The second call
 resumed the exact native thread and recalled a randomly chosen word that was not
 repeated in the second input. Its usage is the difference from the first native
@@ -25,7 +25,7 @@ settings stratum; check failed, stopped, paused and incomplete matches too.
 [Production deployment succeeded](https://github.com/Razdva122/avalon/actions/runs/38725512515)
 after both release images passed publication. The operator explicitly authorized
 resetting unfinished rooms. Server health checks and an external HTTPS request
-passed. `live-verification.json` confirms the running backend version, A/B router,
+passed. The release check confirmed the running backend version, A/B router,
 MongoDB access and worker quota windows (300 and 10080 minutes). At that check no
 new experiment game had started; the empty ledger is the initial baseline, not a
 measurement of zero-cost games. Future game costs are recorded privately in MongoDB.
@@ -46,3 +46,5 @@ measurement of zero-cost games. Future game costs are recorded privately in Mong
 - Backend TypeScript, changed-file ESLint, Prettier and diff checks passed. Whole-AI
   ESLint still reports two pre-existing unused `kind` parameters in room.test.ts;
   that file is unchanged. Independent code review found no remaining blockers.
+
+One-off verification JSON exports were removed during YAGNI cleanup on 16 October 2026. The rollout findings above and the private database ledger remain the operational record.

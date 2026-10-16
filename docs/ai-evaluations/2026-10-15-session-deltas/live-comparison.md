@@ -79,16 +79,10 @@ The quota snapshots cover the whole account, including this chat and any other a
 
 The change achieved smaller submitted messages and cheaper mean uncached input. **A total per-game saving is not established**: uncached input was nearly equal, output and call count were higher, and the quota indicator was coarse. Keep the mode experimental; the production runner was not switched.
 
-## Evidence and reproduction
+## Archive status
 
-- `live-results.json`: both full games, calls, token counts, choices, public/private explanations, observer state and quota snapshots.
-- `fresh-traces.jsonl` / `per-bot-traces.jsonl`: private original inputs and model replies; delta traces also contain the actual submitted session input.
-- `live-summary.json`: totals, per-stage metrics, per-player context growth, final review context and narrow automated quality checks.
-- `live-input-verification.json`: actual-delta replay verification.
-
-```sh
-node docs/ai-evaluations/2026-10-15-bot-sessions/analyze.cjs docs/ai-evaluations/2026-10-15-session-deltas/live-results.json
-node docs/ai-evaluations/2026-10-15-session-deltas/verify-live-input.cjs
-```
+The completed experiment's one-off analysis scripts and machine exports were
+removed during YAGNI cleanup on 16 October 2026. Aggregate measurements, observed
+behavior and the limits of this comparison are retained above.
 
 Both games reached `finished`, five separate persistent sessions were created, initial assignments matched, and no owned temporary profile remained after cleanup. No additional bot model calls were made for analysis. The earlier 511-test implementation check remains the relevant backend validation; this comparison changed only evaluation analysis scripts.

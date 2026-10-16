@@ -6,7 +6,7 @@ User-approved scope: two complete five-player games, one per mode.
 
 Session reuse did not save measured usage in this pilot. More input was cached, but growing history and a longer game outweighed it. Keep the production default as fresh sessions; the new runner is experimental and is used only by this harness.
 
-Subsequent change: [incremental session input](../2026-10-15-session-deltas/README.md) replaces repeated snapshots with exact updates. The benchmark defaults explicitly to the original snapshot mode; `--session-deltas` selects the new mode and saves into a separate directory. The measurements below remain the original full-snapshot pilot.
+Subsequent change: [incremental session input](../2026-10-15-session-deltas/README.md) replaces repeated snapshots with exact updates. The original benchmark used snapshot mode; the later delta-mode pilot was recorded separately. The measurements below remain the original full-snapshot pilot.
 
 The table covers play through assassination. Five post-game conclusions per mode are accounted for separately below.
 
@@ -50,7 +50,7 @@ One match per mode cannot establish unchanged playing strength or a win-rate imp
 - Both `BotRoom` instances reached `finished`; initial seats and roles match exactly.
 - The per-bot pool created exactly five sessions; no owned temporary profile remained after cleanup.
 - 35 backend AI test suites / 506 tests passed. TypeScript, ESLint and source formatting checks passed.
-- `usage-validation.json` checks a real resumed turn: cumulative deltas match native last-turn input, cache, output and reasoning counts.
+- A real resumed-turn usage check confirmed that cumulative deltas match native last-turn input, cache, output and reasoning counts.
 
 ## Method
 
@@ -77,20 +77,13 @@ Quota snapshots are account-wide, coarse, and can include other account activity
 
 ## Preliminary run
 
-The first launch was stopped during mission 1 after review found that resume could use the repository working directory. The corrected runner explicitly sets its OS working directory to the owned experiment directory. `preliminary-results.json` and `preliminary-fresh-traces.jsonl` preserve this excluded launch: six generations have reported usage (83,314 input; 1,808 output), and two more were started without final usage. These requests are excluded from both comparison arms but did consume account resources.
+The first launch was stopped during mission 1 after review found that resume could use the repository working directory. The corrected runner explicitly sets its OS working directory to the owned experiment directory. The excluded launch recorded six generations have reported usage (83,314 input; 1,808 output), and two more were started without final usage. These requests are excluded from both comparison arms but did consume account resources.
 
-## Reproduction and files
+## Archive status
 
-```sh
-# Engine-only checks, no model calls:
-node docs/ai-evaluations/2026-10-15-bot-sessions/compare.cjs
-# Two real games; refuses to overwrite existing live results:
-node docs/ai-evaluations/2026-10-15-bot-sessions/compare.cjs --run
-```
-
-`results.json` holds per-generation usage, choices, private reasoning, public speech, checkpoints and quota snapshots. Each mode's `*-traces.jsonl` contains private model inputs and raw replies. Do not feed this combined diagnostic data back to individual players.
-
-Run `node docs/ai-evaluations/2026-10-15-bot-sessions/analyze.cjs` to rebuild `summary.json`, including per-stage accounting and the complete post-game review context under `finalPublicRecord`. The completed pilot's raw manager checkpoints serialize history callbacks as null; use the trace/review contexts for historical votes and rosters. The harness now records observer state for future runs; this recording-only correction did not change either game's bot inputs.
+The completed pilot's one-off runners, analysis scripts and machine exports were
+removed during YAGNI cleanup on 16 October 2026. Its measurements and limits
+remain in this report; the active session runner is maintained in backend code.
 
 ## Interpretation
 

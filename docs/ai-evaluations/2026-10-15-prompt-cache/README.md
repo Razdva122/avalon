@@ -18,17 +18,10 @@ reuse identities or share conversation history between bots.
 
 ## Comparison
 
-```sh
-node docs/ai-evaluations/2026-10-15-prompt-cache/compare.cjs
-node docs/ai-evaluations/2026-10-15-prompt-cache/compare.cjs --run
-```
-
-Without `--run`, the script only captures and hashes six requests; it makes no
-model calls and does not overwrite results. With `--run`, it overwrites
-`results.json`: one repetition, six saved positions, both transport layouts,
-12 planned decisions and a 16-generation ceiling for repairs. At most two requests
-run concurrently. The model is `gpt-6.1-sol`, medium reasoning, Traditional Chinese;
-the live local CLI is 0.160.0.
+The completed run used one repetition of six saved positions in both transport
+layouts: 12 planned decisions and a 16-generation ceiling for repairs, at most
+two requests concurrently. Model: `gpt-6.1-sol`, medium, Traditional Chinese;
+local CLI: 0.160.0.
 
 Both arms use identical current instruction text, game data, output schema,
 settings and decision pipeline. `before` sends the entire prompt on stdin using
@@ -45,7 +38,7 @@ its attempts are not separately counted by this harness.
 Launch order alternates, but cache warmth, routing and model randomness are not
 controlled. Earlier probes can warm a provider cache. The old layout can also
 receive cache hits; it does not explicitly turn provider caching off.
-`probe.json` contains three preliminary split-message requests, excluded from the
+Three preliminary split-message requests were excluded from the
 final comparison but still part of this investigation's subscription usage.
 
 ## Interpretation and deployment
@@ -71,7 +64,7 @@ Official references:
 
 ## Earlier layout experiment
 
-`results-single-block.json` preserves the first, rejected layout experiment:
+The first, rejected layout experiment recorded
 24 completed decisions, 10/10 required targets in each arm. Putting **all**
 instructions, including stage-specific advice, in one developer block resulted
 in 28,672 cached tokens out of 226,688 input after the change, versus 40,576 out
@@ -110,3 +103,5 @@ backend type checking passed (`--rootDir .` avoids the existing backend test
 importing a UI helper outside its configured root). A reviewer checked secrecy,
 message separation, repairs and worker rollout compatibility. No production
 rollout was performed.
+
+The completed pilot scripts and machine exports were removed during YAGNI cleanup on 16 October 2026.

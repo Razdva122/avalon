@@ -15,10 +15,6 @@ The requested real-game comparison has now completed: see [live results and qual
 
 ## Replay validation, zero inference calls
 
-```sh
-node docs/ai-evaluations/2026-10-15-session-deltas/replay.cjs
-```
-
 The replay uses the two previously completed games. For each player separately, it applies every update and asserts deep equality with the original snapshot. It also reconstructs the complete instruction text and asserts exact equality.
 
 | Saved game                                       | Requests | Exact snapshots and instructions | Original new user text | Incremental new user text | Reduction |
@@ -26,19 +22,13 @@ The replay uses the two previously completed games. For each player separately, 
 | Fresh-session game, replayed as persistent input |       54 |                          54 / 54 |          967,914 bytes |             538,178 bytes |     44.4% |
 | Persistent-session game                          |       84 |                          84 / 84 |        1,667,150 bytes |             755,319 bytes |     54.7% |
 
-Counting the developer message once per player as well, the reductions are 44.7% and 54.8%. Full per-update measurements are in `results.json`.
+Counting the developer message once per player as well, the reductions are 44.7% and 54.8%. The table retains the aggregate measurements.
 
 These are **UTF-8 text sizes**, not token or quota savings. The model still processes conversation history, may receive native context compaction, and may interpret updates differently. Replay proves exact recoverability of supplied data and instructions; it does not prove that an LLM maintains this state without reasoning errors. Subsequent real-game measurements are recorded separately in `live-comparison.md`.
 
-## Available experiment
+## Archive status
 
-The old benchmark explicitly retains snapshot mode to reproduce its recorded results. The new mode can be exercised with:
-
-```sh
-# Complete two engine-only games; no model calls:
-node docs/ai-evaluations/2026-10-15-bot-sessions/compare.cjs --session-deltas
-# Two real games, if explicitly selected for a subsequent measurement:
-node docs/ai-evaluations/2026-10-15-bot-sessions/compare.cjs --session-deltas --run
-```
-
-Live results are written here as `live-results.json` and separate traces, preserving the previous comparison. The harness refuses to overwrite the existing live report. The per-bot runner defaults to delta mode; the production game service still uses its existing fresh-session runner. This change does not enable persistent sessions in production.
+One-off replay/benchmark scripts and machine exports were removed during YAGNI
+cleanup on 16 October 2026. The state encoder, isolated runner and regression
+tests are maintained in backend code. See the production deployment guide for
+current rollout behavior; this document records the earlier experiment.
