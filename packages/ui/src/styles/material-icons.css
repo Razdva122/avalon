@@ -237,6 +237,9 @@
 .material-icons.draw::before {
   content: '\e746';
 }
+.material-icons.dry::before {
+  content: '\f1b3';
+}
 .material-icons.edit::before {
   content: '\e3c9';
 }
@@ -380,6 +383,9 @@
 }
 .material-icons.insights::before {
   content: '\f092';
+}
+.material-icons.iron::before {
+  content: '\e583';
 }
 .material-icons.key::before {
   content: '\e73c';
@@ -614,6 +620,9 @@
 }
 .material-icons.repeat::before {
   content: '\e040';
+}
+.material-icons.reply::before {
+  content: '\e15e';
 }
 .material-icons.report::before {
   content: '\e160';
