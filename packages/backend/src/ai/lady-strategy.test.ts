@@ -1,5 +1,6 @@
 import type { VisualGameState } from '@avalon/types';
 import type { BotRequest } from './client';
+import { systemFor } from './client';
 import { decisionPipeline } from './pipeline';
 
 function inspection(afterMission: number, botDifficulty: 'regular' | 'smart'): BotRequest {
@@ -87,3 +88,66 @@ test("later team reasoning receives the Lady checker signal without another play
   expect(context.checks).toEqual([{ by: 7, target: 1, announced: 'evil', actual: undefined }]);
   expect(context.completedMissions[0]).toMatchObject({ participated: false, yourCard: undefined, cards: undefined });
 });
+
+test.each(['regular', 'smart'] as const)(
+  '%s Evil receives the Lady cover tradeoff at target selection and announcement without forced choices',
+  async (difficulty) => {
+    for (const stage of ['checkLoyalty', 'announceLoyalty'] as const) {
+      const input = inspection(4, difficulty);
+      input.state.stage = stage;
+      input.state.players[6].role = 'mordred';
+      input.state.players[0].role = 'evil';
+      if (stage === 'announceLoyalty') {
+        input.choices = ['good', 'evil'];
+        input.privateCheck = 'evil';
+        input.speak = false;
+        input.state.players[0].features.isSelected = true;
+      }
+      const generate = jest.fn().mockResolvedValue({ choice: 0, speech: 'A tactical choice.', publicReason: '' });
+      const reply = await decisionPipeline(generate)(input);
+      for (const instructions of [generate.mock.calls[0][1].instructions, systemFor(input)]) {
+        expect(instructions).toContain('Evaluate the target and intended announcement together');
+        expect(instructions).toContain('Merlin can identify you specifically as Mordred');
+        expect(instructions).toContain('after mission 4 there is no next check to control');
+        expect(instructions).toContain('decisive Evil gain can justify exposure');
+        expect(instructions).toContain('Among comparably valuable plans');
+        expect(instructions).toContain('known Evil target followed by a truthful Evil announcement');
+        expect(instructions).toContain('Never give up a decisive winning opportunity for variety');
+      }
+      expect(generate.mock.calls[0][0].choices).toEqual(input.choices);
+      expect(reply.choice).toBe(0);
+      expect(generate).toHaveBeenCalledTimes(1);
+    }
+  },
+);
+
+test('Mordred can truthfully expose the inspected ally without the server replacing that choice', async () => {
+  const input = inspection(3, 'smart');
+  input.state.stage = 'announceLoyalty';
+  input.state.players[6].role = 'mordred';
+  input.state.players[0].role = 'evil';
+  input.state.players[0].features.isSelected = true;
+  input.choices = ['good', 'evil'];
+  input.privateCheck = 'evil';
+  input.speak = false;
+  const generate = jest.fn().mockResolvedValue({ choice: 1, speech: 'Truth preserves my cover.' });
+  const result = await decisionPipeline(generate)(input);
+  expect(result).toMatchObject({ choice: 1, speech: '', privateReason: 'Truth preserves my cover.' });
+  expect(generate).toHaveBeenCalledTimes(1);
+});
+
+test.each(['onMission', 'votingForTeam'] as const)(
+  'Lady variety advice does not change the %s winning-action instructions',
+  async (stage) => {
+    const input = inspection(3, 'smart');
+    input.state.stage = stage;
+    input.state.players[6].role = 'mordred';
+    input.choices = stage === 'onMission' ? ['success', 'fail'] : ['approve', 'reject'];
+    input.speak = false;
+    const generate = jest.fn().mockResolvedValue({ choice: stage === 'onMission' ? 1 : 0, speech: 'Win now.' });
+    await decisionPipeline(generate)(input);
+    for (const instructions of [generate.mock.calls[0][1].instructions, systemFor(input)]) {
+      expect(instructions).not.toContain('Among comparably valuable plans');
+    }
+  },
+);

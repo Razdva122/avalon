@@ -16,6 +16,7 @@ import {
   ladyInspectionAdvice,
   ladyTransferPreference,
   ladyChoiceSignalAdvice,
+  evilLadyAdvice,
   assassinationCheck,
 } from './client';
 import type { BotReply, BotRequest, Decide, GenerationOptions, DecisionEvidence } from './client';
@@ -208,8 +209,10 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
       : request.state.stage === 'assassinate'
         ? assassinationCheck
         : request.state.stage === 'checkLoyalty'
-          ? `${ladyInspectionAdvice} ${ladyTransferPreference}`
-          : '';
+          ? `${ladyInspectionAdvice} ${ladyTransferPreference} ${evilLadyAdvice}`
+          : request.state.stage === 'announceLoyalty'
+            ? evilLadyAdvice
+            : '';
   const common =
     languageInstruction(request.language) +
     ' ' +
