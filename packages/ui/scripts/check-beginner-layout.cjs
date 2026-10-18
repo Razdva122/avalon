@@ -368,7 +368,7 @@ io.on('connection', (socket) => {
         errors,
         output,
         checks:
-          'desktop chat, mobile hint dialog, embedded chat, board invariance, disable, and native selection of every seat at five viewport sizes',
+          'desktop chat, mobile hint dialog, embedded chat, board invariance, disable, native selection of every seat at eight viewport sizes, and independent postgame chat layout',
       }),
     );
   } finally {
