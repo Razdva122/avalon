@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import shuffle from 'lodash/shuffle';
 import { aiHumanRoles, type AiHumanRole } from '@avalon/types';
 import { Room } from '@/room';
 import { AI_PROFILE_RATING_SEASON } from './rating-season';
@@ -660,6 +661,11 @@ export class BotRoom extends Room {
       if (this.cancelled || this.manager.game.stage !== 'selectTeam') return;
       if (this.discussion.spoken.has(player)) continue;
       if (this.isHuman(player)) {
+        // The leader can speak voluntarily while others discuss, then submit the team silently.
+        if (player === id) {
+          this.discussion.spoken.add(player);
+          continue;
+        }
         await this.waitForHuman(() => !this.discussion?.spoken.has(player), true, player);
         if (this.cancelled) return;
         continue;
@@ -751,6 +757,11 @@ export class BotRoom extends Room {
       if (this.cancelled || game.stage !== 'assassinate') return;
       if (this.councilSpoken.has(ally.userID)) continue;
       if (this.isHuman(ally.userID)) {
+        // The assassin's board action needs no separate speaking/pass step.
+        if (ally.features.isAssassin) {
+          this.councilSpoken.add(ally.userID);
+          continue;
+        }
         await this.waitForHuman(
           () => game.stage === 'assassinate' && !this.councilSpoken.has(ally.userID),
           true,
@@ -897,10 +908,12 @@ export class BotRoom extends Room {
     this.ai!.canResumeTechnical = false;
     this.ai!.status = 'running';
     try {
-      if (!resumeTechnical)
+      if (!resumeTechnical) {
+        this.players = shuffle(this.players);
         super.startGame(
           this.selectedHumanRole ? { userID: this.ai!.humanPlayerID!, role: this.selectedHumanRole } : undefined,
         );
+      }
       while (!this.cancelled && this.manager.game.stage !== 'end') {
         await this.act();
         await this.checkpoint(this.calculateRoomState());

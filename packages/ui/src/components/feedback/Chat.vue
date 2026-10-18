@@ -101,6 +101,7 @@
         {{ unread.length ? $t('chat.newMessages', { count: unread.length }) : '' }}
       </div>
     </template>
+    <slot v-if="open" name="guidance" />
     <div class="chat-composer" :class="{ 'chat-launchers': !open }">
       <slot name="stickers" />
       <v-btn

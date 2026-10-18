@@ -7,7 +7,12 @@ import type { AiLanguage, Server, ServerSocket, TRoomState } from '@avalon/types
 
 const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
 
-function fixture(kind: 'discussion' | 'vote', language: AiLanguage = 'en', withFriend: boolean | 3 = false) {
+function fixture(
+  kind: 'discussion' | 'vote',
+  language: AiLanguage = 'en',
+  withFriend: boolean | 3 = false,
+  humanLeader = true,
+) {
   const saved: TRoomState[] = [];
   const requests: string[] = [];
   const room = new BotRoom(
@@ -39,6 +44,14 @@ function fixture(kind: 'discussion' | 'vote', language: AiLanguage = 'en', withF
   if (room.data.stage !== 'started') throw Error('not started');
   const game = room.data.manager.game;
   game.leader = game.players.find((player) => player.userID === 'owner')!;
+  if (!humanLeader) {
+    const seats = [
+      ...game.players.filter((player) => !room.isHuman(player.userID)),
+      ...room.humanIDs.map((id) => game.players.find((player) => player.userID === id)!),
+    ];
+    seats.forEach((player, index) => (player.index = index + 1));
+    game.leader = seats[0];
+  }
   if (kind === 'vote') {
     for (const player of game.players.slice(0, 2))
       room.data.manager.callGameMethods('owner', { method: 'selectPlayer', playerID: player.userID });
@@ -57,7 +70,62 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
-test.each([false, true])('repeat proposals give a discussion turn only to a human leader (%s)', async (humanLeader) => {
+test.each([false, true, 3] as const)(
+  'a silent human leader hears every other player before submitting the team (friend=%s)',
+  async (withFriend) => {
+    const { room, ai, game } = fixture('discussion', 'en', withFriend);
+    const run = room.run(true);
+    try {
+      await jest.advanceTimersByTimeAsync(0);
+      const otherHumans = withFriend === 3 ? ['friend2', 'friend'] : withFriend ? ['friend'] : [];
+      for (const speaker of otherHumans) {
+        expect(ai.discussionPlayerID).toBe(speaker);
+        expect(() => room.humanAction('owner', { method: 'sentSelectedPlayers' })).toThrow('discussion');
+        room.finishDiscussion(speaker);
+        await jest.advanceTimersByTimeAsync(0);
+      }
+      expect(ai.waitingForDiscussion).toBeUndefined();
+      expect(ai.discussionPending).toBeUndefined();
+      expect(game.stage).toBe('selectTeam');
+      expect(room.chat.history.filter((entry) => entry.message === 'A public recommendation.')).toHaveLength(
+        5 - room.humanIDs.length,
+      );
+      expect(() => room.humanAction('owner', { method: 'sentSelectedPlayers' })).toThrow();
+      for (const player of game.players.slice(0, 2))
+        room.humanAction('owner', { method: 'selectPlayer', playerID: player.userID });
+      room.humanAction('owner', { method: 'sentSelectedPlayers' });
+      await jest.advanceTimersByTimeAsync(0);
+      expect(game.stage).toBe('votingForTeam');
+      expect(ai.status).toBe('running');
+      expect(room.chat.history.some((entry) => room.isHuman(entry.userID))).toBe(false);
+    } finally {
+      room.stop();
+      await run;
+    }
+  },
+);
+
+test('a human leader cannot bypass another speaker while a bot message is being saved', async () => {
+  const { room, ai, game } = fixture('discussion');
+  let publish!: () => void;
+  room.persistChatMessage = () => new Promise<void>((resolve) => (publish = resolve));
+  const run = room.run(true);
+  try {
+    await jest.advanceTimersByTimeAsync(0);
+    expect(ai.waitingForDiscussion).toBeUndefined();
+    expect(ai.discussionPending).toBe(true);
+    for (const player of game.players.slice(0, 2))
+      room.humanAction('owner', { method: 'selectPlayer', playerID: player.userID });
+    expect(() => room.humanAction('owner', { method: 'sentSelectedPlayers' })).toThrow('discussion');
+    expect(game.stage).toBe('selectTeam');
+  } finally {
+    room.stop();
+    publish?.();
+    await run;
+  }
+});
+
+test.each([false, true])('repeat proposals do not require a human leader to speak (%s)', async (humanLeader) => {
   const { room, ai, game, requests } = fixture('vote');
   if (room.data.stage !== 'started') throw Error('not started');
   room.data.manager.callGameMethods('owner', { method: 'voteForMission', option: 'reject' });
@@ -67,10 +135,6 @@ test.each([false, true])('repeat proposals give a discussion turn only to a huma
   try {
     await jest.advanceTimersByTimeAsync(0);
     if (humanLeader) {
-      expect(ai.waitingForDiscussion).toBe(true);
-      expect(requests).toHaveLength(0);
-      room.finishDiscussion('owner');
-      await jest.advanceTimersByTimeAsync(0);
       expect(ai.waitingForDiscussion).toBeUndefined();
       expect(ai.waitingForHuman).toBe(true);
       expect(game.stage).toBe('selectTeam');
@@ -134,7 +198,7 @@ test.each([
 );
 
 test('passing before expiry cancels that deadline and starts a new deadline only for the next action', async () => {
-  const { room, ai, game } = fixture('discussion');
+  const { room, ai } = fixture('discussion', 'en', false, false);
   const run = room.run(true);
   try {
     await jest.advanceTimersByTimeAsync(0);
@@ -148,16 +212,11 @@ test('passing before expiry cancels that deadline and starts a new deadline only
     expect(ai.humanActionExpiresAt).toBe(1479999);
     await jest.advanceTimersByTimeAsync(1);
     expect(ai.status).toBe('running');
-    room.humanAction('owner', { method: 'selectPlayer', playerID: game.players[0].userID });
     room.addMessage('owner', 'This is not a discussion turn.');
     expect(ai.humanActionExpiresAt).toBe(1479999);
     await jest.advanceTimersByTimeAsync(89998);
-    room.humanAction('owner', { method: 'selectPlayer', playerID: game.players[1].userID });
-    room.humanAction('owner', { method: 'sentSelectedPlayers' });
-    await jest.advanceTimersByTimeAsync(0);
-    expect(game.stage).toBe('votingForTeam');
-    expect(ai.humanActionExpiresAt).toBe(1569998);
-    await jest.advanceTimersByTimeAsync(1);
+    room.humanAction('owner', { method: 'voteForMission', option: 'approve' });
+    expect(ai.humanActionExpiresAt).toBeUndefined();
     expect(ai.status).toBe('running');
   } finally {
     room.stop();
@@ -193,7 +252,7 @@ test('admin human rooms keep unlimited waits and publish no action deadline', as
   const run = room.run(true);
   try {
     await jest.advanceTimersByTimeAsync(180000);
-    expect(ai).toMatchObject({ status: 'running', waitingForHuman: true, waitingForDiscussion: true });
+    expect(ai).toMatchObject({ status: 'running', waitingForHuman: true });
     expect(ai.humanActionExpiresAt).toBeUndefined();
   } finally {
     room.stop();
@@ -278,7 +337,7 @@ test('prestart language changes apply to both the ready message and actual bot r
 test.each(['en', 'ru', 'zh-tw'] as const)(
   'a missed discussion spends the shared reserve before automatically passing (%s)',
   async (language) => {
-    const { room, ai, game } = fixture('discussion', language);
+    const { room, ai, game } = fixture('discussion', language, false, false);
     const run = room.run(true);
     try {
       await jest.advanceTimersByTimeAsync(389999);
@@ -287,7 +346,7 @@ test.each(['en', 'ru', 'zh-tw'] as const)(
       await jest.advanceTimersByTimeAsync(1);
       expect(ai.status).toBe('running');
       expect(ai.waitingForDiscussion).toBeUndefined();
-      expect(game.stage).toBe('selectTeam');
+      expect(game.stage).toBe('votingForTeam');
       expect(ai).toMatchObject({
         humanTimeBankMs: 0,
         humanActionBaseExpiresAt: 1480000,
@@ -305,7 +364,6 @@ test('slow mandatory actions spend a shared reserve instead of refilling it on t
   const run = room.run(true);
   try {
     await jest.advanceTimersByTimeAsync(0);
-    room.finishDiscussion('owner');
     await jest.advanceTimersByTimeAsync(210000);
     expect(ai.status).toBe('running');
     room.humanAction('owner', { method: 'selectPlayer', playerID: game.players[0].userID });
@@ -365,7 +423,7 @@ test('a technical pause spends elapsed overtime and resume retains the remaining
 });
 
 test('discussion overtime reduces the reserve available for the following board action', async () => {
-  const { room, ai } = fixture('discussion');
+  const { room, ai } = fixture('discussion', 'en', false, false);
   const run = room.run(true);
   try {
     await jest.advanceTimersByTimeAsync(120000);
@@ -439,7 +497,7 @@ test('friend table stops instead of passing a discussion when time runs out', as
 });
 
 test('discussion overtime spends only the current speaker reserve', async () => {
-  const { room, ai } = fixture('discussion', 'en', true);
+  const { room, ai } = fixture('discussion', 'en', true, false);
   const run = room.run(true);
   try {
     await jest.advanceTimersByTimeAsync(120000);
@@ -455,7 +513,7 @@ test('discussion overtime spends only the current speaker reserve', async () => 
     room.onChatMessage!(room.addMessage('friend', 'My recommendation.'));
     await jest.advanceTimersByTimeAsync(0);
     expect(ai.waitingForDiscussion).toBeUndefined();
-    expect(ai.humanTimers!.friend).toEqual({ humanTimeBankMs: 300000 });
+    expect(ai.humanTimers!.friend).toMatchObject({ humanTimeBankMs: 300000, humanActionExpiresAt: 1510000 });
     expect(ai.humanTimers!.owner).toMatchObject({ humanTimeBankMs: 270000, humanActionExpiresAt: 1480000 });
   } finally {
     room.stop();
@@ -483,8 +541,6 @@ test('selecting team members does not cancel the friend-mode leader deadline', a
   const { room, ai, game } = fixture('discussion', 'en', true);
   const run = room.run(true);
   try {
-    await jest.advanceTimersByTimeAsync(0);
-    room.finishDiscussion('owner');
     await jest.advanceTimersByTimeAsync(0);
     room.finishDiscussion('friend');
     await jest.advanceTimersByTimeAsync(0);

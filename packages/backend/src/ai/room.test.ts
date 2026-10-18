@@ -1279,14 +1279,20 @@ test('mixed missions keep every bot card pending until all secret decisions are 
   expect(missionBroadcasts).toBe(0);
 });
 
-test('public discussion waits for the human to pass before bots continue', async () => {
+test('public discussion waits for a human who is not the leader before bots continue', async () => {
+  const { Room } = await import('@/room');
   const requests: BotRequest[] = [];
   const room = new BotRoom('human-discussion', 'admin', io, async (request) => {
     requests.push(request);
     return reply(request);
   });
   room.joinAsHuman('admin');
-  const run = room.run();
+  Room.prototype.startGame.call(room);
+  if (room.data.stage !== 'started') throw Error('not started');
+  room.data.manager.game.leader = room.data.manager.game.players.find((p) => p.userID !== 'admin')!;
+  room.ai!.status = 'paused';
+  room.ai!.canResumeTechnical = true;
+  const run = room.run(true);
   try {
     for (let step = 0; step < 100; step++) await new Promise<void>((resolve) => setImmediate(resolve));
     expect(room.ai).toMatchObject({
@@ -1316,7 +1322,7 @@ test('public discussion waits for the human to pass before bots continue', async
 });
 
 test.each([false, true])(
-  'evil human joins the public council before the shot; human assassin=%s',
+  'the council preserves other speakers without requiring the human assassin to speak (%s)',
   async (humanAssassin) => {
     const { Room } = await import('@/room');
     const requests: BotRequest[] = [];
@@ -1365,9 +1371,35 @@ test.each([false, true])(
       expect(() => room.humanAction('admin', { method: 'assassinate', type: 'merlin' })).toThrow('discussion');
     room.ai!.status = 'paused';
     room.ai!.canResumeTechnical = true;
+    let releaseCouncil: (() => void) | undefined;
+    if (humanAssassin) room.persistChatMessage = () => new Promise<void>((resolve) => (releaseCouncil = resolve));
     const run = room.run(true);
     try {
       for (let i = 0; i < 100; i++) await new Promise<void>((resolve) => setImmediate(resolve));
+      if (humanAssassin) {
+        expect(game.stage).toBe('assassinate');
+        expect(room.ai?.discussionPending).toBe(true);
+        const target = game.players.find((p) => p.role.loyalty === 'good')!;
+        room.humanAction('admin', { method: 'selectPlayer', playerID: target.userID });
+        expect(() => room.humanAction('admin', { method: 'assassinate', type: 'merlin' })).toThrow('discussion');
+        room.persistChatMessage = undefined;
+        releaseCouncil!();
+        for (let i = 0; i < 100; i++) await new Promise<void>((resolve) => setImmediate(resolve));
+        expect(room.ai?.waitingForDiscussion).toBeUndefined();
+        expect(room.ai?.discussionPending).toBeUndefined();
+        expect(room.ai?.waitingForHuman).toBe(true);
+        const council = requests.filter((request) => request.councilDiscussion);
+        expect(council.map((request) => request.playerID).sort()).toEqual(
+          game.players
+            .filter((p) => p.role.loyalty === 'evil' && p !== human)
+            .map((p) => p.userID)
+            .sort(),
+        );
+        room.humanAction('admin', { method: 'assassinate', type: 'merlin' });
+        await run;
+        expect(game.stage).toBe('end');
+        return;
+      }
       expect(room.ai?.waitingForDiscussion).toBe(true);
       expect(requests).toHaveLength(0);
       expect(() => room.humanAction('admin', { method: 'assassinate', type: 'merlin' })).toThrow('discussion');
@@ -1384,18 +1416,11 @@ test.each([false, true])(
       expect(room.chat.history.some((m) => m.message.startsWith('Evil council:'))).toBe(true);
       expect(JSON.stringify(requests)).toContain('HUMAN_COUNCIL_ADVICE');
       expect(requests.every((r) => r.playerID !== 'admin')).toBe(true);
-      if (humanAssassin) {
-        expect(game.stage).toBe('assassinate');
-        expect(room.ai?.waitingForDiscussion).toBeUndefined();
-        expect(room.ai?.waitingForHuman).toBe(true);
-        const target = game.players.find((p) => p.role.loyalty === 'good')!;
-        room.humanAction('admin', { method: 'selectPlayer', playerID: target.userID });
-        room.humanAction('admin', { method: 'assassinate', type: 'merlin' });
-      }
       await run;
       expect(game.stage).toBe('end');
     } finally {
       room.stop();
+      releaseCouncil?.();
       await run;
     }
   },

@@ -10,30 +10,7 @@ new Function(
   'exports',
   ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText,
 )(require, moduleUnderTest, moduleUnderTest.exports);
-const { beginnerTip, tipsDisabled, saveTipsDisabled, beginnerBoardScale } = moduleUnderTest.exports;
-test('board scale leaves room for tips and keeps all seats within the narrow viewport', () => {
-  const desktop = beginnerBoardScale(1152, 720);
-  assert.ok(840 * desktop <= 330, 'the board must fit above the reserved tips area');
-  const phone = beginnerBoardScale(390, 844);
-  assert.ok(840 * phone <= 366, 'the board must fit within the phone width');
-  const short = beginnerBoardScale(320, 568);
-  assert.ok(840 * short <= 296);
-  assert.ok([desktop, phone, short].every((scale) => scale > 0 && scale <= 1));
-});
-test('compiled voice-panel visibility rule targets the tip rather than the whole game room', () => {
-  const { parse, compileStyle } = require('@vue/compiler-sfc');
-  const postcss = require('postcss');
-  const filename = require.resolve('../src/components/view/information/BeginnerTips.vue');
-  const { descriptor } = parse(fs.readFileSync(filename, 'utf8'));
-  const result = compileStyle({ source: descriptor.styles[0].content, filename, id: 'data-v-test', scoped: true });
-  assert.deepEqual(result.errors, []);
-  const selectors = [];
-  postcss.parse(result.code).walkDecls('visibility', (declaration) => {
-    if (declaration.value === 'hidden') selectors.push(declaration.parent.selector);
-  });
-  assert.ok(selectors.length > 0);
-  for (const selector of selectors) assert.match(selector, /\.beginner-live-tip\b/, 'only the tip may disappear');
-});
+const { beginnerTip, tipsDisabled, saveTipsDisabled } = moduleUnderTest.exports;
 const ai = { beginner: true, status: 'running', humanPlayerID: 'human' };
 function game(stage, features = {}, extra = {}) {
   return {

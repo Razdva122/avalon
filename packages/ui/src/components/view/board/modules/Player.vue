@@ -322,10 +322,18 @@ export default defineComponent({
     const chatMessage = ref<{ message?: string; timeoutId?: number }>();
     const playerRef = ref<HTMLElement | null>(null);
     const statusElement = ref<HTMLElement | null>(null);
+    const statusOverflow = () => ({
+      padding: {
+        top: Math.max(0, document.querySelector('.header')?.getBoundingClientRect().bottom ?? 0) + 8,
+        right: 8,
+        bottom: 8,
+        left: 8,
+      },
+    });
     const { floatingStyles: statusStyles } = useFloating(playerRef, statusElement, {
       strategy: 'fixed',
       placement: 'top',
-      middleware: [offset(6), shift({ padding: 8 })],
+      middleware: [offset(6), flip(statusOverflow), shift(statusOverflow)],
       whileElementsMounted: (reference, floating, update) =>
         autoUpdate(reference, floating, update, { animationFrame: true }),
     });

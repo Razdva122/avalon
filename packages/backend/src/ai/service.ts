@@ -1,3 +1,4 @@
+import { BeginnerAnalysis, buildBeginnerAnalysis } from './beginner-analysis';
 import { aiHumanRoles, aiPlayedModel, aiRosterInfo } from '@avalon/types';
 import type {
   AiBotDifficulty,
@@ -68,6 +69,7 @@ function humanModeAvailableAt(difficulty: AiBotMode, quota: CodexWeeklyLimit | n
 export class AiService {
   repository?: AiRepository;
   private archive?: AiRepository;
+  private beginnerAnalysis?: BeginnerAnalysis;
   get archiveRepository(): AiRepository | undefined {
     return this.repository || this.archive;
   }
@@ -83,6 +85,7 @@ export class AiService {
     const db = manager.dbManager.dbInstance?.connection.db;
     if (db) this.archive = new AiRepository(db);
     if (process.env.AI_ROOMS_ENABLED === 'true' && db && codexEnabled()) this.repository = new AiRepository(db);
+    if (db && this.repository) this.beginnerAnalysis = new BeginnerAnalysis(db, this.repository);
   }
   private active() {
     return Object.values(this.manager.rooms).find((r) => r.ai && ['ready', 'running', 'paused'].includes(r.ai.status));
@@ -353,6 +356,31 @@ export class AiService {
         cb({ error: 'Could not load AI rooms' });
       }
     });
+    socket.on('getBeginnerReview', async (id, cb) => {
+      if (typeof cb !== 'function') return;
+      try {
+        if (
+          !userID ||
+          !codexEnabled() ||
+          !this.beginnerAnalysis ||
+          typeof id !== 'string' ||
+          !/^[a-zA-Z0-9-]{1,80}$/.test(id)
+        )
+          return cb({ status: 'unavailable' });
+        const live = this.manager.rooms[id];
+        const state = live ? live.calculateRoomState() : await this.archiveRepository?.load(id);
+        if (!state || !buildBeginnerAnalysis(state, userID)) return cb({ status: 'unavailable' });
+        const active = this.active();
+        const canGenerate =
+          !this.creating &&
+          !this.starting &&
+          ![...this.running].some((roomID) => roomID !== id) &&
+          (!active || (active.roomID === id && state.stage === 'started' && state.game.stage === 'end'));
+        cb(await this.beginnerAnalysis.get(state, userID, canGenerate));
+      } catch {
+        cb({ status: 'unavailable' });
+      }
+    });
     socket.on('getAiSpectatorRoles', (id, cb) => {
       if (typeof cb !== 'function') return;
       if (typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id)) return cb({ error: 'Invalid room ID' });
@@ -502,6 +530,7 @@ export class AiService {
         if (this.creating || this.starting || this.running.size) return cb({ error: 'AI room control in progress' });
         if (Object.keys(this.manager.rooms).length >= 500) return cb({ error: 'Room limit reached' });
         this.creating = locked = true;
+        await this.beginnerAnalysis?.cancelAll();
         const modes = await this.humanModes();
         if (
           options.beginner
@@ -667,6 +696,7 @@ export class AiService {
         if (this.creating || this.starting || this.running.size) return cb({ error: 'AI room is being created' });
         this.creating = true;
         try {
+          await this.beginnerAnalysis?.cancelAll();
           const id = randomUUID();
           await this.repository!.claim(id);
           const room = this.createRoom(id, userID!, language, playerCount);

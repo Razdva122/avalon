@@ -1,5 +1,7 @@
 export const beginnerTips = {
   vi: {
+    shortLabel: 'Gợi ý',
+    backToTable: 'Trở lại bàn',
     label: 'Gợi ý cho người mới',
     expand: 'Mở rộng gợi ý',
     collapse: 'Thu gọn gợi ý',
@@ -18,8 +20,7 @@ export const beginnerTips = {
     role_percival: 'Bạn thấy hai ứng viên: Merlin và Morgana. Bạn chưa biết ai là ai. Hãy quan sát hành động của họ.',
     role_morgana: 'Percival nhìn bạn như một Merlin tiềm năng. Bạn thuộc phe Ác và có thể tận dụng sự mơ hồ này.',
     intro: 'Xem vai trò và mục tiêu của bạn. Giữ kín vai trò: một số người chơi là đối thủ của bạn.',
-    discussion:
-      'Nói trong khung chat bạn muốn cử ai làm nhiệm vụ và vì sao. Bạn có thể bỏ qua phát biểu bằng nút “Nhường lượt”.',
+    discussion: 'Đề xuất {count} người đi nhiệm vụ trong chat và giải thích lựa chọn của bạn.',
     discussionWait:
       'Người chơi đang thảo luận về đội. Bot có thể đánh lừa: hãy đối chiếu lời nói với phiếu bầu và kết quả nhiệm vụ.',
     selectLeader: 'Chạm vào người chơi quanh bàn để chọn {count} người. Bạn có thể chọn chính mình. Sau đó cử đội đi.',
@@ -46,6 +47,8 @@ export const beginnerTips = {
     end: 'Ván chơi đã kết thúc. Bàn chơi hiển thị kết quả và lý do. Giờ bạn có thể đối chiếu vai trò đã lộ với lời nói, phiếu bầu và nhiệm vụ của người chơi.',
   },
   en: {
+    shortLabel: 'Hint',
+    backToTable: 'Back to table',
     label: 'Beginner tip',
     expand: 'Expand tip',
     collapse: 'Collapse tip',
@@ -64,8 +67,7 @@ export const beginnerTips = {
     role_percival: 'You see two candidates: Merlin and Morgana. You do not know which is which. Watch their actions.',
     role_morgana: 'Percival sees you as a possible Merlin. You are Evil and can use this uncertainty.',
     intro: 'Check your role and goal. Keep your role secret: some players are your opponents.',
-    discussion:
-      'Tell the chat who you would send on the quest and why. You can skip your message with “Pass the word”.',
+    discussion: 'Suggest {count} players for this quest in chat and explain your choice.',
     discussionWait:
       'The players are discussing the team. Bots can bluff: compare their words with votes and quest results.',
     selectLeader:
@@ -92,6 +94,8 @@ export const beginnerTips = {
     end: 'The game is over. The table shows the result and its reason. You can now compare revealed roles with the players’ words, votes and quests.',
   },
   ru: {
+    shortLabel: 'Подсказка',
+    backToTable: 'Вернуться к столу',
     label: 'Подсказка для новичка',
     expand: 'Развернуть подсказку',
     collapse: 'Свернуть подсказку',
@@ -112,8 +116,7 @@ export const beginnerTips = {
     role_morgana:
       'Персиваль видит вас как возможного Мерлина. Вы играете за зло и можете использовать эту неопределённость.',
     intro: 'Посмотрите свою роль и цель. Держите роль в секрете: среди игроков есть ваши противники.',
-    discussion:
-      'Напишите в чат, кого хотите отправить в поход и почему. Можно пропустить реплику кнопкой «Передать слово».',
+    discussion: 'Предложите в чате команду из {count} участников и объясните свой выбор.',
     discussionWait:
       'Игроки обсуждают команду. Боты могут блефовать — сравнивайте их слова с голосами и результатами походов.',
     selectLeader:
@@ -139,6 +142,8 @@ export const beginnerTips = {
     end: 'Партия завершена. На столе показаны результат и его причина. Теперь можно сопоставить раскрытые роли со словами, голосами и походами игроков.',
   },
   es: {
+    shortLabel: 'Consejo',
+    backToTable: 'Volver a la mesa',
     label: 'Consejo para principiantes',
     expand: 'Mostrar consejo',
     collapse: 'Contraer consejo',
@@ -157,7 +162,7 @@ export const beginnerTips = {
     role_percival: 'Ves a dos candidatos: Merlín y Morgana. No sabes quién es quién. Observa sus acciones.',
     role_morgana: 'Percival te ve como un posible Merlín. Eres del Mal y puedes aprovechar esa incertidumbre.',
     intro: 'Consulta tu rol y objetivo. Mantén tu rol en secreto: algunos jugadores son tus rivales.',
-    discussion: 'Di en el chat a quién enviarías a la misión y por qué. Puedes omitir tu mensaje con «Pasar el turno».',
+    discussion: 'Propón en el chat a {count} jugadores para la misión y explica tu elección.',
     discussionWait:
       'Los jugadores están debatiendo el equipo. Los bots pueden mentir: compara sus palabras con los votos y las misiones.',
     selectLeader:
@@ -184,6 +189,8 @@ export const beginnerTips = {
     end: 'La partida terminó. La mesa muestra el resultado y su motivo. Ahora puedes comparar los roles revelados con las palabras, votos y misiones.',
   },
   pt: {
+    shortLabel: 'Dica',
+    backToTable: 'Voltar à mesa',
     label: 'Dica para iniciantes',
     expand: 'Expandir dica',
     collapse: 'Recolher dica',
@@ -202,7 +209,7 @@ export const beginnerTips = {
     role_percival: 'Você vê dois candidatos: Merlin e Morgana. Não sabe quem é quem. Observe as ações deles.',
     role_morgana: 'Percival vê você como um possível Merlin. Você é do Mal e pode usar essa incerteza.',
     intro: 'Confira seu papel e objetivo. Mantenha seu papel em segredo: alguns jogadores são seus adversários.',
-    discussion: 'Diga no chat quem enviaria à missão e por quê. Você pode pular sua fala com «Passar a vez».',
+    discussion: 'Sugira no chat {count} jogadores para a missão e explique sua escolha.',
     discussionWait:
       'Os jogadores estão discutindo a equipe. Bots podem blefar: compare suas palavras com votos e resultados das missões.',
     selectLeader:
@@ -229,6 +236,8 @@ export const beginnerTips = {
     end: 'A partida terminou. A mesa mostra o resultado e seu motivo. Agora compare os papéis revelados com as palavras, votos e missões.',
   },
   'zh-CN': {
+    shortLabel: '提示',
+    backToTable: '返回牌桌',
     label: '新手提示',
     expand: '展开提示',
     collapse: '收起提示',
@@ -245,7 +254,7 @@ export const beginnerTips = {
     role_percival: '你看到两位候选人：梅林和莫甘娜，但不知道谁是谁。观察他们的行动。',
     role_morgana: '派西维尔会将你视为可能的梅林。你属于坏人阵营，可以利用这种不确定性。',
     intro: '查看你的角色和目标。隐藏自己的角色：有些玩家是你的对手。',
-    discussion: '在聊天中说说想派谁执行任务，以及原因。也可以点击“传话”跳过发言。',
+    discussion: '在聊天中提议本次任务的{count}名队员，并说明理由。',
     discussionWait: '玩家正在讨论队伍。机器人可能会说谎：请结合投票和任务结果判断发言。',
     selectLeader: '点击桌边的玩家，选择{count}位队员。可以选择自己，然后提交队伍。',
     selectWait: '队长正在选择队员。留意队伍组成，接下来你将对这支队伍投票。',
@@ -263,6 +272,8 @@ export const beginnerTips = {
     end: '对局结束。桌面显示结果及原因。现在可以结合公开的角色，回顾玩家的发言、投票和任务。',
   },
   'zh-TW': {
+    shortLabel: '提示',
+    backToTable: '返回牌桌',
     label: '新手提示',
     expand: '展開提示',
     collapse: '收起提示',
@@ -279,7 +290,7 @@ export const beginnerTips = {
     role_percival: '你看到兩位候選人：梅林與莫甘娜，但不知道誰是誰。觀察他們的行動。',
     role_morgana: '派西維爾會將你視為可能的梅林。你屬於壞人陣營，可以利用這種不確定性。',
     intro: '查看你的角色和目標。隱藏自己的角色：有些玩家是你的對手。',
-    discussion: '在聊天中說說想派誰執行任務，以及原因。也可以點擊「傳話」跳過發言。',
+    discussion: '在聊天中提議本次任務的{count}名隊員，並說明理由。',
     discussionWait: '玩家正在討論隊伍。機器人可能會說謊：請結合投票和任務結果判斷發言。',
     selectLeader: '點擊桌邊的玩家，選擇{count}位隊員。可以選擇自己，然後提交隊伍。',
     selectWait: '隊長正在選擇隊員。留意隊伍組成，接下來你將對這支隊伍投票。',

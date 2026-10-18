@@ -42,6 +42,16 @@ export type AiPlayerCount = 5 | 6 | 7 | 8;
 export type AiBotDifficulty = 'smart' | 'regular';
 export type AiBotMode = AiBotDifficulty | 'beginner';
 
+export type BeginnerGameReview = {
+  decision: string;
+  observation: string;
+  next: string;
+  episodeID: string;
+  mission: number;
+  action: 'vote' | 'team' | 'card' | 'assassinate';
+};
+export type BeginnerReviewResponse = { status: 'complete'; review: BeginnerGameReview } | { status: 'unavailable' };
+
 export type AiRoomState = {
   /** Owner human seat; absent in spectator-only bot matches. */
   humanPlayerID?: string;

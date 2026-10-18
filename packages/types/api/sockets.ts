@@ -136,6 +136,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
       result: { roles: Record<string, TRoles>; decisions: import('../room').AiSpectatorDecision[] } | { error: string },
     ) => void,
   ) => void;
+  getBeginnerReview: (roomID: string, callback: (result: import('../room').BeginnerReviewResponse) => void) => void;
   getAiRoomAccess: (
     callback: (result: {
       canManage: boolean;

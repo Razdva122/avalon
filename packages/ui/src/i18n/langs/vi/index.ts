@@ -1,3 +1,4 @@
+import { beginnerReview } from '../beginnerReview';
 import { beginnerTips } from '../beginnerTips';
 import aiAgents from './aiAgents';
 import aiArena from './aiArena';
@@ -18,6 +19,7 @@ import pages from '@/i18n/langs/pages';
 
 export const vi = {
   aiArena,
+  beginnerReview: beginnerReview['vi'],
   beginnerTips: beginnerTips.vi,
   aiAgents,
   passwordRecovery: passwordRecovery.vi,

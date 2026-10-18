@@ -37,8 +37,11 @@ the administrator owner can replace one bot with a human seat. Role/decision
 reveal is available only in games containing bots exclusively, never in mixed games.
 
 Mixed games wait for human discussion and board actions. A persisted public text
-message continues discussion, or Pass turn skips it. Spectator messages are not
-passed to bots. AI games use their own statistics pool; mixed games do not change
+message continues discussion, or Pass turn skips it. A human leader or assassin
+has no separate mandatory speaking turn before their board action. Every other
+participant keeps their scheduled speaking turn; confirmation becomes available
+when those turns finish. Humans can contribute to the chat voluntarily.
+Spectator messages are not passed to bots. AI games use their own statistics pool; mixed games do not change
 ordinary human ratings. A completed human victory against either bot difficulty
 unlocks the dedicated `ai_win` achievement and Morgana sticker.
 
@@ -110,8 +113,9 @@ On the first proposal of each mission, every player gets a public speaking turn
 before the leader finalizes a team. After a rejection, only the new leader speaks:
 a bot selects the final roster in that same turn, addresses another seat and
 explains why it chose this team using earlier discussion and recorded votes.
-A human leader gets a discussion turn followed by team selection; other humans
-and bots do not get scheduled reply turns on repeat proposals. Voting stays quiet,
+A human leader submits the team after hearing the other speakers, without a
+mandatory speech or pass step. Other humans and bots do not get scheduled reply
+turns on repeat proposals. Voting stays quiet,
 and the full public circle returns at the start of the next mission.
 The chosen language applies to public speech, private notes, Evil council,
 server announcements and post-game reflections. JSON keys and legal choice
@@ -307,8 +311,9 @@ They are evidence for those dates, not current operational defaults.
 Before assassination, Evil council advice is published to the room chat immediately,
 with no post-game duplicate. An Evil human gets a speaking turn even when a bot
 is the assassin. The human message becomes part of subsequent bot input. A human
-assassin can shoot only after all council participants have spoken or passed;
-this guard also applies during asynchronous state persistence. Good humans can
+assassin can shoot after all other council participants have spoken or passed,
+without a mandatory speech or pass step of their own. This guard also applies
+during asynchronous state persistence. Good humans can
 read the council in the common chat but do not get an Evil council turn.
 
 ### Session-history A/B measurement
@@ -319,3 +324,71 @@ fixed for the match, including technical resumes; reviews stay independent in bo
 arms. Quota snapshots and per-request usage are recorded in MongoDB, including
 paused/stopped games and unknown usage after failed calls. Comparable settings are
 reported separately. See [deployment and private report](../deploy/codex-production.md#balanced-bot-session-experiment-2026-10-15).
+
+## Beginner post-game review
+
+Beginner participants see a collapsible review after the final reveal in live view.
+On mobile it opens as a compact outcome with replay controls and has three states:
+compact, expanded and hidden. A small restore button remains when hidden. The panel
+overlays the table; switching states never moves or rescales it. Desktop opens the
+full review on the left. AI episodes show the mission and decision type, emphasize
+the decision and next action, and keep the longer observation in a native keyboard-accessible
+disclosure. Replay omits the redundant role/player-count/hints caption.
+The next-match role picker uses one row of five existing role portraits with the selected
+role name above it and native radio semantics,
+a checked indicator and keyboard arrow navigation. Opening it focuses the selected role. Replay actions stay outside the scrolling lesson/role-picker
+area, and the replay button explicitly names the selected role.
+It stays hidden while chat, spoiler hiding or history viewing is active. The review
+uses the outcome and public mission results: Merlin's assassination takes priority,
+otherwise it explains a failed mission or the limits of a successful mission. It
+never attributes a bot's motive or judges a decision using revealed secret cards.
+Manually ended games receive an unfinished notice rather than a victory lesson.
+
+The panel requests an optional personal analysis via `getBeginnerReview(roomID)`.
+The server authorizes the finished beginner participant and uses exactly
+`gpt-6.1-sol` with `low` reasoning. One real episode is returned as decision,
+observation and next-game action. The input separates decision-time knowledge from
+later public results; it excludes other secret cards, the full revealed role list,
+names and chat without reliable decision-time cutoffs. Current episodes cover team
+selection, non-anonymous voluntary votes, Evil's own mission cards and assassination.
+Source IDs and output bounds are validated; temporal interpretation of prose still
+relies on the model following these constraints.
+
+MongoDB `ai_beginner_reviews` atomically claims each room/player pair and caches the
+result (30-day retention). Only games created within the last day can generate a
+new analysis. Concurrent requests share one job, failed/uncertain jobs are not
+silently regenerated, and an unavailable model never falls back to another model.
+Analysis is optional, has a 90-second deadline, and is cancelled before another bot
+room is created. Creation admission is locked before cancellation. Model settings,
+usage and status are recorded under phase `beginner-review` in the existing request
+ledger. The panel keeps the factual lesson and replay controls available while
+waiting or if generation fails. No private review is broadcast to spectators.
+
+Play again preserves the discussion language and defaults to the participant's role;
+the role selector offers the existing five-seat roles. It creates and starts a new
+beginner room with regular bots and hints. Availability is checked on demand, duplicate
+clicks are ignored, and a rejected start can retry the prepared room. Uncertain network
+outcomes recover through the existing room UI. Leaving the originating room cancels
+late starts and navigation. All seven UI languages include the review copy.
+
+Checks: `node --test packages/ui/scripts/beginner-review.test.cjs` and
+`node packages/ui/scripts/check-beginner-review.cjs` (use the development guide's
+`PUPPETEER_EXECUTABLE_PATH` setting when necessary).
+
+## Live beginner guidance layout
+
+Live tips overlay the normal table; no beginner-specific room height or board scale is applied.
+Mobile keeps a small hint launcher in the bottom toolbar so every seat remains tappable.
+It opens an explicit dismissible dialog with a return-to-table button. Opening or disabling
+hints never moves the seats. At desktop widths of 960px and above, guidance remains in the left sidebar beside an open chat,
+while the post-game review uses its own 1280px side-by-side layout. The live card chooses a free vertical band beside the
+actual player portraits and AI status panel, with internal scrolling when needed. On mobile, the live tip moves into the chat above its
+composer, with the same per-room preference and no duplicate floating card. The beginner
+human-turn toolbar keeps the pass button without repeating the full discussion instruction.
+
+Check the production UI with `node packages/ui/scripts/check-beginner-layout.cjs`
+after building. It covers desktop chat, mobile guidance, keyboard viewport sizing,
+board geometry during open/disable/chat, and narrow/landscape layouts. It also hit-tests
+all five seats and verifies native mouse clicks reach `selectPlayer` at eight viewport sizes,
+including the reported short phone layout and narrow desktop windows. Desktop checks also
+assert that the sidebar never intersects a portrait.

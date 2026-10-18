@@ -1,5 +1,5 @@
 <template>
-  <section v-if="ai" class="ai-panel" :aria-label="$t('aiArena.title')">
+  <section v-if="ai" class="ai-panel" :class="{ 'ai-panel--beginner': ai.beginner }" :aria-label="$t('aiArena.title')">
     <div
       v-if="
         isHumanPlayer && (!ai.withFriend || isDiscussionPlayer) && ai.status === 'running' && ai.waitingForDiscussion
@@ -8,7 +8,7 @@
       role="status"
     >
       <strong>{{ $t('aiArena.yourDiscussionTurn') }}</strong>
-      <p>{{ $t('aiArena.discussionHint') }}</p>
+      <p v-if="!ai.beginner">{{ $t('aiArena.discussionHint') }}</p>
       <v-btn color="primary" :loading="busy" :disabled="busy" @click="finishDiscussion">
         {{ $t('aiArena.passTurn') }}
       </v-btn>
@@ -381,6 +381,21 @@ async function control(action: 'start' | 'stop' | 'resumeTechnical') {
 }
 .ai-human-turn p {
   margin: 8px 0 12px;
+}
+.ai-panel--beginner .ai-human-turn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 12px;
+}
+.ai-panel--beginner .ai-human-turn strong {
+  font-size: 13px;
+}
+.ai-panel--beginner .ai-human-turn :deep(.v-btn) {
+  min-height: 44px;
+  text-transform: none;
+  letter-spacing: 0;
 }
 .ai-panel {
   width: min(360px, calc(100vw - 16px));

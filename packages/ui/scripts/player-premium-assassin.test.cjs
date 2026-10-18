@@ -15,8 +15,9 @@ function fixture(overrides = {}) {
   const code = ts.transpileModule(source.match(/<script lang="ts">([\s\S]*?)<\/script>/)[1], {
     compilerOptions: { module: ts.ModuleKind.CommonJS, esModuleInterop: true },
   }).outputText;
+  let statusFloatingOptions;
   const exports = {};
-  new Function('require', 'exports', 'window', code)(
+  new Function('require', 'exports', 'window', 'document', code)(
     (id) => {
       if (id === 'vue')
         return {
@@ -37,13 +38,16 @@ function fixture(overrides = {}) {
       if (id === '@/helpers/plot-cards') return { getPlayerCards: () => [] };
       if (id === '@floating-ui/vue')
         return {
-          useFloating: (_, __, options) => ({
-            middlewareData: vue.ref({}),
-            floatingStyles: vue.ref({ position: options.strategy }),
-          }),
-          offset() {},
-          flip() {},
-          shift() {},
+          useFloating: (_, __, options) => {
+            if (options.placement === 'top') statusFloatingOptions = options;
+            return {
+              middlewareData: vue.ref({}),
+              floatingStyles: vue.ref({ position: options.strategy }),
+            };
+          },
+          offset: require('@floating-ui/vue').offset,
+          flip: require('@floating-ui/vue').flip,
+          shift: require('@floating-ui/vue').shift,
           arrow() {},
         };
       if (id === '@avalon/types/consts') return { availablePlotCards: {} };
@@ -71,6 +75,7 @@ function fixture(overrides = {}) {
     },
     exports,
     { matchMedia: () => ({ matches: false }) },
+    { querySelector: () => ({ getBoundingClientRect: () => ({ bottom: 64 }) }) },
   );
   const props = vue.reactive({
     visibleHistory: undefined,
@@ -117,7 +122,7 @@ function fixture(overrides = {}) {
     app.component('v-btn', { render: () => null });
     return { html: await renderToString(app, context), badge: context.teleports?.body || '' };
   }
-  return { api, props, profile, store, themeClasses, render, stop: () => scope.stop() };
+  return { api, props, profile, store, themeClasses, render, statusFloatingOptions, stop: () => scope.stop() };
 }
 
 test('assassin fire follows the owner premium profile and current player state', () => {
@@ -219,4 +224,30 @@ test('friend and spectator deadlines name the acting player instead of prompting
   assert.ok((await player.render()).badge.includes('Ваше слово: 90 с'));
   player.store.state.profile = undefined;
   assert.ok((await player.render()).badge.includes('Слово: Аня · 90 с'), 'spectators see the player name');
+});
+
+test('top player status stays below the fixed header at desktop and mobile widths', async (t) => {
+  const player = fixture({ thinking: true });
+  t.after(player.stop);
+  const { computePosition } = require('@floating-ui/vue');
+  for (const width of [390, 1440]) {
+    const result = await computePosition(
+      {},
+      {},
+      {
+        ...player.statusFloatingOptions,
+        platform: {
+          getElementRects: async () => ({
+            reference: { x: width / 2 - 40, y: 80, width: 80, height: 100 },
+            floating: { x: 0, y: 0, width: 180, height: 32 },
+          }),
+          getClippingRect: async () => ({ x: 0, y: 0, width, height: 800 }),
+          getDimensions: async () => ({ width: 180, height: 32 }),
+          isElement: async () => false,
+        },
+      },
+    );
+    assert.ok(result.y >= 72, `status at ${result.y} overlaps the header`);
+    assert.ok(result.x >= 8 && result.x + 180 <= width - 8);
+  }
 });

@@ -1,7 +1,4 @@
 import type { VisualGameState, AiRoomState } from '@avalon/types';
-export function beginnerBoardScale(width: number, height: number): number {
-  return Math.max(0.2, Math.min(1, (width - 24) / 840, (height - (height <= 600 ? 260 : 390)) / 840));
-}
 export function beginnerTip(
   game: VisualGameState,
   ai: AiRoomState | undefined,

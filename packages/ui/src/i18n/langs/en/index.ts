@@ -1,3 +1,4 @@
+import { beginnerReview } from '../beginnerReview';
 import { beginnerTips } from '../beginnerTips';
 import aiAgents from './aiAgents';
 import aiArena from './aiArena';
@@ -22,6 +23,7 @@ import pages from '@/i18n/langs/pages';
 
 export const en = {
   aiArena,
+  beginnerReview: beginnerReview['en'],
   beginnerTips: beginnerTips['en'],
   aiAgents,
   passwordRecovery: passwordRecovery['en'],

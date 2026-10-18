@@ -86,6 +86,7 @@ const acknowledgements: Record<string, number> = {
   resetTrueSkillRating: 1,
   updateUserAvatar: 1,
   getAiSpectatorRoles: 1,
+  getBeginnerReview: 1,
   createAiRoom: 1,
   createHumanAiRoom: 0,
   startHumanAiRoom: 2,
