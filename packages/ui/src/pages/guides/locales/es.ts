@@ -106,7 +106,7 @@ export const guides: Record<GuideId, Guide> = {
         title: 'Online no siempre significa jugar a distancia',
         paragraphs: [
           'Una web que reparte roles pasando un móvil por la mesa puede servir para una reunión presencial sin ofrecer una sala para amigos a distancia. Comprueba que cada participante pueda entrar desde su dispositivo. Avalon aquí funciona en el navegador; Among Us requiere que todos instalen el juego en una plataforma compatible.',
-          'En Avalon, las partidas normales de 5–10 personas son gratuitas y cada jugador necesita una cuenta. Si quieres jugar solo o con amigos y bots, consulta antes la configuración: muestra los modos disponibles y los tamaños que requieren Premium. Los debates de los bots están en inglés, ruso y chino tradicional; el idioma de esta guía no amplía esa lista.',
+          'En Avalon, las partidas normales de 5–10 personas son gratuitas y cada jugador necesita una cuenta. Si quieres jugar solo o con amigos y bots, consulta antes la configuración: muestra los modos disponibles y los tamaños que requieren Premium. Los debates de los bots están en inglés, ruso, chino tradicional, español y vietnamita; el idioma de esta guía no amplía esa lista.',
         ],
       },
     ],
@@ -199,7 +199,7 @@ export const guides: Record<GuideId, Guide> = {
         title: 'Una alternativa a Secret Hitler que puedes probar en el navegador',
         paragraphs: [
           'Para probar Avalon aquí no necesitas descargar una aplicación. Cada amigo entra desde su propio dispositivo y con su cuenta. Una sala normal requiere 5–10 personas; compartir el enlace no busca jugadores ni completa el grupo automáticamente.',
-          'Antes de cambiar la noche de juegos de tu grupo, decide si vais a jugar una partida gratuita entre personas o a aprender solos o con amigos y bots. Jugar con IA muestra la disponibilidad y los tamaños que requieren Premium; comprueba también que el grupo pueda seguir un debate en inglés, ruso o chino tradicional.',
+          'Antes de cambiar la noche de juegos de tu grupo, decide si vais a jugar una partida gratuita entre personas o a aprender solos o con amigos y bots. Jugar con IA muestra la disponibilidad y los tamaños que requieren Premium; comprueba también que el grupo pueda seguir un debate en inglés, ruso, chino tradicional, español o vietnamita.',
         ],
       },
     ],
@@ -296,7 +296,7 @@ export const guides: Record<GuideId, Guide> = {
         title: 'Cómo probar Avalon online con tu grupo de Hombres Lobo',
         paragraphs: [
           'Si vuestra referencia es una partida presencial con un narrador y un solo móvil para repartir roles, el primer cambio práctico es que aquí cada jugador necesita una cuenta y su dispositivo. Avalon gestiona los roles secretos, los votos y las misiones en el navegador; tú y tus amigos seguís llevando el debate.',
-          'Para una partida normal gratuita, reúne a 5–10 personas. Si aún falta parte de la aldea, prueba solo o con amigos y bots antes de fijar la sesión del grupo completo. Revisa en la configuración la disponibilidad, los tamaños que requieren Premium y los idiomas de debate admitidos: inglés, ruso y chino tradicional.',
+          'Para una partida normal gratuita, reúne a 5–10 personas. Si aún falta parte de la aldea, prueba solo o con amigos y bots antes de fijar la sesión del grupo completo. Revisa en la configuración la disponibilidad, los tamaños que requieren Premium y los idiomas de debate admitidos: inglés, ruso, chino tradicional, español y vietnamita.',
         ],
       },
     ],
@@ -325,7 +325,7 @@ export const copy: GuideCopy = {
   aiIntro:
     'Juega solo o invita a amigos y deja que los bots ocupen los asientos libres. Elige el tamaño de mesa y el modo en la configuración. ¿Es tu primera vez en Avalon? Prueba el modo guiado Primera partida.',
   aiAvailability:
-    'Necesitas una cuenta. Los debates con bots están disponibles en inglés, ruso y chino tradicional. Elige el modo en la configuración; allí se muestra la disponibilidad actual y se indican los tamaños de mesa que requieren Premium.',
+    'Necesitas una cuenta. Los debates con bots están disponibles en inglés, ruso, chino tradicional, español y vietnamita. Elige el modo en la configuración; allí se muestra la disponibilidad actual y se indican los tamaños de mesa que requieren Premium.',
   startLabel: 'Empieza a jugar a Avalon',
   aiCta: 'Prueba una partida con bots',
   lobbyCta: 'Abre la sala de espera de Avalon',

@@ -7,6 +7,8 @@
           <option value="en">English</option>
           <option value="ru">Русский</option>
           <option value="zh-tw">繁體中文（台灣）</option>
+          <option value="es">Español</option>
+          <option value="vi">Tiếng Việt</option>
         </select>
       </label>
       <label>

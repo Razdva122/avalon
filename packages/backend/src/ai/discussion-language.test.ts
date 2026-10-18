@@ -1,6 +1,6 @@
 import type { AiLanguage } from '@avalon/types';
 import { compactRequest, systemFor } from './client';
-import { publicContext, decisionPipeline } from './pipeline';
+import { publicContext, decisionPipeline, safePublicSpeech } from './pipeline';
 import type { BotRequest } from './client';
 
 const base = {
@@ -18,6 +18,8 @@ const base = {
 } as unknown as BotRequest;
 
 test.each([
+  ['es', 'SPANISH ONLY', '2, ¿qué cambio propones para esta misión?'],
+  ['vi', 'VIETNAMESE ONLY', '2, bạn đề xuất đổi ai trong đội này?'],
   ['ru', 'RUSSIAN ONLY', 'Это компромисс после первой миссии. 2, какую замену ты предлагаешь?'],
   ['zh-tw', 'TRADITIONAL CHINESE', '這是第一輪任務後的折衷方案。2，你建議換誰？'],
 ])(
@@ -52,6 +54,10 @@ test.each([
 );
 
 test.each([
+  ['es', 'Soy Merlin.', ''],
+  ['es', 'Voy a sabotear esta misión.', ''],
+  ['vi', 'Tôi là Merlin.', ''],
+  ['vi', 'Tôi sẽ phá hoại nhiệm vụ này.', ''],
   ['ru', 'Я Мерлин.', 'Нужны более веские основания для поддержки этой команды.'],
   ['ru', 'Я хочу саботировать эту миссию.', 'Нужны более веские основания для поддержки этой команды.'],
   ['zh-tw', '我是梅林。', '我需要更充分的理由才會支持這支隊伍。'],
@@ -101,3 +107,17 @@ test.each([
     expect(generate.mock.calls[1][1].phase).toBe('decision-repair');
   },
 );
+
+test.each([
+  ['es', 'Soy del Bien. Quiero probar este equipo.'],
+  ['vi', 'Tôi thuộc phe Thiện. Hãy thử đội này.'],
+])('allows ordinary Good discussion in %s', (language, speech) => {
+  expect(safePublicSpeech(speech, 'approve', language as AiLanguage)).toBe(speech);
+});
+
+test.each([
+  ['es', 'Soy Percival. 3 es Morgana.'],
+  ['vi', 'Tôi là Percival. 3 là Morgana.'],
+])('allows deliberate Percival claims in %s', (language, speech) => {
+  expect(safePublicSpeech(speech, 'approve', language as AiLanguage, true)).toBe(speech);
+});

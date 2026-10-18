@@ -277,7 +277,17 @@ const signedIn = computed(() => Boolean(store.state.profile?.id));
 const selectedMode = ref<'regular' | 'smart' | 'beginner'>(props.beginner ? 'beginner' : 'regular');
 const withFriend = ref(Boolean(props.withFriend));
 const humanSeats = ref(2);
-const language = ref<AiLanguage>(locale.value === 'ru' ? 'ru' : /^zh[-_]tw$/i.test(locale.value) ? 'zh-tw' : 'en');
+const language = ref<AiLanguage>(
+  locale.value === 'es'
+    ? 'es'
+    : locale.value === 'vi'
+      ? 'vi'
+      : locale.value === 'ru'
+        ? 'ru'
+        : /^zh[-_]tw$/i.test(locale.value)
+          ? 'zh-tw'
+          : 'en',
+);
 const playerCount = ref<AiPlayerCount>(5);
 const availablePlayerCounts = computed<AiPlayerCount[]>(() => (selectedMode.value === 'beginner' ? [5] : [5, 6, 7, 8]));
 const selectedRole = ref<AiHumanRole | ''>('');
@@ -298,6 +308,8 @@ const languageChoices = [
   { value: 'en', title: 'English', flag: '/flags/en.svg' },
   { value: 'ru', title: 'Русский', flag: '/flags/ru.svg' },
   { value: 'zh-tw', title: '繁體中文（台灣）', flag: '/flags/zh-tw.svg' },
+  { value: 'es', title: 'Español', flag: '/flags/es.svg' },
+  { value: 'vi', title: 'Tiếng Việt', flag: '/flags/vi.svg' },
 ];
 watch([playerCount, withFriend], () => {
   humanSeats.value = Math.min(humanSeats.value, playerCount.value - 1);

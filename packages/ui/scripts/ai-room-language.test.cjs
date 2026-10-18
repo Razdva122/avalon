@@ -370,8 +370,8 @@ test('bot discussion defaults to the interface language and falls back to Englis
     ['en', 'en'],
     ['ru', 'ru'],
     ['zh_TW', 'zh-tw'],
-    ['es', 'en'],
-    ['vi', 'en'],
+    ['es', 'es'],
+    ['vi', 'vi'],
   ]) {
     const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
       props: { roomID: 'bot-room', title: 'Host vs4Bots' },
@@ -581,11 +581,16 @@ test('native language selection sends the chosen language when creating an AI ro
   assert.equal(selects.length, 2, 'new-room controls need discussion language and player count selects');
   const language = selects[0];
   assert.deepEqual(
-    room.nodes('option', language).map((option) => [option.props.value, option.children]),
+    Array.from(
+      room.html.match(/<select[\s\S]*?<\/select>/)[0].matchAll(/<option value="([^"]+)">([^<]+)<\/option>/g),
+      ([, value, title]) => [value, title],
+    ),
     [
       ['en', 'English'],
       ['ru', 'Русский'],
       ['zh-tw', '繁體中文（台灣）'],
+      ['es', 'Español'],
+      ['vi', 'Tiếng Việt'],
     ],
   );
   assert.match(room.html, /<label[^>]*><span>Discussion language<\/span>\s*<select/);
@@ -690,6 +695,8 @@ test('room panel displays saved discussion languages and defaults legacy rooms t
     ['en', 'English'],
     ['ru', 'Русский'],
     ['zh-tw', '繁體中文（台灣）'],
+    ['es', 'Español'],
+    ['vi', 'Tiếng Việt'],
   ]) {
     const room = await fixture('components/view/panels/AiRoomPanel.vue', {
       props: { roomID: 'room', ai: { model: 'codex-chatgpt', status: 'ready', language } },
@@ -743,6 +750,8 @@ test('lobby badges identify each saved AI room language and default legacy rooms
     [undefined, 'English'],
     ['ru', 'Русский'],
     ['zh-tw', '繁體中文（台灣）'],
+    ['es', 'Español'],
+    ['vi', 'Tiếng Việt'],
   ]) {
     const room = await fixture('pages/lobby/LobbyRoom.vue', {
       props: {
@@ -1625,7 +1634,7 @@ test('setup role and language choices include artwork in options and selected va
   assert.ok(language, 'language uses a select that supports flags');
   assert.deepEqual(
     language.props.items.map((item) => item.value),
-    ['en', 'ru', 'zh-tw'],
+    ['en', 'ru', 'zh-tw', 'es', 'vi'],
   );
   assert.ok(language.props.items.every((item) => item.flag.endsWith('.svg')));
   assert.match(room.html, /data-role-icon="unknown"/);
@@ -1964,3 +1973,32 @@ test('AI rows show dates only after completion', async (t) => {
     assert.equal(room.html.includes('ai-date'), finished);
   }
 });
+
+for (const language of ['es', 'vi']) {
+  test(`AI setup creates and starts a room using ${language}`, async (t) => {
+    const setup = await fixture('pages/lobby/BotGameSetup.vue', {
+      props: { modelValue: true },
+      locale: language,
+      accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true }) },
+    });
+    t.after(setup.stop);
+    const select = setup.nodes('v-select').find((node) => 'data-bot-language' in node.props);
+    assert.equal(select.props.modelValue, language);
+    assert.ok(select.props.items.some((item) => item.value === language));
+    await setup
+      .nodes('v-btn')
+      .find((node) => 'data-create-bot-game' in node.props)
+      .props.onClick();
+    assert.equal(setup.sent[0][1].language, language);
+    const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
+      props: { roomID: 'bot-room', language },
+      accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true }) },
+    });
+    t.after(room.stop);
+    await room
+      .nodes('v-btn')
+      .find((node) => node.props['data-bot-mode'] === 'regular')
+      .props.onClick();
+    assert.deepEqual(room.sent, [['startHumanAiRoom', 'bot-room', { difficulty: 'regular', language }]]);
+  });
+}

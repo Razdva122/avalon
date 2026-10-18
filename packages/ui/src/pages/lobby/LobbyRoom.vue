@@ -91,7 +91,10 @@ const { userName } = useUserProfile(hostID);
 const game = toRef(props, 'game');
 const { locale, t } = useI18n();
 const aiLanguageLabel = computed(
-  () => ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）' })[game.value.aiLanguage || 'en'],
+  () =>
+    ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）', es: 'Español', vi: 'Tiếng Việt' })[
+      game.value.aiLanguage || 'en'
+    ],
 );
 const aiDate = computed(() =>
   new Date(game.value.startAt || game.value.createAt).toLocaleString(locale.value, {

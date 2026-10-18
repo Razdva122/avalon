@@ -37,7 +37,7 @@ export class VoteInRoom {
 export type CodexSettings = { model: string; reasoning: string };
 export type CodexModelOption = { id: string; label: string; efforts: string[] };
 
-export type AiLanguage = 'en' | 'ru' | 'zh-tw';
+export type AiLanguage = 'en' | 'ru' | 'zh-tw' | 'es' | 'vi';
 export type AiPlayerCount = 5 | 6 | 7 | 8;
 export type AiBotDifficulty = 'smart' | 'regular';
 export type AiBotMode = AiBotDifficulty | 'beginner';

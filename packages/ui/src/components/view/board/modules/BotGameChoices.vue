@@ -130,6 +130,8 @@
                 <option value="en">English</option>
                 <option value="ru">Русский</option>
                 <option value="zh-tw">繁體中文（台灣）</option>
+                <option value="es">Español</option>
+                <option value="vi">Tiếng Việt</option>
               </select>
             </label>
             <label v-if="!beginner" class="bot-language">
@@ -238,14 +240,26 @@ const rosterText = computed(() =>
 );
 
 const selectedLanguage = ref<AiLanguage>(
-  props.language ?? (locale.value === 'ru' ? 'ru' : /^zh[-_]tw$/i.test(locale.value) ? 'zh-tw' : 'en'),
+  props.language ??
+    (locale.value === 'es'
+      ? 'es'
+      : locale.value === 'vi'
+        ? 'vi'
+        : locale.value === 'ru'
+          ? 'ru'
+          : /^zh[-_]tw$/i.test(locale.value)
+            ? 'zh-tw'
+            : 'en'),
 );
 const settingsOpen = ref(false);
 const timeHelpOpen = ref(false);
 const settingsTrigger = ref<HTMLButtonElement>();
 const timeHelpTrigger = ref<HTMLButtonElement>();
 const languageName = computed(
-  () => ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）' })[selectedLanguage.value],
+  () =>
+    ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）', es: 'Español', vi: 'Tiếng Việt' })[
+      selectedLanguage.value
+    ],
 );
 const pendingDifficulty = ref<AiBotDifficulty>();
 const busy = ref(false);

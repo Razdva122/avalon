@@ -82,7 +82,15 @@ export function safePublicSpeech(
     /\b(?:my|our) (?:evil allies|role is|wizard pair|wizard candidates)\b|\b[1-8]\s+(?:is|must be)\s+merlin\b|\bmerlin\s+is\s+[1-8]\b|[1-8]\s*(?:—|-|это|является)\s*мерлин|мерлин\s*(?:—|-|это)\s*[1-8]|мо[яи]\s+(?:роль|злые союзники|союзники|сообщники|пара магов|кандидаты в маги)|(?:我的(?:角色|邪惡盟友|梅林候選人)|[1-8]\s*是梅林)/i;
   const sabotageIntent =
     /\b(?:i|we)\s+(?:will|want to|intend to|plan to|am going to|are going to)\s+(?:sabotage|help evil|(?:let|make|ensure|force)[^.!?]{0,50}\bfail)\b|\b(?:my|our)\s+strategy\s+to\s+(?:let|make|ensure|force)[^.!?]{0,50}\bfail\b|\b(?:prevent\w*|avoid\w*|unintended|accidental)\b[^.!?]{0,70}\bsuccess\b|(?:я|мы)\s+(?:саботир|(?:хочу|хотим|буду|будем|намерен|намерены)\s+(?:саботир|провалить|устроить\s+провал|помочь\s+злу))|(?:избеж|предотврат)[^.!?]{0,50}успех|(?:我|我們)(?:要|想要|想|打算|會|將|計畫)[^。！？]{0,40}(?:破壞|幫助邪惡|讓任務失敗)|(?:避免|阻止)[^。！？]{0,40}(?:成功|正義獲勝)/i;
-  if (!roleLeak.test(checked) && !privateLeak.test(checked) && !sabotageIntent.test(checked)) return speech;
+  const translatedLeak =
+    /(?:^|[\s.!?])(?:yo\s+)?(?:soy|somos)\s+(?:del\s+mal|malvado|malvada|merl[ií]n|percival|morgana|mordred|minion|oberon)\b|(?:tôi|chúng tôi)\s+(?:là\s+(?:merlin|percival|morgana|mordred|minion|oberon)|(?:là|thuộc)\s+phe\s+[aá]c)|\b(?:mi|nuestro)\s+(?:rol\s+es|aliado\s+del\s+mal|pareja\s+de\s+magos)\b|vai trò của tôi|đồng minh phe [aá]c của tôi|\b[1-8]\s+es\s+merl[ií]n\b|[1-8]\s+là\s+Merlin|\b(?:voy a|vamos a|quiero|queremos)\s+sabotear\b|(?:tôi|chúng tôi)\s+(?:sẽ|muốn|định)\s+phá hoại/iu;
+  if (
+    !roleLeak.test(checked) &&
+    !privateLeak.test(checked) &&
+    !sabotageIntent.test(checked) &&
+    !translatedLeak.test(checked)
+  )
+    return speech;
   throw new AiTechnicalPause('Public speech exposes private role or sabotage intent. Match paused.');
 }
 // Detect only an explicit selected roster, not historical teams or hypothetical alternatives.

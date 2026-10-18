@@ -3,6 +3,8 @@ import type { AiLanguage } from '@avalon/types';
 export function languageInstruction(language: AiLanguage = 'en'): string {
   const instruction = {
     en: 'Speak ENGLISH ONLY.',
+    es: 'Speak SPANISH ONLY, using natural Spanish phrasing.',
+    vi: 'Speak VIETNAMESE ONLY, using natural Vietnamese phrasing and correct diacritics.',
     ru: 'Speak RUSSIAN ONLY, using natural Russian phrasing.',
     'zh-tw':
       'Speak TRADITIONAL CHINESE ONLY (zh-TW), with Taiwan vocabulary and Traditional characters, never Simplified Chinese.',
@@ -61,6 +63,59 @@ const texts = {
     neutralReject: 'Нужны более веские основания для поддержки этой команды.',
     neutralApprove: 'Хочу проверить эту команду и оценить результат.',
     neutralProposal: 'Эту команду я хочу проверить на миссии.',
+  },
+  es: {
+    thinking: 'Los bots están pensando su siguiente acción.',
+    waitingForHuman: 'Esperando la acción del jugador humano. Usa los controles del tablero y el chat.',
+    waitingForDiscussion: 'Te toca hablar. Envía un mensaje al chat o pasa el turno.',
+    ready: 'Jugadores de IA listos · Debate en español',
+    pauseExpired: 'Partida detenida: la pausa duró 15 minutos. Crea una nueva partida para volver a jugar.',
+    postGamePrefix: 'Después de la partida: ',
+    councilPrefix: 'Consejo del Mal (revelado): ',
+    vote: (choice: string) => `Voto ${choice === 'approve' ? 'a favor' : 'en contra'}.`,
+    proposal: (team: string) => `Propongo el equipo ${team}.`,
+    inspection: (seat: string, good: boolean) => `He comprobado a ${seat} y anuncio: ${good ? 'Bien' : 'Mal'}.`,
+    inspectionResponse: (inspector: string, good: boolean) =>
+      good
+        ? `Soy del Bien, así que ${inspector} anunció mi bando correctamente. Esto por sí solo no demuestra que ${inspector} sea del Bien.`
+        : `Soy del Bien. ${inspector} miente sobre mi bando; acuso a ${inspector} de ser del Mal.`,
+    council: (target: string, reason: string) => `Consejo del Mal: objetivo ${target}. ${reason}`,
+    percivalClaim: (target: number) =>
+      `Soy Percival. ${target} es Morgana. Incluidme en las misiones y excluid a ${target}.`,
+    percivalStance: (target: number, stance: 'trust' | 'distrust') =>
+      `${stance === 'trust' ? 'Confío' : 'No confío'} en la afirmación de ${target} de ser Percival.`,
+    failedMission: (mission: number, fails: number, targets: (number | undefined)[]) =>
+      `Soy del Bien. La misión ${mission} tuvo ${fails} cartas de fracaso; ${targets.join(' y ')} nos traicionaron. Rechazo los equipos que los incluyan.`,
+    neutralReject: 'Necesito pruebas más sólidas antes de apoyar a este equipo.',
+    neutralApprove: 'Quiero probar este equipo y evaluar el resultado.',
+    neutralProposal: 'Este es el equipo que quiero probar en la misión.',
+  },
+  vi: {
+    thinking: 'Các bot đang suy nghĩ về hành động tiếp theo.',
+    waitingForHuman: 'Đang chờ người chơi hành động. Hãy dùng các nút trên bàn chơi và khung trò chuyện.',
+    waitingForDiscussion: 'Đến lượt bạn phát biểu. Hãy gửi tin nhắn hoặc bỏ qua lượt nói.',
+    ready: 'Người chơi AI đã sẵn sàng · Thảo luận bằng tiếng Việt',
+    pauseExpired: 'Ván chơi đã dừng: đã tạm dừng 15 phút. Hãy tạo ván mới để chơi tiếp.',
+    postGamePrefix: 'Sau ván chơi: ',
+    councilPrefix: 'Hội đồng phe Ác (đã công khai): ',
+    vote: (choice: string) => `Tôi bỏ phiếu ${choice === 'approve' ? 'tán thành' : 'phản đối'}.`,
+    proposal: (team: string) => `Tôi đề xuất đội ${team}.`,
+    inspection: (seat: string, good: boolean) =>
+      `Tôi đã kiểm tra ${seat} và công bố: ${good ? 'phe Thiện' : 'phe Ác'}.`,
+    inspectionResponse: (inspector: string, good: boolean) =>
+      good
+        ? `Tôi thuộc phe Thiện, nên ${inspector} đã công bố đúng phe của tôi. Chỉ điều này chưa chứng minh ${inspector} thuộc phe Thiện.`
+        : `Tôi thuộc phe Thiện. ${inspector} nói dối về kết quả kiểm tra tôi; tôi cho rằng ${inspector} thuộc phe Ác.`,
+    council: (target: string, reason: string) => `Hội đồng phe Ác: mục tiêu ${target}. ${reason}`,
+    percivalClaim: (target: number) =>
+      `Tôi là Percival. ${target} là Morgana. Hãy cho tôi đi nhiệm vụ và loại ${target}.`,
+    percivalStance: (target: number, stance: 'trust' | 'distrust') =>
+      `Tôi ${stance === 'trust' ? 'tin' : 'không tin'} lời ${target} tự nhận là Percival.`,
+    failedMission: (mission: number, fails: number, targets: (number | undefined)[]) =>
+      `Tôi thuộc phe Thiện. Nhiệm vụ ${mission} có ${fails} lá thất bại; ${targets.join(' và ')} đã phản bội chúng ta. Tôi phản đối đội có họ.`,
+    neutralReject: 'Tôi cần bằng chứng thuyết phục hơn trước khi ủng hộ đội này.',
+    neutralApprove: 'Tôi muốn thử đội này và đánh giá kết quả.',
+    neutralProposal: 'Đây là đội tôi muốn thử trong nhiệm vụ.',
   },
   'zh-tw': {
     thinking: '機器人正在思考下一步行動。',

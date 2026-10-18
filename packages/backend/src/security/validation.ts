@@ -176,7 +176,8 @@ export function validPacket(event: string, args: unknown[]): boolean {
             values[0].humanSeats >= 2 &&
             values[0].humanSeats < ((values[0].playerCount ?? 5) as number))) &&
         (values[0].difficulty === undefined || ['regular', 'smart'].includes(values[0].difficulty as string)) &&
-        (values[0].language === undefined || ['en', 'ru', 'zh-tw'].includes(values[0].language as string)) &&
+        (values[0].language === undefined ||
+          ['en', 'ru', 'zh-tw', 'es', 'vi'].includes(values[0].language as string)) &&
         (values[0].playerCount === undefined || [5, 6, 7, 8].includes(values[0].playerCount as number)) &&
         !(values[0].beginner && values[0].withFriend) &&
         !(
@@ -194,7 +195,7 @@ export function validPacket(event: string, args: unknown[]): boolean {
       typeof options.difficulty === 'string' &&
       ['smart', 'regular'].includes(options.difficulty) &&
       typeof options.language === 'string' &&
-      ['en', 'ru', 'zh-tw'].includes(options.language)
+      ['en', 'ru', 'zh-tw', 'es', 'vi'].includes(options.language)
     );
   }
   if (event === 'createAiRoom') {
@@ -205,7 +206,7 @@ export function validPacket(event: string, args: unknown[]): boolean {
       Object.keys(options).every((key) => ['model', 'language', 'playerCount'].includes(key)) &&
       text(options.model, 254) &&
       typeof options.language === 'string' &&
-      ['en', 'ru', 'zh-tw'].includes(options.language) &&
+      ['en', 'ru', 'zh-tw', 'es', 'vi'].includes(options.language) &&
       (!Object.prototype.hasOwnProperty.call(options, 'playerCount') ||
         (typeof options.playerCount === 'number' && [5, 6, 7, 8].includes(options.playerCount)))
     );

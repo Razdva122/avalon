@@ -699,7 +699,7 @@ test.each([
 });
 
 test('first game rechecks its own quota at launch', async () => {
-  const { connect, host } = fixture();
+  const { connect, host } = fixture('admin', true);
   const handlers = connect('owner');
   const created = jest.fn();
   await handlers.createHumanAiRoom({ beginner: true }, created);
@@ -825,4 +825,19 @@ test('legacy friend room cannot shrink to remove its last bot', async () => {
   } finally {
     room.stop();
   }
+});
+
+test.each(['es', 'vi'] as const)('%s is accepted for public AI room creation and launch', async (language) => {
+  const { connect, host } = fixture('admin', true);
+  const handlers = connect('owner');
+  const created = jest.fn();
+  await handlers.createHumanAiRoom({ beginner: false, difficulty: 'regular', language, playerCount: 5 }, created);
+  expect(created.mock.calls[0][0]).toHaveProperty('roomID');
+  const room = host.rooms[created.mock.calls[0][0].roomID] as BotRoom;
+  expect(room.ai!.language).toBe(language);
+  const started = jest.fn();
+  await handlers.startHumanAiRoom(room.roomID, { difficulty: 'regular', language, playerCount: 5 }, started);
+  expect(started).toHaveBeenCalledWith({ ok: true });
+  expect(run).toHaveBeenCalled();
+  room.stop();
 });

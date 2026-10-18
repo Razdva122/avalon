@@ -333,7 +333,7 @@ export const copy = {
   aiIntro:
     'Play solo or invite friends, and let bots fill the empty seats. Choose the table size and mode in setup. New to Avalon? Try the guided First game.',
   aiAvailability:
-    'You need an account. Bot discussions are available in English, Russian and Traditional Chinese. Choose your mode in setup; it shows current availability and labels table sizes that require Premium.',
+    'You need an account. Bot discussions are available in English, Russian, Traditional Chinese, Spanish and Vietnamese. Choose your mode in setup; it shows current availability and labels table sizes that require Premium.',
   startLabel: 'Start playing Avalon',
   aiCta: 'Try a game with bots',
   lobbyCta: 'Open Avalon lobby',

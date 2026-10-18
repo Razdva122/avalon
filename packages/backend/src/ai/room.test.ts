@@ -154,7 +154,7 @@ test('eight-player public speech normalizes references to Player 8 into seat num
   expect(room.chat.history.map((message) => message.message)).toEqual(['8, explain that vote.']);
 });
 
-test.each(['ru', 'zh-tw'] as const)(
+test.each(['ru', 'zh-tw', 'es', 'vi'] as const)(
   '%s room uses its saved language for every stage and public announcement',
   async (language) => {
     const requests: BotRequest[] = [];
@@ -170,13 +170,23 @@ test.each(['ru', 'zh-tw'] as const)(
           const evil = room.data.manager.game.players.find((player) => player.role.loyalty === 'evil')!;
           choice = request.choices.findIndex((team) => team.split(', ').includes(String(evil.index)));
         }
-        return { choice, speech: language === 'ru' ? 'Проверим эту команду.' : '我們來驗證這支隊伍。' };
+        return {
+          choice,
+          speech: {
+            ru: 'Проверим эту команду.',
+            'zh-tw': '我們來驗證這支隊伍。',
+            es: 'Vamos a probar este equipo.',
+            vi: 'Hãy thử đội này.',
+          }[language],
+        };
       },
       async () => {},
       0,
       language,
     );
-    expect(room.ai?.message).toMatch(language === 'ru' ? /рус/iu : /繁體中文/u);
+    expect(room.ai?.message).toMatch(
+      { ru: /рус/iu, 'zh-tw': /繁體中文/u, es: /español/u, vi: /tiếng Việt/u }[language],
+    );
     await room.run();
     expect(room.ai?.status).toBe('finished');
     expect(room.calculateRoomState().ai).toMatchObject({ language });

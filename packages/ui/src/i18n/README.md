@@ -63,5 +63,5 @@ Adding a language also requires updating `TLanguage`, loaders, `LanguageMap` in
 `helpers/i18n`, the generator, locale/route/SEO lists and all localized build checks.
 Copying a language directory alone is insufficient.
 
-AI discussion languages are a separate contract: `en`, `ru`, `zh-tw`.
+AI discussion languages are a separate contract: `en`, `ru`, `zh-tw`, `es`, `vi`.
 They do not follow every UI language. See [AI Arena](../../../../docs/ai-rooms.md).

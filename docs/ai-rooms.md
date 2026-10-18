@@ -89,8 +89,8 @@ AI games are disabled.
 
 Administrator creation accepts
 `createAiRoom({ model, language, playerCount }, callback)`.
-Discussion language is `en`, `ru` or `zh-tw`, with English as the legacy default.
-The UI itself supports six languages. Unsupported model, language and table size
+Discussion language is `en`, `ru`, `zh-tw`, `es` or `vi`, with English as the legacy default.
+The UI itself supports seven languages. Unsupported model, language and table size
 are rejected before room reservation. Public bot play accepts
 `createHumanAiRoom(callback)` (standard) or
 `createHumanAiRoom({ beginner: true }, callback)` (legacy beginner); the callback returns a `roomID` or an `error`.

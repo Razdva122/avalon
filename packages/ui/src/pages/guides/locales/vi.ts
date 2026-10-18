@@ -322,7 +322,7 @@ export const copy: GuideCopy = {
   aiIntro:
     'Chơi một mình hoặc mời bạn bè và để bot lấp chỗ trống. Chọn số chỗ và chế độ trong phần thiết lập. Mới chơi Avalon? Thử chế độ có hướng dẫn Ván đầu tiên.',
   aiAvailability:
-    'Bạn cần tài khoản. Bot hỗ trợ thảo luận bằng tiếng Anh, tiếng Nga và tiếng Trung phồn thể. Chọn chế độ trong phần thiết lập; phần này hiển thị tình trạng hiện tại và đánh dấu số chỗ yêu cầu Premium.',
+    'Bạn cần tài khoản. Bot hỗ trợ thảo luận bằng tiếng Anh, tiếng Nga, tiếng Trung phồn thể, tiếng Tây Ban Nha và tiếng Việt. Chọn chế độ trong phần thiết lập; phần này hiển thị tình trạng hiện tại và đánh dấu số chỗ yêu cầu Premium.',
   startLabel: 'Bắt đầu chơi Avalon',
   aiCta: 'Thử một ván với bot',
   lobbyCta: 'Mở sảnh Avalon',

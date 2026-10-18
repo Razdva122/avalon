@@ -17,6 +17,8 @@ export const botOptions: GameOptions = {
 
 type Choice = { text: string; actions: TGameMethodsParams[] };
 const humanTimeoutMessage: Record<AiLanguage, string> = {
+  es: 'Partida terminada: se agotaron el tiempo de acción y la reserva compartida.',
+  vi: 'Ván chơi đã kết thúc: thời gian hành động và thời gian dự phòng chung đã hết.',
   en: 'Match stopped: the turn time and shared time reserve have run out.',
   ru: 'Партия завершена: время на ход и общий запас исчерпаны.',
   'zh-tw': '對局已結束：行動時間與共用備用時間已用盡。',
@@ -171,7 +173,11 @@ export class BotRoom extends Room {
   }
 
   setLanguage(language: AiLanguage): void {
-    if (this.ai!.status !== 'ready' || this.data.stage !== 'locked' || !['en', 'ru', 'zh-tw'].includes(language))
+    if (
+      this.ai!.status !== 'ready' ||
+      this.data.stage !== 'locked' ||
+      !['en', 'ru', 'zh-tw', 'es', 'vi'].includes(language)
+    )
       throw Error('Discussion language can only be changed before launch');
     this.language = language;
     this.ai!.language = language;
