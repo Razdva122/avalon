@@ -48,16 +48,23 @@ test.each([5, 6, 8] as const)('a %i-player roster draws unique agents from the s
 
 test('the selected agent personality reaches actual decision context and the roster stays fixed', async () => {
   const seen: BotRequest[] = [];
+  const seatsDuringPlay: string[][] = [];
   const room = new BotRoom('agent-room', 'admin', io, async (request) => {
     seen.push(request);
-    room.stop();
-    return { choice: 0, speech: '' };
+    seatsDuringPlay.push([...room.players]);
+    if (seen.length === 2) room.stop();
+    return { choice: 0, speech: 'Compare public votes and quest results before trusting the team.' };
   });
   const players = [...room.players];
   await room.run();
-  expect(room.players).toEqual(players);
-  expect(seen).toHaveLength(1);
-  const agent = BOT_AGENTS.find((a) => a.id === seen[0].playerID)!;
-  expect(seen[0].style).toBe(agent.style);
-  expect(compactRequest(seen[0]).personality).toBe(agent.style);
+  // Launch randomizes seats, without replacing participants or reseating them during play.
+  expect([...room.players].sort()).toEqual([...players].sort());
+  expect(seen).toHaveLength(2);
+  expect(seatsDuringPlay[1]).toEqual(seatsDuringPlay[0]);
+  expect(room.players).toEqual(seatsDuringPlay[0]);
+  for (const request of seen) {
+    const agent = BOT_AGENTS.find((a) => a.id === request.playerID)!;
+    expect(request.style).toBe(agent.style);
+    expect(compactRequest(request).personality).toBe(agent.style);
+  }
 });
