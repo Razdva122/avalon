@@ -52,6 +52,14 @@ function load(file) {
 
 const ids = ['social_deduction_games_online', 'games_like_secret_hitler', 'avalon_vs_werewolf'];
 
+test('translated guides load their own articles without downloading the English articles', async () => {
+  const { loadGuideLocale, getGuideLocale } = load('pages/guides/locales/index.ts');
+  assert.equal(modules.has('pages/guides/content.ts'), false);
+  await loadGuideLocale('ru');
+  assert.ok(getGuideLocale('ru').guides.avalon_vs_werewolf.title);
+  assert.equal(modules.has('pages/guides/content.ts'), false);
+});
+
 test('game discovery links expose all three guides in the reader’s language without loading articles', async () => {
   const GameGuideLinks = load('components/view/information/GameGuideLinks.vue').default;
   const { wiki } = load('i18n/langs/pages/wiki.ts');
@@ -80,6 +88,7 @@ test('game discovery links expose all three guides in the reader’s language wi
 
 test('each public guide renders an accessible comparison and actionable English links on the server', async () => {
   const Guide = load('pages/guides/Guide.vue').default;
+  await load('pages/guides/locales/index.ts').loadGuideLocale('en');
   for (const guide of ids) {
     const app = createSSRApp(Guide, { guide });
     const router = createRouter({

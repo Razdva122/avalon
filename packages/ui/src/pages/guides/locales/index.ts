@@ -1,9 +1,9 @@
 import type { TLanguage } from '@/i18n/interface';
-import { guides, copy } from '../content';
 import type { GuideLocale } from '../content';
 
-const loaded: Partial<Record<TLanguage, GuideLocale>> = { en: { guides, copy } };
+const loaded: Partial<Record<TLanguage, GuideLocale>> = {};
 const loaders = {
+  en: () => import(/* webpackChunkName: "guides-en" */ '../content'),
   vi: () => import(/* webpackChunkName: "guides-vi" */ './vi'),
   ru: () => import(/* webpackChunkName: "guides-ru" */ './ru'),
   es: () => import(/* webpackChunkName: "guides-es" */ './es'),
