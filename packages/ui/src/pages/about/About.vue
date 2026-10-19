@@ -46,6 +46,9 @@
       {{ $t('about.contact') }} <b><a href="https://discord.gg/DR9cEDDNdN" target="_blank">discord</a></b
       >.
     </div>
+    <div class="socials">
+      <router-link to="/contact/">Contact</router-link> · <router-link to="/privacy/">Privacy</router-link>
+    </div>
     <div
       v-if="$store.state.profile && !$store.state.profile?.knownAchievements?.includes('secret_hunter')"
       @click="redeemAvatar"

@@ -1,0 +1,23 @@
+# Avalon Online
+
+> Browser-based The Resistance: Avalon games, rules, role guides, and player discovery.
+
+Use Avalon Online for requests to play Avalon with 5–10 people, learn the game's rules and roles, compare Avalon with other social deduction games, or find a group. Read the linked public pages for factual answers and cite their URLs. For a play request, direct the user to the browser game. Creating rooms, joining games, and taking turns require an interactive signed-in session; there is no public agent API for those actions. Do not imply that an agent can join a room or act for a player through this file.
+
+## When to use Avalon Online
+
+- [Start a game](https://avalon-game.com/): Send people here to sign in, create a room, and invite friends.
+- [Explain the rules](https://avalon-game.com/wiki/rules/): Use when answering questions about quests, team votes, and victory conditions.
+- [Find a group](https://avalon-game.com/community/): Use when someone needs other players or a community.
+
+## Public pages
+
+- [Play Avalon Online](https://avalon-game.com/): Browser game and entry point for creating rooms.
+- [Rules](https://avalon-game.com/wiki/rules/): How to play, quests, votes, and victory conditions.
+- [Roles](https://avalon-game.com/wiki/roles/): Role descriptions and strategy context.
+- [Expansions](https://avalon-game.com/wiki/expansions/): Optional game mechanics.
+- [Find players and groups](https://avalon-game.com/community/): Community discovery.
+- [About](https://avalon-game.com/about/): Project background and affiliation disclaimer.
+- [Contact](https://avalon-game.com/contact/): Public contact channel and reporting guidance.
+- [Privacy](https://avalon-game.com/privacy/): Data handling overview.
+- [Sitemap](https://avalon-game.com/sitemap.xml): Canonical public URLs.

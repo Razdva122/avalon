@@ -142,6 +142,36 @@ module.exports.routesSeo = {
       },
     },
   },
+  contact: {
+    path: '/contact/',
+    name: 'contact',
+    priority: 0.3,
+    meta: {
+      prerender: true,
+      multiLanguage: {
+        en: {
+          title: 'Contact Avalon Online',
+          description: 'How to contact the Avalon Online project about gameplay, accounts, and the website.',
+          keywords: ['Avalon Online contact'],
+        },
+      },
+    },
+  },
+  privacy: {
+    path: '/privacy/',
+    name: 'privacy',
+    priority: 0.3,
+    meta: {
+      prerender: true,
+      multiLanguage: {
+        en: {
+          title: 'Privacy and data handling | Avalon Online',
+          description: 'A plain-language overview of account, gameplay, analytics, and support data on Avalon Online.',
+          keywords: ['Avalon Online privacy'],
+        },
+      },
+    },
+  },
   room: {
     path: '/room/:uuid/',
     props: true,

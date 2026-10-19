@@ -18,6 +18,11 @@ test('home describes the website and free browser game with stable linked identi
   const site = graph.find((node) => node['@type'] === 'WebSite');
   assert(site, 'Missing WebSite in delivered HTML');
   assert.equal(site['@id'], 'https://avalon-game.com/#website');
+  const organization = graph.find((node) => node['@type'] === 'Organization');
+  assert(organization, 'Missing project Organization in delivered HTML');
+  assert.equal(organization['@id'], 'https://avalon-game.com/#organization');
+  assert.equal(organization.url, 'https://avalon-game.com/');
+  assert.equal(site.publisher['@id'], organization['@id']);
   const game = graph.find((node) => node['@type'] === 'WebApplication');
   assert(game, 'Missing WebApplication in delivered HTML');
   assert.equal(game['@id'], 'https://avalon-game.com/#game');

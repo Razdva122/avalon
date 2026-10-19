@@ -29,6 +29,12 @@ const { spawn, spawnSync } = require('node:child_process');
     .replace('listen       443 ssl http2;', `listen 127.0.0.1:${port};`)
     .replace(/^\s*ssl_.*;\s*$/gm, '')
     .replace('root /app;', `root "${dist}";`);
+  const negotiated = spawnSync('awk', ['-f', path.resolve(__dirname, '../../../deploy/nginx/agent-readiness.awk')], {
+    input: server,
+    encoding: 'utf8',
+  });
+  assert.equal(negotiated.status, 0, negotiated.stderr);
+  server = negotiated.stdout;
   const config = path.join(temp, 'nginx.conf');
   fs.writeFileSync(
     config,

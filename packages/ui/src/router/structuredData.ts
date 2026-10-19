@@ -39,6 +39,19 @@ export function updateStructuredData(
       '@id': origin + '/#website',
       url: origin + '/',
       name: 'Avalon Online',
+      publisher: { '@id': origin + '/#organization' },
+    },
+    {
+      '@type': 'Organization',
+      '@id': origin + '/#organization',
+      name: 'Avalon Online',
+      url: origin + '/',
+      sameAs: ['https://github.com/Razdva122/avalon'],
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'project support',
+        url: origin + '/contact/',
+      },
     },
     {
       '@type': 'WebPage',

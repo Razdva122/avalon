@@ -24,6 +24,7 @@ test('entrypoint retains the read-only source and launches nginx with the valida
       .replaceAll('/etc/nginx/avalon-runtime.conf', runtime)
       .replaceAll('/etc/nginx/nginx.conf', source)
       .replaceAll('/usr/local/share/avalon/board-route.awk', path.join(__dirname, 'board-route.awk'))
+      .replaceAll('/usr/local/share/avalon/agent-readiness.awk', path.join(__dirname, 'agent-readiness.awk'))
       .replaceAll('/docker-entrypoint.sh', official)
       .replaceAll('/app', app);
     const entrypoint = path.join(dir, 'entrypoint.sh');

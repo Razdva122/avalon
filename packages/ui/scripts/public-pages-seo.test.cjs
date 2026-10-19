@@ -14,3 +14,13 @@ test('support and community are public, indexable, prerendered pages in all seve
     }
   }
 });
+
+test('contact and privacy have public English routes that prerender into the sitemap', () => {
+  for (const name of ['contact', 'privacy']) {
+    const route = routesSeo[name];
+    assert.equal(route.path, `/${name}/`);
+    assert.equal(route.meta.prerender, true);
+    assert.equal(Boolean(route.meta.skipSiteMap), false);
+    assert.deepEqual(Object.keys(route.meta.multiLanguage), ['en']);
+  }
+});

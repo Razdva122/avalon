@@ -65,6 +65,52 @@ async function check(path, status, redirect, noindex = false) {
 }
 
 async function main() {
+  const markdown = await fetch(origin + '/', { headers: { Accept: 'text/markdown' } });
+  assert.equal(markdown.status, 200);
+  assert.match(markdown.headers.get('content-type') || '', /^text\/markdown\b/i);
+  assert.match(markdown.headers.get('vary') || '', /(?:^|,)\s*Accept\s*(?:,|$)/i);
+  assert.match(await markdown.text(), /^# Avalon Online\n[\s\S]{100,}/);
+  const htmlHome = await fetch(origin + '/', { headers: { Accept: 'text/html' } });
+  assert.match(htmlHome.headers.get('content-type') || '', /^text\/html\b/i);
+  assert.match(htmlHome.headers.get('vary') || '', /(?:^|,)\s*Accept\s*(?:,|$)/i);
+  assert.match(await htmlHome.text(), /<html\b/i);
+  const declinedMarkdown = await fetch(origin + '/', { headers: { Accept: 'text/markdown;q=0, text/html' } });
+  assert.match(declinedMarkdown.headers.get('content-type') || '', /^text\/html\b/i);
+  const preferredMarkdown = await fetch(origin + '/', {
+    headers: { Accept: 'text/markdown, text/html;q=0.8' },
+  });
+  assert.match(preferredMarkdown.headers.get('content-type') || '', /^text\/markdown\b/i);
+  const markdownMissing = await fetch(origin + '/__ora-404-probe-nitbikl8', {
+    headers: { Accept: 'text/markdown' },
+  });
+  assert.equal(markdownMissing.status, 404);
+  assert.match(markdownMissing.headers.get('content-type') || '', /^text\/markdown\b/i);
+  assert.match(markdownMissing.headers.get('vary') || '', /(?:^|,)\s*Accept\s*(?:,|$)/i);
+  assert.match(await markdownMissing.text(), /^# Not Found\n[\s\S]{20,}/);
+  const htmlMissing = await fetch(origin + '/__ora-404-probe-nitbikl8', { headers: { Accept: 'text/html' } });
+  assert.equal(htmlMissing.status, 404);
+  assert.match(htmlMissing.headers.get('content-type') || '', /^text\/html\b/i);
+  assert.match(await htmlMissing.text(), /<html\b/i);
+  const agentGuide = await fetch(origin + '/llms.txt');
+  assert.equal(agentGuide.status, 200);
+  assert.match(agentGuide.headers.get('content-type') || '', /text\/plain/i);
+  assert.match(
+    await agentGuide.text(),
+    /^# Avalon Online[\s\S]*Use Avalon Online for requests[\s\S]*https:\/\/avalon-game\.com\/wiki\/rules\//,
+  );
+  for (const pathname of ['/about/', '/contact/', '/privacy/']) {
+    const response = await fetch(origin + pathname);
+    assert.equal(response.status, 200, pathname);
+    assert.match(response.headers.get('content-type') || '', /text\/html/i, pathname);
+    const page = await response.text();
+    const visibleText = page
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '')
+      .replace(/<style\b[^>]*>[\s\S]*?<\/style>/g, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    assert(visibleText.length >= 500, pathname);
+  }
   for (const pathname of guidePaths) {
     await check(pathname, 200);
     await check(pathname.slice(0, -1), 301, pathname);

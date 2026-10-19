@@ -16,7 +16,8 @@ if [ "${1:-}" = nginx ]; then
     fi
     runtime=/etc/nginx/avalon-runtime.conf
     awk -f /usr/local/share/avalon/board-route.awk /etc/nginx/nginx.conf > "$runtime.routes"
-    sed 's@root[[:space:]][[:space:]]*/app[[:space:]]*;@root /app/.avalon-current;@g' "$runtime.routes" > "$runtime.next"
+    sed 's@root[[:space:]][[:space:]]*/app[[:space:]]*;@root /app/.avalon-current;@g' "$runtime.routes" | \
+      awk -f /usr/local/share/avalon/agent-readiness.awk > "$runtime.next"
     rm "$runtime.routes"
     nginx -t -c "$runtime.next"
     mv "$runtime.next" "$runtime"
