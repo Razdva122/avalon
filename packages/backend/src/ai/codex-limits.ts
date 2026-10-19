@@ -1,3 +1,4 @@
+import { codexEnvironment } from './codex-instances';
 import { spawn } from 'child_process';
 import type { CodexWeeklyLimit } from '@avalon/types';
 import { hasRemoteCodex, remoteCodex, remoteCodexCacheKey } from './codex-remote';
@@ -51,12 +52,12 @@ async function readCodexLimitResponse(): Promise<unknown> {
     'HTTP_PROXY',
     'NO_PROXY',
   ]) {
-    if (process.env[key]) env[key] = process.env[key];
+    if (codexEnvironment()[key]) env[key] = codexEnvironment()[key];
   }
-  if (process.env.AI_CODEX_HOME) env.CODEX_HOME = process.env.AI_CODEX_HOME;
+  if (codexEnvironment().AI_CODEX_HOME) env.CODEX_HOME = codexEnvironment().AI_CODEX_HOME;
   return new Promise((resolve, reject) => {
     const child = spawn(
-      process.env.AI_CODEX_BIN || 'codex',
+      codexEnvironment().AI_CODEX_BIN || 'codex',
       ['app-server', '--stdio', '-c', 'forced_login_method="chatgpt"'],
       { env, stdio: ['pipe', 'pipe', 'pipe'] },
     );
@@ -115,66 +116,28 @@ export async function readCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
   return parseWeeklyLimit(await readCodexLimitResponse());
 }
 
-export type ExperimentQuota = {
-  checkedAt: number;
-  weekly: CodexWeeklyLimit | null;
-  buckets: { limitId: string; primary: QuotaWindow | null; secondary: QuotaWindow | null }[];
-};
-type QuotaWindow = { usedPercent: number; windowDurationMins: number; resetsAt: number | null };
-
-export function parseExperimentQuota(value: unknown): ExperimentQuota {
-  const response = value as { rateLimits?: Bucket; rateLimitsByLimitId?: Record<string, Bucket> } | null;
-  const entries = Object.entries(response?.rateLimitsByLimitId ?? {});
-  if (!entries.length && response?.rateLimits) entries.push(['codex', response.rateLimits]);
-  const window = (w: Window | null | undefined): QuotaWindow | null => {
-    if (
-      !w ||
-      typeof w.usedPercent !== 'number' ||
-      !Number.isFinite(w.usedPercent) ||
-      w.usedPercent < 0 ||
-      w.usedPercent > 100 ||
-      typeof w.windowDurationMins !== 'number' ||
-      !Number.isSafeInteger(w.windowDurationMins) ||
-      w.windowDurationMins <= 0
-    )
-      return null;
-    return {
-      usedPercent: w.usedPercent,
-      windowDurationMins: w.windowDurationMins,
-      resetsAt: typeof w.resetsAt === 'number' && Number.isFinite(w.resetsAt) && w.resetsAt > 0 ? w.resetsAt : null,
-    };
-  };
-  return {
-    checkedAt: Date.now(),
-    weekly: parseWeeklyLimit(value),
-    buckets: entries
-      .filter(([id, b]) => /^[a-zA-Z0-9_.-]{1,80}$/.test(id) && b && typeof b === 'object')
-      .slice(0, 16)
-      .map(([limitId, b]) => ({ limitId, primary: window(b.primary), secondary: window(b.secondary) })),
-  };
-}
-export async function readCodexExperimentQuota(): Promise<ExperimentQuota> {
-  return parseExperimentQuota(await readCodexLimitResponse());
-}
-
-let cache: { key: string; expires: number; value: CodexWeeklyLimit | null } | undefined;
-let pending: { key: string; promise: Promise<CodexWeeklyLimit | null> } | undefined;
+const cache = new Map<string, { expires: number; value: CodexWeeklyLimit | null }>();
+const pending = new Map<string, Promise<CodexWeeklyLimit | null>>();
 export async function getCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
+  const environment = codexEnvironment();
   const key = hasRemoteCodex()
     ? remoteCodexCacheKey()
-    : `${process.env.AI_CODEX_BIN || 'codex'}:${process.env.AI_CODEX_HOME || process.env.CODEX_HOME || process.env.HOME}`;
-  if (cache?.key === key && cache.expires > Date.now()) return cache.value;
-  if (pending?.key === key) return pending.promise;
+    : `${environment.AI_CODEX_BIN || 'codex'}:${environment.AI_CODEX_HOME || environment.CODEX_HOME || environment.HOME}`;
+  const cached = cache.get(key);
+  if (cached && cached.expires > Date.now()) return cached.value;
+  const inFlight = pending.get(key);
+  if (inFlight) return inFlight;
   const promise = readCodexWeeklyLimit()
     .catch(() => null)
     .then((value) => {
-      cache = { key, expires: Date.now() + 60000, value };
+      if (cache.size >= 64) cache.delete(cache.keys().next().value!);
+      cache.set(key, { expires: Date.now() + 60000, value });
       return value;
     });
-  pending = { key, promise };
+  pending.set(key, promise);
   try {
     return await promise;
   } finally {
-    if (pending?.promise === promise) pending = undefined;
+    if (pending.get(key) === promise) pending.delete(key);
   }
 }

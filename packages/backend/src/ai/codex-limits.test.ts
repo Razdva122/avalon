@@ -159,17 +159,3 @@ test('returns the exhausted five-hour window alongside remaining weekly quota', 
     shortTerm: { remainingPercent: 0, resetsAt: 1790953112 },
   });
 });
-
-test('experiment snapshot preserves every quota bucket and excludes account data', async () => {
-  const { parseExperimentQuota } = await import('./codex-limits');
-  const result = parseExperimentQuota({
-    accountId: 'secret',
-    rateLimitsByLimitId: {
-      codex: { primary: { usedPercent: 40, windowDurationMins: 300, resetsAt: 2000000000 } },
-      luna: { secondary: { usedPercent: 12, windowDurationMins: 10080, resetsAt: 2000000001 }, secret: 'credential' },
-    },
-  });
-  expect(result.buckets.map((b) => b.limitId)).toEqual(['codex', 'luna']);
-  expect(result.buckets[1].secondary?.usedPercent).toBe(12);
-  expect(JSON.stringify(result)).not.toMatch(/secret|credential|accountId/);
-});

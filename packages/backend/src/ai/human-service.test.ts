@@ -62,7 +62,13 @@ function fixture(adminID = 'admin', validatePackets = false) {
     },
   } as unknown as Manager;
   const service = new AiService(host);
-  service.repository = { claim, release, save } as unknown as AiRepository;
+  service.repository = {
+    claim,
+    release,
+    save,
+    renewLease: async () => {},
+    busyInstances: async () => [],
+  } as unknown as AiRepository;
   function connect(id?: string) {
     const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
     service.register(
@@ -840,4 +846,174 @@ test.each(['es', 'vi'] as const)('%s is accepted for public AI room creation and
   expect(started).toHaveBeenCalledWith({ ok: true });
   expect(run).toHaveBeenCalled();
   room.stop();
+});
+
+describe('multiple ChatGPT instances', () => {
+  const accounts = [
+    { id: 'first', home: '/profiles/first' },
+    { id: 'second', home: '/profiles/second' },
+  ];
+  const remaining = (short: number, weekly: number) => ({
+    remainingPercent: weekly,
+    checkedAt: Date.now(),
+    resetsAt: null,
+    shortTerm: { remainingPercent: short, resetsAt: null },
+  });
+  beforeEach(() => {
+    process.env.AI_CODEX_INSTANCES = JSON.stringify(accounts);
+  });
+
+  test('reserves the free eligible instance with the highest short quota before weekly quota', async () => {
+    quota.mockResolvedValueOnce(remaining(70, 90)).mockResolvedValueOnce(remaining(80, 10));
+    const { draft, claim } = fixture();
+    const room = await draft();
+    expect(claim).toHaveBeenCalledWith(room.roomID, 'second');
+    expect(JSON.stringify(room.calculateRoomState())).not.toContain('/profiles/');
+  });
+
+  test('allows two simultaneous parties, rejects a third, and reuses only the released instance', async () => {
+    jest.useFakeTimers();
+    const { draft, connect, claim } = fixture();
+    const first = await draft('owner');
+    const second = await draft('other');
+    expect(second.roomID).not.toBe(first.roomID);
+    expect(claim.mock.calls.map((args) => (args as unknown[])[1])).toEqual(['first', 'second']);
+    const denied = jest.fn();
+    await connect('third').createHumanAiRoom(denied);
+    expect(denied.mock.calls[0][0]).toHaveProperty('error');
+    await connect('owner').controlAiRoom(first.roomID, 'stop', jest.fn());
+    const third = await draft('third');
+    expect(claim).toHaveBeenLastCalledWith(third.roomID, 'first');
+    expect(second.ai?.status).toBe('ready');
+    jest.clearAllTimers();
+  });
+
+  test('shows available bot modes while another instance is occupied and finds each participant own room', async () => {
+    const { draft, connect } = fixture();
+    const first = await draft('owner');
+    const access = jest.fn();
+    await connect('other').getAiRoomAccess(access);
+    expect(access.mock.calls[0][0].botsBusy).not.toBe(true);
+    expect(access.mock.calls[0][0].botModes.smart).toBe(true);
+    const second = await draft('other');
+    await connect('other').getAiRoomAccess(access);
+    expect(access.mock.calls[1][0].ownRoomID).toBe(second.roomID);
+    await connect('owner').getAiRoomAccess(access);
+    expect(access.mock.calls[2][0].ownRoomID).toBe(first.roomID);
+  });
+
+  test('concurrent starts of different rooms proceed independently', async () => {
+    const { draft, connect } = fixture();
+    const first = await draft('owner');
+    const second = await draft('other');
+    const responses = [jest.fn(), jest.fn()];
+    await Promise.all([
+      connect('owner').startHumanAiRoom(first.roomID, { difficulty: 'regular', language: 'en' }, responses[0]),
+      connect('other').startHumanAiRoom(second.roomID, { difficulty: 'regular', language: 'en' }, responses[1]),
+    ]);
+    expect(responses.map((cb) => cb.mock.calls[0][0])).toEqual([{ ok: true }, { ok: true }]);
+    expect(first.ai?.status).toBe('running');
+    expect(second.ai?.status).toBe('running');
+  });
+});
+
+describe('instance reservation lifecycle', () => {
+  beforeEach(() => {
+    process.env.AI_CODEX_INSTANCES = JSON.stringify([
+      { id: 'first', home: '/profiles/first' },
+      { id: 'second', home: '/profiles/second' },
+    ]);
+  });
+
+  test('the pinned profile survives another account getting more quota and technical resume', async () => {
+    const { codexEnvironment } = await import('./codex-instances');
+    const { draft, connect } = fixture();
+    const room = await draft();
+    const profiles: (string | undefined)[] = [];
+    run.mockImplementation(async function (this: BotRoom) {
+      profiles.push(codexEnvironment().AI_CODEX_HOME);
+      this.ai!.status = 'paused';
+      this.ai!.canResumeTechnical = true;
+    });
+    const response = jest.fn();
+    await connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'en' }, response);
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    await draft('other');
+    const denied = jest.fn();
+    await connect('third').createHumanAiRoom(denied);
+    expect(denied.mock.calls[0][0]).toHaveProperty('error');
+    await connect('owner').controlAiRoom(room.roomID, 'resumeTechnical', response);
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    expect(response.mock.calls.map(([value]) => value)).toEqual([{ ok: true }, { ok: true }]);
+    expect(profiles).toEqual(['/profiles/first', '/profiles/first']);
+    await connect('owner').controlAiRoom(room.roomID, 'stop', jest.fn());
+    await connect('other').controlAiRoom((await draft('other')).roomID, 'stop', jest.fn());
+  });
+
+  test('ties are resolved by weekly quota and accounts below the selected mode thresholds are skipped', async () => {
+    const { connect, claim } = fixture();
+    quota
+      .mockResolvedValueOnce({ remainingPercent: 50, shortTerm: { remainingPercent: 90 } })
+      .mockResolvedValueOnce({ remainingPercent: 60, shortTerm: { remainingPercent: 90 } });
+    const created = jest.fn();
+    await connect('owner').createHumanAiRoom({ beginner: false, difficulty: 'smart' }, created);
+    const id = created.mock.calls[0][0].roomID;
+    expect(claim).toHaveBeenCalledWith(id, 'second');
+    await connect('owner').controlAiRoom(id, 'stop', jest.fn());
+    claim.mockClear();
+    quota
+      .mockResolvedValueOnce({ remainingPercent: 5, shortTerm: { remainingPercent: 100 } })
+      .mockResolvedValueOnce({ remainingPercent: 6, shortTerm: { remainingPercent: 61 } });
+    await connect('other').createHumanAiRoom({ beginner: false, difficulty: 'smart' }, created);
+    expect(claim).toHaveBeenCalledWith(created.mock.calls[1][0].roomID, 'second');
+  });
+
+  test('simultaneous creators reserve different instances and a concurrent duplicate creator spends only one slot', async () => {
+    const { connect, claim, host } = fixture();
+    const responses = [jest.fn(), jest.fn(), jest.fn()];
+    await Promise.all([
+      connect('owner').createHumanAiRoom(responses[0]),
+      connect('other').createHumanAiRoom(responses[1]),
+      connect('owner').createHumanAiRoom(responses[2]),
+    ]);
+    expect(responses.slice(0, 2).map((cb) => cb.mock.calls[0][0])).toEqual([
+      { roomID: expect.any(String) },
+      { roomID: expect.any(String) },
+    ]);
+    expect(claim.mock.calls.map((args) => (args as unknown[])[1]).sort()).toEqual(['first', 'second']);
+    expect(Object.keys(host.rooms)).toHaveLength(2);
+  });
+});
+
+test('named spectator preparation renews its account reservation beyond the lease duration and stops renewing after cancellation', async () => {
+  jest.useFakeTimers();
+  process.env.AI_CODEX_INSTANCES = JSON.stringify([{ id: 'one', home: '/profiles/one' }]);
+  const { connect, service, host } = fixture();
+  const renew = jest.spyOn(service.repository!, 'renewLease');
+  const response = jest.fn();
+  await connect('admin').createAiRoom('codex-chatgpt', response);
+  const id = response.mock.calls[0][0].roomID;
+  expect(id).toBeDefined();
+  await jest.advanceTimersByTimeAsync(23 * 60000);
+  expect(renew).toHaveBeenCalledWith(id);
+  expect(renew.mock.calls.length).toBeGreaterThanOrEqual(23);
+  expect(host.rooms[id].ai?.status).toBe('ready');
+  await connect('admin').controlAiRoom(id, 'stop', jest.fn());
+  const calls = renew.mock.calls.length;
+  await jest.advanceTimersByTimeAsync(23 * 60000);
+  expect(renew).toHaveBeenCalledTimes(calls);
+});
+
+test('nonpublic pool allocation skips accounts with an exhausted short quota', async () => {
+  process.env.AI_CODEX_INSTANCES = JSON.stringify([
+    { id: 'one', home: '/profiles/one' },
+    { id: 'two', home: '/profiles/two' },
+  ]);
+  quota
+    .mockResolvedValueOnce({ remainingPercent: 90, shortTerm: { remainingPercent: 0 } })
+    .mockResolvedValueOnce({ remainingPercent: 10, shortTerm: { remainingPercent: 0 } });
+  const { connect } = fixture();
+  const response = jest.fn();
+  await connect('admin').createAiRoom('codex-chatgpt', response);
+  expect(response.mock.calls[0][0]).toHaveProperty('error');
 });

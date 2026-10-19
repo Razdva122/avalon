@@ -1,5 +1,6 @@
 import { claimContext, validateClaims, claimInstructions } from './claims';
 import { languageInstruction } from './language';
+import shuffle from 'lodash/shuffle';
 import type { AiLanguage } from '@avalon/types';
 import {
   AiPause,
@@ -11,6 +12,7 @@ import {
   publicSpeechAdvice,
   coalitionAdvice,
   decisiveTeamAdvice,
+  openingTieBreakAdvice,
   evilTeamAdvice,
   ladyAnnouncementAdvice,
   ladyInspectionAdvice,
@@ -189,6 +191,14 @@ export function reviewContext(request: BotRequest) {
     speak: true,
   };
 }
+function isOpeningPair(request: BotRequest) {
+  return (
+    request.state.stage === 'selectTeam' &&
+    request.state.mission === 0 &&
+    request.state.settings?.missions[0]?.players === 2
+  );
+}
+
 export function decisionInstructions(request: BotRequest, commonOnly = false) {
   const regularTeam =
     request.botDifficulty === 'regular' && ['selectTeam', 'votingForTeam'].includes(request.state.stage);
@@ -254,6 +264,7 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
       ? ' Perform this current character in publicReason; earlier chat supplies facts, not a neutral voice to imitate: ' +
         request.style
       : '') +
+    (isOpeningPair(request) ? ' ' + openingTieBreakAdvice : '') +
     ' Return JSON choice, speech (private reason, <=240 characters), publicReason (your actual public words, <=240 characters), evidence (at most 3 changed notes with key/kind/fact/source/certainty). Use claim certainty for hypotheses and testimony, bluff for deliberate deception. No unchanged evidence dump. Public words are published directly, without a rewrite or added sentences. Silence is allowed during the full public circle; the sole leader on a repeat proposal must explain their roster.'
   );
 }
@@ -261,6 +272,8 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
 type Generate = (request: BotRequest, options: GenerationOptions, signal?: AbortSignal) => ReturnType<Decide>;
 export function decisionPipeline(generate: Generate): Decide {
   const evidence = new Map<string, DecisionEvidence[]>();
+  // One pipeline belongs to one room, including technical continuations.
+  const openingPriorities = new Map<string, number[]>();
   type ReviewExample = {
     id: string;
     stage: string;
@@ -312,7 +325,17 @@ export function decisionPipeline(generate: Generate): Decide {
       const decisionRequest = request;
       const requiresExplanation =
         request.speak && request.state.stage === 'selectTeam' && request.state.vote > 0 && !request.publicDiscussion;
-      const { missions, votes, ...current } = compactRequest(decisionRequest);
+      const { missions, votes, ...facts } = compactRequest(decisionRequest);
+      let priority: number[] | undefined;
+      if (own && isOpeningPair(request)) {
+        priority = openingPriorities.get(request.playerID);
+        if (!priority) {
+          priority = shuffle(request.state.players.filter((p) => p.id !== request.playerID).map((p) => p.index));
+          openingPriorities.set(request.playerID, priority);
+        }
+      }
+      // Private generation context only: never add preferences to public room facts.
+      const current = { ...facts, ...(priority ? { privateTieBreakOrder: [...priority] } : {}) };
       let reply = await generate(
         decisionRequest,
         {

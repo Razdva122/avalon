@@ -1,25 +1,26 @@
+import { codexEnvironment } from './codex-instances';
 import { execFile } from 'child_process';
 import { isAbsolute } from 'path';
 import { AiTechnicalPause, CodexRequestFailed } from './client';
 import { AI_REQUEST_TIMEOUT_MS } from './timing';
 
 export function hasRemoteCodex() {
-  return Boolean(process.env.AI_CODEX_SSH_HOST);
+  return Boolean(codexEnvironment().AI_CODEX_SSH_HOST);
 }
 
 export function remoteCodexCacheKey() {
   return ['AI_CODEX_SSH_HOST', 'AI_CODEX_SSH_USER', 'AI_CODEX_SSH_PORT', 'AI_CODEX_SSH_KEY', 'AI_CODEX_SSH_KNOWN_HOSTS']
-    .map((key) => process.env[key] || '')
+    .map((key) => codexEnvironment()[key] || '')
     .join(':');
 }
 
 export function remoteCodex(request: object, signal?: AbortSignal, attempt = 0): Promise<unknown> {
   signal?.throwIfAborted();
-  const host = process.env.AI_CODEX_SSH_HOST || '';
-  const user = process.env.AI_CODEX_SSH_USER || '';
-  const key = process.env.AI_CODEX_SSH_KEY || '';
-  const knownHosts = process.env.AI_CODEX_SSH_KNOWN_HOSTS || '';
-  const port = process.env.AI_CODEX_SSH_PORT || '10022';
+  const host = codexEnvironment().AI_CODEX_SSH_HOST || '';
+  const user = codexEnvironment().AI_CODEX_SSH_USER || '';
+  const key = codexEnvironment().AI_CODEX_SSH_KEY || '';
+  const knownHosts = codexEnvironment().AI_CODEX_SSH_KNOWN_HOSTS || '';
+  const port = codexEnvironment().AI_CODEX_SSH_PORT || '10022';
   if (
     !/^[a-zA-Z0-9][a-zA-Z0-9.-]*$/.test(host) ||
     !/^[a-z_][a-z0-9_-]*$/.test(user) ||
@@ -34,7 +35,7 @@ export function remoteCodex(request: object, signal?: AbortSignal, attempt = 0):
   if (Buffer.byteLength(input) > 1024 * 1024) return Promise.reject(new AiTechnicalPause('Codex request too large.'));
   return new Promise((resolve, reject) => {
     const child = execFile(
-      process.env.AI_CODEX_SSH_BIN || 'ssh',
+      codexEnvironment().AI_CODEX_SSH_BIN || 'ssh',
       [
         '-F',
         '/dev/null',

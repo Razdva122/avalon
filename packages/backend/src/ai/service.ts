@@ -1,4 +1,5 @@
-import { BeginnerAnalysis, buildBeginnerAnalysis } from './beginner-analysis';
+import { configuredCodexInstances, withCodexInstance, type CodexInstance } from './codex-instances';
+import { BeginnerAnalysis, buildBeginnerAnalysis, beginnerAnalysisSettings } from './beginner-analysis';
 import { aiHumanRoles, aiPlayedModel, aiRosterInfo } from '@avalon/types';
 import type {
   AiBotDifficulty,
@@ -13,13 +14,13 @@ import type {
 } from '@avalon/types';
 import type { Manager } from '@/main';
 import { randomUUID } from 'crypto';
-import { AiRepository, SessionExperiment } from './repository';
+import { AiRepository } from './repository';
 import { BotRoom } from './room';
 import { AiPause } from './client';
 import { decisionPipeline } from './pipeline';
 import { getCodexModels, validateCodexSettings } from './codex-models';
-import { getCodexWeeklyLimit, readCodexExperimentQuota } from './codex-limits';
-import { CODEX_MODEL, codexEnabled, codexDecide, codexGameSessions } from './codex';
+import { getCodexWeeklyLimit } from './codex-limits';
+import { CODEX_MODEL, codexEnabled, codexDecide } from './codex';
 import { getBotProfile } from './agents';
 import { hasPremium } from '@/support/premium';
 import { supportTotalCents } from '@/support/repository';
@@ -73,12 +74,13 @@ export class AiService {
   get archiveRepository(): AiRepository | undefined {
     return this.repository || this.archive;
   }
-  private creating = false;
-  private starting = false;
-  private experimentRuns = new Map<string, () => Promise<void>>();
-  private publicStartingID?: string;
-  private technicalStart?: { roomID: string };
+  private creating = new Set<string>();
+  private starting = new Set<string>();
+  private allocating = new Set<string>();
+  private roomInstances = new Map<string, CodexInstance>();
+  private technicalStarts = new Map<string, object>();
   private running = new Set<string>();
+  private draftLeaseTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private launchTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private pauseTimers = new Map<string, { expiresAt: number; timer: ReturnType<typeof setTimeout> }>();
   constructor(private manager: Manager) {
@@ -87,8 +89,109 @@ export class AiService {
     if (process.env.AI_ROOMS_ENABLED === 'true' && db && codexEnabled()) this.repository = new AiRepository(db);
     if (db && this.repository) this.beginnerAnalysis = new BeginnerAnalysis(db, this.repository);
   }
-  private active() {
-    return Object.values(this.manager.rooms).find((r) => r.ai && ['ready', 'running', 'paused'].includes(r.ai.status));
+  private active(userID?: string) {
+    return Object.values(this.manager.rooms).find(
+      (r) =>
+        r.ai &&
+        ['ready', 'running', 'paused'].includes(r.ai.status) &&
+        (!userID || r.leaderID === userID || (r instanceof BotRoom && r.isHuman(userID))),
+    );
+  }
+  private instanceFor(roomID: string) {
+    const instance = this.roomInstances.get(roomID);
+    if (instance) return instance;
+    const legacy = configuredCodexInstances().find((entry) => entry.id === 'default');
+    if (!legacy) throw new AiPause('AI room instance is no longer available.');
+    return legacy;
+  }
+  private inRoom<T>(roomID: string, operation: () => T): T {
+    return withCodexInstance(this.instanceFor(roomID), operation);
+  }
+  private async freeInstances(roomID?: string) {
+    const instances = configuredCodexInstances();
+    const busy = new Map<string, string>();
+    // Single-instance deployments also use local room status; named pools read cross-process leases.
+    if (instances[0].id !== 'default') {
+      for (const lease of await this.repository!.busyInstances()) busy.set(lease.instanceID, lease.roomID);
+    }
+    for (const [id, instance] of this.roomInstances) busy.set(instance.id, id);
+    for (const room of Object.values(this.manager.rooms)) {
+      if (room.ai && (['ready', 'running', 'paused'].includes(room.ai.status) || this.running.has(room.roomID)))
+        busy.set(this.roomInstances.get(room.roomID)?.id ?? 'default', room.roomID);
+    }
+    return instances.filter(
+      (instance) => !this.allocating.has(instance.id) && (!busy.has(instance.id) || busy.get(instance.id) === roomID),
+    );
+  }
+  private async instanceSnapshots(instances: CodexInstance[]) {
+    return Promise.all(
+      instances.map((instance) =>
+        withCodexInstance(instance, async () => {
+          const [quota, models] = await Promise.allSettled([getCodexWeeklyLimit(), getCodexModels()]);
+          return {
+            instance,
+            quota: quota.status === 'fulfilled' ? quota.value : null,
+            models: models.status === 'fulfilled' ? models.value : [],
+          };
+        }),
+      ),
+    );
+  }
+  private async reserveInstance(roomID: string, publicGame: boolean, mode?: AiBotMode, settings?: CodexSettings) {
+    const free = await this.freeInstances();
+    const snapshots =
+      !publicGame && !settings && free.length === 1 && free[0].id === 'default'
+        ? [{ instance: free[0], quota: null, models: [] }]
+        : await this.instanceSnapshots(free);
+    const candidates = snapshots.filter(({ instance, quota, models }) =>
+      publicGame
+        ? mode
+          ? humanModeAvailable(mode, quota, models)
+          : humanModeAvailable('smart', quota, models) || humanModeAvailable('regular', quota, models)
+        : (instance.id === 'default' ||
+            (quota &&
+              Number.isFinite(quota.remainingPercent) &&
+              quota.remainingPercent > 0 &&
+              models.length > 0 &&
+              (quota.shortTerm === null ||
+                (quota.shortTerm &&
+                  Number.isFinite(quota.shortTerm.remainingPercent) &&
+                  quota.shortTerm.remainingPercent > 0)))) &&
+          (!settings ||
+            models.some((model) => model.id === settings.model && model.efforts.includes(settings.reasoning))),
+    );
+    candidates.sort((a, b) => this.compareQuota(a.quota, b.quota));
+    for (const { instance } of candidates) {
+      if (this.allocating.has(instance.id) || [...this.roomInstances.values()].some((held) => held.id === instance.id))
+        continue;
+      this.allocating.add(instance.id);
+      try {
+        await this.claimInstance(roomID, instance);
+        this.roomInstances.set(roomID, instance);
+        return instance;
+      } catch (error) {
+        if (!(error instanceof AiPause)) throw error;
+      } finally {
+        this.allocating.delete(instance.id);
+      }
+    }
+    throw new AiPause('Bot games are currently unavailable: no free eligible ChatGPT instance.');
+  }
+  private compareQuota(a: CodexWeeklyLimit | null, b: CodexWeeklyLimit | null) {
+    // Weekly-only subscriptions rank by their available weekly percentage.
+    const short = (quota: CodexWeeklyLimit | null) =>
+      quota?.shortTerm?.remainingPercent ?? quota?.remainingPercent ?? -1;
+    return short(b) - short(a) || (b?.remainingPercent ?? -1) - (a?.remainingPercent ?? -1);
+  }
+  private claimInstance(roomID: string, instance = this.instanceFor(roomID)) {
+    return instance.id === 'default' ? this.repository!.claim(roomID) : this.repository!.claim(roomID, instance.id);
+  }
+  private async releaseInstance(roomID: string) {
+    try {
+      await this.repository!.release(roomID);
+    } finally {
+      this.roomInstances.delete(roomID);
+    }
   }
   async canManage(userID?: string): Promise<boolean> {
     if (!this.repository || !userID || !codexEnabled()) return false;
@@ -118,29 +221,62 @@ export class AiService {
     }
   }
 
-  private async humanModes() {
-    return (await this.humanAvailability()).botModes;
+  private async humanModes(roomID: string) {
+    const snapshot = (await this.instanceSnapshots([this.instanceFor(roomID)]))[0];
+    return {
+      smart: humanModeAvailable('smart', snapshot.quota, snapshot.models),
+      regular: humanModeAvailable('regular', snapshot.quota, snapshot.models),
+      beginner: humanModeAvailable('beginner', snapshot.quota, snapshot.models),
+    };
   }
 
-  private async humanAvailability() {
-    const [quota, models] = await Promise.allSettled([getCodexWeeklyLimit(), getCodexModels()]);
-    const limit = quota.status === 'fulfilled' ? quota.value : null;
-    const catalog = models.status === 'fulfilled' ? models.value : [];
-    const botModes = {
-      smart: humanModeAvailable('smart', limit, catalog),
-      regular: humanModeAvailable('regular', limit, catalog),
-      beginner: humanModeAvailable('beginner', limit, catalog),
-    };
+  private async humanAvailability(roomID?: string) {
+    const free = await this.freeInstances(roomID);
+    const snapshots = await this.instanceSnapshots(free);
+    // Allocations can finish while metadata is being read.
+    const stillFree = new Set((await this.freeInstances(roomID)).map((instance) => instance.id));
+    const available = snapshots.filter(({ instance }) => stillFree.has(instance.id));
+    const botModes = { smart: false, regular: false, beginner: false };
     const botModeAvailableAt: Partial<Record<AiBotMode, number>> = {};
     for (const difficulty of ['smart', 'regular', 'beginner'] as const) {
-      const availableAt = humanModeAvailableAt(difficulty, limit, catalog);
-      if (!botModes[difficulty] && availableAt !== undefined) botModeAvailableAt[difficulty] = availableAt;
+      botModes[difficulty] = available.some(({ quota, models }) => humanModeAvailable(difficulty, quota, models));
+      if (!botModes[difficulty]) {
+        const resets = available.flatMap(({ quota, models }) => {
+          const at = humanModeAvailableAt(difficulty, quota, models);
+          return at === undefined ? [] : [at];
+        });
+        if (resets.length) botModeAvailableAt[difficulty] = Math.min(...resets);
+      }
     }
-    return { botModes, botModeAvailableAt };
+    return { botModes, botModeAvailableAt, botsBusy: stillFree.size === 0 };
   }
 
   private publicRoom(room: BotRoom) {
     return Boolean(room.ai?.publicBotGame || room.ai?.botDifficulty);
+  }
+
+  private clearDraftLeaseTimer(id: string) {
+    clearTimeout(this.draftLeaseTimers.get(id));
+    this.draftLeaseTimers.delete(id);
+  }
+
+  private retainDraftLease(room: BotRoom) {
+    const id = room.roomID;
+    this.clearDraftLeaseTimer(id);
+    const timer = setTimeout(async () => {
+      if (this.draftLeaseTimers.get(id) !== timer || this.manager.rooms[id] !== room || room.ai?.status !== 'ready')
+        return;
+      try {
+        await room.renewLease!();
+        if (this.draftLeaseTimers.get(id) === timer && room.ai?.status === 'ready') this.retainDraftLease(room);
+      } catch {
+        if (this.draftLeaseTimers.get(id) === timer) {
+          await this.expireLaunch(room, 'Could not retain AI room ownership.').catch(() => {});
+        }
+      }
+    }, 60000);
+    timer.unref();
+    this.draftLeaseTimers.set(id, timer);
   }
 
   private clearLaunchTimer(id: string) {
@@ -148,19 +284,17 @@ export class AiService {
     this.launchTimers.delete(id);
   }
 
-  private async expireLaunch(room: BotRoom) {
+  private async expireLaunch(room: BotRoom, reason = 'Bot game preparation timed out.') {
     if (this.manager.rooms[room.roomID] !== room || room.ai?.status !== 'ready') return;
     this.clearLaunchTimer(room.roomID);
+    this.clearDraftLeaseTimer(room.roomID);
     delete room.ai.launchExpiresAt;
-    room.stop('Bot game preparation timed out after 90 seconds.');
-    if (this.publicStartingID === room.roomID) {
-      this.publicStartingID = undefined;
-      this.starting = false;
-    }
+    room.stop(reason);
+    this.starting.delete(room.roomID);
     try {
       await this.repository!.save(room.calculateRoomState());
     } finally {
-      await this.repository!.release(room.roomID).catch(() => {});
+      await this.releaseInstance(room.roomID).catch(() => {});
       this.manager.updateRoomsList(room);
     }
   }
@@ -184,16 +318,13 @@ export class AiService {
     if (this.pauseTimers.get(id)?.timer !== timer) return;
     this.clearPauseTimer(id);
     if (this.manager.rooms[id] !== room || room.ai?.status !== 'paused') return;
-    if (this.technicalStart?.roomID === id) {
-      this.technicalStart = undefined;
-      this.starting = false;
-    }
+    this.technicalStarts.delete(id);
+    this.starting.delete(id);
     try {
       room.stop(aiText(room.ai.language).pauseExpired);
       await this.repository!.save(room.calculateRoomState());
     } finally {
-      await this.finishExperiment(id);
-      await this.repository!.release(id).catch(() => {});
+      await this.releaseInstance(id).catch(() => {});
       this.manager.updateRoomsList(room);
     }
   }
@@ -209,48 +340,14 @@ export class AiService {
   }
 
   private createRoom(id: string, owner: string, language: AiLanguage, playerCount: AiPlayerCount) {
-    let experiment: SessionExperiment | undefined;
-    let initialization: Promise<void> | undefined;
-    const sessions = codexGameSessions();
-    const settings = () => room.ai?.codex;
-    const experimentInfo = () => ({ version: experiment!.version, mode: experiment!.mode });
-    const initialize = () =>
-      (initialization ??= (async () => {
-        const chosen = settings();
-        experiment = await this.repository!.beginSessionExperiment(id, {
-          model: chosen?.model ?? 'default',
-          reasoning: chosen?.reasoning ?? 'low',
-          difficulty: room.ai?.beginner ? 'beginner' : (room.ai?.botDifficulty ?? 'spectator'),
-          players: room.players.length,
-          humans: room.humanIDs.length,
-          language: room.ai?.language ?? 'en',
-        });
-        await this.repository!.recordExperimentQuota(id, await readCodexExperimentQuota().catch(() => null));
-      })().catch((error) => {
-        initialization = undefined;
-        throw error;
-      }));
-    const pipeline = decisionPipeline(async (request, options, signal) => {
-      await initialize();
-      signal?.throwIfAborted();
-      const runner =
-        experiment!.mode === 'session-delta' && request.state.stage !== 'end'
-          ? sessions.forPlayer(request.playerID)
-          : undefined;
-      return codexDecide(id, this.repository!, runner, settings, experimentInfo)(request, options, signal);
-    });
+    const pipeline = decisionPipeline((request, options, signal) =>
+      codexDecide(id, this.repository!, undefined, () => room.ai?.codex)(request, options, signal),
+    );
     const room: BotRoom = new BotRoom(
       id,
       owner,
       this.manager.io,
-      async (request, signal) => {
-        try {
-          return await pipeline(request, signal);
-        } catch (error) {
-          sessions.invalidate(request.playerID);
-          throw error;
-        }
-      },
+      pipeline,
       async (state) => {
         await this.repository!.save(state);
         if (state.stage === 'started' && state.game.stage === 'end' && state.ai?.humanPlayerID) {
@@ -264,25 +361,6 @@ export class AiService {
       playerCount,
     );
     room.ai!.model = CODEX_MODEL;
-    this.experimentRuns.set(id, async () => {
-      if (initialization) await initialization.catch(() => {});
-      if (!experiment) {
-        if (room.ai?.status === 'stopped') this.experimentRuns.delete(id);
-        return;
-      }
-      try {
-        const quota = await readCodexExperimentQuota().catch(() => null);
-        await this.repository!.recordExperimentProgress(id, room.calculateRoomState(), quota);
-      } finally {
-        if (room.ai?.status === 'finished' || room.ai?.status === 'stopped') {
-          try {
-            await sessions.close();
-          } finally {
-            this.experimentRuns.delete(id);
-          }
-        }
-      }
-    });
     room.renewLease = () => this.repository!.renewLease(id);
     if (this.manager.chatService) {
       room.persistChatMessage = (author, text, requestID) =>
@@ -294,31 +372,34 @@ export class AiService {
   private runRoom(room: BotRoom, technical = false) {
     const id = room.roomID;
     this.clearPauseTimer(id);
+    this.clearDraftLeaseTimer(id);
     this.running.add(id);
     // run changes status synchronously before the first await: duplicate starts cannot spend twice.
-    void room
-      .run(technical)
-      .catch(() => {
-        /* room.run already exposes a sanitized paused status */
-      })
-      .finally(async () => {
-        if (this.manager.rooms[id] === room && room.ai?.status === 'paused') this.schedulePauseExpiry(room);
-        try {
-          await this.finishExperiment(id);
-          await this.repository!.release(id).catch(() => {});
-        } finally {
-          this.running.delete(id);
-          this.manager.updateRoomsList(room);
-        }
-      });
-  }
-
-  private async finishExperiment(id: string) {
-    try {
-      await this.experimentRuns.get(id)?.();
-    } catch {
-      console.error('AI experiment accounting/cleanup failed for room', id);
-    }
+    void this.inRoom(id, () =>
+      room
+        .run(technical)
+        .catch(() => {
+          /* room.run already exposes a sanitized paused status */
+        })
+        .finally(async () => {
+          if (this.manager.rooms[id] === room && room.ai?.status === 'paused') {
+            try {
+              await room.renewLease?.();
+              if (this.manager.rooms[id] === room && room.ai?.status === 'paused') this.schedulePauseExpiry(room);
+            } catch {
+              room.stop('Could not retain AI room ownership.');
+              await this.repository!.save(room.calculateRoomState()).catch(() => {});
+            }
+          }
+          try {
+            if (room.ai?.status === 'finished' || room.ai?.status === 'stopped')
+              await this.releaseInstance(id).catch(() => {});
+          } finally {
+            this.running.delete(id);
+            this.manager.updateRoomsList(room);
+          }
+        }),
+    );
   }
 
   register(socket: ServerSocket, userID?: string) {
@@ -370,13 +451,17 @@ export class AiService {
         const live = this.manager.rooms[id];
         const state = live ? live.calculateRoomState() : await this.archiveRepository?.load(id);
         if (!state || !buildBeginnerAnalysis(state, userID)) return cb({ status: 'unavailable' });
-        const active = this.active();
-        const canGenerate =
-          !this.creating &&
-          !this.starting &&
-          ![...this.running].some((roomID) => roomID !== id) &&
-          (!active || (active.roomID === id && state.stage === 'started' && state.game.stage === 'end'));
-        cb(await this.beginnerAnalysis.get(state, userID, canGenerate));
+        const cached = await this.beginnerAnalysis.get(state, userID, false);
+        if (cached.status === 'complete') return cb(cached);
+        const reviewID = randomUUID();
+        // Reserve before generating/inserting a pending review: busy or depleted accounts
+        // must not permanently cache a failed analysis that never reached a model.
+        await this.reserveInstance(reviewID, false, undefined, beginnerAnalysisSettings);
+        try {
+          cb(await this.inRoom(reviewID, () => this.beginnerAnalysis!.get(state, userID, true)));
+        } finally {
+          await this.releaseInstance(reviewID);
+        }
       } catch {
         cb({ status: 'unavailable' });
       }
@@ -403,7 +488,13 @@ export class AiService {
       if (typeof cb !== 'function') return;
       try {
         if (!codexEnabled() || !(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
-        cb({ weekly: await getCodexWeeklyLimit() });
+        const own = this.active(userID);
+        if (own) return cb({ weekly: await this.inRoom(own.roomID, () => getCodexWeeklyLimit()) });
+        const instances = configuredCodexInstances();
+        if (instances[0].id === 'default') return cb({ weekly: await getCodexWeeklyLimit() });
+        const snapshots = await this.instanceSnapshots(await this.freeInstances());
+        snapshots.sort((a, b) => this.compareQuota(a.quota, b.quota));
+        cb({ weekly: snapshots[0]?.quota ?? null });
       } catch {
         cb({ error: 'Could not load Codex limits' });
       }
@@ -412,7 +503,13 @@ export class AiService {
       if (typeof cb !== 'function') return;
       try {
         if (!codexEnabled() || !(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
-        cb({ models: await getCodexModels() });
+        const own = this.active(userID);
+        if (own) return cb({ models: await this.inRoom(own.roomID, () => getCodexModels()) });
+        const instances = configuredCodexInstances();
+        if (instances[0].id === 'default') return cb({ models: await getCodexModels() });
+        const snapshots = await this.instanceSnapshots(await this.freeInstances());
+        snapshots.sort((a, b) => this.compareQuota(a.quota, b.quota));
+        cb({ models: snapshots[0]?.models ?? [] });
       } catch (error) {
         cb({ error: error instanceof AiPause ? error.message : 'Could not load Codex models' });
       }
@@ -422,29 +519,15 @@ export class AiService {
       try {
         const canManage = await this.canManage(userID);
         const canPlay = await this.canPlay(userID);
-        const eligibleSlot = () => {
-          const active = this.active();
-          return (
-            !active ||
-            (active instanceof BotRoom &&
-              this.publicRoom(active) &&
-              Boolean(userID && active.isHuman(userID)) &&
-              this.launchReady(active))
-          );
-        };
-        const availability =
-          canPlay && eligibleSlot() && !this.creating && !this.starting && !this.running.size
-            ? await this.humanAvailability()
-            : { botModes: { smart: false, regular: false, beginner: false }, botModeAvailableAt: {} };
-        let { botModes } = availability;
-        // A room may claim the shared slot while read-only quota/catalog lookups are in flight.
-        const active = this.active();
-        const botsBusy = !eligibleSlot() || this.creating || this.starting || this.running.size > 0;
-        if (botsBusy) botModes = { smart: false, regular: false, beginner: false };
+        const own = userID ? this.active(userID) : undefined;
         const ownRoomID =
-          active instanceof BotRoom && this.publicRoom(active) && Boolean(userID && active.isHuman(userID))
-            ? active.roomID
-            : undefined;
+          own instanceof BotRoom && this.publicRoom(own) && own.isHuman(userID!) ? own.roomID : undefined;
+        const eligibleOwn = ownRoomID && this.launchReady(own as BotRoom) && !this.starting.has(ownRoomID);
+        const availability =
+          canPlay && (!ownRoomID || eligibleOwn) && !this.creating.has(userID!)
+            ? await this.humanAvailability(eligibleOwn ? ownRoomID : undefined)
+            : { botModes: { smart: false, regular: false, beginner: false }, botModeAvailableAt: {}, botsBusy: true };
+        const { botModes, botsBusy } = availability;
         const publicAccess = canPlay
           ? {
               canPlay,
@@ -461,7 +544,7 @@ export class AiService {
           canManage
             ? {
                 canManage,
-                roomID: this.active()?.roomID,
+                roomID: this.active(userID)?.roomID,
                 models: [{ id: CODEX_MODEL, label: 'Codex · ChatGPT' }],
                 defaultModel: CODEX_MODEL,
                 ...publicAccess,
@@ -520,30 +603,22 @@ export class AiService {
         if (!(await this.canPlay(userID))) return cb({ error: 'AI room access denied' });
         if ((options.playerCount ?? 5) >= 7 && !(await this.canPlayLargeTables(userID!)))
           return cb({ error: 'Premium is required for seven or eight players' });
-        const active = this.active();
+        const active = this.active(userID);
         if (active)
           return cb(
             active instanceof BotRoom && this.publicRoom(active) && Boolean(userID && active.isHuman(userID))
               ? { roomID: active.roomID }
               : { error: 'Another AI match is already active' },
           );
-        if (this.creating || this.starting || this.running.size) return cb({ error: 'AI room control in progress' });
+        if (this.creating.has(userID!)) return cb({ error: 'AI room control in progress' });
         if (Object.keys(this.manager.rooms).length >= 500) return cb({ error: 'Room limit reached' });
-        this.creating = locked = true;
+        this.creating.add(userID!);
+        locked = true;
         await this.beginnerAnalysis?.cancelAll();
-        const modes = await this.humanModes();
-        if (
-          options.beginner
-            ? !modes.beginner
-            : options.difficulty
-              ? !modes[options.difficulty]
-              : !modes.smart && !modes.regular
-        )
-          return cb({ error: 'Bot games are currently unavailable' });
         const profile = await this.manager.dbManager.getUserByID(userID!);
         if (Object.keys(this.manager.rooms).length >= 500) return cb({ error: 'Room limit reached' });
         const id = randomUUID();
-        await this.repository!.claim(id);
+        await this.reserveInstance(id, true, options.beginner ? 'beginner' : options.difficulty);
         claimedID = id;
         const room = (createdRoom = this.createRoom(id, userID!, options.language ?? 'en', options.playerCount ?? 5));
         room.ai!.publicBotGame = true;
@@ -570,10 +645,10 @@ export class AiService {
           createdRoom.stop();
           delete this.manager.rooms[createdRoom.roomID];
         }
-        if (claimedID && !this.running.has(claimedID)) await this.repository!.release(claimedID).catch(() => {});
+        if (claimedID && !this.running.has(claimedID)) await this.releaseInstance(claimedID).catch(() => {});
         cb({ error: error instanceof AiPause ? error.message : 'Could not create AI room' });
       } finally {
-        if (locked) this.creating = false;
+        if (locked) this.creating.delete(userID!);
       }
     });
     socket.on('startHumanAiRoom', async (id, options, cb) => {
@@ -616,18 +691,18 @@ export class AiService {
           await this.expireLaunch(room);
           return cb({ error: 'The bot game preparation time has expired' });
         }
-        if (this.creating || this.starting || this.running.size || this.active() !== room)
-          return cb({ error: 'AI room control in progress' });
-        this.starting = locked = true;
-        this.publicStartingID = id;
-        const modes = await this.humanModes();
+        if (this.starting.has(id) || this.running.has(id)) return cb({ error: 'AI room control in progress' });
+        this.starting.add(id);
+        locked = true;
+        const instance = this.instanceFor(id);
+        const modes = await this.humanModes(id);
         if (!this.launchReady(room)) {
           await this.expireLaunch(room);
           return cb({ error: 'The bot game preparation time has expired' });
         }
         const mode = room.ai!.beginner ? 'beginner' : options.difficulty;
         if (!modes[mode]) return cb({ error: 'This bot mode is currently unavailable' });
-        await this.repository!.claim(id);
+        await this.claimInstance(id, instance);
         claimed = true;
         if (!this.launchReady(room)) {
           await this.expireLaunch(room);
@@ -663,11 +738,9 @@ export class AiService {
       } catch (error) {
         cb({ error: error instanceof AiPause ? error.message : 'Could not start AI room' });
       } finally {
-        if (locked && this.publicStartingID === id) {
-          this.publicStartingID = undefined;
-          this.starting = false;
-        }
-        if (claimed && !this.running.has(id)) await this.repository!.release(id).catch(() => {});
+        if (locked) this.starting.delete(id);
+        if (claimed && !this.running.has(id) && !this.launchReady(this.manager.rooms[id] as BotRoom))
+          await this.releaseInstance(id).catch(() => {});
       }
     });
     socket.on('createAiRoom', async (options, cb) => {
@@ -692,19 +765,20 @@ export class AiService {
           language = options.language;
         }
         if (selectedModel !== CODEX_MODEL) return cb({ error: 'Only Codex is supported' });
-        if (this.active()) return cb({ roomID: this.active()!.roomID });
-        if (this.creating || this.starting || this.running.size) return cb({ error: 'AI room is being created' });
-        this.creating = true;
+        if (this.active(userID)) return cb({ roomID: this.active(userID)!.roomID });
+        if (this.creating.has(userID!)) return cb({ error: 'AI room is being created' });
+        this.creating.add(userID!);
         try {
           await this.beginnerAnalysis?.cancelAll();
           const id = randomUUID();
-          await this.repository!.claim(id);
+          const instance = await this.reserveInstance(id, false);
           const room = this.createRoom(id, userID!, language, playerCount);
           this.manager.rooms[id] = room;
+          if (instance.id !== 'default') this.retainDraftLease(room);
           this.manager.updateRoomsList(room);
           cb({ roomID: id });
         } finally {
-          this.creating = false;
+          this.creating.delete(userID!);
         }
       } catch (error) {
         cb({ error: error instanceof AiPause ? error.message : 'Could not create AI room' });
@@ -733,7 +807,7 @@ export class AiService {
         if (typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(id)) return cb({ error: 'Invalid room ID' });
         const room = this.manager.rooms[id];
         if (!(room instanceof BotRoom) || room.leaderID !== userID) return cb({ error: 'AI room access denied' });
-        if (this.starting || this.running.has(id)) return cb({ error: 'AI room control in progress' });
+        if (this.starting.has(id) || this.running.has(id)) return cb({ error: 'AI room control in progress' });
         room.joinAsHuman(userID!);
         room.updateRoomState(true);
         this.manager.updateRoomsList(room);
@@ -753,13 +827,13 @@ export class AiService {
           this.publicRoom(room) ||
           room.ai?.model !== CODEX_MODEL ||
           room.ai.status !== 'ready' ||
-          this.starting
+          this.starting.has(id)
         )
           return cb({ error: 'Codex settings can only be changed before launch' });
-        const validated = validateCodexSettings(settings, await getCodexModels());
+        const validated = validateCodexSettings(settings, await this.inRoom(id, () => getCodexModels()));
         // Catalog lookup is asynchronous: recheck before changing a possibly started room.
-        if (room.ai.status !== 'ready' || this.starting) return cb({ error: 'AI room control in progress' });
-        this.starting = true;
+        if (room.ai.status !== 'ready' || this.starting.has(id)) return cb({ error: 'AI room control in progress' });
+        this.starting.add(id);
         const previous = room.ai.codex;
         room.ai.codex = validated;
         try {
@@ -768,7 +842,7 @@ export class AiService {
           room.ai.codex = previous;
           throw error;
         } finally {
-          this.starting = false;
+          this.starting.delete(id);
         }
         room.updateRoomState(true);
         this.manager.updateRoomsList(room);
@@ -786,25 +860,27 @@ export class AiService {
         const ownHumanRoom = Boolean(this.publicRoom(room) && userID && room.isHuman(userID));
         if (!(await this.canManage(userID)) && !(ownHumanRoom && (await this.canPlay(userID))))
           return cb({ error: 'AI room access denied' });
-        if (this.starting) return cb({ error: 'AI room control in progress' });
+        if (this.starting.has(id)) return cb({ error: 'AI room control in progress' });
         if (action === 'stop') {
           this.clearLaunchTimer(id);
           this.clearPauseTimer(id);
+          this.clearDraftLeaseTimer(id);
           delete room.ai!.launchExpiresAt;
           room.stop();
-          await this.repository!.save(room.calculateRoomState());
-          if (!this.running.has(id)) {
-            await this.finishExperiment(id);
-            await this.repository!.release(id);
+          try {
+            await this.repository!.save(room.calculateRoomState());
+          } finally {
+            if (!this.running.has(id)) {
+              await this.releaseInstance(id);
+            }
+            this.manager.updateRoomsList(room);
           }
-          this.manager.updateRoomsList(room);
           return cb({ ok: true });
         }
         const technical = action === 'resumeTechnical';
         if (!technical && this.publicRoom(room)) return cb({ error: 'Choose a bot mode and language before launch' });
         if (
-          this.running.size ||
-          this.creating ||
+          this.running.has(id) ||
           (technical
             ? room.ai?.status !== 'paused' || !room.ai.canResumeTechnical
             : action !== 'start' || room.ai?.status !== 'ready')
@@ -812,31 +888,31 @@ export class AiService {
           return cb({ error: 'AI room is not ready to start or resume' });
         if (room.ai?.model === CODEX_MODEL && !room.ai.codex)
           return cb({ error: 'Choose a Codex model and reasoning level before launch' });
-        this.starting = true;
+        this.starting.add(id);
         const technicalStart = technical ? { roomID: id } : undefined;
-        if (technicalStart) this.technicalStart = technicalStart;
+        if (technicalStart) this.technicalStarts.set(id, technicalStart);
         try {
-          if (!technical && room.ai?.botDifficulty && !(await this.humanModes())[room.ai.botDifficulty])
+          if (!technical && room.ai?.botDifficulty && !(await this.humanModes(id))[room.ai.botDifficulty])
             return cb({ error: 'This bot mode is currently unavailable' });
           if (room.ai?.status !== (technical ? 'paused' : 'ready')) return cb({ error: 'AI room control in progress' });
-          await this.repository!.claim(id);
+          await this.claimInstance(id);
           const pause = this.pauseTimers.get(id);
           if (technical && pause && pause.expiresAt <= Date.now()) await this.expirePause(room, pause.timer);
           if (
             this.manager.rooms[id] !== room ||
             room.ai?.status !== (technical ? 'paused' : 'ready') ||
-            (technical && (this.technicalStart !== technicalStart || !room.ai.canResumeTechnical))
+            (technical && (this.technicalStarts.get(id) !== technicalStart || !room.ai.canResumeTechnical))
           ) {
-            await this.repository!.release(id).catch(() => {});
+            await this.releaseInstance(id).catch(() => {});
             return cb({ error: 'AI room is no longer ready to start or resume' });
           }
           this.runRoom(room, technical);
           this.manager.updateRoomsList(room);
           cb({ ok: true });
         } finally {
-          if (!technicalStart || this.technicalStart === technicalStart) {
-            this.technicalStart = undefined;
-            this.starting = false;
+          if (!technicalStart || this.technicalStarts.get(id) === technicalStart) {
+            this.technicalStarts.delete(id);
+            this.starting.delete(id);
           }
         }
       } catch (error) {

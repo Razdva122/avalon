@@ -4,6 +4,8 @@ import type { Manager } from '@/main';
 import type { ServerSocket } from '@avalon/types';
 import { validPacket } from '@/security/validation';
 
+type Handler = (id: string, acknowledge: (result: unknown) => void) => Promise<void>;
+
 test('review packet requires exactly one room ID and an acknowledgement', () => {
   expect(validPacket('getBeginnerReview', ['room', () => {}])).toBe(true);
   expect(validPacket('getBeginnerReview', ['room'])).toBe(false);
@@ -35,9 +37,9 @@ test('review endpoint serves only the finished beginner participant, including a
     const service = new AiService(host);
     Object.assign(service, { repository: { load }, beginnerAnalysis: { get } });
     const connect = (id?: string) => {
-      const events: Record<string, Function> = {};
+      const events: Record<string, Handler> = {};
       service.register(
-        { on: (event: string, handler: Function) => (events[event] = handler) } as unknown as ServerSocket,
+        { on: (event: string, handler: Handler) => (events[event] = handler) } as unknown as ServerSocket,
         id,
       );
       return events;
@@ -51,7 +53,7 @@ test('review endpoint serves only the finished beginner participant, including a
     const ack = jest.fn();
     await connect('owner').getBeginnerReview('room', ack);
     expect(ack).toHaveBeenCalledWith(expect.objectContaining({ status: 'complete' }));
-    expect(get).toHaveBeenCalledWith(room, 'owner', true);
+    expect(get).toHaveBeenCalledWith(room, 'owner', false);
   } finally {
     jest.restoreAllMocks();
   }

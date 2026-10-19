@@ -1,4 +1,4 @@
-import { editableDraft } from '../../../ui/src/pages/community/board-helpers';
+import { editableDraft } from '@avalon/types/board-draft';
 import express from 'express';
 import { Server } from 'http';
 import { AddressInfo } from 'net';

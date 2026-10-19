@@ -1,3 +1,4 @@
+import { codexEnvironment } from './codex-instances';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import type { CodexSettings, CodexModelOption } from '@avalon/types';
@@ -31,20 +32,26 @@ export function validateCodexSettings(value: unknown, catalog: CodexModelOption[
   return { model: model.id, reasoning: settings!.reasoning };
 }
 
-let cache: { key: string; expires: number; models: CodexModelOption[] } | undefined;
-let pending: Promise<CodexModelOption[]> | undefined;
+const cache = new Map<string, { expires: number; models: CodexModelOption[] }>();
+const pending = new Map<string, Promise<CodexModelOption[]>>();
+function cacheModels(key: string, models: CodexModelOption[]) {
+  if (cache.size >= 64) cache.delete(cache.keys().next().value!);
+  cache.set(key, { models, expires: Date.now() + 300000 });
+}
 export async function getCodexModels(): Promise<CodexModelOption[]> {
-  const bin = process.env.AI_CODEX_BIN || 'codex';
-  const home = process.env.AI_CODEX_HOME || process.env.CODEX_HOME;
-  const key = hasRemoteCodex() ? remoteCodexCacheKey() : `${bin}:${home}`;
-  if (cache?.key === key && cache.expires > Date.now()) return cache.models;
-  if (pending) return pending;
-  pending = (async () => {
+  const bin = codexEnvironment().AI_CODEX_BIN || 'codex';
+  const home = codexEnvironment().AI_CODEX_HOME || codexEnvironment().CODEX_HOME;
+  const key = hasRemoteCodex() ? remoteCodexCacheKey() : `${bin}:${home || codexEnvironment().HOME}`;
+  const cached = cache.get(key);
+  if (cached && cached.expires > Date.now()) return cached.models;
+  const inFlight = pending.get(key);
+  if (inFlight) return inFlight;
+  const promise = (async () => {
     try {
       if (hasRemoteCodex()) {
         const models = parseCodexModels(await remoteCodex({ operation: 'models' }));
         if (!models.length) throw new Error('empty');
-        cache = { key, models, expires: Date.now() + 300000 };
+        cacheModels(key, models);
         return models;
       }
       const { stdout } = await promisify(execFile)(bin, ['debug', 'models'], {
@@ -54,13 +61,16 @@ export async function getCodexModels(): Promise<CodexModelOption[]> {
       });
       const models = parseCodexModels(JSON.parse(stdout));
       if (!models.length) throw new Error('empty');
-      cache = { key, models, expires: Date.now() + 300000 };
+      cacheModels(key, models);
       return models;
     } catch {
       throw new AiTechnicalPause('Could not load Codex models. Check server ChatGPT login.');
-    } finally {
-      pending = undefined;
     }
   })();
-  return pending;
+  pending.set(key, promise);
+  try {
+    return await promise;
+  } finally {
+    if (pending.get(key) === promise) pending.delete(key);
+  }
 }

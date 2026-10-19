@@ -2,8 +2,6 @@ import { aiPlayedModel, aiRosterInfo } from '@avalon/types';
 import { AI_LEASE_MS } from './timing';
 import { calculateAiRatings } from './ratings';
 import { AI_PROFILE_RATING_SEASON } from './rating-season';
-import { createHash } from 'crypto';
-import type { ExperimentQuota } from './codex-limits';
 import type { Db } from 'mongodb';
 import type { StartedRoomState, TRoomState, TRoomInfo, PlayerGameSummaryPage } from '@avalon/types';
 import { AiPause } from './client';
@@ -26,10 +24,8 @@ export type AiRequestLog = {
   model?: string;
   reasoning?: string;
   phase?: string;
-  experiment?: { version: string; mode: string };
   attempts?: number;
   unknownUsageAttempts?: number;
-  sessionReset?: boolean;
   failureKind?: string;
 };
 
@@ -48,17 +44,6 @@ export type AiDecisionTrace = {
   evidence?: import('./client').DecisionEvidence[];
   responseID?: string;
   output?: unknown;
-};
-
-export const SESSION_EXPERIMENT_VERSION = 'session-delta-v1';
-export type SessionExperiment = {
-  _id: string;
-  version: string;
-  mode: 'standard' | 'session-delta';
-  startedAt: Date;
-  stratum: string;
-  details: { model: string; reasoning: string; difficulty: string; players: number; humans: number; language: string };
-  quotaBefore?: ExperimentQuota | null;
 };
 
 type Ledger = { _id: string; owner?: string; leaseUntil?: Date };
@@ -99,82 +84,6 @@ export class AiRepository {
       });
     await this.retentionIndexes;
   }
-  /** Called under the global game lease, before any model request. */
-  async beginSessionExperiment(roomID: string, details: SessionExperiment['details']): Promise<SessionExperiment> {
-    await this.renewLease(roomID);
-    const collection = this.db.collection<SessionExperiment>('ai_session_experiments');
-    const existing = await collection.findOne({ _id: roomID });
-    if (existing) return existing;
-    const stratum = createHash('sha256').update(JSON.stringify(details)).digest('hex').slice(0, 24);
-    await collection.createIndex({ version: 1, mode: 1 });
-    const [standard, persistent] = await Promise.all([
-      collection.countDocuments({ version: SESSION_EXPERIMENT_VERSION, mode: 'standard' }),
-      collection.countDocuments({ version: SESSION_EXPERIMENT_VERSION, mode: 'session-delta' }),
-    ]);
-    // The global lease serializes allocation. Counting durable assignments avoids
-    // losing a turn in the alternation if the server crashes before insertion.
-    await this.renewLease(roomID);
-    const assignment: SessionExperiment = {
-      _id: roomID,
-      version: SESSION_EXPERIMENT_VERSION,
-      mode: standard <= persistent ? 'standard' : 'session-delta',
-      startedAt: new Date(),
-      stratum,
-      details,
-    };
-    await collection.insertOne(assignment);
-    return assignment;
-  }
-  async recordExperimentQuota(roomID: string, quota: ExperimentQuota | null) {
-    await this.db
-      .collection<SessionExperiment>('ai_session_experiments')
-      .updateOne(
-        { _id: roomID, quotaBefore: { $exists: false } },
-        { $set: { quotaBefore: quota, quotaBeforeCheckedAt: new Date() } },
-      );
-  }
-  async recordExperimentProgress(roomID: string, state: TRoomState, quota: ExperimentQuota | null) {
-    if (state.stage !== 'started') return;
-    const requests = await this.db.collection<AiRequestLog>('ai_request_costs').find({ roomID }).toArray();
-    const total = (key: 'inputTokens' | 'cachedTokens' | 'outputTokens' | 'submittedInputBytes') =>
-      requests.reduce((sum, r) => sum + (r[key] ?? 0), 0);
-    const segment = { checkedAt: new Date(), status: state.ai?.status, quota };
-    await this.db.collection<SessionExperiment & { segments?: object[] }>('ai_session_experiments').updateOne(
-      { _id: roomID },
-      {
-        $set: {
-          updatedAt: new Date(),
-          status: state.ai?.status,
-          result: state.game.result,
-          metrics: {
-            requests: requests.length,
-            failed: requests.filter((r) => r.status === 'failed').length,
-            cancelled: requests.filter((r) => r.status === 'cancelled').length,
-            attempts: requests.reduce((sum, r) => sum + (r.attempts ?? 1), 0),
-            unknownUsageAttempts: requests.reduce(
-              (sum, r) => sum + (r.unknownUsageAttempts ?? (r.inputTokens === undefined ? 1 : 0)),
-              0,
-            ),
-            inputTokens: total('inputTokens'),
-            cachedTokens: total('cachedTokens'),
-            outputTokens: total('outputTokens'),
-            uncachedTokens: total('inputTokens') - total('cachedTokens'),
-            submittedInputBytes: total('submittedInputBytes'),
-            sessionResets: requests.filter((r) => r.sessionReset).length,
-            requestMs: requests.reduce(
-              (sum, r) => sum + (r.finishedAt ? r.finishedAt.getTime() - r.startedAt.getTime() : 0),
-              0,
-            ),
-            reviews: requests.filter((r) => r.stage === 'end').length,
-            votes: state.game.history.filter((h) => h.type === 'vote').length,
-            rejectedTeams: state.game.history.filter((h) => h.type === 'vote' && h.result === 'reject').length,
-            missions: state.game.history.filter((h) => h.type === 'mission').length,
-          },
-        },
-        $push: { segments: segment },
-      },
-    );
-  }
   async recordRequest(entry: AiRequestLog) {
     const expiresAt =
       entry.finishedAt !== undefined
@@ -200,12 +109,34 @@ export class AiRepository {
   private get ledger() {
     return this.db.collection<Ledger>('ai_experiment_budget');
   }
-  async claim(roomID: string) {
+  private instanceLedgerID(instanceID = 'default') {
+    validateID(instanceID);
+    return instanceID === 'default' ? this.ledgerID : `${this.ledgerID}:${instanceID}`;
+  }
+  private get leaseFilter() {
+    return { $regex: `^${this.ledgerID}(?::[a-zA-Z0-9-]+)?$` };
+  }
+  async busyInstances(): Promise<{ instanceID: string; roomID: string }[]> {
+    const leases = await this.ledger
+      .find({ _id: this.leaseFilter, owner: { $exists: true }, leaseUntil: { $gt: new Date() } })
+      .toArray();
+    return leases.map((lease) => ({
+      instanceID: lease._id === this.ledgerID ? 'default' : lease._id.slice(this.ledgerID.length + 1),
+      roomID: lease.owner!,
+    }));
+  }
+  async claim(roomID: string, instanceID = 'default') {
     validateID(roomID);
-    await this.ledger.updateOne({ _id: this.ledgerID }, { $setOnInsert: { _id: this.ledgerID } }, { upsert: true });
+    const ledgerID = this.instanceLedgerID(instanceID);
+    // Concurrent first claims can race while creating the same lock document.
+    try {
+      await this.ledger.updateOne({ _id: ledgerID }, { $setOnInsert: { _id: ledgerID } }, { upsert: true });
+    } catch (error) {
+      if ((error as { code?: number }).code !== 11000) throw error;
+    }
     const previous = await this.ledger.findOneAndUpdate(
       {
-        _id: this.ledgerID,
+        _id: ledgerID,
         $or: [{ owner: { $exists: false } }, { leaseUntil: { $lt: new Date() } }, { owner: roomID }],
       },
       { $set: { owner: roomID, leaseUntil: new Date(Date.now() + AI_LEASE_MS) } },
@@ -215,12 +146,12 @@ export class AiRepository {
   }
   async release(roomID: string) {
     validateID(roomID);
-    await this.ledger.updateOne({ _id: this.ledgerID, owner: roomID }, { $unset: { owner: '', leaseUntil: '' } });
+    await this.ledger.updateOne({ _id: this.leaseFilter, owner: roomID }, { $unset: { owner: '', leaseUntil: '' } });
   }
   async renewLease(roomID: string) {
     validateID(roomID);
     const result = await this.ledger.updateOne(
-      { _id: this.ledgerID, owner: roomID, leaseUntil: { $gt: new Date() } },
+      { _id: this.leaseFilter, owner: roomID, leaseUntil: { $gt: new Date() } },
       { $set: { leaseUntil: new Date(Date.now() + AI_LEASE_MS) } },
     );
     if (!result.matchedCount) throw new AiPause('Потеряно управление AI-партией.');

@@ -2,6 +2,10 @@
 
 [Documentation index](../docs/README.md)
 
+For the current production host, Compose path and deployment procedure, start with
+[FirstByte operations](firstbyte/DEPLOY.md). The Yandex Cloud VM references below
+are dated historical records, not the current server connection instructions.
+
 The backend image installs `@openai/codex@0.159.2`. Select an image built from the current repository; older images may lack
 production opt-in or remote transport.
 Codex stays disabled until `AI_CODEX_ENABLED=true`; all existing administrator
@@ -29,8 +33,8 @@ and the game-data suffix are sent on stdin. Changing stages therefore preserves
 the common message boundary. `include_environment_context=false` removes
 irrelevant per-request temporary-directory metadata. In standard mode each request uses an
 independent ephemeral session, its own legal-choice schema, disabled tools and
-ChatGPT authentication. The later balanced session experiment below also enables
-per-bot history for half of new games. No model answers or private game states are shared between bots.
+ChatGPT authentication. Each game decision uses this independent mode. No model
+answers or private game states are shared between bots.
 
 The two configuration keys exist in the pinned Codex 0.159.2 source. Live local
 cache experiments use Codex 0.160.0; this is not verification of a deployed worker.
@@ -278,56 +282,7 @@ publish in seat order with stable message IDs. Public thinking state supports tw
 seats, with a legacy single-seat fallback; secret mission generation never identifies
 model-driven seats. Artificial message pacing is disabled.
 
-## Balanced bot-session experiment (2026-10-15)
+## Multiple accounts and parallel games
 
-The game service now assigns started games globally 50/50 to `standard` and
-`session-delta` under the existing global game lease. It counts durable assignments,
-so a failed allocation cannot consume an invisible counter increment. With an odd
-number of games one arm has one extra assignment. A game's assignment never changes
-on a technical resume. Model, reasoning, language, difficulty, table size and human
-count define comparison strata; allocation remains global rather than restarting
-with standard mode for every new combination.
-
-Session-delta uses a private native thread/profile for each bot and match. Only the
-initial turn bootstraps the full state. Later turns send exact changed fields and
-changed common/stage instructions. Both arms use fresh post-game reviews. Failed
-native requests are not automatically retried; an explicitly resumed technical
-pause bootstraps the affected bot in a new thread and records the reset. Rejected
-output validation also invalidates that bot. Other bots retain their own histories.
-
-Update `worker.cjs` **before** the backend. The backward-compatible worker accepts
-`session: {key, id?}` on decisions and `closeSessions: {keys}` for cleanup; keys and
-native IDs must be UUIDs, never paths or CLI options. The existing `/state` volume
-contains `avalon-sessions/<key>`, mode 700, with an empty work directory and an auth
-link to the existing login. Codex may replace its auth link when refreshing its own
-profile; treat the entire session directory as credential-bearing private state.
-Completion, manual stop and pause expiry remove owned profiles. Abandoned worker
-profiles expire after seven inactive days when a later persistent request performs
-GC. Backend crashes cannot restore in-memory BotRoom games; they remain visibly
-incomplete in the experiment ledger. Never share or archive session profiles.
-
-`ai_request_costs` records phase, actual model/reasoning, assigned experiment,
-logical/submitted bytes, input/cache/output tokens, attempts, unknown usage and
-session resets. Cumulative native session usage is subtracted between turns. A
-failed attempt with unavailable usage remains explicitly unknown. A standard-mode
-automatic retry records both attempts and unknown usage for the first. Private
-full inputs/outputs remain in the existing traces with their 30-day retention.
-Cost records retain the existing 365-day retention. `ai_session_experiments` stores
-non-secret durable summaries and all sanitized quota buckets, independent of trace
-TTL. Quota reads bypass the UI's 60-second cache. Paused/stopped games remain in the
-report; they must not be silently discarded as expensive outliers.
-
-Generate the private report inside the backend using its normal environment:
-
-```sh
-npx ts-node -P packages/backend/tsconfig.json -r tsconfig-paths/register packages/backend/src/scripts/reportBotSessions.ts
-```
-
-The report groups comparable settings and modes, exposes completed/paused/stopped/
-incomplete counts, requests/tokens, retries/unknown usage, resets, votes/rejections,
-mission counts and winning sides. Quota observations match bucket/window/reset;
-unknown and reset windows do not become zero spending. All percentage changes are
-coarse account-wide observations, potentially including other activity or pauses.
-They are not exact per-game subscription charges or paid API costs. Five completed
-games per mode within one comparison stratum trigger the initial-review indicator;
-this is an exploratory checkpoint, not proof of equal quality or economic benefit.
+See [codex-instances.md](codex-instances.md) for `AI_CODEX_INSTANCES` configuration,
+per-account game capacity, quota selection and the required drained rollout.

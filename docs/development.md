@@ -49,6 +49,44 @@ npm run test --workspace=packages/backend -- --runInBand src/ai/discussion-flow.
 
 Backend integration tests use temporary MongoDB. If downloading a binary is not
 possible, point `MONGOMS_SYSTEM_BINARY` at a compatible installed `mongod`.
+
+### Codex local test permissions
+
+The trusted project's [.codex/config.toml](../.codex/config.toml) selects
+`avalon-local`: it extends the workspace filesystem sandbox and enables local
+listeners for MongoDB and HTTP fixtures. The network proxy remains enabled with
+only `localhost`, `127.0.0.1` and `::1` allowlisted; this does not enable unrestricted
+external command networking. Global Codex settings are unchanged. The profile uses
+`allow_local_binding = true`; allowlisting localhost alone did not permit test
+listeners in the verified macOS sandbox.
+
+The shared `createTestMongo` helper disables MongoDB's extra Unix socket on macOS
+and Linux. Tests connect to the real temporary database over loopback TCP, so they
+do not need arbitrary Unix socket permissions. Windows keeps its normal startup
+arguments. Permission failures are still surfaced; no integration checks are skipped.
+
+Project configuration is loaded for trusted projects. Start a new Codex chat or
+select the project profile to pick up permission changes; an existing or managed
+chat can keep a stricter runtime profile. In that case, request scoped permission
+for integration-test commands before the first run. `listen EPERM` and
+`sandbox_apply: Operation not permitted` are environment denials, not application
+failures. Do not skip the affected checks or change database behavior to hide them.
+
+To explicitly verify the profile with Codex CLI from the repository root:
+
+```sh
+codex sandbox -P avalon-local -C "$PWD" npm run test --workspace=packages/backend -- --runInBand src/ai/repository.test.ts
+```
+
+Launching a nested sandbox from an already sandboxed tool may itself require a
+scoped approved command. Normal tests inside an active `avalon-local` chat use the
+usual npm commands. The profile was checked with a loopback bind/connection, a
+denied direct external TCP connection and a denied write outside the workspace.
+See the official [permission profiles](https://learn.chatgpt.com/docs/permissions)
+and [project configuration](https://learn.chatgpt.com/docs/config-file/config-advanced).
+
+### Browser executable
+
 If Puppeteer's browser is unavailable, set `PUPPETEER_EXECUTABLE_PATH` to an
 installed Chromium/Chrome executable before running UI production checks.
 On macOS, a typical value is `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`.

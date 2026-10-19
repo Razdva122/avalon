@@ -1,41 +1,17 @@
 'use strict';
 const { spawn, execFile } = require('node:child_process');
 const { promisify } = require('node:util');
-const { mkdtemp, mkdir, symlink, readdir, stat, utimes, writeFile, readFile, rm } = require('node:fs/promises');
+const { mkdtemp, writeFile, readFile, rm } = require('node:fs/promises');
 const { join } = require('node:path');
 const TIMEOUT = 10 * 60 * 1000;
 const LIMIT = 4 * 1024 * 1024;
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-const validKey = (value) => typeof value === 'string' && UUID.test(value);
-const sessionsRoot = () => join(process.env.CODEX_HOME, 'avalon-sessions');
-
 function validateRequest(request) {
   if (!request || typeof request !== 'object' || Array.isArray(request)) throw Error('invalid');
-  if (!['decide', 'models', 'limits', 'closeSessions'].includes(request.operation)) throw Error('invalid');
+  if (!['decide', 'models', 'limits'].includes(request.operation)) throw Error('invalid');
   const allowed =
-    request.operation === 'decide'
-      ? ['operation', 'prompt', 'schema', 'settings', 'instructions', 'session']
-      : request.operation === 'closeSessions'
-        ? ['operation', 'keys']
-        : ['operation'];
+    request.operation === 'decide' ? ['operation', 'prompt', 'schema', 'settings', 'instructions'] : ['operation'];
   if (Object.keys(request).some((k) => !allowed.includes(k))) throw Error('invalid');
-  if (request.operation === 'closeSessions') {
-    if (!Array.isArray(request.keys) || request.keys.length > 64 || !request.keys.every(validKey))
-      throw Error('invalid');
-  }
   if (request.operation !== 'decide') return;
-  if (request.session !== undefined) {
-    const s = request.session;
-    if (
-      !s ||
-      typeof s !== 'object' ||
-      Array.isArray(s) ||
-      Object.keys(s).some((k) => !['key', 'id'].includes(k)) ||
-      !validKey(s.key) ||
-      (s.id !== undefined && !validKey(s.id))
-    )
-      throw Error('invalid');
-  }
   if (typeof request.prompt !== 'string' || !request.prompt || Buffer.byteLength(request.prompt) > 512 * 1024)
     throw Error('invalid');
   if (
@@ -195,33 +171,7 @@ async function quotaDiagnostic() {
   }
 }
 
-async function prepareSession(key) {
-  const root = sessionsRoot();
-  await mkdir(root, { recursive: true, mode: 0o700 });
-  // Abandoned profiles (e.g. a backend crash) have no live game after seven days.
-  for (const entry of await readdir(root, { withFileTypes: true })) {
-    if (!entry.isDirectory() || !validKey(entry.name)) continue;
-    const path = join(root, entry.name);
-    try {
-      if (Date.now() - (await stat(path)).mtimeMs > 7 * 86400000) await rm(path, { recursive: true, force: true });
-    } catch (error) {
-      if (error.code !== 'ENOENT') throw error;
-    }
-  }
-  const home = join(root, key);
-  await mkdir(join(home, 'work'), { recursive: true, mode: 0o700 });
-  try {
-    await symlink(join(process.env.CODEX_HOME, 'auth.json'), join(home, 'auth.json'));
-  } catch (error) {
-    if (error.code !== 'EEXIST') throw error;
-  }
-  await utimes(home, new Date(), new Date());
-  return home;
-}
-
 async function decide(request) {
-  const home = request.session ? await prepareSession(request.session.key) : undefined;
-  let threadID;
   const directory = await mkdtemp('/tmp/avalon-game-');
   try {
     const schema = join(directory, 'schema.json'),
@@ -229,11 +179,11 @@ async function decide(request) {
     await writeFile(schema, JSON.stringify(request.schema));
     const args = [
       'exec',
-      ...(request.session?.id ? ['resume', request.session.id] : []),
       '--ignore-user-config',
-      ...(!request.session ? ['--ephemeral'] : []),
+      '--ephemeral',
       '--skip-git-repo-check',
-      ...(request.session ? ['-c', 'sandbox_mode="read-only"'] : ['--sandbox', 'read-only']),
+      '--sandbox',
+      'read-only',
       '-c',
       'approval_policy="on-request"',
       '-c',
@@ -267,7 +217,8 @@ async function decide(request) {
       '-c',
       'tools.view_image=false',
       ...(request.settings ? ['--model', request.settings.model] : []),
-      ...(!request.session?.id ? ['-C', home ? join(home, 'work') : directory] : []),
+      '-C',
+      directory,
       '--json',
       '--output-schema',
       schema,
@@ -284,7 +235,6 @@ async function decide(request) {
         httpStatus;
       const child = spawn('codex', args, {
         detached: process.platform !== 'win32',
-        ...(home ? { env: { ...process.env, CODEX_HOME: home }, cwd: join(home, 'work') } : {}),
       });
       const kill = () => {
         try {
@@ -360,13 +310,6 @@ async function decide(request) {
               ].includes(event.type)
             )
               lastEvent = event.type;
-            if (request.session && event.type === 'thread.started') {
-              if (!validKey(event.thread_id) || (request.session.id && request.session.id !== event.thread_id)) {
-                failure = true;
-                failureReason = 'invalid_session';
-                kill();
-              } else threadID = event.thread_id;
-            }
             if (event.type === 'turn.completed') tokens = event.usage || {};
             if (['error', 'turn.failed'].includes(event.type))
               noteDiagnostic(event.error?.message || event.message || '');
@@ -426,8 +369,7 @@ async function decide(request) {
     });
     const text = await readFile(output, 'utf8');
     if (Buffer.byteLength(text) > LIMIT) throw Error('output_limit');
-    if (request.session && !threadID) throw Error('invalid_session');
-    return { text, usage, ...(threadID ? { threadID } : {}) };
+    return { text, usage };
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
@@ -435,10 +377,6 @@ async function decide(request) {
 
 async function handleRequest(request) {
   validateRequest(request);
-  if (request.operation === 'closeSessions') {
-    for (const key of request.keys) await rm(join(sessionsRoot(), key), { recursive: true, force: true });
-    return { closed: request.keys.length };
-  }
   if (request.operation === 'decide') return decide(request);
   if (request.operation === 'limits') return quota();
   const { stdout } = await promisify(execFile)('codex', ['debug', 'models'], { timeout: 20000, maxBuffer: LIMIT });

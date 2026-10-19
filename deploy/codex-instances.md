@@ -1,0 +1,107 @@
+# Multiple ChatGPT instances
+
+The backend can run one AI match per configured instance. `AI_CODEX_INSTANCES`
+is a JSON array in the backend environment (1–32 entries). Each instance must
+use a **distinct ChatGPT account**, with its own Codex authentication directory
+or SSH worker. No browser changes are required.
+
+## Local profiles
+
+```yaml
+services:
+  backend:
+    environment:
+      AI_ROOMS_ENABLED: 'true'
+      AI_CODEX_ENABLED: 'true'
+      AI_CODEX_INSTANCES: >-
+        [{"id":"account-one","home":"/var/lib/codex-one"},
+         {"id":"account-two","home":"/var/lib/codex-two"}]
+    volumes:
+      - /opt/avalon/codex-one:/var/lib/codex-one
+      - /opt/avalon/codex-two:/var/lib/codex-two
+```
+
+Authenticate each directory separately using the existing local login procedure
+in [codex-production.md](codex-production.md), setting `CODEX_HOME` to that
+instance's directory inside the backend container. Keep auth files outside Git
+and images. The existing `AI_CODEX_BIN` applies to all local profiles.
+
+## SSH workers
+
+```yaml
+services:
+  backend:
+    environment:
+      AI_ROOMS_ENABLED: 'true'
+      AI_CODEX_ENABLED: 'true'
+      AI_CODEX_INSTANCES: >-
+        [{"id":"account-one","ssh":{"host":"worker-one.example.com","user":"avalon-codex","port":10022,"key":"/run/codex-ssh/one","knownHosts":"/run/codex-ssh/known_hosts"}},
+         {"id":"account-two","ssh":{"host":"worker-two.example.com","user":"avalon-codex","port":10022,"key":"/run/codex-ssh/two","knownHosts":"/run/codex-ssh/known_hosts"}}]
+    volumes:
+      - /opt/avalon/codex-ssh:/run/codex-ssh:ro
+```
+
+Provision each independent worker using [codex-production.md](codex-production.md).
+Use the independent-request worker described in that guide. Each endpoint must actually select its own
+account/auth state. The supplied launcher uses `/opt/avalon-codex/state`, so use
+separate worker machines with the standard launcher. Two SSH users pointing to
+the same standard launcher are **not** separate accounts.
+
+Local and SSH entries may be mixed. `port` defaults to `10022`. IDs contain
+letters, numbers and hyphens, start with a letter or number, and are at most
+64 characters. `default` is reserved for legacy configuration. Duplicate IDs,
+local directory paths and SSH user/host/port destinations are rejected. Different
+paths or DNS aliases for the same account must not be listed as separate instances.
+Explicit pool entries do not inherit legacy `AI_CODEX_HOME` / `CODEX_HOME` or
+`AI_CODEX_SSH_*` connection settings.
+
+## Selection and lifetime
+
+- A public room atomically reserves a free instance during preparation. Only
+  instances supporting the selected model/reasoning and passing both existing
+  quota thresholds are eligible. Quota failures and missing models fail closed.
+- Rank eligible free instances by **remaining five-hour percentage**, then
+  **remaining weekly percentage**. A subscription explicitly reporting no
+  five-hour window ranks by its weekly percentage. Equal quotas use config order.
+  Percentages compare reported remaining allowance, not absolute token capacity
+  across different subscription tiers.
+- Quotas are cached separately per connection for one minute, model catalogs for
+  five minutes. Launch repeats the eligibility check on the reserved instance.
+- Pin the instance for the entire game, including independent decisions,
+  technical pauses/resume and post-game processing. A technical resume does not
+  apply the new-game quota gate or switch accounts.
+- One game per account, up to the number of configured accounts concurrently.
+  If all eligible accounts are busy, reject a new reservation without a queue.
+  The same participant returns to their existing game.
+- Keep existing bot thresholds: smart `>60%` short / `>5%` weekly; regular
+  `>30%` / `>3%`; beginner `>20%` / `>1%`. Weekly-only accounts skip the short gate.
+  Player counts, model settings and Premium admission are unchanged.
+- Public preparation expires after 60 seconds (120 seconds with friends).
+  Administrator spectator drafts renew their lease while waiting for configuration.
+  Technical pauses retain the account for up to the existing 15-minute timeout.
+- Completion, cancellation and preparation/pause expiry release only that room's
+  lease. MongoDB owner checks prevent stale cleanup from releasing another room.
+  A crashed backend's abandoned lease expires after `AI_LEASE_MS` (currently
+  22 minutes). Existing restart behavior still stops archived unfinished games.
+- Beginner analysis briefly reserves a free account too, with model support
+  checked for that account; it cannot spend on an account held by a game.
+  Cached reviews remain readable without free capacity.
+- Admin quota/catalog endpoints describe the administrator's pinned room, or
+  the highest-quota free account before a room has been created. Connection
+  details and instance IDs stay on the server, outside public room state/replays.
+
+## Rollout and rollback
+
+Without `AI_CODEX_INSTANCES`, existing single-instance environment variables and
+the existing MongoDB lease ID continue to work. Setting an invalid or empty pool
+configuration disables allocation rather than silently using the legacy account.
+
+Before enabling a pool, drain all existing AI games and stop the old backend.
+Use stable instance IDs and the same configuration on backend replicas; changing
+IDs creates new lease identities. Do not overlap old single-instance backends
+with a pool containing that same physical account, or rename/reassign instances
+while games are active. Restart only after active games and reviews have ended.
+Rolling back to legacy mode likewise requires draining/stopping the pool first.
+
+This change does not provision or authenticate additional accounts and does not
+modify production configuration automatically.

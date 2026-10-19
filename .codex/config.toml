@@ -1,0 +1,19 @@
+# Local tests need temporary TCP listeners (MongoDB, HTTP and browser fixtures).
+# Preserve workspace filesystem protections and keep external networking filtered.
+default_permissions = "avalon-local"
+
+[features]
+network_proxy = true
+
+[permissions.avalon-local]
+description = "Avalon workspace editing and loopback test services."
+extends = ":workspace"
+
+[permissions.avalon-local.network]
+enabled = true
+allow_local_binding = true
+
+[permissions.avalon-local.network.domains]
+"localhost" = "allow"
+"127.0.0.1" = "allow"
+"::1" = "allow"

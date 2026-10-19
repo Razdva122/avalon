@@ -1,10 +1,21 @@
 import net from 'node:net';
+import { existsSync } from 'node:fs';
 import { MongoMemoryServer } from 'mongodb-memory-server-core';
 import * as ports from 'mongodb-memory-server-core/lib/util/getport';
 import { createTestMongo } from './mongo';
 
 jest.setTimeout(30000);
 afterEach(() => jest.restoreAllMocks());
+
+test('uses loopback TCP without creating an additional Unix socket', async () => {
+  const mongo = await createTestMongo();
+  try {
+    expect(new URL(mongo.getUri()).hostname).toBe('127.0.0.1');
+    expect(existsSync(`/tmp/mongodb-${mongo.instanceInfo!.port}.sock`)).toBe(false);
+  } finally {
+    await mongo.stop();
+  }
+});
 
 test('starts MongoDB on another port when the selected port is occupied before mongod binds', async () => {
   const occupied = net.createServer();

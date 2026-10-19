@@ -137,6 +137,18 @@ the relevant mission/proposal in their sources. These instructions do not impose
 server-selected teams or votes. Prompt-routing tests do not establish stronger
 model play; improvements need model evaluation on recorded situations.
 
+For first-mission two-seat team selection, both difficulties receive a private
+random partner priority, assigned independently to each bot without using roles.
+It stays fixed in that room through discussion, final selection, rejected opening
+proposals and technical retries. Only comparably safe and strategically equivalent
+partners use this tie-break; private knowledge, concrete mission risk and actual
+coalition evidence take priority. Good must not prefer known Evil over a safer
+unresolved partner merely because of the order. Bots must not publish the order or
+invent trust evidence for it. The server supplies a preference, never substitutes
+a roster or adds a model call. Other stages, later missions and three-seat openings
+do not receive the priority or advice. See the
+[saved-position evaluation](ai-evaluations/2026-10-19-opening-priority/README.md).
+
 Team decisions receive the score before each completed mission, the actual
 approvers of its accepted proposal, the next leader after a rejection, and
 sourced contrasts between a voter's support with and without a candidate.
@@ -316,14 +328,12 @@ without a mandatory speech or pass step of their own. This guard also applies
 during asynchronous state persistence. Good humans can
 read the council in the common chat but do not get an Evil council turn.
 
-### Session-history A/B measurement
+### Independent requests
 
-New games alternate globally between standard independent requests and isolated
-per-bot session history with exact incremental input. The private assignment is
-fixed for the match, including technical resumes; reviews stay independent in both
-arms. Quota snapshots and per-request usage are recorded in MongoDB, including
-paused/stopped games and unknown usage after failed calls. Comparable settings are
-reported separately. See [deployment and private report](../deploy/codex-production.md#balanced-bot-session-experiment-2026-10-15).
+Each decision and post-game review starts a fresh Codex request. The backend
+supplies current game state and bounded private notes for that player. Request
+costs, cache usage, retries and unknown usage remain in `ai_request_costs`; private
+inputs and outputs remain in `ai_decision_traces` with their existing retention.
 
 ## Beginner post-game review
 

@@ -155,3 +155,58 @@ test('SSH request failure also gets exactly one retry', async () => {
   expect(JSON.parse((await runCodex('game', codexSchema(['approve'], false))).text).speech).toBe('recovered');
   expect(await readFile(counter, 'utf8')).toBe('2');
 });
+
+test('parallel instance quotas, catalogs and independent decisions route to their own workers', async () => {
+  const { configuredCodexInstances, withCodexInstance } = await import('./codex-instances');
+  const { getCodexWeeklyLimit } = await import('./codex-limits');
+  process.env.AI_CODEX_INSTANCES = JSON.stringify(
+    ['one', 'two'].map((id) => ({
+      id,
+      ssh: {
+        host: `${id}.pool.example`,
+        user: 'avalon-codex',
+        key: '/secrets/key',
+        knownHosts: '/secrets/known_hosts',
+      },
+    })),
+  );
+  const calls = join(directory, 'calls');
+  await executable(`
+    const fs=require('node:fs');const host=process.argv.at(-2);let input='';
+    process.stdin.on('data',d=>input+=d);process.stdin.on('end',()=>{
+      const r=JSON.parse(input);fs.appendFileSync(${JSON.stringify(calls)},JSON.stringify({host,request:r})+'\\n');
+      const first=host.includes('one.pool');
+      let result;
+      if(r.operation==='models') result={models:[{slug:first?'model-one':'model-two',visibility:'list',supported_reasoning_levels:[{effort:'low'}]}]};
+      else if(r.operation==='limits')result={rateLimits:{primary:{usedPercent:first?10:30,windowDurationMins:300},secondary:{usedPercent:first?20:40,windowDurationMins:10080}}};
+      else result={text:host,usage:{input_tokens:1}};
+      setTimeout(()=>console.log(JSON.stringify({ok:true,result})),first?15:1);
+    });
+  `);
+  const instances = configuredCodexInstances();
+  const results = await Promise.all(
+    instances.map((instance) =>
+      withCodexInstance(instance, async () => {
+        const [models, quota] = await Promise.all([getCodexModels(), getCodexWeeklyLimit()]);
+        const first = await runCodex('game', codexSchema(['approve'], false));
+        await runCodex('game two', codexSchema(['approve'], false));
+        return { model: models[0].id, remaining: quota?.remainingPercent, decision: first.text };
+      }),
+    ),
+  );
+  expect(results).toEqual([
+    { model: 'model-one', remaining: 80, decision: 'avalon-codex@one.pool.example' },
+    { model: 'model-two', remaining: 60, decision: 'avalon-codex@two.pool.example' },
+  ]);
+  const requests = (await readFile(calls, 'utf8'))
+    .trim()
+    .split('\n')
+    .map((line) => JSON.parse(line));
+  for (const host of ['one.pool.example', 'two.pool.example']) {
+    const own = requests.filter((r) => r.host.endsWith(host)).map((r) => r.request);
+    const decisions = own.filter((r) => r.operation === 'decide');
+    expect(decisions).toHaveLength(2);
+    expect(own.map((r) => r.operation).sort()).toEqual(['decide', 'decide', 'limits', 'models']);
+  }
+  expect(process.env.AI_CODEX_SSH_HOST).toBe('worker.example');
+});
