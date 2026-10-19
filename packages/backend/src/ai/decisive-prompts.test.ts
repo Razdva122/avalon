@@ -23,7 +23,7 @@ test.each(['regular', 'smart'] as const)(
       expect(instructions).toContain('getting another result is not itself a benefit');
       expect(instructions).toContain('passing up an immediate winning Fail');
       expect(instructions).toContain('one Evil cannot fail a two-Fail mission');
-      expect(instructions).toContain('votingPatterns');
+      expect(instructions).toContain('Read the actual recorded votes across proposals:');
       expect(instructions).toContain('Unanswered questions');
       expect(instructions).toContain('proposal.nextLeader');
       expect(instructions).toContain('previous approvers');

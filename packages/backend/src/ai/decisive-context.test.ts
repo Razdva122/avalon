@@ -6,24 +6,49 @@ import { publicContext } from './pipeline';
 const request = () =>
   structuredClone(fixture.cases.find((entry) => entry.id === 'm5-gambler-vote')!.request) as unknown as BotRequest;
 
-test('forced proposals neither invent mission approvers nor enter voting pattern sources', () => {
+test('private and public contexts retain recorded votes without derived voting summaries', () => {
+  const input = request();
+  for (const context of [compactRequest(input), publicContext(input, 'reject')]) {
+    for (const field of ['offTeamApprovals', 'offTeamVotingPatterns', 'votingPatterns']) {
+      expect(context).not.toHaveProperty(field);
+    }
+    expect(context.votes).toHaveLength(8);
+    expect(context.votes).toContainEqual(
+      expect.objectContaining({
+        mission: 4,
+        attempt: 2,
+        team: [2, 3, 6],
+        votes: [
+          [1, 'approve'],
+          [2, 'approve'],
+          [3, 'approve'],
+          [4, 'reject'],
+          [5, 'reject'],
+          [6, 'reject'],
+        ],
+      }),
+    );
+  }
+});
+
+test('forced proposals neither invent mission approvers nor cast votes', () => {
   const input = request();
   input.state.history = input.state.history.map((event) =>
     event.type === 'vote' ? { ...event, forced: true } : event,
   );
   const context = compactRequest(input);
   expect(context.missions.every((mission) => mission.approvers === undefined)).toBe(true);
-  expect(context.votingPatterns).toEqual([]);
+  expect(context.votes.every((vote) => vote.votes === 'automatic: no vote cast')).toBe(true);
 });
 
-test('anonymous vote totals cannot identify approvers or selective supporters', () => {
+test('anonymous vote totals cannot identify individual approvers', () => {
   const input = request();
   input.state.history = input.state.history.map((event) =>
     event.type === 'vote' ? { ...event, anonymous: true, votes: { approve: 4, reject: 2 } } : event,
   );
   const context = compactRequest(input);
   expect(context.missions.every((mission) => mission.approvers === undefined)).toBe(true);
-  expect(context.votingPatterns).toEqual([]);
+  expect(context.votes.every((vote) => !Array.isArray(vote.votes))).toBe(true);
 });
 
 test('a completed mission cannot borrow the approving coalition of a different roster', () => {
@@ -57,7 +82,7 @@ test('public mission context retains factual cues without exposing private cards
   });
   expect(context).not.toHaveProperty('privateKnowledge');
   expect(context.missions.every((mission) => !('yourCard' in mission) && !('cards' in mission))).toBe(true);
-  expect(context.votingPatterns).toEqual(privateContext.votingPatterns);
+  expect(context.votes).toEqual(privateContext.votes);
 });
 
 test('a successful two-Fail mission retains its threshold and Fail count at two prior failures', () => {

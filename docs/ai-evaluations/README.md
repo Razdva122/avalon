@@ -9,6 +9,8 @@ One-off runners and JSON/JSONL exports were removed during YAGNI cleanup on
 - [Expanded Mordred Lady study](2026-10-17-mordred-lady-expanded/README.md): 14 saved decisions, linked announcements and explicit truthful-Evil plan comparisons.
 - [Mordred predictability](2026-10-17-mordred-predictability/README.md): paired Lady continuations, historical-control limits and current-rule winning checks.
 - [Decisive Good-player choices](2026-10-15-decisive/README.md): retained backend regression fixture and evaluator.
+- [Voting-summary ablation](2026-10-19-voting-summaries/README.md): 36 paired-condition replies on six selected positions from four games, with and without server-derived voting summaries.
+- [Context volume](2026-10-19-context-volume/README.md): conditional advice, duplicate removal, lossless accepted chat and matching response limits; six saved positions.
 - [Prompt duplication](2026-10-15-prompt-dedup/README.md): measured text reduction.
 - [Prompt caching](2026-10-15-prompt-cache/README.md): transport comparison and cache limits.
 - [Initial Codex prototype](2026-10-01-codex/README.md): historical incomplete game and format diagnosis.

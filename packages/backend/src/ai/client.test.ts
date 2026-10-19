@@ -67,11 +67,11 @@ test.each(['selectTeam', 'onMission'])('compact %s context strips internal IDs a
   });
   expect(compact.votes?.length).toBe(25);
   expect(compact.chat?.length).toBe(14);
-  expect(compact.chat!.every((m) => m.text.length <= 240)).toBe(true);
+  expect(compact.chat!.every((m) => m.text === 'a'.repeat(500))).toBe(true);
   const serialized = JSON.stringify(compact);
   expect(serialized).not.toContain('internal-id');
   expect(serialized).not.toContain('private-room-identifier');
-  expect(serialized.length).toBeLessThan(10000);
+  expect(serialized.length).toBeLessThan(15000);
 });
 
 test('explicit action labels resolve to the exact legal action, not a guessed numeric index', () => {

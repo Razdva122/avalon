@@ -572,7 +572,7 @@ test('intentional claim survives public hygiene and other bots choose their publ
     .mockResolvedValueOnce({ choice: 0, speech: 'The voting record contradicts 1.' });
   const result = await decisionPipeline(generate)(r);
   expect(result.speech).toBe('The voting record contradicts 1.');
-  expect(generate.mock.calls[0][1].context.requiredClaimStances).toEqual([]);
+  expect(generate.mock.calls[0][1].context).not.toHaveProperty('requiredClaimStances');
   expect(result.speech).not.toContain('mordred');
   const invalid = jest.fn().mockResolvedValue({ choice: 0, speech: 'Skip the claim.' });
   expect((await decisionPipeline(invalid)(r)).speech).toBe('');

@@ -78,7 +78,7 @@ export const openingTieBreakAdvice =
 export const decisiveTeamAdvice =
   'Good team risk comparison: before choosing, weigh the strongest evidence FOR and AGAINST the exact roster against one reachable alternative. Replacing a reliably Good seat, including yourself, with another unresolved seat needs distinguishing evidence for the whole roster; a mistaken argument alone does not justify that extra exposure. An information bet must name which remaining hypotheses its outcomes would distinguish and why that benefit outweighs the risk of another failure: getting another result is not itself a benefit. After a failure, a personality preference for experimentation cannot replace this comparison. ' +
   "Read completedMissions.scoreBefore: a Success after two failures is much stronger behavioral evidence than an early Success, because passing up an immediate winning Fail is costly to Evil. It is not proof of alignment and never overrides reliable Evil knowledge. Apply that mission's failsRequired: one Evil cannot fail a two-Fail mission, so its success cannot clear every participant. Compare the risk of adding an untested suspect with retaining players from these decisive successes. " +
-  'Read votingPatterns together with the actual votes: repeated support when a candidate is present and rejection when absent is a sourced behavioral pattern, not a role revelation. If you know or strongly infer that a supporter is Evil, selective support is evidence AGAINST that candidate, especially when sabotage wins immediately; do not dismiss it merely because it is not proof. Keep privately deduced alignments separate from public testimony. ' +
+  'Read the actual recorded votes across proposals: repeated support when a candidate is present and rejection when absent is a sourced behavioral pattern, not a role revelation. If you know or strongly infer that a supporter is Evil, selective support is evidence AGAINST that candidate, especially when sabotage wins immediately; do not dismiss it merely because it is not proof. Keep privately deduced alignments separate from public testimony. ' +
   'Unanswered questions and mistaken arguments are weak behavioral clues, not stronger than decisive mission incentives and consistent opposing votes. Reassess your leading accusation before excluding someone; personality and repeating an unanswered question do not improve its evidence. At two failures, state the decisive comparison in your private reason. ' +
   "Use proposal.nextLeader and proposal.fifthLeader when comparing reachable alternatives. Successful missions' previous approvers are a starting coalition to negotiate with, not promised future votes; include your own changed vote when comparing support. More total supporters does not mean safer, especially if the extra support comes from suspected Evil. On early proposals, use the remaining turns to persuade a missing voter for the better-supported roster rather than accept a weaker roster merely because opponents already support it. No fixed roster or vote is required.";
 
@@ -102,7 +102,7 @@ export const publicSpeechAdvice =
 
 export const tableConversationAdvice =
   'Continue the ongoing conversation: answer the latest relevant question or objection instead of restarting a generic team report or reciting your profile. Answer, negotiate, accuse, defend, ask, agree briefly or stay silent as useful; no required question, sentence pattern or emotion. Use natural language and bare seat numbers, within 240 characters. ' +
-  'Personality shapes risk and trust among plausible choices, pace, tone and persuasion; actual side, known facts and legal actions remain binding. State uncertainty when it changes the decision, without a repeated disclaimer. Your own alignment is private confidence, not a public reason for self-inclusion. Express agreement, frustration, warmth or a pointed objection only when earned; never manufacture events. Compare earlier humanStatements with actual votes and missions; offTeamVotingPatterns summarizes public votes, not proven alignment. A discussion choice is a preference before selection; the final leader chooses after the circle. Voting itself is silent.';
+  'Personality shapes risk and trust among plausible choices, pace, tone and persuasion; actual side, known facts and legal actions remain binding. State uncertainty when it changes the decision, without a repeated disclaimer. Your own alignment is private confidence, not a public reason for self-inclusion. Express agreement, frustration, warmth or a pointed objection only when earned; never manufacture events. Compare earlier humanStatements with actual votes and missions; recorded public votes do not prove alignment. A discussion choice is a preference before selection; the final leader chooses after the circle. Voting itself is silent.';
 
 export const merlinAuthorshipCheck =
   'Before publishing, privately check your argument from the viewpoint of a Good player with ONLY the public record and their own participation. Would that player have a reason for this exact preference now? Apply the same public standard to competing claims: if two Lady announcements are disputed, do not endorse the secretly correct one or dismiss the other without a distinguishing PUBLIC fact. Knowing the answer is not that fact. If challenged, answer from the record rather than switching to a new justification just to defend secret certainty. Keep unresolved public alternatives unresolved even when you privately know which is true. Choose with all your private knowledge, but explain only what the public evidence supports; a short preference or silence is available when no honest public explanation adds value. Do not announce this concealment check. Review your recent words AND votes: repeatedly excluding precisely the visible Evil, uniquely trusting the right claimant, or following clean teams from outside can expose you even without originating them. Compare that sequence with other plausible informed Good players: uniquely accurate off-team approvals can distinguish you even when you speak little. Among comparably safe and reachable options, vary how you contribute naturally: support an existing public case, ask a relevant question, negotiate, or let others lead. This is not a fixed rotation or a reason to randomize votes. Preserve a viable winning team; never fabricate evidence, sabotage or select a proven losing roster for cover. Evaluate the actual Fail threshold: one Evil cannot fail a two-Fail mission. Your public voice should still sound like your personality, not a generic cautious analyst.';
@@ -313,88 +313,18 @@ export function compactRequest(request: BotRequest) {
           : undefined,
     };
   });
-  // Public behavior only: keep both denominators and contrary votes, never assign an alignment.
-  const votingPatterns = seats.flatMap(({ index: voter }) => {
-    const castVotes = votes.slice(-25).flatMap((vote) => {
-      if (vote.forced || !Array.isArray(vote.votes)) return [];
-      const value = vote.votes.find(([seat]) => seat === voter)?.[1];
-      return value === 'approve' || value === 'reject' ? [{ ...vote, value }] : [];
-    });
-    return seats.flatMap(({ index: candidate }) => {
-      if (candidate === voter) return [];
-      const counts = (included: boolean) => {
-        const group = castVotes.filter((vote) => vote.team.includes(candidate) === included);
-        return {
-          approve: group.filter((vote) => vote.value === 'approve').length,
-          reject: group.filter((vote) => vote.value === 'reject').length,
-        };
-      };
-      const withCandidate = counts(true),
-        withoutCandidate = counts(false);
-      if (
-        withCandidate.approve < 2 ||
-        withoutCandidate.reject < 2 ||
-        withCandidate.approve * (withoutCandidate.approve + withoutCandidate.reject) <=
-          withoutCandidate.approve * (withCandidate.approve + withCandidate.reject)
-      )
-        return [];
-      return [
-        {
-          voter,
-          candidate,
-          withCandidate,
-          withoutCandidate,
-          sources: castVotes.map(({ mission, attempt }) => ({ mission, attempt })),
-        },
-      ];
-    });
-  });
   const checks = history.filter((e) => e.type === 'announceLoyalty');
-  // Public voting facts only; a rejected proposal never inherits a later mission's result.
-  const offTeamApprovals = votes.slice(-25).flatMap((v) => {
-    if (v.forced || !Array.isArray(v.votes)) return [];
-    const approvingSeats = v.votes.flatMap(([voter, value]) =>
-      typeof voter === 'number' && value === 'approve' && !v.team.includes(voter) ? [voter] : [],
-    );
-    if (!approvingSeats.length) return [];
-    const mission = v.result === 'approve' ? missions.find((m) => m.n === v.mission) : undefined;
-    return [
-      {
-        mission: v.mission,
-        attempt: v.attempt,
-        team: v.team,
-        seats: approvingSeats,
-        proposalResult: v.result,
-        missionResult: mission?.result,
-        fails: mission?.fails,
-      },
-    ];
-  });
-  const offTeamVotingPatterns = seats.flatMap(({ index }) => {
-    const support = offTeamApprovals.filter((v) => v.seats.includes(index));
-    if (!support.length) return [];
-    return [
-      {
-        seat: index,
-        approvals: support.length,
-        soleApprovals: support.filter((v) => v.seats.length === 1).length,
-        failedMissionApprovals: support.filter((v) => v.missionResult === 'fail').length,
-        supportedSeats: seats.flatMap(({ index: partner }) => {
-          const approvals = support.filter((v) => v.team.includes(partner)).length;
-          return approvals ? [{ seat: partner, approvals }] : [];
-        }),
-      },
-    ];
-  });
   const humanSeats = (request.humanPlayerIDs ?? (request.humanPlayerID ? [request.humanPlayerID] : []))
     .map((id) => seat(id))
     .filter((index) => index !== undefined);
+  const recentMessages = new Set(end || assassination ? [] : request.chat.slice(-14));
   const humanMessages = request.chat.filter((m) => humanSeats.includes(Number(m.name)));
   // Keep opening evidence and recent revisions even when bot dialogue displaces the recent chat.
   // ponytail: bounded to 24 human statements; larger histories need a sourced testimony summary.
   const humanStatements = humanMessages
     .filter((_, i) => i < 8 || i >= humanMessages.length - 16)
-    .map((m) => ({ by: Number(m.name), text: m.text.slice(0, 600), status: 'claim' as const }));
+    .filter((m) => !recentMessages.has(m))
+    .map((m) => ({ by: Number(m.name), text: m.text.slice(0, 2000), status: 'claim' as const }));
   const failsRequired = state.settings?.missions[state.mission]?.failsRequired;
   const lastCompletedMission = missions[missions.length - 1]?.n ?? 0;
   return {
@@ -483,9 +413,6 @@ export function compactRequest(request: BotRequest) {
     // The first two lists are authoritative event classes, never interchangeable.
     missions: missionFacts,
     votes: votes.slice(-25),
-    offTeamApprovals: state.stage === 'onMission' ? undefined : offTeamApprovals,
-    offTeamVotingPatterns: state.stage === 'onMission' ? undefined : offTeamVotingPatterns,
-    votingPatterns: voting ? votingPatterns : undefined,
     humanStatements: state.stage === 'onMission' ? undefined : humanStatements,
     checks: checks.map((e) => ({
       by: seat(e.announcerID),
@@ -510,7 +437,7 @@ export function compactRequest(request: BotRequest) {
     chat:
       end || assassination
         ? undefined
-        : request.chat.slice(-14).map((m) => ({ by: m.name, text: m.text.slice(0, 240) })),
+        : request.chat.slice(-14).map((m) => ({ by: m.name, text: m.text.slice(0, 2000) })),
     choices: request.choices,
     result: end ? state.result : undefined,
   };
@@ -532,7 +459,7 @@ export function parseReply(text: string, choices: number | string[], maxSpeech =
 }
 
 export function parseDecisionReply(text: string, choices: string[], request?: BotRequest): BotReply {
-  const reply = parseReply(text, choices);
+  const reply = parseReply(text, choices, 240);
   const data = JSON.parse(text.replace(/^```(?:json)?\s*|\s*```$/g, ''));
   const bounded = (value: unknown, max: number) =>
     typeof value === 'string' && value.trim().length > 0 && value.length <= max;
@@ -540,7 +467,7 @@ export function parseDecisionReply(text: string, choices: string[], request?: Bo
     typeof data.publicReason !== 'string' ||
     data.publicReason.length > 240 ||
     !Array.isArray(data.evidence) ||
-    data.evidence.length > 6 ||
+    data.evidence.length > 3 ||
     data.evidence.some(
       (item: DecisionEvidence) =>
         !item ||

@@ -62,9 +62,6 @@ export function publicContext(request: BotRequest, choice: string) {
       approvers,
     })),
     votes: c.votes,
-    offTeamApprovals: c.offTeamApprovals,
-    offTeamVotingPatterns: c.offTeamVotingPatterns,
-    votingPatterns: c.votingPatterns,
     checks: c.checks.map(({ by, target, announced }) => ({ by, target, announced })),
     chat: c.chat,
   };
@@ -200,6 +197,8 @@ function isOpeningPair(request: BotRequest) {
 }
 
 export function decisionInstructions(request: BotRequest, commonOnly = false) {
+  const role = request.state.players?.find((p) => p.id === request.playerID)?.role;
+  const evil = ['mordred', 'morgana', 'minion', 'oberon'].includes(role || '');
   const regularTeam =
     request.botDifficulty === 'regular' && ['selectTeam', 'votingForTeam'].includes(request.state.stage);
   const assessLadyChoice =
@@ -220,16 +219,17 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
         ? 'Privately check in order: (1) For voting, evaluate ONLY actionFacts.team, the current proposedTeam; for selection, evaluate the exact legal roster you choose. Never substitute an earlier preferred team. (2) Use your own side, privateKnowledge and completed mission deductions; success or testimony cannot erase known Evil. (3) Count known and possible Evil against missionRule.failureAtLeast: enough Evil CAN sabotage, not necessarily WILL; one Evil cannot fail a two-Fail mission, but unknown teammates may supply another. (4) Choose for your actual side. Good normally avoids established sabotage risk when a safer reachable roster exists; Evil seeks sabotage access or concrete cover. (5) Before Reject, compare one reachable alternative and proposal.fifthLeader; only rejecting proposal 4 immediately forces proposal 5. Your own inclusion does not clear others. If off-team as Good, at most alignmentCounts.good - 1 Good can be inside. Before an information bet, name which possible result would distinguish your hypotheses; a known saboteur can explain another Fail without accusing new teammates. At two failures prioritize survival. If repeating a rejected roster, give a new public reason that could persuade a missing voter. Never publish these private checks.'
         : coalitionAdvice +
           ' Distinguish unresolved rosters from established sabotage risk. Persuade a missing voter with specific public evidence or a compromise; repeating the same question is not a new coalition plan.') +
-      ' ' +
-      evilTeamAdvice
+      (evil ? ' ' + evilTeamAdvice : '')
     : request.state.stage === 'onMission'
       ? "Evil card advice: compare sabotage with a concrete future benefit of cover using score and failsRequired. Infer teammates' likely cards from their public words, recorded votes, completed missions and current incentives; keep these predictions uncertain. There is no prearranged sabotage convention or designated saboteur; seat numbers do not assign cards. Compare your card's effect if others play Success or Fail, including redundant exposure and the risk of too few Fails. Allies' future cards remain unknown; unresolved teammates may also be Evil and act independently. Oberon does not know allies. Weigh early exposure against cover, and prioritize a decisive sabotage over trust for a round that may never occur. Too few Evil cannot meet a two-Fail threshold."
       : request.state.stage === 'assassinate'
         ? assassinationCheck
         : request.state.stage === 'checkLoyalty'
-          ? `${ladyInspectionAdvice} ${ladyTransferPreference} ${evilLadyAdvice}`
+          ? `${ladyInspectionAdvice} ${ladyTransferPreference}${evil ? ' ' + evilLadyAdvice : ''}`
           : request.state.stage === 'announceLoyalty'
-            ? evilLadyAdvice
+            ? evil
+              ? evilLadyAdvice
+              : ''
             : '';
   const common =
     languageInstruction(request.language) +
@@ -261,8 +261,7 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
     ' ' +
     (request.speak ? publicSpeechAdvice : '') +
     (request.speak && request.style
-      ? ' Perform this current character in publicReason; earlier chat supplies facts, not a neutral voice to imitate: ' +
-        request.style
+      ? ' Perform personality in publicReason; earlier chat supplies facts, not a neutral voice to imitate.'
       : '') +
     (isOpeningPair(request) ? ' ' + openingTieBreakAdvice : '') +
     ' Return JSON choice, speech (private reason, <=240 characters), publicReason (your actual public words, <=240 characters), evidence (at most 3 changed notes with key/kind/fact/source/certainty). Use claim certainty for hypotheses and testimony, bluff for deliberate deception. No unchanged evidence dump. Public words are published directly, without a rewrite or added sentences. Silence is allowed during the full public circle; the sole leader on a repeat proposal must explain their roster.'
@@ -325,7 +324,7 @@ export function decisionPipeline(generate: Generate): Decide {
       const decisionRequest = request;
       const requiresExplanation =
         request.speak && request.state.stage === 'selectTeam' && request.state.vote > 0 && !request.publicDiscussion;
-      const { missions, votes, ...facts } = compactRequest(decisionRequest);
+      const { missions, votes, tableConventions, requiredClaimStances, ...facts } = compactRequest(decisionRequest);
       let priority: number[] | undefined;
       if (own && isOpeningPair(request)) {
         priority = openingPriorities.get(request.playerID);
@@ -436,10 +435,10 @@ export function decisionPipeline(generate: Generate): Decide {
               public: Boolean(request.speak),
               optionalAnnouncement: Boolean(request.optionalSpeech),
               claimTargets: [...current.claimTargets],
-              requiredClaimStances: [...current.requiredClaimStances],
+              requiredClaimStances: [...requiredClaimStances],
               mandatoryText: '',
             },
-            tableConventions: current.tableConventions,
+            tableConventions,
           },
         ];
         // Keep early assumptions and recent turning points without replaying the whole conversation.

@@ -42,7 +42,7 @@ test('human warnings and free-form role testimony survive bot chatter without te
   );
 });
 
-test('retains early human evidence and recent revisions with bounded text', () => {
+test('retains early human evidence and recent revisions once without truncating accepted text', () => {
   const current = {
     ...request,
     chat: Array.from({ length: 40 }, (_, i) => ({ name: '2', text: `${i}: ${'x'.repeat(1000)}` })),
@@ -50,10 +50,12 @@ test('retains early human evidence and recent revisions with bounded text', () =
   const context = compactRequest(current);
   expect(context).toMatchObject({ humanStatements: expect.any(Array) });
   const statements = (context as unknown as { humanStatements: { text: string }[] }).humanStatements;
-  expect(statements).toHaveLength(24);
+  expect(statements).toHaveLength(10);
   expect(statements[0].text).toMatch(/^0:/);
-  expect(statements[statements.length - 1].text).toMatch(/^39:/);
-  expect(statements.every((s) => s.text.length <= 600)).toBe(true);
+  expect(statements[statements.length - 1].text).toMatch(/^25:/);
+  expect(context.chat![13].text).toMatch(/^39:/);
+  expect([...statements, ...context.chat!]).toHaveLength(24);
+  expect(statements.every((s) => s.text.endsWith('x'.repeat(1000)))).toBe(true);
 });
 
 test('all-bot games and secret mission turns do not add human testimony', () => {

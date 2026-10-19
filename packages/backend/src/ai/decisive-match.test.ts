@@ -8,13 +8,6 @@ const request = (id: string) => structuredClone(saved(id).request) as unknown as
 type Cues = {
   missions: { n: number; scoreBefore?: { successes: number; failures: number }; approvers?: number[] }[];
   proposal?: { nextLeader?: number };
-  votingPatterns?: {
-    voter: number;
-    candidate: number;
-    withCandidate: { approve: number; reject: number };
-    withoutCandidate: { approve: number; reject: number };
-    sources: { mission: number; attempt: number }[];
-  }[];
 };
 const cues = (input: BotRequest) => compactRequest(input) as unknown as Cues;
 
@@ -34,35 +27,6 @@ test('the final first proposal identifies the next leader rather than the fifth 
   expect(cues(request('m5-gambler-vote')).proposal).toMatchObject({ nextLeader: 4 });
 });
 
-test('the final vote exposes repeated support for seat three without inferring alignment', () => {
-  const context = cues(request('m5-gambler-vote'));
-  expect(context.votingPatterns).toContainEqual({
-    voter: 1,
-    candidate: 3,
-    withCandidate: { approve: 3, reject: 0 },
-    withoutCandidate: { approve: 1, reject: 4 },
-    sources: [
-      { mission: 1, attempt: 1 },
-      { mission: 2, attempt: 1 },
-      { mission: 2, attempt: 2 },
-      { mission: 2, attempt: 3 },
-      { mission: 3, attempt: 1 },
-      { mission: 4, attempt: 1 },
-      { mission: 4, attempt: 2 },
-      { mission: 4, attempt: 3 },
-    ],
-  });
-});
-
-test('voting summaries depend on public votes rather than the observer visible roles', () => {
-  const input = request('m5-gambler-vote');
-  const alternativeView = structuredClone(input);
-  alternativeView.state.players[0].role = 'evil';
-  alternativeView.state.players[2].role = 'evil';
-  expect(cues(input).votingPatterns).toBeDefined();
-  expect(cues(alternativeView).votingPatterns).toEqual(cues(input).votingPatterns);
-});
-
 test.each(['forced', 'anonymous'])('%s acceptance does not supply an invented approving coalition', (kind) => {
   const input = request('m5-gambler-vote');
   input.state.history = input.state.history.map((event) =>
@@ -75,21 +39,18 @@ test.each(['forced', 'anonymous'])('%s acceptance does not supply an invented ap
   expect(mission?.approvers).toBeUndefined();
 });
 
-test('forced proposals with stale named votes do not create a repeated support pattern', () => {
-  const input = request('m5-gambler-vote');
-  for (const event of input.state.history) {
-    if (event.type === 'vote' && event.team.some((seat) => seat.id === '3')) event.forced = true;
-  }
-  expect(cues(input).votingPatterns?.find((pattern) => pattern.voter === 1 && pattern.candidate === 3)).toBeUndefined();
-});
-
 test.each(fixture.cases.map((entry) => [entry.id]))(
   '%s preserves legal choices and all delivered human testimony',
   (id) => {
     const entry = saved(id);
     const context = compactRequest(request(id));
     expect(context.choices).toEqual(entry.request.choices);
-    expect(context.humanStatements).toEqual(entry.original.context.humanStatements);
+    const testimony = [...(context.humanStatements || []), ...(context.chat || [])];
+    for (const statement of entry.original.context.humanStatements) {
+      expect(testimony.some((m) => String(m.by) === String(statement.by) && m.text.startsWith(statement.text))).toBe(
+        true,
+      );
+    }
     expect(context.chat).toEqual(entry.original.context.chat);
     expect(context.privateKnowledge?.rolesVisibleToYou).toEqual(
       entry.original.context.privateKnowledge.rolesVisibleToYou,
@@ -130,6 +91,10 @@ test('saved-position evaluation restores the original notes and leaves a legal m
       entry.original.context.privateKnowledge.rolesVisibleToYou,
     );
     expect(context.choices).toEqual(entry.request.choices);
+    for (const field of ['offTeamApprovals', 'offTeamVotingPatterns', 'votingPatterns']) {
+      expect(context).not.toHaveProperty(field);
+      expect(prompt).not.toContain(field);
+    }
     return {
       text: JSON.stringify({
         choice: entry.original.choice,

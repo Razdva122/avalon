@@ -43,7 +43,8 @@ test('publishes a model-understood human claim and remembers its position after 
   expect(contexts[0]).toMatchObject({
     publicRoleClaims: [],
     claimStanceTargets: [2, 3],
-    humanStatements: [{ by: 2, text: request.chat[0].text, status: 'claim' }],
+    humanStatements: [],
+    chat: [{ by: '2', text: request.chat[0].text }],
   });
   const later = {
     ...request,
@@ -98,7 +99,6 @@ test('published structured bot claims survive without parsing their chat and rem
   expect((await decide(other)).speech).toBe('This fits the record.');
   expect(contexts[1]).toMatchObject({
     publicRoleClaims: [{ by: 1, target: 3, status: 'claim' }],
-    requiredClaimStances: [],
   });
 });
 
@@ -109,6 +109,7 @@ test('a textual retraction is left to the model, not silently converted to an ac
   };
   expect(compactRequest(r)).toMatchObject({
     publicRoleClaims: [],
-    humanStatements: [{ text: request.chat[0].text }, { text: 'Отзываю вскрытие, это была проверка реакции.' }],
+    humanStatements: [],
+    chat: [{ text: request.chat[0].text }, { text: 'Отзываю вскрытие, это была проверка реакции.' }],
   });
 });

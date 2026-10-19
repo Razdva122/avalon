@@ -213,7 +213,8 @@ test.each<AiLanguage>(['en', 'ru', 'zh-tw'])(
       privateReason: 'Reject the prior teammate.',
     });
     expect(generate).toHaveBeenCalledTimes(1);
-    expect(generate.mock.calls[0][1].context).toMatchObject({ claimTargets: [], requiredClaimStances: [] });
+    expect(generate.mock.calls[0][1].context).toMatchObject({ claimTargets: [] });
+    expect(generate.mock.calls[0][1].context).not.toHaveProperty('requiredClaimStances');
   },
 );
 

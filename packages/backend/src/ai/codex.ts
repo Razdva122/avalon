@@ -23,7 +23,16 @@ export function codexEnabled() {
 }
 
 export function buildCodexPrompt(instructions: string | undefined, context: unknown, cacheInstructions?: string) {
-  const prefix = CODEX_HEADER + (instructions || '') + CODEX_CLAIM_GUIDE;
+  const claimGuide =
+    context &&
+    typeof context === 'object' &&
+    ['claimTargets', 'claimStanceTargets'].some((key) => {
+      const targets = (context as Record<string, unknown>)[key];
+      return Array.isArray(targets) && targets.length > 0;
+    })
+      ? CODEX_CLAIM_GUIDE
+      : '';
+  const prefix = CODEX_HEADER + (instructions || '') + claimGuide;
   return {
     prompt: prefix + '\nGAME INPUT:\n' + JSON.stringify(context),
     instructions: cacheInstructions === undefined ? prefix : CODEX_HEADER + cacheInstructions,
@@ -34,7 +43,7 @@ export function codexSchema(choices: string[], details: boolean, review = false,
   const claims = request ? claimContext(request) : { targets: [], claimants: [], stanceTargets: [] };
   const evidence = {
     type: 'array',
-    maxItems: 6,
+    maxItems: 3,
     items: {
       type: 'object',
       additionalProperties: false,
@@ -50,7 +59,7 @@ export function codexSchema(choices: string[], details: boolean, review = false,
   };
   const properties = {
     choice: { type: 'string', enum: choices },
-    speech: { type: 'string', maxLength: review ? 800 : 500 },
+    speech: { type: 'string', maxLength: review ? 800 : details ? 240 : 500 },
     ...(details
       ? {
           publicReason: { type: 'string', maxLength: 240 },

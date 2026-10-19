@@ -137,6 +137,20 @@ the relevant mission/proposal in their sources. These instructions do not impose
 server-selected teams or votes. Prompt-routing tests do not establish stronger
 model play; improvements need model evaluation on recorded situations.
 
+The decision input includes personality once. Evil-specific team and Lady advice
+is sent only to Evil players; claim-format guidance is omitted when no claim or
+stance is available. Constant convention fields are omitted from generation,
+while historical review retains its constraints. Private decision reasons are
+limited to 240 characters and changed evidence to three notes, matching the
+instructions and response schema. Standalone replies and reviews keep their
+separate limits.
+
+Recent chat contains up to 14 messages, preserving each accepted message up to
+the server's 2000-character limit. Human testimony retains the first eight and
+last 16 human messages, excluding messages already present in recent chat.
+Assassination and post-game inputs omit chat but retain that human testimony.
+This avoids duplicate text without clipping long human arguments halfway through.
+
 For first-mission two-seat team selection, both difficulties receive a private
 random partner priority, assigned independently to each bot without using roles.
 It stays fixed in that room through discussion, final selection, rejected opening
@@ -151,11 +165,11 @@ do not receive the priority or advice. See the
 
 Team decisions receive the score before each completed mission, the actual
 approvers of its accepted proposal, the next leader after a rejection, and
-sourced contrasts between a voter's support with and without a candidate.
-Forced proposals and anonymous votes supply no individual supporters. These
-summaries contain public behavior, not inferred roles. Both difficulty profiles
-compare decisive successes, selective support from suspected Evil, and a
-reachable alternative before choosing. A Success when Evil already has two
+recorded votes. Off-team approval and selective-support summaries are not sent;
+bots assess voting patterns from the recorded votes themselves.
+Forced proposals and anonymous votes supply no individual supporters. Both
+difficulty profiles compare decisive successes, selective support from suspected
+Evil, and a reachable alternative before choosing. A Success when Evil already has two
 failures is stronger behavioral evidence than an opening Success; the mission's
 Fail threshold still matters and this does not prove alignment. Unanswered
 questions and personality preferences must be weighed against these signals.

@@ -29,7 +29,7 @@ test('structured output applies parser limits to evidence, including the failed 
   const schema = codexSchema(request.choices, true);
   expect(schema.properties.evidence!.items.properties.source.maxLength).toBe(160);
   expect(schema.properties.evidence!.items.properties.fact.maxLength).toBe(240);
-  expect(schema.properties.evidence!.maxItems).toBe(6);
+  expect(schema.properties.evidence!.maxItems).toBe(3);
   expect(schema.properties.choice.enum).toEqual(request.choices);
 });
 
