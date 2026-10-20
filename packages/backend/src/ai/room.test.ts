@@ -1119,6 +1119,8 @@ test.each([false, true])(
               act({ method: 'assassinate', type: 'merlin' });
               break;
           }
+          // A human action can start a new stage; let the bot loop handle its discussion first.
+          break;
         }
       }
       expect(room.ai?.status).toBe('finished');
