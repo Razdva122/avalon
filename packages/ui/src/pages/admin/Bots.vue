@@ -116,13 +116,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useAdminBotMessages } from './locales';
 import type { AiBotInstanceStatus, AiBotMode } from '@avalon/types';
 import type { BotQuotaThresholds } from '@avalon/types';
 import BotQuotaSettings from './BotQuotaSettings.vue';
 import { useBotDashboard } from '@/helpers/composables/useBotDashboard';
 
-const { locale } = useI18n();
+const { locale } = useAdminBotMessages();
 const { data, draftThresholds, loading, denied, error, refresh, saving, saveError, saved, saveThresholds } =
   useBotDashboard();
 async function save(thresholds: BotQuotaThresholds) {
