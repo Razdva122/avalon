@@ -661,7 +661,7 @@ test('all localized after-game messages stay out of prompts and vote-only messag
 
 test.each(['technical'] as const)(
   '%s resume preserves a partial public circle without duplicate speeches',
-  async (kind) => {
+  async () => {
     const { AiTechnicalPause } = await import('./client');
     const requests: BotRequest[] = [];
     let paused = false;
@@ -709,40 +709,37 @@ test('technical resume does not repeat Evil council advice', async () => {
   expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(0);
 });
 
-test.each(['technical'] as const)(
-  '%s resume retries final selection without repeating the public circle',
-  async (kind) => {
-    const { AiTechnicalPause } = await import('./client');
-    const requests: BotRequest[] = [];
-    let paused = false;
-    const room = new BotRoom(
-      'resume-selection',
-      'admin',
-      io,
-      async (request) => {
-        requests.push(request);
-        if (!paused && request.task.startsWith('Choose the final team')) {
-          paused = true;
-          throw new AiTechnicalPause('Output limit');
-        }
-        return reply(request);
-      },
-      async (state) => {
-        if (state.stage === 'started' && state.game.stage === 'onMission') room.stop();
-      },
-    );
-    await room.run();
-    expect(room.ai?.status).toBe('paused');
-    expect(room.chat.history).toHaveLength(7);
-    if (room.data.stage !== 'started') throw Error('not started');
-    expect(room.data.manager.game.players.every((player) => !player.features.isSelected)).toBe(true);
-    await room.run(true);
-    expect(requests.filter((request) => request.publicDiscussion)).toHaveLength(7);
-    expect(requests.filter((request) => request.task.startsWith('Choose the final team'))).toHaveLength(2);
-    expect(room.chat.history.filter((message) => message.message.startsWith('I propose'))).toHaveLength(1);
-    expect(room.data.manager.prepareStateForUser().history.filter((event) => event.type === 'vote')).toHaveLength(1);
-  },
-);
+test.each(['technical'] as const)('%s resume retries final selection without repeating the public circle', async () => {
+  const { AiTechnicalPause } = await import('./client');
+  const requests: BotRequest[] = [];
+  let paused = false;
+  const room = new BotRoom(
+    'resume-selection',
+    'admin',
+    io,
+    async (request) => {
+      requests.push(request);
+      if (!paused && request.task.startsWith('Choose the final team')) {
+        paused = true;
+        throw new AiTechnicalPause('Output limit');
+      }
+      return reply(request);
+    },
+    async (state) => {
+      if (state.stage === 'started' && state.game.stage === 'onMission') room.stop();
+    },
+  );
+  await room.run();
+  expect(room.ai?.status).toBe('paused');
+  expect(room.chat.history).toHaveLength(7);
+  if (room.data.stage !== 'started') throw Error('not started');
+  expect(room.data.manager.game.players.every((player) => !player.features.isSelected)).toBe(true);
+  await room.run(true);
+  expect(requests.filter((request) => request.publicDiscussion)).toHaveLength(7);
+  expect(requests.filter((request) => request.task.startsWith('Choose the final team'))).toHaveLength(2);
+  expect(room.chat.history.filter((message) => message.message.startsWith('I propose'))).toHaveLength(1);
+  expect(room.data.manager.prepareStateForUser().history.filter((event) => event.type === 'vote')).toHaveLength(1);
+});
 
 test.each([
   ['technical', 7],
@@ -1129,8 +1126,10 @@ test.each([false, true])(
       expect(requests.every((r) => !room.isHuman(r.playerID))).toBe(true);
       const lastPublicTurn = requests.filter((r) => r.state.stage === 'selectTeam').pop()!;
       expect(compactRequest(lastPublicTurn).humanStatements).toEqual([
-        expect.objectContaining({ text: 'Consider my proposed team.', status: 'claim' }),
-        ...(withFriend ? [expect.objectContaining({ text: 'Consider my friend proposal.', status: 'claim' })] : []),
+        expect.objectContaining({ text: 'Consider my proposed team.', id: expect.any(Number) }),
+        ...(withFriend
+          ? [expect.objectContaining({ text: 'Consider my friend proposal.', id: expect.any(Number) })]
+          : []),
       ]);
       expect(room.chat.history.filter((m) => m.userID === 'admin').map((m) => m.message)).toEqual([
         'Consider my proposed team.',

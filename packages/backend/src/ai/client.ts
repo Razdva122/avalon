@@ -1,8 +1,12 @@
 import { claimContext, validateClaims } from './claims';
 import { languageInstruction } from './language';
+import { humanTestimony, numericTestimonySource } from './testimony';
 import type { AiBotDifficulty, AiLanguage, VisualGameState } from '@avalon/types';
 
 export type BotRequest = {
+  // Live rooms read each human delta before making an action; legacy replay callers may opt out.
+  readAllChat?: boolean;
+  memoryOnly?: boolean;
   playerID: string;
   humanPlayerID?: string;
   humanPlayerIDs?: string[];
@@ -18,6 +22,8 @@ export type BotRequest = {
   speak: boolean;
   state: VisualGameState;
   chat: { id?: string; name: string; text: string }[];
+  // This observer's model-selected source groups; never shared between players or sent verbatim as metadata.
+  humanMemory?: BotRequest['chat'][];
   choices: string[];
   privateCheck?: string;
   evilEvidence?: { name: string; text: string }[];
@@ -323,14 +329,7 @@ export function compactRequest(request: BotRequest) {
   const humanSeats = (request.humanPlayerIDs ?? (request.humanPlayerID ? [request.humanPlayerID] : []))
     .map((id) => seat(id))
     .filter((index) => index !== undefined);
-  const recentMessages = new Set(end || assassination ? [] : request.chat.slice(-14));
-  const humanMessages = request.chat.filter((m) => humanSeats.includes(Number(m.name)));
-  // Keep opening evidence and recent revisions even when bot dialogue displaces the recent chat.
-  // ponytail: bounded to 24 human statements; larger histories need a sourced testimony summary.
-  const humanStatements = humanMessages
-    .filter((_, i) => i < 8 || i >= humanMessages.length - 16)
-    .filter((m) => !recentMessages.has(m))
-    .map((m) => ({ by: Number(m.name), text: m.text.slice(0, 2000), status: 'claim' as const }));
+  const humanStatements = humanTestimony(request, humanSeats, end || assassination);
   const failsRequired = state.settings?.missions[state.mission]?.failsRequired;
   const lastCompletedMission = missions[missions.length - 1]?.n ?? 0;
   return {
@@ -469,6 +468,17 @@ export function parseDecisionReply(text: string, choices: string[], request?: Bo
   const data = JSON.parse(text.replace(/^```(?:json)?\s*|\s*```$/g, ''));
   const bounded = (value: unknown, max: number) =>
     typeof value === 'string' && value.trim().length > 0 && value.length <= max;
+  if (request?.readAllChat && Array.isArray(data?.evidence)) {
+    for (const note of data.evidence) {
+      if (
+        note.kind === 'testimony' &&
+        (request.memoryOnly || Array.isArray(note.source) || note.key?.startsWith('t:'))
+      ) {
+        if (!/^t:[1-8]:.{1,54}$/u.test(note.key)) throw new AiTechnicalPause('Invalid testimony identity.');
+        note.source = numericTestimonySource(request, note.source, Number(note.key.split(':')[1]));
+      } else if (request.memoryOnly) throw new AiTechnicalPause('Memory must contain human testimony only.');
+    }
+  }
   if (
     typeof data.publicReason !== 'string' ||
     data.publicReason.length > 240 ||

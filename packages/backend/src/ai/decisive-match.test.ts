@@ -40,10 +40,15 @@ test.each(['forced', 'anonymous'])('%s acceptance does not supply an invented ap
 });
 
 test.each(fixture.cases.map((entry) => [entry.id]))(
-  '%s preserves legal choices and all delivered human testimony',
+  '%s preserves legal choices and selected historical human testimony',
   (id) => {
     const entry = saved(id);
-    const context = compactRequest(request(id));
+    const input = request(id);
+    input.humanMemory = input.chat
+      .filter((message) => entry.original.context.humanSeats.includes(Number(message.name)))
+      .slice(0, 8)
+      .map((message) => [message]);
+    const context = compactRequest(input);
     expect(context.choices).toEqual(entry.request.choices);
     const testimony = [...(context.humanStatements || []), ...(context.chat || [])];
     for (const statement of entry.original.context.humanStatements) {

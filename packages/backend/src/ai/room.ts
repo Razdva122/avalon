@@ -460,6 +460,7 @@ export class BotRoom extends Room {
     if (!agent) throw new AiTechnicalPause('Unknown AI agent profile.');
     const state = this.stateFor(id);
     const request: BotRequest = {
+      readAllChat: true,
       language: this.language,
       playerID: id,
       humanPlayerID: this.ai!.humanPlayerID,

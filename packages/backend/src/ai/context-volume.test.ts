@@ -42,7 +42,7 @@ test('recent testimony keeps the end of accepted messages without a duplicate hu
   expect(context.humanStatements).toEqual([]);
   input.chat.push(...Array.from({ length: 14 }, () => ({ name: '1', text: 'Другая реплика.' })));
   const later = compactRequest(input);
-  expect(later.humanStatements).toEqual([{ by: 5, text, status: 'claim' }]);
+  expect(later.humanStatements).toEqual([{ id: 1, by: 5, text }]);
 });
 
 test.each(['assassinate', 'end'] as const)('%s retains human testimony when recent chat is omitted', (stage) => {
@@ -51,7 +51,7 @@ test.each(['assassinate', 'end'] as const)('%s retains human testimony when rece
   input.chat = [{ name: '5', text: 'Важная поздняя реплика.' }];
   const context = compactRequest(input);
   expect(context.chat).toBeUndefined();
-  expect(context.humanStatements).toEqual([{ by: 5, text: 'Важная поздняя реплика.', status: 'claim' }]);
+  expect(context.humanStatements).toEqual([{ id: 1, by: 5, text: 'Важная поздняя реплика.' }]);
 });
 
 test('decision schema and parser share the instructed limits without changing standalone and review ceilings', () => {

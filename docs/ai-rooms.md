@@ -146,10 +146,54 @@ instructions and response schema. Standalone replies and reviews keep their
 separate limits.
 
 Recent chat contains up to 14 messages, preserving each accepted message up to
-the server's 2000-character limit. Human testimony retains the first eight and
-last 16 human messages, excluding messages already present in recent chat.
-Assassination and post-game inputs omit chat but retain that human testimony.
-This avoids duplicate text without clipping long human arguments halfway through.
+the server's 2000-character limit. The opening eight human messages are no longer
+permanently retained. Instead, each bot can preserve up to eight human source
+messages selected through its existing testimony notes, followed by up to 16
+recent human messages. Messages already present in recent chat are not duplicated.
+The serialized testimony block, including source identifiers, cannot exceed the
+old first-eight/last-sixteen block on the same request; recent fallback messages
+can therefore be omitted to make room for important older testimony. Messages
+are not shortened further to fit that budget.
+
+Live rooms read every unread human message before the next bot action, in chronological
+batches of at most 16. Each successful `memory` phase commits its notes and source
+anchors before advancing that bot's cursor. Live reading requires the stable message IDs assigned by the chat service;
+missing or duplicated IDs are rejected before inference. A failure leaves the unread batch
+retryable; earlier successful batches are not repeated. Reading is private: it
+publishes no speech, role claim, vote or game action and receives no engine state
+or private-role assignments. Its existing twelve-note budget contains only testimony,
+with at most three changed notes per response. Validated human histories take
+priority over routine action notes within the same twelve slots. Typed role, inspection and vote
+reports (including corrections of a mistaken button press) and histories with multiple linked sources precede isolated one-off
+subjects. If twelve such histories are already occupied, additional histories
+can still evict the oldest one. Additional reading calls increase
+latency and subscription usage; the per-request context ceiling is unchanged.
+The cursor and notes are per observer and live with the existing room pipeline.
+A backend restart is not a live-game resume protocol. If an unread gap exceeds
+the saved rolling history, the game pauses instead of silently skipping it.
+
+Human testimony uses `t:AUTHOR:SUBJECT` keys. Notes keep exact aliases even when
+they cannot be mapped to a seat, and preserve earliest stance, intermediate
+reversal and latest position in the existing 240-character fact. The model selects
+claims, commitments and corrections by meaning, without a keyword classifier;
+selection and semantic compression remain fallible and require recorded-game evaluation.
+The `source` response is an array of up to eight new numeric references:
+positive numbers identify visible `humanStatements.id` values; `-N` identifies
+one-based `chat` slot N. Only visible messages by the keyed human author pass
+validation. Bot testimony and engine deductions may still use ordinary string
+sources, but do not create human anchors. Stored source metadata is not recopied
+by the model. The server converts validated references into original message
+identities and adds them to earlier sources under the same key. Originals and
+corrections are admitted together or omitted together; long histories keep the
+first and latest seven sources within eight slots. Missing sources are never
+rebound to newer messages. Legacy replay callers retain their string-reference
+protocol unless they explicitly enable `readAllChat`.
+
+Human statements remain unverified testimony, including claims about roles and
+checks. Assassination and post-game context construction omits recent chat but
+applies the same bounded testimony selection. The byte ceiling bounds serialized
+game data, not an exact tokenizer count; model selection quality still requires
+evaluation on recorded situations.
 
 For first-mission two-seat team selection, both difficulties receive a private
 random partner priority, assigned independently to each bot without using roles.
@@ -308,7 +352,8 @@ These human-turn deadlines do not apply to administrator-created mixed games.
 Prepared rooms are temporary and are not archived before gameplay starts.
 
 Model requests have a ten-minute timeout and a twenty-two-minute ownership lease.
-The technical limit is 400 calls for 5–7 bots and 450 for eight. Provider
+The technical limit is 400 action requests for 5–7 bots and 450 for eight;
+private memory batches and transport retries may add provider calls. Provider
 failures pause the game instead of inventing a move. Completed discussion,
 final selection and votes are retained for continuation; persisted message IDs
 prevent duplicate publication. A backend restart is not a live-game resume protocol.

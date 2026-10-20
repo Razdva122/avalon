@@ -41,6 +41,16 @@ export function buildCodexPrompt(instructions: string | undefined, context: unkn
 
 export function codexSchema(choices: string[], details: boolean, review = false, request?: BotRequest) {
   const claims = request ? claimContext(request) : { targets: [], claimants: [], stanceTargets: [] };
+  if (request?.memoryOnly) {
+    claims.targets = [];
+    claims.stanceTargets = [];
+  }
+  const references = {
+    type: 'array',
+    minItems: 1,
+    maxItems: 8,
+    items: { type: 'integer', minimum: -14, maximum: Math.max(request?.chat.length || 0, 14) },
+  };
   const evidence = {
     type: 'array',
     maxItems: 3,
@@ -48,10 +58,22 @@ export function codexSchema(choices: string[], details: boolean, review = false,
       type: 'object',
       additionalProperties: false,
       properties: {
-        key: { type: 'string', minLength: 1, maxLength: 60 },
-        kind: { type: 'string', enum: ['fact', 'deduction', 'testimony', 'prediction', 'bluff'] },
+        key: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 60,
+          ...(request?.memoryOnly ? { pattern: '^t:[1-8]:.+$' } : {}),
+        },
+        kind: {
+          type: 'string',
+          enum: request?.memoryOnly ? ['testimony'] : ['fact', 'deduction', 'testimony', 'prediction', 'bluff'],
+        },
         fact: { type: 'string', minLength: 1, maxLength: 240 },
-        source: { type: 'string', minLength: 1, maxLength: 160 },
+        source: request?.memoryOnly
+          ? references
+          : request?.readAllChat
+            ? { anyOf: [{ type: 'string', minLength: 1, maxLength: 160 }, references] }
+            : { type: 'string', minLength: 1, maxLength: 160 },
         certainty: { type: 'string', enum: ['claim', 'bluff'] },
       },
       required: ['key', 'kind', 'fact', 'source', 'certainty'],

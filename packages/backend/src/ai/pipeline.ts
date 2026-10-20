@@ -1,6 +1,7 @@
 import { claimContext, validateClaims, claimInstructions } from './claims';
 import { languageInstruction } from './language';
 import shuffle from 'lodash/shuffle';
+import { humanTestimony } from './testimony';
 import type { AiLanguage } from '@avalon/types';
 import {
   AiPause,
@@ -246,7 +247,9 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
       ? 'Combine completed missions with your own known card and alignmentCounts. Each Fail needs a different Evil participant. If you played Success in a two-seat team with one Fail, the other player is Evil. Overlapping failed teams may have the same saboteur; do not invent another. Use only public evidence in public deductions. '
       : 'Combine ALL completed missions with alignmentCounts and reliable private facts before disputing a deduction. Fails give a lower bound on Evil in a team; remaining Evil slots can also give an upper bound. Example only: with three Evil total, disjoint teams showing two and one Fails contain exactly two and one Evil, even if Evil sometimes play Success. Do not add bounds across overlapping teams as if their participants were different. Use only publicly available bounds in public arguments, and update old hypotheses when new facts narrow them. ') +
     'Public claims and modelHypotheses are fallible, not verified roles. A truthful Lady result reveals alignment, not role, and does not clear its author. Do not invent votes, inspections, dialogue or future cards. ' +
-    'Current actionFacts, privateKnowledge and recorded events override old modelHypotheses; previous rosters are not the current proposal. Retain supported notes; correct contradicted ones with the same evidence key and mission/proposal or event source. Never reason from a known false note. ' +
+    (request.readAllChat
+      ? 'Facts override notes. Human testimony uses t:AUTHOR:SUBJECT; retain exact aliases and earliest/reversal/latest positions. source=[1-8 NEW refs]: positive=humanStatements.id, -N=chat slotN. Prior anchors persist; never recopy them. Bot testimony and other evidence use string sources. Omit unchanged notes. '
+      : 'Facts override fallible modelHypotheses; old rosters are not current. Correct notes under the same key, citing evidence. Human testimony stays unverified. Keep role/check claims, commitments, corrections and position changes as testimony notes: source="chat:ID,ID" cites humanStatements.id, "recent:N,N" cites 1-based chat slots, "chat:ID;recent:N" combines them. Cite original and revision together; retain author/order in fact. Skip greetings and interface chatter. ') +
     'Never publicly confess being Evil or Merlin, expose the wizard pair or allies, or announce sabotage. A deliberate Percival claim through claimMorgana must appear in publicReason. Public arguments may bluff for your side; the private reason must use actual side and knowledge. Keep private certainty in speech and evidence. Merlin: apply the public-viewpoint check in roleAdvice, treating competing unverified claims equally; protect missions and identity without publishing secret certainty. ' +
     ladyAnnouncementAdvice +
     ' ';
@@ -264,13 +267,14 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
       ? ' Perform personality in publicReason; earlier chat supplies facts, not a neutral voice to imitate.'
       : '') +
     (isOpeningPair(request) ? ' ' + openingTieBreakAdvice : '') +
-    ' Return JSON choice, speech (private reason, <=240 characters), publicReason (your actual public words, <=240 characters), evidence (at most 3 changed notes with key/kind/fact/source/certainty). Use claim certainty for hypotheses and testimony, bluff for deliberate deception. No unchanged evidence dump. Public words are published directly, without a rewrite or added sentences. Silence is allowed during the full public circle; the sole leader on a repeat proposal must explain their roster.'
+    ' Return JSON choice, speech (private <=240 chars), publicReason (published verbatim <=240 chars), evidence (<=3 changed key/kind/fact/source/certainty notes). Use claim for hypotheses/testimony, bluff for deception; omit unchanged notes. Full-circle speech may be silent; a repeat-proposal leader must explain.'
   );
 }
 
 type Generate = (request: BotRequest, options: GenerationOptions, signal?: AbortSignal) => ReturnType<Decide>;
 export function decisionPipeline(generate: Generate): Decide {
   const evidence = new Map<string, DecisionEvidence[]>();
+  const testimony = new Map<string, Map<string, BotRequest['chat']>>();
   // One pipeline belongs to one room, including technical continuations.
   const openingPriorities = new Map<string, number[]>();
   type ReviewExample = {
@@ -303,16 +307,152 @@ export function decisionPipeline(generate: Generate): Decide {
     string,
     { stage: string; publicDiscussion: boolean; mission?: number; proposal?: number; choice: string }[]
   >();
+  const readThrough = new Map<string, string | BotRequest['chat'][number]>();
+  const storeEvidence = (
+    request: BotRequest,
+    current: Pick<ReturnType<typeof compactRequest>, 'humanStatements' | 'chat' | 'humanSeats'>,
+    reply: BotReply,
+  ) => {
+    const merged = new Map((evidence.get(request.playerID) || []).map((fact) => [fact.key, fact]));
+    const sources = new Map(testimony.get(request.playerID));
+    const visible = new Map<string, BotRequest['chat'][number]>();
+    for (const { id } of current.humanStatements || []) {
+      const message =
+        typeof id === 'number'
+          ? request.chat[id - 1]
+          : request.chat.find((m) => m.id === id || m.id?.slice(0, 8) === id)!;
+      visible.set(`chat:${id}`, message);
+    }
+    if (current.chat)
+      request.chat.slice(-14).forEach((message, index) => {
+        if (current.humanSeats.includes(Number(message.name))) visible.set(`recent:${index + 1}`, message);
+      });
+    for (const fact of reply.evidence || []) {
+      merged.delete(fact.key);
+      merged.set(fact.key, {
+        ...fact,
+        certainty: fact.kind === 'bluff' || fact.certainty === 'bluff' ? 'bluff' : 'claim',
+      });
+      const previous = sources.get(fact.key) || [];
+      sources.delete(fact.key);
+      if (fact.kind === 'testimony' && (!request.readAllChat || fact.key.startsWith('t:'))) {
+        // Extract only explicit source references; free-form event/private explanations add no anchors.
+        const blocks = [...fact.source.matchAll(/(?:^|[;；]\s*)(chat|recent):([\da-f-]+(?:,[\da-f-]+)*)(?=$|[;；])/g)];
+        if (!blocks.length || blocks.length > 2) continue;
+        const messages = blocks.flatMap((block) => block![2].split(',').map((id) => visible.get(`${block![1]}:${id}`)));
+        if (messages.length <= 8 && messages.every((message) => message)) {
+          // A revision adds its sources to the same event, preserving the original/correction relationship.
+          const combined = [...previous, ...(messages as BotRequest['chat'])];
+          const order = new Map<string | BotRequest['chat'][number], number>(
+            request.chat.map((message, index) => [message.id ?? message, index]),
+          );
+          const unique = [
+            ...new Map(
+              combined
+                .filter((message) => order.has(message.id ?? message))
+                .map((message) => [message.id ?? message, message]),
+            ).values(),
+          ].sort((a, b) => order.get(a.id ?? a)! - order.get(b.id ?? b)!);
+          // Bound a long-running note to its original and latest seven revisions, rather than losing it at nine.
+          sources.set(fact.key, unique.length > 8 ? [unique[0], ...unique.slice(-7)] : unique);
+        }
+      }
+    }
+    const all = [...merged.values()];
+    const human = request.readAllChat
+      ? all.filter((note) => note.kind === 'testimony' && note.key.startsWith('t:'))
+      : [];
+    // The model types role/check/vote reports; linked sources identify a history without classifying chat by keywords.
+    const important = human
+      .filter(
+        (note) =>
+          ['role', 'check', 'vote'].includes(note.key.split(':')[2]) || (sources.get(note.key)?.length || 0) > 1,
+      )
+      .slice(-12);
+    const available = 12 - important.length;
+    const otherHuman = human.filter((note) => !important.includes(note));
+    const chosen = new Set([...important, ...(available ? otherHuman.slice(-available) : [])]);
+    const primary = human.filter((note) => chosen.has(note));
+    const remaining = 12 - primary.length;
+    const secondary = all.filter((note) => !primary.includes(note));
+    // Engine state can be revisited; unique human history must survive routine action-note churn.
+    const retained = request.readAllChat
+      ? [...(remaining ? secondary.slice(-remaining) : []), ...primary]
+      : all.slice(-12);
+    evidence.set(request.playerID, retained);
+    testimony.set(request.playerID, new Map([...sources].filter(([key]) => retained.some((note) => note.key === key))));
+  };
   return async (request, signal) => {
     try {
       request = {
         ...request,
+        humanMemory: [...(testimony.get(request.playerID)?.values() || [])],
         publicRoleClaims: [
           ...new Map([...publicClaims.values(), ...(request.publicRoleClaims || [])].map((c) => [c.by, c])).values(),
         ],
         previousClaimStances: publicStances.get(request.playerID) || request.previousClaimStances || [],
       };
       signal?.throwIfAborted();
+      if (request.readAllChat) {
+        const humanSeats = (request.humanPlayerIDs ?? (request.humanPlayerID ? [request.humanPlayerID] : []))
+          .map((id) => request.state.players.find((p) => p.id === id)?.index)
+          .filter((n): n is number => n !== undefined);
+        const messages = request.chat.filter((m) => humanSeats.includes(Number(m.name)));
+        if (messages.some((m) => !m.id) || new Set(messages.map((m) => m.id)).size !== messages.length)
+          throw new AiTechnicalPause('Human memory requires unique stable message IDs.');
+        const identity = (m: BotRequest['chat'][number]) => m.id ?? m;
+        const cursor = readThrough.get(request.playerID);
+        const previous = cursor === undefined ? -1 : messages.findIndex((m) => identity(m) === cursor);
+        if (cursor !== undefined && previous < 0)
+          throw new AiTechnicalPause('Unread human chat exceeded saved history; cannot silently skip messages.');
+        for (let offset = previous + 1; offset < messages.length; offset += 16) {
+          const batch = messages.slice(offset, offset + 16);
+          const last = batch[batch.length - 1];
+          const end = request.chat.findIndex((m) => identity(m) === identity(last)) + 1;
+          const memoryRequest: BotRequest = {
+            ...request,
+            memoryOnly: true,
+            choices: ['observe'],
+            speak: false,
+            publicDiscussion: false,
+            optionalSpeech: false,
+            councilDiscussion: false,
+            humanMemory: [],
+            chat: request.chat.slice(0, end),
+            state: { ...request.state, stage: 'votingForTeam' },
+          };
+          const memoryCurrent = compactRequest(memoryRequest);
+          const context = {
+            you: { seat: memoryCurrent.you?.seat },
+            humanSeats,
+            chat: memoryCurrent.chat,
+            humanStatements: humanTestimony(memoryRequest, humanSeats, false),
+            modelHypotheses: (evidence.get(request.playerID) || [])
+              .filter((note) => note.kind === 'testimony' && note.key.startsWith('t:'))
+              .map((note) => ({ key: note.key, kind: note.kind, fact: note.fact, certainty: note.certainty })),
+            choices: ['observe'],
+          };
+          const instructions =
+            languageInstruction(request.language).replace(
+              'Use bare seat numbers, never names or Player prefixes.',
+              '',
+            ) +
+            ' Privately read these human messages; choose observe, speech and publicReason empty, claimMorgana=null, claimStances=[]. Return only JSON with at most3 changed testimony notes; no gameplay action. ' +
+            'Prioritize corrections and changes of trust, roster preferences, commitments, role/check claims. Unverified does not mean unimportant. Skip noise, repeated claims and reconstructible mission arithmetic. ' +
+            'Each key is t:AUTHOR:SUBJECT (e.g. t:7:King or t:2:role). Keep separate subjects and authors separate. Preserve exact names/aliases even without a seat mapping; never replace them with someone. ' +
+            'In fact preserve earliest stance, intermediate reversal and latest stance in order, within240 characters. On same-key update retain relevant earlier history from modelHypotheses, never flatten a changed stance into a generic claim. A repeated claim is not a new role change. ' +
+            'source is an array of1-8 NEW numeric references by that author: positive=humanStatements.id, -N=1-based chat slotN. Server retains earlier anchors; do not recopy their IDs. Cite the correction itself. kind=testimony, certainty=claim. Omit unchanged notes; at most12 are retained.';
+          const reply = await generate(
+            memoryRequest,
+            { phase: 'memory', decisionDetails: true, instructions, cacheInstructions: instructions, context },
+            signal,
+          );
+          signal?.throwIfAborted();
+          storeEvidence(memoryRequest, memoryCurrent, reply);
+          readThrough.set(request.playerID, identity(last));
+        }
+        request = { ...request, humanMemory: [...(testimony.get(request.playerID)?.values() || [])] };
+      }
       if (request.state.stage === 'onMission' && request.choices.length === 1) return { choice: 0, speech: '' };
       const own = request.state.players?.find((p) => p.id === request.playerID);
       if (request.state.stage === 'announceLoyalty' && own && ['servant', 'merlin', 'percival'].includes(own.role)) {
@@ -358,7 +498,14 @@ export function decisionPipeline(generate: Generate): Decide {
                 approvedProposals: (votes || []).filter((v) => v.result !== 'reject'),
                 speak: request.speak,
                 previousDecisions: notes.get(request.playerID) || [],
-                modelHypotheses: evidence.get(request.playerID) || [],
+                modelHypotheses: request.readAllChat
+                  ? (evidence.get(request.playerID) || []).map((note) => ({
+                      key: note.key,
+                      kind: note.kind,
+                      fact: note.fact,
+                      certainty: note.certainty,
+                    }))
+                  : evidence.get(request.playerID) || [],
               },
         },
         signal,
@@ -382,7 +529,14 @@ export function decisionPipeline(generate: Generate): Decide {
               ...current,
               completedMissions: missions,
               teamVotes: votes,
-              modelHypotheses: evidence.get(request.playerID) || [],
+              modelHypotheses: request.readAllChat
+                ? (evidence.get(request.playerID) || []).map((note) => ({
+                    key: note.key,
+                    kind: note.kind,
+                    fact: note.fact,
+                    certainty: note.certainty,
+                  }))
+                : evidence.get(request.playerID) || [],
               inconsistentReply: reply,
               selectedChoice: request.choices[reply.choice],
             },
@@ -446,15 +600,7 @@ export function decisionPipeline(generate: Generate): Decide {
           request.playerID,
           examples.length > 6 ? [...examples.slice(0, 2), ...examples.slice(-4)] : examples,
         );
-        const merged = new Map((evidence.get(request.playerID) || []).map((fact) => [fact.key, fact]));
-        for (const fact of reply.evidence || []) {
-          merged.delete(fact.key);
-          merged.set(fact.key, {
-            ...fact,
-            certainty: fact.kind === 'bluff' || fact.certainty === 'bluff' ? 'bluff' : 'claim',
-          });
-        }
-        evidence.set(request.playerID, [...merged.values()].slice(-12));
+        storeEvidence(request, current, reply);
       }
       notes.set(
         request.playerID,
