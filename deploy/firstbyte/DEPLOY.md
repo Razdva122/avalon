@@ -1,6 +1,6 @@
 # Manual production deployment
 
-Production: FirstByte `157.228.134.198`, `/opt/avalon/production/compose.production.yaml`,
+Production endpoint: configured privately in the `production` GitHub environment, `/opt/avalon/production/compose.production.yaml`,
 Compose project `avalon-production`. The runner does not build images or copy secrets/configuration.
 
 ## Release a version
@@ -85,9 +85,11 @@ container and reloads nginx without restarting it.
 ## Access and server installation
 
 - GitHub environment: `production`, deployment branch policy: **master only**.
-- Environment secret: `FIRSTBYTE_DEPLOY_SSH_KEY` (dedicated ED25519 key, not an administrator key).
+- Environment secrets: `FIRSTBYTE_DEPLOY_SSH_KEY` (dedicated ED25519 key),
+  `FIRSTBYTE_DEPLOY_HOST`, `FIRSTBYTE_DEPLOY_USER`, and
+  `FIRSTBYTE_DEPLOY_KNOWN_HOSTS` (the independently verified host key).
 - SSH account: `avalon-deploy`, no Docker group membership, locked password.
-- Public host key is pinned in `.github/firstbyte_known_hosts`; verify a changed fingerprint through
+- The host key is pinned in `FIRSTBYTE_DEPLOY_KNOWN_HOSTS`; verify a changed fingerprint through
   the provider console/administrator connection, never disable host verification.
 - `/var/lib/avalon-deploy` and `.ssh` are root-owned `0755`; `authorized_keys` is root-owned `0644`.
   Key options are `restrict,command="sudo -n /usr/local/sbin/avalon-deploy \"$SSH_ORIGINAL_COMMAND\""`.

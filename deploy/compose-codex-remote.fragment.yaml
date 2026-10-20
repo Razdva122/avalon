@@ -5,7 +5,7 @@ services:
     environment:
       AI_ROOMS_ENABLED: 'true'
       AI_CODEX_ENABLED: 'false' # Enable during the controlled release rollout.
-      AI_CODEX_SSH_HOST: '146.103.118.73'
+      AI_CODEX_SSH_HOST: '${AI_CODEX_SSH_HOST:?Set the private worker host}'
       AI_CODEX_SSH_PORT: '10022'
       AI_CODEX_SSH_USER: avalon-codex
       AI_CODEX_SSH_KEY: /run/codex-ssh/id_ed25519

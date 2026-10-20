@@ -1,6 +1,9 @@
 #!/bin/sh
 set -eu
-cert=/etc/letsencrypt/live/avalon-prod.avalon-game.com
+set -a
+. "${SMTP_DEPLOY_ENV:-/opt/avalon/smtp/deployment.env}"
+set +a
+cert=${SMTP_CERT_LINEAGE:-/etc/letsencrypt/live/${SMTP_HOSTNAME:?Set SMTP_HOSTNAME privately}}
 target=/opt/avalon/smtp/tls
 [ "${RENEWED_LINEAGE:-$cert}" = "$cert" ] || exit 0
 openssl x509 -in "$cert/fullchain.pem" -checkend 86400 -noout

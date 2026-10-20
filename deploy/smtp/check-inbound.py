@@ -3,6 +3,7 @@
 import argparse
 import datetime as dt
 import json
+import os
 from pathlib import Path
 import re
 import smtplib
@@ -10,7 +11,7 @@ import ssl
 import subprocess
 import time
 
-HOST = 'avalon-prod.avalon-game.com'
+HOST = os.environ['SMTP_HOSTNAME']
 ADDRESS = 'security@avalon-game.com'
 ROOT = Path('/opt/avalon/smtp')
 CONTAINER = 'avalon-smtp-smtp-1'
@@ -34,7 +35,7 @@ def main():
 
     # The VPS /etc/hosts maps HOST to loopback for existing local services.
     # Probe the published IPv4 port, while verifying TLS against its DNS name.
-    with smtplib.SMTP('157.228.134.198', 25, local_hostname=HOST, timeout=30) as connection:
+    with smtplib.SMTP(os.environ['SMTP_PUBLIC_IP'], 25, local_hostname=HOST, timeout=30) as connection:
         assert connection.ehlo()[0] == 250
         assert not connection.has_extn('auth'), 'Public SMTP must not offer authentication'
         assert connection.has_extn('starttls'), 'STARTTLS is missing'
@@ -44,11 +45,11 @@ def main():
         assert connection.starttls(context=context)[0] == 220
         assert connection.ehlo()[0] == 250
         assert not connection.has_extn('auth'), 'Public TLS SMTP must not offer authentication'
-        for recipient in ('lexur-02@yandex.ru', 'unknown-check@avalon-game.com'):
+        for recipient in (os.environ['SMTP_TEST_RECIPIENT'], 'unknown-check@avalon-game.com'):
             assert connection.mail('')[0] == 250
             code, reply = connection.rcpt(recipient)
             assert 500 <= code < 600, f'Unauthorized recipient accepted: {recipient}'
-            if recipient.endswith('@yandex.ru'):
+            if recipient == os.environ['SMTP_TEST_RECIPIENT']:
                 assert code == 554 and b'Relay access denied' in reply, 'Expected explicit relay denial'
             connection.rset()
         for recipient in (f'root@{HOST}', f'postmaster@{HOST}'):

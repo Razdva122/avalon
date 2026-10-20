@@ -2,12 +2,12 @@ name: avalon-smtp
 services:
   smtp:
     image: ghcr.io/docker-mailserver/docker-mailserver@sha256:d0fe7668defe157aad57ea31b1707ad1e2fb57d7a91bdf17cbdf876549946c86
-    hostname: avalon-prod.avalon-game.com
+    hostname: ${SMTP_HOSTNAME:?Set the private SMTP hostname}
     restart: unless-stopped
     stop_grace_period: 1m
     ports:
       - '127.0.0.1:1465:465'
-      - '157.228.134.198:25:25'
+      - '${SMTP_PUBLIC_IP:?Set the private SMTP public IP}:25:25'
     environment:
       SSL_TYPE: manual
       SSL_CERT_PATH: /tls/fullchain.pem
@@ -40,9 +40,9 @@ services:
       - ./tls:/tls:ro
     networks:
       production:
-        ipv4_address: 172.30.90.20
+        ipv4_address: ${SMTP_INTERNAL_IP:?Set the private SMTP container IP}
         aliases:
-          - avalon-prod.avalon-game.com
+          - ${SMTP_HOSTNAME:?Set the private SMTP hostname}
     healthcheck:
       test: ['CMD', 'dms-healthcheck']
       interval: 30s
@@ -51,4 +51,4 @@ services:
 networks:
   production:
     external: true
-    name: avalon-production_production
+    name: ${SMTP_DOCKER_NETWORK:?Set the private SMTP Docker network}

@@ -12,7 +12,7 @@
 
 ## Global constraints
 
-- Exactly one authorized test email to lexur-02@yandex.ru.
+- Exactly one authorized test email to operator@example.net.
 - No public authenticated submission/IMAP/POP3 listeners, unauthenticated relay
   or spoofing. The later approved technical-incoming amendment permits port25.
 - Dedicated 2048-bit DKIM selector vps20261011; TLS 1.2 or higher with certificate verification.
@@ -64,6 +64,6 @@ servers and Google/Cloudflare confirm amended MX/SPF/DKIM and removed legacy
 hosting records. Backup avalon-20261011T144953Z.tar.age includes amended SMTP;
 remote ciphertext checksum readback verified.
 
-FirstByte refused deleting paid mail service4739178 before the minimum one-month
+FirstByte refused deleting paid mail service (private ID) before the minimum one-month
 term ends on2026-11-11. Auto-renewal remains disabled; the service is unused.
-Separate DNS service4738725 (DNS-100-free,0RUB/month) remains active.
+The separate DNS service (DNS-100-free,0RUB/month) remains active.

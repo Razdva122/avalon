@@ -13,6 +13,7 @@ dist
 .env.production
 .env.*.local
 /.private-ops/
+/deploy/smtp/*.env
 
 # Logs
 npm-debug.log*

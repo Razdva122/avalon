@@ -4,6 +4,7 @@ After=docker.service
 
 [Service]
 Type=oneshot
+EnvironmentFile=/opt/avalon/smtp/deployment.env
 ExecStart=/usr/bin/python3 /opt/avalon/smtp/health.py
 TimeoutStartSec=180
 UMask=0077

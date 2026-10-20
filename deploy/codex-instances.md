@@ -105,3 +105,9 @@ Rolling back to legacy mode likewise requires draining/stopping the pool first.
 
 This change does not provision or authenticate additional accounts and does not
 modify production configuration automatically.
+
+## Private operational records
+
+Keep live host addresses, account mappings, host keys, deployment receipts and
+rollback records outside Git. Local operator notes may be stored in the ignored
+`.private-ops/` directory; public documentation should use example endpoints only.

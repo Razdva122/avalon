@@ -1,7 +1,7 @@
 # Image migration from Yandex Storage
 
 On 2026-10-14, all 434 image objects in the public `avalon-game` bucket were
-copied to FirstByte (`157.228.134.198`). Nine empty directory-marker objects were
+copied to FirstByte (`192.0.2.10`). Nine empty directory-marker objects were
 excluded. Total image size: 36,236,202 bytes. The listing was complete
 (`IsTruncated=false`); every copied image was checked against its object size
 and single-part ETag (MD5). SHA-256 hashes were recorded as well.

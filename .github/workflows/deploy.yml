@@ -1,5 +1,5 @@
 name: Deploy to server
-run-name: "${{ inputs.check_only && 'Check' || 'Deploy' }} ${{ inputs.tag }} on FirstByte"
+run-name: "${{ inputs.check_only && 'Check' || 'Deploy' }} ${{ inputs.tag }} on production"
 
 on:
   workflow_dispatch:
@@ -64,22 +64,30 @@ jobs:
       - name: Deploy published images over restricted SSH
         env:
           DEPLOY_SSH_KEY: ${{ secrets.FIRSTBYTE_DEPLOY_SSH_KEY }}
+          DEPLOY_SSH_HOST: ${{ secrets.FIRSTBYTE_DEPLOY_HOST }}
+          DEPLOY_SSH_USER: ${{ secrets.FIRSTBYTE_DEPLOY_USER }}
+          DEPLOY_SSH_KNOWN_HOSTS: ${{ secrets.FIRSTBYTE_DEPLOY_KNOWN_HOSTS }}
         shell: bash
         run: |
           set -euo pipefail
           test -n "$DEPLOY_SSH_KEY" || { echo '::error::Missing production secret FIRSTBYTE_DEPLOY_SSH_KEY'; exit 1; }
+          : "${DEPLOY_SSH_HOST:?Missing production SSH host secret}"
+          : "${DEPLOY_SSH_USER:?Missing production SSH user secret}"
+          : "${DEPLOY_SSH_KNOWN_HOSTS:?Missing production SSH host key secret}"
           umask 077
           key_file=$(mktemp)
-          trap 'rm -f "$key_file"' EXIT
+          known_hosts_file=$(mktemp)
+          trap 'rm -f "$key_file" "$known_hosts_file"' EXIT
           printf '%s\n' "$DEPLOY_SSH_KEY" > "$key_file"
+          printf '%s\n' "$DEPLOY_SSH_KNOWN_HOSTS" > "$known_hosts_file"
           operation=deploy
           if [[ "$SKIP_ROOM_CHECK" == true ]]; then operation=deploy-skip-rooms; fi
           if [[ "$CHECK_ONLY" == true ]]; then operation=check; fi
           ssh -T -i "$key_file" \
             -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
-            -o UserKnownHostsFile=.github/firstbyte_known_hosts \
+            -o UserKnownHostsFile="$known_hosts_file" \
             -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=6 \
-            avalon-deploy@157.228.134.198 "$operation $RELEASE_TAG"
+            -- "$DEPLOY_SSH_USER@$DEPLOY_SSH_HOST" "$operation $RELEASE_TAG"
 
       - name: Check public HTTPS from the GitHub runner
         run: curl --fail --silent --show-error --max-time 20 --output /dev/null https://avalon-game.com/

@@ -102,3 +102,12 @@ an old backend; some migrations/authorization changes cannot simply be reversed.
 Compose fragments are examples to merge into the existing deployment, not
 standalone commands that replace the production stack. Historical VM preparation
 notes describe their recorded date and do not confirm current deployment status.
+
+## Infrastructure privacy
+
+Keep real host addresses, provider account IDs, SSH host keys and operational
+incident/rollback records outside Git. Store CI connection values in the
+`production` environment Secrets; keep host runtime configuration and backups
+private. `.private-ops/` is ignored for local operator notes. Use example hosts
+and documentation-only IP addresses in public guides. Removing a value from the
+current tree does not remove it from earlier Git commits.

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Check real SMTPS authentication and relay restrictions without sending mail."""
 import json
+import os
 from pathlib import Path
 import smtplib
 import socket
 import ssl
 
 ROOT = Path('/opt/avalon/smtp')
-HOST = 'avalon-prod.avalon-game.com'
+HOST = os.environ['SMTP_HOSTNAME']
 
 
 def client():
@@ -23,7 +24,7 @@ def client():
 def no_relay(connection, sender):
     code, _ = connection.mail(sender)
     if code == 250:
-        code, _ = connection.rcpt('lexur-02@yandex.ru')
+        code, _ = connection.rcpt(os.environ['SMTP_TEST_RECIPIENT'])
     connection.rset()
     assert 500 <= code < 600, 'Unauthorized sender or relay was accepted'
 
@@ -43,7 +44,7 @@ def main():
         assert connection.login(env['SMTP_USER'], env['SMTP_PASSWORD'])[0] == 235
         no_relay(connection, 'someone-else@avalon-game.com')
         assert connection.mail('security@avalon-game.com')[0] == 250
-        assert connection.rcpt('lexur-02@yandex.ru')[0] == 250
+        assert connection.rcpt(os.environ['SMTP_TEST_RECIPIENT'])[0] == 250
         connection.rset()  # Never issue DATA; this check sends no message.
     print(json.dumps({'tls': 'verified', 'valid_auth': 'passed', 'invalid_auth': 'rejected', 'unauthenticated_relay': 'rejected', 'sender_spoofing': 'rejected', 'emails_sent': 0}))
 
