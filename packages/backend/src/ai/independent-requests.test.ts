@@ -1,3 +1,4 @@
+import { defaultBotQuotaThresholds } from './quota-policy';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Manager } from '@/main';
 import { AiService } from './service';
@@ -38,6 +39,7 @@ test('every player turn and review sends an independent decision and retains tok
   const service = new AiService({ io, dbManager: {} } as unknown as Manager);
   const audits: any[] = [];
   service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
     renewLease: async () => {},
     recordRequest: async (entry: object) => {
       audits.push(structuredClone(entry));

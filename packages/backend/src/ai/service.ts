@@ -3,6 +3,8 @@ import { BeginnerAnalysis, buildBeginnerAnalysis, beginnerAnalysisSettings } fro
 import { aiHumanRoles, aiPlayedModel, aiRosterInfo } from '@avalon/types';
 import type {
   AiBotDifficulty,
+  AiBotInstanceStatus,
+  BotQuotaThresholds,
   AiBotMode,
   AiLanguage,
   AiPlayerCount,
@@ -26,6 +28,7 @@ import { hasPremium } from '@/support/premium';
 import { supportTotalCents } from '@/support/repository';
 import { AI_PAUSE_TIMEOUT_MS } from './timing';
 import { aiText } from './language';
+import { defaultBotQuotaThresholds, validBotQuotaThresholds } from './quota-policy';
 
 const humanSettings: Record<AiBotMode, CodexSettings> = {
   smart: { model: 'gpt-6.1-sol', reasoning: 'medium' },
@@ -33,29 +36,39 @@ const humanSettings: Record<AiBotMode, CodexSettings> = {
   beginner: { model: 'gpt-6-luna', reasoning: 'low' },
 };
 
-function humanModeAvailable(difficulty: AiBotMode, quota: CodexWeeklyLimit | null, models: CodexModelOption[]) {
+function humanModeAvailable(
+  difficulty: AiBotMode,
+  quota: CodexWeeklyLimit | null,
+  models: CodexModelOption[],
+  thresholds: BotQuotaThresholds,
+) {
   const weekly = quota?.remainingPercent;
   const short = quota?.shortTerm?.remainingPercent;
   const settings = humanSettings[difficulty];
   return (
     typeof weekly === 'number' &&
     Number.isFinite(weekly) &&
-    weekly > (difficulty === 'smart' ? 5 : difficulty === 'regular' ? 3 : 1) &&
+    weekly > thresholds[difficulty].weekly &&
     (quota?.shortTerm === null ||
-      (typeof short === 'number' &&
-        Number.isFinite(short) &&
-        short > (difficulty === 'smart' ? 60 : difficulty === 'regular' ? 30 : 20))) &&
+      (typeof short === 'number' && Number.isFinite(short) && short > thresholds[difficulty].shortTerm)) &&
     models.some((model) => model.id === settings.model && model.efforts.includes(settings.reasoning))
   );
 }
 
-function humanModeAvailableAt(difficulty: AiBotMode, quota: CodexWeeklyLimit | null, models: CodexModelOption[]) {
+function humanModeAvailableAt(
+  difficulty: AiBotMode,
+  quota: CodexWeeklyLimit | null,
+  models: CodexModelOption[],
+  thresholds: BotQuotaThresholds,
+) {
+  if (thresholds[difficulty].weekly === 100 || (quota?.shortTerm !== null && thresholds[difficulty].shortTerm === 100))
+    return;
   const settings = humanSettings[difficulty];
   if (!models.some((model) => model.id === settings.model && model.efforts.includes(settings.reasoning))) return;
   const resets: number[] = [];
   for (const [window, threshold] of [
-    [quota, difficulty === 'smart' ? 5 : difficulty === 'regular' ? 3 : 1],
-    [quota?.shortTerm, difficulty === 'smart' ? 60 : difficulty === 'regular' ? 30 : 20],
+    [quota, thresholds[difficulty].weekly],
+    [quota?.shortTerm, thresholds[difficulty].shortTerm],
   ] as const) {
     if (window === null && quota?.shortTerm === null) continue;
     if (!window || !Number.isFinite(window.remainingPercent)) return;
@@ -138,6 +151,7 @@ export class AiService {
     );
   }
   private async reserveInstance(roomID: string, publicGame: boolean, mode?: AiBotMode, settings?: CodexSettings) {
+    const thresholds = publicGame ? await this.repository!.getBotQuotaThresholds() : defaultBotQuotaThresholds;
     const free = await this.freeInstances();
     const snapshots =
       !publicGame && !settings && free.length === 1 && free[0].id === 'default'
@@ -146,8 +160,9 @@ export class AiService {
     const candidates = snapshots.filter(({ instance, quota, models }) =>
       publicGame
         ? mode
-          ? humanModeAvailable(mode, quota, models)
-          : humanModeAvailable('smart', quota, models) || humanModeAvailable('regular', quota, models)
+          ? humanModeAvailable(mode, quota, models, thresholds)
+          : humanModeAvailable('smart', quota, models, thresholds) ||
+            humanModeAvailable('regular', quota, models, thresholds)
         : (instance.id === 'default' ||
             (quota &&
               Number.isFinite(quota.remainingPercent) &&
@@ -222,15 +237,17 @@ export class AiService {
   }
 
   private async humanModes(roomID: string) {
+    const thresholds = await this.repository!.getBotQuotaThresholds();
     const snapshot = (await this.instanceSnapshots([this.instanceFor(roomID)]))[0];
     return {
-      smart: humanModeAvailable('smart', snapshot.quota, snapshot.models),
-      regular: humanModeAvailable('regular', snapshot.quota, snapshot.models),
-      beginner: humanModeAvailable('beginner', snapshot.quota, snapshot.models),
+      smart: humanModeAvailable('smart', snapshot.quota, snapshot.models, thresholds),
+      regular: humanModeAvailable('regular', snapshot.quota, snapshot.models, thresholds),
+      beginner: humanModeAvailable('beginner', snapshot.quota, snapshot.models, thresholds),
     };
   }
 
   private async humanAvailability(roomID?: string) {
+    const thresholds = await this.repository!.getBotQuotaThresholds();
     const free = await this.freeInstances(roomID);
     const snapshots = await this.instanceSnapshots(free);
     // Allocations can finish while metadata is being read.
@@ -239,10 +256,12 @@ export class AiService {
     const botModes = { smart: false, regular: false, beginner: false };
     const botModeAvailableAt: Partial<Record<AiBotMode, number>> = {};
     for (const difficulty of ['smart', 'regular', 'beginner'] as const) {
-      botModes[difficulty] = available.some(({ quota, models }) => humanModeAvailable(difficulty, quota, models));
+      botModes[difficulty] = available.some(({ quota, models }) =>
+        humanModeAvailable(difficulty, quota, models, thresholds),
+      );
       if (!botModes[difficulty]) {
         const resets = available.flatMap(({ quota, models }) => {
-          const at = humanModeAvailableAt(difficulty, quota, models);
+          const at = humanModeAvailableAt(difficulty, quota, models, thresholds);
           return at === undefined ? [] : [at];
         });
         if (resets.length) botModeAvailableAt[difficulty] = Math.min(...resets);
@@ -403,6 +422,70 @@ export class AiService {
   }
 
   register(socket: ServerSocket, userID?: string) {
+    socket.on('setAiBotQuotaThresholds', async (thresholds, cb) => {
+      if (typeof cb !== 'function') return;
+      try {
+        if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        if (!validBotQuotaThresholds(thresholds)) return cb({ error: 'Invalid bot quota thresholds' });
+        await this.repository!.setBotQuotaThresholds(thresholds);
+        cb({ ok: true });
+      } catch {
+        cb({ error: 'Could not save bot quota thresholds' });
+      }
+    });
+    socket.on('getAiBotDashboard', async (cb) => {
+      if (typeof cb !== 'function') return;
+      try {
+        if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        const thresholds = await this.repository!.getBotQuotaThresholds();
+        const snapshots = await this.instanceSnapshots(configuredCodexInstances());
+        // Read leases after metadata: a reservation may complete while quota is loading.
+        const busy = new Map((await this.repository!.busyInstances()).map((lease) => [lease.instanceID, lease.roomID]));
+        for (const [roomID, instance] of this.roomInstances) busy.set(instance.id, roomID);
+        for (const room of Object.values(this.manager.rooms)) {
+          if (room.ai && (['ready', 'running', 'paused'].includes(room.ai.status) || this.running.has(room.roomID)))
+            busy.set(this.roomInstances.get(room.roomID)?.id ?? 'default', room.roomID);
+        }
+        const instances = snapshots.map<AiBotInstanceStatus>(({ instance, quota, models }) => {
+          const modes = {
+            smart: humanModeAvailable('smart', quota, models, thresholds),
+            regular: humanModeAvailable('regular', quota, models, thresholds),
+            beginner: humanModeAvailable('beginner', quota, models, thresholds),
+          };
+          const roomID = busy.get(instance.id);
+          const room = roomID ? this.manager.rooms[roomID] : undefined;
+          return {
+            id: instance.id,
+            status:
+              roomID || this.allocating.has(instance.id)
+                ? 'busy'
+                : Object.values(modes).some(Boolean)
+                  ? 'free'
+                  : 'unavailable',
+            quota,
+            modes,
+            ...(roomID ? { roomID } : {}),
+            ...(room?.ai
+              ? {
+                  room: {
+                    status: room.ai.status,
+                    title: room.ai.title,
+                    codex: room.ai.codex,
+                    playerCount: room.players.length,
+                    thinking: Boolean(room.ai.thinkingPlayerID || room.ai.thinkingPlayerIDs?.length),
+                    waitingForHuman: Boolean(room.ai.waitingForHuman || room.ai.waitingForDiscussion),
+                  },
+                }
+              : {}),
+          };
+        });
+        // Recheck authority before returning a potentially slow metadata request.
+        if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        cb({ checkedAt: Date.now(), instances, thresholds });
+      } catch {
+        cb({ error: 'Could not load bot dashboard' });
+      }
+    });
     socket.on('getAiRoomsList', async (cb) => {
       if (typeof cb !== 'function') return;
       try {

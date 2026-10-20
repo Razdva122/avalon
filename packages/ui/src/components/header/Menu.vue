@@ -65,6 +65,11 @@
             >{{ $t(item.label) }}
           </LocaleLink>
         </section>
+        <section v-if="$store.state.profile?.isAdmin" class="menu-section">
+          <RouterLink :to="{ name: 'adminBots' }" class="menu-item" @click="open = false">
+            <span class="material-icons" aria-hidden="true">analytics</span>{{ $t('aiArena.botDashboard') }}
+          </RouterLink>
+        </section>
         <section class="menu-section">
           <h3>{{ $t('menu.aboutAvalon') }}</h3>
           <LocaleLink

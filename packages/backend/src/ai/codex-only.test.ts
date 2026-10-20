@@ -1,3 +1,4 @@
+import { defaultBotQuotaThresholds } from './quota-policy';
 import { AiService } from './service';
 import type { Manager } from '@/main';
 import type { AiRepository } from './repository';
@@ -19,7 +20,10 @@ test('only Codex is advertised and legacy provider requests cannot acquire a roo
   const host = { rooms: {}, dbManager: { getUserByID: async () => ({ isAdmin: true }) } } as unknown as Manager;
   const service = new AiService(host);
   const claim = jest.fn();
-  service.repository = { claim } as unknown as AiRepository;
+  service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
+    claim,
+  } as unknown as AiRepository;
   const handlers: Record<string, (...args: unknown[]) => Promise<void>> = {};
   service.register(
     {

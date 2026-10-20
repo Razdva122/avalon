@@ -1,3 +1,4 @@
+import { defaultBotQuotaThresholds } from './quota-policy';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as codexModels from './codex-models';
 import * as codexLimits from './codex-limits';
@@ -36,6 +37,7 @@ test('only database-admin authenticated account can create or control a room, du
   } as unknown as Manager;
   const service = new AiService(host);
   service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
     claim: async () => {},
     release: async () => {},
     save: async () => {},
@@ -149,7 +151,10 @@ test.each([
       dbManager: { getUserByID: async () => ({ isAdmin: true }) },
     } as unknown as Manager;
     const service = new AiService(host);
-    service.repository = { claim: async () => {} } as unknown as AiRepository;
+    service.repository = {
+      getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
+      claim: async () => {},
+    } as unknown as AiRepository;
     const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
     const socket = {
       on: (name: string, handler: any) => {
@@ -180,7 +185,10 @@ test('invalid AI player counts are rejected before reserving a room', async () =
   const host = { rooms: {}, dbManager: { getUserByID: async () => ({ isAdmin: true }) } } as unknown as Manager;
   const service = new AiService(host);
   const claim = jest.fn(async () => {});
-  service.repository = { claim } as unknown as AiRepository;
+  service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
+    claim,
+  } as unknown as AiRepository;
   const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
   service.register(
     {
@@ -206,7 +214,10 @@ test('creation rejects unsupported or malformed language options before claiming
   } as unknown as Manager;
   const service = new AiService(host);
   const claim = jest.fn(async () => {});
-  service.repository = { claim } as unknown as AiRepository;
+  service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
+    claim,
+  } as unknown as AiRepository;
   const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
   service.register(
     {
@@ -269,7 +280,10 @@ test('public AI list returns latest 20 unique rooms with live state and no priva
       result: room.game.result,
     })),
   );
-  service.repository = { recentSummaries: recent } as unknown as AiRepository;
+  service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
+    recentSummaries: recent,
+  } as unknown as AiRepository;
   const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
   service.register({
     on: (name: string, handler: any) => {
@@ -325,7 +339,10 @@ test('public AI list hides stopped rooms after merging live state over stale arc
     ),
   } as unknown as Manager;
   const service = new AiService(host);
-  service.repository = { recentSummaries: async () => archived } as unknown as AiRepository;
+  service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
+    recentSummaries: async () => archived,
+  } as unknown as AiRepository;
   const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
   service.register({ on: (name: string, handler: any) => (handlers[name] = handler) } as unknown as ServerSocket);
   const response = jest.fn();
@@ -355,6 +372,7 @@ test('technical resume requires a current admin and rejects non-recoverable or s
   const service = new AiService(host);
   const claim = jest.fn(async () => {});
   service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
     claim,
     save: async () => {},
     release: async () => {},
@@ -409,7 +427,11 @@ test.each(['development', 'production'])(
       const service = new AiService(host);
       expect(service.repository).toBeDefined();
       const claim = jest.fn();
-      service.repository = { claim, save: jest.fn() } as unknown as AiRepository;
+      service.repository = {
+        getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
+        claim,
+        save: jest.fn(),
+      } as unknown as AiRepository;
       const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
       service.register(
         {
@@ -467,6 +489,7 @@ test('Codex settings require admin access and stay frozen after launch', async (
   const service = new AiService(host);
   const saved: any[] = [];
   service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
     save: async (state: any) => {
       saved.push(state);
     },
@@ -516,7 +539,9 @@ test('administrator access stays available when the Codex catalog fails and publ
     rooms: {},
     dbManager: { getUserByID: async () => ({ isAdmin: true }) },
   } as unknown as Manager);
-  service.repository = {} as AiRepository;
+  service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
+  } as AiRepository;
   const events: Record<string, any> = {};
   service.register(
     {
@@ -568,7 +593,9 @@ test('weekly Codex quota is admin-only in production, unavailable data stays nul
     process.env.NODE_ENV = 'development';
     process.env.AI_CODEX_ENABLED = 'true';
     const service = new AiService(host);
-    service.repository = {} as AiRepository;
+    service.repository = {
+      getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
+    } as AiRepository;
     const connect = (id?: string) => {
       const handlers: Record<string, (...args: any[]) => Promise<void>> = {};
       service.register(
@@ -615,7 +642,10 @@ test('only the database-admin owner can take the single human seat; mixed games 
     dbManager: { getUserByID: async (id: string) => ({ isAdmin: ['owner', 'other-admin'].includes(id) }) },
   } as unknown as Manager;
   const service = new AiService(host);
-  service.repository = { save: async () => {} } as unknown as AiRepository;
+  service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
+    save: async () => {},
+  } as unknown as AiRepository;
   function connect(id?: string) {
     const events: Record<string, (...args: any[]) => any> = {};
     service.register(

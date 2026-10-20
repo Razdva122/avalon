@@ -1,4 +1,5 @@
 import { aiHumanRoles, type AiPlayerCount, type AiHumanRole } from '@avalon/types';
+import { validBotQuotaThresholds } from '@/ai/quota-policy';
 
 export function validID(value: unknown): value is string {
   return (
@@ -66,6 +67,8 @@ const acknowledgements: Record<string, number> = {
   getAiRoomAccess: 0,
   getAiCodexModels: 0,
   getAiCodexWeeklyLimit: 0,
+  getAiBotDashboard: 0,
+  setAiBotQuotaThresholds: 1,
   createRoom: 0,
   joinRoom: 1,
   joinAiRoom: 1,
@@ -117,6 +120,7 @@ const nonIDs = new Set([
   'updateStickerPreferences',
   'createAiRoom',
   'createHumanAiRoom',
+  'setAiBotQuotaThresholds',
   'getPopularRoles',
   'getTopPlayersForPopularRoles',
 ]);
@@ -133,6 +137,7 @@ export function validPacket(event: string, args: unknown[]): boolean {
   if (ack !== undefined && (args.length !== ack + 1 || typeof args[ack] !== 'function')) return false;
   const values = ack !== undefined ? args.slice(0, ack) : args;
   if (values.length > 4) return false;
+  if (event === 'setAiBotQuotaThresholds') return validBotQuotaThresholds(values[0]);
   if (!nonIDs.has(event) && values.length && !validID(values[0])) return false;
   if (event === 'getPlayerGameSummariesPage')
     return (

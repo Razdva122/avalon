@@ -1,3 +1,4 @@
+import { defaultBotQuotaThresholds } from './quota-policy';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Manager } from '@/main';
 import { Room } from '@/room';
@@ -63,6 +64,7 @@ function fixture(adminID = 'admin', validatePackets = false) {
   } as unknown as Manager;
   const service = new AiService(host);
   service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
     claim,
     release,
     save,
@@ -131,6 +133,41 @@ test('create prepares a named four-bot table, reserves its slot, and makes no mo
   expect(room.data.stage).toBe('locked');
   expect(run).not.toHaveBeenCalled();
   expect(claim).toHaveBeenCalledWith(room.roomID);
+});
+
+test('a saved quota policy changes public availability and blocks a prepared room at launch', async () => {
+  const f = fixture('admin', true);
+  const room = await f.draft();
+  f.service.repository!.getBotQuotaThresholds = async () => ({
+    smart: { weekly: 10, shortTerm: 90 },
+    regular: { weekly: 10, shortTerm: 90 },
+    beginner: { weekly: 10, shortTerm: 90 },
+  });
+  const access = jest.fn();
+  await f.connect('owner').getAiRoomAccess(access);
+  expect(access.mock.calls[0][0].botModes).toEqual({ smart: false, regular: false, beginner: false });
+  const start = jest.fn();
+  await f.connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'en' }, start);
+  expect(start.mock.calls[0][0]).toHaveProperty('error');
+  expect(room.ai!.status).toBe('ready');
+});
+
+test('a mode disabled with a 100 percent threshold has no misleading quota recovery estimate', async () => {
+  const f = fixture();
+  f.service.repository!.getBotQuotaThresholds = async () => ({
+    smart: { weekly: 100, shortTerm: 60 },
+    regular: { weekly: 100, shortTerm: 30 },
+    beginner: { weekly: 1, shortTerm: 100 },
+  });
+  quota.mockResolvedValue({
+    remainingPercent: 10,
+    resetsAt: Date.now() / 1000 + 7200,
+    checkedAt: Date.now(),
+    shortTerm: { remainingPercent: 90, resetsAt: Date.now() / 1000 + 3600 },
+  });
+  const response = jest.fn();
+  await f.connect('owner').getAiRoomAccess(response);
+  expect(response.mock.calls[0][0]).not.toHaveProperty('botModeAvailableAt');
 });
 
 test('only the ready-room owner can stop preparation, cancel expiry, and release the slot for another player', async () => {

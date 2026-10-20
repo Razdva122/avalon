@@ -65,7 +65,9 @@
           <p v-if="!ai.publicBotGame && !ai.botDifficulty && ai.model === 'codex-chatgpt'">
             {{ $t('aiArena.codexSubscription') }}
           </p>
-          <CodexWeeklyLimit v-if="canManage && ai.model === 'codex-chatgpt'" />
+          <v-btn v-if="canManage && ai.model === 'codex-chatgpt'" :to="{ name: 'adminBots' }" variant="text">
+            <v-icon icon="analytics" start aria-hidden="true" />{{ $t('aiArena.botDashboard') }}
+          </v-btn>
           <div
             v-if="
               canManage &&
@@ -174,7 +176,6 @@
   </section>
 </template>
 <script setup lang="ts">
-import CodexWeeklyLimit from '@/components/view/panels/CodexWeeklyLimit.vue';
 import { ref, computed, watch } from 'vue';
 import { useMediaQuery } from '@vueuse/core';
 import { VDialog } from 'vuetify/components';

@@ -1,3 +1,4 @@
+import { defaultBotQuotaThresholds } from './quota-policy';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Server, ServerSocket, TRoomState } from '@avalon/types';
 import type { Manager } from '@/main';
@@ -34,6 +35,7 @@ async function pausedRoom(pause: AiPause = new AiTechnicalPause('Output limit re
   let pauseAgain: ((reason: AiPause) => void) | undefined;
   const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
   const repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
     claim: async () => {
       const pending = waitForClaim;
       waitForClaim = undefined;

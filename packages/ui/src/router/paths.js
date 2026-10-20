@@ -18,7 +18,7 @@ function languageSwitchTarget(path, language, availableLocales, hash = '') {
 }
 
 function isNeutralPath(path) {
-  return /^\/(?:password-recovery|profile|leaderboard|achievements\/global|room\/[^/]+|stats\/user\/[^/]+|achievements\/user\/[^/]+)\/$/.test(
+  return /^\/(?:admin\/bots|password-recovery|profile|leaderboard|achievements\/global|room\/[^/]+|stats\/user\/[^/]+|achievements\/user\/[^/]+)\/$/.test(
     basePath(path),
   );
 }

@@ -155,6 +155,11 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
   getAiCodexWeeklyLimit: (
     callback: (result: { weekly: import('../room').CodexWeeklyLimit | null } | { error: string }) => void,
   ) => void;
+  getAiBotDashboard: (callback: (result: import('../room').AiBotDashboard | { error: string }) => void) => void;
+  setAiBotQuotaThresholds: (
+    thresholds: import('../room').BotQuotaThresholds,
+    callback: (result: { ok: true } | { error: string }) => void,
+  ) => void;
   getAiCodexModels: (
     callback: (result: { models: import('../room').CodexModelOption[] } | { error: string }) => void,
   ) => void;

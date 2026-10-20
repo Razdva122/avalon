@@ -1,3 +1,4 @@
+import { defaultBotQuotaThresholds } from './quota-policy';
 import { BotRoom } from './room';
 import { AiService } from './service';
 import type { AiRepository } from './repository';
@@ -289,6 +290,7 @@ test('the service releases the shared room lease after a human action timeout', 
     dbManager: { getUserByID: async () => ({ isAdmin: false }) },
   } as unknown as Manager);
   service.repository = {
+    getBotQuotaThresholds: async () => structuredClone(defaultBotQuotaThresholds),
     claim: async () => {},
     release: async (id: string) => {
       released.push(id);

@@ -1,5 +1,22 @@
 import { validPacket } from './validation';
 
+test('bot threshold edits require a complete bounded numeric policy and an acknowledgement', () => {
+  const thresholds = {
+    smart: { shortTerm: 60, weekly: 5 },
+    regular: { shortTerm: 30, weekly: 3 },
+    beginner: { shortTerm: 20, weekly: 1 },
+  };
+  expect(validPacket('setAiBotQuotaThresholds', [thresholds, () => {}])).toBe(true);
+  for (const value of [-1, 101, NaN, Infinity, '10', 1.5]) {
+    expect(
+      validPacket('setAiBotQuotaThresholds', [{ ...thresholds, regular: { shortTerm: value, weekly: 3 } }, () => {}]),
+    ).toBe(false);
+  }
+  expect(validPacket('setAiBotQuotaThresholds', [{ ...thresholds, extra: {} }, () => {}])).toBe(false);
+  expect(validPacket('setAiBotQuotaThresholds', [{ smart: thresholds.smart }, () => {}])).toBe(false);
+  expect(validPacket('setAiBotQuotaThresholds', [thresholds])).toBe(false);
+});
+
 test('human preparation accepts only its acknowledgement', () => {
   expect(validPacket('createHumanAiRoom', [() => {}])).toBe(true);
   expect(validPacket('createHumanAiRoom', [{ difficulty: 'regular', language: 'ru' }, () => {}])).toBe(false);
@@ -92,6 +109,9 @@ test('Codex catalog and configuration packets accept their required acknowledgem
   expect(validPacket('getAiCodexModels', [() => {}])).toBe(true);
   expect(validPacket('getAiCodexWeeklyLimit', [() => {}])).toBe(true);
   expect(validPacket('getAiCodexWeeklyLimit', [])).toBe(false);
+  expect(validPacket('getAiBotDashboard', [() => {}])).toBe(true);
+  expect(validPacket('getAiBotDashboard', [])).toBe(false);
+  expect(validPacket('getAiBotDashboard', ['forged-user', () => {}])).toBe(false);
   expect(validPacket('configureAiCodex', ['room', { model: 'gpt-6-luna', reasoning: 'high' }, () => {}])).toBe(true);
   expect(validPacket('getAiCodexModels', [])).toBe(false);
   expect(validPacket('configureAiCodex', ['room', { model: 'gpt-6-luna', reasoning: 'high' }])).toBe(false);

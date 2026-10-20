@@ -3,7 +3,8 @@ import { AI_LEASE_MS } from './timing';
 import { calculateAiRatings } from './ratings';
 import { AI_PROFILE_RATING_SEASON } from './rating-season';
 import type { Db } from 'mongodb';
-import type { StartedRoomState, TRoomState, TRoomInfo, PlayerGameSummaryPage } from '@avalon/types';
+import type { StartedRoomState, TRoomState, TRoomInfo, PlayerGameSummaryPage, BotQuotaThresholds } from '@avalon/types';
+import { defaultBotQuotaThresholds, validBotQuotaThresholds } from './quota-policy';
 import { AiPause } from './client';
 
 export type AiRequestLog = {
@@ -57,6 +58,20 @@ type ArchiveSummary = Pick<
 > & { game: Pick<StartedRoomState['game'], 'result'> };
 
 export class AiRepository {
+  async getBotQuotaThresholds(): Promise<BotQuotaThresholds> {
+    const settings = await this.db
+      .collection<{ _id: string; thresholds: BotQuotaThresholds }>('ai_settings')
+      .findOne({ _id: 'bot-quota-thresholds' });
+    if (!settings) return structuredClone(defaultBotQuotaThresholds);
+    if (!validBotQuotaThresholds(settings.thresholds)) throw Error('Invalid bot quota thresholds');
+    return settings.thresholds;
+  }
+  async setBotQuotaThresholds(thresholds: BotQuotaThresholds) {
+    if (!validBotQuotaThresholds(thresholds)) throw Error('Invalid bot quota thresholds');
+    await this.db
+      .collection<{ _id: string; thresholds: BotQuotaThresholds }>('ai_settings')
+      .updateOne({ _id: 'bot-quota-thresholds' }, { $set: { thresholds } }, { upsert: true });
+  }
   private achievementProcessing?: Promise<void>;
   private ratingCache?: { version: number; expires: number; ratings: ReturnType<typeof calculateAiRatings> };
   private ratingPending?: Promise<ReturnType<typeof calculateAiRatings>>;

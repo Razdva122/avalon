@@ -3,6 +3,7 @@ import type { MongoMemoryServer } from 'mongodb-memory-server-core';
 import { createTestMongo } from '@/test-utils/mongo';
 import { MongoClient } from 'mongodb';
 import { AiRepository } from './repository';
+import { defaultBotQuotaThresholds } from './quota-policy';
 import { MigrationManager, migrations } from '@/db/migrations';
 let server: MongoMemoryServer;
 let client: MongoClient;
@@ -13,6 +14,20 @@ beforeAll(async () => {
 afterAll(async () => {
   await client?.close();
   await server?.stop();
+});
+test('bot quota thresholds persist across repository instances and invalid edits leave stored settings intact', async () => {
+  const db = client.db('bot-quota-settings');
+  const repo = new AiRepository(db);
+  expect(await repo.getBotQuotaThresholds()).toEqual(defaultBotQuotaThresholds);
+  const thresholds = {
+    smart: { weekly: 7, shortTerm: 70 },
+    regular: { weekly: 4, shortTerm: 40 },
+    beginner: { weekly: 2, shortTerm: 25 },
+  };
+  await repo.setBotQuotaThresholds(thresholds);
+  expect(await new AiRepository(db).getBotQuotaThresholds()).toEqual(thresholds);
+  await expect(repo.setBotQuotaThresholds({ ...thresholds, beginner: { weekly: -1, shortTerm: 0 } })).rejects.toThrow();
+  expect(await repo.getBotQuotaThresholds()).toEqual(thresholds);
 });
 test('only one concurrent room owns the Codex lease and stale owners cannot renew or release it', async () => {
   const db = client.db('codex-exclusive');

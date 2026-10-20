@@ -75,6 +75,16 @@ const legacyRoutes = {
 
 export const routes: Array<RouteRecordRaw> = [
   {
+    path: '/admin/bots/',
+    name: 'adminBots',
+    component: () => import('@/pages/admin/Bots.vue'),
+    meta: {
+      title: 'Bot administration — Avalon',
+      description: 'Bot instance status and usage limits.',
+      skipSiteMap: true,
+    },
+  },
+  {
     path: '/password-recovery/',
     name: 'passwordRecovery',
     component: () => import('@/pages/account/PasswordRecovery.vue'),
@@ -216,6 +226,10 @@ function updateMetadata(to: RouteLocationNormalized) {
     if (to.name === 'passwordRecovery') {
       meta.title = `${i18n.global.t('passwordRecovery.title')} — Avalon`;
       meta.description = i18n.global.t('passwordRecovery.intro');
+    }
+    if (to.name === 'adminBots') {
+      meta.title = `${i18n.global.t('aiArena.botDashboard')} — Avalon`;
+      meta.description = i18n.global.t('aiArena.botDashboardIntro');
     }
   }
   document.documentElement.lang = i18n.global.locale.value;

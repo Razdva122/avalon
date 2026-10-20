@@ -253,7 +253,12 @@ Codex catalog. Public play uses these fixed server presets:
 | Regular bots | `gpt-6-luna`  | `medium`         | Greater than 30%             | Greater than 3%           |
 | First game   | `gpt-6-luna`  | `low`            | Greater than 20%             | Greater than 1%           |
 
-Both thresholds are strict: equality does not allow a new match. The selected
+These are the default thresholds. Administrators can edit all six integer
+percentages (0–100) on `/admin/bots/`; the policy is persisted in
+`ai_settings` under `bot-quota-thresholds` and read at availability checks,
+room reservation, and launch. Changes do not interrupt running games.
+Both thresholds are strict: equality does not allow a new match. Setting the
+weekly threshold to 100 disables a mode for all accounts. The selected
 preset must also be supported by the authenticated model catalog. Missing or
 invalid quota data disables public starts. If Codex explicitly reports a
 weekly-only account (the other window is null), only the weekly threshold applies;
@@ -268,6 +273,19 @@ snapshot expires; it does not poll the provider while the site is idle. Failed
 reads are also cached for one minute, and an unavailable snapshot denies new
 public starts. Model price comparisons are estimates from the checked-in pricing
 table, not a bill or prediction of subscription consumption.
+
+The administrator menu and the AI room controls link to `/admin/bots/`.
+The panel reports each configured Codex instance, local/cross-process occupancy,
+available public modes, account limits and reset/check times. Room details are
+included for local rooms; remote leases provide a room link. Free/unavailable
+describes eligibility for public game modes, while busy takes precedence over
+quota availability. The panel polls every 15 seconds while visible, retains
+timestamped data on refresh failures and preserves unsaved threshold edits.
+Transient disconnects hide private data but retain a draft in memory until the
+same session is authorized again. Logout, token/account changes, and denied
+access discard that draft. Invalid percentages have inline error explanations.
+Both dashboard reads and threshold writes require current database admin
+authority; credentials and private game decisions are never included.
 
 These checks limit admission; they do not reserve provider quota or guarantee
 completion. Usage elsewhere on the same account can consume the shared quota

@@ -37,6 +37,25 @@ export class VoteInRoom {
 export type CodexSettings = { model: string; reasoning: string };
 export type CodexModelOption = { id: string; label: string; efforts: string[] };
 
+/** Admin-only operational view. Never includes instance environment or credentials. */
+export type AiBotInstanceStatus = {
+  id: string;
+  status: 'free' | 'busy' | 'unavailable';
+  quota: CodexWeeklyLimit | null;
+  modes: Record<AiBotMode, boolean>;
+  roomID?: string;
+  room?: {
+    status: AiRoomState['status'];
+    title?: string;
+    codex?: CodexSettings;
+    playerCount: number;
+    thinking: boolean;
+    waitingForHuman: boolean;
+  };
+};
+export type BotQuotaThresholds = Record<AiBotMode, { shortTerm: number; weekly: number }>;
+export type AiBotDashboard = { checkedAt: number; instances: AiBotInstanceStatus[]; thresholds: BotQuotaThresholds };
+
 export type AiLanguage = 'en' | 'ru' | 'zh-tw' | 'es' | 'vi';
 export type AiPlayerCount = 5 | 6 | 7 | 8;
 export type AiBotDifficulty = 'smart' | 'regular';
