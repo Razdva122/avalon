@@ -235,3 +235,51 @@ test('quota fields identify their mode and explain invalid percentages', async (
     assert.match(html, new RegExp('aria-label="[^"]*dashboardMode' + mode));
   }
 });
+
+function dashboardPage() {
+  const { parse, compileScript } = require('@vue/compiler-sfc');
+  const filename = path.join(__dirname, '../src/pages/admin/Bots.vue');
+  const { descriptor } = parse(fs.readFileSync(filename, 'utf8'), { filename });
+  const code = ts.transpileModule(compileScript(descriptor, { id: filename }).content, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS },
+  }).outputText;
+  const dashboard = {
+    data: vue.ref({ ...snapshot }),
+    denied: vue.ref(false),
+    draftThresholds: vue.ref({ smart: { weekly: 9 } }),
+  };
+  const module = { exports: {} };
+  const mockedRequire = (id) => {
+    if (id === 'vue') return vue;
+    if (id === './locales') return { useAdminBotMessages: () => ({ locale: vue.ref('ru') }) };
+    if (id.includes('useBotDashboard')) return { useBotDashboard: () => dashboard };
+    return {};
+  };
+  new Function('require', 'module', 'exports', code)(mockedRequire, module, module.exports);
+  const scope = vue.effectScope();
+  const page = scope.run(() => module.exports.default.setup({}, { expose() {} }));
+  return { page, dashboard, stop: () => scope.stop() };
+}
+
+test('settings start closed, preserve drafts on close, and close when admin data is removed', async () => {
+  const { page, dashboard, stop } = dashboardPage();
+  try {
+    assert.equal(page.settingsOpen?.value, false);
+    page.settingsOpen.value = true;
+    page.settingsOpen.value = false;
+    assert.equal(dashboard.draftThresholds.value.smart.weekly, 9);
+    page.settingsOpen.value = true;
+    dashboard.data.value = null;
+    await vue.nextTick();
+    assert.equal(page.settingsOpen.value, false);
+    dashboard.data.value = { ...snapshot };
+    await vue.nextTick();
+    assert.equal(page.settingsOpen.value, false);
+    page.settingsOpen.value = true;
+    dashboard.denied.value = true;
+    await vue.nextTick();
+    assert.equal(page.settingsOpen.value, false);
+  } finally {
+    stop();
+  }
+});

@@ -2046,3 +2046,17 @@ for (const language of ['es', 'vi']) {
     assert.deepEqual(room.sent, [['startHumanAiRoom', 'bot-room', { difficulty: 'regular', language }]]);
   });
 }
+
+test('only administrators receive the dashboard destination in a finished room panel', async (t) => {
+  const props = { roomID: 'finished-bot-room', ai: { model: 'codex-chatgpt', status: 'finished', playerCount: 7 } };
+  const admin = await fixture('components/view/panels/AiRoomPanel.vue', { props });
+  t.after(admin.stop);
+  const link = admin.nodes('v-btn').find((node) => node.props?.to?.name === 'adminBots');
+  assert.ok(link, 'administrators can open the dashboard after a game has ended');
+  const member = await fixture('components/view/panels/AiRoomPanel.vue', {
+    props,
+    accessOverrides: { canManage: vue.ref(false) },
+  });
+  t.after(member.stop);
+  assert.ok(!member.nodes('v-btn').some((node) => node.props?.to?.name === 'adminBots'));
+});

@@ -2,13 +2,53 @@
   <main class="bot-admin">
     <header class="page-heading">
       <div>
-        <p class="eyebrow">{{ $t('aiArena.adminOnly') }}</p>
         <h1>{{ $t('aiArena.botDashboard') }}</h1>
-        <p class="muted">{{ $t('aiArena.botDashboardIntro') }}</p>
+        <p class="muted page-intro">{{ $t('aiArena.botDashboardIntro') }}</p>
       </div>
-      <v-btn v-if="!denied" color="primary" variant="outlined" :loading="loading" :disabled="saving" @click="refresh">
-        <v-icon icon="refresh" start aria-hidden="true" />{{ $t('aiArena.dashboardRefresh') }}
-      </v-btn>
+      <div v-if="!denied" class="page-actions">
+        <v-dialog
+          v-if="data"
+          v-model="settingsOpen"
+          :persistent="saving"
+          max-width="920"
+          aria-labelledby="bot-settings-title"
+          scrollable
+        >
+          <template #activator="{ props: activatorProps }">
+            <v-btn v-bind="activatorProps" color="primary" variant="outlined" data-admin-settings>
+              <v-icon icon="settings" start aria-hidden="true" />{{ $t('menu.settings') }}
+            </v-btn>
+          </template>
+          <div class="settings-dialog">
+            <header class="settings-heading">
+              <h2 id="bot-settings-title">{{ $t('menu.settings') }}</h2>
+              <v-btn
+                icon="close"
+                color="primary"
+                variant="text"
+                :aria-label="$t('infoMessage.close')"
+                :disabled="saving"
+                @click="settingsOpen = false"
+              />
+            </header>
+            <div class="settings-body">
+              <BotQuotaSettings
+                :thresholds="data.thresholds"
+                :initial-draft="draftThresholds"
+                :saving="saving"
+                :loading="loading"
+                :error="saveError"
+                :saved="saved"
+                @save="save"
+                @draft="draftThresholds = $event"
+              />
+            </div>
+          </div>
+        </v-dialog>
+        <v-btn color="primary" variant="text" :loading="loading" :disabled="saving" @click="refresh">
+          <v-icon icon="refresh" start aria-hidden="true" />{{ $t('aiArena.dashboardRefresh') }}
+        </v-btn>
+      </div>
     </header>
 
     <p v-if="denied" class="notice" role="alert">{{ $t('aiArena.dashboardDenied') }}</p>
@@ -27,16 +67,7 @@
           <dd>{{ item.count }}</dd>
         </div>
       </dl>
-      <BotQuotaSettings
-        :thresholds="data.thresholds"
-        :initial-draft="draftThresholds"
-        :saving="saving"
-        :loading="loading"
-        :error="saveError"
-        :saved="saved"
-        @save="save"
-        @draft="draftThresholds = $event"
-      />
+
       <p v-if="!data.instances.length" class="notice">{{ $t('aiArena.dashboardEmpty') }}</p>
       <div class="instance-grid">
         <article v-for="bot in data.instances" :key="bot.id" class="instance-card" :aria-labelledby="`bot-${bot.id}`">
@@ -115,7 +146,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useAdminBotMessages } from './locales';
 import type { AiBotInstanceStatus, AiBotMode } from '@avalon/types';
 import type { BotQuotaThresholds } from '@avalon/types';
@@ -125,6 +156,10 @@ import { useBotDashboard } from '@/helpers/composables/useBotDashboard';
 const { locale } = useAdminBotMessages();
 const { data, draftThresholds, loading, denied, error, refresh, saving, saveError, saved, saveThresholds } =
   useBotDashboard();
+const settingsOpen = ref(false);
+watch([data, denied], () => {
+  if (!data.value || denied.value) settingsOpen.value = false;
+});
 async function save(thresholds: BotQuotaThresholds) {
   if (await saveThresholds(thresholds)) void refresh();
 }
@@ -173,25 +208,57 @@ const quotaWindows = (bot: AiBotInstanceStatus) => [
   min-height: 44px;
 }
 h1 {
-  font-size: clamp(26px, 4vw, 36px);
+  font-size: clamp(24px, 4vw, 30px);
   line-height: 1.2;
-  margin: 4px 0 10px;
+  margin: 0 0 6px;
 }
 h2 {
   font-size: 20px;
   overflow-wrap: anywhere;
   min-width: 0;
 }
-.eyebrow,
 .activity-label {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.eyebrow {
-  color: rgb(var(--v-theme-primary));
+.page-intro {
+  font-size: 13px;
 }
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.settings-dialog {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: calc(100dvh - 48px);
+  border-radius: 16px;
+  background: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-text-primary));
+  overflow: hidden;
+}
+.settings-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px 12px 24px;
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.16);
+}
+.settings-body {
+  overflow-y: auto;
+  min-height: 0;
+}
+.settings-body :deep(.quota-settings) {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
 .muted {
   color: rgba(var(--v-theme-on-surface), 0.72);
 }
@@ -200,15 +267,17 @@ h2 {
   flex-wrap: wrap;
   gap: 6px 20px;
   font-size: 13px;
-  margin: 24px 0 16px;
+  margin: 16px 0 12px;
 }
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  background: rgb(var(--v-theme-surface));
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.16);
+  border-radius: 12px;
+  overflow: hidden;
 }
-.summary-card,
 .instance-card,
 .notice {
   background: rgb(var(--v-theme-surface));
@@ -216,17 +285,25 @@ h2 {
   border-radius: 16px;
 }
 .summary-card {
-  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-inline-start: 1px solid rgba(var(--v-theme-on-surface), 0.16);
+}
+.summary-card:first-child {
+  border-inline-start: 0;
 }
 dt {
   font-size: 14px;
 }
 dd {
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 650;
   line-height: 1.3;
   font-variant-numeric: tabular-nums;
-  margin-top: 8px;
+  margin: 0;
 }
 .instance-grid {
   display: grid;
@@ -367,6 +444,12 @@ progress.low::-moz-progress-bar {
   }
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .summary-card:nth-child(3) {
+    border-inline-start: 0;
+  }
+  .summary-card:nth-child(n + 3) {
+    border-top: 1px solid rgba(var(--v-theme-on-surface), 0.16);
   }
   .instance-grid {
     grid-template-columns: minmax(0, 1fr);

@@ -65,7 +65,13 @@
           <p v-if="!ai.publicBotGame && !ai.botDifficulty && ai.model === 'codex-chatgpt'">
             {{ $t('aiArena.codexSubscription') }}
           </p>
-          <v-btn v-if="canManage && ai.model === 'codex-chatgpt'" :to="{ name: 'adminBots' }" variant="text">
+          <v-btn
+            v-if="canManage && ai.model === 'codex-chatgpt'"
+            :to="{ name: 'adminBots' }"
+            class="ai-admin-link"
+            color="primary"
+            variant="outlined"
+          >
             <v-icon icon="analytics" start aria-hidden="true" />{{ $t('aiArena.botDashboard') }}
           </v-btn>
           <div
@@ -510,6 +516,13 @@ details[open] .ai-expand {
 }
 .ai-details :deep(.v-btn__content) {
   white-space: normal;
+}
+.ai-admin-link {
+  box-sizing: border-box;
+  width: 100%;
+  margin-block: 8px;
+  text-transform: none;
+  letter-spacing: 0;
 }
 .ai-error {
   margin: 8px 12px;
