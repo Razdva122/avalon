@@ -274,7 +274,7 @@ const { canPlay, canPlayLargeTables, botModes, botWaitHours, botsBusy, accessSta
   useAiAccess();
 const open = computed({ get: () => props.modelValue, set: (value) => emit('update:modelValue', value) });
 const signedIn = computed(() => Boolean(store.state.profile?.id));
-const selectedMode = ref<'regular' | 'smart' | 'beginner'>(props.beginner ? 'beginner' : 'regular');
+const selectedMode = ref<'regular' | 'smart' | 'beginner'>(props.beginner ? 'beginner' : 'smart');
 const withFriend = ref(Boolean(props.withFriend));
 const humanSeats = ref(2);
 const language = ref<AiLanguage>(
@@ -313,7 +313,8 @@ const languageChoices = [
 ];
 watch([playerCount, withFriend], () => {
   humanSeats.value = Math.min(humanSeats.value, playerCount.value - 1);
-  if (withFriend.value && selectedMode.value === 'beginner') selectedMode.value = 'regular';
+  if (withFriend.value && selectedMode.value === 'beginner')
+    selectedMode.value = modeAvailable('smart') ? 'smart' : 'regular';
   if (withFriend.value || (selectedRole.value && !availableRoles.value.includes(selectedRole.value)))
     selectedRole.value = '';
 });
@@ -341,6 +342,13 @@ const canCreate = computed(
   () =>
     Boolean(ownRoomID.value) ||
     (modeAvailable(selectedMode.value) && (playerCount.value < 7 || canPlayLargeTables.value)),
+);
+watch(
+  () => [modeAvailable('smart'), modeAvailable('regular')],
+  ([smart, regular]) => {
+    if (selectedMode.value === 'smart' && !smart && regular) selectedMode.value = 'regular';
+  },
+  { immediate: true, flush: 'sync' },
 );
 watch([resumeAfterAuth, accessStatus], () => {
   if (!resumeAfterAuth.value || accessStatus.value === 'loading') return;

@@ -1135,6 +1135,50 @@ test('Play with AI remains visible and opens setup when every bot is unavailable
   assert.deepEqual(room.sent, [], 'opening settings must not reserve or create a room');
 });
 
+test('setup defaults to strong bots and falls back to regular bots when access loads', async (t) => {
+  for (const withFriend of [false, true]) {
+    for (const smart of [false, true]) {
+      const room = await fixture('pages/lobby/BotGameSetup.vue', {
+        props: { modelValue: true, withFriend },
+        accessOverrides: { accessStatus: vue.ref('loading') },
+      });
+      t.after(room.stop);
+      assert.match(
+        room.nodes('label').find((node) => node.children.some?.((child) => child.props?.value === 'smart')).props.class,
+        /selected/,
+      );
+      room.access.canPlay.value = true;
+      room.access.botModes.value = { smart, regular: true };
+      room.access.accessStatus.value = 'ready';
+      await room.render();
+      await room
+        .nodes('v-btn')
+        .find((node) => 'data-create-bot-game' in node.props)
+        .props.onClick();
+      assert.equal(room.sent[0][1].difficulty, smart ? 'smart' : 'regular');
+    }
+  }
+});
+
+test('setup preserves a manual regular choice when strong bots are available', async (t) => {
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true, smart: true }) },
+  });
+  t.after(room.stop);
+  room
+    .nodes('input')
+    .find((node) => node.props.value === 'regular')
+    .props['onUpdate:modelValue']('regular');
+  room.access.botModes.value = { regular: true, smart: true };
+  await room.render();
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-create-bot-game' in node.props)
+    .props.onClick();
+  assert.equal(room.sent[0][1].difficulty, 'regular');
+});
+
 test('setup creates the chosen friend table without launching inference', async (t) => {
   const room = await fixture('pages/lobby/BotGameSetup.vue', {
     props: { modelValue: true, withFriend: true },
@@ -1495,7 +1539,7 @@ test('three-human setup reserves two friends and sends the chosen format', async
         beginner: false,
         withFriend: true,
         humanSeats: 3,
-        difficulty: 'regular',
+        difficulty: 'smart',
         language: 'ru',
         playerCount: 5,
       },
