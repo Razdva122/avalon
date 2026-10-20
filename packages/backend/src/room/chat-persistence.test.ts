@@ -193,7 +193,13 @@ test('only a newly persisted human text message finishes the AI discussion turn'
   const room = new BotRoom('human-chat-turn', 'admin', io, async () => ({ choice: 0, speech: 'Test team' }));
   rooms[room.roomID] = room;
   room.joinAsHuman('admin');
-  const run = room.run();
+  Room.prototype.startGame.call(room);
+  if (room.data.stage !== 'started') throw Error('not started');
+  // A human leader skips the separate discussion turn; this scenario needs a bot leader.
+  room.data.manager.game.leader = room.data.manager.game.players.find((player) => player.userID !== 'admin')!;
+  room.ai!.status = 'paused';
+  room.ai!.canResumeTechnical = true;
+  const run = room.run(true);
   try {
     for (let i = 0; i < 100; i++) await new Promise<void>((resolve) => setImmediate(resolve));
     expect(room.ai?.waitingForDiscussion).toBe(true);
