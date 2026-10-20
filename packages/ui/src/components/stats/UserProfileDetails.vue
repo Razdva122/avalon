@@ -32,15 +32,18 @@ const registrationDate = computed(() => {
 .profile-details {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 24px;
+  gap: 12px 24px;
   margin-top: 12px;
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.5;
 }
 dt {
-  opacity: 0.8;
+  color: rgba(var(--v-theme-on-surface), 0.75);
 }
 dd {
   margin: 0;
+  margin-top: 2px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 </style>

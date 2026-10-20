@@ -6,45 +6,49 @@
       <v-card class="profile-card profile-summary" elevation="0">
         <v-card-text>
           <div class="profile-header">
-            <button
-              type="button"
-              @click="openAvatarModal"
-              class="avatar-button"
-              :aria-label="$t('profile.changeAvatar')"
-            >
-              <Avatar class="avatar" :avatarID="$store.state.profile.avatar" />
-              <span class="avatar-edit"><span class="material-icons" aria-hidden="true">photo_camera</span></span>
-            </button>
-            <div class="profile-info">
-              <h2 class="profile-name">{{ $store.state.profile.name || $store.state.profile.login }}</h2>
-              <div class="profile-login">{{ $store.state.profile.login }}</div>
-              <UserProfileDetails :uuid="$store.state.profile.id" />
+            <div class="profile-avatar">
+              <button
+                type="button"
+                @click="openAvatarModal"
+                class="avatar-button"
+                :aria-label="$t('profile.changeAvatar')"
+              >
+                <Avatar class="avatar" :avatarID="$store.state.profile.avatar" alt="" />
+                <span class="avatar-edit"><span class="material-icons" aria-hidden="true">photo_camera</span></span>
+              </button>
               <button type="button" @click="openAvatarModal" class="avatar-link">
                 {{ $t('profile.changeAvatar') }}
               </button>
-              <div v-if="!ratingLoading && trueSkillRating" class="profile-rating">
-                <UserTrueSkillRating :userID="$store.state.profile.id" />
+            </div>
+            <div class="profile-info">
+              <div class="profile-name-row">
+                <h2 class="profile-name">{{ $store.state.profile.name || $store.state.profile.login }}</h2>
+                <div v-if="!ratingLoading && trueSkillRating" class="profile-rating">
+                  <UserTrueSkillRating :userID="$store.state.profile.id" appearance="plain" />
+                </div>
               </div>
+              <div class="profile-login">{{ $store.state.profile.login }}</div>
+              <UserProfileDetails :uuid="$store.state.profile.id" />
             </div>
           </div>
           <div class="profile-actions">
             <v-btn class="action-btn" size="large" @click="goToStats" variant="tonal" color="primary">
               <template v-slot:prepend>
-                <span class="material-icons">analytics</span>
+                <span class="material-icons" aria-hidden="true">analytics</span>
               </template>
               {{ $t('profile.stats') }}
             </v-btn>
             <v-btn class="action-btn" size="large" @click="goToAchievements" variant="tonal" color="primary">
               <template v-slot:prepend>
-                <span class="material-icons">emoji_events</span>
+                <span class="material-icons" aria-hidden="true">emoji_events</span>
               </template>
               {{ $t('menu.achievements') }}
             </v-btn>
             <v-btn
-              class="action-btn"
+              class="action-btn logout-btn"
               size="large"
               color="primary"
-              variant="outlined"
+              variant="text"
               @click="logout"
               prepend-icon="logout"
             >
@@ -579,7 +583,7 @@ export default defineComponent({
   display: flex;
   gap: 24px;
   margin-bottom: 0;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .avatar {
@@ -587,16 +591,9 @@ export default defineComponent({
   height: 104px;
   width: 104px;
   border-radius: 16px;
-  transition: all 0.2s ease;
+  object-fit: cover;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: 2px solid rgba(var(--v-theme-primary), 0.2);
-
-  &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 24px rgba(var(--v-theme-primary), 0.35);
-    border-color: rgba(var(--v-theme-primary), 0.4);
-  }
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.12);
 }
 
 .profile-info {
@@ -617,8 +614,29 @@ export default defineComponent({
   color: rgba(var(--v-theme-on-surface), 0.65);
   overflow-wrap: anywhere;
 }
+.profile-name-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px 24px;
+}
 .profile-rating {
-  margin-top: 4px;
+  padding-left: 24px;
+  border-left: 1px solid rgba(var(--v-theme-on-surface), 0.12);
+}
+.profile-avatar {
+  width: 104px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.profile-summary .profile-info {
+  flex: 1;
+}
+.profile-actions .logout-btn {
+  align-self: flex-end;
+  flex: 0 0 auto;
 }
 
 // Кнопки действий
@@ -868,8 +886,16 @@ export default defineComponent({
     justify-content: flex-start;
   }
 
+  .profile-name-row {
+    gap: 12px;
+    flex-direction: column;
+  }
   .profile-rating {
-    margin-top: 2px;
+    padding-left: 0;
+    border-left: 0;
+  }
+  .profile-avatar {
+    width: 80px;
   }
 
   .profile-actions {
@@ -945,7 +971,7 @@ export default defineComponent({
 }
 .profile-summary :deep(.v-card-text) {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 184px);
   gap: 24px;
   align-items: center;
 }
@@ -954,6 +980,9 @@ export default defineComponent({
   flex-shrink: 0;
   border-radius: 16px;
   cursor: pointer;
+}
+.avatar-button:hover .avatar {
+  border-color: rgb(var(--v-theme-primary));
 }
 .avatar-edit {
   position: absolute;
@@ -972,11 +1001,12 @@ export default defineComponent({
   font-size: 18px;
 }
 .avatar-link {
-  align-self: flex-start;
   min-height: 44px;
-  text-align: left;
+  margin-top: 8px;
+  text-align: center;
   color: rgb(var(--v-theme-primary));
-  font-size: 14px;
+  font-size: 12px;
+  line-height: 1.4;
   font-weight: 600;
   cursor: pointer;
 }
@@ -1052,14 +1082,18 @@ export default defineComponent({
     gap: 20px;
   }
   .profile-actions {
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .profile-actions .action-btn {
-    flex: 1 1 160px;
+  .profile-actions .logout-btn {
+    grid-column: 1 / -1;
+    justify-self: end;
   }
 }
 @media (max-width: 400px) {
+  .profile-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .name-form {
     flex-direction: column;
     align-items: stretch;

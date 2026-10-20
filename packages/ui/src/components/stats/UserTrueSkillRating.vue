@@ -1,6 +1,7 @@
 <template>
-  <div v-if="!loading && trueSkillRating">
-    <v-chip color="primary" variant="tonal" size="default" class="font-weight-medium">
+  <div v-if="!loading && trueSkillRating" :class="{ 'plain-rating': appearance === 'plain' }">
+    <span v-if="appearance === 'plain'" class="rating-value">{{ Math.round(trueSkillRating.mu) }}</span>
+    <v-chip v-else color="primary" variant="tonal" size="default" class="font-weight-medium">
       {{ trueSkillRating?.mu ? Math.round(trueSkillRating?.mu) : '???' }}
     </v-chip>
     <div class="info-hint">
@@ -25,6 +26,10 @@ import type { PlayerTrueSkillRating } from '@avalon/types';
 export default defineComponent({
   name: 'UserTrueSkillRating',
   props: {
+    appearance: {
+      type: String,
+      default: 'chip',
+    },
     userID: {
       type: String,
       required: true,
@@ -88,5 +93,25 @@ export default defineComponent({
 .profile-rating-loading {
   margin-top: 8px;
   margin-bottom: 16px;
+}
+.plain-rating .rating-value {
+  display: block;
+  font-size: 26px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  color: rgb(var(--v-theme-primary));
+}
+.plain-rating .info-hint {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 1;
+  color: rgba(var(--v-theme-on-surface), 0.75);
+}
+@media (max-width: 600px) {
+  .plain-rating .rating-value {
+    font-size: 23px;
+  }
 }
 </style>

@@ -401,6 +401,11 @@ export default defineComponent({
 }
 
 .stats-page {
+  > h1 {
+    font-size: clamp(26px, 2.5vw, 32px);
+    margin-bottom: 20px;
+  }
+
   .good-loyalty-icon,
   .evil-loyalty-icon {
     width: 36px;
