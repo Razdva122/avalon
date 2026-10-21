@@ -33,6 +33,122 @@ test('structured output applies parser limits to evidence, including the failed 
   expect(schema.properties.choice.enum).toEqual(request.choices);
 });
 
+test('memory schema permits testimony keys only for seated humans', () => {
+  const r = {
+    ...request,
+    memoryOnly: true,
+    humanPlayerIDs: ['human-3', 'human-5'],
+    state: {
+      ...request.state,
+      players: [
+        { id: 'bot', index: 1 },
+        { id: 'human-3', index: 3 },
+        { id: 'human-5', index: 5 },
+      ],
+    },
+  } as unknown as BotRequest;
+  const pattern = new RegExp(
+    codexSchema(['observe'], true, false, r).properties.evidence!.items.properties.key.pattern!,
+  );
+  expect(pattern.test('t:3:role')).toBe(true);
+  expect(pattern.test('t:5:King')).toBe(true);
+  expect(pattern.test('t:1:role')).toBe(false);
+  expect(pattern.test('t:4:role')).toBe(false);
+});
+
+test('memory schema permits only human references at their original mixed-chat positions', () => {
+  const r = {
+    ...request,
+    readAllChat: true,
+    memoryOnly: true,
+    humanPlayerID: 'human',
+    humanPlayerIDs: ['human'],
+    state: {
+      ...request.state,
+      players: [
+        { id: 'bot', index: 1 },
+        { id: 'human', index: 3 },
+      ],
+    },
+    chat: Array.from({ length: 18 }, (_, i) => ({
+      id: `m-${i}`,
+      name: [0, 4, 17].includes(i) ? '3' : '1',
+      text: `statement ${i}`,
+    })),
+  } as unknown as BotRequest;
+  const source = codexSchema(['observe'], true, false, r).properties.evidence!.items.properties.source;
+  expect(source).toMatchObject({ items: { enum: [1, -1, -14] } });
+});
+
+test('ordinary decision schema uses text sources and reserves t: identities for human memory', () => {
+  const schema = codexSchema(['approve'], true, false, { ...request, readAllChat: true });
+  const properties = schema.properties.evidence!.items.properties;
+  expect(properties.source).toMatchObject({ type: 'string', minLength: 1, maxLength: 160 });
+  expect(properties.source).not.toHaveProperty('anyOf');
+  const key = new RegExp(properties.key.pattern!);
+  expect(key.test('conflict:4')).toBe(true);
+  expect(key.test('m1_fail')).toBe(true);
+  expect(key.test('t')).toBe(true);
+  expect(key.test('t:5:role')).toBe(false);
+});
+
+test.each([{ refs: [1] }, { refs: [1, 2, 3, 4, 5] }])(
+  'an ambiguous numeric bot note $refs cannot cancel a valid team selection',
+  async ({ refs }) => {
+    process.env.NODE_ENV = 'development';
+    process.env.AI_CODEX_ENABLED = 'true';
+    const input = {
+      ...request,
+      readAllChat: true,
+      humanPlayerIDs: ['human-5'],
+      choices: ['5, 1, 2', '5, 1, 3'],
+      state: {
+        ...request.state,
+        stage: 'selectTeam',
+        players: Array.from({ length: 5 }, (_, i) => ({
+          id: i === 4 ? 'human-5' : `bot-${i + 1}`,
+          index: i + 1,
+          role: 'unknown',
+          features: {},
+        })),
+      },
+      chat: Array.from({ length: 5 }, (_, i) => ({ name: String((i % 4) + 1), text: 'A bot statement.' })),
+    } as unknown as BotRequest;
+    const fact = {
+      key: 'm1_fail',
+      kind: 'fact',
+      fact: 'Mission 1 had one Fail.',
+      source: 'completedMissions',
+      certainty: 'claim',
+    };
+    const raw = JSON.stringify({
+      choice: '5, 1, 2',
+      speech: 'Keep 1 and 3 apart.',
+      publicReason: '',
+      evidence: [
+        fact,
+        {
+          key: 'conflict:4',
+          kind: 'testimony',
+          fact: '4 accuses 5 without public proof.',
+          source: refs,
+          certainty: 'claim',
+        },
+      ],
+      claimMorgana: null,
+      claimStances: [],
+    });
+    const repo = { renewLease: jest.fn(), recordRequest: jest.fn(), recordDecision: jest.fn() };
+    const generate = codexDecide('numeric-testimony-regression', repo, async () => ({ text: raw, usage: {} }));
+    await expect(generate(input, { decisionDetails: true, phase: 'decision' })).resolves.toMatchObject({
+      choice: 0,
+      speech: 'Keep 1 and 3 apart.',
+      evidence: [fact],
+    });
+    await expect(generate({ ...input, choices: ['1, 3, 4'] }, { decisionDetails: true })).rejects.toThrow();
+  },
+);
+
 test('structured output lets the model identify a free-form eighth-seat claim', () => {
   const r = {
     ...request,

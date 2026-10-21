@@ -375,3 +375,76 @@ test('live unread tracking refuses missing or duplicated message IDs instead of 
   await expect(decide(duplicated)).rejects.toThrow('stable');
   expect(generated).toBe(0);
 });
+
+test('memory keeps mixed discussion context and preserves human corrections for later decisions', async () => {
+  const r = input(1);
+  r.chat = [
+    { id: 'bot-before', name: '1', text: 'I played Success.' },
+    { id: 'human-original', name: '2', text: 'I trust King.' },
+    { id: 'bot-between', name: '1', text: 'Send me with King.' },
+    { id: 'human-correction', name: '2', text: 'Now I suspect King.' },
+  ];
+  const frames: ReturnType<typeof compactRequest>[] = [];
+  const decide = decisionPipeline(async (req, o) => {
+    if (o.phase !== 'memory') {
+      frames.push(o.context as ReturnType<typeof compactRequest>);
+      return { choice: 0, speech: '', evidence: [] };
+    }
+    const context = o.context as ReturnType<typeof compactRequest>;
+    expect(context.chat).toEqual([
+      { by: '1', text: 'I played Success.' },
+      { by: '2', text: 'I trust King.' },
+      { by: '1', text: 'Send me with King.' },
+      { by: '2', text: 'Now I suspect King.' },
+    ]);
+    return parseDecisionReply(
+      JSON.stringify({
+        choice: 'observe',
+        speech: '',
+        publicReason: '',
+        evidence: [
+          {
+            key: 't:2:King',
+            kind: 'testimony',
+            fact: 'Trusted King; now suspects King.',
+            source: [-2, -4],
+            certainty: 'claim',
+          },
+        ],
+      }),
+      req.choices,
+      req,
+    );
+  });
+  await expect(decide(r)).resolves.toMatchObject({ choice: 0 });
+  await decide({
+    ...r,
+    chat: [
+      ...r.chat,
+      ...Array.from({ length: 30 }, (_, i) => ({
+        id: `later-bot-${i}`,
+        name: '1',
+        text: 'Continue.',
+      })),
+    ],
+  });
+  expect(frames[1].humanStatements).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ by: 2, text: 'I trust King.' }),
+      expect.objectContaining({ by: 2, text: 'Now I suspect King.' }),
+    ]),
+  );
+});
+
+test('memory ignores bot-authored notes without losing valid human testimony or accepting false human sources', () => {
+  const r = { ...input(1), memoryOnly: true, choices: ['observe'] };
+  r.chat.unshift({ id: 'bot-message', name: '1', text: 'I played Success.' });
+  const bot = { key: 't:1:role', kind: 'testimony', fact: '1 reports Success.', source: [-1], certainty: 'claim' };
+  const human = { key: 't:2:King', kind: 'testimony', fact: '2 changed position.', source: [-2], certainty: 'claim' };
+  const raw = (evidence: unknown[]) => JSON.stringify({ choice: 'observe', speech: '', publicReason: '', evidence });
+  expect(parseDecisionReply(raw([bot]), r.choices, r).evidence).toEqual([]);
+  expect(parseDecisionReply(raw([bot, human]), r.choices, r).evidence).toEqual([{ ...human, source: 'recent:2' }]);
+  expect(() => parseDecisionReply(raw([{ ...human, source: [-1] }]), r.choices, r)).toThrow(
+    'Testimony reference is not a visible statement by its author',
+  );
+});

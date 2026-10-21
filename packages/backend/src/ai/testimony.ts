@@ -1,5 +1,11 @@
 import type { BotRequest } from './client';
 
+export function humanSeatNumbers(request: BotRequest): number[] {
+  return (request.humanPlayerIDs ?? (request.humanPlayerID ? [request.humanPlayerID] : []))
+    .map((id) => request.state.players.find((p) => p.id === id)?.index)
+    .filter((n): n is number => n !== undefined);
+}
+
 /** Select verbatim testimony; importance comes from the model, never keyword matching. */
 export function humanTestimony(request: BotRequest, humanSeats: number[], omitChat: boolean) {
   const recent = new Set(omitChat ? [] : request.chat.slice(-14));
@@ -65,16 +71,13 @@ export function humanTestimony(request: BotRequest, humanSeats: number[], omitCh
 
 /** Numbers are local to this exact input; persisted anchors always use original message identities. */
 export function numericTestimonySource(request: BotRequest, refs: unknown, author: number): string {
-  if (!Array.isArray(refs) || !refs.length || refs.length > 8 || new Set(refs).size !== refs.length)
-    throw new Error('Invalid testimony references');
-  const humans = (request.humanPlayerIDs ?? (request.humanPlayerID ? [request.humanPlayerID] : []))
-    .map((id) => request.state.players.find((p) => p.id === id)?.index)
-    .filter((n): n is number => n !== undefined);
+  if (!Array.isArray(refs) || !refs.length || refs.length > 8) throw new Error('Invalid testimony references');
+  const humans = humanSeatNumbers(request);
   const omitChat = ['end', 'assassinate'].includes(request.state.stage);
   const rows = request.state.stage === 'onMission' ? [] : humanTestimony(request, humans, omitChat);
   const historical: number[] = [],
     recent: number[] = [];
-  for (const ref of refs) {
+  for (const ref of new Set(refs)) {
     if (!Number.isInteger(ref) || ref === 0) throw new Error('Invalid testimony reference');
     const message =
       ref < 0

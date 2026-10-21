@@ -17,6 +17,7 @@ export const botOptions: GameOptions = {
 };
 
 type Choice = { text: string; actions: TGameMethodsParams[] };
+type Publication = { id: string; text: string; requestID: string };
 const humanTimeoutMessage: Record<AiLanguage, string> = {
   es: 'Partida terminada: se agotaron el tiempo de acción y la reserva compartida.',
   vi: 'Ván chơi đã kết thúc: thời gian hành động và thời gian dự phòng chung đã hết.',
@@ -42,6 +43,7 @@ export class BotRoom extends Room {
   private humanActionTimer?: ReturnType<typeof setTimeout>;
   private discussionMessages?: { since: number; existing: Set<string | undefined> };
   private missionChoices = new Map<string, Choice>();
+  private directAction?: { id: string; choice: Choice; applied: boolean; before: Publication[]; after: Publication[] };
   private discussion?: {
     spoken: Set<string>;
     finalTeam?: Choice;
@@ -79,6 +81,14 @@ export class BotRoom extends Room {
       io,
       options,
     );
+    this.checkpoint = async (state) => {
+      try {
+        await checkpoint(state);
+      } catch (error) {
+        if (error instanceof AiPause) throw error;
+        throw new AiTechnicalPause('Could not save AI room progress. Retry to continue.');
+      }
+    };
     this.onChatMessage = (entry) => {
       if (
         entry.kind !== 'sticker' &&
@@ -550,6 +560,24 @@ export class BotRoom extends Room {
       }
     }
     if (state.stage === 'onMission') this.missionChoices.set(id, choices[answer.choice]);
+    if (!councilDiscussion && ['checkLoyalty', 'announceLoyalty', 'assassinate'].includes(state.stage)) {
+      const inspected = state.players.find((player) => player.features.isSelected);
+      const after: Publication[] = [];
+      if (state.stage === 'announceLoyalty' && inspected) {
+        after.push({
+          id,
+          text: aiText(this.language).inspection(this.label(inspected.id), answer.choice === 0),
+          requestID: randomUUID(),
+        });
+        if (!this.isHuman(inspected.id))
+          after.push({
+            id: inspected.id,
+            text: aiText(this.language).inspectionResponse(this.label(id), answer.choice === 0),
+            requestID: randomUUID(),
+          });
+      }
+      this.directAction = { id, choice: choices[answer.choice], applied: false, before: [], after };
+    }
     if (answer.privateReason?.trim()) {
       const previous = this.spectatorDecisions.findIndex((decision) => decision.playerID === id);
       if (previous >= 0) this.spectatorDecisions.splice(previous, 1);
@@ -583,7 +611,10 @@ export class BotRoom extends Room {
       if (task.startsWith('Choose the final team')) {
         speech = `${aiText(this.language).proposal(choices[answer.choice].text)} ${speech}`;
       }
-      await this.publish(id, speech);
+      if (this.directAction) {
+        this.directAction.before.push({ id, text: speech, requestID: randomUUID() });
+        await this.publishDirectQueue(this.directAction.before);
+      } else await this.publish(id, speech);
     } else {
       await this.checkpoint(this.calculateRoomState());
     }
@@ -593,8 +624,14 @@ export class BotRoom extends Room {
     if (this.cancelled) return;
     const discussion = this.discussion;
     if (discussion) discussion.pendingPublication = { id, text, requestID };
-    if (this.persistChatMessage) await this.persistChatMessage(id, text, requestID);
-    else this.addMessage(id, text, requestID);
+    if (this.persistChatMessage) {
+      try {
+        await this.persistChatMessage(id, text, requestID);
+      } catch (error) {
+        if (error instanceof AiPause) throw error;
+        throw new AiTechnicalPause('Could not save AI chat message. Retry to continue.');
+      }
+    } else this.addMessage(id, text, requestID);
     // Insertion succeeded; a later checkpoint pause must not duplicate this message.
     if (discussion) delete discussion.pendingPublication;
     await this.checkpoint(this.calculateRoomState());
@@ -830,6 +867,7 @@ export class BotRoom extends Room {
   }
 
   private async act() {
+    if (this.directAction) return this.completeDirectAction();
     const game = this.manager.game;
     if (game.stage === 'selectTeam') return this.discussTeam();
     if (game.stage === 'votingForTeam') return this.voteForTeam();
@@ -889,19 +927,28 @@ export class BotRoom extends Room {
     }
     if (!choices.length) throw new AiPause('No legal actions available.');
     const result = await this.ask(id, task, choices, speak, privateCheck);
-    if (result) {
-      const inspected = state.players.find((p) => p.features.isSelected);
-      this.apply(id, choices[result.choice]);
-      if (state.stage === 'announceLoyalty' && inspected) {
-        await this.publish(id, aiText(this.language).inspection(this.label(inspected.id), result.choice === 0));
-        // Public Good-persona stance for either side; never changes private alignment knowledge.
-        if (!this.isHuman(inspected.id))
-          await this.publish(
-            inspected.id,
-            aiText(this.language).inspectionResponse(this.label(id), result.choice === 0),
-          );
-      }
+    if (result) await this.completeDirectAction();
+  }
+
+  private async publishDirectQueue(queue: Publication[]) {
+    while (queue.length && !this.cancelled) {
+      const pending = queue[0];
+      await this.publish(pending.id, pending.text, pending.requestID);
+      queue.shift();
     }
+  }
+
+  private async completeDirectAction() {
+    const pending = this.directAction;
+    if (!pending || this.cancelled) return;
+    await this.publishDirectQueue(pending.before);
+    if (this.cancelled) return;
+    if (!pending.applied) {
+      this.apply(pending.id, pending.choice);
+      pending.applied = true;
+    }
+    await this.publishDirectQueue(pending.after);
+    if (!this.cancelled) this.directAction = undefined;
   }
 
   async run(resumeTechnical = false) {

@@ -34,10 +34,16 @@ export function validateClaims(request: BotRequest, reply: BotReply) {
   const stances = reply.claimStances || [];
   if (
     !Array.isArray(stances) ||
-    new Set(stances.map((s) => s?.seat)).size !== stances.length ||
     stances.some((s) => !s || !stanceTargets.includes(s.seat) || !['trust', 'distrust'].includes(s.stance))
   )
     throw Error('Invalid public claim position');
+  const unique = new Map<number, (typeof stances)[number]>();
+  for (const stance of stances) {
+    if (unique.has(stance.seat) && unique.get(stance.seat)!.stance !== stance.stance)
+      throw Error('Conflicting public claim positions');
+    unique.set(stance.seat, stance);
+  }
+  if (reply.claimStances) reply.claimStances = [...unique.values()];
 }
 
 export const claimInstructions =

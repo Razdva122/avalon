@@ -1,7 +1,7 @@
 import { claimContext, validateClaims, claimInstructions } from './claims';
 import { languageInstruction } from './language';
 import shuffle from 'lodash/shuffle';
-import { humanTestimony } from './testimony';
+import { humanSeatNumbers, humanTestimony } from './testimony';
 import type { AiLanguage } from '@avalon/types';
 import {
   AiPause,
@@ -77,13 +77,18 @@ export function safePublicSpeech(
   percivalClaim = false,
 ): string {
   // This guard detects explicit private-role leaks only; it does not understand claims or choose wording.
-  const checked = percivalClaim ? speech.replace(/\bpercival\b|персиваль|派西維爾/gi, 'public claim') : speech;
+  const checked = percivalClaim
+    ? speech.replace(
+        /\b(?:my role is|our role is|mi rol es|nuestro rol es)\s+(?:the\s+)?percival\b|(?:моя|наша)\s+роль\s*(?:—|-|это)?\s*персиваль|vai trò của tôi\s*(?:là\s*)?percival|我的角色(?:是|為)?派西維爾|\bpercival\b|персиваль|派西維爾/giu,
+        'public claim',
+      )
+    : speech;
   const roleLeak =
     /\b(?:i am|i'm|we are|we're)\s+(?:an?\s+|the\s+)?(?:evil|merlin|percival|morgana|mordred|minion|oberon)\b|(?:я|мы)\s*(?:—|-|это|являюсь|являемся)?\s*(?:злой|злые|мерлин|персиваль|моргана|мордред|приспешник|оберон)|(?:我|我們)是(?:邪惡|梅林|派西維爾|莫甘娜|莫德雷德|奧伯倫|爪牙)/i;
   const privateLeak =
     /\b(?:my|our) (?:evil allies|role is|wizard pair|wizard candidates)\b|\b[1-8]\s+(?:is|must be)\s+merlin\b|\bmerlin\s+is\s+[1-8]\b|[1-8]\s*(?:—|-|это|является)\s*мерлин|мерлин\s*(?:—|-|это)\s*[1-8]|мо[яи]\s+(?:роль|злые союзники|союзники|сообщники|пара магов|кандидаты в маги)|(?:我的(?:角色|邪惡盟友|梅林候選人)|[1-8]\s*是梅林)/i;
   const sabotageIntent =
-    /\b(?:i|we)\s+(?:will|want to|intend to|plan to|am going to|are going to)\s+(?:sabotage|help evil|(?:let|make|ensure|force)[^.!?]{0,50}\bfail)\b|\b(?:my|our)\s+strategy\s+to\s+(?:let|make|ensure|force)[^.!?]{0,50}\bfail\b|\b(?:prevent\w*|avoid\w*|unintended|accidental)\b[^.!?]{0,70}\bsuccess\b|(?:я|мы)\s+(?:саботир|(?:хочу|хотим|буду|будем|намерен|намерены)\s+(?:саботир|провалить|устроить\s+провал|помочь\s+злу))|(?:избеж|предотврат)[^.!?]{0,50}успех|(?:我|我們)(?:要|想要|想|打算|會|將|計畫)[^。！？]{0,40}(?:破壞|幫助邪惡|讓任務失敗)|(?:避免|阻止)[^。！？]{0,40}(?:成功|正義獲勝)/i;
+    /\b(?:i|we)\s+(?:will|want to|intend to|plan to|am going to|are going to)\s+(?:sabotage|help evil|(?:let|make|ensure|force)[^.!?]{0,50}\bfail)\b|\b(?:my|our)\s+strategy\s+to\s+(?:let|make|ensure|force)[^.!?]{0,50}\bfail\b|\b(?:prevent\w*|avoid\w*)\s+(?:the\s+)?(?:risk\s+of\s+)?(?:(?:an?|the|any|another|this|that|their|our|its|your|accidental|unintended|risky|(?:good|mission|team)(?:['’]s)?)\s+){0,5}success\b|\b(?:unintended|accidental)\s+success\b|(?:я|мы)\s+(?:саботир|(?:хочу|хотим|буду|будем|намерен|намерены)\s+(?:саботир|провалить|устроить\s+провал|помочь\s+злу))|(?:избеж|предотврат)[а-яё]*\s+(?:риск[а-яё]*\s+)?(?:(?:(?:случайн|нежелательн|очередн|мирн|наш|ваш|эт)[а-яё]*|их)\s+){0,3}успех|(?:我|我們)(?:要|想要|想|打算|會|將|計畫)[^。！？]{0,40}(?:破壞|幫助邪惡|讓任務失敗)|(?:避免|阻止)(?:讓)?(?:這次|本次|這輪|本輪|該輪|此次|任務|意外|正義|的){0,4}(?:成功|正義獲勝)/i;
   const translatedLeak =
     /(?:^|[\s.!?])(?:yo\s+)?(?:soy|somos)\s+(?:del\s+mal|malvado|malvada|merl[ií]n|percival|morgana|mordred|minion|oberon)\b|(?:tôi|chúng tôi)\s+(?:là\s+(?:merlin|percival|morgana|mordred|minion|oberon)|(?:là|thuộc)\s+phe\s+[aá]c)|\b(?:mi|nuestro)\s+(?:rol\s+es|aliado\s+del\s+mal|pareja\s+de\s+magos)\b|vai trò của tôi|đồng minh phe [aá]c của tôi|\b[1-8]\s+es\s+merl[ií]n\b|[1-8]\s+là\s+Merlin|\b(?:voy a|vamos a|quiero|queremos)\s+sabotear\b|(?:tôi|chúng tôi)\s+(?:sẽ|muốn|định)\s+phá hoại/iu;
   if (
@@ -270,7 +275,10 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
       ? ' Perform personality in publicReason; earlier chat supplies facts, not a neutral voice to imitate.'
       : '') +
     (isOpeningPair(request) ? ' ' + openingTieBreakAdvice : '') +
-    ' Return JSON choice, speech (private <=240 chars), publicReason (published verbatim <=240 chars), evidence (<=3 changed key/kind/fact/source/certainty notes). Use claim for hypotheses/testimony, bluff for deception; omit unchanged notes. Full-circle speech may be silent; a repeat-proposal leader must explain.'
+    ' Return JSON choice, speech (private <=240 chars), publicReason (published verbatim <=240 chars), evidence (<=3 changed key/kind/fact/source/certainty notes). Use claim for hypotheses/testimony, bluff for deception; omit unchanged notes. Full-circle speech may be silent; a repeat-proposal leader must explain.' +
+    (request.readAllChat
+      ? ' Action evidence uses descriptive text sources, never numeric arrays. The t: key namespace is reserved for the separate human-memory update; use other keys for action notes.'
+      : '')
   );
 }
 
@@ -397,9 +405,7 @@ export function decisionPipeline(generate: Generate): Decide {
       };
       signal?.throwIfAborted();
       if (request.readAllChat) {
-        const humanSeats = (request.humanPlayerIDs ?? (request.humanPlayerID ? [request.humanPlayerID] : []))
-          .map((id) => request.state.players.find((p) => p.id === id)?.index)
-          .filter((n): n is number => n !== undefined);
+        const humanSeats = humanSeatNumbers(request);
         const messages = request.chat.filter((m) => humanSeats.includes(Number(m.name)));
         if (messages.some((m) => !m.id) || new Set(messages.map((m) => m.id)).size !== messages.length)
           throw new AiTechnicalPause('Human memory requires unique stable message IDs.');
@@ -443,6 +449,7 @@ export function decisionPipeline(generate: Generate): Decide {
             ) +
             playerNameInstructions +
             ' Privately read these human messages; choose observe, speech and publicReason empty, claimMorgana=null, claimStances=[]. Return only JSON with at most3 changed testimony notes; no gameplay action. ' +
+            'Only authors in humanSeats may have testimony notes. Bot messages are context only, never testimony authors or sources. If no human testimony needs updating, return evidence=[]. ' +
             'Prioritize corrections and changes of trust, roster preferences, commitments, role/check claims. Unverified does not mean unimportant. Skip noise, repeated claims and reconstructible mission arithmetic. ' +
             'Each key is t:AUTHOR:SUBJECT (e.g. t:7:King or t:2:role). Keep separate subjects and authors separate. Preserve exact names/aliases even without a seat mapping; never replace them with someone. ' +
             'In fact preserve earliest stance, intermediate reversal and latest stance in order, within240 characters. On same-key update retain relevant earlier history from modelHypotheses, never flatten a changed stance into a generic claim. A repeated claim is not a new role change. ' +

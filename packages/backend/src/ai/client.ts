@@ -1,6 +1,6 @@
 import { claimContext, validateClaims } from './claims';
 import { languageInstruction } from './language';
-import { humanTestimony, numericTestimonySource } from './testimony';
+import { humanSeatNumbers, humanTestimony, numericTestimonySource } from './testimony';
 import type { AiBotDifficulty, AiLanguage, VisualGameState } from '@avalon/types';
 
 export type BotRequest = {
@@ -335,9 +335,7 @@ export function compactRequest(request: BotRequest) {
         ? ' Vote cover: you need three successes AND survival. With fewer than two failures, on ANY mission you MAY deliberately approve a team containing visible Evil when a concrete cover benefit outweighs added mission risk, even if a safer roster is reachable. Compare score, public grounds, prior words and votes, and a reachable alternative. Repeated accurate vetoes while plausible Good players approve can expose you; approval may break that pattern despite an earlier safer preference. Neither an accusation nor certainty of protection is required. Lack of public evidence or one accurate rejection alone does not justify the risk. Known Evil remain Evil and may sabotage despite earlier successes. Otherwise pursue the safer winning plan. No approval quota, random votes or alternating pattern. Keep the motive private and the vote silent; invent no evidence. This permits a vote, not deliberately selecting a dangerous roster or playing Fail.'
         : ' Vote cover is unavailable at two failures: do not accept established risk of a third failure for concealment. Still evaluate the actual Fail threshold: one Evil cannot fail a two-Fail mission.';
   }
-  const humanSeats = (request.humanPlayerIDs ?? (request.humanPlayerID ? [request.humanPlayerID] : []))
-    .map((id) => seat(id))
-    .filter((index) => index !== undefined);
+  const humanSeats = humanSeatNumbers(request);
   const humanStatements = humanTestimony(request, humanSeats, end || assassination);
   const failsRequired = state.settings?.missions[state.mission]?.failsRequired;
   const lastCompletedMission = missions[missions.length - 1]?.n ?? 0;
@@ -467,7 +465,7 @@ export function parseReply(text: string, choices: number | string[], maxSpeech =
     value.choice < 0 ||
     value.choice >= (Array.isArray(choices) ? choices.length : choices) ||
     typeof value.speech !== 'string' ||
-    value.speech.length > maxSpeech
+    [...value.speech].length > maxSpeech
   )
     throw Error('invalid AI reply');
   return { choice: value.choice, speech: value.speech.trim() };
@@ -477,7 +475,16 @@ export function parseDecisionReply(text: string, choices: string[], request?: Bo
   const reply = parseReply(text, choices, 240);
   const data = JSON.parse(text.replace(/^```(?:json)?\s*|\s*```$/g, ''));
   const bounded = (value: unknown, max: number) =>
-    typeof value === 'string' && value.trim().length > 0 && value.length <= max;
+    typeof value === 'string' && value.trim().length > 0 && [...value].length <= max;
+  if (request?.readAllChat && Array.isArray(data?.evidence)) {
+    const humans = humanSeatNumbers(request);
+    // Unsupported notes cannot pin human history or cancel an otherwise valid game decision.
+    data.evidence = data.evidence.filter((note: DecisionEvidence) => {
+      if (!request.memoryOnly) return !Array.isArray(note?.source) || note?.key?.startsWith('t:');
+      const author = /^t:([1-8]):/u.exec(note?.key);
+      return !author || humans.includes(Number(author[1]));
+    });
+  }
   if (request?.readAllChat && Array.isArray(data?.evidence)) {
     for (const note of data.evidence) {
       if (
@@ -491,7 +498,7 @@ export function parseDecisionReply(text: string, choices: string[], request?: Bo
   }
   if (
     typeof data.publicReason !== 'string' ||
-    data.publicReason.length > 240 ||
+    [...data.publicReason].length > 240 ||
     !Array.isArray(data.evidence) ||
     data.evidence.length > 3 ||
     data.evidence.some(
