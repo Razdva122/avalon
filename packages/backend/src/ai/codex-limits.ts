@@ -118,7 +118,8 @@ export async function readCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
 
 const cache = new Map<string, { expires: number; value: CodexWeeklyLimit | null }>();
 const pending = new Map<string, Promise<CodexWeeklyLimit | null>>();
-export async function getCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
+export async function getCodexWeeklyLimit(fresh = false): Promise<CodexWeeklyLimit | null> {
+  if (fresh) return readCodexWeeklyLimit().catch(() => null);
   const environment = codexEnvironment();
   const key = hasRemoteCodex()
     ? remoteCodexCacheKey()

@@ -32,6 +32,7 @@ afterEach(() => {
 
 function fixture() {
   let admin = true;
+  const games: import('@avalon/types').AiGameUsage[] = [];
   let thresholds = {
     smart: { shortTerm: 60, weekly: 5 },
     regular: { shortTerm: 30, weekly: 3 },
@@ -44,6 +45,7 @@ function fixture() {
   const service = new AiService(host);
   service.repository = {
     busyInstances: async () => [{ instanceID: 'one', roomID: 'remote-room' }],
+    recentGameUsage: async () => games,
     getBotQuotaThresholds: async () => thresholds,
     setBotQuotaThresholds: async (value: typeof thresholds) => {
       thresholds = value;
@@ -67,6 +69,7 @@ function fixture() {
   }
   return {
     host,
+    games,
     request,
     revoke: () => {
       admin = false;
@@ -148,4 +151,21 @@ test('only admins can change thresholds and saved values govern the next availab
   expect(result.instances[1].status).toBe('unavailable');
   expect(await f.request('admin', { ...thresholds, beginner: { weekly: -1, shortTerm: 0 } })).toHaveProperty('error');
   expect((await f.request('admin')).thresholds).toEqual(thresholds);
+});
+
+test('usage history marks abandoned games stopped while keeping another process live game active', async () => {
+  const f = fixture();
+  f.games.push(
+    ...([
+      { roomID: 'remote-room', instanceID: 'one', status: 'running' },
+      { roomID: 'abandoned-room', instanceID: 'two', status: 'paused' },
+      { roomID: 'completed-room', instanceID: 'two', status: 'finished' },
+    ] as import('@avalon/types').AiGameUsage[]),
+  );
+  const result = await f.request('admin');
+  expect(result.games.map((game: import('@avalon/types').AiGameUsage) => game.status)).toEqual([
+    'running',
+    'stopped',
+    'finished',
+  ]);
 });

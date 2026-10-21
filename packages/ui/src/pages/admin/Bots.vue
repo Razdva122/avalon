@@ -140,6 +140,7 @@
           </footer>
         </article>
       </div>
+      <BotUsageStats :games="data.games" />
       <p class="muted shared-hint">{{ $t('aiArena.codexWeeklyShared') }}</p>
     </template>
   </main>
@@ -151,6 +152,7 @@ import { useAdminBotMessages } from './locales';
 import type { AiBotInstanceStatus, AiBotMode } from '@avalon/types';
 import type { BotQuotaThresholds } from '@avalon/types';
 import BotQuotaSettings from './BotQuotaSettings.vue';
+import BotUsageStats from './BotUsageStats.vue';
 import { useBotDashboard } from '@/helpers/composables/useBotDashboard';
 
 const { locale } = useAdminBotMessages();
