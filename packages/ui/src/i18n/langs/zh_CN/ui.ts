@@ -86,6 +86,7 @@ export default {
     gameSettings: '游戏设置',
   },
   breadCrumbs: {
+    trapper: "@:{'trapper.name'}",
     merlin: '梅林',
     merlin_pure: '终极梅林',
     guinevere: '女皇',

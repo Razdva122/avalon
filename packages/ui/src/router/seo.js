@@ -1,3 +1,4 @@
+const { trapper } = require('../i18n/langs/pages/seo/trapper');
 const guideSeo = require('../i18n/langs/pages/seo/guides');
 const { communitySolo, communityGroup } = require('../i18n/langs/pages/seo/playerBoards');
 const {
@@ -252,6 +253,12 @@ module.exports.routesSeo = {
       },
       image: 'features/plot_cards.webp',
     },
+  },
+  trapper: {
+    path: '/wiki/expansions/trapper/',
+    name: 'trapper',
+    priority: 0.5,
+    meta: { prerender: true, multiLanguage: trapper, image: 'features/trapper.webp' },
   },
   excalibur: {
     path: '/wiki/expansions/excalibur/',

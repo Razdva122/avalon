@@ -18,6 +18,7 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
     excaliburText:
       'Đảo lá Thành công hoặc Thất bại của một người khác trong Nhiệm vụ sau khi nộp bài, hoặc bỏ qua việc dùng kiếm.',
     plotCardsText: 'Bộ 7 hoặc 15 lá bài bổ sung kiểm tra phe, bác bỏ Đội, đổi Đội trưởng và bỏ phiếu công khai.',
+    trapperText: 'Thêm một người vào mỗi nhiệm vụ. Đội trưởng loại một lá bài đã đánh và bí mật xem giá trị của nó.',
   },
   en: {
     seoHeading: 'Avalon expansions: rules and comparison',
@@ -35,6 +36,8 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
     excaliburText:
       "Flip one other mission participant's Success or Fail after cards are submitted, or skip using the sword.",
     plotCardsText: 'A 7- or 15-card deck adds loyalty checks, team rejection, leadership changes and public voting.',
+    trapperText:
+      'Send one extra player on each mission. The leader excludes one played card and privately sees its value.',
   },
   ru: {
     seoHeading: 'Дополнения Авалона: правила и сравнение',
@@ -51,6 +54,8 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
       'Альтернативная Леди, способная раскрыть злую роль. Добрые роли не называются; есть исключения для ложной лояльности.',
     excaliburText: 'После сдачи карт меняет успех или провал другого участника миссии. Применение можно пропустить.',
     plotCardsText: 'Колода из 7 или 15 карт добавляет проверки, отмену команды, смену лидера и публичные голосования.',
+    trapperText:
+      'Добавляет в поход лишнего участника. Лидер исключает одну сыгранную карту и тайно узнаёт её значение.',
   },
   es: {
     seoHeading: 'Expansiones de Avalon: reglas y comparación',
@@ -68,6 +73,7 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
     excaliburText:
       'Invierte el Éxito o Fracaso de otro participante tras entregar las cartas de misión. Puedes no usarla.',
     plotCardsText: 'Un mazo de 7 o 15 cartas añade consultas, rechazo de equipos, cambios de líder y votos públicos.',
+    trapperText: 'Añade un jugador a cada misión. El líder excluye una carta jugada y ve su valor en secreto.',
   },
   pt: {
     seoHeading: 'Expansões de Avalon: regras e comparação',
@@ -86,6 +92,7 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
       'Inverta o Sucesso ou Fracasso de outro participante após a entrega das cartas de missão. O uso é opcional.',
     plotCardsText:
       'Um baralho de 7 ou 15 cartas acrescenta verificações, rejeição de equipes, mudanças de líder e votos públicos.',
+    trapperText: 'Adiciona um jogador a cada missão. O líder exclui uma carta jogada e vê seu valor em segredo.',
   },
   'zh-CN': {
     seoHeading: '阿瓦隆扩展规则：仙女、神剑与剧情卡比较',
@@ -100,6 +107,7 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
     ladySeaText: '可揭示坏人角色的另一种仙女，不显示好人具体角色，并有误导阵营的例外。',
     excaliburText: '任务牌提交后翻转另一位参与者的成功或失败，也可选择不用剑。',
     plotCardsText: '7张或15张牌组增加阵营查验、否决队伍、更换队长和公开投票。',
+    trapperText: '每次任务多派一人。队长排除一张已打出的任务牌，并私下查看其结果。',
   },
   'zh-TW': {
     seoHeading: '阿瓦隆擴充規則：仙女、神劍與劇情卡比較',
@@ -114,5 +122,6 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
     ladySeaText: '可揭示壞人角色的另一種仙女，不顯示好人具體角色，並有誤導陣營的例外。',
     excaliburText: '任務牌提交後翻轉另一位參與者的成功或失敗，也可選擇不用劍。',
     plotCardsText: '7張或15張牌組增加陣營查驗、否決隊伍、更換隊長和公開投票。',
+    trapperText: '每次任務多派一人。隊長排除一張已打出的任務牌，並私下查看其結果。',
   },
 };

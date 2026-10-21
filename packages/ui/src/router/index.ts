@@ -30,6 +30,7 @@ const routeComponentMap = {
   lady_of_lake: () => import('@/pages/wiki/addons/LadyOfTheLake.vue'),
   lady_of_sea: () => import('@/pages/wiki/addons/LadyOfTheSea.vue'),
   plot_cards: () => import('@/pages/wiki/addons/PlotCards.vue'),
+  trapper: () => import('@/pages/wiki/addons/Trapper.vue'),
   excalibur: () => import('@/pages/wiki/addons/Excalibur.vue'),
   morgana: () => import('@/pages/wiki/roles/Morgana.vue'),
   percival: () => import('@/pages/wiki/roles/Percival.vue'),

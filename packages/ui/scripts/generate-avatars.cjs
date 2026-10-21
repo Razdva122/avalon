@@ -41,7 +41,7 @@ async function generateAvatars() {
   const thumbnailGroups = {
     roles: groups.roles,
     core: [...groups.core, 'player-frame.webp'],
-    features: [...groups.features, 'plot_cards.webp'],
+    features: [...groups.features, 'plot_cards.webp', 'trapper.webp'],
   };
   let thumbnailCount = 0;
   for (const [group, files] of Object.entries(thumbnailGroups)) {

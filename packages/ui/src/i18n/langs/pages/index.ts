@@ -1,5 +1,6 @@
 import { cosmeticRewards } from './cosmeticRewards';
 import { roleDeal } from './roleDeal';
+import { trapperGuide } from './trapperGuide';
 import { expansions } from './expansions';
 import { wikiPlay } from './wikiPlay';
 import { community } from './community';
@@ -52,6 +53,7 @@ export const pages: { [key in TLanguage]: Dictionary<Dictionary<string>> } = {
 };
 
 Object.entries({
+  trapperGuide,
   roleDeal,
   cosmeticRewards,
   expansions,

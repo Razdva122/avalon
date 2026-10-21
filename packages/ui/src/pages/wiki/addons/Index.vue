@@ -53,10 +53,15 @@
           :description="$t('addons.ladyOfSea')"
         />
       </LocaleLink>
-      <LocaleLink class="addon" :to="{ name: 'rules', hash: '#trapper' }">
+      <LocaleLink class="addon" :to="{ name: 'trapper' }">
         <h2>{{ $t('trapper.name') }}</h2>
-        <p>{{ $t('trapper.rules') }}</p>
-        <p>{{ $t('trapper.requirements') }}</p>
+        <p>{{ $t('expansions.trapperText') }}</p>
+        <SchemaImage
+          class="addon-image"
+          :src="getImagePathByID('features', 'trapper')"
+          :alt="$t('trapper.name')"
+          :description="$t('trapper.name')"
+        />
       </LocaleLink>
     </div>
     <section class="wiki-panel">

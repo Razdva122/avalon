@@ -16,13 +16,7 @@
     <component
       :is="linked ? 'LocaleLink' : 'span'"
       class="preview-link addon"
-      :to="
-        linked
-          ? target === 'trapper'
-            ? { name: 'rules', hash: '#trapper' }
-            : { name: toSnakeCase(target) }
-          : undefined
-      "
+      :to="linked ? { name: toSnakeCase(target) } : undefined"
     >
       <AddonIcon class="icon-in-link" :addon="target" />
       <template v-if="text !== ''">

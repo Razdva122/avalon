@@ -24,7 +24,7 @@ export default defineComponent({
   },
   computed: {
     targetNames() {
-      return [...Object.keys(rolesShortInfo), 'ladyOfLake', 'ladyOfSea', 'excalibur', 'plotCards'];
+      return [...Object.keys(rolesShortInfo), 'ladyOfLake', 'ladyOfSea', 'excalibur', 'plotCards', 'trapper'];
     },
     messageParts() {
       // i18n-t reuses the same slot VNode for repeated named placeholders.

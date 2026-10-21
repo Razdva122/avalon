@@ -188,3 +188,68 @@ test('Trapper cannot be enabled below eight players', () => {
   assert.notEqual(instance.settings.addons.trapper, true);
   assert.equal(emitted.length, 0);
 });
+
+test('addon help uses short Trapper copy, its own rules page and independent Plot Cards help', async () => {
+  const Vue = require('vue');
+  const { renderToString } = require('@vue/server-renderer');
+  const { createI18n } = require('vue-i18n');
+  const { trapper } = require('../src/i18n/langs/trapper.ts');
+  const words = require('../src/i18n/langs/ru/addons.ts').default;
+  const help = [];
+  const Help = {
+    props: ['label', 'content', 'route', 'hint'],
+    setup:
+      (props, { slots }) =>
+      () => {
+        help.push({ ...props });
+        return Vue.h('aside', slots.default?.());
+      },
+  };
+  const icon = parse(
+    fs.readFileSync(path.resolve(__dirname, '../src/components/view/information/AddonIcon.vue'), 'utf8'),
+  ).descriptor;
+  const iconModule = { exports: {} };
+  new Function(
+    'require',
+    'module',
+    'exports',
+    ts.transpileModule(icon.script.content, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText,
+  )(require, iconModule, iconModule.exports);
+  const AddonIcon = { ...iconModule.exports.default, render: Vue.compile(icon.template.content) };
+  const Subject = {
+    ...Options,
+    components: { ...Options.components, OptionHelp: Help, AddonIcon, PlayerIcon: { render: () => null } },
+    data() {
+      return { ...Options.data.call(this), type: 'addons', settings: { roles: {}, addons: {} } };
+    },
+    render: Vue.compile(parse(fs.readFileSync(optionsFile, 'utf8')).descriptor.template.content),
+  };
+  const app = Vue.createSSRApp(Subject, { roles: {}, addons: {}, buttonText: 'Дополнения', section: 'addons' });
+  app.use(
+    createI18n({
+      legacy: false,
+      locale: 'ru',
+      messages: { ru: { ...words, trapper: trapper.ru } },
+      missingWarn: false,
+      fallbackWarn: false,
+    }),
+  );
+  for (const name of ['v-btn', 'v-dialog', 'v-card', 'v-checkbox', 'v-tabs', 'v-tab']) {
+    app.component(name, {
+      setup:
+        (_, { slots }) =>
+        () =>
+          Vue.h('div', slots.default?.()),
+    });
+  }
+  const html = await renderToString(app);
+  const trapped = help.find((item) => item.label === 'Ловец');
+  assert.equal(trapped.route, 'trapper');
+  assert.equal(trapped.content, trapper.ru.hint);
+  assert.ok(trapped.content.length < 150);
+  assert.equal(trapped.hint, trapper.ru.players);
+  const plot = help.find((item) => item.label === 'Сюжетные карты');
+  assert.equal(plot.content, words.options.plotCardsHint);
+  assert.equal(plot.hint, undefined);
+  assert.match(html, /class="[^"]*icon-trapper[^"]*"/);
+});

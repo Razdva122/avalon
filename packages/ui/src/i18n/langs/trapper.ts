@@ -12,6 +12,8 @@ export const trapper = {
     cardTitle: 'Исключённая карта: {player}',
     private: 'Значение карты видно только вам.',
     done: 'Понятно',
+    hint: 'В поход идёт лишний игрок. Лидер исключает одну карту и тайно узнаёт её значение.',
+    players: '8–10 игроков',
   },
   en: {
     name: 'Trapper',
@@ -26,6 +28,8 @@ export const trapper = {
     cardTitle: 'Excluded card: {player}',
     private: 'Only you can see this card’s value.',
     done: 'Got it',
+    hint: 'Send one extra player. The leader excludes one mission card and privately sees its value.',
+    players: '8–10 players',
   },
   es: {
     name: 'Trampero',
@@ -40,6 +44,8 @@ export const trapper = {
     cardTitle: 'Carta excluida: {player}',
     private: 'Solo tú puedes ver el valor de esta carta.',
     done: 'Entendido',
+    hint: 'Envía un jugador adicional. El líder excluye una carta y ve su valor en secreto.',
+    players: '8–10 jugadores',
   },
   pt: {
     name: 'Armadilheiro',
@@ -54,6 +60,8 @@ export const trapper = {
     cardTitle: 'Carta excluída: {player}',
     private: 'Só você pode ver o valor desta carta.',
     done: 'Entendi',
+    hint: 'Envie um jogador extra. O líder exclui uma carta e vê seu valor em segredo.',
+    players: '8–10 jogadores',
   },
   vi: {
     name: 'Người đặt bẫy',
@@ -68,6 +76,8 @@ export const trapper = {
     cardTitle: 'Bài bị loại: {player}',
     private: 'Chỉ bạn thấy giá trị của lá bài này.',
     done: 'Đã hiểu',
+    hint: 'Thêm một người đi nhiệm vụ. Đội trưởng loại một lá bài và bí mật xem giá trị của nó.',
+    players: '8–10 người chơi',
   },
   'zh-CN': {
     name: '捕手',
@@ -82,6 +92,8 @@ export const trapper = {
     cardTitle: '被排除的牌：{player}',
     private: '只有你能看到这张牌的结果。',
     done: '明白了',
+    hint: '任务多派一人。队长排除一张任务牌，并私下查看其结果。',
+    players: '8–10人',
   },
   'zh-TW': {
     name: '捕手',
@@ -96,5 +108,7 @@ export const trapper = {
     cardTitle: '被排除的牌：{player}',
     private: '只有你能看到這張牌的結果。',
     done: '明白了',
+    hint: '任務多派一人。隊長排除一張任務牌，並私下查看其結果。',
+    players: '8–10人',
   },
 };

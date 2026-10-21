@@ -15,6 +15,7 @@ const wikiNamespaces = new Set([
   'lady',
   'ladySea',
   'excalibur',
+  'trapperGuide',
   'plotCards',
   'morgana',
   'percival',

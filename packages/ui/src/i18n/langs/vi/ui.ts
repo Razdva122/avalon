@@ -85,6 +85,7 @@ export default {
     gameSettings: 'Cài đặt trò chơi',
   },
   breadCrumbs: {
+    trapper: "@:{'trapper.name'}",
     merlin: 'Merlin',
     merlin_pure: 'Merlin thuần khiết',
     guinevere: 'Guinevere',

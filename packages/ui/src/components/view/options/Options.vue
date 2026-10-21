@@ -132,15 +132,14 @@
               :route="addon.route"
               :content="addon.hint"
               :hint="
-                addon.name === 'trapper' || addon.name === 'plotCards'
-                  ? $t('trapper.requirements')
+                addon.name === 'trapper'
+                  ? $t('trapper.players')
                   : addon.name === 'ladyOfLake' || addon.name === 'ladyOfSea'
                     ? $t('options.ladyExclusive')
                     : undefined
               "
             >
-              <span v-if="addon.name === 'trapper'" class="material-icons" aria-hidden="true">layers</span>
-              <span v-else class="addon-icon" :class="addon.name" aria-hidden="true"></span>
+              <AddonIcon class="addon-icon" :addon="addon.name" aria-hidden="true" />
             </OptionHelp>
             <v-checkbox
               :model-value="settings.addons[addon.name]"
@@ -197,6 +196,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+import AddonIcon from '@/components/view/information/AddonIcon.vue';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import OptionHelp from './OptionHelp.vue';
 import { rolesShortInfo } from '@/components/view/information/const';
@@ -206,7 +206,7 @@ import type { GameOptionsRoles, GameOptionsAddons, GameOptionsFeatures, TAddonsN
 type RoleName = keyof GameOptionsRoles;
 
 export default defineComponent({
-  components: { PlayerIcon, OptionHelp },
+  components: { PlayerIcon, AddonIcon, OptionHelp },
   emits: { apply: (_options: OptionsDraft) => true },
   props: {
     roles: { required: true, type: Object as PropType<GameOptionsRoles> },
@@ -337,7 +337,7 @@ export default defineComponent({
           route: 'excalibur',
           hint: this.$t('options.excaliburHint'),
         },
-        { name: 'trapper', label: this.$t('trapper.name'), route: 'rules', hint: this.$t('trapper.rules') },
+        { name: 'trapper', label: this.$t('trapper.name'), route: 'trapper', hint: this.$t('trapper.hint') },
         {
           name: 'plotCards',
           label: this.$t('addons.plotCards'),
@@ -638,18 +638,6 @@ export default defineComponent({
   height: 1px;
   overflow: hidden;
   clip-path: inset(50%);
-}
-.ladyOfLake {
-  background-image: getImagePathByID('features', 'lady_of_lake');
-}
-.ladyOfSea {
-  background-image: getImagePathByID('features', 'lady_of_sea');
-}
-.excalibur {
-  background-image: getImagePathByID('features', 'excalibur');
-}
-.plotCards {
-  background-image: getImagePathByID('features', 'plot_cards');
 }
 @media (max-width: 599px) {
   .category-full {

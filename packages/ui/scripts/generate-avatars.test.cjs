@@ -20,6 +20,7 @@ test('image generation preserves avatar animation and creates 512px avatars plus
     'roles/merlin',
     'core/player-frame',
     'features/plot_cards',
+    'features/trapper',
     'core/blue_team_no_background',
     'core/red_team_no_background',
     'features/lady_of_lake',
@@ -53,6 +54,7 @@ test('image generation preserves avatar animation and creates 512px avatars plus
     'core/player-frame',
     'core/blue_team_no_background',
     'features/plot_cards',
+    'features/trapper',
   ]) {
     const thumbnail = path.join(root, 'src/assets/thumbnails', name + '.webp');
     assert.ok(await fs.stat(thumbnail).catch(() => false), `Missing thumbnail: ${name}`);

@@ -1,6 +1,5 @@
 <template>
-  <span v-if="addon === 'trapper'" class="material-icons trapper-icon" :title="$t('trapper.name')">layers</span>
-  <span v-else :title="addon" class="addon-image" :class="'icon-' + addon"></span>
+  <span :title="addon === 'trapper' ? $t('trapper.name') : addon" class="addon-image" :class="'icon-' + addon"></span>
 </template>
 
 <script lang="ts">
@@ -19,12 +18,13 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.trapper-icon {
-  font-size: 22px;
-  text-align: center;
-}
 .addon-image {
   display: block;
+}
+
+.icon-trapper {
+  background-image: getThumbnailPathByID('features', 'trapper');
+  background-size: contain;
 }
 
 .icon-excalibur {

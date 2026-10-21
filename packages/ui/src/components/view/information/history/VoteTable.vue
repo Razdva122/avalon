@@ -6,6 +6,7 @@
         <span class="legend-item"><i class="swatch approve" />{{ $t('vote.approve') }}</span>
         <span class="legend-item"><i class="swatch reject" />{{ $t('vote.reject') }}</span>
         <span>✓ {{ $t('history.teamMember') }}</span>
+        <span>⊘ {{ $t('trapper.excluded') }}</span>
         <span class="legend-item"><i class="swatch leader" />{{ $t('history.teamLeader') }}</span>
         <span>? {{ $t('history.anonymousVotes') }}</span>
         <span class="legend-item"><i class="swatch forced" />{{ $t('vote.forcedVote') }}</span>
@@ -62,6 +63,7 @@
                 :aria-label="cellLabel(vote, player.id)"
               >
                 <span v-if="vote.team.some((member) => member.id === player.id)">✓</span>
+                <span v-if="isExcluded(vote, player.id)" class="excluded-card" aria-hidden="true">⊘</span>
                 <small v-if="vote.anonymous && !vote.forced">?</small>
                 <span class="sr-only">{{ cellLabel(vote, player.id) }}</span>
               </td>
@@ -114,6 +116,26 @@ const groups = computed(() => {
   return result;
 });
 const columns = computed(() => groups.value.flatMap((group) => group.votes));
+const excludedCards = computed(() => {
+  const result = new Map<THistoryVote, string>();
+  let lastVote: THistoryVote | undefined;
+  for (const entry of props.history) {
+    if (entry.type === 'hidden') lastVote = undefined;
+    if (entry.type === 'vote') lastVote = entry;
+    const targetID =
+      entry.type === 'mission'
+        ? entry.excludedPlayerID
+        : entry.type === 'discardMissionCard'
+          ? entry.targetID
+          : undefined;
+    if (targetID && lastVote && (lastVote.forced || lastVote.result === 'approve')) {
+      result.set(lastVote, targetID);
+    }
+    if (entry.type === 'mission') lastVote = undefined;
+  }
+  return result;
+});
+const isExcluded = (vote: THistoryVote, id: string) => excludedCards.value.get(vote) === id;
 const value = (vote: THistoryVote, id: string) =>
   vote.forced || vote.anonymous ? undefined : vote.votes.find((item) => item.playerID === id)?.value;
 const count = (vote: THistoryVote, option: 'approve' | 'reject') =>
@@ -122,6 +144,7 @@ const cellLabel = (vote: THistoryVote, id: string) => {
   const parts = [props.playerNames[id]];
   if (vote.leaderID === id) parts.push(t('history.teamLeader'));
   if (vote.team.some((member) => member.id === id)) parts.push(t('history.teamMember'));
+  if (isExcluded(vote, id)) parts.push(t('trapper.excluded'));
   const choice = value(vote, id);
   parts.push(
     vote.forced
@@ -191,6 +214,9 @@ td {
 small {
   font-size: 13px;
   margin-left: 2px;
+}
+.excluded-card {
+  margin-left: 3px;
 }
 .player-name {
   position: sticky;
