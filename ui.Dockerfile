@@ -15,7 +15,7 @@ USER pptruser
 RUN npm ci
 
 COPY --chown=pptruser:pptruser . .
-RUN AVALON_BUILD_CONTAINER=1 npm run build:ui
+RUN node --test .github/tests/*.test.cjs && AVALON_BUILD_CONTAINER=1 npm run build:ui
 
 # Export the exact audited build with images for packaging in CI.
 FROM scratch AS release-artifact

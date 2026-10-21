@@ -1,0 +1,77 @@
+name: Check UI before release
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact release commit to validate
+        type: string
+        required: true
+    outputs:
+      artifact-name:
+        description: Verified UI release artifact from this run
+        value: ${{ jobs.check-ui.outputs.artifact-name }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ui-preflight-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOCKER_BUILD_RECORD_UPLOAD: 'false'
+
+jobs:
+  check-ui:
+    name: UI release preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      artifact-name: ui-release-${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+
+      - name: Resolve checked commit
+        id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: docker/setup-buildx-action@v3
+
+      # The pinned Puppeteer image also pins the actual Node/Chrome build runtime.
+      # No registry login or publishing is needed for PR and branch validation.
+      - name: Build and audit UI in the release environment
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ui.Dockerfile
+          target: release-artifact
+          outputs: type=local,dest=./ui-release
+          platforms: linux/amd64
+          cache-from: type=gha,scope=ui-release-check
+          cache-to: type=gha,scope=ui-release-check,mode=max
+
+      - name: Verify production nginx routing
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes nginx
+          SEO_DIST_DIR=./ui-release node packages/ui/scripts/check-seo-nginx.cjs
+
+      - name: Save verified UI release
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-release-${{ steps.source.outputs.sha }}
+          path: ui-release/
+          if-no-files-found: error
+          retention-days: 1

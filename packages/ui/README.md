@@ -199,6 +199,30 @@ addon icons and team badges use them; full portraits and card artwork retain
 originals. The Material Icons subset is checked in; normal builds need no Python.
 See `src/assets/fonts/README.md` when adding icon names or updating Vuetify.
 
+## Release preflight
+
+`Check UI before release` runs for pull requests and pushes to `master`. It builds
+`ui.Dockerfile` for Linux amd64 using the same pinned Node/Chrome container as
+publication, then runs the existing tests, prerender, bundle budgets, browser
+checks and production nginx routing checks. No registry credentials or container
+publishing are needed for this check.
+
+Commit and push changes before creating a version, then wait for this check to
+succeed. `npm run check:release` verifies a successful push check for the exact
+current `HEAD` on `master` and refuses a dirty working tree, a missing check or a
+failed/incomplete run. It requires an authenticated GitHub CLI (`gh auth status`).
+`npm version` runs this gate in `preversion`, before changing version files or
+creating the release tag.
+
+Tag publication also calls the same preflight for its resolved release commit.
+Both backend and UI publishing wait for it. The UI container packages the
+verified artifact from that run instead of compiling it again. Manual publication
+of an existing tag validates that tag's commit in the same way.
+
+Workflow and release-gate regression tests run with
+`node --test .github/tests/*.test.cjs`; the UI Docker build runs them before the
+full application build.
+
 ## Feature guides
 
 - [AI Arena](../../docs/ai-rooms.md), [voice beta](../../docs/voice-chat.md) and [persistent room chat](../../docs/room-chat.md)

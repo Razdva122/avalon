@@ -15,7 +15,9 @@
     "build:ui": "cross-env NODE_ENV=production npm run build --workspace=packages/ui",
     "start:backend": "cross-env NODE_ENV=production npm run start --workspace=packages/backend",
     "version": "npm run test && npm version $npm_package_version --no-git-tag-version --workspaces && git add .",
-    "postversion": "git push && git push origin tag v$npm_package_version"
+    "postversion": "git push && git push origin tag v$npm_package_version",
+    "check:release": "node .github/scripts/check-release-preflight.cjs",
+    "preversion": "npm run check:release"
   },
   "dependencies": {
     "dotenv": "^16.4.7",

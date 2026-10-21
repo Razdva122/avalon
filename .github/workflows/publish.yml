@@ -62,9 +62,16 @@ jobs:
           echo "tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
+  # The reusable check finishes before either container can be published.
+  check-ui:
+    needs: resolve-release
+    uses: ./.github/workflows/check-ui.yml
+    with:
+      ref: ${{ needs.resolve-release.outputs.sha }}
+
   # Publish backend image
   publish-backend:
-    needs: resolve-release
+    needs: [resolve-release, check-ui]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -94,7 +101,7 @@ jobs:
 
   # Package images with the exact audited UI build.
   publish-ui:
-    needs: resolve-release
+    needs: [resolve-release, check-ui]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -105,10 +112,6 @@ jobs:
           ref: ${{ needs.resolve-release.outputs.sha }}
           persist-credentials: false
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
       - uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
@@ -117,22 +120,11 @@ jobs:
           username: ${{ vars.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build and export the audited UI release
-        uses: docker/build-push-action@v6
+      - name: Download the verified UI release
+        uses: actions/download-artifact@v4
         with:
-          context: .
-          file: ui.Dockerfile
-          target: release-artifact
-          outputs: type=local,dest=./ui-release
-          platforms: linux/amd64
-          cache-from: type=registry,ref=${{ vars.DOCKER_HUB_USERNAME }}/nginx-avalon:buildcache
-          cache-to: type=registry,ref=${{ vars.DOCKER_HUB_USERNAME }}/nginx-avalon:buildcache,mode=max
-
-      - name: Verify exported pages with production nginx routing
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes nginx
-          SEO_DIST_DIR=./ui-release node packages/ui/scripts/check-seo-nginx.cjs
+          name: ${{ needs.check-ui.outputs.artifact-name }}
+          path: ui-release
 
       - name: Package and publish the same UI release
         uses: docker/build-push-action@v6

@@ -37,9 +37,19 @@ test('resolved release outputs preserve the selected tag and the checked-out com
   assert.ok(step);
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'avalon-release-test-'));
   try {
+    const head = 'a'.repeat(40);
+    // Docker deliberately omits .git; supply an explicit checked-out SHA fixture.
+    fs.writeFileSync(
+      path.join(dir, 'git'),
+      `#!${process.execPath}
+if (process.argv.slice(2).join(' ') !== 'rev-parse HEAD') process.exit(1);
+process.stdout.write('${head}\\n');
+`,
+      { mode: 0o700 },
+    );
     const output = path.join(dir, 'output');
     const result = spawnSync('bash', ['-e', '-c', step.run], {
-      env: { ...process.env, RELEASE_TAG: 'v68.0.1', GITHUB_OUTPUT: output },
+      env: { ...process.env, PATH: `${dir}:${process.env.PATH}`, RELEASE_TAG: 'v68.0.1', GITHUB_OUTPUT: output },
       encoding: 'utf8',
     });
     assert.equal(result.status, 0, result.stderr);
@@ -50,7 +60,6 @@ test('resolved release outputs preserve the selected tag and the checked-out com
         .split('\n')
         .map((line) => line.split('=')),
     );
-    const head = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim();
     assert.equal(outputs.tag, 'v68.0.1');
     assert.equal(outputs.sha, head);
   } finally {
