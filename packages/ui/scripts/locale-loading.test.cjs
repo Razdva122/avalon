@@ -82,3 +82,106 @@ test('failed language choice keeps the current interface language', async () => 
   await assert.rejects(select('ru'), /offline/);
   assert.equal(active, 'en');
 });
+
+test('Trapper article dictionaries load only for its page, preserve common messages and reuse cached fallback', async () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const ts = require('typescript');
+  const calls = [];
+  const languages = ['en', 'ru', 'es', 'pt', 'vi', 'zh-CN', 'zh-TW'];
+  const loaders = (group) =>
+    Object.fromEntries(
+      languages.map((language) => [
+        language,
+        async () => {
+          calls.push(`${group}:${language}`);
+          return { [group]: { title: `${group}:${language}` } };
+        },
+      ]),
+    );
+  const module = { exports: {} };
+  const dependencies = {
+    'vue-i18n': require('vue-i18n'),
+    '@/helpers/i18n': { selectLocale: () => 'en' },
+    '@/i18n': {
+      localeLoaders: loaders('common'),
+      wikiLocaleLoaders: loaders('wiki'),
+      trapperLocaleLoaders: loaders('trapperGuide'),
+    },
+    './loader': require('../src/plugins/i18n/loader.ts'),
+  };
+  const source = fs.readFileSync(path.join(__dirname, '../src/plugins/i18n/index.ts'), 'utf8');
+  new Function(
+    'require',
+    'module',
+    'exports',
+    ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText,
+  )((name) => dependencies[name], module, module.exports);
+  const { loadWikiLanguage, i18n } = module.exports;
+  await loadWikiLanguage('ru');
+  assert.deepEqual(calls, ['common:en', 'common:ru', 'wiki:en', 'wiki:ru']);
+  await loadWikiLanguage('ru', 'trapper');
+  assert.deepEqual(calls.slice(4), ['trapperGuide:en', 'trapperGuide:ru']);
+  assert.equal(i18n.global.getLocaleMessage('ru').common.title, 'common:ru');
+  assert.equal(i18n.global.getLocaleMessage('ru').wiki.title, 'wiki:ru');
+  assert.equal(i18n.global.getLocaleMessage('ru').trapperGuide.title, 'trapperGuide:ru');
+  await loadWikiLanguage('ru', 'trapper');
+  assert.equal(calls.length, 6);
+  await loadWikiLanguage('es', 'trapper');
+  assert.deepEqual(calls.slice(6), ['common:es', 'wiki:es', 'trapperGuide:es']);
+});
+
+test('route guard loads Trapper articles for case-insensitive matches and leaves other wiki routes unchanged', async () => {
+  const fs = require('node:fs');
+  const ts = require('typescript');
+  const { createRouter, createMemoryHistory } = require('vue-router');
+  const { basePath } = require('../src/router/paths');
+  const routerSource = fs.readFileSync(require('node:path').join(__dirname, '../src/router/index.ts'), 'utf8');
+  const guardSource = routerSource.slice(
+    routerSource.indexOf('router.beforeResolve('),
+    routerSource.indexOf('router.afterEach('),
+  );
+  let guard;
+  const calls = [];
+  new Function(
+    'router',
+    'pageLanguage',
+    'isNeutralPath',
+    'preferredLanguage',
+    'store',
+    'navigator',
+    'basePath',
+    'loadWikiLanguage',
+    'loadLanguage',
+    ts.transpileModule(guardSource, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText,
+  )(
+    {
+      beforeResolve: (fn) => {
+        guard = fn;
+      },
+    },
+    () => 'ru',
+    () => false,
+    () => 'ru',
+    { state: { settings: {} } },
+    { languages: ['ru'] },
+    basePath,
+    async (...args) => calls.push(['wiki', ...args]),
+    async (...args) => calls.push(['common', ...args]),
+  );
+  const routes = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: '/ru/wiki/expansions/trapper/', meta: { id: 'trapper' }, component: {} },
+      { path: '/ru/wiki/roles/merlin/', meta: { id: 'merlin' }, component: {} },
+    ],
+  });
+  await guard(routes.resolve('/ru/wiki/expansions/Trapper/'));
+  await guard(routes.resolve('/ru/Wiki/Expansions/Trapper/'));
+  await guard(routes.resolve('/ru/wiki/roles/merlin/'));
+  assert.deepEqual(calls, [
+    ['wiki', 'ru', 'trapper'],
+    ['wiki', 'ru', 'trapper'],
+    ['wiki', 'ru', undefined],
+  ]);
+});

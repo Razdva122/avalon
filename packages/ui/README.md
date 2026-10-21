@@ -185,7 +185,8 @@ entry, 383.25 KiB for wiki entries and 466 KiB for chart pages. CSS stays below
 51 KiB per ordinary/wiki entry and 56 KiB for chart pages. App/vendor JS is
 limited to 270 KiB; with common locale fallbacks, 332 KiB. Each common language
 dictionary also has its own 29–37 KiB limit, so wiki copy cannot silently return
-to the shared download. It rejects renderer preloads and icon
+to the shared download. The Trapper guide has separate per-language chunks, loaded
+only on its own page; other wiki entries must not preload them. It rejects renderer preloads and icon
 fonts over 25 KiB. Third-party SDKs are outside these first-party budgets.
 
 `check-startup.cjs` exercises an early click with JavaScript deliberately held,

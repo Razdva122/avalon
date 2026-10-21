@@ -26,3 +26,16 @@ export const wikiLocaleLoaders: Record<TLanguage, () => Promise<TranslationMessa
   'zh-TW': () =>
     import(/* webpackChunkName: "wiki-locale-zh-tw" */ './generated/wiki-zh-TW.json').then((m) => m.default),
 };
+
+// This expansion's full guide is not needed on unrelated wiki pages.
+export const trapperLocaleLoaders: Record<TLanguage, () => Promise<TranslationMessages>> = {
+  en: () => import(/* webpackChunkName: "trapper-locale-en" */ './generated/trapper-en.json').then((m) => m.default),
+  ru: () => import(/* webpackChunkName: "trapper-locale-ru" */ './generated/trapper-ru.json').then((m) => m.default),
+  es: () => import(/* webpackChunkName: "trapper-locale-es" */ './generated/trapper-es.json').then((m) => m.default),
+  pt: () => import(/* webpackChunkName: "trapper-locale-pt" */ './generated/trapper-pt.json').then((m) => m.default),
+  vi: () => import(/* webpackChunkName: "trapper-locale-vi" */ './generated/trapper-vi.json').then((m) => m.default),
+  'zh-CN': () =>
+    import(/* webpackChunkName: "trapper-locale-zh-cn" */ './generated/trapper-zh-CN.json').then((m) => m.default),
+  'zh-TW': () =>
+    import(/* webpackChunkName: "trapper-locale-zh-tw" */ './generated/trapper-zh-TW.json').then((m) => m.default),
+};

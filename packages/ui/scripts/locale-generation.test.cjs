@@ -15,7 +15,7 @@ test('runtime dictionaries translate history labels and unchanged generation pre
   execFileSync(process.execPath, [generator]);
   for (const [name, mtime] of before) {
     assert.equal(fs.statSync(path.join(output, name)).mtimeMs, mtime);
-    if (name.startsWith('wiki-')) continue;
+    if (/^(wiki|trapper)-/.test(name)) continue;
     const messages = JSON.parse(fs.readFileSync(path.join(output, name), 'utf8'));
     const i18n = createI18n({ legacy: false, locale: 'test', messages: { test: messages } });
     for (const key of ['vote.attempt', 'vote.statusRejected', 'vote.statusApproved', 'mission.cards']) {
@@ -105,9 +105,13 @@ test('wiki articles are deferred without losing any translations in all seven la
     const wiki = JSON.parse(fs.readFileSync(path.join(ui, `src/i18n/generated/wiki-${language}.json`), 'utf8'));
     assert.ok(wiki.rules);
     assert.ok(wiki.merlin);
+    assert.equal(wiki.trapperGuide, undefined, `${language}: Trapper rules must not load on other wiki pages`);
+    assert.equal(common.trapperGuide, undefined);
+    const trapper = JSON.parse(fs.readFileSync(path.join(ui, `src/i18n/generated/trapper-${language}.json`), 'utf8'));
+    assert.deepEqual(Object.keys(trapper), ['trapperGuide']);
     const original = require(path.join(ui, 'src/i18n/langs', moduleName))[moduleName];
     assert.deepEqual(
-      { ...common, ...wiki },
+      { ...common, ...wiki, ...trapper },
       JSON.parse(JSON.stringify(original)),
       `${language}: preserve every translation`,
     );

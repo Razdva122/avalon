@@ -15,7 +15,6 @@ const wikiNamespaces = new Set([
   'lady',
   'ladySea',
   'excalibur',
-  'trapperGuide',
   'plotCards',
   'morgana',
   'percival',
@@ -36,6 +35,7 @@ const wikiNamespaces = new Set([
   'cleric',
   'revealer',
 ]);
+const trapperNamespaces = new Set(['trapperGuide']);
 const output = path.join(ui, 'src/i18n/generated');
 fs.mkdirSync(output, { recursive: true });
 for (const [language, moduleName] of Object.entries({
@@ -49,13 +49,20 @@ for (const [language, moduleName] of Object.entries({
 })) {
   const messages = require(path.join(ui, 'src/i18n/langs', moduleName))[moduleName];
   const entries = Object.entries(messages);
-  for (const [prefix, isWiki] of [
-    ['', false],
-    ['wiki-', true],
-  ]) {
+  for (const prefix of ['', 'wiki-', 'trapper-']) {
     const target = path.join(output, `${prefix}${language}.json`);
-    const content = JSON.stringify(Object.fromEntries(entries.filter(([key]) => wikiNamespaces.has(key) === isWiki)));
+    const content = JSON.stringify(
+      Object.fromEntries(
+        entries.filter(([key]) =>
+          prefix === 'wiki-'
+            ? wikiNamespaces.has(key)
+            : prefix === 'trapper-'
+              ? trapperNamespaces.has(key)
+              : !wikiNamespaces.has(key) && !trapperNamespaces.has(key),
+        ),
+      ),
+    );
     if (!fs.existsSync(target) || fs.readFileSync(target, 'utf8') !== content) fs.writeFileSync(target, content);
   }
 }
-console.log('Generated common and deferred wiki dictionaries for seven languages.');
+console.log('Generated common, wiki and page-specific Trapper dictionaries for seven languages.');

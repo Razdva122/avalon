@@ -80,6 +80,7 @@ const buildOnly = new Set(
     .map((file) => `/js/${file.slice(0, -4)}`),
 );
 let maximum = 0;
+let largestWiki = { bytes: 0, page: '' };
 for (const file of htmlFiles(dist)) {
   const html = fs.readFileSync(file, 'utf8');
   const urls = [
@@ -91,8 +92,17 @@ for (const file of htmlFiles(dist)) {
   const cssBytes = urls.filter((url) => url.endsWith('.css')).reduce((sum, url) => sum + gzipSize(url), 0);
   const segments = path.relative(dist, file).split(path.sep);
   const charts = segments.includes('stats');
+  const trapperPage = segments.includes('wiki') && segments.includes('trapper');
+  const trapperLocales = js.filter((url) => /\/trapper-locale-/.test(url));
+  assert.equal(trapperLocales.length > 0, trapperPage, `${file}: Trapper dictionaries must load only on its own page`);
+  if (segments.includes('wiki') && jsBytes > largestWiki.bytes) {
+    largestWiki = { bytes: jsBytes, page: path.relative(dist, file) };
+  }
   const jsBudget = charts ? 466 : segments.includes('wiki') ? 383.25 : 350;
-  assert(jsBytes < jsBudget * 1024, `${file}: route startup JS ${jsBytes} exceeds ${jsBudget} KiB gzip`);
+  assert(
+    jsBytes < jsBudget * 1024,
+    `${file}: route startup JS ${jsBytes} exceeds ${jsBudget} KiB gzip; chunks: ${js.map((url) => `${path.basename(url)}=${gzipSize(url)}`).join(', ')}`,
+  );
   // The complete classic role set adds full-artwork and thumbnail image rules.
   assert(cssBytes < (charts ? 56 : 51) * 1024, `${file}: route CSS ${cssBytes} exceeds budget`);
   maximum = Math.max(maximum, jsBytes);
@@ -102,4 +112,8 @@ const fontBytes = fonts.reduce((sum, file) => sum + fs.statSync(path.join(dist, 
 assert(fontBytes < 25 * 1024, `Initial icon fonts exceed 25 KiB: ${fontBytes}`);
 console.log(
   `Route budgets passed: JS <350 KiB (wiki <383.25, charts <466), CSS ≤51 KiB (charts ≤56); font ${(fontBytes / 1024).toFixed(1)} KiB.`,
+);
+
+console.log(
+  `Largest wiki entry: ${(largestWiki.bytes / 1024).toFixed(2)} KiB gzip (${largestWiki.page}); headroom ${383.25 * 1024 - largestWiki.bytes} bytes.`,
 );

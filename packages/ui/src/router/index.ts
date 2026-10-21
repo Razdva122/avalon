@@ -201,7 +201,8 @@ router.beforeResolve(async (to) => {
     const { loadGuideLocale } = await import(/* webpackChunkName: 'guide-locales' */ '@/pages/guides/locales');
     await loadGuideLocale(language);
   }
-  if (basePath(to.path).startsWith('/wiki/')) await loadWikiLanguage(language);
+  if (basePath(to.path).toLowerCase().startsWith('/wiki/'))
+    await loadWikiLanguage(language, to.meta.id === 'trapper' ? 'trapper' : undefined);
   else await loadLanguage(language);
 });
 

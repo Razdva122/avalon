@@ -1,6 +1,6 @@
 import { createI18n } from 'vue-i18n';
 import { selectLocale } from '@/helpers/i18n';
-import { localeLoaders, wikiLocaleLoaders, type TranslationMessages } from '@/i18n';
+import { localeLoaders, wikiLocaleLoaders, trapperLocaleLoaders, type TranslationMessages } from '@/i18n';
 import type { TLanguage } from '@/i18n/interface';
 import { createMessageLoader, createLanguageSelection } from './loader';
 
@@ -24,9 +24,14 @@ const loadWikiMessages = createMessageLoader<TLanguage, TranslationMessages>(
     i18n.global.mergeLocaleMessage(language, messages);
   },
 );
-export async function loadWikiLanguage(language: TLanguage) {
+const loadTrapperMessages = createMessageLoader<TLanguage, TranslationMessages>(
+  trapperLocaleLoaders,
+  (language, messages) => i18n.global.mergeLocaleMessage(language, messages),
+);
+export async function loadWikiLanguage(language: TLanguage, article?: 'trapper') {
   await loadLanguage(language);
   await loadWikiMessages(language);
+  if (article === 'trapper') await loadTrapperMessages(language);
 }
 
 // Latest user selection wins; a completed route navigation also invalidates
