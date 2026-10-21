@@ -6,6 +6,117 @@ const { mkdtemp, writeFile, rm } = require('node:fs/promises');
 const { tmpdir } = require('node:os');
 const { join } = require('node:path');
 
+const resetKey = '8ae96ff3-3425-4f4c-8772-b6fd61502868';
+
+test('worker validates reset UUID, optional credit ID and exact fields', () => {
+  assert.doesNotThrow(() => validateRequest({ operation: 'reset', idempotencyKey: resetKey }));
+  assert.doesNotThrow(() =>
+    validateRequest({ operation: 'reset', idempotencyKey: resetKey, creditId: 'opaque:reset/test+value=' }),
+  );
+  assert.doesNotThrow(() =>
+    validateRequest({ operation: 'reset', idempotencyKey: resetKey, creditId: 'x'.repeat(512) }),
+  );
+  for (const fields of [
+    {},
+    { idempotencyKey: '' },
+    { idempotencyKey: 'not-a-uuid' },
+    { idempotencyKey: 1 },
+    { idempotencyKey: '8ae96ff3-3425-4f4c-8772-b6fd61502868\n' },
+    ...['', 'x'.repeat(513), null, 1].map((creditId) => ({ idempotencyKey: resetKey, creditId })),
+    { idempotencyKey: resetKey, prompt: 'injected' },
+    { idempotencyKey: resetKey, settings: {} },
+  ])
+    assert.throws(() => validateRequest({ operation: 'reset', ...fields }));
+});
+
+async function withFakeResetServer(result, run) {
+  const directory = await mkdtemp(join(tmpdir(), 'worker-reset-'));
+  const transcript = join(directory, 'rpc.jsonl');
+  try {
+    await writeFile(
+      join(directory, 'codex'),
+      `#!${process.execPath}\nconst fs=require('node:fs');fs.appendFileSync(${JSON.stringify(transcript)},JSON.stringify({args:process.argv.slice(2)})+'\\n');if(process.argv[2]==='debug'){console.log('[]');}else if(process.argv[2]==='exec'){process.stdin.resume();process.stdin.on('end',()=>{console.log(JSON.stringify({type:'turn.failed',error:{message:'HTTP 429'}}));setInterval(()=>{},1000)});}else{require('node:readline').createInterface({input:process.stdin}).on('line',line=>{const m=JSON.parse(line);fs.appendFileSync(${JSON.stringify(transcript)},line+'\\n');if(m.id===1)console.log(JSON.stringify({id:1,result:{}}));if(m.id===2)console.log(JSON.stringify({id:2,result:${JSON.stringify(result)}}));});}`,
+      { mode: 0o700 },
+    );
+    await run(
+      async (request) => {
+        const child = spawn(process.execPath, [join(__dirname, 'worker.cjs')], {
+          env: { ...process.env, PATH: `${directory}:${process.env.PATH}`, CODEX_HOME: directory },
+        });
+        let stdout = '';
+        child.stdout.on('data', (chunk) => (stdout += chunk));
+        const done = new Promise((resolve) => child.on('close', resolve));
+        child.stdin.end(JSON.stringify(request));
+        assert.equal(await done, 0);
+        return JSON.parse(stdout);
+      },
+      async () => (await require('node:fs/promises').readFile(transcript, 'utf8')).trim().split('\n').map(JSON.parse),
+    );
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+}
+
+for (const outcome of ['reset', 'alreadyRedeemed', 'nothingToReset', 'noCredit']) {
+  test(`worker passes a reset attempt unchanged once and sanitizes ${outcome}`, async () => {
+    await withFakeResetServer(
+      { outcome, account: 'PRIVATE_ACCOUNT', token: 'PRIVATE_TOKEN' },
+      async (request, messages) => {
+        const input = {
+          operation: 'reset',
+          idempotencyKey: resetKey,
+          ...(outcome === 'reset' ? { creditId: 'opaque:reset/test+value=' } : {}),
+        };
+        assert.deepEqual(await request(input), { ok: true, result: { outcome } });
+        const sent = await messages();
+        assert.equal(sent.filter((m) => m.args).length, 1, 'one app-server subprocess per manual attempt');
+        assert.deepEqual(
+          sent.filter((m) => m.id === 2),
+          [
+            {
+              id: 2,
+              method: 'account/rateLimitResetCredit/consume',
+              params: { idempotencyKey: resetKey, ...(input.creditId ? { creditId: 'opaque:reset/test+value=' } : {}) },
+            },
+          ],
+        );
+      },
+    );
+  });
+}
+
+for (const result of [null, {}, { outcome: 'unknown', token: 'PRIVATE_TOKEN' }, { outcome: 1 }, ['reset']]) {
+  test(`worker fails safely for unexpected reset result ${JSON.stringify(result)}`, async () => {
+    await withFakeResetServer(result, async (request, messages) => {
+      assert.deepEqual(await request({ operation: 'reset', idempotencyKey: resetKey }), { ok: false, error: 'failed' });
+      assert.equal((await messages()).filter((m) => m.method === 'account/rateLimitResetCredit/consume').length, 1);
+    });
+  });
+}
+
+test('worker discovery reads and failed decisions never consume a reset credit', async () => {
+  await withFakeResetServer(
+    { rateLimits: {}, rateLimitResetCredits: { availableCount: 1 } },
+    async (request, messages) => {
+      assert.equal((await request({ operation: 'limits' })).ok, true);
+      assert.equal((await request({ operation: 'models' })).ok, true);
+      assert.deepEqual(await request({ operation: 'decide', prompt: 'game', schema: {} }), {
+        ok: false,
+        error: 'rate_limit',
+      });
+      const sent = await messages();
+      assert.deepEqual(
+        sent.filter((m) => m.id === 2),
+        [
+          { id: 2, method: 'account/rateLimits/read' },
+          { id: 2, method: 'account/rateLimits/read' },
+        ],
+      );
+      assert.equal(sent.filter((m) => m.method === 'account/rateLimitResetCredit/consume').length, 0);
+    },
+  );
+});
+
 test('worker rejects arbitrary operations, configuration injection and oversized input', () => {
   assert.throws(() => validateRequest({ operation: 'shell', command: 'id' }));
   assert.throws(() =>

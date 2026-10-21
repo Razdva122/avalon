@@ -13,6 +13,31 @@ access checks and subscription usage accounting remain in place.
 Codex is the only supported AI provider; there is no paid inference fallback.
 The AI Arena also requires `AI_ROOMS_ENABLED=true`, included in the fragment.
 
+## Administrator saved resets
+
+`/admin/bots` displays the available earned reset count and expiration dates from
+`account/rateLimits/read.rateLimitResetCredits`. Missing metadata is unavailable,
+not zero; unknown expiry is labelled explicitly. The account card provides a
+confirmation before spending one reset. Only a currently authorized administrator
+can call `consumeAiBotReset`; the server routes the request to that configured
+account's local profile or SSH worker.
+
+The explicit worker operation is `reset` with an `idempotencyKey` UUID and optional
+opaque `creditId`. It calls `account/rateLimitResetCredit/consume` once. Polling,
+quota reads, model requests and errors never apply a reset automatically. Retries
+after an uncertain result reuse the same key while the dashboard stays open.
+Successful consumption refreshes quotas and the persisted weekly usage period.
+The UI distinguishes applied/already applied, nothing to reset and no available
+credit. A failed refresh does not justify spending a different reset.
+
+Install the updated `deploy/codex-worker/worker.cjs` on **each worker before the
+backend/frontend rollout**; older workers reject the new operation. This change
+does not install workers, consume a live reset or deploy production. Verify
+read-only metadata after rollout; applying a real reset requires the administrator
+to confirm it in the interface.
+
+Protocol reference: [Codex App Server](https://learn.chatgpt.com/docs/app-server).
+
 ## Choose the transport
 
 Use local mode when the backend container can authenticate with ChatGPT directly.

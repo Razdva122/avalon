@@ -21,32 +21,39 @@
     </details>
 
     <p v-if="!visible.length" class="usage-empty" role="status">{{ $t('aiArena.usageEmpty') }}</p>
-    <template v-else>
-      <section class="account-overview" aria-labelledby="usage-accounts-heading">
+    <template v-if="visible.length || visibleUsage.length">
+      <section v-if="visibleUsage.length" class="account-overview" aria-labelledby="usage-accounts-heading">
         <h3 id="usage-accounts-heading">{{ $t('aiArena.usageByAccount') }}</h3>
-        <article v-for="id in visibleAccounts" :key="id" class="account-row" :data-account="id">
+        <article
+          v-for="usage in visibleUsage"
+          :key="usage.instanceID"
+          class="account-row"
+          :data-account="usage.instanceID"
+        >
           <div class="account-name">
-            <strong>{{ id }}</strong>
-            <span class="usage-secondary">{{ $t('aiArena.usageGameCount', { count: forAccount(id).length }) }}</span>
+            <strong>{{ usage.instanceID }}</strong>
+            <span class="usage-secondary">{{ $t('aiArena.usageGameCount', { count: usage.gameCount }) }}</span>
           </div>
           <dl class="account-metrics">
             <div>
               <dt>{{ $t('aiArena.usageTokens') }}</dt>
-              <dd>{{ tokenTotal(forAccount(id)) }}</dd>
+              <dd>{{ usage.tokens === null ? $t('aiArena.usageNoData') : number(usage.tokens) }}</dd>
             </div>
             <div>
               <dt>{{ $t('aiArena.usageWeekly') }}</dt>
-              <dd>{{ quotaTotal(forAccount(id), 'weeklySpent') }}</dd>
+              <dd>{{ atLeast(percent(usage.weeklySpent), usage.weeklySpent !== null && usage.weeklyIncomplete) }}</dd>
             </div>
             <div>
               <dt>{{ $t('aiArena.usageShortTerm') }}</dt>
-              <dd>{{ quotaTotal(forAccount(id), 'shortTermSpent') }}</dd>
+              <dd>
+                {{ atLeast(percent(usage.shortTermSpent), usage.shortTermSpent !== null && usage.shortTermIncomplete) }}
+              </dd>
             </div>
           </dl>
         </article>
       </section>
 
-      <section class="game-history" aria-labelledby="usage-games-heading">
+      <section v-if="visible.length" class="game-history" aria-labelledby="usage-games-heading">
         <header class="history-heading">
           <h3 id="usage-games-heading">{{ $t('aiArena.usageGames') }}</h3>
           <span class="usage-secondary" role="status">{{
@@ -58,14 +65,47 @@
             <div class="game-summary">
               <div class="game-identity">
                 <time :datetime="new Date(game.startedAt).toISOString()">{{ date(game.startedAt) }}</time>
-                <span class="usage-secondary">{{ game.instanceID }} · {{ $t(`aiArena.${game.status}`) }}</span>
+                <span class="usage-secondary">{{ game.instanceID }}</span>
+                <div class="game-badges">
+                  <span class="game-badge" :class="`status-${game.status}`">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path :d="statusIcons[game.status]" /></svg>
+                    {{ $t(`aiArena.${game.status}`) }}
+                  </span>
+                  <span
+                    class="game-badge language-badge"
+                    :title="`${$t('aiArena.usageLanguage')}: ${language(game.language)}`"
+                  >
+                    <img
+                      v-if="game.language"
+                      :src="`/flags/${game.language}.svg`"
+                      alt=""
+                      width="24"
+                      height="16"
+                      class="language-flag"
+                    />
+                    <span>{{ game.language ? game.language.toUpperCase() : $t('aiArena.usageNoData') }}</span>
+                  </span>
+                </div>
                 <span class="details-label"
                   ><span class="when-closed">{{ $t('aiArena.usageDetails') }}</span
                   ><span class="when-open">{{ $t('aiArena.usageCollapse') }}</span></span
                 >
               </div>
               <div class="game-players">
-                <strong>{{ mode(game) }}</strong>
+                <strong
+                  class="game-badge bot-badge"
+                  :title="`${$t('aiArena.usageModel')}: ${
+                    game.settings
+                      .map((setting) => setting.model)
+                      .filter(Boolean)
+                      .join(', ') || $t('aiArena.usageNoData')
+                  }`"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path :d="botIcons[game.mode] || botIcons.regular" />
+                  </svg>
+                  {{ mode(game) }}
+                </strong>
                 <span>{{ $t('aiArena.usageHumanCount', { count: game.humanCount }) }}</span>
                 <span>{{ $t('aiArena.usageBotCount', { count: game.botCount }) }}</span>
               </div>
@@ -172,21 +212,41 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { AiGameUsage } from '@avalon/types';
-const props = defineProps<{ games: AiGameUsage[] }>();
+import type { AiGameUsage, AiAccountUsage } from '@avalon/types';
+const props = defineProps<{ games: AiGameUsage[]; accountUsage: AiAccountUsage[] }>();
 const { locale, t, te } = useI18n();
 const account = ref('');
-const accounts = computed(() => [...new Set((props.games ?? []).map((game) => game.instanceID))].sort());
+const accounts = computed(() =>
+  [
+    ...new Set([
+      ...(props.games ?? []).map((game) => game.instanceID),
+      ...(props.accountUsage ?? []).map((usage) => usage.instanceID),
+    ]),
+  ].sort(),
+);
 watch(accounts, (ids) => {
   if (account.value && !ids.includes(account.value)) account.value = '';
 });
 const visible = computed(() =>
   (props.games ?? []).filter((game) => !account.value || game.instanceID === account.value),
 );
-const visibleAccounts = computed(() =>
-  account.value ? accounts.value.filter((id) => id === account.value) : accounts.value,
+const visibleUsage = computed(() =>
+  (props.accountUsage ?? []).filter((usage) => !account.value || usage.instanceID === account.value),
 );
-const forAccount = (id: string) => visible.value.filter((game) => game.instanceID === id);
+const statusIcons: Record<AiGameUsage['status'], string> = {
+  ready: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 7v5l3 2',
+  running: 'M8 4v16l12-8Z',
+  paused: 'M8 5v14M16 5v14',
+  finished: 'M20 11v1a8 8 0 1 1-5-7M8 11l4 4 9-10',
+  stopped: 'M5 5h14v14H5Z',
+};
+const botIcons: Record<string, string> = {
+  beginner: 'M12 6c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V5c-4-1-7-1-10 1ZM12 6v15',
+  regular: 'M12 3v3M9 3h6M5 7h14v13H5zM2 11v5M22 11v5M9 16h6M9 11h.01M15 11h.01',
+  smart:
+    'M12 18V5a3 3 0 0 0-5.9-.8 4 4 0 0 0-2.4 6.5 4 4 0 0 0 .5 7.1A4 4 0 0 0 12 18Zm0 0V5a3 3 0 0 1 5.9-.8 4 4 0 0 1 2.4 6.5 4 4 0 0 1-.5 7.1A4 4 0 0 1 12 18ZM8 8c0 2-1 3-3 3M16 8c0 2 1 3 3 3M7 16c2-1 3 0 3 1M17 16c-2-1-3 0-3 1',
+  custom: 'M4 7h6M14 7h6M4 17h10M18 17h2M10 4v6M14 14v6',
+};
 const number = (value: number) => value.toLocaleString(locale.value);
 const date = (timestamp: number) =>
   new Date(timestamp).toLocaleString(locale.value, {
@@ -202,16 +262,7 @@ const percent = (value: number | null) =>
     : t('aiArena.usagePercent', { value: value.toLocaleString(locale.value, { maximumFractionDigits: 4 }) });
 const atLeast = (value: string, incomplete: boolean) => (incomplete ? t('aiArena.usageAtLeast', { value }) : value);
 const tokenTotal = (games: AiGameUsage[]) =>
-  atLeast(
-    number(games.reduce((total, game) => total + game.inputTokens + game.outputTokens, 0)),
-    games.some((game) => game.unknownUsageRequests > 0),
-  );
-function quotaTotal(games: AiGameUsage[], key: 'weeklySpent' | 'shortTermSpent') {
-  const known = games.filter((game) => game[key] !== null);
-  return known.length
-    ? atLeast(percent(known.reduce((sum, game) => sum + game[key]!, 0)), known.length < games.length)
-    : t('aiArena.usageNoData');
-}
+  number(games.reduce((total, game) => total + game.inputTokens + game.outputTokens, 0));
 const mode = (game: AiGameUsage) =>
   t(`aiArena.${game.mode === 'custom' ? 'usageCustom' : `dashboardMode${game.mode}`}`);
 const language = (value?: string) =>
@@ -374,6 +425,53 @@ select {
   align-items: start;
   gap: 1rem;
   padding: 1.1rem 0.3rem;
+}
+.game-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.2rem 0;
+}
+.game-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 100%;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.18);
+  border-radius: 0.35rem;
+  background: rgba(var(--v-theme-on-surface), 0.04);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+.language-flag {
+  flex-shrink: 0;
+  border-radius: 2px;
+  object-fit: cover;
+}
+.game-badge svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.status-finished {
+  color: rgb(var(--v-theme-success));
+}
+.status-running {
+  color: rgb(var(--v-theme-primary));
+}
+.status-paused {
+  color: rgb(var(--v-theme-warning));
+}
+.status-stopped,
+.status-ready,
+.language-badge {
+  color: rgba(var(--v-theme-on-surface), 0.8);
 }
 .game-identity time {
   font-weight: 600;

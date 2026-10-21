@@ -54,6 +54,10 @@ test('the lazy admin page installs copy for each language, including a freshly l
       'usageDetails',
       'usageInput',
       'usageOutput',
+      'resetTitle',
+      'resetConfirm',
+      'resetResulterror',
+      'resetResultnoCredit',
     ]) {
       const path = `aiArena.${key}`;
       assert.notEqual(i18n.global.t(path, { value: 2, count: 2 }), path, `${language}: ${key}`);

@@ -553,3 +553,152 @@ test('per-game usage survives restart, aggregates retried audits once and keeps 
   await db.collection('ai_game_usage').updateOne({ roomID: state.roomID }, { $set: { expiresAt: new Date(0) } });
   expect(await repo.recentGameUsage()).toEqual([]);
 });
+
+test('account totals follow each weekly reset, include more than 50 games and split games at request boundaries', async () => {
+  const db = client.db('weekly-account-usage');
+  const repo = new AiRepository(db);
+  const now = Date.now();
+  const week = 7 * 86400;
+  const reset = Math.floor(now / 1000) + 86400;
+  const start = (reset - week) * 1000;
+  const quota = { remainingPercent: 80, resetsAt: reset, checkedAt: start, shortTerm: null };
+  const state = {
+    roomID: 'crossing',
+    ai: { status: 'running' },
+    players: [],
+    options: {},
+  } as unknown as import('@avalon/types').StartedRoomState;
+  for (let i = 0; i < 52; i++) {
+    await repo.startGameUsage({ ...state, roomID: `week-${i}` }, 'one', quota);
+    await repo.recordRequest({
+      _id: `request-${i}`,
+      roomID: `week-${i}`,
+      player: 'bot',
+      stage: 'vote',
+      mode: 'codex',
+      startedAt: new Date(start + 1000),
+      status: 'completed',
+      inputTokens: 10,
+      outputTokens: 2,
+    });
+  }
+  await repo.startGameUsage(state, 'one', { ...quota, resetsAt: reset - week, checkedAt: start - 1 });
+  const audit = {
+    player: 'bot',
+    stage: 'vote',
+    mode: 'codex',
+    status: 'completed',
+    inputTokens: 100,
+    outputTokens: 20,
+  };
+  await repo.recordRequest({ ...audit, _id: 'old', roomID: 'crossing', startedAt: new Date(start - 1) });
+  await repo.recordRequest({ ...audit, _id: 'new', roomID: 'crossing', startedAt: new Date(start) });
+  await repo.recordRequest({
+    ...audit,
+    _id: 'review',
+    roomID: 'crossing',
+    startedAt: new Date(start),
+    phase: 'beginner-review',
+  });
+  await repo.recordRequest({
+    ...audit,
+    _id: 'unknown',
+    roomID: 'crossing',
+    startedAt: new Date(start),
+    inputTokens: undefined,
+    outputTokens: undefined,
+  });
+  await repo.startGameUsage({ ...state, roomID: 'other-account' }, 'two', {
+    ...quota,
+    resetsAt: reset + 3600,
+    checkedAt: start + 3600000,
+  });
+  await repo.recordRequest({ ...audit, _id: 'other', roomID: 'other-account', startedAt: new Date(start + 1000) });
+  const summaries = await new AiRepository(db).weeklyAccountUsage(
+    [
+      { id: 'one', quota: { ...quota, checkedAt: now } },
+      { id: 'two', quota: { ...quota, resetsAt: reset + 3600, checkedAt: now } },
+      { id: 'offline', quota: null },
+    ],
+    now,
+  );
+  expect(summaries[0]).toMatchObject({ instanceID: 'one', tokens: 744, gameCount: 53 });
+  expect(summaries[1]).toMatchObject({ instanceID: 'two', tokens: 0, gameCount: 0 });
+  expect(summaries[2]).toMatchObject({ instanceID: 'offline', tokens: null });
+  // The clock alone is not proof of a reset: wait for an observed new deadline.
+  expect((await repo.weeklyAccountUsage([{ id: 'one', quota }], reset * 1000))[0]).toMatchObject({
+    tokens: 744,
+    gameCount: 53,
+  });
+  expect(
+    (
+      await repo.weeklyAccountUsage(
+        [{ id: 'one', quota: { ...quota, resetsAt: reset + week, checkedAt: reset * 1000 } }],
+        reset * 1000,
+      )
+    )[0],
+  ).toMatchObject({ tokens: 0, gameCount: 0 });
+  await repo.recordRequest({ ...audit, _id: 'next-week', roomID: 'crossing', startedAt: new Date(reset * 1000) });
+  expect((await repo.weeklyAccountUsage([{ id: 'one', quota }], reset * 1000))[0]).toMatchObject({
+    tokens: 120,
+    gameCount: 1,
+  });
+  expect(
+    (
+      await repo.weeklyAccountUsage(
+        [{ id: 'one', quota: { ...quota, resetsAt: reset + week, checkedAt: reset * 1000 } }],
+        reset * 1000,
+      )
+    )[0],
+  ).toMatchObject({ tokens: 120, gameCount: 1 });
+  expect((await repo.recentGameUsage()).length).toBe(50);
+});
+
+test('an observed early reset clears account totals and survives restarts, missing metadata and stale readers', async () => {
+  const db = client.db('early-weekly-reset');
+  const repo = new AiRepository(db);
+  const now = Date.now();
+  const quota = { remainingPercent: 40, resetsAt: Math.floor(now / 1000) + 86400, checkedAt: now - 10000 };
+  const state = {
+    roomID: 'ongoing',
+    ai: { status: 'running' },
+    players: [],
+    options: {},
+  } as unknown as import('@avalon/types').StartedRoomState;
+  await repo.startGameUsage(state, 'one', quota);
+  const audit = {
+    roomID: state.roomID,
+    player: 'bot',
+    stage: 'vote',
+    mode: 'codex',
+    status: 'completed',
+    inputTokens: 100,
+    outputTokens: 20,
+  };
+  await repo.recordRequest({ ...audit, _id: 'before-reset', startedAt: new Date(now - 9000) });
+  expect((await repo.weeklyAccountUsage([{ id: 'one', quota }], now))[0].tokens).toBe(120);
+  // The new deadline is still less than seven days away: subtracting a week would retain old usage.
+  const reset = { ...quota, resetsAt: quota.resetsAt + 3600, checkedAt: now };
+  expect((await repo.weeklyAccountUsage([{ id: 'one', quota: reset }], now))[0]).toMatchObject({
+    tokens: 0,
+    gameCount: 0,
+  });
+  await repo.recordRequest({ ...audit, _id: 'after-reset', startedAt: new Date(now + 1) });
+  const restarted = new AiRepository(db);
+  expect((await restarted.weeklyAccountUsage([{ id: 'one', quota: reset }], now + 2))[0].tokens).toBe(120);
+  expect((await restarted.weeklyAccountUsage([{ id: 'one', quota: null }], now + 2))[0].tokens).toBe(120);
+  await Promise.all([
+    repo.weeklyAccountUsage([{ id: 'one', quota }], now + 2),
+    restarted.weeklyAccountUsage([{ id: 'one', quota: { ...reset, checkedAt: now + 2 } }], now + 2),
+  ]);
+  expect((await new AiRepository(db).weeklyAccountUsage([{ id: 'one', quota }], now + 3))[0].tokens).toBe(120);
+  const anotherReset = { ...reset, resetsAt: reset.resetsAt + 7200, checkedAt: now + 4 };
+  await repo.finishGameUsage(state.roomID, anotherReset);
+  expect((await restarted.weeklyAccountUsage([{ id: 'one', quota: null }], now + 4))[0].tokens).toBe(0);
+  // Existing stored game snapshots also seed a first-run period without guessing a week boundary.
+  await db.collection<{ _id: string }>('ai_account_usage_periods').deleteOne({ _id: 'one' });
+  expect((await new AiRepository(db).weeklyAccountUsage([{ id: 'one', quota: anotherReset }], now + 4))[0].tokens).toBe(
+    0,
+  );
+  expect((await repo.recentGameUsage())[0].inputTokens).toBe(200);
+});

@@ -1,5 +1,24 @@
 import { validPacket } from './validation';
 
+test('manual bot resets require an exact bounded request and an acknowledgement', () => {
+  const request = {
+    instanceID: 'account-one',
+    idempotencyKey: '8ae96ff3-3425-4f4c-8772-b6fd61502868',
+    creditId: 'RateLimitResetCredit_1',
+  };
+  expect(validPacket('consumeAiBotReset', [request, () => {}])).toBe(true);
+  expect(validPacket('consumeAiBotReset', [{ ...request, creditId: 'opaque:reset/test+value=' }, () => {}])).toBe(true);
+  for (const invalid of [
+    { ...request, idempotencyKey: '' },
+    { ...request, instanceID: '../one' },
+    { ...request, creditId: 'x'.repeat(513) },
+    { ...request, operation: 'logout' },
+  ]) {
+    expect(validPacket('consumeAiBotReset', [invalid, () => {}])).toBe(false);
+  }
+  expect(validPacket('consumeAiBotReset', [request])).toBe(false);
+});
+
 test('bot threshold edits require a complete bounded numeric policy and an acknowledgement', () => {
   const thresholds = {
     smart: { shortTerm: 60, weekly: 5 },

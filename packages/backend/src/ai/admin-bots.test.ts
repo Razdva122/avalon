@@ -46,12 +46,13 @@ function fixture() {
   service.repository = {
     busyInstances: async () => [{ instanceID: 'one', roomID: 'remote-room' }],
     recentGameUsage: async () => games,
+    weeklyAccountUsage: async () => [],
     getBotQuotaThresholds: async () => thresholds,
     setBotQuotaThresholds: async (value: typeof thresholds) => {
       thresholds = value;
     },
   } as unknown as AiRepository;
-  async function request(userID?: string, value?: unknown) {
+  async function request(userID?: string, value?: unknown, reset?: unknown) {
     const events: Record<string, (...args: any[]) => Promise<void>> = {};
     service.register(
       {
@@ -63,7 +64,8 @@ function fixture() {
     );
     expect(events.getAiBotDashboard).toBeDefined();
     const response = jest.fn();
-    if (value !== undefined) await events.setAiBotQuotaThresholds(value, response);
+    if (reset !== undefined) await events.consumeAiBotReset(reset, response);
+    else if (value !== undefined) await events.setAiBotQuotaThresholds(value, response);
     else await events.getAiBotDashboard(response);
     return response.mock.calls[0][0];
   }
@@ -71,6 +73,7 @@ function fixture() {
     host,
     games,
     request,
+    reset: (userID: string | undefined, value: unknown) => request(userID, undefined, value),
     revoke: () => {
       admin = false;
     },
@@ -83,6 +86,43 @@ test('dashboard requires current database admin authority, including after revoc
   expect(await f.request('admin')).toHaveProperty('instances');
   f.revoke();
   expect(await f.request('admin')).toEqual({ error: 'AI room access denied' });
+});
+
+test('only a current admin can consume an account reset and fresh quotas update its statistics', async () => {
+  const consume = jest.spyOn(limits, 'consumeCodexReset').mockImplementation(async () => {
+    expect(codexEnvironment().AI_CODEX_HOME).toBe('/pool/two');
+    return 'reset';
+  });
+  const f = fixture();
+  const value = {
+    instanceID: 'two',
+    idempotencyKey: '8ae96ff3-3425-4f4c-8772-b6fd61502868',
+    creditId: 'RateLimitResetCredit_1',
+  };
+  expect(await f.reset(undefined, value)).toEqual({ error: 'AI room access denied' });
+  expect(consume).not.toHaveBeenCalled();
+  expect(await f.reset('admin', { ...value, instanceID: 'absent' })).toEqual({ error: 'Unknown bot account' });
+  expect(await f.reset('admin', { ...value, idempotencyKey: 'bad' })).toEqual({ error: 'Invalid reset request' });
+  expect(consume).not.toHaveBeenCalled();
+  expect(await f.reset('admin', value)).toEqual({ outcome: 'reset' });
+  expect(consume).toHaveBeenCalledWith({ idempotencyKey: value.idempotencyKey, creditId: value.creditId });
+  expect(limits.getCodexWeeklyLimit).toHaveBeenCalledWith(true);
+  f.revoke();
+  expect(await f.reset('admin', value)).toEqual({ error: 'AI room access denied' });
+  expect(consume).toHaveBeenCalledTimes(1);
+});
+
+test('reset outcomes are preserved and failed requests do not leave the account locked', async () => {
+  const consume = jest.spyOn(limits, 'consumeCodexReset');
+  const f = fixture();
+  const value = { instanceID: 'one', idempotencyKey: '8ae96ff3-3425-4f4c-8772-b6fd61502868' };
+  consume.mockRejectedValueOnce(Error('transport failed'));
+  expect(await f.reset('admin', value)).toEqual({ error: 'Could not apply bot reset' });
+  for (const outcome of ['alreadyRedeemed', 'nothingToReset', 'noCredit'] as const) {
+    consume.mockResolvedValueOnce(outcome);
+    expect(await f.reset('admin', value)).toEqual({ outcome });
+  }
+  expect(consume.mock.calls.every(([request]) => request.idempotencyKey === value.idempotencyKey)).toBe(true);
 });
 
 test('dashboard includes occupied cross-process instances and preserves healthy entries when one fails', async () => {

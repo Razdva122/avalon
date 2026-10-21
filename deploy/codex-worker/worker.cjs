@@ -7,10 +7,25 @@ const TIMEOUT = 10 * 60 * 1000;
 const LIMIT = 4 * 1024 * 1024;
 function validateRequest(request) {
   if (!request || typeof request !== 'object' || Array.isArray(request)) throw Error('invalid');
-  if (!['decide', 'models', 'limits'].includes(request.operation)) throw Error('invalid');
+  if (!['decide', 'models', 'limits', 'reset'].includes(request.operation)) throw Error('invalid');
   const allowed =
-    request.operation === 'decide' ? ['operation', 'prompt', 'schema', 'settings', 'instructions'] : ['operation'];
+    request.operation === 'decide'
+      ? ['operation', 'prompt', 'schema', 'settings', 'instructions']
+      : request.operation === 'reset'
+        ? ['operation', 'idempotencyKey', 'creditId']
+        : ['operation'];
   if (Object.keys(request).some((k) => !allowed.includes(k))) throw Error('invalid');
+  if (request.operation === 'reset') {
+    if (
+      typeof request.idempotencyKey !== 'string' ||
+      request.idempotencyKey.length !== 36 ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(request.idempotencyKey) ||
+      (request.creditId !== undefined &&
+        (typeof request.creditId !== 'string' || request.creditId.length < 1 || request.creditId.length > 512))
+    )
+      throw Error('invalid');
+    return;
+  }
   if (request.operation !== 'decide') return;
   if (typeof request.prompt !== 'string' || !request.prompt || Buffer.byteLength(request.prompt) > 512 * 1024)
     throw Error('invalid');
@@ -42,7 +57,7 @@ function validateRequest(request) {
   }
 }
 
-function quota() {
+function quota(method = 'account/rateLimits/read', params) {
   return new Promise((resolve, reject) => {
     const child = spawn('codex', ['app-server', '--stdio', '-c', 'forced_login_method="chatgpt"'], {
       detached: process.platform !== 'win32',
@@ -86,7 +101,7 @@ function quota() {
           if (m.error) return finish(Error('failed'));
           if (m.id === 1) {
             send({ method: 'initialized', params: {} });
-            send({ id: 2, method: 'account/rateLimits/read' });
+            send({ id: 2, method, ...(params ? { params } : {}) });
           } else return finish(null, m.result);
         } catch {
           return finish(Error('invalid'));
@@ -379,6 +394,19 @@ async function handleRequest(request) {
   validateRequest(request);
   if (request.operation === 'decide') return decide(request);
   if (request.operation === 'limits') return quota();
+  if (request.operation === 'reset') {
+    const result = await quota('account/rateLimitResetCredit/consume', {
+      idempotencyKey: request.idempotencyKey,
+      ...(request.creditId !== undefined ? { creditId: request.creditId } : {}),
+    });
+    if (
+      !result ||
+      Array.isArray(result) ||
+      !['reset', 'alreadyRedeemed', 'nothingToReset', 'noCredit'].includes(result.outcome)
+    )
+      throw Error('failed');
+    return { outcome: result.outcome };
+  }
   const { stdout } = await promisify(execFile)('codex', ['debug', 'models'], { timeout: 20000, maxBuffer: LIMIT });
   return JSON.parse(stdout);
 }

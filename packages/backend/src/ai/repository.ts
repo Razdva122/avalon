@@ -6,8 +6,8 @@ import type { Db } from 'mongodb';
 import type { StartedRoomState, TRoomState, TRoomInfo, PlayerGameSummaryPage, BotQuotaThresholds } from '@avalon/types';
 import { defaultBotQuotaThresholds, validBotQuotaThresholds } from './quota-policy';
 import { AiPause } from './client';
-import { quotaSpent } from './usage-stats';
-import type { AiGameUsage, CodexWeeklyLimit, CodexSettings } from '@avalon/types';
+import { quotaSpent, weeklyUsagePeriod, type WeeklyUsagePeriod } from './usage-stats';
+import type { AiGameUsage, AiAccountUsage, CodexWeeklyLimit, CodexSettings } from '@avalon/types';
 
 type GameUsageRecord = Omit<
   AiGameUsage,
@@ -78,6 +78,119 @@ type ArchiveSummary = Pick<
 > & { game: Pick<StartedRoomState['game'], 'result'> };
 
 export class AiRepository {
+  private async observeWeeklyQuota(
+    instanceID: string,
+    quota: CodexWeeklyLimit | null,
+  ): Promise<WeeklyUsagePeriod | null> {
+    const periods = this.db.collection<WeeklyUsagePeriod & { _id: string }>('ai_account_usage_periods');
+    for (;;) {
+      const previous = await periods.findOne({ _id: instanceID });
+      let baseline: WeeklyUsagePeriod | null = previous;
+      if (!previous && quota) {
+        // Bootstrap only from recorded observations, never an assumed seven-day start.
+        const history = await this.db
+          .collection<GameUsageRecord>('ai_game_usage')
+          .find({ instanceID }, { projection: { before: 1, after: 1 }, maxTimeMS: 10000 })
+          .toArray();
+        const snapshots = history
+          .flatMap((game) => [game.before, game.after])
+          .filter((snapshot): snapshot is CodexWeeklyLimit =>
+            Boolean(snapshot && snapshot.checkedAt <= quota.checkedAt),
+          )
+          .sort((a, b) => a.checkedAt - b.checkedAt);
+        for (const snapshot of snapshots) baseline = weeklyUsagePeriod(baseline, snapshot);
+      }
+      const next = weeklyUsagePeriod(baseline, quota);
+      if (!next || next === previous) return next;
+      if (previous) {
+        const updated = await periods.updateOne({ _id: instanceID, checkedAt: previous.checkedAt }, { $set: next });
+        if (updated.matchedCount) return next;
+      } else {
+        try {
+          await periods.insertOne({ _id: instanceID, ...next });
+          return next;
+        } catch (error) {
+          if ((error as { code?: number }).code !== 11000) throw error;
+        }
+      }
+      // Another process advanced the snapshot. Re-read instead of rolling it back.
+    }
+  }
+  async weeklyAccountUsage(
+    accounts: { id: string; quota: CodexWeeklyLimit | null }[],
+    now = Date.now(),
+  ): Promise<AiAccountUsage[]> {
+    return Promise.all(
+      accounts.map(async ({ id, quota }) => {
+        const period = await this.observeWeeklyQuota(id, quota);
+        const reset = period?.resetsAt;
+        const result: AiAccountUsage = {
+          instanceID: id,
+          tokens: reset ? 0 : null,
+          gameCount: 0,
+          weeklySpent: reset ? 0 : null,
+          shortTermSpent: reset ? 0 : null,
+          weeklyIncomplete: false,
+          shortTermIncomplete: false,
+        };
+        if (!period) return result;
+        const start = new Date(period.startedAt);
+        const games = await this.db
+          .collection<GameUsageRecord>('ai_game_usage')
+          .find(
+            { instanceID: id, expiresAt: { $gt: new Date(now) } },
+            { projection: { _id: 1, before: 1, after: 1 }, maxTimeMS: 10000 },
+          )
+          .toArray();
+        if (!games.length) return result;
+        const costs = await this.db
+          .collection<AiRequestLog>('ai_request_costs')
+          .aggregate<{
+            _id: string;
+            tokens: number;
+          }>(
+            [
+              {
+                $match: {
+                  roomID: { $in: games.map((game) => game._id) },
+                  startedAt: { $gte: start, $lte: new Date(now) },
+                  phase: { $ne: 'beginner-review' },
+                },
+              },
+              {
+                $group: {
+                  _id: '$roomID',
+                  tokens: { $sum: { $add: [{ $ifNull: ['$inputTokens', 0] }, { $ifNull: ['$outputTokens', 0] }] } },
+                },
+              },
+            ],
+            { maxTimeMS: 10000 },
+          )
+          .toArray();
+        result.tokens = costs.reduce((sum, cost) => sum + cost.tokens, 0);
+        result.gameCount = costs.length;
+        const included = new Set(costs.map((cost) => cost._id));
+        const currentGames = games.filter((game) => included.has(game._id));
+        for (const [key, incomplete, shortTerm] of [
+          ['weeklySpent', 'weeklyIncomplete', false],
+          ['shortTermSpent', 'shortTermIncomplete', true],
+        ] as const) {
+          const values = currentGames.map((game) =>
+            game.before && game.before.resetsAt === reset && game.before.checkedAt >= period.startedAt
+              ? quotaSpent(
+                  shortTerm ? game.before?.shortTerm : game.before,
+                  shortTerm ? game.after?.shortTerm : game.after,
+                )
+              : null,
+          );
+          const known = values.filter((value): value is number => value !== null);
+          result[key] = currentGames.length && !known.length ? null : known.reduce((sum, value) => sum + value, 0);
+          result[incomplete] = known.length < values.length;
+        }
+        return result;
+      }),
+    );
+  }
   async getBotQuotaThresholds(): Promise<BotQuotaThresholds> {
     const settings = await this.db
       .collection<{ _id: string; thresholds: BotQuotaThresholds }>('ai_settings')
@@ -93,6 +206,7 @@ export class AiRepository {
       .updateOne({ _id: 'bot-quota-thresholds' }, { $set: { thresholds } }, { upsert: true });
   }
   async startGameUsage(state: StartedRoomState, instanceID: string, before: CodexWeeklyLimit | null) {
+    await this.observeWeeklyQuota(instanceID, before);
     const startedAt = Date.now();
     const humanCount = state.ai?.humanPlayerIDs?.length ?? (state.ai?.humanPlayerID ? 1 : 0);
     await this.db.collection<GameUsageRecord>('ai_game_usage').updateOne(
@@ -116,6 +230,10 @@ export class AiRepository {
     );
   }
   async finishGameUsage(roomID: string, after: CodexWeeklyLimit | null) {
+    const game = await this.db
+      .collection<GameUsageRecord>('ai_game_usage')
+      .findOne({ _id: roomID }, { projection: { instanceID: 1 } });
+    if (game) await this.observeWeeklyQuota(game.instanceID, after);
     await this.db
       .collection<GameUsageRecord>('ai_game_usage')
       .updateOne({ _id: roomID }, { $set: { after, checkedAt: Date.now() } });

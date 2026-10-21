@@ -22,7 +22,8 @@ import { BotRoom } from './room';
 import { AiPause } from './client';
 import { decisionPipeline } from './pipeline';
 import { getCodexModels, validateCodexSettings } from './codex-models';
-import { getCodexWeeklyLimit } from './codex-limits';
+import { getCodexWeeklyLimit, consumeCodexReset } from './codex-limits';
+import { validBotResetRequest } from './reset-policy';
 import { CODEX_MODEL, codexEnabled, codexDecide } from './codex';
 import { getBotProfile } from './agents';
 import { hasPremium } from '@/support/premium';
@@ -92,6 +93,7 @@ export class AiService {
   private creating = new Set<string>();
   private starting = new Set<string>();
   private allocating = new Set<string>();
+  private resetting = new Set<string>();
   private roomInstances = new Map<string, CodexInstance>();
   private technicalStarts = new Map<string, object>();
   private running = new Set<string>();
@@ -579,6 +581,34 @@ export class AiService {
         cb({ error: 'Could not save bot quota thresholds' });
       }
     });
+    socket.on('consumeAiBotReset', async (request, cb) => {
+      if (typeof cb !== 'function') return;
+      let instanceID: string | undefined;
+      try {
+        if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        if (!validBotResetRequest(request)) return cb({ error: 'Invalid reset request' });
+        const instance = configuredCodexInstances().find((entry) => entry.id === request.instanceID);
+        if (!instance) return cb({ error: 'Unknown bot account' });
+        if (this.resetting.has(instance.id)) return cb({ error: 'Reset already in progress' });
+        instanceID = instance.id;
+        this.resetting.add(instanceID);
+        const outcome = await withCodexInstance(instance, async () => {
+          const outcome = await consumeCodexReset({
+            idempotencyKey: request.idempotencyKey,
+            ...(request.creditId ? { creditId: request.creditId } : {}),
+          });
+          const quota = await getCodexWeeklyLimit(true);
+          await this.repository!.weeklyAccountUsage([{ id: instance.id, quota }]);
+          return outcome;
+        });
+        if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
+        cb({ outcome });
+      } catch {
+        cb({ error: 'Could not apply bot reset' });
+      } finally {
+        if (instanceID) this.resetting.delete(instanceID);
+      }
+    });
     socket.on('getAiBotDashboard', async (cb) => {
       if (typeof cb !== 'function') return;
       try {
@@ -626,13 +656,14 @@ export class AiService {
           };
         });
         const games = await this.repository!.recentGameUsage();
+        const accountUsage = await this.repository!.weeklyAccountUsage(instances);
         for (const game of games) {
           if (['running', 'paused'].includes(game.status) && busy.get(game.instanceID) !== game.roomID)
             game.status = 'stopped';
         }
         // Recheck authority before returning a potentially slow metadata request.
         if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
-        cb({ checkedAt: Date.now(), instances, thresholds, games });
+        cb({ checkedAt: Date.now(), instances, thresholds, games, accountUsage });
       } catch {
         cb({ error: 'Could not load bot dashboard' });
       }

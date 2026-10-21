@@ -13,6 +13,9 @@ export function useBotDashboard() {
   const saving = ref(false);
   const saveError = ref(false);
   const saved = ref(false);
+  const resetting = ref<string | null>(null);
+  const resetFeedback = ref<Record<string, string>>(Object.create(null));
+  const resetAttempts = ref<Record<string, { idempotencyKey: string; creditId?: string }>>(Object.create(null));
   let version = 0;
   let stopped = false;
 
@@ -24,9 +27,12 @@ export function useBotDashboard() {
     saving.value = false;
     saveError.value = false;
     saved.value = false;
+    resetting.value = null;
+    resetFeedback.value = Object.create(null);
+    resetAttempts.value = Object.create(null);
   }
   async function refresh() {
-    if (stopped || loading.value || saving.value) return;
+    if (stopped || loading.value || saving.value || resetting.value) return;
     if (!store.state.profile?.id) {
       clear();
       denied.value = true;
@@ -40,10 +46,7 @@ export function useBotDashboard() {
       if ('error' in result) {
         denied.value = result.error === 'AI room access denied';
         error.value = !denied.value;
-        if (denied.value) {
-          data.value = null;
-          draftThresholds.value = null;
-        }
+        if (denied.value) clear();
       } else {
         data.value = result;
         denied.value = false;
@@ -56,7 +59,7 @@ export function useBotDashboard() {
     }
   }
   async function saveThresholds(thresholds: BotQuotaThresholds): Promise<boolean> {
-    if (stopped || saving.value || loading.value || !data.value || denied.value) return false;
+    if (stopped || saving.value || loading.value || resetting.value || !data.value || denied.value) return false;
     const current = version;
     const submitted = JSON.parse(JSON.stringify(thresholds)) as BotQuotaThresholds;
     saving.value = true;
@@ -82,6 +85,45 @@ export function useBotDashboard() {
       if (current === version) saving.value = false;
     }
   }
+  async function consumeReset(instanceID: string) {
+    if (stopped || resetting.value || loading.value || saving.value || denied.value || !data.value) return;
+    let attempt = resetAttempts.value[instanceID];
+    if (!attempt) {
+      const credits = data.value.instances.find((bot) => bot.id === instanceID)?.quota?.resetCredits;
+      if (!credits || credits.availableCount <= 0) return;
+      const credit = credits.credits
+        ?.filter((item) => item.expiresAt === null || item.expiresAt * 1000 > Date.now())
+        .sort((a, b) => (a.expiresAt ?? Infinity) - (b.expiresAt ?? Infinity))[0];
+      if (credits.credits !== null && !credit) return;
+      attempt = { idempotencyKey: crypto.randomUUID(), ...(credit ? { creditId: credit.id } : {}) };
+      resetAttempts.value[instanceID] = attempt;
+    }
+    const current = version;
+    resetting.value = instanceID;
+    delete resetFeedback.value[instanceID];
+    let acknowledged = false;
+    try {
+      const result = await socket.timeout(120000).emitWithAck('consumeAiBotReset', { instanceID, ...attempt });
+      if (stopped || current !== version) return;
+      if ('error' in result) {
+        if (result.error === 'AI room access denied') {
+          clear();
+          denied.value = true;
+        } else resetFeedback.value[instanceID] = 'error';
+      } else if (['reset', 'alreadyRedeemed', 'nothingToReset', 'noCredit'].includes(result.outcome)) {
+        resetFeedback.value[instanceID] = result.outcome;
+        delete resetAttempts.value[instanceID];
+        acknowledged = true;
+      } else resetFeedback.value[instanceID] = 'error';
+    } catch {
+      if (!stopped && current === version) resetFeedback.value[instanceID] = 'error';
+    } finally {
+      if (current === version) {
+        resetting.value = null;
+        if (acknowledged) void refresh();
+      }
+    }
+  }
   const unwatch = watch(
     () => [store.state.profile?.id, store.state.profile?.token],
     () => {
@@ -90,11 +132,13 @@ export function useBotDashboard() {
       error.value = false;
       void refresh();
     },
-    { immediate: true },
+    { immediate: true, flush: 'sync' },
   );
   const disconnected = () => {
     const draft = draftThresholds.value;
+    const attempts = resetAttempts.value;
     clear();
+    resetAttempts.value = attempts;
     // Retain edits in memory until this same session is authorized again.
     draftThresholds.value = draft;
     error.value = true;
@@ -112,5 +156,20 @@ export function useBotDashboard() {
     socket.off('connect', refresh);
     socket.off('disconnect', disconnected);
   });
-  return { data, draftThresholds, loading, denied, error, refresh, saving, saveError, saved, saveThresholds };
+  return {
+    data,
+    draftThresholds,
+    loading,
+    denied,
+    error,
+    refresh,
+    saving,
+    saveError,
+    saved,
+    saveThresholds,
+    resetting,
+    resetFeedback,
+    resetAttempts,
+    consumeReset,
+  };
 }

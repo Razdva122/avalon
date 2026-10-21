@@ -17,6 +17,7 @@
       <v-btn
         class="prepared-cancel"
         variant="outlined"
+        color="#f4efdf"
         :disabled="busy"
         :loading="busy && !pendingDifficulty"
         @click="leave"
@@ -354,7 +355,6 @@ async function play(difficulty: AiBotDifficulty) {
 .prepared-bot-game :deep(.prepared-cancel) {
   border-color: rgba(244, 239, 223, 0.55);
   background: rgba(0, 0, 0, 0.16);
-  color: #f4efdf;
 }
 .bot-game-choices {
   width: 390px;

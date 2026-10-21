@@ -35,13 +35,28 @@ missing labels in very old replays; newer replays save their model directly.
 ## Administrator game usage
 
 The bot dashboard displays the newest 50 recorded games, an account filter and
-account totals over that same set. Recording starts with the first bot request
+account totals for each account's current weekly quota period. Totals reset with
+that account's weekly quota, independently of the 50-game history limit.
+`ai_account_usage_periods` persists each account's last observed weekly reset date,
+snapshot timestamp and period start. A changed known reset date starts a new period,
+including early resets. A regular rollover uses the previously observed deadline;
+an early reset uses the first snapshot showing the change because Codex does not
+provide the exact reset instant between polls. No seven-day subtraction is used.
+Periods are also observed before gameplay and when a run finishes or pauses.
+On first use, existing game quota snapshots seed the period; without history, it
+starts at the first valid observation. Requests are assigned by their start time,
+including requests in games crossing a reset. Missing or stale metadata preserves
+the saved period; without any valid observation totals are unavailable. Merely
+reaching a predicted deadline does not clear statistics. Updates are atomic across
+processes and survive restarts. Game history is preserved.
+Recording starts with the first bot request
 after launch; historical games are not backfilled. `ai_game_usage` stores the
 account ID, initial human/bot counts, game options, mode and language. Model and
 reasoning settings and token totals come from gameplay request logs. Postgame
 `beginner-review` requests are excluded because they can run on another account.
 Input includes cached input; output includes reasoning, so neither subset is
-added again to the total. Missing or uncertain request usage is marked with ≥.
+added again to the total. Token totals show only recorded usage, without a prefix.
+Unknown request usage is explained in the game details; incomplete quota totals are marked with ≥.
 
 Fresh account quota snapshots are taken before the first request and after each
 run finishes or pauses, while the account is still leased. Weekly and five-hour

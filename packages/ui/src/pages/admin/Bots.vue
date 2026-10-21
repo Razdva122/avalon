@@ -45,7 +45,7 @@
             </div>
           </div>
         </v-dialog>
-        <v-btn color="primary" variant="text" :loading="loading" :disabled="saving" @click="refresh">
+        <v-btn color="primary" variant="text" :loading="loading" :disabled="saving || !!resetting" @click="refresh">
           <v-icon icon="refresh" start aria-hidden="true" />{{ $t('aiArena.dashboardRefresh') }}
         </v-btn>
       </div>
@@ -109,6 +109,15 @@
             {{ $t('aiArena.dashboardQuotaChecked', { date: formatDate(bot.quota.checkedAt) }) }}
           </p>
 
+          <BotResetCredits
+            :bot="bot"
+            :pending="resetting === bot.id"
+            :disabled="loading || saving || !!resetting"
+            :retry="!!resetAttempts[bot.id]"
+            :feedback="resetFeedback[bot.id]"
+            @consume="consumeReset(bot.id)"
+          />
+
           <div class="instance-activity">
             <template v-if="bot.roomID">
               <p class="activity-label">{{ $t('aiArena.dashboardCurrentRoom') }}</p>
@@ -140,7 +149,7 @@
           </footer>
         </article>
       </div>
-      <BotUsageStats :games="data.games" />
+      <BotUsageStats :games="data.games" :account-usage="data.accountUsage" />
       <p class="muted shared-hint">{{ $t('aiArena.codexWeeklyShared') }}</p>
     </template>
   </main>
@@ -153,11 +162,26 @@ import type { AiBotInstanceStatus, AiBotMode } from '@avalon/types';
 import type { BotQuotaThresholds } from '@avalon/types';
 import BotQuotaSettings from './BotQuotaSettings.vue';
 import BotUsageStats from './BotUsageStats.vue';
+import BotResetCredits from './BotResetCredits.vue';
 import { useBotDashboard } from '@/helpers/composables/useBotDashboard';
 
 const { locale } = useAdminBotMessages();
-const { data, draftThresholds, loading, denied, error, refresh, saving, saveError, saved, saveThresholds } =
-  useBotDashboard();
+const {
+  data,
+  draftThresholds,
+  loading,
+  denied,
+  error,
+  refresh,
+  saving,
+  saveError,
+  saved,
+  saveThresholds,
+  resetting,
+  resetFeedback,
+  resetAttempts,
+  consumeReset,
+} = useBotDashboard();
 const settingsOpen = ref(false);
 watch([data, denied], () => {
   if (!data.value || denied.value) settingsOpen.value = false;

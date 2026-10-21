@@ -80,6 +80,16 @@ export type AiBotDashboard = {
   instances: AiBotInstanceStatus[];
   thresholds: BotQuotaThresholds;
   games: AiGameUsage[];
+  accountUsage: AiAccountUsage[];
+};
+export type AiAccountUsage = {
+  instanceID: string;
+  tokens: number | null;
+  gameCount: number;
+  weeklySpent: number | null;
+  shortTermSpent: number | null;
+  weeklyIncomplete: boolean;
+  shortTermIncomplete: boolean;
 };
 
 export type AiLanguage = 'en' | 'ru' | 'zh-tw' | 'es' | 'vi';
@@ -262,7 +272,15 @@ export type AiSpectatorDecision = {
   reason: string;
 };
 
+export type CodexResetCredits = {
+  availableCount: number;
+  credits: { id: string; expiresAt: number | null }[] | null;
+};
+export type CodexResetOutcome = 'reset' | 'alreadyRedeemed' | 'nothingToReset' | 'noCredit';
+export type ConsumeAiBotResetRequest = { instanceID: string; idempotencyKey: string; creditId?: string };
+
 export interface CodexWeeklyLimit {
+  resetCredits?: CodexResetCredits | null;
   // null: provider explicitly reports no short window; undefined: data unavailable.
   shortTerm?: { remainingPercent: number; resetsAt: number | null } | null;
   remainingPercent: number;

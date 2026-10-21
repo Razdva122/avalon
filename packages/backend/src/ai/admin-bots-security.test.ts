@@ -55,6 +55,7 @@ beforeAll(async () => {
   service.repository = {
     busyInstances: async () => [],
     recentGameUsage: async () => [],
+    weeklyAccountUsage: async () => [],
     getBotQuotaThresholds: async () => structuredClone(thresholds),
     setBotQuotaThresholds: async (value: typeof thresholds) => {
       thresholds = structuredClone(value);
@@ -75,6 +76,27 @@ beforeEach(() => {
   accounts.set('admin', { authVersion: 0, isAdmin: true });
   accounts.set('member', { authVersion: 0, isAdmin: false });
   thresholds = structuredClone(defaultBotQuotaThresholds);
+});
+
+test('reset credits are consumed only through a validated admin request', async () => {
+  const consume = jest.spyOn(limits, 'consumeCodexReset').mockResolvedValue('reset');
+  const request = {
+    instanceID: 'default',
+    idempotencyKey: '8ae96ff3-3425-4f4c-8772-b6fd61502868',
+    creditId: 'RateLimitResetCredit_1',
+  };
+  const member = await client('member');
+  expect(await member.timeout(2000).emitWithAck('consumeAiBotReset', request)).toEqual({
+    error: 'AI room access denied',
+  });
+  const admin = await client('admin');
+  expect(await admin.timeout(2000).emitWithAck('consumeAiBotReset', { ...request, idempotencyKey: '' })).toEqual({
+    error: 'invalidRequest',
+  });
+  expect(consume).not.toHaveBeenCalled();
+  expect(await admin.timeout(2000).emitWithAck('consumeAiBotReset', request)).toEqual({ outcome: 'reset' });
+  expect(consume).toHaveBeenCalledTimes(1);
+  consume.mockRestore();
 });
 afterEach(() => {
   for (const client of clients.splice(0)) client.disconnect();

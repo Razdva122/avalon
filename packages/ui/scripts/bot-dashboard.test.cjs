@@ -13,7 +13,10 @@ function fixture() {
   const listeners = {};
   const cleanup = [];
   const socket = {
-    timeout: () => ({ emitWithAck: () => new Promise((resolve, reject) => requests.push({ resolve, reject })) }),
+    timeout: () => ({
+      emitWithAck: (event, payload) =>
+        new Promise((resolve, reject) => requests.push({ event, payload, resolve, reject })),
+    }),
     on: (event, fn) => {
       listeners[event] = fn;
     },
@@ -282,4 +285,196 @@ test('settings start closed, preserve drafts on close, and close when admin data
   } finally {
     stop();
   }
+});
+
+const resetSnapshot = {
+  ...snapshot,
+  instances: [
+    {
+      id: 'one',
+      quota: {
+        resetCredits: {
+          availableCount: 2,
+          credits: [
+            { id: 'expired', expiresAt: 1 },
+            { id: 'later', expiresAt: 9999999999 },
+            { id: 'first', expiresAt: 9999999998 },
+          ],
+        },
+      },
+    },
+  ],
+};
+test('manual reset only emits after action, prevents duplicates and reuses the key after timeout', async () => {
+  const f = fixture();
+  f.requests[0].resolve(structuredClone(resetSnapshot));
+  await tick();
+  assert.equal(f.requests.length, 1);
+  const first = f.dashboard.consumeReset('one');
+  assert.equal(f.requests[1].event, 'consumeAiBotReset');
+  assert.equal(f.requests[1].payload.creditId, 'first');
+  assert.ok(f.requests[1].payload.idempotencyKey);
+  await f.dashboard.consumeReset('one');
+  assert.equal(f.requests.length, 2);
+  f.requests[1].reject(Error('timeout'));
+  await first;
+  const retry = f.dashboard.consumeReset('one');
+  assert.deepEqual(f.requests[2].payload, f.requests[1].payload);
+  f.requests[2].resolve({ outcome: 'alreadyRedeemed' });
+  await retry;
+  assert.equal(f.dashboard.resetFeedback.value.one, 'alreadyRedeemed');
+  assert.equal(f.dashboard.resetAttempts.value.one, undefined);
+  assert.equal(f.requests[3].event, 'getAiBotDashboard');
+  f.stop();
+});
+test('disconnect preserves reset retry key but stale acknowledgement cannot publish; logout removes it', async () => {
+  const f = fixture();
+  f.requests[0].resolve(structuredClone(resetSnapshot));
+  await tick();
+  const reset = f.dashboard.consumeReset('one');
+  const key = f.requests[1].payload.idempotencyKey;
+  f.listeners.disconnect();
+  f.requests[1].resolve({ outcome: 'reset' });
+  await reset;
+  assert.equal(f.dashboard.data.value, null);
+  assert.deepEqual({ ...f.dashboard.resetFeedback.value }, {});
+  assert.equal(f.dashboard.resetAttempts.value.one.idempotencyKey, key);
+  f.store.state.profile = null;
+  assert.deepEqual({ ...f.dashboard.resetAttempts.value }, {});
+  f.stop();
+});
+test('reset supports count-only data and terminal no-op outcomes, but refuses unavailable or expired-only credits', async () => {
+  const f = fixture();
+  f.requests[0].resolve({
+    ...snapshot,
+    instances: [{ id: 'one', quota: { resetCredits: { availableCount: 1, credits: null } } }],
+  });
+  await tick();
+  const reset = f.dashboard.consumeReset('one');
+  assert.equal(f.requests[1].payload.creditId, undefined);
+  f.requests[1].resolve({ outcome: 'nothingToReset' });
+  await reset;
+  assert.equal(f.dashboard.resetFeedback.value.one, 'nothingToReset');
+  f.requests[2].resolve(structuredClone(resetSnapshot));
+  await tick();
+  f.dashboard.data.value.instances[0].quota.resetCredits.credits = [{ id: 'expired', expiresAt: 1 }];
+  await f.dashboard.consumeReset('one');
+  assert.equal(f.requests.length, 3);
+  f.stop();
+});
+
+test('unknown reset acknowledgement preserves retry key, and access denial clears private reset state', async () => {
+  const f = fixture();
+  f.requests[0].resolve(structuredClone(resetSnapshot));
+  await tick();
+  const reset = f.dashboard.consumeReset('one');
+  f.requests[1].resolve({});
+  await reset;
+  assert.equal(f.dashboard.resetFeedback.value.one, 'error');
+  assert.ok(f.dashboard.resetAttempts.value.one);
+  const refresh = f.dashboard.refresh();
+  f.requests[2].resolve({ error: 'AI room access denied' });
+  await refresh;
+  assert.deepEqual({ ...f.dashboard.resetAttempts.value }, {});
+  assert.deepEqual({ ...f.dashboard.resetFeedback.value }, {});
+  f.stop();
+});
+function resetControl(inlineTemplate = false) {
+  const { parse, compileScript } = require('@vue/compiler-sfc');
+  const filename = path.join(__dirname, '../src/pages/admin/BotResetCredits.vue');
+  const { descriptor } = parse(fs.readFileSync(filename, 'utf8'), { filename });
+  const code = ts.transpileModule(compileScript(descriptor, { id: filename, inlineTemplate }).content, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
+  }).outputText;
+  const module = { exports: {} };
+  new Function('require', 'module', 'exports', code)(
+    (id) => (id === 'vue-i18n' ? { useI18n: () => ({ locale: vue.ref('en') }) } : require(id)),
+    module,
+    module.exports,
+  );
+  return module.exports.default;
+}
+test('reset control only emits after confirmation and rejects disabled actions', () => {
+  const emitted = [];
+  const props = vue.reactive({ bot: resetSnapshot.instances[0], pending: false, disabled: false, retry: false });
+  const form = resetControl().setup(props, { expose() {}, emit: (...args) => emitted.push(args) });
+  assert.deepEqual(emitted, []);
+  form.open.value = true;
+  assert.deepEqual(emitted, []);
+  props.disabled = true;
+  form.confirm();
+  assert.deepEqual(emitted, []);
+  props.disabled = false;
+  form.confirm();
+  assert.deepEqual(emitted, [['consume']]);
+  assert.equal(form.open.value, false);
+  props.bot = { id: 'one', quota: { resetCredits: { availableCount: 0, credits: [] } } };
+  assert.equal(form.canReset.value, false);
+  form.confirm();
+  assert.equal(emitted.length, 1);
+  props.retry = true;
+  form.confirm();
+  assert.equal(emitted.length, 2);
+});
+test('reset control renders credit count, expiry, unavailable state, and accessible result text', async () => {
+  const { renderToString } = require('@vue/server-renderer');
+  const render = async (bot, feedback) => {
+    const app = vue.createSSRApp(resetControl(true), { bot, pending: false, disabled: false, retry: false, feedback });
+    app.config.globalProperties.$t = (key, values) => key + (values ? JSON.stringify(values) : '');
+    app.component('v-dialog', { template: '<div><slot name="activator" :props="{}" /></div>' });
+    app.component('v-btn', { template: '<button><slot /></button>' });
+    for (const tag of ['v-card', 'v-card-title', 'v-card-text', 'v-card-actions'])
+      app.component(tag, { template: '<div><slot /></div>' });
+    return renderToString(app);
+  };
+  const html = await render(resetSnapshot.instances[0], 'reset');
+  assert.match(html, /resetCount.*count.*2/);
+  assert.match(html, /resetExpires/);
+  assert.match(html, /role="status"/);
+  assert.match(html, /aria-label="[^"]*resetAccount/);
+  const unavailable = await render({ id: 'missing' }, 'error');
+  assert.match(unavailable, /resetUnavailable/);
+  assert.match(unavailable, /role="alert"/);
+});
+
+test('reset noCredit is distinct and a replacement session ignores the previous acknowledgement', async () => {
+  const f = fixture();
+  f.requests[0].resolve(structuredClone(resetSnapshot));
+  await tick();
+  const reset = f.dashboard.consumeReset('one');
+  f.requests[1].resolve({ outcome: 'noCredit' });
+  await reset;
+  assert.equal(f.dashboard.resetFeedback.value.one, 'noCredit');
+  assert.equal(f.dashboard.resetAttempts.value.one, undefined);
+  f.requests[2].resolve(structuredClone(resetSnapshot));
+  await tick();
+  const next = f.dashboard.consumeReset('one');
+  assert.notEqual(f.requests[3].payload.idempotencyKey, f.requests[1].payload.idempotencyKey);
+  f.store.state.profile = { id: 'other', token: 'two' };
+  f.requests[3].resolve({ outcome: 'reset' });
+  await next;
+  assert.equal(f.dashboard.data.value, null);
+  assert.deepEqual({ ...f.dashboard.resetFeedback.value }, {});
+  f.stop();
+});
+
+test('configured account names matching Object properties get independent UUID reset attempts', async () => {
+  const f = fixture();
+  f.requests[0].resolve({
+    ...snapshot,
+    instances: ['constructor', 'toString'].map((id) => ({
+      id,
+      quota: { resetCredits: { availableCount: 1, credits: null } },
+    })),
+  });
+  await tick();
+  assert.equal(f.dashboard.resetAttempts.value.constructor, undefined);
+  assert.equal(f.dashboard.resetFeedback.value.toString, undefined);
+  const reset = f.dashboard.consumeReset('constructor');
+  assert.equal(f.requests[1].payload.instanceID, 'constructor');
+  assert.match(f.requests[1].payload.idempotencyKey, /^[a-f0-9-]{36}$/);
+  f.requests[1].resolve({ outcome: 'reset' });
+  await reset;
+  assert.equal(f.dashboard.resetFeedback.value.constructor, 'reset');
+  f.stop();
 });

@@ -1,12 +1,49 @@
 import { codexEnvironment } from './codex-instances';
 import { spawn } from 'child_process';
-import type { CodexWeeklyLimit } from '@avalon/types';
+import type { CodexWeeklyLimit, CodexResetCredits, CodexResetOutcome } from '@avalon/types';
 import { hasRemoteCodex, remoteCodex, remoteCodexCacheKey } from './codex-remote';
 
 type Window = { usedPercent?: unknown; windowDurationMins?: unknown; resetsAt?: unknown };
 type Bucket = { primary?: Window | null; secondary?: Window | null };
+function parseResetCredits(value: unknown): CodexResetCredits | null {
+  const resets = value as { availableCount?: unknown; credits?: unknown } | null;
+  if (
+    !resets ||
+    typeof resets.availableCount !== 'number' ||
+    !Number.isSafeInteger(resets.availableCount) ||
+    resets.availableCount < 0
+  )
+    return null;
+  const credits: CodexResetCredits['credits'] = Array.isArray(resets.credits)
+    ? resets.credits.slice(0, 100).flatMap((credit: Record<string, unknown>) => {
+        if (
+          !credit ||
+          typeof credit.id !== 'string' ||
+          !credit.id.length ||
+          credit.id.length > 512 ||
+          credit.status !== 'available' ||
+          credit.resetType !== 'codexRateLimits'
+        )
+          return [];
+        return [
+          {
+            id: credit.id,
+            expiresAt:
+              typeof credit.expiresAt === 'number' && Number.isSafeInteger(credit.expiresAt) && credit.expiresAt > 0
+                ? credit.expiresAt
+                : null,
+          },
+        ];
+      })
+    : null;
+  return { availableCount: resets.availableCount, credits };
+}
 export function parseWeeklyLimit(value: unknown, checkedAt = Date.now()): CodexWeeklyLimit | null {
-  const response = value as { rateLimits?: Bucket; rateLimitsByLimitId?: Record<string, Bucket> } | null;
+  const response = value as {
+    rateLimits?: Bucket;
+    rateLimitsByLimitId?: Record<string, Bucket>;
+    rateLimitResetCredits?: unknown;
+  } | null;
   const bucket = response?.rateLimitsByLimitId ? response.rateLimitsByLimitId.codex : response?.rateLimits;
   const week = [bucket?.primary, bucket?.secondary].find((window) => window?.windowDurationMins === 10080);
   if (!week || typeof week.usedPercent !== 'number' || !Number.isFinite(week.usedPercent)) return null;
@@ -25,6 +62,7 @@ export function parseWeeklyLimit(value: unknown, checkedAt = Date.now()): CodexW
         }
       : undefined;
   return {
+    resetCredits: parseResetCredits(response?.rateLimitResetCredits),
     ...(shortTerm ? { shortTerm } : noShortWindow ? { shortTerm: null } : {}),
     remainingPercent: Math.max(0, Math.min(100, 100 - week.usedPercent)),
     resetsAt:
@@ -33,9 +71,9 @@ export function parseWeeklyLimit(value: unknown, checkedAt = Date.now()): CodexW
   };
 }
 
-// Only initialize and read account quotas: never start a model turn or expose credentials.
-async function readCodexLimitResponse(): Promise<unknown> {
-  if (hasRemoteCodex()) return remoteCodex({ operation: 'limits' });
+// Account RPC only: no model turns or credentials in responses.
+async function codexAccountRequest(reset?: { idempotencyKey: string; creditId?: string }): Promise<unknown> {
+  if (hasRemoteCodex()) return remoteCodex(reset ? { operation: 'reset', ...reset } : { operation: 'limits' });
   const env: NodeJS.ProcessEnv = {};
   for (const key of [
     'PATH',
@@ -97,7 +135,11 @@ async function readCodexLimitResponse(): Promise<unknown> {
           if (message.error) return finish(new Error('Codex limits unavailable'));
           if (message.id === 1) {
             send({ method: 'initialized', params: {} });
-            send({ id: 2, method: 'account/rateLimits/read' });
+            send(
+              reset
+                ? { id: 2, method: 'account/rateLimitResetCredit/consume', params: reset }
+                : { id: 2, method: 'account/rateLimits/read' },
+            );
           } else return finish(undefined, message.result);
         } catch {
           return finish(new Error('Codex limits unavailable'));
@@ -113,24 +155,51 @@ async function readCodexLimitResponse(): Promise<unknown> {
 }
 
 export async function readCodexWeeklyLimit(): Promise<CodexWeeklyLimit | null> {
-  return parseWeeklyLimit(await readCodexLimitResponse());
+  const checkedAt = Date.now();
+  return parseWeeklyLimit(await codexAccountRequest(), checkedAt);
+}
+
+export async function consumeCodexReset(request: {
+  idempotencyKey: string;
+  creditId?: string;
+}): Promise<CodexResetOutcome> {
+  try {
+    const result = (await codexAccountRequest(request)) as { outcome?: unknown } | null;
+    if (
+      !result ||
+      typeof result.outcome !== 'string' ||
+      !['reset', 'alreadyRedeemed', 'nothingToReset', 'noCredit'].includes(result.outcome)
+    )
+      throw Error('Invalid Codex reset response');
+    return result.outcome as CodexResetOutcome;
+  } finally {
+    // Also invalidate uncertain outcomes. Never replay a consume automatically.
+    const key = quotaCacheKey();
+    cache.delete(key);
+    pending.delete(key);
+  }
 }
 
 const cache = new Map<string, { expires: number; value: CodexWeeklyLimit | null }>();
 const pending = new Map<string, Promise<CodexWeeklyLimit | null>>();
-export async function getCodexWeeklyLimit(fresh = false): Promise<CodexWeeklyLimit | null> {
-  if (fresh) return readCodexWeeklyLimit().catch(() => null);
+function quotaCacheKey() {
   const environment = codexEnvironment();
-  const key = hasRemoteCodex()
+  return hasRemoteCodex()
     ? remoteCodexCacheKey()
     : `${environment.AI_CODEX_BIN || 'codex'}:${environment.AI_CODEX_HOME || environment.CODEX_HOME || environment.HOME}`;
+}
+export async function getCodexWeeklyLimit(fresh = false): Promise<CodexWeeklyLimit | null> {
+  const key = quotaCacheKey();
   const cached = cache.get(key);
-  if (cached && cached.expires > Date.now()) return cached.value;
+  if (!fresh && cached && cached.expires > Date.now()) return cached.value;
   const inFlight = pending.get(key);
-  if (inFlight) return inFlight;
-  const promise = readCodexWeeklyLimit()
+  if (!fresh && inFlight) return inFlight;
+  const promise: Promise<CodexWeeklyLimit | null> = readCodexWeeklyLimit()
     .catch(() => null)
     .then((value) => {
+      // A reset or newer forced read invalidated this response. Existing callers
+      // must not receive the old deadline and mistake it for another reset.
+      if (pending.get(key) !== promise) return pending.get(key) ?? cache.get(key)?.value ?? null;
       if (cache.size >= 64) cache.delete(cache.keys().next().value!);
       cache.set(key, { expires: Date.now() + 60000, value });
       return value;
