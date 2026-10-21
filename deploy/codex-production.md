@@ -244,9 +244,11 @@ diagnostics. Network-isolated Linux regressions passed before this worker update
 ## Rate-limit diagnostics
 
 The worker returns `rate_limit` for a failed CLI turn classified as HTTP 429 or
-an explicit rate-limit error. The backend pauses the match with a wait/manual-retry
-message instead of immediately starting another decision request. This changes
-the application's retry behavior; the CLI may perform its own transport retries.
+an explicit rate-limit error. After the first rate-limited decision, the backend
+waits ten seconds and retries the same request once while the match stays running.
+Stop cancels that wait. If the retry fails, the match pauses with the existing
+manual-retry message. Exhausted subscription usage still pauses immediately.
+The CLI may perform its own transport retries.
 Install the updated worker before deploying the backend message change. The
 previous backend already treats this new worker code as a nonretryable pause.
 

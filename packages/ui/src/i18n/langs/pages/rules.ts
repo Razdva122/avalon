@@ -3,6 +3,9 @@ import { Dictionary } from '@avalon/types';
 
 export const rules: { [key in TLanguage]: Dictionary<string> } = {
   pt: {
+    trapperRequirements: 'O {trapper} exige de 8 a 10 jogadores e não pode ser combinado com {plotCards}.',
+    trapperRules:
+      'Cada missão recebe um participante extra. Depois das cartas e do efeito de {excalibur}, o líder exclui uma carta e vê seu valor em segredo. Pode excluir a própria carta ou uma alterada por {excalibur}. A escolha é definitiva. A carta excluída não conta; o limite normal de falhas permanece. Todos veem de quem é a carta, mas não seu valor.',
     teamBalance: 'Bem / Mal',
     variantNote:
       'No jogo de tabuleiro original, cinco equipes rejeitadas consecutivamente para a mesma missão dão a vitória ao mal. Nesta plataforma, após quatro rejeições, a quinta equipe normalmente parte sem votação; as cartas de trama podem afetar sua aprovação. No original, o Assassino faz a escolha final; aqui, o assassinato é realizado pela equipe do mal. Antes de uma partida presencial, combinem as regras e os papéis.',
@@ -112,6 +115,9 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       'Em uma partida normal com Merlin, é preciso sobreviver ao assassinato. No original, o Assassino tem uma tentativa de identificar Merlin. Se acertar, o mal vence; se errar, o bem vence. Nesta plataforma, a equipe do mal realiza essa etapa.',
   },
   vi: {
+    trapperRequirements: '{trapper} yêu cầu 8–10 người chơi và không thể kết hợp với {plotCards}.',
+    trapperRules:
+      'Mỗi nhiệm vụ có thêm một thành viên. Sau khi mọi người đánh bài và xử lý {excalibur}, đội trưởng loại một lá bài rồi bí mật xem giá trị của nó. Có thể loại bài của chính mình hoặc bài đã bị {excalibur} đổi. Không được đổi lựa chọn sau khi xác nhận. Bài bị loại không được tính; ngưỡng thất bại giữ nguyên. Mọi người biết bài của ai bị loại nhưng không biết giá trị.',
     teamBalance: 'Thiện / Ác',
     quickStartTitle: 'Cách chơi Avalon: bắt đầu nhanh',
     quickStep1:
@@ -218,6 +224,9 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       'Trong ván tiêu chuẩn có Merlin, phe Thiện còn phải sống sót qua Ám sát. Sát thủ có một lần đoán Merlin cuối cùng trong trò chơi bàn cờ gốc. Đoán đúng thì phe Ác thắng; đoán sai thì phe Thiện thắng. Nền tảng này để phe Ác xử lý bước đó.',
   },
   en: {
+    trapperRequirements: '{trapper} requires 8–10 players and cannot be combined with {plotCards}.',
+    trapperRules:
+      'Send one extra participant on each mission. After cards are played and {excalibur} resolves, the leader excludes one card and privately sees its value. The leader may exclude their own card or a card changed by {excalibur}. The choice is final. The excluded card does not count; the normal failure threshold stays the same. Everyone sees whose card was excluded, but not its value.',
     teamBalance: 'Good / Evil',
     quickStartTitle: 'How to play Avalon: a quick start',
     quickStep1:
@@ -326,6 +335,10 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       'In a standard game with Merlin, good must also survive the assassination. The Assassin gets one final guess at Merlin in the original board game. A correct guess gives evil the win; a wrong guess gives good the win. This platform lets the evil team handle that step.',
   },
   ru: {
+    trapperRequirements:
+      '{trapper} доступен для 8–10 игроков. Дополнения {trapper} и {plotCards} нельзя включить одновременно.',
+    trapperRules:
+      'В миссию идёт на одного участника больше. После сдачи карт сначала действует {excalibur}, если он включён. Затем лидер исключает одну карту и тайно узнаёт её значение. Можно исключить свою карту или карту, изменённую мечом. Выбор окончательный. Исключённая карта не учитывается; обычный порог провала сохраняется. Остальные видят выбранного игрока, но не значение карты.',
     teamBalance: 'Добро / зло',
     variantNote:
       'На платформе после четырёх отклонённых команд пятая обычно отправляется на миссию без голосования; карты сюжета могут влиять на принятие команды. Финальное убийство выполняет команда зла, поэтому отдельная роль Убийцы не нужна. В настольном оригинале пять отказов подряд приносят победу злу, а последнее решение об убийстве принимает отдельный Убийца.',
@@ -434,6 +447,9 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       'Нет. После трёх успешных миссий команда зла ещё может победить, правильно определив Мерлина. Если выбранные роли добавляют другие цели убийства, действуют и их условия. Добро побеждает, когда переживает этот финальный этап.',
   },
   'zh-CN': {
+    trapperRequirements: '{trapper}仅适用于8–10人局，不能与{plotCards}同时使用。',
+    trapperRules:
+      '每次任务额外增加一名队员。所有人出牌并结算{excalibur}后，队长排除一张牌，再私下查看其结果。可以排除自己的牌或被{excalibur}改变的牌。确认后不能更改。被排除的牌不计入结果，任务失败所需的失败牌数量不变。所有人都知道谁的牌被排除，但看不到牌面。',
     teamBalance: '好人 / 坏人',
     variantNote:
       '原版桌游中，同一任务连续五次组队遭否决，坏人立即获胜。本站通常在四次否决后，让第五位队长直接派队，不再投票；阴谋卡可能影响队伍是否通过。原版由刺客做最后指认，本站则由邪恶阵营处理刺杀。线下游玩前，请先确认采用的规则及角色。',
@@ -531,6 +547,9 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       '一般有梅林的游戏还要进入刺杀阶段。原版由刺客最后猜一次谁是梅林：猜中则坏人获胜，猜错则好人获胜。本站由邪恶阵营处理这个阶段。',
   },
   'zh-TW': {
+    trapperRequirements: '{trapper}僅適用於8–10人局，不能與{plotCards}同時使用。',
+    trapperRules:
+      '每次任務額外增加一名隊員。所有人出牌並結算{excalibur}後，隊長排除一張牌，再私下查看其結果。可以排除自己的牌或被{excalibur}改變的牌。確認後不能更改。被排除的牌不計入結果，任務失敗所需的失敗牌數量不變。所有人都知道誰的牌被排除，但看不到牌面。',
     teamBalance: '好人 / 壞人',
     quickStartTitle: '阿瓦隆怎麼玩？新手快速入門',
     quickStep1: '由 5–10 人遊玩，秘密分配角色，並依角色能力查看起始資訊。好人要讓三次任務成功；壞人要讓三次任務失敗。',
@@ -628,6 +647,9 @@ export const rules: { [key in TLanguage]: Dictionary<string> } = {
       '一般有梅林的遊戲還要進入刺殺階段。原版由刺客最後猜一次誰是梅林：猜中則壞人獲勝，猜錯則好人獲勝。本站由邪惡陣營處理這個階段。',
   },
   es: {
+    trapperRequirements: 'El {trapper} requiere de 8 a 10 jugadores y no se puede combinar con {plotCards}.',
+    trapperRules:
+      'Cada misión lleva un participante adicional. Tras jugar las cartas y resolver {excalibur}, el líder excluye una carta y ve su valor en secreto. Puede excluir su propia carta o una modificada por {excalibur}. La elección es definitiva. La carta excluida no cuenta; se mantiene el umbral normal de fracaso. Todos ven de quién es la carta, pero no su valor.',
     teamBalance: 'Bien / Mal',
     variantNote:
       'En el juego de mesa original, cinco equipos rechazados consecutivamente para una misma misión dan la victoria al mal. En esta plataforma, tras cuatro rechazos, el quinto equipo normalmente sale sin votación; las cartas de trama pueden afectar a su aprobación. En el original, el Asesino realiza la acusación final; aquí, el asesinato lo gestiona el equipo del mal. Antes de jugar presencialmente, acordad las reglas y los roles.',

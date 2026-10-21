@@ -73,14 +73,6 @@
         <section class="menu-section">
           <h3>{{ $t('menu.aboutAvalon') }}</h3>
           <LocaleLink
-            :to="{ name: 'social_deduction_games_online' }"
-            class="menu-item"
-            :class="{ active: active('/guides/') }"
-            @click="open = false"
-          >
-            <span class="material-icons" aria-hidden="true">auto_stories</span>{{ $t('wiki.gameGuides') }}
-          </LocaleLink>
-          <LocaleLink
             :to="{ name: 'about' }"
             class="menu-item"
             :class="{ active: active('/about/') }"

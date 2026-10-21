@@ -1,6 +1,7 @@
 import { mkdtemp, writeFile, readFile, rm } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import timers from 'timers/promises';
 import { remoteCodex } from './codex-remote';
 import { runCodex, codexSchema } from './codex';
 import { getCodexModels } from './codex-models';
@@ -18,6 +19,7 @@ beforeEach(async () => {
   process.env.AI_CODEX_SSH_BIN = join(directory, 'ssh');
 });
 afterEach(async () => {
+  jest.restoreAllMocks();
   process.env = { ...previous };
   await rm(directory, { recursive: true, force: true });
 });
@@ -97,15 +99,34 @@ test('exhausted subscription quota gives an actionable pause reason', async () =
   await expect(remoteCodex({ operation: 'decide' })).rejects.toThrow('subscription usage limit');
 });
 
-test('rate-limited decisions pause with wait and manual retry guidance after one request', async () => {
+test.each([false, true])('rate-limited decisions wait before one retry (alwaysLimited=%s)', async (alwaysLimited) => {
+  const delay = jest.spyOn(timers, 'setTimeout').mockResolvedValue(undefined);
   const counter = join(directory, 'decision-attempts');
   await writeFile(counter, '0');
   await executable(
-    `const fs=require('node:fs');const path=${JSON.stringify(counter)};process.stdin.resume();process.stdin.on('end',()=>{fs.writeFileSync(path,String(Number(fs.readFileSync(path))+1));console.log(JSON.stringify({ok:false,error:'rate_limit'}))});`,
+    `const fs=require('node:fs');const path=${JSON.stringify(counter)};process.stdin.resume();process.stdin.on('end',()=>{const n=Number(fs.readFileSync(path))+1;fs.writeFileSync(path,String(n));console.log(JSON.stringify(n===1||${alwaysLimited}?{ok:false,error:'rate_limit'}:{ok:true,result:{text:'recovered',usage:{input_tokens:7}}}))});`,
   );
-  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toThrow(
-    'Codex request was rate limited. Wait a while, then manually retry the match.',
+  const result = runCodex('game', codexSchema(['approve'], false));
+  if (alwaysLimited) await expect(result).rejects.toMatchObject({ codexAttempts: 2 });
+  else await expect(result).resolves.toMatchObject({ text: 'recovered', attempts: 2, unknownUsageAttempts: 1 });
+  expect(delay).toHaveBeenCalledTimes(1);
+  expect(delay).toHaveBeenCalledWith(10000, undefined, { signal: undefined });
+  expect(await readFile(counter, 'utf8')).toBe('2');
+});
+
+test('Stop cancels the rate-limit wait without sending another decision', async () => {
+  const delay = jest.spyOn(timers, 'setTimeout');
+  const counter = join(directory, 'decision-attempts');
+  await executable(
+    `const fs=require('node:fs');process.stdin.resume();process.stdin.on('end',()=>{fs.appendFileSync(${JSON.stringify(counter)},'1');console.log(JSON.stringify({ok:false,error:'rate_limit'}))});`,
   );
+  const controller = new AbortController();
+  const outcome = runCodex('game', codexSchema(['approve'], false), controller.signal).catch((error) => error);
+  for (let i = 0; i < 100 && !delay.mock.calls.length; i++) await new Promise((resolve) => setTimeout(resolve, 5));
+  const waiting = delay.mock.calls.length;
+  controller.abort();
+  expect(waiting).toBe(1);
+  expect(await outcome).toMatchObject({ name: 'AbortError' });
   expect(await readFile(counter, 'utf8')).toBe('1');
 });
 
@@ -129,7 +150,6 @@ test.each([false, true])('decision request failure retries exactly once (alwaysF
 test.each([
   'busy',
   'usage_limit',
-  'rate_limit',
   'timeout',
   'forbidden_tool',
   'output_limit',

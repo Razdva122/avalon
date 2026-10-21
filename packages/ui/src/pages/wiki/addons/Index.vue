@@ -67,7 +67,6 @@
     <section class="wiki-panel">
       <h2>{{ $t('expansions.compatibilityTitle') }}</h2>
       <p><LocalizedTextWrapper keypath="expansions.compatibilityText" /></p>
-      <p>{{ $t('trapper.requirements') }}</p>
     </section>
     <WikiPlayCta />
   </div>

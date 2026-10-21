@@ -110,12 +110,12 @@
             embedded
           />
         </template>
-        <template #stickers>
+        <template v-if="!roomState.ai?.beginner" #stickers>
           <StickerPicker :roomID="roomState.roomID" @hide-on-board="hideStickers = $event" />
         </template>
       </Chat>
       <VoicePanel
-        v-if="userID && !roomState.archived"
+        v-if="userID && !roomState.archived && !roomState.ai?.beginner"
         :roomUuid="uuid"
         :seatIds="roomState.players.map((player) => player.id).join(',')"
       />

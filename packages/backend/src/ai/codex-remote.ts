@@ -1,7 +1,7 @@
 import { codexEnvironment } from './codex-instances';
 import { execFile } from 'child_process';
 import { isAbsolute } from 'path';
-import { AiTechnicalPause, CodexRequestFailed } from './client';
+import { AiTechnicalPause, CodexRequestFailed, CodexRateLimited } from './client';
 import { AI_REQUEST_TIMEOUT_MS } from './timing';
 
 export function hasRemoteCodex() {
@@ -114,7 +114,13 @@ export function remoteCodex(request: object, signal?: AbortSignal, attempt = 0):
                     : response.error === 'timeout'
                       ? 'Codex response timed out. No action was applied; retry the match.'
                       : 'Codex worker request failed.';
-            return reject(response.error === 'failed' ? new CodexRequestFailed(reason) : new AiTechnicalPause(reason));
+            return reject(
+              response.error === 'failed'
+                ? new CodexRequestFailed(reason)
+                : response.error === 'rate_limit'
+                  ? new CodexRateLimited(reason)
+                  : new AiTechnicalPause(reason),
+            );
           }
           resolve(response.result);
         } catch {

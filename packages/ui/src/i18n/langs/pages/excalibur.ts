@@ -10,7 +10,7 @@ export const excalibur: { [key in TLanguage]: Dictionary<string> } = {
     seoRule2:
       'Sau khi các lá bài Nhiệm vụ được nộp, người giữ kiếm có thể đảo bài của một thành viên khác trong Đội hoặc bỏ qua việc dùng kiếm. Giao diện không cho phép tự chọn mình hay chọn người ngoài Nhiệm vụ.',
     seoRule3:
-      'Mỗi Đội được đề xuất sẽ có người giữ kiếm mới. Kết quả Nhiệm vụ cuối cùng dựa trên các lá bài sau khi đảo và số lá Thất bại cần thiết của Nhiệm vụ.',
+      'Mỗi Đội được đề xuất sẽ có người giữ kiếm mới. Kết quả Nhiệm vụ cuối cùng dựa trên các lá bài sau khi đảo và số lá Thất bại cần thiết của Nhiệm vụ. Nếu bật {trapper}, đội trưởng loại một lá bài sau khi xử lý kiếm và bí mật xem giá trị sau hiệu ứng của {excalibur}.',
     seoLimit1:
       'Ai nhìn thấy lá bài bị đảo? Việc dùng kiếm và mục tiêu được công khai. Trong ván chơi, người giữ kiếm và mục tiêu biết kết quả của lá bài bị tác động; những người khác không nhận được thông tin riêng này.',
     seoLimit2:
@@ -29,7 +29,7 @@ export const excalibur: { [key in TLanguage]: Dictionary<string> } = {
     seoRule2:
       "After mission cards have been submitted, the holder can flip another team member's card or skip using the sword. The interface does not allow the holder to target themselves or anyone outside the mission.",
     seoRule3:
-      "A new holder is chosen for each proposed team. The final mission result uses the cards after the flip and the mission's required number of Fails.",
+      "A new holder is chosen for each proposed team. The final mission result uses the cards after the flip and the mission's required number of Fails. If {trapper} is enabled, the leader excludes a card after the sword resolves and privately sees its value after the effect of {excalibur}.",
     seoLimit1:
       "Who sees the flipped card? The use and target are public. During the game, the holder and target know the affected card's result; other players do not receive that private value.",
     seoLimit2:
@@ -48,7 +48,7 @@ export const excalibur: { [key in TLanguage]: Dictionary<string> } = {
     seoRule2:
       'После сдачи карт миссии владелец может изменить карту другого участника команды или пропустить применение. Интерфейс не разрешает выбрать себя или игрока вне миссии.',
     seoRule3:
-      'Для каждой предложенной команды меч назначается заново. Итог миссии определяется по картам после изменения с учётом требуемого числа провалов.',
+      'Для каждой предложенной команды меч назначается заново. Итог миссии определяется по картам после изменения с учётом требуемого числа провалов. Если включён {trapper}, лидер исключает карту после применения меча и тайно узнаёт её значение, которое мог изменить {excalibur}.',
     seoLimit1:
       'Кто видит изменённую карту? Применение меча и цель публичны. Во время игры владелец и цель знают результат затронутой карты; остальные не получают это тайное значение.',
     seoLimit2:
@@ -67,7 +67,7 @@ export const excalibur: { [key in TLanguage]: Dictionary<string> } = {
     seoRule2:
       'Después de entregar las cartas de misión, el portador puede cambiar la de otro miembro del equipo o no usar la espada. La interfaz impide elegirse a sí mismo o elegir a alguien fuera de la misión.',
     seoRule3:
-      'Se elige un portador para cada equipo propuesto. El resultado final usa las cartas tras el cambio y el número de Fracasos necesario para esa misión.',
+      'Se elige un portador para cada equipo propuesto. El resultado final usa las cartas tras el cambio y el número de Fracasos necesario para esa misión. Si {trapper} está activo, el líder excluye una carta después de resolver la espada y ve en secreto su valor tras el efecto de {excalibur}.',
     seoLimit1:
       '¿Quién ve la carta cambiada? El uso y el objetivo son públicos. Durante la partida, el portador y el objetivo conocen el resultado de la carta afectada; los demás no reciben ese valor privado.',
     seoLimit2:
@@ -86,7 +86,7 @@ export const excalibur: { [key in TLanguage]: Dictionary<string> } = {
     seoRule2:
       'Depois que as cartas de missão são entregues, o portador pode inverter a carta de outro participante ou não usar a espada. A interface não permite escolher a si mesmo nem alguém fora da missão.',
     seoRule3:
-      'Um portador é escolhido para cada equipe proposta. O resultado final considera as cartas após a troca e o número de Fracassos necessário para a missão.',
+      'Um portador é escolhido para cada equipe proposta. O resultado final considera as cartas após a troca e o número de Fracassos necessário para a missão. Se {trapper} estiver ativo, o líder exclui uma carta depois da espada e vê seu valor em segredo após o efeito de {excalibur}.',
     seoLimit1:
       'Quem vê a carta alterada? O uso e o alvo são públicos. Durante a partida, o portador e o alvo conhecem o resultado da carta afetada; os demais não recebem esse valor privado.',
     seoLimit2:
@@ -102,7 +102,8 @@ export const excalibur: { [key in TLanguage]: Dictionary<string> } = {
       '{excalibur}会翻转一张已提交的任务牌：成功变失败，失败变成功。它不会改变角色，也不会改变赞成或反对队伍的投票。',
     seoRule1: '队伍选定后、表决前，队长把剑交给队内另一位玩家，不能给自己。所有人都知道谁持有剑。',
     seoRule2: '任务牌全部提交后，持有者可翻转队内另一人的牌，也可放弃使用。界面不允许选择自己或不在本次任务中的玩家。',
-    seoRule3: '每次提出队伍都要重新指定持有者。最终任务结果根据翻转后的牌，以及该任务所需的失败牌数量计算。',
+    seoRule3:
+      '每次提出队伍都要重新指定持有者。最终任务结果根据翻转后的牌，以及该任务所需的失败牌数量计算。 若启用{trapper}，队长在剑结算后排除一张牌，并私下查看经过{excalibur}效果后的结果。',
     seoLimit1:
       '谁能看到被翻转的牌？是否用剑及目标是公开的。游戏中持有者与目标知道该牌的结果，其他玩家不会获得这个私下信息。',
     seoLimit2:
@@ -117,7 +118,8 @@ export const excalibur: { [key in TLanguage]: Dictionary<string> } = {
       '{excalibur}會翻轉一張已提交的任務牌：成功變失敗，失敗變成功。它不會改變角色，也不會改變贊成或反對隊伍的投票。',
     seoRule1: '隊伍選定後、表決前，隊長把劍交給隊內另一位玩家，不能給自己。所有人都知道誰持有劍。',
     seoRule2: '任務牌全部提交後，持有者可翻轉隊內另一人的牌，也可放棄使用。介面不允許選擇自己或不在本次任務中的玩家。',
-    seoRule3: '每次提出隊伍都要重新指定持有者。最終任務結果根據翻轉後的牌，以及該任務所需的失敗牌數量計算。',
+    seoRule3:
+      '每次提出隊伍都要重新指定持有者。最終任務結果根據翻轉後的牌，以及該任務所需的失敗牌數量計算。 若啟用{trapper}，隊長在劍結算後排除一張牌，並私下查看經過{excalibur}效果後的結果。',
     seoLimit1:
       '誰能看到被翻轉的牌？是否用劍及目標是公開的。遊戲中持有者與目標知道該牌的結果，其他玩家不會獲得這個私下資訊。',
     seoLimit2:

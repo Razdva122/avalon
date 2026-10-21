@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import { PassThrough } from 'stream';
 import { spawn } from 'child_process';
 import { writeFile, access } from 'fs/promises';
+import timers from 'timers/promises';
 import { runCodex, codexSchema } from './codex';
 
 jest.mock('child_process', () => ({ spawn: jest.fn() }));
@@ -150,6 +151,22 @@ test.each(['error', 'turn.failed'])('local usage limit in %s pauses without retr
   });
   await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toThrow('usage limit');
   expect(attempts).toBe(1);
+});
+
+test.each(['error', 'turn.failed'])('local HTTP 429 in %s waits before one retry', async (eventType) => {
+  delete process.env.AI_CODEX_SSH_HOST;
+  const delay = jest.spyOn(timers, 'setTimeout').mockResolvedValue(undefined);
+  let attempts = 0;
+  fakeChild((child) => {
+    const current = mockedSpawn.mock.results[attempts++].value;
+    current.stdout.write(JSON.stringify({ type: eventType, error: { message: 'HTTP 429' } }) + '\n');
+    current.stdout.write(JSON.stringify({ type: 'turn.failed' }) + '\n');
+    child.emit('close', 1);
+  });
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toMatchObject({ codexAttempts: 2 });
+  expect(attempts).toBe(2);
+  expect(delay).toHaveBeenCalledTimes(1);
+  expect(delay).toHaveBeenCalledWith(10000, undefined, { signal: undefined });
 });
 
 test('stop after a failed turn prevents the automatic retry', async () => {

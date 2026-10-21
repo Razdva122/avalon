@@ -4,7 +4,8 @@ import { mkdtemp, writeFile, readFile, rm } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
-import { AiTechnicalPause, CodexRequestFailed, parseReply, parseDecisionReply } from './client';
+import { setTimeout as delay } from 'timers/promises';
+import { AiTechnicalPause, CodexRequestFailed, CodexRateLimited, parseReply, parseDecisionReply } from './client';
 import type { BotRequest, GenerationOptions } from './client';
 import type { AiRepository, AiRequestLog, AiDecisionTrace } from './repository';
 import type { CodexSettings } from '@avalon/types';
@@ -145,7 +146,8 @@ export const runCodex: CodexRunner = async (prompt, schema, signal, settings, in
   try {
     return { ...(await runCodexOnce(prompt, schema, signal, settings, instructions)), attempts: 1 };
   } catch (error) {
-    if (!(error instanceof CodexRequestFailed) || signal?.aborted) throw error;
+    if (!(error instanceof CodexRequestFailed || error instanceof CodexRateLimited) || signal?.aborted) throw error;
+    if (error instanceof CodexRateLimited) await delay(10000, undefined, { signal });
     try {
       return {
         ...(await runCodexOnce(prompt, schema, signal, settings, instructions)),
@@ -329,6 +331,14 @@ const runCodexOnce = async (
           )
             failure = new AiTechnicalPause(
               'Codex subscription usage limit reached. Wait for the limit to reset, then retry the match.',
+            );
+          else if (
+            !failure &&
+            ['error', 'turn.failed'].includes(event.type) &&
+            /rate.?limit|too many requests|\b429\b/i.test(event.error?.message || event.message || '')
+          )
+            failure = new CodexRateLimited(
+              'Codex request was rate limited. Wait a while, then manually retry the match.',
             );
           else if (event.type === 'turn.failed' && !failure)
             failure = new CodexRequestFailed(

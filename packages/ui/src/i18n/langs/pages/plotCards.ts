@@ -12,7 +12,7 @@ export const plotCards: { [key in TLanguage]: Dictionary<string> } = {
     seoRule3:
       'Bài Tức thì được xử lý ngay khi nhận. Bài Chủ động có thể giữ đến giai đoạn cho phép và được tiêu hao khi dùng. Ép phiếu là hiệu ứng kéo dài. Mọi người biết ai đang giữ những lá bài nào.',
     seoLimit1:
-      'Có thể kết hợp các bản mở rộng không? Có: {plotCards} dùng được cùng {excalibur} và một trong hai {ladyOfLake} hoặc {ladyOfSea}. Hai Tiên nữ là lựa chọn thay thế nhau trong cài đặt phòng.',
+      'Có thể kết hợp các bản mở rộng không? Có: {plotCards} dùng được cùng {excalibur} và một trong hai {ladyOfLake} hoặc {ladyOfSea}. Hai Tiên nữ là lựa chọn thay thế nhau trong cài đặt phòng. Không thể kết hợp bài Cốt truyện với {trapper}.',
     seoLimit2:
       'Kiểm tra phe có luôn đúng với phe của người chơi không? Chúng dùng phe hiển thị: {trickster} hiện là Thiện và {troublemaker} hiện là Ác. Lời công bố về kết quả kiểm tra riêng tư cũng có thể là lời nói dối.',
     seoScenario1:
@@ -57,7 +57,7 @@ export const plotCards: { [key in TLanguage]: Dictionary<string> } = {
     seoRule3:
       'Instant cards resolve when received. Usable cards can be kept for their permitted stage and are spent when used. Charge is a continuing effect. Ownership of held cards is public.',
     seoLimit1:
-      'Can you combine expansions? Yes: {plotCards} work with {excalibur} and either {ladyOfLake} or {ladyOfSea}. The two Ladies are alternatives in the room settings.',
+      'Can you combine expansions? Yes: {plotCards} work with {excalibur} and either {ladyOfLake} or {ladyOfSea}. The two Ladies are alternatives in the room settings. Plot Cards cannot be combined with {trapper}.',
     seoLimit2:
       "Are loyalty checks always true to the player's team? They use displayed loyalty: {trickster} appears good and {troublemaker} appears evil. A public claim about a private check can also be a lie.",
     seoScenario1:
@@ -102,7 +102,7 @@ export const plotCards: { [key in TLanguage]: Dictionary<string> } = {
     seoRule3:
       'Мгновенные карты разрешаются при получении. Применяемые можно сохранить до разрешённого этапа; после использования они расходуются. «Иду на вы» действует постоянно. Владельцы полученных карт известны всем.',
     seoLimit1:
-      'Можно ли сочетать дополнения? Да: можно вместе включить {plotCards}, {excalibur} и одну из Леди — {ladyOfLake} или {ladyOfSea}. Две Леди взаимоисключающие в настройках комнаты.',
+      'Можно ли сочетать дополнения? Да: можно вместе включить {plotCards}, {excalibur} и одну из Леди — {ladyOfLake} или {ladyOfSea}. Две Леди взаимоисключающие в настройках комнаты. Дополнения {plotCards} и {trapper} нельзя включить одновременно.',
     seoLimit2:
       'Всегда ли проверка показывает настоящую сторону? Она использует отображаемую лояльность: {trickster} выглядит добрым, {troublemaker} — злым. Публичный рассказ о тайной проверке тоже может быть ложью.',
     seoScenario1:
@@ -147,7 +147,7 @@ export const plotCards: { [key in TLanguage]: Dictionary<string> } = {
     seoRule3:
       'Las cartas instantáneas se resuelven al recibirlas. Las utilizables pueden guardarse hasta su fase permitida y se gastan al usarlas. La carta de voto público tiene un efecto continuo. Todos conocen a los propietarios de las cartas recibidas.',
     seoLimit1:
-      '¿Se pueden combinar expansiones? Sí: {plotCards} funcionan con {excalibur} y con {ladyOfLake} o {ladyOfSea}. Las dos Damas son alternativas en los ajustes de sala.',
+      '¿Se pueden combinar expansiones? Sí: {plotCards} funcionan con {excalibur} y con {ladyOfLake} o {ladyOfSea}. Las dos Damas son alternativas en los ajustes de sala. Las cartas de trama no se pueden combinar con {trapper}.',
     seoLimit2:
       '¿Las consultas siempre muestran el bando real? Usan la lealtad mostrada: {trickster} aparece como bien y {troublemaker} como mal. También se puede mentir al contar un resultado privado.',
     seoScenario1:
@@ -192,7 +192,7 @@ export const plotCards: { [key in TLanguage]: Dictionary<string> } = {
     seoRule3:
       'Cartas instantâneas são resolvidas ao serem recebidas. Cartas utilizáveis podem ser guardadas até a etapa permitida e são gastas ao usar. A carta de voto público tem efeito contínuo. Os donos das cartas recebidas são conhecidos por todos.',
     seoLimit1:
-      'É possível combinar expansões? Sim: {plotCards} funcionam com {excalibur} e com {ladyOfLake} ou {ladyOfSea}. As duas Damas são alternativas nos ajustes da sala.',
+      'É possível combinar expansões? Sim: {plotCards} funcionam com {excalibur} e com {ladyOfLake} ou {ladyOfSea}. As duas Damas são alternativas nos ajustes da sala. As cartas de trama não podem ser combinadas com {trapper}.',
     seoLimit2:
       'A verificação sempre mostra o lado real? Ela usa a lealdade exibida: {trickster} aparece como bem e {troublemaker} como mal. O relato público de um resultado privado também pode ser falso.',
     seoScenario1:
@@ -237,7 +237,7 @@ export const plotCards: { [key in TLanguage]: Dictionary<string> } = {
     seoRule3:
       '即时卡收到后立即处理。可使用卡可以保留到允许的阶段，用后消耗。公开投票卡具有持续效果。所有人都知道已发出的牌由谁持有。',
     seoLimit1:
-      '可以搭配其他扩展吗？可以：{plotCards}可与{excalibur}及{ladyOfLake}或{ladyOfSea}搭配。房间设置中两位仙女只能选一位。',
+      '可以搭配其他扩展吗？可以：{plotCards}可与{excalibur}及{ladyOfLake}或{ladyOfSea}搭配。房间设置中两位仙女只能选一位。 剧情牌不能与{trapper}同时启用。',
     seoLimit2:
       '查验一定显示真实阵营吗？查验采用显示阵营：{trickster}显示好人，{troublemaker}显示坏人。公开转述私下结果时也可以说谎。',
     seoScenario1: '8人局首次组队前抽两张牌。如果队伍被否决，下一位队长重新组队，不再额外抽两张。',
@@ -278,7 +278,7 @@ export const plotCards: { [key in TLanguage]: Dictionary<string> } = {
     seoRule3:
       '即時卡收到後立即處理。可使用卡可以保留到允許的階段，用後消耗。公開投票卡具有持續效果。所有人都知道已發出的牌由誰持有。',
     seoLimit1:
-      '可以搭配其他擴充嗎？可以：{plotCards}可與{excalibur}及{ladyOfLake}或{ladyOfSea}搭配。房間設定中兩位仙女只能選一位。',
+      '可以搭配其他擴充嗎？可以：{plotCards}可與{excalibur}及{ladyOfLake}或{ladyOfSea}搭配。房間設定中兩位仙女只能選一位。 劇情牌不能與{trapper}同時啟用。',
     seoLimit2:
       '查驗一定顯示真實陣營嗎？查驗採用顯示陣營：{trickster}顯示好人，{troublemaker}顯示壞人。公開轉述私下結果時也可以說謊。',
     seoScenario1: '8人局首次組隊前抽兩張牌。如果隊伍被否決，下一位隊長重新組隊，不再額外抽兩張。',
