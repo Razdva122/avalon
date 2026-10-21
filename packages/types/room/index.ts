@@ -54,7 +54,33 @@ export type AiBotInstanceStatus = {
   };
 };
 export type BotQuotaThresholds = Record<AiBotMode, { shortTerm: number; weekly: number }>;
-export type AiBotDashboard = { checkedAt: number; instances: AiBotInstanceStatus[]; thresholds: BotQuotaThresholds };
+export type AiGameUsage = {
+  roomID: string;
+  instanceID: string;
+  startedAt: number;
+  checkedAt?: number;
+  status: AiRoomState['status'];
+  humanCount: number;
+  botCount: number;
+  mode: string;
+  language?: AiLanguage;
+  options: GameOptions;
+  settings: CodexSettings[];
+  inputTokens: number;
+  cachedTokens: number;
+  outputTokens: number;
+  reasoningTokens: number;
+  requests: number;
+  unknownUsageRequests: number;
+  weeklySpent: number | null;
+  shortTermSpent: number | null;
+};
+export type AiBotDashboard = {
+  checkedAt: number;
+  instances: AiBotInstanceStatus[];
+  thresholds: BotQuotaThresholds;
+  games: AiGameUsage[];
+};
 
 export type AiLanguage = 'en' | 'ru' | 'zh-tw' | 'es' | 'vi';
 export type AiPlayerCount = 5 | 6 | 7 | 8;

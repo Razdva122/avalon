@@ -467,3 +467,89 @@ test('independent instance leases allow one concurrent match each and scope stal
   await repo.renewLease('three');
   await expect(claim('four', 'second')).rejects.toThrow();
 });
+
+test('per-game usage survives restart, aggregates retried audits once and keeps account snapshots isolated', async () => {
+  const db = client.db('game-usage');
+  const repo = new AiRepository(db);
+  const state = {
+    roomID: 'usage-room',
+    stage: 'started',
+    createAt: new Date().toISOString(),
+    ai: { status: 'running', humanPlayerIDs: ['human', 'friend'], botDifficulty: 'regular', language: 'ru' },
+    players: Array.from({ length: 5 }, (_, id) => ({ id: String(id) })),
+    options: { roles: { merlin: 1 }, addons: {} },
+    game: { stage: 'votingForTeam' },
+  } as unknown as import('@avalon/types').StartedRoomState;
+  const before = {
+    remainingPercent: 80,
+    resetsAt: 2000000000,
+    checkedAt: 1,
+    shortTerm: { remainingPercent: 90, resetsAt: 1900000000 },
+  };
+  await repo.startGameUsage(state, 'one', before);
+  // Resuming cannot overwrite the initial balance or participant counts.
+  await repo.startGameUsage({ ...state, players: [] }, 'two', { ...before, remainingPercent: 70 });
+  const audit = {
+    _id: 'request-one',
+    roomID: state.roomID,
+    player: 'bot',
+    stage: 'vote',
+    mode: 'codex',
+    startedAt: new Date(),
+    finishedAt: new Date(),
+    status: 'completed',
+    inputTokens: 100,
+    cachedTokens: 40,
+    outputTokens: 20,
+    reasoningTokens: 10,
+    model: 'model-one',
+    reasoning: 'low',
+  };
+  await repo.recordRequest(audit);
+  await repo.recordRequest(audit);
+  await repo.recordRequest({
+    ...audit,
+    _id: 'request-two',
+    inputTokens: 50,
+    cachedTokens: 0,
+    outputTokens: 5,
+    reasoningTokens: 0,
+    status: 'failed',
+    unknownUsageAttempts: 1,
+  });
+  await repo.recordRequest({ ...audit, _id: 'unrelated', roomID: 'other', inputTokens: 9999 });
+  await repo.recordRequest({ ...audit, _id: 'review-on-another-account', phase: 'beginner-review', inputTokens: 9999 });
+  state.ai!.status = 'paused';
+  await repo.save(state);
+  await repo.finishGameUsage(state.roomID, {
+    ...before,
+    remainingPercent: 78,
+    shortTerm: { ...before.shortTerm, remainingPercent: 83 },
+  });
+  const [usage] = await new AiRepository(db).recentGameUsage();
+  expect(usage).toMatchObject({
+    roomID: 'usage-room',
+    instanceID: 'one',
+    humanCount: 2,
+    botCount: 3,
+    status: 'paused',
+    mode: 'regular',
+    language: 'ru',
+    options: state.options,
+    inputTokens: 150,
+    cachedTokens: 40,
+    outputTokens: 25,
+    reasoningTokens: 10,
+    requests: 2,
+    unknownUsageRequests: 1,
+    weeklySpent: 2,
+    shortTermSpent: 7,
+    settings: [{ model: 'model-one', reasoning: 'low' }],
+  });
+  expect(usage).not.toHaveProperty('before');
+  expect(usage).not.toHaveProperty('_id');
+  await repo.finishGameUsage(state.roomID, { ...before, resetsAt: 2100000000, remainingPercent: 99, shortTerm: null });
+  expect((await repo.recentGameUsage())[0]).toMatchObject({ weeklySpent: null, shortTermSpent: null });
+  await db.collection('ai_game_usage').updateOne({ roomID: state.roomID }, { $set: { expiresAt: new Date(0) } });
+  expect(await repo.recentGameUsage()).toEqual([]);
+});

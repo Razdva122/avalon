@@ -54,6 +54,7 @@ beforeAll(async () => {
   } as unknown as Manager);
   service.repository = {
     busyInstances: async () => [],
+    recentGameUsage: async () => [],
     getBotQuotaThresholds: async () => structuredClone(thresholds),
     setBotQuotaThresholds: async (value: typeof thresholds) => {
       thresholds = structuredClone(value);

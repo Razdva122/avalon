@@ -208,6 +208,7 @@ export class AiService {
       await this.repository!.release(roomID);
     } finally {
       this.roomInstances.delete(roomID);
+      this.usageStarted.delete(roomID);
     }
   }
   async canManage(userID?: string): Promise<boolean> {
@@ -360,10 +361,26 @@ export class AiService {
     this.pauseTimers.set(room.roomID, { expiresAt, timer });
   }
 
+  private usageStarted = new Set<string>();
+
   private createRoom(id: string, owner: string, language: AiLanguage, playerCount: AiPlayerCount) {
-    const pipeline = decisionPipeline((request, options, signal) =>
-      codexDecide(id, this.repository!, undefined, () => room.ai?.codex)(request, options, signal),
-    );
+    // Share the initial snapshot across parallel opening decisions. Persist it before spending.
+    let usageStart: Promise<void> | undefined;
+    const pipeline = decisionPipeline(async (request, options, signal) => {
+      const state = room.calculateRoomState();
+      if (state.stage === 'started') {
+        usageStart ??= (async () => {
+          const before = await getCodexWeeklyLimit(true);
+          await this.repository!.startGameUsage(state, this.instanceFor(id).id, before);
+          this.usageStarted.add(id);
+        })().catch((error) => {
+          usageStart = undefined;
+          throw error;
+        });
+        await usageStart;
+      }
+      return codexDecide(id, this.repository!, undefined, () => room.ai?.codex)(request, options, signal);
+    });
     const room: BotRoom = new BotRoom(
       id,
       owner,
@@ -404,6 +421,13 @@ export class AiService {
           /* room.run already exposes a sanitized paused status */
         })
         .finally(async () => {
+          // Fresh limits are read while this room still owns its account, including after a pause.
+          if (this.usageStarted.has(id)) {
+            await this.repository!.finishGameUsage(id, await getCodexWeeklyLimit(true)).catch(() =>
+              console.error('AI game usage snapshot could not be saved'),
+            );
+            if (room.ai?.status === 'finished' || room.ai?.status === 'stopped') this.usageStarted.delete(id);
+          }
           if (this.manager.rooms[id] === room && room.ai?.status === 'paused') {
             try {
               await room.renewLease?.();
@@ -601,9 +625,14 @@ export class AiService {
               : {}),
           };
         });
+        const games = await this.repository!.recentGameUsage();
+        for (const game of games) {
+          if (['running', 'paused'].includes(game.status) && busy.get(game.instanceID) !== game.roomID)
+            game.status = 'stopped';
+        }
         // Recheck authority before returning a potentially slow metadata request.
         if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
-        cb({ checkedAt: Date.now(), instances, thresholds });
+        cb({ checkedAt: Date.now(), instances, thresholds, games });
       } catch {
         cb({ error: 'Could not load bot dashboard' });
       }

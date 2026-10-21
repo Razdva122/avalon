@@ -6,6 +6,26 @@ import type { Db } from 'mongodb';
 import type { StartedRoomState, TRoomState, TRoomInfo, PlayerGameSummaryPage, BotQuotaThresholds } from '@avalon/types';
 import { defaultBotQuotaThresholds, validBotQuotaThresholds } from './quota-policy';
 import { AiPause } from './client';
+import { quotaSpent } from './usage-stats';
+import type { AiGameUsage, CodexWeeklyLimit, CodexSettings } from '@avalon/types';
+
+type GameUsageRecord = Omit<
+  AiGameUsage,
+  | 'settings'
+  | 'inputTokens'
+  | 'cachedTokens'
+  | 'outputTokens'
+  | 'reasoningTokens'
+  | 'requests'
+  | 'unknownUsageRequests'
+  | 'weeklySpent'
+  | 'shortTermSpent'
+> & {
+  _id: string;
+  expiresAt: Date;
+  before: CodexWeeklyLimit | null;
+  after?: CodexWeeklyLimit | null;
+};
 
 export type AiRequestLog = {
   _id: string;
@@ -72,6 +92,104 @@ export class AiRepository {
       .collection<{ _id: string; thresholds: BotQuotaThresholds }>('ai_settings')
       .updateOne({ _id: 'bot-quota-thresholds' }, { $set: { thresholds } }, { upsert: true });
   }
+  async startGameUsage(state: StartedRoomState, instanceID: string, before: CodexWeeklyLimit | null) {
+    const startedAt = Date.now();
+    const humanCount = state.ai?.humanPlayerIDs?.length ?? (state.ai?.humanPlayerID ? 1 : 0);
+    await this.db.collection<GameUsageRecord>('ai_game_usage').updateOne(
+      { _id: state.roomID },
+      {
+        $setOnInsert: {
+          roomID: state.roomID,
+          instanceID,
+          startedAt,
+          expiresAt: this.retentionDate(new Date(startedAt), 'AI_REQUEST_RETENTION_DAYS', 365),
+          before,
+          status: state.ai?.status ?? 'running',
+          humanCount,
+          botCount: state.players.length - humanCount,
+          mode: state.ai?.beginner ? 'beginner' : (state.ai?.botDifficulty ?? 'custom'),
+          language: state.ai?.language,
+          options: state.options,
+        },
+      },
+      { upsert: true },
+    );
+  }
+  async finishGameUsage(roomID: string, after: CodexWeeklyLimit | null) {
+    await this.db
+      .collection<GameUsageRecord>('ai_game_usage')
+      .updateOne({ _id: roomID }, { $set: { after, checkedAt: Date.now() } });
+  }
+  async recentGameUsage(): Promise<AiGameUsage[]> {
+    await this.ensureRetentionIndexes();
+    const records = await this.db
+      .collection<GameUsageRecord>('ai_game_usage')
+      .find({ expiresAt: { $gt: new Date() } }, { maxTimeMS: 10000 })
+      .sort({ startedAt: -1 })
+      .limit(50)
+      .toArray();
+    if (!records.length) return [];
+    const costs = await this.db
+      .collection<AiRequestLog>('ai_request_costs')
+      .aggregate<{
+        _id: string;
+        inputTokens: number;
+        cachedTokens: number;
+        outputTokens: number;
+        reasoningTokens: number;
+        requests: number;
+        unknownUsageRequests: number;
+        settings: CodexSettings[];
+      }>(
+        [
+          { $match: { roomID: { $in: records.map((r) => r.roomID) }, phase: { $ne: 'beginner-review' } } },
+          {
+            $group: {
+              _id: '$roomID',
+              inputTokens: { $sum: '$inputTokens' },
+              cachedTokens: { $sum: '$cachedTokens' },
+              outputTokens: { $sum: '$outputTokens' },
+              reasoningTokens: { $sum: '$reasoningTokens' },
+              requests: { $sum: 1 },
+              unknownUsageRequests: {
+                $sum: {
+                  $cond: [
+                    {
+                      $or: [
+                        { $eq: [{ $ifNull: ['$inputTokens', null] }, null] },
+                        { $eq: [{ $ifNull: ['$outputTokens', null] }, null] },
+                        { $gt: ['$unknownUsageAttempts', 0] },
+                      ],
+                    },
+                    1,
+                    0,
+                  ],
+                },
+              },
+              settings: { $addToSet: { model: '$model', reasoning: '$reasoning' } },
+            },
+          },
+        ],
+        { maxTimeMS: 10000 },
+      )
+      .toArray();
+    return records.map(({ _id, before, after, expiresAt, ...record }) => {
+      void expiresAt; // Storage retention metadata is never sent to clients.
+      const cost = costs.find((entry) => entry._id === _id);
+      return {
+        ...record,
+        settings: cost?.settings ?? [],
+        requests: cost?.requests ?? 0,
+        inputTokens: cost?.inputTokens ?? 0,
+        cachedTokens: cost?.cachedTokens ?? 0,
+        outputTokens: cost?.outputTokens ?? 0,
+        reasoningTokens: cost?.reasoningTokens ?? 0,
+        unknownUsageRequests: cost?.unknownUsageRequests ?? 1,
+        weeklySpent: quotaSpent(before, after),
+        shortTermSpent: quotaSpent(before?.shortTerm, after?.shortTerm),
+      };
+    });
+  }
   private achievementProcessing?: Promise<void>;
   private ratingCache?: { version: number; expires: number; ratings: ReturnType<typeof calculateAiRatings> };
   private ratingPending?: Promise<ReturnType<typeof calculateAiRatings>>;
@@ -90,6 +208,8 @@ export class AiRepository {
   private async ensureRetentionIndexes() {
     if (!this.retentionIndexes)
       this.retentionIndexes = Promise.all([
+        this.db.collection('ai_game_usage').createIndex({ startedAt: -1 }),
+        this.db.collection('ai_game_usage').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
         this.db.collection('ai_request_costs').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
         this.db.collection('ai_request_costs').createIndex({ roomID: 1, startedAt: 1 }),
         this.db.collection('ai_decision_traces').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
@@ -175,6 +295,9 @@ export class AiRepository {
     // Separate collection keeps AI replays out of all existing ranked statistics queries.
     if (state.stage !== 'started') return;
     validateID(state.roomID);
+    await this.db
+      .collection<GameUsageRecord>('ai_game_usage')
+      .updateOne({ _id: state.roomID }, { $set: { status: state.ai?.status ?? 'stopped' } });
     const saved = structuredClone(state);
     saved.createAt = new Date(saved.createAt).toISOString();
     await this.db.collection<{ _id: string; state: StartedRoomState }>('ai_room_replays').updateOne(
