@@ -1,4 +1,17 @@
 export default {
+  lobbyBotCount: '機器人：{count}',
+  lobbyFixed: '固定配置',
+  lobbyChatTitle: '在文字聊天中討論',
+  lobbyPremiumLimit: '房主沒有 Premium 時，7–8 人桌最多允許 2 個機器人。',
+  lobbyLaunch: '開始 · {count} 個席位',
+
+  lobbyPlay: '與 AI 對戰',
+  lobbyStrong: '強力機器人將補齊剩餘席位。',
+  lobbyFixedRules: '本局的角色和擴充已固定，無法變更。',
+  lobbyTextOnly: '機器人會閱讀和傳送文字聊天，但聽不到語音聊天。',
+  lobbyTimersRating: '本局不影響一般排名。行動回合與討論皆有時間限制。',
+  lobbyRosterChanged: '玩家名單已變更。請關閉並重新開啟此視窗以確認新名單。',
+
   filterWithBots: '機器人對局',
   setupGuestTitle: '登入後開始遊戲',
   setupGuestHint: '可以先選擇設定。登入後即可檢查機器人是否可用並建立遊戲。',

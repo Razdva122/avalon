@@ -1,6 +1,6 @@
 import { configuredCodexInstances, withCodexInstance, type CodexInstance } from './codex-instances';
 import { BeginnerAnalysis, buildBeginnerAnalysis, beginnerAnalysisSettings } from './beginner-analysis';
-import { aiHumanRoles, aiPlayedModel, aiRosterInfo } from '@avalon/types';
+import { aiHumanRoles, aiPlayedModel, aiRosterInfo, lobbyAiSizes } from '@avalon/types';
 import type {
   AiBotDifficulty,
   AiBotInstanceStatus,
@@ -15,6 +15,7 @@ import type {
   TRoomInfo,
 } from '@avalon/types';
 import type { Manager } from '@/main';
+import { validPacket } from '@/security/validation';
 import { randomUUID } from 'crypto';
 import { AiRepository } from './repository';
 import { BotRoom } from './room';
@@ -87,6 +88,7 @@ export class AiService {
   get archiveRepository(): AiRepository | undefined {
     return this.repository || this.archive;
   }
+  private lobbyRooms = new WeakSet<BotRoom>();
   private creating = new Set<string>();
   private starting = new Set<string>();
   private allocating = new Set<string>();
@@ -422,6 +424,125 @@ export class AiService {
   }
 
   register(socket: ServerSocket, userID?: string) {
+    socket.on('getLobbyAiAccess', async (id, cb) => {
+      if (typeof cb !== 'function') return;
+      if (!validPacket('getLobbyAiAccess', [id, cb])) return cb({ error: 'invalidRequest' });
+      try {
+        const room = this.manager.rooms[id];
+        if (
+          !room ||
+          room.ai ||
+          room.nextRoomID ||
+          room.leaderID !== userID ||
+          !['created', 'locked'].includes(room.data.stage) ||
+          !room.players.includes(userID!)
+        )
+          return cb({ error: 'Lobby AI access denied' });
+        if (!(await this.canPlay(userID))) return cb({ error: 'AI room access denied' });
+        const [hostPremium, availability] = await Promise.all([
+          this.canPlayLargeTables(userID!),
+          this.humanAvailability(),
+        ]);
+        if (
+          this.manager.rooms[id] !== room ||
+          room.ai ||
+          room.leaderID !== userID ||
+          !['created', 'locked'].includes(room.data.stage) ||
+          !room.players.includes(userID!)
+        )
+          return cb({ error: 'Lobby changed' });
+        cb({ available: availability.botModes.smart, hostPremium, humanPlayerIDs: [...room.players] });
+      } catch {
+        cb({ error: 'Could not load lobby bot availability' });
+      }
+    });
+    socket.on('startLobbyAiRoom', async (id, options, cb) => {
+      if (typeof cb !== 'function') return;
+      if (!validPacket('startLobbyAiRoom', [id, options, cb])) return cb({ error: 'invalidRequest' });
+      const original = this.manager.rooms[id];
+      if (!userID || !original || original.leaderID !== userID) return cb({ error: 'Lobby AI access denied' });
+      if (original instanceof BotRoom && this.lobbyRooms.has(original)) {
+        return cb(
+          original.ai!.playerCount === options.playerCount &&
+            original.ai!.language === options.language &&
+            original.humanIDs.length === options.humanPlayerIDs.length &&
+            original.humanIDs.every((human, index) => human === options.humanPlayerIDs[index])
+            ? { ok: true }
+            : { error: 'This lobby has already launched' },
+        );
+      }
+      if (this.starting.has(id)) return cb({ error: 'AI room control in progress' });
+      const humans = [...options.humanPlayerIDs];
+      const stage = original.data.stage;
+      const unchanged = () =>
+        this.manager.rooms[id] === original &&
+        !original.ai &&
+        !original.nextRoomID &&
+        original.leaderID === userID &&
+        original.data.stage === stage &&
+        ['created', 'locked'].includes(stage) &&
+        original.players.includes(userID) &&
+        original.players.length === humans.length &&
+        humans.every((human, index) => original.players[index] === human && !getBotProfile(human)) &&
+        !humans.some((human) => this.active(human));
+      if (!unchanged()) return cb({ error: 'Lobby or confirmed players changed' });
+      const size = lobbyAiSizes(humans.length, true).find((size) => size.playerCount === options.playerCount);
+      if (!size) return cb({ error: 'At least one human and one bot are required' });
+      this.starting.add(id);
+      let claimed = false;
+      let adopted = false;
+      try {
+        if (!(await this.canPlay(userID))) return cb({ error: 'AI room access denied' });
+        const hostPremium = await this.canPlayLargeTables(userID);
+        if (
+          lobbyAiSizes(humans.length, hostPremium).find((size) => size.playerCount === options.playerCount)
+            ?.requiresPremium
+        )
+          return cb({ error: 'Host Premium is required for more than two bots at seven or eight seats' });
+        if (!unchanged()) return cb({ error: 'Lobby or confirmed players changed' });
+        await this.beginnerAnalysis?.cancelAll();
+        await this.reserveInstance(id, true, 'smart');
+        claimed = true;
+        // Drain preceding lobby chat writes, then adopt the latest cache object at the synchronous swap.
+        await this.manager.chatService?.history(id, original.chat.history);
+        if (!unchanged()) return cb({ error: 'Lobby or confirmed players changed' });
+        const room = this.createRoom(id, userID, options.language, options.playerCount);
+        room.createAt = original.createAt;
+        room.chat = original.chat;
+        if (!this.manager.chatService && original.persistChatMessage)
+          room.persistChatMessage = original.persistChatMessage;
+        const previousChat = original.onChatMessage;
+        const aiChat = room.onChatMessage;
+        room.onChatMessage = (entry) => {
+          previousChat?.call(original, entry);
+          aiChat?.(entry);
+        };
+        room.ai!.publicBotGame = true;
+        room.ai!.humanPlayerID = userID;
+        room.ai!.humanPlayerIDs = humans;
+        room.ai!.humanSeats = humans.length;
+        room.ai!.withFriend = humans.length > 1;
+        room.ai!.botDifficulty = 'smart';
+        room.ai!.preparedDifficulty = 'smart';
+        room.ai!.codex = { ...humanSettings.smart };
+        room.ai!.title = `${humans.length} Humans vs ${size.botCount} Bots`;
+        delete room.ai!.profileRatingSeason;
+        humans.forEach((human, index) => {
+          room.players[room.players.length - 1 - index] = human;
+        });
+        this.manager.rooms[id] = room;
+        this.lobbyRooms.add(room);
+        adopted = true;
+        this.runRoom(room);
+        this.manager.updateRoomsList(room);
+        cb({ ok: true });
+      } catch (error) {
+        cb({ error: error instanceof AiPause ? error.message : 'Could not start lobby AI game' });
+      } finally {
+        this.starting.delete(id);
+        if (claimed && !adopted) await this.releaseInstance(id).catch(() => {});
+      }
+    });
     socket.on('setAiBotQuotaThresholds', async (thresholds, cb) => {
       if (typeof cb !== 'function') return;
       try {

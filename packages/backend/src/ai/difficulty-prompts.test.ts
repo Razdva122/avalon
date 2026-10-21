@@ -34,6 +34,42 @@ const request: BotRequest = {
   } as unknown as VisualGameState,
 };
 
+test.each(['regular', 'smart'] as const)(
+  '%s Merlin vote cover depends on completed failures, including after mission two',
+  (botDifficulty) => {
+    const cases: [string[], boolean][] = [
+      [[], true],
+      [['success'], true],
+      [['success', 'success'], true],
+      [['success', 'success', 'fail'], true],
+      [['fail', 'fail'], false],
+      [['success', 'fail', 'fail'], false],
+      [['fail', 'success', 'success', 'fail'], false],
+    ];
+    for (const [results, permitsCover] of cases) {
+      const input: BotRequest = {
+        ...request,
+        botDifficulty,
+        state: {
+          ...request.state,
+          mission: results.length,
+          history: results.map((result, index) => ({
+            type: 'mission',
+            index,
+            result,
+            fails: result === 'fail' ? 1 : 0,
+            actions: [{ playerID: '1', value: 'success' }],
+          })) as VisualGameState['history'],
+        },
+      };
+      const context = compactRequest(input);
+      expect(context.roleAdvice!.includes('MAY deliberately approve')).toBe(permitsCover);
+      expect(context.actionFacts).toMatchObject({ team: [1, 3, 5], knownEvilOnTeam: [5], failsRequired: 1 });
+      expect(context.choices).toEqual(['approve', 'reject']);
+    }
+  },
+);
+
 test.each(['selectTeam', 'votingForTeam'] as const)(
   'regular %s gets shorter instructions and role advice without changing facts or legal actions',
   async (stage) => {

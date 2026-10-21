@@ -94,6 +94,11 @@ export class Manager {
       return;
     }
 
+    if (room.ai) {
+      clearTimeout(this.roomTimers.get(room.roomID));
+      this.roomTimers.delete(room.roomID);
+    }
+
     if (removeRoom || room.ai?.status === 'stopped') {
       this.roomsList = this.roomsList.filter((el) => el.uuid !== room.roomID);
     } else {

@@ -112,20 +112,22 @@
     <h2 id="mission-sizes">{{ $t('rules.missionSizes') }}</h2>
 
     <div class="table">
-      <table>
+      <table :aria-label="$t('rules.missionSizes')">
         <thead>
           <tr>
-            <th>{{ $t('rules.numberOfPlayers') }}</th>
-            <th>{{ $t('rules.missionNumber', { number: 1 }) }}</th>
-            <th>{{ $t('rules.missionNumber', { number: 2 }) }}</th>
-            <th>{{ $t('rules.missionNumber', { number: 3 }) }}</th>
-            <th>{{ $t('rules.missionNumber', { number: 4 }) }}</th>
-            <th>{{ $t('rules.missionNumber', { number: 5 }) }}</th>
+            <th scope="col">{{ $t('rules.numberOfPlayers') }}</th>
+            <th scope="col">{{ $t('rules.teamBalance') }}</th>
+            <th scope="col">{{ $t('rules.missionNumber', { number: 1 }) }}</th>
+            <th scope="col">{{ $t('rules.missionNumber', { number: 2 }) }}</th>
+            <th scope="col">{{ $t('rules.missionNumber', { number: 3 }) }}</th>
+            <th scope="col">{{ $t('rules.missionNumber', { number: 4 }) }}</th>
+            <th scope="col">{{ $t('rules.missionNumber', { number: 5 }) }}</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <th>{{ $t('rules.countPlayers', { count: 5 }) }}</th>
+            <th scope="row">{{ $t('rules.countPlayers', { count: 5 }) }}</th>
+            <td>3 / 2</td>
             <td>2</td>
             <td>3</td>
             <td>2</td>
@@ -133,7 +135,8 @@
             <td>3</td>
           </tr>
           <tr>
-            <th>{{ $t('rules.countPlayers', { count: 6 }) }}</th>
+            <th scope="row">{{ $t('rules.countPlayers', { count: 6 }) }}</th>
+            <td>4 / 2</td>
             <td>2</td>
             <td>3</td>
             <td>4</td>
@@ -141,7 +144,8 @@
             <td>4</td>
           </tr>
           <tr>
-            <th>{{ $t('rules.countPlayers', { count: 7 }) }}</th>
+            <th scope="row">{{ $t('rules.countPlayers', { count: 7 }) }}</th>
+            <td>4 / 3</td>
             <td>2</td>
             <td>3</td>
             <td>3</td>
@@ -149,7 +153,8 @@
             <td>4</td>
           </tr>
           <tr>
-            <th>{{ $t('rules.countPlayers', { count: 8 }) }}</th>
+            <th scope="row">{{ $t('rules.countPlayers', { count: 8 }) }}</th>
+            <td>5 / 3</td>
             <td>3</td>
             <td>4</td>
             <td>4</td>
@@ -157,7 +162,8 @@
             <td>5</td>
           </tr>
           <tr>
-            <th>{{ $t('rules.countPlayers', { count: 9 }) }}</th>
+            <th scope="row">{{ $t('rules.countPlayers', { count: 9 }) }}</th>
+            <td>6 / 3</td>
             <td>3</td>
             <td>4</td>
             <td>4</td>
@@ -165,7 +171,8 @@
             <td>5</td>
           </tr>
           <tr>
-            <th>{{ $t('rules.countPlayers', { count: 10 }) }}</th>
+            <th scope="row">{{ $t('rules.countPlayers', { count: 10 }) }}</th>
+            <td>6 / 4</td>
             <td>3</td>
             <td>4</td>
             <td>4</td>
@@ -549,6 +556,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   text-align: center;
+  overflow-wrap: normal;
 }
 
 th,

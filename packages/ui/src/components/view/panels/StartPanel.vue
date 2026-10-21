@@ -83,6 +83,7 @@
         {{ $t('startPanel.startGame') }}
       </v-btn>
       <p class="lobby-start-hint" role="status">{{ $t(startHint) }}</p>
+      <LobbyAiButton :roomID="roomState.roomID" :humanPlayerIDs="roomState.players.map((player) => player.id)" />
       <HostPanel :roomState="roomState" />
     </div>
   </template>
@@ -97,11 +98,12 @@ import { TPageRoomState } from '@/helpers/game-state-manager';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
 import HostPanel from './HostPanel.vue';
+import LobbyAiButton from './LobbyAiButton.vue';
 import BotGameChoices from '@/components/view/board/modules/BotGameChoices.vue';
 
 export default defineComponent({
   name: 'StartPanel',
-  components: { HostPanel, BotGameChoices },
+  components: { HostPanel, BotGameChoices, LobbyAiButton },
   props: {
     roomState: {
       type: Object as PropType<TPageRoomState>,

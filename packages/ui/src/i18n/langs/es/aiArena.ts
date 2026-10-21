@@ -1,4 +1,19 @@
 export default {
+  lobbyBotCount: 'Bots: {count}',
+  lobbyFixed: 'Fijos',
+  lobbyChatTitle: 'Habla por el chat',
+  lobbyPremiumLimit: 'Sin Premium del anfitrión, las mesas de 7–8 jugadores permiten hasta 2 bots.',
+  lobbyLaunch: 'Jugar · {count} asientos',
+
+  lobbyPlay: 'Jugar con IA',
+  lobbyStrong: 'Los bots fuertes ocupan los asientos restantes.',
+  lobbyFixedRules: 'Los roles y complementos de esta partida son fijos y no se pueden cambiar.',
+  lobbyTextOnly: 'Los bots leen y escriben en el chat de texto. No pueden oír el chat de voz.',
+  lobbyTimersRating:
+    'Esta partida no afecta a tu clasificación normal. Los turnos y el debate tienen un límite de tiempo.',
+  lobbyRosterChanged:
+    'La lista de jugadores cambió. Cierra y vuelve a abrir esta ventana para confirmar la nueva lista.',
+
   filterWithBots: 'Con bots',
   setupGuestTitle: 'Inicia sesión para empezar',
   setupGuestHint:

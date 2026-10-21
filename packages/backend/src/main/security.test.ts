@@ -327,3 +327,22 @@ test('ordinary game sockets admit only the mixed-room human, never bot identitie
   expect(game.players[0].features.isSelected).toBe(true);
   room.stop();
 });
+
+test('adopting a lobby as an AI room clears its ordinary expiry timer without destroying voice', () => {
+  jest.useFakeTimers();
+  try {
+    const { manager } = fixture();
+    const voice = jest.spyOn(manager.voice, 'destroyRoom');
+    const before = jest.getTimerCount();
+    manager.createRoom('lobby', 'owner', ['owner']);
+    expect(jest.getTimerCount()).toBe(before + 1);
+    const adopted = new BotRoom('lobby', 'owner', manager.io, async () => ({ choice: 0, speech: '' }));
+    manager.rooms.lobby = adopted;
+    manager.updateRoomsList(adopted);
+    expect(jest.getTimerCount()).toBe(before);
+    expect(manager.rooms.lobby).toBe(adopted);
+    expect(voice).not.toHaveBeenCalled();
+  } finally {
+    jest.useRealTimers();
+  }
+});

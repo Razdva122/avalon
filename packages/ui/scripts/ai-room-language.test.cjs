@@ -70,6 +70,7 @@ async function fixture(
   const notifications = [];
   const emitted = [];
   const cleanup = [];
+  const socketListeners = new Map();
   const mounted = [];
   const access = {
     accessStatus: vue.ref('ready'),
@@ -131,6 +132,8 @@ async function fixture(
     if (id === '@/api/socket')
       return {
         socket: {
+          on: (event, callback) => socketListeners.set(event, callback),
+          off: (event) => socketListeners.delete(event),
           emit: (...args) => sent.push(args),
           timeout: () => ({
             emitWithAck: async (...args) => {
@@ -147,6 +150,8 @@ async function fixture(
       );
     if (id === '@avalon/types/room/ai-roles')
       return evaluate(fs.readFileSync(path.join(__dirname, '../../types/room/ai-roles.ts'), 'utf8'));
+    if (id === '@avalon/types/room/lobby-ai')
+      return evaluate(fs.readFileSync(path.join(__dirname, '../../types/room/lobby-ai.ts'), 'utf8'));
     if (id === '@avalon/types/room/ai-model')
       return evaluate(fs.readFileSync(path.join(__dirname, '../../types/room/ai-model.ts'), 'utf8'));
     if (id === '@/helpers/codex-pricing')
@@ -256,6 +261,7 @@ async function fixture(
     html,
     nodes,
     sent,
+    socketListeners,
     navigation,
     notifications,
     storeState,
@@ -2059,4 +2065,294 @@ test('only administrators receive the dashboard destination in a finished room p
   });
   t.after(member.stop);
   assert.ok(!member.nodes('v-btn').some((node) => node.props?.to?.name === 'adminBots'));
+});
+
+const lobbyAiProps = () => ({ roomID: 'lobby-room', humanPlayerIDs: ['owner', 'friend'] });
+const lobbyAccess = { available: true, hostPremium: false, humanPlayerIDs: ['owner', 'friend'] };
+async function lobbyAiFixture(options = {}) {
+  const room = await fixture('components/view/panels/LobbyAiButton.vue', {
+    props: lobbyAiProps(),
+    acknowledge: async () => lobbyAccess,
+    ...options,
+  });
+  await vue.nextTick();
+  await room.render();
+  return room;
+}
+const launchButton = (room) => room.nodes('v-btn').find((node) => 'data-launch-lobby-ai' in node.props);
+const openLobbyAi = async (room) => {
+  await room.render();
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-open-lobby-ai' in node.props)
+    .props.onClick();
+  await room.render();
+};
+test('lobby AI setup makes seat impact, role sides and the launch action easy to scan', async (t) => {
+  const room = await lobbyAiFixture({ locale: 'ru' });
+  t.after(room.stop);
+  await openLobbyAi(room);
+  const html = await room.render();
+  const sizes = room.nodes('button').filter((node) => node.props?.['data-lobby-ai-size']);
+  for (const size of sizes) {
+    const text = await renderToString(vue.createSSRApp({ render: () => size }));
+    assert.match(text, /Ботов:/, 'every size explains the number of bots before selecting it');
+  }
+  assert.equal((html.match(/data-role-icon=/g) || []).length, 5);
+  assert.match(html, /Добро/);
+  assert.match(html, /Зло/);
+  assert.ok(room.nodes('footer').some((node) => node.props?.class === 'dialog-actions'));
+  const close = room.nodes('button').find((node) => 'data-close-lobby-ai' in node.props);
+  assert.equal(close.props['aria-label'], 'Закрыть');
+  assert.match(html, /Голосовой чат они не слышат/);
+});
+test('lobby AI language choices show local flags and preserve the selected launch language', async (t) => {
+  const room = await lobbyAiFixture({
+    acknowledge: async (event) => (event === 'startLobbyAiRoom' ? { ok: true } : lobbyAccess),
+  });
+  t.after(room.stop);
+  await openLobbyAi(room);
+  const select = room.nodes('v-select').find((node) => 'data-lobby-ai-language' in node.props);
+  assert.ok(select);
+  for (const language of select.props.items) {
+    assert.equal(language.flag, `/flags/${language.value}.svg`);
+    assert.ok(fs.existsSync(path.join(__dirname, '../public', language.flag)));
+  }
+  assert.match(await room.render(), /src="\/flags\/en.svg"/);
+  select.props['onUpdate:modelValue']('vi');
+  await room.render();
+  await launchButton(room).props.onClick();
+  assert.equal(room.sent.at(-1)[2].language, 'vi');
+});
+test('lobby AI shows locked Premium sizes, exact fixed roles and selected language launch payload', async (t) => {
+  const room = await lobbyAiFixture({
+    locale: 'ru',
+    acknowledge: async (event) => (event === 'startLobbyAiRoom' ? { ok: true } : lobbyAccess),
+  });
+  t.after(room.stop);
+  await openLobbyAi(room);
+  assert.deepEqual(
+    room
+      .nodes('button')
+      .filter((n) => n.props?.['data-lobby-ai-size'])
+      .map((n) => [n.props['data-lobby-ai-size'], n.props.disabled]),
+    [
+      [5, false],
+      [6, false],
+      [7, true],
+      [8, true],
+    ],
+  );
+  assert.deepEqual(
+    room
+      .nodes('span')
+      .filter((n) => n.props?.['data-table-role'])
+      .map((n) => [n.props['data-table-role'], n.props['data-role-count']]),
+    [
+      ['merlin', 1],
+      ['percival', 1],
+      ['servant', 1],
+      ['mordred', 1],
+      ['morgana', 1],
+    ],
+  );
+  await launchButton(room).props.onClick();
+  assert.deepEqual(room.sent.at(-1), [
+    'startLobbyAiRoom',
+    'lobby-room',
+    { playerCount: 5, language: 'ru', humanPlayerIDs: ['owner', 'friend'] },
+  ]);
+});
+test('lobby AI invalidates confirmation when the roster changes and requires reopening', async (t) => {
+  const room = await lobbyAiFixture();
+  t.after(room.stop);
+  await openLobbyAi(room);
+  room.setupProps.humanPlayerIDs = ['owner', 'new-friend'];
+  await vue.nextTick();
+  await room.render();
+  assert.equal(launchButton(room).props.disabled, true);
+  await launchButton(room).props.onClick();
+  assert.equal(
+    room.sent.some(([event]) => event === 'startLobbyAiRoom'),
+    false,
+  );
+});
+test('lobby AI refreshes on reconnect and disables an open dialog when strong bots disappear', async (t) => {
+  let available = true;
+  const room = await lobbyAiFixture({ acknowledge: async () => ({ ...lobbyAccess, available }) });
+  t.after(room.stop);
+  await openLobbyAi(room);
+  available = false;
+  await room.socketListeners.get('connect')();
+  await room.render();
+  assert.equal(launchButton(room).props.disabled, true);
+  await launchButton(room).props.onClick();
+  assert.equal(
+    room.sent.some(([event]) => event === 'startLobbyAiRoom'),
+    false,
+  );
+});
+test('lobby AI rejects a refreshed server roster before starting', async (t) => {
+  let changed = false;
+  const room = await lobbyAiFixture({
+    acknowledge: async () => ({
+      ...lobbyAccess,
+      humanPlayerIDs: changed ? ['owner', 'different'] : lobbyAccess.humanPlayerIDs,
+    }),
+  });
+  t.after(room.stop);
+  await openLobbyAi(room);
+  changed = true;
+  await launchButton(room).props.onClick();
+  assert.equal(
+    room.sent.some(([event]) => event === 'startLobbyAiRoom'),
+    false,
+  );
+  assert.equal(launchButton(room).props.disabled, true);
+});
+
+test('lobby AI ignores stale access replies after changing rooms', async (t) => {
+  let release;
+  const room = await lobbyAiFixture({
+    acknowledge: async (_event, roomID) =>
+      roomID === 'lobby-room'
+        ? new Promise((resolve) => {
+            release = resolve;
+          })
+        : { ...lobbyAccess, available: false },
+  });
+  t.after(room.stop);
+  room.setupProps.roomID = 'another-room';
+  await vue.nextTick();
+  await Promise.resolve();
+  release(lobbyAccess);
+  await vue.nextTick();
+  await room.render();
+  assert.equal(
+    room.nodes('v-btn').some((n) => 'data-open-lobby-ai' in n.props),
+    false,
+  );
+});
+test('lobby AI suppresses duplicate launches and renders a server failure', async (t) => {
+  let release;
+  const room = await lobbyAiFixture({
+    acknowledge: async (event) =>
+      event === 'startLobbyAiRoom'
+        ? new Promise((resolve) => {
+            release = resolve;
+          })
+        : lobbyAccess,
+  });
+  t.after(room.stop);
+  await openLobbyAi(room);
+  const click = launchButton(room).props.onClick;
+  const pending = click();
+  await click();
+  await new Promise(setImmediate);
+  assert.equal(room.sent.filter(([event]) => event === 'startLobbyAiRoom').length, 1);
+  release({ error: 'The strong bots are busy' });
+  await pending;
+  assert.match(await room.render(), /Could not start the match/);
+  assert.equal(launchButton(room).props.loading, false);
+});
+test('lobby AI offers free two-bot large tables and previews all fixed roles and Lady', async (t) => {
+  const room = await lobbyAiFixture({
+    props: { roomID: 'lobby-room', humanPlayerIDs: ['owner', 'a', 'b', 'c', 'd'] },
+    acknowledge: async () => ({ available: true, hostPremium: false, humanPlayerIDs: ['owner', 'a', 'b', 'c', 'd'] }),
+  });
+  t.after(room.stop);
+  await openLobbyAi(room);
+  const sizes = () => room.nodes('button').filter((n) => n.props?.['data-lobby-ai-size']);
+  assert.deepEqual(
+    sizes().map((n) => [n.props['data-lobby-ai-size'], n.props.disabled]),
+    [
+      [6, false],
+      [7, false],
+      [8, true],
+    ],
+  );
+  sizes()
+    .find((n) => n.props['data-lobby-ai-size'] === 7)
+    .props.onClick();
+  await room.render();
+  assert.deepEqual(
+    room
+      .nodes('span')
+      .filter((n) => n.props?.['data-table-role'])
+      .map((n) => [n.props['data-table-role'], n.props['data-role-count']]),
+    [
+      ['merlin', 1],
+      ['percival', 1],
+      ['servant', 2],
+      ['mordred', 1],
+      ['morgana', 1],
+      ['oberon', 1],
+    ],
+  );
+  assert.match(await room.render(), /Lady of the lake/);
+});
+for (const locale of locales) {
+  test(`lobby AI explanations are translated in ${locale}`, async (t) => {
+    const room = await lobbyAiFixture({ locale });
+    t.after(room.stop);
+    await openLobbyAi(room);
+    const html = await room.render();
+    assert.doesNotMatch(html, /aiArena\.lobby/);
+    for (const key of [
+      'lobbyPlay',
+      'lobbyStrong',
+      'lobbyFixedRules',
+      'lobbyTextOnly',
+      'lobbyTimersRating',
+      'lobbyRosterChanged',
+    ])
+      assert.equal(typeof messages[locale].aiArena[key], 'string');
+  });
+}
+
+test('lobby AI hides a stale preview instead of showing negative bots when the roster grows', async (t) => {
+  const room = await lobbyAiFixture();
+  t.after(room.stop);
+  await openLobbyAi(room);
+  room.setupProps.humanPlayerIDs = ['owner', 'a', 'b', 'c', 'd', 'e'];
+  await vue.nextTick();
+  const html = await room.render();
+  assert.doesNotMatch(html, /-1 bots/);
+  assert.equal(room.nodes('span').filter((n) => n.props?.['data-table-role']).length, 0);
+});
+
+test('lobby AI background polling does not supersede a pending launch preflight', async (t) => {
+  t.mock.timers.enable({ apis: ['setInterval'] });
+  let calls = 0;
+  let release;
+  const room = await lobbyAiFixture({
+    acknowledge: async (event) => {
+      if (event === 'startLobbyAiRoom') return { ok: true };
+      if (++calls === 3)
+        return new Promise((resolve) => {
+          release = resolve;
+        });
+      return lobbyAccess;
+    },
+  });
+  t.after(room.stop);
+  await openLobbyAi(room);
+  await new Promise(setImmediate);
+  const pending = launchButton(room).props.onClick();
+  t.mock.timers.tick(15000);
+  await room.socketListeners.get('connect')();
+  release(lobbyAccess);
+  await pending;
+  assert.equal(room.sent.filter(([event]) => event === 'startLobbyAiRoom').length, 1);
+});
+
+test('lobby AI keeps confirmation through room broadcasts with an unchanged roster', async (t) => {
+  const room = await lobbyAiFixture();
+  t.after(room.stop);
+  await openLobbyAi(room);
+  assert.equal(launchButton(room).props.disabled, false);
+  room.setupProps.humanPlayerIDs = ['owner', 'friend'];
+  await vue.nextTick();
+  await room.render();
+  assert.equal(launchButton(room).props.disabled, false);
 });

@@ -93,6 +93,8 @@ const acknowledgements: Record<string, number> = {
   createAiRoom: 1,
   createHumanAiRoom: 0,
   startHumanAiRoom: 2,
+  getLobbyAiAccess: 1,
+  startLobbyAiRoom: 2,
   getLoyalty: 1,
   getVoiceState: 1,
   joinVoice: 1,
@@ -192,6 +194,22 @@ export function validPacket(event: string, args: unknown[]): boolean {
             (values[0].playerCount !== undefined && values[0].playerCount !== 5))
         ))
     );
+  if (event === 'getLobbyAiAccess') return true;
+  if (event === 'startLobbyAiRoom') {
+    const options = values[1];
+    return (
+      record(options) &&
+      Object.keys(options).length === 3 &&
+      Object.keys(options).every((key) => ['playerCount', 'language', 'humanPlayerIDs'].includes(key)) &&
+      [5, 6, 7, 8].includes(options.playerCount as number) &&
+      ['en', 'ru', 'zh-tw', 'es', 'vi'].includes(options.language as string) &&
+      Array.isArray(options.humanPlayerIDs) &&
+      options.humanPlayerIDs.length >= 1 &&
+      options.humanPlayerIDs.length <= 7 &&
+      options.humanPlayerIDs.every(validID) &&
+      new Set(options.humanPlayerIDs).size === options.humanPlayerIDs.length
+    );
+  }
   if (event === 'startHumanAiRoom') {
     const options = values[1];
     return (

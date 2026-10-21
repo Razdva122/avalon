@@ -47,6 +47,33 @@ unlocks the dedicated `ai_win` achievement and Morgana sticker.
 
 ## Table and characters
 
+### Add strong bots to an existing lobby
+
+Ordinary lobbies offer **Play with AI** to the seated host when strong bots are
+available and at least one eligible table size exists. The host chooses the final
+size (5–8 seats); every currently seated human stays, and bots fill the remaining
+seats. Spectators do not count. Five/six-seat tables allow up to four/five bots.
+Seven/eight-seat tables allow at most two bots without Premium; Premium on the
+host account unlocks every remaining seat, up to six/seven bots. At least one
+human and one bot are required. This policy applies to the existing-lobby flow;
+the separate AI Arena setup retains its own access rules.
+
+The setup shows the exact fixed role composition below, Lady of the Lake for
+seven/eight seats, the selected discussion language, human action time limits and
+the absence of ordinary rating changes. Bots communicate through text chat and
+read human messages there; they cannot hear the voice conversation. AI rules
+replace the ordinary lobby settings only when launch succeeds. Canceling setup
+leaves the room unchanged.
+
+`getLobbyAiAccess(roomID, callback)` reports strong-bot availability, the host's
+Premium entitlement and the seated human IDs. `startLobbyAiRoom(roomID,
+{ playerCount, language, humanPlayerIDs }, callback)` starts in the same room.
+The server derives the bot count, forces the strong preset and fixed AI rules,
+and validates the confirmed roster again after asynchronous resource allocation.
+The existing room ID, creation time, chat and connected viewers are retained.
+An unsuccessful preparation releases its reservation and keeps the ordinary lobby.
+No AI resource is reserved merely by opening the settings.
+
 | Players | Good                             | Evil                     | Lady of the Lake |
 | ------- | -------------------------------- | ------------------------ | ---------------- |
 | 5       | Merlin, Percival, Servant        | Mordred, Morgana         | No               |

@@ -1,4 +1,17 @@
 export default {
+  lobbyBotCount: 'Bot: {count}',
+  lobbyFixed: 'Cố định',
+  lobbyChatTitle: 'Thảo luận trong chat',
+  lobbyPremiumLimit: 'Nếu chủ phòng không có Premium, bàn 7–8 người cho phép tối đa 2 bot.',
+  lobbyLaunch: 'Chơi · {count} chỗ',
+
+  lobbyPlay: 'Chơi với AI',
+  lobbyStrong: 'Bot mạnh sẽ lấp đầy các chỗ còn lại.',
+  lobbyFixedRules: 'Vai trò và tiện ích của ván này được cố định và không thể thay đổi.',
+  lobbyTextOnly: 'Bot đọc và viết trong trò chuyện văn bản. Bot không nghe được trò chuyện thoại.',
+  lobbyTimersRating: 'Ván này không ảnh hưởng đến xếp hạng thông thường. Lượt chơi và thảo luận có giới hạn thời gian.',
+  lobbyRosterChanged: 'Danh sách người chơi đã thay đổi. Hãy đóng và mở lại cửa sổ để xác nhận danh sách mới.',
+
   filterWithBots: 'Có bot',
   setupGuestTitle: 'Đăng nhập để bắt đầu ván chơi',
   setupGuestHint: 'Chọn cài đặt ngay bây giờ. Đăng nhập để tạo ván chơi và kiểm tra bot có sẵn.',

@@ -1,4 +1,17 @@
 export default {
+  lobbyBotCount: 'Bots: {count}',
+  lobbyFixed: 'Fixed',
+  lobbyChatTitle: 'Discuss in chat',
+  lobbyPremiumLimit: 'Without host Premium, 7–8-player tables allow up to 2 bots.',
+  lobbyLaunch: 'Play · {count} seats',
+
+  lobbyPlay: 'Play with AI',
+  lobbyStrong: 'Strong bots fill the remaining seats.',
+  lobbyFixedRules: 'These roles and addons are fixed and cannot be changed for this match.',
+  lobbyTextOnly: 'Bots read and write text chat. They cannot hear voice chat.',
+  lobbyTimersRating: 'This match does not affect your normal rating. Turns and discussions have time limits.',
+  lobbyRosterChanged: 'The player list changed. Close and reopen this dialog to confirm the new roster.',
+
   filterWithBots: 'With bots',
   setupGuestTitle: 'Sign in to start a game',
   setupGuestHint: 'Choose your settings now. Sign in to create a game and check bot availability.',
