@@ -27,16 +27,17 @@ function checkReleasePreflight(exec = execFileSync) {
   if (flag?.state === 'success') return;
   // Existing successful releases from before this policy have no budget status.
   if (!flag && run.status === 'completed' && run.conclusion === 'success') return;
-  if (flag?.state !== 'failure') {
+  if (!flag && run.status !== 'completed') {
     throw Error(`Проверка предыдущего выпуска ещё не завершена или завершилась ошибкой: ${run.html_url}`);
   }
   const sha = exec('git', ['rev-parse', 'HEAD'], options).trim();
   const repair = api(`commits/${sha}/statuses?per_page=100`, true).find(
     ({ context }) => context === 'avalon/bundle-budget',
   );
-  if (repair?.state === 'success' && Date.parse(repair.created_at) > Date.parse(flag.created_at)) return;
+  if (repair?.state === 'success' && Date.parse(repair.created_at) > Date.parse(flag?.created_at || run.updated_at))
+    return;
   throw Error(
-    `В предыдущем выпуске обнаружено превышение размера бандла. Исправьте его, отправьте исправление в master и дождитесь успешной проверки "Check UI before release" для текущего коммита. ${flag.target_url || run.html_url}`,
+    `В предыдущем выпуске ${flag ? 'обнаружено превышение размера бандла' : 'не завершена проверка сборки'}. Исправьте проблему, отправьте исправление в master и дождитесь успешной проверки "Check UI before release" для текущего коммита. ${flag?.target_url || run.html_url}`,
   );
 }
 

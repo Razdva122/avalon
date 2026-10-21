@@ -117,6 +117,17 @@ test('local release allows one oversized release, then requires a verified repai
     () => checkReleasePreflight(runner({ runs: [{ ...run, conclusion: 'failure' }], release: [] }).exec),
     /провер/i,
   );
+  assert.doesNotThrow(
+    () =>
+      checkReleasePreflight(
+        runner({
+          runs: [{ ...run, conclusion: 'failure', updated_at: '2026-10-21T11:00:00Z' }],
+          release: [],
+          repair: [status('success', 'avalon/bundle-budget')],
+        }).exec,
+      ),
+    'a failed previous build can be recovered with a verified fix',
+  );
   assert.throws(() => checkReleasePreflight(runner({ offline: true }).exec), /GitHub/i);
   assert.throws(() => checkReleasePreflight(runner({ dirty: true }).exec), /Commit/i);
 });
