@@ -44,6 +44,20 @@ test('the lazy admin page installs copy for each language, including a freshly l
     assert.ok(!html.includes('aiArena.thresholdTitle'), language);
     assert.equal(i18n.global.t('aiArena.botDashboard'), 'Menu');
     assert.ok(i18n.global.t('aiArena.thresholdRangeError').length > 5);
+    for (const key of [
+      'usagePeriod',
+      'usagePercent',
+      'usageNoData',
+      'usageAtLeast',
+      'usageHumanCount',
+      'usageBotCount',
+      'usageDetails',
+      'usageInput',
+      'usageOutput',
+    ]) {
+      const path = `aiArena.${key}`;
+      assert.notEqual(i18n.global.t(path, { value: 2, count: 2 }), path, `${language}: ${key}`);
+    }
   }
 });
 

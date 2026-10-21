@@ -45,7 +45,8 @@ added again to the total. Missing or uncertain request usage is marked with ≥.
 
 Fresh account quota snapshots are taken before the first request and after each
 run finishes or pauses, while the account is still leased. Weekly and five-hour
-consumption is shown in percentage points. Missing data, unknown or changed reset
+consumption is shown as a percentage of each window's quota (the difference
+between its remaining-percent snapshots). Missing data, unknown or changed reset
 timestamps, and increasing balances produce unavailable values. Account activity
 outside Avalon can also affect the measured change. During play, token usage
 refreshes with the dashboard; quota figures update at the next pause or finish.
