@@ -267,10 +267,6 @@
       <LocalizedTextWrapper keypath="rules.excaliburHint" />
     </p>
 
-    <h3 id="trapper"><PreviewLink target="trapper" /></h3>
-    <p><LocalizedTextWrapper keypath="rules.trapperRequirements" /></p>
-    <p><LocalizedTextWrapper keypath="rules.trapperRules" /></p>
-
     <v-divider :thickness="5"></v-divider>
 
     <h2 id="faq">{{ $t('rules.faqTitle') }}</h2>
