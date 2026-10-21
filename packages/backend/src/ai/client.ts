@@ -487,15 +487,22 @@ export function parseDecisionReply(text: string, choices: string[], request?: Bo
     });
   }
   if (request?.readAllChat && Array.isArray(data?.evidence)) {
-    for (const note of data.evidence) {
+    data.evidence = data.evidence.filter((note: DecisionEvidence) => {
       if (
         note.kind === 'testimony' &&
         (request.memoryOnly || Array.isArray(note.source) || note.key?.startsWith('t:'))
       ) {
         if (!/^t:[1-8]:.{1,54}$/u.test(note.key)) throw new AiTechnicalPause('Invalid testimony identity.');
-        note.source = numericTestimonySource(request, note.source, Number(note.key.split(':')[1]));
+        try {
+          note.source = numericTestimonySource(request, note.source, Number(note.key.split(':')[1]));
+        } catch (error) {
+          // A bad memory anchor invalidates the whole update, not the match or earlier memory.
+          if (request.memoryOnly) return false;
+          throw error;
+        }
       } else if (request.memoryOnly) throw new AiTechnicalPause('Memory must contain human testimony only.');
-    }
+      return true;
+    });
   }
   if (
     typeof data.publicReason !== 'string' ||

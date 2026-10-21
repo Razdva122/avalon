@@ -144,7 +144,7 @@ test('numeric sources keep original, reversal and latest quote bound to their au
   );
 });
 
-test('numeric-source parse failure keeps earlier successful batch and retries the unread correction', async () => {
+test('invalid memory references do not stop decisions or repeat already read batches', async () => {
   const counts: number[] = [];
   let invalid = true;
   const decide = decisionPipeline(async (r, o) => {
@@ -161,9 +161,9 @@ test('numeric-source parse failure keeps earlier successful batch and retries th
       r,
     );
   });
-  await expect(decide(input())).rejects.toThrow();
-  await decide(input());
-  expect(counts).toEqual([16, 32, 32]);
+  await expect(decide(input())).resolves.toMatchObject({ choice: 0 });
+  await expect(decide(input())).resolves.toMatchObject({ choice: 0 });
+  expect(counts).toEqual([16, 32]);
 });
 
 test('source author must match the keyed speaker even when another human is visible', () => {
@@ -436,7 +436,7 @@ test('memory keeps mixed discussion context and preserves human corrections for 
   );
 });
 
-test('memory ignores bot-authored notes without losing valid human testimony or accepting false human sources', () => {
+test('memory drops an entire note with false sources while retaining valid human testimony', () => {
   const r = { ...input(1), memoryOnly: true, choices: ['observe'] };
   r.chat.unshift({ id: 'bot-message', name: '1', text: 'I played Success.' });
   const bot = { key: 't:1:role', kind: 'testimony', fact: '1 reports Success.', source: [-1], certainty: 'claim' };
@@ -444,7 +444,60 @@ test('memory ignores bot-authored notes without losing valid human testimony or 
   const raw = (evidence: unknown[]) => JSON.stringify({ choice: 'observe', speech: '', publicReason: '', evidence });
   expect(parseDecisionReply(raw([bot]), r.choices, r).evidence).toEqual([]);
   expect(parseDecisionReply(raw([bot, human]), r.choices, r).evidence).toEqual([{ ...human, source: 'recent:2' }]);
-  expect(() => parseDecisionReply(raw([{ ...human, source: [-1] }]), r.choices, r)).toThrow(
-    'Testimony reference is not a visible statement by its author',
-  );
+  expect(
+    parseDecisionReply(
+      raw([
+        { ...human, source: [-2, -1] },
+        { ...human, key: 't:2:trust' },
+      ]),
+      r.choices,
+      r,
+    ).evidence,
+  ).toEqual([{ ...human, key: 't:2:trust', source: 'recent:2' }]);
+});
+
+test.each([[[]], [[0]], [[-15]], [[1000]], ['recent:1'], [[-1, -1, -1, -1, -1, -1, -1, -1, -1]]])(
+  'memory ignores invalid references %j without fabricating anchors',
+  (source) => {
+    const r = { ...input(1), memoryOnly: true, choices: ['observe'] };
+    const raw = JSON.stringify({
+      choice: 'observe',
+      speech: '',
+      publicReason: '',
+      evidence: [{ key: 't:2:trust', kind: 'testimony', fact: 'Changed.', source, certainty: 'claim' }],
+    });
+    expect(parseDecisionReply(raw, r.choices, r).evidence).toEqual([]);
+  },
+);
+
+test('a rejected memory correction preserves earlier testimony and its pinned message', async () => {
+  const frames: { humanStatements?: { text: string }[]; modelHypotheses?: { fact: string }[] }[] = [];
+  const decide = decisionPipeline(async (r, options) => {
+    if (options.phase !== 'memory') {
+      frames.push(options.context as (typeof frames)[number]);
+      return { choice: 0, speech: '', evidence: [] };
+    }
+    return parseDecisionReply(
+      JSON.stringify({
+        choice: 'observe',
+        speech: '',
+        publicReason: '',
+        evidence: [
+          {
+            key: 't:2:King',
+            kind: 'testimony',
+            certainty: 'claim',
+            fact: r.chat.length === 16 ? '2 trusts King.' : 'Invalid correction.',
+            source: r.chat.length === 16 ? [-14] : [0],
+          },
+        ],
+      }),
+      r.choices,
+      r,
+    );
+  });
+  await expect(decide(input(16))).resolves.toMatchObject({ choice: 0 });
+  await expect(decide(input(32))).resolves.toMatchObject({ choice: 0 });
+  expect(frames[1].modelHypotheses).toEqual([expect.objectContaining({ fact: '2 trusts King.' })]);
+  expect(frames[1].humanStatements).toContainEqual(expect.objectContaining({ text: 'statement 15' }));
 });

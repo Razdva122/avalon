@@ -89,7 +89,7 @@ test('duplicate memory anchors collapse without accepting zero or another author
   const note = { key: 't:2:trust', kind: 'testimony', fact: '2 trusts 3.', source: [-1, -1], certainty: 'claim' };
   const raw = (evidence: unknown[]) => JSON.stringify({ ...reply, choice: 'observe', evidence });
   expect(parseDecisionReply(raw([note]), r.choices, r).evidence).toEqual([{ ...note, source: 'recent:1' }]);
-  expect(() => parseDecisionReply(raw([{ ...note, source: [0] }]), r.choices, r)).toThrow();
+  expect(parseDecisionReply(raw([{ ...note, source: [0] }]), r.choices, r).evidence).toEqual([]);
   expect(() => parseDecisionReply(raw([{ ...note, key: 't:3:trust' }]), ['observe'], request)).toThrow();
 });
 
