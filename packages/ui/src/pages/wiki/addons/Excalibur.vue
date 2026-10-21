@@ -29,7 +29,6 @@
       </ul>
     </section>
     <nav class="wiki-nav" :aria-label="$t('wiki.title')">
-      <PreviewLink target="trapper" />
       <LocaleLink :to="{ name: 'expansions' }">{{ $t('wiki.addonsTitle') }}</LocaleLink>
       <LocaleLink :to="{ name: 'roles' }">{{ $t('wiki.rolesTitle') }}</LocaleLink>
     </nav>
@@ -39,7 +38,6 @@
 </template>
 
 <script setup lang="ts">
-import PreviewLink from '@/components/view/information/PreviewLink.vue';
 import WikiBreadCrumbs from '@/components/header/WikiBreadCrumbs.vue';
 import SchemaImage from '@/components/view/SchemaImage.vue';
 import LocalizedTextWrapper from '@/components/feedback/LocalizedTextWrapper.vue';

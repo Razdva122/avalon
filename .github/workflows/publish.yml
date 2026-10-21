@@ -156,6 +156,7 @@ jobs:
       - name: Clean obsolete release BuildKit caches
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
+          retries: 3
           script: |
             const cleanup = require('./.github/scripts/cleanup-buildkit-caches.cjs');
             await cleanup({ github, context, core });
