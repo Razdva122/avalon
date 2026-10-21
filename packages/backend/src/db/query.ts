@@ -27,6 +27,7 @@ const addons: { [key in TAddonsName]: true } = {
   ladyOfLake: true,
   ladyOfSea: true,
   plotCards: true,
+  trapper: true,
 };
 
 export const query = {

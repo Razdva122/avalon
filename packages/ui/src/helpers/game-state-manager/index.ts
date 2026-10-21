@@ -303,6 +303,7 @@ export class GameStateManager {
         mission: 'onMission',
         switchLancelots: 'switchLancelots',
         switchResult: 'useExcalibur',
+        discardMissionCard: 'discardMissionCard',
         hidden: 'hidden',
         giveCard: 'giveCard',
         leadToVictory: 'leadToVictory',

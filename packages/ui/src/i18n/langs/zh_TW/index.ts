@@ -1,3 +1,4 @@
+import { trapper } from '../trapper';
 import { beginnerReview } from '../beginnerReview';
 import { beginnerTips } from '../beginnerTips';
 import aiAgents from './aiAgents';
@@ -22,6 +23,7 @@ import modals from './modals';
 import achievements from './achievements';
 
 export const zh_TW = {
+  trapper: trapper['zh-TW'],
   aiArena,
   beginnerReview: beginnerReview['zh-TW'],
   beginnerTips: beginnerTips['zh-TW'],

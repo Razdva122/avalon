@@ -132,13 +132,24 @@
               :route="addon.route"
               :content="addon.hint"
               :hint="
-                addon.name === 'ladyOfLake' || addon.name === 'ladyOfSea' ? $t('options.ladyExclusive') : undefined
+                addon.name === 'trapper' || addon.name === 'plotCards'
+                  ? $t('trapper.requirements')
+                  : addon.name === 'ladyOfLake' || addon.name === 'ladyOfSea'
+                    ? $t('options.ladyExclusive')
+                    : undefined
               "
             >
-              <span class="addon-icon" :class="addon.name" aria-hidden="true"></span>
+              <span v-if="addon.name === 'trapper'" class="material-icons" aria-hidden="true">layers</span>
+              <span v-else class="addon-icon" :class="addon.name" aria-hidden="true"></span>
             </OptionHelp>
             <v-checkbox
               :model-value="settings.addons[addon.name]"
+              :disabled="
+                addon.name === 'trapper' &&
+                !settings.addons.trapper &&
+                playerCount !== undefined &&
+                (playerCount < 8 || playerCount > 10)
+              "
               :label="addon.label"
               hide-details
               color="info"
@@ -326,6 +337,7 @@ export default defineComponent({
           route: 'excalibur',
           hint: this.$t('options.excaliburHint'),
         },
+        { name: 'trapper', label: this.$t('trapper.name'), route: 'rules', hint: this.$t('trapper.rules') },
         {
           name: 'plotCards',
           label: this.$t('addons.plotCards'),
@@ -430,7 +442,16 @@ export default defineComponent({
     },
     changeAddon(name: TAddonsName, enabled: boolean) {
       if (!this.settings.addons) return;
+      if (
+        enabled &&
+        name === 'trapper' &&
+        this.playerCount !== undefined &&
+        (this.playerCount < 8 || this.playerCount > 10)
+      )
+        return;
       this.settings.addons[name] = enabled;
+      if (enabled && name === 'trapper') this.settings.addons.plotCards = false;
+      if (enabled && name === 'plotCards') this.settings.addons.trapper = false;
       if (enabled && name === 'ladyOfLake') this.settings.addons.ladyOfSea = false;
       if (enabled && name === 'ladyOfSea') this.settings.addons.ladyOfLake = false;
       this.publishChanges();

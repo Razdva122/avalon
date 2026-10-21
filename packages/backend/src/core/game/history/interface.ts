@@ -10,6 +10,7 @@ import type {
   THistoryMission,
   HistoryAssassinate,
   SwitchResult,
+  DiscardMissionCard,
   SwitchLancelots,
   TLoyalty,
   CheckLoyalty,
@@ -68,6 +69,7 @@ export type THistoryData = {
     announced: TLoyalty | TRoles;
     actual: TLoyalty | TRoles;
   };
+  discardMissionCard: { leader: IPlayerInGame; target: IPlayerInGame; result: TMissionResult };
   switchResult: {
     switcher: IPlayerInGame;
     target?: IPlayerInGame;
@@ -127,6 +129,7 @@ export type THistoryDataForManager = {
   revealLoyalty: RevealLoyalty;
   announceLoyalty: AnnounceLoyalty;
   switchResult: SwitchResult;
+  discardMissionCard: DiscardMissionCard;
   switchLancelots: SwitchLancelots;
   giveCard: GiveCard;
   preVote: PreVote;

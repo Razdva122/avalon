@@ -118,6 +118,7 @@ import { useStore } from '@/store';
 import { groupHistory } from '@/helpers/history-groups';
 
 import SwitchLancelots from '@/components/view/information/history/SwitchLancelots.vue';
+import DiscardMissionCard from './history/DiscardMissionCard.vue';
 import SwitchResult from '@/components/view/information/history/SwitchResult.vue';
 import CheckLoyalty from '@/components/view/information/history/CheckLoyalty.vue';
 import RevealLoyalty from '@/components/view/information/history/RevealLoyalty.vue';
@@ -139,6 +140,7 @@ export default defineComponent({
     VoteTable,
     SwitchLancelots,
     SwitchResult,
+    DiscardMissionCard,
     CheckLoyalty,
     RevealLoyalty,
     AnnounceLoyalty,

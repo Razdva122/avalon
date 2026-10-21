@@ -1,5 +1,6 @@
 import type {
   ExcaliburAddon,
+  TrapperAddon,
   IGameAddon,
   LadyOfLakeAddon,
   AssassinAddon,
@@ -39,6 +40,7 @@ export interface IGameAddons extends TAddonsArray {
   ladyOfLake?: LadyOfLakeAddon;
   ladyOfSea?: LadyOfSeaAddon;
   excalibur?: ExcaliburAddon;
+  trapper?: TrapperAddon;
   plotCards?: PlotCardsAddon;
   lancelots?: LancelotsAddon;
   witch?: WitchAddon;

@@ -16,11 +16,17 @@
     <component
       :is="linked ? 'LocaleLink' : 'span'"
       class="preview-link addon"
-      :to="linked ? { name: toSnakeCase(target) } : undefined"
+      :to="
+        linked
+          ? target === 'trapper'
+            ? { name: 'rules', hash: '#trapper' }
+            : { name: toSnakeCase(target) }
+          : undefined
+      "
     >
       <AddonIcon class="icon-in-link" :addon="target" />
       <template v-if="text !== ''">
-        {{ text ? $t('previewLink.' + text) : $t('addons.' + target) }}
+        {{ text ? $t('previewLink.' + text) : $t(target === 'trapper' ? 'trapper.name' : 'addons.' + target) }}
       </template>
     </component>
   </template>

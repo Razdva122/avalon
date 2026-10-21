@@ -339,6 +339,13 @@ export class GameTimer {
         case 'onMission':
           this.handleMissionTimeout();
           break;
+        case 'discardMissionCard': {
+          this.game.clearSelectedPlayers();
+          const target = _.sample(this.game.currentMission.data.actions)!.player;
+          this.game.selectPlayer(this.game.leader.userID, target.userID);
+          this.game.addons.trapper!.discardMissionCard(this.game.leader.userID);
+          break;
+        }
         case 'useExcalibur':
           this.handleUseExcaliburTimeout();
           break;

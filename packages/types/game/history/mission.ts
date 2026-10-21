@@ -28,6 +28,9 @@ export class HistoryMissionBase extends HistoryBase {
   @prop()
   public leaderID?: string;
 
+  @prop()
+  public excludedPlayerID?: string;
+
   @prop({ required: true, type: Schema.Types.Mixed, _id: false })
   public actions!: IAction[] | IActionWithResult[];
 
@@ -72,6 +75,20 @@ export class SwitchResult extends HistoryBase {
 
   @prop()
   public targetID?: string;
+
+  @prop()
+  public result?: TMissionResult;
+}
+
+/** A publicly excluded card whose value is private to the leader until game end. */
+export class DiscardMissionCard extends HistoryBase {
+  declare type: 'discardMissionCard';
+
+  @prop({ required: true })
+  public leaderID!: string;
+
+  @prop({ required: true })
+  public targetID!: string;
 
   @prop()
   public result?: TMissionResult;

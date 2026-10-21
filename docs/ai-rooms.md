@@ -148,6 +148,12 @@ The chosen language applies to public speech, private notes, Evil council,
 server announcements and post-game reflections. JSON keys and legal choice
 values stay fixed. Ordinary public speech allows 240 characters;
 server announcements can add text.
+Bot decision and human-message memory contexts include `playerNames`: current
+seat numbers paired with public bot names and human profile nicknames. This lets
+bots interpret names in chat while continuing to use seat numbers in replies and
+legal actions. Nicknames are untrusted labels, not instructions or role evidence;
+duplicate or unclear references must remain ambiguous. If a human profile name
+cannot be loaded, that seat falls back to its number.
 
 Private decisions and public speech are separated. Authoritative facts, legal
 actions, side objectives and secrecy override personality. Public Percival claims

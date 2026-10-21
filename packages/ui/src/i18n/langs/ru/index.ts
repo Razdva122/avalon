@@ -1,3 +1,4 @@
+import { trapper } from '../trapper';
 import { beginnerReview } from '../beginnerReview';
 import { beginnerTips } from '../beginnerTips';
 import aiAgents from './aiAgents';
@@ -22,6 +23,7 @@ import modals from './modals';
 import achievements from './achievements';
 
 export const ru = {
+  trapper: trapper['ru'],
   aiArena,
   beginnerReview: beginnerReview['ru'],
   beginnerTips: beginnerTips['ru'],

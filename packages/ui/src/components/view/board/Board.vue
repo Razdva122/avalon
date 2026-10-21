@@ -1,5 +1,6 @@
 <template>
   <div class="board-and-timer">
+    <TrapperReveal :game="liveGame" />
     <div class="wrapper">
       <div
         ref="boardRef"
@@ -147,6 +148,7 @@ import Player from '@/components/view/board/modules/Player.vue';
 import Timer from '@/components/feedback/Timer.vue';
 import GameTimer from '@/components/feedback/GameTimer.vue';
 import Game from '@/components/view/board/game/Game.vue';
+import TrapperReveal from './game/modules/TrapperReveal.vue';
 import StartPanel from '@/components/view/panels/StartPanel.vue';
 import OptionsPreview from '@/components/view/information/OptionsPreview.vue';
 import AnnounceLoyalty from '@/components/view/board/game/modules/AnnounceLoyalty.vue';
@@ -188,6 +190,7 @@ export default defineComponent({
     Player,
     Game,
     StartPanel,
+    TrapperReveal,
     Timer,
     GameTimer,
     AnnounceLoyalty,
@@ -636,6 +639,7 @@ export default defineComponent({
 
       if (
         (stage === 'weFoundYou' && hasActiveCard(gameState.value, playerID, 'weFoundYou')) ||
+        (stage === 'discardMissionCard' && features.isLeader) ||
         (stage === 'useExcalibur' && features.excalibur) ||
         (stage === 'ambush' && hasActiveCard(gameState.value, playerID, 'ambush'))
       ) {
@@ -800,6 +804,7 @@ export default defineComponent({
       loyaltyBadges,
       roomState,
       gameState,
+      liveGame,
       players,
       playerInGame,
       discussionPlayerID,

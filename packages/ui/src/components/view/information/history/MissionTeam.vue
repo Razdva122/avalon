@@ -9,6 +9,9 @@
       <span class="team-name">{{ playerNames[member.id] }}</span>
       <span v-if="member.id === leaderID" class="chip-label">{{ $t('history.teamLeader') }}</span>
       <span v-if="member.excalibur" class="chip-label">{{ $t('vote.excaliburOwner') }}</span>
+      <span v-if="actions?.some((action) => action.playerID === member.id && action.discarded)" class="chip-label">{{
+        $t('trapper.excluded')
+      }}</span>
       <span v-if="cardResult(member.id)" class="card-result">
         <span aria-hidden="true">{{ cardResult(member.id) === 'fail' ? '×' : '✓' }}</span>
         {{ $t(cardResult(member.id) === 'fail' ? 'mission.cardFail' : 'mission.cardSuccess') }}

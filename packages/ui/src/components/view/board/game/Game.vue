@@ -77,7 +77,10 @@
       />
     </div>
     <div class="vote-stage mb-4">{{ $t('game.voteStage') }}: {{ gameState.vote + 1 }} / 5</div>
-    <div class="button-panel actions-or-info mb-4 d-flex flex-column align-center">
+    <div
+      class="button-panel actions-or-info mb-4 d-flex flex-column align-center"
+      :class="{ 'trapper-action': gameState.stage === 'discardMissionCard' }"
+    >
       <PlotCardsPanel v-if="!visibleHistory" :data="gameState.addonsData.plotCards?.activeCards" :game="gameState" />
       <InGamePanel
         v-if="inGamePanel && !visibleHistory && stateManager.viewMode.value === 'live'"
@@ -88,7 +91,7 @@
         class="d-flex flex-row align-center justify-center"
         v-if="visibleHistory?.type === 'mission' && !missionAnimationActive"
       >
-        <template v-for="i in visibleHistory.settings.players">
+        <template v-for="i in visibleHistory.settings.players - (visibleHistory.excludedPlayerID ? 1 : 0)">
           <div
             v-if="visibleHistory.fails !== undefined"
             class="mission-result-element"
@@ -102,6 +105,14 @@
           <i class="material-icons icon-result" :class="i <= visibleHistory.votes.approve ? 'check' : 'close'"></i>
         </template>
       </div>
+      <DiscardMissionCard
+        v-if="visibleHistory?.type === 'discardMissionCard'"
+        :data="visibleHistory"
+        :player-names="playerNames"
+      />
+      <p v-if="!inGamePanel && !visibleHistory && gameState.stage === 'discardMissionCard'" role="status">
+        {{ $t('trapper.waiting') }}
+      </p>
       <LancelotsView v-if="visibleHistory?.type === 'switchLancelots'" :data="visibleHistory"></LancelotsView>
       <div v-if="gameState.result && stateManager.viewMode.value === 'live'" class="game-result">
         <div v-if="gameState.result.winner">
@@ -119,7 +130,9 @@
     </div>
     <div class="meta-info font-weight-bold d-flex justify-space-between">
       <div>
-        <span>{{ $t('game.stage') + ': ' + $t('game.' + stageText) }}</span>
+        <span>{{
+          $t('game.stage') + ': ' + $t(gameState.stage === 'discardMissionCard' ? 'trapper.name' : 'game.' + stageText)
+        }}</span>
       </div>
       <div>
         <span class="text-info">{{ gameState.settings.players.good }}</span> vs
@@ -130,12 +143,14 @@
 </template>
 
 <script lang="ts">
+import { useUserProfile } from '@/helpers/composables/useUserProfile';
 import { gameStageLabel } from '@/helpers/game-stage-label';
 import last from 'lodash/last';
 import { useI18n } from 'vue-i18n';
 import type { THistoryResults } from '@avalon/types';
 import { defineComponent, PropType, computed, inject } from 'vue';
 import Mission from '@/components/view/board/game/modules/Mission.vue';
+import DiscardMissionCard from '@/components/view/information/history/DiscardMissionCard.vue';
 import History from '@/components/view/information/History.vue';
 import InGamePanel from '@/components/view/panels/InGamePanel.vue';
 import Spoiler from '@/components/feedback/Spoiler.vue';
@@ -149,6 +164,7 @@ export default defineComponent({
   components: {
     Mission,
     History,
+    DiscardMissionCard,
     InGamePanel,
     Spoiler,
     LancelotsView,
@@ -170,6 +186,8 @@ export default defineComponent({
     const gameState = inject(gameStateKey)!;
     const stateManager = inject(stateManagerKey)!;
     const roomState = stateManager.startedRoomState;
+    const names = gameState.value.players.map((player) => [player.id, useUserProfile(player.id).userName] as const);
+    const playerNames = computed(() => Object.fromEntries(names.map(([id, name]) => [id, name.value])));
 
     // The replay snapshot advances after the history timer, so land the public
     // result on its token without advancing any other part of the game.
@@ -210,7 +228,7 @@ export default defineComponent({
 
         const lastElement = last(roomState.value.gameStates[pointer].history)!;
 
-        return t(`history.${lastElement.type}`);
+        return lastElement.type === 'discardMissionCard' ? t('trapper.name') : t(`history.${lastElement.type}`);
       }
 
       return [
@@ -226,6 +244,7 @@ export default defineComponent({
 
     return {
       gameState,
+      playerNames,
       displayMissions,
       stateManager,
       endReason,
@@ -251,6 +270,12 @@ export default defineComponent({
 
 .actions-or-info {
   height: 84px;
+}
+.actions-or-info.trapper-action {
+  height: auto;
+  min-height: 84px;
+  gap: 8px;
+  text-align: center;
 }
 
 .action-icon {

@@ -24,7 +24,8 @@ export function calculateVisualElement(history: THistoryResults[]): { element?: 
     (lastElement?.type === 'announceLoyalty' && lastElement.announced) ||
     lastElement?.type === 'mission' ||
     lastElement?.type === 'switchLancelots' ||
-    lastElement?.type === 'ambush'
+    lastElement?.type === 'ambush' ||
+    lastElement?.type === 'discardMissionCard'
   ) {
     return {
       element: lastElement,
@@ -168,7 +169,7 @@ export function loyaltyBadge(
 /** Anonymous public totals only; individual mission votes never enter the scene. */
 export function missionReveal(event?: THistoryResults) {
   if (!event || event.type !== 'mission') return;
-  const players = event.settings.players;
+  const players = event.settings.players - (event.excludedPlayerID ? 1 : 0);
   if (!Number.isInteger(players) || players < 1 || players > 5) return;
   if (event.hidden) return { index: event.index, players, hidden: true as const };
   if (event.fails === undefined || !event.result) return;

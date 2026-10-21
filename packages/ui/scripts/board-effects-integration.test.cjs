@@ -289,6 +289,8 @@ function fixture(t, initial = game(), reducedMotion = false) {
       const Game = compile('../src/components/view/board/game/Game.vue', (id) => {
         if (id === 'vue') return { ...vue, inject: (key) => (key === keys.gameStateKey ? manager.game : manager) };
         if (id === 'vue-i18n') return { useI18n: () => ({ t: (key) => key }) };
+        if (id === '@/helpers/composables/useUserProfile')
+          return { useUserProfile: (id) => ({ userName: vue.ref(id) }) };
         if (id === '@/helpers/game-state-manager') return keys;
         if (id.startsWith('@/')) return {};
         return require(id);

@@ -136,7 +136,13 @@ export default defineComponent({
 
     const isStartGameDisabled = computed(() => {
       return (
-        roomState.value.stage !== 'locked' || roomState.value.players.length < 5 || roomState.value.players.length > 10
+        roomState.value.stage !== 'locked' ||
+        roomState.value.players.length < 5 ||
+        roomState.value.players.length > 10 ||
+        Boolean(
+          roomState.value.options?.addons?.trapper &&
+          (roomState.value.players.length < 8 || roomState.value.options?.addons?.plotCards),
+        )
       );
     });
 
@@ -157,11 +163,14 @@ export default defineComponent({
     };
 
     const startHint = computed(() =>
-      roomState.value.players.length < 5 || roomState.value.players.length > 10
-        ? 'hostMenu.needPlayers'
-        : roomState.value.stage !== 'locked'
-          ? 'hostMenu.lockBeforeStart'
-          : 'hostMenu.ready',
+      roomState.value.options?.addons?.trapper &&
+      (roomState.value.players.length < 8 || roomState.value.options?.addons?.plotCards)
+        ? 'trapper.requirements'
+        : roomState.value.players.length < 5 || roomState.value.players.length > 10
+          ? 'hostMenu.needPlayers'
+          : roomState.value.stage !== 'locked'
+            ? 'hostMenu.lockBeforeStart'
+            : 'hostMenu.ready',
     );
     const onLockClick = () => {
       if (isUserLeader.value && roomState.value.stage !== 'started') socket.emit('lockRoom', roomState.value.roomID);

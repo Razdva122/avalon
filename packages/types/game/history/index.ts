@@ -9,7 +9,7 @@ export * from './special';
 // Export the combined type for all history results
 import { HiddenHistory } from './base';
 import { AnonymousHistoryVote, HistoryVote, PreVote } from './vote';
-import { HistoryMission, HistoryMissionHidden, SwitchResult } from './mission';
+import { HistoryMission, HistoryMissionHidden, SwitchResult, DiscardMissionCard } from './mission';
 import { CheckLoyalty, RevealLoyalty, AnnounceLoyalty } from './loyalty';
 import { GiveCard, LeadToVictory, RestoreHonor, Ambush, KingReturns, PlayCard, WeFoundYou } from './cards';
 import { HistoryAssassinate, SwitchLancelots } from './special';
@@ -24,6 +24,7 @@ export type THistoryResults =
   | RevealLoyalty
   | AnnounceLoyalty
   | SwitchResult
+  | DiscardMissionCard
   | HiddenHistory
   | SwitchLancelots
   | GiveCard

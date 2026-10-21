@@ -5,5 +5,6 @@ export interface IMissionAction {
   player: IPlayerInGame;
   switchedBy?: string;
   openToEveryone?: boolean;
+  discarded?: boolean;
   value: TMissionResult | 'unvoted';
 }

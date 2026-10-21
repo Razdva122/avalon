@@ -5,7 +5,7 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
   vi: {
     seoHeading: 'Các bản mở rộng Avalon: luật chơi và so sánh',
     intro:
-      'Bạn đang tìm bản mở rộng hoặc bài bổ sung cho Avalon? Hướng dẫn này so sánh bốn mô-đun tùy chọn có trên trang web. Chúng bổ sung thông tin hoặc thay đổi cách thực hiện Nhiệm vụ.',
+      'Bạn đang tìm bản mở rộng hoặc bài bổ sung cho Avalon? Hướng dẫn này so sánh năm mô-đun tùy chọn có trên trang web. Chúng bổ sung thông tin hoặc thay đổi cách thực hiện Nhiệm vụ.',
     chooseTitle: 'Nên chọn bản mở rộng nào?',
     chooseText:
       'Bắt đầu với {ladyOfLake} để bí mật kiểm tra phe. Chọn {excalibur} để đảo lá bài Nhiệm vụ, {plotCards} để có thêm nhiều hành động, hoặc {ladyOfSea} để biết chi tiết hơn về vai phe Ác. Đọc luật cơ bản trước, rồi thêm cơ chế mà nhóm bạn muốn.',
@@ -22,7 +22,7 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
   en: {
     seoHeading: 'Avalon expansions: rules and comparison',
     intro:
-      'Looking for an Avalon expansion pack or extra cards? This guide compares the four optional modules available on this site. They add information or change mission play.',
+      'Looking for an Avalon expansion pack or extra cards? This guide compares the five optional modules available on this site. They add information or change mission play.',
     chooseTitle: 'Which expansion should you choose?',
     chooseText:
       'Start with {ladyOfLake} for private loyalty checks. Choose {excalibur} for changing a mission card, {plotCards} for several new actions, or {ladyOfSea} for more detailed evil role information. Read the base rules first, then add the mechanics your group wants.',
@@ -39,7 +39,7 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
   ru: {
     seoHeading: 'Дополнения Авалона: правила и сравнение',
     intro:
-      'Ищете дополнения или дополнительные карты для Авалона? Здесь сравниваются четыре модуля, доступные на сайте. Они добавляют информацию или меняют ход миссий.',
+      'Ищете дополнения или дополнительные карты для Авалона? Здесь сравниваются пять модулей, доступные на сайте. Они добавляют информацию или меняют ход миссий.',
     chooseTitle: 'Какое дополнение выбрать?',
     chooseText:
       'Для тайных проверок подойдёт {ladyOfLake}. Для смены карты миссии — {excalibur}, для нескольких новых действий — {plotCards}, для более подробных сведений о злых ролях — {ladyOfSea}. Сначала изучите базовые правила, затем добавляйте нужные вашей компании механики.',
@@ -55,7 +55,7 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
   es: {
     seoHeading: 'Expansiones de Avalon: reglas y comparación',
     intro:
-      '¿Buscas expansiones o cartas adicionales para Avalon? Esta guía compara los cuatro módulos opcionales disponibles en el sitio. Añaden información o cambian las misiones.',
+      '¿Buscas expansiones o cartas adicionales para Avalon? Esta guía compara los cinco módulos opcionales disponibles en el sitio. Añaden información o cambian las misiones.',
     chooseTitle: '¿Qué expansión elegir?',
     chooseText:
       'Elige {ladyOfLake} para consultas privadas de lealtad, {excalibur} para cambiar una carta de misión, {plotCards} para varias acciones nuevas o {ladyOfSea} para obtener más información sobre personajes malvados. Aprende primero las reglas básicas y añade las mecánicas que quiera tu grupo.',
@@ -72,7 +72,7 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
   pt: {
     seoHeading: 'Expansões de Avalon: regras e comparação',
     intro:
-      'Procurando expansões ou cartas extras para Avalon? Este guia compara os quatro módulos opcionais disponíveis no site. Eles acrescentam informação ou alteram missões.',
+      'Procurando expansões ou cartas extras para Avalon? Este guia compara os cinco módulos opcionais disponíveis no site. Eles acrescentam informação ou alteram missões.',
     chooseTitle: 'Qual expansão escolher?',
     chooseText:
       'Escolha {ladyOfLake} para verificações privadas de lealdade, {excalibur} para inverter uma carta de missão, {plotCards} para várias ações novas ou {ladyOfSea} para obter mais detalhes sobre personagens do mal. Aprenda as regras básicas e acrescente as mecânicas desejadas pelo grupo.',
@@ -89,7 +89,7 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
   },
   'zh-CN': {
     seoHeading: '阿瓦隆扩展规则：仙女、神剑与剧情卡比较',
-    intro: '想了解阿瓦隆扩展包或额外卡牌？本指南比较本站提供的四种可选模块，它们增加信息或改变任务流程。',
+    intro: '想了解阿瓦隆扩展包或额外卡牌？本指南比较本站提供的五种可选模块，它们增加信息或改变任务流程。',
     chooseTitle: '该选择哪种扩展？',
     chooseText:
       '想私下查验阵营可选{ladyOfLake}；想改变任务牌可选{excalibur}；想增加多种行动可选{plotCards}；想知道更多坏人角色信息可选{ladyOfSea}。先学会基础规则，再加入适合你们的机制。',
@@ -103,7 +103,7 @@ export const expansions: { [key in TLanguage]: Dictionary<string> } = {
   },
   'zh-TW': {
     seoHeading: '阿瓦隆擴充規則：仙女、神劍與劇情卡比較',
-    intro: '想了解阿瓦隆擴充包或額外卡牌？本指南比較本站提供的四種可選模組，它們增加資訊或改變任務流程。',
+    intro: '想了解阿瓦隆擴充包或額外卡牌？本指南比較本站提供的五種可選模組，它們增加資訊或改變任務流程。',
     chooseTitle: '該選擇哪種擴充？',
     chooseText:
       '想私下查驗陣營可選{ladyOfLake}；想改變任務牌可選{excalibur}；想增加多種行動可選{plotCards}；想知道更多壞人角色資訊可選{ladyOfSea}。先學會基礎規則，再加入適合你們的機制。',

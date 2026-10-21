@@ -43,6 +43,9 @@ export class TimerDurations {
   public useExcalibur?: TimerConfig;
 
   @prop({ type: () => TimerConfig, _id: false })
+  public discardMissionCard?: TimerConfig;
+
+  @prop({ type: () => TimerConfig, _id: false })
   public giveCard?: TimerConfig;
 
   @prop({ type: () => TimerConfig, _id: false })
@@ -116,6 +119,9 @@ export class GameOptionsRoles implements CheckRoleKeys<GameOptionsRoles> {
 }
 
 export class GameOptionsAddons {
+  @prop()
+  public trapper?: boolean;
+
   @prop()
   public ladyOfLake?: boolean;
 

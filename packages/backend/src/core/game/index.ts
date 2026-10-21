@@ -139,6 +139,13 @@ export class Game extends GameHooks {
       throw new Error(`Invalid players count. Players count: ${userIDs.length}`);
     }
 
+    if (options.addons.trapper && (userIDs.length < 8 || userIDs.length > 10)) {
+      throw new Error('Trapper requires 8–10 players');
+    }
+    if (options.addons.trapper && options.addons.plotCards) {
+      throw new Error('Trapper cannot be combined with plot cards');
+    }
+
     this.stateObserver = stateObserver;
 
     const settings = gamesSettings[userIDs.length];
@@ -148,6 +155,10 @@ export class Game extends GameHooks {
 
     this.settings = {
       ...settings,
+      missions: settings.missions.map((mission) => ({
+        ...mission,
+        players: mission.players + (options.addons.trapper ? 1 : 0),
+      })),
       roles: rolesInfo.roles,
     };
 
@@ -338,13 +349,15 @@ export class Game extends GameHooks {
     const previous = _.last(this.history);
     this.history.push(this.currentMission);
     const extraDelay =
-      previous?.type === 'announceLoyalty'
+      previous?.type === 'discardMissionCard'
         ? 10000
-        : previous?.type === 'switchResult'
-          ? (previous as HistoryElement<'switchResult'>).data.target
-            ? 3000
-            : 2000
-          : 0;
+        : previous?.type === 'announceLoyalty'
+          ? 10000
+          : previous?.type === 'switchResult'
+            ? (previous as HistoryElement<'switchResult'>).data.target
+              ? 3000
+              : 2000
+            : 0;
     this.timer.setHistoryDelay(10000 + extraDelay);
   }
 

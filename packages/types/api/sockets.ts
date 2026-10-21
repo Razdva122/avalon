@@ -245,6 +245,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
 
   giveExcalibur: (uuid: string) => void;
   useExcalibur: (uuid: string) => void;
+  discardMissionCard: (uuid: string) => void;
 
   useWitchAbility: (uuid: string, result: boolean) => void;
 

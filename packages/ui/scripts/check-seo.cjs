@@ -172,7 +172,8 @@ for (const route of Object.values(routesSeo).filter((route) => route.meta.preren
       for (const [tag, href] of html.matchAll(/<a\s[^>]*href="([^"]*)"[^>]*>/g)) {
         if (tag.includes('hreflang=')) continue;
         if (href.startsWith('/') && basePath(href).startsWith('/wiki/')) {
-          assert.equal(href, localizedPath(href, language), `${pathname}: link switches language: ${href}`);
+          const linkPath = new URL(href, origin).pathname;
+          assert.equal(linkPath, localizedPath(linkPath, language), `${pathname}: link switches language: ${href}`);
         }
       }
     }

@@ -8,6 +8,7 @@ import {
   AiTechnicalPause,
   compactRequest,
   systemFor,
+  playerNameInstructions,
   tableConversationAdvice,
   conversationVoiceAdvice,
   publicSpeechAdvice,
@@ -33,6 +34,7 @@ export function publicContext(request: BotRequest, choice: string) {
     language: request.language ?? 'en',
     playerCount: c.playerCount,
     humanSeats: c.humanSeats,
+    playerNames: c.playerNames,
     approvalsRequired: c.approvalsRequired,
     alignmentCounts: c.alignmentCounts,
     roleCounts: c.roleCounts,
@@ -234,6 +236,7 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
             : '';
   const common =
     languageInstruction(request.language) +
+    playerNameInstructions +
     ' ' +
     (regularTeam
       ? 'Answer the current objection, offer a preference or stay silent. Use bare seat numbers; avoid generic reports and repeated caveats.'
@@ -425,6 +428,7 @@ export function decisionPipeline(generate: Generate): Decide {
           const context = {
             you: { seat: memoryCurrent.you?.seat },
             humanSeats,
+            playerNames: memoryCurrent.playerNames,
             chat: memoryCurrent.chat,
             humanStatements: humanTestimony(memoryRequest, humanSeats, false),
             modelHypotheses: (evidence.get(request.playerID) || [])
@@ -437,6 +441,7 @@ export function decisionPipeline(generate: Generate): Decide {
               'Use bare seat numbers, never names or Player prefixes.',
               '',
             ) +
+            playerNameInstructions +
             ' Privately read these human messages; choose observe, speech and publicReason empty, claimMorgana=null, claimStances=[]. Return only JSON with at most3 changed testimony notes; no gameplay action. ' +
             'Prioritize corrections and changes of trust, roster preferences, commitments, role/check claims. Unverified does not mean unimportant. Skip noise, repeated claims and reconstructible mission arithmetic. ' +
             'Each key is t:AUTHOR:SUBJECT (e.g. t:7:King or t:2:role). Keep separate subjects and authors separate. Preserve exact names/aliases even without a seat mapping; never replace them with someone. ' +

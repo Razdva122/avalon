@@ -111,11 +111,12 @@ export class Room {
   }
 
   startGame(selectedRole?: { userID: string; role: import('@avalon/types').TRoles }) {
+    const manager = new GameManager(this.players, this.options, this.io, this.roomID, selectedRole);
     this.startAt = String(new Date());
     this.data = {
       stage: 'started',
       startAt: this.startAt,
-      manager: new GameManager(this.players, this.options, this.io, this.roomID, selectedRole),
+      manager,
     };
     this.updateRoomState(true);
   }
@@ -149,6 +150,9 @@ export class Room {
   }
 
   updateOptions(options: GameOptions) {
+    if (options.addons.trapper && options.addons.plotCards) {
+      throw new Error('Trapper cannot be combined with plot cards');
+    }
     this.options = options;
     this.updateRoomState();
   }

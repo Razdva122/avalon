@@ -156,6 +156,7 @@ export function validPacket(event: string, args: unknown[]): boolean {
       (values[1] === 'approve' || values[1] === 'reject') &&
       (event !== 'preVote' || validID(values[2]))
     );
+  if (event === 'discardMissionCard') return values.length === 1;
   if (event === 'actionOnMission') return values.length === 2 && (values[1] === 'success' || values[1] === 'fail');
   if (event === 'startCustomTimer' || event === 'addCustomTimerTime')
     return (
@@ -265,6 +266,7 @@ export function validPacket(event: string, args: unknown[]): boolean {
       record(options.roles) &&
       record(options.addons) &&
       record(options.features) &&
+      !(options.addons.trapper && options.addons.plotCards) &&
       Object.values(options.roles).every((n) => typeof n === 'number' && Number.isInteger(n) && n >= 0 && n <= 10) &&
       safeOptions(options)
     );

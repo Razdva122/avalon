@@ -31,7 +31,8 @@ export type TAddonsStages =
   | TAssassinAddonStages
   | TLancelotsStages
   | TWitchStages
-  | TPlotCardsStages;
+  | TPlotCardsStages
+  | 'discardMissionCard';
 
 /**
  * Player features added with addons
@@ -85,4 +86,4 @@ export class AddonsData {
 /**
  * Addons names
  */
-export type TAddonsName = 'ladyOfLake' | 'excalibur' | 'ladyOfSea' | 'plotCards';
+export type TAddonsName = 'ladyOfLake' | 'excalibur' | 'ladyOfSea' | 'plotCards' | 'trapper';

@@ -53,10 +53,16 @@
           :description="$t('addons.ladyOfSea')"
         />
       </LocaleLink>
+      <LocaleLink class="addon" :to="{ name: 'rules', hash: '#trapper' }">
+        <h2>{{ $t('trapper.name') }}</h2>
+        <p>{{ $t('trapper.rules') }}</p>
+        <p>{{ $t('trapper.requirements') }}</p>
+      </LocaleLink>
     </div>
     <section class="wiki-panel">
       <h2>{{ $t('expansions.compatibilityTitle') }}</h2>
       <p><LocalizedTextWrapper keypath="expansions.compatibilityText" /></p>
+      <p>{{ $t('trapper.requirements') }}</p>
     </section>
     <WikiPlayCta />
   </div>

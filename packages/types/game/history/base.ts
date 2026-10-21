@@ -10,6 +10,7 @@ export type THistoryType =
   | 'checkLoyalty'
   | 'revealLoyalty'
   | 'announceLoyalty'
+  | 'discardMissionCard'
   | 'switchResult'
   | 'switchLancelots'
   | 'giveCard'
@@ -50,6 +51,7 @@ export class HiddenHistory extends HistoryBase {
 export interface IAction {
   playerID: string;
   switchedBy?: string;
+  discarded?: boolean;
 }
 
 /**

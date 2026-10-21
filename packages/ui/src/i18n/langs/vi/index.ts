@@ -1,3 +1,4 @@
+import { trapper } from '../trapper';
 import { beginnerReview } from '../beginnerReview';
 import { beginnerTips } from '../beginnerTips';
 import aiAgents from './aiAgents';
@@ -18,6 +19,7 @@ import achievements from './achievements';
 import pages from '@/i18n/langs/pages';
 
 export const vi = {
+  trapper: trapper['vi'],
   aiArena,
   beginnerReview: beginnerReview['vi'],
   beginnerTips: beginnerTips.vi,

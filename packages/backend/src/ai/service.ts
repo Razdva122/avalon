@@ -381,6 +381,7 @@ export class AiService {
       language,
       playerCount,
     );
+    room.resolvePlayerName = async (playerID) => (await this.manager.dbManager.getUserByID(playerID)).name;
     room.ai!.model = CODEX_MODEL;
     room.renewLease = () => this.repository!.renewLease(id);
     if (this.manager.chatService) {

@@ -133,6 +133,7 @@ export default defineComponent({
         default: STAGE_TIMER_DEFAULTS.announceLoyalty,
       },
       { name: 'giveExcalibur', label: t('options.stageGiveExcalibur'), default: STAGE_TIMER_DEFAULTS.giveExcalibur },
+      { name: 'discardMissionCard', label: t('trapper.name'), default: STAGE_TIMER_DEFAULTS.discardMissionCard },
       { name: 'useExcalibur', label: t('options.stageUseExcalibur'), default: STAGE_TIMER_DEFAULTS.useExcalibur },
     ]);
 

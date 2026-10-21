@@ -167,3 +167,24 @@ test('opening a dedicated section uses the latest complete settings', () => {
   instance.openOptions();
   assert.equal(instance.type, 'roles');
 });
+
+test('Trapper and plot cards cannot be enabled together, while Excalibur stays selected', () => {
+  const { instance } = panel();
+  instance.playerCount = 8;
+  instance.changeAddon('excalibur', true);
+  instance.changeAddon('plotCards', true);
+  instance.changeAddon('trapper', true);
+  assert.equal(instance.settings.addons.trapper, true);
+  assert.equal(instance.settings.addons.plotCards, false);
+  assert.equal(instance.settings.addons.excalibur, true);
+  instance.changeAddon('plotCards', true);
+  assert.equal(instance.settings.addons.trapper, false);
+});
+
+test('Trapper cannot be enabled below eight players', () => {
+  const { instance, emitted } = panel();
+  instance.playerCount = 7;
+  instance.changeAddon('trapper', true);
+  assert.notEqual(instance.settings.addons.trapper, true);
+  assert.equal(emitted.length, 0);
+});

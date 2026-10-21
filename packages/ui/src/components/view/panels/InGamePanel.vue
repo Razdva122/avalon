@@ -52,6 +52,12 @@
       }}</v-btn
     >
   </template>
+  <template v-if="game.stage === 'discardMissionCard'">
+    <p role="status">{{ $t(isUserLeader ? 'trapper.instruction' : 'trapper.waiting') }}</p>
+    <v-btn v-if="isUserLeader" color="warning" :disabled="!isDiscardAvailable" @click="emitClick('discardMissionCard')">
+      {{ $t('trapper.exclude') }}
+    </v-btn>
+  </template>
   <template v-if="game.stage === 'witchAbility' && isUserWitch">
     <v-btn color="success" @click="() => witchAbilityClick(true)" class="mb-2">
       {{ $t('inGame.useWitchAbility') }}
@@ -70,7 +76,8 @@ import Spoiler from '@/components/feedback/Spoiler.vue';
 import AssassinateControl from '@/components/view/panels/controls/AssassinateControl.vue';
 import { useGamePlayerState } from '@/helpers/composables/useGamePlayerState';
 
-type TMethodsWithoutParams = 'sentSelectedPlayers' | 'checkLoyalty' | 'giveExcalibur' | 'useExcalibur';
+type TMethodsWithoutParams =
+  'sentSelectedPlayers' | 'checkLoyalty' | 'giveExcalibur' | 'useExcalibur' | 'discardMissionCard';
 
 export default defineComponent({
   name: 'InGamePanel',
@@ -164,6 +171,10 @@ export default defineComponent({
       );
     });
 
+    const isDiscardAvailable = computed(
+      () => isSinglePlayerSelected.value && game.value.players.some((p) => p.features.isSelected && p.features.isSent),
+    );
+
     const isUseExcaliburAvailable = computed(() => {
       return (
         isZeroPlayerSelected.value ||
@@ -211,6 +222,7 @@ export default defineComponent({
       isCheckAvailable,
       isGiveExcaliburAvailable,
       isUseExcaliburAvailable,
+      isDiscardAvailable,
       isSendTeamDisabled,
       onVoteClick,
       onMissionClick,

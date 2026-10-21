@@ -724,6 +724,10 @@ export class Manager {
       getRoomManager(uuid).callGameMethods(userID, { method: 'giveExcalibur' });
     });
 
+    socket.on('discardMissionCard', (uuid) => {
+      getRoomManager(uuid).callGameMethods(userID, { method: 'discardMissionCard' });
+    });
+
     socket.on('useExcalibur', (uuid) => {
       getRoomManager(uuid).callGameMethods(userID, { method: 'useExcalibur' });
     });

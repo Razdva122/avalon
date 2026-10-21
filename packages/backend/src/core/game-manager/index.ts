@@ -237,6 +237,11 @@ export class GameManager {
         this.game.addons.excalibur.giveExcalibur(userID);
         break;
 
+      case 'discardMissionCard':
+        this.ensureAddonExists(this.game.addons.trapper, 'trapper');
+        this.game.addons.trapper.discardMissionCard(userID);
+        break;
+
       case 'useExcalibur':
         this.ensureAddonExists(this.game.addons.excalibur, 'excalibur');
         this.game.addons.excalibur.useExcalibur(userID);

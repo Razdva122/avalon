@@ -8,7 +8,7 @@ import type { TGameMethodsParams } from '@/core/game-manager';
 import { AiPause, AiTechnicalPause, type Decide, type BotRequest, type BotReply } from './client';
 import { aiText, isAfterGameSpeech, isVoteOnly } from './language';
 
-import { BOT_AGENTS, selectBotAgents } from './agents';
+import { BOT_AGENTS, selectBotAgents, getBotProfile } from './agents';
 export { BOT_PROFILES } from './agents';
 export const botOptions: GameOptions = {
   roles: { merlin: 1, percival: 1, mordred: 1, morgana: 1, oberon: 1 },
@@ -31,6 +31,7 @@ function combinations(ids: string[], count: number): string[][] {
 
 export class BotRoom extends Room {
   renewLease?: () => Promise<void>;
+  resolvePlayerName?: (id: string) => Promise<string | undefined>;
   readonly spectatorDecisions: AiSpectatorDecision[] = [];
   private selectedHumanRole?: AiHumanRole;
   private decisionSequence = 0;
@@ -460,6 +461,15 @@ export class BotRoom extends Room {
     if (!agent) throw new AiTechnicalPause('Unknown AI agent profile.');
     const state = this.stateFor(id);
     const request: BotRequest = {
+      playerNames: await Promise.all(
+        state.players.map(async (player) => ({
+          seat: player.index,
+          name:
+            getBotProfile(player.id)?.name ??
+            (await this.resolvePlayerName?.(player.id).catch(() => undefined)) ??
+            `${player.index}`,
+        })),
+      ),
       readAllChat: true,
       language: this.language,
       playerID: id,
@@ -493,6 +503,7 @@ export class BotRoom extends Room {
         .slice(0)
         .map((m) => ({ id: m.id, name: this.label(m.userID), text: m.message })),
     };
+    if (this.cancelled || signal.aborted) return null;
     // Only Evil needs a model call for the secret mission card: never expose its identity.
     const secretMission = state.stage === 'onMission' && Boolean(this.ai!.humanPlayerID);
     if (state.stage !== 'onMission') {

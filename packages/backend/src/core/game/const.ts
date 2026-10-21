@@ -7,6 +7,7 @@ import {
   LadyOfLakeAddon,
   LadyOfSeaAddon,
   ExcaliburAddon,
+  TrapperAddon,
   LancelotsAddon,
   WitchAddon,
   RevealerAddon,
@@ -226,6 +227,7 @@ export const addons: Record<TAddonsName, TAdditionalAddonsData> = {
     addon: ExcaliburAddon,
     key: 'excalibur',
   },
+  trapper: { addon: TrapperAddon, key: 'trapper' },
   plotCards: {
     addon: PlotCardsAddon,
     key: 'plotCards',

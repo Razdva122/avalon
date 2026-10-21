@@ -438,6 +438,9 @@
     <p>
       <strong>{{ $t('rules.note') }}</strong> <LocalizedTextWrapper keypath="rules.gameSetupNote" />
     </p>
+    <h2 id="trapper">{{ $t('trapper.name') }}</h2>
+    <p>{{ $t('trapper.requirements') }}</p>
+    <p>{{ $t('trapper.rules') }}</p>
     <WikiPlayCta :show-rules="false" />
   </div>
 </template>

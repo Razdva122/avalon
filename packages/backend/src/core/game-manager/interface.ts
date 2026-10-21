@@ -26,6 +26,7 @@ export type TGameMethodsParams =
   | TRevealLoyaltyParams
   | TAnnounceLoyaltyParams
   | TGiveExcaliburParams
+  | { method: 'discardMissionCard' }
   | TUseExcaliburParams
   | TWitchAbilityParams
   | TGivePlotCardParams

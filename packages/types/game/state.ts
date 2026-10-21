@@ -8,6 +8,7 @@ import {
   HistoryAssassinate,
   CheckLoyalty,
   SwitchResult,
+  DiscardMissionCard,
   HiddenHistory,
   SwitchLancelots,
   HistoryVoteBase,
@@ -78,6 +79,7 @@ export class VisualGameState {
       { type: AnnounceLoyalty, value: 'announceLoyalty' },
       { type: RevealLoyalty, value: 'revealLoyalty' },
       { type: SwitchResult, value: 'switchResult' },
+      { type: DiscardMissionCard, value: 'discardMissionCard' },
       { type: HiddenHistory, value: 'hiddenHistory' },
       { type: SwitchLancelots, value: 'switchLancelots' },
       { type: GiveCard, value: 'giveCard' },
@@ -117,13 +119,7 @@ export class VisualGameState {
  * Possible game stages
  */
 export type TGameStage =
-  | 'initialization'
-  | 'votingForTeam'
-  | 'hidden'
-  | 'onMission'
-  | 'selectTeam'
-  | 'end'
-  | TAddonsStages;
+  'initialization' | 'votingForTeam' | 'hidden' | 'onMission' | 'selectTeam' | 'end' | TAddonsStages;
 
 /**
  * Possible game results
