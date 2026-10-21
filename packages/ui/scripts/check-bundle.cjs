@@ -29,17 +29,25 @@ const gzipBytes = initial.reduce(
   (sum, file) => sum + zlib.gzipSync(fs.readFileSync(path.join(dist, 'js', file))).length,
   0,
 );
-assert(gzipBytes < 315 * 1024, `Initial JavaScript exceeds 315 KiB gzip: ${gzipBytes}`);
+// Measured after the wiki split: app/vendors 264.1 KiB, common dictionaries
+// 26.8–34.6 KiB, ordinary entries ≤341.9 KiB and chart entries ≤457.3 KiB.
+// Keep a small allowance for edits and compression differences across Node versions.
+assert(gzipBytes < 270 * 1024, `Initial JavaScript exceeds 270 KiB gzip: ${gzipBytes}`);
+const localeBudgets = { en: 29, ru: 37, es: 31, pt: 31, 'zh-cn': 32, 'zh-tw': 32, vi: 32 };
 const localeSizes = Object.fromEntries(
-  ['en', 'ru', 'es', 'pt', 'zh-cn', 'zh-tw', 'vi'].map((language) => {
+  Object.entries(localeBudgets).map(([language, budget]) => {
     const chunks = files.filter((file) => file.startsWith(`locale-${language}.`) && file.endsWith('.js'));
     assert.equal(chunks.length, 1, `${language}: expected one independent locale chunk`);
-    return [language, zlib.gzipSync(fs.readFileSync(path.join(dist, 'js', chunks[0]))).length];
+    const wikiChunks = files.filter((file) => file.startsWith(`wiki-locale-${language}.`) && file.endsWith('.js'));
+    assert.equal(wikiChunks.length, 1, `${language}: expected one deferred wiki dictionary`);
+    const bytes = zlib.gzipSync(fs.readFileSync(path.join(dist, 'js', chunks[0]))).length;
+    assert(bytes < budget * 1024, `${language}: common dictionary ${bytes} exceeds ${budget} KiB gzip`);
+    return [language, bytes];
   }),
 );
 for (const [language, bytes] of Object.entries(localeSizes)) {
   const startup = gzipBytes + localeSizes.en + (language === 'en' ? 0 : bytes);
-  assert(startup < 383.25 * 1024, `${language}: startup plus dictionaries exceeds 383.25 KiB gzip`);
+  assert(startup < 332 * 1024, `${language}: startup plus dictionaries exceeds 332 KiB gzip`);
 }
 const css = fs
   .readdirSync(path.join(dist, 'css'))
@@ -81,8 +89,10 @@ for (const file of htmlFiles(dist)) {
   for (const url of js) assert(!buildOnly.has(url), `${file}: build-only renderer preloaded: ${url}`);
   const jsBytes = js.reduce((sum, url) => sum + gzipSize(url), 0);
   const cssBytes = urls.filter((url) => url.endsWith('.css')).reduce((sum, url) => sum + gzipSize(url), 0);
-  const charts = path.relative(dist, file).split(path.sep).includes('stats');
-  assert(jsBytes < (charts ? 504 : 383.25) * 1024, `${file}: route startup JS ${jsBytes} exceeds budget`);
+  const segments = path.relative(dist, file).split(path.sep);
+  const charts = segments.includes('stats');
+  const jsBudget = charts ? 466 : segments.includes('wiki') ? 383.25 : 350;
+  assert(jsBytes < jsBudget * 1024, `${file}: route startup JS ${jsBytes} exceeds ${jsBudget} KiB gzip`);
   // The complete classic role set adds full-artwork and thumbnail image rules.
   assert(cssBytes < (charts ? 56 : 51) * 1024, `${file}: route CSS ${cssBytes} exceeds budget`);
   maximum = Math.max(maximum, jsBytes);
@@ -91,5 +101,5 @@ const fonts = fs.readdirSync(path.join(dist, 'fonts')).filter((file) => file.end
 const fontBytes = fonts.reduce((sum, file) => sum + fs.statSync(path.join(dist, 'fonts', file)).size, 0);
 assert(fontBytes < 25 * 1024, `Initial icon fonts exceed 25 KiB: ${fontBytes}`);
 console.log(
-  `Route budgets passed: JS ≤383.25 KiB (charts ≤504), CSS ≤51 KiB (charts ≤56); font ${(fontBytes / 1024).toFixed(1)} KiB.`,
+  `Route budgets passed: JS <350 KiB (wiki <383.25, charts <466), CSS ≤51 KiB (charts ≤56); font ${(fontBytes / 1024).toFixed(1)} KiB.`,
 );

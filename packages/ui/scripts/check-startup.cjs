@@ -64,6 +64,31 @@ const puppeteer = require('puppeteer');
     );
     await page.click('.create-room');
     await page.waitForSelector('.modal-overlay input', { visible: true });
+    assert.ok(!requested.some((url) => /\/wiki-locale-/.test(url)), 'lobby must not fetch wiki dictionaries');
+    await page.goto(origin + '/ru/support/', { waitUntil: 'networkidle0' });
+    assert.ok(!requested.some((url) => /\/wiki-locale-/.test(url)), 'support must not fetch wiki dictionaries');
+    requested.length = 0;
+    const navigate = (route) =>
+      page.evaluate(async (route) => {
+        await document.querySelector('#app').__vue_app__.config.globalProperties.$router.push(route);
+      }, route);
+    await navigate('/ru/wiki/rules/');
+    assert.deepEqual(
+      requested
+        .filter((url) => /\/wiki-locale-/.test(url))
+        .map((url) => new URL(url).pathname.match(/wiki-locale-([^.]+)/)[1])
+        .sort(),
+      ['en', 'ru'],
+      'opening a wiki article fetches only its language and English fallback',
+    );
+    const russianHeading = await page.$eval('h1', (element) => element.textContent);
+    await navigate('/vi/wiki/rules/');
+    assert.notEqual(await page.$eval('h1', (element) => element.textContent), russianHeading);
+    requested.length = 0;
+    await navigate('/ru/support/');
+    await navigate('/ru/wiki/rules/');
+    assert.equal(await page.$eval('h1', (element) => element.textContent), russianHeading);
+    assert.ok(!requested.some((url) => /\/wiki-locale-/.test(url)), 'revisiting keeps installed wiki translations');
     requested.length = 0;
     await page.goto(origin + '/wiki/rules/', { waitUntil: 'networkidle0' });
     assert.equal(await page.$eval('h1', (h1) => Boolean(h1.textContent.trim())), true);

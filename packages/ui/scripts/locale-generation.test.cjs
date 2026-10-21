@@ -15,6 +15,7 @@ test('runtime dictionaries translate history labels and unchanged generation pre
   execFileSync(process.execPath, [generator]);
   for (const [name, mtime] of before) {
     assert.equal(fs.statSync(path.join(output, name)).mtimeMs, mtime);
+    if (name.startsWith('wiki-')) continue;
     const messages = JSON.parse(fs.readFileSync(path.join(output, name), 'utf8'));
     const i18n = createI18n({ legacy: false, locale: 'test', messages: { test: messages } });
     for (const key of ['vote.attempt', 'vote.statusRejected', 'vote.statusApproved', 'mission.cards']) {
@@ -74,5 +75,41 @@ test('webpack regenerates locale JSON when translation sources change during wat
     if (watcher) await new Promise((resolve) => watcher.close(resolve));
     await new Promise((resolve) => compiler.close(resolve));
     fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('wiki articles are deferred without losing any translations in all seven languages', () => {
+  execFileSync(process.execPath, [path.join(__dirname, 'generate-locales.cjs')]);
+  const ui = path.resolve(__dirname, '..');
+  require('ts-node').register({
+    project: path.join(ui, 'tsconfig.json'),
+    transpileOnly: true,
+    compilerOptions: { module: 'CommonJS' },
+  });
+  require('tsconfig-paths').register({ baseUrl: ui, paths: { '@/*': ['src/*'] } });
+  for (const [language, moduleName] of Object.entries({
+    en: 'en',
+    ru: 'ru',
+    es: 'es',
+    pt: 'pt',
+    vi: 'vi',
+    'zh-CN': 'zh_CN',
+    'zh-TW': 'zh_TW',
+  })) {
+    const common = JSON.parse(fs.readFileSync(path.join(ui, `src/i18n/generated/${language}.json`), 'utf8'));
+    assert.equal(common.rules, undefined, `${language}: full rules must not be shared`);
+    assert.equal(common.merlin, undefined, `${language}: full role articles must not be shared`);
+    assert.ok(common.roles.merlin);
+    assert.ok(common.wiki);
+    assert.ok(common.about);
+    const wiki = JSON.parse(fs.readFileSync(path.join(ui, `src/i18n/generated/wiki-${language}.json`), 'utf8'));
+    assert.ok(wiki.rules);
+    assert.ok(wiki.merlin);
+    const original = require(path.join(ui, 'src/i18n/langs', moduleName))[moduleName];
+    assert.deepEqual(
+      { ...common, ...wiki },
+      JSON.parse(JSON.stringify(original)),
+      `${language}: preserve every translation`,
+    );
   }
 });

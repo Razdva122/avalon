@@ -180,8 +180,12 @@ pages and prerender never initialize analytics.
 
 Prerender captures route/dictionary preloads before importing its build-only SSR
 renderer. `check-bundle.cjs` validates complete HTML entry dependencies, including
-route chunks and locale fallbacks: 365 KiB gzip JS / 50 KiB gzip CSS per public
-entry, with 480 / 55 KiB for chart pages. It rejects renderer preloads and icon
+route chunks and locale fallbacks: JS below 350 KiB gzip per ordinary public
+entry, 383.25 KiB for wiki entries and 466 KiB for chart pages. CSS stays below
+51 KiB per ordinary/wiki entry and 56 KiB for chart pages. App/vendor JS is
+limited to 270 KiB; with common locale fallbacks, 332 KiB. Each common language
+dictionary also has its own 29–37 KiB limit, so wiki copy cannot silently return
+to the shared download. It rejects renderer preloads and icon
 fonts over 25 KiB. Third-party SDKs are outside these first-party budgets.
 
 `check-startup.cjs` exercises an early click with JavaScript deliberately held,

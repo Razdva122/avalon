@@ -6,7 +6,7 @@ import { routesSeo } from '@/router/seo';
 import type { TMultiLangRoute, TNormalizedLangRoute } from '@/router/seo';
 import { TLanguage, LanguageMap } from '@/helpers/i18n';
 import { getImagePath } from '@/helpers/images';
-import { i18n, loadLanguage, commitLanguage } from '@/plugins/i18n';
+import { i18n, loadLanguage, loadWikiLanguage, commitLanguage } from '@/plugins/i18n';
 import { basePath, localizedPath, isNeutralPath } from './paths';
 import { updateStructuredData } from './structuredData';
 import { wikiBreadcrumbs } from './breadcrumbs';
@@ -200,9 +200,8 @@ router.beforeResolve(async (to) => {
     const { loadGuideLocale } = await import(/* webpackChunkName: 'guide-locales' */ '@/pages/guides/locales');
     await loadGuideLocale(language);
   }
-  await loadLanguage(
-    pageLanguage(to.path, isNeutralPath(to.path), preferredLanguage(store.state.settings, navigator.languages)),
-  );
+  if (basePath(to.path).startsWith('/wiki/')) await loadWikiLanguage(language);
+  else await loadLanguage(language);
 });
 
 router.afterEach((to, _from, failure) => {

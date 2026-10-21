@@ -34,7 +34,9 @@ password recovery are combined at generation time.
 
 `src/i18n/generated/*.json` is generated and ignored by Git. Do not edit it.
 The browser loads the chosen language and English fallback rather than all seven
-dictionaries. The locale loader prevents an old request from replacing a newer selection.
+dictionaries. Full wiki article bodies live in `wiki-<language>.json` chunks and
+load only on `/wiki/` routes, after the common dictionaries. Shared role names,
+navigation and gameplay hints stay in the common files. The locale loader prevents an old request from replacing a newer selection.
 
 ## In components
 
