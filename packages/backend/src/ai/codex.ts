@@ -75,11 +75,8 @@ export function codexSchema(choices: string[], details: boolean, review = false,
           type: 'string',
           minLength: 1,
           maxLength: 60,
-          ...(request?.memoryOnly
-            ? { pattern: `^t:(${humans.join('|')}):.{1,54}$` }
-            : request?.readAllChat
-              ? { pattern: '^(?:t$|t[^:]|[^t]).*$' }
-              : {}),
+          // Keep action keys unconstrained: the former exclusion regex breaks Codex generation.
+          ...(request?.memoryOnly ? { pattern: `^t:(${humans.join('|')}):.{1,54}$` } : {}),
         },
         kind: {
           type: 'string',

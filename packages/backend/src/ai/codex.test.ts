@@ -80,16 +80,12 @@ test('memory schema permits only human references at their original mixed-chat p
   expect(source).toMatchObject({ items: { enum: [1, -1, -14] } });
 });
 
-test('ordinary decision schema uses text sources and reserves t: identities for human memory', () => {
+test('ordinary decision schema avoids generation-breaking key patterns and uses text sources', () => {
   const schema = codexSchema(['approve'], true, false, { ...request, readAllChat: true });
   const properties = schema.properties.evidence!.items.properties;
   expect(properties.source).toMatchObject({ type: 'string', minLength: 1, maxLength: 160 });
   expect(properties.source).not.toHaveProperty('anyOf');
-  const key = new RegExp(properties.key.pattern!);
-  expect(key.test('conflict:4')).toBe(true);
-  expect(key.test('m1_fail')).toBe(true);
-  expect(key.test('t')).toBe(true);
-  expect(key.test('t:5:role')).toBe(false);
+  expect(properties.key).not.toHaveProperty('pattern');
 });
 
 test.each([{ refs: [1] }, { refs: [1, 2, 3, 4, 5] }])(
