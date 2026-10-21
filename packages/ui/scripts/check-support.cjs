@@ -1,8 +1,20 @@
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const fs = require('node:fs');
 const express = require('express');
 const puppeteer = require('puppeteer');
 const jsQR = require('jsqr');
+const dist = path.resolve(__dirname, '../dist');
+const qrChunks = fs
+  .readdirSync(path.join(dist, 'js'))
+  .filter((file) => file.endsWith('.js.map'))
+  .filter((file) =>
+    JSON.parse(fs.readFileSync(path.join(dist, 'js', file), 'utf8')).sources.some((source) =>
+      /node_modules\/qrcode\//.test(source),
+    ),
+  )
+  .map((file) => `/js/${file.slice(0, -4)}`);
+assert(qrChunks.length, 'Expected the QR encoder in a separately loaded chunk');
 
 // Production UI against local fixtures: no real blockchain requests or wallet operations.
 const networks = [
@@ -91,7 +103,12 @@ app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, '../dist/index.
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));
     await page.setRequestInterception(true);
-    page.on('request', (req) => (req.url().startsWith(origin) ? req.continue() : req.abort()));
+    const requestedScripts = new Set();
+    page.on('request', (req) => {
+      const url = new URL(req.url());
+      if (url.origin === origin && url.pathname.endsWith('.js')) requestedScripts.add(url.pathname);
+      return req.url().startsWith(origin) ? req.continue() : req.abort();
+    });
     await page.evaluateOnNewDocument(() => {
       // Keep browser and saved preference English: the public Russian URL must
       // select Russian independently of machine or visitor settings.
@@ -111,6 +128,10 @@ app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, '../dist/index.
     await page.setViewport({ width: 390, height: 844 });
     await page.goto(`${origin}/ru/support/`, { waitUntil: 'networkidle0' });
     await page.waitForSelector('#support-txid');
+    assert(
+      qrChunks.every((chunk) => !requestedScripts.has(chunk)),
+      'QR encoder must not download before opening QR',
+    );
     assert.equal(await page.$eval('#support-address', (el) => el.value), networks[0].address);
     assert.deepEqual(
       await page.$$eval('input[name="support-network"]', (els) => els.map((el) => el.value)),
@@ -133,6 +154,10 @@ app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, '../dist/index.
     }
     await page.click('[aria-controls="support-qr"]');
     await page.waitForSelector('#support-qr canvas');
+    assert(
+      qrChunks.some((chunk) => requestedScripts.has(chunk)),
+      'Opening QR must load its encoder',
+    );
     async function decodedAddress() {
       const pixels = await page.$eval('#support-qr canvas', (el) => ({
         data: Array.from(el.getContext('2d').getImageData(0, 0, el.width, el.height).data),
@@ -233,9 +258,29 @@ app.get('*', (_req, res) => res.sendFile(path.resolve(__dirname, '../dist/index.
         path: path.join(process.env.SUPPORT_SCREENSHOT_DIR, 'support-desktop.png'),
         fullPage: true,
       });
+    // A failed optional chunk must keep the payment address usable and explain the missing QR.
+    const failedQR = await browser.newPage();
+    await failedQR.setCacheEnabled(false);
+    await failedQR.setRequestInterception(true);
+    failedQR.on('request', (req) => {
+      const url = new URL(req.url());
+      return url.origin !== origin || qrChunks.includes(url.pathname) ? req.abort() : req.continue();
+    });
+    await failedQR.goto(`${origin}/ru/support/`, { waitUntil: 'networkidle0' });
+    await failedQR.waitForSelector('#support-address');
+    await failedQR.click('[aria-controls="support-qr"]');
+    const failureText = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../src/i18n/generated/ru.json'), 'utf8'))
+      .support.qrFailed;
+    await failedQR.waitForFunction(
+      (text) => [...document.querySelectorAll('[role="alert"]')].some((element) => element.textContent === text),
+      { timeout: 3000 },
+      failureText,
+    );
+    assert.equal(await failedQR.$eval('#support-address', (element) => element.value), networks[0].address);
+    await failedQR.close();
     assert.deepEqual(errors, []);
     console.log(
-      'Support UI passed: network/recipient, txid validation, pending and credited amounts, duplicate error, unavailable network and mobile/desktop layout.',
+      'Support UI passed: on-demand QR download, network/recipient, txid validation, pending and credited amounts, duplicate error, unavailable network and mobile/desktop layout.',
     );
   } finally {
     await browser?.close();

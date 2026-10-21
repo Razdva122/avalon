@@ -165,7 +165,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
+import { computed, ref, onMounted, onUnmounted, watch, defineAsyncComponent, h } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from '@/store';
 import { useStickers } from '@/helpers/composables/useStickers';
@@ -173,10 +173,19 @@ import Avatar from '@/components/user/Avatar.vue';
 import SupportBenefits from './SupportBenefits.vue';
 import Giveaway from './Giveaway.vue';
 import NetworkIcon from './NetworkIcon.vue';
-import WalletQR from './WalletQR.vue';
 import { isSupportTxid } from './checkout';
 import { prerender } from '@/helpers/prerender';
 import { supportRequest, SupportInfo, SupportAccount, SupportPayment } from '@/api/support';
+
+const WalletQR = defineAsyncComponent({
+  loader: () => import(/* webpackChunkName: 'wallet-qr' */ './WalletQR.vue'),
+  errorComponent: {
+    setup() {
+      const { t } = useI18n();
+      return () => h('p', { class: 'error', role: 'alert' }, t('support.qrFailed'));
+    },
+  },
+});
 const { t } = useI18n();
 const store = useStore();
 const info = ref<SupportInfo | null>(null);
