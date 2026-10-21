@@ -34,6 +34,8 @@ const localeSizes = Object.fromEntries(
   ['en', 'ru', 'es', 'pt', 'zh-cn', 'zh-tw', 'vi'].map((language) => {
     const chunks = files.filter((file) => file.startsWith(`locale-${language}.`) && file.endsWith('.js'));
     assert.equal(chunks.length, 1, `${language}: expected one independent locale chunk`);
+    const wikiChunks = files.filter((file) => file.startsWith(`wiki-locale-${language}.`) && file.endsWith('.js'));
+    assert.equal(wikiChunks.length, 1, `${language}: expected one deferred wiki dictionary`);
     return [language, zlib.gzipSync(fs.readFileSync(path.join(dist, 'js', chunks[0]))).length];
   }),
 );

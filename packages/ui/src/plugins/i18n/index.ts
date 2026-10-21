@@ -1,6 +1,6 @@
 import { createI18n } from 'vue-i18n';
 import { selectLocale } from '@/helpers/i18n';
-import { localeLoaders, type TranslationMessages } from '@/i18n';
+import { localeLoaders, wikiLocaleLoaders, type TranslationMessages } from '@/i18n';
 import type { TLanguage } from '@/i18n/interface';
 import { createMessageLoader, createLanguageSelection } from './loader';
 
@@ -15,6 +15,19 @@ export const i18n = createI18n({
 export const loadLanguage = createMessageLoader<TLanguage, TranslationMessages>(localeLoaders, (language, messages) => {
   i18n.global.setLocaleMessage(language, messages);
 });
+
+// Install the common dictionary first: its initial setLocaleMessage must not
+// overwrite article messages loaded concurrently by another navigation.
+const loadWikiMessages = createMessageLoader<TLanguage, TranslationMessages>(
+  wikiLocaleLoaders,
+  (language, messages) => {
+    i18n.global.mergeLocaleMessage(language, messages);
+  },
+);
+export async function loadWikiLanguage(language: TLanguage) {
+  await loadLanguage(language);
+  await loadWikiMessages(language);
+}
 
 // Latest user selection wins; a completed route navigation also invalidates
 // pending private-page selections.

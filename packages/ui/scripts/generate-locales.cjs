@@ -10,6 +10,31 @@ require('tsconfig-paths').register({ baseUrl: ui, paths: { '@/*': ['src/*'] } })
 
 // Page translation source files group all languages together. Resolve those
 // groups at build time so a visitor downloads only the chosen dictionary.
+const wikiNamespaces = new Set([
+  'lancelots',
+  'lady',
+  'ladySea',
+  'excalibur',
+  'plotCards',
+  'morgana',
+  'percival',
+  'rules',
+  'lovers',
+  'merlin',
+  'oberon',
+  'mordred',
+  'troublemaker',
+  'trickster',
+  'witch',
+  'brute',
+  'lunatic',
+  'guinevere',
+  'merlinPure',
+  'minion',
+  'servant',
+  'cleric',
+  'revealer',
+]);
 const output = path.join(ui, 'src/i18n/generated');
 fs.mkdirSync(output, { recursive: true });
 for (const [language, moduleName] of Object.entries({
@@ -22,8 +47,14 @@ for (const [language, moduleName] of Object.entries({
   'zh-TW': 'zh_TW',
 })) {
   const messages = require(path.join(ui, 'src/i18n/langs', moduleName))[moduleName];
-  const target = path.join(output, `${language}.json`);
-  const content = JSON.stringify(messages);
-  if (!fs.existsSync(target) || fs.readFileSync(target, 'utf8') !== content) fs.writeFileSync(target, content);
+  const entries = Object.entries(messages);
+  for (const [prefix, isWiki] of [
+    ['', false],
+    ['wiki-', true],
+  ]) {
+    const target = path.join(output, `${prefix}${language}.json`);
+    const content = JSON.stringify(Object.fromEntries(entries.filter(([key]) => wikiNamespaces.has(key) === isWiki)));
+    if (!fs.existsSync(target) || fs.readFileSync(target, 'utf8') !== content) fs.writeFileSync(target, content);
+  }
 }
-console.log('Generated seven independent locale dictionaries.');
+console.log('Generated common and deferred wiki dictionaries for seven languages.');
