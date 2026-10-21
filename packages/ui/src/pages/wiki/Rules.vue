@@ -34,7 +34,7 @@
 
     <h2>{{ $t('rules.gameObjective') }}</h2>
 
-    <i18n-t keypath="rules.objectiveArthur" tag="h3">
+    <i18n-t keypath="rules.objectiveArthur" tag="h3" scope="global">
       <template v-slot:goodLoyaltyIcon>
         <span class="good-loyalty-icon"></span>
       </template>
@@ -44,7 +44,7 @@
       <LocalizedTextWrapper keypath="rules.missionObjective" />
     </p>
 
-    <i18n-t keypath="rules.objectiveMordred" tag="h3">
+    <i18n-t keypath="rules.objectiveMordred" tag="h3" scope="global">
       <template v-slot:evilLoyaltyIcon>
         <span class="evil-loyalty-icon"></span>
       </template>
@@ -74,7 +74,7 @@
 
     <h3>2. {{ $t('rules.missionPhaseTitle') }}</h3>
     <ul>
-      <i18n-t keypath="rules.teamApproved" tag="li">
+      <i18n-t keypath="rules.teamApproved" tag="li" scope="global">
         <template v-slot:goodLoyaltyIcon>
           <span class="good-loyalty-icon"></span>
         </template>
@@ -83,7 +83,7 @@
         </template>
       </i18n-t>
       <li>{{ $t('rules.submitCardsToLeader') }}</li>
-      <i18n-t keypath="rules.cardsRevealed" tag="li">
+      <i18n-t keypath="rules.cardsRevealed" tag="li" scope="global">
         <template v-slot:goodLoyaltyIcon>
           <span class="good-loyalty-icon"></span>
         </template>
@@ -185,7 +185,7 @@
 
     <p>
       <b>{{ $t('rules.note') }}</b>
-      <i18n-t keypath="rules.twoFailsNote" tag="span">
+      <i18n-t keypath="rules.twoFailsNote" tag="span" scope="global">
         <template v-slot:evilLoyaltyIcon>
           <span class="evil-loyalty-icon"></span>
         </template>
