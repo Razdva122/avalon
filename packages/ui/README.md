@@ -207,17 +207,32 @@ publication, then runs the existing tests, prerender, bundle budgets, browser
 checks and production nginx routing checks. No registry credentials or container
 publishing are needed for this check.
 
-Commit and push changes before creating a version, then wait for this check to
-succeed. `npm run check:release` verifies a successful push check for the exact
-current `HEAD` on `master` and refuses a dirty working tree, a missing check or a
-failed/incomplete run. It requires an authenticated GitHub CLI (`gh auth status`).
-`npm version` runs this gate in `preversion`, before changing version files or
-creating the release tag.
+`npm version` runs `npm run check:release` before changing version files or
+creating a tag. It requires a clean working tree and an authenticated GitHub CLI
+(`gh auth status`). Normally it only checks the previous release's budget flag;
+it does **not** require pushing or waiting for a CI run on the current commit.
 
-Tag publication also calls the same preflight for its resolved release commit.
-Both backend and UI publishing wait for it. The UI container packages the
-verified artifact from that run instead of compiling it again. Manual publication
-of an existing tag validates that tag's commit in the same way.
+Numeric bundle size overruns in the release container are warnings. The build
+writes `bundle-budget.json`, and CI persists a durable commit status in GitHub
+(`avalon/bundle-budget/release-<run-id>`). That release can publish both containers.
+The next local `npm version` is blocked if the previous release exceeded budget.
+To unblock, fix the size, commit and push the fix to `master`, and wait for
+`Check UI before release` to verify the exact commit you will release. Its green
+`avalon/bundle-budget` status confirms the repair. Repeated checks use the newest
+status, so an older passing result cannot hide a subsequent failure.
+
+A missing/incomplete/failed previous release check blocks release until it is
+resolved. Successful releases predating this policy have no debt flag and are
+accepted. Network/authentication errors fail closed. Direct `git tag` bypasses
+npm hooks; use `npm version` for the protected release path.
+
+Tag publication calls the preflight for its resolved release commit. Both backend
+and UI publishing wait for it, including saving the budget flag. The UI container
+packages the verified artifact instead of compiling it again. Manual publication
+validates the selected tag in the same way. Tests, build errors, dependency audit
+violations and other functional checks remain fatal. Ordinary local UI builds
+also keep numeric budgets strict; only the release Docker build explicitly sets
+`AVALON_BUNDLE_BUDGET=report`. PR builds cannot write budget statuses.
 
 Workflow and release-gate regression tests run with
 `node --test .github/tests/*.test.cjs`; the UI Docker build runs them before the

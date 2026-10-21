@@ -65,6 +65,9 @@ jobs:
   # The reusable check finishes before either container can be published.
   check-ui:
     needs: resolve-release
+    permissions:
+      contents: read
+      statuses: write
     uses: ./.github/workflows/check-ui.yml
     with:
       ref: ${{ needs.resolve-release.outputs.sha }}

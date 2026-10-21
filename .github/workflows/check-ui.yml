@@ -30,8 +30,11 @@ jobs:
   check-ui:
     name: UI release preflight
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     timeout-minutes: 30
     outputs:
+      violations: ${{ steps.budget.outputs.violations }}
       artifact-name: ui-release-${{ steps.source.outputs.sha }}
     steps:
       - uses: actions/checkout@v4
@@ -62,6 +65,11 @@ jobs:
           cache-from: type=gha,scope=ui-release-check
           cache-to: type=gha,scope=ui-release-check,mode=max
 
+      - name: Read bundle budget report
+        id: budget
+        run: |
+          node -e 'const r = require("./ui-release/bundle-budget.json"); if (!Array.isArray(r.violations)) throw Error("Invalid budget report"); require("node:fs").appendFileSync(process.env.GITHUB_OUTPUT, `violations=${r.violations.length}\n`);'
+
       - name: Verify production nginx routing
         run: |
           sudo apt-get update
@@ -75,3 +83,30 @@ jobs:
           path: ui-release/
           if-no-files-found: error
           retention-days: 1
+
+  record-budget:
+    needs: check-ui
+    if: ${{ inputs.ref || (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    steps:
+      - name: Persist bundle budget flag
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        env:
+          VIOLATIONS: ${{ needs.check-ui.outputs.violations }}
+          RELEASE_REF: ${{ inputs.ref }}
+        with:
+          script: |
+            const count = Number(process.env.VIOLATIONS);
+            if (!Number.isInteger(count) || count < 0 || process.env.VIOLATIONS === '') throw Error('Missing bundle budget report');
+            const release = Boolean(process.env.RELEASE_REF);
+            await github.rest.repos.createCommitStatus({
+              ...context.repo,
+              sha: context.sha,
+              context: release ? `avalon/bundle-budget/release-${context.runId}` : 'avalon/bundle-budget',
+              state: count ? 'failure' : 'success',
+              description: count ? `${count} bundle budget limit(s) exceeded; fix before next release` : 'Bundle size is within budget',
+              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+            });
+            if (count) core.warning(`${count} bundle budget limit(s) exceeded. This release may proceed; the next local release requires a verified fix.`);
