@@ -114,6 +114,7 @@ export default {
     rules: 'Luật chơi',
   },
   hostMenu: {
+    transferHost: 'Chuyển quyền chủ phòng',
     manage: 'Quản lý sảnh',
     close: 'Đóng bảng',
     players: 'người chơi',

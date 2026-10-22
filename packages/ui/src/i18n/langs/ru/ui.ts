@@ -117,6 +117,7 @@ export default {
     rules: 'Правила',
   },
   hostMenu: {
+    transferHost: 'Передать права хоста',
     manage: 'Управление лобби',
     close: 'Закрыть панель',
     players: 'игроков',

@@ -604,6 +604,24 @@ export class Manager {
       }
     });
 
+    socket.on('transferHost', (uuid, nextHostID) => {
+      if (typeof uuid !== 'string' || typeof nextHostID !== 'string') return;
+      const room = this.rooms[uuid];
+      if (
+        !room ||
+        room.ai ||
+        room.nextRoomID ||
+        room.leaderID !== userID ||
+        nextHostID === userID ||
+        !room.players.includes(nextHostID)
+      )
+        return;
+
+      room.leaderID = nextHostID;
+      room.updateRoomState(true);
+      eventBus.emit('roomUpdated', room);
+    });
+
     socket.on('kickPlayer', (uuid, kickUserID) => {
       const room = this.rooms[uuid];
       const canKickGuest =

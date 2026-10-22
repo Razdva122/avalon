@@ -4,6 +4,45 @@ import type { Server, ServerSocket, StartedRoomState } from '@avalon/types';
 import type { DBManager } from '@/db';
 import { BotRoom } from '@/ai/room';
 
+test.each(['created', 'locked', 'started'] as const)('host can transfer ownership in a %s room', (stage) => {
+  const { manager, handlers, broadcasts } = fixture(true);
+  manager.createRoom('table', 'alice', ['alice', 'bob', 'carol', 'dave', 'eve']);
+  const room = manager.rooms.table;
+  if (stage === 'locked') room.toggleLockedState();
+  if (stage === 'started') room.startGame();
+  const gameLeader = room.data.stage === 'started' ? room.data.manager.game.leader.userID : undefined;
+
+  handlers.transferHost('table', 'bob');
+
+  expect(room.leaderID).toBe('bob');
+  expect(room.calculateRoomState().players.find((player) => player.id === 'bob')?.isLeader).toBe(true);
+  expect(broadcasts).toContainEqual(
+    expect.objectContaining({
+      event: 'roomUpdated',
+      value: expect.objectContaining({ leaderID: 'bob' }),
+    }),
+  );
+  if (room.data.stage === 'started') expect(room.data.manager.game.leader.userID).toBe(gameLeader);
+  handlers.transferHost('table', 'carol');
+  handlers.lockRoom('table');
+  expect(room.leaderID).toBe('bob');
+  expect(room.data.stage).toBe(stage);
+});
+
+test('ownership transfer rejects non-hosts, absent players, malformed input and replaced rooms', () => {
+  const { manager, handlers } = fixture(true);
+  manager.createRoom('table', 'bob', ['alice', 'bob']);
+  const room = manager.rooms.table;
+  handlers.transferHost('table', 'alice');
+  expect(room.leaderID).toBe('bob');
+  room.leaderID = 'alice';
+  for (const target of ['spectator', '', null, ['bob'], 'alice']) handlers.transferHost('table', target);
+  expect(room.leaderID).toBe('alice');
+  room.nextRoomID = 'next';
+  handlers.transferHost('table', 'bob');
+  expect(room.leaderID).toBe('alice');
+});
+
 jest.mock('@/voice/runtime', () => ({
   createRoomVoice: () => ({ destroyRoom() {}, reconcile() {}, revokeSocket() {} }),
   registerVoiceEndpoints() {},

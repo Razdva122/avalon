@@ -116,6 +116,7 @@ export default {
     rules: 'Rules',
   },
   hostMenu: {
+    transferHost: 'Transfer host rights',
     manage: 'Manage lobby',
     close: 'Close panel',
     players: 'players',

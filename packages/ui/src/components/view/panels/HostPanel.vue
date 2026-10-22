@@ -94,6 +94,15 @@
                     role="img"
                     >stars</span
                   >
+                  <v-btn
+                    v-if="player.id !== roomState.leaderID"
+                    variant="text"
+                    color="text-primary"
+                    size="small"
+                    class="host-transfer"
+                    @click="transferHost(player.id)"
+                    >{{ $t('hostMenu.transferHost') }}</v-btn
+                  >
                 </li>
               </ol>
             </details>
@@ -195,6 +204,12 @@ export default defineComponent({
       socket.emit('startGame', props.roomState.roomID);
       open.value = false;
     }
+    function transferHost(playerID: string) {
+      if (playerID === props.roomState.leaderID || !props.roomState.players.some((player) => player.id === playerID))
+        return;
+      socket.emit('transferHost', props.roomState.roomID, playerID);
+      open.value = false;
+    }
     function confirmAction() {
       if (!canVote.value || !confirmation.value) return;
       socket.emit(confirmation.value, props.roomState.roomID);
@@ -225,6 +240,7 @@ export default defineComponent({
       updateFeatures,
       emitAction,
       startGame,
+      transferHost,
       confirmAction,
     };
   },
@@ -424,6 +440,12 @@ export default defineComponent({
 .host-crown {
   color: var(--accent);
   font-size: 18px;
+}
+.host-transfer {
+  min-height: 44px;
+  flex-shrink: 0;
+  letter-spacing: 0;
+  text-transform: none;
 }
 .host-shuffle .material-icons {
   margin-right: 8px;

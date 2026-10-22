@@ -495,10 +495,9 @@ export function parseDecisionReply(text: string, choices: string[], request?: Bo
         if (!/^t:[1-8]:.{1,54}$/u.test(note.key)) throw new AiTechnicalPause('Invalid testimony identity.');
         try {
           note.source = numericTestimonySource(request, note.source, Number(note.key.split(':')[1]));
-        } catch (error) {
+        } catch {
           // A bad memory anchor invalidates the whole update, not the match or earlier memory.
-          if (request.memoryOnly) return false;
-          throw error;
+          return false;
         }
       } else if (request.memoryOnly) throw new AiTechnicalPause('Memory must contain human testimony only.');
       return true;

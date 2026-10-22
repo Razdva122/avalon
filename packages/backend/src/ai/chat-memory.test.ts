@@ -87,11 +87,11 @@ test('numeric references resolve only visible human rows and do not require reco
     });
   const reply = parseDecisionReply(raw([-14]), r.choices, r);
   expect(reply.evidence![0].source).toBe('recent:14');
-  expect(() => parseDecisionReply(raw([1]), r.choices, r)).toThrow();
-  expect(() => parseDecisionReply(raw([-15]), r.choices, r)).toThrow();
-  expect(() => parseDecisionReply(raw(Array(9).fill(-1)), r.choices, r)).toThrow();
+  expect(parseDecisionReply(raw([1]), r.choices, r).evidence).toEqual([]);
+  expect(parseDecisionReply(raw([-15]), r.choices, r).evidence).toEqual([]);
+  expect(parseDecisionReply(raw(Array(9).fill(-1)), r.choices, r).evidence).toEqual([]);
   r.chat[r.chat.length - 1].name = '1';
-  expect(() => parseDecisionReply(raw([-14]), r.choices, r)).toThrow();
+  expect(parseDecisionReply(raw([-14]), r.choices, r).evidence).toEqual([]);
 });
 
 test('numeric sources during assassination use only the displayed historical rows, never hidden recent chat', () => {
@@ -105,7 +105,7 @@ test('numeric sources during assassination use only the displayed historical row
       evidence: [{ key: 't:2:King', kind: 'testimony', fact: 'Changed position.', source, certainty: 'claim' }],
     });
   expect(parseDecisionReply(raw([32]), r.choices, r).evidence![0].source).toBe('chat:32');
-  expect(() => parseDecisionReply(raw([-14]), r.choices, r)).toThrow();
+  expect(parseDecisionReply(raw([-14]), r.choices, r).evidence).toEqual([]);
 });
 
 test('numeric sources keep original, reversal and latest quote bound to their author after eviction and rolling IDs', async () => {
@@ -171,7 +171,7 @@ test('source author must match the keyed speaker even when another human is visi
   r.state.players.push({ id: 'other', index: 3, role: 'unknown', features: {} });
   r.humanPlayerIDs!.push('other');
   r.chat[r.chat.length - 1].name = '3';
-  expect(() =>
+  expect(
     parseDecisionReply(
       JSON.stringify({
         choice: 'approve',
@@ -181,8 +181,8 @@ test('source author must match the keyed speaker even when another human is visi
       }),
       r.choices,
       r,
-    ),
-  ).toThrow();
+    ).evidence,
+  ).toEqual([]);
 });
 
 test('ordinary decisions can still record unpinned testimony from bots; memory-only notes cannot', () => {
@@ -501,3 +501,25 @@ test('a rejected memory correction preserves earlier testimony and its pinned me
   expect(frames[1].modelHypotheses).toEqual([expect.objectContaining({ fact: '2 trusts King.' })]);
   expect(frames[1].humanStatements).toContainEqual(expect.objectContaining({ text: 'statement 15' }));
 });
+
+test.each(['-2', 'chat slot2; chat slot4', 'Чат: сообщение 2 о Мерлине'])(
+  'a legal game decision survives a malformed testimony source %s',
+  (source) => {
+    const r = input(4);
+    const valid = { key: 'mission1', kind: 'fact', fact: 'Mission succeeded.', source: 'mission1', certainty: 'claim' };
+    const raw = (choice: string) =>
+      JSON.stringify({
+        choice,
+        speech: 'I approve.',
+        publicReason: 'The mission succeeded.',
+        evidence: [valid, { key: 't:2:role', kind: 'testimony', fact: '2 claims Merlin.', source, certainty: 'claim' }],
+      });
+    expect(parseDecisionReply(raw('approve'), r.choices, r)).toMatchObject({
+      choice: 0,
+      speech: 'I approve.',
+      publicReason: 'The mission succeeded.',
+      evidence: [valid],
+    });
+    expect(() => parseDecisionReply(raw('invented'), r.choices, r)).toThrow('invalid AI reply');
+  },
+);

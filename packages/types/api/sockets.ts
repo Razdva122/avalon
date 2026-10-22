@@ -220,6 +220,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
   sendMessage: (uuid: string, message: string, requestID: string, callback: (result: ChatSendResult) => void) => void;
   lockRoom: (uuid: string) => void;
   kickPlayer: (uuid: string, userID: string) => void;
+  transferHost: (uuid: string, userID: string) => void;
   leaveRoom: (uuid: string) => void;
 
   endGame: (uuid: string) => void;

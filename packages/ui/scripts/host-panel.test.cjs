@@ -43,6 +43,24 @@ test('host cannot start before locking or with an invalid player count', () => {
   assert.equal(p.sent.length, 1);
   p.stop();
 });
+test('ownership transfer selects a seated player and closes the panel, including during a game', () => {
+  const p = panel();
+  p.props.roomState.leaderID = '0';
+  for (const stage of ['created', 'locked', 'started']) {
+    p.props.roomState.stage = stage;
+    p.state.open.value = true;
+    p.state.transferHost('1');
+    assert.equal(p.state.open.value, false);
+  }
+  assert.deepEqual(
+    p.sent,
+    Array.from({ length: 3 }, () => ['transferHost', 'room', '1']),
+  );
+  p.state.transferHost('spectator');
+  p.state.transferHost('0');
+  assert.equal(p.sent.length, 3);
+  p.stop();
+});
 test('confirmation launches the existing vote and blocks stale or overlapping votes', () => {
   const p = panel();
   p.props.roomState.stage = 'started';

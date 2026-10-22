@@ -115,6 +115,7 @@ export default {
     rules: '规则',
   },
   hostMenu: {
+    transferHost: '转让房主权限',
     manage: '管理房间',
     close: '关闭面板',
     players: '位玩家',

@@ -118,6 +118,7 @@ export default {
     rules: 'Reglas',
   },
   hostMenu: {
+    transferHost: 'Transferir permisos de anfitrión',
     manage: 'Gestionar sala',
     close: 'Cerrar panel',
     players: 'jugadores',

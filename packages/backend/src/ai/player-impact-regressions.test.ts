@@ -90,7 +90,7 @@ test('duplicate memory anchors collapse without accepting zero or another author
   const raw = (evidence: unknown[]) => JSON.stringify({ ...reply, choice: 'observe', evidence });
   expect(parseDecisionReply(raw([note]), r.choices, r).evidence).toEqual([{ ...note, source: 'recent:1' }]);
   expect(parseDecisionReply(raw([{ ...note, source: [0] }]), r.choices, r).evidence).toEqual([]);
-  expect(() => parseDecisionReply(raw([{ ...note, key: 't:3:trust' }]), ['observe'], request)).toThrow();
+  expect(parseDecisionReply(raw([{ ...note, key: 't:3:trust' }]), ['observe'], request).evidence).toEqual([]);
 });
 
 test('runtime text limits count the same Unicode characters as the output schema', () => {

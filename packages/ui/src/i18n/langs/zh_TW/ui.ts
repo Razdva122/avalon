@@ -115,6 +115,7 @@ export default {
     rules: '規則',
   },
   hostMenu: {
+    transferHost: '轉讓房主權限',
     manage: '管理房間',
     close: '關閉面板',
     players: '位玩家',
