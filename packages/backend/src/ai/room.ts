@@ -606,6 +606,10 @@ export class BotRoom extends Room {
       await this.publishCouncil();
       return answer;
     }
+    if (state.stage === 'assassinate') {
+      const previousTarget = this.evilCouncil.find((advice) => advice.seat === this.label(id))?.target;
+      speak = Boolean(previousTarget && previousTarget !== choices[answer.choice].text);
+    }
     if (speak && answer.speech.trim()) {
       let speech = answer.speech.trim().replace(/\bplayers?\s*#?([1-8])\b/gi, '$1');
       if (task.startsWith('Choose the final team')) {
@@ -913,6 +917,7 @@ export class BotRoom extends Room {
         }));
         break;
       case 'assassinate':
+        speak = true;
         task =
           'Choose the player you believe is Merlin after reviewing ALL teammates in evilCouncil and the early public clues in evilEvidence';
         choices = state.players

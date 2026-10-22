@@ -1,10 +1,74 @@
 import { BotRoom, BOT_PROFILES, botOptions } from './room';
 import { compactRequest } from './client';
+import { decisionPipeline } from './pipeline';
 import type { BotRequest } from './client';
 import type { Server } from '@avalon/types';
 
 const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
 const reply = (request: BotRequest) => ({ choice: 0, speech: request.speak ? 'I suggest testing this team.' : '' });
+
+test.each([
+  { changed: false, interruptPublication: false },
+  { changed: true, interruptPublication: false },
+  { changed: true, interruptPublication: true },
+])(
+  'assassin explains before shooting ($changed, interrupted=$interruptPublication)',
+  async ({ changed, interruptPublication }) => {
+    const explanation = 'I changed my target because the earlier vote is a stronger clue.';
+    let finalTarget: string | undefined;
+    let publishedBeforeShot = false;
+    let finalDecisions = 0;
+    const room = new BotRoom(
+      'changed-assassination',
+      'admin',
+      io,
+      decisionPipeline(async (request) => {
+        const finalShot = request.state.stage === 'assassinate' && !request.councilDiscussion;
+        const choice =
+          request.state.stage === 'onMission' ? request.choices.indexOf('success') : finalShot && changed ? 1 : 0;
+        if (finalShot) {
+          finalTarget = request.choices[choice];
+          finalDecisions++;
+        }
+        return { choice, speech: 'PRIVATE_REASON', publicReason: finalShot ? explanation : 'A public recommendation.' };
+      }),
+      async (state) => {
+        if (state.stage === 'started' && state.chat.some((m) => m.message === explanation)) {
+          publishedBeforeShot ||= state.game.stage === 'assassinate';
+        }
+      },
+      0,
+      'en',
+      5,
+    );
+    let interrupted = false;
+    room.persistChatMessage = async (id, text, requestID) => {
+      if (interruptPublication && text === explanation && !interrupted) {
+        interrupted = true;
+        throw Error('Chat temporarily unavailable');
+      }
+      room.addMessage(id, text, requestID);
+    };
+    await room.run();
+    if (interruptPublication) {
+      expect(room.ai?.canResumeTechnical).toBe(true);
+      expect(room.data.stage === 'started' && room.data.manager.game.stage).toBe('assassinate');
+      expect(room.chat.history.some((m) => m.message === explanation)).toBe(false);
+      await room.run(true);
+    }
+    expect(room.ai?.status).toBe('finished');
+    expect(finalDecisions).toBe(1);
+    expect(room.chat.history.filter((m) => m.message === explanation)).toHaveLength(changed ? 1 : 0);
+    expect(publishedBeforeShot).toBe(changed);
+    expect(room.chat.history.some((m) => m.message.includes('PRIVATE_REASON'))).toBe(false);
+    if (room.data.stage !== 'started') throw Error('not started');
+    const state = room.data.manager.prepareStateForUser();
+    const shot = state.history.find((event) => event.type === 'assassinate');
+    expect(shot?.type === 'assassinate' && state.players.find((p) => p.id === shot.killedIDs[0])?.index).toBe(
+      Number(finalTarget),
+    );
+  },
+);
 
 test('seven bots complete a real game, including Lady of Lake and assassination, with public discussion', async () => {
   const stages = new Set<string>();

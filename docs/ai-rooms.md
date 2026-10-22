@@ -432,7 +432,12 @@ They are evidence for those dates, not current operational defaults.
 
 Before assassination, Evil council advice is published to the room chat immediately,
 with no post-game duplicate. An Evil human gets a speaking turn even when a bot
-is the assassin. The human message becomes part of subsequent bot input. A human
+is the assassin. The human message becomes part of subsequent bot input. If a bot
+assassin changes its own council target, it publishes a short public explanation
+naming the new target and the public evidence behind the change before shooting.
+An unchanged target needs no extra announcement. Missing explanations are retried
+once, then pause the game; interrupted publication resumes before the saved shot
+without regenerating the decision. Private decision reasons stay private. A human
 assassin can shoot after all other council participants have spoken or passed,
 without a mandatory speech or pass step of their own. This guard also applies
 during asynchronous state persistence. Good humans can

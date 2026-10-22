@@ -57,6 +57,37 @@ const discussion = {
   },
 } as unknown as BotRequest;
 
+test.each([true, false])(
+  'changed assassination target requires a public explanation (repair succeeds=%s)',
+  async (repaired) => {
+    const input: BotRequest = {
+      ...discussion,
+      publicDiscussion: false,
+      choices: ['2', '3'],
+      state: { ...discussion.state, stage: 'assassinate' },
+      evilCouncil: [
+        { seat: '4', target: '3', reason: 'Another player recommends 3.' },
+        { seat: '1', target: '2', reason: 'I recommend 2.' },
+      ],
+    };
+    let attempts = 0;
+    const decide = decisionPipeline(async () => ({
+      choice: 1,
+      speech: 'PRIVATE_REASON',
+      publicReason:
+        ++attempts > 1 && repaired ? 'I now think 3 is Merlin because the early vote is more convincing.' : '',
+    }));
+    if (repaired) {
+      await expect(decide(input)).resolves.toMatchObject({
+        choice: 1,
+        speech: 'I now think 3 is Merlin because the early vote is more convincing.',
+      });
+    } else {
+      await expect(decide(input)).rejects.toThrow('Changed assassination target requires a public explanation');
+    }
+  },
+);
+
 test.each<AiLanguage>(['en', 'ru', 'zh-tw'])(
   '%s public circle describes a preference and receives recorded votes without private knowledge',
   async (language) => {

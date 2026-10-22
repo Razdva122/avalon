@@ -221,7 +221,9 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
         ? 'As leader, select the final roster after hearing the full circle. publicReason may be empty.'
         : request.councilDiscussion
           ? 'The Evil council is public. In publicReason discuss your assassination candidate from public evidence, compare an alternative and respond to earlier advice without announcing private allies. speech remains your private reason, including during council.'
-          : 'Choose the action for the current stage. When speak=false, publicReason must be empty.';
+          : request.state.stage === 'assassinate'
+            ? 'Choose the final assassination target freely. Compare your choice with YOUR OWN earlier target in evilCouncil. If you change that target, publicReason must name the new target and briefly explain why you changed your mind using public evidence; this is published before the shot. Do not claim new events occurred if you only reassessed existing clues. Keep private role knowledge and private reasoning in speech. If your target is unchanged, leave publicReason empty.'
+            : 'Choose the action for the current stage. When speak=false, publicReason must be empty.';
   const strategy = ['selectTeam', 'votingForTeam'].includes(request.state.stage)
     ? (regularTeam
         ? 'Privately check in order: (1) For voting, evaluate ONLY actionFacts.team, the current proposedTeam; for selection, evaluate the exact legal roster you choose. Never substitute an earlier preferred team. (2) Use your own side, privateKnowledge and completed mission deductions; success or testimony cannot erase known Evil. (3) Count known and possible Evil against missionRule.failureAtLeast: enough Evil CAN sabotage, not necessarily WILL; one Evil cannot fail a two-Fail mission, but unknown teammates may supply another. (4) Choose for your actual side. Good normally avoids established sabotage risk when a safer reachable roster exists; Evil seeks sabotage access or concrete cover. (5) Before Reject, compare one reachable alternative and proposal.fifthLeader; only rejecting proposal 4 immediately forces proposal 5. Your own inclusion does not clear others. If off-team as Good, at most alignmentCounts.good - 1 Good can be inside. Before an information bet, name which possible result would distinguish your hypotheses; a known saboteur can explain another Fail without accusing new teammates. At two failures prioritize survival. If repeating a rejected roster, give a new public reason that could persuade a missing voter. Never publish these private checks.'
@@ -476,6 +478,12 @@ export function decisionPipeline(generate: Generate): Decide {
       const decisionRequest = request;
       const requiresExplanation =
         request.speak && request.state.stage === 'selectTeam' && request.state.vote > 0 && !request.publicDiscussion;
+      const councilTarget =
+        request.state.stage === 'assassinate' && !request.councilDiscussion
+          ? request.evilCouncil?.find((advice) => advice.seat === request.name)?.target
+          : undefined;
+      const changedTarget = (reply: BotReply) =>
+        Boolean(councilTarget && councilTarget !== request.choices[reply.choice]);
       const { missions, votes, tableConventions, requiredClaimStances, ...facts } = compactRequest(decisionRequest);
       let priority: number[] | undefined;
       if (own && isOpeningPair(request)) {
@@ -523,7 +531,7 @@ export function decisionPipeline(generate: Generate): Decide {
         signal,
       );
       signal?.throwIfAborted();
-      const missingExplanation = requiresExplanation && !reply.publicReason?.trim();
+      const missingExplanation = (requiresExplanation || changedTarget(reply)) && !reply.publicReason?.trim();
       if (missingExplanation || contradictsRoster(decisionRequest, reply)) {
         reply = await generate(
           decisionRequest,
@@ -535,7 +543,9 @@ export function decisionPipeline(generate: Generate): Decide {
               decisionInstructions(request) +
               claimInstructions +
               (missingExplanation
-                ? ' Your public explanation was empty. Return one legal choice and a nonempty publicReason addressing another seat and explaining that exact roster from public evidence. Finish now.'
+                ? changedTarget(reply)
+                  ? ' Your changed assassination target needs a public explanation. Return one legal choice; if it differs from your own council target, include a nonempty publicReason naming the new target and explaining the change from public evidence. Finish now.'
+                  : ' Your public explanation was empty. Return one legal choice and a nonempty publicReason addressing another seat and explaining that exact roster from public evidence. Finish now.'
                 : ' Your previous choice and explicitly selected roster in speech or publicReason disagree. Reconsider using the same facts; return one legal choice with matching private and public explanations. You may correct either the choice or explanations. Finish now.'),
             context: {
               ...current,
@@ -564,13 +574,15 @@ export function decisionPipeline(generate: Generate): Decide {
       if (!finalReview) validateClaims(request, reply);
       const speech = finalReview
         ? reply.speech
-        : request.councilDiscussion
+        : request.state.stage === 'assassinate'
           ? reply.publicReason || ''
           : request.speak
             ? safePublicSpeech(reply.publicReason || '', choice, request.language, reply.claimMorgana != null)
             : '';
       if (requiresExplanation && !speech.trim())
         throw new AiTechnicalPause('Repeat proposal requires a public leader explanation.');
+      if (changedTarget(reply) && !speech.trim())
+        throw new AiTechnicalPause('Changed assassination target requires a public explanation.');
       // Record only metadata accompanying published model speech, never generate speech from metadata.
       if (speech.trim() && own && !finalReview && !request.councilDiscussion) {
         if (reply.claimMorgana != null)
