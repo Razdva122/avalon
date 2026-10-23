@@ -103,6 +103,59 @@ async function until(check: () => Promise<boolean>) {
   throw Error('Expected asynchronous cleanup did not complete');
 }
 
+test.each([
+  {
+    label: 'earlier reset beats higher percentage',
+    firstReset: 14400,
+    secondReset: 3600,
+    secondPercent: 70,
+    expected: 'two',
+  },
+  { label: 'insufficient quota is excluded', firstReset: 14400, secondReset: 3600, secondPercent: 60, expected: 'one' },
+  {
+    label: 'equal resets use remaining percentage',
+    firstReset: 3600,
+    secondReset: 3600,
+    secondPercent: 70,
+    expected: 'one',
+  },
+  {
+    label: 'unknown resets use remaining percentage',
+    firstReset: null,
+    secondReset: null,
+    secondPercent: 70,
+    expected: 'one',
+  },
+  {
+    label: 'known reset precedes unknown reset',
+    firstReset: null,
+    secondReset: 3600,
+    secondPercent: 70,
+    expected: 'two',
+  },
+  { label: 'expired reset is not preferred', firstReset: -3600, secondReset: 3600, secondPercent: 70, expected: 'two' },
+])('smart account selection: $label', async ({ firstReset, secondReset, secondPercent, expected }) => {
+  const now = Math.floor(Date.now() / 1000);
+  jest.spyOn(limits, 'getCodexWeeklyLimit').mockImplementation(async () => {
+    const first = codexEnvironment().AI_CODEX_HOME === '/pool/one';
+    const reset = first ? firstReset : secondReset;
+    return {
+      remainingPercent: 80,
+      resetsAt: now + 86400,
+      checkedAt: Date.now(),
+      shortTerm: { remainingPercent: first ? 90 : secondPercent, resetsAt: reset === null ? null : now + reset },
+    };
+  });
+  const db = client.db(`pool-${database++}`);
+  const service = fixture(db);
+  const response = jest.fn();
+  await service.connect('alice').createHumanAiRoom({ beginner: false, difficulty: 'smart' }, response);
+  expect(response).toHaveBeenCalledWith({ roomID: expect.any(String) });
+  expect(await new AiRepository(db).busyInstances()).toEqual([
+    { instanceID: expected, roomID: response.mock.calls[0][0].roomID },
+  ]);
+});
+
 test('two backend services atomically reserve different instances and share busy/release state', async () => {
   const db = client.db(`pool-${database++}`);
   const a = fixture(db);

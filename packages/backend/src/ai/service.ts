@@ -197,7 +197,16 @@ export class AiService {
     throw new AiPause('Bot games are currently unavailable: no free eligible ChatGPT instance.');
   }
   private compareQuota(a: CodexWeeklyLimit | null, b: CodexWeeklyLimit | null) {
-    // Weekly-only subscriptions rank by their available weekly percentage.
+    // Spend eligible short-term quota that refreshes soonest first.
+    const now = Date.now() / 1000;
+    const nextReset = (quota: CodexWeeklyLimit | null) => {
+      const reset = quota?.shortTerm?.resetsAt;
+      return typeof reset === 'number' && Number.isFinite(reset) && reset > now ? reset : Infinity;
+    };
+    const aReset = nextReset(a);
+    const bReset = nextReset(b);
+    if (aReset !== bReset) return aReset < bReset ? -1 : 1;
+    // Equal/unknown resets and weekly-only subscriptions fall back to remaining quota.
     const short = (quota: CodexWeeklyLimit | null) =>
       quota?.shortTerm?.remainingPercent ?? quota?.remainingPercent ?? -1;
     return short(b) - short(a) || (b?.remainingPercent ?? -1) - (a?.remainingPercent ?? -1);
