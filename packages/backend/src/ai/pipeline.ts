@@ -1,4 +1,6 @@
 import { claimContext, validateClaims, claimInstructions } from './claims';
+import { exposedEvilAdvice, nextExposedEvilState, stripOwnEvilAdmission } from './exposed-evil';
+import type { ExposedEvilState } from './exposed-evil';
 import { languageInstruction } from './language';
 import shuffle from 'lodash/shuffle';
 import { humanSeatNumbers, humanTestimony } from './testimony';
@@ -14,6 +16,7 @@ import {
   publicSpeechAdvice,
   coalitionAdvice,
   decisiveTeamAdvice,
+  winningOpportunityAdvice,
   openingTieBreakAdvice,
   evilTeamAdvice,
   ladyAnnouncementAdvice,
@@ -75,22 +78,29 @@ export function safePublicSpeech(
   _choice: string,
   _language?: AiLanguage,
   percivalClaim = false,
+  evilAdmission = false,
 ): string {
   // This guard detects explicit private-role leaks only; it does not understand claims or choose wording.
+  const ownSideChecked = stripOwnEvilAdmission(speech);
+  if (!evilAdmission && ownSideChecked !== speech)
+    throw new AiTechnicalPause('Public Evil admission was not authorized by the actor.');
+  const visible = evilAdmission ? ownSideChecked : speech;
   const checked = percivalClaim
-    ? speech.replace(
+    ? visible.replace(
         /\b(?:my role is|our role is|mi rol es|nuestro rol es)\s+(?:the\s+)?percival\b|(?:моя|наша)\s+роль\s*(?:—|-|это)?\s*персиваль|vai trò của tôi\s*(?:là\s*)?percival|我的角色(?:是|為)?派西維爾|\bpercival\b|персиваль|派西維爾/giu,
         'public claim',
       )
-    : speech;
+    : visible;
   const roleLeak =
-    /\b(?:i am|i'm|we are|we're)\s+(?:an?\s+|the\s+)?(?:evil|merlin|percival|morgana|mordred|minion|oberon)\b|(?:я|мы)\s*(?:—|-|это|являюсь|являемся)?\s*(?:злой|злые|мерлин|персиваль|моргана|мордред|приспешник|оберон)|(?:我|我們)是(?:邪惡|梅林|派西維爾|莫甘娜|莫德雷德|奧伯倫|爪牙)/i;
+    /own public alignment[\s,;:—-]*(?:(?:and|и)\s+)?(?:merlin|percival|morgana|mordred|minion|oberon|мерлин|персиваль|моргана|мордред|приспешник|оберон|梅林|派西維爾|莫甘娜|莫德雷德|奧伯倫|爪牙)|\b(?:i am|i'm|we are|we're)\s+(?:an?\s+|the\s+)?(?:evil|merlin|percival|morgana|mordred|minion|oberon)\b|(?<![\p{L}\p{N}_])(?:я|мы)\s*(?:—|-|это|являюсь|являемся)?\s*(?:злой|злые|мерлин|персиваль|моргана|мордред|приспешник|оберон)|(?:我|我們)是(?:邪惡|梅林|派西維爾|莫甘娜|莫德雷德|奧伯倫|爪牙)/iu;
   const privateLeak =
     /\b(?:my|our) (?:evil allies|role is|wizard pair|wizard candidates)\b|\b[1-8]\s+(?:is|must be)\s+merlin\b|\bmerlin\s+is\s+[1-8]\b|[1-8]\s*(?:—|-|это|является)\s*мерлин|мерлин\s*(?:—|-|это)\s*[1-8]|мо[яи]\s+(?:роль|злые союзники|союзники|сообщники|пара магов|кандидаты в маги)|(?:我的(?:角色|邪惡盟友|梅林候選人)|[1-8]\s*是梅林)/i;
   const sabotageIntent =
     /\b(?:i|we)\s+(?:will|want to|intend to|plan to|am going to|are going to)\s+(?:sabotage|help evil|(?:let|make|ensure|force)[^.!?]{0,50}\bfail)\b|\b(?:my|our)\s+strategy\s+to\s+(?:let|make|ensure|force)[^.!?]{0,50}\bfail\b|\b(?:prevent\w*|avoid\w*)\s+(?:the\s+)?(?:risk\s+of\s+)?(?:(?:an?|the|any|another|this|that|their|our|its|your|accidental|unintended|risky|(?:good|mission|team)(?:['’]s)?)\s+){0,5}success\b|\b(?:unintended|accidental)\s+success\b|(?:я|мы)\s+(?:саботир|(?:хочу|хотим|буду|будем|намерен|намерены)\s+(?:саботир|провалить|устроить\s+провал|помочь\s+злу))|(?:избеж|предотврат)[а-яё]*\s+(?:риск[а-яё]*\s+)?(?:(?:(?:случайн|нежелательн|очередн|мирн|наш|ваш|эт)[а-яё]*|их)\s+){0,3}успех|(?:我|我們)(?:要|想要|想|打算|會|將|計畫)[^。！？]{0,40}(?:破壞|幫助邪惡|讓任務失敗)|(?:避免|阻止)(?:讓)?(?:這次|本次|這輪|本輪|該輪|此次|任務|意外|正義|的){0,4}(?:成功|正義獲勝)/i;
   const translatedLeak =
     /(?:^|[\s.!?])(?:yo\s+)?(?:soy|somos)\s+(?:del\s+mal|malvado|malvada|merl[ií]n|percival|morgana|mordred|minion|oberon)\b|(?:tôi|chúng tôi)\s+(?:là\s+(?:merlin|percival|morgana|mordred|minion|oberon)|(?:là|thuộc)\s+phe\s+[aá]c)|\b(?:mi|nuestro)\s+(?:rol\s+es|aliado\s+del\s+mal|pareja\s+de\s+magos)\b|vai trò của tôi|đồng minh phe [aá]c của tôi|\b[1-8]\s+es\s+merl[ií]n\b|[1-8]\s+là\s+Merlin|\b(?:voy a|vamos a|quiero|queremos)\s+sabotear\b|(?:tôi|chúng tôi)\s+(?:sẽ|muốn|định)\s+phá hoại/iu;
+  if (/\bmy ally\b|мой\s+(?:союзник|сообщник)|моя\s+скрытая\s+стратегия|my private strategy/iu.test(checked))
+    throw new AiTechnicalPause('Public speech exposes private allies or strategy.');
   if (
     !roleLeak.test(checked) &&
     !privateLeak.test(checked) &&
@@ -252,7 +262,9 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
     conversationVoiceAdvice +
     ' ' +
     'Play Avalon for your actual side and objective, using roleAdvice and privateKnowledge. Choose exactly one supplied legal choice. You choose strategy, trust, risk and public bluffing; known facts constrain private beliefs. No fixed speech, roster or vote is mandated. ' +
-    'Completed missions establish results and Fail counts; rejected proposals played no cards and did not change the score. Each participant plays one card. Success alone does not prove alignment. Read failsRequired, approvalsRequired and score literally. Proposals 1–4 require a majority; proposal 5 runs automatically. Good needs three successes and Merlin surviving; Evil needs three failures or killing Merlin. Oberon knows no allies; use only visible privateKnowledge. ' +
+    'Completed missions establish results and Fail counts; rejected proposals played no cards and did not change the score. Each participant plays one card. An ordinary Success alone does not prove alignment; apply the winning-opportunity rule for decisive successes. Read failsRequired, approvalsRequired and score literally. Proposals 1–4 require a majority; proposal 5 runs automatically. Good needs three successes and Merlin surviving; Evil needs three failures or killing Merlin. Oberon knows no allies; use only visible privateKnowledge. ' +
+    winningOpportunityAdvice +
+    ' ' +
     (regularTeam
       ? 'Combine completed missions with your own known card and alignmentCounts. Each Fail needs a different Evil participant. If you played Success in a two-seat team with one Fail, the other player is Evil. Overlapping failed teams may have the same saboteur; do not invent another. Use only public evidence in public deductions. '
       : 'Combine ALL completed missions with alignmentCounts and reliable private facts before disputing a deduction. Fails give a lower bound on Evil in a team; remaining Evil slots can also give an upper bound. Example only: with three Evil total, disjoint teams showing two and one Fails contain exactly two and one Evil, even if Evil sometimes play Success. Do not add bounds across overlapping teams as if their participants were different. Use only publicly available bounds in public arguments, and update old hypotheses when new facts narrow them. ') +
@@ -260,7 +272,11 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
     (request.readAllChat
       ? 'Facts override notes. Human testimony uses t:AUTHOR:SUBJECT; retain exact aliases and earliest/reversal/latest positions. source=[1-8 NEW refs]: positive=humanStatements.id, -N=chat slotN. Prior anchors persist; never recopy them. Bot testimony and other evidence use string sources. Omit unchanged notes. '
       : 'Facts override fallible modelHypotheses; old rosters are not current. Correct notes under the same key, citing evidence. Human testimony stays unverified. Keep role/check claims, commitments, corrections and position changes as testimony notes: source="chat:ID,ID" cites humanStatements.id, "recent:N,N" cites 1-based chat slots, "chat:ID;recent:N" combines them. Cite original and revision together; retain author/order in fact. Skip greetings and interface chatter. ') +
-    'Never publicly confess being Evil or Merlin, expose the wizard pair or allies, or announce sabotage. A deliberate Percival claim through claimMorgana must appear in publicReason. Public arguments may bluff for your side; the private reason must use actual side and knowledge. Keep private certainty in speech and evidence. Merlin: apply the public-viewpoint check in roleAdvice, treating competing unverified claims equally; protect missions and identity without publishing secret certainty. ' +
+    'Never publicly confess being Merlin, expose a specific private role, the wizard pair or allies, or announce secret mission cards. Your own Evil ALIGNMENT may be admitted only through the structured admitEvil action and its public words as described below. A deliberate Percival claim through claimMorgana must appear in publicReason. Public arguments may bluff for your side; the private reason must use actual side and knowledge. Keep private certainty in speech and evidence. Merlin: apply the public-viewpoint check in roleAdvice, treating competing unverified claims equally; protect missions and identity without publishing secret certainty. ' +
+    (evil
+      ? exposedEvilAdvice
+      : 'publicEvilAdmissions records other bots admitting their own Evil alignment. Good must not use admitEvil. An admitted Evil can promote an ally directly or endorse Good to discredit them; support alone is not proof of alliance. Compare both motives with actual votes, score and mission facts.') +
+    ' ' +
     ladyAnnouncementAdvice +
     ' ';
   if (commonOnly) return common;
@@ -286,6 +302,8 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
 
 type Generate = (request: BotRequest, options: GenerationOptions, signal?: AbortSignal) => ReturnType<Decide>;
 export function decisionPipeline(generate: Generate): Decide {
+  // Separate from bounded notes: survives evidence churn and technical continuation in this room.
+  const exposedEvil = new Map<string, ExposedEvilState>();
   const evidence = new Map<string, DecisionEvidence[]>();
   const testimony = new Map<string, Map<string, BotRequest['chat']>>();
   // One pipeline belongs to one room, including technical continuations.
@@ -494,7 +512,14 @@ export function decisionPipeline(generate: Generate): Decide {
         }
       }
       // Private generation context only: never add preferences to public room facts.
-      const current = { ...facts, ...(priority ? { privateTieBreakOrder: [...priority] } : {}) };
+      const current = {
+        ...facts,
+        ...(priority ? { privateTieBreakOrder: [...priority] } : {}),
+        publicEvilAdmissions: request.state.players.filter((p) => exposedEvil.has(p.id)).map((p) => p.index),
+        ...(exposedEvil.has(request.playerID)
+          ? { exposedEvil: structuredClone(exposedEvil.get(request.playerID)!) }
+          : {}),
+      };
       let reply = await generate(
         decisionRequest,
         {
@@ -572,17 +597,27 @@ export function decisionPipeline(generate: Generate): Decide {
       const choice = request.choices[reply.choice];
       if (choice === undefined) throw new AiTechnicalPause('Invalid private decision.');
       if (!finalReview) validateClaims(request, reply);
+      const nextExposure = finalReview
+        ? undefined
+        : nextExposedEvilState(request, reply, exposedEvil.get(request.playerID));
       const speech = finalReview
         ? reply.speech
         : request.state.stage === 'assassinate'
           ? reply.publicReason || ''
           : request.speak
-            ? safePublicSpeech(reply.publicReason || '', choice, request.language, reply.claimMorgana != null)
+            ? safePublicSpeech(
+                reply.publicReason || '',
+                choice,
+                request.language,
+                reply.claimMorgana != null,
+                Boolean(nextExposure),
+              )
             : '';
       if (requiresExplanation && !speech.trim())
         throw new AiTechnicalPause('Repeat proposal requires a public leader explanation.');
       if (changedTarget(reply) && !speech.trim())
         throw new AiTechnicalPause('Changed assassination target requires a public explanation.');
+      if (nextExposure) exposedEvil.set(request.playerID, structuredClone(nextExposure));
       // Record only metadata accompanying published model speech, never generate speech from metadata.
       if (speech.trim() && own && !finalReview && !request.councilDiscussion) {
         if (reply.claimMorgana != null)

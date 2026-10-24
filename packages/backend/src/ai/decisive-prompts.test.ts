@@ -21,8 +21,8 @@ test.each(['regular', 'smart'] as const)(
       expect(instructions).toContain('scoreBefore');
       expect(instructions).toContain('Replacing a reliably Good seat');
       expect(instructions).toContain('getting another result is not itself a benefit');
-      expect(instructions).toContain('passing up an immediate winning Fail');
-      expect(instructions).toContain('one Evil cannot fail a two-Fail mission');
+      // Winning-opportunity deductions and the two-Fail exception are exercised by the real-model
+      // evaluate-winning-opportunity cases; their old advisory wording is no longer a contract.
       expect(instructions).toContain('Read the actual recorded votes across proposals:');
       expect(instructions).toContain('Unanswered questions');
       expect(instructions).toContain('proposal.nextLeader');

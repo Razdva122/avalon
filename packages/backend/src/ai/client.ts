@@ -1,6 +1,8 @@
 import { claimContext, validateClaims } from './claims';
 import { languageInstruction } from './language';
 import { humanSeatNumbers, humanTestimony, numericTestimonySource } from './testimony';
+import { exposedEvilFields } from './exposed-evil';
+import type { ExposedEvilPlan } from './exposed-evil';
 import type { AiBotDifficulty, AiLanguage, VisualGameState } from '@avalon/types';
 
 export type BotRequest = {
@@ -43,6 +45,9 @@ export type DecisionEvidence = {
   certainty: 'proven' | 'claim' | 'bluff';
 };
 export type BotReply = {
+  admitEvil?: boolean;
+  exposedStrategy?: ExposedEvilPlan | null;
+  strategyChangeReason?: string;
   choice: number;
   speech: string;
   privateReason?: string;
@@ -83,9 +88,12 @@ export const openingAdvice =
 export const openingTieBreakAdvice =
   "Opening equivalent-choice tie-break: privateTieBreakOrder is a private random preference, independent of roles, trust and evidence. For a two-seat opening roster including yourself, first compare partners using your actual side, private knowledge, whole-roster mission risk and recorded public evidence. Among partners that remain comparably safe and strategically equivalent, choose the first eligible partner in privateTieBreakOrder. An unknown player's seat number, next leadership or position in choices or knowledge lists alone is not a reason to override this tie-break; concrete safety differences, recorded support and real coalition needs take priority. For Good, a known Evil is not an eligible equivalent to an unresolved partner on a one-Fail mission when a safer legal roster exists. The priority never overrides facts, winning actions or role secrecy. Do not publish the private order, describe it as evidence or invent a factual reason for trusting the selected partner. Keep a supported preference until new information or a concrete coalition reason warrants revision.";
 
+export const winningOpportunityAdvice =
+  "Winning-opportunity deduction: assume players seek victory and do not voluntarily forgo a guaranteed immediate win. Read each completed mission's scoreBefore and failsRequired, not today's score. If Evil already had two failures BEFORE a successful mission and that mission required only one Fail, classify ALL its participants as Good for subsequent strategic decisions: any Evil participant could have won immediately by playing Fail. Do not retain 'Evil chose Success for cover instead of winning' as an unresolved alternative without concrete contrary evidence. This is a strategic deduction under the win-seeking assumption, not a server role reveal. Reliable private roles, inspections and hard mission arithmetic override it: if they establish Evil on that roster, keep that Evil knowledge and do not use this mission to clear its participants. An early Success or a successful two-Fail mission does NOT clear all participants. Propagate supported alignments through earlier failed missions, remaining Evil slots and your private role constraints, including Percival's wizard pair. Carry these conclusions into team choices, Lady inspections and assassination reasoning; do not reset a strategically resolved seat to unknown merely because it lacks a Lady check. Before inspecting an already resolved alignment, compare the remaining genuinely unresolved targets and name a concrete public benefit if you still choose the redundant check. Keep private role deductions private.";
+
 export const decisiveTeamAdvice =
   'Good team risk comparison: before choosing, weigh the strongest evidence FOR and AGAINST the exact roster against one reachable alternative. Replacing a reliably Good seat, including yourself, with another unresolved seat needs distinguishing evidence for the whole roster; a mistaken argument alone does not justify that extra exposure. An information bet must name which remaining hypotheses its outcomes would distinguish and why that benefit outweighs the risk of another failure: getting another result is not itself a benefit. After a failure, a personality preference for experimentation cannot replace this comparison. ' +
-  "Read completedMissions.scoreBefore: a Success after two failures is much stronger behavioral evidence than an early Success, because passing up an immediate winning Fail is costly to Evil. It is not proof of alignment and never overrides reliable Evil knowledge. Apply that mission's failsRequired: one Evil cannot fail a two-Fail mission, so its success cannot clear every participant. Compare the risk of adding an untested suspect with retaining players from these decisive successes. " +
+  'Apply the winning-opportunity deduction before comparing rosters. A successful two-Fail mission alone cannot clear every participant. Compare the risk of adding an untested suspect with retaining players cleared by a decisive one-Fail success. ' +
   'Read the actual recorded votes across proposals: repeated support when a candidate is present and rejection when absent is a sourced behavioral pattern, not a role revelation. If you know or strongly infer that a supporter is Evil, selective support is evidence AGAINST that candidate, especially when sabotage wins immediately; do not dismiss it merely because it is not proof. Keep privately deduced alignments separate from public testimony. ' +
   'Unanswered questions and mistaken arguments are weak behavioral clues, not stronger than decisive mission incentives and consistent opposing votes. Reassess your leading accusation before excluding someone; personality and repeating an unanswered question do not improve its evidence. At two failures, state the decisive comparison in your private reason. ' +
   "Use proposal.nextLeader and proposal.fifthLeader when comparing reachable alternatives. Successful missions' previous approvers are a starting coalition to negotiate with, not promised future votes; include your own changed vote when comparing support. More total supporters does not mean safer, especially if the extra support comes from suspected Evil. On early proposals, use the remaining turns to persuade a missing voter for the better-supported roster rather than accept a weaker roster merely because opponents already support it. No fixed roster or vote is required.";
@@ -531,6 +539,7 @@ export function parseDecisionReply(text: string, choices: string[], request?: Bo
   }));
   const result = {
     ...reply,
+    ...exposedEvilFields(data, request),
     publicReason: data.publicReason.trim(),
     evidence,
     ...(data.claimMorgana != null ? { claimMorgana: data.claimMorgana } : {}),

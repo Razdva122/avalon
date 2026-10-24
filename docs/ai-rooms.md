@@ -304,6 +304,30 @@ from verified alignment. A redundant target alone does not establish Evil, and
 another player's private card is not public evidence. These are model strategy
 instructions, not server-enforced targets or alignment deductions.
 
+An Evil bot whose cover is exhausted can acknowledge only its own Evil alignment
+in public speech with `admitEvil`; it cannot disclose its specific role or allies.
+The same decision supplies `exposedStrategy`: a direct or reverse plan, promoted
+and desired seats, a target audience, private rationale and a reconsideration
+condition. A reverse plan requires evidence that the audience distrusts its
+endorsements. An immediate winning move takes precedence over deception.
+
+The room pipeline keeps admission and plan separately from bounded evidence
+notes, including through technical continuation. Other bots receive only
+`publicEvilAdmissions`; the plan stays private. Later replies leave the plan null
+to retain it. Changing its mode, seats or audience requires a full replacement
+and `strategyChangeReason`; omission never clears an admission. Explicit claims
+of Good after admission are rejected. This is in-memory live-room state; backend
+restart recovery remains unsupported. Proposed metadata is included in private
+decision traces.
+
+Run the controlled multi-turn model evaluation from the repository root:
+`npx ts-node -r tsconfig-paths/register --project packages/backend/tsconfig.json packages/backend/src/ai/evaluate-exposed-evil.ts --run --output=/tmp/exposed-evil.json`.
+It uses the normal decision pipeline and response schema with
+`gpt-6.1-sol / medium`, five decisions for each line, and synthetic continuations
+rather than a full simulation of all players. `--mode=direct` or `--mode=reverse`
+selects one line. The JSON report includes public speech, private reasons,
+stored plans, expected choices and failures.
+
 During ordinary play and the public Evil council, only `publicReason` is
 published. `speech` remains the private decision reason used by diagnostics and
 post-game review examples; the final post-game reflection uses `speech` publicly.

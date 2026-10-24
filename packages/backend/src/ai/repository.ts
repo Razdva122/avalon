@@ -51,6 +51,9 @@ export type AiRequestLog = {
 };
 
 export type AiDecisionTrace = {
+  admitEvil?: boolean;
+  exposedStrategy?: import('./exposed-evil').ExposedEvilPlan | null;
+  strategyChangeReason?: string;
   _id: string;
   roomID: string;
   player: string;

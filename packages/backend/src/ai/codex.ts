@@ -12,6 +12,7 @@ import type { CodexSettings } from '@avalon/types';
 import { AI_REQUEST_TIMEOUT_MS } from './timing';
 import { claimContext } from './claims';
 import { humanSeatNumbers, humanTestimony } from './testimony';
+import { isEvilActor } from './exposed-evil';
 import { hasRemoteCodex, remoteCodex } from './codex-remote';
 
 const CODEX_HEADER =
@@ -42,6 +43,8 @@ export function buildCodexPrompt(instructions: string | undefined, context: unkn
 }
 
 export function codexSchema(choices: string[], details: boolean, review = false, request?: BotRequest) {
+  const exposureEligible = request && !request.memoryOnly && isEvilActor(request);
+  const seats = request?.state.players.map((p) => p.index) || [];
   const claims = request ? claimContext(request) : { targets: [], claimants: [], stanceTargets: [] };
   const humans = request?.memoryOnly ? humanSeatNumbers(request) : [];
   const memoryReferences = request?.memoryOnly
@@ -117,6 +120,25 @@ export function codexSchema(choices: string[], details: boolean, review = false,
               required: ['seat', 'stance'],
             },
           },
+          ...(exposureEligible
+            ? {
+                admitEvil: { type: 'boolean' },
+                exposedStrategy: {
+                  type: ['object', 'null'],
+                  additionalProperties: false,
+                  properties: {
+                    mode: { type: 'string', enum: ['direct', 'reverse'] },
+                    promotedSeat: { type: 'integer', enum: seats },
+                    desiredSeat: { type: 'integer', enum: seats },
+                    audienceSeat: { type: 'integer', enum: seats },
+                    rationale: { type: 'string', minLength: 1, maxLength: 240 },
+                    reconsiderWhen: { type: 'string', minLength: 1, maxLength: 160 },
+                  },
+                  required: ['mode', 'promotedSeat', 'desiredSeat', 'audienceSeat', 'rationale', 'reconsiderWhen'],
+                },
+                strategyChangeReason: { type: 'string', maxLength: 240 },
+              }
+            : {}),
         }
       : {}),
   };
@@ -444,6 +466,9 @@ export function codexDecide(
       trace.speech = reply.speech;
       trace.publicReason = reply.publicReason;
       trace.evidence = reply.evidence;
+      trace.admitEvil = reply.admitEvil;
+      trace.exposedStrategy = reply.exposedStrategy;
+      trace.strategyChangeReason = reply.strategyChangeReason;
       return reply;
     } catch (error) {
       audit.status = signal?.aborted ? 'cancelled' : 'failed';
