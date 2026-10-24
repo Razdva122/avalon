@@ -5,6 +5,8 @@ import { BotRoom } from './room';
 import type { BotRequest } from './client';
 import type { AiLanguage, Server } from '@avalon/types';
 
+afterEach(() => delete process.env.AI_DECISION_GUARDS);
+
 const discussion = {
   playerID: '1',
   name: '1',
@@ -268,6 +270,9 @@ test('private memory and final review distinguish public preferences from submit
 });
 
 test('real room and decision pipeline complete a circle, silent final choice and independent votes together', async () => {
+  // This checks the flow, not the choices: with a random deal a server guard can replace a dominated roster,
+  // and code votes would answer the Good seats without a call. Turning guards off turns off both.
+  process.env.AI_DECISION_GUARDS = 'off';
   const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
   const generate = jest.fn().mockImplementation(async (request, options) => {
     if (options.phase === 'speech') return { choice: 0, speech: options.context.publicReason };

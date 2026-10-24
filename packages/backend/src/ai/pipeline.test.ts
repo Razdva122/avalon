@@ -1,5 +1,5 @@
 import { decisionPipeline, publicContext, safePublicSpeech } from './pipeline';
-import { AiPause } from './client';
+import { AiInvalidReply, AiPause } from './client';
 import type { BotRequest } from './client';
 import type { VisualGameState } from '@avalon/types';
 const request: BotRequest = {
@@ -242,6 +242,32 @@ test('provider errors and cancellation prevent additional requests', async () =>
   });
   await expect(decisionPipeline(cancelled)(request, controller.signal)).rejects.toThrow();
   expect(cancelled).toHaveBeenCalledTimes(1);
+});
+
+test('a reply that breaks the output contract is asked for once more, then pauses', async () => {
+  const flaky = jest
+    .fn()
+    .mockRejectedValueOnce(new AiInvalidReply('Codex returned an invalid response.'))
+    .mockResolvedValue({ choice: 1, speech: 'Second try.', publicReason: '' });
+  expect((await decisionPipeline(flaky)(request)).choice).toBe(1);
+  expect(flaky).toHaveBeenCalledTimes(2);
+  const broken = jest.fn().mockRejectedValue(new AiInvalidReply('Codex returned an invalid response.'));
+  await expect(decisionPipeline(broken)(request)).rejects.toBeInstanceOf(AiPause);
+  expect(broken).toHaveBeenCalledTimes(2);
+});
+
+test('a failed optional rewrite keeps the reply it would have replaced', async () => {
+  const echoed: BotRequest = {
+    ...request,
+    chat: [{ name: '3', text: 'Keep them: they already delivered a clean success.' }],
+  } as BotRequest;
+  const generate = jest.fn(async (_r, options) => {
+    if (options.phase === 'echo') throw new AiInvalidReply('Codex returned an invalid response.');
+    return { choice: 0, speech: 'Private.', publicReason: 'Fine, they already delivered a clean success.' };
+  });
+  const reply = await decisionPipeline(generate)(echoed);
+  expect(generate.mock.calls.map(([, options]) => options.phase)).toEqual(['decision', 'echo']);
+  expect(reply.speech).toBe('Fine, they already delivered a clean success.');
 });
 
 test('evidence outlives four turns and public speech receives only the intended public reason', async () => {

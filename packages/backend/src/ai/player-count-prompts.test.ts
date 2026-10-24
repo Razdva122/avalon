@@ -3,6 +3,8 @@ import { compactRequest } from './client';
 import type { BotRequest } from './client';
 import { publicContext, decisionPipeline } from './pipeline';
 
+afterEach(() => delete process.env.AI_CODE_VOTES);
+
 const requestFor = (count: number): BotRequest =>
   ({
     playerID: '1',
@@ -155,6 +157,8 @@ test.each([
 ])(
   'opening vote advice for %i players uses the required majority instead of one Good vote',
   async (count, approvalsRequired) => {
+    // The model's vote prompt; with code votes on, a Good seat's vote never reaches it.
+    process.env.AI_CODE_VOTES = 'off';
     const request = requestFor(count);
     request.publicDiscussion = false;
     request.speak = false;

@@ -87,11 +87,30 @@ test('numeric references resolve only visible human rows and do not require reco
     });
   const reply = parseDecisionReply(raw([-14]), r.choices, r);
   expect(reply.evidence![0].source).toBe('recent:14');
-  expect(parseDecisionReply(raw([1]), r.choices, r).evidence).toEqual([]);
-  expect(parseDecisionReply(raw([-15]), r.choices, r).evidence).toEqual([]);
-  expect(parseDecisionReply(raw(Array(9).fill(-1)), r.choices, r).evidence).toEqual([]);
+  // An invalid anchor drops its note; the decision itself stands.
+  const dropped = (text: string) => expect(parseDecisionReply(text, r.choices, r).evidence).toEqual([]);
+  dropped(raw([1]));
+  dropped(raw([-15]));
+  dropped(raw(Array(9).fill(-1)));
   r.chat[r.chat.length - 1].name = '1';
-  expect(parseDecisionReply(raw([-14]), r.choices, r).evidence).toEqual([]);
+  dropped(raw([-14]));
+});
+
+test('a decision that writes a t: note with a free-text source keeps its choice and drops the note', () => {
+  // The decision schema's source is a string, so this always failed the anchor check and paused human matches.
+  const r = input(32);
+  const reply = parseDecisionReply(
+    JSON.stringify({
+      choice: 'approve',
+      speech: '',
+      publicReason: '',
+      evidence: [{ key: 't:2:King', kind: 'testimony', fact: 'Suspects King.', source: 'chat:3', certainty: 'claim' }],
+    }),
+    r.choices,
+    r,
+  );
+  expect(reply.choice).toBe(r.choices.indexOf('approve'));
+  expect(reply.evidence).toEqual([]);
 });
 
 test('numeric sources during assassination use only the displayed historical rows, never hidden recent chat', () => {

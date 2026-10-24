@@ -85,9 +85,14 @@ test.each(['selectTeam', 'votingForTeam'] as const)(
       contexts.push(options);
       return { choice: 0, speech: 'Private reason.', publicReason: '' };
     });
-    // Prompt advice does not become a server veto or silently change the model's choice.
-    expect(await decide(regular)).toMatchObject({ choice: 0 });
-    expect(await decide(smart)).toMatchObject({ choice: 0 });
+    // Difficulty changes prompt advice only; dominated-move guards are covered in guards.test.ts.
+    process.env.AI_DECISION_GUARDS = 'off';
+    try {
+      expect(await decide(regular)).toMatchObject({ choice: 0 });
+      expect(await decide(smart)).toMatchObject({ choice: 0 });
+    } finally {
+      delete process.env.AI_DECISION_GUARDS;
+    }
     expect(contexts[0].instructions!.length).toBeLessThan(contexts[1].instructions!.length * 0.8);
     const a = compactRequest(regular),
       b = compactRequest(smart);

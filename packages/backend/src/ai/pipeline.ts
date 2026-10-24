@@ -1,11 +1,37 @@
 import { claimContext, validateClaims, claimInstructions } from './claims';
 import { exposedEvilAdvice, nextExposedEvilState, stripOwnEvilAdmission } from './exposed-evil';
 import type { ExposedEvilState } from './exposed-evil';
-import { languageInstruction } from './language';
+import { aiText, languageInstruction } from './language';
+import { buildAnalysis } from './analysis';
+import {
+  codeVote,
+  codeVotesEnabled,
+  echoedPhrase,
+  guardDecision,
+  failWish,
+  merlinSpeechExposure,
+  restatedRoster,
+  stalePhrases,
+  usedStalePhrases,
+} from './guards';
+import { EVIL_ROLES } from './deduction';
 import shuffle from 'lodash/shuffle';
+import {
+  addressedToYou,
+  confessesFail,
+  falseVoteClaim,
+  humanTypography,
+  speakerContext,
+  speakerEnabled,
+  speakerInstructions,
+  spokenPass,
+  withoutRepeatedEmoji,
+  withoutTeamRepeat,
+} from './speaker';
 import { humanSeatNumbers, humanTestimony } from './testimony';
 import type { AiLanguage } from '@avalon/types';
 import {
+  AiInvalidReply,
   AiPause,
   AiTechnicalPause,
   compactRequest,
@@ -137,6 +163,29 @@ function contradictsRoster(request: BotRequest, reply: BotReply): boolean {
   );
 }
 
+// Seats a leader's explanation leaves out ("keeping 5 off", "replacing 5 with 6") although its roster includes them:
+// the model sometimes submits the neighbouring roster from the long legal list. Negated phrasings do not count.
+export function excludedButChosen(request: BotRequest, reply: BotReply): number[] {
+  const choice = request.choices[reply.choice];
+  if (
+    request.state.stage !== 'selectTeam' ||
+    request.publicDiscussion ||
+    !choice ||
+    !/^[1-8](\s*,\s*[1-8])*$/.test(choice)
+  )
+    return [];
+  const team = choice.split(',').map(Number);
+  const text = reply.publicReason || '';
+  const exclusion =
+    /\b(?:keep(?:ing)?|leav(?:e|ing)|left)\s+([1-8])\s+(?:off|out)\b|\b(?:drop(?:ping)?|replac(?:e|ing)|swap(?:ping)?|bench(?:ing)?)\s+([1-8])\b|\bwithout\s+([1-8])\b|\b([1-8])\s+(?:stays?|sits?)\s+(?:off|out)\b/gi;
+  const negated = /(?:\bnot|n['’]t|\bno|\bnever|\bwithout|\bthan)\s+(?:\w+\s+){0,2}$/i;
+  const seats = [...text.matchAll(exclusion)]
+    .filter((match) => !negated.test(text.slice(Math.max(0, match.index! - 30), match.index)))
+    .map((match) => Number(match[1] || match[2] || match[3] || match[4]))
+    .filter((seat) => team.includes(seat));
+  return [...new Set(seats)];
+}
+
 export function reviewContext(request: BotRequest) {
   const c = compactRequest(request);
   const votes = c.votes || [];
@@ -214,6 +263,16 @@ function isOpeningPair(request: BotRequest) {
   );
 }
 
+const analysisAdvice =
+  'analysis is private server bookkeeping, recomputed every turn from engine records and YOUR private knowledge, and never shown to others. seats[].evilChance and status combine every Evil assignment consistent with mission Fail counts, your own cards, your private knowledge and Lady results, weighted by typical play: Evil nearly always fails when a Fail wins at once, so a Success at 0-2 strongly clears its team. Approving a roster you are not on is real evidence after mission 1: Good players rarely do it unless the record clears that roster, while Evil often backs rosters holding an ally. provenEvil, provenGood, provenSafe and provenUnsafe are certain. teams[].failRisk is the estimated chance that exact roster fails. Trust analysis over your own arithmetic, memory notes and chat impressions: tone, an unanswered question or a weak argument is far weaker evidence than these numbers. ' +
+  "Good: recommend, propose and approve the lowest-failRisk roster that can realistically pass; reject when a clearly safer legal roster exists and more proposals remain, above all when stakes say a failure loses. Do not swap a likely-Good seat for a riskier one to punish an argument. A confident claim, a repeated push or another player's assurance is not evidence: check it against votes, cards and Lady results, and say so when they contradict it. " +
+  'Evil: exposedAllies lists allies the table already reads as Evil; cut them loose in words, votes and rosters, never defend them by name or push them back onto teams, and agree when the table names them. teams.sabotageTeamsThatLookSafest lists rosters with enough known Evil to fail that the table may still accept; missionCard shows whether your Fail matters and how suspicious each outcome makes you; announcement shows how each Lady announcement changes public suspicion. merlinCandidates ranks Good seats by how Merlin-like their votes and proposals were. Your own off-team approvals feed publicView exactly as above, so back an off-team roster with an ally only when your vote can actually pass a roster you need. ' +
+  'Merlin: assassinView shows your current Merlin-likeness and, for this vote or roster, how each option changes it. To hide your sight the server may cast your silent vote as assassinView.servantLikeVote, the vote a Servant in your seat would cast: always before any failure, and for cheap rejections before two failures; otherwise you vote with your full sight. When fewer than two missions have failed and a Fail would not decide the game, a lower-exposure option can be worth some extra mission risk; never trade a decisive mission for cover. Before rejecting, count support in this discussion and in recorded votes: a lone rejection of a roster most of the table backs rarely stops it and mainly marks you as Merlin. Do not be the one who names or pushes the exact right roster every mission: let a Servant propose it and agree briefly. ' +
+  'publicView is what someone without your private knowledge can infer: Merlin and Evil should keep public arguments consistent with it. Never quote analysis or its percentages as public facts; argue from missions, votes and statements. ';
+
+const regularAnalysisAdvice =
+  'analysis is private server bookkeeping from engine records and your private knowledge: seats[].evilChance and status and teams[].failRisk are more reliable than your own arithmetic, and proven statuses are certain. Never quote it publicly. ';
+
 export function decisionInstructions(request: BotRequest, commonOnly = false) {
   const role = request.state.players?.find((p) => p.id === request.playerID)?.role;
   const evil = ['mordred', 'morgana', 'minion', 'oberon'].includes(role || '');
@@ -233,7 +292,7 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
           ? 'The Evil council is public. In publicReason discuss your assassination candidate from public evidence, compare an alternative and respond to earlier advice without announcing private allies. speech remains your private reason, including during council.'
           : request.state.stage === 'assassinate'
             ? 'Choose the final assassination target freely. Compare your choice with YOUR OWN earlier target in evilCouncil. If you change that target, publicReason must name the new target and briefly explain why you changed your mind using public evidence; this is published before the shot. Do not claim new events occurred if you only reassessed existing clues. Keep private role knowledge and private reasoning in speech. If your target is unchanged, leave publicReason empty.'
-            : 'Choose the action for the current stage. When speak=false, publicReason must be empty.';
+            : 'Choose the action for the current stage. When speak=false, publicReason must be empty, but speech still holds your short private reason.';
   const strategy = ['selectTeam', 'votingForTeam'].includes(request.state.stage)
     ? (regularTeam
         ? 'Privately check in order: (1) For voting, evaluate ONLY actionFacts.team, the current proposedTeam; for selection, evaluate the exact legal roster you choose. Never substitute an earlier preferred team. (2) Use your own side, privateKnowledge and completed mission deductions; success or testimony cannot erase known Evil. (3) Count known and possible Evil against missionRule.failureAtLeast: enough Evil CAN sabotage, not necessarily WILL; one Evil cannot fail a two-Fail mission, but unknown teammates may supply another. (4) Choose for your actual side. Good normally avoids established sabotage risk when a safer reachable roster exists; Evil seeks sabotage access or concrete cover. (5) Before Reject, compare one reachable alternative and proposal.fifthLeader; only rejecting proposal 4 immediately forces proposal 5. Your own inclusion does not clear others. If off-team as Good, at most alignmentCounts.good - 1 Good can be inside. Before an information bet, name which possible result would distinguish your hypotheses; a known saboteur can explain another Fail without accusing new teammates. At two failures prioritize survival. If repeating a rejected roster, give a new public reason that could persuade a missing voter. Never publish these private checks.'
@@ -241,7 +300,7 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
           ' Distinguish unresolved rosters from established sabotage risk. Persuade a missing voter with specific public evidence or a compromise; repeating the same question is not a new coalition plan.') +
       (evil ? ' ' + evilTeamAdvice : '')
     : request.state.stage === 'onMission'
-      ? "Evil card advice: compare sabotage with a concrete future benefit of cover using score and failsRequired. Infer teammates' likely cards from their public words, recorded votes, completed missions and current incentives; keep these predictions uncertain. There is no prearranged sabotage convention or designated saboteur; seat numbers do not assign cards. Compare your card's effect if others play Success or Fail, including redundant exposure and the risk of too few Fails. Allies' future cards remain unknown; unresolved teammates may also be Evil and act independently. Oberon does not know allies. Weigh early exposure against cover, and prioritize a decisive sabotage over trust for a round that may never occur. Too few Evil cannot meet a two-Fail threshold."
+      ? "Evil card advice: compare sabotage with a concrete future benefit of cover using score and failsRequired. Infer teammates' likely cards from their public words, recorded votes, completed missions and current incentives; keep these predictions uncertain. Table convention: when more Evil you know of are on a mission than its Fails need, the lowest-numbered of them play Fail, as many as it needs, and the rest play Success (seat 1 led first and the lead passes upward); analysis.missionCard.convention says which you are. Oberon and the other Evil do not see each other, so Oberon is outside it. Compare your card's effect if others play Success or Fail, including redundant exposure and the risk of too few Fails. Allies' future cards remain unknown; unresolved teammates may also be Evil and act independently. Oberon does not know allies. Weigh early exposure against cover, and prioritize a decisive sabotage over trust for a round that may never occur. Too few Evil cannot meet a two-Fail threshold. On a two-player first mission play Success: your partner would know exactly who failed."
       : request.state.stage === 'assassinate'
         ? assassinationCheck
         : request.state.stage === 'checkLoyalty'
@@ -261,6 +320,7 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
     ' ' +
     conversationVoiceAdvice +
     ' ' +
+    (regularTeam ? regularAnalysisAdvice : analysisAdvice) +
     'Play Avalon for your actual side and objective, using roleAdvice and privateKnowledge. Choose exactly one supplied legal choice. You choose strategy, trust, risk and public bluffing; known facts constrain private beliefs. No fixed speech, roster or vote is mandated. ' +
     'Completed missions establish results and Fail counts; rejected proposals played no cards and did not change the score. Each participant plays one card. An ordinary Success alone does not prove alignment; apply the winning-opportunity rule for decisive successes. Read failsRequired, approvalsRequired and score literally. Proposals 1–4 require a majority; proposal 5 runs automatically. Good needs three successes and Merlin surviving; Evil needs three failures or killing Merlin. Oberon knows no allies; use only visible privateKnowledge. ' +
     winningOpportunityAdvice +
@@ -301,7 +361,31 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
 }
 
 type Generate = (request: BotRequest, options: GenerationOptions, signal?: AbortSignal) => ReturnType<Decide>;
-export function decisionPipeline(generate: Generate): Decide {
+// The speaker's line ('speech') keeps the table's level: chat is what separates the bots from people.
+const LIGHT_PHASES = ['memory', 'echo', 'variety', 'brevity', 'evil-cover', 'merlin-cover', 'roster-repair', 'review'];
+
+/**
+ * Which calls get more or less thinking than the table's reasoning level: the assassination, final rosters, Lady
+ * checks and anything at match point settle games; rewording a line or reading old chat does not.
+ */
+function decisionWeight(request: BotRequest, phase?: string): GenerationOptions['weight'] {
+  if (LIGHT_PHASES.includes(phase || '')) return 'light';
+  const state = request.state;
+  if (!state || request.publicDiscussion) return undefined;
+  if (['assassinate', 'checkLoyalty', 'announceLoyalty'].includes(state.stage)) return 'critical';
+  if (state.stage === 'selectTeam') return 'critical';
+  const missions = (state.history || []).filter((event) => event.type === 'mission' && 'fails' in event) as {
+    fails: number;
+    settings?: { failsRequired?: number };
+  }[];
+  const failures = missions.filter((m) => m.fails >= (m.settings?.failsRequired ?? 1)).length;
+  if (failures >= 2 || missions.length - failures >= 2) return 'critical';
+  return undefined;
+}
+
+export function decisionPipeline(rawGenerate: Generate): Decide {
+  const generate: Generate = (request, options, signal) =>
+    rawGenerate(request, { weight: decisionWeight(request, options.phase), ...options }, signal);
   // Separate from bounded notes: survives evidence churn and technical continuation in this room.
   const exposedEvil = new Map<string, ExposedEvilState>();
   const evidence = new Map<string, DecisionEvidence[]>();
@@ -413,8 +497,56 @@ export function decisionPipeline(generate: Generate): Decide {
     evidence.set(request.playerID, retained);
     testimony.set(request.playerID, new Map([...sources].filter(([key]) => retained.some((note) => note.key === key))));
   };
+  // A reply that breaks the output contract is usually a one-off, and a paused match stalls every human at the
+  // table: ask once more. Provider failures are not retried here.
+  const retrying: Generate = async (call, options, signal) => {
+    try {
+      return await generate(call, options, signal);
+    } catch (error) {
+      if (!(error instanceof AiInvalidReply) || signal?.aborted) throw error;
+      return generate(call, options, signal);
+    }
+  };
+  // Rewrites of an already valid reply are optional: if one fails, keep the reply it would have replaced. A slow one
+  // gives up after a minute instead of holding the turn for the full Codex timeout (a stalled call paused a Codex
+  // check game for ten minutes).
+  const optional = async (call: BotRequest, options: GenerationOptions, signal?: AbortSignal) => {
+    const limit = AbortSignal.timeout(Number(process.env.AI_OPTIONAL_TIMEOUT_MS || 60000));
+    try {
+      return await generate(call, options, signal ? AbortSignal.any([signal, limit]) : limit);
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      return undefined;
+    }
+  };
   return async (request, signal) => {
     try {
+      // A Good seat's silent vote is the deduction engine's vote, after the same guards as a model vote, with no call:
+      // it was right more often than the model's votes, and at human tables confident words steered the model (where
+      // the two disagreed the engine was right 36 times, the model 19). With humans seated Merlin still votes through
+      // the model, whose cover reasoning weighs what the table is saying.
+      const voter = request.state.players?.find((p) => p.id === request.playerID);
+      if (
+        codeVotesEnabled() &&
+        request.state.stage === 'votingForTeam' &&
+        voter &&
+        !EVIL_ROLES.includes(voter.role) &&
+        (voter.role !== 'merlin' || !humanSeatNumbers(request).length)
+      ) {
+        const vote = codeVote(request);
+        const guard = vote && guardDecision(request, vote);
+        const index = vote ? request.choices.indexOf(guard ? guard.choice : vote) : -1;
+        if (index >= 0)
+          return {
+            choice: index,
+            speech: '',
+            privateReason: guard
+              ? `Server guard: ${guard.reason}`
+              : vote === 'approve'
+                ? 'Code vote: this roster is as safe as the best one I can form from what I know.'
+                : 'Code vote: a safer roster is available from what I know.',
+          };
+      }
       request = {
         ...request,
         humanMemory: [...(testimony.get(request.playerID)?.values() || [])],
@@ -474,7 +606,7 @@ export function decisionPipeline(generate: Generate): Decide {
             'Each key is t:AUTHOR:SUBJECT (e.g. t:7:King or t:2:role). Keep separate subjects and authors separate. Preserve exact names/aliases even without a seat mapping; never replace them with someone. ' +
             'In fact preserve earliest stance, intermediate reversal and latest stance in order, within240 characters. On same-key update retain relevant earlier history from modelHypotheses, never flatten a changed stance into a generic claim. A repeated claim is not a new role change. ' +
             'source is an array of1-8 NEW numeric references by that author: positive=humanStatements.id, -N=1-based chat slotN. Server retains earlier anchors; do not recopy their IDs. Cite the correction itself. kind=testimony, certainty=claim. Omit unchanged notes; at most12 are retained.';
-          const reply = await generate(
+          const reply = await retrying(
             memoryRequest,
             { phase: 'memory', decisionDetails: true, instructions, cacheInstructions: instructions, context },
             signal,
@@ -512,6 +644,8 @@ export function decisionPipeline(generate: Generate): Decide {
         }
       }
       // Private generation context only: never add preferences to public room facts.
+      const analysis = finalReview ? undefined : buildAnalysis(decisionRequest);
+      const stale = finalReview || !request.speak ? [] : stalePhrases(decisionRequest);
       const current = {
         ...facts,
         ...(priority ? { privateTieBreakOrder: [...priority] } : {}),
@@ -519,8 +653,17 @@ export function decisionPipeline(generate: Generate): Decide {
         ...(exposedEvil.has(request.playerID)
           ? { exposedEvil: structuredClone(exposedEvil.get(request.playerID)!) }
           : {}),
+        ...(analysis ? { analysis } : {}),
+        ...(stale.length
+          ? {
+              wornOutPhrases: {
+                phrases: stale,
+                rule: 'This table has already said these too often; players read them as a bot. Do not use them: say it in your own words or more briefly.',
+              },
+            }
+          : {}),
       };
-      let reply = await generate(
+      let reply = await retrying(
         decisionRequest,
         {
           phase: finalReview ? 'review' : 'decision',
@@ -558,7 +701,7 @@ export function decisionPipeline(generate: Generate): Decide {
       signal?.throwIfAborted();
       const missingExplanation = (requiresExplanation || changedTarget(reply)) && !reply.publicReason?.trim();
       if (missingExplanation || contradictsRoster(decisionRequest, reply)) {
-        reply = await generate(
+        reply = await retrying(
           decisionRequest,
           {
             phase: 'decision-repair',
@@ -594,6 +737,241 @@ export function decisionPipeline(generate: Generate): Decide {
         if (contradictsRoster(decisionRequest, reply))
           throw new AiTechnicalPause('Decision and explained roster disagree.');
       }
+      const excluded = finalReview ? [] : excludedButChosen(decisionRequest, reply);
+      if (excluded.length) {
+        // One repair, which may also keep the roster: the phrase check cannot always tell an argued case from a slip.
+        const repaired = await optional(
+          decisionRequest,
+          {
+            phase: 'roster-repair',
+            decisionDetails: true,
+            cacheInstructions: decisionInstructions(request, true),
+            instructions:
+              decisionInstructions(request) +
+              claimInstructions +
+              ` Your publicReason says ${excluded.join(', ')} stays off the team, but your selected roster ${request.choices[reply.choice]} includes ${excluded.length > 1 ? 'them' : 'that seat'}. Return the roster you actually mean, with a matching explanation; if ${excluded.join(', ')} does belong on it, say so plainly. Finish now.`,
+            context: {
+              ...current,
+              completedMissions: missions,
+              teamVotes: votes,
+              inconsistentReply: reply,
+              selectedChoice: request.choices[reply.choice],
+            },
+          },
+          signal,
+        );
+        signal?.throwIfAborted();
+        if (
+          repaired &&
+          !contradictsRoster(decisionRequest, repaired) &&
+          (!requiresExplanation || repaired.publicReason?.trim())
+        )
+          reply = repaired;
+      }
+      let guard = finalReview ? undefined : guardDecision(decisionRequest, request.choices[reply.choice]);
+      if (guard && ['selectTeam', 'checkLoyalty'].includes(request.state.stage)) {
+        // A spoken roster or Lady check gets one chance to revise its own explanation before the server substitutes it.
+        const revised = await optional(
+          decisionRequest,
+          {
+            phase: 'decision-guard',
+            decisionDetails: true,
+            cacheInstructions: decisionInstructions(request, true),
+            instructions:
+              decisionInstructions(request) +
+              claimInstructions +
+              ` Server check rejected your roster ${request.choices[reply.choice]}: ${guard.reason} Choose again from the same legal choices, for example ${guard.choice}, with matching private and public explanations. Finish now.`,
+            context: { ...current, completedMissions: missions, teamVotes: votes, rejectedReply: reply },
+          },
+          signal,
+        );
+        signal?.throwIfAborted();
+        if (
+          revised &&
+          !contradictsRoster(decisionRequest, revised) &&
+          (!requiresExplanation || revised.publicReason?.trim())
+        )
+          reply = revised;
+        guard = guardDecision(decisionRequest, request.choices[reply.choice]);
+      }
+      // Moving the shot off the assassin's own council pick needs a public explanation the server cannot write, so
+      // such a shot stays with the model.
+      if (guard && councilTarget && councilTarget !== guard.choice && request.state.stage === 'assassinate')
+        guard = undefined;
+      if (guard) {
+        const index = request.choices.indexOf(guard.choice);
+        if (index >= 0) {
+          const spoken = request.speak && request.state.stage === 'selectTeam';
+          reply = {
+            ...reply,
+            choice: index,
+            speech: `Server guard: ${guard.reason}`.slice(0, 240),
+            publicReason: spoken ? (requiresExplanation ? aiText(request.language).neutralProposal : '') : '',
+            claimMorgana: undefined,
+            claimStances: [],
+          };
+        }
+      }
+      // An Evil admission, anything an admitted Evil says and the assassin's changed-target note keep the decision's
+      // own words: the speaker and the rewrites know neither, and a line that drops the admission or later claims Good
+      // fails the exposed-Evil checks.
+      const ownWords =
+        Boolean(reply.admitEvil) ||
+        exposedEvil.has(request.playerID) ||
+        (request.state.stage === 'assassinate' && !request.councilDiscussion);
+      // Think, then talk (speaker.ts): with the action final, a short call writes the line from what a player has in
+      // mind. Its line must pass every speech check below; otherwise the decision's own line stays.
+      if (
+        speakerEnabled() &&
+        !ownWords &&
+        !finalReview &&
+        (request.speak || request.councilDiscussion) &&
+        reply.claimMorgana == null &&
+        !reply.claimStances?.length &&
+        (reply.publicReason?.trim() ||
+          requiresExplanation ||
+          (own && request.publicDiscussion && addressedToYou(request, own.index).length))
+      ) {
+        const draft = reply.publicReason?.trim() || '';
+        const instructions = speakerInstructions(request);
+        const spoken = await optional(
+          decisionRequest,
+          {
+            phase: 'speech',
+            decisionDetails: true,
+            cacheInstructions: instructions,
+            instructions,
+            context: speakerContext(decisionRequest, reply, { missions, votes }, draft),
+          },
+          signal,
+        );
+        signal?.throwIfAborted();
+        const line = spoken?.publicReason?.trim() || '';
+        const candidate = { ...reply, publicReason: line };
+        // A discussion seat may pass, as people do, unless someone just addressed it.
+        const passes =
+          spoken &&
+          !line &&
+          request.publicDiscussion &&
+          !requiresExplanation &&
+          !(own && addressedToYou(request, own.index).length);
+        const leaks = () => {
+          try {
+            safePublicSpeech(line, request.choices[reply.choice], request.language);
+            return false;
+          } catch {
+            return true;
+          }
+        };
+        // Council lines are open Merlin talk, so the role-leak check does not apply to them.
+        if (
+          line &&
+          line.length <= 240 &&
+          (request.councilDiscussion || !leaks()) &&
+          !contradictsRoster(decisionRequest, candidate) &&
+          !excludedButChosen(decisionRequest, candidate).length &&
+          !echoedPhrase(decisionRequest, line) &&
+          !failWish(decisionRequest, line) &&
+          !confessesFail(line) &&
+          !falseVoteClaim(decisionRequest, line) &&
+          (request.councilDiscussion || !merlinSpeechExposure(decisionRequest, line))
+        )
+          reply = candidate;
+        else if (passes) reply = { ...reply, publicReason: '' };
+      }
+      // One rewrite of the public words only, for a line a check flagged: the choice never changes. `accept` says
+      // whether the new line fixes it; `withhold` drops an optional line that stays broken.
+      const rewrite = async (phase: string, check: string, accept: (text: string) => boolean, withhold = false) => {
+        const revised = await optional(
+          decisionRequest,
+          {
+            phase,
+            decisionDetails: true,
+            cacheInstructions: decisionInstructions(request, true),
+            instructions:
+              decisionInstructions(request) +
+              claimInstructions +
+              ` Server check on your public text: ${check}${requiresExplanation ? '' : ' An empty publicReason is allowed.'} Finish now.`,
+            context: { ...current, completedMissions: missions, teamVotes: votes, rejectedReply: reply },
+          },
+          signal,
+        );
+        signal?.throwIfAborted();
+        const text = revised?.publicReason || '';
+        if (
+          revised &&
+          revised.choice === reply.choice &&
+          !contradictsRoster(decisionRequest, revised) &&
+          (!requiresExplanation || text.trim()) &&
+          accept(text)
+        )
+          reply = {
+            ...reply,
+            publicReason: revised.publicReason,
+            claimMorgana: revised.claimMorgana,
+            claimStances: revised.claimStances,
+          };
+        else if (withhold && !requiresExplanation)
+          reply = { ...reply, publicReason: '', claimMorgana: undefined, claimStances: [] };
+      };
+      const checksSpeech = !finalReview && !request.councilDiscussion && request.speak && !ownWords;
+      const keep = () => `Keep the same choice, ${request.choices[reply.choice]},`;
+      // Human testers' most common complaint: bots repeating each other's lines.
+      const echo = checksSpeech ? echoedPhrase(decisionRequest, reply.publicReason || '') : undefined;
+      if (echo)
+        await rewrite(
+          'echo',
+          `"${echo}" repeats an earlier chat line word for word, and players read copied lines as a bot. ${keep()} and rewrite publicReason in your own words and personality: answer a specific player, add what is new, or keep it to a short agreement.`,
+          (text) => !echoedPhrase(decisionRequest, text),
+        );
+      // Stock lines must not pile up over a game.
+      const worn =
+        stale.length && !finalReview && !ownWords
+          ? usedStalePhrases(decisionRequest, reply.publicReason || '', stale)
+          : [];
+      if (worn.length)
+        await rewrite(
+          'variety',
+          `${worn.map((pair) => `"${pair}"`).join(', ')} ${worn.length > 1 ? 'are' : 'is'} worn out at this table, and players read stock phrases as a bot. ${keep()} and rewrite publicReason in your own words and personality without them, shorter if you can.`,
+          (text) =>
+            !echoedPhrase(decisionRequest, text) && usedStalePhrases(decisionRequest, text, stale).length < worn.length,
+        );
+      const restated =
+        checksSpeech && !requiresExplanation ? restatedRoster(decisionRequest, reply.publicReason || '') : undefined;
+      // Once a proposal has its backers people either agree in a few words or say nothing; half of such turns (by seat
+      // and turn, so it is stable on retry) pass outright unless someone just addressed the seat, which also saves
+      // the rewrite call.
+      const quiet =
+        restated &&
+        own &&
+        !addressedToYou(request, own.index).length &&
+        (own.index + request.state.mission + request.state.vote) % 2 === 0;
+      if (quiet) reply = { ...reply, publicReason: '', claimMorgana: undefined, claimStances: [] };
+      else if (restated) {
+        const before = (reply.publicReason || '').length;
+        await rewrite(
+          'brevity',
+          `at least two players just argued for ${restated}, and a long restatement of the same case reads as a bot. ${keep()} and either agree in your own voice in at most ten words or leave publicReason empty. Add something only if it is new.`,
+          (text) => text.length < before,
+        );
+      }
+      // A line that still gives the wish away is withheld.
+      const wish = checksSpeech ? failWish(decisionRequest, reply.publicReason || '') : undefined;
+      if (wish)
+        await rewrite(
+          'evil-cover',
+          `"${wish}" reads as wanting the mission to fail, which only Evil wants. ${keep()} and rewrite publicReason as a Good player would argue for it, from public missions and votes.`,
+          (text) => !failWish(decisionRequest, text),
+          true,
+        );
+      const exposed = checksSpeech ? merlinSpeechExposure(decisionRequest, reply.publicReason || '') : undefined;
+      if (exposed)
+        await rewrite(
+          'merlin-cover',
+          `it names ${exposed.join(', ')}, whom you see as Evil, while the public record gives a Servant no reason to doubt ${exposed.length > 1 ? 'them' : 'that seat'} yet. Assassins look for exactly this kind of early accurate doubt. ${keep()} and rewrite publicReason so it does not doubt, warn against or exclude ${exposed.length > 1 ? 'those seats' : 'that seat'} without a public reason; naming them neutrally or favourably is fine.`,
+          () => true,
+          true,
+        );
       const choice = request.choices[reply.choice];
       if (choice === undefined) throw new AiTechnicalPause('Invalid private decision.');
       if (!finalReview) validateClaims(request, reply);
@@ -674,14 +1052,31 @@ export function decisionPipeline(generate: Generate): Decide {
           },
         ].slice(-4),
       );
+      // A leader's final pick is printed after "I propose <team>.", so an opening that names the team again goes.
+      const typed = finalReview
+        ? speech
+        : withoutRepeatedEmoji(request, own?.index ?? 0, humanTypography(speech, request.language));
+      const unrepeated =
+        request.state.stage === 'selectTeam' && !request.publicDiscussion
+          ? withoutTeamRepeat(typed, choice)
+          : request.publicDiscussion && spokenPass(typed)
+            ? ''
+            : typed;
       return {
         choice: request.choices.indexOf(choice),
-        speech,
+        // An invented vote is the most damaging tell, so an optional line that claims one stays unsaid.
+        speech:
+          (request.publicDiscussion && spokenPass(typed)) ||
+          (!requiresExplanation && !request.councilDiscussion && falseVoteClaim(request, typed))
+            ? ''
+            : unrepeated.trim() || typed,
         privateReason: finalReview ? undefined : reply.speech.slice(0, 240),
       };
     } catch (error) {
       const pause =
         error instanceof AiPause ? error : new AiTechnicalPause('AI decision or speech failed. Match paused.');
+      // Keep the underlying error for logs; players only see the pause message.
+      if (pause !== error) Object.assign(pause, { cause: error });
       throw pause;
     }
   };

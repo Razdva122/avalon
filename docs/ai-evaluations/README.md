@@ -4,6 +4,7 @@ Completed experiments retain their findings and measurement limits in Markdown.
 One-off runners and JSON/JSONL exports were removed during YAGNI cleanup on
 16 October 2026. They are not part of the maintained test or deployment tools.
 
+- [Deduction engine and guards](2026-10-22-deduction-engine/README.md): exact alignment bookkeeping per bot, saved positions 2/10 → 10/10, self-play blunder audit and Merlin cover voting.
 - [Alliance secrecy](2026-10-16-alliance-secrecy/README.md): six saved positions, before/after choices and winning-sabotage checks.
 - [Lady cover and Mordred exposure](2026-10-17-lady-cover/README.md): six saved positions, two samples per variant, target choices and announcement limits.
 - [Expanded Mordred Lady study](2026-10-17-mordred-lady-expanded/README.md): 14 saved decisions, linked announcements and explicit truthful-Evil plan comparisons.

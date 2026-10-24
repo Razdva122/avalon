@@ -1,5 +1,5 @@
 import fixture from './fixtures/decisive-match.json';
-import { decisionPipeline } from './pipeline';
+import { decisionPipeline, excludedButChosen } from './pipeline';
 import type { BotRequest } from './client';
 
 const request = () =>
@@ -73,4 +73,29 @@ test.each([
   const reply = await decisionPipeline(generate)(input);
   expect(generate).toHaveBeenCalledTimes(1);
   expect(input.choices[reply.choice]).toBe('2, 4, 5, 6');
+});
+
+test('a leader whose explanation leaves out a seat its roster includes gets one repair', async () => {
+  process.env.AI_DECISION_GUARDS = 'off';
+  try {
+    const base = request();
+    const leader = {
+      ...base,
+      publicDiscussion: false,
+      state: { ...base.state, stage: 'selectTeam' },
+      choices: ['1, 4, 5', '1, 4, 6'],
+    } as BotRequest;
+    const generate = jest
+      .fn()
+      .mockResolvedValueOnce({ choice: 0, speech: 'Private.', publicReason: '5, I am replacing 5 with 6 this time.' })
+      .mockResolvedValueOnce({ choice: 1, speech: 'Private.', publicReason: '5, I am replacing 5 with 6 this time.' });
+    const reply = await decisionPipeline(generate)(leader);
+    expect(generate.mock.calls.map(([, options]) => options.phase)).toEqual(['decision', 'roster-repair']);
+    expect(leader.choices[reply.choice]).toBe('1, 4, 6');
+    const says = (publicReason: string) => excludedButChosen(leader, { choice: 0, speech: '', publicReason });
+    expect(says("I'm not dropping 5 after that success.")).toEqual([]);
+    expect(says('Keeping 5 off this one.')).toEqual([5]);
+  } finally {
+    delete process.env.AI_DECISION_GUARDS;
+  }
 });

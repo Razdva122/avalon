@@ -82,7 +82,7 @@ test('saved regression positions contain no room or user identifiers or unobserv
   }
 });
 
-test('saved-position evaluation restores the original notes and leaves a legal model decision unchanged', async () => {
+test('saved-position evaluation restores the original notes and the guard rejects the losing approval', async () => {
   const entry = saved('m5-gambler-vote');
   const result = await evaluateCase(entry.id, 'after', async (prompt) => {
     const context = JSON.parse(prompt.split('GAME INPUT:\n')[1]);
@@ -112,7 +112,8 @@ test('saved-position evaluation restores the original notes and leaves a legal m
       usage: {},
     };
   });
-  expect(result).toMatchObject({ choice: 'approve', expectedChoice: 'reject', passed: false });
+  // The recorded approval sends a roster that fails ~96% of the time at 0-2 while a near-safe roster exists.
+  expect(result).toMatchObject({ choice: 'reject', expectedChoice: 'reject', passed: true });
 });
 
 test('the baseline evaluation sends the historical observer context without newly added cues', async () => {

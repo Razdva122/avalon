@@ -572,7 +572,11 @@ export class BotRoom extends Room {
         if (!this.isHuman(inspected.id))
           after.push({
             id: inspected.id,
-            text: aiText(this.language).inspectionResponse(this.label(id), answer.choice === 0),
+            text: aiText(this.language).inspectionResponse(
+              this.label(id),
+              answer.choice === 0,
+              Number(this.label(inspected.id)) || 0,
+            ),
             requestID: randomUUID(),
           });
       }
@@ -613,7 +617,8 @@ export class BotRoom extends Room {
     if (speak && answer.speech.trim()) {
       let speech = answer.speech.trim().replace(/\bplayers?\s*#?([1-8])\b/gi, '$1');
       if (task.startsWith('Choose the final team')) {
-        speech = `${aiText(this.language).proposal(choices[answer.choice].text)} ${speech}`;
+        const game = this.manager.game;
+        speech = `${aiText(this.language).proposal(choices[answer.choice].text, (game.turn ?? 0) * 5 + (state.vote ?? 0), this.label(id))} ${speech}`;
       }
       if (this.directAction) {
         this.directAction.before.push({ id, text: speech, requestID: randomUUID() });

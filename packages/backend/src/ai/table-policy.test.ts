@@ -2,6 +2,14 @@ import { decisionPipeline } from './pipeline';
 import fixtures from './fixtures/postulates.json';
 import type { BotRequest } from './client';
 
+// These fixtures check that prompts leave strategy to the model; dominated-move guards are tested separately.
+beforeAll(() => {
+  process.env.AI_DECISION_GUARDS = 'off';
+});
+afterAll(() => {
+  delete process.env.AI_DECISION_GUARDS;
+});
+
 test.each(
   fixtures.filter((f) =>
     ['mission-five-proven-evil', 'postulate-mordred-2', 'self-inclusion-proposal'].includes(f.name),
