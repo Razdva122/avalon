@@ -264,6 +264,19 @@ test('guards: with more known Evil on a mission than Fails needed, only the lowe
   expect(guardDecision(fourth(5), 'success')).toMatchObject({ choice: 'fail' });
   // Oberon sees nobody, so it is outside the convention.
   expect(guardDecision(card(5, { 5: 'oberon' }, opening, 1, [2, 4, 5]), 'fail')).toBeUndefined();
+  // The server cannot play a human's card: with human seat 4 designated, bot 5's choice stays open, and at two Good
+  // successes its Fail is the last chance (review of PR #18).
+  const withHuman = (history: Event[], mission: number, team: number[]) => ({
+    ...card(5, { 4: 'morgana', 5: 'mordred' }, history, mission, team),
+    humanPlayerIDs: ['4'],
+  });
+  expect(guardDecision(withHuman(opening, 1, [2, 4, 5]), 'fail')).toBeUndefined();
+  const twoSuccesses = [mission(0, [1, 2], 0), mission(1, [1, 2, 3], 0)];
+  expect(guardDecision(withHuman(twoSuccesses, 2, [1, 4, 5]), 'fail')).toBeUndefined();
+  expect(guardDecision(withHuman(twoSuccesses, 2, [1, 4, 5]), 'success')).toMatchObject({ choice: 'fail' });
+  expect(buildAnalysis(withHuman(opening, 1, [2, 4, 5]))?.missionCard).toMatchObject({
+    convention: expect.stringContaining('4 is human and may not follow it'),
+  });
 });
 
 test('guards: before any failure Merlin votes as a Servant would; afterwards its choice stands', () => {
@@ -595,6 +608,105 @@ test('guards: a Good leader always puts itself on its own team, in place of the 
     reason: expect.stringContaining('leaves themselves off'),
   });
   expect(guardDecision(request, '1, 2, 6')).toBeUndefined();
+});
+
+test('pipeline: when a guard replaces the roster of an admitting Evil leader, the admission matches the published words', async () => {
+  // Morgana leads and leaves herself off; the guard puts her on 1, 2, 6 (review of PR #18).
+  const table = (stage = 'selectTeam') => ({
+    ...game({
+      players: 7,
+      observer: 1,
+      roles: { 1: 'morgana', 5: 'mordred' },
+      history: [mission(0, [3, 4], 1)],
+      stage,
+      mission: 1,
+      leader: 1,
+      team: stage === 'selectTeam' ? [] : [1, 2, 6],
+    }),
+    speak: stage === 'selectTeam',
+    ...(stage === 'selectTeam' ? { choices: ['2, 3, 6', '1, 2, 6', '1, 2, 3', '1, 3, 6', '2, 5, 6'] } : {}),
+  });
+  const plan = {
+    mode: 'direct' as const,
+    promotedSeat: 5,
+    desiredSeat: 5,
+    audienceSeat: 6,
+    rationale: '6 still follows my lead on rosters.',
+    reconsiderWhen: '6 stops following my rosters.',
+  };
+  const admits = (choice: number) => ({
+    choice,
+    speech: 'My cover is gone.',
+    publicReason: 'Fine, I am evil. This team still deserves a look.',
+    admitEvil: true,
+    exposedStrategy: plan,
+    evidence: [],
+  });
+  const run = async (admission?: ReturnType<typeof admits>) => {
+    const contexts: Record<string, unknown>[] = [];
+    const decide = decisionPipeline(async (request, options) => {
+      contexts.push(options.context as Record<string, unknown>);
+      if (options.phase === 'decision')
+        return request.state.stage === 'selectTeam' ? admits(0) : { choice: 0, speech: 'Vote.', evidence: [] };
+      if (options.phase === 'admission' && admission) return admission;
+      throw Error('optional call unavailable');
+    });
+    const reply = await decide(table());
+    await decide(table('votingForTeam'));
+    return { reply, next: contexts[contexts.length - 1] };
+  };
+  // Every optional call unavailable: the substituted roster goes out without the admission, which waits.
+  const unavailable = await run();
+  expect(table().choices[unavailable.reply.choice]).toBe('1, 2, 6');
+  expect(unavailable.reply.speech).not.toMatch(/evil/i);
+  expect(unavailable.next.publicEvilAdmissions).toEqual([]);
+  expect(unavailable.next).not.toHaveProperty('exposedEvil');
+  // An admission for the server's roster is published with it.
+  const again = await run(admits(1));
+  expect(table().choices[again.reply.choice]).toBe('1, 2, 6');
+  expect(again.reply.speech).toContain('I am evil');
+  expect(again.next.publicEvilAdmissions).toEqual([1]);
+  expect(again.next.exposedEvil).toEqual({ admitted: true, plan });
+  // One for another roster is not taken.
+  const elsewhere = await run(admits(2));
+  expect(elsewhere.reply.speech).not.toMatch(/evil/i);
+  expect(elsewhere.next.publicEvilAdmissions).toEqual([]);
+});
+
+test('pipeline: a withheld line records none of its claims', async () => {
+  // Percival leads the opener and claims Morgana, but the line also invents a vote, so it is withheld.
+  const table = (observer: number, stage: string) => ({
+    ...game({
+      players: 7,
+      observer,
+      roles: { 3: 'percival', 5: 'morgana' },
+      history: [],
+      stage,
+      mission: 0,
+      leader: 3,
+      team: stage === 'selectTeam' ? [] : [3, 6],
+    }),
+    speak: stage === 'selectTeam',
+    ...(stage === 'selectTeam' ? { choices: ['3, 6', '1, 3', '3, 5'] } : {}),
+  });
+  const requests: BotRequest[] = [];
+  const decide = decisionPipeline(async (request, options) => {
+    requests.push(request);
+    if (options.phase !== 'decision') throw Error('optional call unavailable');
+    return request.state.stage === 'selectTeam'
+      ? {
+          choice: 0,
+          speech: 'Claim Percival.',
+          publicReason: 'I am Percival. 1 is Morgana. 4 approved earlier.',
+          claimMorgana: 1,
+          claimStances: [],
+          evidence: [],
+        }
+      : { choice: 0, speech: 'Vote.', evidence: [] };
+  });
+  expect((await decide(table(3, 'selectTeam'))).speech).toBe('');
+  await decide(table(5, 'votingForTeam'));
+  expect(requests[requests.length - 1].publicRoleClaims ?? []).toEqual([]);
 });
 
 test('speech: a long restatement of a proposal two players already backed is flagged, new points are not', () => {

@@ -285,6 +285,9 @@ export function buildAnalysis(request: BotRequest) {
       const saboteurs = conventionSaboteurs(team, knowledge.evil, context.failsRequired);
       if (bits(team & knowledge.evil) <= context.failsRequired) return undefined;
       if (score.failures >= 2) return 'A Fail wins the game now, so every Evil card may be a Fail.';
+      const humanSaboteurs = maskOf(saboteurs) & knowledge.humans & ~bit(own.index);
+      if (humanSaboteurs && !saboteurs.includes(own.index))
+        return `By the convention ${label(maskOf(saboteurs))} play${saboteurs.length > 1 ? '' : 's'} the Fail, but ${label(humanSaboteurs)} ${bits(humanSaboteurs) > 1 ? 'are humans' : 'is human'} and may not follow it: weigh what they said and whether this mission must fail.`;
       return saboteurs.includes(own.index)
         ? `You are among the lowest-numbered Evil you know on this team: if it is to fail, your Fail is needed, and ${label(team & knowledge.evil & ~maskOf(saboteurs))} will play Success.`
         : `Play Success: by the convention ${label(maskOf(saboteurs))} play${saboteurs.length > 1 ? '' : 's'} the Fail, and a second Fail only exposes you.`;

@@ -616,6 +616,23 @@ forced an Oberon bot to announce Mordred as Evil at 70% and 68% public suspicion
 called burning a teammate; the guard now forces only clear cases (an ally at 90% or more is told truthfully, one
 under 50% is covered) and leaves the middle to the model.
 
+## Review of PR #18
+
+The maintainer's review found four faults, each reproduced by a test that failed before the fix:
+
+- **Admission after a guard swap.** A guard that replaced an admitting Evil leader's roster kept the admission but
+  dropped its words, and the exposed-Evil check paused the match. A first admission now gets one call to restate it
+  for the server's roster, or waits for a later turn; repaired replies are taken only if they pass the exposed-Evil
+  and leak checks.
+- **Convention with a human ally.** The one-Fail convention could switch a bot's Fail to Success because a human
+  ally was the one due to fail. The server plays only bot cards, so with a human designated the bot's card stays its
+  own, and at two Good successes the last-chance rule makes it Fail.
+- **Claims from withheld lines.** A line withheld for an invented vote had already recorded its Percival claim and
+  stances. The published line is now settled first, and claims, stances and the post-game record follow it.
+- **Remote timeout.** The three-minute attempt deadline covered only a local Codex CLI. It now covers the SSH worker
+  too: the SSH session is closed (the worker's launcher then removes the Codex container) and the attempt is retried
+  once, as is a worker `timeout` reply.
+
 ## Limits
 
 - Sample sizes are small. Six saved positions are development positions, not an

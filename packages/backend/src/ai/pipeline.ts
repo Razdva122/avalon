@@ -737,6 +737,24 @@ export function decisionPipeline(rawGenerate: Generate): Decide {
         if (contradictsRoster(decisionRequest, reply))
           throw new AiTechnicalPause('Decision and explained roster disagree.');
       }
+      // A repaired reply must still pass the exposed-Evil checks and the leak filter that end this turn; one that does
+      // not is not taken, so it cannot pause the match.
+      const publishable = (candidate: BotReply) => {
+        try {
+          const next = nextExposedEvilState(request, candidate, exposedEvil.get(request.playerID));
+          if (request.speak && request.state.stage !== 'assassinate')
+            safePublicSpeech(
+              candidate.publicReason || '',
+              request.choices[candidate.choice] ?? '',
+              request.language,
+              candidate.claimMorgana != null,
+              Boolean(next),
+            );
+          return true;
+        } catch {
+          return false;
+        }
+      };
       const excluded = finalReview ? [] : excludedButChosen(decisionRequest, reply);
       if (excluded.length) {
         // One repair, which may also keep the roster: the phrase check cannot always tell an argued case from a slip.
@@ -764,7 +782,8 @@ export function decisionPipeline(rawGenerate: Generate): Decide {
         if (
           repaired &&
           !contradictsRoster(decisionRequest, repaired) &&
-          (!requiresExplanation || repaired.publicReason?.trim())
+          (!requiresExplanation || repaired.publicReason?.trim()) &&
+          publishable(repaired)
         )
           reply = repaired;
       }
@@ -789,7 +808,8 @@ export function decisionPipeline(rawGenerate: Generate): Decide {
         if (
           revised &&
           !contradictsRoster(decisionRequest, revised) &&
-          (!requiresExplanation || revised.publicReason?.trim())
+          (!requiresExplanation || revised.publicReason?.trim()) &&
+          publishable(revised)
         )
           reply = revised;
         guard = guardDecision(decisionRequest, request.choices[reply.choice]);
@@ -802,6 +822,7 @@ export function decisionPipeline(rawGenerate: Generate): Decide {
         const index = request.choices.indexOf(guard.choice);
         if (index >= 0) {
           const spoken = request.speak && request.state.stage === 'selectTeam';
+          const admission = reply.admitEvil ? reply : undefined;
           reply = {
             ...reply,
             choice: index,
@@ -810,6 +831,47 @@ export function decisionPipeline(rawGenerate: Generate): Decide {
             claimMorgana: undefined,
             claimStances: [],
           };
+          // An admission went out with the model's words for its own choice. A first admission gets one call to make
+          // it with the server's choice; otherwise it waits for a later turn, and the model sees that it is not in
+          // publicEvilAdmissions. A seat that has already admitted loses nothing.
+          if (admission) {
+            const previous = exposedEvil.get(request.playerID);
+            const again = previous
+              ? undefined
+              : await optional(
+                  decisionRequest,
+                  {
+                    phase: 'admission',
+                    decisionDetails: true,
+                    cacheInstructions: decisionInstructions(request, true),
+                    instructions:
+                      decisionInstructions(request) +
+                      claimInstructions +
+                      ` Server check replaced your choice ${request.choices[admission.choice]} with ${guard.choice}: ${guard.reason} Your public words and admission were for the old choice. Return ${guard.choice} with a publicReason for it in your own words. To admit your own Evil alignment now, say so in it with admitEvil=true and your exposedStrategy; to wait, use admitEvil=false and exposedStrategy=null. Finish now.`,
+                    context: { ...current, completedMissions: missions, teamVotes: votes, rejectedReply: admission },
+                  },
+                  signal,
+                );
+            signal?.throwIfAborted();
+            if (
+              again?.admitEvil &&
+              again.choice === index &&
+              !contradictsRoster(decisionRequest, again) &&
+              (!requiresExplanation || again.publicReason?.trim()) &&
+              publishable(again)
+            )
+              reply = {
+                ...reply,
+                publicReason: again.publicReason,
+                admitEvil: true,
+                exposedStrategy: again.exposedStrategy,
+                strategyChangeReason: again.strategyChangeReason,
+              };
+            else
+              reply = previous
+                ? { ...reply, admitEvil: false }
+                : { ...reply, admitEvil: false, exposedStrategy: undefined, strategyChangeReason: undefined };
+          }
         }
       }
       // An Evil admission, anything an admitted Evil says and the assassin's changed-target note keep the decision's
@@ -995,9 +1057,25 @@ export function decisionPipeline(rawGenerate: Generate): Decide {
         throw new AiTechnicalPause('Repeat proposal requires a public leader explanation.');
       if (changedTarget(reply) && !speech.trim())
         throw new AiTechnicalPause('Changed assassination target requires a public explanation.');
+      // The words the room receives, settled before anything is recorded about them. A leader's final pick is printed
+      // after "I propose <team>.", so an opening that names the team again goes. An invented vote is the most damaging
+      // tell, so an optional line that claims one stays unsaid, unless it carries the decision's own words: an
+      // admission or an admitted Evil's line passed the exposed-Evil checks as written.
+      const typed = finalReview
+        ? speech
+        : withoutRepeatedEmoji(request, own?.index ?? 0, humanTypography(speech, request.language));
+      const withheld =
+        (request.publicDiscussion && spokenPass(typed)) ||
+        (!requiresExplanation &&
+          !request.councilDiscussion &&
+          !(ownWords && !finalReview) &&
+          Boolean(falseVoteClaim(request, typed)));
+      const unrepeated =
+        request.state.stage === 'selectTeam' && !request.publicDiscussion ? withoutTeamRepeat(typed, choice) : typed;
+      const published = withheld ? '' : unrepeated.trim() || typed;
       if (nextExposure) exposedEvil.set(request.playerID, structuredClone(nextExposure));
       // Record only metadata accompanying published model speech, never generate speech from metadata.
-      if (speech.trim() && own && !finalReview && !request.councilDiscussion) {
+      if (published.trim() && own && !finalReview && !request.councilDiscussion) {
         if (reply.claimMorgana != null)
           publicClaims.set(own.index, { by: own.index, target: reply.claimMorgana, status: 'claim' });
         const stances = new Map((publicStances.get(request.playerID) || []).map((s) => [s.seat, s]));
@@ -1021,7 +1099,7 @@ export function decisionPipeline(rawGenerate: Generate): Decide {
             choice,
             legalChoices: [...request.choices],
             reason: reply.speech.slice(0, 240),
-            publicStatement: speech.slice(0, 500),
+            publicStatement: published.slice(0, 500),
             speechRules: {
               public: Boolean(request.speak),
               optionalAnnouncement: Boolean(request.optionalSpeech),
@@ -1052,24 +1130,9 @@ export function decisionPipeline(rawGenerate: Generate): Decide {
           },
         ].slice(-4),
       );
-      // A leader's final pick is printed after "I propose <team>.", so an opening that names the team again goes.
-      const typed = finalReview
-        ? speech
-        : withoutRepeatedEmoji(request, own?.index ?? 0, humanTypography(speech, request.language));
-      const unrepeated =
-        request.state.stage === 'selectTeam' && !request.publicDiscussion
-          ? withoutTeamRepeat(typed, choice)
-          : request.publicDiscussion && spokenPass(typed)
-            ? ''
-            : typed;
       return {
         choice: request.choices.indexOf(choice),
-        // An invented vote is the most damaging tell, so an optional line that claims one stays unsaid.
-        speech:
-          (request.publicDiscussion && spokenPass(typed)) ||
-          (!requiresExplanation && !request.councilDiscussion && falseVoteClaim(request, typed))
-            ? ''
-            : unrepeated.trim() || typed,
+        speech: published,
         privateReason: finalReview ? undefined : reply.speech.slice(0, 240),
       };
     } catch (error) {

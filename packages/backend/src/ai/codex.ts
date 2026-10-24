@@ -204,19 +204,29 @@ const runCodexOnce = async (
   if (instructions !== undefined && (!instructions || !prompt.startsWith(instructions)))
     throw new AiTechnicalPause('Invalid Codex instruction prefix.');
   if (hasRemoteCodex()) {
-    const result = (await remoteCodex(
-      {
-        operation: 'decide',
-        prompt,
-        schema,
-        settings,
-        instructions,
-      },
-      signal,
-    )) as {
-      text?: unknown;
-      usage?: Usage;
-    } | null;
+    // The same attempt deadline as the local CLI below. Closing the SSH session makes the worker's launcher remove
+    // the Codex container, and runCodex retries the attempt once.
+    const attempt = new AbortController();
+    const timer = setTimeout(() => attempt.abort(), CODEX_ATTEMPT_TIMEOUT_MS);
+    let result: { text?: unknown; usage?: Usage } | null;
+    try {
+      result = (await remoteCodex(
+        {
+          operation: 'decide',
+          prompt,
+          schema,
+          settings,
+          instructions,
+        },
+        signal ? AbortSignal.any([signal, attempt.signal]) : attempt.signal,
+      )) as typeof result;
+    } catch (error) {
+      if (attempt.signal.aborted && !signal?.aborted)
+        throw new CodexRequestFailed('Codex response timed out. Retry the match.');
+      throw error;
+    } finally {
+      clearTimeout(timer);
+    }
     if (!result || typeof result.text !== 'string' || !result.usage || typeof result.usage !== 'object')
       throw new AiTechnicalPause('Invalid Codex worker decision.');
     return { text: result.text, usage: result.usage };

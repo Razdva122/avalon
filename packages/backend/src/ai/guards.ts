@@ -218,9 +218,15 @@ export function guardDecision(request: BotRequest, choice: string): Guard | unde
         : undefined;
     if (failures >= 2 && choice !== 'fail')
       return { choice: 'fail', reason: 'A failed mission wins the game for Evil now.' };
-    // A Fail that ends the game exposes nobody, so the convention only governs the others.
+    // A Fail that ends the game exposes nobody, so the convention only governs the others. The server plays only
+    // bot cards: a human saboteur may not follow the convention, so with one designated the choice stays open.
     const saboteurs = conventionSaboteurs(team, knowledge.evil, r);
-    if (failures < 2 && bits(team & knowledge.evil) > r && !saboteurs.includes(own.index))
+    if (
+      failures < 2 &&
+      bits(team & knowledge.evil) > r &&
+      !saboteurs.includes(own.index) &&
+      !(maskOf(saboteurs) & knowledge.humans)
+    )
       return choice === 'fail'
         ? {
             choice: 'success',
