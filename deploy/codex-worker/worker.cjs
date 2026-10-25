@@ -186,12 +186,41 @@ async function quotaDiagnostic() {
   }
 }
 
+// As in the backend's codex.ts: Codex's own coding-agent prompt, skills list and permission, apps and collaboration
+// notes are most of every call's input and say nothing about Avalon. AI_CODEX_LEAN=off restores Codex's defaults.
+const BASE_INSTRUCTIONS =
+  'You play one seat in a game of Avalon. Follow the developer instructions and reply only with JSON matching the output schema.\n';
+
+// The model's own catalog entry with its coding tools off, as leanCatalog in the backend's codex.ts: only fields this
+// Codex's catalog has change, and without the entry the call keeps Codex's catalog. In the container AI_CODEX_LEAN
+// comes from launch.sh's docker environment.
+async function leanCatalog(model) {
+  try {
+    const listing = promisify(execFile)('codex', ['debug', 'models'], { timeout: 20000, maxBuffer: LIMIT });
+    listing.child.stdin?.end();
+    const entry = JSON.parse((await listing).stdout).models?.find((m) => m.slug === model);
+    if (!entry) return undefined;
+    const lean = { tool_mode: 'direct', multi_agent_version: null, experimental_supported_tools: [] };
+    Object.assign(lean, { apply_patch_tool_type: null, model_messages: null });
+    const known = Object.entries(lean).filter(([key]) => key in entry);
+    return JSON.stringify({ models: [{ ...entry, ...Object.fromEntries(known) }] });
+  } catch {
+    return undefined;
+  }
+}
+
 async function decide(request) {
   const directory = await mkdtemp('/tmp/avalon-game-');
   try {
     const schema = join(directory, 'schema.json'),
-      output = join(directory, 'reply.json');
+      output = join(directory, 'reply.json'),
+      base = join(directory, 'base.md'),
+      catalogFile = join(directory, 'catalog.json'),
+      lean = process.env.AI_CODEX_LEAN !== 'off';
     await writeFile(schema, JSON.stringify(request.schema));
+    if (lean) await writeFile(base, BASE_INSTRUCTIONS);
+    const catalog = lean && request.settings ? await leanCatalog(request.settings.model) : undefined;
+    if (catalog) await writeFile(catalogFile, catalog);
     const args = [
       'exec',
       '--ignore-user-config',
@@ -231,6 +260,17 @@ async function decide(request) {
       'web_search="disabled"',
       '-c',
       'tools.view_image=false',
+      ...(lean
+        ? [
+            '-c',
+            `model_instructions_file=${JSON.stringify(base)}`,
+            '-c',
+            'skills.include_instructions=false',
+            ...['permissions', 'apps', 'collaboration_mode'].flatMap((k) => ['-c', `include_${k}_instructions=false`]),
+            ...['sleep_tool', 'goals'].flatMap((k) => ['-c', `features.${k}=false`]),
+          ]
+        : []),
+      ...(catalog ? ['-c', `model_catalog_json=${JSON.stringify(catalogFile)}`] : []),
       ...(request.settings ? ['--model', request.settings.model] : []),
       '-C',
       directory,
