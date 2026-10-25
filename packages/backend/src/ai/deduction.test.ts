@@ -329,8 +329,12 @@ test('code votes: at a bot-only table a Good seat votes from the deduction engin
   const withHuman = { ...game(servantOptions()), humanPlayerIDs: ['5'] };
   expect(await decisionPipeline(generate)(withHuman)).toMatchObject({ choice: 1, speech: '' });
   expect(generate).not.toHaveBeenCalled();
+  // Before the fourth proposal Merlin's off-team vote is the Servant cover vote either way, so it needs no call.
   const merlin = { ...game({ ...servantOptions(), roles: { 3: 'merlin', 4: 'evil' } }), humanPlayerIDs: ['5'] };
-  await decisionPipeline(generate)(merlin).catch(() => undefined);
+  expect(await decisionPipeline(generate)(merlin)).toMatchObject({ choice: 1, speech: '' });
+  expect(generate).not.toHaveBeenCalled();
+  const late = { ...game({ ...servantOptions(), roles: { 3: 'merlin', 4: 'evil' }, vote: 3 }), humanPlayerIDs: ['5'] };
+  await decisionPipeline(generate)(late).catch(() => undefined);
   expect(generate).toHaveBeenCalled();
   generate.mockClear();
   const evil = game({ ...servantOptions(), roles: { 4: 'morgana', 5: 'evil' }, observer: 4 });
@@ -647,12 +651,13 @@ test('pipeline: when a guard replaces the roster of an admitting Evil leader, th
     const decide = decisionPipeline(async (request, options) => {
       contexts.push(options.context as Record<string, unknown>);
       if (options.phase === 'decision')
-        return request.state.stage === 'selectTeam' ? admits(0) : { choice: 0, speech: 'Vote.', evidence: [] };
+        return request.publicDiscussion ? { choice: 0, speech: 'Talk.', evidence: [] } : admits(0);
       if (options.phase === 'admission' && admission) return admission;
       throw Error('optional call unavailable');
     });
     const reply = await decide(table());
-    await decide(table('votingForTeam'));
+    // The next turn: a discussion before the following proposal.
+    await decide({ ...table(), publicDiscussion: true });
     return { reply, next: contexts[contexts.length - 1] };
   };
   // Every optional call unavailable: the substituted roster goes out without the admission, which waits.

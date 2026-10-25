@@ -3,7 +3,9 @@
 // runs without turn timers here; an unanswered turn falls back to a default action after AI_LAB_TURN_MINUTES.
 // --deal-only prints the seats and roles for AI_LAB_SEED without any model call, to pick deals; --fake-bots always
 // takes the first legal choice, to check the mailbox flow for free. --evil-bots=old|new runs the Evil bot seats on
-// another build than --bots, to score one side's play against the same opponents.
+// another build than --bots, to score one side's play against the same opponents. The output lists every model call
+// with its phase and token usage (token-report.ts); --fake-model answers them with canned replies, to count calls and
+// prompt sizes for free.
 // Bots run through the local Codex CLI and its ChatGPT login, as production does.
 // Usage: AI_LAB_SEED=11 [AI_LAB_BASELINE=/abs/baseline-ai] \
 //   npx ts-node --transpile-only src/ai/lab/human-play.ts --players=7 --humans=2 --bots=new [--evil-bots=old] \
@@ -71,6 +73,10 @@ async function main() {
   let decide: Decide = async () => {
     throw new AiPause('No model calls with --deal-only');
   };
+  // Each model call's phase, reasoning, prompt size and token usage. --fake-model runs the real pipelines on canned
+  // replies instead of the model, to count calls and prompt sizes for free.
+  const fakeModel = process.argv.includes('--fake-model');
+  const calls: { phase: string; stage: string; reasoning: string; chars: number; usage?: unknown }[] = [];
   if (process.argv.includes('--fake-bots'))
     decide = async (request) => ({
       choice: 0,
@@ -81,13 +87,31 @@ async function main() {
     if ([bots, evilBots].includes('old') && !baseline) throw Error('AI_LAB_BASELINE is not set');
     const generate: Parameters<typeof decisionPipeline>[0] = async (request, options, signal) => {
       const built = buildCodexPrompt(options.instructions, options.context, options.cacheInstructions);
+      const effort = callEffort(reasoning, options.weight, ['minimal', 'low', 'medium', 'high']);
+      const call = { phase: options.phase || 'decision', stage: request.state.stage, reasoning: effort };
+      if (fakeModel) {
+        calls.push({ ...call, chars: built.prompt.length });
+        // Distinct short lines, so the speech checks rarely ask for rewrites; a leader includes itself.
+        const own = request.state.players.find((p) => p.id === request.playerID)?.index;
+        const team = request.choices.findIndex((c) => c.split(', ').includes(String(own)));
+        return {
+          choice:
+            request.state.stage === 'selectTeam' && team >= 0
+              ? team
+              : Math.floor(Math.random() * request.choices.length),
+          speech: 'private',
+          publicReason: request.speak || request.councilDiscussion ? `line ${calls.length} from ${own}` : '',
+          evidence: [],
+        };
+      }
       const result = await runCodex(
         built.prompt,
         codexSchema(request.choices, Boolean(options.decisionDetails), request.state.stage === 'end', request),
         signal,
-        { model, reasoning: callEffort(reasoning, options.weight, ['minimal', 'low', 'medium', 'high']) },
+        { model, reasoning: effort },
         built.instructions,
       );
+      calls.push({ ...call, chars: built.prompt.length, usage: result.usage });
       return labParse(result.text, request, Boolean(options.decisionDetails));
     };
     const pipeline = (which: string) =>
@@ -494,6 +518,7 @@ async function main() {
       .map((e) => (e.type === 'mission' ? { n: e.index + 1, result: e.result, fails: e.fails } : null)),
     assassination: game?.history.filter((e) => e.type === 'assassinate'),
     decisions: trace.length,
+    calls,
     humanTurns: humanTrace.length,
     timeouts: humanTrace.filter((t) => t.source === 'timeout').length,
   };

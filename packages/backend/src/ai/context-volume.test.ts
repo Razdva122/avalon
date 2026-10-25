@@ -14,11 +14,15 @@ test('Good receives its facts and risk comparison without private Evil strategy'
   const evil = structuredClone(good);
   evil.state.players.find((p) => p.id === evil.playerID)!.role = 'mordred';
   expect(decisionInstructions(evil)).toContain('Evil alliance secrecy:');
+  expect(decisionInstructions(evil)).not.toContain('Good team risk comparison:');
+  // Lady announcement rules arrive with the first Lady check.
+  expect(decisionInstructions(good)).not.toContain('Lady rule for this AI table');
   good.state.stage = 'checkLoyalty';
   evil.state.stage = 'checkLoyalty';
   expect(decisionInstructions(good)).toContain('Lady inspection:');
   expect(decisionInstructions(good)).not.toContain('Evil Lady tradeoff:');
   expect(decisionInstructions(evil)).toContain('Evil Lady tradeoff:');
+  expect(decisionInstructions(good)).toContain('Lady rule for this AI table');
 });
 
 test('a speaking decision includes one personality copy and no constant protocol fields', async () => {

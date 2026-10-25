@@ -633,6 +633,41 @@ The maintainer's review found four faults, each reproduced by a test that failed
   too: the SSH session is closed (the worker's launcher then removes the Codex container) and the attempt is retried
   once, as is a worker `timeout` reply.
 
+## Token use
+
+The maintainer's 100 games on GPT Luna: complete bad decisions fell from 20% to 15%, but tokens per game rose 82%.
+Every model call was then logged with its phase and Codex usage (`lab/human-play.ts`, `lab/token-report.ts`; one
+seated human that passes and approves, `low` reasoning; free call counts with `--fake-model`).
+
+- **Codex's own prompt.** Each `codex exec` sent 10,900 input tokens for a one-line prompt: the coding-agent prompt,
+  a skills list, permission, apps and collaboration notes, and the model's coding tools (a JavaScript runner,
+  multi-agent tools, user questions). A one-line base prompt, those notes off and the model's own catalog entry
+  without its tools bring that to 360 (`AI_CODEX_LEAN=off` restores the defaults). At low reasoning Luna spent no
+  reasoning tokens, and Codex reported no cached input, so input size and the number of calls set the cost.
+- **Calls the server settles.** A silent vote or mission card that the guards settle the same way for either answer
+  (Merlin's cover votes before any failure, a winning Fail, the Fail convention) no longer reaches the model.
+- **Rewrites.** Each flagged check (copied line, stock phrase, restatement, Fail wish, Merlin's early doubt) used to
+  cost its own call with the full decision prompt; one rewrite now answers all of them, through the speaker's short
+  prompt unless a Percival claim must be kept.
+- **Prompt text.** The analysis guide, the Good team risk comparison and the Lady announcement rules go only to the
+  seats and moments they are for. The speaker and line rewrites keep the table's reasoning level instead of the
+  raised one for leaders, and re-explaining a guarded choice is a light call.
+
+Three deals each, original and new bots, both on the lean Codex settings:
+
+| Bots     | Tokens per game | Tokens per bot turn | Calls per bot turn | Missions | Proposals rejected |
+| -------- | --------------- | ------------------- | ------------------ | -------- | ------------------ |
+| Original | 302k            | 6.1k                | 0.99               | 3.3      | 0 of 10            |
+| New      | 584k            | 6.0k                | 1.01               | 4.7      | 12 of 26           |
+
+Per bot turn the new bots now cost what the original ones do. The lean settings take about 10,500 tokens off every
+call, by the one-line measurement above roughly 60% of what an original bot turn costs on Codex's defaults. Their games are longer: two of the original's three ended 0-3 in three missions with every team
+approved, while the new Good seats rejected risky teams and the games went to four or five missions. Of the new
+bots' tokens, 71% are decisions, 23% the speaker and 6% guard re-explanations and rewrites; `AI_SPEAKER=off` drops the
+speaker. On these six games the right-answer benchmark found the new bots' logged decisions right at least as often
+as the original's in every category, so the lean Codex settings did not visibly change play; three games per side is
+too few for more.
+
 ## Limits
 
 - Sample sizes are small. Six saved positions are development positions, not an

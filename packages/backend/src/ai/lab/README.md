@@ -21,6 +21,9 @@ node --no-warnings src/ai/lab/seat.ts /tmp/hp/5-new/human-1 answer 3 '{"vote":"r
 npx ts-node --transpile-only src/ai/lab/make-baseline.ts fb9bbbf6 /tmp/baseline-ai   # the original bots
 ```
 
+Every game log lists its model calls with phase, reasoning and Codex token usage; `--fake-model` runs the real
+pipelines on canned replies instead, to count calls and prompt sizes for free.
+
 ## Measuring logged games (no model calls)
 
 ```sh
@@ -31,6 +34,8 @@ npx ts-node --transpile-only src/ai/lab/decision-bench.ts [--flips] [--fixture=<
 npx ts-node --transpile-only src/ai/lab/chat-score.ts /tmp/hp-*.json
 # The assassin: Merlin's rank in merlinCandidates, logged shots and shots after the guard.
 npx ts-node --transpile-only src/ai/lab/assassin-eval.ts /tmp/hp-*.json
+# Tokens per game, per bot turn and per call phase.
+npx ts-node --transpile-only src/ai/lab/token-report.ts /tmp/hp-*.json
 ```
 
 `AI_DECISION_GUARDS=off` disables the guards, which isolates the analysis block's effect on the model's choices.

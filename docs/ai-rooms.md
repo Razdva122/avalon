@@ -180,11 +180,19 @@ a Fail wins, Good approving a provably sabotage-capable roster, or a match-point
 approval far riskier than a reachable alternative. It also casts Merlin's silent
 vote as a Servant in that seat would on cheap or early votes, so voting does not
 reveal Merlin's sight, and Good seats other than Merlin vote from the engine
-without a model call. After the decision a second short call (`ai/speaker.ts`)
-writes the public line from the bot's personality, role posture and the chat;
-server checks rewrite or drop lines that repeat stock phrases, leak a role or
-contradict the action. Each call's reasoning effort follows its stakes
-(`decisionWeight` in `ai/pipeline.ts`).
+without a model call. A silent vote or mission card that the guards would settle
+the same way whatever the model answered gets no model call either. After the
+decision a second short call (`ai/speaker.ts`) writes the public line from the
+bot's personality, role posture and the chat; server checks drop lines that leak
+a role or contradict the action, and one short rewrite answers everything else
+they flag (copied lines, stock phrases, long restatements). Each call's reasoning
+effort follows its stakes (`decisionWeight` in `ai/pipeline.ts`).
+
+Codex runs with a one-line base prompt instead of its coding-agent prompt, without
+its skills list and permission, apps and collaboration notes, and with the model's
+own catalog entry (from `codex debug models`) stripped of its coding tools: a
+one-line prompt costs 360 input tokens instead of 10,900 (`ai/codex.ts`, mirrored
+in the remote worker). `AI_CODEX_LEAN=off` restores Codex's defaults.
 
 `AI_DECISION_GUARDS=off` disables the guards and engine votes, `AI_CODE_VOTES=off`
 only the engine votes, `AI_SPEAKER=off` the speaker call, and

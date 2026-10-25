@@ -262,12 +262,41 @@ test('a failed optional rewrite keeps the reply it would have replaced', async (
     chat: [{ name: '3', text: 'Keep them: they already delivered a clean success.' }],
   } as BotRequest;
   const generate = jest.fn(async (_r, options) => {
-    if (options.phase === 'echo') throw new AiInvalidReply('Codex returned an invalid response.');
+    if (options.phase === 'line') throw new AiInvalidReply('Codex returned an invalid response.');
     return { choice: 0, speech: 'Private.', publicReason: 'Fine, they already delivered a clean success.' };
   });
   const reply = await decisionPipeline(generate)(echoed);
-  expect(generate.mock.calls.map(([, options]) => options.phase)).toEqual(['decision', 'echo']);
+  expect(generate.mock.calls.map(([, options]) => options.phase)).toEqual(['decision', 'line']);
   expect(reply.speech).toBe('Fine, they already delivered a clean success.');
+});
+
+test('a flagged line gets one rewrite, through the speaker prompt when the speaker is on', async () => {
+  const echoed: BotRequest = {
+    ...request,
+    chat: [{ name: '3', text: 'Keep them: they already delivered a clean success.' }],
+  } as BotRequest;
+  const generate = jest.fn(async (_r, options) =>
+    options.phase === 'line'
+      ? { choice: 0, speech: 'Private.', publicReason: 'Same team, it worked last time.' }
+      : { choice: 0, speech: 'Private.', publicReason: 'Fine, they already delivered a clean success.' },
+  );
+  process.env.AI_SPEAKER = 'on';
+  try {
+    const reply = await decisionPipeline(generate)(echoed);
+    // The speaker repeats the copied line too, so the decision's line goes to the rewrite.
+    expect(generate.mock.calls.map(([, options]) => options.phase)).toEqual(['decision', 'speech', 'line']);
+    const line = generate.mock.calls[2][1];
+    expect(line.instructions).toContain('writing your next chat line');
+    expect(line.instructions).toContain('repeats an earlier chat line');
+    expect(line.context).not.toHaveProperty('analysis');
+    expect(reply.speech).toBe('Same team, it worked last time.');
+  } finally {
+    process.env.AI_SPEAKER = 'off';
+  }
+  // Without the speaker the rewrite keeps the decision's prompt.
+  generate.mockClear();
+  await decisionPipeline(generate)(echoed);
+  expect(generate.mock.calls[1][1].instructions).not.toContain('writing your next chat line');
 });
 
 test('evidence outlives four turns and public speech receives only the intended public reason', async () => {
