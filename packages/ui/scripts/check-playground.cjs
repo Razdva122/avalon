@@ -197,9 +197,27 @@ const puppeteer = require('puppeteer');
     await seed([[2, 2, 4, 0]]);
     await open();
     await page.focus('.puzzle-2048-board');
-    for (const key of ['ArrowLeft', 'ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft']) await page.keyboard.press(key);
+    await page.evaluate(() => {
+      window.__bornPaints = [];
+      let frames = 0;
+      const sample = () => {
+        if (document.querySelector('.tile-born'))
+          window.__bornPaints.push(JSON.parse(localStorage.getItem('avalon.playground.2048.v1')).nextID);
+        if (++frames < 30) requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+      const board = document.querySelector('.puzzle-2048-board');
+      board.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      window.__firstMoveID = JSON.parse(localStorage.getItem('avalon.playground.2048.v1')).nextID;
+      for (const key of ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft'])
+        board.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+    });
     await page.waitForFunction(() => document.querySelectorAll('.tile-born').length > 0);
     await new Promise((resolve) => setTimeout(resolve, 450));
+    assert.ok(
+      await page.evaluate(() => window.__bornPaints.includes(window.__firstMoveID)),
+      'a queued move must allow the newly created tiles to paint before sliding again',
+    );
     const rapid = await saved();
     assert.ok(rapid.tiles.every((t) => t.row >= 0 && t.row < 4 && t.col >= 0 && t.col < 4));
     assert.equal(new Set(rapid.tiles.map((t) => `${t.row},${t.col}`)).size, rapid.tiles.length);
@@ -304,10 +322,15 @@ const puppeteer = require('puppeteer');
     await open();
     await page.focus('.puzzle-2048-board');
     await page.keyboard.press('ArrowLeft');
+    await page.waitForSelector('.tile-crowned .grail-aura');
+    assert.equal(await page.$('.game-end'), null, 'the Grail accent is visible before the win message');
     await page.waitForSelector('.game-end', { visible: true });
     assert.equal((await saved()).score, 2048);
     await page.click('.game-end .game-primary');
     assert.equal((await saved()).continued, true);
+    await close();
+    await open();
+    assert.equal(await page.$('.tile-crowned'), null, 'restoring a 2048 tile must not replay its first-time accent');
     await close();
     await seed([
       [2, 4, 2, 4],
@@ -456,6 +479,8 @@ const puppeteer = require('puppeteer');
     );
   } finally {
     await browser?.close();
+    fixture.io.disconnectSockets(true);
+    server.closeAllConnections();
     await new Promise((resolve) => fixture.io.close(resolve));
     if (server.listening) await new Promise((resolve) => server.close(resolve));
   }

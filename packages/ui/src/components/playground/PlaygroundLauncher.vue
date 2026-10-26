@@ -64,7 +64,19 @@
           :aria-busy="loading"
           @click="chooseGame"
         >
-          <span class="picker-game-icon picker-number-grid" aria-hidden="true"><i>2</i><i>0</i><i>4</i><i>8</i></span>
+          <span class="picker-game-icon picker-runestone" aria-hidden="true">
+            <svg viewBox="0 0 72 72" fill="none">
+              <rect class="rune-underlay" x="15" y="12" width="44" height="50" rx="7" transform="rotate(-9 37 37)" />
+              <rect class="rune-slab" x="11" y="10" width="50" height="51" rx="7" />
+              <rect class="rune-bevel" x="14" y="13" width="44" height="45" rx="5" />
+              <path class="rune-etch" d="M18 26v-9h9m18 0h9v9M18 45v9h9m18 0h9v-9M18 21h4v-4m28 0v4h4" />
+              <text x="36" y="38" text-anchor="middle">2048</text>
+              <path
+                class="rune-cup"
+                d="M31 43h10l-1 4a4 4 0 0 1-8 0l-1-4Zm5 8v4m-3 0h6m-8-11h-2v2a3 3 0 0 0 3 3m9-5h2v2a3 3 0 0 1-3 3"
+              />
+            </svg>
+          </span>
           <strong>{{ loading ? $t('mainPage.loading') : '2048' }}</strong>
         </button>
         <button v-for="slot in 2" :key="slot" class="playground-choice playground-soon" type="button" disabled>
@@ -244,6 +256,7 @@ async function chooseGame() {
   font-size: 13px;
   text-align: center;
   color: rgb(var(--v-theme-text-primary));
+  transition: background-color 140ms ease;
 }
 .picker-game-icon {
   display: grid;
@@ -259,37 +272,49 @@ async function chooseGame() {
   width: 36px;
   height: 36px;
 }
-.picker-number-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 3px;
-  padding: 9px;
-  background: #263d3f;
-  border-color: #9b7a46;
+.picker-runestone {
+  background: linear-gradient(145deg, #345153, #182f33);
+  border-color: #a78b50;
+  box-shadow:
+    inset 0 0 0 3px #1a3135,
+    inset 0 0 0 4px #a78b5055;
 }
-.picker-number-grid i {
-  display: grid;
-  place-items: center;
+.picker-runestone svg {
   width: 100%;
   height: 100%;
-  border-radius: 4px;
-  background: #d7d0be;
-  font-style: normal;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 17px;
-  font-weight: 800;
-  color: #29445c;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
 }
-.picker-number-grid i:nth-child(2) {
-  background: #c1c2b5;
+.rune-underlay {
+  fill: #929786;
+  stroke: #b5ad8d;
 }
-.picker-number-grid i:nth-child(3) {
-  background: #566c77;
-  color: #f4e8cf;
+.rune-slab {
+  fill: #d7d0be;
+  stroke: #969882;
+  stroke-width: 1.5;
 }
-.picker-number-grid i:nth-child(4) {
-  background: #2f4d58;
-  color: #f5e7cc;
+.rune-bevel {
+  stroke: #f5efd9;
+}
+.rune-etch {
+  stroke: #858c79;
+}
+.picker-runestone text {
+  fill: #263b3e;
+  font:
+    bold 18px Georgia,
+    'Times New Roman',
+    serif;
+  letter-spacing: -1px;
+}
+.rune-cup {
+  stroke: #7d673b;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.playground-game-2048:active .picker-runestone svg {
+  transform: scale(0.96);
 }
 .playground-soon {
   color: rgb(var(--v-theme-text-secondary));
@@ -304,10 +329,19 @@ button:focus-visible {
   outline-offset: 3px;
 }
 @media (hover: hover) and (pointer: fine) {
+  .playground-game-2048:hover .picker-runestone svg {
+    transform: translateY(-2px);
+  }
   .playground-launcher:hover,
   .picker-close:hover,
   .playground-choice:not(:disabled):hover {
     background: rgb(var(--v-theme-inset-hover));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .picker-runestone svg {
+    transition: none;
+    transform: none !important;
   }
 }
 </style>

@@ -11,7 +11,7 @@
     @after-leave="afterClose"
     @after-enter="focusBoard"
   >
-    <section class="playground-panel" @keydown="onKey">
+    <section class="playground-panel" :style="{ '--tile-slide-duration': `${slideDuration}ms` }" @keydown="onKey">
       <header class="playground-header">
         <button
           v-if="backLabel"
@@ -95,11 +95,15 @@
                     'tile-born': bornIDs.includes(tile.id),
                     'tile-merged': mergedIDs.includes(tile.id),
                     'tile-long': tile.value >= 1024,
+                    'tile-crowned': tile.id === grailID,
                   },
                 ]"
               >
                 <svg
+                  v-for="layer in mergedIDs.includes(tile.id) ? ['base', 'glow'] : ['base']"
+                  :key="layer"
                   class="tile-carving"
+                  :class="{ 'tile-rune-glow': layer === 'glow' }"
                   viewBox="0 0 100 100"
                   fill="none"
                   stroke="currentColor"
@@ -110,6 +114,7 @@
                     <path d="M5 27V5h22M5 13h8V5m0 15h7v-7h-7v7Zm7-7 5-5M9 24l4-4" />
                   </g>
                 </svg>
+                <span v-if="tile.id === grailID" class="grail-aura" />
                 <svg
                   v-if="tile.value >= 2048"
                   class="tile-grail"
@@ -124,7 +129,7 @@
                     d="M5 4h14l-1 6a6 6 0 0 1-12 0L5 4Zm7 12v5m-5 0h10M5 6H2v2a5 5 0 0 0 5 5M19 6h3v2a5 5 0 0 1-5 5"
                   />
                 </svg>
-                <span>{{ tile.value }}</span>
+                <span class="tile-glyph">{{ tile.value }}</span>
               </div>
             </div>
           </div>
@@ -217,6 +222,8 @@ persist();
 const rendered = ref<Tile[]>(state.value.tiles);
 const bornIDs = ref<number[]>([]),
   mergedIDs = ref<number[]>([]);
+const grailID = ref<number | null>(null),
+  celebrating = ref(false);
 const confirmReset = ref(false),
   animating = ref(false),
   scoreGain = ref(0),
@@ -224,11 +231,13 @@ const confirmReset = ref(false),
 let queued: Direction | null = null;
 let frame = 0;
 let timer: ReturnType<typeof setTimeout> | undefined;
+let grailTimer: ReturnType<typeof setTimeout> | undefined;
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const slideDuration = 140;
 const won = computed(() => state.value.tiles.some((tile) => tile.value >= 2048) && !state.value.continued);
 const over = computed(() => !canMove(state.value.tiles));
 const message = computed(() => {
-  if (animating.value) return null;
+  if (animating.value || celebrating.value) return null;
   if (confirmReset.value) return { title: copy.value.reset, text: copy.value.resetText, action: copy.value.resetYes };
   if (won.value) return { title: copy.value.won, text: copy.value.wonText, action: copy.value.keep };
   if (over.value) return { title: copy.value.over, text: copy.value.overText, action: copy.value.again };
@@ -265,6 +274,10 @@ function move(direction: Direction) {
   }
   const result = moveTiles(state.value, direction);
   if (!result.changed) return;
+  const firstGrail =
+    !state.value.continued &&
+    !state.value.tiles.some((tile) => tile.value >= 2048) &&
+    result.state.tiles.find((tile) => tile.value === 2048);
   bornIDs.value = [];
   mergedIDs.value = [];
   animating.value = true;
@@ -272,19 +285,30 @@ function move(direction: Direction) {
   // Commit and save the final board immediately, even if the panel closes mid-animation.
   state.value = spawnTile(result.state);
   persist();
-  scoreGain.value = result.gain;
-  gainRevision.value++;
   timer = setTimeout(
     () => {
       rendered.value = state.value.tiles;
       mergedIDs.value = result.mergedIDs;
       bornIDs.value = [state.value.nextID - 1];
-      animating.value = false;
-      const pending = queued;
-      queued = null;
-      if (pending) nextTick(() => move(pending));
+      scoreGain.value = result.gain;
+      gainRevision.value++;
+      if (firstGrail && !reducedMotion.matches) {
+        grailID.value = firstGrail.id;
+        celebrating.value = true;
+        grailTimer = setTimeout(() => (celebrating.value = false), 480);
+      }
+      const finish = () => {
+        animating.value = false;
+        const pending = queued;
+        queued = null;
+        if (pending) move(pending);
+      };
+      // Paint the final positions before another input retargets newly mounted stones.
+      // Otherwise Vue can combine both updates and make the next slide jump.
+      if (reducedMotion.matches) void nextTick(finish);
+      else frame = requestAnimationFrame(() => (frame = requestAnimationFrame(finish)));
     },
-    reducedMotion.matches ? 0 : 130,
+    reducedMotion.matches ? 0 : slideDuration,
   );
 }
 function requestReset() {
@@ -294,6 +318,9 @@ function requestReset() {
 }
 function reset() {
   clearTimeout(timer);
+  clearTimeout(grailTimer);
+  celebrating.value = false;
+  grailID.value = null;
   cancelAnimationFrame(frame);
   queued = null;
   animating.value = false;
@@ -375,6 +402,7 @@ function cancelPointer() {
 }
 onBeforeUnmount(() => {
   clearTimeout(timer);
+  clearTimeout(grailTimer);
   cancelAnimationFrame(frame);
   queued = null;
   cancelPointer();
@@ -544,8 +572,9 @@ button:disabled {
   background-color: #233b3d;
   background-image: linear-gradient(#183134ce, #183134ce), url('@/assets/images/playground/runestone.webp');
   background-size:
-    auto,
-    192px 192px;
+    100% 100%,
+    100% 100%;
+  background-repeat: no-repeat;
   border: 2px solid #967744;
   box-shadow:
     inset 0 0 0 2px #152c2e,
@@ -590,7 +619,7 @@ button:disabled {
   position: absolute;
   width: calc((100% - 3 * var(--board-gap)) / 4);
   height: calc((100% - 3 * var(--board-gap)) / 4);
-  transition: transform 130ms var(--game-ease);
+  transition: transform var(--tile-slide-duration) var(--game-ease);
 }
 .tile-face {
   --stone-color: #d7d0be;
@@ -617,7 +646,7 @@ button:disabled {
     inset 0 1px 1px #ffffff85,
     inset 0 -2px 1px #00000045,
     0 2px 3px #071c2660;
-  > span {
+  > .tile-glyph {
     z-index: 2;
     text-shadow: 0 1px 1px #00000045;
   }
@@ -641,8 +670,8 @@ button:disabled {
   opacity: 0.55;
   pointer-events: none;
 }
-.tile-2 > span,
-.tile-4 > span {
+.tile-2 > .tile-glyph,
+.tile-4 > .tile-glyph {
   text-shadow:
     0 1px 0 #ffffff85,
     0 -1px 0 #00000025;
@@ -699,7 +728,7 @@ button:disabled {
     inset 0 1px 1px #fff0bd70,
     inset 0 0 0 3px #bea05d35,
     0 0 12px #d1a74545;
-  > span {
+  > .tile-glyph {
     transform: translateY(-12%);
   }
 }
@@ -725,15 +754,75 @@ button:disabled {
   pointer-events: none;
 }
 .tile-born {
-  animation: tile-arrive 160ms var(--game-ease) both;
+  animation: tile-arrive 180ms var(--game-ease) both;
 }
 .tile-merged {
-  animation: tile-combine 180ms var(--game-ease) both;
+  animation: tile-combine 220ms var(--game-ease) both;
+}
+.tile-merged > .tile-glyph {
+  animation: glyph-reveal 120ms var(--game-ease) both;
+}
+.tile-rune-glow {
+  color: #f1cc78;
+  filter: drop-shadow(0 0 2px #e4b94e);
+  animation: rune-glint 260ms ease-out both;
+}
+.grail-aura {
+  position: absolute;
+  inset: 8%;
+  border: 1px solid #ffe5a3;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 10px #f2ca6a55,
+    0 0 10px #f2ca6a55;
+  pointer-events: none;
+  animation: grail-bloom 300ms var(--game-ease) both;
+}
+.tile-crowned .tile-grail {
+  animation: grail-shine 300ms ease-out both;
+}
+@keyframes glyph-reveal {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes rune-glint {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes grail-bloom {
+  from {
+    opacity: 0.9;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.16);
+  }
+}
+@keyframes grail-shine {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  35% {
+    opacity: 1;
+  }
 }
 @keyframes tile-arrive {
   from {
     opacity: 0;
-    transform: scale(0.88);
+    transform: scale(0.94);
   }
   to {
     opacity: 1;
@@ -742,10 +831,10 @@ button:disabled {
 }
 @keyframes tile-combine {
   0% {
-    transform: scale(0.96);
+    transform: scale(0.98);
   }
   45% {
-    transform: scale(1.1);
+    transform: scale(1.055);
   }
   100% {
     transform: scale(1);
@@ -767,7 +856,7 @@ button:disabled {
   }
   to {
     opacity: 0;
-    transform: translateY(-32px);
+    transform: translateY(-24px);
   }
 }
 .game-hint {
@@ -970,11 +1059,18 @@ button:disabled {
   }
   .tile-born,
   .tile-merged,
+  .tile-merged > .tile-glyph,
+  .tile-crowned .tile-grail,
   .score-gain {
     animation: none;
   }
   .score-gain {
     display: none;
+  }
+  .tile-rune-glow,
+  .grail-aura {
+    display: none;
+    animation: none;
   }
   button {
     transition: background-color 120ms ease;
