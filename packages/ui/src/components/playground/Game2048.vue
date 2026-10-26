@@ -40,11 +40,18 @@
         </button>
       </header>
       <div class="playground-content">
-        <div class="game-heading">
-          <h2 id="playground-title">2048<span aria-hidden="true">.</span></h2>
-          <span class="game-mark" aria-hidden="true">✦</span>
+        <div class="game-identity">
+          <div class="game-brand" :class="{ 'game-brand-hidden': turnActive }" :aria-hidden="turnActive || undefined">
+            <div class="game-heading">
+              <h2 id="playground-title">2048<span aria-hidden="true">.</span></h2>
+              <span class="game-mark" aria-hidden="true">✦</span>
+            </div>
+            <p class="game-subtitle">{{ copy.title }}</p>
+          </div>
+          <Transition name="turn-notice">
+            <PlaygroundTurnNotice v-if="turnActive" class="game-turn-notice" @return="dialogOpen = false" />
+          </Transition>
         </div>
-        <p class="game-subtitle">{{ copy.title }}</p>
         <div class="game-toolbar">
           <div class="game-stat">
             <span>{{ copy.score }}</span
@@ -183,7 +190,8 @@ import { useI18n } from 'vue-i18n';
 import { canMove, createGame, loadGame, moveTiles, saveGame, spawnTile, swipeDirection } from './game2048';
 import type { Direction, Game2048, Tile } from './game2048';
 import { copy2048 } from './messages2048';
-defineProps<{ backLabel?: string }>();
+import PlaygroundTurnNotice from './PlaygroundTurnNotice.vue';
+defineProps<{ backLabel?: string; turnActive?: boolean }>();
 const emit = defineEmits<{ (event: 'close'): void; (event: 'back'): void }>();
 let returnToPicker = false;
 function afterClose() {
@@ -440,6 +448,26 @@ button:disabled {
 }
 .playground-content {
   padding: 0 24px 22px;
+}
+.game-identity {
+  position: relative;
+  display: flow-root;
+}
+.game-brand-hidden {
+  visibility: hidden;
+}
+.game-turn-notice {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+.turn-notice-enter-active,
+.turn-notice-leave-active {
+  transition: opacity 160ms ease;
+}
+.turn-notice-enter-from,
+.turn-notice-leave-to {
+  opacity: 0;
 }
 .game-heading {
   display: flex;

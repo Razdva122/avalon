@@ -1,5 +1,7 @@
 export default {
   menu: {
+    playgroundTurnTitle: 'Đến lượt bạn ở Avalon',
+    playgroundReturn: 'Về bàn chơi',
     playgroundTitle: 'Trò chơi nhỏ',
     playgroundClose: 'Đóng khu trò chơi',
     playgroundSoon: 'Sắp ra mắt',

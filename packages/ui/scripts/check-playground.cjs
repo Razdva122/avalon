@@ -365,16 +365,79 @@ const puppeteer = require('puppeteer');
     if (screenshotDir) await page.screenshot({ path: path.join(screenshotDir, '2048-mobile-dark.png') });
     await close();
     await open();
+    const beforeTurn = await saved();
+    const beforeTurnBounds = await page.$eval('.puzzle-2048-board', (el) => {
+      const r = el.getBoundingClientRect();
+      return [r.x, r.y, r.width, r.height];
+    });
     fixture.room.game.players[0].features.waitForAction = true;
     fixture.io.emit('gameUpdated', fixture.room.game);
-    await page.waitForSelector('.playground-panel', { hidden: true });
-    assert.ok(
+    await page.waitForSelector('.playground-panel .playground-turn-notice', { visible: true, timeout: 5000 });
+    assert.equal(
       await page.$eval('.playground-launcher', (button) => button.disabled),
-      'own turn closes and disables playground',
+      false,
+      'own turn must not disable playground',
     );
+    assert.deepEqual(await saved(), beforeTurn, 'turn notification preserves the current game');
+    const afterTurnBounds = await page.$eval('.puzzle-2048-board', (el) => {
+      const r = el.getBoundingClientRect();
+      return [r.x, r.y, r.width, r.height];
+    });
+    assert.deepEqual(afterTurnBounds, beforeTurnBounds, 'notification must not move or resize the board');
+    assert.ok(
+      await page.$eval('.puzzle-2048-board', (el) => document.activeElement === el),
+      'notification must not steal keyboard focus',
+    );
+    await page.keyboard.press('ArrowRight');
+    await page.waitForFunction(
+      (nextID) => JSON.parse(localStorage.getItem('avalon.playground.2048.v1')).nextID > nextID,
+      {},
+      beforeTurn.nextID,
+    );
+    assert.ok(await page.$('.playground-turn-notice'), 'game stays playable while turn notice is visible');
+    await page.waitForFunction(
+      () => getComputedStyle(document.querySelector('.playground-panel .playground-turn-notice')).opacity === '1',
+    );
+    await page.waitForFunction(
+      () =>
+        !document
+          .querySelector('.playground-panel')
+          .getAnimations({ subtree: true })
+          .some((animation) => animation.playState === 'running'),
+    );
+    if (screenshotDir) await page.screenshot({ path: path.join(screenshotDir, 'turn-notice-mobile.png') });
+    await close();
+    await page.click('.playground-launcher');
+    await page.waitForSelector('.playground-picker .playground-turn-notice', { visible: true });
+    assert.equal(
+      await page.$eval('.playground-game-2048', (button) => button.disabled),
+      false,
+      '2048 can be opened while an action is pending',
+    );
+    await page.locator('.playground-picker .playground-turn-return').click();
+    await page.waitForSelector('.playground-picker', { hidden: true });
+    await page.setViewport({ width: 1366, height: 768 });
+    await open();
+    assert.ok(
+      await page.$('.playground-panel .playground-turn-notice'),
+      'notice is visible when opening during an existing turn',
+    );
+    assert.ok(
+      await page.$eval('.playground-panel', (el) => el.scrollHeight - el.clientHeight <= 1),
+      'notice does not cause desktop scrolling',
+    );
+    if (screenshotDir) await page.screenshot({ path: path.join(screenshotDir, 'turn-notice-desktop.png') });
     fixture.room.game.players[0].features.waitForAction = false;
     fixture.io.emit('gameUpdated', fixture.room.game);
-    await page.waitForFunction(() => !document.querySelector('.playground-launcher').disabled);
+    await page.waitForSelector('.playground-turn-notice', { hidden: true });
+    assert.ok(await page.$('.puzzle-2048-board'), 'game remains open after the action is completed');
+    fixture.room.game.players[0].features.waitForAction = true;
+    fixture.io.emit('gameUpdated', fixture.room.game);
+    await page.waitForSelector('.playground-turn-notice', { visible: true });
+    await page.locator('.playground-panel .playground-turn-return').click();
+    await page.waitForSelector('.playground-panel', { hidden: true });
+    fixture.room.game.players[0].features.waitForAction = false;
+    fixture.io.emit('gameUpdated', fixture.room.game);
     // Storage can be denied in private contexts; play should remain available and honest about saving.
     await page.evaluate(() =>
       Object.defineProperty(window, 'localStorage', {
@@ -389,7 +452,7 @@ const puppeteer = require('puppeteer');
     assert.ok(await page.$('.save-warning'));
     assert.deepEqual(errors, []);
     console.log(
-      '2048 browser checks passed: on-demand JS/CSS, compact desktop layout, keyboard, rapid input, native touch/cancel, local restore, win/loss, corrupt/blocked storage and reduced motion.',
+      '2048 browser checks passed: on-demand JS/CSS, compact desktop layout, non-blocking turn notices, keyboard, rapid input, native touch/cancel, local restore, win/loss, corrupt/blocked storage and reduced motion.',
     );
   } finally {
     await browser?.close();

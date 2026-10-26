@@ -178,7 +178,7 @@ The board, score and best score stay in `localStorage` under
 `avalon.playground.2048.v1`; no account or backend is involved. Invalid saves start
 fresh, and blocked storage leaves the game playable with a visible saving notice.
 Pointer swipes are confined to the board; arrow keys, WASD and on-screen controls
-are available. The panel closes and saves when the room requires the player's action.
+are available. When the room requires the player's action, a persistent notice replaces the game heading without moving the board. The game stays open and playable; its notice offers an explicit return-to-table button. The picker also shows the notice and remains available during a turn.
 
 Run the engine tests with `node --test packages/ui/scripts/playground-2048.test.cjs`.
 The browser check runs as part of `npm run check:build --workspace=packages/ui`;

@@ -2,13 +2,13 @@
   <button
     class="playground-launcher"
     type="button"
-    :disabled="turnActive"
     :title="$t('menu.playground')"
     :aria-label="$t('menu.playground')"
     :aria-expanded="pickerOpen || visible"
     aria-haspopup="dialog"
     @click="pickerOpen = true"
   >
+    <span v-if="turnActive" class="playground-turn-dot" aria-hidden="true" />
     <svg
       viewBox="0 0 24 24"
       fill="none"
@@ -54,12 +54,13 @@
           </svg>
         </button>
       </header>
+      <PlaygroundTurnNotice v-if="turnActive" class="picker-turn-notice" @return="close" />
       <div class="playground-choices">
         <button
           ref="firstGame"
           class="playground-choice playground-game-2048"
           type="button"
-          :disabled="loading || turnActive"
+          :disabled="loading"
           :aria-busy="loading"
           @click="chooseGame"
         >
@@ -92,6 +93,7 @@
     :is="game"
     v-if="visible && game"
     :back-label="$t('menu.playgroundBack')"
+    :turn-active="turnActive"
     @back="
       visible = false;
       pickerOpen = true;
@@ -105,7 +107,8 @@ import type { Component } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import eventBus from '@/helpers/event-bus';
-const props = defineProps<{ turnActive?: boolean }>();
+import PlaygroundTurnNotice from './PlaygroundTurnNotice.vue';
+defineProps<{ turnActive?: boolean }>();
 const game = shallowRef<Component>();
 const firstGame = ref<HTMLButtonElement>();
 function focusFirstGame() {
@@ -124,22 +127,16 @@ function close() {
   visible.value = false;
   pendingGame = false;
 }
-watch(
-  () => props.turnActive,
-  (active) => {
-    if (active) close();
-  },
-);
 watch(() => route.fullPath, close);
 onBeforeUnmount(close);
 function afterPickerLeave() {
-  if (pendingGame && !props.turnActive) {
+  if (pendingGame) {
     pendingGame = false;
     visible.value = true;
   }
 }
 async function chooseGame() {
-  if (loading.value || props.turnActive) return;
+  if (loading.value) return;
   const request = ++revision;
   loading.value = true;
   try {
@@ -147,7 +144,7 @@ async function chooseGame() {
     game.value ??= markRaw(
       (await import(/* webpackChunkName: "playground-2048", webpackPrefetch: false */ './Game2048.vue')).default,
     );
-    if (request === revision && !props.turnActive) {
+    if (request === revision) {
       pendingGame = true;
       pickerOpen.value = false;
     }
@@ -160,6 +157,7 @@ async function chooseGame() {
 </script>
 <style scoped>
 .playground-launcher {
+  position: relative;
   display: grid;
   place-items: center;
   width: 44px;
@@ -168,6 +166,20 @@ async function chooseGame() {
   border-radius: 12px;
   color: rgb(var(--v-theme-primary));
   touch-action: manipulation;
+}
+.playground-turn-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d49a29;
+  box-shadow: 0 0 0 2px rgb(var(--v-theme-surface));
+  pointer-events: none;
+}
+.picker-turn-notice {
+  margin-bottom: 18px;
 }
 .playground-launcher svg {
   width: 25px;

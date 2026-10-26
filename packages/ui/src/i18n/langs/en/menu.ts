@@ -4,6 +4,8 @@
  */
 export default {
   menu: {
+    playgroundTurnTitle: 'Your turn in Avalon',
+    playgroundReturn: 'Return to table',
     playgroundTitle: 'Mini-games',
     playgroundClose: 'Close playground',
     playgroundSoon: 'Coming soon',

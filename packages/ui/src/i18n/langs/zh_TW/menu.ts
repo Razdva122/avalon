@@ -4,6 +4,8 @@
  */
 export default {
   menu: {
+    playgroundTurnTitle: '阿瓦隆輪到你了',
+    playgroundReturn: '返回牌桌',
     playgroundTitle: '小遊戲',
     playgroundClose: '關閉遊樂場',
     playgroundSoon: '即將推出',
