@@ -37,13 +37,58 @@ function fixture() {
     { hidden: false },
   );
   const dashboard = exports.useBotDashboard();
-  return { store, requests, listeners, dashboard, stop: () => cleanup.forEach((fn) => fn()) };
+  return {
+    store,
+    requests,
+    listeners,
+    dashboard,
+    getBotSlots: exports.getBotSlots,
+    stop: () => cleanup.forEach((fn) => fn()),
+  };
 }
 const snapshot = { checkedAt: 123, instances: [{ id: 'one', status: 'free' }] };
 const tick = async () => {
   await vue.nextTick();
   await Promise.resolve();
 };
+
+test('game slot counts use configured capacity and unique occupied rooms instead of account status counts', () => {
+  const f = fixture();
+  try {
+    assert.deepEqual(f.getBotSlots({ maxGames: 2, status: 'free', rooms: [{ roomID: 'a' }] }), {
+      total: 2,
+      used: 1,
+      free: 1,
+      unavailable: 0,
+    });
+    assert.deepEqual(f.getBotSlots({ maxGames: 2, status: 'busy', rooms: [{ roomID: 'a' }, { roomID: 'b' }] }), {
+      total: 2,
+      used: 2,
+      free: 0,
+      unavailable: 0,
+    });
+    assert.deepEqual(f.getBotSlots({ maxGames: 2, status: 'unavailable', rooms: [{ roomID: 'a' }] }), {
+      total: 2,
+      used: 1,
+      free: 0,
+      unavailable: 1,
+    });
+    assert.deepEqual(f.getBotSlots({ maxGames: 2, status: 'free', rooms: [{ roomID: 'a' }, { roomID: 'a' }] }), {
+      total: 2,
+      used: 1,
+      free: 1,
+      unavailable: 0,
+    });
+    assert.deepEqual(f.getBotSlots({ status: 'busy', roomID: 'legacy' }), {
+      total: 1,
+      used: 1,
+      free: 0,
+      unavailable: 0,
+    });
+  } finally {
+    f.stop();
+  }
+});
 
 test('logout discards an in-flight admin response', async () => {
   const f = fixture();

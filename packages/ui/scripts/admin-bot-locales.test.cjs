@@ -58,9 +58,20 @@ test('the lazy admin page installs copy for each language, including a freshly l
       'resetConfirm',
       'resetResulterror',
       'resetResultnoCredit',
+      'dashboardAccounts',
+      'dashboardSlotsUsed',
+      'dashboardSlotsFree',
+      'dashboardSlotsUnavailable',
+      'dashboardSlotUsage',
+      'dashboardSlotAvailability',
+      'dashboardSlotHelp',
     ]) {
       const path = `aiArena.${key}`;
-      assert.notEqual(i18n.global.t(path, { value: 2, count: 2 }), path, `${language}: ${key}`);
+      assert.notEqual(
+        i18n.global.t(path, { value: 2, count: 2, used: 1, total: 2, free: 1, unavailable: 0 }),
+        path,
+        `${language}: ${key}`,
+      );
     }
   }
 });

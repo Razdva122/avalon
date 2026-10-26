@@ -61,12 +61,14 @@
         <span>{{ $t('aiArena.dashboardPolling') }}</span>
         <strong v-if="error">{{ $t('aiArena.dashboardStale') }}</strong>
       </div>
+      <p class="muted">{{ $t('aiArena.dashboardAccounts', { count: data.instances.length }) }}</p>
       <dl class="summary-grid">
         <div v-for="item in summary" :key="item.label" class="summary-card" :class="item.status">
           <dt>{{ $t(item.label) }}</dt>
           <dd>{{ item.count }}</dd>
         </div>
       </dl>
+      <p class="muted shared-hint">{{ $t('aiArena.dashboardSlotHelp') }}</p>
 
       <p v-if="!data.instances.length" class="notice">{{ $t('aiArena.dashboardEmpty') }}</p>
       <div class="instance-grid">
@@ -77,6 +79,11 @@
               <span class="status-dot" aria-hidden="true" />{{ $t(`aiArena.instance${bot.status}`) }}
             </span>
           </header>
+
+          <div class="slot-capacity">
+            <strong>{{ $t('aiArena.dashboardSlotUsage', getBotSlots(bot)) }}</strong>
+            <p class="muted">{{ $t('aiArena.dashboardSlotAvailability', getBotSlots(bot)) }}</p>
+          </div>
 
           <div class="quotas">
             <section v-for="window in quotaWindows(bot)" :key="window.label" class="quota-window">
@@ -167,7 +174,7 @@ import type { BotQuotaThresholds } from '@avalon/types';
 import BotQuotaSettings from './BotQuotaSettings.vue';
 import BotUsageStats from './BotUsageStats.vue';
 import BotResetCredits from './BotResetCredits.vue';
-import { useBotDashboard } from '@/helpers/composables/useBotDashboard';
+import { getBotSlots, useBotDashboard } from '@/helpers/composables/useBotDashboard';
 
 const { locale } = useAdminBotMessages();
 const {
@@ -193,14 +200,19 @@ watch([data, denied], () => {
 async function save(thresholds: BotQuotaThresholds) {
   if (await saveThresholds(thresholds)) void refresh();
 }
-const summary = computed(() => [
-  { label: 'aiArena.dashboardTotal', count: data.value?.instances.length ?? 0, status: '' },
-  ...(['free', 'busy', 'unavailable'] as const).map((status) => ({
-    label: `aiArena.instance${status}`,
-    count: data.value?.instances.filter((bot) => bot.status === status).length ?? 0,
-    status,
-  })),
-]);
+const summary = computed(() => {
+  const counts = (data.value?.instances ?? []).map(getBotSlots);
+  return [
+    { label: 'aiArena.dashboardTotal', count: counts.reduce((sum, slots) => sum + slots.total, 0), status: '' },
+    { label: 'aiArena.dashboardSlotsUsed', count: counts.reduce((sum, slots) => sum + slots.used, 0), status: 'busy' },
+    { label: 'aiArena.dashboardSlotsFree', count: counts.reduce((sum, slots) => sum + slots.free, 0), status: 'free' },
+    {
+      label: 'aiArena.dashboardSlotsUnavailable',
+      count: counts.reduce((sum, slots) => sum + slots.unavailable, 0),
+      status: 'unavailable',
+    },
+  ];
+});
 const formatDate = (timestamp: number) =>
   new Date(timestamp).toLocaleString(locale.value, {
     day: 'numeric',
@@ -224,6 +236,12 @@ const quotaWindows = (bot: AiBotInstanceStatus) => [
   margin: 0 auto;
   padding: 82px 24px 56px;
   color: rgb(var(--v-theme-text-primary));
+}
+.slot-capacity {
+  padding: 12px 0;
+}
+.slot-capacity p {
+  margin: 4px 0 0;
 }
 .page-heading,
 .instance-heading,
