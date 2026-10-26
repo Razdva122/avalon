@@ -43,6 +43,8 @@ export type AiBotInstanceStatus = {
   status: 'free' | 'busy' | 'unavailable';
   quota: CodexWeeklyLimit | null;
   modes: Record<AiBotMode, boolean>;
+  maxGames?: 1 | 2;
+  rooms?: { roomID: string; room?: AiBotInstanceStatus['room'] }[];
   roomID?: string;
   room?: {
     status: AiRoomState['status'];

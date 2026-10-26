@@ -2,7 +2,7 @@ import { codexEnvironment } from './codex-instances';
 import { execFile } from 'child_process';
 import { isAbsolute } from 'path';
 import { AiTechnicalPause, CodexRequestFailed, CodexRateLimited } from './client';
-import { AI_REQUEST_TIMEOUT_MS } from './timing';
+import { AI_REQUEST_TIMEOUT_MS, AI_WORKER_QUEUE_TIMEOUT_MS } from './timing';
 
 export function hasRemoteCodex() {
   return Boolean(codexEnvironment().AI_CODEX_SSH_HOST);
@@ -72,7 +72,7 @@ export function remoteCodex(request: object, signal?: AbortSignal, attempt = 0):
         'avalon-codex-v1',
       ],
       {
-        timeout: AI_REQUEST_TIMEOUT_MS + 15000,
+        timeout: AI_REQUEST_TIMEOUT_MS + AI_WORKER_QUEUE_TIMEOUT_MS + 15000,
         maxBuffer: 4 * 1024 * 1024,
         killSignal: 'SIGKILL',
         signal,

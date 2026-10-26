@@ -119,21 +119,25 @@
           />
 
           <div class="instance-activity">
-            <template v-if="bot.roomID">
-              <p class="activity-label">{{ $t('aiArena.dashboardCurrentRoom') }}</p>
-              <RouterLink class="room-link" :to="{ name: 'room', params: { uuid: bot.roomID } }">
-                {{ bot.room?.title || bot.roomID }} <span aria-hidden="true">↗</span>
-              </RouterLink>
-              <template v-if="bot.room">
-                <p>
-                  {{ $t(`aiArena.${bot.room.status}`) }} ·
-                  {{ $t('aiArena.dashboardPlayers', { count: bot.room.playerCount }) }}
-                </p>
-                <p v-if="bot.room.codex" class="muted">{{ bot.room.codex.model }} · {{ bot.room.codex.reasoning }}</p>
-                <p v-if="bot.room.thinking">{{ $t('aiArena.dashboardThinking') }}</p>
-                <p v-else-if="bot.room.waitingForHuman">{{ $t('aiArena.dashboardWaiting') }}</p>
-              </template>
-              <p v-else class="muted">{{ $t('aiArena.dashboardRemoteRoom') }}</p>
+            <template v-if="bot.rooms?.length || bot.roomID">
+              <div v-for="activity in bot.rooms ?? [{ roomID: bot.roomID!, room: bot.room }]" :key="activity.roomID">
+                <p class="activity-label">{{ $t('aiArena.dashboardCurrentRoom') }}</p>
+                <RouterLink class="room-link" :to="{ name: 'room', params: { uuid: activity.roomID } }">
+                  {{ activity.room?.title || activity.roomID }} <span aria-hidden="true">↗</span>
+                </RouterLink>
+                <template v-if="activity.room">
+                  <p>
+                    {{ $t(`aiArena.${activity.room.status}`) }} ·
+                    {{ $t('aiArena.dashboardPlayers', { count: activity.room.playerCount }) }}
+                  </p>
+                  <p v-if="activity.room.codex" class="muted">
+                    {{ activity.room.codex.model }} · {{ activity.room.codex.reasoning }}
+                  </p>
+                  <p v-if="activity.room.thinking">{{ $t('aiArena.dashboardThinking') }}</p>
+                  <p v-else-if="activity.room.waitingForHuman">{{ $t('aiArena.dashboardWaiting') }}</p>
+                </template>
+                <p v-else class="muted">{{ $t('aiArena.dashboardRemoteRoom') }}</p>
+              </div>
             </template>
             <p v-else>{{ $t(bot.status === 'busy' ? 'aiArena.dashboardAllocating' : 'aiArena.dashboardNoRoom') }}</p>
           </div>

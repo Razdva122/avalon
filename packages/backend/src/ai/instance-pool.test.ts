@@ -103,6 +103,52 @@ async function until(check: () => Promise<boolean>) {
   throw Error('Expected asynchronous cleanup did not complete');
 }
 
+test('two games on one account reserve separately and the dashboard retains both live games', async () => {
+  process.env.AI_CODEX_INSTANCES = JSON.stringify([{ id: 'one', home: '/pool/one', maxGames: 2 }]);
+  const db = client.db(`two-games-${database++}`);
+  const a = fixture(db);
+  const b = fixture(db);
+  const first = await a.create('first-human');
+  const second = await b.create('second-human');
+  expect(first.roomID).toBeDefined();
+  expect(second.roomID).toBeDefined();
+  expect((await a.create('overflow-human')).error).toBeDefined();
+  expect(await a.service.repository!.busyInstances()).toEqual(
+    expect.arrayContaining([
+      { instanceID: 'one', roomID: first.roomID },
+      { instanceID: 'one', roomID: second.roomID },
+    ]),
+  );
+  let dashboard: any;
+  await a.connect('admin-dashboard').getAiBotDashboard((value: any) => {
+    dashboard = value;
+  });
+  expect(dashboard.instances).toHaveLength(1);
+  expect(dashboard.instances[0]).toMatchObject({ id: 'one', maxGames: 2, status: 'busy' });
+  expect(dashboard.instances[0].rooms.map((room: any) => room.roomID).sort()).toEqual(
+    [first.roomID, second.roomID].sort(),
+  );
+  await a.connect('first-human').controlAiRoom(first.roomID, 'stop', () => {});
+  await a.connect('admin-dashboard').getAiBotDashboard((value: any) => {
+    dashboard = value;
+  });
+  expect(dashboard.instances[0].status).toBe('free');
+  const replacement = await a.create('replacement-human');
+  expect(replacement.roomID).toBeDefined();
+});
+
+test('the legacy dashboard observes the default account held by another backend', async () => {
+  delete process.env.AI_CODEX_INSTANCES;
+  const db = client.db(`legacy-dashboard-${database++}`);
+  const a = fixture(db);
+  await new AiRepository(db).claim('remote-room');
+  let dashboard: any;
+  await a.connect('admin-dashboard').getAiBotDashboard((value: any) => {
+    dashboard = value;
+  });
+  expect(dashboard.instances[0]).toMatchObject({ id: 'default', status: 'busy', roomID: 'remote-room' });
+});
+
 test.each([
   {
     label: 'earlier reset beats higher percentage',

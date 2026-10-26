@@ -1,9 +1,20 @@
 # Multiple ChatGPT instances
 
-The backend can run one AI match per configured instance. `AI_CODEX_INSTANCES`
+The backend can run one or two AI matches per configured instance. `AI_CODEX_INSTANCES`
 is a JSON array in the backend environment (1–32 entries). Each instance must
 use a **distinct ChatGPT account**, with its own Codex authentication directory
 or SSH worker. No browser changes are required.
+
+Set optional `maxGames: 2` on an existing named entry to share that account across
+two games; omitted or `1` preserves the original capacity. Other values are rejected.
+For example, `{"id":"account-one","home":"/var/lib/codex-one","maxGames":2}`.
+Do not duplicate an account or SSH destination to create game slots. Quotas, caches,
+resets and usage identity stay account-scoped; each game has its own atomic MongoDB
+lease. The original lease document remains the first slot and `:slot2` is the second.
+Administrator status is free while a slot remains; its account card lists both rooms.
+For overlapping games, per-game quota percentages are unavailable and account sums
+are marked incomplete, since account snapshots include both games. Token totals
+remain exact from request audits.
 
 ## Local profiles
 
@@ -70,7 +81,7 @@ Explicit pool entries do not inherit legacy `AI_CODEX_HOME` / `CODEX_HOME` or
 - Pin the instance for the entire game, including independent decisions,
   technical pauses/resume and post-game processing. A technical resume does not
   apply the new-game quota gate or switch accounts.
-- One game per account, up to the number of configured accounts concurrently.
+- One game per account by default, or two with `maxGames: 2`.
   If all eligible accounts are busy, reject a new reservation without a queue.
   The same participant returns to their existing game.
 - Keep existing bot thresholds: smart `>60%` short / `>5%` weekly; regular
@@ -82,7 +93,7 @@ Explicit pool entries do not inherit legacy `AI_CODEX_HOME` / `CODEX_HOME` or
 - Completion, cancellation and preparation/pause expiry release only that room's
   lease. MongoDB owner checks prevent stale cleanup from releasing another room.
   A crashed backend's abandoned lease expires after `AI_LEASE_MS` (currently
-  22 minutes). Existing restart behavior still stops archived unfinished games.
+  42 minutes, covering queueing and a transport retry). Existing restart behavior still stops archived unfinished games.
 - Beginner analysis briefly reserves a free account too, with model support
   checked for that account; it cannot spend on an account held by a game.
   Cached reviews remain readable without free capacity.
@@ -102,6 +113,18 @@ IDs creates new lease identities. Do not overlap old single-instance backends
 with a pool containing that same physical account, or rename/reassign instances
 while games are active. Restart only after active games and reviews have ended.
 Rolling back to legacy mode likewise requires draining/stopping the pool first.
+
+Before enabling two games, install the updated launcher on that account worker:
+two execution slots share **512 MiB RAM, one CPU and 256 tasks**, with no swap.
+Per-container ceilings are 512 MiB/one CPU/128 tasks. Queue admission is serialized
+under `worker-queue.lock`, with SSH heartbeats and cancellation while waiting;
+the queue deadline is 600 seconds. A decision keeps its separate 600-second deadline.
+The backend SSH deadline is 1,215 seconds. Queued calls are never model-turn retries.
+Metadata uses the same bounded queue. Install worker first, then backend, and only
+then set `maxGames: 2` after draining all games/reviews. Check parent cgroup limits
+and leave host headroom; increasing account capacity does not fix upstream HTTP 429.
+For rollback drain both slots before restoring the old backend/launcher or reducing
+capacity; preserve auth, lock files, account IDs and usage ledgers.
 
 This change does not provision or authenticate additional accounts and does not
 modify production configuration automatically.

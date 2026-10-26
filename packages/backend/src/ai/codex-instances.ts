@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from 'async_hooks';
 import { isAbsolute, resolve } from 'path';
 
-export type CodexInstance = { id: string; environment: NodeJS.ProcessEnv };
+export type CodexInstance = { id: string; environment: NodeJS.ProcessEnv; maxGames?: 1 | 2 };
 const context = new AsyncLocalStorage<CodexInstance>();
 const connectionKeys = [
   'AI_CODEX_HOME',
@@ -39,9 +39,10 @@ export function configuredCodexInstances(): CodexInstance[] {
   const destinations = new Set<string>();
   return entries.map((value: unknown) => {
     if (!value || typeof value !== 'object' || Array.isArray(value)) throw invalid();
-    const entry = value as { id?: unknown; home?: unknown; ssh?: unknown };
+    const entry = value as { id?: unknown; home?: unknown; ssh?: unknown; maxGames?: unknown };
     if (
-      Object.keys(entry).some((key) => !['id', 'home', 'ssh'].includes(key)) ||
+      Object.keys(entry).some((key) => !['id', 'home', 'ssh', 'maxGames'].includes(key)) ||
+      (entry.maxGames !== undefined && entry.maxGames !== 1 && entry.maxGames !== 2) ||
       typeof entry.id !== 'string' ||
       !/^[a-zA-Z0-9][a-zA-Z0-9-]{0,63}$/.test(entry.id) ||
       entry.id === 'default' ||
@@ -83,6 +84,10 @@ export function configuredCodexInstances(): CodexInstance[] {
     }
     if (destinations.has(destination)) throw invalid();
     destinations.add(destination);
-    return { id: entry.id, environment };
+    return {
+      id: entry.id,
+      environment,
+      ...(entry.maxGames !== undefined ? { maxGames: entry.maxGames as 1 | 2 } : {}),
+    };
   });
 }

@@ -45,9 +45,22 @@ heartbeat=$!
 # Quota/catalog reads may briefly hold both slots as a game turn. Wait
 # before dispatching, without replaying a decision that may already have run.
 # Polling keeps cancellation responsive; the heartbeat also covers this wait.
-deadline=$((SECONDS + 30))
+# Serialize admission while the head waits for either execution slot. The OS
+# schedules admission contenders; newcomers cannot take a slot before the head.
+# Nonblocking acquisition keeps the existing SSH cancellation path responsive.
+deadline=$((SECONDS + 600))
+exec 8>/opt/avalon-codex/worker-queue.lock
+admitted=false
+busy() {
+  kill "$heartbeat" >/dev/null 2>&1 || true
+  wait "$heartbeat" 2>/dev/null || true
+  heartbeat=''
+  printf '%s\n' '{"ok":false,"error":"busy"}'
+  exit 0
+}
 while [ "$locked" = false ]; do
-  if flock -s -n 9; then
+  if [ "$admitted" = false ] && flock -x -n 8; then admitted=true; fi
+  if [ "$admitted" = true ] && flock -s -n 9; then
     for slot in 1 2; do
       exec 10>"/opt/avalon-codex/worker-slot-$slot.lock"
       if flock -n 10; then
@@ -60,18 +73,16 @@ while [ "$locked" = false ]; do
     flock -u 9
   fi
   if [ "$SECONDS" -ge "$deadline" ]; then
-    kill "$heartbeat" >/dev/null 2>&1 || true
-    wait "$heartbeat" 2>/dev/null || true
-    heartbeat=''
-    printf '%s\n' '{"ok":false,"error":"busy"}'
-    exit 0
+    busy
   fi
   sleep 0.2
 done
+flock -u 8
+exec 8>&-
 # Complete creation before spawning the attach client: cleanup always has a
 # registered container to remove, even if SSH stops during slow image/storage work.
-docker create -i --name "$container" --memory=256m --memory-swap=256m \
-  --cpus=0.5 --pids-limit=128 --cgroup-parent=avalon-codex.slice \
+docker create -i --name "$container" --memory=512m --memory-swap=512m \
+  --cpus=1 --pids-limit=128 --cgroup-parent=avalon-codex.slice \
   --cap-drop=ALL --security-opt=no-new-privileges \
   --read-only --user=10001:10001 --tmpfs /tmp:rw,nosuid,nodev,size=64m,mode=1777 \
   -e HOME=/tmp -e CODEX_HOME=/state \

@@ -49,6 +49,9 @@ test('parallel first decisions share a persisted fresh snapshot and finish reads
   service.repository = {
     startGameUsage: start,
     finishGameUsage: finish,
+    renewLease: async () => {
+      events.push('renew');
+    },
     release: async () => {
       events.push('released');
     },
@@ -75,5 +78,5 @@ test('parallel first decisions share a persisted fresh snapshot and finish reads
   (service as any).runRoom(room);
   await new Promise((resolve) => setImmediate(resolve));
   expect(finish).toHaveBeenCalledWith(room.roomID, after);
-  expect(events).toEqual(['quota', 'persisted', 'decision', 'decision', 'quota', 'finish', 'released']);
+  expect(events).toEqual(['quota', 'persisted', 'decision', 'decision', 'renew', 'quota', 'finish', 'released']);
 });

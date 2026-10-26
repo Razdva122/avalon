@@ -92,7 +92,7 @@ export class AiService {
   private lobbyRooms = new WeakSet<BotRoom>();
   private creating = new Set<string>();
   private starting = new Set<string>();
-  private allocating = new Set<string>();
+  private allocating = new Map<string, string>();
   private resetting = new Set<string>();
   private roomInstances = new Map<string, CodexInstance>();
   private technicalStarts = new Map<string, object>();
@@ -124,20 +124,31 @@ export class AiService {
   private inRoom<T>(roomID: string, operation: () => T): T {
     return withCodexInstance(this.instanceFor(roomID), operation);
   }
-  private async freeInstances(roomID?: string) {
+  private async occupiedInstances(includeLegacy = false) {
     const instances = configuredCodexInstances();
-    const busy = new Map<string, string>();
+    const busy = new Map<string, Set<string>>();
+    const add = (instanceID: string, roomID: string) => {
+      if (!busy.has(instanceID)) busy.set(instanceID, new Set());
+      busy.get(instanceID)!.add(roomID);
+    };
     // Single-instance deployments also use local room status; named pools read cross-process leases.
-    if (instances[0].id !== 'default') {
-      for (const lease of await this.repository!.busyInstances()) busy.set(lease.instanceID, lease.roomID);
+    if (includeLegacy || instances[0].id !== 'default') {
+      for (const lease of await this.repository!.busyInstances()) add(lease.instanceID, lease.roomID);
     }
-    for (const [id, instance] of this.roomInstances) busy.set(instance.id, id);
+    for (const [id, instance] of this.roomInstances) add(instance.id, id);
+    for (const [roomID, instanceID] of this.allocating) add(instanceID, roomID);
     for (const room of Object.values(this.manager.rooms)) {
       if (room.ai && (['ready', 'running', 'paused'].includes(room.ai.status) || this.running.has(room.roomID)))
-        busy.set(this.roomInstances.get(room.roomID)?.id ?? 'default', room.roomID);
+        add(this.roomInstances.get(room.roomID)?.id ?? 'default', room.roomID);
     }
+    return busy;
+  }
+  private async freeInstances(roomID?: string) {
+    const instances = configuredCodexInstances();
+    const busy = await this.occupiedInstances();
     return instances.filter(
-      (instance) => !this.allocating.has(instance.id) && (!busy.has(instance.id) || busy.get(instance.id) === roomID),
+      (instance) =>
+        busy.get(instance.id)?.has(roomID ?? '') || (busy.get(instance.id)?.size ?? 0) < (instance.maxGames ?? 1),
     );
   }
   private async instanceSnapshots(instances: CodexInstance[]) {
@@ -181,9 +192,14 @@ export class AiService {
     );
     candidates.sort((a, b) => this.compareQuota(a.quota, b.quota));
     for (const { instance } of candidates) {
-      if (this.allocating.has(instance.id) || [...this.roomInstances.values()].some((held) => held.id === instance.id))
-        continue;
-      this.allocating.add(instance.id);
+      if (!(await this.freeInstances()).some((free) => free.id === instance.id)) continue;
+      // Recheck synchronously after the database read: another local creator may have resumed first.
+      const localRooms = new Set([
+        ...[...this.roomInstances].filter(([, held]) => held.id === instance.id).map(([id]) => id),
+        ...[...this.allocating].filter(([, id]) => id === instance.id).map(([roomID]) => roomID),
+      ]);
+      if (localRooms.size >= (instance.maxGames ?? 1)) continue;
+      this.allocating.set(roomID, instance.id);
       try {
         await this.claimInstance(roomID, instance);
         this.roomInstances.set(roomID, instance);
@@ -191,7 +207,7 @@ export class AiService {
       } catch (error) {
         if (!(error instanceof AiPause)) throw error;
       } finally {
-        this.allocating.delete(instance.id);
+        this.allocating.delete(roomID);
       }
     }
     throw new AiPause('Bot games are currently unavailable: no free eligible ChatGPT instance.');
@@ -212,7 +228,11 @@ export class AiService {
     return short(b) - short(a) || (b?.remainingPercent ?? -1) - (a?.remainingPercent ?? -1);
   }
   private claimInstance(roomID: string, instance = this.instanceFor(roomID)) {
-    return instance.id === 'default' ? this.repository!.claim(roomID) : this.repository!.claim(roomID, instance.id);
+    return instance.id === 'default'
+      ? this.repository!.claim(roomID)
+      : instance.maxGames === 2
+        ? this.repository!.claim(roomID, instance.id, 2)
+        : this.repository!.claim(roomID, instance.id);
   }
   private async releaseInstance(roomID: string) {
     try {
@@ -434,9 +454,13 @@ export class AiService {
         .finally(async () => {
           // Fresh limits are read while this room still owns its account, including after a pause.
           if (this.usageStarted.has(id)) {
-            await this.repository!.finishGameUsage(id, await getCodexWeeklyLimit(true)).catch(() =>
-              console.error('AI game usage snapshot could not be saved'),
-            );
+            try {
+              // Metadata shares the worker queue; renew before waiting behind another game's turn.
+              await room.renewLease?.();
+              await this.repository!.finishGameUsage(id, await getCodexWeeklyLimit(true));
+            } catch {
+              console.error('AI game usage snapshot could not be saved');
+            }
             if (room.ai?.status === 'finished' || room.ai?.status === 'stopped') this.usageStarted.delete(id);
           }
           if (this.manager.rooms[id] === room && room.ai?.status === 'paused') {
@@ -625,49 +649,50 @@ export class AiService {
         const thresholds = await this.repository!.getBotQuotaThresholds();
         const snapshots = await this.instanceSnapshots(configuredCodexInstances());
         // Read leases after metadata: a reservation may complete while quota is loading.
-        const busy = new Map((await this.repository!.busyInstances()).map((lease) => [lease.instanceID, lease.roomID]));
-        for (const [roomID, instance] of this.roomInstances) busy.set(instance.id, roomID);
-        for (const room of Object.values(this.manager.rooms)) {
-          if (room.ai && (['ready', 'running', 'paused'].includes(room.ai.status) || this.running.has(room.roomID)))
-            busy.set(this.roomInstances.get(room.roomID)?.id ?? 'default', room.roomID);
-        }
+        const busy = await this.occupiedInstances(true);
         const instances = snapshots.map<AiBotInstanceStatus>(({ instance, quota, models }) => {
           const modes = {
             smart: humanModeAvailable('smart', quota, models, thresholds),
             regular: humanModeAvailable('regular', quota, models, thresholds),
             beginner: humanModeAvailable('beginner', quota, models, thresholds),
           };
-          const roomID = busy.get(instance.id);
-          const room = roomID ? this.manager.rooms[roomID] : undefined;
+          const rooms = [...(busy.get(instance.id) ?? [])].map((roomID) => {
+            const room = this.manager.rooms[roomID];
+            return {
+              roomID,
+              ...(room?.ai
+                ? {
+                    room: {
+                      status: room.ai.status,
+                      title: room.ai.title,
+                      codex: room.ai.codex,
+                      playerCount: room.players.length,
+                      thinking: Boolean(room.ai.thinkingPlayerID || room.ai.thinkingPlayerIDs?.length),
+                      waitingForHuman: Boolean(room.ai.waitingForHuman || room.ai.waitingForDiscussion),
+                    },
+                  }
+                : {}),
+            };
+          });
           return {
             id: instance.id,
+            maxGames: instance.maxGames ?? 1,
+            rooms,
             status:
-              roomID || this.allocating.has(instance.id)
+              rooms.length >= (instance.maxGames ?? 1)
                 ? 'busy'
                 : Object.values(modes).some(Boolean)
                   ? 'free'
                   : 'unavailable',
             quota,
             modes,
-            ...(roomID ? { roomID } : {}),
-            ...(room?.ai
-              ? {
-                  room: {
-                    status: room.ai.status,
-                    title: room.ai.title,
-                    codex: room.ai.codex,
-                    playerCount: room.players.length,
-                    thinking: Boolean(room.ai.thinkingPlayerID || room.ai.thinkingPlayerIDs?.length),
-                    waitingForHuman: Boolean(room.ai.waitingForHuman || room.ai.waitingForDiscussion),
-                  },
-                }
-              : {}),
+            ...rooms[0],
           };
         });
         const games = await this.repository!.recentGameUsage();
         const accountUsage = await this.repository!.weeklyAccountUsage(instances);
         for (const game of games) {
-          if (['running', 'paused'].includes(game.status) && busy.get(game.instanceID) !== game.roomID)
+          if (['running', 'paused'].includes(game.status) && !busy.get(game.instanceID)?.has(game.roomID))
             game.status = 'stopped';
         }
         // Recheck authority before returning a potentially slow metadata request.

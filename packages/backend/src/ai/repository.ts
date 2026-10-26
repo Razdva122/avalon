@@ -25,6 +25,7 @@ type GameUsageRecord = Omit<
   expiresAt: Date;
   before: CodexWeeklyLimit | null;
   after?: CodexWeeklyLimit | null;
+  sharedQuota?: boolean;
 };
 
 export type AiRequestLog = {
@@ -142,7 +143,7 @@ export class AiRepository {
           .collection<GameUsageRecord>('ai_game_usage')
           .find(
             { instanceID: id, expiresAt: { $gt: new Date(now) } },
-            { projection: { _id: 1, before: 1, after: 1 }, maxTimeMS: 10000 },
+            { projection: { _id: 1, before: 1, after: 1, sharedQuota: 1 }, maxTimeMS: 10000 },
           )
           .toArray();
         if (!games.length) return result;
@@ -179,7 +180,10 @@ export class AiRepository {
           ['shortTermSpent', 'shortTermIncomplete', true],
         ] as const) {
           const values = currentGames.map((game) =>
-            game.before && game.before.resetsAt === reset && game.before.checkedAt >= period.startedAt
+            !game.sharedQuota &&
+            game.before &&
+            game.before.resetsAt === reset &&
+            game.before.checkedAt >= period.startedAt
               ? quotaSpent(
                   shortTerm ? game.before?.shortTerm : game.before,
                   shortTerm ? game.after?.shortTerm : game.after,
@@ -212,7 +216,7 @@ export class AiRepository {
     await this.observeWeeklyQuota(instanceID, before);
     const startedAt = Date.now();
     const humanCount = state.ai?.humanPlayerIDs?.length ?? (state.ai?.humanPlayerID ? 1 : 0);
-    await this.db.collection<GameUsageRecord>('ai_game_usage').updateOne(
+    const created = await this.db.collection<GameUsageRecord>('ai_game_usage').updateOne(
       { _id: state.roomID },
       {
         $setOnInsert: {
@@ -231,6 +235,30 @@ export class AiRepository {
       },
       { upsert: true },
     );
+    if (created.upsertedCount) {
+      // Subscription snapshots include all concurrent games; never attribute the same spend twice.
+      const liveSiblings = (await this.busyInstances())
+        .filter((lease) => lease.instanceID === instanceID && lease.roomID !== state.roomID)
+        .map((lease) => lease.roomID);
+      const siblings = await this.db
+        .collection<GameUsageRecord>('ai_game_usage')
+        .find(
+          {
+            instanceID,
+            _id: { $ne: state.roomID },
+            $or: [{ _id: { $in: liveSiblings } }, { checkedAt: { $gte: startedAt } }],
+          },
+          { projection: { _id: 1 }, maxTimeMS: 10000 },
+        )
+        .toArray();
+      if (siblings.length)
+        await this.db
+          .collection<GameUsageRecord>('ai_game_usage')
+          .updateMany(
+            { _id: { $in: [state.roomID, ...siblings.map(({ _id }) => _id)] } },
+            { $set: { sharedQuota: true } },
+          );
+    }
   }
   async finishGameUsage(roomID: string, after: CodexWeeklyLimit | null) {
     const game = await this.db
@@ -294,7 +322,7 @@ export class AiRepository {
         { maxTimeMS: 10000 },
       )
       .toArray();
-    return records.map(({ _id, before, after, expiresAt, ...record }) => {
+    return records.map(({ _id, before, after, expiresAt, sharedQuota, ...record }) => {
       void expiresAt; // Storage retention metadata is never sent to clients.
       const cost = costs.find((entry) => entry._id === _id);
       return {
@@ -306,8 +334,8 @@ export class AiRepository {
         outputTokens: cost?.outputTokens ?? 0,
         reasoningTokens: cost?.reasoningTokens ?? 0,
         unknownUsageRequests: cost?.unknownUsageRequests ?? 1,
-        weeklySpent: quotaSpent(before, after),
-        shortTermSpent: quotaSpent(before?.shortTerm, after?.shortTerm),
+        weeklySpent: sharedQuota ? null : quotaSpent(before, after),
+        shortTermSpent: sharedQuota ? null : quotaSpent(before?.shortTerm, after?.shortTerm),
       };
     });
   }
@@ -370,35 +398,48 @@ export class AiRepository {
     return instanceID === 'default' ? this.ledgerID : `${this.ledgerID}:${instanceID}`;
   }
   private get leaseFilter() {
-    return { $regex: `^${this.ledgerID}(?::[a-zA-Z0-9-]+)?$` };
+    return { $regex: `^${this.ledgerID}(?::[a-zA-Z0-9-]+)?(?::slot2)?$` };
   }
   async busyInstances(): Promise<{ instanceID: string; roomID: string }[]> {
     const leases = await this.ledger
       .find({ _id: this.leaseFilter, owner: { $exists: true }, leaseUntil: { $gt: new Date() } })
       .toArray();
     return leases.map((lease) => ({
-      instanceID: lease._id === this.ledgerID ? 'default' : lease._id.slice(this.ledgerID.length + 1),
+      instanceID: lease._id === this.ledgerID ? 'default' : lease._id.slice(this.ledgerID.length + 1).split(':')[0],
       roomID: lease.owner!,
     }));
   }
-  async claim(roomID: string, instanceID = 'default') {
+  async claim(roomID: string, instanceID = 'default', maxGames: 1 | 2 = 1) {
     validateID(roomID);
+    if (![1, 2].includes(maxGames) || (instanceID === 'default' && maxGames !== 1))
+      throw new Error('Invalid AI account capacity');
     const ledgerID = this.instanceLedgerID(instanceID);
-    // Concurrent first claims can race while creating the same lock document.
-    try {
-      await this.ledger.updateOne({ _id: ledgerID }, { $setOnInsert: { _id: ledgerID } }, { upsert: true });
-    } catch (error) {
-      if ((error as { code?: number }).code !== 11000) throw error;
-    }
-    const previous = await this.ledger.findOneAndUpdate(
-      {
-        _id: ledgerID,
-        $or: [{ owner: { $exists: false } }, { leaseUntil: { $lt: new Date() } }, { owner: roomID }],
-      },
-      { $set: { owner: roomID, leaseUntil: new Date(Date.now() + AI_LEASE_MS) } },
+    const slots = maxGames === 2 ? [ledgerID, `${ledgerID}:slot2`] : [ledgerID];
+    // Starting/resuming an already reserved room must retain its original slot.
+    const existing = await this.ledger.findOneAndUpdate(
+      { _id: { $in: slots }, owner: roomID, leaseUntil: { $gt: new Date() } },
+      { $set: { leaseUntil: new Date(Date.now() + AI_LEASE_MS) } },
       { returnDocument: 'before' },
     );
-    if (!previous) throw new AiPause('Другая AI-партия уже запущена.');
+    if (existing) return;
+    for (const slot of slots) {
+      // Concurrent first claims can race while creating the same lock document.
+      try {
+        await this.ledger.updateOne({ _id: slot }, { $setOnInsert: { _id: slot } }, { upsert: true });
+      } catch (error) {
+        if ((error as { code?: number }).code !== 11000) throw error;
+      }
+      const previous = await this.ledger.findOneAndUpdate(
+        {
+          _id: slot,
+          $or: [{ owner: { $exists: false } }, { leaseUntil: { $lt: new Date() } }, { owner: roomID }],
+        },
+        { $set: { owner: roomID, leaseUntil: new Date(Date.now() + AI_LEASE_MS) } },
+        { returnDocument: 'before' },
+      );
+      if (previous) return;
+    }
+    throw new AiPause('Другая AI-партия уже запущена.');
   }
   async release(roomID: string) {
     validateID(roomID);
