@@ -36,6 +36,7 @@
       >
         <VoiceIcon :name="voice.microphoneEnabled.value ? 'mic' : 'micOff'" />
       </button>
+      <div v-if="$slots.tools" class="voice-dock-tools"><slot name="tools" /></div>
     </div>
     <Transition name="voice-reveal">
       <section
@@ -482,6 +483,11 @@ onUnmounted(() => {
   border-radius: 16px;
   box-shadow: 0 4px 18px #0002;
   padding: 4px;
+}
+.voice-dock-tools {
+  margin-inline-start: 4px;
+  padding-inline-start: 4px;
+  border-inline-start: 1px solid rgba(var(--v-theme-text-primary), 0.12);
 }
 .voice-launcher {
   display: flex;

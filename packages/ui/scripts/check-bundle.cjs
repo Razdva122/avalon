@@ -14,6 +14,10 @@ for (const file of maps) {
     assert(!/node_modules\/lodash\/lodash\.js/.test(source), `${file}: full Lodash import`);
     assert(!/src\/i18n\/langs\/pages\/(?!seo\/)/.test(source), `${file}: unsplit page dictionaries`);
     if (/^(app|chunk-vendors)\./.test(file)) {
+      assert(
+        !/components\/playground\/(?:Game2048\.vue|game2048\.ts|messages2048\.ts)/.test(source),
+        `${file}: 2048 in startup bundle`,
+      );
       assert(!source.includes('/i18n/generated/'), `${file}: locale dictionary in startup bundle`);
       assert(!source.includes('@vue/server-renderer'), `${file}: build renderer in startup bundle`);
     }

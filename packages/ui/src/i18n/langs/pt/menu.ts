@@ -4,6 +4,13 @@
  */
 export default {
   menu: {
+    playgroundTitle: 'Minijogos',
+    playgroundClose: 'Fechar playground',
+    playgroundSoon: 'Em breve',
+    playgroundBack: 'Voltar aos jogos',
+
+    playground: 'Abrir playground',
+    playgroundError: 'Não foi possível carregar 2048. Tente novamente.',
     back: 'Voltar',
     darkTheme: 'Tema escuro',
 

@@ -4,6 +4,13 @@
  */
 export default {
   menu: {
+    playgroundTitle: '小游戏',
+    playgroundClose: '关闭游乐场',
+    playgroundSoon: '即将推出',
+    playgroundBack: '返回游戏列表',
+
+    playground: '打开游乐场',
+    playgroundError: '无法加载2048，请重试。',
     back: '返回',
     darkTheme: '深色模式',
 

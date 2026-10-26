@@ -1,5 +1,12 @@
 export default {
   menu: {
+    playgroundTitle: 'Trò chơi nhỏ',
+    playgroundClose: 'Đóng khu trò chơi',
+    playgroundSoon: 'Sắp ra mắt',
+    playgroundBack: 'Về danh sách trò chơi',
+
+    playground: 'Mở khu trò chơi',
+    playgroundError: 'Không thể tải 2048. Vui lòng thử lại.',
     back: 'Quay lại',
     darkTheme: 'Giao diện tối',
     rulesRoles: 'Luật chơi và vai trò',

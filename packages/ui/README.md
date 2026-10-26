@@ -167,6 +167,23 @@ Previews use the existing content-hash URLs, immutable cache and image release
 manifest. Both sizes are included in the published UI container. Opening a
 role page after an avatar may download the larger image separately. Historical cloud objects remain available for clients with cached old builds.
 
+## 2048 playground
+
+The gamepad button to the right of the room voice controls opens a playground on the left of the table, with a **2048** tile and two coming-soon slots. Choosing **2048** opens its responsive game panel. `PlaygroundLauncher.vue`
+loads `Game2048.vue`, its engine, copy and CSS through the `playground-2048` dynamic
+chunk only after choosing its tile; opening the picker does not fetch the game. No game assets or dependencies are added to the startup bundle.
+The production bundle audit and `scripts/check-playground.cjs` guard this boundary.
+
+The board, score and best score stay in `localStorage` under
+`avalon.playground.2048.v1`; no account or backend is involved. Invalid saves start
+fresh, and blocked storage leaves the game playable with a visible saving notice.
+Pointer swipes are confined to the board; arrow keys, WASD and on-screen controls
+are available. The panel closes and saves when the room requires the player's action.
+
+Run the engine tests with `node --test packages/ui/scripts/playground-2048.test.cjs`.
+The browser check runs as part of `npm run check:build --workspace=packages/ui`;
+set `PLAYGROUND_SCREENSHOTS` to a directory to capture desktop and mobile previews.
+
 ## Startup performance
 
 The HTML head queues one early **Create room** action until `avalon:ready` fires

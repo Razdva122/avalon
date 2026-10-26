@@ -118,7 +118,10 @@
         v-if="userID && !roomState.archived && !roomState.ai?.beginner"
         :roomUuid="uuid"
         :seatIds="roomState.players.map((player) => player.id).join(',')"
-      />
+      >
+        <template #tools><PlaygroundLauncher :turn-active="playgroundTurnActive" /></template>
+      </VoicePanel>
+      <div v-else class="room-playground-dock"><PlaygroundLauncher :turn-active="playgroundTurnActive" /></div>
     </template>
     <p v-else role="status">{{ $t('mainPage.loading') }}</p>
   </div>
@@ -149,6 +152,7 @@ import RatingChangesPanel from '@/components/stats/RatingChangesPanel.vue';
 import { roomVoiceKey } from '@/helpers/room-voice-context';
 import type { createRoomVoice } from '@/helpers/composables/useRoomVoice';
 import VoicePanel from '@/components/voice/VoicePanel.vue';
+import PlaygroundLauncher from '@/components/playground/PlaygroundLauncher.vue';
 import eventBus from '@/helpers/event-bus';
 import { ASSASSINATION_REVEAL_DURATION } from '@/components/view/board/animations/render';
 import { assassinationReveal } from '@/components/view/board/helpers';
@@ -172,6 +176,7 @@ export default defineComponent({
     StickerPicker,
     RatingChangesPanel,
     VoicePanel,
+    PlaygroundLauncher,
   },
   props: {
     uuid: {
@@ -222,6 +227,13 @@ export default defineComponent({
       () => props.uuid,
       roomState,
       () => hideStickers.value,
+    );
+    // Read the live room so replaying history cannot hide an action that is due now.
+    const playgroundTurnActive = computed(() =>
+      Boolean(
+        roomState.value?.stage === 'started' &&
+        roomState.value.game.players.some((player) => player.id === userID.value && player.features.waitForAction),
+      ),
     );
     const game = stateManager.game;
     const assassinationActive = ref(false);
@@ -389,6 +401,7 @@ export default defineComponent({
     );
     return {
       stateManager,
+      playgroundTurnActive,
       tipsSession,
       compactViewport,
       reviewBesideChat,
@@ -521,5 +534,25 @@ export default defineComponent({
   border-radius: 0 0 6px 0;
   background: rgb(var(--v-theme-info));
   color: white !important;
+}
+</style>
+
+<style scoped>
+.room-playground-dock {
+  position: fixed;
+  left: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 15;
+  padding: 4px;
+  border: 1px solid rgb(var(--v-theme-surface-border));
+  border-radius: 16px;
+  background: rgb(var(--v-theme-surface));
+  box-shadow: 0 4px 18px #0002;
+}
+@media (max-width: 600px) {
+  .room-playground-dock {
+    left: 8px;
+    bottom: calc(8px + env(safe-area-inset-bottom));
+  }
 }
 </style>

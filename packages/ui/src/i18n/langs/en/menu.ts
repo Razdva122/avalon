@@ -4,6 +4,13 @@
  */
 export default {
   menu: {
+    playgroundTitle: 'Mini-games',
+    playgroundClose: 'Close playground',
+    playgroundSoon: 'Coming soon',
+    playgroundBack: 'Back to games',
+
+    playground: 'Open playground',
+    playgroundError: 'Could not load 2048. Please try again.',
     back: 'Back',
     darkTheme: 'Dark theme',
 

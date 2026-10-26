@@ -4,6 +4,13 @@
  */
 export default {
   menu: {
+    playgroundTitle: 'Мини-игры',
+    playgroundClose: 'Закрыть playground',
+    playgroundSoon: 'Скоро',
+    playgroundBack: 'К играм',
+
+    playground: 'Открыть playground',
+    playgroundError: 'Не удалось загрузить 2048. Попробуйте ещё раз.',
     back: 'Назад',
     darkTheme: 'Тёмная тема',
 
