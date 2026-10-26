@@ -99,20 +99,26 @@ test('exhausted subscription quota gives an actionable pause reason', async () =
   await expect(remoteCodex({ operation: 'decide' })).rejects.toThrow('subscription usage limit');
 });
 
-test.each([false, true])('rate-limited decisions wait before one retry (alwaysLimited=%s)', async (alwaysLimited) => {
-  const delay = jest.spyOn(timers, 'setTimeout').mockResolvedValue(undefined);
-  const counter = join(directory, 'decision-attempts');
-  await writeFile(counter, '0');
-  await executable(
-    `const fs=require('node:fs');const path=${JSON.stringify(counter)};process.stdin.resume();process.stdin.on('end',()=>{const n=Number(fs.readFileSync(path))+1;fs.writeFileSync(path,String(n));console.log(JSON.stringify(n===1||${alwaysLimited}?{ok:false,error:'rate_limit'}:{ok:true,result:{text:'recovered',usage:{input_tokens:7}}}))});`,
-  );
-  const result = runCodex('game', codexSchema(['approve'], false));
-  if (alwaysLimited) await expect(result).rejects.toMatchObject({ codexAttempts: 2 });
-  else await expect(result).resolves.toMatchObject({ text: 'recovered', attempts: 2, unknownUsageAttempts: 1 });
-  expect(delay).toHaveBeenCalledTimes(1);
-  expect(delay).toHaveBeenCalledWith(10000, undefined, { signal: undefined });
-  expect(await readFile(counter, 'utf8')).toBe('2');
-});
+test.each([false, true])(
+  'rate-limited decisions use bounded exponential backoff (alwaysLimited=%s)',
+  async (alwaysLimited) => {
+    const delay = jest.spyOn(timers, 'setTimeout').mockResolvedValue(undefined);
+    const counter = join(directory, 'decision-attempts');
+    await writeFile(counter, '0');
+    await executable(
+      `const fs=require('node:fs');const path=${JSON.stringify(counter)};process.stdin.resume();process.stdin.on('end',()=>{const n=Number(fs.readFileSync(path))+1;fs.writeFileSync(path,String(n));console.log(JSON.stringify(n===1||${alwaysLimited}?{ok:false,error:'rate_limit'}:{ok:true,result:{text:'recovered',usage:{input_tokens:7}}}))});`,
+    );
+    const result = runCodex('game', codexSchema(['approve'], false));
+    if (alwaysLimited) await expect(result).rejects.toMatchObject({ codexAttempts: 4 });
+    else await expect(result).resolves.toMatchObject({ text: 'recovered', attempts: 2, unknownUsageAttempts: 1 });
+    expect(delay).toHaveBeenCalledTimes(alwaysLimited ? 3 : 1);
+    delay.mock.calls.forEach(([ms], i) => {
+      expect(ms).toBeGreaterThanOrEqual(10000 * 2 ** i);
+      expect(ms).toBeLessThanOrEqual(10000 * 2 ** i + 1000);
+    });
+    expect(await readFile(counter, 'utf8')).toBe(alwaysLimited ? '4' : '2');
+  },
+);
 
 test('Stop cancels the rate-limit wait without sending another decision', async () => {
   const delay = jest.spyOn(timers, 'setTimeout');
@@ -229,4 +235,61 @@ test('parallel instance quotas, catalogs and independent decisions route to thei
     expect(own.map((r) => r.operation).sort()).toEqual(['decide', 'decide', 'limits', 'models']);
   }
   expect(process.env.AI_CODEX_SSH_HOST).toBe('worker.example');
+});
+
+test.each([37, 3600, -1, '37'])('remote Retry-After %s is validated and respected', async (seconds) => {
+  const delay = jest.spyOn(timers, 'setTimeout').mockResolvedValue(undefined);
+  const counter = join(directory, 'retry-after');
+  await writeFile(counter, '0');
+  await executable(
+    `const fs=require('fs');let n=Number(fs.readFileSync(${JSON.stringify(counter)}));process.stdin.resume();process.stdin.on('end',()=>{fs.writeFileSync(${JSON.stringify(counter)},String(++n));console.log(JSON.stringify(n===1?{ok:false,error:'rate_limit',retryAfterSeconds:${JSON.stringify(seconds)}}:{ok:true,result:{text:'ok',usage:{}}}));});`,
+  );
+  const result = runCodex('game', codexSchema(['approve'], false));
+  if (seconds === 3600) {
+    await expect(result).rejects.toMatchObject({ codexAttempts: 1 });
+    expect(delay).not.toHaveBeenCalled();
+    expect(await readFile(counter, 'utf8')).toBe('1');
+  } else {
+    await expect(result).resolves.toMatchObject({ attempts: 2 });
+    const ms = delay.mock.calls[0][0] as number;
+    expect(ms).toBeGreaterThanOrEqual(seconds === 37 ? 37000 : 10000);
+    expect(ms).toBeLessThanOrEqual(seconds === 37 ? 38000 : 11000);
+  }
+});
+
+test('slow rate-limit failures cannot extend the retry budget', async () => {
+  const now = jest.spyOn(Date, 'now').mockReturnValue(0);
+  const delay = jest.spyOn(timers, 'setTimeout').mockImplementation(async () => {
+    now.mockReturnValue(85000);
+  });
+  await executable(
+    `process.stdin.resume();process.stdin.on('end',()=>console.log(JSON.stringify({ok:false,error:'rate_limit'})));`,
+  );
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toMatchObject({ codexAttempts: 2 });
+  expect(delay).toHaveBeenCalledTimes(1);
+});
+
+test('generic failure after rate-limit recovery pauses without extending the lease with another long attempt', async () => {
+  jest.spyOn(timers, 'setTimeout').mockResolvedValue(undefined);
+  const counter = join(directory, 'mixed-attempts');
+  await writeFile(counter, '0');
+  await executable(
+    `const fs=require('fs');process.stdin.resume();process.stdin.on('end',()=>{const n=Number(fs.readFileSync(${JSON.stringify(counter)}))+1;fs.writeFileSync(${JSON.stringify(counter)},String(n));console.log(JSON.stringify({ok:false,error:n===1?'rate_limit':'failed'}));});`,
+  );
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toMatchObject({ codexAttempts: 2 });
+  expect(await readFile(counter, 'utf8')).toBe('2');
+});
+
+test('an overslept rate-limit timer cannot dispatch after the recovery deadline', async () => {
+  const now = jest.spyOn(Date, 'now').mockReturnValue(0);
+  const delay = jest.spyOn(timers, 'setTimeout').mockImplementation(async () => {
+    now.mockReturnValue(91000);
+  });
+  const counter = join(directory, 'overslept');
+  await executable(
+    `const fs=require('fs');process.stdin.resume();process.stdin.on('end',()=>{fs.appendFileSync(${JSON.stringify(counter)},'1');console.log(JSON.stringify({ok:false,error:'rate_limit'}));});`,
+  );
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toMatchObject({ codexAttempts: 1 });
+  expect(delay).toHaveBeenCalledTimes(1);
+  expect(await readFile(counter, 'utf8')).toBe('1');
 });

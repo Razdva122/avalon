@@ -165,20 +165,35 @@ export type CodexRunner = (
 }>;
 
 export const runCodex: CodexRunner = async (prompt, schema, signal, settings, instructions) => {
-  try {
-    return { ...(await runCodexOnce(prompt, schema, signal, settings, instructions)), attempts: 1 };
-  } catch (error) {
-    if (!(error instanceof CodexRequestFailed || error instanceof CodexRateLimited) || signal?.aborted) throw error;
-    if (error instanceof CodexRateLimited) await delay(10000, undefined, { signal });
+  const startedAt = Date.now();
+  let attempts = 0,
+    rateRetries = 0;
+  for (;;) {
+    signal?.throwIfAborted();
+    attempts++;
     try {
       return {
         ...(await runCodexOnce(prompt, schema, signal, settings, instructions)),
-        attempts: 2,
-        unknownUsageAttempts: 1,
+        attempts,
+        ...(attempts > 1 ? { unknownUsageAttempts: attempts - 1 } : {}),
       };
-    } catch (second) {
-      if (second instanceof Error) Object.assign(second, { codexAttempts: 2 });
-      throw second;
+    } catch (error) {
+      if (error instanceof Error) Object.assign(error, { codexAttempts: attempts });
+      if (signal?.aborted || attempts >= 4) throw error;
+      if (error instanceof CodexRateLimited) {
+        const waitMs =
+          Math.max(10000 * 2 ** rateRetries, (error.retryAfterSeconds || 0) * 1000) + Math.floor(Math.random() * 1001);
+        // Keep all rate-limit recovery within 90 seconds, below the existing account lease margin.
+        if (Date.now() - startedAt + waitMs > 90000) throw error;
+        rateRetries++;
+        try {
+          await delay(waitMs, undefined, { signal });
+          if (Date.now() - startedAt > 90000) throw error;
+        } catch (cancelled) {
+          if (cancelled instanceof Error) Object.assign(cancelled, { codexAttempts: attempts });
+          throw cancelled;
+        }
+      } else if (!(error instanceof CodexRequestFailed) || attempts !== 1) throw error;
     }
   }
 };
@@ -347,8 +362,8 @@ const runCodexOnce = async (
           if (event.type === 'turn.completed') tokens = event.usage || {};
           if (
             ['error', 'turn.failed'].includes(event.type) &&
-            /(?:hit|reached|exceeded) your usage limit|usage_limit_reached/i.test(
-              event.error?.message || event.message || '',
+            /(?:hit|reached|exceeded) your usage limit|usage_limit_reached|insufficient_quota/i.test(
+              [event.error?.code, event.error?.type, event.error?.message || event.message || ''].join(' '),
             )
           )
             failure = new AiTechnicalPause(
@@ -361,6 +376,7 @@ const runCodexOnce = async (
           )
             failure = new CodexRateLimited(
               'Codex request was rate limited. Wait a while, then manually retry the match.',
+              localRetryAfter(event.error?.message || event.message || ''),
             );
           else if (event.type === 'turn.failed' && !failure)
             failure = new CodexRequestFailed(
@@ -483,4 +499,21 @@ export function codexDecide(
       await repository.recordDecision(trace);
     }
   };
+}
+
+function localRetryAfter(message: string): number | undefined {
+  const header = message.match(/\bretry-after\s*[:=]\s*([^\r\n]+)/i)?.[1].trim();
+  if (header && /^\d+(?:\.\d+)?$/.test(header)) return Math.min(Number(header), Number.MAX_SAFE_INTEGER);
+  if (header && /^[A-Z][a-z]{2}, \d{2} [A-Z][a-z]{2} \d{4} \d{2}:\d{2}:\d{2} GMT$/.test(header)) {
+    const at = Date.parse(header);
+    if (Number.isFinite(at)) return Math.max(0, (at - Date.now()) / 1000);
+  }
+  const retry = message.match(
+    /\b(?:try|retry) (?:again )?(?:in|after)\s+(\d+(?:\.\d+)?)\s*(milliseconds?|ms|minutes?|mins?|seconds?|secs?|s)(?=$|[\s,.;])/i,
+  );
+  if (retry)
+    return Math.min(
+      Number.MAX_SAFE_INTEGER,
+      Number(retry[1]) * (/^(?:milliseconds?|ms)$/i.test(retry[2]) ? 0.001 : /^min/i.test(retry[2]) ? 60 : 1),
+    );
 }

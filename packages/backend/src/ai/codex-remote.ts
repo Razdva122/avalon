@@ -118,7 +118,7 @@ export function remoteCodex(request: object, signal?: AbortSignal, attempt = 0):
               response.error === 'failed'
                 ? new CodexRequestFailed(reason)
                 : response.error === 'rate_limit'
-                  ? new CodexRateLimited(reason)
+                  ? new CodexRateLimited(reason, response.retryAfterSeconds)
                   : new AiTechnicalPause(reason),
             );
           }

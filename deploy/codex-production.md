@@ -244,10 +244,16 @@ diagnostics. Network-isolated Linux regressions passed before this worker update
 ## Rate-limit diagnostics
 
 The worker returns `rate_limit` for a failed CLI turn classified as HTTP 429 or
-an explicit rate-limit error. After the first rate-limited decision, the backend
-waits ten seconds and retries the same request once while the match stays running.
-Stop cancels that wait. If the retry fails, the match pauses with the existing
-manual-retry message. Exhausted subscription usage still pauses immediately.
+an explicit rate-limit error. The backend makes up to four total attempts for a rate-limited decision while
+keeping the match running. Retry delays grow from 10 to 20 to 40 seconds, with
+up to one second of random jitter. A valid `Retry-After` (seconds or HTTP date)
+is a minimum delay and takes precedence over prose in the CLI error. New
+rate-limit retries must fit within the first 90 seconds of the request; longer
+server cooldowns pause the match rather than retrying early. Stop cancels the
+wait. Exhausted subscription usage, including `insufficient_quota`, still pauses
+immediately. Other request failures retain the existing single retry only after
+the first attempt; they do not add another long request after rate-limit retries.
+Attempt counts and unknown usage include every dispatched attempt.
 The CLI may perform its own transport retries.
 Install the updated worker before deploying the backend message change. The
 previous backend already treats this new worker code as a nonretryable pause.
@@ -257,7 +263,14 @@ The same private `state/avalon-last-failure.json` now includes `rateLimit`:
 - `kind`: `tokens`, `requests`, `concurrency`, `account_usage`, or `unknown`,
   derived only from explicit CLI error wording. `windowDurationSeconds`, numeric
   `limit`/`used`/`requested`, and `retryAfterSeconds` are included when recognized.
-  Unsupported number formats or units are omitted rather than guessed.
+  Unsupported number formats or units are omitted rather than guessed. Long valid
+  cooldowns remain recorded and are returned to the backend as `retryAfterSeconds`;
+  older workers without that field still work with the default backoff.
+- `errorCode` and `errorType`: recognized values only, such as `slow_down`,
+  `rate_limit_exceeded`, and `insufficient_quota`. Structured CLI error fields are
+  inspected as well as diagnostic messages. Unknown values are omitted.
+- `requestID`: a bounded `req_` identifier or UUID found in request-ID diagnostics,
+  to correlate a provider refusal without retaining the raw error message.
 - `quota`: a fresh read of `account/rateLimits/read`, with `checkedAt`,
   `status`, and up to 16 sanitized `buckets`. Each bucket contains its limit ID,
   primary/secondary usage percentage, window duration and reset timestamp,

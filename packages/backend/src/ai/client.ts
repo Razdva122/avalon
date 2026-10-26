@@ -60,7 +60,14 @@ export type Decide = (request: BotRequest, signal?: AbortSignal) => Promise<BotR
 export class AiPause extends Error {}
 export class AiTechnicalPause extends AiPause {}
 export class CodexRequestFailed extends AiTechnicalPause {}
-export class CodexRateLimited extends AiTechnicalPause {}
+export class CodexRateLimited extends AiTechnicalPause {
+  readonly retryAfterSeconds?: number;
+  constructor(message: string, retryAfterSeconds?: unknown) {
+    super(message);
+    if (typeof retryAfterSeconds === 'number' && Number.isFinite(retryAfterSeconds) && retryAfterSeconds >= 0)
+      this.retryAfterSeconds = retryAfterSeconds;
+  }
+}
 
 export const ladyAnnouncementAdvice =
   'Lady rule for this AI table: Good bots must announce the actual Lady result; they cannot lie, even to protect Merlin. Only Evil bots may announce a false result. humanSeats lists humans; all other seated players are bots. Humans may lie regardless of alignment, so a false human announcement alone does not prove Evil. If reliable knowledge or valid mission deductions establish that a bot announcement is false, that false announcement by a bot proves that checker Evil; retain this deduction in subsequent reasoning. A truthful announcement alone does not prove the checker Good: Evil may tell the truth. You may publicly state your own Success card as participation testimony and accuse a false bot checker using the resulting deduction without naming your role, Merlin or the wizard pair. Others cannot see your card, so your statement is testimony to them, not public engine proof. Do not expose private role assignments as the source of your accusation.';

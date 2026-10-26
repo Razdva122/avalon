@@ -153,7 +153,7 @@ test.each(['error', 'turn.failed'])('local usage limit in %s pauses without retr
   expect(attempts).toBe(1);
 });
 
-test.each(['error', 'turn.failed'])('local HTTP 429 in %s waits before one retry', async (eventType) => {
+test.each(['error', 'turn.failed'])('local HTTP 429 in %s waits before bounded retries', async (eventType) => {
   delete process.env.AI_CODEX_SSH_HOST;
   const delay = jest.spyOn(timers, 'setTimeout').mockResolvedValue(undefined);
   let attempts = 0;
@@ -163,10 +163,13 @@ test.each(['error', 'turn.failed'])('local HTTP 429 in %s waits before one retry
     current.stdout.write(JSON.stringify({ type: 'turn.failed' }) + '\n');
     child.emit('close', 1);
   });
-  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toMatchObject({ codexAttempts: 2 });
-  expect(attempts).toBe(2);
-  expect(delay).toHaveBeenCalledTimes(1);
-  expect(delay).toHaveBeenCalledWith(10000, undefined, { signal: undefined });
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toMatchObject({ codexAttempts: 4 });
+  expect(attempts).toBe(4);
+  expect(delay).toHaveBeenCalledTimes(3);
+  delay.mock.calls.forEach(([ms], i) => {
+    expect(ms).toBeGreaterThanOrEqual(10000 * 2 ** i);
+    expect(ms).toBeLessThanOrEqual(10000 * 2 ** i + 1000);
+  });
 });
 
 test('stop after a failed turn prevents the automatic retry', async () => {
@@ -198,3 +201,40 @@ test('a forbidden tool error cannot become retryable through a later failed-turn
   await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toThrow('tool');
   expect(attempts).toBe(1);
 });
+
+test.each([
+  { message: 'HTTP 429', code: 'insufficient_quota' },
+  { message: 'HTTP 429', type: 'insufficient_quota' },
+  { message: 'HTTP 429 {"code":"insufficient_quota"}' },
+])('local structured quota exhaustion is terminal: %s', async (error) => {
+  delete process.env.AI_CODEX_SSH_HOST;
+  const delay = jest.spyOn(timers, 'setTimeout').mockResolvedValue(undefined);
+  fakeChild((child) => {
+    mockedSpawn.mock.results[mockedSpawn.mock.calls.length - 1].value.stdout.write(
+      JSON.stringify({ type: 'turn.failed', error }) + '\n',
+    );
+    child.emit('close', 1);
+  });
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toThrow('usage limit');
+  expect(mockedSpawn).toHaveBeenCalledTimes(1);
+  expect(delay).not.toHaveBeenCalled();
+});
+
+test.each(['HTTP 429\nRetry-After: 37', 'HTTP 429\nRetry-After: Mon, 26 Oct 2026 15:00:37 GMT  \n'])(
+  'local Retry-After delays the retry: %s',
+  async (message) => {
+    delete process.env.AI_CODEX_SSH_HOST;
+    jest.spyOn(Date, 'now').mockReturnValue(Date.parse('2026-10-26T15:00:00Z'));
+    const delay = jest.spyOn(timers, 'setTimeout').mockResolvedValue(undefined);
+    let n = 0;
+    fakeChild((child, args) => {
+      const current = mockedSpawn.mock.results[n++].value;
+      if (n === 1) {
+        current.stdout.write(JSON.stringify({ type: 'turn.failed', error: { message } }) + '\n');
+        child.emit('close', 1);
+      } else void writeFile(args[args.indexOf('-o') + 1], '{}').then(() => child.emit('close', 0));
+    });
+    await expect(runCodex('game', codexSchema(['approve'], false))).resolves.toMatchObject({ attempts: 2 });
+    expect(delay.mock.calls[0][0]).toBeGreaterThanOrEqual(37000);
+  },
+);

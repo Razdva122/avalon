@@ -112,8 +112,18 @@ function quota(method = 'account/rateLimits/read', params) {
   });
 }
 
-function parseRateLimit(text) {
+function parseRateLimit(text, now = Date.now()) {
   const details = { kind: 'unknown' };
+  const code = text.match(
+    /"code"\s*:\s*"(rate_limit_exceeded|slow_down|too_many_requests|server_is_overloaded|insufficient_quota)"/i,
+  );
+  const type = text.match(/"type"\s*:\s*"(rate_limit_error|server_error|insufficient_quota)"/i);
+  const requestID = text.match(
+    /\b(?:x-request-id|request[_ -]id)\s*[:=]\s*(req_[a-zA-Z0-9]{6,100}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?=$|[\s,;])/i,
+  );
+  if (code) details.errorCode = code[1].toLowerCase();
+  if (type) details.errorType = type[1].toLowerCase();
+  if (requestID) details.requestID = requestID[1];
   if (/concurrent requests|concurrency|simultaneous requests/i.test(text)) details.kind = 'concurrency';
   else if (/tokens? per (?:min|second)|\bTPM\b/i.test(text)) details.kind = 'tokens';
   else if (/requests? per (?:min|second)|\bRPM\b/i.test(text)) details.kind = 'requests';
@@ -123,14 +133,24 @@ function parseRateLimit(text) {
     const amount = text.match(new RegExp(`\\b${label}\\s*[:=]?\\s*(\\d+)(?=$|\\s|[,.;](?!\\d))`, 'i'));
     if (amount && Number.isSafeInteger(Number(amount[1]))) details[label] = Number(amount[1]);
   }
-  const retry =
-    text.match(
+  const header = text.match(/\bretry-after\s*[:=]\s*([^\r\n]+)/i)?.[1].trim();
+  if (header && /^\d+(?:\.\d+)?$/.test(header)) {
+    details.retryAfterSeconds = Math.min(Number(header), Number.MAX_SAFE_INTEGER);
+  } else if (
+    header &&
+    /^[A-Z][a-z]{2}, \d{2} [A-Z][a-z]{2} \d{4} \d{2}:\d{2}:\d{2} GMT$/i.test(header) &&
+    Number.isFinite(Date.parse(header))
+  ) {
+    details.retryAfterSeconds = Math.max(0, (Date.parse(header) - now) / 1000);
+  } else {
+    const retry = text.match(
       /\b(?:try|retry) (?:again )?(?:in|after)\s+(\d+(?:\.\d+)?)\s*(milliseconds?|ms|minutes?|mins?|seconds?|secs?|s)(?=$|[\s,.;])/i,
-    ) || text.match(/\bretry-after\s*[:=]\s*(\d+(?:\.\d+)?)(?=[\t ]*(?:\r?\n|$))/i);
-  if (retry) {
-    const seconds =
-      Number(retry[1]) * (/^(?:milliseconds?|ms)$/i.test(retry[2]) ? 0.001 : /^min/i.test(retry[2]) ? 60 : 1);
-    if (Number.isFinite(seconds) && seconds >= 0 && seconds <= 7 * 86400) details.retryAfterSeconds = seconds;
+    );
+    if (retry)
+      details.retryAfterSeconds = Math.min(
+        Number.MAX_SAFE_INTEGER,
+        Number(retry[1]) * (/^(?:milliseconds?|ms)$/i.test(retry[2]) ? 0.001 : /^min/i.test(retry[2]) ? 60 : 1),
+      );
   }
   return details;
 }
@@ -278,7 +298,7 @@ async function decide(request) {
           /(?:HTTP(?:\/\d(?:\.\d)?)?\s+|status(?:\s+code)?\s*[:=]?\s*)([45]\d{2})\b/i,
         );
         if (status) httpStatus = Number(status[1]);
-        if (/(?:hit|reached|exceeded) your usage limit|usage_limit_reached/i.test(diagnosticBuffer))
+        if (/(?:hit|reached|exceeded) your usage limit|usage_limit_reached|insufficient_quota/i.test(diagnosticBuffer))
           errorCategory = 'usage_limit';
         else if (/rate.?limit|too many requests/i.test(diagnosticBuffer) || httpStatus === 429)
           errorCategory = 'rate_limit';
@@ -326,8 +346,15 @@ async function decide(request) {
             )
               lastEvent = event.type;
             if (event.type === 'turn.completed') tokens = event.usage || {};
-            if (['error', 'turn.failed'].includes(event.type))
-              noteDiagnostic(event.error?.message || event.message || '');
+            if (['error', 'turn.failed'].includes(event.type)) {
+              noteDiagnostic(
+                '\n' +
+                  JSON.stringify({ code: event.error?.code, type: event.error?.type }) +
+                  '\n' +
+                  (event.error?.message || event.message || '') +
+                  '\n',
+              );
+            }
             if (['command_execution', 'mcp_tool_call', 'web_search', 'file_change'].includes(event.item?.type)) {
               failureReason = 'forbidden_tool';
               failure = true;
@@ -377,7 +404,12 @@ async function decide(request) {
             /* diagnostic storage must not prevent request cleanup */
           }
         }
-        if (failure || code !== 0) reject(Error(failureReason));
+        if (failure || code !== 0)
+          reject(
+            Object.assign(Error(failureReason), {
+              retryAfterSeconds: parseRateLimit(diagnosticBuffer).retryAfterSeconds,
+            }),
+          );
         else resolve(tokens);
       });
       child.stdin.end(request.instructions ? request.prompt.slice(request.instructions.length) : request.prompt);
@@ -427,6 +459,9 @@ async function main() {
     process.stdout.write(
       JSON.stringify({
         ok: false,
+        ...(error.message === 'rate_limit' && error.retryAfterSeconds !== undefined
+          ? { retryAfterSeconds: error.retryAfterSeconds }
+          : {}),
         error: ['rate_limit', 'usage_limit', 'timeout', 'forbidden_tool', 'output_limit', 'cli_unavailable'].includes(
           error.message,
         )
@@ -440,5 +475,5 @@ async function main() {
     );
   }
 }
-module.exports = { validateRequest, handleRequest };
+module.exports = { validateRequest, handleRequest, parseRateLimit };
 if (require.main === module) main();

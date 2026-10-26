@@ -29,13 +29,13 @@ test('worker validates reset UUID, optional credit ID and exact fields', () => {
     assert.throws(() => validateRequest({ operation: 'reset', ...fields }));
 });
 
-async function withFakeResetServer(result, run) {
+async function withFakeResetServer(result, run, error = { message: 'HTTP 429' }) {
   const directory = await mkdtemp(join(tmpdir(), 'worker-reset-'));
   const transcript = join(directory, 'rpc.jsonl');
   try {
     await writeFile(
       join(directory, 'codex'),
-      `#!${process.execPath}\nconst fs=require('node:fs');fs.appendFileSync(${JSON.stringify(transcript)},JSON.stringify({args:process.argv.slice(2)})+'\\n');if(process.argv[2]==='debug'){console.log('[]');}else if(process.argv[2]==='exec'){process.stdin.resume();process.stdin.on('end',()=>{console.log(JSON.stringify({type:'turn.failed',error:{message:'HTTP 429'}}));setInterval(()=>{},1000)});}else{require('node:readline').createInterface({input:process.stdin}).on('line',line=>{const m=JSON.parse(line);fs.appendFileSync(${JSON.stringify(transcript)},line+'\\n');if(m.id===1)console.log(JSON.stringify({id:1,result:{}}));if(m.id===2)console.log(JSON.stringify({id:2,result:${JSON.stringify(result)}}));});}`,
+      `#!${process.execPath}\nconst fs=require('node:fs');fs.appendFileSync(${JSON.stringify(transcript)},JSON.stringify({args:process.argv.slice(2)})+'\\n');if(process.argv[2]==='debug'){console.log('[]');}else if(process.argv[2]==='exec'){process.stdin.resume();process.stdin.on('end',()=>{const errors=${JSON.stringify(error)};for(const [i,error] of (Array.isArray(errors)?errors:[errors]).entries())console.log(JSON.stringify({type:Array.isArray(errors)&&i===0?'error':'turn.failed',error}));setInterval(()=>{},1000)});}else{require('node:readline').createInterface({input:process.stdin}).on('line',line=>{const m=JSON.parse(line);fs.appendFileSync(${JSON.stringify(transcript)},line+'\\n');if(m.id===1)console.log(JSON.stringify({id:1,result:{}}));if(m.id===2)console.log(JSON.stringify({id:2,result:${JSON.stringify(result)}}));});}`,
       { mode: 0o700 },
     );
     await run(
@@ -51,6 +51,8 @@ async function withFakeResetServer(result, run) {
         return JSON.parse(stdout);
       },
       async () => (await require('node:fs/promises').readFile(transcript, 'utf8')).trim().split('\n').map(JSON.parse),
+      async () =>
+        JSON.parse(await require('node:fs/promises').readFile(join(directory, 'avalon-last-failure.json'), 'utf8')),
     );
   } finally {
     await rm(directory, { recursive: true, force: true });
@@ -402,7 +404,11 @@ for (const [message, kind, retryAfterSeconds, amounts, chunks] of [
       const done = new Promise((resolve) => child.on('close', resolve));
       child.stdin.end(JSON.stringify({ operation: 'decide', prompt: 'PRIVATE_GAME_INPUT', schema: {} }));
       assert.equal(await done, 0);
-      assert.deepEqual(JSON.parse(stdout), { ok: false, error: 'rate_limit' });
+      assert.deepEqual(JSON.parse(stdout), {
+        ok: false,
+        error: 'rate_limit',
+        ...(retryAfterSeconds === undefined ? {} : { retryAfterSeconds }),
+      });
       const diagnostic = JSON.parse(
         await require('node:fs/promises').readFile(join(directory, 'avalon-last-failure.json'), 'utf8'),
       );
@@ -517,3 +523,88 @@ test(
     }
   },
 );
+
+test('safe diagnostics retain structured error identifiers and HTTP-date Retry-After without raw messages', () => {
+  const { parseRateLimit } = require('./worker.cjs');
+  const now = Date.parse('2026-10-26T15:00:00Z');
+  const details = parseRateLimit(
+    'HTTP 429 {"error":{"code":"slow_down","type":"rate_limit_error"}}\nX-Request-ID: req_abcdef123456\nRetry-After: Mon, 26 Oct 2026 15:00:37 GMT\nPRIVATE_TOKEN PRIVATE_GAME_INPUT',
+    now,
+  );
+  assert.deepEqual(details, {
+    kind: 'unknown',
+    errorCode: 'slow_down',
+    errorType: 'rate_limit_error',
+    requestID: 'req_abcdef123456',
+    retryAfterSeconds: 37,
+  });
+  assert.doesNotMatch(JSON.stringify(details), /PRIVATE_/);
+  const unsupported = parseRateLimit('{"code":"PRIVATE_CODE","type":"PRIVATE_TYPE"} X-Request-ID: PRIVATE_ACCOUNT');
+  assert.deepEqual(unsupported, { kind: 'unknown' });
+});
+
+test('structured CLI error fields reach safe diagnostics without retaining arbitrary fields', async () => {
+  await withFakeResetServer(
+    { rateLimits: {} },
+    async (request, _messages, diagnostic) => {
+      assert.deepEqual(await request({ operation: 'decide', prompt: 'PRIVATE_GAME_INPUT', schema: {} }), {
+        ok: false,
+        error: 'rate_limit',
+      });
+      const details = await diagnostic();
+      assert.equal(details.rateLimit.errorCode, 'slow_down');
+      assert.equal(details.rateLimit.errorType, 'rate_limit_error');
+      assert.doesNotMatch(JSON.stringify(details), /PRIVATE_/);
+    },
+    { message: 'HTTP 429 PRIVATE_TOKEN', code: 'slow_down', type: 'rate_limit_error', private: 'PRIVATE_OTHER' },
+  );
+});
+
+test('Retry-After headers win over prose and long cooldowns remain terminal for automatic recovery', () => {
+  const { parseRateLimit } = require('./worker.cjs');
+  assert.equal(parseRateLimit('Retry-After: 80\nPlease try again in 1 seconds.').retryAfterSeconds, 80);
+  assert.equal(parseRateLimit('Retry-After: 691200\n').retryAfterSeconds, 691200);
+  assert.equal(
+    parseRateLimit('Retry-After: Mon, 26 Oct 2026 15:00:37 GMT  \n', Date.parse('2026-10-26T15:00:00Z'))
+      .retryAfterSeconds,
+    37,
+  );
+});
+for (const error of [
+  { message: 'HTTP 429', code: 'insufficient_quota' },
+  { message: 'HTTP 429', type: 'insufficient_quota' },
+  { message: 'HTTP 429 {"code":"insufficient_quota"}' },
+]) {
+  test(
+    'exhausted quota in structured fields or JSON is not reported as transient HTTP429 ' + JSON.stringify(error),
+    async () => {
+      await withFakeResetServer(
+        { rateLimits: {} },
+        async (request) => {
+          assert.deepEqual(await request({ operation: 'decide', prompt: 'game', schema: {} }), {
+            ok: false,
+            error: 'usage_limit',
+          });
+        },
+        error,
+      );
+    },
+  );
+}
+
+for (const header of ['80', 'Mon, 26 Oct 2037 15:00:37 GMT']) {
+  test('an error followed by turn.failed preserves Retry-After ' + header, async () => {
+    await withFakeResetServer(
+      { rateLimits: {} },
+      async (request) => {
+        const before = Date.now();
+        const reply = await request({ operation: 'decide', prompt: 'game', schema: {} });
+        assert.equal(reply.error, 'rate_limit');
+        const expected = header === '80' ? 80 : (Date.parse(header) - before) / 1000;
+        assert.ok(reply.retryAfterSeconds >= expected - 5);
+        assert.ok(reply.retryAfterSeconds <= expected);
+      },
+      [{ message: 'HTTP 429\nRetry-After: ' + header }, { message: 'HTTP 429' }],
+    );
+  });
+}
