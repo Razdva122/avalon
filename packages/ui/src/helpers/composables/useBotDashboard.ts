@@ -1,7 +1,21 @@
 import { onBeforeUnmount, ref, watch } from 'vue';
-import type { AiBotDashboard, BotQuotaThresholds } from '@avalon/types';
+import type { AiBotDashboard, AiBotInstanceStatus, BotQuotaThresholds } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
+
+export function getBotSlots(bot: AiBotInstanceStatus) {
+  const total = bot.maxGames ?? 1;
+  const used = bot.rooms
+    ? new Set(bot.rooms.map((room) => room.roomID)).size
+    : bot.roomID
+      ? 1
+      : bot.status === 'busy'
+        ? total
+        : 0;
+  const empty = Math.max(0, total - used);
+  const free = bot.status === 'free' ? empty : 0;
+  return { total, used, free, unavailable: empty - free };
+}
 
 export function useBotDashboard() {
   const store = useStore();
