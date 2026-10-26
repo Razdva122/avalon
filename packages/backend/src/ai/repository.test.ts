@@ -468,6 +468,121 @@ test('independent instance leases allow one concurrent match each and scope stal
   await expect(claim('four', 'second')).rejects.toThrow();
 });
 
+test('two account slots are atomic across backends and release preserves the other owner', async () => {
+  const db = client.db('two-game-slots');
+  const repo = new AiRepository(db);
+  const peer = new AiRepository(db);
+  const results = await Promise.allSettled([
+    repo.claim('one', 'shared', 2),
+    peer.claim('two', 'shared', 2),
+    peer.claim('three', 'shared', 2),
+  ]);
+  expect(results.filter((result) => result.status === 'fulfilled')).toHaveLength(2);
+  const busy = await peer.busyInstances();
+  expect(busy).toHaveLength(2);
+  expect(busy.every((lease) => lease.instanceID === 'shared')).toBe(true);
+  await expect(peer.claim('overflow', 'shared', 2)).rejects.toThrow();
+  await repo.release(busy[0].roomID);
+  // Re-claiming the surviving room must renew its slot, never consume the freed one.
+  await peer.claim(busy[1].roomID, 'shared', 2);
+  expect(await repo.busyInstances()).toHaveLength(1);
+  await peer.claim('replacement', 'shared', 2);
+  await repo.release(busy[0].roomID);
+  await expect(repo.renewLease(busy[0].roomID)).rejects.toThrow();
+  await repo.renewLease(busy[1].roomID);
+  await repo.renewLease('replacement');
+  expect(await repo.busyInstances()).toHaveLength(2);
+});
+
+test('overlapping games retain exact token totals without double-counting shared account quota', async () => {
+  const db = client.db('shared-account-accounting');
+  const repo = new AiRepository(db);
+  const now = Date.now();
+  const before = {
+    remainingPercent: 90,
+    resetsAt: Math.floor(now / 1000) + 86400,
+    checkedAt: now - 1000,
+    shortTerm: { remainingPercent: 90, resetsAt: Math.floor(now / 1000) + 3600 },
+  };
+  const state = {
+    ai: { status: 'running' },
+    players: [],
+    options: {},
+  } as unknown as import('@avalon/types').StartedRoomState;
+  await Promise.all(['a', 'b'].map((roomID) => repo.claim(roomID, 'shared', 2)));
+  await Promise.all(['a', 'b'].map((roomID) => repo.startGameUsage({ ...state, roomID }, 'shared', before)));
+  for (const roomID of ['a', 'b']) {
+    await repo.recordRequest({
+      _id: roomID,
+      roomID,
+      player: 'bot',
+      stage: 'vote',
+      mode: 'codex',
+      startedAt: new Date(now),
+      status: 'completed',
+      inputTokens: 100,
+      outputTokens: 20,
+    });
+    await repo.finishGameUsage(roomID, {
+      ...before,
+      remainingPercent: 80,
+      checkedAt: Date.now(),
+      shortTerm: { ...before.shortTerm, remainingPercent: 80 },
+    });
+  }
+  expect(await repo.recentGameUsage()).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ roomID: 'a', inputTokens: 100, weeklySpent: null, shortTermSpent: null }),
+      expect.objectContaining({ roomID: 'b', inputTokens: 100, weeklySpent: null, shortTermSpent: null }),
+    ]),
+  );
+  expect((await repo.weeklyAccountUsage([{ id: 'shared', quota: before }]))[0]).toMatchObject({
+    tokens: 240,
+    gameCount: 2,
+    weeklySpent: null,
+    weeklyIncomplete: true,
+    shortTermSpent: null,
+    shortTermIncomplete: true,
+  });
+});
+
+test('a paused game retains shared-quota protection when a sibling starts before it resumes', async () => {
+  const repo = new AiRepository(client.db('paused-shared-account'));
+  const now = Date.now();
+  const quota = { remainingPercent: 90, resetsAt: Math.floor(now / 1000) + 86400, checkedAt: now };
+  const state = {
+    ai: { status: 'running' },
+    players: [],
+    options: {},
+  } as unknown as import('@avalon/types').StartedRoomState;
+  await repo.claim('paused', 'one', 2);
+  await repo.startGameUsage({ ...state, roomID: 'paused' }, 'one', quota);
+  await repo.finishGameUsage('paused', { ...quota, remainingPercent: 89, checkedAt: now + 1 });
+  await client
+    .db('paused-shared-account')
+    .collection('ai_game_usage')
+    .updateOne({ roomID: 'paused' }, { $set: { status: 'paused', checkedAt: now - 1 } });
+  await repo.claim('sibling', 'one', 2);
+  await repo.startGameUsage({ ...state, roomID: 'sibling' }, 'one', quota);
+  await repo.finishGameUsage('paused', { ...quota, remainingPercent: 80, checkedAt: now + 2 });
+  expect((await repo.recentGameUsage()).find((game) => game.roomID === 'paused')!.weeklySpent).toBeNull();
+});
+
+test('an abandoned usage record without a live lease cannot contaminate later game quota', async () => {
+  const repo = new AiRepository(client.db('abandoned-shared-account'));
+  const quota = { remainingPercent: 90, resetsAt: Math.floor(Date.now() / 1000) + 86400, checkedAt: Date.now() };
+  const state = {
+    ai: { status: 'running' },
+    players: [],
+    options: {},
+  } as unknown as import('@avalon/types').StartedRoomState;
+  await repo.startGameUsage({ ...state, roomID: 'abandoned' }, 'one', quota);
+  await repo.claim('new-room', 'one', 2);
+  await repo.startGameUsage({ ...state, roomID: 'new-room' }, 'one', quota);
+  await repo.finishGameUsage('new-room', { ...quota, remainingPercent: 89, checkedAt: Date.now() });
+  expect((await repo.recentGameUsage()).find((game) => game.roomID === 'new-room')!.weeklySpent).toBe(1);
+});
+
 test('per-game usage survives restart, aggregates retried audits once and keeps account snapshots isolated', async () => {
   const db = client.db('game-usage');
   const repo = new AiRepository(db);
