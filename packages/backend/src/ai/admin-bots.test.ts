@@ -21,9 +21,10 @@ beforeEach(() => {
     if (codexEnvironment().AI_CODEX_HOME === '/pool/three') throw Error('offline');
     return { remainingPercent: 80, resetsAt: null, checkedAt: 123, shortTerm: null };
   });
-  jest
-    .spyOn(catalog, 'getCodexModels')
-    .mockResolvedValue([{ id: 'gpt-6-luna', label: 'Luna', efforts: ['low', 'medium'] }]);
+  jest.spyOn(catalog, 'getCodexModels').mockResolvedValue([
+    { id: 'gpt-6-luna', label: 'Luna', efforts: ['low', 'medium'] },
+    { id: 'gpt-6.1-terra', label: 'Terra', efforts: ['low', 'medium'] },
+  ]);
 });
 afterEach(() => {
   jest.restoreAllMocks();

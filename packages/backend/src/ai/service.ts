@@ -34,8 +34,8 @@ import { defaultBotQuotaThresholds, validBotQuotaThresholds } from './quota-poli
 
 const humanSettings: Record<AiBotMode, CodexSettings> = {
   smart: { model: 'gpt-6.1-sol', reasoning: 'medium' },
-  regular: { model: 'gpt-6-luna', reasoning: 'medium' },
-  beginner: { model: 'gpt-6-luna', reasoning: 'low' },
+  regular: { model: 'gpt-6.1-terra', reasoning: 'medium' },
+  beginner: { model: 'gpt-6.1-terra', reasoning: 'low' },
 };
 
 function humanModeAvailable(

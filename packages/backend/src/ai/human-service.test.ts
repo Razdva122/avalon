@@ -14,7 +14,7 @@ import { errorHandler } from '@/helpers/socket';
 const initialEnvironment = { ...process.env };
 const models = [
   { id: 'gpt-6.1-sol', label: 'Sol', efforts: ['medium'] },
-  { id: 'gpt-6-luna', label: 'Luna', efforts: ['low', 'medium'] },
+  { id: 'gpt-6.1-terra', label: 'Terra', efforts: ['low', 'medium'] },
 ];
 let quota: jest.SpyInstance;
 let modelCatalog: jest.SpyInstance;
@@ -209,7 +209,7 @@ test('only the ready-room owner can stop preparation, cancel expiry, and release
 
 test.each([
   ['smart', 'gpt-6.1-sol', 'medium'],
-  ['regular', 'gpt-6-luna', 'medium'],
+  ['regular', 'gpt-6.1-terra', 'medium'],
 ])('start applies %s settings and language to the same ready room', async (difficulty, model, reasoning) => {
   const { draft, connect, claim, host } = fixture();
   const room = await draft();
@@ -374,14 +374,14 @@ test('technical resume retains selected model without applying a new-match quota
   await connect('owner').controlAiRoom(room.roomID, 'resumeTechnical', response);
   expect(response).toHaveBeenCalledWith({ ok: true });
   expect(quota).not.toHaveBeenCalled();
-  expect(room.ai?.codex).toEqual({ model: 'gpt-6-luna', reasoning: 'medium' });
+  expect(room.ai?.codex).toEqual({ model: 'gpt-6.1-terra', reasoning: 'medium' });
 });
 
 test('model catalog support is checked again before starting', async () => {
   const { draft, connect, claim } = fixture();
   const room = await draft();
   claim.mockClear();
-  modelCatalog.mockResolvedValue([{ id: 'gpt-6-luna', label: 'Luna', efforts: ['high'] }]);
+  modelCatalog.mockResolvedValue([{ id: 'gpt-6.1-terra', label: 'Terra', efforts: ['high'] }]);
   const response = jest.fn();
   await connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'en' }, response);
   expect(response.mock.calls[0][0]).toHaveProperty('error');
@@ -738,7 +738,7 @@ test.each([
   const started = jest.fn();
   await handlers.startHumanAiRoom(id, { difficulty: 'regular', language: 'en', playerCount: 5 }, started);
   expect(started).toHaveBeenCalledWith({ ok: true });
-  expect(host.rooms[id].ai?.codex).toEqual({ model: 'gpt-6-luna', reasoning: 'low' });
+  expect(host.rooms[id].ai?.codex).toEqual({ model: 'gpt-6.1-terra', reasoning: 'low' });
 });
 
 test('first game rechecks its own quota at launch', async () => {

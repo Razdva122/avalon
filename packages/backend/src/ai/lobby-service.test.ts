@@ -26,7 +26,7 @@ beforeEach(() => {
   });
   jest.spyOn(catalog, 'getCodexModels').mockResolvedValue([
     { id: 'gpt-6.1-sol', label: 'Sol', efforts: ['medium'] },
-    { id: 'gpt-6-luna', label: 'Luna', efforts: ['medium'] },
+    { id: 'gpt-6.1-terra', label: 'Terra', efforts: ['medium'] },
   ]);
   // Keep the real game/roles engine, but never spend model requests or start action timers.
   jest.spyOn(BotRoom.prototype, 'run').mockImplementation(async function (this: BotRoom) {
@@ -209,7 +209,7 @@ test('requires callback and rejects reserved room IDs through the socket path', 
 
 test('unavailable strong preset does not fall back to regular bots', async () => {
   const f = fixture();
-  jest.mocked(catalog.getCodexModels).mockResolvedValue([{ id: 'gpt-6-luna', label: 'Luna', efforts: ['medium'] }]);
+  jest.mocked(catalog.getCodexModels).mockResolvedValue([{ id: 'gpt-6.1-terra', label: 'Terra', efforts: ['medium'] }]);
   const cb = jest.fn();
   await f.connect('owner').getLobbyAiAccess('lobby-id', cb);
   expect(cb.mock.calls[0][0].available).toBe(false);

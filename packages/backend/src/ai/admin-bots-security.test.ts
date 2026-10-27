@@ -39,9 +39,10 @@ beforeAll(async () => {
   jest
     .spyOn(limits, 'getCodexWeeklyLimit')
     .mockResolvedValue({ remainingPercent: 80, shortTerm: null, resetsAt: null, checkedAt: 123 });
-  jest
-    .spyOn(models, 'getCodexModels')
-    .mockResolvedValue([{ id: 'gpt-6-luna', label: 'Luna', efforts: ['low', 'medium'] }]);
+  jest.spyOn(models, 'getCodexModels').mockResolvedValue([
+    { id: 'gpt-6-luna', label: 'Luna', efforts: ['low', 'medium'] },
+    { id: 'gpt-6.1-terra', label: 'Terra', efforts: ['low', 'medium'] },
+  ]);
   const service = new AiService({
     rooms: {},
     dbManager: {

@@ -46,6 +46,7 @@ beforeEach(() => {
   jest.spyOn(catalog, 'getCodexModels').mockResolvedValue([
     { id: 'gpt-6.1-sol', label: 'Sol', efforts: ['low', 'medium'] },
     { id: 'gpt-6-luna', label: 'Luna', efforts: ['low', 'medium'] },
+    { id: 'gpt-6.1-terra', label: 'Terra', efforts: ['low', 'medium'] },
   ]);
 });
 afterEach(async () => {
