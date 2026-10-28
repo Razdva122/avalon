@@ -2,6 +2,22 @@ import { languageSuggestions } from '../../suggestions';
 
 export default {
   timerUi: {
+    controls: 'Lượt và bộ đếm giờ',
+    perTurn: 'Mỗi lượt',
+    customDuration: 'Tùy chỉnh thời gian…',
+    durationRange: 'Nhập số nguyên từ 1 đến 86400 giây.',
+    durationHint: 'Áp dụng khi bắt đầu hoặc chuyển lượt. Thời gian đang đếm không đổi.',
+    nextPlayer: 'Tiếp theo: {name}',
+    nextHint: 'Chuyển lượt và bắt đầu đếm lại {time}',
+    start: 'Bắt đầu',
+    stop: 'Dừng',
+    addCurrentHint: 'Chỉ thêm một phút cho lượt hiện tại',
+
+    turn: 'Lượt',
+    unassigned: 'Bộ đếm giờ chung',
+    next: 'Tiếp theo',
+    playerTurn: 'Lượt: {name}',
+
     doubleClickMinute: 'Nhấp đúp để thêm một phút',
     addTime: '+ thời gian',
     stage: 'Theo giai đoạn',
@@ -142,8 +158,8 @@ export default {
     host: 'Quản trị viên',
     hostPanel: 'Bảng quản trị',
     endRestartGameHint: 'Dùng các nút để bỏ phiếu kết thúc hoặc chơi lại ván này',
-    endGame: 'Kết thúc ván chơi',
-    restartGame: 'Chơi lại',
+    endGame: 'Bỏ phiếu kết thúc',
+    restartGame: 'Bỏ phiếu bắt đầu lại',
     shuffle: 'Xáo trộn',
     shuffleHint: 'Xáo trộn người chơi trong sảnh',
   },

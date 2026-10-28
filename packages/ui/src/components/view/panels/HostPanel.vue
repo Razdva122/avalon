@@ -17,7 +17,7 @@
         >
       </v-btn>
     </template>
-    <section class="host-console">
+    <section class="host-console" :class="themeClasses">
       <header class="host-header">
         <div>
           <h2>{{ $t(started ? 'hostMenu.hostPanel' : 'startPanel.options') }}</h2>
@@ -42,6 +42,10 @@
               ><strong>{{ roomState.players.length }}</strong> / 10 {{ $t('hostMenu.players') }}</span
             >
           </div>
+          <section v-if="manualTimer && !gameEnded" class="host-section">
+            <h3>{{ $t('timerUi.controls') }}</h3>
+            <CustomTimerControls :roomID="roomState.roomID" :leaderID="roomState.leaderID" />
+          </section>
           <section v-if="!started" class="host-section">
             <div class="host-section-heading">
               <h3>{{ $t('hostMenu.access') }}</h3>
@@ -118,14 +122,8 @@
             >
             <p v-if="!started" class="host-description">{{ $t('hostMenu.shuffleHint') }}</p>
           </section>
-          <section v-if="manualTimer && !gameEnded" class="host-section">
-            <h3>{{ $t('options.timer') }}</h3>
-            <CustomTimerControls :roomID="roomState.roomID" :leaderID="roomState.leaderID" />
-          </section>
-          <section v-if="started && !gameEnded" class="host-section host-danger">
-            <div class="host-section-heading">
-              <h3>{{ $t('hostMenu.gameActions') }}</h3>
-            </div>
+          <details v-if="started && !gameEnded" class="host-section host-danger">
+            <summary>{{ $t('hostMenu.gameActions') }}</summary>
             <p class="host-description">
               {{ $t(roomState.vote ? 'hostMenu.votePending' : 'hostMenu.endRestartGameHint') }}
             </p>
@@ -135,7 +133,7 @@
             <v-btn block variant="text" color="error" :disabled="!canVote" @click="confirmation = 'endGame'">{{
               $t('hostMenu.endGame')
             }}</v-btn>
-          </section>
+          </details>
           <p v-if="gameEnded" class="host-description" role="status">{{ $t('hostMenu.finishedHint') }}</p>
         </div>
         <footer class="host-footer">
@@ -160,7 +158,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
-import { useDisplay } from 'vuetify';
+import { useDisplay, useTheme } from 'vuetify';
 import type { GameOptionsFeatures } from '@avalon/types';
 import type { TPageRoomState } from '@/helpers/game-state-manager';
 import { socket } from '@/api/socket';
@@ -180,6 +178,7 @@ export default defineComponent({
     const open = ref(false);
     const confirmation = ref<'endGame' | 'endAndRestartGame' | null>(null);
     const { smAndDown } = useDisplay();
+    const { themeClasses } = useTheme();
     const started = computed(() => props.roomState.stage === 'started');
     const manualTimer = computed(() => props.roomState.stage === 'started' && props.roomState.game?.timer?.isCustom);
     const locked = computed(() => props.roomState.stage === 'locked');
@@ -228,6 +227,7 @@ export default defineComponent({
       open,
       confirmation,
       smAndDown,
+      themeClasses,
       started,
       manualTimer,
       locked,
@@ -471,6 +471,21 @@ export default defineComponent({
 }
 .host-start .material-icons {
   margin-right: 8px;
+}
+.host-danger > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.host-danger > summary::after {
+  content: '⌄';
+  margin-left: auto;
+}
+.host-danger[open] > summary {
+  margin-bottom: 12px;
 }
 .host-danger :deep(.v-btn) {
   margin-top: 8px;

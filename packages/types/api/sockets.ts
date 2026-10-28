@@ -263,9 +263,12 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
   useWeFoundYou: (uuid: string, use: boolean, cardID: string) => void;
 
   // Custom timer events
-  startCustomTimer: (uuid: string, durationSeconds: number) => void;
+  startCustomTimer: (uuid: string, durationSeconds?: number) => void;
   addCustomTimerTime: (uuid: string, additionalSeconds: number) => void;
   stopCustomTimer: (uuid: string) => void;
+  setCustomTimerPlayer: (uuid: string, playerID: string | null) => void;
+  nextCustomTimerPlayer: (uuid: string) => void;
+  setCustomTimerDuration: (uuid: string, durationSeconds: number) => void;
 }
 
 export type Server = SuperServer<ClientToServerEvents, ServerToClientEvents>;

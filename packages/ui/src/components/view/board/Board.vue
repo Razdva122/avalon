@@ -83,6 +83,11 @@
             :thinking="thinkingPlayerIDs.includes(player.id)"
             :discussion-turn="discussionPlayerID === player.id"
             :action-timer="playerActionTimer(player.id)"
+            :manual-timer="
+              stateManager.viewMode.value === 'live' && gameTimer?.isCustom && gameTimer.playerID === player.id
+                ? gameTimer
+                : undefined
+            "
             :voice-side="Math.sin((2 * Math.PI * i) / players.length + Math.PI) > 0.75 ? 'left' : 'right'"
             :private-decision="
               roomState.ai && !playerInGame && spectatorRoles[player.id]
@@ -120,21 +125,21 @@
         class="game-timer"
       >
         <GameTimer
+          v-if="!gameTimer.playerID"
           @timerEnd="onGameTimerEnd"
           @addMinute="addTimerMinute"
-          :canAdjust="userIsLeader && gameTimer.isCustom"
+          :canAdjust="userIsLeader && gameTimer.isCustom && gameTimer.active"
           :endTime="gameTimer.endTime || Date.now()"
           :isCustom="gameTimer.isCustom"
           :active="gameTimer.active"
-        >
-          <template v-slot:timer-controls>
-            <CustomTimerControls
-              v-if="userIsLeader && gameTimer.isCustom"
-              :roomID="roomState.roomID"
-              :leaderID="roomState.leaderID"
-            />
-          </template>
-        </GameTimer>
+        />
+        <CustomTimerControls
+          v-if="userIsLeader && gameTimer.isCustom"
+          class="timer-controls-only"
+          compact
+          :roomID="roomState.roomID"
+          :leaderID="roomState.leaderID"
+        />
       </div>
     </div>
   </div>
@@ -597,8 +602,14 @@ export default defineComponent({
     });
 
     const addTimerMinute = () => {
-      if (!userIsLeader.value || !gameTimer.value?.isCustom || stateManager.viewMode.value !== 'live') return;
-      socket.emit(gameTimer.value.active ? 'addCustomTimerTime' : 'startCustomTimer', roomState.value.roomID, 60);
+      if (
+        !userIsLeader.value ||
+        !gameTimer.value?.isCustom ||
+        !gameTimer.value.active ||
+        stateManager.viewMode.value !== 'live'
+      )
+        return;
+      socket.emit('addCustomTimerTime', roomState.value.roomID, 60);
     };
 
     const onGameTimerEnd = () => {
@@ -1064,5 +1075,18 @@ export default defineComponent({
 }
 .game-timer {
   min-width: 0;
+  max-width: calc(100vw - 16px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.timer-controls-only {
+  padding: 8px;
+  border-radius: 8px;
+  color: rgb(var(--v-theme-text-primary));
+  background: rgb(var(--v-theme-inset));
+  box-shadow: 0 1px 4px #0002;
 }
 </style>

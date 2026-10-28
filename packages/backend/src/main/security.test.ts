@@ -47,6 +47,39 @@ jest.mock('@/voice/runtime', () => ({
   createRoomVoice: () => ({ destroyRoom() {}, reconcile() {}, revokeSocket() {} }),
   registerVoiceEndpoints() {},
 }));
+
+test('only the current lobby host can assign and advance the shared manual timer', () => {
+  const { manager, handlers, broadcasts } = fixture(true);
+  manager.createRoom('table', 'alice', ['alice', 'bob', 'carol', 'dave', 'eve'], {
+    roles: {},
+    addons: {},
+    features: { useCustomTimer: true },
+  });
+  const room = manager.rooms.table;
+  handlers.setCustomTimerPlayer('table', 'bob');
+  room.startGame();
+  const timer = (room.calculateRoomState() as StartedRoomState).game.timer;
+  expect(timer?.playerID).toBeUndefined();
+  handlers.startCustomTimer('table', 120);
+  handlers.setCustomTimerDuration('table', 180);
+  handlers.setCustomTimerPlayer('table', 'eve');
+  handlers.nextCustomTimerPlayer('table');
+  expect((room.calculateRoomState() as StartedRoomState).game.timer).toMatchObject({ playerID: 'alice', active: true });
+  expect(broadcasts).toContainEqual(
+    expect.objectContaining({
+      event: 'gameUpdated',
+      value: expect.objectContaining({ timer: expect.objectContaining({ playerID: 'alice' }) }),
+    }),
+  );
+  handlers.transferHost('table', 'bob');
+  handlers.setCustomTimerDuration('table', 30);
+  expect((room.calculateRoomState() as StartedRoomState).game.timer?.durationSeconds).toBe(180);
+  handlers.setCustomTimerPlayer('table', 'eve');
+  handlers.nextCustomTimerPlayer('table');
+  expect((room.calculateRoomState() as StartedRoomState).game.timer?.playerID).toBe('alice');
+  handlers.setCustomTimerPlayer('missing', 'alice');
+  handlers.nextCustomTimerPlayer('missing');
+});
 jest.mock('@/ai/service', () => ({
   AiService: class {
     register() {}

@@ -11,15 +11,7 @@
           {{ $t('aiArena.botTimeBankRemaining', { seconds: reserveSeconds }) }}
         </p>
         <p class="bot-action-hint">
-          {{
-            $t(
-              withFriend
-                ? 'aiArena.botFriendDeadlineHint'
-                : discussion
-                  ? 'aiArena.botDiscussionDeadlineHint'
-                  : 'aiArena.botActionDeadlineHint',
-            )
-          }}
+          {{ $t(deadlineHintKey) }}
         </p>
       </div>
     </details>
@@ -36,15 +28,7 @@
       {{ $t('aiArena.botTimeBankRemaining', { seconds: reserveSeconds }) }}
     </p>
     <p v-if="phase === 'action' && !compact" class="bot-action-hint">
-      {{
-        $t(
-          withFriend
-            ? 'aiArena.botFriendDeadlineHint'
-            : discussion
-              ? 'aiArena.botDiscussionDeadlineHint'
-              : 'aiArena.botActionDeadlineHint',
-        )
-      }}
+      {{ $t(deadlineHintKey) }}
     </p>
   </div>
 </template>
@@ -60,8 +44,18 @@ const props = defineProps<{
   playerName?: string;
   phase: 'preparation' | 'action';
   compact?: boolean;
+  manual?: boolean;
 }>();
 const now = ref(Date.now());
+const deadlineHintKey = computed(() =>
+  props.manual
+    ? 'timerUi.manualHint'
+    : props.withFriend
+      ? 'aiArena.botFriendDeadlineHint'
+      : props.discussion
+        ? 'aiArena.botDiscussionDeadlineHint'
+        : 'aiArena.botActionDeadlineHint',
+);
 const usingReserve = computed(
   () => props.phase === 'action' && props.baseExpiresAt !== undefined && now.value >= props.baseExpiresAt,
 );

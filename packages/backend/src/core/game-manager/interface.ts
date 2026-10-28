@@ -38,7 +38,10 @@ export type TGameMethodsParams =
   | TUseWeFoundYouParams
   | TStartCustomTimerParams
   | TAddCustomTimerTimeParams
-  | TStopCustomTimerParams;
+  | TStopCustomTimerParams
+  | { method: 'setCustomTimerPlayer'; playerID: string | null }
+  | { method: 'nextCustomTimerPlayer' }
+  | { method: 'setCustomTimerDuration'; durationSeconds: number };
 
 export type TSelectPlayerParams = {
   method: 'selectPlayer';
@@ -135,7 +138,7 @@ export type TUseWeFoundYouParams = {
 
 export type TStartCustomTimerParams = {
   method: 'startCustomTimer';
-  durationSeconds: number;
+  durationSeconds?: number;
 };
 
 export type TAddCustomTimerTimeParams = {

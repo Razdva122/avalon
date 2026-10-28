@@ -109,6 +109,8 @@ export class VisualGameState {
   @prop({ type: Schema.Types.Mixed, _id: false })
   public timer?: {
     active: boolean;
+    playerID?: string;
+    durationSeconds?: number;
     endTime?: number;
     stage?: TTimerStage;
     isCustom?: boolean; // Флаг, указывающий, что это кастомный таймер

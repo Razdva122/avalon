@@ -65,7 +65,10 @@ function fixture(overrides = {}) {
         const code = ts.transpileModule(script.content + '\n' + template.code, {
           compilerOptions: { module: ts.ModuleKind.CommonJS },
         }).outputText;
-        new Function('require', 'exports', code)(() => ({ ...vue, onMounted() {}, onBeforeUnmount() {} }), timer);
+        new Function('require', 'exports', code)(
+          () => ({ ...vue, onMounted() {}, onBeforeUnmount() {}, onUnmounted() {} }),
+          timer,
+        );
         timer.default.render = timer.render;
         return { __esModule: true, default: timer.default };
       }
@@ -103,6 +106,7 @@ function fixture(overrides = {}) {
     const app = vue.createSSRApp({ ...exports.default, setup: () => api, render: renderer.render }, props);
     app.config.globalProperties.$t = (key, params = {}) =>
       ({
+        'timerUi.manualHint': 'Ведущий запускает и останавливает таймер во время игры.',
         'aiArena.yourDiscussionTurn': 'Ваше слово',
         'aiArena.thinking': 'Думает',
         'aiArena.botActionTime': `Твой ход: ${params.seconds} с`,
@@ -250,4 +254,40 @@ test('top player status stays below the fixed header at desktop and mobile width
     assert.ok(result.y >= 72, `status at ${result.y} overlaps the header`);
     assert.ok(result.x >= 8 && result.x + 180 <= width - 8);
   }
+});
+
+test('manual timer appears above its assigned player for everyone and follows reassignment', async (t) => {
+  t.mock.method(Date, 'now', () => 1114567);
+  const player = fixture({
+    playerState: { id: 'owner', name: 'Аня', features: {} },
+    manualTimer: { isCustom: true, active: true, playerID: 'owner', endTime: 1234567 },
+  });
+  t.after(player.stop);
+  let rendered = await player.render();
+  assert.ok(rendered.badge.includes('manual-player-timer'), rendered.badge);
+  assert.ok(rendered.badge.includes('Ход: Аня · 120 с'), rendered.badge);
+  assert.ok(rendered.badge.includes('<summary'), 'manual turns reuse the AI timer disclosure');
+  assert.ok(
+    rendered.badge.includes('Ведущий запускает и останавливает таймер'),
+    'manual hint must not promise AI deadlines',
+  );
+  assert.ok(!rendered.badge.includes('aiArena.botActionDeadlineHint'));
+  assert.ok(rendered.badge.includes('role="timer"'), rendered.badge);
+  assert.ok(!rendered.html.includes('manual-player-timer'), 'clock must float above the avatar outside table scaling');
+  assert.equal(player.api.activeManualTimer.value.endTime, 1234567);
+  player.store.state.profile = undefined;
+  assert.ok((await player.render()).badge.includes('manual-player-timer'), 'spectators also see the assigned timer');
+  player.props.manualTimer.playerID = 'next-player';
+  assert.ok(!(await player.render()).badge.includes('manual-player-timer'), 'Next removes the old player clock');
+  player.props.manualTimer.playerID = 'owner';
+  player.props.manualTimer.active = false;
+  assert.ok(
+    (await player.render()).badge.includes('Ход: Аня · 0 с'),
+    'expired or stopped timer retains whose turn it is',
+  );
+  player.props.visibleHistory = { type: 'preVote', votes: [] };
+  assert.ok(!(await player.render()).badge.includes('manual-player-timer'), 'history hides the live timer');
+  player.props.visibleHistory = undefined;
+  player.props.manualTimer = undefined;
+  assert.ok(!(await player.render()).badge.includes('manual-player-timer'), 'unbinding removes the clock');
 });

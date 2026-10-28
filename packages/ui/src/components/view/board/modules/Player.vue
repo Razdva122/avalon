@@ -7,17 +7,26 @@
   >
     <Teleport to="body">
       <div
-        v-if="thinking || isOwnDiscussionTurn || activeActionTimer"
+        v-if="thinking || isOwnDiscussionTurn || activeActionTimer || activeManualTimer"
         ref="statusElement"
         class="ai-player-status"
-        :class="[statusThemeClasses, { 'human-action-status': activeActionTimer }]"
+        :class="[statusThemeClasses, { 'human-action-status': activeActionTimer || activeManualTimer }]"
         :style="statusStyles"
-        :role="activeActionTimer ? undefined : 'status'"
+        :role="activeActionTimer || activeManualTimer ? undefined : 'status'"
         aria-atomic="true"
-        :aria-label="activeActionTimer ? undefined : `${player.name}: ${$t(statusKey)}`"
+        :aria-label="activeActionTimer || activeManualTimer ? undefined : `${player.name}: ${$t(statusKey)}`"
       >
         <BotGameTimer
-          v-if="activeActionTimer"
+          v-if="activeManualTimer"
+          class="manual-player-timer"
+          :expires-at="activeManualTimer.active ? activeManualTimer.endTime || 0 : 0"
+          :player-name="isOwnVoice ? undefined : player.name"
+          phase="action"
+          manual
+          compact
+        />
+        <BotGameTimer
+          v-else-if="activeActionTimer"
           :expires-at="activeActionTimer.humanActionExpiresAt!"
           :base-expires-at="activeActionTimer.humanActionBaseExpiresAt"
           :time-bank-ms="activeActionTimer.humanTimeBankMs"
@@ -241,6 +250,7 @@ import type {
   TGameStage,
   IActionWithResult,
   TPlotCardNames,
+  VisualGameState,
 } from '@avalon/types';
 import { availablePlotCards } from '@avalon/types/consts';
 import { getPlayerCards, isAdjacentPlayer, hasActiveCard } from '@/helpers/plot-cards';
@@ -272,6 +282,7 @@ export default defineComponent({
     thinking: { type: Boolean, default: false },
     discussionTurn: { type: Boolean, default: false },
     actionTimer: { type: Object as PropType<AiRoomState> },
+    manualTimer: { type: Object as PropType<VisualGameState['timer']> },
     voiceSide: { type: String as PropType<'left' | 'right'>, default: 'right' },
     playerState: {
       type: Object as PropType<IFrontendPlayer | RoomPlayer>,
@@ -301,6 +312,11 @@ export default defineComponent({
     const isOwnDiscussionTurn = computed(() => props.discussionTurn && isOwnVoice.value && !props.visibleHistory);
     const activeActionTimer = computed(() =>
       !props.visibleHistory && props.actionTimer?.humanActionExpiresAt ? props.actionTimer : undefined,
+    );
+    const activeManualTimer = computed(() =>
+      !props.visibleHistory && props.manualTimer?.isCustom && props.manualTimer.playerID === props.playerState.id
+        ? props.manualTimer
+        : undefined,
     );
     const statusKey = computed(() => (isOwnDiscussionTurn.value ? 'aiArena.yourDiscussionTurn' : 'aiArena.thinking'));
     const voiceStatus = computed(() => {
@@ -587,6 +603,7 @@ export default defineComponent({
       isOwnVoice,
       isOwnDiscussionTurn,
       activeActionTimer,
+      activeManualTimer,
       statusKey,
       statusElement,
       statusStyles,

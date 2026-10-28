@@ -104,9 +104,16 @@ test.each([
   ['voteForMission', ['room', 'bogus']],
   ['voteForMission', ['room', undefined]],
   ['preVote', ['room', 'abstain', 'card']],
-  ['startCustomTimer', ['room']],
   ['startCustomTimer', ['room', '60']],
   ['addCustomTimerTime', ['room', -1]],
+  ['setCustomTimerDuration', ['room', 0]],
+  ['setCustomTimerDuration', ['room', 1.5]],
+  ['setCustomTimerDuration', ['room', '120']],
+  ['setCustomTimerDuration', ['room', 86401]],
+  ['setCustomTimerPlayer', ['room']],
+  ['setCustomTimerPlayer', ['room', {}]],
+  ['setCustomTimerPlayer', ['room', 'spectator', 'extra']],
+  ['nextCustomTimerPlayer', ['room', 'extra']],
   ['actionOnMission', ['room', 'bogus']],
 ])('rejects invalid gameplay arguments for %s', (event, args) => {
   expect(validPacket(event, args)).toBe(false);
@@ -115,7 +122,12 @@ test.each([
   ['voteForMission', ['room', 'approve']],
   ['preVote', ['room', 'reject', 'card']],
   ['startCustomTimer', ['room', 60]],
+  ['startCustomTimer', ['room']],
   ['addCustomTimerTime', ['room', 30]],
+  ['setCustomTimerDuration', ['room', 120]],
+  ['setCustomTimerPlayer', ['room', 'alice']],
+  ['setCustomTimerPlayer', ['room', null]],
+  ['nextCustomTimerPlayer', ['room']],
   ['actionOnMission', ['room', 'fail']],
 ])('accepts legitimate gameplay arguments for %s', (event, args) => {
   expect(validPacket(event, args)).toBe(true);

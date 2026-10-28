@@ -642,7 +642,28 @@ export class Manager {
     });
 
     // Custom timer events
-    socket.on('startCustomTimer', (uuid: string, durationSeconds: number) => {
+    socket.on('setCustomTimerDuration', (uuid: string, durationSeconds: number) => {
+      const room = this.rooms[uuid];
+      if (room && !room.ai && room.leaderID === userID && room.data.stage === 'started') {
+        room.data.manager.callGameMethods(userID, { method: 'setCustomTimerDuration', durationSeconds });
+      }
+    });
+
+    socket.on('setCustomTimerPlayer', (uuid: string, playerID: string | null) => {
+      const room = this.rooms[uuid];
+      if (room && !room.ai && room.leaderID === userID && room.data.stage === 'started') {
+        room.data.manager.callGameMethods(userID, { method: 'setCustomTimerPlayer', playerID });
+      }
+    });
+
+    socket.on('nextCustomTimerPlayer', (uuid: string) => {
+      const room = this.rooms[uuid];
+      if (room && !room.ai && room.leaderID === userID && room.data.stage === 'started') {
+        room.data.manager.callGameMethods(userID, { method: 'nextCustomTimerPlayer' });
+      }
+    });
+
+    socket.on('startCustomTimer', (uuid: string, durationSeconds?: number) => {
       const room = this.rooms[uuid];
       if (room && !room.ai && room.leaderID === userID && room.data.stage === 'started') {
         room.data.manager.callGameMethods(userID, { method: 'startCustomTimer', durationSeconds });

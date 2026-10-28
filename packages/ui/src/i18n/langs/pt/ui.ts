@@ -5,6 +5,22 @@ import { languageSuggestions } from '../../suggestions';
  */
 export default {
   timerUi: {
+    controls: 'Vez e cronômetro',
+    perTurn: 'Por vez',
+    customDuration: 'Tempo personalizado…',
+    durationRange: 'Insira de 1 a 86400 segundos inteiros.',
+    durationHint: 'Aplica-se ao iniciar ou passar a vez. A contagem atual não muda.',
+    nextPlayer: 'Próximo: {name}',
+    nextHint: 'Passar a vez e iniciar uma contagem de {time}',
+    start: 'Iniciar',
+    stop: 'Parar',
+    addCurrentHint: 'Adicionar um minuto apenas à vez atual',
+
+    turn: 'Vez',
+    unassigned: 'Cronômetro geral',
+    next: 'Próximo',
+    playerTurn: 'Vez de: {name}',
+
     doubleClickMinute: 'Clique duas vezes para adicionar um minuto',
     addTime: '+ tempo',
     stage: 'Por etapa',
@@ -144,8 +160,8 @@ export default {
     host: 'Anfitrião',
     hostPanel: 'Painel do anfitrião',
     endRestartGameHint: 'Os botões iniciarão a votação para o fim ou reinício do jogo',
-    endGame: 'Encerrar jogo',
-    restartGame: 'Reiniciar jogo',
+    endGame: 'Votar para encerrar',
+    restartGame: 'Votar para reiniciar',
     shuffle: 'Embaralhar',
     shuffleHint: 'Embaralhar posições dos jogadores no lobby',
   },

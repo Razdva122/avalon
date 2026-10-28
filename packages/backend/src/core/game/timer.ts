@@ -18,6 +18,8 @@ export class GameTimer {
   private game: Game;
   private pendingHistoryDelay: number = 0;
   private isCustomTimer: boolean;
+  private customTimerPlayerID?: string;
+  private customTimerDurationSeconds = 60;
 
   constructor(game: Game, isCustomTimer?: boolean) {
     this.game = game;
@@ -129,7 +131,8 @@ export class GameTimer {
    * Запуск кастомного таймера
    * @param durationSeconds Продолжительность таймера в секундах
    */
-  startCustomTimer(durationSeconds: number): void {
+  startCustomTimer(durationSeconds = this.customTimerDurationSeconds): void {
+    this.customTimerDurationSeconds = durationSeconds;
     this.clearTimer();
 
     console.log(`[GameTimer] Starting custom timer, duration: ${durationSeconds}s`);
@@ -181,8 +184,10 @@ export class GameTimer {
     const newDuration = remainingTime + additionalSeconds * 1000;
 
     const now = Date.now();
+    this.currentTimer.startTime = now;
     this.currentTimer.endTime = now + newDuration;
     this.currentTimer.duration = newDuration;
+    this.currentTimer.expired = false;
 
     // Создать новый таймаут
     const newTimeoutId = setTimeout(() => {
@@ -198,6 +203,28 @@ export class GameTimer {
 
     this.timers.set('custom', newTimeoutId);
     this.game.stateObserver.gameStateChanged();
+  }
+
+  setCustomTimerPlayer(playerID: string | null): void {
+    if (!this.isCustomTimer || this.game.stage === 'end') return;
+    if (playerID !== null && !this.game.players.some((player) => player.userID === playerID)) return;
+    this.customTimerPlayerID = playerID ?? undefined;
+    this.game.stateObserver.gameStateChanged();
+  }
+
+  setCustomTimerDuration(durationSeconds: number): void {
+    if (!this.isCustomTimer || this.game.stage === 'end') return;
+    if (!Number.isInteger(durationSeconds) || durationSeconds <= 0 || durationSeconds > 86400) return;
+    this.customTimerDurationSeconds = durationSeconds;
+    this.game.stateObserver.gameStateChanged();
+  }
+
+  nextCustomTimerPlayer(): void {
+    if (!this.isCustomTimer || this.game.stage === 'end') return;
+    const player = this.game.players.find((player) => player.userID === this.customTimerPlayerID);
+    if (!player) return;
+    this.customTimerPlayerID = player.next.userID;
+    this.startCustomTimer(this.customTimerDurationSeconds);
   }
 
   /**
@@ -265,9 +292,19 @@ export class GameTimer {
   /**
    * Get timer state for frontend
    */
-  getTimerState(): { active: boolean; endTime?: number; stage?: TTimerStage; isCustom: boolean } {
+  getTimerState(): {
+    durationSeconds?: number;
+    playerID?: string;
+    active: boolean;
+    endTime?: number;
+    stage?: TTimerStage;
+    isCustom: boolean;
+  } {
+    const player = this.isCustomTimer
+      ? { playerID: this.customTimerPlayerID, durationSeconds: this.customTimerDurationSeconds }
+      : {};
     if (!this.currentTimer || this.currentTimer.expired) {
-      return { active: false, isCustom: this.isCustomTimer };
+      return { ...player, active: false, isCustom: this.isCustomTimer };
     }
 
     const now = Date.now();
@@ -279,12 +316,13 @@ export class GameTimer {
 
     // Check if timer has already expired
     if (now >= this.currentTimer.endTime) {
-      return { active: false, isCustom: this.isCustomTimer };
+      return { ...player, active: false, isCustom: this.isCustomTimer };
     }
 
     // Для кастомного таймера
     if (this.isCustomTimer) {
       return {
+        ...player,
         active: true,
         endTime: this.currentTimer.endTime,
         stage: this.currentTimer.stage,

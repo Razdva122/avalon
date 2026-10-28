@@ -5,6 +5,22 @@ import { languageSuggestions } from '../../suggestions';
  */
 export default {
   timerUi: {
+    controls: 'Turno y temporizador',
+    perTurn: 'Por turno',
+    customDuration: 'Tiempo personalizado…',
+    durationRange: 'Introduce entre 1 y 86400 segundos enteros.',
+    durationHint: 'Se aplica al iniciar o pasar el turno. La cuenta actual no cambia.',
+    nextPlayer: 'Siguiente: {name}',
+    nextHint: 'Pasar el turno e iniciar una cuenta de {time}',
+    start: 'Iniciar',
+    stop: 'Detener',
+    addCurrentHint: 'Añadir un minuto solo al turno actual',
+
+    turn: 'Turno',
+    unassigned: 'Temporizador común',
+    next: 'Siguiente',
+    playerTurn: 'Turno: {name}',
+
     doubleClickMinute: 'Doble clic para añadir un minuto',
     addTime: '+ tiempo',
     stage: 'Por etapa',
@@ -146,8 +162,8 @@ export default {
     host: 'Anfitrión',
     hostPanel: 'Panel del anfitrión',
     endRestartGameHint: 'Los botones iniciarán la votación para finalizar o reiniciar el juego',
-    endGame: 'Finalizar juego',
-    restartGame: 'Reiniciar juego',
+    endGame: 'Votar para finalizar',
+    restartGame: 'Votar para reiniciar',
     shuffle: 'Mezclar',
     shuffleHint: 'Mezclar las posiciones de los jugadores en el vestíbulo',
   },

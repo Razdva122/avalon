@@ -5,6 +5,22 @@ import { languageSuggestions } from '../../suggestions';
  */
 export default {
   timerUi: {
+    controls: 'Turn and timer',
+    perTurn: 'Per turn',
+    customDuration: 'Custom time…',
+    durationRange: 'Enter 1–86400 whole seconds.',
+    durationHint: 'Applies when starting or passing a turn. The current countdown stays unchanged.',
+    nextPlayer: 'Next: {name}',
+    nextHint: 'Pass the turn and start a fresh {time} countdown',
+    start: 'Start',
+    stop: 'Stop',
+    addCurrentHint: 'Add one minute to the current turn only',
+
+    turn: 'Turn',
+    unassigned: 'Shared timer',
+    next: 'Next',
+    playerTurn: 'Turn: {name}',
+
     doubleClickMinute: 'Double-click to add one minute',
     addTime: '+ time',
     stage: 'By stage',
@@ -144,8 +160,8 @@ export default {
     host: 'Admin',
     hostPanel: 'Admin panel',
     endRestartGameHint: 'Buttons are used to vote for ending or restarting the game',
-    endGame: 'End game',
-    restartGame: 'Restart game',
+    endGame: 'Vote to end the game',
+    restartGame: 'Vote to restart the game',
     shuffle: 'Shuffle',
     shuffleHint: 'Shuffle players in the lobby',
   },

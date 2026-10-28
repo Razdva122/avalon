@@ -5,6 +5,22 @@ import { languageSuggestions } from '../../suggestions';
  */
 export default {
   timerUi: {
+    controls: '回合與計時',
+    perTurn: '每回合',
+    customDuration: '自訂時間…',
+    durationRange: '請輸入 1 至 86400 的整數秒數。',
+    durationHint: '開始或移交回合時生效。目前倒數計時不變。',
+    nextPlayer: '下一位：{name}',
+    nextHint: '移交回合並重新倒數計時 {time}',
+    start: '開始',
+    stop: '停止',
+    addCurrentHint: '僅為目前回合增加一分鐘',
+
+    turn: '回合',
+    unassigned: '共用計時器',
+    next: '下一位',
+    playerTurn: '目前回合：{name}',
+
     doubleClickMinute: '按兩下增加一分鐘',
     addTime: '+ 時間',
     stage: '階段計時',
@@ -143,8 +159,8 @@ export default {
     host: '房主',
     hostPanel: '房主面板',
     endRestartGameHint: '開始投票,決定遊戲結束或重新開始',
-    endGame: '遊戲結束',
-    restartGame: '重新開始遊戲',
+    endGame: '投票結束遊戲',
+    restartGame: '投票重新開始',
     shuffle: '隨機換位',
     shuffleHint: '隨機調整大廳中玩家的位置',
   },

@@ -160,8 +160,11 @@ export function validPacket(event: string, args: unknown[]): boolean {
       (event !== 'preVote' || validID(values[2]))
     );
   if (event === 'discardMissionCard') return values.length === 1;
+  if (event === 'setCustomTimerPlayer') return values.length === 2 && (values[1] === null || validID(values[1]));
+  if (event === 'nextCustomTimerPlayer') return values.length === 1;
   if (event === 'actionOnMission') return values.length === 2 && (values[1] === 'success' || values[1] === 'fail');
-  if (event === 'startCustomTimer' || event === 'addCustomTimerTime')
+  if (event === 'startCustomTimer' && values.length === 1) return true;
+  if (event === 'startCustomTimer' || event === 'addCustomTimerTime' || event === 'setCustomTimerDuration')
     return (
       values.length === 2 &&
       typeof values[1] === 'number' &&

@@ -5,6 +5,22 @@ import { languageSuggestions } from '../../suggestions';
  */
 export default {
   timerUi: {
+    controls: 'Ход и таймер',
+    perTurn: 'На ход',
+    customDuration: 'Своё время…',
+    durationRange: 'Введите целое число от 1 до 86400 секунд.',
+    durationHint: 'Длительность применяется при запуске и передаче хода. Идущий отсчёт не меняется.',
+    nextPlayer: 'Следующий: {name}',
+    nextHint: 'Передать ход и запустить новый отсчёт на {time}',
+    start: 'Запустить',
+    stop: 'Остановить',
+    addCurrentHint: 'Добавить минуту только к текущему ходу',
+
+    turn: 'Ход',
+    unassigned: 'Общий таймер',
+    next: 'Далее',
+    playerTurn: 'Ход: {name}',
+
     doubleClickMinute: 'Двойной клик — добавить минуту',
     addTime: '+ время',
     stage: 'По этапам',
@@ -145,8 +161,8 @@ export default {
     host: 'Ведущий',
     hostPanel: 'Управление лобби',
     endRestartGameHint: 'Кнопки используются для голосования за окончание или перезапуск игры',
-    endGame: 'Закончить игру',
-    restartGame: 'Перезапустить игру',
+    endGame: 'Голосование за завершение',
+    restartGame: 'Голосование за перезапуск',
     shuffle: 'Перемешать',
     shuffleHint: 'Перемешать игроков в лобби',
   },

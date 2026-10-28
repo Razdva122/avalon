@@ -12,7 +12,11 @@ function panel() {
   const exports = {};
   new Function('require', 'exports', code)((id) => {
     if (id === 'vue') return vue;
-    if (id === 'vuetify') return { useDisplay: () => ({ smAndDown: vue.ref(false) }) };
+    if (id === 'vuetify')
+      return {
+        useDisplay: () => ({ smAndDown: vue.ref(false) }),
+        useTheme: () => ({ themeClasses: vue.ref('v-theme--lightTheme') }),
+      };
     if (id === '@/api/socket') return { socket: { emit: (...args) => sent.push(args) } };
     if (id.endsWith('/room-options'))
       return { useRoomOptions: (source, publish) => ({ options: vue.ref(source()), applyOptions: publish }) };

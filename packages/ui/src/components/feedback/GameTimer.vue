@@ -12,6 +12,9 @@
     >
       <span class="material-icons" aria-hidden="true">timer</span>
       <div>
+        <p v-if="playerName" class="timer-player-name" role="status">
+          {{ $t('timerUi.playerTurn', { name: playerName }) }}
+        </p>
         <p class="timer-caption sr-only">{{ $t(isCustom ? 'timerUi.manual' : 'timerUi.stage') }}</p>
         <span
           class="time"
@@ -39,6 +42,7 @@ export default defineComponent({
     isCustom: { type: Boolean, default: false },
     active: { type: Boolean, default: true },
     canAdjust: { type: Boolean, default: false },
+    playerName: { type: String, default: '' },
   },
   emits: ['timerEnd', 'addMinute'],
   setup(props, { emit }) {
@@ -154,6 +158,9 @@ export default defineComponent({
   gap: 6px;
 }
 .game-timer-container {
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
   color: rgb(var(--v-theme-text-primary));
   background: rgb(var(--v-theme-inset));
   border-radius: 8px;
@@ -182,6 +189,13 @@ export default defineComponent({
   line-height: 1;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+.timer-player-name {
+  max-width: 160px;
+  margin: 0 0 3px;
+  font-size: 12px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 .low-time {
   color: rgb(var(--v-theme-warning));

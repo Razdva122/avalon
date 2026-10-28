@@ -320,6 +320,18 @@ export class GameManager {
       }
 
       // Custom timer methods
+      case 'setCustomTimerDuration':
+        this.game.timer.setCustomTimerDuration(params.durationSeconds);
+        break;
+
+      case 'setCustomTimerPlayer':
+        this.game.timer.setCustomTimerPlayer(params.playerID);
+        break;
+
+      case 'nextCustomTimerPlayer':
+        this.game.timer.nextCustomTimerPlayer();
+        break;
+
       case 'startCustomTimer':
         this.game.timer.startCustomTimer(params.durationSeconds);
         break;
