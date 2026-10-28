@@ -1,16 +1,22 @@
 import { EventEmitter } from 'events';
 import { PassThrough } from 'stream';
-import { spawn } from 'child_process';
-import { writeFile, access } from 'fs/promises';
+import { execFile, spawn } from 'child_process';
+import { writeFile, access, readFile } from 'fs/promises';
 import timers from 'timers/promises';
 import { runCodex, codexSchema } from './codex';
 
-jest.mock('child_process', () => ({ spawn: jest.fn() }));
+jest.mock('child_process', () => ({ spawn: jest.fn(), execFile: jest.fn() }));
 const mockedSpawn = spawn as jest.Mock;
+const mockedExecFile = execFile as unknown as jest.Mock;
+// Without a catalog from `codex debug models` the runner keeps Codex's own tools.
+beforeEach(() =>
+  mockedExecFile.mockImplementation((_bin, _args, _options, callback) => callback(new Error('no catalog'))),
+);
 const previous = { ...process.env };
 afterEach(() => {
   jest.restoreAllMocks();
   mockedSpawn.mockReset();
+  mockedExecFile.mockReset();
   process.env = { ...previous };
 });
 
@@ -76,6 +82,66 @@ test('runner uses the model and reasoning selected for this party', async () => 
   const args = mockedSpawn.mock.calls[0][1];
   expect(args[args.indexOf('--model') + 1]).toBe('gpt-6-luna');
   expect(args).toContain('model_reasoning_effort="high"');
+});
+
+test('the model runs with a one-line base prompt and its own catalog entry without coding tools', async () => {
+  process.env.AI_CODEX_HOME = '/tmp/lean-catalog-home';
+  const entry = {
+    slug: 'gpt-6-luna',
+    tool_mode: 'code_mode_only',
+    multi_agent_version: 'v2',
+    experimental_supported_tools: ['clock'],
+    context_window: 272000,
+  };
+  mockedExecFile.mockImplementation((_bin, args, _options, callback) =>
+    callback(null, { stdout: JSON.stringify({ models: [{ slug: 'other' }, entry] }), stderr: '' }),
+  );
+  const files: Record<string, string> = {};
+  fakeChild((child, args) => {
+    const path = (key: string) => {
+      const arg = args.find((value) => value.startsWith(`${key}=`));
+      return arg && JSON.parse(arg.slice(key.length + 1));
+    };
+    void Promise.all(
+      ['model_catalog_json', 'model_instructions_file'].map((key) => path(key) && readFile(path(key), 'utf8')),
+    )
+      .then(([catalog, base]) => files.catalog ?? Object.assign(files, { catalog, base }))
+      .then(() => writeFile(args[args.indexOf('-o') + 1], '{"choice":"approve","speech":"test"}'))
+      .then(() => child.emit('close', 0));
+  });
+  await runCodex('input', codexSchema(['approve'], false), undefined, { model: 'gpt-6-luna', reasoning: 'low' });
+  expect(mockedExecFile.mock.calls[0][1]).toEqual(['debug', 'models']);
+  // Only fields this Codex's catalog has change.
+  expect(JSON.parse(files.catalog)).toEqual({
+    models: [{ ...entry, tool_mode: 'direct', multi_agent_version: null, experimental_supported_tools: [] }],
+  });
+  expect(files.base).toContain('Avalon');
+  const args = mockedSpawn.mock.calls[0][1];
+  expect(args).toContain('skills.include_instructions=false');
+  expect(args).toContain('include_permissions_instructions=false');
+  // The catalog is read once per binary and home; AI_CODEX_LEAN=off restores Codex's defaults.
+  await runCodex('input', codexSchema(['approve'], false), undefined, { model: 'gpt-6-luna', reasoning: 'low' });
+  expect(mockedExecFile).toHaveBeenCalledTimes(1);
+  process.env.AI_CODEX_LEAN = 'off';
+  await runCodex('input', codexSchema(['approve'], false), undefined, { model: 'gpt-6-luna', reasoning: 'low' });
+  const plain = mockedSpawn.mock.calls[2][1] as string[];
+  expect(plain.some((arg) => /model_catalog_json|model_instructions_file|skills\.include/.test(arg))).toBe(false);
+});
+
+test('a model missing from the catalog runs on Codex defaults for its tools', async () => {
+  process.env.AI_CODEX_HOME = '/tmp/missing-catalog-home';
+  mockedExecFile.mockImplementation((_bin, _args, _options, callback) =>
+    callback(null, { stdout: JSON.stringify({ models: [{ slug: 'other' }] }), stderr: '' }),
+  );
+  fakeChild((child, args) => {
+    void writeFile(args[args.indexOf('-o') + 1], '{"choice":"approve","speech":"test"}').then(() =>
+      child.emit('close', 0),
+    );
+  });
+  await runCodex('input', codexSchema(['approve'], false), undefined, { model: 'gpt-6-luna', reasoning: 'low' });
+  const args = mockedSpawn.mock.calls[0][1] as string[];
+  expect(args.some((arg) => arg.startsWith('model_catalog_json='))).toBe(false);
+  expect(args.some((arg) => arg.startsWith('model_instructions_file='))).toBe(true);
 });
 
 test('reusable instructions stay separate from changing private game input', async () => {

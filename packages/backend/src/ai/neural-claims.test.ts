@@ -84,7 +84,8 @@ test('published structured bot claims survive without parsing their chat and rem
       claimStances: [{ seat: 1, stance: 'distrust' }],
     };
   });
-  expect((await decide(request)).speech).toBe('I am Percival; I have reason to call 3 Morgana.');
+  // Published as typed in chat: a semicolon becomes a full stop (humanTypography).
+  expect((await decide(request)).speech).toBe('I am Percival. I have reason to call 3 Morgana.');
   const other = {
     ...request,
     playerID: 'other',

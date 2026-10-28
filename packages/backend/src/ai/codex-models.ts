@@ -32,6 +32,31 @@ export function validateCodexSettings(value: unknown, catalog: CodexModelOption[
   return { model: model.id, reasoning: settings!.reasoning };
 }
 
+const EFFORTS = ['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra'];
+
+/**
+ * The reasoning level for one call: a step above the table's level for the decisions that settle games, a step
+ * below for rewording and reading chat, never below low or above high, and only levels the model supports.
+ */
+export function callEffort(base: string, weight?: 'light' | 'critical', supported?: string[]) {
+  const index = EFFORTS.indexOf(base);
+  if (!weight || index < 0 || !supported?.length) return base;
+  const target =
+    weight === 'critical'
+      ? Math.max(index, Math.min(index + 1, EFFORTS.indexOf('high')))
+      : Math.min(index, Math.max(index - 1, EFFORTS.indexOf('low')));
+  return supported.includes(EFFORTS[target]) ? EFFORTS[target] : base;
+}
+
+/** Reasoning levels a model supports, from any cached catalog; undefined until a catalog was loaded. */
+export function cachedEfforts(model: string) {
+  for (const entry of cache.values()) {
+    const found = entry.models.find((m) => m.id === model);
+    if (found) return found.efforts;
+  }
+  return undefined;
+}
+
 const cache = new Map<string, { expires: number; models: CodexModelOption[] }>();
 const pending = new Map<string, Promise<CodexModelOption[]>>();
 function cacheModels(key: string, models: CodexModelOption[]) {

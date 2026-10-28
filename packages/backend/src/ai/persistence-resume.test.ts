@@ -1,5 +1,6 @@
 import type { Server } from '@avalon/types';
 import { AiPause, type BotRequest } from './client';
+import { aiText } from './language';
 import { BotRoom } from './room';
 
 const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
@@ -189,8 +190,8 @@ test.each([
     ]);
     expect(messages.slice(explanation, explanation + 3).map((message) => message.message)).toEqual([
       'Inspect this player.',
-      `I inspected ${target.index} and announce: Good.`,
-      `I am Good, so ${check.name} reported my alignment correctly. This alone does not prove ${check.name} is Good.`,
+      `Checked ${target.index} with the Lady: Good.`,
+      aiText('en').inspectionResponse(check.name, true, target.index),
     ]);
     if (failedPublication) {
       const retried = publications.filter((publication) => publication.requestID === failedPublication!.requestID);

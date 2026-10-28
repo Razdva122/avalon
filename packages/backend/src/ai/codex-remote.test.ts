@@ -156,7 +156,6 @@ test.each([false, true])('decision request failure retries exactly once (alwaysF
 test.each([
   'busy',
   'usage_limit',
-  'timeout',
   'forbidden_tool',
   'output_limit',
   'cli_unavailable',
@@ -170,6 +169,63 @@ test.each([
   );
   await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toThrow();
   expect(await readFile(counter, 'utf8')).toBe('1');
+});
+
+test('a worker timeout applied no action and is retried once', async () => {
+  const counter = join(directory, 'decision-attempts');
+  await writeFile(counter, '0');
+  await executable(
+    `const fs=require('node:fs');const path=${JSON.stringify(counter)};process.stdin.resume();process.stdin.on('end',()=>{fs.writeFileSync(path,String(Number(fs.readFileSync(path))+1));console.log(JSON.stringify({ok:false,error:'timeout'}))});`,
+  );
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toThrow('timed out');
+  expect(await readFile(counter, 'utf8')).toBe('2');
+});
+
+test('a remote decision still running after three minutes closes SSH and is retried once', async () => {
+  const pids = join(directory, 'pids');
+  await writeFile(pids, '');
+  // Hangs like a stalled worker: the request is read, no response ever comes.
+  await executable(
+    `require('node:fs').appendFileSync(${JSON.stringify(pids)},process.pid+'\\n');process.stdin.resume();setInterval(()=>{},1000);`,
+  );
+  const started = async (count: number) => {
+    // Fake timers also stop Date, so wait on the monotonic clock.
+    const until = process.hrtime.bigint() + 10_000_000_000n;
+    while (process.hrtime.bigint() < until) {
+      if ((await readFile(pids, 'utf8')).trim().split('\n').filter(Boolean).length >= count) return;
+      await new Promise((resolve) => setImmediate(resolve));
+    }
+    throw Error('fake SSH did not start');
+  };
+  const alive = (pid: number) => {
+    try {
+      process.kill(pid, 0);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  let seen: number[] = [];
+  let survivors: number[] = [];
+  jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate'] });
+  try {
+    const outcome = runCodex('game', codexSchema(['approve'], false)).catch((error) => error);
+    await started(1);
+    await jest.advanceTimersByTimeAsync(3 * 60 * 1000);
+    await started(2);
+    await jest.advanceTimersByTimeAsync(3 * 60 * 1000);
+    expect(await outcome).toMatchObject({ message: expect.stringContaining('timed out') });
+  } finally {
+    jest.useRealTimers();
+    seen = (await readFile(pids, 'utf8')).trim().split('\n').filter(Boolean).map(Number);
+    for (let i = 0; i < 100 && seen.some(alive); i++) await new Promise((resolve) => setTimeout(resolve, 20));
+    // A failing run must not leave hung fake SSH clients behind.
+    survivors = seen.filter(alive);
+    for (const pid of survivors) process.kill(pid, 'SIGKILL');
+  }
+  expect(seen).toHaveLength(2);
+  // Both SSH clients were killed, which is what makes the worker's launcher remove its container.
+  expect(survivors).toEqual([]);
 });
 
 test('SSH request failure also gets exactly one retry', async () => {

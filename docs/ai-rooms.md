@@ -166,9 +166,39 @@ Rules, legal choices, private knowledge, language and output format remain share
 Regular team decisions explicitly check the current roster, known and possible Evil,
 the Fail threshold and a reachable alternative before acting. Both profiles treat
 old model notes as fallible, correct contradicted notes under the same key and cite
-the relevant mission/proposal in their sources. These instructions do not impose
-server-selected teams or votes. Prompt-routing tests do not establish stronger
-model play; improvements need model evaluation on recorded situations.
+the relevant mission/proposal in their sources. Prompt-routing tests do not establish
+stronger model play; improvements need model evaluation on recorded situations.
+
+Every non-review decision context also carries a private `analysis` block built by
+`ai/deduction.ts` and `ai/analysis.ts`: the server enumerates every Evil seat set
+consistent with the bot's own knowledge, Fail counts and Lady results (Good bots
+announce truthfully; human announcements are only weighted), weights them by
+typical play and reports seat reads, roster fail risks, the public view, Evil card
+and announcement consequences, a Merlin detector for assassination and Merlin's
+own exposure. `ai/guards.ts` overrides dominated moves, such as Evil passing when
+a Fail wins, Good approving a provably sabotage-capable roster, or a match-point
+approval far riskier than a reachable alternative. It also casts Merlin's silent
+vote as a Servant in that seat would on cheap or early votes, so voting does not
+reveal Merlin's sight, and Good seats other than Merlin vote from the engine
+without a model call. A silent vote or mission card that the guards would settle
+the same way whatever the model answered gets no model call either. After the
+decision a second short call (`ai/speaker.ts`) writes the public line from the
+bot's personality, role posture and the chat; server checks drop lines that leak
+a role or contradict the action, and one short rewrite answers everything else
+they flag (copied lines, stock phrases, long restatements). Each call's reasoning
+effort follows its stakes (`decisionWeight` in `ai/pipeline.ts`).
+
+Codex runs with a one-line base prompt instead of its coding-agent prompt, without
+its skills list and permission, apps and collaboration notes, and with the model's
+own catalog entry (from `codex debug models`) stripped of its coding tools: a
+one-line prompt costs 360 input tokens instead of 10,900 (`ai/codex.ts`, mirrored
+in the remote worker). `AI_CODEX_LEAN=off` restores Codex's defaults.
+
+`AI_DECISION_GUARDS=off` disables the guards and engine votes, `AI_CODE_VOTES=off`
+only the engine votes, `AI_SPEAKER=off` the speaker call, and
+`AI_OPTIONAL_TIMEOUT_MS` (default 60000) caps the speaker and rewrite calls.
+Non-standard roles or addons disable the analysis, guards and engine votes. See
+the [evaluation record](ai-evaluations/2026-10-22-deduction-engine/README.md).
 
 The decision input includes personality once. Evil-specific team and Lady advice
 is sent only to Evil players; claim-format guidance is omitted when no claim or

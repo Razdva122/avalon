@@ -33,16 +33,27 @@ test('publishes council public arguments while keeping private reasons separate'
   });
   const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
   const room = new BotRoom('council-public-reason', 'admin', io, decide, undefined, 0, 'en', 5);
-  await room.run();
+  // The scripted Evil always passes so Good reaches the council; the match-point Fail guard would prevent that.
+  process.env.AI_DECISION_GUARDS = 'off';
+  try {
+    await room.run();
+  } finally {
+    delete process.env.AI_DECISION_GUARDS;
+  }
 
   expect(room.ai?.status).toBe('finished');
-  const councilMessages = room.chat.history.filter((message) => message.message.startsWith('Evil council:'));
+  const councilMessages = room.chat.history.filter((message) => message.message.startsWith('Evil council'));
   expect(councilMessages).toHaveLength(2);
-  for (const message of councilMessages) expect(message.message).toContain(publicReason);
+  // Published as typed in chat: a semicolon becomes a full stop (humanTypography).
+  for (const message of councilMessages) expect(message.message).toContain(publicReason.replace('; a', '. A'));
   expect(JSON.stringify(room.chat.history)).not.toContain(privateReason);
   expect(JSON.stringify(councilRequests)).not.toContain(privateReason);
   expect(councilRequests[1].evilCouncil).toEqual([
-    { seat: councilRequests[0].name, target: councilRequests[0].choices[0], reason: publicReason },
+    {
+      seat: councilRequests[0].name,
+      target: councilRequests[0].choices[0],
+      reason: publicReason.replace('; a', '. A'),
+    },
   ]);
 });
 

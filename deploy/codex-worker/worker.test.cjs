@@ -228,6 +228,39 @@ test('worker separates reusable instructions and rejects a prefix that would dis
   }
 });
 
+test('worker runs the model with a one-line base prompt and its catalog entry without coding tools', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'worker-lean-test-'));
+  try {
+    // The fake CLI lists one model and accepts a decision only with the lean base prompt and catalog.
+    await writeFile(
+      join(directory, 'codex'),
+      `#!${process.execPath}\nconst fs=require('node:fs');const args=process.argv.slice(2);if(args[0]==='debug'){console.log(JSON.stringify({models:[{slug:'gpt-6-luna',tool_mode:'code_mode_only',multi_agent_version:'v2'}]}));process.exit(0)}const file=k=>JSON.parse(args.find(a=>a.startsWith(k+'=')).slice(k.length+1));process.stdin.resume();process.stdin.on('end',()=>{const model=JSON.parse(fs.readFileSync(file('model_catalog_json'),'utf8')).models[0];if(model.tool_mode!=='direct'||model.multi_agent_version!==null||!fs.readFileSync(file('model_instructions_file'),'utf8').includes('Avalon')||!args.includes('skills.include_instructions=false'))process.exit(2);fs.writeFileSync(args[args.indexOf('-o')+1],'{"choice":"approve","speech":"test"}');console.log(JSON.stringify({type:'turn.completed',usage:{input_tokens:360}}));});`,
+      { mode: 0o700 },
+    );
+    const child = spawn(process.execPath, [join(__dirname, 'worker.cjs')], {
+      env: { ...process.env, PATH: `${directory}:${process.env.PATH}` },
+    });
+    let stdout = '';
+    child.stdout.on('data', (chunk) => (stdout += chunk));
+    const done = new Promise((resolve) => child.on('close', resolve));
+    child.stdin.end(
+      JSON.stringify({
+        operation: 'decide',
+        prompt: 'Play Avalon.\nGAME INPUT:\n{}',
+        instructions: 'Play Avalon.',
+        schema: { type: 'object' },
+        settings: { model: 'gpt-6-luna', reasoning: 'low' },
+      }),
+    );
+    assert.equal(await done, 0);
+    const response = JSON.parse(stdout);
+    assert.equal(response.ok, true);
+    assert.equal(response.result.usage.input_tokens, 360);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test('worker reports exhausted subscription quota without exposing raw CLI diagnostics', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'worker-quota-test-'));
   try {

@@ -186,7 +186,7 @@ test.each([
     expect(votes.every((vote) => !vote.anonymous && vote.votes.length === count)).toBe(true);
     expect(history.filter((event) => event.type === 'mission')).toHaveLength(3);
     expect(requests.filter((request) => request.councilDiscussion)).toHaveLength(evilCount);
-    expect(room.chat.history.filter((message) => message.message.startsWith('Evil council:'))).toHaveLength(evilCount);
+    expect(room.chat.history.filter((message) => message.message.startsWith('Evil council'))).toHaveLength(evilCount);
     expect(requests.filter((request) => request.state.stage === 'end')).toHaveLength(0);
     expect(room.chat.history.filter((message) => message.message.startsWith('Post-game:'))).toHaveLength(0);
   },
@@ -258,7 +258,7 @@ test.each(['ru', 'zh-tw', 'es', 'vi'] as const)(
     for (const stage of ['selectTeam', 'onMission', 'checkLoyalty', 'announceLoyalty', 'assassinate'])
       expect(requests.some((request) => request.state.stage === stage)).toBe(true);
     expect(room.chat.history.map((message) => message.message).join('\n')).not.toMatch(
-      /I propose|I vote|I inspected|I am Good|Post-game:|Evil council \(revealed\)/,
+      /I propose|I vote|I inspected|Checked \d with the Lady|I am Good|Post-game:|Evil council \(revealed\)/,
     );
   },
 );
@@ -383,21 +383,22 @@ test.each([0, 1])(
     expect(requests.filter((r) => r.state.stage === 'end')).toHaveLength(0);
     expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(0);
     expect(room.chat.history.some((m) => m.message.includes('they are Evil'))).toBe(false);
-    expect(room.chat.history.some((m) => /I inspected \d and announce: (Good|Evil)\./.test(m.message))).toBe(true);
+    expect(room.chat.history.some((m) => /Checked \d with the Lady: (Good|Evil)\./.test(m.message))).toBe(true);
     if (room.data.stage !== 'started') throw Error('not started');
     const history = room.data.manager.prepareStateForUser().history;
     for (const event of history) {
       if (event.type !== 'announceLoyalty') continue;
       const target: { index: number } = room.data.manager.game.players.find((p) => p.userID === event.targetID)!;
       const message: { id?: string; message: string } | undefined = room.chat.history.find(
-        (m) => m.userID === event.announcerID && m.message.startsWith(`I inspected ${target.index} and announce:`),
+        (m) => m.userID === event.announcerID && m.message.startsWith(`Checked ${target.index} with the Lady:`),
       );
       const responseIndex = room.chat.history.findIndex((m) => m.id === message?.id) + 1;
       expect(room.chat.history[responseIndex]?.userID).toBe(event.targetID);
-      expect(room.chat.history[responseIndex]?.message).toContain('I am Good');
-      expect(room.chat.history[responseIndex]?.message).toContain(announcement === 0 ? 'does not prove' : 'is lying');
+      expect(room.chat.history[responseIndex]?.message).toContain('Good');
+      // The reply varies by seat; every Good-result form says "right", every Evil-result form "lying".
+      expect(room.chat.history[responseIndex]?.message).toMatch(announcement === 0 ? /right/i : /lying/);
       expect(message?.message).toBe(
-        `I inspected ${target.index} and announce: ${event.announced === 'good' ? 'Good' : 'Evil'}.`,
+        `Checked ${target.index} with the Lady: ${event.announced === 'good' ? 'Good' : 'Evil'}.`,
       );
     }
     const first = requests[0];
@@ -545,7 +546,7 @@ test('the ten-second interval also covers Lady announcements', async () => {
     }
     await running;
     expect(room.ai?.status).toBe('finished');
-    expect(room.chat.history.some((m) => m.message.startsWith('I inspected'))).toBe(true);
+    expect(room.chat.history.some((m) => m.message.startsWith('Checked '))).toBe(true);
     expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(0);
     expect(times.length).toBeGreaterThan(20);
     expect(times.slice(1).every((time, index) => time - times[index] >= 10000)).toBe(true);
@@ -621,7 +622,7 @@ test('all three evil players publicly deliberate with early evidence before the 
     }
     if (r.task.startsWith('Evil council')) council.push(r);
     if (r.task.startsWith('Choose the player you believe is Merlin')) {
-      expect(room.chat.history.filter((m) => m.message.startsWith('Evil council:'))).toHaveLength(3);
+      expect(room.chat.history.filter((m) => m.message.startsWith('Evil council'))).toHaveLength(3);
       final = r;
     }
     const speech = first
@@ -641,7 +642,7 @@ test('all three evil players publicly deliberate with early evidence before the 
     expect(JSON.stringify(r)).toContain('EARLY_CLUE');
   }
   expect(JSON.stringify(final)).toContain('SECRET_COUNCIL');
-  expect(room.chat.history.filter((m) => m.message.startsWith('Evil council:'))).toHaveLength(3);
+  expect(room.chat.history.filter((m) => m.message.startsWith('Evil council'))).toHaveLength(3);
 });
 
 test('Stop during the public council prevents subsequent advice and assassination', async () => {
@@ -769,7 +770,7 @@ test('technical resume does not repeat Evil council advice', async () => {
   await room.run();
   for (let attempt = 0; attempt < 12 && room.ai?.canResumeTechnical; attempt++) await room.run(true);
   expect(room.ai?.status).toBe('finished');
-  expect(room.chat.history.filter((m) => m.message.startsWith('Evil council:'))).toHaveLength(3);
+  expect(room.chat.history.filter((m) => m.message.startsWith('Evil council'))).toHaveLength(3);
   expect(room.chat.history.filter((m) => m.message.startsWith('Post-game:'))).toHaveLength(0);
 });
 
@@ -1478,7 +1479,7 @@ test.each([false, true])(
       room.chat.append(message);
       room.onChatMessage!(message);
       for (let i = 0; i < 100; i++) await new Promise<void>((resolve) => setImmediate(resolve));
-      expect(room.chat.history.some((m) => m.message.startsWith('Evil council:'))).toBe(true);
+      expect(room.chat.history.some((m) => m.message.startsWith('Evil council'))).toBe(true);
       expect(JSON.stringify(requests)).toContain('HUMAN_COUNCIL_ADVICE');
       expect(requests.every((r) => r.playerID !== 'admin')).toBe(true);
       await run;

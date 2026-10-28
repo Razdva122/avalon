@@ -3,6 +3,11 @@ import { compactRequest } from './client';
 import type { BotRequest } from './client';
 import { publicContext, decisionPipeline } from './pipeline';
 
+afterEach(() => {
+  delete process.env.AI_CODE_VOTES;
+  delete process.env.AI_DECISION_GUARDS;
+});
+
 const requestFor = (count: number): BotRequest =>
   ({
     playerID: '1',
@@ -155,6 +160,8 @@ test.each([
 ])(
   'opening vote advice for %i players uses the required majority instead of one Good vote',
   async (count, approvalsRequired) => {
+    // The model's vote prompt; with code votes or guards on, this leader's vote on its own team never reaches it.
+    process.env.AI_DECISION_GUARDS = 'off';
     const request = requestFor(count);
     request.publicDiscussion = false;
     request.speak = false;

@@ -2,6 +2,7 @@ import type { AiLanguage } from '@avalon/types';
 import { compactRequest, systemFor } from './client';
 import { publicContext, decisionPipeline, safePublicSpeech } from './pipeline';
 import type { BotRequest } from './client';
+import { aiText } from './language';
 
 const base = {
   playerID: '1',
@@ -120,4 +121,10 @@ test.each([
   ['vi', 'Tôi là Percival. 3 là Morgana.'],
 ])('allows deliberate Percival claims in %s', (language, speech) => {
   expect(safePublicSpeech(speech, 'approve', language as AiLanguage, true)).toBe(speech);
+});
+
+test('a leader names the team the way people type it, with themselves as "me"', () => {
+  const forms = [0, 1, 2, 3].map((n) => aiText('en').proposal('6, 1, 2', n, '6'));
+  expect(forms).toEqual(['I propose 6, 1, 2.', '1, 2 and me.', 'Going with 1, 2 and me.', "Let's do 1, 2 and me."]);
+  expect(aiText('en').proposal('1, 2', 1, '6')).toBe('1 and 2.');
 });

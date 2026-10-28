@@ -22,13 +22,37 @@ const texts = {
     postGamePrefix: 'Post-game: ',
     councilPrefix: 'Evil council (revealed): ',
     vote: (choice: string) => `I vote ${choice}.`,
-    proposal: (team: string) => `I propose ${team}.`,
-    inspection: (seat: string, good: boolean) => `I inspected ${seat} and announce: ${good ? 'Good' : 'Evil'}.`,
-    inspectionResponse: (inspector: string, good: boolean) =>
-      good
-        ? `I am Good, so ${inspector} reported my alignment correctly. This alone does not prove ${inspector} is Good.`
-        : `I am Good. ${inspector} is lying about my inspection; I accuse ${inspector} of being Evil.`,
-    council: (target: string, reason: string) => `Evil council: Target ${target}. ${reason}`,
+    // A few natural forms, picked by the proposal's place in the game, so a leader's line is not the same stamp
+    // every time; every form names the team, the leader as "me" the way people type it ("Going with 1, 2 and me.").
+    // A blind judge read the fixed "4, 1, 2 for this one." as a bot's line.
+    proposal: (team: string, n = 0, leader?: string) => {
+      const seats = team.split(', ');
+      const named = leader && seats.includes(leader) ? [...seats.filter((seat) => seat !== leader), 'me'] : seats;
+      const list = named.length > 1 ? `${named.slice(0, -1).join(', ')} and ${named[named.length - 1]}` : named[0];
+      return [
+        `I propose ${team}.`,
+        `${list[0].toUpperCase()}${list.slice(1)}.`,
+        `Going with ${list}.`,
+        `Let's do ${list}.`,
+      ][n % 4];
+    },
+    inspection: (seat: string, good: boolean) => `Checked ${seat} with the Lady: ${good ? 'Good' : 'Evil'}.`,
+    // Varied by the inspected seat: one fixed reply repeated by every checked bot read as a template.
+    inspectionResponse: (inspector: string, good: boolean, n = 0) =>
+      (good
+        ? [
+            `Yep, ${inspector} is right about me. Doesn't make ${inspector} Good though.`,
+            `${inspector}'s right, I'm Good. Says nothing about ${inspector} yet.`,
+            `Right, I'm Good. Still not sure about ${inspector}.`,
+            `${inspector} got me right, I'm Good. Their own side is another question.`,
+          ]
+        : [
+            `${inspector} is lying, I'm Good. So ${inspector} is the Evil one here.`,
+            `${inspector} is lying. I'm Good, which makes you the Evil one.`,
+            `You're lying, ${inspector}. I'm Good, so you just outed yourself.`,
+            `${inspector} is lying about me. I'm Good, so look at ${inspector}.`,
+          ])[n % 4],
+    council: (target: string, reason: string) => `Evil council - my pick is ${target}. ${reason}`,
     percivalClaim: (target: number) =>
       `I am Percival. ${target} is Morgana. Include me in missions and exclude ${target}.`,
     percivalStance: (target: number, stance: 'trust' | 'distrust') => `I ${stance} ${target}'s Percival claim.`,
@@ -48,12 +72,12 @@ const texts = {
     councilPrefix: 'Совет злых (раскрыт): ',
     vote: (choice: string) => `Я голосую ${choice === 'approve' ? 'за' : 'против'}.`,
     proposal: (team: string) => `Я предлагаю команду ${team}.`,
-    inspection: (seat: string, good: boolean) => `Я проверил ${seat} и объявляю: ${good ? 'мирный' : 'злой'}.`,
+    inspection: (seat: string, good: boolean) => `Проверил ${seat} Леди: ${good ? 'мирный' : 'злой'}.`,
     inspectionResponse: (inspector: string, good: boolean) =>
       good
-        ? `Я мирный, поэтому ${inspector} верно объявил мою сторону. Само по себе это не доказывает, что ${inspector} мирный.`
-        : `Я мирный. ${inspector} лжёт о моей проверке; я обвиняю ${inspector} в игре за злых.`,
-    council: (target: string, reason: string) => `Совет злых: Цель ${target}. ${reason}`,
+        ? `Да, ${inspector} про меня прав. Но это ещё не значит, что ${inspector} мирный.`
+        : `${inspector} врёт, я мирный. Значит, злой тут сам ${inspector}.`,
+    council: (target: string, reason: string) => `Совет злых: я за ${target}. ${reason}`,
     percivalClaim: (target: number) =>
       `Я Персиваль. ${target} — Моргана. Включайте меня в миссии и исключайте ${target}.`,
     percivalStance: (target: number, stance: 'trust' | 'distrust') =>

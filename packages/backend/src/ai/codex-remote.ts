@@ -114,8 +114,9 @@ export function remoteCodex(request: object, signal?: AbortSignal, attempt = 0):
                     : response.error === 'timeout'
                       ? 'Codex response timed out. No action was applied; retry the match.'
                       : 'Codex worker request failed.';
+            // A worker timeout applied no action, so it is retried once like a local timed-out attempt.
             return reject(
-              response.error === 'failed'
+              response.error === 'failed' || response.error === 'timeout'
                 ? new CodexRequestFailed(reason)
                 : response.error === 'rate_limit'
                   ? new CodexRateLimited(reason, response.retryAfterSeconds)
