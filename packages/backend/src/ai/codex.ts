@@ -1,11 +1,18 @@
-import { codexEnvironment } from './codex-instances';
+import { codexEnvironment, codexInstanceID } from './codex-instances';
 import { spawn } from 'child_process';
 import { mkdtemp, writeFile, readFile, rm } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 import { setTimeout as delay } from 'timers/promises';
-import { AiTechnicalPause, CodexRequestFailed, CodexRateLimited, parseReply, parseDecisionReply } from './client';
+import {
+  AiTechnicalPause,
+  CodexRequestFailed,
+  CodexRateLimited,
+  CodexUsageLimited,
+  parseReply,
+  parseDecisionReply,
+} from './client';
 import type { BotRequest, GenerationOptions } from './client';
 import type { AiRepository, AiRequestLog, AiDecisionTrace } from './repository';
 import type { CodexSettings } from '@avalon/types';
@@ -366,7 +373,7 @@ const runCodexOnce = async (
               [event.error?.code, event.error?.type, event.error?.message || event.message || ''].join(' '),
             )
           )
-            failure = new AiTechnicalPause(
+            failure = new CodexUsageLimited(
               'Codex subscription usage limit reached. Wait for the limit to reset, then retry the match.',
             );
           else if (
@@ -431,6 +438,7 @@ export function codexDecide(
     const audit: AiRequestLog = {
       _id: id,
       roomID,
+      instanceID: codexInstanceID(),
       player: request.playerID,
       stage: request.state.stage,
       mode: CODEX_MODEL,

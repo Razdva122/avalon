@@ -1,3 +1,4 @@
+import { CodexUsageLimited } from './client';
 import { EventEmitter } from 'events';
 import { PassThrough } from 'stream';
 import { spawn } from 'child_process';
@@ -149,7 +150,7 @@ test.each(['error', 'turn.failed'])('local usage limit in %s pauses without retr
       mockedSpawn.mock.results[attempts - 1].value.stdout.write(JSON.stringify({ type: 'turn.failed' }) + '\n');
     child.emit('close', 1);
   });
-  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toThrow('usage limit');
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toBeInstanceOf(CodexUsageLimited);
   expect(attempts).toBe(1);
 });
 
@@ -215,7 +216,7 @@ test.each([
     );
     child.emit('close', 1);
   });
-  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toThrow('usage limit');
+  await expect(runCodex('game', codexSchema(['approve'], false))).rejects.toBeInstanceOf(CodexUsageLimited);
   expect(mockedSpawn).toHaveBeenCalledTimes(1);
   expect(delay).not.toHaveBeenCalled();
 });

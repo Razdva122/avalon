@@ -26,11 +26,14 @@ type GameUsageRecord = Omit<
   before: CodexWeeklyLimit | null;
   after?: CodexWeeklyLimit | null;
   sharedQuota?: boolean;
+  instanceIDs?: string[];
+  initialInstanceID?: string;
 };
 
 export type AiRequestLog = {
   _id: string;
   roomID: string;
+  instanceID?: string;
   player: string;
   stage: string;
   mode: string;
@@ -142,8 +145,11 @@ export class AiRepository {
         const games = await this.db
           .collection<GameUsageRecord>('ai_game_usage')
           .find(
-            { instanceID: id, expiresAt: { $gt: new Date(now) } },
-            { projection: { _id: 1, before: 1, after: 1, sharedQuota: 1 }, maxTimeMS: 10000 },
+            { $or: [{ instanceID: id }, { instanceIDs: id }], expiresAt: { $gt: new Date(now) } },
+            {
+              projection: { _id: 1, instanceID: 1, initialInstanceID: 1, before: 1, after: 1, sharedQuota: 1 },
+              maxTimeMS: 10000,
+            },
           )
           .toArray();
         if (!games.length) return result;
@@ -157,6 +163,17 @@ export class AiRepository {
               {
                 $match: {
                   roomID: { $in: games.map((game) => game._id) },
+                  $or: [
+                    { instanceID: id },
+                    {
+                      instanceID: { $exists: false },
+                      roomID: {
+                        $in: games
+                          .filter((game) => (game.initialInstanceID ?? game.instanceID) === id)
+                          .map((game) => game._id),
+                      },
+                    },
+                  ],
                   startedAt: { $gte: start, $lte: new Date(now) },
                   phase: { $ne: 'beginner-review' },
                 },
@@ -269,6 +286,23 @@ export class AiRepository {
       .collection<GameUsageRecord>('ai_game_usage')
       .updateOne({ _id: roomID }, { $set: { after, checkedAt: Date.now() } });
   }
+  async switchGameInstance(roomID: string, previous: string, next: string, before: CodexWeeklyLimit | null) {
+    await this.observeWeeklyQuota(next, before);
+    // Snapshots from different accounts cannot be subtracted. Keep token costs per request.
+    const games = this.db.collection<GameUsageRecord>('ai_game_usage');
+    await games.updateOne(
+      { _id: roomID, initialInstanceID: { $exists: false } },
+      { $set: { initialInstanceID: previous } },
+    );
+    await games.updateOne(
+      { _id: roomID },
+      { $set: { instanceID: next, sharedQuota: true }, $addToSet: { instanceIDs: { $each: [previous, next] } } },
+    );
+    const siblings = (await this.busyInstances())
+      .filter((lease) => lease.instanceID === next)
+      .map((lease) => lease.roomID);
+    await games.updateMany({ _id: { $in: siblings } }, { $set: { sharedQuota: true } });
+  }
   async recentGameUsage(): Promise<AiGameUsage[]> {
     await this.ensureRetentionIndexes();
     const records = await this.db
@@ -322,8 +356,10 @@ export class AiRepository {
         { maxTimeMS: 10000 },
       )
       .toArray();
-    return records.map(({ _id, before, after, expiresAt, sharedQuota, ...record }) => {
+    return records.map(({ _id, before, after, expiresAt, sharedQuota, instanceIDs, initialInstanceID, ...record }) => {
       void expiresAt; // Storage retention metadata is never sent to clients.
+      void instanceIDs;
+      void initialInstanceID;
       const cost = costs.find((entry) => entry._id === _id);
       return {
         ...record,
@@ -398,7 +434,7 @@ export class AiRepository {
     return instanceID === 'default' ? this.ledgerID : `${this.ledgerID}:${instanceID}`;
   }
   private get leaseFilter() {
-    return { $regex: `^${this.ledgerID}(?::[a-zA-Z0-9-]+)?(?::slot2)?$` };
+    return { $regex: `^${this.ledgerID}(?::[a-zA-Z0-9-]+)?(?::slot2|:overflow-[a-zA-Z0-9-]+)?$` };
   }
   async busyInstances(): Promise<{ instanceID: string; roomID: string }[]> {
     const leases = await this.ledger
@@ -417,7 +453,7 @@ export class AiRepository {
     const slots = maxGames === 2 ? [ledgerID, `${ledgerID}:slot2`] : [ledgerID];
     // Starting/resuming an already reserved room must retain its original slot.
     const existing = await this.ledger.findOneAndUpdate(
-      { _id: { $in: slots }, owner: roomID, leaseUntil: { $gt: new Date() } },
+      { _id: { $in: [...slots, `${ledgerID}:overflow-${roomID}`] }, owner: roomID, leaseUntil: { $gt: new Date() } },
       { $set: { leaseUntil: new Date(Date.now() + AI_LEASE_MS) } },
       { returnDocument: 'before' },
     );
@@ -441,9 +477,34 @@ export class AiRepository {
     }
     throw new AiPause('Другая AI-партия уже запущена.');
   }
-  async release(roomID: string) {
+  async claimOverflow(roomID: string, instanceID: string) {
     validateID(roomID);
-    await this.ledger.updateOne({ _id: this.leaseFilter, owner: roomID }, { $unset: { owner: '', leaseUntil: '' } });
+    const slot = `${this.instanceLedgerID(instanceID)}:overflow-${roomID}`;
+    // Emergency continuations may exceed maxGames; ordinary new games still use bounded slots.
+    await this.ledger.updateOne(
+      { _id: slot },
+      { $set: { owner: roomID, leaseUntil: new Date(Date.now() + AI_LEASE_MS) } },
+      { upsert: true },
+    );
+  }
+  async release(roomID: string, instanceID?: string) {
+    validateID(roomID);
+    const overflow =
+      instanceID === undefined
+        ? { $regex: `^${this.ledgerID}(?::[a-zA-Z0-9-]+)?:overflow-${roomID}$` }
+        : `${this.instanceLedgerID(instanceID)}:overflow-${roomID}`;
+    await this.ledger.deleteMany({ _id: overflow, owner: roomID });
+    const filter =
+      instanceID === undefined
+        ? this.leaseFilter
+        : {
+            $in: [
+              this.instanceLedgerID(instanceID),
+              `${this.instanceLedgerID(instanceID)}:slot2`,
+              `${this.instanceLedgerID(instanceID)}:overflow-${roomID}`,
+            ],
+          };
+    await this.ledger.updateMany({ _id: filter, owner: roomID }, { $unset: { owner: '', leaseUntil: '' } });
   }
   async renewLease(roomID: string) {
     validateID(roomID);

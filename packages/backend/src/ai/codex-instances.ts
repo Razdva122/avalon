@@ -22,6 +22,10 @@ export function codexEnvironment(): NodeJS.ProcessEnv {
   return { ...process.env, ...context.getStore()?.environment };
 }
 
+export function codexInstanceID(): string {
+  return context.getStore()?.id ?? 'default';
+}
+
 export function configuredCodexInstances(): CodexInstance[] {
   const raw = process.env.AI_CODEX_INSTANCES;
   if (raw === undefined) {

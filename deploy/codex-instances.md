@@ -78,12 +78,24 @@ Explicit pool entries do not inherit legacy `AI_CODEX_HOME` / `CODEX_HOME` or
   across different subscription tiers.
 - Quotas are cached separately per connection for one minute, model catalogs for
   five minutes. Launch repeats the eligibility check on the reserved instance.
-- Pin the instance for the entire game, including independent decisions,
-  technical pauses/resume and post-game processing. A technical resume does not
-  apply the new-game quota gate or switch accounts.
+- Keep the instance across decisions, technical pauses/resume and post-game
+  processing, except when a decision reports subscription quota exhaustion.
+  Retry that unfinished request on another account supporting the same model and
+  reasoning, with positive weekly and five-hour allowance (weekly-only accounts
+  skip the five-hour check). Prefer available normal slots, then the least-loaded
+  busy account, allowing an emergency continuation beyond `maxGames`.
+  Concurrent requests share the room's account switch; completed decisions remain
+  applied. Do not revisit exhausted accounts during the same run. If none remain,
+  retain the normal technical pause. Other technical errors do not switch accounts.
+  A manual technical resume starts a new attempt without the new-game quota gate.
 - One game per account by default, or two with `maxGames: 2`.
   If all eligible accounts are busy, reject a new reservation without a queue.
   The same participant returns to their existing game.
+- Emergency continuation leases appear in occupancy and the dashboard, renew
+  during play/pause, and release without affecting other games. Request token
+  costs stay attributed to the account that handled each request. Games that
+  change accounts have no per-game percentage estimate, since quota snapshots
+  from different accounts cannot be subtracted.
 - Keep existing bot thresholds: smart `>60%` short / `>5%` weekly; regular
   `>30%` / `>3%`; beginner `>20%` / `>1%`. Weekly-only accounts skip the short gate.
   Player counts, model settings and Premium admission are unchanged.

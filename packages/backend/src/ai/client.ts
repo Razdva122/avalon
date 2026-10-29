@@ -59,6 +59,7 @@ export type BotReply = {
 export type Decide = (request: BotRequest, signal?: AbortSignal) => Promise<BotReply>;
 export class AiPause extends Error {}
 export class AiTechnicalPause extends AiPause {}
+export class CodexUsageLimited extends AiTechnicalPause {}
 export class CodexRequestFailed extends AiTechnicalPause {}
 export class CodexRateLimited extends AiTechnicalPause {
   readonly retryAfterSeconds?: number;

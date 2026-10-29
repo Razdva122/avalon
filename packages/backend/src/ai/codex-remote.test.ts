@@ -1,3 +1,4 @@
+import { CodexUsageLimited } from './client';
 import { mkdtemp, writeFile, readFile, rm } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -96,7 +97,7 @@ test('exhausted subscription quota gives an actionable pause reason', async () =
   await executable(
     `process.stdin.resume();process.stdin.on('end',()=>console.log('{"ok":false,"error":"usage_limit"}'));`,
   );
-  await expect(remoteCodex({ operation: 'decide' })).rejects.toThrow('subscription usage limit');
+  await expect(remoteCodex({ operation: 'decide' })).rejects.toBeInstanceOf(CodexUsageLimited);
 });
 
 test.each([false, true])(

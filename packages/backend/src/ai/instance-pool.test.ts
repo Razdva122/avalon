@@ -266,7 +266,7 @@ test('a completed match frees capacity after cleanup without releasing another r
   expect(await a.create('carol')).toHaveProperty('roomID');
 });
 
-test('real room pipelines keep independent remote requests and quota allocation on each reserved worker', async () => {
+test.each(['usage_limit', 'timeout'])('games only switch accounts for quota exhaustion (%s)', async (failure) => {
   const directory = await mkdtemp(join(tmpdir(), 'avalon-pool-pipeline-'));
   const calls = join(directory, 'calls');
   process.env.AI_CODEX_SSH_BIN = join(directory, 'ssh');
@@ -282,7 +282,7 @@ test('real room pipelines keep independent remote requests and quota allocation 
 const fs=require('node:fs');const host=process.argv.at(-2);let input='';
 process.stdin.on('data',d=>input+=d);process.stdin.on('end',()=>{
 const r=JSON.parse(input);fs.appendFileSync(${JSON.stringify(calls)},JSON.stringify({host,request:r})+'\\n');
-console.log(JSON.stringify(r.operation==='decide'?{ok:false,error:'usage_limit'}:
+console.log(JSON.stringify(r.operation==='decide'?{ok:false,error:${JSON.stringify(failure)}}:
 {ok:true,result:{rateLimits:{primary:{windowDurationMins:300,usedPercent:10},secondary:{windowDurationMins:10080,usedPercent:20}}}}));
 });`,
     { mode: 0o700 },
@@ -306,7 +306,11 @@ console.log(JSON.stringify(r.operation==='decide'?{ok:false,error:'usage_limit'}
       b.connect('admin-two').controlAiRoom(two, 'start', () => {}),
     ]);
     await until(async () => a.host.rooms[one].ai?.status === 'paused' && b.host.rooms[two].ai?.status === 'paused');
-    await until(async () => (await db.collection('ai_request_costs').countDocuments({ status: 'failed' })) === 2);
+    await until(
+      async () =>
+        (await db.collection('ai_request_costs').countDocuments({ status: 'failed' })) ===
+        (failure === 'usage_limit' ? 4 : 2),
+    );
     const leases = await new AiRepository(db).busyInstances();
     expect(leases).toHaveLength(2);
     await Promise.all([
@@ -323,7 +327,11 @@ console.log(JSON.stringify(r.operation==='decide'?{ok:false,error:'usage_limit'}
         .filter((entry) => entry.request.operation === 'decide')
         .map((entry) => entry.host)
         .sort(),
-    ).toEqual(['worker@one.pool.example', 'worker@two.pool.example']);
+    ).toEqual(
+      failure === 'usage_limit'
+        ? ['worker@one.pool.example', 'worker@one.pool.example', 'worker@two.pool.example', 'worker@two.pool.example']
+        : ['worker@one.pool.example', 'worker@two.pool.example'],
+    );
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
@@ -379,3 +387,125 @@ test('exhausted quotas do not cache a failed beginner review before an instance 
   expect(response).toHaveBeenCalledWith({ status: 'unavailable' });
   expect(await db.collection('ai_beginner_reviews').findOne({ _id: 'review-game:alice' as any })).toBeNull();
 });
+
+test.each(['busy', 'free', 'least-loaded', 'collision'])(
+  'quota failover preserves the request and chooses the right account (%s)',
+  async (scenario) => {
+    const hasFree = scenario === 'free';
+    const leastLoaded = scenario === 'least-loaded';
+    const collision = scenario === 'collision';
+    const quota = () => ({ remainingPercent: 80, resetsAt: 2000000000, checkedAt: Date.now(), shortTerm: null });
+    jest.spyOn(limits, 'getCodexWeeklyLimit').mockImplementation(async () => quota());
+    const directory = await mkdtemp(join(tmpdir(), 'avalon-failover-'));
+    const calls = join(directory, 'calls');
+    process.env.AI_CODEX_SSH_BIN = join(directory, 'ssh');
+    process.env.AI_CODEX_INSTANCES = JSON.stringify(
+      (collision
+        ? ['one', 'two', 'three', 'four']
+        : hasFree || leastLoaded
+          ? ['one', 'two', 'three']
+          : ['one', 'two']
+      ).map((id) => ({
+        id,
+        ...(leastLoaded && id === 'two' ? { maxGames: 2 } : {}),
+        ssh: { host: `${id}.pool.example`, user: 'worker', key: '/keys/key', knownHosts: '/keys/hosts' },
+      })),
+    );
+    await writeFile(
+      process.env.AI_CODEX_SSH_BIN,
+      `#!${process.execPath}
+const fs=require('node:fs');const host=process.argv.at(-2);let input='';
+process.stdin.on('data',d=>input+=d);process.stdin.on('end',()=>{
+const r=JSON.parse(input);fs.appendFileSync(${JSON.stringify(calls)},JSON.stringify({host,request:r})+'\\n');
+console.log(JSON.stringify(host==='worker@one.pool.example'&&r.operation==='decide'
+?{ok:false,error:'usage_limit'}:{ok:true,result:r.operation==='decide'
+?{text:JSON.stringify({choice:r.schema.properties.choice.enum[0],speech:'',publicReason:'',evidence:[],claimMorgana:null,claimStances:[]}),usage:{input_tokens:42,output_tokens:5}}
+:{rateLimits:{primary:{windowDurationMins:300,usedPercent:10},secondary:{windowDurationMins:10080,usedPercent:20}}}}));
+});`,
+      { mode: 0o700 },
+    );
+    const db = client.db(`failover-${database++}`);
+    const a = fixture(db);
+    const b = fixture(db);
+    try {
+      const response = jest.fn();
+      await a.connect('admin-one').createAiRoom('codex-chatgpt', response);
+      const id = response.mock.calls[0][0].roomID as string;
+      expect(id).toBeDefined();
+      await a.connect('admin-one').configureAiCodex(id, { model: 'gpt-6-luna', reasoning: 'medium' }, () => {});
+      const sibling = await b.create('other-human');
+      expect(sibling.roomID).toBeDefined();
+      const siblings = [{ instanceID: 'two', roomID: sibling.roomID }];
+      if (leastLoaded) {
+        siblings.push({ instanceID: 'two', roomID: (await b.create('second-human')).roomID });
+        siblings.push({ instanceID: 'three', roomID: (await b.create('third-human')).roomID });
+      }
+      if (collision) {
+        const claim = AiRepository.prototype.claim;
+        let raced = false;
+        jest.spyOn(AiRepository.prototype, 'claim').mockImplementation(async function (
+          this: AiRepository,
+          roomID,
+          instanceID,
+          maxGames,
+        ) {
+          if (roomID === id && instanceID === 'three' && !raced) {
+            raced = true;
+            await claim.call(this, 'racing-room', 'three');
+            siblings.push({ instanceID: 'three', roomID: 'racing-room' });
+          }
+          return claim.call(this, roomID, instanceID, maxGames);
+        });
+      }
+      await a.connect('admin-one').controlAiRoom(id, 'start', () => {});
+      await until(
+        async () => (await db.collection('ai_request_costs').countDocuments({ roomID: id, status: 'completed' })) > 0,
+      );
+      const target = collision ? 'four' : hasFree || leastLoaded ? 'three' : 'two';
+      const repo = new AiRepository(db);
+      await repo.renewLease(id);
+      await repo.claim(id, target);
+      expect(await repo.busyInstances()).toHaveLength(siblings.length + 1);
+      await a.connect('admin-one').controlAiRoom(id, 'stop', () => {});
+      await until(async () => (await repo.busyInstances()).length === siblings.length);
+      expect(await new AiRepository(db).busyInstances()).toEqual(expect.arrayContaining(siblings));
+      const requests = (await readFile(calls, 'utf8'))
+        .trim()
+        .split('\n')
+        .map((line) => JSON.parse(line))
+        .filter((entry) => entry.request.operation === 'decide');
+      const original = requests.find((entry) => entry.host === 'worker@one.pool.example');
+      expect(
+        requests.some(
+          (entry) => entry.host === `worker@${target}.pool.example` && entry.request.prompt === original.request.prompt,
+        ),
+      ).toBe(true);
+      expect(
+        requests.filter(
+          (entry) => entry.host === 'worker@one.pool.example' && entry.request.prompt === original.request.prompt,
+        ),
+      ).toHaveLength(1);
+      expect(await db.collection('ai_game_usage').findOne({ roomID: id })).toMatchObject({
+        instanceID: target,
+        sharedQuota: true,
+      });
+      const usage = await new AiRepository(db).weeklyAccountUsage([
+        { id: 'one', quota: quota() },
+        { id: target, quota: quota() },
+      ]);
+      expect(usage[0]).toMatchObject({ tokens: 0, gameCount: 1, weeklyIncomplete: true });
+      const costs = await db.collection('ai_request_costs').find({ roomID: id, instanceID: target }).toArray();
+      expect(usage[1].tokens).toBe(
+        costs.reduce((sum, cost) => sum + (cost.inputTokens ?? 0) + (cost.outputTokens ?? 0), 0),
+      );
+      expect(usage[1].tokens).toBeGreaterThan(0);
+      expect(usage[1].gameCount).toBe(1);
+    } finally {
+      // Stop before deleting the executable, including when an assertion fails.
+      for (const room of Object.values(a.host.rooms))
+        await a.connect(room.leaderID).controlAiRoom(room.roomID, 'stop', () => {});
+      await until(async () => !(a.service as any).running.size);
+      await rm(directory, { recursive: true, force: true });
+    }
+  },
+);

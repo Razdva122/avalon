@@ -1,7 +1,7 @@
 import { codexEnvironment } from './codex-instances';
 import { execFile } from 'child_process';
 import { isAbsolute } from 'path';
-import { AiTechnicalPause, CodexRequestFailed, CodexRateLimited } from './client';
+import { AiTechnicalPause, CodexRequestFailed, CodexRateLimited, CodexUsageLimited } from './client';
 import { AI_REQUEST_TIMEOUT_MS, AI_WORKER_QUEUE_TIMEOUT_MS } from './timing';
 
 export function hasRemoteCodex() {
@@ -119,7 +119,9 @@ export function remoteCodex(request: object, signal?: AbortSignal, attempt = 0):
                 ? new CodexRequestFailed(reason)
                 : response.error === 'rate_limit'
                   ? new CodexRateLimited(reason, response.retryAfterSeconds)
-                  : new AiTechnicalPause(reason),
+                  : response.error === 'usage_limit'
+                    ? new CodexUsageLimited(reason)
+                    : new AiTechnicalPause(reason),
             );
           }
           resolve(response.result);

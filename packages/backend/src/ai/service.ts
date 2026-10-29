@@ -19,7 +19,7 @@ import { validPacket } from '@/security/validation';
 import { randomUUID } from 'crypto';
 import { AiRepository } from './repository';
 import { BotRoom } from './room';
-import { AiPause } from './client';
+import { AiPause, CodexUsageLimited } from './client';
 import { decisionPipeline } from './pipeline';
 import { getCodexModels, validateCodexSettings } from './codex-models';
 import { getCodexWeeklyLimit, consumeCodexReset } from './codex-limits';
@@ -95,6 +95,8 @@ export class AiService {
   private allocating = new Map<string, string>();
   private resetting = new Set<string>();
   private roomInstances = new Map<string, CodexInstance>();
+  private switchingInstances = new Map<string, Promise<boolean>>();
+  private exhaustedInstances = new Map<string, Set<string>>();
   private technicalStarts = new Map<string, object>();
   private running = new Set<string>();
   private draftLeaseTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -234,12 +236,85 @@ export class AiService {
         ? this.repository!.claim(roomID, instance.id, 2)
         : this.repository!.claim(roomID, instance.id);
   }
+  private async switchExhaustedInstance(roomID: string, failed: CodexInstance, signal?: AbortSignal) {
+    const exhausted = this.exhaustedInstances.get(roomID) ?? new Set<string>();
+    this.exhaustedInstances.set(roomID, exhausted);
+    exhausted.add(failed.id);
+    const pending = this.switchingInstances.get(roomID);
+    if (pending) return pending;
+    if (this.instanceFor(roomID).id !== failed.id) return true;
+    const switching = (async () => {
+      const snapshots = await this.instanceSnapshots(
+        configuredCodexInstances().filter((entry) => !exhausted.has(entry.id)),
+      );
+      const settings = (this.manager.rooms[roomID] as BotRoom).ai?.codex;
+      let busy = await this.occupiedInstances();
+      const candidates = snapshots.filter(
+        ({ quota, models }) =>
+          quota &&
+          Number.isFinite(quota.remainingPercent) &&
+          quota.remainingPercent > 0 &&
+          (quota.shortTerm === null ||
+            (quota.shortTerm &&
+              Number.isFinite(quota.shortTerm.remainingPercent) &&
+              quota.shortTerm.remainingPercent > 0)) &&
+          settings &&
+          models.some((model) => model.id === settings.model && model.efforts.includes(settings.reasoning)),
+      );
+      const load = (instance: CodexInstance) => busy.get(instance.id)?.size ?? 0;
+      const rank = () =>
+        candidates.sort(
+          (a, b) =>
+            Number(load(a.instance) >= (a.instance.maxGames ?? 1)) -
+              Number(load(b.instance) >= (b.instance.maxGames ?? 1)) ||
+            load(a.instance) - load(b.instance) ||
+            this.compareQuota(a.quota, b.quota),
+        );
+      // A racing failover may consume our first choice. Try every normal slot before overflowing.
+      for (const overflow of [false, true]) {
+        if (overflow) busy = await this.occupiedInstances();
+        for (const { instance, quota } of rank()) {
+          signal?.throwIfAborted();
+          this.allocating.set(roomID, instance.id);
+          try {
+            try {
+              await this.claimInstance(roomID, instance);
+            } catch (error) {
+              if (!(error instanceof AiPause)) throw error;
+              if (!overflow) continue;
+              await this.repository!.claimOverflow(roomID, instance.id);
+            }
+            try {
+              signal?.throwIfAborted();
+              await this.repository!.switchGameInstance(roomID, failed.id, instance.id, quota);
+            } catch (error) {
+              await this.repository!.release(roomID, instance.id);
+              throw error;
+            }
+            this.roomInstances.set(roomID, instance);
+            await this.repository!.release(roomID, failed.id);
+            return true;
+          } finally {
+            this.allocating.delete(roomID);
+          }
+        }
+      }
+      return false;
+    })();
+    this.switchingInstances.set(roomID, switching);
+    try {
+      return await switching;
+    } finally {
+      this.switchingInstances.delete(roomID);
+    }
+  }
   private async releaseInstance(roomID: string) {
     try {
       await this.repository!.release(roomID);
     } finally {
       this.roomInstances.delete(roomID);
       this.usageStarted.delete(roomID);
+      this.exhaustedInstances.delete(roomID);
     }
   }
   async canManage(userID?: string): Promise<boolean> {
@@ -410,7 +485,28 @@ export class AiService {
         });
         await usageStart;
       }
-      return codexDecide(id, this.repository!, undefined, () => room.ai?.codex)(request, options, signal);
+      for (;;) {
+        signal?.throwIfAborted();
+        await this.switchingInstances.get(id);
+        signal?.throwIfAborted();
+        const instance = this.instanceFor(id);
+        if (this.exhaustedInstances.get(id)?.has(instance.id))
+          throw new CodexUsageLimited(
+            'Codex subscription usage limit reached on all eligible accounts. Retry after a limit reset.',
+          );
+        try {
+          return await withCodexInstance(instance, () =>
+            codexDecide(id, this.repository!, undefined, () => room.ai?.codex)(request, options, signal),
+          );
+        } catch (error) {
+          if (
+            !(error instanceof CodexUsageLimited) ||
+            signal?.aborted ||
+            !(await this.switchExhaustedInstance(id, instance, signal))
+          )
+            throw error;
+        }
+      }
     });
     const room: BotRoom = new BotRoom(
       id,
@@ -444,6 +540,7 @@ export class AiService {
     this.clearPauseTimer(id);
     this.clearDraftLeaseTimer(id);
     this.running.add(id);
+    this.exhaustedInstances.delete(id);
     // run changes status synchronously before the first await: duplicate starts cannot spend twice.
     void this.inRoom(id, () =>
       room
@@ -457,7 +554,7 @@ export class AiService {
             try {
               // Metadata shares the worker queue; renew before waiting behind another game's turn.
               await room.renewLease?.();
-              await this.repository!.finishGameUsage(id, await getCodexWeeklyLimit(true));
+              await this.repository!.finishGameUsage(id, await this.inRoom(id, () => getCodexWeeklyLimit(true)));
             } catch {
               console.error('AI game usage snapshot could not be saved');
             }
