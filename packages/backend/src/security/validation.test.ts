@@ -200,7 +200,6 @@ test.each([
   { playerCount: '7' },
   { playerCount: 9 },
   { unknown: true },
-  { beginner: true, difficulty: 'smart' },
   { beginner: true, playerCount: 6 },
 ])('unified bot setup rejects malformed options %j', (invalid) => {
   expect(
@@ -227,3 +226,12 @@ test('solo and beginner setup cannot reserve friends', () => {
 test.each(['es', 'vi'])('accepts %s for public AI launch packets', (language) => {
   expect(validPacket('startHumanAiRoom', ['room', { difficulty: 'regular', language }, () => {}])).toBe(true);
 });
+
+test.each(['regular', 'smart'])(
+  'beginner wire setup accepts the canonical bot mode or legacy %s alias',
+  (difficulty) => {
+    expect(
+      validPacket('createHumanAiRoom', [{ beginner: true, difficulty, playerCount: 5, language: 'en' }, () => {}]),
+    ).toBe(true);
+  },
+);

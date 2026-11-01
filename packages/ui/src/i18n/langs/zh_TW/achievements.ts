@@ -4,7 +4,7 @@
 export default {
   achievements: {
     ai_win: '人類因素',
-    ai_win_description: '在普通或智慧機器人模式中贏得一場 AI 對局。',
+    ai_win_description: '贏得一場與 AI 機器人的對局。',
     best_of_the_best: '強中之強',
     best_of_the_best_description:
       '從開始遊戲或最近一次重設評分後，完成至少10場計分對局，並達到6800或更高的TrueSkill評分。',

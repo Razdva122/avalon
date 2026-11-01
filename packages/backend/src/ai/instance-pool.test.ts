@@ -158,7 +158,7 @@ test.each([
     secondPercent: 70,
     expected: 'two',
   },
-  { label: 'insufficient quota is excluded', firstReset: 14400, secondReset: 3600, secondPercent: 60, expected: 'one' },
+  { label: 'insufficient quota is excluded', firstReset: 14400, secondReset: 3600, secondPercent: 30, expected: 'one' },
   {
     label: 'equal resets use remaining percentage',
     firstReset: 3600,

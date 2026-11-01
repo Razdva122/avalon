@@ -94,7 +94,7 @@ test('rejects fabricated episodes and evidence from after the selected outcome',
   expect(() => parseBeginnerAnalysis(JSON.stringify({ ...reply, sources: ['event-99'] }), context)).toThrow();
   expect(() => parseBeginnerAnalysis(JSON.stringify({ ...reply, next: '' }), context)).toThrow();
 });
-test('analysis runs once with the fixed model and low reasoning, persists and reuses the result', async () => {
+test('analysis runs once with the Terra medium, persists and reuses the result', async () => {
   const docs = new Map<string, any>();
   const collection = {
     createIndex: async () => {},
@@ -118,7 +118,7 @@ test('analysis runs once with the fixed model and low reasoning, persists and re
     usage: { input_tokens: 30, output_tokens: 20 },
   }));
   const audit = jest.fn(async () => {});
-  const models = async () => [{ id: 'gpt-6.1-sol', label: 'Sol', efforts: ['low'] }];
+  const models = async () => [{ id: 'gpt-6.1-terra', label: 'Terra', efforts: ['medium'] }];
   const review = new BeginnerAnalysis(
     { collection: () => collection } as any,
     { recordRequest: audit } as any,
@@ -130,7 +130,7 @@ test('analysis runs once with the fixed model and low reasoning, persists and re
   expect(two).toEqual(one);
   expect(runner).toHaveBeenCalledTimes(1);
   expect(runner.mock.calls[0]).toHaveLength(5);
-  expect((runner.mock.calls[0] as unknown[])[3]).toEqual({ model: 'gpt-6.1-sol', reasoning: 'low' });
+  expect((runner.mock.calls[0] as unknown[])[3]).toEqual({ model: 'gpt-6.1-terra', reasoning: 'medium' });
   const restarted = new BeginnerAnalysis(
     { collection: () => collection } as any,
     { recordRequest: audit } as any,
@@ -168,7 +168,7 @@ test('starting another game cancels optional analysis and never replays an uncer
     { collection: () => collection } as any,
     { recordRequest: async () => {} } as any,
     runner as any,
-    async () => [{ id: 'gpt-6.1-sol', label: 'Sol', efforts: ['low'] }],
+    async () => [{ id: 'gpt-6.1-terra', label: 'Terra', efforts: ['medium'] }],
   );
   const pending = analysis.get(state(), 'me');
   await started;

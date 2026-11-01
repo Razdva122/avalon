@@ -217,8 +217,6 @@ function isOpeningPair(request: BotRequest) {
 export function decisionInstructions(request: BotRequest, commonOnly = false) {
   const role = request.state.players?.find((p) => p.id === request.playerID)?.role;
   const evil = ['mordred', 'morgana', 'minion', 'oberon'].includes(role || '');
-  const regularTeam =
-    request.botDifficulty === 'regular' && ['selectTeam', 'votingForTeam'].includes(request.state.stage);
   const assessLadyChoice =
     request.state.stage === 'checkLoyalty' ||
     (['selectTeam', 'votingForTeam'].includes(request.state.stage) &&
@@ -235,10 +233,8 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
             ? 'Choose the final assassination target freely. Compare your choice with YOUR OWN earlier target in evilCouncil. If you change that target, publicReason must name the new target and briefly explain why you changed your mind using public evidence; this is published before the shot. Do not claim new events occurred if you only reassessed existing clues. Keep private role knowledge and private reasoning in speech. If your target is unchanged, leave publicReason empty.'
             : 'Choose the action for the current stage. When speak=false, publicReason must be empty.';
   const strategy = ['selectTeam', 'votingForTeam'].includes(request.state.stage)
-    ? (regularTeam
-        ? 'Privately check in order: (1) For voting, evaluate ONLY actionFacts.team, the current proposedTeam; for selection, evaluate the exact legal roster you choose. Never substitute an earlier preferred team. (2) Use your own side, privateKnowledge and completed mission deductions; success or testimony cannot erase known Evil. (3) Count known and possible Evil against missionRule.failureAtLeast: enough Evil CAN sabotage, not necessarily WILL; one Evil cannot fail a two-Fail mission, but unknown teammates may supply another. (4) Choose for your actual side. Good normally avoids established sabotage risk when a safer reachable roster exists; Evil seeks sabotage access or concrete cover. (5) Before Reject, compare one reachable alternative and proposal.fifthLeader; only rejecting proposal 4 immediately forces proposal 5. Your own inclusion does not clear others. If off-team as Good, at most alignmentCounts.good - 1 Good can be inside. Before an information bet, name which possible result would distinguish your hypotheses; a known saboteur can explain another Fail without accusing new teammates. At two failures prioritize survival. If repeating a rejected roster, give a new public reason that could persuade a missing voter. Never publish these private checks.'
-        : coalitionAdvice +
-          ' Distinguish unresolved rosters from established sabotage risk. Persuade a missing voter with specific public evidence or a compromise; repeating the same question is not a new coalition plan.') +
+    ? coalitionAdvice +
+      ' Distinguish unresolved rosters from established sabotage risk. Persuade a missing voter with specific public evidence or a compromise; repeating the same question is not a new coalition plan.' +
       (evil ? ' ' + evilTeamAdvice : '')
     : request.state.stage === 'onMission'
       ? "Evil card advice: compare sabotage with a concrete future benefit of cover using score and failsRequired. Infer teammates' likely cards from their public words, recorded votes, completed missions and current incentives; keep these predictions uncertain. There is no prearranged sabotage convention or designated saboteur; seat numbers do not assign cards. Compare your card's effect if others play Success or Fail, including redundant exposure and the risk of too few Fails. Allies' future cards remain unknown; unresolved teammates may also be Evil and act independently. Oberon does not know allies. Weigh early exposure against cover, and prioritize a decisive sabotage over trust for a round that may never occur. Too few Evil cannot meet a two-Fail threshold."
@@ -255,9 +251,7 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
     languageInstruction(request.language) +
     playerNameInstructions +
     ' ' +
-    (regularTeam
-      ? 'Answer the current objection, offer a preference or stay silent. Use bare seat numbers; avoid generic reports and repeated caveats.'
-      : tableConversationAdvice) +
+    tableConversationAdvice +
     ' ' +
     conversationVoiceAdvice +
     ' ' +
@@ -265,9 +259,7 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
     'Completed missions establish results and Fail counts; rejected proposals played no cards and did not change the score. Each participant plays one card. An ordinary Success alone does not prove alignment; apply the winning-opportunity rule for decisive successes. Read failsRequired, approvalsRequired and score literally. Proposals 1–4 require a majority; proposal 5 runs automatically. Good needs three successes and Merlin surviving; Evil needs three failures or killing Merlin. Oberon knows no allies; use only visible privateKnowledge. ' +
     winningOpportunityAdvice +
     ' ' +
-    (regularTeam
-      ? 'Combine completed missions with your own known card and alignmentCounts. Each Fail needs a different Evil participant. If you played Success in a two-seat team with one Fail, the other player is Evil. Overlapping failed teams may have the same saboteur; do not invent another. Use only public evidence in public deductions. '
-      : 'Combine ALL completed missions with alignmentCounts and reliable private facts before disputing a deduction. Fails give a lower bound on Evil in a team; remaining Evil slots can also give an upper bound. Example only: with three Evil total, disjoint teams showing two and one Fails contain exactly two and one Evil, even if Evil sometimes play Success. Do not add bounds across overlapping teams as if their participants were different. Use only publicly available bounds in public arguments, and update old hypotheses when new facts narrow them. ') +
+    'Combine ALL completed missions with alignmentCounts and reliable private facts before disputing a deduction. Fails give a lower bound on Evil in a team; remaining Evil slots can also give an upper bound. Example only: with three Evil total, disjoint teams showing two and one Fails contain exactly two and one Evil, even if Evil sometimes play Success. Do not add bounds across overlapping teams as if their participants were different. Use only publicly available bounds in public arguments, and update old hypotheses when new facts narrow them. ' +
     'Public claims and modelHypotheses are fallible, not verified roles. A truthful Lady result reveals alignment, not role, and does not clear its author. Do not invent votes, inspections, dialogue or future cards. ' +
     (request.readAllChat
       ? 'Facts override notes. Human testimony uses t:AUTHOR:SUBJECT; retain exact aliases and earliest/reversal/latest positions. source=[1-8 NEW refs]: positive=humanStatements.id, -N=chat slotN. Prior anchors persist; never recopy them. Bot testimony and other evidence use string sources. Omit unchanged notes. '

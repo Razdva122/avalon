@@ -169,7 +169,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useAdminBotMessages } from './locales';
-import type { AiBotInstanceStatus, AiBotMode } from '@avalon/types';
+import type { AiBotInstanceStatus } from '@avalon/types';
 import type { BotQuotaThresholds } from '@avalon/types';
 import BotQuotaSettings from './BotQuotaSettings.vue';
 import BotUsageStats from './BotUsageStats.vue';
@@ -222,7 +222,9 @@ const formatDate = (timestamp: number) =>
     second: '2-digit',
   });
 const availableModes = (bot: AiBotInstanceStatus) =>
-  (Object.keys(bot.modes) as AiBotMode[]).filter((mode) => bot.modes[mode]);
+  (['regular', 'beginner'] as const).filter((mode) =>
+    mode === 'regular' ? bot.modes.regular || bot.modes.smart : bot.modes.beginner,
+  );
 const quotaWindows = (bot: AiBotInstanceStatus) => [
   ...(bot.quota?.shortTerm === null ? [] : [{ label: 'aiArena.codexShortTermLimit', value: bot.quota?.shortTerm }]),
   { label: 'aiArena.codexWeeklyLimit', value: bot.quota },

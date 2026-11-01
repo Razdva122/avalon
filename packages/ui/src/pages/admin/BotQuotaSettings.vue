@@ -65,9 +65,13 @@ const props = defineProps<{
   saved: boolean;
 }>();
 const emit = defineEmits<{ save: [thresholds: BotQuotaThresholds]; draft: [thresholds: BotQuotaThresholds] }>();
-const modes = ['smart', 'regular', 'beginner'] as const;
+const modes = ['regular', 'beginner'] as const;
 const windows = ['shortTerm', 'weekly'] as const;
-const clone = (value: BotQuotaThresholds): BotQuotaThresholds => JSON.parse(JSON.stringify(value));
+const clone = (value: BotQuotaThresholds): BotQuotaThresholds => ({
+  regular: { ...value.regular },
+  smart: { ...value.regular },
+  beginner: { ...value.beginner },
+});
 const draft = ref(clone(props.initialDraft || props.thresholds));
 watch(draft, (value) => emit('draft', clone(value)), { deep: true, flush: 'sync' });
 const dirty = computed(() =>
@@ -138,7 +142,7 @@ fieldset {
 }
 .threshold-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
 }
 label {

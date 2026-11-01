@@ -12,7 +12,7 @@ import type { CodexRunner } from './codex';
 import { getCodexModels } from './codex-models';
 import type { AiRepository, AiRequestLog } from './repository';
 
-export const beginnerAnalysisSettings = { model: 'gpt-6.1-sol', reasoning: 'low' };
+export const beginnerAnalysisSettings = { model: 'gpt-6.1-terra', reasoning: 'medium' };
 const settings = beginnerAnalysisSettings;
 type PublicEvent = { id: string; type: string; mission: number; [key: string]: unknown };
 type Episode = {

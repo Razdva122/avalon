@@ -71,7 +71,7 @@ test.each(['regular', 'smart'] as const)(
 );
 
 test.each(['selectTeam', 'votingForTeam'] as const)(
-  'regular %s gets shorter instructions and role advice without changing facts or legal actions',
+  'regular %s shares full instructions and role advice with its smart alias without changing facts or legal actions',
   async (stage) => {
     const input = {
       ...request,
@@ -88,10 +88,12 @@ test.each(['selectTeam', 'votingForTeam'] as const)(
     // Prompt advice does not become a server veto or silently change the model's choice.
     expect(await decide(regular)).toMatchObject({ choice: 0 });
     expect(await decide(smart)).toMatchObject({ choice: 0 });
-    expect(contexts[0].instructions!.length).toBeLessThan(contexts[1].instructions!.length * 0.8);
+    expect(contexts[0].instructions).toBe(contexts[1].instructions);
+    expect(contexts[0].instructions).toBe(decisionInstructions(input));
     const a = compactRequest(regular),
       b = compactRequest(smart);
-    expect(a.roleAdvice!.length).toBeLessThan(b.roleAdvice!.length * 0.6);
+    expect(a.roleAdvice).toBe(b.roleAdvice);
+    expect(a.roleAdvice).toBe(compactRequest(input).roleAdvice);
     expect(a.privateKnowledge).toEqual(b.privateKnowledge);
     expect(a.actionFacts).toEqual(b.actionFacts);
     expect(a.actionFacts).toMatchObject({ team: [1, 3, 5], knownEvilOnTeam: [5], failsRequired: 1 });
@@ -129,5 +131,5 @@ test.each(['regular', 'smart'] as const)('a %s room passes its difficulty to eve
   await room.run();
   expect(room.ai?.status).toBe('finished');
   expect(requests.length).toBeGreaterThan(0);
-  for (const r of requests) expect(r).toMatchObject({ botDifficulty: difficulty });
+  for (const r of requests) expect(r).toMatchObject({ botDifficulty: 'regular' });
 });

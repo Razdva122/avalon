@@ -136,7 +136,7 @@ test('dashboard includes occupied cross-process instances and preserves healthy 
       roomID: 'remote-room',
       quota: expect.objectContaining({ remainingPercent: 80 }),
     }),
-    expect.objectContaining({ id: 'two', status: 'free', modes: { smart: false, regular: true, beginner: true } }),
+    expect.objectContaining({ id: 'two', status: 'free', modes: { smart: true, regular: true, beginner: true } }),
     expect.objectContaining({ id: 'three', status: 'unavailable', quota: null }),
   ]);
   expect(JSON.stringify(result)).not.toMatch(/\/pool\/|environment|AI_CODEX_HOME/);
@@ -188,10 +188,10 @@ test('only admins can change thresholds and saved values govern the next availab
   expect(await f.request(undefined, thresholds)).toEqual({ error: 'AI room access denied' });
   expect(await f.request('admin', thresholds)).toEqual({ ok: true });
   const result = await f.request('admin');
-  expect(result.thresholds).toEqual(thresholds);
+  expect(result.thresholds).toEqual({ ...thresholds, smart: thresholds.regular });
   expect(result.instances[1].status).toBe('unavailable');
   expect(await f.request('admin', { ...thresholds, beginner: { weekly: -1, shortTerm: 0 } })).toHaveProperty('error');
-  expect((await f.request('admin')).thresholds).toEqual(thresholds);
+  expect((await f.request('admin')).thresholds).toEqual({ ...thresholds, smart: thresholds.regular });
 });
 
 test('usage history marks abandoned games stopped while keeping another process live game active', async () => {

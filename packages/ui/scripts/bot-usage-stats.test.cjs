@@ -159,10 +159,10 @@ test('usage view sums recorded tokens, marks incomplete quota totals and renders
   assert.match(first, /src="\/flags\/ru.svg"/);
   assert.match(first, /title="[^"]*&lt;private&gt;[^"]*"/);
   assert.match(second, /class="[^"]*game-badge[^"]*status-finished/);
-  assert.match(second, /aiArena.dashboardModesmart/);
+  assert.match(second, /aiArena.dashboardModeregular/);
   assert.match(second, /title="[^"]*English[^"]*"/);
   assert.match(second, />EN<\/span>/);
   assert.match(second, /src="\/flags\/en.svg"/);
   const botIcon = (summary) => summary.match(/class="game-badge bot-badge"[\s\S]*?<path d="([^"]+)"/)[1];
-  assert.notEqual(botIcon(first), botIcon(second), 'Regular and smart bots need visually distinct icons');
+  assert.equal(botIcon(first), botIcon(second), 'Legacy and current bots share one mode icon');
 });

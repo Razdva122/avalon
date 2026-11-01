@@ -195,11 +195,7 @@ export function validPacket(event: string, args: unknown[]): boolean {
           ['en', 'ru', 'zh-tw', 'es', 'vi'].includes(values[0].language as string)) &&
         (values[0].playerCount === undefined || [5, 6, 7, 8].includes(values[0].playerCount as number)) &&
         !(values[0].beginner && values[0].withFriend) &&
-        !(
-          values[0].beginner &&
-          ((values[0].difficulty !== undefined && values[0].difficulty !== 'regular') ||
-            (values[0].playerCount !== undefined && values[0].playerCount !== 5))
-        ))
+        !(values[0].beginner && values[0].playerCount !== undefined && values[0].playerCount !== 5))
     );
   if (event === 'getLobbyAiAccess') return true;
   if (event === 'startLobbyAiRoom') {

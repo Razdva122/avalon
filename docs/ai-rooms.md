@@ -9,7 +9,7 @@ while checking access, and when every bot mode is unavailable. It opens a setup
 dialog before reserving a room. Owners of an existing match return to that room.
 
 Setup offers Solo / With friends, with a choice of 2 to one fewer than the total seats, including
-the owner, regular bots, stronger opponents, and a compact
+the owner, one shared bot profile, and a compact
 solo-only First game option. The discussion language defaults to the supported
 interface language or English. Total seats are 5, 6, 7 or 8; 7/8 display Premium
 and require the server-checked entitlement. Unavailable modes remain visible as
@@ -126,10 +126,10 @@ are rejected before room reservation. Public bot play accepts
 `createHumanAiRoom({ beginner: true }, callback)` (legacy beginner); the callback returns a `roomID` or an `error`.
 The setup dialog passes `{ beginner, withFriend, difficulty, language, playerCount }`
 to `createHumanAiRoom` to save the prepared settings.
-`startHumanAiRoom(roomID, { difficulty: 'smart' | 'regular', language, playerCount?: 5 | 6 | 7 | 8 }, callback)`
+`startHumanAiRoom(roomID, { difficulty: 'regular', language, playerCount?: 5 | 6 | 7 | 8 }, callback)`
 starts the same prepared room and returns `ok: true` or an `error`. The server
 chooses the model and reasoning effort, validates table size and Premium, and
-forces Luna low bots with five seats for beginner rooms; clients cannot override
+uses Terra medium for every public game and five seats for beginner rooms; clients cannot override
 these settings or start another owner's room.
 Access responses include `canPlay`, `botModes` availability and `ownRoomID` for
 returning to the owner's active match. Room state records the selected mode as
@@ -158,17 +158,13 @@ cannot be loaded, that seat falls back to its number.
 Private decisions and public speech are separated. Authoritative facts, legal
 actions, side objectives and secrecy override personality. Public Percival claims
 are testimony, not verified knowledge; claims and reactions use the model's own
-words. The room's saved `botDifficulty` selects prompt advice independently of the
-model: regular bots receive shorter team-selection/voting instructions and compact
-role advice; smart bots retain deeper strategy and coalition negotiation. Matches
-without a saved difficulty, including administrator games, use smart advice.
-Rules, legal choices, private knowledge, language and output format remain shared.
-Regular team decisions explicitly check the current roster, known and possible Evil,
-the Fail threshold and a reachable alternative before acting. Both profiles treat
-old model notes as fallible, correct contradicted notes under the same key and cite
-the relevant mission/proposal in their sources. These instructions do not impose
-server-selected teams or votes. Prompt-routing tests do not establish stronger
-model play; improvements need model evaluation on recorded situations.
+words. All bots share the full strategy and role advice: current-roster checks, mission arithmetic,
+role secrecy, coalition negotiation, and alternatives before acting. There is no shortened
+regular profile or separate smart profile. Old `smart` requests and prepared rooms normalize
+to `regular`; historical replays and actual recorded model identities remain unchanged.
+Model notes stay fallible and must yield to authoritative game facts. These instructions
+do not impose server-selected teams or votes. Prompt tests establish routing and preserved
+instructions, not stronger play; quality changes still need evaluation on saved situations.
 
 The decision input includes personality once. Evil-specific team and Lady advice
 is sent only to Evil players; claim-format guidance is omitted when no claim or
@@ -348,16 +344,17 @@ Codex records subscription token usage; there is no RUB budget or per-game paid
 API charge. Administrator model selection and reasoning use the authenticated
 Codex catalog. Public play uses these fixed server presets:
 
-| Mode         | Model         | Reasoning effort | Required five-hour remainder | Required weekly remainder |
-| ------------ | ------------- | ---------------- | ---------------------------- | ------------------------- |
-| Smart bots   | `gpt-6.1-sol` | `medium`         | Greater than 60%             | Greater than 5%           |
-| Regular bots | `gpt-6-luna`  | `medium`         | Greater than 30%             | Greater than 3%           |
-| First game   | `gpt-6-luna`  | `low`            | Greater than 20%             | Greater than 1%           |
+| Mode                     | Model           | Reasoning effort | Required five-hour remainder | Required weekly remainder |
+| ------------------------ | --------------- | ---------------- | ---------------------------- | ------------------------- |
+| Bot game                 | `gpt-6.1-terra` | `medium`         | Greater than 30%             | Greater than 3%           |
+| First game with teaching | `gpt-6.1-terra` | `medium`         | Greater than 20%             | Greater than 1%           |
 
-These are the default thresholds. Administrators can edit all six integer
-percentages (0–100) on `/admin/bots/`; the policy is persisted in
-`ai_settings` under `bot-quota-thresholds` and read at availability checks,
-room reservation, and launch. Changes do not interrupt running games.
+These are the default thresholds. Administrators can edit the four integer percentages
+(0–100) on `/admin/bots/`. The policy is persisted in `ai_settings` under
+`bot-quota-thresholds` and read at availability checks, room reservation, and launch.
+The legacy `smart` wire/storage field mirrors `regular`; it is not a separate threshold
+or administrative control. Existing stored smart limits cannot create a second eligibility
+policy. Changes do not interrupt running games.
 Both thresholds are strict: equality does not allow a new match. Setting the
 weekly threshold to 100 disables a mode for all accounts. The selected
 preset must also be supported by the authenticated model catalog. Missing or
@@ -495,7 +492,7 @@ Manually ended games receive an unfinished notice rather than a victory lesson.
 
 The panel requests an optional personal analysis via `getBeginnerReview(roomID)`.
 The server authorizes the finished beginner participant and uses exactly
-`gpt-6.1-sol` with `low` reasoning. One real episode is returned as decision,
+`gpt-6.1-terra` with `medium` reasoning. One real episode is returned as decision,
 observation and next-game action. The input separates decision-time knowledge from
 later public results; it excludes other secret cards, the full revealed role list,
 names and chat without reliable decision-time cutoffs. Current episodes cover team
@@ -515,7 +512,7 @@ waiting or if generation fails. No private review is broadcast to spectators.
 
 Play again preserves the discussion language and defaults to the participant's role;
 the role selector offers the existing five-seat roles. It creates and starts a new
-beginner room with regular bots and hints. Availability is checked on demand, duplicate
+beginner room with the shared bot profile and hints. Availability is checked on demand, duplicate
 clicks are ignored, and a rejected start can retry the prepared room. Uncertain network
 outcomes recover through the existing room UI. Leaving the originating room cancels
 late starts and navigation. All seven UI languages include the review copy.

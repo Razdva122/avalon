@@ -9,9 +9,9 @@
         variant="flat"
         prepend-icon="play_arrow"
         :loading="busy && !!pendingDifficulty"
-        :disabled="busy || !canPlay || !botModes[beginner ? 'beginner' : difficulty] || waitingForPlayers"
+        :disabled="busy || !canPlay || !botModes[beginner ? 'beginner' : 'regular'] || waitingForPlayers"
         data-prepared-start
-        @click="play(difficulty)"
+        @click="play"
         >{{ $t('aiArena.setupStart') }}</v-btn
       >
       <v-btn
@@ -48,27 +48,19 @@
             :data-bot-mode="difficulty"
             :class="`bot-mode-button bot-mode-button--${difficulty}`"
             :loading="busy && pendingDifficulty === difficulty"
-            :disabled="busy || !canPlay || !botModes[beginner ? 'beginner' : difficulty] || waitingForPlayers"
+            :disabled="busy || !canPlay || !botModes[beginner ? 'beginner' : 'regular'] || waitingForPlayers"
             :aria-describedby="`bot-${difficulty}-availability`"
-            @click="play(difficulty)"
+            @click="play"
           >
-            {{
-              $t(
-                beginner
-                  ? 'aiArena.botBeginnerStart'
-                  : difficulty === 'smart'
-                    ? 'aiArena.botSmart'
-                    : 'aiArena.botRegular',
-              )
-            }}
+            {{ $t(beginner ? 'aiArena.botBeginnerStart' : 'aiArena.botRegular') }}
           </v-btn>
           <p
             :id="`bot-${difficulty}-availability`"
             class="bot-availability"
             role="status"
-            :aria-label="!botModes[beginner ? 'beginner' : difficulty] && botsBusy ? $t('aiArena.botBusy') : undefined"
+            :aria-label="!botModes[beginner ? 'beginner' : 'regular'] && botsBusy ? $t('aiArena.botBusy') : undefined"
           >
-            <template v-if="!botModes[beginner ? 'beginner' : difficulty]">
+            <template v-if="!botModes[beginner ? 'beginner' : 'regular']">
               {{
                 !botsBusy && botWaitHours[beginner ? 'beginner' : difficulty] !== undefined
                   ? $t('aiArena.botAvailabilityShort', {
@@ -153,9 +145,6 @@
               <p>
                 <strong>{{ $t('aiArena.botRegular') }}.</strong> {{ $t('aiArena.botRegularHint') }}
               </p>
-              <p>
-                <strong>{{ $t('aiArena.botSmart') }}.</strong> {{ $t('aiArena.botSmartHint') }}
-              </p>
             </template>
           </div>
           <button
@@ -227,7 +216,7 @@ const { t, locale } = useI18n();
 const router = useRouter();
 const { canPlay, canPlayLargeTables, botModes, botsBusy, botWaitHours, accessStatus, refresh } = useAiAccess();
 const formatHours = (hours: number) => new Intl.NumberFormat(locale.value.replace('_', '-')).format(hours);
-const botDifficulties = computed<AiBotDifficulty[]>(() => (props.beginner ? ['regular'] : ['regular', 'smart']));
+const botDifficulties = ['regular'] as const;
 const selectedPlayerCount = ref<AiPlayerCount>(props.playerCount ?? 5);
 const expectedHumanCount = computed(() => (props.withFriend ? (props.humanSeats ?? 2) : 1));
 const openHumanSeats = computed(() => Math.max(0, expectedHumanCount.value - (props.humanCount ?? 1)));
@@ -282,7 +271,8 @@ async function leave() {
     busy.value = false;
   }
 }
-async function play(difficulty: AiBotDifficulty) {
+async function play() {
+  const difficulty = 'regular';
   if (waitingForPlayers.value) return;
   if (
     busy.value ||
@@ -389,7 +379,7 @@ async function play(difficulty: AiBotDifficulty) {
 }
 .bot-modes {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 12px;
   margin-top: 8px;
 }
@@ -417,11 +407,6 @@ async function play(difficulty: AiBotDifficulty) {
 .bot-mode :deep(.bot-mode-button--regular) {
   background: #f1eadb;
   color: #263438;
-}
-.bot-mode :deep(.bot-mode-button--smart) {
-  background: #295f8f;
-  color: #fff;
-  border: 1px solid #75a3c6;
 }
 .bot-mode :deep(.v-btn--disabled) {
   opacity: 1;
