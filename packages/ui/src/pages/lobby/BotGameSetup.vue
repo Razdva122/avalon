@@ -101,13 +101,13 @@
           <legend class="sr-only">{{ $t('aiArena.setupTitle') }}</legend>
           <div class="standard-modes">
             <label
-              v-for="mode in ['regular', 'smart'] as const"
+              v-for="mode in ['regular'] as const"
               :key="mode"
               class="mode-option"
               :class="{ selected: selectedMode === mode, unavailable: !modeAvailable(mode) }"
             >
-              <v-icon :icon="mode === 'smart' ? 'fa:fa-solid fa-brain' : 'fa:fa-solid fa-robot'" aria-hidden="true" />
-              <strong>{{ $t(mode === 'smart' ? 'aiArena.setupSmart' : 'aiArena.setupRegular') }}</strong>
+              <v-icon icon="fa:fa-solid fa-robot" aria-hidden="true" />
+              <strong>{{ $t('aiArena.setupRegular') }}</strong>
               <input
                 v-model="selectedMode"
                 type="radio"
@@ -210,15 +210,7 @@
         <details class="setup-explanations">
           <summary>{{ $t('aiArena.setupDetails') }}</summary>
           <p>
-            {{
-              $t(
-                selectedMode === 'beginner'
-                  ? 'aiArena.setupBeginnerHint'
-                  : selectedMode === 'smart'
-                    ? 'aiArena.setupSmartHint'
-                    : 'aiArena.setupRegularHint',
-              )
-            }}
+            {{ $t(selectedMode === 'beginner' ? 'aiArena.setupBeginnerHint' : 'aiArena.setupRegularHint') }}
           </p>
           <p v-if="withFriend">{{ $t('aiArena.setupFriendHint') }}</p>
           <p>{{ $t('aiArena.botPremiumSeats') }}</p>
@@ -274,7 +266,7 @@ const { canPlay, canPlayLargeTables, botModes, botWaitHours, botsBusy, accessSta
   useAiAccess();
 const open = computed({ get: () => props.modelValue, set: (value) => emit('update:modelValue', value) });
 const signedIn = computed(() => Boolean(store.state.profile?.id));
-const selectedMode = ref<'regular' | 'smart' | 'beginner'>(props.beginner ? 'beginner' : 'smart');
+const selectedMode = ref<'regular' | 'beginner'>(props.beginner ? 'beginner' : 'regular');
 const withFriend = ref(Boolean(props.withFriend));
 const humanSeats = ref(2);
 const language = ref<AiLanguage>(
@@ -313,8 +305,7 @@ const languageChoices = [
 ];
 watch([playerCount, withFriend], () => {
   humanSeats.value = Math.min(humanSeats.value, playerCount.value - 1);
-  if (withFriend.value && selectedMode.value === 'beginner')
-    selectedMode.value = modeAvailable('smart') ? 'smart' : 'regular';
+  if (withFriend.value && selectedMode.value === 'beginner') selectedMode.value = 'regular';
   if (withFriend.value || (selectedRole.value && !availableRoles.value.includes(selectedRole.value)))
     selectedRole.value = '';
 });
@@ -329,7 +320,7 @@ let active = true;
 onBeforeUnmount(() => {
   active = false;
 });
-function modeAvailable(mode: 'regular' | 'smart' | 'beginner') {
+function modeAvailable(mode: 'regular' | 'beginner') {
   if (!signedIn.value) return !(mode === 'beginner' && withFriend.value);
   return (
     accessStatus.value === 'ready' &&
@@ -342,13 +333,6 @@ const canCreate = computed(
   () =>
     Boolean(ownRoomID.value) ||
     (modeAvailable(selectedMode.value) && (playerCount.value < 7 || canPlayLargeTables.value)),
-);
-watch(
-  () => [modeAvailable('smart'), modeAvailable('regular')],
-  ([smart, regular]) => {
-    if (selectedMode.value === 'smart' && !smart && regular) selectedMode.value = 'regular';
-  },
-  { immediate: true, flush: 'sync' },
 );
 watch([resumeAfterAuth, accessStatus], () => {
   if (!resumeAfterAuth.value || accessStatus.value === 'loading') return;
@@ -371,22 +355,13 @@ const notice = computed(() => {
   if (accessStatus.value === 'loading') return '';
   if (accessStatus.value === 'error') return t('aiArena.connectionError');
   if (botsBusy.value) return t('aiArena.setupBusy');
-  if (!canPlay.value || (!botModes.value.smart && !botModes.value.regular && !modeAvailable('beginner')))
-    return t('aiArena.setupAllUnavailable');
-  if (!botModes.value.smart) return t('aiArena.setupSmartUnavailable');
-  if (!botModes.value.regular) return t('aiArena.setupRegularUnavailable');
+  if (!canPlay.value || !modeAvailable(selectedMode.value)) return t('aiArena.setupAllUnavailable');
   return '';
 });
 const waitHours = computed(() => {
-  if (botsBusy.value || accessStatus.value !== 'ready' || !signedIn.value) return undefined;
-  if (modeAvailable('smart') || modeAvailable('regular') || modeAvailable('beginner')) {
-    if (!botModes.value.smart) return botWaitHours.value.smart;
-    if (!botModes.value.regular) return botWaitHours.value.regular;
+  if (botsBusy.value || accessStatus.value !== 'ready' || !signedIn.value || modeAvailable(selectedMode.value))
     return undefined;
-  }
-  const modes = withFriend.value ? (['smart', 'regular'] as const) : (['smart', 'regular', 'beginner'] as const);
-  const waits = modes.map((mode) => botWaitHours.value[mode]).filter((hours): hours is number => hours !== undefined);
-  return waits.length ? Math.min(...waits) : undefined;
+  return botWaitHours.value[selectedMode.value];
 });
 const formatHours = (hours: number) => new Intl.NumberFormat(locale.value.replace('_', '-')).format(hours);
 async function create() {
@@ -413,7 +388,7 @@ async function create() {
           ...(!withFriend.value && selectedRole.value ? { role: selectedRole.value } : {}),
           withFriend: withFriend.value,
           ...(withFriend.value && humanSeats.value !== 2 ? { humanSeats: humanSeats.value } : {}),
-          difficulty: selectedMode.value === 'smart' ? 'smart' : 'regular',
+          difficulty: 'regular',
           language: language.value,
           playerCount: playerCount.value,
         });
@@ -532,7 +507,7 @@ fieldset {
 }
 .standard-modes {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 .mode-option {

@@ -119,11 +119,7 @@ const aiRosterLabel = computed(() => {
   return t(humans === 1 ? 'aiArena.mixedPlayerCount' : 'aiArena.playerCount', { count: bots });
 });
 const aiModeLabel = computed(() =>
-  game.value.aiBeginner
-    ? t('aiArena.cardBeginner')
-    : game.value.aiBotDifficulty
-      ? t(game.value.aiBotDifficulty === 'smart' ? 'aiArena.cardSmart' : 'aiArena.cardRegular')
-      : '',
+  game.value.aiBeginner ? t('aiArena.cardBeginner') : game.value.aiBotDifficulty ? t('aiArena.cardRegular') : '',
 );
 const aiAction = computed(() => t(game.value.aiStatus === 'running' ? 'aiArena.cardWatch' : 'mainPage.viewGame'));
 const canJoin = computed(

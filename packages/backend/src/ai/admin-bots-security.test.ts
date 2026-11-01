@@ -134,7 +134,7 @@ test.each([undefined, 'member'])(
         .timeout(2000)
         .emitWithAck('setAiBotQuotaThresholds', { ...thresholds, smart: { shortTerm: 1, weekly: 0 } }),
     ).toEqual({ error: 'AI room access denied' });
-    expect(thresholds.smart).toEqual({ shortTerm: 60, weekly: 5 });
+    expect(thresholds.smart).toEqual({ shortTerm: 30, weekly: 3 });
   },
 );
 
@@ -147,14 +147,17 @@ test('admin can use the endpoints; malformed packets cannot change persisted thr
   const socket = await client('admin');
   const changed = { ...thresholds, regular: { weekly: 7, shortTerm: 40 } };
   expect(await socket.timeout(2000).emitWithAck('setAiBotQuotaThresholds', changed)).toEqual({ ok: true });
-  expect((await socket.timeout(2000).emitWithAck('getAiBotDashboard')).thresholds).toEqual(changed);
+  expect((await socket.timeout(2000).emitWithAck('getAiBotDashboard')).thresholds).toEqual({
+    ...changed,
+    smart: changed.regular,
+  });
   expect(await socket.timeout(2000).emitWithAck('getAiBotDashboard', 'admin')).toEqual({ error: 'invalidRequest' });
   expect(
     await socket
       .timeout(2000)
       .emitWithAck('setAiBotQuotaThresholds', { ...changed, regular: { weekly: -1, shortTerm: 20 } }),
   ).toEqual({ error: 'invalidRequest' });
-  expect(thresholds).toEqual(changed);
+  expect(thresholds).toEqual({ ...changed, smart: changed.regular });
 });
 
 test('removing admin rights rejects reads and writes on an already connected socket', async () => {

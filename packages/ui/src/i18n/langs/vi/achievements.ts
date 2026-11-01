@@ -1,7 +1,7 @@
 export default {
   achievements: {
     ai_win: 'Yếu tố con người',
-    ai_win_description: 'Thắng một ván đấu AI với bot thông thường hoặc thông minh.',
+    ai_win_description: 'Thắng một ván đấu với bot AI.',
     best_of_the_best: 'Giỏi nhất trong những người giỏi nhất',
     best_of_the_best_description:
       'Đạt điểm TrueSkill từ 6800 trở lên sau khi hoàn thành ít nhất 10 ván xếp hạng kể từ lúc bắt đầu hoặc lần đặt lại điểm gần nhất.',

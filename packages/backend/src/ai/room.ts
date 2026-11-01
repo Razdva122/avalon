@@ -486,7 +486,7 @@ export class BotRoom extends Room {
       humanPlayerID: this.ai!.humanPlayerID,
       humanPlayerIDs: this.ai!.humanPlayerIDs,
       beginner: this.ai!.beginner,
-      botDifficulty: this.ai!.botDifficulty,
+      botDifficulty: this.ai!.botDifficulty === 'smart' ? 'regular' : this.ai!.botDifficulty,
       name: this.label(id),
       style: agent.style,
       task,

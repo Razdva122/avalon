@@ -30,13 +30,9 @@ import { hasPremium } from '@/support/premium';
 import { supportTotalCents } from '@/support/repository';
 import { AI_PAUSE_TIMEOUT_MS } from './timing';
 import { aiText } from './language';
-import { defaultBotQuotaThresholds, validBotQuotaThresholds } from './quota-policy';
+import { canonicalBotQuotaThresholds, defaultBotQuotaThresholds, validBotQuotaThresholds } from './quota-policy';
 
-const humanSettings: Record<AiBotMode, CodexSettings> = {
-  smart: { model: 'gpt-6.1-sol', reasoning: 'medium' },
-  regular: { model: 'gpt-6.1-terra', reasoning: 'medium' },
-  beginner: { model: 'gpt-6.1-terra', reasoning: 'low' },
-};
+const humanSettings: CodexSettings = { model: 'gpt-6.1-terra', reasoning: 'medium' };
 
 function humanModeAvailable(
   difficulty: AiBotMode,
@@ -44,9 +40,10 @@ function humanModeAvailable(
   models: CodexModelOption[],
   thresholds: BotQuotaThresholds,
 ) {
+  if (difficulty === 'smart') difficulty = 'regular';
   const weekly = quota?.remainingPercent;
   const short = quota?.shortTerm?.remainingPercent;
-  const settings = humanSettings[difficulty];
+  const settings = humanSettings;
   return (
     typeof weekly === 'number' &&
     Number.isFinite(weekly) &&
@@ -63,9 +60,10 @@ function humanModeAvailableAt(
   models: CodexModelOption[],
   thresholds: BotQuotaThresholds,
 ) {
+  if (difficulty === 'smart') difficulty = 'regular';
   if (thresholds[difficulty].weekly === 100 || (quota?.shortTerm !== null && thresholds[difficulty].shortTerm === 100))
     return;
-  const settings = humanSettings[difficulty];
+  const settings = humanSettings;
   if (!models.some((model) => model.id === settings.model && model.efforts.includes(settings.reasoning))) return;
   const resets: number[] = [];
   for (const [window, threshold] of [
@@ -178,8 +176,7 @@ export class AiService {
       publicGame
         ? mode
           ? humanModeAvailable(mode, quota, models, thresholds)
-          : humanModeAvailable('smart', quota, models, thresholds) ||
-            humanModeAvailable('regular', quota, models, thresholds)
+          : humanModeAvailable('regular', quota, models, thresholds)
         : (instance.id === 'default' ||
             (quota &&
               Number.isFinite(quota.remainingPercent) &&
@@ -346,7 +343,7 @@ export class AiService {
   }
 
   private async humanModes(roomID: string) {
-    const thresholds = await this.repository!.getBotQuotaThresholds();
+    const thresholds = canonicalBotQuotaThresholds(await this.repository!.getBotQuotaThresholds());
     const snapshot = (await this.instanceSnapshots([this.instanceFor(roomID)]))[0];
     return {
       smart: humanModeAvailable('smart', snapshot.quota, snapshot.models, thresholds),
@@ -356,7 +353,7 @@ export class AiService {
   }
 
   private async humanAvailability(roomID?: string) {
-    const thresholds = await this.repository!.getBotQuotaThresholds();
+    const thresholds = canonicalBotQuotaThresholds(await this.repository!.getBotQuotaThresholds());
     const free = await this.freeInstances(roomID);
     const snapshots = await this.instanceSnapshots(free);
     // Allocations can finish while metadata is being read.
@@ -536,6 +533,11 @@ export class AiService {
   }
 
   private runRoom(room: BotRoom, technical = false) {
+    if (this.publicRoom(room)) {
+      room.ai!.botDifficulty = 'regular';
+      room.ai!.preparedDifficulty = 'regular';
+      room.ai!.codex = { ...humanSettings };
+    }
     const id = room.roomID;
     this.clearPauseTimer(id);
     this.clearDraftLeaseTimer(id);
@@ -608,7 +610,7 @@ export class AiService {
           !room.players.includes(userID!)
         )
           return cb({ error: 'Lobby changed' });
-        cb({ available: availability.botModes.smart, hostPremium, humanPlayerIDs: [...room.players] });
+        cb({ available: availability.botModes.regular, hostPremium, humanPlayerIDs: [...room.players] });
       } catch {
         cb({ error: 'Could not load lobby bot availability' });
       }
@@ -658,7 +660,7 @@ export class AiService {
           return cb({ error: 'Host Premium is required for more than two bots at seven or eight seats' });
         if (!unchanged()) return cb({ error: 'Lobby or confirmed players changed' });
         await this.beginnerAnalysis?.cancelAll();
-        await this.reserveInstance(id, true, 'smart');
+        await this.reserveInstance(id, true, 'regular');
         claimed = true;
         // Drain preceding lobby chat writes, then adopt the latest cache object at the synchronous swap.
         await this.manager.chatService?.history(id, original.chat.history);
@@ -679,9 +681,9 @@ export class AiService {
         room.ai!.humanPlayerIDs = humans;
         room.ai!.humanSeats = humans.length;
         room.ai!.withFriend = humans.length > 1;
-        room.ai!.botDifficulty = 'smart';
-        room.ai!.preparedDifficulty = 'smart';
-        room.ai!.codex = { ...humanSettings.smart };
+        room.ai!.botDifficulty = 'regular';
+        room.ai!.preparedDifficulty = 'regular';
+        room.ai!.codex = { ...humanSettings };
         room.ai!.title = `${humans.length} Humans vs ${size.botCount} Bots`;
         delete room.ai!.profileRatingSeason;
         humans.forEach((human, index) => {
@@ -705,7 +707,7 @@ export class AiService {
       try {
         if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
         if (!validBotQuotaThresholds(thresholds)) return cb({ error: 'Invalid bot quota thresholds' });
-        await this.repository!.setBotQuotaThresholds(thresholds);
+        await this.repository!.setBotQuotaThresholds(canonicalBotQuotaThresholds(thresholds));
         cb({ ok: true });
       } catch {
         cb({ error: 'Could not save bot quota thresholds' });
@@ -743,7 +745,7 @@ export class AiService {
       if (typeof cb !== 'function') return;
       try {
         if (!(await this.canManage(userID))) return cb({ error: 'AI room access denied' });
-        const thresholds = await this.repository!.getBotQuotaThresholds();
+        const thresholds = canonicalBotQuotaThresholds(await this.repository!.getBotQuotaThresholds());
         const snapshots = await this.instanceSnapshots(configuredCodexInstances());
         // Read leases after metadata: a reservation may complete while quota is loading.
         const busy = await this.occupiedInstances(true);
@@ -987,9 +989,7 @@ export class AiService {
         (options.difficulty !== undefined && !['regular', 'smart'].includes(options.difficulty)) ||
         (options.language !== undefined && !['en', 'ru', 'zh-tw', 'es', 'vi'].includes(options.language)) ||
         (options.playerCount !== undefined && ![5, 6, 7, 8].includes(options.playerCount)) ||
-        (options.beginner &&
-          ((options.difficulty !== undefined && options.difficulty !== 'regular') ||
-            (options.playerCount !== undefined && options.playerCount !== 5)))
+        (options.beginner && options.playerCount !== undefined && options.playerCount !== 5)
       )
         return cb({ error: 'Invalid bot room options' });
       let claimedID: string | undefined;
@@ -1019,7 +1019,7 @@ export class AiService {
         const room = (createdRoom = this.createRoom(id, userID!, options.language ?? 'en', options.playerCount ?? 5));
         room.ai!.publicBotGame = true;
         room.ai!.beginner = options.beginner;
-        room.ai!.preparedDifficulty = options.difficulty;
+        room.ai!.preparedDifficulty = options.difficulty === undefined ? undefined : 'regular';
         if (options.withFriend) {
           room.ai!.withFriend = true;
           room.ai!.humanSeats = options.humanSeats ?? 2;
@@ -1071,15 +1071,13 @@ export class AiService {
           return cb({ error: 'Wait for your friend to join before launch' });
         if (
           room.ai!.preparedDifficulty &&
-          (options.difficulty !== room.ai!.preparedDifficulty ||
-            options.language !== room.ai!.language ||
-            (options.playerCount ?? 5) !== room.ai!.playerCount)
+          (options.language !== room.ai!.language || (options.playerCount ?? 5) !== room.ai!.playerCount)
         )
           return cb({ error: 'The prepared bot settings cannot be changed at launch' });
         const playerCount = options.playerCount ?? 5;
         if (room.ai!.withFriend && (room.ai!.humanSeats ?? 2) >= playerCount)
           return cb({ error: 'At least one bot seat is required' });
-        if (room.ai!.beginner && (options.difficulty !== 'regular' || playerCount !== 5))
+        if (room.ai!.beginner && playerCount !== 5)
           return cb({ error: 'Beginner games require regular bots and five players' });
         if (playerCount >= 7 && !(await this.canPlayLargeTables(userID!)))
           return cb({ error: 'Premium is required for seven or eight players' });
@@ -1096,7 +1094,7 @@ export class AiService {
           await this.expireLaunch(room);
           return cb({ error: 'The bot game preparation time has expired' });
         }
-        const mode = room.ai!.beginner ? 'beginner' : options.difficulty;
+        const mode = room.ai!.beginner ? 'beginner' : 'regular';
         if (!modes[mode]) return cb({ error: 'This bot mode is currently unavailable' });
         await this.claimInstance(id, instance);
         claimed = true;
@@ -1124,8 +1122,9 @@ export class AiService {
         room.ai!.title = room.ai!.title?.replace(/vs \d+ Bots$/, `vs ${playerCount - room.humanIDs.length} Bots`);
         if (friendNames.length) room.ai!.title = room.ai!.title?.replace(' vs ', ` + ${friendNames.join(' + ')} vs `);
         room.setLanguage(options.language);
-        room.ai!.botDifficulty = options.difficulty;
-        room.ai!.codex = { ...humanSettings[mode] };
+        room.ai!.botDifficulty = 'regular';
+        room.ai!.preparedDifficulty = 'regular';
+        room.ai!.codex = { ...humanSettings };
         delete room.ai!.launchExpiresAt;
         this.clearLaunchTimer(id);
         this.runRoom(room);

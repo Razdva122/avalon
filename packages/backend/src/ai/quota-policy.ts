@@ -1,7 +1,7 @@
 import type { BotQuotaThresholds } from '@avalon/types';
 
 export const defaultBotQuotaThresholds: BotQuotaThresholds = {
-  smart: { shortTerm: 60, weekly: 5 },
+  smart: { shortTerm: 30, weekly: 3 },
   regular: { shortTerm: 30, weekly: 3 },
   beginner: { shortTerm: 20, weekly: 1 },
 };
@@ -30,4 +30,9 @@ export function validBotQuotaThresholds(value: unknown): value is BotQuotaThresh
       );
     })
   );
+}
+
+// Keep the legacy wire field as an alias; regular is the only standard quota policy.
+export function canonicalBotQuotaThresholds(value: BotQuotaThresholds): BotQuotaThresholds {
+  return { ...value, smart: { ...value.regular } };
 }

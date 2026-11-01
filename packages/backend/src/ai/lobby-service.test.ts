@@ -131,8 +131,8 @@ test('launch adopts identity, creation time and chat and keeps durable bot and h
   expect(room.humanIDs).toEqual(['owner', 'friend']);
   expect(room.players).toHaveLength(5);
   expect(room.ai).toMatchObject({
-    botDifficulty: 'smart',
-    codex: { model: 'gpt-6.1-sol', reasoning: 'medium' },
+    botDifficulty: 'regular',
+    codex: { model: 'gpt-6.1-terra', reasoning: 'medium' },
     status: 'running',
   });
   await room.persistChatMessage!('friend', 'hello after launch', 'human-chat');
@@ -207,9 +207,9 @@ test('requires callback and rejects reserved room IDs through the socket path', 
   expect(f.host.rooms['lobby-id']).toBe(f.lobby);
 });
 
-test('unavailable strong preset does not fall back to regular bots', async () => {
+test('lobby preset requires Terra medium without falling back to another model', async () => {
   const f = fixture();
-  jest.mocked(catalog.getCodexModels).mockResolvedValue([{ id: 'gpt-6.1-terra', label: 'Terra', efforts: ['medium'] }]);
+  jest.mocked(catalog.getCodexModels).mockResolvedValue([{ id: 'gpt-6.1-sol', label: 'Sol', efforts: ['medium'] }]);
   const cb = jest.fn();
   await f.connect('owner').getLobbyAiAccess('lobby-id', cb);
   expect(cb.mock.calls[0][0].available).toBe(false);

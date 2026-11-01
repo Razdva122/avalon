@@ -208,7 +208,7 @@ test('only the ready-room owner can stop preparation, cancel expiry, and release
 });
 
 test.each([
-  ['smart', 'gpt-6.1-sol', 'medium'],
+  ['smart', 'gpt-6.1-terra', 'medium'],
   ['regular', 'gpt-6.1-terra', 'medium'],
 ])('start applies %s settings and language to the same ready room', async (difficulty, model, reasoning) => {
   const { draft, connect, claim, host } = fixture();
@@ -220,7 +220,7 @@ test.each([
   expect(response).toHaveBeenCalledWith({ ok: true });
   expect(Object.keys(host.rooms)).toEqual([room.roomID]);
   expect(room.ai).toMatchObject({
-    botDifficulty: difficulty,
+    botDifficulty: 'regular',
     codex: { model, reasoning },
     language: 'ru',
     status: 'running',
@@ -232,8 +232,8 @@ test.each([
 });
 
 test.each([
-  ['smart', 60, 6],
-  ['smart', 61, 5],
+  ['smart', 30, 4],
+  ['smart', 31, 3],
   ['regular', 30, 4],
   ['regular', 31, 3],
   ['regular', Number.NaN, 10],
@@ -361,13 +361,16 @@ test('only the human owner may start; generic start and admin reconfiguration ar
   expect(room.ai?.status).toBe('ready');
 });
 
-test('technical resume retains selected model without applying a new-match quota gate', async () => {
+test('technical resume canonicalizes legacy public presets without applying a new-match quota gate', async () => {
   const { draft, connect } = fixture();
   const room = await draft();
   await connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'ru' }, jest.fn());
   await new Promise<void>((resolve) => setImmediate(resolve));
   room.ai!.status = 'paused';
   room.ai!.canResumeTechnical = true;
+  room.ai!.botDifficulty = 'smart';
+  room.ai!.preparedDifficulty = 'smart';
+  room.ai!.codex = { model: 'gpt-6.1-sol', reasoning: 'low' };
   quota.mockResolvedValue(null);
   quota.mockClear();
   const response = jest.fn();
@@ -489,8 +492,8 @@ test('preparation respects the manager room cap', async () => {
 });
 
 test.each([
-  [10, 60, 1100000, 1010800, { smart: 1010800000 }],
-  [5, 90, 1100000, 1010800, { smart: 1100000000 }],
+  [10, 60, 1100000, 1010800, {}],
+  [5, 90, 1100000, 1010800, {}],
   [2, 10, 1100000, 1010800, { smart: 1100000000, regular: 1100000000, beginner: 1010800000 }],
   [10, 90, 1100000, 1010800, {}],
   [2, 10, null, 1010800, { beginner: 1010800000 }],
@@ -564,10 +567,7 @@ test('beginner preparation pins regular bots and five seats', async () => {
   await connect('owner').createHumanAiRoom({ beginner: true }, created);
   const room = host.rooms[created.mock.calls[0][0].roomID] as BotRoom;
   expect(room.ai?.beginner).toBe(true);
-  for (const options of [
-    { difficulty: 'smart', language: 'ru' },
-    { difficulty: 'regular', language: 'ru', playerCount: 6 },
-  ]) {
+  for (const options of [{ difficulty: 'regular', language: 'ru', playerCount: 6 }]) {
     const rejected = jest.fn();
     await connect('owner').startHumanAiRoom(room.roomID, options, rejected);
     expect(rejected.mock.calls[0][0]).toHaveProperty('error');
@@ -652,7 +652,7 @@ test('creation saves the chosen mode, language and size before launch without in
   expect(response.mock.calls[0][0]).toHaveProperty('roomID');
   const room = host.rooms[response.mock.calls[0][0].roomID] as BotRoom;
   expect(room.players).toHaveLength(8);
-  expect(room.ai).toMatchObject({ preparedDifficulty: 'smart', language: 'ru', playerCount: 8, withFriend: true });
+  expect(room.ai).toMatchObject({ preparedDifficulty: 'regular', language: 'ru', playerCount: 8, withFriend: true });
   expect(room.ai!.launchExpiresAt).toBe(Date.now() + 120000);
   expect(run).not.toHaveBeenCalled();
   await jest.advanceTimersByTimeAsync(119999);
@@ -677,7 +677,6 @@ test.each([
   { beginner: false, difficulty: 'unknown', language: 'ru', playerCount: 5 },
   { beginner: false, difficulty: 'regular', language: 'unknown', playerCount: 5 },
   { beginner: false, difficulty: 'regular', language: 'ru', playerCount: 7 },
-  { beginner: true, difficulty: 'smart', language: 'ru', playerCount: 5 },
   { beginner: true, difficulty: 'regular', language: 'ru', playerCount: 6 },
 ])('invalid or unentitled setup never reserves the shared slot: %j', async (options) => {
   const { connect, claim } = fixture();
@@ -696,7 +695,6 @@ test('a prepared setup cannot be changed by a different launch payload', async (
   );
   const room = host.rooms[created.mock.calls[0][0].roomID] as BotRoom;
   for (const options of [
-    { difficulty: 'smart', language: 'ru', playerCount: 6 },
     { difficulty: 'regular', language: 'en', playerCount: 6 },
     { difficulty: 'regular', language: 'ru', playerCount: 5 },
   ]) {
@@ -738,7 +736,7 @@ test.each([
   const started = jest.fn();
   await handlers.startHumanAiRoom(id, { difficulty: 'regular', language: 'en', playerCount: 5 }, started);
   expect(started).toHaveBeenCalledWith({ ok: true });
-  expect(host.rooms[id].ai?.codex).toEqual({ model: 'gpt-6.1-terra', reasoning: 'low' });
+  expect(host.rooms[id].ai?.codex).toEqual({ model: 'gpt-6.1-terra', reasoning: 'medium' });
 });
 
 test('first game rechecks its own quota at launch', async () => {
@@ -774,7 +772,7 @@ test('smart bots can prepare and start above 60 percent without waiting for a qu
   const started = jest.fn();
   await handlers.startHumanAiRoom(id, { difficulty: 'smart', language: 'en' }, started);
   expect(started).toHaveBeenCalledWith({ ok: true });
-  expect(host.rooms[id].ai?.codex).toEqual({ model: 'gpt-6.1-sol', reasoning: 'medium' });
+  expect(host.rooms[id].ai?.codex).toEqual({ model: 'gpt-6.1-terra', reasoning: 'medium' });
 });
 
 test.each([false, true])(
@@ -999,7 +997,7 @@ describe('instance reservation lifecycle', () => {
     await connect('owner').controlAiRoom(id, 'stop', jest.fn());
     claim.mockClear();
     quota
-      .mockResolvedValueOnce({ remainingPercent: 5, shortTerm: { remainingPercent: 100 } })
+      .mockResolvedValueOnce({ remainingPercent: 3, shortTerm: { remainingPercent: 100 } })
       .mockResolvedValueOnce({ remainingPercent: 6, shortTerm: { remainingPercent: 61 } });
     await connect('other').createHumanAiRoom({ beginner: false, difficulty: 'smart' }, created);
     expect(claim).toHaveBeenCalledWith(created.mock.calls[1][0].roomID, 'second');
@@ -1054,3 +1052,53 @@ test('nonpublic pool allocation skips accounts with an exhausted short quota', a
   await connect('admin').createAiRoom('codex-chatgpt', response);
   expect(response.mock.calls[0][0]).toHaveProperty('error');
 });
+
+test.each([true, false])(
+  'smart alias uses regular availability and reset estimates with legacy thresholds (allowed=%s)',
+  async (allowed) => {
+    const f = fixture();
+    f.service.repository!.getBotQuotaThresholds = async () => ({
+      smart: { weekly: allowed ? 100 : 0, shortTerm: allowed ? 100 : 0 },
+      regular: { weekly: allowed ? 3 : 10, shortTerm: 30 },
+      beginner: { weekly: 1, shortTerm: 20 },
+    });
+    const reset = Math.floor(Date.now() / 1000) + 3600;
+    quota.mockResolvedValue({
+      remainingPercent: 10,
+      resetsAt: reset,
+      shortTerm: { remainingPercent: 90, resetsAt: reset },
+    });
+    const cb = jest.fn();
+    await f.connect('owner').getAiRoomAccess(cb);
+    const result = cb.mock.calls[0][0];
+    expect(result.botModes.smart).toBe(allowed);
+    expect(result.botModes.regular).toBe(allowed);
+    expect(result.botModeAvailableAt?.smart).toBe(allowed ? undefined : reset * 1000);
+    expect(result.botModeAvailableAt?.regular).toBe(allowed ? undefined : reset * 1000);
+  },
+);
+
+test.each([false, true])(
+  'legacy smart setup launches as canonical regular with Terra medium (beginner=%s)',
+  async (beginner) => {
+    modelCatalog.mockResolvedValue([{ id: 'gpt-6.1-terra', label: 'Terra', efforts: ['medium'] }]);
+    const f = fixture('admin', true);
+    const created = jest.fn();
+    await f
+      .connect('owner')
+      .createHumanAiRoom({ beginner, difficulty: 'smart', language: 'en', playerCount: 5 }, created);
+    const room = f.host.rooms[created.mock.calls[0][0].roomID] as BotRoom;
+    expect(room?.ai?.preparedDifficulty).toBe('regular');
+    // A room prepared by a legacy process can also launch through the canonical request.
+    room.ai!.preparedDifficulty = 'smart';
+    const started = jest.fn();
+    await f.connect('owner').startHumanAiRoom(room.roomID, { difficulty: 'regular', language: 'en' }, started);
+    expect(started).toHaveBeenCalledWith({ ok: true });
+    expect(room.ai).toMatchObject({
+      beginner,
+      botDifficulty: 'regular',
+      preparedDifficulty: 'regular',
+      codex: { model: 'gpt-6.1-terra', reasoning: 'medium' },
+    });
+  },
+);

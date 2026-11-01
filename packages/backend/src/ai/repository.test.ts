@@ -25,9 +25,9 @@ test('bot quota thresholds persist across repository instances and invalid edits
     beginner: { weekly: 2, shortTerm: 25 },
   };
   await repo.setBotQuotaThresholds(thresholds);
-  expect(await new AiRepository(db).getBotQuotaThresholds()).toEqual(thresholds);
+  expect(await new AiRepository(db).getBotQuotaThresholds()).toEqual({ ...thresholds, smart: thresholds.regular });
   await expect(repo.setBotQuotaThresholds({ ...thresholds, beginner: { weekly: -1, shortTerm: 0 } })).rejects.toThrow();
-  expect(await repo.getBotQuotaThresholds()).toEqual(thresholds);
+  expect(await repo.getBotQuotaThresholds()).toEqual({ ...thresholds, smart: thresholds.regular });
 });
 test('only one concurrent room owns the Codex lease and stale owners cannot renew or release it', async () => {
   const db = client.db('codex-exclusive');
@@ -816,4 +816,18 @@ test('an observed early reset clears account totals and survives restarts, missi
     0,
   );
   expect((await repo.recentGameUsage())[0].inputTokens).toBe(200);
+});
+
+test('legacy stored smart quota settings are exposed as a regular alias', async () => {
+  const db = client.db('legacy-bot-quota-settings');
+  await db.collection<{ _id: string; thresholds: typeof defaultBotQuotaThresholds }>('ai_settings').insertOne({
+    _id: 'bot-quota-thresholds',
+    thresholds: {
+      smart: { weekly: 99, shortTerm: 99 },
+      regular: { weekly: 4, shortTerm: 40 },
+      beginner: { weekly: 2, shortTerm: 25 },
+    },
+  });
+  const thresholds = await new AiRepository(db).getBotQuotaThresholds();
+  expect(thresholds.smart).toEqual(thresholds.regular);
 });

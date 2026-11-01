@@ -14,6 +14,13 @@ Keep application, database, mail, storage and voice secrets independent of AI.
 Remove obsolete inference credentials from every deployment source, including
 VM metadata, Compose environment/env_file and local environment files.
 
+Public games, friend/lobby bot games, beginner games and optional beginner analysis
+use `gpt-6.1-terra` with `medium` reasoning. The UI offers one bot profile plus the
+separate teaching option. Legacy `smart` packets normalize to `regular`; both names
+share the regular quota thresholds. Administrator custom model experiments remain
+explicitly configurable. Deploy backend and UI together so old cached clients stay
+compatible while refreshed clients stop showing tier controls.
+
 ## Rollout
 
 1. Run the backend AI tests, backend type check, UI tests and production UI build.

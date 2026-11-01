@@ -191,30 +191,30 @@ function settingsForm(initialDraft = null) {
 
 test('threshold polling preserves unsaved edits; discarding adopts the latest server values', async () => {
   const { props, form } = settingsForm();
-  form.draft.value.smart.weekly = 9;
-  props.thresholds = { ...props.thresholds, smart: { weekly: 7, shortTerm: 65 } };
+  form.draft.value.regular.weekly = 9;
+  props.thresholds = { ...props.thresholds, regular: { weekly: 7, shortTerm: 65 } };
   await tick();
-  assert.equal(form.draft.value.smart.weekly, 9);
+  assert.equal(form.draft.value.regular.weekly, 9);
   form.reset();
-  assert.equal(form.draft.value.smart.weekly, 7);
+  assert.equal(form.draft.value.regular.weekly, 7);
   assert.equal(form.dirty.value, false);
-  props.thresholds = { ...props.thresholds, smart: { weekly: 8, shortTerm: 65 } };
+  props.thresholds = { ...props.thresholds, regular: { weekly: 8, shortTerm: 65 } };
   await tick();
-  assert.equal(form.draft.value.smart.weekly, 8);
+  assert.equal(form.draft.value.regular.weekly, 8);
 });
 
 test('the reauthorized form restores a same-session draft without mutating the saved policy', () => {
   const initialDraft = {
-    smart: { weekly: 9, shortTerm: 65 },
-    regular: { weekly: 3, shortTerm: 30 },
+    smart: { weekly: 99, shortTerm: 99 },
+    regular: { weekly: 9, shortTerm: 65 },
     beginner: { weekly: 1, shortTerm: 20 },
   };
   const { props, form } = settingsForm(initialDraft);
-  assert.equal(form.draft.value.smart.weekly, 9);
-  assert.equal(props.thresholds.smart.weekly, 5);
+  assert.equal(form.draft.value.regular.weekly, 9);
+  assert.equal(props.thresholds.regular.weekly, 3);
   assert.equal(form.dirty.value, true);
   form.reset();
-  assert.equal(form.draft.value.smart.weekly, 5);
+  assert.equal(form.draft.value.regular.weekly, 3);
 });
 
 test('threshold form prevents invalid percentages and duplicate saves', () => {
@@ -231,6 +231,10 @@ test('threshold form prevents invalid percentages and duplicate saves', () => {
   props.saving = false;
   form.submit();
   assert.equal(emitted.find(([event]) => event === 'save')[1].regular.weekly, 7);
+  assert.deepEqual(
+    emitted.find(([event]) => event === 'save')[1].smart,
+    emitted.find(([event]) => event === 'save')[1].regular,
+  );
 });
 
 test('a temporary disconnect preserves only the same-session form draft, and denial or logout removes it', async () => {
@@ -265,8 +269,8 @@ test('quota fields identify their mode and explain invalid percentages', async (
   new Function('require', 'module', 'exports', code)(require, module, module.exports);
   const app = vue.createSSRApp(module.exports.default, {
     thresholds: {
-      smart: { weekly: 5, shortTerm: 101 },
-      regular: { weekly: 3, shortTerm: 30 },
+      smart: { weekly: 5, shortTerm: 60 },
+      regular: { weekly: 3, shortTerm: 101 },
       beginner: { weekly: 1, shortTerm: 20 },
     },
     saving: false,
@@ -279,7 +283,8 @@ test('quota fields identify their mode and explain invalid percentages', async (
   const html = await renderToString(app);
   assert.match(html, /aria-invalid="true"/);
   assert.match(html, /aiArena.thresholdRangeError/);
-  for (const mode of ['smart', 'regular', 'beginner']) {
+  assert.doesNotMatch(html, /dashboardModesmart/);
+  for (const mode of ['regular', 'beginner']) {
     assert.match(html, new RegExp('aria-label="[^"]*dashboardMode' + mode));
   }
 });

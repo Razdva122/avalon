@@ -347,8 +347,8 @@ test('only ready public bot room owners choose bots on the table; ordinary rooms
   }
 });
 
-test('players start a prepared bot room with either mode and the language selected on the table', async (t) => {
-  for (const difficulty of ['smart', 'regular']) {
+test('players start a prepared bot room with the unified mode and the language selected on the table', async (t) => {
+  for (const difficulty of ['regular']) {
     const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
       props: { roomID: 'bot-room', title: 'Host vs4Bots' },
       locale: 'en',
@@ -407,12 +407,10 @@ test('unavailable bot modes stay visible and cannot initiate a match', async (t)
     },
   });
   t.after(room.stop);
-  const smart = room.nodes('v-btn').find((node) => node.props['data-bot-mode'] === 'smart');
-  const regular = room.nodes('v-btn').find((node) => node.props['data-bot-mode'] === 'regular');
-  assert.ok(smart?.props.disabled);
-  assert.equal(regular?.props.disabled, false);
-  await smart.props.onClick();
-  assert.deepEqual(room.sent, []);
+  const modes = room.nodes('v-btn').filter((node) => node.props['data-bot-mode']);
+  assert.equal(modes.length, 1);
+  assert.equal(modes[0].props['data-bot-mode'], 'regular');
+  assert.equal(modes[0].props.disabled, false);
   room.access.botModes.value = { smart: false, regular: false };
   await room.render();
   assert.ok(
@@ -489,7 +487,7 @@ test('bot table locks language and prevents duplicate starts while the server ac
     acknowledge: () => new Promise((resolve) => (finish = resolve)),
   });
   t.after(room.stop);
-  const button = room.nodes('v-btn').find((node) => node.props['data-bot-mode'] === 'smart');
+  const button = room.nodes('v-btn').find((node) => node.props['data-bot-mode'] === 'regular');
   const starting = button.props.onClick();
   await button.props.onClick();
   await room
@@ -497,7 +495,7 @@ test('bot table locks language and prevents duplicate starts while the server ac
     .find((node) => node.props.class === 'bot-leave-button')
     .props.onClick();
   await room.render();
-  assert.deepEqual(room.sent, [['startHumanAiRoom', 'bot-room', { difficulty: 'smart', language: 'en' }]]);
+  assert.deepEqual(room.sent, [['startHumanAiRoom', 'bot-room', { difficulty: 'regular', language: 'en' }]]);
   assert.ok(room.nodes('select')[0].props.disabled);
   assert.ok(room.nodes('v-btn').every((node) => node.props.disabled));
   finish({ ok: true });
@@ -866,12 +864,12 @@ for (const isHumanPlayer of [true, false]) {
   });
 }
 
-test('smart bot availability shows fractional hours to the quota reset and no estimate for occupied bots', async (t) => {
+test('bot availability shows fractional hours to the quota reset and no estimate for occupied bots', async (t) => {
   t.mock.method(Date, 'now', () => 1000000000);
   const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
     locale: 'ru',
     props: { roomID: 'quota-wait' },
-    accessOverrides: { canPlay: vue.ref(true), botWaitHours: vue.ref({ smart: 2.4 }) },
+    accessOverrides: { canPlay: vue.ref(true), botWaitHours: vue.ref({ regular: 2.4 }) },
   });
   t.after(room.stop);
   assert.ok(room.html.includes('2,4'), room.html);
@@ -1002,7 +1000,7 @@ test('AI lobby cards show the actual mixed table size and saved beginner mode', 
   assert.ok(!room.html.includes('<i aria-hidden="true">'), 'finished cards have no live dot');
 });
 
-test('AI lobby shows saved smart difficulty and a live-only indicator', async (t) => {
+test('AI lobby unifies legacy bot difficulty and retains a live-only indicator', async (t) => {
   const room = await fixture('pages/lobby/LobbyRoom.vue', {
     locale: 'ru',
     props: {
@@ -1021,7 +1019,8 @@ test('AI lobby shows saved smart difficulty and a live-only indicator', async (t
     },
   });
   t.after(room.stop);
-  assert.ok(room.html.includes('Умные'));
+  assert.ok(room.html.includes('Боты'));
+  assert.ok(!room.html.includes('Умные'));
   assert.ok(room.html.includes('1 человек + 7 ботов'));
   assert.ok(room.html.includes('<i aria-hidden="true">'));
   assert.ok(room.html.includes('Смотреть'));
@@ -1141,32 +1140,27 @@ test('Play with AI remains visible and opens setup when every bot is unavailable
   assert.deepEqual(room.sent, [], 'opening settings must not reserve or create a room');
 });
 
-test('setup defaults to strong bots and falls back to regular bots when access loads', async (t) => {
+test('setup has one bot option plus teaching mode and always requests canonical bots', async (t) => {
   for (const withFriend of [false, true]) {
-    for (const smart of [false, true]) {
-      const room = await fixture('pages/lobby/BotGameSetup.vue', {
-        props: { modelValue: true, withFriend },
-        accessOverrides: { accessStatus: vue.ref('loading') },
-      });
-      t.after(room.stop);
-      assert.match(
-        room.nodes('label').find((node) => node.children.some?.((child) => child.props?.value === 'smart')).props.class,
-        /selected/,
-      );
-      room.access.canPlay.value = true;
-      room.access.botModes.value = { smart, regular: true };
-      room.access.accessStatus.value = 'ready';
-      await room.render();
-      await room
-        .nodes('v-btn')
-        .find((node) => 'data-create-bot-game' in node.props)
-        .props.onClick();
-      assert.equal(room.sent[0][1].difficulty, smart ? 'smart' : 'regular');
-    }
+    const room = await fixture('pages/lobby/BotGameSetup.vue', {
+      props: { modelValue: true, withFriend },
+      accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true, smart: true, beginner: true }) },
+    });
+    t.after(room.stop);
+    const choices = room.nodes('input').filter((node) => node.props.name === 'bot-mode');
+    assert.deepEqual(
+      choices.map((node) => node.props.value),
+      withFriend ? ['regular'] : ['regular', 'beginner'],
+    );
+    await room
+      .nodes('v-btn')
+      .find((node) => 'data-create-bot-game' in node.props)
+      .props.onClick();
+    assert.equal(room.sent[0][1].difficulty, 'regular');
   }
 });
 
-test('setup preserves a manual regular choice when strong bots are available', async (t) => {
+test('setup preserves the bot choice when access refreshes', async (t) => {
   const room = await fixture('pages/lobby/BotGameSetup.vue', {
     props: { modelValue: true },
     accessOverrides: { canPlay: vue.ref(true), botModes: vue.ref({ regular: true, smart: true }) },
@@ -1198,8 +1192,8 @@ test('setup creates the chosen friend table without launching inference', async 
   t.after(room.stop);
   room
     .nodes('input')
-    .find((node) => node.props.value === 'smart')
-    .props['onUpdate:modelValue']('smart');
+    .find((node) => node.props.value === 'regular')
+    .props['onUpdate:modelValue']('regular');
   room
     .nodes('button')
     .find((node) => node.props['data-player-count'] === 8)
@@ -1210,7 +1204,7 @@ test('setup creates the chosen friend table without launching inference', async 
     .find((node) => node.props['data-create-bot-game'] !== undefined)
     .props.onClick();
   assert.deepEqual(room.sent, [
-    ['createHumanAiRoom', { beginner: false, withFriend: true, difficulty: 'smart', language: 'ru', playerCount: 8 }],
+    ['createHumanAiRoom', { beginner: false, withFriend: true, difficulty: 'regular', language: 'ru', playerCount: 8 }],
   ]);
   assert.deepEqual(room.navigation, [{ name: 'room', params: { uuid: 'created-room' } }]);
 });
@@ -1237,10 +1231,10 @@ test('setup locks Premium seats and unavailable bots while keeping settings visi
     },
   });
   t.after(room.stop);
-  assert.ok(room.html.includes('Сильные боты сейчас недоступны'));
-  assert.ok(room.html.includes('Будут доступны через 2 ч.'));
+  assert.ok(!room.html.includes('Сильные боты'));
+  assert.ok(!room.html.includes('Будут доступны через 2 ч.'));
   assert.ok(!room.html.includes('Проверить снова'));
-  assert.equal(room.nodes('input').find((node) => node.props.value === 'smart').props.disabled, true);
+  assert.equal(room.nodes('input').find((node) => node.props.value === 'regular').props.disabled, false);
   const seats = room.nodes('button').filter((node) => node.props['data-player-count']);
   assert.deepEqual(
     seats.map((node) => [node.props['data-player-count'], !!node.props.disabled]),
@@ -1338,7 +1332,7 @@ test('created room uses the saved setup after reload and waits for the friend', 
   assert.deepEqual(room.sent, []);
 });
 
-test('saved solo setup starts with the persisted language, size and difficulty', async (t) => {
+test('saved legacy solo setup preserves language and size while using the canonical bot mode', async (t) => {
   const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
     props: { roomID: 'saved-room', difficulty: 'smart', language: 'ru', playerCount: 8 },
     accessOverrides: {
@@ -1353,7 +1347,7 @@ test('saved solo setup starts with the persisted language, size and difficulty',
     .find((node) => node.props['data-prepared-start'] !== undefined)
     .props.onClick();
   assert.deepEqual(room.sent, [
-    ['startHumanAiRoom', 'saved-room', { difficulty: 'smart', language: 'ru', playerCount: 8 }],
+    ['startHumanAiRoom', 'saved-room', { difficulty: 'regular', language: 'ru', playerCount: 8 }],
   ]);
 });
 
@@ -1502,8 +1496,8 @@ test('setup recovery belongs to the displayed unavailable mode and excludes begi
     },
   });
   t.after(solo.stop);
-  assert.ok(solo.html.includes('Сильные боты сейчас недоступны'));
-  assert.ok(solo.html.includes('Будут доступны через 144 ч.'));
+  assert.ok(solo.html.includes('Боты сейчас недоступны'));
+  assert.ok(solo.html.includes('Будут доступны через 4 ч.'));
   const friend = await fixture('pages/lobby/BotGameSetup.vue', {
     props: { modelValue: true, withFriend: true },
     locale: 'ru',
@@ -1545,7 +1539,7 @@ test('three-human setup reserves two friends and sends the chosen format', async
         beginner: false,
         withFriend: true,
         humanSeats: 3,
-        difficulty: 'smart',
+        difficulty: 'regular',
         language: 'ru',
         playerCount: 5,
       },
@@ -1954,13 +1948,13 @@ test('guest setup explains authentication and lets visitors choose difficulty be
   });
   t.after(room.stop);
   assert.match(room.html, /Настройки можно выбрать заранее/);
-  for (const mode of ['regular', 'smart', 'beginner']) {
+  for (const mode of ['regular', 'beginner']) {
     assert.equal(room.nodes('input').find((node) => node.props.value === mode).props.disabled, false);
   }
   room
     .nodes('input')
-    .find((node) => node.props.value === 'smart')
-    .props['onUpdate:modelValue']('smart');
+    .find((node) => node.props.value === 'regular')
+    .props['onUpdate:modelValue']('regular');
   await room.render();
   await room
     .nodes('v-btn')

@@ -102,7 +102,7 @@
                   }`"
                 >
                   <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path :d="botIcons[game.mode] || botIcons.regular" />
+                    <path :d="botIcons[game.mode === 'smart' ? 'regular' : game.mode] || botIcons.regular" />
                   </svg>
                   {{ mode(game) }}
                 </strong>
@@ -243,8 +243,6 @@ const statusIcons: Record<AiGameUsage['status'], string> = {
 const botIcons: Record<string, string> = {
   beginner: 'M12 6c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V5c-4-1-7-1-10 1ZM12 6v15',
   regular: 'M12 3v3M9 3h6M5 7h14v13H5zM2 11v5M22 11v5M9 16h6M9 11h.01M15 11h.01',
-  smart:
-    'M12 18V5a3 3 0 0 0-5.9-.8 4 4 0 0 0-2.4 6.5 4 4 0 0 0 .5 7.1A4 4 0 0 0 12 18Zm0 0V5a3 3 0 0 1 5.9-.8 4 4 0 0 1 2.4 6.5 4 4 0 0 1-.5 7.1A4 4 0 0 1 12 18ZM8 8c0 2-1 3-3 3M16 8c0 2 1 3 3 3M7 16c2-1 3 0 3 1M17 16c-2-1-3 0-3 1',
   custom: 'M4 7h6M14 7h6M4 17h10M18 17h2M10 4v6M14 14v6',
 };
 const number = (value: number) => value.toLocaleString(locale.value);
@@ -264,7 +262,9 @@ const atLeast = (value: string, incomplete: boolean) => (incomplete ? t('aiArena
 const tokenTotal = (games: AiGameUsage[]) =>
   number(games.reduce((total, game) => total + game.inputTokens + game.outputTokens, 0));
 const mode = (game: AiGameUsage) =>
-  t(`aiArena.${game.mode === 'custom' ? 'usageCustom' : `dashboardMode${game.mode}`}`);
+  t(
+    `aiArena.${game.mode === 'custom' ? 'usageCustom' : `dashboardMode${game.mode === 'beginner' ? 'beginner' : 'regular'}`}`,
+  );
 const language = (value?: string) =>
   value ? new Intl.DisplayNames([locale.value], { type: 'language' }).of(value) : t('aiArena.usageNoData');
 function optionList(options: object | undefined, group: string, counts = false) {
