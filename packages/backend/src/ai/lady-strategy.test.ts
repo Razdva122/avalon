@@ -1,7 +1,10 @@
+import { createHash } from 'crypto';
 import type { VisualGameState } from '@avalon/types';
 import type { BotRequest } from './client';
 import { systemFor } from './client';
 import { decisionPipeline } from './pipeline';
+import { decisionInstructions } from './pipeline';
+import { claimContext, claimInstructions } from './claims';
 
 function inspection(afterMission: number, botDifficulty: 'regular' | 'smart'): BotRequest {
   return {
@@ -135,6 +138,34 @@ test('Mordred can truthfully expose the inspected ally without the server replac
   expect(result).toMatchObject({ choice: 1, speech: '', privateReason: 'Truth preserves my cover.' });
   expect(generate).toHaveBeenCalledTimes(1);
 });
+
+test.each(['checkLoyalty', 'announceLoyalty'] as const)(
+  'the evaluated consequence paragraph is appended to the Evil %s stage, outside the common cache prefix',
+  async (stage) => {
+    const input = inspection(3, 'regular');
+    input.state.players[6].role = 'mordred';
+    input.state.stage = stage;
+    if (stage === 'announceLoyalty') {
+      input.speak = false;
+      input.choices = ['good', 'evil'];
+      input.privateCheck = 'good';
+      input.state.players[0].features.isSelected = true;
+    }
+    const generate = jest.fn().mockResolvedValue({ choice: 0, speech: 'A tactical choice.', publicReason: '' });
+    await decisionPipeline(generate)(input);
+    const options = generate.mock.calls[0][1];
+    const claims = claimContext(input);
+    const baseline =
+      decisionInstructions(input) + (claims.targets.length || claims.stanceTargets.length ? claimInstructions : '');
+    const addition = options.instructions.slice(baseline.length);
+    expect(options.instructions.startsWith(baseline)).toBe(true);
+    expect(createHash('sha256').update(addition.trim()).digest('hex')).toBe(
+      '4ce8a3033631ccb1d2533531d4092a86454ded6c14a1ada5ea5c731014403479',
+    );
+    expect(options.cacheInstructions).toBe(decisionInstructions(input, true));
+    expect(generate.mock.calls[0][0].choices).toEqual(input.choices);
+  },
+);
 
 test.each(['onMission', 'votingForTeam'] as const)(
   'Lady variety advice does not change the %s winning-action instructions',

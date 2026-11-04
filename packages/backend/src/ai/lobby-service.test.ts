@@ -44,6 +44,12 @@ function fixture(humans = ['owner']) {
   const host = {
     rooms: Object.create(null),
     io,
+    createRoom: (id: string, owner: string, humans: string[]) => {
+      host.rooms[id] = new Room(id, owner, [...humans], io);
+    },
+    destroyRoom: (id: string) => {
+      delete host.rooms[id];
+    },
     updateRoomsList: () => {},
     dbManager: {
       getUserByID: async (id: string) => {
@@ -338,3 +344,29 @@ test('a human already in an active bot game cannot launch another lobby', async 
   expect(f.host.rooms['lobby-id']).toBe(f.lobby);
   expect(f.held.size).toBe(0);
 });
+
+test.each([
+  ['owner', 'a', 'b', 'c', 'd'],
+  ['first', 'owner', 'b', 'c', 'd'],
+])(
+  'non-Premium lobby rematch preserves a seven-seat two-bot roster with the owner in any position',
+  async (...humans: string[]) => {
+    const f = fixture(humans);
+    f.lobby.leaderID = 'owner';
+    expect(await f.start('owner', { playerCount: 7, language: 'ru', humanPlayerIDs: humans })).toEqual({ ok: true });
+    const previous = f.host.rooms['lobby-id'] as BotRoom;
+    if (previous.data.stage !== 'started') throw Error('Expected a started game');
+    previous.data.manager.game.stage = 'end';
+    previous.ai!.status = 'finished';
+    await (f.service as any).releaseInstance(previous.roomID);
+    const reply = jest.fn();
+    await f.connect('owner').restartHumanAiRoom(previous.roomID, reply);
+    const id = reply.mock.calls[0][0].roomID;
+    expect(id).toBeDefined();
+    const next = f.host.rooms[id] as BotRoom;
+    expect(next.ai).toMatchObject({ status: 'running', playerCount: 7, language: 'ru' });
+    expect(next.humanIDs).toEqual(['owner', ...humans.filter((id) => id !== 'owner')]);
+    expect(previous.nextRoomID).toBe(id);
+    expect(previous.data.manager.game.stage).toBe('end');
+  },
+);

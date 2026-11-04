@@ -115,6 +115,15 @@ model selection or access to private decisions and account quotas. The public
 AI list/archive remains viewable without management rights, including when new
 AI games are disabled.
 
+After a public bot game ends, its owner can restart from the board when bot
+capacity and table entitlement are available. The server retains
+the previous replay, creates a fresh game with the same human roster, language
+and table size, and moves the room viewers to it. Slot and participant checks
+run again on click; duplicate requests return the same successor. Ordinary
+rematches use the existing-lobby entitlement rules, including non-Premium large
+tables with at most two bots. An admission or launch failure leaves the completed game
+available for retry and releases any unsuccessful preparation.
+
 ## Discussion and decisions
 
 Administrator creation accepts

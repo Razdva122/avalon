@@ -2,6 +2,7 @@ import { configuredCodexInstances, withCodexInstance, type CodexInstance } from 
 import { BeginnerAnalysis, buildBeginnerAnalysis, beginnerAnalysisSettings } from './beginner-analysis';
 import { aiHumanRoles, aiPlayedModel, aiRosterInfo, lobbyAiSizes } from '@avalon/types';
 import type {
+  ClientToServerEvents,
   AiBotDifficulty,
   AiBotInstanceStatus,
   BotQuotaThresholds,
@@ -16,6 +17,7 @@ import type {
 } from '@avalon/types';
 import type { Manager } from '@/main';
 import { validPacket } from '@/security/validation';
+import { roomChannel } from '@/helpers/channels';
 import { randomUUID } from 'crypto';
 import { AiRepository } from './repository';
 import { BotRoom } from './room';
@@ -615,7 +617,7 @@ export class AiService {
         cb({ error: 'Could not load lobby bot availability' });
       }
     });
-    socket.on('startLobbyAiRoom', async (id, options, cb) => {
+    const startLobbyAiRoom: ClientToServerEvents['startLobbyAiRoom'] = async (id, options, cb) => {
       if (typeof cb !== 'function') return;
       if (!validPacket('startLobbyAiRoom', [id, options, cb])) return cb({ error: 'invalidRequest' });
       const original = this.manager.rooms[id];
@@ -701,7 +703,8 @@ export class AiService {
         this.starting.delete(id);
         if (claimed && !adopted) await this.releaseInstance(id).catch(() => {});
       }
-    });
+    };
+    socket.on('startLobbyAiRoom', startLobbyAiRoom);
     socket.on('setAiBotQuotaThresholds', async (thresholds, cb) => {
       if (typeof cb !== 'function') return;
       try {
@@ -953,7 +956,7 @@ export class AiService {
         cb({ canManage: false });
       }
     });
-    socket.on('createHumanAiRoom', async (...args: unknown[]) => {
+    const createHumanAiRoom = async (args: unknown[], freshOnly = false) => {
       const cb = args[args.length - 1] as (result: { roomID: string } | { error: string }) => void;
       if (typeof cb !== 'function') return;
       const options =
@@ -1002,7 +1005,10 @@ export class AiService {
         const active = this.active(userID);
         if (active)
           return cb(
-            active instanceof BotRoom && this.publicRoom(active) && Boolean(userID && active.isHuman(userID))
+            !freshOnly &&
+              active instanceof BotRoom &&
+              this.publicRoom(active) &&
+              Boolean(userID && active.isHuman(userID))
               ? { roomID: active.roomID }
               : { error: 'Another AI match is already active' },
           );
@@ -1046,8 +1052,9 @@ export class AiService {
       } finally {
         if (locked) this.creating.delete(userID!);
       }
-    });
-    socket.on('startHumanAiRoom', async (id, options, cb) => {
+    };
+    socket.on('createHumanAiRoom', (...args: unknown[]) => createHumanAiRoom(args));
+    const startHumanAiRoom: ClientToServerEvents['startHumanAiRoom'] = async (id, options, cb) => {
       if (typeof cb !== 'function') return;
       let locked = false;
       let claimed = false;
@@ -1136,6 +1143,75 @@ export class AiService {
         if (locked) this.starting.delete(id);
         if (claimed && !this.running.has(id) && !this.launchReady(this.manager.rooms[id] as BotRoom))
           await this.releaseInstance(id).catch(() => {});
+      }
+    };
+    socket.on('startHumanAiRoom', startHumanAiRoom);
+    socket.on('restartHumanAiRoom', async (id, cb) => {
+      if (typeof cb !== 'function') return;
+      if (typeof id !== 'string') return cb({ error: 'Invalid room ID' });
+      const previous = this.manager.rooms[id];
+      if (
+        !(previous instanceof BotRoom) ||
+        !this.publicRoom(previous) ||
+        previous.leaderID !== userID ||
+        previous.ai?.humanPlayerID !== userID ||
+        previous.data.stage !== 'started' ||
+        previous.data.manager.game.stage !== 'end'
+      )
+        return cb({ error: 'Only the owner can restart a completed bot game' });
+      if (previous.nextRoomID) return cb({ roomID: previous.nextRoomID });
+      if (this.starting.has(id)) return cb({ error: 'AI room control in progress' });
+      this.starting.add(id);
+      try {
+        const humans = [userID!, ...previous.humanIDs.filter((human) => human !== userID)];
+        if (humans.some((human) => this.active(human) || this.creating.has(human)))
+          return cb({ error: 'A player already has another AI match' });
+        const playerCount = previous.ai.playerCount ?? (previous.players.length as AiPlayerCount);
+        const language = previous.ai.language ?? 'en';
+        let created: string | undefined;
+        if (previous.ai.beginner) {
+          let creationError: string | undefined;
+          await createHumanAiRoom(
+            [
+              { beginner: true, difficulty: 'regular', language, playerCount },
+              (result: { roomID: string } | { error: string }) => {
+                if ('error' in result) creationError = result.error;
+                else created = result.roomID;
+              },
+            ],
+            true,
+          );
+          if (!created) return cb({ error: creationError ?? 'Could not create bot rematch' });
+          let launchError: string | undefined;
+          await startHumanAiRoom(created, { difficulty: 'regular', language, playerCount }, (result) => {
+            if ('error' in result) launchError = result.error;
+          });
+          if (launchError) {
+            await this.expireLaunch(this.manager.rooms[created] as BotRoom, launchError);
+            return cb({ error: launchError });
+          }
+        } else {
+          // Reuse lobby admission: large tables with <=2 bots do not require Premium.
+          created = randomUUID();
+          this.manager.createRoom(created, userID!, humans);
+          let launchError: string | undefined;
+          await startLobbyAiRoom(created, { playerCount, language, humanPlayerIDs: humans }, (result) => {
+            if ('error' in result) launchError = result.error;
+          });
+          if (launchError) {
+            this.manager.destroyRoom(created);
+            return cb({ error: launchError });
+          }
+        }
+        previous.nextRoomID = created;
+        this.manager.voice?.destroyRoom(id);
+        this.manager.io.to(roomChannel(id)).emit('restartGame', created);
+        previous.updateRoomState();
+        cb({ roomID: created });
+      } catch {
+        cb({ error: 'Could not restart bot game' });
+      } finally {
+        this.starting.delete(id);
       }
     });
     socket.on('createAiRoom', async (options, cb) => {

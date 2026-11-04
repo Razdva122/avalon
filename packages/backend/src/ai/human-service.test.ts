@@ -50,6 +50,12 @@ function fixture(adminID = 'admin', validatePackets = false) {
   const host = {
     rooms: {},
     io,
+    createRoom: (id: string, owner: string, humans: string[]) => {
+      host.rooms[id] = new Room(id, owner, [...humans], io);
+    },
+    destroyRoom: (id: string) => {
+      delete host.rooms[id];
+    },
     updateRoomsList() {},
     dbManager: {
       getUserFeatures: async (id: string) => ({
@@ -93,6 +99,76 @@ function fixture(adminID = 'admin', validatePackets = false) {
   }
   return { host, service, connect, claim, release, save, draft };
 }
+
+async function finishedBotGame(humans = ['owner'], beginner = false) {
+  const f = fixture('admin', true);
+  const created = jest.fn();
+  await f.connect(humans[0]).createHumanAiRoom(
+    {
+      beginner,
+      difficulty: 'regular',
+      language: 'ru',
+      playerCount: beginner ? 5 : 6,
+      withFriend: humans.length > 1,
+      ...(humans.length > 1 ? { humanSeats: humans.length } : {}),
+    },
+    created,
+  );
+  const room = f.host.rooms[created.mock.calls[0][0].roomID] as BotRoom;
+  humans.slice(1).forEach((id) => room.joinGame(id));
+  Room.prototype.startGame.call(room);
+  if (room.data.stage !== 'started') throw Error('Expected a started game');
+  room.data.manager.game.stage = 'end';
+  room.ai!.status = 'finished';
+  await (f.service as any).releaseInstance(room.roomID);
+  return { ...f, room };
+}
+
+test.each([['owner'], ['owner', 'friend'], ['owner', 'friend', 'third']])(
+  'rematch retains the completed game and starts with the same humans: %s',
+  async (...humans: string[]) => {
+    const f = await finishedBotGame(humans);
+    const reply = jest.fn();
+    await f.connect('owner').restartHumanAiRoom(f.room.roomID, reply);
+    const id = reply.mock.calls[0][0].roomID;
+    expect(id).toBeDefined();
+    expect(id).not.toBe(f.room.roomID);
+    const next = f.host.rooms[id] as BotRoom;
+    expect(next.humanIDs).toEqual(humans);
+    expect(next.ai).toMatchObject({ language: 'ru', playerCount: 6, status: 'running', botDifficulty: 'regular' });
+    expect(f.room.data.stage === 'started' && f.room.data.manager.game.stage).toBe('end');
+    expect(f.room.nextRoomID).toBe(id);
+    const claims = f.claim.mock.calls.length;
+    const retry = jest.fn();
+    await f.connect('owner').restartHumanAiRoom(f.room.roomID, retry);
+    expect(retry).toHaveBeenCalledWith({ roomID: id });
+    expect(f.claim).toHaveBeenCalledTimes(claims);
+  },
+);
+
+test('only the owner can rematch a finished human bot game', async () => {
+  const f = await finishedBotGame(['owner', 'friend']);
+  const denied = jest.fn();
+  await f.connect('friend').restartHumanAiRoom(f.room.roomID, denied);
+  expect(denied.mock.calls[0][0]).toHaveProperty('error');
+  expect(f.room.nextRoomID).toBeUndefined();
+  if (f.room.data.stage !== 'started') throw Error('Expected a started game');
+  f.room.data.manager.game.stage = 'selectTeam';
+  await f.connect('owner').restartHumanAiRoom(f.room.roomID, denied);
+  expect(denied.mock.calls[1][0]).toHaveProperty('error');
+  expect(Object.keys(f.host.rooms)).toHaveLength(1);
+});
+
+test('a rematch cannot take a slot occupied by another game', async () => {
+  const f = await finishedBotGame();
+  const occupied = await f.draft('other');
+  const reply = jest.fn();
+  await f.connect('owner').restartHumanAiRoom(f.room.roomID, reply);
+  expect(reply.mock.calls[0][0]).toHaveProperty('error');
+  expect(f.room.nextRoomID).toBeUndefined();
+  expect(occupied.ai!.status).toBe('ready');
+  expect(Object.keys(f.host.rooms)).toHaveLength(2);
+});
 
 test.each([false, true])(
   'unified setup reaches room creation through socket validation, withFriend=%s',
@@ -1102,3 +1178,56 @@ test.each([false, true])(
     });
   },
 );
+
+test('concurrent rematch clicks cannot reserve two rooms', async () => {
+  const f = await finishedBotGame();
+  let unblock!: () => void;
+  let entered!: () => void;
+  const claimed = new Promise<void>((resolve) => {
+    entered = resolve;
+  });
+  f.claim.mockImplementationOnce(
+    () =>
+      new Promise<void>((resolve) => {
+        unblock = resolve;
+        entered();
+      }),
+  );
+  const firstReply = jest.fn();
+  const first = f.connect('owner').restartHumanAiRoom(f.room.roomID, firstReply);
+  await claimed;
+  const secondReply = jest.fn();
+  await f.connect('owner').restartHumanAiRoom(f.room.roomID, secondReply);
+  expect(secondReply.mock.calls[0][0]).toHaveProperty('error');
+  unblock();
+  await first;
+  expect(firstReply.mock.calls[0][0]).toHaveProperty('roomID');
+  expect(Object.keys(f.host.rooms)).toHaveLength(2);
+});
+
+test('rematch does not pull a friend out of another bot game', async () => {
+  const f = await finishedBotGame(['owner', 'friend']);
+  await f.draft('friend');
+  const reply = jest.fn();
+  await f.connect('owner').restartHumanAiRoom(f.room.roomID, reply);
+  expect(reply.mock.calls[0][0]).toHaveProperty('error');
+  expect(f.room.nextRoomID).toBeUndefined();
+  expect(Object.keys(f.host.rooms)).toHaveLength(2);
+});
+
+test('a failed beginner rematch launch releases its draft and leaves the old game restartable', async () => {
+  const f = await finishedBotGame(['owner'], true);
+  quota.mockResolvedValueOnce({ remainingPercent: 10, shortTerm: { remainingPercent: 90 }, checkedAt: Date.now() });
+  quota.mockResolvedValue({ remainingPercent: 0, shortTerm: { remainingPercent: 0 }, checkedAt: Date.now() });
+  const reply = jest.fn();
+  await f.connect('owner').restartHumanAiRoom(f.room.roomID, reply);
+  expect(reply.mock.calls[0][0]).toHaveProperty('error');
+  expect(f.room.nextRoomID).toBeUndefined();
+  const draft = Object.values(f.host.rooms).find((room) => room.roomID !== f.room.roomID)!;
+  expect(draft.ai!.status).toBe('stopped');
+  expect(f.release).toHaveBeenCalledWith(draft.roomID);
+  quota.mockResolvedValue({ remainingPercent: 10, shortTerm: { remainingPercent: 90 }, checkedAt: Date.now() });
+  const retry = jest.fn();
+  await f.connect('owner').restartHumanAiRoom(f.room.roomID, retry);
+  expect(retry.mock.calls[0][0].roomID).toBeDefined();
+});

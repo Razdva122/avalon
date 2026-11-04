@@ -95,6 +95,7 @@ const acknowledgements: Record<string, number> = {
   createAiRoom: 1,
   createHumanAiRoom: 0,
   startHumanAiRoom: 2,
+  restartHumanAiRoom: 1,
   getLobbyAiAccess: 1,
   startLobbyAiRoom: 2,
   getLoyalty: 1,

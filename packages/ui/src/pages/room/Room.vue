@@ -61,6 +61,17 @@
         </template>
         <template v-slot:restart>
           <div class="d-flex flex-column align-center">
+            <BotRematchButton
+              v-if="
+                roomState.ai &&
+                roomState.stage === 'started' &&
+                roomState.game.stage === 'end' &&
+                stateManager.viewMode.value === 'live' &&
+                !assassinationActive
+              "
+              :key="roomState.roomID"
+              :room="roomState"
+            />
             <v-btn color="primary" v-if="displayRestartButton" @click="restartGame" class="restart-button">{{
               $t('room.restartGame')
             }}</v-btn>
@@ -158,6 +169,7 @@ import { ASSASSINATION_REVEAL_DURATION } from '@/components/view/board/animation
 import { assassinationReveal } from '@/components/view/board/helpers';
 import { useWindowSize } from '@vueuse/core';
 import BeginnerReview from '@/components/view/information/BeginnerReview.vue';
+import BotRematchButton from '@/components/view/board/modules/BotRematchButton.vue';
 import BeginnerTips from '@/components/view/information/BeginnerTips.vue';
 import { beginnerTipsSession as tipsSession, startBeginnerTips } from '@/helpers/beginner-tips-session';
 
@@ -166,6 +178,7 @@ export default defineComponent({
   components: {
     BeginnerTips,
     BeginnerReview,
+    BotRematchButton,
     Board,
     AiRoomPanel,
     RolesInfo,

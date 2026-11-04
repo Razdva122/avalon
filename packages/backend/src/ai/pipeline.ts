@@ -24,6 +24,7 @@ import {
   ladyTransferPreference,
   ladyChoiceSignalAdvice,
   evilLadyAdvice,
+  evilLadyConsequenceAdvice,
   assassinationCheck,
 } from './client';
 import type { BotReply, BotRequest, Decide, GenerationOptions, DecisionEvidence } from './client';
@@ -525,6 +526,10 @@ export function decisionPipeline(generate: Generate): Decide {
             : decisionInstructions(request) +
               (claimContext(request).targets.length || claimContext(request).stanceTargets.length
                 ? claimInstructions
+                : '') +
+              (['checkLoyalty', 'announceLoyalty'].includes(request.state.stage) &&
+              ['mordred', 'morgana', 'oberon', 'minion'].includes(own?.role || '')
+                ? '\n' + evilLadyConsequenceAdvice
                 : ''),
           context: finalReview
             ? { ...reviewContext(request), decisionExamples: reviewExamples.get(request.playerID) || [] }

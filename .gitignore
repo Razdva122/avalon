@@ -35,3 +35,6 @@ pnpm-debug.log*
 /artifacts/
 /announcements/
 /output/
+
+# Local investigation data (private game traces and experiment output)
+/work/
