@@ -44,7 +44,8 @@ function checkIdle(rooms) {
 }
 
 module.exports = { checkIdle };
-if (require.main === module) {
+// Deploy streams this script to `docker exec ... node -`; stdin has no require.main.
+if (require.main === module || module.id === '[stdin]') {
   const { io } = require('socket.io-client');
   const socket = io('https://avalon-game.com', { transports: ['websocket'], reconnection: false });
   const timer = setTimeout(() => {

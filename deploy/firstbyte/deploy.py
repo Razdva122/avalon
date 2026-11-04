@@ -67,8 +67,16 @@ def write_compose(content):
 
 
 def idle():
-    run(['docker', 'exec', '-i', '-w', '/app', 'avalon-production-backend-1', 'node', '-'],
-        input=(ROOT / 'check-idle.cjs').read_text(), timeout=25)
+    output = run(['docker', 'exec', '-i', '-w', '/app', 'avalon-production-backend-1', 'node', '-'],
+                 input=(ROOT / 'check-idle.cjs').read_text(), timeout=25)
+    try:
+        decision = json.loads(output)
+    except (ValueError, TypeError) as error:
+        raise RuntimeError('Room guard did not return a valid decision; deployment refused') from error
+    if (not isinstance(decision, dict) or type(decision.get('exitCode')) is not int
+            or decision['exitCode'] != 0 or decision.get('activeRooms') != []):
+        raise RuntimeError('Room guard did not confirm an idle server; deployment refused')
+    print('Room guard confirmed idle: ' + output, flush=True)
 
 
 def prepare_static(image):

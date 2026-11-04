@@ -29,6 +29,20 @@ NEW = {
 
 
 class DeployTests(unittest.TestCase):
+    def test_idle_requires_an_explicit_valid_success_decision(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'check-idle.cjs').write_text('check rooms')
+            for output in ['', 'not json', '{}', '[]', '{"exitCode":false,"activeRooms":[]}',
+                           '{"exitCode":0}', '{"exitCode":0,"activeRooms":[{"id":"live"}]}',
+                           '{"exitCode":3,"activeRooms":[]}']:
+                with self.subTest(output=output), patch.object(deploy, 'ROOT', root), \
+                     patch.object(deploy, 'run', return_value=output), self.assertRaises(RuntimeError):
+                    deploy.idle()
+            with patch.object(deploy, 'ROOT', root), \
+                 patch.object(deploy, 'run', return_value='{"exitCode":0,"activeRooms":[]}'):
+                deploy.idle()
+
     def test_ssh_boundary_rejects_commands_and_shell_payloads(self):
         for value in ['deploy v71.0.0', 'check v72.0.0-rc.1', 'deploy-skip-rooms v71.0.0']:
             self.assertEqual(deploy.parse_command(value), tuple(value.split(' ')))
@@ -70,6 +84,8 @@ class DeployTests(unittest.TestCase):
                     raise AssertionError('Deployment must not wait for off-host backup')
                 if args[:2] == ['docker', 'exec'] and kwargs.get('input') == 'check rooms' and failure == 'busy':
                     raise subprocess.CalledProcessError(3, args)
+                if args[:2] == ['docker', 'exec'] and kwargs.get('input') == 'check rooms':
+                    return '{"exitCode":0,"activeRooms":[]}'
                 if 'up' in args:
                     starts.append(compose.read_text())
                     if failure == 'start' and len(starts) == 1:

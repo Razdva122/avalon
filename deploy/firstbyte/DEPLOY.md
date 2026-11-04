@@ -99,6 +99,10 @@ container and reloads nginx without restarting it.
   as `/opt/avalon/production/nginx-entrypoint.sh` (`0755`), and symlink
   `/usr/local/sbin/avalon-deploy` to it. Install the existing `deploy/voice/check-idle.cjs` as
   `/opt/avalon/production/check-idle.cjs` (`0600`).
+- The room guard is streamed into `node -`, so its stdin entry point must execute too.
+  Deployment requires an explicit JSON decision with `exitCode: 0` and `activeRooms: []`;
+  an empty successful process output must never permit activation. Update both installed
+  scripts together when changing this contract; no application restart is required.
 - Prerequisites: the existing FirstByte production compose, backup service, watchdog, Python 3,
   Docker Compose, curl, sudo and systemd. Deployment does not bootstrap a blank server.
 

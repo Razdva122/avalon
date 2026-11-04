@@ -2,6 +2,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const os = require('node:os');
+const { spawnSync } = require('node:child_process');
 const { test } = require('node:test');
 
 // Loading the decision helper must not connect to production or install timers.
@@ -30,6 +32,46 @@ const completed = (overrides = {}) => ({
 
 test('importing the guard is side-effect free', () => {
   loadGuard();
+});
+test('the actual deployment stdin entry point checks mixed human/bot games and reports a decision', () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'avalon-idle-'));
+  const preload = path.join(directory, 'socket-fixture.cjs');
+  fs.writeFileSync(
+    preload,
+    `
+    const Module = require('node:module');
+    const original = Module._load;
+    Module._load = function(name, ...args) {
+      if (name !== 'socket.io-client') return original.call(this, name, ...args);
+      return { io: () => ({
+        on(event, callback) { if (event === 'connect') setImmediate(callback); },
+        emit(event, callback) { callback(JSON.parse(process.env.IDLE_FIXTURE)); },
+        close() {},
+      }) };
+    };
+  `,
+  );
+  try {
+    for (const [rooms, expected] of [
+      [[completed({ uuid: 'three-humans-three-bots', ai: true, aiHumanCount: 3, players: 6, result: undefined })], 3],
+      [[completed()], 0],
+      [[completed({ result: null })], 2],
+      [Array.from({ length: 20 }, (_, i) => completed({ uuid: String(i) })), 2],
+    ]) {
+      const result = spawnSync(process.execPath, ['--require', preload, '-'], {
+        input: fs.readFileSync(path.join(__dirname, 'check-idle.cjs'), 'utf8'),
+        encoding: 'utf8',
+        env: { ...process.env, IDLE_FIXTURE: JSON.stringify(rooms) },
+        timeout: 3000,
+      });
+      assert.equal(result.status, expected, result.stderr || result.stdout);
+      const decision = JSON.parse(result.stdout);
+      assert.equal(decision.exitCode, expected);
+      if (expected === 3) assert.equal(decision.activeRooms[0].id, 'three-humans-three-bots');
+    }
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
 });
 test('an empty list or fewer than 20 completed rooms permits activation', () => {
   const checkIdle = loadGuard();
