@@ -100,14 +100,14 @@ function fixture(adminID = 'admin', validatePackets = false) {
   return { host, service, connect, claim, release, save, draft };
 }
 
-async function finishedBotGame(humans = ['owner'], beginner = false) {
+async function finishedBotGame(humans = ['owner'], beginner = false, language: 'ru' | 'pt' | 'zh-cn' = 'ru') {
   const f = fixture('admin', true);
   const created = jest.fn();
   await f.connect(humans[0]).createHumanAiRoom(
     {
       beginner,
       difficulty: 'regular',
-      language: 'ru',
+      language,
       playerCount: beginner ? 5 : 6,
       withFriend: humans.length > 1,
       ...(humans.length > 1 ? { humanSeats: humans.length } : {}),
@@ -944,20 +944,23 @@ test('legacy friend room cannot shrink to remove its last bot', async () => {
   }
 });
 
-test.each(['es', 'vi'] as const)('%s is accepted for public AI room creation and launch', async (language) => {
-  const { connect, host } = fixture('admin', true);
-  const handlers = connect('owner');
-  const created = jest.fn();
-  await handlers.createHumanAiRoom({ beginner: false, difficulty: 'regular', language, playerCount: 5 }, created);
-  expect(created.mock.calls[0][0]).toHaveProperty('roomID');
-  const room = host.rooms[created.mock.calls[0][0].roomID] as BotRoom;
-  expect(room.ai!.language).toBe(language);
-  const started = jest.fn();
-  await handlers.startHumanAiRoom(room.roomID, { difficulty: 'regular', language, playerCount: 5 }, started);
-  expect(started).toHaveBeenCalledWith({ ok: true });
-  expect(run).toHaveBeenCalled();
-  room.stop();
-});
+test.each(['es', 'vi', 'pt', 'zh-cn'] as const)(
+  '%s is accepted for public AI room creation and launch',
+  async (language) => {
+    const { connect, host } = fixture('admin', true);
+    const handlers = connect('owner');
+    const created = jest.fn();
+    await handlers.createHumanAiRoom({ beginner: false, difficulty: 'regular', language, playerCount: 5 }, created);
+    expect(created.mock.calls[0][0]).toHaveProperty('roomID');
+    const room = host.rooms[created.mock.calls[0][0].roomID] as BotRoom;
+    expect(room.ai!.language).toBe(language);
+    const started = jest.fn();
+    await handlers.startHumanAiRoom(room.roomID, { difficulty: 'regular', language, playerCount: 5 }, started);
+    expect(started).toHaveBeenCalledWith({ ok: true });
+    expect(run).toHaveBeenCalled();
+    room.stop();
+  },
+);
 
 describe('multiple ChatGPT instances', () => {
   const accounts = [
@@ -1230,4 +1233,13 @@ test('a failed beginner rematch launch releases its draft and leaves the old gam
   const retry = jest.fn();
   await f.connect('owner').restartHumanAiRoom(f.room.roomID, retry);
   expect(retry.mock.calls[0][0].roomID).toBeDefined();
+});
+
+test.each(['pt', 'zh-cn'] as const)('rematch preserves %s discussion', async (language) => {
+  const f = await finishedBotGame(['owner'], false, language);
+  const reply = jest.fn();
+  await f.connect('owner').restartHumanAiRoom(f.room.roomID, reply);
+  const next = f.host.rooms[reply.mock.calls[0][0].roomID] as BotRoom;
+  expect(next.ai).toMatchObject({ language, status: 'running' });
+  next.stop();
 });

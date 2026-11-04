@@ -18,6 +18,8 @@ const base = {
 } as unknown as BotRequest;
 
 test.each([
+  ['pt', 'PORTUGUESE ONLY', '2, que mudança você propõe para esta missão?'],
+  ['zh-cn', 'SIMPLIFIED CHINESE ONLY', '这是第一轮任务后的折中方案。2，你建议换谁？'],
   ['es', 'SPANISH ONLY', '2, ¿qué cambio propones para esta misión?'],
   ['vi', 'VIETNAMESE ONLY', '2, bạn đề xuất đổi ai trong đội này?'],
   ['ru', 'RUSSIAN ONLY', 'Это компромисс после первой миссии. 2, какую замену ты предлагаешь?'],
@@ -54,6 +56,12 @@ test.each([
 );
 
 test.each([
+  ['pt', 'Sou Merlin.', ''],
+  ['pt', 'Meus aliados do Mal são 2 e 3.', ''],
+  ['pt', 'Os meus aliados são 2 e 3.', ''],
+  ['pt', 'Vou sabotar esta missão.', ''],
+  ['zh-cn', '我是梅林。', ''],
+  ['zh-cn', '我要破坏这次任务。', ''],
   ['es', 'Soy Merlin.', ''],
   ['es', 'Voy a sabotear esta misión.', ''],
   ['vi', 'Tôi là Merlin.', ''],
@@ -109,6 +117,8 @@ test.each([
 );
 
 test.each([
+  ['pt', 'Sou do Bem. Quero testar esta equipe.'],
+  ['zh-cn', '我是正义方。我想测试这支队伍。'],
   ['es', 'Soy del Bien. Quiero probar este equipo.'],
   ['vi', 'Tôi thuộc phe Thiện. Hãy thử đội này.'],
 ])('allows ordinary Good discussion in %s', (language, speech) => {
@@ -116,6 +126,8 @@ test.each([
 });
 
 test.each([
+  ['pt', 'Sou Percival. 3 é Morgana.'],
+  ['zh-cn', '我是派西维尔。3 是莫甘娜。'],
   ['es', 'Soy Percival. 3 es Morgana.'],
   ['vi', 'Tôi là Percival. 3 là Morgana.'],
 ])('allows deliberate Percival claims in %s', (language, speech) => {

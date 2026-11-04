@@ -1,3 +1,4 @@
+import { isAiLanguage } from '@avalon/types/room/ai-language';
 import { aiHumanRoles, type AiPlayerCount, type AiHumanRole } from '@avalon/types';
 import { validBotQuotaThresholds } from '@/ai/quota-policy';
 import { validBotResetRequest } from '@/ai/reset-policy';
@@ -192,8 +193,7 @@ export function validPacket(event: string, args: unknown[]): boolean {
             values[0].humanSeats >= 2 &&
             values[0].humanSeats < ((values[0].playerCount ?? 5) as number))) &&
         (values[0].difficulty === undefined || ['regular', 'smart'].includes(values[0].difficulty as string)) &&
-        (values[0].language === undefined ||
-          ['en', 'ru', 'zh-tw', 'es', 'vi'].includes(values[0].language as string)) &&
+        (values[0].language === undefined || isAiLanguage(values[0].language)) &&
         (values[0].playerCount === undefined || [5, 6, 7, 8].includes(values[0].playerCount as number)) &&
         !(values[0].beginner && values[0].withFriend) &&
         !(values[0].beginner && values[0].playerCount !== undefined && values[0].playerCount !== 5))
@@ -206,7 +206,7 @@ export function validPacket(event: string, args: unknown[]): boolean {
       Object.keys(options).length === 3 &&
       Object.keys(options).every((key) => ['playerCount', 'language', 'humanPlayerIDs'].includes(key)) &&
       [5, 6, 7, 8].includes(options.playerCount as number) &&
-      ['en', 'ru', 'zh-tw', 'es', 'vi'].includes(options.language as string) &&
+      isAiLanguage(options.language) &&
       Array.isArray(options.humanPlayerIDs) &&
       options.humanPlayerIDs.length >= 1 &&
       options.humanPlayerIDs.length <= 7 &&
@@ -223,7 +223,7 @@ export function validPacket(event: string, args: unknown[]): boolean {
       typeof options.difficulty === 'string' &&
       ['smart', 'regular'].includes(options.difficulty) &&
       typeof options.language === 'string' &&
-      ['en', 'ru', 'zh-tw', 'es', 'vi'].includes(options.language)
+      isAiLanguage(options.language)
     );
   }
   if (event === 'createAiRoom') {
@@ -234,7 +234,7 @@ export function validPacket(event: string, args: unknown[]): boolean {
       Object.keys(options).every((key) => ['model', 'language', 'playerCount'].includes(key)) &&
       text(options.model, 254) &&
       typeof options.language === 'string' &&
-      ['en', 'ru', 'zh-tw', 'es', 'vi'].includes(options.language) &&
+      isAiLanguage(options.language) &&
       (!Object.prototype.hasOwnProperty.call(options, 'playerCount') ||
         (typeof options.playerCount === 'number' && [5, 6, 7, 8].includes(options.playerCount)))
     );

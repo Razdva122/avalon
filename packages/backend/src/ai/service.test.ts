@@ -125,6 +125,8 @@ test('spectator reveal is AI-only, returns spectator details and never mutates p
 });
 
 test.each([
+  ['pt', undefined],
+  ['zh-cn', undefined],
   ['en', undefined],
   ['ru', undefined],
   ['zh-tw', undefined],
@@ -227,7 +229,7 @@ test('creation rejects unsupported or malformed language options before claiming
     } as unknown as ServerSocket,
     'owner',
   );
-  for (const language of ['EN', 'ru-RU', 'zh', 'zh-cn', '', undefined, null, {}, ['en']]) {
+  for (const language of ['EN', 'ru-RU', 'zh', 'zh-hk', '', undefined, null, {}, ['en']]) {
     const response = jest.fn();
     await handlers.createAiRoom({ model: 'codex-chatgpt', language }, response);
     expect(response.mock.calls[0][0]).toEqual({ error: 'Invalid AI language' });

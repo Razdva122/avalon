@@ -9,6 +9,8 @@
           <option value="zh-tw">繁體中文（台灣）</option>
           <option value="es">Español</option>
           <option value="vi">Tiếng Việt</option>
+          <option value="pt">Português</option>
+          <option value="zh-cn">简体中文</option>
         </select>
       </label>
       <label>

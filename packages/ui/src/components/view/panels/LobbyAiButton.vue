@@ -180,6 +180,8 @@ const languageChoices = [
   { value: 'zh-tw', title: '繁體中文（台灣）', flag: '/flags/zh-tw.svg' },
   { value: 'es', title: 'Español', flag: '/flags/es.svg' },
   { value: 'vi', title: 'Tiếng Việt', flag: '/flags/vi.svg' },
+  { value: 'pt', title: 'Português', flag: '/flags/pt.svg' },
+  { value: 'zh-cn', title: '简体中文', flag: '/flags/zh-cn.svg' },
 ];
 const open = ref(false);
 const busy = ref(false);
@@ -189,11 +191,13 @@ const confirmedRoster = ref<string[] | null>(null);
 const error = ref('');
 const playerCount = ref<AiPlayerCount>(5);
 const language = ref<AiLanguage>(
-  ['ru', 'es', 'vi'].includes(locale.value)
+  ['ru', 'es', 'vi', 'pt'].includes(locale.value)
     ? (locale.value as AiLanguage)
     : /^zh[-_]tw$/i.test(locale.value)
       ? 'zh-tw'
-      : 'en',
+      : /^zh[-_]cn$/i.test(locale.value)
+        ? 'zh-cn'
+        : 'en',
 );
 const rosterKey = (ids: string[]) => JSON.stringify([...ids].sort());
 const sizes = computed(() => lobbyAiSizes(props.humanPlayerIDs.length, premium.value));

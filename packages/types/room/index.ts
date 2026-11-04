@@ -2,6 +2,7 @@ import { index, prop } from '@typegoose/typegoose';
 
 import { VisualGameState } from '../game/state';
 import { GameOptions } from '../game/options';
+import type { AiLanguage } from './ai-language';
 
 export * from './list';
 
@@ -94,7 +95,7 @@ export type AiAccountUsage = {
   shortTermIncomplete: boolean;
 };
 
-export type AiLanguage = 'en' | 'ru' | 'zh-tw' | 'es' | 'vi';
+export * from './ai-language';
 export type AiPlayerCount = 5 | 6 | 7 | 8;
 export type AiBotDifficulty = 'smart' | 'regular';
 export type AiBotMode = AiBotDifficulty | 'beginner';

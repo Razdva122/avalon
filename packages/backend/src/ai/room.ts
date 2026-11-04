@@ -1,3 +1,4 @@
+import { isAiLanguage } from '@avalon/types/room/ai-language';
 import { randomUUID } from 'crypto';
 import shuffle from 'lodash/shuffle';
 import { aiHumanRoles, type AiHumanRole } from '@avalon/types';
@@ -19,6 +20,8 @@ export const botOptions: GameOptions = {
 type Choice = { text: string; actions: TGameMethodsParams[] };
 type Publication = { id: string; text: string; requestID: string };
 const humanTimeoutMessage: Record<AiLanguage, string> = {
+  pt: 'Partida encerrada: o tempo de ação e a reserva compartilhada se esgotaram.',
+  'zh-cn': '对局已结束：行动时间和共用备用时间已用尽。',
   es: 'Partida terminada: se agotaron el tiempo de acción y la reserva compartida.',
   vi: 'Ván chơi đã kết thúc: thời gian hành động và thời gian dự phòng chung đã hết.',
   en: 'Match stopped: the turn time and shared time reserve have run out.',
@@ -185,11 +188,7 @@ export class BotRoom extends Room {
   }
 
   setLanguage(language: AiLanguage): void {
-    if (
-      this.ai!.status !== 'ready' ||
-      this.data.stage !== 'locked' ||
-      !['en', 'ru', 'zh-tw', 'es', 'vi'].includes(language)
-    )
+    if (this.ai!.status !== 'ready' || this.data.stage !== 'locked' || !isAiLanguage(language))
       throw Error('Discussion language can only be changed before launch');
     this.language = language;
     this.ai!.language = language;

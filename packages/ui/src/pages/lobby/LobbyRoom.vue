@@ -92,9 +92,15 @@ const game = toRef(props, 'game');
 const { locale, t } = useI18n();
 const aiLanguageLabel = computed(
   () =>
-    ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）', es: 'Español', vi: 'Tiếng Việt' })[
-      game.value.aiLanguage || 'en'
-    ],
+    ({
+      en: 'English',
+      ru: 'Русский',
+      'zh-tw': '繁體中文（台灣）',
+      es: 'Español',
+      vi: 'Tiếng Việt',
+      pt: 'Português',
+      'zh-cn': '简体中文',
+    })[game.value.aiLanguage || 'en'],
 );
 const aiDate = computed(() =>
   new Date(game.value.startAt || game.value.createAt).toLocaleString(locale.value, {

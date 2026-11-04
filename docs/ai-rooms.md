@@ -128,8 +128,8 @@ available for retry and releases any unsuccessful preparation.
 
 Administrator creation accepts
 `createAiRoom({ model, language, playerCount }, callback)`.
-Discussion language is `en`, `ru`, `zh-tw`, `es` or `vi`, with English as the legacy default.
-The UI itself supports seven languages. Unsupported model, language and table size
+Discussion supports all seven site languages: `en`, `ru`, `zh-tw`, `es`, `vi`, `pt` and `zh-cn`,
+with English as the legacy default. Chinese discussions use the selected Traditional or Simplified script. Unsupported model, language and table size
 are rejected before room reservation. Public bot play accepts
 `createHumanAiRoom(callback)` (standard) or
 `createHumanAiRoom({ beginner: true }, callback)` (legacy beginner); the callback returns a `roomID` or an `error`.

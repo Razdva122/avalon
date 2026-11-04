@@ -233,9 +233,15 @@ const rosterText = computed(() => {
 const displayPlayerCount = computed(() => props.ai.playerCount ?? props.playerCount ?? 7);
 const displayLanguage = computed(
   () =>
-    ({ en: 'English', ru: 'Русский', 'zh-tw': '繁體中文（台灣）', es: 'Español', vi: 'Tiếng Việt' })[
-      props.ai.language || 'en'
-    ],
+    ({
+      en: 'English',
+      ru: 'Русский',
+      'zh-tw': '繁體中文（台灣）',
+      es: 'Español',
+      vi: 'Tiếng Việt',
+      pt: 'Português',
+      'zh-cn': '简体中文',
+    })[props.ai.language || 'en'],
 );
 const pricedCodexModels = computed(() => {
   const ids = codexModels.value.map((model) => model.id);

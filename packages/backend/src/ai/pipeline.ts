@@ -88,25 +88,28 @@ export function safePublicSpeech(
   const visible = evilAdmission ? ownSideChecked : speech;
   const checked = percivalClaim
     ? visible.replace(
-        /\b(?:my role is|our role is|mi rol es|nuestro rol es)\s+(?:the\s+)?percival\b|(?:моя|наша)\s+роль\s*(?:—|-|это)?\s*персиваль|vai trò của tôi\s*(?:là\s*)?percival|我的角色(?:是|為)?派西維爾|\bpercival\b|персиваль|派西維爾/giu,
+        /\b(?:my role is|our role is|mi rol es|nuestro rol es|meu papel é|nosso papel é)\s+(?:the\s+)?percival\b|(?:моя|наша)\s+роль\s*(?:—|-|это)?\s*персиваль|vai trò của tôi\s*(?:là\s*)?percival|我的角色(?:是|為|为)?派西[維维][爾尔]|\bpercival\b|персиваль|派西[維维][爾尔]/giu,
         'public claim',
       )
     : visible;
   const roleLeak =
-    /own public alignment[\s,;:—-]*(?:(?:and|и)\s+)?(?:merlin|percival|morgana|mordred|minion|oberon|мерлин|персиваль|моргана|мордред|приспешник|оберон|梅林|派西維爾|莫甘娜|莫德雷德|奧伯倫|爪牙)|\b(?:i am|i'm|we are|we're)\s+(?:an?\s+|the\s+)?(?:evil|merlin|percival|morgana|mordred|minion|oberon)\b|(?<![\p{L}\p{N}_])(?:я|мы)\s*(?:—|-|это|являюсь|являемся)?\s*(?:злой|злые|мерлин|персиваль|моргана|мордред|приспешник|оберон)|(?:我|我們)是(?:邪惡|梅林|派西維爾|莫甘娜|莫德雷德|奧伯倫|爪牙)/iu;
+    /own public alignment[\s,;:—-]*(?:(?:and|и|e)\s+)?(?:merlin|percival|morgana|mordred|minion|oberon|мерлин|персиваль|моргана|мордред|приспешник|оберон|梅林|派西[維维][爾尔]|莫甘娜|莫德雷德|[奧奥]伯[倫伦]|爪牙)|\b(?:i am|i'm|we are|we're)\s+(?:an?\s+|the\s+)?(?:evil|merlin|percival|morgana|mordred|minion|oberon)\b|(?<![\p{L}\p{N}_])(?:я|мы)\s*(?:—|-|это|являюсь|являемся)?\s*(?:злой|злые|мерлин|персиваль|моргана|мордред|приспешник|оберон)|(?:我|我們|我们)是(?:邪[惡恶]|梅林|派西[維维][爾尔]|莫甘娜|莫德雷德|[奧奥]伯[倫伦]|爪牙)/iu;
   const privateLeak =
-    /\b(?:my|our) (?:evil allies|role is|wizard pair|wizard candidates)\b|\b[1-8]\s+(?:is|must be)\s+merlin\b|\bmerlin\s+is\s+[1-8]\b|[1-8]\s*(?:—|-|это|является)\s*мерлин|мерлин\s*(?:—|-|это)\s*[1-8]|мо[яи]\s+(?:роль|злые союзники|союзники|сообщники|пара магов|кандидаты в маги)|(?:我的(?:角色|邪惡盟友|梅林候選人)|[1-8]\s*是梅林)/i;
+    /\b(?:my|our) (?:evil allies|role is|wizard pair|wizard candidates)\b|\b[1-8]\s+(?:is|must be)\s+merlin\b|\bmerlin\s+is\s+[1-8]\b|[1-8]\s*(?:—|-|это|является)\s*мерлин|мерлин\s*(?:—|-|это)\s*[1-8]|мо[яи]\s+(?:роль|злые союзники|союзники|сообщники|пара магов|кандидаты в маги)|(?:我的(?:角色|邪[惡恶]盟友|梅林候[選选]人)|[1-8]\s*是梅林)/i;
   const sabotageIntent =
-    /\b(?:i|we)\s+(?:will|want to|intend to|plan to|am going to|are going to)\s+(?:sabotage|help evil|(?:let|make|ensure|force)[^.!?]{0,50}\bfail)\b|\b(?:my|our)\s+strategy\s+to\s+(?:let|make|ensure|force)[^.!?]{0,50}\bfail\b|\b(?:prevent\w*|avoid\w*)\s+(?:the\s+)?(?:risk\s+of\s+)?(?:(?:an?|the|any|another|this|that|their|our|its|your|accidental|unintended|risky|(?:good|mission|team)(?:['’]s)?)\s+){0,5}success\b|\b(?:unintended|accidental)\s+success\b|(?:я|мы)\s+(?:саботир|(?:хочу|хотим|буду|будем|намерен|намерены)\s+(?:саботир|провалить|устроить\s+провал|помочь\s+злу))|(?:избеж|предотврат)[а-яё]*\s+(?:риск[а-яё]*\s+)?(?:(?:(?:случайн|нежелательн|очередн|мирн|наш|ваш|эт)[а-яё]*|их)\s+){0,3}успех|(?:我|我們)(?:要|想要|想|打算|會|將|計畫)[^。！？]{0,40}(?:破壞|幫助邪惡|讓任務失敗)|(?:避免|阻止)(?:讓)?(?:這次|本次|這輪|本輪|該輪|此次|任務|意外|正義|的){0,4}(?:成功|正義獲勝)/i;
+    /\b(?:i|we)\s+(?:will|want to|intend to|plan to|am going to|are going to)\s+(?:sabotage|help evil|(?:let|make|ensure|force)[^.!?]{0,50}\bfail)\b|\b(?:my|our)\s+strategy\s+to\s+(?:let|make|ensure|force)[^.!?]{0,50}\bfail\b|\b(?:prevent\w*|avoid\w*)\s+(?:the\s+)?(?:risk\s+of\s+)?(?:(?:an?|the|any|another|this|that|their|our|its|your|accidental|unintended|risky|(?:good|mission|team)(?:['’]s)?)\s+){0,5}success\b|\b(?:unintended|accidental)\s+success\b|(?:я|мы)\s+(?:саботир|(?:хочу|хотим|буду|будем|намерен|намерены)\s+(?:саботир|провалить|устроить\s+провал|помочь\s+злу))|(?:избеж|предотврат)[а-яё]*\s+(?:риск[а-яё]*\s+)?(?:(?:(?:случайн|нежелательн|очередн|мирн|наш|ваш|эт)[а-яё]*|их)\s+){0,3}успех|(?:我|我們|我们)(?:要|想要|想|打算|會|会|將|将|計畫|计划)[^。！？]{0,40}(?:破[壞坏]|[幫帮]助邪[惡恶]|[讓让]任[務务]失[敗败])|(?:避免|阻止)(?:讓)?(?:[這这]次|本次|[這这]輪|本[輪轮]|[該该][輪轮]|此次|任[務务]|意外|正[義义]|的){0,4}(?:成功|正[義义][獲获][勝胜])/i;
   const translatedLeak =
     /(?:^|[\s.!?])(?:yo\s+)?(?:soy|somos)\s+(?:del\s+mal|malvado|malvada|merl[ií]n|percival|morgana|mordred|minion|oberon)\b|(?:tôi|chúng tôi)\s+(?:là\s+(?:merlin|percival|morgana|mordred|minion|oberon)|(?:là|thuộc)\s+phe\s+[aá]c)|\b(?:mi|nuestro)\s+(?:rol\s+es|aliado\s+del\s+mal|pareja\s+de\s+magos)\b|vai trò của tôi|đồng minh phe [aá]c của tôi|\b[1-8]\s+es\s+merl[ií]n\b|[1-8]\s+là\s+Merlin|\b(?:voy a|vamos a|quiero|queremos)\s+sabotear\b|(?:tôi|chúng tôi)\s+(?:sẽ|muốn|định)\s+phá hoại/iu;
+  const portugueseLeak =
+    /(?:^|[\s.!?])(?:(?:eu|nós)\s+)?(?:sou|somos)\s+(?:(?:o|a)\s+)?(?:do\s+mal|malvado|malvada|merl[ií]n|percival|morgana|mordred|minion|oberon)\b|\b(?:meus?|nossos?)\s+(?:papel|aliados?|par\s+de\s+magos)\b|\b(?:minha|nossa)\s+(?:função|estratégia\s+(?:secreta|privada))\b|\b[1-8]\s+é\s+merl[ií]n\b|\b(?:vou|vamos|quero|queremos|pretendo|pretendemos)\s+sabotar\b/iu;
   if (/\bmy ally\b|мой\s+(?:союзник|сообщник)|моя\s+скрытая\s+стратегия|my private strategy/iu.test(checked))
     throw new AiTechnicalPause('Public speech exposes private allies or strategy.');
   if (
     !roleLeak.test(checked) &&
     !privateLeak.test(checked) &&
     !sabotageIntent.test(checked) &&
-    !translatedLeak.test(checked)
+    !translatedLeak.test(checked) &&
+    !portugueseLeak.test(checked)
   )
     return speech;
   throw new AiTechnicalPause('Public speech exposes private role or sabotage intent. Match paused.');

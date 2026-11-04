@@ -18,12 +18,12 @@ export function isEvilActor(request: BotRequest) {
 
 // Only the speaker's alignment is eligible; never a specific role or allies.
 const ownEvil =
-  /\b(?:i am|i'm|i’m)\s+(?:(?:an?|the)\s+)?(?:evil|mafia|bad guy)\b|\bi play for (?:evil|the evil side)\b|(?<![\p{L}\p{N}_])я\s*(?:—|-|это)?\s*(?:злой|злая|мафия|т[её]мный|т[её]мная|тьма)|(?<![\p{L}\p{N}_])я\s+на\s+(?:стороне\s+(?:зла|тьмы)|т[её]мной\s+стороне)|(?<![\p{L}\p{N}_])(?:я\s+)?играю\s+за\s+(?:зло|тьму)|(?<![\p{L}\p{N}_])я\s+за\s+(?:зло|тьму)|我(?:是|屬於)(?:邪惡|黑方|壞人)|\b(?:yo\s+)?soy\s+(?:del mal|malvado|malvada)\b|tôi\s+(?:là|thuộc)\s+phe\s+[aá]c/giu;
+  /\b(?:i am|i'm|i’m)\s+(?:(?:an?|the)\s+)?(?:evil|mafia|bad guy)\b|\bi play for (?:evil|the evil side)\b|(?<![\p{L}\p{N}_])я\s*(?:—|-|это)?\s*(?:злой|злая|мафия|т[её]мный|т[её]мная|тьма)|(?<![\p{L}\p{N}_])я\s+на\s+(?:стороне\s+(?:зла|тьмы)|т[её]мной\s+стороне)|(?<![\p{L}\p{N}_])(?:я\s+)?играю\s+за\s+(?:зло|тьму)|(?<![\p{L}\p{N}_])я\s+за\s+(?:зло|тьму)|我(?:是|屬於|属于)(?:邪[惡恶]|黑方|[壞坏]人)|\b(?:yo\s+)?soy\s+(?:del mal|malvado|malvada)\b|tôi\s+(?:là|thuộc)\s+phe\s+[aá]c|\b(?:eu\s+)?sou\s+(?:do\s+mal|malvado|malvada)\b/giu;
 export function stripOwnEvilAdmission(speech: string) {
   return speech.replace(ownEvil, 'own public alignment');
 }
 function deniesAdmission(speech: string) {
-  return /\b(?:i am|i'm)\s+(?:good|innocent|not evil)\b|(?<![\p{L}\p{N}_])я\s*(?:—|-|это)?\s*(?:мирный|мирная|добрый|добрая|светлый|светлая|не\s+злой|не\s+мафия)|(?<![\p{L}\p{N}_])я\s+на\s+(?:стороне\s+(?:добра|света)|светлой\s+стороне)|(?<![\p{L}\p{N}_])(?:я\s+)?играю\s+за\s+(?:добро|свет)|(?<![\p{L}\p{N}_])я\s+за\s+(?:добро|свет)|我是(?:好人|正義)|\bsoy\s+(?:bueno|buena|inocente)\b|tôi\s+thuộc\s+phe\s+thiện/iu.test(
+  return /\b(?:i am|i'm)\s+(?:good|innocent|not evil)\b|(?<![\p{L}\p{N}_])я\s*(?:—|-|это)?\s*(?:мирный|мирная|добрый|добрая|светлый|светлая|не\s+злой|не\s+мафия)|(?<![\p{L}\p{N}_])я\s+на\s+(?:стороне\s+(?:добра|света)|светлой\s+стороне)|(?<![\p{L}\p{N}_])(?:я\s+)?играю\s+за\s+(?:добро|свет)|(?<![\p{L}\p{N}_])я\s+за\s+(?:добро|свет)|我是(?:好人|正[義义])|\bsoy\s+(?:bueno|buena|inocente)\b|tôi\s+thuộc\s+phe\s+thiện|\b(?:eu\s+)?sou\s+(?:do\s+bem|inocente|bom|boa)\b/iu.test(
     speech,
   );
 }

@@ -378,6 +378,11 @@ test('bot discussion defaults to the interface language and falls back to Englis
     ['zh_TW', 'zh-tw'],
     ['es', 'es'],
     ['vi', 'vi'],
+    ['pt', 'pt'],
+    ['zh-CN', 'zh-cn'],
+    ['zh_CN', 'zh-cn'],
+    ['zh-TW', 'zh-tw'],
+    ['fr', 'en'],
   ]) {
     const room = await fixture('components/view/board/modules/BotGameChoices.vue', {
       props: { roomID: 'bot-room', title: 'Host vs4Bots' },
@@ -595,6 +600,8 @@ test('native language selection sends the chosen language when creating an AI ro
       ['zh-tw', '繁體中文（台灣）'],
       ['es', 'Español'],
       ['vi', 'Tiếng Việt'],
+      ['pt', 'Português'],
+      ['zh-cn', '简体中文'],
     ],
   );
   assert.match(room.html, /<label[^>]*><span>Discussion language<\/span>\s*<select/);
@@ -701,6 +708,8 @@ test('room panel displays saved discussion languages and defaults legacy rooms t
     ['zh-tw', '繁體中文（台灣）'],
     ['es', 'Español'],
     ['vi', 'Tiếng Việt'],
+    ['pt', 'Português'],
+    ['zh-cn', '简体中文'],
   ]) {
     const room = await fixture('components/view/panels/AiRoomPanel.vue', {
       props: { roomID: 'room', ai: { model: 'codex-chatgpt', status: 'ready', language } },
@@ -756,6 +765,8 @@ test('lobby badges identify each saved AI room language and default legacy rooms
     ['zh-tw', '繁體中文（台灣）'],
     ['es', 'Español'],
     ['vi', 'Tiếng Việt'],
+    ['pt', 'Português'],
+    ['zh-cn', '简体中文'],
   ]) {
     const room = await fixture('pages/lobby/LobbyRoom.vue', {
       props: {
@@ -1678,7 +1689,7 @@ test('setup role and language choices include artwork in options and selected va
   assert.ok(language, 'language uses a select that supports flags');
   assert.deepEqual(
     language.props.items.map((item) => item.value),
-    ['en', 'ru', 'zh-tw', 'es', 'vi'],
+    ['en', 'ru', 'zh-tw', 'es', 'vi', 'pt', 'zh-cn'],
   );
   assert.ok(language.props.items.every((item) => item.flag.endsWith('.svg')));
   assert.match(room.html, /data-role-icon="unknown"/);

@@ -218,7 +218,7 @@ test('eight-player public speech normalizes references to Player 8 into seat num
   expect(room.chat.history.map((message) => message.message)).toEqual(['8, explain that vote.']);
 });
 
-test.each(['ru', 'zh-tw', 'es', 'vi'] as const)(
+test.each(['ru', 'zh-tw', 'es', 'vi', 'pt', 'zh-cn'] as const)(
   '%s room uses its saved language for every stage and public announcement',
   async (language) => {
     const requests: BotRequest[] = [];
@@ -241,6 +241,8 @@ test.each(['ru', 'zh-tw', 'es', 'vi'] as const)(
             'zh-tw': '我們來驗證這支隊伍。',
             es: 'Vamos a probar este equipo.',
             vi: 'Hãy thử đội này.',
+            pt: 'Vamos testar esta equipe.',
+            'zh-cn': '我们来验证这支队伍。',
           }[language],
         };
       },
@@ -249,7 +251,9 @@ test.each(['ru', 'zh-tw', 'es', 'vi'] as const)(
       language,
     );
     expect(room.ai?.message).toMatch(
-      { ru: /рус/iu, 'zh-tw': /繁體中文/u, es: /español/u, vi: /tiếng Việt/u }[language],
+      { ru: /рус/iu, 'zh-tw': /繁體中文/u, es: /español/u, vi: /tiếng Việt/u, pt: /português/u, 'zh-cn': /简体中文/u }[
+        language
+      ],
     );
     await room.run();
     expect(room.ai?.status).toBe('finished');

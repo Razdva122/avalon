@@ -49,13 +49,13 @@ test.each([
   { difficulty: 'custom', language: 'ru' },
   { difficulty: 'smart', language: 'ru', model: 'gpt-6.1-sol' },
   { difficulty: 'smart', language: 'ru', playerCount: 9 },
-  { difficulty: 'regular', language: 'zh-cn' },
+  { difficulty: 'regular', language: 'zh-hk' },
   null,
 ])('rejects malformed or customized public bot creation %#', (options) => {
   expect(validPacket('startHumanAiRoom', ['room', options, () => {}])).toBe(false);
 });
 
-test.each(['en', 'ru', 'zh-tw', 'es', 'vi'])(
+test.each(['en', 'ru', 'zh-tw', 'es', 'vi', 'pt', 'zh-cn'])(
   'accepts AI creation options with %s and an acknowledgement',
   (language) => {
     expect(validPacket('createAiRoom', [{ model: 'codex-chatgpt', language }, () => {}])).toBe(true);
@@ -63,7 +63,7 @@ test.each(['en', 'ru', 'zh-tw', 'es', 'vi'])(
 );
 
 test.each([5, 6, 7, 8])('accepts %i AI players in every discussion language', (playerCount) => {
-  for (const language of ['en', 'ru', 'zh-tw', 'es', 'vi'])
+  for (const language of ['en', 'ru', 'zh-tw', 'es', 'vi', 'pt', 'zh-cn'])
     expect(validPacket('createAiRoom', [{ model: 'codex-chatgpt', language, playerCount }, () => {}])).toBe(true);
 });
 
@@ -92,7 +92,7 @@ test.each([
   { model: '', language: 'ru' },
   { model: 'a'.repeat(255), language: 'ru' },
   { model: { $ne: null }, language: 'ru' },
-  { model: 'codex-chatgpt', language: 'zh-cn' },
+  { model: 'codex-chatgpt', language: 'zh-hk' },
   { model: 'codex-chatgpt', language: ['ru'] },
   { model: 'codex-chatgpt', language: 'ru', extra: true },
   Object.assign(Object.create({ language: 'ru' }), { model: 'codex-chatgpt' }),
@@ -179,7 +179,7 @@ test('unified bot setup passes packet validation for all supported modes and siz
   for (const difficulty of ['regular', 'smart'])
     for (const withFriend of [false, true])
       for (const playerCount of [5, 6, 7, 8])
-        for (const language of ['en', 'ru', 'zh-tw', 'es', 'vi'])
+        for (const language of ['en', 'ru', 'zh-tw', 'es', 'vi', 'pt', 'zh-cn'])
           expect(
             validPacket('createHumanAiRoom', [
               { beginner: false, withFriend, difficulty, language, playerCount },
@@ -223,7 +223,7 @@ test('solo and beginner setup cannot reserve friends', () => {
   expect(validPacket('createHumanAiRoom', [{ beginner: true, withFriend: true, humanSeats: 3 }, () => {}])).toBe(false);
 });
 
-test.each(['es', 'vi'])('accepts %s for public AI launch packets', (language) => {
+test.each(['es', 'vi', 'pt', 'zh-cn'])('accepts %s for public AI launch packets', (language) => {
   expect(validPacket('startHumanAiRoom', ['room', { difficulty: 'regular', language }, () => {}])).toBe(true);
 });
 

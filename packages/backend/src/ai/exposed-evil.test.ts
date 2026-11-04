@@ -164,6 +164,9 @@ test('own-side admission still blocks specific roles, allies and private strateg
 });
 
 test.each([
+  'Sou do Mal.',
+  'Eu sou do Mal.',
+  '我是邪恶方。',
   'Да, я на стороне зла.',
   'Я на стороне тьмы.',
   'Я тёмный.',
@@ -215,7 +218,7 @@ test('a publicly admitted actor cannot return to claiming Good', async () => {
   await expect(decide(request())).rejects.toThrow();
 });
 
-test.each(['Я злой Мордред.', 'I am evil Morgana.'])(
+test.each(['Sou do mal e Morgana.', 'Я злой Мордред.', 'I am evil Morgana.'])(
   'alignment admission does not permit specific-role disclosure: %s',
   (line) => {
     expect(() => guard(line, '', 'ru', false, true)).toThrow();
@@ -227,7 +230,7 @@ test('an accusation containing меня is not a first-person admission', () => 
   expect(guard(line, '', 'ru')).toBe(line);
 });
 
-test.each(['Я за добро.', 'Я на стороне добра.', 'Я играю за добро.'])(
+test.each(['Sou do Bem.', '我是正义方。', 'Я за добро.', 'Я на стороне добра.', 'Я играю за добро.'])(
   'a public admission cannot be retracted using natural alignment words: %s',
   async (line) => {
     let turn = 0;

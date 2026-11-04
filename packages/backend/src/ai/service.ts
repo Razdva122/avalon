@@ -1,3 +1,4 @@
+import { isAiLanguage } from '@avalon/types/room/ai-language';
 import { configuredCodexInstances, withCodexInstance, type CodexInstance } from './codex-instances';
 import { BeginnerAnalysis, buildBeginnerAnalysis, beginnerAnalysisSettings } from './beginner-analysis';
 import { aiHumanRoles, aiPlayedModel, aiRosterInfo, lobbyAiSizes } from '@avalon/types';
@@ -990,7 +991,7 @@ export class AiService {
             options.humanSeats >= (options.playerCount ?? 5))) ||
         (options.beginner && options.withFriend === true) ||
         (options.difficulty !== undefined && !['regular', 'smart'].includes(options.difficulty)) ||
-        (options.language !== undefined && !['en', 'ru', 'zh-tw', 'es', 'vi'].includes(options.language)) ||
+        (options.language !== undefined && !isAiLanguage(options.language)) ||
         (options.playerCount !== undefined && ![5, 6, 7, 8].includes(options.playerCount)) ||
         (options.beginner && options.playerCount !== undefined && options.playerCount !== 5)
       )
@@ -1071,7 +1072,7 @@ export class AiService {
           Object.keys(options).some((key) => !['difficulty', 'language', 'playerCount'].includes(key)) ||
           (options.playerCount !== undefined && ![5, 6, 7, 8].includes(options.playerCount)) ||
           !['smart', 'regular'].includes(options.difficulty) ||
-          !['en', 'ru', 'zh-tw', 'es', 'vi'].includes(options.language)
+          !isAiLanguage(options.language)
         )
           return cb({ error: 'Invalid bot mode or language' });
         if (room.ai!.withFriend && room.humanIDs.length !== (room.ai!.humanSeats ?? 2))
@@ -1225,8 +1226,7 @@ export class AiService {
         else {
           if (!options || typeof options !== 'object' || Array.isArray(options) || typeof options.model !== 'string')
             return cb({ error: 'Invalid AI model' });
-          if (!['en', 'ru', 'zh-tw', 'es', 'vi'].includes(options.language))
-            return cb({ error: 'Invalid AI language' });
+          if (!isAiLanguage(options.language)) return cb({ error: 'Invalid AI language' });
           if (Object.prototype.hasOwnProperty.call(options, 'playerCount')) {
             if (typeof options.playerCount !== 'number' || ![5, 6, 7, 8].includes(options.playerCount))
               return cb({ error: 'Invalid AI player count' });

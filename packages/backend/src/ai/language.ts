@@ -3,6 +3,8 @@ import type { AiLanguage } from '@avalon/types';
 export function languageInstruction(language: AiLanguage = 'en'): string {
   const instruction = {
     en: 'Speak ENGLISH ONLY.',
+    pt: 'Speak PORTUGUESE ONLY, using natural Portuguese phrasing and correct accents.',
+    'zh-cn': 'Speak SIMPLIFIED CHINESE ONLY (zh-CN), using Simplified characters, never Traditional Chinese.',
     es: 'Speak SPANISH ONLY, using natural Spanish phrasing.',
     vi: 'Speak VIETNAMESE ONLY, using natural Vietnamese phrasing and correct diacritics.',
     ru: 'Speak RUSSIAN ONLY, using natural Russian phrasing.',
@@ -116,6 +118,56 @@ const texts = {
     neutralReject: 'Tôi cần bằng chứng thuyết phục hơn trước khi ủng hộ đội này.',
     neutralApprove: 'Tôi muốn thử đội này và đánh giá kết quả.',
     neutralProposal: 'Đây là đội tôi muốn thử trong nhiệm vụ.',
+  },
+  pt: {
+    thinking: 'Os bots estão pensando na próxima ação.',
+    waitingForHuman: 'Aguardando a ação do jogador humano. Use os controles do tabuleiro e o chat.',
+    waitingForDiscussion: 'É sua vez de falar. Envie uma mensagem no chat ou passe a vez.',
+    ready: 'Jogadores de IA prontos · Discussão em português',
+    pauseExpired: 'Partida encerrada: a pausa durou 15 minutos. Crie uma nova partida para jogar novamente.',
+    postGamePrefix: 'Após a partida: ',
+    councilPrefix: 'Conselho do Mal (revelado): ',
+    vote: (choice: string) => `Voto ${choice === 'approve' ? 'a favor' : 'contra'}.`,
+    proposal: (team: string) => `Proponho a equipe ${team}.`,
+    inspection: (seat: string, good: boolean) => `Verifiquei ${seat} e anuncio: ${good ? 'Bem' : 'Mal'}.`,
+    inspectionResponse: (inspector: string, good: boolean) =>
+      good
+        ? `Sou do Bem, então ${inspector} anunciou meu alinhamento corretamente. Isso por si só não prova que ${inspector} é do Bem.`
+        : `Sou do Bem. ${inspector} está mentindo sobre minha verificação; acuso ${inspector} de ser do Mal.`,
+    council: (target: string, reason: string) => `Conselho do Mal: alvo ${target}. ${reason}`,
+    percivalClaim: (target: number) => `Sou Percival. ${target} é Morgana. Incluam-me nas missões e excluam ${target}.`,
+    percivalStance: (target: number, stance: 'trust' | 'distrust') =>
+      `${stance === 'trust' ? 'Confio' : 'Não confio'} na afirmação de ${target} de ser Percival.`,
+    failedMission: (mission: number, fails: number, targets: (number | undefined)[]) =>
+      `Sou do Bem. A missão ${mission} teve ${fails} cartas de fracasso; ${targets.join(' e ')} nos traíram. Rejeito equipes com eles.`,
+    neutralReject: 'Preciso de provas mais fortes antes de apoiar esta equipe.',
+    neutralApprove: 'Quero testar esta equipe e avaliar o resultado.',
+    neutralProposal: 'Esta é a equipe que quero testar na missão.',
+  },
+  'zh-cn': {
+    thinking: '机器人正在思考下一步行动。',
+    waitingForHuman: '等待真人玩家行动。请使用游戏面板和聊天室。',
+    waitingForDiscussion: '轮到你发言。请在聊天室发言或跳过。',
+    ready: 'AI 玩家已就绪 · 简体中文讨论',
+    pauseExpired: '对局已停止：暂停已达 15 分钟。请创建新对局以继续游戏。',
+    postGamePrefix: '赛后回顾：',
+    councilPrefix: '邪恶阵营密谈（公开）：',
+    vote: (choice: string) => `我投${choice === 'approve' ? '赞成' : '反对'}票。`,
+    proposal: (team: string) => `我提议队伍 ${team}。`,
+    inspection: (seat: string, good: boolean) => `我查验了 ${seat}，宣布：${good ? '正义' : '邪恶'}。`,
+    inspectionResponse: (inspector: string, good: boolean) =>
+      good
+        ? `我是正义方，所以 ${inspector} 正确公布了我的阵营。这本身并不能证明 ${inspector} 是正义方。`
+        : `我是正义方。${inspector} 对我的查验结果说谎；我指控 ${inspector} 是邪恶方。`,
+    council: (target: string, reason: string) => `邪恶阵营会议：目标 ${target}。${reason}`,
+    percivalClaim: (target: number) => `我是派西维尔。${target} 是莫甘娜。请让我参加任务，排除 ${target}。`,
+    percivalStance: (target: number, stance: 'trust' | 'distrust') =>
+      `我${stance === 'trust' ? '' : '不'}相信 ${target} 的派西维尔声明。`,
+    failedMission: (mission: number, fails: number, targets: (number | undefined)[]) =>
+      `我是正义方。第 ${mission} 次任务有 ${fails} 张失败卡；${targets.join(' 和 ')} 背叛了我们。我反对包含他们的队伍。`,
+    neutralReject: '我需要更充分的理由才会支持这支队伍。',
+    neutralApprove: '我想测试这支队伍，再评估结果。',
+    neutralProposal: '这是我想在任务中测试的队伍。',
   },
   'zh-tw': {
     thinking: '機器人正在思考下一步行動。',

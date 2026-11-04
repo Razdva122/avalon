@@ -270,15 +270,19 @@ const selectedMode = ref<'regular' | 'beginner'>(props.beginner ? 'beginner' : '
 const withFriend = ref(Boolean(props.withFriend));
 const humanSeats = ref(2);
 const language = ref<AiLanguage>(
-  locale.value === 'es'
-    ? 'es'
-    : locale.value === 'vi'
-      ? 'vi'
-      : locale.value === 'ru'
-        ? 'ru'
-        : /^zh[-_]tw$/i.test(locale.value)
-          ? 'zh-tw'
-          : 'en',
+  locale.value === 'pt'
+    ? 'pt'
+    : locale.value === 'es'
+      ? 'es'
+      : locale.value === 'vi'
+        ? 'vi'
+        : locale.value === 'ru'
+          ? 'ru'
+          : /^zh[-_]tw$/i.test(locale.value)
+            ? 'zh-tw'
+            : /^zh[-_]cn$/i.test(locale.value)
+              ? 'zh-cn'
+              : 'en',
 );
 const playerCount = ref<AiPlayerCount>(5);
 const availablePlayerCounts = computed<AiPlayerCount[]>(() => (selectedMode.value === 'beginner' ? [5] : [5, 6, 7, 8]));
@@ -302,6 +306,8 @@ const languageChoices = [
   { value: 'zh-tw', title: '繁體中文（台灣）', flag: '/flags/zh-tw.svg' },
   { value: 'es', title: 'Español', flag: '/flags/es.svg' },
   { value: 'vi', title: 'Tiếng Việt', flag: '/flags/vi.svg' },
+  { value: 'pt', title: 'Português', flag: '/flags/pt.svg' },
+  { value: 'zh-cn', title: '简体中文', flag: '/flags/zh-cn.svg' },
 ];
 watch([playerCount, withFriend], () => {
   humanSeats.value = Math.min(humanSeats.value, playerCount.value - 1);
