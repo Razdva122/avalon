@@ -140,6 +140,24 @@ test('AI room summaries preserve selected language and default older archives to
   ]);
 });
 
+test('only a durably stored terminal snapshot is safe to release', async () => {
+  const db = client.db('terminal-ai-replay');
+  const repo = new AiRepository(db);
+  const replays = db.collection<{ _id: string; state: Record<string, unknown> }>('ai_room_replays');
+  await replays.insertOne({
+    _id: 'room',
+    state: { roomID: 'room', game: { stage: 'end' }, ai: { status: 'running' } },
+  });
+
+  expect(await repo.load('room')).toMatchObject({ ai: { status: 'stopped' } });
+  expect(await repo.hasTerminalReplay('room', 'stopped')).toBe(false);
+
+  await replays.updateOne({ _id: 'room' }, { $set: { 'state.ai.status': 'stopped' } });
+  expect(await repo.hasTerminalReplay('room', 'stopped')).toBe(true);
+  expect(await repo.hasTerminalReplay('room', 'finished')).toBe(false);
+  expect(await repo.hasTerminalReplay('missing', 'finished')).toBe(false);
+});
+
 test('lobby summaries skip stopped archives before limiting without deleting their replays', async () => {
   const db = client.db('summary-stopped');
   const collection = db.collection<{ _id: string; state: Record<string, unknown> }>('ai_room_replays');

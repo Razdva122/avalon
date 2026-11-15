@@ -37,6 +37,9 @@ import { installSessionChecks, revokeUserSockets } from '@/user/sessions';
 import { AchievementManager } from '@/achievements';
 import { AvatarsManager } from '@/user/avatars';
 
+const roomRetentionMs = 30 * 60000;
+const roomCleanupRetryMs = 60000;
+
 export class Manager {
   voice: VoiceService;
   aiService: AiService;
@@ -82,7 +85,7 @@ export class Manager {
         this.destroyRoom(uuid);
       }
     };
-    const timer = setTimeout(expire, 30 * 60000);
+    const timer = setTimeout(expire, roomRetentionMs);
     timer.unref();
     this.roomTimers.set(uuid, timer);
   }
@@ -94,9 +97,13 @@ export class Manager {
       return;
     }
 
-    if (room.ai) {
-      clearTimeout(this.roomTimers.get(room.roomID));
-      this.roomTimers.delete(room.roomID);
+    if (room.ai && !removeRoom) {
+      if (room.ai.status === 'finished' || room.ai.status === 'stopped') {
+        if (!this.roomTimers.has(room.roomID)) this.scheduleAiRoomExpiry(room, roomRetentionMs);
+      } else {
+        clearTimeout(this.roomTimers.get(room.roomID));
+        this.roomTimers.delete(room.roomID);
+      }
     }
 
     if (removeRoom || room.ai?.status === 'stopped') {
@@ -199,8 +206,43 @@ export class Manager {
     }
   }
 
+  private scheduleAiRoomExpiry(room: Room, delay: number) {
+    const id = room.roomID;
+    const expire = async () => {
+      if (this.roomTimers.get(id) !== timer) return;
+      const status = room.ai?.status;
+      if (this.rooms[id] !== room || (status !== 'finished' && status !== 'stopped')) {
+        this.roomTimers.delete(id);
+        return;
+      }
+
+      if (room.data.stage === 'started') {
+        try {
+          const archive = this.aiService.archiveRepository;
+          if (!archive) throw Error('AI archive unavailable');
+          const saved = await archive.hasTerminalReplay(id, status);
+          if (this.roomTimers.get(id) !== timer || this.rooms[id] !== room) return;
+          // The final checkpoint may have failed even if an earlier replay was saved.
+          if (!saved) await archive.save(room.calculateRoomState());
+        } catch {
+          if (this.roomTimers.get(id) === timer) this.scheduleAiRoomExpiry(room, roomCleanupRetryMs);
+          return;
+        }
+      }
+
+      if (this.roomTimers.get(id) === timer && this.rooms[id] === room) this.releaseRoom(id);
+    };
+    const timer = setTimeout(() => void expire(), delay);
+    timer.unref();
+    this.roomTimers.set(id, timer);
+  }
+
   destroyRoom(uuid: string) {
     if (this.rooms[uuid]?.ai) return;
+    this.releaseRoom(uuid);
+  }
+
+  private releaseRoom(uuid: string) {
     clearTimeout(this.roomTimers.get(uuid));
     this.roomTimers.delete(uuid);
     const room = this.rooms[uuid];
@@ -212,8 +254,8 @@ export class Manager {
     // Releasing a completed room must not remove its saved game from the lobby.
     const completed = room?.data.stage === 'started' && room.data.manager.game.stage === 'end';
     if (!completed) this.updateRoomsList(uuid, true);
-    this.io.to(roomChannel(uuid)).emit('destroyRoom', uuid);
     delete this.rooms[uuid];
+    this.io.to(roomChannel(uuid)).emit('destroyRoom', uuid);
   }
 
   async saveRoomToDB(room: Room) {
@@ -284,7 +326,7 @@ export class Manager {
       if (!room || room.ai) return;
       // Give players a full conversation window after the game, regardless of its duration.
       clearTimeout(this.roomTimers.get(roomID));
-      const timer = setTimeout(() => this.destroyRoom(roomID), 30 * 60000);
+      const timer = setTimeout(() => this.destroyRoom(roomID), roomRetentionMs);
       timer.unref();
       this.roomTimers.set(roomID, timer);
     });
@@ -361,7 +403,8 @@ export class Manager {
           if (current) cb(publicRoomState(current.calculateRoomState(userState.userID)));
           else {
             // A post-game room may expire while its durable history is loading.
-            const archived = await this.dbManager.getRoomFromDB(uuid);
+            const archived =
+              (await this.dbManager.getRoomFromDB(uuid)) || (await this.aiService.archiveRepository?.load(uuid));
             if (archived) {
               const chat = await this.chatService.history(uuid, archived.chat);
               cb(publicRoomState({ ...archived, chat, archived: true }));

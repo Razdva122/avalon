@@ -780,6 +780,13 @@ export class AiRepository {
     }
     return state;
   }
+  async hasTerminalReplay(id: string, status: 'finished' | 'stopped') {
+    validateID(id);
+    return !!(await this.db
+      .collection<{ _id: string; state: StartedRoomState }>('ai_room_replays')
+      .findOne({ _id: id, 'state.game.stage': 'end', 'state.ai.status': status }, { projection: { _id: 1 } }));
+  }
+
   async load(id: string) {
     validateID(id);
     const doc = await this.db
