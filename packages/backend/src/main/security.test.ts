@@ -3,6 +3,7 @@ import { eventBus } from '@/helpers';
 import type { Server, ServerSocket, StartedRoomState } from '@avalon/types';
 import type { DBManager } from '@/db';
 import { BotRoom } from '@/ai/room';
+import { Room } from '@/room';
 
 test.each(['created', 'locked', 'started'] as const)('host can transfer ownership in a %s room', (stage) => {
   const { manager, handlers, broadcasts } = fixture(true);
@@ -166,7 +167,7 @@ function fixture(auth = false) {
   };
   const db = {
     getLastRooms: async () => [],
-    getRoomFromDB: async () => ({ roomID: 'archive', stage: 'started' }),
+    getRoomFromDB: async (id: string) => (id === 'archive' ? { roomID: id, stage: 'started' } : null),
     getUserCompletedAchievements: async () => [],
   };
   const manager = new Manager(io as unknown as Server, db as unknown as DBManager);
@@ -398,6 +399,116 @@ test('ordinary game sockets admit only the mixed-room human, never bot identitie
   handlers.selectPlayer('mixed', game.players[0].userID);
   expect(game.players[0].features.isSelected).toBe(true);
   room.stop();
+});
+
+test('expiring a finished bot room frees a slot and keeps the replay available', async () => {
+  const { manager, handlers, broadcasts } = fixture(true);
+  await Promise.resolve();
+  const room = new BotRoom('finished-bot', 'bob', manager.io, async () => ({ choice: 0, speech: '' }));
+  manager.rooms[room.roomID] = room;
+  Room.prototype.startGame.call(room);
+  if (room.data.stage !== 'started') throw Error('game did not start');
+  room.data.manager.game.endGame('rejectedVote');
+  room.ai!.status = 'finished';
+  const snapshot = structuredClone(room.calculateRoomState());
+  const load = jest.fn(async () => structuredClone(snapshot));
+  Object.assign(manager.aiService, { archiveRepository: { load, hasTerminalReplay: async () => true } });
+
+  for (let i = 0; i < 499; i++) manager.rooms[`active-${i}`] = { leaderID: 'bob' } as Room;
+  manager.updateRoomsList(room);
+  expect(() => manager.createRoom('new', 'alice', ['alice'])).toThrow('roomLimit');
+  await jest.advanceTimersByTimeAsync(30 * 60000 - 1);
+  expect(manager.rooms[room.roomID]).toBe(room);
+
+  // Join starts against the live room but the chat lookup finishes after expiry.
+  let resumeJoin!: (chat: []) => void;
+  jest.spyOn(manager.chatService, 'history').mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        resumeJoin = resolve;
+      }),
+  );
+  const joiningReplay = jest.fn();
+  const joining = handlers.joinRoom(room.roomID, joiningReplay);
+  await Promise.resolve();
+
+  await jest.advanceTimersByTimeAsync(1);
+  expect(manager.rooms[room.roomID]).toBeUndefined();
+  resumeJoin([]);
+  await joining;
+  expect(joiningReplay).toHaveBeenCalledWith(expect.objectContaining({ roomID: room.roomID, archived: true }));
+  expect(broadcasts).toContainEqual({ channel: 'room:finished-bot', event: 'destroyRoom', value: 'finished-bot' });
+  expect(manager.roomListCutted).toContainEqual(expect.objectContaining({ uuid: room.roomID, aiStatus: 'finished' }));
+  const created = jest.fn();
+  handlers.createRoom(created);
+  expect(manager.rooms[created.mock.calls[0][0]]).toBeDefined();
+
+  const replay = jest.fn();
+  await handlers.joinRoom(room.roomID, replay);
+  expect(replay).toHaveBeenCalledWith(
+    expect.objectContaining({
+      roomID: room.roomID,
+      archived: true,
+      ai: expect.objectContaining({ status: 'finished' }),
+      game: expect.objectContaining({ stage: 'end', result: expect.objectContaining({ reason: 'rejectedVote' }) }),
+    }),
+  );
+});
+
+test('AI expiry retries a failed final replay write before releasing the room', async () => {
+  const { manager, handlers } = fixture();
+  const room = new BotRoom('stopped-bot', 'owner', manager.io, async () => ({ choice: 0, speech: '' }));
+  manager.rooms[room.roomID] = room;
+  Room.prototype.startGame.call(room);
+  let saved = structuredClone(room.calculateRoomState());
+  const save = jest
+    .fn(async (state) => {
+      saved = structuredClone(state);
+    })
+    .mockRejectedValueOnce(new Error('database unavailable'));
+  Object.assign(manager.aiService, {
+    archiveRepository: {
+      load: async () => structuredClone(saved),
+      hasTerminalReplay: async () => saved.ai?.status === 'stopped',
+      save,
+    },
+  });
+  room.stop();
+  manager.updateRoomsList(room);
+
+  await jest.advanceTimersByTimeAsync(30 * 60000);
+  expect(save).toHaveBeenCalledTimes(1);
+  expect(manager.rooms[room.roomID]).toBe(room);
+
+  await jest.advanceTimersByTimeAsync(60000);
+  expect(save).toHaveBeenCalledTimes(2);
+  expect(manager.rooms[room.roomID]).toBeUndefined();
+  const replay = jest.fn();
+  await handlers.joinRoom(room.roomID, replay);
+  expect(replay).toHaveBeenCalledWith(
+    expect.objectContaining({
+      archived: true,
+      ai: expect.objectContaining({ status: 'stopped' }),
+      game: expect.objectContaining({ stage: 'end', result: expect.objectContaining({ reason: 'manualy' }) }),
+    }),
+  );
+});
+
+test('stopped AI drafts expire without affecting active AI rooms', async () => {
+  const { manager } = fixture();
+  const decide = async () => ({ choice: 0, speech: '' });
+  const draft = new BotRoom('draft', 'owner', manager.io, decide);
+  const active = new BotRoom('active', 'owner', manager.io, decide);
+  manager.rooms.draft = draft;
+  manager.rooms.active = active;
+  draft.stop();
+  active.ai!.status = 'running';
+  manager.updateRoomsList(draft);
+  manager.updateRoomsList(active);
+
+  await jest.advanceTimersByTimeAsync(30 * 60000);
+  expect(manager.rooms.draft).toBeUndefined();
+  expect(manager.rooms.active).toBe(active);
 });
 
 test('adopting a lobby as an AI room clears its ordinary expiry timer without destroying voice', () => {
