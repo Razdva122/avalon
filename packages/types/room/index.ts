@@ -37,6 +37,7 @@ export class VoteInRoom {
 
 export type CodexSettings = { model: string; reasoning: string };
 export type CodexModelOption = { id: string; label: string; efforts: string[] };
+export type AiBotGameCapacity = 1 | 2 | 3;
 
 /** Admin-only operational view. Never includes instance environment or credentials. */
 export type AiBotInstanceStatus = {
@@ -44,7 +45,7 @@ export type AiBotInstanceStatus = {
   status: 'free' | 'busy' | 'unavailable';
   quota: CodexWeeklyLimit | null;
   modes: Record<AiBotMode, boolean>;
-  maxGames?: 1 | 2;
+  maxGames?: AiBotGameCapacity;
   rooms?: { roomID: string; room?: AiBotInstanceStatus['room'] }[];
   roomID?: string;
   room?: {

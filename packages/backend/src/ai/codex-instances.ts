@@ -1,7 +1,8 @@
 import { AsyncLocalStorage } from 'async_hooks';
 import { isAbsolute, resolve } from 'path';
+import type { AiBotGameCapacity } from '@avalon/types';
 
-export type CodexInstance = { id: string; environment: NodeJS.ProcessEnv; maxGames?: 1 | 2 };
+export type CodexInstance = { id: string; environment: NodeJS.ProcessEnv; maxGames?: AiBotGameCapacity };
 const context = new AsyncLocalStorage<CodexInstance>();
 const connectionKeys = [
   'AI_CODEX_HOME',
@@ -46,7 +47,7 @@ export function configuredCodexInstances(): CodexInstance[] {
     const entry = value as { id?: unknown; home?: unknown; ssh?: unknown; maxGames?: unknown };
     if (
       Object.keys(entry).some((key) => !['id', 'home', 'ssh', 'maxGames'].includes(key)) ||
-      (entry.maxGames !== undefined && entry.maxGames !== 1 && entry.maxGames !== 2) ||
+      (entry.maxGames !== undefined && entry.maxGames !== 1 && entry.maxGames !== 2 && entry.maxGames !== 3) ||
       typeof entry.id !== 'string' ||
       !/^[a-zA-Z0-9][a-zA-Z0-9-]{0,63}$/.test(entry.id) ||
       entry.id === 'default' ||
@@ -91,7 +92,7 @@ export function configuredCodexInstances(): CodexInstance[] {
     return {
       id: entry.id,
       environment,
-      ...(entry.maxGames !== undefined ? { maxGames: entry.maxGames as 1 | 2 } : {}),
+      ...(entry.maxGames !== undefined ? { maxGames: entry.maxGames } : {}),
     };
   });
 }

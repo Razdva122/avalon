@@ -486,31 +486,36 @@ test('independent instance leases allow one concurrent match each and scope stal
   await expect(claim('four', 'second')).rejects.toThrow();
 });
 
-test('two account slots are atomic across backends and release preserves the other owner', async () => {
-  const db = client.db('two-game-slots');
-  const repo = new AiRepository(db);
-  const peer = new AiRepository(db);
-  const results = await Promise.allSettled([
-    repo.claim('one', 'shared', 2),
-    peer.claim('two', 'shared', 2),
-    peer.claim('three', 'shared', 2),
-  ]);
-  expect(results.filter((result) => result.status === 'fulfilled')).toHaveLength(2);
-  const busy = await peer.busyInstances();
-  expect(busy).toHaveLength(2);
-  expect(busy.every((lease) => lease.instanceID === 'shared')).toBe(true);
-  await expect(peer.claim('overflow', 'shared', 2)).rejects.toThrow();
-  await repo.release(busy[0].roomID);
-  // Re-claiming the surviving room must renew its slot, never consume the freed one.
-  await peer.claim(busy[1].roomID, 'shared', 2);
-  expect(await repo.busyInstances()).toHaveLength(1);
-  await peer.claim('replacement', 'shared', 2);
-  await repo.release(busy[0].roomID);
-  await expect(repo.renewLease(busy[0].roomID)).rejects.toThrow();
-  await repo.renewLease(busy[1].roomID);
-  await repo.renewLease('replacement');
-  expect(await repo.busyInstances()).toHaveLength(2);
-});
+test.each([2, 3] as const)(
+  '%i account slots are atomic across backends and preserve other owners on release',
+  async (capacity) => {
+    const db = client.db(`game-slots-${capacity}`);
+    const repo = new AiRepository(db);
+    const peer = new AiRepository(db);
+    const contenders = Array.from({ length: capacity + 1 }, (_, index) => `room-${index}`);
+    const results = await Promise.allSettled(
+      contenders.map((roomID, index) => (index % 2 ? peer : repo).claim(roomID, 'shared', capacity)),
+    );
+    expect(results.filter((result) => result.status === 'fulfilled')).toHaveLength(capacity);
+    const busy = await peer.busyInstances();
+    expect(busy).toHaveLength(capacity);
+    expect(new Set(busy.map(({ roomID }) => roomID)).size).toBe(capacity);
+    expect(busy.every((lease) => lease.instanceID === 'shared')).toBe(true);
+    await expect(peer.claim('overflow', 'shared', capacity)).rejects.toThrow();
+    await repo.release(busy[0].roomID, 'shared');
+    // Re-claiming the surviving room must renew its slot, never consume the freed one.
+    for (const { roomID } of busy.slice(1)) {
+      await peer.claim(roomID, 'shared', capacity);
+      await repo.renewLease(roomID);
+    }
+    expect(await repo.busyInstances()).toHaveLength(capacity - 1);
+    await peer.claim('replacement', 'shared', capacity);
+    await repo.release(busy[0].roomID);
+    await expect(repo.renewLease(busy[0].roomID)).rejects.toThrow();
+    await repo.renewLease('replacement');
+    expect(await repo.busyInstances()).toHaveLength(capacity);
+  },
+);
 
 test('overlapping games retain exact token totals without double-counting shared account quota', async () => {
   const db = client.db('shared-account-accounting');

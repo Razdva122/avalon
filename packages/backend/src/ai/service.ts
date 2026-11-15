@@ -232,8 +232,8 @@ export class AiService {
   private claimInstance(roomID: string, instance = this.instanceFor(roomID)) {
     return instance.id === 'default'
       ? this.repository!.claim(roomID)
-      : instance.maxGames === 2
-        ? this.repository!.claim(roomID, instance.id, 2)
+      : instance.maxGames === 2 || instance.maxGames === 3
+        ? this.repository!.claim(roomID, instance.id, instance.maxGames)
         : this.repository!.claim(roomID, instance.id);
   }
   private async switchExhaustedInstance(roomID: string, failed: CodexInstance, signal?: AbortSignal) {

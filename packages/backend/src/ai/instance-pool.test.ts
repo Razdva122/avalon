@@ -104,32 +104,28 @@ async function until(check: () => Promise<boolean>) {
   throw Error('Expected asynchronous cleanup did not complete');
 }
 
-test('two games on one account reserve separately and the dashboard retains both live games', async () => {
-  process.env.AI_CODEX_INSTANCES = JSON.stringify([{ id: 'one', home: '/pool/one', maxGames: 2 }]);
-  const db = client.db(`two-games-${database++}`);
+test.each([2, 3])('%i games on one account reserve separately and appear on the dashboard', async (capacity) => {
+  process.env.AI_CODEX_INSTANCES = JSON.stringify([{ id: 'one', home: '/pool/one', maxGames: capacity }]);
+  const db = client.db(`games-${database++}`);
   const a = fixture(db);
   const b = fixture(db);
   const first = await a.create('first-human');
-  const second = await b.create('second-human');
-  expect(first.roomID).toBeDefined();
-  expect(second.roomID).toBeDefined();
+  const remote = [];
+  for (let i = 1; i < capacity; i++) remote.push(await b.create(`remote-human-${i}`));
+  const roomIDs = [first, ...remote].map(({ roomID }) => roomID);
+  expect(roomIDs).toEqual(Array(capacity).fill(expect.any(String)));
   expect((await a.create('overflow-human')).error).toBeDefined();
   expect(await a.service.repository!.busyInstances()).toEqual(
-    expect.arrayContaining([
-      { instanceID: 'one', roomID: first.roomID },
-      { instanceID: 'one', roomID: second.roomID },
-    ]),
+    expect.arrayContaining(roomIDs.map((roomID) => ({ instanceID: 'one', roomID }))),
   );
   let dashboard: any;
   await a.connect('admin-dashboard').getAiBotDashboard((value: any) => {
     dashboard = value;
   });
   expect(dashboard.instances).toHaveLength(1);
-  expect(dashboard.instances[0]).toMatchObject({ id: 'one', maxGames: 2, status: 'busy' });
-  expect(dashboard.instances[0].rooms.map((room: any) => room.roomID).sort()).toEqual(
-    [first.roomID, second.roomID].sort(),
-  );
-  await a.connect('first-human').controlAiRoom(first.roomID, 'stop', () => {});
+  expect(dashboard.instances[0]).toMatchObject({ id: 'one', maxGames: capacity, status: 'busy' });
+  expect(dashboard.instances[0].rooms.map((room: any) => room.roomID).sort()).toEqual([...roomIDs].sort());
+  await b.connect(`remote-human-${capacity - 1}`).controlAiRoom(roomIDs.at(-1), 'stop', () => {});
   await a.connect('admin-dashboard').getAiBotDashboard((value: any) => {
     dashboard = value;
   });

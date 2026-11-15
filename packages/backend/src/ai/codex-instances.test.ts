@@ -65,15 +65,17 @@ test('account game capacity is explicit and preserves a single quota identity', 
   process.env.AI_CODEX_INSTANCES = JSON.stringify([
     { id: 'one', home: '/one', maxGames: 2 },
     { id: 'two', home: '/two' },
+    { id: 'three', home: '/three', maxGames: 3 },
   ]);
   const instances = configuredCodexInstances();
   expect(instances.map(({ id, maxGames }) => ({ id, maxGames: maxGames ?? 1 }))).toEqual([
     { id: 'one', maxGames: 2 },
     { id: 'two', maxGames: 1 },
+    { id: 'three', maxGames: 3 },
   ]);
 });
 
-test.each([0, 3, -1, 1.5, '2', null])('invalid per-account game capacity fails closed: %s', (maxGames) => {
+test.each([0, 4, -1, 1.5, '3', null])('invalid per-account game capacity fails closed: %s', (maxGames) => {
   process.env.AI_CODEX_INSTANCES = JSON.stringify([{ id: 'one', home: '/one', maxGames }]);
   expect(() => configuredCodexInstances()).toThrow('Invalid AI_CODEX_INSTANCES');
 });

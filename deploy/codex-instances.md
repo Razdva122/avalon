@@ -1,19 +1,20 @@
 # Multiple ChatGPT instances
 
-The backend can run one or two AI matches per configured instance. `AI_CODEX_INSTANCES`
+The backend can run up to three AI matches per configured instance. `AI_CODEX_INSTANCES`
 is a JSON array in the backend environment (1–32 entries). Each instance must
 use a **distinct ChatGPT account**, with its own Codex authentication directory
 or SSH worker. No browser changes are required.
 
-Set optional `maxGames: 2` on an existing named entry to share that account across
-two games; omitted or `1` preserves the original capacity. Other values are rejected.
-For example, `{"id":"account-one","home":"/var/lib/codex-one","maxGames":2}`.
+Set `maxGames` to `2` or `3` on an existing named entry to choose the number of
+parallel games for that account. The default is `1`.
+For example, `{"id":"account-one","home":"/var/lib/codex-one","maxGames":3}`.
 Do not duplicate an account or SSH destination to create game slots. Quotas, caches,
 resets and usage identity stay account-scoped; each game has its own atomic MongoDB
-lease. The original lease document remains the first slot and `:slot2` is the second.
-Administrator status is free while a slot remains; its account card lists both rooms.
+lease. The original lease document remains the first slot, followed by `:slot2`
+and `:slot3`. The account card lists the occupied rooms and reports free status
+while a slot remains.
 For overlapping games, per-game quota percentages are unavailable and account sums
-are marked incomplete, since account snapshots include both games. Token totals
+are marked incomplete, since account snapshots include all concurrent games. Token totals
 remain exact from request audits.
 
 ## Local profiles
@@ -88,7 +89,7 @@ Explicit pool entries do not inherit legacy `AI_CODEX_HOME` / `CODEX_HOME` or
   applied. Do not revisit exhausted accounts during the same run. If none remain,
   retain the normal technical pause. Other technical errors do not switch accounts.
   A manual technical resume starts a new attempt without the new-game quota gate.
-- One game per account by default, or two with `maxGames: 2`.
+- One game per account by default. `maxGames` sets the number of game slots.
   If all eligible accounts are busy, reject a new reservation without a queue.
   The same participant returns to their existing game.
 - Emergency continuation leases appear in occupancy and the dashboard, renew
@@ -126,17 +127,22 @@ with a pool containing that same physical account, or rename/reassign instances
 while games are active. Restart only after active games and reviews have ended.
 Rolling back to legacy mode likewise requires draining/stopping the pool first.
 
-Before enabling two games, install the updated launcher on that account worker:
-two execution slots share **512 MiB RAM, one CPU and 256 tasks**, with no swap.
+Before enabling multiple games on an SSH worker, install the launcher with the
+shared request queue. Its two execution slots share **512 MiB RAM, one CPU and 256 tasks**,
+with no swap. Up to three games share those same two execution slots.
 Per-container ceilings are 512 MiB/one CPU/128 tasks. Queue admission is serialized
 under `worker-queue.lock`, with SSH heartbeats and cancellation while waiting;
 the queue deadline is 600 seconds. A decision keeps its separate 600-second deadline.
 The backend SSH deadline is 1,215 seconds. Queued calls are never model-turn retries.
-Metadata uses the same bounded queue. Install worker first, then backend, and only
-then set `maxGames: 2` after draining all games/reviews. Check parent cgroup limits
-and leave host headroom; increasing account capacity does not fix upstream HTTP 429.
-For rollback drain both slots before restoring the old backend/launcher or reducing
-capacity; preserve auth, lock files, account IDs and usage ledgers.
+Metadata uses the same bounded queue. After games and reviews have ended, set
+`maxGames: 3` on the desired entry in the backend's `AI_CODEX_INSTANCES` for a
+release that supports three slots. The setting takes effect when that release
+recreates the backend. Check parent cgroup limits and leave host headroom.
+For rollback, drain all slots and restore a compatible `maxGames` value before
+recreating an older backend. Preserve auth, lock files, account IDs and usage ledgers.
+Automatic image rollback keeps the current Compose configuration. If it restores
+an image older than three-slot support, restore the previous `maxGames` value and
+recreate the backend to bring the AI account pool back online.
 
 This change does not provision or authenticate additional accounts and does not
 modify production configuration automatically.

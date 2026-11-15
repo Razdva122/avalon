@@ -7,7 +7,7 @@ import type { StartedRoomState, TRoomState, TRoomInfo, PlayerGameSummaryPage, Bo
 import { canonicalBotQuotaThresholds, defaultBotQuotaThresholds, validBotQuotaThresholds } from './quota-policy';
 import { AiPause } from './client';
 import { quotaSpent, weeklyUsagePeriod, type WeeklyUsagePeriod } from './usage-stats';
-import type { AiGameUsage, AiAccountUsage, CodexWeeklyLimit, CodexSettings } from '@avalon/types';
+import type { AiGameUsage, AiAccountUsage, AiBotGameCapacity, CodexWeeklyLimit, CodexSettings } from '@avalon/types';
 
 type GameUsageRecord = Omit<
   AiGameUsage,
@@ -438,7 +438,10 @@ export class AiRepository {
     return instanceID === 'default' ? this.ledgerID : `${this.ledgerID}:${instanceID}`;
   }
   private get leaseFilter() {
-    return { $regex: `^${this.ledgerID}(?::[a-zA-Z0-9-]+)?(?::slot2|:overflow-[a-zA-Z0-9-]+)?$` };
+    return { $regex: `^${this.ledgerID}(?::[a-zA-Z0-9-]+)?(?::slot[23]|:overflow-[a-zA-Z0-9-]+)?$` };
+  }
+  private gameSlots(ledgerID: string) {
+    return [ledgerID, `${ledgerID}:slot2`, `${ledgerID}:slot3`];
   }
   async busyInstances(): Promise<{ instanceID: string; roomID: string }[]> {
     const leases = await this.ledger
@@ -449,12 +452,12 @@ export class AiRepository {
       roomID: lease.owner!,
     }));
   }
-  async claim(roomID: string, instanceID = 'default', maxGames: 1 | 2 = 1) {
+  async claim(roomID: string, instanceID = 'default', maxGames: AiBotGameCapacity = 1) {
     validateID(roomID);
-    if (![1, 2].includes(maxGames) || (instanceID === 'default' && maxGames !== 1))
+    if (![1, 2, 3].includes(maxGames) || (instanceID === 'default' && maxGames !== 1))
       throw new Error('Invalid AI account capacity');
     const ledgerID = this.instanceLedgerID(instanceID);
-    const slots = maxGames === 2 ? [ledgerID, `${ledgerID}:slot2`] : [ledgerID];
+    const slots = this.gameSlots(ledgerID).slice(0, maxGames);
     // Starting/resuming an already reserved room must retain its original slot.
     const existing = await this.ledger.findOneAndUpdate(
       { _id: { $in: [...slots, `${ledgerID}:overflow-${roomID}`] }, owner: roomID, leaseUntil: { $gt: new Date() } },
@@ -499,15 +502,7 @@ export class AiRepository {
         : `${this.instanceLedgerID(instanceID)}:overflow-${roomID}`;
     await this.ledger.deleteMany({ _id: overflow, owner: roomID });
     const filter =
-      instanceID === undefined
-        ? this.leaseFilter
-        : {
-            $in: [
-              this.instanceLedgerID(instanceID),
-              `${this.instanceLedgerID(instanceID)}:slot2`,
-              `${this.instanceLedgerID(instanceID)}:overflow-${roomID}`,
-            ],
-          };
+      instanceID === undefined ? this.leaseFilter : { $in: this.gameSlots(this.instanceLedgerID(instanceID)) };
     await this.ledger.updateMany({ _id: filter, owner: roomID }, { $unset: { owner: '', leaseUntil: '' } });
   }
   async renewLease(roomID: string) {
