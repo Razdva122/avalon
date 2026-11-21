@@ -1,6 +1,6 @@
 {
   "name": "avalon-monorepo",
-  "version": "75.12.5",
+  "version": "75.12.6",
   "description": "A monorepo for avalon",
   "private": true,
   "license": "MIT",
