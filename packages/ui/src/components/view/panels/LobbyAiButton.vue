@@ -39,7 +39,7 @@
               type="button"
               :data-lobby-ai-size="size.playerCount"
               :aria-pressed="playerCount === size.playerCount"
-              :aria-describedby="size.requiresPremium ? `premium-limit-${roomID}` : undefined"
+              :aria-describedby="size.requiresPremium && weeklyLargeGame ? `lobby-weekly-game-${roomID}` : undefined"
               :disabled="busy || size.requiresPremium"
               @click="playerCount = size.playerCount"
             >
@@ -53,14 +53,16 @@
               />
               <strong>{{ size.playerCount }}</strong>
               <span>{{ $t('aiArena.lobbyBotCount', { count: size.botCount }) }}</span>
-              <small v-if="size.requiresPremium">Premium</small>
             </button>
           </div>
         </fieldset>
-        <p v-if="sizes.some((size) => size.requiresPremium)" :id="`premium-limit-${roomID}`" class="premium-note">
-          <v-icon icon="workspace_premium" size="18" aria-hidden="true" />
-          <span>{{ $t('aiArena.lobbyPremiumLimit') }}</span>
-        </p>
+        <WeeklyBotGameNotice
+          v-if="showWeeklyGame"
+          :id="`lobby-weekly-game-${roomID}`"
+          :weekly="weeklyLargeGame"
+          :premium="premium"
+          lobby
+        />
         <section v-if="confirmedRoster" class="table-preview" :aria-label="$t('aiArena.setupTableRoles')">
           <div class="section-heading">
             <h3>{{ $t('aiArena.setupTableRoles') }}</h3>
@@ -165,10 +167,11 @@ import { useI18n } from 'vue-i18n';
 import { useMediaQuery } from '@vueuse/core';
 import { socket } from '@/api/socket';
 import { aiHumanRoles } from '@avalon/types/room/ai-roles';
-import { lobbyAiSizes } from '@avalon/types/room/lobby-ai';
-import type { AiLanguage, AiPlayerCount } from '@avalon/types';
+import { lobbyAiSizes, needsLargeBotGameAccess } from '@avalon/types/room/lobby-ai';
+import type { AiLanguage, AiPlayerCount, WeeklyLargeBotGame } from '@avalon/types';
 import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import AddonIcon from '@/components/view/information/AddonIcon.vue';
+import WeeklyBotGameNotice from './WeeklyBotGameNotice.vue';
 
 const props = defineProps<{ roomID: string; humanPlayerIDs: string[] }>();
 const { locale, t } = useI18n();
@@ -187,6 +190,7 @@ const open = ref(false);
 const busy = ref(false);
 const available = ref(false);
 const premium = ref(false);
+const weeklyLargeGame = ref<WeeklyLargeBotGame>();
 const confirmedRoster = ref<string[] | null>(null);
 const error = ref('');
 const playerCount = ref<AiPlayerCount>(5);
@@ -200,7 +204,12 @@ const language = ref<AiLanguage>(
         : 'en',
 );
 const rosterKey = (ids: string[]) => JSON.stringify([...ids].sort());
-const sizes = computed(() => lobbyAiSizes(props.humanPlayerIDs.length, premium.value));
+const sizes = computed(() =>
+  lobbyAiSizes(props.humanPlayerIDs.length, premium.value, (weeklyLargeGame.value?.remaining ?? 0) > 0),
+);
+const showWeeklyGame = computed(() =>
+  sizes.value.some((size) => needsLargeBotGameAccess(size.playerCount, props.humanPlayerIDs.length)),
+);
 const canOpen = computed(() => available.value && sizes.value.some((size) => !size.requiresPremium));
 const canLaunch = computed(
   () =>
@@ -232,6 +241,7 @@ async function refresh() {
     }
     available.value = access.available;
     premium.value = access.hostPremium;
+    weeklyLargeGame.value = access.weeklyLargeGame;
     if (rosterKey(access.humanPlayerIDs) !== roster) {
       confirmedRoster.value = null;
       return false;
@@ -272,8 +282,15 @@ async function launch() {
       humanPlayerIDs,
     });
     if (roomID !== props.roomID) return;
-    if ('error' in result) error.value = t('aiArena.botPlayError');
-    else open.value = false;
+    if ('error' in result) {
+      if (result.error === 'weeklyLargeGameUsed' && result.resetsAt !== undefined) {
+        weeklyLargeGame.value = result.weeklyLargeGame ?? {
+          limit: weeklyLargeGame.value?.limit ?? 1,
+          remaining: 0,
+          resetsAt: result.resetsAt,
+        };
+      } else error.value = t('aiArena.botPlayError');
+    } else open.value = false;
   } catch {
     error.value = t('aiArena.connectionError');
   } finally {
@@ -444,25 +461,7 @@ legend {
   top: 9px;
   right: 9px;
 }
-.size-options small {
-  font-size: 10px;
-  line-height: 1;
-  font-weight: 600;
-  color: var(--dialog-muted);
-}
-.premium-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  margin-top: 10px;
-  color: var(--dialog-muted);
-  font-size: 12px;
-  line-height: 1.5;
-}
-.premium-note .v-icon {
-  flex-shrink: 0;
-  margin-top: 1px;
-}
+
 .table-preview {
   margin-top: 22px;
 }

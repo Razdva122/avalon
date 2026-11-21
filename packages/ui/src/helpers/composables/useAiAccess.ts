@@ -1,5 +1,5 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
-import type { AiBotMode, ClientToServerEvents, CodexModelOption } from '@avalon/types';
+import type { AiBotMode, ClientToServerEvents, CodexModelOption, WeeklyLargeBotGame } from '@avalon/types';
 import { socket } from '@/api/socket';
 import { useStore } from '@/store';
 
@@ -11,6 +11,8 @@ export function useAiAccess() {
   const canManage = ref(false);
   const canPlay = ref(false);
   const canPlayLargeTables = ref(false);
+  const weeklyLargeGame = ref<WeeklyLargeBotGame>();
+  const largeTableAccess = computed(() => canPlayLargeTables.value || (weeklyLargeGame.value?.remaining ?? 0) > 0);
   const botsBusy = ref(false);
   const accessStatus = ref<'loading' | 'ready' | 'error'>('loading');
   const botModes = ref({ smart: false, regular: false, beginner: false });
@@ -43,6 +45,7 @@ export function useAiAccess() {
     canManage.value = false;
     canPlay.value = false;
     canPlayLargeTables.value = false;
+    weeklyLargeGame.value = undefined;
     botsBusy.value = false;
     botModes.value = { smart: false, regular: false, beginner: false };
     botModeAvailableAt.value = {};
@@ -56,6 +59,7 @@ export function useAiAccess() {
     canManage.value = access.canManage;
     canPlay.value = access.canPlay === true;
     canPlayLargeTables.value = access.canPlay === true && access.canPlayLargeTables === true;
+    weeklyLargeGame.value = access.canPlay ? access.weeklyLargeGame : undefined;
     botsBusy.value = access.canPlay === true && access.botsBusy === true;
     accessStatus.value = 'ready';
     botModes.value = access.canPlay
@@ -66,6 +70,11 @@ export function useAiAccess() {
     models.value = access.canManage ? access.models || [] : [];
     defaultModel.value = access.canManage ? access.defaultModel || '' : '';
     activeRoomID.value = access.canManage ? access.roomID : undefined;
+  }
+  function markWeeklyGameUsed(resetsAt: number, allowance?: WeeklyLargeBotGame) {
+    weeklyLargeGame.value = allowance ?? { limit: weeklyLargeGame.value?.limit ?? 1, remaining: 0, resetsAt };
+    if (latestAccess?.userID === store.state.profile?.id && latestAccess)
+      latestAccess.value = { ...latestAccess.value, weeklyLargeGame: weeklyLargeGame.value };
   }
   async function refresh() {
     now.value = Date.now();
@@ -145,6 +154,9 @@ export function useAiAccess() {
     canManage,
     canPlay,
     canPlayLargeTables,
+    weeklyLargeGame,
+    largeTableAccess,
+    markWeeklyGameUsed,
     botsBusy,
     accessStatus,
     botModes,

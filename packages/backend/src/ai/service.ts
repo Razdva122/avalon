@@ -1,10 +1,11 @@
 import { isAiLanguage } from '@avalon/types/room/ai-language';
 import { configuredCodexInstances, withCodexInstance, type CodexInstance } from './codex-instances';
 import { BeginnerAnalysis, buildBeginnerAnalysis, beginnerAnalysisSettings } from './beginner-analysis';
-import { aiHumanRoles, aiPlayedModel, aiRosterInfo, lobbyAiSizes } from '@avalon/types';
+import { aiHumanRoles, aiPlayedModel, aiRosterInfo, lobbyAiSizes, needsLargeBotGameAccess } from '@avalon/types';
 import type {
   ClientToServerEvents,
   AiBotDifficulty,
+  BotGameAdmissionError,
   AiBotInstanceStatus,
   BotQuotaThresholds,
   AiBotMode,
@@ -16,6 +17,7 @@ import type {
   ServerSocket,
   TRoomInfo,
 } from '@avalon/types';
+import { Room } from '@/room';
 import type { Manager } from '@/main';
 import { validPacket } from '@/security/validation';
 import { roomChannel } from '@/helpers/channels';
@@ -33,7 +35,14 @@ import { hasPremium } from '@/support/premium';
 import { supportTotalCents } from '@/support/repository';
 import { AI_PAUSE_TIMEOUT_MS } from './timing';
 import { aiText } from './language';
+import { largeBotGameAge, largeBotGameWeek, weeklyGameAllowance, WeeklyLargeGameUsed } from './weekly-large-game';
 import { canonicalBotQuotaThresholds, defaultBotQuotaThresholds, validBotQuotaThresholds } from './quota-policy';
+
+function botGameAdmissionError(error: unknown, fallback: string): BotGameAdmissionError {
+  if (error instanceof WeeklyLargeGameUsed)
+    return { error: error.message, resetsAt: error.allowance.resetsAt, weeklyLargeGame: error.allowance };
+  return { error: error instanceof AiPause ? error.message : fallback };
+}
 
 const humanSettings: CodexSettings = { model: 'gpt-6.1-terra', reasoning: 'medium' };
 
@@ -92,6 +101,7 @@ export class AiService {
   }
   private lobbyRooms = new WeakSet<BotRoom>();
   private creating = new Set<string>();
+  private weeklyStartingPlayers = new Set<string>();
   private starting = new Set<string>();
   private allocating = new Map<string, string>();
   private resetting = new Set<string>();
@@ -337,11 +347,50 @@ export class AiService {
   }
 
   private async canPlayLargeTables(userID: string): Promise<boolean> {
+    const features = await this.manager.dbManager.getUserFeatures(userID);
+    return hasPremium(await supportTotalCents(userID), features);
+  }
+
+  private async weeklyLargeGame(hostID: string) {
+    const registrationDate = await this.manager.dbManager.getUserRegistrationDate(hostID);
+    const now = Date.now();
+    const { startsAt, resetsAt } = largeBotGameWeek(now);
+    const age = largeBotGameAge(registrationDate, now);
+    const used = age.limit ? await this.repository!.weeklyGamesUsed(hostID, startsAt) : 0;
+    const allowance = weeklyGameAllowance(age, used, resetsAt);
+    return { allowance, registrationDate };
+  }
+
+  private async needsWeeklyStart(hostID: string, playerCount: AiPlayerCount, humans: number, arena = false) {
+    if (!needsLargeBotGameAccess(playerCount, humans, arena) || (await this.canPlayLargeTables(hostID))) return;
+    const weekly = await this.weeklyLargeGame(hostID);
+    if (!weekly.allowance.remaining) throw new WeeklyLargeGameUsed(weekly.allowance);
+    return weekly;
+  }
+
+  private async commitWeeklyStart(
+    room: BotRoom,
+    current: Room,
+    registrationDate: string | undefined,
+    launch: () => void,
+    configure?: () => void,
+  ) {
+    const humans = [...room.humanIDs];
+    current.committingBotStart = true;
+    for (const human of humans) this.weeklyStartingPlayers.add(human);
     try {
-      const features = await this.manager.dbManager.getUserFeatures(userID);
-      return hasPremium(await supportTotalCents(userID), features);
-    } catch {
-      return false;
+      const prepared = room.prepareWeeklyStart(configure);
+      const now = Date.now();
+      const { startsAt, resetsAt } = largeBotGameWeek(now);
+      const age = largeBotGameAge(registrationDate, now);
+      if (!(await this.repository!.commitWeeklyStart(prepared.state, startsAt, age.limit))) {
+        throw new WeeklyLargeGameUsed(weeklyGameAllowance(age, age.limit, resetsAt));
+      }
+      prepared.adopt();
+      launch();
+    } finally {
+      for (const human of humans) this.weeklyStartingPlayers.delete(human);
+      current.committingBotStart = false;
     }
   }
 
@@ -413,7 +462,7 @@ export class AiService {
   }
 
   private async expireLaunch(room: BotRoom, reason = 'Bot game preparation timed out.') {
-    if (this.manager.rooms[room.roomID] !== room || room.ai?.status !== 'ready') return;
+    if (this.manager.rooms[room.roomID] !== room || room.ai?.status !== 'ready' || room.committingBotStart) return;
     this.clearLaunchTimer(room.roomID);
     this.clearDraftLeaseTimer(room.roomID);
     delete room.ai.launchExpiresAt;
@@ -602,9 +651,11 @@ export class AiService {
           return cb({ error: 'Lobby AI access denied' });
         if (!(await this.canPlay(userID))) return cb({ error: 'AI room access denied' });
         const [hostPremium, availability] = await Promise.all([
-          this.canPlayLargeTables(userID!),
+          this.canPlayLargeTables(userID!).catch(() => undefined),
           this.humanAvailability(),
         ]);
+        const weeklyLargeGame =
+          hostPremium === false ? (await this.weeklyLargeGame(userID!).catch(() => undefined))?.allowance : undefined;
         if (
           this.manager.rooms[id] !== room ||
           room.ai ||
@@ -613,15 +664,25 @@ export class AiService {
           !room.players.includes(userID!)
         )
           return cb({ error: 'Lobby changed' });
-        cb({ available: availability.botModes.regular, hostPremium, humanPlayerIDs: [...room.players] });
+        cb({
+          available: availability.botModes.regular,
+          hostPremium: hostPremium === true,
+          humanPlayerIDs: [...room.players],
+          ...(weeklyLargeGame && { weeklyLargeGame }),
+        });
       } catch {
         cb({ error: 'Could not load lobby bot availability' });
       }
     });
-    const startLobbyAiRoom: ClientToServerEvents['startLobbyAiRoom'] = async (id, options, cb) => {
+    const startLobbyAiRoom = async (
+      id: Parameters<ClientToServerEvents['startLobbyAiRoom']>[0],
+      options: Parameters<ClientToServerEvents['startLobbyAiRoom']>[1],
+      cb: Parameters<ClientToServerEvents['startLobbyAiRoom']>[2],
+      rematch?: { room: Room; arena?: boolean },
+    ) => {
       if (typeof cb !== 'function') return;
       if (!validPacket('startLobbyAiRoom', [id, options, cb])) return cb({ error: 'invalidRequest' });
-      const original = this.manager.rooms[id];
+      const original = rematch?.room ?? this.manager.rooms[id];
       if (!userID || !original || original.leaderID !== userID) return cb({ error: 'Lobby AI access denied' });
       if (original instanceof BotRoom && this.lobbyRooms.has(original)) {
         return cb(
@@ -637,7 +698,7 @@ export class AiService {
       const humans = [...options.humanPlayerIDs];
       const stage = original.data.stage;
       const unchanged = () =>
-        this.manager.rooms[id] === original &&
+        this.manager.rooms[id] === (rematch ? undefined : original) &&
         !original.ai &&
         !original.nextRoomID &&
         original.leaderID === userID &&
@@ -646,7 +707,9 @@ export class AiService {
         original.players.includes(userID) &&
         original.players.length === humans.length &&
         humans.every((human, index) => original.players[index] === human && !getBotProfile(human)) &&
-        !humans.some((human) => this.active(human));
+        !humans.some(
+          (human) => this.active(human) || this.creating.has(human) || this.weeklyStartingPlayers.has(human),
+        );
       if (!unchanged()) return cb({ error: 'Lobby or confirmed players changed' });
       const size = lobbyAiSizes(humans.length, true).find((size) => size.playerCount === options.playerCount);
       if (!size) return cb({ error: 'At least one human and one bot are required' });
@@ -655,12 +718,7 @@ export class AiService {
       let adopted = false;
       try {
         if (!(await this.canPlay(userID))) return cb({ error: 'AI room access denied' });
-        const hostPremium = await this.canPlayLargeTables(userID);
-        if (
-          lobbyAiSizes(humans.length, hostPremium).find((size) => size.playerCount === options.playerCount)
-            ?.requiresPremium
-        )
-          return cb({ error: 'Host Premium is required for more than two bots at seven or eight seats' });
+        const weeklyStart = await this.needsWeeklyStart(userID, options.playerCount, humans.length, rematch?.arena);
         if (!unchanged()) return cb({ error: 'Lobby or confirmed players changed' });
         await this.beginnerAnalysis?.cancelAll();
         await this.reserveInstance(id, true, 'regular');
@@ -680,6 +738,7 @@ export class AiService {
           aiChat?.(entry);
         };
         room.ai!.publicBotGame = true;
+        if (rematch?.arena) room.ai!.arenaSetup = true;
         room.ai!.humanPlayerID = userID;
         room.ai!.humanPlayerIDs = humans;
         room.ai!.humanSeats = humans.length;
@@ -692,20 +751,24 @@ export class AiService {
         humans.forEach((human, index) => {
           room.players[room.players.length - 1 - index] = human;
         });
-        this.manager.rooms[id] = room;
-        this.lobbyRooms.add(room);
-        adopted = true;
-        this.runRoom(room);
-        this.manager.updateRoomsList(room);
+        const launch = () => {
+          this.manager.rooms[id] = room;
+          this.lobbyRooms.add(room);
+          adopted = true;
+          this.runRoom(room);
+          this.manager.updateRoomsList(room);
+        };
+        if (weeklyStart) await this.commitWeeklyStart(room, original, weeklyStart.registrationDate, launch);
+        else launch();
         cb({ ok: true });
       } catch (error) {
-        cb({ error: error instanceof AiPause ? error.message : 'Could not start lobby AI game' });
+        cb(botGameAdmissionError(error, 'Could not start lobby AI game'));
       } finally {
         this.starting.delete(id);
         if (claimed && !adopted) await this.releaseInstance(id).catch(() => {});
       }
     };
-    socket.on('startLobbyAiRoom', startLobbyAiRoom);
+    socket.on('startLobbyAiRoom', (id, options, cb) => startLobbyAiRoom(id, options, cb));
     socket.on('setAiBotQuotaThresholds', async (thresholds, cb) => {
       if (typeof cb !== 'function') return;
       try {
@@ -930,11 +993,15 @@ export class AiService {
             ? await this.humanAvailability(eligibleOwn ? ownRoomID : undefined)
             : { botModes: { smart: false, regular: false, beginner: false }, botModeAvailableAt: {}, botsBusy: true };
         const { botModes, botsBusy } = availability;
+        const premium = canPlay ? await this.canPlayLargeTables(userID!).catch(() => undefined) : undefined;
+        const weeklyLargeGame =
+          premium === false ? (await this.weeklyLargeGame(userID!).catch(() => undefined))?.allowance : undefined;
         const publicAccess = canPlay
           ? {
               canPlay,
               botModes,
-              canPlayLargeTables: await this.canPlayLargeTables(userID!),
+              canPlayLargeTables: premium === true,
+              ...(weeklyLargeGame && { weeklyLargeGame }),
               ...(!botsBusy && Object.keys(availability.botModeAvailableAt).length
                 ? { botModeAvailableAt: availability.botModeAvailableAt }
                 : {}),
@@ -958,7 +1025,7 @@ export class AiService {
       }
     });
     const createHumanAiRoom = async (args: unknown[], freshOnly = false) => {
-      const cb = args[args.length - 1] as (result: { roomID: string } | { error: string }) => void;
+      const cb = args[args.length - 1] as (result: { roomID: string } | BotGameAdmissionError) => void;
       if (typeof cb !== 'function') return;
       const options =
         args.length === 1
@@ -1001,8 +1068,6 @@ export class AiService {
       let locked = false;
       try {
         if (!(await this.canPlay(userID))) return cb({ error: 'AI room access denied' });
-        if ((options.playerCount ?? 5) >= 7 && !(await this.canPlayLargeTables(userID!)))
-          return cb({ error: 'Premium is required for seven or eight players' });
         const active = this.active(userID);
         if (active)
           return cb(
@@ -1013,10 +1078,12 @@ export class AiService {
               ? { roomID: active.roomID }
               : { error: 'Another AI match is already active' },
           );
-        if (this.creating.has(userID!)) return cb({ error: 'AI room control in progress' });
+        if (this.creating.has(userID!) || this.weeklyStartingPlayers.has(userID!))
+          return cb({ error: 'AI room control in progress' });
         if (Object.keys(this.manager.rooms).length >= 500) return cb({ error: 'Room limit reached' });
         this.creating.add(userID!);
         locked = true;
+        await this.needsWeeklyStart(userID!, options.playerCount ?? 5, options.humanSeats ?? 1, true);
         await this.beginnerAnalysis?.cancelAll();
         const profile = await this.manager.dbManager.getUserByID(userID!);
         if (Object.keys(this.manager.rooms).length >= 500) return cb({ error: 'Room limit reached' });
@@ -1025,6 +1092,7 @@ export class AiService {
         claimedID = id;
         const room = (createdRoom = this.createRoom(id, userID!, options.language ?? 'en', options.playerCount ?? 5));
         room.ai!.publicBotGame = true;
+        room.ai!.arenaSetup = true;
         room.ai!.beginner = options.beginner;
         room.ai!.preparedDifficulty = options.difficulty === undefined ? undefined : 'regular';
         if (options.withFriend) {
@@ -1049,7 +1117,7 @@ export class AiService {
           delete this.manager.rooms[createdRoom.roomID];
         }
         if (claimedID && !this.running.has(claimedID)) await this.releaseInstance(claimedID).catch(() => {});
-        cb({ error: error instanceof AiPause ? error.message : 'Could not create AI room' });
+        cb(botGameAdmissionError(error, 'Could not create AI room'));
       } finally {
         if (locked) this.creating.delete(userID!);
       }
@@ -1087,8 +1155,7 @@ export class AiService {
           return cb({ error: 'At least one bot seat is required' });
         if (room.ai!.beginner && playerCount !== 5)
           return cb({ error: 'Beginner games require regular bots and five players' });
-        if (playerCount >= 7 && !(await this.canPlayLargeTables(userID!)))
-          return cb({ error: 'Premium is required for seven or eight players' });
+        if (room.data.stage === 'started' && room.ai!.arenaSetup && !room.nextRoomID) return cb({ ok: true });
         if (!this.launchReady(room)) {
           await this.expireLaunch(room);
           return cb({ error: 'The bot game preparation time has expired' });
@@ -1096,6 +1163,7 @@ export class AiService {
         if (this.starting.has(id) || this.running.has(id)) return cb({ error: 'AI room control in progress' });
         this.starting.add(id);
         locked = true;
+        const weeklyStart = await this.needsWeeklyStart(userID!, playerCount, room.humanIDs.length, true);
         const instance = this.instanceFor(id);
         const modes = await this.humanModes(id);
         if (!this.launchReady(room)) {
@@ -1126,22 +1194,43 @@ export class AiService {
           if (humanIDs.some((id, index) => room.humanIDs[index] !== id) || room.humanIDs.length !== humanIDs.length)
             return cb({ error: 'Bot room preparation changed' });
         }
-        room.setPlayerCount(playerCount);
-        room.ai!.title = room.ai!.title?.replace(/vs \d+ Bots$/, `vs ${playerCount - room.humanIDs.length} Bots`);
-        if (friendNames.length) room.ai!.title = room.ai!.title?.replace(' vs ', ` + ${friendNames.join(' + ')} vs `);
-        room.setLanguage(options.language);
-        room.ai!.botDifficulty = 'regular';
-        room.ai!.preparedDifficulty = 'regular';
-        room.ai!.codex = { ...humanSettings };
-        delete room.ai!.launchExpiresAt;
-        this.clearLaunchTimer(id);
-        this.runRoom(room);
-        this.manager.updateRoomsList(room);
+        if (room.humanIDs.some((human) => this.weeklyStartingPlayers.has(human)))
+          return cb({ error: 'A player already has another AI match' });
+        const configure = () => {
+          room.setPlayerCount(playerCount);
+          room.ai!.title = room.ai!.title?.replace(/vs \d+ Bots$/, `vs ${playerCount - room.humanIDs.length} Bots`);
+          if (friendNames.length) room.ai!.title = room.ai!.title?.replace(' vs ', ` + ${friendNames.join(' + ')} vs `);
+          room.setLanguage(options.language);
+          room.ai!.botDifficulty = 'regular';
+          room.ai!.preparedDifficulty = 'regular';
+          room.ai!.codex = { ...humanSettings };
+        };
+        const launch = () => {
+          delete room.ai!.launchExpiresAt;
+          this.clearLaunchTimer(id);
+          this.runRoom(room);
+          this.manager.updateRoomsList(room);
+        };
+        if (weeklyStart) await this.commitWeeklyStart(room, room, weeklyStart.registrationDate, launch, configure);
+        else {
+          configure();
+          launch();
+        }
         cb({ ok: true });
       } catch (error) {
-        cb({ error: error instanceof AiPause ? error.message : 'Could not start AI room' });
+        cb(botGameAdmissionError(error, 'Could not start AI room'));
       } finally {
-        if (locked) this.starting.delete(id);
+        if (locked) {
+          this.starting.delete(id);
+          const room = this.manager.rooms[id];
+          if (
+            !this.running.has(id) &&
+            room instanceof BotRoom &&
+            room.ai?.status === 'ready' &&
+            !this.launchReady(room)
+          )
+            await this.expireLaunch(room).catch(() => {});
+        }
         if (claimed && !this.running.has(id) && !this.launchReady(this.manager.rooms[id] as BotRoom))
           await this.releaseInstance(id).catch(() => {});
       }
@@ -1165,7 +1254,11 @@ export class AiService {
       this.starting.add(id);
       try {
         const humans = [userID!, ...previous.humanIDs.filter((human) => human !== userID)];
-        if (humans.some((human) => this.active(human) || this.creating.has(human)))
+        if (
+          humans.some(
+            (human) => this.active(human) || this.creating.has(human) || this.weeklyStartingPlayers.has(human),
+          )
+        )
           return cb({ error: 'A player already has another AI match' });
         const playerCount = previous.ai.playerCount ?? (previous.players.length as AiPlayerCount);
         const language = previous.ai.language ?? 'en';
@@ -1192,17 +1285,20 @@ export class AiService {
             return cb({ error: launchError });
           }
         } else {
-          // Reuse lobby admission: large tables with <=2 bots do not require Premium.
+          // Preserve the admission rules of the original setup when creating a fresh match.
+          if (Object.keys(this.manager.rooms).length >= 500) return cb({ error: 'Room limit reached' });
           created = randomUUID();
-          this.manager.createRoom(created, userID!, humans);
-          let launchError: string | undefined;
-          await startLobbyAiRoom(created, { playerCount, language, humanPlayerIDs: humans }, (result) => {
-            if ('error' in result) launchError = result.error;
-          });
-          if (launchError) {
-            this.manager.destroyRoom(created);
-            return cb({ error: launchError });
-          }
+          const successor = new Room(created, userID!, humans, this.manager.io);
+          let launchError: BotGameAdmissionError | undefined;
+          await startLobbyAiRoom(
+            created,
+            { playerCount, language, humanPlayerIDs: humans },
+            (result) => {
+              if ('error' in result) launchError = result;
+            },
+            { room: successor, arena: previous.ai.arenaSetup },
+          );
+          if (launchError) return cb(launchError);
         }
         previous.nextRoomID = created;
         this.manager.voice?.destroyRoom(id);

@@ -11,8 +11,8 @@ dialog before reserving a room. Owners of an existing match return to that room.
 Setup offers Solo / With friends, with a choice of 2 to one fewer than the total seats, including
 the owner, one shared bot profile, and a compact
 solo-only First game option. The discussion language defaults to the supported
-interface language or English. Total seats are 5, 6, 7 or 8; 7/8 display Premium
-and require the server-checked entitlement. Unavailable modes remain visible as
+interface language or English. Total seats are 5, 6, 7 or 8. The setup displays
+the host's weekly allowance or Premium access for the two larger tables. Unavailable modes remain visible as
 locked choices; one notification explains mode availability, known recovery hours,
 or that the shared slot is occupied. Guests can reach authentication from setup.
 
@@ -27,8 +27,8 @@ joining or removing a guest updates the live roster immediately.
 Reserved friend seats appear empty until authenticated humans join through the
 room link. Launch waits for the selected number of humans; removing one guest
 keeps the other guest seated. Older friend rooms retain their two-human default. The owner starts with one Start match button using the saved
-settings. Launch rechecks quota and Premium; prepared settings cannot be altered
-by a different launch payload. Legacy preparation without saved settings retains
+settings. Launch rechecks bot capacity and large-table access; prepared settings
+cannot be altered by a different launch payload. Legacy preparation without saved settings retains
 its original table controls. Only one AI room reserves the shared slot at a time,
 including preparation, active play and technical pauses.
 
@@ -53,10 +53,21 @@ Ordinary lobbies offer **Play with AI** to the seated host when strong bots are
 available and at least one eligible table size exists. The host chooses the final
 size (5–8 seats); every currently seated human stays, and bots fill the remaining
 seats. Spectators do not count. Five/six-seat tables allow up to four/five bots.
-Seven/eight-seat tables allow at most two bots without Premium; Premium on the
-host account unlocks every remaining seat, up to six/seven bots. At least one
-human and one bot are required. This policy applies to the existing-lobby flow;
-the separate AI Arena setup retains its own access rules.
+A seven/eight-seat table in an ordinary lobby uses the host's weekly large
+game only when it adds more than two bots. In AI Arena setup, a table of either
+size uses the weekly game. Premium hosts can fill any number of open bot seats.
+At least one human and one bot are required.
+
+The weekly allowance belongs to the host and is shared by AI Arena, ordinary
+lobbies and rematches. Non-Premium accounts get zero games for their first
+seven days, one game from day seven and two once they are more than six calendar
+months old, calculated in Yekaterinburg time. The allowance increases as soon
+as the account reaches a new tier.
+Legacy profiles without a saved registration date keep the standard one-game allowance.
+It renews on Monday at 00:00 in Yekaterinburg. Opening settings or
+preparing a room does not use it. The server records each charged start for the host and week together with the
+initial replay. An invited player keeps
+their weekly game. A rematch checks the same rules as the original setup.
 
 The setup shows the exact fixed role composition below, Lady of the Lake for
 seven/eight seats, the selected discussion language, human action time limits and
@@ -66,7 +77,7 @@ replace the ordinary lobby settings only when launch succeeds. Canceling setup
 leaves the room unchanged.
 
 `getLobbyAiAccess(roomID, callback)` reports strong-bot availability, the host's
-Premium entitlement and the seated human IDs. `startLobbyAiRoom(roomID,
+Premium entitlement, weekly allowance when applicable and the seated human IDs. `startLobbyAiRoom(roomID,
 { playerCount, language, humanPlayerIDs }, callback)` starts in the same room.
 The server derives the bot count, forces the strong preset and fixed AI rules,
 and validates the confirmed roster again after asynchronous resource allocation.
@@ -119,10 +130,9 @@ After a public bot game ends, its owner can restart from the board when bot
 capacity and table entitlement are available. The server retains
 the previous replay, creates a fresh game with the same human roster, language
 and table size, and moves the room viewers to it. Slot and participant checks
-run again on click; duplicate requests return the same successor. Ordinary
-rematches use the existing-lobby entitlement rules, including non-Premium large
-tables with at most two bots. An admission or launch failure leaves the completed game
-available for retry and releases any unsuccessful preparation.
+run again on click; duplicate requests return the same successor. Rematches use
+the original setup's large-table rules. An admission or launch failure leaves the
+completed game available for retry and releases any unsuccessful preparation.
 
 ## Discussion and decisions
 
@@ -137,7 +147,7 @@ The setup dialog passes `{ beginner, withFriend, difficulty, language, playerCou
 to `createHumanAiRoom` to save the prepared settings.
 `startHumanAiRoom(roomID, { difficulty: 'regular', language, playerCount?: 5 | 6 | 7 | 8 }, callback)`
 starts the same prepared room and returns `ok: true` or an `error`. The server
-chooses the model and reasoning effort, validates table size and Premium, and
+chooses the model and reasoning effort, validates table size and large-table access, and
 uses Terra medium for every public game and five seats for beginner rooms; clients cannot override
 these settings or start another owner's room.
 Access responses include `canPlay`, `botModes` availability and `ownRoomID` for

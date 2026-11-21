@@ -3,8 +3,18 @@
     <v-btn color="primary" class="restart-button" :disabled="busy || !canRestart" :loading="busy" @click="restart">
       {{ $t('room.restartGame') }}
     </v-btn>
+    <WeeklyBotGameNotice
+      v-if="largeTableRequired && !canPlayLargeTables && !existingRoom"
+      :weekly="weeklyLargeGame"
+      launch
+    />
     <p v-if="error" role="alert" class="text-error">{{ error }}</p>
-    <p v-else-if="!canRestart && accessStatus === 'ready'" role="status">
+    <p
+      v-else-if="
+        !canRestart && accessStatus === 'ready' && (!largeTableRequired || largeTableAccess || !weeklyLargeGame)
+      "
+      role="status"
+    >
       {{ $t(botsBusy ? 'aiArena.botBusy' : 'aiArena.setupAllUnavailable') }}
     </p>
   </div>
@@ -17,14 +27,26 @@ import { useStore } from '@/store';
 import { socket } from '@/api/socket';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
 import { openRoomRoute } from '@/helpers/open-room-route';
-import { lobbyAiSizes } from '@avalon/types/room/lobby-ai';
+import { lobbyAiSizes, needsLargeBotGameAccess } from '@avalon/types/room/lobby-ai';
+import WeeklyBotGameNotice from '@/components/view/panels/WeeklyBotGameNotice.vue';
 import type { TPageRoomState } from '@/helpers/game-state-manager';
 
 const props = defineProps<{ room: TPageRoomState }>();
 const { t } = useI18n();
 const router = useRouter();
 const store = useStore();
-const { canPlay, canPlayLargeTables, accessStatus, botModes, botsBusy, ownRoomID, refresh } = useAiAccess();
+const {
+  canPlay,
+  canPlayLargeTables,
+  weeklyLargeGame,
+  largeTableAccess,
+  markWeeklyGameUsed,
+  accessStatus,
+  botModes,
+  botsBusy,
+  ownRoomID,
+  refresh,
+} = useAiAccess();
 const busy = ref(false);
 const error = ref('');
 let active = true;
@@ -45,18 +67,23 @@ const eligible = computed(() =>
     (!props.room.archived || existingRoom.value),
   ),
 );
+const humanCount = computed(() => props.room.ai?.humanPlayerIDs?.length ?? 1);
+const playerCount = computed(() => props.room.ai?.playerCount ?? props.room.players?.length ?? 5);
+const validTable = computed(() =>
+  lobbyAiSizes(humanCount.value, true).some((size) => size.playerCount === playerCount.value),
+);
+const largeTableRequired = computed(() =>
+  needsLargeBotGameAccess(playerCount.value, humanCount.value, props.room.ai?.arenaSetup),
+);
 const canRestart = computed(
   () =>
     accessStatus.value === 'ready' &&
     canPlay.value &&
     Boolean(
       existingRoom.value ||
-      (botModes.value[props.room.ai?.beginner ? 'beginner' : 'regular'] &&
-        lobbyAiSizes(props.room.ai?.humanPlayerIDs?.length ?? 1, canPlayLargeTables.value).some(
-          (size) =>
-            size.playerCount === (props.room.ai?.playerCount ?? props.room.players?.length ?? 5) &&
-            !size.requiresPremium,
-        )),
+      (validTable.value &&
+        botModes.value[props.room.ai?.beginner ? 'beginner' : 'regular'] &&
+        (!largeTableRequired.value || largeTableAccess.value)),
     ),
 );
 async function restart() {
@@ -71,7 +98,9 @@ async function restart() {
       : await socket.timeout(30000).emitWithAck('restartHumanAiRoom', origin);
     if (!isActive()) return;
     if ('error' in result) {
-      error.value = t('aiArena.botPlayError');
+      if (result.error === 'weeklyLargeGameUsed' && result.resetsAt !== undefined) {
+        markWeeklyGameUsed(result.resetsAt, result.weeklyLargeGame);
+      } else error.value = t('aiArena.botPlayError');
       void refresh();
       return;
     }
@@ -92,6 +121,7 @@ async function restart() {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 8px;
 }
 .bot-rematch p {
   max-width: 280px;

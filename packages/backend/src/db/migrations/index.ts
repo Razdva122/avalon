@@ -149,6 +149,41 @@ export const migrations: Migration[] = [
       }
     },
   },
+  {
+    name: '2026-11-21-ai-weekly-large-game-v1',
+    async up(db) {
+      await reconcileIndex(
+        db.collection('ai_room_replays'),
+        { weeklyHostID: 1, weeklyStartsAt: 1 },
+        {
+          unique: true,
+          partialFilterExpression: { weeklyHostID: { $exists: true }, weeklyStartsAt: { $exists: true } },
+        },
+      );
+    },
+  },
+  {
+    name: '2026-11-21-ai-weekly-large-game-slots-v2',
+    async up(db) {
+      const replays = db.collection('ai_room_replays');
+      await reconcileIndex(
+        replays,
+        { weeklyHostID: 1, weeklyStartsAt: 1, weeklySlot: 1 },
+        {
+          unique: true,
+          partialFilterExpression: { weeklyHostID: { $exists: true }, weeklyStartsAt: { $exists: true } },
+        },
+      );
+      const previous = (await replays.indexes()).find(
+        (index) =>
+          index.unique &&
+          Object.keys(index.key).length === 2 &&
+          index.key.weeklyHostID === 1 &&
+          index.key.weeklyStartsAt === 1,
+      );
+      if (previous?.name) await replays.dropIndex(previous.name);
+    },
+  },
 ];
 
 interface MigrationState {

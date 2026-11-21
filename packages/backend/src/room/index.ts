@@ -1,7 +1,7 @@
 import { roomChannel, userChannel } from '@/helpers/channels';
 import { publicRoomState } from '@/ai/public-state';
 import type { TRoomState, Server, GameOptions, TVoteTarget, VoteInRoom } from '@avalon/types';
-import type { TRoomData } from '@/room/interface';
+import type { TRoomData, TStartedRoomData } from '@/room/interface';
 import { eventBus } from '@/helpers';
 import { GameManager } from '@/core/game-manager';
 import { Chat } from '@/room/chat';
@@ -13,6 +13,7 @@ export class Room {
   ai?: import('@avalon/types').AiRoomState;
   roomID: string;
   nextRoomID?: string;
+  committingBotStart = false;
   players: string[];
   leaderID: string;
   vote?: VoteInRoom;
@@ -110,18 +111,31 @@ export class Room {
     }
   }
 
+  protected createStartedGame(
+    players: string[],
+    selectedRole?: { userID: string; role: import('@avalon/types').TRoles },
+  ): TStartedRoomData {
+    const manager = new GameManager(players, this.options, this.io, this.roomID, selectedRole);
+    return { stage: 'started', startAt: String(new Date()), manager };
+  }
+
   startGame(selectedRole?: { userID: string; role: import('@avalon/types').TRoles }) {
-    const manager = new GameManager(this.players, this.options, this.io, this.roomID, selectedRole);
-    this.startAt = String(new Date());
-    this.data = {
-      stage: 'started',
-      startAt: this.startAt,
-      manager,
-    };
+    this.data = this.createStartedGame(this.players, selectedRole);
+    this.startAt = this.data.startAt;
     this.updateRoomState(true);
   }
 
   calculateRoomState(userID?: string): TRoomState {
+    return this.roomStateFor(this.data, this.players, userID);
+  }
+
+  protected roomStateFor(
+    data: TStartedRoomData,
+    players: string[],
+    userID?: string,
+  ): import('@avalon/types').StartedRoomState;
+  protected roomStateFor(data: TRoomData, players: string[], userID?: string): TRoomState;
+  protected roomStateFor(data: TRoomData, players: string[], userID?: string): TRoomState {
     const roomState = {
       ai: this.ai,
       archived: Boolean(this.nextRoomID),
@@ -130,21 +144,21 @@ export class Room {
       vote: this.vote,
       chat: this.chat.history,
       options: this.options,
-      players: this.players.map((id) => ({ id, isLeader: id === this.leaderID })),
+      players: players.map((id) => ({ id, isLeader: id === this.leaderID })),
       createAt: this.createAt,
     };
 
-    if (this.data.stage === 'started') {
+    if (data.stage === 'started') {
       return {
         ...roomState,
-        startAt: this.data.startAt,
-        stage: this.data.stage,
-        game: this.data.manager.prepareStateForUser(userID),
+        startAt: data.startAt,
+        stage: data.stage,
+        game: data.manager.prepareStateForUser(userID),
       };
     } else {
       return {
         ...roomState,
-        stage: this.data.stage,
+        stage: data.stage,
       };
     }
   }

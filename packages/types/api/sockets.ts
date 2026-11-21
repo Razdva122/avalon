@@ -144,6 +144,7 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
       botsBusy?: boolean;
       botModes?: Record<AiBotMode, boolean>;
       canPlayLargeTables?: boolean;
+      weeklyLargeGame?: import('../room').WeeklyLargeBotGame;
       /** Estimated quota recovery, in Unix milliseconds; omitted when unknown or occupied. */
       botModeAvailableAt?: Partial<Record<AiBotMode, number>>;
       ownRoomID?: string;
@@ -176,9 +177,12 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
     options: string | { model: string; language: AiLanguage; playerCount?: AiPlayerCount },
     callback: (result: { roomID: string } | { error: string }) => void,
   ) => void;
-  restartHumanAiRoom: (roomID: string, callback: (result: { roomID: string } | { error: string }) => void) => void;
+  restartHumanAiRoom: (
+    roomID: string,
+    callback: (result: { roomID: string } | import('../room').BotGameAdmissionError) => void,
+  ) => void;
   createHumanAiRoom: {
-    (callback: (result: { roomID: string } | { error: string }) => void): void;
+    (callback: (result: { roomID: string } | import('../room').BotGameAdmissionError) => void): void;
     (
       options: {
         beginner: boolean;
@@ -189,24 +193,31 @@ export interface ClientToServerEvents extends ClientToServerUserEvents, TrueSkil
         language?: AiLanguage;
         playerCount?: AiPlayerCount;
       },
-      callback: (result: { roomID: string } | { error: string }) => void,
+      callback: (result: { roomID: string } | import('../room').BotGameAdmissionError) => void,
     ): void;
   };
   getLobbyAiAccess: (
     roomID: string,
     callback: (
-      result: { available: boolean; hostPremium: boolean; humanPlayerIDs: string[] } | { error: string },
+      result:
+        | {
+            available: boolean;
+            hostPremium: boolean;
+            humanPlayerIDs: string[];
+            weeklyLargeGame?: import('../room').WeeklyLargeBotGame;
+          }
+        | import('../room').BotGameAdmissionError,
     ) => void,
   ) => void;
   startLobbyAiRoom: (
     roomID: string,
     options: { playerCount: AiPlayerCount; language: AiLanguage; humanPlayerIDs: string[] },
-    callback: (result: { ok: true } | { error: string }) => void,
+    callback: (result: { ok: true } | import('../room').BotGameAdmissionError) => void,
   ) => void;
   startHumanAiRoom: (
     roomID: string,
     options: { difficulty: AiBotDifficulty; language: AiLanguage; playerCount?: AiPlayerCount },
-    callback: (result: { ok: true } | { error: string }) => void,
+    callback: (result: { ok: true } | import('../room').BotGameAdmissionError) => void,
   ) => void;
   controlAiRoom: (
     roomID: string,

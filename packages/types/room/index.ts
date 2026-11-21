@@ -111,6 +111,9 @@ export type BeginnerGameReview = {
 };
 export type BeginnerReviewResponse = { status: 'complete'; review: BeginnerGameReview } | { status: 'unavailable' };
 
+export type WeeklyLargeBotGame = { limit: number; remaining: number; resetsAt: number; unlocksAt?: number };
+export type BotGameAdmissionError = { error: string; resetsAt?: number; weeklyLargeGame?: WeeklyLargeBotGame };
+
 export type AiRoomState = {
   /** Owner human seat; absent in spectator-only bot matches. */
   humanPlayerID?: string;
@@ -125,6 +128,7 @@ export type AiRoomState = {
   >;
   /** Public one-human/four-bot room, including its ready preparation stage. */
   publicBotGame?: boolean;
+  arenaSetup?: boolean;
   /** Beginner-only five-seat match with simpler bot communication. */
   beginner?: boolean;
   /** Settings chosen before creating the prepared public room. */

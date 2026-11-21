@@ -854,3 +854,42 @@ test('legacy stored smart quota settings are exposed as a regular alias', async 
   const thresholds = await new AiRepository(db).getBotQuotaThresholds();
   expect(thresholds.smart).toEqual(thresholds.regular);
 });
+
+test.each([
+  [1, 0],
+  [2, 0],
+  [2, 1],
+])('weekly admission atomically enforces a limit of %i with %i legacy launches', async (limit, legacy) => {
+  const db = client.db(`weekly-large-game-${limit}-${legacy}`);
+  const weeklyMigrations = migrations.filter(({ name }) => name.includes('weekly-large-game'));
+  await MigrationManager.runMigrations(db, weeklyMigrations.slice(0, 1));
+  const makeState = (roomID: string) =>
+    ({
+      roomID,
+      leaderID: 'owner',
+      stage: 'started',
+      createAt: '2026-11-22T18:55:00.000Z',
+      ai: { status: 'running' },
+      game: { stage: 'selectTeam' },
+    }) as unknown as import('@avalon/types').StartedRoomState;
+  const repo = new AiRepository(db);
+  const other = new AiRepository(db);
+  const week = Date.parse('2026-11-15T19:00:00Z');
+  if (legacy) expect(await repo.commitWeeklyStart(makeState('legacy'), week, 1)).toBe(true);
+  await MigrationManager.runMigrations(db, weeklyMigrations);
+  expect(await repo.weeklyGamesUsed('owner', week)).toBe(legacy);
+  const results = await Promise.all([
+    repo.commitWeeklyStart(makeState('first'), week, limit),
+    other.commitWeeklyStart(makeState('second'), week, limit),
+    other.commitWeeklyStart(makeState('third'), week, limit),
+  ]);
+  expect(results.filter(Boolean)).toHaveLength(limit - legacy);
+  expect(await db.collection('ai_room_replays').countDocuments()).toBe(limit);
+  expect(await other.weeklyGamesUsed('owner', week)).toBe(limit);
+  expect(await repo.weeklyGamesUsed('guest', week)).toBe(0);
+  const winner = ['first', 'second', 'third'][results.findIndex(Boolean)];
+  await repo.save(makeState(winner));
+  expect(await other.weeklyGamesUsed('owner', week)).toBe(limit);
+  const next = Date.parse('2026-11-22T19:00:00Z');
+  expect(await repo.commitWeeklyStart(makeState('next-week'), next, limit)).toBe(true);
+});

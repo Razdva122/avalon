@@ -86,7 +86,7 @@ export class Manager {
     const expire = () => {
       const room = this.rooms[uuid];
       if (!room) return;
-      if (room.data.stage === 'started' && room.data.manager.game.stage !== 'end') {
+      if (room.committingBotStart || (room.data.stage === 'started' && room.data.manager.game.stage !== 'end')) {
         const timer = setTimeout(expire, 5 * 60000);
         timer.unref();
         this.roomTimers.set(uuid, timer);
@@ -193,7 +193,7 @@ export class Manager {
       throw new Error(`Cant find game for restart with uuid ${uuid}`);
     }
 
-    if (room.ai) throw new Error('Create a new AI room with AI controls');
+    if (room.ai || room.committingBotStart) throw new Error('Create a new AI room with AI controls');
 
     if (room.data.stage === 'started') {
       if (room.nextRoomID) {
@@ -586,7 +586,7 @@ export class Manager {
     socket.on('joinGame', (uuid) => {
       const room = this.rooms[uuid];
 
-      if (room) {
+      if (room && !room.committingBotStart) {
         room.joinGame(userID);
         eventBus.emit('roomUpdated', room);
       }
@@ -595,7 +595,7 @@ export class Manager {
     socket.on('leaveGame', (uuid) => {
       const room = this.rooms[uuid];
 
-      if (room) {
+      if (room && !room.committingBotStart) {
         room.leaveGame(userID);
 
         if (this.rooms[uuid]) {
@@ -606,7 +606,7 @@ export class Manager {
 
     socket.on('lockRoom', (uuid) => {
       const room = this.rooms[uuid];
-      if (room && !room.ai && room.leaderID === userID) {
+      if (room && !room.committingBotStart && !room.ai && room.leaderID === userID) {
         room.toggleLockedState();
         eventBus.emit('roomUpdated', room);
       }
@@ -614,7 +614,7 @@ export class Manager {
 
     socket.on('updateOptions', (uuid, options) => {
       const room = this.rooms[uuid];
-      if (room && !room.ai && room.leaderID === userID) {
+      if (room && !room.committingBotStart && !room.ai && room.leaderID === userID) {
         room.updateOptions(options);
         eventBus.emit('roomUpdated', room);
       }
@@ -622,35 +622,35 @@ export class Manager {
 
     socket.on('endGame', (uuid) => {
       const room = this.rooms[uuid];
-      if (room && !room.ai && room.leaderID === userID) {
+      if (room && !room.committingBotStart && !room.ai && room.leaderID === userID) {
         room.startVoteFor('endGame');
       }
     });
 
     socket.on('endAndRestartGame', (uuid) => {
       const room = this.rooms[uuid];
-      if (room && !room.ai && room.leaderID === userID) {
+      if (room && !room.committingBotStart && !room.ai && room.leaderID === userID) {
         room.startVoteFor('endAndRestartGame');
       }
     });
 
     socket.on('shuffle', (uuid) => {
       const room = this.rooms[uuid];
-      if (room && !room.ai && room.leaderID === userID) {
+      if (room && !room.committingBotStart && !room.ai && room.leaderID === userID) {
         room.shuffle();
       }
     });
 
     socket.on('voteInRoom', (uuid, result) => {
       const room = this.rooms[uuid];
-      if (room) {
+      if (room && !room.committingBotStart) {
         room.makeVote(userID, result);
       }
     });
 
     socket.on('startGame', (uuid) => {
       const room = this.rooms[uuid];
-      if (room && !room.ai && room.leaderID === userID) {
+      if (room && !room.committingBotStart && !room.ai && room.leaderID === userID) {
         room.startGame();
         eventBus.emit('roomUpdated', room);
       }
@@ -662,6 +662,7 @@ export class Manager {
       if (
         !room ||
         room.ai ||
+        room.committingBotStart ||
         room.nextRoomID ||
         room.leaderID !== userID ||
         nextHostID === userID ||
@@ -684,7 +685,7 @@ export class Manager {
         room.data.stage === 'locked' &&
         kickUserID !== room.leaderID &&
         room.isHuman(kickUserID);
-      if (room && (!room.ai || canKickGuest) && room.leaderID === userID) {
+      if (room && !room.committingBotStart && (!room.ai || canKickGuest) && room.leaderID === userID) {
         room.leaveGame(kickUserID);
 
         if (this.rooms[uuid]) {

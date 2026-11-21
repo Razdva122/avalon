@@ -16,11 +16,18 @@ async function fixture(reply = async () => ({ roomID: 'next' })) {
   const access = {
     canPlay: vue.ref(true),
     canPlayLargeTables: vue.ref(false),
+    weeklyLargeGame: vue.ref(),
     accessStatus: vue.ref('ready'),
     botModes: vue.ref({ regular: true, beginner: true }),
     botsBusy: vue.ref(false),
     ownRoomID: vue.ref(),
     refresh: async () => {},
+  };
+  access.largeTableAccess = vue.computed(
+    () => access.canPlayLargeTables.value || (access.weeklyLargeGame.value?.remaining ?? 0) > 0,
+  );
+  access.markWeeklyGameUsed = (resetsAt) => {
+    access.weeklyLargeGame.value = { remaining: 0, resetsAt };
   };
   const store = vue.reactive({ state: { profile: { id: 'owner' } } });
   const props = vue.reactive({
@@ -51,6 +58,7 @@ async function fixture(reply = async () => ({ roomID: 'next' })) {
         )(exports);
         return exports;
       }
+      if (id.endsWith('/WeeklyBotGameNotice.vue')) return { default: { render: () => null } };
       if (id === '@/store') return { useStore: () => store };
       if (id === '@/helpers/composables/useAiAccess') return { useAiAccess: () => access };
       if (id === '@/helpers/open-room-route')
@@ -156,9 +164,13 @@ test('a previously created own match can be resumed without reserving a second s
   assert.deepEqual(f.routes, ['already-created']);
 });
 
-test('large-table rematches retain the Premium restriction', async () => {
+test('large-table rematches accept Premium or a weekly game', async () => {
   const f = await fixture();
   f.props.room.ai.playerCount = 7;
+  assert.equal(f.state.canRestart.value, false);
+  f.access.weeklyLargeGame.value = { remaining: 1, resetsAt: 1 };
+  assert.equal(f.state.canRestart.value, true);
+  f.access.weeklyLargeGame.value = { remaining: 0, resetsAt: 1 };
   assert.equal(f.state.canRestart.value, false);
   f.access.canPlayLargeTables.value = true;
   assert.equal(f.state.canRestart.value, true);

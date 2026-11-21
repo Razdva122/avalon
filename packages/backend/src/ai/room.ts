@@ -955,6 +955,37 @@ export class BotRoom extends Room {
     if (!this.cancelled) this.directAction = undefined;
   }
 
+  prepareWeeklyStart(configure?: () => void) {
+    const draft = {
+      players: this.players,
+      options: this.options,
+      language: this.language,
+      maxCapacity: this.maxCapacity,
+      ai: this.ai!,
+    };
+    this.ai = { ...draft.ai };
+    try {
+      configure?.();
+      const players = shuffle(this.players);
+      const data = this.createStartedGame(
+        players,
+        this.selectedHumanRole ? { userID: this.ai.humanPlayerID!, role: this.selectedHumanRole } : undefined,
+      );
+      const { options, language, maxCapacity, ai } = this;
+      const state = this.roomStateFor(data, players);
+      const startedAi = { ...ai, status: 'running' as const };
+      delete startedAi.launchExpiresAt;
+      return {
+        state: { ...state, ai: startedAi },
+        adopt: () => {
+          Object.assign(this, { players, options, language, maxCapacity, ai, data, startAt: data.startAt });
+        },
+      };
+    } finally {
+      Object.assign(this, draft);
+    }
+  }
+
   async run(resumeTechnical = false) {
     if (
       this.executing ||
@@ -972,10 +1003,13 @@ export class BotRoom extends Room {
     this.ai!.status = 'running';
     try {
       if (!resumeTechnical) {
-        this.players = shuffle(this.players);
-        super.startGame(
-          this.selectedHumanRole ? { userID: this.ai!.humanPlayerID!, role: this.selectedHumanRole } : undefined,
-        );
+        if (this.data.stage === 'started') this.updateRoomState(true);
+        else {
+          this.players = shuffle(this.players);
+          super.startGame(
+            this.selectedHumanRole ? { userID: this.ai!.humanPlayerID!, role: this.selectedHumanRole } : undefined,
+          );
+        }
       }
       while (!this.cancelled && this.manager.game.stage !== 'end') {
         await this.act();

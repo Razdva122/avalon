@@ -75,6 +75,12 @@ export class UserLayer {
     return user;
   }
 
+  async getUserRegistrationDate(id: string): Promise<string | undefined> {
+    if (!validID(id)) throw Error('invalidRequest');
+    const user = await userProfileModel.findOne({ id }, { registrationDate: 1 }).lean();
+    return user?.registrationDate;
+  }
+
   async getUserFeatures(id: string): Promise<UserFeatures | null> {
     if (!validID(id)) throw Error('invalidRequest');
     const features = await userFeaturesModel.findOne({ userID: id });

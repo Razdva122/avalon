@@ -77,6 +77,7 @@ async function fixture(
     canManage: vue.ref(true),
     canPlay: vue.ref(false),
     canPlayLargeTables: vue.ref(false),
+    weeklyLargeGame: vue.ref(),
     botModes: vue.ref({ smart: false, regular: false }),
     botModeAvailableAt: vue.ref({}),
     botWaitHours: vue.ref({}),
@@ -88,6 +89,12 @@ async function fixture(
     codexModels: vue.ref([]),
     refresh: async () => {},
     ...accessOverrides,
+  };
+  access.largeTableAccess = vue.computed(
+    () => access.canPlayLargeTables.value || (access.weeklyLargeGame.value?.remaining ?? 0) > 0,
+  );
+  access.markWeeklyGameUsed = (resetsAt) => {
+    access.weeklyLargeGame.value = { remaining: 0, resetsAt };
   };
   const i18n = createI18n({ legacy: false, locale, fallbackLocale: false, messages });
   const filename = path.join(__dirname, '../src', file);
@@ -1231,7 +1238,7 @@ test('setup omits availability-checking text while access loads', async (t) => {
   assert.equal(room.nodes('v-btn').find((node) => 'data-create-bot-game' in node.props).props.disabled, true);
 });
 
-test('setup locks Premium seats and unavailable bots while keeping settings visible', async (t) => {
+test('setup locks large seats without an allowance while keeping settings visible', async (t) => {
   const room = await fixture('pages/lobby/BotGameSetup.vue', {
     props: { modelValue: true },
     locale: 'ru',
@@ -2129,7 +2136,7 @@ test('lobby AI language choices show local flags and preserve the selected launc
   await launchButton(room).props.onClick();
   assert.equal(room.sent.at(-1)[2].language, 'vi');
 });
-test('lobby AI shows locked Premium sizes, exact fixed roles and selected language launch payload', async (t) => {
+test('lobby AI shows locked large sizes, exact fixed roles and selected language launch payload', async (t) => {
   const room = await lobbyAiFixture({
     locale: 'ru',
     acknowledge: async (event) => (event === 'startLobbyAiRoom' ? { ok: true } : lobbyAccess),
@@ -2360,4 +2367,35 @@ test('lobby AI keeps confirmation through room broadcasts with an unchanged rost
   await vue.nextTick();
   await room.render();
   assert.equal(launchButton(room).props.disabled, false);
+});
+
+test('setup unlocks both large seats with a weekly game and locks them together after a server rejection', async (t) => {
+  const reset = Date.parse('2026-11-22T19:00:00Z');
+  const room = await fixture('pages/lobby/BotGameSetup.vue', {
+    props: { modelValue: true },
+    accessOverrides: {
+      canPlay: vue.ref(true),
+      botModes: vue.ref({ regular: true }),
+      weeklyLargeGame: vue.ref({ limit: 2, remaining: 2, resetsAt: reset }),
+    },
+    acknowledge: async () => ({ error: 'weeklyLargeGameUsed', resetsAt: reset }),
+  });
+  t.after(room.stop);
+  const seats = () => room.nodes('button').filter((node) => node.props['data-player-count']);
+  assert.deepEqual(
+    seats().map((node) => !!node.props.disabled),
+    [false, false, false, false],
+  );
+  seats().at(-1).props.onClick();
+  await room.render();
+  await room
+    .nodes('v-btn')
+    .find((node) => 'data-create-bot-game' in node.props)
+    .props.onClick();
+  assert.equal(room.sent[0][1].playerCount, 8);
+  await room.render();
+  assert.deepEqual(
+    seats().map((node) => !!node.props.disabled),
+    [false, false, true, true],
+  );
 });

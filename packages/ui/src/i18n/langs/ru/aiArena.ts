@@ -1,8 +1,19 @@
 export default {
+  weeklyGameAvailable: '1 большая игра доступна на этой неделе',
+  weeklyGameDetails: 'Для стола на 7 или 8 игроков. Лимит списывается при запуске партии.',
+  weeklyLobbyGameDetails: 'В этом лобби лимит расходуется при запуске стола на 7–8 мест с тремя и более ботами.',
+  weeklyGameUsed: 'Недельный лимит больших игр использован',
+  weeklyGameReset: 'Снова доступна {date}.',
+  weeklyGameTwoAvailable: 'Доступны 2 большие игры на этой неделе',
+  weeklyGameOneOfTwo: 'Осталась 1 из 2 больших игр на этой неделе',
+  weeklyGameNewAccount: 'Большие игры доступны через 7 дней после регистрации',
+  weeklyGameUnlock: 'Доступно с {date}.',
+  weeklyGameGuest: 'Войдите, чтобы проверить лимит больших игр',
+  weeklyGamePremium: 'Столы на 7 и 8 игроков входят в Premium',
+  weeklyGameLaunch: 'При запуске будет использована недельная игра на 7–8 мест.',
   lobbyBotCount: 'Ботов: {count}',
   lobbyFixed: 'Фиксированы',
   lobbyChatTitle: 'Общайтесь в чате',
-  lobbyPremiumLimit: 'Без Premium у ведущего на 7–8 участников можно добавить до 2 ботов.',
   lobbyLaunch: 'Играть · {count} мест',
 
   lobbyPlay: 'Играть с ИИ',
@@ -66,7 +77,6 @@ export default {
   cardDiscussion: 'Обсуждение',
   botBeginnerStart: 'Начать',
   botBeginnerHint: '5 игроков: вы и 4 бота. Боты говорят проще и объясняют свои решения.',
-  botPremiumSeats: '7 и 8 игроков доступны с Premium.',
   yourDiscussionTurn: 'Ваше слово',
   discussionHint:
     'Отправь сообщение в чат — боты продолжат обсуждение. Можно пропустить реплику кнопкой «Передать слово».',

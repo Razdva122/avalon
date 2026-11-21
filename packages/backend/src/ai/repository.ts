@@ -2,7 +2,8 @@ import { aiPlayedModel, aiRosterInfo } from '@avalon/types';
 import { AI_LEASE_MS } from './timing';
 import { calculateAiRatings } from './ratings';
 import { AI_PROFILE_RATING_SEASON } from './rating-season';
-import type { Db } from 'mongodb';
+import { MongoServerError, type Db } from 'mongodb';
+import { randomUUID } from 'crypto';
 import type { StartedRoomState, TRoomState, TRoomInfo, PlayerGameSummaryPage, BotQuotaThresholds } from '@avalon/types';
 import { canonicalBotQuotaThresholds, defaultBotQuotaThresholds, validBotQuotaThresholds } from './quota-policy';
 import { AiPause } from './client';
@@ -513,6 +514,56 @@ export class AiRepository {
     );
     if (!result.matchedCount) throw new AiPause('Потеряно управление AI-партией.');
   }
+  async weeklyGamesUsed(hostID: string, startsAt: number) {
+    return this.db
+      .collection('ai_room_replays')
+      .countDocuments(
+        { weeklyHostID: hostID, weeklyStartsAt: startsAt },
+        { limit: 2, readConcern: { level: 'majority' } },
+      );
+  }
+
+  async commitWeeklyStart(state: StartedRoomState, startsAt: number, limit: number) {
+    validateID(state.roomID);
+    const replays = this.db.collection<{
+      _id: string;
+      state: StartedRoomState;
+      weeklyHostID: string;
+      weeklyStartsAt: number;
+      weeklyStartAttempt: string;
+      weeklySlot?: 2 | null;
+    }>('ai_room_replays');
+    const weeklyStartAttempt = randomUUID();
+    const saved = { ...state, createAt: new Date(state.createAt).toISOString() };
+    const ownerWeek = { weeklyHostID: state.leaderID, weeklyStartsAt: startsAt };
+    const durableRead = { projection: { _id: 1 }, readConcern: { level: 'majority' as const } };
+    // Old replays and first-slot launches omit weeklySlot. MongoDB indexes a missing field as null.
+    for (const weeklySlot of limit >= 2 ? [null, 2 as const] : limit === 1 ? [null] : []) {
+      try {
+        await replays.insertOne(
+          { _id: state.roomID, state: saved, ...ownerWeek, weeklyStartAttempt, ...(weeklySlot && { weeklySlot }) },
+          { writeConcern: { w: 'majority', j: true } },
+        );
+      } catch (error) {
+        // An acknowledgement can be lost after MongoDB stores the launch.
+        const committed = await replays.findOne({ _id: state.roomID, weeklyStartAttempt }, durableRead);
+        if (!committed) {
+          if (
+            error instanceof MongoServerError &&
+            error.code === 11000 &&
+            (await replays.findOne({ ...ownerWeek, weeklySlot }, durableRead))
+          )
+            continue;
+          throw error;
+        }
+      }
+      this.listVersion++;
+      this.listCache = undefined;
+      return true;
+    }
+    return false;
+  }
+
   async save(state: TRoomState) {
     // Separate collection keeps AI replays out of all existing ranked statistics queries.
     if (state.stage !== 'started') return;

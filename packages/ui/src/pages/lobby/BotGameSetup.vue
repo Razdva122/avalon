@@ -45,14 +45,31 @@
               type="button"
               :data-player-count="count"
               :aria-pressed="playerCount === count"
-              :disabled="busy || (count >= 7 && !canPlayLargeTables)"
+              :aria-describedby="
+                count >= 7 && (!signedIn || canPlayLargeTables || weeklyLargeGame) ? 'setup-weekly-game' : undefined
+              "
+              :disabled="busy || (count >= 7 && signedIn && !largeTableAccess)"
               @click="playerCount = count"
             >
               <span>{{ count }}</span
-              ><span v-if="count >= 7" class="premium-label"><v-icon icon="fa:fa-solid fa-crown" />Premium</span>
+              ><v-icon
+                v-if="count >= 7 && weeklyLargeGame?.remaining === 0"
+                class="seat-lock"
+                icon="lock"
+                size="14"
+                aria-hidden="true"
+              />
             </button>
           </div>
         </fieldset>
+        <WeeklyBotGameNotice
+          v-if="selectedMode !== 'beginner'"
+          id="setup-weekly-game"
+          class="setup-weekly-game"
+          :weekly="weeklyLargeGame"
+          :premium="canPlayLargeTables"
+          :guest="!signedIn"
+        />
         <label v-if="withFriend" class="language-field human-seats-field">
           <span>{{ $t('aiArena.setupHumanPlayers') }}</span>
           <select v-model="humanSeats" :disabled="busy" data-human-seats>
@@ -213,7 +230,6 @@
             {{ $t(selectedMode === 'beginner' ? 'aiArena.setupBeginnerHint' : 'aiArena.setupRegularHint') }}
           </p>
           <p v-if="withFriend">{{ $t('aiArena.setupFriendHint') }}</p>
-          <p>{{ $t('aiArena.botPremiumSeats') }}</p>
         </details>
       </div>
       <footer class="setup-footer">
@@ -249,6 +265,7 @@ import PlayerIcon from '@/components/view/information/PlayerIcon.vue';
 import AddonIcon from '@/components/view/information/AddonIcon.vue';
 import { rolesShortInfo } from '@/components/view/information/const';
 import { useAiAccess } from '@/helpers/composables/useAiAccess';
+import WeeklyBotGameNotice from '@/components/view/panels/WeeklyBotGameNotice.vue';
 import { openRoomRoute } from '@/helpers/open-room-route';
 import type { AiLanguage, AiPlayerCount } from '@avalon/types';
 import { aiHumanRoles, type AiHumanRole } from '@avalon/types/room/ai-roles';
@@ -262,8 +279,19 @@ const emit = defineEmits<{
 const { t, locale } = useI18n();
 const router = useRouter();
 const store = useStore();
-const { canPlay, canPlayLargeTables, botModes, botWaitHours, botsBusy, accessStatus, ownRoomID, refresh } =
-  useAiAccess();
+const {
+  canPlay,
+  canPlayLargeTables,
+  weeklyLargeGame,
+  largeTableAccess,
+  markWeeklyGameUsed,
+  botModes,
+  botWaitHours,
+  botsBusy,
+  accessStatus,
+  ownRoomID,
+  refresh,
+} = useAiAccess();
 const open = computed({ get: () => props.modelValue, set: (value) => emit('update:modelValue', value) });
 const signedIn = computed(() => Boolean(store.state.profile?.id));
 const selectedMode = ref<'regular' | 'beginner'>(props.beginner ? 'beginner' : 'regular');
@@ -338,15 +366,15 @@ function modeAvailable(mode: 'regular' | 'beginner') {
 const canCreate = computed(
   () =>
     Boolean(ownRoomID.value) ||
-    (modeAvailable(selectedMode.value) && (playerCount.value < 7 || canPlayLargeTables.value)),
+    (modeAvailable(selectedMode.value) && (playerCount.value < 7 || largeTableAccess.value)),
 );
 watch([resumeAfterAuth, accessStatus], () => {
   if (!resumeAfterAuth.value || accessStatus.value === 'loading') return;
   resumeAfterAuth.value = false;
   if (active && open.value && accessStatus.value === 'ready') void create();
 });
-watch([selectedMode, canPlayLargeTables], () => {
-  if (selectedMode.value === 'beginner' || (!canPlayLargeTables.value && playerCount.value >= 7)) playerCount.value = 5;
+watch(selectedMode, (mode) => {
+  if (mode === 'beginner') playerCount.value = 5;
 });
 watch(open, (value) => {
   if (!value) resumeAfterAuth.value = false;
@@ -400,8 +428,12 @@ async function create() {
         });
     if (!active) return;
     if ('error' in result) {
-      error.value = t('aiArena.botPlayError');
-      emit('error', error.value);
+      if (result.error === 'weeklyLargeGameUsed' && result.resetsAt !== undefined) {
+        markWeeklyGameUsed(result.resetsAt, result.weeklyLargeGame);
+      } else {
+        error.value = t('aiArena.botPlayError');
+        emit('error', error.value);
+      }
       void refresh();
     } else if (await openRoomRoute(router, result.roomID, () => active)) {
       open.value = false;
@@ -452,6 +484,14 @@ async function create() {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
+.setup-weekly-game {
+  margin: 10px 0 14px;
+}
+.seat-lock {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
 .play-format {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -478,7 +518,6 @@ async function create() {
   color: rgb(var(--v-theme-text-primary));
 }
 .friend-hint,
-.premium-hint,
 .mode-hint {
   font-size: 13px;
   line-height: 1.5;
@@ -632,6 +671,7 @@ fieldset {
   gap: 8px;
 }
 .seat-row button {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -651,20 +691,6 @@ fieldset {
   background: rgb(var(--v-theme-bg-app));
   color: rgb(var(--v-theme-text-secondary));
   cursor: not-allowed;
-}
-.premium-label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: rgb(var(--v-theme-support-accent));
-  font-size: 11px;
-  font-weight: 600;
-}
-.premium-label .v-icon {
-  font-size: 12px;
-}
-.premium-hint {
-  margin-top: 8px;
 }
 .setup-footer {
   flex-shrink: 0;

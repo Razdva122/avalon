@@ -47,6 +47,7 @@ function fixture(adminID = 'admin', validatePackets = false) {
   const claim = jest.fn<Promise<void>, [string]>(async () => {});
   const release = jest.fn<Promise<void>, [string]>(async () => {});
   const save = jest.fn(async () => {});
+  const weeklyGamesUsed = jest.fn(async () => 0);
   const host = {
     rooms: {},
     io,
@@ -58,6 +59,7 @@ function fixture(adminID = 'admin', validatePackets = false) {
     },
     updateRoomsList() {},
     dbManager: {
+      getUserRegistrationDate: async () => undefined,
       getUserFeatures: async (id: string) => ({
         showPremiumBadge: false,
         ...(id === 'premium' ? { premiumGrantedAt: new Date() } : {}),
@@ -74,6 +76,7 @@ function fixture(adminID = 'admin', validatePackets = false) {
     claim,
     release,
     save,
+    weeklyGamesUsed,
     renewLease: async () => {},
     busyInstances: async () => [],
   } as unknown as AiRepository;
@@ -97,7 +100,7 @@ function fixture(adminID = 'admin', validatePackets = false) {
     expect(response.mock.calls[0][0]).toHaveProperty('roomID');
     return host.rooms[response.mock.calls[0][0].roomID] as BotRoom;
   }
-  return { host, service, connect, claim, release, save, draft };
+  return { host, service, connect, claim, release, save, draft, weeklyGamesUsed };
 }
 
 async function finishedBotGame(humans = ['owner'], beginner = false, language: 'ru' | 'pt' | 'zh-cn' = 'ru') {
@@ -384,6 +387,7 @@ test('a ready room is reused by its owner and prevents another party reserving t
     canManage: false,
     canPlay: true,
     canPlayLargeTables: false,
+    weeklyLargeGame: { limit: 1, remaining: 1, resetsAt: expect.any(Number) },
     ownRoomID: first.roomID,
     botModes: { smart: true, regular: true, beginner: true },
   });
@@ -392,6 +396,7 @@ test('a ready room is reused by its owner and prevents another party reserving t
     canManage: false,
     canPlay: true,
     canPlayLargeTables: false,
+    weeklyLargeGame: { limit: 1, remaining: 1, resetsAt: expect.any(Number) },
     botsBusy: true,
     botModes: { smart: false, regular: false, beginner: false },
   });
@@ -623,9 +628,10 @@ test.each([5, 6, 7, 8])('public table supports %i seats with server premium admi
   expect(room.options.addons.ladyOfLake).toBe(playerCount >= 7 ? true : undefined);
 });
 
-test.each([7, 8])('non-premium cannot start a %i-player table', async (playerCount) => {
-  const { draft, connect } = fixture();
+test.each([7, 8])('a spent weekly game blocks a %i-player table at launch', async (playerCount) => {
+  const { draft, connect, weeklyGamesUsed } = fixture();
   const room = await draft();
+  weeklyGamesUsed.mockResolvedValue(1);
   const response = jest.fn();
   await connect('owner').startHumanAiRoom(
     room.roomID,
@@ -666,17 +672,16 @@ test.each([
   [1000, true],
 ])('paid premium admission at %i cents is %s', async (total, allowed) => {
   jest.mocked(support.supportTotalCents).mockResolvedValue(total as number);
-  const { draft, connect } = fixture();
+  const { draft, connect, weeklyGamesUsed } = fixture();
   const room = await draft();
+  weeklyGamesUsed.mockResolvedValue(1);
   const result = jest.fn();
   await connect('owner').startHumanAiRoom(
     room.roomID,
     { difficulty: 'regular', language: 'ru', playerCount: 8 },
     result,
   );
-  expect(result.mock.calls[0][0]).toEqual(
-    allowed ? { ok: true } : { error: 'Premium is required for seven or eight players' },
-  );
+  expect(result.mock.calls[0][0]).toMatchObject(allowed ? { ok: true } : { error: 'weeklyLargeGameUsed' });
 });
 
 test.each([2, 3])(
@@ -755,7 +760,8 @@ test.each([
   { beginner: false, difficulty: 'regular', language: 'ru', playerCount: 7 },
   { beginner: true, difficulty: 'regular', language: 'ru', playerCount: 6 },
 ])('invalid or unentitled setup never reserves the shared slot: %j', async (options) => {
-  const { connect, claim } = fixture();
+  const { connect, claim, weeklyGamesUsed } = fixture();
+  weeklyGamesUsed.mockResolvedValue(1);
   const response = jest.fn();
   await connect('owner').createHumanAiRoom(options, response);
   expect(response.mock.calls[0][0]).toHaveProperty('error');

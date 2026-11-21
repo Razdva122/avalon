@@ -1,8 +1,19 @@
 export default {
+  weeklyGameAvailable: 'Tienes 1 partida grande disponible esta semana',
+  weeklyGameDetails: 'Para mesas de 7 u 8 jugadores. Cuenta al iniciar la partida.',
+  weeklyLobbyGameDetails: 'En esta sala, cuenta al iniciar una mesa de 7 u 8 jugadores con al menos 3 bots.',
+  weeklyGameUsed: 'Ya usaste tu partida grande semanal',
+  weeklyGameReset: 'Volverá a estar disponible el {date}.',
+  weeklyGameTwoAvailable: 'Tienes 2 partidas grandes disponibles esta semana',
+  weeklyGameOneOfTwo: 'Te queda 1 de 2 partidas grandes esta semana',
+  weeklyGameNewAccount: 'Las partidas grandes se habilitan 7 días después del registro',
+  weeklyGameUnlock: 'Disponible a partir del {date}.',
+  weeklyGameGuest: 'Inicia sesión para consultar tu límite de partidas grandes',
+  weeklyGamePremium: 'Premium incluye mesas de 7 y 8 jugadores',
+  weeklyGameLaunch: 'Al iniciar esta partida usarás tu partida grande semanal.',
   lobbyBotCount: 'Bots: {count}',
   lobbyFixed: 'Fijos',
   lobbyChatTitle: 'Habla por el chat',
-  lobbyPremiumLimit: 'Sin Premium del anfitrión, las mesas de 7–8 jugadores permiten hasta 2 bots.',
   lobbyLaunch: 'Jugar · {count} asientos',
 
   lobbyPlay: 'Jugar con IA',
@@ -68,7 +79,6 @@ export default {
   cardDiscussion: 'Debate',
   botBeginnerStart: 'Empezar',
   botBeginnerHint: '5 jugadores: tú y 4 bots. Los bots hablan de forma sencilla y explican sus decisiones.',
-  botPremiumSeats: 'Las partidas de 7 y 8 jugadores requieren Premium.',
   yourDiscussionTurn: 'Tu turno de hablar',
   discussionHint:
     'Envía un mensaje al chat para continuar la discusión, o pulsa «Pasar turno» para omitir tu intervención.',

@@ -47,3 +47,13 @@ test('public profiles include registration date and count only completed AI game
   await replays.deleteMany({});
   expect(await users.getPublicUserProfile('player')).toMatchObject({ registrationDate, aiGamesCount: 0 });
 });
+
+test('weekly eligibility reads the stored registration date without hydrating a new timestamp for legacy profiles', async () => {
+  const registrationDate = '2025-03-12T10:30:00.000Z';
+  const profiles = userProfileModel.collection;
+  const profile = (id: string) => ({ id, name: id, login: id, email: `${id}@example.com`, password: 'hash' });
+  await profiles.insertMany([{ ...profile('stored-date'), registrationDate }, profile('legacy-no-date')]);
+  const users = new UserLayer();
+  expect(await users.getUserRegistrationDate('stored-date')).toBe(registrationDate);
+  expect(await users.getUserRegistrationDate('legacy-no-date')).toBeUndefined();
+});

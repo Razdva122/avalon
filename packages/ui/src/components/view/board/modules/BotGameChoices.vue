@@ -3,13 +3,16 @@
     <div v-if="difficulty" class="prepared-bot-game">
       <h2 class="bot-table">{{ rosterText }}</h2>
       <p>{{ waitingForPlayers ? waitingText : $t('aiArena.ready') }}</p>
+      <WeeklyBotGameNotice v-if="selectedPlayerCount >= 7 && !canPlayLargeTables" :weekly="weeklyLargeGame" launch />
       <BotGameTimer v-if="expiresAt" :expires-at="expiresAt" phase="preparation" compact />
       <v-btn
         class="prepared-start"
         variant="flat"
         prepend-icon="play_arrow"
         :loading="busy && !!pendingDifficulty"
-        :disabled="busy || !canPlay || !botModes[beginner ? 'beginner' : 'regular'] || waitingForPlayers"
+        :disabled="
+          busy || !canPlay || !botModes[beginner ? 'beginner' : 'regular'] || waitingForPlayers || largeTableLocked
+        "
         data-prepared-start
         @click="play"
         >{{ $t('aiArena.setupStart') }}</v-btn
@@ -42,13 +45,16 @@
         <v-icon icon="settings" class="bot-settings-icon" aria-hidden="true" />
       </button>
       <p v-if="waitingForPlayers" role="status">{{ waitingText }}</p>
+      <WeeklyBotGameNotice v-if="selectedPlayerCount >= 7 && !canPlayLargeTables" :weekly="weeklyLargeGame" launch />
       <div class="bot-modes" :class="{ 'bot-modes--beginner': beginner }">
         <div v-for="difficulty in botDifficulties" :key="difficulty" class="bot-mode">
           <v-btn
             :data-bot-mode="difficulty"
             :class="`bot-mode-button bot-mode-button--${difficulty}`"
             :loading="busy && pendingDifficulty === difficulty"
-            :disabled="busy || !canPlay || !botModes[beginner ? 'beginner' : 'regular'] || waitingForPlayers"
+            :disabled="
+              busy || !canPlay || !botModes[beginner ? 'beginner' : 'regular'] || waitingForPlayers || largeTableLocked
+            "
             :aria-describedby="`bot-${difficulty}-availability`"
             @click="play"
           >
@@ -134,13 +140,13 @@
               <select v-model="selectedPlayerCount" :disabled="busy">
                 <option :value="5">5</option>
                 <option :value="6">6</option>
-                <option :value="7" :disabled="!canPlayLargeTables">7 · Premium</option>
-                <option :value="8" :disabled="!canPlayLargeTables">8 · Premium</option>
+                <option :value="7" :disabled="!largeTableAccess">7</option>
+                <option :value="8" :disabled="!largeTableAccess">8</option>
               </select>
             </label>
           </div>
           <p class="bot-sheet-note">{{ rosterText }}</p>
-          <p v-if="!beginner && !canPlayLargeTables" class="bot-sheet-note">{{ $t('aiArena.botPremiumSeats') }}</p>
+          <WeeklyBotGameNotice v-if="!beginner" :weekly="weeklyLargeGame" :premium="canPlayLargeTables" />
           <div class="bot-sheet-explanations">
             <p v-if="beginner">{{ $t('aiArena.botBeginnerHint') }}</p>
             <template v-else>
@@ -202,6 +208,7 @@ import { localizedPath } from '@/router/paths';
 import { socket } from '@/api/socket';
 import type { AiBotDifficulty, AiLanguage, AiPlayerCount } from '@avalon/types';
 import BotGameTimer from './BotGameTimer.vue';
+import WeeklyBotGameNotice from '@/components/view/panels/WeeklyBotGameNotice.vue';
 const props = defineProps<{
   roomID: string;
   title?: string;
@@ -216,10 +223,22 @@ const props = defineProps<{
 }>();
 const { t, locale } = useI18n();
 const router = useRouter();
-const { canPlay, canPlayLargeTables, botModes, botsBusy, botWaitHours, accessStatus, refresh } = useAiAccess();
+const {
+  canPlay,
+  canPlayLargeTables,
+  weeklyLargeGame,
+  largeTableAccess,
+  markWeeklyGameUsed,
+  botModes,
+  botsBusy,
+  botWaitHours,
+  accessStatus,
+  refresh,
+} = useAiAccess();
 const formatHours = (hours: number) => new Intl.NumberFormat(locale.value.replace('_', '-')).format(hours);
 const botDifficulties = ['regular'] as const;
 const selectedPlayerCount = ref<AiPlayerCount>(props.playerCount ?? 5);
+const largeTableLocked = computed(() => selectedPlayerCount.value >= 7 && !largeTableAccess.value);
 const expectedHumanCount = computed(() => (props.withFriend ? (props.humanSeats ?? 2) : 1));
 const openHumanSeats = computed(() => Math.max(0, expectedHumanCount.value - (props.humanCount ?? 1)));
 const waitingForPlayers = computed(() => openHumanSeats.value > 0);
@@ -293,7 +312,7 @@ async function play() {
     accessStatus.value !== 'ready'
   )
     return;
-  if (!props.beginner && selectedPlayerCount.value >= 7 && !canPlayLargeTables.value) return;
+  if (largeTableLocked.value) return;
   if (props.expiresAt && Date.now() >= props.expiresAt) {
     error.value = t('aiArena.botTimeout');
     return;
@@ -308,7 +327,9 @@ async function play() {
       ...(!props.beginner && selectedPlayerCount.value !== 5 ? { playerCount: selectedPlayerCount.value } : {}),
     });
     if ('error' in result) {
-      error.value = t('aiArena.botPlayError');
+      if (result.error === 'weeklyLargeGameUsed' && result.resetsAt !== undefined) {
+        markWeeklyGameUsed(result.resetsAt, result.weeklyLargeGame);
+      } else error.value = t('aiArena.botPlayError');
       await refresh();
     }
   } catch {
