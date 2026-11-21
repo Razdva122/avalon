@@ -19,6 +19,8 @@ import {
   winningOpportunityAdvice,
   openingTieBreakAdvice,
   evilTeamAdvice,
+  evilRosterCoverAdvice,
+  evilVoteCoverAdvice,
   ladyAnnouncementAdvice,
   ladyInspectionAdvice,
   ladyTransferPreference,
@@ -239,7 +241,9 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
   const strategy = ['selectTeam', 'votingForTeam'].includes(request.state.stage)
     ? coalitionAdvice +
       ' Distinguish unresolved rosters from established sabotage risk. Persuade a missing voter with specific public evidence or a compromise; repeating the same question is not a new coalition plan.' +
-      (evil ? ' ' + evilTeamAdvice : '')
+      (evil
+        ? ` ${evilTeamAdvice} ${request.state.stage === 'votingForTeam' ? evilVoteCoverAdvice : evilRosterCoverAdvice}`
+        : ' ' + decisiveTeamAdvice)
     : request.state.stage === 'onMission'
       ? "Evil card advice: compare sabotage with a concrete future benefit of cover using score and failsRequired. Infer teammates' likely cards from their public words, recorded votes, completed missions and current incentives; keep these predictions uncertain. There is no prearranged sabotage convention or designated saboteur; seat numbers do not assign cards. Compare your card's effect if others play Success or Fail, including redundant exposure and the risk of too few Fails. Allies' future cards remain unknown; unresolved teammates may also be Evil and act independently. Oberon does not know allies. Weigh early exposure against cover, and prioritize a decisive sabotage over trust for a round that may never occur. Too few Evil cannot meet a two-Fail threshold."
       : request.state.stage === 'assassinate'
@@ -281,7 +285,6 @@ export function decisionInstructions(request: BotRequest, commonOnly = false) {
     (assessLadyChoice ? ladyChoiceSignalAdvice + ' ' : '') +
     strategy +
     ' ' +
-    (['selectTeam', 'votingForTeam'].includes(request.state.stage) ? decisiveTeamAdvice + ' ' : '') +
     turn +
     ' ' +
     (request.speak ? publicSpeechAdvice : '') +
@@ -303,7 +306,7 @@ export function decisionPipeline(generate: Generate): Decide {
   const evidence = new Map<string, DecisionEvidence[]>();
   const testimony = new Map<string, Map<string, BotRequest['chat']>>();
   // One pipeline belongs to one room, including technical continuations.
-  const openingPriorities = new Map<string, number[]>();
+  const rosterPriorities = new Map<string, number[]>();
   type ReviewExample = {
     id: string;
     stage: string;
@@ -500,11 +503,11 @@ export function decisionPipeline(generate: Generate): Decide {
         Boolean(councilTarget && councilTarget !== request.choices[reply.choice]);
       const { missions, votes, tableConventions, requiredClaimStances, ...facts } = compactRequest(decisionRequest);
       let priority: number[] | undefined;
-      if (own && isOpeningPair(request)) {
-        priority = openingPriorities.get(request.playerID);
+      if (own && (isOpeningPair(request) || (request.state.stage === 'selectTeam' && facts.allianceCover))) {
+        priority = rosterPriorities.get(request.playerID);
         if (!priority) {
           priority = shuffle(request.state.players.filter((p) => p.id !== request.playerID).map((p) => p.index));
-          openingPriorities.set(request.playerID, priority);
+          rosterPriorities.set(request.playerID, priority);
         }
       }
       // Private generation context only: never add preferences to public room facts.

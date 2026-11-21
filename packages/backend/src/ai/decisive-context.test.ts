@@ -1,7 +1,7 @@
 import fixture from './fixtures/decisive-match.json';
 import { compactRequest } from './client';
 import type { BotRequest } from './client';
-import { publicContext } from './pipeline';
+import { decisionInstructions, decisionPipeline, publicContext } from './pipeline';
 
 const request = () =>
   structuredClone(fixture.cases.find((entry) => entry.id === 'm5-gambler-vote')!.request) as unknown as BotRequest;
@@ -112,4 +112,86 @@ test('next leader follows seat order and distinguishes early, fourth and forced 
   input.state.vote = 4;
   expect(compactRequest(input).proposal).toMatchObject({ number: 5, fifthLeader: 6, forced: true });
   expect(compactRequest(input).proposal?.nextLeader).toBeUndefined();
+});
+
+const allianceRequest = () => {
+  const input = request();
+  const me = input.state.players.find((player) => player.id === input.playerID)!;
+  me.role = 'mordred';
+  const ally = input.state.players.find((player) => player.id !== me.id)!;
+  ally.role = 'evil';
+  const other = input.state.players.find((player) => player.id !== me.id && player.id !== ally.id)!;
+  const fourth = input.state.players.find((player) => ![me.id, ally.id, other.id].includes(player.id))!;
+  const proposal = input.state.history.find((event) => event.type === 'vote')!;
+  const turn = (leaderID: string, ids: string[], value: 'approve' | 'reject') => ({
+    ...proposal,
+    leaderID,
+    anonymous: false as const,
+    forced: false,
+    team: ids.map((id) => ({ id })),
+    votes: [{ playerID: me.id, value, onMission: ids.includes(me.id) }],
+  });
+  const first = turn(other.id, [ally.id, other.id], 'approve');
+  input.state.history = [
+    first,
+    first,
+    turn(other.id, [ally.id, other.id], 'reject'),
+    turn(other.id, [other.id, fourth.id], 'approve'),
+    turn(other.id, [other.id, fourth.id], 'reject'),
+    turn(me.id, [me.id, ally.id], 'approve'),
+    turn(me.id, [me.id, other.id], 'approve'),
+    turn(me.id, [me.id, other.id], 'reject'),
+    { ...first, forced: true },
+    { ...first, anonymous: true, votes: { approve: 4, reject: 2 } },
+  ];
+  input.state.stage = 'votingForTeam';
+  input.speak = false;
+  input.choices = ['approve', 'reject'];
+  return { input, ally, me, other };
+};
+
+test('Evil privately sees its actual off-team votes and self-inclusive rosters by known ally', async () => {
+  const { input, ally, me } = allianceRequest();
+  const expected = [
+    {
+      ally: ally.index,
+      offTeamVotes: { withAlly: { approve: 2, reject: 1 }, withoutAlly: { approve: 1, reject: 1 } },
+      selfInclusiveProposals: { withAlly: 1, withoutAlly: 2 },
+    },
+  ];
+  expect(publicContext(input, 'approve')).not.toHaveProperty('allianceCover');
+  await decisionPipeline(async (_request, options) => {
+    expect(options.context).toMatchObject({ allianceCover: expected });
+    expect(options.instructions).toContain('A single Fail card still matters');
+    return { choice: 0, speech: 'The decisive sabotage can justify exposure.', publicReason: '' };
+  })(input);
+  me.role = 'oberon';
+  ally.role = 'unknown';
+  expect(compactRequest(input)).not.toHaveProperty('allianceCover', expect.anything());
+  me.role = 'merlin';
+  ally.role = 'evil';
+  expect(compactRequest(input)).not.toHaveProperty('allianceCover', expect.anything());
+  me.role = 'mordred';
+  input.state.stage = 'onMission';
+  expect(compactRequest(input)).not.toHaveProperty('allianceCover', expect.anything());
+});
+
+test('Evil can choose either vote and either self-inclusive roster after considering cover', async () => {
+  const { input, ally, me, other } = allianceRequest();
+  for (const stage of ['votingForTeam', 'selectTeam'] as const) {
+    input.state.stage = stage;
+    input.choices =
+      stage === 'selectTeam' ? [`${me.index}, ${ally.index}`, `${me.index}, ${other.index}`] : ['approve', 'reject'];
+    expect(decisionInstructions(input)).toContain(
+      stage === 'selectTeam'
+        ? 'strongest legal option also including your known ally'
+        : 'compare approving now with rejecting',
+    );
+    for (const choice of [0, 1]) {
+      const result = await decisionPipeline(async () => ({ choice, speech: 'Compared tactical value and cover.' }))(
+        input,
+      );
+      expect(result.choice).toBe(choice);
+    }
+  }
 });

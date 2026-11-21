@@ -100,6 +100,37 @@ test('each bot has a priority containing its own possible partners', async () =>
   expect([...generate.mock.calls[1][1].context.privateTieBreakOrder].sort()).toEqual([1, 2, 3, 5, 6, 7]);
 });
 
+test('Evil leaders reuse the role-independent priority for comparable partners on later missions', async () => {
+  const input = opening('mordred');
+  input.state.players.find((player) => player.index === 2)!.role = 'evil';
+  const generate = jest.fn().mockResolvedValue(reply);
+  const decide = decisionPipeline(generate);
+  await decide(input);
+
+  const later = {
+    ...input,
+    publicDiscussion: false,
+    optionalSpeech: true,
+    choices: ['1, 2, 3', '1, 3, 4'],
+    state: { ...input.state, mission: 1 },
+  };
+  generate.mockResolvedValue({ choice: 0, speech: 'A comparable team.', publicReason: '' });
+  await decide(later);
+  const first = generate.mock.calls[0][1];
+  const second = generate.mock.calls[1][1];
+  expect(second.context.privateTieBreakOrder).toEqual(first.context.privateTieBreakOrder);
+  expect(second.context.privateTieBreakOrder).toHaveLength(6);
+  expect(second.instructions).toContain('use privateTieBreakOrder to decide between them');
+  expect(publicContext(later, later.choices[0])).not.toHaveProperty('privateTieBreakOrder');
+  await decide({
+    ...later,
+    speak: false,
+    choices: ['approve', 'reject'],
+    state: { ...later.state, stage: 'votingForTeam' },
+  });
+  expect(generate.mock.calls[2][1].context).not.toHaveProperty('privateTieBreakOrder');
+});
+
 test.each([
   ['votingForTeam', 0, 2],
   ['onMission', 0, 2],

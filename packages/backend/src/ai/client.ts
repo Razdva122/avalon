@@ -111,9 +111,13 @@ export const decisiveTeamAdvice =
   "Use proposal.nextLeader and proposal.fifthLeader when comparing reachable alternatives. Successful missions' previous approvers are a starting coalition to negotiate with, not promised future votes; include your own changed vote when comparing support. More total supporters does not mean safer, especially if the extra support comes from suspected Evil. On early proposals, use the remaining turns to persuade a missing voter for the better-supported roster rather than accept a weaker roster merely because opponents already support it. No fixed roster or vote is required.";
 
 export const evilTeamAdvice =
-  "Evil alliance secrecy: before recommending a team, selecting the final roster or voting, privately review what your actual proposals and votes reveal about links to known allies. Secret knowledge of an ally's side is not public evidence for trusting them. Compare the observed public facts distinguishing that seat from other candidates; if none exists, weigh how an unexplained preference or repeated selective support could expose both of you. Account for your earlier public position and the full sequence of choices, not just careful wording this turn. Do not invent events to justify the move or publish this private assessment. " +
-  'Good-viewpoint action check: retaining your actual Evil knowledge and objective, ask whether a Good player in your seat could support this exact roster from public missions, votes and statements, including the risk of being off-team. Review whether you repeatedly approve or promote an ally while rejecting comparable rosters without them. Repeating a preference or citing hoped-for supporters is not new public evidence; verify the coalition against actual recorded support. If the preference lacks a credible public basis and exposes the link, compare changing the action: a feasible roster including yourself, another publicly defensible roster, or rejection with a reachable alternative. Rewording the same revealing choice does not hide the pattern. Do not manufacture evidence, mechanically oppose allies or randomize votes for cover. Keep this assessment private. ' +
-  "Evil team tradeoff: an ally on the roster provides sabotage access, not an automatic reason to approve. Compare immediate Evil gain with the cost to your and your allies' cover, coalition credibility and future invitations. When the score permits and the immediate tactical benefit is small, consider another feasible roster or allowing an early Good success for a concrete later benefit. Support or oppose allies as the actual position warrants, without fixed voting patterns or forced ally rejection. A decisive sabotage or immediate Evil victory takes priority over cover and hypothetical future trust.";
+  'Evil alliance secrecy: use allianceCover, when present, to compare your recorded votes from off the team and your actual proposals that included yourself, with and without each known ally. Use the full sequence and the public facts behind it. Individually plausible excuses can still produce a readable pattern. While posing as Good, verify that actual missions, votes or statements distinguish comparable rosters. If you have an exposedEvil plan, use the history to protect hidden allies while following that plan. Keep this comparison private. Do not manufacture evidence, use quotas or alternate mechanically.';
+
+export const evilVoteCoverAdvice =
+  'Before voting from off the team, compare approving now with rejecting and the reachable next or forced roster. When an ally is on the team, identify what this approval gains over that alternative and what the table can already see in your votes. If approval repeats selective support without a distinguishing public fact, favor rejection when there is a viable alternative for Evil and your exposedEvil plan does not call for that signal. A single Fail card still matters: approve when a defensible public case and concrete tactical gain justify it, or when it is your best realistic chance to win now or prevent the decisive Good success. When you are on the team, account for your own access to sabotage and the future value of cover. Use the actual Fail threshold and never assume an ally will play Fail.';
+
+export const evilRosterCoverAdvice =
+  'Before selecting a roster with yourself on it, identify the strongest legal option also including your known ally and compare it with your best option without them. Your own access to a Fail is identical in both. If neither side has two points and the team with your ally has a credible path to approval, give weight to playing together: routine separation makes the seats everyone accepts easier to clear. When you have repeatedly left this ally out, favor including them now if the public case is comparable. A generic fear of being seen together, an untested ally, or an earlier tentative suggestion is not a concrete reason to exclude them. Use actual objections, mission evidence and recorded votes to distinguish the complete rosters. If both remain comparably credible and neither has a concrete strategic advantage, use privateTieBreakOrder to decide between them when available: prefer the team containing the earliest seat in that order that belongs to only one of the two teams. A real approval advantage, risk of exposure based on the public record, or an advantage in reaching the required Fail count overrides the order. Preserve decisive wins, established exposedEvil plans and the fifth-proposal rule. Keep the order and the comparison private.';
 
 export const evilVisibilityAdvice =
   'Evil knowledge is limited to privateKnowledge and the public roleCounts. Oberon is possible only if roleCounts.oberon is positive; then Oberon does not know allies and is not shown to other Evil during missions, so a roster with no KNOWN Evil may still contain Oberon. Never invent an absent role or an extra Evil slot beyond alignmentCounts. Allies choose cards independently; predictions about their cards must use observed game evidence, not a prearranged convention. Reveal-stage knowledge may be used only after the game state actually reveals it.';
@@ -204,6 +208,8 @@ export function excludesMissionPartners(mission: { team: readonly unknown[]; fai
   return (mission.team.length === 2 && mission.fails === 1) || (mission.team.length === 3 && mission.fails === 2);
 }
 
+const visibleEvilRoles = ['evil', 'mordred', 'morgana', 'minion', 'oberon'];
+
 export function compactRequest(request: BotRequest) {
   const { state } = request;
   const claims = claimContext(request);
@@ -231,7 +237,7 @@ export function compactRequest(request: BotRequest) {
   const own = players.find((p) => p.id === request.playerID);
   let ownRoleAdvice = own && roleAdvice[own.role];
   if (own?.role === 'merlin') {
-    const visibleEvil = players.filter((p) => ['evil', 'mordred', 'morgana', 'minion', 'oberon'].includes(p.role));
+    const visibleEvil = players.filter((p) => visibleEvilRoles.includes(p.role));
     ownRoleAdvice += ` You currently see ${visibleEvil.length} Evil seat(s) in privateKnowledge.rolesVisibleToYou.`;
     if (roleCounts?.mordred)
       ownRoleAdvice +=
@@ -343,6 +349,24 @@ export function compactRequest(request: BotRequest) {
   const humanStatements = humanTestimony(request, humanSeats, end || assassination);
   const failsRequired = state.settings?.missions[state.mission]?.failsRequired;
   const lastCompletedMission = missions[missions.length - 1]?.n ?? 0;
+  const allianceCover =
+    voting && own && side === 'evil'
+      ? seats
+          .filter((p) => p.index !== own.index && visibleEvilRoles.includes(p.role))
+          .map(({ index: ally }) => {
+            const offTeamVotes = { withAlly: { approve: 0, reject: 0 }, withoutAlly: { approve: 0, reject: 0 } };
+            const selfInclusiveProposals = { withAlly: 0, withoutAlly: 0 };
+            for (const vote of votes) {
+              const group = vote.team.includes(ally) ? 'withAlly' : 'withoutAlly';
+              if (vote.team.includes(own.index)) {
+                if (vote.leader === own.index) selfInclusiveProposals[group]++;
+              } else if (vote.yourVote === 'approve' || vote.yourVote === 'reject') {
+                offTeamVotes[group][vote.yourVote]++;
+              }
+            }
+            return { ally, offTeamVotes, selfInclusiveProposals };
+          })
+      : [];
   return {
     you: own && {
       seat: own.index,
@@ -386,6 +410,7 @@ export function compactRequest(request: BotRequest) {
       failures: missions.filter((m) => m.result === 'fail').length,
     },
     proposal: voting ? proposal : undefined,
+    allianceCover: allianceCover.length ? allianceCover : undefined,
     lady: inspection
       ? {
           afterMission: lastCompletedMission,
@@ -406,9 +431,7 @@ export function compactRequest(request: BotRequest) {
             team,
             youAreOnTeam: team.includes(own.index),
             knownEvilOnTeam: players
-              .filter(
-                (p) => team.includes(p.index) && ['evil', 'mordred', 'morgana', 'minion', 'oberon'].includes(p.role),
-              )
+              .filter((p) => team.includes(p.index) && visibleEvilRoles.includes(p.role))
               .map((p) => p.index),
             unresolvedOnTeam: players
               .filter((p) => team.includes(p.index) && ['unknown', 'mysteryWizard'].includes(p.role))
