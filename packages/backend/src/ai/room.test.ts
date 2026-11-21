@@ -3,6 +3,7 @@ import { compactRequest } from './client';
 import { decisionPipeline } from './pipeline';
 import type { BotRequest } from './client';
 import type { Server } from '@avalon/types';
+import lodash from 'lodash';
 
 const io = { to: () => io, except: () => io, emit: () => true } as unknown as Server;
 const reply = (request: BotRequest) => ({ choice: 0, speech: request.speak ? 'I suggest testing this team.' : '' });
@@ -1418,23 +1419,33 @@ test.each([false, true])(
       [human.role, evil.role] = [evil.role, human.role];
     }
     const manager = room.data.manager;
-    for (let mission = 0; mission < 3; mission++) {
-      for (const p of game.players.slice(0, game.settings.missions[mission].players))
-        manager.callGameMethods(game.leader.userID, { method: 'selectPlayer', playerID: p.userID });
-      manager.callGameMethods(game.leader.userID, { method: 'sentSelectedPlayers' });
-      for (const p of game.players) manager.callGameMethods(p.userID, { method: 'voteForMission', option: 'approve' });
-      for (const p of game.players.filter((p) => p.features.isSent))
-        manager.callGameMethods(p.userID, { method: 'actionOnMission', result: 'success' });
+    game.players.sort((a, b) => Number(b === human) - Number(a === human));
+    // With the human first, sampling the last evil player would normally choose a bot.
+    const sample = jest.spyOn(lodash, 'sample').mockImplementation((players) => lodash.last(lodash.values(players)));
+    try {
+      for (let mission = 0; mission < 3; mission++) {
+        for (const p of game.players.slice(0, game.settings.missions[mission].players))
+          manager.callGameMethods(game.leader.userID, { method: 'selectPlayer', playerID: p.userID });
+        manager.callGameMethods(game.leader.userID, { method: 'sentSelectedPlayers' });
+        for (const p of game.players)
+          manager.callGameMethods(p.userID, { method: 'voteForMission', option: 'approve' });
+        for (const p of game.players.filter((p) => p.features.isSent))
+          manager.callGameMethods(p.userID, { method: 'actionOnMission', result: 'success' });
+      }
+    } finally {
+      sample.mockRestore();
     }
     expect(game.stage).toBe('assassinate');
-    const assassin = humanAssassin
-      ? human
-      : game.players.find((p) => p.userID !== 'admin' && p.role.loyalty === 'evil')!;
-    for (const p of game.players) {
-      p.features.isAssassin = p === assassin;
-      p.features.waitForAction = p === assassin;
+    if (humanAssassin) {
+      expect(game.players.filter((p) => p.features.isAssassin).map((p) => p.userID)).toEqual(['admin']);
+    } else {
+      // Keep covering a council with a human adviser and an already appointed bot assassin.
+      const assassin = game.players.find((p) => p !== human && p.role.loyalty === 'evil')!;
+      for (const p of game.players) {
+        p.features.isAssassin = p === assassin;
+        p.features.waitForAction = p === assassin;
+      }
     }
-    game.players.sort((a, b) => Number(b === human) - Number(a === human));
     room.ai!.status = 'running';
     if (humanAssassin)
       expect(() => room.humanAction('admin', { method: 'assassinate', type: 'merlin' })).toThrow('discussion');

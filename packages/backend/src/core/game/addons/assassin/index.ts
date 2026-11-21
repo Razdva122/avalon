@@ -28,6 +28,7 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
   game: Game;
   options: TAssassinateOptions;
   progressData?: AssassinateProgressData;
+  preferredAssassinIDs: readonly string[] = [];
 
   constructor(game: Game, options: TAssassinateOptions) {
     this.game = game;
@@ -58,18 +59,17 @@ export class AssassinAddon implements IGameAddon<TAssassinateOptions> {
     if (this.game.calculateCurrentWinner() === 'good') {
       this.game.stage = 'assassinate';
 
-      // Generate assassin
-      const assassin = _.sample(this.game.players.filter((player) => player.role.loyalty === 'evil'))!;
+      const evilPlayers = this.game.players.filter((player) => player.role.loyalty === 'evil');
+      const preferredAssassins = evilPlayers.filter((player) => this.preferredAssassinIDs.includes(player.userID));
+      const assassin = (_.sample(preferredAssassins) ?? _.sample(evilPlayers))!;
 
       assassin.features.isAssassin = true;
       assassin.features.waitForAction = true;
 
-      const visibleEvil = this.game.players
-        .filter((player) => player.role.loyalty === 'evil')
-        .reduce<Dictionary<TVisibleRole>>((acc, el) => {
-          acc[el.userID] = el.role.role;
-          return acc;
-        }, {});
+      const visibleEvil = evilPlayers.reduce<Dictionary<TVisibleRole>>((acc, el) => {
+        acc[el.userID] = el.role.role;
+        return acc;
+      }, {});
 
       this.game.updateVisibleRolesState('all', visibleEvil);
 

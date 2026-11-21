@@ -4,7 +4,15 @@ import shuffle from 'lodash/shuffle';
 import { aiHumanRoles, type AiHumanRole } from '@avalon/types';
 import { Room } from '@/room';
 import { AI_PROFILE_RATING_SEASON } from './rating-season';
-import type { AiLanguage, AiPlayerCount, GameOptions, Server, TRoomState, AiSpectatorDecision } from '@avalon/types';
+import type {
+  AiLanguage,
+  AiPlayerCount,
+  GameOptions,
+  Server,
+  TRoles,
+  TRoomState,
+  AiSpectatorDecision,
+} from '@avalon/types';
 import type { TGameMethodsParams } from '@/core/game-manager';
 import { AiPause, AiTechnicalPause, type Decide, type BotRequest, type BotReply } from './client';
 import { aiText, isAfterGameSpeech, isVoteOnly } from './language';
@@ -400,6 +408,13 @@ export class BotRoom extends Room {
   }
   override startGame(): void {
     throw Error('Use AI room controls');
+  }
+
+  protected override createStartedGame(players: string[], selectedRole?: { userID: string; role: TRoles }) {
+    const data = super.createStartedGame(players, selectedRole);
+    const assassin = data.manager.game.addons.assassin;
+    if (assassin) assassin.preferredAssassinIDs = this.humanIDs;
+    return data;
   }
 
   stop(message = 'Match stopped.') {
