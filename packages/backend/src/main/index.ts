@@ -58,6 +58,15 @@ export class Manager {
     return this.roomsList.slice(0, 20);
   }
 
+  getActiveRoomIDs() {
+    return Object.values(this.rooms)
+      .filter(
+        (room) =>
+          room.ai?.status !== 'stopped' && (room.data.stage !== 'started' || room.data.manager.game.stage !== 'end'),
+      )
+      .map((room) => room.roomID);
+  }
+
   createRoom(uuid: string, leaderID: string, players: string[], options?: GameOptions) {
     const retained = Object.values(this.rooms);
     if (

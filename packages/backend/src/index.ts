@@ -12,6 +12,7 @@ import { connectDB, DBManager } from '@/db';
 import { MigrationError, ensureAchievementCatalog } from '@/db/migrations';
 
 import { Manager } from '@/main';
+import { deploymentRoomsHandler } from '@/main/deployment-rooms';
 import { supportRouter } from '@/support/routes';
 import { playerBoardsRouter } from '@/player-boards/routes';
 import { ensurePlayerBoardIndexes } from '@/player-boards/repository';
@@ -79,6 +80,7 @@ async function start() {
   );
   const dbManager = new DBManager(mongoose);
   const manager = new Manager(io, dbManager);
+  app.get('/internal/deploy/rooms', deploymentRoomsHandler(manager));
   startVoiceGateway(manager.voice);
 
   // Start the rating scheduler (will initialize ratings if needed)

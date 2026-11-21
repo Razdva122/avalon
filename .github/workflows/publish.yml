@@ -55,6 +55,9 @@ jobs:
       - name: Check mounted nginx configuration upgrade
         run: node --test deploy/nginx/*.test.cjs
 
+      - name: Test production room guard
+        run: node --test deploy/firstbyte/check-idle.test.cjs
+
       - name: Resolve immutable release commit
         id: release
         shell: bash

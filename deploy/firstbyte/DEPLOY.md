@@ -97,12 +97,17 @@ container and reloads nginx without restarting it.
   `avalon-deploy ALL=(root) NOPASSWD: /usr/local/sbin/avalon-deploy`.
 - Install `deploy.py` root-owned as `/opt/avalon/production/deploy.py` (`0700`), install `deploy/nginx/entrypoint.sh`
   as `/opt/avalon/production/nginx-entrypoint.sh` (`0755`), and symlink
-  `/usr/local/sbin/avalon-deploy` to it. Install the existing `deploy/voice/check-idle.cjs` as
+  `/usr/local/sbin/avalon-deploy` to it. Install `deploy/firstbyte/check-idle.cjs` as
   `/opt/avalon/production/check-idle.cjs` (`0600`).
-- The room guard is streamed into `node -`, so its stdin entry point must execute too.
+- The room guard is streamed into `node -` in the running backend container. It reads
+  the entire in-memory room inventory through the loopback-only endpoint on port 3000.
   Deployment requires an explicit JSON decision with `exitCode: 0` and `activeRooms: []`;
-  an empty successful process output must never permit activation. Update both installed
-  scripts together when changing this contract; no application restart is required.
+  an unavailable endpoint, invalid response, or unfinished room blocks activation.
+  Keep the previous guard until the running backend supports the endpoint. If the
+  previous guard cannot verify rooms during the transition, use the existing
+  one-time override only with explicit operator approval. Install and run the new
+  guard after activation. Restore the previous guard for a rollback to a backend
+  without the endpoint.
 - Prerequisites: the existing FirstByte production compose, backup service, watchdog, Python 3,
   Docker Compose, curl, sudo and systemd. Deployment does not bootstrap a blank server.
 

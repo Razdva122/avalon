@@ -1,6 +1,8 @@
 import { Manager } from './index';
+import { deploymentRoomsHandler } from './deployment-rooms';
 import { eventBus } from '@/helpers';
 import type { Server, ServerSocket, StartedRoomState } from '@avalon/types';
+import type { Request, Response } from 'express';
 import type { DBManager } from '@/db';
 import { BotRoom } from '@/ai/room';
 import { Room } from '@/room';
@@ -238,6 +240,53 @@ test('waiting rooms are actually released after idle TTL, not just hidden from l
   jest.advanceTimersByTime(30 * 60000);
   expect(manager.rooms.waiting).toBeUndefined();
   expect(manager.roomListCutted).not.toEqual(expect.arrayContaining([expect.objectContaining({ uuid: 'waiting' })]));
+});
+
+test('deployment counts live games and waiting rooms even when archives fill the lobby response', () => {
+  const { manager } = fixture();
+  manager.createRoom('waiting', 'alice', ['alice']);
+  manager.createRoom('locked', 'bob', ['bob']);
+  manager.rooms.locked.toggleLockedState();
+  for (const id of ['running', 'finished']) {
+    manager.createRoom(id, 'charlie', ['charlie', 'bob', 'alice', 'dave', 'eve']);
+    manager.rooms[id].startGame();
+  }
+  const finished = manager.rooms.finished;
+  if (finished.data.stage !== 'started') throw Error('game did not start');
+  finished.data.manager.game.endGame('manualy');
+  const stopped = new BotRoom('stopped', 'alice', manager.io, async () => ({ choice: 0, speech: '' }));
+  stopped.stop();
+  manager.rooms.stopped = stopped;
+  const archive = finished.calculateRoomState() as StartedRoomState;
+  manager.generateRoomsListFromDB(
+    Array.from({ length: 21 }, (_, i) => ({ ...archive, roomID: `archive-${i}`, createAt: '2099-01-01' })),
+  );
+
+  expect(manager.roomListCutted).toHaveLength(20);
+  expect(manager.roomListCutted.every((room) => room.result)).toBe(true);
+  expect(manager.getActiveRoomIDs().sort()).toEqual(['locked', 'running', 'waiting']);
+});
+
+test.each([
+  ['127.0.0.1', {}, true],
+  ['::1', {}, true],
+  ['::ffff:127.0.0.1', {}, true],
+  ['172.18.0.4', { 'x-forwarded-for': '127.0.0.1' }, false],
+  ['127.0.0.1', { 'x-forwarded-for': '203.0.113.1' }, false],
+])('deployment room route accepts only direct loopback requests (%s)', (remoteAddress, headers, allowed) => {
+  const getActiveRoomIDs = jest.fn(() => ['active']);
+  const request = { socket: { remoteAddress }, headers } as unknown as Request;
+  const response = { status: jest.fn(), set: jest.fn(), end: jest.fn(), json: jest.fn() };
+  response.status.mockReturnValue(response);
+  response.set.mockReturnValue(response);
+  deploymentRoomsHandler({ getActiveRoomIDs })(request, response as unknown as Response);
+  if (allowed) {
+    expect(response.json).toHaveBeenCalledWith({ activeRooms: ['active'] });
+    expect(response.set).toHaveBeenCalledWith('Cache-Control', 'no-store');
+  } else {
+    expect(response.status).toHaveBeenCalledWith(404);
+    expect(getActiveRoomIDs).not.toHaveBeenCalled();
+  }
 });
 
 test.each(['manualy', 'rejectedVote'] as const)(
