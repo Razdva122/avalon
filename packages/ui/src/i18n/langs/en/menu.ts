@@ -12,7 +12,7 @@ export default {
     playgroundBack: 'Back to games',
 
     playground: 'Open playground',
-    playgroundError: 'Could not load 2048. Please try again.',
+    playgroundError: 'Could not load {game}. Please try again.',
     back: 'Back',
     darkTheme: 'Dark theme',
 

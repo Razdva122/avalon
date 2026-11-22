@@ -12,7 +12,7 @@ export default {
     playgroundBack: 'Voltar aos jogos',
 
     playground: 'Abrir playground',
-    playgroundError: 'Não foi possível carregar 2048. Tente novamente.',
+    playgroundError: 'Não foi possível carregar {game}. Tente novamente.',
     back: 'Voltar',
     darkTheme: 'Tema escuro',
 

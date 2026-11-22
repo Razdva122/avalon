@@ -169,7 +169,7 @@ role page after an avatar may download the larger image separately. Historical c
 
 ## 2048 playground
 
-The gamepad button to the right of the room voice controls opens a playground on the left of the table, with a **2048** tile and two coming-soon slots. Choosing **2048** opens its responsive game panel. `PlaygroundLauncher.vue`
+The gamepad button to the right of the room voice controls opens a playground on the left of the table, with **2048**, **Excalibur Jump**, and one coming-soon slot. Choosing **2048** opens its responsive game panel. `PlaygroundLauncher.vue`
 loads `Game2048.vue`, its engine, copy and CSS through the `playground-2048` dynamic
 chunk only after choosing its tile; opening the picker does not fetch the game. No game assets or dependencies are added to the startup bundle.
 The production bundle audit and `scripts/check-playground.cjs` guard this boundary.
@@ -178,7 +178,9 @@ The board, score and best score stay in `localStorage` under
 `avalon.playground.2048.v1`; no account or backend is involved. Invalid saves start
 fresh, and blocked storage leaves the game playable with a visible saving notice.
 Pointer swipes are confined to the board; arrow keys, WASD and on-screen controls
-are available. When the room requires the player's action, a persistent notice replaces the game heading without moving the board. The game stays open and playable; its notice offers an explicit return-to-table button. The picker also shows the notice and remains available during a turn.
+are available. When the room requires the player's action and 2048 is open, a persistent notice replaces the game heading without moving the board. The game stays playable, and the notice offers a return-to-table button. The picker remains available during a turn.
+
+**Excalibur Jump** loads on demand in its own chunk. Hold an arrow key, an on-screen arrow, or either side of the playfield on a touchscreen to steer between stone ledges, drifting lilies, cracked slabs that support one bounce, and wooden ledges that support two. A pale mark previews where the sword will land. Rare golden runes launch the sword immediately. Ledges narrow, spread out, and vary more until the height counter reaches about 1500. Closing the panel pauses the attempt in the tab, and the best height is saved on the device.
 
 Run the engine tests with `node --test packages/ui/scripts/playground-2048.test.cjs`.
 The browser check runs as part of `npm run check:build --workspace=packages/ui`;

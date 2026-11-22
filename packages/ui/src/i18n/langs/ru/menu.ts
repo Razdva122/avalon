@@ -12,7 +12,7 @@ export default {
     playgroundBack: 'К играм',
 
     playground: 'Открыть playground',
-    playgroundError: 'Не удалось загрузить 2048. Попробуйте ещё раз.',
+    playgroundError: 'Не удалось загрузить {game}. Попробуйте ещё раз.',
     back: 'Назад',
     darkTheme: 'Тёмная тема',
 

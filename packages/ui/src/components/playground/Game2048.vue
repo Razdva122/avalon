@@ -410,19 +410,13 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@import './game-chrome';
+
 .playground-panel {
   --board-gap: 9px;
   --game-frame-space: 88px;
   --game-ease: cubic-bezier(0.23, 1, 0.32, 1);
-  color: rgb(var(--v-theme-text-primary));
-  background: rgb(var(--v-theme-surface));
-  border: 1px solid rgb(var(--v-theme-surface-border));
-  border-radius: 22px;
-  box-shadow:
-    0 16px 64px #142b4029,
-    0 2px 8px #142b4010;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  @include playground-panel;
   max-height: calc(100dvh - 88px);
 }
 .playground-header {
@@ -443,12 +437,7 @@ onBeforeUnmount(() => {
 }
 .playground-icon,
 .game-new {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  flex-shrink: 0;
+  @include playground-header-icon;
 }
 svg {
   width: 22px;
@@ -532,32 +521,10 @@ button:disabled {
   align-items: center;
 }
 .game-stat {
-  position: relative;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: rgb(var(--v-theme-inset-hover));
-  min-width: 0;
-  > span:first-child {
-    font-size: 11px;
-    font-weight: 650;
-    color: rgb(var(--v-theme-text-secondary));
-  }
-  strong {
-    font-size: 23px;
-    font-weight: 750;
-    line-height: 1.3;
-    font-variant-numeric: tabular-nums;
-    overflow-wrap: anywhere;
-  }
+  @include playground-stat;
 }
 .game-best {
-  background: rgb(var(--v-theme-support-surface));
-  strong {
-    color: rgb(var(--v-theme-support-accent));
-  }
+  @include playground-best;
 }
 .game-new {
   border: 1px solid rgb(var(--v-theme-surface-border));
@@ -933,15 +900,10 @@ button:disabled {
 }
 .game-primary,
 .game-secondary {
-  min-height: 44px;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 650;
+  @include playground-action;
 }
 .game-primary {
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
+  @include playground-primary;
 }
 .game-secondary {
   border: 1px solid rgb(var(--v-theme-surface-border));

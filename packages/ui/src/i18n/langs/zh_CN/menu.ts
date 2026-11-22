@@ -12,7 +12,7 @@ export default {
     playgroundBack: '返回游戏列表',
 
     playground: '打开游乐场',
-    playgroundError: '无法加载2048，请重试。',
+    playgroundError: '无法加载{game}，请重试。',
     back: '返回',
     darkTheme: '深色模式',
 

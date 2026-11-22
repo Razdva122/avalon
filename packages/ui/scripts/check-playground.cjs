@@ -67,7 +67,7 @@ const puppeteer = require('puppeteer');
         },
         { rows, extra },
       );
-    const open = async () => {
+    const openPicker = async () => {
       // An exiting menu scrim can still cover the header after its content is hidden.
       await page.waitForFunction(() => {
         const button = document.querySelector('.playground-launcher');
@@ -80,6 +80,9 @@ const puppeteer = require('puppeteer');
       await page.click('.playground-launcher');
       await page.waitForSelector('.playground-picker', { visible: true });
       await page.waitForFunction(() => document.activeElement === document.querySelector('.playground-game-2048'));
+    };
+    const open = async () => {
+      await openPicker();
       await page.locator('.playground-game-2048').click();
       await page.waitForSelector('.puzzle-2048-board', { visible: true });
       await page.waitForFunction(() => document.activeElement === document.querySelector('.puzzle-2048-board'));
@@ -97,8 +100,8 @@ const puppeteer = require('puppeteer');
     await page.goto(`${origin}/room/playground-preview/`, { waitUntil: 'networkidle0' });
     await page.waitForSelector('.playground-launcher');
     assert.ok(
-      !requests.some((url) => /playground-2048[.]/.test(url)),
-      '2048 JS and CSS must not be fetched before opening',
+      !requests.some((url) => /playground-(2048|excalibur)[.]/.test(url)),
+      'mini-game JS and CSS must not be fetched before opening',
     );
     assert.equal(
       await page.$('.header .playground-launcher'),
@@ -118,8 +121,30 @@ const puppeteer = require('puppeteer');
     await page.waitForSelector('.playground-picker', { visible: true });
     await page.waitForFunction(() => document.activeElement === document.querySelector('.playground-game-2048'));
     assert.equal(await page.$$('.playground-choice').then((nodes) => nodes.length), 3);
-    assert.equal(await page.$$('.playground-choice:disabled').then((nodes) => nodes.length), 2);
-    assert.ok(!requests.some((url) => /playground-2048[.]/.test(url)), 'opening the picker must not fetch 2048');
+    assert.equal(await page.$$('.playground-choice:disabled').then((nodes) => nodes.length), 1);
+    for (const choice of ['.playground-game-excalibur', '.playground-game-2048']) {
+      await page.hover(choice);
+      await page.waitForFunction(
+        (selector) => {
+          const artwork = document.querySelector(`${selector} .picker-game-icon`);
+          return new DOMMatrix(getComputedStyle(artwork).transform).m42 === -2;
+        },
+        { timeout: 2000 },
+        choice,
+      );
+    }
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    await page.hover('.playground-game-excalibur');
+    assert.equal(
+      await page.$eval('.picker-excalibur', (el) => getComputedStyle(el).transform),
+      'none',
+      'game icons stay still when reduced motion is requested',
+    );
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
+    assert.ok(
+      !requests.some((url) => /playground-(2048|excalibur)[.]/.test(url)),
+      'opening the picker must not fetch either game',
+    );
     assert.ok(!requests.some((url) => /runestone[.]/.test(url)), 'opening the picker must not fetch the stone texture');
     assert.ok(
       await page.$eval('.playground-picker', (panel) => panel.getBoundingClientRect().right < innerWidth / 2),
@@ -153,6 +178,7 @@ const puppeteer = require('puppeteer');
     assert.equal(await page.$('.puzzle-2048-board'), null, 'dismissed download must not leave a pending launch');
     await seed([[2, 2, 2, 2]]);
     await open();
+    assert.ok(!requests.some((url) => /playground-excalibur[.]/.test(url)), '2048 must not fetch Excalibur Jump');
     assert.ok(
       requests.some((url) => /playground-2048[.].*\.js/.test(url)),
       'opening must fetch game JS',
@@ -367,6 +393,7 @@ const puppeteer = require('puppeteer');
     await open();
     if (screenshotDir) await page.screenshot({ path: path.join(screenshotDir, '2048-mobile.png') });
     const lightBoardBackground = await page.$eval('.puzzle-2048-board', (el) => getComputedStyle(el).backgroundColor);
+    const lightPanelBackground = await page.$eval('.playground-panel', (el) => getComputedStyle(el).backgroundColor);
     await close();
     await page.click('.menu-trigger');
     await page.waitForSelector('.theme-switch', { visible: true });
@@ -430,14 +457,24 @@ const puppeteer = require('puppeteer');
     );
     if (screenshotDir) await page.screenshot({ path: path.join(screenshotDir, 'turn-notice-mobile.png') });
     await close();
+    assert.equal(
+      await page.$('.playground-launcher .playground-turn-dot'),
+      null,
+      'pending Avalon action does not mark the launcher when the playground is closed',
+    );
     await page.click('.playground-launcher');
-    await page.waitForSelector('.playground-picker .playground-turn-notice', { visible: true });
+    await page.waitForSelector('.playground-picker', { visible: true });
+    assert.equal(
+      await page.$('.playground-picker .playground-turn-notice'),
+      null,
+      'pending Avalon action does not show a notice in the game picker',
+    );
     assert.equal(
       await page.$eval('.playground-game-2048', (button) => button.disabled),
       false,
       '2048 can be opened while an action is pending',
     );
-    await page.locator('.playground-picker .playground-turn-return').click();
+    await page.locator('.playground-picker-close').click();
     await page.waitForSelector('.playground-picker', { hidden: true });
     await page.setViewport({ width: 1366, height: 768 });
     await open();
@@ -459,6 +496,115 @@ const puppeteer = require('puppeteer');
     await page.waitForSelector('.playground-turn-notice', { visible: true });
     await page.locator('.playground-panel .playground-turn-return').click();
     await page.waitForSelector('.playground-panel', { hidden: true });
+    await page.setViewport({ width: 390, height: 720 });
+    const spriteRequest = /\/img\/excalibur-(stone|lily|cracked|wood|wood-cracked|sword|rune)\.[a-f0-9]+\.webp/;
+    assert.ok(!requests.some((url) => spriteRequest.test(url)), 'Excalibur art is deferred until the game opens');
+    await page.locator('.playground-launcher').click();
+    await page.waitForFunction(() => document.activeElement === document.querySelector('.playground-game-2048'));
+    await page.locator('.playground-game-excalibur').click();
+    await page.waitForSelector('.jump-panel canvas', { visible: true });
+    assert.equal(
+      await page.$eval('.jump-panel', (el) => getComputedStyle(el).backgroundColor),
+      darkBackground,
+      'both mini-games use the same dark panel surface',
+    );
+    const nightLake = await page.$eval('.jump-backdrop', (el) => getComputedStyle(el).backgroundImage);
+    await page.waitForFunction(
+      (pattern) =>
+        new Set(
+          performance
+            .getEntriesByType('resource')
+            .filter((entry) => new RegExp(pattern).test(entry.name) && entry.decodedBodySize > 0)
+            .map((entry) => entry.name),
+        ).size === 7,
+      {},
+      spriteRequest.source,
+    );
+    assert.ok(requests.some((url) => /playground-excalibur[.].*\.js/.test(url)));
+    assert.equal(await page.$('.playground-turn-notice'), null, 'turn notices belong to 2048 only');
+    assert.ok(
+      await page.$eval('.jump-panel', (el) => el.scrollHeight - el.clientHeight <= 1),
+      'Excalibur controls fit a mobile viewport',
+    );
+    await page.locator('.jump-action').click();
+    assert.equal(await page.$eval('[data-jump-height]', (el) => Number(el.textContent)), 0);
+    await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 2 });
+    const jumpTouch = await page.$eval('.jump-panel canvas', (el) => {
+      const bounds = el.getBoundingClientRect();
+      return { x: bounds.left + bounds.width * 0.76, y: bounds.top + bounds.height * 0.6 };
+    });
+    await touch('touchStart', [jumpTouch]);
+    await new Promise((resolve) => setTimeout(resolve, 285));
+    await touch('touchEnd', []);
+    await page.waitForFunction(() => Number(document.querySelector('[data-jump-height]').textContent) > 2);
+    const initialHeight = await page.$eval('[data-jump-height]', (el) => Number(el.textContent));
+    await page.locator('.jump-hold').click();
+    const pausedHeight = await page.$eval('[data-jump-height]', (el) => Number(el.textContent));
+    assert.ok(pausedHeight >= initialHeight);
+    await page.locator('.jump-icon:first-child').click();
+    await page.waitForSelector('.playground-picker', { visible: true });
+    await page.waitForFunction(() => document.activeElement === document.querySelector('.playground-game-2048'));
+    await page.locator('.playground-game-excalibur').click();
+    await page.waitForSelector('.jump-action', { visible: true });
+    assert.equal(await page.$eval('.jump-action', (el) => el.textContent.trim()), 'Продолжить');
+    assert.equal(await page.$eval('[data-jump-height]', (el) => Number(el.textContent)), pausedHeight);
+    await page.locator('.jump-action').click();
+    await page.keyboard.down('ArrowLeft');
+    await page.waitForFunction(() => document.querySelector('.jump-action')?.textContent.trim() === 'Ещё раз');
+    await page.keyboard.up('ArrowLeft');
+    assert.ok((await page.evaluate(() => Number(localStorage.getItem('avalon.playground.excalibur-jump.best')))) > 0);
+    await page.locator('.jump-action').click();
+    await page.keyboard.down('ArrowRight');
+    await new Promise((resolve) => setTimeout(resolve, 285));
+    await page.keyboard.up('ArrowRight');
+    await page.waitForFunction(() => Number(document.querySelector('[data-jump-height]').textContent) >= 10);
+    assert.equal(await page.$('.jump-surge'), null, 'the opening screen cannot trigger a rune surge');
+    await page.locator('.jump-icon:last-child').click();
+    await page.waitForSelector('.jump-panel', { hidden: true });
+    await page.setViewport({ width: 812, height: 375, isMobile: true, hasTouch: true });
+    await page.locator('.playground-launcher').click();
+    await page.waitForFunction(() => document.activeElement === document.querySelector('.playground-game-2048'));
+    await page.locator('.playground-game-excalibur').click();
+    await page.waitForSelector('.jump-panel canvas', { visible: true });
+    assert.ok(
+      await page.$eval('.jump-panel', (el) => {
+        const controls = el.querySelector('.jump-controls').getBoundingClientRect();
+        const field = el.querySelector('canvas').getBoundingClientRect();
+        return el.scrollHeight - el.clientHeight <= 1 && controls.bottom <= innerHeight && controls.left > field.right;
+      }),
+      'playfield and controls fit a short landscape viewport together',
+    );
+    await page.locator('.jump-icon:last-child').click();
+    await page.waitForSelector('.jump-panel', { hidden: true });
+    await page.setViewport({ width: 390, height: 720, isMobile: true, hasTouch: true });
+    await page.locator('.menu-trigger').click();
+    await page.locator('.theme-switch').click();
+    await page.waitForFunction(() => document.querySelector('.theme-switch')?.getAttribute('aria-checked') === 'false');
+    await page.locator('.close-menu').click();
+    await page.waitForFunction(() => {
+      const menu = document.querySelector('.site-menu-overlay .v-overlay__content');
+      return !menu || getComputedStyle(menu).display === 'none';
+    });
+    await openPicker();
+    await page.locator('.playground-game-excalibur').click();
+    await page.waitForSelector('.jump-panel canvas', { visible: true });
+    assert.equal(
+      await page.$eval('.jump-panel', (el) => getComputedStyle(el).backgroundColor),
+      lightPanelBackground,
+      'both mini-games use the same light panel surface',
+    );
+    const dayLake = await page.$eval('.jump-backdrop', (el) => getComputedStyle(el).backgroundImage);
+    assert.notEqual(dayLake, nightLake, 'the lake art follows the app theme');
+    await page.waitForFunction(() =>
+      performance
+        .getEntriesByType('resource')
+        .some((entry) => /excalibur-lake-day[.]/.test(entry.name) && entry.decodedBodySize > 0),
+    );
+    await page.locator('.jump-icon:last-child').click();
+    await page.waitForSelector('.jump-panel', { hidden: true });
+    console.log(
+      'Excalibur Jump browser checks passed: on-demand art, native touch, landscape, delayed rune, resume and record.',
+    );
     fixture.room.game.players[0].features.waitForAction = false;
     fixture.io.emit('gameUpdated', fixture.room.game);
     // Storage can be denied in private contexts; play should remain available and honest about saving.

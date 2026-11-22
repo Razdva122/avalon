@@ -15,3 +15,12 @@ Generation prompt:
 > behind large numbers. Premium lightly weathered tabletop stone, not rubble.
 > No borders, bevels, carving, ornament, runes, text, objects or watermark.
 > Seamless edges; no large cracks or high-contrast shapes. Readable as stone at 80px.
+
+## Excalibur Jump sprites
+
+The stone ledges, lily, sword, and rune were made with ImageGen and exported as
+transparent WebP sprites. The game aligns each platform's painted surface with
+its collision plane and loads the sprites on demand.
+
+`excalibur-lake-day.webp` and `excalibur-lake.webp` are the daybreak and
+moonlit versions of the same scene. Excalibur Jump selects one with the Avalon theme.
