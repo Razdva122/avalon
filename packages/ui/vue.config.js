@@ -35,6 +35,13 @@ module.exports = defineConfig({
     },
   },
   chainWebpack: (config) => {
+    if (process.env.NODE_ENV === 'production') {
+      config.optimization.minimizer('terser').tap((args) => {
+        // Fold redundant variables to keep the prerendered startup bundles within budget.
+        args[0].terserOptions.compress.reduce_vars = true;
+        return args;
+      });
+    }
     config.plugin('locale-generation').use(LocaleGenerationPlugin);
     // Keep images out of JavaScript and give every image a cacheable file URL.
     config.module.rule('images').type('asset/resource').set('generator', imageAssets);
