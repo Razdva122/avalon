@@ -122,12 +122,14 @@ const puppeteer = require('puppeteer');
     await page.waitForFunction(() => document.activeElement === document.querySelector('.playground-game-2048'));
     assert.equal(await page.$$('.playground-choice').then((nodes) => nodes.length), 3);
     assert.equal(await page.$$('.playground-choice:disabled').then((nodes) => nodes.length), 1);
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
     for (const choice of ['.playground-game-excalibur', '.playground-game-2048']) {
       await page.hover(choice);
       await page.waitForFunction(
         (selector) => {
           const artwork = document.querySelector(`${selector} .picker-game-icon`);
-          return new DOMMatrix(getComputedStyle(artwork).transform).m42 === -2;
+          const expected = matchMedia('(hover: hover) and (pointer: fine)').matches ? -2 : 0;
+          return Math.abs(new DOMMatrix(getComputedStyle(artwork).transform).m42 - expected) < 0.01;
         },
         { timeout: 2000 },
         choice,
