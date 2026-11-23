@@ -195,3 +195,95 @@ test('Evil can choose either vote and either self-inclusive roster after conside
     }
   }
 });
+
+test.each([true, false])(
+  'undercover Evil avoids contradicting its own account of the first failure (discussion=%s)',
+  async (publicDiscussion) => {
+    const input = request();
+    const firstMission = input.state.history.find((event) => event.type === 'mission')!;
+    input.playerID = '4';
+    input.state.players.find((player) => player.id === '4')!.role = 'morgana';
+    input.state.players.find((player) => player.id === '2')!.role = 'evil';
+    input.state.stage = 'selectTeam';
+    input.state.mission = 1;
+    input.state.vote = publicDiscussion ? 0 : 1;
+    const actions = [{ playerID: '4', value: 'fail' as const }, { playerID: '6' }];
+    input.state.history = [{ ...firstMission, hidden: false, result: 'fail', leaderID: '4', fails: 1, actions }];
+    input.publicDiscussion = publicDiscussion;
+    input.speak = true;
+    input.choices = ['2, 5, 6', '1, 2, 5', '1, 3, 5'];
+
+    let offeredChoices: string[] = [];
+    const decide = decisionPipeline(async (turn, options) => {
+      offeredChoices = turn.choices;
+      expect(options.context).toMatchObject({ choices: turn.choices });
+      return { choice: 0, speech: 'This team can sabotage.', publicReason: '5, I would bring 1 and 2 with you.' };
+    });
+    expect((await decide(input)).choice).toBe(1);
+    expect(offeredChoices).toEqual(['1, 2, 5', '1, 3, 5']);
+    expect(publicContext(input, '1, 2, 5')).not.toHaveProperty('coverConflicts');
+
+    if (!publicDiscussion) {
+      const repair = decisionPipeline(async (_turn, options) => {
+        if (options.phase === 'decision') return { choice: 0, speech: '', publicReason: '' };
+        expect(options.phase).toBe('decision-repair');
+        expect(options.context).toMatchObject({ selectedChoice: '1, 2, 5', choices: ['1, 2, 5', '1, 3, 5'] });
+        return { choice: 0, speech: '', publicReason: '5, I would bring 1 and 2 with you.' };
+      });
+      expect((await repair(input)).choice).toBe(1);
+    }
+
+    const failedMission = input.state.history[0];
+    const afterLady = {
+      ...input,
+      state: {
+        ...input.state,
+        history: [
+          failedMission,
+          { type: 'announceLoyalty' as const, announcerID: '5', targetID: '6', announced: 'good' as const },
+        ],
+      },
+    };
+    const afterLadyDecision = decisionPipeline(async (turn, options) => {
+      expect(turn.choices).toEqual(['1, 2, 5', '1, 3, 5']);
+      expect(options.context).toMatchObject({ coverConflicts: [{ seat: 6, mission: 1, laterLadyGoodBy: 5 }] });
+      expect(options.instructions).toContain('explicitly dispute the announcement');
+      return {
+        choice: 0,
+        speech: '',
+        publicReason: '5, I dispute your Lady report: 6 played the Fail on our mission.',
+      };
+    });
+    expect(await afterLadyDecision(afterLady)).toMatchObject({
+      choice: 1,
+      speech: '5, I dispute your Lady report: 6 played the Fail on our mission.',
+    });
+    for (const result of ['fail', 'success'] as const) {
+      const additionalMissions = result === 'fail' ? 1 : 2;
+      const history = Array.from({ length: additionalMissions }, (_, index) => ({
+        ...firstMission,
+        hidden: false as const,
+        index: index + 1,
+        result,
+        fails: result === 'fail' ? 1 : 0,
+      }));
+      expect(
+        (
+          await afterLadyDecision({
+            ...afterLady,
+            state: { ...afterLady.state, history: [failedMission, ...history, ...afterLady.state.history.slice(1)] },
+          })
+        ).choice,
+      ).toBe(1);
+    }
+
+    const scenarios = [
+      { ...input, choices: ['2, 5, 6', '1, 3, 5'] },
+      { ...input, state: { ...input.state, vote: 4 } },
+    ];
+    for (const turn of scenarios) {
+      expect((await decide(turn)).choice).toBe(0);
+      expect(offeredChoices).toEqual(turn.choices);
+    }
+  },
+);

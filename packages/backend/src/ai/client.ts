@@ -117,6 +117,8 @@ export const evilVoteCoverAdvice =
   'Before voting from off the team, compare approving now with rejecting and the reachable next or forced roster. When an ally is on the team, identify what this approval gains over that alternative and what the table can already see in your votes. If approval repeats selective support without a distinguishing public fact, favor rejection when there is a viable alternative for Evil and your exposedEvil plan does not call for that signal. A single Fail card still matters: approve when a defensible public case and concrete tactical gain justify it, or when it is your best realistic chance to win now or prevent the decisive Good success. When you are on the team, account for your own access to sabotage and the future value of cover. Use the actual Fail threshold and never assume an ally will play Fail.';
 
 export const evilRosterCoverAdvice =
+  'For any proposal that needs a vote, including at a decisive score, assess whether the exact roster can realistically reach approvalsRequired before counting its access to Fail cards. Use recorded votes and objections to identify persuadable seats. A player asking for a place or proposing their own roster is not a promise to approve a different roster. Known Evil can choose their cards independently. An obvious contradiction in your public case can cost votes and expose you and your allies even if the roster is rejected. Prefer a publicly defensible alternative with a realistic path to approval and comparable sabotage access. An automatic fifth proposal needs no approval. ' +
+  'Until you publicly admit Evil through admitEvil, keep your public account consistent with being Good. coverConflicts identifies former teammates who must have played Fail under that account, with the mission number. Wanting a seat or promising a vote cannot change that deduction. If laterLadyGoodBy names an announcer, their Good report conflicts with that account. If you argue about that target or report in publicReason, explicitly dispute the announcement, identify the announcer and explain the Fail count from your public Good viewpoint. Disputing a report does not by itself prove the announcer Evil. You can focus on a different subject without endorsing the report. A tactical need may justify choosing a risky roster, but must not make you describe the target as cleared. Once you have openly admitted Evil, follow your exposed plan. Keep private knowledge and your actual card out of publicReason. ' +
   'Before selecting a roster with yourself on it, identify the strongest legal option also including your known ally and compare it with your best option without them. Your own access to a Fail is identical in both. If neither side has two points and the team with your ally has a credible path to approval, give weight to playing together: routine separation makes the seats everyone accepts easier to clear. When you have repeatedly left this ally out, favor including them now if the public case is comparable. A generic fear of being seen together, an untested ally, or an earlier tentative suggestion is not a concrete reason to exclude them. Use actual objections, mission evidence and recorded votes to distinguish the complete rosters. If both remain comparably credible and neither has a concrete strategic advantage, use privateTieBreakOrder to decide between them when available: prefer the team containing the earliest seat in that order that belongs to only one of the two teams. A real approval advantage, risk of exposure based on the public record, or an advantage in reaching the required Fail count overrides the order. Preserve decisive wins, established exposedEvil plans and the fifth-proposal rule. Keep the order and the comparison private.';
 
 export const evilVisibilityAdvice =
@@ -339,6 +341,34 @@ export function compactRequest(request: BotRequest) {
     };
   });
   const checks = history.filter((e) => e.type === 'announceLoyalty');
+  const coverConflicts =
+    own && side === 'evil' && state.stage === 'selectTeam'
+      ? history.flatMap((event, index) => {
+          if (
+            event.type !== 'mission' ||
+            event.result !== 'fail' ||
+            !excludesMissionPartners({ team: event.actions, fails: event.fails }) ||
+            event.excludedPlayerID ||
+            event.actions.some((action) => action.switchedBy || action.discarded) ||
+            !event.actions.some((action) => action.playerID === own.id)
+          )
+            return [];
+          return event.actions
+            .filter((action) => action.playerID !== own.id)
+            .map(({ playerID }) => {
+              const announcement = history
+                .slice(index + 1)
+                .filter((entry) => entry.type === 'announceLoyalty')
+                .filter((entry) => entry.targetID === playerID)
+                .pop();
+              return {
+                seat: seat(playerID),
+                mission: event.index + 1,
+                laterLadyGoodBy: announcement?.announced === 'good' ? seat(announcement.announcerID) : undefined,
+              };
+            });
+        })
+      : [];
   if (own?.role === 'merlin' && state.stage === 'votingForTeam') {
     ownRoleAdvice +=
       missions.filter((mission) => mission.result === 'fail').length < 2
@@ -411,6 +441,7 @@ export function compactRequest(request: BotRequest) {
     },
     proposal: voting ? proposal : undefined,
     allianceCover: allianceCover.length ? allianceCover : undefined,
+    coverConflicts: coverConflicts.length ? coverConflicts : undefined,
     lady: inspection
       ? {
           afterMission: lastCompletedMission,

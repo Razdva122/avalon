@@ -492,7 +492,6 @@ export function decisionPipeline(generate: Generate): Decide {
         return { choice, speech: '' };
       }
       const finalReview = request.state.stage === 'end';
-      const decisionRequest = request;
       const requiresExplanation =
         request.speak && request.state.stage === 'selectTeam' && request.state.vote > 0 && !request.publicDiscussion;
       const councilTarget =
@@ -501,7 +500,31 @@ export function decisionPipeline(generate: Generate): Decide {
           : undefined;
       const changedTarget = (reply: BotReply) =>
         Boolean(councilTarget && councilTarget !== request.choices[reply.choice]);
-      const { missions, votes, tableConventions, requiredClaimStances, ...facts } = compactRequest(decisionRequest);
+      const { missions, votes, tableConventions, requiredClaimStances, ...facts } = compactRequest(request);
+      let decisionRequest = request;
+      const conflicts = facts.coverConflicts;
+      const failsRequired = facts.actionFacts?.failsRequired;
+      if (own && conflicts?.length && failsRequired && request.state.vote < 4 && !exposedEvil.has(request.playerID)) {
+        const knownEvil = new Set([own.index, ...(facts.allianceCover || []).map(({ ally }) => ally)]);
+        const rosters = request.choices.map((choice) => {
+          const team = choice.split(',').map(Number);
+          return {
+            choice,
+            conflicts: conflicts.some(({ seat }) => seat !== undefined && team.includes(seat)),
+            sabotage: Math.min(failsRequired, team.filter((seat) => knownEvil.has(seat)).length),
+          };
+        });
+        const bestWithoutConflict = Math.max(
+          -1,
+          ...rosters.filter((team) => !team.conflicts).map((team) => team.sabotage),
+        );
+        decisionRequest = {
+          ...request,
+          choices: rosters
+            .filter((team) => !team.conflicts || team.sabotage > bestWithoutConflict)
+            .map(({ choice }) => choice),
+        };
+      }
       let priority: number[] | undefined;
       if (own && (isOpeningPair(request) || (request.state.stage === 'selectTeam' && facts.allianceCover))) {
         priority = rosterPriorities.get(request.playerID);
@@ -513,6 +536,7 @@ export function decisionPipeline(generate: Generate): Decide {
       // Private generation context only: never add preferences to public room facts.
       const current = {
         ...facts,
+        choices: decisionRequest.choices,
         ...(priority ? { privateTieBreakOrder: [...priority] } : {}),
         publicEvilAdmissions: request.state.players.filter((p) => exposedEvil.has(p.id)).map((p) => p.index),
         ...(exposedEvil.has(request.playerID)
@@ -588,7 +612,7 @@ export function decisionPipeline(generate: Generate): Decide {
                   }))
                 : evidence.get(request.playerID) || [],
               inconsistentReply: reply,
-              selectedChoice: request.choices[reply.choice],
+              selectedChoice: decisionRequest.choices[reply.choice],
             },
           },
           signal,
@@ -597,7 +621,7 @@ export function decisionPipeline(generate: Generate): Decide {
         if (contradictsRoster(decisionRequest, reply))
           throw new AiTechnicalPause('Decision and explained roster disagree.');
       }
-      const choice = request.choices[reply.choice];
+      const choice = decisionRequest.choices[reply.choice];
       if (choice === undefined) throw new AiTechnicalPause('Invalid private decision.');
       if (!finalReview) validateClaims(request, reply);
       const nextExposure = finalReview
@@ -644,7 +668,7 @@ export function decisionPipeline(generate: Generate): Decide {
             team: current.actionFacts?.team,
             knowledge: current.privateKnowledge,
             choice,
-            legalChoices: [...request.choices],
+            legalChoices: [...decisionRequest.choices],
             reason: reply.speech.slice(0, 240),
             publicStatement: speech.slice(0, 500),
             speechRules: {
