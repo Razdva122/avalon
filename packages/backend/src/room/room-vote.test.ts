@@ -52,6 +52,8 @@ describe.each([5, 6, 7, 8, 9, 10])('%i players', (n) => {
     room.makeVote(String(required), true);
     expect(endSpy).toHaveBeenCalledTimes(1);
     expect(room.vote).toBeUndefined();
+    expect(() => room.makeVote(String(required + 1), true)).toThrow();
+    expect(endSpy).toHaveBeenCalledTimes(1);
   });
 
   test('vote is cancelled when enough no votes make majority impossible', () => {
