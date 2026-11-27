@@ -180,9 +180,13 @@ export default defineComponent({
       socket.emit('startGame', roomState.value.roomID);
     };
 
-    const onCopyClick = () => {
-      navigator.clipboard.writeText(neutralRoomUrl(window.location.href));
-      eventBus.emit('infoMessage', t('infoMessage.linkCopied'));
+    const onCopyClick = async () => {
+      try {
+        await navigator.clipboard.writeText(neutralRoomUrl(window.location.href));
+        eventBus.emit('infoMessage', t('infoMessage.linkCopied'));
+      } catch {
+        eventBus.emit('infoMessage', t('infoMessage.linkCopyFailed'));
+      }
     };
 
     return {

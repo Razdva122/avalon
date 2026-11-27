@@ -49,6 +49,7 @@ export default {
     waitForAction: '游戏更新了!我们正在等待您的行动',
     loginToJoin: '登入加入游戏',
     linkCopied: '连结已复制到剪贴簿',
+    linkCopyFailed: '复制链接失败，请从地址栏复制。',
     loginToCreate: '登入创建游戏',
     close: '关闭',
     loginChanged: '账号已更改',
