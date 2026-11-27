@@ -49,6 +49,7 @@ export default {
     waitForAction: 'O jogo foi atualizado! Estamos esperando sua ação',
     loginToJoin: 'Faça login para entrar no jogo',
     linkCopied: 'Link foi copiado para a área de transferência',
+    linkCopyFailed: 'Não foi possível copiar o link. Copie-o da barra de endereços.',
     loginToCreate: 'Faça login para criar um jogo',
     close: 'Fechar',
     loginChanged: 'Login alterado',

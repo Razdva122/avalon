@@ -49,6 +49,7 @@ export default {
     waitForAction: '¡El juego se ha actualizado! Estamos esperando tu acción',
     loginToJoin: 'Inicia sesión para unirte al juego',
     linkCopied: 'El enlace ha sido copiado al portapapeles',
+    linkCopyFailed: 'No se pudo copiar el enlace. Cópialo desde la barra de direcciones.',
     loginToCreate: 'Inicia sesión para crear un juego',
     close: 'Cerrar',
     loginChanged: 'Usuario cambiado',

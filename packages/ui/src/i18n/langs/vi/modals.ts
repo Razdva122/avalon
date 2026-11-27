@@ -45,6 +45,7 @@ export default {
     waitForAction: 'Ván chơi đã cập nhật! Đang chờ bạn hành động',
     loginToJoin: 'Đăng nhập để tham gia ván chơi',
     linkCopied: 'Đã sao chép liên kết vào bảng nhớ tạm',
+    linkCopyFailed: 'Không thể sao chép liên kết. Hãy sao chép từ thanh địa chỉ.',
     loginToCreate: 'Đăng nhập để tạo ván chơi',
     close: 'Đóng',
     loginChanged: 'Đã đổi tên đăng nhập',
