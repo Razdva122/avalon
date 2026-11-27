@@ -68,16 +68,22 @@ describe.each([5, 6, 7, 8, 9, 10])('%i players', (n) => {
     room.makeVote(String(noNeeded), false);
     expect(room.vote).toBeUndefined();
   });
-});
 
-test('restart is emitted exactly once', () => {
-  const room = startedRoom(5);
-  const emit = jest.spyOn(eventBus, 'emit');
-  room.startVoteFor('endAndRestartGame');
-  ['1', '2', '3'].forEach((id) => room.makeVote(id, true));
-  // The third yes already closed the vote, so a late vote must not trigger a second restart.
-  expect(() => room.makeVote('4', true)).toThrow();
-  expect(emit.mock.calls.filter(([e]) => e === 'restartRoom')).toHaveLength(1);
+  test('restart fires only when yes reaches required, and only once', () => {
+    const room = startedRoom(n);
+    const emit = jest.spyOn(eventBus, 'emit');
+    const restartCalls = () => emit.mock.calls.filter(([e]) => e === 'restartRoom').length;
+    room.startVoteFor('endAndRestartGame');
+    ids(n)
+      .slice(0, required - 1)
+      .forEach((id) => room.makeVote(id, true));
+    expect(restartCalls()).toBe(0);
+    room.makeVote(String(required), true);
+    expect(restartCalls()).toBe(1);
+    // The vote closed at the majority, so a late vote must not trigger a second restart.
+    expect(() => room.makeVote(String(required + 1), true)).toThrow();
+    expect(restartCalls()).toBe(1);
+  });
 });
 
 test('cannot start second vote or vote after game ended', () => {
