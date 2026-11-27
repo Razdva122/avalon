@@ -13,11 +13,14 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { socket } from '@/api/socket';
 import eventBus from '@/helpers/event-bus';
+import { serverErrorKey } from '@/helpers/socket-errors';
 
 export default defineComponent({
   setup() {
+    const { t, te } = useI18n();
     const snackbar = ref<boolean>(false);
     const text = ref<string>('');
 
@@ -28,7 +31,7 @@ export default defineComponent({
 
     socket.on('serverError', (error) => {
       snackbar.value = true;
-      text.value = `Server error: ${error}`;
+      text.value = t(serverErrorKey(error, (key) => te(key)));
     });
 
     return {
