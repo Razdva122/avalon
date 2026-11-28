@@ -45,7 +45,7 @@ function mountSnackbar(locale = 'en') {
   };
 }
 
-test('server error codes sent by the backend have translations in every locale', () => {
+test('standard socket error codes have translations in every locale', () => {
   for (const locale of locales)
     for (const code of serverCodes)
       assert.equal(typeof messages[locale].errors[code], 'string', `missing errors.${code} in ${locale}`);
@@ -58,7 +58,7 @@ test('rate limit server errors show the existing translation instead of the code
   assert.equal(snackbar.state.text.value, 'Too many requests. Please wait and try again.');
 });
 
-test('known server error codes are translated in the current locale', () => {
+test('standard socket error codes are translated in the current locale', () => {
   for (const locale of locales) {
     const snackbar = mountSnackbar(locale);
     for (const code of serverCodes) {
@@ -80,11 +80,23 @@ test('changing the language translates later server errors in the new language',
 test('unknown or malformed server errors fall back to a generic message without exposing details', () => {
   for (const locale of locales) {
     const snackbar = mountSnackbar(locale);
-    for (const error of ['unknownCode', 'internal.stack', '', undefined, null, 123, {}, ['rateLimited']]) {
+    for (const error of [
+      'invalidMessage',
+      'notInRoom',
+      'failed',
+      'unknownCode',
+      'internal.stack',
+      '',
+      undefined,
+      null,
+      123,
+      {},
+      ['rateLimited'],
+    ]) {
       snackbar.serverError(error);
       assert.equal(snackbar.state.snackbar.value, true);
       assert.equal(snackbar.state.text.value, messages[locale].errors.requestFailed, `${locale} ${String(error)}`);
-      assert.doesNotMatch(snackbar.state.text.value, /Server error|unknownCode|internal/);
+      assert.doesNotMatch(snackbar.state.text.value, /Server error|invalidMessage|notInRoom|unknownCode|internal/);
     }
   }
 });
